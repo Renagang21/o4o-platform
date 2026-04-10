@@ -6,7 +6,7 @@
  * 공통 /api/v1/forum/operator/* API 사용 (forumOperatorApi)
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   FileCheck,
   Search,
@@ -102,9 +102,14 @@ export default function ForumManagementPage() {
   const [categories, setCategories] = useState<CategoryData[]>([]);
   const [isCatsLoading, setIsCatsLoading] = useState(false);
   const [catSearch, setCatSearch] = useState('');
+  const [catStatusFilter, setCatStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [deactivateTarget, setDeactivateTarget] = useState<CategoryData | null>(null);
   const [deactivateReason, setDeactivateReason] = useState('');
   const [isDeactivating, setIsDeactivating] = useState(false);
+
+  // ── WO-KPA-A-OPERATOR-FORUM-MANAGEMENT-DATATABLE-BULK-ACTION-V1 ──
+  const [selectedCatIds, setSelectedCatIds] = useState<Set<string>>(new Set());
+  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
 
   // ── Hard delete 모달 (WO-KPA-A-OPERATOR-FORUM-HARD-DELETE-SAFE-GUARD-V1) ──
   interface DeleteCheckData {
@@ -214,10 +219,135 @@ export default function ForumManagementPage() {
     }
   };
 
-  const filteredCategories = categories.filter((c) => {
+  const filteredCategories = useMemo(() => categories.filter((c) => {
     const q = catSearch.toLowerCase();
-    return c.name.toLowerCase().includes(q) || (c.creatorName || '').toLowerCase().includes(q);
-  });
+    const matchesSearch = c.name.toLowerCase().includes(q) || (c.creatorName || '').toLowerCase().includes(q);
+    const matchesStatus = catStatusFilter === 'all'
+      || (catStatusFilter === 'active' && c.isActive)
+      || (catStatusFilter === 'inactive' && !c.isActive);
+    return matchesSearch && matchesStatus;
+  }), [categories, catSearch, catStatusFilter]);
+
+  // Reset selection on filter change
+  useEffect(() => { setSelectedCatIds(new Set()); }, [catSearch, catStatusFilter]);
+
+  const toggleSelectCat = useCallback((id: string) => {
+    setSelectedCatIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const allCatsSelected = filteredCategories.length > 0 && filteredCategories.every((c) => selectedCatIds.has(c.id));
+  const someCatsSelected = filteredCategories.some((c) => selectedCatIds.has(c.id));
+
+  const toggleSelectAllCats = useCallback(() => {
+    if (allCatsSelected) {
+      setSelectedCatIds(new Set());
+    } else {
+      setSelectedCatIds(new Set(filteredCategories.map((c) => c.id)));
+    }
+  }, [allCatsSelected, filteredCategories]);
+
+  // ── Bulk soft delete (비활성화): 선택된 활성 포럼만 대상 ──
+  const handleBulkSoftDelete = async () => {
+    const targets = filteredCategories.filter((c) => selectedCatIds.has(c.id) && c.isActive);
+    if (targets.length === 0) {
+      toast.error('비활성화할 수 있는 활성 포럼이 없습니다');
+      return;
+    }
+    const reason = prompt(`선택한 ${targets.length}개 활성 포럼을 비활성화합니다.\n사유를 입력하세요:`);
+    if (!reason?.trim()) return;
+    if (!confirm(`${targets.length}개 포럼을 비활성화합니다. 진행하시겠습니까?`)) return;
+
+    setIsBulkProcessing(true);
+    let success = 0;
+    let failed = 0;
+    const failedNames: string[] = [];
+
+    for (const cat of targets) {
+      try {
+        const result = await forumOperatorApi.directDeactivate(cat.id, { reason: reason.trim() });
+        if (result.success) success++;
+        else { failed++; failedNames.push(cat.name); }
+      } catch {
+        failed++; failedNames.push(cat.name);
+      }
+    }
+
+    if (failed === 0) {
+      toast.success(`${success}개 포럼 비활성화 완료`);
+    } else {
+      toast.error(`${success}건 성공, ${failed}건 실패${failedNames.length > 0 ? ` (${failedNames.join(', ')})` : ''}`);
+    }
+    setSelectedCatIds(new Set());
+    loadCategories();
+    setIsBulkProcessing(false);
+  };
+
+  // ── Bulk hard delete (완전 삭제): 선택된 비활성 포럼만 대상 ──
+  const handleBulkHardDelete = async () => {
+    const targets = filteredCategories.filter((c) => selectedCatIds.has(c.id) && !c.isActive);
+    if (targets.length === 0) {
+      toast.error('완전 삭제할 수 있는 비활성 포럼이 없습니다');
+      return;
+    }
+    const reason = prompt(`선택한 ${targets.length}개 비활성 포럼을 완전 삭제합니다.\n삭제 사유를 입력하세요 (복구 불가):`);
+    if (!reason?.trim()) return;
+    if (!confirm(`${targets.length}개 포럼을 영구 삭제합니다.\n이 작업은 복구할 수 없습니다. 진행하시겠습니까?`)) return;
+
+    setIsBulkProcessing(true);
+    let success = 0;
+    let blocked = 0;
+    let failed = 0;
+    const blockedItems: Array<{ name: string; reasons: string[] }> = [];
+
+    for (const cat of targets) {
+      try {
+        // 1) delete-check
+        const check = await forumOperatorApi.getDeleteCheck(cat.id);
+        if (!check.data?.hardDeleteAllowed) {
+          blocked++;
+          blockedItems.push({ name: cat.name, reasons: check.data?.blockedReasons || ['삭제 불가'] });
+          continue;
+        }
+        // 2) hard delete
+        const result = await forumOperatorApi.hardDelete(cat.id, { reason: reason.trim() });
+        if (result.success) success++;
+        else { failed++; }
+      } catch {
+        failed++;
+      }
+    }
+
+    if (success > 0 && blocked === 0 && failed === 0) {
+      toast.success(`${success}개 포럼 영구 삭제 완료`);
+    } else {
+      const parts: string[] = [];
+      if (success > 0) parts.push(`${success}건 삭제`);
+      if (blocked > 0) parts.push(`${blocked}건 차단`);
+      if (failed > 0) parts.push(`${failed}건 실패`);
+      const detail = blockedItems.map((b) => `${b.name}: ${b.reasons.join(', ')}`).join('\n');
+      if (blocked > 0) {
+        alert(`처리 결과: ${parts.join(', ')}\n\n차단 사유:\n${detail}`);
+      }
+      toast.success(parts.join(', '));
+    }
+    setSelectedCatIds(new Set());
+    loadCategories();
+    setIsBulkProcessing(false);
+  };
+
+  const selectedActiveCount = useMemo(() =>
+    filteredCategories.filter((c) => selectedCatIds.has(c.id) && c.isActive).length,
+    [filteredCategories, selectedCatIds],
+  );
+  const selectedInactiveCount = useMemo(() =>
+    filteredCategories.filter((c) => selectedCatIds.has(c.id) && !c.isActive).length,
+    [filteredCategories, selectedCatIds],
+  );
 
   const filteredRequests = requests.filter((r) => {
     const q = searchQuery.toLowerCase();
@@ -522,7 +652,7 @@ export default function ForumManagementPage() {
       )}
       </>)}
 
-      {/* ── Tab: 포럼 목록 (WO-KPA-A-OPERATOR-FORUM-DIRECT-SOFT-DELETE-V1) ── */}
+      {/* ── Tab: 포럼 목록 (WO-KPA-A-OPERATOR-FORUM-MANAGEMENT-DATATABLE-BULK-ACTION-V1) ── */}
       {activeTab === 'categories' && (
         <>
           {isCatsLoading ? (
@@ -532,56 +662,130 @@ export default function ForumManagementPage() {
             </div>
           ) : (
             <>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                <input
-                  type="text"
-                  placeholder="포럼명 또는 개설자 검색..."
-                  value={catSearch}
-                  onChange={(e) => setCatSearch(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+              {/* 검색 + 상태 필터 */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="포럼명 또는 개설자 검색..."
+                    value={catSearch}
+                    onChange={(e) => setCatSearch(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div className="relative">
+                  <select
+                    value={catStatusFilter}
+                    onChange={(e) => setCatStatusFilter(e.target.value as 'all' | 'active' | 'inactive')}
+                    className="pl-4 pr-8 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white text-sm"
+                  >
+                    <option value="all">모든 상태</option>
+                    <option value="active">활성</option>
+                    <option value="inactive">비활성</option>
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                </div>
               </div>
 
+              {/* Bulk Action Bar */}
+              {selectedCatIds.size > 0 && (
+                <div className="flex items-center gap-3 px-4 py-2.5 bg-blue-50 border border-blue-200 rounded-lg">
+                  <span className="text-sm text-blue-700 font-medium">{selectedCatIds.size}개 선택</span>
+                  <div className="h-4 w-px bg-blue-200" />
+                  {selectedActiveCount > 0 && (
+                    <button
+                      onClick={handleBulkSoftDelete}
+                      disabled={isBulkProcessing}
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-amber-600 hover:bg-amber-700 rounded disabled:opacity-50 transition-colors"
+                    >
+                      {isBulkProcessing ? <Spinner className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                      비활성화 ({selectedActiveCount})
+                    </button>
+                  )}
+                  {selectedInactiveCount > 0 && (
+                    <button
+                      onClick={handleBulkHardDelete}
+                      disabled={isBulkProcessing}
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-rose-600 hover:bg-rose-700 rounded disabled:opacity-50 transition-colors"
+                    >
+                      {isBulkProcessing ? <Spinner className="w-3.5 h-3.5 animate-spin" /> : <AlertOctagon className="w-3.5 h-3.5" />}
+                      완전 삭제 ({selectedInactiveCount})
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setSelectedCatIds(new Set())}
+                    className="ml-auto text-sm text-slate-500 hover:text-slate-700"
+                  >
+                    선택 해제
+                  </button>
+                </div>
+              )}
+
+              {/* DataTable */}
               <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
                 <table className="w-full">
                   <thead className="bg-slate-50 border-b border-slate-200">
                     <tr>
-                      <th className="px-6 py-3 text-left text-sm font-medium text-slate-600">포럼명</th>
-                      <th className="px-6 py-3 text-left text-sm font-medium text-slate-600">개설자</th>
-                      <th className="px-6 py-3 text-left text-sm font-medium text-slate-600">게시글</th>
-                      <th className="px-6 py-3 text-left text-sm font-medium text-slate-600">상태</th>
-                      <th className="px-6 py-3 text-right text-sm font-medium text-slate-600">작업</th>
+                      <th className="px-3 py-3 w-10">
+                        <input
+                          type="checkbox"
+                          checked={allCatsSelected}
+                          ref={(el) => { if (el) el.indeterminate = !allCatsSelected && someCatsSelected; }}
+                          onChange={toggleSelectAllCats}
+                          disabled={filteredCategories.length === 0}
+                          className="w-4 h-4 accent-blue-600 cursor-pointer disabled:opacity-30"
+                        />
+                      </th>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-slate-600">포럼명</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-slate-600">개설자</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-slate-600">게시글</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-slate-600">상태</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-slate-600">생성일</th>
+                      <th className="px-4 py-3 text-right text-sm font-medium text-slate-600">작업</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {filteredCategories.map((cat) => (
-                      <tr key={cat.id} className={`hover:bg-slate-50 ${!cat.isActive ? 'opacity-50' : ''}`}>
-                        <td className="px-6 py-4">
+                      <tr key={cat.id} className={`hover:bg-slate-50 ${!cat.isActive ? 'bg-slate-50/50' : ''}`}>
+                        <td className="px-3 py-3">
+                          <input
+                            type="checkbox"
+                            checked={selectedCatIds.has(cat.id)}
+                            onChange={() => toggleSelectCat(cat.id)}
+                            className="w-4 h-4 accent-blue-600 cursor-pointer"
+                          />
+                        </td>
+                        <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
-                            <span className="font-medium text-slate-800">{cat.name}</span>
+                            <span className={`font-medium ${cat.isActive ? 'text-slate-800' : 'text-slate-500'}`}>{cat.name}</span>
                             {cat.forumType === 'closed' ? (
                               <span className="px-1.5 py-0.5 text-xs font-medium rounded bg-slate-100 text-slate-600">비공개</span>
                             ) : (
                               <span className="px-1.5 py-0.5 text-xs font-medium rounded bg-blue-50 text-blue-600">공개</span>
                             )}
                           </div>
-                          <div className="text-sm text-slate-400 line-clamp-1">{cat.description}</div>
+                          {cat.description && (
+                            <div className="text-sm text-slate-400 line-clamp-1 mt-0.5">{cat.description}</div>
+                          )}
                         </td>
-                        <td className="px-6 py-4 text-sm text-slate-600">
+                        <td className="px-4 py-3 text-sm text-slate-600">
                           {cat.creatorName || '-'}
                         </td>
-                        <td className="px-6 py-4 text-sm text-slate-600">
+                        <td className="px-4 py-3 text-sm text-slate-600">
                           {cat.postCount}
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-4 py-3">
                           {cat.isActive ? (
                             <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700">활성</span>
                           ) : (
                             <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-slate-100 text-slate-500">비활성</span>
                           )}
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-4 py-3 text-sm text-slate-500">
+                          {formatDate(cat.createdAt)}
+                        </td>
+                        <td className="px-4 py-3">
                           <div className="flex justify-end gap-1">
                             {cat.isActive && (
                               <button
@@ -615,9 +819,20 @@ export default function ForumManagementPage() {
                       <List className="w-8 h-8 text-slate-400" />
                     </div>
                     <h3 className="mt-4 text-lg font-medium text-slate-800">포럼이 없습니다</h3>
-                    <p className="mt-2 text-slate-500">승인된 포럼이 여기에 표시됩니다</p>
+                    <p className="mt-2 text-slate-500">
+                      {catStatusFilter !== 'all' ? '조건에 맞는 포럼이 없습니다' : '승인된 포럼이 여기에 표시됩니다'}
+                    </p>
                   </div>
                 )}
+              </div>
+
+              {/* 목록 하단 요약 */}
+              <div className="flex items-center justify-between text-sm text-slate-500">
+                <span>총 {filteredCategories.length}개 포럼</span>
+                <span>
+                  활성 {categories.filter((c) => c.isActive).length} /
+                  비활성 {categories.filter((c) => !c.isActive).length}
+                </span>
               </div>
             </>
           )}
