@@ -22,7 +22,7 @@ export function NewsPage() {
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const [newsItems] = useState<NewsItem[]>([
+  const [newsItems, setNewsItems] = useState<NewsItem[]>([
     {
       id: '1',
       title: '2025년 신년 인사',
@@ -97,6 +97,12 @@ export function NewsPage() {
     toast.info(`공지 #${id} ${currentState ? '고정 해제' : '고정'} 처리 (UI 데모)`);
   };
 
+  const handleDelete = (id: string, title: string) => {
+    if (!window.confirm(`"${title}"\n\n이 공지를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`)) return;
+    setNewsItems((prev) => prev.filter((item) => item.id !== id));
+    toast.success('공지가 삭제되었습니다.');
+  };
+
   return (
     <div>
       <AdminHeader
@@ -155,7 +161,7 @@ export function NewsPage() {
                 <th style={{ ...styles.th, width: '100px' }}>작성일</th>
                 <th style={{ ...styles.th, width: '80px' }}>조회</th>
                 <th style={{ ...styles.th, width: '80px' }}>상태</th>
-                <th style={{ ...styles.th, width: '120px' }}>관리</th>
+                <th style={{ ...styles.th, width: '170px' }}>관리</th>
               </tr>
             </thead>
             <tbody>
@@ -205,6 +211,12 @@ export function NewsPage() {
                         onClick={() => handleTogglePublish(item.id, item.isPublished)}
                       >
                         {item.isPublished ? '비공개' : '게시'}
+                      </button>
+                      <button
+                        style={styles.deleteButton}
+                        onClick={() => handleDelete(item.id, item.title)}
+                      >
+                        삭제
                       </button>
                     </div>
                   </td>
@@ -346,6 +358,15 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: colors.neutral100,
     color: colors.neutral600,
     border: `1px solid ${colors.neutral300}`,
+    borderRadius: '4px',
+    fontSize: '12px',
+    cursor: 'pointer',
+  },
+  deleteButton: {
+    padding: '6px 12px',
+    backgroundColor: '#fef2f2',
+    color: '#dc2626',
+    border: '1px solid #fecaca',
     borderRadius: '4px',
     fontSize: '12px',
     cursor: 'pointer',
