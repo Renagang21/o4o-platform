@@ -28,6 +28,7 @@ export function createNetureOperatorTrialRoutes(): Router {
 
   router.get('/', MarketTrialOperatorController.listAll);
   router.get('/:id', MarketTrialOperatorController.getDetail);
+  router.get('/:id/participants/export', MarketTrialOperatorController.exportParticipantsCSV);
   router.patch('/:id/approve', MarketTrialOperatorController.approve1st);
   router.patch('/:id/reject', MarketTrialOperatorController.reject1st);
 

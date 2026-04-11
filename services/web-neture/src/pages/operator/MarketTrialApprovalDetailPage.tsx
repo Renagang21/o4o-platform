@@ -7,7 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getOperatorTrialDetail, approveTrialFirst, rejectTrialFirst } from '../../api/trial';
+import { getOperatorTrialDetail, approveTrialFirst, rejectTrialFirst, exportParticipantsCSV } from '../../api/trial';
 import type { OperatorTrial } from '../../api/trial';
 
 const STATUS_LABELS: Record<string, string> = {
@@ -36,6 +36,7 @@ export default function MarketTrialApprovalDetailPage() {
   const [actionLoading, setActionLoading] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
+  const [exportLoading, setExportLoading] = useState(false);
 
   useEffect(() => {
     if (id) loadTrial();
@@ -77,6 +78,18 @@ export default function MarketTrialApprovalDetailPage() {
       setError(err.response?.data?.message || err.message || '반려에 실패했습니다.');
     } finally {
       setActionLoading(false);
+    }
+  };
+
+  const handleExport = async () => {
+    if (!id) return;
+    setExportLoading(true);
+    try {
+      await exportParticipantsCSV(id);
+    } catch (err: any) {
+      setError(err.response?.data?.message || err.message || 'CSV 다운로드에 실패했습니다.');
+    } finally {
+      setExportLoading(false);
     }
   };
 
@@ -132,6 +145,18 @@ export default function MarketTrialApprovalDetailPage() {
           label="참여 현황"
           value={`${trial.currentParticipants}명${trial.maxParticipants ? ` / ${trial.maxParticipants}명` : ''}`}
         />
+        {/* 참여자 CSV 내보내기 */}
+        {trial.currentParticipants > 0 && (
+          <div className="pt-2">
+            <button
+              onClick={handleExport}
+              disabled={exportLoading}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 disabled:opacity-50 transition"
+            >
+              {exportLoading ? '다운로드 중...' : '참여자 CSV 다운로드'}
+            </button>
+          </div>
+        )}
         {trial.visibleServiceKeys && trial.visibleServiceKeys.length > 0 && (
           <div>
             <span className="text-sm text-gray-500">대상 서비스</span>

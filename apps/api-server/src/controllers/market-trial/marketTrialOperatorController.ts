@@ -253,6 +253,110 @@ export class MarketTrialOperatorController {
   }
 
   // ============================================================================
+  // Participant Export
+  // WO-MARKET-TRIAL-PARTICIPANT-EXPORT-V1
+  // ============================================================================
+
+  /**
+   * GET /api/v1/neture/operator/market-trial/:id/participants/export
+   * Trial 참여자 목록 CSV 다운로드
+   */
+  static async exportParticipantsCSV(req: AuthRequest, res: Response) {
+    try {
+      const { id } = req.params;
+      const ds = MarketTrialOperatorController.dataSource;
+      if (!ds) {
+        return res.status(500).json({ success: false, message: 'DataSource not initialized' });
+      }
+
+      const trial = await MarketTrialOperatorController.trialRepo.findOne({ where: { id } });
+      if (!trial) {
+        return res.status(404).json({ success: false, message: 'Trial not found' });
+      }
+
+      const rows: Array<{
+        participantName: string;
+        participantType: string;
+        rewardType: string | null;
+        rewardStatus: string;
+        createdAt: Date;
+      }> = await ds.query(
+        `SELECT
+           COALESCE(u."displayName", u.email, '알 수 없음') AS "participantName",
+           p."participantType",
+           p."rewardType",
+           p."rewardStatus",
+           p."createdAt"
+         FROM market_trial_participants p
+         LEFT JOIN users u ON u.id = p."participantId"
+         WHERE p."marketTrialId" = $1
+         ORDER BY p."createdAt" DESC`,
+        [id],
+      );
+
+      // Human-readable label maps
+      const rewardTypeLabel = (v: string | null) => {
+        if (v === 'product') return '제품 보상';
+        if (v === 'cash') return '현금 보상';
+        return v || '-';
+      };
+      const rewardStatusLabel = (v: string) => {
+        if (v === 'pending') return '대기';
+        if (v === 'fulfilled') return '이행 완료';
+        return v;
+      };
+      const participantTypeLabel = (v: string) => {
+        if (v === 'seller') return '판매자';
+        if (v === 'partner') return '파트너';
+        return v;
+      };
+      const fmtDate = (d: Date) => {
+        const dt = new Date(d);
+        const y = dt.getFullYear();
+        const m = String(dt.getMonth() + 1).padStart(2, '0');
+        const day = String(dt.getDate()).padStart(2, '0');
+        const h = String(dt.getHours()).padStart(2, '0');
+        const min = String(dt.getMinutes()).padStart(2, '0');
+        return `${y}-${m}-${day} ${h}:${min}`;
+      };
+
+      // CSV header + rows
+      const header = ['참여자명', '참여자유형', '보상방식', '보상상태', '참여일', 'Trial제목', 'Trial상태'];
+      const trialTitle = (trial.title || '').replace(/"/g, '""');
+      const trialStatusLabel: Record<string, string> = {
+        draft: '작성 중', submitted: '심사 대기', approved: '승인됨',
+        recruiting: '모집 중', development: '준비 중',
+        outcome_confirming: '결과 확정', fulfilled: '이행 완료', closed: '종료',
+      };
+      const trialStatusText = trialStatusLabel[trial.status] || trial.status;
+
+      const csvRows = rows.map((r) => [
+        `"${(r.participantName || '').replace(/"/g, '""')}"`,
+        `"${participantTypeLabel(r.participantType)}"`,
+        `"${rewardTypeLabel(r.rewardType)}"`,
+        `"${rewardStatusLabel(r.rewardStatus)}"`,
+        `"${fmtDate(r.createdAt)}"`,
+        `"${trialTitle}"`,
+        `"${trialStatusText}"`,
+      ].join(','));
+
+      // BOM for Excel UTF-8 compatibility
+      const bom = '\uFEFF';
+      const csv = bom + [header.join(','), ...csvRows].join('\n');
+
+      const safeTitle = (trial.title || 'trial').replace(/[^a-zA-Z0-9가-힣_-]/g, '_').slice(0, 30);
+      const filename = `market-trial-${safeTitle}-participants.csv`;
+
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      res.send(csv);
+    } catch (error) {
+      console.error('Operator export participants CSV error:', error);
+      res.status(500).json({ success: false, message: 'Failed to export participants' });
+    }
+  }
+
+  // ============================================================================
   // Service Operator 2nd Approval
   // WO-MARKET-TRIAL-NETURE-SINGLE-APPROVAL-TRANSITION-V1: DEPRECATED
   // 서비스별 2차 승인 제거됨. 아래 메서드들은 하위 호환용으로 유지하되
