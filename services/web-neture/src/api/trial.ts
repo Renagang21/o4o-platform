@@ -166,6 +166,28 @@ export async function rejectTrialFirst(trialId: string, reason: string): Promise
   return data.data || data;
 }
 
+/**
+ * WO-MARKET-TRIAL-PARTICIPANT-EXPORT-V1: 참여자 CSV 다운로드
+ */
+export async function exportParticipantsCSV(trialId: string): Promise<void> {
+  const response = await api.get(
+    `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/participants/export`,
+    { responseType: 'blob' },
+  );
+  const blob = new Blob([response.data], { type: 'text/csv;charset=utf-8' });
+  const url = window.URL.createObjectURL(blob);
+  const disposition = response.headers['content-disposition'] || '';
+  const filenameMatch = disposition.match(/filename="?([^"]+)"?/);
+  const filename = filenameMatch ? filenameMatch[1] : `market-trial-${trialId}-participants.csv`;
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.URL.revokeObjectURL(url);
+}
+
 // ============================================================================
 // Shipping / Fulfillment (existing)
 // ============================================================================
