@@ -1443,18 +1443,12 @@ importers:
 
   packages/account-ui:
     dependencies:
-      lucide-react:
-        specifier: '>=0.300.0'
-        version: 0.523.0(react@19.2.0)
       react:
         specifier: 19.2.0
         version: 19.2.0
       react-dom:
         specifier: 19.2.0
         version: 19.2.0(react@19.2.0)
-      react-router-dom:
-        specifier: ^6.0.0 || ^7.0.0
-        version: 7.9.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
     devDependencies:
       '@types/react':
         specifier: 19.2.7
@@ -1462,6 +1456,12 @@ importers:
       '@types/react-dom':
         specifier: 19.2.3
         version: 19.2.3(@types/react@19.2.7)
+      lucide-react:
+        specifier: ^0.300.0
+        version: 0.300.0(react@19.2.0)
+      react-router-dom:
+        specifier: ^7.0.0
+        version: 7.9.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       typescript:
         specifier: 5.4.5
         version: 5.4.5
@@ -10548,6 +10548,11 @@ packages:
   lru-cache@6.0.0:
     resolution: {integrity: sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==}
     engines: {node: '>=10'}
+
+  lucide-react@0.300.0:
+    resolution: {integrity: sha512-rQxUUCmWAvNLoAsMZ5j04b2+OJv6UuNLYMY7VK0eVlm4aTwUEjEEHc09/DipkNIlhXUSDn2xoyIzVT0uh7dRsg==}
+    peerDependencies:
+      react: 19.2.0
 
   lucide-react@0.523.0:
     resolution: {integrity: sha512-rUjQoy7egZT9XYVXBK1je9ckBnNp7qzRZOhLQx5RcEp2dCGlXo+mv6vf7Am4LimEcFBJIIZzSGfgTqc9QCrPSw==}
@@ -22074,6 +22079,10 @@ snapshots:
     dependencies:
       yallist: 4.0.0
     optional: true
+
+  lucide-react@0.300.0(react@19.2.0):
+    dependencies:
+      react: 19.2.0
 
   lucide-react@0.523.0(react@19.2.0):
     dependencies:
