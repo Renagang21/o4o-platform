@@ -17,7 +17,7 @@
  * 사용 API:
  *   - cmsApi.getContents() : 플랫폼 CMS 콘텐츠 목록 조회
  *   - assetSnapshotApi.copy() : 콘텐츠를 내 매장에 복사
- *   - dashboardApi.getCopiedSourceIds() : 이미 복사한 콘텐츠 ID 목록
+ *   - assetSnapshotApi.list() : 이미 복사한 콘텐츠 ID 목록 (KPA asset snapshots 기반)
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
@@ -25,7 +25,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { cmsApi, type CmsContent } from '../../api/cms';
 import { assetSnapshotApi } from '../../api/assetSnapshot';
-import { dashboardApi } from '../../api/dashboard';
 import { useAuth } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
 
@@ -113,11 +112,14 @@ export function HubContentLibraryPage() {
   // 빈 탭 동적 숨김용 타입별 카운트
   const [tabCounts, setTabCounts] = useState<Record<string, number> | null>(null);
 
-  // 이미 복사된 콘텐츠 ID 로드
+  // 이미 복사된 콘텐츠 ID 로드 (KPA asset snapshots 기반)
   useEffect(() => {
     if (!user?.id) return;
-    dashboardApi.getCopiedSourceIds(user.id)
-      .then(res => setCopiedIds(new Set(res.sourceIds || [])))
+    assetSnapshotApi.list({ type: 'cms', limit: 200 })
+      .then(res => {
+        const ids = (res.data?.items || []).map((item: { sourceAssetId: string }) => item.sourceAssetId);
+        setCopiedIds(new Set(ids));
+      })
       .catch(() => {});
   }, [user?.id]);
 
