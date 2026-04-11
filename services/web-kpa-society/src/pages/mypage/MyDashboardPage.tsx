@@ -15,6 +15,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Card, MyPageNavigation } from '../../components/common';
 import { AiSummaryButton } from '../../components/ai';
 import { mypageApi } from '../../api';
+import { getMyParticipations } from '../../api/marketTrial';
+import type { MyParticipationSummary } from '../../api/marketTrial';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 import type { UserActivity } from '../../api/mypage';
@@ -62,12 +64,29 @@ function getUserDisplayName(user: any): string {
   return user.name || '사용자';
 }
 
+const TRIAL_STATUS_LABELS: Record<string, string> = {
+  recruiting: '모집 중',
+  development: '준비 중',
+  outcome_confirming: '결과 확정',
+  fulfilled: '이행 완료',
+  closed: '종료',
+};
+
+const TRIAL_STATUS_COLORS: Record<string, { bg: string; text: string }> = {
+  recruiting: { bg: '#DCFCE7', text: '#166534' },
+  development: { bg: '#F3E8FF', text: '#6B21A8' },
+  outcome_confirming: { bg: '#E0E7FF', text: '#3730A3' },
+  fulfilled: { bg: '#CCFBF1', text: '#115E59' },
+  closed: { bg: '#FEE2E2', text: '#991B1B' },
+};
+
 export function MyDashboardPage() {
   const location = useLocation();
   const servicePrefix = getServicePrefix(location.pathname);
   const { user } = useAuth();
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [activities, setActivities] = useState<UserActivity[]>([]);
+  const [participations, setParticipations] = useState<MyParticipationSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -101,13 +120,15 @@ export function MyDashboardPage() {
       setLoading(true);
       setError(null);
 
-      const [summaryRes, activitiesRes] = await Promise.all([
+      const [summaryRes, activitiesRes, participationsRes] = await Promise.all([
         mypageApi.getDashboardSummary(),
         mypageApi.getActivities({ limit: 5 }),
+        getMyParticipations().catch(() => ({ success: true, data: [] as MyParticipationSummary[] })),
       ]);
 
       setSummary(summaryRes.data);
       setActivities(activitiesRes.data);
+      setParticipations(participationsRes.data || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : '데이터를 불러오는데 실패했습니다.');
     } finally {
@@ -287,6 +308,60 @@ export function MyDashboardPage() {
           </Card>
         </Link>
       </div>
+
+      {/* Market Trial 참여 현황 */}
+      <Card padding="large" style={{ marginTop: '24px' }}>
+        <div style={styles.trialHeader}>
+          <h3 style={styles.sectionTitle}>Market Trial</h3>
+          <Link to={`${servicePrefix}/market-trial`} style={styles.trialHubLink}>
+            전체 보기 →
+          </Link>
+        </div>
+        {participations.length === 0 ? (
+          <div style={styles.trialEmptyState}>
+            <span style={styles.trialEmptyIcon}>🧪</span>
+            <p style={styles.trialEmptyText}>참여 중인 Market Trial이 없습니다.</p>
+            <Link to={`${servicePrefix}/market-trial`} style={styles.trialEmptyLink}>
+              Market Trial 둘러보기
+            </Link>
+          </div>
+        ) : (
+          <div style={styles.trialList}>
+            {participations.slice(0, 5).map((p) => {
+              const trial = p.trial;
+              if (!trial) return null;
+              const statusLabel = TRIAL_STATUS_LABELS[trial.status] || trial.status;
+              const statusColor = TRIAL_STATUS_COLORS[trial.status] || { bg: colors.neutral100, text: colors.neutral700 };
+              return (
+                <Link
+                  key={p.id}
+                  to={`${servicePrefix}/market-trial/${trial.id}`}
+                  style={styles.trialItem}
+                >
+                  <div style={styles.trialItemContent}>
+                    <span style={styles.trialTitle}>{trial.title}</span>
+                    <span style={styles.trialMeta}>
+                      {trial.supplierName || '공급자'} · {p.rewardType === 'product' ? '제품' : '현금'} · {new Date(p.joinedAt).toLocaleDateString('ko-KR')}
+                    </span>
+                  </div>
+                  <div style={styles.trialItemRight}>
+                    <span style={{
+                      ...styles.trialStatusBadge,
+                      backgroundColor: statusColor.bg,
+                      color: statusColor.text,
+                    }}>
+                      {statusLabel}
+                    </span>
+                    {p.rewardStatus === 'fulfilled' && (
+                      <span style={styles.trialRewardBadge}>이행 완료</span>
+                    )}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </Card>
 
       {/* 최근 활동 */}
       <Card padding="large" style={{ marginTop: '24px' }}>
@@ -568,5 +643,93 @@ const styles: Record<string, React.CSSProperties> = {
     textDecoration: 'none',
     fontSize: '14px',
     paddingTop: '8px',
+  },
+  // Market Trial 섹션
+  trialHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '16px',
+  },
+  trialHubLink: {
+    ...typography.bodyS,
+    color: colors.primary,
+    textDecoration: 'none',
+    fontWeight: 500,
+  },
+  trialEmptyState: {
+    textAlign: 'center' as const,
+    padding: '24px 0',
+  },
+  trialEmptyIcon: {
+    fontSize: '32px',
+    display: 'block',
+    marginBottom: '8px',
+  },
+  trialEmptyText: {
+    ...typography.bodyM,
+    color: colors.neutral500,
+    margin: '0 0 12px',
+  },
+  trialEmptyLink: {
+    ...typography.bodyS,
+    color: colors.primary,
+    textDecoration: 'none',
+    fontWeight: 500,
+  },
+  trialList: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+  },
+  trialItem: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '12px',
+    padding: '12px 0',
+    borderBottom: `1px solid ${colors.neutral100}`,
+    textDecoration: 'none',
+    color: 'inherit',
+  },
+  trialItemContent: {
+    flex: 1,
+    minWidth: 0,
+    display: 'flex',
+    flexDirection: 'column' as const,
+  },
+  trialTitle: {
+    ...typography.bodyM,
+    color: colors.neutral800,
+    fontWeight: 500,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap' as const,
+  },
+  trialMeta: {
+    ...typography.bodyS,
+    color: colors.neutral500,
+    marginTop: '2px',
+  },
+  trialItemRight: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    flexShrink: 0,
+  },
+  trialStatusBadge: {
+    ...typography.bodyS,
+    padding: '3px 8px',
+    borderRadius: '10px',
+    fontWeight: 500,
+    whiteSpace: 'nowrap' as const,
+  },
+  trialRewardBadge: {
+    ...typography.bodyS,
+    padding: '3px 8px',
+    borderRadius: '10px',
+    backgroundColor: '#CCFBF1',
+    color: '#115E59',
+    fontWeight: 500,
+    whiteSpace: 'nowrap' as const,
   },
 };
