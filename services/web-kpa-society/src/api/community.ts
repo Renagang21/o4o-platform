@@ -2,7 +2,9 @@
  * Community Hub API Client
  *
  * WO-KPA-A-COMMUNITY-HUB-IMPLEMENTATION-V1
- * Public read endpoints for ads/sponsors + Operator CRUD
+ * WO-KPA-A-HOME-FOOTER-LINKS-MANAGEMENT-V1: Quick Links API 추가
+ *
+ * Public read endpoints for ads/sponsors/quickLinks + Operator CRUD
  *
  * WO-KPA-A-OPERATOR-COMMUNITY-REGRESSION-FIX-V1:
  * authClient.api (axios, localStorage strategy) 통일
@@ -46,6 +48,22 @@ export interface CommunitySponsorFull extends CommunitySponsor {
   updatedAt?: string;
 }
 
+export interface CommunityQuickLink {
+  id: string;
+  title: string;
+  description: string | null;
+  imageUrl: string;
+  linkUrl: string;
+  openInNewTab: boolean;
+  displayOrder: number;
+}
+
+export interface CommunityQuickLinkFull extends CommunityQuickLink {
+  isActive: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
 // ==================== Public API ====================
 
 export const communityApi = {
@@ -61,6 +79,11 @@ export const communityApi = {
 
   getSponsors: async (): Promise<{ sponsors: CommunitySponsor[] }> => {
     const res = await authClient.api.get(`${KPA_BASE}/community/sponsors`);
+    return res.data?.data ?? res.data;
+  },
+
+  getQuickLinks: async (): Promise<{ quickLinks: CommunityQuickLink[] }> => {
+    const res = await authClient.api.get(`${KPA_BASE}/community/quick-links`);
     return res.data?.data ?? res.data;
   },
 };
@@ -115,5 +138,29 @@ export const communityManageApi = {
 
   deleteSponsor: async (id: string): Promise<void> => {
     await authClient.api.delete(`${KPA_BASE}/community/manage/sponsors/${id}`);
+  },
+
+  // Quick Links
+  listQuickLinks: async (): Promise<{ quickLinks: CommunityQuickLinkFull[] }> => {
+    const res = await authClient.api.get(`${KPA_BASE}/community/manage/quick-links`);
+    return res.data?.data ?? res.data;
+  },
+
+  createQuickLink: async (data: {
+    title: string; imageUrl: string; linkUrl: string;
+    description?: string; openInNewTab?: boolean;
+    displayOrder?: number; isActive?: boolean;
+  }): Promise<CommunityQuickLinkFull> => {
+    const res = await authClient.api.post(`${KPA_BASE}/community/manage/quick-links`, data);
+    return res.data?.data ?? res.data;
+  },
+
+  updateQuickLink: async (id: string, data: Record<string, unknown>): Promise<CommunityQuickLinkFull> => {
+    const res = await authClient.api.put(`${KPA_BASE}/community/manage/quick-links/${id}`, data);
+    return res.data?.data ?? res.data;
+  },
+
+  deleteQuickLink: async (id: string): Promise<void> => {
+    await authClient.api.delete(`${KPA_BASE}/community/manage/quick-links/${id}`);
   },
 };

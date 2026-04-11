@@ -2,7 +2,9 @@
  * KPA Community Hub Service
  *
  * WO-KPA-A-COMMUNITY-HUB-IMPLEMENTATION-V1
- * Ads/Sponsors CRUD + Public Read for Community Hub
+ * WO-KPA-A-HOME-FOOTER-LINKS-MANAGEMENT-V1: Quick Links CRUD 추가
+ *
+ * Ads/Sponsors/QuickLinks CRUD + Public Read for Community Hub
  *
  * Raw SQL + parameter binding (Boundary Policy)
  * service_code filter on all queries (Guard Rule #3)
@@ -51,6 +53,22 @@ export class CommunityHubService {
     }
   }
 
+  async getActiveQuickLinks(serviceCode: string) {
+    try {
+      return await this.ds.query(
+        `SELECT id, title, description, image_url AS "imageUrl", link_url AS "linkUrl",
+                open_in_new_tab AS "openInNewTab", display_order AS "displayOrder"
+         FROM community_quick_links
+         WHERE service_code = $1 AND is_active = true
+         ORDER BY display_order ASC, created_at DESC`,
+        [serviceCode],
+      );
+    } catch (err: any) {
+      console.warn('[CommunityHub] community_quick_links query failed:', err.message);
+      return [];
+    }
+  }
+
   // ==================== Operator: Ads CRUD ====================
 
   async listAds(serviceCode: string, type?: string) {
@@ -69,7 +87,6 @@ export class CommunityHubService {
     try {
       return await this.ds.query(sql, params);
     } catch (err: any) {
-      // safeQuery: community_ads 테이블 미존재 시 빈 배열 반환
       console.warn('[CommunityHub] community_ads table may not exist:', err.message);
       return [];
     }
@@ -248,6 +265,108 @@ export class CommunityHubService {
     if (!UUID_RE.test(id)) return false;
     const result = await this.ds.query(
       `DELETE FROM community_sponsors WHERE id = $1 AND service_code = $2`,
+      [id, serviceCode],
+    );
+    return (result as any)?.[1] > 0;
+  }
+
+  // ==================== Operator: Quick Links CRUD ====================
+
+  async listQuickLinks(serviceCode: string) {
+    try {
+      return await this.ds.query(
+        `SELECT id, title, description, image_url AS "imageUrl", link_url AS "linkUrl",
+                open_in_new_tab AS "openInNewTab",
+                display_order AS "displayOrder", is_active AS "isActive",
+                created_at AS "createdAt", updated_at AS "updatedAt"
+         FROM community_quick_links
+         WHERE service_code = $1
+         ORDER BY display_order ASC, created_at DESC`,
+        [serviceCode],
+      );
+    } catch (err: any) {
+      console.warn('[CommunityHub] community_quick_links table may not exist:', err.message);
+      return [];
+    }
+  }
+
+  async createQuickLink(data: {
+    serviceCode: string;
+    title: string;
+    imageUrl: string;
+    linkUrl: string;
+    description?: string;
+    openInNewTab?: boolean;
+    displayOrder?: number;
+    isActive?: boolean;
+  }) {
+    const [row] = await this.ds.query(
+      `INSERT INTO community_quick_links (service_code, title, description, image_url, link_url, open_in_new_tab, display_order, is_active)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       RETURNING id, title, description, image_url AS "imageUrl", link_url AS "linkUrl",
+                 open_in_new_tab AS "openInNewTab",
+                 display_order AS "displayOrder", is_active AS "isActive",
+                 created_at AS "createdAt"`,
+      [
+        data.serviceCode,
+        data.title,
+        data.description ?? null,
+        data.imageUrl,
+        data.linkUrl,
+        data.openInNewTab !== false,
+        data.displayOrder ?? 0,
+        data.isActive !== false,
+      ],
+    );
+    return row;
+  }
+
+  async updateQuickLink(id: string, serviceCode: string, data: Record<string, unknown>) {
+    if (!UUID_RE.test(id)) return null;
+
+    const sets: string[] = [];
+    const params: unknown[] = [];
+    let idx = 1;
+
+    const fieldMap: Record<string, string> = {
+      title: 'title',
+      description: 'description',
+      imageUrl: 'image_url',
+      linkUrl: 'link_url',
+      openInNewTab: 'open_in_new_tab',
+      displayOrder: 'display_order',
+      isActive: 'is_active',
+    };
+
+    for (const [key, col] of Object.entries(fieldMap)) {
+      if (data[key] !== undefined) {
+        sets.push(`"${col}" = $${idx}`);
+        params.push(data[key]);
+        idx++;
+      }
+    }
+
+    if (sets.length === 0) return null;
+
+    sets.push(`"updated_at" = now()`);
+    params.push(id, serviceCode);
+
+    const [row] = await this.ds.query(
+      `UPDATE community_quick_links SET ${sets.join(', ')}
+       WHERE id = $${idx} AND service_code = $${idx + 1}
+       RETURNING id, title, description, image_url AS "imageUrl", link_url AS "linkUrl",
+                 open_in_new_tab AS "openInNewTab",
+                 display_order AS "displayOrder", is_active AS "isActive",
+                 updated_at AS "updatedAt"`,
+      params,
+    );
+    return row ?? null;
+  }
+
+  async deleteQuickLink(id: string, serviceCode: string) {
+    if (!UUID_RE.test(id)) return false;
+    const result = await this.ds.query(
+      `DELETE FROM community_quick_links WHERE id = $1 AND service_code = $2`,
       [id, serviceCode],
     );
     return (result as any)?.[1] > 0;

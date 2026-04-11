@@ -4,10 +4,11 @@
  * WO-KPA-HOME-PHASE1-V1: Home page summary endpoints
  * WO-KPA-A-PUBLIC-HOME-INTEGRATION-AND-MENU-SIMPLIFICATION-V1: 통합 허브 확장
  * WO-KPA-A-HOME-HUB-ENHANCEMENT-V1: forumCategories 제거, notices limit 조정
+ * WO-KPA-A-HOME-FOOTER-LINKS-MANAGEMENT-V1: quickLinks 추가 (8th parallel call)
  */
 
 import { apiClient } from './client';
-import { communityApi, type CommunityAd, type CommunitySponsor } from './community';
+import { communityApi, type CommunityAd, type CommunitySponsor, type CommunityQuickLink } from './community';
 import type { SignageHomeMedia, SignageHomePlaylist } from '@o4o/types/signage';
 import type { ForumHomePost } from '@o4o/types/forum';
 import type { ForumHubItem, ForumActivityCategory } from '../types';
@@ -89,6 +90,7 @@ export interface HomePageData {
   heroAds: CommunityAd[];
   pageAds: CommunityAd[];
   sponsors: CommunitySponsor[];
+  quickLinks: CommunityQuickLink[];
 }
 
 export const homeApi = {
@@ -115,9 +117,10 @@ export const homeApi = {
    * 통합 Home 전체 데이터를 병렬로 가져오기
    * WO-KPA-A-PUBLIC-HOME-INTEGRATION-AND-MENU-SIMPLIFICATION-V1
    * WO-KPA-A-HOME-HUB-ENHANCEMENT-V1: forumCategories 제거 → 7개 병렬 호출
+   * WO-KPA-A-HOME-FOOTER-LINKS-MANAGEMENT-V1: quickLinks 추가 → 8개 병렬 호출
    */
   async prefetchAll(): Promise<HomePageData> {
-    const [noticesRes, communityRes, signageRes, forumHubRes, heroRes, pageAdRes, sponsorRes] =
+    const [noticesRes, communityRes, signageRes, forumHubRes, heroRes, pageAdRes, sponsorRes, quickLinkRes] =
       await Promise.allSettled([
         apiClient.get<NoticesResponse>('/home/notices', { limit: 5 }),
         apiClient.get<CommunityResponse>('/home/community', { postLimit: 3, featuredLimit: 3 }),
@@ -126,6 +129,7 @@ export const homeApi = {
         communityApi.getHeroAds(),
         communityApi.getPageAds(),
         communityApi.getSponsors(),
+        communityApi.getQuickLinks(),
       ]);
 
     return {
@@ -145,6 +149,9 @@ export const homeApi = {
         : [],
       sponsors: sponsorRes.status === 'fulfilled'
         ? (sponsorRes.value as any)?.data?.sponsors ?? (sponsorRes.value as any)?.sponsors ?? []
+        : [],
+      quickLinks: quickLinkRes.status === 'fulfilled'
+        ? (quickLinkRes.value as any)?.data?.quickLinks ?? (quickLinkRes.value as any)?.quickLinks ?? []
         : [],
     };
   },

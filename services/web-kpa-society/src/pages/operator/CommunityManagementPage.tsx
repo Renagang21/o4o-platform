@@ -1,13 +1,15 @@
 /**
- * CommunityManagementPage — Operator Home 편집 (광고/스폰서 관리)
+ * CommunityManagementPage — Operator Home 편집 (광고/스폰서/하단 링크 관리)
  *
  * WO-KPA-A-COMMUNITY-HUB-IMPLEMENTATION-V1
  * WO-KPA-A-HOME-EXPOSURE-MENU-RELOCATION-AND-MEDIA-PICKER-V1:
  *   - 헤더: '커뮤니티 관리' → 'Home 편집'
  *   - 이미지 입력: URL 직접 입력 → 미디어 라이브러리 선택 + URL fallback
+ * WO-KPA-A-HOME-FOOTER-LINKS-MANAGEMENT-V1:
+ *   - 4th tab: 하단 링크 (community_quick_links CRUD)
  *
- * 3 tabs: Hero 광고 | 페이지 광고 | 스폰서
- * CRUD for community_ads and community_sponsors
+ * 4 tabs: Hero 광고 | 페이지 광고 | 스폰서 | 하단 링크
+ * CRUD for community_ads, community_sponsors, community_quick_links
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -23,16 +25,24 @@ import {
   Monitor,
   Users,
   ImageIcon,
+  Link2,
+  ExternalLink,
 } from 'lucide-react';
-import { communityManageApi, type CommunityAdFull, type CommunitySponsorFull } from '../../api/community';
+import {
+  communityManageApi,
+  type CommunityAdFull,
+  type CommunitySponsorFull,
+  type CommunityQuickLinkFull,
+} from '../../api/community';
 import MediaPickerModal from '../../components/common/MediaPickerModal';
 
-type Tab = 'hero' | 'page' | 'sponsors';
+type Tab = 'hero' | 'page' | 'sponsors' | 'quickLinks';
 
 export default function CommunityManagementPage() {
   const [tab, setTab] = useState<Tab>('hero');
   const [ads, setAds] = useState<CommunityAdFull[]>([]);
   const [sponsors, setSponsors] = useState<CommunitySponsorFull[]>([]);
+  const [quickLinks, setQuickLinks] = useState<CommunityQuickLinkFull[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -45,6 +55,9 @@ export default function CommunityManagementPage() {
       if (tab === 'sponsors') {
         const res = await communityManageApi.listSponsors();
         setSponsors((res as any)?.data?.sponsors ?? (res as any)?.sponsors ?? []);
+      } else if (tab === 'quickLinks') {
+        const res = await communityManageApi.listQuickLinks();
+        setQuickLinks((res as any)?.data?.quickLinks ?? (res as any)?.quickLinks ?? []);
       } else {
         const res = await communityManageApi.listAds(tab);
         setAds((res as any)?.data?.ads ?? (res as any)?.ads ?? []);
@@ -64,6 +77,8 @@ export default function CommunityManagementPage() {
     try {
       if (tab === 'sponsors') {
         await communityManageApi.deleteSponsor(id);
+      } else if (tab === 'quickLinks') {
+        await communityManageApi.deleteQuickLink(id);
       } else {
         await communityManageApi.deleteAd(id);
       }
@@ -83,6 +98,8 @@ export default function CommunityManagementPage() {
     setShowModal(true);
   };
 
+  const addButtonLabel = tab === 'sponsors' ? '스폰서 추가' : tab === 'quickLinks' ? '링크 추가' : '광고 추가';
+
   return (
     <div style={{ padding: '24px 0' }}>
       {/* Header */}
@@ -92,7 +109,7 @@ export default function CommunityManagementPage() {
         </div>
         <div>
           <h1 style={{ fontSize: 20, fontWeight: 600, color: '#1e293b', margin: 0 }}>Home 편집</h1>
-          <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>Home 화면의 Hero 배너, 광고, 스폰서를 관리합니다</p>
+          <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>Home 화면의 Hero 배너, 광고, 스폰서, 하단 링크를 관리합니다</p>
         </div>
       </div>
 
@@ -102,6 +119,7 @@ export default function CommunityManagementPage() {
           { key: 'hero' as Tab, label: 'Hero 광고', icon: Image },
           { key: 'page' as Tab, label: '페이지 광고', icon: Monitor },
           { key: 'sponsors' as Tab, label: '스폰서', icon: Users },
+          { key: 'quickLinks' as Tab, label: '하단 링크', icon: Link2 },
         ]).map(({ key, label, icon: Icon }) => (
           <button
             key={key}
@@ -131,7 +149,7 @@ export default function CommunityManagementPage() {
             border: 'none', borderRadius: 8, cursor: 'pointer',
           }}
         >
-          <Plus size={14} /> {tab === 'sponsors' ? '스폰서 추가' : '광고 추가'}
+          <Plus size={14} /> {addButtonLabel}
         </button>
       </div>
 
@@ -148,6 +166,8 @@ export default function CommunityManagementPage() {
         </div>
       ) : tab === 'sponsors' ? (
         <SponsorTable sponsors={sponsors} onEdit={openEdit} onDelete={handleDelete} />
+      ) : tab === 'quickLinks' ? (
+        <QuickLinkTable quickLinks={quickLinks} onEdit={openEdit} onDelete={handleDelete} />
       ) : (
         <AdTable ads={ads} onEdit={openEdit} onDelete={handleDelete} />
       )}
@@ -283,6 +303,70 @@ function SponsorTable({ sponsors, onEdit, onDelete }: {
   );
 }
 
+// ─── Quick Link Table ───
+
+function QuickLinkTable({ quickLinks, onEdit, onDelete }: {
+  quickLinks: CommunityQuickLinkFull[];
+  onEdit: (ql: CommunityQuickLinkFull) => void;
+  onDelete: (id: string) => void;
+}) {
+  if (quickLinks.length === 0) {
+    return <p style={{ textAlign: 'center', color: '#94a3b8', padding: 32, fontSize: 14 }}>등록된 하단 링크가 없습니다.</p>;
+  }
+  return (
+    <div style={{ border: '1px solid #e2e8f0', borderRadius: 12, overflow: 'hidden' }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+        <thead>
+          <tr style={{ backgroundColor: '#f8fafc' }}>
+            <th style={thStyle}>아이콘</th>
+            <th style={thStyle}>제목</th>
+            <th style={thStyle}>링크</th>
+            <th style={thStyle}>새 탭</th>
+            <th style={thStyle}>순서</th>
+            <th style={thStyle}>상태</th>
+            <th style={thStyle}>액션</th>
+          </tr>
+        </thead>
+        <tbody>
+          {quickLinks.map((ql) => (
+            <tr key={ql.id} style={{ borderTop: '1px solid #e2e8f0' }}>
+              <td style={tdStyle}>
+                <img src={ql.imageUrl} alt="" style={{ width: 36, height: 36, objectFit: 'cover', borderRadius: 6 }} />
+              </td>
+              <td style={tdStyle}>
+                <div>{ql.title}</div>
+                {ql.description && <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>{ql.description}</div>}
+              </td>
+              <td style={tdStyle}>
+                <a href={ql.linkUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#2563eb', fontSize: 12, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                  <ExternalLink size={11} /> 링크
+                </a>
+              </td>
+              <td style={tdStyle}>{ql.openInNewTab ? '예' : '아니오'}</td>
+              <td style={tdStyle}>{ql.displayOrder}</td>
+              <td style={tdStyle}>
+                <span style={{
+                  fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 4,
+                  backgroundColor: ql.isActive ? '#dcfce7' : '#fee2e2',
+                  color: ql.isActive ? '#16a34a' : '#dc2626',
+                }}>
+                  {ql.isActive ? '활성' : '비활성'}
+                </span>
+              </td>
+              <td style={tdStyle}>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <button onClick={() => onEdit(ql)} style={iconBtn}><Edit3 size={14} /></button>
+                  <button onClick={() => onDelete(ql.id)} style={{ ...iconBtn, color: '#dc2626' }}><Trash2 size={14} /></button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 // ─── Form Modal ───
 
 function FormModal({ tab, editItem, onClose, onSaved }: {
@@ -291,16 +375,20 @@ function FormModal({ tab, editItem, onClose, onSaved }: {
   onClose: () => void;
   onSaved: () => void;
 }) {
-  const isAd = tab !== 'sponsors';
+  const isAd = tab === 'hero' || tab === 'page';
+  const isSponsor = tab === 'sponsors';
+  const isQuickLink = tab === 'quickLinks';
   const isEdit = !!editItem;
 
   const [form, setForm] = useState({
-    type: tab === 'sponsors' ? '' : tab,
+    type: isAd ? tab : '',
     title: editItem?.title ?? '',
     name: editItem?.name ?? '',
     imageUrl: editItem?.imageUrl ?? '',
     logoUrl: editItem?.logoUrl ?? '',
     linkUrl: editItem?.linkUrl ?? '',
+    description: editItem?.description ?? '',
+    openInNewTab: editItem?.openInNewTab ?? true,
     startDate: editItem?.startDate?.slice(0, 10) ?? '',
     endDate: editItem?.endDate?.slice(0, 10) ?? '',
     displayOrder: editItem?.displayOrder ?? 0,
@@ -308,8 +396,16 @@ function FormModal({ tab, editItem, onClose, onSaved }: {
   });
   const [saving, setSaving] = useState(false);
   const [showMediaPicker, setShowMediaPicker] = useState(false);
-  const mediaPickerField = isAd ? 'imageUrl' : 'logoUrl';
-  const mediaPickerFolder = isAd ? 'banner' : 'brand';
+
+  const mediaPickerField = isQuickLink ? 'imageUrl' : isAd ? 'imageUrl' : 'logoUrl';
+  const mediaPickerFolder = isQuickLink ? 'icon' : isAd ? 'banner' : 'brand';
+  const mediaPickerTitle = isQuickLink ? '링크 아이콘 선택' : isAd ? '광고 이미지 선택' : '스폰서 로고 선택';
+
+  const modalTitle = isQuickLink
+    ? '하단 링크'
+    : isSponsor
+      ? '스폰서'
+      : tab === 'hero' ? 'Hero 광고' : '페이지 광고';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -331,7 +427,7 @@ function FormModal({ tab, editItem, onClose, onSaved }: {
         } else {
           await communityManageApi.createAd(adData);
         }
-      } else {
+      } else if (isSponsor) {
         const sponsorData = {
           name: form.name,
           logoUrl: form.logoUrl,
@@ -343,6 +439,21 @@ function FormModal({ tab, editItem, onClose, onSaved }: {
           await communityManageApi.updateSponsor(editItem.id, sponsorData);
         } else {
           await communityManageApi.createSponsor(sponsorData);
+        }
+      } else if (isQuickLink) {
+        const qlData = {
+          title: form.title,
+          imageUrl: form.imageUrl,
+          linkUrl: form.linkUrl,
+          description: form.description || undefined,
+          openInNewTab: form.openInNewTab,
+          displayOrder: Number(form.displayOrder),
+          isActive: form.isActive,
+        };
+        if (isEdit) {
+          await communityManageApi.updateQuickLink(editItem.id, qlData);
+        } else {
+          await communityManageApi.createQuickLink(qlData);
         }
       }
       onSaved();
@@ -359,7 +470,7 @@ function FormModal({ tab, editItem, onClose, onSaved }: {
       <div style={modalContent} onClick={(e) => e.stopPropagation()}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <h3 style={{ fontSize: 16, fontWeight: 600, margin: 0 }}>
-            {isEdit ? '수정' : '추가'} — {tab === 'sponsors' ? '스폰서' : tab === 'hero' ? 'Hero 광고' : '페이지 광고'}
+            {isEdit ? '수정' : '추가'} — {modalTitle}
           </h3>
           <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} /></button>
         </div>
@@ -380,7 +491,7 @@ function FormModal({ tab, editItem, onClose, onSaved }: {
                 <Field label="종료일" value={form.endDate} onChange={(v) => update('endDate', v)} type="date" />
               </div>
             </>
-          ) : (
+          ) : isSponsor ? (
             <>
               <Field label="이름" value={form.name} onChange={(v) => update('name', v)} required />
               <ImageField
@@ -390,6 +501,29 @@ function FormModal({ tab, editItem, onClose, onSaved }: {
                 onPickerOpen={() => setShowMediaPicker(true)}
               />
               <Field label="링크 URL" value={form.linkUrl} onChange={(v) => update('linkUrl', v)} />
+            </>
+          ) : (
+            <>
+              <Field label="제목" value={form.title} onChange={(v) => update('title', v)} required />
+              <Field label="설명 (선택)" value={form.description} onChange={(v) => update('description', v)} />
+              <ImageField
+                label="아이콘/이미지"
+                value={form.imageUrl}
+                onChange={(v) => update('imageUrl', v)}
+                onPickerOpen={() => setShowMediaPicker(true)}
+              />
+              <Field label="링크 URL" value={form.linkUrl} onChange={(v) => update('linkUrl', v)} required />
+              <div style={{ marginBottom: 16 }}>
+                <label style={labelStyle}>새 탭에서 열기</label>
+                <select
+                  value={form.openInNewTab ? 'true' : 'false'}
+                  onChange={(e) => update('openInNewTab', e.target.value === 'true')}
+                  style={inputStyle}
+                >
+                  <option value="true">예</option>
+                  <option value="false">아니오</option>
+                </select>
+              </div>
             </>
           )}
 
@@ -429,7 +563,7 @@ function FormModal({ tab, editItem, onClose, onSaved }: {
             update(mediaPickerField, asset.url);
             setShowMediaPicker(false);
           }}
-          title={isAd ? '광고 이미지 선택' : '스폰서 로고 선택'}
+          title={mediaPickerTitle}
           defaultFolder={mediaPickerFolder}
         />
       </div>

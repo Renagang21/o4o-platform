@@ -2,9 +2,10 @@
  * KPA Community Hub Controller
  *
  * WO-KPA-A-COMMUNITY-HUB-IMPLEMENTATION-V1
+ * WO-KPA-A-HOME-FOOTER-LINKS-MANAGEMENT-V1: Quick Links CRUD 추가
  *
- * Public: GET /community/ads, GET /community/sponsors
- * Operator: /community/manage/ads (CRUD), /community/manage/sponsors (CRUD)
+ * Public: GET /community/ads, GET /community/sponsors, GET /community/quick-links
+ * Operator: /community/manage/ads (CRUD), /community/manage/sponsors (CRUD), /community/manage/quick-links (CRUD)
  */
 
 import { Router, Request, Response, RequestHandler } from 'express';
@@ -50,7 +51,16 @@ export function createCommunityHubController(
     }),
   );
 
-  // ==================== Operator Endpoints ====================
+  // GET /community/quick-links
+  router.get(
+    '/community/quick-links',
+    asyncHandler(async (req: Request, res: Response): Promise<void> => {
+      const quickLinks = await service.getActiveQuickLinks(SERVICE_CODE);
+      res.json({ success: true, data: { quickLinks } });
+    }),
+  );
+
+  // ==================== Operator: Ads CRUD ====================
 
   // GET /community/manage/ads
   router.get(
@@ -112,6 +122,8 @@ export function createCommunityHubController(
     }),
   );
 
+  // ==================== Operator: Sponsors CRUD ====================
+
   // GET /community/manage/sponsors
   router.get(
     '/community/manage/sponsors',
@@ -165,6 +177,67 @@ export function createCommunityHubController(
       const deleted = await service.deleteSponsor(req.params.id, SERVICE_CODE);
       if (!deleted) {
         res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Sponsor not found' });
+        return;
+      }
+      res.json({ success: true });
+    }),
+  );
+
+  // ==================== Operator: Quick Links CRUD ====================
+
+  // GET /community/manage/quick-links
+  router.get(
+    '/community/manage/quick-links',
+    requireAuth as any,
+    requireKpaScope('kpa:operator') as any,
+    asyncHandler(async (req: Request, res: Response): Promise<void> => {
+      const quickLinks = await service.listQuickLinks(SERVICE_CODE);
+      res.json({ success: true, data: { quickLinks } });
+    }),
+  );
+
+  // POST /community/manage/quick-links
+  router.post(
+    '/community/manage/quick-links',
+    requireAuth as any,
+    requireKpaScope('kpa:operator') as any,
+    asyncHandler(async (req: Request, res: Response): Promise<void> => {
+      const { title, imageUrl, linkUrl, description, openInNewTab, displayOrder, isActive } = req.body;
+      if (!title || !imageUrl || !linkUrl) {
+        res.status(400).json({ success: false, error: 'MISSING_FIELDS', message: 'title, imageUrl, linkUrl are required' });
+        return;
+      }
+      const quickLink = await service.createQuickLink({
+        serviceCode: SERVICE_CODE, title, imageUrl, linkUrl, description, openInNewTab, displayOrder, isActive,
+      });
+      res.status(201).json({ success: true, data: quickLink });
+    }),
+  );
+
+  // PUT /community/manage/quick-links/:id
+  router.put(
+    '/community/manage/quick-links/:id',
+    requireAuth as any,
+    requireKpaScope('kpa:operator') as any,
+    asyncHandler(async (req: Request, res: Response): Promise<void> => {
+      const updated = await service.updateQuickLink(req.params.id, SERVICE_CODE, req.body);
+      if (!updated) {
+        res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Quick link not found' });
+        return;
+      }
+      res.json({ success: true, data: updated });
+    }),
+  );
+
+  // DELETE /community/manage/quick-links/:id
+  router.delete(
+    '/community/manage/quick-links/:id',
+    requireAuth as any,
+    requireKpaScope('kpa:operator') as any,
+    asyncHandler(async (req: Request, res: Response): Promise<void> => {
+      const deleted = await service.deleteQuickLink(req.params.id, SERVICE_CODE);
+      if (!deleted) {
+        res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Quick link not found' });
         return;
       }
       res.json({ success: true });
