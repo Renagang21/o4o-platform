@@ -14,7 +14,6 @@ const defaultSettings: AppSettings = {
   users: { enabled: true },
   content: { enabled: true },
   forum: { enabled: false },
-  crowdfunding: { enabled: false },
   signage: { enabled: false },
   affiliate: { enabled: false }
 };
@@ -74,7 +73,6 @@ export const menuToAppMapping: Record<string, string> = {
   'media-add': 'content',
   'forum': 'forum',
   'signage': 'signage',
-  'crowdfunding': 'crowdfunding',
   'affiliate': 'affiliate',
   'affiliate-partners': 'affiliate',
   'affiliate-links': 'affiliate',

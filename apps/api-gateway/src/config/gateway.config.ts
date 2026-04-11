@@ -102,13 +102,6 @@ export const gatewayConfig: GatewayConfig = {
       timeout: 10000,
       retries: 3
     },
-    crowdfunding: {
-      name: 'Crowdfunding Service',
-      url: process.env.CROWDFUNDING_SERVICE_URL || 'http://localhost:4000',
-      healthCheck: '/api/health',
-      timeout: 10000,
-      retries: 3
-    }
   },
   
   // Route Definitions
@@ -164,12 +157,6 @@ export const gatewayConfig: GatewayConfig = {
     { path: '/api/v1/playlists', service: 'signage', auth: true },
     { path: '/api/v1/schedules', service: 'signage', auth: true },
     
-    // Crowdfunding Routes
-    { path: '/api/v1/campaigns', service: 'crowdfunding', methods: ['GET'], auth: false },
-    { path: '/api/v1/campaigns/:id', service: 'crowdfunding', methods: ['GET'], auth: false },
-    { path: '/api/v1/campaigns', service: 'crowdfunding', methods: ['POST', 'PUT', 'DELETE'], auth: true },
-    { path: '/api/v1/campaigns/:id/pledge', service: 'crowdfunding', methods: ['POST'], auth: true },
-    
     // Admin Routes (all require auth)
     { path: '/api/v1/admin/*', service: 'auth', auth: true }
   ],
@@ -180,7 +167,6 @@ export const gatewayConfig: GatewayConfig = {
       process.env.FRONTEND_URL || 'http://localhost:3000',
       'http://localhost:3001', // admin dashboard
       'http://localhost:3002', // e-commerce
-      'http://localhost:3003', // crowdfunding
       'https://neture.co.kr',
       'https://admin.neture.co.kr',
       'https://shop.neture.co.kr',

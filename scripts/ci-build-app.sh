@@ -68,7 +68,7 @@ build_app() {
             pnpm run build
             cd ../..
             ;;
-        "crowdfunding"|"forum"|"ecommerce"|"signage"|"digital-signage"|"affiliate"|"vendors")
+        "forum"|"ecommerce"|"signage"|"digital-signage"|"affiliate"|"vendors")
             # All these are part of admin-dashboard
             echo "Building ${app} components (admin-dashboard module)..."
             # Apply CI build optimizations if config exists
@@ -84,7 +84,7 @@ build_app() {
             ;;
         *)
             echo "⚠️ Unknown app: $app"
-            echo "Valid options: admin, storefront, api, main, crowdfunding, forum, ecommerce, signage/digital-signage, affiliate, vendors, all"
+            echo "Valid options: admin, storefront, api, main, forum, ecommerce, signage/digital-signage, affiliate, vendors, all"
             exit 1
             ;;
     esac

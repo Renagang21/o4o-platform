@@ -99,8 +99,6 @@ export const menuPermissions: MenuPermission[] = [
     permissions: ['cgm-pharmacist.patients.read'],
   },
 
-  // Crowdfunding - No restriction (allow all)
-
   // CMS - No restriction (allow all)
   // Posts, Pages, Media - All users can view
   

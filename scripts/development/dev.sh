@@ -53,7 +53,7 @@ run_type_check() {
     
     # Build packages first
     echo "Building packages..."
-    for pkg in types utils ui auth-client auth-context crowdfunding-types forum-types shortcodes block-core; do
+    for pkg in types utils ui auth-client auth-context forum-types shortcodes block-core; do
         if [ -d "packages/$pkg" ]; then
             echo "  - Building @o4o/$pkg"
             (cd "packages/$pkg" && npx tsc 2>/dev/null) || true
@@ -71,7 +71,7 @@ run_type_check() {
     
     # Type check apps
     echo "Type checking apps..."
-    for app in api-server main-site admin-dashboard ecommerce crowdfunding digital-signage; do
+    for app in api-server main-site admin-dashboard ecommerce digital-signage; do
         if [ -d "apps/$app" ]; then
             echo "  - Checking $app"
             (cd "apps/$app" && npx tsc --noEmit 2>/dev/null) || true
@@ -85,7 +85,7 @@ run_type_check_frontend() {
     
     # Build packages first
     echo "Building packages..."
-    for pkg in types utils ui auth-client auth-context crowdfunding-types forum-types shortcodes block-core; do
+    for pkg in types utils ui auth-client auth-context forum-types shortcodes block-core; do
         if [ -d "packages/$pkg" ]; then
             echo "  - Building @o4o/$pkg"
             (cd "packages/$pkg" && npx tsc 2>/dev/null) || true
@@ -103,7 +103,7 @@ run_type_check_frontend() {
     
     # Type check frontend apps only (skip api-server)
     echo "Type checking frontend apps..."
-    for app in main-site admin-dashboard ecommerce crowdfunding digital-signage; do
+    for app in main-site admin-dashboard ecommerce digital-signage; do
         if [ -d "apps/$app" ]; then
             echo "  - Checking $app"
             (cd "apps/$app" && npx tsc --noEmit 2>/dev/null) || true
@@ -136,7 +136,7 @@ run_build() {
     
     # Build apps
     echo "Building apps..."
-    for app in api-server main-site admin-dashboard ecommerce crowdfunding digital-signage; do
+    for app in api-server main-site admin-dashboard ecommerce digital-signage; do
         if [ -d "apps/$app" ]; then
             echo "  - Building $app"
             (cd "apps/$app" && pnpm run build) || true
