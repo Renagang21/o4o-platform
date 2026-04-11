@@ -320,6 +320,9 @@ export function MarketTrialDetailPage() {
                 </p>
                 <p style={{ fontSize: '0.8125rem', color: '#15803D', margin: '2px 0 0 0' }}>
                   보상 방식: {REWARD_LABELS[participation?.rewardType || selectedReward || ''] || '선택됨'}
+                  {participation?.joinedAt && (
+                    <> · 참여일: {new Date(participation.joinedAt).toLocaleDateString()}</>
+                  )}
                 </p>
               </div>
             </div>

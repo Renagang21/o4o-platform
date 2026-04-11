@@ -4,6 +4,7 @@
  * WO-MARKET-TRIAL-SERVICE-ENTRY-BANNER-AND-GATEWAY-V1
  * WO-MARKET-TRIAL-KPA-TRIAL-HUB-REFINE-V1
  * WO-MARKET-TRIAL-KPA-DETAIL-AND-FORUM-DEEP-LINK-V1
+ * WO-MARKET-TRIAL-MY-PARTICIPATION-STATUS-V1
  *
  * Market Trial API는 /api/market-trial에 마운트되어 있어
  * KPA apiClient(/api/v1/kpa prefix)와 호환되지 않음.
@@ -153,6 +154,33 @@ export async function joinTrial(
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ rewardType }),
+  });
+  return res.json();
+}
+
+// ── My Participations ──
+
+export interface MyParticipationSummary extends ParticipationInfo {
+  trial?: {
+    id: string;
+    title: string;
+    status: string;
+    supplierName?: string;
+  };
+}
+
+/**
+ * 현재 사용자의 전체 참여 목록 조회
+ * WO-MARKET-TRIAL-MY-PARTICIPATION-STATUS-V1
+ */
+export async function getMyParticipations(): Promise<{
+  success: boolean;
+  data: MyParticipationSummary[];
+}> {
+  const token = getAccessToken();
+  if (!token) return { success: true, data: [] };
+  const res = await fetch(`${API_BASE}/api/market-trial/my-participations`, {
+    headers: { Authorization: `Bearer ${token}` },
   });
   return res.json();
 }
