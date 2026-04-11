@@ -36,9 +36,9 @@ export function HeroBannerSection({ ads }: Props) {
     return (
       <section style={styles.defaultHero}>
         <div style={styles.defaultContent}>
-          <span style={styles.badge}>대한약사회</span>
-          <h1 style={styles.title}>약사회 통합 서비스</h1>
-          <p style={styles.subtitle}>포럼 · 교육 · 사이니지 · 약국 서비스를 한 곳에서</p>
+          <span style={styles.badge}>약사/약국 서비스</span>
+          <h1 style={styles.title}>약사 커뮤니티와 약국 경영 서비스</h1>
+          <p style={styles.subtitle}>약사 커뮤니티와 약국 경영 서비스를 한 곳에서</p>
         </div>
       </section>
     );
