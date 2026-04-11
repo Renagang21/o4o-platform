@@ -150,17 +150,27 @@ export function createOperatorProductApplicationsController(
       );
 
       // 3. 승인 대상 org의 listing UPSERT (없으면 생성, 있으면 활성화)
+      //    SAVEPOINT 사용: bridge 승인(대한약사회 등)의 경우 organization FK 제약 위반 가능 → 안전 처리
       const serviceKey = approval.service_key || 'kpa-society';
-      const upsertResult = await manager.query(
-        `INSERT INTO organization_product_listings
-           (id, organization_id, service_key, master_id, offer_id, is_active, created_at, updated_at)
-         SELECT gen_random_uuid(), $2, $3, spo.master_id, spo.id, true, NOW(), NOW()
-         FROM supplier_product_offers spo
-         WHERE spo.id = $1
-         ON CONFLICT (organization_id, service_key, offer_id)
-         DO UPDATE SET is_active = true, updated_at = NOW()`,
-        [approval.offer_id, approval.organization_id, serviceKey],
-      );
+      let listingUpserted = false;
+      await manager.query('SAVEPOINT upsert_listing');
+      try {
+        await manager.query(
+          `INSERT INTO organization_product_listings
+             (id, organization_id, service_key, master_id, offer_id, is_active, created_at, updated_at)
+           SELECT gen_random_uuid(), $2, $3, spo.master_id, spo.id, true, NOW(), NOW()
+           FROM supplier_product_offers spo
+           WHERE spo.id = $1
+           ON CONFLICT (organization_id, service_key, offer_id)
+           DO UPDATE SET is_active = true, updated_at = NOW()`,
+          [approval.offer_id, approval.organization_id, serviceKey],
+        );
+        await manager.query('RELEASE SAVEPOINT upsert_listing');
+        listingUpserted = true;
+      } catch {
+        await manager.query('ROLLBACK TO SAVEPOINT upsert_listing');
+        // FK 위반 등 — bridge 승인에서는 정상. 후속 bulk UPDATE로 기존 listing 활성화.
+      }
 
       // 4. 해당 offer의 kpa-society listings 전체 활성화 (auto-expansion으로 미리 생성된 다른 org listing 포함)
       const listingResult = await manager.query(
@@ -176,7 +186,7 @@ export function createOperatorProductApplicationsController(
           offerId: approval.offer_id,
           organizationId: approval.organization_id,
           activatedListings: listingResult[1] || 0,
-          listingUpserted: true,
+          listingUpserted,
         },
       };
     });
