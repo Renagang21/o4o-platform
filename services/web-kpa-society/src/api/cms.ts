@@ -137,6 +137,7 @@ export const cmsApi = {
     type?: string;
     status?: string;
     authorRole?: string;
+    search?: string;
     limit?: number;
     offset?: number;
   }): Promise<ContentsResponse> => {
@@ -146,6 +147,7 @@ export const cmsApi = {
       type: options?.type || '',
       status: options?.status || '',
       authorRole: options?.authorRole || '',
+      search: options?.search || '',
       limit: String(options?.limit || 20),
       offset: String(options?.offset || 0),
     });

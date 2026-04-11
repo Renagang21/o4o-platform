@@ -2,6 +2,7 @@
  * HubContentLibraryPage - 플랫폼 콘텐츠 라이브러리
  *
  * WO-O4O-HUB-CONTENT-LIBRARY-V1
+ * WO-O4O-KPA-CONTENT-HUB-LIST-UX-REFINE-V1: 카드→테이블, 탭 확장, 검색, 복사 UX 개선
  *
  * Hub 공용공간에서 플랫폼이 제공하는 CMS 콘텐츠를 탐색하고
  * "내 매장에 복사" 버튼으로 자신의 매장 자산에 추가하는 페이지.
@@ -11,31 +12,52 @@
  *   - assetSnapshotApi.copy() : 콘텐츠를 내 매장에 복사
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { cmsApi, type CmsContent } from '../../api/cms';
 import { assetSnapshotApi } from '../../api/assetSnapshot';
-import { colors, shadows, borderRadius } from '../../styles/theme';
+import { colors } from '../../styles/theme';
 
 // ============================================
 // 타입 필터 정의
 // ============================================
 
-// WO-KPA-SOCIETY-CONTENT-POLICY-IMPLEMENTATION-AB-V1: KPA 실운영 타입(notice, news)만 유지
-type ContentTypeFilter = 'all' | 'notice' | 'news';
+type ContentTypeFilter = 'all' | 'notice' | 'news' | 'guide' | 'knowledge' | 'event' | 'promo';
 
 const TYPE_TABS: { key: ContentTypeFilter; label: string }[] = [
   { key: 'all', label: '전체' },
   { key: 'notice', label: '공지사항' },
   { key: 'news', label: '뉴스' },
+  { key: 'guide', label: '가이드' },
+  { key: 'knowledge', label: '지식자료' },
+  { key: 'event', label: '이벤트' },
+  { key: 'promo', label: '프로모션' },
 ];
 
 const TYPE_BADGE_COLORS: Record<string, { bg: string; text: string }> = {
   notice: { bg: '#fef3c7', text: '#92400e' },
   news: { bg: '#d1fae5', text: '#065f46' },
+  guide: { bg: '#dbeafe', text: '#1e40af' },
+  knowledge: { bg: '#ede9fe', text: '#5b21b6' },
+  event: { bg: '#ffedd5', text: '#9a3412' },
+  promo: { bg: '#fce7f3', text: '#9d174d' },
 };
 
 const PAGE_LIMIT = 20;
+
+function formatDate(dateString: string): string {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diff = now.getTime() - date.getTime();
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  if (days > 7) return date.toLocaleDateString('ko-KR');
+  if (days > 0) return `${days}일 전`;
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  if (hours > 0) return `${hours}시간 전`;
+  const minutes = Math.floor(diff / (1000 * 60));
+  return minutes > 0 ? `${minutes}분 전` : '방금 전';
+}
 
 // ============================================
 // 컴포넌트
@@ -49,9 +71,11 @@ export function HubContentLibraryPage() {
   const [offset, setOffset] = useState(0);
   const [total, setTotal] = useState(0);
   const [copyingId, setCopyingId] = useState<string | null>(null);
-  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [searchInput, setSearchInput] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const fetchContents = useCallback(async (type: ContentTypeFilter, pageOffset: number) => {
+  const fetchContents = useCallback(async (type: ContentTypeFilter, pageOffset: number, search: string) => {
     setLoading(true);
     setError(null);
     try {
@@ -59,6 +83,7 @@ export function HubContentLibraryPage() {
         serviceKey: 'kpa',
         type: type === 'all' ? undefined : type,
         status: 'published',
+        search: search || undefined,
         limit: PAGE_LIMIT,
         offset: pageOffset,
       });
@@ -72,194 +97,263 @@ export function HubContentLibraryPage() {
   }, []);
 
   useEffect(() => {
-    fetchContents(typeFilter, offset);
-  }, [fetchContents, typeFilter, offset]);
+    fetchContents(typeFilter, offset, searchQuery);
+  }, [fetchContents, typeFilter, offset, searchQuery]);
 
   const handleTypeChange = (type: ContentTypeFilter) => {
     setTypeFilter(type);
+    setOffset(0);
+    setCopiedId(null);
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSearchQuery(searchInput.trim());
+    setOffset(0);
+    setCopiedId(null);
+  };
+
+  const handleClearSearch = () => {
+    setSearchInput('');
+    setSearchQuery('');
     setOffset(0);
   };
 
   const handleCopy = async (content: CmsContent) => {
     setCopyingId(content.id);
-    setToast(null);
     try {
       await assetSnapshotApi.copy({
         sourceService: 'kpa',
         sourceAssetId: content.id,
         assetType: 'cms',
       });
-      setToast({ type: 'success', message: `"${content.title}" 이(가) 내 매장에 복사되었습니다.` });
+      toast.success(`"${content.title}" 복사 완료`);
+      setCopiedId(content.id);
     } catch (e: any) {
-      const msg = e.message || '복사에 실패했습니다.';
-      setToast({ type: 'error', message: msg });
+      toast.error(e.message || '복사에 실패했습니다.');
     } finally {
       setCopyingId(null);
-      setTimeout(() => setToast(null), 4000);
     }
   };
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
   const currentPage = Math.floor(offset / PAGE_LIMIT) + 1;
 
+  const goToPage = (p: number) => {
+    if (p < 1 || p > totalPages) return;
+    setOffset((p - 1) * PAGE_LIMIT);
+    setCopiedId(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const pageNumbers = useMemo(() => {
+    const pages: number[] = [];
+    const maxVisible = 5;
+    let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+    const end = Math.min(totalPages, start + maxVisible - 1);
+    if (end - start + 1 < maxVisible) start = Math.max(1, end - maxVisible + 1);
+    for (let i = start; i <= end; i++) pages.push(i);
+    return pages;
+  }, [currentPage, totalPages]);
+
+  const hasFilters = !!searchQuery || typeFilter !== 'all';
+
   return (
-    <div style={styles.container}>
+    <div style={s.container}>
       {/* Hero */}
-      <header style={styles.hero}>
-        <h1 style={styles.heroTitle}>플랫폼 콘텐츠</h1>
-        <p style={styles.heroDesc}>
+      <header style={s.hero}>
+        <h1 style={s.heroTitle}>플랫폼 콘텐츠</h1>
+        <p style={s.heroDesc}>
           본부/공급사가 제공하는 CMS 콘텐츠를 탐색하고 내 매장에 복사합니다.
         </p>
       </header>
 
-      {/* Toast */}
-      {toast && (
-        <div style={{
-          ...styles.toast,
-          backgroundColor: toast.type === 'success' ? '#f0fdf4' : '#fef2f2',
-          borderColor: toast.type === 'success' ? '#86efac' : '#fecaca',
-          color: toast.type === 'success' ? '#166534' : '#991b1b',
-        }}>
-          <span>{toast.type === 'success' ? '\u2705' : '\u274c'}</span>
-          <span>{toast.message}</span>
+      {/* Search */}
+      <form style={s.searchForm} onSubmit={handleSearchSubmit}>
+        <input
+          type="text"
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          placeholder="제목 또는 요약 검색"
+          style={s.searchInput}
+        />
+        <button type="submit" style={s.searchBtn}>검색</button>
+      </form>
+
+      {/* Type Filter Tabs */}
+      <div style={s.filterBar}>
+        <div style={s.categories}>
+          {TYPE_TABS.map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => handleTypeChange(tab.key)}
+              style={{
+                ...s.catBtn,
+                ...(typeFilter === tab.key ? s.catBtnActive : {}),
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Active filters */}
+      {hasFilters && (
+        <div style={s.activeFilters}>
+          <span style={s.activeLabel}>
+            {searchQuery && `"${searchQuery}" `}
+            {typeFilter !== 'all' && TYPE_TABS.find(t => t.key === typeFilter)?.label}
+          </span>
+          <button onClick={() => { handleClearSearch(); setTypeFilter('all'); }} style={s.clearBtn}>
+            초기화
+          </button>
         </div>
       )}
 
-      {/* Type Filter Tabs */}
-      <div style={styles.filterBar}>
-        {TYPE_TABS.map(tab => (
-          <button
-            key={tab.key}
-            onClick={() => handleTypeChange(tab.key)}
-            style={{
-              ...styles.filterTab,
-              ...(typeFilter === tab.key ? styles.filterTabActive : {}),
-            }}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      {/* Loading */}
+      {loading && (
+        <div style={s.tableWrapper}>
+          <table style={s.table}>
+            <thead><tr>
+              <th style={{ ...s.th, width: '80px' }}>유형</th>
+              <th style={s.th}>제목</th>
+              <th style={{ ...s.th, width: '200px' }}>요약</th>
+              <th style={{ ...s.th, width: '100px' }}>작성일</th>
+              <th style={{ ...s.th, width: '120px' }}></th>
+            </tr></thead>
+            <tbody>
+              {[1, 2, 3, 4, 5].map(i => (
+                <tr key={i}><td colSpan={5} style={s.td}>
+                  <div style={{ height: '14px', backgroundColor: colors.neutral200, borderRadius: '4px', width: `${50 + i * 8}%` }} />
+                </td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
-      {/* Content List */}
-      {loading ? (
-        <div style={styles.emptyState}>콘텐츠 목록을 불러오는 중...</div>
-      ) : error ? (
-        <div style={styles.errorState}>
-          <p>{error}</p>
-          <button onClick={() => fetchContents(typeFilter, offset)} style={styles.retryButton}>
+      {/* Error */}
+      {!loading && error && (
+        <div style={s.emptyState}>
+          <p style={{ color: '#dc2626' }}>{error}</p>
+          <button onClick={() => fetchContents(typeFilter, offset, searchQuery)} style={s.retryButton}>
             다시 시도
           </button>
         </div>
-      ) : contents.length === 0 ? (
-        <div style={styles.emptyState}>
-          {typeFilter === 'all'
-            ? '현재 제공되는 콘텐츠가 없습니다.'
-            : `"${TYPE_TABS.find(t => t.key === typeFilter)?.label}" 유형의 콘텐츠가 없습니다.`}
-        </div>
-      ) : (
+      )}
+
+      {/* Table */}
+      {!loading && !error && (
         <>
-          {/* Result count */}
-          <div style={styles.resultCount}>
-            총 {total}건{typeFilter !== 'all' && ` (${TYPE_TABS.find(t => t.key === typeFilter)?.label})`}
+          {/* Info bar */}
+          <div style={s.infoBar}>
+            <span style={s.totalCount}>
+              {hasFilters ? `검색 결과 ${total}건` : `총 ${total}개의 콘텐츠`}
+            </span>
+            {totalPages > 1 && (
+              <span style={s.pageInfo}>{currentPage} / {totalPages} 페이지</span>
+            )}
           </div>
 
-          {/* Card Grid */}
-          <div style={styles.cardGrid}>
-            {contents.map(item => {
-              const badgeColor = TYPE_BADGE_COLORS[item.type] || { bg: '#f1f5f9', text: '#475569' };
-              const isCopying = copyingId === item.id;
+          <div style={s.tableWrapper}>
+            <table style={s.table}>
+              <thead>
+                <tr>
+                  <th style={{ ...s.th, width: '80px' }}>유형</th>
+                  <th style={s.th}>제목</th>
+                  <th style={{ ...s.th, width: '200px' }}>요약</th>
+                  <th style={{ ...s.th, width: '100px' }}>작성일</th>
+                  <th style={{ ...s.th, width: '120px' }}></th>
+                </tr>
+              </thead>
+              <tbody>
+                {contents.length > 0 ? contents.map(item => {
+                  const badgeColor = TYPE_BADGE_COLORS[item.type] || { bg: '#f1f5f9', text: '#475569' };
+                  const isCopying = copyingId === item.id;
+                  const isCopied = copiedId === item.id;
 
-              return (
-                <div key={item.id} style={styles.card}>
-                  {/* Image placeholder */}
-                  {item.imageUrl ? (
-                    <div style={{
-                      ...styles.cardImage,
-                      backgroundImage: `url(${item.imageUrl})`,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center',
-                    }} />
-                  ) : (
-                    <div style={styles.cardImagePlaceholder}>
-                      <span style={{ fontSize: '24px' }}>📄</span>
-                    </div>
-                  )}
-
-                  {/* Body */}
-                  <div style={styles.cardBody}>
-                    <div style={styles.cardMeta}>
-                      <span style={{
-                        ...styles.typeBadge,
-                        backgroundColor: badgeColor.bg,
-                        color: badgeColor.text,
-                      }}>
-                        {TYPE_TABS.find(t => t.key === item.type)?.label || item.type}
-                      </span>
-                      {item.isPinned && <span style={styles.pinnedBadge}>고정</span>}
-                    </div>
-                    <h3 style={styles.cardTitle}>{item.title}</h3>
-                    {item.summary && (
-                      <p style={styles.cardSummary}>{item.summary}</p>
-                    )}
-                    <div style={styles.cardFooter}>
-                      <span style={styles.cardDate}>
-                        {item.publishedAt
-                          ? new Date(item.publishedAt).toLocaleDateString('ko-KR')
-                          : new Date(item.createdAt).toLocaleDateString('ko-KR')}
-                      </span>
-                      <button
-                        onClick={() => handleCopy(item)}
-                        disabled={isCopying}
-                        style={{
-                          ...styles.copyButton,
-                          opacity: isCopying ? 0.6 : 1,
-                          cursor: isCopying ? 'not-allowed' : 'pointer',
-                        }}
-                      >
-                        {isCopying ? '복사 중...' : '내 매장에 복사'}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+                  return (
+                    <tr key={item.id} style={item.isPinned ? s.pinnedRow : s.row}>
+                      <td style={{ ...s.td, width: '80px', textAlign: 'center' }}>
+                        <span style={{ ...s.typeBadge, backgroundColor: badgeColor.bg, color: badgeColor.text }}>
+                          {TYPE_TABS.find(t => t.key === item.type)?.label || item.type}
+                        </span>
+                        {item.isPinned && <span style={s.pinnedBadge}>고정</span>}
+                      </td>
+                      <td style={s.td}>
+                        <span style={s.titleText}>{item.title}</span>
+                      </td>
+                      <td style={{ ...s.td, width: '200px', color: colors.neutral500, fontSize: '13px' }}>
+                        <span style={s.summaryText}>{item.summary || '-'}</span>
+                      </td>
+                      <td style={{ ...s.td, width: '100px', color: colors.neutral400, fontSize: '13px' }}>
+                        {formatDate(item.publishedAt || item.createdAt)}
+                      </td>
+                      <td style={{ ...s.td, width: '120px', textAlign: 'center' }}>
+                        {isCopied ? (
+                          <Link to="/store/content" style={s.goToStoreLink}>
+                            작업하러 가기
+                          </Link>
+                        ) : (
+                          <button
+                            onClick={() => handleCopy(item)}
+                            disabled={isCopying}
+                            style={{
+                              ...s.copyButton,
+                              opacity: isCopying ? 0.6 : 1,
+                              cursor: isCopying ? 'not-allowed' : 'pointer',
+                            }}
+                          >
+                            {isCopying ? '복사 중...' : '내 매장에 복사'}
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                }) : (
+                  <tr>
+                    <td colSpan={5} style={s.emptyCell}>
+                      {hasFilters ? (
+                        <>
+                          <p style={s.emptyTitle}>검색 결과가 없습니다</p>
+                          <button onClick={() => { handleClearSearch(); setTypeFilter('all'); }} style={s.emptyBtn}>
+                            전체 목록 보기
+                          </button>
+                        </>
+                      ) : (
+                        <p style={s.emptyTitle}>현재 제공되는 콘텐츠가 없습니다</p>
+                      )}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div style={styles.pagination}>
-              <button
-                onClick={() => setOffset(Math.max(0, offset - PAGE_LIMIT))}
-                disabled={currentPage <= 1}
-                style={{
-                  ...styles.pageButton,
-                  opacity: currentPage <= 1 ? 0.4 : 1,
-                  cursor: currentPage <= 1 ? 'not-allowed' : 'pointer',
-                }}
-              >
-                &laquo; 이전
-              </button>
-              <span style={styles.pageInfo}>{currentPage} / {totalPages}</span>
-              <button
-                onClick={() => setOffset(offset + PAGE_LIMIT)}
-                disabled={currentPage >= totalPages}
-                style={{
-                  ...styles.pageButton,
-                  opacity: currentPage >= totalPages ? 0.4 : 1,
-                  cursor: currentPage >= totalPages ? 'not-allowed' : 'pointer',
-                }}
-              >
-                다음 &raquo;
-              </button>
+            <div style={s.pagination}>
+              <button onClick={() => goToPage(1)} disabled={currentPage === 1}
+                style={{ ...s.pageBtn, ...(currentPage === 1 ? s.pageBtnDisabled : {}) }}>&laquo;</button>
+              <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}
+                style={{ ...s.pageBtn, ...(currentPage === 1 ? s.pageBtnDisabled : {}) }}>&lsaquo;</button>
+              {pageNumbers.map(p => (
+                <button key={p} onClick={() => goToPage(p)}
+                  style={{ ...s.pageBtn, ...(p === currentPage ? s.pageBtnActive : {}) }}>{p}</button>
+              ))}
+              <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages}
+                style={{ ...s.pageBtn, ...(currentPage === totalPages ? s.pageBtnDisabled : {}) }}>&rsaquo;</button>
+              <button onClick={() => goToPage(totalPages)} disabled={currentPage === totalPages}
+                style={{ ...s.pageBtn, ...(currentPage === totalPages ? s.pageBtnDisabled : {}) }}>&raquo;</button>
             </div>
           )}
         </>
       )}
 
       {/* Guide notice */}
-      <div style={styles.notice}>
-        <span style={styles.noticeIcon}>💡</span>
+      <div style={s.notice}>
+        <span style={s.noticeIcon}>💡</span>
         <span>
           복사된 콘텐츠는{' '}
           <Link to="/store/content" style={{ color: colors.primary }}>내 매장 &gt; 자산 관리</Link>
@@ -274,245 +368,154 @@ export function HubContentLibraryPage() {
 // 스타일
 // ============================================
 
-const styles: Record<string, React.CSSProperties> = {
+const s: Record<string, React.CSSProperties> = {
   container: {
     maxWidth: '1100px',
     margin: '0 auto',
     padding: '24px',
   },
 
-  // Breadcrumb
-  breadcrumb: {
-    marginBottom: '16px',
-  },
-  breadcrumbLink: {
-    fontSize: '0.875rem',
-    color: colors.primary,
-    textDecoration: 'none',
-  },
-
   // Hero
   hero: {
-    marginBottom: '24px',
-    paddingBottom: '20px',
+    marginBottom: '20px',
+    paddingBottom: '16px',
     borderBottom: '2px solid #e2e8f0',
   },
   heroTitle: {
     margin: 0,
-    fontSize: '1.75rem',
+    fontSize: '1.5rem',
     fontWeight: 700,
     color: colors.neutral900,
   },
   heroDesc: {
-    margin: '8px 0 0',
-    fontSize: '0.95rem',
+    margin: '6px 0 0',
+    fontSize: '0.875rem',
     color: colors.neutral500,
   },
 
-  // Toast
-  toast: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    padding: '12px 16px',
-    borderRadius: '8px',
-    border: '1px solid',
-    fontSize: '0.875rem',
-    marginBottom: '16px',
-  },
+  // Search
+  searchForm: { display: 'flex', gap: '8px', marginBottom: '12px' },
+  searchInput: {
+    flex: 1, padding: '8px 14px', fontSize: '14px', border: `1px solid ${colors.neutral200}`,
+    borderRadius: '6px', outline: 'none', backgroundColor: colors.white, boxSizing: 'border-box',
+  } as React.CSSProperties,
+  searchBtn: {
+    padding: '8px 18px', fontSize: '14px', fontWeight: 500, color: colors.white,
+    backgroundColor: colors.primary, border: 'none', borderRadius: '6px', cursor: 'pointer', whiteSpace: 'nowrap',
+  } as React.CSSProperties,
 
   // Filter
   filterBar: {
-    display: 'flex',
-    gap: '8px',
-    marginBottom: '20px',
-    flexWrap: 'wrap' as const,
+    display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px',
+    flexWrap: 'wrap', marginBottom: '8px',
+  } as React.CSSProperties,
+  categories: { display: 'flex', gap: '8px', flexWrap: 'wrap' } as React.CSSProperties,
+  catBtn: {
+    padding: '6px 14px', fontSize: '13px', fontWeight: 500,
+    border: `1px solid ${colors.neutral300}`, borderRadius: '20px',
+    backgroundColor: colors.white, color: colors.neutral700, cursor: 'pointer',
+  } as React.CSSProperties,
+  catBtnActive: {
+    backgroundColor: colors.primary, borderColor: colors.primary, color: colors.white,
   },
-  filterTab: {
-    padding: '6px 14px',
-    fontSize: '0.8125rem',
-    fontWeight: 500,
-    color: colors.neutral500,
-    backgroundColor: colors.neutral100,
-    border: 'none',
-    borderRadius: '20px',
-    cursor: 'pointer',
-    transition: 'all 0.15s',
+  activeFilters: {
+    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+    padding: '6px 12px', backgroundColor: '#eff6ff', borderRadius: '6px', border: '1px solid #bfdbfe',
+    marginBottom: '8px',
   },
-  filterTabActive: {
-    backgroundColor: colors.primary,
-    color: '#fff',
-  },
+  activeLabel: { fontSize: '13px', color: '#1d4ed8' },
+  clearBtn: {
+    fontSize: '12px', color: '#1d4ed8', background: 'none', border: 'none',
+    cursor: 'pointer', textDecoration: 'underline', padding: '2px 4px',
+  } as React.CSSProperties,
 
-  // Result count
-  resultCount: {
-    fontSize: '0.8125rem',
-    color: colors.neutral500,
-    marginBottom: '12px',
+  // Table
+  tableWrapper: {
+    backgroundColor: colors.white, borderRadius: '8px', border: `1px solid ${colors.neutral200}`,
+    overflow: 'hidden', marginBottom: '8px',
   },
+  table: { width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' } as React.CSSProperties,
+  th: {
+    padding: '10px 12px', fontSize: '12px', fontWeight: 600, color: colors.neutral500,
+    backgroundColor: colors.neutral50, borderBottom: `1px solid ${colors.neutral200}`, textAlign: 'left',
+  } as React.CSSProperties,
+  td: {
+    padding: '12px', fontSize: '14px', color: colors.neutral900, borderBottom: `1px solid ${colors.neutral100}`,
+    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+  } as React.CSSProperties,
+  row: { transition: 'background-color 0.1s' },
+  pinnedRow: { backgroundColor: '#fffbeb', transition: 'background-color 0.1s' },
 
-  // Card grid
-  cardGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-    gap: '20px',
-    marginBottom: '24px',
-  },
-  card: {
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.lg,
-    boxShadow: shadows.sm,
-    border: `1px solid ${colors.neutral200}`,
-    overflow: 'hidden',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  cardImage: {
-    height: '140px',
-    backgroundColor: '#f1f5f9',
-  },
-  cardImagePlaceholder: {
-    height: '100px',
-    backgroundColor: '#f8fafc',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  cardBody: {
-    padding: '16px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
-    flex: 1,
-  },
-  cardMeta: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-  },
+  // Badges
   typeBadge: {
-    display: 'inline-block',
-    padding: '2px 8px',
-    fontSize: '0.6875rem',
-    fontWeight: 600,
+    display: 'inline-block', padding: '2px 8px', fontSize: '11px', fontWeight: 600,
     borderRadius: '4px',
   },
   pinnedBadge: {
-    display: 'inline-block',
-    padding: '2px 6px',
-    fontSize: '0.625rem',
-    fontWeight: 600,
-    color: '#b45309',
-    backgroundColor: '#fef3c7',
-    borderRadius: '4px',
+    display: 'inline-block', padding: '1px 6px', fontSize: '10px', fontWeight: 600,
+    color: '#b45309', backgroundColor: '#fef3c7', borderRadius: '3px', marginLeft: '4px',
   },
-  cardTitle: {
-    margin: 0,
-    fontSize: '0.95rem',
-    fontWeight: 600,
-    color: colors.neutral900,
-    lineHeight: 1.4,
-    display: '-webkit-box',
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: 'vertical',
-    overflow: 'hidden',
+  titleText: { fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } as React.CSSProperties,
+  summaryText: { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } as React.CSSProperties,
+
+  // Info bar
+  infoBar: {
+    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+    padding: '8px 0', marginBottom: '4px',
   },
-  cardSummary: {
-    margin: 0,
-    fontSize: '0.8125rem',
-    color: colors.neutral500,
-    lineHeight: 1.5,
-    display: '-webkit-box',
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: 'vertical',
-    overflow: 'hidden',
-    flex: 1,
-  },
-  cardFooter: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: '8px',
-    paddingTop: '8px',
-    borderTop: '1px solid #f1f5f9',
-  },
-  cardDate: {
-    fontSize: '0.75rem',
-    color: colors.neutral400,
-  },
+  totalCount: { fontSize: '13px', color: colors.neutral500 },
+  pageInfo: { fontSize: '13px', color: colors.neutral400 },
+
+  // Copy button
   copyButton: {
-    padding: '5px 12px',
-    fontSize: '0.75rem',
-    fontWeight: 600,
-    color: colors.white,
-    backgroundColor: colors.primary,
-    border: 'none',
-    borderRadius: '6px',
-    transition: 'opacity 0.15s',
+    padding: '5px 12px', fontSize: '12px', fontWeight: 600,
+    color: colors.white, backgroundColor: colors.primary,
+    border: 'none', borderRadius: '6px', transition: 'opacity 0.15s',
+  },
+  goToStoreLink: {
+    fontSize: '12px', fontWeight: 600, color: colors.primary,
+    textDecoration: 'none',
   },
 
   // Pagination
   pagination: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '16px',
-    marginBottom: '32px',
+    display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '4px', padding: '24px 0',
   },
-  pageButton: {
-    padding: '6px 14px',
-    fontSize: '0.8125rem',
-    fontWeight: 500,
-    color: colors.neutral600,
-    backgroundColor: colors.white,
-    border: `1px solid ${colors.neutral200}`,
-    borderRadius: '6px',
-  },
-  pageInfo: {
-    fontSize: '0.8125rem',
-    color: colors.neutral500,
-  },
+  pageBtn: {
+    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+    minWidth: '36px', height: '36px', padding: '0 8px',
+    fontSize: '14px', fontWeight: 500, color: colors.neutral600,
+    backgroundColor: colors.white, border: `1px solid ${colors.neutral200}`, borderRadius: '6px',
+    cursor: 'pointer', transition: 'all 0.15s',
+  } as React.CSSProperties,
+  pageBtnActive: { backgroundColor: colors.primary, color: colors.white, borderColor: colors.primary },
+  pageBtnDisabled: { color: colors.neutral300, cursor: 'default', opacity: 0.5 },
 
   // Empty / Error
   emptyState: {
-    textAlign: 'center' as const,
-    padding: '60px 20px',
-    fontSize: '0.9rem',
-    color: colors.neutral400,
+    textAlign: 'center' as const, padding: '60px 20px', fontSize: '0.9rem', color: colors.neutral400,
   },
-  errorState: {
-    textAlign: 'center' as const,
-    padding: '60px 20px',
-    color: '#dc2626',
-    fontSize: '0.9rem',
+  emptyCell: { padding: '60px 20px', textAlign: 'center' } as React.CSSProperties,
+  emptyTitle: { fontSize: '15px', color: colors.neutral500, margin: '0 0 12px 0' },
+  emptyBtn: {
+    display: 'inline-flex', alignItems: 'center', padding: '8px 18px',
+    fontSize: '13px', fontWeight: 600, color: colors.white, backgroundColor: colors.primary,
+    textDecoration: 'none', borderRadius: '6px', border: 'none', cursor: 'pointer',
   },
   retryButton: {
-    marginTop: '12px',
-    padding: '6px 16px',
-    fontSize: '0.8125rem',
-    color: colors.primary,
-    backgroundColor: 'transparent',
-    border: `1px solid ${colors.primary}`,
-    borderRadius: '6px',
-    cursor: 'pointer',
+    marginTop: '12px', padding: '6px 16px', fontSize: '0.8125rem',
+    color: colors.primary, backgroundColor: 'transparent',
+    border: `1px solid ${colors.primary}`, borderRadius: '6px', cursor: 'pointer',
   },
 
   // Notice
   notice: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    gap: '12px',
-    padding: '18px 22px',
-    backgroundColor: colors.primary + '08',
-    borderRadius: borderRadius.lg,
-    border: `1px solid ${colors.primary}20`,
-    fontSize: '0.875rem',
-    color: colors.neutral600,
-    lineHeight: 1.5,
-    marginTop: '24px',
+    display: 'flex', alignItems: 'flex-start', gap: '12px',
+    padding: '18px 22px', backgroundColor: colors.primary + '08',
+    borderRadius: '10px', border: `1px solid ${colors.primary}20`,
+    fontSize: '0.875rem', color: colors.neutral600, lineHeight: 1.5, marginTop: '24px',
   },
   noticeIcon: {
-    fontSize: '18px',
-    flexShrink: 0,
+    fontSize: '18px', flexShrink: 0,
   },
 };

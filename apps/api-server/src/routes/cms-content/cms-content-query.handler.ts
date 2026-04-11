@@ -142,6 +142,7 @@ export function createCmsContentQueryRoutes(deps: {
         visibilityScope,
         limit = '20',
         offset = '0',
+        search,
       } = req.query;
 
       const contentRepo = dataSource.getRepository(CmsContent);
@@ -175,12 +176,33 @@ export function createCmsContentQueryRoutes(deps: {
         where.visibilityScope = visibilityScope as string;
       }
 
-      const [contents, total] = await contentRepo.findAndCount({
-        where,
-        order: { isPinned: 'DESC', sortOrder: 'ASC', createdAt: 'DESC' },
-        take: parseInt(limit as string, 10),
-        skip: parseInt(offset as string, 10),
-      });
+      // WO-O4O-KPA-CONTENT-HUB-LIST-UX-REFINE-V1: search 지원
+      const takeVal = parseInt(limit as string, 10);
+      const skipVal = parseInt(offset as string, 10);
+
+      let contents: CmsContent[];
+      let total: number;
+
+      if (search && typeof search === 'string' && search.trim()) {
+        const qb = contentRepo.createQueryBuilder('c');
+        Object.entries(where).forEach(([key, val]) => {
+          qb.andWhere(`c."${key}" = :${key}`, { [key]: val });
+        });
+        const searchTerm = `%${search.trim()}%`;
+        qb.andWhere('(c.title ILIKE :search OR c.summary ILIKE :search)', { search: searchTerm });
+        qb.orderBy('c."isPinned"', 'DESC')
+          .addOrderBy('c."sortOrder"', 'ASC')
+          .addOrderBy('c."createdAt"', 'DESC');
+        qb.take(takeVal).skip(skipVal);
+        [contents, total] = await qb.getManyAndCount();
+      } else {
+        [contents, total] = await contentRepo.findAndCount({
+          where,
+          order: { isPinned: 'DESC', sortOrder: 'ASC', createdAt: 'DESC' },
+          take: takeVal,
+          skip: skipVal,
+        });
+      }
 
       res.json({
         success: true,
@@ -203,8 +225,8 @@ export function createCmsContentQueryRoutes(deps: {
         })),
         pagination: {
           total,
-          limit: parseInt(limit as string, 10),
-          offset: parseInt(offset as string, 10),
+          limit: takeVal,
+          offset: skipVal,
         },
       });
     } catch (error: any) {
