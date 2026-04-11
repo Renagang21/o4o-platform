@@ -65,6 +65,12 @@ export interface CatalogProduct {
   description: string | null;
   purpose: string;
   distributionType: string;
+  /** 일반 공급가 (B2B) */
+  priceGeneral: number | null;
+  /** 서비스 공급가 (KPA 기준가) */
+  priceGold: number | null;
+  /** 소비자 참고가 */
+  consumerReferencePrice: number | null;
   createdAt: string;
   updatedAt: string;
   supplierId: string;

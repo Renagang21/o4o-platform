@@ -68,7 +68,10 @@ export function createOperatorProductApplicationsController(
               pa.decided_at AS reviewed_at,
               pa.created_at, pa.updated_at,
               pa.approval_type,
-              supplier_org.name AS supplier_name
+              supplier_org.name AS supplier_name,
+              spo.price_general AS "priceGeneral",
+              spo.price_gold AS "priceGold",
+              spo.consumer_reference_price AS "consumerReferencePrice"
        FROM product_approvals pa
        LEFT JOIN supplier_product_offers spo ON spo.id = pa.offer_id
        LEFT JOIN product_masters pm ON pm.id = spo.master_id

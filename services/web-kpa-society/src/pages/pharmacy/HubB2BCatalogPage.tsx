@@ -21,6 +21,19 @@ import {
 } from '../../api/pharmacyProducts';
 import { colors, shadows, borderRadius } from '../../styles/theme';
 
+/** KPA 기준 가격: priceGold 우선 → priceGeneral fallback */
+function formatKpaPrice(item: CatalogProduct): string {
+  const price = item.priceGold ?? item.priceGeneral;
+  if (price == null) return '-';
+  return price.toLocaleString('ko-KR') + '원';
+}
+
+function getPriceSublabel(item: CatalogProduct): string | null {
+  if (item.priceGold != null) return '서비스가';
+  if (item.priceGeneral != null) return '일반가';
+  return null;
+}
+
 // ============================================
 // 카테고리 필터
 // ============================================
@@ -309,6 +322,9 @@ export function HubB2BCatalogPage() {
               <span style={{ ...styles.th, flex: 0.8, cursor: 'pointer' }} onClick={() => handleSort('category')}>
                 카테고리{sortIndicator('category')}
               </span>
+              <span style={{ ...styles.th, flex: 0.8, textAlign: 'right' }}>
+                공급가
+              </span>
               <span style={{ ...styles.th, flex: 0.8, cursor: 'pointer' }} onClick={() => handleSort('status')}>
                 상태{sortIndicator('status')}
               </span>
@@ -350,6 +366,18 @@ export function HubB2BCatalogPage() {
                   <div style={{ ...styles.td, flex: 0.8 }}>
                     {item.category && (
                       <span style={styles.categoryBadge}>{item.category}</span>
+                    )}
+                  </div>
+
+                  {/* 공급가 */}
+                  <div style={{ ...styles.td, flex: 0.8, alignItems: 'flex-end' }}>
+                    <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: colors.neutral900 }}>
+                      {formatKpaPrice(item)}
+                    </span>
+                    {getPriceSublabel(item) && (
+                      <span style={{ fontSize: '0.625rem', color: colors.neutral400, marginTop: 1 }}>
+                        {getPriceSublabel(item)}
+                      </span>
                     )}
                   </div>
 

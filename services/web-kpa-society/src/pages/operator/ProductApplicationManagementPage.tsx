@@ -36,6 +36,12 @@ interface ProductApplication {
     [key: string]: unknown;
   };
   supplierName: string | null;
+  /** 일반 공급가 */
+  priceGeneral: number | null;
+  /** 서비스 공급가 (KPA 기준) */
+  priceGold: number | null;
+  /** 소비자 참고가 */
+  consumerReferencePrice: number | null;
   status: 'pending' | 'approved' | 'rejected';
   reject_reason: string | null;
   requested_by: string;
@@ -51,6 +57,20 @@ interface Stats {
 }
 
 type StatusFilter = 'all' | 'pending' | 'approved' | 'rejected';
+
+/** KPA 기준 가격 표시: priceGold 우선 → priceGeneral fallback → '-' */
+function formatKpaPrice(app: ProductApplication): string {
+  const price = app.priceGold ?? app.priceGeneral;
+  if (price == null) return '-';
+  return price.toLocaleString('ko-KR') + '원';
+}
+
+/** priceGold 존재 시 '서비스가', 아니면 '일반가' */
+function getPriceLabel(app: ProductApplication): string | null {
+  if (app.priceGold != null) return '서비스가';
+  if (app.priceGeneral != null) return '일반가';
+  return null;
+}
 
 // ============================================
 // 컴포넌트
@@ -232,6 +252,7 @@ export default function ProductApplicationManagementPage() {
                   <th style={thStyle}>약국</th>
                   <th style={thStyle}>상품명</th>
                   <th style={thStyle}>공급사</th>
+                  <th style={{ ...thStyle, textAlign: 'right' }}>공급가</th>
                   <th style={thStyle}>카테고리</th>
                   <th style={thStyle}>신청일</th>
                   <th style={thStyle}>상태</th>
@@ -250,6 +271,14 @@ export default function ProductApplicationManagementPage() {
                         <div style={{ fontWeight: 500 }}>{app.product_name}</div>
                       </td>
                       <td style={tdStyle}>{app.supplierName || '-'}</td>
+                      <td style={{ ...tdStyle, textAlign: 'right', whiteSpace: 'nowrap' }}>
+                        <div style={{ fontWeight: 500 }}>{formatKpaPrice(app)}</div>
+                        {getPriceLabel(app) && (
+                          <div style={{ fontSize: '0.625rem', color: '#94a3b8', marginTop: 1 }}>
+                            {getPriceLabel(app)}
+                          </div>
+                        )}
+                      </td>
                       <td style={tdStyle}>{(app.product_metadata?.category as string) || '-'}</td>
                       <td style={tdStyle}>{new Date(app.requested_at).toLocaleDateString('ko-KR')}</td>
                       <td style={tdStyle}>
