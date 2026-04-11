@@ -376,7 +376,7 @@ export function createCheckoutController(
            FROM organization_product_listings opl
            JOIN supplier_product_offers spo ON spo.id = opl.offer_id
            WHERE opl.organization_id = $1
-             AND opl.service_key = 'kpa'
+             AND opl.service_key = 'kpa-society'
              AND opl.offer_id::text = ANY($2::text[])
              AND spo.distribution_type = 'PRIVATE'`,
           [pharmacy.id, productIds]
@@ -410,7 +410,7 @@ export function createCheckoutController(
              ON oc.id = opc.channel_id
            WHERE opc.channel_id = $1
              AND opl.organization_id = $2
-             AND opl.service_key = 'kpa'
+             AND opl.service_key = 'kpa-society'
              AND opl.is_active = true
              AND opc.is_active = true
              AND oc.status = 'APPROVED'`,

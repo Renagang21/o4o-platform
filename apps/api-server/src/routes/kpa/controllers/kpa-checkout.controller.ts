@@ -36,7 +36,7 @@ import {
 // ============================================================================
 
 interface KpaOrderMetadata {
-  serviceKey: 'kpa';
+  serviceKey: 'kpa-society' | 'kpa';
   organizationId: string;
   organizationName?: string;
   channelType: string;
@@ -396,7 +396,7 @@ export function createKpaCheckoutController(
              ON oc.id = opc.channel_id
            WHERE opc.channel_id = $1
              AND opl.organization_id = $2
-             AND opl.service_key = 'kpa'
+             AND opl.service_key = 'kpa-society'
              AND opl.is_active = true
              AND opc.is_active = true
              AND oc.status = 'APPROVED'`,
@@ -492,7 +492,7 @@ export function createKpaCheckoutController(
 
           // 6b. Core 위임 주문 생성
           const metadata: KpaOrderMetadata = {
-            serviceKey: 'kpa',
+            serviceKey: 'kpa-society',
             organizationId: organization.id,
             organizationName: organization.name,
             channelType: 'B2C',
@@ -608,8 +608,8 @@ export function createKpaCheckoutController(
           .leftJoinAndSelect('order.items', 'items')
           .where('order.buyerId = :buyerId', { buyerId })
           .andWhere(
-            "order.orderType = :retail AND order.metadata->>'serviceKey' = :serviceKey",
-            { retail: OrderType.RETAIL, serviceKey: 'kpa' }
+            "order.orderType = :retail AND order.metadata->>'serviceKey' IN (:...serviceKeys)",
+            { retail: OrderType.RETAIL, serviceKeys: ['kpa-society', 'kpa'] }
           )
           .orderBy('order.createdAt', 'DESC')
           .take(limit)
@@ -670,8 +670,8 @@ export function createKpaCheckoutController(
           .where('order.id = :orderId', { orderId })
           .andWhere('order.buyerId = :buyerId', { buyerId })
           .andWhere(
-            "order.orderType = :retail AND order.metadata->>'serviceKey' = :serviceKey",
-            { retail: OrderType.RETAIL, serviceKey: 'kpa' }
+            "order.orderType = :retail AND order.metadata->>'serviceKey' IN (:...serviceKeys)",
+            { retail: OrderType.RETAIL, serviceKeys: ['kpa-society', 'kpa'] }
           )
           .getOne();
 

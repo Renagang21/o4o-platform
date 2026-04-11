@@ -82,7 +82,7 @@ export function createProductPolicyV2InternalRouter(dataSource: DataSource): Rou
       const result = await service.createServiceApproval(
         offerId,
         organizationId,
-        serviceKey || 'kpa',
+        serviceKey || 'kpa-society',
         requestedBy || 'internal-test',
       );
 
@@ -162,7 +162,7 @@ export function createProductPolicyV2InternalRouter(dataSource: DataSource): Rou
       const result = await service.createPrivateApproval(
         offerId,
         sellerOrgId,
-        serviceKey || 'kpa',
+        serviceKey || 'kpa-society',
       );
 
       logger.info('[v2-internal] createPrivateApproval:', {

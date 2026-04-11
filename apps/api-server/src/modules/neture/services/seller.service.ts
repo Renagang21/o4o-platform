@@ -143,7 +143,7 @@ export class SellerService {
        WHERE organization_id = $1 AND status = 'active' LIMIT 1`,
       [organizationId],
     );
-    return enrollment[0]?.service_code || 'kpa';
+    return enrollment[0]?.service_code || 'kpa-society';
   }
 
   /**

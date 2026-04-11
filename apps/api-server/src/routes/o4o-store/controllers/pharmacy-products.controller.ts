@@ -31,14 +31,14 @@ const VALID_SERVICE_KEYS = Object.values(SERVICE_KEYS) as string[];
 
 function resolveServiceKeyFromQuery(query: any): string {
   const requested = query?.service_key;
-  if (!requested) return SERVICE_KEYS.KPA;
+  if (!requested) return SERVICE_KEYS.KPA_SOCIETY;
   if (VALID_SERVICE_KEYS.includes(requested)) return requested;
   throw new ApiError(400, `Invalid service_key: ${requested}`, 'INVALID_SERVICE_KEY');
 }
 
 function resolveServiceKeyFromBody(body: any): string {
   const requested = body?.service_key;
-  if (!requested) return SERVICE_KEYS.KPA;
+  if (!requested) return SERVICE_KEYS.KPA_SOCIETY;
   if (VALID_SERVICE_KEYS.includes(requested)) return requested;
   throw new ApiError(400, `Invalid service_key: ${requested}`, 'INVALID_SERVICE_KEY');
 }

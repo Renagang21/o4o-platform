@@ -44,7 +44,7 @@ function generateSlug(title: string): string {
 
 /**
  * WO-KPA-STORE-CHANNEL-INTEGRATION-V1: serviceKey parameter
- * Allows reuse for KPA stores with service_key='kpa'
+ * Allows reuse for KPA stores with service_key='kpa-society'
  */
 export function createBlogController(
   dataSource: DataSource,
