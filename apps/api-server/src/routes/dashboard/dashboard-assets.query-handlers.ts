@@ -133,6 +133,11 @@ export function createListAssetsHandler(dataSource: DataSource) {
         }),
       });
     } catch (error: any) {
+      // cms_media table may not exist yet — return empty list
+      if (error.message?.includes('does not exist')) {
+        res.json({ success: true, data: [] });
+        return;
+      }
       console.error('Failed to list dashboard assets:', error);
       res.status(500).json({
         success: false,
@@ -177,6 +182,11 @@ export function createGetCopiedSourceIdsHandler(dataSource: DataSource) {
 
       res.json({ success: true, sourceIds });
     } catch (error: any) {
+      // cms_media table may not exist yet — treat as "no copies"
+      if (error.message?.includes('does not exist')) {
+        res.json({ success: true, sourceIds: [] });
+        return;
+      }
       console.error('Failed to get copied source IDs:', error);
       res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
     }
@@ -271,6 +281,11 @@ export function createGetKpiHandler(dataSource: DataSource) {
         },
       });
     } catch (error: any) {
+      // cms_media table may not exist yet — return zero KPI
+      if (error.message?.includes('does not exist')) {
+        res.json({ success: true, data: { totalAssets: 0, activeAssets: 0, recentViewsSum: 0, topRecommended: null } });
+        return;
+      }
       console.error('Failed to get dashboard KPI:', error);
       res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
     }
