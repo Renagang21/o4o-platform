@@ -10,6 +10,9 @@
  *
  * WO-MARKET-TRIAL-KPA-DETAIL-AND-FORUM-DEEP-LINK-V1:
  * getTrials/getTrialById에 forumPostId 포함하여 개별 포럼 deep link 지원
+ *
+ * WO-MARKET-TRIAL-MY-PARTICIPATION-STATUS-V1:
+ * getMyParticipations() — 현재 사용자의 전체 참여 목록 반환 (허브 참여 상태 표시용)
  */
 
 import { Response } from 'express';
@@ -215,6 +218,56 @@ export class MarketTrialController {
     } catch (error) {
       console.error('Get my trials error:', error);
       res.status(500).json({ success: false, message: 'Failed to get trials' });
+    }
+  }
+
+  /**
+   * GET /api/market-trial/my-participations
+   * 현재 사용자가 참여한 Trial 목록 (참여 상태 + Trial 요약 포함)
+   * WO-MARKET-TRIAL-MY-PARTICIPATION-STATUS-V1
+   */
+  static async getMyParticipations(req: AuthRequest, res: Response) {
+    try {
+      const userId = (req as any).user?.id;
+      if (!userId) {
+        return res.status(401).json({ success: false, message: 'Authentication required' });
+      }
+
+      const participations = await MarketTrialController.participantRepo.find({
+        where: { participantId: userId },
+        order: { createdAt: 'DESC' },
+      });
+
+      if (participations.length === 0) {
+        return res.json({ success: true, data: [] });
+      }
+
+      // Batch-fetch trial data for all participations
+      const trialIds = participations.map((p) => p.marketTrialId);
+      const trials = await MarketTrialController.trialRepo
+        .createQueryBuilder('trial')
+        .where('trial.id IN (:...ids)', { ids: trialIds })
+        .getMany();
+
+      const trialMap = new Map(trials.map((t) => [t.id, t]));
+
+      const data = participations.map((p) => {
+        const trial = trialMap.get(p.marketTrialId);
+        return {
+          ...toParticipationDTO(p),
+          trial: trial ? {
+            id: trial.id,
+            title: trial.title,
+            status: trial.status,
+            supplierName: trial.supplierName || undefined,
+          } : undefined,
+        };
+      });
+
+      res.json({ success: true, data });
+    } catch (error) {
+      console.error('Get my participations error:', error);
+      res.status(500).json({ success: false, message: 'Failed to get participations' });
     }
   }
 

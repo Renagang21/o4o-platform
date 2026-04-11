@@ -9,6 +9,10 @@
  *   - Phase 3: 신규/추천 뱃지 표시
  *   - Phase 4: 상태 컬럼 + 필터 표시 강화
  *   - Phase 5: 빈 상태 UX 개선
+ * WO-O4O-KPA-CONTENT-HUB-TYPE-DISPLAY-REMAP-V1:
+ *   - 7탭→5탭 display 리매핑 (notice+news, promo+event 병합)
+ *   - 빈 탭 동적 숨김
+ *   - 유형 배지 display category 기준
  *
  * 사용 API:
  *   - cmsApi.getContents() : 플랫폼 CMS 콘텐츠 목록 조회
@@ -26,28 +30,42 @@ import { useAuth } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
 
 // ============================================
-// 타입 필터 정의
+// Display 탭 정의 — WO-O4O-KPA-CONTENT-HUB-TYPE-DISPLAY-REMAP-V1
+// DB type 유지, 프론트엔드 display category로 리매핑
 // ============================================
 
-type ContentTypeFilter = 'all' | 'notice' | 'news' | 'guide' | 'knowledge' | 'event' | 'promo';
+type DisplayTabKey = 'all' | 'notice-news' | 'guide' | 'knowledge' | 'promo-event';
 
-const TYPE_TABS: { key: ContentTypeFilter; label: string }[] = [
-  { key: 'all', label: '전체' },
-  { key: 'notice', label: '공지사항' },
-  { key: 'news', label: '뉴스' },
-  { key: 'guide', label: '가이드' },
-  { key: 'knowledge', label: '지식자료' },
-  { key: 'event', label: '이벤트' },
-  { key: 'promo', label: '프로모션' },
+interface DisplayTab {
+  key: DisplayTabKey;
+  label: string;
+  dbTypes: string[] | null; // null = 전체 (type 파라미터 미전송)
+}
+
+const HUB_DISPLAY_TABS: DisplayTab[] = [
+  { key: 'all', label: '전체', dbTypes: null },
+  { key: 'notice-news', label: '공지/소식', dbTypes: ['notice', 'news'] },
+  { key: 'guide', label: '가이드', dbTypes: ['guide'] },
+  { key: 'knowledge', label: '지식자료', dbTypes: ['knowledge'] },
+  { key: 'promo-event', label: '혜택/이벤트', dbTypes: ['promo', 'event'] },
 ];
 
-const TYPE_BADGE_COLORS: Record<string, { bg: string; text: string }> = {
-  notice: { bg: '#fef3c7', text: '#92400e' },
-  news: { bg: '#d1fae5', text: '#065f46' },
-  guide: { bg: '#dbeafe', text: '#1e40af' },
-  knowledge: { bg: '#ede9fe', text: '#5b21b6' },
-  event: { bg: '#ffedd5', text: '#9a3412' },
-  promo: { bg: '#fce7f3', text: '#9d174d' },
+// DB type → display label
+const DISPLAY_LABEL_MAP: Record<string, string> = {
+  notice: '공지/소식',
+  news: '공지/소식',
+  guide: '가이드',
+  knowledge: '지식자료',
+  promo: '혜택/이벤트',
+  event: '혜택/이벤트',
+};
+
+// Display category → badge color
+const DISPLAY_BADGE_COLORS: Record<string, { bg: string; text: string }> = {
+  '공지/소식': { bg: '#fef3c7', text: '#92400e' },
+  '가이드': { bg: '#dbeafe', text: '#1e40af' },
+  '지식자료': { bg: '#ede9fe', text: '#5b21b6' },
+  '혜택/이벤트': { bg: '#fce7f3', text: '#9d174d' },
 };
 
 const PAGE_LIMIT = 20;
@@ -81,19 +99,21 @@ export function HubContentLibraryPage() {
   const [contents, setContents] = useState<CmsContent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [typeFilter, setTypeFilter] = useState<ContentTypeFilter>('all');
+  const [activeTab, setActiveTab] = useState<DisplayTabKey>('all');
   const [offset, setOffset] = useState(0);
   const [total, setTotal] = useState(0);
   const [copyingId, setCopyingId] = useState<string | null>(null);
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Phase 1: 이미 복사된 콘텐츠 ID set
+  // 이미 복사된 콘텐츠 ID set
   const [copiedIds, setCopiedIds] = useState<Set<string>>(new Set());
-  // 세션 내 방금 복사한 ID (작업 이동 링크 표시용)
   const [justCopiedId, setJustCopiedId] = useState<string | null>(null);
 
-  // Phase 1: 이미 복사된 콘텐츠 ID 로드
+  // 빈 탭 동적 숨김용 타입별 카운트
+  const [tabCounts, setTabCounts] = useState<Record<string, number> | null>(null);
+
+  // 이미 복사된 콘텐츠 ID 로드
   useEffect(() => {
     if (!user?.id) return;
     dashboardApi.getCopiedSourceIds(user.id)
@@ -101,20 +121,81 @@ export function HubContentLibraryPage() {
       .catch(() => {});
   }, [user?.id]);
 
-  const fetchContents = useCallback(async (type: ContentTypeFilter, pageOffset: number, search: string) => {
+  // 탭 카운트 로드 (mount 1회)
+  useEffect(() => {
+    cmsApi.getContents({ serviceKey: 'kpa', status: 'published', limit: 200, offset: 0 })
+      .then(res => {
+        const counts: Record<string, number> = {};
+        res.data.forEach((item: CmsContent) => {
+          if (item.type !== 'hero' && item.type !== 'featured') {
+            counts[item.type] = (counts[item.type] || 0) + 1;
+          }
+        });
+        setTabCounts(counts);
+      })
+      .catch(() => {});
+  }, []);
+
+  // 빈 탭 숨김: 데이터 0건 탭 비노출 (전체 탭은 항상 표시)
+  const visibleTabs = useMemo(() => {
+    if (!tabCounts) return HUB_DISPLAY_TABS;
+    return HUB_DISPLAY_TABS.filter(tab => {
+      if (tab.key === 'all') return true;
+      if (!tab.dbTypes) return true;
+      return tab.dbTypes.some(t => (tabCounts[t] || 0) > 0);
+    });
+  }, [tabCounts]);
+
+  const fetchContents = useCallback(async (tabKey: DisplayTabKey, pageOffset: number, search: string) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await cmsApi.getContents({
-        serviceKey: 'kpa',
-        type: type === 'all' ? undefined : type,
-        status: 'published',
-        search: search || undefined,
-        limit: PAGE_LIMIT,
-        offset: pageOffset,
-      });
-      setContents(res.data);
-      setTotal(res.pagination.total);
+      const tab = HUB_DISPLAY_TABS.find(t => t.key === tabKey);
+      const dbTypes = tab?.dbTypes;
+
+      if (!dbTypes || dbTypes.length === 1) {
+        // 단일 타입 또는 전체: 기존 API 직접 호출
+        const res = await cmsApi.getContents({
+          serviceKey: 'kpa',
+          type: dbTypes?.[0],
+          status: 'published',
+          search: search || undefined,
+          limit: PAGE_LIMIT,
+          offset: pageOffset,
+        });
+        // hero, featured는 Hub 미노출
+        const filtered = res.data.filter((item: CmsContent) =>
+          item.type !== 'hero' && item.type !== 'featured'
+        );
+        if (dbTypes) {
+          // 단일 타입 탭: 서버측 필터링이므로 hero/featured 안 들어옴
+          setContents(res.data);
+          setTotal(res.pagination.total);
+        } else {
+          // 전체 탭: hero/featured 제외 후 카운트 보정
+          setContents(filtered);
+          setTotal(res.pagination.total - (res.data.length - filtered.length));
+        }
+      } else {
+        // 복합 타입: 병렬 호출 후 merge + 클라이언트 페이지네이션
+        const results = await Promise.all(
+          dbTypes.map(type => cmsApi.getContents({
+            serviceKey: 'kpa',
+            type,
+            status: 'published',
+            search: search || undefined,
+            limit: 200,
+            offset: 0,
+          }))
+        );
+        const allItems = results.flatMap(r => r.data);
+        allItems.sort((a, b) => {
+          if (a.isPinned !== b.isPinned) return a.isPinned ? -1 : 1;
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+        setTotal(allItems.length);
+        setContents(allItems.slice(pageOffset, pageOffset + PAGE_LIMIT));
+      }
     } catch (e: any) {
       setError(e.message || '콘텐츠 목록을 불러오지 못했습니다.');
     } finally {
@@ -123,11 +204,11 @@ export function HubContentLibraryPage() {
   }, []);
 
   useEffect(() => {
-    fetchContents(typeFilter, offset, searchQuery);
-  }, [fetchContents, typeFilter, offset, searchQuery]);
+    fetchContents(activeTab, offset, searchQuery);
+  }, [fetchContents, activeTab, offset, searchQuery]);
 
-  const handleTypeChange = (type: ContentTypeFilter) => {
-    setTypeFilter(type);
+  const handleTabChange = (key: DisplayTabKey) => {
+    setActiveTab(key);
     setOffset(0);
     setJustCopiedId(null);
   };
@@ -147,10 +228,9 @@ export function HubContentLibraryPage() {
 
   const resetAllFilters = () => {
     handleClearSearch();
-    setTypeFilter('all');
+    setActiveTab('all');
   };
 
-  // Phase 2: 복사 후 토스트에 작업 이동 링크
   const handleCopy = async (content: CmsContent) => {
     setCopyingId(content.id);
     try {
@@ -159,11 +239,8 @@ export function HubContentLibraryPage() {
         sourceAssetId: content.id,
         assetType: 'cms',
       });
-      // Phase 1: 복사 완료 → copiedIds에 추가
       setCopiedIds(prev => new Set(prev).add(content.id));
       setJustCopiedId(content.id);
-
-      // Phase 2: 토스트에 작업 이동 안내
       toast.success(
         `"${content.title}" 이(가) 내 매장에 복사되었습니다. 자산 관리에서 작업할 수 있습니다.`
       );
@@ -194,12 +271,11 @@ export function HubContentLibraryPage() {
     return pages;
   }, [currentPage, totalPages]);
 
-  const hasFilters = !!searchQuery || typeFilter !== 'all';
+  const hasFilters = !!searchQuery || activeTab !== 'all';
 
-  // Phase 4: 테이블 헤더 컬럼 (상태 컬럼 추가)
   const tableHeaders = (
     <tr>
-      <th style={{ ...s.th, width: '80px' }}>유형</th>
+      <th style={{ ...s.th, width: '100px' }}>유형</th>
       <th style={s.th}>제목</th>
       <th style={{ ...s.th, width: '200px' }}>요약</th>
       <th style={{ ...s.th, width: '70px' }}>상태</th>
@@ -230,16 +306,16 @@ export function HubContentLibraryPage() {
         <button type="submit" style={s.searchBtn}>검색</button>
       </form>
 
-      {/* Type Filter Tabs */}
+      {/* Display Tab Filter */}
       <div style={s.filterBar}>
         <div style={s.categories}>
-          {TYPE_TABS.map(tab => (
+          {visibleTabs.map(tab => (
             <button
               key={tab.key}
-              onClick={() => handleTypeChange(tab.key)}
+              onClick={() => handleTabChange(tab.key)}
               style={{
                 ...s.catBtn,
-                ...(typeFilter === tab.key ? s.catBtnActive : {}),
+                ...(activeTab === tab.key ? s.catBtnActive : {}),
               }}
             >
               {tab.label}
@@ -248,14 +324,14 @@ export function HubContentLibraryPage() {
         </div>
       </div>
 
-      {/* Phase 4: Active filters display */}
+      {/* Active filters display */}
       {hasFilters && (
         <div style={s.activeFilters}>
           <div style={s.activeChips}>
-            {typeFilter !== 'all' && (
+            {activeTab !== 'all' && (
               <span style={s.filterChip}>
-                {TYPE_TABS.find(t => t.key === typeFilter)?.label}
-                <button onClick={() => setTypeFilter('all')} style={s.chipClose}>&times;</button>
+                {HUB_DISPLAY_TABS.find(t => t.key === activeTab)?.label}
+                <button onClick={() => setActiveTab('all')} style={s.chipClose}>&times;</button>
               </span>
             )}
             {searchQuery && (
@@ -291,7 +367,7 @@ export function HubContentLibraryPage() {
       {!loading && error && (
         <div style={s.emptyState}>
           <p style={{ color: '#dc2626' }}>{error}</p>
-          <button onClick={() => fetchContents(typeFilter, offset, searchQuery)} style={s.retryButton}>
+          <button onClick={() => fetchContents(activeTab, offset, searchQuery)} style={s.retryButton}>
             다시 시도
           </button>
         </div>
@@ -315,7 +391,8 @@ export function HubContentLibraryPage() {
               <thead>{tableHeaders}</thead>
               <tbody>
                 {contents.length > 0 ? contents.map(item => {
-                  const badgeColor = TYPE_BADGE_COLORS[item.type] || { bg: '#f1f5f9', text: '#475569' };
+                  const displayLabel = DISPLAY_LABEL_MAP[item.type] || item.type;
+                  const badgeColor = DISPLAY_BADGE_COLORS[displayLabel] || { bg: '#f1f5f9', text: '#475569' };
                   const isCopying = copyingId === item.id;
                   const alreadyCopied = copiedIds.has(item.id);
                   const wasJustCopied = justCopiedId === item.id;
@@ -323,14 +400,14 @@ export function HubContentLibraryPage() {
 
                   return (
                     <tr key={item.id} style={item.isPinned ? s.pinnedRow : s.row}>
-                      {/* 유형 */}
-                      <td style={{ ...s.td, width: '80px', textAlign: 'center' }}>
+                      {/* 유형 — display category 기준 */}
+                      <td style={{ ...s.td, width: '100px', textAlign: 'center' }}>
                         <span style={{ ...s.typeBadge, backgroundColor: badgeColor.bg, color: badgeColor.text }}>
-                          {TYPE_TABS.find(t => t.key === item.type)?.label || item.type}
+                          {displayLabel}
                         </span>
                       </td>
 
-                      {/* 제목 + Phase 3 뱃지 */}
+                      {/* 제목 + 뱃지 */}
                       <td style={s.td}>
                         <div style={s.titleCell}>
                           <span style={s.titleText}>{item.title}</span>
@@ -344,7 +421,7 @@ export function HubContentLibraryPage() {
                         <span style={s.summaryText}>{item.summary || '-'}</span>
                       </td>
 
-                      {/* Phase 4: 상태 컬럼 */}
+                      {/* 상태 컬럼 */}
                       <td style={{ ...s.td, width: '70px', textAlign: 'center' }}>
                         {alreadyCopied ? (
                           <span style={s.statusCopied}>복사됨</span>
@@ -388,7 +465,7 @@ export function HubContentLibraryPage() {
                     </tr>
                   );
                 }) : (
-                  /* Phase 5: 빈 상태 UX 개선 */
+                  /* 빈 상태 UX */
                   <tr>
                     <td colSpan={6} style={s.emptyCell}>
                       <div style={s.emptyIcon}>
@@ -401,7 +478,7 @@ export function HubContentLibraryPage() {
                           <p style={s.emptyTitle}>조건에 맞는 콘텐츠가 없습니다</p>
                           <p style={s.emptyDesc}>
                             {searchQuery && `"${searchQuery}" `}
-                            {typeFilter !== 'all' && `[${TYPE_TABS.find(t => t.key === typeFilter)?.label}] `}
+                            {activeTab !== 'all' && `[${HUB_DISPLAY_TABS.find(t => t.key === activeTab)?.label}] `}
                             필터에 해당하는 결과가 없습니다.
                           </p>
                           <button onClick={resetAllFilters} style={s.emptyBtn}>
@@ -509,7 +586,7 @@ const s: Record<string, React.CSSProperties> = {
     backgroundColor: colors.primary, borderColor: colors.primary, color: colors.white,
   },
 
-  // Phase 4: Active filters with chips
+  // Active filters with chips
   activeFilters: {
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
     padding: '8px 12px', backgroundColor: '#eff6ff', borderRadius: '6px', border: '1px solid #bfdbfe',
@@ -554,7 +631,6 @@ const s: Record<string, React.CSSProperties> = {
     display: 'inline-block', padding: '2px 8px', fontSize: '11px', fontWeight: 600,
     borderRadius: '4px',
   },
-  // Phase 3: title cell with inline badges
   titleCell: {
     display: 'flex', alignItems: 'center', gap: '6px', overflow: 'hidden',
   },
@@ -572,7 +648,7 @@ const s: Record<string, React.CSSProperties> = {
   },
   summaryText: { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } as React.CSSProperties,
 
-  // Phase 4: Status column
+  // Status column
   statusCopied: {
     display: 'inline-block', padding: '2px 8px', fontSize: '11px', fontWeight: 600,
     color: '#059669', backgroundColor: '#d1fae5', borderRadius: '4px',
@@ -619,7 +695,7 @@ const s: Record<string, React.CSSProperties> = {
   pageBtnActive: { backgroundColor: colors.primary, color: colors.white, borderColor: colors.primary },
   pageBtnDisabled: { color: colors.neutral300, cursor: 'default', opacity: 0.5 },
 
-  // Phase 5: Empty / Error
+  // Empty / Error
   emptyState: {
     textAlign: 'center' as const, padding: '60px 20px', fontSize: '0.9rem', color: colors.neutral400,
   },

@@ -4,18 +4,25 @@
  * WO-MARKET-TRIAL-SERVICE-ENTRY-BANNER-AND-GATEWAY-V1: 초기 구현
  * WO-MARKET-TRIAL-KPA-TRIAL-HUB-REFINE-V1: 운영형 허브로 정비
  * WO-MARKET-TRIAL-KPA-DETAIL-AND-FORUM-DEEP-LINK-V1: 상세/포럼 액션 분리
+ * WO-MARKET-TRIAL-MY-PARTICIPATION-STATUS-V1: 내 참여 상태 표시
  *
  * 구조:
  * 1. 헤더 + 허브 설명
  * 2. 참여 안내 (3단 흐름)
- * 3. 모집 중 Trial 섹션 (주요)
- * 4. 진행 중 / 종료 Trial 섹션 (보조)
- * 5. 포럼 연결 안내
+ * 3. 내가 참여한 시범판매 섹션 (로그인 시)
+ * 4. 모집 중 Trial 섹션 (주요)
+ * 5. 진행 중 / 종료 Trial 섹션 (보조)
+ * 6. 포럼 연결 안내
  */
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getTrials, type TrialSummary } from '../../api/marketTrial';
+import {
+  getTrials,
+  getMyParticipations,
+  type TrialSummary,
+  type ParticipationInfo,
+} from '../../api/marketTrial';
 import { colors, borderRadius } from '../../styles/theme';
 
 // ── 상태 분류 ──
@@ -45,16 +52,33 @@ const SERVICE_KEY_LABELS: Record<string, string> = {
 
 // ── 메인 컴포넌트 ──
 
+const REWARD_LABELS: Record<string, string> = {
+  product: '제품 보상',
+  cash: '현금 보상',
+};
+
 export function MarketTrialHubPage() {
   const [trials, setTrials] = useState<TrialSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  // 내 참여 상태 (trialId → ParticipationInfo)
+  const [participationMap, setParticipationMap] = useState<Map<string, ParticipationInfo>>(new Map());
 
   useEffect(() => {
-    const fetchTrials = async () => {
+    const fetchData = async () => {
       try {
-        const response = await getTrials();
-        if (response.success) {
-          setTrials(response.data);
+        const [trialsRes, partRes] = await Promise.all([
+          getTrials(),
+          getMyParticipations().catch(() => ({ success: true as const, data: [] })),
+        ]);
+        if (trialsRes.success) {
+          setTrials(trialsRes.data);
+        }
+        if (partRes.success && partRes.data.length > 0) {
+          const map = new Map<string, ParticipationInfo>();
+          for (const p of partRes.data) {
+            map.set(p.trialId, p);
+          }
+          setParticipationMap(map);
         }
       } catch {
         setTrials([]);
@@ -62,12 +86,15 @@ export function MarketTrialHubPage() {
         setIsLoading(false);
       }
     };
-    fetchTrials();
+    fetchData();
   }, []);
 
   const recruiting = trials.filter((t) => getDisplayGroup(t.status) === 'recruiting');
   const active = trials.filter((t) => getDisplayGroup(t.status) === 'active');
   const ended = trials.filter((t) => getDisplayGroup(t.status) === 'ended');
+
+  // 내가 참여한 Trial 목록
+  const myTrials = trials.filter((t) => participationMap.has(t.id));
 
   return (
     <div style={{ maxWidth: '920px', margin: '0 auto', padding: '32px 16px 64px' }}>
@@ -123,7 +150,16 @@ export function MarketTrialHubPage() {
         ))}
       </section>
 
-      {/* ── 3. 모집 중 (Recruiting) ── */}
+      {/* ── 3. 내가 참여한 시범판매 ── */}
+      {myTrials.length > 0 && (
+        <Section title="내가 참여한 시범판매" count={myTrials.length} accentColor="#7C3AED">
+          {myTrials.map((trial) => (
+            <TrialCard key={`my-${trial.id}`} trial={trial} group={getDisplayGroup(trial.status)} participation={participationMap.get(trial.id)} />
+          ))}
+        </Section>
+      )}
+
+      {/* ── 4. 모집 중 (Recruiting) ── */}
       <Section
         title="모집 중"
         count={recruiting.length}
@@ -132,27 +168,27 @@ export function MarketTrialHubPage() {
       >
         {recruiting.length > 0 ? (
           recruiting.map((trial) => (
-            <TrialCard key={trial.id} trial={trial} group="recruiting" />
+            <TrialCard key={trial.id} trial={trial} group="recruiting" participation={participationMap.get(trial.id)} />
           ))
         ) : (
           <EmptySection />
         )}
       </Section>
 
-      {/* ── 4. 진행 중 ── */}
+      {/* ── 5. 진행 중 ── */}
       {active.length > 0 && (
         <Section title="진행 중" count={active.length} accentColor="#2563EB">
           {active.map((trial) => (
-            <TrialCard key={trial.id} trial={trial} group="active" />
+            <TrialCard key={trial.id} trial={trial} group="active" participation={participationMap.get(trial.id)} />
           ))}
         </Section>
       )}
 
-      {/* ── 5. 종료 ── */}
+      {/* ── 6. 종료 ── */}
       {ended.length > 0 && (
         <Section title="종료" count={ended.length} accentColor={colors.neutral400}>
           {ended.map((trial) => (
-            <TrialCard key={trial.id} trial={trial} group="ended" />
+            <TrialCard key={trial.id} trial={trial} group="ended" participation={participationMap.get(trial.id)} />
           ))}
         </Section>
       )}
@@ -258,8 +294,9 @@ function Section({
 
 // ── Trial 카드 ──
 
-function TrialCard({ trial, group }: { trial: TrialSummary; group: DisplayGroup }) {
+function TrialCard({ trial, group, participation }: { trial: TrialSummary; group: DisplayGroup; participation?: ParticipationInfo }) {
   const isEnded = group === 'ended';
+  const hasJoined = !!participation;
 
   const statusBadge = (() => {
     switch (group) {
@@ -280,13 +317,13 @@ function TrialCard({ trial, group }: { trial: TrialSummary; group: DisplayGroup 
     <div style={{
       backgroundColor: colors.white,
       borderRadius: borderRadius.lg,
-      border: `1px solid ${colors.neutral200}`,
+      border: `1px solid ${hasJoined ? '#C4B5FD' : colors.neutral200}`,
       opacity: isEnded ? 0.65 : 1,
       overflow: 'hidden',
     }}>
       {/* 카드 본문 */}
       <div style={{ padding: '20px 24px' }}>
-        {/* 상단: 상태 + 공급자 + 서비스 태그 */}
+        {/* 상단: 상태 + 참여 배지 + 공급자 + 서비스 태그 */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', flexWrap: 'wrap' }}>
           <span style={{
             padding: '2px 10px',
@@ -298,6 +335,18 @@ function TrialCard({ trial, group }: { trial: TrialSummary; group: DisplayGroup 
           }}>
             {statusBadge.label}
           </span>
+          {hasJoined && (
+            <span style={{
+              padding: '2px 10px',
+              backgroundColor: '#EDE9FE',
+              color: '#6D28D9',
+              borderRadius: '12px',
+              fontSize: '0.75rem',
+              fontWeight: 600,
+            }}>
+              내 참여 · {REWARD_LABELS[participation.rewardType] || participation.rewardType}
+            </span>
+          )}
           {trial.supplierName && (
             <span style={{ fontSize: '0.8125rem', color: colors.neutral400 }}>
               {trial.supplierName}
