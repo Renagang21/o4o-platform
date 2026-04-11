@@ -87,10 +87,10 @@ const heroSlides: HeroSlide[] = [
   },
   {
     id: 'trial',
-    title: '신상품 Market Trial\n참여 매장 모집 중',
+    title: '신상품 시범판매\nKPA-a 허브에서 참여하세요',
     subtitle: '브랜드의 신상품을 먼저 체험하고 피드백을 공유하세요',
     bgGradient: '#334155',
-    cta: { label: '시범판매 보기', link: '/store/market-trial', variant: 'primary' },
+    cta: { label: '시범판매 현황 보기', link: '/store/market-trial', variant: 'primary' },
   },
   {
     id: 'tourist',

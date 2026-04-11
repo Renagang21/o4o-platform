@@ -42,7 +42,7 @@ function MarketTrialBanner() {
               시범판매 (Market Trial)
             </h3>
             <p className="text-sm text-gray-600 mt-1">
-              공급자로서 신제품 시범판매를 제안하고, 약국 파트너의 피드백을 받아보세요.
+              공급자로서 신제품 시범판매를 제안하세요. 승인 후 KPA-a 허브를 통해 약국 파트너에게 노출됩니다.
             </p>
           </div>
           <Link
