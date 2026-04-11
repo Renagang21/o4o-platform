@@ -82,9 +82,10 @@ export class ApiClient {
         }
 
         const body = await response.json().catch(() => ({ message: 'Network error' }));
-        const error: any = new Error(body.message || body.error || `HTTP error! status: ${response.status}`);
+        const errorMsg = body.error?.message || body.message || (typeof body.error === 'string' ? body.error : null) || `HTTP error! status: ${response.status}`;
+        const error: any = new Error(errorMsg);
         error.status = response.status;
-        error.code = body.code;
+        error.code = body.error?.code || body.code;
         error.data = body.data;
         throw error;
       }

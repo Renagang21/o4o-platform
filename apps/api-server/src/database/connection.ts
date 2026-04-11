@@ -417,6 +417,10 @@ import {
 import {
   CmsContent,
   CmsContentSlot,
+  CmsMedia,
+  CmsMediaFile,
+  CmsMediaFolder,
+  CmsMediaTag,
 } from '@o4o-apps/cms-core/entities';
 
 // ============================================================================
@@ -919,9 +923,14 @@ export const AppDataSource = new DataSource({
     Attendance,
     // ============================================================================
     // CMS-CORE ENTITIES (WO-NETURE-SMOKE-STABILIZATION-V1)
+    // WO-O4O-KPA-CONTENT-COPY-INFRA-HOTFIX-V1: CmsMedia 계열 추가
     // ============================================================================
     CmsContent,
     CmsContentSlot,
+    CmsMedia,
+    CmsMediaFile,
+    CmsMediaFolder,
+    CmsMediaTag,
     // ============================================================================
     // DIGITAL-SIGNAGE-CORE ENTITIES (Phase 2: Production Build)
     // ============================================================================
