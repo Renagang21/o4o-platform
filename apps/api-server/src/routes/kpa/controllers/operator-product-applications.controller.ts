@@ -167,9 +167,9 @@ export function createOperatorProductApplicationsController(
         );
         await manager.query('RELEASE SAVEPOINT upsert_listing');
         listingUpserted = true;
-      } catch {
+      } catch (upsertErr: any) {
         await manager.query('ROLLBACK TO SAVEPOINT upsert_listing');
-        // FK 위반 등 — bridge 승인에서는 정상. 후속 bulk UPDATE로 기존 listing 활성화.
+        logger.warn(`[OperatorProductApplications] listing upsert failed for org=${approval.organization_id}, offer=${approval.offer_id}: ${upsertErr?.message || upsertErr}`);
       }
 
       // 4. 해당 offer의 kpa-society listings 전체 활성화 (auto-expansion으로 미리 생성된 다른 org listing 포함)
