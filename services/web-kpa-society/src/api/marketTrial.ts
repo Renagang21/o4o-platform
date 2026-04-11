@@ -108,3 +108,51 @@ export async function getTrialDetail(id: string): Promise<{ success: boolean; da
   });
   return res.json();
 }
+
+// ── Participation ──
+
+export interface ParticipationInfo {
+  id: string;
+  trialId: string;
+  participantId: string;
+  role: string;
+  rewardType: 'cash' | 'product';
+  rewardStatus: 'pending' | 'fulfilled';
+  joinedAt: string;
+}
+
+/**
+ * 현재 사용자의 참여 정보 조회
+ * WO-MARKET-TRIAL-PARTICIPATION-REQUEST-UI-V1
+ */
+export async function getParticipation(
+  trialId: string,
+): Promise<{ success: boolean; data: ParticipationInfo | null }> {
+  const token = getAccessToken();
+  if (!token) return { success: true, data: null };
+  const res = await fetch(`${API_BASE}/api/market-trial/${trialId}/participation`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.json();
+}
+
+/**
+ * Trial 참여 신청
+ * WO-MARKET-TRIAL-PARTICIPATION-REQUEST-UI-V1
+ */
+export async function joinTrial(
+  trialId: string,
+  rewardType: 'cash' | 'product',
+): Promise<{ success: boolean; data?: ParticipationInfo; message?: string }> {
+  const token = getAccessToken();
+  if (!token) return { success: false, message: '로그인이 필요합니다.' };
+  const res = await fetch(`${API_BASE}/api/market-trial/${trialId}/join`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ rewardType }),
+  });
+  return res.json();
+}
