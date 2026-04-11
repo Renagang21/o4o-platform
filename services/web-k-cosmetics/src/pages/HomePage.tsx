@@ -90,7 +90,7 @@ const heroSlides: HeroSlide[] = [
     title: '신상품 Market Trial\n참여 매장 모집 중',
     subtitle: '브랜드의 신상품을 먼저 체험하고 피드백을 공유하세요',
     bgGradient: '#334155',
-    cta: { label: '자세히 보기', link: '/platform/stores', variant: 'primary' },
+    cta: { label: '시범판매 보기', link: '/store/market-trial', variant: 'primary' },
   },
   {
     id: 'tourist',

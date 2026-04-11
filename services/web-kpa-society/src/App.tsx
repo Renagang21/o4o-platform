@@ -17,6 +17,10 @@ import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 // Forum pages
 import { ForumHomePage, ForumListPage, ForumDetailPage, ForumWritePage } from './pages/forum';
 
+// Market Trial (WO-MARKET-TRIAL-SERVICE-ENTRY-BANNER-AND-GATEWAY-V1, WO-MARKET-TRIAL-KPA-DETAIL-AND-FORUM-DEEP-LINK-V1)
+import { MarketTrialHubPage } from './pages/market-trial/MarketTrialHubPage';
+import { MarketTrialDetailPage } from './pages/market-trial/MarketTrialDetailPage';
+
 // LMS pages
 import { EducationPage, LmsCoursesPage, LmsCourseDetailPage, LmsLessonPage, LmsCertificatesPage } from './pages/lms';
 
@@ -384,6 +388,10 @@ function App() {
           <Route path="/forum/post/:id" element={<Layout serviceName={SERVICE_NAME}><ForumDetailPage /></Layout>} />
           <Route path="/forum/write" element={<Layout serviceName={SERVICE_NAME}><ForumWritePage /></Layout>} />
           <Route path="/forum/edit/:id" element={<Layout serviceName={SERVICE_NAME}><ForumWritePage /></Layout>} />
+
+          {/* Market Trial (WO-MARKET-TRIAL-SERVICE-ENTRY-BANNER-AND-GATEWAY-V1, WO-MARKET-TRIAL-KPA-DETAIL-AND-FORUM-DEEP-LINK-V1) */}
+          <Route path="/market-trial" element={<Layout serviceName={SERVICE_NAME}><MarketTrialHubPage /></Layout>} />
+          <Route path="/market-trial/:id" element={<Layout serviceName={SERVICE_NAME}><MarketTrialDetailPage /></Layout>} />
 
 
           {/* =========================================================

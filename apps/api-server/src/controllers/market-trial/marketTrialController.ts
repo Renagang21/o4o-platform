@@ -4,6 +4,12 @@
  * WO-MARKET-TRIAL-DB-PERSISTENCE-INTEGRATION-V1:
  * In-memory Map → TypeORM Repository 전환.
  * API 계약(엔드포인트, 요청/응답 형식) 유지.
+ *
+ * WO-MARKET-TRIAL-SERVICE-ENTRY-BANNER-AND-GATEWAY-V1:
+ * gateway() — 접근 상태 + 오픈 trial 정보 반환 (서비스별 유입 창구용)
+ *
+ * WO-MARKET-TRIAL-KPA-DETAIL-AND-FORUM-DEEP-LINK-V1:
+ * getTrials/getTrialById에 forumPostId 포함하여 개별 포럼 deep link 지원
  */
 
 import { Response } from 'express';
@@ -12,6 +18,7 @@ import { DataSource, Repository } from 'typeorm';
 import {
   MarketTrial,
   MarketTrialParticipant,
+  MarketTrialForum,
   TrialStatus,
 } from '@o4o/market-trial';
 import { MarketTrialService } from '@o4o/market-trial';
@@ -43,6 +50,7 @@ export class MarketTrialController {
   private static dataSource: DataSource | null = null;
   private static trialRepo: Repository<MarketTrial>;
   private static participantRepo: Repository<MarketTrialParticipant>;
+  private static forumRepo: Repository<MarketTrialForum>;
   private static trialService: MarketTrialService;
 
   /**
@@ -52,7 +60,71 @@ export class MarketTrialController {
     this.dataSource = ds;
     this.trialRepo = ds.getRepository(MarketTrial);
     this.participantRepo = ds.getRepository(MarketTrialParticipant);
+    this.forumRepo = ds.getRepository(MarketTrialForum);
     this.trialService = new MarketTrialService(ds);
+  }
+
+  /**
+   * GET /api/market-trial/gateway
+   * 접근 상태 + 오픈 trial 요약 반환 (서비스별 유입 창구용)
+   * WO-MARKET-TRIAL-SERVICE-ENTRY-BANNER-AND-GATEWAY-V1
+   */
+  static async gateway(req: AuthRequest, res: Response) {
+    try {
+      const { serviceKey } = req.query;
+      const userId = (req as any).user?.id;
+
+      const emptyResponse = (accessStatus: string) =>
+        res.json({ success: true, data: { accessStatus, openTrialCount: 0, trials: [] } });
+
+      // 1. 로그인 체크
+      if (!userId) return emptyResponse('not_logged_in');
+
+      // 2. KPA membership 체크
+      const membership = await MarketTrialController.dataSource!.query(
+        `SELECT status FROM service_memberships WHERE user_id = $1 AND service_key = 'kpa-society'`,
+        [userId],
+      );
+      if (!membership.length) return emptyResponse('no_kpa_membership');
+
+      // 3. 약국 회원 체크 (organization_members + organizations)
+      const orgMember = await MarketTrialController.dataSource!.query(
+        `SELECT om.status FROM organization_members om
+         JOIN organizations o ON o.id = om.organization_id
+         WHERE om.user_id = $1 AND o."isActive" = true`,
+        [userId],
+      );
+      if (!orgMember.length) return emptyResponse('not_pharmacy_member');
+      if (orgMember[0].status === 'pending') return emptyResponse('pending_approval');
+
+      // 4. 해당 서비스의 오픈 trial 조회
+      const qb = MarketTrialController.trialRepo.createQueryBuilder('trial')
+        .where('trial.status = :status', { status: TrialStatus.RECRUITING });
+
+      if (serviceKey && typeof serviceKey === 'string') {
+        qb.andWhere(
+          `trial."visibleServiceKeys" @> :serviceKeys::jsonb`,
+          { serviceKeys: JSON.stringify([serviceKey]) },
+        );
+      }
+
+      qb.orderBy('trial.createdAt', 'DESC');
+      const trials = await qb.getMany();
+
+      if (!trials.length) return emptyResponse('no_trials');
+
+      return res.json({
+        success: true,
+        data: {
+          accessStatus: 'accessible',
+          openTrialCount: trials.length,
+          trials: trials.map(toGatewayDTO),
+        },
+      });
+    } catch (error) {
+      console.error('Gateway error:', error);
+      res.status(500).json({ success: false, message: 'Failed to get gateway info' });
+    }
   }
 
   /**
@@ -139,7 +211,7 @@ export class MarketTrialController {
         order: { createdAt: 'DESC' },
       });
 
-      res.json({ success: true, data: trials.map(toTrialDTO) });
+      res.json({ success: true, data: trials.map((t) => toTrialDTO(t)) });
     } catch (error) {
       console.error('Get my trials error:', error);
       res.status(500).json({ success: false, message: 'Failed to get trials' });
@@ -187,9 +259,14 @@ export class MarketTrialController {
         trials.map((t) => MarketTrialController.trialService.evaluateStatusIfNeeded(t)),
       );
 
+      // WO-MARKET-TRIAL-KPA-DETAIL-AND-FORUM-DEEP-LINK-V1:
+      // Bulk-fetch forum post IDs for all trials
+      const trialIds = evaluated.map((t) => t.id);
+      const forumMap = await buildForumPostMap(MarketTrialController.forumRepo, trialIds);
+
       res.json({
         success: true,
-        data: evaluated.map(toTrialDTO),
+        data: evaluated.map((t) => toTrialDTO(t, forumMap.get(t.id))),
       });
     } catch (error) {
       console.error('Get trials error:', error);
@@ -219,9 +296,14 @@ export class MarketTrialController {
       // WO-O4O-MARKET-TRIAL-PHASE1-STABILIZATION-V1: evaluate expired status
       const evaluated = await MarketTrialController.trialService.evaluateStatusIfNeeded(trial);
 
+      // WO-MARKET-TRIAL-KPA-DETAIL-AND-FORUM-DEEP-LINK-V1: forum deep link
+      const forumMapping = await MarketTrialController.forumRepo.findOne({
+        where: { marketTrialId: id },
+      });
+
       res.json({
         success: true,
-        data: toTrialDTO(evaluated),
+        data: toTrialDTO(evaluated, forumMapping?.forumId),
       });
     } catch (error) {
       console.error('Get trial error:', error);
@@ -374,8 +456,9 @@ export class MarketTrialController {
 
 /**
  * Convert trial entity to legacy-compatible DTO format
+ * WO-MARKET-TRIAL-KPA-DETAIL-AND-FORUM-DEEP-LINK-V1: forumPostId 추가
  */
-function toTrialDTO(trial: MarketTrial): any {
+function toTrialDTO(trial: MarketTrial, forumPostId?: string | null): any {
   return {
     id: trial.id,
     title: trial.title,
@@ -393,7 +476,40 @@ function toTrialDTO(trial: MarketTrial): any {
     endDate: trial.fundingEndAt ? new Date(trial.fundingEndAt).toISOString() : undefined,
     deadline: trial.fundingEndAt ? new Date(trial.fundingEndAt).toISOString() : undefined,
     visibleServiceKeys: trial.visibleServiceKeys,
+    forumPostId: forumPostId || undefined,
     createdAt: new Date(trial.createdAt).toISOString(),
+  };
+}
+
+/**
+ * Bulk-fetch forum post IDs for a list of trial IDs
+ * WO-MARKET-TRIAL-KPA-DETAIL-AND-FORUM-DEEP-LINK-V1
+ */
+async function buildForumPostMap(
+  forumRepo: Repository<MarketTrialForum>,
+  trialIds: string[],
+): Promise<Map<string, string>> {
+  if (trialIds.length === 0) return new Map();
+  const mappings = await forumRepo
+    .createQueryBuilder('mtf')
+    .where('mtf.marketTrialId IN (:...ids)', { ids: trialIds })
+    .getMany();
+  return new Map(mappings.map((m) => [m.marketTrialId, m.forumId]));
+}
+
+/**
+ * Convert trial entity to lightweight gateway DTO
+ * WO-MARKET-TRIAL-SERVICE-ENTRY-BANNER-AND-GATEWAY-V1
+ */
+function toGatewayDTO(trial: MarketTrial): any {
+  return {
+    id: trial.id,
+    title: trial.title,
+    status: trial.status,
+    supplierName: trial.supplierName || undefined,
+    currentParticipants: trial.currentParticipants,
+    maxParticipants: trial.maxParticipants || undefined,
+    fundingEndAt: trial.fundingEndAt ? new Date(trial.fundingEndAt).toISOString() : undefined,
   };
 }
 

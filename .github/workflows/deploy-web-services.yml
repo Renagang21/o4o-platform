@@ -38,6 +38,7 @@ env:
   VITE_API_URL_KPA_SOCIETY: https://api.neture.co.kr
   VITE_API_URL_GLUCOSEVIEW: https://api.neture.co.kr
   VITE_API_URL_K_COSMETICS: https://api.neture.co.kr
+  VITE_KPA_URL: https://kpa-society-web-3e3aws7zqa-du.a.run.app
 
 jobs:
   detect-changes:

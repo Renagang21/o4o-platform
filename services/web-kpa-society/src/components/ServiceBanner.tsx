@@ -129,6 +129,16 @@ export function ExternalServiceSection() {
           showDisclaimer={false}
           isInternal={true}
         />
+        <ServiceBanner
+          icon="🧪"
+          title="시범판매 참여"
+          description="공급자의 신제품을 먼저 체험하고 의견을 공유하세요."
+          linkUrl="/market-trial"
+          linkText="시범판매 보기"
+          variant="secondary"
+          showDisclaimer={false}
+          isInternal={true}
+        />
       </div>
     </section>
   );

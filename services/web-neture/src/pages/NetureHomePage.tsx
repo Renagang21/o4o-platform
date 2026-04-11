@@ -15,6 +15,7 @@
  * 8. Supplier / Partner CTA (정적)
  */
 
+import { Link } from 'react-router-dom';
 import HeroSlider from '../components/home/HeroSlider';
 import { PlatformIntroSection } from '../components/home/PlatformIntroSection';
 import HomepageAds from '../components/home/HomepageAds';
@@ -24,12 +25,46 @@ import { FeaturedSection } from '../components/home/FeaturedSection';
 import PartnerLogoCarousel from '../components/home/PartnerLogoCarousel';
 import { HomeCtaSection } from '../components/home/HomeCtaSection';
 
+/**
+ * WO-MARKET-TRIAL-SERVICE-ENTRY-BANNER-AND-GATEWAY-V1:
+ * Neture 공급자 관점 — 시범판매 제안 배너
+ */
+function MarketTrialBanner() {
+  return (
+    <section className="max-w-7xl mx-auto px-4 py-8">
+      <div
+        className="rounded-xl p-6 border border-violet-200"
+        style={{ background: 'linear-gradient(to right, #f5f3ff, #faf5ff)' }}
+      >
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">
+              시범판매 (Market Trial)
+            </h3>
+            <p className="text-sm text-gray-600 mt-1">
+              공급자로서 신제품 시범판매를 제안하고, 약국 파트너의 피드백을 받아보세요.
+            </p>
+          </div>
+          <Link
+            to="/supplier/market-trial/new"
+            className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 transition-colors whitespace-nowrap"
+          >
+            시범판매 제안하기
+            <span>→</span>
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function NetureHomePage() {
   return (
     <div className="min-h-screen">
       <HeroSlider />
       <PlatformIntroSection />
       <HomepageAds />
+      <MarketTrialBanner />
       <LatestUpdatesSection />
       <CommunityPreviewSection />
       <FeaturedSection />

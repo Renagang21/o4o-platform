@@ -17,6 +17,9 @@ const router: Router = Router();
 router.post('/', authenticate, MarketTrialController.createTrial);
 router.get('/my', authenticate, MarketTrialController.getMyTrials);
 
+// Gateway: access status + open trial summary (WO-MARKET-TRIAL-SERVICE-ENTRY-BANNER-AND-GATEWAY-V1)
+router.get('/gateway', optionalAuth, MarketTrialController.gateway);
+
 // Public routes (list and detail)
 router.get('/', optionalAuth, MarketTrialController.getTrials);
 router.get('/:id', optionalAuth, MarketTrialController.getTrialById);

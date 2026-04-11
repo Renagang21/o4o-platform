@@ -3,9 +3,13 @@
  *
  * WO-MARKET-TRIAL-B2B-API-UNIFICATION-V1:
  * 공통 API (/api/market-trial?serviceKey=k-cosmetics) 사용.
+ *
+ * WO-MARKET-TRIAL-SERVICE-ENTRY-BANNER-AND-GATEWAY-V1:
+ * Gateway 패턴 적용 — 접근 상태 확인 + KPA-a 연결.
  */
 
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Search,
   Filter,
@@ -15,9 +19,13 @@ import {
   CheckCircle,
   Clock,
   XCircle,
+  ExternalLink,
+  Info,
 } from 'lucide-react';
 
 import { api, API_BASE_URL } from '../../lib/apiClient';
+
+const KPA_URL = import.meta.env.VITE_KPA_URL || 'https://kpa-society-web-3e3aws7zqa-du.a.run.app';
 
 interface MarketTrialItem {
   id: string;
@@ -36,6 +44,16 @@ interface MarketTrialItem {
   currentParticipants: number;
   createdAt: string;
 }
+
+type AccessStatus =
+  | 'not_logged_in'
+  | 'no_kpa_membership'
+  | 'not_pharmacy_member'
+  | 'pending_approval'
+  | 'no_trials'
+  | 'accessible'
+  | 'loading'
+  | 'error';
 
 type DisplayGroup = 'upcoming' | 'active' | 'ended';
 
@@ -64,15 +82,56 @@ const statusFilters: { value: DisplayGroup | 'all'; label: string }[] = [
   { value: 'ended', label: '종료' },
 ];
 
+const ACCESS_STATUS_MESSAGES: Record<string, { title: string; description: string; actionLabel?: string; actionUrl?: string }> = {
+  not_logged_in: {
+    title: '로그인이 필요합니다',
+    description: '시범판매 참여를 위해 먼저 로그인해 주세요.',
+    actionLabel: '로그인',
+    actionUrl: '/auth/login',
+  },
+  no_kpa_membership: {
+    title: 'KPA-a 회원 전용 서비스입니다',
+    description: '시범판매는 약사회(KPA-a) 회원에게 제공됩니다. KPA-a에 가입 후 참여하세요.',
+    actionLabel: 'KPA-a 바로가기',
+    actionUrl: KPA_URL,
+  },
+  not_pharmacy_member: {
+    title: '약국 회원만 참여할 수 있습니다',
+    description: '시범판매 참여를 위해 약국 회원 등록이 필요합니다.',
+  },
+  pending_approval: {
+    title: '약국 회원 승인 대기 중',
+    description: '약국 회원 승인이 완료되면 시범판매에 참여하실 수 있습니다.',
+  },
+  no_trials: {
+    title: '현재 모집 중인 시범판매가 없습니다',
+    description: '이 서비스에 해당하는 모집 중인 시범판매가 없습니다. 나중에 다시 확인해 주세요.',
+  },
+};
+
 export default function MarketTrialListPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<DisplayGroup | 'all'>('all');
   const [trials, setTrials] = useState<MarketTrialItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [accessStatus, setAccessStatus] = useState<AccessStatus>('loading');
 
   useEffect(() => {
-    const fetchTrials = async () => {
+    const fetchData = async () => {
       setIsLoading(true);
+      // Fetch gateway status
+      try {
+        const gwRes = await api.get(`${API_BASE_URL}/api/market-trial/gateway?serviceKey=k-cosmetics`);
+        if (gwRes.data?.success && gwRes.data?.data) {
+          setAccessStatus(gwRes.data.data.accessStatus as AccessStatus);
+        } else {
+          setAccessStatus('error');
+        }
+      } catch {
+        setAccessStatus('error');
+      }
+
+      // Fetch trials list
       try {
         const response = await api.get(`${API_BASE_URL}/api/market-trial?serviceKey=k-cosmetics`);
         if (response.data?.success && response.data?.data) {
@@ -84,7 +143,7 @@ export default function MarketTrialListPage() {
         setIsLoading(false);
       }
     };
-    fetchTrials();
+    fetchData();
   }, []);
 
   const filteredTrials = trials.filter((trial) => {
@@ -132,6 +191,8 @@ export default function MarketTrialListPage() {
     );
   }
 
+  const statusMsg = ACCESS_STATUS_MESSAGES[accessStatus];
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -139,6 +200,58 @@ export default function MarketTrialListPage() {
         <h1 className="text-2xl font-bold text-slate-800">Market Trial</h1>
         <p className="text-slate-500">신제품 체험 및 테스트 프로그램</p>
       </div>
+
+      {/* Gateway Banner — KPA-a 연결 안내 */}
+      <div className="bg-violet-50 rounded-xl p-4 border border-violet-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-start gap-3">
+          <Info className="w-5 h-5 text-violet-600 mt-0.5 flex-shrink-0" />
+          <div>
+            <p className="text-sm font-medium text-violet-800">
+              시범판매 참여는 KPA-a(약사회)에서 운영됩니다
+            </p>
+            <p className="text-xs text-violet-600 mt-0.5">
+              모집 중인 시범판매 확인 및 참여는 KPA-a 시범판매 허브에서 진행하세요.
+            </p>
+          </div>
+        </div>
+        <a
+          href={`${KPA_URL}/market-trial`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 px-4 py-2 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 transition-colors whitespace-nowrap"
+        >
+          KPA-a에서 참여하기
+          <ExternalLink className="w-3.5 h-3.5" />
+        </a>
+      </div>
+
+      {/* Access Status Message (if not accessible) */}
+      {statusMsg && accessStatus !== 'accessible' && accessStatus !== 'error' && (
+        <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
+          <p className="text-sm font-medium text-amber-800">{statusMsg.title}</p>
+          <p className="text-xs text-amber-600 mt-1">{statusMsg.description}</p>
+          {statusMsg.actionLabel && statusMsg.actionUrl && (
+            statusMsg.actionUrl.startsWith('http') ? (
+              <a
+                href={statusMsg.actionUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 mt-3 px-3 py-1.5 bg-amber-600 text-white text-xs font-medium rounded-lg hover:bg-amber-700"
+              >
+                {statusMsg.actionLabel}
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            ) : (
+              <Link
+                to={statusMsg.actionUrl}
+                className="inline-flex items-center gap-1 mt-3 px-3 py-1.5 bg-amber-600 text-white text-xs font-medium rounded-lg hover:bg-amber-700"
+              >
+                {statusMsg.actionLabel}
+              </Link>
+            )
+          )}
+        </div>
+      )}
 
       {/* Search & Filters */}
       <div className="bg-white rounded-2xl shadow-sm p-4 space-y-4">
@@ -226,14 +339,25 @@ export default function MarketTrialListPage() {
                 </div>
               )}
 
-              <div className="px-5 py-3">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-500">참여자</span>
+              <div className="px-5 py-3 flex items-center justify-between">
+                <div className="text-sm">
+                  <span className="text-slate-500">참여자 </span>
                   <span className="font-medium text-slate-700">
                     {trial.currentParticipants}
                     {trial.maxParticipants ? ` / ${trial.maxParticipants}` : ''}명
                   </span>
                 </div>
+                {group === 'active' && (
+                  <a
+                    href={`${KPA_URL}/market-trial`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-sm font-medium text-violet-700 hover:text-violet-800"
+                  >
+                    KPA-a에서 참여
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                )}
               </div>
             </div>
           );
