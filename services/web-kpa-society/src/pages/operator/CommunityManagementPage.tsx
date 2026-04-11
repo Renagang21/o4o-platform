@@ -1,7 +1,10 @@
 /**
- * CommunityManagementPage — Operator Community Ads/Sponsors 관리
+ * CommunityManagementPage — Operator Home 편집 (광고/스폰서 관리)
  *
  * WO-KPA-A-COMMUNITY-HUB-IMPLEMENTATION-V1
+ * WO-KPA-A-HOME-EXPOSURE-MENU-RELOCATION-AND-MEDIA-PICKER-V1:
+ *   - 헤더: '커뮤니티 관리' → 'Home 편집'
+ *   - 이미지 입력: URL 직접 입력 → 미디어 라이브러리 선택 + URL fallback
  *
  * 3 tabs: Hero 광고 | 페이지 광고 | 스폰서
  * CRUD for community_ads and community_sponsors
@@ -19,8 +22,10 @@ import {
   X,
   Monitor,
   Users,
+  ImageIcon,
 } from 'lucide-react';
 import { communityManageApi, type CommunityAdFull, type CommunitySponsorFull } from '../../api/community';
+import MediaPickerModal from '../../components/common/MediaPickerModal';
 
 type Tab = 'hero' | 'page' | 'sponsors';
 
@@ -86,8 +91,8 @@ export default function CommunityManagementPage() {
           <Monitor size={20} color="#2563eb" />
         </div>
         <div>
-          <h1 style={{ fontSize: 20, fontWeight: 600, color: '#1e293b', margin: 0 }}>커뮤니티 관리</h1>
-          <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>Community Hub 광고 및 스폰서 관리</p>
+          <h1 style={{ fontSize: 20, fontWeight: 600, color: '#1e293b', margin: 0 }}>Home 편집</h1>
+          <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>Home 화면의 Hero 배너, 광고, 스폰서를 관리합니다</p>
         </div>
       </div>
 
@@ -302,6 +307,9 @@ function FormModal({ tab, editItem, onClose, onSaved }: {
     isActive: editItem?.isActive ?? true,
   });
   const [saving, setSaving] = useState(false);
+  const [showMediaPicker, setShowMediaPicker] = useState(false);
+  const mediaPickerField = isAd ? 'imageUrl' : 'logoUrl';
+  const mediaPickerFolder = isAd ? 'banner' : 'brand';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -360,7 +368,12 @@ function FormModal({ tab, editItem, onClose, onSaved }: {
           {isAd ? (
             <>
               <Field label="제목" value={form.title} onChange={(v) => update('title', v)} required />
-              <Field label="이미지 URL" value={form.imageUrl} onChange={(v) => update('imageUrl', v)} required />
+              <ImageField
+                label="이미지"
+                value={form.imageUrl}
+                onChange={(v) => update('imageUrl', v)}
+                onPickerOpen={() => setShowMediaPicker(true)}
+              />
               <Field label="링크 URL" value={form.linkUrl} onChange={(v) => update('linkUrl', v)} />
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <Field label="시작일" value={form.startDate} onChange={(v) => update('startDate', v)} type="date" />
@@ -370,7 +383,12 @@ function FormModal({ tab, editItem, onClose, onSaved }: {
           ) : (
             <>
               <Field label="이름" value={form.name} onChange={(v) => update('name', v)} required />
-              <Field label="로고 URL" value={form.logoUrl} onChange={(v) => update('logoUrl', v)} required />
+              <ImageField
+                label="로고"
+                value={form.logoUrl}
+                onChange={(v) => update('logoUrl', v)}
+                onPickerOpen={() => setShowMediaPicker(true)}
+              />
               <Field label="링크 URL" value={form.linkUrl} onChange={(v) => update('linkUrl', v)} />
             </>
           )}
@@ -403,7 +421,91 @@ function FormModal({ tab, editItem, onClose, onSaved }: {
             {saving ? '저장 중...' : isEdit ? '수정' : '추가'}
           </button>
         </form>
+
+        <MediaPickerModal
+          open={showMediaPicker}
+          onClose={() => setShowMediaPicker(false)}
+          onSelect={(asset) => {
+            update(mediaPickerField, asset.url);
+            setShowMediaPicker(false);
+          }}
+          title={isAd ? '광고 이미지 선택' : '스폰서 로고 선택'}
+          defaultFolder={mediaPickerFolder}
+        />
       </div>
+    </div>
+  );
+}
+
+// ─── ImageField: 미디어 라이브러리 선택 + URL 직접 입력 fallback ───
+
+function ImageField({ label, value, onChange, onPickerOpen }: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  onPickerOpen: () => void;
+}) {
+  const [showUrlInput, setShowUrlInput] = useState(false);
+
+  return (
+    <div style={{ marginBottom: 16 }}>
+      <label style={labelStyle}>{label}</label>
+      {value && (
+        <div style={{ marginBottom: 8, position: 'relative', display: 'inline-block' }}>
+          <img
+            src={value}
+            alt="미리보기"
+            style={{ maxHeight: 80, maxWidth: '100%', borderRadius: 6, border: '1px solid #e2e8f0', objectFit: 'contain' }}
+          />
+          <button
+            type="button"
+            onClick={() => onChange('')}
+            style={{
+              position: 'absolute', top: -6, right: -6,
+              width: 20, height: 20, borderRadius: '50%',
+              backgroundColor: '#dc2626', color: 'white',
+              border: 'none', cursor: 'pointer', fontSize: 11,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
+          >
+            ×
+          </button>
+        </div>
+      )}
+      <div style={{ display: 'flex', gap: 6 }}>
+        <button
+          type="button"
+          onClick={onPickerOpen}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 6,
+            padding: '7px 14px', fontSize: 12, fontWeight: 500,
+            color: '#2563eb', backgroundColor: '#eff6ff',
+            border: '1px solid #bfdbfe', borderRadius: 8, cursor: 'pointer',
+          }}
+        >
+          <ImageIcon size={14} /> 미디어 라이브러리에서 선택
+        </button>
+        <button
+          type="button"
+          onClick={() => setShowUrlInput(!showUrlInput)}
+          style={{
+            padding: '7px 10px', fontSize: 11, color: '#64748b',
+            backgroundColor: '#f8fafc', border: '1px solid #e2e8f0',
+            borderRadius: 8, cursor: 'pointer',
+          }}
+        >
+          URL 직접 입력
+        </button>
+      </div>
+      {showUrlInput && (
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="https://..."
+          style={{ ...inputStyle, marginTop: 8 }}
+        />
+      )}
     </div>
   );
 }

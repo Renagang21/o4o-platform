@@ -37,6 +37,7 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   ],
   content: [
     { label: '공지사항', path: '/operator/news' },
+    { label: 'Home 편집', path: '/operator/community' },
     { label: '콘텐츠 허브', path: '/operator/docs' },
     { label: '콘텐츠 관리', path: '/operator/content' },
   ],
@@ -48,7 +49,6 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '카테고리 관리', path: '/operator/signage/categories' },
   ],
   forum: [
-    { label: '커뮤니티 관리', path: '/operator/community' },
     { label: '포럼 관리', path: '/operator/forum-management' },
     { label: '삭제 요청', path: '/operator/forum-delete-requests' },
     { label: '포럼 분석', path: '/operator/forum-analytics' },
@@ -100,6 +100,7 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
   ],
   content: [
     { label: '공지사항', path: '/operator/news' },
+    { label: 'Home 편집', path: '/operator/community' },
     { label: '콘텐츠 허브', path: '/operator/docs' },
     { label: '콘텐츠 관리', path: '/operator/content' },
   ],
@@ -111,7 +112,6 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: '카테고리 관리', path: '/operator/signage/categories' },
   ],
   forum: [
-    { label: '커뮤니티 관리', path: '/operator/community' },
     { label: '포럼 관리', path: '/operator/forum-management' },
     { label: '삭제 요청', path: '/operator/forum-delete-requests' },
     { label: '포럼 분석', path: '/operator/forum-analytics' },

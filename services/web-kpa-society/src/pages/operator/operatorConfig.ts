@@ -320,7 +320,7 @@ export function buildKpaOperatorConfig(
     // Admin 추가 4개
     ...(isAdmin ? [
       { id: 'qa-requests', label: '조직 가입 요청', link: '/operator/organization-requests', icon: '👥' },
-      { id: 'qa-community', label: '커뮤니티 관리', link: '/operator/community', icon: '🏠' },
+      { id: 'qa-community', label: 'Home 편집', link: '/operator/community', icon: '🏠' },
       { id: 'qa-roles', label: '역할 관리', link: '/operator/roles', icon: '🔑' },
       { id: 'qa-audit', label: '감사 로그', link: '/operator/audit-logs', icon: '📋' },
     ] : []),
