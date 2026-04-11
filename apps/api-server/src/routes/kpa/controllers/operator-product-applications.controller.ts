@@ -124,16 +124,18 @@ export function createOperatorProductApplicationsController(
 
   // ─── PATCH /:id/approve — SERVICE 승인 처리 (KPA 2차 심사) ──────────────
   // WO-KPA-SOCIETY-SECOND-REVIEW-BRIDGE-FOUNDATION-V1
-  // approvalV2Service.approveServiceProduct()는 listing을 is_active=false로 만들고 단일 org만 처리.
-  // KPA 2차 심사 승인은 이미 존재하는 kpa-society listings 전체를 활성화해야 하므로 직접 트랜잭션 사용.
+  // WO-KPA-PRODUCT-APPROVAL-LISTING-UPSERT-FIX-V1:
+  //   승인 대상 org의 listing이 없는 경우에도 반드시 생성+활성화 (UPSERT).
+  //   auto-expansion이 선행되지 않은 약국(pending enrollment 등)에서도 정상 동작 보장.
   router.patch('/:id/approve', asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
     const approvedBy = (req as any).user?.id || 'unknown';
 
     const result = await dataSource.transaction(async (manager) => {
-      // 1. product_approvals PENDING 확인
+      // 1. product_approvals PENDING 확인 (organization_id 포함 조회)
       const [approval] = await manager.query(
-        `SELECT id, offer_id, approval_status FROM product_approvals WHERE id = $1`,
+        `SELECT id, offer_id, organization_id, service_key, approval_status
+         FROM product_approvals WHERE id = $1`,
         [id],
       );
       if (!approval || approval.approval_status !== 'pending') {
@@ -147,16 +149,35 @@ export function createOperatorProductApplicationsController(
         [id, approvedBy],
       );
 
-      // 3. 해당 offer의 kpa-society listings 전체 활성화
+      // 3. 승인 대상 org의 listing UPSERT (없으면 생성, 있으면 활성화)
+      const serviceKey = approval.service_key || 'kpa-society';
+      const upsertResult = await manager.query(
+        `INSERT INTO organization_product_listings
+           (id, organization_id, service_key, master_id, offer_id, is_active, created_at, updated_at)
+         SELECT gen_random_uuid(), $2, $3, spo.master_id, spo.id, true, NOW(), NOW()
+         FROM supplier_product_offers spo
+         WHERE spo.id = $1
+         ON CONFLICT (organization_id, service_key, offer_id)
+         DO UPDATE SET is_active = true, updated_at = NOW()`,
+        [approval.offer_id, approval.organization_id, serviceKey],
+      );
+
+      // 4. 해당 offer의 kpa-society listings 전체 활성화 (auto-expansion으로 미리 생성된 다른 org listing 포함)
       const listingResult = await manager.query(
         `UPDATE organization_product_listings SET is_active = true, updated_at = NOW()
-         WHERE offer_id = $1 AND service_key = 'kpa-society'`,
-        [approval.offer_id],
+         WHERE offer_id = $1 AND service_key = $2`,
+        [approval.offer_id, serviceKey],
       );
 
       return {
         success: true,
-        data: { approvalId: id, offerId: approval.offer_id, activatedListings: listingResult[1] || 0 },
+        data: {
+          approvalId: id,
+          offerId: approval.offer_id,
+          organizationId: approval.organization_id,
+          activatedListings: listingResult[1] || 0,
+          listingUpserted: true,
+        },
       };
     });
 
@@ -168,7 +189,7 @@ export function createOperatorProductApplicationsController(
       });
     }
 
-    logger.info(`[OperatorProductApplications] KPA 2차 심사 승인: ${id} by ${approvedBy}, activated=${(result.data as any)?.activatedListings}`);
+    logger.info(`[OperatorProductApplications] KPA 2차 심사 승인: ${id} by ${approvedBy}, org=${(result.data as any)?.organizationId}, activated=${(result.data as any)?.activatedListings}, upserted=${(result.data as any)?.listingUpserted}`);
     actionLogService?.logSuccess('kpa-society', approvedBy, 'kpa.operator.product_approve', {
       meta: { targetId: id, statusBefore: 'pending', statusAfter: 'approved' },
     }).catch(() => {});
