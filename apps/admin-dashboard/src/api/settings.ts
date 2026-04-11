@@ -59,13 +59,6 @@ export interface IntegrationSettings {
       defaultPlaylist?: string;
       autoApprove: boolean;
     };
-    crowdfunding: {
-      enabled: boolean;
-      apiKey?: string;
-      paymentGateway: string;
-      feePercentage: number;
-      minCampaignAmount: number;
-    };
   };
   payment: {
     stripe?: {

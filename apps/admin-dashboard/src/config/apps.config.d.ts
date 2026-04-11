@@ -13,13 +13,6 @@ export declare const appsConfig: {
         readonly icon: "Monitor";
         readonly color: "secondary";
     };
-    readonly crowdfunding: {
-        readonly name: "Crowdfunding";
-        readonly url: any;
-        readonly apiEndpoint: "/api/v1/crowdfunding";
-        readonly icon: "DollarSign";
-        readonly color: "success";
-    };
 };
 export declare const ssoConfig: {
     enabled: boolean;
@@ -72,13 +65,6 @@ export declare const apiEndpoints: {
         content: string;
         schedules: string;
         playlists: string;
-    };
-    crowdfunding: {
-        stats: string;
-        campaigns: string;
-        contributions: string;
-        users: string;
-        payouts: string;
     };
     dashboard: {
         overview: string;

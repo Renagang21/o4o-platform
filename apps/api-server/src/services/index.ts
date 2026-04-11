@@ -12,7 +12,6 @@ export * from './CacheService.js';
 // export * from './CartService.js';
 export * from './CircuitBreakerService.js';
 // export * from './CouponService.js';
-// export * from './CrowdfundingService.js';
 // DatabaseOptimizationService removed (WO-O4O-CODEBASE-CLEANUP-V1)
 // DeploymentMonitoringService removed (WO-O4O-CODEBASE-CLEANUP-V1)
 export * from './ErrorAlertService.js';

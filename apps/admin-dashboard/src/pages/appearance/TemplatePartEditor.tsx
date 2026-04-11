@@ -502,7 +502,6 @@ export default function TemplatePartEditor() {
                         <SelectItem value="">모든 서브도메인</SelectItem>
                         <SelectItem value="shop">shop</SelectItem>
                         <SelectItem value="forum">forum</SelectItem>
-                        <SelectItem value="crowdfunding">crowdfunding</SelectItem>
                         <SelectItem value="admin">admin</SelectItem>
                       </SelectContent>
                     </Select>

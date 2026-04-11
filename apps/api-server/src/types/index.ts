@@ -137,7 +137,6 @@ export interface ApiResponse<T = any> {
 }
 
 // Re-export all types
-// export * from './crowdfunding-types.js';
 export * from './form-builder.js';
 export { 
   SlowQuery, IndexInfo, DuplicateIndex, TableStats, TableSize,

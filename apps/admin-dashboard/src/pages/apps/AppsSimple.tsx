@@ -9,7 +9,6 @@ import {
   FileText,
   TrendingUp,
   Monitor,
-  DollarSign,
   Box
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -57,19 +56,6 @@ const availableApps: App[] = [
     isCore: false,
     features: ['추천 링크 생성', '수수료 추적', '파트너 대시보드', '실적 분석'],
     settings: '/affiliate/settings'
-  },
-  {
-    id: 'crowdfunding',
-    name: '크라우드펀딩',
-    description: '프로젝트 펀딩 및 후원 관리 플랫폼',
-    icon: <DollarSign className="w-6 h-6" />,
-    version: '1.2.0',
-    author: 'O4O Platform',
-    category: 'Finance',
-    isCore: false,
-    features: ['프로젝트 관리', '후원자 관리', '리워드 시스템', '펀딩 통계'],
-    dependencies: ['ecommerce'],
-    settings: '/crowdfunding'
   },
   {
     id: 'forum',
