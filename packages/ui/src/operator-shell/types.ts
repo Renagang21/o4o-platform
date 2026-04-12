@@ -60,6 +60,14 @@ export interface OperatorShellProps {
   footer?: ReactNode | false;
   /** 헤더 우측 추가 액션 (e.g., AccountMenu) */
   headerActions?: ReactNode;
+  /** 헤더 전체 커스터마이징 — 제공 시 기본 헤더 대신 렌더링 */
+  renderHeader?: (props: {
+    serviceName: string;
+    user: { name: string; email?: string } | null;
+    onLogout: () => void;
+    homeLink: string;
+    dashboardLink: string;
+  }) => ReactNode;
   /** Content 영역 — 일반적으로 <Outlet /> */
   children: ReactNode;
 }
