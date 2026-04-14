@@ -149,7 +149,7 @@ build_packages() {
     echo -e "${GREEN}📦 Building packages...${NC}"
     
     # Build in dependency order
-    local packages=("types" "utils" "ui" "auth-client" "auth-context" "crowdfunding-types" "forum-types" "shortcodes")
+    local packages=("types" "utils" "ui" "auth-client" "auth-context" "forum-types" "shortcodes")
     
     for pkg in "${packages[@]}"; do
         if [ -d "packages/$pkg" ]; then
