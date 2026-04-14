@@ -3,7 +3,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { PageHeader, LoadingSpinner, EmptyState, Card, MyPageNavigation } from '../../components/common';
 import { mypageApi } from '../../api';
@@ -11,23 +11,7 @@ import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 import type { UserSettings } from '../../api/mypage';
 
-/**
- * 현재 URL 경로에서 서비스 컨텍스트 prefix를 추출
- * - /branch-services/:branchId/* → '/branch-services/:branchId' (Service C)
- * - 기타 → '' (빈 문자열, 커뮤니티)
- */
-function getServicePrefix(pathname: string): string {
-  // 분회 서비스 컨텍스트 (Service C): /branch-services/:branchId/*
-  const branchServicesMatch = pathname.match(/^(\/branch-services\/[^/]+)/);
-  if (branchServicesMatch) return branchServicesMatch[1];
-
-  // 메인 커뮤니티 컨텍스트
-  return '';
-}
-
 export function MySettingsPage() {
-  const location = useLocation();
-  const servicePrefix = getServicePrefix(location.pathname);
   const { user, logoutAll } = useAuth();
   const navigate = useNavigate();
   const [settings, setSettings] = useState<UserSettings | null>(null);
@@ -79,7 +63,7 @@ export function MySettingsPage() {
 
     try {
       await logoutAll();
-      navigate(servicePrefix || '/');
+      navigate('/');
     } catch (err) {
       toast.error('로그아웃에 실패했습니다. 다시 시도해주세요.');
     }
@@ -141,8 +125,8 @@ export function MySettingsPage() {
       <PageHeader
         title="설정"
         breadcrumb={[
-          { label: '홈', href: servicePrefix || '/' },
-          { label: '마이페이지', href: `${servicePrefix}/mypage` },
+          { label: '홈', href: '/' },
+          { label: '마이페이지', href: `/mypage` },
           { label: '설정' },
         ]}
       />

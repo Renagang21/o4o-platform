@@ -24,36 +24,21 @@ const NAV_ITEMS: NavItem[] = [
   { label: '설정', path: '/mypage/settings' },
 ];
 
-/**
- * 현재 URL 경로에서 서비스 컨텍스트 prefix를 추출
- */
-function getServicePrefix(pathname: string): string {
-  const branchServicesMatch = pathname.match(/^(\/branch-services\/[^/]+)/);
-  if (branchServicesMatch) return branchServicesMatch[1];
-  return '';
-}
-
 export function MyPageNavigation() {
   const location = useLocation();
-  const servicePrefix = getServicePrefix(location.pathname);
-
-  // servicePrefix를 제거한 순수 경로로 active 판별
-  const purePath = servicePrefix
-    ? location.pathname.replace(servicePrefix, '')
-    : location.pathname;
 
   return (
     <nav style={navStyles.container}>
       <div style={navStyles.inner}>
         {NAV_ITEMS.map(item => {
           const isActive = item.path === '/mypage'
-            ? purePath === '/mypage'
-            : purePath.startsWith(item.path);
+            ? location.pathname === '/mypage'
+            : location.pathname.startsWith(item.path);
 
           return (
             <Link
               key={item.path}
-              to={`${servicePrefix}${item.path}`}
+              to={item.path}
               style={{
                 ...navStyles.tab,
                 ...(isActive ? navStyles.tabActive : {}),

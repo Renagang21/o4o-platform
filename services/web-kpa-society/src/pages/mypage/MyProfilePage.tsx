@@ -9,18 +9,12 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { PageHeader, LoadingSpinner, EmptyState, Card, MyPageNavigation } from '../../components/common';
 import { mypageApi, type ProfileResponse } from '../../api';
 import { useAuth, ACTIVITY_TYPE_LABELS } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
-
-function getServicePrefix(pathname: string): string {
-  const branchServicesMatch = pathname.match(/^(\/branch-services\/[^/]+)/);
-  if (branchServicesMatch) return branchServicesMatch[1];
-  return '';
-}
 
 const EDITABLE_ACTIVITY_TYPES = [
   'pharmacy_owner', 'pharmacy_employee', 'hospital',
@@ -39,8 +33,6 @@ const ORGANIZATION_ROLE_LABELS: Record<string, string> = {
 type TabKey = 'basic' | 'role';
 
 export function MyProfilePage() {
-  const location = useLocation();
-  const servicePrefix = getServicePrefix(location.pathname);
   const { user, setActivityType, checkAuth } = useAuth();
   const [profile, setProfile] = useState<ProfileResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -257,8 +249,8 @@ export function MyProfilePage() {
       <PageHeader
         title="프로필"
         breadcrumb={[
-          { label: '홈', href: servicePrefix || '/' },
-          { label: '마이페이지', href: `${servicePrefix}/mypage` },
+          { label: '홈', href: '/' },
+          { label: '마이페이지', href: `/mypage` },
           { label: '프로필' },
         ]}
       />

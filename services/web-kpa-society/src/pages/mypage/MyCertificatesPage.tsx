@@ -3,30 +3,13 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Pagination, Card, MyPageNavigation } from '../../components/common';
 import { mypageApi } from '../../api';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 import type { Certificate } from '../../types';
 
-/**
- * 현재 URL 경로에서 서비스 컨텍스트 prefix를 추출
- * - /branch-services/:branchId/* → '/branch-services/:branchId' (Service C)
- * - 기타 → '' (빈 문자열, 커뮤니티)
- */
-function getServicePrefix(pathname: string): string {
-  // 분회 서비스 컨텍스트 (Service C): /branch-services/:branchId/*
-  const branchServicesMatch = pathname.match(/^(\/branch-services\/[^/]+)/);
-  if (branchServicesMatch) return branchServicesMatch[1];
-
-  // 메인 커뮤니티 컨텍스트
-  return '';
-}
-
 export function MyCertificatesPage() {
-  const location = useLocation();
-  const servicePrefix = getServicePrefix(location.pathname);
   const { user } = useAuth();
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [loading, setLoading] = useState(true);
@@ -98,8 +81,8 @@ export function MyCertificatesPage() {
         title="이수현황"
         description="수료한 교육 과정의 수료증을 확인하세요"
         breadcrumb={[
-          { label: '홈', href: servicePrefix || '/' },
-          { label: '마이페이지', href: `${servicePrefix}/mypage` },
+          { label: '홈', href: '/' },
+          { label: '마이페이지', href: `/mypage` },
           { label: '이수현황' },
         ]}
       />
@@ -110,7 +93,7 @@ export function MyCertificatesPage() {
           icon="📋"
           title="완료 기록이 없습니다"
           description="안내 흐름을 완료하면 기록이 생성됩니다."
-          action={{ label: '안내 흐름 보기', onClick: () => window.location.href = `${servicePrefix}/lms/courses` }}
+          action={{ label: '안내 흐름 보기', onClick: () => window.location.href = `/lms/courses` }}
         />
       ) : (
         <>

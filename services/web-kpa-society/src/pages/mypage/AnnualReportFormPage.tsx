@@ -13,24 +13,10 @@
  */
 
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { useAuth } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
-
-/**
- * 현재 URL 경로에서 서비스 컨텍스트 prefix를 추출
- * - /branch-services/:branchId/* → '/branch-services/:branchId' (Service C)
- * - 기타 → '' (빈 문자열, 커뮤니티)
- */
-function getServicePrefix(pathname: string): string {
-  // 분회 서비스 컨텍스트 (Service C): /branch-services/:branchId/*
-  const branchServicesMatch = pathname.match(/^(\/branch-services\/[^/]+)/);
-  if (branchServicesMatch) return branchServicesMatch[1];
-
-  // 메인 커뮤니티 컨텍스트
-  return '';
-}
 
 // 취업 활동 유형
 type ActivityType =
@@ -118,8 +104,6 @@ const currentYear = new Date().getFullYear();
 
 export function AnnualReportFormPage() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const servicePrefix = getServicePrefix(location.pathname);
   const { user } = useAuth();
 
   const [formData, setFormData] = useState<AnnualReportData>({
@@ -187,7 +171,7 @@ export function AnnualReportFormPage() {
       return;
     }
     toast.success(`${formData.year}년도 약사 회원 신고서가 제출되었습니다.`);
-    navigate(`${servicePrefix}/mypage`);
+    navigate(`/mypage`);
   };
 
   const isPharmacyOwner = formData.employment.activityType === 'pharmacy_owner';

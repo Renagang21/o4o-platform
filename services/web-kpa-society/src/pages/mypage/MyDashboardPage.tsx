@@ -11,7 +11,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Card, MyPageNavigation } from '../../components/common';
 import { AiSummaryButton } from '../../components/ai';
 import { mypageApi } from '../../api';
@@ -20,20 +20,6 @@ import type { MyParticipationSummary } from '../../api/marketTrial';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 import type { UserActivity } from '../../api/mypage';
-
-/**
- * 현재 URL 경로에서 서비스 컨텍스트 prefix를 추출
- * - /branch-services/:branchId/* → '/branch-services/:branchId' (Service C)
- * - 기타 → '' (빈 문자열, 커뮤니티)
- */
-function getServicePrefix(pathname: string): string {
-  // 분회 서비스 컨텍스트 (Service C): /branch-services/:branchId/*
-  const branchServicesMatch = pathname.match(/^(\/branch-services\/[^/]+)/);
-  if (branchServicesMatch) return branchServicesMatch[1];
-
-  // 메인 커뮤니티 컨텍스트
-  return '';
-}
 
 // 회계 항목 타입 (단식부기)
 interface AccountingEntry {
@@ -81,8 +67,6 @@ const TRIAL_STATUS_COLORS: Record<string, { bg: string; text: string }> = {
 };
 
 export function MyDashboardPage() {
-  const location = useLocation();
-  const servicePrefix = getServicePrefix(location.pathname);
   const { user } = useAuth();
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [activities, setActivities] = useState<UserActivity[]>([]);
@@ -169,7 +153,7 @@ export function MyDashboardPage() {
     <div style={styles.container}>
       <PageHeader
         title="마이페이지"
-        breadcrumb={[{ label: '홈', href: servicePrefix || '/' }, { label: '마이페이지' }]}
+        breadcrumb={[{ label: '홈', href: '/' }, { label: '마이페이지' }]}
       />
       <MyPageNavigation />
 
@@ -264,7 +248,7 @@ export function MyDashboardPage() {
 
       {/* 활동 요약 카드 */}
       <div style={styles.summaryGrid}>
-        <Link to={`${servicePrefix}/mypage/enrollments`} style={styles.summaryLink}>
+        <Link to={`/mypage/enrollments`} style={styles.summaryLink}>
           <Card padding="medium">
             <div style={styles.summaryItem}>
               <span style={styles.summaryIcon}>📚</span>
@@ -280,7 +264,7 @@ export function MyDashboardPage() {
             <span style={styles.summaryLabel}>수료 완료</span>
           </div>
         </Card>
-        <Link to={`${servicePrefix}/mypage/certificates`} style={styles.summaryLink}>
+        <Link to={`/mypage/certificates`} style={styles.summaryLink}>
           <Card padding="medium">
             <div style={styles.summaryItem}>
               <span style={styles.summaryIcon}>🎓</span>
@@ -289,7 +273,7 @@ export function MyDashboardPage() {
             </div>
           </Card>
         </Link>
-        <Link to={`${servicePrefix}/mypage/my-forums`} style={styles.summaryLink}>
+        <Link to={`/mypage/my-forums`} style={styles.summaryLink}>
           <Card padding="medium">
             <div style={styles.summaryItem}>
               <span style={styles.summaryIcon}>💬</span>
@@ -298,7 +282,7 @@ export function MyDashboardPage() {
             </div>
           </Card>
         </Link>
-        <Link to={`${servicePrefix}/event-offers/history`} style={styles.summaryLink}>
+        <Link to={`/event-offers/history`} style={styles.summaryLink}>
           <Card padding="medium">
             <div style={styles.summaryItem}>
               <span style={styles.summaryIcon}>🛒</span>
@@ -313,7 +297,7 @@ export function MyDashboardPage() {
       <Card padding="large" style={{ marginTop: '24px' }}>
         <div style={styles.trialHeader}>
           <h3 style={styles.sectionTitle}>Market Trial</h3>
-          <Link to={`${servicePrefix}/market-trial`} style={styles.trialHubLink}>
+          <Link to={`/market-trial`} style={styles.trialHubLink}>
             전체 보기 →
           </Link>
         </div>
@@ -321,7 +305,7 @@ export function MyDashboardPage() {
           <div style={styles.trialEmptyState}>
             <span style={styles.trialEmptyIcon}>🧪</span>
             <p style={styles.trialEmptyText}>참여 중인 Market Trial이 없습니다.</p>
-            <Link to={`${servicePrefix}/market-trial`} style={styles.trialEmptyLink}>
+            <Link to={`/market-trial`} style={styles.trialEmptyLink}>
               Market Trial 둘러보기
             </Link>
           </div>
@@ -335,7 +319,7 @@ export function MyDashboardPage() {
               return (
                 <Link
                   key={p.id}
-                  to={`${servicePrefix}/market-trial/${trial.id}`}
+                  to={`/market-trial/${trial.id}`}
                   style={styles.trialItem}
                 >
                   <div style={styles.trialItemContent}>
@@ -393,19 +377,19 @@ export function MyDashboardPage() {
 
       {/* 바로가기 */}
       <div style={styles.quickLinks}>
-        <Link to={`${servicePrefix}/mypage/profile`} style={styles.quickLink}>
+        <Link to={`/mypage/profile`} style={styles.quickLink}>
           <span style={styles.quickLinkIcon}>👤</span>
           <span>프로필</span>
         </Link>
-        <Link to={`${servicePrefix}/mypage/my-forums`} style={styles.quickLink}>
+        <Link to={`/mypage/my-forums`} style={styles.quickLink}>
           <span style={styles.quickLinkIcon}>💬</span>
           <span>내 포럼</span>
         </Link>
-        <Link to={`${servicePrefix}/mypage/certificates`} style={styles.quickLink}>
+        <Link to={`/mypage/certificates`} style={styles.quickLink}>
           <span style={styles.quickLinkIcon}>🎓</span>
           <span>이수현황</span>
         </Link>
-        <Link to={`${servicePrefix}/mypage/settings`} style={styles.quickLink}>
+        <Link to={`/mypage/settings`} style={styles.quickLink}>
           <span style={styles.quickLinkIcon}>⚙️</span>
           <span>설정</span>
         </Link>

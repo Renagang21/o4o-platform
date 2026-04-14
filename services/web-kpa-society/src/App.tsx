@@ -242,7 +242,7 @@ function RoleBasedHome() {
     setChecked(true);
 
     if (user?.roles) {
-      const target = getDefaultRouteByRole(user.roles, user.membershipRole);
+      const target = getDefaultRouteByRole(user.roles);
       // WO-KPA-SOCIETY-DASHBOARD-TO-MYPAGE-CONSOLIDATION-V1: /mypage가 기본값
       if (target !== '/mypage' && target !== '/login') {
         navigate(target, { replace: true });

@@ -8,25 +8,11 @@
  */
 
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { PageHeader, Card } from '../../components/common';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
-
-/**
- * 현재 URL 경로에서 서비스 컨텍스트 prefix를 추출
- * - /branch-services/:branchId/* → '/branch-services/:branchId' (Service C)
- * - 기타 → '' (빈 문자열, 커뮤니티)
- */
-function getServicePrefix(pathname: string): string {
-  // 분회 서비스 컨텍스트 (Service C): /branch-services/:branchId/*
-  const branchServicesMatch = pathname.match(/^(\/branch-services\/[^/]+)/);
-  if (branchServicesMatch) return branchServicesMatch[1];
-
-  // 메인 커뮤니티 컨텍스트
-  return '';
-}
 
 // Mock 데이터 - 신상신고 현황
 interface StatusReportRecord {
@@ -84,8 +70,6 @@ const workplaceTypes = [
 ];
 
 export function PersonalStatusReportPage() {
-  const location = useLocation();
-  const servicePrefix = getServicePrefix(location.pathname);
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -133,8 +117,8 @@ export function PersonalStatusReportPage() {
         <PageHeader
           title="신상신고"
           breadcrumb={[
-            { label: '홈', href: servicePrefix || '/' },
-            { label: '마이페이지', href: `${servicePrefix}/mypage` },
+            { label: '홈', href: '/' },
+            { label: '마이페이지', href: `/mypage` },
             { label: '신상신고' },
           ]}
         />
@@ -159,8 +143,8 @@ export function PersonalStatusReportPage() {
       <PageHeader
         title="신상신고"
         breadcrumb={[
-          { label: '홈', href: servicePrefix || '/' },
-          { label: '마이페이지', href: `${servicePrefix}/mypage` },
+          { label: '홈', href: '/' },
+          { label: '마이페이지', href: `/mypage` },
           { label: '신상신고' },
         ]}
       />
