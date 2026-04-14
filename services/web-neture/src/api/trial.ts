@@ -53,6 +53,25 @@ export interface ServiceApproval {
 
 export interface OperatorTrial extends Trial {
   serviceApprovals?: ServiceApproval[];
+  forumLink?: {
+    forumPostId: string;
+    slug: string | null;
+    url: string;
+  } | null;
+}
+
+export interface TrialParticipant {
+  id: string;
+  name: string;
+  type: string;
+  rewardType: string | null;
+  rewardStatus: string;
+  joinedAt: string;
+}
+
+export interface ParticipantListResponse {
+  summary: { totalCount: number; productCount: number; cashCount: number };
+  participants: TrialParticipant[];
 }
 
 export interface CreateTrialPayload {
@@ -163,6 +182,14 @@ export async function approveTrialFirst(trialId: string): Promise<OperatorTrial>
 
 export async function rejectTrialFirst(trialId: string, reason: string): Promise<OperatorTrial> {
   const { data } = await api.patch(`${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/reject`, { reason });
+  return data.data || data;
+}
+
+/**
+ * WO-MARKET-TRIAL-OPERATION-READINESS-V1: 참여자 목록 JSON (인라인 표시)
+ */
+export async function getOperatorTrialParticipants(trialId: string): Promise<ParticipantListResponse> {
+  const { data } = await api.get(`${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/participants`);
   return data.data || data;
 }
 

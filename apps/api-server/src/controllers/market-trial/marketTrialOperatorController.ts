@@ -253,9 +253,75 @@ export class MarketTrialOperatorController {
   }
 
   // ============================================================================
-  // Participant Export
+  // Participants
   // WO-MARKET-TRIAL-PARTICIPANT-EXPORT-V1
+  // WO-MARKET-TRIAL-OPERATION-READINESS-V1: JSON participant list for inline display
   // ============================================================================
+
+  /**
+   * GET /api/v1/neture/operator/market-trial/:id/participants
+   * Trial 참여자 목록 JSON (운영자 인라인 조회용)
+   * 최소 운영 정보: 이름, 유형, 보상방식, 보상상태, 참여일
+   */
+  static async listParticipants(req: AuthRequest, res: Response) {
+    try {
+      const { id } = req.params;
+      const ds = MarketTrialOperatorController.dataSource;
+      if (!ds) {
+        return res.status(500).json({ success: false, message: 'DataSource not initialized' });
+      }
+
+      const trial = await MarketTrialOperatorController.trialRepo.findOne({ where: { id } });
+      if (!trial) {
+        return res.status(404).json({ success: false, message: 'Trial not found' });
+      }
+
+      const rows: Array<{
+        id: string;
+        participantName: string;
+        participantType: string;
+        rewardType: string | null;
+        rewardStatus: string;
+        createdAt: Date;
+      }> = await ds.query(
+        `SELECT
+           p.id,
+           COALESCE(u."displayName", u.email, '알 수 없음') AS "participantName",
+           p."participantType",
+           p."rewardType",
+           p."rewardStatus",
+           p."createdAt"
+         FROM market_trial_participants p
+         LEFT JOIN users u ON u.id = p."participantId"
+         WHERE p."marketTrialId" = $1
+         ORDER BY p."createdAt" DESC`,
+        [id],
+      );
+
+      // Summary counts
+      const totalCount = rows.length;
+      const productCount = rows.filter((r) => r.rewardType === 'product').length;
+      const cashCount = rows.filter((r) => r.rewardType === 'cash').length;
+
+      res.json({
+        success: true,
+        data: {
+          summary: { totalCount, productCount, cashCount },
+          participants: rows.map((r) => ({
+            id: r.id,
+            name: r.participantName,
+            type: r.participantType,
+            rewardType: r.rewardType,
+            rewardStatus: r.rewardStatus,
+            joinedAt: new Date(r.createdAt).toISOString(),
+          })),
+        },
+      });
+    } catch (error) {
+      console.error('Operator list participants error:', error);
+      res.status(500).json({ success: false, message: 'Failed to list participants' });
+    }
+  }
 
   /**
    * GET /api/v1/neture/operator/market-trial/:id/participants/export

@@ -2,6 +2,8 @@
  * Market Trial Approvals Page (Neture Operator)
  *
  * WO-O4O-MARKET-TRIAL-PHASE1-V1
+ * WO-MARKET-TRIAL-OPERATOR-CONSOLIDATED-REFINE-V1: 모바일 가독성 + 참여 수 표시 + 요약 지표
+ * WO-MARKET-TRIAL-OPERATION-READINESS-V1: 보상 힌트 + 모바일 카드 최종 정리
  * 운영자 승인 목록 — submitted trials 심사 + 전체 trial 관리 (단일 승인 구조)
  */
 
@@ -83,6 +85,11 @@ export default function MarketTrialApprovalsPage() {
         </div>
       )}
 
+      {/* Summary Metrics */}
+      {!loading && trials.length > 0 && (
+        <SummaryBar trials={trials} />
+      )}
+
       {loading ? (
         <div className="text-center py-12 text-gray-500">불러오는 중...</div>
       ) : trials.length === 0 ? (
@@ -91,37 +98,97 @@ export default function MarketTrialApprovalsPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {trials.map((trial) => {
-            const statusCfg = STATUS_CONFIG[trial.status] || { label: trial.status, color: 'bg-gray-100 text-gray-700' };
-            return (
-              <div
-                key={trial.id}
-                onClick={() => navigate(`/operator/market-trial/${trial.id}`)}
-                className="p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm cursor-pointer transition"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="min-w-0 flex-1">
-                    <h3 className="font-medium text-gray-900 truncate">{trial.title}</h3>
-                    <p className="text-sm text-gray-500 mt-1">
-                      {trial.supplierName || '공급자'} · {new Date(trial.createdAt).toLocaleDateString('ko-KR')}
-                    </p>
-                    {trial.visibleServiceKeys && trial.visibleServiceKeys.length > 0 && (
-                      <div className="flex gap-1 mt-2">
-                        {trial.visibleServiceKeys.map((key) => (
-                          <span key={key} className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">
-                            {key}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  <span className={`px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap ${statusCfg.color}`}>
-                    {statusCfg.label}
-                  </span>
-                </div>
-              </div>
-            );
-          })}
+          {trials.map((trial) => (
+            <TrialCard key={trial.id} trial={trial} onClick={() => navigate(`/operator/market-trial/${trial.id}`)} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Summary Metrics Bar ──
+
+function SummaryBar({ trials }: { trials: OperatorTrial[] }) {
+  const recruiting = trials.filter((t) => t.status === 'recruiting').length;
+  const submitted = trials.filter((t) => t.status === 'submitted').length;
+  const totalParticipants = trials.reduce((sum, t) => sum + t.currentParticipants, 0);
+
+  return (
+    <div className="grid grid-cols-3 gap-3 mb-5">
+      <div className="bg-white border border-gray-200 rounded-lg p-3 text-center">
+        <p className="text-lg font-bold text-yellow-600">{submitted}</p>
+        <p className="text-xs text-gray-500 mt-0.5">심사 대기</p>
+      </div>
+      <div className="bg-white border border-gray-200 rounded-lg p-3 text-center">
+        <p className="text-lg font-bold text-green-600">{recruiting}</p>
+        <p className="text-xs text-gray-500 mt-0.5">모집 중</p>
+      </div>
+      <div className="bg-white border border-gray-200 rounded-lg p-3 text-center">
+        <p className="text-lg font-bold text-blue-600">{totalParticipants}</p>
+        <p className="text-xs text-gray-500 mt-0.5">전체 참여자</p>
+      </div>
+    </div>
+  );
+}
+
+// ── Trial Card (enhanced) ──
+
+function TrialCard({ trial, onClick }: { trial: OperatorTrial; onClick: () => void }) {
+  const statusCfg = STATUS_CONFIG[trial.status] || { label: trial.status, color: 'bg-gray-100 text-gray-700' };
+  const recruitRate =
+    trial.maxParticipants && trial.maxParticipants > 0
+      ? Math.round((trial.currentParticipants / trial.maxParticipants) * 100)
+      : null;
+
+  return (
+    <div
+      onClick={onClick}
+      className="p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm cursor-pointer transition"
+    >
+      {/* Row 1: Title + Status */}
+      <div className="flex items-start justify-between gap-2">
+        <h3 className="font-medium text-gray-900 truncate min-w-0 flex-1">{trial.title}</h3>
+        <span className={`px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap shrink-0 ${statusCfg.color}`}>
+          {statusCfg.label}
+        </span>
+      </div>
+
+      {/* Row 2: Supplier + Date */}
+      <p className="text-sm text-gray-500 mt-1">
+        {trial.supplierName || '공급자'} · {new Date(trial.createdAt).toLocaleDateString('ko-KR')}
+      </p>
+
+      {/* Row 3: Participant count + Recruitment rate + Reward hint */}
+      <div className="flex items-center gap-3 mt-2 flex-wrap">
+        <span className="text-xs text-gray-600">
+          참여 <span className="font-semibold text-gray-900">{trial.currentParticipants}</span>
+          {trial.maxParticipants ? `/${trial.maxParticipants}` : ''}명
+        </span>
+        {recruitRate !== null && (
+          <span className={`text-xs font-medium ${recruitRate >= 80 ? 'text-red-600' : recruitRate >= 50 ? 'text-yellow-600' : 'text-gray-500'}`}>
+            ({recruitRate}%)
+          </span>
+        )}
+        {trial.outcomeSnapshot?.expectedType && (
+          <span className={`text-xs px-1.5 py-0.5 rounded ${
+            trial.outcomeSnapshot.expectedType === 'product'
+              ? 'bg-green-50 text-green-700'
+              : 'bg-yellow-50 text-yellow-700'
+          }`}>
+            {trial.outcomeSnapshot.expectedType === 'product' ? '제품' : '현금'}
+          </span>
+        )}
+      </div>
+
+      {/* Row 4: Service keys */}
+      {trial.visibleServiceKeys && trial.visibleServiceKeys.length > 0 && (
+        <div className="flex gap-1 mt-2 flex-wrap">
+          {trial.visibleServiceKeys.map((key) => (
+            <span key={key} className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">
+              {key}
+            </span>
+          ))}
         </div>
       )}
     </div>
