@@ -5,8 +5,11 @@
  *
  * Validates that KPA role guards match KPA-ROLE-MATRIX-V1.md:
  * 1. requireKpaScope() allowed/denied roles
- * 2. isBranchOperator() allowed/denied roles
- * 3. Cross-service import isolation (KPA-a ↔ KPA-c)
+ * 2. Cross-service import isolation (KPA-a)
+ *
+ * WO-KPA-A-BRANCH-CHAPTER-REMOVAL-PHASE4-DEAD-CODE-AND-DROP-V1:
+ * isBranchOperator (KPA-c) tests removed — branch controllers deleted.
+ * kpa:branch_admin and kpa:branch_operator removed from allowed roles.
  *
  * These tests detect guard logic changes at CI time.
  */
@@ -44,19 +47,17 @@ describe('hasAnyServiceRole (core utility)', () => {
 // ─────────────────────────────────────────────────────
 // 2. requireKpaScope — KPA-a guard role matrix
 //
-// Frozen role list from kpa.routes.ts:
-//   ALLOWED: kpa:admin, kpa:operator, kpa:district_admin, kpa:branch_admin, kpa:branch_operator
+// Frozen role list from KPA_SCOPE_CONFIG (security-core):
+//   ALLOWED: kpa:admin, kpa:operator, kpa:district_admin
 //   DENIED:  platform:*, legacy unprefixed, other services
 // ─────────────────────────────────────────────────────
 
 describe('requireKpaScope role matrix (KPA-a)', () => {
-  // The exact role list used in requireKpaScope (kpa.routes.ts lines 85-91)
+  // The exact role list used in requireKpaScope (kpa.routes.ts KPA_SCOPE_CONFIG)
   const KPA_SCOPE_ALLOWED_ROLES = [
     'kpa:admin',
     'kpa:operator',
     'kpa:district_admin',
-    'kpa:branch_admin',
-    'kpa:branch_operator',
   ];
 
   describe('ALLOWED roles', () => {
@@ -117,76 +118,9 @@ describe('requireKpaScope role matrix (KPA-a)', () => {
 });
 
 // ─────────────────────────────────────────────────────
-// 3. isBranchOperator — KPA-c guard role matrix
-//
-// Frozen role list from branch-admin-dashboard.controller.ts:
-//   ALLOWED: kpa:branch_admin, kpa:branch_operator, kpa:admin, kpa:operator
-//   DENIED:  platform:*, legacy unprefixed, other services
-// ─────────────────────────────────────────────────────
-
-describe('isBranchOperator role matrix (KPA-c)', () => {
-  const BRANCH_ALLOWED_ROLES = [
-    'kpa:branch_admin',
-    'kpa:branch_operator',
-    'kpa:admin',
-    'kpa:operator',
-  ];
-
-  describe('ALLOWED roles', () => {
-    it.each(BRANCH_ALLOWED_ROLES)('%s → allowed', (role) => {
-      expect(hasAnyServiceRole([role], BRANCH_ALLOWED_ROLES)).toBe(true);
-    });
-  });
-
-  describe('DENIED roles', () => {
-    const deniedRoles = [
-      'platform:admin',
-      'platform:super_admin',
-      'neture:admin',
-      'cosmetics:admin',
-      'admin',              // legacy
-      'super_admin',        // legacy
-      'branch_admin',       // legacy
-      'branch_operator',    // legacy
-      'kpa:pharmacist',     // member
-      'kpa:district_admin', // not in branch allowed list
-    ];
-
-    it.each(deniedRoles)('%s → denied', (role) => {
-      expect(hasAnyServiceRole([role], BRANCH_ALLOWED_ROLES)).toBe(false);
-    });
-  });
-
-  // Verify branch-admin-dashboard uses membership-aware guard
-  it('branch-admin-dashboard.controller.ts uses createMembershipScopeGuard(KPA_SCOPE_CONFIG)', () => {
-    const filePath = path.resolve(
-      __dirname,
-      '../routes/kpa/controllers/branch-admin-dashboard.controller.ts'
-    );
-    const content = fs.readFileSync(filePath, 'utf8');
-
-    // Must import config from security-core
-    expect(content).toContain(`from '@o4o/security-core'`);
-    expect(content).toContain('createMembershipScopeGuard');
-    expect(content).toContain('KPA_SCOPE_CONFIG');
-  });
-
-  // Verify KPA_SCOPE_CONFIG blocks other service prefixes (shared with KPA-a)
-  it('KPA_SCOPE_CONFIG blocks other service prefixes', () => {
-    const { KPA_SCOPE_CONFIG } = require('@o4o/security-core');
-
-    const expectedBlocked = ['neture', 'glycopharm', 'cosmetics', 'glucoseview'];
-    for (const prefix of expectedBlocked) {
-      expect(KPA_SCOPE_CONFIG.blockedServicePrefixes).toContain(prefix);
-    }
-  });
-});
-
-// ─────────────────────────────────────────────────────
-// 4. Cross-Service Import Isolation
+// 3. Cross-Service Import Isolation
 //
 // KPA-a (kpa.routes.ts) must NOT import branch entities
-// KPA-c (branch-admin-dashboard) must NOT import CmsContent
 // ─────────────────────────────────────────────────────
 
 describe('Cross-Service Isolation', () => {
@@ -208,30 +142,5 @@ describe('Cross-Service Isolation', () => {
     expect(staticImports).not.toContain('kpa-branch-news');
     expect(staticImports).not.toContain('kpa-branch-officer');
     expect(staticImports).not.toContain('kpa-branch-doc');
-  });
-
-  it('branch-admin-dashboard.controller.ts does NOT import CmsContent', () => {
-    const filePath = path.resolve(
-      __dirname,
-      '../routes/kpa/controllers/branch-admin-dashboard.controller.ts'
-    );
-    const content = fs.readFileSync(filePath, 'utf8');
-
-    // CmsContent / cms-core must NEVER be imported in KPA-c controller
-    expect(content).not.toContain('CmsContent');
-    expect(content).not.toContain('cms-core');
-    expect(content).not.toContain('cms_contents');
-  });
-
-  it('branch-public.controller.ts does NOT import CmsContent', () => {
-    const filePath = path.resolve(
-      __dirname,
-      '../routes/kpa/controllers/branch-public.controller.ts'
-    );
-    const content = fs.readFileSync(filePath, 'utf8');
-
-    expect(content).not.toContain('CmsContent');
-    expect(content).not.toContain('cms-core');
-    expect(content).not.toContain('cms_contents');
   });
 });

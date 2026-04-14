@@ -32,12 +32,12 @@ describe('KPA Scope Guard', () => {
   });
 
   describe('allowed roles', () => {
+    // WO-KPA-A-BRANCH-CHAPTER-REMOVAL-PHASE4-DEAD-CODE-AND-DROP-V1:
+    // kpa:branch_admin and kpa:branch_operator removed from KPA_SCOPE_CONFIG
     const allowedRoles = [
       'kpa:admin',
       'kpa:operator',
       'kpa:district_admin',
-      'kpa:branch_admin',
-      'kpa:branch_operator',
     ];
 
     it.each(allowedRoles)('role %s → allowed for kpa:operator scope', async (role) => {
