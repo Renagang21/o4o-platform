@@ -22,6 +22,7 @@
     "@o4o/store-asset-policy-core": "workspace:*",
     "@o4o/store-ui-core": "workspace:*",
     "@o4o/operator-ux-core": "workspace:*",
+    "@o4o/account-ui": "workspace:*",
     "@o4o/types": "workspace:*",
     "@o4o/ui": "workspace:*",
     "@o4o/utils": "workspace:*",
