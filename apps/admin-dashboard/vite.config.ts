@@ -49,6 +49,7 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       '@o4o/cgm-pharmacist-app': path.resolve(__dirname, '../../packages/cgm-pharmacist-app/src'),
       // AI Prompts - map to dist for subpath imports (@o4o/ai-prompts/admin)
       '@o4o/ai-prompts': path.resolve(__dirname, '../../packages/ai-prompts/dist'),
+      '@o4o/content-editor': path.resolve(__dirname, '../../packages/content-editor/dist'),
       // Force React to use single version
       'react': path.resolve(__dirname, '../../node_modules/react'),
       'react-dom': path.resolve(__dirname, '../../node_modules/react-dom'),
@@ -157,11 +158,6 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
 
         // Exclude backend/Node.js modules that forum-core imports
         if (id === 'express' || id === 'typeorm') {
-          return true;
-        }
-
-        // Exclude @o4o/content-editor (imported by forum-core admin-ui)
-        if (id.includes('@o4o/content-editor')) {
           return true;
         }
 
