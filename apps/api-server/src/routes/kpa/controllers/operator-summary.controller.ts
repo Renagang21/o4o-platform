@@ -279,15 +279,11 @@ export function createOperatorSummaryController(
 
     // WO-PLATFORM-APPROVAL-ENGINE-UNIFICATION-V1: dual-query (unified + legacy)
     const [
-      branchCount,
-      groupCount,
       totalMembers,
       pendingApprovals,
       pendingJoinResult,
       pendingJoinUnifiedRows,
     ] = await Promise.all([
-      orgRepo.count({ where: { type: 'branch', isActive: true } }),
-      orgRepo.count({ where: { type: 'group', isActive: true } }),
       memberRepo.count({ where: { status: 'active' } }),
       appRepo.count({ where: { status: 'submitted' } }),
       joinReqRepo
@@ -316,7 +312,6 @@ export function createOperatorSummaryController(
       success: true,
       data: {
         kpis: {
-          totalBranches: branchCount + groupCount,
           totalMembers,
           pendingApprovals,
         },

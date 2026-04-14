@@ -8,7 +8,7 @@
 
 import React, { useState } from 'react';
 
-export type InquiryType = 'branch' | 'division' | 'pharmacy';
+export type InquiryType = 'pharmacy';
 
 export interface JoinInquiryFormProps {
   /** 참여 유형 */
@@ -18,14 +18,10 @@ export interface JoinInquiryFormProps {
 }
 
 const TYPE_LABELS: Record<InquiryType, string> = {
-  branch: '지부 도입',
-  division: '분회 참여',
   pharmacy: '약국 참여',
 };
 
 const DEFAULT_SUBMIT_LABELS: Record<InquiryType, string> = {
-  branch: '도입 문의 보내기',
-  division: '참여 문의 보내기',
   pharmacy: '참여 문의 보내기',
 };
 

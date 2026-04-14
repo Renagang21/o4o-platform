@@ -21,8 +21,7 @@ export const KPA_SCOPE_CONFIG: ServiceScopeGuardConfig = {
     'kpa:admin',
     'kpa:operator',
     'kpa:district_admin',
-    'kpa:branch_admin',
-    'kpa:branch_operator',
+    // kpa:branch_admin, kpa:branch_operator removed — WO-KPA-A-BRANCH-CHAPTER-REMOVAL-PHASE3-DATA-AND-ROLE-CLEANUP-V1
   ],
   platformBypass: false,
   legacyRoles: [],

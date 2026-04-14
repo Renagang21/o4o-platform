@@ -151,16 +151,6 @@ export class RegisterRequestDto {
   @IsString()
   pharmacyName?: string;
 
-  /** GlucoseView: 지부 ID */
-  @IsOptional()
-  @IsString()
-  branchId?: string;
-
-  /** GlucoseView: 분회 ID */
-  @IsOptional()
-  @IsString()
-  chapterId?: string;
-
   // --- 동의 필드 (서비스별 택일) ---
 
   /** KPA/GlycoPharm: 약관 동의 */

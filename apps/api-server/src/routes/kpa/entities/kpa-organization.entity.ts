@@ -14,7 +14,8 @@ import {
   JoinColumn,
 } from 'typeorm';
 
-export type KpaOrganizationType = 'association' | 'branch' | 'group';
+// WO-KPA-A-BRANCH-CHAPTER-REMOVAL-PHASE4-DEAD-CODE-AND-DROP-V1: branch/group removed
+export type KpaOrganizationType = 'association';
 
 @Entity('kpa_organizations')
 export class KpaOrganization {

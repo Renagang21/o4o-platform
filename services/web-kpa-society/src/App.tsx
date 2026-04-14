@@ -63,19 +63,10 @@ import { ResourcesListPage, ResourcesHomePage } from './pages/resources';
 import { PolicyPage, PrivacyPage } from './pages/legal';
 
 // Organization pages
-import { OrganizationAboutPage, BranchesPage, BranchDetailPage, OfficersPage, ContactPage } from './pages/organization';
+import { OrganizationAboutPage, OfficersPage, ContactPage } from './pages/organization';
 
 // MyPage pages
 import { MyDashboardPage, MyProfilePage, MySettingsPage, MyCertificatesPage, PersonalStatusReportPage, AnnualReportFormPage, MyForumDashboardPage, RequestCategoryPage as KpaRequestCategoryPage, MyRequestsPage, ForumMemberManagementPage } from './pages/mypage';
-
-// Branch Routes (분회 서브디렉토리)
-import { BranchRoutes } from './routes/BranchRoutes';
-
-// Branch Admin Routes (분회 관리자)
-import { BranchAdminRoutes } from './routes/BranchAdminRoutes';
-
-// Branch Operator Routes (분회 운영자) WO-KPA-C-BRANCH-OPERATOR-IMPLEMENTATION-V1
-import { BranchOperatorRoutes } from './routes/BranchOperatorRoutes';
 
 // Admin Routes (지부 관리자)
 import { AdminRoutes } from './routes/AdminRoutes';
@@ -100,13 +91,10 @@ import { CommunityHomePage } from './pages/CommunityHomePage';
 // Community Hub — /community는 Home으로 리다이렉트 (WO-KPA-A-PUBLIC-HOME-INTEGRATION-AND-MENU-SIMPLIFICATION-V1)
 
 // Service Detail Pages (WO-KPA-HOME-SERVICE-SECTION-V1)
-import { BranchServicePage, DivisionServicePage, PharmacyServicePage, ForumServicePage, LmsServicePage } from './pages/services';
-
-// Branch Services Landing (WO-KPA-SOCIETY-MAIN-NAV-REFINE-V1)
-import { BranchServicesPage } from './pages/BranchServicesPage';
+import { PharmacyServicePage, ForumServicePage, LmsServicePage } from './pages/services';
 
 // Join/Participation Pages (WO-KPA-HOME-SERVICE-SECTION-V1)
-import { BranchJoinPage, DivisionJoinPage, PharmacyJoinPage } from './pages/join';
+import { PharmacyJoinPage } from './pages/join';
 
 // Pharmacy Management (WO-KPA-PHARMACY-MANAGEMENT-V1, WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1)
 import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyApprovalGatePage, HubContentLibraryPage, HubB2BCatalogPage, HubSignageLibraryPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage, LayoutBuilderPage, StoreChannelsPage, StoreOrdersPage, StoreBillingPage, StoreSignagePage, StoreLibraryNewPage, StoreLibraryPage, StoreLibraryDetailPage, StoreLibraryEditPage, StoreQRPage, StorePopPage, MarketingAnalyticsPage, StoreHomePage, ProductMarketingPage, StoreLocalProductsPage, StoreTabletDisplaysPage } from './pages/pharmacy';
@@ -139,7 +127,6 @@ import { getDefaultRouteByRole } from './lib/auth-utils';
 
 // WO-O4O-GUARD-PATTERN-NORMALIZATION-V1: 통일된 Guard 인터페이스
 import { PharmacyGuard } from './components/auth/PharmacyGuard';
-import { PharmacistOnlyGuard } from './components/auth/PharmacistOnlyGuard';
 import { PharmacyOwnerOnlyGuard } from './components/auth/PharmacyOwnerOnlyGuard';
 // WO-KPA-PHARMACY-HUB-NAVIGATION-RESTRUCTURE-V1: HUB용 완화 가드
 import { HubGuard } from './components/auth/HubGuard';
@@ -396,32 +383,22 @@ function App() {
 
           {/* =========================================================
            * Service C - 분회 서비스 (Branch Services)
-           * WO-KPA-BRANCH-SERVICE-ROUTE-MIGRATION-V1
-           *
-           * 분회 서비스는 /branch-services 아래에서 독립 운영
-           * - /branch-services : 분회 서비스 홈 (허브)
-           * - /branch-services/demo : 분회 서비스 데모
-           * - /branch-services/:branchId/* : 실제 분회 서비스
-           *
-           * 이 구조는 /demo/* (Service B)와 완전히 분리됨
+           * WO-KPA-A-BRANCH-CHAPTER-REMOVAL-PHASE2-CUTOFF-V1: 분회 서비스 제거
+           * 모든 /branch-services/* 경로 → / 리다이렉트
            * ========================================================= */}
-          <Route path="/branch-services" element={<PharmacistOnlyGuard><BranchServicesPage /></PharmacistOnlyGuard>} />
-          {/* SVC-C: 분회 Admin 대시보드 (WO-KPA-C-BRANCH-ADMIN-IMPLEMENTATION-V1) */}
-          <Route path="/branch-services/:branchId/admin/*" element={<BranchAdminRoutes />} />
-          {/* SVC-C: 분회 Operator 대시보드 (WO-KPA-C-BRANCH-OPERATOR-IMPLEMENTATION-V1) */}
-          <Route path="/branch-services/:branchId/operator/*" element={<BranchOperatorRoutes />} />
-          <Route path="/branch-services/:branchId/*" element={<PharmacistOnlyGuard><BranchRoutes /></PharmacistOnlyGuard>} />
+          <Route path="/branch-services" element={<Navigate to="/" replace />} />
+          <Route path="/branch-services/:branchId/admin/*" element={<Navigate to="/" replace />} />
+          <Route path="/branch-services/:branchId/operator/*" element={<Navigate to="/" replace />} />
+          <Route path="/branch-services/:branchId/*" element={<Navigate to="/" replace />} />
 
           {/* Service Detail Pages (WO-KPA-HOME-SERVICE-SECTION-V1) */}
-          <Route path="/services/branch" element={<BranchServicePage />} />
-          <Route path="/services/division" element={<DivisionServicePage />} />
+          <Route path="/services/branch" element={<Navigate to="/" replace />} />
+          <Route path="/services/division" element={<Navigate to="/" replace />} />
           <Route path="/services/pharmacy" element={<PharmacyServicePage />} />
           <Route path="/services/forum" element={<ForumServicePage />} />
           <Route path="/services/lms" element={<LmsServicePage />} />
 
           {/* Join/Participation Pages (WO-KPA-HOME-SERVICE-SECTION-V1) */}
-          <Route path="/join/branch" element={<BranchJoinPage />} />
-          <Route path="/join/division" element={<DivisionJoinPage />} />
           <Route path="/join/pharmacy" element={<PharmacyJoinPage />} />
 
           {/* ========================================
@@ -520,15 +497,12 @@ function App() {
           <Route path="/demo/intranet/*" element={<IntranetRoutes />} />
 
           {/* ===================================================
-           * Legacy: /demo/branch/* → /branch-services/* 리다이렉트
-           * WO-KPA-BRANCH-SERVICE-ROUTE-MIGRATION-V1
-           *
-           * 분회 서비스는 이제 /branch-services/* 에서 운영
-           * 기존 /demo/branch/* 경로는 호환성을 위해 리다이렉트
+           * Legacy: /demo/branch/* → / 리다이렉트
+           * WO-KPA-A-BRANCH-CHAPTER-REMOVAL-PHASE2-CUTOFF-V1: 분회 서비스 제거
            * =================================================== */}
-          <Route path="/demo/branch/:branchId/admin/*" element={<BranchAdminRoutes />} />
-          <Route path="/demo/branch/:branchId/*" element={<PharmacistOnlyGuard><BranchRoutes /></PharmacistOnlyGuard>} />
-          <Route path="/demo/branch" element={<Navigate to="/branch-services" replace />} />
+          <Route path="/demo/branch/:branchId/admin/*" element={<Navigate to="/" replace />} />
+          <Route path="/demo/branch/:branchId/*" element={<Navigate to="/" replace />} />
+          <Route path="/demo/branch" element={<Navigate to="/" replace />} />
 
           {/* Main Layout Routes - /demo 하위 나머지 경로 */}
           <Route path="/demo/*" element={<DemoLayoutRoutes />} />
@@ -555,7 +529,7 @@ function App() {
           {/* Operator Routes — WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: KpaOperatorLayout (standalone sidebar) */}
           <Route path="/operator/*" element={<OperatorRoutes />} />
           <Route path="/intranet/*" element={<Navigate to="/demo/intranet" replace />} />
-          <Route path="/branch/*" element={<Navigate to="/branch-services" replace />} />
+          <Route path="/branch/*" element={<Navigate to="/" replace />} />
 
           {/* ========================================
            * 커뮤니티 서비스 라우트 (메인 서비스)
@@ -607,8 +581,8 @@ function App() {
 
           {/* Organization (약사회 소개) */}
           <Route path="/organization" element={<Layout serviceName={SERVICE_NAME}><OrganizationAboutPage /></Layout>} />
-          <Route path="/organization/branches" element={<Layout serviceName={SERVICE_NAME}><BranchesPage /></Layout>} />
-          <Route path="/organization/branch/:id" element={<Layout serviceName={SERVICE_NAME}><BranchDetailPage /></Layout>} />
+          <Route path="/organization/branches" element={<Navigate to="/organization" replace />} />
+          <Route path="/organization/branch/:id" element={<Navigate to="/organization" replace />} />
           <Route path="/organization/officers" element={<Layout serviceName={SERVICE_NAME}><OfficersPage /></Layout>} />
           <Route path="/organization/contact" element={<Layout serviceName={SERVICE_NAME}><ContactPage /></Layout>} />
 
@@ -820,8 +794,8 @@ function DemoLayoutRoutes() {
 
         {/* Organization (조직소개) */}
         <Route path="/organization" element={<OrganizationAboutPage />} />
-        <Route path="/organization/branches" element={<BranchesPage />} />
-        <Route path="/organization/branches/:id" element={<BranchDetailPage />} />
+        <Route path="/organization/branches" element={<Navigate to="/organization" replace />} />
+        <Route path="/organization/branches/:id" element={<Navigate to="/organization" replace />} />
         <Route path="/organization/officers" element={<OfficersPage />} />
         <Route path="/organization/contact" element={<ContactPage />} />
 

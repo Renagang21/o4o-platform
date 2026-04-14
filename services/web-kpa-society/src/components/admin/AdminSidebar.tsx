@@ -55,7 +55,6 @@ const ADMIN_SIDEBAR_GROUPS: SidebarGroup[] = [
     label: 'Approvals',
     icon: ClipboardCheck,
     items: [
-      { label: '분회 관리', path: '/admin/divisions' },
       { label: '신상신고', path: '/admin/annual-report' },
     ],
   },

@@ -70,7 +70,6 @@ const demoMenuItems: MenuItem[] = [
     href: '/organization',
     children: [
       { label: '조직 소개', href: '/organization' },
-      { label: '지부/분회', href: '/organization/branches' },
       { label: '임원 현황', href: '/organization/officers' },
     ],
   },

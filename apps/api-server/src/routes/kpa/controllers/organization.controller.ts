@@ -108,7 +108,7 @@ export function createOrganizationController(
     requireScope('kpa:admin'),
     [
       body('name').isString().notEmpty().isLength({ min: 2, max: 200 }),
-      body('type').isIn(['association', 'branch', 'group']),
+      body('type').isIn(['association']),
       body('parent_id').optional().isUUID(),
       body('description').optional().isString(),
       body('address').optional().isString(),

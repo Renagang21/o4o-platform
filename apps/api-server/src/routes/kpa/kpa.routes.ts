@@ -27,9 +27,6 @@
  * │  /news/admin/list   - 콘텐츠 전체 목록                                 │
  * │  /forum/moderation  - 포럼 중재                                       │
  * ├─────────────────────────────────────────────────────────────────────┤
- * │ BRANCH ADMIN (coreRequireAuth + branch-level guard)                │
- * │  /branch-admin      - 분회 관리자 대시보드                              │
- * ├─────────────────────────────────────────────────────────────────────┤
  * │ AUTHENTICATED (requireAuth only)                                    │
  * │  /mypage            - 마이페이지                                       │
  * │  /lms/enrollments   - 수강 관리                                       │
@@ -40,7 +37,6 @@
  * │  /assets            - 자산 스냅샷 (복사/조회)                           │
  * ├─────────────────────────────────────────────────────────────────────┤
  * │ PUBLIC (no auth / optionalAuth)                                     │
- * │  /branches          - 분회 공개 정보                                    │
  * │  /forum (GET)       - 포럼 조회                                        │
  * │  (demo-forum removed — WO-O4O-KPA-CODE-CLEANUP-V1)                     │
  * │  /lms/courses (GET) - 강좌 목록                                        │
@@ -62,8 +58,6 @@ import { createOrganizationController } from './controllers/organization.control
 import { createMemberController } from './controllers/member.controller.js';
 import { createApplicationController } from './controllers/application.controller.js';
 import { createAdminDashboardController } from './controllers/admin-dashboard.controller.js';
-import { createBranchAdminDashboardController } from './controllers/branch-admin-dashboard.controller.js';
-import { createBranchPublicController } from './controllers/branch-public.controller.js';
 import { createOperatorSummaryController } from './controllers/operator-summary.controller.js';
 import { createGroupbuyOperatorController } from './controllers/groupbuy-operator.controller.js';
 import { createJoinInquiryAdminRoutes, createJoinInquiryPublicRoutes } from './controllers/join-inquiry.controller.js';
@@ -94,7 +88,6 @@ import { createTabletController } from '../o4o-store/controllers/tablet.controll
 import { createBlogController } from '../o4o-store/controllers/blog.controller.js';
 import { createLayoutController } from '../o4o-store/controllers/layout.controller.js'; // WO-STORE-BLOCK-ENGINE-V1
 // WO-O4O-ROUTES-REFACTOR-V1: Extracted controllers
-import { createBranchMemberController } from './controllers/branch-member.controller.js';
 import { createInstructorController } from './controllers/instructor.controller.js';
 import { createCourseRequestController } from './controllers/course-request.controller.js';
 import { createForumRequestController } from './controllers/forum-request.controller.js';
@@ -184,15 +177,6 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Admin Force Asset routes (WO-KPA-A-ASSET-CONTROL-EXTENSION-V2)
   router.use('/admin/force-assets', createAdminForceAssetController(dataSource, coreRequireAuth as any, requireKpaScope));
-
-  // Branch Admin Dashboard routes (WO-KPA-OPERATOR-DASHBOARD-IMPROVEMENT-V1)
-  router.use('/branch-admin', createBranchAdminDashboardController(dataSource, coreRequireAuth as any));
-
-  // Branch member workflow + District hierarchy (WO-O4O-ROUTES-REFACTOR-V1)
-  router.use('/', createBranchMemberController(dataSource, coreRequireAuth as any, requireKpaScope));
-
-  // Branch Public routes — read-only endpoints for /branch-services/:branchId pages
-  router.use('/branches', createBranchPublicController(dataSource));
 
   // Instructor Qualifications (WO-O4O-ROUTES-REFACTOR-V1)
   router.use('/', createInstructorController(dataSource, coreRequireAuth as any, requireKpaScope));
@@ -763,227 +747,28 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // ============================================================================
   // Resources Routes - /api/v1/kpa/resources/*
-  // WO-KPA-A-RESOURCES-API-IMPLEMENTATION-V1: KpaBranchDoc 기반 실데이터 조회
+  // WO-KPA-A-BRANCH-CHAPTER-REMOVAL-PHASE4-DEAD-CODE-AND-DROP-V1:
+  // kpa_branch_docs 테이블 DROP으로 인해 자료실 기능 종료
+  // 읽기 → 빈 목록 반환, 쓰기 → 410 Gone
   // ============================================================================
   const resourcesRouter = Router();
 
-  // 카테고리 매핑: 프론트(forms/guidelines/policies) → DB(form/guide/regulation)
-  const CATEGORY_MAP: Record<string, string> = {
-    forms: 'form',
-    guidelines: 'guide',
-    policies: 'regulation',
-  };
-
-  resourcesRouter.get('/', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
-    const category = req.query.category as string | undefined;
-    const search = req.query.search as string | undefined;
-
-    const { KpaBranchDoc } = await import('./entities/kpa-branch-doc.entity.js');
-    const qb = dataSource.getRepository(KpaBranchDoc)
-      .createQueryBuilder('d')
-      .where('d.is_public = true')
-      .andWhere('d.is_deleted = false')
-      .orderBy('d.created_at', 'DESC')
-      .skip((page - 1) * limit)
-      .take(limit);
-
-    if (category && category !== 'all') {
-      const dbCategory = CATEGORY_MAP[category] || category;
-      qb.andWhere('d.category = :category', { category: dbCategory });
-    }
-
-    if (search && search.trim()) {
-      qb.andWhere('(d.title ILIKE :search OR d.description ILIKE :search OR d.file_name ILIKE :search)', {
-        search: `%${search.trim()}%`,
-      });
-    }
-
-    const [items, total] = await qb.getManyAndCount();
-
-    res.json({
-      success: true,
-      data: items.map((d: any) => ({
-        id: d.id,
-        title: d.title,
-        description: d.description,
-        category: d.category,
-        fileUrl: d.file_url,
-        fileName: d.file_name,
-        fileSize: d.file_size,
-        downloadCount: d.download_count,
-        author: d.uploaded_by,
-        createdAt: d.created_at,
-        updatedAt: d.updated_at,
-      })),
-      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
-    });
-  }));
-
-  resourcesRouter.get('/:id', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
-    const { KpaBranchDoc } = await import('./entities/kpa-branch-doc.entity.js');
-    const doc = await dataSource.getRepository(KpaBranchDoc).findOne({
-      where: { id: req.params.id, is_public: true, is_deleted: false },
-    });
-    if (!doc) {
-      res.status(404).json({ success: false, error: { message: 'Resource not found' } });
-      return;
-    }
-    res.json({
-      success: true,
-      data: {
-        id: doc.id,
-        title: doc.title,
-        description: doc.description,
-        category: doc.category,
-        fileUrl: doc.file_url,
-        fileName: doc.file_name,
-        fileSize: doc.file_size,
-        downloadCount: doc.download_count,
-        author: doc.uploaded_by,
-        createdAt: doc.created_at,
-        updatedAt: doc.updated_at,
-      },
-    });
-  }));
-
-  resourcesRouter.post('/:id/download', authenticate, asyncHandler(async (req: Request, res: Response) => {
-    const { KpaBranchDoc } = await import('./entities/kpa-branch-doc.entity.js');
-    const repo = dataSource.getRepository(KpaBranchDoc);
-    const doc = await repo.findOne({
-      where: { id: req.params.id, is_public: true, is_deleted: false },
-    });
-    if (!doc || !doc.file_url) {
-      res.status(404).json({ success: false, error: { message: 'Resource not found' } });
-      return;
-    }
-    await repo.increment({ id: doc.id }, 'download_count', 1);
-    res.json({ success: true, data: { downloadUrl: doc.file_url } });
-  }));
-
-  // WO-KPA-A-OPERATOR-RESOURCES-CMS-V1: operator CMS 엔드포인트 (등록/수정/삭제/업로드)
-
-  // POST /resources — 자료 등록
-  resourcesRouter.post('/', authenticate, requireKpaScope('kpa:operator') as any, asyncHandler(async (req: Request, res: Response) => {
-    const userId = (req as any).user?.id;
-    const { title, description, category, fileUrl, fileName, fileSize, isPublic } = req.body;
-
-    if (!title || typeof title !== 'string' || !title.trim()) {
-      res.status(400).json({ success: false, error: '제목은 필수입니다' });
-      return;
-    }
-
-    const { KpaBranchDoc } = await import('./entities/kpa-branch-doc.entity.js');
-    const repo = dataSource.getRepository(KpaBranchDoc);
-    const doc = repo.create({
-      organization_id: '00000000-0000-0000-0000-000000000000', // KPA-a platform-level
-      title: title.trim(),
-      description: description?.trim() || null,
-      category: category || 'general',
-      file_url: fileUrl || null,
-      file_name: fileName || null,
-      file_size: fileSize || 0,
-      is_public: isPublic ?? true,
-      uploaded_by: userId,
-    });
-    const saved = await repo.save(doc);
-
-    res.status(201).json({
-      success: true,
-      data: {
-        id: saved.id,
-        title: saved.title,
-        description: saved.description,
-        category: saved.category,
-        fileUrl: saved.file_url,
-        fileName: saved.file_name,
-        fileSize: saved.file_size,
-        downloadCount: saved.download_count,
-        author: saved.uploaded_by,
-        createdAt: saved.created_at,
-        updatedAt: saved.updated_at,
-      },
-    });
-  }));
-
-  // PATCH /resources/:id — 자료 수정
-  resourcesRouter.patch('/:id', authenticate, requireKpaScope('kpa:operator') as any, asyncHandler(async (req: Request, res: Response) => {
-    const { KpaBranchDoc } = await import('./entities/kpa-branch-doc.entity.js');
-    const repo = dataSource.getRepository(KpaBranchDoc);
-    const doc = await repo.findOne({ where: { id: req.params.id, is_deleted: false } });
-    if (!doc) {
-      res.status(404).json({ success: false, error: 'Resource not found' });
-      return;
-    }
-
-    const { title, description, category, fileUrl, fileName, fileSize, isPublic } = req.body;
-    if (title !== undefined) doc.title = title.trim();
-    if (description !== undefined) doc.description = description?.trim() || null;
-    if (category !== undefined) doc.category = category;
-    if (fileUrl !== undefined) doc.file_url = fileUrl || null;
-    if (fileName !== undefined) doc.file_name = fileName || null;
-    if (fileSize !== undefined) doc.file_size = fileSize || 0;
-    if (isPublic !== undefined) doc.is_public = isPublic;
-
-    const saved = await repo.save(doc);
-    res.json({
-      success: true,
-      data: {
-        id: saved.id,
-        title: saved.title,
-        description: saved.description,
-        category: saved.category,
-        fileUrl: saved.file_url,
-        fileName: saved.file_name,
-        fileSize: saved.file_size,
-        downloadCount: saved.download_count,
-        author: saved.uploaded_by,
-        createdAt: saved.created_at,
-        updatedAt: saved.updated_at,
-      },
-    });
-  }));
-
-  // DELETE /resources/:id — 자료 삭제 (soft delete)
-  resourcesRouter.delete('/:id', authenticate, requireKpaScope('kpa:operator') as any, asyncHandler(async (req: Request, res: Response) => {
-    const { KpaBranchDoc } = await import('./entities/kpa-branch-doc.entity.js');
-    const repo = dataSource.getRepository(KpaBranchDoc);
-    const doc = await repo.findOne({ where: { id: req.params.id, is_deleted: false } });
-    if (!doc) {
-      res.status(404).json({ success: false, error: 'Resource not found' });
-      return;
-    }
-    doc.is_deleted = true;
-    await repo.save(doc);
-    res.json({ success: true, message: '자료가 삭제되었습니다' });
-  }));
-
-  // POST /resources/upload — 파일 업로드 (메타데이터 반환)
-  resourcesRouter.post('/upload', authenticate, requireKpaScope('kpa:operator') as any, uploadSingleMiddleware('file'), asyncHandler(async (req: Request, res: Response) => {
-    const file = (req as any).file as Express.Multer.File | undefined;
-    if (!file) {
-      res.status(400).json({ success: false, error: '파일이 필요합니다' });
-      return;
-    }
-
-    try {
-      const { MediaLibraryService } = await import('../../modules/media/services/media-library.service.js');
-      const mediaService = new MediaLibraryService(dataSource);
-      const userId = (req as any).user?.id || '';
-      const asset = await mediaService.upload(file, userId, 'kpa-society', 'kpa-resources');
-      res.json({
-        success: true,
-        data: {
-          fileUrl: asset.url,
-          fileName: file.originalname,
-          fileSize: file.size,
-        },
-      });
-    } catch {
-      res.status(500).json({ success: false, error: '파일 업로드에 실패했습니다' });
-    }
-  }));
+  // WO-KPA-A-BRANCH-CHAPTER-REMOVAL-PHASE4: 자료실 기능 종료 (kpa_branch_docs DROP)
+  resourcesRouter.get('/', (_req: Request, res: Response) => {
+    res.json({ success: true, data: [], pagination: { page: 1, limit: 20, total: 0, totalPages: 0 } });
+  });
+  resourcesRouter.get('/:id', (_req: Request, res: Response) => {
+    res.status(410).json({ success: false, error: '자료실 서비스가 종료되었습니다.', code: 'SERVICE_DISCONTINUED' });
+  });
+  resourcesRouter.post('*', (_req: Request, res: Response) => {
+    res.status(410).json({ success: false, error: '자료실 서비스가 종료되었습니다.', code: 'SERVICE_DISCONTINUED' });
+  });
+  resourcesRouter.patch('*', (_req: Request, res: Response) => {
+    res.status(410).json({ success: false, error: '자료실 서비스가 종료되었습니다.', code: 'SERVICE_DISCONTINUED' });
+  });
+  resourcesRouter.delete('*', (_req: Request, res: Response) => {
+    res.status(410).json({ success: false, error: '자료실 서비스가 종료되었습니다.', code: 'SERVICE_DISCONTINUED' });
+  });
 
   router.use('/resources', resourcesRouter);
 

@@ -21,7 +21,6 @@ type ScopeMiddleware = (scope: string) => RequestHandler;
 // Response interfaces
 // WO-O4O-API-STRUCTURE-NORMALIZATION-PHASE2-V1: placeholder 필드 제거
 interface DashboardStats {
-  totalBranches: number;     // 분회 수 (type = 'branch' or 'group')
   totalMembers: number;      // 전체 활성 회원 수
   pendingApprovals: number;  // 승인 대기 신청서
 }
@@ -30,8 +29,6 @@ interface OrganizationStats {
   total: number;
   byType: {
     association: number;  // 본회
-    branch: number;       // 지부
-    group: number;        // 분회
   };
   active: number;
   inactive: number;
@@ -91,14 +88,6 @@ export function createAdminDashboardController(
         const memberRepo = dataSource.getRepository(KpaMember);
         const appRepo = dataSource.getRepository(KpaApplication);
 
-        // Query organization stats
-        // WO-O4O-DASHBOARD-QUERY-STABILITY-V1: individual .catch() per query
-        const [branchCount, groupCount] = await Promise.all([
-          orgRepo.count({ where: { type: 'branch', isActive: true } }).catch((e) => { logger.warn('[KpaAdminDashboard] branchCount failed:', e.message); return 0; }),
-          orgRepo.count({ where: { type: 'group', isActive: true } }).catch((e) => { logger.warn('[KpaAdminDashboard] groupCount failed:', e.message); return 0; }),
-        ]);
-        const totalBranches = branchCount + groupCount;
-
         // Query member stats
         const totalMembers = await memberRepo.count({ where: { status: 'active' } });
 
@@ -106,7 +95,6 @@ export function createAdminDashboardController(
         const pendingApprovals = await appRepo.count({ where: { status: 'submitted' } });
 
         const stats: DashboardStats = {
-          totalBranches,
           totalMembers,
           pendingApprovals,
         };
@@ -132,18 +120,16 @@ export function createAdminDashboardController(
         const orgRepo = dataSource.getRepository(OrganizationStore);
 
         // WO-O4O-DASHBOARD-QUERY-STABILITY-V1: individual .catch() per query
-        const [total, association, branch, group, active, inactive] = await Promise.all([
+        const [total, association, active, inactive] = await Promise.all([
           orgRepo.count().catch((e) => { logger.warn('[KpaAdminDashboard] org total failed:', e.message); return 0; }),
           orgRepo.count({ where: { type: 'association' } }).catch((e) => { logger.warn('[KpaAdminDashboard] org association failed:', e.message); return 0; }),
-          orgRepo.count({ where: { type: 'branch' } }).catch((e) => { logger.warn('[KpaAdminDashboard] org branch failed:', e.message); return 0; }),
-          orgRepo.count({ where: { type: 'group' } }).catch((e) => { logger.warn('[KpaAdminDashboard] org group failed:', e.message); return 0; }),
           orgRepo.count({ where: { isActive: true } }).catch((e) => { logger.warn('[KpaAdminDashboard] org active failed:', e.message); return 0; }),
           orgRepo.count({ where: { isActive: false } }).catch((e) => { logger.warn('[KpaAdminDashboard] org inactive failed:', e.message); return 0; }),
         ]);
 
         const stats: OrganizationStats = {
           total,
-          byType: { association, branch, group },
+          byType: { association },
           active,
           inactive,
         };

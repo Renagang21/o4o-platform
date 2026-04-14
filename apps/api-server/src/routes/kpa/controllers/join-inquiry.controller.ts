@@ -20,8 +20,6 @@ import { KpaJoinInquiry, JoinInquiryType, JoinInquiryStatus } from '../entities/
 import logger from '../../../utils/logger.js';
 
 const TYPE_LABELS: Record<JoinInquiryType, string> = {
-  branch: '지부 도입',
-  division: '분회 참여',
   pharmacy: '약국 참여',
 };
 
@@ -40,7 +38,7 @@ export function createJoinInquiryPublicRoutes(dataSource: DataSource): Router {
       const { type, contact, message } = req.body;
 
       // 유효성 검사: type
-      if (!type || !['branch', 'division', 'pharmacy'].includes(type)) {
+      if (!type || !['pharmacy'].includes(type)) {
         return res.status(400).json({
           success: false,
           error: '유효하지 않은 문의 유형입니다.',
@@ -137,7 +135,7 @@ export function createJoinInquiryAdminRoutes(
 
       const qb = repo.createQueryBuilder('inquiry');
 
-      if (type && ['branch', 'division', 'pharmacy'].includes(type as string)) {
+      if (type && ['pharmacy'].includes(type as string)) {
         qb.andWhere('inquiry.type = :type', { type });
       }
 
@@ -162,7 +160,7 @@ export function createJoinInquiryAdminRoutes(
         data: {
           items: items.map((item) => ({
             ...item,
-            typeLabel: TYPE_LABELS[item.type],
+            typeLabel: TYPE_LABELS[item.type] ?? item.type,
           })),
           pagination: {
             page: pageNum,

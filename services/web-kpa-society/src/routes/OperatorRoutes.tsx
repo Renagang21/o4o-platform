@@ -24,7 +24,7 @@ import KpaOperatorDashboard from '../pages/operator/KpaOperatorDashboard';
 import OperatorStoresPage from '../pages/operator/OperatorStoresPage';
 import OperatorStoreDetailPage from '../pages/operator/OperatorStoreDetailPage';
 import OperatorStoreChannelsPage from '../pages/operator/OperatorStoreChannelsPage';
-import { NewsPage } from '../pages/admin-branch';
+// WO-KPA-A-BRANCH-CHAPTER-REMOVAL-PHASE4: admin-branch/NewsPage 제거 → operator/news 리다이렉트
 // WO-KPA-A-PLACEHOLDER-PAGES-IMPLEMENTATION: KPA-a operator 전용 페이지로 교체
 import OperatorForumPage from '../pages/operator/OperatorForumPage';
 import OperatorContentHubPage from '../pages/operator/OperatorContentHubPage';
@@ -95,8 +95,8 @@ export function OperatorRoutes() {
 
           {/* ── 콘텐츠 CRUD (WO-KPA-ADMIN-OPERATOR-MENU-REALIGNMENT-V1: Admin에서 이동) ── */}
 
-          {/* 공지사항 */}
-          <Route path="news" element={<NewsPage />} />
+          {/* 공지사항 → 콘텐츠 관리로 리다이렉트 */}
+          <Route path="news" element={<Navigate to="content" replace />} />
 
           {/* 자료실 → 콘텐츠 허브로 전환 (WO-O4O-KPA-CONTENT-HUB-FOUNDATION-V1) */}
           <Route path="docs" element={<OperatorContentHubPage />} />

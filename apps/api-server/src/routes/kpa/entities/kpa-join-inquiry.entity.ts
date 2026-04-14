@@ -16,7 +16,7 @@ import {
   Index,
 } from 'typeorm';
 
-export type JoinInquiryType = 'branch' | 'division' | 'pharmacy';
+export type JoinInquiryType = 'pharmacy';
 export type JoinInquiryStatus = 'new' | 'contacted' | 'converted' | 'closed';
 
 @Entity('kpa_join_inquiries')
@@ -28,8 +28,6 @@ export class KpaJoinInquiry {
 
   /**
    * 문의 유형
-   * - branch: 지부 도입 문의
-   * - division: 분회 참여 문의
    * - pharmacy: 약국 참여 문의
    */
   @Column({ type: 'varchar', length: 50 })
