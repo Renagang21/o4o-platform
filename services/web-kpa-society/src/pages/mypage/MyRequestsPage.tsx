@@ -11,7 +11,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { MyPageNavigation } from '../../components/common';
+import { MyPageNavigation } from '@o4o/account-ui';
+import { KPA_MYPAGE_NAV_ITEMS } from './navItems';
 import {
   ClipboardList,
   Clock,
@@ -168,7 +169,7 @@ export default function MyRequestsPage() {
 
   return (
     <div className="max-w-4xl mx-auto py-8 px-4">
-      <MyPageNavigation />
+      <MyPageNavigation items={KPA_MYPAGE_NAV_ITEMS} />
 
       {/* Header */}
       <div className="mb-6">

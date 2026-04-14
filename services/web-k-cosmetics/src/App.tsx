@@ -37,7 +37,10 @@ const SupplyPage = lazy(() => import('@/pages').then(m => ({ default: m.SupplyPa
 const TouristHubPage = lazy(() => import('@/pages').then(m => ({ default: m.TouristHubPage })));
 const RegisterPage = lazy(() => import('@/pages/auth/RegisterPage'));
 const PartnerInfoPage = lazy(() => import('@/pages/PartnerInfoPage'));
-const MyPage = lazy(() => import('@/pages/MyPage'));
+// MyPage 3-split (WO-O4O-KCOSMETICS-MYPAGE-SPLIT-V1)
+const MyPageHub = lazy(() => import('@/pages/mypage/MyPageHub'));
+const MyProfilePage = lazy(() => import('@/pages/mypage/MyProfilePage'));
+const MySettingsPage = lazy(() => import('@/pages/mypage/MySettingsPage'));
 
 // Partner Application (WO-PARTNER-APPLICATION-V1)
 const PartnerApplyPage = lazy(() => import('@/pages/partners/ApplyPage'));
@@ -230,12 +233,28 @@ function AppRoutes() {
           }
         />
 
-        {/* MyPage (Protected) */}
+        {/* MyPage 3-split (WO-O4O-KCOSMETICS-MYPAGE-SPLIT-V1) */}
         <Route
           path="mypage"
           element={
             <ProtectedRoute>
-              <MyPage />
+              <MyPageHub />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="mypage/profile"
+          element={
+            <ProtectedRoute>
+              <MyProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="mypage/settings"
+          element={
+            <ProtectedRoute>
+              <MySettingsPage />
             </ProtectedRoute>
           }
         />

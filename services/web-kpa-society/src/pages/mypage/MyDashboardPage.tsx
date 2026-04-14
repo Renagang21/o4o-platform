@@ -8,15 +8,21 @@
  * WO-KPA-A-MYPAGE-HUB-NAVIGATION-AND-CTA-ENHANCEMENT-V1
  * - MyPageNavigation 탭 네비게이션 추가
  * - 내 포럼 바로가기 추가, 작성 글 카드 링크 연결
+ *
+ * WO-MARKET-TRIAL-KPA-DASHBOARD-SUMMARY-V1
+ * - 모집 중 Trial 요약 숫자 + 내 참여 현황 통합 위젯
+ * - Gateway API로 모집 중 신호 추가 (발견성 강화)
  */
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { PageHeader, LoadingSpinner, EmptyState, Card, MyPageNavigation } from '../../components/common';
+import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
+import { MyPageNavigation } from '@o4o/account-ui';
+import { KPA_MYPAGE_NAV_ITEMS } from './navItems';
 import { AiSummaryButton } from '../../components/ai';
 import { mypageApi } from '../../api';
-import { getMyParticipations } from '../../api/marketTrial';
-import type { MyParticipationSummary } from '../../api/marketTrial';
+import { getMyParticipations, getGateway } from '../../api/marketTrial';
+import type { MyParticipationSummary, GatewayTrialSummary, AccessStatus } from '../../api/marketTrial';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 import type { UserActivity } from '../../api/mypage';
@@ -71,6 +77,7 @@ export function MyDashboardPage() {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [activities, setActivities] = useState<UserActivity[]>([]);
   const [participations, setParticipations] = useState<MyParticipationSummary[]>([]);
+  const [recruitingTrials, setRecruitingTrials] = useState<GatewayTrialSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -104,15 +111,19 @@ export function MyDashboardPage() {
       setLoading(true);
       setError(null);
 
-      const [summaryRes, activitiesRes, participationsRes] = await Promise.all([
+      const [summaryRes, activitiesRes, participationsRes, gatewayRes] = await Promise.all([
         mypageApi.getDashboardSummary(),
         mypageApi.getActivities({ limit: 5 }),
         getMyParticipations().catch(() => ({ success: true, data: [] as MyParticipationSummary[] })),
+        getGateway().catch(() => ({ success: true, data: { accessStatus: 'no_trials' as AccessStatus, openTrialCount: 0, trials: [] as GatewayTrialSummary[] } })),
       ]);
 
       setSummary(summaryRes.data);
       setActivities(activitiesRes.data);
       setParticipations(participationsRes.data || []);
+      if (gatewayRes.success && gatewayRes.data) {
+        setRecruitingTrials(gatewayRes.data.trials || []);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : '데이터를 불러오는데 실패했습니다.');
     } finally {
@@ -155,7 +166,7 @@ export function MyDashboardPage() {
         title="마이페이지"
         breadcrumb={[{ label: '홈', href: '/' }, { label: '마이페이지' }]}
       />
-      <MyPageNavigation />
+      <MyPageNavigation items={KPA_MYPAGE_NAV_ITEMS} />
 
       {/* 사용자 프로필 요약 */}
       <Card padding="large" style={{ marginBottom: '24px' }}>
@@ -293,7 +304,7 @@ export function MyDashboardPage() {
         </Link>
       </div>
 
-      {/* Market Trial 참여 현황 */}
+      {/* Market Trial — 요약 + 모집 중 + 내 참여 */}
       <Card padding="large" style={{ marginTop: '24px' }}>
         <div style={styles.trialHeader}>
           <h3 style={styles.sectionTitle}>Market Trial</h3>
@@ -301,9 +312,25 @@ export function MyDashboardPage() {
             전체 보기 →
           </Link>
         </div>
-        {participations.length === 0 ? (
+
+        {/* 요약 숫자 */}
+        <div style={styles.trialSummaryRow}>
+          <div style={styles.trialSummaryStat}>
+            <span style={styles.trialSummaryNumber}>{recruitingTrials.length}</span>
+            <span style={styles.trialSummaryLabel}>모집 중</span>
+          </div>
+          <div style={styles.trialSummaryDivider} />
+          <div style={styles.trialSummaryStat}>
+            <span style={styles.trialSummaryNumber}>{participations.length}</span>
+            <span style={styles.trialSummaryLabel}>내 참여</span>
+          </div>
+        </div>
+
+        {recruitingTrials.length === 0 && participations.length === 0 ? (
+          /* 모집 중도 없고 내 참여도 없는 경우 */
           <div style={styles.trialEmptyState}>
             <span style={styles.trialEmptyIcon}>🧪</span>
+<<<<<<< Updated upstream
             <p style={styles.trialEmptyText}>참여 중인 Market Trial이 없습니다.</p>
             <Link to={`/market-trial`} style={styles.trialEmptyLink}>
               Market Trial 둘러보기
@@ -329,21 +356,93 @@ export function MyDashboardPage() {
                     </span>
                   </div>
                   <div style={styles.trialItemRight}>
+=======
+            <p style={styles.trialEmptyText}>현재 진행 중인 Market Trial이 없습니다.</p>
+            <Link to={`${servicePrefix}/market-trial`} style={styles.trialEmptyLink}>
+              Market Trial 허브 둘러보기
+            </Link>
+          </div>
+        ) : (
+          <>
+            {/* 모집 중 Trial (미참여 건 우선, 최대 2건) */}
+            {recruitingTrials.length > 0 && (
+              <div style={styles.trialSubSection}>
+                <h4 style={styles.trialSubTitle}>모집 중</h4>
+                {recruitingTrials.slice(0, 2).map((trial) => (
+                  <Link
+                    key={trial.id}
+                    to={`${servicePrefix}/market-trial/${trial.id}`}
+                    style={styles.trialItem}
+                  >
+                    <div style={styles.trialItemContent}>
+                      <span style={styles.trialTitle}>{trial.title}</span>
+                      <span style={styles.trialMeta}>
+                        {trial.supplierName || '공급자'} · 참여 {trial.currentParticipants}{trial.maxParticipants ? ` / ${trial.maxParticipants}` : ''}명
+                        {trial.fundingEndAt ? ` · 마감 ${new Date(trial.fundingEndAt).toLocaleDateString('ko-KR')}` : ''}
+                      </span>
+                    </div>
+>>>>>>> Stashed changes
                     <span style={{
                       ...styles.trialStatusBadge,
-                      backgroundColor: statusColor.bg,
-                      color: statusColor.text,
+                      backgroundColor: '#DCFCE7',
+                      color: '#166534',
                     }}>
-                      {statusLabel}
+                      모집중
                     </span>
-                    {p.rewardStatus === 'fulfilled' && (
-                      <span style={styles.trialRewardBadge}>이행 완료</span>
-                    )}
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
+                  </Link>
+                ))}
+                {recruitingTrials.length > 2 && (
+                  <Link to={`${servicePrefix}/market-trial`} style={styles.trialMoreLink}>
+                    +{recruitingTrials.length - 2}건 더 보기
+                  </Link>
+                )}
+              </div>
+            )}
+
+            {/* 내 참여 현황 (최대 3건) */}
+            {participations.length > 0 && (
+              <div style={styles.trialSubSection}>
+                <h4 style={styles.trialSubTitle}>내 참여</h4>
+                {participations.slice(0, 3).map((p) => {
+                  const trial = p.trial;
+                  if (!trial) return null;
+                  const statusLabel = TRIAL_STATUS_LABELS[trial.status] || trial.status;
+                  const statusColor = TRIAL_STATUS_COLORS[trial.status] || { bg: colors.neutral100, text: colors.neutral700 };
+                  return (
+                    <Link
+                      key={p.id}
+                      to={`${servicePrefix}/market-trial/${trial.id}`}
+                      style={styles.trialItem}
+                    >
+                      <div style={styles.trialItemContent}>
+                        <span style={styles.trialTitle}>{trial.title}</span>
+                        <span style={styles.trialMeta}>
+                          {trial.supplierName || '공급자'} · {p.rewardType === 'product' ? '제품' : '현금'} · {new Date(p.joinedAt).toLocaleDateString('ko-KR')}
+                        </span>
+                      </div>
+                      <div style={styles.trialItemRight}>
+                        <span style={{
+                          ...styles.trialStatusBadge,
+                          backgroundColor: statusColor.bg,
+                          color: statusColor.text,
+                        }}>
+                          {statusLabel}
+                        </span>
+                        {p.rewardStatus === 'fulfilled' && (
+                          <span style={styles.trialRewardBadge}>이행 완료</span>
+                        )}
+                      </div>
+                    </Link>
+                  );
+                })}
+                {participations.length > 3 && (
+                  <Link to={`${servicePrefix}/market-trial`} style={styles.trialMoreLink}>
+                    +{participations.length - 3}건 더 보기
+                  </Link>
+                )}
+              </div>
+            )}
+          </>
         )}
       </Card>
 
@@ -629,6 +728,57 @@ const styles: Record<string, React.CSSProperties> = {
     paddingTop: '8px',
   },
   // Market Trial 섹션
+  trialSummaryRow: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '32px',
+    padding: '16px 0',
+    marginBottom: '16px',
+    backgroundColor: colors.neutral50,
+    borderRadius: '8px',
+  },
+  trialSummaryStat: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    alignItems: 'center',
+    gap: '4px',
+  },
+  trialSummaryNumber: {
+    fontSize: '1.5rem',
+    fontWeight: 700,
+    color: colors.neutral900,
+  },
+  trialSummaryLabel: {
+    ...typography.bodyS,
+    color: colors.neutral500,
+  },
+  trialSummaryDivider: {
+    width: '1px',
+    height: '32px',
+    backgroundColor: colors.neutral200,
+  },
+  trialSubSection: {
+    marginBottom: '16px',
+  },
+  trialSubTitle: {
+    ...typography.bodyS,
+    fontWeight: 600,
+    color: colors.neutral500,
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.02em',
+    marginBottom: '8px',
+    marginTop: 0,
+  },
+  trialMoreLink: {
+    display: 'block',
+    textAlign: 'center' as const,
+    ...typography.bodyS,
+    color: colors.primary,
+    textDecoration: 'none',
+    padding: '8px 0',
+    fontWeight: 500,
+  },
   trialHeader: {
     display: 'flex',
     justifyContent: 'space-between',

@@ -1,12 +1,10 @@
 /**
- * MyPage - 계정 허브
+ * MyProfilePage - 프로필 편집
  *
- * WO-MY-PAGE-FUNCTIONAL-ENABLEMENT-V1
- * WO-O4O-ACCOUNT-UI-COMMON-PACKAGE-V1: 공통 account-ui 패키지 기반 전환
+ * WO-O4O-GLYCOPHARM-MYPAGE-SPLIT-V1
  *
- * - 프로필 수정 (이름, 연락처) → PUT /api/v1/users/profile
- * - 비밀번호 변경 → PUT /api/v1/users/password
- * - 역할 라벨 정합성 보정
+ * /mypage/profile — 이름, 연락처 등 개인정보 편집 전용 페이지.
+ * 기존 MyPage.tsx에서 프로필 편집 로직을 분리.
  */
 
 import { useState } from 'react';
@@ -18,15 +16,13 @@ import {
   Phone,
   Building2,
   Shield,
-  Lock,
   CheckCircle,
   AlertCircle,
 } from 'lucide-react';
 import {
-  AccountPageLayout,
+  MyPageLayout,
   ProfileCard,
   ProfileInfoField,
-  PasswordChangeModal,
 } from '@o4o/account-ui';
 
 const roleLabels: Record<string, string> = {
@@ -53,7 +49,7 @@ interface FeedbackState {
   message: string;
 }
 
-export default function MyPage() {
+export default function MyProfilePage() {
   const { user, updateUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
@@ -63,10 +59,6 @@ export default function MyPage() {
   });
   const [saving, setSaving] = useState(false);
   const [feedback, setFeedback] = useState<FeedbackState | null>(null);
-
-  // Password change modal state
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [changingPassword, setChangingPassword] = useState(false);
 
   if (!user) {
     return (
@@ -117,17 +109,8 @@ export default function MyPage() {
     setFeedback(null);
   };
 
-  const handleChangePassword = async (currentPassword: string, newPassword: string, newPasswordConfirm: string) => {
-    setChangingPassword(true);
-    try {
-      await api.put('/users/password', { currentPassword, newPassword, newPasswordConfirm });
-    } finally {
-      setChangingPassword(false);
-    }
-  };
-
   return (
-    <AccountPageLayout title="마이페이지">
+    <MyPageLayout title="마이페이지">
       {/* Feedback Banner */}
       {feedback && (
         <div
@@ -147,7 +130,7 @@ export default function MyPage() {
       )}
 
       <ProfileCard
-        initial={user?.lastName?.charAt(0) || user?.name?.charAt(0) || '?'}
+        initial={user.lastName?.charAt(0) || user.name?.charAt(0) || '?'}
         name={displayName}
         email={user.email}
         roleLabel={roleLabel}
@@ -206,47 +189,6 @@ export default function MyPage() {
           icon={<Shield className="w-5 h-5 text-gray-400" />}
         />
       </ProfileCard>
-
-      {/* Security */}
-      <div className="bg-white rounded-2xl shadow-sm p-6 mb-4">
-        <h3 className="text-sm font-semibold text-gray-900 mb-4">보안 설정</h3>
-        <div className="space-y-3">
-          <button
-            onClick={() => setShowPasswordModal(true)}
-            className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <Lock className="w-4 h-4 text-gray-500" />
-              <span className="text-sm text-gray-700">비밀번호 변경</span>
-            </div>
-          </button>
-          <button className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
-            <span className="text-sm text-gray-700">2단계 인증</span>
-            <span className="text-xs text-gray-400">비활성화</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Account */}
-      <div className="bg-white rounded-2xl shadow-sm p-6">
-        <h3 className="text-sm font-semibold text-gray-900 mb-4">계정 관리</h3>
-        <div className="space-y-3">
-          <button className="w-full text-left p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
-            <span className="text-sm text-gray-700">알림 설정</span>
-          </button>
-          <button className="w-full text-left p-4 bg-red-50 rounded-xl hover:bg-red-100 transition-colors">
-            <span className="text-sm text-red-600">계정 탈퇴</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Password Change Modal */}
-      <PasswordChangeModal
-        open={showPasswordModal}
-        onClose={() => setShowPasswordModal(false)}
-        onSubmit={handleChangePassword}
-        submitting={changingPassword}
-      />
-    </AccountPageLayout>
+    </MyPageLayout>
   );
 }

@@ -4,4 +4,8 @@ export { ProfileInfoField } from './components/ProfileInfoField.js';
 export { SecuritySection } from './components/SecuritySection.js';
 export { PasswordChangeModal } from './components/PasswordChangeModal.js';
 export { QuickActionsSection } from './components/QuickActionsSection.js';
+export { MyPageNavigation } from './components/MyPageNavigation.js';
+export { MyPageLayout } from './components/MyPageLayout.js';
+export { SettingsSection } from './components/SettingsSection.js';
+export type { MyPageNavItem } from './components/MyPageNavigation.js';
 export type { ProfileField } from './types.js';

@@ -11,7 +11,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
-import { PageHeader, LoadingSpinner, EmptyState, Card, MyPageNavigation } from '../../components/common';
+import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
+import { MyPageNavigation } from '@o4o/account-ui';
+import { KPA_MYPAGE_NAV_ITEMS } from './navItems';
 import { mypageApi, type ProfileResponse } from '../../api';
 import { useAuth, ACTIVITY_TYPE_LABELS } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
@@ -254,7 +256,7 @@ export function MyProfilePage() {
           { label: '프로필' },
         ]}
       />
-      <MyPageNavigation />
+      <MyPageNavigation items={KPA_MYPAGE_NAV_ITEMS} />
 
       {/* Tab bar */}
       <div style={styles.tabBar}>

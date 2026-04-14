@@ -8,7 +8,8 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { MyPageNavigation } from '../../components/common';
+import { MyPageNavigation } from '@o4o/account-ui';
+import { KPA_MYPAGE_NAV_ITEMS } from './navItems';
 import { forumApi, forumMembershipApi } from '../../api/forum';
 import type { ForumJoinRequest, ForumMember } from '../../api/forum';
 import {
@@ -161,7 +162,7 @@ export default function ForumMemberManagementPage() {
 
   return (
     <div className="max-w-4xl mx-auto py-8 px-4">
-      <MyPageNavigation />
+      <MyPageNavigation items={KPA_MYPAGE_NAV_ITEMS} />
 
       {/* Back link */}
       <Link to="/mypage/my-forums" className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 transition-colors mb-4">

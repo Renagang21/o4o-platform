@@ -3,7 +3,9 @@
  */
 
 import { useState, useEffect } from 'react';
-import { PageHeader, LoadingSpinner, EmptyState, Pagination, Card, MyPageNavigation } from '../../components/common';
+import { PageHeader, LoadingSpinner, EmptyState, Pagination, Card } from '../../components/common';
+import { MyPageNavigation } from '@o4o/account-ui';
+import { KPA_MYPAGE_NAV_ITEMS } from './navItems';
 import { mypageApi } from '../../api';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
@@ -86,7 +88,7 @@ export function MyCertificatesPage() {
           { label: '이수현황' },
         ]}
       />
-      <MyPageNavigation />
+      <MyPageNavigation items={KPA_MYPAGE_NAV_ITEMS} />
 
       {certificates.length === 0 ? (
         <EmptyState

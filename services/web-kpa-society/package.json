@@ -13,6 +13,7 @@
     "@o4o/block-renderer": "workspace:*",
     "@o4o/error-handling": "workspace:*",
     "@o4o/ai-components": "workspace:*",
+    "@o4o/account-ui": "workspace:*",
     "@o4o/auth-client": "workspace:*",
     "@o4o/auth-utils": "workspace:*",
     "@o4o/content-editor": "workspace:*",

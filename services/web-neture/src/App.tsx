@@ -108,7 +108,10 @@ import {
 import AccountRecoveryPage from './pages/auth/AccountRecoveryPage';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import { RegisterPendingPage } from './pages/RegisterPendingPage';
-import MyPage from './pages/MyPage';
+// MyPage 3-split (WO-O4O-NETURE-MYPAGE-SPLIT-V1)
+import MyPageHub from './pages/mypage/MyPageHub';
+import MyProfilePage from './pages/mypage/MyProfilePage';
+import MySettingsPage from './pages/mypage/MySettingsPage';
 import PartnershipRequestListPage from './pages/partners/requests/PartnershipRequestListPage';
 import PartnershipRequestDetailPage from './pages/partners/requests/PartnershipRequestDetailPage';
 import PartnershipRequestCreatePage from './pages/partners/requests/PartnershipRequestCreatePage';
@@ -524,7 +527,10 @@ function App() {
             ================================================================ */}
             <Route element={<NetureLayout />}>
               <Route path="/" element={<NetureHomePage />} />
-              <Route path="/mypage" element={<MyPage />} />
+              {/* MyPage 3-split (WO-O4O-NETURE-MYPAGE-SPLIT-V1) */}
+              <Route path="/mypage" element={<MyPageHub />} />
+              <Route path="/mypage/profile" element={<MyProfilePage />} />
+              <Route path="/mypage/settings" element={<MySettingsPage />} />
               <Route path="/my" element={<Navigate to="/mypage" replace />} />
               <Route path="/supplier" element={<SupplierLandingPage />} />
               <Route path="/partner" element={<PartnerLandingPage />} />

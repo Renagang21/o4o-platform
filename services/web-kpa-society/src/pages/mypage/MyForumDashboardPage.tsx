@@ -9,7 +9,8 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { MyPageNavigation } from '../../components/common';
+import { MyPageNavigation } from '@o4o/account-ui';
+import { KPA_MYPAGE_NAV_ITEMS } from './navItems';
 import {
   MessageSquare,
   MessageSquarePlus,
@@ -140,7 +141,7 @@ export default function MyForumDashboardPage() {
 
   return (
     <div className="max-w-4xl mx-auto py-8 px-4">
-      <MyPageNavigation />
+      <MyPageNavigation items={KPA_MYPAGE_NAV_ITEMS} />
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
           <MessageSquare className="w-6 h-6 text-blue-600" />

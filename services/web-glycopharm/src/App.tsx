@@ -197,8 +197,10 @@ const MyRequestsPage = lazy(() => import('@/pages/forum/MyRequestsPage'));
 const ForumFeedbackPage = lazy(() => import('@/pages/forum/ForumFeedbackPage'));
 const EducationPage = lazy(() => import('@/pages/education/EducationPage'));
 
-// Common Pages
-const MyPage = lazy(() => import('@/pages/MyPage'));
+// MyPage 3-split (WO-O4O-GLYCOPHARM-MYPAGE-SPLIT-V1)
+const MyPageHub = lazy(() => import('@/pages/mypage/MyPageHub'));
+const MyProfilePage = lazy(() => import('@/pages/mypage/MyProfilePage'));
+const MySettingsPage = lazy(() => import('@/pages/mypage/MySettingsPage'));
 
 
 // Apply Pages (API 연동)
@@ -427,9 +429,20 @@ function AppRoutes() {
         <Route path="hub/content" element={<HubContentListPage />} />
         {/* WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1 */}
         <Route path="library/content" element={<HubContentListPage />} />
+        {/* MyPage 3-split (WO-O4O-GLYCOPHARM-MYPAGE-SPLIT-V1) */}
         <Route path="mypage" element={
           <SoftGuard feature="mypage">
-            <MyPage />
+            <MyPageHub />
+          </SoftGuard>
+        } />
+        <Route path="mypage/profile" element={
+          <SoftGuard feature="mypage">
+            <MyProfilePage />
+          </SoftGuard>
+        } />
+        <Route path="mypage/settings" element={
+          <SoftGuard feature="mypage">
+            <MySettingsPage />
           </SoftGuard>
         } />
 
