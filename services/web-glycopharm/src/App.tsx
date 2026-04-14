@@ -38,10 +38,9 @@ const RegisterPage = lazy(() => import('@/pages/auth/RegisterPage'));
 const RoleSelectPage = lazy(() => import('@/pages/auth/RoleSelectPage'));
 
 // WO-GLYCOPHARM-ENTRY-SCREENS-V1: Placeholder dashboards
-// WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1 Phase 4-C1:
-//   PharmacistPlaceholderPage → PharmacyPlaceholderPage (file + component rename)
 const PatientMainPage = lazy(() => import('@/pages/PatientPlaceholderPage'));
-const PharmacyPlaceholderPage = lazy(() => import('@/pages/PharmacyPlaceholderPage'));
+// PharmacyPlaceholderPage 제거 — WO-O4O-GLYCOPHARM-NAVIGATION-AND-STORE-STRUCTURE-REFINE-V1:
+//   /pharmacy → Navigate to /care/patients (직접 리다이렉트)
 
 // WO-GLYCOPHARM-PHARMACIST-COACHING-SCREEN-V1 + PATIENT-LIST-SCREEN-V1 + PATIENT-DETAIL-SCREEN-V1
 // WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1 Phase 4-C1:
@@ -68,25 +67,26 @@ const PatientDataAnalysisPage = lazy(() => import('@/pages/patient/DataAnalysisP
 const PatientPharmacyCoachingPage = lazy(() => import('@/pages/patient/PharmacyCoachingPage'));
 const PatientCareGuidelinePage = lazy(() => import('@/pages/patient/CareGuidelinePage'));
 
-// Store pages (files under pages/pharmacy/ — reused by /store routes)
-const StoreMainPage = lazy(() => import('@/pages/pharmacy/StoreMainPage'));
-const PharmacyProducts = lazy(() => import('@/pages/pharmacy/PharmacyProducts'));
-const PharmacyOrders = lazy(() => import('@/pages/pharmacy/PharmacyOrders'));
-const PharmacyPatients = lazy(() => import('@/pages/pharmacy/PharmacyPatients'));
-const PharmacySettings = lazy(() => import('@/pages/pharmacy/PharmacySettings'));
-const PharmacyManagement = lazy(() => import('@/pages/pharmacy/PharmacyManagement'));
-const PharmacyB2BProducts = lazy(() => import('@/pages/pharmacy/PharmacyB2BProducts'));
-const CustomerRequestsPage = lazy(() => import('@/pages/pharmacy/CustomerRequestsPage')); // Phase 1: Common Request
+// Store Management pages (WO-O4O-GLYCOPHARM-NAVIGATION-AND-STORE-STRUCTURE-REFINE-V1:
+//   pages/pharmacy/ → pages/store-management/ 이동, /store/* 라우트 담당)
+const StoreMainPage = lazy(() => import('@/pages/store-management/StoreMainPage'));
+const PharmacyProducts = lazy(() => import('@/pages/store-management/PharmacyProducts'));
+const PharmacyOrders = lazy(() => import('@/pages/store-management/PharmacyOrders'));
+const PharmacyPatients = lazy(() => import('@/pages/store-management/PharmacyPatients'));
+const PharmacySettings = lazy(() => import('@/pages/store-management/PharmacySettings'));
+const PharmacyManagement = lazy(() => import('@/pages/store-management/PharmacyManagement'));
+const PharmacyB2BProducts = lazy(() => import('@/pages/store-management/PharmacyB2BProducts'));
+const CustomerRequestsPage = lazy(() => import('@/pages/store-management/CustomerRequestsPage')); // Phase 1: Common Request
 
 // Store Signage (WO-O4O-GLYCOPHARM-SIGNAGE-MIGRATION-V1: KPA standard)
-const StoreSignagePage = lazy(() => import('@/pages/pharmacy/StoreSignagePage'));
+const StoreSignagePage = lazy(() => import('@/pages/store-management/StoreSignagePage'));
 
 // Signage Extension (New)
-const ContentLibraryPage = lazy(() => import('@/pages/pharmacy/signage').then(m => ({ default: m.ContentLibraryPage })));
-const ContentHubPage = lazy(() => import('@/pages/pharmacy/signage').then(m => ({ default: m.ContentHubPage })));
-const SignagePreviewPage = lazy(() => import('@/pages/pharmacy/signage').then(m => ({ default: m.SignagePreviewPage })));
-const SignagePlaylistDetailPage = lazy(() => import('@/pages/pharmacy/signage').then(m => ({ default: m.PlaylistDetailPage })));
-const SignageMediaDetailPage = lazy(() => import('@/pages/pharmacy/signage').then(m => ({ default: m.MediaDetailPage })));
+const ContentLibraryPage = lazy(() => import('@/pages/store-management/signage').then(m => ({ default: m.ContentLibraryPage })));
+const ContentHubPage = lazy(() => import('@/pages/store-management/signage').then(m => ({ default: m.ContentHubPage })));
+const SignagePreviewPage = lazy(() => import('@/pages/store-management/signage').then(m => ({ default: m.SignagePreviewPage })));
+const SignagePlaylistDetailPage = lazy(() => import('@/pages/store-management/signage').then(m => ({ default: m.PlaylistDetailPage })));
+const SignageMediaDetailPage = lazy(() => import('@/pages/store-management/signage').then(m => ({ default: m.MediaDetailPage })));
 
 // Signage Operator Console (WO-O4O-SIGNAGE-CONSOLE-V1)
 const HqMediaPage = lazy(() => import('@/pages/operator/signage/HqMediaPage'));
@@ -97,13 +97,13 @@ const SignageTemplatesPage = lazy(() => import('@/pages/operator/signage/Templat
 const SignageTemplateDetailPage = lazy(() => import('@/pages/operator/signage/TemplateDetailPage'));
 
 // Market Trial Extension
-const MarketTrialListPage = lazy(() => import('@/pages/pharmacy/market-trial').then(m => ({ default: m.MarketTrialListPage })));
+const MarketTrialListPage = lazy(() => import('@/pages/store-management/market-trial').then(m => ({ default: m.MarketTrialListPage })));
 // OperatorTrialSelectorPage removed (WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: deprecated)
 // WO-O4O-MARKET-TRIAL-PHASE1-V1: Service approval + store detail pages
-const MarketTrialDetailPage = lazy(() => import('@/pages/pharmacy/market-trial/MarketTrialDetailPage'));
+const MarketTrialDetailPage = lazy(() => import('@/pages/store-management/market-trial/MarketTrialDetailPage'));
 
 // B2B Order & Supply
-const B2BOrderPage = lazy(() => import('@/pages/pharmacy/b2b-order').then(m => ({ default: m.B2BOrderPage })));
+const B2BOrderPage = lazy(() => import('@/pages/store-management/b2b-order').then(m => ({ default: m.B2BOrderPage })));
 const SupplyPage = lazy(() => import('@/pages/b2b').then(m => ({ default: m.SupplyPage })));
 
 // Forum Extension
@@ -169,14 +169,14 @@ const StoreAssetsPage = lazy(() => import('@/pages/store/StoreAssetsPage'));
 const StoreChannelsPage = lazy(() => import('@/pages/store/StoreChannelsPage'));
 
 // Pharmacy Store Apply
-const StoreApplyPage = lazy(() => import('@/pages/pharmacy/StoreApplyPage'));
+const StoreApplyPage = lazy(() => import('@/pages/store-management/StoreApplyPage'));
 
 // WO-STORE-BILLING-FOUNDATION-V1: 정산/인보이스
-const StoreBillingPage = lazy(() => import('@/pages/pharmacy/StoreBillingPage'));
+const StoreBillingPage = lazy(() => import('@/pages/store-management/StoreBillingPage'));
 
 // WO-O4O-STORE-LOCAL-PRODUCT-UI-V1: 자체 상품 CRUD + 태블릿 진열 관리
-const StoreLocalProductsPage = lazy(() => import('@/pages/pharmacy/StoreLocalProductsPage'));
-const StoreTabletDisplaysPage = lazy(() => import('@/pages/pharmacy/StoreTabletDisplaysPage'));
+const StoreLocalProductsPage = lazy(() => import('@/pages/store-management/StoreLocalProductsPage'));
+const StoreTabletDisplaysPage = lazy(() => import('@/pages/store-management/StoreTabletDisplaysPage'));
 
 // Consumer Store
 const StoreFront = lazy(() => import('@/pages/store/StoreFront'));
@@ -209,7 +209,7 @@ const MyApplicationsPage = lazy(() => import('@/pages/apply/MyApplicationsPage')
 const QrLandingPage = lazy(() => import('@/pages/qr/QrLandingPage'));
 
 // Funnel Visualization (Phase 3-A: WO-O4O-FUNNEL-VISUALIZATION-PHASE3A-CP1)
-const FunnelPage = lazy(() => import('@/pages/pharmacy/FunnelPage'));
+const FunnelPage = lazy(() => import('@/pages/store-management/FunnelPage'));
 
 // Care Pages (WO-CARE-PATIENT-DETAIL-STRUCTURE-V1)
 const CareDashboardPage = lazy(() => import('@/pages/care').then(m => ({ default: m.CareDashboardPage })));
@@ -387,8 +387,11 @@ function AppRoutes() {
         <Route path="patient/select-pharmacy" element={<PatientSelectPharmacyPage />} />
         <Route path="patient/appointments" element={<PatientAppointmentsPage />} />
       </Route>
-      {/* WO-GLYCOPHARM-GATEWAY-SERVICE-ROUTING-CLEANUP-V1: /pharmacist → /pharmacy */}
-      <Route path="pharmacy" element={<PharmacyPlaceholderPage />} />
+      {/* WO-O4O-GLYCOPHARM-NAVIGATION-AND-STORE-STRUCTURE-REFINE-V1:
+          PharmacyPlaceholderPage 제거 — /pharmacy 직접 리다이렉트.
+          약국 사용자는 /care/patients (Care 대시보드) 로 직행.
+          비로그인/당뇨인은 / 로 리다이렉트. */}
+      <Route path="pharmacy" element={<Navigate to="/care/patients" replace />} />
       <Route path="pharmacy/patients" element={<PharmacistPatientsPage />} />
       <Route path="pharmacy/patient/:patientId" element={<PharmacistPatientDetailPage />} />
       <Route path="pharmacy/patient-requests" element={<PharmacistPatientRequestsPage />} />

@@ -22,18 +22,11 @@ import {
   Home,
   MessageSquare,
   BookOpen,
-  Tv,
-  Monitor,
-  Tag,
   Store,
-  BarChart3,
   FileText,
-  Briefcase,
+  Monitor,
   DollarSign,
   ShieldCheck,
-  Calendar,
-  UserPlus,
-  HeartPulse,
 } from 'lucide-react';
 
 interface DashboardLayoutProps {
@@ -81,34 +74,15 @@ const roleConfig: Record<string, RoleConfig> = {
       ]},
     ],
   },
+  // WO-O4O-GLYCOPHARM-NAVIGATION-AND-STORE-STRUCTURE-REFINE-V1:
+  //   PHARMACY 사이드바는 DashboardLayout이 아닌 StoreDashboardLayout(store-ui-core)이 담당.
+  //   /store/* 라우트 → StoreLayoutWrapper → GLYCOPHARM_STORE_CONFIG(menuSections).
+  //   이 항목은 더 이상 라우트에서 사용되지 않음 (dead code 제거).
   [GLYCOPHARM_ROLES.PHARMACY]: {
     title: '약국 관리',
     icon: Building2,
     color: 'primary',
-    menuItems: [
-      { path: '/store', label: '대시보드', icon: LayoutDashboard },
-      // WO-O4O-GLYCOPHARM-PHARMACY-SIDEBAR-MENU-ADD-V1: Care 운영 메뉴 직접 진입
-      { path: '/pharmacy/appointments', label: '상담 예약 관리', icon: Calendar },
-      { path: '/pharmacy/patient-requests', label: '당뇨인 연결 요청', icon: UserPlus },
-      { path: '/pharmacy/patients', label: '당뇨인 관리', icon: HeartPulse },
-      { path: '/store/identity', label: '매장 메인', icon: Store },
-      { path: '/store/b2b-order', label: 'B2B 주문', icon: ShoppingCart },
-      { path: '/store/products', label: '상품 관리', icon: Package },
-      { path: '/store/orders', label: '주문 내역', icon: ShoppingCart },
-      { path: '/store/services', label: '고객 관리', icon: Users },
-      { path: '/store/signage', label: '스마트 디스플레이', icon: Tv },
-      { path: '/store/content', label: '콘텐츠 가져오기', icon: Monitor },
-      { path: '/store/signage/library', label: '콘텐츠 라이브러리', icon: Monitor },
-      { path: '/store/signage', label: '내 사이니지', icon: Tv },
-      { path: '/store/market-trial', label: 'Market Trial', icon: Tag },
-      { path: '/store/funnel', label: '전환 퍼널', icon: BarChart3 },
-      { path: '/store/management', label: '약국 경영', icon: Briefcase },
-      { path: '/forum', label: '포럼', icon: MessageSquare },
-      { path: '/education', label: '강좌', icon: BookOpen },
-      { path: '/store/hub', label: '매장 HUB', icon: ShoppingCart },
-      { path: '/store/identity', label: '내 매장', icon: Store },
-      { path: '/store/settings', label: '설정', icon: Settings },
-    ],
+    menuItems: [],
   },
   [GLYCOPHARM_ROLES.SUPPLIER]: {
     title: '공급자 관리',

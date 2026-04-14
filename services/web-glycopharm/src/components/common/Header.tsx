@@ -1,6 +1,7 @@
 /**
  * Header - GlycoPharm 헤더
- * WO-O4O-GLYCOPHARM-NAVIGATION-CLEANUP-V1: Care 중심 4-메뉴
+ * WO-O4O-GLYCOPHARM-NAVIGATION-AND-STORE-STRUCTURE-REFINE-V1:
+ *   공개/조건부 메뉴 분리 — 비로그인: Home+커뮤니티, 약국 로그인: +Care관리+약국관리
  */
 
 import { useState } from 'react';
@@ -24,15 +25,20 @@ import {
 import ServiceSwitcher from '../ServiceSwitcher';
 
 /**
- * WO-O4O-GLYCOPHARM-NAVIGATION-CLEANUP-V1: 4-메뉴
- * GlycoPharm = Care 운영 도구. 포럼/당뇨인관리 메뉴 제거.
- * 약국 로그인 시 Home → /care/patients (Care 메인)
+ * 공개 메뉴 — 로그인 상태 관계없이 항상 표시
  */
-const menuItems = [
+const publicMenuItems = [
   { label: 'Home', icon: Home, pathPublic: '/', pathAuth: '/care/patients', end: true },
   { label: '커뮤니티', icon: MessageSquare, pathPublic: '/community', pathAuth: '/community', end: false },
-  { label: 'Care 관리', icon: HeartPulse, pathPublic: '/care', pathAuth: '/care', end: false },
-  { label: '약국 관리', icon: Store, pathPublic: '/store', pathAuth: '/store', end: false },
+];
+
+/**
+ * 조건부 메뉴 — 약국(pharmacy) 로그인 시에만 표시
+ * GlycoPharm = 약국 전용 서비스. Care와 약국 경영은 약국 사용자에게만 노출.
+ */
+const pharmacyMenuItems = [
+  { label: 'Care 관리', icon: HeartPulse, path: '/care', end: false },
+  { label: '약국 관리', icon: Store, path: '/store', end: false },
 ];
 
 export default function Header() {
@@ -90,9 +96,10 @@ export default function Header() {
             </div>
           </NavLink>
 
-          {/* Desktop Navigation - 통합 4-메뉴 */}
+          {/* Desktop Navigation — 공개 메뉴 + 조건부 약국 메뉴 */}
           <nav className="hidden md:flex items-center gap-1">
-            {menuItems.map((item) => {
+            {/* 공개 메뉴 */}
+            {publicMenuItems.map((item) => {
               const path = isPharmacy ? item.pathAuth : item.pathPublic;
               return (
                 <NavLink
@@ -105,6 +112,22 @@ export default function Header() {
                 </NavLink>
               );
             })}
+            {/* 조건부 약국 메뉴 */}
+            {isPharmacy && (
+              <>
+                <span className="mx-1 h-4 w-px bg-slate-200" />
+                {pharmacyMenuItems.map((item) => (
+                  <NavLink
+                    key={item.label}
+                    to={item.path}
+                    end={item.end}
+                    className={({ isActive }) => desktopNavClass(isActive)}
+                  >
+                    {item.label}
+                  </NavLink>
+                ))}
+              </>
+            )}
           </nav>
 
           {/* Desktop User Actions */}
@@ -206,7 +229,8 @@ export default function Header() {
         {mobileMenuOpen && (
           <div className="md:hidden py-4 border-t animate-fade-in">
             <nav className="flex flex-col gap-1">
-              {menuItems.map((item) => {
+              {/* 공개 메뉴 */}
+              {publicMenuItems.map((item) => {
                 const path = isPharmacy ? item.pathAuth : item.pathPublic;
                 return (
                   <NavLink
@@ -223,6 +247,26 @@ export default function Header() {
                   </NavLink>
                 );
               })}
+              {/* 조건부 약국 메뉴 */}
+              {isPharmacy && (
+                <>
+                  <div className="my-1 border-t border-slate-100" />
+                  {pharmacyMenuItems.map((item) => (
+                    <NavLink
+                      key={item.label}
+                      to={item.path}
+                      end={item.end}
+                      className={({ isActive }) => mobileNavClass(isActive)}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <span className="flex items-center gap-3">
+                        <item.icon className="w-5 h-5" />
+                        {item.label}
+                      </span>
+                    </NavLink>
+                  ))}
+                </>
+              )}
             </nav>
 
             <div className="mt-4 pt-4 border-t">

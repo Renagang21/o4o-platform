@@ -77,14 +77,58 @@ export const COSMETICS_STORE_CONFIG: StoreDashboardConfig = {
   ],
 };
 
-/** GlycoPharm Store Config (WO-STORE-BILLING-FOUNDATION-V1) */
+/**
+ * GlycoPharm Store Config
+ * WO-O4O-GLYCOPHARM-NAVIGATION-AND-STORE-STRUCTURE-REFINE-V1:
+ *   flat enabledMenus → 섹션형 menuSections (4개 그룹)
+ *   개요 / 운영 / 마케팅·콘텐츠 / 경영 / 설정
+ */
 export const GLYCOPHARM_STORE_CONFIG: StoreDashboardConfig = {
   serviceKey: 'glycopharm',
-  serviceName: 'GlycoPharm',
+  serviceName: 'GlycoPharm 약국',
   basePath: '/store',
-  enabledMenus: [
-    'dashboard', 'products', 'local-products', 'channels', 'orders',
-    'content', 'signage', 'billing', 'settings',
+  enabledMenus: ['dashboard'],   // section 모드에서는 미사용, 하위 호환용으로 유지
+  menuSections: [
+    {
+      label: '',
+      items: [
+        { key: 'dashboard', label: '대시보드', subPath: '/hub' },
+      ],
+    },
+    {
+      label: '운영',
+      items: [
+        { key: 'products',        label: '상품 관리',    subPath: '/products' },
+        { key: 'local-products',  label: '자체 상품',    subPath: '/local-products' },
+        { key: 'b2b-order',       label: 'B2B 주문',     subPath: '/b2b-order' },
+        { key: 'orders',          label: '주문 내역',    subPath: '/orders' },
+        { key: 'tablet-displays', label: '태블릿 진열',  subPath: '/tablet-displays' },
+        { key: 'requests',        label: '고객 요청',    subPath: '/requests' },
+      ],
+    },
+    {
+      label: '마케팅·콘텐츠',
+      items: [
+        { key: 'market-trial', label: 'Market Trial', subPath: '/market-trial' },
+        { key: 'funnel',       label: '전환 퍼널',      subPath: '/funnel' },
+        { key: 'content',      label: '콘텐츠 가져오기', subPath: '/content' },
+        { key: 'channels',     label: '채널 관리',      subPath: '/channels' },
+        { key: 'signage',      label: '사이니지',        subPath: '/signage' },
+      ],
+    },
+    {
+      label: '경영',
+      items: [
+        { key: 'management', label: '약국 경영', subPath: '/management' },
+        { key: 'billing',    label: '정산/인보이스', subPath: '/billing' },
+      ],
+    },
+    {
+      label: '설정',
+      items: [
+        { key: 'settings', label: '설정', subPath: '/settings' },
+      ],
+    },
   ],
 };
 

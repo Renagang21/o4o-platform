@@ -35,6 +35,10 @@ import {
   ClipboardList,
   Building2,
   Home,
+  Briefcase,
+  TrendingUp,
+  Users,
+  Tv,
 } from 'lucide-react';
 import type { StoreDashboardConfig, StoreMenuKey } from '../config/storeMenuConfig';
 import { ALL_STORE_MENUS } from '../config/storeMenuConfig';
@@ -78,6 +82,15 @@ const SECTION_ICONS: Record<string, typeof LayoutDashboard> = {
   'layout-builder': PanelLeft,
   template: Palette,
   billing: Receipt,
+  // GlycoPharm 전용 섹션 키 (WO-O4O-GLYCOPHARM-NAVIGATION-AND-STORE-STRUCTURE-REFINE-V1)
+  'b2b-order': Truck,
+  'market-trial': Tag,
+  'funnel': TrendingUp,
+  'management': Briefcase,
+  'management-b2b': Package,
+  'requests': Users,
+  'signage-display': Tv,
+  settings: Settings,
 };
 
 export interface StoreSidebarProps {
