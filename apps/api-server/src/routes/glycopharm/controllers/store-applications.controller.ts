@@ -684,6 +684,14 @@ export function createStoreApplicationsController(
               await extRepo.save(newExt);
             }
           }
+
+          // WO-O4O-GLYCOPHARM-PHARMACY-APPROVAL-TO-SEARCH-VISIBILITY-ALIGNMENT-V1:
+          // Ensure enrollment exists so pharmacy appears in patient search.
+          // ON CONFLICT DO NOTHING → idempotent, safe to call even if already enrolled.
+          await organizationOpsService.enrollService({
+            organizationId: existingOrg.id,
+            serviceCode: 'glycopharm',
+          });
         }
 
         // WO-O4O-ORGANIZATION-SERVICE-CENTRALIZATION-V1: membership via central service
