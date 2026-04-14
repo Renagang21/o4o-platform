@@ -398,6 +398,13 @@ import { PlatformPayment } from '../entities/payment/PlatformPayment.entity.js';
 import { EcommerceOrder, EcommerceOrderItem, EcommercePayment } from '@o4o/ecommerce-core/entities';
 
 // ============================================================================
+// CHECKOUT ENTITIES (WO-KPA-CHECKOUT-ORDER-ENTITY-ALIGNMENT-FIX-V1)
+// ============================================================================
+import { CheckoutOrder } from '../entities/checkout/CheckoutOrder.entity.js';
+import { CheckoutPayment } from '../entities/checkout/CheckoutPayment.entity.js';
+import { OrderLog } from '../entities/checkout/OrderLog.entity.js';
+
+// ============================================================================
 // ORGANIZATION-CORE ENTITIES (Phase 4: Entities-only Re-introduction)
 // Use /entities subpath to avoid side-effect loading
 // ============================================================================
@@ -871,6 +878,12 @@ export const AppDataSource = new DataSource({
     EcommerceOrder,
     EcommerceOrderItem,
     EcommercePayment,
+    // ============================================================================
+    // CHECKOUT ENTITIES (WO-KPA-CHECKOUT-ORDER-ENTITY-ALIGNMENT-FIX-V1)
+    // ============================================================================
+    CheckoutOrder,
+    CheckoutPayment,
+    OrderLog,
     // ============================================================================
     // ORGANIZATION-CORE ENTITIES (Phase 4: Entities-only Re-introduction)
     // ============================================================================
