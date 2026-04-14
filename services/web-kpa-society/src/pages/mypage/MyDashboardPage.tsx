@@ -330,33 +330,6 @@ export function MyDashboardPage() {
           /* 모집 중도 없고 내 참여도 없는 경우 */
           <div style={styles.trialEmptyState}>
             <span style={styles.trialEmptyIcon}>🧪</span>
-<<<<<<< Updated upstream
-            <p style={styles.trialEmptyText}>참여 중인 Market Trial이 없습니다.</p>
-            <Link to={`/market-trial`} style={styles.trialEmptyLink}>
-              Market Trial 둘러보기
-            </Link>
-          </div>
-        ) : (
-          <div style={styles.trialList}>
-            {participations.slice(0, 5).map((p) => {
-              const trial = p.trial;
-              if (!trial) return null;
-              const statusLabel = TRIAL_STATUS_LABELS[trial.status] || trial.status;
-              const statusColor = TRIAL_STATUS_COLORS[trial.status] || { bg: colors.neutral100, text: colors.neutral700 };
-              return (
-                <Link
-                  key={p.id}
-                  to={`/market-trial/${trial.id}`}
-                  style={styles.trialItem}
-                >
-                  <div style={styles.trialItemContent}>
-                    <span style={styles.trialTitle}>{trial.title}</span>
-                    <span style={styles.trialMeta}>
-                      {trial.supplierName || '공급자'} · {p.rewardType === 'product' ? '제품' : '현금'} · {new Date(p.joinedAt).toLocaleDateString('ko-KR')}
-                    </span>
-                  </div>
-                  <div style={styles.trialItemRight}>
-=======
             <p style={styles.trialEmptyText}>현재 진행 중인 Market Trial이 없습니다.</p>
             <Link to={`${servicePrefix}/market-trial`} style={styles.trialEmptyLink}>
               Market Trial 허브 둘러보기
@@ -381,7 +354,6 @@ export function MyDashboardPage() {
                         {trial.fundingEndAt ? ` · 마감 ${new Date(trial.fundingEndAt).toLocaleDateString('ko-KR')}` : ''}
                       </span>
                     </div>
->>>>>>> Stashed changes
                     <span style={{
                       ...styles.trialStatusBadge,
                       backgroundColor: '#DCFCE7',
