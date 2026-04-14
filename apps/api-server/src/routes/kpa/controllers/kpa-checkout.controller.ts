@@ -582,13 +582,13 @@ export function createKpaCheckoutController(
 
         const orderRepo = dataSource.getRepository(CheckoutOrder);
         const [orders, total] = await orderRepo
-          .createQueryBuilder('order')
-          .where('order.buyerId = :buyerId', { buyerId })
+          .createQueryBuilder('co')
+          .where('co.buyerId = :buyerId', { buyerId })
           .andWhere(
-            "order.metadata->>'serviceKey' IN (:...serviceKeys)",
+            "co.metadata->>'serviceKey' IN (:...serviceKeys)",
             { serviceKeys: ['kpa-society', 'kpa'] }
           )
-          .orderBy('order.createdAt', 'DESC')
+          .orderBy('co.createdAt', 'DESC')
           .take(limit)
           .skip(offset)
           .getManyAndCount();
@@ -642,11 +642,11 @@ export function createKpaCheckoutController(
 
         const orderRepo = dataSource.getRepository(CheckoutOrder);
         const order = await orderRepo
-          .createQueryBuilder('order')
-          .where('order.id = :orderId', { orderId })
-          .andWhere('order.buyerId = :buyerId', { buyerId })
+          .createQueryBuilder('co')
+          .where('co.id = :orderId', { orderId })
+          .andWhere('co.buyerId = :buyerId', { buyerId })
           .andWhere(
-            "order.metadata->>'serviceKey' IN (:...serviceKeys)",
+            "co.metadata->>'serviceKey' IN (:...serviceKeys)",
             { serviceKeys: ['kpa-society', 'kpa'] }
           )
           .getOne();
