@@ -84,13 +84,8 @@ interface RecentActivity {
 
 export function OperatorDashboardPage() {
   const { currentOrganization } = useOrganization();
-  const orgType = currentOrganization?.type === 'branch' ? 'branch' : 'district';
-
-  // WO-KPA-OPERATOR-DASHBOARD-LINK-FIX-V1: 분회 서비스 경로 마이그레이션
-  // WO-KPA-BRANCH-SERVICE-ROUTE-MIGRATION-V1: /branch-services/:branchId/*
-  const adminBasePath = orgType === 'branch'
-    ? `/branch-services/${currentOrganization?.id}/admin`
-    : '/admin';
+  const orgType = 'district' as const;
+  const adminBasePath = '/admin';
   const intranetBasePath = '/intranet';
   const lmsBasePath = '';
 
@@ -232,7 +227,7 @@ export function OperatorDashboardPage() {
       id: 'finance',
       title: '💰 재정 관리',
       description: '회계, 연회비, 예산 관리',
-      link: orgType === 'branch' ? `${adminBasePath}/membership-fee` : `${adminBasePath}/fee`,
+      link: `${adminBasePath}/fee`,
       stats: [
         { label: '현재 잔액', value: formatCurrency(stats.finance.currentBalance), color: colors.primary },
         { label: '월 수입', value: formatCurrency(stats.finance.monthlyIncome), color: '#059669' },
@@ -335,7 +330,7 @@ export function OperatorDashboardPage() {
                 <span style={styles.quickActionIcon}>📢</span>
                 <span>공지 작성</span>
               </Link>
-              <Link to={orgType === 'branch' ? `${adminBasePath}/membership-fee` : `${adminBasePath}/fee`} style={styles.quickAction}>
+              <Link to={`${adminBasePath}/fee`} style={styles.quickAction}>
                 <span style={styles.quickActionIcon}>💰</span>
                 <span>연회비 관리</span>
               </Link>
@@ -371,7 +366,7 @@ export function OperatorDashboardPage() {
         <div style={styles.financeSection}>
           <div style={styles.financeHeader}>
             <h3 style={styles.cardTitle}>💰 재정 요약</h3>
-            <Link to={orgType === 'branch' ? `${adminBasePath}/membership-fee` : `${adminBasePath}/fee`} style={styles.viewAllLink}>
+            <Link to={`${adminBasePath}/fee`} style={styles.viewAllLink}>
               상세 보기 →
             </Link>
           </div>

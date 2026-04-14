@@ -57,7 +57,7 @@ function getAccessibleOrganizationsForRole(role: string | undefined): Organizati
       return ALL_ORGANIZATIONS;
     case 'branch_admin':
       return ALL_ORGANIZATIONS.filter(
-        (org) => org.type === 'branch' || org.type === 'division' || org.type === 'committee'
+        (org) => org.type === 'committee'
       );
     case 'pharmacist':
     default:

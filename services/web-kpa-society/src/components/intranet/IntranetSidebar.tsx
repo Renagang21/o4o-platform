@@ -68,8 +68,6 @@ export function IntranetSidebar() {
 
   const getOrgIcon = (type: Organization['type']) => {
     switch (type) {
-      case 'branch': return '🏛️';
-      case 'division': return '🏘️';
       case 'committee': return '👥';
       default: return '📂';
     }
@@ -77,8 +75,6 @@ export function IntranetSidebar() {
 
   const getOrgTypeLabel = (type: Organization['type']) => {
     switch (type) {
-      case 'branch': return '지부';
-      case 'division': return '분회';
       case 'committee': return '위원회';
       default: return '조직';
     }
@@ -90,8 +86,6 @@ export function IntranetSidebar() {
   };
 
   // 조직 목록을 계층 구조로 그룹화
-  const branches = getOrganizationsByType('branch');
-  const divisions = getOrganizationsByType('division');
   const committees = getOrganizationsByType('committee');
 
   return (
@@ -134,42 +128,6 @@ export function IntranetSidebar() {
               ))}
             </div>
           )}
-
-          {/* 지부 */}
-          <div style={styles.orgGroup}>
-            <div style={styles.orgGroupTitle}>지부</div>
-            {branches.map((org) => (
-              <button
-                key={org.id}
-                style={{
-                  ...styles.orgOption,
-                  ...(currentOrganization.id === org.id ? styles.orgOptionActive : {}),
-                }}
-                onClick={() => handleSelectOrg(org.id)}
-              >
-                <span>{getOrgIcon(org.type)}</span>
-                <span>{org.name}</span>
-              </button>
-            ))}
-          </div>
-
-          {/* 분회 */}
-          <div style={styles.orgGroup}>
-            <div style={styles.orgGroupTitle}>분회</div>
-            {divisions.map((org) => (
-              <button
-                key={org.id}
-                style={{
-                  ...styles.orgOption,
-                  ...(currentOrganization.id === org.id ? styles.orgOptionActive : {}),
-                }}
-                onClick={() => handleSelectOrg(org.id)}
-              >
-                <span>{getOrgIcon(org.type)}</span>
-                <span>{org.name}</span>
-              </button>
-            ))}
-          </div>
 
           {/* 위원회 */}
           <div style={styles.orgGroup}>

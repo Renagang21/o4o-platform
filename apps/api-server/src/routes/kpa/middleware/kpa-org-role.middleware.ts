@@ -73,7 +73,7 @@ export function requireOrgRole(
           success: false,
           error: {
             code: 'NO_ACTIVE_MEMBERSHIP',
-            message: '활성 분회 소속이 없습니다.',
+            message: '활성 소속이 없습니다.',
           },
         });
         return;
@@ -86,7 +86,7 @@ export function requireOrgRole(
           success: false,
           error: {
             code: 'INSUFFICIENT_ORG_ROLE',
-            message: `이 기능은 ${minimumRole} 이상의 분회 역할이 필요합니다.`,
+            message: `이 기능은 ${minimumRole} 이상의 역할이 필요합니다.`,
           },
         });
         return;

@@ -18,8 +18,6 @@ export const ROLES = {
 
   // KPA-b 레거시/데모 (격리, 제거 예정)
   KPA_DISTRICT_ADMIN: 'kpa:district_admin',
-  KPA_BRANCH_ADMIN: 'kpa:branch_admin',
-  KPA_BRANCH_OPERATOR: 'kpa:branch_operator',
 
   // 플랫폼 Super
   PLATFORM_ADMIN: 'platform:admin',

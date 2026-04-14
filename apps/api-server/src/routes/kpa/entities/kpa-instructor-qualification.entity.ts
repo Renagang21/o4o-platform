@@ -9,7 +9,7 @@
  * WO-KPA-B-LMS-GUARD-BYPASS-AUDIT-AND-IMPLEMENTATION-V1
  *
  * KPA 조직 내 강사 자격 신청 및 승인 추적.
- * 기존 lms_instructor_applications와 별도 — KPA 조직 컨텍스트 + branch admin 승인.
+ * 기존 lms_instructor_applications와 별도 — KPA 조직 컨텍스트 + 관리자 승인.
  */
 
 import {

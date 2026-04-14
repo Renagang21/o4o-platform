@@ -12,17 +12,17 @@
 
 import { Organization, OrganizationMember, CommitteeType, COMMITTEE_TYPE_LABELS } from '../types/organization';
 
-// 지부 (1개만 존재)
+// WO-KPA-A-BRANCH-CHAPTER-REMOVAL-PHASE4-DEAD-CODE-AND-DROP-V1: branch/division 제거
+// 레거시 인트라넷 샘플 데이터 - committee로 통합
 export const SAMPLE_BRANCH: Organization = {
   id: 'branch-1',
-  name: '샘플지부',
-  type: 'branch',
-  memberCount: 0, // 초기값 0, 실제 운영 시 회원 추가
+  name: '샘플조직',
+  type: 'committee',
+  memberCount: 0,
 };
 
-// 분회 목록 (1개만 사전 생성)
 export const SAMPLE_DIVISIONS: Organization[] = [
-  { id: 'div-sample', name: '샘플분회', type: 'division', parentId: 'branch-1', memberCount: 0 },
+  { id: 'div-sample', name: '샘플위원회', type: 'committee', parentId: 'branch-1', memberCount: 0 },
 ];
 
 // 위원회 유형

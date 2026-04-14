@@ -17,57 +17,10 @@ function buildQueryString(params?: Record<string, string | number | boolean | un
   return qs ? `?${qs}` : '';
 }
 
-// 분회 타입
-interface Branch {
-  id: string;
-  code: string;
-  name: string;
-  type: 'division' | 'branch';
-  parentId?: string;
-  level: number;
-  path: string;
-  isActive: boolean;
-  memberCount?: number;
-  officerCount?: number;
-  metadata?: {
-    address?: string;
-    phone?: string;
-    fax?: string;
-    email?: string;
-    workingHours?: string;
-    description?: string;
-  };
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface CreateBranchDto {
-  name: string;
-  code: string;
-  type: 'branch';
-  isActive?: boolean;
-  metadata?: Branch['metadata'];
-}
-
-interface UpdateBranchDto {
-  name?: string;
-  isActive?: boolean;
-  metadata?: Branch['metadata'];
-}
-
 // WO-O4O-API-STRUCTURE-NORMALIZATION-PHASE2-V1: placeholder 필드 제거
 interface DashboardStats {
-  totalBranches: number;
   totalMembers: number;
   pendingApprovals: number;
-}
-
-interface PaginatedResult<T> {
-  items: T[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
 }
 
 export const adminApi = {
@@ -75,32 +28,8 @@ export const adminApi = {
   getDashboardStats: () =>
     apiClient.get<{ data: DashboardStats }>('/admin/dashboard/stats'),
 
-  // 분회 목록
-  getBranches: (params?: { page?: number; limit?: number }) =>
-    apiClient.get<{ data: PaginatedResult<Branch> }>(`/admin/branches${buildQueryString(params)}`),
-
-  // 분회 상세
-  getBranch: (id: string) =>
-    apiClient.get<{ data: Branch }>(`/admin/branches/${id}`),
-
-  // 분회 생성
-  createBranch: (data: CreateBranchDto) =>
-    apiClient.post<{ data: Branch }>('/admin/branches', data),
-
-  // 분회 수정
-  updateBranch: (id: string, data: UpdateBranchDto) =>
-    apiClient.patch<{ data: Branch }>(`/admin/branches/${id}`, data),
-
-  // 분회 삭제
-  deleteBranch: (id: string) =>
-    apiClient.delete(`/admin/branches/${id}`),
-
-  // 분회 활성화/비활성화
-  toggleBranchActive: (id: string) =>
-    apiClient.post(`/admin/branches/${id}/toggle-active`),
-
   // 회원 목록 (관리자용)
-  getMembers: (params?: { branchId?: string; page?: number; limit?: number }) =>
+  getMembers: (params?: { page?: number; limit?: number }) =>
     apiClient.get(`/admin/members${buildQueryString(params)}`),
 
   // 승인 대기 목록
@@ -194,7 +123,7 @@ export interface AssignStewardDto {
 export interface Organization {
   id: string;
   name: string;
-  type: 'association' | 'branch' | 'group';
+  type: 'association';
   parent_id: string | null;
   description: string | null;
   address: string | null;
@@ -208,7 +137,7 @@ export interface Organization {
 
 export interface CreateOrganizationDto {
   name: string;
-  type: 'association' | 'branch' | 'group';
+  type: 'association';
   parent_id?: string;
   description?: string;
   address?: string;

@@ -26,7 +26,7 @@ const SAMPLE_REQUESTS: CommitteeChangeRequest[] = [
     id: 'req-1',
     requestType: 'create',
     organizationId: 'div-gangnam',
-    organizationType: 'division',
+    organizationType: 'association',
     committeeType: 'other',
     committeeName: '복지위원회',
     reason: '회원 복지 증진을 위한 별도 위원회 신설이 필요합니다.',
@@ -39,7 +39,7 @@ const SAMPLE_REQUESTS: CommitteeChangeRequest[] = [
     id: 'req-2',
     requestType: 'update',
     organizationId: 'branch-1',
-    organizationType: 'branch',
+    organizationType: 'association',
     committeeType: 'academic',
     targetCommitteeId: 'committee-academic-1',
     reason: '학술위원회 명칭을 "교육연수위원회"로 변경 요청합니다.',
@@ -56,7 +56,7 @@ const SAMPLE_REQUESTS: CommitteeChangeRequest[] = [
     id: 'req-3',
     requestType: 'delete',
     organizationId: 'div-seocho',
-    organizationType: 'division',
+    organizationType: 'association',
     committeeType: 'other',
     committeeName: '특별위원회',
     targetCommitteeId: 'committee-special-1',
@@ -95,8 +95,8 @@ export function CommitteeRequestsPage() {
     const request: CommitteeChangeRequest = {
       id: `req-${Date.now()}`,
       requestType: newRequest.requestType,
-      organizationId: 'branch-1', // 현재 조직
-      organizationType: 'branch',
+      organizationId: 'assoc-1', // 현재 조직
+      organizationType: 'association',
       committeeType: newRequest.committeeType,
       committeeName: newRequest.committeeType === 'other' ? newRequest.committeeName : undefined,
       reason: newRequest.reason,

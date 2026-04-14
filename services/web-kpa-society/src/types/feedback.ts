@@ -95,7 +95,7 @@ import { ROLES, hasAnyRole } from '../lib/role-constants';
  */
 export function canWriteFeedback(userRoles?: string[]): boolean {
   if (!userRoles) return false;
-  return hasAnyRole(userRoles, [ROLES.KPA_DISTRICT_ADMIN, ROLES.KPA_BRANCH_ADMIN, ROLES.KPA_ADMIN]);
+  return hasAnyRole(userRoles, [ROLES.KPA_DISTRICT_ADMIN, ROLES.KPA_ADMIN]);
 }
 
 /**

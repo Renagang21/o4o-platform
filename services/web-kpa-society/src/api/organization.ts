@@ -14,14 +14,6 @@ export const organizationApi = {
   getOrganization: () =>
     apiClient.get<ApiResponse<Organization>>('/organization'),
 
-  // 지부/분회 목록
-  getBranches: (params?: { type?: 'branch' | 'chapter' }) =>
-    apiClient.get<ApiResponse<Organization[]>>('/organization/branches', params),
-
-  // 지부/분회 상세
-  getBranch: (id: string) =>
-    apiClient.get<ApiResponse<Organization>>(`/organization/branches/${id}`),
-
   // 임원 목록
   getOfficers: (params?: { organizationId?: string }) =>
     apiClient.get<ApiResponse<Officer[]>>('/organization/officers', params),

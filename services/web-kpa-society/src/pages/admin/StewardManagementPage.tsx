@@ -69,17 +69,16 @@ export function StewardManagementPage() {
       // Demo fallback
       setStewards([]);
       setOrganizations([
-        { id: 'org-1', name: '서울지부', type: 'branch', parent_id: null, description: null, address: null, phone: null, is_active: true, created_at: '', updated_at: '' },
-        { id: 'org-2', name: '강남분회', type: 'group', parent_id: 'org-1', description: null, address: null, phone: null, is_active: true, created_at: '', updated_at: '' },
+        { id: 'org-1', name: '샘플조직', type: 'association', parent_id: null, description: null, address: null, phone: null, is_active: true, created_at: '', updated_at: '' },
       ]);
     } finally {
       setLoading(false);
     }
   }, [filterOrgId, filterScopeType]);
 
-  const loadMembersForOrg = async (orgId: string) => {
+  const loadMembersForOrg = async (_orgId: string) => {
     try {
-      const res = await adminApi.getMembers({ branchId: orgId }) as any;
+      const res = await adminApi.getMembers() as any;
       setMembers(res.data?.items || []);
     } catch {
       setMembers([]);
@@ -214,7 +213,7 @@ export function StewardManagementPage() {
                   <option value="">조직 선택</option>
                   {organizations.map(org => (
                     <option key={org.id} value={org.id}>
-                      {org.type === 'group' ? '└ ' : ''}{org.name}
+                      {org.name}
                     </option>
                   ))}
                 </select>

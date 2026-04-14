@@ -3,7 +3,7 @@
  * WO-KPA-COMMITTEE-INTRANET-V1
  */
 
-export type OrganizationType = 'branch' | 'division' | 'committee' | 'pharmacy';
+export type OrganizationType = 'committee' | 'pharmacy';
 export type CommitteeType = 'academic' | 'it' | 'general';
 export type MemberRole = 'chair' | 'officer' | 'member';
 
@@ -35,8 +35,6 @@ export interface OrganizationMember {
  * 조직 유형 라벨
  */
 export const ORGANIZATION_TYPE_LABELS: Record<OrganizationType, string> = {
-  branch: '지부',
-  division: '분회',
   committee: '위원회',
   pharmacy: '약국',
 };
@@ -92,14 +90,14 @@ export type CommitteeRequestStatus = 'pending' | 'approved' | 'rejected';
 
 /**
  * 위원회 변경 요청 인터페이스
- * - 지부/분회 관리자가 요청
+ * - 협회 관리자가 요청
  * - 사이트 운영자가 승인/반려
  */
 export interface CommitteeChangeRequest {
   id: string;
   requestType: CommitteeRequestType;
-  organizationId: string;        // 요청하는 조직 (지부 또는 분회)
-  organizationType: 'branch' | 'division';
+  organizationId: string;        // 요청하는 조직 ID
+  organizationType: 'association';
   committeeType: CommitteeType | 'other';
   committeeName?: string;        // 기타 위원회인 경우 이름
   targetCommitteeId?: string;    // update/delete 시 대상 위원회 ID
@@ -429,8 +427,6 @@ export type ContextType = OrganizationType | 'pharmacy';
 
 /** Context 유형 라벨 */
 export const CONTEXT_TYPE_LABELS: Record<ContextType, string> = {
-  branch: '지부',
-  division: '분회',
   committee: '위원회',
   pharmacy: '약국',
 };
