@@ -14,22 +14,18 @@
 
 import { Router, Request, Response, NextFunction } from 'express';
 import { body, validationResult } from 'express-validator';
-import { DataSource, Brackets } from 'typeorm';
+import { DataSource } from 'typeorm';
 import type { AuthRequest } from '../../../types/auth.js';
 import logger from '../../../utils/logger.js';
 import { opsMetrics, OPS } from '../../../services/ops-metrics.service.js';
 import { validateSupplierSellerRelation } from '../../../core/checkout/checkout-guard.service.js';
 import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 import {
-  EcommerceOrder,
-  EcommerceOrderItem,
-  OrderType,
-  OrderStatus,
-  PaymentStatus,
-  BuyerType,
-  SellerType,
+  CheckoutOrder,
+  CheckoutOrderStatus,
+  CheckoutPaymentStatus,
   type ShippingAddress,
-} from '@o4o/ecommerce-core/entities';
+} from '../../../entities/checkout/CheckoutOrder.entity.js';
 
 // ============================================================================
 // Type Definitions
@@ -112,83 +108,58 @@ function handleValidationErrors(req: Request, res: Response): boolean {
 }
 
 // ============================================================================
-// Core Order Creation (same as GlycoPharm checkout.controller.ts)
+// Core Order Creation — CheckoutOrder (checkout_orders) 기반
 // ============================================================================
 
-async function createCoreOrder(
+async function createCheckoutOrder(
   manager: import('typeorm').EntityManager,
   dto: {
     buyerId: string;
     sellerId: string;
-    orderType: OrderType;
+    supplierId: string;
+    sellerOrganizationId?: string;
     items: Array<{
-      productId?: string;
+      productId: string;
       productName: string;
-      sku?: string;
       quantity: number;
       unitPrice: number;
-      discount?: number;
-      metadata?: Record<string, unknown>;
+      subtotal: number;
     }>;
     shippingAddress?: ShippingAddress;
     shippingFee?: number;
     discount?: number;
     metadata?: Record<string, unknown>;
-    orderSource?: string;
   }
-): Promise<EcommerceOrder> {
-  const subtotal = dto.items.reduce((sum, item) => {
-    return sum + (item.quantity * item.unitPrice - (item.discount || 0));
-  }, 0);
-
+): Promise<CheckoutOrder> {
+  const subtotal = dto.items.reduce((sum, item) => sum + item.subtotal, 0);
   const shippingFee = dto.shippingFee || 0;
   const discount = dto.discount || 0;
   const totalAmount = subtotal + shippingFee - discount;
 
-  const orderRepo = manager.getRepository(EcommerceOrder);
-  const orderItemRepo = manager.getRepository(EcommerceOrderItem);
+  const orderRepo = manager.getRepository(CheckoutOrder);
 
   const order = orderRepo.create({
     orderNumber: generateOrderNumber(),
     buyerId: dto.buyerId,
-    buyerType: BuyerType.USER,
     sellerId: dto.sellerId,
-    sellerType: SellerType.ORGANIZATION,
-    orderType: dto.orderType,
+    supplierId: dto.supplierId,
+    sellerOrganizationId: dto.sellerOrganizationId,
+    items: dto.items,
     subtotal,
     shippingFee,
     discount,
     totalAmount,
-    currency: 'KRW',
-    paymentStatus: PaymentStatus.PENDING,
-    status: OrderStatus.CREATED,
+    status: CheckoutOrderStatus.CREATED,
+    paymentStatus: CheckoutPaymentStatus.PENDING,
     shippingAddress: dto.shippingAddress,
     metadata: dto.metadata,
-    orderSource: dto.orderSource,
   });
 
   const savedOrder = await orderRepo.save(order);
 
-  const items = dto.items.map((itemDto) =>
-    orderItemRepo.create({
-      orderId: savedOrder.id,
-      productId: itemDto.productId,
-      productName: itemDto.productName,
-      sku: itemDto.sku,
-      quantity: itemDto.quantity,
-      unitPrice: itemDto.unitPrice,
-      discount: itemDto.discount || 0,
-      subtotal: itemDto.quantity * itemDto.unitPrice - (itemDto.discount || 0),
-      metadata: itemDto.metadata,
-    })
-  );
-
-  await orderItemRepo.save(items);
-
-  logger.info('[EcommerceCore] Order created:', {
+  logger.info('[KPA Checkout] Order created via CheckoutOrder:', {
     orderId: savedOrder.id,
     orderNumber: savedOrder.orderNumber,
-    orderType: savedOrder.orderType,
     sellerId: savedOrder.sellerId,
     totalAmount: savedOrder.totalAmount,
   });
@@ -457,6 +428,7 @@ export function createKpaCheckoutController(
 
         try {
           // 6a. sales_limit 검증 (PAID 기준 + FOR UPDATE)
+          // checkout_orders.items는 JSONB 배열이므로 jsonb_array_elements 사용
           if (channelMappings.length > 0) {
             const productsWithLimit = channelMappings.filter((m) => m.sales_limit !== null);
 
@@ -465,13 +437,14 @@ export function createKpaCheckoutController(
               if (!requestedItem) continue;
 
               const soldResult: Array<{ sold: number }> = await queryRunner.query(
-                `SELECT COALESCE(SUM(oi.quantity), 0)::int AS sold
-                 FROM ecommerce_order_items oi
-                 JOIN ecommerce_orders o ON o.id = oi."orderId"
-                 WHERE oi."productId" = $1
-                   AND o."sellerId" = $2
-                   AND o.status = 'PAID'
-                 FOR UPDATE OF o`,
+                `SELECT COALESCE(SUM((item->>'quantity')::int), 0)::int AS sold
+                 FROM checkout_orders co,
+                      jsonb_array_elements(co.items) AS item
+                 WHERE item->>'productId' = $1
+                   AND co."sellerId" = $2
+                   AND co.status = 'paid'
+                   AND co.metadata->>'serviceKey' IN ('kpa-society', 'kpa')
+                 FOR UPDATE OF co`,
                 [mapping.product_id, organization.id]
               );
 
@@ -490,7 +463,7 @@ export function createKpaCheckoutController(
             }
           }
 
-          // 6b. Core 위임 주문 생성
+          // 6b. CheckoutOrder 기반 주문 생성
           const metadata: KpaOrderMetadata = {
             serviceKey: 'kpa-society',
             organizationId: organization.id,
@@ -501,11 +474,18 @@ export function createKpaCheckoutController(
             ...(dto.referral?.referrerId ? { referral: dto.referral } : {}),
           };
 
-          const savedOrder = await createCoreOrder(queryRunner.manager, {
+          const savedOrder = await createCheckoutOrder(queryRunner.manager, {
             buyerId,
             sellerId: organization.id,
-            orderType: OrderType.RETAIL,
-            items: orderItems,
+            supplierId: organization.id,
+            sellerOrganizationId: organization.id,
+            items: orderItems.map((item) => ({
+              productId: item.productId,
+              productName: item.productName,
+              quantity: item.quantity,
+              unitPrice: item.unitPrice,
+              subtotal: item.subtotal,
+            })),
             shippingAddress: dto.shippingAddress
               ? {
                   ...dto.shippingAddress,
@@ -515,7 +495,6 @@ export function createKpaCheckoutController(
             shippingFee,
             discount,
             metadata: metadata as unknown as Record<string, unknown>,
-            orderSource: 'online',
           });
 
           // 6c. Commit
@@ -529,7 +508,6 @@ export function createKpaCheckoutController(
           logger.info('[KPA Checkout] Order created:', {
             orderId: savedOrder.id,
             orderNumber: savedOrder.orderNumber,
-            orderType: savedOrder.orderType,
             buyerId,
             organizationId: organization.id,
             channelId: b2cChannelId,
@@ -542,19 +520,19 @@ export function createKpaCheckoutController(
             data: {
               orderId: savedOrder.id,
               orderNumber: savedOrder.orderNumber,
-              orderType: savedOrder.orderType,
+              orderType: 'retail',
               status: savedOrder.status,
               paymentStatus: savedOrder.paymentStatus,
               subtotal: savedOrder.subtotal,
               shippingFee: savedOrder.shippingFee,
               discount: savedOrder.discount,
               totalAmount: savedOrder.totalAmount,
-              currency: savedOrder.currency,
+              currency: 'KRW',
               organization: {
                 id: organization.id,
                 name: organization.name,
               },
-              items: orderItems.map((item) => ({
+              items: savedOrder.items.map((item) => ({
                 productId: item.productId,
                 productName: item.productName,
                 quantity: item.quantity,
@@ -602,14 +580,13 @@ export function createKpaCheckoutController(
         const limit = Math.min(Number(req.query.limit) || 20, 100);
         const offset = (page - 1) * limit;
 
-        const orderRepo = dataSource.getRepository(EcommerceOrder);
+        const orderRepo = dataSource.getRepository(CheckoutOrder);
         const [orders, total] = await orderRepo
           .createQueryBuilder('order')
-          .leftJoinAndSelect('order.items', 'items')
           .where('order.buyerId = :buyerId', { buyerId })
           .andWhere(
-            "order.orderType = :retail AND order.metadata->>'serviceKey' IN (:...serviceKeys)",
-            { retail: OrderType.RETAIL, serviceKeys: ['kpa-society', 'kpa'] }
+            "order.metadata->>'serviceKey' IN (:...serviceKeys)",
+            { serviceKeys: ['kpa-society', 'kpa'] }
           )
           .orderBy('order.createdAt', 'DESC')
           .take(limit)
@@ -628,7 +605,7 @@ export function createKpaCheckoutController(
               id: (order.metadata as KpaOrderMetadata)?.organizationId,
               name: (order.metadata as KpaOrderMetadata)?.organizationName,
             },
-            itemCount: (order.items as unknown[])?.length || 0,
+            itemCount: order.items?.length || 0,
             createdAt: order.createdAt,
           })),
           pagination: {
@@ -663,15 +640,14 @@ export function createKpaCheckoutController(
           return errorResponse(res, 401, 'UNAUTHORIZED', 'User not authenticated');
         }
 
-        const orderRepo = dataSource.getRepository(EcommerceOrder);
+        const orderRepo = dataSource.getRepository(CheckoutOrder);
         const order = await orderRepo
           .createQueryBuilder('order')
-          .leftJoinAndSelect('order.items', 'items')
           .where('order.id = :orderId', { orderId })
           .andWhere('order.buyerId = :buyerId', { buyerId })
           .andWhere(
-            "order.orderType = :retail AND order.metadata->>'serviceKey' IN (:...serviceKeys)",
-            { retail: OrderType.RETAIL, serviceKeys: ['kpa-society', 'kpa'] }
+            "order.metadata->>'serviceKey' IN (:...serviceKeys)",
+            { serviceKeys: ['kpa-society', 'kpa'] }
           )
           .getOne();
 
@@ -686,28 +662,25 @@ export function createKpaCheckoutController(
           data: {
             id: order.id,
             orderNumber: order.orderNumber,
-            orderType: order.orderType,
+            orderType: 'retail',
             status: order.status,
             paymentStatus: order.paymentStatus,
             subtotal: order.subtotal,
             shippingFee: order.shippingFee,
             discount: order.discount,
             totalAmount: order.totalAmount,
-            currency: order.currency,
+            currency: 'KRW',
             organization: {
               id: metadata?.organizationId,
               name: metadata?.organizationName,
             },
             deliveryMethod: metadata?.deliveryMethod,
             shippingAddress: order.shippingAddress,
-            items: (order.items as EcommerceOrderItem[])?.map((item) => ({
-              id: item.id,
+            items: order.items?.map((item) => ({
               productId: item.productId,
               productName: item.productName,
-              sku: item.sku,
               quantity: item.quantity,
               unitPrice: item.unitPrice,
-              discount: item.discount,
               subtotal: item.subtotal,
             })),
             paidAt: order.paidAt,

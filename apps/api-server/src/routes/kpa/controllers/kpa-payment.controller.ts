@@ -15,7 +15,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { body, param, validationResult } from 'express-validator';
 import { DataSource } from 'typeorm';
 import { PaymentCoreService } from '@o4o/payment-core';
-import { EcommerceOrder, OrderStatus } from '@o4o/ecommerce-core/entities';
+import { CheckoutOrder, CheckoutOrderStatus } from '../../../entities/checkout/CheckoutOrder.entity.js';
 import { TypeORMPaymentRepository } from '../../../services/payment/adapters/TypeORMPaymentRepository.js';
 import { TossPaymentProviderAdapter } from '../../../services/payment/adapters/TossPaymentProviderAdapter.js';
 import { EventHubPaymentPublisher } from '../../../services/payment/adapters/EventHubPaymentPublisher.js';
@@ -46,11 +46,11 @@ function handleValidationErrors(req: Request, res: Response): boolean {
   return false;
 }
 
-function generateOrderName(order: EcommerceOrder): string {
+function generateOrderName(order: CheckoutOrder): string {
   if (!order.items || order.items.length === 0) {
     return 'KPA 주문';
   }
-  const firstItem = order.items[0] as { productName?: string };
+  const firstItem = order.items[0];
   const itemName = firstItem?.productName || 'KPA 상품';
   if (order.items.length === 1) {
     return itemName;
@@ -63,7 +63,7 @@ export function createKpaPaymentController(
   requireAuth: (req: Request, res: Response, next: NextFunction) => void,
 ): Router {
   const router = Router();
-  const orderRepository = dataSource.getRepository(EcommerceOrder);
+  const orderRepository = dataSource.getRepository(CheckoutOrder);
 
   // Adapter 인스턴스 생성 + PaymentCoreService 조립
   const repository = new TypeORMPaymentRepository(dataSource);
@@ -99,14 +99,13 @@ export function createKpaPaymentController(
 
         const order = await orderRepository.findOne({
           where: { id: orderId, buyerId: userId },
-          relations: ['items'],
         });
 
         if (!order) {
           return errorResponse(res, 404, 'ORDER_NOT_FOUND', 'Order not found');
         }
 
-        if (order.status !== OrderStatus.CREATED && order.status !== OrderStatus.PENDING_PAYMENT) {
+        if (order.status !== CheckoutOrderStatus.CREATED && order.status !== CheckoutOrderStatus.PENDING_PAYMENT) {
           return errorResponse(res, 400, 'ORDER_NOT_PAYABLE', 'Order is not in payable state', {
             currentStatus: order.status,
           });
@@ -116,7 +115,7 @@ export function createKpaPaymentController(
           orderId: order.id,
           orderName: generateOrderName(order),
           amount: Number(order.totalAmount),
-          currency: order.currency,
+          currency: 'KRW',
           successUrl,
           failUrl,
           sourceService: 'kpa',
@@ -277,14 +276,13 @@ export function createKpaPaymentController(
 
         const order = await orderRepository.findOne({
           where: { id: req.params.orderId, buyerId: userId },
-          relations: ['items'],
         });
 
         if (!order) {
           return errorResponse(res, 404, 'ORDER_NOT_FOUND', 'Order not found');
         }
 
-        if (order.status !== OrderStatus.CREATED && order.status !== OrderStatus.PENDING_PAYMENT) {
+        if (order.status !== CheckoutOrderStatus.CREATED && order.status !== CheckoutOrderStatus.PENDING_PAYMENT) {
           return errorResponse(res, 400, 'ORDER_NOT_PAYABLE', 'Order is not payable', {
             currentStatus: order.status,
           });
@@ -297,7 +295,7 @@ export function createKpaPaymentController(
             orderNumber: order.orderNumber,
             orderName: generateOrderName(order),
             amount: Number(order.totalAmount),
-            currency: order.currency,
+            currency: 'KRW',
             clientKey: process.env.TOSS_PAYMENTS_CLIENT_KEY || 'test_ck_test_key',
           },
         });
