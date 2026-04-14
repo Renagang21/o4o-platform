@@ -110,6 +110,7 @@ storybook-static
 # IDE-specific files
 .idea/
 .vscode/
+.claude/
 
 # OS-specific files
 .DS_Store
