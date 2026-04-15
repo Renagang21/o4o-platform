@@ -519,6 +519,9 @@ function App() {
           <Route path="/operator/*" element={<OperatorRoutes />} />
           <Route path="/intranet/*" element={<Navigate to="/demo/intranet" replace />} />
 
+          {/* Supplier Event Offer Proposal (WO-EVENT-OFFER-SUPPLIER-PROPOSAL-PATH-V1) */}
+          <Route path="/supplier/event-offers" element={<Layout serviceName={SERVICE_NAME}><SupplierEventOfferPage /></Layout>} />
+
           {/* ========================================
            * 커뮤니티 서비스 라우트 (메인 서비스)
            * WO-KPA-COMMUNITY-ROOT-ROUTES-V1
@@ -777,8 +780,7 @@ function DemoLayoutRoutes() {
         <Route path="/event-offers/history" element={<PharmacyOwnerOnlyGuard><EventOfferHistoryPage /></PharmacyOwnerOnlyGuard>} />
         <Route path="/event-offers/:id" element={<PharmacyOwnerOnlyGuard><EventOfferDetailPage /></PharmacyOwnerOnlyGuard>} />
 
-        {/* Supplier Event Offer Proposal (WO-EVENT-OFFER-SUPPLIER-PROPOSAL-PATH-V1) */}
-        <Route path="/supplier/event-offers" element={<Layout serviceName={SERVICE_NAME}><SupplierEventOfferPage /></Layout>} />
+        {/* Pharmacy Management - 실경로로 리다이렉트 (WO-KPA-PHARMACY-LOCATION-V1) */}
 
         {/* Pharmacy Management - 실경로로 리다이렉트 (WO-KPA-PHARMACY-LOCATION-V1) */}
         <Route path="/pharmacy" element={<Navigate to="/pharmacy" replace />} />
