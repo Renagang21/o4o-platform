@@ -83,22 +83,21 @@ export class MarketTrialController {
       // 1. 로그인 체크
       if (!userId) return emptyResponse('not_logged_in');
 
-      // 2. KPA membership 체크
+      // 2. KPA membership 체크 (service_key 'kpa'/'kpa-society' 혼재 대응)
       const membership = await MarketTrialController.dataSource!.query(
-        `SELECT status FROM service_memberships WHERE user_id = $1 AND service_key = 'kpa-society'`,
+        `SELECT status FROM service_memberships WHERE user_id = $1 AND service_key IN ('kpa', 'kpa-society')`,
         [userId],
       );
       if (!membership.length) return emptyResponse('no_kpa_membership');
 
       // 3. 약국 회원 체크 (organization_members + organizations)
       const orgMember = await MarketTrialController.dataSource!.query(
-        `SELECT om.status FROM organization_members om
+        `SELECT om.id FROM organization_members om
          JOIN organizations o ON o.id = om.organization_id
-         WHERE om.user_id = $1 AND o."isActive" = true`,
+         WHERE om.user_id = $1 AND o."isActive" = true AND om.left_at IS NULL`,
         [userId],
       );
       if (!orgMember.length) return emptyResponse('not_pharmacy_member');
-      if (orgMember[0].status === 'pending') return emptyResponse('pending_approval');
 
       // 4. 해당 서비스의 오픈 trial 조회
       const qb = MarketTrialController.trialRepo.createQueryBuilder('trial')
