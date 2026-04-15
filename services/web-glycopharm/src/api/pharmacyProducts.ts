@@ -48,6 +48,6 @@ export async function getCatalog(params?: {
   if (params?.offset != null) searchParams.set('offset', params.offset.toString());
 
   const queryString = searchParams.toString();
-  const res = await api.get(`/kpa/pharmacy/products/catalog${queryString ? `?${queryString}` : ''}`);
+  const res = await api.get(`/glycopharm/pharmacy/products/catalog${queryString ? `?${queryString}` : ''}`);
   return res.data;
 }
