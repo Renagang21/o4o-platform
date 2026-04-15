@@ -218,6 +218,63 @@ export interface Certificate {
   downloadUrl: string;
 }
 
+// Quiz (WO-O4O-QUIZ-SYSTEM-V1)
+export interface QuizQuestion {
+  id: string;
+  question: string;
+  type: 'single' | 'multi' | 'text';
+  options?: string[];
+  points?: number;
+  order: number;
+}
+
+export interface Quiz {
+  id: string;
+  title: string;
+  description?: string;
+  questions: QuizQuestion[];
+  passingScore: number;
+  lessonId?: string;
+  courseId?: string;
+}
+
+export interface QuizResult {
+  attemptId: string;
+  score: number;
+  passed: boolean;
+  correctCount: number;
+  total: number;
+  earnedPoints: number;
+  totalPoints: number;
+  answers: Array<{
+    questionId: string;
+    isCorrect?: boolean;
+    points?: number;
+  }>;
+  lessonCompleted: boolean;
+  creditsEarned: number;
+}
+
+// Credit (WO-O4O-CREDIT-SYSTEM-V1)
+export interface CreditTransaction {
+  id: string;
+  amount: number;
+  transactionType: 'earn' | 'spend' | 'adjust';
+  sourceType: string;
+  sourceId?: string;
+  description?: string;
+  createdAt: string;
+}
+
+// Completion (WO-O4O-COMPLETION-V1)
+export interface CourseCompletionItem {
+  id: string;
+  courseId: string;
+  courseTitle: string;
+  enrollmentId: string;
+  completedAt: string;
+}
+
 // 공동구매 통계 (WO-KPA-GROUPBUY-STATS-V1)
 export interface GroupbuyStats {
   totalOrders: number;

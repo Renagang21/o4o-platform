@@ -1,9 +1,7 @@
 /**
  * LmsLessonPage - 단계 보기 페이지
  *
- * 핵심 원칙:
- * - 이 기능은 교육이나 평가를 위한 것이 아닙니다
- * - 콘텐츠를 순서대로 안내하기 위한 도구입니다
+ * WO-O4O-QUIZ-SYSTEM-V1: 퀴즈 타입 레슨 지원 추가
  */
 
 import { useState, useEffect } from 'react';
@@ -12,7 +10,7 @@ import { toast } from '@o4o/error-handling';
 import { LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { lmsApi } from '../../api';
 import { colors, typography } from '../../styles/theme';
-import type { Course, Lesson, Enrollment } from '../../types';
+import type { Course, Lesson, Enrollment, Quiz, QuizResult } from '../../types';
 import { ContentRenderer } from '@o4o/content-editor';
 
 export function LmsLessonPage() {
@@ -25,9 +23,22 @@ export function LmsLessonPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Quiz state (WO-O4O-QUIZ-SYSTEM-V1)
+  const [quiz, setQuiz] = useState<Quiz | null>(null);
+  const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string | string[]>>({});
+  const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
   useEffect(() => {
     if (courseId && lessonId) loadData();
   }, [courseId, lessonId]);
+
+  // Reset quiz state when lesson changes
+  useEffect(() => {
+    setQuiz(null);
+    setSelectedAnswers({});
+    setQuizResult(null);
+  }, [lessonId]);
 
   const loadData = async () => {
     try {
@@ -49,6 +60,18 @@ export function LmsLessonPage() {
         setEnrollment(enrollmentRes.data);
       } catch {
         // 미시작 상태
+      }
+
+      // Load quiz if lesson type is quiz
+      if (lessonRes.data?.type === 'quiz') {
+        try {
+          const quizRes = await lmsApi.getQuizForLesson(lessonId!);
+          if (quizRes.data?.quiz) {
+            setQuiz(quizRes.data.quiz);
+          }
+        } catch {
+          // No quiz available
+        }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : '단계를 불러오는데 실패했습니다.');
@@ -77,6 +100,57 @@ export function LmsLessonPage() {
     }
   };
 
+  const handleAnswerSelect = (questionId: string, answer: string) => {
+    setSelectedAnswers(prev => ({ ...prev, [questionId]: answer }));
+  };
+
+  const handleQuizSubmit = async () => {
+    if (!quiz) return;
+
+    // Check all questions answered
+    const unanswered = quiz.questions.filter(q => !selectedAnswers[q.id]);
+    if (unanswered.length > 0) {
+      toast.error(`${unanswered.length}개 문제를 아직 풀지 않았습니다.`);
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const answers = Object.entries(selectedAnswers).map(([questionId, answer]) => ({
+        questionId,
+        answer,
+      }));
+
+      const res = await lmsApi.submitQuiz(quiz.id, answers);
+      setQuizResult(res.data);
+
+      if (res.data.passed) {
+        const credits = res.data.creditsEarned;
+        toast.success(credits > 0
+          ? `퀴즈를 통과했습니다! (+${credits} 크레딧)`
+          : '퀴즈를 통과했습니다!');
+        // Reload enrollment to reflect progress
+        try {
+          const enrollmentRes = await lmsApi.getEnrollment(courseId!);
+          setEnrollment(enrollmentRes.data);
+        } catch {
+          // ignore
+        }
+      } else {
+        toast.error('불합격입니다. 다시 시도해 주세요.');
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : '퀴즈 제출에 실패했습니다.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleRetry = () => {
+    setSelectedAnswers({});
+    setQuizResult(null);
+  };
+
   if (loading) {
     return <LoadingSpinner message="단계를 불러오는 중..." />;
   }
@@ -98,6 +172,7 @@ export function LmsLessonPage() {
   const prevLesson = currentIndex > 0 ? lessons[currentIndex - 1] : null;
   const nextLesson = currentIndex < lessons.length - 1 ? lessons[currentIndex + 1] : null;
   const isCompleted = enrollment?.completedLessons?.includes(currentLesson.id);
+  const isQuizLesson = currentLesson.type === 'quiz' && quiz;
 
   return (
     <div style={styles.wrapper}>
@@ -128,7 +203,9 @@ export function LmsLessonPage() {
                   {isLessonCompleted ? '✓' : index + 1}
                 </span>
                 <span style={styles.lessonTitle}>{lesson.title}</span>
-                <span style={styles.lessonDuration}>{lesson.duration}분</span>
+                <span style={styles.lessonDuration}>
+                  {lesson.type === 'quiz' ? '퀴즈' : `${lesson.duration}분`}
+                </span>
               </Link>
             );
           })}
@@ -158,28 +235,138 @@ export function LmsLessonPage() {
           <h1 style={styles.title}>{currentLesson.title}</h1>
         </div>
 
-        {/* 비디오 영역 */}
-        <div style={styles.videoContainer}>
-          {currentLesson.videoUrl ? (
-            <video
-              style={styles.video}
-              src={currentLesson.videoUrl}
-              controls
-              autoPlay
-            />
-          ) : (
-            <div style={styles.videoPlaceholder}>
-              <span>🎬</span>
-              <p>동영상이 준비 중입니다</p>
-            </div>
-          )}
-        </div>
+        {/* 퀴즈 영역 (WO-O4O-QUIZ-SYSTEM-V1) */}
+        {isQuizLesson ? (
+          <div>
+            {quiz.description && (
+              <Card padding="large" style={{ marginBottom: '16px' }}>
+                <p style={{ ...typography.bodyM, color: colors.neutral600 }}>{quiz.description}</p>
+                <p style={{ ...typography.bodyS, color: colors.neutral500, marginTop: '8px' }}>
+                  합격 기준: {quiz.passingScore}점 이상
+                </p>
+              </Card>
+            )}
 
-        {/* 내용 */}
-        {currentLesson.content && (
-          <Card padding="large" style={{ marginTop: '24px' }}>
-            <ContentRenderer html={currentLesson.content} style={styles.content} />
-          </Card>
+            {/* 결과 표시 */}
+            {quizResult && (
+              <Card padding="large" style={{
+                marginBottom: '24px',
+                backgroundColor: quizResult.passed ? '#f0fdf4' : '#fef2f2',
+                border: `1px solid ${quizResult.passed ? '#86efac' : '#fca5a5'}`,
+              }}>
+                <h3 style={{
+                  ...typography.headingS,
+                  color: quizResult.passed ? '#166534' : '#991b1b',
+                  marginBottom: '12px',
+                }}>
+                  {quizResult.passed ? '합격' : '불합격'}
+                </h3>
+                <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
+                  <div>
+                    <span style={{ ...typography.bodyS, color: colors.neutral500 }}>점수</span>
+                    <p style={{ ...typography.headingM, color: colors.neutral900 }}>
+                      {Math.round(quizResult.score)}점
+                    </p>
+                  </div>
+                  <div>
+                    <span style={{ ...typography.bodyS, color: colors.neutral500 }}>정답</span>
+                    <p style={{ ...typography.headingM, color: colors.neutral900 }}>
+                      {quizResult.correctCount} / {quizResult.total}
+                    </p>
+                  </div>
+                  {quizResult.creditsEarned > 0 && (
+                    <div>
+                      <span style={{ ...typography.bodyS, color: colors.neutral500 }}>크레딧</span>
+                      <p style={{ ...typography.headingM, color: '#166534' }}>
+                        +{quizResult.creditsEarned} C
+                      </p>
+                    </div>
+                  )}
+                </div>
+                {!quizResult.passed && (
+                  <button style={styles.retryButton} onClick={handleRetry}>
+                    다시 시도
+                  </button>
+                )}
+              </Card>
+            )}
+
+            {/* 문제 목록 */}
+            {!quizResult && quiz.questions.map((question, qIndex) => (
+              <Card key={question.id} padding="large" style={{ marginBottom: '16px' }}>
+                <h4 style={{ ...typography.bodyL, fontWeight: 600, color: colors.neutral900, marginBottom: '16px' }}>
+                  {qIndex + 1}. {question.question}
+                  {question.points && question.points > 1 && (
+                    <span style={{ ...typography.bodyS, color: colors.neutral400, marginLeft: '8px' }}>
+                      ({question.points}점)
+                    </span>
+                  )}
+                </h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {question.options?.map((option, oIndex) => {
+                    const isSelected = selectedAnswers[question.id] === option;
+                    return (
+                      <button
+                        key={oIndex}
+                        onClick={() => handleAnswerSelect(question.id, option)}
+                        style={{
+                          ...styles.optionButton,
+                          ...(isSelected ? styles.optionButtonSelected : {}),
+                        }}
+                      >
+                        <span style={styles.optionLabel}>
+                          {String.fromCharCode(65 + oIndex)}
+                        </span>
+                        <span>{option}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </Card>
+            ))}
+
+            {/* 제출 버튼 */}
+            {!quizResult && (
+              <div style={{ textAlign: 'center', marginTop: '24px' }}>
+                <button
+                  style={{
+                    ...styles.submitButton,
+                    opacity: submitting ? 0.6 : 1,
+                  }}
+                  onClick={handleQuizSubmit}
+                  disabled={submitting}
+                >
+                  {submitting ? '채점 중...' : '제출'}
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <>
+            {/* 비디오 영역 */}
+            <div style={styles.videoContainer}>
+              {currentLesson.videoUrl ? (
+                <video
+                  style={styles.video}
+                  src={currentLesson.videoUrl}
+                  controls
+                  autoPlay
+                />
+              ) : (
+                <div style={styles.videoPlaceholder}>
+                  <span>🎬</span>
+                  <p>동영상이 준비 중입니다</p>
+                </div>
+              )}
+            </div>
+
+            {/* 내용 */}
+            {currentLesson.content && (
+              <Card padding="large" style={{ marginTop: '24px' }}>
+                <ContentRenderer html={currentLesson.content} style={styles.content} />
+              </Card>
+            )}
+          </>
         )}
 
         {/* 네비게이션 */}
@@ -195,7 +382,7 @@ export function LmsLessonPage() {
             <div />
           )}
 
-          {!isCompleted && enrollment && (
+          {!isCompleted && enrollment && !isQuizLesson && (
             <button style={styles.completeButton} onClick={handleComplete}>
               ✓ 완료
             </button>
@@ -224,6 +411,7 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     minHeight: '100vh',
   },
+  container: {},
   sidebar: {
     width: '320px',
     backgroundColor: colors.neutral900,
@@ -376,6 +564,58 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: '6px',
     fontSize: '14px',
     fontWeight: 500,
+    cursor: 'pointer',
+  },
+  // Quiz styles (WO-O4O-QUIZ-SYSTEM-V1)
+  optionButton: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    padding: '14px 16px',
+    backgroundColor: colors.neutral50,
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: '8px',
+    cursor: 'pointer',
+    textAlign: 'left' as const,
+    fontSize: '14px',
+    color: colors.neutral700,
+    transition: 'all 0.15s',
+  },
+  optionButtonSelected: {
+    backgroundColor: '#eff6ff',
+    borderColor: colors.primary,
+    color: colors.primary,
+  },
+  optionLabel: {
+    width: '28px',
+    height: '28px',
+    borderRadius: '50%',
+    backgroundColor: colors.neutral200,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '13px',
+    fontWeight: 600,
+    flexShrink: 0,
+  },
+  submitButton: {
+    padding: '14px 48px',
+    backgroundColor: colors.primary,
+    color: colors.white,
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '16px',
+    fontWeight: 600,
+    cursor: 'pointer',
+  },
+  retryButton: {
+    marginTop: '16px',
+    padding: '10px 24px',
+    backgroundColor: colors.neutral100,
+    color: colors.neutral700,
+    border: `1px solid ${colors.neutral300}`,
+    borderRadius: '6px',
+    fontSize: '14px',
     cursor: 'pointer',
   },
 };

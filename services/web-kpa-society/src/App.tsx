@@ -74,7 +74,7 @@ import { PolicyPage, PrivacyPage } from './pages/legal';
 import { OrganizationAboutPage, OfficersPage, ContactPage } from './pages/organization';
 
 // MyPage pages
-import { MyDashboardPage, MyProfilePage, MySettingsPage, MyCertificatesPage, PersonalStatusReportPage, AnnualReportFormPage, MyForumDashboardPage, RequestCategoryPage as KpaRequestCategoryPage, MyRequestsPage, ForumMemberManagementPage, MyQualificationsPage, MyEnrollmentsPage } from './pages/mypage';
+import { MyDashboardPage, MyProfilePage, MySettingsPage, MyCertificatesPage, PersonalStatusReportPage, AnnualReportFormPage, MyForumDashboardPage, RequestCategoryPage as KpaRequestCategoryPage, MyRequestsPage, ForumMemberManagementPage, MyQualificationsPage, MyEnrollmentsPage, MyCreditsPage, MyCompletionsPage } from './pages/mypage';
 
 // Admin Routes (지부 관리자)
 import { AdminRoutes } from './routes/AdminRoutes';
@@ -597,6 +597,10 @@ function App() {
           {/* WO-O4O-QUALIFICATION-SYSTEM-V1 */}
           <Route path="/mypage/qualifications" element={<Layout serviceName={SERVICE_NAME}><MyQualificationsPage /></Layout>} />
           <Route path="/mypage/enrollments" element={<Layout serviceName={SERVICE_NAME}><MyEnrollmentsPage /></Layout>} />
+          {/* WO-O4O-CREDIT-SYSTEM-V1 */}
+          <Route path="/mypage/credits" element={<Layout serviceName={SERVICE_NAME}><MyCreditsPage /></Layout>} />
+          {/* WO-O4O-COMPLETION-V1 */}
+          <Route path="/mypage/completions" element={<Layout serviceName={SERVICE_NAME}><MyCompletionsPage /></Layout>} />
 
           {/* Participation (참여) */}
           <Route path="/participation" element={<Layout serviceName={SERVICE_NAME}><ParticipationListPage /></Layout>} />
@@ -805,6 +809,8 @@ function DemoLayoutRoutes() {
         <Route path="/mypage/profile" element={<MyProfilePage />} />
         <Route path="/mypage/settings" element={<MySettingsPage />} />
         <Route path="/mypage/certificates" element={<MyCertificatesPage />} />
+        <Route path="/mypage/credits" element={<MyCreditsPage />} />
+        <Route path="/mypage/completions" element={<MyCompletionsPage />} />
         <Route path="/mypage/status-report" element={<PersonalStatusReportPage />} />
         <Route path="/mypage/annual-report" element={<AnnualReportFormPage />} />
 

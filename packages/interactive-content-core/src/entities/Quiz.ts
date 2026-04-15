@@ -31,6 +31,7 @@ export interface QuizQuestion {
 @Entity('lms_quizzes')
 @Index(['isPublished', 'createdAt'])
 @Index(['bundleId'])
+@Index(['lessonId'])
 export class Quiz {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -57,6 +58,10 @@ export class Quiz {
   // Course 연결 (optional)
   @Column({ type: 'uuid', nullable: true })
   courseId?: string;
+
+  // Lesson 연결 (optional) — WO-O4O-QUIZ-SYSTEM-V1
+  @Column({ type: 'uuid', nullable: true })
+  lessonId?: string;
 
   // 합격 점수 (백분율)
   @Column({ type: 'integer', default: 70 })

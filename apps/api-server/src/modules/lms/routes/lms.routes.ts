@@ -5,6 +5,10 @@ import { EnrollmentController } from '../controllers/EnrollmentController.js';
 import { CertificateController } from '../controllers/CertificateController.js';
 // WO-LMS-INSTRUCTOR-ROLE-V1
 import { InstructorController } from '../controllers/InstructorController.js';
+// WO-O4O-QUIZ-SYSTEM-V1
+import { QuizController } from '../controllers/QuizController.js';
+// WO-O4O-COMPLETION-V1
+import { CompletionController } from '../controllers/CompletionController.js';
 import { requireAuth } from '../../../common/middleware/auth.middleware.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import { requireEnrollment } from '../middleware/requireEnrollment.js';
@@ -66,6 +70,32 @@ router.delete('/lessons/:id', requireAuth, requireInstructor, asyncHandler(Lesso
 
 // POST /api/v1/lms/courses/:courseId/lessons/reorder - Reorder Lessons
 router.post('/courses/:courseId/lessons/reorder', requireAuth, requireInstructor, asyncHandler(LessonController.reorderLessons));
+
+// ========================================
+// QUIZ ROUTES (WO-O4O-QUIZ-SYSTEM-V1)
+// ========================================
+
+// GET /api/v1/lms/lessons/:lessonId/quiz - Get Quiz for Lesson
+router.get('/lessons/:lessonId/quiz', requireAuth, asyncHandler(QuizController.getQuizForLesson));
+
+// POST /api/v1/lms/quizzes - Create Quiz (Instructor)
+router.post('/quizzes', requireAuth, requireInstructor, asyncHandler(QuizController.createQuiz));
+
+// POST /api/v1/lms/quizzes/:quizId/submit - Submit Quiz Answers
+router.post('/quizzes/:quizId/submit', requireAuth, asyncHandler(QuizController.submitQuiz));
+
+// GET /api/v1/lms/quizzes/:quizId/attempts - Get User's Attempts
+router.get('/quizzes/:quizId/attempts', requireAuth, asyncHandler(QuizController.getAttempts));
+
+// PATCH /api/v1/lms/quizzes/:quizId - Update Quiz (Instructor)
+router.patch('/quizzes/:quizId', requireAuth, requireInstructor, asyncHandler(QuizController.updateQuiz));
+
+// ========================================
+// COMPLETION ROUTES (WO-O4O-COMPLETION-V1)
+// ========================================
+
+// GET /api/v1/lms/completions/me - Get My Completions
+router.get('/completions/me', requireAuth, asyncHandler(CompletionController.getMyCompletions));
 
 // ========================================
 // ENROLLMENT ROUTES

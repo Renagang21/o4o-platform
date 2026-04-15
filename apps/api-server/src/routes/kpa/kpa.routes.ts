@@ -132,6 +132,10 @@ import { LessonController } from '../../modules/lms/controllers/LessonController
 import { EnrollmentController } from '../../modules/lms/controllers/EnrollmentController.js';
 import { CertificateController } from '../../modules/lms/controllers/CertificateController.js';
 import { InstructorPublicController } from '../../modules/lms/controllers/InstructorPublicController.js';
+// WO-O4O-CREDIT-SYSTEM-V1
+import { CreditController } from '../../modules/credit/controllers/CreditController.js';
+// WO-O4O-COMPLETION-V1
+import { CompletionController } from '../../modules/lms/controllers/CompletionController.js';
 
 /**
  * KPA Scope Guard — powered by @o4o/security-core
@@ -436,7 +440,18 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // Instructor Public Profile (no auth) - WO-CONTENT-INSTRUCTOR-PUBLIC-PROFILE-V1
   lmsRouter.get('/instructors/:userId/public-profile', asyncHandler(InstructorPublicController.getPublicProfile));
 
+  // WO-O4O-COMPLETION-V1: Completions
+  lmsRouter.get('/completions/me', authenticate, asyncHandler(CompletionController.getMyCompletions));
+
   router.use('/lms', lmsRouter);
+
+  // ============================================================================
+  // Credit Routes - /api/v1/kpa/credits/* (WO-O4O-CREDIT-SYSTEM-V1)
+  // ============================================================================
+  const creditRouter = Router();
+  creditRouter.get('/me', authenticate, asyncHandler(CreditController.getMyBalance));
+  creditRouter.get('/me/transactions', authenticate, asyncHandler(CreditController.getMyTransactions));
+  router.use('/credits', creditRouter);
 
   // ============================================================================
   // Home Routes - /api/v1/kpa/home/*

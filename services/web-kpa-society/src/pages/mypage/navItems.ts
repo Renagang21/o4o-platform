@@ -6,6 +6,8 @@ export const KPA_MYPAGE_NAV_ITEMS: MyPageNavItem[] = [
   { label: '내 포럼', path: '/my-forums' },
   { label: '내 신청', path: '/my-requests' },
   { label: '내 수강', path: '/enrollments' },
+  { label: '내 수료', path: '/completions' },
   { label: '이수현황', path: '/certificates' },
+  { label: '크레딧', path: '/credits' },
   { label: '설정', path: '/settings' },
 ];

@@ -12,6 +12,9 @@ import type {
   Enrollment,
   Certificate,
   InstructorPublicProfile,
+  Quiz,
+  QuizResult,
+  CourseCompletionItem,
   PaginatedResponse,
   ApiResponse,
 } from '../types';
@@ -62,6 +65,20 @@ export const lmsApi = {
 
   downloadCertificate: (id: string) =>
     apiClient.get<Blob>(`/lms/certificates/${id}/download`),
+
+  // 퀴즈 (WO-O4O-QUIZ-SYSTEM-V1)
+  getQuizForLesson: (lessonId: string) =>
+    apiClient.get<ApiResponse<{ quiz: Quiz }>>(`/lms/lessons/${lessonId}/quiz`),
+
+  submitQuiz: (quizId: string, answers: Array<{ questionId: string; answer: string | string[] }>) =>
+    apiClient.post<ApiResponse<QuizResult>>(`/lms/quizzes/${quizId}/submit`, { answers }),
+
+  getQuizAttempts: (quizId: string) =>
+    apiClient.get<ApiResponse<{ attempts: any[] }>>(`/lms/quizzes/${quizId}/attempts`),
+
+  // 수료 (WO-O4O-COMPLETION-V1)
+  getMyCompletions: (params?: { page?: number; limit?: number }) =>
+    apiClient.get<PaginatedResponse<CourseCompletionItem>>('/lms/completions/me', params),
 
   // 강사 공개 프로필 - WO-CONTENT-INSTRUCTOR-PUBLIC-PROFILE-V1
   getInstructorProfile: (userId: string) =>
