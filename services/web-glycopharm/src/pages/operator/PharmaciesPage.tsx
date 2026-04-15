@@ -33,6 +33,8 @@ import {
   type PharmacyStatus,
   type PharmacyTier,
 } from '@/api/glycopharm';
+import StatusBadge from '../../components/common/StatusBadge';
+import PageHeader from '../../components/common/PageHeader';
 
 // Tab types
 type TabType = 'all' | 'active' | 'pending' | 'issues';
@@ -46,25 +48,6 @@ const EMPTY_STATS: OperatorPharmacyStats = {
   totalMonthlyRevenue: 0,
   avgOrdersPerPharmacy: 0,
 };
-
-// Status badge component
-function StatusBadge({ status }: { status: PharmacyStatus }) {
-  const config = {
-    active: { label: '활성', color: 'bg-green-100 text-green-700', icon: CheckCircle },
-    pending: { label: '승인대기', color: 'bg-amber-100 text-amber-700', icon: Clock },
-    suspended: { label: '일시정지', color: 'bg-red-100 text-red-700', icon: AlertCircle },
-    inactive: { label: '비활성', color: 'bg-slate-100 text-slate-600', icon: AlertCircle },
-  };
-
-  const { label, color, icon: Icon } = config[status];
-
-  return (
-    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${color}`}>
-      <Icon className="w-3 h-3" />
-      {label}
-    </span>
-  );
-}
 
 // Tier badge component
 function TierBadge({ tier }: { tier: PharmacyTier }) {
@@ -175,11 +158,10 @@ export default function PharmaciesPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-slate-800">약국 네트워크</h1>
-        <p className="text-slate-500 text-sm">가맹 약국 관리 및 모니터링</p>
-      </div>
+      <PageHeader
+        title="약국 네트워크"
+        description="가맹 약국 관리 및 모니터링"
+      />
 
       {/* Error Banner */}
       {error && (

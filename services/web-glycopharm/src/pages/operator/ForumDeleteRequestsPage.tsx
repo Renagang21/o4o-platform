@@ -10,7 +10,6 @@ import {
   Trash2,
   CheckCircle,
   XCircle,
-  Clock,
   Loader2,
   AlertCircle,
   Inbox,
@@ -18,6 +17,8 @@ import {
   X,
 } from 'lucide-react';
 import { forumDeleteRequestApi } from '@/services/api';
+import StatusBadge from '../../components/common/StatusBadge';
+import PageHeader from '../../components/common/PageHeader';
 
 interface DeleteRequest {
   id: string;
@@ -115,16 +116,11 @@ export default function ForumDeleteRequestsPage() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
-          <Trash2 className="w-6 h-6 text-red-500" />
-          포럼 삭제 요청 관리
-        </h1>
-        <p className="text-slate-500 mt-1">
-          포럼 소유자의 삭제 요청을 검토하고 승인/반려합니다
-        </p>
-      </div>
+      <PageHeader
+        title="포럼 삭제 요청 관리"
+        description="포럼 소유자의 삭제 요청을 검토하고 승인/반려합니다"
+        icon={<Trash2 className="w-6 h-6 text-red-500" />}
+      />
 
       {/* Status Tabs */}
       <div className="flex gap-1 mb-6 bg-slate-100 rounded-lg p-1">
@@ -205,12 +201,9 @@ export default function ForumDeleteRequestsPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
+                  <StatusBadge status={req.deleteRequestStatus} />
                   {req.deleteRequestStatus === 'pending' && (
                     <>
-                      <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-yellow-50 text-yellow-700 flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        대기 중
-                      </span>
                       <button
                         onClick={() => openReview(req.id, 'approve')}
                         className="px-3 py-1.5 text-xs font-medium bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
@@ -224,18 +217,6 @@ export default function ForumDeleteRequestsPage() {
                         반려
                       </button>
                     </>
-                  )}
-                  {req.deleteRequestStatus === 'approved' && (
-                    <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-green-50 text-green-700 flex items-center gap-1">
-                      <CheckCircle className="w-3 h-3" />
-                      승인됨
-                    </span>
-                  )}
-                  {req.deleteRequestStatus === 'rejected' && (
-                    <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-red-50 text-red-700 flex items-center gap-1">
-                      <XCircle className="w-3 h-3" />
-                      반려됨
-                    </span>
                   )}
                 </div>
               </div>

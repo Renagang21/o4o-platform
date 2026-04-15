@@ -21,6 +21,7 @@ import {
 import { DataTable } from '@o4o/ui';
 import type { Column } from '@o4o/ui';
 import { api } from '../../lib/apiClient';
+import PageHeader from '../../components/common/PageHeader';
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -130,21 +131,20 @@ export default function ProductsPage() {
 
   return (
     <div className="space-y-6 p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">상품 관리</h1>
-          <p className="text-slate-500 text-sm mt-1">Product Master 기반 플랫폼 상품 카탈로그</p>
-        </div>
-        <button
-          onClick={fetchProducts}
-          disabled={isLoading}
-          className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors text-sm disabled:opacity-50"
-        >
-          <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-          새로고침
-        </button>
-      </div>
+      <PageHeader
+        title="상품 관리"
+        description="Product Master 기반 플랫폼 상품 카탈로그"
+        actions={
+          <button
+            onClick={fetchProducts}
+            disabled={isLoading}
+            className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors text-sm disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+            새로고침
+          </button>
+        }
+      />
 
       {/* Error Banner */}
       {error && (

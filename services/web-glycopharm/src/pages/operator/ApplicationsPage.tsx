@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Clock, CheckCircle, XCircle, Building2, Truck, Monitor, ChevronRight, Filter } from 'lucide-react';
+import { Building2, Truck, Monitor, ChevronRight, Filter } from 'lucide-react';
 import { DataTable } from '@o4o/ui';
 import type { Column } from '@o4o/ui';
 import { glycopharmApi } from '@/api/glycopharm';
 import type { AdminApplication, ApplicationStatus, ServiceType, OrganizationType } from '@/api/glycopharm';
+import StatusBadge from '../../components/common/StatusBadge';
+import PageHeader from '../../components/common/PageHeader';
 
 /**
  * Operator Applications Page
@@ -15,12 +17,6 @@ const SERVICE_LABELS: Record<ServiceType, { label: string; icon: typeof Building
   dropshipping: { label: '무재고 판매', icon: Truck },
   sample_sales: { label: '샘플 판매', icon: Building2 },
   digital_signage: { label: '디지털 사이니지', icon: Monitor },
-};
-
-const STATUS_CONFIG: Record<ApplicationStatus, { label: string; icon: typeof Clock; bgColor: string; textColor: string }> = {
-  submitted: { label: '심사 대기', icon: Clock, bgColor: 'bg-amber-100', textColor: 'text-amber-700' },
-  approved: { label: '승인됨', icon: CheckCircle, bgColor: 'bg-green-100', textColor: 'text-green-700' },
-  rejected: { label: '반려됨', icon: XCircle, bgColor: 'bg-red-100', textColor: 'text-red-700' },
 };
 
 export default function ApplicationsPage() {
@@ -82,11 +78,10 @@ export default function ApplicationsPage() {
 
   return (
     <div className="p-6">
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-800 mb-2">신청 관리</h1>
-        <p className="text-slate-500">약국 참여 신청을 검토하고 승인/반려 처리합니다.</p>
-      </div>
+      <PageHeader
+        title="신청 관리"
+        description="약국 참여 신청을 검토하고 승인/반려 처리합니다."
+      />
 
       {/* Filters */}
       <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
@@ -223,16 +218,7 @@ export default function ApplicationsPage() {
             key: 'status',
             title: '상태',
             width: '120px',
-            render: (_v, app) => {
-              const cfg = STATUS_CONFIG[app.status];
-              const Icon = cfg.icon;
-              return (
-                <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${cfg.bgColor} ${cfg.textColor}`}>
-                  <Icon className="w-3 h-3" />
-                  {cfg.label}
-                </span>
-              );
-            },
+            render: (_v, app) => <StatusBadge status={app.status} />,
           },
           {
             key: 'submittedAt',

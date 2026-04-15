@@ -17,6 +17,8 @@ import {
 import { DataTable } from '@o4o/ui';
 import type { Column } from '@o4o/ui';
 import { api } from '../../lib/apiClient';
+import StatusBadge from '../../components/common/StatusBadge';
+import PageHeader from '../../components/common/PageHeader';
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -133,24 +135,21 @@ export default function StoresPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
-            <Store className="w-6 h-6 text-primary-600" />
-            매장 관리
-          </h1>
-          <p className="text-slate-500 text-sm mt-1">O4O 플랫폼 매장 카탈로그</p>
-        </div>
-        <button
-          onClick={fetchStores}
-          disabled={isLoading}
-          className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors text-sm disabled:opacity-50"
-        >
-          <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-          새로고침
-        </button>
-      </div>
+      <PageHeader
+        title="매장 관리"
+        description="O4O 플랫폼 매장 카탈로그"
+        icon={<Store className="w-6 h-6 text-primary-600" />}
+        actions={
+          <button
+            onClick={fetchStores}
+            disabled={isLoading}
+            className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors text-sm disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+            새로고침
+          </button>
+        }
+      />
 
       {/* Error */}
       {error && (
@@ -267,11 +266,7 @@ export default function StoresPage() {
               key: 'isActive',
               title: '상태',
               width: '70px',
-              render: (_v, s) => (
-                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${s.isActive ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500'}`}>
-                  {s.isActive ? '활성' : '비활성'}
-                </span>
-              ),
+              render: (_v, s) => <StatusBadge status={s.isActive ? 'active' : 'inactive'} />,
             },
             {
               key: 'createdAt',

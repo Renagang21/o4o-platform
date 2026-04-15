@@ -31,6 +31,8 @@ import {
 import { DataTable } from '@o4o/ui';
 import type { Column } from '@o4o/ui';
 import { glycopharmApi, type OperatorOrder, type OperatorOrderStats, type OrderStatus } from '@/api/glycopharm';
+import StatusBadge from '../../components/common/StatusBadge';
+import PageHeader from '../../components/common/PageHeader';
 
 type TabType = 'all' | 'pending' | 'processing' | 'shipped' | 'completed';
 
@@ -44,28 +46,7 @@ const EMPTY_STATS: OperatorOrderStats = {
   avgOrderValue: 0,
 };
 
-// Status badge
-function StatusBadge({ status }: { status: OrderStatus }) {
-  const config = {
-    pending: { label: '대기', color: 'bg-amber-100 text-amber-700', icon: Clock },
-    confirmed: { label: '확인됨', color: 'bg-blue-100 text-blue-700', icon: CheckCircle },
-    processing: { label: '처리중', color: 'bg-purple-100 text-purple-700', icon: Package },
-    shipped: { label: '배송중', color: 'bg-indigo-100 text-indigo-700', icon: Truck },
-    delivered: { label: '배송완료', color: 'bg-green-100 text-green-700', icon: CheckCircle },
-    cancelled: { label: '취소됨', color: 'bg-red-100 text-red-700', icon: XCircle },
-  };
-
-  const { label, color, icon: Icon } = config[status];
-
-  return (
-    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${color}`}>
-      <Icon className="w-3 h-3" />
-      {label}
-    </span>
-  );
-}
-
-// Payment badge
+// Payment badge (text-only, no background)
 function PaymentBadge({ status }: { status: 'pending' | 'paid' | 'refunded' }) {
   const config = {
     pending: { label: '결제대기', color: 'text-amber-600' },
@@ -178,27 +159,26 @@ export default function OrdersPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">주문 관리</h1>
-          <p className="text-slate-500 text-sm">약국 B2B 주문 현황 및 처리</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <button className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors text-sm">
-            <Download className="w-4 h-4" />
-            내보내기
-          </button>
-          <button
-            onClick={fetchOrders}
-            disabled={isLoading}
-            className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors text-sm disabled:opacity-50"
-          >
-            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-            새로고침
-          </button>
-        </div>
-      </div>
+      <PageHeader
+        title="주문 관리"
+        description="약국 B2B 주문 현황 및 처리"
+        actions={
+          <>
+            <button className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors text-sm">
+              <Download className="w-4 h-4" />
+              내보내기
+            </button>
+            <button
+              onClick={fetchOrders}
+              disabled={isLoading}
+              className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors text-sm disabled:opacity-50"
+            >
+              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+              새로고침
+            </button>
+          </>
+        }
+      />
 
       {/* Error Banner */}
       {error && (

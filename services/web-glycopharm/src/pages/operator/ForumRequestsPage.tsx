@@ -16,6 +16,8 @@ import type { Column } from '@o4o/ui';
 import type { CategoryRequestStatus } from '@/types';
 import { forumRequestApi } from '@/services/api';
 import { toast } from '@o4o/error-handling';
+import StatusBadge from '../../components/common/StatusBadge';
+import PageHeader from '../../components/common/PageHeader';
 
 interface RequestData {
   id: string;
@@ -35,29 +37,6 @@ interface RequestData {
   createdAt: string;
   updatedAt: string;
 }
-
-const statusConfig: Record<CategoryRequestStatus, { label: string; color: string; bgColor: string }> = {
-  pending: {
-    label: '대기 중',
-    color: 'text-yellow-700',
-    bgColor: 'bg-yellow-100',
-  },
-  revision_requested: {
-    label: '보완 요청',
-    color: 'text-orange-700',
-    bgColor: 'bg-orange-100',
-  },
-  approved: {
-    label: '승인됨',
-    color: 'text-green-700',
-    bgColor: 'bg-green-100',
-  },
-  rejected: {
-    label: '거절됨',
-    color: 'text-red-700',
-    bgColor: 'bg-red-100',
-  },
-};
 
 function formatDate(dateString: string): string {
   const date = new Date(dateString);
@@ -179,24 +158,19 @@ export default function ForumRequestsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
-            <FileCheck className="w-7 h-7 text-primary-600" />
-            포럼 신청 관리
-          </h1>
-          <p className="text-slate-500 mt-1">
-            사용자의 포럼 생성 신청을 검토하고 승인하세요
-          </p>
-        </div>
-        {pendingCount > 0 && (
-          <div className="flex items-center gap-2 px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg">
-            <Clock className="w-5 h-5" />
-            <span className="font-medium">{pendingCount}건의 대기 중인 신청</span>
-          </div>
-        )}
-      </div>
+      <PageHeader
+        title="포럼 신청 관리"
+        description="사용자의 포럼 생성 신청을 검토하고 승인하세요"
+        icon={<FileCheck className="w-7 h-7 text-primary-600" />}
+        actions={
+          pendingCount > 0 ? (
+            <div className="flex items-center gap-2 px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg">
+              <Clock className="w-5 h-5" />
+              <span className="font-medium">{pendingCount}건의 대기 중인 신청</span>
+            </div>
+          ) : undefined
+        }
+      />
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
@@ -259,14 +233,7 @@ export default function ForumRequestsPage() {
             key: 'status',
             title: '상태',
             width: '100px',
-            render: (_v, req) => {
-              const cfg = statusConfig[req.status];
-              return (
-                <span className={`px-3 py-1 text-xs font-medium rounded-full ${cfg.bgColor} ${cfg.color}`}>
-                  {cfg.label}
-                </span>
-              );
-            },
+            render: (_v, req) => <StatusBadge status={req.status} />,
           },
           {
             key: 'actions',
