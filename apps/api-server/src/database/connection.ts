@@ -162,6 +162,7 @@ import {
   TabletServiceRequest, // WO-STORE-TABLET-REQUEST-CHANNEL-V1
   StoreBlogPost, // WO-STORE-BLOG-CHANNEL-V1
   GlycopharmPharmacyExtension, // WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1
+  GlycopharmMember, // WO-GLYCOPHARM-MEMBER-TABLE-CREATION-V1
 } from '../routes/glycopharm/entities/index.js';
 
 // ============================================================================
@@ -673,6 +674,7 @@ export const AppDataSource = new DataSource({
     TabletServiceRequest, // WO-STORE-TABLET-REQUEST-CHANNEL-V1
     StoreBlogPost, // WO-STORE-BLOG-CHANNEL-V1
     GlycopharmPharmacyExtension, // WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1
+    GlycopharmMember, // WO-GLYCOPHARM-MEMBER-TABLE-CREATION-V1
     // ============================================================================
     // ASSET SNAPSHOT ENTITY (WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1)
     // ============================================================================

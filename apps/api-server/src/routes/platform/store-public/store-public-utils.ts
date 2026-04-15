@@ -169,8 +169,9 @@ export async function queryVisibleProducts(
          0 AS stock_quantity, '[]'::jsonb AS images,
          CASE WHEN spo.is_active THEN 'active' ELSE 'inactive' END AS status,
          false AS is_featured,
-         s.name AS manufacturer, '' AS description,
-         '' AS short_description,
+         s.name AS manufacturer,
+         COALESCE(sp.description, spo.consumer_detail_description, '') AS description,
+         COALESCE(sp.short_description, spo.consumer_short_description, '') AS short_description,
          opl.created_at AS sort_order,
          spo.created_at, spo.updated_at,
          opl.organization_id AS pharmacy_id,
@@ -190,6 +191,10 @@ export async function queryVisibleProducts(
          ON oc.id = opc.channel_id
          AND oc.channel_type = 'B2C'
          AND oc.status = 'APPROVED'
+       LEFT JOIN store_products sp
+         ON sp.product_master_id = pm.id
+         AND sp.organization_id = opl.organization_id
+         AND sp.is_active = true
        WHERE spo.is_active = true
          AND s.status = 'ACTIVE'
          ${whereExtra}
@@ -296,8 +301,9 @@ export async function queryTabletVisibleProducts(
          0 AS stock_quantity, '[]'::jsonb AS images,
          CASE WHEN spo.is_active THEN 'active' ELSE 'inactive' END AS status,
          false AS is_featured,
-         s.name AS manufacturer, '' AS description,
-         '' AS short_description,
+         s.name AS manufacturer,
+         COALESCE(sp.description, spo.consumer_detail_description, '') AS description,
+         COALESCE(sp.short_description, spo.consumer_short_description, '') AS short_description,
          opl.created_at AS sort_order,
          spo.created_at, spo.updated_at,
          opl.organization_id AS pharmacy_id
@@ -316,10 +322,14 @@ export async function queryTabletVisibleProducts(
          ON oc.id = opc.channel_id
          AND oc.channel_type = 'TABLET'
          AND oc.status = 'APPROVED'
+       LEFT JOIN store_products sp
+         ON sp.product_master_id = pm.id
+         AND sp.organization_id = opl.organization_id
+         AND sp.is_active = true
        WHERE spo.is_active = true
          AND s.status = 'ACTIVE'
          ${whereExtra}
-       ORDER BY spo.id, ${sortField} ${sortOrder}
+       ORDER by spo.id, ${sortField} ${sortOrder}
        LIMIT ${limit} OFFSET ${offset}`,
       params,
     );

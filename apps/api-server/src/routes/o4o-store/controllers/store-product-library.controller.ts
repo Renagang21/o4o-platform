@@ -11,6 +11,7 @@
  * POST /list                    — Store Listing 생성
  * GET  /                        — 내 매장 진열 목록
  * PATCH /:id                    — Listing 수정 (isActive, price)
+ * PATCH /:id/description        — 매장 상품 설명 override (WO-STORE-PRODUCT-DESCRIPTION-OVERRIDE-V1)
  *
  * 인증: requireAuth + requireStoreOwner (organization_members 기반)
  */
@@ -245,6 +246,124 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
 
     logger.info(`[StoreProductLibrary] Listing updated: id=${id}, org=${organizationId}`);
     res.json({ success: true, data: updated });
+  }));
+
+  // ─── PATCH /:id/description — 매장 상품 설명 override ──────────────
+  // WO-STORE-PRODUCT-DESCRIPTION-OVERRIDE-V1 Phase 2
+  //
+  // :id = offer ID (spo.id) — 공개 상품 API에서 반환하는 ID와 동일
+  // StoreProduct.description / shortDescription 를 매장 단위로 설정.
+  // StoreProduct 없으면 CatalogProduct 기반 자동 생성 후 저장.
+  router.patch('/:id/description', requireAuth, requireStoreOwner as RequestHandler, asyncHandler(async (req: Request, res: Response) => {
+    const organizationId = (req as any).organizationId;
+    const userId = (req as any).user?.id;
+    const { id: offerId } = req.params;
+    const { description, shortDescription } = req.body;
+
+    if (description === undefined && shortDescription === undefined) {
+      return res.status(400).json({ success: false, error: { code: 'INVALID_INPUT', message: 'description or shortDescription required' } });
+    }
+
+    // 1. Listing 확인 — offer_id 기반 (boundary: organizationId)
+    const listingRows: Array<{ id: string; master_id: string }> = await dataSource.query(
+      `SELECT id, master_id FROM organization_product_listings
+       WHERE offer_id = $1 AND organization_id = $2 AND is_active = true
+       LIMIT 1`,
+      [offerId, organizationId],
+    );
+    if (listingRows.length === 0) {
+      return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Product listing not found' } });
+    }
+
+    const masterId = listingRows[0].master_id;
+
+    // 2. CatalogProduct 조회 or 생성
+    let catalogRows: Array<{ id: string }> = await dataSource.query(
+      `SELECT id FROM catalog_products WHERE product_master_id = $1 LIMIT 1`,
+      [masterId],
+    );
+    let catalogProductId: string;
+
+    if (catalogRows.length > 0) {
+      catalogProductId = catalogRows[0].id;
+    } else {
+      // ProductMaster 정보로 CatalogProduct 생성
+      const masterRows: Array<{ marketing_name: string }> = await dataSource.query(
+        `SELECT marketing_name FROM product_masters WHERE id = $1`,
+        [masterId],
+      );
+      const productName = masterRows[0]?.marketing_name || '상품';
+
+      const insertCatalog: Array<{ id: string }> = await dataSource.query(
+        `INSERT INTO catalog_products (id, product_master_id, name, regulatory_type, created_by, is_active, created_at, updated_at)
+         VALUES (gen_random_uuid(), $1, $2, 'GENERAL', $3, true, NOW(), NOW())
+         RETURNING id`,
+        [masterId, productName, userId],
+      );
+      catalogProductId = insertCatalog[0].id;
+    }
+
+    // 3. StoreProduct 조회 or 생성
+    let spRows: Array<{ id: string }> = await dataSource.query(
+      `SELECT id FROM store_products
+       WHERE organization_id = $1 AND catalog_product_id = $2
+       LIMIT 1`,
+      [organizationId, catalogProductId],
+    );
+    let storeProductId: string;
+
+    if (spRows.length > 0) {
+      storeProductId = spRows[0].id;
+    } else {
+      const masterRows2: Array<{ marketing_name: string }> = await dataSource.query(
+        `SELECT marketing_name FROM product_masters WHERE id = $1`,
+        [masterId],
+      );
+      const productName = masterRows2[0]?.marketing_name || '상품';
+
+      const insertSp: Array<{ id: string }> = await dataSource.query(
+        `INSERT INTO store_products (id, organization_id, catalog_product_id, product_master_id, name, is_active, created_by, created_at, updated_at)
+         VALUES (gen_random_uuid(), $1, $2, $3, $4, true, $5, NOW(), NOW())
+         RETURNING id`,
+        [organizationId, catalogProductId, masterId, productName, userId],
+      );
+      storeProductId = insertSp[0].id;
+    }
+
+    // 4. description / shortDescription 업데이트
+    const setClauses: string[] = [];
+    const setParams: any[] = [];
+    let paramIdx = 1;
+
+    if (description !== undefined) {
+      setClauses.push(`description = $${paramIdx++}`);
+      setParams.push(description);
+    }
+    if (shortDescription !== undefined) {
+      setClauses.push(`short_description = $${paramIdx++}`);
+      setParams.push(shortDescription);
+    }
+    setClauses.push(`updated_at = NOW()`);
+
+    setParams.push(storeProductId);
+    setParams.push(organizationId);
+
+    await dataSource.query(
+      `UPDATE store_products
+       SET ${setClauses.join(', ')}
+       WHERE id = $${paramIdx++} AND organization_id = $${paramIdx}`,
+      setParams,
+    );
+
+    // 5. 결과 반환
+    const result = await dataSource.query(
+      `SELECT id, description, short_description AS "shortDescription", updated_at AS "updatedAt"
+       FROM store_products WHERE id = $1`,
+      [storeProductId],
+    );
+
+    logger.info(`[StoreProductLibrary] Description updated: storeProduct=${storeProductId}, org=${organizationId}`);
+    res.json({ success: true, data: result[0] });
   }));
 
   return router;

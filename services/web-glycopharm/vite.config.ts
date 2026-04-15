@@ -9,6 +9,8 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
+    // react-router-dom 중복 인스턴스 방지
+    dedupe: ['react', 'react-dom', 'react-router-dom'],
   },
   server: {
     port: 4201,

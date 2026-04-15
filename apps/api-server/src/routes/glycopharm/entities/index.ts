@@ -75,3 +75,11 @@ export {
 
 // WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1 Phase B-1a
 export { GlycopharmPharmacyExtension } from './glycopharm-pharmacy-extension.entity.js';
+
+// WO-GLYCOPHARM-MEMBER-TABLE-CREATION-V1
+export {
+  GlycopharmMember,
+  type GlycopharmMembershipType,
+  type GlycopharmMemberSubRole,
+  type GlycopharmMemberStatus,
+} from './glycopharm-member.entity.js';

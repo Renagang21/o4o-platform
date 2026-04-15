@@ -2,16 +2,20 @@
  * StorefrontProductDetailPage — Public Product Detail
  *
  * WO-O4O-KPA-CUSTOMER-COMMERCE-LOOP-V1
+ * WO-STORE-PRODUCT-DESCRIPTION-OVERRIDE-V1 (설명 수정 기능)
  *
  * 경로: /store/:slug/products/:id
- * 공개 페이지 — 인증 불필요
+ * 공개 페이지 — 인증 불필요 (매장 owner 인증 시 설명 수정 가능)
  *
  * API: GET /api/v1/stores/:slug/products/:id (이미 구현됨)
+ * API: PATCH /api/v1/store/products/:id/description (매장 owner용)
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ShoppingCart, ArrowLeft, Plus, Minus } from 'lucide-react';
+import { ShoppingCart, ArrowLeft, Plus, Minus, Edit3, X, Save } from 'lucide-react';
+import { ContentRenderer, RichTextEditor } from '@o4o/content-editor';
+import { getAccessToken } from '../../contexts/AuthContext';
 import * as cartService from '../../services/cartService';
 import { extractReferralFromUrl, saveReferralCookie } from '../../utils/referral';
 
@@ -23,6 +27,7 @@ interface ProductDetail {
   id: string;
   name: string;
   description?: string;
+  shortDescription?: string;
   category?: string;
   manufacturer?: string;
   barcode?: string;
@@ -50,7 +55,8 @@ async function fetchProduct(slug: string, productId: string): Promise<ProductDet
   return {
     id: p.id,
     name: p.name || p.productName || '상품',
-    description: p.description,
+    description: p.description || undefined,
+    shortDescription: p.short_description || p.shortDescription || undefined,
     category: p.category,
     manufacturer: p.manufacturer || p.manufacturerName,
     barcode: p.barcode,
@@ -59,6 +65,33 @@ async function fetchProduct(slug: string, productId: string): Promise<ProductDet
     imageUrl: p.imageUrl || p.image_url,
     supplierName: p.supplierName || p.supplier_name,
   };
+}
+
+// ============================================================================
+// Description Update API (authenticated, store owner only)
+// ============================================================================
+
+async function updateProductDescription(
+  productId: string,
+  payload: { description?: string; shortDescription?: string },
+): Promise<{ success: boolean; error?: string }> {
+  const token = getAccessToken();
+  if (!token) return { success: false, error: '로그인이 필요합니다.' };
+
+  const base = import.meta.env.VITE_API_BASE_URL || '';
+  const res = await fetch(`${base}/api/v1/store/products/${productId}/description`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+  const json = await res.json();
+  if (!res.ok || !json.success) {
+    return { success: false, error: json.error?.message || '저장에 실패했습니다.' };
+  }
+  return { success: true };
 }
 
 // ============================================================================
@@ -74,6 +107,19 @@ export function StorefrontProductDetailPage() {
   const [quantity, setQuantity] = useState(1);
   const [addedToCart, setAddedToCart] = useState(false);
   const [cartCount, setCartCount] = useState(0);
+
+  // Description editing state (store owner only)
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [editingDescription, setEditingDescription] = useState(false);
+  const [editDesc, setEditDesc] = useState('');
+  const [editShortDesc, setEditShortDesc] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  // Check if user is authenticated (store owner can edit descriptions)
+  useEffect(() => {
+    setIsAuthenticated(!!getAccessToken());
+  }, []);
 
   // WO-O4O-REFERRAL-ATTRIBUTION-V1: ref 파라미터 → cookie 저장
   useEffect(() => {
@@ -109,6 +155,31 @@ export function StorefrontProductDetailPage() {
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 2000);
   };
+
+  const handleEditDescription = useCallback(() => {
+    if (!product) return;
+    setEditDesc(product.description || '');
+    setEditShortDesc(product.shortDescription || '');
+    setSaveError(null);
+    setEditingDescription(true);
+  }, [product]);
+
+  const handleSaveDescription = useCallback(async () => {
+    if (!product || !id) return;
+    setSaving(true);
+    setSaveError(null);
+    const result = await updateProductDescription(id, {
+      description: editDesc,
+      shortDescription: editShortDesc,
+    });
+    setSaving(false);
+    if (result.success) {
+      setProduct({ ...product, description: editDesc || undefined, shortDescription: editShortDesc || undefined });
+      setEditingDescription(false);
+    } else {
+      setSaveError(result.error || '저장에 실패했습니다.');
+    }
+  }, [product, id, editDesc, editShortDesc]);
 
   const displayPrice = product ? (product.salePrice ?? product.price) : null;
 
@@ -205,15 +276,131 @@ export function StorefrontProductDetailPage() {
             </div>
           )}
 
+          {/* Short Description */}
+          {product.shortDescription && (
+            <div style={{ marginTop: '16px' }}>
+              <div style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.6 }}>
+                <ContentRenderer html={product.shortDescription} />
+              </div>
+            </div>
+          )}
+
           {/* Description */}
           {product.description && (
             <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid #f1f5f9' }}>
               <h3 style={{ fontSize: '15px', fontWeight: 600, color: '#334155', marginBottom: '8px' }}>상품 설명</h3>
-              <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{product.description}</p>
+              <ContentRenderer html={product.description} variant="product-detail" />
+            </div>
+          )}
+
+          {/* Edit Description Button (store owner only) */}
+          {isAuthenticated && (
+            <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid #f1f5f9' }}>
+              <button
+                onClick={handleEditDescription}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '6px',
+                  padding: '8px 16px', borderRadius: '8px',
+                  border: '1px solid #e2e8f0', backgroundColor: '#fff',
+                  color: '#475569', fontSize: '13px', cursor: 'pointer',
+                }}
+              >
+                <Edit3 size={14} />
+                설명 수정
+              </button>
             </div>
           )}
         </div>
       </main>
+
+      {/* Description Edit Modal */}
+      {editingDescription && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 100,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: '16px',
+        }}>
+          <div style={{
+            backgroundColor: '#fff', borderRadius: '12px', width: '100%', maxWidth: '640px',
+            maxHeight: '90vh', overflow: 'auto', padding: '24px',
+          }}>
+            {/* Modal Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a' }}>상품 설명 수정</h2>
+              <button
+                onClick={() => setEditingDescription(false)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
+              >
+                <X size={20} color="#64748b" />
+              </button>
+            </div>
+
+            {/* Short Description */}
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+                간이 설명
+              </label>
+              <textarea
+                value={editShortDesc}
+                onChange={(e) => setEditShortDesc(e.target.value)}
+                placeholder="간단한 상품 소개 (선택)"
+                rows={3}
+                style={{
+                  width: '100%', padding: '10px 12px', borderRadius: '8px',
+                  border: '1px solid #e2e8f0', fontSize: '14px', lineHeight: 1.5,
+                  resize: 'vertical', fontFamily: 'inherit',
+                }}
+              />
+            </div>
+
+            {/* Description (RichTextEditor) */}
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+                상세 설명
+              </label>
+              <RichTextEditor
+                value={editDesc}
+                onChange={setEditDesc}
+                placeholder="상세 상품 설명을 입력하세요..."
+                minHeight="250px"
+                preset="compact"
+              />
+            </div>
+
+            {/* Error */}
+            {saveError && (
+              <p style={{ fontSize: '13px', color: '#dc2626', marginBottom: '12px' }}>{saveError}</p>
+            )}
+
+            {/* Actions */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+              <button
+                onClick={() => setEditingDescription(false)}
+                style={{
+                  padding: '10px 20px', borderRadius: '8px', fontSize: '14px', fontWeight: 500,
+                  border: '1px solid #e2e8f0', backgroundColor: '#fff', color: '#475569', cursor: 'pointer',
+                }}
+              >
+                취소
+              </button>
+              <button
+                onClick={handleSaveDescription}
+                disabled={saving}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '6px',
+                  padding: '10px 20px', borderRadius: '8px', fontSize: '14px', fontWeight: 600,
+                  border: 'none', backgroundColor: saving ? '#93c5fd' : '#2563eb', color: '#fff',
+                  cursor: saving ? 'not-allowed' : 'pointer',
+                }}
+              >
+                <Save size={16} />
+                {saving ? '저장 중...' : '저장'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Bottom Bar — Add to Cart */}
       <div style={{
