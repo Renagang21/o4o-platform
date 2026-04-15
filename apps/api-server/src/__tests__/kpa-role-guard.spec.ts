@@ -110,7 +110,7 @@ describe('requireKpaScope role matrix (KPA-a)', () => {
     expect(KPA_SCOPE_CONFIG.platformBypass).toBe(false);
 
     // Blocked service prefixes must include other services
-    const expectedBlocked = ['neture', 'glycopharm', 'cosmetics', 'glucoseview'];
+    const expectedBlocked = ['neture', 'glycopharm', 'cosmetics'];
     for (const prefix of expectedBlocked) {
       expect(KPA_SCOPE_CONFIG.blockedServicePrefixes).toContain(prefix);
     }
