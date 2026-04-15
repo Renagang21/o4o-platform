@@ -167,17 +167,6 @@ import {
 // ============================================================================
 // GLUCOSEVIEW ENTITIES (Phase C-1, C-2, C-3)
 // ============================================================================
-import {
-  GlucoseViewVendor,
-  GlucoseViewViewProfile,
-  GlucoseViewConnection,
-  GlucoseViewCustomer,
-  GlucoseViewBranch,
-  GlucoseViewChapter,
-  GlucoseViewPharmacist,
-  GlucoseViewApplication,
-  GlucoseViewPharmacy,
-} from '../routes/glucoseview/entities/index.js';
 
 // CARE MODULE ENTITIES (WO-CARE-KPI-SNAPSHOT-V1, WO-CARE-COACHING-ENGINE-V1)
 import { CareKpiSnapshot } from '../modules/care/entities/care-kpi-snapshot.entity.js';
@@ -318,6 +307,7 @@ import { KpaExternalExpertProfile } from '../routes/kpa/entities/kpa-external-ex
 import { KpaSupplierStaffProfile } from '../routes/kpa/entities/kpa-supplier-staff-profile.entity.js';
 import { MemberQualification } from '../routes/kpa/entities/member-qualification.entity.js';
 import { QualificationRequest } from '../routes/kpa/entities/qualification-request.entity.js';
+import { InstructorProfile } from '../routes/kpa/entities/instructor-profile.entity.js';
 
 // ============================================================================
 // PARTNER DASHBOARD ENTITIES (WO-PARTNER-DASHBOARD-API-BE-IMPLEMENTATION-V1)
@@ -716,18 +706,6 @@ export const AppDataSource = new DataSource({
     StoreBlogPost, // WO-STORE-BLOG-CHANNEL-V1
     GlycopharmPharmacyExtension, // WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1
     // ============================================================================
-    // GLUCOSEVIEW ENTITIES (Phase C-1, C-2, C-3: API + Customer + Pharmacist)
-    // ============================================================================
-    GlucoseViewVendor,
-    GlucoseViewViewProfile,
-    GlucoseViewConnection,
-    GlucoseViewCustomer,
-    GlucoseViewBranch,
-    GlucoseViewChapter,
-    GlucoseViewPharmacist,
-    GlucoseViewApplication,
-    GlucoseViewPharmacy,
-    // ============================================================================
     // CARE MODULE ENTITIES (WO-CARE-KPI-SNAPSHOT-V1, WO-CARE-COACHING-ENGINE-V1)
     // ============================================================================
     CareKpiSnapshot,
@@ -851,6 +829,8 @@ export const AppDataSource = new DataSource({
     // WO-O4O-QUALIFICATION-SYSTEM-V1
     MemberQualification,
     QualificationRequest,
+    // WO-O4O-INSTRUCTOR-APPLICATION-V1
+    InstructorProfile,
     // WO-O4O-SERVICE-PRODUCT-LAYER-PREP-V1
     ServiceProduct,
     // ============================================================================

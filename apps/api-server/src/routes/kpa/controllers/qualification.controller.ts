@@ -17,6 +17,7 @@ import { DataSource } from 'typeorm';
 import type { AuthRequest } from '../../../types/auth.js';
 import { MemberQualification, QUALIFICATION_TYPES } from '../entities/member-qualification.entity.js';
 import { QualificationRequest } from '../entities/qualification-request.entity.js';
+import { InstructorProfile } from '../entities/instructor-profile.entity.js'; // WO-O4O-INSTRUCTOR-APPLICATION-V1
 
 type AuthMiddleware = RequestHandler;
 type ScopeMiddleware = (scope: string) => RequestHandler;
@@ -38,6 +39,7 @@ export function createQualificationController(
   const router = Router();
   const qualRepo = dataSource.getRepository(MemberQualification);
   const reqRepo = dataSource.getRepository(QualificationRequest);
+  const profileRepo = dataSource.getRepository(InstructorProfile); // WO-O4O-INSTRUCTOR-APPLICATION-V1
 
   /**
    * POST /qualifications/apply
@@ -55,6 +57,22 @@ export function createQualificationController(
       const userId = req.user!.id;
       const qualType = req.body.qualificationType as string;
       const requestData = req.body.data || {};
+
+      // WO-O4O-INSTRUCTOR-APPLICATION-V1: instructor 필수 필드 검증
+      if (qualType === 'instructor') {
+        const missing: string[] = [];
+        if (!requestData.displayName?.trim()) missing.push('displayName');
+        if (!Array.isArray(requestData.expertise) || requestData.expertise.length === 0) missing.push('expertise');
+        if (!requestData.lecturePlanSummary?.trim()) missing.push('lecturePlanSummary');
+        if (missing.length > 0) {
+          res.status(400).json({
+            success: false,
+            error: '강사 신청 필수 항목이 누락되었습니다.',
+            details: missing.map(f => ({ field: f, message: `${f} is required for instructor application` })),
+          });
+          return;
+        }
+      }
 
       try {
         // 이미 approved 또는 pending 자격이 있으면 중복 방지
@@ -250,6 +268,33 @@ export function createQualificationController(
             qual.approved_at = null;
           }
           await qualRepo.save(qual);
+        }
+
+        // WO-O4O-INSTRUCTOR-APPLICATION-V1: instructor 승인 시 profile 생성
+        if (newStatus === 'approved' && qReq.qualification_type === 'instructor') {
+          try {
+            const rd = qReq.request_data as Record<string, any>;
+            const existingProfile = await profileRepo.findOne({ where: { user_id: qReq.user_id } });
+            if (!existingProfile) {
+              const profile = profileRepo.create({
+                user_id: qReq.user_id,
+                display_name: rd.displayName || '',
+                organization: rd.organization || null,
+                job_title: rd.jobTitle || null,
+                expertise: Array.isArray(rd.expertise) ? rd.expertise : [],
+                bio: rd.bio || null,
+                experience: rd.experience || null,
+                lecture_topics: Array.isArray(rd.lectureTopics) ? rd.lectureTopics : [],
+                lecture_plan_summary: rd.lecturePlanSummary || null,
+                portfolio_url: rd.portfolioUrl || null,
+                is_active: true,
+              });
+              await profileRepo.save(profile);
+            }
+          } catch (profileErr) {
+            console.error('[Qualification] instructor_profile creation failed:', profileErr);
+            // 프로필 생성 실패는 승인 결과에 영향 없음 (로그만)
+          }
         }
 
         res.json({ success: true, data: qReq });

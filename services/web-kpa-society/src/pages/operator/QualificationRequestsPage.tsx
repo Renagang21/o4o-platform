@@ -24,6 +24,60 @@ const STATUS_COLORS: Record<string, string> = {
   rejected: '#ef4444',
 };
 
+const INSTRUCTOR_FIELD_LABELS: Record<string, string> = {
+  displayName: '표시 이름',
+  organization: '소속 기관',
+  jobTitle: '직책',
+  expertise: '전문 분야',
+  bio: '자기소개',
+  experience: '경력 사항',
+  lectureTopics: '강의 주제',
+  lecturePlanSummary: '강의 계획 요약',
+  portfolioUrl: '포트폴리오 URL',
+};
+
+function TagList({ items }: { items: string[] }) {
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+      {items.map((tag, i) => (
+        <span key={i} style={{ padding: '2px 10px', backgroundColor: '#e0f2fe', color: '#0369a1', borderRadius: '12px', fontSize: '12px', fontWeight: 500 }}>
+          {tag}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function InstructorRequestDetail({ data }: { data: Record<string, any> }) {
+  const orderedKeys = ['displayName', 'organization', 'jobTitle', 'expertise', 'bio', 'experience', 'lectureTopics', 'lecturePlanSummary', 'portfolioUrl'];
+  const displayed = new Set<string>();
+
+  return (
+    <>
+      {orderedKeys.map(k => {
+        if (!(k in data)) return null;
+        displayed.add(k);
+        const v = data[k];
+        const label = INSTRUCTOR_FIELD_LABELS[k] || k;
+        return (
+          <div key={k} style={styles.detailRow}>
+            <span style={styles.detailLabel}>{label}</span>
+            <span style={{ ...styles.detailValue }}>
+              {Array.isArray(v) ? <TagList items={v} /> : String(v || '-')}
+            </span>
+          </div>
+        );
+      })}
+      {Object.entries(data).filter(([k]) => !displayed.has(k)).map(([k, v]) => (
+        <div key={k} style={styles.detailRow}>
+          <span style={styles.detailLabel}>{k}</span>
+          <span style={styles.detailValue}>{Array.isArray(v) ? v.join(', ') : String(v)}</span>
+        </div>
+      ))}
+    </>
+  );
+}
+
 export default function QualificationRequestsPage() {
   const [requests, setRequests] = useState<QualificationRequest[]>([]);
   const [total, setTotal] = useState(0);
@@ -175,12 +229,15 @@ export default function QualificationRequestsPage() {
               <span>{new Date(selectedRequest.created_at).toLocaleDateString('ko-KR')}</span>
             </div>
 
-            {Object.entries(selectedRequest.request_data).map(([k, v]) => (
-              <div key={k} style={styles.detailRow}>
-                <span style={styles.detailLabel}>{k}</span>
-                <span style={styles.detailValue}>{String(v)}</span>
-              </div>
-            ))}
+            {selectedRequest.qualification_type === 'instructor'
+              ? <InstructorRequestDetail data={selectedRequest.request_data as Record<string, any>} />
+              : Object.entries(selectedRequest.request_data).map(([k, v]) => (
+                  <div key={k} style={styles.detailRow}>
+                    <span style={styles.detailLabel}>{k}</span>
+                    <span style={styles.detailValue}>{String(v)}</span>
+                  </div>
+                ))
+            }
 
             <div style={styles.formGroup}>
               <label style={styles.label}>검토 의견 (선택)</label>
