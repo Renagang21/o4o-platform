@@ -74,7 +74,7 @@ import { PolicyPage, PrivacyPage } from './pages/legal';
 import { OrganizationAboutPage, OfficersPage, ContactPage } from './pages/organization';
 
 // MyPage pages
-import { MyDashboardPage, MyProfilePage, MySettingsPage, MyCertificatesPage, PersonalStatusReportPage, AnnualReportFormPage, MyForumDashboardPage, RequestCategoryPage as KpaRequestCategoryPage, MyRequestsPage, ForumMemberManagementPage, MyQualificationsPage } from './pages/mypage';
+import { MyDashboardPage, MyProfilePage, MySettingsPage, MyCertificatesPage, PersonalStatusReportPage, AnnualReportFormPage, MyForumDashboardPage, RequestCategoryPage as KpaRequestCategoryPage, MyRequestsPage, ForumMemberManagementPage, MyQualificationsPage, MyEnrollmentsPage } from './pages/mypage';
 
 // Admin Routes (지부 관리자)
 import { AdminRoutes } from './routes/AdminRoutes';
@@ -593,6 +593,7 @@ function App() {
           <Route path="/mypage/my-requests" element={<Layout serviceName={SERVICE_NAME}><MyRequestsPage /></Layout>} />
           {/* WO-O4O-QUALIFICATION-SYSTEM-V1 */}
           <Route path="/mypage/qualifications" element={<Layout serviceName={SERVICE_NAME}><MyQualificationsPage /></Layout>} />
+          <Route path="/mypage/enrollments" element={<Layout serviceName={SERVICE_NAME}><MyEnrollmentsPage /></Layout>} />
 
           {/* Participation (참여) */}
           <Route path="/participation" element={<Layout serviceName={SERVICE_NAME}><ParticipationListPage /></Layout>} />

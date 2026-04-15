@@ -9,3 +9,4 @@ export { default as RequestCategoryPage } from './RequestCategoryPage';
 export { default as MyRequestsPage } from './MyRequestsPage';
 export { default as ForumMemberManagementPage } from './ForumMemberManagementPage';
 export { MyQualificationsPage } from './MyQualificationsPage';
+export { MyEnrollmentsPage } from './MyEnrollmentsPage'; // WO-O4O-ENROLLMENT-SYSTEM-V1
