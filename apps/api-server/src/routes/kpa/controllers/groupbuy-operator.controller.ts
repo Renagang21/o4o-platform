@@ -119,11 +119,12 @@ export function createGroupbuyOperatorController(
           SELECT
             spo.id,
             COALESCE(pm.marketing_name, '(상품명 없음)') AS title,
-            COALESCE(ns.name, '(공급사 없음)') AS "supplierName",
+            COALESCE(org.name, '(공급사 없음)') AS "supplierName",
             spo.price_general::numeric AS price
           FROM supplier_product_offers spo
           LEFT JOIN product_masters pm ON pm.id = spo.master_id
           LEFT JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+          LEFT JOIN organizations org ON org.id = ns.organization_id
           WHERE spo.approval_status = 'APPROVED'
             AND spo.is_active = true
             AND spo.id NOT IN (
@@ -164,13 +165,14 @@ export function createGroupbuyOperatorController(
             opl.is_active AS "isVisible",
             opl.created_at AS "startDate",
             COALESCE(pm.marketing_name, '(상품명 없음)') AS title,
-            COALESCE(ns.name, '(공급사 없음)') AS "supplierName",
+            COALESCE(org.name, '(공급사 없음)') AS "supplierName",
             CONCAT('단가: ', COALESCE(spo.price_general::text, '미정'), '원') AS "conditionSummary",
             COALESCE(oc.order_count, 0)::int AS "orderCount",
             COALESCE(oc.participant_count, 0)::int AS "participantCount"
           FROM organization_product_listings opl
           LEFT JOIN supplier_product_offers spo ON spo.id = opl.offer_id
           LEFT JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+          LEFT JOIN organizations org ON org.id = ns.organization_id
           LEFT JOIN product_masters pm ON pm.id = opl.master_id
           LEFT JOIN (
             SELECT
@@ -303,10 +305,11 @@ export function createGroupbuyOperatorController(
         const offerRows = await dataSource.query(
           `SELECT spo.master_id, spo.price_general,
                   pm.marketing_name,
-                  ns.name
+                  org.name AS org_name
            FROM supplier_product_offers spo
            LEFT JOIN product_masters pm ON pm.id = spo.master_id
            LEFT JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+           LEFT JOIN organizations org ON org.id = ns.organization_id
            WHERE spo.id = $1`,
           [offerId]
         );
@@ -340,7 +343,7 @@ export function createGroupbuyOperatorController(
             id: saved.id,
             offerId,
             title: offer.marketing_name || '(상품명 없음)',
-            supplierName: offer.name || '(공급사 없음)',
+            supplierName: offer.org_name || '(공급사 없음)',
             conditionSummary: `단가: ${offer.price_general ?? '미정'}원`,
             orderCount: 0,
             participantCount: 0,

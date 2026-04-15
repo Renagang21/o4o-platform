@@ -86,11 +86,12 @@ export function createSupplierOffersController(
             spo.id,
             spo.master_id AS "masterId",
             COALESCE(pm.marketing_name, '(상품명 없음)') AS title,
-            COALESCE(ns.name, '(공급사 없음)') AS "supplierName",
+            COALESCE(org.name, '(공급사 없음)') AS "supplierName",
             spo.price_general::numeric AS price,
             spo.approval_status AS "approvalStatus"
           FROM supplier_product_offers spo
           JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+          LEFT JOIN organizations org ON org.id = ns.organization_id
           LEFT JOIN product_masters pm ON pm.id = spo.master_id
           WHERE spo.supplier_id = $1
             AND spo.approval_status = 'APPROVED'
@@ -135,11 +136,12 @@ export function createSupplierOffersController(
             opl.is_active AS "isActive",
             opl.created_at AS "proposedAt",
             COALESCE(pm.marketing_name, '(상품명 없음)') AS title,
-            COALESCE(ns.name, '(공급사 없음)') AS "supplierName",
+            COALESCE(org.name, '(공급사 없음)') AS "supplierName",
             spo.price_general::numeric AS price
           FROM organization_product_listings opl
           JOIN supplier_product_offers spo ON spo.id = opl.offer_id
           JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+          LEFT JOIN organizations org ON org.id = ns.organization_id
           LEFT JOIN product_masters pm ON pm.id = spo.master_id
           WHERE opl.service_key = 'kpa-groupbuy'
             AND spo.supplier_id = $1
@@ -194,9 +196,10 @@ export function createSupplierOffersController(
         const offerRows = await dataSource.query(
           `SELECT spo.id, spo.master_id, spo.price_general,
                   spo.approval_status, spo.is_active,
-                  pm.marketing_name, ns.name
+                  pm.marketing_name, org.name AS org_name
            FROM supplier_product_offers spo
            JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+           LEFT JOIN organizations org ON org.id = ns.organization_id
            LEFT JOIN product_masters pm ON pm.id = spo.master_id
            WHERE spo.id = $1`,
           [offerId]
@@ -262,7 +265,7 @@ export function createSupplierOffersController(
             id: saved.id,
             offerId,
             title: offer.marketing_name || '(상품명 없음)',
-            supplierName: offer.name || '(공급사 없음)',
+            supplierName: offer.org_name || '(공급사 없음)',
             status: 'pending',
             isActive: false,
             proposedAt,
