@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Clock, CheckCircle, XCircle, Building2, Truck, Monitor, ChevronRight, Filter } from 'lucide-react';
+import { DataTable } from '@o4o/ui';
+import type { Column } from '@o4o/ui';
 import { glycopharmApi } from '@/api/glycopharm';
 import type { AdminApplication, ApplicationStatus, ServiceType, OrganizationType } from '@/api/glycopharm';
 
@@ -179,116 +181,96 @@ export default function ApplicationsPage() {
         </div>
       )}
 
-      {/* Applications List */}
-      {!loading && !error && applications.length > 0 && (
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-200">
-              <tr>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">약국명</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">신청자</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">서비스</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">상태</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">신청일</th>
-                <th className="px-4 py-3"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {applications.map((app) => {
-                const statusConfig = STATUS_CONFIG[app.status];
-                const StatusIcon = statusConfig.icon;
+      {/* Applications Table */}
+      {!error && (() => {
+        const columns: Column<AdminApplication>[] = [
+          {
+            key: 'organizationName',
+            title: '약국명',
+            render: (_v, app) => (
+              <div>
+                <p className="font-medium text-slate-800">{app.organizationName}</p>
+                <p className="text-xs text-slate-500">
+                  {app.organizationType === 'pharmacy' ? '개인 약국' : '약국 체인'}
+                </p>
+              </div>
+            ),
+          },
+          {
+            key: 'userName',
+            title: '신청자',
+            render: (_v, app) => (
+              <div>
+                <p className="text-sm text-slate-700">{app.userName || '-'}</p>
+                <p className="text-xs text-slate-500">{app.userEmail || '-'}</p>
+              </div>
+            ),
+          },
+          {
+            key: 'serviceTypes',
+            title: '서비스',
+            render: (_v, app) => (
+              <div className="flex flex-wrap gap-1">
+                {app.serviceTypes.map((serviceType) => (
+                  <span key={serviceType} className="inline-flex items-center px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded">
+                    {SERVICE_LABELS[serviceType]?.label ?? serviceType}
+                  </span>
+                ))}
+              </div>
+            ),
+          },
+          {
+            key: 'status',
+            title: '상태',
+            width: '120px',
+            render: (_v, app) => {
+              const cfg = STATUS_CONFIG[app.status];
+              const Icon = cfg.icon;
+              return (
+                <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${cfg.bgColor} ${cfg.textColor}`}>
+                  <Icon className="w-3 h-3" />
+                  {cfg.label}
+                </span>
+              );
+            },
+          },
+          {
+            key: 'submittedAt',
+            title: '신청일',
+            width: '100px',
+            render: (_v, app) => (
+              <span className="text-sm text-slate-600">{new Date(app.submittedAt).toLocaleDateString('ko-KR')}</span>
+            ),
+          },
+          {
+            key: 'actions',
+            title: '',
+            width: '60px',
+            align: 'right',
+            render: (_v, app) => (
+              <Link to={`/operator/applications/${app.id}`} className="inline-flex items-center gap-1 text-primary-600 hover:text-primary-700 text-sm font-medium">
+                상세<ChevronRight className="w-4 h-4" />
+              </Link>
+            ),
+          },
+        ];
 
-                return (
-                  <tr key={app.id} className="hover:bg-slate-50">
-                    <td className="px-4 py-4">
-                      <div>
-                        <p className="font-medium text-slate-800">{app.organizationName}</p>
-                        <p className="text-xs text-slate-500">
-                          {app.organizationType === 'pharmacy' ? '개인 약국' : '약국 체인'}
-                        </p>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <div>
-                        <p className="text-sm text-slate-700">{app.userName || '-'}</p>
-                        <p className="text-xs text-slate-500">{app.userEmail || '-'}</p>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <div className="flex flex-wrap gap-1">
-                        {app.serviceTypes.map((serviceType) => {
-                          const service = SERVICE_LABELS[serviceType];
-                          return (
-                            <span
-                              key={serviceType}
-                              className="inline-flex items-center px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded"
-                            >
-                              {service.label}
-                            </span>
-                          );
-                        })}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${statusConfig.bgColor} ${statusConfig.textColor}`}>
-                        <StatusIcon className="w-3 h-3" />
-                        {statusConfig.label}
-                      </span>
-                    </td>
-                    <td className="px-4 py-4">
-                      <span className="text-sm text-slate-600">
-                        {new Date(app.submittedAt).toLocaleDateString('ko-KR')}
-                      </span>
-                    </td>
-                    <td className="px-4 py-4">
-                      <Link
-                        to={`/operator/applications/${app.id}`}
-                        className="inline-flex items-center gap-1 text-primary-600 hover:text-primary-700 text-sm font-medium"
-                      >
-                        상세
-                        <ChevronRight className="w-4 h-4" />
-                      </Link>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2 py-4 border-t border-slate-100">
-              <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page === 1}
-                className="px-3 py-1 text-sm text-slate-600 hover:bg-slate-100 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                이전
-              </button>
-              <span className="text-sm text-slate-600">
-                {page} / {totalPages}
-              </span>
-              <button
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={page === totalPages}
-                className="px-3 py-1 text-sm text-slate-600 hover:bg-slate-100 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                다음
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Empty State */}
-      {!loading && !error && applications.length === 0 && (
-        <div className="bg-white rounded-xl shadow-sm p-12 text-center">
-          <Building2 className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-          <p className="text-slate-500">
-            {hasFilters ? '조건에 맞는 신청이 없습니다.' : '신청 내역이 없습니다.'}
-          </p>
-        </div>
-      )}
+        return (
+          <DataTable<AdminApplication>
+            columns={columns}
+            dataSource={applications}
+            rowKey="id"
+            loading={loading}
+            emptyText={hasFilters ? '조건에 맞는 신청이 없습니다.' : '신청 내역이 없습니다.'}
+            pagination={{
+              current: page,
+              pageSize: 20,
+              total,
+              onChange: (p) => setPage(p),
+            }}
+          />
+        );
+      })()}
     </div>
   );
 }

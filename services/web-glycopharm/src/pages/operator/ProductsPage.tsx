@@ -14,12 +14,12 @@ import {
   RefreshCw,
   Loader2,
   AlertCircle,
-  ChevronRight,
-  ChevronLeft,
   Image,
   Truck,
   Copy,
 } from 'lucide-react';
+import { DataTable } from '@o4o/ui';
+import type { Column } from '@o4o/ui';
 import { api } from '../../lib/apiClient';
 
 // ─── Types ───────────────────────────────────────────────────
@@ -227,140 +227,83 @@ export default function ProductsPage() {
           </div>
         </div>
 
-        {/* Loading */}
-        {isLoading && products.length === 0 && (
-          <div className="flex items-center justify-center py-20">
-            <div className="flex flex-col items-center gap-3">
-              <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
-              <p className="text-slate-500 text-sm">상품 데이터 로딩 중...</p>
-            </div>
-          </div>
-        )}
-
         {/* Table */}
-        {(!isLoading || products.length > 0) && (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-slate-50 border-b border-slate-100">
-                <tr>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">이미지</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">상품명</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">바코드</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">브랜드</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">카테고리</th>
-                  <th className="text-center px-4 py-3 text-xs font-medium text-slate-500 uppercase">공급자</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">생성일</th>
-                  <th className="w-10"></th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {products.length === 0 && !isLoading ? (
-                  <tr>
-                    <td colSpan={8} className="px-4 py-12 text-center text-slate-400 text-sm">
-                      상품 데이터가 없습니다
-                    </td>
-                  </tr>
-                ) : (
-                  products.map((product) => (
-                    <tr
-                      key={product.id}
-                      onClick={() => navigate(`/operator/products/${product.id}`)}
-                      className="hover:bg-slate-50 transition-colors cursor-pointer"
-                    >
-                      <td className="px-4 py-3">
-                        {product.primaryImage ? (
-                          <img
-                            src={product.primaryImage}
-                            alt={product.marketingName}
-                            className="w-10 h-10 rounded-lg object-cover border border-slate-200"
-                          />
-                        ) : (
-                          <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
-                            <Package className="w-5 h-5 text-slate-300" />
-                          </div>
-                        )}
-                      </td>
-                      <td className="px-4 py-3">
-                        <p className="font-medium text-slate-800 text-sm">{product.marketingName}</p>
-                        {product.regulatoryName && product.regulatoryName !== product.marketingName && (
-                          <p className="text-xs text-slate-400 mt-0.5 truncate max-w-[240px]">{product.regulatoryName}</p>
-                        )}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className="font-mono text-xs text-slate-600 bg-slate-50 px-2 py-1 rounded">
-                          {product.barcode}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-slate-600">
-                        {product.brandName || <span className="text-slate-300">-</span>}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-slate-600">
-                        {product.categoryName || <span className="text-slate-300">-</span>}
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-medium ${
-                          product.supplierCount > 0
-                            ? 'bg-blue-100 text-blue-700'
-                            : 'bg-slate-100 text-slate-400'
-                        }`}>
-                          {product.supplierCount}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-slate-500">
-                        {formatDate(product.createdAt)}
-                      </td>
-                      <td className="px-4 py-3">
-                        <ChevronRight className="w-4 h-4 text-slate-300" />
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
+        {(() => {
+          const columns: Column<ProductData>[] = [
+            {
+              key: 'primaryImage',
+              title: '이미지',
+              width: '70px',
+              render: (_v, p) => p.primaryImage
+                ? <img src={p.primaryImage} alt={p.marketingName} className="w-10 h-10 rounded-lg object-cover border border-slate-200" />
+                : <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center"><Package className="w-5 h-5 text-slate-300" /></div>,
+            },
+            {
+              key: 'marketingName',
+              title: '상품명',
+              render: (_v, p) => (
+                <div>
+                  <p className="font-medium text-slate-800 text-sm">{p.marketingName}</p>
+                  {p.regulatoryName && p.regulatoryName !== p.marketingName && (
+                    <p className="text-xs text-slate-400 mt-0.5 truncate max-w-[240px]">{p.regulatoryName}</p>
+                  )}
+                </div>
+              ),
+            },
+            {
+              key: 'barcode',
+              title: '바코드',
+              width: '130px',
+              render: (_v, p) => <span className="font-mono text-xs text-slate-600 bg-slate-50 px-2 py-1 rounded">{p.barcode}</span>,
+            },
+            {
+              key: 'brandName',
+              title: '브랜드',
+              width: '120px',
+              render: (_v, p) => p.brandName ? <span className="text-sm text-slate-600">{p.brandName}</span> : <span className="text-slate-300">-</span>,
+            },
+            {
+              key: 'categoryName',
+              title: '카테고리',
+              width: '120px',
+              render: (_v, p) => p.categoryName ? <span className="text-sm text-slate-600">{p.categoryName}</span> : <span className="text-slate-300">-</span>,
+            },
+            {
+              key: 'supplierCount',
+              title: '공급자',
+              width: '70px',
+              align: 'right',
+              render: (_v, p) => (
+                <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-medium ${p.supplierCount > 0 ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-400'}`}>
+                  {p.supplierCount}
+                </span>
+              ),
+            },
+            {
+              key: 'createdAt',
+              title: '생성일',
+              width: '100px',
+              render: (_v, p) => <span className="text-sm text-slate-500">{formatDate(p.createdAt)}</span>,
+            },
+          ];
 
-        {/* Pagination */}
-        {!isLoading && pagination.totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100">
-            <p className="text-sm text-slate-500">
-              총 {pagination.total}개 중 {(pagination.page - 1) * pagination.limit + 1}-
-              {Math.min(pagination.page * pagination.limit, pagination.total)}개 표시
-            </p>
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
-                className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
-                const start = Math.max(1, Math.min(currentPage - 2, pagination.totalPages - 4));
-                return start + i;
-              }).filter(p => p <= pagination.totalPages).map((page) => (
-                <button
-                  key={page}
-                  onClick={() => setCurrentPage(page)}
-                  className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
-                    currentPage === page
-                      ? 'bg-primary-500 text-white'
-                      : 'hover:bg-slate-100 text-slate-600'
-                  }`}
-                >
-                  {page}
-                </button>
-              ))}
-              <button
-                onClick={() => setCurrentPage(Math.min(pagination.totalPages, currentPage + 1))}
-                disabled={currentPage === pagination.totalPages}
-                className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        )}
+          return (
+            <DataTable<ProductData>
+              columns={columns}
+              dataSource={products}
+              rowKey="id"
+              loading={isLoading}
+              emptyText="상품 데이터가 없습니다"
+              onRowClick={(p) => navigate(`/operator/products/${p.id}`)}
+              pagination={{
+                current: currentPage,
+                pageSize: pagination.limit,
+                total: pagination.total,
+                onChange: (p) => setCurrentPage(p),
+              }}
+            />
+          );
+        })()}
       </div>
     </div>
   );

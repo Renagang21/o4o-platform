@@ -13,8 +13,6 @@ import {
   Search,
   MapPin,
   MoreVertical,
-  ChevronLeft,
-  ChevronRight,
   Star,
   TrendingUp,
   TrendingDown,
@@ -26,6 +24,8 @@ import {
   BarChart3,
   Loader2,
 } from 'lucide-react';
+import { DataTable } from '@o4o/ui';
+import type { Column } from '@o4o/ui';
 import {
   glycopharmApi,
   type OperatorPharmacy,
@@ -46,16 +46,6 @@ const EMPTY_STATS: OperatorPharmacyStats = {
   totalMonthlyRevenue: 0,
   avgOrdersPerPharmacy: 0,
 };
-
-// Empty state component
-function EmptyState({ message }: { message: string }) {
-  return (
-    <div className="text-center py-12">
-      <AlertCircle size={48} className="mx-auto mb-4 text-slate-300" />
-      <p className="text-slate-500 text-lg">{message}</p>
-    </div>
-  );
-}
 
 // Status badge component
 function StatusBadge({ status }: { status: PharmacyStatus }) {
@@ -359,186 +349,122 @@ export default function PharmaciesPage() {
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto">
-          {pharmacies.length === 0 ? (
-            <EmptyState message="자료가 없습니다" />
-          ) : (
-            <table className="w-full">
-              <thead className="bg-slate-50">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                    약국 정보
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                    지역
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                    등급
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                    상태
-                  </th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
-                    월 주문
-                  </th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
-                    월 매출
-                  </th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
-                    성장률
-                  </th>
-                  <th className="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">
-                    액션
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {pharmacies.map((pharmacy) => (
-                  <tr key={pharmacy.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-4 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center">
-                          <Building2 className="w-5 h-5 text-primary-600" />
-                        </div>
-                        <div>
-                          <p className="font-medium text-slate-800">{pharmacy.name}</p>
-                          <p className="text-xs text-slate-500">{pharmacy.ownerName} | {pharmacy.email}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <div className="flex items-center gap-1 text-sm text-slate-600">
-                        <MapPin className="w-3 h-3" />
-                        {pharmacy.region}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <TierBadge tier={pharmacy.tier} />
-                    </td>
-                    <td className="px-4 py-4">
-                      <StatusBadge status={pharmacy.status} />
-                    </td>
-                    <td className="px-4 py-4 text-right">
-                      <span className="font-medium text-slate-800">{pharmacy.monthlyOrders}</span>
-                      <span className="text-slate-400 text-xs ml-1">건</span>
-                    </td>
-                    <td className="px-4 py-4 text-right">
-                      <span className="font-medium text-slate-800">
-                        {(pharmacy.monthlyRevenue / 10000).toLocaleString()}
-                      </span>
-                      <span className="text-slate-400 text-xs ml-1">만원</span>
-                    </td>
-                    <td className="px-4 py-4 text-right">
-                      <div className={`flex items-center justify-end gap-1 ${
-                        pharmacy.growthRate > 0 ? 'text-green-600' : pharmacy.growthRate < 0 ? 'text-red-600' : 'text-slate-500'
-                      }`}>
-                        {pharmacy.growthRate > 0 ? (
-                          <TrendingUp className="w-3 h-3" />
-                        ) : pharmacy.growthRate < 0 ? (
-                          <TrendingDown className="w-3 h-3" />
-                        ) : null}
-                        <span className="font-medium">{Math.abs(pharmacy.growthRate)}%</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <div className="flex items-center justify-center">
-                        <div className="relative">
-                          <button
-                            onClick={() => setSelectedPharmacy(selectedPharmacy === pharmacy.id ? null : pharmacy.id)}
-                            className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
-                          >
-                            <MoreVertical className="w-4 h-4 text-slate-400" />
-                          </button>
-                          {selectedPharmacy === pharmacy.id && (
-                            <>
-                              <div
-                                className="fixed inset-0 z-10"
-                                onClick={() => setSelectedPharmacy(null)}
-                              />
-                              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border py-2 z-20">
-                                <button className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50">
-                                  상세 보기
-                                </button>
-                                <button className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50">
-                                  주문 내역
-                                </button>
-                                <button className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50">
-                                  성과 분석
-                                </button>
-                                <hr className="my-1" />
-                                {pharmacy.status === 'active' ? (
-                                  <button className="w-full px-4 py-2 text-left text-sm text-amber-600 hover:bg-amber-50">
-                                    일시 정지
-                                  </button>
-                                ) : (
-                                  <button className="w-full px-4 py-2 text-left text-sm text-green-600 hover:bg-green-50">
-                                    활성화
-                                  </button>
-                                )}
-                              </div>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100">
-            <p className="text-sm text-slate-500">
-              총 {totalItems}개 중 {(currentPage - 1) * itemsPerPage + 1}-
-              {Math.min(currentPage * itemsPerPage, totalItems)}개 표시
-            </p>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
-                className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                // Show pages around current page
-                let page: number;
-                if (totalPages <= 5) {
-                  page = i + 1;
-                } else if (currentPage <= 3) {
-                  page = i + 1;
-                } else if (currentPage >= totalPages - 2) {
-                  page = totalPages - 4 + i;
-                } else {
-                  page = currentPage - 2 + i;
-                }
-                return (
-                  <button
-                    key={page}
-                    onClick={() => setCurrentPage(page)}
-                    className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
-                      currentPage === page
-                        ? 'bg-primary-500 text-white'
-                        : 'hover:bg-slate-100 text-slate-600'
-                    }`}
-                  >
-                    {page}
+        {(() => {
+          const columns: Column<OperatorPharmacy>[] = [
+            {
+              key: 'name',
+              title: '약국 정보',
+              render: (_v, p) => (
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center">
+                    <Building2 className="w-5 h-5 text-primary-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-slate-800">{p.name}</p>
+                    <p className="text-xs text-slate-500">{p.ownerName} | {p.email}</p>
+                  </div>
+                </div>
+              ),
+            },
+            {
+              key: 'region',
+              title: '지역',
+              width: '100px',
+              render: (_v, p) => (
+                <div className="flex items-center gap-1 text-sm text-slate-600">
+                  <MapPin className="w-3 h-3" />{p.region}
+                </div>
+              ),
+            },
+            {
+              key: 'tier',
+              title: '등급',
+              width: '100px',
+              render: (_v, p) => <TierBadge tier={p.tier} />,
+            },
+            {
+              key: 'status',
+              title: '상태',
+              width: '110px',
+              render: (_v, p) => <StatusBadge status={p.status} />,
+            },
+            {
+              key: 'monthlyOrders',
+              title: '월 주문',
+              width: '90px',
+              align: 'right',
+              render: (_v, p) => (
+                <span className="font-medium text-slate-800">{p.monthlyOrders}<span className="text-slate-400 text-xs ml-1">건</span></span>
+              ),
+            },
+            {
+              key: 'monthlyRevenue',
+              title: '월 매출',
+              width: '100px',
+              align: 'right',
+              render: (_v, p) => (
+                <span className="font-medium text-slate-800">{(p.monthlyRevenue / 10000).toLocaleString()}<span className="text-slate-400 text-xs ml-1">만원</span></span>
+              ),
+            },
+            {
+              key: 'growthRate',
+              title: '성장률',
+              width: '80px',
+              align: 'right',
+              render: (_v, p) => (
+                <div className={`flex items-center justify-end gap-1 ${p.growthRate > 0 ? 'text-green-600' : p.growthRate < 0 ? 'text-red-600' : 'text-slate-500'}`}>
+                  {p.growthRate > 0 ? <TrendingUp className="w-3 h-3" /> : p.growthRate < 0 ? <TrendingDown className="w-3 h-3" /> : null}
+                  <span className="font-medium">{Math.abs(p.growthRate)}%</span>
+                </div>
+              ),
+            },
+            {
+              key: 'actions',
+              title: '액션',
+              width: '60px',
+              align: 'right',
+              render: (_v, p) => (
+                <div className="relative flex justify-end">
+                  <button onClick={() => setSelectedPharmacy(selectedPharmacy === p.id ? null : p.id)} className="p-2 rounded-lg hover:bg-slate-100 transition-colors">
+                    <MoreVertical className="w-4 h-4 text-slate-400" />
                   </button>
-                );
-              })}
-              <button
-                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                disabled={currentPage === totalPages}
-                className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        )}
+                  {selectedPharmacy === p.id && (
+                    <>
+                      <div className="fixed inset-0 z-10" onClick={() => setSelectedPharmacy(null)} />
+                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border py-2 z-20">
+                        <button className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50">상세 보기</button>
+                        <button className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50">주문 내역</button>
+                        <button className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50">성과 분석</button>
+                        <hr className="my-1" />
+                        {p.status === 'active' ? (
+                          <button className="w-full px-4 py-2 text-left text-sm text-amber-600 hover:bg-amber-50">일시 정지</button>
+                        ) : (
+                          <button className="w-full px-4 py-2 text-left text-sm text-green-600 hover:bg-green-50">활성화</button>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </div>
+              ),
+            },
+          ];
+
+          return (
+            <DataTable<OperatorPharmacy>
+              columns={columns}
+              dataSource={pharmacies}
+              rowKey="id"
+              loading={isLoading}
+              emptyText="자료가 없습니다"
+              pagination={{
+                current: currentPage,
+                pageSize: itemsPerPage,
+                total: totalItems,
+                onChange: (p) => setCurrentPage(p),
+              }}
+            />
+          );
+        })()}
       </div>
     </div>
   );

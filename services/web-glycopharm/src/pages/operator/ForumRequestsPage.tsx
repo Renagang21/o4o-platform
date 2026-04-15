@@ -11,6 +11,8 @@ import {
   AlertCircle,
   RotateCcw,
 } from 'lucide-react';
+import { DataTable } from '@o4o/ui';
+import type { Column } from '@o4o/ui';
 import type { CategoryRequestStatus } from '@/types';
 import { forumRequestApi } from '@/services/api';
 import { toast } from '@o4o/error-handling';
@@ -225,100 +227,81 @@ export default function ForumRequestsPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-slate-50 border-b border-slate-200">
-            <tr>
-              <th className="px-6 py-3 text-left text-sm font-medium text-slate-600">포럼명</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-slate-600">신청자</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-slate-600">신청일</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-slate-600">상태</th>
-              <th className="px-6 py-3 text-right text-sm font-medium text-slate-600">작업</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {filteredRequests.map((request) => {
-              const status = statusConfig[request.status];
+      {(() => {
+        const columns: Column<RequestData>[] = [
+          {
+            key: 'name',
+            title: '포럼명',
+            render: (_v, req) => (
+              <div>
+                <div className="font-medium text-slate-800">{req.name}</div>
+                <div className="text-sm text-slate-500 line-clamp-1">{req.description}</div>
+              </div>
+            ),
+          },
+          {
+            key: 'requesterName',
+            title: '신청자',
+            render: (_v, req) => (
+              <div>
+                <div className="text-slate-800">{req.requesterName}</div>
+                {req.requesterEmail && <div className="text-sm text-slate-500">{req.requesterEmail}</div>}
+              </div>
+            ),
+          },
+          {
+            key: 'createdAt',
+            title: '신청일',
+            width: '160px',
+            render: (_v, req) => <span className="text-sm text-slate-600">{formatDate(req.createdAt)}</span>,
+          },
+          {
+            key: 'status',
+            title: '상태',
+            width: '100px',
+            render: (_v, req) => {
+              const cfg = statusConfig[req.status];
               return (
-                <tr key={request.id} className="hover:bg-slate-50">
-                  <td className="px-6 py-4">
-                    <div>
-                      <div className="font-medium text-slate-800">{request.name}</div>
-                      <div className="text-sm text-slate-500 line-clamp-1">
-                        {request.description}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div>
-                      <div className="text-slate-800">{request.requesterName}</div>
-                      {request.requesterEmail && (
-                        <div className="text-sm text-slate-500">{request.requesterEmail}</div>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-slate-600">
-                    {formatDate(request.createdAt)}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-3 py-1 text-xs font-medium rounded-full ${status.bgColor} ${status.color}`}>
-                      {status.label}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex justify-end gap-2">
-                      <button
-                        onClick={() => setSelectedRequest(request)}
-                        className="p-2 rounded-lg hover:bg-slate-100 text-slate-600"
-                        title="상세보기"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                      {isReviewable(request.status) && (
-                        <>
-                          <button
-                            onClick={() => {
-                              setSelectedRequest(request);
-                              setReviewComment('');
-                            }}
-                            className="p-2 rounded-lg hover:bg-green-100 text-green-600"
-                            title="승인"
-                          >
-                            <CheckCircle className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => {
-                              setSelectedRequest(request);
-                              setReviewComment('');
-                            }}
-                            className="p-2 rounded-lg hover:bg-red-100 text-red-600"
-                            title="거절"
-                          >
-                            <XCircle className="w-4 h-4" />
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </td>
-                </tr>
+                <span className={`px-3 py-1 text-xs font-medium rounded-full ${cfg.bgColor} ${cfg.color}`}>
+                  {cfg.label}
+                </span>
               );
-            })}
-          </tbody>
-        </table>
+            },
+          },
+          {
+            key: 'actions',
+            title: '작업',
+            width: '100px',
+            align: 'right',
+            render: (_v, req) => (
+              <div className="flex justify-end gap-2">
+                <button onClick={() => setSelectedRequest(req)} className="p-2 rounded-lg hover:bg-slate-100 text-slate-600" title="상세보기">
+                  <Eye className="w-4 h-4" />
+                </button>
+                {isReviewable(req.status) && (
+                  <>
+                    <button onClick={() => { setSelectedRequest(req); setReviewComment(''); }} className="p-2 rounded-lg hover:bg-green-100 text-green-600" title="승인">
+                      <CheckCircle className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => { setSelectedRequest(req); setReviewComment(''); }} className="p-2 rounded-lg hover:bg-red-100 text-red-600" title="거절">
+                      <XCircle className="w-4 h-4" />
+                    </button>
+                  </>
+                )}
+              </div>
+            ),
+          },
+        ];
 
-        {/* Empty State */}
-        {filteredRequests.length === 0 && (
-          <div className="text-center py-12">
-            <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto">
-              <FileCheck className="w-8 h-8 text-slate-400" />
-            </div>
-            <h3 className="mt-4 text-lg font-medium text-slate-800">신청 내역이 없습니다</h3>
-            <p className="mt-2 text-slate-500">
-              검색 조건에 맞는 신청이 없습니다
-            </p>
-          </div>
-        )}
-      </div>
+        return (
+          <DataTable<RequestData>
+            columns={columns}
+            dataSource={filteredRequests}
+            rowKey="id"
+            emptyText="검색 조건에 맞는 신청이 없습니다"
+          />
+        );
+      })()}
 
       {/* Review Modal */}
       {selectedRequest && (

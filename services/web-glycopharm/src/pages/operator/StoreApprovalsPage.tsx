@@ -18,10 +18,11 @@ import {
   ChevronRight,
   Filter,
   RefreshCw,
-  Loader2,
   AlertCircle,
   Building2,
 } from 'lucide-react';
+import { DataTable } from '@o4o/ui';
+import type { Column } from '@o4o/ui';
 import { storeApi } from '@/api/store';
 import type { StoreApplication, StoreApplicationStatus } from '@/types/store';
 
@@ -262,14 +263,6 @@ export default function StoreApprovalsPage() {
         </div>
       </div>
 
-      {/* Loading */}
-      {loading && (
-        <div className="text-center py-16">
-          <Loader2 className="w-10 h-10 text-primary-600 animate-spin mx-auto mb-4" />
-          <p className="text-slate-500">불러오는 중...</p>
-        </div>
-      )}
-
       {/* Error */}
       {!loading && error && (
         <div className="bg-white rounded-xl shadow-sm p-8 text-center">
@@ -284,124 +277,93 @@ export default function StoreApprovalsPage() {
         </div>
       )}
 
-      {/* Applications List */}
-      {!loading && !error && applications.length > 0 && (
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-200">
-              <tr>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">
-                  약국명
-                </th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">
-                  사업자 정보
-                </th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">
-                  관리약사
-                </th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">
-                  상태
-                </th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">
-                  신청일
-                </th>
-                <th className="px-4 py-3"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {applications.map((app) => {
-                const statusConfig = STATUS_CONFIG[app.status];
-                const StatusIcon = statusConfig.icon;
-
-                return (
-                  <tr key={app.id} className="hover:bg-slate-50">
-                    <td className="px-4 py-4">
-                      <div>
-                        <p className="font-medium text-slate-800">{app.form.pharmacyName}</p>
-                        <p className="text-xs text-slate-500">{app.form.pharmacyAddress}</p>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <div>
-                        <p className="text-sm text-slate-700">{app.form.businessName}</p>
-                        <p className="text-xs text-slate-500">{app.form.businessNumber}</p>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <div>
-                        <p className="text-sm text-slate-700">{app.form.pharmacistName}</p>
-                        <p className="text-xs text-slate-500">
-                          면허 #{app.form.pharmacistLicense}
-                        </p>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <span
-                        className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${statusConfig.bgColor} ${statusConfig.textColor}`}
-                      >
-                        <StatusIcon className="w-3 h-3" />
-                        {statusConfig.label}
-                      </span>
-                    </td>
-                    <td className="px-4 py-4">
-                      <span className="text-sm text-slate-600">
-                        {app.submittedAt
-                          ? new Date(app.submittedAt).toLocaleDateString('ko-KR')
-                          : '-'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-4">
-                      <Link
-                        to={`/operator/store-approvals/${app.id}`}
-                        className="inline-flex items-center gap-1 text-primary-600 hover:text-primary-700 text-sm font-medium"
-                      >
-                        상세
-                        <ChevronRight className="w-4 h-4" />
-                      </Link>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2 py-4 border-t border-slate-100">
-              <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page === 1}
-                className="px-3 py-1 text-sm text-slate-600 hover:bg-slate-100 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                이전
-              </button>
+      {/* Applications Table */}
+      {!error && (() => {
+        const columns: Column<StoreApplication>[] = [
+          {
+            key: 'pharmacyName',
+            title: '약국명',
+            render: (_v, app) => (
+              <div>
+                <p className="font-medium text-slate-800">{app.form.pharmacyName}</p>
+                <p className="text-xs text-slate-500">{app.form.pharmacyAddress}</p>
+              </div>
+            ),
+          },
+          {
+            key: 'businessName',
+            title: '사업자 정보',
+            render: (_v, app) => (
+              <div>
+                <p className="text-sm text-slate-700">{app.form.businessName}</p>
+                <p className="text-xs text-slate-500">{app.form.businessNumber}</p>
+              </div>
+            ),
+          },
+          {
+            key: 'pharmacistName',
+            title: '관리약사',
+            render: (_v, app) => (
+              <div>
+                <p className="text-sm text-slate-700">{app.form.pharmacistName}</p>
+                <p className="text-xs text-slate-500">면허 #{app.form.pharmacistLicense}</p>
+              </div>
+            ),
+          },
+          {
+            key: 'status',
+            title: '상태',
+            width: '120px',
+            render: (_v, app) => {
+              const cfg = STATUS_CONFIG[app.status];
+              const Icon = cfg.icon;
+              return (
+                <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${cfg.bgColor} ${cfg.textColor}`}>
+                  <Icon className="w-3 h-3" />
+                  {cfg.label}
+                </span>
+              );
+            },
+          },
+          {
+            key: 'submittedAt',
+            title: '신청일',
+            width: '100px',
+            render: (_v, app) => (
               <span className="text-sm text-slate-600">
-                {page} / {totalPages}
+                {app.submittedAt ? new Date(app.submittedAt).toLocaleDateString('ko-KR') : '-'}
               </span>
-              <button
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={page === totalPages}
-                className="px-3 py-1 text-sm text-slate-600 hover:bg-slate-100 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                다음
-              </button>
-            </div>
-          )}
-        </div>
-      )}
+            ),
+          },
+          {
+            key: 'actions',
+            title: '',
+            width: '60px',
+            align: 'right',
+            render: (_v, app) => (
+              <Link to={`/operator/store-approvals/${app.id}`} className="inline-flex items-center gap-1 text-primary-600 hover:text-primary-700 text-sm font-medium">
+                상세<ChevronRight className="w-4 h-4" />
+              </Link>
+            ),
+          },
+        ];
 
-      {/* Empty State */}
-      {!loading && !error && applications.length === 0 && (
-        <div className="bg-white rounded-xl shadow-sm p-12 text-center">
-          <Store className="w-16 h-16 text-slate-200 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-slate-800 mb-2">신청 내역이 없습니다</h3>
-          <p className="text-slate-500">
-            {hasFilters
-              ? '조건에 맞는 신청이 없습니다.'
-              : '아직 스토어 판매 참여 신청이 없습니다.'}
-          </p>
-        </div>
-      )}
+        return (
+          <DataTable<StoreApplication>
+            columns={columns}
+            dataSource={applications}
+            rowKey="id"
+            loading={loading}
+            emptyText={hasFilters ? '조건에 맞는 신청이 없습니다.' : '아직 스토어 판매 참여 신청이 없습니다.'}
+            pagination={{
+              current: page,
+              pageSize: 20,
+              total,
+              onChange: (p) => setPage(p),
+            }}
+          />
+        );
+      })()}
     </div>
   );
 }

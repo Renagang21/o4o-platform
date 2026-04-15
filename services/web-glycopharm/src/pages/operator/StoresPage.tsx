@@ -13,9 +13,9 @@ import {
   RefreshCw,
   Search,
   AlertTriangle,
-  ChevronLeft,
-  ChevronRight,
 } from 'lucide-react';
+import { DataTable } from '@o4o/ui';
+import type { Column } from '@o4o/ui';
 import { api } from '../../lib/apiClient';
 
 // ─── Types ───────────────────────────────────────────────────
@@ -205,154 +205,99 @@ export default function StoresPage() {
           </div>
         </div>
 
-        {/* Loading */}
-        {isLoading && stores.length === 0 && (
-          <div className="flex items-center justify-center py-20">
-            <div className="flex flex-col items-center gap-3">
-              <RefreshCw className="w-8 h-8 animate-spin text-primary-600" />
-              <p className="text-slate-500 text-sm">매장 데이터 로딩 중...</p>
-            </div>
-          </div>
-        )}
+        {/* Table */}
+        {(() => {
+          const columns: Column<StoreData>[] = [
+            {
+              key: 'name',
+              title: '매장명',
+              render: (_v, s) => (
+                <div>
+                  <p className="font-medium text-slate-800 text-sm">{s.name}</p>
+                  <p className="text-xs text-slate-400 mt-0.5">{typeLabel[s.type] || s.type}</p>
+                </div>
+              ),
+            },
+            {
+              key: 'code',
+              title: '코드',
+              width: '100px',
+              render: (_v, s) => (
+                <span className="font-mono text-xs text-slate-600 bg-slate-50 px-2 py-1 rounded">{s.code || '-'}</span>
+              ),
+            },
+            {
+              key: 'slug',
+              title: 'Slug',
+              width: '130px',
+              render: (_v, s) => s.slug
+                ? <span className="font-mono text-xs text-primary-600">{s.slug}</span>
+                : <span className="text-slate-300">-</span>,
+            },
+            {
+              key: 'ownerName',
+              title: '운영자',
+              render: (_v, s) => s.ownerName
+                ? <div><p className="text-sm text-slate-700">{s.ownerName}</p><p className="text-xs text-slate-400">{s.ownerEmail}</p></div>
+                : <span className="text-sm text-slate-300">-</span>,
+            },
+            {
+              key: 'channelCount',
+              title: '채널',
+              width: '60px',
+              align: 'right',
+              render: (_v, s) => (
+                <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-medium ${s.channelCount > 0 ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-400'}`}>
+                  {s.channelCount}
+                </span>
+              ),
+            },
+            {
+              key: 'productCount',
+              title: '상품',
+              width: '60px',
+              align: 'right',
+              render: (_v, s) => (
+                <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-medium ${s.productCount > 0 ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-400'}`}>
+                  {s.productCount}
+                </span>
+              ),
+            },
+            {
+              key: 'isActive',
+              title: '상태',
+              width: '70px',
+              render: (_v, s) => (
+                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${s.isActive ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500'}`}>
+                  {s.isActive ? '활성' : '비활성'}
+                </span>
+              ),
+            },
+            {
+              key: 'createdAt',
+              title: '생성일',
+              width: '100px',
+              render: (_v, s) => <span className="text-sm text-slate-500">{formatDate(s.createdAt)}</span>,
+            },
+          ];
 
-        {(!isLoading || stores.length > 0) && (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-slate-50 border-b border-slate-100">
-                <tr>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-slate-500">매장명</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-slate-500">코드</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-slate-500">Slug</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-slate-500">운영자</th>
-                  <th className="text-center px-4 py-3 text-xs font-medium text-slate-500">채널</th>
-                  <th className="text-center px-4 py-3 text-xs font-medium text-slate-500">상품</th>
-                  <th className="text-center px-4 py-3 text-xs font-medium text-slate-500">상태</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-slate-500">생성일</th>
-                  <th className="w-10"></th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {stores.length === 0 && !isLoading ? (
-                  <tr>
-                    <td colSpan={9} className="px-4 py-12 text-center text-slate-400 text-sm">
-                      매장 데이터가 없습니다
-                    </td>
-                  </tr>
-                ) : (
-                  stores.map((store) => (
-                    <tr
-                      key={store.id}
-                      onClick={() => navigate(`/operator/stores/${store.id}`)}
-                      className="hover:bg-slate-50 transition-colors cursor-pointer"
-                    >
-                      <td className="px-4 py-3">
-                        <p className="font-medium text-slate-800 text-sm">{store.name}</p>
-                        <p className="text-xs text-slate-400 mt-0.5">{typeLabel[store.type] || store.type}</p>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className="font-mono text-xs text-slate-600 bg-slate-50 px-2 py-1 rounded">
-                          {store.code || '-'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-slate-600">
-                        {store.slug ? (
-                          <span className="font-mono text-xs text-primary-600">{store.slug}</span>
-                        ) : (
-                          <span className="text-slate-300">-</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3">
-                        {store.ownerName ? (
-                          <div>
-                            <p className="text-sm text-slate-700">{store.ownerName}</p>
-                            <p className="text-xs text-slate-400">{store.ownerEmail}</p>
-                          </div>
-                        ) : (
-                          <span className="text-sm text-slate-300">-</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-medium ${
-                          store.channelCount > 0
-                            ? 'bg-blue-100 text-blue-700'
-                            : 'bg-slate-100 text-slate-400'
-                        }`}>
-                          {store.channelCount}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-medium ${
-                          store.productCount > 0
-                            ? 'bg-purple-100 text-purple-700'
-                            : 'bg-slate-100 text-slate-400'
-                        }`}>
-                          {store.productCount}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                          store.isActive
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-slate-100 text-slate-500'
-                        }`}>
-                          {store.isActive ? '활성' : '비활성'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-slate-500">
-                        {formatDate(store.createdAt)}
-                      </td>
-                      <td className="px-4 py-3">
-                        <ChevronRight className="w-4 h-4 text-slate-300" />
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {/* Pagination */}
-        {!isLoading && pagination.totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100">
-            <p className="text-sm text-slate-500">
-              총 {pagination.total}개 중 {(pagination.page - 1) * pagination.limit + 1}-
-              {Math.min(pagination.page * pagination.limit, pagination.total)}개 표시
-            </p>
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
-                className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
-                const start = Math.max(1, Math.min(currentPage - 2, pagination.totalPages - 4));
-                return start + i;
-              }).filter(p => p <= pagination.totalPages).map((page) => (
-                <button
-                  key={page}
-                  onClick={() => setCurrentPage(page)}
-                  className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
-                    currentPage === page
-                      ? 'bg-primary-600 text-white'
-                      : 'hover:bg-slate-100 text-slate-600'
-                  }`}
-                >
-                  {page}
-                </button>
-              ))}
-              <button
-                onClick={() => setCurrentPage(Math.min(pagination.totalPages, currentPage + 1))}
-                disabled={currentPage === pagination.totalPages}
-                className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        )}
+          return (
+            <DataTable<StoreData>
+              columns={columns}
+              dataSource={stores}
+              rowKey="id"
+              loading={isLoading}
+              emptyText="매장 데이터가 없습니다"
+              onRowClick={(s) => navigate(`/operator/stores/${s.id}`)}
+              pagination={{
+                current: currentPage,
+                pageSize: pagination.limit,
+                total: pagination.total,
+                onChange: (p) => setCurrentPage(p),
+              }}
+            />
+          );
+        })()}
       </div>
     </div>
   );
