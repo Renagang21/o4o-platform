@@ -1,18 +1,11 @@
 /**
  * PatientMainPage — 당뇨인용 메인 메뉴 화면
  * WO-GLYCOPHARM-PATIENT-MAIN-SCREEN-V1
- *
- * 메뉴형 시스템: 5개 기능 버튼으로 구성
- * - 개인 설정 관리
- * - 데이터 입력 및 조회
- * - 데이터 분석 확인
- * - 약사 코칭 확인
- * - 당뇨 케어 가이드라인
  */
 
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Activity, LogOut, Settings, ClipboardEdit, BarChart3, MessageCircle, BookOpen, Building2, Calendar, ChevronRight, List } from 'lucide-react';
+import { Activity, LogOut, Settings, ClipboardEdit, BarChart3, MessageCircle, Building2, Calendar, ChevronRight, List } from 'lucide-react';
 
 const MENU_ITEMS = [
   {
@@ -73,14 +66,6 @@ const MENU_ITEMS = [
     icon: MessageCircle,
     color: 'text-violet-600',
     bg: 'bg-violet-50',
-  },
-  {
-    label: '당뇨 케어 가이드라인',
-    description: '당뇨 관리 교육 자료',
-    path: '/patient/care-guideline',
-    icon: BookOpen,
-    color: 'text-amber-600',
-    bg: 'bg-amber-50',
   },
 ] as const;
 

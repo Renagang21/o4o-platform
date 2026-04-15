@@ -44,14 +44,6 @@ export interface CockpitData {
     operatorNotices: number;
     applicationAlerts: number;
   } | null;
-  careDashboard: {
-    totalPatients: number;
-    highRiskCount: number;
-    moderateRiskCount: number;
-    lowRiskCount: number;
-    recentCoachingCount: number;
-    improvingCount: number;
-  } | null;
   signageStats: {
     enabled: boolean;
     activeContents: number;
@@ -65,58 +57,7 @@ export interface CockpitData {
 
 function buildGlycoSignals(data: CockpitData): Record<string, HubSignal> {
   const signals: Record<string, HubSignal> = {};
-  const { aiSummary, todayActions, careDashboard } = data;
-
-  // Care signals
-  if (careDashboard) {
-    const { highRiskCount, totalPatients, recentCoachingCount, improvingCount } = careDashboard;
-    const highRiskRatio = totalPatients > 0 ? highRiskCount / totalPatients : 0;
-
-    if (highRiskCount > 0) {
-      if (highRiskRatio > 0.3) {
-        signals['glycopharm.high_risk'] = createActionSignal('critical', {
-          label: '고위험',
-          count: highRiskCount,
-          pulse: true,
-          action: {
-            key: 'glycopharm.trigger.care_review',
-            buttonLabel: '리뷰 시작',
-          },
-        });
-      } else {
-        signals['glycopharm.high_risk'] = createSignal('warning', {
-          label: '고위험',
-          count: highRiskCount,
-        });
-      }
-    } else {
-      signals['glycopharm.high_risk'] = createSignal('info', { label: '양호' });
-    }
-
-    // 코칭 세션 신호 (pulse 제거 — UX Guidelines §4.4)
-    if (recentCoachingCount === 0 && highRiskCount > 0) {
-      signals['glycopharm.coaching'] = createActionSignal('critical', {
-        label: '미실시',
-        action: {
-          key: 'glycopharm.trigger.create_session',
-          buttonLabel: '세션 생성',
-        },
-      });
-    } else if (recentCoachingCount > 0) {
-      signals['glycopharm.coaching'] = createSignal('info', {
-        label: '최근 7일',
-        count: recentCoachingCount,
-      });
-    }
-
-    // 분석 (개선 추세)
-    if (improvingCount > 0) {
-      signals['glycopharm.analysis'] = createSignal('info', {
-        label: '개선중',
-        count: improvingCount,
-      });
-    }
-  }
+  const { aiSummary, todayActions } = data;
 
   // AI Summary 신호 (pulse: critical일 때만 — UX Guidelines §4.4)
   if (aiSummary) {
@@ -198,21 +139,6 @@ async function executeAction(key: string, _payload?: Record<string, unknown>): P
   const api = authClient.api;
 
   switch (key) {
-    case 'glycopharm.trigger.care_review': {
-      const res = await api.post('/glycopharm/pharmacy/hub/trigger/care-review');
-      const body = res.data as any;
-      return { success: body.success, message: body.data?.message || body.error?.message };
-    }
-    case 'glycopharm.trigger.create_session': {
-      const res = await api.post('/glycopharm/pharmacy/hub/trigger/coaching-auto-create');
-      const body = res.data as any;
-      return { success: body.success, message: body.data?.message || body.error?.message };
-    }
-    case 'glycopharm.trigger.refresh_ai': {
-      const res = await api.post('/glycopharm/pharmacy/hub/trigger/ai-refresh');
-      const body = res.data as any;
-      return { success: body.success, message: body.data?.message || body.error?.message };
-    }
     case 'glycopharm.trigger.review_requests': {
       // Navigate action — no API call
       return { success: true, message: '요청 페이지로 이동' };
@@ -229,7 +155,6 @@ export function useStoreHub() {
   const [cockpitData, setCockpitData] = useState<CockpitData>({
     aiSummary: null,
     todayActions: null,
-    careDashboard: null,
     signageStats: null,
     productStats: null,
   });
@@ -248,15 +173,14 @@ export function useStoreHub() {
     const api = authClient.api;
 
     try {
-      const [aiRes, actionsRes, careRes, signageRes, productsRes] = await Promise.allSettled([
+      const [aiRes, actionsRes, signageRes, productsRes] = await Promise.allSettled([
         api.get('/glycopharm/pharmacy/cockpit/ai-summary'),
         api.get('/glycopharm/pharmacy/cockpit/today-actions'),
-        api.get('/care/dashboard'),
         api.get('/glycopharm/pharmacy/cockpit/franchise-services'),
         api.get('/glycopharm/pharmacy/products?pageSize=1'),
       ]);
 
-      [aiRes, actionsRes, careRes, signageRes, productsRes].forEach((r, i) => {
+      [aiRes, actionsRes, signageRes, productsRes].forEach((r, i) => {
         if (r.status === 'rejected') {
           console.error(`[Store Hub] fetch[${i}] failed:`, r.reason);
         }
@@ -268,7 +192,6 @@ export function useStoreHub() {
       setCockpitData({
         aiSummary: aiRes.status === 'fulfilled' ? (aiRes.value.data as any)?.data : null,
         todayActions: actionsRes.status === 'fulfilled' ? (actionsRes.value.data as any)?.data : null,
-        careDashboard: careRes.status === 'fulfilled' ? (careRes.value.data as any)?.data : null,
         signageStats: franchiseData?.signage ?? null,
         productStats: productsRes.status === 'fulfilled'
           ? { total: (productsRes.value.data as any)?.data?.total ?? 0 } : null,

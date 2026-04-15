@@ -19,7 +19,7 @@ export const GLYCOPHARM_DASHBOARD_MAP: Record<string, string> = {
   'platform:super_admin': '/admin',
   'glycopharm:admin': '/admin',
   'glycopharm:operator': '/operator',
-  'pharmacy': '/care',
+  'pharmacy': '/store/hub',
   'customer': '/patient',
 };
 

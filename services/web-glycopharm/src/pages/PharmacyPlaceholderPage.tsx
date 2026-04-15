@@ -10,7 +10,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Activity, LogOut, Users, UserPlus, Calendar, Briefcase, ChevronDown, MessageSquare, LayoutGrid, Store, BookOpen, Info } from 'lucide-react';
+import { Activity, LogOut, Users, UserPlus, Calendar, Briefcase, ChevronDown, MessageSquare, LayoutGrid, Store, Info } from 'lucide-react';
 
 export default function PharmacyPlaceholderPage() {
   const { user, logout } = useAuth();
@@ -88,20 +88,6 @@ export default function PharmacyPlaceholderPage() {
             </span>
             <span className="text-[11px] font-normal text-violet-400">환자가 보낸 약사 연결 신청 승인</span>
           </button>
-          <button
-            onClick={() => navigate('/care')}
-            className="w-full py-3 text-sm font-medium text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors"
-          >
-            Care 대시보드
-          </button>
-          <button
-            onClick={() => navigate('/care/guideline')}
-            className="w-full py-3 text-sm font-medium text-amber-600 border border-amber-200 rounded-xl hover:bg-amber-50 transition-colors flex items-center justify-center gap-2"
-          >
-            <BookOpen className="w-4 h-4" />
-            케어 가이드라인
-          </button>
-
           {/* 약국 경영 아코디언 */}
           <div className="border border-emerald-200 rounded-xl overflow-hidden">
             <button

@@ -364,11 +364,9 @@ function AppRoutes() {
 <Route path="patient/select-pharmacy" element={<PatientSelectPharmacyPage />} />
         <Route path="patient/appointments" element={<PatientAppointmentsPage />} />
       </Route>
-      {/* WO-O4O-GLYCOPHARM-NAVIGATION-AND-STORE-STRUCTURE-REFINE-V1:
-          PharmacyPlaceholderPage 제거 — /pharmacy 직접 리다이렉트.
-          약국 사용자는 /care/patients (Care 대시보드) 로 직행.
-          비로그인/당뇨인은 / 로 리다이렉트. */}
-      <Route path="pharmacy" element={<Navigate to="/care/patients" replace />} />
+      {/* WO-O4O-GLYCOPHARM-ENTRYPOINT-AND-NAV-REALIGN-V1:
+          /pharmacy → /store/hub (care 제거 후 약국 경영 허브로 재지정) */}
+      <Route path="pharmacy" element={<Navigate to="/store/hub" replace />} />
       <Route path="pharmacy/patients" element={<PharmacistPatientsPage />} />
       <Route path="pharmacy/patient/:patientId" element={<PharmacistPatientDetailPage />} />
       <Route path="pharmacy/patient-requests" element={<PharmacistPatientRequestsPage />} />

@@ -61,11 +61,7 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: 'AI 정산', path: '/operator/ai-billing' },
     { label: '운영 분석', path: '/operator/analytics' },
   ],
-  /* WO-O4O-GLYCOPHARM-ADMIN-OPERATOR-MENU-REALIGNMENT-V1: care 그룹 신설 */
-  care: [
-    { label: '케어 현황', path: '/operator/care' },
-    { label: '케어 알림', path: '/operator/care/alerts' },
-  ],
+  // care group removed — WO-O4O-GLYCOPHARM-CARE-REMOVAL-V1
   system: [
     { label: '서비스 설정', path: '/operator/settings' },
   ],
@@ -127,10 +123,6 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: 'AI 사용량', path: '/operator/ai-usage' },
     { label: 'AI 정산', path: '/operator/ai-billing' },
     { label: '운영 분석', path: '/operator/analytics' },
-  ],
-  care: [
-    { label: '케어 현황', path: '/operator/care' },
-    { label: '케어 알림', path: '/operator/care/alerts' },
   ],
   system: [
     { label: '서비스 설정', path: '/operator/settings' },
