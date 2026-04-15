@@ -22,6 +22,10 @@ export interface Trial {
   supplierId: string;
   supplierName?: string;
   status: TrialStatus;
+  // WO-MARKET-TRIAL-TO-PRODUCT-CONVERSION-FLOW-V1
+  convertedProductId?: string | null;
+  convertedProductName?: string | null;
+  conversionNote?: string | null;
   outcomeSnapshot?: {
     expectedType: 'product' | 'cash';
     description: string;
@@ -58,7 +62,13 @@ export interface OperatorTrial extends Trial {
     slug: string | null;
     url: string;
   } | null;
+  // WO-MARKET-TRIAL-TO-PRODUCT-CONVERSION-FLOW-V1
+  convertedProductId?: string | null;
+  convertedProductName?: string | null;
+  conversionNote?: string | null;
 }
+
+export type CustomerConversionStatus = 'none' | 'interested' | 'considering' | 'adopted' | 'first_order';
 
 export interface TrialParticipant {
   id: string;
@@ -66,11 +76,26 @@ export interface TrialParticipant {
   type: string;
   rewardType: string | null;
   rewardStatus: string;
+  customerConversionStatus: CustomerConversionStatus;
+  customerConversionAt: string | null;
+  customerConversionNote: string | null;
+  // WO-MARKET-TRIAL-LISTING-AUTOLINK-V1
+  listingId: string | null;
+  organizationId: string | null;
   joinedAt: string;
 }
 
+export interface ParticipantSummary {
+  totalCount: number;
+  productCount: number;
+  cashCount: number;
+  fulfilledCount: number;
+  pendingCount: number;
+  fulfillmentRate: number;
+}
+
 export interface ParticipantListResponse {
-  summary: { totalCount: number; productCount: number; cashCount: number };
+  summary: ParticipantSummary;
   participants: TrialParticipant[];
 }
 
@@ -88,6 +113,32 @@ export interface CreateTrialPayload {
   fundingStartAt: string;
   fundingEndAt: string;
   trialPeriodDays: number;
+}
+
+export interface TrialResultsSummary {
+  totalCount: number;
+  productCount: number;
+  cashCount: number;
+  fulfilledCount: number;
+  pendingCount: number;
+  fulfillmentRate: number;
+  recruitRate: number | null;
+  // WO-MARKET-TRIAL-PARTICIPANT-TO-CUSTOMER-FLOW-V1
+  conversionDistribution?: {
+    none: number;
+    interested: number;
+    considering: number;
+    adopted: number;
+    first_order: number;
+  };
+  // WO-MARKET-TRIAL-LISTING-AUTOLINK-V1
+  listingCount?: number;
+}
+
+export interface TrialResults {
+  trial: Trial;
+  summary: TrialResultsSummary;
+  forumPostId: string | null;
 }
 
 export interface Participation {
@@ -160,6 +211,111 @@ export async function getMyTrials(): Promise<Trial[]> {
   return data.data || data;
 }
 
+/**
+ * WO-MARKET-TRIAL-SUPPLIER-RESULTS-AND-FEEDBACK-V1:
+ * 공급자용 Trial 결과 조회 (집계 통계 + 포럼 링크)
+ */
+export async function getSupplierTrialResults(trialId: string): Promise<TrialResults> {
+  const { data } = await api.get(`${API_BASE_URL}/api/market-trial/${trialId}/results`);
+  return data.data || data;
+}
+
+// ============================================================================
+// WO-MARKET-TRIAL-TO-PRODUCT-CONVERSION-FLOW-V1
+// ============================================================================
+
+export interface ConvertTrialPayload {
+  /** Link to existing ProductMaster (A안) */
+  productId?: string;
+  /** Create new ProductMaster (B안) */
+  productName?: string;
+  /** Operator note */
+  conversionNote?: string;
+}
+
+export interface TrialConversionResult {
+  trial: OperatorTrial;
+  conversionResult: {
+    productId: string;
+    productName: string;
+    productRewardCount: number;
+    note: string | null;
+  };
+}
+
+export async function convertTrialToProduct(
+  trialId: string,
+  payload: ConvertTrialPayload,
+): Promise<TrialConversionResult> {
+  const { data } = await api.post(
+    `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/convert`,
+    payload,
+  );
+  return data.data || data;
+}
+
+export interface ProductSearchItem {
+  id: string;
+  name: string;
+  supplierName: string;
+  categoryName: string;
+  regulatoryType: string;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface ProductSearchResponse {
+  data: ProductSearchItem[];
+  meta: { total: number; page: number; limit: number };
+}
+
+/**
+ * WO-MARKET-TRIAL-PRODUCT-LINK-SEARCH-UI-V1:
+ * 전환 모달용 상품(SupplierProductOffer) 검색
+ */
+export async function searchProductsForConversion(
+  keyword: string,
+  opts?: { supplierUserId?: string; page?: number; limit?: number },
+): Promise<ProductSearchResponse> {
+  const params = new URLSearchParams();
+  if (keyword) params.set('keyword', keyword);
+  if (opts?.supplierUserId) params.set('supplierUserId', opts.supplierUserId);
+  if (opts?.page) params.set('page', String(opts.page));
+  if (opts?.limit) params.set('limit', String(opts.limit));
+  const qs = params.toString();
+  const { data } = await api.get(
+    `${API_BASE_URL}/api/v1/neture/operator/market-trial/products/search${qs ? `?${qs}` : ''}`,
+  );
+  return data;
+}
+
+// ============================================================================
+// WO-MARKET-TRIAL-OPERATIONS-CONSOLIDATION-V1: Funnel API
+// ============================================================================
+
+export interface TrialFunnel {
+  recruitCount: number | null;
+  participantCount: number;
+  productRewardCount: number;
+  convertedProduct: boolean;
+  convertedProductId: string | null;
+  convertedProductName: string | null;
+  conversionDistribution: {
+    none: number;
+    interested: number;
+    considering: number;
+    adopted: number;
+    first_order: number;
+  };
+  listingCount: number;
+  firstOrderCount: number;
+}
+
+export async function getTrialFunnel(trialId: string): Promise<TrialFunnel> {
+  const { data } = await api.get(`${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/funnel`);
+  return data.data || data;
+}
+
 // ============================================================================
 // Neture Operator API — 1차 승인 (WO-O4O-MARKET-TRIAL-PHASE1-V1)
 // ============================================================================
@@ -187,9 +343,85 @@ export async function rejectTrialFirst(trialId: string, reason: string): Promise
 
 /**
  * WO-MARKET-TRIAL-OPERATION-READINESS-V1: 참여자 목록 JSON (인라인 표시)
+ * WO-MARKET-TRIAL-SETTLEMENT-AND-FULFILLMENT-MANAGEMENT-V1: 필터 지원 추가
  */
-export async function getOperatorTrialParticipants(trialId: string): Promise<ParticipantListResponse> {
-  const { data } = await api.get(`${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/participants`);
+export async function getOperatorTrialParticipants(
+  trialId: string,
+  filters?: {
+    rewardType?: 'product' | 'cash';
+    rewardStatus?: 'pending' | 'fulfilled';
+    customerConversionStatus?: CustomerConversionStatus;
+  },
+): Promise<ParticipantListResponse> {
+  const params = new URLSearchParams();
+  if (filters?.rewardType) params.append('rewardType', filters.rewardType);
+  if (filters?.rewardStatus) params.append('rewardStatus', filters.rewardStatus);
+  if (filters?.customerConversionStatus) params.append('customerConversionStatus', filters.customerConversionStatus);
+  const qs = params.toString();
+  const { data } = await api.get(
+    `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/participants${qs ? `?${qs}` : ''}`,
+  );
+  return data.data || data;
+}
+
+/**
+ * WO-MARKET-TRIAL-PARTICIPANT-TO-CUSTOMER-FLOW-V1:
+ * 참여자 고객 전환 단계 변경
+ */
+export async function updateParticipantConversionStatus(
+  trialId: string,
+  participantId: string,
+  status: CustomerConversionStatus,
+  note?: string,
+): Promise<{ id: string; customerConversionStatus: CustomerConversionStatus; customerConversionAt: string | null; customerConversionNote: string | null }> {
+  const { data } = await api.patch(
+    `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/participants/${participantId}/conversion`,
+    { status, note },
+  );
+  return data.data || data;
+}
+
+/**
+ * WO-MARKET-TRIAL-SETTLEMENT-AND-FULFILLMENT-MANAGEMENT-V1:
+ * 참여자 이행 상태 변경
+ */
+export async function updateParticipantRewardStatus(
+  trialId: string,
+  participantId: string,
+  rewardStatus: 'pending' | 'fulfilled',
+): Promise<{ id: string; rewardType: string | null; rewardStatus: string }> {
+  const { data } = await api.patch(
+    `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/participants/${participantId}/reward-status`,
+    { rewardStatus },
+  );
+  return data.data || data;
+}
+
+/**
+ * WO-MARKET-TRIAL-LISTING-AUTOLINK-V1:
+ * adopted 참여자 매장에 Trial 상품 진열 등록
+ */
+export async function createListingFromTrialParticipant(
+  trialId: string,
+  participantId: string,
+  price?: number,
+): Promise<{ listingId: string; organizationId: string; offerId: string; masterId: string }> {
+  const { data } = await api.post(
+    `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/participants/${participantId}/listing`,
+    { price },
+  );
+  return data.data || data;
+}
+
+/**
+ * WO-MARKET-TRIAL-SETTLEMENT-AND-FULFILLMENT-MANAGEMENT-V1:
+ * Trial 단위 상태 전환
+ */
+export async function updateTrialStatus(trialId: string, status: TrialStatus): Promise<OperatorTrial> {
+  const { data } = await api.patch(
+    `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/status`,
+    { status },
+  );
   return data.data || data;
 }
 

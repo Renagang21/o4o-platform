@@ -158,6 +158,11 @@ class CheckoutService {
       totalAmount,
     });
 
+    // WO-MARKET-TRIAL-ORDER-CONNECTION-AUTOMATION-V1: fire-and-forget
+    void tryConnectOrderToTrial(savedOrder).catch((err) =>
+      logger.warn('[MarketTrial] tryConnectOrderToTrial failed:', err),
+    );
+
     return savedOrder;
   }
 
@@ -488,3 +493,100 @@ class CheckoutService {
 }
 
 export const checkoutService = new CheckoutService();
+
+// ============================================================================
+// WO-MARKET-TRIAL-ORDER-CONNECTION-AUTOMATION-V1
+// ============================================================================
+
+/**
+ * Fire-and-forget hook: detect first orders from trial listings and
+ * auto-promote participant adopted → first_order.
+ *
+ * Match logic:
+ *   - For each order item, check if organization_product_listings has a row
+ *     where offer_id = item.productId AND source_type = 'market_trial'
+ *     AND organization_id = order.sellerOrganizationId
+ *   - If found, look up the trial participant via market_trial_participants.listingId
+ *   - Atomically update customerConversionStatus 'adopted' → 'first_order'
+ *     (WHERE customerConversionStatus = 'adopted' prevents double-promotion)
+ *   - Notify the trial supplier
+ */
+async function tryConnectOrderToTrial(order: CheckoutOrder): Promise<void> {
+  if (!order.sellerOrganizationId || !order.items?.length) return;
+
+  const ds = AppDataSource;
+  if (!ds.isInitialized) return;
+
+  for (const item of order.items) {
+    try {
+      // Find a trial listing matching this order item + seller org
+      const listingRows: Array<{
+        listingId: string;
+        trialId: string;
+        participantId: string;
+        participantUserId: string;
+        trialTitle: string;
+        supplierUserId: string | null;
+      }> = await ds.query(
+        `SELECT
+           opl.id                         AS "listingId",
+           opl.source_id                  AS "trialId",
+           mtp.id                         AS "participantId",
+           mtp."participantId"            AS "participantUserId",
+           mt.title                       AS "trialTitle",
+           ns_user.user_id                AS "supplierUserId"
+         FROM organization_product_listings opl
+         JOIN market_trial_participants mtp ON mtp."listingId" = opl.id
+         JOIN market_trials mt              ON mt.id = opl.source_id
+         LEFT JOIN neture_suppliers ns_user ON ns_user.id = mt."supplierId"
+         WHERE opl.source_type = 'market_trial'
+           AND opl.organization_id = $1
+           AND opl.offer_id = $2
+           AND mtp."customerConversionStatus" = 'adopted'
+         LIMIT 1`,
+        [order.sellerOrganizationId, item.productId],
+      );
+
+      if (!listingRows.length) continue;
+
+      const row = listingRows[0];
+
+      // Atomically promote adopted → first_order (CAS: WHERE = 'adopted')
+      const updated: Array<{ id: string }> = await ds.query(
+        `UPDATE market_trial_participants
+         SET "customerConversionStatus" = 'first_order',
+             "customerConversionAt"     = NOW()
+         WHERE id = $1
+           AND "customerConversionStatus" = 'adopted'
+         RETURNING id`,
+        [row.participantId],
+      );
+
+      if (!updated.length) continue; // Already promoted by another order
+
+      logger.info('[MarketTrial] First order detected, participant promoted to first_order', {
+        orderId: order.id,
+        trialId: row.trialId,
+        participantId: row.participantId,
+      });
+
+      // Notify supplier (fire-and-forget, skip if no userId)
+      if (row.supplierUserId) {
+        await ds.query(
+          `INSERT INTO notifications
+             (id, "userId", channel, type, title, message, metadata, "isRead", "createdAt")
+           VALUES
+             (gen_random_uuid(), $1, 'in_app', 'custom', $2, $3, $4::jsonb, false, NOW())`,
+          [
+            row.supplierUserId,
+            `시범판매 첫 주문 발생`,
+            `"${row.trialTitle}" 시범판매에서 첫 주문이 발생했습니다.`,
+            JSON.stringify({ trialId: row.trialId, participantId: row.participantId, orderId: order.id }),
+          ],
+        ).catch(() => {/* notifications 테이블 없어도 무시 */});
+      }
+    } catch (itemErr) {
+      logger.warn('[MarketTrial] tryConnectOrderToTrial item error:', itemErr);
+    }
+  }
+}

@@ -72,6 +72,35 @@ export class MarketTrialParticipant {
   @Column({ type: 'varchar', length: 20, default: 'pending' })
   rewardStatus!: string;
 
+  /**
+   * Linked OrganizationProductListing ID (set when operator creates a store listing for this participant).
+   * WO-MARKET-TRIAL-LISTING-AUTOLINK-V1
+   */
+  @Column({ type: 'uuid', nullable: true })
+  listingId?: string;
+
+  /**
+   * Customer conversion pipeline stage.
+   * WO-MARKET-TRIAL-PARTICIPANT-TO-CUSTOMER-FLOW-V1
+   * none | interested | considering | adopted | first_order
+   */
+  @Column({ type: 'varchar', length: 30, default: 'none' })
+  customerConversionStatus!: string;
+
+  /**
+   * Timestamp when customerConversionStatus was last updated.
+   * WO-MARKET-TRIAL-PARTICIPANT-TO-CUSTOMER-FLOW-V1
+   */
+  @Column({ type: 'timestamp', nullable: true })
+  customerConversionAt?: Date;
+
+  /**
+   * Operator note for the current conversion stage.
+   * WO-MARKET-TRIAL-PARTICIPANT-TO-CUSTOMER-FLOW-V1
+   */
+  @Column({ type: 'text', nullable: true })
+  customerConversionNote?: string;
+
   @CreateDateColumn()
   createdAt!: Date;
 }

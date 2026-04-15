@@ -29,6 +29,8 @@ router.get('/:id', optionalAuth, MarketTrialController.getTrialById);
 
 // Authenticated routes
 router.get('/:id/participation', authenticate, MarketTrialController.getParticipation);
+// WO-MARKET-TRIAL-SUPPLIER-RESULTS-AND-FEEDBACK-V1: supplier results (auth + owner check inside)
+router.get('/:id/results', authenticate, MarketTrialController.getSupplierTrialResults);
 router.post('/:id/join', authenticate, MarketTrialController.joinTrial);
 router.patch('/:id/submit', authenticate, MarketTrialController.submitTrial);
 

@@ -158,9 +158,15 @@ const MyHandledProductsPage = lazy(() =>
   import('./pages/seller/MyHandledProductsPage')
 );
 
-// Supplier Market Trial (WO-O4O-MARKET-TRIAL-PHASE1-V1)
+// Supplier Market Trial (WO-O4O-MARKET-TRIAL-PHASE1-V1 + WO-MARKET-TRIAL-SUPPLIER-RESULTS-AND-FEEDBACK-V1)
 const SupplierTrialCreatePage = lazy(() =>
   import('./pages/supplier').then((m) => ({ default: m.SupplierTrialCreatePage }))
+);
+const SupplierTrialListPage = lazy(() =>
+  import('./pages/supplier').then((m) => ({ default: m.SupplierTrialListPage }))
+);
+const SupplierTrialDetailPage = lazy(() =>
+  import('./pages/supplier').then((m) => ({ default: m.SupplierTrialDetailPage }))
 );
 
 // Supplier Library
@@ -588,8 +594,10 @@ function App() {
               {/* WO-NETURE-B2B-CONTENT-MANAGEMENT-V1 */}
               <Route path="/supplier/b2b-content" element={<SupplierB2BContentPage />} />
               <Route path="/supplier/profile" element={<SupplierProfilePage />} />
-              {/* WO-O4O-MARKET-TRIAL-PHASE1-V1 */}
+              {/* WO-O4O-MARKET-TRIAL-PHASE1-V1 + WO-MARKET-TRIAL-SUPPLIER-RESULTS-AND-FEEDBACK-V1 */}
+              <Route path="/supplier/market-trial" element={<SupplierTrialListPage />} />
               <Route path="/supplier/market-trial/new" element={<SupplierTrialCreatePage />} />
+              <Route path="/supplier/market-trial/:id" element={<SupplierTrialDetailPage />} />
               <Route path="/supplier/signage/content" element={<SignageContentHubPage />} />
               <Route path="/supplier/signage/manage" element={<StoreSignagePage />} />
               <Route path="/supplier/forum" element={<ForumPage title="공급자 포럼" description="공급자 간 소통 공간" basePath="/supplier/forum" />} />

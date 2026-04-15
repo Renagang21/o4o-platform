@@ -404,6 +404,91 @@ export class MarketTrialController {
   }
 
   /**
+   * GET /api/market-trial/:id/results
+   * 공급자용 Trial 결과 조회 (집계 통계 + 포럼 링크, 개인 정보 미포함)
+   * WO-MARKET-TRIAL-SUPPLIER-RESULTS-AND-FEEDBACK-V1
+   */
+  static async getSupplierTrialResults(req: AuthRequest, res: Response) {
+    try {
+      const { id } = req.params;
+      const userId = (req as any).user?.id;
+      if (!userId) {
+        return res.status(401).json({ success: false, message: 'Authentication required' });
+      }
+
+      const trial = await MarketTrialController.trialRepo.findOne({ where: { id } });
+      if (!trial) {
+        return res.status(404).json({ success: false, message: 'Trial not found' });
+      }
+      if (trial.supplierId !== userId) {
+        return res.status(403).json({ success: false, message: 'Not authorized' });
+      }
+
+      // Aggregate participant stats (no individual info exposed)
+      const rows = await MarketTrialController.participantRepo.find({
+        where: { marketTrialId: id },
+        select: ['rewardType', 'rewardStatus', 'customerConversionStatus'] as any,
+      });
+
+      const totalCount = rows.length;
+      const productCount = rows.filter((r) => r.rewardType === 'product').length;
+      const cashCount = rows.filter((r) => r.rewardType === 'cash').length;
+      const fulfilledCount = rows.filter((r) => r.rewardStatus === 'fulfilled').length;
+      const fulfillmentRate = totalCount > 0 ? Math.round((fulfilledCount / totalCount) * 100) : 0;
+      const recruitRate = trial.maxParticipants
+        ? Math.round((totalCount / trial.maxParticipants) * 100)
+        : null;
+
+      // WO-MARKET-TRIAL-PARTICIPANT-TO-CUSTOMER-FLOW-V1: conversion pipeline distribution
+      const conversionDistribution = {
+        none:        rows.filter((r: any) => !r.customerConversionStatus || r.customerConversionStatus === 'none').length,
+        interested:  rows.filter((r: any) => r.customerConversionStatus === 'interested').length,
+        considering: rows.filter((r: any) => r.customerConversionStatus === 'considering').length,
+        adopted:     rows.filter((r: any) => r.customerConversionStatus === 'adopted').length,
+        first_order: rows.filter((r: any) => r.customerConversionStatus === 'first_order').length,
+      };
+
+      // WO-MARKET-TRIAL-LISTING-AUTOLINK-V1: count store listings created from this trial
+      let listingCount = 0;
+      if (MarketTrialController.dataSource) {
+        const listingCountRows: Array<{ cnt: number }> = await MarketTrialController.dataSource.query(
+          `SELECT COUNT(*)::int AS cnt FROM organization_product_listings
+           WHERE source_type = 'market_trial' AND source_id = $1`,
+          [id],
+        );
+        listingCount = listingCountRows[0]?.cnt ?? 0;
+      }
+
+      // Forum link
+      const forumMapping = await MarketTrialController.forumRepo.findOne({
+        where: { marketTrialId: id },
+      });
+
+      res.json({
+        success: true,
+        data: {
+          trial: toTrialDTO(trial, forumMapping?.forumId),
+          summary: {
+            totalCount,
+            productCount,
+            cashCount,
+            fulfilledCount,
+            pendingCount: totalCount - fulfilledCount,
+            fulfillmentRate,
+            recruitRate,
+            conversionDistribution,
+            listingCount,
+          },
+          forumPostId: forumMapping?.forumId || null,
+        },
+      });
+    } catch (error) {
+      console.error('Get supplier trial results error:', error);
+      res.status(500).json({ success: false, message: 'Failed to get trial results' });
+    }
+  }
+
+  /**
    * POST /api/market-trial/:id/join
    * Trial 참여 (보상 선택 포함)
    */
@@ -530,6 +615,10 @@ function toTrialDTO(trial: MarketTrial, forumPostId?: string | null): any {
     deadline: trial.fundingEndAt ? new Date(trial.fundingEndAt).toISOString() : undefined,
     visibleServiceKeys: trial.visibleServiceKeys,
     forumPostId: forumPostId || undefined,
+    // WO-MARKET-TRIAL-TO-PRODUCT-CONVERSION-FLOW-V1
+    convertedProductId: trial.convertedProductId || null,
+    convertedProductName: trial.convertedProductName || null,
+    conversionNote: trial.conversionNote || null,
     createdAt: new Date(trial.createdAt).toISOString(),
   };
 }

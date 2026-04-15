@@ -167,6 +167,36 @@ export class MarketTrial {
   @Column({ type: 'jsonb', default: '[]' })
   visibleServiceKeys!: string[];
 
+  /**
+   * Linked ProductMaster ID after Trial → Product conversion
+   * WO-MARKET-TRIAL-TO-PRODUCT-CONVERSION-FLOW-V1
+   * Null = not yet converted, non-null = converted
+   */
+  @Column({ type: 'uuid', nullable: true })
+  convertedProductId?: string;
+
+  /**
+   * Denormalized product name for display (avoids JOIN)
+   * WO-MARKET-TRIAL-TO-PRODUCT-CONVERSION-FLOW-V1
+   */
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  convertedProductName?: string;
+
+  /**
+   * Operator note on conversion decision
+   * WO-MARKET-TRIAL-TO-PRODUCT-CONVERSION-FLOW-V1
+   */
+  @Column({ type: 'text', nullable: true })
+  conversionNote?: string;
+
+  /**
+   * Timestamp when conversion notifications were dispatched to product-reward participants.
+   * Used to prevent duplicate notification sends.
+   * WO-MARKET-TRIAL-CONVERSION-NOTIFICATION-V1
+   */
+  @Column({ type: 'timestamp', nullable: true })
+  notificationSentAt?: Date;
+
   @CreateDateColumn()
   createdAt!: Date;
 

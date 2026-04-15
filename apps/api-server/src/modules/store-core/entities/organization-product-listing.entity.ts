@@ -66,6 +66,20 @@ export class OrganizationProductListing {
   @Column({ type: 'numeric', precision: 12, scale: 2, nullable: true })
   price: number | null;
 
+  /**
+   * Origin type of this listing — 'market_trial' when created via Trial listing flow.
+   * WO-MARKET-TRIAL-LISTING-AUTOLINK-V1
+   */
+  @Column({ name: 'source_type', type: 'varchar', length: 50, nullable: true })
+  source_type: string | null;
+
+  /**
+   * ID of the source record (e.g. Market Trial ID when source_type = 'market_trial').
+   * WO-MARKET-TRIAL-LISTING-AUTOLINK-V1
+   */
+  @Column({ name: 'source_id', type: 'uuid', nullable: true })
+  source_id: string | null;
+
   @CreateDateColumn()
   created_at: Date;
 
