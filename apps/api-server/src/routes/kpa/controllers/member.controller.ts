@@ -165,7 +165,7 @@ export function createMemberController(
           }
         }
 
-        const member = memberRepo.create({
+        const memberData: Partial<KpaMember> = {
           user_id: req.user!.id,
           organization_id: organizationId,
           membership_type: membershipType,
@@ -180,7 +180,8 @@ export function createMemberController(
           pharmacy_address: isPharmacistType ? (req.body.pharmacy_address || null) : null,
           activity_type: req.body.activity_type || null,
           fee_category: req.body.fee_category || null,
-        } as any);
+        };
+        const member = memberRepo.create(memberData);
 
         const saved = await memberRepo.save(member);
 

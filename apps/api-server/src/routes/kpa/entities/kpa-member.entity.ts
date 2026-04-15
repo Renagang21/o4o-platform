@@ -59,8 +59,8 @@ export class KpaMember {
   @Column({ type: 'uuid' })
   user_id: string;  // auth-core 사용자 ID
 
-  @Column({ type: 'uuid' })
-  organization_id: string;
+  @Column({ type: 'uuid', nullable: true })
+  organization_id: string | null;
 
   @Column({ type: 'varchar', length: 50, default: 'member' })
   role: KpaMemberRole;
