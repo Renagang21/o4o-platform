@@ -155,10 +155,11 @@ const SettlementsPage = lazy(() => import('@/pages/operator/SettlementsPage'));
 const ReportsPage = lazy(() => import('@/pages/operator/ReportsPage'));
 const BillingPreviewPage = lazy(() => import('@/pages/operator/BillingPreviewPage'));
 const InvoicesPage = lazy(() => import('@/pages/operator/InvoicesPage'));
-// Hub Exploration (WO-O4O-HUB-EXPLORATION-CORE-V1)
+// Hub Exploration (WO-O4O-HUB-EXPLORATION-CORE-V1 / WO-O4O-GLYCOPHARM-KPA-STYLE-UX-REFINE-P1-V1)
 const GlycoPharmHubPage = lazy(() => import('@/pages/hub/GlycoPharmHubPage').then(m => ({ default: m.GlycoPharmHubPage })));
 const HubB2BCatalogPage = lazy(() => import('@/pages/hub/HubB2BCatalogPage').then(m => ({ default: m.HubB2BCatalogPage })));
 const HubContentListPage = lazy(() => import('@/pages/hub/HubContentListPage').then(m => ({ default: m.HubContentListPage })));
+import { GlycoPharmHubLayout } from '@/components/layouts/GlycoPharmHubLayout';
 
 // Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
 import { StoreDashboardLayout, GLYCOPHARM_STORE_CONFIG, resolveStoreMenu } from '@o4o/store-ui-core';
@@ -423,10 +424,12 @@ function AppRoutes() {
         <Route path="b2b/supply" element={<SupplyPage />} />
         {/* Signage Public (WO-SIGNAGE-CONTENT-HUB-V1) */}
         <Route path="signage" element={<ContentLibraryPage />} />
-        {/* Hub Exploration (WO-O4O-HUB-EXPLORATION-CORE-V1) */}
-        <Route path="hub" element={<GlycoPharmHubPage />} />
-        <Route path="hub/b2b" element={<HubB2BCatalogPage />} />
-        <Route path="hub/content" element={<HubContentListPage />} />
+        {/* Hub Exploration — sidebar layout (WO-O4O-GLYCOPHARM-KPA-STYLE-UX-REFINE-P1-V1) */}
+        <Route path="hub" element={<GlycoPharmHubLayout />}>
+          <Route index element={<GlycoPharmHubPage />} />
+          <Route path="b2b" element={<HubB2BCatalogPage />} />
+          <Route path="content" element={<HubContentListPage />} />
+        </Route>
         {/* WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1 */}
         <Route path="library/content" element={<HubContentListPage />} />
         {/* MyPage 3-split (WO-O4O-GLYCOPHARM-MYPAGE-SPLIT-V1) */}

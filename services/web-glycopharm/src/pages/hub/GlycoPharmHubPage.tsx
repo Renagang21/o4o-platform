@@ -215,7 +215,7 @@ export function GlycoPharmHubPage() {
 
   return (
     <HubExplorationLayout
-      theme={{ primaryColor: '#0d9488', maxWidth: '1100px' }}
+      theme={{ primaryColor: '#0d9488', maxWidth: '100%' }}
       hero={{ slides: heroSlides, autoInterval: heroSlides.length > 1 ? 5000 : 0 }}
       b2bRevenue={b2bItems.length > 0 ? { items: b2bItems, title: 'B2B', ctaLabel: 'B2B 전체 보기', onCtaClick: () => navigate('/hub/b2b') } : undefined}
       ads={ads.length > 0 ? { ads } : undefined}

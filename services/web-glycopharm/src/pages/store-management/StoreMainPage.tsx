@@ -15,7 +15,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
 import {
   Package,
   ShoppingCart,
@@ -32,6 +32,10 @@ import {
   Activity,
   BarChart3,
   Zap,
+  Truck,
+  Tag,
+  FileText,
+  DollarSign,
 } from 'lucide-react';
 import { pharmacyApi } from '@/api/pharmacy';
 import type {
@@ -43,6 +47,16 @@ import type {
   ProductSnapshotData,
 } from '@/api/pharmacy';
 import { logStoreAction } from '@/utils/store-action-log';
+
+// ─── 주요 바로가기 (KPA StoreHomePage 3×2 그리드 패턴) ────
+const QUICK_ACTIONS = [
+  { label: 'B2B 주문', icon: Truck, desc: '공급사 상품 주문 확인', path: '/store/b2b-order', color: '#059669' },
+  { label: 'Market Trial', icon: Tag, desc: '마켓트라이얼 관리', path: '/store/market-trial', color: '#0d9488' },
+  { label: '상품 관리', icon: Package, desc: '상품 목록 및 등록', path: '/store/products', color: '#7c3aed' },
+  { label: '사이니지', icon: Tv, desc: '디지털 디스플레이 관리', path: '/store/signage', color: '#2563eb' },
+  { label: '콘텐츠', icon: FileText, desc: '콘텐츠 가져오기', path: '/store/content', color: '#ec4899' },
+  { label: '설정', icon: Settings, desc: '약국 설정 관리', path: '/store/settings', color: '#64748b' },
+];
 
 // ─── Block 8: Quick Link 정의 ───────────────────────────
 const QUICK_LINKS = [
@@ -233,80 +247,97 @@ export default function StoreMainPage() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
+      {/* ── 페이지 헤더 ── */}
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-slate-800">내 약국 홈</h1>
+          <p className="text-sm text-slate-500 mt-0.5">약국 운영 현황을 한눈에 파악합니다</p>
+        </div>
+        <button
+          onClick={() => fetchData(true)}
+          disabled={refreshing}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-slate-500 border border-slate-200 rounded-lg bg-white hover:bg-slate-50 transition-colors disabled:opacity-50"
+        >
+          <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+          새로고침
+        </button>
+      </div>
+
       {/* ========================================= */}
-      {/* Block 1: 매장 KPI 요약                    */}
+      {/* Block 1: 매장 KPI — 4칸 아이콘 그리드      */}
+      {/* KPA StoreHomePage 패턴 참고               */}
       {/* ========================================= */}
-      <div className="bg-white rounded-2xl shadow-sm p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center">
-              <TrendingUp className="w-5 h-5 text-slate-600" />
-            </div>
-            <h2 className="text-lg font-semibold text-slate-800">매장 KPI</h2>
+      {kpiSummary ? (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="bg-white border border-slate-200 rounded-xl p-4 text-center">
+            <ShoppingCart className="w-5 h-5 mx-auto mb-2" style={{ color: '#059669' }} />
+            <p className="text-2xl font-bold text-slate-800">{kpiSummary.todayOrders}</p>
+            <p className="text-xs text-slate-500 mt-0.5">오늘 주문</p>
           </div>
-          <div className="flex items-center gap-2">
-            {refreshing && <Loader2 className="w-4 h-4 text-slate-400 animate-spin" />}
-            <button
-              onClick={() => fetchData(true)}
-              disabled={refreshing}
-              className="p-1.5 rounded-lg hover:bg-slate-100 transition-colors disabled:opacity-50"
-              title="새로고침"
-            >
-              <RefreshCw className="w-4 h-4 text-slate-400" />
-            </button>
+          <div className="bg-white border border-slate-200 rounded-xl p-4 text-center">
+            <Activity className="w-5 h-5 mx-auto mb-2" style={{ color: '#2563eb' }} />
+            <p className="text-2xl font-bold text-slate-800">{kpiSummary.weekOrders}</p>
+            <p className="text-xs text-slate-500 mt-0.5">이번주 주문</p>
+          </div>
+          <div className="bg-white border border-slate-200 rounded-xl p-4 text-center">
+            <DollarSign className="w-5 h-5 mx-auto mb-2" style={{ color: '#7c3aed' }} />
+            <p className="text-xl font-bold text-slate-800">
+              {(kpiSummary.monthRevenue / 10000).toFixed(0)}
+              <span className="text-sm font-normal text-slate-500 ml-0.5">만원</span>
+            </p>
+            <div className="flex items-center justify-center gap-1 mt-0.5">
+              <p className="text-xs text-slate-500">이번달 매출</p>
+              {revenueGrowth !== 0 && (
+                <span className={`text-[10px] font-medium px-1 py-0.5 rounded ${
+                  revenueGrowth > 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'
+                }`}>
+                  {revenueGrowth > 0 ? '+' : ''}{revenueGrowth}%
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="bg-white border border-slate-200 rounded-xl p-4 text-center">
+            <BarChart3 className="w-5 h-5 mx-auto mb-2" style={{ color: '#f59e0b' }} />
+            <p className="text-xl font-bold text-slate-800">
+              {(kpiSummary.avgOrderValue / 1000).toFixed(0)}
+              <span className="text-sm font-normal text-slate-500 ml-0.5">천원</span>
+            </p>
+            <p className="text-xs text-slate-500 mt-0.5">평균 주문가</p>
           </div>
         </div>
+      ) : kpiLoading ? (
+        <div className="flex justify-center py-8">
+          <Loader2 className="w-6 h-6 text-slate-300 animate-spin" />
+        </div>
+      ) : (
+        <p className="text-sm text-slate-500 text-center py-6 bg-white rounded-xl border border-slate-200">
+          KPI 데이터를 불러올 수 없습니다.
+        </p>
+      )}
 
-        {kpiSummary ? (
-          <>
-            <div className="grid grid-cols-3 gap-4 mb-4">
-              <div className="p-4 bg-slate-50 rounded-xl">
-                <p className="text-2xl font-bold text-slate-800">{kpiSummary.todayOrders}</p>
-                <p className="text-sm text-slate-500">오늘 주문</p>
-              </div>
-              <div className="p-4 bg-slate-50 rounded-xl">
-                <p className="text-2xl font-bold text-slate-800">{kpiSummary.weekOrders}</p>
-                <p className="text-sm text-slate-500">이번주 주문</p>
-              </div>
-              <div className="p-4 bg-slate-50 rounded-xl">
-                <p className="text-2xl font-bold text-slate-800">{kpiSummary.monthOrders}</p>
-                <p className="text-sm text-slate-500">이번달 주문</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 bg-slate-50 rounded-xl">
-                <p className="text-2xl font-bold text-slate-800">
-                  {kpiSummary.monthRevenue.toLocaleString()}
-                  <span className="text-sm font-normal text-slate-500 ml-1">원</span>
-                </p>
-                <div className="flex items-center gap-2">
-                  <p className="text-sm text-slate-500">이번달 매출</p>
-                  {revenueGrowth !== 0 && (
-                    <span className={`text-xs font-medium px-1.5 py-0.5 rounded ${
-                      revenueGrowth > 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'
-                    }`}>
-                      {revenueGrowth > 0 ? '+' : ''}{revenueGrowth}%
-                    </span>
-                  )}
-                </div>
-              </div>
-              <div className="p-4 bg-slate-50 rounded-xl">
-                <p className="text-2xl font-bold text-slate-800">
-                  {kpiSummary.avgOrderValue.toLocaleString()}
-                  <span className="text-sm font-normal text-slate-500 ml-1">원</span>
-                </p>
-                <p className="text-sm text-slate-500">평균 주문가</p>
-              </div>
-            </div>
-          </>
-        ) : kpiLoading ? (
-          <div className="flex justify-center py-8">
-            <Loader2 className="w-6 h-6 text-slate-300 animate-spin" />
-          </div>
-        ) : (
-          <p className="text-sm text-slate-500 text-center py-6">KPI 데이터를 불러올 수 없습니다.</p>
-        )}
+      {/* ========================================= */}
+      {/* 주요 바로가기 — 3×2 그리드                 */}
+      {/* KPA StoreHomePage 주요 바로가기 패턴 참고   */}
+      {/* ========================================= */}
+      <div className="bg-white border border-slate-200 rounded-xl p-5">
+        <h2 className="text-sm font-semibold text-slate-700 mb-3">주요 바로가기</h2>
+        <div className="grid grid-cols-3 gap-3">
+          {QUICK_ACTIONS.map((item) => {
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.label}
+                to={item.path}
+                className="flex flex-col items-center p-4 bg-slate-50 border border-slate-100 rounded-xl text-center hover:border-slate-200 hover:bg-slate-100 transition-colors"
+              >
+                <Icon className="w-6 h-6 mb-2" style={{ color: item.color }} />
+                <p className="text-sm font-semibold text-slate-800">{item.label}</p>
+                <p className="text-xs text-slate-400 mt-0.5">{item.desc}</p>
+              </Link>
+            );
+          })}
+        </div>
       </div>
 
       {/* ========================================= */}

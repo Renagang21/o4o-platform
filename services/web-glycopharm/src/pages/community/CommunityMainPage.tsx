@@ -10,12 +10,15 @@
  * Sponsors/Ads: communityApi 연동
  *
  * 섹션 순서:
- *  1. Hero (스폰서 포함)
- *  2. Feed (탭 + 정렬 + DataTable)
- *  3. 광고 섹션
- *  4. 콘텐츠 (최근 + 추천 카드 그리드)
- *  5. 디지털 사이니지 미리보기
- *  6. 파트너 로고 슬라이드
+ *  1. Hero (심플 타이틀 + CTA)
+ *  2. KPI 카드 (오늘 글 / 참여자 / 인기 카테고리)
+ *  3. 공지사항
+ *  4. Feed (탭 + 정렬 + DataTable)
+ *  5. 광고 섹션
+ *  6. 콘텐츠 (최근 + 추천 카드 그리드)
+ *  7. 스폰서
+ *  8. 디지털 사이니지 미리보기
+ *  9. 파트너 로고 슬라이드
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -27,6 +30,10 @@ import {
   ArrowRight,
   Image as ImageIcon,
   ExternalLink,
+  MessageSquare,
+  Users,
+  Tag,
+  Bell,
 } from 'lucide-react';
 import { DataTable, type Column } from '@o4o/ui';
 import { HUB_PRODUCER_LABELS, type HubProducer } from '@o4o/types/hub-content';
@@ -281,62 +288,93 @@ export default function CommunityMainPage() {
   const recommendedIds = new Set(recommendedContent.map((c) => c.id));
   const recentContent = contentItems.filter((c) => !recommendedIds.has(c.id)).slice(0, 6);
 
+  // KPI 집계 (feedItems 기반)
+  const today = new Date().toISOString().slice(0, 10);
+  const todayPosts = feedItems.filter((i) => i.date.startsWith(today)).length;
+  const uniqueAuthors = new Set(feedItems.map((i) => i.author)).size;
+  const topCategory = (() => {
+    const counts: Record<string, number> = {};
+    feedItems.forEach((i) => { counts[i.category] = (counts[i.category] || 0) + 1; });
+    return Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '–';
+  })();
+
+  // 공지 (category === '공지' or first 3 pinned-style items)
+  const noticeItems = feedItems.filter((i) => i.category === '공지').slice(0, 5);
+
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="max-w-4xl mx-auto px-4 py-8">
 
-        {/* ─── 1. Hero Section ─── */}
-        <section className="mb-10">
-          <div className="flex flex-col lg:flex-row gap-6">
-            {/* Left: Title + CTA */}
-            <div className="flex-1">
-              <h1 className="text-2xl font-bold text-slate-900 leading-snug mb-3">
-                약국 운영 경험을 나누고<br />바로 매장에 적용하세요
-              </h1>
-              <p className="text-sm text-slate-500 mb-5">
-                회원 약사들의 운영 노하우, 제품 경험, 마케팅 전략을 공유하는 공간입니다.
-              </p>
-              <div className="flex gap-3">
-                <Link
-                  to="/forum/write"
-                  className="px-5 py-2.5 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors"
-                >
-                  글 작성
-                </Link>
-                <Link
-                  to="/education"
-                  className="px-5 py-2.5 text-sm font-medium text-primary-700 bg-primary-50 rounded-lg hover:bg-primary-100 transition-colors"
-                >
-                  강좌 신청
-                </Link>
-              </div>
-            </div>
-
-            {/* Right: Sponsor Cards */}
-            <div className="flex-1 flex flex-col gap-3">
-              {sponsors.length > 0 ? sponsors.slice(0, 3).map((s) => (
-                <a
-                  key={s.id}
-                  href={s.linkUrl ?? undefined}
-                  className="block p-3.5 bg-white border border-slate-200 rounded-lg hover:border-primary-300 transition-colors"
-                >
-                  <p className="text-sm font-medium text-slate-800">{s.name}</p>
-                </a>
-              )) : (
-                <div className="p-3.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-400 text-center">
-                  스폰서 정보를 불러오는 중...
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Stats Bar */}
-          <div className="mt-5 text-xs text-slate-400">
-            오늘 글 23 &nbsp;|&nbsp; 참여자 58 &nbsp;|&nbsp; 인기: 혈당관리
+        {/* ─── 1. Hero Section (스폰서 분리) ─── */}
+        <section className="mb-8">
+          <h1 className="text-2xl font-bold text-slate-900 leading-snug mb-2">
+            약국 운영 경험을 나누고<br />바로 매장에 적용하세요
+          </h1>
+          <p className="text-sm text-slate-500 mb-4">
+            회원 약사들의 운영 노하우, 제품 경험, 마케팅 전략을 공유하는 공간입니다.
+          </p>
+          <div className="flex gap-3">
+            <Link
+              to="/forum/write"
+              className="px-5 py-2.5 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors"
+            >
+              글 작성
+            </Link>
+            <Link
+              to="/education"
+              className="px-5 py-2.5 text-sm font-medium text-primary-700 bg-primary-50 rounded-lg hover:bg-primary-100 transition-colors"
+            >
+              강좌 신청
+            </Link>
           </div>
         </section>
 
-        {/* ─── 2. Feed Section ─── */}
+        {/* ─── 2. KPI 카드 블록 (Stats Bar → 카드형) ─── */}
+        <section className="mb-8">
+          <div className="grid grid-cols-3 gap-3">
+            <div className="bg-white border border-slate-200 rounded-xl p-4 text-center">
+              <MessageSquare className="w-5 h-5 mx-auto mb-2 text-primary-500" />
+              <p className="text-2xl font-bold text-slate-800">{feedLoading ? '–' : todayPosts}</p>
+              <p className="text-xs text-slate-500 mt-0.5">오늘 글</p>
+            </div>
+            <div className="bg-white border border-slate-200 rounded-xl p-4 text-center">
+              <Users className="w-5 h-5 mx-auto mb-2 text-blue-500" />
+              <p className="text-2xl font-bold text-slate-800">{feedLoading ? '–' : uniqueAuthors}</p>
+              <p className="text-xs text-slate-500 mt-0.5">참여자</p>
+            </div>
+            <div className="bg-white border border-slate-200 rounded-xl p-4 text-center">
+              <Tag className="w-5 h-5 mx-auto mb-2 text-emerald-500" />
+              <p className="text-lg font-bold text-slate-800 truncate">{feedLoading ? '–' : topCategory}</p>
+              <p className="text-xs text-slate-500 mt-0.5">인기 카테고리</p>
+            </div>
+          </div>
+        </section>
+
+        {/* ─── 3. 공지 섹션 (NoticeSection 패턴) ─── */}
+        {!feedLoading && noticeItems.length > 0 && (
+          <section className="mb-8">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Bell className="w-4 h-4 text-slate-500" />
+                <h2 className="text-sm font-semibold text-slate-700">공지사항</h2>
+              </div>
+              <Link to="/forum?category=공지" className="flex items-center gap-1 text-xs text-primary-600 hover:text-primary-700 font-medium">
+                전체보기 <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+            <div className="bg-white border border-slate-200 rounded-xl divide-y divide-slate-100">
+              {noticeItems.map((item) => (
+                <div key={item.id} className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors">
+                  <span className="shrink-0 px-1.5 py-0.5 text-[10px] font-medium bg-primary-50 text-primary-600 rounded">공지</span>
+                  <span className="flex-1 text-sm text-slate-700 truncate">{item.title}</span>
+                  <span className="text-xs text-slate-400 shrink-0">{formatFeedDate(item.date)}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ─── 4. Feed Section ─── */}
         <section className="mb-10">
           {/* Tabs */}
           <div className="flex items-center gap-1 border-b border-slate-200 mb-3 overflow-x-auto">
@@ -403,7 +441,7 @@ export default function CommunityMainPage() {
           </div>
         </section>
 
-        {/* ─── 3. Ads Section ─── */}
+        {/* ─── 5. Ads Section ─── */}
         {ads.length > 0 && (
           <section className="mb-10">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -420,7 +458,7 @@ export default function CommunityMainPage() {
           </section>
         )}
 
-        {/* ─── 4. Content Section (WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1) ─── */}
+        {/* ─── 6. Content Section (WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1) ─── */}
         <section className="mb-10">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold text-slate-800">콘텐츠</h2>
@@ -467,7 +505,33 @@ export default function CommunityMainPage() {
           )}
         </section>
 
-        {/* ─── 5. Digital Signage Preview ─── */}
+        {/* ─── 7. Sponsors Section ─── */}
+        {sponsors.length > 0 && (
+          <section className="mb-10">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-semibold text-slate-700">스폰서</h2>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {sponsors.map((sp) => (
+                <a
+                  key={sp.id}
+                  href={sp.linkUrl ?? undefined}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center px-4 py-3 bg-white border border-slate-200 rounded-lg hover:border-slate-300 transition-colors"
+                >
+                  {sp.logoUrl ? (
+                    <img src={sp.logoUrl} alt={sp.name} className="h-6 object-contain" />
+                  ) : (
+                    <span className="text-xs font-medium text-slate-500">{sp.name}</span>
+                  )}
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ─── 8. Digital Signage Preview ─── */}
         <section className="mb-10">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-lg font-bold text-slate-800">디지털 사이니지</h2>
@@ -530,7 +594,7 @@ export default function CommunityMainPage() {
           )}
         </section>
 
-        {/* ─── 6. Partner Logo Slide ─── */}
+        {/* ─── 9. Partner Logo Slide ─── */}
         <section className="mb-6 overflow-hidden">
           <div className="relative group">
             <div className="flex animate-marquee group-hover:[animation-play-state:paused]">
