@@ -176,8 +176,8 @@ export function createGroupbuyOperatorController(
             SELECT
               metadata->>'productListingId' AS listing_id,
               COUNT(*)::int AS order_count,
-              COUNT(DISTINCT "buyerId")::int AS participant_count
-            FROM ecommerce_orders
+              COUNT(DISTINCT buyer_id)::int AS participant_count
+            FROM checkout_orders
             WHERE metadata->>'serviceKey' = 'kpa-groupbuy'
             GROUP BY metadata->>'productListingId'
           ) oc ON oc.listing_id = opl.id::text

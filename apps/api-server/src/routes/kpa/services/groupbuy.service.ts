@@ -1,36 +1,20 @@
 /**
  * KPA Groupbuy Service
  *
- * WO-O4O-ROUTES-REFACTOR-V1: Extracted from kpa.routes.ts (lines 2367-2594)
- * WO-KPA-GROUPBUY-ORDER-METADATA-SYNC-V1: E-commerce Core entities for order creation
- * WO-KPA-CAMPAIGN-PARTICIPATE-ENFORCEMENT-V1: Server-enforced pricing + validation gates
+ * WO-O4O-ROUTES-REFACTOR-V1: Extracted from kpa.routes.ts
+ * WO-EVENT-OFFER-FIX-V1: checkout_orders 테이블 사용, ecommerce_orders 제거
  *
  * Responsibilities:
  * - Groupbuy listing queries (public, with optional auth)
  * - Operator stats aggregation
- * - User participation (order creation via E-commerce Core)
+ * - User participation (order creation via checkoutService)
  */
 
 import type { DataSource, Repository } from 'typeorm';
 import { OrganizationProductListing } from '../../../modules/store-core/entities/organization-product-listing.entity.js';
 import { SERVICE_KEYS } from '../../../constants/service-keys.js';
-import {
-  EcommerceOrder,
-  EcommerceOrderItem,
-  OrderType,
-  OrderStatus,
-  PaymentStatus,
-  BuyerType,
-  SellerType,
-} from '@o4o/ecommerce-core/entities';
-
-// WO-KPA-GROUPBUY-ORDER-METADATA-SYNC-V1: ORD-YYYYMMDD-XXXX (GlycoPharm 동일 포맷)
-function generateGroupbuyOrderNumber(): string {
-  const now = new Date();
-  const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');
-  const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-  return `ORD-${dateStr}-${random}`;
-}
+import { CheckoutOrder } from '../../../entities/checkout/CheckoutOrder.entity.js';
+import { checkoutService } from '../../../services/checkout.service.js';
 
 export class GroupbuyService {
   private listingRepo: Repository<OrganizationProductListing>;
@@ -66,27 +50,24 @@ export class GroupbuyService {
     participatingStores: number;
     registeredProducts: number;
   }> {
-    const [orderStats, quantityStats, storeStats, listingCount] = await Promise.all([
+    const [orderStats, storeStats, listingCount] = await Promise.all([
       this.dataSource.query(`
         SELECT
-          COUNT(*)::int as "totalOrders",
-          COALESCE(SUM(eo."totalAmount"), 0)::numeric as "totalRevenue"
-        FROM ecommerce_orders eo
-        WHERE eo.metadata->>'serviceKey' = 'kpa-groupbuy'
-          AND eo.status = 'paid'
+          COUNT(*)::int AS "totalOrders",
+          COALESCE(SUM(total_amount), 0)::numeric AS "totalRevenue",
+          COALESCE(SUM(
+            (SELECT COALESCE(SUM((elem->>'quantity')::int), 0)
+             FROM jsonb_array_elements(items) AS elem)
+          ), 0)::int AS "totalQuantity"
+        FROM checkout_orders
+        WHERE metadata->>'serviceKey' = 'kpa-groupbuy'
+          AND status = 'paid'
       `),
       this.dataSource.query(`
-        SELECT COALESCE(SUM(oi.quantity), 0)::int as "totalQuantity"
-        FROM ecommerce_order_items oi
-        INNER JOIN ecommerce_orders eo ON eo.id = oi."orderId"
-        WHERE eo.metadata->>'serviceKey' = 'kpa-groupbuy'
-          AND eo.status = 'paid'
-      `),
-      this.dataSource.query(`
-        SELECT COUNT(DISTINCT eo."buyerId")::int as "participatingStores"
-        FROM ecommerce_orders eo
-        WHERE eo.metadata->>'serviceKey' = 'kpa-groupbuy'
-          AND eo.status = 'paid'
+        SELECT COUNT(DISTINCT buyer_id)::int AS "participatingStores"
+        FROM checkout_orders
+        WHERE metadata->>'serviceKey' = 'kpa-groupbuy'
+          AND status = 'paid'
       `),
       this.listingRepo.count({
         where: { service_key: SERVICE_KEYS.KPA_GROUPBUY, is_active: true },
@@ -95,7 +76,7 @@ export class GroupbuyService {
 
     return {
       totalOrders: orderStats[0]?.totalOrders ?? 0,
-      totalQuantity: quantityStats[0]?.totalQuantity ?? 0,
+      totalQuantity: orderStats[0]?.totalQuantity ?? 0,
       totalRevenue: parseFloat(orderStats[0]?.totalRevenue ?? '0'),
       participatingStores: storeStats[0]?.participatingStores ?? 0,
       registeredProducts: listingCount,
@@ -106,13 +87,12 @@ export class GroupbuyService {
    * GET /my-participations — Authenticated user's groupbuy orders
    */
   async getMyParticipations(userId: string): Promise<{ data: any[]; total: number }> {
-    const orderRepo = this.dataSource.getRepository(EcommerceOrder);
+    const orderRepo = this.dataSource.getRepository(CheckoutOrder);
     const [orders, total] = await orderRepo
       .createQueryBuilder('o')
-      .leftJoinAndSelect('o.items', 'items')
-      .where('o."buyerId" = :buyerId', { buyerId: userId })
+      .where('o.buyerId = :buyerId', { buyerId: userId })
       .andWhere("o.metadata->>'serviceKey' = :sk", { sk: 'kpa-groupbuy' })
-      .orderBy('o."createdAt"', 'DESC')
+      .orderBy('o.createdAt', 'DESC')
       .take(20)
       .getManyAndCount();
 
@@ -139,10 +119,9 @@ export class GroupbuyService {
   }
 
   /**
-   * POST /:id/participate — Create groupbuy order
+   * POST /:id/participate — Create groupbuy order via checkoutService
    *
-   * WO-KPA-GROUPBUY-ORDER-METADATA-SYNC-V1: listing.service_key -> Order.metadata.serviceKey propagation
-   * WO-KPA-CAMPAIGN-PARTICIPATE-ENFORCEMENT-V1: Server-enforced price + validation gates
+   * WO-EVENT-OFFER-FIX-V1: checkout_orders 사용, metadata.serviceKey 전파
    */
   async participate(
     listingId: string,
@@ -157,13 +136,12 @@ export class GroupbuyService {
       throw new GroupbuyError(404, 'Product not found');
     }
 
-    // 2. 수량 (기본 1) + 가격 조회
-    // WO-KPA-CAMPAIGN-PARTICIPATE-ENFORCEMENT-V1: 서버 강제 가격 + 검증 게이트
     const quantity = Math.max(1, parseInt(String(data?.quantity)) || 1);
 
-    // Gate 1: Supplier product 활성/승인 검증
+    // 2. Supplier product 활성/승인 검증 + 가격 조회
     const productRows = await this.dataSource.query(
-      `SELECT spo.price_general, spo.is_active, spo.approval_status, s.status AS supplier_status,
+      `SELECT spo.id AS spo_id, spo.supplier_id, spo.price_general, spo.is_active,
+              spo.approval_status, s.status AS supplier_status,
               pm.marketing_name
        FROM supplier_product_offers spo
        JOIN neture_suppliers s ON s.id = spo.supplier_id
@@ -175,69 +153,34 @@ export class GroupbuyService {
       throw new GroupbuyError(404, 'Supplier product not found');
     }
     const product = productRows[0];
-    if (!product.is_active) {
-      throw new GroupbuyError(400, 'Product is not active', 'PRODUCT_INACTIVE');
-    }
-    if (product.approval_status !== 'APPROVED') {
-      throw new GroupbuyError(400, 'Product is not approved', 'PRODUCT_NOT_APPROVED');
-    }
-    if (product.supplier_status !== 'ACTIVE') {
-      throw new GroupbuyError(400, 'Supplier is not active', 'SUPPLIER_INACTIVE');
-    }
-    const basePrice = Number(product.price_general ?? 0);
+    if (!product.is_active) throw new GroupbuyError(400, 'Product is not active', 'PRODUCT_INACTIVE');
+    if (product.approval_status !== 'APPROVED') throw new GroupbuyError(400, 'Product is not approved', 'PRODUCT_NOT_APPROVED');
+    if (product.supplier_status !== 'ACTIVE') throw new GroupbuyError(400, 'Supplier is not active', 'SUPPLIER_INACTIVE');
 
-    const unitPrice = basePrice;
+    const unitPrice = Number(product.price_general ?? 0);
+    if (unitPrice <= 0) throw new GroupbuyError(400, 'Invalid product price', 'INVALID_PRICE');
 
-    // Gate 3: 가격 유효성
-    if (unitPrice <= 0) {
-      throw new GroupbuyError(400, 'Invalid product price', 'INVALID_PRICE');
-    }
     const subtotal = quantity * unitPrice;
 
-    // 3. metadata.serviceKey 전파 — listing.service_key -> Order.metadata.serviceKey
-    const metadata: Record<string, unknown> = {
-      serviceKey: listing.service_key,
-      productListingId: listing.id,
-      productName: product.marketing_name || '',
-      productId: listing.offer_id,
-    };
-
-    // 4. ecommerce_orders에 주문 생성 (GlycoPharm createCoreOrder 패턴)
-    const orderRepo = this.dataSource.getRepository(EcommerceOrder);
-    const orderItemRepo = this.dataSource.getRepository(EcommerceOrderItem);
-
-    const order = orderRepo.create({
-      orderNumber: generateGroupbuyOrderNumber(),
+    // 3. 주문 생성 (checkoutService 경유 — CLAUDE.md 규칙)
+    const savedOrder = await checkoutService.createOrder({
       buyerId: userId,
-      buyerType: BuyerType.USER,
       sellerId: listing.organization_id,
-      sellerType: SellerType.ORGANIZATION,
-      orderType: OrderType.RETAIL,
-      subtotal,
-      shippingFee: 0,
-      discount: 0,
-      totalAmount: subtotal,
-      currency: 'KRW',
-      paymentStatus: PaymentStatus.PENDING,
-      status: OrderStatus.CREATED,
-      metadata,
-      orderSource: 'kpa-society',
+      supplierId: product.supplier_id,
+      items: [{
+        productId: listing.offer_id,
+        productName: product.marketing_name || '',
+        quantity,
+        unitPrice,
+        subtotal,
+      }],
+      metadata: {
+        serviceKey: listing.service_key,
+        productListingId: listing.id,
+        productName: product.marketing_name || '',
+        productId: listing.offer_id,
+      },
     });
-
-    const savedOrder = await orderRepo.save(order);
-
-    const orderItem = orderItemRepo.create({
-      orderId: savedOrder.id,
-      productId: listing.offer_id,
-      productName: product.marketing_name || '',
-      quantity,
-      unitPrice,
-      discount: 0,
-      subtotal,
-      metadata: { productListingId: listing.id },
-    });
-
-    await orderItemRepo.save(orderItem);
 
     return {
       orderId: savedOrder.id,
@@ -249,7 +192,7 @@ export class GroupbuyService {
 }
 
 /**
- * Typed error for groupbuy operations — carries HTTP status + optional error code
+ * Typed error for groupbuy operations
  */
 export class GroupbuyError extends Error {
   constructor(
