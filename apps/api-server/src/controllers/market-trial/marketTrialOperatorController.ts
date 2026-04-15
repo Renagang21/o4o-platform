@@ -1143,7 +1143,7 @@ async function dispatchConversionNotifications(
     );
   }
 
-  console.log(`[MarketTrial] Sent conversion notifications for trial ${trialId} → ${participants.length} participant(s)`);
+  console.error(`[MarketTrial] Sent conversion notifications for trial ${trialId} → ${participants.length} participant(s)`);
 }
 
 // ============================================================================
