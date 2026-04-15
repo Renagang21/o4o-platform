@@ -6,7 +6,7 @@
 
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth, isPharmacistRole } from '@/contexts/AuthContext';
 import { useLoginModal } from '@/contexts/LoginModalContext';
 import {
   Menu,
@@ -45,8 +45,8 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
-  // WO-O4O-AUTH-RBAC-CLEANUP-V1: prefixed role checks
-  const isPharmacy = isAuthenticated && user?.roles?.some(r => r === 'pharmacy');
+  // WO-GLYCOPHARM-ROLE-PREFIX-MIGRATION-V1: glycopharm:pharmacist OR legacy pharmacy
+  const isPharmacy = isAuthenticated && user?.roles?.some(r => isPharmacistRole(r));
   const isAdmin = isAuthenticated && user?.roles?.some(r => r === 'glycopharm:admin' || r === 'platform:super_admin');
   const isOperator = isAuthenticated && user?.roles?.some(r => r === 'glycopharm:operator' || r === 'glycopharm:admin' || r === 'platform:super_admin');
 

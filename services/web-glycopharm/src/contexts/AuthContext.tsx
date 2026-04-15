@@ -86,18 +86,26 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export { GLYCOPHARM_ROLE_PRIORITY, GLYCOPHARM_DASHBOARD_MAP, getGlycopharmDashboardRoute } from '../config/dashboard';
 
 // GlycoPharm role constants — DB에 실제 저장되는 값과 일치
+// WO-GLYCOPHARM-ROLE-PREFIX-MIGRATION-V1: PHARMACIST 추가, PHARMACY는 호환용 유지
 export const GLYCOPHARM_ROLES = {
   ADMIN: 'glycopharm:admin',
   OPERATOR: 'glycopharm:operator',
-  PHARMACY: 'pharmacy',
+  PHARMACIST: 'glycopharm:pharmacist',
+  PHARMACY: 'pharmacy', // DEPRECATED → PHARMACIST (호환용 유지)
   SUPPLIER: 'supplier',
   CONSUMER: 'customer',
   PLATFORM_SUPER_ADMIN: 'platform:super_admin',
 } as const;
 
+/** 약사 역할 확인 헬퍼 — glycopharm:pharmacist OR legacy pharmacy 모두 인정 */
+export function isPharmacistRole(role: string): boolean {
+  return role === GLYCOPHARM_ROLES.PHARMACIST || role === GLYCOPHARM_ROLES.PHARMACY;
+}
+
 export const ROLE_LABELS: Record<string, string> = {
   [GLYCOPHARM_ROLES.ADMIN]: '관리자',
-  [GLYCOPHARM_ROLES.PHARMACY]: '약국',
+  [GLYCOPHARM_ROLES.PHARMACIST]: '약사',
+  [GLYCOPHARM_ROLES.PHARMACY]: '약국', // legacy
   [GLYCOPHARM_ROLES.SUPPLIER]: '공급자',
   [GLYCOPHARM_ROLES.OPERATOR]: '운영자',
   [GLYCOPHARM_ROLES.CONSUMER]: '소비자',
@@ -106,7 +114,8 @@ export const ROLE_LABELS: Record<string, string> = {
 
 export const ROLE_ICONS: Record<string, string> = {
   [GLYCOPHARM_ROLES.ADMIN]: '👑',
-  [GLYCOPHARM_ROLES.PHARMACY]: '💊',
+  [GLYCOPHARM_ROLES.PHARMACIST]: '💊',
+  [GLYCOPHARM_ROLES.PHARMACY]: '💊', // legacy
   [GLYCOPHARM_ROLES.SUPPLIER]: '📦',
   [GLYCOPHARM_ROLES.OPERATOR]: '🛡️',
   [GLYCOPHARM_ROLES.CONSUMER]: '👤',

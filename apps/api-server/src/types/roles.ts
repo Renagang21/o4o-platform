@@ -59,12 +59,13 @@ export type NetureRole =
  * GlycoPharm service roles
  */
 export type GlycoPharmRole =
-  | 'glycopharm:admin'    // GlycoPharm admin
-  | 'glycopharm:operator' // GlycoPharm operator
-  | 'pharmacy'            // 약국 (정규)
-  | 'supplier'            // 공급자
-  | 'partner'             // 파트너
-  | 'customer';           // 당뇨인 (정규)
+  | 'glycopharm:admin'       // GlycoPharm admin
+  | 'glycopharm:operator'    // GlycoPharm operator
+  | 'glycopharm:pharmacist'  // GlycoPharm 약사 (WO-GLYCOPHARM-ROLE-PREFIX-MIGRATION-V1)
+  | 'pharmacy'               // DEPRECATED → glycopharm:pharmacist (호환용 유지)
+  | 'supplier'               // 공급자
+  | 'partner'                // 파트너
+  | 'customer';              // 당뇨인 (정규)
 
 /**
  * K-Cosmetics service roles
@@ -361,13 +362,21 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
     category: 'service',
     deprecated: false
   },
-  'pharmacy': {
-    role: 'pharmacy',
-    label: '약국',
-    description: 'GlycoPharm 약국 (정규)',
+  'glycopharm:pharmacist': {
+    role: 'glycopharm:pharmacist',
+    label: '약사',
+    description: 'GlycoPharm 약사 (WO-GLYCOPHARM-ROLE-PREFIX-MIGRATION-V1)',
     service: 'glycopharm',
     category: 'service',
     deprecated: false
+  },
+  'pharmacy': {
+    role: 'pharmacy',
+    label: '약국',
+    description: 'GlycoPharm 약국 — DEPRECATED → glycopharm:pharmacist',
+    service: 'glycopharm',
+    category: 'service',
+    deprecated: true
   },
   'customer': {
     role: 'customer',

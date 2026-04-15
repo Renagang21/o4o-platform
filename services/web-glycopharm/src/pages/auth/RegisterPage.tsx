@@ -120,7 +120,8 @@ export default function RegisterPage() {
         firstName: formData.firstName,
         nickname: formData.nickname,
         phone: formData.phone.replace(/\D/g, ''),
-        role: memberType === 'pharmacy' ? 'pharmacy' : 'customer',
+        // WO-GLYCOPHARM-ROLE-PREFIX-MIGRATION-V1: 신규 가입은 glycopharm:pharmacist
+        role: memberType === 'pharmacy' ? 'glycopharm:pharmacist' : 'customer',
         service: 'glycopharm',
         ...(memberType === 'pharmacy' && {
           businessName: formData.businessName || undefined,
