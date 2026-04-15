@@ -62,8 +62,9 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '운영 분석', path: '/operator/analytics' },
   ],
   // care group removed — WO-O4O-GLYCOPHARM-CARE-REMOVAL-V1
+  // WO-GLYCOPHARM-OPERATOR-MENU-ADMIN-GUARD-V1: system = admin 전용
   system: [
-    { label: '서비스 설정', path: '/operator/settings' },
+    { label: '서비스 설정', path: '/operator/settings', adminOnly: true },
   ],
 };
 
