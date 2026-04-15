@@ -72,35 +72,6 @@ export const SERVICE_SCOPES: Record<string, ServiceScopes> = {
   },
 
   /**
-   * 글루코스뷰 스코프 (혈당관리 = glycocare scope)
-   * WO-KPA-OPERATOR-SCOPE-UNIFICATION-V1
-   */
-  glucoseview: {
-    public: [
-      'glucoseview:info:read',
-    ],
-    member: [
-      'glucoseview:customer:read',
-      'glucoseview:customer:write',
-      'glucoseview:pharmacist:read',
-    ],
-    operator: [
-      'glucoseview:customer:read',
-      'glucoseview:customer:write',
-      'glucoseview:customer:manage',
-      'glucoseview:pharmacist:read',
-      'glucoseview:pharmacist:manage',
-      'glucoseview:branch:read',
-      'glucoseview:policy:manage',
-      'glucoseview:content:manage',
-      'glucoseview:certification:manage',
-    ],
-    admin: [
-      'glucoseview:branch:manage',
-      'glucoseview:pharmacist:manage',
-      'glucoseview:customer:manage',
-    ],
-  },
 
   /**
    * 네처 스코프
@@ -239,9 +210,7 @@ import type { OperatorScopeKey } from '@o4o/types';
  * 서비스 엔트리 포인트 식별자
  */
 export type ServiceEntryPoint =
-  | 'branch'           // 분회 서비스
   | 'pharmacy'         // 약국 서비스
-  | 'glucosecare'      // 혈당관리 프로그램
   | 'forum'            // 약사 포럼
   | 'lms'              // 약사 개인 LMS
   | 'admin';           // 관리자 대시보드
@@ -272,14 +241,6 @@ export interface ServiceEntryConfig {
  * - glycocare는 프로그램 스코프로, 단독 서비스가 아님
  */
 export const SERVICE_ENTRY_DEFAULTS: Record<ServiceEntryPoint, ServiceEntryConfig> = {
-  branch: {
-    entry: 'branch',
-    defaultScopeKey: 'kpa_society',
-    serviceCode: 'kpa-society',
-    displayName: '분회 서비스',
-    description: '분회 단위 조직 관리 서비스',
-    isProgram: false,
-  },
   pharmacy: {
     entry: 'pharmacy',
     defaultScopeKey: 'kpa_society',
@@ -287,14 +248,6 @@ export const SERVICE_ENTRY_DEFAULTS: Record<ServiceEntryPoint, ServiceEntryConfi
     displayName: '약국 서비스',
     description: '약국 기본 서비스',
     isProgram: false,
-  },
-  glucosecare: {
-    entry: 'glucosecare',
-    defaultScopeKey: 'glycocare',
-    serviceCode: 'glucoseview',
-    displayName: '혈당관리 프로그램',
-    description: '약국 서비스의 특수 프로그램 (혈당관리)',
-    isProgram: true,
   },
   forum: {
     entry: 'forum',
@@ -349,12 +302,6 @@ export function getServiceEntryConfig(entry: ServiceEntryPoint): ServiceEntryCon
 export function detectServiceEntryFromPath(path: string): ServiceEntryPoint | null {
   const pathLower = path.toLowerCase();
 
-  if (pathLower.includes('/glucoseview') || pathLower.includes('/glucosecare') || pathLower.includes('/glycocare')) {
-    return 'glucosecare';
-  }
-  if (pathLower.includes('/branch') || pathLower.includes('/chapter')) {
-    return 'branch';
-  }
   if (pathLower.includes('/pharmacy') || pathLower.includes('/yakguk')) {
     return 'pharmacy';
   }

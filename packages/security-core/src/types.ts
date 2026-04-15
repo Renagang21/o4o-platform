@@ -10,7 +10,6 @@ export type ServiceKey =
   | 'neture'
   | 'glycopharm'
   | 'cosmetics'
-  | 'glucoseview'
   | 'platform';
 
 /** Service-prefixed role format: "service:role" */

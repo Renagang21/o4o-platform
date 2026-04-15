@@ -88,7 +88,6 @@ import { createCosmeticsRoutes } from '../routes/cosmetics/cosmetics.routes.js';
 import { createYaksaRoutes } from '../routes/yaksa/yaksa.routes.js';
 import { createGlycopharmRoutes } from '../routes/glycopharm/glycopharm.routes.js';
 import { createKpaRoutes, createKpaJoinPublicRoutes } from '../routes/kpa/kpa.routes.js';
-import { createGlucoseViewRoutes } from '../routes/glucoseview/glucoseview.routes.js';
 import { createNetureRoutes } from '../routes/neture/neture.routes.js';
 import createNetureModuleRoutes from '../modules/neture/neture.routes.js';
 import netureLibraryRoutes from '../modules/neture/neture-library.routes.js';
@@ -445,14 +444,6 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Glycopharm routes:', glycopharmError);
     }
 
-    // 28. Register GlucoseView routes (Phase C-1)
-    try {
-      const glucoseviewRoutes = createGlucoseViewRoutes(dataSource);
-      app.use('/api/v1/glucoseview', glucoseviewRoutes);
-      logger.info('✅ GlucoseView routes registered at /api/v1/glucoseview');
-    } catch (glucoseviewError) {
-      logger.error('Failed to register GlucoseView routes:', glucoseviewError);
-    }
 
     // 28b. Register Care Analysis routes (WO-CARE-KPI-SNAPSHOT-V1)
     try {

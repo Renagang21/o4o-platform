@@ -21,14 +21,13 @@ export function getAssetTypeLabel(type: AssetType): string {
 }
 
 // ===== 서비스 범위 =====
-export type ServiceScope = 'all' | 'neture' | 'k-cosmetics' | 'glycopharm' | 'glucoseview' | 'kpa-society';
+export type ServiceScope = 'all' | 'neture' | 'k-cosmetics' | 'glycopharm' | 'kpa-society';
 
 export const SERVICE_SCOPE_OPTIONS: Array<{ value: ServiceScope; label: string }> = [
   { value: 'all', label: '전체 서비스' },
   { value: 'neture', label: '네처 (Neture)' },
   { value: 'k-cosmetics', label: 'K-코스메틱' },
   { value: 'glycopharm', label: '글라이코팜' },
-  { value: 'glucoseview', label: '글루코스뷰' },
   { value: 'kpa-society', label: 'KPA 약사회' },
 ];
 

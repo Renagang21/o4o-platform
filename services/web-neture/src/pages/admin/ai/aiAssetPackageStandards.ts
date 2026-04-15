@@ -174,42 +174,6 @@ export const AI_ASSET_PACKAGE_STANDARDS: ServicePackage[] = [
       'Non-Product(회원 안내)와 Content(공지) 균형 필요',
     ],
   },
-  {
-    serviceSlug: 'glucoseview',
-    serviceName: 'GlucoseView',
-    description: '혈당 관리 서비스 - 콘텐츠/비상품 중심',
-    requirements: [
-      {
-        type: 'brand',
-        label: '브랜드',
-        minCount: 2,
-        description: 'CGM 기기 브랜드, 파트너사',
-      },
-      {
-        type: 'product',
-        label: '상품',
-        minCount: 5,
-        description: 'CGM 기기, 관련 용품',
-      },
-      {
-        type: 'non_product',
-        label: '비상품',
-        minCount: 10,
-        description: '혈당 관리법, 기기 사용법, FAQ',
-      },
-      {
-        type: 'content',
-        label: '콘텐츠',
-        minCount: 8,
-        description: '건강 가이드, 사용 팁, 사례',
-      },
-    ],
-    totalMinAssets: 25,
-    notes: [
-      '헬스케어 서비스 특성상 교육적 콘텐츠 비중 높음',
-      'Non-Product(사용 가이드) 품질이 서비스 만족도에 직결',
-    ],
-  },
 ];
 
 /**

@@ -56,14 +56,12 @@ export const getAllowedOrigins = (): string[] => {
     "https://shop.neture.co.kr", "https://forum.neture.co.kr", "https://signage.neture.co.kr",
     "https://funding.neture.co.kr", "https://auth.neture.co.kr", "https://api.neture.co.kr",
     "https://glycopharm.co.kr", "https://www.glycopharm.co.kr",
-    "https://glucoseview.co.kr", "https://www.glucoseview.co.kr",
     "https://kpa-society.co.kr", "https://www.kpa-society.co.kr",
     "https://k-cosmetics.site", "https://www.k-cosmetics.site",
     "https://siteguide.co.kr", "https://www.siteguide.co.kr",
     // Cloud Run service URLs (GCP asia-northeast3)
     "https://glycopharm-web-3e3aws7zqa-du.a.run.app",
     "https://neture-web-3e3aws7zqa-du.a.run.app",
-    "https://glucoseview-web-3e3aws7zqa-du.a.run.app",
     "https://kpa-society-web-3e3aws7zqa-du.a.run.app",
     "https://k-cosmetics-web-3e3aws7zqa-du.a.run.app",
   ];

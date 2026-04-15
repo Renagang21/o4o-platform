@@ -72,11 +72,6 @@ export const DEFAULT_AI_POLICIES: Record<string, AiPolicy> = {
     enabled: true,
     allowedFeatures: ['preview'],
   },
-  'glucoseview': {
-    serviceId: 'glucoseview',
-    enabled: true,
-    allowedFeatures: ['preview'],
-  },
   'k-cosmetics': {
     serviceId: 'k-cosmetics',
     enabled: true,

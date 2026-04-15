@@ -12,7 +12,7 @@
 // ─────────────────────────────────────────────────────
 
 /** Services that can request AI insights */
-export type AIServiceId = 'kpa' | 'neture' | 'glycopharm' | 'glucoseview' | 'cosmetics';
+export type AIServiceId = 'kpa' | 'neture' | 'glycopharm' | 'cosmetics';
 
 /** Supported AI provider backends */
 export type AIProviderId = 'gemini' | 'openai';

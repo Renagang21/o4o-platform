@@ -171,7 +171,6 @@ export const gatewayConfig: GatewayConfig = {
       'https://admin.neture.co.kr',
       'https://shop.neture.co.kr',
       'https://kpa-society.co.kr',
-      'https://glucoseview.com',
       'https://glycopharm.com',
       'https://k-cosmetics.co.kr'
     ],

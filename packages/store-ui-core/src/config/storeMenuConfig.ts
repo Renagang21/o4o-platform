@@ -132,14 +132,6 @@ export const GLYCOPHARM_STORE_CONFIG: StoreDashboardConfig = {
   ],
 };
 
-/** GlucoseView Store Config */
-export const GLUCOSEVIEW_STORE_CONFIG: StoreDashboardConfig = {
-  serviceKey: 'glucoseview',
-  serviceName: 'GlucoseView',
-  basePath: '/store',
-  enabledMenus: ['dashboard', 'settings'],
-};
-
 /**
  * KPA-Society Store Config
  * WO-KPA-STORE-SIDEBAR-REALIGNMENT-V1

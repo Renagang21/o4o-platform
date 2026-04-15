@@ -486,19 +486,6 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     author: 'O4O Platform',
     serviceGroups: ['yaksa'],
   },
-  {
-    appId: 'cgm-glucoseview',
-    name: 'CGM GlucoseView',
-    version: '1.0.0',
-    description: '약사용 CGM 혈당 분석 서비스 - 환자 혈당 패턴 모니터링 및 인사이트 제공',
-    category: 'healthcare',
-    tags: ['CGM', 'glucose', '혈당', 'pharmacist', '약사', 'patient', 'monitoring', 'insight', '패턴'],
-    type: 'standalone',
-    status: 'active',
-    dependencies: { 'auth-core': '>=1.0.0', 'organization-core': '>=1.0.0' },
-    author: 'O4O Platform',
-    serviceGroups: ['yaksa'], // temporary - pending pharmacy serviceGroup decision
-  },
 
 
   // ============================================

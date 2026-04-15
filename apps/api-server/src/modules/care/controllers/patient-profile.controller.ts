@@ -16,12 +16,10 @@ import type { DataSource } from 'typeorm';
 import { authenticate } from '../../../middleware/auth.middleware.js';
 import type { AuthRequest } from '../../../middleware/auth.middleware.js';
 import { PatientHealthProfile } from '../entities/patient-health-profile.entity.js';
-import { GlucoseViewCustomer } from '../../../routes/glucoseview/entities/glucoseview-customer.entity.js';
 
 export function createPatientProfileRouter(dataSource: DataSource): Router {
   const router = Router();
   const profileRepo = dataSource.getRepository(PatientHealthProfile);
-  const customerRepo = dataSource.getRepository(GlucoseViewCustomer);
 
   /**
    * GET /patient-profile/me — 본인 프로필 조회
@@ -59,19 +57,7 @@ export function createPatientProfileRouter(dataSource: DataSource): Router {
         where: { userId: user.id },
       });
 
-      // 3. Customer info (optional, email match)
-      let customerInfo: { birthYear?: number | null; gender?: string | null } | null = null;
-      if (user.email) {
-        const customer = await customerRepo.findOne({
-          where: { email: user.email },
-        });
-        if (customer) {
-          customerInfo = {
-            birthYear: customer.birth_year || null,
-            gender: customer.gender || null,
-          };
-        }
-      }
+      const customerInfo: { birthYear?: number | null; gender?: string | null } | null = null;
 
       res.json({
         success: true,

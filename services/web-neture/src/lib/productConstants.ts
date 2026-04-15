@@ -120,7 +120,6 @@ export function getSupplyPolicyBadges(product: {
 const SERVICE_DISPLAY: Record<string, string> = {
   'kpa-society': 'KPA',
   'glycopharm': 'GlycoPharm',
-  'glucoseview': 'GlucoseView',
   'k-cosmetics': 'K-Cosmetics',
 };
 

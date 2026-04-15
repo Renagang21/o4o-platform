@@ -18,7 +18,6 @@ export const SERVICE_KEYS = {
   KPA_SOCIETY: 'kpa-society',
   K_COSMETICS: 'k-cosmetics',
   NETURE: 'neture',
-  GLUCOSEVIEW: 'glucoseview',
 } as const;
 
 export type ServiceKey = typeof SERVICE_KEYS[keyof typeof SERVICE_KEYS];

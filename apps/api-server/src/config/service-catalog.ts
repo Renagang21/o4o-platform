@@ -41,13 +41,6 @@ export const O4O_SERVICES: O4OService[] = [
     joinEnabled: true,
   },
   {
-    key: 'glucoseview',
-    name: 'GlucoseView',
-    domain: 'glucoseview.co.kr',
-    description: '혈당 데이터 조회 서비스',
-    joinEnabled: true,
-  },
-  {
     key: 'kpa-society',
     name: 'KPA Society',
     domain: 'kpa-society.co.kr',

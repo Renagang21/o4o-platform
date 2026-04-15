@@ -1753,19 +1753,6 @@ importers:
 
   packages/capabilities: {}
 
-  packages/cgm-glucoseview:
-    dependencies:
-      typeorm:
-        specifier: ^0.3.20
-        version: 0.3.27(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.8.2)(pg@8.16.3)(redis@5.10.0)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.25)(typescript@5.9.3))
-    devDependencies:
-      '@types/node':
-        specifier: ^20.0.0
-        version: 20.19.25
-      typescript:
-        specifier: ^5.3.0
-        version: 5.9.3
-
   packages/cgm-pharmacist-app:
     dependencies:
       '@o4o/types':
@@ -3199,97 +3186,6 @@ importers:
       typescript:
         specifier: ~5.9.3
         version: 5.9.3
-      vite:
-        specifier: ^7.2.4
-        version: 7.2.4(@types/node@24.10.1)(jiti@1.21.7)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
-
-  services/web-glucoseview:
-    dependencies:
-      '@o4o/ai-components':
-        specifier: workspace:*
-        version: link:../../packages/o4o-ai-components
-      '@o4o/auth-client':
-        specifier: workspace:*
-        version: link:../../packages/auth-client
-      '@o4o/auth-utils':
-        specifier: workspace:*
-        version: link:../../packages/auth-utils
-      '@o4o/content-editor':
-        specifier: workspace:*
-        version: link:../../packages/content-editor
-      '@o4o/error-handling':
-        specifier: workspace:*
-        version: link:../../packages/error-handling
-      '@o4o/operator-core':
-        specifier: workspace:*
-        version: link:../../packages/operator-core
-      '@o4o/operator-ux-core':
-        specifier: workspace:*
-        version: link:../../packages/operator-ux-core
-      '@o4o/store-ui-core':
-        specifier: workspace:*
-        version: link:../../packages/store-ui-core
-      '@o4o/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      '@o4o/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-      lucide-react:
-        specifier: ^0.523.0
-        version: 0.523.0(react@19.2.0)
-      react:
-        specifier: 19.2.0
-        version: 19.2.0
-      react-dom:
-        specifier: 19.2.0
-        version: 19.2.0(react@19.2.0)
-      react-router-dom:
-        specifier: ^7.9.6
-        version: 7.9.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
-    devDependencies:
-      '@eslint/js':
-        specifier: ^9.39.1
-        version: 9.39.1
-      '@types/node':
-        specifier: ^24.10.1
-        version: 24.10.1
-      '@types/react':
-        specifier: 19.2.7
-        version: 19.2.7
-      '@types/react-dom':
-        specifier: 19.2.3
-        version: 19.2.3(@types/react@19.2.7)
-      '@vitejs/plugin-react':
-        specifier: ^5.1.1
-        version: 5.1.1(vite@7.2.4(@types/node@24.10.1)(jiti@1.21.7)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))
-      autoprefixer:
-        specifier: ^10.4.22
-        version: 10.4.22(postcss@8.5.6)
-      eslint:
-        specifier: ^9.39.1
-        version: 9.39.1(jiti@1.21.7)
-      eslint-plugin-react-hooks:
-        specifier: ^7.0.1
-        version: 7.0.1(eslint@9.39.1(jiti@1.21.7))
-      eslint-plugin-react-refresh:
-        specifier: ^0.4.24
-        version: 0.4.24(eslint@9.39.1(jiti@1.21.7))
-      globals:
-        specifier: ^16.5.0
-        version: 16.5.0
-      postcss:
-        specifier: ^8.5.6
-        version: 8.5.6
-      tailwindcss:
-        specifier: 3.4.17
-        version: 3.4.17(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@24.10.1)(typescript@5.9.3))
-      typescript:
-        specifier: ~5.9.3
-        version: 5.9.3
-      typescript-eslint:
-        specifier: ^8.46.4
-        version: 8.48.0(eslint@9.39.1(jiti@1.21.7))(typescript@5.9.3)
       vite:
         specifier: ^7.2.4
         version: 7.2.4(@types/node@24.10.1)(jiti@1.21.7)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)

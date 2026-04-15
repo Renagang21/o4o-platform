@@ -25,7 +25,7 @@ export const KPA_SCOPE_CONFIG: ServiceScopeGuardConfig = {
   ],
   platformBypass: false,
   legacyRoles: [],
-  blockedServicePrefixes: ['platform', 'neture', 'glycopharm', 'cosmetics', 'glucoseview'],
+  blockedServicePrefixes: ['platform', 'neture', 'glycopharm', 'cosmetics'],
 };
 
 /**
@@ -44,7 +44,7 @@ export const NETURE_SCOPE_CONFIG: ServiceScopeGuardConfig = {
   ],
   platformBypass: true,
   legacyRoles: [],
-  blockedServicePrefixes: ['kpa', 'glycopharm', 'cosmetics', 'glucoseview'],
+  blockedServicePrefixes: ['kpa', 'glycopharm', 'cosmetics'],
   scopeRoleMapping: {
     'neture:admin': ['neture:admin'],
     'neture:operator': ['neture:operator', 'neture:admin'],
@@ -67,7 +67,7 @@ export const PLATFORM_SCOPE_CONFIG: ServiceScopeGuardConfig = {
   ],
   platformBypass: false,
   legacyRoles: [],
-  blockedServicePrefixes: ['kpa', 'neture', 'glycopharm', 'cosmetics', 'glucoseview'],
+  blockedServicePrefixes: ['kpa', 'neture', 'glycopharm', 'cosmetics'],
 };
 
 /**
@@ -84,7 +84,7 @@ export const GLYCOPHARM_SCOPE_CONFIG: ServiceScopeGuardConfig = {
   ],
   platformBypass: true,
   legacyRoles: [],
-  blockedServicePrefixes: ['kpa', 'neture', 'cosmetics', 'glucoseview'],
+  blockedServicePrefixes: ['kpa', 'neture', 'cosmetics'],
 };
 
 /**
@@ -103,32 +103,9 @@ export const COSMETICS_SCOPE_CONFIG: ServiceScopeGuardConfig = {
   ],
   platformBypass: true,
   legacyRoles: [],
-  blockedServicePrefixes: ['kpa', 'neture', 'glycopharm', 'glucoseview'],
+  blockedServicePrefixes: ['kpa', 'neture', 'glycopharm'],
   scopeRoleMapping: {
     'cosmetics:admin': ['cosmetics:admin'],
     'cosmetics:operator': ['cosmetics:operator', 'cosmetics:admin'],
-  },
-};
-
-/**
- * GlucoseView Service Configuration
- *
- * WO-O4O-OPERATOR-API-ARCHITECTURE-UNIFICATION-V1: Extracted from inline glucoseview.routes.ts
- *
- * Platform bypass enabled: platform:super_admin can access.
- * Scope-level role mapping for hierarchical access control.
- */
-export const GLUCOSEVIEW_SCOPE_CONFIG: ServiceScopeGuardConfig = {
-  serviceKey: 'glucoseview',
-  allowedRoles: [
-    'glucoseview:admin',
-    'glucoseview:operator',
-  ],
-  platformBypass: true,
-  legacyRoles: [],
-  blockedServicePrefixes: ['kpa', 'neture', 'glycopharm', 'cosmetics'],
-  scopeRoleMapping: {
-    'glucoseview:admin': ['glucoseview:admin'],
-    'glucoseview:operator': ['glucoseview:operator', 'glucoseview:admin'],
   },
 };

@@ -16,7 +16,7 @@ import type { Request, Response } from 'express';
 import { authenticate, requireAdmin } from '../middleware/auth.middleware.js';
 import { CopilotEngineService } from './copilot-engine.service.js';
 
-const VALID_SERVICES = ['neture', 'glycopharm', 'glucoseview', 'cosmetics', 'kpa'] as const;
+const VALID_SERVICES = ['neture', 'glycopharm', 'cosmetics', 'kpa'] as const;
 
 export function createCopilotEngineController(): Router {
   const router = Router();

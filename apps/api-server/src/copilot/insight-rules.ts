@@ -51,11 +51,6 @@ const SERVICE_LINKS: Record<AIServiceId, Record<string, string>> = {
     products: '/operator/products?status=PENDING',
     orders: '/operator/orders',
   },
-  glucoseview: {
-    applications: '/operator/applications',
-    pharmacists: '/operator/users',
-    pharmacies: '/operator/stores',
-  },
   kpa: {
     members: '/operator/members',
     content: '/operator/content?status=pending',
@@ -99,12 +94,6 @@ function checkApprovalBacklog(
     case 'cosmetics':
       pendingPaths.push(
         { path: 'products.pending', label: '상품 승인 대기', linkKey: 'products' },
-      );
-      break;
-    case 'glucoseview':
-      pendingPaths.push(
-        { path: 'applications.pending', label: '참여 신청 대기', linkKey: 'applications' },
-        { path: 'pharmacists.pending', label: '약사 승인 대기', linkKey: 'pharmacists' },
       );
       break;
     case 'kpa':

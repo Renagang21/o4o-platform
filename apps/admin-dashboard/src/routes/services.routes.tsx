@@ -12,9 +12,6 @@ const CosmeticsProductsRouter = lazy(() => import('@/pages/cosmetics-products/Co
 // Glycopharm Pages (Phase B-3)
 const GlycopharmRouter = lazy(() => import('@/pages/glycopharm/GlycopharmRouter'));
 
-// GlucoseView Pages (Phase C-3)
-const GlucoseViewRouter = lazy(() => import('@/pages/glucoseview/GlucoseViewRouter'));
-
 // Service Applications Admin Pages (Phase C-4)
 const ServiceApplicationsPage = lazy(() => import('@/pages/service-applications/ServiceApplicationsPage'));
 const ServiceApplicationDetailPage = lazy(() => import('@/pages/service-applications/ServiceApplicationDetailPage'));
@@ -30,7 +27,7 @@ const PageLoader = () => (
 );
 
 /**
- * Service domain routes — cosmetics, glycopharm, glucoseview, neture, service applications
+ * Service domain routes — cosmetics, glycopharm, neture, service applications
  */
 export function ServiceRoutes() {
   return [
@@ -59,15 +56,6 @@ export function ServiceRoutes() {
       <AdminProtectedRoute requiredRoles={['admin']}>
         <Suspense fallback={<PageLoader />}>
           <GlycopharmRouter />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-
-    // GlucoseView - CGM Data View Configuration (Phase C-3)
-    <Route key="/glucoseview/*" path="/glucoseview/*" element={
-      <AdminProtectedRoute requiredRoles={['admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <GlucoseViewRouter />
         </Suspense>
       </AdminProtectedRoute>
     } />,

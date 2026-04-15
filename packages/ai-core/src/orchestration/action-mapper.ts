@@ -31,10 +31,6 @@ const TRIGGER_CATALOG: Record<AIServiceId, Record<string, { triggerId: string; r
     '운영 리포트 생성': { triggerId: 'kpa.report.operations', requiresApproval: false },
     '포럼 활동 알림': { triggerId: 'kpa.alert.forum_activity', requiresApproval: false },
   },
-  glucoseview: {
-    '환자 모니터링 알림': { triggerId: 'glucoseview.alert.monitoring', requiresApproval: false },
-    '데이터 리포트 생성': { triggerId: 'glucoseview.report.data', requiresApproval: false },
-  },
   cosmetics: {
     '성분 분석 리포트': { triggerId: 'cosmetics.report.ingredients', requiresApproval: false },
     '트렌드 알림': { triggerId: 'cosmetics.alert.trend', requiresApproval: false },

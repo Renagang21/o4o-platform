@@ -27,7 +27,6 @@ export {
   PLATFORM_SCOPE_CONFIG,
   GLYCOPHARM_SCOPE_CONFIG,
   COSMETICS_SCOPE_CONFIG,
-  GLUCOSEVIEW_SCOPE_CONFIG,
 } from './service-configs.js';
 
 // Types

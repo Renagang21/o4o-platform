@@ -19,7 +19,6 @@ export type ServiceKey =
   | 'neture'       // Neture service
   | 'glycopharm'   // GlycoPharm service
   | 'cosmetics'    // K-Cosmetics service
-  | 'glucoseview'  // GlucoseView service
   | 'lms';         // LMS service
 
 /**
@@ -80,15 +79,6 @@ export type CosmeticsRole =
   | 'cosmetics:partner';   // K-Cosmetics partner
 
 /**
- * GlucoseView service roles
- */
-export type GlucoseViewRole =
-  | 'glucoseview:admin'      // GlucoseView admin
-  | 'glucoseview:operator'   // GlucoseView operator
-  | 'glucoseview:pharmacist' // GlucoseView 약사
-  | 'glucoseview:user';      // GlucoseView 사용자
-
-/**
  * LMS roles
  */
 export type LmsRole =
@@ -103,7 +93,6 @@ export type PrefixedRole =
   | NetureRole
   | GlycoPharmRole
   | CosmeticsRole
-  | GlucoseViewRole
   | LmsRole;
 
 /**
@@ -383,7 +372,7 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
   'customer': {
     role: 'customer',
     label: '당뇨인',
-    description: 'GlycoPharm/GlucoseView 당뇨인 (정규)',
+    description: '당뇨인 (정규)',
     service: 'glycopharm',
     category: 'service',
     deprecated: false
@@ -463,39 +452,6 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
     deprecated: false
   },
 
-  // GlucoseView roles
-  'glucoseview:admin': {
-    role: 'glucoseview:admin',
-    label: 'GlucoseView Admin',
-    description: 'GlucoseView administrator',
-    service: 'glucoseview',
-    category: 'service',
-    deprecated: false
-  },
-  'glucoseview:operator': {
-    role: 'glucoseview:operator',
-    label: 'GlucoseView Operator',
-    description: 'GlucoseView operator',
-    service: 'glucoseview',
-    category: 'service',
-    deprecated: false
-  },
-  'glucoseview:pharmacist': {
-    role: 'glucoseview:pharmacist',
-    label: 'GlucoseView Pharmacist',
-    description: 'GlucoseView 약사',
-    service: 'glucoseview',
-    category: 'service',
-    deprecated: false
-  },
-  'glucoseview:user': {
-    role: 'glucoseview:user',
-    label: 'GlucoseView User',
-    description: 'GlucoseView 사용자',
-    service: 'glucoseview',
-    category: 'service',
-    deprecated: false
-  },
 
   // LMS roles
   'lms:instructor': {
