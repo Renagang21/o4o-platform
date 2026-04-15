@@ -38,7 +38,7 @@ export function PharmacyServicePage() {
         <ul style={styles.list}>
           <li>약국 정보 관리</li>
           <li>회원 서비스 이용</li>
-          <li>공동구매 참여</li>
+          <li>이벤트 참여</li>
           <li>교육 및 자격증 관리</li>
           <li>포럼 및 커뮤니티 활동</li>
         </ul>

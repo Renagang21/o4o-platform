@@ -84,7 +84,7 @@ export function FeedbackDetailPage() {
   const canWrite = canWriteFeedback(user?.roles);
   const canManage = canManageFeedback(user?.roles);
   const userRoles = user?.roles ?? [];
-  const isOperator = hasAnyRole(userRoles, [ROLES.KPA_ADMIN, ROLES.KPA_OPERATOR, ROLES.KPA_DISTRICT_ADMIN]);
+  const isOperator = hasAnyRole(userRoles, [ROLES.KPA_ADMIN, ROLES.KPA_OPERATOR]);
 
   const handleSubmitComment = async () => {
     if (!newComment.trim()) return;

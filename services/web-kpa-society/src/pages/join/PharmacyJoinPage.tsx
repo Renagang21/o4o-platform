@@ -33,7 +33,7 @@ export function PharmacyJoinPage() {
         </p>
         <ul style={styles.list}>
           <li>포럼 및 커뮤니티 이용</li>
-          <li>공동구매 참여</li>
+          <li>이벤트 참여</li>
           <li>교육 서비스 이용</li>
           <li>자료실 및 정보 열람</li>
           <li>약국 정보 관리</li>

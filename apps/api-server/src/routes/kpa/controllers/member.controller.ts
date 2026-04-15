@@ -183,7 +183,7 @@ export function createMemberController(
         };
         const member = memberRepo.create(memberData);
 
-        const saved = await memberRepo.save(member);
+        const saved: KpaMember = await memberRepo.save(member);
 
         // WO-KPA-A-ACTIVITY-TYPE-SSOT-ALIGNMENT-V1: SSOT sync → kpa_pharmacist_profiles
         if (req.body.activity_type) {

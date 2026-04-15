@@ -1,15 +1,11 @@
 /**
  * OrganizationServicePage - 약사회 서비스 (데모)
  *
- * "지금은 데모를 보여주고, 나중에는 조용히 사라질 수 있도록"
- *
  * 컴포넌트 트리:
  * OrganizationServicePage
  * ├─ PageHeader
  * ├─ DemoNoticeSection
- * ├─ BranchDemoSection
- * │  └─ DemoCardGrid → DemoCard
- * └─ DivisionDemoSection
+ * └─ BranchDemoSection
  *    └─ DemoCardGrid → DemoCard
  */
 
@@ -25,17 +21,6 @@ const branchCards: DemoCardData[] = [
     badge: '도입 검토용 데모',
     ctaLabel: '데모 보기',
     href: '/demo',
-  },
-];
-
-// 분회 데모 카드
-const divisionCards: DemoCardData[] = [
-  {
-    title: '데모 분회',
-    description: '분회 단위 커뮤니티·운영 서비스 예시',
-    badge: '데모 분회',
-    ctaLabel: '바로가기',
-    href: '/branch-services/demo',
   },
 ];
 
@@ -60,12 +45,6 @@ export function OrganizationServicePage() {
         <section style={styles.section}>
           <h2 style={styles.sectionTitle}>지부 서비스 (데모)</h2>
           <DemoCardGrid cards={branchCards} />
-        </section>
-
-        {/* DivisionDemoSection */}
-        <section style={styles.section}>
-          <h2 style={styles.sectionTitle}>분회 서비스 (데모)</h2>
-          <DemoCardGrid cards={divisionCards} />
         </section>
       </div>
     </div>

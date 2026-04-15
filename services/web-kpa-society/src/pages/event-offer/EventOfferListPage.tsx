@@ -1,5 +1,5 @@
 /**
- * GroupbuyListPage - 공동구매 목록 페이지
+ * EventOfferListPage - 이벤트 목록 페이지
  */
 
 import { useState, useEffect } from 'react';
@@ -82,15 +82,15 @@ export function EventOfferListPage() {
   };
 
   if (loading) {
-    return <LoadingSpinner message="공동구매를 불러오는 중..." />;
+    return <LoadingSpinner message="이벤트를 불러오는 중..." />;
   }
 
   return (
     <div style={styles.container}>
       <PageHeader
-        title="공동구매"
-        description="회원 전용 공동구매에 참여하세요"
-        breadcrumb={[{ label: '홈', href: '/' }, { label: '공동구매' }]}
+        title="이벤트"
+        description="회원 전용 이벤트에 참여하세요"
+        breadcrumb={[{ label: '홈', href: '/' }, { label: '이벤트' }]}
       />
 
       <div style={styles.filters}>
@@ -126,8 +126,8 @@ export function EventOfferListPage() {
       {groupbuys.length === 0 ? (
         <EmptyState
           icon="🛒"
-          title="공동구매가 없습니다"
-          description="현재 진행 중인 공동구매가 없습니다."
+          title="이벤트가 없습니다"
+          description="현재 진행 중인 이벤트가 없습니다."
         />
       ) : (
         <>

@@ -16,9 +16,6 @@ export const ROLES = {
   KPA_ADMIN: 'kpa:admin',
   KPA_OPERATOR: 'kpa:operator',
 
-  // KPA-b 레거시/데모 (격리, 제거 예정)
-  KPA_DISTRICT_ADMIN: 'kpa:district_admin',
-
   // 플랫폼 Super
   PLATFORM_ADMIN: 'platform:admin',
   PLATFORM_OPERATOR: 'platform:operator',
@@ -72,25 +69,16 @@ export function hasAnyRole(userRoles: string[], group: readonly string[]): boole
 }
 
 /**
- * WO-KPA-C-ROLE-SYNC-NORMALIZATION-V1
- * 분회 역할 체크 — membershipRole (KpaMember.role) 기반
- */
-export function hasBranchRole(membershipRole?: string): boolean {
-  return membershipRole === 'admin' || membershipRole === 'operator';
-}
-
-/**
  * WO-KPA-A-AUTH-UX-STATE-UNIFICATION-V1
  * 직능 선택 면제 판정 — 단일 진입점
- * admin, operator, student, 분회 admin/operator → 직능 선택 불필요
+ * admin, operator, student → 직능 선택 불필요
  */
 export function isActivityTypeExempt(
   roles: string[],
-  membershipRole?: string,
+  _membershipRole?: string,
   membershipType?: string,
 ): boolean {
   if (hasAnyRole(roles, FUNCTION_GATE_EXEMPT_ROLES)) return true;
-  if (hasBranchRole(membershipRole)) return true;
   if (membershipType === 'student') return true;
   return false;
 }

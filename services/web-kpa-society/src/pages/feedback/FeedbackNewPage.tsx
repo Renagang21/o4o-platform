@@ -8,7 +8,6 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { useAuth } from '../../contexts';
 import { colors } from '../../styles/theme';
-import { ROLES } from '../../lib/role-constants';
 import {
   FeedbackType,
   FEEDBACK_TYPE_LABELS,
@@ -141,7 +140,7 @@ export function FeedbackNewPage() {
           <span style={styles.authorLabel}>작성자:</span>
           <span style={styles.authorName}>{user?.name || '알 수 없음'}</span>
           <span style={styles.authorRole}>
-            ({user?.roles.includes(ROLES.KPA_DISTRICT_ADMIN) ? '지부 운영자' : '분회 운영자'})
+            (운영자)
           </span>
         </div>
 

@@ -28,14 +28,14 @@ import { colors, borderRadius } from '../../styles/theme';
 const DOMAIN_TABS = [
   { id: 'all', label: '전체', serviceKey: undefined },
   { id: 'kpa', label: '일반 B2B', serviceKey: 'kpa' },
-  { id: 'kpa-groupbuy', label: '공동구매', serviceKey: 'kpa-groupbuy' },
+  { id: 'kpa-groupbuy', label: '이벤트', serviceKey: 'kpa-groupbuy' },
   { id: 'glycopharm', label: '혈당관리', serviceKey: 'glycopharm' },
   { id: 'cosmetics', label: '화장품', serviceKey: 'cosmetics' },
 ] as const;
 
 const SERVICE_KEY_LABELS: Record<string, { text: string; color: string; bg: string }> = {
   kpa: { text: 'B2B', color: '#2563EB', bg: '#DBEAFE' },
-  'kpa-groupbuy': { text: '공동구매', color: '#7C3AED', bg: '#EDE9FE' },
+  'kpa-groupbuy': { text: '이벤트', color: '#7C3AED', bg: '#EDE9FE' },
   cosmetics: { text: '화장품', color: '#DB2777', bg: '#FCE7F3' },
   glycopharm: { text: '혈당관리', color: '#059669', bg: '#D1FAE5' },
 };

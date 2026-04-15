@@ -98,7 +98,7 @@ export function SupplierDetailPage() {
                   )}
                   {supplier.tradeTypes.includes('groupbuy') && (
                     <span style={{ ...styles.tradeTypeBadge, ...styles.groupbuyBadge }}>
-                      공동구매
+                      이벤트
                     </span>
                   )}
                 </div>
@@ -162,10 +162,10 @@ export function SupplierDetailPage() {
 
         {/* 우측: 사이드바 */}
         <div style={styles.sidebar}>
-          {/* 진행중 공동구매 */}
+          {/* 진행중 이벤트 */}
           {supplier.activeGroupbuys.length > 0 && (
             <section style={styles.sideCard}>
-              <h3 style={styles.sideCardTitle}>🔥 진행중 공동구매</h3>
+              <h3 style={styles.sideCardTitle}>🔥 진행중 이벤트</h3>
               {supplier.activeGroupbuys.map((gb) => (
                 <div key={gb.id} style={styles.groupbuyItem}>
                   <span style={styles.groupbuyName}>{gb.productName}</span>
@@ -249,8 +249,8 @@ export function SupplierDetailPage() {
         <span style={styles.noticeIcon}>ℹ️</span>
         <span style={styles.noticeText}>
           {isOwner
-            ? '상품을 선택하여 구매하거나 공동구매에 참여할 수 있습니다.'
-            : '상품 정보를 확인할 수 있습니다. 구매 및 공동구매 참여는 개설약사만 가능합니다.'}
+            ? '상품을 선택하여 구매하거나 이벤트에 참여할 수 있습니다.'
+            : '상품 정보를 확인할 수 있습니다. 구매 및 이벤트 참여는 개설약사만 가능합니다.'}
         </span>
       </div>
     </div>

@@ -13,7 +13,7 @@ export const kpaSocietyAiReportConfig: AiReportConfig = {
   assetTypes: [],
   infoBannerText: (
     <>
-      <strong>Context Asset</strong>은 AI 응답에 포함된 강좌, 회원, 문서, 공동구매 정보입니다.
+      <strong>Context Asset</strong>은 AI 응답에 포함된 강좌, 회원, 문서, 이벤트 정보입니다.
       이 리포트를 통해 회원들이 어떤 정보를 많이 찾고 있는지 파악하고,
       서비스 개선에 활용할 수 있습니다.
     </>

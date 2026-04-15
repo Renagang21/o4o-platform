@@ -10,11 +10,13 @@ import { Organization, OrganizationMember, MemberRole } from '../types/organizat
 import type { ActiveContext, PersistedContext } from '../types/organization';
 import {
   ALL_ORGANIZATIONS,
+  SAMPLE_COMMITTEES,
   getOrganizationById,
   getOrganizationChain,
   getOrganizationMembers,
-  SAMPLE_BRANCH,
 } from '../data/sampleOrganizations';
+
+const DEFAULT_ORG = SAMPLE_COMMITTEES[0] || ALL_ORGANIZATIONS[0];
 
 const STORAGE_KEY = 'kpa_active_context';
 
@@ -96,8 +98,8 @@ function persistContext(org: Organization, role: MemberRole): void {
 export function OrganizationProvider({ children }: OrganizationProviderProps) {
   const { user } = useAuth();
 
-  // 초기 조직: localStorage 복원 → 기본값 SAMPLE_BRANCH
-  const initialOrg = restorePersistedContext() || SAMPLE_BRANCH;
+  // 초기 조직: localStorage 복원 → 기본값 DEFAULT_ORG
+  const initialOrg = restorePersistedContext() || DEFAULT_ORG;
   const [currentOrganization, setCurrentOrg] = useState<Organization>(initialOrg);
   const [organizationChain, setOrganizationChain] = useState<Organization[]>(
     getOrganizationChain(initialOrg.id)
@@ -157,8 +159,8 @@ export function OrganizationProvider({ children }: OrganizationProviderProps) {
 
   const clearContext = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY);
-    setCurrentOrg(SAMPLE_BRANCH);
-    setOrganizationChain(getOrganizationChain(SAMPLE_BRANCH.id));
+    setCurrentOrg(DEFAULT_ORG);
+    setOrganizationChain(getOrganizationChain(DEFAULT_ORG.id));
   }, []);
 
   // === WO-CONTEXT-JOIN-REQUEST-MVP-V1 + WO-PHARMACY-CONTEXT-AUTO-REFRESH-V1 ===

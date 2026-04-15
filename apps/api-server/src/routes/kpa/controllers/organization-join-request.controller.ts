@@ -179,7 +179,7 @@ export function createOrganizationJoinRequestRoutes(
         const appliedAt = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
 
         const serviceNameMap: Record<string, string> = {
-          join: 'KPA 지부/분회',
+          join: 'KPA 약사회',
           promotion: 'KPA 역할 승격',
           operator: 'KPA 운영자',
         };
@@ -407,7 +407,7 @@ export function createOrganizationJoinRequestRoutes(
           const decidedAt = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
 
           const serviceNameMap: Record<string, string> = {
-            join: 'KPA 지부/분회',
+            join: 'KPA 약사회',
             promotion: 'KPA 역할 승격',
             operator: 'KPA 운영자',
           };
@@ -529,7 +529,7 @@ export function createOrganizationJoinRequestRoutes(
           const decidedAt = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
 
           const serviceNameMap: Record<string, string> = {
-            join: 'KPA 지부/분회',
+            join: 'KPA 약사회',
             promotion: 'KPA 역할 승격',
             operator: 'KPA 운영자',
           };

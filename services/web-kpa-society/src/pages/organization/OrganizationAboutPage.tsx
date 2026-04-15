@@ -111,7 +111,7 @@ export function OrganizationAboutPage() {
           </div>
           <div style={styles.timelineItem}>
             <span style={styles.timelineYear}>2015</span>
-            <span style={styles.timelineEvent}>공동구매 사업 시작</span>
+            <span style={styles.timelineEvent}>이벤트 사업 시작</span>
           </div>
           <div style={styles.timelineItem}>
             <span style={styles.timelineYear}>2010</span>

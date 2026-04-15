@@ -1,5 +1,5 @@
 /**
- * KpaGroupbuyPage - 공동구매 상품 카탈로그 페이지
+ * KpaEventOfferPage - 이벤트 상품 카탈로그 페이지
  *
  * WO-KPA-GROUPBUY-PAGE-V1: organization_product_listings 기반 상품 카탈로그
  * WO-KPA-GROUPBUY-STATS-V1: 운영자 통계 카드 추가
@@ -81,21 +81,21 @@ export function KpaEventOfferPage() {
   };
 
   if (loading) {
-    return <LoadingSpinner message="공동구매 상품을 불러오는 중..." />;
+    return <LoadingSpinner message="이벤트 상품을 불러오는 중..." />;
   }
 
   return (
     <div style={styles.container}>
       <PageHeader
-        title="공동구매"
-        description="약사회 회원 전용 공동구매 상품"
-        breadcrumb={[{ label: '약국 HUB', href: '/hub' }, { label: '공동구매' }]}
+        title="이벤트"
+        description="약사회 회원 전용 이벤트 상품"
+        breadcrumb={[{ label: '약국 HUB', href: '/hub' }, { label: '이벤트' }]}
       />
 
       {/* 운영자 통계 카드 (WO-KPA-GROUPBUY-STATS-V1) */}
       {isOperator && stats && (
         <div style={styles.statsSection}>
-          <h3 style={styles.statsTitle}>공동구매 운영 현황</h3>
+          <h3 style={styles.statsTitle}>이벤트 운영 현황</h3>
           <div style={styles.statsGrid}>
             <div style={styles.statCard}>
               <span style={styles.statLabel}>총 주문</span>
@@ -126,7 +126,7 @@ export function KpaEventOfferPage() {
         <div style={styles.bannerContent}>
           <span style={styles.bannerIcon}>🛒</span>
           <div>
-            <p style={styles.bannerTitle}>약사회 공동구매 전용 상품입니다.</p>
+            <p style={styles.bannerTitle}>약사회 이벤트 전용 상품입니다.</p>
             <p style={styles.bannerDesc}>
               {hasStore
                 ? '매장 등록이 확인되었습니다. 상품을 선택하여 주문할 수 있습니다.'
@@ -143,8 +143,8 @@ export function KpaEventOfferPage() {
       {products.length === 0 ? (
         <EmptyState
           icon="🛒"
-          title="공동구매 상품이 없습니다"
-          description="현재 등록된 공동구매 상품이 없습니다."
+          title="이벤트 상품이 없습니다"
+          description="현재 등록된 이벤트 상품이 없습니다."
         />
       ) : (
         <>
@@ -154,7 +154,7 @@ export function KpaEventOfferPage() {
                 <Card hover padding="none">
                   <div style={styles.thumbnail}>
                     <div style={styles.thumbnailPlaceholder}>🛍️</div>
-                    <span style={styles.serviceBadge}>공동구매</span>
+                    <span style={styles.serviceBadge}>이벤트</span>
                   </div>
                   <div style={styles.content}>
                     <h3 style={styles.title}>{product.product_name}</h3>

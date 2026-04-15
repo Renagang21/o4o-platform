@@ -128,7 +128,7 @@ export function SupplierListPage() {
           <select style={styles.filterSelect}>
             <option value="all">전체 거래유형</option>
             <option value="b2b">일반 B2B</option>
-            <option value="groupbuy">공동구매</option>
+            <option value="groupbuy">이벤트</option>
           </select>
           <select style={styles.filterSelect}>
             <option value="all">전체 카테고리</option>
@@ -184,7 +184,7 @@ export function SupplierListPage() {
                 )}
                 {supplier.tradeTypes.includes('groupbuy') && (
                   <span style={{ ...styles.tradeTypeBadge, ...styles.groupbuyBadge }}>
-                    공동구매
+                    이벤트
                   </span>
                 )}
               </div>
@@ -226,8 +226,8 @@ export function SupplierListPage() {
         <span style={styles.noticeIcon}>ℹ️</span>
         <span style={styles.noticeText}>
           {isOwner
-            ? '공급자를 선택하여 상품을 확인하고 구매 또는 공동구매에 참여할 수 있습니다.'
-            : '공급자 및 상품 정보를 확인할 수 있습니다. 구매 및 공동구매 참여는 개설약사만 가능합니다.'}
+            ? '공급자를 선택하여 상품을 확인하고 구매 또는 이벤트에 참여할 수 있습니다.'
+            : '공급자 및 상품 정보를 확인할 수 있습니다. 구매 및 이벤트 참여는 개설약사만 가능합니다.'}
         </span>
       </div>
     </div>

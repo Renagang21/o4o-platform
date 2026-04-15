@@ -339,7 +339,7 @@ export interface Resource {
 export interface Organization {
   id: string;
   name: string;
-  type: 'headquarters' | 'branch' | 'chapter';
+  type: 'headquarters' | 'committee' | 'pharmacy';
   parentId?: string;
   address?: string;
   phone?: string;

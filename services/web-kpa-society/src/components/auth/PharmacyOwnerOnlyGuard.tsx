@@ -45,7 +45,7 @@ export function PharmacyOwnerOnlyGuard({ children }: PharmacyOwnerOnlyGuardProps
     return <>{children}</>;
   }
 
-  return renderError('약국 개설자만 공동구매에 참여할 수 있습니다.', navigate);
+  return renderError('약국 개설자만 이벤트에 참여할 수 있습니다.', navigate);
 }
 
 function renderError(

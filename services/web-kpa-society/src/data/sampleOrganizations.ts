@@ -12,41 +12,20 @@
 
 import { Organization, OrganizationMember, CommitteeType, COMMITTEE_TYPE_LABELS } from '../types/organization';
 
-// WO-KPA-A-BRANCH-CHAPTER-REMOVAL-PHASE4-DEAD-CODE-AND-DROP-V1: branch/division 제거
-// 레거시 인트라넷 샘플 데이터 - committee로 통합
-export const SAMPLE_BRANCH: Organization = {
-  id: 'branch-1',
-  name: '샘플조직',
-  type: 'committee',
-  memberCount: 0,
-};
-
-export const SAMPLE_DIVISIONS: Organization[] = [
-  { id: 'div-sample', name: '샘플위원회', type: 'committee', parentId: 'branch-1', memberCount: 0 },
-];
-
 // 위원회 유형
 const COMMITTEE_TYPES: CommitteeType[] = ['academic', 'it', 'general'];
 
-// 위원회 생성 함수
+// 샘플 위원회 생성
+const SAMPLE_COMMITTEE_PARENT_ID = 'committee-root';
 function generateCommittees(): Organization[] {
-  const committees: Organization[] = [];
-
-  SAMPLE_DIVISIONS.forEach((division) => {
-    COMMITTEE_TYPES.forEach((committeeType) => {
-      const divisionShortName = division.name.replace('분회', '');
-      committees.push({
-        id: `committee-${division.id}-${committeeType}`,
-        name: `${divisionShortName}분회 ${COMMITTEE_TYPE_LABELS[committeeType]}`,
-        type: 'committee',
-        parentId: division.id,
-        committeeType,
-        memberCount: 3,
-      });
-    });
-  });
-
-  return committees;
+  return COMMITTEE_TYPES.map((committeeType) => ({
+    id: `committee-root-${committeeType}`,
+    name: `샘플 ${COMMITTEE_TYPE_LABELS[committeeType]}`,
+    type: 'committee' as const,
+    parentId: SAMPLE_COMMITTEE_PARENT_ID,
+    committeeType,
+    memberCount: 3,
+  }));
 }
 
 export const SAMPLE_COMMITTEES: Organization[] = generateCommittees();
@@ -57,10 +36,8 @@ export const SAMPLE_PHARMACIES: Organization[] = [
   { id: 'pharmacy-2', name: '건강약국', type: 'pharmacy', memberCount: 0 },
 ];
 
-// 전체 조직 목록 (지부 + 분회 + 위원회 + 약국)
+// 전체 조직 목록 (위원회 + 약국)
 export const ALL_ORGANIZATIONS: Organization[] = [
-  SAMPLE_BRANCH,
-  ...SAMPLE_DIVISIONS,
   ...SAMPLE_COMMITTEES,
   ...SAMPLE_PHARMACIES,
 ];

@@ -40,14 +40,14 @@ const CHANNEL_LABELS: Record<string, string> = {
 
 const SERVICE_KEY_OPTIONS = [
   { value: 'kpa', label: '일반 B2B' },
-  { value: 'kpa-groupbuy', label: 'KPA 공동구매' },
+  { value: 'kpa-groupbuy', label: 'KPA 이벤트' },
   { value: 'cosmetics', label: '화장품 서비스' },
   { value: 'glycopharm', label: '혈당관리 서비스' },
 ] as const;
 
 const SERVICE_KEY_LABELS: Record<string, { text: string; color: string; bg: string }> = {
   kpa: { text: 'B2B', color: '#2563EB', bg: '#DBEAFE' },
-  'kpa-groupbuy': { text: '공동구매', color: '#7C3AED', bg: '#EDE9FE' },
+  'kpa-groupbuy': { text: '이벤트', color: '#7C3AED', bg: '#EDE9FE' },
   cosmetics: { text: '화장품', color: '#DB2777', bg: '#FCE7F3' },
   glycopharm: { text: '혈당관리', color: '#059669', bg: '#D1FAE5' },
 };

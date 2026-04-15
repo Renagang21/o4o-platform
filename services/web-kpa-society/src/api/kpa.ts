@@ -17,7 +17,7 @@ export interface Organization {
   id: string;
   name: string;
   code: string;
-  type: 'headquarters' | 'branch' | 'chapter';
+  type: 'headquarters' | 'committee' | 'pharmacy';
   parentId?: string;
   description?: string;
   isActive: boolean;
@@ -133,7 +133,7 @@ class KpaApiClient {
   // ============================================================================
 
   async listOrganizations(params?: {
-    type?: 'headquarters' | 'branch' | 'chapter';
+    type?: 'headquarters' | 'committee' | 'pharmacy';
     parentId?: string;
     isActive?: boolean;
     search?: string;

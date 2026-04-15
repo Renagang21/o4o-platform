@@ -125,7 +125,6 @@ export const forumYaksaManifest = {
 
   defaultConfig: {
     categories: [
-      { name: '지부 공지', slug: 'branch-announcements', color: '#1E40AF' },
       { name: '복약지도', slug: 'medication-guidance', color: '#3B82F6' },
       { name: '부작용 공유', slug: 'side-effects', color: '#60A5FA' },
       { name: '교육자료', slug: 'education', color: '#93C5FD' },
