@@ -52,7 +52,8 @@ export class EnrollmentService extends BaseService<Enrollment> {
 
   // CRUD Operations
   async enrollCourse(data: EnrollCourseRequest): Promise<Enrollment> {
-    // Check if already enrolled
+    // Check if already enrolled (exclude terminal states — allow re-enroll after cancel/reject/expire)
+    // WO-O4O-ENROLLMENT-SYSTEM-V1: cancelled/rejected/expired → re-enrollment allowed
     const existing = await this.enrollmentRepository.findOne({
       where: {
         userId: data.userId,
@@ -61,7 +62,29 @@ export class EnrollmentService extends BaseService<Enrollment> {
     });
 
     if (existing) {
-      throw new Error('User is already enrolled in this course');
+      const terminalStatuses: EnrollmentStatus[] = [
+        EnrollmentStatus.CANCELLED,
+        EnrollmentStatus.REJECTED,
+        EnrollmentStatus.EXPIRED,
+      ];
+      if (!terminalStatuses.includes(existing.status)) {
+        throw new Error('User is already enrolled in this course');
+      }
+      // Reactivate terminal enrollment — reset progress
+      existing.status = EnrollmentStatus.IN_PROGRESS;
+      existing.progressPercentage = 0;
+      existing.completedLessons = 0;
+      existing.enrolledAt = new Date();
+      existing.startedAt = new Date();
+      existing.completedAt = undefined as any;
+      const reactivated = await this.enrollmentRepository.save(existing);
+      logger.info(`[LMS] Enrollment reactivated`, {
+        enrollmentId: reactivated.id,
+        userId: data.userId,
+        courseId: data.courseId,
+        previousStatus: existing.status,
+      });
+      return reactivated;
     }
 
     // Check if course is full
