@@ -15,7 +15,6 @@ import TabletLayout from '@/components/layouts/TabletLayout';
 import { RoleGuard, OperatorRoute } from '@/components/auth/RoleGuard';
 
 // Public Pages (always loaded - first paint)
-import LandingPage from '@/pages/LandingPage';
 import LoginPage from '@/pages/auth/LoginPage';
 import HandoffPage from '@/pages/HandoffPage';
 import AccountRecoveryPage from '@/pages/auth/AccountRecoveryPage';
@@ -294,8 +293,8 @@ function OperatorAreaLayout() {
 function AppRoutes() {
   return (
     <Routes>
-      {/* WO-GLYCOPHARM-ENTRY-SCREENS-V1: 진입 화면 (MainLayout 없음) */}
-      <Route index element={<LandingPage />} />
+      {/* WO-O4O-GLYCOPHARM-HOME-TO-COMMUNITY-V1: Home = 커뮤니티 */}
+      <Route index element={<Navigate to="/community" replace />} />
       <Route path="handoff" element={<HandoffPage />} />
       <Route path="login" element={<LoginPage />} />
       <Route path="register" element={<RegisterPage />} />

@@ -64,8 +64,6 @@ export default function LoginPage() {
       // Post-login 라우팅
       if (returnUrl) {
         navigate(returnUrl);
-      } else if (loginType === 'patient') {
-        navigate('/patient');
       } else if (loginType === 'pharmacy') {
         navigate('/store/hub');
       } else if (loginType === 'operator') {
@@ -79,13 +77,11 @@ export default function LoginPage() {
     }
   };
 
-  const subtitle = loginType === 'patient'
-    ? '당뇨인용 시스템 로그인'
-    : loginType === 'pharmacy'
-      ? '약국용 시스템 로그인'
-      : loginType === 'operator'
-        ? '운영자 로그인'
-        : 'GlycoPharm에 오신 것을 환영합니다';
+  const subtitle = loginType === 'pharmacy'
+    ? '약국용 시스템 로그인'
+    : loginType === 'operator'
+      ? '운영자 로그인'
+      : 'GlycoPharm에 오신 것을 환영합니다';
 
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 bg-white">
@@ -105,11 +101,6 @@ export default function LoginPage() {
           </div>
           <h1 className="text-2xl font-bold text-slate-800">로그인</h1>
           <p className="text-slate-500 mt-2">{subtitle}</p>
-          {loginType === 'patient' && (
-            <p className="text-xs text-slate-400 mt-2">
-              당뇨인 전용 서비스 <a href={import.meta.env.VITE_GLUCOSEVIEW_URL || 'https://glucoseview.co.kr'} className="text-blue-500 hover:underline">GlucoseView</a>도 이용 가능합니다
-            </p>
-          )}
         </div>
 
         {/* Login Form */}
@@ -222,18 +213,6 @@ export default function LoginPage() {
           <div className="mt-4 pt-4 border-t border-dashed border-slate-200">
             <p className="text-center text-xs text-slate-400 mb-3">테스트 계정</p>
             <div className="flex gap-2">
-              <button
-                type="button"
-                disabled={isSubmitting}
-                onClick={() => {
-                  setEmail('patient_test@glycopharm.co.kr');
-                  setPassword('O4oTestPass@1');
-                  setError('');
-                }}
-                className="flex-1 py-2 text-sm border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-50 disabled:opacity-50"
-              >
-                테스트 당뇨인
-              </button>
               <button
                 type="button"
                 disabled={isSubmitting}
