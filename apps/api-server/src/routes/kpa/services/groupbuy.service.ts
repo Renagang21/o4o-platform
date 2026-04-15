@@ -54,7 +54,7 @@ export class GroupbuyService {
       this.dataSource.query(`
         SELECT
           COUNT(*)::int AS "totalOrders",
-          COALESCE(SUM(total_amount), 0)::numeric AS "totalRevenue",
+          COALESCE(SUM("totalAmount"), 0)::numeric AS "totalRevenue",
           COALESCE(SUM(
             (SELECT COALESCE(SUM((elem->>'quantity')::int), 0)
              FROM jsonb_array_elements(items) AS elem)
@@ -64,7 +64,7 @@ export class GroupbuyService {
           AND status = 'paid'
       `),
       this.dataSource.query(`
-        SELECT COUNT(DISTINCT buyer_id)::int AS "participatingStores"
+        SELECT COUNT(DISTINCT "buyerId")::int AS "participatingStores"
         FROM checkout_orders
         WHERE metadata->>'serviceKey' = 'kpa-groupbuy'
           AND status = 'paid'
