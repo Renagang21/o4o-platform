@@ -5,7 +5,7 @@ import { PRODUCT_CONTENT_PROMPTS } from '@o4o/ai-prompts/store';
 import type { ProductContentInput } from '@o4o/ai-prompts/store';
 import { ProductAiContent } from '../entities/product-ai-content.entity.js';
 import type { ProductAiContentType } from '../entities/product-ai-content.entity.js';
-import { AiModelSetting } from '../../care/entities/ai-model-setting.entity.js';
+// AiModelSetting removed — WO-O4O-GLYCOPHARM-CARE-REMOVAL-V1
 
 /**
  * ProductAiContentService — WO-O4O-PRODUCT-AI-CONTENT-PIPELINE-V1
@@ -32,12 +32,10 @@ interface LlmContentResponse {
 
 export class ProductAiContentService {
   private contentRepo: Repository<ProductAiContent>;
-  private settingRepo: Repository<AiModelSetting>;
   private gemini: GeminiProvider;
 
   constructor(private dataSource: DataSource) {
     this.contentRepo = dataSource.getRepository(ProductAiContent);
-    this.settingRepo = dataSource.getRepository(AiModelSetting);
     this.gemini = new GeminiProvider();
   }
 
@@ -172,10 +170,9 @@ export class ProductAiContentService {
   }
 
   private async buildProviderConfig(): Promise<AIProviderConfig> {
-    const setting = await this.settingRepo.findOne({ where: { service: 'store' } });
-    const model = setting?.model || 'gemini-3.0-flash';
-    const temperature = setting ? Number(setting.temperature) : 0.3;
-    const maxTokens = setting?.maxTokens || 2048;
+    const model = 'gemini-3.0-flash';
+    const temperature = 0.3;
+    const maxTokens = 2048;
 
     let apiKey = '';
     try {

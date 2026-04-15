@@ -12,26 +12,17 @@
 
 import type { DataSource } from 'typeorm';
 import type { AIProviderConfig } from '@o4o/ai-core';
-import { AiModelSetting } from '../modules/care/entities/ai-model-setting.entity.js';
+// AiModelSetting removed — WO-O4O-GLYCOPHARM-CARE-REMOVAL-V1
 
 export function buildConfigResolver(
   dataSource: DataSource,
-  service: 'care' | 'store',
+  service: 'store',
   overrides?: { maxTokens?: number },
 ): () => Promise<AIProviderConfig> {
   return async (): Promise<AIProviderConfig> => {
-    // 1. ai_model_settings → model, temperature, maxTokens
-    let setting: AiModelSetting | null = null;
-    try {
-      const repo = dataSource.getRepository(AiModelSetting);
-      setting = await repo.findOne({ where: { service } });
-    } catch {
-      // Table may not exist yet
-    }
-
-    const model = setting?.model || 'gemini-2.5-flash';
-    const temperature = setting ? Number(setting.temperature) : 0.3;
-    const maxTokens = overrides?.maxTokens ?? setting?.maxTokens ?? 2048;
+    const model = 'gemini-2.5-flash';
+    const temperature = 0.3;
+    const maxTokens = overrides?.maxTokens ?? 2048;
 
     // 2. ai_settings → apiKey
     let apiKey = '';

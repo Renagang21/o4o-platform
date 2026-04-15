@@ -24,8 +24,8 @@ jest.mock('../../modules/auth/services/role-assignment.service.js', () => ({
   roleAssignmentService: { hasAnyRole: mockHasAnyRole },
 }));
 
-import { createPharmacyContextMiddleware } from '../../modules/care/care-pharmacy-context.middleware';
-import type { PharmacyContextRequest } from '../../modules/care/care-pharmacy-context.middleware';
+import { createPharmacyContextMiddleware } from '../../routes/glycopharm/pharmacy-context.middleware';
+import type { PharmacyContextRequest } from '../../routes/glycopharm/pharmacy-context.middleware';
 
 /**
  * Create a mock DataSource that returns sequential query results.

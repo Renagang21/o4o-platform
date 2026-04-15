@@ -65,7 +65,6 @@ const PatientDataAnalysisPage = lazy(() => import('@/pages/patient/DataAnalysisP
 // WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1 Phase 4-C1:
 //   pages/patient/PharmacistCoachingPage → pages/patient/PharmacyCoachingPage
 const PatientPharmacyCoachingPage = lazy(() => import('@/pages/patient/PharmacyCoachingPage'));
-const PatientCareGuidelinePage = lazy(() => import('@/pages/patient/CareGuidelinePage'));
 
 // Store Management pages (WO-O4O-GLYCOPHARM-NAVIGATION-AND-STORE-STRUCTURE-REFINE-V1:
 //   pages/pharmacy/ → pages/store-management/ 이동, /store/* 라우트 담당)
@@ -140,10 +139,6 @@ const AiUsageDashboardPage = lazy(() => import('@/pages/operator/AiUsageDashboar
 const AiBillingPage = lazy(() => import('@/pages/operator/AiBillingPage'));
 const OperatorAnalyticsPage = lazy(() => import('@/pages/operator/AnalyticsPage'));
 
-// Operator Care Pages (WO-O4O-GLYCOPHARM-OPERATOR-CARE-PAGES-V1)
-const OperatorCareDashboardPage = lazy(() => import('@/pages/operator/care/OperatorCareDashboardPage'));
-const OperatorCareAlertsPage = lazy(() => import('@/pages/operator/care/OperatorCareAlertsPage'));
-
 // Operator Guideline Management (WO-GLYCOPHARM-GUIDELINE-CMS-MIGRATION-V1)
 const GuidelineManagementPage = lazy(() => import('@/pages/operator/GuidelineManagementPage'));
 
@@ -216,29 +211,6 @@ const QrLandingPage = lazy(() => import('@/pages/qr/QrLandingPage'));
 
 // Funnel Visualization (Phase 3-A: WO-O4O-FUNNEL-VISUALIZATION-PHASE3A-CP1)
 const FunnelPage = lazy(() => import('@/pages/store-management/FunnelPage'));
-
-// Care Pages (WO-CARE-PATIENT-DETAIL-STRUCTURE-V1)
-const CareDashboardPage = lazy(() => import('@/pages/care').then(m => ({ default: m.CareDashboardPage })));
-const PatientsPage = lazy(() => import('@/pages/care').then(m => ({ default: m.PatientsPage })));
-const PatientDetailPage = lazy(() => import('@/pages/care').then(m => ({ default: m.PatientDetailPage })));
-const AnalysisPage = lazy(() => import('@/pages/care').then(m => ({ default: m.AnalysisPage })));
-const CoachingPage = lazy(() => import('@/pages/care').then(m => ({ default: m.CoachingPage })));
-
-// Pharmacist Guideline (WO-GLYCOPHARM-PHARMACIST-GUIDELINE-V1)
-// WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1 Phase 4-C1:
-//   pages/care/PharmacistGuidelinePage → pages/care/PharmacyGuidelinePage
-const PharmacyGuidelinePage = lazy(() => import('@/pages/care/PharmacyGuidelinePage'));
-
-// Full Records View (WO-O4O-GLYCOPHARM-PATIENT-FULL-DATA-VIEW-V1)
-const RecordsPage = lazy(() => import('@/pages/care/RecordsPage'));
-
-// Patient Detail Tabs (WO-O4O-PATIENT-DETAIL-CARE-WORKSPACE-V1)
-const DataTab = lazy(() => import('@/pages/care/patient-tabs').then(m => ({ default: m.DataTab })));
-const PatientAnalysisTab = lazy(() => import('@/pages/care/patient-tabs').then(m => ({ default: m.AnalysisTab })));
-const PatientCoachingTab = lazy(() => import('@/pages/care/patient-tabs').then(m => ({ default: m.CoachingTab })));
-const HistoryTab = lazy(() => import('@/pages/care/patient-tabs').then(m => ({ default: m.HistoryTab })));
-const PatientMessagesTab = lazy(() => import('@/pages/care/patient-tabs').then(m => ({ default: m.MessagesTab })));
-
 
 // Loading fallback
 function PageLoading() {
@@ -389,8 +361,7 @@ function AppRoutes() {
             외부 북마크/이전 딥링크 호환을 위해 두 경로 모두 동일 컴포넌트를 가리킴. */}
         <Route path="patient/pharmacy-coaching" element={<PatientPharmacyCoachingPage />} />
         <Route path="patient/pharmacist-coaching" element={<PatientPharmacyCoachingPage />} />
-        <Route path="patient/care-guideline" element={<PatientCareGuidelinePage />} />
-        <Route path="patient/select-pharmacy" element={<PatientSelectPharmacyPage />} />
+<Route path="patient/select-pharmacy" element={<PatientSelectPharmacyPage />} />
         <Route path="patient/appointments" element={<PatientAppointmentsPage />} />
       </Route>
       {/* WO-O4O-GLYCOPHARM-NAVIGATION-AND-STORE-STRUCTURE-REFINE-V1:
@@ -459,27 +430,6 @@ function AppRoutes() {
             <StoreEntryPage />
           </SoftGuard>
         } />
-      </Route>
-
-      {/* Care Routes (WO-GLYCOPHARM-SOFT-GUARD-INTRO-V1: SoftGuard로 전환) */}
-      <Route path="care" element={<MainLayout />}>
-        <Route element={<SoftGuardOutlet feature="care" allowedRoles={[GLYCOPHARM_ROLES.PHARMACY]} />}>
-          <Route index element={<CareDashboardPage />} />
-          <Route path="patients" element={<PatientsPage />} />
-          <Route path="patient-requests" element={<PharmacistPatientRequestsPage />} />
-          {/* Patient Detail with nested tabs (WO-O4O-PATIENT-DETAIL-CARE-WORKSPACE-V1) */}
-          <Route path="patients/:id" element={<PatientDetailPage />}>
-            <Route index element={<DataTab />} />
-            <Route path="analysis" element={<PatientAnalysisTab />} />
-            <Route path="coaching" element={<PatientCoachingTab />} />
-            <Route path="messages" element={<PatientMessagesTab />} />
-            <Route path="history" element={<HistoryTab />} />
-          </Route>
-          <Route path="analysis" element={<AnalysisPage />} />
-          <Route path="coaching" element={<CoachingPage />} />
-          <Route path="guideline" element={<PharmacyGuidelinePage />} />
-          <Route path="records" element={<RecordsPage />} />
-        </Route>
       </Route>
 
       {/* Service User Routes (Phase 2: WO-AUTH-SERVICE-IDENTITY-PHASE2-GLYCOPHARM) */}
@@ -590,10 +540,6 @@ function AppRoutes() {
         <Route path="analytics" element={<OperatorAnalyticsPage />} />
         {/* WO-O4O-GLYCOPHARM-ADMIN-OPERATOR-CLEANUP-V1:
             역할 관리는 /admin/roles 에서만 접근. /operator/roles 라우트 제거. */}
-        {/* Care (WO-O4O-GLYCOPHARM-OPERATOR-CARE-PAGES-V1) */}
-        <Route path="care" element={<OperatorCareDashboardPage />} />
-        <Route path="care/alerts" element={<OperatorCareAlertsPage />} />
-        {/* WO-MARKET-TRIAL-NETURE-SINGLE-APPROVAL-TRANSITION-V1: 서비스별 2차 승인 제거 → 네뚜레 단일 승인 */}
         {/* Guideline Management (WO-GLYCOPHARM-GUIDELINE-CMS-MIGRATION-V1) */}
         <Route path="guidelines" element={<GuidelineManagementPage />} />
         {/* Settings */}

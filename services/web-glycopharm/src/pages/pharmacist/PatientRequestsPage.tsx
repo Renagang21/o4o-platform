@@ -16,7 +16,6 @@ import {
 } from 'lucide-react';
 import { pharmacyApi } from '@/api/pharmacy';
 import type { PharmacyLinkRequestDto } from '@/api/pharmacy';
-import CareSubNav from '@/pages/care/CareSubNav';
 
 export default function PatientRequestsPage() {
   const [requests, setRequests] = useState<PharmacyLinkRequestDto[]>([]);
@@ -74,7 +73,6 @@ export default function PatientRequestsPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <CareSubNav />
       <div className="px-4 py-6">
       <div className="w-full max-w-lg mx-auto">
         <div className="flex items-center gap-3 mb-6">

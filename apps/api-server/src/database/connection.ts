@@ -168,38 +168,6 @@ import {
 // GLUCOSEVIEW ENTITIES (Phase C-1, C-2, C-3)
 // ============================================================================
 
-// CARE MODULE ENTITIES (WO-CARE-KPI-SNAPSHOT-V1, WO-CARE-COACHING-ENGINE-V1)
-import { CareKpiSnapshot } from '../modules/care/entities/care-kpi-snapshot.entity.js';
-import { CareCoachingSession } from '../modules/care/entities/care-coaching-session.entity.js';
-
-// HEALTH DATA PIPELINE (WO-O4O-HEALTH-DATA-PIPELINE-V1)
-import { HealthReading } from '../modules/care/entities/health-reading.entity.js';
-
-// CARE LLM INSIGHT (WO-O4O-CARE-LLM-INSIGHT-V1)
-import { CareLlmInsight } from '../modules/care/entities/care-llm-insight.entity.js';
-import { AiModelSetting } from '../modules/care/entities/ai-model-setting.entity.js';
-
-// CARE COACHING DRAFT (WO-O4O-CARE-AI-COACHING-DRAFT-V1)
-import { CareCoachingDraft } from '../modules/care/entities/care-coaching-draft.entity.js';
-
-// CARE ALERT ENGINE (WO-O4O-CARE-ALERT-ENGINE-V1)
-import { CareAlert } from '../modules/care/entities/care-alert.entity.js';
-
-// CARE ACTION ENGINE (WO-O4O-CARE-ACTION-ENGINE-V2.2)
-import { CareAction } from '../modules/care/entities/care-action.entity.js';
-
-// PHARMACY LINK REQUEST (WO-GLYCOPHARM-PATIENT-PHARMACY-LINK-FLOW-V1)
-import { CarePharmacyLinkRequest } from '../modules/care/entities/care-pharmacy-link-request.entity.js';
-
-// CARE APPOINTMENT (WO-GLYCOPHARM-APPOINTMENT-SYSTEM-V1)
-import { CareAppointment } from '../modules/care/entities/care-appointment.entity.js';
-
-// PATIENT HEALTH PROFILE (WO-GLYCOPHARM-PATIENT-PROFILE-V1)
-import { PatientHealthProfile } from '../modules/care/entities/patient-health-profile.entity.js';
-
-// CARE MESSAGE (WO-O4O-CARE-QNA-SYSTEM-V1)
-import { CareMessage } from '../modules/care/entities/care-message.entity.js';
-
 // STORE AI ENTITIES (WO-O4O-STORE-HUB-AI-SUMMARY-V1)
 import { StoreAiSnapshot } from '../modules/store-ai/entities/store-ai-snapshot.entity.js';
 import { StoreAiInsight } from '../modules/store-ai/entities/store-ai-insight.entity.js';
@@ -705,48 +673,6 @@ export const AppDataSource = new DataSource({
     TabletServiceRequest, // WO-STORE-TABLET-REQUEST-CHANNEL-V1
     StoreBlogPost, // WO-STORE-BLOG-CHANNEL-V1
     GlycopharmPharmacyExtension, // WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1
-    // ============================================================================
-    // CARE MODULE ENTITIES (WO-CARE-KPI-SNAPSHOT-V1, WO-CARE-COACHING-ENGINE-V1)
-    // ============================================================================
-    CareKpiSnapshot,
-    CareCoachingSession,
-    // ============================================================================
-    // HEALTH DATA PIPELINE (WO-O4O-HEALTH-DATA-PIPELINE-V1)
-    // ============================================================================
-    HealthReading,
-    // ============================================================================
-    // CARE LLM INSIGHT (WO-O4O-CARE-LLM-INSIGHT-V1)
-    // ============================================================================
-    CareLlmInsight,
-    AiModelSetting,
-    // ============================================================================
-    // CARE COACHING DRAFT (WO-O4O-CARE-AI-COACHING-DRAFT-V1)
-    // ============================================================================
-    CareCoachingDraft,
-    // ============================================================================
-    // CARE ALERT ENGINE (WO-O4O-CARE-ALERT-ENGINE-V1)
-    // ============================================================================
-    CareAlert,
-    // ============================================================================
-    // CARE ACTION ENGINE (WO-O4O-CARE-ACTION-ENGINE-V2.2)
-    // ============================================================================
-    CareAction,
-    // ============================================================================
-    // PHARMACY LINK REQUEST (WO-GLYCOPHARM-PATIENT-PHARMACY-LINK-FLOW-V1)
-    // ============================================================================
-    CarePharmacyLinkRequest,
-    // ============================================================================
-    // CARE APPOINTMENT (WO-GLYCOPHARM-APPOINTMENT-SYSTEM-V1)
-    // ============================================================================
-    CareAppointment,
-    // ============================================================================
-    // PATIENT HEALTH PROFILE (WO-GLYCOPHARM-PATIENT-PROFILE-V1)
-    // ============================================================================
-    PatientHealthProfile,
-    // ============================================================================
-    // CARE MESSAGE (WO-O4O-CARE-QNA-SYSTEM-V1)
-    // ============================================================================
-    CareMessage,
     // ============================================================================
     // ASSET SNAPSHOT ENTITY (WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1)
     // ============================================================================

@@ -94,7 +94,7 @@ export default function PharmacyPatients() {
           </p>
         </div>
         <button
-          onClick={() => navigate('/care/patients?register=true')}
+          onClick={() => navigate('/store/patients')}
           className="flex items-center gap-2 px-4 py-2.5 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors shadow-lg shadow-primary-600/25"
         >
           <Plus className="w-5 h-5" />

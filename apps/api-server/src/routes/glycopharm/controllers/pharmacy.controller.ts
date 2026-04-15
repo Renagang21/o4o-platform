@@ -18,7 +18,7 @@ import { DataSource } from 'typeorm';
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
 // GlycopharmOrder - REMOVED (Phase 4-A: Legacy Order System Deprecation)
 // Orders will be handled via E-commerce Core with OrderType.GLYCOPHARM
-import type { PharmacyContextRequest } from '../../../modules/care/care-pharmacy-context.middleware.js';
+import type { PharmacyContextRequest } from '../pharmacy-context.middleware.js';
 import { GlycopharmRepository } from '../repositories/glycopharm.repository.js';
 
 type AuthMiddleware = RequestHandler;

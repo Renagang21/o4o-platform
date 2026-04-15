@@ -1,27 +1,13 @@
 /**
  * GlycoPharmOperatorDashboard — 운영자 대시보드
  *
- * WO-O4O-GLYCOPHARM-OPERATOR-DASHBOARD-FOUNDATION-V1:
- *   Phase 1 — KPI + Action Queue + Quick Actions 기본 골격
- *
- * WO-O4O-GLYCOPHARM-OPERATOR-DASHBOARD-BUSINESS-BLOCKS-V2:
- *   Phase 2 — 사업 운영 블록 추가
- *   [4] Store / Pharmacy 운영  — 약국·매장 운영 허브
- *   [5] Forum / Community 운영 — 포럼·커뮤니티 운영 허브
- *
- * WO-O4O-GLYCOPHARM-OPERATOR-DASHBOARD-CARE-CONTENT-BLOCKS-V3:
- *   Phase 3 — 남은 핵심 운영 축 추가
- *   [6] Care 운영              — 케어 현황·알림 모니터링
- *   [7] Content / Signage 운영 — 본부 콘텐츠 자산 운영
- *
  * Block 구조:
- *  [1] KPI Grid          — 6개 핵심 지표 (약국·상품·케어)
+ *  [1] KPI Grid          — 핵심 지표 (약국·상품)
  *  [2] Action Queue      — 즉시 처리 항목 (입점 대기·임시저장·알림)
- *  [3] Quick Actions     — 주요 기능 바로가기 (5개)
+ *  [3] Quick Actions     — 주요 기능 바로가기
  *  [4] Store/Pharmacy    — 약국 네트워크·매장 운영 진입점
  *  [5] Forum/Community   — 포럼 요청·삭제·관리·분석 진입점
- *  [6] Care              — 케어 현황·알림 모니터링 진입점
- *  [7] Content/Signage   — 미디어·플레이리스트·템플릿·가이드라인 진입점
+ *  [6] Content/Signage   — 미디어·플레이리스트·템플릿·가이드라인 진입점
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -37,8 +23,6 @@ import {
   Settings,
   Users,
   BarChart3,
-  HeartPulse,
-  Bell,
   MonitorPlay,
   ListMusic,
   LayoutTemplate,
@@ -60,21 +44,18 @@ import OperatorAlerts from '../../components/OperatorAlerts';
 
 // ─── Phase 1 Constants ──────────────────────────────────────
 
-/** Phase 1: 6개 KPI만 표시 (total-orders stub · care-adoption-rate 제외) */
+/** KPI 표시 목록 */
 const PHASE1_KPI_KEYS = new Set([
   'active-pharmacies',
   'pending-applications',
   'active-products',
   'total-patients',
-  'high-risk-patients',
-  'open-care-alerts',
 ]);
 
-/** Phase 1: Quick Actions — 운영자 주요 진입점 5개 */
+/** Quick Actions — 운영자 주요 진입점 */
 const PHASE1_QUICK_ACTIONS: QuickActionItem[] = [
   { id: 'manage-products', label: '상품 관리', link: '/operator/products', icon: 'package' },
   { id: 'manage-orders', label: '주문 관리', link: '/operator/orders', icon: 'shopping-cart' },
-  { id: 'manage-care', label: '케어 관리', link: '/operator/care', icon: 'heart' },
   { id: 'manage-hq-media', label: '본부 콘텐츠', link: '/operator/signage/hq-media', icon: 'monitor' },
   { id: 'ai-report', label: 'AI 리포트', link: '/operator/ai-report', icon: 'bar-chart' },
 ];
@@ -111,12 +92,7 @@ const FORUM_COMMUNITY_LINKS: BusinessLink[] = [
   { label: '포럼 분석', path: '/operator/forum-analytics', icon: BarChart3, description: '포럼 활동 통계·트렌드' },
 ];
 
-// ─── Phase 3: Care / Content Block Definitions ──────────────
-
-const CARE_LINKS: BusinessLink[] = [
-  { label: '케어 현황', path: '/operator/care', icon: HeartPulse, description: '네트워크 전체 케어 모니터링' },
-  { label: '케어 알림', path: '/operator/care/alerts', icon: Bell, description: '미처리 알림 확인·처리' },
-];
+// ─── Phase 3: Content Block Definitions ─────────────────────
 
 const CONTENT_SIGNAGE_LINKS: BusinessLink[] = [
   { label: 'HQ 미디어', path: '/operator/signage/hq-media', icon: MonitorPlay, description: '본부 미디어 자산 관리' },
@@ -255,17 +231,6 @@ export default function GlycoPharmOperatorDashboard() {
       : []),
   ];
 
-  // Phase 3: Care 요약 수치 (기존 KPI에서 추출)
-  const highRiskPatients = getKpiValue(config.kpis, 'high-risk-patients');
-  const openCareAlerts = getKpiValue(config.kpis, 'open-care-alerts');
-
-  const careStats = [
-    ...(highRiskPatients != null ? [{ label: '고위험 환자', value: highRiskPatients }] : []),
-    ...(openCareAlerts != null && openCareAlerts !== 0
-      ? [{ label: '미처리 알림', value: openCareAlerts }]
-      : []),
-  ];
-
   return (
     <div className="space-y-6">
       {/* Operator Alerts (rule-based, above dashboard) */}
@@ -276,7 +241,7 @@ export default function GlycoPharmOperatorDashboard() {
         <div>
           <h1 className="text-2xl font-bold text-slate-800">운영 대시보드</h1>
           <p className="text-sm text-slate-500 mt-1">
-            GlycoPharm 운영 실행 — 신청 처리 · 약국·매장 운영 · 케어 모니터링 · 콘텐츠 관리
+            GlycoPharm 운영 실행 — 신청 처리 · 약국·매장 운영 · 콘텐츠 관리
           </p>
         </div>
         <button
@@ -316,23 +281,12 @@ export default function GlycoPharmOperatorDashboard() {
         />
       </div>
 
-      {/* Block 6-7: Care / Content 운영 블록 (Phase 3) — 2열 그리드 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Block 6: Care 운영 */}
-        <BusinessBlock
-          title="케어 운영"
-          description="네트워크 전체 케어 현황과 알림을 모니터링합니다."
-          links={CARE_LINKS}
-          stats={careStats}
-        />
-
-        {/* Block 7: Content / Signage 운영 */}
-        <BusinessBlock
-          title="콘텐츠 · 사이니지 운영"
-          description="본부 콘텐츠 자산과 사이니지 운영 항목을 관리합니다."
-          links={CONTENT_SIGNAGE_LINKS}
-        />
-      </div>
+      {/* Block 6: Content / Signage 운영 */}
+      <BusinessBlock
+        title="콘텐츠 · 사이니지 운영"
+        description="본부 콘텐츠 자산과 사이니지 운영 항목을 관리합니다."
+        links={CONTENT_SIGNAGE_LINKS}
+      />
     </div>
   );
 }

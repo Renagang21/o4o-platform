@@ -1,7 +1,7 @@
 /**
  * Header - GlycoPharm 헤더
  * WO-O4O-GLYCOPHARM-NAVIGATION-AND-STORE-STRUCTURE-REFINE-V1:
- *   공개/조건부 메뉴 분리 — 비로그인: Home+커뮤니티, 약국 로그인: +Care관리+약국관리
+ *   공개/조건부 메뉴 분리 — 비로그인: Home+커뮤니티, 약국 로그인: +약국관리
  */
 
 import { useState } from 'react';
@@ -17,7 +17,6 @@ import {
   Activity,
   Home,
   MessageSquare,
-  HeartPulse,
   Store,
   LayoutDashboard,
 } from 'lucide-react';
@@ -28,16 +27,14 @@ import ServiceSwitcher from '../ServiceSwitcher';
  * 공개 메뉴 — 로그인 상태 관계없이 항상 표시
  */
 const publicMenuItems = [
-  { label: 'Home', icon: Home, pathPublic: '/', pathAuth: '/care/patients', end: true },
+  { label: 'Home', icon: Home, pathPublic: '/', pathAuth: '/store', end: true },
   { label: '커뮤니티', icon: MessageSquare, pathPublic: '/community', pathAuth: '/community', end: false },
 ];
 
 /**
  * 조건부 메뉴 — 약국(pharmacy) 로그인 시에만 표시
- * GlycoPharm = 약국 전용 서비스. Care와 약국 경영은 약국 사용자에게만 노출.
  */
 const pharmacyMenuItems = [
-  { label: 'Care 관리', icon: HeartPulse, path: '/care', end: false },
   { label: '약국 관리', icon: Store, path: '/store', end: false },
 ];
 
@@ -57,7 +54,7 @@ export default function Header() {
   const roleDashboardLinks = isAuthenticated ? [
     ...(isAdmin ? [{ label: '관리자 대시보드', path: '/admin' }] : []),
     ...(isOperator ? [{ label: '운영자 대시보드', path: '/operator' }] : []),
-    ...(isPharmacy ? [{ label: 'Care 대시보드', path: '/care' }] : []),
+    ...(isPharmacy ? [{ label: '약국 관리', path: '/store' }] : []),
   ] : [];
 
   const handleLogout = () => {
@@ -85,8 +82,8 @@ export default function Header() {
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-slate-200/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
-          {/* Logo — WO-O4O-GLYCOPHARM-NAVIGATION-CLEANUP-V1: pharmacy → /care/patients */}
-          <NavLink to={isPharmacy ? '/care/patients' : '/'} className="flex items-center gap-2">
+          {/* Logo */}
+          <NavLink to={isPharmacy ? '/store' : '/'} className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-lg shadow-primary-500/25">
               <Activity className="w-5 h-5 text-white" />
             </div>

@@ -16,7 +16,7 @@ import { createStoreApplicationsController } from './controllers/store-applicati
 import { createCheckoutController } from './controllers/checkout.controller.js'; // Phase 4-B: E-commerce Core Integration
 import { createGlycopharmPaymentController } from './controllers/glycopharm-payment.controller.js'; // WO-O4O-PAYMENT-CORE-GLYCOPHARM-PILOT-V1
 import { createCockpitController } from './controllers/cockpit.controller.js';
-import { createHubTriggerController } from './controllers/hub-trigger.controller.js'; // WO-GLYCOPHARM-HUB-AI-TRIGGER-INTEGRATION-V1
+// hub-trigger.controller removed — WO-O4O-GLYCOPHARM-CARE-REMOVAL-V1 (care-only endpoints)
 // signage.controller removed — WO-O4O-GLYCOPHARM-SIGNAGE-MIGRATION-V1
 import { createOperatorController } from './controllers/operator.controller.js';
 import { createPublicController } from './controllers/public.controller.js';
@@ -56,7 +56,7 @@ import { ActionLogService } from '@o4o/action-log-core';
 // WO-O4O-OPERATOR-ACTION-LAYER-V1
 import { createActionQueueRouter } from '../../common/action-queue/index.js';
 import { glycopharmActionConfig } from './action-definitions.js';
-import { createPharmacyContextMiddleware } from '../../modules/care/care-pharmacy-context.middleware.js';
+import { createPharmacyContextMiddleware } from './pharmacy-context.middleware.js';
 
 // Domain controllers - Forum
 import { ForumController } from '../../controllers/forum/ForumController.js';
@@ -194,17 +194,6 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
     actionLogService,
   );
   router.use('/pharmacy/cockpit', cockpitController);
-
-  // ============================================================================
-  // Hub Trigger Routes — QuickAction execution endpoints
-  // WO-GLYCOPHARM-HUB-AI-TRIGGER-INTEGRATION-V1
-  // ============================================================================
-  const hubTriggerController = createHubTriggerController(
-    dataSource,
-    coreRequireAuth as any,
-    actionLogService,
-  );
-  router.use('/pharmacy/hub', hubTriggerController);
 
   // WO-GLYCOPHARM-SCOPE-SIMPLIFICATION-V1: shared pharmacy context middleware
   const requirePharmacyContext = createPharmacyContextMiddleware(dataSource);

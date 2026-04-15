@@ -1,30 +1,17 @@
 /**
- * Care Pharmacy Context Middleware
+ * Pharmacy Context Middleware
  *
  * WO-GLYCOPHARM-CARE-DATA-ISOLATION-PHASE1-V1
  * WO-GLYCOPHARM-SCOPE-SIMPLIFICATION-V1: error code granularity
+ * Moved from modules/care/ — WO-O4O-GLYCOPHARM-CARE-REMOVAL-V1
  *
  * Resolves the authenticated user's pharmacy and attaches it to the request.
- * All Care/GlycoPharm pharmacy-scoped endpoints use this single middleware.
- *
- * Flow:
- * 1. Requires auth (req.user must exist — use after authenticate middleware)
- * 2. Admin bypass: glycopharm:admin / platform:admin → pharmacyId = null (global access)
- * 3. Looks up organization: created_by_user_id → organization_members fallback
- * 4. Checks glycopharm enrollment
- * 5. Sets req.pharmacyId
- *
- * Error codes (WO-GLYCOPHARM-SCOPE-SIMPLIFICATION-V1):
- *   UNAUTHORIZED              — no user on request
- *   GLYCOPHARM_ORG_NOT_FOUND  — no organization for this user
- *   GLYCOPHARM_ORG_INACTIVE   — organization exists but isActive = false
- *   GLYCOPHARM_NOT_ENROLLED   — organization exists but no active glycopharm enrollment
- *   PHARMACY_LOOKUP_ERROR     — unexpected DB error
+ * All GlycoPharm pharmacy-scoped endpoints use this single middleware.
  */
 
 import type { Request, Response, NextFunction } from 'express';
 import type { DataSource } from 'typeorm';
-import { roleAssignmentService } from '../auth/services/role-assignment.service.js';
+import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 
 export interface PharmacyContextRequest extends Request {
   user?: any;
@@ -54,8 +41,6 @@ export function createPharmacyContextMiddleware(dataSource: DataSource) {
     const userId = user.id;
 
     try {
-      // Admin bypass: global access (pharmacyId = null means no filter)
-      // WO-O4O-AUTH-MIDDLEWARE-CONSOLIDATION-V1: JWT snapshot → DB 실시간 조회 전환
       const isAdmin = await roleAssignmentService.hasAnyRole(userId, [...ADMIN_ROLES]);
       if (isAdmin) {
         pcReq.pharmacyId = null;
@@ -63,16 +48,12 @@ export function createPharmacyContextMiddleware(dataSource: DataSource) {
         return;
       }
 
-      // Step A: Find organization for this user
-      // Priority 1: created_by_user_id (pharmacy owner/creator)
-      // Priority 2: organization_members (staff pharmacist, multi-user pharmacies)
       let orgResult = await dataSource.query(
         `SELECT id, "isActive" FROM organizations WHERE created_by_user_id = $1 LIMIT 1`,
         [userId],
       );
 
       if (orgResult.length === 0) {
-        // Fallback: check organization_members
         orgResult = await dataSource.query(
           `SELECT o.id, o."isActive"
            FROM organizations o
@@ -102,7 +83,6 @@ export function createPharmacyContextMiddleware(dataSource: DataSource) {
         return;
       }
 
-      // Step B: Check glycopharm enrollment
       const enrollmentResult = await dataSource.query(
         `SELECT id FROM organization_service_enrollments
          WHERE organization_id = $1 AND service_code = 'glycopharm' AND status = 'active'
@@ -131,5 +111,4 @@ export function createPharmacyContextMiddleware(dataSource: DataSource) {
   };
 }
 
-/** Alias for clarity — identical to createPharmacyContextMiddleware */
 export const createGlycopharmOwnerMiddleware = createPharmacyContextMiddleware;
