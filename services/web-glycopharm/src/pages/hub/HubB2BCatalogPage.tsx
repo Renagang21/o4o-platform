@@ -73,32 +73,24 @@ export function HubB2BCatalogPage() {
   const items: B2BTableItem[] = products.map(catalogToTableItem);
 
   return (
-    <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '24px' }}>
-      <div style={{ marginBottom: '16px' }}>
-        <Link to="/hub" style={{ fontSize: '0.875rem', color: '#0d9488', textDecoration: 'none' }}>
-          &larr; GlycoPharm HUB
-        </Link>
+    <div className="px-1 py-2">
+      {/* 페이지 헤더 */}
+      <div className="mb-6">
+        <h1 className="text-xl font-bold text-slate-900">B2B 상품 카탈로그</h1>
+        <p className="text-sm text-slate-500 mt-0.5">공급자가 제공하는 상품을 탐색하고 내 약국에 신청합니다.</p>
       </div>
 
-      <header style={{ marginBottom: '24px', paddingBottom: '20px', borderBottom: '2px solid #e2e8f0' }}>
-        <h1 style={{ margin: 0, fontSize: '1.75rem', fontWeight: 700, color: '#0F172A' }}>
-          B2B 상품 카탈로그
-        </h1>
-        <p style={{ margin: '8px 0 0', fontSize: '0.95rem', color: '#64748B' }}>
-          공급자가 제공하는 상품을 탐색할 수 있습니다.
-        </p>
-      </header>
-
+      {/* 콘텐츠 */}
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '60px 20px', color: '#94A3B8' }}>
-          상품 카탈로그를 불러오는 중...
+        <div className="flex items-center justify-center py-20">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600" />
         </div>
       ) : error ? (
-        <div style={{ textAlign: 'center', padding: '60px 20px', color: '#dc2626' }}>
-          <p>{error}</p>
+        <div className="text-center py-16">
+          <p className="text-sm text-red-500 mb-3">{error}</p>
           <button
             onClick={() => fetchData(category)}
-            style={{ marginTop: '12px', padding: '6px 16px', fontSize: '0.8125rem', color: '#0d9488', background: 'transparent', border: '1px solid #0d9488', borderRadius: '6px', cursor: 'pointer' }}
+            className="px-4 py-2 text-sm text-teal-600 border border-teal-300 rounded-lg hover:bg-teal-50 transition-colors"
           >
             다시 시도
           </button>
@@ -117,15 +109,12 @@ export function HubB2BCatalogPage() {
         />
       )}
 
-      <div style={{
-        display: 'flex', alignItems: 'flex-start', gap: '12px',
-        padding: '18px 22px', backgroundColor: '#0d948808',
-        borderRadius: '12px', border: '1px solid #0d948820',
-        fontSize: '0.875rem', color: '#475569', lineHeight: 1.5, marginTop: '24px',
-      }}>
-        <span style={{ fontSize: '18px', flexShrink: 0 }}>💡</span>
+      {/* Store 연결 안내 */}
+      <div className="flex items-start gap-3 px-5 py-4 bg-teal-50/60 border border-teal-100 rounded-xl mt-6 text-sm text-slate-600 leading-relaxed">
+        <span className="text-lg shrink-0">💡</span>
         <span>
-          상품에 관심이 있으시면 공급사에 직접 문의하세요.
+          관심 상품은 <strong>신청 버튼</strong>을 눌러 내 약국에 등록할 수 있습니다.
+          승인 후 <Link to="/store/management/b2b" className="text-teal-700 underline underline-offset-2 hover:text-teal-800">매장 B2B 관리</Link>에서 확인하세요.
         </span>
       </div>
     </div>

@@ -11,14 +11,15 @@
  *
  * 섹션 순서:
  *  1. Hero (심플 타이틀 + CTA)
- *  2. KPI 카드 (오늘 글 / 참여자 / 인기 카테고리)
- *  3. 공지사항
- *  4. Feed (탭 + 정렬 + DataTable)
- *  5. 광고 섹션
- *  6. 콘텐츠 (최근 + 추천 카드 그리드)
- *  7. 스폰서
- *  8. 디지털 사이니지 미리보기
- *  9. 파트너 로고 슬라이드
+ *  2. 공지사항 (최신 5건, 클릭 이동)
+ *  3. KPI 카드 (오늘 글 / 참여자 / 인기 카테고리)
+ *  4. 인기 글 카드 (top 3 by viewCount)
+ *  5. Feed (탭 + 정렬 + DataTable)
+ *  6. 광고 섹션
+ *  7. 콘텐츠 (최근 + 추천 카드 그리드)
+ *  8. 스폰서
+ *  9. 디지털 사이니지 미리보기
+ * 10. 파트너 로고 슬라이드
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -329,7 +330,35 @@ export default function CommunityMainPage() {
           </div>
         </section>
 
-        {/* ─── 2. KPI 카드 블록 (Stats Bar → 카드형) ─── */}
+        {/* ─── 2. 공지 섹션 ─── */}
+        {!feedLoading && noticeItems.length > 0 && (
+          <section className="mb-8">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Bell className="w-4 h-4 text-slate-500" />
+                <h2 className="text-sm font-semibold text-slate-700">공지사항</h2>
+              </div>
+              <Link to="/forum/posts?category=공지" className="flex items-center gap-1 text-xs text-primary-600 hover:text-primary-700 font-medium">
+                전체보기 <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+            <div className="bg-white border border-slate-200 rounded-xl divide-y divide-slate-100">
+              {noticeItems.map((item) => (
+                <Link
+                  key={item.id}
+                  to="/forum/posts"
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors"
+                >
+                  <span className="shrink-0 px-1.5 py-0.5 text-[10px] font-medium bg-primary-50 text-primary-600 rounded">공지</span>
+                  <span className="flex-1 text-sm text-slate-700 truncate">{item.title}</span>
+                  <span className="text-xs text-slate-400 shrink-0">{formatFeedDate(item.date)}</span>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ─── 3. KPI 카드 블록 ─── */}
         <section className="mb-8">
           <div className="grid grid-cols-3 gap-3">
             <div className="bg-white border border-slate-200 rounded-xl p-4 text-center">
@@ -350,31 +379,45 @@ export default function CommunityMainPage() {
           </div>
         </section>
 
-        {/* ─── 3. 공지 섹션 (NoticeSection 패턴) ─── */}
-        {!feedLoading && noticeItems.length > 0 && (
-          <section className="mb-8">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <Bell className="w-4 h-4 text-slate-500" />
-                <h2 className="text-sm font-semibold text-slate-700">공지사항</h2>
+        {/* ─── 4. 인기 글 카드 (top 3 by viewCount) ─── */}
+        {!feedLoading && filteredFeed.length > 0 && (() => {
+          const hotPosts = [...feedItems].sort((a, b) => b.viewCount - a.viewCount).slice(0, 3);
+          return (
+            <section className="mb-8">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-sm font-semibold text-slate-700">인기 글</h2>
+                <Link to="/forum/posts" className="flex items-center gap-1 text-xs text-primary-600 hover:text-primary-700 font-medium">
+                  전체보기 <ArrowRight className="w-3 h-3" />
+                </Link>
               </div>
-              <Link to="/forum?category=공지" className="flex items-center gap-1 text-xs text-primary-600 hover:text-primary-700 font-medium">
-                전체보기 <ArrowRight className="w-3 h-3" />
-              </Link>
-            </div>
-            <div className="bg-white border border-slate-200 rounded-xl divide-y divide-slate-100">
-              {noticeItems.map((item) => (
-                <div key={item.id} className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors">
-                  <span className="shrink-0 px-1.5 py-0.5 text-[10px] font-medium bg-primary-50 text-primary-600 rounded">공지</span>
-                  <span className="flex-1 text-sm text-slate-700 truncate">{item.title}</span>
-                  <span className="text-xs text-slate-400 shrink-0">{formatFeedDate(item.date)}</span>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {hotPosts.map((item, idx) => (
+                  <Link
+                    key={item.id}
+                    to="/forum/posts"
+                    className="bg-white border border-slate-200 rounded-xl p-4 hover:border-primary-200 hover:shadow-sm transition-all"
+                  >
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <span className="shrink-0 w-5 h-5 rounded-full bg-slate-100 text-slate-500 text-[10px] font-bold flex items-center justify-center">
+                        {idx + 1}
+                      </span>
+                      <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded bg-slate-100 text-slate-500">
+                        {item.category}
+                      </span>
+                    </div>
+                    <p className="text-sm font-medium text-slate-800 line-clamp-2 mb-2">{item.title}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] text-slate-400">{item.author}</span>
+                      <span className="text-[10px] text-slate-400">조회 {item.viewCount}</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          );
+        })()}
 
-        {/* ─── 4. Feed Section ─── */}
+        {/* ─── 5. Feed Section ─── */}
         <section className="mb-10">
           {/* Tabs */}
           <div className="flex items-center gap-1 border-b border-slate-200 mb-3 overflow-x-auto">

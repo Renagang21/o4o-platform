@@ -58,13 +58,6 @@ const QUICK_ACTIONS = [
   { label: '설정', icon: Settings, desc: '약국 설정 관리', path: '/store/settings', color: '#64748b' },
 ];
 
-// ─── Block 8: Quick Link 정의 ───────────────────────────
-const QUICK_LINKS = [
-  { label: '상품 관리', icon: Package, path: '/store/products' },
-  { label: '주문 확인', icon: ShoppingCart, path: '/store/orders' },
-  { label: '콘텐츠 관리', icon: Tv, path: '/store/content' },
-  { label: '매장 설정', icon: Settings, path: '/store/settings' },
-];
 
 /** Action 텍스트에서 네비게이션 경로 추론 */
 function inferActionPath(label: string): string | null {
@@ -737,26 +730,9 @@ export default function StoreMainPage() {
           </div>
         )}
 
-        {/* Quick links */}
-        <div className={allActions.length > 0 ? 'border-t border-slate-100 pt-4' : ''}>
-          <p className="text-xs text-slate-400 mb-3">빠른 이동</p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-            {QUICK_LINKS.map((link) => {
-              const LinkIcon = link.icon;
-              return (
-                <NavLink
-                  key={link.path}
-                  to={link.path}
-                  onClick={() => logStoreAction('copilot_quick_link')}
-                  className="flex items-center gap-2 p-3 bg-slate-50 rounded-xl hover:bg-emerald-50 hover:text-emerald-700 transition-colors group"
-                >
-                  <LinkIcon className="w-4 h-4 text-slate-400 group-hover:text-emerald-600" />
-                  <span className="text-sm font-medium">{link.label}</span>
-                </NavLink>
-              );
-            })}
-          </div>
-        </div>
+        {allActions.length === 0 && (
+          <p className="text-sm text-slate-500">AI 요약 또는 상품 분석을 먼저 실행하면 추천 행동이 표시됩니다.</p>
+        )}
       </div>
     </div>
   );
