@@ -41,6 +41,77 @@ export class GroupbuyService {
   }
 
   /**
+   * GET /enriched — Public enriched listing with product/supplier info
+   * WO-EVENT-OFFER-HUB-TABLE-AND-DIRECT-ORDER-REFINE-V1
+   * WO-EVENT-OFFER-HUB-TIME-WINDOW-FILTER-HOTFIX-V1: status 필터 + updatedAt 추가
+   */
+  async listGroupbuysEnriched(
+    page: number,
+    limit: number,
+    status?: 'active' | 'ended' | 'all',
+  ): Promise<{
+    data: Array<{
+      id: string;
+      offerId: string;
+      price: number | null;
+      isActive: boolean;
+      createdAt: string;
+      updatedAt: string;
+      supplierId: string;
+      unitPrice: number | null;
+      productName: string;
+      supplierName: string;
+    }>;
+    total: number;
+  }> {
+    const safePage = page || 1;
+    const safeLimit = Math.min(limit || 20, 50);
+    const offset = (safePage - 1) * safeLimit;
+    const effectiveStatus = status || 'active';
+
+    // is_active 필터 조건
+    const activeClause =
+      effectiveStatus === 'active'
+        ? 'AND opl.is_active = true'
+        : effectiveStatus === 'ended'
+          ? 'AND opl.is_active = false'
+          : ''; // 'all' → 필터 없음
+
+    const countResult = await this.dataSource.query(
+      `SELECT COUNT(*)::int AS total
+       FROM organization_product_listings
+       WHERE service_key = $1 ${activeClause}`,
+      [SERVICE_KEYS.KPA_GROUPBUY],
+    );
+    const total = countResult[0]?.total ?? 0;
+
+    const rows = await this.dataSource.query(
+      `SELECT
+         opl.id,
+         opl.offer_id AS "offerId",
+         opl.price::numeric,
+         opl.is_active AS "isActive",
+         opl.created_at AS "createdAt",
+         opl.updated_at AS "updatedAt",
+         spo.supplier_id AS "supplierId",
+         COALESCE(spo.price_general, opl.price)::numeric AS "unitPrice",
+         COALESCE(pm.marketing_name, '(상품명 없음)') AS "productName",
+         COALESCE(org.name, '(공급사 없음)') AS "supplierName"
+       FROM organization_product_listings opl
+       LEFT JOIN supplier_product_offers spo ON spo.id = opl.offer_id
+       LEFT JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+       LEFT JOIN organizations org ON org.id = ns.organization_id
+       LEFT JOIN product_masters pm ON pm.id = opl.master_id
+       WHERE opl.service_key = $1 ${activeClause}
+       ORDER BY org.name ASC, opl.created_at ASC
+       LIMIT $2 OFFSET $3`,
+      [SERVICE_KEYS.KPA_GROUPBUY, safeLimit, offset],
+    );
+
+    return { data: rows, total };
+  }
+
+  /**
    * GET /stats — Operator stats (orders, quantity, revenue, stores, listings)
    */
   async getGroupbuyStats(): Promise<{

@@ -299,6 +299,23 @@ export interface GroupbuyProduct {
   updated_at: string;
 }
 
+// 이벤트 상품 (Enriched, WO-EVENT-OFFER-HUB-TABLE-AND-DIRECT-ORDER-REFINE-V1)
+export interface EventOfferItem {
+  id: string;
+  offerId: string;
+  price: number | null;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  supplierId: string;
+  unitPrice: number | null;
+  productName: string;
+  supplierName: string;
+}
+
+// 이벤트 상태 (WO-EVENT-OFFER-HUB-TIME-WINDOW-FILTER-HOTFIX-V1)
+export type EventOfferStatus = 'active' | 'ended' | 'all';
+
 // 공동구매 (캠페인 모델 - legacy)
 export interface Groupbuy {
   id: string;

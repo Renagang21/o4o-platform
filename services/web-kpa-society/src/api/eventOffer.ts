@@ -8,6 +8,7 @@ import type {
   GroupbuyProduct,
   GroupbuyStats,
   GroupbuyParticipation,
+  EventOfferItem,
   PaginatedResponse,
   ApiResponse,
 } from '../types';
@@ -31,6 +32,19 @@ export const eventOfferApi = {
   // 이벤트 운영 통계 (WO-KPA-GROUPBUY-STATS-V1)
   getGroupbuyStats: () =>
     apiClient.get<{ success: boolean; data: GroupbuyStats }>('/groupbuy/stats'),
+
+  // 이벤트 상품 목록 (enriched, WO-EVENT-OFFER-HUB-TABLE-AND-DIRECT-ORDER-REFINE-V1)
+  // WO-EVENT-OFFER-HUB-TIME-WINDOW-FILTER-HOTFIX-V1: status 필터 추가
+  getEnrichedGroupbuys: (params?: {
+    page?: number;
+    limit?: number;
+    status?: 'active' | 'ended' | 'all';
+  }) =>
+    apiClient.get<{
+      success: boolean;
+      data: EventOfferItem[];
+      pagination: { page: number; limit: number; total: number; totalPages: number };
+    }>('/groupbuy/enriched', params),
 
   // 이벤트 목록 (legacy campaign)
   getGroupbuys: (params?: {
