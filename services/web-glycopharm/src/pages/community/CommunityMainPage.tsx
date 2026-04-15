@@ -346,7 +346,7 @@ export default function CommunityMainPage() {
               {noticeItems.map((item) => (
                 <Link
                   key={item.id}
-                  to="/forum/posts"
+                  to={`/forum/posts/${item.id}`}
                   className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors"
                 >
                   <span className="shrink-0 px-1.5 py-0.5 text-[10px] font-medium bg-primary-50 text-primary-600 rounded">공지</span>
@@ -394,7 +394,7 @@ export default function CommunityMainPage() {
                 {hotPosts.map((item, idx) => (
                   <Link
                     key={item.id}
-                    to="/forum/posts"
+                    to={`/forum/posts/${item.id}`}
                     className="bg-white border border-slate-200 rounded-xl p-4 hover:border-primary-200 hover:shadow-sm transition-all"
                   >
                     <div className="flex items-start justify-between gap-2 mb-2">
@@ -480,7 +480,18 @@ export default function CommunityMainPage() {
               }))}
               rowKey="id"
               emptyText="게시물이 없습니다."
+              onRowClick={(row) => navigate(`/forum/posts/${row.id}`)}
             />
+            {!feedLoading && filteredFeed.length === 0 && (
+              <div className="py-4 text-center">
+                <Link
+                  to="/forum/write"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-primary-600 bg-primary-50 rounded-lg hover:bg-primary-100 transition-colors"
+                >
+                  첫 글 작성하기
+                </Link>
+              </div>
+            )}
           </div>
         </section>
 

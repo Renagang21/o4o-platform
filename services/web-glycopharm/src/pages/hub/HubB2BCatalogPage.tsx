@@ -16,21 +16,9 @@ import {
 } from '@o4o/hub-exploration-core';
 import { getCatalog } from '../../api/pharmacyProducts';
 import type { CatalogProduct } from '../../api/pharmacyProducts';
+import { apiClient } from '@/services/api';
 
 const CATEGORIES = ['전체', '의약품', '건강기능식품', '의료기기', '화장품', '생활용품'];
-
-function catalogToTableItem(p: CatalogProduct): B2BTableItem {
-  return {
-    id: p.id,
-    name: p.name,
-    supplierName: p.supplierName,
-    legalCategory: p.category ?? undefined,
-    createdAt: p.createdAt,
-    note: p.description ?? undefined,
-    isApplied: p.isApplied,
-    isApproved: p.isApproved,
-  };
-}
 
 export function HubB2BCatalogPage() {
   const [products, setProducts] = useState<CatalogProduct[]>([]);
@@ -38,6 +26,8 @@ export function HubB2BCatalogPage() {
   const [error, setError] = useState<string | null>(null);
   const [category, setCategory] = useState('전체');
   const [sortKey, setSortKey] = useState<B2BTableSortKey>('createdAt');
+  // Track applying state per product to update UI immediately
+  const [applyingId, setApplyingId] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   const fetchData = useCallback(async (cat: string) => {
@@ -70,7 +60,37 @@ export function HubB2BCatalogPage() {
     }
   };
 
-  const items: B2BTableItem[] = products.map(catalogToTableItem);
+  const handleApply = async (productId: string) => {
+    if (applyingId) return;
+    setApplyingId(productId);
+    try {
+      await apiClient.post('/api/v1/glycopharm/pharmacy/products/apply', {
+        productId,
+        service_key: 'glycopharm',
+      });
+      // Optimistically mark as applied
+      setProducts(prev => prev.map(p => p.id === productId ? { ...p, isApplied: true } : p));
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.message || '신청 중 오류가 발생했습니다.';
+      alert(msg);
+    } finally {
+      setApplyingId(null);
+    }
+  };
+
+  const items: B2BTableItem[] = products.map((p) => ({
+    id: p.id,
+    name: p.name,
+    supplierName: p.supplierName,
+    legalCategory: p.category ?? undefined,
+    createdAt: p.createdAt,
+    note: p.description ?? undefined,
+    isApplied: p.isApplied,
+    isApproved: p.isApproved,
+    onApply: (!p.isApplied && !p.isApproved)
+      ? () => handleApply(p.id)
+      : undefined,
+  }));
 
   return (
     <div className="px-1 py-2">

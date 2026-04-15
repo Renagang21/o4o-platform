@@ -106,6 +106,9 @@ const MarketTrialDetailPage = lazy(() => import('@/pages/store-management/market
 const B2BOrderPage = lazy(() => import('@/pages/store-management/b2b-order').then(m => ({ default: m.B2BOrderPage })));
 const SupplyPage = lazy(() => import('@/pages/b2b').then(m => ({ default: m.SupplyPage })));
 
+// Forum Post Detail (WO-O4O-GLYCOPHARM-KPA-STYLE-UX-REFINE-P3-V1)
+const ForumPostDetailPage = lazy(() => import('@/pages/forum/ForumPostDetailPage'));
+
 // Forum Extension
 const ForumListPage = lazy(() => import('@/pages/forum-ext').then(m => ({ default: m.ForumListPage })));
 const ForumFeedPage = lazy(() => import('@/pages/forum-ext').then(m => ({ default: m.ForumFeedPage })));
@@ -409,6 +412,7 @@ function AppRoutes() {
         <Route path="forum" element={<ForumHubPage />} />
         <Route path="forum/write" element={<ForumWritePage />} />
         <Route path="forum/posts" element={<ForumPage />} />
+        <Route path="forum/posts/:id" element={<ForumPostDetailPage />} />
         <Route path="forum/request-category" element={<RequestCategoryPage />} />
         <Route path="forum/my-requests" element={<MyRequestsPage />} />
         <Route path="forum/feedback" element={<ForumFeedbackPage />} />

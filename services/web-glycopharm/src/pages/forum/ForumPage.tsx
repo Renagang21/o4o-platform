@@ -8,7 +8,7 @@
  */
 
 import { useState, useEffect, useMemo } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { apiClient } from '@/services/api';
 
 interface ForumPostAuthor {
@@ -92,6 +92,7 @@ function formatDate(dateString: string): string {
 }
 
 export default function ForumPage() {
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const searchQuery = searchParams.get('q') || '';
@@ -291,7 +292,7 @@ export default function ForumPage() {
               <table className="w-full border-collapse" style={{ tableLayout: 'fixed' }}>
                 <tbody>
                   {hotPosts.map(post => (
-                    <tr key={post.id} className="bg-amber-50 cursor-pointer hover:bg-amber-100 transition-colors">
+                    <tr key={post.id} className="bg-amber-50 cursor-pointer hover:bg-amber-100 transition-colors" onClick={() => navigate(`/forum/posts/${post.id}`)}>
                       <td className="px-3 py-3 text-center border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: '80px' }}>
                         <span className="inline-block px-2 py-0.5 text-[11px] font-medium rounded bg-slate-100 text-slate-500">{post.category}</span>
                       </td>
@@ -335,7 +336,7 @@ export default function ForumPage() {
               </thead>
               <tbody>
                 {posts.length > 0 ? posts.map(post => (
-                  <tr key={post.id} className="cursor-pointer hover:bg-slate-50 transition-colors">
+                  <tr key={post.id} className="cursor-pointer hover:bg-slate-50 transition-colors" onClick={() => navigate(`/forum/posts/${post.id}`)}>
                     <td className="px-3 py-3 text-center border-b border-slate-50 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: '80px' }}>
                       <span className="inline-block px-2 py-0.5 text-[11px] font-medium rounded bg-slate-100 text-slate-500">{post.category}</span>
                     </td>
