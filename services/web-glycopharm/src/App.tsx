@@ -37,34 +37,7 @@ const ContactPage = lazy(() => import('@/pages/ContactPage'));
 const RegisterPage = lazy(() => import('@/pages/auth/RegisterPage'));
 const RoleSelectPage = lazy(() => import('@/pages/auth/RoleSelectPage'));
 
-// WO-GLYCOPHARM-ENTRY-SCREENS-V1: Placeholder dashboards
-const PatientMainPage = lazy(() => import('@/pages/PatientPlaceholderPage'));
-// PharmacyPlaceholderPage 제거 — WO-O4O-GLYCOPHARM-NAVIGATION-AND-STORE-STRUCTURE-REFINE-V1:
-//   /pharmacy → Navigate to /care/patients (직접 리다이렉트)
-
-// WO-GLYCOPHARM-PHARMACIST-COACHING-SCREEN-V1 + PATIENT-LIST-SCREEN-V1 + PATIENT-DETAIL-SCREEN-V1
-// WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1 Phase 4-C1:
-//   pages/pharmacist/PharmacistCoachingPage → pages/pharmacist/PharmacyCoachingPage
-const PharmacyCoachingPage = lazy(() => import('@/pages/pharmacist/PharmacyCoachingPage'));
-const PharmacistPatientsPage = lazy(() => import('@/pages/pharmacist/PharmacistPatientsPage'));
-const PharmacistPatientDetailPage = lazy(() => import('@/pages/pharmacist/PharmacistPatientDetailPage'));
-
-// WO-GLYCOPHARM-PATIENT-PHARMACY-LINK-FLOW-V1
-const PatientSelectPharmacyPage = lazy(() => import('@/pages/patient/SelectPharmacyPage'));
-const PharmacistPatientRequestsPage = lazy(() => import('@/pages/pharmacist/PatientRequestsPage'));
-
-// WO-GLYCOPHARM-APPOINTMENT-SYSTEM-V1
-const PatientAppointmentsPage = lazy(() => import('@/pages/patient/AppointmentsPage'));
-const PharmacistAppointmentsPage = lazy(() => import('@/pages/pharmacist/AppointmentsPage'));
-
-// WO-GLYCOPHARM-PATIENT-MAIN-SCREEN-V1: Patient sub-pages
-const PatientProfilePage = lazy(() => import('@/pages/patient/ProfilePage'));
-const PatientGlucoseInputPage = lazy(() => import('@/pages/patient/GlucoseInputPage'));
-const PatientRecordsListPage = lazy(() => import('@/pages/patient/RecordsListPage'));
-const PatientDataAnalysisPage = lazy(() => import('@/pages/patient/DataAnalysisPage'));
-// WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1 Phase 4-C1:
-//   pages/patient/PharmacistCoachingPage → pages/patient/PharmacyCoachingPage
-const PatientPharmacyCoachingPage = lazy(() => import('@/pages/patient/PharmacyCoachingPage'));
+// WO-O4O-GLYCOPHARM-PATIENT-SURFACE-REMOVAL-V1: Patient/pharmacist pages removed
 
 // Store Management pages (WO-O4O-GLYCOPHARM-NAVIGATION-AND-STORE-STRUCTURE-REFINE-V1:
 //   pages/pharmacy/ → pages/store-management/ 이동, /store/* 라우트 담당)
@@ -249,27 +222,6 @@ function ServiceUserProtectedRoute({ children }: { children: React.ReactNode }) 
 }
 
 /**
- * WO-GLYCOPHARM-CARE-UI-ADJUST-V1 + WO-GLYCOPHARM-LANDING-FLOW-FIX-V1:
- * Patient Auth Guard — 비로그인 → /login?type=patient 리다이렉트
- */
-const PATIENT_ROLES = ['customer'];
-
-function PatientAuthGuardOutlet() {
-  const { isAuthenticated, user, isLoading } = useAuth();
-  const location = useLocation();
-
-  if (isLoading) return <PageLoading />;
-  if (!isAuthenticated) {
-    return <Navigate to="/login?type=patient" state={{ from: location.pathname }} replace />;
-  }
-  // 당뇨인 role 체크 — 약국/운영자는 /patient 접근 불가
-  if (user && !user.roles.some(r => PATIENT_ROLES.includes(r))) {
-    return <Navigate to="/" replace />;
-  }
-  return <Outlet />;
-}
-
-/**
  * WO-GLYCOPHARM-SOFT-GUARD-INTRO-V1: Soft Guard
  * 비로그인 → FeatureIntroPage 표시 (로그인 리다이렉트 대신)
  * 로그인 + 권한 불일치 → / 리다이렉트
@@ -349,29 +301,9 @@ function AppRoutes() {
       <Route path="register" element={<RegisterPage />} />
       <Route path="forgot-password" element={<AccountRecoveryPage />} />
       <Route path="reset-password" element={<ResetPasswordPage />} />
-      {/* WO-GLYCOPHARM-CARE-UI-ADJUST-V1: 당뇨인 라우트 인증 가드 */}
-      <Route element={<PatientAuthGuardOutlet />}>
-        <Route path="patient" element={<PatientMainPage />} />
-        <Route path="patient/profile" element={<PatientProfilePage />} />
-        <Route path="patient/glucose-input" element={<PatientGlucoseInputPage />} />
-        <Route path="patient/records" element={<PatientRecordsListPage />} />
-        <Route path="patient/data-analysis" element={<PatientDataAnalysisPage />} />
-        {/* WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1 Phase 4-C2:
-            신규 표준 경로 `patient/pharmacy-coaching` + legacy alias `patient/pharmacist-coaching`
-            외부 북마크/이전 딥링크 호환을 위해 두 경로 모두 동일 컴포넌트를 가리킴. */}
-        <Route path="patient/pharmacy-coaching" element={<PatientPharmacyCoachingPage />} />
-        <Route path="patient/pharmacist-coaching" element={<PatientPharmacyCoachingPage />} />
-<Route path="patient/select-pharmacy" element={<PatientSelectPharmacyPage />} />
-        <Route path="patient/appointments" element={<PatientAppointmentsPage />} />
-      </Route>
       {/* WO-O4O-GLYCOPHARM-ENTRYPOINT-AND-NAV-REALIGN-V1:
-          /pharmacy → /store/hub (care 제거 후 약국 경영 허브로 재지정) */}
+          /pharmacy → /store/hub */}
       <Route path="pharmacy" element={<Navigate to="/store/hub" replace />} />
-      <Route path="pharmacy/patients" element={<PharmacistPatientsPage />} />
-      <Route path="pharmacy/patient/:patientId" element={<PharmacistPatientDetailPage />} />
-      <Route path="pharmacy/patient-requests" element={<PharmacistPatientRequestsPage />} />
-      <Route path="pharmacy/appointments" element={<PharmacistAppointmentsPage />} />
-      <Route path="pharmacy/coaching/:patientId" element={<PharmacyCoachingPage />} />
 
       {/* Public Routes with MainLayout */}
       <Route element={<MainLayout />}>
@@ -447,12 +379,9 @@ function AppRoutes() {
         <Route path="dashboard" element={<ServiceDashboardPage />} />
       </Route>
 
-      {/* Backward compat redirects
-          WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1 Phase 4-C2:
-            `/pharmacist` 및 `/pharmacist/*` → `/pharmacy` 리다이렉트는 레거시 북마크 대응
-            (외부 URL 영향이 있으므로 즉시 제거하지 않고 alias 유지). */}
-      <Route path="pharmacist" element={<Navigate to="/pharmacy" replace />} />
-      <Route path="pharmacist/*" element={<Navigate to="/pharmacy" replace />} />
+      {/* Backward compat: /pharmacist → /store/hub (레거시 북마크 대응) */}
+      <Route path="pharmacist" element={<Navigate to="/store/hub" replace />} />
+      <Route path="pharmacist/*" element={<Navigate to="/store/hub" replace />} />
 
       {/* Supplier Dashboard - Neture에서 관리 */}
       <Route

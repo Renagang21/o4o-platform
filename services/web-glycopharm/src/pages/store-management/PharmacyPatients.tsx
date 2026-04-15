@@ -4,10 +4,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Search,
-  Plus,
   User,
   Phone,
   Mail,
@@ -27,7 +25,6 @@ const diabetesLabels: Record<string, string> = {
 };
 
 export default function PharmacyPatients() {
-  const navigate = useNavigate();
   const [customers, setCustomers] = useState<PharmacyCustomer[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -93,13 +90,6 @@ export default function PharmacyPatients() {
             {loading ? '불러오는 중...' : `총 ${totalCount}명의 고객`}
           </p>
         </div>
-        <button
-          onClick={() => navigate('/store/patients')}
-          className="flex items-center gap-2 px-4 py-2.5 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors shadow-lg shadow-primary-600/25"
-        >
-          <Plus className="w-5 h-5" />
-          고객 등록
-        </button>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
