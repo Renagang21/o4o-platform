@@ -84,7 +84,8 @@ export default function CourseNewPage() {
         level: form.level,
         tags: tags.length > 0 ? tags : undefined,
       });
-      const courseId = res.data?.data?.id;
+      // API returns { success, data: { course: Course } }
+      const courseId = res.data?.data?.course?.id;
       if (courseId) {
         navigate(`/instructor/courses/${courseId}`);
       } else {

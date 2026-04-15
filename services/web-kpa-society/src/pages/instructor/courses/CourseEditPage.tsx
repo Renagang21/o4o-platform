@@ -215,8 +215,10 @@ export default function CourseEditPage() {
         lmsInstructorApi.getCourse(id),
         lmsInstructorApi.getLessons(id),
       ]);
-      const c: Course = (cRes as any).data?.data;
-      const ls: Lesson[] = (lRes as any).data?.data || [];
+      // GET /lms/courses/:id → { success, data: { course: Course } }
+      const c: Course = (cRes as any).data?.data?.course;
+      // GET /lms/courses/:id/lessons → { success, data: Lesson[], pagination }
+      const ls: Lesson[] = Array.isArray((lRes as any).data?.data) ? (lRes as any).data?.data : [];
       setCourse(c);
       setForm({ title: c.title, description: c.description, level: c.level });
       setTags(c.tags || []);

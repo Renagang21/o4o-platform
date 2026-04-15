@@ -68,8 +68,9 @@ export default function CourseListPage() {
   useEffect(() => {
     lmsInstructorApi.myCourses()
       .then((res: any) => {
-        const d = res.data?.data;
-        setCourses(d?.data || []);
+        // API returns: { success, data: Course[], pagination: {...} }
+        const courses = res.data?.data;
+        setCourses(Array.isArray(courses) ? courses : []);
       })
       .catch((err: any) => {
         if (err?.response?.data?.code === 'INSTRUCTOR_REQUIRED') {

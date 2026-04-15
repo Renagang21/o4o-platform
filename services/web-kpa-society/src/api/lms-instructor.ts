@@ -48,12 +48,18 @@ export interface Lesson {
   updatedAt: string;
 }
 
-export interface CoursesResponse {
-  data: Course[];
+export interface Pagination {
   total: number;
   page: number;
   limit: number;
   totalPages: number;
+}
+
+// Actual API response: { success, data: Course[], pagination: Pagination }
+export interface CoursesResponseWrapper {
+  success: boolean;
+  data: Course[];
+  pagination: Pagination;
 }
 
 export interface CreateCourseDto {
@@ -95,7 +101,7 @@ export interface UpdateLessonDto {
 export const lmsInstructorApi = {
   /** 내 강의 목록 */
   myCourses: (page = 1, limit = 20) =>
-    authClient.api.get<{ success: boolean; data: CoursesResponse }>(
+    authClient.api.get<CoursesResponseWrapper>(
       `/lms/instructor/courses?page=${page}&limit=${limit}`,
     ),
 
