@@ -96,6 +96,7 @@ import { createCommunityHubController } from './controllers/community-hub.contro
 import { createLegalDocumentsController } from './controllers/legal-documents.controller.js';
 import { createGroupbuyController } from './controllers/groupbuy.controller.js';
 import { createMypageController } from './controllers/mypage.controller.js';
+import { createQualificationController } from './controllers/qualification.controller.js'; // WO-O4O-QUALIFICATION-SYSTEM-V1
 import { createWorkingContentController } from './controllers/working-content.controller.js';
 import { execute } from '@o4o/ai-core';
 import { buildConfigResolver } from '../../utils/ai-config-resolver.js';
@@ -177,6 +178,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Admin Force Asset routes (WO-KPA-A-ASSET-CONTROL-EXTENSION-V2)
   router.use('/admin/force-assets', createAdminForceAssetController(dataSource, coreRequireAuth as any, requireKpaScope));
+
+  // Qualification System (WO-O4O-QUALIFICATION-SYSTEM-V1)
+  router.use('/qualifications', createQualificationController(dataSource, coreRequireAuth as any, requireKpaScope));
 
   // Instructor Qualifications (WO-O4O-ROUTES-REFACTOR-V1)
   router.use('/', createInstructorController(dataSource, coreRequireAuth as any, requireKpaScope));

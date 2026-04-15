@@ -31,6 +31,9 @@ export { KpaStudentProfile } from './kpa-student-profile.entity.js';
 // WO-O4O-REGISTRATION-STRUCTURE-REFACTOR-V1
 export { KpaExternalExpertProfile } from './kpa-external-expert-profile.entity.js';
 export { KpaSupplierStaffProfile } from './kpa-supplier-staff-profile.entity.js';
+// WO-O4O-QUALIFICATION-SYSTEM-V1
+export { MemberQualification, QUALIFICATION_TYPES } from './member-qualification.entity.js';
+export { QualificationRequest } from './qualification-request.entity.js';
 // WO-KPA-B-LMS-GUARD-BYPASS-AUDIT-AND-IMPLEMENTATION-V1
 /** @deprecated WO-PLATFORM-APPROVAL-ENGINE-UNIFICATION-V1: Use KpaApprovalRequest (entity_type='instructor_qualification'). Kept for legacy data reads. */
 export { KpaInstructorQualification } from './kpa-instructor-qualification.entity.js';

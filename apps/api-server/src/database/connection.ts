@@ -316,6 +316,8 @@ import {
 } from '../routes/kpa/entities/index.js';
 import { KpaExternalExpertProfile } from '../routes/kpa/entities/kpa-external-expert-profile.entity.js';
 import { KpaSupplierStaffProfile } from '../routes/kpa/entities/kpa-supplier-staff-profile.entity.js';
+import { MemberQualification } from '../routes/kpa/entities/member-qualification.entity.js';
+import { QualificationRequest } from '../routes/kpa/entities/qualification-request.entity.js';
 
 // ============================================================================
 // PARTNER DASHBOARD ENTITIES (WO-PARTNER-DASHBOARD-API-BE-IMPLEMENTATION-V1)
@@ -846,6 +848,9 @@ export const AppDataSource = new DataSource({
     // WO-O4O-REGISTRATION-STRUCTURE-REFACTOR-V1
     KpaExternalExpertProfile,
     KpaSupplierStaffProfile,
+    // WO-O4O-QUALIFICATION-SYSTEM-V1
+    MemberQualification,
+    QualificationRequest,
     // WO-O4O-SERVICE-PRODUCT-LAYER-PREP-V1
     ServiceProduct,
     // ============================================================================

@@ -16,3 +16,4 @@ export { default as AuditLogPage } from './AuditLogPage';
 export { default as PharmacyRequestManagementPage } from './PharmacyRequestManagementPage';
 export { default as ProductApplicationManagementPage } from './ProductApplicationManagementPage';
 export { default as CommunityManagementPage } from './CommunityManagementPage';
+export { default as QualificationRequestsPage } from './QualificationRequestsPage';

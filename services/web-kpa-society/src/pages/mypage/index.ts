@@ -8,3 +8,4 @@ export { default as MyForumDashboardPage } from './MyForumDashboardPage';
 export { default as RequestCategoryPage } from './RequestCategoryPage';
 export { default as MyRequestsPage } from './MyRequestsPage';
 export { default as ForumMemberManagementPage } from './ForumMemberManagementPage';
+export { MyQualificationsPage } from './MyQualificationsPage';

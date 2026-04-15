@@ -66,7 +66,7 @@ import { PolicyPage, PrivacyPage } from './pages/legal';
 import { OrganizationAboutPage, OfficersPage, ContactPage } from './pages/organization';
 
 // MyPage pages
-import { MyDashboardPage, MyProfilePage, MySettingsPage, MyCertificatesPage, PersonalStatusReportPage, AnnualReportFormPage, MyForumDashboardPage, RequestCategoryPage as KpaRequestCategoryPage, MyRequestsPage, ForumMemberManagementPage } from './pages/mypage';
+import { MyDashboardPage, MyProfilePage, MySettingsPage, MyCertificatesPage, PersonalStatusReportPage, AnnualReportFormPage, MyForumDashboardPage, RequestCategoryPage as KpaRequestCategoryPage, MyRequestsPage, ForumMemberManagementPage, MyQualificationsPage } from './pages/mypage';
 
 // Admin Routes (지부 관리자)
 import { AdminRoutes } from './routes/AdminRoutes';
@@ -229,7 +229,6 @@ function NewsIdRedirect() {
 /**
  * WO-KPA-A-DEFAULT-ROUTE-FIX-V2
  * / 접근 시 로그인된 관리자/운영자는 적절한 경로로 자동 리다이렉트
- * WO-KPA-C-DEFAULT-ROUTE-ALIGNMENT-V1: branch role → /branch-services 추가
  * 일반 사용자 및 비로그인 → CommunityHomePage 표시
  */
 function RoleBasedHome() {
@@ -381,15 +380,6 @@ function App() {
           <Route path="/market-trial/:id" element={<Layout serviceName={SERVICE_NAME}><MarketTrialDetailPage /></Layout>} />
 
 
-          {/* =========================================================
-           * Service C - 분회 서비스 (Branch Services)
-           * WO-KPA-A-BRANCH-CHAPTER-REMOVAL-PHASE2-CUTOFF-V1: 분회 서비스 제거
-           * 모든 /branch-services/* 경로 → / 리다이렉트
-           * ========================================================= */}
-          <Route path="/branch-services" element={<Navigate to="/" replace />} />
-          <Route path="/branch-services/:branchId/admin/*" element={<Navigate to="/" replace />} />
-          <Route path="/branch-services/:branchId/operator/*" element={<Navigate to="/" replace />} />
-          <Route path="/branch-services/:branchId/*" element={<Navigate to="/" replace />} />
 
           {/* Service Detail Pages (WO-KPA-HOME-SERVICE-SECTION-V1) */}
           <Route path="/services/branch" element={<Navigate to="/" replace />} />
@@ -472,8 +462,7 @@ function App() {
            * - /demo/admin/* : 지부 관리자 데모
            * - /demo/operator/* : 서비스 운영자 데모
            * - /demo/intranet/* : 인트라넷 데모
-           * - /demo/forum/* : 지부/분회 포럼 데모 (NOT /forum)
-           * - /demo/branch/:branchId/* : 분회 서비스 데모 (레거시)
+           * - /demo/forum/* : 포럼 데모 (NOT /forum)
            *
            * WO-KPA-DEMO-ROUTE-ISOLATION-V1
            * WO-KPA-DEMO-SCOPE-SEPARATION-AND-IMPLEMENTATION-V1
@@ -495,14 +484,6 @@ function App() {
 
           {/* Intranet Routes (인트라넷 - 별도 레이아웃) */}
           <Route path="/demo/intranet/*" element={<IntranetRoutes />} />
-
-          {/* ===================================================
-           * Legacy: /demo/branch/* → / 리다이렉트
-           * WO-KPA-A-BRANCH-CHAPTER-REMOVAL-PHASE2-CUTOFF-V1: 분회 서비스 제거
-           * =================================================== */}
-          <Route path="/demo/branch/:branchId/admin/*" element={<Navigate to="/" replace />} />
-          <Route path="/demo/branch/:branchId/*" element={<Navigate to="/" replace />} />
-          <Route path="/demo/branch" element={<Navigate to="/" replace />} />
 
           {/* Main Layout Routes - /demo 하위 나머지 경로 */}
           <Route path="/demo/*" element={<DemoLayoutRoutes />} />
@@ -529,7 +510,6 @@ function App() {
           {/* Operator Routes — WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: KpaOperatorLayout (standalone sidebar) */}
           <Route path="/operator/*" element={<OperatorRoutes />} />
           <Route path="/intranet/*" element={<Navigate to="/demo/intranet" replace />} />
-          <Route path="/branch/*" element={<Navigate to="/" replace />} />
 
           {/* ========================================
            * 커뮤니티 서비스 라우트 (메인 서비스)
@@ -582,7 +562,6 @@ function App() {
           {/* Organization (약사회 소개) */}
           <Route path="/organization" element={<Layout serviceName={SERVICE_NAME}><OrganizationAboutPage /></Layout>} />
           <Route path="/organization/branches" element={<Navigate to="/organization" replace />} />
-          <Route path="/organization/branch/:id" element={<Navigate to="/organization" replace />} />
           <Route path="/organization/officers" element={<Layout serviceName={SERVICE_NAME}><OfficersPage /></Layout>} />
           <Route path="/organization/contact" element={<Layout serviceName={SERVICE_NAME}><ContactPage /></Layout>} />
 
@@ -598,6 +577,8 @@ function App() {
           <Route path="/mypage/my-forums/:forumId/members" element={<Layout serviceName={SERVICE_NAME}><ForumMemberManagementPage /></Layout>} />
           {/* WO-KPA-A-MYPAGE-UNIFIED-REQUEST-INBOX-V1 */}
           <Route path="/mypage/my-requests" element={<Layout serviceName={SERVICE_NAME}><MyRequestsPage /></Layout>} />
+          {/* WO-O4O-QUALIFICATION-SYSTEM-V1 */}
+          <Route path="/mypage/qualifications" element={<Layout serviceName={SERVICE_NAME}><MyQualificationsPage /></Layout>} />
 
           {/* Participation (참여) */}
           <Route path="/participation" element={<Layout serviceName={SERVICE_NAME}><ParticipationListPage /></Layout>} />
