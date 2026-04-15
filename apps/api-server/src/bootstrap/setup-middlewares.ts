@@ -60,6 +60,12 @@ export const getAllowedOrigins = (): string[] => {
     "https://kpa-society.co.kr", "https://www.kpa-society.co.kr",
     "https://k-cosmetics.site", "https://www.k-cosmetics.site",
     "https://siteguide.co.kr", "https://www.siteguide.co.kr",
+    // Cloud Run service URLs (GCP asia-northeast3)
+    "https://glycopharm-web-3e3aws7zqa-du.a.run.app",
+    "https://neture-web-3e3aws7zqa-du.a.run.app",
+    "https://glucoseview-web-3e3aws7zqa-du.a.run.app",
+    "https://kpa-society-web-3e3aws7zqa-du.a.run.app",
+    "https://k-cosmetics-web-3e3aws7zqa-du.a.run.app",
   ];
 
   return [...devOrigins, ...ipOrigins, ...prodOrigins, ...envOrigins];
