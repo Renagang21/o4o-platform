@@ -91,7 +91,7 @@ export function createMemberController(
     '/apply',
     requireAuth,
     [
-      body('organization_id').isUUID(),
+      body('organization_id').optional().isUUID(),
       body('membership_type').optional().isIn(['pharmacist', 'student', 'pharmacist_member', 'pharmacy_student_member', 'external_expert', 'supplier_staff']),
       body('license_number').optional().isString().isLength({ max: 100 }),
       body('university_name').optional().isString().isLength({ max: 200 }),
@@ -106,6 +106,15 @@ export function createMemberController(
         'A1_pharmacy_owner', 'A2_pharma_manager', 'B1_pharmacy_employee',
         'B2_pharma_company_employee', 'C1_hospital', 'C2_admin_edu_research', 'D_fee_exempted',
       ]),
+      body('sub_role').optional().isString().isLength({ max: 100 }),
+      body('institution_name').optional().isString().isLength({ max: 200 }),
+      body('institution_type').optional().isString().isLength({ max: 100 }),
+      body('department').optional().isString().isLength({ max: 200 }),
+      body('qualification').optional().isString().isLength({ max: 200 }),
+      body('qualification_type').optional().isString().isLength({ max: 100 }),
+      body('company_name').optional().isString().isLength({ max: 200 }),
+      body('company_type').optional().isString().isLength({ max: 100 }),
+      body('job_title').optional().isString().isLength({ max: 100 }),
       handleValidationErrors,
     ],
     async (req: AuthRequest, res: Response): Promise<void> => {
@@ -122,16 +131,25 @@ export function createMemberController(
           return;
         }
 
-        // 조직 확인
-        const org = await orgRepo.findOne({ where: { id: req.body.organization_id } });
-        if (!org) {
-          res.status(400).json({ error: { code: 'INVALID_ORG', message: 'Organization not found' } });
-          return;
-        }
-
         const membershipType = req.body.membership_type || 'pharmacist';
         const isPharmacistType = membershipType === 'pharmacist' || membershipType === 'pharmacist_member';
         const isStudentType = membershipType === 'student' || membershipType === 'pharmacy_student_member';
+        const isExternalExpert = membershipType === 'external_expert';
+        const isSupplierStaff = membershipType === 'supplier_staff';
+
+        // 조직 확인 — 약사/학생 타입은 조직 필수, 외부전문가/업체직원은 선택
+        let organizationId: string | null = req.body.organization_id || null;
+        if (organizationId) {
+          const org = await orgRepo.findOne({ where: { id: organizationId } });
+          if (!org) {
+            res.status(400).json({ error: { code: 'INVALID_ORG', message: 'Organization not found' } });
+            return;
+          }
+        } else if (isPharmacistType || isStudentType) {
+          res.status(400).json({ error: { code: 'MISSING_ORG', message: 'organization_id is required for this membership type' } });
+          return;
+        }
+
         const licenseNumber = isPharmacistType ? (req.body.license_number || null) : null;
 
         // 면허번호 중복 체크 (상태 무관 절대 유일)
@@ -149,19 +167,20 @@ export function createMemberController(
 
         const member = memberRepo.create({
           user_id: req.user!.id,
-          organization_id: req.body.organization_id,
+          organization_id: organizationId,
           membership_type: membershipType,
+          sub_role: req.body.sub_role || null,
           role: 'member',
           status: 'pending',
           identity_status: 'active',
           license_number: licenseNumber,
           university_name: isStudentType ? (req.body.university_name || null) : null,
           student_year: isStudentType ? (req.body.student_year || null) : null,
-          pharmacy_name: req.body.pharmacy_name || null,
-          pharmacy_address: req.body.pharmacy_address || null,
+          pharmacy_name: isPharmacistType ? (req.body.pharmacy_name || null) : null,
+          pharmacy_address: isPharmacistType ? (req.body.pharmacy_address || null) : null,
           activity_type: req.body.activity_type || null,
           fee_category: req.body.fee_category || null,
-        });
+        } as any);
 
         const saved = await memberRepo.save(member);
 
@@ -176,6 +195,49 @@ export function createMemberController(
             );
           } catch (syncErr) {
             console.error('[SSOT-SYNC] kpa_pharmacist_profiles sync on apply:', syncErr);
+          }
+        }
+
+        // WO-O4O-REGISTRATION-STRUCTURE-REFACTOR-V1: profile insert for new member types
+        if (isExternalExpert && req.body.sub_role) {
+          try {
+            await dataSource.query(
+              `INSERT INTO kpa_external_expert_profiles
+               (user_id, expert_domain, institution_name, institution_type, department, qualification, qualification_type)
+               VALUES ($1, $2, $3, $4, $5, $6, $7)
+               ON CONFLICT (user_id) DO NOTHING`,
+              [
+                req.user!.id,
+                req.body.sub_role,
+                req.body.institution_name || null,
+                req.body.institution_type || null,
+                req.body.department || null,
+                req.body.qualification || null,
+                req.body.qualification_type || null,
+              ]
+            );
+          } catch (profileErr) {
+            console.error('[PROFILE-SYNC] kpa_external_expert_profiles sync on apply:', profileErr);
+          }
+        }
+
+        if (isSupplierStaff && req.body.company_name) {
+          try {
+            await dataSource.query(
+              `INSERT INTO kpa_supplier_staff_profiles
+               (user_id, company_name, company_type, job_title, department)
+               VALUES ($1, $2, $3, $4, $5)
+               ON CONFLICT (user_id) DO NOTHING`,
+              [
+                req.user!.id,
+                req.body.company_name,
+                req.body.company_type || 'other',
+                req.body.job_title || null,
+                req.body.department || null,
+              ]
+            );
+          } catch (profileErr) {
+            console.error('[PROFILE-SYNC] kpa_supplier_staff_profiles sync on apply:', profileErr);
           }
         }
 
@@ -328,20 +390,29 @@ export function createMemberController(
                 [member.user_id, member.university_name, member.student_year]
               );
             } else if (mType === 'external_expert') {
+              // Profile should already exist from registration; this is a safety-net insert only
+              const expertDomain = (member as any).sub_role || 'general';
               await dataSource.query(
                 `INSERT INTO kpa_external_expert_profiles (user_id, expert_domain)
                  VALUES ($1, $2)
                  ON CONFLICT (user_id) DO NOTHING`,
-                [member.user_id, (member as any).sub_role || 'general']
+                [member.user_id, expertDomain]
               );
             } else if (mType === 'supplier_staff') {
-              // company_name comes from pharmacy_name field used during registration fallback
-              await dataSource.query(
-                `INSERT INTO kpa_supplier_staff_profiles (user_id, company_name, company_type)
-                 VALUES ($1, $2, $3)
-                 ON CONFLICT (user_id) DO NOTHING`,
-                [member.user_id, member.pharmacy_name || 'Unknown', 'other']
+              // Profile should already exist from registration; this is a safety-net insert only
+              // Look up existing profile first to avoid overwriting with poor fallback data
+              const [existingProfile] = await dataSource.query(
+                `SELECT company_name FROM kpa_supplier_staff_profiles WHERE user_id = $1 LIMIT 1`,
+                [member.user_id]
               );
+              if (!existingProfile) {
+                await dataSource.query(
+                  `INSERT INTO kpa_supplier_staff_profiles (user_id, company_name, company_type)
+                   VALUES ($1, $2, $3)
+                   ON CONFLICT (user_id) DO NOTHING`,
+                  [member.user_id, 'Unknown', 'other']
+                );
+              }
             } else {
               // pharmacist / pharmacist_member
               await dataSource.query(
