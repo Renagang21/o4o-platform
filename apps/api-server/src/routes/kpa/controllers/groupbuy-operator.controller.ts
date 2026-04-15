@@ -78,16 +78,21 @@ function createErrorResponse(
   });
 }
 
-/** kpa_members에서 운영자 organization_id 조회 */
+/** kpa_members에서 운영자 organization_id 조회 — 본인 우선, 없으면 operator 역할 기준 */
 async function resolveOperatorOrgId(
   dataSource: DataSource,
   userId: string
 ): Promise<string | null> {
   const rows = await dataSource.query(
-    `SELECT organization_id FROM kpa_members WHERE user_id = $1 LIMIT 1`,
+    `SELECT organization_id FROM kpa_members WHERE user_id = $1 AND organization_id IS NOT NULL LIMIT 1`,
     [userId]
   );
-  return rows[0]?.organization_id ?? null;
+  if (rows[0]?.organization_id) return rows[0].organization_id;
+  // fallback: kpa operator 역할 기준
+  const fallback = await dataSource.query(
+    `SELECT organization_id FROM kpa_members WHERE role = 'operator' AND organization_id IS NOT NULL LIMIT 1`
+  );
+  return fallback[0]?.organization_id ?? null;
 }
 
 const requireKpaScope = createMembershipScopeGuard(KPA_SCOPE_CONFIG);

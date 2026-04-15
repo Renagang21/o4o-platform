@@ -51,7 +51,7 @@ async function resolveSupplierIdByUser(dataSource: DataSource, userId: string): 
  */
 async function resolveKpaOrgId(dataSource: DataSource): Promise<string | null> {
   const rows = await dataSource.query(
-    `SELECT organization_id FROM kpa_members WHERE status = 'active' LIMIT 1`
+    `SELECT organization_id FROM kpa_members WHERE role = 'operator' AND organization_id IS NOT NULL LIMIT 1`
   );
   return rows[0]?.organization_id ?? null;
 }
