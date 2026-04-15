@@ -1,8 +1,9 @@
 /**
- * Groupbuy Admin API - 공동구매 운영자용 API 서비스
+ * Event Offer Admin API - 이벤트 운영자용 API 서비스
  *
  * WO-KPA-GROUPBUY-OPERATOR-UI-V1
  * WO-KPA-GROUPBUY-OPERATION-STABILIZATION-V1: 안정화
+ * WO-EVENT-OFFER-OPERATOR-UX-REFINE-V1: available-offers, offerId 추가
  *
  * 캐시 정책:
  * - 통계 조회: 캐시 유효시간 10~30분
@@ -15,6 +16,7 @@ import { apiClient } from './client';
 // Types
 export interface GroupbuyProduct {
   id: string;
+  offerId: string;
   title: string;
   supplierName: string;
   conditionSummary: string;
@@ -27,12 +29,23 @@ export interface GroupbuyProduct {
   status: 'upcoming' | 'active' | 'ended';
 }
 
+export interface AvailableOffer {
+  id: string;
+  title: string;
+  supplierName: string;
+  price: number | null;
+}
+
+export interface AvailableOffersData {
+  organizationId: string | null;
+  offers: AvailableOffer[];
+}
+
 export interface GroupbuyStats {
   totalOrders: number;
   totalParticipants: number;
   dailyOrders: { date: string; count: number }[];
   productOrders: { productId: string; productName: string; orderCount: number }[];
-  /** 캐시 정보 */
   cachedAt?: string;
   cacheValidUntil?: string;
 }
@@ -44,11 +57,8 @@ export interface GroupbuyApiError {
 }
 
 export interface CreateGroupbuyProductDto {
-  title: string;
-  supplierName: string;
-  conditionSummary: string;
-  startDate: string;
-  endDate: string;
+  offerId: string;
+  // organizationId는 서버에서 kpa_members로 자동 주입
 }
 
 /** 공급자 연계 상태 */
@@ -73,19 +83,26 @@ export interface StatsMetaInfo {
 
 export const eventOfferAdminApi = {
   /**
-   * 공동구매 상품 목록 조회
+   * 등록 가능한 공급자 상품 목록 + 운영자 조직 ID
+   * WO-EVENT-OFFER-OPERATOR-UX-REFINE-V1
+   */
+  getAvailableOffers: () =>
+    apiClient.get<{ data: AvailableOffersData }>('/groupbuy-admin/available-offers'),
+
+  /**
+   * 이벤트 상품 목록
    */
   getProducts: () =>
     apiClient.get<{ data: GroupbuyProduct[] }>('/groupbuy-admin/products'),
 
   /**
-   * 공동구매 상품 추가
+   * 이벤트 상품 추가 (offerId만 전달, organizationId는 서버 자동 주입)
    */
   addProduct: (data: CreateGroupbuyProductDto) =>
     apiClient.post<{ data: GroupbuyProduct }>('/groupbuy-admin/products', data),
 
   /**
-   * 공동구매 상품 제거
+   * 이벤트 상품 제외 (소프트 삭제)
    */
   removeProduct: (id: string) =>
     apiClient.delete<{ success: boolean }>(`/groupbuy-admin/products/${id}`),
@@ -100,7 +117,7 @@ export const eventOfferAdminApi = {
     ),
 
   /**
-   * 상품 순서 변경
+   * 상품 순서 변경 (display_order 미구현, echo 반환)
    */
   updateOrder: (id: string, order: number) =>
     apiClient.post<{ data: { id: string; order: number } }>(
@@ -109,14 +126,13 @@ export const eventOfferAdminApi = {
     ),
 
   /**
-   * 공동구매 통계 조회
+   * 이벤트 통계
    */
   getStats: () =>
     apiClient.get<{ data: GroupbuyStats; _meta?: StatsMetaInfo }>('/groupbuy-admin/stats'),
 
   /**
    * 공급자 연계 상태 확인
-   * WO-KPA-GROUPBUY-SUPPLIER-STATS-DRYRUN-V1
    */
   getSupplierStatus: () =>
     apiClient.get<{ data: SupplierStatusResponse }>('/groupbuy-admin/supplier-status'),

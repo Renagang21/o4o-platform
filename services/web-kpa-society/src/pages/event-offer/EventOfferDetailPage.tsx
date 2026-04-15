@@ -21,6 +21,7 @@ export function EventOfferDetailPage() {
   const [product, setProduct] = useState<GroupbuyProduct | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [participating, setParticipating] = useState(false);
 
   const hasStore = user?.isStoreOwner === true;
 
@@ -128,8 +129,24 @@ export function EventOfferDetailPage() {
 
             <div style={styles.actionSection}>
               {hasStore ? (
-                <button style={styles.orderButton} onClick={() => toast.info('주문 기능은 준비 중입니다.')}>
-                  주문하기
+                <button
+                  style={{ ...styles.orderButton, opacity: participating ? 0.7 : 1 }}
+                  disabled={participating}
+                  onClick={async () => {
+                    if (participating) return;
+                    setParticipating(true);
+                    try {
+                      await eventOfferApi.participate(id!, 1);
+                      toast.success('이벤트 참여가 완료되었습니다. 참여 내역에서 확인하세요.');
+                      navigate('/event-offers/history');
+                    } catch (err) {
+                      toast.error(err instanceof Error ? err.message : '이벤트 참여에 실패했습니다.');
+                    } finally {
+                      setParticipating(false);
+                    }
+                  }}
+                >
+                  {participating ? '참여 중...' : '주문하기'}
                 </button>
               ) : user ? (
                 <div style={styles.noStoreNotice}>

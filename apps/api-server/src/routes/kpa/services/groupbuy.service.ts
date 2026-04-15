@@ -118,11 +118,12 @@ export class GroupbuyService {
 
     const data = orders.map(o => ({
       id: o.id,
-      orderNumber: o.orderNumber,
+      groupbuyId: (o.metadata as any)?.productListingId || '',
+      groupbuy: { title: (o.metadata as any)?.productName || o.orderNumber },
+      quantity: (o.items as any[])?.[0]?.quantity || 1,
+      totalPrice: o.totalAmount,
+      participatedAt: o.createdAt,
       status: o.status,
-      totalAmount: o.totalAmount,
-      productName: (o.metadata as any)?.productName,
-      createdAt: o.createdAt,
     }));
 
     return { data, total };

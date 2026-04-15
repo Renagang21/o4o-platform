@@ -1,5 +1,5 @@
 /**
- * Groupbuy API 서비스
+ * Event Offer API 서비스
  */
 
 import { apiClient } from './client';
@@ -13,7 +13,7 @@ import type {
 } from '../types';
 
 export const eventOfferApi = {
-  // 공동구매 상품 목록 (product listing 기반, WO-KPA-GROUPBUY-PAGE-V1)
+  // 이벤트 상품 목록 (product listing 기반, WO-KPA-GROUPBUY-PAGE-V1)
   getGroupbuyProducts: (params?: {
     page?: number;
     limit?: number;
@@ -24,15 +24,15 @@ export const eventOfferApi = {
       pagination: { page: number; limit: number; total: number; totalPages: number };
     }>('/groupbuy', params),
 
-  // 공동구매 상품 상세 (WO-KPA-GROUPBUY-PAGE-V1)
+  // 이벤트 상품 상세 (WO-KPA-GROUPBUY-PAGE-V1)
   getGroupbuyProduct: (id: string) =>
     apiClient.get<{ success: boolean; data: GroupbuyProduct }>(`/groupbuy/${id}`),
 
-  // 공동구매 운영 통계 (WO-KPA-GROUPBUY-STATS-V1)
+  // 이벤트 운영 통계 (WO-KPA-GROUPBUY-STATS-V1)
   getGroupbuyStats: () =>
     apiClient.get<{ success: boolean; data: GroupbuyStats }>('/groupbuy/stats'),
 
-  // 공동구매 목록 (legacy campaign)
+  // 이벤트 목록 (legacy campaign)
   getGroupbuys: (params?: {
     status?: 'upcoming' | 'active' | 'ended';
     category?: string;
@@ -42,7 +42,7 @@ export const eventOfferApi = {
   }) =>
     apiClient.get<PaginatedResponse<Groupbuy>>('/groupbuy', params),
 
-  // 공동구매 상세
+  // 이벤트 상세
   getGroupbuy: (id: string) =>
     apiClient.get<ApiResponse<Groupbuy>>(`/groupbuy/${id}`),
 

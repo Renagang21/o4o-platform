@@ -60,6 +60,7 @@ import { createApplicationController } from './controllers/application.controlle
 import { createAdminDashboardController } from './controllers/admin-dashboard.controller.js';
 import { createOperatorSummaryController } from './controllers/operator-summary.controller.js';
 import { createGroupbuyOperatorController } from './controllers/groupbuy-operator.controller.js';
+import { createSupplierOffersController } from './controllers/supplier-offers.controller.js';
 import { createJoinInquiryAdminRoutes, createJoinInquiryPublicRoutes } from './controllers/join-inquiry.controller.js';
 import { createOrganizationJoinRequestRoutes } from './controllers/organization-join-request.controller.js';
 import { createPharmacyRequestRoutes } from './controllers/pharmacy-request.controller.js';
@@ -223,6 +224,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Groupbuy Operator routes (WO-KPA-GROUPBUY-OPERATOR-UI-V1)
   router.use('/groupbuy-admin', createGroupbuyOperatorController(dataSource, coreRequireAuth as any));
+
+  // Supplier Event Offer proposal routes (WO-EVENT-OFFER-SUPPLIER-PROPOSAL-PATH-V1)
+  router.use('/supplier', createSupplierOffersController(dataSource, coreRequireAuth as any));
 
   // Join Inquiry Admin routes (WO-KPA-JOIN-CONVERSION-V1)
   router.use('/join-inquiries', createJoinInquiryAdminRoutes(dataSource, coreRequireAuth as any, requireKpaScope));
