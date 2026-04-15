@@ -351,21 +351,32 @@ export class AuthRegisterController extends BaseController {
     userId: string,
     data: RegisterRequestDto,
   ): Promise<void> {
-    // KPA Society: auto-create KPA member (pharmacist with org, or student without org)
-    if (data.service === 'kpa-society' && (data.organizationId || data.membershipType === 'student')) {
-      const licenseNum = data.membershipType === 'pharmacist' ? (data.licenseNumber || null) : null;
+    if (data.service !== 'kpa-society') return;
+
+    const memberType = data.membershipType || 'pharmacist';
+    const isPharmacist = memberType === 'pharmacist' || memberType === 'pharmacist_member';
+    const isStudent = memberType === 'student' || memberType === 'pharmacy_student_member';
+    const isExternalExpert = memberType === 'external_expert';
+    const isSupplierStaff = memberType === 'supplier_staff';
+
+    // KPA Society: auto-create KPA member
+    // All new member types create a pending kpa_member; org can be assigned at approval
+    const needsMember = data.organizationId || isStudent || isExternalExpert || isSupplierStaff || memberType === 'pharmacist_member';
+    if (needsMember) {
+      const licenseNum = isPharmacist ? (data.licenseNumber || null) : null;
 
       const memberResult = await manager.query(`
-        INSERT INTO kpa_members (user_id, organization_id, membership_type, license_number, university_name, role, status, identity_status)
-        VALUES ($1, $2, $3, $4, $5, 'member', 'pending', 'active')
+        INSERT INTO kpa_members (user_id, organization_id, membership_type, sub_role, license_number, university_name, role, status, identity_status)
+        VALUES ($1, $2, $3, $4, $5, $6, 'member', 'pending', 'active')
         ON CONFLICT (user_id) DO NOTHING
         RETURNING id
       `, [
         userId,
         data.organizationId || null,
-        data.membershipType || 'pharmacist',
+        memberType,
+        data.subRole || null,
         licenseNum,
-        data.membershipType === 'student' ? (data.universityName || null) : null,
+        isStudent ? (data.universityName || null) : null,
       ]);
 
       // 서비스별 승인 레코드 생성 (kpa-a: 커뮤니티)
@@ -379,7 +390,7 @@ export class AuthRegisterController extends BaseController {
     }
 
     // WO-ROLE-NORMALIZATION-PHASE3-B-V1: create kpa_pharmacist_profiles record
-    if (data.service === 'kpa-society' && (data.pharmacistFunction || data.licenseNumber)) {
+    if (isPharmacist && (data.pharmacistFunction || data.licenseNumber)) {
       const functionToActivity: Record<string, string> = {
         pharmacy: 'pharmacy_employee', hospital: 'hospital',
         industry: 'other_industry', other: 'other',
@@ -391,6 +402,38 @@ export class AuthRegisterController extends BaseController {
           userId,
           data.licenseNumber || null,
           data.pharmacistFunction ? (functionToActivity[data.pharmacistFunction] || 'other') : null,
+        ]
+      );
+    }
+
+    // WO-O4O-REGISTRATION-STRUCTURE-REFACTOR-V1: create kpa_external_expert_profiles record
+    if (isExternalExpert && data.subRole) {
+      await manager.query(
+        `INSERT INTO kpa_external_expert_profiles (user_id, expert_domain, institution_name, institution_type, department, qualification, qualification_type)
+         VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (user_id) DO NOTHING`,
+        [
+          userId,
+          data.subRole,
+          data.institutionName || null,
+          data.institutionType || null,
+          data.department || null,
+          data.qualification || null,
+          data.qualificationType || null,
+        ]
+      );
+    }
+
+    // WO-O4O-REGISTRATION-STRUCTURE-REFACTOR-V1: create kpa_supplier_staff_profiles record
+    if (isSupplierStaff && data.companyName) {
+      await manager.query(
+        `INSERT INTO kpa_supplier_staff_profiles (user_id, company_name, company_type, job_title, department)
+         VALUES ($1, $2, $3, $4, $5) ON CONFLICT (user_id) DO NOTHING`,
+        [
+          userId,
+          data.companyName,
+          data.companyType || 'other',
+          data.jobTitle || null,
+          data.department || null,
         ]
       );
     }

@@ -19,7 +19,13 @@ export type KpaMemberRole = 'member' | 'operator' | 'admin';
 /** WO-KPA-A-MEMBER-STATUS-SEMANTICS-SEPARATION-V1: rejected 추가 (반려 ≠ 정지) */
 export type KpaMemberStatus = 'pending' | 'active' | 'suspended' | 'rejected' | 'withdrawn';
 export type KpaIdentityStatus = 'active' | 'suspended' | 'withdrawn';
-export type KpaMemberType = 'pharmacist' | 'student';
+export type KpaMemberType =
+  | 'pharmacist'           // 약사 정회원 (legacy: 'pharmacist')
+  | 'student'              // 약대생 준회원 (legacy: 'student')
+  | 'pharmacist_member'    // 약사 정회원 (신규)
+  | 'pharmacy_student_member' // 약대생 준회원 (신규)
+  | 'external_expert'      // 외부전문가 준회원
+  | 'supplier_staff';      // 제약/의료기기 업체 직원
 
 // Phase 5: 직능 분류 (프론트엔드 ActivityType 매핑)
 export type KpaActivityType =
@@ -67,6 +73,10 @@ export class KpaMember {
 
   @Column({ type: 'varchar', length: 50, default: 'pharmacist' })
   membership_type: KpaMemberType;
+
+  /** WO-O4O-REGISTRATION-STRUCTURE-REFACTOR-V1: 그룹 내 세부 역할 (예: 의사, 연구원, 제조사 MR 등) */
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  sub_role: string | null;
 
   @Column({ type: 'varchar', length: 100, nullable: true })
   license_number: string | null;  // 약사 면허번호

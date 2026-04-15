@@ -92,7 +92,7 @@ export function createMemberController(
     requireAuth,
     [
       body('organization_id').isUUID(),
-      body('membership_type').optional().isIn(['pharmacist', 'student']),
+      body('membership_type').optional().isIn(['pharmacist', 'student', 'pharmacist_member', 'pharmacy_student_member', 'external_expert', 'supplier_staff']),
       body('license_number').optional().isString().isLength({ max: 100 }),
       body('university_name').optional().isString().isLength({ max: 200 }),
       body('student_year').optional().isInt({ min: 1, max: 6 }),
@@ -130,7 +130,9 @@ export function createMemberController(
         }
 
         const membershipType = req.body.membership_type || 'pharmacist';
-        const licenseNumber = membershipType === 'pharmacist' ? (req.body.license_number || null) : null;
+        const isPharmacistType = membershipType === 'pharmacist' || membershipType === 'pharmacist_member';
+        const isStudentType = membershipType === 'student' || membershipType === 'pharmacy_student_member';
+        const licenseNumber = isPharmacistType ? (req.body.license_number || null) : null;
 
         // 면허번호 중복 체크 (상태 무관 절대 유일)
         if (licenseNumber) {
@@ -153,8 +155,8 @@ export function createMemberController(
           status: 'pending',
           identity_status: 'active',
           license_number: licenseNumber,
-          university_name: membershipType === 'student' ? (req.body.university_name || null) : null,
-          student_year: membershipType === 'student' ? (req.body.student_year || null) : null,
+          university_name: isStudentType ? (req.body.university_name || null) : null,
+          student_year: isStudentType ? (req.body.student_year || null) : null,
           pharmacy_name: req.body.pharmacy_name || null,
           pharmacy_address: req.body.pharmacy_address || null,
           activity_type: req.body.activity_type || null,
@@ -316,15 +318,32 @@ export function createMemberController(
                WHERE id = $1`,
               [member.user_id, req.user!.id]
             );
-            // WO-KPA-A-ROLE-CLEANUP-V1: Create profile instead of role assignment
-            if (member.membership_type === 'student') {
+            // WO-KPA-A-ROLE-CLEANUP-V1 + WO-O4O-REGISTRATION-STRUCTURE-REFACTOR-V1: Create profile per membership type
+            const mType = member.membership_type;
+            if (mType === 'student' || mType === 'pharmacy_student_member') {
               await dataSource.query(
                 `INSERT INTO kpa_student_profiles (user_id, university_name, student_year)
                  VALUES ($1, $2, $3)
                  ON CONFLICT (user_id) DO NOTHING`,
                 [member.user_id, member.university_name, member.student_year]
               );
+            } else if (mType === 'external_expert') {
+              await dataSource.query(
+                `INSERT INTO kpa_external_expert_profiles (user_id, expert_domain)
+                 VALUES ($1, $2)
+                 ON CONFLICT (user_id) DO NOTHING`,
+                [member.user_id, (member as any).sub_role || 'general']
+              );
+            } else if (mType === 'supplier_staff') {
+              // company_name comes from pharmacy_name field used during registration fallback
+              await dataSource.query(
+                `INSERT INTO kpa_supplier_staff_profiles (user_id, company_name, company_type)
+                 VALUES ($1, $2, $3)
+                 ON CONFLICT (user_id) DO NOTHING`,
+                [member.user_id, member.pharmacy_name || 'Unknown', 'other']
+              );
             } else {
+              // pharmacist / pharmacist_member
               await dataSource.query(
                 `INSERT INTO kpa_pharmacist_profiles (user_id, license_number, activity_type)
                  VALUES ($1, $2, $3)
@@ -570,7 +589,8 @@ export function createMemberController(
         const changes: Record<string, any> = {};
 
         // kpa_members 필드 업데이트
-        if (membership_type && ['pharmacist', 'student'].includes(membership_type)) {
+        const validMembershipTypes = ['pharmacist', 'student', 'pharmacist_member', 'pharmacy_student_member', 'external_expert', 'supplier_staff'];
+        if (membership_type && validMembershipTypes.includes(membership_type)) {
           changes.membership_type = membership_type;
           member.membership_type = membership_type;
         }
@@ -754,6 +774,8 @@ export function createMemberController(
         // 순서: 프로필 → memberships/roles → member_services(CASCADE) → member → user
         await dataSource.query(`DELETE FROM kpa_pharmacist_profiles WHERE user_id = $1`, [member.user_id]).catch(() => {});
         await dataSource.query(`DELETE FROM kpa_student_profiles WHERE user_id = $1`, [member.user_id]).catch(() => {});
+        await dataSource.query(`DELETE FROM kpa_external_expert_profiles WHERE user_id = $1`, [member.user_id]).catch(() => {});
+        await dataSource.query(`DELETE FROM kpa_supplier_staff_profiles WHERE user_id = $1`, [member.user_id]).catch(() => {});
         await dataSource.query(`DELETE FROM service_memberships WHERE user_id = $1`, [member.user_id]).catch(() => {});
         await dataSource.query(`DELETE FROM role_assignments WHERE user_id = $1`, [member.user_id]).catch(() => {});
         await memberRepo.remove(member); // CASCADE: kpa_member_services 자동 삭제

@@ -314,6 +314,8 @@ import {
   KpaStudentProfile, // WO-KPA-A-RBAC-PROFILE-NORMALIZATION-V1
   ServiceProduct, // WO-O4O-SERVICE-PRODUCT-LAYER-PREP-V1
 } from '../routes/kpa/entities/index.js';
+import { KpaExternalExpertProfile } from '../routes/kpa/entities/kpa-external-expert-profile.entity.js';
+import { KpaSupplierStaffProfile } from '../routes/kpa/entities/kpa-supplier-staff-profile.entity.js';
 
 // ============================================================================
 // PARTNER DASHBOARD ENTITIES (WO-PARTNER-DASHBOARD-API-BE-IMPLEMENTATION-V1)
@@ -841,6 +843,9 @@ export const AppDataSource = new DataSource({
     KpaPharmacistProfile,
     // WO-KPA-A-RBAC-PROFILE-NORMALIZATION-V1
     KpaStudentProfile,
+    // WO-O4O-REGISTRATION-STRUCTURE-REFACTOR-V1
+    KpaExternalExpertProfile,
+    KpaSupplierStaffProfile,
     // WO-O4O-SERVICE-PRODUCT-LAYER-PREP-V1
     ServiceProduct,
     // ============================================================================
