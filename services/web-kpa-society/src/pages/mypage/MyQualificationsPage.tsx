@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   qualificationApi,
   type MemberQualification,
@@ -65,6 +66,7 @@ const STATUS_COLORS: Record<string, string> = {
 // ─── Component ───────────────────────────────────────────────
 
 export function MyQualificationsPage() {
+  const navigate = useNavigate();
   const [qualifications, setQualifications] = useState<MemberQualification[]>([]);
   const [requests, setRequests] = useState<QualificationRequest[]>([]);
   const [loading, setLoading] = useState(true);
@@ -208,6 +210,15 @@ export function MyQualificationsPage() {
                   <span style={styles.qualDate}>
                     승인일: {new Date(q.approved_at).toLocaleDateString('ko-KR')}
                   </span>
+                )}
+                {/* WO-O4O-INSTRUCTOR-DASHBOARD-V1: instructor 승인 시 대시보드 버튼 */}
+                {q.qualification_type === 'instructor' && q.status === 'approved' && (
+                  <button
+                    style={styles.dashboardBtn}
+                    onClick={() => navigate('/instructor')}
+                  >
+                    강사 대시보드 →
+                  </button>
                 )}
               </div>
             ))}
@@ -459,6 +470,7 @@ const styles: Record<string, React.CSSProperties> = {
   qualDate: { fontSize: '12px', color: colors.neutral400 },
   statusBadge: { padding: '3px 10px', borderRadius: '12px', fontSize: '12px', fontWeight: 500, color: colors.white },
   applyBtn: { width: '100%', padding: '14px', fontSize: '15px', fontWeight: 600, color: colors.white, backgroundColor: colors.primary, border: 'none', borderRadius: '8px', cursor: 'pointer', marginBottom: '20px' },
+  dashboardBtn: { marginLeft: 'auto', padding: '5px 14px', fontSize: '13px', fontWeight: 500, color: colors.white, backgroundColor: '#10b981', border: 'none', borderRadius: '6px', cursor: 'pointer' },
   formCard: { backgroundColor: colors.white, padding: '24px', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', marginBottom: '20px' },
   formGroup: { marginBottom: '16px' },
   formRow: { display: 'flex', gap: '16px' },

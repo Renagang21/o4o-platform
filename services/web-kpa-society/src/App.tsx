@@ -29,6 +29,8 @@ import { CourseHubPage, CourseIntroPage } from './pages/courses';
 
 // Instructor pages - WO-CONTENT-INSTRUCTOR-PUBLIC-PROFILE-V1
 import { InstructorProfilePage } from './pages/instructors/InstructorProfilePage';
+// Instructor Dashboard - WO-O4O-INSTRUCTOR-DASHBOARD-V1
+import InstructorDashboardPage from './pages/instructor/InstructorDashboardPage';
 
 // Events pages (WO-KPA-COMMUNITY-HOME-V1)
 import { EventsHomePage } from './pages/events/EventsHomePage';
@@ -539,6 +541,9 @@ function App() {
 
           {/* Instructor Public Profile - WO-CONTENT-INSTRUCTOR-PUBLIC-PROFILE-V1 */}
           <Route path="/instructors/:userId" element={<Layout serviceName={SERVICE_NAME}><InstructorProfilePage /></Layout>} />
+
+          {/* Instructor Dashboard - WO-O4O-INSTRUCTOR-DASHBOARD-V1 */}
+          <Route path="/instructor" element={<Layout serviceName={SERVICE_NAME}><InstructorDashboardPage /></Layout>} />
 
           {/* LMS (교육/강의) */}
           <Route path="/lms" element={<Layout serviceName={SERVICE_NAME}><EducationPage /></Layout>} />

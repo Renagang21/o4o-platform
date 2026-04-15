@@ -97,6 +97,7 @@ import { createLegalDocumentsController } from './controllers/legal-documents.co
 import { createGroupbuyController } from './controllers/groupbuy.controller.js';
 import { createMypageController } from './controllers/mypage.controller.js';
 import { createQualificationController } from './controllers/qualification.controller.js'; // WO-O4O-QUALIFICATION-SYSTEM-V1
+import { createInstructorDashboardController } from './controllers/instructor-dashboard.controller.js'; // WO-O4O-INSTRUCTOR-DASHBOARD-V1
 import { createWorkingContentController } from './controllers/working-content.controller.js';
 import { execute } from '@o4o/ai-core';
 import { buildConfigResolver } from '../../utils/ai-config-resolver.js';
@@ -181,6 +182,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Qualification System (WO-O4O-QUALIFICATION-SYSTEM-V1)
   router.use('/qualifications', createQualificationController(dataSource, coreRequireAuth as any, requireKpaScope));
+
+  // Instructor Dashboard (WO-O4O-INSTRUCTOR-DASHBOARD-V1)
+  router.use('/instructor', createInstructorDashboardController(dataSource, coreRequireAuth as any));
 
   // Instructor Qualifications (WO-O4O-ROUTES-REFACTOR-V1)
   router.use('/', createInstructorController(dataSource, coreRequireAuth as any, requireKpaScope));
