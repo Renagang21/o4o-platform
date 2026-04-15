@@ -31,6 +31,10 @@ import { CourseHubPage, CourseIntroPage } from './pages/courses';
 import { InstructorProfilePage } from './pages/instructors/InstructorProfilePage';
 // Instructor Dashboard - WO-O4O-INSTRUCTOR-DASHBOARD-V1
 import InstructorDashboardPage from './pages/instructor/InstructorDashboardPage';
+// LMS Instructor pages - WO-O4O-LMS-FOUNDATION-V1
+import CourseListPage from './pages/instructor/courses/CourseListPage';
+import CourseNewPage from './pages/instructor/courses/CourseNewPage';
+import CourseEditPage from './pages/instructor/courses/CourseEditPage';
 
 // Events pages (WO-KPA-COMMUNITY-HOME-V1)
 import { EventsHomePage } from './pages/events/EventsHomePage';
@@ -48,6 +52,8 @@ import {
 
 // Event Offer pages
 import { EventOfferListPage, EventOfferDetailPage, EventOfferHistoryPage, KpaEventOfferPage } from './pages/event-offer';
+// Supplier pages
+import { SupplierEventOfferPage } from './pages/supplier/SupplierEventOfferPage';
 
 // News pages
 import { NewsListPage, NewsDetailPage, GalleryPage } from './pages/news';
@@ -544,6 +550,9 @@ function App() {
 
           {/* Instructor Dashboard - WO-O4O-INSTRUCTOR-DASHBOARD-V1 */}
           <Route path="/instructor" element={<Layout serviceName={SERVICE_NAME}><InstructorDashboardPage /></Layout>} />
+          <Route path="/instructor/courses" element={<Layout serviceName={SERVICE_NAME}><CourseListPage /></Layout>} />
+          <Route path="/instructor/courses/new" element={<Layout serviceName={SERVICE_NAME}><CourseNewPage /></Layout>} />
+          <Route path="/instructor/courses/:id" element={<Layout serviceName={SERVICE_NAME}><CourseEditPage /></Layout>} />
 
           {/* LMS (교육/강의) */}
           <Route path="/lms" element={<Layout serviceName={SERVICE_NAME}><EducationPage /></Layout>} />
@@ -766,6 +775,9 @@ function DemoLayoutRoutes() {
         <Route path="/event-offers" element={<PharmacyOwnerOnlyGuard><EventOfferListPage /></PharmacyOwnerOnlyGuard>} />
         <Route path="/event-offers/history" element={<PharmacyOwnerOnlyGuard><EventOfferHistoryPage /></PharmacyOwnerOnlyGuard>} />
         <Route path="/event-offers/:id" element={<PharmacyOwnerOnlyGuard><EventOfferDetailPage /></PharmacyOwnerOnlyGuard>} />
+
+        {/* Supplier Event Offer Proposal (WO-EVENT-OFFER-SUPPLIER-PROPOSAL-PATH-V1) */}
+        <Route path="/supplier/event-offers" element={<Layout serviceName={SERVICE_NAME}><SupplierEventOfferPage /></Layout>} />
 
         {/* Pharmacy Management - 실경로로 리다이렉트 (WO-KPA-PHARMACY-LOCATION-V1) */}
         <Route path="/pharmacy" element={<Navigate to="/pharmacy" replace />} />

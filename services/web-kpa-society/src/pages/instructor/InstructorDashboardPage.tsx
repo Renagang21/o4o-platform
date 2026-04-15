@@ -152,21 +152,19 @@ function InstructorProfileCard({ data, onEdit }: { data: InstructorDashboardData
   );
 }
 
-// ── S3: 강의 관리 placeholder ────────────────────────────────
-function CoursePlaceholderCard() {
+// ── S3: 강의 관리 카드 (WO-O4O-LMS-FOUNDATION-V1) ────────────
+function CourseManagementCard() {
+  const navigate = useNavigate();
   return (
-    <Card style={{ backgroundColor: '#f8fafc' }}>
+    <Card>
       <CardTitle>강의 관리</CardTitle>
-      <div style={{ textAlign: 'center', padding: '24px 0' }}>
+      <div style={{ textAlign: 'center', padding: '16px 0' }}>
         <div style={{ fontSize: '36px', marginBottom: '12px' }}>📚</div>
-        <p style={{ fontSize: '15px', fontWeight: 600, color: colors.neutral700, marginBottom: '6px' }}>
-          강의 관리 기능 준비 중
+        <p style={{ fontSize: '14px', color: colors.neutral600, marginBottom: '20px' }}>
+          강의를 생성하고 레슨을 관리하세요.
         </p>
-        <p style={{ fontSize: '13px', color: colors.neutral500, marginBottom: '20px' }}>
-          곧 Course 생성 기능이 제공됩니다.
-        </p>
-        <button style={{ ...styles.actionBtn, opacity: 0.5, cursor: 'not-allowed' }} disabled>
-          강의 개설 준비
+        <button style={styles.actionBtn} onClick={() => navigate('/instructor/courses')}>
+          강의 관리 바로가기
         </button>
       </div>
     </Card>
@@ -409,7 +407,7 @@ export default function InstructorDashboardPage() {
       <div style={styles.grid}>
         <InstructorSummaryCard data={data} />
         <InstructorProfileCard data={data} onEdit={() => setEditOpen(true)} />
-        <CoursePlaceholderCard />
+        <CourseManagementCard />
         <ReviewInfoCard data={data} />
         <div style={{ gridColumn: '1 / -1' }}>
           <FuturePlaceholderCard />

@@ -18,6 +18,7 @@ import type { AuthRequest } from '../../../types/auth.js';
 import { MemberQualification, QUALIFICATION_TYPES } from '../entities/member-qualification.entity.js';
 import { QualificationRequest } from '../entities/qualification-request.entity.js';
 import { InstructorProfile } from '../entities/instructor-profile.entity.js'; // WO-O4O-INSTRUCTOR-APPLICATION-V1
+import { roleAssignmentService } from '../../../modules/auth/services/role-assignment.service.js'; // WO-O4O-LMS-FOUNDATION-V1
 
 type AuthMiddleware = RequestHandler;
 type ScopeMiddleware = (scope: string) => RequestHandler;
@@ -271,6 +272,7 @@ export function createQualificationController(
         }
 
         // WO-O4O-INSTRUCTOR-APPLICATION-V1: instructor 승인 시 profile 생성
+        // WO-O4O-LMS-FOUNDATION-V1: lms:instructor 역할 부여
         if (newStatus === 'approved' && qReq.qualification_type === 'instructor') {
           try {
             const rd = qReq.request_data as Record<string, any>;
@@ -294,6 +296,16 @@ export function createQualificationController(
           } catch (profileErr) {
             console.error('[Qualification] instructor_profile creation failed:', profileErr);
             // 프로필 생성 실패는 승인 결과에 영향 없음 (로그만)
+          }
+          try {
+            await roleAssignmentService.assignRole({
+              userId: qReq.user_id,
+              role: 'lms:instructor',
+              assignedBy: req.user!.id,
+            });
+          } catch (roleErr) {
+            console.error('[Qualification] lms:instructor role assignment failed:', roleErr);
+            // 역할 부여 실패는 승인 결과에 영향 없음 (로그만)
           }
         }
 
