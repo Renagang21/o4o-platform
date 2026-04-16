@@ -54,6 +54,14 @@ export class EnrollmentService extends BaseService<Enrollment> {
   async enrollCourse(data: EnrollCourseRequest): Promise<Enrollment> {
     // Check if already enrolled (exclude terminal states — allow re-enroll after cancel/reject/expire)
     // WO-O4O-ENROLLMENT-SYSTEM-V1: cancelled/rejected/expired → re-enrollment allowed
+    //
+    // ── POLICY: IR-O4O-MARKETING-CONTENT-REWARD-POLICY-V1 ─────────────────────────
+    // 재참여 정책:
+    //   허용: CANCELLED / REJECTED / EXPIRED 상태 → 재참여 허용
+    //   차단: COMPLETED 상태 → 재참여 허용하지 않음 (아래 조건에 포함되지 않아 throw)
+    // 정책 변경 시 반드시 IR → 합의 → WO 순서로 진행할 것.
+    // 직접 코드 수정으로 이 정책을 우회하지 말 것.
+    // ────────────────────────────────────────────────────────────────────────────────
     const existing = await this.enrollmentRepository.findOne({
       where: {
         userId: data.userId,
@@ -66,6 +74,7 @@ export class EnrollmentService extends BaseService<Enrollment> {
         EnrollmentStatus.CANCELLED,
         EnrollmentStatus.REJECTED,
         EnrollmentStatus.EXPIRED,
+        // NOTE: COMPLETED 는 의도적으로 포함하지 않음 — 재참여 차단 정책
       ];
       if (!terminalStatuses.includes(existing.status)) {
         throw new Error('User is already enrolled in this course');

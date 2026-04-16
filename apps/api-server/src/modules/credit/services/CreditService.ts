@@ -53,6 +53,15 @@ export class CreditService {
     referenceKey: string,
     description: string,
   ): Promise<CreditTransaction | null> {
+    // ── POLICY: IR-O4O-MARKETING-CONTENT-REWARD-POLICY-V1 ─────────────────────────
+    // 보상 중복 지급 방지 정책:
+    //   referenceKey UNIQUE 제약 기반으로 동일 보상 이벤트에 대한 중복 지급을 방지한다.
+    //   course_complete 보상의 referenceKey = `course_complete:{userId}:{courseId}`.
+    //   재참여 / 재완료가 발생하더라도 동일 referenceKey가 이미 존재하면 null 반환(지급 안 함).
+    // 수동 보상 정책:
+    //   이 earnCredit() 메서드를 통한 수동/관리자 직접 호출은 현재 단계에서 금지한다.
+    //   수동 보상 도입 시 승인 절차, 사유 기록, 감사 로그를 포함한 별도 WO가 필요하다.
+    // ────────────────────────────────────────────────────────────────────────────────
     // Dedup check
     const existing = await this.transactionRepository.findOne({
       where: { referenceKey },

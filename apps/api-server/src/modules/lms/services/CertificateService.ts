@@ -54,6 +54,12 @@ export class CertificateService extends BaseService<Certificate> {
 
   // CRUD Operations
   async issueCertificate(data: IssueCertificateRequest, issuedBy?: string): Promise<Certificate> {
+    // ── POLICY: IR-O4O-MARKETING-CONTENT-REWARD-POLICY-V1 ─────────────────────────
+    // 수료증 발급 정책:
+    //   Certificate는 동일 userId + courseId 기준 1회만 발급한다.
+    //   재참여 후 재완료가 발생하더라도 수료증을 재발급하지 않는다.
+    //   (아래 dedup 체크에서 throw — CompletionService에서 catch 처리)
+    // ────────────────────────────────────────────────────────────────────────────────
     // Check if certificate already exists
     const existing = await this.certificateRepository.findOne({
       where: {

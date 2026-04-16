@@ -327,6 +327,16 @@ export class QuizService {
       enrollment.complete(enrollment.averageQuizScore ?? undefined);
 
       // WO-O4O-CREDIT-SYSTEM-V1: Award credits for course complete
+      // ── POLICY: IR-O4O-MARKETING-CONTENT-REWARD-POLICY-V1 ─────────────────────────
+      // 보상 지급 정책:
+      //   course_complete 보상은 동일 userId + courseId 기준 1회만 지급한다.
+      //   referenceKey = `course_complete:{userId}:{courseId}` UNIQUE 제약으로 DB 레벨에서 중복 방지.
+      //   재참여 또는 재완료가 발생하더라도 보상은 재지급하지 않는다.
+      //   (CreditService.earnCredit 내부에서 dedup 처리 — null 반환)
+      // 수동 보상 정책:
+      //   운영자 수동 보상 기능은 현재 단계에서 지원하지 않는다.
+      //   승인/감사 정책 확정 전까지 수동 지급 관련 로직/엔드포인트 추가 금지.
+      // ────────────────────────────────────────────────────────────────────────────────
       try {
         const creditService = CreditService.getInstance();
         await creditService.earnCredit(
