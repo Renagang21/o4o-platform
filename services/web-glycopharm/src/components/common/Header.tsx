@@ -32,7 +32,7 @@ import ServiceSwitcher from '../ServiceSwitcher';
 const publicMenuItems = [
   { label: '홈', icon: Home, path: '/', end: true },
   { label: '포럼', icon: MessageSquare, path: '/forum', end: false },
-  { label: '강의', icon: GraduationCap, path: '/education', end: false },
+  { label: '강의 / 마케팅 콘텐츠', icon: GraduationCap, path: '/education', end: false },
 ];
 
 /**
