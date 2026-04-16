@@ -662,13 +662,13 @@ export class MarketTrialOperatorController {
       let sqlParams: unknown[];
       if (settlementNote !== undefined) {
         sql = `UPDATE market_trial_participants
-               SET "settlementStatus" = $1, "settlementNote" = $2
+               SET "settlementStatus" = $1, "settlementNote" = $2, "updatedAt" = now()
                WHERE id = $3 AND "marketTrialId" = $4
                RETURNING id, "settlementStatus", "settlementNote", "updatedAt"`;
         sqlParams = [newStatus, settlementNote, participantId, id];
       } else {
         sql = `UPDATE market_trial_participants
-               SET "settlementStatus" = $1
+               SET "settlementStatus" = $1, "updatedAt" = now()
                WHERE id = $2 AND "marketTrialId" = $3
                RETURNING id, "settlementStatus", "settlementNote", "updatedAt"`;
         sqlParams = [newStatus, participantId, id];
