@@ -266,6 +266,165 @@ export class InstructorController extends BaseController {
   }
 
   // ========================================
+  // 강사 운영 대시보드 (WO-O4O-LMS-INSTRUCTOR-DASHBOARD-MVP-V1)
+  // ========================================
+
+  /**
+   * GET /instructor/dashboard/stats/:courseId
+   * 강의별 운영 지표
+   */
+  static async dashboardStats(req: Request, res: Response): Promise<any> {
+    try {
+      const { courseId } = req.params;
+      const userId = (req as any).user?.id;
+
+      // 강좌 소유권 확인
+      const courseRepo = AppDataSource.getRepository(Course);
+      const course = await courseRepo.findOne({ where: { id: courseId } });
+      if (!course) return BaseController.notFound(res, 'Course not found');
+      const isKpaAdmin = await roleAssignmentService.hasAnyRole(userId, ['kpa:admin']);
+      if (course.instructorId !== userId && !isKpaAdmin) {
+        return BaseController.forbidden(res, '본인 강의의 통계만 조회할 수 있습니다');
+      }
+
+      const enrollmentRepo = AppDataSource.getRepository(Enrollment);
+
+      // 수강자 수 (상태별)
+      const statusCounts = await enrollmentRepo
+        .createQueryBuilder('e')
+        .select('e.status', 'status')
+        .addSelect('COUNT(*)::int', 'cnt')
+        .where('e.courseId = :courseId', { courseId })
+        .groupBy('e.status')
+        .getRawMany();
+
+      const countMap: Record<string, number> = {};
+      for (const row of statusCounts) countMap[row.status] = Number(row.cnt);
+
+      const totalEnrollments = Object.values(countMap).reduce((a, b) => a + b, 0);
+      const inProgressCount = countMap['in_progress'] || 0;
+      const completedCount = countMap['completed'] || 0;
+      const completionRate = totalEnrollments > 0
+        ? Math.round((completedCount / totalEnrollments) * 1000) / 10
+        : 0;
+
+      // 평균 진도율
+      const progressRow = await enrollmentRepo
+        .createQueryBuilder('e')
+        .select('COALESCE(AVG(e.progressPercentage), 0)::numeric(5,1)', 'avg')
+        .where('e.courseId = :courseId AND e.status IN (:...statuses)', {
+          courseId,
+          statuses: ['in_progress', 'completed'],
+        })
+        .getRawOne();
+      const averageProgress = parseFloat(progressRow?.avg ?? '0');
+
+      // 퀴즈 통계 — Quiz.courseId 직접 참조
+      const quizAttemptRepo = AppDataSource.getRepository('QuizAttempt');
+      const quizStatsRow = await quizAttemptRepo
+        .createQueryBuilder('qa')
+        .innerJoin('Quiz', 'q', 'q.id = qa.quizId')
+        .select('COUNT(*)::int', 'total')
+        .addSelect('COUNT(CASE WHEN qa.passed = true THEN 1 END)::int', 'passed')
+        .addSelect('COALESCE(AVG(qa.score), 0)::numeric(5,1)', 'avgScore')
+        .where('q.courseId = :courseId', { courseId })
+        .getRawOne();
+
+      const quizTotal = Number(quizStatsRow?.total ?? 0);
+      const quizPassed = Number(quizStatsRow?.passed ?? 0);
+      const quizPassRate = quizTotal > 0
+        ? Math.round((quizPassed / quizTotal) * 1000) / 10
+        : 0;
+      const averageQuizScore = parseFloat(quizStatsRow?.avgScore ?? '0');
+
+      // 인증서 발행 수
+      const certCount = await AppDataSource.getRepository('Certificate')
+        .createQueryBuilder('c')
+        .where('c.courseId = :courseId', { courseId })
+        .getCount();
+
+      return BaseController.ok(res, {
+        courseId,
+        totalEnrollments,
+        inProgressCount,
+        completedCount,
+        completionRate,
+        averageProgress,
+        quizPassRate,
+        averageQuizScore,
+        certificateIssuedCount: certCount,
+      });
+    } catch (error: any) {
+      logger.error('[InstructorController.dashboardStats] Error', { error: error.message });
+      return BaseController.error(res, error);
+    }
+  }
+
+  /**
+   * GET /instructor/dashboard/courses
+   * 강사 강의 목록 + 요약 통계 (N+1 방지)
+   */
+  static async dashboardCourses(req: Request, res: Response): Promise<any> {
+    try {
+      const userId = (req as any).user?.id;
+
+      // 강사 본인 강의 목록
+      const courseRepo = AppDataSource.getRepository(Course);
+      const courses = await courseRepo.find({
+        where: { instructorId: userId },
+        order: { createdAt: 'DESC' },
+        select: ['id', 'title', 'status', 'createdAt'],
+      });
+
+      if (courses.length === 0) {
+        return BaseController.ok(res, { courses: [] });
+      }
+
+      const courseIds = courses.map(c => c.id);
+
+      // 한 번의 쿼리로 모든 강의의 집계 통계 조회 (N+1 방지)
+      const enrollmentRepo = AppDataSource.getRepository(Enrollment);
+      const statsRows = await enrollmentRepo
+        .createQueryBuilder('e')
+        .select('e.courseId', 'courseId')
+        .addSelect('COUNT(*)::int', 'total')
+        .addSelect('COUNT(CASE WHEN e.status = :completed THEN 1 END)::int', 'completed')
+        .addSelect('COALESCE(AVG(e.progressPercentage), 0)::numeric(5,1)', 'avgProgress')
+        .where('e.courseId IN (:...courseIds)', { courseIds, completed: 'completed' })
+        .groupBy('e.courseId')
+        .getRawMany();
+
+      const statsMap: Record<string, { total: number; completed: number; avgProgress: number }> = {};
+      for (const row of statsRows) {
+        statsMap[row.courseId] = {
+          total: Number(row.total),
+          completed: Number(row.completed),
+          avgProgress: parseFloat(row.avgProgress),
+        };
+      }
+
+      const result = courses.map(c => {
+        const s = statsMap[c.id] || { total: 0, completed: 0, avgProgress: 0 };
+        return {
+          courseId: c.id,
+          title: c.title,
+          status: c.status,
+          totalEnrollments: s.total,
+          completionRate: s.total > 0
+            ? Math.round((s.completed / s.total) * 1000) / 10
+            : 0,
+          averageProgress: s.avgProgress,
+        };
+      });
+
+      return BaseController.ok(res, { courses: result });
+    } catch (error: any) {
+      logger.error('[InstructorController.dashboardCourses] Error', { error: error.message });
+      return BaseController.error(res, error);
+    }
+  }
+
+  // ========================================
   // 수강 승인/거절 (강사)
   // ========================================
 

@@ -149,4 +149,39 @@ export const lmsInstructorApi = {
   /** 강의 발행 취소 */
   unpublishCourse: (id: string) =>
     authClient.api.post<{ success: boolean; data: Course }>(`/lms/courses/${id}/unpublish`, {}),
+
+  // ── 대시보드 (WO-O4O-LMS-INSTRUCTOR-DASHBOARD-MVP-V1) ──────────
+
+  /** 강의별 운영 지표 */
+  dashboardStats: (courseId: string) =>
+    authClient.api.get<{
+      success: boolean;
+      data: {
+        courseId: string;
+        totalEnrollments: number;
+        inProgressCount: number;
+        completedCount: number;
+        completionRate: number;
+        averageProgress: number;
+        quizPassRate: number;
+        averageQuizScore: number;
+        certificateIssuedCount: number;
+      };
+    }>(`/lms/instructor/dashboard/stats/${courseId}`),
+
+  /** 강사 강의 목록 + 요약 통계 */
+  dashboardCourses: () =>
+    authClient.api.get<{
+      success: boolean;
+      data: {
+        courses: Array<{
+          courseId: string;
+          title: string;
+          status: CourseStatus;
+          totalEnrollments: number;
+          completionRate: number;
+          averageProgress: number;
+        }>;
+      };
+    }>('/lms/instructor/dashboard/courses'),
 };

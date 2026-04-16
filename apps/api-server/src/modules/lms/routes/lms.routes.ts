@@ -184,6 +184,12 @@ router.get('/instructor/courses', requireAuth, requireInstructor, asyncHandler(I
 // GET /api/v1/lms/instructor/enrollments - Pending Enrollments for My Courses (Instructor)
 router.get('/instructor/enrollments', requireAuth, requireInstructor, asyncHandler(InstructorController.pendingEnrollments));
 
+// GET /api/v1/lms/instructor/dashboard/courses - 강사 강의 목록 + 요약 통계 (WO-O4O-LMS-INSTRUCTOR-DASHBOARD-MVP-V1)
+router.get('/instructor/dashboard/courses', requireAuth, requireInstructor, asyncHandler(InstructorController.dashboardCourses));
+
+// GET /api/v1/lms/instructor/dashboard/stats/:courseId - 강의별 운영 지표 (WO-O4O-LMS-INSTRUCTOR-DASHBOARD-MVP-V1)
+router.get('/instructor/dashboard/stats/:courseId', requireAuth, requireInstructor, asyncHandler(InstructorController.dashboardStats));
+
 // POST /api/v1/lms/instructor/enrollments/:id/approve - Approve Enrollment (Instructor)
 router.post('/instructor/enrollments/:id/approve', requireAuth, requireInstructor, asyncHandler(InstructorController.approveEnrollment));
 

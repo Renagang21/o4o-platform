@@ -35,6 +35,8 @@ import InstructorDashboardPage from './pages/instructor/InstructorDashboardPage'
 import CourseListPage from './pages/instructor/courses/CourseListPage';
 import CourseNewPage from './pages/instructor/courses/CourseNewPage';
 import CourseEditPage from './pages/instructor/courses/CourseEditPage';
+// Instructor Course Dashboard - WO-O4O-LMS-INSTRUCTOR-DASHBOARD-MVP-V1
+import InstructorCourseDashboardPage from './pages/instructor/InstructorCourseDashboardPage';
 
 // Events pages (WO-KPA-COMMUNITY-HOME-V1)
 import { EventsHomePage } from './pages/events/EventsHomePage';
@@ -556,6 +558,7 @@ function App() {
           <Route path="/instructor/courses" element={<Layout serviceName={SERVICE_NAME}><CourseListPage /></Layout>} />
           <Route path="/instructor/courses/new" element={<Layout serviceName={SERVICE_NAME}><CourseNewPage /></Layout>} />
           <Route path="/instructor/courses/:id" element={<Layout serviceName={SERVICE_NAME}><CourseEditPage /></Layout>} />
+          <Route path="/instructor/dashboard" element={<Layout serviceName={SERVICE_NAME}><InstructorCourseDashboardPage /></Layout>} />
 
           {/* LMS (교육/강의) */}
           <Route path="/lms" element={<Layout serviceName={SERVICE_NAME}><EducationPage /></Layout>} />

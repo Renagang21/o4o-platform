@@ -152,7 +152,7 @@ function InstructorProfileCard({ data, onEdit }: { data: InstructorDashboardData
   );
 }
 
-// ── S3: 강의 관리 카드 (WO-O4O-LMS-FOUNDATION-V1) ────────────
+// ── S3: 강의 관리 카드 (WO-O4O-LMS-FOUNDATION-V1 + WO-O4O-LMS-INSTRUCTOR-DASHBOARD-MVP-V1) ──
 function CourseManagementCard() {
   const navigate = useNavigate();
   return (
@@ -163,9 +163,15 @@ function CourseManagementCard() {
         <p style={{ fontSize: '14px', color: colors.neutral600, marginBottom: '20px' }}>
           강의를 생성하고 레슨을 관리하세요.
         </p>
-        <button style={styles.actionBtn} onClick={() => navigate('/instructor/courses')}>
-          강의 관리 바로가기
-        </button>
+        <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <button style={styles.actionBtn} onClick={() => navigate('/instructor/courses')}>
+            강의 관리
+          </button>
+          <button style={{ ...styles.actionBtn, backgroundColor: '#f0f9ff', color: '#0369a1', border: '1px solid #bae6fd' }}
+            onClick={() => navigate('/instructor/dashboard')}>
+            운영 대시보드
+          </button>
+        </div>
       </div>
     </Card>
   );
