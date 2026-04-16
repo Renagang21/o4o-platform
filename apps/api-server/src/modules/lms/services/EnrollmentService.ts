@@ -71,12 +71,14 @@ export class EnrollmentService extends BaseService<Enrollment> {
         throw new Error('User is already enrolled in this course');
       }
       // Reactivate terminal enrollment — reset progress
+      // WO-O4O-LMS-INTEGRITY-PATCH-V1: completedLessonIds도 함께 초기화
       existing.status = EnrollmentStatus.IN_PROGRESS;
       existing.progressPercentage = 0;
       existing.completedLessons = 0;
       existing.enrolledAt = new Date();
       existing.startedAt = new Date();
       existing.completedAt = undefined as any;
+      existing.metadata = { ...(existing.metadata || {}), completedLessonIds: [] };
       const reactivated = await this.enrollmentRepository.save(existing);
       logger.info(`[LMS] Enrollment reactivated`, {
         enrollmentId: reactivated.id,

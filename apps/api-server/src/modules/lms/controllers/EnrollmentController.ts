@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
 import { EnrollmentService } from '../services/EnrollmentService.js';
+import { AppDataSource } from '../../../database/connection.js';
 import logger from '../../../utils/logger.js';
 
 /**
@@ -218,12 +219,18 @@ export class EnrollmentController extends BaseController {
         const completedIds: string[] = enrollment.metadata?.completedLessonIds || [];
         if (!completedIds.includes(lessonId)) {
           completedIds.push(lessonId);
-          const totalLessons = enrollment.totalLessons || 1;
+          // WO-O4O-LMS-INTEGRITY-PATCH-V1: 레슨 추가/삭제 반영을 위해 현재 시점 공개 레슨 수 동적 조회
+          const currentTotalLessons = await AppDataSource.getRepository('Lesson')
+            .createQueryBuilder('lesson')
+            .where('lesson.courseId = :courseId', { courseId })
+            .andWhere('lesson.isPublished = :isPublished', { isPublished: true })
+            .getCount();
+          const totalLessons = currentTotalLessons || enrollment.totalLessons || 1;
           await service.updateEnrollment(enrollment.id, {
             completedLessons: completedIds.length,
             totalLessons,
           });
-          // Save metadata separately via updateEnrollment
+          // Save metadata separately via repo.update
           const repo = (service as any).enrollmentRepository;
           await repo.update(enrollment.id, {
             metadata: { ...enrollment.metadata, completedLessonIds: completedIds },
