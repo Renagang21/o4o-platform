@@ -11,7 +11,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { lmsInstructorApi } from '../../api/lms-instructor';
 import { colors, typography } from '../../styles/theme';
 
-type StatusFilter = 'all' | 'in_progress' | 'completed' | 'cancelled';
+type StatusFilter = 'all' | 'in_progress' | 'completed' | 'completed_uncredited' | 'cancelled';
 
 interface ParticipantItem {
   enrollmentId: string;
@@ -23,7 +23,8 @@ interface ParticipantItem {
   completedAt: string | null;
   certificateIssued: boolean;
   credited: boolean;
-  credits: number;
+  creditAmount: number | null;
+  creditedAt: string | null;
 }
 
 interface Summary {
@@ -125,11 +126,13 @@ export default function ContentParticipantsPage() {
     try {
       setLoading(true);
       setError(null);
-      const res = await lmsInstructorApi.participants(courseId, {
-        status: statusFilter,
+      const apiParams: Parameters<typeof lmsInstructorApi.participants>[1] = {
+        status: statusFilter === 'completed_uncredited' ? 'completed' : statusFilter,
         page,
         limit: LIMIT,
-      });
+      };
+      if (statusFilter === 'completed_uncredited') apiParams.credited = false;
+      const res = await lmsInstructorApi.participants(courseId, apiParams);
       const d = (res as any).data;
       setCourseTitle(d.course?.title ?? '');
       setSummary(d.summary ?? { total: 0, inProgress: 0, completed: 0, cancelled: 0 });
@@ -186,10 +189,11 @@ export default function ContentParticipantsPage() {
 
       {/* 상태 필터 탭 */}
       <div style={styles.tabBar}>
-        <FilterTab value="all"         current={statusFilter} label="전체"  count={summary.total}       onChange={handleFilterChange} />
-        <FilterTab value="in_progress" current={statusFilter} label="진행중" count={summary.inProgress}   onChange={handleFilterChange} />
-        <FilterTab value="completed"   current={statusFilter} label="완료"   count={summary.completed}    onChange={handleFilterChange} />
-        <FilterTab value="cancelled"   current={statusFilter} label="취소"   count={summary.cancelled}    onChange={handleFilterChange} />
+        <FilterTab value="all"                current={statusFilter} label="전체"       count={summary.total}       onChange={handleFilterChange} />
+        <FilterTab value="in_progress"        current={statusFilter} label="진행중"     count={summary.inProgress}   onChange={handleFilterChange} />
+        <FilterTab value="completed"          current={statusFilter} label="완료"       count={summary.completed}    onChange={handleFilterChange} />
+        <FilterTab value="completed_uncredited" current={statusFilter} label="완료(미지급)"              onChange={handleFilterChange} />
+        <FilterTab value="cancelled"          current={statusFilter} label="취소"       count={summary.cancelled}    onChange={handleFilterChange} />
       </div>
 
       {/* 테이블 */}
@@ -261,9 +265,16 @@ export default function ContentParticipantsPage() {
                   </td>
                   <td style={styles.td}>
                     {item.credited ? (
-                      <span style={{ color: '#0369a1', fontSize: '12px', fontWeight: 600 }}>
-                        지급됨 ({item.credits}점)
-                      </span>
+                      <div>
+                        <span style={{ color: '#0369a1', fontSize: '12px', fontWeight: 600 }}>
+                          지급됨 / {item.creditAmount} Credit
+                        </span>
+                        {item.creditedAt && (
+                          <div style={{ color: colors.neutral400, fontSize: '11px', marginTop: '2px' }}>
+                            {fmt(item.creditedAt)}
+                          </div>
+                        )}
+                      </div>
                     ) : (
                       <span style={{ color: colors.neutral400, fontSize: '12px' }}>미지급</span>
                     )}

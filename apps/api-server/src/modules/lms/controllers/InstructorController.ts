@@ -447,7 +447,7 @@ export class InstructorController extends BaseController {
         return BaseController.forbidden(res, '본인 콘텐츠의 참여자만 조회할 수 있습니다');
       }
 
-      const { status, page = '1', limit = '20', sort = 'enrolledAt_desc' } = req.query as Record<string, string>;
+      const { status, credited, page = '1', limit = '20', sort = 'enrolledAt_desc' } = req.query as Record<string, string>;
       const pageNum = Math.max(1, parseInt(page, 10) || 1);
       const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 20));
 
@@ -470,6 +470,17 @@ export class InstructorController extends BaseController {
         };
         const mapped = statusMap[status];
         if (mapped) query.andWhere('e.status = :status', { status: mapped });
+      }
+
+      // completed + 미지급 필터 (WO-O4O-MARKETING-CONTENT-REWARD-DETAIL-MVP-V1)
+      if (credited === 'false') {
+        // status 필터가 없거나 all이면 completed로 강제
+        if (!status || status === 'all') {
+          query.andWhere('e.status = :completedStatus', { completedStatus: 'completed' });
+        }
+        query.andWhere(
+          `NOT EXISTS (SELECT 1 FROM credit_transactions ct2 WHERE ct2.source_type = 'course_complete' AND ct2.source_id = :courseId AND ct2.user_id = e.user_id)`
+        );
       }
 
       // 정렬
@@ -500,32 +511,41 @@ export class InstructorController extends BaseController {
       const totalAll = Object.values(summaryMap).reduce((a, b) => a + b, 0);
 
       // credit_transactions — 이 페이지 userIds 기준으로 한 번만 조회 (N+1 방지)
+      // amount + createdAt도 함께 조회 (WO-O4O-MARKETING-CONTENT-REWARD-DETAIL-MVP-V1)
       const userIds = enrollments.map(e => e.userId).filter(Boolean);
-      let creditedSet = new Set<string>();
+      let creditMap = new Map<string, { amount: number; creditedAt: string }>();
       if (userIds.length > 0) {
         const creditRows = await AppDataSource
           .getRepository('CreditTransaction')
           .createQueryBuilder('ct')
           .select('ct.userId', 'userId')
+          .addSelect('ct.amount', 'amount')
+          .addSelect('ct.createdAt', 'creditedAt')
           .where('ct.sourceType = :type', { type: 'course_complete' })
           .andWhere('ct.sourceId = :courseId', { courseId })
           .andWhere('ct.userId IN (:...userIds)', { userIds })
           .getRawMany();
-        creditedSet = new Set(creditRows.map((r: any) => r.userId));
+        creditMap = new Map(
+          creditRows.map((r: any) => [r.userId, { amount: Number(r.amount), creditedAt: r.creditedAt }])
+        );
       }
 
-      const items = enrollments.map(e => ({
-        enrollmentId: e.id,
-        userId: e.userId,
-        userName: (e.user as any)?.name || '(이름 없음)',
-        enrolledAt: e.enrolledAt ?? e.createdAt,
-        status: e.status,
-        progressPercentage: e.progressPercentage ?? 0,
-        completedAt: e.completedAt ?? null,
-        certificateIssued: !!e.certificateId,
-        credited: creditedSet.has(e.userId),
-        credits: course.credits ?? 0,
-      }));
+      const items = enrollments.map(e => {
+        const creditInfo = creditMap.get(e.userId);
+        return {
+          enrollmentId: e.id,
+          userId: e.userId,
+          userName: (e.user as any)?.name || '(이름 없음)',
+          enrolledAt: e.enrolledAt ?? e.createdAt,
+          status: e.status,
+          progressPercentage: e.progressPercentage ?? 0,
+          completedAt: e.completedAt ?? null,
+          certificateIssued: !!e.certificateId,
+          credited: !!creditInfo,
+          creditAmount: creditInfo?.amount ?? null,
+          creditedAt: creditInfo?.creditedAt ?? null,
+        };
+      });
 
       return BaseController.ok(res, {
         course: { id: course.id, title: course.title },
