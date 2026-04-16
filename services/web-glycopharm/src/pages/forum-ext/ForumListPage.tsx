@@ -24,9 +24,10 @@ import { toast } from '@o4o/error-handling';
 import { EmptyState, LoadingState, ErrorState } from '@/components/common';
 import type { Forum, ForumStatus, ForumApplicationFormData, UserRole } from '@/types';
 
-// WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed role options
+// WO-GLYCOPHARM-ACCESS-POLICY-AND-ROLE-CLEANUP-V1: PHARMACIST 추가, PHARMACY 호환 유지
 const roleOptions: { value: UserRole; label: string }[] = [
-  { value: GLYCOPHARM_ROLES.PHARMACY, label: '약국' },
+  { value: GLYCOPHARM_ROLES.PHARMACIST, label: '약사' },
+  { value: GLYCOPHARM_ROLES.PHARMACY, label: '약국 (레거시)' },
   { value: GLYCOPHARM_ROLES.SUPPLIER, label: '공급자' },
   { value: GLYCOPHARM_ROLES.OPERATOR, label: '운영자' },
 ];
@@ -40,8 +41,8 @@ export default function ForumListPage() {
     title: '',
     description: '',
     purpose: '',
-    targetRoles: [GLYCOPHARM_ROLES.PHARMACY],
-    allowedWriteRoles: [GLYCOPHARM_ROLES.PHARMACY],
+    targetRoles: [GLYCOPHARM_ROLES.PHARMACIST],
+    allowedWriteRoles: [GLYCOPHARM_ROLES.PHARMACIST],
     note: '',
   });
 
@@ -148,8 +149,8 @@ export default function ForumListPage() {
         title: '',
         description: '',
         purpose: '',
-        targetRoles: [GLYCOPHARM_ROLES.PHARMACY],
-        allowedWriteRoles: [GLYCOPHARM_ROLES.PHARMACY],
+        targetRoles: [GLYCOPHARM_ROLES.PHARMACIST],
+        allowedWriteRoles: [GLYCOPHARM_ROLES.PHARMACIST],
         note: '',
       });
     } catch {
