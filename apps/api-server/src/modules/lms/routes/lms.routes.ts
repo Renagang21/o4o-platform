@@ -150,6 +150,9 @@ router.get('/certificates/verify/:verificationCode', asyncHandler(CertificateCon
 // GET /api/v1/lms/certificates/number/:certificateNumber - Get Certificate by Number
 router.get('/certificates/number/:certificateNumber', requireAuth, asyncHandler(CertificateController.getCertificateByNumber));
 
+// GET /api/v1/lms/certificates/:id/pdf - Download Certificate PDF (WO-O4O-LMS-CERTIFICATE-PDF-V1)
+router.get('/certificates/:id/pdf', requireAuth, asyncHandler(CertificateController.downloadPdf));
+
 // GET /api/v1/lms/certificates/:id - Get Certificate by ID
 router.get('/certificates/:id', requireAuth, asyncHandler(CertificateController.getCertificate));
 

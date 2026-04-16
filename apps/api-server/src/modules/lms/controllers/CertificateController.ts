@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
 import { CertificateService } from '../services/CertificateService.js';
+import { generateCertificatePdf } from '../utils/certificatePdf.js';
 import logger from '../../../utils/logger.js';
 
 /**
@@ -186,6 +187,53 @@ export class CertificateController extends BaseController {
         return BaseController.notFound(res, error.message);
       }
 
+      return BaseController.error(res, error);
+    }
+  }
+
+  // WO-O4O-LMS-CERTIFICATE-PDF-V1
+  static async downloadPdf(req: Request, res: Response): Promise<any> {
+    try {
+      const { id } = req.params;
+      const requestUserId = (req as any).user?.id;
+
+      if (!requestUserId) {
+        return BaseController.unauthorized(res, 'User not authenticated');
+      }
+
+      const service = CertificateService.getInstance();
+      const certificate = await service.getCertificate(id);
+
+      if (!certificate) {
+        return BaseController.notFound(res, 'Certificate not found');
+      }
+
+      // 본인 수료증만 다운로드 가능
+      if (certificate.userId !== requestUserId) {
+        return BaseController.forbidden(res, 'Access denied');
+      }
+
+      const userName = (certificate.user as any)?.name || '수강자';
+      const courseTitle = certificate.course?.title || '과정';
+
+      const pdfBuffer = await generateCertificatePdf({
+        userName,
+        courseTitle,
+        completedAt: certificate.completedAt,
+        issuedAt: certificate.issuedAt,
+        certificateNumber: certificate.certificateNumber,
+        credits: certificate.credits,
+        issuerName: certificate.issuerName,
+        issuerTitle: certificate.issuerTitle,
+      });
+
+      const safeNumber = certificate.certificateNumber.replace(/[^a-zA-Z0-9-_]/g, '_');
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="certificate-${safeNumber}.pdf"`);
+      res.setHeader('Content-Length', pdfBuffer.length);
+      return res.end(pdfBuffer);
+    } catch (error: any) {
+      logger.error('[CertificateController.downloadPdf] Error', { error: error.message });
       return BaseController.error(res, error);
     }
   }

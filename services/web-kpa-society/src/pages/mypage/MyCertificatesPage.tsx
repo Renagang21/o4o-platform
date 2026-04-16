@@ -7,7 +7,7 @@ import { PageHeader, LoadingSpinner, EmptyState, Pagination, Card } from '../../
 import { MyPageNavigation } from '@o4o/account-ui';
 import { KPA_MYPAGE_NAV_ITEMS } from './navItems';
 import { mypageApi } from '../../api';
-import { useAuth } from '../../contexts';
+import { useAuth, getAccessToken } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 import type { Certificate } from '../../types';
 
@@ -42,9 +42,26 @@ export function MyCertificatesPage() {
     }
   };
 
-  const handleDownload = (cert: Certificate) => {
-    if (cert.downloadUrl) {
-      window.open(cert.downloadUrl, '_blank');
+  const handleDownload = async (cert: Certificate) => {
+    try {
+      const token = getAccessToken();
+      const apiBase = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+      const response = await fetch(
+        `${apiBase}/api/v1/lms/certificates/${cert.id}/pdf`,
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} },
+      );
+      if (!response.ok) throw new Error('PDF 다운로드에 실패했습니다.');
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `certificate-${cert.certificateNumber}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch {
+      alert('수료증 다운로드에 실패했습니다. 잠시 후 다시 시도해 주세요.');
     }
   };
 
