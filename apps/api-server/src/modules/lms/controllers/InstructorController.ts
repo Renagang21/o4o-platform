@@ -425,6 +425,126 @@ export class InstructorController extends BaseController {
   }
 
   // ========================================
+  // 콘텐츠별 참여자 관리 (WO-O4O-MARKETING-CONTENT-OPERATIONS-MVP-V1)
+  // ========================================
+
+  /**
+   * GET /instructor/participants/:courseId
+   * 콘텐츠별 참여자 목록 + 수료증/보상 지급 여부
+   * 파라미터: status(all|in_progress|completed|cancelled), page, limit, sort
+   */
+  static async participants(req: Request, res: Response): Promise<any> {
+    try {
+      const { courseId } = req.params;
+      const userId = (req as any).user?.id;
+
+      // 소유권 확인 (dashboardStats와 동일 패턴)
+      const courseRepo = AppDataSource.getRepository(Course);
+      const course = await courseRepo.findOne({ where: { id: courseId }, select: ['id', 'title', 'credits', 'instructorId'] });
+      if (!course) return BaseController.notFound(res, 'Course not found');
+      const isKpaAdmin = await roleAssignmentService.hasAnyRole(userId, ['kpa:admin']);
+      if (course.instructorId !== userId && !isKpaAdmin) {
+        return BaseController.forbidden(res, '본인 콘텐츠의 참여자만 조회할 수 있습니다');
+      }
+
+      const { status, page = '1', limit = '20', sort = 'enrolledAt_desc' } = req.query as Record<string, string>;
+      const pageNum = Math.max(1, parseInt(page, 10) || 1);
+      const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 20));
+
+      const enrollmentRepo = AppDataSource.getRepository(Enrollment);
+      const query = enrollmentRepo
+        .createQueryBuilder('e')
+        .where('e.courseId = :courseId', { courseId })
+        .leftJoinAndSelect('e.user', 'user');
+
+      // 상태 필터
+      if (status && status !== 'all') {
+        const statusMap: Record<string, string> = {
+          in_progress: 'in_progress',
+          completed: 'completed',
+          cancelled: 'cancelled',
+          pending: 'pending',
+          approved: 'approved',
+          rejected: 'rejected',
+          expired: 'expired',
+        };
+        const mapped = statusMap[status];
+        if (mapped) query.andWhere('e.status = :status', { status: mapped });
+      }
+
+      // 정렬
+      const sortMap: Record<string, [string, 'ASC' | 'DESC']> = {
+        enrolledAt_desc: ['e.enrolledAt', 'DESC'],
+        enrolledAt_asc:  ['e.enrolledAt', 'ASC'],
+        completedAt_desc: ['e.completedAt', 'DESC'],
+        completedAt_asc:  ['e.completedAt', 'ASC'],
+      };
+      const [sortCol, sortDir] = sortMap[sort] ?? ['e.enrolledAt', 'DESC'];
+      query.orderBy(sortCol, sortDir).addOrderBy('e.createdAt', 'DESC');
+
+      query.skip((pageNum - 1) * limitNum).take(limitNum);
+
+      const [enrollments, total] = await query.getManyAndCount();
+
+      // 요약 통계 (전체 — 필터 무관)
+      const summaryRows = await enrollmentRepo
+        .createQueryBuilder('e')
+        .select('e.status', 'status')
+        .addSelect('COUNT(*)::int', 'cnt')
+        .where('e.courseId = :courseId', { courseId })
+        .groupBy('e.status')
+        .getRawMany();
+
+      const summaryMap: Record<string, number> = {};
+      for (const row of summaryRows) summaryMap[row.status] = Number(row.cnt);
+      const totalAll = Object.values(summaryMap).reduce((a, b) => a + b, 0);
+
+      // credit_transactions — 이 페이지 userIds 기준으로 한 번만 조회 (N+1 방지)
+      const userIds = enrollments.map(e => e.userId).filter(Boolean);
+      let creditedSet = new Set<string>();
+      if (userIds.length > 0) {
+        const creditRows = await AppDataSource
+          .getRepository('CreditTransaction')
+          .createQueryBuilder('ct')
+          .select('ct.userId', 'userId')
+          .where('ct.sourceType = :type', { type: 'course_complete' })
+          .andWhere('ct.sourceId = :courseId', { courseId })
+          .andWhere('ct.userId IN (:...userIds)', { userIds })
+          .getRawMany();
+        creditedSet = new Set(creditRows.map((r: any) => r.userId));
+      }
+
+      const items = enrollments.map(e => ({
+        enrollmentId: e.id,
+        userId: e.userId,
+        userName: (e.user as any)?.name || '(이름 없음)',
+        enrolledAt: e.enrolledAt ?? e.createdAt,
+        status: e.status,
+        progressPercentage: e.progressPercentage ?? 0,
+        completedAt: e.completedAt ?? null,
+        certificateIssued: !!e.certificateId,
+        credited: creditedSet.has(e.userId),
+        credits: course.credits ?? 0,
+      }));
+
+      return BaseController.ok(res, {
+        course: { id: course.id, title: course.title },
+        summary: {
+          total: totalAll,
+          inProgress: summaryMap['in_progress'] ?? 0,
+          completed: summaryMap['completed'] ?? 0,
+          cancelled: summaryMap['cancelled'] ?? 0,
+        },
+        items,
+        pagination: { page: pageNum, limit: limitNum, total },
+      });
+    } catch (error: any) {
+      logger.error('[InstructorController.participants] Error', { error: error.message });
+      return BaseController.error(res, error);
+    }
+  }
+
+  // ========================================
   // 수강 승인/거절 (강사)
   // ========================================
 

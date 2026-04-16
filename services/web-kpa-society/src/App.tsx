@@ -20,6 +20,8 @@ import { ForumHomePage, ForumListPage, ForumDetailPage, ForumWritePage } from '.
 // Market Trial (WO-MARKET-TRIAL-SERVICE-ENTRY-BANNER-AND-GATEWAY-V1, WO-MARKET-TRIAL-KPA-DETAIL-AND-FORUM-DEEP-LINK-V1)
 import { MarketTrialHubPage } from './pages/market-trial/MarketTrialHubPage';
 import { MarketTrialDetailPage } from './pages/market-trial/MarketTrialDetailPage';
+// Market Trial Phase 2 (WO-MARKET-TRIAL-PHASE2-PARTICIPANT-DASHBOARD-AND-SETTLEMENT-STATE-V1)
+import { MyParticipationsPage } from './pages/market-trial/MyParticipationsPage';
 
 // LMS pages
 import { EducationPage, LmsCoursesPage, LmsCourseDetailPage, LmsLessonPage, LmsCertificatesPage } from './pages/lms';
@@ -39,6 +41,8 @@ import CourseNewPage from './pages/instructor/courses/CourseNewPage';
 import CourseEditPage from './pages/instructor/courses/CourseEditPage';
 // Instructor Course Dashboard - WO-O4O-LMS-INSTRUCTOR-DASHBOARD-MVP-V1
 import InstructorCourseDashboardPage from './pages/instructor/InstructorCourseDashboardPage';
+// Content Participants Page - WO-O4O-MARKETING-CONTENT-OPERATIONS-MVP-V1
+import ContentParticipantsPage from './pages/instructor/ContentParticipantsPage';
 
 // Events pages (WO-KPA-COMMUNITY-HOME-V1)
 import { EventsHomePage } from './pages/events/EventsHomePage';
@@ -389,6 +393,7 @@ function App() {
 
           {/* Market Trial (WO-MARKET-TRIAL-SERVICE-ENTRY-BANNER-AND-GATEWAY-V1, WO-MARKET-TRIAL-KPA-DETAIL-AND-FORUM-DEEP-LINK-V1) */}
           <Route path="/market-trial" element={<Layout serviceName={SERVICE_NAME}><MarketTrialHubPage /></Layout>} />
+          <Route path="/market-trial/my" element={<Layout serviceName={SERVICE_NAME}><MyParticipationsPage /></Layout>} />
           <Route path="/market-trial/:id" element={<Layout serviceName={SERVICE_NAME}><MarketTrialDetailPage /></Layout>} />
 
 
@@ -561,6 +566,8 @@ function App() {
           <Route path="/instructor/courses/new" element={<Layout serviceName={SERVICE_NAME}><CourseNewPage /></Layout>} />
           <Route path="/instructor/courses/:id" element={<Layout serviceName={SERVICE_NAME}><CourseEditPage /></Layout>} />
           <Route path="/instructor/dashboard" element={<Layout serviceName={SERVICE_NAME}><InstructorCourseDashboardPage /></Layout>} />
+          {/* WO-O4O-MARKETING-CONTENT-OPERATIONS-MVP-V1 */}
+          <Route path="/instructor/contents/:courseId/participants" element={<Layout serviceName={SERVICE_NAME}><ContentParticipantsPage /></Layout>} />
 
           {/* LMS (교육/강의) */}
           <Route path="/lms" element={<Layout serviceName={SERVICE_NAME}><EducationPage /></Layout>} />

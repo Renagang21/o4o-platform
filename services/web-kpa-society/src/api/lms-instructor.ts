@@ -184,4 +184,34 @@ export const lmsInstructorApi = {
         }>;
       };
     }>('/lms/instructor/dashboard/courses'),
+
+  // WO-O4O-MARKETING-CONTENT-OPERATIONS-MVP-V1
+  /** 콘텐츠별 참여자 목록 */
+  participants: (courseId: string, params?: { status?: string; page?: number; limit?: number; sort?: string }) => {
+    const qs = new URLSearchParams();
+    if (params?.status) qs.set('status', params.status);
+    if (params?.page)   qs.set('page', String(params.page));
+    if (params?.limit)  qs.set('limit', String(params.limit));
+    if (params?.sort)   qs.set('sort', params.sort);
+    return authClient.api.get<{
+      success: boolean;
+      data: {
+        course: { id: string; title: string };
+        summary: { total: number; inProgress: number; completed: number; cancelled: number };
+        items: Array<{
+          enrollmentId: string;
+          userId: string;
+          userName: string;
+          enrolledAt: string;
+          status: string;
+          progressPercentage: number;
+          completedAt: string | null;
+          certificateIssued: boolean;
+          credited: boolean;
+          credits: number;
+        }>;
+        pagination: { page: number; limit: number; total: number };
+      };
+    }>(`/lms/instructor/participants/${courseId}?${qs.toString()}`);
+  },
 };

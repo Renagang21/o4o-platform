@@ -7,6 +7,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { lmsInstructorApi } from '../../api/lms-instructor';
 import { colors, typography } from '../../styles/theme';
 
@@ -80,6 +81,7 @@ function CourseTable({
   courses,
   selectedId,
   onSelect,
+  onManageParticipants,
 }: {
   courses: Array<{
     courseId: string;
@@ -91,6 +93,7 @@ function CourseTable({
   }>;
   selectedId: string;
   onSelect: (id: string) => void;
+  onManageParticipants: (id: string) => void;
 }) {
   return (
     <div style={{
@@ -102,8 +105,8 @@ function CourseTable({
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr style={{ backgroundColor: colors.neutral50 }}>
-            {['강의명', '상태', '수강자', '완료율', '평균 진도율'].map(h => (
-              <th key={h} style={{
+            {['강의명', '상태', '수강자', '완료율', '평균 진도율', ''].map((h, i) => (
+              <th key={i} style={{
                 padding: '12px 16px',
                 textAlign: 'left',
                 ...typography.bodyS,
@@ -151,6 +154,24 @@ function CourseTable({
               <td style={{ padding: '12px 16px', ...typography.bodyM, color: colors.neutral700 }}>
                 {c.averageProgress.toFixed(1)}%
               </td>
+              <td style={{ padding: '12px 16px' }} onClick={e => e.stopPropagation()}>
+                <button
+                  onClick={() => onManageParticipants(c.courseId)}
+                  style={{
+                    padding: '5px 12px',
+                    fontSize: '12px',
+                    fontWeight: 500,
+                    color: colors.primary,
+                    backgroundColor: 'transparent',
+                    border: `1px solid ${colors.primary}`,
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  참여자 관리
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
@@ -161,6 +182,7 @@ function CourseTable({
 
 // ── 메인 페이지 ───────────────────────────────────────────────
 export default function InstructorCourseDashboardPage() {
+  const navigate = useNavigate();
   const [courseList, setCourseList] = useState<Array<{
     courseId: string;
     title: string;
@@ -314,6 +336,7 @@ export default function InstructorCourseDashboardPage() {
           courses={courseList}
           selectedId={selectedCourseId}
           onSelect={setSelectedCourseId}
+          onManageParticipants={(id) => navigate(`/instructor/contents/${id}/participants`)}
         />
       </div>
     </div>
