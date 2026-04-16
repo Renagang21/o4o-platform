@@ -11,7 +11,7 @@ export class AddSourceIndexToCreditTransactions20260416600000 implements Migrati
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
       CREATE INDEX IF NOT EXISTS idx_credit_transactions_source
-      ON credit_transactions (source_type, source_id)
+      ON credit_transactions ("sourceType", "sourceId")
     `);
   }
 
