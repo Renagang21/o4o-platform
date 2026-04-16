@@ -320,6 +320,27 @@ export interface ReviewApplicationRequest {
   rejectionReason?: string;
 }
 
+// WO-GLYCOPHARM-MEMBER-REGISTER-FLOW-V1
+export type GlycopharmMemberStatus = 'pending' | 'approved' | 'rejected' | 'suspended' | 'withdrawn';
+export interface GlycopharmMemberRecord {
+  id: string;
+  userId: string;
+  membershipType: 'pharmacist';
+  subRole: 'pharmacy_owner' | 'staff_pharmacist' | null;
+  organizationId: string | null;
+  status: GlycopharmMemberStatus;
+  approvedBy: string | null;
+  approvedAt: string | null;
+  rejectionReason: string | null;
+  metadata: {
+    licenseNumber?: string;
+    pharmacyName?: string;
+    pharmacyAddress?: string;
+  } | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface ReviewApplicationResponse {
   success: boolean;
   message: string;
@@ -637,6 +658,45 @@ class GlycopharmApiClient {
     searchParams.set('value', value);
     const endpoint = `/platform/slug/check?${searchParams.toString()}`;
     return this.request(endpoint);
+  }
+
+  // ========================================================================
+  // Member Registration Flow (WO-GLYCOPHARM-MEMBER-REGISTER-FLOW-V1)
+  // ========================================================================
+
+  async applyMembership(dto: {
+    subRole: 'pharmacy_owner' | 'staff_pharmacist';
+    licenseNumber?: string;
+    organizationId?: string;
+    pharmacyName?: string;
+    pharmacyAddress?: string;
+  }): Promise<{ success: boolean; data: GlycopharmMemberRecord }> {
+    return this.request('/glycopharm/members/apply', { method: 'POST', body: dto });
+  }
+
+  async getMyMembership(): Promise<{ success: boolean; data: GlycopharmMemberRecord | null }> {
+    return this.request('/glycopharm/members/me');
+  }
+
+  async listGlycopharmMembers(params?: {
+    status?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<{ success: boolean; data: { items: GlycopharmMemberRecord[]; total: number; page: number; totalPages: number } }> {
+    const q = new URLSearchParams();
+    if (params?.status) q.set('status', params.status);
+    if (params?.page) q.set('page', String(params.page));
+    if (params?.limit) q.set('limit', String(params.limit));
+    const qs = q.toString() ? `?${q.toString()}` : '';
+    return this.request(`/glycopharm/members${qs}`);
+  }
+
+  async approveMember(memberId: string): Promise<{ success: boolean; data: GlycopharmMemberRecord }> {
+    return this.request(`/glycopharm/members/${memberId}/approve`, { method: 'PATCH' });
+  }
+
+  async rejectMember(memberId: string, reason?: string): Promise<{ success: boolean; data: GlycopharmMemberRecord }> {
+    return this.request(`/glycopharm/members/${memberId}/reject`, { method: 'PATCH', body: { reason } });
   }
 }
 

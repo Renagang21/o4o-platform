@@ -177,6 +177,7 @@ const MySettingsPage = lazy(() => import('@/pages/mypage/MySettingsPage'));
 // Apply Pages (API 연동)
 const PharmacyApplyPage = lazy(() => import('@/pages/apply/PharmacyApplyPage'));
 const MyApplicationsPage = lazy(() => import('@/pages/apply/MyApplicationsPage'));
+const PharmacistApplyPage = lazy(() => import('@/pages/apply/PharmacistApplyPage'));
 
 // QR Landing (Phase 2-B: WO-O4O-REQUEST-UX-REFINEMENT-PHASE2B)
 const QrLandingPage = lazy(() => import('@/pages/qr/QrLandingPage'));
@@ -322,7 +323,7 @@ function AppRoutes() {
         <Route path="education" element={<EducationPage />} />
         <Route path="contact" element={<ContactPage />} />
         <Route path="apply" element={<PharmacyApplyPage />} />
-
+        <Route path="apply/pharmacist" element={<PharmacistApplyPage />} />
         <Route path="apply/my-applications" element={<MyApplicationsPage />} />
         {/* B2B Supply */}
         <Route path="b2b/supply" element={<SupplyPage />} />

@@ -48,6 +48,7 @@ import { createBillingPreviewController } from './controllers/billing-preview.co
 import { createInvoiceController } from './controllers/invoice.controller.js'; // Phase 3-D: Invoice Finalization
 import { createInvoiceDispatchController } from './controllers/invoice-dispatch.controller.js'; // Phase 3-E: Invoice Dispatch
 import { createGlycopharmCommunityHubController } from './controllers/glycopharm-community-hub.controller.js'; // WO-GLYCOPHARM-COMMUNITY-HUB-IMPLEMENTATION-V1
+import { createGlycopharmMemberController } from './controllers/glycopharm-member.controller.js'; // WO-GLYCOPHARM-MEMBER-REGISTER-FLOW-V1
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 import { hasAnyServiceRole, logLegacyRoleUsage } from '../../utils/role.utils.js';
 import { GLYCOPHARM_SCOPE_CONFIG } from '@o4o/security-core';
@@ -89,6 +90,13 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   router.use('/', glycopharmController);
 
   // Smart Display routes removed — WO-O4O-GLYCOPHARM-SIGNAGE-MIGRATION-V1
+
+  // Member registration/approval routes — WO-GLYCOPHARM-MEMBER-REGISTER-FLOW-V1
+  const glycopharmMemberController = createGlycopharmMemberController(
+    dataSource,
+    coreRequireAuth as any,
+  );
+  router.use('/', glycopharmMemberController);
 
   // Forum Category Request routes
   const forumRequestController = createForumRequestController(
