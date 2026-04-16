@@ -43,20 +43,20 @@ export class OrganizationMember {
   /**
    * 조직 ID (FK → organizations.id)
    */
-  @Column({ type: 'uuid' })
+  @Column({ name: 'organization_id', type: 'uuid' })
   organizationId!: string;
 
   /**
    * 조직 관계
    */
   @ManyToOne(() => Organization)
-  @JoinColumn({ name: 'organizationId' })
+  @JoinColumn({ name: 'organization_id' })
   organization!: Organization;
 
   /**
    * 회원 ID (FK → users.id)
    */
-  @Column({ type: 'uuid' })
+  @Column({ name: 'user_id', type: 'uuid' })
   userId!: string;
 
   /**

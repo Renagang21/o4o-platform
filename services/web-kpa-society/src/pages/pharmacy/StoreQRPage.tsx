@@ -29,6 +29,7 @@ import {
 import type { StoreQrCode, QrAnalyticsData } from '../../api/storeQr';
 import { getListings } from '../../api/pharmacyProducts';
 import { fetchLocalProducts } from '../../api/localProducts';
+import { getAccessToken } from '../../contexts/AuthContext';
 
 const LANDING_TYPE_OPTIONS: { value: string; label: string }[] = [
   { value: 'product', label: '제품' },
@@ -243,12 +244,14 @@ export function StoreQRPage() {
     setShowPrintModal(false);
     setPrinting(true);
     try {
+      const token = getAccessToken();
+      const authHeaders: HeadersInit = token ? { 'Authorization': `Bearer ${token}` } : {};
+
       if (template === 'sheet') {
         // 기본 QR 시트 — 기존 일괄 출력
         const resp = await fetch(`${apiBase}/pharmacy/qr/print`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
+          headers: { 'Content-Type': 'application/json', ...authHeaders },
           body: JSON.stringify({ qrIds: Array.from(selectedIds) }),
         });
         if (!resp.ok) throw new Error('Print failed');
@@ -271,7 +274,7 @@ export function StoreQRPage() {
       for (const qr of productQrs) {
         const resp = await fetch(
           `${apiBase}/pharmacy/qr/${qr.id}/flyer?template=${templateNum}`,
-          { credentials: 'include' },
+          { headers: authHeaders },
         );
         if (!resp.ok) throw new Error('Flyer generation failed');
         const blob = await resp.blob();
