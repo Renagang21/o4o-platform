@@ -144,6 +144,12 @@ export const GLYCOPHARM_STORE_CONFIG: StoreDashboardConfig = {
  *   - 대시보드→홈, 운영+마케팅→콘텐츠+홍보, 채널/디바이스·구매 섹션 제거
  *   - 미완성 메뉴 비노출 (B2C, 주문 작업대, 구매 내역)
  *   - 상품 관리(B2B)→상품 관리 명칭 정리
+ *
+ * WO-STORE-HIDDEN-ROUTES-UNHIDE-V1:
+ *   - "매장 디스플레이" 섹션 신설 (4항목 flat 구조)
+ *   - signage를 "콘텐츠"에서 "매장 디스플레이"로 이동
+ *   - 매장 진열 상품(B2C), 채널 현황, 매장 사이니지, 태블릿 진열 정식 노출
+ *   - 순서: 매장 진열 상품 → 채널 현황 → 매장 사이니지 → 태블릿 진열
  */
 export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
   serviceKey: 'kpa-society',
@@ -158,7 +164,6 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
     { label: '콘텐츠', items: [
       { key: 'library', label: '자료실', subPath: '/operation/library' },
       { key: 'blog', label: '블로그', subPath: '/content/blog' },
-      { key: 'signage', label: '매장 사이니지', subPath: '/marketing/signage' },
     ]},
     { label: '홍보', items: [
       { key: 'qr', label: 'QR 관리', subPath: '/marketing/qr' },
@@ -168,6 +173,12 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'products', label: '상품 관리', subPath: '/commerce/products' },
       { key: 'local-products', label: '자체 상품', subPath: '/commerce/local-products' },
       { key: 'orders', label: '주문 관리', subPath: '/commerce/orders' },
+    ]},
+    { label: '매장 디스플레이', items: [
+      { key: 'products-b2c',     label: '매장 진열 상품', subPath: '/commerce/products/b2c' },
+      { key: 'channels',         label: '채널 현황',      subPath: '/channels' },
+      { key: 'signage',          label: '매장 사이니지',  subPath: '/marketing/signage' },
+      { key: 'tablet-displays',  label: '태블릿 진열',   subPath: '/commerce/tablet-displays' },
     ]},
     { label: '분석', items: [
       { key: 'analytics-marketing', label: '마케팅 분석', subPath: '/analytics/marketing' },
