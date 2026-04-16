@@ -8,7 +8,7 @@ interface AccountPageLayoutProps {
 
 export function AccountPageLayout({ title, subtitle, children }: AccountPageLayoutProps) {
   return (
-    <div className="max-w-xl mx-auto py-10 px-4">
+    <div className="max-w-4xl mx-auto py-10 px-4">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
         {subtitle && (
