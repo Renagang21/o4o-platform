@@ -1029,6 +1029,30 @@ export const supplierProfileApi = {
   },
 };
 
+// ==================== KPA Event Offer Stats ====================
+// WO-EVENT-OFFER-SUPPLIER-DASHBOARD-STATS-INTEGRATION-V1
+
+export interface SupplierEventOfferStats {
+  totalOffers: number;
+  activeOffers: number;
+  inactiveOffers: number;
+  totalOrders: number;
+  totalRevenue: number;
+}
+
+/**
+ * 공급자 KPA 이벤트/특가 성과 집계 API
+ * GET /api/v1/kpa/supplier/event-offers/stats
+ */
+export const supplierKpaEventOfferApi = {
+  getStats: (): Promise<SupplierEventOfferStats> =>
+    api
+      .get<{ success: boolean; data: SupplierEventOfferStats }>(
+        '/kpa/supplier/event-offers/stats'
+      )
+      .then(res => res.data.data),
+};
+
 /** WO-NETURE-SPOT-PRICE-POLICY-FOUNDATION-V1 */
 export interface SpotPricePolicy {
   id: string;

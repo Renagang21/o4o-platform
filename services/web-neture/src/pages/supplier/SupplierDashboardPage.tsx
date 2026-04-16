@@ -24,6 +24,8 @@ import {
   type DistributionItem,
   type TrendingProductItem,
   type SupplierAiInsight,
+  supplierKpaEventOfferApi,
+  type SupplierEventOfferStats,
 } from '../../lib/api';
 
 export default function SupplierDashboardPage() {
@@ -35,6 +37,7 @@ export default function SupplierDashboardPage() {
   const [performance, setPerformance] = useState<ProductPerformanceItem[]>([]);
   const [distribution, setDistribution] = useState<DistributionItem[]>([]);
   const [trending, setTrending] = useState<TrendingProductItem[]>([]);
+  const [eventOfferStats, setEventOfferStats] = useState<SupplierEventOfferStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -71,6 +74,11 @@ export default function SupplierDashboardPage() {
 
     supplierCopilotApi.getTrendingProducts()
       .then(d => setTrending(d))
+      .catch(() => {});
+
+    // Event Offer stats (KPA) — 실패해도 대시보드 영향 없음
+    supplierKpaEventOfferApi.getStats()
+      .then(d => setEventOfferStats(d))
       .catch(() => {});
 
     setLoading(false);
@@ -136,6 +144,31 @@ export default function SupplierDashboardPage() {
           </div>
         )}
       </div>
+
+      {/* Block 1.5: 이벤트/특가 현황 (amber) — WO-EVENT-OFFER-SUPPLIER-DASHBOARD-STATS-INTEGRATION-V1 */}
+      {eventOfferStats !== null && (
+        <div className="bg-amber-50 rounded-xl border border-amber-200 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-base font-semibold text-amber-900">이벤트/특가 현황 (KPA)</h2>
+            <span className="text-xs text-amber-500">KPA 약사회 이벤트 기준</span>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <EventKpiCard label="전체 이벤트" value={eventOfferStats.totalOffers} />
+            <EventKpiCard label="노출중" value={eventOfferStats.activeOffers} accent />
+            <EventKpiCard label="이벤트 주문" value={eventOfferStats.totalOrders} />
+            <EventKpiCard
+              label="이벤트 매출"
+              value={eventOfferStats.totalRevenue}
+              format="currency"
+            />
+          </div>
+          {eventOfferStats.totalOffers === 0 && (
+            <p className="text-xs text-amber-500 mt-4 text-center">
+              KPA 이벤트 제안 이력이 없습니다. KPA 사이트에서 이벤트를 제안해보세요.
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Block 2: AI 공급자 요약 (indigo) */}
       <div className="bg-indigo-50 rounded-xl border border-indigo-200 p-6">
@@ -328,6 +361,28 @@ function KpiCard({ label, value, accent }: { label: string; value: number; accen
     <div className={`rounded-lg p-4 ${accent ? 'bg-slate-800 text-white' : 'bg-slate-50 text-slate-700'}`}>
       <p className={`text-xs font-medium mb-1 ${accent ? 'text-slate-300' : 'text-slate-500'}`}>{label}</p>
       <p className="text-2xl font-bold">{value.toLocaleString()}</p>
+    </div>
+  );
+}
+
+function EventKpiCard({
+  label,
+  value,
+  accent,
+  format,
+}: {
+  label: string;
+  value: number;
+  accent?: boolean;
+  format?: 'currency';
+}) {
+  const display = format === 'currency'
+    ? `${value.toLocaleString('ko-KR')}원`
+    : value.toLocaleString();
+  return (
+    <div className={`rounded-lg p-4 ${accent ? 'bg-amber-700 text-white' : 'bg-amber-100/60 text-amber-900'}`}>
+      <p className={`text-xs font-medium mb-1 ${accent ? 'text-amber-200' : 'text-amber-600'}`}>{label}</p>
+      <p className="text-xl font-bold">{display}</p>
     </div>
   );
 }

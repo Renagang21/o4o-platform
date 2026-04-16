@@ -17,6 +17,7 @@ import { KpaAuditLog } from '../../kpa/entities/kpa-audit-log.entity.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import { createRequireStoreOwner } from '../../../utils/store-owner.utils.js';
 import type { StoreAddress } from '../../../types/store-address.js';
+import { StoreSlugService } from '@o4o/platform-core/store-identity';
 
 type AuthMiddleware = RequestHandler;
 
@@ -71,6 +72,10 @@ export function createPharmacyInfoController(
 
     const meta = (org.metadata as Record<string, any>) || {};
 
+    // Resolve slug from platform_store_slugs (SSOT)
+    const slugService = new StoreSlugService(dataSource);
+    const slugRecord = await slugService.findByStoreId(organizationId, 'kpa');
+
     // Build response from organizations table
     const data: PharmacyInfoResponse = {
       organizationId: org.id,
@@ -81,7 +86,7 @@ export function createPharmacyInfoController(
       addressDetail: (org.address_detail as StoreAddress) || null,
       taxInvoiceEmail: meta.taxInvoiceEmail || null,
       ownerPhone: meta.ownerPhone || null,
-      storeSlug: org.code || null,
+      storeSlug: slugRecord?.slug ?? null,
     };
 
     // Fallback: if key fields are empty, try kpa_pharmacy_requests
@@ -229,6 +234,10 @@ export function createPharmacyInfoController(
       console.error('[KPA AuditLog] Failed to write pharmacy info audit:', e);
     }
 
+    // Resolve slug from platform_store_slugs (SSOT)
+    const slugService = new StoreSlugService(dataSource);
+    const slugRecord = await slugService.findByStoreId(organizationId, 'kpa');
+
     const meta = org.metadata as Record<string, any>;
     res.json({
       success: true,
@@ -241,7 +250,7 @@ export function createPharmacyInfoController(
         addressDetail: (org as any).address_detail || null,
         taxInvoiceEmail: meta?.taxInvoiceEmail || null,
         ownerPhone: meta?.ownerPhone || null,
-        storeSlug: org.code || null,
+        storeSlug: slugRecord?.slug ?? null,
       } satisfies PharmacyInfoResponse,
     });
   }));

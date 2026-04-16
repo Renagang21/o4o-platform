@@ -82,6 +82,8 @@ export {
   type TrendingProductItem,
   type SupplierAiInsight,
   type SpotPricePolicy,
+  supplierKpaEventOfferApi,
+  type SupplierEventOfferStats,
 } from './supplier.js';
 
 // Seller API

@@ -10,9 +10,10 @@
  * 운영자 역할: "노출 관리자" (is_active 토글)
  *
  * API:
- *   GET  /kpa/supplier/my-offers    — 제안 가능한 SPO 목록
- *   GET  /kpa/supplier/event-offers — 내 제안 OPL 목록
- *   POST /kpa/supplier/event-offers — SPO → OPL(is_active=false) 제안 생성
+ *   GET  /kpa/supplier/my-offers           — 제안 가능한 SPO 목록
+ *   GET  /kpa/supplier/event-offers        — 내 제안 OPL 목록
+ *   GET  /kpa/supplier/event-offers/stats  — 공급자 Event Offer 성과 집계 (WO-EVENT-OFFER-SUPPLIER-DASHBOARD-STATS-INTEGRATION-V1)
+ *   POST /kpa/supplier/event-offers        — SPO → OPL(is_active=false) 제안 생성
  */
 
 import { Router, Request, Response, RequestHandler } from 'express';
@@ -108,6 +109,63 @@ export function createSupplierOffersController(
         res.json({ success: true, data: { offers, supplierId } });
       } catch (error: any) {
         console.error('[supplier/my-offers] error:', error);
+        err(res, 500, 'INTERNAL_ERROR');
+      }
+    }
+  );
+
+  /**
+   * GET /kpa/supplier/event-offers/stats
+   * 공급자 기준 Event Offer 성과 집계
+   * WO-EVENT-OFFER-SUPPLIER-DASHBOARD-STATS-INTEGRATION-V1
+   *
+   * 집계 기준:
+   *   organization_product_listings (OPL, service_key='kpa-groupbuy')
+   *   → supplier_product_offers → neture_suppliers (user_id 일치)
+   *   → checkout_orders (metadata.productListingId, serviceKey='kpa-groupbuy', status='paid')
+   */
+  router.get(
+    '/event-offers/stats',
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const userId = (req as any).user?.id;
+        const supplierId = await resolveSupplierIdByUser(dataSource, userId);
+
+        if (!supplierId) {
+          err(res, 403, 'SUPPLIER_NOT_FOUND');
+          return;
+        }
+
+        const [statsRow] = await dataSource.query(`
+          SELECT
+            COUNT(DISTINCT opl.id)::int                                              AS "totalOffers",
+            COUNT(DISTINCT CASE WHEN opl.is_active = true  THEN opl.id END)::int    AS "activeOffers",
+            COUNT(DISTINCT CASE WHEN opl.is_active = false THEN opl.id END)::int    AS "inactiveOffers",
+            COUNT(co.id)::int                                                        AS "totalOrders",
+            COALESCE(SUM(co."totalAmount"), 0)::numeric                             AS "totalRevenue"
+          FROM organization_product_listings opl
+          JOIN supplier_product_offers spo ON spo.id = opl.offer_id
+          JOIN neture_suppliers ns          ON ns.id  = spo.supplier_id
+          LEFT JOIN checkout_orders co
+            ON  co.metadata->>'productListingId' = opl.id::text
+            AND co.metadata->>'serviceKey'       = 'kpa-groupbuy'
+            AND co.status = 'paid'
+          WHERE opl.service_key = 'kpa-groupbuy'
+            AND ns.user_id = $1
+        `, [userId]);
+
+        res.json({
+          success: true,
+          data: {
+            totalOffers:    statsRow?.totalOffers    ?? 0,
+            activeOffers:   statsRow?.activeOffers   ?? 0,
+            inactiveOffers: statsRow?.inactiveOffers ?? 0,
+            totalOrders:    statsRow?.totalOrders    ?? 0,
+            totalRevenue:   Number(statsRow?.totalRevenue ?? 0),
+          },
+        });
+      } catch (error: any) {
+        console.error('[supplier/event-offers/stats] error:', error);
         err(res, 500, 'INTERNAL_ERROR');
       }
     }
