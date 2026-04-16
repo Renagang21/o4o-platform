@@ -8,8 +8,13 @@
  *   adminApi/joinRequestApi 의존 제거 → operatorApi.getDistrictSummary() 단일 호출.
  *   Operator scope에서 직접 데이터 조회.
  *
+ * WO-KPA-OPERATOR-DASHBOARD-EVENT-OFFER-KPI-V1:
+ *   기존 /groupbuy-admin/products + /groupbuy-admin/stats API 재사용.
+ *   Event Offer KPI 카드(이벤트/특가, 노출중, 이벤트 주문) 추가.
+ *   이벤트/특가 관리 Quick Action 추가.
+ *
  * Block 구조:
- *  [1] KPI Grid       — 분회, 회원, 승인 대기
+ *  [1] KPI Grid       — 분회, 회원, 승인 대기, 이벤트/특가, 노출중, 이벤트 주문
  *  [2] AI Summary     — 조직 상태 기반 인사이트
  *  [3] Action Queue   — 승인 대기 요청
  *  [4] Activity Log   — 대기 요청 상세
@@ -27,13 +32,20 @@ import {
   type QuickActionItem,
 } from '@o4o/operator-ux-core';
 import { operatorApi, type DistrictOperatorSummary } from '../../api/operator';
+import { eventOfferAdminApi, type GroupbuyProduct, type GroupbuyStats } from '../../api/eventOfferAdmin';
 import { JOIN_REQUEST_TYPE_LABELS } from '../../types/joinRequest';
 import type { JoinRequestType } from '../../types/joinRequest';
+
+interface EventOfferSnapshot {
+  products: GroupbuyProduct[];
+  stats: GroupbuyStats | null;
+}
 
 // ─── Data Transformer ───
 
 function buildDashboardConfig(
   data: DistrictOperatorSummary,
+  eventOffer?: EventOfferSnapshot,
 ): OperatorDashboardConfig {
   const { kpis: stats, pendingRequests } = data;
 
@@ -58,6 +70,33 @@ function buildDashboardConfig(
       status: stats.pendingApprovals > 0 ? 'warning' : 'neutral',
     },
   ];
+
+  // Event Offer KPIs (기존 /groupbuy-admin/products + /groupbuy-admin/stats 재사용)
+  if (eventOffer) {
+    const visibleCount = eventOffer.products.filter(p => p.isVisible).length;
+    kpis.push(
+      {
+        key: 'event-total',
+        label: '이벤트/특가',
+        value: eventOffer.products.length,
+        status: eventOffer.products.length === 0 ? 'warning' : 'neutral',
+      },
+      {
+        key: 'event-visible',
+        label: '노출중',
+        value: visibleCount,
+        status: visibleCount === 0 && eventOffer.products.length > 0 ? 'warning' : 'neutral',
+      },
+    );
+    if (eventOffer.stats !== null) {
+      kpis.push({
+        key: 'event-orders',
+        label: '이벤트 주문',
+        value: eventOffer.stats.totalOrders,
+        status: 'neutral',
+      });
+    }
+  }
 
   // Block 2: AI Summary
   const aiSummary: AiSummaryItem[] = [];
@@ -138,6 +177,7 @@ function buildDashboardConfig(
     { id: 'qa-members', label: '회원 관리', link: '/admin/members', icon: '👥' },
     { id: 'qa-divisions', label: '분회 관리', link: '/admin/divisions', icon: '🏢' },
     { id: 'qa-committee', label: '위원회 관리', link: '/admin/committee-requests', icon: '👔' },
+    { id: 'qa-event-offers', label: '이벤트/특가 관리', link: '/demo/intranet/event-offers', icon: '🏷️' },
     { id: 'qa-settings', label: '설정', link: '/admin/settings', icon: '⚙️' },
   ];
 
@@ -155,8 +195,18 @@ export function KpaOperatorDashboardPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await operatorApi.getDistrictSummary(10);
-      setConfig(buildDashboardConfig(res.data));
+      const [districtRes, productsRes, statsRes] = await Promise.allSettled([
+        operatorApi.getDistrictSummary(10),
+        eventOfferAdminApi.getProducts(),
+        eventOfferAdminApi.getStats(),
+      ]);
+
+      if (districtRes.status === 'rejected') throw districtRes.reason;
+
+      const products = productsRes.status === 'fulfilled' ? (productsRes.value?.data ?? []) : [];
+      const stats = statsRes.status === 'fulfilled' ? (statsRes.value?.data ?? null) : null;
+
+      setConfig(buildDashboardConfig(districtRes.value.data, { products, stats }));
     } catch (err) {
       console.error('Failed to fetch operator dashboard:', err);
       setError('데이터를 불러오지 못했습니다.');

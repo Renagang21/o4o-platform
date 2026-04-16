@@ -191,6 +191,42 @@ export class CertificateController extends BaseController {
     }
   }
 
+  // WO-O4O-LMS-CERTIFICATE-VERIFICATION-V1
+  static async verifyPublic(req: Request, res: Response): Promise<any> {
+    try {
+      const { id } = req.params;
+      const service = CertificateService.getInstance();
+      const certificate = await service.getCertificate(id);
+
+      if (!certificate || !certificate.isValid || certificate.isExpired()) {
+        return res.status(200).json({ valid: false });
+      }
+
+      const userName = (certificate.user as any)?.name || '수강자';
+      const courseTitle = certificate.course?.title || '과정';
+
+      return res.status(200).json({
+        valid: true,
+        certificate: {
+          certificateId: certificate.id,
+          certificateCode: certificate.certificateNumber,
+          userName,
+          courseTitle,
+          completedAt: certificate.completedAt
+            ? new Date(certificate.completedAt).toISOString().split('T')[0]
+            : null,
+          issuedAt: certificate.issuedAt
+            ? new Date(certificate.issuedAt).toISOString().split('T')[0]
+            : null,
+          issuer: certificate.issuerName || 'O4O LMS',
+        },
+      });
+    } catch (error: any) {
+      logger.error('[CertificateController.verifyPublic] Error', { error: error.message });
+      return res.status(200).json({ valid: false });
+    }
+  }
+
   // WO-O4O-LMS-CERTIFICATE-PDF-V1
   static async downloadPdf(req: Request, res: Response): Promise<any> {
     try {

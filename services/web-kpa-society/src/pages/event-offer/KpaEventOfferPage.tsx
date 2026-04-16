@@ -245,9 +245,9 @@ export function KpaEventOfferPage() {
   return (
     <div style={styles.container}>
       <PageHeader
-        title="이벤트"
-        description="약사회 회원 전용 이벤트 상품"
-        breadcrumb={[{ label: '약국 HUB', href: '/hub' }, { label: '이벤트' }]}
+        title="이벤트/특가"
+        description="kpa-society 전용 이벤트 상품"
+        breadcrumb={[{ label: '약국 HUB', href: '/hub' }, { label: '이벤트/특가' }]}
       />
 
       {/* 운영자 통계 카드 */}
@@ -284,7 +284,7 @@ export function KpaEventOfferPage() {
         <div style={styles.bannerContent}>
           <span style={styles.bannerIcon}>🛒</span>
           <div>
-            <p style={styles.bannerTitle}>약사회 이벤트 전용 상품입니다.</p>
+            <p style={styles.bannerTitle}>kpa-society 이벤트 전용 상품입니다.</p>
             <p style={styles.bannerDesc}>
               {hasStore
                 ? '상품을 선택하고 이벤트 공간에서 바로 주문할 수 있습니다.'

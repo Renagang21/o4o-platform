@@ -23,6 +23,8 @@ import { MarketTrialDetailPage } from './pages/market-trial/MarketTrialDetailPag
 
 // LMS pages
 import { EducationPage, LmsCoursesPage, LmsCourseDetailPage, LmsLessonPage, LmsCertificatesPage } from './pages/lms';
+// Certificate Verification (WO-O4O-LMS-CERTIFICATE-VERIFICATION-V1) — public, no auth
+import CertificateVerifyPage from './pages/lms/CertificateVerifyPage';
 
 // Course pages (Public-facing) - WO-CONTENT-COURSE-HUB/INTRO
 import { CourseHubPage, CourseIntroPage } from './pages/courses';
@@ -717,6 +719,9 @@ function App() {
 
           {/* QR Landing Page (WO-O4O-QR-LANDING-PAGE-V1) — public, no auth */}
           <Route path="/qr/:slug" element={<QrLandingPage />} />
+
+          {/* Certificate Verification (WO-O4O-LMS-CERTIFICATE-VERIFICATION-V1) — public, no auth */}
+          <Route path="/certificate/verify/:certificateId" element={<CertificateVerifyPage />} />
 
           {/* Public Signage Rendering (WO-O4O-SIGNAGE-STRUCTURE-CONSOLIDATION-V1) — public, no auth */}
           <Route path="/public/signage" element={<PublicSignagePage />} />

@@ -3,9 +3,13 @@
  *
  * WO-O4O-STORE-MARKETING-DASHBOARD-V1
  * WO-KPA-A-STORE-PHASE1-UI-UX-REFINE-V1: QR 편향 완화 (Quick Actions 확장, 제목 개선)
+ * WO-KPA-STORE-DASHBOARD-EVENT-OFFER-SECTION-V1:
+ *   기존 /groupbuy/my-participations API 재사용.
+ *   이벤트/특가 참여 현황 섹션 추가 (최대 5건).
+ *   이벤트/특가 HUB 및 이력 페이지 연결.
  *
  * Store Hub 마케팅 진입 화면.
- * KPI 요약 + 마케팅 성과 + 최근 활동 + 빠른 이동.
+ * KPI 요약 + 마케팅 성과 + 최근 활동 + 이벤트/특가 + 빠른 이동.
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -21,29 +25,37 @@ import {
   Megaphone,
   BookOpen,
   Clock,
+  Tag,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { colors } from '../../styles/theme';
 import { getMarketingAnalytics, getRecentScans } from '../../api/storeAnalytics';
 import type { MarketingAnalyticsData, RecentScanItem } from '../../api/storeAnalytics';
+import { eventOfferApi } from '../../api';
+import type { GroupbuyParticipation } from '../../types';
 
 export function StoreMarketingDashboardPage() {
   const [analytics, setAnalytics] = useState<MarketingAnalyticsData | null>(null);
   const [recentScans, setRecentScans] = useState<RecentScanItem[]>([]);
+  const [participations, setParticipations] = useState<GroupbuyParticipation[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [analyticsRes, scansRes] = await Promise.all([
+      const [analyticsRes, scansRes, participationsRes] = await Promise.allSettled([
         getMarketingAnalytics(),
         getRecentScans(),
+        eventOfferApi.getMyParticipations({ limit: 5 }),
       ]);
-      if (analyticsRes.success && analyticsRes.data) {
-        setAnalytics(analyticsRes.data);
+      if (analyticsRes.status === 'fulfilled' && analyticsRes.value.success && analyticsRes.value.data) {
+        setAnalytics(analyticsRes.value.data);
       }
-      if (scansRes.success && scansRes.data) {
-        setRecentScans(scansRes.data);
+      if (scansRes.status === 'fulfilled' && scansRes.value.success && scansRes.value.data) {
+        setRecentScans(scansRes.value.data);
+      }
+      if (participationsRes.status === 'fulfilled') {
+        setParticipations(participationsRes.value.data ?? []);
       }
     } catch {
       // silent
@@ -190,6 +202,58 @@ export function StoreMarketingDashboardPage() {
         </div>
       </div>
 
+      {/* 이벤트/특가 섹션 */}
+      <div style={styles.section}>
+        <div style={styles.sectionHeader}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Tag size={16} style={{ color: '#f59e0b' }} />
+            <h2 style={styles.sectionTitle}>이벤트/특가</h2>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <Link to="/event-offers/history" style={styles.seeAllLink}>
+              이력 보기 <ArrowRight size={12} />
+            </Link>
+            <Link to="/hub/event-offers" style={styles.eventHubLink}>
+              이벤트/특가 보러가기 <ArrowRight size={12} />
+            </Link>
+          </div>
+        </div>
+        {participations.length === 0 ? (
+          <div style={styles.eventEmptyState}>
+            <Tag size={32} style={{ color: colors.neutral300, marginBottom: '8px' }} />
+            <p style={styles.emptyText}>참여한 이벤트가 없습니다.</p>
+            <Link to="/hub/event-offers" style={styles.eventEmptyBtn}>
+              이벤트/특가 확인하기
+            </Link>
+          </div>
+        ) : (
+          <div style={styles.eventList}>
+            {participations.slice(0, 5).map((p) => {
+              const badge = STATUS_BADGE[p.status] ?? STATUS_BADGE.pending;
+              return (
+                <div key={p.id} style={styles.eventItem}>
+                  <div style={styles.eventInfo}>
+                    <p style={styles.eventTitle}>{p.groupbuy?.title ?? '이벤트'}</p>
+                    <span style={styles.eventMeta}>
+                      <Clock size={10} style={{ marginRight: '3px' }} />
+                      {formatRelativeTime(p.participatedAt)}
+                    </span>
+                  </div>
+                  <div style={styles.eventRight}>
+                    <span style={{ ...styles.eventBadge, color: badge.color, backgroundColor: badge.bg }}>
+                      {badge.label}
+                    </span>
+                    <span style={styles.eventAmount}>
+                      {p.quantity}개 · {new Intl.NumberFormat('ko-KR').format(p.totalPrice)}원
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
       {/* Quick Actions */}
       <div style={styles.section}>
         <h2 style={styles.sectionTitle}>빠른 이동</h2>
@@ -224,6 +288,12 @@ export function StoreMarketingDashboardPage() {
     </div>
   );
 }
+
+const STATUS_BADGE: Record<string, { label: string; color: string; bg: string }> = {
+  pending:   { label: '대기중', color: '#92400e', bg: '#FEF3C7' },
+  confirmed: { label: '확정',   color: '#065f46', bg: '#D1FAE5' },
+  cancelled: { label: '취소',   color: '#991b1b', bg: '#FEE2E2' },
+};
 
 function formatRelativeTime(dateStr: string): string {
   const now = Date.now();
@@ -450,6 +520,84 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '11px',
     color: colors.neutral400,
     marginTop: '2px',
+  },
+
+  // Event Offer section
+  eventHubLink: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+    fontSize: '12px',
+    color: '#f59e0b',
+    textDecoration: 'none',
+    fontWeight: 500,
+  },
+  eventEmptyState: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    alignItems: 'center',
+    padding: '24px 0 8px',
+  },
+  eventEmptyBtn: {
+    marginTop: '10px',
+    padding: '7px 16px',
+    borderRadius: '8px',
+    backgroundColor: '#FEF3C7',
+    color: '#92400e',
+    fontSize: '13px',
+    fontWeight: 500,
+    textDecoration: 'none',
+  },
+  eventList: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '6px',
+  },
+  eventItem: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '10px 12px',
+    borderRadius: '8px',
+    backgroundColor: colors.neutral50,
+  },
+  eventInfo: {
+    flex: 1,
+    minWidth: 0,
+  },
+  eventTitle: {
+    fontSize: '13px',
+    fontWeight: 500,
+    color: colors.neutral800,
+    margin: 0,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap' as const,
+  },
+  eventMeta: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    fontSize: '11px',
+    color: colors.neutral400,
+    marginTop: '2px',
+  },
+  eventRight: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    alignItems: 'flex-end',
+    gap: '4px',
+    marginLeft: '12px',
+    flexShrink: 0,
+  },
+  eventBadge: {
+    fontSize: '11px',
+    fontWeight: 500,
+    padding: '2px 8px',
+    borderRadius: '4px',
+  },
+  eventAmount: {
+    fontSize: '12px',
+    color: colors.neutral600,
   },
 
   // Quick Actions
