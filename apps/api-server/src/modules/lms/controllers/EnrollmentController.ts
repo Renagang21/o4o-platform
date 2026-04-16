@@ -178,4 +178,64 @@ export class EnrollmentController extends BaseController {
       return BaseController.error(res, error);
     }
   }
+
+  // WO-O4O-LMS-ROUTING-INTEGRATION-FIX-V1
+  static async getMyEnrollmentForCourse(req: Request, res: Response): Promise<any> {
+    try {
+      const { courseId } = req.params;
+      const userId = (req as any).user?.id;
+
+      if (!userId) return BaseController.unauthorized(res, 'User not authenticated');
+
+      const service = EnrollmentService.getInstance();
+      const enrollment = await service.getEnrollmentByUserAndCourse(userId, courseId);
+
+      if (!enrollment) return BaseController.notFound(res, 'Enrollment not found');
+
+      return BaseController.ok(res, { enrollment });
+    } catch (error: any) {
+      logger.error('[EnrollmentController.getMyEnrollmentForCourse] Error', { error: error.message });
+      return BaseController.error(res, error);
+    }
+  }
+
+  // WO-O4O-LMS-ROUTING-INTEGRATION-FIX-V1
+  static async updateLessonProgress(req: Request, res: Response): Promise<any> {
+    try {
+      const { courseId } = req.params;
+      const userId = (req as any).user?.id;
+      const { lessonId, completed } = req.body;
+
+      if (!userId) return BaseController.unauthorized(res, 'User not authenticated');
+
+      const service = EnrollmentService.getInstance();
+      const enrollment = await service.getEnrollmentByUserAndCourse(userId, courseId);
+
+      if (!enrollment) return BaseController.notFound(res, 'Enrollment not found');
+
+      if (completed && lessonId) {
+        // Track completed lesson IDs in metadata
+        const completedIds: string[] = enrollment.metadata?.completedLessonIds || [];
+        if (!completedIds.includes(lessonId)) {
+          completedIds.push(lessonId);
+          const totalLessons = enrollment.totalLessons || 1;
+          await service.updateEnrollment(enrollment.id, {
+            completedLessons: completedIds.length,
+            totalLessons,
+          });
+          // Save metadata separately via updateEnrollment
+          const repo = (service as any).enrollmentRepository;
+          await repo.update(enrollment.id, {
+            metadata: { ...enrollment.metadata, completedLessonIds: completedIds },
+          });
+        }
+      }
+
+      const updated = await service.getEnrollment(enrollment.id);
+      return BaseController.ok(res, { enrollment: updated });
+    } catch (error: any) {
+      logger.error('[EnrollmentController.updateLessonProgress] Error', { error: error.message });
+      return BaseController.error(res, error);
+    }
+  }
 }

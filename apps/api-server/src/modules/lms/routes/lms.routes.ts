@@ -125,6 +125,12 @@ router.post('/enrollments/:id/complete', requireAuth, asyncHandler(EnrollmentCon
 // POST /api/v1/lms/enrollments/:id/cancel - Cancel Enrollment
 router.post('/enrollments/:id/cancel', requireAuth, asyncHandler(EnrollmentController.cancelEnrollment));
 
+// GET /api/v1/lms/enrollments/me/course/:courseId - Get My Enrollment for a Course (WO-O4O-LMS-ROUTING-INTEGRATION-FIX-V1)
+router.get('/enrollments/me/course/:courseId', requireAuth, asyncHandler(EnrollmentController.getMyEnrollmentForCourse));
+
+// POST /api/v1/lms/enrollments/:courseId/progress - Update Lesson Progress (WO-O4O-LMS-ROUTING-INTEGRATION-FIX-V1)
+router.post('/enrollments/:courseId/progress', requireAuth, asyncHandler(EnrollmentController.updateLessonProgress));
+
 // ========================================
 // CERTIFICATE ROUTES
 // ========================================

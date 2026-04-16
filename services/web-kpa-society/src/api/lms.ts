@@ -37,21 +37,24 @@ export const lmsApi = {
   getLessons: (courseId: string) =>
     apiClient.get<ApiResponse<Lesson[]>>(`/lms/courses/${courseId}/lessons`),
 
-  getLesson: (courseId: string, lessonId: string) =>
-    apiClient.get<ApiResponse<Lesson>>(`/lms/courses/${courseId}/lessons/${lessonId}`),
+  // WO-O4O-LMS-ROUTING-INTEGRATION-FIX-V1: use /lms/lessons/:id (not course sub-path)
+  getLesson: (_courseId: string, lessonId: string) =>
+    apiClient.get<ApiResponse<{ lesson: Lesson }>>(`/lms/lessons/${lessonId}`),
 
   // 진행
   getMyEnrollments: (params?: { status?: string; page?: number; limit?: number }) =>
     apiClient.get<PaginatedResponse<Enrollment>>('/lms/enrollments', params),
 
-  getEnrollment: (courseId: string) =>
-    apiClient.get<ApiResponse<Enrollment>>(`/lms/enrollments/${courseId}`),
+  // WO-O4O-LMS-ROUTING-INTEGRATION-FIX-V1: lookup by courseId for current user
+  getEnrollmentByCourse: (courseId: string) =>
+    apiClient.get<ApiResponse<{ enrollment: Enrollment }>>(`/lms/enrollments/me/course/${courseId}`),
 
   enrollCourse: (courseId: string) =>
-    apiClient.post<ApiResponse<Enrollment>>(`/lms/courses/${courseId}/enroll`),
+    apiClient.post<ApiResponse<{ enrollment: Enrollment }>>(`/lms/courses/${courseId}/enroll`),
 
+  // WO-O4O-LMS-ROUTING-INTEGRATION-FIX-V1: progress endpoint now exists in backend
   updateProgress: (courseId: string, lessonId: string, completed: boolean) =>
-    apiClient.post<ApiResponse<Enrollment>>(`/lms/enrollments/${courseId}/progress`, {
+    apiClient.post<ApiResponse<{ enrollment: Enrollment }>>(`/lms/enrollments/${courseId}/progress`, {
       lessonId,
       completed,
     }),

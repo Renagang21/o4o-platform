@@ -40,14 +40,15 @@ export function LmsCourseDetailPage() {
         lmsApi.getLessons(id!),
       ]);
 
-      setCourse(courseRes.data);
-      setLessons(lessonsRes.data);
+      // WO-O4O-LMS-ROUTING-INTEGRATION-FIX-V1: extract from nested response shapes
+      setCourse((courseRes as any).data?.course ?? (courseRes as any).data ?? null);
+      setLessons(Array.isArray((lessonsRes as any).data) ? (lessonsRes as any).data : []);
 
       // 진행 정보 확인 (로그인 시)
       if (user) {
         try {
-          const enrollmentRes = await lmsApi.getEnrollment(id!);
-          setEnrollment(enrollmentRes.data);
+          const enrollmentRes = await lmsApi.getEnrollmentByCourse(id!);
+          setEnrollment((enrollmentRes as any).data?.enrollment ?? (enrollmentRes as any).data ?? null);
         } catch {
           // 미시작 상태
         }
@@ -68,7 +69,7 @@ export function LmsCourseDetailPage() {
     try {
       setEnrolling(true);
       const res = await lmsApi.enrollCourse(id!);
-      setEnrollment(res.data);
+      setEnrollment((res as any).data?.enrollment ?? (res as any).data ?? null);
       toast.success('시작 등록이 완료되었습니다.');
     } catch (err) {
       toast.error('시작 등록에 실패했습니다.');

@@ -51,19 +51,25 @@ export function LmsLessonPage() {
         lmsApi.getLesson(courseId!, lessonId!),
       ]);
 
-      setCourse(courseRes.data);
-      setLessons(lessonsRes.data);
-      setCurrentLesson(lessonRes.data);
+      // WO-O4O-LMS-ROUTING-INTEGRATION-FIX-V1: extract from nested response shapes
+      const courseData = (courseRes as any).data?.course ?? (courseRes as any).data ?? null;
+      const lessonsData = Array.isArray((lessonsRes as any).data) ? (lessonsRes as any).data : [];
+      const lessonData = (lessonRes as any).data?.lesson ?? (lessonRes as any).data ?? null;
+
+      setCourse(courseData);
+      setLessons(lessonsData);
+      setCurrentLesson(lessonData);
 
       try {
-        const enrollmentRes = await lmsApi.getEnrollment(courseId!);
-        setEnrollment(enrollmentRes.data);
+        const enrollmentRes = await lmsApi.getEnrollmentByCourse(courseId!);
+        const enrollmentData = (enrollmentRes as any).data?.enrollment ?? (enrollmentRes as any).data ?? null;
+        setEnrollment(enrollmentData);
       } catch {
         // 미시작 상태
       }
 
       // Load quiz if lesson type is quiz
-      if (lessonRes.data?.type === 'quiz') {
+      if (lessonData?.type === 'quiz') {
         try {
           const quizRes = await lmsApi.getQuizForLesson(lessonId!);
           if (quizRes.data?.quiz) {
@@ -85,7 +91,9 @@ export function LmsLessonPage() {
 
     try {
       const res = await lmsApi.updateProgress(courseId, lessonId, true);
-      setEnrollment(res.data);
+      // WO-O4O-LMS-ROUTING-INTEGRATION-FIX-V1: extract enrollment from nested response
+      const updatedEnrollment = (res as any).data?.enrollment ?? (res as any).data ?? null;
+      setEnrollment(updatedEnrollment);
 
       // 다음 레슨으로 이동
       const currentIndex = lessons.findIndex(l => l.id === lessonId);
@@ -131,8 +139,9 @@ export function LmsLessonPage() {
           : '퀴즈를 통과했습니다!');
         // Reload enrollment to reflect progress
         try {
-          const enrollmentRes = await lmsApi.getEnrollment(courseId!);
-          setEnrollment(enrollmentRes.data);
+          const enrollmentRes = await lmsApi.getEnrollmentByCourse(courseId!);
+          const enrollmentData = (enrollmentRes as any).data?.enrollment ?? (enrollmentRes as any).data ?? null;
+          setEnrollment(enrollmentData);
         } catch {
           // ignore
         }
@@ -171,7 +180,10 @@ export function LmsLessonPage() {
   const currentIndex = lessons.findIndex(l => l.id === lessonId);
   const prevLesson = currentIndex > 0 ? lessons[currentIndex - 1] : null;
   const nextLesson = currentIndex < lessons.length - 1 ? lessons[currentIndex + 1] : null;
-  const isCompleted = enrollment?.completedLessons?.includes(currentLesson.id);
+  // WO-O4O-LMS-ROUTING-INTEGRATION-FIX-V1: completedLessons is a count (number), not array
+  // Use metadata.completedLessonIds for per-lesson completion tracking
+  const completedLessonIds: string[] = (enrollment as any)?.metadata?.completedLessonIds || [];
+  const isCompleted = completedLessonIds.includes(currentLesson.id);
   const isQuizLesson = currentLesson.type === 'quiz' && quiz;
 
   return (
@@ -188,7 +200,7 @@ export function LmsLessonPage() {
         <div style={styles.lessonList}>
           {lessons.map((lesson, index) => {
             const isActive = lesson.id === lessonId;
-            const isLessonCompleted = enrollment?.completedLessons?.includes(lesson.id);
+            const isLessonCompleted = completedLessonIds.includes(lesson.id);
 
             return (
               <Link
