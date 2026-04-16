@@ -26,8 +26,8 @@ export function MyPageNavigation({
   const normalizedBase = basePath.replace(/\/+$/, '');
 
   return (
-    <nav className="mb-6 border-b border-gray-200 overflow-x-auto">
-      <div className="flex min-w-max">
+    <nav className="mb-6 border-b border-gray-200">
+      <div className="flex flex-wrap">
         {items.map((item) => {
           const fullPath = item.path
             ? `${normalizedBase}${item.path}`
