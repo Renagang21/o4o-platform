@@ -13,6 +13,11 @@
  *
  * WO-MARKET-TRIAL-MY-PARTICIPATION-STATUS-V1:
  * getMyParticipations() — 현재 사용자의 전체 참여 목록 반환 (허브 참여 상태 표시용)
+ *
+ * WO-MARKET-TRIAL-PHASE2-PARTICIPANT-DASHBOARD-AND-SETTLEMENT-STATE-V1:
+ * getMyParticipations() 확장 — 정산 계산값 포함
+ * getMyParticipationDetail() — 참여 상세 + 정산 예시
+ * saveSettlementChoice() — 참여자 선택 저장 (product/cash)
  */
 
 import { Response } from 'express';
@@ -256,8 +261,10 @@ export class MarketTrialController {
 
       const data = participations.map((p) => {
         const trial = trialMap.get(p.marketTrialId);
+        const settlementCalc = trial ? calcSettlementForParticipant(p, trial) : null;
         return {
           ...toParticipationDTO(p),
+          ...settlementCalc,
           trial: trial ? {
             id: trial.id,
             title: trial.title,
@@ -593,6 +600,118 @@ export class MarketTrialController {
       });
     }
   }
+
+  /**
+   * GET /api/market-trial/:id/my-settlement
+   * 현재 사용자의 특정 Trial 참여 상세 + 정산 계산 정보
+   * WO-MARKET-TRIAL-PHASE2-PARTICIPANT-DASHBOARD-AND-SETTLEMENT-STATE-V1
+   */
+  static async getMyParticipationDetail(req: AuthRequest, res: Response) {
+    try {
+      const { id } = req.params;
+      const userId = (req as any).user?.id;
+      if (!userId) {
+        return res.status(401).json({ success: false, message: 'Authentication required' });
+      }
+
+      const participation = await MarketTrialController.participantRepo.findOne({
+        where: { marketTrialId: id, participantId: userId },
+      });
+      if (!participation) {
+        return res.status(404).json({ success: false, message: 'Participation not found' });
+      }
+
+      const trial = await MarketTrialController.trialRepo.findOne({ where: { id } });
+      const settlementCalc = trial ? calcSettlementForParticipant(participation, trial) : null;
+
+      const forumMapping = await MarketTrialController.forumRepo.findOne({
+        where: { marketTrialId: id },
+      });
+
+      res.json({
+        success: true,
+        data: {
+          ...toParticipationDTO(participation),
+          ...settlementCalc,
+          trial: trial ? toTrialDTO(trial, forumMapping?.forumId) : undefined,
+        },
+      });
+    } catch (error) {
+      console.error('Get my participation detail error:', error);
+      res.status(500).json({ success: false, message: 'Failed to get participation detail' });
+    }
+  }
+
+  /**
+   * POST /api/market-trial/:id/settlement-choice
+   * 참여자 정산 선택 저장 (product | cash)
+   * WO-MARKET-TRIAL-PHASE2-PARTICIPANT-DASHBOARD-AND-SETTLEMENT-STATE-V1
+   */
+  static async saveSettlementChoice(req: AuthRequest, res: Response) {
+    try {
+      const { id } = req.params;
+      const { choice } = req.body;
+      const userId = (req as any).user?.id;
+      if (!userId) {
+        return res.status(401).json({ success: false, message: 'Authentication required' });
+      }
+
+      if (!choice || !['product', 'cash'].includes(choice)) {
+        return res.status(400).json({ success: false, message: 'choice must be "product" or "cash"' });
+      }
+
+      const participation = await MarketTrialController.participantRepo.findOne({
+        where: { marketTrialId: id, participantId: userId },
+      });
+      if (!participation) {
+        return res.status(404).json({ success: false, message: 'Participation not found' });
+      }
+
+      // 상태 전이 보호: 이미 오프라인 정산 완료 시 변경 금지
+      if (participation.settlementStatus === 'offline_settled') {
+        return res.status(400).json({
+          success: false,
+          message: '정산이 완료된 참여는 선택을 변경할 수 없습니다.',
+        });
+      }
+
+      // 선택 가능 상태 검증: pending은 아직 선택 불가
+      if (participation.settlementStatus === 'pending') {
+        return res.status(400).json({
+          success: false,
+          message: '아직 정산 선택이 가능한 시점이 아닙니다.',
+        });
+      }
+
+      const trial = await MarketTrialController.trialRepo.findOne({ where: { id } });
+      const settlementCalc = trial ? calcSettlementForParticipant(participation, trial) : null;
+
+      // 선택 저장 + 상태 → choice_completed
+      await MarketTrialController.participantRepo.update(participation.id, {
+        settlementChoice: choice,
+        settlementStatus: 'choice_completed',
+        settlementAmount: settlementCalc?.totalSettlementAmount ?? null,
+        settlementProductQty: choice === 'product' ? (settlementCalc?.estimatedProductQty ?? null) : null,
+        settlementRemainder: choice === 'product' ? (settlementCalc?.estimatedRemainder ?? null) : null,
+      } as any);
+
+      const updated = await MarketTrialController.participantRepo.findOne({
+        where: { id: participation.id },
+      });
+
+      res.json({
+        success: true,
+        data: {
+          ...toParticipationDTO(updated!),
+          ...calcSettlementForParticipant(updated!, trial),
+        },
+        message: '선택이 저장되었습니다.',
+      });
+    } catch (error) {
+      console.error('Save settlement choice error:', error);
+      res.status(500).json({ success: false, message: 'Failed to save settlement choice' });
+    }
+  }
 }
 
 /**
@@ -688,7 +807,8 @@ function toGatewayDTO(trial: MarketTrial): any {
 }
 
 /**
- * Convert participant entity to legacy-compatible DTO format
+ * Convert participant entity to DTO format
+ * Phase 2: 정산 필드 포함
  */
 function toParticipationDTO(p: MarketTrialParticipant): any {
   return {
@@ -698,6 +818,52 @@ function toParticipationDTO(p: MarketTrialParticipant): any {
     role: p.participantType,
     rewardType: p.rewardType || 'cash',
     rewardStatus: p.rewardStatus,
+    // Phase 2 settlement fields
+    settlementChoice: p.settlementChoice ?? null,
+    settlementStatus: p.settlementStatus || 'pending',
+    settlementAmount: p.settlementAmount != null ? Number(p.settlementAmount) : null,
+    settlementProductQty: p.settlementProductQty ?? null,
+    settlementRemainder: p.settlementRemainder != null ? Number(p.settlementRemainder) : null,
+    creditProcessStatus: p.creditProcessStatus || 'not_applicable',
+    settlementNote: p.settlementNote ?? null,
     joinedAt: new Date(p.createdAt).toISOString(),
+  };
+}
+
+/**
+ * 참여자 기준 정산 계산값 반환
+ * contributionAmount(참여금) × (1 + rewardRate/100) = totalSettlementAmount
+ * WO-MARKET-TRIAL-PHASE2-PARTICIPANT-DASHBOARD-AND-SETTLEMENT-STATE-V1
+ */
+function calcSettlementForParticipant(
+  p: MarketTrialParticipant,
+  trial: MarketTrial,
+): {
+  contributionAmount: number;
+  rewardRate: number;
+  totalSettlementAmount: number;
+  trialUnitPrice: number | null;
+  estimatedProductQty: number | null;
+  estimatedRemainder: number | null;
+} {
+  const contribution = Number(p.contributionAmount) || 0;
+  const rewardRate = Number(trial.rewardRate) || 0;
+  const unitPrice = Number(trial.trialUnitPrice) || 0;
+  const totalSettlementAmount = Math.round(contribution * (1 + rewardRate / 100));
+
+  let estimatedProductQty: number | null = null;
+  let estimatedRemainder: number | null = null;
+  if (unitPrice > 0) {
+    estimatedProductQty = Math.floor(totalSettlementAmount / unitPrice);
+    estimatedRemainder = Math.round(totalSettlementAmount - estimatedProductQty * unitPrice);
+  }
+
+  return {
+    contributionAmount: contribution,
+    rewardRate,
+    totalSettlementAmount,
+    trialUnitPrice: unitPrice || null,
+    estimatedProductQty,
+    estimatedRemainder,
   };
 }

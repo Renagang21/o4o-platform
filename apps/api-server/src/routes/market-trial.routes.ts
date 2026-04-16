@@ -34,4 +34,8 @@ router.get('/:id/results', authenticate, MarketTrialController.getSupplierTrialR
 router.post('/:id/join', authenticate, MarketTrialController.joinTrial);
 router.patch('/:id/submit', authenticate, MarketTrialController.submitTrial);
 
+// WO-MARKET-TRIAL-PHASE2-PARTICIPANT-DASHBOARD-AND-SETTLEMENT-STATE-V1
+router.get('/:id/my-settlement', authenticate, MarketTrialController.getMyParticipationDetail);
+router.post('/:id/settlement-choice', authenticate, MarketTrialController.saveSettlementChoice);
+
 export default router;

@@ -129,13 +129,41 @@ export interface ParticipationInfo {
   joinedAt: string;
 }
 
+// WO-MARKET-TRIAL-PHASE2-PARTICIPANT-DASHBOARD-AND-SETTLEMENT-STATE-V1
+export type SettlementStatus =
+  | 'pending'
+  | 'choice_pending'
+  | 'choice_completed'
+  | 'offline_review'
+  | 'offline_settled';
+
+export type CreditProcessStatus = 'not_applicable' | 'pending' | 'planned' | 'completed';
+
+export interface ParticipationInfoDetail extends ParticipationInfo {
+  // 정산 선택/상태
+  settlementChoice: 'product' | 'cash' | null;
+  settlementStatus: SettlementStatus;
+  settlementAmount: number | null;
+  settlementProductQty: number | null;
+  settlementRemainder: number | null;
+  creditProcessStatus: CreditProcessStatus;
+  settlementNote: string | null;
+  // 계산값 (API가 trial 기준으로 계산)
+  contributionAmount?: number;
+  rewardRate?: number;
+  totalSettlementAmount?: number;
+  trialUnitPrice?: number | null;
+  estimatedProductQty?: number | null;
+  estimatedRemainder?: number | null;
+}
+
 /**
  * 현재 사용자의 참여 정보 조회
  * WO-MARKET-TRIAL-PARTICIPATION-REQUEST-UI-V1
  */
 export async function getParticipation(
   trialId: string,
-): Promise<{ success: boolean; data: ParticipationInfo | null }> {
+): Promise<{ success: boolean; data: ParticipationInfoDetail | null }> {
   const token = getAccessToken();
   if (!token) return { success: true, data: null };
   const res = await fetch(`${API_BASE}/api/market-trial/${trialId}/participation`, {
@@ -167,7 +195,7 @@ export async function joinTrial(
 
 // ── My Participations ──
 
-export interface MyParticipationSummary extends ParticipationInfo {
+export interface MyParticipationSummary extends ParticipationInfoDetail {
   trial?: {
     id: string;
     title: string;
@@ -188,6 +216,40 @@ export async function getMyParticipations(): Promise<{
   if (!token) return { success: true, data: [] };
   const res = await fetch(`${API_BASE}/api/market-trial/my-participations`, {
     headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.json();
+}
+
+/**
+ * 특정 Trial 내 참여 상세 + 정산 계산 조회
+ * WO-MARKET-TRIAL-PHASE2-PARTICIPANT-DASHBOARD-AND-SETTLEMENT-STATE-V1
+ */
+export async function getMyParticipationDetail(trialId: string): Promise<{
+  success: boolean;
+  data: ParticipationInfoDetail & { trial?: TrialSummary };
+}> {
+  const token = getAccessToken();
+  if (!token) return { success: false, data: null as any };
+  const res = await fetch(`${API_BASE}/api/market-trial/${trialId}/my-settlement`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.json();
+}
+
+/**
+ * 정산 선택 저장 (product | cash)
+ * WO-MARKET-TRIAL-PHASE2-PARTICIPANT-DASHBOARD-AND-SETTLEMENT-STATE-V1
+ */
+export async function saveSettlementChoice(
+  trialId: string,
+  choice: 'product' | 'cash',
+): Promise<{ success: boolean; data?: ParticipationInfoDetail; message?: string }> {
+  const token = getAccessToken();
+  if (!token) return { success: false, message: '로그인이 필요합니다.' };
+  const res = await fetch(`${API_BASE}/api/market-trial/${trialId}/settlement-choice`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ choice }),
   });
   return res.json();
 }

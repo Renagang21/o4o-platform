@@ -156,6 +156,12 @@ export function MarketTrialHubPage() {
           {myTrials.map((trial) => (
             <TrialCard key={`my-${trial.id}`} trial={trial} group={getDisplayGroup(trial.status)} participation={participationMap.get(trial.id)} />
           ))}
+          {/* WO-MARKET-TRIAL-PHASE2: 내 참여 전체 보기 링크 */}
+          <div style={{ textAlign: 'right', marginTop: '4px' }}>
+            <Link to="/market-trial/my" style={{ fontSize: '0.875rem', color: '#7C3AED', fontWeight: 600, textDecoration: 'none' }}>
+              내 참여 내역 전체 보기 →
+            </Link>
+          </div>
         </Section>
       )}
 
