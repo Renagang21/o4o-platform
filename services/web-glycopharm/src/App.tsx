@@ -67,11 +67,10 @@ const HqPlaylistDetailPage = lazy(() => import('@/pages/operator/signage/HqPlayl
 const SignageTemplatesPage = lazy(() => import('@/pages/operator/signage/TemplatesPage'));
 const SignageTemplateDetailPage = lazy(() => import('@/pages/operator/signage/TemplateDetailPage'));
 
-// Market Trial Extension
-const MarketTrialListPage = lazy(() => import('@/pages/store-management/market-trial').then(m => ({ default: m.MarketTrialListPage })));
-// OperatorTrialSelectorPage removed (WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: deprecated)
-// WO-O4O-MARKET-TRIAL-PHASE1-V1: Service approval + store detail pages
-const MarketTrialDetailPage = lazy(() => import('@/pages/store-management/market-trial/MarketTrialDetailPage'));
+// Market Trial → Neture redirect
+// WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1:
+// Market Trial 실행은 Neture로 일원화. /store/market-trial/* 는 동일 경로의 Neture로 redirect.
+const MarketTrialNetureRedirect = lazy(() => import('@/components/common/MarketTrialNetureRedirect'));
 
 // B2B Order & Supply
 const B2BOrderPage = lazy(() => import('@/pages/store-management/b2b-order').then(m => ({ default: m.B2BOrderPage })));
@@ -532,8 +531,10 @@ function AppRoutes() {
         <Route path="signage/media/:id" element={<SignageMediaDetailPage />} />
         <Route path="signage/preview" element={<SignagePreviewPage />} />
         {/* Extensions */}
-        <Route path="market-trial" element={<MarketTrialListPage />} />
-        <Route path="market-trial/:id" element={<MarketTrialDetailPage />} />
+        {/* WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1:
+            Market Trial 실행은 Neture로 일원화. URL은 호환을 위해 유지하고 redirect 처리. */}
+        <Route path="market-trial" element={<MarketTrialNetureRedirect />} />
+        <Route path="market-trial/:id" element={<MarketTrialNetureRedirect />} />
         <Route path="b2b-order" element={<B2BOrderPage />} />
         <Route path="requests" element={<CustomerRequestsPage />} />
         <Route path="funnel" element={<FunnelPage />} />

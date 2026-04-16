@@ -17,11 +17,9 @@ import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 // Forum pages
 import { ForumHomePage, ForumListPage, ForumDetailPage, ForumWritePage } from './pages/forum';
 
-// Market Trial (WO-MARKET-TRIAL-SERVICE-ENTRY-BANNER-AND-GATEWAY-V1, WO-MARKET-TRIAL-KPA-DETAIL-AND-FORUM-DEEP-LINK-V1)
-import { MarketTrialHubPage } from './pages/market-trial/MarketTrialHubPage';
-import { MarketTrialDetailPage } from './pages/market-trial/MarketTrialDetailPage';
-// Market Trial Phase 2 (WO-MARKET-TRIAL-PHASE2-PARTICIPANT-DASHBOARD-AND-SETTLEMENT-STATE-V1)
-import { MyParticipationsPage } from './pages/market-trial/MyParticipationsPage';
+// Market Trial — WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1
+// 실행은 Neture 단독. KPA는 entry → Neture redirect 만 유지.
+import { MarketTrialNetureRedirect } from './components/MarketTrialNetureRedirect';
 
 // LMS pages
 import { EducationPage, LmsCoursesPage, LmsCourseDetailPage, LmsLessonPage, LmsCertificatesPage } from './pages/lms';
@@ -391,10 +389,11 @@ function App() {
           <Route path="/forum/write" element={<Layout serviceName={SERVICE_NAME}><ForumWritePage /></Layout>} />
           <Route path="/forum/edit/:id" element={<Layout serviceName={SERVICE_NAME}><ForumWritePage /></Layout>} />
 
-          {/* Market Trial (WO-MARKET-TRIAL-SERVICE-ENTRY-BANNER-AND-GATEWAY-V1, WO-MARKET-TRIAL-KPA-DETAIL-AND-FORUM-DEEP-LINK-V1) */}
-          <Route path="/market-trial" element={<Layout serviceName={SERVICE_NAME}><MarketTrialHubPage /></Layout>} />
-          <Route path="/market-trial/my" element={<Layout serviceName={SERVICE_NAME}><MyParticipationsPage /></Layout>} />
-          <Route path="/market-trial/:id" element={<Layout serviceName={SERVICE_NAME}><MarketTrialDetailPage /></Layout>} />
+          {/* Market Trial — WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1
+              실행은 Neture 단독. 기존 URL은 backward-compat을 위해 redirect 유지. */}
+          <Route path="/market-trial" element={<Layout serviceName={SERVICE_NAME}><MarketTrialNetureRedirect /></Layout>} />
+          <Route path="/market-trial/my" element={<Layout serviceName={SERVICE_NAME}><MarketTrialNetureRedirect /></Layout>} />
+          <Route path="/market-trial/:id" element={<Layout serviceName={SERVICE_NAME}><MarketTrialNetureRedirect /></Layout>} />
 
 
 

@@ -86,11 +86,12 @@ const heroSlides: HeroSlide[] = [
     cta: { label: '시작하기', link: '/platform/stores', variant: 'primary' },
   },
   {
+    // WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1: Market Trial은 Neture 통합 허브로 진입
     id: 'trial',
-    title: '신상품 시범판매\nKPA-a 허브에서 참여하세요',
+    title: '신상품 시범판매\nNeture 허브에서 참여하세요',
     subtitle: '브랜드의 신상품을 먼저 체험하고 피드백을 공유하세요',
     bgGradient: '#334155',
-    cta: { label: '시범판매 현황 보기', link: '/store/market-trial', variant: 'primary' },
+    cta: { label: 'Neture에서 시범판매 보기', link: 'https://neture.co.kr/market-trial', variant: 'primary' },
   },
   {
     id: 'tourist',
@@ -310,26 +311,42 @@ function HeroSection() {
                       매장·브랜드와 함께 운영 구조를 검증하는 단계입니다
                     </p>
                   )}
-                  {slide.cta && (
-                    <Link
-                      to={slide.cta.link}
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        padding: '12px 24px',
-                        borderRadius: '6px',
-                        fontWeight: 500,
-                        fontSize: '14px',
-                        textDecoration: 'none',
-                        backgroundColor: '#fff',
-                        color: '#1e293b',
-                      }}
-                    >
-                      {slide.cta.label}
-                      <span>→</span>
-                    </Link>
-                  )}
+                  {slide.cta && (() => {
+                    // WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1:
+                    // 외부 URL(http://, https://)은 <a target="_blank">, 내부는 <Link>
+                    const ctaStyle = {
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '12px 24px',
+                      borderRadius: '6px',
+                      fontWeight: 500,
+                      fontSize: '14px',
+                      textDecoration: 'none',
+                      backgroundColor: '#fff',
+                      color: '#1e293b',
+                    } as const;
+                    const isExternal = /^https?:\/\//.test(slide.cta.link);
+                    if (isExternal) {
+                      return (
+                        <a
+                          href={slide.cta.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={ctaStyle}
+                        >
+                          {slide.cta.label}
+                          <span>→</span>
+                        </a>
+                      );
+                    }
+                    return (
+                      <Link to={slide.cta.link} style={ctaStyle}>
+                        {slide.cta.label}
+                        <span>→</span>
+                      </Link>
+                    );
+                  })()}
                 </div>
               </div>
             </div>

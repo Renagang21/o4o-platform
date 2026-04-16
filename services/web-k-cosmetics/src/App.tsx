@@ -88,8 +88,10 @@ const SignageTemplateDetailPage = lazy(() => import('@/pages/operator/signage/Te
 import { StoreDashboardLayout, StorePlaceholderPage, COSMETICS_STORE_CONFIG, resolveStoreMenu } from '@o4o/store-ui-core';
 import { useStoreCapabilities } from './hooks/useStoreCapabilities';
 
-// Market Trial (WO-MARKET-TRIAL-B2B-API-UNIFICATION-V1)
-const MarketTrialListPage = lazy(() => import('@/pages/store/MarketTrialListPage'));
+// Market Trial → Neture redirect
+// WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1:
+// Market Trial 실행은 Neture로 일원화. /store/market-trial 은 Neture로 redirect.
+const MarketTrialNetureRedirect = lazy(() => import('@/components/common/MarketTrialNetureRedirect'));
 
 // Operator Dashboard Pages
 const KCosmeticsOperatorDashboard = lazy(() => import('@/pages/operator/KCosmeticsOperatorDashboard'));
@@ -381,7 +383,9 @@ function AppRoutes() {
         <Route path="orders" element={<StorePlaceholderPage title="주문 관리" />} />
         <Route path="billing" element={<StorePlaceholderPage title="정산/인보이스" />} />
         <Route path="content" element={<StorePlaceholderPage title="콘텐츠 관리" />} />
-        <Route path="market-trial" element={<MarketTrialListPage />} />
+        {/* WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1:
+            Market Trial 실행은 Neture로 일원화. URL은 호환을 위해 유지하고 redirect 처리. */}
+        <Route path="market-trial" element={<MarketTrialNetureRedirect />} />
         {/* Interest 관리 (WO-O4O-TABLET-INTEREST-UX-REFACTOR-V1) */}
         <Route path="interest-requests" element={<InterestRequestsPage />} />
         <Route path="settings" element={<StorePlaceholderPage title="설정" />} />
