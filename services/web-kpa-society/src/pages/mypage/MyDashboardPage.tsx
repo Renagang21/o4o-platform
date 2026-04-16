@@ -331,7 +331,7 @@ export function MyDashboardPage() {
           <div style={styles.trialEmptyState}>
             <span style={styles.trialEmptyIcon}>🧪</span>
             <p style={styles.trialEmptyText}>현재 진행 중인 Market Trial이 없습니다.</p>
-            <Link to={`${servicePrefix}/market-trial`} style={styles.trialEmptyLink}>
+            <Link to={`/market-trial`} style={styles.trialEmptyLink}>
               Market Trial 허브 둘러보기
             </Link>
           </div>
@@ -344,7 +344,7 @@ export function MyDashboardPage() {
                 {recruitingTrials.slice(0, 2).map((trial) => (
                   <Link
                     key={trial.id}
-                    to={`${servicePrefix}/market-trial/${trial.id}`}
+                    to={`/market-trial/${trial.id}`}
                     style={styles.trialItem}
                   >
                     <div style={styles.trialItemContent}>
@@ -364,7 +364,7 @@ export function MyDashboardPage() {
                   </Link>
                 ))}
                 {recruitingTrials.length > 2 && (
-                  <Link to={`${servicePrefix}/market-trial`} style={styles.trialMoreLink}>
+                  <Link to={`/market-trial`} style={styles.trialMoreLink}>
                     +{recruitingTrials.length - 2}건 더 보기
                   </Link>
                 )}
@@ -383,7 +383,7 @@ export function MyDashboardPage() {
                   return (
                     <Link
                       key={p.id}
-                      to={`${servicePrefix}/market-trial/${trial.id}`}
+                      to={`/market-trial/${trial.id}`}
                       style={styles.trialItem}
                     >
                       <div style={styles.trialItemContent}>
@@ -408,7 +408,7 @@ export function MyDashboardPage() {
                   );
                 })}
                 {participations.length > 3 && (
-                  <Link to={`${servicePrefix}/market-trial`} style={styles.trialMoreLink}>
+                  <Link to={`/market-trial`} style={styles.trialMoreLink}>
                     +{participations.length - 3}건 더 보기
                   </Link>
                 )}
