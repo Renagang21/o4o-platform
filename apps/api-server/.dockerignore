@@ -22,6 +22,11 @@
 !dist/database/migrations/*.js
 !dist/database/migrations/*.js.map
 
+# Allow static assets (fonts for PDF generation)
+!src/assets
+!src/assets/fonts
+!src/assets/fonts/NotoSansKR-Regular.ttf
+
 # Allow production dependencies manifest
 !package.production.json
 
