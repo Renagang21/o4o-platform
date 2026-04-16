@@ -421,8 +421,10 @@ export function createStoreQrLandingController(
 
       const pdfBuffer = await generateProductFlyer(flyerProduct, template as 1 | 4 | 8);
       const safeName = (flyerProduct.productName).replace(/[^a-zA-Z0-9가-힣\s]/g, '').trim().slice(0, 30);
+      const asciiPart = safeName.replace(/[^\x20-\x7E]/g, '').trim() || 'flyer';
+      const encodedPart = encodeURIComponent(`flyer-${safeName}-${template}.pdf`);
       res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename="flyer-${safeName}-${template}.pdf"`);
+      res.setHeader('Content-Disposition', `attachment; filename="flyer-${asciiPart}-${template}.pdf"; filename*=UTF-8''${encodedPart}`);
       res.send(pdfBuffer);
     }),
   );
