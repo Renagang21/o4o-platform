@@ -102,6 +102,7 @@ const ApplicationDetailPage = lazy(() => import('@/pages/operator/ApplicationDet
 const StoreApprovalsPage = lazy(() => import('@/pages/operator/StoreApprovalsPage'));
 const StoreApprovalDetailPage = lazy(() => import('@/pages/operator/StoreApprovalDetailPage'));
 // StoreTemplateManagerPage 제거 — pharmacySlug="demo" 하드코딩으로 미완성 (글로벌 템플릿 저장소 미구현)
+const GlycopharmMembersPage = lazy(() => import('@/pages/operator/GlycopharmMembersPage'));
 const UsersPage = lazy(() => import('@/pages/operator/UsersPage'));
 const UserDetailPage = lazy(() => import('@/pages/operator/UserDetailPage'));
 const RoleManagementPage = lazy(() => import('@/pages/operator/RoleManagementPage'));
@@ -446,6 +447,7 @@ function AppRoutes() {
         <Route path="community" element={<CommunityManagementPage />} />
         <Route path="store-approvals" element={<StoreApprovalsPage />} />
         <Route path="store-approvals/:id" element={<StoreApprovalDetailPage />} />
+        <Route path="glycopharm-members" element={<GlycopharmMembersPage />} />
         <Route path="users" element={<UsersPage />} />
         <Route path="users/:id" element={<UserDetailPage />} />
         <Route path="ai-report" element={<AiReportPage />} />

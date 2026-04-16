@@ -128,6 +128,7 @@ export class GlycopharmMemberService {
    */
   async listMembers(opts: {
     status?: string;
+    subRole?: string;
     page?: number;
     limit?: number;
   }): Promise<{ items: GlycopharmMember[]; total: number; page: number; totalPages: number }> {
@@ -135,7 +136,8 @@ export class GlycopharmMemberService {
     const limit = opts.limit ?? 20;
 
     const qb = this.repo.createQueryBuilder('m');
-    if (opts.status) qb.where('m.status = :status', { status: opts.status });
+    if (opts.status) qb.andWhere('m.status = :status', { status: opts.status });
+    if (opts.subRole) qb.andWhere('m.sub_role = :subRole', { subRole: opts.subRole });
     qb.orderBy('m.created_at', 'DESC').skip((page - 1) * limit).take(limit);
 
     const [items, total] = await qb.getManyAndCount();

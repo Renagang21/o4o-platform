@@ -108,6 +108,7 @@ export function createGlycopharmMemberController(
     '/members',
     requireAuth,
     query('status').optional().isIn(['pending', 'approved', 'rejected', 'suspended', 'withdrawn']),
+    query('subRole').optional().isIn(['pharmacy_owner', 'staff_pharmacist']),
     query('page').optional().isInt({ min: 1 }),
     query('limit').optional().isInt({ min: 1, max: 100 }),
     async (req: Request, res: Response) => {
@@ -124,10 +125,11 @@ export function createGlycopharmMemberController(
       }
 
       const status = req.query.status as string | undefined;
+      const subRole = req.query.subRole as string | undefined;
       const page = parseInt(String(req.query.page ?? '1'), 10);
       const limit = parseInt(String(req.query.limit ?? '20'), 10);
 
-      const result = await memberService.listMembers({ status, page, limit });
+      const result = await memberService.listMembers({ status, subRole, page, limit });
       res.json({ success: true, data: result });
     },
   );

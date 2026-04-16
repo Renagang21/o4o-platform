@@ -680,11 +680,13 @@ class GlycopharmApiClient {
 
   async listGlycopharmMembers(params?: {
     status?: string;
+    subRole?: string;
     page?: number;
     limit?: number;
   }): Promise<{ success: boolean; data: { items: GlycopharmMemberRecord[]; total: number; page: number; totalPages: number } }> {
     const q = new URLSearchParams();
     if (params?.status) q.set('status', params.status);
+    if (params?.subRole) q.set('subRole', params.subRole);
     if (params?.page) q.set('page', String(params.page));
     if (params?.limit) q.set('limit', String(params.limit));
     const qs = q.toString() ? `?${q.toString()}` : '';
