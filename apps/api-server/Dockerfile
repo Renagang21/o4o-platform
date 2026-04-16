@@ -64,6 +64,9 @@ COPY dist/migrate.js.map ./dist/migrate.js.map
 # - migrations/*.js: Compiled migration files
 COPY dist/database ./dist/database
 
+# Copy static assets (fonts for PDF generation)
+COPY src/assets ./dist/assets
+
 # Verify the bundle and migration files exist
 RUN ls -la /app/dist/main.js || (echo "CRITICAL: dist/main.js not found!" && exit 1)
 RUN ls -la /app/dist/migrate.js || (echo "CRITICAL: dist/migrate.js not found!" && exit 1)
