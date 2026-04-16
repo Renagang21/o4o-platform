@@ -1,7 +1,9 @@
 /**
  * Header - GlycoPharm 헤더
- * WO-O4O-GLYCOPHARM-NAVIGATION-AND-STORE-STRUCTURE-REFINE-V1:
- *   공개/조건부 메뉴 분리 — 비로그인: Home+커뮤니티, 약국 로그인: +약국관리
+ * WO-GLYCOPHARM-TOP-NAV-KPA-ALIGN-V1:
+ *   KPA-Society 기준 역할 기반 메뉴 구조
+ *   비로그인/일반: 홈 | 포럼 | 강의
+ *   약사 로그인: 홈 | 포럼 | 강의 | ─ | 약국 HUB | 내 약국
  */
 
 import { useState } from 'react';
@@ -19,6 +21,7 @@ import {
   MessageSquare,
   Store,
   LayoutDashboard,
+  GraduationCap,
 } from 'lucide-react';
 
 import ServiceSwitcher from '../ServiceSwitcher';
@@ -27,15 +30,17 @@ import ServiceSwitcher from '../ServiceSwitcher';
  * 공개 메뉴 — 로그인 상태 관계없이 항상 표시
  */
 const publicMenuItems = [
-  { label: 'Home', icon: Home, pathPublic: '/', pathAuth: '/store', end: true },
-  { label: '커뮤니티', icon: MessageSquare, pathPublic: '/community', pathAuth: '/community', end: false },
+  { label: '홈', icon: Home, path: '/', end: true },
+  { label: '포럼', icon: MessageSquare, path: '/forum', end: false },
+  { label: '강의', icon: GraduationCap, path: '/education', end: false },
 ];
 
 /**
- * 조건부 메뉴 — 약국(pharmacy) 로그인 시에만 표시
+ * 조건부 메뉴 — glycopharm:pharmacist 로그인 시에만 표시
  */
 const pharmacyMenuItems = [
-  { label: '약국 관리', icon: Store, path: '/store', end: false },
+  { label: '약국 HUB', icon: LayoutDashboard, path: '/store/hub', end: false },
+  { label: '내 약국', icon: Store, path: '/store', end: false },
 ];
 
 export default function Header() {
@@ -83,7 +88,7 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <NavLink to={isPharmacy ? '/store' : '/'} className="flex items-center gap-2">
+          <NavLink to="/" className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-lg shadow-primary-500/25">
               <Activity className="w-5 h-5 text-white" />
             </div>
@@ -96,19 +101,16 @@ export default function Header() {
           {/* Desktop Navigation — 공개 메뉴 + 조건부 약국 메뉴 */}
           <nav className="hidden md:flex items-center gap-1">
             {/* 공개 메뉴 */}
-            {publicMenuItems.map((item) => {
-              const path = isPharmacy ? item.pathAuth : item.pathPublic;
-              return (
-                <NavLink
-                  key={item.label}
-                  to={path}
-                  end={item.end}
-                  className={({ isActive }) => desktopNavClass(isActive)}
-                >
-                  {item.label}
-                </NavLink>
-              );
-            })}
+            {publicMenuItems.map((item) => (
+              <NavLink
+                key={item.label}
+                to={item.path}
+                end={item.end}
+                className={({ isActive }) => desktopNavClass(isActive)}
+              >
+                {item.label}
+              </NavLink>
+            ))}
             {/* 조건부 약국 메뉴 */}
             {isPharmacy && (
               <>
@@ -227,23 +229,20 @@ export default function Header() {
           <div className="md:hidden py-4 border-t animate-fade-in">
             <nav className="flex flex-col gap-1">
               {/* 공개 메뉴 */}
-              {publicMenuItems.map((item) => {
-                const path = isPharmacy ? item.pathAuth : item.pathPublic;
-                return (
-                  <NavLink
-                    key={item.label}
-                    to={path}
-                    end={item.end}
-                    className={({ isActive }) => mobileNavClass(isActive)}
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <span className="flex items-center gap-3">
-                      <item.icon className="w-5 h-5" />
-                      {item.label}
-                    </span>
-                  </NavLink>
-                );
-              })}
+              {publicMenuItems.map((item) => (
+                <NavLink
+                  key={item.label}
+                  to={item.path}
+                  end={item.end}
+                  className={({ isActive }) => mobileNavClass(isActive)}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <span className="flex items-center gap-3">
+                    <item.icon className="w-5 h-5" />
+                    {item.label}
+                  </span>
+                </NavLink>
+              ))}
               {/* 조건부 약국 메뉴 */}
               {isPharmacy && (
                 <>
