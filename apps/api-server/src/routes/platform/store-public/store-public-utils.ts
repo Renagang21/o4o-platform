@@ -14,6 +14,20 @@ import { cacheAside, hashCacheKey, READ_CACHE_TTL } from '../../../cache/read-ca
 import type { StoreBlock, TemplateProfile } from '../../glycopharm/entities/glycopharm-pharmacy.entity.js';
 
 // ============================================================================
+// Service Key Mapping (WO-O4O-STORE-SERVICEKEY-MAPPING-FIX-V1)
+// ============================================================================
+
+/**
+ * platform_store_slugs.service_key = 'kpa'
+ * organization_product_listings.service_key = 'kpa-society'
+ * 두 테이블 간 불일치 보정: OPL 조회 시 'kpa-society'도 포함.
+ */
+export function resolveServiceKeys(serviceKey: string): string[] {
+  if (serviceKey === 'kpa') return ['kpa', 'kpa-society'];
+  return [serviceKey];
+}
+
+// ============================================================================
 // Slug Resolution Helper
 // ============================================================================
 
