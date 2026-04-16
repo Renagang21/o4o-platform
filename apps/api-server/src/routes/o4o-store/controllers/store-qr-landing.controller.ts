@@ -28,6 +28,8 @@ import { asyncHandler } from '../../../middleware/error-handler.js';
 import { createRequireStoreOwner } from '../../../utils/store-owner.utils.js';
 import { generateQrPng, generateQrSvg, generateQrPrintPdf } from '../../../services/qr-print.service.js';
 import type { QrPrintItem } from '../../../services/qr-print.service.js';
+import { generateProductFlyer } from '../../../services/qr-flyer.service.js';
+import type { FlyerProduct } from '../../../services/qr-flyer.service.js';
 
 type AuthMiddleware = RequestHandler;
 
@@ -326,6 +328,101 @@ export function createStoreQrLandingController(
 
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', 'attachment; filename="qr-print.pdf"');
+      res.send(pdfBuffer);
+    }),
+  );
+
+  // ─── GET /pharmacy/qr/:id/flyer — 상품 QR 전단지 PDF 출력 ─────
+  // WO-O4O-STORE-QR-TEMPLATE-PRINT-UX-FINISH-V1
+  router.get(
+    '/pharmacy/qr/:id/flyer',
+    requireAuth,
+    requirePharmacyOwner,
+    asyncHandler(async (req: Request, res: Response) => {
+      const organizationId = (req as any).organizationId;
+      const { id } = req.params;
+      const template = parseInt(req.query.template as string);
+
+      if (![1, 4, 8].includes(template)) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'VALIDATION_ERROR', message: 'template must be 1, 4, or 8' },
+        });
+        return;
+      }
+
+      const qr = await qrRepo.findOne({
+        where: { id, organizationId, isActive: true },
+      });
+
+      if (!qr) {
+        res.status(404).json({
+          success: false,
+          error: { code: 'QR_NOT_FOUND', message: 'QR code not found' },
+        });
+        return;
+      }
+      if (qr.landingType !== 'product' || !qr.landingTargetId) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'NOT_PRODUCT_QR', message: 'Flyer is only available for product-type QR codes with a target product' },
+        });
+        return;
+      }
+
+      // Resolve landingTargetId → supplier_product_offer
+      // landingTargetId may be: supplier_product_offers.id OR organization_product_listings.id
+      const targetId = qr.landingTargetId;
+      const [productRow] = await dataSource.query(
+        `SELECT
+           COALESCE(pm.marketing_name, 'Unknown') AS product_name,
+           pm.brand_name,
+           spo.price_general,
+           spo.id AS offer_id
+         FROM supplier_product_offers spo
+         LEFT JOIN product_masters pm ON pm.id = spo.master_id
+         WHERE spo.id = $1 AND spo.is_active = true
+         UNION
+         SELECT
+           COALESCE(pm.marketing_name, 'Unknown') AS product_name,
+           pm.brand_name,
+           spo.price_general,
+           spo.id AS offer_id
+         FROM organization_product_listings opl
+         JOIN supplier_product_offers spo ON spo.id = opl.offer_id
+         LEFT JOIN product_masters pm ON pm.id = spo.master_id
+         WHERE opl.id = $1 AND spo.is_active = true
+         LIMIT 1`,
+        [targetId],
+      );
+
+      if (!productRow) {
+        res.status(404).json({
+          success: false,
+          error: { code: 'PRODUCT_NOT_FOUND', message: 'Product not found for this QR code' },
+        });
+        return;
+      }
+
+      // Get store name
+      const [orgRow] = await dataSource.query(
+        `SELECT name FROM organizations WHERE id = $1 LIMIT 1`,
+        [organizationId],
+      );
+
+      const qrUrl = `https://${PUBLIC_DOMAIN}/qr/${qr.slug}`;
+      const flyerProduct: FlyerProduct = {
+        productName: productRow.product_name,
+        brandName: productRow.brand_name || undefined,
+        price: Number(productRow.price_general) || 0,
+        storeName: orgRow?.name || '약국',
+        qrUrl,
+      };
+
+      const pdfBuffer = await generateProductFlyer(flyerProduct, template as 1 | 4 | 8);
+      const safeName = (flyerProduct.productName).replace(/[^a-zA-Z0-9가-힣\s]/g, '').trim().slice(0, 30);
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="flyer-${safeName}-${template}.pdf"`);
       res.send(pdfBuffer);
     }),
   );

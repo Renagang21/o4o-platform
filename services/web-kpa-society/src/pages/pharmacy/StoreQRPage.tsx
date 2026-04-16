@@ -18,6 +18,8 @@ import { toast } from '@o4o/error-handling';
 import { colors } from '../../styles/theme';
 import { StoreLibrarySelectorModal } from '../../components/store/StoreLibrarySelectorModal';
 import type { LibrarySelectorResult } from '../../components/store/StoreLibrarySelectorModal';
+import { QrPrintTemplateModal } from './QrPrintTemplateModal';
+import type { PrintTemplate } from './QrPrintTemplateModal';
 import {
   getStoreQrCodes,
   createStoreQrCode,
@@ -69,6 +71,7 @@ export function StoreQRPage() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [printing, setPrinting] = useState(false);
   const [downloadMenuId, setDownloadMenuId] = useState<string | null>(null);
+  const [showPrintModal, setShowPrintModal] = useState(false);
 
   // Product dropdown state
   const [productOptions, setProductOptions] = useState<{ id: string; name: string }[]>([]);
@@ -228,23 +231,56 @@ export function StoreQRPage() {
     setDownloadMenuId(null);
   };
 
-  const handleBatchPrint = async () => {
-    if (selectedIds.size === 0) return;
+  const handleOpenPrintModal = () => {
+    if (selectedIds.size === 0) {
+      toast.error('출력할 QR을 먼저 선택해 주세요.');
+      return;
+    }
+    setShowPrintModal(true);
+  };
+
+  const handleConfirmPrint = async (template: PrintTemplate) => {
+    setShowPrintModal(false);
     setPrinting(true);
     try {
-      const resp = await fetch(`${apiBase}/pharmacy/qr/print`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ qrIds: Array.from(selectedIds) }),
-      });
-      if (!resp.ok) throw new Error('Print failed');
-      const blob = await resp.blob();
-      const url = URL.createObjectURL(blob);
-      window.open(url, '_blank');
-      setTimeout(() => URL.revokeObjectURL(url), 60000);
+      if (template === 'sheet') {
+        // 기본 QR 시트 — 기존 일괄 출력
+        const resp = await fetch(`${apiBase}/pharmacy/qr/print`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ qrIds: Array.from(selectedIds) }),
+        });
+        if (!resp.ok) throw new Error('Print failed');
+        const blob = await resp.blob();
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+        return;
+      }
+
+      // Flyer 템플릿 — product 타입 QR만 처리
+      const templateNum = template === 'flyer1' ? 1 : template === 'flyer4' ? 4 : 8;
+      const productQrs = items.filter(
+        (i) => selectedIds.has(i.id) && i.landingType === 'product' && i.landingTargetId,
+      );
+      if (productQrs.length === 0) {
+        toast.error('이 템플릿은 상품 QR에만 사용할 수 있습니다.');
+        return;
+      }
+      for (const qr of productQrs) {
+        const resp = await fetch(
+          `${apiBase}/pharmacy/qr/${qr.id}/flyer?template=${templateNum}`,
+          { credentials: 'include' },
+        );
+        if (!resp.ok) throw new Error('Flyer generation failed');
+        const blob = await resp.blob();
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+      }
     } catch {
-      toast.error('PDF 생성에 실패했습니다');
+      toast.error('PDF 생성 중 오류가 발생했습니다.');
     } finally {
       setPrinting(false);
     }
@@ -287,7 +323,7 @@ export function StoreQRPage() {
           </label>
           {selectedIds.size > 0 && (
             <button
-              onClick={handleBatchPrint}
+              onClick={handleOpenPrintModal}
               disabled={printing}
               style={{ ...styles.printBtn, opacity: printing ? 0.7 : 1 }}
             >
@@ -529,6 +565,14 @@ export function StoreQRPage() {
         open={showSelector}
         onSelect={handleLibrarySelect}
         onClose={() => setShowSelector(false)}
+      />
+
+      {/* Print Template Modal */}
+      <QrPrintTemplateModal
+        open={showPrintModal}
+        selectedQrs={items.filter((i) => selectedIds.has(i.id))}
+        onConfirm={handleConfirmPrint}
+        onClose={() => setShowPrintModal(false)}
       />
     </div>
   );
