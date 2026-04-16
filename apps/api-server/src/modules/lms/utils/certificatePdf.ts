@@ -8,6 +8,7 @@
  */
 
 import PDFDocument from 'pdfkit';
+import QRCode from 'qrcode';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
@@ -31,13 +32,31 @@ export interface CertificatePdfData {
   credits?: number;
   issuerName?: string;
   issuerTitle?: string;
+  verificationUrl?: string;  // WO-O4O-LMS-CERTIFICATE-ACCESS-ENHANCEMENT-V1
+}
+
+/**
+ * verificationUrl을 QR 코드 PNG 버퍼로 변환한다.
+ * 실패 시 null 반환 (PDF 생성은 계속됨).
+ */
+async function buildQrBuffer(url: string): Promise<Buffer | null> {
+  try {
+    const dataUrl = await QRCode.toDataURL(url, { margin: 1, width: 200, errorCorrectionLevel: 'M' });
+    const base64 = dataUrl.replace(/^data:image\/png;base64,/, '');
+    return Buffer.from(base64, 'base64');
+  } catch {
+    return null;
+  }
 }
 
 /**
  * 수료증 PDF Buffer를 생성한다.
  * 폰트 파일이 있으면 한국어 렌더링, 없으면 Helvetica 폴백.
  */
-export function generateCertificatePdf(data: CertificatePdfData): Promise<Buffer> {
+export async function generateCertificatePdf(data: CertificatePdfData): Promise<Buffer> {
+  // QR 코드는 PDF 스트림 시작 전에 준비 (async)
+  const qrBuffer = data.verificationUrl ? await buildQrBuffer(data.verificationUrl) : null;
+
   return new Promise((resolve, reject) => {
     const chunks: Buffer[] = [];
 
@@ -145,6 +164,18 @@ export function generateCertificatePdf(data: CertificatePdfData): Promise<Buffer
       doc.fillColor('#888888').text('이수 학점', col2, certY);
       setFont(13, true);
       doc.fillColor('#1e3a5f').text(`${data.credits} 학점`, col2, certY + 16);
+    }
+
+    // ── QR 코드 (WO-O4O-LMS-CERTIFICATE-ACCESS-ENHANCEMENT-V1) ──
+    if (qrBuffer) {
+      const qrSize = 72;
+      const qrX = W - 50 - qrSize;   // 오른쪽 여백 50pt
+      const qrY = certY - 8;
+      doc.image(qrBuffer, qrX, qrY, { width: qrSize, height: qrSize });
+      setFont(7);
+      doc
+        .fillColor('#aaaaaa')
+        .text('온라인 검증', qrX, qrY + qrSize + 4, { width: qrSize, align: 'center' });
     }
 
     // ── 발급 기관 ─────────────────────────────────────────────

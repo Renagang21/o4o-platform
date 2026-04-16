@@ -252,6 +252,13 @@ export class CertificateController extends BaseController {
       const userName = (certificate.user as any)?.name || '수강자';
       const courseTitle = certificate.course?.title || '과정';
 
+      // WO-O4O-LMS-CERTIFICATE-ACCESS-ENHANCEMENT-V1: 검증 URL 생성
+      const frontendBase =
+        process.env.KPA_FRONTEND_URL ||
+        process.env.FRONTEND_URL ||
+        'https://yaksa.site';
+      const verificationUrl = `${frontendBase}/certificate/verify/${certificate.id}`;
+
       const pdfBuffer = await generateCertificatePdf({
         userName,
         courseTitle,
@@ -261,6 +268,7 @@ export class CertificateController extends BaseController {
         credits: certificate.credits,
         issuerName: certificate.issuerName,
         issuerTitle: certificate.issuerTitle,
+        verificationUrl,
       });
 
       const safeNumber = certificate.certificateNumber.replace(/[^a-zA-Z0-9-_]/g, '_');

@@ -18,6 +18,7 @@ export function MyCertificatesPage() {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [copyFeedback, setCopyFeedback] = useState<{ [id: string]: 'success' | 'fail' }>({});
 
   useEffect(() => {
     if (user) loadData();
@@ -39,6 +40,18 @@ export function MyCertificatesPage() {
       setError(err instanceof Error ? err.message : '데이터를 불러오는데 실패했습니다.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCopyLink = async (cert: Certificate) => {
+    const verifyUrl = `${window.location.origin}/certificate/verify/${cert.id}`;
+    try {
+      await navigator.clipboard.writeText(verifyUrl);
+      setCopyFeedback(prev => ({ ...prev, [cert.id]: 'success' }));
+    } catch {
+      setCopyFeedback(prev => ({ ...prev, [cert.id]: 'fail' }));
+    } finally {
+      setTimeout(() => setCopyFeedback(prev => { const next = { ...prev }; delete next[cert.id]; return next; }), 2500);
     }
   };
 
@@ -134,12 +147,32 @@ export function MyCertificatesPage() {
                       <span style={styles.infoValue}>{cert.certificateNumber}</span>
                     </div>
                   </div>
-                  <button
-                    style={styles.downloadButton}
-                    onClick={() => handleDownload(cert)}
-                  >
-                    📥 다운로드
-                  </button>
+                  <div style={styles.actionRow}>
+                    <button
+                      style={styles.downloadButton}
+                      onClick={() => handleDownload(cert)}
+                    >
+                      📥 다운로드
+                    </button>
+                    <button
+                      style={styles.copyButton}
+                      onClick={() => handleCopyLink(cert)}
+                    >
+                      🔗 검증 링크 복사
+                    </button>
+                  </div>
+                  {copyFeedback[cert.id] && (
+                    <p style={{
+                      fontSize: '12px',
+                      marginTop: '8px',
+                      color: copyFeedback[cert.id] === 'success' ? '#15803d' : '#b91c1c',
+                      textAlign: 'center',
+                    }}>
+                      {copyFeedback[cert.id] === 'success'
+                        ? '검증 링크가 복사되었습니다.'
+                        : '링크 복사에 실패했습니다.'}
+                    </p>
+                  )}
                 </div>
               </Card>
             ))}
@@ -200,14 +233,28 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.neutral800,
     fontWeight: 500,
   },
+  actionRow: {
+    display: 'flex',
+    gap: '8px',
+  },
   downloadButton: {
-    width: '100%',
-    padding: '12px',
+    flex: 1,
+    padding: '12px 8px',
     backgroundColor: colors.primary,
     color: colors.white,
     border: 'none',
     borderRadius: '6px',
-    fontSize: '14px',
+    fontSize: '13px',
+    cursor: 'pointer',
+  },
+  copyButton: {
+    flex: 1,
+    padding: '12px 8px',
+    backgroundColor: colors.white,
+    color: colors.primary,
+    border: `1px solid ${colors.primary}`,
+    borderRadius: '6px',
+    fontSize: '13px',
     cursor: 'pointer',
   },
 };
