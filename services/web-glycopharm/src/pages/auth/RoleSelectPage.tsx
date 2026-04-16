@@ -9,11 +9,11 @@ import {
 } from 'lucide-react';
 import type { UserRole } from '@/types';
 
-// WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed role options
+// WO-GLYCOPHARM-PHARMACY-ROLE-FINAL-CLEANUP-V1: PHARMACIST 단일 기준
 const roleOptions: Array<{ role: UserRole; label: string; description: string; icon: typeof Building2; color: string }> = [
   {
-    role: GLYCOPHARM_ROLES.PHARMACY,
-    label: '약국',
+    role: GLYCOPHARM_ROLES.PHARMACIST,
+    label: '약사',
     description: '약국 운영, 상품 판매, 고객 관리',
     icon: Building2,
     color: 'primary',

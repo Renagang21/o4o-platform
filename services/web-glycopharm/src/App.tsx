@@ -356,9 +356,8 @@ function AppRoutes() {
         } />
 
         {/* Store Entry Portal (WO-STORE-MAIN-ENTRY-LAYOUT-V1) */}
-        {/* WO-GLYCOPHARM-ACCESS-POLICY-AND-ROLE-CLEANUP-V1: PHARMACIST 추가 (PHARMACY 호환 유지) */}
         <Route path="store" element={
-          <SoftGuard feature="store" allowedRoles={[GLYCOPHARM_ROLES.PHARMACY, GLYCOPHARM_ROLES.PHARMACIST]}>
+          <SoftGuard feature="store" allowedRoles={[GLYCOPHARM_ROLES.PHARMACIST]}>
             <StoreEntryPage />
           </SoftGuard>
         } />
@@ -504,11 +503,10 @@ function AppRoutes() {
       <Route path="qr/:pharmacyId" element={<QrLandingPage />} />
 
       {/* Store Owner Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1) */}
-      {/* WO-GLYCOPHARM-ACCESS-POLICY-AND-ROLE-CLEANUP-V1: PHARMACIST 추가 (PHARMACY 호환 유지) */}
       <Route
         path="store"
         element={
-          <ProtectedRoute allowedRoles={[GLYCOPHARM_ROLES.PHARMACY, GLYCOPHARM_ROLES.PHARMACIST]}>
+          <ProtectedRoute allowedRoles={[GLYCOPHARM_ROLES.PHARMACIST]}>
             <StoreLayoutWrapper />
           </ProtectedRoute>
         }

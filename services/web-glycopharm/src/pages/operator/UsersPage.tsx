@@ -102,10 +102,10 @@ function getPrimaryRole(u: UserData): string {
 }
 
 // Role tab filtering
-// WO-GLYCOPHARM-ACCESS-POLICY-AND-ROLE-CLEANUP-V1: pharmacist 포함 (pharmacy 호환 유지)
+// WO-GLYCOPHARM-PHARMACY-ROLE-FINAL-CLEANUP-V1: pharmacist 단일 기준
 const ROLE_TAB_FILTER: Record<string, string[]> = {
   all: [],
-  pharmacy: ['pharmacy', 'glycopharm:pharmacist'],
+  pharmacy: ['glycopharm:pharmacist'],
   customer: ['customer'],
   pending: [],
 };

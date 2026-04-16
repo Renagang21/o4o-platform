@@ -24,10 +24,9 @@ import { toast } from '@o4o/error-handling';
 import { EmptyState, LoadingState, ErrorState } from '@/components/common';
 import type { Forum, ForumStatus, ForumApplicationFormData, UserRole } from '@/types';
 
-// WO-GLYCOPHARM-ACCESS-POLICY-AND-ROLE-CLEANUP-V1: PHARMACIST 추가, PHARMACY 호환 유지
+// WO-GLYCOPHARM-PHARMACY-ROLE-FINAL-CLEANUP-V1: PHARMACIST 단일
 const roleOptions: { value: UserRole; label: string }[] = [
   { value: GLYCOPHARM_ROLES.PHARMACIST, label: '약사' },
-  { value: GLYCOPHARM_ROLES.PHARMACY, label: '약국 (레거시)' },
   { value: GLYCOPHARM_ROLES.SUPPLIER, label: '공급자' },
   { value: GLYCOPHARM_ROLES.OPERATOR, label: '운영자' },
 ];

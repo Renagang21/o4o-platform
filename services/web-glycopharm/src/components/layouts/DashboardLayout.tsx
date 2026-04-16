@@ -74,16 +74,6 @@ const roleConfig: Record<string, RoleConfig> = {
       ]},
     ],
   },
-  // WO-O4O-GLYCOPHARM-NAVIGATION-AND-STORE-STRUCTURE-REFINE-V1:
-  //   PHARMACY 사이드바는 DashboardLayout이 아닌 StoreDashboardLayout(store-ui-core)이 담당.
-  //   /store/* 라우트 → StoreLayoutWrapper → GLYCOPHARM_STORE_CONFIG(menuSections).
-  //   이 항목은 더 이상 라우트에서 사용되지 않음 (dead code 제거).
-  [GLYCOPHARM_ROLES.PHARMACY]: {
-    title: '약국 관리',
-    icon: Building2,
-    color: 'primary',
-    menuItems: [],
-  },
   [GLYCOPHARM_ROLES.SUPPLIER]: {
     title: '공급자 관리',
     icon: Truck,

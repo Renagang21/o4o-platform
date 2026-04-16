@@ -82,9 +82,9 @@ export interface User {
 }
 
 // Pharmacy specific user data
-// WO-GLYCOPHARM-ROLE-PREFIX-MIGRATION-V1: glycopharm:pharmacist 우선, pharmacy 호환용 유지
+// WO-GLYCOPHARM-PHARMACY-ROLE-FINAL-CLEANUP-V1: pharmacy 제거, glycopharm:pharmacist 단일
 export interface PharmacyUser extends User {
-  role: 'glycopharm:pharmacist' | 'pharmacy';
+  role: 'glycopharm:pharmacist';
   pharmacy: {
     id: string;
     name: string;

@@ -7,13 +7,12 @@
 
 import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
 
-// WO-GLYCOPHARM-ROLE-PREFIX-MIGRATION-V1: glycopharm:pharmacist 우선, pharmacy 호환 유지
+// WO-GLYCOPHARM-PHARMACY-ROLE-FINAL-CLEANUP-V1: pharmacy 레거시 제거
 export const GLYCOPHARM_ROLE_PRIORITY = [
   'platform:super_admin',
   'glycopharm:admin',
   'glycopharm:operator',
   'glycopharm:pharmacist',
-  'pharmacy', // DEPRECATED — 호환용 유지
   'customer',
 ] as const;
 
@@ -22,7 +21,6 @@ export const GLYCOPHARM_DASHBOARD_MAP: Record<string, string> = {
   'glycopharm:admin': '/admin',
   'glycopharm:operator': '/operator',
   'glycopharm:pharmacist': '/store/hub',
-  'pharmacy': '/store/hub', // DEPRECATED — 호환용 유지
   'customer': '/patient',
 };
 
