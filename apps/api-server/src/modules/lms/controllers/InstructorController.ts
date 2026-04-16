@@ -447,7 +447,7 @@ export class InstructorController extends BaseController {
         return BaseController.forbidden(res, '본인 콘텐츠의 참여자만 조회할 수 있습니다');
       }
 
-      const { status, credited, page = '1', limit = '20', sort = 'enrolledAt_desc' } = req.query as Record<string, string>;
+      const { status, credited, query: nameSearch, page = '1', limit = '20', sort = 'enrolledAt_desc' } = req.query as Record<string, string>;
       const pageNum = Math.max(1, parseInt(page, 10) || 1);
       const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 20));
 
@@ -472,15 +472,23 @@ export class InstructorController extends BaseController {
         if (mapped) query.andWhere('e.status = :status', { status: mapped });
       }
 
-      // completed + 미지급 필터 (WO-O4O-MARKETING-CONTENT-REWARD-DETAIL-MVP-V1)
+      // 보상 지급 필터 (WO-O4O-MARKETING-CONTENT-OPERATIONS-ENHANCEMENT-V2)
       if (credited === 'false') {
-        // status 필터가 없거나 all이면 completed로 강제
         if (!status || status === 'all') {
           query.andWhere('e.status = :completedStatus', { completedStatus: 'completed' });
         }
         query.andWhere(
           `NOT EXISTS (SELECT 1 FROM credit_transactions ct2 WHERE ct2.source_type = 'course_complete' AND ct2.source_id = :courseId AND ct2.user_id = e.user_id)`
         );
+      } else if (credited === 'true') {
+        query.andWhere(
+          `EXISTS (SELECT 1 FROM credit_transactions ct2 WHERE ct2.source_type = 'course_complete' AND ct2.source_id = :courseId AND ct2.user_id = e.user_id)`
+        );
+      }
+
+      // 이름 검색 (ILIKE)
+      if (nameSearch && nameSearch.trim()) {
+        query.andWhere('user.name ILIKE :nameSearch', { nameSearch: `%${nameSearch.trim()}%` });
       }
 
       // 정렬
@@ -560,6 +568,202 @@ export class InstructorController extends BaseController {
       });
     } catch (error: any) {
       logger.error('[InstructorController.participants] Error', { error: error.message });
+      return BaseController.error(res, error);
+    }
+  }
+
+  // ========================================
+  // 보상 운영 요약 통계 (WO-O4O-MARKETING-CONTENT-OPERATIONS-ENHANCEMENT-V2)
+  // ========================================
+
+  /**
+   * GET /instructor/participants/:courseId/summary
+   * 보상 운영 요약 통계 (강의 전체 기준 aggregate)
+   */
+  static async participantsSummary(req: Request, res: Response): Promise<any> {
+    try {
+      const { courseId } = req.params;
+      const userId = (req as any).user?.id;
+
+      const courseRepo = AppDataSource.getRepository(Course);
+      const course = await courseRepo.findOne({ where: { id: courseId }, select: ['id', 'title', 'instructorId'] });
+      if (!course) return BaseController.notFound(res, 'Course not found');
+      const isKpaAdmin = await roleAssignmentService.hasAnyRole(userId, ['kpa:admin']);
+      if (course.instructorId !== userId && !isKpaAdmin) {
+        return BaseController.forbidden(res, '본인 콘텐츠의 통계만 조회할 수 있습니다');
+      }
+
+      const enrollmentRepo = AppDataSource.getRepository(Enrollment);
+
+      // 상태별 카운트
+      const statusRows = await enrollmentRepo
+        .createQueryBuilder('e')
+        .select('e.status', 'status')
+        .addSelect('COUNT(*)::int', 'cnt')
+        .where('e.courseId = :courseId', { courseId })
+        .groupBy('e.status')
+        .getRawMany();
+
+      const statusMap: Record<string, number> = {};
+      for (const row of statusRows) statusMap[row.status] = Number(row.cnt);
+      const totalAll = Object.values(statusMap).reduce((a, b) => a + b, 0);
+
+      // 보상 지급 통계 (COUNT + SUM)
+      const creditStats = await AppDataSource
+        .getRepository('CreditTransaction')
+        .createQueryBuilder('ct')
+        .select('COUNT(*)::int', 'creditedCount')
+        .addSelect('COALESCE(SUM(ct.amount), 0)::int', 'totalCredits')
+        .where('ct.sourceType = :type', { type: 'course_complete' })
+        .andWhere('ct.sourceId = :courseId', { courseId })
+        .getRawOne();
+
+      // 완료(미지급) 카운트 — NOT EXISTS 서브쿼리
+      const uncreditedRow = await enrollmentRepo
+        .createQueryBuilder('e')
+        .select('COUNT(*)::int', 'cnt')
+        .where('e.courseId = :courseId', { courseId })
+        .andWhere('e.status = :status', { status: 'completed' })
+        .andWhere(
+          `NOT EXISTS (SELECT 1 FROM credit_transactions ct2 WHERE ct2.source_type = 'course_complete' AND ct2.source_id = :courseId AND ct2.user_id = e.user_id)`
+        )
+        .getRawOne();
+
+      return BaseController.ok(res, {
+        total: totalAll,
+        inProgress: statusMap['in_progress'] ?? 0,
+        completed: statusMap['completed'] ?? 0,
+        cancelled: statusMap['cancelled'] ?? 0,
+        creditedCount: Number(creditStats?.creditedCount ?? 0),
+        uncreditedCompletedCount: Number(uncreditedRow?.cnt ?? 0),
+        totalCredits: Number(creditStats?.totalCredits ?? 0),
+      });
+    } catch (error: any) {
+      logger.error('[InstructorController.participantsSummary] Error', { error: error.message });
+      return BaseController.error(res, error);
+    }
+  }
+
+  // ========================================
+  // CSV 내보내기 (WO-O4O-MARKETING-CONTENT-OPERATIONS-ENHANCEMENT-V2)
+  // ========================================
+
+  /**
+   * GET /instructor/participants/:courseId/export
+   * 참여자 CSV 내보내기 (필터 반영 전체 다운로드)
+   */
+  static async participantsExport(req: Request, res: Response): Promise<any> {
+    try {
+      const { courseId } = req.params;
+      const userId = (req as any).user?.id;
+
+      const courseRepo = AppDataSource.getRepository(Course);
+      const course = await courseRepo.findOne({ where: { id: courseId }, select: ['id', 'title', 'instructorId'] });
+      if (!course) return BaseController.notFound(res, 'Course not found');
+      const isKpaAdmin = await roleAssignmentService.hasAnyRole(userId, ['kpa:admin']);
+      if (course.instructorId !== userId && !isKpaAdmin) {
+        return BaseController.forbidden(res, '본인 콘텐츠만 내보낼 수 있습니다');
+      }
+
+      const { status, credited, query: nameSearch } = req.query as Record<string, string>;
+
+      const enrollmentRepo = AppDataSource.getRepository(Enrollment);
+      const exportQuery = enrollmentRepo
+        .createQueryBuilder('e')
+        .where('e.courseId = :courseId', { courseId })
+        .leftJoinAndSelect('e.user', 'user');
+
+      if (status && status !== 'all') {
+        const statusMap: Record<string, string> = {
+          in_progress: 'in_progress', completed: 'completed', cancelled: 'cancelled',
+          pending: 'pending', approved: 'approved', rejected: 'rejected', expired: 'expired',
+        };
+        const mapped = statusMap[status];
+        if (mapped) exportQuery.andWhere('e.status = :status', { status: mapped });
+      }
+
+      if (credited === 'false') {
+        if (!status || status === 'all') {
+          exportQuery.andWhere('e.status = :completedStatus', { completedStatus: 'completed' });
+        }
+        exportQuery.andWhere(
+          `NOT EXISTS (SELECT 1 FROM credit_transactions ct2 WHERE ct2.source_type = 'course_complete' AND ct2.source_id = :courseId AND ct2.user_id = e.user_id)`
+        );
+      } else if (credited === 'true') {
+        exportQuery.andWhere(
+          `EXISTS (SELECT 1 FROM credit_transactions ct2 WHERE ct2.source_type = 'course_complete' AND ct2.source_id = :courseId AND ct2.user_id = e.user_id)`
+        );
+      }
+
+      if (nameSearch && nameSearch.trim()) {
+        exportQuery.andWhere('user.name ILIKE :nameSearch', { nameSearch: `%${nameSearch.trim()}%` });
+      }
+
+      exportQuery.orderBy('e.enrolledAt', 'DESC');
+      const enrollments = await exportQuery.getMany();
+
+      // credit_transactions — 전체 userIds 기준 한 번 조회
+      const allUserIds = enrollments.map(e => e.userId).filter(Boolean);
+      let creditMap = new Map<string, { amount: number; creditedAt: string }>();
+      if (allUserIds.length > 0) {
+        const creditRows = await AppDataSource
+          .getRepository('CreditTransaction')
+          .createQueryBuilder('ct')
+          .select('ct.userId', 'userId')
+          .addSelect('ct.amount', 'amount')
+          .addSelect('ct.createdAt', 'creditedAt')
+          .where('ct.sourceType = :type', { type: 'course_complete' })
+          .andWhere('ct.sourceId = :courseId', { courseId })
+          .andWhere('ct.userId IN (:...allUserIds)', { allUserIds })
+          .getRawMany();
+        creditMap = new Map(
+          creditRows.map((r: any) => [r.userId, { amount: Number(r.amount), creditedAt: r.creditedAt }])
+        );
+      }
+
+      // CSV 생성 (UTF-8 BOM)
+      const fmtDate = (d: Date | string | null) => {
+        if (!d) return '';
+        const dt = new Date(d as string);
+        return `${dt.getFullYear()}.${String(dt.getMonth() + 1).padStart(2, '0')}.${String(dt.getDate()).padStart(2, '0')}`;
+      };
+      const esc = (v: string) =>
+        v.includes(',') || v.includes('"') || v.includes('\n')
+          ? `"${v.replace(/"/g, '""')}"`
+          : v;
+
+      const statusLabel: Record<string, string> = {
+        in_progress: '진행중', completed: '완료', cancelled: '취소',
+        pending: '대기', approved: '승인', rejected: '거절', expired: '만료',
+      };
+
+      const headers = ['이름', '참여일', '상태', '진도율(%)', '완료일', '수료증', '보상지급', '보상금액(Credit)', '보상지급일'];
+      const rows = enrollments.map(e => {
+        const creditInfo = creditMap.get(e.userId);
+        return [
+          (e.user as any)?.name || '',
+          fmtDate(e.enrolledAt ?? e.createdAt),
+          statusLabel[e.status] ?? e.status,
+          String(e.progressPercentage ?? 0),
+          fmtDate(e.completedAt),
+          e.certificateId ? 'Y' : 'N',
+          creditInfo ? 'Y' : 'N',
+          creditInfo ? String(creditInfo.amount) : '',
+          creditInfo ? fmtDate(creditInfo.creditedAt) : '',
+        ].map(esc).join(',');
+      });
+
+      const BOM = '\uFEFF';
+      const csv = BOM + [headers.map(esc).join(','), ...rows].join('\r\n');
+
+      const safeTitle = course.title.replace(/[^\w가-힣]/g, '_').slice(0, 30);
+      const filename = `participants_${safeTitle}_${new Date().toISOString().slice(0, 10)}.csv`;
+
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(filename)}`);
+      return res.send(csv);
+    } catch (error: any) {
+      logger.error('[InstructorController.participantsExport] Error', { error: error.message });
       return BaseController.error(res, error);
     }
   }

@@ -193,6 +193,12 @@ router.get('/instructor/enrollments', requireAuth, requireInstructor, asyncHandl
 // GET /api/v1/lms/instructor/dashboard/courses - 강사 강의 목록 + 요약 통계 (WO-O4O-LMS-INSTRUCTOR-DASHBOARD-MVP-V1)
 router.get('/instructor/dashboard/courses', requireAuth, requireInstructor, asyncHandler(InstructorController.dashboardCourses));
 
+// GET /api/v1/lms/instructor/participants/:courseId/summary - 보상 운영 요약 통계 (WO-O4O-MARKETING-CONTENT-OPERATIONS-ENHANCEMENT-V2)
+router.get('/instructor/participants/:courseId/summary', requireAuth, requireInstructor, asyncHandler(InstructorController.participantsSummary));
+
+// GET /api/v1/lms/instructor/participants/:courseId/export - CSV 내보내기 (WO-O4O-MARKETING-CONTENT-OPERATIONS-ENHANCEMENT-V2)
+router.get('/instructor/participants/:courseId/export', requireAuth, requireInstructor, asyncHandler(InstructorController.participantsExport));
+
 // GET /api/v1/lms/instructor/participants/:courseId - 콘텐츠별 참여자 관리 (WO-O4O-MARKETING-CONTENT-OPERATIONS-MVP-V1)
 router.get('/instructor/participants/:courseId', requireAuth, requireInstructor, asyncHandler(InstructorController.participants));
 

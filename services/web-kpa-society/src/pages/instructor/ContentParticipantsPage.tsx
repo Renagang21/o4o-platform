@@ -2,16 +2,19 @@
  * ContentParticipantsPage — 콘텐츠별 참여자 관리
  *
  * WO-O4O-MARKETING-CONTENT-OPERATIONS-MVP-V1
+ * WO-O4O-MARKETING-CONTENT-OPERATIONS-ENHANCEMENT-V2
  * 경로: /instructor/contents/:courseId/participants
  * 접근 조건: lms:instructor 역할 보유
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { lmsInstructorApi } from '../../api/lms-instructor';
+import { getAccessToken } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 
 type StatusFilter = 'all' | 'in_progress' | 'completed' | 'completed_uncredited' | 'cancelled';
+type CreditedFilter = 'all' | 'true' | 'false';
 
 interface ParticipantItem {
   enrollmentId: string;
@@ -27,11 +30,21 @@ interface ParticipantItem {
   creditedAt: string | null;
 }
 
-interface Summary {
+interface BasicSummary {
   total: number;
   inProgress: number;
   completed: number;
   cancelled: number;
+}
+
+interface RewardSummary {
+  total: number;
+  inProgress: number;
+  completed: number;
+  cancelled: number;
+  creditedCount: number;
+  uncreditedCompletedCount: number;
+  totalCredits: number;
 }
 
 // ── 상태 배지 ────────────────────────────────────────────────
@@ -61,7 +74,7 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 // ── 요약 카드 ─────────────────────────────────────────────────
-function SummaryCard({ label, value, accent }: { label: string; value: number; accent: string }) {
+function SummaryCard({ label, value, sub, accent }: { label: string; value: string | number; sub?: string; accent: string }) {
   return (
     <div style={{
       backgroundColor: colors.white,
@@ -70,10 +83,11 @@ function SummaryCard({ label, value, accent }: { label: string; value: number; a
       borderLeft: `4px solid ${accent}`,
       boxShadow: '0 1px 3px rgba(0,0,0,0.07)',
     }}>
-      <p style={{ fontSize: '12px', color: colors.neutral500, margin: '0 0 6px' }}>{label}</p>
-      <p style={{ fontSize: '26px', fontWeight: 700, color: colors.neutral900, margin: 0 }}>
-        {value.toLocaleString()}
+      <p style={{ fontSize: '12px', color: colors.neutral500, margin: '0 0 4px' }}>{label}</p>
+      <p style={{ fontSize: '24px', fontWeight: 700, color: colors.neutral900, margin: 0, lineHeight: 1 }}>
+        {typeof value === 'number' ? value.toLocaleString() : value}
       </p>
+      {sub && <p style={{ fontSize: '11px', color: colors.neutral400, margin: '4px 0 0' }}>{sub}</p>}
     </div>
   );
 }
@@ -98,6 +112,7 @@ function FilterTab({
         fontWeight: active ? 600 : 400,
         color: active ? colors.primary : colors.neutral600,
         transition: 'all 0.15s',
+        whiteSpace: 'nowrap',
       }}
     >
       {label}{count !== undefined ? ` (${count})` : ''}
@@ -111,31 +126,68 @@ export default function ContentParticipantsPage() {
   const navigate = useNavigate();
 
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [creditedFilter, setCreditedFilter] = useState<CreditedFilter>('all');
+  const [nameSearchInput, setNameSearchInput] = useState('');
+  const [nameSearch, setNameSearch] = useState('');
   const [page, setPage] = useState(1);
   const [items, setItems] = useState<ParticipantItem[]>([]);
-  const [summary, setSummary] = useState<Summary>({ total: 0, inProgress: 0, completed: 0, cancelled: 0 });
+  const [basicSummary, setBasicSummary] = useState<BasicSummary>({ total: 0, inProgress: 0, completed: 0, cancelled: 0 });
+  const [rewardSummary, setRewardSummary] = useState<RewardSummary | null>(null);
   const [courseTitle, setCourseTitle] = useState('');
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [exportLoading, setExportLoading] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
+  const searchRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const LIMIT = 20;
 
+  // 이름 검색 디바운스 (400ms)
+  useEffect(() => {
+    if (searchRef.current) clearTimeout(searchRef.current);
+    searchRef.current = setTimeout(() => {
+      setNameSearch(nameSearchInput);
+      setPage(1);
+    }, 400);
+    return () => { if (searchRef.current) clearTimeout(searchRef.current); };
+  }, [nameSearchInput]);
+
+  // 보상 요약 통계 — courseId 변경 시 1회 로드
+  useEffect(() => {
+    if (!courseId) return;
+    lmsInstructorApi.participantsSummary(courseId)
+      .then(res => setRewardSummary((res as any).data ?? null))
+      .catch(() => {/* summary 실패는 무시 */});
+  }, [courseId]);
+
+  // 참여자 목록 로드
   const load = useCallback(async () => {
     if (!courseId) return;
     try {
       setLoading(true);
       setError(null);
+
+      // completed_uncredited 탭은 status=completed + credited=false
+      const isUncreditedTab = statusFilter === 'completed_uncredited';
       const apiParams: Parameters<typeof lmsInstructorApi.participants>[1] = {
-        status: statusFilter === 'completed_uncredited' ? 'completed' : statusFilter,
+        status: isUncreditedTab ? 'completed' : statusFilter,
         page,
         limit: LIMIT,
+        query: nameSearch || undefined,
       };
-      if (statusFilter === 'completed_uncredited') apiParams.credited = false;
+      if (isUncreditedTab) {
+        apiParams.credited = false;
+      } else if (creditedFilter === 'true') {
+        apiParams.credited = true;
+      } else if (creditedFilter === 'false') {
+        apiParams.credited = false;
+      }
+
       const res = await lmsInstructorApi.participants(courseId, apiParams);
       const d = (res as any).data;
       setCourseTitle(d.course?.title ?? '');
-      setSummary(d.summary ?? { total: 0, inProgress: 0, completed: 0, cancelled: 0 });
+      setBasicSummary(d.summary ?? { total: 0, inProgress: 0, completed: 0, cancelled: 0 });
       setItems(d.items ?? []);
       const t = d.pagination?.total ?? 0;
       setTotalPages(Math.max(1, Math.ceil(t / LIMIT)));
@@ -144,12 +196,19 @@ export default function ContentParticipantsPage() {
     } finally {
       setLoading(false);
     }
-  }, [courseId, statusFilter, page]);
+  }, [courseId, statusFilter, creditedFilter, nameSearch, page]);
 
   useEffect(() => { load(); }, [load]);
 
-  const handleFilterChange = (f: StatusFilter) => {
+  const handleStatusChange = (f: StatusFilter) => {
     setStatusFilter(f);
+    // 완료(미지급) 탭 선택 시 보상 필터 초기화
+    if (f === 'completed_uncredited') setCreditedFilter('all');
+    setPage(1);
+  };
+
+  const handleCreditedChange = (f: CreditedFilter) => {
+    setCreditedFilter(f);
     setPage(1);
   };
 
@@ -159,17 +218,58 @@ export default function ContentParticipantsPage() {
     return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
   };
 
+  // CSV 다운로드
+  const handleExport = async () => {
+    if (!courseId) return;
+    try {
+      setExportLoading(true);
+      setExportError(null);
+
+      const isUncreditedTab = statusFilter === 'completed_uncredited';
+      const exportParams: Parameters<typeof lmsInstructorApi.participantsExportUrl>[1] = {
+        status: isUncreditedTab ? 'completed' : (statusFilter !== 'all' ? statusFilter : undefined),
+        query: nameSearch || undefined,
+      };
+      if (isUncreditedTab) {
+        exportParams.credited = 'false';
+      } else if (creditedFilter !== 'all') {
+        exportParams.credited = creditedFilter;
+      }
+
+      const url = lmsInstructorApi.participantsExportUrl(courseId, exportParams);
+      const token = await getAccessToken();
+      const response = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) throw new Error('export failed');
+
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      const cd = response.headers.get('Content-Disposition') ?? '';
+      const match = cd.match(/filename\*=UTF-8''(.+)/);
+      a.download = match ? decodeURIComponent(match[1]) : `participants_${courseId}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
+    } catch {
+      setExportError('CSV 내보내기에 실패했습니다.');
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
   return (
     <div style={styles.container}>
       {/* 헤더 */}
       <div style={styles.header}>
-        <button
-          onClick={() => navigate('/instructor/dashboard')}
-          style={styles.backBtn}
-        >
+        <button onClick={() => navigate('/instructor/dashboard')} style={styles.backBtn}>
           ← 대시보드로
         </button>
-        <div>
+        <div style={{ flex: 1 }}>
           <h1 style={styles.pageTitle}>참여자 관리</h1>
           {courseTitle && (
             <p style={{ ...typography.bodyM, color: colors.neutral500, margin: '4px 0 0' }}>
@@ -177,23 +277,100 @@ export default function ContentParticipantsPage() {
             </p>
           )}
         </div>
+        {/* CSV 다운로드 버튼 */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+          <button
+            onClick={handleExport}
+            disabled={exportLoading}
+            style={{
+              padding: '8px 16px',
+              fontSize: '13px',
+              fontWeight: 500,
+              color: exportLoading ? colors.neutral400 : colors.primary,
+              backgroundColor: colors.white,
+              border: `1px solid ${exportLoading ? colors.neutral300 : colors.primary}`,
+              borderRadius: '6px',
+              cursor: exportLoading ? 'not-allowed' : 'pointer',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {exportLoading ? '내보내는 중...' : 'CSV 다운로드'}
+          </button>
+          {exportError && (
+            <p style={{ fontSize: '11px', color: '#dc2626', margin: 0 }}>{exportError}</p>
+          )}
+        </div>
       </div>
 
-      {/* 요약 카드 */}
+      {/* 요약 카드 — 기본 통계 + 보상 통계 */}
       <div style={styles.summaryGrid}>
-        <SummaryCard label="전체 참여자" value={summary.total} accent={colors.primary} />
-        <SummaryCard label="진행중" value={summary.inProgress} accent="#f59e0b" />
-        <SummaryCard label="완료" value={summary.completed} accent="#10b981" />
-        <SummaryCard label="취소" value={summary.cancelled} accent="#ef4444" />
+        <SummaryCard label="총 참여자" value={basicSummary.total} accent={colors.primary} />
+        <SummaryCard label="완료" value={basicSummary.completed} accent="#10b981" />
+        <SummaryCard label="보상 지급" value={rewardSummary?.creditedCount ?? '-'} accent="#0369a1" />
+        <SummaryCard
+          label="완료(미지급)"
+          value={rewardSummary?.uncreditedCompletedCount ?? '-'}
+          accent="#f59e0b"
+        />
+        <SummaryCard
+          label="총 지급 Credit"
+          value={rewardSummary ? `${rewardSummary.totalCredits.toLocaleString()} C` : '-'}
+          accent="#8b5cf6"
+        />
+      </div>
+
+      {/* 필터 행 — 보상 필터 + 이름 검색 */}
+      <div style={styles.filterRow}>
+        {/* 보상 필터 */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '13px', color: colors.neutral600, whiteSpace: 'nowrap' }}>보상:</span>
+          {(['all', 'true', 'false'] as CreditedFilter[]).map(v => (
+            <button
+              key={v}
+              onClick={() => handleCreditedChange(v)}
+              disabled={statusFilter === 'completed_uncredited' && v !== 'all'}
+              style={{
+                padding: '5px 12px',
+                fontSize: '12px',
+                fontWeight: creditedFilter === v ? 600 : 400,
+                color: creditedFilter === v ? colors.primary : colors.neutral600,
+                backgroundColor: creditedFilter === v ? '#eff6ff' : colors.white,
+                border: `1px solid ${creditedFilter === v ? colors.primary : colors.neutral300}`,
+                borderRadius: '20px',
+                cursor: 'pointer',
+                opacity: statusFilter === 'completed_uncredited' && v !== 'all' ? 0.4 : 1,
+              }}
+            >
+              {v === 'all' ? '전체' : v === 'true' ? '지급됨' : '미지급'}
+            </button>
+          ))}
+        </div>
+
+        {/* 이름 검색 */}
+        <input
+          type="text"
+          placeholder="이름 검색..."
+          value={nameSearchInput}
+          onChange={e => setNameSearchInput(e.target.value)}
+          style={{
+            padding: '7px 12px',
+            fontSize: '13px',
+            border: `1px solid ${colors.neutral300}`,
+            borderRadius: '6px',
+            width: '200px',
+            outline: 'none',
+            color: colors.neutral800,
+          }}
+        />
       </div>
 
       {/* 상태 필터 탭 */}
       <div style={styles.tabBar}>
-        <FilterTab value="all"                current={statusFilter} label="전체"       count={summary.total}       onChange={handleFilterChange} />
-        <FilterTab value="in_progress"        current={statusFilter} label="진행중"     count={summary.inProgress}   onChange={handleFilterChange} />
-        <FilterTab value="completed"          current={statusFilter} label="완료"       count={summary.completed}    onChange={handleFilterChange} />
-        <FilterTab value="completed_uncredited" current={statusFilter} label="완료(미지급)"              onChange={handleFilterChange} />
-        <FilterTab value="cancelled"          current={statusFilter} label="취소"       count={summary.cancelled}    onChange={handleFilterChange} />
+        <FilterTab value="all"                  current={statusFilter} label="전체"       count={basicSummary.total}       onChange={handleStatusChange} />
+        <FilterTab value="in_progress"          current={statusFilter} label="진행중"     count={basicSummary.inProgress}  onChange={handleStatusChange} />
+        <FilterTab value="completed"            current={statusFilter} label="완료"       count={basicSummary.completed}   onChange={handleStatusChange} />
+        <FilterTab value="completed_uncredited" current={statusFilter} label="완료(미지급)"                                onChange={handleStatusChange} />
+        <FilterTab value="cancelled"            current={statusFilter} label="취소"       count={basicSummary.cancelled}   onChange={handleStatusChange} />
       </div>
 
       {/* 테이블 */}
@@ -208,7 +385,7 @@ export default function ContentParticipantsPage() {
         </div>
       ) : items.length === 0 ? (
         <div style={styles.centerMsg}>
-          <p style={{ color: colors.neutral500 }}>해당 상태의 참여자가 없습니다.</p>
+          <p style={{ color: colors.neutral500 }}>해당 조건의 참여자가 없습니다.</p>
         </div>
       ) : (
         <div style={styles.tableWrap}>
@@ -235,15 +412,11 @@ export default function ContentParticipantsPage() {
                   <td style={styles.td}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <div style={{
-                        width: '60px',
-                        height: '6px',
-                        backgroundColor: colors.neutral200,
-                        borderRadius: '3px',
-                        overflow: 'hidden',
+                        width: '60px', height: '6px',
+                        backgroundColor: colors.neutral200, borderRadius: '3px', overflow: 'hidden',
                       }}>
                         <div style={{
-                          width: `${item.progressPercentage}%`,
-                          height: '100%',
+                          width: `${item.progressPercentage}%`, height: '100%',
                           backgroundColor: item.progressPercentage === 100 ? '#10b981' : colors.primary,
                           borderRadius: '3px',
                         }} />
@@ -257,11 +430,10 @@ export default function ContentParticipantsPage() {
                     <span style={{ color: colors.neutral600, fontSize: '13px' }}>{fmt(item.completedAt)}</span>
                   </td>
                   <td style={styles.td}>
-                    {item.certificateIssued ? (
-                      <span style={{ color: '#15803d', fontSize: '12px', fontWeight: 600 }}>발급됨</span>
-                    ) : (
-                      <span style={{ color: colors.neutral400, fontSize: '12px' }}>없음</span>
-                    )}
+                    {item.certificateIssued
+                      ? <span style={{ color: '#15803d', fontSize: '12px', fontWeight: 600 }}>발급됨</span>
+                      : <span style={{ color: colors.neutral400, fontSize: '12px' }}>없음</span>
+                    }
                   </td>
                   <td style={styles.td}>
                     {item.credited ? (
@@ -322,7 +494,8 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     alignItems: 'flex-start',
     gap: '16px',
-    marginBottom: '28px',
+    marginBottom: '24px',
+    flexWrap: 'wrap',
   },
   backBtn: {
     padding: '8px 12px',
@@ -343,15 +516,24 @@ const styles: Record<string, React.CSSProperties> = {
   },
   summaryGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-    gap: '16px',
-    marginBottom: '28px',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+    gap: '12px',
+    marginBottom: '24px',
+  },
+  filterRow: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    gap: '12px',
+    marginBottom: '8px',
   },
   tabBar: {
     display: 'flex',
     borderBottom: `1px solid ${colors.neutral200}`,
     marginBottom: '20px',
     gap: '4px',
+    overflowX: 'auto',
   },
   tableWrap: {
     backgroundColor: colors.white,

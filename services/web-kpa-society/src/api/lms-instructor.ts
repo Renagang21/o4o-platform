@@ -187,10 +187,12 @@ export const lmsInstructorApi = {
 
   // WO-O4O-MARKETING-CONTENT-OPERATIONS-MVP-V1
   /** 콘텐츠별 참여자 목록 */
-  participants: (courseId: string, params?: { status?: string; credited?: boolean; page?: number; limit?: number; sort?: string }) => {
+  participants: (courseId: string, params?: { status?: string; credited?: boolean; query?: string; page?: number; limit?: number; sort?: string }) => {
     const qs = new URLSearchParams();
     if (params?.status) qs.set('status', params.status);
     if (params?.credited === false) qs.set('credited', 'false');
+    if (params?.credited === true)  qs.set('credited', 'true');
+    if (params?.query)  qs.set('query', params.query);
     if (params?.page)   qs.set('page', String(params.page));
     if (params?.limit)  qs.set('limit', String(params.limit));
     if (params?.sort)   qs.set('sort', params.sort);
@@ -215,5 +217,30 @@ export const lmsInstructorApi = {
         pagination: { page: number; limit: number; total: number };
       };
     }>(`/lms/instructor/participants/${courseId}?${qs.toString()}`);
+  },
+
+  /** 보상 운영 요약 통계 (WO-O4O-MARKETING-CONTENT-OPERATIONS-ENHANCEMENT-V2) */
+  participantsSummary: (courseId: string) =>
+    authClient.api.get<{
+      success: boolean;
+      data: {
+        total: number;
+        inProgress: number;
+        completed: number;
+        cancelled: number;
+        creditedCount: number;
+        uncreditedCompletedCount: number;
+        totalCredits: number;
+      };
+    }>(`/lms/instructor/participants/${courseId}/summary`),
+
+  /** CSV 내보내기 URL 반환 — fetch + blob 다운로드용 */
+  participantsExportUrl: (courseId: string, params?: { status?: string; credited?: string; query?: string }) => {
+    const qs = new URLSearchParams();
+    if (params?.status)  qs.set('status', params.status);
+    if (params?.credited) qs.set('credited', params.credited);
+    if (params?.query)   qs.set('query', params.query);
+    const base = (import.meta as any).env?.VITE_API_BASE_URL ?? '';
+    return `${base}/api/v1/lms/instructor/participants/${courseId}/export?${qs.toString()}`;
   },
 };
