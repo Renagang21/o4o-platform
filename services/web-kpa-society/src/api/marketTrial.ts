@@ -36,6 +36,13 @@ export interface TrialSummary {
   endDate?: string;
   visibleServiceKeys: string[];
   forumPostId?: string;
+  // WO-MARKET-TRIAL-CROWDFUNDING-CORE-ALIGNMENT-V1
+  targetAmount?: number | null;
+  currentAmount?: number;
+  trialUnitPrice?: number | null;
+  rewardRate?: number;
+  amountRate?: number | null;
+  recruitRate?: number | null;
   createdAt: string;
 }
 

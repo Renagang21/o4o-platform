@@ -148,6 +148,14 @@ export class MarketTrial {
   rewardOptions!: string[];
 
   /**
+   * Reward rate (%) that participants receive on top of their contribution.
+   * e.g. 5 means participants get 5% extra value (in product or cash) back.
+   * WO-MARKET-TRIAL-CROWDFUNDING-CORE-ALIGNMENT-V1
+   */
+  @Column({ type: 'decimal', precision: 5, scale: 2, default: 0 })
+  rewardRate!: number;
+
+  /**
    * Maximum number of participants (null = unlimited)
    */
   @Column({ type: 'int', nullable: true })

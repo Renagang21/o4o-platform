@@ -289,6 +289,57 @@ export function MarketTrialDetailPage() {
         </div>
       </section>
 
+      {/* ── 펀딩 구조 — WO-MARKET-TRIAL-CROWDFUNDING-CORE-ALIGNMENT-V1 ── */}
+      {(trial.targetAmount || (trial.rewardRate != null && trial.rewardRate > 0)) && (
+        <section style={{
+          backgroundColor: '#F5F3FF',
+          borderRadius: borderRadius.lg,
+          border: '1px solid #DDD6FE',
+          padding: '16px 20px',
+          marginBottom: '20px',
+        }}>
+          <h3 style={{ fontSize: '0.875rem', fontWeight: 600, color: '#5B21B6', marginBottom: '12px' }}>
+            펀딩 구조
+          </h3>
+          <InfoGrid>
+            {trial.targetAmount != null && trial.targetAmount > 0 && (
+              <InfoItem label="목표 금액" value={`${trial.targetAmount.toLocaleString()}원`} />
+            )}
+            {trial.currentAmount != null && trial.currentAmount > 0 && (
+              <InfoItem label="현재 모집" value={`${trial.currentAmount.toLocaleString()}원`} />
+            )}
+            {trial.amountRate != null && (
+              <InfoItem label="달성률" value={`${trial.amountRate}%`} />
+            )}
+            {trial.trialUnitPrice != null && trial.trialUnitPrice > 0 && (
+              <InfoItem label="제품 단가" value={`${trial.trialUnitPrice.toLocaleString()}원`} />
+            )}
+            {trial.rewardRate != null && trial.rewardRate > 0 && (
+              <InfoItem label="리워드" value={`+${trial.rewardRate}%`} />
+            )}
+          </InfoGrid>
+          {trial.trialUnitPrice != null && trial.trialUnitPrice > 0 && trial.rewardRate != null && trial.rewardRate > 0 && (() => {
+            const total = Math.round(trial.trialUnitPrice * (1 + trial.rewardRate / 100));
+            const qty = Math.floor(total / trial.trialUnitPrice);
+            const rem = total - qty * trial.trialUnitPrice;
+            return (
+              <div style={{
+                marginTop: '12px',
+                padding: '10px 14px',
+                backgroundColor: '#EDE9FE',
+                borderRadius: borderRadius.md,
+                fontSize: '0.8125rem',
+                color: '#4C1D95',
+              }}>
+                <strong>정산 예시</strong>: 단가 {trial.trialUnitPrice.toLocaleString()}원 참여 시
+                → 총 {total.toLocaleString()}원 환원
+                {qty > 0 && ` → 약 ${qty}개${rem > 0 ? ` + 잔액 ${rem.toLocaleString()}원` : ''}`}
+              </div>
+            );
+          })()}
+        </section>
+      )}
+
       {/* ── 참여 신청 섹션 ── */}
       <section style={{
         backgroundColor: colors.white,

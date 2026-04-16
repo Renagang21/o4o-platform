@@ -40,6 +40,18 @@ export interface Trial {
   startDate?: string;
   endDate?: string;
   trialPeriodDays?: number;
+  // WO-MARKET-TRIAL-CROWDFUNDING-CORE-ALIGNMENT-V1
+  targetAmount?: number | null;
+  currentAmount?: number;
+  trialUnitPrice?: number | null;
+  rewardRate?: number;
+  amountRate?: number | null;
+  recruitRate?: number | null;
+  settlementPreview?: {
+    totalAmount: number;
+    productQty: number;
+    remainder: number;
+  } | null;
   createdAt: string;
   updatedAt?: string;
 }
@@ -113,6 +125,10 @@ export interface CreateTrialPayload {
   fundingStartAt: string;
   fundingEndAt: string;
   trialPeriodDays: number;
+  // WO-MARKET-TRIAL-CROWDFUNDING-CORE-ALIGNMENT-V1
+  targetAmount?: number;
+  trialUnitPrice?: number;
+  rewardRate?: number;
 }
 
 export interface TrialResultsSummary {

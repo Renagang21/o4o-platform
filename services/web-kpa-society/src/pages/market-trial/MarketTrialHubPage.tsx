@@ -405,6 +405,49 @@ function TrialCard({ trial, group, participation }: { trial: TrialSummary; group
         )}
       </div>
 
+      {/* 펀딩 정보 — WO-MARKET-TRIAL-CROWDFUNDING-CORE-ALIGNMENT-V1 */}
+      {(trial.targetAmount || (trial.rewardRate != null && trial.rewardRate > 0)) && (
+        <div style={{
+          padding: '10px 24px',
+          borderTop: `1px solid ${colors.neutral100}`,
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '14px',
+          fontSize: '0.8125rem',
+          alignItems: 'center',
+        }}>
+          {trial.targetAmount && trial.targetAmount > 0 && (
+            <span style={{ color: colors.neutral600 }}>
+              목표 <strong style={{ color: colors.neutral800 }}>{trial.targetAmount.toLocaleString()}원</strong>
+              {trial.currentAmount != null && trial.currentAmount > 0 && (
+                <> · 현재 {trial.currentAmount.toLocaleString()}원</>
+              )}
+            </span>
+          )}
+          {trial.amountRate != null && (
+            <span style={{
+              padding: '1px 8px',
+              backgroundColor: trial.amountRate >= 100 ? '#DCFCE7' : '#EFF6FF',
+              color: trial.amountRate >= 100 ? '#166534' : '#1D4ED8',
+              borderRadius: '10px',
+              fontWeight: 600,
+            }}>
+              {trial.amountRate}% 달성
+            </span>
+          )}
+          {trial.rewardRate != null && trial.rewardRate > 0 && (
+            <span style={{ color: '#7C3AED', fontWeight: 600 }}>
+              리워드 +{trial.rewardRate}%
+            </span>
+          )}
+          {trial.trialUnitPrice && trial.trialUnitPrice > 0 && (
+            <span style={{ color: colors.neutral500 }}>
+              단가 {trial.trialUnitPrice.toLocaleString()}원
+            </span>
+          )}
+        </div>
+      )}
+
       {/* 하단: 메타 정보 + 액션 */}
       <div style={{
         padding: '12px 24px',
@@ -419,6 +462,17 @@ function TrialCard({ trial, group, participation }: { trial: TrialSummary; group
           <span>
             참여 {trial.currentParticipants}{trial.maxParticipants ? ` / ${trial.maxParticipants}` : ''}명
           </span>
+          {trial.recruitRate != null && (
+            <span style={{
+              padding: '1px 6px',
+              backgroundColor: colors.neutral100,
+              borderRadius: '8px',
+              color: colors.neutral600,
+              fontWeight: 500,
+            }}>
+              모집 {trial.recruitRate}%
+            </span>
+          )}
           {trial.endDate && (
             <span>
               마감 {new Date(trial.endDate).toLocaleDateString()}

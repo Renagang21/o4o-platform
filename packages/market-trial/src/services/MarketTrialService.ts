@@ -34,9 +34,33 @@ export interface CreateTrialDto {
   maxParticipants?: number;
   trialUnitPrice?: number;
   targetAmount?: number;
+  /** Reward rate (%) — WO-MARKET-TRIAL-CROWDFUNDING-CORE-ALIGNMENT-V1 */
+  rewardRate?: number;
   fundingStartAt: Date;
   fundingEndAt: Date;
   trialPeriodDays: number;
+}
+
+/**
+ * 크라우드 펀딩 정산 계산
+ * WO-MARKET-TRIAL-CROWDFUNDING-CORE-ALIGNMENT-V1
+ *
+ * @param contribution  참여자 기여금 (원)
+ * @param rewardRate    리워드 비율 (%, e.g. 5 = 5%)
+ * @param unitPrice     제품 단가 (원, 0이면 수량 계산 안 함)
+ */
+export function calculateSettlement(
+  contribution: number,
+  rewardRate: number,
+  unitPrice: number,
+): { totalAmount: number; productQty: number; remainder: number } {
+  const totalAmount = contribution * (1 + rewardRate / 100);
+  if (!unitPrice || unitPrice <= 0) {
+    return { totalAmount, productQty: 0, remainder: totalAmount };
+  }
+  const productQty = Math.floor(totalAmount / unitPrice);
+  const remainder = totalAmount - productQty * unitPrice;
+  return { totalAmount, productQty, remainder };
 }
 
 export interface ParticipateDto {
@@ -78,6 +102,7 @@ export class MarketTrialService {
       maxParticipants: dto.maxParticipants || undefined,
       trialUnitPrice: dto.trialUnitPrice || 0,
       targetAmount: dto.targetAmount || 0,
+      rewardRate: dto.rewardRate ?? 0,
       currentAmount: 0,
       fundingStartAt: dto.fundingStartAt,
       fundingEndAt: dto.fundingEndAt,

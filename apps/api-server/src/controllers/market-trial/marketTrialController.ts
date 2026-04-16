@@ -145,6 +145,7 @@ export class MarketTrialController {
       const {
         title, description, visibleServiceKeys, outcomeSnapshot,
         maxParticipants, fundingStartAt, fundingEndAt, trialPeriodDays,
+        targetAmount, trialUnitPrice, rewardRate,
       } = req.body;
 
       if (!title || !fundingStartAt || !fundingEndAt || !trialPeriodDays) {
@@ -162,6 +163,9 @@ export class MarketTrialController {
         visibleServiceKeys: visibleServiceKeys || [],
         outcomeSnapshot,
         maxParticipants: maxParticipants || undefined,
+        targetAmount: targetAmount != null ? Number(targetAmount) : undefined,
+        trialUnitPrice: trialUnitPrice != null ? Number(trialUnitPrice) : undefined,
+        rewardRate: rewardRate != null ? Number(rewardRate) : undefined,
         fundingStartAt: new Date(fundingStartAt),
         fundingEndAt: new Date(fundingEndAt),
         trialPeriodDays: Number(trialPeriodDays),
@@ -596,6 +600,27 @@ export class MarketTrialController {
  * WO-MARKET-TRIAL-KPA-DETAIL-AND-FORUM-DEEP-LINK-V1: forumPostId 추가
  */
 function toTrialDTO(trial: MarketTrial, forumPostId?: string | null): any {
+  const targetAmount = Number(trial.targetAmount) || 0;
+  const currentAmount = Number(trial.currentAmount) || 0;
+  const trialUnitPrice = Number(trial.trialUnitPrice) || 0;
+  const rewardRate = Number(trial.rewardRate) || 0;
+  const maxParticipants = trial.maxParticipants || null;
+  const currentParticipants = trial.currentParticipants;
+
+  // 달성률 계산 (WO-MARKET-TRIAL-CROWDFUNDING-CORE-ALIGNMENT-V1)
+  const amountRate = targetAmount > 0 ? Math.round((currentAmount / targetAmount) * 100) : null;
+  const recruitRate = maxParticipants ? Math.round((currentParticipants / maxParticipants) * 100) : null;
+
+  // 정산 미리보기 (단가 1단위 참여 기준)
+  let settlementPreview: { totalAmount: number; productQty: number; remainder: number } | null = null;
+  if (trialUnitPrice > 0 || rewardRate > 0) {
+    const base = trialUnitPrice > 0 ? trialUnitPrice : 10000;
+    const total = base * (1 + rewardRate / 100);
+    const qty = trialUnitPrice > 0 ? Math.floor(total / trialUnitPrice) : 0;
+    const rem = trialUnitPrice > 0 ? total - qty * trialUnitPrice : total;
+    settlementPreview = { totalAmount: Math.round(total), productQty: qty, remainder: Math.round(rem) };
+  }
+
   return {
     id: trial.id,
     title: trial.title,
@@ -607,8 +632,8 @@ function toTrialDTO(trial: MarketTrial, forumPostId?: string | null): any {
     productRewardDescription: trial.outcomeSnapshot?.description,
     status: trial.status,
     outcomeSnapshot: trial.outcomeSnapshot,
-    maxParticipants: trial.maxParticipants || undefined,
-    currentParticipants: trial.currentParticipants,
+    maxParticipants: maxParticipants || undefined,
+    currentParticipants,
     startDate: trial.fundingStartAt ? new Date(trial.fundingStartAt).toISOString() : undefined,
     endDate: trial.fundingEndAt ? new Date(trial.fundingEndAt).toISOString() : undefined,
     deadline: trial.fundingEndAt ? new Date(trial.fundingEndAt).toISOString() : undefined,
@@ -618,6 +643,14 @@ function toTrialDTO(trial: MarketTrial, forumPostId?: string | null): any {
     convertedProductId: trial.convertedProductId || null,
     convertedProductName: trial.convertedProductName || null,
     conversionNote: trial.conversionNote || null,
+    // WO-MARKET-TRIAL-CROWDFUNDING-CORE-ALIGNMENT-V1
+    targetAmount: targetAmount || null,
+    currentAmount: currentAmount || 0,
+    trialUnitPrice: trialUnitPrice || null,
+    rewardRate: rewardRate || 0,
+    amountRate,
+    recruitRate,
+    settlementPreview,
     createdAt: new Date(trial.createdAt).toISOString(),
   };
 }

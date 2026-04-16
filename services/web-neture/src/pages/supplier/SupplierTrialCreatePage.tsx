@@ -27,8 +27,23 @@ export default function SupplierTrialCreatePage() {
   const [fundingStartAt, setFundingStartAt] = useState('');
   const [fundingEndAt, setFundingEndAt] = useState('');
   const [trialPeriodDays, setTrialPeriodDays] = useState('30');
+  // WO-MARKET-TRIAL-CROWDFUNDING-CORE-ALIGNMENT-V1
+  const [targetAmount, setTargetAmount] = useState('');
+  const [trialUnitPrice, setTrialUnitPrice] = useState('');
+  const [rewardRate, setRewardRate] = useState('0');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // 정산 계산 미리보기
+  const settlementPreview = (() => {
+    const unit = Number(trialUnitPrice);
+    const rate = Number(rewardRate);
+    if (!unit || unit <= 0) return null;
+    const total = unit * (1 + rate / 100);
+    const qty = Math.floor(total / unit);
+    const rem = total - qty * unit;
+    return { total: Math.round(total), qty, rem: Math.round(rem) };
+  })();
 
   const toggleServiceKey = (key: string) => {
     setVisibleServiceKeys((prev) =>
@@ -73,6 +88,10 @@ export default function SupplierTrialCreatePage() {
         fundingStartAt: new Date(fundingStartAt).toISOString(),
         fundingEndAt: new Date(fundingEndAt).toISOString(),
         trialPeriodDays: Number(trialPeriodDays),
+        // WO-MARKET-TRIAL-CROWDFUNDING-CORE-ALIGNMENT-V1
+        targetAmount: targetAmount ? Number(targetAmount) : undefined,
+        trialUnitPrice: trialUnitPrice ? Number(trialUnitPrice) : undefined,
+        rewardRate: Number(rewardRate) || 0,
       };
 
       const created = await createTrial(payload);
@@ -179,6 +198,75 @@ export default function SupplierTrialCreatePage() {
             placeholder="예: 시험 참여 매장에 정식 제품 1박스 제공"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
+        </div>
+
+        {/* 펀딩 구조 — WO-MARKET-TRIAL-CROWDFUNDING-CORE-ALIGNMENT-V1 */}
+        <div className="space-y-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <h3 className="text-sm font-semibold text-blue-800">펀딩 구조 설정</h3>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                목표 금액 (원)
+              </label>
+              <input
+                type="number"
+                value={targetAmount}
+                onChange={(e) => setTargetAmount(e.target.value)}
+                min="0"
+                placeholder="예: 1000000"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                제품 단가 (원)
+              </label>
+              <input
+                type="number"
+                value={trialUnitPrice}
+                onChange={(e) => setTrialUnitPrice(e.target.value)}
+                min="0"
+                placeholder="예: 2000"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              리워드 (%) — 참여자에게 돌아가는 추가 환원 비율
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="number"
+                value={rewardRate}
+                onChange={(e) => setRewardRate(e.target.value)}
+                min="0"
+                max="100"
+                step="0.5"
+                className="w-32 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+              <span className="text-sm text-gray-500">% (0 = 리워드 없음)</span>
+            </div>
+          </div>
+
+          {/* 계산 미리보기 */}
+          {settlementPreview && (
+            <div className="p-3 bg-white border border-blue-200 rounded-lg text-sm">
+              <p className="font-medium text-blue-700 mb-1">정산 계산 미리보기 (단가 1개 기준)</p>
+              <p className="text-gray-600">
+                단가 {Number(trialUnitPrice).toLocaleString()}원 + 리워드 {rewardRate}%
+                → 총 {settlementPreview.total.toLocaleString()}원
+              </p>
+              {settlementPreview.qty > 0 && (
+                <p className="text-gray-600">
+                  → 약 {settlementPreview.qty}개
+                  {settlementPreview.rem > 0 ? ` + 잔액 ${settlementPreview.rem.toLocaleString()}원` : ''}
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         {/* 참여 인원 */}

@@ -4,7 +4,7 @@
  * Export all services for market-trial
  */
 
-export { MarketTrialService } from './MarketTrialService.js';
+export { MarketTrialService, calculateSettlement } from './MarketTrialService.js';
 export type {
   CreateTrialDto,
   ParticipateDto,
