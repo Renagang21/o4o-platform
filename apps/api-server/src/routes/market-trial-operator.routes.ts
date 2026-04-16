@@ -110,6 +110,8 @@ export function createNetureOperatorTrialRoutes(): Router {
   router.patch('/:id/participants/:participantId/reward-status', MarketTrialOperatorController.updateParticipantRewardStatus);
   // WO-MARKET-TRIAL-PARTICIPANT-TO-CUSTOMER-FLOW-V1
   router.patch('/:id/participants/:participantId/conversion', MarketTrialOperatorController.updateParticipantConversionStatus);
+  // WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1
+  router.patch('/:id/participants/:participantId/settlement-status', MarketTrialOperatorController.updateParticipantSettlementStatus);
   // WO-MARKET-TRIAL-LISTING-AUTOLINK-V1
   router.post('/:id/participants/:participantId/listing', MarketTrialOperatorController.createListingFromParticipant);
   router.patch('/:id/status', MarketTrialOperatorController.updateTrialStatus);

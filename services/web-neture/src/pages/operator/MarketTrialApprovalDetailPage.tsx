@@ -19,6 +19,7 @@ import {
   exportParticipantsCSV,
   updateParticipantRewardStatus,
   updateParticipantConversionStatus,
+  updateParticipantSettlementStatus,
   createListingFromTrialParticipant,
   updateTrialStatus,
   convertTrialToProduct,
@@ -32,6 +33,7 @@ import type {
   TrialStatus,
   ProductSearchItem,
   CustomerConversionStatus,
+  SettlementStatus,
 } from '../../api/trial';
 import { BaseTable } from '@o4o/ui';
 import type { O4OColumn } from '@o4o/ui';
@@ -75,6 +77,8 @@ export default function MarketTrialApprovalDetailPage() {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [updatingConversionId, setUpdatingConversionId] = useState<string | null>(null);
   const [creatingListingId, setCreatingListingId] = useState<string | null>(null);
+  // WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1
+  const [updatingSettlementId, setUpdatingSettlementId] = useState<string | null>(null);
   const [showStatusModal, setShowStatusModal] = useState(false);
   // WO-MARKET-TRIAL-PRODUCT-LINK-SEARCH-UI-V1
   const [showConvertModal, setShowConvertModal] = useState(false);
@@ -210,6 +214,24 @@ export default function MarketTrialApprovalDetailPage() {
       setError(err.response?.data?.message || err.message || '전환 상태 변경에 실패했습니다.');
     } finally {
       setUpdatingConversionId(null);
+    }
+  };
+
+  // WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1
+  const handleSettlementStatusChange = async (
+    participant: TrialParticipant,
+    newStatus: SettlementStatus,
+    note?: string,
+  ) => {
+    if (!id) return;
+    setUpdatingSettlementId(participant.id);
+    try {
+      await updateParticipantSettlementStatus(id, participant.id, newStatus, note);
+      await loadParticipants(id, filter);
+    } catch (err: any) {
+      setError(err.response?.data?.message || err.message || '정산 상태 변경에 실패했습니다.');
+    } finally {
+      setUpdatingSettlementId(null);
     }
   };
 
@@ -415,6 +437,9 @@ export default function MarketTrialApprovalDetailPage() {
         onCreateListing={handleCreateListing}
         creatingListingId={creatingListingId}
         trialConverted={!!trial.convertedProductId}
+        onSettlementStatusChange={handleSettlementStatusChange}
+        updatingSettlementId={updatingSettlementId}
+        trialStatus={trial.status}
       />
 
       {/* Trial Status Control (non-submitted states) */}
@@ -746,6 +771,33 @@ const CONVERSION_STATUS_COLORS: Record<CustomerConversionStatus, string> = {
 
 const CONVERSION_STATUS_OPTIONS: CustomerConversionStatus[] = ['none', 'interested', 'considering', 'adopted', 'first_order'];
 
+// WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1
+const SETTLEMENT_STATUS_LABELS: Record<SettlementStatus, string> = {
+  pending: '정산 대기',
+  choice_pending: '선택 대기',
+  choice_completed: '선택 완료',
+  offline_review: '운영 확인 중',
+  offline_settled: '정산 완료',
+};
+
+const SETTLEMENT_STATUS_COLORS: Record<SettlementStatus, string> = {
+  pending: 'bg-gray-100 text-gray-600',
+  choice_pending: 'bg-amber-100 text-amber-700',
+  choice_completed: 'bg-blue-100 text-blue-700',
+  offline_review: 'bg-purple-100 text-purple-700',
+  offline_settled: 'bg-green-100 text-green-700',
+};
+
+// 운영자 허용 전이 (pending→choice_pending은 cascade 우선, 개별 수동도 허용)
+const OPERATOR_SETTLEMENT_NEXT: Partial<Record<SettlementStatus, { to: SettlementStatus; label: string }>> = {
+  pending: { to: 'choice_pending', label: '선택 개방' },
+  choice_completed: { to: 'offline_review', label: '운영 확인 시작' },
+  offline_review: { to: 'offline_settled', label: '정산 완료 처리' },
+};
+
+// Trial 상태 기준 정산 섹션 표시 여부
+const SETTLEMENT_VISIBLE_STATUSES: TrialStatus[] = ['development', 'outcome_confirming', 'fulfilled', 'closed'];
+
 function ParticipantSection({
   participants,
   totalCount,
@@ -760,6 +812,9 @@ function ParticipantSection({
   onCreateListing,
   creatingListingId,
   trialConverted,
+  onSettlementStatusChange,
+  updatingSettlementId,
+  trialStatus,
 }: {
   participants: TrialParticipant[];
   totalCount: number;
@@ -774,6 +829,10 @@ function ParticipantSection({
   onCreateListing: (p: TrialParticipant) => void;
   creatingListingId: string | null;
   trialConverted: boolean;
+  // WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1
+  onSettlementStatusChange: (p: TrialParticipant, s: SettlementStatus, note?: string) => void;
+  updatingSettlementId: string | null;
+  trialStatus: TrialStatus;
 }) {
   const typeLabel = (t: string) => (t === 'seller' ? '판매자' : t === 'partner' ? '파트너' : t);
   const rewardLabel = (r: string | null) => {
@@ -935,6 +994,90 @@ function ParticipantSection({
               })}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1: 정산 상태 관리 섹션 */}
+      {SETTLEMENT_VISIBLE_STATUSES.includes(trialStatus) && totalCount > 0 && (
+        <div className="mt-4 border-t border-gray-100 pt-4">
+          <h3 className="text-sm font-semibold text-gray-700 mb-3">정산 상태 관리</h3>
+          <div className="overflow-x-auto -mx-4 sm:-mx-5">
+            <table className="w-full text-sm min-w-[900px]">
+              <thead>
+                <tr className="border-b border-gray-100">
+                  <th className="text-left py-2 px-4 text-xs font-medium text-gray-500">이름</th>
+                  <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">참여금</th>
+                  <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">리워드%</th>
+                  <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">총 정산 금액</th>
+                  <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">예상 수량</th>
+                  <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">잔액</th>
+                  <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">선택</th>
+                  <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">정산 상태</th>
+                  <th className="text-right py-2 px-4 text-xs font-medium text-gray-500">액션</th>
+                </tr>
+              </thead>
+              <tbody>
+                {participants.map((p) => {
+                  const ss = (p.settlementStatus ?? 'pending') as SettlementStatus;
+                  const nextAction = OPERATOR_SETTLEMENT_NEXT[ss];
+                  const isUpdating = updatingSettlementId === p.id;
+                  return (
+                    <tr key={p.id} className="border-b border-gray-50 hover:bg-gray-50">
+                      <td className="py-2.5 px-4 text-gray-900 font-medium">{p.name}</td>
+                      <td className="py-2.5 px-2 text-gray-700 text-xs">
+                        {p.contributionAmount > 0 ? `${p.contributionAmount.toLocaleString()}원` : '-'}
+                      </td>
+                      <td className="py-2.5 px-2 text-gray-700 text-xs">
+                        {p.rewardRate > 0 ? `+${p.rewardRate}%` : '-'}
+                      </td>
+                      <td className="py-2.5 px-2 text-gray-700 text-xs font-medium">
+                        {p.totalSettlementAmount > 0 ? `${p.totalSettlementAmount.toLocaleString()}원` : '-'}
+                      </td>
+                      <td className="py-2.5 px-2 text-gray-700 text-xs">
+                        {p.estimatedProductQty != null ? `${p.estimatedProductQty}개` : '-'}
+                      </td>
+                      <td className="py-2.5 px-2 text-gray-700 text-xs">
+                        {p.estimatedRemainder != null ? `${p.estimatedRemainder.toLocaleString()}원` : '-'}
+                      </td>
+                      <td className="py-2.5 px-2">
+                        {p.settlementChoice ? (
+                          <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                            p.settlementChoice === 'product'
+                              ? 'bg-green-50 text-green-700'
+                              : 'bg-yellow-50 text-yellow-700'
+                          }`}>
+                            {p.settlementChoice === 'product' ? '제품' : '현금'}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-gray-300">미선택</span>
+                        )}
+                      </td>
+                      <td className="py-2.5 px-2">
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${SETTLEMENT_STATUS_COLORS[ss]}`}>
+                          {SETTLEMENT_STATUS_LABELS[ss]}
+                        </span>
+                      </td>
+                      <td className="py-2.5 px-4 text-right">
+                        {nextAction ? (
+                          <button
+                            onClick={() => onSettlementStatusChange(p, nextAction.to)}
+                            disabled={isUpdating}
+                            className="px-2.5 py-1 text-xs text-white bg-indigo-600 rounded hover:bg-indigo-700 disabled:opacity-50"
+                          >
+                            {isUpdating ? '...' : nextAction.label}
+                          </button>
+                        ) : (
+                          <span className="text-xs text-gray-300">
+                            {ss === 'offline_settled' ? '완료' : ss === 'choice_pending' ? '참여자 선택 대기' : '-'}
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

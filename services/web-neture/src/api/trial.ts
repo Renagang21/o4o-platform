@@ -82,6 +82,10 @@ export interface OperatorTrial extends Trial {
 
 export type CustomerConversionStatus = 'none' | 'interested' | 'considering' | 'adopted' | 'first_order';
 
+// WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1
+export type SettlementStatus =
+  | 'pending' | 'choice_pending' | 'choice_completed' | 'offline_review' | 'offline_settled';
+
 export interface TrialParticipant {
   id: string;
   name: string;
@@ -95,6 +99,20 @@ export interface TrialParticipant {
   listingId: string | null;
   organizationId: string | null;
   joinedAt: string;
+  // WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1
+  contributionAmount: number;
+  rewardRate: number;
+  totalSettlementAmount: number;
+  trialUnitPrice: number | null;
+  estimatedProductQty: number | null;
+  estimatedRemainder: number | null;
+  settlementStatus: SettlementStatus;
+  settlementChoice: 'product' | 'cash' | null;
+  settlementAmount: number | null;
+  settlementProductQty: number | null;
+  settlementRemainder: number | null;
+  settlementNote: string | null;
+  updatedAt: string;
 }
 
 export interface ParticipantSummary {
@@ -104,6 +122,12 @@ export interface ParticipantSummary {
   fulfilledCount: number;
   pendingCount: number;
   fulfillmentRate: number;
+  // WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1
+  settlementPendingCount: number;
+  choicePendingCount: number;
+  choiceCompletedCount: number;
+  offlineReviewCount: number;
+  offlineSettledCount: number;
 }
 
 export interface ParticipantListResponse {
@@ -409,6 +433,24 @@ export async function updateParticipantRewardStatus(
   const { data } = await api.patch(
     `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/participants/${participantId}/reward-status`,
     { rewardStatus },
+  );
+  return data.data || data;
+}
+
+/**
+ * WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1:
+ * 운영자 participant 정산 상태 변경
+ * 허용 전이: pending→choice_pending, choice_completed→offline_review, offline_review→offline_settled
+ */
+export async function updateParticipantSettlementStatus(
+  trialId: string,
+  participantId: string,
+  settlementStatus: SettlementStatus,
+  settlementNote?: string,
+): Promise<{ id: string; settlementStatus: SettlementStatus; settlementNote: string | null; updatedAt: string | null }> {
+  const { data } = await api.patch(
+    `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/participants/${participantId}/settlement-status`,
+    { settlementStatus, ...(settlementNote !== undefined && { settlementNote }) },
   );
   return data.data || data;
 }

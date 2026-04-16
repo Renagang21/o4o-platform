@@ -33,6 +33,22 @@ const ALLOWED_TRIAL_TRANSITIONS: Partial<Record<TrialStatus, TrialStatus[]>> = {
   [TrialStatus.FULFILLED]: [TrialStatus.CLOSED],
 };
 
+/**
+ * WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1
+ * 운영자가 허용하는 participant settlementStatus 전이 규칙
+ * pending → choice_pending: 수동 개방 (cascade 또는 개별 예외)
+ * choice_completed → offline_review: 운영자 검토 시작
+ * offline_review → offline_settled: 운영자 정산 완료
+ * offline_settled: 변경 불가 (locked)
+ */
+const ALLOWED_SETTLEMENT_TRANSITIONS: Record<string, string[]> = {
+  pending: ['choice_pending'],
+  choice_pending: [],
+  choice_completed: ['offline_review'],
+  offline_review: ['offline_settled'],
+  offline_settled: [],
+};
+
 // Valid participant reward status values
 const VALID_REWARD_STATUSES = ['pending', 'fulfilled'] as const;
 type RewardStatus = typeof VALID_REWARD_STATUSES[number];
@@ -392,6 +408,12 @@ export class MarketTrialOperatorController {
         conditions.push(`COALESCE(p."customerConversionStatus", 'none') = $${params.length}`);
       }
 
+      // WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1: settlement filter support
+      if (req.query.settlementStatus && typeof req.query.settlementStatus === 'string') {
+        params.push(req.query.settlementStatus);
+        conditions.push(`p."settlementStatus" = $${params.length}`);
+      }
+
       const rows: Array<{
         id: string;
         participantName: string;
@@ -404,6 +426,15 @@ export class MarketTrialOperatorController {
         listingId: string | null;
         organizationId: string | null;
         createdAt: Date;
+        // WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1
+        contributionAmount: string | null;
+        settlementStatus: string;
+        settlementChoice: string | null;
+        settlementAmount: string | null;
+        settlementProductQty: number | null;
+        settlementRemainder: string | null;
+        settlementNote: string | null;
+        updatedAt: Date;
       }> = await ds.query(
         `SELECT
            p.id,
@@ -420,7 +451,15 @@ export class MarketTrialOperatorController {
               AND om.role IN ('owner', 'admin', 'manager')
               AND om.left_at IS NULL
             LIMIT 1) AS "organizationId",
-           p."createdAt"
+           p."createdAt",
+           p."contributionAmount",
+           COALESCE(p."settlementStatus", 'pending') AS "settlementStatus",
+           p."settlementChoice",
+           p."settlementAmount",
+           p."settlementProductQty",
+           p."settlementRemainder",
+           p."settlementNote",
+           p."updatedAt"
          FROM market_trial_participants p
          LEFT JOIN users u ON u.id = p."participantId"
          WHERE ${conditions.join(' AND ')}
@@ -428,9 +467,9 @@ export class MarketTrialOperatorController {
         params,
       );
 
-      // Full count (without filters) for summary
-      const allRows: Array<{ rewardType: string | null; rewardStatus: string }> = await ds.query(
-        `SELECT p."rewardType", p."rewardStatus"
+      // Full count (without filters) for summary — fetch settlement status counts too
+      const allRows: Array<{ rewardType: string | null; rewardStatus: string; settlementStatus: string }> = await ds.query(
+        `SELECT p."rewardType", p."rewardStatus", COALESCE(p."settlementStatus", 'pending') AS "settlementStatus"
          FROM market_trial_participants p
          WHERE p."marketTrialId" = $1`,
         [id],
@@ -442,6 +481,16 @@ export class MarketTrialOperatorController {
       const fulfilledCount = allRows.filter((r) => r.rewardStatus === 'fulfilled').length;
       const pendingCount = totalCount - fulfilledCount;
       const fulfillmentRate = totalCount > 0 ? Math.round((fulfilledCount / totalCount) * 100) : 0;
+      // WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1
+      const settlementPendingCount = allRows.filter((r) => r.settlementStatus === 'pending').length;
+      const choicePendingCount = allRows.filter((r) => r.settlementStatus === 'choice_pending').length;
+      const choiceCompletedCount = allRows.filter((r) => r.settlementStatus === 'choice_completed').length;
+      const offlineReviewCount = allRows.filter((r) => r.settlementStatus === 'offline_review').length;
+      const offlineSettledCount = allRows.filter((r) => r.settlementStatus === 'offline_settled').length;
+
+      // Also fetch trial's rewardRate for settlement calc display
+      const trialRewardRate = Number(trial.rewardRate) || 0;
+      const trialUnitPrice = trial.trialUnitPrice ? Number(trial.trialUnitPrice) : null;
 
       res.json({
         success: true,
@@ -453,20 +502,50 @@ export class MarketTrialOperatorController {
             fulfilledCount,
             pendingCount,
             fulfillmentRate,
+            // WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1
+            settlementPendingCount,
+            choicePendingCount,
+            choiceCompletedCount,
+            offlineReviewCount,
+            offlineSettledCount,
           },
-          participants: rows.map((r) => ({
-            id: r.id,
-            name: r.participantName,
-            type: r.participantType,
-            rewardType: r.rewardType,
-            rewardStatus: r.rewardStatus,
-            customerConversionStatus: r.customerConversionStatus,
-            customerConversionAt: r.customerConversionAt ? new Date(r.customerConversionAt).toISOString() : null,
-            customerConversionNote: r.customerConversionNote || null,
-            listingId: r.listingId || null,
-            organizationId: r.organizationId || null,
-            joinedAt: new Date(r.createdAt).toISOString(),
-          })),
+          participants: rows.map((r) => {
+            const contribution = Number(r.contributionAmount) || 0;
+            const totalSettlementAmount = Math.round(contribution * (1 + trialRewardRate / 100));
+            let estimatedProductQty: number | null = null;
+            let estimatedRemainder: number | null = null;
+            if (trialUnitPrice && trialUnitPrice > 0) {
+              estimatedProductQty = Math.floor(totalSettlementAmount / trialUnitPrice);
+              estimatedRemainder = Math.round(totalSettlementAmount - estimatedProductQty * trialUnitPrice);
+            }
+            return {
+              id: r.id,
+              name: r.participantName,
+              type: r.participantType,
+              rewardType: r.rewardType,
+              rewardStatus: r.rewardStatus,
+              customerConversionStatus: r.customerConversionStatus,
+              customerConversionAt: r.customerConversionAt ? new Date(r.customerConversionAt).toISOString() : null,
+              customerConversionNote: r.customerConversionNote || null,
+              listingId: r.listingId || null,
+              organizationId: r.organizationId || null,
+              joinedAt: new Date(r.createdAt).toISOString(),
+              // WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1
+              contributionAmount: contribution,
+              rewardRate: trialRewardRate,
+              totalSettlementAmount,
+              trialUnitPrice,
+              estimatedProductQty,
+              estimatedRemainder,
+              settlementStatus: r.settlementStatus,
+              settlementChoice: r.settlementChoice || null,
+              settlementAmount: r.settlementAmount != null ? Number(r.settlementAmount) : null,
+              settlementProductQty: r.settlementProductQty ?? null,
+              settlementRemainder: r.settlementRemainder != null ? Number(r.settlementRemainder) : null,
+              settlementNote: r.settlementNote || null,
+              updatedAt: new Date(r.updatedAt).toISOString(),
+            };
+          }),
         },
       });
     } catch (error) {
@@ -527,6 +606,93 @@ export class MarketTrialOperatorController {
     } catch (error) {
       console.error('Update participant reward status error:', error);
       res.status(500).json({ success: false, message: 'Failed to update participant status' });
+    }
+  }
+
+  /**
+   * PATCH /api/v1/neture/operator/market-trial/:id/participants/:participantId/settlement-status
+   * WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1:
+   * 운영자 participant 정산 상태 변경
+   * Body: { settlementStatus, settlementNote? }
+   * 허용 전이: pending→choice_pending, choice_completed→offline_review, offline_review→offline_settled
+   */
+  static async updateParticipantSettlementStatus(req: AuthRequest, res: Response) {
+    try {
+      const { id, participantId } = req.params;
+      const { settlementStatus: newStatus, settlementNote } = req.body;
+      const ds = MarketTrialOperatorController.dataSource;
+      if (!ds) {
+        return res.status(500).json({ success: false, message: 'DataSource not initialized' });
+      }
+
+      if (!newStatus || typeof newStatus !== 'string') {
+        return res.status(400).json({ success: false, message: 'settlementStatus is required' });
+      }
+
+      // Verify trial exists
+      const trial = await MarketTrialOperatorController.trialRepo.findOne({ where: { id } });
+      if (!trial) {
+        return res.status(404).json({ success: false, message: 'Trial not found' });
+      }
+
+      // Fetch current participant status
+      const rows: Array<{ id: string; settlementStatus: string }> = await ds.query(
+        `SELECT id, COALESCE("settlementStatus", 'pending') AS "settlementStatus"
+         FROM market_trial_participants
+         WHERE id = $1 AND "marketTrialId" = $2`,
+        [participantId, id],
+      );
+      if (!rows || rows.length === 0) {
+        return res.status(404).json({ success: false, message: 'Participant not found for this trial' });
+      }
+
+      const currentStatus = rows[0].settlementStatus;
+      const allowed = ALLOWED_SETTLEMENT_TRANSITIONS[currentStatus] ?? [];
+
+      if (!allowed.includes(newStatus)) {
+        const allowedStr = allowed.length > 0 ? allowed.join(', ') : '없음';
+        return res.status(400).json({
+          success: false,
+          message: `"${currentStatus}" 상태에서 "${newStatus}"로 전이할 수 없습니다. 허용: ${allowedStr}`,
+        });
+      }
+
+      // Build update query — include settlementNote if provided
+      let sql: string;
+      let sqlParams: unknown[];
+      if (settlementNote !== undefined) {
+        sql = `UPDATE market_trial_participants
+               SET "settlementStatus" = $1, "settlementNote" = $2
+               WHERE id = $3 AND "marketTrialId" = $4
+               RETURNING id, "settlementStatus", "settlementNote", "updatedAt"`;
+        sqlParams = [newStatus, settlementNote, participantId, id];
+      } else {
+        sql = `UPDATE market_trial_participants
+               SET "settlementStatus" = $1
+               WHERE id = $2 AND "marketTrialId" = $3
+               RETURNING id, "settlementStatus", "settlementNote", "updatedAt"`;
+        sqlParams = [newStatus, participantId, id];
+      }
+
+      const result = await ds.query(sql, sqlParams);
+      if (!result || result.length === 0) {
+        return res.status(404).json({ success: false, message: 'Participant not found' });
+      }
+
+      const row = result[0];
+      res.json({
+        success: true,
+        data: {
+          id: row.id,
+          settlementStatus: row.settlementStatus,
+          settlementNote: row.settlementNote,
+          updatedAt: row.updatedAt ? new Date(row.updatedAt).toISOString() : null,
+        },
+        message: `정산 상태가 "${newStatus}"로 변경되었습니다.`,
+      });
+    } catch (error) {
+      console.error('Update participant settlement status error:', error);
+      res.status(500).json({ success: false, message: 'Failed to update settlement status' });
     }
   }
 
@@ -755,10 +921,27 @@ export class MarketTrialOperatorController {
       trial.status = newStatus as TrialStatus;
       await MarketTrialOperatorController.trialRepo.save(trial);
 
+      // WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1
+      // Trial → OUTCOME_CONFIRMING 전환 시 pending 참여자 → choice_pending cascade
+      let cascadeCount = 0;
+      if (newStatus === TrialStatus.OUTCOME_CONFIRMING) {
+        const ds = MarketTrialOperatorController.dataSource;
+        if (ds) {
+          const result = await ds.query(
+            `UPDATE market_trial_participants
+             SET "settlementStatus" = 'choice_pending'
+             WHERE "marketTrialId" = $1
+               AND COALESCE("settlementStatus", 'pending') = 'pending'`,
+            [id],
+          );
+          cascadeCount = result?.rowCount ?? result?.length ?? 0;
+        }
+      }
+
       res.json({
         success: true,
         data: toOperatorTrialDTO(trial),
-        message: `Trial 상태가 "${newStatus}"로 변경되었습니다.`,
+        message: `Trial 상태가 "${newStatus}"로 변경되었습니다.${cascadeCount > 0 ? ` 참여자 ${cascadeCount}명 정산 선택 대기로 전환.` : ''}`,
       });
     } catch (error) {
       console.error('Update trial status error:', error);
