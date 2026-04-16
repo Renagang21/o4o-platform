@@ -10,15 +10,21 @@
  *   - glycopharm:pharmacist 역할이 이미 정상 사용 중이어야 한다.
  *   - 동일 userId에 이미 glycopharm:pharmacist가 있으면 pharmacy 행 삭제(중복 방지).
  *
- * ⚠️  실행 전 반드시 사용자(ChatGPT/운영자) 확인 필요
- *     - 확인 명령: SELECT role, COUNT(*) FROM role_assignments WHERE role IN ('pharmacy','glycopharm:pharmacist') AND is_active=true GROUP BY role;
- *     - 실행 후 검증: SELECT role, COUNT(*) FROM role_assignments WHERE role IN ('pharmacy','glycopharm:pharmacist') GROUP BY role;
+ * ⚠️  실행 전 확인 쿼리:
+ *     SELECT role, COUNT(*) FROM role_assignments
+ *     WHERE role IN ('pharmacy','glycopharm:pharmacist') AND is_active=true
+ *     GROUP BY role;
+ *
+ * ✅ 실행 후 검증 쿼리:
+ *     SELECT role, COUNT(*) FROM role_assignments
+ *     WHERE role IN ('pharmacy','glycopharm:pharmacist')
+ *     GROUP BY role;
  */
 
 import type { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class BackfillPharmacyToGlycopharmPharmacist1771200000026 implements MigrationInterface {
-  name = 'BackfillPharmacyToGlycopharmPharmacist1771200000026';
+export class BackfillPharmacyToGlycopharmPharmacist20260416000001 implements MigrationInterface {
+  name = 'BackfillPharmacyToGlycopharmPharmacist20260416000001';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Step 1: 이미 glycopharm:pharmacist를 가진 userId에 대해 pharmacy 행 삭제 (중복 제거)
@@ -43,7 +49,7 @@ export class BackfillPharmacyToGlycopharmPharmacist1771200000026 implements Migr
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    // 롤백: glycopharm:pharmacist → pharmacy (단, 이 migration으로 생성된 행만)
+    // 롤백: glycopharm:pharmacist → pharmacy
     // 안전을 위해 down은 수동 확인 후 실행 권장
     await queryRunner.query(`
       UPDATE role_assignments
