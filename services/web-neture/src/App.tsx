@@ -169,6 +169,17 @@ const SupplierTrialDetailPage = lazy(() =>
   import('./pages/supplier').then((m) => ({ default: m.SupplierTrialDetailPage }))
 );
 
+// Participant Market Trial (WO-NETURE-MARKET-TRIAL-PARTICIPANT-PAGES-V1)
+const MarketTrialHubPage = lazy(() =>
+  import('./pages/market-trial').then((m) => ({ default: m.MarketTrialHubPage }))
+);
+const MarketTrialDetailPage = lazy(() =>
+  import('./pages/market-trial').then((m) => ({ default: m.MarketTrialDetailPage }))
+);
+const MyParticipationsPage = lazy(() =>
+  import('./pages/market-trial').then((m) => ({ default: m.MyParticipationsPage }))
+);
+
 // Supplier Library
 const SupplierLibraryPage = lazy(() =>
   import('./pages/supplier').then((m) => ({ default: m.SupplierLibraryPage }))
@@ -565,6 +576,11 @@ function App() {
 
               {/* WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1 */}
               <Route path="/library/content" element={<ContentLibraryPage />} />
+
+              {/* Market Trial Participant (WO-NETURE-MARKET-TRIAL-PARTICIPANT-PAGES-V1) */}
+              <Route path="/market-trial" element={<MarketTrialHubPage />} />
+              <Route path="/market-trial/my" element={<MyParticipationsPage />} />
+              <Route path="/market-trial/:id" element={<MarketTrialDetailPage />} />
             </Route>
 
             {/* ================================================================

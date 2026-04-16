@@ -190,6 +190,48 @@ export interface Participation {
   createdAt: string;
 }
 
+// ============================================================================
+// WO-NETURE-MARKET-TRIAL-PARTICIPANT-PAGES-V1: Participant types
+// (KPA-Society marketTrial.ts → Neture canonical 이식)
+// ============================================================================
+
+export type CreditProcessStatus = 'not_applicable' | 'pending' | 'planned' | 'completed';
+
+export interface ParticipationInfo {
+  id: string;
+  trialId: string;
+  participantId: string;
+  role: string;
+  rewardType: 'cash' | 'product';
+  rewardStatus: 'pending' | 'fulfilled';
+  joinedAt: string;
+}
+
+export interface ParticipationInfoDetail extends ParticipationInfo {
+  settlementChoice: 'product' | 'cash' | null;
+  settlementStatus: SettlementStatus;
+  settlementAmount: number | null;
+  settlementProductQty: number | null;
+  settlementRemainder: number | null;
+  creditProcessStatus: CreditProcessStatus;
+  settlementNote: string | null;
+  contributionAmount?: number;
+  rewardRate?: number;
+  totalSettlementAmount?: number;
+  trialUnitPrice?: number | null;
+  estimatedProductQty?: number | null;
+  estimatedRemainder?: number | null;
+}
+
+export interface MyParticipationSummary extends ParticipationInfoDetail {
+  trial?: {
+    id: string;
+    title: string;
+    status: TrialStatus;
+    supplierName?: string;
+  };
+}
+
 export interface ShippingAddress {
   participationId: string;
   recipientName: string;
@@ -229,6 +271,46 @@ export async function joinTrial(
   rewardType: 'cash' | 'product'
 ): Promise<Participation> {
   const { data } = await api.post(`${API_BASE_URL}/api/market-trial/${trialId}/join`, { rewardType });
+  return data.data || data;
+}
+
+// ============================================================================
+// WO-NETURE-MARKET-TRIAL-PARTICIPANT-PAGES-V1: Participant API
+// ============================================================================
+
+/** Trial 상세 + 내 참여 여부 — 로그인 유저 한정 */
+export async function getParticipation(trialId: string): Promise<ParticipationInfo | null> {
+  try {
+    const { data } = await api.get(`${API_BASE_URL}/api/market-trial/${trialId}/participation`);
+    return data.data || data || null;
+  } catch (err: unknown) {
+    const axiosErr = err as { response?: { status?: number } };
+    if (axiosErr.response?.status === 404) return null;
+    throw err;
+  }
+}
+
+/** 내 참여 목록 — `/market-trial/my` */
+export async function getMyParticipations(): Promise<MyParticipationSummary[]> {
+  const { data } = await api.get(`${API_BASE_URL}/api/market-trial/my-participations`);
+  return data.data || data || [];
+}
+
+/** 내 참여 상세 + 정산 정보 — `/market-trial/my` 드로어 */
+export async function getMyParticipationDetail(trialId: string): Promise<ParticipationInfoDetail> {
+  const { data } = await api.get(`${API_BASE_URL}/api/market-trial/${trialId}/my-settlement`);
+  return data.data || data;
+}
+
+/** 정산 선택 저장 (제품 / 현금) */
+export async function saveSettlementChoice(
+  trialId: string,
+  choice: 'product' | 'cash',
+): Promise<ParticipationInfoDetail> {
+  const { data } = await api.post(
+    `${API_BASE_URL}/api/market-trial/${trialId}/settlement-choice`,
+    { choice },
+  );
   return data.data || data;
 }
 
