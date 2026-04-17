@@ -46,6 +46,7 @@ import {
   Search,
   ExternalLink,
 } from 'lucide-react';
+import { DataTable, type Column } from '@o4o/ui';
 import { useAuth } from '../../contexts';
 import {
   fetchSchedules,
@@ -234,7 +235,7 @@ export function StoreSignagePage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const organizationId = user?.kpaMembership?.organizationId || '';
-  const [activeTab, setActiveTab] = useState<ActiveTab>('assets');
+  const [activeTab, setActiveTab] = useState<ActiveTab>('explore');
 
   // ── Schedule state ──
   const [schedules, setSchedules] = useState<SignageScheduleItem[]>([]);
@@ -265,6 +266,7 @@ export function StoreSignagePage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [sortKey, setSortKey] = useState<SortKey>('newest');
   const [page, setPage] = useState(1);
+  const [assetKeyword, setAssetKeyword] = useState('');
 
   // ── Playlist state ──
   const [playlists, setPlaylists] = useState<StorePlaylist[]>([]);
@@ -275,6 +277,7 @@ export function StoreSignagePage() {
   const [playlistItemsLoading, setPlaylistItemsLoading] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newPlaylistName, setNewPlaylistName] = useState('');
+  const [playlistKeyword, setPlaylistKeyword] = useState('');
 
   // ── Signage snapshot list for "add to playlist" ──
   const [signageSnapshots, setSignageSnapshots] = useState<StoreAssetItem[]>([]);
@@ -440,11 +443,15 @@ export function StoreSignagePage() {
   const kpi = useMemo(() => computeSignageKpi(items), [items]);
   const forcedExpiringCount = useMemo(() => items.filter(isForcedExpiringSoon).length, [items]);
 
-  // Filter + Sort
+  // Filter + Sort + Keyword
   const filteredItems = useMemo(() => {
-    const filtered = applyFilters(items, statusFilter);
+    let filtered = applyFilters(items, statusFilter);
+    if (assetKeyword.trim()) {
+      const kw = assetKeyword.toLowerCase();
+      filtered = filtered.filter(item => item.title.toLowerCase().includes(kw));
+    }
     return applySort(filtered, sortKey);
-  }, [items, statusFilter, sortKey]);
+  }, [items, statusFilter, sortKey, assetKeyword]);
 
   // Pagination
   const totalPages = Math.max(1, Math.ceil(filteredItems.length / PAGE_LIMIT));
@@ -453,7 +460,13 @@ export function StoreSignagePage() {
     return filteredItems.slice(start, start + PAGE_LIMIT);
   }, [filteredItems, page]);
 
-  useEffect(() => { setPage(1); }, [statusFilter, sortKey]);
+  useEffect(() => { setPage(1); }, [statusFilter, sortKey, assetKeyword]);
+
+  const filteredPlaylists = useMemo(() => {
+    if (!playlistKeyword.trim()) return playlists;
+    const kw = playlistKeyword.toLowerCase();
+    return playlists.filter(p => p.name.toLowerCase().includes(kw));
+  }, [playlists, playlistKeyword]);
 
   // Handlers
   const handleToggleStatus = async (item: StoreAssetItem) => {
@@ -593,13 +606,6 @@ export function StoreSignagePage() {
         </div>
         <div className="flex gap-2">
           <button
-            onClick={() => navigate('/hub/signage')}
-            className="flex items-center gap-2 px-3 py-2 text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50"
-          >
-            <Monitor className="w-4 h-4" />
-            약국 HUB에서 가져오기
-          </button>
-          <button
             onClick={() => {
               fetchItems(); loadPlaylists();
               if (activeTab === 'schedules') { loadSchedules(); loadSignagePlaylists(); }
@@ -615,17 +621,6 @@ export function StoreSignagePage() {
       {/* ─── Tab Bar ─────────────────────────────── */}
       <div className="flex gap-1 mb-1 border-b border-slate-200">
         <button
-          onClick={() => setActiveTab('assets')}
-          className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
-            activeTab === 'assets'
-              ? 'border-blue-600 text-blue-700'
-              : 'border-transparent text-slate-500 hover:text-slate-700'
-          }`}
-        >
-          <Monitor className="w-4 h-4" />
-          내 동영상
-        </button>
-        <button
           onClick={() => setActiveTab('explore')}
           className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
             activeTab === 'explore'
@@ -635,6 +630,17 @@ export function StoreSignagePage() {
         >
           <Search className="w-4 h-4" />
           가져올 콘텐츠
+        </button>
+        <button
+          onClick={() => setActiveTab('assets')}
+          className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+            activeTab === 'assets'
+              ? 'border-blue-600 text-blue-700'
+              : 'border-transparent text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          <Monitor className="w-4 h-4" />
+          내 동영상
         </button>
         <button
           onClick={() => setActiveTab('playlist')}
@@ -801,50 +807,141 @@ export function StoreSignagePage() {
             </div>
           )}
 
-          {/* Playlist list — Table UI */}
-          {playlistLoading ? (
-            <div className="flex items-center justify-center py-12 text-slate-400">
-              <Loader2 className="w-5 h-5 animate-spin mr-2" /> 플레이리스트 로딩 중...
+          {/* Playlist search */}
+          {!playlistLoading && !playlistError && playlists.length > 0 && (
+            <div className="relative mb-3">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input
+                type="text"
+                value={playlistKeyword}
+                onChange={e => setPlaylistKeyword(e.target.value)}
+                placeholder="플레이리스트 이름으로 검색..."
+                className="w-full pl-9 pr-4 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
-          ) : playlistError ? (
+          )}
+
+          {/* Playlist list — DataTable */}
+          {playlistError ? (
             <div className="text-center py-12 text-red-500 text-sm">
               <AlertCircle className="w-5 h-5 mx-auto mb-2" />
               {playlistError}
             </div>
-          ) : playlists.length === 0 ? (
+          ) : playlists.length === 0 && !playlistLoading ? (
             <div className="text-center py-12 text-slate-400">
               <ListVideo className="w-8 h-8 mx-auto mb-2 text-slate-300" />
               <p className="text-sm">플레이리스트가 없습니다.</p>
               <p className="text-xs mt-1">'가져올 콘텐츠' 탭에서 콘텐츠를 가져온 뒤 플레이리스트를 만들어 구성하세요.</p>
             </div>
           ) : (
-            <div className="bg-white rounded-lg border border-slate-200 overflow-hidden mb-6">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-slate-50 text-left text-xs text-slate-500 uppercase tracking-wide">
-                    <th className="px-4 py-3 font-medium">이름</th>
-                    <th className="px-4 py-3 font-medium w-20 text-center">항목 수</th>
-                    <th className="px-4 py-3 font-medium w-20 text-center">유형</th>
-                    <th className="px-4 py-3 font-medium w-32">수정일</th>
-                    <th className="px-4 py-3 font-medium w-24">게시</th>
-                    <th className="px-4 py-3 font-medium w-20 text-center">사용</th>
-                    <th className="px-4 py-3 font-medium w-32 text-right">액션</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {playlists.map(pl => (
-                    <PlaylistRow
-                      key={pl.id}
-                      playlist={pl}
-                      isSelected={selectedPlaylistId === pl.id}
-                      isInUse={activePlaylistIds.has(pl.id)}
-                      onSelect={() => setSelectedPlaylistId(pl.id === selectedPlaylistId ? null : pl.id)}
-                      onTogglePublish={() => handleTogglePublish(pl)}
-                      onDelete={() => handleDeletePlaylist(pl)}
-                    />
-                  ))}
-                </tbody>
-              </table>
+            <div className="mb-6">
+              <DataTable<StorePlaylist>
+                columns={[
+                  {
+                    key: 'name',
+                    title: '이름',
+                    render: (_v, pl) => (
+                      <div className="flex items-center gap-2">
+                        <ListVideo className="w-4 h-4 text-slate-400 flex-shrink-0" />
+                        <span className="font-medium text-slate-900 truncate max-w-xs">{pl.name}</span>
+                        {pl.forcedCount > 0 && (
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-red-100 text-red-700">
+                            강제 {pl.forcedCount}
+                          </span>
+                        )}
+                      </div>
+                    ),
+                  },
+                  {
+                    key: 'itemCount',
+                    title: '항목 수',
+                    dataIndex: 'itemCount',
+                    align: 'center',
+                    render: (v) => <span className="text-slate-600">{v}</span>,
+                  },
+                  {
+                    key: 'playlistType',
+                    title: '유형',
+                    dataIndex: 'playlistType',
+                    align: 'center',
+                    render: (v) => (
+                      <span className="px-2 py-0.5 rounded-full text-[11px] bg-slate-100 text-slate-600">
+                        {v === 'SINGLE' ? '단일' : '목록'}
+                      </span>
+                    ),
+                  },
+                  {
+                    key: 'updatedAt',
+                    title: '수정일',
+                    dataIndex: 'updatedAt',
+                    render: (v) => <span className="text-xs text-slate-500">{new Date(v).toLocaleDateString('ko-KR')}</span>,
+                  },
+                  {
+                    key: 'publishStatus',
+                    title: '게시',
+                    dataIndex: 'publishStatus',
+                    render: (_v, pl) => (
+                      <button
+                        onClick={e => { e.stopPropagation(); handleTogglePublish(pl); }}
+                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium cursor-pointer hover:opacity-80 transition-opacity ${
+                          pl.publishStatus === 'published' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500'
+                        }`}
+                        title="클릭하여 게시 상태 변경"
+                      >
+                        {pl.publishStatus === 'published' ? '게시 중' : '초안'}
+                      </button>
+                    ),
+                  },
+                  {
+                    key: 'inUse',
+                    title: '사용',
+                    align: 'center',
+                    render: (_v, pl) => activePlaylistIds.has(pl.id) ? (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                        <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                        사용 중
+                      </span>
+                    ) : (
+                      <span className="text-xs text-slate-400">미사용</span>
+                    ),
+                  },
+                  {
+                    key: 'actions',
+                    title: '',
+                    align: 'right',
+                    render: (_v, pl) => (
+                      <div className="flex items-center justify-end gap-1">
+                        <button
+                          onClick={e => { e.stopPropagation(); setSelectedPlaylistId(pl.id === selectedPlaylistId ? null : pl.id); }}
+                          className={`inline-flex items-center gap-1 px-2 py-1 text-[11px] rounded border transition-colors ${
+                            selectedPlaylistId === pl.id
+                              ? 'bg-blue-600 text-white border-blue-600'
+                              : 'text-blue-600 border-blue-200 hover:bg-blue-50'
+                          }`}
+                        >
+                          <Play className="w-3 h-3" />
+                          {selectedPlaylistId === pl.id ? '닫기' : '편집'}
+                        </button>
+                        <button
+                          onClick={e => { e.stopPropagation(); handleDeletePlaylist(pl); }}
+                          className="p-1 text-slate-400 hover:text-red-500 rounded"
+                          title="삭제"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ),
+                  },
+                ] as Column<StorePlaylist>[]}
+                dataSource={filteredPlaylists}
+                rowKey="id"
+                loading={playlistLoading}
+                onRow={pl => ({
+                  onClick: () => setSelectedPlaylistId(pl.id === selectedPlaylistId ? null : pl.id),
+                  className: selectedPlaylistId === pl.id ? 'bg-blue-50/40' : '',
+                })}
+                emptyText="검색 결과가 없습니다"
+              />
             </div>
           )}
 
@@ -1245,24 +1342,30 @@ export function StoreSignagePage() {
       )}
 
       {/* ─── Quick Actions ─────────────────────────── */}
-      {!loading && !error && (
+      {!loading && !error && items.length === 0 && (
         <div className="flex gap-2 mb-6">
           <button
-            onClick={() => navigate('/hub/signage')}
+            onClick={() => setActiveTab('explore')}
             className="px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100"
           >
-            약국 HUB에서 가져오기
-          </button>
-          <button
-            onClick={() => navigate('/store/content?tab=signage')}
-            className="px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-50 border border-slate-200 rounded-lg hover:bg-slate-100"
-          >
-            전체 자산에서 보기
+            콘텐츠 탐색하러 가기
           </button>
         </div>
       )}
 
-      {/* ─── [B] 필터 바 ─────────────────────────── */}
+      {/* ─── [B] 검색 + 필터 바 ─────────────────── */}
+      {!loading && !error && items.length > 0 && (
+        <div className="relative mb-3">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <input
+            type="text"
+            value={assetKeyword}
+            onChange={e => setAssetKeyword(e.target.value)}
+            placeholder="동영상 이름으로 검색..."
+            className="w-full pl-9 pr-4 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      )}
       {!loading && !error && items.length > 0 && (
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-1">
@@ -1329,13 +1432,13 @@ export function StoreSignagePage() {
           {items.length === 0 ? (
             <>
               <Monitor className="w-10 h-10 mx-auto mb-3 text-slate-300" />
-              <p className="text-sm">사이니지 자산이 없습니다.</p>
-              <p className="text-xs mt-1">약국 HUB에서 사이니지 콘텐츠를 가져와주세요.</p>
+              <p className="text-sm">동영상이 없습니다.</p>
+              <p className="text-xs mt-1">'가져올 콘텐츠' 탭에서 콘텐츠를 가져와주세요.</p>
               <button
-                onClick={() => navigate('/hub/signage')}
+                onClick={() => setActiveTab('explore')}
                 className="mt-4 px-4 py-2 text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50"
               >
-                약국 HUB으로 이동
+                콘텐츠 탐색하러 가기
               </button>
             </>
           ) : (

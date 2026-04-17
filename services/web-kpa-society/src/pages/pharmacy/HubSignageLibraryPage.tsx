@@ -197,7 +197,7 @@ export function HubSignageLibraryPage() {
       <header style={styles.hero}>
         <h1 style={styles.heroTitle}>플랫폼 사이니지</h1>
         <p style={styles.heroDesc}>
-          디지털 사이니지 미디어와 플레이리스트를 탐색하고 내 매장에 추가합니다.
+          디지털 사이니지 미디어와 플레이리스트를 탐색하고 내 매장에 추가합니다. 추가 후 사이니지 운영 화면에서 재생 스케줄을 설정하세요.
         </p>
       </header>
 
@@ -478,9 +478,9 @@ export function HubSignageLibraryPage() {
       <div style={styles.notice}>
         <span style={styles.noticeIcon}>💡</span>
         <span>
-          추가된 사이니지 자산은{' '}
-          <Link to="/store/content?tab=signage" style={{ color: colors.primary }}>내 매장 &gt; 자산 관리 &gt; 사이니지</Link>
-          에서 게시 상태를 관리할 수 있습니다.
+          추가한 사이니지는{' '}
+          <Link to="/store/marketing/signage" style={{ color: colors.primary }}>사이니지 운영 화면</Link>
+          에서 플레이리스트 구성과 스케줄 적용을 할 수 있습니다.
         </span>
       </div>
     </div>
