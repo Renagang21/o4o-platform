@@ -312,7 +312,6 @@ function KpaStoreLayoutWrapper() {
       config={resolvedConfig}
       userName={user?.name || user?.email || ''}
       homeLink="/"
-      onLogout={handleLogout}
       navItems={KPA_STORE_NAV_ITEMS}
       serviceLabel="약사 네트워크"
       serviceBadge="KPA"

@@ -138,22 +138,12 @@ export const GLYCOPHARM_STORE_CONFIG: StoreDashboardConfig = {
 
 /**
  * KPA-Society Store Config
- * WO-KPA-STORE-SIDEBAR-REALIGNMENT-V1
- * WO-KPA-PHARMACY-HUB-NAVIGATION-RESTRUCTURE-V1:
- *   - 약국 정보 섹션 추가 (대시보드 아래)
- *   - 주문 가능 상품 제거 (canonical: /hub/b2b)
- *
- * WO-KPA-A-STORE-HOME-AND-SIDEBAR-RESTRUCTURE-V1:
- *   - 8섹션/20항목 → 5섹션/13항목 재구성
- *   - 대시보드→홈, 운영+마케팅→콘텐츠+홍보, 채널/디바이스·구매 섹션 제거
- *   - 미완성 메뉴 비노출 (B2C, 주문 작업대, 구매 내역)
- *   - 상품 관리(B2B)→상품 관리 명칭 정리
- *
- * WO-STORE-HIDDEN-ROUTES-UNHIDE-V1:
- *   - "매장 디스플레이" 섹션 신설 (4항목 flat 구조)
- *   - signage를 "콘텐츠"에서 "매장 디스플레이"로 이동
- *   - 매장 진열 상품(B2C), 채널 현황, 매장 사이니지, 태블릿 진열 정식 노출
- *   - 순서: 매장 진열 상품 → 채널 현황 → 매장 사이니지 → 태블릿 진열
+ * WO-STORE-SIDEBAR-RESTRUCTURE-V1:
+ *   - 7섹션/15항목 → 6섹션/14항목 재구성
+ *   - 홈 단독 / 상품·주문 / 매장 실행 / 채널 / 자료·분석 / 설정
+ *   - 자체 상품·매장 진열 상품 사이드바 제거 (라우트 유지)
+ *   - 라벨 변경: QR 관리→QR 코드, 채널 현황→B2B 사이트, 매장 사이니지→디지털 사이니지
+ *   - 약국 정보 설정 그룹으로 이동
  */
 export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
   serviceKey: 'kpa-society',
@@ -163,32 +153,28 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
   menuSections: [
     { label: '', items: [
       { key: 'home', label: '홈', subPath: '' },
-      { key: 'pharmacy-info', label: '약국 정보', subPath: '/info' },
-    ]},
-    { label: '콘텐츠', items: [
-      { key: 'library', label: '자료실', subPath: '/operation/library' },
-      { key: 'blog', label: '블로그', subPath: '/content/blog' },
-    ]},
-    { label: '홍보', items: [
-      { key: 'qr', label: 'QR 관리', subPath: '/marketing/qr' },
-      { key: 'pop', label: 'POP 자료', subPath: '/marketing/pop' },
     ]},
     { label: '상품/주문', items: [
       { key: 'products', label: '상품 관리', subPath: '/commerce/products' },
-      { key: 'local-products', label: '자체 상품', subPath: '/commerce/local-products' },
-      { key: 'orders', label: '주문 관리', subPath: '/commerce/orders' },
+      { key: 'orders',   label: '주문 관리', subPath: '/commerce/orders' },
     ]},
-    { label: '매장 디스플레이', items: [
-      { key: 'products-b2c',     label: '매장 진열 상품', subPath: '/commerce/products/b2c' },
-      { key: 'channels',         label: '채널 현황',      subPath: '/channels' },
-      { key: 'signage',          label: '매장 사이니지',  subPath: '/marketing/signage' },
-      { key: 'tablet-displays',  label: '태블릿 진열',   subPath: '/commerce/tablet-displays' },
+    { label: '매장 실행', items: [
+      { key: 'signage', label: '디지털 사이니지', subPath: '/marketing/signage' },
+      { key: 'qr',      label: 'QR 코드',        subPath: '/marketing/qr' },
+      { key: 'pop',     label: 'POP 자료',        subPath: '/marketing/pop' },
     ]},
-    { label: '분석', items: [
+    { label: '채널', items: [
+      { key: 'tablet-displays', label: '태블릿 진열', subPath: '/commerce/tablet-displays' },
+      { key: 'channels',        label: 'B2B 사이트',  subPath: '/channels' },
+      { key: 'blog',            label: '블로그',       subPath: '/content/blog' },
+    ]},
+    { label: '자료/분석', items: [
+      { key: 'library',            label: '자료실',     subPath: '/operation/library' },
       { key: 'analytics-marketing', label: '마케팅 분석', subPath: '/analytics/marketing' },
     ]},
     { label: '설정', items: [
-      { key: 'store-settings', label: '매장 설정', subPath: '/settings' },
+      { key: 'pharmacy-info',  label: '약국 정보',      subPath: '/info' },
+      { key: 'store-settings', label: '매장 설정',      subPath: '/settings' },
       { key: 'layout-builder', label: '레이아웃 빌더', subPath: '/settings/layout' },
     ]},
   ],
