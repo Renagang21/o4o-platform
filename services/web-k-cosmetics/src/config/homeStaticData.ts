@@ -1,13 +1,12 @@
 /**
  * K-Cosmetics Home Static Data
  *
- * WO-KCOS-HOME-DYNAMIC-IMPL-V1:
- *   notices → CMS API 연동 완료, 이 파일에서 제거됨.
- *   아래 데이터는 운영자 관리 콘텐츠로 대체 예정.
+ * WO-KCOS-HOME-DYNAMIC-IMPL-V1: notices → CMS API 연동 완료, 제거됨
+ * WO-KCOS-HOME-DYNAMIC-IMPL-V2: nowRunningItems, partners → API 연동 완료, 제거됨
  *
- * TODO(WO-KCOS-HOME-DYNAMIC-IMPL-V2): heroSlides → CMS slots('hero') 연동
- * TODO(WO-KCOS-HOME-DYNAMIC-IMPL-V2): nowRunningItems → market-trial / product API 연동
- * TODO(WO-KCOS-HOME-DYNAMIC-IMPL-V2): partners → CMS slot 또는 파트너 API 연동
+ * TODO(WO-KCOS-HOME-DYNAMIC-IMPL-V3): heroSlides → cmsApi.getSlots('hero') 연동
+ * TODO(WO-KCOS-HOME-DYNAMIC-IMPL-V3): quickActionCards.status.value → storeHub KPI 연동
+ *   (requireAuth 필요, 로그인/비로그인 분기 처리 포함)
  */
 
 // ── Hero Slides ───────────────────────────────────────────────────────────
@@ -65,8 +64,9 @@ export interface QuickActionCard {
 }
 
 /**
- * TODO(WO-KCOS-HOME-DYNAMIC-IMPL-V2):
+ * TODO(WO-KCOS-HOME-DYNAMIC-IMPL-V3):
  *   status.value를 storeHub.fetchStoreKpiSummary() 기반 실시간 데이터로 교체
+ *   requireAuth 적용 필요 → 비로그인 시 '-' placeholder 유지, 로그인 시 실제 수치 표시
  */
 export const quickActionCards: QuickActionCard[] = [
   {
@@ -109,65 +109,4 @@ export const quickActionCards: QuickActionCard[] = [
     color: '#e2e8f0',
     status: { label: '연결 중', value: '매장' },
   },
-];
-
-// ── Now Running Items ─────────────────────────────────────────────────────
-
-export interface NowRunningItem {
-  id: string;
-  type: 'trial' | 'event' | 'campaign' | 'product';
-  title: string;
-  supplier?: string;
-  deadline?: string;
-  participants?: number;
-  link: string;
-}
-
-/**
- * TODO(WO-KCOS-HOME-DYNAMIC-IMPL-V2): market-trial API 또는 product API 연동
- */
-export const nowRunningItems: NowRunningItem[] = [
-  {
-    id: '1',
-    type: 'trial',
-    title: '신규 스킨케어 라인 Trial',
-    supplier: 'COSRX',
-    deadline: '2026.01.31',
-    participants: 15,
-    link: '/platform/stores',
-  },
-  {
-    id: '2',
-    type: 'product',
-    title: '2026 S/S 신상품 입고',
-    supplier: 'Innisfree',
-    deadline: '2026.02.15',
-    link: '/products',
-  },
-  {
-    id: '3',
-    type: 'campaign',
-    title: '설날 특별 캠페인',
-    deadline: '2026.02.01',
-    link: '/products',
-  },
-];
-
-// ── Partners ──────────────────────────────────────────────────────────────
-
-export interface Partner {
-  id: string;
-  name: string;
-  type: 'association' | 'supplier' | 'brand';
-}
-
-/**
- * TODO(WO-KCOS-HOME-DYNAMIC-IMPL-V2): CMS slot 또는 파트너 API 연동
- */
-export const partners: Partner[] = [
-  { id: '1', name: 'COSRX', type: 'brand' },
-  { id: '2', name: 'Innisfree', type: 'brand' },
-  { id: '3', name: 'Laneige', type: 'brand' },
-  { id: '4', name: 'Sulwhasoo', type: 'brand' },
-  { id: '5', name: 'Etude', type: 'brand' },
 ];

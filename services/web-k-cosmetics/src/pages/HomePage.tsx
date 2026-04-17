@@ -25,12 +25,10 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts';
 import { BusinessOnboardingBanner } from '../components/onboarding/BusinessOnboardingBanner';
 import { NoticeSection } from '../components/home/NoticeSection';
-import { homeApi, HomePrefetchData } from '../api/home';
+import { homeApi, HomePrefetchData, HomeRunningTrial, HomePartner } from '../api/home';
 import {
   heroSlides, HeroSlide,
   quickActionCards,
-  nowRunningItems, NowRunningItem,
-  partners,
 } from '../config/homeStaticData';
 
 // ========================================
@@ -236,15 +234,16 @@ function QuickActionSection() {
   );
 }
 
-function NowRunningSection() {
-  const getTypeLabel = (type: NowRunningItem['type']) => {
-    switch (type) {
-      case 'trial': return 'Trial';
-      case 'product': return '신상품';
-      case 'event': return '이벤트';
-      case 'campaign': return '캠페인';
-    }
-  };
+function NowRunningSection({ items, loading }: { items: HomeRunningTrial[]; loading: boolean }) {
+  if (loading) {
+    return (
+      <section style={{ padding: '40px 24px', maxWidth: '1200px', margin: '0 auto' }}>
+        <p style={{ color: '#94a3b8', fontSize: '13px', textAlign: 'center' }}>불러오는 중...</p>
+      </section>
+    );
+  }
+
+  if (items.length === 0) return null;
 
   return (
     <section style={{ padding: '40px 24px', maxWidth: '1200px', margin: '0 auto' }}>
@@ -253,23 +252,34 @@ function NowRunningSection() {
           <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#1e293b', marginBottom: '4px' }}>Now Running</h2>
           <p style={{ fontSize: '13px', color: '#64748b' }}>지금 참여 가능한 프로그램</p>
         </div>
-        <Link to="/products" style={{ fontSize: '13px', color: '#64748b', fontWeight: 500, textDecoration: 'none' }}>
+        <a
+          href="https://neture.co.kr/market-trial"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ fontSize: '13px', color: '#64748b', fontWeight: 500, textDecoration: 'none' }}
+        >
           전체보기 →
-        </Link>
+        </a>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
-        {nowRunningItems.map((item) => (
-          <Link key={item.id} to={item.link} style={{
-            backgroundColor: '#fff', borderRadius: '8px', padding: '16px',
-            border: '1px solid #e2e8f0', textDecoration: 'none',
-          }}>
+        {items.map((item) => (
+          <a
+            key={item.id}
+            href={item.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              backgroundColor: '#fff', borderRadius: '8px', padding: '16px',
+              border: '1px solid #e2e8f0', textDecoration: 'none', display: 'block',
+            }}
+          >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
               <span style={{
                 padding: '3px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 500,
                 backgroundColor: '#f1f5f9', color: '#475569',
               }}>
-                {getTypeLabel(item.type)}
+                Trial
               </span>
               {item.deadline && (
                 <span style={{ fontSize: '11px', color: '#94a3b8' }}>~{item.deadline}</span>
@@ -280,18 +290,20 @@ function NowRunningSection() {
             </h3>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
               {item.supplier && <span style={{ color: '#64748b' }}>{item.supplier}</span>}
-              {item.participants && (
+              {typeof item.participants === 'number' && (
                 <span style={{ color: '#94a3b8' }}>{item.participants}개 매장 참여</span>
               )}
             </div>
-          </Link>
+          </a>
         ))}
       </div>
     </section>
   );
 }
 
-function PartnerTrustSection() {
+function PartnerTrustSection({ partners }: { partners: HomePartner[] }) {
+  if (partners.length === 0) return null;
+
   return (
     <section style={{ padding: '40px 24px', maxWidth: '1200px', margin: '0 auto' }}>
       <p style={{ textAlign: 'center', fontSize: '13px', color: '#64748b', marginBottom: '20px' }}>
@@ -299,13 +311,29 @@ function PartnerTrustSection() {
       </p>
       <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '10px' }}>
         {partners.map((partner) => (
-          <div key={partner.id} style={{
-            padding: '10px 16px', borderRadius: '6px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            backgroundColor: '#f8fafc', border: '1px solid #e2e8f0',
-          }}>
-            <span style={{ fontWeight: 500, fontSize: '13px', color: '#475569' }}>{partner.name}</span>
-          </div>
+          partner.linkUrl ? (
+            <a
+              key={partner.id}
+              href={partner.linkUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                padding: '10px 16px', borderRadius: '6px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', textDecoration: 'none',
+              }}
+            >
+              <span style={{ fontWeight: 500, fontSize: '13px', color: '#475569' }}>{partner.name}</span>
+            </a>
+          ) : (
+            <div key={partner.id} style={{
+              padding: '10px 16px', borderRadius: '6px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              backgroundColor: '#f8fafc', border: '1px solid #e2e8f0',
+            }}>
+              <span style={{ fontWeight: 500, fontSize: '13px', color: '#475569' }}>{partner.name}</span>
+            </div>
+          )
         ))}
       </div>
     </section>
@@ -374,8 +402,8 @@ export function HomePage() {
       {/* 2. Quick Action — 운영 도구 요약 */}
       <QuickActionSection />
 
-      {/* 3. Now Running — 신상품/Trial/이벤트 */}
-      <NowRunningSection />
+      {/* 3. Now Running — Market Trial (V2 동적화 완료) */}
+      <NowRunningSection items={homeData?.runningTrials ?? []} loading={loading} />
 
       {/* 4. 운영 공지 (V1 동적화 완료) */}
       <NoticeSection prefetchedNotices={homeData?.notices} loading={loading} />
@@ -383,8 +411,8 @@ export function HomePage() {
       {/* CTA for Non-authenticated Users */}
       <CTASection />
 
-      {/* 5. 협력 브랜드 신뢰 Zone */}
-      <PartnerTrustSection />
+      {/* 5. 협력 브랜드 신뢰 Zone (V2 동적화 완료) */}
+      <PartnerTrustSection partners={homeData?.partners ?? []} />
     </div>
   );
 }
