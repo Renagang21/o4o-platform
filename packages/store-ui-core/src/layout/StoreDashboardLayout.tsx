@@ -34,6 +34,8 @@ interface StoreDashboardLayoutProps {
   orgName?: string;
   /** 커스텀 우측 영역 (StoreTopBar에 전달) */
   topBarRight?: React.ReactNode;
+  /** true이면 StoreTopBar를 숨김 (외부 GlobalHeader 사용 시) */
+  hideTopBar?: boolean;
 }
 
 export function StoreDashboardLayout({
@@ -48,25 +50,28 @@ export function StoreDashboardLayout({
   serviceBadge,
   orgName,
   topBarRight,
+  hideTopBar = false,
 }: StoreDashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-100">
-      {/* ──── TopBar ──── */}
-      <StoreTopBar
-        config={config}
-        userName={userName}
-        userInitial={userInitial}
-        homeLink={homeLink}
-        onLogout={onLogout}
-        onMenuToggle={() => setSidebarOpen(true)}
-        navItems={navItems}
-        serviceLabel={serviceLabel}
-        serviceBadge={serviceBadge}
-        orgName={orgName}
-        topBarRight={topBarRight}
-      />
+      {/* ──── TopBar (외부 GlobalHeader 사용 시 숨김) ──── */}
+      {!hideTopBar && (
+        <StoreTopBar
+          config={config}
+          userName={userName}
+          userInitial={userInitial}
+          homeLink={homeLink}
+          onLogout={onLogout}
+          onMenuToggle={() => setSidebarOpen(true)}
+          navItems={navItems}
+          serviceLabel={serviceLabel}
+          serviceBadge={serviceBadge}
+          orgName={orgName}
+          topBarRight={topBarRight}
+        />
+      )}
 
       {/* ──── Body: sidebar + content ──── */}
       <div className="flex flex-1 min-h-0">
@@ -80,7 +85,11 @@ export function StoreDashboardLayout({
 
         {/* Sidebar: fixed drawer on mobile, sticky in-flow on desktop */}
         <aside
-          className={`fixed top-14 left-0 z-40 h-[calc(100vh-3.5rem)] w-64 bg-white shadow-xl transform transition-transform duration-300 lg:sticky lg:top-14 lg:z-auto lg:shadow-none lg:border-r lg:border-slate-200 lg:shrink-0 lg:translate-x-0 ${
+          className={`fixed left-0 z-40 w-64 bg-white shadow-xl transform transition-transform duration-300 lg:sticky lg:z-auto lg:shadow-none lg:border-r lg:border-slate-200 lg:shrink-0 lg:translate-x-0 ${
+            hideTopBar
+              ? 'top-16 h-[calc(100vh-4rem)] lg:top-16'
+              : 'top-14 h-[calc(100vh-3.5rem)] lg:top-14'
+          } ${
             sidebarOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
         >

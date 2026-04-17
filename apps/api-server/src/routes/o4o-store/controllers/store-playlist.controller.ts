@@ -1,7 +1,8 @@
 /**
  * Store Playlist Controller — Store 중심 Playlist 엔진
  *
- * WO-O4O-SIGNAGE-STORE-PLAYLIST-ENGINE-V1
+ * WO-O4O-SIGNAGE-KPA-PHASE1-MODERNIZATION-V1
+ * Refactored: raw SQL → StorePlaylistRepository
  *
  * Endpoints:
  *   Auth (pharmacy owner):
@@ -11,6 +12,7 @@
  *     DELETE /store-playlists/:id          — 플레이리스트 삭제
  *     GET    /store-playlists/:id/items    — 항목 목록
  *     POST   /store-playlists/:id/items    — 항목 추가 (snapshot)
+ *     POST   /store-playlists/:id/items/from-library — Library에서 추가
  *     PATCH  /store-playlists/:id/items/reorder — 순서 변경
  *     DELETE /store-playlists/:id/items/:itemId — 항목 삭제 (locked 제외)
  *
@@ -22,7 +24,7 @@ import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import type { AuthRequest } from '../../../types/auth.js';
 import { resolveStoreAccess } from '../../../utils/store-owner.utils.js';
-import { AssetCopyService } from '@o4o/asset-copy-core';
+import { StorePlaylistRepository } from '../repositories/store-playlist.repository.js';
 
 type AuthMiddleware = RequestHandler;
 
@@ -36,6 +38,7 @@ export function createStorePlaylistController(
   serviceKey?: string,
 ): Router {
   const router = Router();
+  const repo = new StorePlaylistRepository(dataSource);
 
   // ═══════════════════════════════════════════════════
   // PUBLIC: GET /store-playlists/public/:id
@@ -48,20 +51,8 @@ export function createStorePlaylistController(
       try {
         const { id } = req.params;
 
-        const rows = await dataSource.query(
-          `SELECT
-             p.id,
-             p.name,
-             p.playlist_type AS "playlistType",
-             p.organization_id AS "organizationId"
-           FROM store_playlists p
-           WHERE p.id = $1
-             AND p.publish_status = 'published'
-             AND p.is_active = true`,
-          [id],
-        );
-
-        if (rows.length === 0) {
+        const playlist = await repo.findPublicPlaylist(id);
+        if (!playlist) {
           res.status(404).json({
             success: false,
             error: { code: 'NOT_FOUND', message: 'Playlist not found or not published' },
@@ -69,88 +60,8 @@ export function createStorePlaylistController(
           return;
         }
 
-        const playlist = rows[0];
-
-        // Fetch items with snapshot content_json for video URL
-        // If serviceKey is provided, merge active forced content via UNION
-        let items: any[];
-        if (serviceKey) {
-          items = await dataSource.query(
-            `SELECT
-               i.id,
-               i.snapshot_id AS "snapshotId",
-               i.display_order AS "displayOrder",
-               i.is_forced AS "isForced",
-               s.title,
-               s.content_json AS "contentJson"
-             FROM store_playlist_items i
-             JOIN o4o_asset_snapshots s ON s.id = i.snapshot_id
-             WHERE i.playlist_id = $1
-               AND (
-                 i.is_forced = false
-                 OR (
-                   (i.forced_start_at IS NULL OR NOW() >= i.forced_start_at)
-                   AND (i.forced_end_at IS NULL OR NOW() <= i.forced_end_at)
-                 )
-               )
-
-             UNION ALL
-
-             SELECT
-               'forced-' || fc.id AS id,
-               NULL AS "snapshotId",
-               COALESCE(fp.display_order, 9999) AS "displayOrder",
-               true AS "isForced",
-               fc.title,
-               json_build_object(
-                 'url', fc.video_url,
-                 'sourceType', fc.source_type,
-                 'embedId', fc.embed_id,
-                 'thumbnailUrl', fc.thumbnail_url
-               ) AS "contentJson"
-             FROM signage_forced_content fc
-             LEFT JOIN signage_forced_content_positions fp
-               ON fp.forced_content_id = fc.id AND fp.playlist_id = $1
-             WHERE fc.service_key = $2
-               AND fc.is_active = true
-               AND fc.deleted_at IS NULL
-               AND NOW() >= fc.start_at
-               AND NOW() <= fc.end_at
-
-             ORDER BY "displayOrder" ASC`,
-            [id, serviceKey],
-          );
-        } else {
-          items = await dataSource.query(
-            `SELECT
-               i.id,
-               i.snapshot_id AS "snapshotId",
-               i.display_order AS "displayOrder",
-               i.is_forced AS "isForced",
-               s.title,
-               s.content_json AS "contentJson"
-             FROM store_playlist_items i
-             JOIN o4o_asset_snapshots s ON s.id = i.snapshot_id
-             WHERE i.playlist_id = $1
-               AND (
-                 i.is_forced = false
-                 OR (
-                   (i.forced_start_at IS NULL OR NOW() >= i.forced_start_at)
-                   AND (i.forced_end_at IS NULL OR NOW() <= i.forced_end_at)
-                 )
-               )
-             ORDER BY i.display_order ASC`,
-            [id],
-          );
-        }
-
-        res.json({
-          success: true,
-          data: {
-            ...playlist,
-            items,
-          },
-        });
+        const items = await repo.findPublicPlaylistItems(id, serviceKey);
+        res.json({ success: true, data: { ...playlist, items } });
       } catch (error: any) {
         res.status(500).json({
           success: false,
@@ -182,39 +93,13 @@ export function createStorePlaylistController(
           return;
         }
 
-        // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
         const organizationId = await resolveStoreAccess(dataSource, userId, userRoles);
         if (!organizationId) {
           res.json({ success: true, data: [] });
           return;
         }
 
-        const playlists = await dataSource.query(
-          `SELECT
-             p.id,
-             p.name,
-             p.playlist_type AS "playlistType",
-             p.publish_status AS "publishStatus",
-             p.is_active AS "isActive",
-             p.source_playlist_id AS "sourcePlaylistId",
-             p.created_at AS "createdAt",
-             p.updated_at AS "updatedAt",
-             COALESCE(ic.item_count, 0)::int AS "itemCount",
-             COALESCE(ic.forced_count, 0)::int AS "forcedCount"
-           FROM store_playlists p
-           LEFT JOIN (
-             SELECT
-               playlist_id,
-               COUNT(*)::int AS item_count,
-               COUNT(*) FILTER (WHERE is_forced = true)::int AS forced_count
-             FROM store_playlist_items
-             GROUP BY playlist_id
-           ) ic ON ic.playlist_id = p.id
-           WHERE p.organization_id = $1 AND p.is_active = true
-           ORDER BY p.updated_at DESC`,
-          [organizationId],
-        );
-
+        const playlists = await repo.findPlaylistsByOrganization(organizationId);
         res.json({ success: true, data: playlists });
       } catch (error: any) {
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
@@ -240,7 +125,6 @@ export function createStorePlaylistController(
           return;
         }
 
-        // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
         const organizationId = await resolveStoreAccess(dataSource, userId, userRoles);
         if (!organizationId) {
           res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
@@ -254,16 +138,8 @@ export function createStorePlaylistController(
         }
 
         const type = playlistType === 'SINGLE' ? 'SINGLE' : 'LIST';
-
-        const result = await dataSource.query(
-          `INSERT INTO store_playlists (organization_id, name, playlist_type)
-           VALUES ($1, $2, $3)
-           RETURNING id, name, playlist_type AS "playlistType", publish_status AS "publishStatus",
-                     is_active AS "isActive", created_at AS "createdAt"`,
-          [organizationId, name.trim(), type],
-        );
-
-        res.status(201).json({ success: true, data: result[0] });
+        const result = await repo.createPlaylist(organizationId, name.trim(), type);
+        res.status(201).json({ success: true, data: result });
       } catch (error: any) {
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
@@ -283,7 +159,6 @@ export function createStorePlaylistController(
         const userId = authReq.user?.id;
         const userRoles = authReq.user?.roles || [];
 
-        // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
         if (!userId) {
           res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
@@ -297,46 +172,24 @@ export function createStorePlaylistController(
         const { id } = req.params;
         const { name, publishStatus, isActive } = req.body;
 
-        // Build dynamic SET clause
-        const sets: string[] = [];
-        const params: any[] = [];
-        let paramIndex = 1;
+        // Validate: at least one valid field to update
+        const updates: { name?: string; publishStatus?: string; isActive?: boolean } = {};
+        if (name !== undefined) updates.name = name;
+        if (publishStatus === 'draft' || publishStatus === 'published') updates.publishStatus = publishStatus;
+        if (isActive !== undefined) updates.isActive = isActive;
 
-        if (name !== undefined) {
-          sets.push(`name = $${paramIndex++}`);
-          params.push(name.trim());
-        }
-        if (publishStatus !== undefined && (publishStatus === 'draft' || publishStatus === 'published')) {
-          sets.push(`publish_status = $${paramIndex++}`);
-          params.push(publishStatus);
-        }
-        if (isActive !== undefined) {
-          sets.push(`is_active = $${paramIndex++}`);
-          params.push(!!isActive);
-        }
-
-        if (sets.length === 0) {
+        if (Object.keys(updates).length === 0) {
           res.status(400).json({ success: false, error: { code: 'INVALID_INPUT', message: 'Nothing to update' } });
           return;
         }
 
-        sets.push(`updated_at = NOW()`);
-
-        const result = await dataSource.query(
-          `UPDATE store_playlists
-           SET ${sets.join(', ')}
-           WHERE id = $${paramIndex} AND organization_id = $${paramIndex + 1}
-           RETURNING id, name, playlist_type AS "playlistType", publish_status AS "publishStatus",
-                     is_active AS "isActive", updated_at AS "updatedAt"`,
-          [...params, id, organizationId],
-        );
-
-        if (result.length === 0) {
+        const result = await repo.updatePlaylist(id, organizationId, updates);
+        if (!result) {
           res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Playlist not found' } });
           return;
         }
 
-        res.json({ success: true, data: result[0] });
+        res.json({ success: true, data: result });
       } catch (error: any) {
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
@@ -356,7 +209,6 @@ export function createStorePlaylistController(
         const userId = authReq.user?.id;
         const userRoles = authReq.user?.roles || [];
 
-        // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
         if (!userId) {
           res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
@@ -368,20 +220,13 @@ export function createStorePlaylistController(
         }
 
         const { id } = req.params;
-
-        const result = await dataSource.query(
-          `UPDATE store_playlists SET is_active = false, updated_at = NOW()
-           WHERE id = $1 AND organization_id = $2
-           RETURNING id`,
-          [id, organizationId],
-        );
-
-        if (result.length === 0) {
+        const result = await repo.softDeletePlaylist(id, organizationId);
+        if (!result) {
           res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Playlist not found' } });
           return;
         }
 
-        res.json({ success: true, data: { id: result[0].id, deleted: true } });
+        res.json({ success: true, data: { id: result.id, deleted: true } });
       } catch (error: any) {
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
@@ -405,7 +250,6 @@ export function createStorePlaylistController(
         const userId = authReq.user?.id;
         const userRoles = authReq.user?.roles || [];
 
-        // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
         if (!userId) {
           res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
@@ -418,71 +262,12 @@ export function createStorePlaylistController(
 
         const { id } = req.params;
 
-        // Verify playlist ownership
-        const plCheck = await dataSource.query(
-          `SELECT id FROM store_playlists WHERE id = $1 AND organization_id = $2 AND is_active = true`,
-          [id, organizationId],
-        );
-        if (plCheck.length === 0) {
+        if (!await repo.verifyOwnership(id, organizationId)) {
           res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Playlist not found' } });
           return;
         }
 
-        // Fetch real items
-        const realItems = await dataSource.query(
-          `SELECT
-             i.id,
-             i.snapshot_id AS "snapshotId",
-             i.display_order AS "displayOrder",
-             i.is_forced AS "isForced",
-             i.is_locked AS "isLocked",
-             i.forced_start_at AS "forcedStartAt",
-             i.forced_end_at AS "forcedEndAt",
-             i.created_at AS "createdAt",
-             s.title,
-             s.content_json AS "contentJson",
-             s.asset_type AS "assetType"
-           FROM store_playlist_items i
-           JOIN o4o_asset_snapshots s ON s.id = i.snapshot_id
-           WHERE i.playlist_id = $1
-           ORDER BY i.display_order ASC`,
-          [id],
-        );
-
-        // Merge active forced content if serviceKey is configured
-        let items: any[] = realItems;
-        if (serviceKey) {
-          const forcedItems = await dataSource.query(
-            `SELECT
-               'forced-' || fc.id AS id,
-               NULL AS "snapshotId",
-               COALESCE(fp.display_order, 9999) AS "displayOrder",
-               true AS "isForced",
-               true AS "isLocked",
-               fc.start_at AS "forcedStartAt",
-               fc.end_at AS "forcedEndAt",
-               fc.created_at AS "createdAt",
-               fc.title,
-               json_build_object(
-                 'url', fc.video_url,
-                 'sourceType', fc.source_type,
-                 'embedId', fc.embed_id,
-                 'thumbnailUrl', fc.thumbnail_url
-               ) AS "contentJson",
-               'signage' AS "assetType"
-             FROM signage_forced_content fc
-             LEFT JOIN signage_forced_content_positions fp
-               ON fp.forced_content_id = fc.id AND fp.playlist_id = $1
-             WHERE fc.service_key = $2
-               AND fc.is_active = true
-               AND fc.deleted_at IS NULL
-             ORDER BY COALESCE(fp.display_order, 9999) ASC`,
-            [id, serviceKey],
-          );
-
-          items = [...realItems, ...forcedItems].sort((a, b) => a.displayOrder - b.displayOrder);
-        }
-
+        const items = await repo.findPlaylistItems(id, serviceKey);
         res.json({ success: true, data: items });
       } catch (error: any) {
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
@@ -503,7 +288,6 @@ export function createStorePlaylistController(
         const userId = authReq.user?.id;
         const userRoles = authReq.user?.roles || [];
 
-        // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
         if (!userId) {
           res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
@@ -522,52 +306,13 @@ export function createStorePlaylistController(
           return;
         }
 
-        // Verify playlist ownership
-        const plCheck = await dataSource.query(
-          `SELECT id, playlist_type FROM store_playlists WHERE id = $1 AND organization_id = $2 AND is_active = true`,
-          [id, organizationId],
-        );
-        if (plCheck.length === 0) {
+        if (!await repo.verifyOwnership(id, organizationId)) {
           res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Playlist not found' } });
           return;
         }
 
-        // Use transaction to prevent race conditions (especially SINGLE type)
-        const result = await dataSource.transaction(async (manager) => {
-          // Lock the playlist row to serialise concurrent inserts
-          const locked = await manager.query(
-            `SELECT id, playlist_type FROM store_playlists WHERE id = $1 FOR UPDATE`,
-            [id],
-          );
-
-          // SINGLE type: max 1 item
-          if (locked[0]?.playlist_type === 'SINGLE') {
-            const existingCount = await manager.query(
-              `SELECT COUNT(*)::int AS count FROM store_playlist_items WHERE playlist_id = $1`,
-              [id],
-            );
-            if (existingCount[0]?.count > 0) {
-              throw Object.assign(new Error('SINGLE playlist allows only 1 item'), { statusCode: 400, code: 'SINGLE_LIMIT' });
-            }
-          }
-
-          // Get next display_order
-          const maxOrder = await manager.query(
-            `SELECT COALESCE(MAX(display_order), -1)::int + 1 AS next_order FROM store_playlist_items WHERE playlist_id = $1`,
-            [id],
-          );
-
-          const rows = await manager.query(
-            `INSERT INTO store_playlist_items (playlist_id, snapshot_id, display_order)
-             VALUES ($1, $2, $3)
-             RETURNING id, snapshot_id AS "snapshotId", display_order AS "displayOrder",
-                       is_forced AS "isForced", is_locked AS "isLocked", created_at AS "createdAt"`,
-            [id, snapshotId, maxOrder[0].next_order],
-          );
-          return rows;
-        });
-
-        res.status(201).json({ success: true, data: result[0] });
+        const result = await repo.addItem(id, snapshotId);
+        res.status(201).json({ success: true, data: result });
       } catch (error: any) {
         if (error.statusCode && error.code) {
           res.status(error.statusCode).json({ success: false, error: { code: error.code, message: error.message } });
@@ -582,7 +327,6 @@ export function createStorePlaylistController(
    * POST /store-playlists/:id/items/from-library
    * Library에서 항목 추가 — Library item → asset snapshot → playlist item
    * Body: { libraryItemId }
-   * WO-O4O-SIGNAGE-LIBRARY-INTEGRATION-V1
    */
   router.post(
     '/:id/items/from-library',
@@ -611,98 +355,13 @@ export function createStorePlaylistController(
           return;
         }
 
-        // Verify playlist ownership
-        const plCheck = await dataSource.query(
-          `SELECT id, playlist_type FROM store_playlists WHERE id = $1 AND organization_id = $2 AND is_active = true`,
-          [id, organizationId],
-        );
-        if (plCheck.length === 0) {
+        if (!await repo.verifyOwnership(id, organizationId)) {
           res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Playlist not found' } });
           return;
         }
 
-        // Verify library item ownership
-        const libItem = await dataSource.query(
-          `SELECT id, title, file_url, file_name, mime_type, category
-           FROM store_library_items
-           WHERE id = $1 AND organization_id = $2 AND is_active = true`,
-          [libraryItemId, organizationId],
-        );
-        if (libItem.length === 0) {
-          res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Library item not found' } });
-          return;
-        }
-
-        const lib = libItem[0];
-
-        // Step 1: Create or reuse snapshot via AssetCopyService (duplicate-safe)
-        const assetCopyService = new AssetCopyService(dataSource);
-        let snapshotId: string;
-        try {
-          const copyResult = await assetCopyService.copyResolved({
-            sourceService: 'store-library',
-            sourceAssetId: libraryItemId,
-            assetType: 'signage',
-            targetOrganizationId: organizationId,
-            createdBy: userId,
-            title: lib.title,
-            contentJson: {
-              fileUrl: lib.file_url,
-              fileName: lib.file_name,
-              mimeType: lib.mime_type,
-              category: lib.category,
-              source: 'store-library',
-            },
-          });
-          snapshotId = copyResult.snapshot.id;
-        } catch (err: any) {
-          if (err.message === 'DUPLICATE_SNAPSHOT') {
-            // Reuse existing snapshot
-            const existing = await dataSource.query(
-              `SELECT id FROM o4o_asset_snapshots
-               WHERE organization_id = $1 AND source_asset_id = $2 AND asset_type = 'signage'
-               LIMIT 1`,
-              [organizationId, libraryItemId],
-            );
-            snapshotId = existing[0].id;
-          } else {
-            throw err;
-          }
-        }
-
-        // Step 2: Add snapshot to playlist (with lock)
-        const result = await dataSource.transaction(async (manager) => {
-          const locked = await manager.query(
-            `SELECT id, playlist_type FROM store_playlists WHERE id = $1 FOR UPDATE`,
-            [id],
-          );
-
-          if (locked[0]?.playlist_type === 'SINGLE') {
-            const existingCount = await manager.query(
-              `SELECT COUNT(*)::int AS count FROM store_playlist_items WHERE playlist_id = $1`,
-              [id],
-            );
-            if (existingCount[0]?.count > 0) {
-              throw Object.assign(new Error('SINGLE playlist allows only 1 item'), { statusCode: 400, code: 'SINGLE_LIMIT' });
-            }
-          }
-
-          const maxOrder = await manager.query(
-            `SELECT COALESCE(MAX(display_order), -1)::int + 1 AS next_order FROM store_playlist_items WHERE playlist_id = $1`,
-            [id],
-          );
-
-          const rows = await manager.query(
-            `INSERT INTO store_playlist_items (playlist_id, snapshot_id, display_order)
-             VALUES ($1, $2, $3)
-             RETURNING id, snapshot_id AS "snapshotId", display_order AS "displayOrder",
-                       is_forced AS "isForced", is_locked AS "isLocked", created_at AS "createdAt"`,
-            [id, snapshotId, maxOrder[0].next_order],
-          );
-          return rows;
-        });
-
-        res.status(201).json({ success: true, data: result[0] });
+        const result = await repo.addItemFromLibrary(id, libraryItemId, organizationId, userId);
+        res.status(201).json({ success: true, data: result });
       } catch (error: any) {
         if (error.statusCode && error.code) {
           res.status(error.statusCode).json({ success: false, error: { code: error.code, message: error.message } });
@@ -727,7 +386,6 @@ export function createStorePlaylistController(
         const userId = authReq.user?.id;
         const userRoles = authReq.user?.roles || [];
 
-        // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
         if (!userId) {
           res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
@@ -746,38 +404,13 @@ export function createStorePlaylistController(
           return;
         }
 
-        // Verify playlist ownership
-        const plCheck = await dataSource.query(
-          `SELECT id FROM store_playlists WHERE id = $1 AND organization_id = $2 AND is_active = true`,
-          [id, organizationId],
-        );
-        if (plCheck.length === 0) {
+        if (!await repo.verifyOwnership(id, organizationId)) {
           res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Playlist not found' } });
           return;
         }
 
-        // Update display_order for each item
-        // Virtual forced items (forced-{uuid}) use signage_forced_content_positions
-        for (let i = 0; i < order.length; i++) {
-          const itemId = order[i] as string;
-          if (itemId.startsWith('forced-')) {
-            const forcedContentId = itemId.substring(7);
-            await dataSource.query(
-              `INSERT INTO signage_forced_content_positions (playlist_id, forced_content_id, display_order)
-               VALUES ($1, $2, $3)
-               ON CONFLICT (playlist_id, forced_content_id) DO UPDATE SET display_order = $3`,
-              [id, forcedContentId, i],
-            );
-          } else {
-            await dataSource.query(
-              `UPDATE store_playlist_items SET display_order = $1, updated_at = NOW()
-               WHERE id = $2 AND playlist_id = $3`,
-              [i, itemId, id],
-            );
-          }
-        }
-
-        res.json({ success: true, data: { reordered: order.length } });
+        const result = await repo.reorderItems(id, order);
+        res.json({ success: true, data: result });
       } catch (error: any) {
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
@@ -797,7 +430,6 @@ export function createStorePlaylistController(
         const userId = authReq.user?.id;
         const userRoles = authReq.user?.roles || [];
 
-        // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
         if (!userId) {
           res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
@@ -819,41 +451,18 @@ export function createStorePlaylistController(
           return;
         }
 
-        // Verify playlist ownership
-        const plCheck = await dataSource.query(
-          `SELECT id FROM store_playlists WHERE id = $1 AND organization_id = $2`,
-          [id, organizationId],
-        );
-        if (plCheck.length === 0) {
+        if (!await repo.verifyOwnership(id, organizationId)) {
           res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Playlist not found' } });
           return;
         }
 
-        // Check if locked
-        const itemCheck = await dataSource.query(
-          `SELECT id, is_locked FROM store_playlist_items WHERE id = $1 AND playlist_id = $2`,
-          [itemId, id],
-        );
-        if (itemCheck.length === 0) {
-          res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Item not found' } });
-          return;
-        }
-
-        if (itemCheck[0].is_locked) {
-          res.status(403).json({
-            success: false,
-            error: { code: 'ITEM_LOCKED', message: 'Forced content cannot be deleted' },
-          });
-          return;
-        }
-
-        await dataSource.query(
-          `DELETE FROM store_playlist_items WHERE id = $1 AND playlist_id = $2`,
-          [itemId, id],
-        );
-
+        await repo.deleteItem(id, itemId);
         res.json({ success: true, data: { id: itemId, deleted: true } });
       } catch (error: any) {
+        if (error.statusCode && error.code) {
+          res.status(error.statusCode).json({ success: false, error: { code: error.code, message: error.message } });
+          return;
+        }
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
     },

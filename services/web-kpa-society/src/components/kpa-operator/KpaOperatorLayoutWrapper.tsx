@@ -46,6 +46,7 @@ export default function KpaOperatorLayoutWrapper() {
         user={user ? { name: user.name || '', email: user.email } : null}
         onLogout={handleLogout}
         renderHeader={() => null}
+        sidebarTopOffset="top-20"
       >
         <Outlet />
       </OperatorShell>

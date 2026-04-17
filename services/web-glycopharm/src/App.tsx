@@ -285,6 +285,7 @@ function StoreLayoutWrapper() {
         homeLink="/"
         onLogout={() => { logout(); navigate('/'); }}
         banner={<RedirectNoticeBanner />}
+        hideTopBar
       />
     </div>
   );

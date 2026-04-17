@@ -107,7 +107,7 @@ export default function SupplierOpsLayout() {
         <div className="flex gap-6">
           {/* Desktop Sidebar */}
           <aside className="w-60 flex-shrink-0 hidden md:block">
-            <nav className="bg-white rounded-xl border border-gray-200 overflow-hidden sticky top-6">
+            <nav className="bg-white rounded-xl border border-gray-200 overflow-hidden sticky top-20">
               {sidebarGroups.map((group) => {
                 const Icon = group.icon;
                 const active = isGroupActive(group);

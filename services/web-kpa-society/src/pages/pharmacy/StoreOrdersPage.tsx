@@ -15,6 +15,7 @@ import type { Column } from '@o4o/ui';
 import { RefreshCw, AlertCircle } from 'lucide-react';
 import { getStoreOrders, getStoreOrderKpi } from '../../api/checkout';
 import type { StoreOrder, StoreOrderKpi } from '../../api/checkout';
+import { StoreOrderDetailDrawer } from './StoreOrderDetailDrawer';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
 
 // ── 상태 정의 (CheckoutOrderStatus enum 기준) ──
@@ -45,6 +46,7 @@ export function StoreOrdersPage() {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -226,6 +228,7 @@ export function StoreOrdersPage() {
           columns={columns}
           dataSource={orders}
           rowKey="id"
+          onRowClick={(row) => setSelectedOrderId(row.id)}
           pagination={{
             current: page,
             pageSize: PAGE_SIZE,
@@ -235,6 +238,17 @@ export function StoreOrdersPage() {
           emptyText="주문이 없습니다"
         />
       )}
+
+      {/* Order Detail Drawer */}
+      <StoreOrderDetailDrawer
+        orderId={selectedOrderId}
+        open={!!selectedOrderId}
+        onClose={() => setSelectedOrderId(null)}
+        onStatusChange={() => {
+          loadData();
+          setSelectedOrderId(null);
+        }}
+      />
     </div>
   );
 }

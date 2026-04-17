@@ -120,7 +120,7 @@ import { PharmacyInfoPage } from './pages/pharmacy/PharmacyInfoPage';
 
 // WO-PHARMACY-MANAGEMENT-CONSOLIDATION-V1 Phase 2: Store Core v1.0 통합
 import { StoreDashboardLayout, KPA_SOCIETY_STORE_CONFIG } from '@o4o/store-ui-core';
-import { StoreUserDropdown } from './components/store/StoreUserDropdown';
+import { KpaGlobalHeader } from './components/KpaGlobalHeader';
 import { SupplierListPage, SupplierDetailPage } from './pages/pharmacy/b2b';
 
 // Work Pages (WO-KPA-WORK-IMPLEMENT-V1) - 근무약사 전용 업무 화면
@@ -275,17 +275,9 @@ function RoleBasedHome() {
 
 /**
  * WO-STORE-CORE-MENU-ALIGNMENT-V1 Phase 2 Step 3
- * WO-O4O-STORE-ADMIN-LAYOUT-STANDARDIZATION-V1: navItems 추가
+ * WO-O4O-GLOBAL-LAYOUT-HOTFIX-V1: GlobalHeader 추가 + StoreTopBar 숨김
  * Store Core v1.0 — KPA-a Store Dashboard Layout Wrapper
  */
-const KPA_STORE_NAV_ITEMS = [
-  { label: '홈', href: '/' },
-  { label: '포럼', href: '/forum' },
-  { label: '강의 / 마케팅 콘텐츠', href: '/lms' },
-  { label: '약국 HUB', href: '/hub' },
-  { label: '내 약국', href: '/store' },
-];
-
 function KpaStoreLayoutWrapper() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -300,19 +292,18 @@ function KpaStoreLayoutWrapper() {
     return () => { cancelled = true; };
   }, []);
 
-  const handleLogout = () => { logout(); navigate('/'); };
-
   return (
-    <StoreDashboardLayout
-      config={KPA_SOCIETY_STORE_CONFIG}
-      userName={user?.name || user?.email || ''}
-      homeLink="/"
-      navItems={KPA_STORE_NAV_ITEMS}
-      serviceLabel="약사 네트워크"
-      serviceBadge="KPA"
-      orgName={pharmacyName}
-      topBarRight={<StoreUserDropdown homeLink="/" onLogout={handleLogout} />}
-    />
+    <div className="min-h-screen flex flex-col">
+      <KpaGlobalHeader />
+      <StoreDashboardLayout
+        config={KPA_SOCIETY_STORE_CONFIG}
+        userName={user?.name || user?.email || ''}
+        homeLink="/"
+        orgName={pharmacyName}
+        onLogout={() => { logout(); navigate('/'); }}
+        hideTopBar
+      />
+    </div>
   );
 }
 

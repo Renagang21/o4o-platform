@@ -185,6 +185,7 @@ function StoreLayoutWrapper() {
         userName={user?.name || user?.email || ''}
         homeLink="/"
         onLogout={() => { logout(); navigate('/'); }}
+        hideTopBar
       />
     </div>
   );

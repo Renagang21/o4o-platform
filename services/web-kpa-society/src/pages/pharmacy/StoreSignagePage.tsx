@@ -225,7 +225,7 @@ function applySort(items: StoreAssetItem[], sortKey: SortKey): StoreAssetItem[] 
   return sorted;
 }
 
-type ActiveTab = 'assets' | 'playlist' | 'schedules' | 'explore';
+type ActiveTab = 'assets' | 'playlist' | 'schedules';
 
 const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'] as const;
 
@@ -235,7 +235,7 @@ export function StoreSignagePage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const organizationId = user?.kpaMembership?.organizationId || '';
-  const [activeTab, setActiveTab] = useState<ActiveTab>('explore');
+  const [activeTab, setActiveTab] = useState<ActiveTab>('assets');
 
   // ── Schedule state ──
   const [schedules, setSchedules] = useState<SignageScheduleItem[]>([]);
@@ -606,6 +606,13 @@ export function StoreSignagePage() {
         </div>
         <div className="flex gap-2">
           <button
+            onClick={() => navigate('/hub/signage')}
+            className="flex items-center gap-2 px-3 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+          >
+            <Plus className="w-4 h-4" />
+            콘텐츠 추가
+          </button>
+          <button
             onClick={() => {
               fetchItems(); loadPlaylists();
               if (activeTab === 'schedules') { loadSchedules(); loadSignagePlaylists(); }
@@ -620,17 +627,6 @@ export function StoreSignagePage() {
 
       {/* ─── Tab Bar ─────────────────────────────── */}
       <div className="flex gap-1 mb-1 border-b border-slate-200">
-        <button
-          onClick={() => setActiveTab('explore')}
-          className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
-            activeTab === 'explore'
-              ? 'border-blue-600 text-blue-700'
-              : 'border-transparent text-slate-500 hover:text-slate-700'
-          }`}
-        >
-          <Search className="w-4 h-4" />
-          가져올 콘텐츠
-        </button>
         <button
           onClick={() => setActiveTab('assets')}
           className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
@@ -654,27 +650,25 @@ export function StoreSignagePage() {
           내 플레이리스트
         </button>
         <button
-          disabled
-          className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-slate-300 cursor-not-allowed"
-          title="스케줄 기능은 준비 중입니다"
+          onClick={() => setActiveTab('schedules')}
+          className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+            activeTab === 'schedules'
+              ? 'border-blue-600 text-blue-700'
+              : 'border-transparent text-slate-500 hover:text-slate-700'
+          }`}
         >
           <Calendar className="w-4 h-4" />
           스케줄
-          <span className="text-xs bg-slate-100 text-slate-400 px-1.5 py-0.5 rounded-full font-normal">준비 중</span>
         </button>
       </div>
 
       {/* ─── 운영 흐름 배너 (Phase 3) ──────────────── */}
       <div className="flex items-center gap-0 mb-6 mt-3 text-xs text-slate-400 select-none">
         <button
-          onClick={() => setActiveTab('explore')}
-          className={`flex items-center gap-1 px-3 py-1.5 rounded-full transition-colors ${
-            activeTab === 'explore'
-              ? 'bg-blue-50 text-blue-700 font-medium'
-              : 'hover:text-slate-600'
-          }`}
+          onClick={() => navigate('/hub/signage')}
+          className="flex items-center gap-1 px-3 py-1.5 rounded-full transition-colors hover:text-slate-600"
         >
-          <Search className="w-3 h-3" /> ① 콘텐츠 탐색
+          <ExternalLink className="w-3 h-3" /> ① 콘텐츠 탐색
         </button>
         <span className="px-1 text-slate-200">→</span>
         <button
@@ -751,28 +745,6 @@ export function StoreSignagePage() {
         </button>
       </div>
 
-      {/* ═══ Explore Tab (가져올 콘텐츠) ═══════════ */}
-      {activeTab === 'explore' && (
-        <div className="flex flex-col items-center justify-center py-16 gap-6 text-center">
-          <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center">
-            <Search className="w-8 h-8 text-blue-500" />
-          </div>
-          <div>
-            <h2 className="text-lg font-semibold text-slate-800 mb-1">사이니지 허브에서 콘텐츠 탐색</h2>
-            <p className="text-sm text-slate-500 max-w-sm">
-              약사회 및 공급자가 제공하는 안내 영상·자료를 탐색하고 내 매장으로 가져오세요.
-            </p>
-          </div>
-          <button
-            onClick={() => navigate('/hub/signage')}
-            className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <ExternalLink className="w-4 h-4" />
-            콘텐츠 허브 열기
-          </button>
-        </div>
-      )}
-
       {/* ═══ Playlist Tab ═══════════════════════════ */}
       {activeTab === 'playlist' && (
         <div>
@@ -829,7 +801,7 @@ export function StoreSignagePage() {
             <div className="text-center py-12 text-slate-400">
               <ListVideo className="w-8 h-8 mx-auto mb-2 text-slate-300" />
               <p className="text-sm">플레이리스트가 없습니다.</p>
-              <p className="text-xs mt-1">'가져올 콘텐츠' 탭에서 콘텐츠를 가져온 뒤 플레이리스트를 만들어 구성하세요.</p>
+              <p className="text-xs mt-1">콘텐츠 허브에서 콘텐츠를 가져온 뒤 플레이리스트를 만들어 구성하세요.</p>
             </div>
           ) : (
             <div className="mb-6">
@@ -1048,17 +1020,10 @@ export function StoreSignagePage() {
         </div>
       )}
 
-      {/* ═══ Schedule Tab — HOLD (Core V1: 스케줄 기반 재생 보류) ══════ */}
+      {/* ═══ Schedule Tab ══════════════════════════ */}
       {activeTab === 'schedules' && (
         <div>
-          <div className="flex items-center gap-3 p-6 bg-slate-50 border border-slate-200 rounded-xl">
-            <Calendar className="w-8 h-8 text-slate-300 flex-shrink-0" />
-            <div>
-              <p className="font-semibold text-slate-600">스케줄 기능 준비 중</p>
-              <p className="text-sm text-slate-400 mt-0.5">시간·요일 기반 자동 재생 스케줄은 곧 제공될 예정입니다.</p>
-            </div>
-          </div>
-          {false && (<><div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-slate-800">스케줄</h2>
             <button
               onClick={() => { resetScheduleForm(); setShowScheduleForm(true); }}
@@ -1218,110 +1183,117 @@ export function StoreSignagePage() {
               <p className="text-xs mt-1">먼저 '내 플레이리스트' 탭에서 플레이리스트를 만들고 콘텐츠를 추가하세요.</p>
             </div>
           ) : (
-            <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-slate-50 text-left text-xs text-slate-500 uppercase tracking-wide">
-                    <th className="px-4 py-3 font-medium">이름</th>
-                    <th className="px-4 py-3 font-medium">플레이리스트</th>
-                    <th className="px-4 py-3 font-medium w-40">요일</th>
-                    <th className="px-4 py-3 font-medium w-28">시간</th>
-                    <th className="px-4 py-3 font-medium w-28">기간</th>
-                    <th className="px-4 py-3 font-medium w-16 text-center">우선순위</th>
-                    <th className="px-4 py-3 font-medium w-20 text-center">상태</th>
-                    <th className="px-4 py-3 font-medium w-20 text-center">재생</th>
-                    <th className="px-4 py-3 font-medium w-20 text-right">액션</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {schedules.map(sch => {
-                    const isNowActive = isScheduleNowActive(sch, new Date());
-                    const isUpcoming = !isNowActive && sch.isActive && (() => {
-                      const now = new Date();
-                      const day = now.getDay();
-                      const hhmm = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-                      return sch.daysOfWeek.includes(day) && toHHMM(sch.startTime) > hhmm;
-                    })();
-                    return (
-                    <tr key={sch.id} className={`hover:bg-slate-50 transition-colors ${
-                      isNowActive ? 'bg-green-50 border-l-2 border-green-500' : ''
+            <DataTable<SignageScheduleItem>
+              columns={[
+                {
+                  key: 'name',
+                  title: '이름',
+                  dataIndex: 'name',
+                  render: (v) => <span className="font-medium text-slate-900">{v}</span>,
+                },
+                {
+                  key: 'playlist',
+                  title: '플레이리스트',
+                  render: (_v, sch) => (
+                    <span className="text-slate-600 text-xs">
+                      {sch.playlist?.name || signagePlaylists.find(p => p.id === sch.playlistId)?.name || playlists.find(p => p.id === sch.playlistId)?.name || sch.playlistId.slice(0, 8)}
+                    </span>
+                  ),
+                },
+                {
+                  key: 'daysOfWeek',
+                  title: '요일',
+                  render: (_v, sch) => (
+                    <div className="flex gap-0.5">
+                      {DAY_LABELS.map((label, idx) => (
+                        <span
+                          key={idx}
+                          className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-medium ${
+                            sch.daysOfWeek.includes(idx) ? 'bg-blue-100 text-blue-700' : 'bg-slate-50 text-slate-300'
+                          }`}
+                        >{label}</span>
+                      ))}
+                    </div>
+                  ),
+                },
+                {
+                  key: 'time',
+                  title: '시간',
+                  render: (_v, sch) => <span className="text-xs text-slate-600">{sch.startTime.slice(0, 5)}–{sch.endTime.slice(0, 5)}</span>,
+                },
+                {
+                  key: 'period',
+                  title: '기간',
+                  render: (_v, sch) => (
+                    <span className="text-xs text-slate-500">
+                      {sch.validFrom || sch.validUntil ? `${sch.validFrom ?? '∞'} ~ ${sch.validUntil ?? '∞'}` : '상시'}
+                    </span>
+                  ),
+                },
+                {
+                  key: 'priority',
+                  title: '우선순위',
+                  dataIndex: 'priority',
+                  align: 'center' as const,
+                  render: (v) => <span className="text-xs text-slate-500">{v}</span>,
+                },
+                {
+                  key: 'isActive',
+                  title: '상태',
+                  align: 'center' as const,
+                  render: (_v, sch) => (
+                    <span className={`inline-block px-1.5 py-0.5 rounded text-[11px] font-medium ${
+                      sch.isActive ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500'
                     }`}>
-                      <td className="px-4 py-3 font-medium text-slate-900">{sch.name}</td>
-                      <td className="px-4 py-3 text-slate-600 text-xs">
-                        {sch.playlist?.name || signagePlaylists.find(p => p.id === sch.playlistId)?.name || playlists.find(p => p.id === sch.playlistId)?.name || sch.playlistId.slice(0, 8)}
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex gap-0.5">
-                          {DAY_LABELS.map((label, idx) => (
-                            <span
-                              key={idx}
-                              className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-medium ${
-                                sch.daysOfWeek.includes(idx)
-                                  ? 'bg-blue-100 text-blue-700'
-                                  : 'bg-slate-50 text-slate-300'
-                              }`}
-                            >
-                              {label}
-                            </span>
-                          ))}
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 text-xs text-slate-600">
-                        {sch.startTime.slice(0, 5)}–{sch.endTime.slice(0, 5)}
-                      </td>
-                      <td className="px-4 py-3 text-xs text-slate-500">
-                        {sch.validFrom || sch.validUntil
-                          ? `${sch.validFrom ?? '∞'} ~ ${sch.validUntil ?? '∞'}`
-                          : '상시'}
-                      </td>
-                      <td className="px-4 py-3 text-center text-xs text-slate-500">{sch.priority}</td>
-                      <td className="px-4 py-3 text-center">
-                        <span className={`inline-block px-1.5 py-0.5 rounded text-[11px] font-medium ${
-                          sch.isActive ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500'
-                        }`}>
-                          {sch.isActive ? '활성' : '비활성'}
-                        </span>
-                      </td>
-                      {/* 재생 상태 뱃지 */}
-                      <td className="px-4 py-3 text-center">
-                        {isNowActive ? (
-                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[11px] font-semibold bg-green-100 text-green-700">
-                            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                            현재
-                          </span>
-                        ) : isUpcoming ? (
-                          <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[11px] font-medium bg-blue-50 text-blue-600">
-                            예정
-                          </span>
-                        ) : (
-                          <span className="text-xs text-slate-300">—</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <button
-                            onClick={() => openEditSchedule(sch)}
-                            className="p-1 text-slate-400 hover:text-blue-600 rounded"
-                            title="수정"
-                          >
-                            <Pencil className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteSchedule(sch)}
-                            className="p-1 text-slate-400 hover:text-red-500 rounded"
-                            title="삭제"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
+                      {sch.isActive ? '활성' : '비활성'}
+                    </span>
+                  ),
+                },
+                {
+                  key: 'playback',
+                  title: '재생',
+                  align: 'center' as const,
+                  render: (_v, sch) => {
+                    const now = new Date();
+                    const isNowActive = isScheduleNowActive(sch, now);
+                    const isUpcoming = !isNowActive && sch.isActive && sch.daysOfWeek.includes(now.getDay())
+                      && toHHMM(sch.startTime) > `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+                    return isNowActive ? (
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[11px] font-semibold bg-green-100 text-green-700">
+                        <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />현재
+                      </span>
+                    ) : isUpcoming ? (
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[11px] font-medium bg-blue-50 text-blue-600">예정</span>
+                    ) : (
+                      <span className="text-xs text-slate-300">—</span>
                     );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}</>)}
+                  },
+                },
+                {
+                  key: 'actions',
+                  title: '',
+                  align: 'right' as const,
+                  render: (_v, sch) => (
+                    <div className="flex items-center justify-end gap-1">
+                      <button onClick={() => openEditSchedule(sch)} className="p-1 text-slate-400 hover:text-blue-600 rounded" title="수정">
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+                      <button onClick={() => handleDeleteSchedule(sch)} className="p-1 text-slate-400 hover:text-red-500 rounded" title="삭제">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ),
+                },
+              ] as Column<SignageScheduleItem>[]}
+              dataSource={schedules}
+              rowKey="id"
+              loading={false}
+              onRow={sch => ({
+                className: isScheduleNowActive(sch, new Date()) ? 'bg-green-50 border-l-2 border-green-500' : '',
+              })}
+              emptyText="스케줄이 없습니다"
+            />
+          )}
         </div>
       )}
 
@@ -1350,10 +1322,10 @@ export function StoreSignagePage() {
       {!loading && !error && items.length === 0 && (
         <div className="flex gap-2 mb-6">
           <button
-            onClick={() => setActiveTab('explore')}
+            onClick={() => navigate('/hub/signage')}
             className="px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100"
           >
-            콘텐츠 탐색하러 가기
+            콘텐츠 허브에서 가져오기
           </button>
         </div>
       )}
@@ -1438,12 +1410,12 @@ export function StoreSignagePage() {
             <>
               <Monitor className="w-10 h-10 mx-auto mb-3 text-slate-300" />
               <p className="text-sm">동영상이 없습니다.</p>
-              <p className="text-xs mt-1">'가져올 콘텐츠' 탭에서 콘텐츠를 가져와주세요.</p>
+              <p className="text-xs mt-1">콘텐츠 허브에서 콘텐츠를 가져와주세요.</p>
               <button
-                onClick={() => setActiveTab('explore')}
+                onClick={() => navigate('/hub/signage')}
                 className="mt-4 px-4 py-2 text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50"
               >
-                콘텐츠 탐색하러 가기
+                콘텐츠 허브에서 가져오기
               </button>
             </>
           ) : (
@@ -1452,32 +1424,122 @@ export function StoreSignagePage() {
         </div>
       ) : (
         <>
-          <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-slate-50 text-left text-xs text-slate-500 uppercase">
-                  <th className="px-4 py-3 font-medium">제목</th>
-                  <th className="px-4 py-3 font-medium w-24">상태</th>
-                  <th className="px-4 py-3 font-medium w-40">채널 배치</th>
-                  <th className="px-4 py-3 font-medium w-28">가져온 날짜</th>
-                  <th className="px-4 py-3 font-medium w-24 text-right">액션</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {pagedItems.map(item => (
-                  <SignageRow
-                    key={item.id}
-                    item={item}
-                    updatingId={updatingId}
-                    channelUpdatingId={channelUpdatingId}
-                    onToggleStatus={handleToggleStatus}
-                    onToggleChannel={handleToggleChannel}
-                    onAddToPlaylist={() => setActiveTab('playlist')}
-                  />
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <DataTable<StoreAssetItem>
+            columns={[
+              {
+                key: 'title',
+                title: '제목',
+                render: (_v, item) => {
+                  const expired = isForcedExpired(item);
+                  const expiringSoon = isForcedExpiringSoon(item);
+                  return (
+                    <div>
+                      <div className="font-medium text-slate-900 truncate max-w-md">{item.title}</div>
+                      {item.isForced && (
+                        <div className="flex items-center gap-2 mt-1">
+                          {expired ? (
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-400">강제노출 만료</span>
+                          ) : (
+                            <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold ${expiringSoon ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'}`}>
+                              {expiringSoon ? <AlertTriangle className="w-3 h-3" /> : <ShieldAlert className="w-3 h-3" />}
+                              {expiringSoon ? '만료 임박' : '강제노출'}
+                            </span>
+                          )}
+                          {item.isLocked && <span className="inline-flex items-center gap-0.5 text-[10px] text-slate-400"><Lock className="w-3 h-3" /></span>}
+                          {(item.forcedStartAt || item.forcedEndAt) && (
+                            <span className="text-[10px] text-slate-400">
+                              {formatShortDate(item.forcedStartAt)} ~ {formatShortDate(item.forcedEndAt)}
+                              {expiringSoon && item.forcedEndAt && <span className="ml-1 text-amber-600 font-medium">(D-{daysUntil(item.forcedEndAt)})</span>}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                },
+              },
+              {
+                key: 'publishStatus',
+                title: '상태',
+                render: (_v, item) => {
+                  const statusCfg = STATUS_CONFIG[item.publishStatus] || STATUS_CONFIG.draft;
+                  const isUpdating = updatingId === item.id;
+                  return item.isForced ? (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 cursor-not-allowed opacity-70" title="관리자 강제노출 - 변경 불가">
+                      <Lock className="w-3 h-3 mr-1" />{statusCfg.label}
+                    </span>
+                  ) : (
+                    <button
+                      onClick={e => { e.stopPropagation(); handleToggleStatus(item); }}
+                      disabled={isUpdating}
+                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium cursor-pointer hover:opacity-80 transition-opacity disabled:opacity-50 ${statusCfg.bg} ${statusCfg.text}`}
+                      title="클릭하여 상태 변경 (초안 → 게시됨 → 숨김)"
+                    >
+                      {isUpdating && <Loader2 className="w-3 h-3 animate-spin mr-1" />}{statusCfg.label}
+                    </button>
+                  );
+                },
+              },
+              {
+                key: 'channelMap',
+                title: '채널 배치',
+                render: (_v, item) => {
+                  const disabled = item.isForced || item.isLocked || channelUpdatingId === item.id;
+                  return (
+                    <div className="flex gap-1.5">
+                      {CHANNEL_DEFS.map(ch => {
+                        const isOn = item.channelMap?.[ch.key] ?? false;
+                        return (
+                          <button
+                            key={ch.key}
+                            onClick={e => { e.stopPropagation(); handleToggleChannel(item, ch.key); }}
+                            disabled={disabled}
+                            className={`inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium transition-colors ${
+                              isOn
+                                ? `bg-${ch.color}-100 text-${ch.color}-700 border border-${ch.color}-300`
+                                : 'bg-slate-50 text-slate-400 border border-slate-200'
+                            } ${disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:opacity-80'}`}
+                            title={`${ch.label} 채널 ${isOn ? 'OFF' : 'ON'}`}
+                          >
+                            {isOn ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+                            {ch.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  );
+                },
+              },
+              {
+                key: 'createdAt',
+                title: '가져온 날짜',
+                dataIndex: 'createdAt',
+                render: (v) => <span className="text-slate-500">{formatDate(v)}</span>,
+              },
+              {
+                key: 'actions',
+                title: '',
+                align: 'right' as const,
+                render: () => (
+                  <button
+                    onClick={() => setActiveTab('playlist')}
+                    className="inline-flex items-center gap-1 px-2 py-1 text-[11px] text-blue-600 border border-blue-200 rounded hover:bg-blue-50"
+                    title="플레이리스트 탭으로 이동하여 추가"
+                  >
+                    <ListVideo className="w-3 h-3" />
+                    추가
+                  </button>
+                ),
+              },
+            ] as Column<StoreAssetItem>[]}
+            dataSource={pagedItems}
+            rowKey="id"
+            loading={false}
+            onRow={item => ({
+              className: item.isForced && !isForcedExpired(item) ? 'bg-red-50/30' : isForcedExpired(item) ? 'opacity-60' : '',
+            })}
+            emptyText="사이니지가 없습니다"
+          />
 
           {/* Pagination */}
           {totalPages > 1 && (
@@ -1555,123 +1617,3 @@ const CHANNEL_DEFS = [
   { key: 'promotion', label: '프로모션', Icon: Megaphone, color: 'emerald' },
 ] as const;
 
-function SignageRow({ item, updatingId, channelUpdatingId, onToggleStatus, onToggleChannel, onAddToPlaylist }: {
-  item: StoreAssetItem;
-  updatingId: string | null;
-  channelUpdatingId: string | null;
-  onToggleStatus: (item: StoreAssetItem) => void;
-  onToggleChannel: (item: StoreAssetItem, channelKey: string) => void;
-  onAddToPlaylist?: () => void;
-}) {
-  const statusCfg = STATUS_CONFIG[item.publishStatus] || STATUS_CONFIG.draft;
-  const isUpdating = updatingId === item.id;
-  const isChannelUpdating = channelUpdatingId === item.id;
-  const isForced = item.isForced;
-  const isLocked = item.isLocked;
-  const expiringSoon = isForcedExpiringSoon(item);
-  const expired = isForcedExpired(item);
-
-  return (
-    <tr className={`hover:bg-slate-50 ${isForced && !expired ? 'bg-red-50/30' : ''} ${expired ? 'opacity-60' : ''}`}>
-      {/* Title + forced badge */}
-      <td className="px-4 py-3">
-        <div className="font-medium text-slate-900 truncate max-w-md">{item.title}</div>
-        {isForced && (
-          <div className="flex items-center gap-2 mt-1">
-            {expired ? (
-              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-400">
-                강제노출 만료
-              </span>
-            ) : (
-              <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold ${
-                expiringSoon ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'
-              }`}>
-                {expiringSoon ? <AlertTriangle className="w-3 h-3" /> : <ShieldAlert className="w-3 h-3" />}
-                {expiringSoon ? '만료 임박' : '강제노출'}
-              </span>
-            )}
-            {isLocked && (
-              <span className="inline-flex items-center gap-0.5 text-[10px] text-slate-400">
-                <Lock className="w-3 h-3" />
-              </span>
-            )}
-            {(item.forcedStartAt || item.forcedEndAt) && (
-              <span className="text-[10px] text-slate-400">
-                {formatShortDate(item.forcedStartAt)} ~ {formatShortDate(item.forcedEndAt)}
-                {expiringSoon && item.forcedEndAt && (
-                  <span className="ml-1 text-amber-600 font-medium">(D-{daysUntil(item.forcedEndAt)})</span>
-                )}
-              </span>
-            )}
-          </div>
-        )}
-      </td>
-
-      {/* Status toggle */}
-      <td className="px-4 py-3">
-        {isForced ? (
-          <span
-            className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 cursor-not-allowed opacity-70"
-            title="관리자 강제노출 - 변경 불가"
-          >
-            <Lock className="w-3 h-3 mr-1" />
-            {statusCfg.label}
-          </span>
-        ) : (
-          <button
-            onClick={() => onToggleStatus(item)}
-            disabled={isUpdating}
-            className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium cursor-pointer hover:opacity-80 transition-opacity disabled:opacity-50 ${statusCfg.bg} ${statusCfg.text}`}
-            title="클릭하여 상태 변경 (초안 → 게시됨 → 숨김)"
-          >
-            {isUpdating && <Loader2 className="w-3 h-3 animate-spin mr-1" />}
-            {statusCfg.label}
-          </button>
-        )}
-      </td>
-
-      {/* Channel toggles */}
-      <td className="px-4 py-3">
-        <div className="flex gap-1.5">
-          {CHANNEL_DEFS.map(ch => {
-            const isOn = item.channelMap?.[ch.key] ?? false;
-            const disabled = isForced || isLocked || isChannelUpdating;
-            return (
-              <button
-                key={ch.key}
-                onClick={() => onToggleChannel(item, ch.key)}
-                disabled={disabled}
-                className={`inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium transition-colors ${
-                  isOn
-                    ? `bg-${ch.color}-100 text-${ch.color}-700 border border-${ch.color}-300`
-                    : 'bg-slate-50 text-slate-400 border border-slate-200'
-                } ${disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:opacity-80'}`}
-                title={`${ch.label} 채널 ${isOn ? 'OFF' : 'ON'}`}
-              >
-                {isOn ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
-                {ch.label}
-              </button>
-            );
-          })}
-        </div>
-      </td>
-
-      {/* Date */}
-      <td className="px-4 py-3 text-slate-500">{formatDate(item.createdAt)}</td>
-
-      {/* Action */}
-      <td className="px-4 py-3 text-right">
-        {onAddToPlaylist && (
-          <button
-            onClick={onAddToPlaylist}
-            className="inline-flex items-center gap-1 px-2 py-1 text-[11px] text-blue-600 border border-blue-200 rounded hover:bg-blue-50"
-            title="플레이리스트 탭으로 이동하여 추가"
-          >
-            <ListVideo className="w-3 h-3" />
-            추가
-          </button>
-        )}
-      </td>
-    </tr>
-  );
-}

@@ -68,6 +68,8 @@ export interface OperatorShellProps {
     homeLink: string;
     dashboardLink: string;
   }) => ReactNode;
+  /** Sidebar sticky 오프셋 Tailwind 클래스 (default: 'top-6'). GlobalHeader 사용 시 'top-20' */
+  sidebarTopOffset?: string;
   /** Content 영역 — 일반적으로 <Outlet /> */
   children: ReactNode;
 }

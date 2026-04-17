@@ -32,6 +32,7 @@ export default function OperatorLayoutWrapper() {
         user={user ? { name: user.name || '', email: user.email } : null}
         onLogout={() => { logout(); navigate('/'); }}
         renderHeader={() => null}
+        sidebarTopOffset="top-20"
       >
         <Outlet />
       </OperatorShell>

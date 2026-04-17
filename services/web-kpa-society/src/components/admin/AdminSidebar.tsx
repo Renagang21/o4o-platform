@@ -104,7 +104,7 @@ export function AdminSidebar() {
   };
 
   return (
-    <aside className="fixed left-0 top-0 bottom-0 w-[260px] bg-white border-r border-gray-200 flex flex-col z-[100]">
+    <aside className="fixed left-0 top-16 h-[calc(100vh-4rem)] w-[260px] bg-white border-r border-gray-200 flex flex-col z-40">
       {/* 지부 정보 */}
       <div className="flex items-center gap-3 px-5 py-6 border-b border-gray-200">
         <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center">

@@ -190,15 +190,15 @@ export function IntranetSidebar() {
 const styles: Record<string, React.CSSProperties> = {
   sidebar: {
     width: '260px',
-    height: '100vh',
+    height: 'calc(100vh - 4rem)',
     position: 'fixed',
     left: 0,
-    top: 0,
+    top: '4rem',
     backgroundColor: colors.white,
     borderRight: `1px solid ${colors.neutral200}`,
     display: 'flex',
     flexDirection: 'column',
-    zIndex: 100,
+    zIndex: 40,
   },
   orgHeader: {
     padding: '20px',

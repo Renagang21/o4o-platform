@@ -51,7 +51,7 @@ export function GlycoPharmHubLayout() {
       <div className="max-w-5xl mx-auto px-4 py-8">
         <div className="flex gap-6 items-start">
           {/* ── 좌측 사이드바 ── */}
-          <aside className="w-52 shrink-0 bg-white border border-slate-200 rounded-xl overflow-hidden sticky top-6">
+          <aside className="w-52 shrink-0 bg-white border border-slate-200 rounded-xl overflow-hidden sticky top-20">
             <div className="px-4 py-4 border-b border-slate-100">
               <h2 className="text-sm font-bold text-slate-800">약국 HUB</h2>
               <p className="text-xs text-slate-400 mt-0.5">플랫폼 자원을 탐색하고 내 매장에 가져갑니다</p>

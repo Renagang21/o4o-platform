@@ -27,6 +27,8 @@ import {
   CheckoutPaymentStatus,
   type ShippingAddress,
 } from '../../../entities/checkout/CheckoutOrder.entity.js';
+import { OrderLog, OrderAction } from '../../../entities/checkout/OrderLog.entity.js';
+import { checkoutService } from '../../../services/checkout.service.js';
 
 // ============================================================================
 // Type Definitions
@@ -754,6 +756,254 @@ export function createKpaCheckoutController(
           success: true,
           data: { total: 0, pending: 0, completed: 0, monthlyRevenue: 0 },
         });
+      }
+    }
+  );
+
+  /**
+   * GET /checkout/store-orders/:orderId
+   * 매장 주문 상세 (판매자 관점)
+   * WO-STORE-ORDER-MANAGEMENT-FULL-IMPLEMENTATION-V1
+   */
+  router.get(
+    '/store-orders/:orderId',
+    requireAuth,
+    requireStoreOwner,
+    async (req: Request, res: Response) => {
+      try {
+        const organizationId = (req as any).organizationId;
+        const { orderId } = req.params;
+        if (!organizationId || !orderId) {
+          return errorResponse(res, 400, 'INVALID_REQUEST', 'Missing required parameters');
+        }
+
+        // 주문 조회 (boundary: sellerOrganizationId + serviceKey)
+        const order = await dataSource.getRepository(CheckoutOrder).findOne({
+          where: { id: orderId, sellerOrganizationId: organizationId },
+        });
+
+        if (!order) {
+          return errorResponse(res, 404, 'ORDER_NOT_FOUND', 'Order not found');
+        }
+
+        const meta = order.metadata as KpaOrderMetadata | null;
+        if (!meta || !['kpa-society', 'kpa'].includes(meta.serviceKey)) {
+          return errorResponse(res, 404, 'ORDER_NOT_FOUND', 'Order not found');
+        }
+
+        // Buyer info (마스킹)
+        let buyerName = '—';
+        let buyerEmail = '—';
+        try {
+          const users = await dataSource.query(
+            `SELECT name, email FROM users WHERE id = $1 LIMIT 1`,
+            [order.buyerId]
+          );
+          if (users.length > 0) {
+            buyerName = users[0].name || '—';
+            const email = users[0].email || '';
+            if (email.includes('@')) {
+              const [local, domain] = email.split('@');
+              buyerEmail = `${local.slice(0, 3)}***@${domain}`;
+            }
+          }
+        } catch {
+          // buyer info lookup failure is non-critical
+        }
+
+        // Payments
+        let payments: any[] = [];
+        try {
+          payments = await dataSource.query(
+            `SELECT id, amount, status, method, "cardCompany", "approvedAt",
+                    "refundedAmount", "refundReason", "refundedAt", "createdAt"
+             FROM checkout_payments
+             WHERE "orderId" = $1
+             ORDER BY "createdAt" DESC`,
+            [orderId]
+          );
+        } catch {
+          // payments table may not exist in some environments
+        }
+
+        // Logs
+        let logs: any[] = [];
+        try {
+          logs = await dataSource.query(
+            `SELECT id, action, "previousStatus", "newStatus", "performedBy",
+                    "performerType", message, "createdAt"
+             FROM checkout_order_logs
+             WHERE "orderId" = $1
+             ORDER BY "createdAt" DESC`,
+            [orderId]
+          );
+        } catch {
+          // logs table may not exist in some environments
+        }
+
+        res.json({
+          success: true,
+          data: {
+            id: order.id,
+            orderNumber: order.orderNumber,
+            status: order.status,
+            paymentStatus: order.paymentStatus,
+            totalAmount: order.totalAmount,
+            subtotal: order.subtotal,
+            shippingFee: order.shippingFee,
+            discount: order.discount,
+            buyerName,
+            buyerEmail,
+            items: (order.items || []).map((item) => ({
+              productId: item.productId,
+              productName: item.productName,
+              quantity: item.quantity,
+              unitPrice: item.unitPrice,
+              subtotal: item.subtotal,
+            })),
+            metadata: {
+              serviceKey: meta.serviceKey,
+              channelType: meta.channelType,
+              deliveryMethod: meta.deliveryMethod,
+              organizationName: meta.organizationName,
+            },
+            shippingAddress: order.shippingAddress || null,
+            payments,
+            logs,
+            paidAt: order.paidAt,
+            cancelledAt: order.cancelledAt,
+            refundedAt: order.refundedAt,
+            createdAt: order.createdAt,
+            updatedAt: order.updatedAt,
+          },
+        });
+      } catch (error: unknown) {
+        const err = error as Error;
+        logger.error('[KPA Checkout] Store order detail error:', err);
+        errorResponse(res, 500, 'STORE_ORDER_DETAIL_ERROR', 'Failed to get order detail');
+      }
+    }
+  );
+
+  /**
+   * PATCH /checkout/store-orders/:orderId/status
+   * 매장 주문 상태 변경 (취소/환불)
+   * WO-STORE-ORDER-MANAGEMENT-FULL-IMPLEMENTATION-V1
+   */
+  router.patch(
+    '/store-orders/:orderId/status',
+    requireAuth,
+    requireStoreOwner,
+    body('action').isIn(['cancel', 'refund']).withMessage('action must be cancel or refund'),
+    body('reason').isString().notEmpty().withMessage('reason is required'),
+    async (req: Request, res: Response) => {
+      try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+          return errorResponse(res, 400, 'VALIDATION_ERROR', errors.array()[0]?.msg || 'Invalid input');
+        }
+
+        const organizationId = (req as any).organizationId;
+        const userId = (req as any).user?.id;
+        const { orderId } = req.params;
+        const { action, reason } = req.body;
+
+        if (!organizationId || !orderId) {
+          return errorResponse(res, 400, 'INVALID_REQUEST', 'Missing required parameters');
+        }
+
+        // 주문 조회 (boundary guard)
+        const orderRepo = dataSource.getRepository(CheckoutOrder);
+        const order = await orderRepo.findOne({
+          where: { id: orderId, sellerOrganizationId: organizationId },
+        });
+
+        if (!order) {
+          return errorResponse(res, 404, 'ORDER_NOT_FOUND', 'Order not found');
+        }
+
+        const meta = order.metadata as KpaOrderMetadata | null;
+        if (!meta || !['kpa-society', 'kpa'].includes(meta.serviceKey)) {
+          return errorResponse(res, 404, 'ORDER_NOT_FOUND', 'Order not found');
+        }
+
+        if (action === 'cancel') {
+          // cancel: created or pending_payment → cancelled
+          if (order.status !== CheckoutOrderStatus.CREATED &&
+              order.status !== CheckoutOrderStatus.PENDING_PAYMENT) {
+            return errorResponse(
+              res, 400, 'INVALID_TRANSITION',
+              `Cannot cancel order in '${order.status}' status. Only 'created' or 'pending_payment' orders can be cancelled.`
+            );
+          }
+
+          const previousStatus = order.status;
+          order.status = CheckoutOrderStatus.CANCELLED;
+          order.cancelledAt = new Date();
+          await orderRepo.save(order);
+
+          // OrderLog
+          const logRepo = dataSource.getRepository(OrderLog);
+          const log = logRepo.create({
+            orderId: order.id,
+            action: OrderAction.CANCELLED,
+            previousStatus,
+            newStatus: CheckoutOrderStatus.CANCELLED,
+            performedBy: userId || 'system',
+            performerType: 'operator',
+            message: reason,
+          });
+          await logRepo.save(log);
+
+          logger.info(`[KPA Checkout] Order ${order.orderNumber} cancelled by operator ${userId}`);
+        } else if (action === 'refund') {
+          // refund: paid → refunded (delegate to checkoutService)
+          if (order.status !== CheckoutOrderStatus.PAID) {
+            return errorResponse(
+              res, 400, 'INVALID_TRANSITION',
+              `Cannot refund order in '${order.status}' status. Only 'paid' orders can be refunded.`
+            );
+          }
+
+          try {
+            await checkoutService.refundOrder(orderId, {
+              reason,
+              performedBy: userId || 'system',
+              performerType: 'operator',
+            });
+          } catch (refundError: unknown) {
+            const rErr = refundError as Error;
+            logger.error(`[KPA Checkout] Refund failed for ${order.orderNumber}:`, rErr);
+            return errorResponse(res, 400, 'REFUND_FAILED', rErr.message || 'Refund failed');
+          }
+
+          logger.info(`[KPA Checkout] Order ${order.orderNumber} refunded by operator ${userId}`);
+        }
+
+        // 갱신된 주문 반환
+        const updated = await orderRepo.findOne({ where: { id: orderId } });
+        if (!updated) {
+          return errorResponse(res, 500, 'ORDER_REFRESH_ERROR', 'Failed to refresh order');
+        }
+
+        res.json({
+          success: true,
+          data: {
+            id: updated.id,
+            orderNumber: updated.orderNumber,
+            status: updated.status,
+            paymentStatus: updated.paymentStatus,
+            totalAmount: updated.totalAmount,
+            paidAt: updated.paidAt,
+            cancelledAt: updated.cancelledAt,
+            refundedAt: updated.refundedAt,
+            updatedAt: updated.updatedAt,
+          },
+        });
+      } catch (error: unknown) {
+        const err = error as Error;
+        logger.error('[KPA Checkout] Store order status change error:', err);
+        errorResponse(res, 500, 'STATUS_CHANGE_ERROR', 'Failed to change order status');
       }
     }
   );

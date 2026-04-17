@@ -50,6 +50,7 @@ export function OperatorShell({
   dashboardLink = '/operator',
   footer,
   headerActions,
+  sidebarTopOffset = 'top-6',
   renderHeader,
   children,
 }: OperatorShellProps) {
@@ -162,7 +163,7 @@ export function OperatorShell({
         <div className="flex gap-6">
           {/* ── Desktop Sidebar ── */}
           <aside className="w-60 flex-shrink-0 hidden md:block">
-            <nav className="bg-white rounded-xl border border-gray-200 overflow-hidden sticky top-6">
+            <nav className={`bg-white rounded-xl border border-gray-200 overflow-hidden sticky ${sidebarTopOffset}`}>
               {visibleGroups.map((group) => {
                 const Icon = group.icon;
                 const active = isGroupActive(group);
