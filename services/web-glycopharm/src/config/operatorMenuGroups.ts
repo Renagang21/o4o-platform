@@ -49,6 +49,7 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '템플릿', path: '/operator/signage/templates' },
     { label: '콘텐츠 허브', path: '/operator/signage/content' },
     { label: '콘텐츠 라이브러리', path: '/operator/signage/library' },
+    { label: '강제 콘텐츠', path: '/operator/signage/forced-content' },
   ],
   forum: [
     { label: '포럼 관리', path: '/operator/forum-management' },
@@ -115,6 +116,7 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: '템플릿', path: '/operator/signage/templates' },
     { label: '콘텐츠 허브', path: '/operator/signage/content' },
     { label: '콘텐츠 라이브러리', path: '/operator/signage/library' },
+    { label: '강제 콘텐츠', path: '/operator/signage/forced-content' },
   ],
   forum: [
     { label: '포럼 관리', path: '/operator/forum-management' },

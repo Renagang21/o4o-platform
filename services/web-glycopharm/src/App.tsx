@@ -68,6 +68,8 @@ const HqPlaylistsPage = lazy(() => import('@/pages/operator/signage/HqPlaylistsP
 const HqPlaylistDetailPage = lazy(() => import('@/pages/operator/signage/HqPlaylistDetailPage'));
 const SignageTemplatesPage = lazy(() => import('@/pages/operator/signage/TemplatesPage'));
 const SignageTemplateDetailPage = lazy(() => import('@/pages/operator/signage/TemplateDetailPage'));
+// WO-O4O-GLYCOPHARM-SIGNAGE-FORCED-CONTENT-V1
+const ForcedContentPage = lazy(() => import('@/pages/operator/signage/ForcedContentPage'));
 
 // Market Trial → Neture redirect
 // WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1:
@@ -477,6 +479,8 @@ function AppRoutes() {
         <Route path="signage/hq-playlists/:playlistId" element={<HqPlaylistDetailPage />} />
         <Route path="signage/templates" element={<SignageTemplatesPage />} />
         <Route path="signage/templates/:templateId" element={<SignageTemplateDetailPage />} />
+        {/* WO-O4O-GLYCOPHARM-SIGNAGE-FORCED-CONTENT-V1 */}
+        <Route path="signage/forced-content" element={<ForcedContentPage />} />
         {/* 운영 분석 (WO-O4O-AUDIT-ANALYTICS-LAYER-V1) */}
         <Route path="analytics" element={<OperatorAnalyticsPage />} />
         {/* WO-O4O-GLYCOPHARM-ADMIN-OPERATOR-CLEANUP-V1:
