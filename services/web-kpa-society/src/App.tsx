@@ -113,6 +113,8 @@ import { PharmacyJoinPage } from './pages/join';
 // Pharmacy Management (WO-KPA-PHARMACY-MANAGEMENT-V1, WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1)
 import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyApprovalGatePage, HubContentLibraryPage, HubB2BCatalogPage, HubSignageLibraryPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage, StoreChannelsPage, StoreOrdersPage, StoreBillingPage, StoreSignagePage, StoreLibraryNewPage, StoreLibraryPage, StoreLibraryDetailPage, StoreLibraryEditPage, StoreQRPage, StorePopPage, MarketingAnalyticsPage, StoreHomePage, ProductMarketingPage, StoreLocalProductsPage, StoreTabletDisplaysPage } from './pages/pharmacy';
 import { StoreOrderWorktablePage } from './pages/pharmacy/StoreOrderWorktablePage';
+import { SignagePlaybackPage } from './pages/pharmacy/SignagePlaybackPage';
+import { SignagePlayerSelectPage } from './pages/pharmacy/SignagePlayerSelectPage';
 // WO-KPA-PHARMACY-HUB-SIDEBAR-LAYOUT-AND-PRODUCT-TABS-FIX-V1: 약국 HUB 사이드바 레이아웃
 import { PharmacyHubLayout } from './components/pharmacy/PharmacyHubLayout';
 // WO-KPA-PHARMACY-HUB-NAVIGATION-RESTRUCTURE-V1: PharmacyInfoPage + HubGuard
@@ -644,7 +646,12 @@ function App() {
             {/* Marketing */}
             <Route path="marketing/qr" element={<StoreQRPage />} />
             <Route path="marketing/pop" element={<StorePopPage />} />
-            <Route path="marketing/signage" element={<StoreSignagePage />} />
+            <Route path="marketing/signage" element={<Navigate to="playlist" replace />} />
+            <Route path="marketing/signage/playlist" element={<StoreSignagePage />} />
+            <Route path="marketing/signage/videos" element={<StoreSignagePage />} />
+            <Route path="marketing/signage/schedules" element={<StoreSignagePage />} />
+            <Route path="marketing/signage/player" element={<SignagePlayerSelectPage />} />
+            <Route path="marketing/signage/play/:playlistId" element={<SignagePlaybackPage />} />
 
             {/* Commerce — WO-KPA-PHARMACY-HUB-NAVIGATION-RESTRUCTURE-V1: orderable → /hub/b2b canonical */}
             <Route path="commerce/orderable" element={<Navigate to="/hub/b2b" replace />} />
@@ -666,7 +673,7 @@ function App() {
             <Route path="pop" element={<Navigate to="/store/marketing/pop" replace />} />
             <Route path="library" element={<Navigate to="/store/operation/library" replace />} />
             <Route path="library/new" element={<Navigate to="/store/operation/library/new" replace />} />
-            <Route path="signage" element={<Navigate to="/store/marketing/signage" replace />} />
+            <Route path="signage" element={<Navigate to="/store/marketing/signage/playlist" replace />} />
             <Route path="analytics" element={<Navigate to="/store/analytics/marketing" replace />} />
             <Route path="products" element={<Navigate to="/store/commerce/products" replace />} />
             <Route path="products/b2c" element={<Navigate to="/store/commerce/products/b2c" replace />} />

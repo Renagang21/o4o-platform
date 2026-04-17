@@ -17,7 +17,7 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Monitor,
   Loader2,
@@ -222,10 +222,26 @@ const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'] as const;
 
 export default function StoreSignageMainPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   // organizationId: user.pharmacyId (GlycoPharm pharmacy = organization)
   const organizationId = (user as { pharmacyId?: string } | null)?.pharmacyId || '';
-  const [activeTab, setActiveTab] = useState<ActiveTab>('assets');
+
+  // URL-based tab derivation (IA restructure)
+  const activeTab = useMemo((): ActiveTab => {
+    if (location.pathname.includes('/videos')) return 'assets';
+    if (location.pathname.includes('/schedules')) return 'schedules';
+    return 'playlist';
+  }, [location.pathname]);
+
+  const navigateTab = (tab: ActiveTab) => {
+    const map: Record<ActiveTab, string> = {
+      playlist: '/store/signage/playlist',
+      assets: '/store/signage/videos',
+      schedules: '/store/signage/schedules',
+    };
+    navigate(map[tab], { replace: true });
+  };
 
   // ── Schedule state ──
   const [schedules, setSchedules] = useState<SignageScheduleItem[]>([]);
@@ -615,7 +631,7 @@ export default function StoreSignageMainPage() {
         ] as { key: ActiveTab; label: string; Icon: React.ElementType }[]).map(tab => (
           <button
             key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
+            onClick={() => navigateTab(tab.key)}
             className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
               activeTab === tab.key
                 ? 'border-blue-600 text-blue-700'
@@ -638,7 +654,7 @@ export default function StoreSignageMainPage() {
         </button>
         <span className="px-1 text-slate-200">→</span>
         <button
-          onClick={() => setActiveTab('playlist')}
+          onClick={() => navigateTab('playlist')}
           className={`flex items-center gap-1 px-3 py-1.5 rounded-full transition-colors ${
             activeTab === 'playlist' ? 'bg-blue-50 text-blue-700 font-medium' : 'hover:text-slate-600'
           }`}
@@ -647,7 +663,7 @@ export default function StoreSignageMainPage() {
         </button>
         <span className="px-1 text-slate-200">→</span>
         <button
-          onClick={() => setActiveTab('schedules')}
+          onClick={() => navigateTab('schedules')}
           className={`flex items-center gap-1 px-3 py-1.5 rounded-full transition-colors ${
             activeTab === 'schedules' ? 'bg-blue-50 text-blue-700 font-medium' : 'hover:text-slate-600'
           }`}
@@ -693,7 +709,7 @@ export default function StoreSignageMainPage() {
           </div>
         )}
         <button
-          onClick={() => setActiveTab('schedules')}
+          onClick={() => navigateTab('schedules')}
           className="flex-shrink-0 text-xs text-slate-400 hover:text-blue-600 underline underline-offset-2"
         >
           스케줄 관리
@@ -1470,7 +1486,7 @@ export default function StoreSignageMainPage() {
                 align: 'right',
                 render: () => (
                   <button
-                    onClick={() => setActiveTab('playlist')}
+                    onClick={() => navigateTab('playlist')}
                     className="inline-flex items-center gap-1 px-2 py-1 text-[11px] text-blue-600 border border-blue-200 rounded hover:bg-blue-50"
                     title="플레이리스트 탭으로 이동하여 추가"
                   >

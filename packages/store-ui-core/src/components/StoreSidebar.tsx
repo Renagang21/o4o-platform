@@ -39,6 +39,9 @@ import {
   TrendingUp,
   Users,
   Tv,
+  ListVideo,
+  Calendar,
+  Play,
 } from 'lucide-react';
 import type { StoreDashboardConfig, StoreMenuKey } from '../config/storeMenuConfig';
 import { ALL_STORE_MENUS } from '../config/storeMenuConfig';
@@ -90,6 +93,10 @@ const SECTION_ICONS: Record<string, typeof LayoutDashboard> = {
   'management-b2b': Package,
   'requests': Users,
   'signage-display': Tv,
+  'signage-playlist': ListVideo,
+  'signage-videos': Monitor,
+  'signage-schedules': Calendar,
+  'signage-player': Play,
   settings: Settings,
 };
 

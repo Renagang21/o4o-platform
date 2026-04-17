@@ -111,13 +111,21 @@ export const GLYCOPHARM_STORE_CONFIG: StoreDashboardConfig = {
       ],
     },
     {
+      label: '디지털 사이니지',
+      items: [
+        { key: 'signage-playlist',  label: '플레이리스트', subPath: '/signage/playlist' },
+        { key: 'signage-videos',    label: '동영상',       subPath: '/signage/videos' },
+        { key: 'signage-schedules', label: '스케줄',       subPath: '/signage/schedules' },
+        { key: 'signage-player',    label: '재생',         subPath: '/signage/player' },
+      ],
+    },
+    {
       label: '마케팅·콘텐츠',
       items: [
         { key: 'market-trial', label: 'Market Trial', subPath: '/market-trial' },
         { key: 'funnel',       label: '전환 퍼널',      subPath: '/funnel' },
         { key: 'content',      label: '콘텐츠 가져오기', subPath: '/content' },
         { key: 'channels',     label: '채널 관리',      subPath: '/channels' },
-        { key: 'signage',      label: '사이니지',        subPath: '/signage' },
       ],
     },
     {
@@ -158,10 +166,15 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'products', label: '상품 관리', subPath: '/commerce/products' },
       { key: 'orders',   label: '주문 관리', subPath: '/commerce/orders' },
     ]},
+    { label: '디지털 사이니지', items: [
+      { key: 'signage-playlist',  label: '플레이리스트', subPath: '/marketing/signage/playlist' },
+      { key: 'signage-videos',    label: '동영상',       subPath: '/marketing/signage/videos' },
+      { key: 'signage-schedules', label: '스케줄',       subPath: '/marketing/signage/schedules' },
+      { key: 'signage-player',    label: '재생',         subPath: '/marketing/signage/player' },
+    ]},
     { label: '매장 실행', items: [
-      { key: 'signage', label: '디지털 사이니지', subPath: '/marketing/signage' },
-      { key: 'qr',      label: 'QR 코드',        subPath: '/marketing/qr' },
-      { key: 'pop',     label: 'POP 자료',        subPath: '/marketing/pop' },
+      { key: 'qr',  label: 'QR 코드', subPath: '/marketing/qr' },
+      { key: 'pop', label: 'POP 자료', subPath: '/marketing/pop' },
     ]},
     { label: '채널', items: [
       { key: 'tablet-displays', label: '태블릿 진열', subPath: '/commerce/tablet-displays' },

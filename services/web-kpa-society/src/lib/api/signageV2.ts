@@ -14,6 +14,7 @@
 import type {
   SignageMediaResponse,
   SignagePlaylistResponse,
+  SignagePlaylistItemResponse,
   SignageMediaType,
   MediaOwnerType,
   TransitionEffect,
@@ -24,6 +25,7 @@ import type {
 // Re-export shared types with local aliases for backward compatibility
 export type SignageMedia = SignageMediaResponse;
 export type SignagePlaylist = SignagePlaylistResponse;
+export type SignagePlaylistItem = SignagePlaylistItemResponse;
 export type { SignageMediaType, MediaOwnerType, TransitionEffect, ContentSource };
 
 interface ApiResponse<T> {

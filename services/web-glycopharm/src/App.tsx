@@ -60,6 +60,7 @@ const SignageMediaDetailPage = lazy(() => import('@/pages/store-management/signa
 // WO-O4O-GLYCOPHARM-SIGNAGE-PHASE1-V1
 const StoreSignageMainPage = lazy(() => import('@/pages/store-management/signage').then(m => ({ default: m.StoreSignageMainPage })));
 const SignagePlaybackPage = lazy(() => import('@/pages/store-management/signage').then(m => ({ default: m.SignagePlaybackPage })));
+const SignagePlayerSelectPage = lazy(() => import('@/pages/store-management/signage/SignagePlayerSelectPage').then(m => ({ default: m.SignagePlayerSelectPage })));
 
 // Signage Operator Console (WO-O4O-SIGNAGE-CONSOLE-V1)
 const HqMediaPage = lazy(() => import('@/pages/operator/signage/HqMediaPage'));
@@ -548,8 +549,12 @@ function AppRoutes() {
         <Route path="apply" element={<StoreApplyPage />} />
         {/* billing: 정산/인보이스 (WO-STORE-BILLING-FOUNDATION-V1) */}
         <Route path="billing" element={<StoreBillingPage />} />
-        {/* Signage — WO-O4O-GLYCOPHARM-SIGNAGE-PHASE1-V1 */}
-        <Route path="signage" element={<StoreSignageMainPage />} />
+        {/* Signage — WO-O4O-GLYCOPHARM-SIGNAGE-PHASE1-V1 + IA-RESTRUCTURE-V2 */}
+        <Route path="signage" element={<Navigate to="playlist" replace />} />
+        <Route path="signage/playlist" element={<StoreSignageMainPage />} />
+        <Route path="signage/videos" element={<StoreSignageMainPage />} />
+        <Route path="signage/schedules" element={<StoreSignageMainPage />} />
+        <Route path="signage/player" element={<SignagePlayerSelectPage />} />
         <Route path="signage/play/:playlistId" element={<SignagePlaybackPage />} />
         {/* Legacy signage routes (maintained for backward compat) */}
         <Route path="signage/library" element={<ContentLibraryPage />} />
