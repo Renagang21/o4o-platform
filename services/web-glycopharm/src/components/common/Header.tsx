@@ -37,9 +37,12 @@ const publicMenuItems = [
 
 /**
  * 조건부 메뉴 — glycopharm:pharmacist 로그인 시에만 표시
+ * WO-GLYCOPHARM-HEADER-HUB-STORE-ROUTING-FIX-V1:
+ *   약국 HUB → /hub (플랫폼 탐색 허브)
+ *   내 약국 → /store (약국 운영 진입점)
  */
 const pharmacyMenuItems = [
-  { label: '약국 HUB', icon: LayoutDashboard, path: '/store/hub', end: false },
+  { label: '약국 HUB', icon: LayoutDashboard, path: '/hub', end: false },
   { label: '내 약국', icon: Store, path: '/store', end: false },
 ];
 
