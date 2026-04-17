@@ -21,7 +21,7 @@ export * from './SignagePlaylistItem.entity.js';
 
 // Media management
 export * from './SignageMedia.entity.js';
-export * from './SignageMediaTag.entity.js';
+// SignageMediaTag removed (WO-KPA-SIGNAGE-DEAD-CODE-CLEANUP-V1)
 
 // Schedule management
 export * from './SignageSchedule.entity.js';
@@ -32,12 +32,10 @@ export * from './SignageTemplateZone.entity.js';
 export * from './SignageLayoutPreset.entity.js';
 export * from './SignageContentBlock.entity.js';
 
-// Social & Sharing
-export * from './SignagePlaylistShare.entity.js';
+// Social & Sharing — SignagePlaylistShare removed (WO-KPA-SIGNAGE-DEAD-CODE-CLEANUP-V1)
 
-// AI & Analytics
+// AI & Analytics — SignageAnalytics removed (WO-KPA-SIGNAGE-DEAD-CODE-CLEANUP-V1)
 export * from './SignageAiGenerationLog.entity.js';
-export * from './SignageAnalytics.entity.js';
 
 // ========== Legacy Entity Imports ==========
 import { MediaSource } from './MediaSource.entity.js';
@@ -52,15 +50,12 @@ import { ActionExecution } from './ActionExecution.entity.js';
 import { SignagePlaylist } from './SignagePlaylist.entity.js';
 import { SignagePlaylistItem } from './SignagePlaylistItem.entity.js';
 import { SignageMedia } from './SignageMedia.entity.js';
-import { SignageMediaTag } from './SignageMediaTag.entity.js';
 import { SignageSchedule } from './SignageSchedule.entity.js';
 import { SignageTemplate } from './SignageTemplate.entity.js';
 import { SignageTemplateZone } from './SignageTemplateZone.entity.js';
 import { SignageLayoutPreset } from './SignageLayoutPreset.entity.js';
 import { SignageContentBlock } from './SignageContentBlock.entity.js';
-import { SignagePlaylistShare } from './SignagePlaylistShare.entity.js';
 import { SignageAiGenerationLog } from './SignageAiGenerationLog.entity.js';
-import { SignageAnalytics } from './SignageAnalytics.entity.js';
 
 /**
  * Legacy entities (for backward compatibility)
@@ -86,7 +81,6 @@ export const SignageCoreEntities = [
   SignagePlaylistItem,
   // Media
   SignageMedia,
-  SignageMediaTag,
   // Schedule
   SignageSchedule,
   // Template
@@ -94,11 +88,8 @@ export const SignageCoreEntities = [
   SignageTemplateZone,
   SignageLayoutPreset,
   SignageContentBlock,
-  // Social
-  SignagePlaylistShare,
-  // AI & Analytics
+  // AI
   SignageAiGenerationLog,
-  SignageAnalytics,
 ] as const;
 
 /**

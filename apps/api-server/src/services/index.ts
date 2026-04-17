@@ -1,7 +1,7 @@
 // Auto-generated index file for services
 
 // Export all service files
-export * from './AnalyticsService.js';
+// AnalyticsService removed (WO-KPA-SIGNAGE-DEAD-CODE-CLEANUP-V1)
 // AuthService removed (WO-O4O-AUTH-DEADCODE-CLEANUP-V1) — authentication.service.ts로 대체
 // AuthServiceV2 removed (WO-O4O-LEGACY-CLEANUP-V1)
 // AutoRecoveryService removed (WO-O4O-CODEBASE-CLEANUP-V1)
@@ -27,15 +27,15 @@ export { loginSecurityService } from '../modules/auth/services/login-security.se
 // OperationsMonitoringService removed (WO-O4O-CODEBASE-CLEANUP-V1)
 // export * from './OrderAutomationService.js';
 // export * from './OrderSplitService.js';
-export * from './PerformanceMonitoringInitializer.js';
-export * from './PerformanceOptimizationService.js';
+// PerformanceMonitoringInitializer removed (WO-KPA-SIGNAGE-DEAD-CODE-CLEANUP-V1)
+// PerformanceOptimizationService removed (WO-KPA-SIGNAGE-DEAD-CODE-CLEANUP-V1)
 // export * from './RecommendationService.js';
 // RefreshTokenService migrated to modules/auth/services/refresh-token.service.ts
 export { refreshTokenService } from '../modules/auth/services/refresh-token.service.js';
 // export * from './RestockNotificationService.js';
 // export * from './ReturnExchangeService.js';
 // export * from './ReviewService.js';
-export * from './ScheduledReportingService.js';
+// ScheduledReportingService removed (WO-KPA-SIGNAGE-DEAD-CODE-CLEANUP-V1)
 // export * from './SearchService.js';
 export * from './SecurityAuditService.js';
 // SelfHealingService removed (WO-O4O-CODEBASE-CLEANUP-V1)

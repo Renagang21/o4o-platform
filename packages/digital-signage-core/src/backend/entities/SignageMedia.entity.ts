@@ -10,7 +10,6 @@ import {
   VersionColumn,
 } from 'typeorm';
 import type { SignagePlaylistItem } from './SignagePlaylistItem.entity.js';
-import type { SignageMediaTag } from './SignageMediaTag.entity.js';
 
 /**
  * SignageMedia Entity
@@ -167,6 +166,4 @@ export class SignageMedia {
   @OneToMany('SignagePlaylistItem', 'media')
   playlistItems!: SignagePlaylistItem[];
 
-  @OneToMany('SignageMediaTag', 'media')
-  mediaTags!: SignageMediaTag[];
 }
