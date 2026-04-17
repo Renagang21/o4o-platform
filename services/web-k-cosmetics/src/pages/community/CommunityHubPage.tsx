@@ -4,24 +4,23 @@
  * WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1
  * WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1: 콘텐츠 섹션 추가
  * WO-KCOS-COMMUNITY-CONTENT-INTEGRATION-V1: ResourceSection(placeholder) 제거
+ * WO-KCOS-COMMUNITY-FORUM-STRUCTURE-ALIGN-V1: Forum/RecentPosts 중복 제거, 포럼 CTA 추가
  *
  * Route: /community
  * Adapted from KPA CommunityHubPage template.
  *
- * 7 sections:
+ * 섹션 구조 (V2 — 포럼 중복 제거 후):
  *  1. HeroBannerSection  — community_ads type=hero
- *  2. ForumSection       — forum categories
- *  3. LatestPostsSection — recent posts
+ *  2. ForumCTA           — /forum 바로가기 단일 카드
+ *  3. ContentSection     — CMS hub content (최근 + 추천) → /library/content 전체보기
  *  4. AdSection          — community_ads type=page
  *  5. VideoSection       — signage media
- *  5.5 ContentSection    — CMS hub content (최근 + 추천) → /library/content 전체보기
  *  6. SponsorBar         — community_sponsors
  */
 
 import { useState, useEffect, CSSProperties } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { communityApi, type CommunityAd, type CommunitySponsor } from '../../services/communityApi';
-import { fetchPopularForums, fetchForumPosts, type PopularForum, type ForumPost } from '../../services/forumApi';
 import { publicContentApi, type SignageMedia } from '../../lib/api/signageV2';
 import { hubContentApi, type HubContentItemResponse } from '../../lib/api/hubContent';
 import { HeroBannerSection } from '../../components/community/HeroBannerSection';
@@ -33,8 +32,6 @@ export default function CommunityHubPage() {
   const [heroAds, setHeroAds] = useState<CommunityAd[]>([]);
   const [pageAds, setPageAds] = useState<CommunityAd[]>([]);
   const [sponsors, setSponsors] = useState<CommunitySponsor[]>([]);
-  const [categories, setCategories] = useState<PopularForum[]>([]);
-  const [posts, setPosts] = useState<ForumPost[]>([]);
   const [media, setMedia] = useState<SignageMedia[]>([]);
   const [contentItems, setContentItems] = useState<HubContentItemResponse[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,11 +41,9 @@ export default function CommunityHubPage() {
       communityApi.getHeroAds(),
       communityApi.getPageAds(),
       communityApi.getSponsors(),
-      fetchPopularForums(6),
-      fetchForumPosts({ limit: 5 }),
       publicContentApi.listMedia(undefined, 'k-cosmetics', { limit: 4 }).catch(() => ({ data: [] })),
       hubContentApi.list({ sourceDomain: 'cms', limit: 50 }).catch(() => ({ data: [] })),
-    ]).then(([heroRes, pageRes, sponsorRes, catRes, postsRes, signageRes, contentRes]) => {
+    ]).then(([heroRes, pageRes, sponsorRes, signageRes, contentRes]) => {
       if (heroRes.status === 'fulfilled') {
         const v = heroRes.value as any;
         setHeroAds(v?.data?.ads ?? v?.ads ?? []);
@@ -60,15 +55,6 @@ export default function CommunityHubPage() {
       if (sponsorRes.status === 'fulfilled') {
         const v = sponsorRes.value as any;
         setSponsors(v?.data?.sponsors ?? v?.sponsors ?? []);
-      }
-      if (catRes.status === 'fulfilled') {
-        const v = catRes.value as any;
-        setCategories(v?.data ?? []);
-      }
-      if (postsRes.status === 'fulfilled') {
-        const v = postsRes.value as any;
-        const postData = v?.data ?? [];
-        setPosts(Array.isArray(postData) ? postData : []);
       }
       if (signageRes.status === 'fulfilled') {
         const v = signageRes.value as any;
@@ -102,41 +88,45 @@ export default function CommunityHubPage() {
         {/* 1. Hero Banner */}
         <HeroBannerSection ads={heroAds} />
 
-        {/* 2. Forum Section */}
-        <Section title="Forum" linkTo="/forum" linkLabel="Go to Forum">
-          {categories.length > 0 ? (
-            <div style={styles.categoryGrid}>
-              {categories.slice(0, 6).map((cat) => (
-                <Link key={cat.id} to={`/forum/posts?category=${cat.id}`} style={styles.categoryCard}>
-                  <span style={styles.categoryEmoji}>{CATEGORY_ICONS[cat.name] || '💬'}</span>
-                  <span style={styles.categoryName}>{cat.name}</span>
-                  <span style={styles.categoryCount}>{cat.postCount} posts</span>
-                </Link>
-              ))}
+        {/* 2. Forum CTA (WO-KCOS-COMMUNITY-FORUM-STRUCTURE-ALIGN-V1: 중복 섹션 → 단일 CTA) */}
+        <section style={styles.section}>
+          <Link to="/forum" style={styles.forumCta}>
+            <div style={styles.forumCtaIcon}>💬</div>
+            <div style={styles.forumCtaBody}>
+              <h3 style={styles.forumCtaTitle}>K-Cosmetics 포럼</h3>
+              <p style={styles.forumCtaDesc}>뷰티 트렌드, 스킨케어, 메이크업 — 자유롭게 토론하고 정보를 공유하세요</p>
             </div>
-          ) : (
-            <p style={styles.empty}>No forum categories yet.</p>
-          )}
-        </Section>
+            <span style={styles.forumCtaArrow}>→</span>
+          </Link>
+        </section>
 
-        {/* 3. Latest Posts */}
-        <Section title="Recent Posts" linkTo="/forum/posts" linkLabel="View All">
-          {posts.length > 0 ? (
-            <div style={styles.postList}>
-              {posts.map((post) => (
-                <Link key={post.id} to={`/forum/post/${post.id}`} style={styles.postItem}>
-                  <div style={styles.postMain}>
-                    <span style={styles.postTitle}>{post.title}</span>
-                  </div>
-                  <div style={styles.postMeta}>
-                    <span>{post.author?.name || 'Anonymous'}</span>
-                    <span>{new Date(post.createdAt).toLocaleDateString()}</span>
-                  </div>
-                </Link>
-              ))}
-            </div>
+        {/* 3. Content Section (WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1) */}
+        <Section title="콘텐츠" linkTo="/library/content" linkLabel="전체보기 →">
+          {contentItems.length === 0 ? (
+            <p style={styles.empty}>등록된 콘텐츠가 없습니다.</p>
           ) : (
-            <p style={styles.empty}>No posts yet.</p>
+            <>
+              {recentContent.length > 0 && (
+                <div style={{ marginBottom: 20 }}>
+                  <p style={styles.contentSubTitle}>최근 콘텐츠</p>
+                  <div style={styles.contentGrid}>
+                    {recentContent.map((item) => (
+                      <ContentCard key={item.id} item={item} />
+                    ))}
+                  </div>
+                </div>
+              )}
+              {recommendedContent.length > 0 && (
+                <div>
+                  <p style={styles.contentSubTitle}>추천 콘텐츠</p>
+                  <div style={styles.contentGrid}>
+                    {recommendedContent.map((item) => (
+                      <ContentCard key={item.id} item={item} />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </Section>
 
@@ -172,36 +162,6 @@ export default function CommunityHubPage() {
             </div>
           ) : (
             <p style={styles.empty}>No videos yet.</p>
-          )}
-        </Section>
-
-        {/* 5.5 Content Section (WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1) */}
-        <Section title="콘텐츠" linkTo="/library/content" linkLabel="전체보기 →">
-          {contentItems.length === 0 ? (
-            <p style={styles.empty}>등록된 콘텐츠가 없습니다.</p>
-          ) : (
-            <>
-              {recentContent.length > 0 && (
-                <div style={{ marginBottom: 20 }}>
-                  <p style={styles.contentSubTitle}>최근 콘텐츠</p>
-                  <div style={styles.contentGrid}>
-                    {recentContent.map((item) => (
-                      <ContentCard key={item.id} item={item} />
-                    ))}
-                  </div>
-                </div>
-              )}
-              {recommendedContent.length > 0 && (
-                <div>
-                  <p style={styles.contentSubTitle}>추천 콘텐츠</p>
-                  <div style={styles.contentGrid}>
-                    {recommendedContent.map((item) => (
-                      <ContentCard key={item.id} item={item} />
-                    ))}
-                  </div>
-                </div>
-              )}
-            </>
           )}
         </Section>
 
@@ -261,22 +221,6 @@ function ContentCard({ item }: { item: HubContentItemResponse }) {
     </div>
   );
 }
-
-// ─── Category emoji mapping ───
-const CATEGORY_ICONS: Record<string, string> = {
-  'Free Board': '💬',
-  'Beauty Trends': '💄',
-  'Skincare': '🧴',
-  'Makeup': '💋',
-  'Reviews': '⭐',
-  'Q&A': '❓',
-  '자유게시판': '💬',
-  '뷰티 트렌드': '💄',
-  '스킨케어': '🧴',
-  '메이크업': '💋',
-  '리뷰': '⭐',
-  '질문답변': '❓',
-};
 
 // ─── Section wrapper ───
 
@@ -344,74 +288,49 @@ const styles: Record<string, CSSProperties> = {
     textAlign: 'center' as const,
     padding: '24px 0',
   },
-  // Forum categories
-  categoryGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
-    gap: 12,
-  },
-  categoryCard: {
+  // Forum CTA (WO-KCOS-COMMUNITY-FORUM-STRUCTURE-ALIGN-V1)
+  forumCta: {
     display: 'flex',
-    flexDirection: 'column' as const,
     alignItems: 'center',
-    gap: 6,
-    padding: '16px 12px',
+    gap: 16,
+    padding: '20px 24px',
     backgroundColor: 'white',
     borderRadius: 12,
     border: '1px solid #e2e8f0',
     textDecoration: 'none',
     transition: 'box-shadow 0.2s',
   },
-  categoryEmoji: {
-    fontSize: 24,
-  },
-  categoryName: {
-    fontSize: 13,
-    fontWeight: 600,
-    color: '#334155',
-  },
-  categoryCount: {
-    fontSize: 11,
-    color: '#94a3b8',
-  },
-  // Posts
-  postList: {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: 1,
-    backgroundColor: '#e2e8f0',
+  forumCtaIcon: {
+    width: 48,
+    height: 48,
     borderRadius: 12,
-    overflow: 'hidden',
-  },
-  postItem: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '12px 16px',
-    backgroundColor: 'white',
-    textDecoration: 'none',
-  },
-  postMain: {
+    backgroundColor: '#fdf2f8',
     display: 'flex',
     alignItems: 'center',
-    gap: 8,
+    justifyContent: 'center',
+    fontSize: 24,
+    flexShrink: 0,
+  },
+  forumCtaBody: {
     flex: 1,
     minWidth: 0,
   },
-  postTitle: {
-    fontSize: 14,
-    color: '#334155',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap' as const,
+  forumCtaTitle: {
+    fontSize: 16,
+    fontWeight: 700,
+    color: '#1e293b',
+    margin: 0,
   },
-  postMeta: {
-    display: 'flex',
-    gap: 10,
-    fontSize: 12,
-    color: '#94a3b8',
+  forumCtaDesc: {
+    fontSize: 13,
+    color: '#64748b',
+    margin: '4px 0 0 0',
+  },
+  forumCtaArrow: {
+    fontSize: 18,
+    color: '#DB2777',
+    fontWeight: 600,
     flexShrink: 0,
-    marginLeft: 12,
   },
   // Media
   mediaGrid: {
