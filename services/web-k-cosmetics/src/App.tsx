@@ -88,6 +88,9 @@ const SignageTemplateDetailPage = lazy(() => import('@/pages/operator/signage/Te
 import { StoreDashboardLayout, StorePlaceholderPage, COSMETICS_STORE_CONFIG, resolveStoreMenu } from '@o4o/store-ui-core';
 import { useStoreCapabilities } from './hooks/useStoreCapabilities';
 
+// Store Settings (WO-STORE-COMMON-SETTINGS-KCOS-UI-V1)
+const StoreSettingsPage = lazy(() => import('@/pages/store/StoreSettingsPage'));
+
 // Market Trial → Neture redirect
 // WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1:
 // Market Trial 실행은 Neture로 일원화. /store/market-trial 은 Neture로 redirect.
@@ -388,7 +391,7 @@ function AppRoutes() {
         <Route path="market-trial" element={<MarketTrialNetureRedirect />} />
         {/* Interest 관리 (WO-O4O-TABLET-INTEREST-UX-REFACTOR-V1) */}
         <Route path="interest-requests" element={<InterestRequestsPage />} />
-        <Route path="settings" element={<StorePlaceholderPage title="설정" />} />
+        <Route path="settings" element={<StoreSettingsPage />} />
       </Route>
 
       {/* Tablet Kiosk — Public, no auth (WO-O4O-TABLET-INTEREST-UX-REFACTOR-V1) */}
