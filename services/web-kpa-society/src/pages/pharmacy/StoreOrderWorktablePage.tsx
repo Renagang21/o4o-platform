@@ -2,20 +2,23 @@
  * StoreOrderWorktablePage — 관심상품 주문 작업대
  *
  * WO-KPA-A-STORE-ORDER-WORKTABLE-WITH-SUPPLIER-SUMMARY-V1
+ * WO-STORE-B2B-ORDER-EXECUTION-FLOW-V1: 주문 생성 기능 추가
  *
  * 왼쪽: 관심상품 테이블 (DataTable + 수량 입력)
- * 오른쪽: 공급사별 주문 요약 패널
+ * 오른쪽: 공급사별 주문 요약 패널 + 주문하기 버튼
  *
  * 데이터: getCatalog(isListed/isApproved) + getListings() 클라이언트 병합
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { DataTable } from '@o4o/ui';
 import type { Column } from '@o4o/ui';
-import { Search, Package, RefreshCw, X, ShoppingCart, AlertCircle } from 'lucide-react';
+import { Search, Package, RefreshCw, X, ShoppingCart, AlertCircle, CheckCircle2, XCircle } from 'lucide-react';
 import { getCatalog, getListings } from '../../api/pharmacyProducts';
 import type { CatalogProduct, ProductListing } from '../../api/pharmacyProducts';
+import { createOrder } from '../../api/checkout';
+import { useAuth } from '../../contexts/AuthContext';
 import { colors, borderRadius } from '../../styles/theme';
 
 // ── Types ──
@@ -44,15 +47,35 @@ function formatPrice(v: number | null): string {
   return v.toLocaleString('ko-KR') + '원';
 }
 
+// ── Order Result Type ──
+
+interface OrderResult {
+  supplierId: string;
+  supplierName: string;
+  success: boolean;
+  orderNumber?: string;
+  error?: string;
+}
+
 // ── Component ──
 
 export function StoreOrderWorktablePage() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const organizationId = user?.kpaMembership?.organizationId;
+
   const [products, setProducts] = useState<WorktableProduct[]>([]);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [searchQuery, setSearchQuery] = useState('');
   const [supplierFilter, setSupplierFilter] = useState('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Order creation state
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [isOrdering, setIsOrdering] = useState(false);
+  const [orderError, setOrderError] = useState<string | null>(null);
+  const [orderResults, setOrderResults] = useState<OrderResult[]>([]);
 
   // ── Data loading ──
 
@@ -123,6 +146,74 @@ export function StoreOrderWorktablePage() {
   const resetAllQuantities = useCallback(() => {
     setQuantities({});
   }, []);
+
+  // ── B2B Order creation ──
+
+  const handleCreateOrders = useCallback(async () => {
+    if (!organizationId) {
+      setOrderError('매장 정보를 찾을 수 없습니다. 다시 로그인해주세요.');
+      return;
+    }
+
+    setIsOrdering(true);
+    setOrderError(null);
+    const results: OrderResult[] = [];
+
+    // Group products by supplier
+    const supplierGroups = new Map<string, {
+      supplierName: string;
+      items: Array<{ productId: string; quantity: number }>;
+    }>();
+
+    products.forEach(p => {
+      const qty = quantities[p.id] || 0;
+      if (qty <= 0) return;
+
+      const existing = supplierGroups.get(p.supplierId);
+      if (existing) {
+        existing.items.push({ productId: p.id, quantity: qty });
+      } else {
+        supplierGroups.set(p.supplierId, {
+          supplierName: p.supplierName,
+          items: [{ productId: p.id, quantity: qty }],
+        });
+      }
+    });
+
+    // Sequential per-supplier order creation
+    for (const [supplierId, group] of supplierGroups) {
+      try {
+        const response = await createOrder({
+          organizationId,
+          items: group.items,
+          deliveryMethod: 'pickup',
+        });
+
+        results.push({
+          supplierId,
+          supplierName: group.supplierName,
+          success: true,
+          orderNumber: response.data.orderNumber,
+        });
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : '주문 생성에 실패했습니다';
+        results.push({
+          supplierId,
+          supplierName: group.supplierName,
+          success: false,
+          error: msg,
+        });
+      }
+    }
+
+    setOrderResults(results);
+    setIsOrdering(false);
+
+    const allSucceeded = results.every(r => r.success);
+    if (allSucceeded) {
+      resetAllQuantities();
+    }
+  }, [organizationId, products, quantities, resetAllQuantities]);
 
   // ── Filters ──
 
@@ -435,10 +526,146 @@ export function StoreOrderWorktablePage() {
                   </span>
                 </div>
               </div>
+
+              {/* Order button */}
+              <button
+                onClick={() => {
+                  setOrderResults([]);
+                  setOrderError(null);
+                  setShowConfirmModal(true);
+                }}
+                style={S.orderButton}
+                disabled={!organizationId}
+              >
+                <ShoppingCart size={16} />
+                주문하기 ({supplierSummaries.length}건)
+              </button>
             </>
           )}
         </div>
       </div>
+
+      {/* ── Confirm Order Modal ── */}
+      {showConfirmModal && (
+        <div style={S.modalOverlay} onClick={() => !isOrdering && setShowConfirmModal(false)}>
+          <div style={S.modalContent} onClick={e => e.stopPropagation()}>
+            {orderResults.length > 0 ? (
+              /* ── Results view ── */
+              <>
+                <h3 style={S.modalTitle}>
+                  {orderResults.every(r => r.success) ? 'B2B 주문 완료' : '주문 처리 결과'}
+                </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {orderResults.map(r => (
+                    <div key={r.supplierId} style={{
+                      ...S.resultRow,
+                      borderLeft: `3px solid ${r.success ? '#10b981' : '#ef4444'}`,
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        {r.success
+                          ? <CheckCircle2 size={16} style={{ color: '#10b981' }} />
+                          : <XCircle size={16} style={{ color: '#ef4444' }} />
+                        }
+                        <span style={{ fontWeight: 600, fontSize: '14px' }}>{r.supplierName}</span>
+                      </div>
+                      {r.success
+                        ? <span style={{ color: '#10b981', fontSize: '13px' }}>{r.orderNumber}</span>
+                        : <span style={{ color: '#ef4444', fontSize: '13px' }}>{r.error}</span>
+                      }
+                    </div>
+                  ))}
+                </div>
+                <div style={S.modalActions}>
+                  {orderResults.every(r => r.success) ? (
+                    <button
+                      onClick={() => { setShowConfirmModal(false); navigate('/store/commerce/orders'); }}
+                      style={S.modalPrimaryBtn}
+                    >
+                      주문 관리로 이동
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setShowConfirmModal(false)}
+                      style={S.modalSecondaryBtn}
+                    >
+                      닫기
+                    </button>
+                  )}
+                </div>
+              </>
+            ) : (
+              /* ── Confirmation view ── */
+              <>
+                <h3 style={S.modalTitle}>B2B 주문 확인</h3>
+                <p style={{ fontSize: '13px', color: colors.neutral600, margin: '0 0 16px' }}>
+                  아래 내용으로 공급사별 {supplierSummaries.length}건의 B2B 주문을 생성합니다.
+                </p>
+
+                {supplierSummaries.map(s => {
+                  const supplierProducts = products.filter(
+                    p => p.supplierId === s.supplierId && (quantities[p.id] || 0) > 0,
+                  );
+                  return (
+                    <div key={s.supplierId} style={S.confirmCard}>
+                      <div style={S.confirmCardHeader}>
+                        <span style={{ fontWeight: 600 }}>{s.supplierName}</span>
+                        <span style={{ color: colors.primary, fontWeight: 600 }}>
+                          {formatPrice(s.totalAmount)}
+                        </span>
+                      </div>
+                      {supplierProducts.map(p => (
+                        <div key={p.id} style={S.confirmProductRow}>
+                          <span style={{ fontSize: '12px', color: colors.neutral600, flex: 1 }}>
+                            {p.productName}
+                          </span>
+                          <span style={{ fontSize: '12px', color: colors.neutral500 }}>
+                            {quantities[p.id]}개
+                          </span>
+                          <span style={{ fontSize: '12px', fontWeight: 500, width: '80px', textAlign: 'right' }}>
+                            {formatPrice((p.basePrice || 0) * (quantities[p.id] || 0))}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })}
+
+                <div style={S.confirmTotal}>
+                  <span>총 주문 금액</span>
+                  <span style={{ fontSize: '18px', fontWeight: 700, color: colors.primary }}>
+                    {formatPrice(totalOrderAmount)}
+                  </span>
+                </div>
+
+                <p style={{ fontSize: '11px', color: colors.neutral400, margin: '8px 0 0', textAlign: 'center' }}>
+                  실제 결제 금액은 공급가 기준으로 산정됩니다
+                </p>
+
+                {orderError && (
+                  <p style={{ color: '#ef4444', fontSize: '13px', margin: '12px 0 0' }}>{orderError}</p>
+                )}
+
+                <div style={S.modalActions}>
+                  <button
+                    onClick={() => setShowConfirmModal(false)}
+                    style={S.modalSecondaryBtn}
+                    disabled={isOrdering}
+                  >
+                    취소
+                  </button>
+                  <button
+                    onClick={handleCreateOrders}
+                    style={S.modalPrimaryBtn}
+                    disabled={isOrdering}
+                  >
+                    {isOrdering ? '주문 처리 중...' : `${supplierSummaries.length}건 주문하기`}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -689,5 +916,116 @@ const S: Record<string, React.CSSProperties> = {
     fontSize: '14px',
     fontWeight: 600,
     color: colors.neutral800,
+  },
+
+  // Order button
+  orderButton: {
+    marginTop: '12px',
+    width: '100%',
+    padding: '12px 16px',
+    fontSize: '15px',
+    fontWeight: 600,
+    color: '#fff',
+    backgroundColor: colors.primary,
+    border: 'none',
+    borderRadius: borderRadius.md,
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '8px',
+  },
+
+  // Modal
+  modalOverlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1000,
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: borderRadius.lg,
+    padding: '24px',
+    maxWidth: '520px',
+    width: '90%',
+    maxHeight: '80vh',
+    overflowY: 'auto',
+  },
+  modalTitle: {
+    fontSize: '18px',
+    fontWeight: 700,
+    color: colors.neutral800,
+    margin: '0 0 16px',
+  },
+  modalActions: {
+    display: 'flex',
+    gap: '10px',
+    justifyContent: 'flex-end',
+    marginTop: '20px',
+  },
+  modalPrimaryBtn: {
+    padding: '10px 24px',
+    fontSize: '14px',
+    fontWeight: 600,
+    color: '#fff',
+    backgroundColor: colors.primary,
+    border: 'none',
+    borderRadius: borderRadius.md,
+    cursor: 'pointer',
+  },
+  modalSecondaryBtn: {
+    padding: '10px 24px',
+    fontSize: '14px',
+    fontWeight: 500,
+    color: colors.neutral600,
+    backgroundColor: colors.neutral100,
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: borderRadius.md,
+    cursor: 'pointer',
+  },
+  confirmCard: {
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: borderRadius.md,
+    padding: '12px',
+    marginBottom: '10px',
+  },
+  confirmCardHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '8px',
+    paddingBottom: '8px',
+    borderBottom: `1px solid ${colors.neutral100}`,
+  },
+  confirmProductRow: {
+    display: 'flex',
+    gap: '8px',
+    alignItems: 'center',
+    padding: '2px 0',
+  },
+  confirmTotal: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '14px',
+    backgroundColor: '#f0fdf4',
+    borderRadius: borderRadius.md,
+    marginTop: '12px',
+    fontWeight: 600,
+  },
+  resultRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '10px 12px',
+    borderRadius: borderRadius.md,
+    backgroundColor: colors.neutral50,
   },
 };

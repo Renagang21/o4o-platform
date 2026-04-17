@@ -19,6 +19,7 @@ import type { AuthRequest } from '../../../types/auth.js';
 import logger from '../../../utils/logger.js';
 import { opsMetrics, OPS } from '../../../services/ops-metrics.service.js';
 import { validateSupplierSellerRelation } from '../../../core/checkout/checkout-guard.service.js';
+import { createRequireStoreOwner } from '../../../utils/store-owner.utils.js';
 import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 import {
   CheckoutOrder,
@@ -692,6 +693,151 @@ export function createKpaCheckoutController(
         const err = error as Error;
         logger.error('[KPA Checkout] Get order error:', err);
         errorResponse(res, 500, 'ORDER_GET_ERROR', 'Failed to get order');
+      }
+    }
+  );
+
+  // ==========================================================================
+  // Store Owner Endpoints (WO-STORE-B2B-ORDER-EXECUTION-FLOW-V1)
+  // 판매자 관점: 매장 주문 목록 + KPI
+  // ==========================================================================
+
+  const requireStoreOwner = createRequireStoreOwner(dataSource);
+
+  /**
+   * GET /checkout/store-orders/kpi
+   * 매장 주문 KPI (총 주문 / 진행 중 / 완료 / 이번 달 매출)
+   */
+  router.get(
+    '/store-orders/kpi',
+    requireAuth,
+    requireStoreOwner,
+    async (req: Request, res: Response) => {
+      try {
+        const organizationId = (req as any).organizationId;
+        if (!organizationId) {
+          return res.json({
+            success: true,
+            data: { total: 0, pending: 0, completed: 0, monthlyRevenue: 0 },
+          });
+        }
+
+        const rows = await dataSource.query(
+          `SELECT
+             COUNT(*)::int AS total,
+             COUNT(*) FILTER (WHERE status IN ('created','pending_payment'))::int AS pending,
+             COUNT(*) FILTER (WHERE status = 'paid')::int AS completed,
+             COALESCE(SUM("totalAmount") FILTER (
+               WHERE "createdAt" >= date_trunc('month', CURRENT_DATE) AND status = 'paid'
+             ), 0)::numeric AS "monthlyRevenue"
+           FROM checkout_orders
+           WHERE "sellerOrganizationId" = $1
+             AND metadata->>'serviceKey' IN ('kpa-society', 'kpa')`,
+          [organizationId]
+        );
+
+        const row = rows[0] || {};
+        res.json({
+          success: true,
+          data: {
+            total: Number(row.total || 0),
+            pending: Number(row.pending || 0),
+            completed: Number(row.completed || 0),
+            monthlyRevenue: Number(row.monthlyRevenue || 0),
+          },
+        });
+      } catch (error: unknown) {
+        const err = error as Error;
+        logger.error('[KPA Checkout] Store KPI error:', err);
+        // Graceful degradation
+        res.json({
+          success: true,
+          data: { total: 0, pending: 0, completed: 0, monthlyRevenue: 0 },
+        });
+      }
+    }
+  );
+
+  /**
+   * GET /checkout/store-orders
+   * 매장 주문 목록 (판매자 관점 — sellerOrganizationId 기준)
+   */
+  router.get(
+    '/store-orders',
+    requireAuth,
+    requireStoreOwner,
+    async (req: Request, res: Response) => {
+      try {
+        const organizationId = (req as any).organizationId;
+        if (!organizationId) {
+          return res.json({
+            success: true,
+            data: [],
+            pagination: { page: 1, limit: 20, total: 0, totalPages: 0 },
+          });
+        }
+
+        const page = Number(req.query.page) || 1;
+        const limit = Math.min(Number(req.query.limit) || 20, 100);
+        const offset = (page - 1) * limit;
+        const status = req.query.status as string | undefined;
+
+        const qb = dataSource.getRepository(CheckoutOrder)
+          .createQueryBuilder('co')
+          .where('co.sellerOrganizationId = :organizationId', { organizationId })
+          .andWhere(
+            "co.metadata->>'serviceKey' IN (:...serviceKeys)",
+            { serviceKeys: ['kpa-society', 'kpa'] }
+          );
+
+        if (status && status !== 'all') {
+          qb.andWhere('co.status = :status', { status });
+        }
+
+        qb.orderBy('co.createdAt', 'DESC')
+          .take(limit)
+          .skip(offset);
+
+        const [orders, total] = await qb.getManyAndCount();
+
+        res.json({
+          success: true,
+          data: orders.map((order) => ({
+            id: order.id,
+            orderNumber: order.orderNumber,
+            status: order.status,
+            paymentStatus: order.paymentStatus,
+            totalAmount: order.totalAmount,
+            subtotal: order.subtotal,
+            shippingFee: order.shippingFee,
+            discount: order.discount,
+            buyerId: order.buyerId,
+            itemCount: order.items?.length || 0,
+            items: order.items?.map((item) => ({
+              productName: item.productName,
+              quantity: item.quantity,
+              unitPrice: item.unitPrice,
+              subtotal: item.subtotal,
+            })),
+            metadata: {
+              channelType: (order.metadata as KpaOrderMetadata)?.channelType,
+              deliveryMethod: (order.metadata as KpaOrderMetadata)?.deliveryMethod,
+              organizationName: (order.metadata as KpaOrderMetadata)?.organizationName,
+            },
+            createdAt: order.createdAt,
+            updatedAt: order.updatedAt,
+          })),
+          pagination: {
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit),
+          },
+        });
+      } catch (error: unknown) {
+        const err = error as Error;
+        logger.error('[KPA Checkout] Store orders list error:', err);
+        errorResponse(res, 500, 'STORE_ORDER_LIST_ERROR', 'Failed to list store orders');
       }
     }
   );
