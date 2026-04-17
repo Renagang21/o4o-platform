@@ -119,8 +119,8 @@ import { PharmacyHubLayout } from './components/pharmacy/PharmacyHubLayout';
 import { PharmacyInfoPage } from './pages/pharmacy/PharmacyInfoPage';
 
 // WO-PHARMACY-MANAGEMENT-CONSOLIDATION-V1 Phase 2: Store Core v1.0 통합
-import { StoreDashboardLayout, KPA_SOCIETY_STORE_CONFIG, resolveStoreMenu } from '@o4o/store-ui-core';
-import { useStoreCapabilities } from './hooks/useStoreCapabilities';
+import { StoreDashboardLayout, KPA_SOCIETY_STORE_CONFIG } from '@o4o/store-ui-core';
+import { KpaGlobalHeader } from './components/KpaGlobalHeader';
 import { StoreUserDropdown } from './components/store/StoreUserDropdown';
 import { SupplierListPage, SupplierDetailPage } from './pages/pharmacy/b2b';
 
@@ -290,8 +290,6 @@ const KPA_STORE_NAV_ITEMS = [
 function KpaStoreLayoutWrapper() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const enabledCaps = useStoreCapabilities();
-
   // WO-KPA-SOCIETY-STORE-LAYOUT-ORGNAME-TO-PHARMACY-NAME-FIX-V1:
   // 분회명(membershipOrgName) 대신 실제 약국명을 표시
   const [pharmacyName, setPharmacyName] = useState<string | undefined>(undefined);
@@ -303,21 +301,22 @@ function KpaStoreLayoutWrapper() {
     return () => { cancelled = true; };
   }, []);
 
-  const resolvedConfig = resolveStoreMenu(KPA_SOCIETY_STORE_CONFIG, enabledCaps);
-
   const handleLogout = () => { logout(); navigate('/'); };
 
   return (
-    <StoreDashboardLayout
-      config={resolvedConfig}
-      userName={user?.name || user?.email || ''}
-      homeLink="/"
-      navItems={KPA_STORE_NAV_ITEMS}
-      serviceLabel="약사 네트워크"
-      serviceBadge="KPA"
-      orgName={pharmacyName}
-      topBarRight={<StoreUserDropdown homeLink="/" onLogout={handleLogout} />}
-    />
+    <div className="min-h-screen flex flex-col">
+      <KpaGlobalHeader />
+      <StoreDashboardLayout
+        config={KPA_SOCIETY_STORE_CONFIG}
+        userName={user?.name || user?.email || ''}
+        homeLink="/"
+        navItems={KPA_STORE_NAV_ITEMS}
+        serviceLabel="약사 네트워크"
+        serviceBadge="KPA"
+        orgName={pharmacyName}
+        topBarRight={<StoreUserDropdown homeLink="/" onLogout={handleLogout} />}
+      />
+    </div>
   );
 }
 
