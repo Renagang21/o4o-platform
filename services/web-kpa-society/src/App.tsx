@@ -282,9 +282,9 @@ function RoleBasedHome() {
 const KPA_STORE_NAV_ITEMS = [
   { label: '홈', href: '/' },
   { label: '포럼', href: '/forum' },
-  { label: '강의', href: '/lms' },
-  { label: '콘텐츠', href: '/content' },
+  { label: '강의 / 마케팅 콘텐츠', href: '/lms' },
   { label: '약국 HUB', href: '/hub' },
+  { label: '내 약국', href: '/store' },
 ];
 
 function KpaStoreLayoutWrapper() {
