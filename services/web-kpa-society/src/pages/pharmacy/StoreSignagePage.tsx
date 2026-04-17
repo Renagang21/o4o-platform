@@ -3,10 +3,12 @@
  *
  * WO-O4O-STORE-SIGNAGE-ENGINE-V1
  * WO-O4O-SIGNAGE-STORE-PLAYLIST-ENGINE-V1: Playlist 탭 추가
+ * WO-O4O-SIGNAGE-KPA-PHASE1-MODERNIZATION-V1: 3탭 구조 전환, DataTable 적용
  *
- * /store/signage: 2탭 구조
- *  [Tab 1] 플레이리스트 — Store Playlist CRUD + item 관리
- *  [Tab 2] 자산 관리 — 기존 channel_map 기반 (점진적 축소)
+ * /store/signage: 3탭 구조
+ *  [Tab 1] 내 동영상 — 기존 channel_map 기반 자산 관리
+ *  [Tab 2] 내 플레이리스트 — Store Playlist CRUD + item 관리
+ *  [Tab 3] 스케줄 — 시간/요일 기반 재생 스케줄 CRUD
  *
  * 전이 패턴: Hub → assetSnapshotApi.copy → o4o_asset_snapshots → Playlist에 추가
  *
