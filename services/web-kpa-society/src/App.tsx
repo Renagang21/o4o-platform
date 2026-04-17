@@ -111,7 +111,7 @@ import { PharmacyServicePage, ForumServicePage, LmsServicePage } from './pages/s
 import { PharmacyJoinPage } from './pages/join';
 
 // Pharmacy Management (WO-KPA-PHARMACY-MANAGEMENT-V1, WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1)
-import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyApprovalGatePage, HubContentLibraryPage, HubB2BCatalogPage, HubSignageLibraryPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage, LayoutBuilderPage, StoreChannelsPage, StoreOrdersPage, StoreBillingPage, StoreSignagePage, StoreLibraryNewPage, StoreLibraryPage, StoreLibraryDetailPage, StoreLibraryEditPage, StoreQRPage, StorePopPage, MarketingAnalyticsPage, StoreHomePage, ProductMarketingPage, StoreLocalProductsPage, StoreTabletDisplaysPage } from './pages/pharmacy';
+import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyApprovalGatePage, HubContentLibraryPage, HubB2BCatalogPage, HubSignageLibraryPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage, StoreChannelsPage, StoreOrdersPage, StoreBillingPage, StoreSignagePage, StoreLibraryNewPage, StoreLibraryPage, StoreLibraryDetailPage, StoreLibraryEditPage, StoreQRPage, StorePopPage, MarketingAnalyticsPage, StoreHomePage, ProductMarketingPage, StoreLocalProductsPage, StoreTabletDisplaysPage } from './pages/pharmacy';
 import { StoreOrderWorktablePage } from './pages/pharmacy/StoreOrderWorktablePage';
 // WO-KPA-PHARMACY-HUB-SIDEBAR-LAYOUT-AND-PRODUCT-TABS-FIX-V1: 약국 HUB 사이드바 레이아웃
 import { PharmacyHubLayout } from './components/pharmacy/PharmacyHubLayout';
@@ -696,7 +696,8 @@ function App() {
             <Route path="content/:snapshotId/edit" element={<StoreContentEditPage />} />
             <Route path="billing" element={<StoreBillingPage />} />
             <Route path="settings" element={<PharmacyStorePage />} />
-            <Route path="settings/layout" element={<LayoutBuilderPage />} />
+            {/* WO-STORE-COMMON-SETTINGS-KPA-MIGRATION-V1: layout integrated into /store/settings */}
+            <Route path="settings/layout" element={<Navigate to="/store/settings" replace />} />
             <Route path="settings/template" element={<PharmacyTemplatePage />} />
           </Route>
 

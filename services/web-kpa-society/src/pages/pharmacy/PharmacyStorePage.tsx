@@ -1,15 +1,21 @@
 /**
  * PharmacyStorePage - 매장 설정
  *
- * WO-KPA-A-STORE-SETTINGS-STRUCTURE-CLEANUP-V1
+ * WO-STORE-COMMON-SETTINGS-KPA-MIGRATION-V1
  *
- * 3-Section 구조:
- * 1. 매장 기본 설정 — 매장 정보, 디바이스 미리보기
- * 2. 서비스 관리 — 컴포넌트 표시/숨김 토글
- * 3. 디자인 관리 — 템플릿 선택, 테마 선택
+ * 공통 Store Settings API 사용 + 블록 기반 레이아웃 편집 + 실제 iframe 미리보기
  *
- * 핵심 원칙:
- * "약국 매장 UI는 자유 편집 대상이 아니라 표준 템플릿을 선택하는 구조다."
+ * 제거:
+ *   - 8개 dead 컴포넌트 토글 (banner/categories/featured/promotion/new-arrivals/
+ *     best-sellers/health-info/pharmacy-info) — storefront_config.components와 연결 없음
+ *   - mock preview (emoji)
+ *   - PUT /pharmacy/store/config 호출
+ *
+ * 추가:
+ *   - GET /stores/:slug/settings (공통 API)
+ *   - PATCH /stores/:slug/settings (공통 API)
+ *   - 블록 편집 (순서/활성화/config) — LayoutBuilderPage 통합
+ *   - iframe 실제 매장 미리보기 (/store/:slug)
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -17,86 +23,46 @@ import { Link } from 'react-router-dom';
 import { colors, shadows, borderRadius } from '../../styles/theme';
 import { useAuth, TestUser } from '../../contexts/AuthContext';
 import { isPharmacyOwner, PharmacistFeeCategory } from '../../types';
-import { getStoreConfig, saveStoreConfig } from '../../api/pharmacyStoreConfig';
+import { getStoreSlug } from '../../api/pharmacyInfo';
+import { apiClient } from '../../api/client';
+import { StoreBlockRegistry, type StoreBlock, type StoreBlockType } from '@o4o/ui';
 
-// 템플릿 정의
-const templates = [
-  {
-    id: 'standard',
-    name: 'Standard',
-    description: '기본 레이아웃, 가장 많이 사용',
-    preview: '📋',
-    features: ['상단 배너', '카테고리 그리드', '추천 상품', '프로모션'],
-  },
-  {
-    id: 'compact',
-    name: 'Compact',
-    description: '정보 밀도 높음, 상품 중심',
-    preview: '📦',
-    features: ['미니 헤더', '리스트 뷰', '빠른 검색', '가격 강조'],
-  },
-  {
-    id: 'visual',
-    name: 'Visual',
-    description: '이미지 중심, 시각적 강조',
-    preview: '🖼️',
-    features: ['풀스크린 배너', '이미지 그리드', '캐러셀', '비주얼 프로모션'],
-  },
-  {
-    id: 'minimal',
-    name: 'Minimal',
-    description: '깔끔하고 단순한 디자인',
-    preview: '✨',
-    features: ['심플 헤더', '여백 활용', '텍스트 중심', '깔끔한 카드'],
-  },
-];
+// ── Types ─────────────────────────────────────────────────────────────────────
 
-// 테마 정의
-const themes = [
-  { id: 'default', name: '기본', primaryColor: '#2563EB', accentColor: '#3B82F6' },
-  { id: 'warm', name: '따뜻한', primaryColor: '#EA580C', accentColor: '#F97316' },
-  { id: 'nature', name: '자연', primaryColor: '#16A34A', accentColor: '#22C55E' },
-  { id: 'elegant', name: '우아한', primaryColor: '#7C3AED', accentColor: '#8B5CF6' },
-  { id: 'modern', name: '모던', primaryColor: '#0F172A', accentColor: '#475569' },
-  { id: 'soft', name: '부드러운', primaryColor: '#EC4899', accentColor: '#F472B6' },
-];
-
-// 컴포넌트 정의 (On/Off 가능)
-const storeComponents = [
-  { id: 'banner', name: '상단 배너', description: '메인 프로모션 영역', required: true },
-  { id: 'categories', name: '카테고리', description: '상품 카테고리 네비게이션', required: true },
-  { id: 'featured', name: '추천 상품', description: '약사 추천 상품 영역', required: false },
-  { id: 'promotion', name: '프로모션', description: '할인/이벤트 영역', required: false },
-  { id: 'new-arrivals', name: '신상품', description: '최근 등록 상품', required: false },
-  { id: 'best-sellers', name: '베스트셀러', description: '인기 상품 목록', required: false },
-  { id: 'health-info', name: '건강 정보', description: '건강 팁/정보 콘텐츠', required: false },
-  { id: 'pharmacy-info', name: '약국 소개', description: '약국 정보 및 연락처', required: false },
-];
-
-// 디바이스 정의
-const devices = [
-  { id: 'mall', name: 'B2C 몰', icon: '🛒', description: '웹/모바일 쇼핑몰' },
-  { id: 'tablet', name: '태블릿', icon: '📱', description: '매장 태블릿 디스플레이' },
-  { id: 'kiosk', name: '키오스크', icon: '🖥️', description: '무인 주문/안내 키오스크' },
-];
-
-// 기본 설정값
-const defaultSettings = {
-  template: 'standard',
-  theme: 'default',
-  components: {
-    'banner': true,
-    'categories': true,
-    'featured': true,
-    'promotion': true,
-    'new-arrivals': false,
-    'best-sellers': true,
-    'health-info': false,
-    'pharmacy-info': true,
-  },
-};
-
+type StoreTemplate = 'BASIC' | 'COMMERCE_FOCUS' | 'CONTENT_FOCUS' | 'MINIMAL';
+type StoreTheme = 'professional' | 'neutral' | 'clean' | 'modern';
+type PreviewDevice = 'B2C' | 'TABLET' | 'KIOSK';
 type SaveState = 'idle' | 'saving' | 'saved' | 'error';
+
+interface StoreSettings {
+  template: StoreTemplate;
+  theme: StoreTheme;
+  blocks: StoreBlock[];
+}
+
+// ── Constants ─────────────────────────────────────────────────────────────────
+
+const TEMPLATES: Array<{ id: StoreTemplate; name: string; description: string }> = [
+  { id: 'BASIC', name: '기본형', description: '균형 잡힌 표준 레이아웃' },
+  { id: 'COMMERCE_FOCUS', name: '상업 강조형', description: 'B2C 판매 중심' },
+  { id: 'CONTENT_FOCUS', name: '콘텐츠 중심형', description: '브랜드·전문성 강조' },
+  { id: 'MINIMAL', name: '간결형', description: '핵심 요소만' },
+];
+
+const THEMES: Array<{ id: StoreTheme; name: string; primaryColor: string; accentColor: string }> = [
+  { id: 'professional', name: '전문적', primaryColor: '#1e40af', accentColor: '#3b82f6' },
+  { id: 'neutral',      name: '중립적', primaryColor: '#374151', accentColor: '#6b7280' },
+  { id: 'clean',        name: '깔끔한', primaryColor: '#0891b2', accentColor: '#06b6d4' },
+  { id: 'modern',       name: '모던',   primaryColor: '#0f172a', accentColor: '#475569' },
+];
+
+const DEVICES: Array<{ id: PreviewDevice; name: string; icon: string; maxWidth: string }> = [
+  { id: 'B2C',    name: 'B2C 몰',   icon: '🛒', maxWidth: '100%' },
+  { id: 'TABLET', name: '태블릿',   icon: '📱', maxWidth: '280px' },
+  { id: 'KIOSK',  name: '키오스크', icon: '🖥️', maxWidth: '200px' },
+];
+
+// ── Component ─────────────────────────────────────────────────────────────────
 
 export function PharmacyStorePage() {
   const { user } = useAuth();
@@ -107,288 +73,353 @@ export function PharmacyStorePage() {
   const isOwner = isPharmacyOwner(userFeeCategory);
   const roleLabel = isOwner ? '개설약사' : '근무약사';
 
-  // 상태 관리
-  const [selectedTemplate, setSelectedTemplate] = useState(defaultSettings.template);
-  const [selectedTheme, setSelectedTheme] = useState(defaultSettings.theme);
-  const [componentStates, setComponentStates] = useState(defaultSettings.components);
-  const [previewDevice, setPreviewDevice] = useState<'mall' | 'tablet' | 'kiosk'>('mall');
+  // ── Store state ──────────────────────────────────────────────────────────
+  const [slug, setSlug] = useState<string | null>(null);
   const [pharmacyName, setPharmacyName] = useState('내 약국');
-  const [, setConfigLoaded] = useState(false);
-  const [saveState, setSaveState] = useState<SaveState>('idle');
+  const [noStore, setNoStore] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // 서버에서 설정 로드
+  // Settings state
+  const [template, setTemplate] = useState<StoreTemplate>('BASIC');
+  const [theme, setTheme] = useState<StoreTheme>('professional');
+  const [blocks, setBlocks] = useState<StoreBlock[]>([]);
+  const [isDefaultLayout, setIsDefaultLayout] = useState(false);
+
+  // UI state
+  const [previewDevice, setPreviewDevice] = useState<PreviewDevice>('B2C');
+  const [saveState, setSaveState] = useState<SaveState>('idle');
+  const [error, setError] = useState<string | null>(null);
+
+  // ── Load settings ────────────────────────────────────────────────────────
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const data = await getStoreConfig();
+        const resolved = await getStoreSlug();
+        if (!resolved) { setNoStore(true); setLoading(false); return; }
         if (cancelled) return;
-        const cfg = data.storefrontConfig || {};
-        if (cfg.template) setSelectedTemplate(cfg.template as string);
-        if (cfg.theme) setSelectedTheme(cfg.theme as string);
-        if (cfg.components) setComponentStates(prev => ({ ...prev, ...(cfg.components as Record<string, boolean>) }));
-        if (data.organizationName) setPharmacyName(data.organizationName);
-        setConfigLoaded(true);
+        setSlug(resolved);
+
+        const res = await apiClient.get<{
+          success: boolean;
+          data: { storeId: string; slug: string; settings: StoreSettings };
+        }>(`/stores/${encodeURIComponent(resolved)}/settings`);
+
+        if (cancelled) return;
+        if (res.success) {
+          setTemplate(res.data.settings.template);
+          setTheme(res.data.settings.theme);
+          setBlocks(res.data.settings.blocks ?? []);
+          // storefront_blocks가 없어 generateDefaultBlocks에서 나온 경우 isDefault 처리
+          setIsDefaultLayout(res.data.settings.blocks.length === 0);
+        }
       } catch {
-        // 서버 연결 실패 시 기본값 사용
-        setConfigLoaded(true);
+        // fallback: leave defaults
+      } finally {
+        if (!cancelled) setLoading(false);
       }
     })();
     return () => { cancelled = true; };
   }, []);
 
-  // 서버에 설정 저장
-  const handleSave = useCallback(async () => {
-    setSaveState('saving');
-    try {
-      await saveStoreConfig({
-        template: selectedTemplate,
-        theme: selectedTheme,
-        components: componentStates,
-      });
-      setSaveState('saved');
-      setTimeout(() => setSaveState('idle'), 2000);
-    } catch {
-      setSaveState('error');
-      setTimeout(() => setSaveState('idle'), 3000);
-    }
-  }, [selectedTemplate, selectedTheme, componentStates]);
-
-  // 기본값으로 초기화
-  const handleReset = useCallback(() => {
-    setSelectedTemplate(defaultSettings.template);
-    setSelectedTheme(defaultSettings.theme);
-    setComponentStates(defaultSettings.components);
+  // Load pharmacy name separately
+  useEffect(() => {
+    (async () => {
+      try {
+        const { getPharmacyInfo } = await import('../../api/pharmacyInfo');
+        const info = await getPharmacyInfo();
+        if (info?.name) setPharmacyName(info.name);
+      } catch { /* ignore */ }
+    })();
   }, []);
 
-  // 컴포넌트 토글
-  const toggleComponent = (componentId: string) => {
+  // ── Block editing (from LayoutBuilderPage) ────────────────────────────────
+  const moveBlock = (index: number, dir: -1 | 1) => {
     if (!isOwner) return;
-    const component = storeComponents.find(c => c.id === componentId);
-    if (component?.required) return;
-
-    setComponentStates(prev => ({
-      ...prev,
-      [componentId]: !prev[componentId as keyof typeof prev],
-    }));
+    const target = index + dir;
+    if (target < 0 || target >= blocks.length) return;
+    const updated = [...blocks];
+    [updated[index], updated[target]] = [updated[target], updated[index]];
+    setBlocks(updated);
   };
 
-  // 근무약사인 경우 안내
+  const toggleBlock = (index: number) => {
+    if (!isOwner) return;
+    const updated = [...blocks];
+    updated[index] = { ...updated[index], enabled: !updated[index].enabled };
+    setBlocks(updated);
+  };
+
+  const updateBlockConfig = (index: number, key: string, value: number) => {
+    if (!isOwner) return;
+    const updated = [...blocks];
+    updated[index] = { ...updated[index], config: { ...(updated[index].config ?? {}), [key]: value } };
+    setBlocks(updated);
+  };
+
+  const getBlockMeta = (type: StoreBlockType) => {
+    const def = StoreBlockRegistry[type];
+    return def
+      ? { name: def.label, description: def.description, defaultConfig: def.defaultConfig }
+      : { name: type, description: '', defaultConfig: {} };
+  };
+
+  // ── Save ─────────────────────────────────────────────────────────────────
+  const handleSave = useCallback(async () => {
+    if (!slug || saveState === 'saving') return;
+    setSaveState('saving');
+    setError(null);
+    try {
+      await apiClient.patch(`/stores/${encodeURIComponent(slug)}/settings`, {
+        template,
+        theme,
+        blocks,
+      });
+      setSaveState('saved');
+      setIsDefaultLayout(false);
+      setTimeout(() => setSaveState('idle'), 2000);
+    } catch (e: any) {
+      setSaveState('error');
+      setError(e.message || '저장에 실패했습니다');
+      setTimeout(() => setSaveState('idle'), 3000);
+    }
+  }, [slug, template, theme, blocks, saveState]);
+
+  // ── Access denied (근무약사) ──────────────────────────────────────────────
   if (!isOwner) {
     return (
-      <div style={styles.container}>
-        <header style={styles.header}>
-          <Link to="/store" style={styles.backLink}>&larr; 내 매장관리</Link>
-          <h1 style={styles.pageTitle}>매장 설정</h1>
+      <div style={S.container}>
+        <header style={S.header}>
+          <Link to="/store" style={S.backLink}>&larr; 내 매장관리</Link>
+          <h1 style={S.pageTitle}>매장 설정</h1>
         </header>
-        <div style={styles.accessDenied}>
-          <span style={styles.accessDeniedIcon}>🔒</span>
-          <h2 style={styles.accessDeniedTitle}>접근 권한 없음</h2>
-          <p style={styles.accessDeniedText}>
-            매장 설정은 개설약사만 변경할 수 있습니다.
-          </p>
-          <Link to="/store" style={styles.backButton}>
-            돌아가기
-          </Link>
+        <div style={S.accessDenied}>
+          <span style={{ fontSize: '48px', marginBottom: '16px' }}>🔒</span>
+          <h2 style={S.accessDeniedTitle}>접근 권한 없음</h2>
+          <p style={S.accessDeniedText}>매장 설정은 개설약사만 변경할 수 있습니다.</p>
+          <Link to="/store" style={S.backButton}>돌아가기</Link>
         </div>
       </div>
     );
   }
 
-  const enabledCount = Object.values(componentStates).filter(Boolean).length;
-  const totalCount = storeComponents.length;
+  // ── No store ──────────────────────────────────────────────────────────────
+  if (noStore) {
+    return (
+      <div style={S.container}>
+        <header style={S.header}>
+          <Link to="/store" style={S.backLink}>&larr; 내 매장관리</Link>
+          <h1 style={S.pageTitle}>매장 설정</h1>
+        </header>
+        <div style={S.accessDenied}>
+          <span style={{ fontSize: '48px', marginBottom: '16px' }}>🏪</span>
+          <h2 style={S.accessDeniedTitle}>매장이 설정되지 않았습니다</h2>
+          <p style={S.accessDeniedText}>매장 설정을 완료한 후 레이아웃을 관리할 수 있습니다.</p>
+          <Link to="/hub" style={S.backButton}>약국 HUB로 이동</Link>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Loading ───────────────────────────────────────────────────────────────
+  if (loading) {
+    return (
+      <div style={S.container}>
+        <div style={{ textAlign: 'center', padding: '80px 0', color: colors.neutral400 }}>
+          불러오는 중...
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div style={styles.container}>
-      {/* 헤더 */}
-      <header style={styles.header}>
-        <div style={styles.headerContent}>
-          <Link to="/store" style={styles.backLink}>&larr; 내 매장관리</Link>
-          <div style={styles.headerMain}>
-            <div style={styles.pharmacyInfo}>
-              <h1 style={styles.pharmacyName}>{pharmacyName}</h1>
-              <span style={styles.subLabel}>· 매장 설정</span>
+    <div style={S.container}>
+      {/* Header */}
+      <header style={S.header}>
+        <div style={S.headerContent}>
+          <Link to="/store" style={S.backLink}>&larr; 내 매장관리</Link>
+          <div style={S.headerMain}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+              <h1 style={S.pharmacyName}>{pharmacyName}</h1>
+              <span style={S.subLabel}>· 매장 설정</span>
             </div>
-            <div style={styles.roleInfo}>
-              <span style={styles.roleBadge}>{roleLabel}</span>
-            </div>
+            <span style={S.roleBadge}>{roleLabel}</span>
           </div>
         </div>
       </header>
 
-      <div style={styles.mainGrid}>
-        {/* 좌측: 설정 패널 */}
-        <div style={styles.settingsPanel}>
+      {error && (
+        <div style={S.errorBanner}>{error}</div>
+      )}
 
-          {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-           * Section 1: 매장 기본 설정
-           * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-          <div style={styles.sectionGroup}>
-            <div style={styles.sectionGroupHeader}>
-              <span style={styles.sectionGroupIcon}>🏪</span>
-              <h2 style={styles.sectionGroupTitle}>매장 기본 설정</h2>
+      <div style={S.mainGrid}>
+        {/* ── Left: Settings Panel ─────────────────────────────────────── */}
+        <div style={S.settingsPanel}>
+
+          {/* ── Section 1: 레이아웃 블록 편집 ── */}
+          <div style={S.sectionGroup}>
+            <div style={S.sectionGroupHeader}>
+              <span style={S.sectionGroupIcon}>📐</span>
+              <h2 style={S.sectionGroupTitle}>레이아웃 편집</h2>
             </div>
 
-            <section style={styles.section}>
-              <h3 style={styles.sectionTitle}>매장 정보</h3>
-              <div style={styles.infoRow}>
-                <span style={styles.infoLabel}>매장명</span>
-                <span style={styles.infoValue}>{pharmacyName}</span>
-              </div>
-              <div style={styles.infoRow}>
-                <span style={styles.infoLabel}>적용 템플릿</span>
-                <span style={styles.infoValue}>
-                  {templates.find(t => t.id === selectedTemplate)?.name || 'Standard'}
-                </span>
-              </div>
-              <div style={styles.infoRow}>
-                <span style={styles.infoLabel}>적용 테마</span>
-                <span style={styles.infoValue}>
-                  {themes.find(t => t.id === selectedTheme)?.name || '기본'}
-                </span>
-              </div>
-            </section>
+            <section style={S.section}>
+              <h3 style={S.sectionTitle}>블록 구성</h3>
+              <p style={S.sectionDesc}>블록 순서를 변경하거나 표시 여부를 설정합니다.</p>
 
-            <section style={styles.section}>
-              <h3 style={styles.sectionTitle}>디바이스 미리보기</h3>
-              <p style={styles.sectionDesc}>매장이 노출되는 디바이스 채널입니다.</p>
-              <div style={styles.deviceList}>
-                {devices.map(device => (
-                  <div key={device.id} style={styles.deviceCard}>
-                    <span style={styles.deviceCardIcon}>{device.icon}</span>
-                    <div>
-                      <span style={styles.deviceCardName}>{device.name}</span>
-                      <span style={styles.deviceCardDesc}>{device.description}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          </div>
+              {isDefaultLayout && (
+                <div style={S.infoNotice}>
+                  기본 템플릿 레이아웃을 사용 중입니다. 변경 후 저장하면 커스텀 레이아웃이 적용됩니다.
+                </div>
+              )}
 
-          {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-           * Section 2: 서비스 관리
-           * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-          <div style={styles.sectionGroup}>
-            <div style={styles.sectionGroupHeader}>
-              <span style={styles.sectionGroupIcon}>🔧</span>
-              <div>
-                <h2 style={styles.sectionGroupTitle}>서비스 관리</h2>
-                <span style={styles.sectionGroupMeta}>{enabledCount}/{totalCount} 활성</span>
-              </div>
-            </div>
+              {blocks.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '32px 0', color: colors.neutral400, fontSize: '14px' }}>
+                  블록 정보를 불러오는 중...
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {blocks.map((block, index) => {
+                    const meta = getBlockMeta(block.type);
+                    const hasLimitConfig = block.type === 'PRODUCT_GRID' || block.type === 'BLOG_LIST';
+                    const defaultLimit = (meta.defaultConfig as any).limit;
 
-            <section style={styles.section}>
-              <h3 style={styles.sectionTitle}>컴포넌트 표시 설정</h3>
-              <p style={styles.sectionDesc}>매장에 표시할 서비스 영역을 선택합니다. 필수 항목은 변경할 수 없습니다.</p>
-              <div style={styles.componentList}>
-                {storeComponents.map(component => (
-                  <div
-                    key={component.id}
-                    style={{
-                      ...styles.componentItem,
-                      opacity: component.required ? 0.7 : 1,
-                    }}
-                  >
-                    <div style={styles.componentInfo}>
-                      <div style={styles.componentNameRow}>
-                        <span style={styles.componentName}>{component.name}</span>
-                        {component.required && (
-                          <span style={styles.requiredBadge}>필수</span>
+                    return (
+                      <div
+                        key={block.type}
+                        style={{
+                          ...S.blockItem,
+                          backgroundColor: block.enabled ? colors.white : colors.neutral50,
+                          borderColor: block.enabled ? colors.neutral200 : colors.neutral100,
+                          opacity: block.enabled ? 1 : 0.6,
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          {/* Move buttons */}
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                            <button
+                              onClick={() => moveBlock(index, -1)}
+                              disabled={index === 0}
+                              style={{ ...S.arrowBtn, opacity: index === 0 ? 0.3 : 1 }}
+                            >▲</button>
+                            <button
+                              onClick={() => moveBlock(index, 1)}
+                              disabled={index === blocks.length - 1}
+                              style={{ ...S.arrowBtn, opacity: index === blocks.length - 1 ? 0.3 : 1 }}
+                            >▼</button>
+                          </div>
+
+                          {/* Block info */}
+                          <div style={{ flex: 1 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
+                              <span style={{ fontSize: '14px', fontWeight: 600, color: colors.neutral800 }}>{meta.name}</span>
+                              <span style={{ fontSize: '11px', color: colors.neutral400, fontFamily: 'monospace' }}>{block.type}</span>
+                            </div>
+                            <p style={{ fontSize: '13px', color: colors.neutral500, margin: 0 }}>{meta.description}</p>
+                          </div>
+
+                          {/* Toggle */}
+                          <button
+                            onClick={() => toggleBlock(index)}
+                            style={{
+                              width: '48px', height: '28px', borderRadius: '14px',
+                              border: 'none',
+                              backgroundColor: block.enabled ? colors.primary : colors.neutral300,
+                              cursor: 'pointer', position: 'relative', transition: 'background-color 0.2s',
+                              flexShrink: 0,
+                            }}
+                          >
+                            <div style={{
+                              width: '22px', height: '22px', borderRadius: '50%',
+                              backgroundColor: colors.white,
+                              position: 'absolute', top: '3px',
+                              left: block.enabled ? '23px' : '3px',
+                              transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
+                            }} />
+                          </button>
+                        </div>
+
+                        {/* Limit config */}
+                        {hasLimitConfig && block.enabled && (
+                          <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: `1px solid ${colors.neutral100}`, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <label style={{ fontSize: '13px', color: colors.neutral600 }}>표시 개수:</label>
+                            <input
+                              type="number"
+                              min={1}
+                              max={12}
+                              value={block.config?.limit ?? defaultLimit ?? 4}
+                              onChange={(e) => updateBlockConfig(index, 'limit', Math.max(1, Math.min(12, parseInt(e.target.value) || 1)))}
+                              style={{
+                                width: '60px', padding: '4px 8px', borderRadius: '6px',
+                                border: `1px solid ${colors.neutral200}`,
+                                fontSize: '13px', textAlign: 'center',
+                              }}
+                            />
+                          </div>
                         )}
-                        <span style={{
-                          ...styles.statusBadge,
-                          backgroundColor: componentStates[component.id as keyof typeof componentStates]
-                            ? '#dcfce7' : '#f1f5f9',
-                          color: componentStates[component.id as keyof typeof componentStates]
-                            ? '#16a34a' : '#94a3b8',
-                        }}>
-                          {componentStates[component.id as keyof typeof componentStates] ? '활성' : '비활성'}
-                        </span>
                       </div>
-                      <span style={styles.componentDesc}>{component.description}</span>
-                    </div>
-                    <button
-                      style={{
-                        ...styles.toggleButton,
-                        backgroundColor: componentStates[component.id as keyof typeof componentStates]
-                          ? colors.primary
-                          : colors.neutral300,
-                      }}
-                      onClick={() => toggleComponent(component.id)}
-                      disabled={component.required}
-                    >
-                      <span style={{
-                        ...styles.toggleKnob,
-                        transform: componentStates[component.id as keyof typeof componentStates]
-                          ? 'translateX(20px)'
-                          : 'translateX(0)',
-                      }} />
-                    </button>
-                  </div>
-                ))}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
             </section>
           </div>
 
-          {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-           * Section 3: 디자인 관리
-           * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-          <div style={styles.sectionGroup}>
-            <div style={styles.sectionGroupHeader}>
-              <span style={styles.sectionGroupIcon}>🎨</span>
-              <h2 style={styles.sectionGroupTitle}>디자인 관리</h2>
+          {/* ── Section 2: 디자인 설정 ── */}
+          <div style={S.sectionGroup}>
+            <div style={S.sectionGroupHeader}>
+              <span style={S.sectionGroupIcon}>🎨</span>
+              <h2 style={S.sectionGroupTitle}>디자인 설정</h2>
             </div>
 
-            {/* 템플릿 선택 */}
-            <section style={styles.section}>
-              <h3 style={styles.sectionTitle}>레이아웃 템플릿</h3>
-              <p style={styles.sectionDesc}>페이지 레이아웃과 컴포넌트 배치 구조를 선택합니다.</p>
-              <div style={styles.templateGrid}>
-                {templates.map(template => (
+            {/* Template */}
+            <section style={S.section}>
+              <h3 style={S.sectionTitle}>레이아웃 템플릿</h3>
+              <p style={S.sectionDesc}>기본 블록 구성 구조를 선택합니다. 변경 시 블록 목록이 재설정됩니다.</p>
+              <div style={S.templateGrid}>
+                {TEMPLATES.map(t => (
                   <div
-                    key={template.id}
+                    key={t.id}
                     style={{
-                      ...styles.templateCard,
-                      borderColor: selectedTemplate === template.id ? colors.primary : colors.neutral200,
-                      backgroundColor: selectedTemplate === template.id ? colors.primary + '08' : colors.white,
+                      ...S.templateCard,
+                      borderColor: template === t.id ? colors.primary : colors.neutral200,
+                      backgroundColor: template === t.id ? colors.primary + '08' : colors.white,
                     }}
-                    onClick={() => setSelectedTemplate(template.id)}
+                    onClick={() => isOwner && setTemplate(t.id)}
                   >
-                    <div style={styles.templatePreview}>{template.preview}</div>
-                    <div style={styles.templateInfo}>
-                      <h4 style={styles.templateName}>{template.name}</h4>
-                      <p style={styles.templateDesc}>{template.description}</p>
+                    <div style={S.templateInfo}>
+                      <h4 style={S.templateName}>{t.name}</h4>
+                      <p style={S.templateDesc}>{t.description}</p>
                     </div>
-                    {selectedTemplate === template.id && (
-                      <span style={styles.selectedBadge}>선택됨</span>
+                    {template === t.id && (
+                      <span style={S.selectedBadge}>선택됨</span>
                     )}
                   </div>
                 ))}
               </div>
             </section>
 
-            {/* 테마 선택 */}
-            <section style={styles.section}>
-              <h3 style={styles.sectionTitle}>테마 · 컬러</h3>
-              <p style={styles.sectionDesc}>색상과 스타일을 선택합니다. 즉시 미리보기에 반영됩니다.</p>
-              <div style={styles.themeGrid}>
-                {themes.map(theme => (
+            {/* Theme */}
+            <section style={S.section}>
+              <h3 style={S.sectionTitle}>테마 · 컬러</h3>
+              <p style={S.sectionDesc}>색상과 스타일을 선택합니다.</p>
+              <div style={S.themeGrid}>
+                {THEMES.map(t => (
                   <div
-                    key={theme.id}
+                    key={t.id}
                     style={{
-                      ...styles.themeCard,
-                      borderColor: selectedTheme === theme.id ? theme.primaryColor : colors.neutral200,
+                      ...S.themeCard,
+                      borderColor: theme === t.id ? t.primaryColor : colors.neutral200,
                     }}
-                    onClick={() => setSelectedTheme(theme.id)}
+                    onClick={() => isOwner && setTheme(t.id)}
                   >
-                    <div style={styles.themeColors}>
-                      <span style={{ ...styles.colorDot, backgroundColor: theme.primaryColor }} />
-                      <span style={{ ...styles.colorDot, backgroundColor: theme.accentColor }} />
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      <span style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: t.primaryColor, display: 'block' }} />
+                      <span style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: t.accentColor, display: 'block' }} />
                     </div>
-                    <span style={styles.themeName}>{theme.name}</span>
-                    {selectedTheme === theme.id && (
-                      <span style={styles.themeCheck}>✓</span>
+                    <span style={{ fontSize: '0.875rem', fontWeight: 500, color: colors.neutral700 }}>{t.name}</span>
+                    {theme === t.id && (
+                      <span style={S.themeCheck}>✓</span>
                     )}
                   </div>
                 ))}
@@ -397,121 +428,89 @@ export function PharmacyStorePage() {
           </div>
         </div>
 
-        {/* 우측: 미리보기 패널 */}
-        <div style={styles.previewPanel}>
-          <div style={styles.previewHeader}>
-            <h2 style={styles.previewTitle}>미리보기</h2>
-            <div style={styles.deviceTabs}>
-              {devices.map(device => (
+        {/* ── Right: Preview Panel ──────────────────────────────────────── */}
+        <div style={S.previewPanel}>
+          {/* Device tabs */}
+          <div style={S.previewHeader}>
+            <h2 style={S.previewTitle}>미리보기</h2>
+            <div style={{ display: 'flex', gap: '6px' }}>
+              {DEVICES.map(d => (
                 <button
-                  key={device.id}
+                  key={d.id}
                   style={{
-                    ...styles.deviceTab,
-                    backgroundColor: previewDevice === device.id ? colors.primary : colors.white,
-                    color: previewDevice === device.id ? colors.white : colors.neutral600,
+                    ...S.deviceTab,
+                    backgroundColor: previewDevice === d.id ? colors.primary : colors.white,
+                    color: previewDevice === d.id ? colors.white : colors.neutral600,
                   }}
-                  onClick={() => setPreviewDevice(device.id as typeof previewDevice)}
+                  onClick={() => setPreviewDevice(d.id)}
                 >
-                  <span style={styles.deviceTabIcon}>{device.icon}</span>
-                  <span>{device.name}</span>
+                  <span style={{ fontSize: '1rem' }}>{d.icon}</span>
+                  <span>{d.name}</span>
                 </button>
               ))}
             </div>
           </div>
 
-          <div style={styles.previewFrame}>
-            <div style={{
-              ...styles.previewContent,
-              ...(previewDevice === 'tablet' ? styles.tabletFrame : {}),
-              ...(previewDevice === 'kiosk' ? styles.kioskFrame : {}),
-            }}>
-              <div style={styles.mockScreen}>
-                <div style={{
-                  ...styles.mockHeader,
-                  backgroundColor: themes.find(t => t.id === selectedTheme)?.primaryColor,
-                }}>
-                  <span style={styles.mockLogo}>💊 {pharmacyName}</span>
-                </div>
-                <div style={styles.mockBody}>
-                  {componentStates.banner && (
-                    <div style={styles.mockBanner}>
-                      <span>🏷️ 배너 영역</span>
-                    </div>
-                  )}
-                  {componentStates.categories && (
-                    <div style={styles.mockSection}>
-                      <span>📂 카테고리</span>
-                    </div>
-                  )}
-                  {componentStates.featured && (
-                    <div style={styles.mockSection}>
-                      <span>⭐ 추천 상품</span>
-                    </div>
-                  )}
-                  {componentStates.promotion && (
-                    <div style={styles.mockSection}>
-                      <span>🎁 프로모션</span>
-                    </div>
-                  )}
-                  {componentStates['best-sellers'] && (
-                    <div style={styles.mockSection}>
-                      <span>🔥 베스트셀러</span>
-                    </div>
-                  )}
-                  {componentStates['pharmacy-info'] && (
-                    <div style={styles.mockSection}>
-                      <span>🏥 약국 소개</span>
-                    </div>
-                  )}
-                </div>
-                <div style={styles.mockFooter}>
-                  <span style={styles.mockTemplateLabel}>
-                    {templates.find(t => t.id === selectedTemplate)?.name} 템플릿
-                  </span>
-                </div>
+          {/* iframe preview */}
+          <div style={S.previewFrame}>
+            {slug ? (
+              <div style={{ maxWidth: DEVICES.find(d => d.id === previewDevice)?.maxWidth ?? '100%', margin: '0 auto', overflow: 'hidden', borderRadius: '8px', border: `1px solid ${colors.neutral200}` }}>
+                <iframe
+                  key={`${slug}-${previewDevice}`}
+                  src={`/store/${encodeURIComponent(slug)}`}
+                  title="매장 미리보기"
+                  style={{
+                    width: '100%',
+                    height: '500px',
+                    border: 'none',
+                    display: 'block',
+                  }}
+                />
               </div>
-            </div>
+            ) : (
+              <div style={{ textAlign: 'center', padding: '48px 0', color: colors.neutral400, fontSize: '14px' }}>
+                슬러그가 설정되지 않아 미리보기를 표시할 수 없습니다.
+              </div>
+            )}
           </div>
 
-          {/* 저장 버튼 */}
-          <div style={styles.actionButtons}>
+          {/* Open in new tab */}
+          {slug && (
+            <div style={{ textAlign: 'center' }}>
+              <a
+                href={`/store/${encodeURIComponent(slug)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ fontSize: '13px', color: colors.primary, textDecoration: 'none' }}
+              >
+                새 탭에서 매장 열기 →
+              </a>
+            </div>
+          )}
+
+          {/* Save buttons */}
+          <div style={S.actionButtons}>
             <button
               style={{
-                ...styles.saveButton,
+                ...S.saveButton,
                 opacity: saveState === 'saving' ? 0.7 : 1,
               }}
               onClick={handleSave}
-              disabled={saveState === 'saving'}
+              disabled={saveState === 'saving' || !slug}
             >
               {saveState === 'saving' ? '저장 중...' :
                saveState === 'saved' ? '저장 완료' :
                saveState === 'error' ? '저장 실패 — 다시 시도' :
                '변경사항 저장'}
             </button>
-            <button style={styles.resetButton} onClick={handleReset}>
-              기본값으로 초기화
-            </button>
           </div>
 
-          {/* 표준 vs 유료 안내 */}
-          <div style={styles.boundaryNotice}>
-            <div style={styles.boundaryCol}>
-              <h4 style={styles.boundaryTitle}>✅ 표준 범위</h4>
-              <ul style={styles.boundaryList}>
-                <li>템플릿 선택</li>
-                <li>테마 선택</li>
-                <li>컴포넌트 표시/숨김</li>
-              </ul>
-            </div>
-            <div style={styles.boundaryDivider} />
-            <div style={styles.boundaryCol}>
-              <h4 style={styles.boundaryTitlePaid}>💎 유료 커스텀</h4>
-              <ul style={styles.boundaryList}>
-                <li>템플릿 구조 변경</li>
-                <li>브랜드 전용 UI</li>
-              </ul>
-              <button style={styles.inquiryButton}>문의 →</button>
-            </div>
+          {/* Info notice */}
+          <div style={S.boundaryNotice}>
+            <p style={{ margin: 0, fontSize: '12px', color: colors.neutral500, lineHeight: 1.6 }}>
+              블록 순서·활성화, 템플릿, 테마를 저장하면 실제 매장에 즉시 반영됩니다.
+              채널 설정(B2C·태블릿·키오스크 승인)은 운영자에게 문의하세요.
+            </p>
           </div>
         </div>
       </div>
@@ -519,59 +518,21 @@ export function PharmacyStorePage() {
   );
 }
 
-const styles: Record<string, React.CSSProperties> = {
+// ── Styles ────────────────────────────────────────────────────────────────────
+
+const S: Record<string, React.CSSProperties> = {
   container: {
     maxWidth: '1400px',
     margin: '0 auto',
     padding: '24px',
   },
-
-  // Header
-  header: {
-    marginBottom: '24px',
-  },
-  headerContent: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '12px',
-  },
-  backLink: {
-    color: colors.primary,
-    textDecoration: 'none',
-    fontSize: '0.875rem',
-    fontWeight: 500,
-  },
-  headerMain: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  pharmacyInfo: {
-    display: 'flex',
-    alignItems: 'baseline',
-    gap: '8px',
-  },
-  pharmacyName: {
-    fontSize: '1.5rem',
-    fontWeight: 700,
-    color: colors.neutral900,
-    margin: 0,
-  },
-  pageTitle: {
-    fontSize: '1.5rem',
-    fontWeight: 700,
-    color: colors.neutral900,
-    margin: 0,
-  },
-  subLabel: {
-    fontSize: '1rem',
-    color: colors.neutral500,
-    fontWeight: 500,
-  },
-  roleInfo: {
-    display: 'flex',
-    alignItems: 'center',
-  },
+  header: { marginBottom: '24px' },
+  headerContent: { display: 'flex', flexDirection: 'column', gap: '12px' },
+  backLink: { color: colors.primary, textDecoration: 'none', fontSize: '0.875rem', fontWeight: 500 },
+  headerMain: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
+  pharmacyName: { fontSize: '1.5rem', fontWeight: 700, color: colors.neutral900, margin: 0 },
+  pageTitle: { fontSize: '1.5rem', fontWeight: 700, color: colors.neutral900, margin: 0 },
+  subLabel: { fontSize: '1rem', color: colors.neutral500, fontWeight: 500 },
   roleBadge: {
     padding: '4px 12px',
     backgroundColor: colors.primary + '15',
@@ -580,31 +541,12 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '0.75rem',
     fontWeight: 600,
   },
-
-  // Access Denied
   accessDenied: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '80px 40px',
-    textAlign: 'center',
+    display: 'flex', flexDirection: 'column', alignItems: 'center',
+    justifyContent: 'center', padding: '80px 40px', textAlign: 'center',
   },
-  accessDeniedIcon: {
-    fontSize: '48px',
-    marginBottom: '16px',
-  },
-  accessDeniedTitle: {
-    fontSize: '1.25rem',
-    fontWeight: 600,
-    color: colors.neutral800,
-    margin: '0 0 8px',
-  },
-  accessDeniedText: {
-    fontSize: '0.9375rem',
-    color: colors.neutral500,
-    margin: '0 0 24px',
-  },
+  accessDeniedTitle: { fontSize: '1.25rem', fontWeight: 600, color: colors.neutral800, margin: '0 0 8px' },
+  accessDeniedText: { fontSize: '0.9375rem', color: colors.neutral500, margin: '0 0 24px' },
   backButton: {
     padding: '10px 24px',
     backgroundColor: colors.primary,
@@ -614,462 +556,118 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '0.875rem',
     fontWeight: 500,
   },
-
-  // Main Grid
+  errorBanner: {
+    padding: '12px 16px',
+    backgroundColor: '#fef2f2',
+    border: '1px solid #fecaca',
+    borderRadius: '8px',
+    color: '#dc2626',
+    fontSize: '14px',
+    marginBottom: '16px',
+  },
   mainGrid: {
     display: 'grid',
     gridTemplateColumns: '1fr 400px',
     gap: '24px',
-    marginBottom: '32px',
   },
-
-  // Settings Panel
-  settingsPanel: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '32px',
-  },
-
-  // Section Group (3-section structure)
-  sectionGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '16px',
-  },
+  settingsPanel: { display: 'flex', flexDirection: 'column', gap: '32px' },
+  sectionGroup: { display: 'flex', flexDirection: 'column', gap: '16px' },
   sectionGroupHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    paddingBottom: '12px',
-    borderBottom: `2px solid ${colors.neutral200}`,
+    display: 'flex', alignItems: 'center', gap: '10px',
+    paddingBottom: '12px', borderBottom: `2px solid ${colors.neutral200}`,
   },
-  sectionGroupIcon: {
-    fontSize: '1.25rem',
-  },
-  sectionGroupTitle: {
-    fontSize: '1.125rem',
-    fontWeight: 700,
-    color: colors.neutral900,
-    margin: 0,
-  },
-  sectionGroupMeta: {
-    fontSize: '0.75rem',
-    color: colors.neutral500,
-    fontWeight: 500,
-  },
-
-  // Section Card
+  sectionGroupIcon: { fontSize: '1.25rem' },
+  sectionGroupTitle: { fontSize: '1.125rem', fontWeight: 700, color: colors.neutral900, margin: 0 },
   section: {
     backgroundColor: colors.white,
     borderRadius: borderRadius.lg,
     boxShadow: shadows.sm,
     padding: '24px',
   },
-  sectionTitle: {
-    fontSize: '1rem',
-    fontWeight: 600,
-    color: colors.neutral800,
-    margin: '0 0 4px',
+  sectionTitle: { fontSize: '1rem', fontWeight: 600, color: colors.neutral800, margin: '0 0 4px' },
+  sectionDesc: { fontSize: '0.875rem', color: colors.neutral500, margin: '0 0 16px' },
+  infoNotice: {
+    padding: '8px 12px',
+    backgroundColor: '#fffbeb',
+    border: '1px solid #fde68a',
+    borderRadius: '8px',
+    fontSize: '13px',
+    color: '#92400e',
+    marginBottom: '16px',
   },
-  sectionDesc: {
-    fontSize: '0.875rem',
-    color: colors.neutral500,
-    margin: '0 0 16px',
-  },
-
-  // Info Rows (매장 기본 설정)
-  infoRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '10px 0',
-    borderBottom: `1px solid ${colors.neutral100}`,
-  },
-  infoLabel: {
-    fontSize: '0.875rem',
-    color: colors.neutral500,
-  },
-  infoValue: {
-    fontSize: '0.875rem',
-    fontWeight: 500,
-    color: colors.neutral800,
-  },
-
-  // Device List
-  deviceList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
-  },
-  deviceCard: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    padding: '12px',
-    backgroundColor: colors.neutral50,
-    borderRadius: borderRadius.md,
-  },
-  deviceCardIcon: {
-    fontSize: '1.25rem',
-  },
-  deviceCardName: {
-    display: 'block',
-    fontSize: '0.875rem',
-    fontWeight: 500,
-    color: colors.neutral800,
-  },
-  deviceCardDesc: {
-    display: 'block',
-    fontSize: '0.75rem',
-    color: colors.neutral500,
-  },
-
-  // Template Grid
-  templateGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, 1fr)',
-    gap: '12px',
-  },
-  templateCard: {
-    position: 'relative',
+  blockItem: {
     padding: '16px',
-    border: '2px solid',
-    borderRadius: borderRadius.md,
-    cursor: 'pointer',
-    transition: 'all 0.2s',
+    border: '1px solid',
+    borderRadius: '12px',
+    transition: 'all 0.15s',
   },
-  templatePreview: {
-    fontSize: '32px',
-    marginBottom: '12px',
+  arrowBtn: {
+    width: '28px', height: '22px', borderRadius: '4px',
+    border: `1px solid ${colors.neutral200}`, backgroundColor: colors.white,
+    cursor: 'pointer', fontSize: '10px',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    color: colors.neutral500,
+  },
+  templateGrid: { display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' },
+  templateCard: {
+    position: 'relative', padding: '16px', border: '2px solid',
+    borderRadius: borderRadius.md, cursor: 'pointer', transition: 'all 0.2s',
   },
   templateInfo: {},
-  templateName: {
-    fontSize: '1rem',
-    fontWeight: 600,
-    color: colors.neutral800,
-    margin: 0,
-  },
-  templateDesc: {
-    fontSize: '0.8125rem',
-    color: colors.neutral500,
-    margin: '4px 0 0',
-  },
+  templateName: { fontSize: '1rem', fontWeight: 600, color: colors.neutral800, margin: 0 },
+  templateDesc: { fontSize: '0.8125rem', color: colors.neutral500, margin: '4px 0 0' },
   selectedBadge: {
-    position: 'absolute',
-    top: '8px',
-    right: '8px',
-    padding: '2px 8px',
-    backgroundColor: colors.primary,
-    color: colors.white,
-    borderRadius: '10px',
-    fontSize: '0.6875rem',
-    fontWeight: 600,
+    position: 'absolute', top: '8px', right: '8px',
+    padding: '2px 8px', backgroundColor: colors.primary, color: colors.white,
+    borderRadius: '10px', fontSize: '0.6875rem', fontWeight: 600,
   },
-
-  // Theme Grid
-  themeGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
-    gap: '12px',
-  },
+  themeGrid: { display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' },
   themeCard: {
-    position: 'relative',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '8px',
-    padding: '16px',
-    border: '2px solid',
-    borderRadius: borderRadius.md,
-    cursor: 'pointer',
-    transition: 'all 0.2s',
-  },
-  themeColors: {
-    display: 'flex',
-    gap: '6px',
-  },
-  colorDot: {
-    width: '24px',
-    height: '24px',
-    borderRadius: '50%',
-  },
-  themeName: {
-    fontSize: '0.875rem',
-    fontWeight: 500,
-    color: colors.neutral700,
+    position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center',
+    gap: '8px', padding: '16px', border: '2px solid', borderRadius: borderRadius.md,
+    cursor: 'pointer', transition: 'all 0.2s',
   },
   themeCheck: {
-    position: 'absolute',
-    top: '4px',
-    right: '4px',
-    width: '20px',
-    height: '20px',
-    backgroundColor: colors.primary,
-    color: colors.white,
-    borderRadius: '50%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '0.75rem',
-    fontWeight: 600,
+    position: 'absolute', top: '4px', right: '4px',
+    width: '20px', height: '20px', backgroundColor: colors.primary, color: colors.white,
+    borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+    fontSize: '0.75rem', fontWeight: 600,
   },
-
-  // Component List
-  componentList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '12px',
-  },
-  componentItem: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '12px 16px',
-    backgroundColor: colors.neutral50,
-    borderRadius: borderRadius.md,
-  },
-  componentInfo: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '2px',
-  },
-  componentNameRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-  },
-  componentName: {
-    fontSize: '0.9375rem',
-    fontWeight: 500,
-    color: colors.neutral800,
-  },
-  componentDesc: {
-    fontSize: '0.75rem',
-    color: colors.neutral500,
-  },
-  requiredBadge: {
-    display: 'inline-block',
-    padding: '1px 6px',
-    backgroundColor: colors.warning + '20',
-    color: colors.warning,
-    borderRadius: '4px',
-    fontSize: '0.625rem',
-    fontWeight: 500,
-  },
-  statusBadge: {
-    display: 'inline-block',
-    padding: '1px 6px',
-    borderRadius: '4px',
-    fontSize: '0.625rem',
-    fontWeight: 500,
-  },
-  toggleButton: {
-    position: 'relative',
-    width: '44px',
-    height: '24px',
-    borderRadius: '12px',
-    border: 'none',
-    cursor: 'pointer',
-    transition: 'background-color 0.2s',
-    flexShrink: 0,
-  },
-  toggleKnob: {
-    position: 'absolute',
-    top: '2px',
-    left: '2px',
-    width: '20px',
-    height: '20px',
-    backgroundColor: colors.white,
-    borderRadius: '50%',
-    transition: 'transform 0.2s',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
-  },
-
-  // Preview Panel
   previewPanel: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '16px',
-    position: 'sticky',
-    top: '100px',
-    height: 'fit-content',
+    display: 'flex', flexDirection: 'column', gap: '16px',
+    position: 'sticky', top: '100px', height: 'fit-content',
   },
   previewHeader: {
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.lg,
-    boxShadow: shadows.sm,
-    padding: '20px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '12px',
+    backgroundColor: colors.white, borderRadius: borderRadius.lg,
+    boxShadow: shadows.sm, padding: '20px',
+    display: 'flex', flexDirection: 'column', gap: '12px',
   },
-  previewTitle: {
-    fontSize: '1.125rem',
-    fontWeight: 600,
-    color: colors.neutral800,
-    margin: 0,
-  },
-  deviceTabs: {
-    display: 'flex',
-    gap: '8px',
-  },
+  previewTitle: { fontSize: '1.125rem', fontWeight: 600, color: colors.neutral800, margin: 0 },
   deviceTab: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '8px 12px',
-    border: `1px solid ${colors.neutral200}`,
-    borderRadius: borderRadius.md,
-    fontSize: '0.8125rem',
-    cursor: 'pointer',
+    display: 'flex', alignItems: 'center', gap: '6px',
+    padding: '8px 10px', border: `1px solid ${colors.neutral200}`,
+    borderRadius: borderRadius.md, fontSize: '0.8125rem', cursor: 'pointer',
     transition: 'all 0.2s',
   },
-  deviceTabIcon: {
-    fontSize: '1rem',
-  },
   previewFrame: {
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.lg,
-    boxShadow: shadows.sm,
-    padding: '16px',
-  },
-  previewContent: {
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.sm,
+    backgroundColor: colors.white, borderRadius: borderRadius.lg,
+    boxShadow: shadows.sm, padding: '16px',
     overflow: 'hidden',
-    border: `1px solid ${colors.neutral200}`,
   },
-  tabletFrame: {
-    maxWidth: '280px',
-    margin: '0 auto',
-  },
-  kioskFrame: {
-    maxWidth: '200px',
-    margin: '0 auto',
-    minHeight: '300px',
-  },
-
-  // Mock Screen
-  mockScreen: {
-    display: 'flex',
-    flexDirection: 'column',
-    minHeight: '280px',
-  },
-  mockHeader: {
-    padding: '12px 16px',
-    color: colors.white,
-  },
-  mockLogo: {
-    fontSize: '0.875rem',
-    fontWeight: 600,
-  },
-  mockBody: {
-    flex: 1,
-    padding: '12px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
-  },
-  mockBanner: {
-    padding: '20px',
-    backgroundColor: colors.neutral100,
-    borderRadius: borderRadius.sm,
-    textAlign: 'center',
-    fontSize: '0.8125rem',
-    color: colors.neutral600,
-  },
-  mockSection: {
-    padding: '12px',
-    backgroundColor: colors.neutral50,
-    borderRadius: borderRadius.sm,
-    fontSize: '0.75rem',
-    color: colors.neutral500,
-  },
-  mockFooter: {
-    padding: '8px 12px',
-    backgroundColor: colors.neutral50,
-    borderTop: `1px solid ${colors.neutral100}`,
-    textAlign: 'center',
-  },
-  mockTemplateLabel: {
-    fontSize: '0.6875rem',
-    color: colors.neutral400,
-  },
-
-  // Action Buttons
   actionButtons: {
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.lg,
-    boxShadow: shadows.sm,
-    padding: '16px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
+    backgroundColor: colors.white, borderRadius: borderRadius.lg,
+    boxShadow: shadows.sm, padding: '16px',
   },
   saveButton: {
-    padding: '12px',
-    backgroundColor: colors.primary,
-    color: colors.white,
-    border: 'none',
-    borderRadius: borderRadius.md,
-    fontSize: '0.9375rem',
-    fontWeight: 500,
-    cursor: 'pointer',
+    width: '100%', padding: '12px',
+    backgroundColor: colors.primary, color: colors.white,
+    border: 'none', borderRadius: borderRadius.md,
+    fontSize: '0.9375rem', fontWeight: 500, cursor: 'pointer',
   },
-  resetButton: {
-    padding: '12px',
-    backgroundColor: 'transparent',
-    color: colors.neutral600,
-    border: `1px solid ${colors.neutral300}`,
-    borderRadius: borderRadius.md,
-    fontSize: '0.875rem',
-    cursor: 'pointer',
-  },
-
-  // Boundary Notice
   boundaryNotice: {
-    display: 'flex',
-    gap: '16px',
-    padding: '16px',
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.lg,
-    boxShadow: shadows.sm,
-  },
-  boundaryCol: {
-    flex: 1,
-  },
-  boundaryDivider: {
-    width: '1px',
-    backgroundColor: colors.neutral200,
-  },
-  boundaryTitle: {
-    fontSize: '0.8125rem',
-    fontWeight: 600,
-    color: colors.success,
-    margin: '0 0 8px',
-  },
-  boundaryTitlePaid: {
-    fontSize: '0.8125rem',
-    fontWeight: 600,
-    color: colors.warning,
-    margin: '0 0 8px',
-  },
-  boundaryList: {
-    margin: 0,
-    paddingLeft: '16px',
-    fontSize: '0.75rem',
-    color: colors.neutral600,
-    lineHeight: 1.8,
-  },
-  inquiryButton: {
-    marginTop: '8px',
-    padding: '6px 12px',
-    backgroundColor: colors.warning + '15',
-    color: colors.warning,
-    border: `1px solid ${colors.warning}`,
-    borderRadius: borderRadius.md,
-    fontSize: '0.75rem',
-    fontWeight: 500,
-    cursor: 'pointer',
+    backgroundColor: colors.white, borderRadius: borderRadius.lg,
+    boxShadow: shadows.sm, padding: '16px',
   },
 };
+
+export default PharmacyStorePage;
