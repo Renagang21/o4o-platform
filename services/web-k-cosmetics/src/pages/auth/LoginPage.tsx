@@ -113,29 +113,28 @@ export default function LoginPage() {
           </button>
         </form>
 
-        {/* 테스트 계정 자동입력 — 매장 경영자 */}
-        <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center' }}>
-          {[
-            { label: '매장 경영자', email: 'phamacy1@o4o.com', password: 'O4oTestPass@1' },
-          ].map((acct) => (
-            <button
-              key={acct.email}
-              type="button"
-              onClick={() => { setEmail(acct.email); setPassword(acct.password); setError(null); }}
-              style={{
-                padding: '6px 16px',
-                fontSize: '12px',
-                fontWeight: 500,
-                color: '#475569',
-                backgroundColor: '#f1f5f9',
-                border: '1px solid #e2e8f0',
-                borderRadius: '8px',
-                cursor: 'pointer',
-              }}
-            >
-              {acct.label}
-            </button>
-          ))}
+        {/* 테스트 계정 빠른 로그인 */}
+        <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px dashed #e2e8f0' }}>
+          <p style={{ textAlign: 'center', fontSize: '12px', color: '#94a3b8', marginBottom: '10px' }}>테스트 계정</p>
+          <button
+            type="button"
+            disabled={loading}
+            onClick={() => { setEmail('phamacy1@o4o.com'); setPassword('O4oTestPass@1'); setError(null); }}
+            style={{
+              width: '100%',
+              padding: '8px',
+              fontSize: '13px',
+              fontWeight: 500,
+              color: '#475569',
+              backgroundColor: '#f8fafc',
+              border: '1px solid #e2e8f0',
+              borderRadius: '8px',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              opacity: loading ? 0.5 : 1,
+            }}
+          >
+            매장 경영자 로그인
+          </button>
         </div>
 
         <div style={styles.footer}>
