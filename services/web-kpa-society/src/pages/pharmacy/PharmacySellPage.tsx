@@ -722,60 +722,84 @@ function ChannelSettingsPanel({ listingId, onClose }: { listingId: string; onClo
                   채널 승인 후 설정 가능합니다
                 </p>
               ) : (
-                <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
-                  {/* Visibility Toggle */}
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.85rem', cursor: 'pointer' }}>
-                    <input
-                      type="checkbox"
-                      checked={ch.isVisible}
-                      onChange={() => handleToggleVisible(idx)}
-                      style={{ width: 16, height: 16 }}
-                    />
-                    노출
-                  </label>
+                <>
+                  <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
+                    {/* Visibility Toggle */}
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.85rem', cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={ch.isVisible}
+                        onChange={() => handleToggleVisible(idx)}
+                        style={{ width: 16, height: 16 }}
+                      />
+                      노출
+                    </label>
 
-                  {/* Sales Limit */}
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.85rem' }}>
-                    판매 한도:
-                    <input
-                      type="text"
-                      value={ch.salesLimit ?? ''}
-                      onChange={e => handleSalesLimitChange(idx, e.target.value)}
-                      placeholder="제한 없음"
-                      disabled={!ch.isVisible}
-                      style={{
-                        width: 80,
-                        padding: '4px 8px',
-                        border: '1px solid #D1D5DB',
-                        borderRadius: 4,
-                        fontSize: '0.85rem',
-                        textAlign: 'center',
-                        backgroundColor: ch.isVisible ? '#fff' : '#F1F5F9',
-                      }}
-                    />
-                  </label>
+                    {/* Sales Limit */}
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.85rem' }}>
+                      판매 한도:
+                      <input
+                        type="text"
+                        value={ch.salesLimit ?? ''}
+                        onChange={e => handleSalesLimitChange(idx, e.target.value)}
+                        placeholder="제한 없음"
+                        disabled={!ch.isVisible}
+                        style={{
+                          width: 80,
+                          padding: '4px 8px',
+                          border: '1px solid #D1D5DB',
+                          borderRadius: 4,
+                          fontSize: '0.85rem',
+                          textAlign: 'center',
+                          backgroundColor: ch.isVisible ? '#fff' : '#F1F5F9',
+                        }}
+                      />
+                    </label>
 
-                  {/* Display Order */}
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.85rem' }}>
-                    정렬:
-                    <input
-                      type="number"
-                      value={ch.displayOrder ?? 0}
-                      onChange={e => handleDisplayOrderChange(idx, e.target.value)}
-                      disabled={!ch.isVisible}
-                      min={0}
-                      style={{
-                        width: 60,
-                        padding: '4px 8px',
-                        border: '1px solid #D1D5DB',
-                        borderRadius: 4,
-                        fontSize: '0.85rem',
-                        textAlign: 'center',
-                        backgroundColor: ch.isVisible ? '#fff' : '#F1F5F9',
-                      }}
-                    />
-                  </label>
-                </div>
+                    {/* Display Order */}
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.85rem' }}>
+                      정렬:
+                      <input
+                        type="number"
+                        value={ch.displayOrder ?? 0}
+                        onChange={e => handleDisplayOrderChange(idx, e.target.value)}
+                        disabled={!ch.isVisible}
+                        min={0}
+                        style={{
+                          width: 60,
+                          padding: '4px 8px',
+                          border: '1px solid #D1D5DB',
+                          borderRadius: 4,
+                          fontSize: '0.85rem',
+                          textAlign: 'center',
+                          backgroundColor: ch.isVisible ? '#fff' : '#F1F5F9',
+                        }}
+                      />
+                    </label>
+                  </div>
+
+                  {/* TABLET → 태블릿 진열 연결 안내 (WO-STORE-SELL-LISTINGS-TABLET-LINK-V1) */}
+                  {ch.channelType === 'TABLET' && (
+                    <div style={{
+                      marginTop: 8,
+                      fontSize: '0.78rem',
+                      color: '#64748b',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 4,
+                      flexWrap: 'wrap',
+                    }}>
+                      <span>노출 여부는 여기서 설정합니다. 디바이스별 배치는</span>
+                      <Link
+                        to="/store/commerce/tablet-displays"
+                        style={{ color: '#4F46E5', fontWeight: 500, textDecoration: 'underline', whiteSpace: 'nowrap' }}
+                      >
+                        태블릿 진열
+                      </Link>
+                      <span>에서 관리합니다.</span>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           );
