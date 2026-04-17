@@ -80,6 +80,15 @@ export interface QuizSubmitResult {
   }>;
 }
 
+export interface LmsCertificate {
+  id: string;
+  courseId: string;
+  userId: string;
+  issuedAt: string;
+  courseTitle?: string;
+  userName?: string;
+}
+
 export const lmsApi = {
   getCourses: async (params?: {
     search?: string;
@@ -155,5 +164,26 @@ export const lmsApi = {
       lessonId,
       completed: true,
     });
+  },
+
+  getMyCertificate: async (courseId: string): Promise<LmsCertificate | null> => {
+    try {
+      const { data } = await api.get<{ success: boolean; data: { certificate: LmsCertificate } }>(
+        `/lms/certificates/course/${courseId}`,
+      );
+      return data.data.certificate;
+    } catch {
+      return null;
+    }
+  },
+
+  downloadCertificate: async (
+    certificateId: string,
+  ): Promise<Blob> => {
+    const { data } = await api.get<Blob>(
+      `/lms/certificates/${certificateId}/download`,
+      { responseType: 'blob' },
+    );
+    return data;
   },
 };

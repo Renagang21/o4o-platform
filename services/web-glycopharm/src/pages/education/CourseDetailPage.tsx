@@ -18,8 +18,12 @@ import {
   FileText,
   Lock,
   ChevronRight,
+  Award,
+  Download,
+  ExternalLink,
+  Loader2,
 } from 'lucide-react';
-import { lmsApi, type LmsCourse, type LmsLesson, type LmsQuiz, type QuizSubmitResult } from '@/api/lms';
+import { lmsApi, type LmsCourse, type LmsLesson, type LmsQuiz, type QuizSubmitResult, type LmsCertificate } from '@/api/lms';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLoginModal } from '@/contexts/LoginModalContext';
 
@@ -264,6 +268,11 @@ export default function CourseDetailPage() {
   const [completing, setCompleting] = useState(false);
   const [lessonCompleted, setLessonCompleted] = useState(false);
 
+  // Certificate state
+  const [certificate, setCertificate] = useState<LmsCertificate | null>(null);
+  const [loadingCertificate, setLoadingCertificate] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+
   // ── 강의 조회 ──────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!id) return;
@@ -298,6 +307,43 @@ export default function CourseDetailPage() {
       .finally(() => { if (!cancelled) setLessonsLoading(false); });
     return () => { cancelled = true; };
   }, [id, enrolled]);
+
+  // ── 인증서 조회 (완료 시 자동) ─────────────────────────────────────────────
+  const progress = lessons.length > 0
+    ? Math.round((completedLessonIds.size / lessons.length) * 100)
+    : 0;
+  const completed = enrolled && lessons.length > 0 && completedLessonIds.size >= lessons.length;
+
+  useEffect(() => {
+    if (!id || !completed || certificate !== null) return;
+    let cancelled = false;
+    setLoadingCertificate(true);
+    lmsApi.getMyCertificate(id)
+      .then((cert) => { if (!cancelled) setCertificate(cert); })
+      .finally(() => { if (!cancelled) setLoadingCertificate(false); });
+    return () => { cancelled = true; };
+  }, [id, completed, certificate]);
+
+  // ── 인증서 다운로드 ────────────────────────────────────────────────────────
+  const handleDownload = async () => {
+    if (!certificate || downloading) return;
+    setDownloading(true);
+    try {
+      const blob = await lmsApi.downloadCertificate(certificate.id);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `certificate-${certificate.id}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch {
+      // PDF 다운로드 실패 시 조용히 무시
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   // ── 레슨 선택 시 퀴즈 조회 ──────────────────────────────────────────────────
   const handleSelectLesson = useCallback(async (lesson: LmsLesson) => {
@@ -345,10 +391,6 @@ export default function CourseDetailPage() {
       setEnrolling(false);
     }
   };
-
-  const progress = lessons.length > 0
-    ? Math.round((completedLessonIds.size / lessons.length) * 100)
-    : 0;
 
   // ── Loading ──────────────────────────────────────────────────────────────
   if (loading) {
@@ -418,19 +460,29 @@ export default function CourseDetailPage() {
             <p className="text-slate-600 leading-relaxed mb-5">{course.description}</p>
           )}
 
-          {/* Progress bar (enrolled only) */}
+          {/* Progress / Completion */}
           {enrolled && lessons.length > 0 && (
             <div className="mb-5">
-              <div className="flex justify-between text-xs text-slate-500 mb-1">
-                <span>진행률</span>
-                <span>{completedLessonIds.size} / {lessons.length} 레슨 완료 ({progress}%)</span>
-              </div>
-              <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-primary-500 rounded-full transition-all duration-500"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
+              {completed ? (
+                <div className="flex items-center gap-2 px-4 py-2.5 bg-green-50 rounded-xl border border-green-200 w-fit">
+                  <Award className="w-5 h-5 text-green-600 flex-shrink-0" />
+                  <span className="text-green-700 font-semibold text-sm">수료 완료</span>
+                  <span className="text-green-500 text-xs">· 전체 {lessons.length}개 레슨</span>
+                </div>
+              ) : (
+                <>
+                  <div className="flex justify-between text-xs text-slate-500 mb-1">
+                    <span>진행률</span>
+                    <span>{completedLessonIds.size} / {lessons.length} 레슨 완료 ({progress}%)</span>
+                  </div>
+                  <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-primary-500 rounded-full transition-all duration-500"
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
+                </>
+              )}
             </div>
           )}
 
@@ -451,6 +503,58 @@ export default function CourseDetailPage() {
             )}
             {enrollError && <p className="text-sm text-red-500">{enrollError}</p>}
           </div>
+
+          {/* Certificate section */}
+          {completed && (
+            <div className="mt-5 pt-5 border-t border-slate-100">
+              {loadingCertificate ? (
+                <div className="flex items-center gap-2 text-sm text-slate-400">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>수료증 확인 중...</span>
+                </div>
+              ) : certificate ? (
+                <div className="bg-amber-50 rounded-xl border border-amber-200 p-4">
+                  <div className="flex items-start gap-3">
+                    <Award className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-amber-800">수료증 발급 완료</p>
+                      <p className="text-xs text-amber-600 mt-0.5">
+                        발급일: {new Date(certificate.issuedAt).toLocaleDateString('ko-KR', {
+                          year: 'numeric', month: 'long', day: 'numeric',
+                        })}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <button
+                        onClick={() => window.open(`/api/v1/lms/certificates/${certificate.id}/download`, '_blank')}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-amber-300 text-amber-700 text-xs font-medium rounded-lg hover:bg-amber-50 transition-colors"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        인증서 보기
+                      </button>
+                      <button
+                        onClick={handleDownload}
+                        disabled={downloading}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-600 text-white text-xs font-medium rounded-lg hover:bg-amber-700 transition-colors disabled:opacity-60"
+                      >
+                        {downloading ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <Download className="w-3.5 h-3.5" />
+                        )}
+                        PDF 다운로드
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 text-sm text-slate-400">
+                  <Award className="w-4 h-4" />
+                  <span>수료증이 아직 발급 처리 중입니다.</span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
