@@ -120,7 +120,6 @@ import { PharmacyInfoPage } from './pages/pharmacy/PharmacyInfoPage';
 
 // WO-PHARMACY-MANAGEMENT-CONSOLIDATION-V1 Phase 2: Store Core v1.0 통합
 import { StoreDashboardLayout, KPA_SOCIETY_STORE_CONFIG } from '@o4o/store-ui-core';
-import { KpaGlobalHeader } from './components/KpaGlobalHeader';
 import { StoreUserDropdown } from './components/store/StoreUserDropdown';
 import { SupplierListPage, SupplierDetailPage } from './pages/pharmacy/b2b';
 
@@ -304,19 +303,16 @@ function KpaStoreLayoutWrapper() {
   const handleLogout = () => { logout(); navigate('/'); };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <KpaGlobalHeader />
-      <StoreDashboardLayout
-        config={KPA_SOCIETY_STORE_CONFIG}
-        userName={user?.name || user?.email || ''}
-        homeLink="/"
-        navItems={KPA_STORE_NAV_ITEMS}
-        serviceLabel="약사 네트워크"
-        serviceBadge="KPA"
-        orgName={pharmacyName}
-        topBarRight={<StoreUserDropdown homeLink="/" onLogout={handleLogout} />}
-      />
-    </div>
+    <StoreDashboardLayout
+      config={KPA_SOCIETY_STORE_CONFIG}
+      userName={user?.name || user?.email || ''}
+      homeLink="/"
+      navItems={KPA_STORE_NAV_ITEMS}
+      serviceLabel="약사 네트워크"
+      serviceBadge="KPA"
+      orgName={pharmacyName}
+      topBarRight={<StoreUserDropdown homeLink="/" onLogout={handleLogout} />}
+    />
   );
 }
 
