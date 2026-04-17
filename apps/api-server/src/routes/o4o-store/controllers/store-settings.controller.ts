@@ -157,7 +157,7 @@ export function createStoreSettingsController(
     if (!record || !record.isActive) return null;
     const rows: any[] = await dataSource.query(
       `SELECT id, name, storefront_config, storefront_blocks, template_profile
-       FROM organizations WHERE id = $1 AND is_active = true LIMIT 1`,
+       FROM organizations WHERE id = $1 AND "isActive" = true LIMIT 1`,
       [record.storeId],
     );
     return rows[0] ?? null;
