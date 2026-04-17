@@ -120,7 +120,7 @@ export const GLYCOCARE_OPERATOR_POLICY: OperatorPolicy = {
 export const KPA_SOCIETY_OPERATOR_POLICY: OperatorPolicy = {
   scopeKey: 'kpa_society',
   displayName: 'KPA 운영자',
-  description: '대한약사회 서비스 운영자',
+  description: 'KPA-Society 서비스 운영자',
 
   joinRequirements: {
     strictness: 'relaxed',

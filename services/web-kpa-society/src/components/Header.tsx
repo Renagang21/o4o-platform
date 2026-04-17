@@ -135,7 +135,7 @@ export function Header({ serviceName }: { serviceName: string }) {
           {/* Logo */}
           <Link to="/" style={styles.logo}>
             <span style={styles.logoIcon}>💊</span>
-            <span style={styles.logoText}>{serviceName || '약사회'}</span>
+            <span style={styles.logoText}>{serviceName || 'KPA-Society'}</span>
           </Link>
 
           {/* Desktop Navigation — 공개/역할 메뉴 분리 */}

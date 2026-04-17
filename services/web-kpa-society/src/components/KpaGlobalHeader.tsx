@@ -84,7 +84,7 @@ export function KpaGlobalHeader() {
     <GlobalHeader
       brand={{
         icon: '💊',
-        name: '대한약사회',
+        name: 'KPA-Society',
         subtitle: '약사 전문 플랫폼',
         primaryColor: '#2563eb',
       }}

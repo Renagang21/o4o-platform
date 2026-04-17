@@ -26,7 +26,7 @@ const roleOptions: Array<{ role: UserRole; label: string; description: string; e
 
 const SERVICE_LABELS: Record<string, string> = {
   neture: 'Neture', glycopharm: 'GlycoPharm', glucoseview: 'GlucoseView',
-  'k-cosmetics': 'K-Cosmetics', 'kpa-society': '대한약사회', platform: 'O4O 플랫폼',
+  'k-cosmetics': 'K-Cosmetics', 'kpa-society': 'KPA-Society', platform: 'O4O 플랫폼',
 };
 
 export default function RegisterPage() {

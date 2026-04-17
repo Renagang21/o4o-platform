@@ -132,7 +132,7 @@ export function NewsListPage() {
       {/* 허브 소개 */}
       {!currentType && (
         <p style={styles.hubDescription}>
-          대한약사회에서 제공하는 공지사항과 뉴스를 확인하세요.
+          KPA-Society 공지사항과 뉴스를 확인하세요.
         </p>
       )}
 
