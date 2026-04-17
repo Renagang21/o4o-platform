@@ -614,12 +614,20 @@ export function StoreChannelsPage() {
           </button>
         )}
         {activeTab === 'TABLET' && (
-          <button
-            onClick={() => navigate('/store/channels/tablet')}
-            className="px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100"
-          >
-            태블릿 요청 관리
-          </button>
+          <>
+            <button
+              onClick={() => navigate('/store/commerce/tablet-displays')}
+              className="px-3 py-1.5 text-xs font-medium text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100"
+            >
+              태블릿 진열
+            </button>
+            <button
+              onClick={() => navigate('/store/channels/tablet')}
+              className="px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100"
+            >
+              태블릿 주문 요청
+            </button>
+          </>
         )}
         {activeTab === 'B2C' && orgCode && (
           <a
@@ -887,10 +895,32 @@ export function StoreChannelsPage() {
           </div>
         )
       ) : (
-        <div className="text-center py-16 text-slate-400 bg-white rounded-lg border border-slate-200">
-          <p className="text-sm">이 채널의 콘텐츠 배치 기능은 준비 중입니다.</p>
-          <p className="text-xs mt-1">상품 노출은 위 KPI에서 확인할 수 있습니다.</p>
-        </div>
+        activeTab === 'TABLET' ? (
+          <div className="bg-white rounded-lg border border-slate-200 p-6">
+            <p className="text-sm font-medium text-slate-700 mb-4">태블릿 채널 관리</p>
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                onClick={() => navigate('/store/commerce/tablet-displays')}
+                className="flex flex-col items-start gap-1 p-4 rounded-lg border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-left"
+              >
+                <span className="text-sm font-semibold text-indigo-700">태블릿 진열</span>
+                <span className="text-xs text-indigo-500">태블릿에 어떤 상품을 표시할지 디바이스별로 구성합니다</span>
+              </button>
+              <button
+                onClick={() => navigate('/store/channels/tablet')}
+                className="flex flex-col items-start gap-1 p-4 rounded-lg border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-left"
+              >
+                <span className="text-sm font-semibold text-emerald-700">태블릿 주문 요청</span>
+                <span className="text-xs text-emerald-500">태블릿에서 들어온 주문 요청을 확인하고 처리합니다</span>
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="text-center py-16 text-slate-400 bg-white rounded-lg border border-slate-200">
+            <p className="text-sm">이 채널의 콘텐츠 배치 기능은 준비 중입니다.</p>
+            <p className="text-xs mt-1">상품 노출은 위 KPI에서 확인할 수 있습니다.</p>
+          </div>
+        )
       )}
 
       {/* ─── Add Product Modal ───────────────────── */}
