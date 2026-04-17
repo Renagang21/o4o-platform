@@ -1,15 +1,16 @@
 /**
  * MainLayout - K-Cosmetics
- * Based on GlycoPharm MainLayout structure
+ * WO-O4O-GLOBAL-LAYOUT-UNIFICATION-V1: Header → KCosGlobalHeader 교체
  */
 
 import { Outlet } from 'react-router-dom';
-import { Header, Footer } from '@/components/common';
+import { KCosGlobalHeader } from '@/components/KCosGlobalHeader';
+import { Footer } from '@/components/common';
 
 export default function MainLayout() {
   return (
     <div style={styles.container}>
-      <Header />
+      <KCosGlobalHeader />
       <main style={styles.main}>
         <Outlet />
       </main>

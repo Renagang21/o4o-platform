@@ -7,25 +7,38 @@
 import { Outlet } from 'react-router-dom';
 import { OrganizationProvider } from '../../contexts/OrganizationContext';
 import { IntranetSidebar } from './IntranetSidebar';
+import { KpaGlobalHeader } from '../KpaGlobalHeader';
 import { colors } from '../../styles/theme';
 
+/**
+ * WO-O4O-GLOBAL-LAYOUT-UNIFICATION-V1: GlobalHeader 추가 (Layer A)
+ * IntranetSidebar 유지 (Layer C)
+ */
 export function IntranetLayout() {
   return (
     <OrganizationProvider>
-      <div style={styles.container}>
-        <IntranetSidebar />
-        <main style={styles.main}>
-          <Outlet />
-        </main>
+      <div style={styles.outerContainer}>
+        <KpaGlobalHeader />
+        <div style={styles.container}>
+          <IntranetSidebar />
+          <main style={styles.main}>
+            <Outlet />
+          </main>
+        </div>
       </div>
     </OrganizationProvider>
   );
 }
 
 const styles: Record<string, React.CSSProperties> = {
+  outerContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: '100vh',
+  },
   container: {
     display: 'flex',
-    minHeight: '100vh',
+    flex: 1,
     backgroundColor: colors.neutral100,
   },
   main: {

@@ -137,6 +137,7 @@ import { GlycoPharmHubLayout } from '@/components/layouts/GlycoPharmHubLayout';
 
 // Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
 import { StoreDashboardLayout, GLYCOPHARM_STORE_CONFIG, resolveStoreMenu } from '@o4o/store-ui-core';
+import { GlycoGlobalHeader } from './components/GlycoGlobalHeader';
 import { useStoreCapabilities } from './hooks/useStoreCapabilities';
 const StoreOverviewPage = lazy(() => import('@/pages/store/StoreOverviewPage'));
 const StoreEntryPage = lazy(() => import('@/pages/store/StoreEntryPage'));
@@ -276,13 +277,16 @@ function StoreLayoutWrapper() {
   const resolvedConfig = resolveStoreMenu(GLYCOPHARM_STORE_CONFIG, enabledCaps);
 
   return (
-    <StoreDashboardLayout
-      config={resolvedConfig}
-      userName={user?.name || user?.email || ''}
-      homeLink="/"
-      onLogout={() => { logout(); navigate('/'); }}
-      banner={<RedirectNoticeBanner />}
-    />
+    <div className="min-h-screen flex flex-col">
+      <GlycoGlobalHeader />
+      <StoreDashboardLayout
+        config={resolvedConfig}
+        userName={user?.name || user?.email || ''}
+        homeLink="/"
+        onLogout={() => { logout(); navigate('/'); }}
+        banner={<RedirectNoticeBanner />}
+      />
+    </div>
   );
 }
 

@@ -1,74 +1,19 @@
 /**
  * NetureLayout - Neture 플랫폼 메인 레이아웃
  *
- * Work Order: WO-O4O-NETURE-UI-REFACTORING-V1
+ * WO-O4O-NETURE-UI-REFACTORING-V1
+ * WO-O4O-GLOBAL-LAYOUT-UNIFICATION-V1: Header → NetureGlobalHeader 교체
  *
- * Header 메뉴: Home | Supplier | Partner | Community | Contact Us | About | Login
  * 스코프: /, /about, /community, /contact
  */
 
-import { Link, Outlet, useLocation } from 'react-router-dom';
-import AccountMenu from '../AccountMenu';
-import ServiceSwitcher from '../ServiceSwitcher';
-import { useAuth } from '../../contexts/AuthContext';
+import { Link, Outlet } from 'react-router-dom';
+import { NetureGlobalHeader } from '../NetureGlobalHeader';
 
 export default function NetureLayout() {
-  const location = useLocation();
-  const { isAuthenticated } = useAuth();
-
-  const isActive = (path: string) => {
-    if (path === '/') return location.pathname === '/';
-    return location.pathname === path || location.pathname.startsWith(path + '/');
-  };
-
-  const navLinkClass = (path: string) =>
-    `px-3 py-2 text-sm font-medium transition-colors ${
-      isActive(path)
-        ? 'text-primary-600'
-        : 'text-gray-700 hover:text-primary-600'
-    }`;
-
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <Link to="/" className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-primary-600">Neture</span>
-            </Link>
-
-            {/* Navigation */}
-            <nav className="hidden md:flex items-center space-x-1">
-              <Link to="/" className={navLinkClass('/')}>
-                Home
-              </Link>
-              <Link to="/community" className={navLinkClass('/community')}>
-                Community
-              </Link>
-              <Link to="/supplier" className={navLinkClass('/supplier')}>
-                Supplier
-              </Link>
-              <Link to="/partner" className={navLinkClass('/partner')}>
-                Partner
-              </Link>
-              <Link to="/contact" className={navLinkClass('/contact')}>
-                Contact Us
-              </Link>
-              <Link to="/about" className={navLinkClass('/about')}>
-                About
-              </Link>
-            </nav>
-
-            {/* Account */}
-            <div className="flex items-center gap-2">
-              {isAuthenticated && <ServiceSwitcher currentServiceKey="neture" />}
-              <AccountMenu />
-            </div>
-          </div>
-        </div>
-      </header>
+      <NetureGlobalHeader />
 
       {/* Main Content */}
       <main>

@@ -1,10 +1,12 @@
 /**
- * Layout - 경기도약사회 스타일
- * Header (nav 포함) + Content + Footer
+ * Layout - KPA Society 메인 레이아웃
+ * GlobalHeader + Content + Footer
+ *
+ * WO-O4O-GLOBAL-LAYOUT-UNIFICATION-V1: Header → KpaGlobalHeader 교체
  */
 
 import type { ReactNode } from 'react';
-import { Header } from './Header';
+import { KpaGlobalHeader } from './KpaGlobalHeader';
 import { Footer } from './Footer';
 
 interface LayoutProps {
@@ -12,10 +14,10 @@ interface LayoutProps {
   children: ReactNode;
 }
 
-export function Layout({ serviceName, children }: LayoutProps) {
+export function Layout({ serviceName: _serviceName, children }: LayoutProps) {
   return (
     <div style={styles.container}>
-      <Header serviceName={serviceName} />
+      <KpaGlobalHeader />
       <main style={styles.main}>{children}</main>
       <Footer />
     </div>

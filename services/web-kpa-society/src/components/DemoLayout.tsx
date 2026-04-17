@@ -19,7 +19,7 @@
  */
 
 import type { ReactNode } from 'react';
-import { DemoHeader } from './DemoHeader';
+import { KpaGlobalHeader } from './KpaGlobalHeader';
 import { Footer } from './Footer';
 
 interface DemoLayoutProps {
@@ -27,17 +27,22 @@ interface DemoLayoutProps {
   children: ReactNode;
 }
 
-export function DemoLayout({ serviceName, children }: DemoLayoutProps) {
+/**
+ * WO-O4O-GLOBAL-LAYOUT-UNIFICATION-V1: DemoHeader → GlobalHeader 교체
+ * 데모 배너는 ContextBar (Layer B)로 유지.
+ * DemoHeader.tsx는 더 이상 사용하지 않음.
+ */
+export function DemoLayout({ serviceName: _serviceName, children }: DemoLayoutProps) {
   return (
     <div style={styles.container}>
-      {/* 데모 안내 배너 — 모든 /demo/* 페이지에 상시 노출 */}
+      <KpaGlobalHeader />
+      {/* ContextBar: 데모 안내 배너 — Layer B */}
       <div style={styles.demoBanner}>
         <span style={styles.demoBannerIcon}>ℹ️</span>
         <span style={styles.demoBannerText}>
           이 서비스는 지부/분회 홈페이지의 예시 화면입니다. 실제 지부/분회 서비스는 별도 도메인에서 운영됩니다.
         </span>
       </div>
-      <DemoHeader serviceName={serviceName} />
       <main style={styles.main}>{children}</main>
       <Footer />
     </div>

@@ -8,6 +8,7 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { KCosGlobalHeader } from '../KCosGlobalHeader';
 import {
   LayoutDashboard,
   Target,
@@ -19,7 +20,6 @@ import {
   LogOut,
   ChevronDown,
   Handshake,
-  Home,
 } from '@/components/icons';
 
 const menuItems = [
@@ -42,41 +42,9 @@ export default function PartnerLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Top Header */}
-      <header className="sticky top-0 z-50 bg-white border-b border-slate-200">
-        <div className="flex items-center justify-between px-4 h-14">
-          {/* Logo */}
-          <NavLink to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-pink-500 to-pink-600 flex items-center justify-center">
-              <Handshake className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-bold text-lg text-slate-800">K-Cosmetics</span>
-          </NavLink>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1">
-            <NavLink
-              to="/"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100"
-            >
-              <Home className="w-4 h-4" />
-              홈
-            </NavLink>
-            <span className="mx-2 h-5 w-px bg-slate-200" />
-            <span className="px-3 py-1.5 rounded-lg text-sm font-medium bg-pink-100 text-pink-700">
-              파트너 센터
-            </span>
-          </nav>
-
-          {/* Mobile Section Badge */}
-          <div className="md:hidden">
-            <span className="px-2 py-1 rounded-lg text-xs font-medium bg-pink-100 text-pink-700">
-              파트너 센터
-            </span>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-slate-50 flex flex-col">
+      {/* WO-O4O-GLOBAL-LAYOUT-UNIFICATION-V1: Layer A — GlobalHeader */}
+      <KCosGlobalHeader />
 
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
@@ -88,7 +56,7 @@ export default function PartnerLayout() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-14 left-0 z-40 h-[calc(100vh-56px)] w-64 bg-white border-r border-slate-200 transform transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed top-16 left-0 z-40 h-[calc(100vh-4rem)] w-64 bg-white border-r border-slate-200 transform transition-transform duration-300 lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -158,8 +126,8 @@ export default function PartnerLayout() {
 
       {/* Main Content */}
       <div className="lg:ml-64">
-        {/* Sub Header */}
-        <header className="sticky top-14 z-30 bg-white border-b border-slate-200">
+        {/* Sub Header — Layer B Context */}
+        <header className="sticky top-16 z-30 bg-white border-b border-slate-200">
           <div className="flex items-center justify-between px-4 py-3">
             {/* Mobile Menu Button */}
             <button

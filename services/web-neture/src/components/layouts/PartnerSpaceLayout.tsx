@@ -21,8 +21,8 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import AccountMenu from '../AccountMenu';
 import { useAuth } from '../../contexts/AuthContext';
+import { NetureGlobalHeader } from '../NetureGlobalHeader';
 
 /* ------------------------------------------------------------------ */
 /*  Sidebar 그룹 정의                                                   */
@@ -111,28 +111,8 @@ export default function PartnerSpaceLayout() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 shrink-0">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-14">
-            <Link to="/" className="flex items-center gap-2">
-              <span className="text-xl font-bold text-primary-600">Neture</span>
-              <span className="text-xs font-medium text-slate-500 border-l border-slate-300 pl-2">
-                Partner
-              </span>
-            </Link>
-
-            <nav className="hidden md:flex items-center space-x-1">
-              <Link to="/" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary-600 transition-colors">Home</Link>
-              <Link to="/supplier" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary-600 transition-colors">Supplier</Link>
-              <Link to="/partner" className="px-3 py-2 text-sm font-medium text-primary-600 transition-colors">Partner</Link>
-              <Link to="/community" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary-600 transition-colors">Community</Link>
-            </nav>
-
-            <AccountMenu />
-          </div>
-        </div>
-      </header>
+      {/* WO-O4O-GLOBAL-LAYOUT-UNIFICATION-V1: Layer A — GlobalHeader */}
+      <NetureGlobalHeader />
 
       {/* Body: Sidebar + Content */}
       <div className="flex-1 max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">

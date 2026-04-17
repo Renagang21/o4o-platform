@@ -1,11 +1,18 @@
+/**
+ * MainLayout - GlycoPharm 메인 레이아웃
+ * GlobalHeader + Content + Footer
+ *
+ * WO-O4O-GLOBAL-LAYOUT-UNIFICATION-V1: Header → GlycoGlobalHeader 교체
+ */
+
 import { Outlet } from 'react-router-dom';
-import Header from '@/components/common/Header';
+import { GlycoGlobalHeader } from '@/components/GlycoGlobalHeader';
 import Footer from '@/components/common/Footer';
 
 export default function MainLayout() {
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
-      <Header />
+      <GlycoGlobalHeader />
       <main className="flex-1">
         <Outlet />
       </main>

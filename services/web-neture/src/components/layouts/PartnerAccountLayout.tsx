@@ -11,8 +11,8 @@
 
 import { Link, Outlet, useLocation, Navigate } from 'react-router-dom';
 import { LayoutDashboard, FileText, Link2, Store, MessageSquare } from 'lucide-react';
-import AccountMenu from '../AccountMenu';
 import { useAuth } from '../../contexts/AuthContext';
+import { NetureGlobalHeader } from '../NetureGlobalHeader';
 
 const SIDEBAR_ITEMS = [
   { label: 'Dashboard', path: '/account/partner', icon: LayoutDashboard, exact: true },
@@ -58,19 +58,8 @@ export default function PartnerAccountLayout() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link to="/" className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-primary-600">Neture</span>
-            </Link>
-            <div className="flex items-center">
-              <AccountMenu />
-            </div>
-          </div>
-        </div>
-      </header>
+      {/* WO-O4O-GLOBAL-LAYOUT-UNIFICATION-V1: Layer A — GlobalHeader */}
+      <NetureGlobalHeader />
 
       {/* Sidebar + Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">

@@ -2,6 +2,7 @@ import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth, GLYCOPHARM_ROLES } from '@/contexts/AuthContext';
 import type { UserRole } from '@/types';
+import { GlycoGlobalHeader } from '../GlycoGlobalHeader';
 import {
   LayoutDashboard,
   Package,
@@ -18,13 +19,7 @@ import {
   Shield,
   Bell,
   Search,
-  Activity,
-  Home,
-  MessageSquare,
-  BookOpen,
   Store,
-  FileText,
-  Monitor,
   DollarSign,
   ShieldCheck,
 } from 'lucide-react';
@@ -136,95 +131,9 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100">
-      {/* Global Top Navigation */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-lg border-b border-slate-200/50">
-        <div className="flex items-center justify-between px-4 h-14">
-          {/* Logo */}
-          <NavLink to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-md shadow-primary-500/25">
-              <Activity className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-bold text-lg text-slate-800">GlycoPharm</span>
-          </NavLink>
-
-          {/* Navigation Links */}
-          <nav className="hidden md:flex items-center gap-1">
-            <NavLink
-              to="/"
-              end
-              className={({ isActive }) =>
-                `flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${isActive
-                  ? 'bg-primary-100 text-primary-700'
-                  : 'text-slate-600 hover:bg-slate-100'
-                }`
-              }
-            >
-              <Home className="w-4 h-4" />
-              홈
-            </NavLink>
-            <NavLink
-              to="/forum"
-              className={({ isActive }) =>
-                `flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${isActive
-                  ? 'bg-primary-100 text-primary-700'
-                  : 'text-slate-600 hover:bg-slate-100'
-                }`
-              }
-            >
-              <MessageSquare className="w-4 h-4" />
-              포럼
-            </NavLink>
-            <NavLink
-              to="/education"
-              className={({ isActive }) =>
-                `flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${isActive
-                  ? 'bg-primary-100 text-primary-700'
-                  : 'text-slate-600 hover:bg-slate-100'
-                }`
-              }
-            >
-              <BookOpen className="w-4 h-4" />
-              교육/자료
-            </NavLink>
-            <NavLink
-              to="/apply"
-              className={({ isActive }) =>
-                `flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${isActive
-                  ? 'bg-primary-100 text-primary-700'
-                  : 'text-slate-600 hover:bg-slate-100'
-                }`
-              }
-            >
-              <FileText className="w-4 h-4" />
-              참여 신청
-            </NavLink>
-            <NavLink
-              to="/signage"
-              className={({ isActive }) =>
-                `flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${isActive
-                  ? 'bg-primary-100 text-primary-700'
-                  : 'text-slate-600 hover:bg-slate-100'
-                }`
-              }
-            >
-              <Monitor className="w-4 h-4" />
-              디지털 사이니지
-            </NavLink>
-            <span className="mx-2 h-5 w-px bg-slate-200" />
-            <span className={`px-3 py-1.5 rounded-lg text-sm font-medium bg-${config.color}-100 text-${config.color}-700`}>
-              {config.title}
-            </span>
-          </nav>
-
-          {/* Mobile - Current Section */}
-          <div className="md:hidden flex items-center gap-2">
-            <span className={`px-2 py-1 rounded-lg text-xs font-medium bg-${config.color}-100 text-${config.color}-700`}>
-              {config.title}
-            </span>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-slate-100 flex flex-col">
+      {/* WO-O4O-GLOBAL-LAYOUT-UNIFICATION-V1: Layer A — GlobalHeader */}
+      <GlycoGlobalHeader />
 
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
@@ -236,7 +145,7 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-14 left-0 z-40 h-[calc(100vh-56px)] w-64 bg-white shadow-xl transform transition-transform duration-300 lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed top-16 left-0 z-40 h-[calc(100vh-4rem)] w-64 bg-white shadow-xl transform transition-transform duration-300 lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
       >
         <div className="flex flex-col h-full">
@@ -365,9 +274,9 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
       </aside>
 
       {/* Main Content */}
-      <div className="lg:ml-64 pt-14">
-        {/* Dashboard Header */}
-        <header className="sticky top-14 z-30 bg-white border-b">
+      <div className="lg:ml-64 pt-16">
+        {/* Dashboard Header — Layer B Context */}
+        <header className="sticky top-16 z-30 bg-white border-b">
           <div className="flex items-center justify-between px-4 py-3">
             {/* Mobile Menu Button */}
             <button

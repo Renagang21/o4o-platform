@@ -9,6 +9,7 @@ import { AuthProvider, useAuth, getKCosmeticsDashboardRoute } from '@/contexts/A
 import { LoginModalProvider } from '@/contexts/LoginModalContext';
 import LoginModal from '@/components/common/LoginModal';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
+import { KCosGlobalHeader } from '@/components/KCosGlobalHeader';
 
 // Layouts (always needed)
 import MainLayout from '@/components/layouts/MainLayout';
@@ -177,12 +178,15 @@ function StoreLayoutWrapper() {
   const resolvedConfig = resolveStoreMenu(COSMETICS_STORE_CONFIG, enabledCaps);
 
   return (
-    <StoreDashboardLayout
-      config={resolvedConfig}
-      userName={user?.name || user?.email || ''}
-      homeLink="/"
-      onLogout={() => { logout(); navigate('/'); }}
-    />
+    <div className="min-h-screen flex flex-col">
+      <KCosGlobalHeader />
+      <StoreDashboardLayout
+        config={resolvedConfig}
+        userName={user?.name || user?.email || ''}
+        homeLink="/"
+        onLogout={() => { logout(); navigate('/'); }}
+      />
+    </div>
   );
 }
 
