@@ -35,6 +35,8 @@ import { createPublishedAssetsController } from '../o4o-store/controllers/publis
 import { createStoreSettingsController } from '../o4o-store/controllers/store-settings.controller.js'; // WO-STORE-COMMON-SETTINGS-FOUNDATION-V1
 // WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1
 import { createCosmeticsCommunityHubController } from './controllers/cosmetics-community-hub.controller.js';
+// WO-KCOS-TOURIST-HUB-STATS-BACKEND-IMPL-V1
+import { createCosmeticsTouristHubController } from './controllers/cosmetics-tourist-hub.controller.js';
 // WO-O4O-OPERATOR-ACTION-LAYER-V1
 import { createActionQueueRouter } from '../../common/action-queue/index.js';
 import { cosmeticsActionConfig } from './action-definitions.js';
@@ -127,6 +129,9 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
 
   // Community Hub — ads, sponsors (WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1)
   router.use('/', createCosmeticsCommunityHubController(dataSource, coreRequireAuth as any, requireCosmeticsScope as any));
+
+  // Tourist Hub — stats (WO-KCOS-TOURIST-HUB-STATS-BACKEND-IMPL-V1)
+  router.use('/tourist-hub', createCosmeticsTouristHubController(dataSource));
 
   return router;
 }

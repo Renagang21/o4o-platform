@@ -3,19 +3,19 @@
  *
  * WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1
  * WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1: 콘텐츠 섹션 추가
+ * WO-KCOS-COMMUNITY-CONTENT-INTEGRATION-V1: ResourceSection(placeholder) 제거
  *
  * Route: /community
  * Adapted from KPA CommunityHubPage template.
  *
- * 8 sections:
+ * 7 sections:
  *  1. HeroBannerSection  — community_ads type=hero
  *  2. ForumSection       — forum categories
  *  3. LatestPostsSection — recent posts
  *  4. AdSection          — community_ads type=page
  *  5. VideoSection       — signage media
- *  5.5 ContentSection    — CMS hub content (최근 + 추천)
- *  6. ResourceSection    — placeholder
- *  7. SponsorBar         — community_sponsors
+ *  5.5 ContentSection    — CMS hub content (최근 + 추천) → /library/content 전체보기
+ *  6. SponsorBar         — community_sponsors
  */
 
 import { useState, useEffect, CSSProperties } from 'react';
@@ -205,14 +205,7 @@ export default function CommunityHubPage() {
           )}
         </Section>
 
-        {/* 6. Resource Section */}
-        <Section title="Resources">
-          <div style={styles.resourceCard}>
-            <p style={styles.resourceText}>Resource section coming soon.</p>
-          </div>
-        </Section>
-
-        {/* 7. Sponsor Bar */}
+        {/* 6. Sponsor Bar */}
         <SponsorBar sponsors={sponsors} />
       </div>
     </div>
@@ -534,21 +527,6 @@ const styles: Record<string, CSSProperties> = {
   contentDate: {
     fontSize: 10,
     color: '#cbd5e1',
-    margin: 0,
-  },
-  // Resources
-  resourceCard: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    border: '1px solid #e2e8f0',
-    padding: '20px 24px',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  resourceText: {
-    fontSize: 14,
-    color: '#475569',
     margin: 0,
   },
   // Media action

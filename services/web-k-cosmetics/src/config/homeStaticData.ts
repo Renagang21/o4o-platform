@@ -3,9 +3,10 @@
  *
  * WO-KCOS-HOME-DYNAMIC-IMPL-V1: notices → CMS API 연동 완료, 제거됨
  * WO-KCOS-HOME-DYNAMIC-IMPL-V2: nowRunningItems, partners → API 연동 완료, 제거됨
+ * WO-KCOS-HOME-DYNAMIC-IMPL-V3: heroSlides → api/home.ts getHeroSlides() 연동 완료
+ *   heroSlides[] 배열은 CMS 데이터 부재 시 fallback으로 유지
  *
- * TODO(WO-KCOS-HOME-DYNAMIC-IMPL-V3): heroSlides → cmsApi.getSlots('hero') 연동
- * TODO(WO-KCOS-HOME-DYNAMIC-IMPL-V3): quickActionCards.status.value → storeHub KPI 연동
+ * TODO(WO-KCOS-HOME-DYNAMIC-IMPL-V4): quickActionCards.status.value → storeHub KPI 연동
  *   (requireAuth 필요, 로그인/비로그인 분기 처리 포함)
  */
 
@@ -64,7 +65,7 @@ export interface QuickActionCard {
 }
 
 /**
- * TODO(WO-KCOS-HOME-DYNAMIC-IMPL-V3):
+ * TODO(WO-KCOS-HOME-DYNAMIC-IMPL-V4):
  *   status.value를 storeHub.fetchStoreKpiSummary() 기반 실시간 데이터로 교체
  *   requireAuth 적용 필요 → 비로그인 시 '-' placeholder 유지, 로그인 시 실제 수치 표시
  */
@@ -90,16 +91,20 @@ export const quickActionCards: QuickActionCard[] = [
     status: { label: '공급', value: '사용 중' },
   },
   {
+    // WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1: Market Trial 진입은 Neture 허브로 (외부 링크)
+    // WO-KCOS-HOME-QUICK-ACTION-STATUS-TUNE-V1: 잘못된 /platform/stores 링크 → Neture 외부 URL 수정
     id: 'trial',
     title: 'Market Trial',
     subtitle: '신상품 체험',
     description: '브랜드의 신상품 Trial에 참여하세요',
     icon: '🎯',
-    link: '/platform/stores',
+    link: 'https://neture.co.kr/market-trial',
     color: '#e2e8f0',
     status: { label: '진행 중', value: '-' },
   },
   {
+    // WO-KCOS-HOME-QUICK-ACTION-STATUS-TUNE-V2: status.value는 fallback 전용
+    // 실수치는 GET /cosmetics/tourist-hub/stats → homeApi.getTouristHubStats() 로 표시
     id: 'tourist-hub',
     title: 'Tourist Hub',
     subtitle: '관광객 허브',
@@ -107,6 +112,6 @@ export const quickActionCards: QuickActionCard[] = [
     icon: '🌏',
     link: '/services/tourists',
     color: '#e2e8f0',
-    status: { label: '연결 중', value: '매장' },
+    status: { label: '연결 중', value: '-' },
   },
 ];

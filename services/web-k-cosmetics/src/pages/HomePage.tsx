@@ -191,8 +191,19 @@ function HeroSection({ slides }: { slides: HomeHeroSlide[] }) {
   );
 }
 
-function QuickActionSection() {
+function QuickActionSection({
+  productsVisibleCount,
+  touristHubActiveStores,
+}: {
+  productsVisibleCount: number | null;
+  touristHubActiveStores: number | null;
+}) {
   const { isAuthenticated } = useAuth();
+
+  const cardStyle = {
+    backgroundColor: '#fff', borderRadius: '8px', padding: '20px',
+    border: '1px solid #e2e8f0', textDecoration: 'none', display: 'block',
+  } as const;
 
   return (
     <section style={{ padding: '40px 24px', maxWidth: '1200px', margin: '0 auto' }}>
@@ -212,28 +223,52 @@ function QuickActionSection() {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
-        {quickActionCards.map((card) => (
-          <Link key={card.id} to={card.link} style={{
-            backgroundColor: '#fff', borderRadius: '8px', padding: '20px',
-            border: '1px solid #e2e8f0', textDecoration: 'none',
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
-              <div style={{
-                width: '40px', height: '40px', borderRadius: '8px', backgroundColor: '#f1f5f9',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px',
-              }}>
-                {card.icon}
+        {quickActionCards.map((card) => {
+          // WO-KCOS-HOME-QUICK-ACTION-STATUS-TUNE-V1: products — 로그인 시 실수치
+          // WO-KCOS-HOME-QUICK-ACTION-STATUS-TUNE-V2: tourist-hub — public API 실수치
+          const statusValue =
+            card.id === 'products' && isAuthenticated && productsVisibleCount !== null
+              ? productsVisibleCount
+              : card.id === 'tourist-hub' && touristHubActiveStores !== null
+                ? touristHubActiveStores
+                : card.status.value;
+
+          // 외부 URL 카드 (trial: Neture Market Trial 등) — <a target="_blank">
+          // 내부 URL 카드 — <Link>
+          const isExternal = /^https?:\/\//.test(card.link);
+          const cardInner = (
+            <>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
+                <div style={{
+                  width: '40px', height: '40px', borderRadius: '8px', backgroundColor: '#f1f5f9',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px',
+                }}>
+                  {card.icon}
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <p style={{ fontSize: '20px', fontWeight: 600, color: '#1e293b' }}>{statusValue}</p>
+                  <p style={{ fontSize: '11px', color: '#94a3b8' }}>{card.status.label}</p>
+                </div>
               </div>
-              <div style={{ textAlign: 'right' }}>
-                <p style={{ fontSize: '20px', fontWeight: 600, color: '#1e293b' }}>{card.status.value}</p>
-                <p style={{ fontSize: '11px', color: '#94a3b8' }}>{card.status.label}</p>
-              </div>
-            </div>
-            <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#1e293b', marginBottom: '4px' }}>{card.title}</h3>
-            <p style={{ fontSize: '13px', color: '#64748b', fontWeight: 500, marginBottom: '6px' }}>{card.subtitle}</p>
-            <p style={{ fontSize: '13px', color: '#94a3b8' }}>{card.description}</p>
-          </Link>
-        ))}
+              <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#1e293b', marginBottom: '4px' }}>{card.title}</h3>
+              <p style={{ fontSize: '13px', color: '#64748b', fontWeight: 500, marginBottom: '6px' }}>{card.subtitle}</p>
+              <p style={{ fontSize: '13px', color: '#94a3b8' }}>{card.description}</p>
+            </>
+          );
+
+          if (isExternal) {
+            return (
+              <a key={card.id} href={card.link} target="_blank" rel="noopener noreferrer" style={cardStyle}>
+                {cardInner}
+              </a>
+            );
+          }
+          return (
+            <Link key={card.id} to={card.link} style={cardStyle}>
+              {cardInner}
+            </Link>
+          );
+        })}
       </div>
     </section>
   );
@@ -345,6 +380,30 @@ function PartnerTrustSection({ partners }: { partners: HomePartner[] }) {
   );
 }
 
+// WO-KCOS-COMMUNITY-CONTENT-INTEGRATION-V1: Home → 커뮤니티 진입 경로 추가
+function CommunityCTASection() {
+  return (
+    <section style={{ padding: '0 24px 40px', maxWidth: '1200px', margin: '0 auto' }}>
+      <div style={{
+        backgroundColor: '#f8fafc', borderRadius: '8px', padding: '24px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        border: '1px solid #e2e8f0', flexWrap: 'wrap', gap: '12px',
+      }}>
+        <div>
+          <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#1e293b', marginBottom: '4px' }}>K-Cosmetics 커뮤니티</h3>
+          <p style={{ fontSize: '13px', color: '#64748b' }}>포럼, 콘텐츠, 최신 K-Beauty 정보를 한 곳에서 확인하세요</p>
+        </div>
+        <Link to="/community" style={{
+          padding: '10px 20px', backgroundColor: '#e91e63', color: '#fff',
+          borderRadius: '8px', fontWeight: 500, fontSize: '14px', textDecoration: 'none', flexShrink: 0,
+        }}>
+          커뮤니티 →
+        </Link>
+      </div>
+    </section>
+  );
+}
+
 function CTASection() {
   const { isAuthenticated } = useAuth();
   if (isAuthenticated) return null;
@@ -384,8 +443,10 @@ function CTASection() {
 // ========================================
 
 export function HomePage() {
+  const { isAuthenticated } = useAuth();
   const [homeData, setHomeData] = useState<HomePrefetchData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [productsVisibleCount, setProductsVisibleCount] = useState<number | null>(null);
 
   useEffect(() => {
     homeApi.prefetchAll()
@@ -393,6 +454,14 @@ export function HomePage() {
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
+
+  // products 실수치: 로그인 시에만 호출 (requireAuth — 비로그인 시 401)
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    homeApi.getProductsVisibleCount()
+      .then(setProductsVisibleCount)
+      .catch(() => setProductsVisibleCount(null));
+  }, [isAuthenticated]);
 
   // CMS heroSlides 우선, 없으면 정적 fallback (homeStaticData.ts)
   const activeHeroSlides = homeData?.heroSlides?.length ? homeData.heroSlides : heroSlides;
@@ -407,14 +476,20 @@ export function HomePage() {
         <BusinessOnboardingBanner />
       </div>
 
-      {/* 2. Quick Action — 운영 도구 요약 */}
-      <QuickActionSection />
+      {/* 2. Quick Action — 운영 도구 요약 (V4 tune: products/tourist-hub 실수치, trial 링크 수정) */}
+      <QuickActionSection
+        productsVisibleCount={productsVisibleCount}
+        touristHubActiveStores={homeData?.touristHubActiveStores ?? null}
+      />
 
       {/* 3. Now Running — Market Trial (V2 동적화 완료) */}
       <NowRunningSection items={homeData?.runningTrials ?? []} loading={loading} />
 
       {/* 4. 운영 공지 (V1 동적화 완료) */}
       <NoticeSection prefetchedNotices={homeData?.notices} loading={loading} />
+
+      {/* 커뮤니티 진입 CTA (WO-KCOS-COMMUNITY-CONTENT-INTEGRATION-V1) */}
+      <CommunityCTASection />
 
       {/* CTA for Non-authenticated Users */}
       <CTASection />

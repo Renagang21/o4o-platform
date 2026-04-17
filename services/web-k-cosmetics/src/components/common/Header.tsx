@@ -67,11 +67,13 @@ export default function Header() {
           </Link>
 
           {/* Desktop Navigation */}
+          {/* WO-KCOS-MENU-STRUCTURE-ALIGN-V1: 허브 추가, 문의하기 제거
+               WO-KCOS-COMMUNITY-CONTENT-INTEGRATION-V1: 콘텐츠 제거 (커뮤니티 서브 페이지) */}
           <nav style={styles.nav}>
             <Link to="/" style={styles.navLink}>홈</Link>
+            <Link to="/hub" style={styles.navLink}>허브</Link>
             <Link to="/community" style={styles.navLink}>커뮤니티</Link>
             <Link to="/forum" style={styles.navLink}>포럼</Link>
-            <Link to="/contact" style={styles.navLink}>문의하기</Link>
             {isAuthenticated && (
               <Link to="/store" style={styles.navLinkAccent}>매장 관리</Link>
             )}
@@ -152,9 +154,9 @@ export default function Header() {
           <div style={styles.mobileMenu}>
             <nav style={styles.mobileNav}>
               <Link to="/" style={styles.mobileNavLink} onClick={() => setMobileMenuOpen(false)}>홈</Link>
+              <Link to="/hub" style={styles.mobileNavLink} onClick={() => setMobileMenuOpen(false)}>허브</Link>
               <Link to="/community" style={styles.mobileNavLink} onClick={() => setMobileMenuOpen(false)}>커뮤니티</Link>
               <Link to="/forum" style={styles.mobileNavLink} onClick={() => setMobileMenuOpen(false)}>포럼</Link>
-              <Link to="/contact" style={styles.mobileNavLink} onClick={() => setMobileMenuOpen(false)}>문의하기</Link>
               {isAuthenticated && (
                 <Link to="/store" style={styles.mobileNavLink} onClick={() => setMobileMenuOpen(false)}>매장 관리</Link>
               )}

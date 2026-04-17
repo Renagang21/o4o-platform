@@ -66,14 +66,18 @@ export const ALL_STORE_MENUS: StoreMenuItemDef[] = [
   { key: 'settings', label: '설정', subPath: '/settings' },
 ];
 
-/** K-Cosmetics Store Config */
+/**
+ * K-Cosmetics Store Config
+ * WO-KCOS-MENU-STRUCTURE-ALIGN-V1: placeholder 메뉴 비노출
+ *   제거: products, orders, billing, content, settings (StorePlaceholderPage)
+ *   유지: dashboard, local-products, channels (실구현 완료)
+ */
 export const COSMETICS_STORE_CONFIG: StoreDashboardConfig = {
   serviceKey: 'cosmetics',
   serviceName: 'K-Cosmetics',
   basePath: '/store',
   enabledMenus: [
-    'dashboard', 'products', 'local-products', 'channels', 'orders',
-    'billing', 'content', 'settings',
+    'dashboard', 'local-products', 'channels',
   ],
 };
 

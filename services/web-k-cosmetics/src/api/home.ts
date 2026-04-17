@@ -53,6 +53,7 @@ export interface HomePrefetchData {
   runningTrials: HomeRunningTrial[];
   partners: HomePartner[];
   heroSlides: HomeHeroSlide[];
+  touristHubActiveStores: number | null;
 }
 
 // ── Mappers ────────────────────────────────────────────────────────────────
@@ -128,6 +129,30 @@ export const homeApi = {
   },
 
   /**
+   * Tourist Hub 활성 매장 수 (cosmetics.cosmetics_stores WHERE status='approved')
+   * 인증: public (비로그인 가능)
+   * WO-KCOS-HOME-QUICK-ACTION-STATUS-TUNE-V2: tourist-hub 카드 실수치 표시용
+   */
+  async getTouristHubStats(): Promise<number | null> {
+    const res = await api.get('/cosmetics/tourist-hub/stats');
+    const activeStores = res.data?.data?.activeStores;
+    return typeof activeStores === 'number' ? activeStores : null;
+  },
+
+  /**
+   * 노출 중 상품 수 (store-hub/channels.visibleProductCount 합산)
+   * 인증: requireAuth (로그인 필수) — 비로그인 시 null 반환
+   * WO-KCOS-HOME-QUICK-ACTION-STATUS-TUNE-V1: products 카드 실수치 표시용
+   */
+  async getProductsVisibleCount(): Promise<number | null> {
+    const res = await api.get('/store-hub/channels');
+    const channels: { visibleProductCount?: number }[] = res.data?.data || [];
+    if (channels.length === 0) return null;
+    const total = channels.reduce((sum, ch) => sum + (ch.visibleProductCount ?? 0), 0);
+    return total;
+  },
+
+  /**
    * Hero 슬라이드 목록 (CMS slots, slotKey='hero', serviceKey='cosmetics')
    * 인증: optionalAuth (비로그인 가능)
    * CMS 데이터 없으면 빈 배열 반환 → caller에서 정적 fallback 사용
@@ -159,17 +184,19 @@ export const homeApi = {
    * 홈 전체 prefetch (Promise.allSettled — 부분 실패 safe)
    */
   async prefetchAll(): Promise<HomePrefetchData> {
-    const [noticesResult, trialsResult, partnersResult, heroSlidesResult] = await Promise.allSettled([
+    const [noticesResult, trialsResult, partnersResult, heroSlidesResult, touristHubResult] = await Promise.allSettled([
       homeApi.getNotices(5),
       homeApi.getRunningTrials(3),
       homeApi.getPartners(),
       homeApi.getHeroSlides(),
+      homeApi.getTouristHubStats(),
     ]);
     return {
       notices: noticesResult.status === 'fulfilled' ? noticesResult.value : [],
       runningTrials: trialsResult.status === 'fulfilled' ? trialsResult.value : [],
       partners: partnersResult.status === 'fulfilled' ? partnersResult.value : [],
       heroSlides: heroSlidesResult.status === 'fulfilled' ? heroSlidesResult.value : [],
+      touristHubActiveStores: touristHubResult.status === 'fulfilled' ? touristHubResult.value : null,
     };
   },
 };

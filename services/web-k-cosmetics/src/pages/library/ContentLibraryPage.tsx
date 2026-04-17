@@ -8,7 +8,7 @@
  */
 
 import { useState, useEffect, useCallback, CSSProperties } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { hubContentApi, type HubContentItemResponse } from '../../lib/api/hubContent';
 import { dashboardCopyApi } from '../../lib/api/dashboardCopy';
 import { useAuth } from '../../contexts/AuthContext';
@@ -26,7 +26,6 @@ const PAGE_SIZE = 12;
 
 export default function ContentLibraryPage() {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [items, setItems] = useState<HubContentItemResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeType, setActiveType] = useState('all');
@@ -53,10 +52,8 @@ export default function ContentLibraryPage() {
         sourceId: item.id,
         targetDashboardId: user.id,
       });
+      // WO-KCOS-COMMUNITY-CONTENT-INTEGRATION-V1: /my-content 라우트 미존재 → 복사 완료 표시만
       setCopiedIds(prev => new Set(prev).add(item.id));
-      if (confirm('내 콘텐츠에 복사되었습니다.\n내 콘텐츠로 이동하시겠습니까?')) {
-        navigate('/my-content');
-      }
     } catch (err: any) {
       alert(err.message || '복사 중 오류가 발생했습니다.');
     } finally {
