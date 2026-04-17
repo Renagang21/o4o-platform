@@ -32,6 +32,7 @@ import { createProductMarketingController } from '../o4o-store/controllers/produ
 import { createAssetSnapshotController } from '../o4o-store/controllers/asset-snapshot.controller.js';
 import { createStoreAssetControlController } from '../o4o-store/controllers/store-asset-control.controller.js';
 import { createPublishedAssetsController } from '../o4o-store/controllers/published-assets.controller.js';
+import { createStoreSettingsController } from '../o4o-store/controllers/store-settings.controller.js'; // WO-STORE-COMMON-SETTINGS-FOUNDATION-V1
 // WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1
 import { createCosmeticsCommunityHubController } from './controllers/cosmetics-community-hub.controller.js';
 // WO-O4O-OPERATOR-ACTION-LAYER-V1
@@ -81,6 +82,8 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
   router.use('/orders', orderController); // H2-0: 주문 엔드포인트
   router.use('/payments', paymentController); // Payment EventHub 연결
   router.use('/stores', storeController); // WO-KCOS-STORES-PHASE1-V1: 매장 관리
+  // WO-STORE-COMMON-SETTINGS-FOUNDATION-V1: unified settings + channel config
+  router.use('/stores', createStoreSettingsController(dataSource, coreRequireAuth as any));
 
   // ============================================================================
   // Store HUB Controllers (WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1)

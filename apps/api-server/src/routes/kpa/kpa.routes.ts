@@ -88,6 +88,7 @@ import { createKpaPaymentController } from './controllers/kpa-payment.controller
 import { createTabletController } from '../o4o-store/controllers/tablet.controller.js';
 import { createBlogController } from '../o4o-store/controllers/blog.controller.js';
 import { createLayoutController } from '../o4o-store/controllers/layout.controller.js'; // WO-STORE-BLOCK-ENGINE-V1
+import { createStoreSettingsController } from '../o4o-store/controllers/store-settings.controller.js'; // WO-STORE-COMMON-SETTINGS-FOUNDATION-V1
 // WO-O4O-ROUTES-REFACTOR-V1: Extracted controllers
 import { createInstructorController } from './controllers/instructor.controller.js';
 import { createCourseRequestController } from './controllers/course-request.controller.js';
@@ -315,6 +316,10 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   const kpaLayoutController = createLayoutController(dataSource, coreRequireAuth as any);
   router.use('/stores', kpaLayoutController);
+
+  // WO-STORE-COMMON-SETTINGS-FOUNDATION-V1: unified settings + channel config
+  const kpaStoreSettingsController = createStoreSettingsController(dataSource, coreRequireAuth as any);
+  router.use('/stores', kpaStoreSettingsController);
 
   // ============================================================================
   // Membership Query — /api/v1/kpa/me/membership

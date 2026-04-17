@@ -24,6 +24,7 @@ import { createStoreController } from './controllers/store.controller.js'; // WO
 import { createTabletController } from '../o4o-store/controllers/tablet.controller.js'; // WO-STORE-TABLET-REQUEST-CHANNEL-V1
 import { createBlogController } from '../o4o-store/controllers/blog.controller.js'; // WO-STORE-BLOG-CHANNEL-V1
 import { createLayoutController } from '../o4o-store/controllers/layout.controller.js'; // WO-STORE-BLOCK-ENGINE-V1
+import { createStoreSettingsController } from '../o4o-store/controllers/store-settings.controller.js'; // WO-STORE-COMMON-SETTINGS-FOUNDATION-V1
 // WO-O4O-GLYCOPHARM-STORE-HUB-ADOPTION-V1
 import { createStoreHubController } from '../o4o-store/controllers/store-hub.controller.js';
 import { createPharmacyProductsController } from '../o4o-store/controllers/pharmacy-products.controller.js';
@@ -405,6 +406,10 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   // ============================================================================
   const layoutController = createLayoutController(dataSource, coreRequireAuth as any);
   router.use('/stores', layoutController);
+
+  // WO-STORE-COMMON-SETTINGS-FOUNDATION-V1: unified settings + channel config
+  const glycopharmStoreSettingsController = createStoreSettingsController(dataSource, coreRequireAuth as any);
+  router.use('/stores', glycopharmStoreSettingsController);
 
   // ============================================================================
   // Store Routes (Public StoreFront API, slug 기반)
