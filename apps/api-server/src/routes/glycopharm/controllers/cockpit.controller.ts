@@ -146,9 +146,22 @@ export function createCockpitController(
           applicationStatus = application.status as PharmacyStatus['applicationStatus'];
         }
 
+        // WO-STORE-COMMON-SETTINGS-POST-VERIFY-V1: use platform_store_slugs
+        // instead of pharmacy.code — aligns with store-settings controller
+        let resolvedSlug: string | undefined;
+        if (pharmacy?.id) {
+          try {
+            const slugRow = await dataSource.query(
+              `SELECT slug FROM platform_store_slugs WHERE store_id = $1 AND is_active = true ORDER BY created_at ASC LIMIT 1`,
+              [pharmacy.id]
+            );
+            resolvedSlug = slugRow[0]?.slug || undefined;
+          } catch { /* graceful degradation — fall back to no slug */ }
+        }
+
         const response: PharmacyStatus = {
           pharmacyName: pharmacy?.name || '미등록 약국',
-          storeSlug: pharmacy?.code,
+          storeSlug: resolvedSlug,
           storeStatus,
           applicationStatus,
           legalInfoStatus,

@@ -273,14 +273,17 @@ export function createStoreHubController(
           ),
         );
 
-        // WO-CHANNEL-EXECUTION-CONSOLE-V1: attach org code for storefront preview
+        // WO-CHANNEL-EXECUTION-CONSOLE-V1: attach slug for storefront preview
+        // WO-STORE-COMMON-SETTINGS-POST-VERIFY-V1: use platform_store_slugs
+        // instead of organizations.code — the store-settings controller resolves
+        // via StoreSlugService.findBySlug() which reads platform_store_slugs.
         let organizationCode: string | null = null;
         try {
-          const orgRow = await dataSource.query(
-            `SELECT code FROM organizations WHERE id = $1`,
+          const slugRow = await dataSource.query(
+            `SELECT slug FROM platform_store_slugs WHERE store_id = $1 AND is_active = true ORDER BY created_at ASC LIMIT 1`,
             [organizationId]
           );
-          organizationCode = orgRow[0]?.code || null;
+          organizationCode = slugRow[0]?.slug || null;
         } catch { /* graceful degradation */ }
 
         res.json({ success: true, data: channels, organizationCode });
