@@ -20,6 +20,8 @@ import {
   deleteLocalProduct,
 } from '../../api/localProducts';
 import type { LocalProduct, LocalProductInput, BadgeType } from '../../api/localProducts';
+// WO-KPA-STORE-LOCAL-PRODUCT-RICHTEXT-INTEGRATION-V1: AI 정리 기능 활성화
+import { RichTextEditor } from '@o4o/content-editor';
 
 // ==================== Constants ====================
 
@@ -455,7 +457,9 @@ function ProductFormModal({
     };
 
     if (category.trim()) data.category = category.trim();
-    if (description.trim()) data.description = description.trim();
+    // RichTextEditor returns HTML — strip tags to detect genuinely empty content
+    const descText = description.replace(/<[^>]*>/g, '').trim();
+    if (descText) data.description = description;
     if (summary.trim()) data.summary = summary.trim();
     if (priceDisplay.trim()) data.priceDisplay = priceDisplay.trim();
     if (thumbnailUrl.trim()) data.thumbnailUrl = thumbnailUrl.trim();
@@ -473,7 +477,7 @@ function ProductFormModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 z-[1000] flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] flex flex-col shadow-2xl">
+      <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b">
           <h2 className="text-lg font-bold text-slate-900">
@@ -508,12 +512,12 @@ function ProductFormModal({
           </Field>
 
           <Field label="설명">
-            <textarea
+            <RichTextEditor
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="상품 설명"
-              rows={2}
-              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
+              onChange={({ html }) => setDescription(html)}
+              preset="full"
+              minHeight="200px"
+              placeholder="상품 상세 설명을 입력하세요..."
             />
           </Field>
 
