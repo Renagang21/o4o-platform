@@ -277,7 +277,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   router.use('/store-contents', createStoreContentController(dataSource, coreRequireAuth as any));
 
   // Store Playlist routes (WO-O4O-SIGNAGE-STORE-PLAYLIST-ENGINE-V1)
-  router.use('/store-playlists', createStorePlaylistController(dataSource, coreRequireAuth as any));
+  router.use('/store-playlists', createStorePlaylistController(dataSource, coreRequireAuth as any, 'kpa-society'));
 
   // O4O-STORE: root-mounted controllers (internal prefix /pharmacy/*)
   // 컨트롤러 내부에 full path 정의됨. prefix 분리는 별도 WO에서 수행.

@@ -33,6 +33,7 @@ type AuthMiddleware = RequestHandler;
 export function createStorePlaylistController(
   dataSource: DataSource,
   requireAuth: AuthMiddleware,
+  serviceKey?: string,
 ): Router {
   const router = Router();
 
@@ -71,27 +72,77 @@ export function createStorePlaylistController(
         const playlist = rows[0];
 
         // Fetch items with snapshot content_json for video URL
-        const items = await dataSource.query(
-          `SELECT
-             i.id,
-             i.snapshot_id AS "snapshotId",
-             i.display_order AS "displayOrder",
-             i.is_forced AS "isForced",
-             s.title,
-             s.content_json AS "contentJson"
-           FROM store_playlist_items i
-           JOIN o4o_asset_snapshots s ON s.id = i.snapshot_id
-           WHERE i.playlist_id = $1
-             AND (
-               i.is_forced = false
-               OR (
-                 (i.forced_start_at IS NULL OR NOW() >= i.forced_start_at)
-                 AND (i.forced_end_at IS NULL OR NOW() <= i.forced_end_at)
+        // If serviceKey is provided, merge active forced content via UNION
+        let items: any[];
+        if (serviceKey) {
+          items = await dataSource.query(
+            `SELECT
+               i.id,
+               i.snapshot_id AS "snapshotId",
+               i.display_order AS "displayOrder",
+               i.is_forced AS "isForced",
+               s.title,
+               s.content_json AS "contentJson"
+             FROM store_playlist_items i
+             JOIN o4o_asset_snapshots s ON s.id = i.snapshot_id
+             WHERE i.playlist_id = $1
+               AND (
+                 i.is_forced = false
+                 OR (
+                   (i.forced_start_at IS NULL OR NOW() >= i.forced_start_at)
+                   AND (i.forced_end_at IS NULL OR NOW() <= i.forced_end_at)
+                 )
                )
-             )
-           ORDER BY i.display_order ASC`,
-          [id],
-        );
+
+             UNION ALL
+
+             SELECT
+               'forced-' || fc.id AS id,
+               NULL AS "snapshotId",
+               COALESCE(fp.display_order, 9999) AS "displayOrder",
+               true AS "isForced",
+               fc.title,
+               json_build_object(
+                 'url', fc.video_url,
+                 'sourceType', fc.source_type,
+                 'embedId', fc.embed_id,
+                 'thumbnailUrl', fc.thumbnail_url
+               ) AS "contentJson"
+             FROM signage_forced_content fc
+             LEFT JOIN signage_forced_content_positions fp
+               ON fp.forced_content_id = fc.id AND fp.playlist_id = $1
+             WHERE fc.service_key = $2
+               AND fc.is_active = true
+               AND fc.deleted_at IS NULL
+               AND NOW() >= fc.start_at
+               AND NOW() <= fc.end_at
+
+             ORDER BY "displayOrder" ASC`,
+            [id, serviceKey],
+          );
+        } else {
+          items = await dataSource.query(
+            `SELECT
+               i.id,
+               i.snapshot_id AS "snapshotId",
+               i.display_order AS "displayOrder",
+               i.is_forced AS "isForced",
+               s.title,
+               s.content_json AS "contentJson"
+             FROM store_playlist_items i
+             JOIN o4o_asset_snapshots s ON s.id = i.snapshot_id
+             WHERE i.playlist_id = $1
+               AND (
+                 i.is_forced = false
+                 OR (
+                   (i.forced_start_at IS NULL OR NOW() >= i.forced_start_at)
+                   AND (i.forced_end_at IS NULL OR NOW() <= i.forced_end_at)
+                 )
+               )
+             ORDER BY i.display_order ASC`,
+            [id],
+          );
+        }
 
         res.json({
           success: true,
@@ -377,7 +428,8 @@ export function createStorePlaylistController(
           return;
         }
 
-        const items = await dataSource.query(
+        // Fetch real items
+        const realItems = await dataSource.query(
           `SELECT
              i.id,
              i.snapshot_id AS "snapshotId",
@@ -396,6 +448,40 @@ export function createStorePlaylistController(
            ORDER BY i.display_order ASC`,
           [id],
         );
+
+        // Merge active forced content if serviceKey is configured
+        let items: any[] = realItems;
+        if (serviceKey) {
+          const forcedItems = await dataSource.query(
+            `SELECT
+               'forced-' || fc.id AS id,
+               NULL AS "snapshotId",
+               COALESCE(fp.display_order, 9999) AS "displayOrder",
+               true AS "isForced",
+               true AS "isLocked",
+               fc.start_at AS "forcedStartAt",
+               fc.end_at AS "forcedEndAt",
+               fc.created_at AS "createdAt",
+               fc.title,
+               json_build_object(
+                 'url', fc.video_url,
+                 'sourceType', fc.source_type,
+                 'embedId', fc.embed_id,
+                 'thumbnailUrl', fc.thumbnail_url
+               ) AS "contentJson",
+               'signage' AS "assetType"
+             FROM signage_forced_content fc
+             LEFT JOIN signage_forced_content_positions fp
+               ON fp.forced_content_id = fc.id AND fp.playlist_id = $1
+             WHERE fc.service_key = $2
+               AND fc.is_active = true
+               AND fc.deleted_at IS NULL
+             ORDER BY COALESCE(fp.display_order, 9999) ASC`,
+            [id, serviceKey],
+          );
+
+          items = [...realItems, ...forcedItems].sort((a, b) => a.displayOrder - b.displayOrder);
+        }
 
         res.json({ success: true, data: items });
       } catch (error: any) {
@@ -671,12 +757,24 @@ export function createStorePlaylistController(
         }
 
         // Update display_order for each item
+        // Virtual forced items (forced-{uuid}) use signage_forced_content_positions
         for (let i = 0; i < order.length; i++) {
-          await dataSource.query(
-            `UPDATE store_playlist_items SET display_order = $1, updated_at = NOW()
-             WHERE id = $2 AND playlist_id = $3`,
-            [i, order[i], id],
-          );
+          const itemId = order[i] as string;
+          if (itemId.startsWith('forced-')) {
+            const forcedContentId = itemId.substring(7);
+            await dataSource.query(
+              `INSERT INTO signage_forced_content_positions (playlist_id, forced_content_id, display_order)
+               VALUES ($1, $2, $3)
+               ON CONFLICT (playlist_id, forced_content_id) DO UPDATE SET display_order = $3`,
+              [id, forcedContentId, i],
+            );
+          } else {
+            await dataSource.query(
+              `UPDATE store_playlist_items SET display_order = $1, updated_at = NOW()
+               WHERE id = $2 AND playlist_id = $3`,
+              [i, itemId, id],
+            );
+          }
         }
 
         res.json({ success: true, data: { reordered: order.length } });
@@ -711,6 +809,15 @@ export function createStorePlaylistController(
         }
 
         const { id, itemId } = req.params;
+
+        // Virtual forced content items cannot be deleted
+        if (itemId.startsWith('forced-')) {
+          res.status(403).json({
+            success: false,
+            error: { code: 'ITEM_LOCKED', message: 'Forced content cannot be deleted' },
+          });
+          return;
+        }
 
         // Verify playlist ownership
         const plCheck = await dataSource.query(

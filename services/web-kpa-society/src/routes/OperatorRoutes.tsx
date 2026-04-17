@@ -41,6 +41,7 @@ import HqPlaylistDetailPage from '../pages/operator/signage/HqPlaylistDetailPage
 import TemplatesPage from '../pages/operator/signage/TemplatesPage';
 import TemplateDetailPage from '../pages/operator/signage/TemplateDetailPage';
 import CategoriesPage from '../pages/operator/signage/CategoriesPage';
+import ForcedContentPage from '../pages/operator/signage/ForcedContentPage';
 import OperatorAnalyticsPage from '../pages/operator/AnalyticsPage';
 import { RoleGuard } from '../components/auth/RoleGuard';
 import { PLATFORM_ROLES, ROLES } from '../lib/role-constants';
@@ -85,6 +86,8 @@ export function OperatorRoutes() {
           <Route path="signage/templates/:templateId" element={<TemplateDetailPage />} />
           {/* 사이니지 카테고리 관리 (WO-O4O-SIGNAGE-REGISTRATION-AND-CATEGORY-REFINE-V1) */}
           <Route path="signage/categories" element={<CategoriesPage />} />
+          {/* 강제 콘텐츠 관리 (WO-KPA-SIGNAGE-FORCED-CONTENT-IMPLEMENTATION-V1) */}
+          <Route path="signage/forced-content" element={<ForcedContentPage />} />
 
           {/* 약관 관리 (WO-KPA-LEGAL-PAGES-V1) — admin-only */}
           <Route path="legal" element={<RoleGuard allowedRoles={[ROLES.KPA_ADMIN, ROLES.PLATFORM_SUPER_ADMIN]}><LegalManagementPage /></RoleGuard>} />

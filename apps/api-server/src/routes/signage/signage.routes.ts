@@ -6,6 +6,7 @@ import { SignageScheduleController } from './controllers/schedule.controller.js'
 import { SignageTemplateController } from './controllers/template.controller.js';
 import { SignageContentController } from './controllers/content.controller.js';
 import { SignageGlobalContentController } from './controllers/global-content.controller.js';
+import { SignageForcedContentController } from './controllers/forced-content.controller.js';
 import {
   requireSignageAdmin,
   requireSignageOperator,
@@ -41,6 +42,7 @@ export function createSignageRoutes(dataSource: DataSource): Router {
   const templateCtrl = new SignageTemplateController(dataSource);
   const contentCtrl = new SignageContentController(dataSource);
   const globalCtrl = new SignageGlobalContentController(dataSource);
+  const forcedCtrl = new SignageForcedContentController(dataSource);
 
   // Apply authentication and service key validation to all routes
   router.use(requireAuth);
@@ -243,6 +245,21 @@ export function createSignageRoutes(dataSource: DataSource): Router {
   // DELETE /api/signage/:serviceKey/hq/media/:id - Hard delete HQ media (Operator only)
   // WO-KPA-SOCIETY-OPERATOR-SIGNAGE-CONTENT-HARD-DELETE-POLICY-V1
   router.delete('/hq/media/:id', requireSignageOperator, mediaCtrl.hardDeleteMedia);
+
+  // ========== Forced Content Routes (WO-KPA-SIGNAGE-FORCED-CONTENT-IMPLEMENTATION-V1) ==========
+  // Operator manages forced content that is auto-injected into all store playlists at query time
+
+  // GET /api/signage/:serviceKey/hq/forced-content - List forced content
+  router.get('/hq/forced-content', requireSignageOperator, forcedCtrl.list);
+
+  // POST /api/signage/:serviceKey/hq/forced-content - Create forced content
+  router.post('/hq/forced-content', requireSignageOperator, forcedCtrl.create);
+
+  // PATCH /api/signage/:serviceKey/hq/forced-content/:id - Update forced content
+  router.patch('/hq/forced-content/:id', requireSignageOperator, forcedCtrl.update);
+
+  // DELETE /api/signage/:serviceKey/hq/forced-content/:id - Soft delete forced content
+  router.delete('/hq/forced-content/:id', requireSignageOperator, forcedCtrl.remove);
 
   // ========== Community Content Creation Routes (WO-O4O-SIGNAGE-COMMUNITY-AUTHORSHIP-PHASE1-V1) ==========
   // Community creates global content with source='community', scope='global'
