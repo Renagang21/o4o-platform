@@ -3,13 +3,14 @@
  *
  * WO-KCOS-HOME-UI-V2: 초기 구현 (정적)
  * WO-KCOS-HOME-DYNAMIC-IMPL-V1: 운영 공지 동적화 (CMS API 연동)
+ * WO-KCOS-HOME-DYNAMIC-IMPL-V3: heroSlides CMS slots 연동
  *
  * 화면 구조 (상→하):
- * 1. Hero / Campaign Slider — 플랫폼 정체성 + 캠페인  [TODO V2: CMS slots 연동]
- * 2. Quick Action — 운영 도구 상태 요약               [TODO V2: storeHub KPI 연동]
- * 3. Now Running — 신상품/Trial/이벤트               [TODO V2: market-trial API 연동]
+ * 1. Hero / Campaign Slider — 플랫폼 정체성 + 캠페인  [V3 완료: CMS slots 연동, 정적 fallback]
+ * 2. Quick Action — 운영 도구 상태 요약               [TODO V4: storeHub KPI 연동]
+ * 3. Now Running — 신상품/Trial/이벤트               [V2 완료: market-trial API 연동]
  * 4. 운영 공지 / 가이드                              [V1 완료: CMS 동적 연동]
- * 5. 협력 브랜드 신뢰 Zone                           [TODO V2: 파트너 API 연동]
+ * 5. 협력 브랜드 신뢰 Zone                           [V2 완료: 파트너 API 연동]
  *
  * 원칙:
  * - 통계/차트 ❌
@@ -25,9 +26,9 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts';
 import { BusinessOnboardingBanner } from '../components/onboarding/BusinessOnboardingBanner';
 import { NoticeSection } from '../components/home/NoticeSection';
-import { homeApi, HomePrefetchData, HomeRunningTrial, HomePartner } from '../api/home';
+import { homeApi, HomePrefetchData, HomeRunningTrial, HomePartner, HomeHeroSlide } from '../api/home';
 import {
-  heroSlides, HeroSlide,
+  heroSlides,
   quickActionCards,
 } from '../config/homeStaticData';
 
@@ -35,23 +36,27 @@ import {
 // Components
 // ========================================
 
-function HeroSection() {
+function HeroSection({ slides }: { slides: HomeHeroSlide[] }) {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
+    setCurrentSlide(0);
+  }, [slides]);
+
+  useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 6000);
     return () => clearInterval(timer);
-  }, []);
+  }, [slides]);
 
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
+  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
 
   return (
     <section style={{ position: 'relative', overflow: 'hidden' }}>
       <div style={{ position: 'relative', height: '320px' }}>
-        {heroSlides.map((slide: HeroSlide, index: number) => (
+        {slides.map((slide: HomeHeroSlide, index: number) => (
           <div
             key={slide.id}
             style={{
@@ -163,7 +168,7 @@ function HeroSection() {
           border: 'none', color: '#fff', fontSize: '18px', cursor: 'pointer',
         }}>‹</button>
         <div style={{ display: 'flex', gap: '8px' }}>
-          {heroSlides.map((_: HeroSlide, index: number) => (
+          {slides.map((_: HomeHeroSlide, index: number) => (
             <button
               key={index}
               onClick={() => setCurrentSlide(index)}
@@ -389,10 +394,13 @@ export function HomePage() {
       .finally(() => setLoading(false));
   }, []);
 
+  // CMS heroSlides 우선, 없으면 정적 fallback (homeStaticData.ts)
+  const activeHeroSlides = homeData?.heroSlides?.length ? homeData.heroSlides : heroSlides;
+
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#fff' }}>
-      {/* 1. Hero / Campaign Slider */}
-      <HeroSection />
+      {/* 1. Hero / Campaign Slider (V3: CMS 연동, 정적 fallback) */}
+      <HeroSection slides={activeHeroSlides} />
 
       {/* Business Onboarding Banner */}
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '24px 24px 0' }}>
