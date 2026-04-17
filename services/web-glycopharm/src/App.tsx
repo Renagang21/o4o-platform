@@ -168,6 +168,9 @@ const MyRequestsPage = lazy(() => import('@/pages/forum/MyRequestsPage'));
 const ForumFeedbackPage = lazy(() => import('@/pages/forum/ForumFeedbackPage'));
 const EducationPage = lazy(() => import('@/pages/education/EducationPage'));
 const CourseDetailPage = lazy(() => import('@/pages/education/CourseDetailPage'));
+// WO-GLYCOPHARM-INSTRUCTOR-OPERATOR-V1
+const InstructorDashboardPage = lazy(() => import('@/pages/instructor/InstructorDashboardPage'));
+const LmsCoursesPage = lazy(() => import('@/pages/operator/LmsCoursesPage'));
 
 // MyPage 3-split (WO-O4O-GLYCOPHARM-MYPAGE-SPLIT-V1)
 const MyPageHub = lazy(() => import('@/pages/mypage/MyPageHub'));
@@ -323,6 +326,12 @@ function AppRoutes() {
         <Route path="forum-ext/:forumId" element={<ForumFeedPage />} />
         <Route path="education" element={<EducationPage />} />
         <Route path="education/:id" element={<CourseDetailPage />} />
+        {/* Instructor Dashboard — WO-GLYCOPHARM-INSTRUCTOR-OPERATOR-V1 */}
+        <Route path="instructor" element={
+          <RoleGuard allowedRoles={['lms:instructor', 'glycopharm:admin', 'platform:super_admin']}>
+            <InstructorDashboardPage />
+          </RoleGuard>
+        } />
         <Route path="contact" element={<ContactPage />} />
         <Route path="apply" element={<PharmacyApplyPage />} />
         <Route path="apply/pharmacist" element={<PharmacistApplyPage />} />
@@ -472,6 +481,8 @@ function AppRoutes() {
             역할 관리는 /admin/roles 에서만 접근. /operator/roles 라우트 제거. */}
         {/* Guideline Management (WO-GLYCOPHARM-GUIDELINE-CMS-MIGRATION-V1) */}
         <Route path="guidelines" element={<GuidelineManagementPage />} />
+        {/* LMS Management (WO-GLYCOPHARM-INSTRUCTOR-OPERATOR-V1) */}
+        <Route path="lms/courses" element={<LmsCoursesPage />} />
         {/* Settings */}
         <Route path="settings" element={<SettingsPage />} />
       </Route>
