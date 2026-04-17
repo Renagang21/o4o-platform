@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Search,
   Clock,
@@ -21,6 +22,7 @@ const LEVEL_LABEL: Record<string, string> = {
 };
 
 export default function EducationPage() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLevel, setSelectedLevel] = useState('all');
   const [courses, setCourses] = useState<LmsCourse[]>([]);
@@ -128,6 +130,7 @@ export default function EducationPage() {
           {courses.map((course) => (
             <div
               key={course.id}
+              onClick={() => navigate(`/education/${course.id}`)}
               className="bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer group"
             >
               {/* Thumbnail */}

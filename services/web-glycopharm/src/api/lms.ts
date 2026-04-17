@@ -1,8 +1,8 @@
 /**
  * LMS API Client — GlycoPharm
- * WO-GLYCOPHARM-LMS-ROUTING-INTEGRATION-V1
+ * WO-GLYCOPHARM-LMS-ROUTING-INTEGRATION-V1 / WO-GLYCOPHARM-COURSE-DETAIL-ENROLL-V1
  *
- * 전역 LMS 엔드포인트 /api/v1/lms/courses 사용
+ * 전역 LMS 엔드포인트 /api/v1/lms/* 사용
  * kpaLmsScopeGuard는 GET 요청을 통과시킴 — 백엔드 변경 불필요
  */
 import { api } from '@/lib/apiClient';
@@ -18,6 +18,14 @@ export interface LmsCourse {
   instructorId: string | null;
   isPublished: boolean;
   createdAt: string;
+}
+
+export interface LmsEnrollment {
+  id: string;
+  courseId: string;
+  userId: string;
+  status: string;
+  enrolledAt: string;
 }
 
 export interface LmsCoursesResult {
@@ -44,5 +52,30 @@ export const lmsApi = {
     if (params?.limit) query.set('limit', String(params.limit));
     const { data } = await api.get<LmsCoursesResult>(`/lms/courses?${query.toString()}`);
     return data;
+  },
+
+  getCourseById: async (id: string): Promise<LmsCourse> => {
+    const { data } = await api.get<{ success: boolean; data: { course: LmsCourse } }>(
+      `/lms/courses/${id}`,
+    );
+    return data.data.course;
+  },
+
+  getMyEnrollment: async (courseId: string): Promise<LmsEnrollment | null> => {
+    try {
+      const { data } = await api.get<{ success: boolean; data: { enrollment: LmsEnrollment } }>(
+        `/lms/enrollments/${courseId}`,
+      );
+      return data.data.enrollment;
+    } catch {
+      return null;
+    }
+  },
+
+  enrollCourse: async (courseId: string): Promise<LmsEnrollment> => {
+    const { data } = await api.post<{ success: boolean; data: { enrollment: LmsEnrollment } }>(
+      `/lms/courses/${courseId}/enroll`,
+    );
+    return data.data.enrollment;
   },
 };
