@@ -482,6 +482,11 @@ function RedirectContentDetail() {
   const { id } = useParams();
   return <Navigate to={`/partner/contents/${id}`} replace />;
 }
+// WO-CLEANUP-2: /admin/market-trial/:id → /operator/market-trial/:id
+function RedirectAdminMarketTrialDetail() {
+  const { id } = useParams();
+  return <Navigate to={`/operator/market-trial/${id}`} replace />;
+}
 
 // /login 경로 접근 시 홈으로 리다이렉트하고 로그인 모달 열기
 function LoginRedirect() {
@@ -816,8 +821,9 @@ function App() {
               <Route path="/admin/supplier-quality" element={<SupplierQualityPage />} />
               <Route path="/admin/category-mapping-rules" element={<CategoryMappingRulesPage />} />
               <Route path="/admin/roles" element={<RoleManagementPage />} />
-              <Route path="/admin/market-trial" element={<MarketTrialApprovalsPage />} />
-              <Route path="/admin/market-trial/:id" element={<MarketTrialApprovalDetailPage />} />
+              {/* WO-CLEANUP-2: /admin/market-trial → /operator/market-trial redirect */}
+              <Route path="/admin/market-trial" element={<Navigate to="/operator/market-trial" replace />} />
+              <Route path="/admin/market-trial/:id" element={<RedirectAdminMarketTrialDetail />} />
               <Route path="/admin/categories" element={<CategoryManagementPage />} />
               <Route path="/admin/brands" element={<BrandManagementPage />} />
               <Route path="/admin/product-cleanup" element={<ProductDataCleanupPage />} />

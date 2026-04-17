@@ -82,7 +82,6 @@ export const CLOSED_STATUSES: TrialStatus[] = [
 export const TRIAL_STATUS_LABELS: Record<TrialStatus, string> = {
   [TrialStatus.DRAFT]: '작성 중',
   [TrialStatus.SUBMITTED]: '심사 대기',
-  [TrialStatus.APPROVED]: '승인됨',
   [TrialStatus.RECRUITING]: '모집 중',
   [TrialStatus.DEVELOPMENT]: '준비 중',
   [TrialStatus.OUTCOME_CONFIRMING]: '결과 확정 중',
@@ -104,7 +103,6 @@ export function getTrialDisplayGroup(status: TrialStatus): TrialDisplayGroup {
   switch (status) {
     case TrialStatus.DRAFT:
     case TrialStatus.SUBMITTED:
-    case TrialStatus.APPROVED:
       return 'upcoming';
     case TrialStatus.RECRUITING:
     case TrialStatus.DEVELOPMENT:

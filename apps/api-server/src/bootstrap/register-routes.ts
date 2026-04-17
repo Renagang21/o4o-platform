@@ -68,7 +68,7 @@ import aiProxyRoutes from '../routes/ai-proxy.routes.js';
 import aiAdminRoutes from '../routes/ai-admin.routes.js';
 import { MarketTrialController } from '../controllers/market-trial/marketTrialController.js';
 import { MarketTrialOperatorController } from '../controllers/market-trial/marketTrialOperatorController.js';
-import { createNetureOperatorTrialRoutes, createServiceOperatorTrialRoutes } from '../routes/market-trial-operator.routes.js';
+import { createNetureOperatorTrialRoutes } from '../routes/market-trial-operator.routes.js';
 import trialShippingRoutes from '../extensions/trial-shipping/index.js';
 import trialFulfillmentRoutes from '../extensions/trial-fulfillment/index.js';
 import { TrialFulfillmentController } from '../extensions/trial-fulfillment/trialFulfillment.controller.js';
@@ -341,7 +341,6 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     // 22-mt. Market Trial Operator Routes (WO-O4O-MARKET-TRIAL-PHASE1-V1)
     MarketTrialOperatorController.setDataSource(dataSource);
     app.use('/api/v1/neture/operator/market-trial', createNetureOperatorTrialRoutes());
-    app.use('/api/v1/:serviceKey/operator/market-trial', createServiceOperatorTrialRoutes());
     logger.info('✅ Market Trial Operator routes registered');
 
     // 22-ai. Register AI Query routes (Phase AI-1)

@@ -52,11 +52,7 @@ const NEXT_ACTION: Record<string, { title: string; desc: string }> = {
   },
   submitted: {
     title: 'Neture 운영자가 검토 중입니다',
-    desc: '검토 완료 후 서비스 운영자 2차 승인 단계로 진행됩니다. 별도 조치는 필요 없습니다.',
-  },
-  approved: {
-    title: '서비스 운영자 검토 중입니다',
-    desc: '서비스 채널별 운영자가 최종 승인하면 모집이 시작됩니다.',
+    desc: '검토 완료 후 승인되면 바로 모집이 시작됩니다. 별도 조치는 필요 없습니다.',
   },
   recruiting: {
     title: '참여자 모집 중입니다',

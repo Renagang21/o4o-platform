@@ -24,8 +24,7 @@ import {
 export enum TrialStatus {
   DRAFT = 'draft',                         // 초안 - 공급자가 작성 중
   SUBMITTED = 'submitted',                 // 제출됨 - 운영자 심사 대기
-  APPROVED = 'approved',                   // 승인됨 - 모집 시작 전
-  RECRUITING = 'recruiting',               // 모집 중 - 참여자 모집 진행
+  RECRUITING = 'recruiting',               // 모집 중 - 운영자 단일 승인 후 즉시 진입
   DEVELOPMENT = 'development',             // 개발/준비 중 - 모집 완료 후 상품 준비
   OUTCOME_CONFIRMING = 'outcome_confirming', // 결과 확정 중 - 참여자 Decision 수집
   FULFILLED = 'fulfilled',                 // 이행 완료 - Trial 성공 종료

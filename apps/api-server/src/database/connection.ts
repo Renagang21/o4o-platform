@@ -305,12 +305,12 @@ import {
   MarketTrialParticipant,
   MarketTrialForum,
   MarketTrialDecision,
-  MarketTrialServiceApproval,
 } from '@o4o/market-trial';
 
 // MARKET-TRIAL EXTENSION ENTITIES
 import { MarketTrialShippingAddress } from '../extensions/trial-shipping/entities/MarketTrialShippingAddress.entity.js';
 import { MarketTrialFulfillment } from '../extensions/trial-fulfillment/entities/MarketTrialFulfillment.entity.js';
+import { MarketTrialForumSyncFailure } from '../extensions/trial-forum-monitor/entities/MarketTrialForumSyncFailure.entity.js';
 
 // ============================================================================
 // PLATFORM PHYSICAL STORE ENTITIES (WO-O4O-CROSS-SERVICE-STORE-LINKING-V1)
@@ -911,9 +911,9 @@ export const AppDataSource = new DataSource({
     MarketTrialParticipant,
     MarketTrialForum,
     MarketTrialDecision,
-    MarketTrialServiceApproval,
     MarketTrialShippingAddress,
     MarketTrialFulfillment,
+    MarketTrialForumSyncFailure,
     // ============================================================================
     // STORE LIBRARY (WO-O4O-STORE-LIBRARY-FOUNDATION-V1) — merged into existing entry above
     // ============================================================================

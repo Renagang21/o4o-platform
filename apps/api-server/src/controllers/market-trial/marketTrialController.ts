@@ -43,15 +43,14 @@ const CLOSED_STATUSES: TrialStatus[] = [
 ];
 
 /**
- * WO-O4O-MARKET-TRIAL-PHASE1-POST-STABILIZATION-VERIFY-V1:
+ * WO-CLEANUP-3: APPROVED 상태 제거 후 현행화
  * Pre-launch statuses excluded from public API by default.
  * DRAFT/SUBMITTED visible only to supplier (getMyTrials).
- * APPROVED visible only to service operators (2nd approval list).
+ * (단일 승인 구조: 운영자 승인 즉시 RECRUITING 진입, APPROVED 상태 없음)
  */
 const PRE_LAUNCH_STATUSES: TrialStatus[] = [
   TrialStatus.DRAFT,
   TrialStatus.SUBMITTED,
-  TrialStatus.APPROVED,
 ];
 
 export class MarketTrialController {

@@ -12,7 +12,7 @@ import { api, API_BASE_URL } from '../lib/apiClient';
 // ============================================================================
 
 export type TrialStatus =
-  | 'draft' | 'submitted' | 'approved' | 'recruiting'
+  | 'draft' | 'submitted' | 'recruiting'
   | 'development' | 'outcome_confirming' | 'fulfilled' | 'closed';
 
 export interface Trial {
@@ -56,19 +56,7 @@ export interface Trial {
   updatedAt?: string;
 }
 
-export interface ServiceApproval {
-  id: string;
-  trialId: string;
-  serviceKey: string;
-  status: 'pending' | 'approved' | 'rejected';
-  reviewedBy?: string | null;
-  reviewedAt?: string | null;
-  reason?: string | null;
-  createdAt: string;
-}
-
 export interface OperatorTrial extends Trial {
-  serviceApprovals?: ServiceApproval[];
   forumLink?: {
     forumPostId: string;
     slug: string | null;
@@ -585,6 +573,59 @@ export async function exportParticipantsCSV(trialId: string): Promise<void> {
   a.click();
   a.remove();
   window.URL.revokeObjectURL(url);
+}
+
+// ============================================================================
+// WO-MONITOR-1: 포럼 연계 실패 API
+// ============================================================================
+
+export type ForumSyncStage = 'category_check' | 'forum_post_create' | 'forum_mapping_save';
+export type ForumSyncSeverity = 'critical' | 'warning';
+
+export interface ForumSyncFailure {
+  id: string;
+  trialId: string;
+  trialTitle: string;
+  stage: ForumSyncStage;
+  severity: ForumSyncSeverity;
+  errorMessage: string;
+  occurredAt: string;
+  resolvedAt: string | null;
+  resolutionNote: string | null;
+}
+
+export interface ForumSyncFailureListResponse {
+  data: ForumSyncFailure[];
+  meta: { total: number; page: number; limit: number };
+}
+
+export async function getForumSyncFailures(params?: {
+  trialId?: string;
+  resolved?: 'true' | 'false';
+  page?: number;
+  limit?: number;
+}): Promise<ForumSyncFailureListResponse> {
+  const sp = new URLSearchParams();
+  if (params?.trialId) sp.set('trialId', params.trialId);
+  if (params?.resolved) sp.set('resolved', params.resolved);
+  if (params?.page) sp.set('page', String(params.page));
+  if (params?.limit) sp.set('limit', String(params.limit));
+  const qs = sp.toString();
+  const { data } = await api.get(
+    `${API_BASE_URL}/api/v1/neture/operator/market-trial/forum-sync-failures${qs ? `?${qs}` : ''}`,
+  );
+  return data;
+}
+
+export async function resolveForumSyncFailure(
+  failureId: string,
+  note?: string,
+): Promise<ForumSyncFailure> {
+  const { data } = await api.patch(
+    `${API_BASE_URL}/api/v1/neture/operator/market-trial/forum-sync-failures/${failureId}/resolve`,
+    { note },
+  );
+  return data.data || data;
 }
 
 // ============================================================================

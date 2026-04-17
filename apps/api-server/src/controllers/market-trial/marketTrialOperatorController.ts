@@ -20,10 +20,13 @@ import { DataSource, Repository } from 'typeorm';
 import {
   MarketTrial,
   TrialStatus,
-  MarketTrialServiceApproval,
-  ServiceApprovalStatus,
   MarketTrialForum,
 } from '@o4o/market-trial';
+import {
+  MarketTrialForumSyncFailure,
+  type ForumSyncStage,
+  type ForumSyncSeverity,
+} from '../../extensions/trial-forum-monitor/entities/MarketTrialForumSyncFailure.entity.js';
 
 // Allowed trial status transitions (operator-initiated)
 const ALLOWED_TRIAL_TRANSITIONS: Partial<Record<TrialStatus, TrialStatus[]>> = {
@@ -63,13 +66,52 @@ type CustomerConversionStatus = typeof VALID_CUSTOMER_CONVERSION_STATUSES[number
 export class MarketTrialOperatorController {
   private static dataSource: DataSource | null = null;
   private static trialRepo: Repository<MarketTrial>;
-  private static approvalRepo: Repository<MarketTrialServiceApproval>;
   private static forumRepo: Repository<MarketTrialForum>;
+  private static forumSyncFailureRepo: Repository<MarketTrialForumSyncFailure>;
   static setDataSource(ds: DataSource) {
     this.dataSource = ds;
     this.trialRepo = ds.getRepository(MarketTrial);
-    this.approvalRepo = ds.getRepository(MarketTrialServiceApproval);
     this.forumRepo = ds.getRepository(MarketTrialForum);
+    this.forumSyncFailureRepo = ds.getRepository(MarketTrialForumSyncFailure);
+  }
+
+  // ============================================================================
+  // Internal: 포럼 연계 실패 기록 헬퍼
+  // ============================================================================
+
+  private static async recordForumSyncFailure(
+    trial: Pick<MarketTrial, 'id' | 'title'>,
+    stage: ForumSyncStage,
+    severity: ForumSyncSeverity,
+    error: unknown,
+  ): Promise<void> {
+    const err = error instanceof Error ? error : new Error(String(error));
+    const logPayload = {
+      event: 'market_trial.forum_sync_failure',
+      trialId: trial.id,
+      trialTitle: trial.title,
+      stage,
+      severity,
+      errorMessage: err.message,
+    };
+    console.error(JSON.stringify(logPayload));
+
+    try {
+      const record = this.forumSyncFailureRepo.create({
+        trialId: trial.id,
+        trialTitle: trial.title,
+        stage,
+        severity,
+        errorMessage: err.message,
+        errorStack: err.stack ?? null,
+        resolvedAt: null,
+        resolutionNote: null,
+      });
+      await this.forumSyncFailureRepo.save(record);
+    } catch (saveErr) {
+      // 실패 기록 저장 자체가 실패해도 주 흐름에 영향 없음
+      console.error('[MarketTrial] Failed to save forum sync failure record:', saveErr);
+    }
   }
 
   // ============================================================================
@@ -101,7 +143,7 @@ export class MarketTrialOperatorController {
 
   /**
    * GET /api/v1/neture/operator/market-trial/:id
-   * Trial 상세 (ServiceApproval 포함)
+   * Trial 상세
    */
   static async getDetail(req: AuthRequest, res: Response) {
     try {
@@ -110,11 +152,6 @@ export class MarketTrialOperatorController {
       if (!trial) {
         return res.status(404).json({ success: false, message: 'Trial not found' });
       }
-
-      const approvals = await MarketTrialOperatorController.approvalRepo.find({
-        where: { trialId: id },
-        order: { createdAt: 'ASC' },
-      });
 
       // WO-MARKET-TRIAL-KPA-FORUM-INTEGRATION-V1: 연결된 KPA 포럼 게시글 정보
       const forumMapping = await MarketTrialOperatorController.forumRepo.findOne({
@@ -140,7 +177,6 @@ export class MarketTrialOperatorController {
         success: true,
         data: {
           ...toOperatorTrialDTO(trial),
-          serviceApprovals: approvals.map(toServiceApprovalDTO),
           forumLink,
         },
       });
@@ -183,6 +219,7 @@ export class MarketTrialOperatorController {
 
       // WO-MARKET-TRIAL-KPA-FORUM-INTEGRATION-V1:
       // KPA-a Market Trial 포럼 카테고리에 자동 게시글 생성 + 매핑 저장
+      // WO-MONITOR-1: 단계별 실패를 market_trial_forum_sync_failures에 기록
       const existingForum = await MarketTrialOperatorController.forumRepo.findOne({
         where: { marketTrialId: trial.id },
       });
@@ -191,11 +228,19 @@ export class MarketTrialOperatorController {
           const ds = MarketTrialOperatorController.dataSource;
           const TRIAL_FORUM_CATEGORY_ID = 'f0000000-0a00-4000-f000-0000000000f1';
 
-          // 카테고리 존재 확인
-          const catExists = await ds.query(
-            `SELECT id FROM forum_category WHERE id = $1`,
-            [TRIAL_FORUM_CATEGORY_ID],
-          );
+          // Stage 1: 카테고리 존재 확인
+          let catExists: Array<{ id: string }>;
+          try {
+            catExists = await ds.query(
+              `SELECT id FROM forum_category WHERE id = $1`,
+              [TRIAL_FORUM_CATEGORY_ID],
+            );
+          } catch (catErr) {
+            await MarketTrialOperatorController.recordForumSyncFailure(
+              trial, 'category_check', 'warning', catErr,
+            );
+            catExists = [];
+          }
 
           if (catExists.length > 0) {
             const slug = `market-trial-${trial.id.slice(0, 8)}-${Date.now().toString(36)}`;
@@ -208,41 +253,58 @@ export class MarketTrialOperatorController {
               { type: 'paragraph', data: { text: `※ 본 게시글은 운영자 승인으로 자동 생성되었습니다.` } },
             ]);
 
-            const inserted = await ds.query(
-              `INSERT INTO forum_post (
-                "id", "title", "slug", "content", "excerpt",
-                "type", "status", "categoryId", "author_id",
-                "isPinned", "isLocked", "allowComments",
-                "viewCount", "commentCount", "likeCount",
-                "published_at", "created_at", "updated_at"
-              ) VALUES (
-                gen_random_uuid(), $1, $2, $3, $4,
-                'announcement', 'publish', $5, NULL,
-                false, false, true,
-                0, 0, 0,
-                NOW(), NOW(), NOW()
-              ) RETURNING id`,
-              [
-                `[시범판매] ${trial.title}`,
-                slug,
-                content,
-                excerpt,
-                TRIAL_FORUM_CATEGORY_ID,
-              ],
-            );
+            // Stage 2: 포럼 게시글 INSERT
+            let forumPostId: string | null = null;
+            try {
+              const inserted = await ds.query(
+                `INSERT INTO forum_post (
+                  "id", "title", "slug", "content", "excerpt",
+                  "type", "status", "categoryId", "author_id",
+                  "isPinned", "isLocked", "allowComments",
+                  "viewCount", "commentCount", "likeCount",
+                  "published_at", "created_at", "updated_at"
+                ) VALUES (
+                  gen_random_uuid(), $1, $2, $3, $4,
+                  'announcement', 'publish', $5, NULL,
+                  false, false, true,
+                  0, 0, 0,
+                  NOW(), NOW(), NOW()
+                ) RETURNING id`,
+                [
+                  `[시범판매] ${trial.title}`,
+                  slug,
+                  content,
+                  excerpt,
+                  TRIAL_FORUM_CATEGORY_ID,
+                ],
+              );
+              forumPostId = inserted[0]?.id ?? null;
+            } catch (postErr) {
+              await MarketTrialOperatorController.recordForumSyncFailure(
+                trial, 'forum_post_create', 'critical', postErr,
+              );
+            }
 
-            const forumPostId = inserted[0]?.id;
+            // Stage 3: 매핑 저장
             if (forumPostId) {
-              const forumMapping = MarketTrialOperatorController.forumRepo.create({
-                marketTrialId: trial.id,
-                forumId: forumPostId,
-              });
-              await MarketTrialOperatorController.forumRepo.save(forumMapping);
+              try {
+                const forumMapping = MarketTrialOperatorController.forumRepo.create({
+                  marketTrialId: trial.id,
+                  forumId: forumPostId,
+                });
+                await MarketTrialOperatorController.forumRepo.save(forumMapping);
+              } catch (mappingErr) {
+                await MarketTrialOperatorController.recordForumSyncFailure(
+                  trial, 'forum_mapping_save', 'critical', mappingErr,
+                );
+              }
             }
           }
         } catch (forumError) {
-          // 포럼 생성 실패는 승인 자체를 막지 않음 (재시도/수동 연결 가능)
-          console.error('[MarketTrial] Forum post creation failed:', forumError);
+          // 예상 외 에러 — 전체 블록 실패
+          await MarketTrialOperatorController.recordForumSyncFailure(
+            trial, 'forum_post_create', 'critical', forumError,
+          );
         }
       }
 
@@ -1016,7 +1078,7 @@ export class MarketTrialOperatorController {
       const header = ['참여자명', '참여자유형', '보상방식', '보상상태', '참여일', 'Trial제목', 'Trial상태'];
       const trialTitle = (trial.title || '').replace(/"/g, '""');
       const trialStatusLabel: Record<string, string> = {
-        draft: '작성 중', submitted: '심사 대기', approved: '승인됨',
+        draft: '작성 중', submitted: '심사 대기',
         recruiting: '모집 중', development: '준비 중',
         outcome_confirming: '결과 확정', fulfilled: '이행 완료', closed: '종료',
       };
@@ -1169,105 +1231,83 @@ export class MarketTrialOperatorController {
   }
 
   // ============================================================================
-  // Service Operator 2nd Approval
-  // WO-MARKET-TRIAL-NETURE-SINGLE-APPROVAL-TRANSITION-V1: DEPRECATED
-  // 서비스별 2차 승인 제거됨. 아래 메서드들은 하위 호환용으로 유지하되
-  // 실제 상태 전이 없이 403 반환.
+  // WO-MONITOR-1: 포럼 연계 실패 조회 API
   // ============================================================================
 
   /**
-   * GET /api/v1/:serviceKey/operator/market-trial
-   * 서비스별 Trial 목록 (ServiceApproval 상태 포함)
+   * GET /api/v1/neture/operator/market-trial/forum-sync-failures
+   * 포럼 연계 실패 목록 (운영자 전용)
+   * query: trialId?, resolved? (true|false), limit?, page?
    */
-  static async listForService(req: AuthRequest, res: Response) {
+  static async listForumSyncFailures(req: AuthRequest, res: Response) {
     try {
-      const { serviceKey } = req.params;
-      const { status: approvalStatusFilter } = req.query;
+      const { trialId, resolved, limit: limitStr, page: pageStr } = req.query;
 
-      // Trials visible to this service, excluding DRAFT/SUBMITTED
-      const qb = MarketTrialOperatorController.trialRepo
-        .createQueryBuilder('trial')
-        .where(`trial."visibleServiceKeys" @> :serviceKeys::jsonb`, {
-          serviceKeys: JSON.stringify([serviceKey]),
-        })
-        .andWhere('trial.status NOT IN (:...excludeStatuses)', {
-          excludeStatuses: [TrialStatus.DRAFT, TrialStatus.SUBMITTED],
-        })
-        .orderBy('trial.createdAt', 'DESC');
+      const limit = Math.min(100, Math.max(1, Number(limitStr) || 50));
+      const page = Math.max(1, Number(pageStr) || 1);
+      const offset = (page - 1) * limit;
 
-      const trials = await qb.getMany();
+      const qb = MarketTrialOperatorController.forumSyncFailureRepo
+        .createQueryBuilder('f')
+        .orderBy('f.occurredAt', 'DESC')
+        .take(limit)
+        .skip(offset);
 
-      // Fetch service approvals for these trials
-      const trialIds = trials.map((t) => t.id);
-      let approvals: MarketTrialServiceApproval[] = [];
-      if (trialIds.length > 0) {
-        const aqb = MarketTrialOperatorController.approvalRepo
-          .createQueryBuilder('sa')
-          .where('sa.trialId IN (:...trialIds)', { trialIds })
-          .andWhere('sa.serviceKey = :serviceKey', { serviceKey });
-        approvals = await aqb.getMany();
+      if (trialId && typeof trialId === 'string') {
+        qb.andWhere('f.trialId = :trialId', { trialId });
       }
 
-      const approvalMap = new Map(approvals.map((a) => [a.trialId, a]));
-
-      // Optionally filter by approval status
-      let result = trials.map((trial) => ({
-        ...toOperatorTrialDTO(trial),
-        serviceApproval: approvalMap.has(trial.id)
-          ? toServiceApprovalDTO(approvalMap.get(trial.id)!)
-          : null,
-      }));
-
-      if (approvalStatusFilter && typeof approvalStatusFilter === 'string') {
-        result = result.filter((r) => r.serviceApproval?.status === approvalStatusFilter);
+      if (resolved === 'true') {
+        qb.andWhere('f.resolvedAt IS NOT NULL');
+      } else if (resolved === 'false') {
+        qb.andWhere('f.resolvedAt IS NULL');
       }
 
-      res.json({ success: true, data: result });
+      const [items, total] = await qb.getManyAndCount();
+
+      res.json({
+        success: true,
+        data: items.map(toForumSyncFailureDTO),
+        meta: { total, page, limit },
+      });
     } catch (error) {
-      console.error('Service operator list error:', error);
-      res.status(500).json({ success: false, message: 'Failed to list trials for service' });
+      console.error('listForumSyncFailures error:', error);
+      res.status(500).json({ success: false, message: 'Failed to list forum sync failures' });
     }
   }
 
   /**
-   * GET /api/v1/:serviceKey/operator/market-trial/:id
-   * 서비스별 Trial 상세 (ServiceApproval 포함)
+   * PATCH /api/v1/neture/operator/market-trial/forum-sync-failures/:failureId/resolve
+   * 실패 건 resolved 처리 (운영자 메모 저장 가능)
    */
-  static async getDetailForService(req: AuthRequest, res: Response) {
+  static async resolveForumSyncFailure(req: AuthRequest, res: Response) {
     try {
-      const { serviceKey, id } = req.params;
+      const { failureId } = req.params;
+      const { note } = req.body as { note?: string };
 
-      const trial = await MarketTrialOperatorController.trialRepo.findOne({ where: { id } });
-      if (!trial) {
-        return res.status(404).json({ success: false, message: 'Trial not found' });
+      const record = await MarketTrialOperatorController.forumSyncFailureRepo.findOne({
+        where: { id: failureId },
+      });
+
+      if (!record) {
+        return res.status(404).json({ success: false, message: 'Failure record not found' });
       }
 
-      const approval = await MarketTrialOperatorController.approvalRepo.findOne({
-        where: { trialId: id, serviceKey },
-      });
+      if (record.resolvedAt) {
+        return res.status(400).json({ success: false, message: 'Already resolved' });
+      }
 
-      res.json({
-        success: true,
-        data: {
-          ...toOperatorTrialDTO(trial),
-          serviceApproval: approval ? toServiceApprovalDTO(approval) : null,
-        },
-      });
+      record.resolvedAt = new Date();
+      record.resolutionNote = note ?? null;
+      await MarketTrialOperatorController.forumSyncFailureRepo.save(record);
+
+      res.json({ success: true, data: toForumSyncFailureDTO(record) });
     } catch (error) {
-      console.error('Service operator detail error:', error);
-      res.status(500).json({ success: false, message: 'Failed to get trial detail' });
+      console.error('resolveForumSyncFailure error:', error);
+      res.status(500).json({ success: false, message: 'Failed to resolve failure record' });
     }
   }
 
-  /** @deprecated WO-MARKET-TRIAL-NETURE-SINGLE-APPROVAL-TRANSITION-V1: 서비스별 2차 승인 제거 */
-  static async approve2nd(req: AuthRequest, res: Response) {
-    res.status(403).json({ success: false, message: 'Service-level approval is no longer required. Trials are approved by Neture operator only.' });
-  }
-
-  /** @deprecated WO-MARKET-TRIAL-NETURE-SINGLE-APPROVAL-TRANSITION-V1: 서비스별 2차 승인 제거 */
-  static async reject2nd(req: AuthRequest, res: Response) {
-    res.status(403).json({ success: false, message: 'Service-level approval is no longer required. Trials are approved by Neture operator only.' });
-  }
 }
 
 // ============================================================================
@@ -1333,6 +1373,21 @@ async function dispatchConversionNotifications(
 // DTO converters
 // ============================================================================
 
+function toForumSyncFailureDTO(f: MarketTrialForumSyncFailure) {
+  return {
+    id: f.id,
+    trialId: f.trialId,
+    trialTitle: f.trialTitle,
+    stage: f.stage,
+    severity: f.severity,
+    errorMessage: f.errorMessage,
+    // errorStack은 API 응답에 노출하지 않음 (내부 저장 전용)
+    occurredAt: new Date(f.occurredAt).toISOString(),
+    resolvedAt: f.resolvedAt ? new Date(f.resolvedAt).toISOString() : null,
+    resolutionNote: f.resolutionNote,
+  };
+}
+
 function toOperatorTrialDTO(trial: MarketTrial) {
   return {
     id: trial.id,
@@ -1359,15 +1414,3 @@ function toOperatorTrialDTO(trial: MarketTrial) {
   };
 }
 
-function toServiceApprovalDTO(a: MarketTrialServiceApproval) {
-  return {
-    id: a.id,
-    trialId: a.trialId,
-    serviceKey: a.serviceKey,
-    status: a.status,
-    reviewedBy: a.reviewedBy,
-    reviewedAt: a.reviewedAt ? new Date(a.reviewedAt).toISOString() : null,
-    reason: a.reason,
-    createdAt: new Date(a.createdAt).toISOString(),
-  };
-}
