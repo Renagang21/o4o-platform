@@ -17,6 +17,12 @@ import { AiSettings } from '../entities/AiSettings.js';
 import type { AuthRequest } from '../types/auth.js';
 import type { AIProvider } from '../types/ai-proxy.types.js';
 import logger from '../utils/logger.js';
+import {
+  isSupportedOutputType,
+  buildSystemPrompt,
+  buildUserPrompt,
+  parseResponse,
+} from '../services/ai-prompts/index.js';
 
 const router: Router = Router();
 
@@ -197,5 +203,94 @@ async function getGeminiApiKey(): Promise<string> {
 
   throw new Error('Gemini API key not configured. Set GEMINI_API_KEY or configure in AI Settings.');
 }
+
+// ===========================================
+// POST /api/ai/content — outputType 기반 콘텐츠 변환
+// WO-AI-CONTENT-TRANSFORM-IMPLEMENTATION-V1
+// WO-AI-PROMPT-STRUCTURE-DESIGN-V1
+// ===========================================
+
+router.post('/content', authenticate, async (req, res: Response) => {
+  const authReq = req as AuthRequest;
+  const userId = authReq.user?.id;
+
+  if (!userId) {
+    return res.status(401).json({ success: false, error: '로그인이 필요합니다.' });
+  }
+
+  const { input, outputType = 'product_detail', options = {} } = req.body;
+
+  if (!input || typeof input !== 'string' || input.trim().length === 0) {
+    return res.status(400).json({ success: false, error: 'input 텍스트가 필요합니다.' });
+  }
+
+  if (!isSupportedOutputType(outputType)) {
+    return res.status(400).json({ success: false, error: `지원하지 않는 outputType: ${outputType}` });
+  }
+
+  const systemPrompt = buildSystemPrompt(outputType, options);
+  const userPrompt = buildUserPrompt(outputType, input);
+  const requestId = crypto.randomUUID();
+
+  try {
+    const apiKey = await getGeminiApiKey();
+    const model = 'gemini-2.0-flash';
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+    const geminiRes = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: systemPrompt }] },
+        contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+        generationConfig: {
+          temperature: 0.5,
+          maxOutputTokens: 2000,
+          responseMimeType: 'application/json',
+        },
+      }),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!geminiRes.ok) {
+      const errBody = await geminiRes.text();
+      logger.error('AI content: Gemini error', { requestId, status: geminiRes.status, body: errBody });
+      return res.status(502).json({ success: false, error: 'AI 서비스 오류가 발생했습니다.', requestId });
+    }
+
+    const data = await geminiRes.json();
+    const rawText: string = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+
+    if (!rawText) {
+      return res.status(502).json({ success: false, error: 'AI 응답이 비어 있습니다.', requestId });
+    }
+
+    let parsedJson: Record<string, any> = {};
+    try {
+      const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) parsedJson = JSON.parse(jsonMatch[0]);
+    } catch {
+      parsedJson = {};
+    }
+
+    const normalized = parseResponse(outputType, parsedJson, rawText);
+
+    logger.info('AI content generated', { requestId, userId, outputType, model });
+
+    return res.json({ success: true, ...normalized, requestId });
+  } catch (error: any) {
+    logger.error('AI content generate error', { requestId, error: error.message });
+    return res.status(500).json({
+      success: false,
+      error: error.message || 'AI 콘텐츠 생성 중 오류가 발생했습니다.',
+      requestId,
+    });
+  }
+});
 
 export default router;

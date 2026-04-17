@@ -27,8 +27,10 @@ import {
   Redo,
   Minus,
   Highlighter,
+  Sparkles,
 } from 'lucide-react';
 import type { EditorPreset } from '../types';
+import { AiContentModal } from './AiContentModal';
 
 interface ExistingImage {
   id: string;
@@ -48,6 +50,7 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [showVideoInput, setShowVideoInput] = useState(false);
   const [showImageInput, setShowImageInput] = useState(false);
+  const [showAiModal, setShowAiModal] = useState(false);
   const [linkUrl, setLinkUrl] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
   const [imageUrl, setImageUrl] = useState('');
@@ -155,6 +158,7 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
   };
 
   return (
+    <>
     <div style={{
       display: 'flex',
       flexWrap: 'wrap',
@@ -558,6 +562,35 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
         </div>
       )}
 
+      {/* AI 정리 버튼 (full only) — WO-AI-CONTENT-TRANSFORM-IMPLEMENTATION-V1 */}
+      {preset === 'full' && (
+        <>
+          <Divider />
+          <button
+            type="button"
+            onClick={() => setShowAiModal(true)}
+            title="AI로 텍스트를 상품 설명으로 재구성"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              padding: '4px 10px',
+              border: '1px solid #c7d2fe',
+              borderRadius: '6px',
+              background: '#eef2ff',
+              color: '#4f46e5',
+              fontSize: '12px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <Sparkles size={14} />
+            AI 정리
+          </button>
+        </>
+      )}
+
       {/* Video — full only */}
       {preset === 'full' && (
         <div style={{ position: 'relative' }}>
@@ -632,6 +665,14 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
         </div>
       )}
     </div>
+
+    {/* AI 콘텐츠 변환 모달 */}
+    <AiContentModal
+      open={showAiModal}
+      onClose={() => setShowAiModal(false)}
+      editor={editor}
+    />
+    </>
   );
 }
 
