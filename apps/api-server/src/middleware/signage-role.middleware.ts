@@ -273,10 +273,10 @@ export const requireSignageStore = async (
 
   // Check in-memory first (admin, explicit permission, etc.)
   if (!hasSignageStorePermission(req.user, organizationId)) {
-    // Fallback: check kpa_members table for organization membership
+    // Fallback: check organization_members table for store membership (universal, all services)
     try {
       const rows = await AppDataSource.query(
-        `SELECT 1 FROM kpa_members WHERE user_id = $1 AND organization_id = $2 AND status = 'active' LIMIT 1`,
+        `SELECT 1 FROM organization_members WHERE user_id = $1 AND organization_id = $2 AND role IN ('owner', 'admin', 'manager') AND left_at IS NULL LIMIT 1`,
         [(req.user as any).id || (req.user as any).userId, organizationId],
       );
       if (!rows || rows.length === 0) {
@@ -415,7 +415,7 @@ export const requireSignageOperatorOrStore = async (
     if (!hasAccess) {
       try {
         const rows = await AppDataSource.query(
-          `SELECT 1 FROM kpa_members WHERE user_id = $1 AND organization_id = $2 AND status = 'active' LIMIT 1`,
+          `SELECT 1 FROM organization_members WHERE user_id = $1 AND organization_id = $2 AND role IN ('owner', 'admin', 'manager') AND left_at IS NULL LIMIT 1`,
           [(req.user as any).id || (req.user as any).userId, organizationId],
         );
         hasAccess = rows && rows.length > 0;
