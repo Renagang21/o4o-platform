@@ -8,9 +8,11 @@
  *
  * 제공 기능:
  * - Global Content 조회
- * - Playlist Clone
  * - Force Content 적용 여부 판단
  * - Media 접근
+ *
+ * 제거됨 (WO-KPA-SIGNAGE-RESIDUAL-CODE-ALIGNMENT-V1):
+ * - Playlist Clone / Media Clone → asset-snapshot-copy 경로로 대체됨
  */
 
 import type { DataSource } from 'typeorm';
@@ -18,7 +20,6 @@ import type {
   ExtensionType,
   ExtensionContentSource,
   ExtensionGlobalContentItem,
-  CloneResult,
 } from './extension.types.js';
 import { FORCE_ALLOWED_SOURCES, CORE_CONTENT_SOURCES } from './extension.types.js';
 import { canForceContent } from './extension.config.js';
@@ -47,15 +48,6 @@ interface GlobalContentQueryOptions {
   isForced?: boolean;
 }
 
-/**
- * Clone Options
- */
-interface CloneOptions {
-  name?: string;
-  targetOrganizationId?: string;
-  includeItems?: boolean;
-  cloneMedia?: boolean;
-}
 
 /**
  * Core Playlist Response (from Core Service)
@@ -357,238 +349,6 @@ export class CoreExtensionAdapter {
     return results;
   }
 
-  // ========== PLAYLIST CLONE ==========
-
-  /**
-   * Core Playlist Clone
-   *
-   * Extension에서 Core Playlist를 Clone할 때 사용
-   * Clone 결과는 scope: 'store'로 생성
-   */
-  async cloneCorePlaylist(
-    sourceId: string,
-    scope: CoreScope,
-    options: CloneOptions = {},
-    userId?: string,
-  ): Promise<CloneResult> {
-    // Find source playlist
-    const sourcePlaylist = await this.dataSource
-      .createQueryBuilder()
-      .select('*')
-      .from('signage_playlists', 'p')
-      .where('p.id = :id', { id: sourceId })
-      .andWhere('p.service_key = :serviceKey', { serviceKey: scope.serviceKey })
-      .andWhere('p.deleted_at IS NULL')
-      .getRawOne();
-
-    if (!sourcePlaylist) {
-      throw new Error('Source playlist not found');
-    }
-
-    // Check if forced (forced cannot be cloned)
-    if (sourcePlaylist.is_forced) {
-      throw new Error('Forced content cannot be cloned');
-    }
-
-    const now = new Date();
-    const clonedId = this.generateUUID();
-
-    // Create cloned playlist
-    await this.dataSource
-      .createQueryBuilder()
-      .insert()
-      .into('signage_playlists')
-      .values({
-        id: clonedId,
-        service_key: scope.serviceKey,
-        organization_id: options.targetOrganizationId || scope.organizationId || null,
-        name: options.name || `Copy of ${sourcePlaylist.name}`,
-        description: sourcePlaylist.description,
-        status: 'draft',
-        loop_enabled: sourcePlaylist.loop_enabled,
-        default_item_duration: sourcePlaylist.default_item_duration,
-        transition_type: sourcePlaylist.transition_type,
-        transition_duration: sourcePlaylist.transition_duration,
-        is_public: false,
-        metadata: sourcePlaylist.metadata,
-        source: 'store',
-        scope: 'store',
-        parent_playlist_id: sourceId,
-        is_forced: false,
-        item_count: 0,
-        total_duration: 0,
-        like_count: 0,
-        download_count: 0,
-        created_by_user_id: userId || null,
-        created_at: now,
-        updated_at: now,
-      })
-      .execute();
-
-    let itemsCloned = 0;
-    let mediaCloned = 0;
-
-    // Clone items if requested
-    if (options.includeItems !== false) {
-      const sourceItems = await this.dataSource
-        .createQueryBuilder()
-        .select('*')
-        .from('signage_playlist_items', 'i')
-        .where('i.playlist_id = :playlistId', { playlistId: sourceId })
-        .orderBy('i.sort_order', 'ASC')
-        .getRawMany();
-
-      for (const item of sourceItems) {
-        const itemId = this.generateUUID();
-        await this.dataSource
-          .createQueryBuilder()
-          .insert()
-          .into('signage_playlist_items')
-          .values({
-            id: itemId,
-            playlist_id: clonedId,
-            media_id: item.media_id,
-            sort_order: item.sort_order,
-            duration: item.duration,
-            transition_type: item.transition_type,
-            is_active: item.is_active,
-            is_forced: false, // Clone은 항상 false
-            source_type: 'store',
-            metadata: item.metadata,
-            created_at: now,
-            updated_at: now,
-          })
-          .execute();
-        itemsCloned++;
-      }
-
-      // Update playlist stats
-      await this.updatePlaylistStats(clonedId);
-    }
-
-    // Increment download count on source
-    await this.dataSource
-      .createQueryBuilder()
-      .update('signage_playlists')
-      .set({ download_count: () => 'download_count + 1' })
-      .where('id = :id', { id: sourceId })
-      .execute();
-
-    return {
-      success: true,
-      clonedId,
-      sourceId,
-      itemsCloned,
-      mediaCloned,
-    };
-  }
-
-  /**
-   * Core Media Clone
-   */
-  async cloneCoreMedia(
-    sourceId: string,
-    scope: CoreScope,
-    options: CloneOptions = {},
-    userId?: string,
-  ): Promise<CloneResult> {
-    const sourceMedia = await this.dataSource
-      .createQueryBuilder()
-      .select('*')
-      .from('signage_media', 'm')
-      .where('m.id = :id', { id: sourceId })
-      .andWhere('m.service_key = :serviceKey', { serviceKey: scope.serviceKey })
-      .andWhere('m.deleted_at IS NULL')
-      .getRawOne();
-
-    if (!sourceMedia) {
-      throw new Error('Source media not found');
-    }
-
-    const now = new Date();
-    const clonedId = this.generateUUID();
-
-    await this.dataSource
-      .createQueryBuilder()
-      .insert()
-      .into('signage_media')
-      .values({
-        id: clonedId,
-        service_key: scope.serviceKey,
-        organization_id: options.targetOrganizationId || scope.organizationId || null,
-        name: options.name || `Copy of ${sourceMedia.name}`,
-        description: sourceMedia.description,
-        media_type: sourceMedia.media_type,
-        source_type: sourceMedia.source_type,
-        source_url: sourceMedia.source_url,
-        embed_id: sourceMedia.embed_id,
-        thumbnail_url: sourceMedia.thumbnail_url,
-        duration: sourceMedia.duration,
-        resolution: sourceMedia.resolution,
-        file_size: sourceMedia.file_size,
-        mime_type: sourceMedia.mime_type,
-        content: sourceMedia.content,
-        tags: sourceMedia.tags,
-        category: sourceMedia.category,
-        metadata: sourceMedia.metadata,
-        status: 'active',
-        source: 'store',
-        scope: 'store',
-        parent_media_id: sourceId,
-        created_by_user_id: userId || null,
-        created_at: now,
-        updated_at: now,
-      })
-      .execute();
-
-    return {
-      success: true,
-      clonedId,
-      sourceId,
-      itemsCloned: 0,
-      mediaCloned: 1,
-    };
-  }
-
-  // ========== HELPER METHODS ==========
-
-  /**
-   * Playlist 통계 업데이트
-   */
-  private async updatePlaylistStats(playlistId: string): Promise<void> {
-    const stats = await this.dataSource
-      .createQueryBuilder()
-      .select([
-        'COUNT(*) as "itemCount"',
-        'COALESCE(SUM(duration), 0) as "totalDuration"',
-      ])
-      .from('signage_playlist_items', 'i')
-      .where('i.playlist_id = :playlistId', { playlistId })
-      .andWhere('i.is_active = true')
-      .getRawOne();
-
-    await this.dataSource
-      .createQueryBuilder()
-      .update('signage_playlists')
-      .set({
-        item_count: parseInt(stats.itemCount, 10) || 0,
-        total_duration: parseInt(stats.totalDuration, 10) || 0,
-        updated_at: new Date(),
-      })
-      .where('id = :id', { id: playlistId })
-      .execute();
-  }
-
-  /**
-   * UUID 생성
-   */
-  private generateUUID(): string {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-      const r = (Math.random() * 16) | 0;
-      const v = c === 'x' ? r : (r & 0x3) | 0x8;
-      return v.toString(16);
-    });
-  }
 }
 
 // ============================================================================

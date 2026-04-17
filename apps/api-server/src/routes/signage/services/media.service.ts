@@ -51,6 +51,14 @@ export class SignageMediaService {
     scope: ScopeFilter,
     userId?: string,
   ): Promise<MediaResponseDto> {
+    // Core V1: Video media must use YouTube or Vimeo only
+    if (dto.mediaType === 'video' && !['youtube', 'vimeo'].includes(dto.sourceType)) {
+      throw Object.assign(new Error('유튜브 또는 비메오 URL만 등록할 수 있습니다'), {
+        code: 'UNSUPPORTED_VIDEO_SOURCE',
+        statusCode: 400,
+      });
+    }
+
     const media = await this.repository.createMedia({
       ...dto,
       serviceKey: scope.serviceKey,
