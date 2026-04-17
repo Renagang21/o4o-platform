@@ -20,9 +20,11 @@ import {
 } from 'lucide-react';
 import type { StoreTemplate, StoreTheme } from '@/types/store';
 import { DEFAULT_STORE_TEMPLATE, DEFAULT_STORE_THEME, THEME_METAS } from '@/types/store';
-import { storeApi } from '@/api/store';
 import { pharmacyApi } from '@/api/pharmacy';
+import { api } from '@/lib/apiClient';
 import { toast } from '@o4o/error-handling';
+// WO-STORE-COMMON-SETTINGS-GLYCOPHARM-ALIGNMENT-V1: storeApi.getStorefrontConfig / updateStorefrontConfig
+// are kept in store.ts as legacy but no longer called here. Using common /stores/:slug/settings API.
 
 export default function PharmacySettings() {
   const [activeTab, setActiveTab] = useState('store');
@@ -53,15 +55,55 @@ export default function PharmacySettings() {
             storeSlug: slug,
           }));
 
-          // Load storefront config if slug available
+          // Load storefront config via common settings API
           if (slug) {
-            const configRes = await storeApi.getStorefrontConfig(slug);
-            if (configRes.success && configRes.data) {
-              setStoreSettings(prev => ({
-                ...prev,
-                theme: (configRes.data?.theme as StoreTheme) || DEFAULT_STORE_THEME,
-                template: (configRes.data?.template as StoreTemplate) || DEFAULT_STORE_TEMPLATE,
-              }));
+            try {
+              const settingsRes = await api.get<{ success: boolean; data: { settings: { theme: string; template: string } } }>(
+                `/glycopharm/stores/${encodeURIComponent(slug)}/settings`
+              );
+              if (settingsRes.data?.success && settingsRes.data?.data?.settings) {
+                const s = settingsRes.data.data.settings;
+                setStoreSettings(prev => ({
+                  ...prev,
+                  theme: (s.theme as StoreTheme) || DEFAULT_STORE_THEME,
+                  // Keep GlycoPharm template display as-is (franchise-standard);
+                  // template_profile stored separately and not overwritten here
+                  template: (DEFAULT_STORE_TEMPLATE as StoreTemplate),
+                }));
+              }
+            } catch {
+              // fallback: keep defaults
+            }
+
+            // Load channel status from common channels API
+            try {
+              const channelsRes = await api.get<{ success: boolean; data: Array<{ type: string; status: string; config: any; approvedAt: string | null; createdAt: string }> }>(
+                `/glycopharm/stores/${encodeURIComponent(slug)}/channels`
+              );
+              if (channelsRes.data?.success && Array.isArray(channelsRes.data?.data)) {
+                const channels = channelsRes.data.data;
+                const mapStatus = (status: string): 'none' | 'requested' | 'approved' | 'rejected' => {
+                  if (status === 'APPROVED') return 'approved';
+                  if (status === 'PENDING') return 'requested';
+                  if (status === 'REJECTED') return 'rejected';
+                  return 'none';
+                };
+                const kiosk = channels.find(c => c.type === 'KIOSK');
+                const tablet = channels.find(c => c.type === 'TABLET');
+                setDeviceSettings(prev => ({
+                  ...prev,
+                  kioskStatus: kiosk ? mapStatus(kiosk.status) : 'none',
+                  kioskApprovedAt: kiosk?.approvedAt ?? null,
+                  kioskAutoReset: kiosk?.config?.autoResetMinutes ?? prev.kioskAutoReset,
+                  kioskProductLimit: kiosk?.config?.productLimit ?? prev.kioskProductLimit,
+                  kioskPin: kiosk?.config?.pin ?? prev.kioskPin,
+                  tabletStatus: tablet ? mapStatus(tablet.status) : 'none',
+                  tabletApprovedAt: tablet?.approvedAt ?? null,
+                  tabletPin: tablet?.config?.pin ?? prev.tabletPin,
+                }));
+              }
+            } catch {
+              // fallback: keep local defaults
             }
           }
         }
@@ -109,6 +151,7 @@ export default function PharmacySettings() {
   const kioskUrl = `${baseUrl}/store/${storeSettings.storeSlug}/kiosk`;
   const tabletUrl = `${baseUrl}/store/${storeSettings.storeSlug}/tablet`;
 
+  // WO-STORE-COMMON-SETTINGS-GLYCOPHARM-ALIGNMENT-V1: common PATCH /stores/:slug/settings
   const handleSave = async () => {
     if (!storeSettings.storeSlug) {
       toast.error('매장 정보를 불러올 수 없습니다.');
@@ -116,14 +159,54 @@ export default function PharmacySettings() {
     }
     setSaving(true);
     try {
-      await storeApi.updateStorefrontConfig(storeSettings.storeSlug, {
+      await api.patch(`/glycopharm/stores/${encodeURIComponent(storeSettings.storeSlug)}/settings`, {
         theme: storeSettings.theme,
-        template: storeSettings.template,
+        // template not sent — GlycoPharm uses franchise-standard template_profile independently
       });
       toast.success('설정이 저장되었습니다.');
     } catch (err) {
       console.error('Failed to save settings:', err);
       toast.error('설정 저장에 실패했습니다.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // WO-STORE-COMMON-SETTINGS-GLYCOPHARM-ALIGNMENT-V1: save channel config via common channels API
+  const handleDeviceConfigSave = async () => {
+    if (!storeSettings.storeSlug) {
+      toast.error('매장 정보를 불러올 수 없습니다.');
+      return;
+    }
+    setSaving(true);
+    try {
+      const slug = encodeURIComponent(storeSettings.storeSlug);
+      const saves: Promise<any>[] = [];
+
+      if (deviceSettings.kioskStatus === 'approved') {
+        saves.push(
+          api.patch(`/glycopharm/stores/${slug}/channels/KIOSK`, {
+            enabled: true,
+            ...(deviceSettings.kioskPin ? { pin: deviceSettings.kioskPin } : {}),
+            autoResetMinutes: deviceSettings.kioskAutoReset,
+            productLimit: deviceSettings.kioskProductLimit,
+          })
+        );
+      }
+      if (deviceSettings.tabletStatus === 'approved') {
+        saves.push(
+          api.patch(`/glycopharm/stores/${slug}/channels/TABLET`, {
+            enabled: true,
+            ...(deviceSettings.tabletPin ? { pin: deviceSettings.tabletPin } : {}),
+          })
+        );
+      }
+
+      await Promise.all(saves);
+      toast.success('채널 설정이 저장되었습니다.');
+    } catch (err) {
+      console.error('Failed to save device settings:', err);
+      toast.error('채널 설정 저장에 실패했습니다.');
     } finally {
       setSaving(false);
     }
@@ -740,11 +823,12 @@ export default function PharmacySettings() {
                 {/* 저장 버튼 (승인된 채널이 있을 때만) */}
                 {(deviceSettings.kioskStatus === 'approved' || deviceSettings.tabletStatus === 'approved') && (
                   <button
-                    onClick={handleSave}
-                    className="flex items-center justify-center gap-2 w-full py-3 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors"
+                    onClick={handleDeviceConfigSave}
+                    disabled={saving}
+                    className="flex items-center justify-center gap-2 w-full py-3 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-50"
                   >
-                    <Save className="w-5 h-5" />
-                    설정 저장
+                    {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+                    {saving ? '저장 중...' : '채널 설정 저장'}
                   </button>
                 )}
               </div>
