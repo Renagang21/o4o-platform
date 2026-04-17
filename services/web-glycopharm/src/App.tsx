@@ -49,8 +49,7 @@ const PharmacyManagement = lazy(() => import('@/pages/store-management/PharmacyM
 const PharmacyB2BProducts = lazy(() => import('@/pages/store-management/PharmacyB2BProducts'));
 const CustomerRequestsPage = lazy(() => import('@/pages/store-management/CustomerRequestsPage')); // Phase 1: Common Request
 
-// Store Signage (WO-O4O-GLYCOPHARM-SIGNAGE-MIGRATION-V1: KPA standard)
-const StoreSignagePage = lazy(() => import('@/pages/store-management/StoreSignagePage'));
+// Store Signage — WO-O4O-GLYCOPHARM-SIGNAGE-PHASE1-V1 (StoreSignagePage → StoreSignageMainPage로 교체됨)
 
 // Signage Extension (New)
 const ContentLibraryPage = lazy(() => import('@/pages/store-management/signage').then(m => ({ default: m.ContentLibraryPage })));
@@ -58,6 +57,9 @@ const ContentHubPage = lazy(() => import('@/pages/store-management/signage').the
 const SignagePreviewPage = lazy(() => import('@/pages/store-management/signage').then(m => ({ default: m.SignagePreviewPage })));
 const SignagePlaylistDetailPage = lazy(() => import('@/pages/store-management/signage').then(m => ({ default: m.PlaylistDetailPage })));
 const SignageMediaDetailPage = lazy(() => import('@/pages/store-management/signage').then(m => ({ default: m.MediaDetailPage })));
+// WO-O4O-GLYCOPHARM-SIGNAGE-PHASE1-V1
+const StoreSignageMainPage = lazy(() => import('@/pages/store-management/signage').then(m => ({ default: m.StoreSignageMainPage })));
+const SignagePlaybackPage = lazy(() => import('@/pages/store-management/signage').then(m => ({ default: m.SignagePlaybackPage })));
 
 // Signage Operator Console (WO-O4O-SIGNAGE-CONSOLE-V1)
 const HqMediaPage = lazy(() => import('@/pages/operator/signage/HqMediaPage'));
@@ -537,8 +539,10 @@ function AppRoutes() {
         <Route path="apply" element={<StoreApplyPage />} />
         {/* billing: 정산/인보이스 (WO-STORE-BILLING-FOUNDATION-V1) */}
         <Route path="billing" element={<StoreBillingPage />} />
-        {/* Signage — WO-O4O-GLYCOPHARM-SIGNAGE-MIGRATION-V1: KPA standard StoreSignagePage */}
-        <Route path="signage" element={<StoreSignagePage />} />
+        {/* Signage — WO-O4O-GLYCOPHARM-SIGNAGE-PHASE1-V1 */}
+        <Route path="signage" element={<StoreSignageMainPage />} />
+        <Route path="signage/play/:playlistId" element={<SignagePlaybackPage />} />
+        {/* Legacy signage routes (maintained for backward compat) */}
         <Route path="signage/library" element={<ContentLibraryPage />} />
         <Route path="signage/playlist/:id" element={<SignagePlaylistDetailPage />} />
         <Route path="signage/media/:id" element={<SignageMediaDetailPage />} />
