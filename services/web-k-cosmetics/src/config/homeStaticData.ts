@@ -1,0 +1,173 @@
+/**
+ * K-Cosmetics Home Static Data
+ *
+ * WO-KCOS-HOME-DYNAMIC-IMPL-V1:
+ *   notices → CMS API 연동 완료, 이 파일에서 제거됨.
+ *   아래 데이터는 운영자 관리 콘텐츠로 대체 예정.
+ *
+ * TODO(WO-KCOS-HOME-DYNAMIC-IMPL-V2): heroSlides → CMS slots('hero') 연동
+ * TODO(WO-KCOS-HOME-DYNAMIC-IMPL-V2): nowRunningItems → market-trial / product API 연동
+ * TODO(WO-KCOS-HOME-DYNAMIC-IMPL-V2): partners → CMS slot 또는 파트너 API 연동
+ */
+
+// ── Hero Slides ───────────────────────────────────────────────────────────
+
+export interface HeroSlide {
+  id: string;
+  title: string;
+  subtitle: string;
+  bgGradient: string;
+  cta?: { label: string; link: string; variant: 'primary' | 'secondary' };
+}
+
+export const heroSlides: HeroSlide[] = [
+  {
+    id: 'main',
+    title: 'K-Beauty Store를 위한\n운영 플랫폼',
+    subtitle: '브랜드·매장·관광객이 연결됩니다',
+    bgGradient: '#1e293b',
+    cta: { label: '시작하기', link: '/platform/stores', variant: 'primary' },
+  },
+  {
+    // WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1: Market Trial은 Neture 통합 허브로 진입
+    id: 'trial',
+    title: '신상품 시범판매\nNeture 허브에서 참여하세요',
+    subtitle: '브랜드의 신상품을 먼저 체험하고 피드백을 공유하세요',
+    bgGradient: '#334155',
+    cta: { label: 'Neture에서 시범판매 보기', link: 'https://neture.co.kr/market-trial', variant: 'primary' },
+  },
+  {
+    id: 'tourist',
+    title: '지금 12개 매장\n관광객 연결 중',
+    subtitle: 'Tourist Hub를 통해 실시간 연결됩니다',
+    bgGradient: '#475569',
+    cta: { label: 'Tourist Hub 보기', link: '/services/tourists', variant: 'primary' },
+  },
+  {
+    id: 'trust',
+    title: '다수 매장·다수 브랜드가 함께하는\nK-Beauty 플랫폼',
+    subtitle: '검증된 정품 매장만 연결합니다',
+    bgGradient: '#0f172a',
+  },
+];
+
+// ── Quick Action Cards ────────────────────────────────────────────────────
+
+export interface QuickActionCard {
+  id: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  icon: string;
+  link: string;
+  color: string;
+  status: { label: string; value: string | number };
+}
+
+/**
+ * TODO(WO-KCOS-HOME-DYNAMIC-IMPL-V2):
+ *   status.value를 storeHub.fetchStoreKpiSummary() 기반 실시간 데이터로 교체
+ */
+export const quickActionCards: QuickActionCard[] = [
+  {
+    id: 'products',
+    title: 'Products',
+    subtitle: '상품 관리',
+    description: '매장에 노출할 상품을 관리하세요',
+    icon: '📦',
+    link: '/platform/stores/products',
+    color: '#e2e8f0',
+    status: { label: '노출 중', value: '-' },
+  },
+  {
+    id: 'supply',
+    title: 'Supply',
+    subtitle: 'B2B 공급',
+    description: '검증된 공급자의 상품을 조달합니다',
+    icon: '📋',
+    link: '/b2b/supply',
+    color: '#e2e8f0',
+    status: { label: '공급', value: '사용 중' },
+  },
+  {
+    id: 'trial',
+    title: 'Market Trial',
+    subtitle: '신상품 체험',
+    description: '브랜드의 신상품 Trial에 참여하세요',
+    icon: '🎯',
+    link: '/platform/stores',
+    color: '#e2e8f0',
+    status: { label: '진행 중', value: '-' },
+  },
+  {
+    id: 'tourist-hub',
+    title: 'Tourist Hub',
+    subtitle: '관광객 허브',
+    description: '관광객·콘텐츠·매장을 연결합니다',
+    icon: '🌏',
+    link: '/services/tourists',
+    color: '#e2e8f0',
+    status: { label: '연결 중', value: '매장' },
+  },
+];
+
+// ── Now Running Items ─────────────────────────────────────────────────────
+
+export interface NowRunningItem {
+  id: string;
+  type: 'trial' | 'event' | 'campaign' | 'product';
+  title: string;
+  supplier?: string;
+  deadline?: string;
+  participants?: number;
+  link: string;
+}
+
+/**
+ * TODO(WO-KCOS-HOME-DYNAMIC-IMPL-V2): market-trial API 또는 product API 연동
+ */
+export const nowRunningItems: NowRunningItem[] = [
+  {
+    id: '1',
+    type: 'trial',
+    title: '신규 스킨케어 라인 Trial',
+    supplier: 'COSRX',
+    deadline: '2026.01.31',
+    participants: 15,
+    link: '/platform/stores',
+  },
+  {
+    id: '2',
+    type: 'product',
+    title: '2026 S/S 신상품 입고',
+    supplier: 'Innisfree',
+    deadline: '2026.02.15',
+    link: '/products',
+  },
+  {
+    id: '3',
+    type: 'campaign',
+    title: '설날 특별 캠페인',
+    deadline: '2026.02.01',
+    link: '/products',
+  },
+];
+
+// ── Partners ──────────────────────────────────────────────────────────────
+
+export interface Partner {
+  id: string;
+  name: string;
+  type: 'association' | 'supplier' | 'brand';
+}
+
+/**
+ * TODO(WO-KCOS-HOME-DYNAMIC-IMPL-V2): CMS slot 또는 파트너 API 연동
+ */
+export const partners: Partner[] = [
+  { id: '1', name: 'COSRX', type: 'brand' },
+  { id: '2', name: 'Innisfree', type: 'brand' },
+  { id: '3', name: 'Laneige', type: 'brand' },
+  { id: '4', name: 'Sulwhasoo', type: 'brand' },
+  { id: '5', name: 'Etude', type: 'brand' },
+];

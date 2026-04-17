@@ -1,15 +1,15 @@
 /**
  * HomePage - K-Cosmetics 세미 프랜차이즈 쇼윈도
  *
- * Work Order: WO-KCOS-HOME-UI-V2
- * Reference: GlycoPharm HomePage 구조 기반
+ * WO-KCOS-HOME-UI-V2: 초기 구현 (정적)
+ * WO-KCOS-HOME-DYNAMIC-IMPL-V1: 운영 공지 동적화 (CMS API 연동)
  *
  * 화면 구조 (상→하):
- * 1. Hero / Campaign Slider - 플랫폼 정체성 + 캠페인
- * 2. Quick Action - 운영 도구 상태 요약 (Products, Supply, Market Trial, Tourist Hub)
- * 3. Now Running - 신상품/Trial/이벤트
- * 4. 운영 공지 / 가이드
- * 5. 협력기관 / 파트너 신뢰 Zone
+ * 1. Hero / Campaign Slider — 플랫폼 정체성 + 캠페인  [TODO V2: CMS slots 연동]
+ * 2. Quick Action — 운영 도구 상태 요약               [TODO V2: storeHub KPI 연동]
+ * 3. Now Running — 신상품/Trial/이벤트               [TODO V2: market-trial API 연동]
+ * 4. 운영 공지 / 가이드                              [V1 완료: CMS 동적 연동]
+ * 5. 협력 브랜드 신뢰 Zone                           [TODO V2: 파트너 API 연동]
  *
  * 원칙:
  * - 통계/차트 ❌
@@ -24,198 +24,14 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts';
 import { BusinessOnboardingBanner } from '../components/onboarding/BusinessOnboardingBanner';
-
-// ========================================
-// Types
-// ========================================
-
-interface HeroSlide {
-  id: string;
-  title: string;
-  subtitle: string;
-  bgGradient: string;
-  cta?: { label: string; link: string; variant: 'primary' | 'secondary' };
-}
-
-interface QuickActionCard {
-  id: string;
-  title: string;
-  subtitle: string;
-  description: string;
-  icon: string;
-  link: string;
-  color: string;
-  status: { label: string; value: string | number };
-}
-
-interface NowRunningItem {
-  id: string;
-  type: 'trial' | 'event' | 'campaign' | 'product';
-  title: string;
-  supplier?: string;
-  deadline?: string;
-  participants?: number;
-  link: string;
-}
-
-interface Notice {
-  id: string;
-  title: string;
-  date: string;
-  isPinned: boolean;
-  link: string;
-}
-
-interface Partner {
-  id: string;
-  name: string;
-  logo?: string;
-  type: 'association' | 'supplier' | 'brand';
-}
-
-// ========================================
-// Static Data (운영자 관리 콘텐츠로 대체 예정)
-// ========================================
-
-const heroSlides: HeroSlide[] = [
-  {
-    id: 'main',
-    title: 'K-Beauty Store를 위한\n운영 플랫폼',
-    subtitle: '브랜드·매장·관광객이 연결됩니다',
-    bgGradient: '#1e293b',
-    cta: { label: '시작하기', link: '/platform/stores', variant: 'primary' },
-  },
-  {
-    // WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1: Market Trial은 Neture 통합 허브로 진입
-    id: 'trial',
-    title: '신상품 시범판매\nNeture 허브에서 참여하세요',
-    subtitle: '브랜드의 신상품을 먼저 체험하고 피드백을 공유하세요',
-    bgGradient: '#334155',
-    cta: { label: 'Neture에서 시범판매 보기', link: 'https://neture.co.kr/market-trial', variant: 'primary' },
-  },
-  {
-    id: 'tourist',
-    title: '지금 12개 매장\n관광객 연결 중',
-    subtitle: 'Tourist Hub를 통해 실시간 연결됩니다',
-    bgGradient: '#475569',
-    cta: { label: 'Tourist Hub 보기', link: '/services/tourists', variant: 'primary' },
-  },
-  {
-    id: 'trust',
-    title: '다수 매장·다수 브랜드가 함께하는\nK-Beauty 플랫폼',
-    subtitle: '검증된 정품 매장만 연결합니다',
-    bgGradient: '#0f172a',
-  },
-];
-
-const quickActionCards: QuickActionCard[] = [
-  {
-    id: 'products',
-    title: 'Products',
-    subtitle: '상품 관리',
-    description: '매장에 노출할 상품을 관리하세요',
-    icon: '📦',
-    link: '/platform/stores/products',
-    color: '#e2e8f0',
-    status: { label: '노출 중', value: 24 },
-  },
-  {
-    id: 'supply',
-    title: 'Supply',
-    subtitle: 'B2B 공급',
-    description: '검증된 공급자의 상품을 조달합니다',
-    icon: '📋',
-    link: '/b2b/supply',
-    color: '#e2e8f0',
-    status: { label: '공급', value: '사용 중' },
-  },
-  {
-    id: 'trial',
-    title: 'Market Trial',
-    subtitle: '신상품 체험',
-    description: '브랜드의 신상품 Trial에 참여하세요',
-    icon: '🎯',
-    link: '/platform/stores',
-    color: '#e2e8f0',
-    status: { label: '진행 중', value: 3 },
-  },
-  {
-    id: 'tourist-hub',
-    title: 'Tourist Hub',
-    subtitle: '관광객 허브',
-    description: '관광객·콘텐츠·매장을 연결합니다',
-    icon: '🌏',
-    link: '/services/tourists',
-    color: '#e2e8f0',
-    status: { label: '연결 중', value: '매장' },
-  },
-];
-
-const nowRunningItems: NowRunningItem[] = [
-  {
-    id: '1',
-    type: 'trial',
-    title: '신규 스킨케어 라인 Trial',
-    supplier: 'COSRX',
-    deadline: '2026.01.31',
-    participants: 15,
-    link: '/platform/stores',
-  },
-  {
-    id: '2',
-    type: 'product',
-    title: '2026 S/S 신상품 입고',
-    supplier: 'Innisfree',
-    deadline: '2026.02.15',
-    link: '/products',
-  },
-  {
-    id: '3',
-    type: 'campaign',
-    title: '설날 특별 캠페인',
-    deadline: '2026.02.01',
-    link: '/products',
-  },
-];
-
-const notices: Notice[] = [
-  {
-    id: '1',
-    title: '[공지] K-Cosmetics 플랫폼 오픈 안내',
-    date: '2026.01.10',
-    isPinned: true,
-    link: '/about',
-  },
-  {
-    id: '2',
-    title: '[안내] Market Trial 참여 가이드',
-    date: '2026.01.08',
-    isPinned: true,
-    link: '/for-store-owners',
-  },
-  {
-    id: '3',
-    title: '1월 신상품 입고 안내',
-    date: '2026.01.05',
-    isPinned: false,
-    link: '/products',
-  },
-  {
-    id: '4',
-    title: '협력 브랜드 추가 안내',
-    date: '2026.01.03',
-    isPinned: false,
-    link: '/about',
-  },
-];
-
-const partners: Partner[] = [
-  { id: '1', name: 'COSRX', type: 'brand' },
-  { id: '2', name: 'Innisfree', type: 'brand' },
-  { id: '3', name: 'Laneige', type: 'brand' },
-  { id: '4', name: 'Sulwhasoo', type: 'brand' },
-  { id: '5', name: 'Etude', type: 'brand' },
-];
+import { NoticeSection } from '../components/home/NoticeSection';
+import { homeApi, HomePrefetchData } from '../api/home';
+import {
+  heroSlides, HeroSlide,
+  quickActionCards,
+  nowRunningItems, NowRunningItem,
+  partners,
+} from '../config/homeStaticData';
 
 // ========================================
 // Components
@@ -224,7 +40,6 @@ const partners: Partner[] = [
 function HeroSection() {
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  // Auto slide
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
@@ -238,7 +53,7 @@ function HeroSection() {
   return (
     <section style={{ position: 'relative', overflow: 'hidden' }}>
       <div style={{ position: 'relative', height: '320px' }}>
-        {heroSlides.map((slide, index) => (
+        {heroSlides.map((slide: HeroSlide, index: number) => (
           <div
             key={slide.id}
             style={{
@@ -249,10 +64,7 @@ function HeroSection() {
               zIndex: index === currentSlide ? 10 : 0,
             }}
           >
-            <div style={{
-              height: '100%',
-              background: slide.bgGradient,
-            }}>
+            <div style={{ height: '100%', background: slide.bgGradient }}>
               <div style={{
                 maxWidth: '1200px',
                 margin: '0 auto',
@@ -275,12 +87,7 @@ function HeroSection() {
                       color: 'rgba(255,255,255,0.8)',
                       marginBottom: '16px',
                     }}>
-                      <span style={{
-                        width: '6px',
-                        height: '6px',
-                        backgroundColor: '#34d399',
-                        borderRadius: '50%',
-                      }}></span>
+                      <span style={{ width: '6px', height: '6px', backgroundColor: '#34d399', borderRadius: '50%' }}></span>
                       <span>운영형 알파 · v0.8.0</span>
                     </div>
                   )}
@@ -301,19 +108,14 @@ function HeroSection() {
                   }}>
                     {slide.subtitle}
                   </p>
-                  {/* WO-GLOBAL-ALPHA-STATUS-HERO-V080: 알파 단계 안내 문구 (첫 번째 슬라이드에만) */}
                   {index === 0 && (
-                    <p style={{
-                      fontSize: '13px',
-                      color: 'rgba(255,255,255,0.5)',
-                      marginBottom: '24px',
-                    }}>
+                    <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', marginBottom: '24px' }}>
                       매장·브랜드와 함께 운영 구조를 검증하는 단계입니다
                     </p>
                   )}
                   {slide.cta && (() => {
                     // WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1:
-                    // 외부 URL(http://, https://)은 <a target="_blank">, 내부는 <Link>
+                    // 외부 URL은 <a target="_blank">, 내부는 <Link>
                     const ctaStyle = {
                       display: 'inline-flex',
                       alignItems: 'center',
@@ -329,21 +131,14 @@ function HeroSection() {
                     const isExternal = /^https?:\/\//.test(slide.cta.link);
                     if (isExternal) {
                       return (
-                        <a
-                          href={slide.cta.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={ctaStyle}
-                        >
-                          {slide.cta.label}
-                          <span>→</span>
+                        <a href={slide.cta.link} target="_blank" rel="noopener noreferrer" style={ctaStyle}>
+                          {slide.cta.label}<span>→</span>
                         </a>
                       );
                     }
                     return (
                       <Link to={slide.cta.link} style={ctaStyle}>
-                        {slide.cta.label}
-                        <span>→</span>
+                        {slide.cta.label}<span>→</span>
                       </Link>
                     );
                   })()}
@@ -354,7 +149,6 @@ function HeroSection() {
         ))}
       </div>
 
-      {/* Slide Controls */}
       <div style={{
         position: 'absolute',
         bottom: '24px',
@@ -365,32 +159,18 @@ function HeroSection() {
         alignItems: 'center',
         gap: '16px',
       }}>
-        <button
-          onClick={prevSlide}
-          style={{
-            width: '40px',
-            height: '40px',
-            borderRadius: '50%',
-            backgroundColor: 'rgba(255,255,255,0.2)',
-            backdropFilter: 'blur(8px)',
-            border: 'none',
-            color: '#fff',
-            fontSize: '18px',
-            cursor: 'pointer',
-          }}
-        >
-          ‹
-        </button>
+        <button onClick={prevSlide} style={{
+          width: '40px', height: '40px', borderRadius: '50%',
+          backgroundColor: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(8px)',
+          border: 'none', color: '#fff', fontSize: '18px', cursor: 'pointer',
+        }}>‹</button>
         <div style={{ display: 'flex', gap: '8px' }}>
-          {heroSlides.map((_, index) => (
+          {heroSlides.map((_: HeroSlide, index: number) => (
             <button
               key={index}
               onClick={() => setCurrentSlide(index)}
               style={{
-                height: '8px',
-                borderRadius: '4px',
-                border: 'none',
-                cursor: 'pointer',
+                height: '8px', borderRadius: '4px', border: 'none', cursor: 'pointer',
                 transition: 'all 0.3s',
                 width: index === currentSlide ? '32px' : '8px',
                 backgroundColor: index === currentSlide ? '#fff' : 'rgba(255,255,255,0.4)',
@@ -398,22 +178,11 @@ function HeroSection() {
             />
           ))}
         </div>
-        <button
-          onClick={nextSlide}
-          style={{
-            width: '40px',
-            height: '40px',
-            borderRadius: '50%',
-            backgroundColor: 'rgba(255,255,255,0.2)',
-            backdropFilter: 'blur(8px)',
-            border: 'none',
-            color: '#fff',
-            fontSize: '18px',
-            cursor: 'pointer',
-          }}
-        >
-          ›
-        </button>
+        <button onClick={nextSlide} style={{
+          width: '40px', height: '40px', borderRadius: '50%',
+          backgroundColor: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(8px)',
+          border: 'none', color: '#fff', fontSize: '18px', cursor: 'pointer',
+        }}>›</button>
       </div>
     </section>
   );
@@ -430,50 +199,25 @@ function QuickActionSection() {
           <p style={{ fontSize: '13px', color: '#64748b' }}>매장 운영에 필요한 핵심 기능</p>
         </div>
         {isAuthenticated && (
-          <Link
-            to="/platform/stores"
-            style={{
-              fontSize: '14px',
-              color: '#64748b',
-              fontWeight: 500,
-              textDecoration: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-            }}
-          >
+          <Link to="/platform/stores" style={{
+            fontSize: '14px', color: '#64748b', fontWeight: 500,
+            textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px',
+          }}>
             대시보드 →
           </Link>
         )}
       </div>
 
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-        gap: '16px',
-      }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
         {quickActionCards.map((card) => (
-          <Link
-            key={card.id}
-            to={card.link}
-            style={{
-              backgroundColor: '#fff',
-              borderRadius: '8px',
-              padding: '20px',
-              border: '1px solid #e2e8f0',
-              textDecoration: 'none',
-            }}
-          >
+          <Link key={card.id} to={card.link} style={{
+            backgroundColor: '#fff', borderRadius: '8px', padding: '20px',
+            border: '1px solid #e2e8f0', textDecoration: 'none',
+          }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
               <div style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '8px',
-                backgroundColor: '#f1f5f9',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '20px',
+                width: '40px', height: '40px', borderRadius: '8px', backgroundColor: '#f1f5f9',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px',
               }}>
                 {card.icon}
               </div>
@@ -509,44 +253,21 @@ function NowRunningSection() {
           <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#1e293b', marginBottom: '4px' }}>Now Running</h2>
           <p style={{ fontSize: '13px', color: '#64748b' }}>지금 참여 가능한 프로그램</p>
         </div>
-        <Link
-          to="/products"
-          style={{
-            fontSize: '13px',
-            color: '#64748b',
-            fontWeight: 500,
-            textDecoration: 'none',
-          }}
-        >
+        <Link to="/products" style={{ fontSize: '13px', color: '#64748b', fontWeight: 500, textDecoration: 'none' }}>
           전체보기 →
         </Link>
       </div>
 
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-        gap: '16px',
-      }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
         {nowRunningItems.map((item) => (
-          <Link
-            key={item.id}
-            to={item.link}
-            style={{
-              backgroundColor: '#fff',
-              borderRadius: '8px',
-              padding: '16px',
-              border: '1px solid #e2e8f0',
-              textDecoration: 'none',
-            }}
-          >
+          <Link key={item.id} to={item.link} style={{
+            backgroundColor: '#fff', borderRadius: '8px', padding: '16px',
+            border: '1px solid #e2e8f0', textDecoration: 'none',
+          }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
               <span style={{
-                padding: '3px 8px',
-                borderRadius: '4px',
-                fontSize: '11px',
-                fontWeight: 500,
-                backgroundColor: '#f1f5f9',
-                color: '#475569',
+                padding: '3px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 500,
+                backgroundColor: '#f1f5f9', color: '#475569',
               }}>
                 {getTypeLabel(item.type)}
               </span>
@@ -558,85 +279,13 @@ function NowRunningSection() {
               {item.title}
             </h3>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
-              {item.supplier && (
-                <span style={{ color: '#64748b' }}>{item.supplier}</span>
-              )}
+              {item.supplier && <span style={{ color: '#64748b' }}>{item.supplier}</span>}
               {item.participants && (
-                <span style={{ color: '#94a3b8' }}>
-                  {item.participants}개 매장 참여
-                </span>
+                <span style={{ color: '#94a3b8' }}>{item.participants}개 매장 참여</span>
               )}
             </div>
           </Link>
         ))}
-      </div>
-    </section>
-  );
-}
-
-
-function NoticeSection() {
-  return (
-    <section style={{ padding: '40px 24px', maxWidth: '1200px', margin: '0 auto' }}>
-      <div style={{
-        backgroundColor: '#fff',
-        borderRadius: '8px',
-        border: '1px solid #e2e8f0',
-        overflow: 'hidden',
-      }}>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '16px 20px',
-          borderBottom: '1px solid #e2e8f0',
-        }}>
-          <h2 style={{ fontSize: '16px', fontWeight: 600, color: '#1e293b' }}>운영 공지</h2>
-          <Link
-            to="/about"
-            style={{
-              fontSize: '13px',
-              color: '#64748b',
-              fontWeight: 500,
-              textDecoration: 'none',
-            }}
-          >
-            전체보기 ›
-          </Link>
-        </div>
-        <div>
-          {notices.map((notice, index) => (
-            <Link
-              key={notice.id}
-              to={notice.link}
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '16px 20px',
-                borderBottom: index < notices.length - 1 ? '1px solid #f5f5f5' : 'none',
-                textDecoration: 'none',
-                transition: 'background 0.2s',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                {notice.isPinned && (
-                  <span style={{ fontSize: '14px' }}>📌</span>
-                )}
-                <span style={{
-                  fontSize: '14px',
-                  color: notice.isPinned ? '#1a1a1a' : '#666',
-                  fontWeight: notice.isPinned ? 500 : 400,
-                }}>
-                  {notice.title}
-                </span>
-              </div>
-              <span style={{ fontSize: '12px', color: '#999', flexShrink: 0, marginLeft: '16px' }}>
-                {notice.date}
-              </span>
-            </Link>
-          ))}
-        </div>
       </div>
     </section>
   );
@@ -650,18 +299,11 @@ function PartnerTrustSection() {
       </p>
       <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '10px' }}>
         {partners.map((partner) => (
-          <div
-            key={partner.id}
-            style={{
-              padding: '10px 16px',
-              borderRadius: '6px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#f8fafc',
-              border: '1px solid #e2e8f0',
-            }}
-          >
+          <div key={partner.id} style={{
+            padding: '10px 16px', borderRadius: '6px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            backgroundColor: '#f8fafc', border: '1px solid #e2e8f0',
+          }}>
             <span style={{ fontWeight: 500, fontSize: '13px', color: '#475569' }}>{partner.name}</span>
           </div>
         ))}
@@ -672,17 +314,11 @@ function PartnerTrustSection() {
 
 function CTASection() {
   const { isAuthenticated } = useAuth();
-
   if (isAuthenticated) return null;
 
   return (
     <section style={{ padding: '40px 24px', maxWidth: '1200px', margin: '0 auto' }}>
-      <div style={{
-        backgroundColor: '#1e293b',
-        borderRadius: '8px',
-        padding: '40px',
-        textAlign: 'center',
-      }}>
+      <div style={{ backgroundColor: '#1e293b', borderRadius: '8px', padding: '40px', textAlign: 'center' }}>
         <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#fff', marginBottom: '8px' }}>
           K-Cosmetics와 함께하세요
         </h2>
@@ -690,39 +326,18 @@ function CTASection() {
           K-Beauty 매장으로 성장할 수 있는 모든 도구와 네트워크를 제공합니다
         </p>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'center' }}>
-          <Link
-            to="/for-store-owners"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '12px 24px',
-              backgroundColor: '#fff',
-              color: '#1e293b',
-              fontWeight: 500,
-              borderRadius: '6px',
-              textDecoration: 'none',
-              fontSize: '14px',
-            }}
-          >
+          <Link to="/for-store-owners" style={{
+            display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '12px 24px',
+            backgroundColor: '#fff', color: '#1e293b', fontWeight: 500, borderRadius: '6px',
+            textDecoration: 'none', fontSize: '14px',
+          }}>
             매장 시작하기 →
           </Link>
-          <Link
-            to="/auth/login"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '12px 24px',
-              backgroundColor: 'transparent',
-              color: '#94a3b8',
-              fontWeight: 500,
-              borderRadius: '6px',
-              textDecoration: 'none',
-              fontSize: '14px',
-              border: '1px solid #475569',
-            }}
-          >
+          <Link to="/auth/login" style={{
+            display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '12px 24px',
+            backgroundColor: 'transparent', color: '#94a3b8', fontWeight: 500, borderRadius: '6px',
+            textDecoration: 'none', fontSize: '14px', border: '1px solid #475569',
+          }}>
             로그인
           </Link>
         </div>
@@ -736,6 +351,16 @@ function CTASection() {
 // ========================================
 
 export function HomePage() {
+  const [homeData, setHomeData] = useState<HomePrefetchData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    homeApi.prefetchAll()
+      .then(setHomeData)
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#fff' }}>
       {/* 1. Hero / Campaign Slider */}
@@ -746,14 +371,14 @@ export function HomePage() {
         <BusinessOnboardingBanner />
       </div>
 
-      {/* 2. Quick Action - 운영 도구 요약 */}
+      {/* 2. Quick Action — 운영 도구 요약 */}
       <QuickActionSection />
 
-      {/* 3. Now Running - 신상품/Trial/이벤트 */}
+      {/* 3. Now Running — 신상품/Trial/이벤트 */}
       <NowRunningSection />
 
-      {/* 4. 운영 공지 / 가이드 */}
-      <NoticeSection />
+      {/* 4. 운영 공지 (V1 동적화 완료) */}
+      <NoticeSection prefetchedNotices={homeData?.notices} loading={loading} />
 
       {/* CTA for Non-authenticated Users */}
       <CTASection />
