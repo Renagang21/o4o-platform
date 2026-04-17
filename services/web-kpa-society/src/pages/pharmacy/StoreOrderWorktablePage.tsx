@@ -19,6 +19,7 @@ import { getCatalog, getListings } from '../../api/pharmacyProducts';
 import type { CatalogProduct, ProductListing } from '../../api/pharmacyProducts';
 import { createOrder } from '../../api/checkout';
 import { useAuth } from '../../contexts/AuthContext';
+import { toast } from '@o4o/error-handling';
 import { colors, borderRadius } from '../../styles/theme';
 
 // ── Types ──
@@ -128,6 +129,34 @@ export function StoreOrderWorktablePage() {
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  // ── Pre-fill from B2B catalog (sessionStorage) ──
+  // WO-STORE-B2B-CATALOG-TO-WORKTABLE-FLOW-V1
+
+  useEffect(() => {
+    if (products.length === 0) return;
+    const raw = sessionStorage.getItem('worktable_preselect');
+    if (!raw) return;
+    try {
+      const preselect: Record<string, number> = JSON.parse(raw);
+      sessionStorage.removeItem('worktable_preselect');
+      setQuantities(prev => {
+        const next = { ...prev };
+        for (const [productId, qty] of Object.entries(preselect)) {
+          if (qty > 0 && products.some(p => p.id === productId)) {
+            next[productId] = (next[productId] || 0) + qty;
+          }
+        }
+        return next;
+      });
+      const addedCount = Object.entries(preselect).filter(
+        ([pid, q]) => q > 0 && products.some(p => p.id === pid),
+      ).length;
+      if (addedCount > 0) {
+        toast.success(`카탈로그에서 선택한 ${addedCount}건의 상품이 작업대에 추가되었습니다.`);
+      }
+    } catch { /* ignore parse errors */ }
+  }, [products]);
 
   // ── Quantity management ──
 
