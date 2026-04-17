@@ -43,6 +43,8 @@ import {
   Play,
   Calendar,
   Pencil,
+  Search,
+  ExternalLink,
 } from 'lucide-react';
 import { useAuth } from '../../contexts';
 import {
@@ -222,7 +224,7 @@ function applySort(items: StoreAssetItem[], sortKey: SortKey): StoreAssetItem[] 
   return sorted;
 }
 
-type ActiveTab = 'assets' | 'playlist' | 'schedules';
+type ActiveTab = 'assets' | 'playlist' | 'schedules' | 'explore';
 
 const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'] as const;
 
@@ -621,7 +623,18 @@ export function StoreSignagePage() {
           }`}
         >
           <Monitor className="w-4 h-4" />
-          내 콘텐츠
+          내 동영상
+        </button>
+        <button
+          onClick={() => setActiveTab('explore')}
+          className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+            activeTab === 'explore'
+              ? 'border-blue-600 text-blue-700'
+              : 'border-transparent text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          <Search className="w-4 h-4" />
+          가져올 콘텐츠
         </button>
         <button
           onClick={() => setActiveTab('playlist')}
@@ -650,14 +663,14 @@ export function StoreSignagePage() {
       {/* ─── 운영 흐름 배너 (Phase 3) ──────────────── */}
       <div className="flex items-center gap-0 mb-6 mt-3 text-xs text-slate-400 select-none">
         <button
-          onClick={() => setActiveTab('assets')}
+          onClick={() => setActiveTab('explore')}
           className={`flex items-center gap-1 px-3 py-1.5 rounded-full transition-colors ${
-            activeTab === 'assets'
+            activeTab === 'explore'
               ? 'bg-blue-50 text-blue-700 font-medium'
               : 'hover:text-slate-600'
           }`}
         >
-          <Monitor className="w-3 h-3" /> ① 콘텐츠 확보
+          <Search className="w-3 h-3" /> ① 콘텐츠 탐색
         </button>
         <span className="px-1 text-slate-200">→</span>
         <button
@@ -734,6 +747,28 @@ export function StoreSignagePage() {
         </button>
       </div>
 
+      {/* ═══ Explore Tab (가져올 콘텐츠) ═══════════ */}
+      {activeTab === 'explore' && (
+        <div className="flex flex-col items-center justify-center py-16 gap-6 text-center">
+          <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center">
+            <Search className="w-8 h-8 text-blue-500" />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold text-slate-800 mb-1">사이니지 허브에서 콘텐츠 탐색</h2>
+            <p className="text-sm text-slate-500 max-w-sm">
+              약사회 및 공급자가 제공하는 안내 영상·자료를 탐색하고 내 매장으로 가져오세요.
+            </p>
+          </div>
+          <button
+            onClick={() => navigate('/hub/signage')}
+            className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <ExternalLink className="w-4 h-4" />
+            콘텐츠 허브 열기
+          </button>
+        </div>
+      )}
+
       {/* ═══ Playlist Tab ═══════════════════════════ */}
       {activeTab === 'playlist' && (
         <div>
@@ -780,7 +815,7 @@ export function StoreSignagePage() {
             <div className="text-center py-12 text-slate-400">
               <ListVideo className="w-8 h-8 mx-auto mb-2 text-slate-300" />
               <p className="text-sm">플레이리스트가 없습니다.</p>
-              <p className="text-xs mt-1">'내 콘텐츠' 탭에서 콘텐츠를 확보한 뒤 플레이리스트를 만들어 구성하세요.</p>
+              <p className="text-xs mt-1">'가져올 콘텐츠' 탭에서 콘텐츠를 가져온 뒤 플레이리스트를 만들어 구성하세요.</p>
             </div>
           ) : (
             <div className="bg-white rounded-lg border border-slate-200 overflow-hidden mb-6">
@@ -1188,11 +1223,11 @@ export function StoreSignagePage() {
         </div>
       )}
 
-      {/* ═══ Assets Tab (내 콘텐츠) ════════════════ */}
+      {/* ═══ Assets Tab (내 동영상) ════════════════ */}
       {activeTab === 'assets' && <>
 
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-slate-800">내 콘텐츠</h2>
+        <h2 className="text-lg font-semibold text-slate-800">내 동영상</h2>
         <p className="text-xs text-slate-400">약국 HUB에서 가져온 사이니지 자산 목록입니다</p>
       </div>
 

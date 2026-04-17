@@ -1,15 +1,17 @@
 /**
  * HQ Media Management Page — Signage Console (KPA Society)
  * WO-O4O-SIGNAGE-CONSOLE-V1
+ * WO-KPA-SIGNAGE-UI-RESTRUCTURE-V1: 검색바 추가 + DataTable 전환
  *
  * Operator creates & manages HQ signage media.
  * API: /api/signage/kpa-society/hq/*
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAccessToken } from '../../../contexts/AuthContext';
-import { Film, RefreshCw, Plus, ChevronRight, Sparkles, Trash2 } from 'lucide-react';
+import { Film, RefreshCw, Plus, ChevronRight, Sparkles, Trash2, Search } from 'lucide-react';
+import { DataTable, type Column } from '@o4o/ui';
 import AiContentGenerationModal from './AiContentGenerationModal';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
@@ -51,6 +53,7 @@ export default function HqMediaPage() {
   const [showAiModal, setShowAiModal] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [searchKeyword, setSearchKeyword] = useState('');
 
   // Create form
   const [formName, setFormName] = useState('');
@@ -140,6 +143,70 @@ export default function HqMediaPage() {
     archived: media.filter(m => m.status === 'archived').length,
   };
 
+  const filteredMedia = useMemo(() => {
+    if (!searchKeyword.trim()) return media;
+    const kw = searchKeyword.toLowerCase();
+    return media.filter(m =>
+      m.name.toLowerCase().includes(kw) ||
+      (mediaTypeLabel[m.mediaType] || m.mediaType).toLowerCase().includes(kw)
+    );
+  }, [media, searchKeyword]);
+
+  const columns: Column<MediaItem>[] = [
+    {
+      key: 'name',
+      title: '이름',
+      dataIndex: 'name',
+      render: (value) => <span className="font-medium text-slate-800 text-sm">{value}</span>,
+    },
+    {
+      key: 'mediaType',
+      title: '타입',
+      dataIndex: 'mediaType',
+      render: (value) => <span className="text-sm text-slate-600">{mediaTypeLabel[value] || value}</span>,
+    },
+    {
+      key: 'sourceType',
+      title: '소스',
+      dataIndex: 'sourceType',
+      render: (value) => <span className="text-sm text-slate-600">{sourceTypeLabel[value] || value}</span>,
+    },
+    {
+      key: 'status',
+      title: '상태',
+      dataIndex: 'status',
+      align: 'center',
+      render: (value) => {
+        const sc = statusConfig[value] || { text: value, cls: 'bg-slate-100 text-slate-600' };
+        return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${sc.cls}`}>{sc.text}</span>;
+      },
+    },
+    {
+      key: 'createdAt',
+      title: '생성일',
+      dataIndex: 'createdAt',
+      render: (value) => <span className="text-sm text-slate-500">{formatDate(value)}</span>,
+    },
+    {
+      key: 'actions',
+      title: '',
+      width: '60px',
+      align: 'right',
+      render: (_value, record) => (
+        <div className="flex items-center justify-end gap-1">
+          <button
+            onClick={e => { e.stopPropagation(); setDeleteConfirm({ id: record.id, name: record.name }); }}
+            className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+            title="완전 삭제"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+          <ChevronRight className="w-4 h-4 text-slate-300" />
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -220,62 +287,27 @@ export default function HqMediaPage() {
         </div>
       )}
 
-      {/* Table */}
-      <div className="bg-white rounded-xl border border-blue-100 overflow-hidden">
-        {isLoading && media.length === 0 ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="flex flex-col items-center gap-3">
-              <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
-              <p className="text-slate-500 text-sm">로딩 중...</p>
-            </div>
-          </div>
-        ) : (
-          <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-100">
-              <tr>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500">이름</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500">타입</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500">소스</th>
-                <th className="text-center px-4 py-3 text-xs font-medium text-slate-500">상태</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500">생성일</th>
-                <th className="w-10"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {media.length === 0 ? (
-                <tr><td colSpan={6} className="px-4 py-12 text-center text-slate-400 text-sm">HQ 미디어가 없습니다</td></tr>
-              ) : media.map(m => {
-                const sc = statusConfig[m.status] || { text: m.status, cls: 'bg-slate-100 text-slate-600' };
-                return (
-                  <tr key={m.id} onClick={() => navigate(`/operator/signage/hq-media/${m.id}`)} className="hover:bg-slate-50 transition-colors cursor-pointer">
-                    <td className="px-4 py-3">
-                      <p className="font-medium text-slate-800 text-sm">{m.name}</p>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-slate-600">{mediaTypeLabel[m.mediaType] || m.mediaType}</td>
-                    <td className="px-4 py-3 text-sm text-slate-600">{sourceTypeLabel[m.sourceType] || m.sourceType}</td>
-                    <td className="px-4 py-3 text-center">
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${sc.cls}`}>{sc.text}</span>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-slate-500">{formatDate(m.createdAt)}</td>
-                    <td className="px-4 py-3 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <button
-                          onClick={e => { e.stopPropagation(); setDeleteConfirm({ id: m.id, name: m.name }); }}
-                          className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                          title="완전 삭제"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                        <ChevronRight className="w-4 h-4 text-slate-300" />
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+        <input
+          type="text"
+          value={searchKeyword}
+          onChange={e => setSearchKeyword(e.target.value)}
+          placeholder="미디어 이름 또는 타입으로 검색..."
+          className="w-full pl-9 pr-4 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
       </div>
+
+      {/* Table */}
+      <DataTable<MediaItem>
+        columns={columns}
+        dataSource={filteredMedia}
+        rowKey="id"
+        loading={isLoading}
+        onRowClick={record => navigate(`/operator/signage/hq-media/${record.id}`)}
+        emptyText="HQ 미디어가 없습니다"
+      />
 
       {showAiModal && (
         <AiContentGenerationModal

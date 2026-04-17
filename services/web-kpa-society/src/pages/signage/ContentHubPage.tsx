@@ -98,7 +98,7 @@ const SOURCE_TABS: { key: ContentSource | 'all'; label: string }[] = [
 
 // ─── Main Component ────────────────────────────────────
 
-export default function ContentHubPage({ operatorMode = false }: { operatorMode?: boolean }) {
+export default function ContentHubPage() {
   const { user } = useAuth();
 
   // Filter state
@@ -288,7 +288,7 @@ export default function ContentHubPage({ operatorMode = false }: { operatorMode?
             약사회 및 커뮤니티에서 제공하는 안내·교육 영상을 탐색하고 내 매장에서 활용하세요
           </p>
         </div>
-        {user && !operatorMode && (
+        {user && (
           <button
             onClick={() => { setCreateForm({ name: '', description: '', sourceUrl: '', category: '' }); setCreateError(null); setCreateModal({ type: 'media' }); }}
             className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
@@ -380,7 +380,7 @@ export default function ContentHubPage({ operatorMode = false }: { operatorMode?
           <div className="py-16 text-center text-sm text-slate-400 flex flex-col items-center gap-2">
             <VideoIcon className="h-8 w-8 text-slate-200" />
             <p>등록된 콘텐츠가 없습니다</p>
-            {user && !operatorMode && source === 'community' && (
+            {user && source === 'community' && (
               <button
                 onClick={() => { setCreateForm({ name: '', description: '', sourceUrl: '', category: '' }); setCreateError(null); setCreateModal({ type: 'media' }); }}
                 className="mt-1 text-blue-600 hover:underline"
@@ -548,7 +548,7 @@ export default function ContentHubPage({ operatorMode = false }: { operatorMode?
       </div>
 
       {/* Community Content Creation Modal */}
-      {createModal && !operatorMode && (
+      {createModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4">
             <div className="flex items-center justify-between mb-4">

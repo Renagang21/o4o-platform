@@ -1,12 +1,14 @@
 /**
  * HQ Playlists Management Page — Signage Console (KPA Society)
  * WO-O4O-SIGNAGE-CONSOLE-V1
+ * WO-KPA-SIGNAGE-UI-RESTRUCTURE-V1: 검색바 추가 + DataTable 전환
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAccessToken } from '../../../contexts/AuthContext';
-import { ListMusic, RefreshCw, Plus, ChevronRight, Trash2 } from 'lucide-react';
+import { ListMusic, RefreshCw, Plus, ChevronRight, Trash2, Search } from 'lucide-react';
+import { DataTable, type Column } from '@o4o/ui';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 const SERVICE_KEY = 'kpa-society';
@@ -38,6 +40,7 @@ export default function HqPlaylistsPage() {
   const [showForm, setShowForm] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [searchKeyword, setSearchKeyword] = useState('');
 
   const [formName, setFormName] = useState('');
   const [formLoop, setFormLoop] = useState(true);
@@ -126,6 +129,77 @@ export default function HqPlaylistsPage() {
     return m > 0 ? `${m}분 ${s}초` : `${s}초`;
   };
 
+  const filteredPlaylists = useMemo(() => {
+    if (!searchKeyword.trim()) return playlists;
+    const kw = searchKeyword.toLowerCase();
+    return playlists.filter(p => p.name.toLowerCase().includes(kw));
+  }, [playlists, searchKeyword]);
+
+  const columns: Column<PlaylistItem>[] = [
+    {
+      key: 'name',
+      title: '이름',
+      dataIndex: 'name',
+      render: (value) => <span className="font-medium text-slate-800 text-sm">{value}</span>,
+    },
+    {
+      key: 'itemCount',
+      title: '항목 수',
+      dataIndex: 'itemCount',
+      align: 'center',
+      render: (value) => (
+        <span className="inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-medium bg-blue-100 text-blue-700">{value}</span>
+      ),
+    },
+    {
+      key: 'totalDuration',
+      title: '총 시간',
+      dataIndex: 'totalDuration',
+      render: (value) => <span className="text-sm text-slate-600">{formatDuration(value)}</span>,
+    },
+    {
+      key: 'loopEnabled',
+      title: '루프',
+      dataIndex: 'loopEnabled',
+      align: 'center',
+      render: (value) => <span className="text-sm">{value ? 'O' : '-'}</span>,
+    },
+    {
+      key: 'status',
+      title: '상태',
+      dataIndex: 'status',
+      align: 'center',
+      render: (value) => {
+        const sc = statusConfig[value] || { text: value, cls: 'bg-slate-100 text-slate-600' };
+        return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${sc.cls}`}>{sc.text}</span>;
+      },
+    },
+    {
+      key: 'createdAt',
+      title: '생성일',
+      dataIndex: 'createdAt',
+      render: (value) => <span className="text-sm text-slate-500">{formatDate(value)}</span>,
+    },
+    {
+      key: 'actions',
+      title: '',
+      width: '60px',
+      align: 'right',
+      render: (_value, record) => (
+        <div className="flex items-center justify-end gap-1">
+          <button
+            onClick={e => { e.stopPropagation(); setDeleteConfirm({ id: record.id, name: record.name }); }}
+            className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+            title="완전 삭제"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+          <ChevronRight className="w-4 h-4 text-slate-300" />
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -183,61 +257,27 @@ export default function HqPlaylistsPage() {
         </div>
       )}
 
-      {/* Table */}
-      <div className="bg-white rounded-xl border border-blue-100 overflow-hidden">
-        {isLoading && playlists.length === 0 ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
-          </div>
-        ) : (
-          <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-100">
-              <tr>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500">이름</th>
-                <th className="text-center px-4 py-3 text-xs font-medium text-slate-500">항목 수</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500">총 시간</th>
-                <th className="text-center px-4 py-3 text-xs font-medium text-slate-500">루프</th>
-                <th className="text-center px-4 py-3 text-xs font-medium text-slate-500">상태</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500">생성일</th>
-                <th className="w-10"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {playlists.length === 0 ? (
-                <tr><td colSpan={7} className="px-4 py-12 text-center text-slate-400 text-sm">HQ 플레이리스트가 없습니다</td></tr>
-              ) : playlists.map(p => {
-                const sc = statusConfig[p.status] || { text: p.status, cls: 'bg-slate-100 text-slate-600' };
-                return (
-                  <tr key={p.id} onClick={() => navigate(`/operator/signage/hq-playlists/${p.id}`)} className="hover:bg-slate-50 transition-colors cursor-pointer">
-                    <td className="px-4 py-3 font-medium text-slate-800 text-sm">{p.name}</td>
-                    <td className="px-4 py-3 text-center">
-                      <span className="inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-medium bg-blue-100 text-blue-700">{p.itemCount}</span>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-slate-600">{formatDuration(p.totalDuration)}</td>
-                    <td className="px-4 py-3 text-center text-sm">{p.loopEnabled ? 'O' : '-'}</td>
-                    <td className="px-4 py-3 text-center">
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${sc.cls}`}>{sc.text}</span>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-slate-500">{formatDate(p.createdAt)}</td>
-                    <td className="px-4 py-3 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <button
-                          onClick={e => { e.stopPropagation(); setDeleteConfirm({ id: p.id, name: p.name }); }}
-                          className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                          title="완전 삭제"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                        <ChevronRight className="w-4 h-4 text-slate-300" />
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+        <input
+          type="text"
+          value={searchKeyword}
+          onChange={e => setSearchKeyword(e.target.value)}
+          placeholder="플레이리스트 이름으로 검색..."
+          className="w-full pl-9 pr-4 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
       </div>
+
+      {/* Table */}
+      <DataTable<PlaylistItem>
+        columns={columns}
+        dataSource={filteredPlaylists}
+        rowKey="id"
+        loading={isLoading}
+        onRowClick={record => navigate(`/operator/signage/hq-playlists/${record.id}`)}
+        emptyText="HQ 플레이리스트가 없습니다"
+      />
 
       {/* Delete Confirmation Modal */}
       {deleteConfirm && (

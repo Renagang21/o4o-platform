@@ -32,7 +32,7 @@ import OperatorContentDetailPage from '../pages/operator/OperatorContentDetailPa
 import WorkingContentListPage from '../pages/operator/WorkingContentListPage';
 import WorkingContentEditPage from '../pages/operator/WorkingContentEditPage';
 import { OrganizationJoinRequestsPage } from '../pages/admin/OrganizationJoinRequestsPage';
-import ContentHubPage from '../pages/signage/ContentHubPage';
+// ContentHubPage import removed (WO-KPA-SIGNAGE-UI-RESTRUCTURE-V1) — community-only page, no operator route
 // Signage Operator Console (WO-O4O-SIGNAGE-CONSOLE-V1)
 import HqMediaPage from '../pages/operator/signage/HqMediaPage';
 import HqMediaDetailPage from '../pages/operator/signage/HqMediaDetailPage';
@@ -75,8 +75,7 @@ export function OperatorRoutes() {
           {/* 콘텐츠 관리 (WO-KPA-A-CONTENT-CMS-PHASE1-V1) */}
           <Route path="content" element={<ContentManagementPage />} />
 
-          {/* 사이니지 콘텐츠 허브 (운영자 모드: 커뮤니티 등록 UI 숨김) */}
-          <Route path="signage/content" element={<ContentHubPage operatorMode />} />
+          {/* signage/content removed (WO-KPA-SIGNAGE-UI-RESTRUCTURE-V1) — use /intranet/signage/content for community */}
           {/* Signage Operator Console (WO-O4O-SIGNAGE-CONSOLE-V1) */}
           <Route path="signage/hq-media" element={<HqMediaPage />} />
           <Route path="signage/hq-media/:mediaId" element={<HqMediaDetailPage />} />
