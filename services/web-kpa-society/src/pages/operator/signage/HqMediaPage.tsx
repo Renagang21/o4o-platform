@@ -271,8 +271,8 @@ export default function HqMediaPage() {
               <label className="block text-xs font-medium text-slate-500 mb-1">소스 타입</label>
               <select value={formSourceType} onChange={e => setFormSourceType(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <option value="url">URL</option>
-                <option value="upload">업로드</option>
-                <option value="embed">임베드</option>
+                <option value="youtube">YouTube</option>
+                <option value="vimeo">Vimeo</option>
               </select>
             </div>
             <div>

@@ -16,7 +16,7 @@ import type { SignagePlaylistItem } from './SignagePlaylistItem.entity.js';
  *
  * Production-ready media entity supporting:
  * - Multiple media types (video, image, html, text, rich_text, link)
- * - Multiple source types (upload, youtube, vimeo, url, cms)
+ * - Multiple source types (youtube, vimeo, url, cms) — upload removed per Core V1
  * - Multi-tenant isolation
  * - Soft delete and versioning
  */
@@ -59,7 +59,7 @@ export class SignageMedia {
     type: 'varchar',
     length: 20,
   })
-  sourceType!: 'upload' | 'youtube' | 'vimeo' | 'url' | 'cms';
+  sourceType!: 'youtube' | 'vimeo' | 'url' | 'cms';
 
   @Column({ type: 'text' })
   sourceUrl!: string;

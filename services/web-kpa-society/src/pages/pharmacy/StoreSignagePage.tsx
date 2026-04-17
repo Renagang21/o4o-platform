@@ -654,15 +654,13 @@ export function StoreSignagePage() {
           내 플레이리스트
         </button>
         <button
-          onClick={() => setActiveTab('schedules')}
-          className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
-            activeTab === 'schedules'
-              ? 'border-blue-600 text-blue-700'
-              : 'border-transparent text-slate-500 hover:text-slate-700'
-          }`}
+          disabled
+          className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-slate-300 cursor-not-allowed"
+          title="스케줄 기능은 준비 중입니다"
         >
           <Calendar className="w-4 h-4" />
           스케줄
+          <span className="text-xs bg-slate-100 text-slate-400 px-1.5 py-0.5 rounded-full font-normal">준비 중</span>
         </button>
       </div>
 
@@ -1050,10 +1048,17 @@ export function StoreSignagePage() {
         </div>
       )}
 
-      {/* ═══ Schedule Tab ═════════════════════════════ */}
+      {/* ═══ Schedule Tab — HOLD (Core V1: 스케줄 기반 재생 보류) ══════ */}
       {activeTab === 'schedules' && (
         <div>
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3 p-6 bg-slate-50 border border-slate-200 rounded-xl">
+            <Calendar className="w-8 h-8 text-slate-300 flex-shrink-0" />
+            <div>
+              <p className="font-semibold text-slate-600">스케줄 기능 준비 중</p>
+              <p className="text-sm text-slate-400 mt-0.5">시간·요일 기반 자동 재생 스케줄은 곧 제공될 예정입니다.</p>
+            </div>
+          </div>
+          {false && (<><div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-slate-800">스케줄</h2>
             <button
               onClick={() => { resetScheduleForm(); setShowScheduleForm(true); }}
@@ -1316,7 +1321,7 @@ export function StoreSignagePage() {
                 </tbody>
               </table>
             </div>
-          )}
+          )}</>)}
         </div>
       )}
 
@@ -1543,94 +1548,6 @@ function KpiCard({ label, count, color, warning }: {
   );
 }
 
-/* ─── PlaylistRow ────────────────────────────── */
-
-function PlaylistRow({ playlist, isSelected, isInUse, onSelect, onTogglePublish, onDelete }: {
-  playlist: StorePlaylist;
-  isSelected: boolean;
-  isInUse: boolean;
-  onSelect: () => void;
-  onTogglePublish: () => void;
-  onDelete: () => void;
-}) {
-  return (
-    <tr className={`hover:bg-slate-50 transition-colors ${isSelected ? 'bg-blue-50/40' : ''}`}>
-      {/* Name */}
-      <td className="px-4 py-3">
-        <div className="flex items-center gap-2">
-          <ListVideo className="w-4 h-4 text-slate-400 flex-shrink-0" />
-          <span className="font-medium text-slate-900 truncate max-w-xs">{playlist.name}</span>
-          {playlist.forcedCount > 0 && (
-            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-red-100 text-red-700">
-              강제 {playlist.forcedCount}
-            </span>
-          )}
-        </div>
-      </td>
-      {/* Item count */}
-      <td className="px-4 py-3 text-center text-slate-600">{playlist.itemCount}</td>
-      {/* Type */}
-      <td className="px-4 py-3 text-center">
-        <span className="px-2 py-0.5 rounded-full text-[11px] bg-slate-100 text-slate-600">
-          {playlist.playlistType === 'SINGLE' ? '단일' : '목록'}
-        </span>
-      </td>
-      {/* Updated at */}
-      <td className="px-4 py-3 text-xs text-slate-500">
-        {new Date(playlist.updatedAt).toLocaleDateString('ko-KR')}
-      </td>
-      {/* Publish status */}
-      <td className="px-4 py-3">
-        <button
-          onClick={onTogglePublish}
-          className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium cursor-pointer hover:opacity-80 transition-opacity ${
-            playlist.publishStatus === 'published'
-              ? 'bg-green-100 text-green-700'
-              : 'bg-slate-100 text-slate-500'
-          }`}
-          title="클릭하여 게시 상태 변경"
-        >
-          {playlist.publishStatus === 'published' ? '게시 중' : '초안'}
-        </button>
-      </td>
-      {/* In-use status */}
-      <td className="px-4 py-3 text-center">
-        {isInUse ? (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-            사용 중
-          </span>
-        ) : (
-          <span className="text-xs text-slate-400">미사용</span>
-        )}
-      </td>
-      {/* Actions */}
-      <td className="px-4 py-3 text-right">
-        <div className="flex items-center justify-end gap-1">
-          <button
-            onClick={onSelect}
-            className={`inline-flex items-center gap-1 px-2 py-1 text-[11px] rounded border transition-colors ${
-              isSelected
-                ? 'bg-blue-600 text-white border-blue-600'
-                : 'text-blue-600 border-blue-200 hover:bg-blue-50'
-            }`}
-            title="콘텐츠 편집"
-          >
-            <Play className="w-3 h-3" />
-            {isSelected ? '닫기' : '편집'}
-          </button>
-          <button
-            onClick={onDelete}
-            className="p-1 text-slate-400 hover:text-red-500 rounded"
-            title="삭제"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      </td>
-    </tr>
-  );
-}
 
 const CHANNEL_DEFS = [
   { key: 'signage', label: '사이니지', Icon: Tv, color: 'purple' },

@@ -148,8 +148,27 @@ export class SignageGlobalContentController {
     try {
       const scope = extractScope(req);
       const userId = extractUserId(req);
+
+      const { source: _s, scope: _sc, organizationId: _oid, serviceKey: _sk, ...safeBody } = req.body;
+
+      // Core V1: HQ video media — YouTube/Vimeo URL only (no file upload)
+      let resolvedSourceType = safeBody.sourceType;
+      if (safeBody.sourceUrl) {
+        try {
+          resolvedSourceType = detectVideoSourceType(safeBody.sourceUrl);
+        } catch {
+          res.status(400).json({
+            success: false,
+            error: '유튜브 또는 비메오 URL만 등록할 수 있습니다',
+            code: 'UNSUPPORTED_VIDEO_SOURCE',
+          });
+          return;
+        }
+      }
+
       const dto: CreateGlobalMediaDto = {
-        ...req.body,
+        ...safeBody,
+        sourceType: resolvedSourceType,
         source: 'hq',
         scope: 'global',
       };

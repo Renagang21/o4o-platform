@@ -134,7 +134,7 @@ export interface CreateMediaDto {
   name: string;
   description?: string;
   mediaType: 'video' | 'image' | 'html' | 'text' | 'rich_text' | 'link';
-  sourceType: 'upload' | 'youtube' | 'vimeo' | 'url' | 'cms';
+  sourceType: 'youtube' | 'vimeo' | 'url' | 'cms';
   sourceUrl: string;
   embedId?: string;
   thumbnailUrl?: string;
@@ -164,7 +164,7 @@ export interface MediaQueryDto {
   page?: number;
   limit?: number;
   mediaType?: 'video' | 'image' | 'html' | 'text' | 'rich_text' | 'link';
-  sourceType?: 'upload' | 'youtube' | 'vimeo' | 'url' | 'cms';
+  sourceType?: 'youtube' | 'vimeo' | 'url' | 'cms';
   status?: SignageStatus;
   category?: string;
   tags?: string[];
