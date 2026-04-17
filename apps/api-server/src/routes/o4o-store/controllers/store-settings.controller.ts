@@ -317,13 +317,13 @@ export function createStoreSettingsController(
       // Write storefront_config; if blocks changed also sync storefront_blocks for backward compat
       if (patch.blocks !== undefined) {
         await dataSource.query(
-          `UPDATE organizations SET storefront_config = $1::jsonb, storefront_blocks = $2::jsonb, updated_at = NOW()
+          `UPDATE organizations SET storefront_config = $1::jsonb, storefront_blocks = $2::jsonb, "updatedAt" = NOW()
            WHERE id = $3`,
           [JSON.stringify(updated), JSON.stringify(patch.blocks), org.id],
         );
       } else {
         await dataSource.query(
-          `UPDATE organizations SET storefront_config = $1::jsonb, updated_at = NOW()
+          `UPDATE organizations SET storefront_config = $1::jsonb, "updatedAt" = NOW()
            WHERE id = $2`,
           [JSON.stringify(updated), org.id],
         );
