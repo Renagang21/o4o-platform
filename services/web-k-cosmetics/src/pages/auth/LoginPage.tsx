@@ -113,6 +113,31 @@ export default function LoginPage() {
           </button>
         </form>
 
+        {/* 테스트 계정 자동입력 — 매장 경영자 */}
+        <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center' }}>
+          {[
+            { label: '매장 경영자', email: 'phamacy1@o4o.com', password: 'O4oTestPass@1' },
+          ].map((acct) => (
+            <button
+              key={acct.email}
+              type="button"
+              onClick={() => { setEmail(acct.email); setPassword(acct.password); setError(null); }}
+              style={{
+                padding: '6px 16px',
+                fontSize: '12px',
+                fontWeight: 500,
+                color: '#475569',
+                backgroundColor: '#f1f5f9',
+                border: '1px solid #e2e8f0',
+                borderRadius: '8px',
+                cursor: 'pointer',
+              }}
+            >
+              {acct.label}
+            </button>
+          ))}
+        </div>
+
         <div style={styles.footer}>
           <Link to="/" style={styles.link}>홈으로 돌아가기</Link>
         </div>
