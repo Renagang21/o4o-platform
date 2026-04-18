@@ -12,7 +12,7 @@
  */
 
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, UserCircle, Settings, Shield } from 'lucide-react';
+import { LayoutDashboard, Settings, Shield } from 'lucide-react';
 import { GlobalHeader, GlobalHeaderMenuItem } from '@o4o/ui';
 import { useAuth } from '../contexts/AuthContext';
 import { useLoginModal } from '../contexts/LoginModalContext';
@@ -95,9 +95,6 @@ export function NetureGlobalHeader() {
         <>
           <GlobalHeaderMenuItem to="/mypage" icon={<LayoutDashboard className="w-4 h-4" />}>
             마이페이지
-          </GlobalHeaderMenuItem>
-          <GlobalHeaderMenuItem to="/mypage/profile" icon={<UserCircle className="w-4 h-4" />}>
-            프로필
           </GlobalHeaderMenuItem>
           <GlobalHeaderMenuItem to="/mypage/settings" icon={<Settings className="w-4 h-4" />}>
             설정

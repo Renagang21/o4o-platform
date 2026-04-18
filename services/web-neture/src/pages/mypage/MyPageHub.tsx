@@ -1,15 +1,60 @@
 /**
- * MyPageHub - 마이페이지 허브 (읽기 전용 요약 + 빠른 이동)
+ * MyPageHub - 마이페이지 활동 허브
  *
  * WO-O4O-NETURE-MYPAGE-SPLIT-V1
+ * WO-MYPAGE-IA-RESTRUCTURE-V1
+ *
+ * 프로필 카드 중심 → 공급자 활동 허브로 전환.
+ * 프로필 정보는 /mypage/profile에 집중, 여기서는 컴팩트 인사 + Quick Actions.
  */
 
 import { useNavigate } from 'react-router-dom';
-import { User, Mail, Shield, UserCog, Settings, ChevronRight } from 'lucide-react';
+import {
+  User,
+  UserCog,
+  Settings,
+  ChevronRight,
+  Plus,
+  Package,
+  ShoppingCart,
+  FileCheck,
+  FlaskConical,
+  DollarSign,
+  ArrowRight,
+  BarChart3,
+  Users,
+} from 'lucide-react';
 import { useAuth, ROLE_LABELS, getNetureDashboardRoute } from '../../contexts';
 import { useLoginModal } from '../../contexts/LoginModalContext';
 import { MyPageLayout, QuickActionsSection } from '@o4o/account-ui';
 import { Link } from 'react-router-dom';
+
+// ─── Quick Action 정의 ─────────────────────────────────────────────────────
+
+interface QuickAction {
+  label: string;
+  path: string;
+  icon: typeof Package;
+  color: string;
+}
+
+const SUPPLIER_ACTIONS: QuickAction[] = [
+  { label: '상품 등록', path: '/supplier/products/new', icon: Plus, color: '#3b82f6' },
+  { label: '상품 관리', path: '/supplier/products', icon: Package, color: '#6366f1' },
+  { label: '주문 관리', path: '/supplier/orders', icon: ShoppingCart, color: '#0891b2' },
+  { label: '공급 요청', path: '/supplier/offers', icon: FileCheck, color: '#059669' },
+  { label: 'Market Trial', path: '/supplier/market-trial', icon: FlaskConical, color: '#8b5cf6' },
+  { label: '정산 관리', path: '/account/supplier/settlements', icon: DollarSign, color: '#d97706' },
+];
+
+const PARTNER_ACTIONS: QuickAction[] = [
+  { label: '파트너 대시보드', path: '/partner/dashboard', icon: BarChart3, color: '#3b82f6' },
+  { label: '커미션 관리', path: '/supplier/partner-commissions', icon: DollarSign, color: '#059669' },
+  { label: '콘텐츠 라이브러리', path: '/supplier/library', icon: Package, color: '#6366f1' },
+  { label: '커뮤니티', path: '/supplier/forum', icon: Users, color: '#8b5cf6' },
+];
+
+// ─── Component ──────────────────────────────────────────────────────────────
 
 export default function MyPageHub() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -40,36 +85,83 @@ export default function MyPageHub() {
   const dashboardPath = getNetureDashboardRoute(user.roles);
   const roleLabel = ROLE_LABELS[activeRole] || '사용자';
 
+  const isSupplier = user.roles.some(
+    (r: string) => r === 'neture:supplier' || r === 'supplier',
+  );
+  const isPartner = user.roles.some(
+    (r: string) => r === 'neture:partner' || r === 'partner',
+  );
+
+  const quickActions = isSupplier
+    ? SUPPLIER_ACTIONS
+    : isPartner
+      ? PARTNER_ACTIONS
+      : [];
+
   const handleLogout = async () => {
     await logout();
     navigate('/workspace');
   };
 
   return (
-    <MyPageLayout title="마이페이지" subtitle="내 정보를 확인하고 관리할 수 있습니다">
-      {/* Profile Summary (read-only) */}
-      <div className="bg-white rounded-2xl shadow-sm overflow-hidden mb-4">
-        <div className="bg-gradient-to-r from-primary-500 to-primary-600 px-6 py-8">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-              <span className="text-2xl font-bold text-white">{user.name?.charAt(0) || '?'}</span>
+    <MyPageLayout title="마이페이지" subtitle="주요 작업을 빠르게 시작하세요">
+      {/* Compact Greeting Bar */}
+      <div className="bg-white rounded-2xl shadow-sm p-5 mb-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
+              <span className="text-base font-bold text-primary-700">
+                {user.name?.charAt(0) || '?'}
+              </span>
             </div>
-            <div className="flex-1 min-w-0">
-              <h2 className="text-xl font-bold text-white truncate">{user.name}</h2>
-              <p className="text-primary-100 text-sm truncate">{user.email}</p>
-              <div className="mt-2">
-                <span className="inline-block px-3 py-1 bg-white/20 rounded-full text-xs font-medium text-white">
-                  {roleLabel}
-                </span>
-              </div>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-gray-900 truncate">
+                {user.name}님, 안녕하세요
+              </p>
+              <span className="inline-block mt-0.5 px-2 py-0.5 bg-primary-50 text-primary-700 rounded text-xs font-medium">
+                {roleLabel}
+              </span>
             </div>
           </div>
-        </div>
-        <div className="p-6 space-y-3">
-          <InfoRow icon={<Mail className="w-4 h-4 text-gray-400" />} label="이메일" value={user.email} />
-          <InfoRow icon={<Shield className="w-4 h-4 text-gray-400" />} label="역할" value={roleLabel} />
+          <Link
+            to="/mypage/profile"
+            className="flex items-center gap-1 text-sm text-primary-600 hover:text-primary-700 font-medium whitespace-nowrap flex-shrink-0"
+          >
+            프로필 보기
+            <ChevronRight className="w-4 h-4" />
+          </Link>
         </div>
       </div>
+
+      {/* Role-based Quick Actions */}
+      {quickActions.length > 0 && (
+        <div className="bg-white rounded-2xl shadow-sm p-5 mb-4">
+          <h3 className="text-sm font-semibold text-gray-900 mb-3">주요 작업</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {quickActions.map((action) => {
+              const Icon = action.icon;
+              return (
+                <Link
+                  key={action.path}
+                  to={action.path}
+                  className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors group"
+                >
+                  <div
+                    className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: action.color }}
+                  >
+                    <Icon size={16} color="#fff" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700 flex-1 truncate">
+                    {action.label}
+                  </span>
+                  <ArrowRight className="w-3.5 h-3.5 text-gray-300 group-hover:text-gray-500 flex-shrink-0" />
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Navigation Cards */}
       <div className="grid grid-cols-2 gap-3 mb-4">
@@ -91,22 +183,13 @@ export default function MyPageHub() {
         </Link>
       </div>
 
-      {/* Quick Actions */}
+      {/* Quick Actions (Dashboard + Logout) */}
       <QuickActionsSection
         dashboardPath={dashboardPath}
+        dashboardLabel={isSupplier ? '공급자 대시보드' : isPartner ? '파트너 대시보드' : '내 대시보드'}
         showDashboard={activeRole !== 'user'}
         onLogout={handleLogout}
       />
     </MyPageLayout>
-  );
-}
-
-function InfoRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
-  return (
-    <div className="flex items-center gap-3 py-2">
-      {icon}
-      <span className="text-xs text-gray-400 w-14">{label}</span>
-      <span className="text-sm text-gray-700">{value}</span>
-    </div>
   );
 }

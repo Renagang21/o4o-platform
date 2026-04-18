@@ -38,7 +38,7 @@ export default function MySettingsPage() {
   }
 
   return (
-    <MyPageLayout title="마이페이지" subtitle="내 정보를 확인하고 관리할 수 있습니다">
+    <MyPageLayout title="마이페이지" subtitle="계정 보안 및 환경 설정을 관리합니다">
       <SettingsSection title="보안 설정">
         <button
           onClick={() => toast.info('비밀번호 변경 기능은 준비 중입니다.')}
