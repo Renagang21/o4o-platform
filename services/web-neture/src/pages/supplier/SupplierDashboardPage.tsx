@@ -16,6 +16,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { FlaskConical, ArrowRight } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import {
   supplierCopilotApi,
@@ -169,6 +170,38 @@ export default function SupplierDashboardPage() {
           )}
         </div>
       )}
+
+      {/* Market Trial CTA — WO-SUPPLIER-DASHBOARD-MARKET-TRIAL-INTEGRATION-V1 */}
+      <div className="bg-violet-50 rounded-xl border border-violet-200 p-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-violet-600 flex items-center justify-center flex-shrink-0">
+              <FlaskConical size={20} color="#fff" />
+            </div>
+            <div>
+              <h2 className="text-base font-semibold text-violet-900">Market Trial</h2>
+              <p className="text-sm text-violet-600 mt-0.5">
+                시범 판매를 통해 매장 반응을 확인하고 참여 매장을 모집할 수 있습니다.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-3 mt-4">
+          <Link
+            to="/supplier/market-trial/new"
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 transition-colors"
+          >
+            Trial 생성하기
+            <ArrowRight size={14} />
+          </Link>
+          <Link
+            to="/supplier/market-trial"
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-white text-violet-700 text-sm font-medium rounded-lg border border-violet-200 hover:bg-violet-100 transition-colors"
+          >
+            Trial 관리
+          </Link>
+        </div>
+      </div>
 
       {/* Block 2: AI 공급자 요약 (indigo) */}
       <div className="bg-indigo-50 rounded-xl border border-indigo-200 p-6">
@@ -390,6 +423,7 @@ function EventKpiCard({
 const QUICK_LINKS = [
   { label: '상품 관리', path: '/supplier/products' },
   { label: '주문 관리', path: '/supplier/orders' },
+  { label: 'Market Trial', path: '/supplier/market-trial' },
   { label: '라이브러리', path: '/supplier/library' },
   { label: '판매자 신청', path: '/supplier/requests' },
   { label: '정산 현황', path: '/supplier/orders' },
@@ -406,6 +440,8 @@ function inferActionPath(action: string, navigate: (path: string) => void) {
     navigate('/supplier/library');
   } else if (lower.includes('판매자') || lower.includes('seller') || lower.includes('신청')) {
     navigate('/supplier/requests');
+  } else if (lower.includes('trial') || lower.includes('시범') || lower.includes('트라이얼')) {
+    navigate('/supplier/market-trial');
   } else if (lower.includes('프로필') || lower.includes('profile')) {
     navigate('/supplier/profile');
   }

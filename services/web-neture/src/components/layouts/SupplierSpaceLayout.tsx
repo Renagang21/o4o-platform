@@ -16,6 +16,7 @@ import {
   Home,
   Package,
   ShoppingCart,
+  FlaskConical,
   CreditCard,
   BookOpen,
   MessageSquare,
@@ -60,6 +61,11 @@ const SUPPLIER_SIDEBAR_GROUPS: SidebarGroup[] = [
     label: 'Orders',
     icon: ShoppingCart,
     items: [{ label: '주문 현황', path: '/supplier/orders' }],
+  },
+  {
+    label: 'Market Trial',
+    icon: FlaskConical,
+    items: [{ label: 'Market Trial', path: '/supplier/market-trial' }],
   },
   {
     label: 'Finance',
