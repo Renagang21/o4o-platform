@@ -47,6 +47,8 @@ export interface Trial {
   rewardRate?: number;
   amountRate?: number | null;
   recruitRate?: number | null;
+  // WO-MARKET-TRIAL-KPA-DETAIL-AND-FORUM-DEEP-LINK-V1
+  forumPostId?: string;
   settlementPreview?: {
     totalAmount: number;
     productQty: number;

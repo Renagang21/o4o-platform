@@ -2,10 +2,17 @@
  * OrganizationJoinRequestsPage - 조직 가입/역할 요청 관리 (운영자)
  *
  * WO-CONTEXT-JOIN-REQUEST-MVP-V1
+ * WO-O4O-TABLE-STANDARD-V2 — DataTable 표준 전환
+ *
+ * 공통 joinRequestApi 사용
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { CheckCircle, XCircle } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
+import { ActionBar } from '@o4o/ui';
+import { DataTable, Pagination } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { joinRequestApi } from '../../api/joinRequestApi';
 import type { OrganizationJoinRequest } from '../../types/joinRequest';
 import {
@@ -19,9 +26,14 @@ export function OrganizationJoinRequestsPage() {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [reviewNoteId, setReviewNoteId] = useState<string | null>(null);
   const [reviewNote, setReviewNote] = useState('');
+
+  // Selection & Bulk
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
 
   const loadRequests = useCallback(async () => {
     try {
@@ -30,6 +42,7 @@ export function OrganizationJoinRequestsPage() {
       const response = await joinRequestApi.getPending({ page, limit: 20 });
       setRequests(response.data.items);
       setTotalPages(response.data.pagination.totalPages);
+      setTotal(response.data.pagination.total ?? response.data.items.length);
     } catch (err: any) {
       setError(err.message || '요청 목록을 불러올 수 없습니다.');
     } finally {
@@ -41,9 +54,13 @@ export function OrganizationJoinRequestsPage() {
     loadRequests();
   }, [loadRequests]);
 
+  // Reset selection on page change
+  useEffect(() => {
+    setSelectedIds(new Set());
+  }, [page]);
+
   const handleApprove = async (id: string) => {
     if (!confirm('이 요청을 승인하시겠습니까?')) return;
-
     setActionLoading(id);
     try {
       const note = reviewNoteId === id ? reviewNote : undefined;
@@ -60,7 +77,6 @@ export function OrganizationJoinRequestsPage() {
 
   const handleReject = async (id: string) => {
     if (!confirm('이 요청을 반려하시겠습니까?')) return;
-
     setActionLoading(id);
     try {
       const note = reviewNoteId === id ? reviewNote : undefined;
@@ -75,213 +91,198 @@ export function OrganizationJoinRequestsPage() {
     }
   };
 
-  return (
-    <div style={{ padding: '24px' }}>
-      <h2 style={{ margin: '0 0 8px', fontSize: '20px', fontWeight: 700 }}>
-        조직 가입/역할 요청 관리
-      </h2>
-      <p style={{ margin: '0 0 24px', color: '#64748b', fontSize: '14px' }}>
-        대기 중인 가입 및 역할 요청을 확인하고 승인/반려합니다.
-      </p>
+  // ─── Bulk Actions ───
 
-      {loading ? (
-        <div style={{ textAlign: 'center', padding: '40px', color: '#94a3b8' }}>
-          불러오는 중...
+  const handleBulkApprove = async () => {
+    if (selectedIds.size === 0) return;
+    setIsBulkProcessing(true);
+    let success = 0;
+    for (const id of selectedIds) {
+      try {
+        await joinRequestApi.approve(id);
+        success++;
+      } catch { /* continue */ }
+    }
+    setIsBulkProcessing(false);
+    setSelectedIds(new Set());
+    toast.success(`${success}건 일괄 승인 완료`);
+    loadRequests();
+  };
+
+  const handleBulkReject = async () => {
+    if (selectedIds.size === 0) return;
+    setIsBulkProcessing(true);
+    let success = 0;
+    for (const id of selectedIds) {
+      try {
+        await joinRequestApi.reject(id, '일괄 반려');
+        success++;
+      } catch { /* continue */ }
+    }
+    setIsBulkProcessing(false);
+    setSelectedIds(new Set());
+    toast.success(`${success}건 일괄 반려 완료`);
+    loadRequests();
+  };
+
+  // ─── Column Definitions ───
+
+  const columns: ListColumnDef<OrganizationJoinRequest>[] = [
+    {
+      key: 'request_type',
+      header: '요청 유형',
+      render: (_v, row) => JOIN_REQUEST_TYPE_LABELS[row.request_type] || row.request_type,
+    },
+    {
+      key: 'requested_role',
+      header: '요청 역할',
+      render: (_v, row) => REQUESTED_ROLE_LABELS[row.requested_role] || row.requested_role,
+    },
+    {
+      key: 'requested_sub_role',
+      header: '세부 역할',
+      render: (_v, row) => row.requested_sub_role || '-',
+    },
+    {
+      key: 'user_id',
+      header: '요청자 ID',
+      render: (_v, row) => (
+        <span className="text-xs font-mono text-slate-600">{row.user_id.slice(0, 8)}...</span>
+      ),
+    },
+    {
+      key: 'organization_id',
+      header: '조직 ID',
+      render: (_v, row) => (
+        <span className="text-xs font-mono text-slate-600">{row.organization_id.slice(0, 8)}...</span>
+      ),
+    },
+    {
+      key: 'created_at',
+      header: '요청일',
+      sortable: true,
+      sortAccessor: (row) => new Date(row.created_at).getTime(),
+      render: (_v, row) => new Date(row.created_at).toLocaleDateString('ko-KR'),
+    },
+    {
+      key: '_actions',
+      header: '처리',
+      system: true,
+      align: 'center',
+      width: '220px',
+      onCellClick: () => {},
+      render: (_v, row) => (
+        <div>
+          <div className="flex gap-1.5 justify-center">
+            <button
+              onClick={() =>
+                reviewNoteId === row.id
+                  ? setReviewNoteId(null)
+                  : (setReviewNoteId(row.id), setReviewNote(''))
+              }
+              className="px-2.5 py-1 text-xs bg-slate-100 border border-slate-300 rounded hover:bg-slate-200"
+            >
+              메모
+            </button>
+            <button
+              onClick={() => handleApprove(row.id)}
+              disabled={actionLoading === row.id}
+              className="px-3 py-1 text-xs font-semibold text-white bg-green-500 rounded hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              승인
+            </button>
+            <button
+              onClick={() => handleReject(row.id)}
+              disabled={actionLoading === row.id}
+              className="px-3 py-1 text-xs font-semibold text-white bg-red-500 rounded hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              반려
+            </button>
+          </div>
+          {reviewNoteId === row.id && (
+            <div className="mt-2">
+              <input
+                type="text"
+                value={reviewNote}
+                onChange={(e) => setReviewNote(e.target.value)}
+                onClick={(e) => e.stopPropagation()}
+                placeholder="처리 메모 입력"
+                className="w-full px-2 py-1 text-xs border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-400"
+              />
+            </div>
+          )}
         </div>
-      ) : error ? (
-        <div style={{ textAlign: 'center', padding: '40px', color: '#dc2626' }}>
+      ),
+    },
+  ];
+
+  if (error) {
+    return (
+      <div className="p-6">
+        <h2 className="text-xl font-bold text-slate-800 mb-2">조직 가입/역할 요청 관리</h2>
+        <p className="text-sm text-slate-500 mb-6">대기 중인 가입 및 역할 요청을 확인하고 승인/반려합니다.</p>
+        <div className="text-center py-10 text-red-600">
           {error}
           <button
             onClick={loadRequests}
-            style={{
-              display: 'block',
-              margin: '12px auto 0',
-              padding: '8px 16px',
-              background: '#f1f5f9',
-              border: '1px solid #cbd5e1',
-              borderRadius: '6px',
-              cursor: 'pointer',
-            }}
+            className="block mx-auto mt-3 px-4 py-2 bg-slate-100 border border-slate-300 rounded-lg text-sm text-slate-600 hover:bg-slate-200"
           >
             다시 시도
           </button>
         </div>
-      ) : requests.length === 0 ? (
-        <div style={{
-          textAlign: 'center',
-          padding: '60px 20px',
-          background: '#f8fafc',
-          borderRadius: '8px',
-          color: '#94a3b8',
-        }}>
-          대기 중인 요청이 없습니다.
-        </div>
-      ) : (
-        <>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{
-              width: '100%',
-              borderCollapse: 'collapse',
-              fontSize: '14px',
-            }}>
-              <thead>
-                <tr style={{ borderBottom: '2px solid #e2e8f0' }}>
-                  <th style={thStyle}>요청 유형</th>
-                  <th style={thStyle}>요청 역할</th>
-                  <th style={thStyle}>세부 역할</th>
-                  <th style={thStyle}>요청자 ID</th>
-                  <th style={thStyle}>조직 ID</th>
-                  <th style={thStyle}>요청일</th>
-                  <th style={{ ...thStyle, textAlign: 'center' }}>처리</th>
-                </tr>
-              </thead>
-              <tbody>
-                {requests.map((req) => (
-                  <tr key={req.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                    <td style={tdStyle}>
-                      {JOIN_REQUEST_TYPE_LABELS[req.request_type]}
-                    </td>
-                    <td style={tdStyle}>
-                      {REQUESTED_ROLE_LABELS[req.requested_role]}
-                    </td>
-                    <td style={tdStyle}>
-                      {req.requested_sub_role || '-'}
-                    </td>
-                    <td style={{ ...tdStyle, fontSize: '12px', fontFamily: 'monospace' }}>
-                      {req.user_id.slice(0, 8)}...
-                    </td>
-                    <td style={{ ...tdStyle, fontSize: '12px', fontFamily: 'monospace' }}>
-                      {req.organization_id.slice(0, 8)}...
-                    </td>
-                    <td style={tdStyle}>
-                      {new Date(req.created_at).toLocaleDateString('ko-KR')}
-                    </td>
-                    <td style={{ ...tdStyle, textAlign: 'center' }}>
-                      <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
-                        <button
-                          onClick={() =>
-                            reviewNoteId === req.id
-                              ? setReviewNoteId(null)
-                              : (setReviewNoteId(req.id), setReviewNote(''))
-                          }
-                          style={{
-                            padding: '4px 10px',
-                            background: '#f1f5f9',
-                            border: '1px solid #cbd5e1',
-                            borderRadius: '4px',
-                            fontSize: '12px',
-                            cursor: 'pointer',
-                          }}
-                        >
-                          메모
-                        </button>
-                        <button
-                          onClick={() => handleApprove(req.id)}
-                          disabled={actionLoading === req.id}
-                          style={{
-                            padding: '4px 12px',
-                            background: actionLoading === req.id ? '#86efac' : '#22c55e',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: '4px',
-                            fontSize: '12px',
-                            fontWeight: 600,
-                            cursor: actionLoading === req.id ? 'not-allowed' : 'pointer',
-                          }}
-                        >
-                          승인
-                        </button>
-                        <button
-                          onClick={() => handleReject(req.id)}
-                          disabled={actionLoading === req.id}
-                          style={{
-                            padding: '4px 12px',
-                            background: actionLoading === req.id ? '#fca5a5' : '#ef4444',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: '4px',
-                            fontSize: '12px',
-                            fontWeight: 600,
-                            cursor: actionLoading === req.id ? 'not-allowed' : 'pointer',
-                          }}
-                        >
-                          반려
-                        </button>
-                      </div>
-                      {reviewNoteId === req.id && (
-                        <div style={{ marginTop: '8px' }}>
-                          <input
-                            type="text"
-                            value={reviewNote}
-                            onChange={(e) => setReviewNote(e.target.value)}
-                            placeholder="처리 메모 입력"
-                            style={{
-                              width: '100%',
-                              padding: '4px 8px',
-                              border: '1px solid #d1d5db',
-                              borderRadius: '4px',
-                              fontSize: '12px',
-                              boxSizing: 'border-box',
-                            }}
-                          />
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+      </div>
+    );
+  }
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '20px' }}>
-              <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page <= 1}
-                style={paginationBtnStyle(page <= 1)}
-              >
-                이전
-              </button>
-              <span style={{ padding: '6px 12px', fontSize: '14px', color: '#475569' }}>
-                {page} / {totalPages}
-              </span>
-              <button
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={page >= totalPages}
-                style={paginationBtnStyle(page >= totalPages)}
-              >
-                다음
-              </button>
-            </div>
-          )}
-        </>
-      )}
+  return (
+    <div className="p-6">
+      <h2 className="text-xl font-bold text-slate-800 mb-2">조직 가입/역할 요청 관리</h2>
+      <p className="text-sm text-slate-500 mb-6">대기 중인 가입 및 역할 요청을 확인하고 승인/반려합니다.</p>
+
+      {/* ActionBar */}
+      <ActionBar
+        selectedCount={selectedIds.size}
+        onClearSelection={() => setSelectedIds(new Set())}
+        actions={[
+          {
+            key: 'approve',
+            label: `승인 (${selectedIds.size})`,
+            onClick: handleBulkApprove,
+            variant: 'primary',
+            icon: <CheckCircle size={14} />,
+            loading: isBulkProcessing,
+          },
+          {
+            key: 'reject',
+            label: `반려 (${selectedIds.size})`,
+            onClick: handleBulkReject,
+            variant: 'danger',
+            icon: <XCircle size={14} />,
+            loading: isBulkProcessing,
+          },
+        ]}
+      />
+
+      {/* DataTable */}
+      <DataTable<OrganizationJoinRequest>
+        columns={columns}
+        data={requests}
+        rowKey="id"
+        loading={loading}
+        emptyMessage="대기 중인 요청이 없습니다."
+        tableId="kpa-org-join-requests"
+        selectable
+        selectedKeys={selectedIds}
+        onSelectionChange={setSelectedIds}
+      />
+
+      {/* Pagination */}
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        onPageChange={setPage}
+        total={total}
+      />
     </div>
   );
-}
-
-const thStyle: React.CSSProperties = {
-  padding: '10px 12px',
-  textAlign: 'left',
-  fontWeight: 600,
-  color: '#475569',
-  fontSize: '13px',
-};
-
-const tdStyle: React.CSSProperties = {
-  padding: '10px 12px',
-  color: '#1e293b',
-};
-
-function paginationBtnStyle(disabled: boolean): React.CSSProperties {
-  return {
-    padding: '6px 16px',
-    background: disabled ? '#f1f5f9' : '#fff',
-    border: '1px solid #cbd5e1',
-    borderRadius: '6px',
-    fontSize: '13px',
-    color: disabled ? '#94a3b8' : '#475569',
-    cursor: disabled ? 'not-allowed' : 'pointer',
-  };
 }

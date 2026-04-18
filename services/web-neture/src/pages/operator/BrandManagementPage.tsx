@@ -1,14 +1,17 @@
 /**
  * BrandManagementPage — 운영자 브랜드 관리
  * WO-NETURE-BRAND-MANAGEMENT-V1
+ * WO-O4O-TABLE-STANDARD-V2 — DataTable 표준 전환
  *
  * 기능: 검색 / 이름 수정 / 병합
  * 브랜드 생성 UI 없음 (자동 생성 유지)
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Search, Pencil, GitMerge, X, Loader2, Check, Package } from 'lucide-react';
+import { Search, Pencil, GitMerge, X, Check, Package } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
+import { DataTable } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { operatorBrandApi, type BrandItem } from '../../lib/api/operatorBrand';
 
 export default function BrandManagementPage() {
@@ -98,6 +101,87 @@ export default function BrandManagementPage() {
     (!mergeSearch || b.name.toLowerCase().includes(mergeSearch.toLowerCase()))
   );
 
+  // ─── Column Definitions ───
+
+  const columns: ListColumnDef<BrandItem>[] = [
+    {
+      key: 'name',
+      header: '브랜드명',
+      sortable: true,
+      render: (_v, row) => {
+        if (editingId === row.id) {
+          return (
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={editName}
+                onChange={e => setEditName(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') saveEdit();
+                  if (e.key === 'Escape') cancelEdit();
+                }}
+                onClick={e => e.stopPropagation()}
+                className="flex-1 px-2 py-1 border border-emerald-400 rounded text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                autoFocus
+              />
+              <button onClick={saveEdit} className="p-1 text-emerald-600 hover:bg-emerald-50 rounded" title="저장">
+                <Check className="w-4 h-4" />
+              </button>
+              <button onClick={cancelEdit} className="p-1 text-slate-400 hover:bg-slate-100 rounded" title="취소">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          );
+        }
+        return <span className="text-sm font-medium text-slate-800">{row.name}</span>;
+      },
+    },
+    {
+      key: 'productCount',
+      header: (
+        <div className="flex items-center justify-center gap-1">
+          <Package className="w-3.5 h-3.5" />
+          상품 수
+        </div>
+      ),
+      align: 'center',
+      width: '100px',
+      sortable: true,
+      sortAccessor: (row) => row.productCount,
+      render: (_v, row) => (
+        <span className={`text-sm font-medium ${row.productCount > 0 ? 'text-slate-700' : 'text-slate-400'}`}>
+          {row.productCount}
+        </span>
+      ),
+    },
+    {
+      key: '_actions',
+      header: '작업',
+      system: true,
+      align: 'right',
+      width: '100px',
+      onCellClick: () => {},
+      render: (_v, row) => (
+        <div className="flex items-center justify-end gap-1">
+          <button
+            onClick={() => startEdit(row)}
+            className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded"
+            title="이름 수정"
+          >
+            <Pencil className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => openMerge(row)}
+            className="p-1.5 text-slate-400 hover:text-orange-600 hover:bg-orange-50 rounded"
+            title="다른 브랜드로 병합"
+          >
+            <GitMerge className="w-4 h-4" />
+          </button>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
       {/* Header */}
@@ -123,90 +207,15 @@ export default function BrandManagementPage() {
         총 {brands.length}개 브랜드
       </div>
 
-      {/* Table */}
-      {loading ? (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
-        </div>
-      ) : (
-        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-200">
-              <tr>
-                <th className="px-6 py-3 text-left text-sm font-medium text-slate-600">브랜드명</th>
-                <th className="px-4 py-3 text-center text-sm font-medium text-slate-600 w-24">
-                  <div className="flex items-center justify-center gap-1">
-                    <Package className="w-3.5 h-3.5" />
-                    상품 수
-                  </div>
-                </th>
-                <th className="px-4 py-3 text-right text-sm font-medium text-slate-600 w-32">작업</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {brands.length === 0 && (
-                <tr>
-                  <td colSpan={3} className="px-6 py-12 text-center text-slate-400">
-                    {search ? '검색 결과가 없습니다' : '브랜드가 없습니다'}
-                  </td>
-                </tr>
-              )}
-              {brands.map(brand => (
-                <tr key={brand.id} className="hover:bg-slate-50">
-                  <td className="px-6 py-3">
-                    {editingId === brand.id ? (
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="text"
-                          value={editName}
-                          onChange={e => setEditName(e.target.value)}
-                          onKeyDown={e => {
-                            if (e.key === 'Enter') saveEdit();
-                            if (e.key === 'Escape') cancelEdit();
-                          }}
-                          className="flex-1 px-2 py-1 border border-emerald-400 rounded text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                          autoFocus
-                        />
-                        <button onClick={saveEdit} className="p-1 text-emerald-600 hover:bg-emerald-50 rounded" title="저장">
-                          <Check className="w-4 h-4" />
-                        </button>
-                        <button onClick={cancelEdit} className="p-1 text-slate-400 hover:bg-slate-100 rounded" title="취소">
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ) : (
-                      <span className="text-sm font-medium text-slate-800">{brand.name}</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <span className={`text-sm font-medium ${brand.productCount > 0 ? 'text-slate-700' : 'text-slate-400'}`}>
-                      {brand.productCount}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center justify-end gap-1">
-                      <button
-                        onClick={() => startEdit(brand)}
-                        className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded"
-                        title="이름 수정"
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => openMerge(brand)}
-                        className="p-1.5 text-slate-400 hover:text-orange-600 hover:bg-orange-50 rounded"
-                        title="다른 브랜드로 병합"
-                      >
-                        <GitMerge className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      {/* DataTable */}
+      <DataTable<BrandItem>
+        columns={columns}
+        data={brands}
+        rowKey="id"
+        loading={loading}
+        emptyMessage={search ? '검색 결과가 없습니다' : '브랜드가 없습니다'}
+        tableId="neture-brand-management"
+      />
 
       {/* Merge Modal */}
       {showMergeModal && mergeSource && (

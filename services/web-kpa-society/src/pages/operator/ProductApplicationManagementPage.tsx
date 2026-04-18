@@ -2,6 +2,7 @@
  * ProductApplicationManagementPage - 상품 판매 신청 관리 (Operator)
  *
  * WO-O4O-PRODUCT-APPROVAL-WORKFLOW-V1
+ * WO-O4O-TABLE-STANDARD-V2 — DataTable 표준 전환
  *
  * /hub/b2b에서 약국이 신청한 상품을 조회하고 승인/거절합니다.
  * 승인 시 organization_product_listings에 자동 생성됩니다.
@@ -14,8 +15,11 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { OperatorConfirmModal, useOperatorAction } from '@o4o/ui';
+import { CheckCircle, XCircle } from 'lucide-react';
+import { OperatorConfirmModal, useOperatorAction, ActionBar } from '@o4o/ui';
 import { OperatorActionType } from '@o4o/types';
+import { DataTable, Pagination } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { apiClient } from '../../api/client';
 
 // ============================================
@@ -72,6 +76,12 @@ function getPriceLabel(app: ProductApplication): string | null {
   return null;
 }
 
+const STATUS_LABELS: Record<string, { label: string; color: string; bg: string }> = {
+  pending: { label: '승인 대기', color: '#92400e', bg: '#fef3c7' },
+  approved: { label: '승인', color: '#065f46', bg: '#d1fae5' },
+  rejected: { label: '거절', color: '#991b1b', bg: '#fee2e2' },
+};
+
 // ============================================
 // 컴포넌트
 // ============================================
@@ -87,8 +97,12 @@ export default function ProductApplicationManagementPage() {
   const [total, setTotal] = useState(0);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [actionTargetId, setActionTargetId] = useState<string | null>(null);
-  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [toastMsg, setToastMsg] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const { pendingAction, loading: actionHookLoading, requestAction, cancelAction, executeAction } = useOperatorAction();
+
+  // Selection
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
 
   const loadStats = useCallback(async () => {
     try {
@@ -125,6 +139,13 @@ export default function ProductApplicationManagementPage() {
   useEffect(() => { loadStats(); }, [loadStats]);
   useEffect(() => { loadApplications(); }, [loadApplications]);
 
+  // Reset selection on filter change
+  useEffect(() => {
+    setSelectedIds(new Set());
+  }, [statusFilter]);
+
+  // ─── Individual Actions (OperatorConfirmModal) ───
+
   const openApproveModal = (appId: string) => {
     setActionTargetId(appId);
     requestAction(OperatorActionType.APPROVE);
@@ -144,17 +165,59 @@ export default function ProductApplicationManagementPage() {
     await executeAction(async () => {
       if (pendingAction === OperatorActionType.APPROVE) {
         await apiClient.patch(`/operator/product-applications/${actionTargetId}/approve`, {});
-        setToast({ type: 'success', message: `"${app.product_name}" 승인 완료. 매장 진열 상품이 생성되었습니다.` });
+        setToastMsg({ type: 'success', message: `"${app.product_name}" 승인 완료. 매장 진열 상품이 생성되었습니다.` });
       } else {
         await apiClient.patch(`/operator/product-applications/${actionTargetId}/reject`, { reason: reason || undefined });
-        setToast({ type: 'success', message: `"${app.product_name}" 거절 처리되었습니다.` });
+        setToastMsg({ type: 'success', message: `"${app.product_name}" 거절 처리되었습니다.` });
       }
       loadApplications();
       loadStats();
     });
     setActionLoading(null);
     setActionTargetId(null);
-    setTimeout(() => setToast(null), 4000);
+    setTimeout(() => setToastMsg(null), 4000);
+  };
+
+  // ─── Bulk Actions ───
+
+  const handleBulkApprove = async () => {
+    const pendingIds = [...selectedIds].filter((id) => {
+      const app = applications.find((a) => a.id === id);
+      return app?.status === 'pending';
+    });
+    if (pendingIds.length === 0) return;
+    setIsBulkProcessing(true);
+    for (const id of pendingIds) {
+      try {
+        await apiClient.patch(`/operator/product-applications/${id}/approve`, {});
+      } catch { /* continue */ }
+    }
+    setIsBulkProcessing(false);
+    setSelectedIds(new Set());
+    setToastMsg({ type: 'success', message: `${pendingIds.length}건 일괄 승인 완료` });
+    loadApplications();
+    loadStats();
+    setTimeout(() => setToastMsg(null), 4000);
+  };
+
+  const handleBulkReject = async () => {
+    const pendingIds = [...selectedIds].filter((id) => {
+      const app = applications.find((a) => a.id === id);
+      return app?.status === 'pending';
+    });
+    if (pendingIds.length === 0) return;
+    setIsBulkProcessing(true);
+    for (const id of pendingIds) {
+      try {
+        await apiClient.patch(`/operator/product-applications/${id}/reject`, { reason: '일괄 거절' });
+      } catch { /* continue */ }
+    }
+    setIsBulkProcessing(false);
+    setSelectedIds(new Set());
+    setToastMsg({ type: 'success', message: `${pendingIds.length}건 일괄 거절 완료` });
+    loadApplications();
+    loadStats();
+    setTimeout(() => setToastMsg(null), 4000);
   };
 
   const handleFilterChange = (filter: StatusFilter) => {
@@ -162,50 +225,150 @@ export default function ProductApplicationManagementPage() {
     setPage(1);
   };
 
-  const STATUS_LABELS: Record<string, { label: string; color: string; bg: string }> = {
-    pending: { label: '승인 대기', color: '#92400e', bg: '#fef3c7' },
-    approved: { label: '승인', color: '#065f46', bg: '#d1fae5' },
-    rejected: { label: '거절', color: '#991b1b', bg: '#fee2e2' },
-  };
+  // ─── Bulk action counts ───
+
+  const selectedPendingCount = [...selectedIds].filter((id) => {
+    const app = applications.find((a) => a.id === id);
+    return app?.status === 'pending';
+  }).length;
+
+  // ─── Column Definitions ───
+
+  const columns: ListColumnDef<ProductApplication>[] = [
+    {
+      key: 'organizationName',
+      header: '약국',
+      render: (_v, row) => row.organizationName || row.organization_id.slice(0, 8),
+    },
+    {
+      key: 'product_name',
+      header: '상품명',
+      sortable: true,
+      render: (_v, row) => (
+        <span className="font-medium text-slate-800">{row.product_name}</span>
+      ),
+    },
+    {
+      key: 'supplierName',
+      header: '공급사',
+      render: (_v, row) => row.supplierName || '-',
+    },
+    {
+      key: 'price',
+      header: '공급가',
+      align: 'right',
+      render: (_v, row) => (
+        <div>
+          <span className="font-medium">{formatKpaPrice(row)}</span>
+          {getPriceLabel(row) && (
+            <div className="text-[10px] text-slate-400 mt-0.5">{getPriceLabel(row)}</div>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'category',
+      header: '카테고리',
+      render: (_v, row) => (row.product_metadata?.category as string) || '-',
+    },
+    {
+      key: 'requested_at',
+      header: '신청일',
+      sortable: true,
+      sortAccessor: (row) => new Date(row.requested_at).getTime(),
+      render: (_v, row) => new Date(row.requested_at).toLocaleDateString('ko-KR'),
+    },
+    {
+      key: 'status',
+      header: '상태',
+      render: (_v, row) => {
+        const info = STATUS_LABELS[row.status] || STATUS_LABELS.pending;
+        return (
+          <div>
+            <span
+              className="inline-block px-2 py-0.5 rounded text-[11px] font-semibold"
+              style={{ backgroundColor: info.bg, color: info.color }}
+            >
+              {info.label}
+            </span>
+            {row.reject_reason && (
+              <div className="text-[11px] text-slate-400 mt-0.5">사유: {row.reject_reason}</div>
+            )}
+          </div>
+        );
+      },
+    },
+    {
+      key: '_actions',
+      header: '액션',
+      system: true,
+      align: 'center',
+      width: '120px',
+      onCellClick: () => {},
+      render: (_v, row) => {
+        if (row.status !== 'pending') {
+          if (row.status === 'approved' && row.reviewed_at) {
+            return <span className="text-xs text-slate-400">{new Date(row.reviewed_at).toLocaleDateString('ko-KR')}</span>;
+          }
+          return null;
+        }
+        const isTarget = actionLoading === row.id;
+        return (
+          <div className="flex gap-1.5 justify-center">
+            <button
+              onClick={() => openApproveModal(row.id)}
+              disabled={isTarget}
+              className="px-3 py-1 rounded-md text-xs font-semibold bg-blue-700 text-white hover:bg-blue-800 disabled:opacity-60"
+            >
+              {isTarget ? '처리중...' : '승인'}
+            </button>
+            <button
+              onClick={() => openRejectModal(row.id)}
+              disabled={isTarget}
+              className="px-3 py-1 rounded-md text-xs font-semibold border border-red-200 text-red-600 hover:bg-red-50 disabled:opacity-60"
+            >
+              거절
+            </button>
+          </div>
+        );
+      },
+    },
+  ];
 
   return (
-    <div style={{ maxWidth: 1100, margin: '0 auto', padding: 24 }}>
-      <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: 8 }}>상품 판매 신청 관리</h1>
-      <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: 24 }}>
+    <div className="max-w-[1100px] mx-auto p-6">
+      <h1 className="text-2xl font-bold mb-2">상품 판매 신청 관리</h1>
+      <p className="text-sm text-slate-500 mb-6">
         약국이 약국 HUB에서 신청한 B2B 상품을 승인하거나 거절합니다.
       </p>
 
       {/* Toast */}
-      {toast && (
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 8,
-          padding: '12px 16px', borderRadius: 8, border: '1px solid',
-          fontSize: '0.875rem', marginBottom: 16,
-          backgroundColor: toast.type === 'success' ? '#f0fdf4' : '#fef2f2',
-          borderColor: toast.type === 'success' ? '#86efac' : '#fecaca',
-          color: toast.type === 'success' ? '#166534' : '#991b1b',
-        }}>
-          {toast.message}
+      {toastMsg && (
+        <div className={`flex items-center gap-2 px-4 py-3 rounded-lg border text-sm mb-4 ${
+          toastMsg.type === 'success'
+            ? 'bg-green-50 border-green-300 text-green-800'
+            : 'bg-red-50 border-red-300 text-red-800'
+        }`}>
+          {toastMsg.message}
         </div>
       )}
 
-      {/* Stats */}
-      <div style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
-        {[
+      {/* Stats / Filter */}
+      <div className="flex gap-3 mb-6 flex-wrap">
+        {([
           { key: 'all' as StatusFilter, label: '전체', count: stats.pending + stats.approved + stats.rejected },
           { key: 'pending' as StatusFilter, label: '승인 대기', count: stats.pending },
           { key: 'approved' as StatusFilter, label: '승인', count: stats.approved },
           { key: 'rejected' as StatusFilter, label: '거절', count: stats.rejected },
-        ].map(item => (
+        ]).map(item => (
           <button
             key={item.key}
             onClick={() => handleFilterChange(item.key)}
-            style={{
-              padding: '8px 16px', borderRadius: 8, border: '1px solid #e2e8f0',
-              fontSize: '0.8125rem', fontWeight: 500, cursor: 'pointer',
-              backgroundColor: statusFilter === item.key ? '#1e40af' : '#ffffff',
-              color: statusFilter === item.key ? '#ffffff' : '#475569',
-            }}
+            className={`px-4 py-2 rounded-lg border text-[13px] font-medium ${
+              statusFilter === item.key
+                ? 'bg-blue-800 text-white border-blue-800'
+                : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+            }`}
           >
             {item.label} ({item.count})
           </button>
@@ -214,151 +377,66 @@ export default function ProductApplicationManagementPage() {
 
       {/* Error */}
       {error && (
-        <div style={{ padding: 40, textAlign: 'center', color: '#dc2626' }}>
+        <div className="text-center py-10 text-red-600">
           {error}
-          <div style={{ marginTop: 12 }}>
-            <button onClick={loadApplications} style={{
-              padding: '6px 16px', fontSize: '0.8125rem', cursor: 'pointer',
-              border: '1px solid #dc2626', borderRadius: 6, backgroundColor: 'transparent', color: '#dc2626',
-            }}>다시 시도</button>
+          <div className="mt-3">
+            <button
+              onClick={loadApplications}
+              className="px-4 py-1.5 text-[13px] border border-red-600 text-red-600 rounded-md hover:bg-red-50"
+            >
+              다시 시도
+            </button>
           </div>
         </div>
       )}
 
-      {/* Loading */}
-      {loading && !error && (
-        <div style={{ padding: 60, textAlign: 'center', color: '#94a3b8' }}>
-          신청 목록을 불러오는 중...
-        </div>
+      {/* ActionBar */}
+      <ActionBar
+        selectedCount={selectedIds.size}
+        onClearSelection={() => setSelectedIds(new Set())}
+        actions={[
+          ...(selectedPendingCount > 0 ? [{
+            key: 'approve',
+            label: `승인 (${selectedPendingCount})`,
+            onClick: handleBulkApprove,
+            variant: 'primary' as const,
+            icon: <CheckCircle size={14} />,
+            loading: isBulkProcessing,
+          }] : []),
+          ...(selectedPendingCount > 0 ? [{
+            key: 'reject',
+            label: `거절 (${selectedPendingCount})`,
+            onClick: handleBulkReject,
+            variant: 'danger' as const,
+            icon: <XCircle size={14} />,
+            loading: isBulkProcessing,
+          }] : []),
+        ]}
+      />
+
+      {/* DataTable */}
+      {!error && (
+        <DataTable<ProductApplication>
+          columns={columns}
+          data={applications}
+          rowKey="id"
+          loading={loading}
+          emptyMessage={statusFilter === 'pending' ? '처리 대기 중인 신청이 없습니다.' : '해당 상태의 신청이 없습니다.'}
+          tableId="kpa-product-applications"
+          selectable
+          selectedKeys={selectedIds}
+          onSelectionChange={setSelectedIds}
+        />
       )}
 
-      {/* Empty */}
-      {!loading && !error && applications.length === 0 && (
-        <div style={{ padding: 60, textAlign: 'center', color: '#94a3b8' }}>
-          {statusFilter === 'pending' ? '처리 대기 중인 신청이 없습니다.' : '해당 상태의 신청이 없습니다.'}
-        </div>
-      )}
-
-      {/* Table */}
-      {!loading && !error && applications.length > 0 && (
-        <>
-          <div style={{ fontSize: '0.8125rem', color: '#64748b', marginBottom: 8 }}>
-            총 {total}건
-          </div>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8125rem' }}>
-              <thead>
-                <tr style={{ borderBottom: '2px solid #e2e8f0' }}>
-                  <th style={thStyle}>약국</th>
-                  <th style={thStyle}>상품명</th>
-                  <th style={thStyle}>공급사</th>
-                  <th style={{ ...thStyle, textAlign: 'right' }}>공급가</th>
-                  <th style={thStyle}>카테고리</th>
-                  <th style={thStyle}>신청일</th>
-                  <th style={thStyle}>상태</th>
-                  <th style={{ ...thStyle, textAlign: 'center' }}>액션</th>
-                </tr>
-              </thead>
-              <tbody>
-                {applications.map(app => {
-                  const statusInfo = STATUS_LABELS[app.status] || STATUS_LABELS.pending;
-                  const isActionTarget = actionLoading === app.id;
-
-                  return (
-                    <tr key={app.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                      <td style={tdStyle}>{app.organizationName || app.organization_id.slice(0, 8)}</td>
-                      <td style={tdStyle}>
-                        <div style={{ fontWeight: 500 }}>{app.product_name}</div>
-                      </td>
-                      <td style={tdStyle}>{app.supplierName || '-'}</td>
-                      <td style={{ ...tdStyle, textAlign: 'right', whiteSpace: 'nowrap' }}>
-                        <div style={{ fontWeight: 500 }}>{formatKpaPrice(app)}</div>
-                        {getPriceLabel(app) && (
-                          <div style={{ fontSize: '0.625rem', color: '#94a3b8', marginTop: 1 }}>
-                            {getPriceLabel(app)}
-                          </div>
-                        )}
-                      </td>
-                      <td style={tdStyle}>{(app.product_metadata?.category as string) || '-'}</td>
-                      <td style={tdStyle}>{new Date(app.requested_at).toLocaleDateString('ko-KR')}</td>
-                      <td style={tdStyle}>
-                        <span style={{
-                          display: 'inline-block', padding: '2px 8px', borderRadius: 4,
-                          fontSize: '0.6875rem', fontWeight: 600,
-                          backgroundColor: statusInfo.bg, color: statusInfo.color,
-                        }}>
-                          {statusInfo.label}
-                        </span>
-                        {app.reject_reason && (
-                          <div style={{ fontSize: '0.6875rem', color: '#94a3b8', marginTop: 2 }}>
-                            사유: {app.reject_reason}
-                          </div>
-                        )}
-                      </td>
-                      <td style={{ ...tdStyle, textAlign: 'center' }}>
-                        {app.status === 'pending' && (
-                          <div style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
-                            <button
-                              onClick={() => openApproveModal(app.id)}
-                              disabled={isActionTarget}
-                              style={{
-                                padding: '4px 12px', borderRadius: 6, border: 'none',
-                                fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer',
-                                backgroundColor: '#1e40af', color: '#ffffff',
-                                opacity: isActionTarget ? 0.6 : 1,
-                              }}
-                            >
-                              {isActionTarget ? '처리중...' : '승인'}
-                            </button>
-                            <button
-                              onClick={() => openRejectModal(app.id)}
-                              disabled={isActionTarget}
-                              style={{
-                                padding: '4px 12px', borderRadius: 6,
-                                fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer',
-                                backgroundColor: '#ffffff', color: '#dc2626',
-                                border: '1px solid #fecaca',
-                                opacity: isActionTarget ? 0.6 : 1,
-                              }}
-                            >
-                              거절
-                            </button>
-                          </div>
-                        )}
-                        {app.status === 'approved' && app.reviewed_at && (
-                          <span style={{ fontSize: '0.6875rem', color: '#94a3b8' }}>
-                            {new Date(app.reviewed_at).toLocaleDateString('ko-KR')}
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 16, marginTop: 20 }}>
-              <button
-                onClick={() => setPage(p => Math.max(1, p - 1))}
-                disabled={page <= 1}
-                style={{ ...pageBtn, opacity: page <= 1 ? 0.4 : 1 }}
-              >
-                &laquo; 이전
-              </button>
-              <span style={{ fontSize: '0.8125rem', color: '#64748b' }}>{page} / {totalPages}</span>
-              <button
-                onClick={() => setPage(p => p + 1)}
-                disabled={page >= totalPages}
-                style={{ ...pageBtn, opacity: page >= totalPages ? 0.4 : 1 }}
-              >
-                다음 &raquo;
-              </button>
-            </div>
-          )}
-        </>
+      {/* Pagination */}
+      {!error && (
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+          total={total}
+        />
       )}
 
       {/* Action Confirm Modal (WO-O4O-OPERATOR-ACTION-STANDARDIZATION-V1) */}
@@ -380,31 +458,3 @@ export default function ProductApplicationManagementPage() {
     </div>
   );
 }
-
-// ============================================
-// 스타일 헬퍼
-// ============================================
-
-const thStyle: React.CSSProperties = {
-  padding: '10px 12px',
-  textAlign: 'left',
-  fontWeight: 600,
-  color: '#475569',
-  whiteSpace: 'nowrap',
-};
-
-const tdStyle: React.CSSProperties = {
-  padding: '10px 12px',
-  color: '#334155',
-};
-
-const pageBtn: React.CSSProperties = {
-  padding: '6px 14px',
-  fontSize: '0.8125rem',
-  fontWeight: 500,
-  color: '#475569',
-  backgroundColor: '#fff',
-  border: '1px solid #e2e8f0',
-  borderRadius: 6,
-  cursor: 'pointer',
-};

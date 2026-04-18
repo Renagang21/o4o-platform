@@ -1,6 +1,7 @@
 /**
  * Operator Signage Category Management Page — KPA Society
  * WO-O4O-SIGNAGE-REGISTRATION-AND-CATEGORY-REFINE-V1 Phase 4
+ * WO-O4O-TABLE-STANDARD-V2 — DataTable 표준 전환
  *
  * Operators can create, reorder, and deactivate signage categories.
  * No hard delete — isActive=false hides from community dropdowns.
@@ -9,7 +10,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { getAccessToken } from '../../../contexts/AuthContext';
-import { Tag, Plus, Eye, EyeOff, RefreshCw, GripVertical } from 'lucide-react';
+import { Tag, Plus, Eye, EyeOff, RefreshCw } from 'lucide-react';
+import { DataTable } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 const SERVICE_KEY = 'kpa-society';
@@ -51,7 +54,7 @@ export default function CategoriesPage() {
         (a: Category, b: Category) => a.sortOrder - b.sortOrder
       );
       setCategories(list);
-    } catch (e) {
+    } catch {
       setError('카테고리 목록을 불러오지 못했습니다.');
     } finally {
       setIsLoading(false);
@@ -144,6 +147,77 @@ export default function CategoriesPage() {
     }
   };
 
+  // ─── Column Definitions ───
+
+  const columns: ListColumnDef<Category>[] = [
+    {
+      key: 'name',
+      header: '카테고리명',
+      render: (_v, row) => (
+        <span className={`font-medium ${row.isActive ? 'text-slate-800' : 'text-slate-400'}`}>
+          {row.name}
+        </span>
+      ),
+    },
+    {
+      key: 'sortOrder',
+      header: '정렬',
+      align: 'center',
+      width: '100px',
+      sortable: true,
+      sortAccessor: (row) => row.sortOrder,
+      render: (_v, row) => (
+        <input
+          type="number"
+          defaultValue={row.sortOrder}
+          onBlur={(e) => handleUpdateSortOrder(row, parseInt(e.target.value))}
+          onClick={(e) => e.stopPropagation()}
+          disabled={isSaving === row.id}
+          className="w-16 px-2 py-1 text-center text-sm border border-slate-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-400 disabled:opacity-50"
+        />
+      ),
+    },
+    {
+      key: 'isActive',
+      header: '상태',
+      align: 'center',
+      width: '80px',
+      render: (_v, row) => (
+        <span
+          className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+            row.isActive
+              ? 'bg-green-100 text-green-700'
+              : 'bg-slate-100 text-slate-500'
+          }`}
+        >
+          {row.isActive ? '활성' : '비활성'}
+        </span>
+      ),
+    },
+    {
+      key: '_actions',
+      header: '관리',
+      system: true,
+      align: 'right',
+      width: '60px',
+      onCellClick: () => {},
+      render: (_v, row) => (
+        <button
+          onClick={() => handleToggleActive(row)}
+          disabled={isSaving === row.id}
+          title={row.isActive ? '비활성화' : '활성화'}
+          className="p-1.5 text-slate-400 hover:text-slate-700 rounded disabled:opacity-50"
+        >
+          {row.isActive ? (
+            <EyeOff className="w-4 h-4" />
+          ) : (
+            <Eye className="w-4 h-4" />
+          )}
+        </button>
+      ),
+    },
+  ];
+
   return (
     <div className="p-6 max-w-3xl mx-auto">
       {/* Header */}
@@ -225,77 +299,15 @@ export default function CategoriesPage() {
         </div>
       )}
 
-      {/* Loading */}
-      {isLoading ? (
-        <div className="text-center py-12 text-slate-400 text-sm">불러오는 중...</div>
-      ) : categories.length === 0 ? (
-        <div className="text-center py-12 text-slate-400 text-sm">등록된 카테고리가 없습니다.</div>
-      ) : (
-        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-slate-100 bg-slate-50">
-                <th className="text-left px-4 py-3 font-medium text-slate-600 w-8">
-                  <GripVertical className="w-4 h-4 text-slate-400" />
-                </th>
-                <th className="text-left px-4 py-3 font-medium text-slate-600">카테고리명</th>
-                <th className="text-center px-4 py-3 font-medium text-slate-600 w-24">정렬</th>
-                <th className="text-center px-4 py-3 font-medium text-slate-600 w-20">상태</th>
-                <th className="text-right px-4 py-3 font-medium text-slate-600 w-20">관리</th>
-              </tr>
-            </thead>
-            <tbody>
-              {categories.map((cat) => (
-                <tr
-                  key={cat.id}
-                  className={`border-b border-slate-100 last:border-0 ${
-                    !cat.isActive ? 'opacity-50' : ''
-                  }`}
-                >
-                  <td className="px-4 py-3 text-slate-400">
-                    <GripVertical className="w-4 h-4" />
-                  </td>
-                  <td className="px-4 py-3 font-medium text-slate-800">{cat.name}</td>
-                  <td className="px-4 py-3 text-center">
-                    <input
-                      type="number"
-                      defaultValue={cat.sortOrder}
-                      onBlur={(e) => handleUpdateSortOrder(cat, parseInt(e.target.value))}
-                      disabled={isSaving === cat.id}
-                      className="w-16 px-2 py-1 text-center text-sm border border-slate-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-400 disabled:opacity-50"
-                    />
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                        cat.isActive
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-slate-100 text-slate-500'
-                      }`}
-                    >
-                      {cat.isActive ? '활성' : '비활성'}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <button
-                      onClick={() => handleToggleActive(cat)}
-                      disabled={isSaving === cat.id}
-                      title={cat.isActive ? '비활성화' : '활성화'}
-                      className="p-1.5 text-slate-400 hover:text-slate-700 rounded disabled:opacity-50"
-                    >
-                      {cat.isActive ? (
-                        <EyeOff className="w-4 h-4" />
-                      ) : (
-                        <Eye className="w-4 h-4" />
-                      )}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      {/* DataTable */}
+      <DataTable<Category>
+        columns={columns}
+        data={categories}
+        rowKey="id"
+        loading={isLoading}
+        emptyMessage="등록된 카테고리가 없습니다."
+        tableId="kpa-signage-categories"
+      />
 
       <p className="mt-4 text-xs text-slate-400">
         * 비활성화된 카테고리는 커뮤니티 등록 드롭다운에서 숨겨집니다. 삭제는 지원하지 않습니다.

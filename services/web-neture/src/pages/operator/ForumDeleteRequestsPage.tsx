@@ -2,6 +2,8 @@
  * ForumDeleteRequestsPage - 포럼 삭제 요청 관리
  *
  * WO-O4O-FORUM-OPERATOR-UNIFICATION-V1
+ * WO-O4O-TABLE-STANDARD-V2 — DataTable 표준 전환
+ *
  * 운영자가 포럼 삭제 요청을 검토/승인/거절
  * 공통 /api/v1/forum/operator/* API 사용
  */
@@ -16,6 +18,9 @@ import {
   Loader2,
 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
+import { ActionBar } from '@o4o/ui';
+import { DataTable } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { forumOperatorApi } from '../../services/forumApi';
 
 type DeleteRequestStatus = 'pending' | 'approved' | 'rejected';
@@ -60,8 +65,17 @@ export default function ForumDeleteRequestsPage() {
   const [reviewComment, setReviewComment] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // Selection & Bulk
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
+
   useEffect(() => {
     loadRequests();
+  }, [statusFilter]);
+
+  // Reset selection on filter change
+  useEffect(() => {
+    setSelectedIds(new Set());
   }, [statusFilter]);
 
   const loadRequests = async () => {
@@ -100,6 +114,118 @@ export default function ForumDeleteRequestsPage() {
       setIsProcessing(false);
     }
   };
+
+  // ─── Bulk Actions ───
+
+  const handleBulkApprove = async () => {
+    const pendingIds = [...selectedIds].filter((id) => {
+      const r = requests.find((req) => req.id === id);
+      return r?.deleteRequestStatus === 'pending';
+    });
+    if (pendingIds.length === 0) return;
+    setIsBulkProcessing(true);
+    let success = 0;
+    for (const id of pendingIds) {
+      try {
+        await forumOperatorApi.approveDelete(id, {});
+        success++;
+      } catch { /* continue */ }
+    }
+    setIsBulkProcessing(false);
+    setSelectedIds(new Set());
+    toast.success(`${success}건 일괄 승인 완료`);
+    loadRequests();
+  };
+
+  const handleBulkReject = async () => {
+    const pendingIds = [...selectedIds].filter((id) => {
+      const r = requests.find((req) => req.id === id);
+      return r?.deleteRequestStatus === 'pending';
+    });
+    if (pendingIds.length === 0) return;
+    setIsBulkProcessing(true);
+    let success = 0;
+    for (const id of pendingIds) {
+      try {
+        await forumOperatorApi.rejectDelete(id, { reviewComment: '일괄 반려' });
+        success++;
+      } catch { /* continue */ }
+    }
+    setIsBulkProcessing(false);
+    setSelectedIds(new Set());
+    toast.success(`${success}건 일괄 반려 완료`);
+    loadRequests();
+  };
+
+  const selectedPendingCount = [...selectedIds].filter((id) => {
+    const r = requests.find((req) => req.id === id);
+    return r?.deleteRequestStatus === 'pending';
+  }).length;
+
+  // ─── Column Definitions ───
+
+  const columns: ListColumnDef<DeleteRequestData>[] = [
+    {
+      key: 'name',
+      header: '포럼명',
+      sortable: true,
+      render: (_v, row) => (
+        <div>
+          <div className="font-medium text-slate-800">{row.name}</div>
+          <div className="text-sm text-slate-500 line-clamp-1">{row.description}</div>
+        </div>
+      ),
+    },
+    {
+      key: 'creatorName',
+      header: '생성자',
+      render: (_v, row) => row.creatorName || '-',
+    },
+    {
+      key: 'postCount',
+      header: '게시글 수',
+      sortable: true,
+      sortAccessor: (row) => row.postCount,
+    },
+    {
+      key: 'deleteRequestedAt',
+      header: '요청일',
+      sortable: true,
+      sortAccessor: (row) => new Date(row.deleteRequestedAt).getTime(),
+      render: (_v, row) => (
+        <span className="text-sm text-slate-600">{formatDate(row.deleteRequestedAt)}</span>
+      ),
+    },
+    {
+      key: 'deleteRequestStatus',
+      header: '상태',
+      render: (_v, row) => {
+        const status = statusConfig[row.deleteRequestStatus] || statusConfig.pending;
+        return (
+          <span className={`px-3 py-1 text-xs font-medium rounded-full ${status.bgColor} ${status.color}`}>
+            {status.label}
+          </span>
+        );
+      },
+    },
+    {
+      key: '_actions',
+      header: '작업',
+      system: true,
+      align: 'right',
+      width: '80px',
+      onCellClick: () => {},
+      render: (_v, row) => (
+        <button
+          onClick={() => { setSelectedRequest(row); setReviewComment(''); }}
+          className="p-2 rounded-lg hover:bg-slate-100 text-slate-600"
+          title="상세보기"
+        >
+          <Eye className="w-4 h-4" />
+        </button>
+      ),
+    },
+  ];
 
   if (isLoading) {
     return (
@@ -148,69 +274,50 @@ export default function ForumDeleteRequestsPage() {
         ))}
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-slate-50 border-b border-slate-200">
-            <tr>
-              <th className="px-6 py-3 text-left text-sm font-medium text-slate-600">포럼명</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-slate-600">생성자</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-slate-600">게시글 수</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-slate-600">요청일</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-slate-600">상태</th>
-              <th className="px-6 py-3 text-right text-sm font-medium text-slate-600">작업</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {requests.map((request) => {
-              const status = statusConfig[request.deleteRequestStatus] || statusConfig.pending;
-              return (
-                <tr key={request.id} className="hover:bg-slate-50">
-                  <td className="px-6 py-4">
-                    <div className="font-medium text-slate-800">{request.name}</div>
-                    <div className="text-sm text-slate-500 line-clamp-1">{request.description}</div>
-                  </td>
-                  <td className="px-6 py-4 text-slate-800">
-                    {request.creatorName || '-'}
-                  </td>
-                  <td className="px-6 py-4 text-slate-600">
-                    {request.postCount}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-slate-600">
-                    {formatDate(request.deleteRequestedAt)}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-3 py-1 text-xs font-medium rounded-full ${status.bgColor} ${status.color}`}>
-                      {status.label}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex justify-end gap-2">
-                      <button
-                        onClick={() => { setSelectedRequest(request); setReviewComment(''); }}
-                        className="p-2 rounded-lg hover:bg-slate-100 text-slate-600"
-                        title="상세보기"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+      {/* ActionBar */}
+      <ActionBar
+        selectedCount={selectedIds.size}
+        onClearSelection={() => setSelectedIds(new Set())}
+        actions={[
+          ...(selectedPendingCount > 0 ? [{
+            key: 'approve',
+            label: `삭제 승인 (${selectedPendingCount})`,
+            onClick: handleBulkApprove,
+            variant: 'primary' as const,
+            icon: <CheckCircle size={14} />,
+            loading: isBulkProcessing,
+          }] : []),
+          ...(selectedPendingCount > 0 ? [{
+            key: 'reject',
+            label: `반려 (${selectedPendingCount})`,
+            onClick: handleBulkReject,
+            variant: 'danger' as const,
+            icon: <XCircle size={14} />,
+            loading: isBulkProcessing,
+          }] : []),
+        ]}
+      />
 
-        {requests.length === 0 && (
-          <div className="text-center py-12">
+      {/* DataTable */}
+      <DataTable<DeleteRequestData>
+        columns={columns}
+        data={requests}
+        rowKey="id"
+        loading={false}
+        emptyMessage={
+          <div className="text-center py-8">
             <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto">
               <Trash2 className="w-8 h-8 text-slate-400" />
             </div>
             <h3 className="mt-4 text-lg font-medium text-slate-800">삭제 요청이 없습니다</h3>
             <p className="mt-2 text-slate-500">포럼 삭제 요청이 들어오면 여기에 표시됩니다</p>
           </div>
-        )}
-      </div>
+        }
+        tableId="neture-forum-delete-requests"
+        selectable
+        selectedKeys={selectedIds}
+        onSelectionChange={setSelectedIds}
+      />
 
       {/* Review Modal */}
       {selectedRequest && (

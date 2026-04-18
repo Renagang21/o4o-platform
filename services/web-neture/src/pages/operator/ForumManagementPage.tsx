@@ -2,6 +2,8 @@
  * ForumManagementPage - 포럼 카테고리 요청 관리
  *
  * WO-O4O-FORUM-OPERATOR-UNIFICATION-V1
+ * WO-O4O-TABLE-STANDARD-V2 — DataTable 표준 전환
+ *
  * 운영자가 사용자의 포럼 생성 요청을 검토/승인/거절/보완요청
  * 공통 /api/v1/forum/operator/* API 사용
  */
@@ -19,6 +21,9 @@ import {
   Loader2,
 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
+import { ActionBar } from '@o4o/ui';
+import { DataTable } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { forumOperatorApi } from '../../services/forumApi';
 
 type CategoryRequestStatus = 'pending' | 'revision_requested' | 'approved' | 'rejected';
@@ -73,9 +78,18 @@ export default function ForumManagementPage() {
   const [reviewComment, setReviewComment] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // Selection & Bulk
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
+
   useEffect(() => {
     loadRequests();
   }, [statusFilter]);
+
+  // Reset selection on filter/search change
+  useEffect(() => {
+    setSelectedIds(new Set());
+  }, [statusFilter, searchQuery]);
 
   const loadRequests = async () => {
     setIsLoading(true);
@@ -120,6 +134,119 @@ export default function ForumManagementPage() {
       setIsProcessing(false);
     }
   };
+
+  // ─── Bulk Actions ───
+
+  const handleBulkApprove = async () => {
+    const reviewableIds = [...selectedIds].filter((id) => {
+      const r = filteredRequests.find((req) => req.id === id);
+      return r && isReviewable(r.status);
+    });
+    if (reviewableIds.length === 0) return;
+    setIsBulkProcessing(true);
+    let success = 0;
+    for (const id of reviewableIds) {
+      try {
+        await forumOperatorApi.review(id, { action: 'approve' });
+        success++;
+      } catch { /* continue */ }
+    }
+    setIsBulkProcessing(false);
+    setSelectedIds(new Set());
+    toast.success(`${success}건 일괄 승인 완료`);
+    loadRequests();
+  };
+
+  const handleBulkReject = async () => {
+    const reviewableIds = [...selectedIds].filter((id) => {
+      const r = filteredRequests.find((req) => req.id === id);
+      return r && isReviewable(r.status);
+    });
+    if (reviewableIds.length === 0) return;
+    setIsBulkProcessing(true);
+    let success = 0;
+    for (const id of reviewableIds) {
+      try {
+        await forumOperatorApi.review(id, { action: 'reject', reviewComment: '일괄 거절' });
+        success++;
+      } catch { /* continue */ }
+    }
+    setIsBulkProcessing(false);
+    setSelectedIds(new Set());
+    toast.success(`${success}건 일괄 거절 완료`);
+    loadRequests();
+  };
+
+  const selectedReviewableCount = [...selectedIds].filter((id) => {
+    const r = filteredRequests.find((req) => req.id === id);
+    return r && isReviewable(r.status);
+  }).length;
+
+  // ─── Column Definitions ───
+
+  const columns: ListColumnDef<RequestData>[] = [
+    {
+      key: 'name',
+      header: '포럼명',
+      sortable: true,
+      render: (_v, row) => (
+        <div>
+          <div className="font-medium text-slate-800">{row.name}</div>
+          <div className="text-sm text-slate-500 line-clamp-1">{row.description}</div>
+        </div>
+      ),
+    },
+    {
+      key: 'requesterName',
+      header: '신청자',
+      render: (_v, row) => (
+        <div>
+          <div className="text-slate-800">{row.requesterName}</div>
+          {row.requesterEmail && (
+            <div className="text-sm text-slate-500">{row.requesterEmail}</div>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'createdAt',
+      header: '신청일',
+      sortable: true,
+      sortAccessor: (row) => new Date(row.createdAt).getTime(),
+      render: (_v, row) => (
+        <span className="text-sm text-slate-600">{formatDate(row.createdAt)}</span>
+      ),
+    },
+    {
+      key: 'status',
+      header: '상태',
+      render: (_v, row) => {
+        const status = statusConfig[row.status] || statusConfig.pending;
+        return (
+          <span className={`px-3 py-1 text-xs font-medium rounded-full ${status.bgColor} ${status.color}`}>
+            {status.label}
+          </span>
+        );
+      },
+    },
+    {
+      key: '_actions',
+      header: '작업',
+      system: true,
+      align: 'right',
+      width: '80px',
+      onCellClick: () => {},
+      render: (_v, row) => (
+        <button
+          onClick={() => { setSelectedRequest(row); setReviewComment(''); }}
+          className="p-2 rounded-lg hover:bg-slate-100 text-slate-600"
+          title="상세보기"
+        >
+          <Eye className="w-4 h-4" />
+        </button>
+      ),
+    },
+  ];
 
   if (isLoading) {
     return (
@@ -179,68 +306,50 @@ export default function ForumManagementPage() {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-slate-50 border-b border-slate-200">
-            <tr>
-              <th className="px-6 py-3 text-left text-sm font-medium text-slate-600">포럼명</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-slate-600">신청자</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-slate-600">신청일</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-slate-600">상태</th>
-              <th className="px-6 py-3 text-right text-sm font-medium text-slate-600">작업</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {filteredRequests.map((request) => {
-              const status = statusConfig[request.status] || statusConfig.pending;
-              return (
-                <tr key={request.id} className="hover:bg-slate-50">
-                  <td className="px-6 py-4">
-                    <div className="font-medium text-slate-800">{request.name}</div>
-                    <div className="text-sm text-slate-500 line-clamp-1">{request.description}</div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-slate-800">{request.requesterName}</div>
-                    {request.requesterEmail && (
-                      <div className="text-sm text-slate-500">{request.requesterEmail}</div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-slate-600">
-                    {formatDate(request.createdAt)}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-3 py-1 text-xs font-medium rounded-full ${status.bgColor} ${status.color}`}>
-                      {status.label}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex justify-end gap-2">
-                      <button
-                        onClick={() => { setSelectedRequest(request); setReviewComment(''); }}
-                        className="p-2 rounded-lg hover:bg-slate-100 text-slate-600"
-                        title="상세보기"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+      {/* ActionBar */}
+      <ActionBar
+        selectedCount={selectedIds.size}
+        onClearSelection={() => setSelectedIds(new Set())}
+        actions={[
+          ...(selectedReviewableCount > 0 ? [{
+            key: 'approve',
+            label: `승인 (${selectedReviewableCount})`,
+            onClick: handleBulkApprove,
+            variant: 'primary' as const,
+            icon: <CheckCircle size={14} />,
+            loading: isBulkProcessing,
+          }] : []),
+          ...(selectedReviewableCount > 0 ? [{
+            key: 'reject',
+            label: `거절 (${selectedReviewableCount})`,
+            onClick: handleBulkReject,
+            variant: 'danger' as const,
+            icon: <XCircle size={14} />,
+            loading: isBulkProcessing,
+          }] : []),
+        ]}
+      />
 
-        {filteredRequests.length === 0 && (
-          <div className="text-center py-12">
+      {/* DataTable */}
+      <DataTable<RequestData>
+        columns={columns}
+        data={filteredRequests}
+        rowKey="id"
+        loading={false}
+        emptyMessage={
+          <div className="text-center py-8">
             <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto">
               <FileCheck className="w-8 h-8 text-slate-400" />
             </div>
             <h3 className="mt-4 text-lg font-medium text-slate-800">신청 내역이 없습니다</h3>
             <p className="mt-2 text-slate-500">포럼 생성 요청이 들어오면 여기에 표시됩니다</p>
           </div>
-        )}
-      </div>
+        }
+        tableId="neture-forum-requests"
+        selectable
+        selectedKeys={selectedIds}
+        onSelectionChange={setSelectedIds}
+      />
 
       {/* Review Modal */}
       {selectedRequest && (

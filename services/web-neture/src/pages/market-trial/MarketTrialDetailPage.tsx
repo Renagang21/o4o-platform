@@ -435,6 +435,28 @@ export function MarketTrialDetailPage() {
         )}
       </section>
 
+      {/* 포럼 토론 (WO-NETURE-MARKET-TRIAL-PAGE-SEPARATION-AND-HOME-RESTRUCTURE-V1) */}
+      {trial.forumPostId && (
+        <section style={s.forumBox}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div>
+              <h3 style={{ fontSize: '0.875rem', fontWeight: 600, color: '#374151', margin: '0 0 4px 0' }}>
+                포럼 토론
+              </h3>
+              <p style={{ fontSize: '0.8125rem', color: '#6B7280', margin: 0 }}>
+                이 시범판매에 관한 공지 및 토론을 포럼에서 확인하세요.
+              </p>
+            </div>
+            <Link
+              to={`/community/forum/post/${trial.forumPostId}`}
+              style={s.forumLink}
+            >
+              포럼 글 보기 →
+            </Link>
+          </div>
+        </section>
+      )}
+
       {/* 하단: 허브 복귀 */}
       <div style={{ textAlign: 'center', marginTop: '24px' }}>
         <Link to="/market-trial" style={{ fontSize: '0.8125rem', color: '#9CA3AF', textDecoration: 'none' }}>
@@ -559,4 +581,19 @@ const s: Record<string, React.CSSProperties> = {
 
   warnBox: { padding: '12px 16px', backgroundColor: '#FEF3C7', borderRadius: '8px' },
   infoBox: { padding: '12px 16px', backgroundColor: '#F9FAFB', borderRadius: '8px' },
+
+  forumBox: {
+    padding: '16px 20px',
+    backgroundColor: '#FFFFFF',
+    borderRadius: '12px',
+    border: '1px solid #E5E7EB',
+    marginBottom: '20px',
+  },
+  forumLink: {
+    fontSize: '0.8125rem',
+    fontWeight: 600,
+    color: '#2563EB',
+    textDecoration: 'none',
+    whiteSpace: 'nowrap',
+  },
 };

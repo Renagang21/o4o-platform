@@ -1,5 +1,6 @@
 /**
  * AiBillingPage — WO-O4O-AI-BILLING-DATA-SYSTEM-V1
+ * WO-O4O-TABLE-STANDARD-V2 — DataTable 표준 전환
  *
  * AI 정산 데이터 관리: 생성 / 확정 / 결제 완료 / 조정 / CSV 내보내기
  */
@@ -14,6 +15,8 @@ import {
   Plus,
   Edit3,
 } from 'lucide-react';
+import { DataTable } from '@o4o/ui';
+import type { Column } from '@o4o/ui';
 import { api, API_BASE_URL } from '@/lib/apiClient';
 
 interface BillingSummary {
@@ -101,7 +104,7 @@ export default function AiBillingPage() {
       a.download = filename;
       a.click();
       URL.revokeObjectURL(url);
-    } catch (err: any) {
+    } catch {
       alert('Export failed');
     }
   };
@@ -135,6 +138,116 @@ export default function AiBillingPage() {
       </span>
     );
   };
+
+  // ─── Column Definitions ───
+
+  const columns: Column<BillingSummary>[] = [
+    {
+      key: 'period',
+      title: '기간',
+      render: (_v, b) => <span className="font-medium text-gray-900">{b.period}</span>,
+    },
+    {
+      key: 'serviceKey',
+      title: '서비스',
+      render: (_v, b) => (
+        <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded ${
+          b.serviceKey === 'care' ? 'bg-purple-100 text-purple-700' :
+          b.serviceKey === 'store' ? 'bg-blue-100 text-blue-700' :
+          'bg-gray-100 text-gray-700'
+        }`}>{b.serviceKey}</span>
+      ),
+    },
+    {
+      key: 'totalRequests',
+      title: '요청수',
+      align: 'right',
+      render: (_v, b) => b.totalRequests.toLocaleString(),
+    },
+    {
+      key: 'totalTokens',
+      title: '토큰',
+      align: 'right',
+      render: (_v, b) => <span className="text-gray-500">{formatTokens(b.totalTokens)}</span>,
+    },
+    {
+      key: 'totalCost',
+      title: '비용',
+      align: 'right',
+      render: (_v, b) => <span className="text-gray-500">${b.totalCost.toFixed(4)}</span>,
+    },
+    {
+      key: 'adjustmentAmount',
+      title: '조정',
+      align: 'right',
+      render: (_v, b) => {
+        if (b.adjustmentAmount !== 0) {
+          return (
+            <span className={b.adjustmentAmount < 0 ? 'text-red-600' : 'text-green-600'}>
+              {b.adjustmentAmount > 0 ? '+' : ''}${b.adjustmentAmount.toFixed(4)}
+            </span>
+          );
+        }
+        return <span className="text-gray-300">-</span>;
+      },
+    },
+    {
+      key: 'finalCost',
+      title: '최종 비용',
+      align: 'right',
+      render: (_v, b) => <span className="font-medium text-gray-900">${b.finalCost.toFixed(4)}</span>,
+    },
+    {
+      key: 'status',
+      title: '상태',
+      align: 'center',
+      render: (_v, b) => statusBadge(b.status),
+    },
+    {
+      key: '_actions',
+      title: '액션',
+      align: 'center',
+      width: '120px',
+      render: (_v, b) => (
+        <div className="flex items-center justify-center gap-1">
+          {b.status === 'draft' && (
+            <>
+              <button
+                onClick={(e) => { e.stopPropagation(); setAdjustModal({ id: b.id, current: b.adjustmentAmount }); setAdjustAmount(String(b.adjustmentAmount)); }}
+                title="조정"
+                className="p-1 text-gray-400 hover:text-blue-600 rounded"
+              >
+                <Edit3 className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); handleConfirm(b.id); }}
+                title="확정"
+                className="p-1 text-gray-400 hover:text-green-600 rounded"
+              >
+                <CheckCircle className="w-3.5 h-3.5" />
+              </button>
+            </>
+          )}
+          {b.status === 'confirmed' && (
+            <button
+              onClick={(e) => { e.stopPropagation(); handlePaid(b.id); }}
+              title="결제 완료"
+              className="p-1 text-gray-400 hover:text-green-600 rounded"
+            >
+              <CreditCard className="w-3.5 h-3.5" />
+            </button>
+          )}
+          <button
+            onClick={(e) => { e.stopPropagation(); handleExport(b.id); }}
+            title="CSV 내보내기"
+            className="p-1 text-gray-400 hover:text-blue-600 rounded"
+          >
+            <Download className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      ),
+    },
+  ];
 
   return (
     <div className="space-y-6">
@@ -174,89 +287,13 @@ export default function AiBillingPage() {
           <FileText className="w-4 h-4 text-gray-500" />
           <h2 className="text-sm font-semibold text-gray-800">정산 목록</h2>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-gray-500">
-              <tr>
-                <th className="px-4 py-2 text-left font-medium">기간</th>
-                <th className="px-4 py-2 text-left font-medium">서비스</th>
-                <th className="px-4 py-2 text-right font-medium">요청수</th>
-                <th className="px-4 py-2 text-right font-medium">토큰</th>
-                <th className="px-4 py-2 text-right font-medium">비용</th>
-                <th className="px-4 py-2 text-right font-medium">조정</th>
-                <th className="px-4 py-2 text-right font-medium">최종 비용</th>
-                <th className="px-4 py-2 text-center font-medium">상태</th>
-                <th className="px-4 py-2 text-center font-medium">액션</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {billings.length === 0 ? (
-                <tr><td colSpan={9} className="px-4 py-8 text-center text-gray-400">정산 데이터 없음</td></tr>
-              ) : billings.map((b) => (
-                <tr key={b.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-2 font-medium text-gray-900">{b.period}</td>
-                  <td className="px-4 py-2">
-                    <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded ${
-                      b.serviceKey === 'care' ? 'bg-purple-100 text-purple-700' :
-                      b.serviceKey === 'store' ? 'bg-blue-100 text-blue-700' :
-                      'bg-gray-100 text-gray-700'
-                    }`}>{b.serviceKey}</span>
-                  </td>
-                  <td className="px-4 py-2 text-right">{b.totalRequests.toLocaleString()}</td>
-                  <td className="px-4 py-2 text-right text-gray-500">{formatTokens(b.totalTokens)}</td>
-                  <td className="px-4 py-2 text-right text-gray-500">${b.totalCost.toFixed(4)}</td>
-                  <td className="px-4 py-2 text-right">
-                    {b.adjustmentAmount !== 0
-                      ? <span className={b.adjustmentAmount < 0 ? 'text-red-600' : 'text-green-600'}>
-                          {b.adjustmentAmount > 0 ? '+' : ''}${b.adjustmentAmount.toFixed(4)}
-                        </span>
-                      : <span className="text-gray-300">-</span>}
-                  </td>
-                  <td className="px-4 py-2 text-right font-medium text-gray-900">${b.finalCost.toFixed(4)}</td>
-                  <td className="px-4 py-2 text-center">{statusBadge(b.status)}</td>
-                  <td className="px-4 py-2 text-center">
-                    <div className="flex items-center justify-center gap-1">
-                      {b.status === 'draft' && (
-                        <>
-                          <button
-                            onClick={() => { setAdjustModal({ id: b.id, current: b.adjustmentAmount }); setAdjustAmount(String(b.adjustmentAmount)); }}
-                            title="조정"
-                            className="p-1 text-gray-400 hover:text-blue-600 rounded"
-                          >
-                            <Edit3 className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            onClick={() => handleConfirm(b.id)}
-                            title="확정"
-                            className="p-1 text-gray-400 hover:text-green-600 rounded"
-                          >
-                            <CheckCircle className="w-3.5 h-3.5" />
-                          </button>
-                        </>
-                      )}
-                      {b.status === 'confirmed' && (
-                        <button
-                          onClick={() => handlePaid(b.id)}
-                          title="결제 완료"
-                          className="p-1 text-gray-400 hover:text-green-600 rounded"
-                        >
-                          <CreditCard className="w-3.5 h-3.5" />
-                        </button>
-                      )}
-                      <button
-                        onClick={() => handleExport(b.id)}
-                        title="CSV 내보내기"
-                        className="p-1 text-gray-400 hover:text-blue-600 rounded"
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <DataTable<BillingSummary>
+          columns={columns}
+          dataSource={billings}
+          rowKey="id"
+          loading={loading}
+          emptyText="정산 데이터 없음"
+        />
       </div>
 
       {/* Adjustment Modal */}
