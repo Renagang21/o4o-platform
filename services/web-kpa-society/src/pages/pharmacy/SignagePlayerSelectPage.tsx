@@ -16,6 +16,7 @@ export function SignagePlayerSelectPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [keyword, setKeyword] = useState('');
+  const [selectedPlayerKeys, setSelectedPlayerKeys] = useState<string[]>([]);
 
   const loadPlaylists = useCallback(async () => {
     setLoading(true);
@@ -138,6 +139,10 @@ export function SignagePlayerSelectPage() {
 
       {/* Table */}
       <DataTable<StorePlaylist>
+        rowSelection={{
+          selectedRowKeys: selectedPlayerKeys,
+          onChange: setSelectedPlayerKeys,
+        }}
         columns={columns}
         dataSource={filtered}
         rowKey="id"

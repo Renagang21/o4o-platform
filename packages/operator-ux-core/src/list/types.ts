@@ -88,6 +88,13 @@ export interface DataTableProps<T extends Record<string, any>> {
   persistState?: boolean;
   /** 컬럼 표시/숨김 토글 UI */
   columnVisibility?: boolean;
+  // WO-O4O-TABLE-STANDARD-V1: Selection support
+  /** 행 선택 활성화 */
+  selectable?: boolean;
+  /** 선택된 행 키 목록 */
+  selectedKeys?: Set<string>;
+  /** 선택 변경 콜백 */
+  onSelectionChange?: (keys: Set<string>) => void;
 }
 
 // ─── Pagination Props ───

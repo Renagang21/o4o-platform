@@ -2,13 +2,17 @@
  * OperatorProductApprovalPage — Operator 상품 승인 관리
  *
  * WO-O4O-NETURE-PRODUCT-APPROVAL-UI-V1
+ * WO-O4O-TABLE-STANDARD-V1 — Raw HTML → DataTable + Selection + Bulk Action
  *
  * 기존 adminProductApi 재사용 + ProductDetailDrawer로 검토.
  * AdminProductApprovalPage 대비: Drawer 기반 상세, 이미지 포함.
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { Trash2 } from 'lucide-react';
+import { CheckCircle, XCircle, Trash2 } from 'lucide-react';
+import { ActionBar } from '@o4o/ui';
+import { DataTable } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { adminProductApi, type AdminProduct, type DistributionType } from '../../lib/api';
 import { productCleanupApi } from '../../lib/api/operatorProductCleanup';
 import type { SupplierProduct } from '../../lib/api';
@@ -77,6 +81,8 @@ export default function OperatorProductApprovalPage() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
 
   // Drawer
   const [drawerProduct, setDrawerProduct] = useState<AdminProduct | null>(null);
@@ -95,6 +101,11 @@ export default function OperatorProductApprovalPage() {
   useEffect(() => {
     loadProducts();
   }, [loadProducts]);
+
+  // Reset selection on filter/tab change
+  useEffect(() => {
+    setSelectedIds(new Set());
+  }, [statusFilter, searchTerm]);
 
   // ─── Actions ───
 
@@ -121,6 +132,42 @@ export default function OperatorProductApprovalPage() {
     }
   };
 
+  // ─── Bulk Actions ───
+
+  const handleBulkApprove = async () => {
+    const pendingIds = [...selectedIds].filter((id) => {
+      const p = products.find((prod) => prod.id === id);
+      return p?.approvalStatus === 'PENDING';
+    });
+    if (pendingIds.length === 0) return;
+    setIsBulkProcessing(true);
+    for (const id of pendingIds) {
+      try {
+        await adminProductApi.approveProduct(id);
+      } catch { /* continue */ }
+    }
+    setIsBulkProcessing(false);
+    setSelectedIds(new Set());
+    await loadProducts();
+  };
+
+  const handleBulkReject = async () => {
+    const pendingIds = [...selectedIds].filter((id) => {
+      const p = products.find((prod) => prod.id === id);
+      return p?.approvalStatus === 'PENDING';
+    });
+    if (pendingIds.length === 0) return;
+    setIsBulkProcessing(true);
+    for (const id of pendingIds) {
+      try {
+        await adminProductApi.rejectProduct(id, '일괄 반려');
+      } catch { /* continue */ }
+    }
+    setIsBulkProcessing(false);
+    setSelectedIds(new Set());
+    await loadProducts();
+  };
+
   // ─── Filtering ───
 
   const filtered = products.filter((p) => {
@@ -136,6 +183,126 @@ export default function OperatorProductApprovalPage() {
   const pendingCount = products.filter((p) => p.approvalStatus === 'PENDING').length;
   const approvedCount = products.filter((p) => p.approvalStatus === 'APPROVED').length;
   const rejectedCount = products.filter((p) => p.approvalStatus === 'REJECTED').length;
+
+  // ─── Bulk action counts ───
+
+  const selectedPendingCount = [...selectedIds].filter((id) => {
+    const p = products.find((prod) => prod.id === id);
+    return p?.approvalStatus === 'PENDING';
+  }).length;
+
+  // ─── Column Definitions ───
+
+  const columns: ListColumnDef<AdminProduct>[] = [
+    {
+      key: 'marketingName',
+      header: '상품명',
+      sortable: true,
+      render: (_v, row) => (
+        <div>
+          <p className="font-medium text-slate-800">{row.marketingName}</p>
+          <p className="text-xs text-slate-400 mt-0.5">{row.id.slice(0, 8)}...</p>
+        </div>
+      ),
+    },
+    {
+      key: 'supplierName',
+      header: '공급자',
+      sortable: true,
+    },
+    {
+      key: 'category',
+      header: '카테고리',
+      render: (v) => v || '-',
+    },
+    {
+      key: 'distributionType',
+      header: '유통정책',
+      align: 'center',
+      width: '100px',
+      render: (v) => (
+        <span className="inline-block px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700">
+          {DIST_LABELS[v] || v}
+        </span>
+      ),
+    },
+    {
+      key: 'approvalStatus',
+      header: '상태',
+      align: 'center',
+      width: '100px',
+      sortable: true,
+      render: (v) => {
+        const badge = STATUS_BADGE[v] || { label: v, cls: 'bg-slate-100 text-slate-600' };
+        return (
+          <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${badge.cls}`}>
+            {badge.label}
+          </span>
+        );
+      },
+    },
+    {
+      key: 'createdAt',
+      header: '등록일',
+      width: '110px',
+      sortable: true,
+      sortAccessor: (row) => new Date(row.createdAt).getTime(),
+      render: (v) => (
+        <span className="text-xs text-slate-500">
+          {new Date(v).toLocaleDateString('ko-KR')}
+        </span>
+      ),
+    },
+    {
+      key: '_actions',
+      header: '액션',
+      align: 'center',
+      width: '130px',
+      system: true,
+      onCellClick: () => {},
+      render: (_v, row) => (
+        <>
+          {row.approvalStatus === 'PENDING' && (
+            <div className="flex items-center justify-center gap-2">
+              <button
+                onClick={() => handleApprove(row.id)}
+                disabled={actionLoading === row.id}
+                className="px-2.5 py-1 bg-green-600 text-white rounded text-xs font-medium hover:bg-green-700 disabled:opacity-50"
+              >
+                승인
+              </button>
+              <button
+                onClick={() => {
+                  setRejectTarget({ id: row.id, name: row.marketingName });
+                  setRejectReason('');
+                }}
+                disabled={actionLoading === row.id}
+                className="px-2.5 py-1 bg-red-600 text-white rounded text-xs font-medium hover:bg-red-700 disabled:opacity-50"
+              >
+                반려
+              </button>
+            </div>
+          )}
+          {row.approvalStatus === 'APPROVED' && (
+            <button
+              onClick={async () => {
+                if (!confirm(`"${row.marketingName}"을 삭제(휴지통 이동)하시겠습니까?`)) return;
+                setActionLoading(row.id);
+                const res = await productCleanupApi.softDelete(row.id);
+                setActionLoading(null);
+                if (res.success) loadProducts();
+              }}
+              disabled={actionLoading === row.id}
+              className="p-1.5 rounded hover:bg-red-50 text-red-400 hover:text-red-600 disabled:opacity-50"
+              title="삭제 (휴지통으로 이동)"
+            >
+              <Trash2 size={14} />
+            </button>
+          )}
+        </>
+      ),
+    },
+  ];
 
   // ─── Drawer approval actions ───
 
@@ -200,105 +367,49 @@ export default function OperatorProductApprovalPage() {
         />
       </div>
 
-      {/* Table */}
-      <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-slate-50 border-b border-slate-200">
-            <tr>
-              <th className="text-left px-4 py-3 font-medium text-slate-600">상품명</th>
-              <th className="text-left px-4 py-3 font-medium text-slate-600">공급자</th>
-              <th className="text-left px-4 py-3 font-medium text-slate-600">카테고리</th>
-              <th className="text-center px-4 py-3 font-medium text-slate-600">유통정책</th>
-              <th className="text-center px-4 py-3 font-medium text-slate-600">상태</th>
-              <th className="text-left px-4 py-3 font-medium text-slate-600">등록일</th>
-              <th className="text-center px-4 py-3 font-medium text-slate-600">액션</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan={7} className="text-center py-12 text-slate-400">로딩 중...</td>
-              </tr>
-            ) : filtered.length === 0 ? (
-              <tr>
-                <td colSpan={7} className="text-center py-12 text-slate-400">
-                  {products.length === 0 ? '등록된 상품이 없습니다' : '검색 결과가 없습니다'}
-                </td>
-              </tr>
-            ) : (
-              filtered.map((p) => {
-                const badge = STATUS_BADGE[p.approvalStatus] || { label: p.approvalStatus, cls: 'bg-slate-100 text-slate-600' };
-                return (
-                  <tr
-                    key={p.id}
-                    className="border-b border-slate-100 hover:bg-slate-50 cursor-pointer"
-                    onClick={() => setDrawerProduct(p)}
-                  >
-                    <td className="px-4 py-3">
-                      <p className="font-medium text-slate-800">{p.marketingName}</p>
-                      <p className="text-xs text-slate-400 mt-0.5">{p.id.slice(0, 8)}...</p>
-                    </td>
-                    <td className="px-4 py-3 text-slate-600">{p.supplierName}</td>
-                    <td className="px-4 py-3 text-slate-600">{p.category || '-'}</td>
-                    <td className="px-4 py-3 text-center">
-                      <span className="inline-block px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700">
-                        {DIST_LABELS[p.distributionType] || p.distributionType}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${badge.cls}`}>
-                        {badge.label}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-slate-500 text-xs">
-                      {new Date(p.createdAt).toLocaleDateString('ko-KR')}
-                    </td>
-                    <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
-                      {p.approvalStatus === 'PENDING' && (
-                        <div className="flex items-center justify-center gap-2">
-                          <button
-                            onClick={() => handleApprove(p.id)}
-                            disabled={actionLoading === p.id}
-                            className="px-2.5 py-1 bg-green-600 text-white rounded text-xs font-medium hover:bg-green-700 disabled:opacity-50"
-                          >
-                            승인
-                          </button>
-                          <button
-                            onClick={() => {
-                              setRejectTarget({ id: p.id, name: p.marketingName });
-                              setRejectReason('');
-                            }}
-                            disabled={actionLoading === p.id}
-                            className="px-2.5 py-1 bg-red-600 text-white rounded text-xs font-medium hover:bg-red-700 disabled:opacity-50"
-                          >
-                            반려
-                          </button>
-                        </div>
-                      )}
-                      {p.approvalStatus === 'APPROVED' && (
-                        <button
-                          onClick={async () => {
-                            if (!confirm(`"${p.marketingName}"을 삭제(휴지통 이동)하시겠습니까?`)) return;
-                            setActionLoading(p.id);
-                            const res = await productCleanupApi.softDelete(p.id);
-                            setActionLoading(null);
-                            if (res.success) loadProducts();
-                          }}
-                          disabled={actionLoading === p.id}
-                          className="p-1.5 rounded hover:bg-red-50 text-red-400 hover:text-red-600 disabled:opacity-50"
-                          title="삭제 (휴지통으로 이동)"
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
+      {/* Action Bar */}
+      <div className="mb-3">
+        <ActionBar
+          selectedCount={selectedIds.size}
+          onClearSelection={() => setSelectedIds(new Set())}
+          actions={[
+            ...(selectedPendingCount > 0
+              ? [
+                  {
+                    key: 'approve',
+                    label: `승인 (${selectedPendingCount})`,
+                    onClick: handleBulkApprove,
+                    variant: 'primary' as const,
+                    icon: <CheckCircle size={14} />,
+                    loading: isBulkProcessing,
+                  },
+                  {
+                    key: 'reject',
+                    label: `반려 (${selectedPendingCount})`,
+                    onClick: handleBulkReject,
+                    variant: 'danger' as const,
+                    icon: <XCircle size={14} />,
+                    loading: isBulkProcessing,
+                  },
+                ]
+              : []),
+          ]}
+        />
       </div>
+
+      {/* DataTable */}
+      <DataTable<AdminProduct>
+        columns={columns}
+        data={filtered}
+        rowKey="id"
+        loading={loading}
+        emptyMessage={products.length === 0 ? '등록된 상품이 없습니다' : '검색 결과가 없습니다'}
+        onRowClick={(row) => setDrawerProduct(row)}
+        tableId="neture-product-approval"
+        selectable
+        selectedKeys={selectedIds}
+        onSelectionChange={setSelectedIds}
+      />
 
       {/* Reject Modal */}
       {rejectTarget && (

@@ -24,7 +24,7 @@ import {
   BarChart3,
   Loader2,
 } from 'lucide-react';
-import { DataTable } from '@o4o/ui';
+import { DataTable, ActionBar } from '@o4o/ui';
 import type { Column } from '@o4o/ui';
 import {
   glycopharmApi,
@@ -75,6 +75,8 @@ export default function PharmaciesPage() {
   const [tierFilter, setTierFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedPharmacy, setSelectedPharmacy] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
 
   // API data state
   const [pharmacies, setPharmacies] = useState<OperatorPharmacy[]>([]);
@@ -137,6 +139,11 @@ export default function PharmaciesPage() {
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
+  }, [activeTab, regionFilter, tierFilter, searchTerm]);
+
+  // Reset selection on filter changes
+  useEffect(() => {
+    setSelectedIds([]);
   }, [activeTab, regionFilter, tierFilter, searchTerm]);
 
   // Calculate tab counts from stats
@@ -330,6 +337,44 @@ export default function PharmaciesPage() {
           </div>
         </div>
 
+        {/* Bulk Actions */}
+        {(() => {
+          const selectedActiveCount = selectedIds.filter(id => {
+            const p = pharmacies.find(ph => ph.id === id);
+            return p?.status === 'active';
+          }).length;
+          const selectedInactiveCount = selectedIds.filter(id => {
+            const p = pharmacies.find(ph => ph.id === id);
+            return p?.status !== 'active';
+          }).length;
+          return (
+            <div className="px-4 pt-3">
+              <ActionBar
+                selectedCount={selectedIds.length}
+                onClearSelection={() => setSelectedIds([])}
+                actions={[
+                  ...(selectedActiveCount > 0 ? [{
+                    key: 'suspend',
+                    label: `일시 정지 (${selectedActiveCount})`,
+                    onClick: () => { /* TODO: wire up pharmacy status API */ },
+                    variant: 'warning' as const,
+                    icon: <Clock size={14} />,
+                    loading: isBulkProcessing,
+                  }] : []),
+                  ...(selectedInactiveCount > 0 ? [{
+                    key: 'activate',
+                    label: `활성화 (${selectedInactiveCount})`,
+                    onClick: () => { /* TODO: wire up pharmacy status API */ },
+                    variant: 'primary' as const,
+                    icon: <CheckCircle size={14} />,
+                    loading: isBulkProcessing,
+                  }] : []),
+                ]}
+              />
+            </div>
+          );
+        })()}
+
         {/* Table */}
         {(() => {
           const columns: Column<OperatorPharmacy>[] = [
@@ -438,6 +483,10 @@ export default function PharmaciesPage() {
               rowKey="id"
               loading={isLoading}
               emptyText="자료가 없습니다"
+              rowSelection={{
+                selectedRowKeys: selectedIds,
+                onChange: setSelectedIds,
+              }}
               pagination={{
                 current: currentPage,
                 pageSize: itemsPerPage,

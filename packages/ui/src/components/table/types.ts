@@ -105,7 +105,7 @@ export interface BaseTableProps<T> {
   columnVisibility?: boolean;
 
   // WO-O4O-BASETABLE-SELECTION-COLUMN-STICKY-AND-SELECT-ALL-V1
-  /** 행 선택 활성화 — 맨 왼쪽 체크박스 컬럼 자동 생성 */
+  /** 행 선택 활성화 — key='_select' 컬럼의 헤더에 select-all 체크박스 자동 생성 */
   selectable?: boolean;
   /** 선택된 행 키 목록 */
   selectedKeys?: Set<string>;

@@ -619,6 +619,7 @@ export * from './ag-components';
 export { AddressSearch } from './components/AddressSearch';
 export type { AddressSearchProps, AddressSearchValue } from './components/AddressSearch';
 export * from './components/table/BaseTable';
+export * from './components/table/ActionBar';
 export { useTableSort } from './components/table/useTableSort';
 export type { SortOrder, SortState, UseTableSortOptions, UseTableSortReturn } from './components/table/useTableSort';
 export { useTableFilter } from './components/table/useTableFilter';

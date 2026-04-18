@@ -28,7 +28,7 @@ import {
   AlertCircle,
   Loader2,
 } from 'lucide-react';
-import { DataTable } from '@o4o/ui';
+import { DataTable, ActionBar } from '@o4o/ui';
 import type { Column } from '@o4o/ui';
 import { glycopharmApi, type OperatorOrder, type OperatorOrderStats, type OrderStatus } from '@/api/glycopharm';
 import StatusBadge from '../../components/common/StatusBadge';
@@ -71,6 +71,8 @@ export default function OrdersPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalOrders, setTotalOrders] = useState(0);
   const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
 
   const itemsPerPage = 10;
 
@@ -125,6 +127,11 @@ export default function OrdersPage() {
   useEffect(() => {
     fetchOrders();
   }, [fetchOrders]);
+
+  // Reset selection on tab/filter/search change
+  useEffect(() => {
+    setSelectedIds([]);
+  }, [activeTab, dateFilter, searchTerm]);
 
   // Tab counts (based on stats)
   const tabs = [
@@ -326,6 +333,52 @@ export default function OrdersPage() {
           </div>
         </div>
 
+        {/* Bulk Actions */}
+        {(() => {
+          const selectedPendingCount = selectedIds.filter(id => {
+            const o = orders.find(ord => ord.id === id);
+            return o?.status === 'pending';
+          }).length;
+          const selectedProcessingCount = selectedIds.filter(id => {
+            const o = orders.find(ord => ord.id === id);
+            return o?.status === 'processing';
+          }).length;
+          return (
+            <div className="px-4 pt-3">
+              <ActionBar
+                selectedCount={selectedIds.length}
+                onClearSelection={() => setSelectedIds([])}
+                actions={[
+                  ...(selectedPendingCount > 0 ? [{
+                    key: 'confirm',
+                    label: `주문 확인 (${selectedPendingCount})`,
+                    onClick: () => { /* TODO: wire up order status API */ },
+                    variant: 'primary' as const,
+                    icon: <CheckCircle size={14} />,
+                    loading: isBulkProcessing,
+                  }] : []),
+                  ...(selectedProcessingCount > 0 ? [{
+                    key: 'ship',
+                    label: `배송 시작 (${selectedProcessingCount})`,
+                    onClick: () => { /* TODO: wire up order status API */ },
+                    variant: 'primary' as const,
+                    icon: <Truck size={14} />,
+                    loading: isBulkProcessing,
+                  }] : []),
+                  ...(selectedPendingCount > 0 ? [{
+                    key: 'cancel',
+                    label: `주문 취소 (${selectedPendingCount})`,
+                    onClick: () => { /* TODO: wire up order status API */ },
+                    variant: 'danger' as const,
+                    icon: <XCircle size={14} />,
+                    loading: isBulkProcessing,
+                  }] : []),
+                ]}
+              />
+            </div>
+          );
+        })()}
+
         {/* Table */}
         {(() => {
           const columns: Column<OperatorOrder>[] = [
@@ -431,6 +484,10 @@ export default function OrdersPage() {
               rowKey="id"
               loading={isLoading}
               emptyText="자료가 없습니다"
+              rowSelection={{
+                selectedRowKeys: selectedIds,
+                onChange: setSelectedIds,
+              }}
               pagination={{
                 current: currentPage,
                 pageSize: itemsPerPage,

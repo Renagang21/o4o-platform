@@ -27,7 +27,7 @@ import {
   Eye,
   EyeOff,
 } from 'lucide-react';
-import { DataTable } from '@o4o/ui';
+import { DataTable, ActionBar } from '@o4o/ui';
 import type { Column } from '@o4o/ui';
 import { MemberListLayout, StatusBadge, RoleBadge, ServiceBadge } from '@o4o/operator-ux-core';
 import type { MemberTab } from '@o4o/operator-ux-core';
@@ -313,6 +313,8 @@ export default function UsersPage() {
   const [passwordUser, setPasswordUser] = useState<UserData | null>(null);
   const [editUser, setEditUser] = useState<UserData | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<UserData | null>(null);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
 
   // Stats
   const [stats, setStats] = useState({ total: 0, active: 0, pending: 0, rejected: 0, pharmacyCount: 0, customerCount: 0 });
@@ -373,6 +375,11 @@ export default function UsersPage() {
   useEffect(() => { fetchUsers(1); }, [fetchUsers]);
   useEffect(() => { fetchStats(); }, [fetchStats]);
 
+  // Reset selection on tab/search change
+  useEffect(() => {
+    setSelectedIds([]);
+  }, [activeTab, searchQuery]);
+
   const handleStatusChange = async (userId: string, status: string) => {
     const label = status === 'approved' ? '승인' : status === 'rejected' ? '거부' : status;
     if (!confirm(`이 사용자를 ${label} 처리하시겠습니까?`)) return;
@@ -393,6 +400,50 @@ export default function UsersPage() {
 
   const handleDelete = (user: UserData) => {
     setDeleteTarget(user);
+  };
+
+  // ─── Bulk Actions ───
+
+  const handleBulkApprove = async () => {
+    const ids = selectedIds.filter(id => {
+      const u = filteredUsers.find(user => user.id === id);
+      return u?.status === 'pending' || u?.status === 'rejected';
+    });
+    if (ids.length === 0) return;
+    setIsBulkProcessing(true);
+    for (const id of ids) {
+      try {
+        await apiFetch(`/api/v1/operator/members/${id}/status`, {
+          method: 'PATCH',
+          body: JSON.stringify({ status: 'approved' }),
+        });
+      } catch { /* continue */ }
+    }
+    setIsBulkProcessing(false);
+    setSelectedIds([]);
+    fetchUsers(pagination.page);
+    fetchStats();
+  };
+
+  const handleBulkReject = async () => {
+    const ids = selectedIds.filter(id => {
+      const u = filteredUsers.find(user => user.id === id);
+      return u?.status === 'pending';
+    });
+    if (ids.length === 0) return;
+    setIsBulkProcessing(true);
+    for (const id of ids) {
+      try {
+        await apiFetch(`/api/v1/operator/members/${id}/status`, {
+          method: 'PATCH',
+          body: JSON.stringify({ status: 'rejected' }),
+        });
+      } catch { /* continue */ }
+    }
+    setIsBulkProcessing(false);
+    setSelectedIds([]);
+    fetchUsers(pagination.page);
+    fetchStats();
   };
 
   // ─── Role tab filtering (client-side) ──────────────
@@ -562,6 +613,44 @@ export default function UsersPage() {
           </div>
         )}
 
+        {/* Bulk Actions */}
+        {(() => {
+          const selectedPendingCount = selectedIds.filter(id => {
+            const u = filteredUsers.find(user => user.id === id);
+            return u?.status === 'pending';
+          }).length;
+          const selectedApprovableCount = selectedIds.filter(id => {
+            const u = filteredUsers.find(user => user.id === id);
+            return u?.status === 'pending' || u?.status === 'rejected';
+          }).length;
+          return (
+            <div className="mb-3">
+              <ActionBar
+                selectedCount={selectedIds.length}
+                onClearSelection={() => setSelectedIds([])}
+                actions={[
+                  ...(selectedApprovableCount > 0 ? [{
+                    key: 'approve',
+                    label: `승인 (${selectedApprovableCount})`,
+                    onClick: handleBulkApprove,
+                    variant: 'primary' as const,
+                    icon: <UserCheck size={14} />,
+                    loading: isBulkProcessing,
+                  }] : []),
+                  ...(selectedPendingCount > 0 ? [{
+                    key: 'reject',
+                    label: `거부 (${selectedPendingCount})`,
+                    onClick: handleBulkReject,
+                    variant: 'danger' as const,
+                    icon: <UserX size={14} />,
+                    loading: isBulkProcessing,
+                  }] : []),
+                ]}
+              />
+            </div>
+          );
+        })()}
+
         {/* DataTable */}
         <DataTable<UserData>
           columns={columns}
@@ -570,6 +659,10 @@ export default function UsersPage() {
           loading={loading}
           emptyText={activeTab === 'pending' ? '가입 신청이 없습니다.' : '등록된 사용자가 없습니다.'}
           onRowClick={(user) => navigate(`/operator/users/${user.id}`)}
+          rowSelection={{
+            selectedRowKeys: selectedIds,
+            onChange: setSelectedIds,
+          }}
           pagination={{
             current: pagination.page,
             pageSize: pagination.limit,

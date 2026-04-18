@@ -1,9 +1,9 @@
 /**
  * Operator Users Page — 회원 관리
  * WO-KPA-OPERATOR-MANAGEMENT-MIGRATION-V1
+ * WO-O4O-TABLE-STANDARD-V1 — Raw HTML → DataTable + Selection + Bulk Action
  *
  * MembershipConsole API 기반 (/api/v1/operator/members)
- * GlycoPharm 표준 구현 복제
  *
  * 탭: 회원 목록 | 가입 신청
  * 기능: 승인, 거부, 비밀번호 변경, 삭제, 멤버십 표시, 상세 페이지 이동
@@ -30,6 +30,9 @@ import {
   Eye,
   EyeOff,
 } from 'lucide-react';
+import { ActionBar } from '@o4o/ui';
+import { DataTable } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { authClient } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
 import EditUserModal from './EditUserModal';
@@ -221,6 +224,8 @@ export default function UsersPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [passwordUser, setPasswordUser] = useState<UserData | null>(null);
   const [editUser, setEditUser] = useState<UserData | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
 
   // Stats
   const [stats, setStats] = useState({ total: 0, active: 0, pending: 0, rejected: 0 });
@@ -268,6 +273,11 @@ export default function UsersPage() {
   useEffect(() => { fetchUsers(1); }, [fetchUsers]);
   useEffect(() => { fetchStats(); }, [fetchStats]);
 
+  // Reset selection on tab/filter/search change
+  useEffect(() => {
+    setSelectedIds(new Set());
+  }, [tab, statusFilter, search]);
+
   const handleStatusChange = async (userId: string, status: string) => {
     const label = status === 'approved' ? '승인' : status === 'rejected' ? '거부' : status;
     if (!confirm(`이 사용자를 ${label} 처리하시겠습니까?`)) return;
@@ -299,6 +309,275 @@ export default function UsersPage() {
       setActionLoading(null);
     }
   };
+
+  // ─── Bulk Actions ───
+
+  const handleBulkApprove = async () => {
+    const targetIds = [...selectedIds].filter((id) => {
+      const u = users.find((user) => user.id === id);
+      return u?.status === 'pending' || u?.status === 'rejected';
+    });
+    if (targetIds.length === 0) return;
+    setIsBulkProcessing(true);
+    for (const id of targetIds) {
+      try {
+        await apiFetch(`/api/v1/operator/members/${id}/status`, {
+          method: 'PATCH',
+          body: JSON.stringify({ status: 'approved' }),
+        });
+      } catch { /* continue */ }
+    }
+    setIsBulkProcessing(false);
+    setSelectedIds(new Set());
+    fetchUsers(pagination.page);
+    fetchStats();
+  };
+
+  const handleBulkReject = async () => {
+    const targetIds = [...selectedIds].filter((id) => {
+      const u = users.find((user) => user.id === id);
+      return u?.status === 'pending';
+    });
+    if (targetIds.length === 0) return;
+    setIsBulkProcessing(true);
+    for (const id of targetIds) {
+      try {
+        await apiFetch(`/api/v1/operator/members/${id}/status`, {
+          method: 'PATCH',
+          body: JSON.stringify({ status: 'rejected' }),
+        });
+      } catch { /* continue */ }
+    }
+    setIsBulkProcessing(false);
+    setSelectedIds(new Set());
+    fetchUsers(pagination.page);
+    fetchStats();
+  };
+
+  const handleBulkSuspend = async () => {
+    const targetIds = [...selectedIds].filter((id) => {
+      const u = users.find((user) => user.id === id);
+      return u?.status === 'active' || u?.status === 'approved';
+    });
+    if (targetIds.length === 0) return;
+    setIsBulkProcessing(true);
+    for (const id of targetIds) {
+      try {
+        await apiFetch(`/api/v1/operator/members/${id}/status`, {
+          method: 'PATCH',
+          body: JSON.stringify({ status: 'suspended' }),
+        });
+      } catch { /* continue */ }
+    }
+    setIsBulkProcessing(false);
+    setSelectedIds(new Set());
+    fetchUsers(pagination.page);
+    fetchStats();
+  };
+
+  // ─── Bulk action counts ───
+
+  const selectedPendingCount = [...selectedIds].filter((id) => {
+    const u = users.find((user) => user.id === id);
+    return u?.status === 'pending';
+  }).length;
+
+  const selectedApprovableCount = [...selectedIds].filter((id) => {
+    const u = users.find((user) => user.id === id);
+    return u?.status === 'pending' || u?.status === 'rejected';
+  }).length;
+
+  const selectedSuspendableCount = [...selectedIds].filter((id) => {
+    const u = users.find((user) => user.id === id);
+    return u?.status === 'active' || u?.status === 'approved';
+  }).length;
+
+  // ─── Column Definitions ───
+
+  const columns: ListColumnDef<UserData>[] = [
+    {
+      key: 'name',
+      header: '이름',
+      render: (_v, row) => (
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center text-sm font-medium text-slate-600">
+            {getUserName(row).charAt(0)}
+          </div>
+          <span className="font-medium text-slate-800 text-sm">{getUserName(row)}</span>
+        </div>
+      ),
+    },
+    {
+      key: 'email',
+      header: '이메일',
+      sortable: true,
+    },
+    {
+      key: 'role',
+      header: '역할',
+      render: (_v, row) => <span className="text-sm text-slate-600">{getRoleLabel(row)}</span>,
+    },
+    {
+      key: 'memberships',
+      header: '서비스',
+      render: (_v, row) => (
+        <div className="flex flex-wrap gap-1">
+          {(row.memberships && row.memberships.length > 0) ? (
+            row.memberships.map((m) => (
+              <span
+                key={m.id}
+                className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium ${
+                  m.status === 'active' ? 'bg-blue-50 text-blue-700' :
+                  m.status === 'pending' ? 'bg-amber-50 text-amber-700' :
+                  'bg-slate-100 text-slate-500'
+                }`}
+                title={`${SERVICE_LABELS[m.serviceKey] || m.serviceKey}: ${m.status}`}
+              >
+                {SERVICE_LABELS[m.serviceKey] || m.serviceKey}
+              </span>
+            ))
+          ) : (
+            <span className="text-xs text-slate-400">-</span>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'createdAt',
+      header: '가입일',
+      width: '110px',
+      sortable: true,
+      sortAccessor: (row) => new Date(row.createdAt).getTime(),
+      render: (v) => <span className="text-sm text-slate-600">{new Date(v).toLocaleDateString('ko-KR')}</span>,
+    },
+    {
+      key: 'status',
+      header: '상태',
+      width: '80px',
+      sortable: true,
+      render: (v) => <StatusBadge status={v} />,
+    },
+    {
+      key: '_actions',
+      header: '관리',
+      align: 'right',
+      width: '180px',
+      system: true,
+      onCellClick: () => {},
+      render: (_v, row) => (
+        <div className="flex items-center justify-end gap-1">
+          {actionLoading === row.id ? (
+            <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
+          ) : (
+            <>
+              {(row.status === 'pending') && (
+                <>
+                  <button
+                    onClick={() => handleStatusChange(row.id, 'approved')}
+                    title="승인"
+                    className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"
+                  >
+                    <UserCheck className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleStatusChange(row.id, 'rejected')}
+                    title="거부"
+                    className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg"
+                  >
+                    <UserX className="w-4 h-4" />
+                  </button>
+                </>
+              )}
+              {row.status === 'rejected' && (
+                <button
+                  onClick={() => handleStatusChange(row.id, 'approved')}
+                  title="승인"
+                  className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"
+                >
+                  <UserCheck className="w-4 h-4" />
+                </button>
+              )}
+              {(row.status === 'active' || row.status === 'approved') && (
+                <button
+                  onClick={() => handleStatusChange(row.id, 'suspended')}
+                  title="정지"
+                  className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg"
+                >
+                  <XCircle className="w-4 h-4" />
+                </button>
+              )}
+              {row.status === 'suspended' && (
+                <button
+                  onClick={() => handleStatusChange(row.id, 'approved')}
+                  title="활성화"
+                  className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"
+                >
+                  <CheckCircle className="w-4 h-4" />
+                </button>
+              )}
+              <button
+                onClick={() => setEditUser(row)}
+                title="정보 수정"
+                className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg"
+              >
+                <Pencil className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setPasswordUser(row)}
+                title="비밀번호 변경"
+                className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg"
+              >
+                <KeyRound className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => handleDelete(row)}
+                title="삭제"
+                className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+              <ChevronRight className="w-4 h-4 text-slate-300 ml-1" />
+            </>
+          )}
+        </div>
+      ),
+    },
+  ];
+
+  // ─── Bulk action bar actions ───
+
+  const bulkActions = [
+    ...(selectedApprovableCount > 0
+      ? [{
+          key: 'approve',
+          label: `승인 (${selectedApprovableCount})`,
+          onClick: handleBulkApprove,
+          variant: 'primary' as const,
+          icon: <UserCheck size={14} />,
+          loading: isBulkProcessing,
+        }]
+      : []),
+    ...(selectedPendingCount > 0
+      ? [{
+          key: 'reject',
+          label: `거부 (${selectedPendingCount})`,
+          onClick: handleBulkReject,
+          variant: 'danger' as const,
+          icon: <UserX size={14} />,
+          loading: isBulkProcessing,
+        }]
+      : []),
+    ...(selectedSuspendableCount > 0
+      ? [{
+          key: 'suspend',
+          label: `정지 (${selectedSuspendableCount})`,
+          onClick: handleBulkSuspend,
+          variant: 'warning' as const,
+          icon: <XCircle size={14} />,
+          loading: isBulkProcessing,
+        }]
+      : []),
+  ];
 
   return (
     <div className="p-6">
@@ -397,179 +676,51 @@ export default function UsersPage() {
         </div>
       )}
 
-      {/* Loading */}
-      {loading && (
-        <div className="text-center py-16">
-          <Loader2 className="w-8 h-8 text-blue-600 animate-spin mx-auto mb-3" />
-          <p className="text-slate-500 text-sm">불러오는 중...</p>
-        </div>
-      )}
+      {/* Action Bar */}
+      <div className="mb-3">
+        <ActionBar
+          selectedCount={selectedIds.size}
+          onClearSelection={() => setSelectedIds(new Set())}
+          actions={bulkActions}
+        />
+      </div>
 
-      {/* Table */}
-      {!loading && users.length > 0 && (
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-200">
-              <tr>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">이름</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">이메일</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">역할</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">서비스</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">가입일</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">상태</th>
-                <th className="text-right px-4 py-3 text-xs font-medium text-slate-500 uppercase">관리</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {users.map((user) => (
-                <tr
-                  key={user.id}
-                  className="hover:bg-slate-50 cursor-pointer"
-                  onClick={() => navigate(`/operator/users/${user.id}`)}
-                >
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center text-sm font-medium text-slate-600">
-                        {getUserName(user).charAt(0)}
-                      </div>
-                      <span className="font-medium text-slate-800 text-sm">{getUserName(user)}</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-slate-600">{user.email}</td>
-                  <td className="px-4 py-3 text-sm text-slate-600">{getRoleLabel(user)}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex flex-wrap gap-1">
-                      {(user.memberships && user.memberships.length > 0) ? (
-                        user.memberships.map((m) => (
-                          <span
-                            key={m.id}
-                            className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium ${
-                              m.status === 'active' ? 'bg-blue-50 text-blue-700' :
-                              m.status === 'pending' ? 'bg-amber-50 text-amber-700' :
-                              'bg-slate-100 text-slate-500'
-                            }`}
-                            title={`${SERVICE_LABELS[m.serviceKey] || m.serviceKey}: ${m.status}`}
-                          >
-                            {SERVICE_LABELS[m.serviceKey] || m.serviceKey}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="text-xs text-slate-400">-</span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-slate-600">{new Date(user.createdAt).toLocaleDateString('ko-KR')}</td>
-                  <td className="px-4 py-3"><StatusBadge status={user.status} /></td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
-                      {actionLoading === user.id ? (
-                        <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
-                      ) : (
-                        <>
-                          {(user.status === 'pending') && (
-                            <>
-                              <button
-                                onClick={() => handleStatusChange(user.id, 'approved')}
-                                title="승인"
-                                className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"
-                              >
-                                <UserCheck className="w-4 h-4" />
-                              </button>
-                              <button
-                                onClick={() => handleStatusChange(user.id, 'rejected')}
-                                title="거부"
-                                className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg"
-                              >
-                                <UserX className="w-4 h-4" />
-                              </button>
-                            </>
-                          )}
-                          {user.status === 'rejected' && (
-                            <button
-                              onClick={() => handleStatusChange(user.id, 'approved')}
-                              title="승인"
-                              className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"
-                            >
-                              <UserCheck className="w-4 h-4" />
-                            </button>
-                          )}
-                          {(user.status === 'active' || user.status === 'approved') && (
-                            <button
-                              onClick={() => handleStatusChange(user.id, 'suspended')}
-                              title="정지"
-                              className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg"
-                            >
-                              <XCircle className="w-4 h-4" />
-                            </button>
-                          )}
-                          {user.status === 'suspended' && (
-                            <button
-                              onClick={() => handleStatusChange(user.id, 'approved')}
-                              title="활성화"
-                              className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"
-                            >
-                              <CheckCircle className="w-4 h-4" />
-                            </button>
-                          )}
-                          <button
-                            onClick={() => setEditUser(user)}
-                            title="정보 수정"
-                            className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg"
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => setPasswordUser(user)}
-                            title="비밀번호 변경"
-                            className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg"
-                          >
-                            <KeyRound className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(user)}
-                            title="삭제"
-                            className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                          <ChevronRight className="w-4 h-4 text-slate-300 ml-1" />
-                        </>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* DataTable */}
+      <DataTable<UserData>
+        columns={columns}
+        data={users}
+        rowKey="id"
+        loading={loading}
+        emptyMessage={
+          tab === 'pending'
+            ? '가입 신청이 없습니다.'
+            : '등록된 사용자가 없습니다.'
+        }
+        onRowClick={(row) => navigate(`/operator/users/${row.id}`)}
+        tableId="kpa-users"
+        selectable
+        selectedKeys={selectedIds}
+        onSelectionChange={setSelectedIds}
+      />
 
-          {/* Pagination */}
-          {pagination.totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2 py-4 border-t border-slate-100">
-              <button
-                onClick={() => fetchUsers(pagination.page - 1)}
-                disabled={pagination.page <= 1}
-                className="px-3 py-1 text-sm text-slate-600 hover:bg-slate-100 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                이전
-              </button>
-              <span className="text-sm text-slate-600">{pagination.page} / {pagination.totalPages}</span>
-              <button
-                onClick={() => fetchUsers(pagination.page + 1)}
-                disabled={pagination.page >= pagination.totalPages}
-                className="px-3 py-1 text-sm text-slate-600 hover:bg-slate-100 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                다음
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Empty */}
-      {!loading && users.length === 0 && !error && (
-        <div className="bg-white rounded-xl shadow-sm p-12 text-center">
-          <Users className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-          <p className="text-slate-500">{tab === 'pending' ? '가입 신청이 없습니다.' : '등록된 사용자가 없습니다.'}</p>
+      {/* Pagination */}
+      {!loading && pagination.totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 py-4">
+          <button
+            onClick={() => fetchUsers(pagination.page - 1)}
+            disabled={pagination.page <= 1}
+            className="px-3 py-1 text-sm text-slate-600 hover:bg-slate-100 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            이전
+          </button>
+          <span className="text-sm text-slate-600">{pagination.page} / {pagination.totalPages}</span>
+          <button
+            onClick={() => fetchUsers(pagination.page + 1)}
+            disabled={pagination.page >= pagination.totalPages}
+            className="px-3 py-1 text-sm text-slate-600 hover:bg-slate-100 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            다음
+          </button>
         </div>
       )}
 

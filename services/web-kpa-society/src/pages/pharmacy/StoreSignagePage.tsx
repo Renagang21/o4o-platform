@@ -46,7 +46,6 @@ import {
   Calendar,
   Pencil,
   Search,
-  ExternalLink,
 } from 'lucide-react';
 import { DataTable, type Column } from '@o4o/ui';
 import { useAuth } from '../../contexts';
@@ -79,6 +78,12 @@ import {
   type StorePlaylist,
   type StorePlaylistItem,
 } from '../../api/storePlaylist';
+import {
+  fetchSignageMedia,
+  createSignageMedia,
+  deleteSignageMedia,
+  type SignageMediaItem,
+} from '../../api/signageMedia';
 import { StoreLibrarySelectorModal } from '../../components/store/StoreLibrarySelectorModal';
 import type { LibrarySelectorResult } from '../../components/store/StoreLibrarySelectorModal';
 
@@ -194,37 +199,34 @@ function computeSignageKpi(items: StoreAssetItem[]) {
   return { published, draft, hidden, forcedActive, signageChannel };
 }
 
-/* ─── Filter & Sort ──────────────────────────── */
+/* ─── Unified Video Item (snapshot + direct media) ── */
 
-function applyFilters(items: StoreAssetItem[], statusFilter: StatusFilter): StoreAssetItem[] {
-  return items.filter(item => {
-    if (statusFilter === 'published' && item.publishStatus !== 'published') return false;
-    if (statusFilter === 'draft' && item.publishStatus !== 'draft') return false;
-    if (statusFilter === 'hidden' && item.publishStatus !== 'hidden') return false;
-    if (statusFilter === 'forced' && !isForcedActive(item)) return false;
-    return true;
-  });
+type VideoSource = 'snapshot' | 'direct';
+
+interface UnifiedVideoItem {
+  id: string;
+  title: string;
+  source: VideoSource;
+  sourceUrl?: string;
+  sourceType?: string;
+  publishStatus?: AssetPublishStatus;
+  channelMap?: ChannelMap;
+  isForced?: boolean;
+  isLocked?: boolean;
+  forcedStartAt?: string | null;
+  forcedEndAt?: string | null;
+  createdAt: string;
+  _snapshot?: StoreAssetItem;
+  _media?: SignageMediaItem;
 }
 
-function applySort(items: StoreAssetItem[], sortKey: SortKey): StoreAssetItem[] {
-  const sorted = [...items];
-  sorted.sort((a, b) => {
-    if (sortKey === 'forced-first') {
-      const aF = isForcedActive(a) ? 1 : 0;
-      const bF = isForcedActive(b) ? 1 : 0;
-      if (bF !== aF) return bF - aF;
-      if (a.forcedEndAt && b.forcedEndAt) {
-        return new Date(a.forcedEndAt).getTime() - new Date(b.forcedEndAt).getTime();
-      }
-    }
-    if (sortKey === 'published-first') {
-      const order: Record<string, number> = { published: 0, draft: 1, hidden: 2 };
-      const diff = (order[a.publishStatus] ?? 9) - (order[b.publishStatus] ?? 9);
-      if (diff !== 0) return diff;
-    }
-    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-  });
-  return sorted;
+function detectVideoSource(url: string): 'youtube' | 'vimeo' | null {
+  try {
+    const u = new URL(url);
+    if (u.hostname.includes('youtube.com') || u.hostname.includes('youtu.be')) return 'youtube';
+    if (u.hostname.includes('vimeo.com')) return 'vimeo';
+    return null;
+  } catch { return null; }
 }
 
 type ActiveTab = 'assets' | 'playlist' | 'schedules';
@@ -296,11 +298,20 @@ export function StoreSignagePage() {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newPlaylistName, setNewPlaylistName] = useState('');
   const [playlistKeyword, setPlaylistKeyword] = useState('');
+  const [selectedPlaylistKeys, setSelectedPlaylistKeys] = useState<string[]>([]);
 
   // ── Signage snapshot list for "add to playlist" ──
   const [signageSnapshots, setSignageSnapshots] = useState<StoreAssetItem[]>([]);
   const [showAddPicker, setShowAddPicker] = useState(false);
   const [showLibrarySelector, setShowLibrarySelector] = useState(false);
+
+  // ── Direct video registration (signage_media) ──
+  const [signageMediaItems, setSignageMediaItems] = useState<SignageMediaItem[]>([]);
+  const [showVideoRegForm, setShowVideoRegForm] = useState(false);
+  const [regVideoTitle, setRegVideoTitle] = useState('');
+  const [regVideoUrl, setRegVideoUrl] = useState('');
+  const [regVideoSaving, setRegVideoSaving] = useState(false);
+  const [selectedVideoKeys, setSelectedVideoKeys] = useState<string[]>([]);
 
   const fetchItems = useCallback(async () => {
     setLoading(true);
@@ -367,13 +378,22 @@ export function StoreSignagePage() {
     }
   }, [organizationId]);
 
+  const loadSignageMedia = useCallback(async () => {
+    if (!organizationId) return;
+    try {
+      const data = await fetchSignageMedia(organizationId);
+      setSignageMediaItems(data);
+    } catch { setSignageMediaItems([]); }
+  }, [organizationId]);
+
   // 마운트 시 콘텐츠·플레이리스트·스케줄 병렬 로드 (상단 요약 패널에 필요)
   useEffect(() => {
     fetchItems();
     loadPlaylists();
     loadSchedules();
     loadSignagePlaylists();
-  }, [fetchItems, loadPlaylists, loadSchedules, loadSignagePlaylists]);
+    loadSignageMedia();
+  }, [fetchItems, loadPlaylists, loadSchedules, loadSignagePlaylists, loadSignageMedia]);
 
   useEffect(() => {
     if (activeTab === 'schedules' && schedules.length === 0) {
@@ -457,26 +477,114 @@ export function StoreSignagePage() {
     }
   };
 
-  // KPI
+  // ── Video registration handler ──
+  const handleRegisterVideo = async () => {
+    if (!regVideoTitle.trim() || !regVideoUrl.trim()) return;
+    const sourceType = detectVideoSource(regVideoUrl.trim());
+    if (!sourceType) {
+      alert('YouTube 또는 Vimeo URL만 등록할 수 있습니다.');
+      return;
+    }
+    setRegVideoSaving(true);
+    try {
+      await createSignageMedia(organizationId, {
+        name: regVideoTitle.trim(),
+        mediaType: 'video',
+        sourceType,
+        sourceUrl: regVideoUrl.trim(),
+      });
+      setRegVideoTitle('');
+      setRegVideoUrl('');
+      setShowVideoRegForm(false);
+      loadSignageMedia();
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : '동영상 등록에 실패했습니다.');
+    } finally {
+      setRegVideoSaving(false);
+    }
+  };
+
+  const handleDeleteMedia = async (mediaId: string) => {
+    if (!confirm('이 동영상을 삭제하시겠습니까?')) return;
+    try {
+      await deleteSignageMedia(organizationId, mediaId);
+      loadSignageMedia();
+    } catch { /* user can retry */ }
+  };
+
+  // ── Unified video list (snapshots + direct media) ──
+  const unifiedVideos = useMemo((): UnifiedVideoItem[] => {
+    const snaps: UnifiedVideoItem[] = items.map(s => ({
+      id: s.id,
+      title: s.title,
+      source: 'snapshot' as const,
+      publishStatus: s.publishStatus,
+      channelMap: s.channelMap,
+      isForced: s.isForced,
+      isLocked: s.isLocked,
+      forcedStartAt: s.forcedStartAt,
+      forcedEndAt: s.forcedEndAt,
+      createdAt: s.createdAt,
+      _snapshot: s,
+    }));
+    const media: UnifiedVideoItem[] = signageMediaItems.map(m => ({
+      id: `media_${m.id}`,
+      title: m.name,
+      source: 'direct' as const,
+      sourceUrl: m.sourceUrl,
+      sourceType: m.sourceType,
+      createdAt: m.createdAt,
+      _media: m,
+    }));
+    return [...snaps, ...media];
+  }, [items, signageMediaItems]);
+
+  // KPI (snapshot 기준 유지)
   const kpi = useMemo(() => computeSignageKpi(items), [items]);
   const forcedExpiringCount = useMemo(() => items.filter(isForcedExpiringSoon).length, [items]);
 
-  // Filter + Sort + Keyword
-  const filteredItems = useMemo(() => {
-    let filtered = applyFilters(items, statusFilter);
+  // Filter + Sort + Keyword (unified: snapshots + direct media)
+  const filteredUnified = useMemo(() => {
+    let filtered = unifiedVideos.filter(v => {
+      // Status filter: only apply to snapshots; direct always passes on 'all'
+      if (statusFilter !== 'all' && v.source === 'snapshot') {
+        if (statusFilter === 'published' && v.publishStatus !== 'published') return false;
+        if (statusFilter === 'draft' && v.publishStatus !== 'draft') return false;
+        if (statusFilter === 'hidden' && v.publishStatus !== 'hidden') return false;
+        if (statusFilter === 'forced' && !v._snapshot) return false;
+        if (statusFilter === 'forced' && v._snapshot && !isForcedActive(v._snapshot)) return false;
+      }
+      if (statusFilter !== 'all' && v.source === 'direct') return false;
+      return true;
+    });
     if (assetKeyword.trim()) {
       const kw = assetKeyword.toLowerCase();
-      filtered = filtered.filter(item => item.title.toLowerCase().includes(kw));
+      filtered = filtered.filter(v => v.title.toLowerCase().includes(kw));
     }
-    return applySort(filtered, sortKey);
-  }, [items, statusFilter, sortKey, assetKeyword]);
+    // Sort
+    filtered.sort((a, b) => {
+      if (sortKey === 'forced-first' && a._snapshot && b._snapshot) {
+        const aF = isForcedActive(a._snapshot) ? 1 : 0;
+        const bF = isForcedActive(b._snapshot) ? 1 : 0;
+        if (bF !== aF) return bF - aF;
+      }
+      if (sortKey === 'published-first') {
+        const order: Record<string, number> = { published: 0, draft: 1, hidden: 2 };
+        const aO = a.publishStatus ? (order[a.publishStatus] ?? 9) : 9;
+        const bO = b.publishStatus ? (order[b.publishStatus] ?? 9) : 9;
+        if (aO !== bO) return aO - bO;
+      }
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+    return filtered;
+  }, [unifiedVideos, statusFilter, sortKey, assetKeyword]);
 
   // Pagination
-  const totalPages = Math.max(1, Math.ceil(filteredItems.length / PAGE_LIMIT));
-  const pagedItems = useMemo(() => {
+  const totalPages = Math.max(1, Math.ceil(filteredUnified.length / PAGE_LIMIT));
+  const pagedUnified = useMemo(() => {
     const start = (page - 1) * PAGE_LIMIT;
-    return filteredItems.slice(start, start + PAGE_LIMIT);
-  }, [filteredItems, page]);
+    return filteredUnified.slice(start, start + PAGE_LIMIT);
+  }, [filteredUnified, page]);
 
   useEffect(() => { setPage(1); }, [statusFilter, sortKey, assetKeyword]);
 
@@ -620,16 +728,9 @@ export function StoreSignagePage() {
             <Link to="/store" className="text-blue-600 hover:underline">&larr; 대시보드</Link>
           </div>
           <h1 className="text-2xl font-bold text-slate-900">사이니지 운영</h1>
-          <p className="text-sm text-slate-500 mt-1">콘텐츠를 확보하고, 플레이리스트로 구성하고, 스케줄을 적용합니다</p>
+          <p className="text-sm text-slate-500 mt-1">동영상을 등록하고, 플레이리스트로 구성하고, 스케줄을 적용합니다</p>
         </div>
         <div className="flex gap-2">
-          <button
-            onClick={() => navigate('/hub/signage')}
-            className="flex items-center gap-2 px-3 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700"
-          >
-            <Plus className="w-4 h-4" />
-            콘텐츠 추가
-          </button>
           <button
             onClick={() => {
               fetchItems(); loadPlaylists();
@@ -677,38 +778,6 @@ export function StoreSignagePage() {
         >
           <Calendar className="w-4 h-4" />
           스케줄
-        </button>
-      </div>
-
-      {/* ─── 운영 흐름 배너 (Phase 3) ──────────────── */}
-      <div className="flex items-center gap-0 mb-6 mt-3 text-xs text-slate-400 select-none">
-        <button
-          onClick={() => navigate('/hub/signage')}
-          className="flex items-center gap-1 px-3 py-1.5 rounded-full transition-colors hover:text-slate-600"
-        >
-          <ExternalLink className="w-3 h-3" /> ① 콘텐츠 탐색
-        </button>
-        <span className="px-1 text-slate-200">→</span>
-        <button
-          onClick={() => navigateTab('playlist')}
-          className={`flex items-center gap-1 px-3 py-1.5 rounded-full transition-colors ${
-            activeTab === 'playlist'
-              ? 'bg-blue-50 text-blue-700 font-medium'
-              : 'hover:text-slate-600'
-          }`}
-        >
-          <ListVideo className="w-3 h-3" /> ② 플레이리스트 구성
-        </button>
-        <span className="px-1 text-slate-200">→</span>
-        <button
-          onClick={() => navigateTab('schedules')}
-          className={`flex items-center gap-1 px-3 py-1.5 rounded-full transition-colors ${
-            activeTab === 'schedules'
-              ? 'bg-blue-50 text-blue-700 font-medium'
-              : 'hover:text-slate-600'
-          }`}
-        >
-          <Calendar className="w-3 h-3" /> ③ 스케줄 적용
         </button>
       </div>
 
@@ -819,11 +888,15 @@ export function StoreSignagePage() {
             <div className="text-center py-12 text-slate-400">
               <ListVideo className="w-8 h-8 mx-auto mb-2 text-slate-300" />
               <p className="text-sm">플레이리스트가 없습니다.</p>
-              <p className="text-xs mt-1">콘텐츠 허브에서 콘텐츠를 가져온 뒤 플레이리스트를 만들어 구성하세요.</p>
+              <p className="text-xs mt-1">'새 플레이리스트' 버튼으로 플레이리스트를 만드세요.</p>
             </div>
           ) : (
             <div className="mb-6">
               <DataTable<StorePlaylist>
+                rowSelection={{
+                  selectedRowKeys: selectedPlaylistKeys,
+                  onChange: setSelectedPlaylistKeys,
+                }}
                 columns={[
                   {
                     key: 'name',
@@ -964,7 +1037,7 @@ export function StoreSignagePage() {
                     </button>
                   </div>
                   {signageSnapshots.length === 0 ? (
-                    <p className="text-xs text-slate-400">사이니지 자산이 없습니다. Hub에서 가져오거나 Library에서 선택하세요.</p>
+                    <p className="text-xs text-slate-400">사이니지 자산이 없습니다. '내 동영상' 탭에서 동영상을 먼저 등록하세요.</p>
                   ) : (
                     <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
                       {signageSnapshots.map(snap => (
@@ -1320,8 +1393,50 @@ export function StoreSignagePage() {
 
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-slate-800">내 동영상</h2>
-        <p className="text-xs text-slate-400">약국 HUB에서 가져온 사이니지 자산 목록입니다</p>
+        <button
+          onClick={() => setShowVideoRegForm(true)}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50"
+        >
+          <Plus className="w-4 h-4" />
+          동영상 등록
+        </button>
       </div>
+
+      {/* Video registration form */}
+      {showVideoRegForm && (
+        <div className="flex gap-2 mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <input
+            type="text"
+            value={regVideoTitle}
+            onChange={e => setRegVideoTitle(e.target.value)}
+            placeholder="동영상 이름"
+            className="flex-1 px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+            autoFocus
+          />
+          <input
+            type="url"
+            value={regVideoUrl}
+            onChange={e => setRegVideoUrl(e.target.value)}
+            placeholder="YouTube 또는 Vimeo URL"
+            className="flex-1 px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+            onKeyDown={e => e.key === 'Enter' && handleRegisterVideo()}
+          />
+          <button
+            onClick={handleRegisterVideo}
+            disabled={regVideoSaving || !regVideoTitle.trim() || !regVideoUrl.trim()}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {regVideoSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+            등록
+          </button>
+          <button
+            onClick={() => { setShowVideoRegForm(false); setRegVideoTitle(''); setRegVideoUrl(''); }}
+            className="px-3 py-1.5 text-sm text-slate-600 border border-slate-300 rounded-md hover:bg-slate-50"
+          >
+            취소
+          </button>
+        </div>
+      )}
 
       {/* ─── [A] Signage KPI ─────────────────────── */}
       {!loading && !error && (
@@ -1336,20 +1451,8 @@ export function StoreSignagePage() {
         </div>
       )}
 
-      {/* ─── Quick Actions ─────────────────────────── */}
-      {!loading && !error && items.length === 0 && (
-        <div className="flex gap-2 mb-6">
-          <button
-            onClick={() => navigate('/hub/signage')}
-            className="px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100"
-          >
-            콘텐츠 허브에서 가져오기
-          </button>
-        </div>
-      )}
-
       {/* ─── [B] 검색 + 필터 바 ─────────────────── */}
-      {!loading && !error && items.length > 0 && (
+      {!loading && !error && unifiedVideos.length > 0 && (
         <div className="relative mb-3">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
@@ -1361,7 +1464,7 @@ export function StoreSignagePage() {
           />
         </div>
       )}
-      {!loading && !error && items.length > 0 && (
+      {!loading && !error && unifiedVideos.length > 0 && (
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-1">
             <Filter className="w-3.5 h-3.5 text-slate-400" />
@@ -1422,37 +1525,49 @@ export function StoreSignagePage() {
           <p className="text-sm">{error}</p>
           <button onClick={fetchItems} className="mt-3 text-sm text-blue-600 hover:underline">다시 시도</button>
         </div>
-      ) : filteredItems.length === 0 ? (
+      ) : filteredUnified.length === 0 ? (
         <div className="text-center py-20 text-slate-400">
-          {items.length === 0 ? (
+          {unifiedVideos.length === 0 ? (
             <>
               <Monitor className="w-10 h-10 mx-auto mb-3 text-slate-300" />
               <p className="text-sm">동영상이 없습니다.</p>
-              <p className="text-xs mt-1">콘텐츠 허브에서 콘텐츠를 가져와주세요.</p>
-              <button
-                onClick={() => navigate('/hub/signage')}
-                className="mt-4 px-4 py-2 text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50"
-              >
-                콘텐츠 허브에서 가져오기
-              </button>
+              <p className="text-xs mt-1">'동영상 등록' 버튼으로 YouTube 또는 Vimeo 동영상을 등록하세요.</p>
             </>
           ) : (
-            <p className="text-sm">선택한 필터 조건에 해당하는 사이니지가 없습니다.</p>
+            <p className="text-sm">선택한 필터 조건에 해당하는 동영상이 없습니다.</p>
           )}
         </div>
       ) : (
         <>
-          <DataTable<StoreAssetItem>
+          <DataTable<UnifiedVideoItem>
+            rowSelection={{
+              selectedRowKeys: selectedVideoKeys,
+              onChange: setSelectedVideoKeys,
+            }}
             columns={[
               {
                 key: 'title',
                 title: '제목',
-                render: (_v, item) => {
+                render: (_v, v) => {
+                  if (v.source === 'direct') {
+                    return (
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-slate-900 truncate max-w-md">{v.title}</span>
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-purple-100 text-purple-700">
+                          {v.sourceType === 'youtube' ? 'YouTube' : v.sourceType === 'vimeo' ? 'Vimeo' : '직접'}
+                        </span>
+                      </div>
+                    );
+                  }
+                  const item = v._snapshot!;
                   const expired = isForcedExpired(item);
                   const expiringSoon = isForcedExpiringSoon(item);
                   return (
                     <div>
-                      <div className="font-medium text-slate-900 truncate max-w-md">{item.title}</div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-slate-900 truncate max-w-md">{v.title}</span>
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-500">HUB</span>
+                      </div>
                       {item.isForced && (
                         <div className="flex items-center gap-2 mt-1">
                           {expired ? (
@@ -1479,7 +1594,11 @@ export function StoreSignagePage() {
               {
                 key: 'publishStatus',
                 title: '상태',
-                render: (_v, item) => {
+                render: (_v, v) => {
+                  if (v.source === 'direct') {
+                    return <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700">등록됨</span>;
+                  }
+                  const item = v._snapshot!;
                   const statusCfg = STATUS_CONFIG[item.publishStatus] || STATUS_CONFIG.draft;
                   const isUpdating = updatingId === item.id;
                   return item.isForced ? (
@@ -1501,7 +1620,11 @@ export function StoreSignagePage() {
               {
                 key: 'channelMap',
                 title: '채널 배치',
-                render: (_v, item) => {
+                render: (_v, v) => {
+                  if (v.source === 'direct') {
+                    return <span className="text-xs text-slate-300">—</span>;
+                  }
+                  const item = v._snapshot!;
                   const disabled = item.isForced || item.isLocked || channelUpdatingId === item.id;
                   return (
                     <div className="flex gap-1.5">
@@ -1530,15 +1653,24 @@ export function StoreSignagePage() {
               },
               {
                 key: 'createdAt',
-                title: '가져온 날짜',
+                title: '등록일',
                 dataIndex: 'createdAt',
-                render: (v) => <span className="text-slate-500">{formatDate(v)}</span>,
+                render: (v) => <span className="text-slate-500">{formatDate(v as string)}</span>,
               },
               {
                 key: 'actions',
                 title: '',
                 align: 'right' as const,
-                render: () => (
+                render: (_v, v) => v.source === 'direct' ? (
+                  <button
+                    onClick={e => { e.stopPropagation(); handleDeleteMedia(v._media!.id); }}
+                    className="inline-flex items-center gap-1 px-2 py-1 text-[11px] text-red-600 border border-red-200 rounded hover:bg-red-50"
+                    title="삭제"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                    삭제
+                  </button>
+                ) : (
                   <button
                     onClick={() => navigateTab('playlist')}
                     className="inline-flex items-center gap-1 px-2 py-1 text-[11px] text-blue-600 border border-blue-200 rounded hover:bg-blue-50"
@@ -1549,20 +1681,22 @@ export function StoreSignagePage() {
                   </button>
                 ),
               },
-            ] as Column<StoreAssetItem>[]}
-            dataSource={pagedItems}
+            ] as Column<UnifiedVideoItem>[]}
+            dataSource={pagedUnified}
             rowKey="id"
             loading={false}
-            onRow={item => ({
-              className: item.isForced && !isForcedExpired(item) ? 'bg-red-50/30' : isForcedExpired(item) ? 'opacity-60' : '',
+            onRow={v => ({
+              className: v.source === 'snapshot' && v._snapshot && v._snapshot.isForced && !isForcedExpired(v._snapshot) ? 'bg-red-50/30'
+                : v.source === 'snapshot' && v._snapshot && isForcedExpired(v._snapshot) ? 'opacity-60'
+                : '',
             })}
-            emptyText="사이니지가 없습니다"
+            emptyText="동영상이 없습니다"
           />
 
           {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex items-center justify-between mt-4 text-sm text-slate-500">
-              <span>{filteredItems.length}건 중 {(page - 1) * PAGE_LIMIT + 1}–{Math.min(page * PAGE_LIMIT, filteredItems.length)} · {page}/{totalPages} 페이지</span>
+              <span>{filteredUnified.length}건 중 {(page - 1) * PAGE_LIMIT + 1}–{Math.min(page * PAGE_LIMIT, filteredUnified.length)} · {page}/{totalPages} 페이지</span>
               <div className="flex gap-2">
                 <button
                   onClick={() => setPage(p => Math.max(1, p - 1))}

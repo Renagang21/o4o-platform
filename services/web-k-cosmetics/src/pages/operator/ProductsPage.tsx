@@ -1,6 +1,7 @@
 /**
  * Operator Products Page — Product Master Console
  * WO-O4O-PRODUCT-MASTER-CONSOLE-V1
+ * WO-O4O-TABLE-STANDARD-V1 — Raw HTML → DataTable + Selection
  *
  * /api/v1/operator/products API (Extension Layer)
  * Cookie-based auth (K-Cosmetics)
@@ -8,6 +9,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ChevronRight } from 'lucide-react';
+import { DataTable } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { api } from '../../lib/apiClient';
 
 // ─── Types ───────────────────────────────────────────────────
@@ -60,6 +64,7 @@ export default function ProductsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const fetchProducts = useCallback(async () => {
     setIsLoading(true);
@@ -97,6 +102,11 @@ export default function ProductsPage() {
     fetchProducts();
   }, [fetchProducts]);
 
+  // Reset selection on search/page change
+  useEffect(() => {
+    setSelectedIds(new Set());
+  }, [searchTerm, currentPage]);
+
   const handleSearch = () => {
     setSearchTerm(searchInput);
     setCurrentPage(1);
@@ -113,6 +123,90 @@ export default function ProductsPage() {
       return '-';
     }
   };
+
+  // ─── Column Definitions ───
+
+  const columns: ListColumnDef<ProductData>[] = [
+    {
+      key: 'primaryImage',
+      header: '이미지',
+      width: '60px',
+      system: true,
+      render: (v, row) => v ? (
+        <img
+          src={v}
+          alt={row.marketingName}
+          className="w-10 h-10 rounded-lg object-cover border border-slate-200"
+        />
+      ) : (
+        <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-slate-300 text-xs">
+          N/A
+        </div>
+      ),
+    },
+    {
+      key: 'marketingName',
+      header: '상품명',
+      sortable: true,
+      render: (_v, row) => (
+        <div>
+          <p className="font-medium text-slate-800 text-sm">{row.marketingName}</p>
+          {row.regulatoryName && row.regulatoryName !== row.marketingName && (
+            <p className="text-xs text-slate-400 mt-0.5 truncate max-w-[240px]">{row.regulatoryName}</p>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'barcode',
+      header: '바코드',
+      width: '130px',
+      render: (v) => (
+        <span className="font-mono text-xs text-slate-600 bg-slate-50 px-2 py-1 rounded">
+          {v}
+        </span>
+      ),
+    },
+    {
+      key: 'brandName',
+      header: '브랜드',
+      render: (v) => v || <span className="text-slate-300">-</span>,
+    },
+    {
+      key: 'categoryName',
+      header: '카테고리',
+      render: (v) => v || <span className="text-slate-300">-</span>,
+    },
+    {
+      key: 'supplierCount',
+      header: '공급자',
+      align: 'center',
+      width: '70px',
+      sortable: true,
+      render: (v) => (
+        <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-medium ${
+          v > 0 ? 'bg-pink-100 text-pink-700' : 'bg-slate-100 text-slate-400'
+        }`}>
+          {v}
+        </span>
+      ),
+    },
+    {
+      key: 'createdAt',
+      header: '생성일',
+      width: '110px',
+      sortable: true,
+      sortAccessor: (row) => new Date(row.createdAt).getTime(),
+      render: (v) => <span className="text-sm text-slate-500">{formatDate(v)}</span>,
+    },
+    {
+      key: '_nav',
+      header: '',
+      width: '40px',
+      system: true,
+      render: () => <ChevronRight className="w-4 h-4 text-slate-300" />,
+    },
+  ];
 
   return (
     <div className="space-y-6">
@@ -160,10 +254,9 @@ export default function ProductsPage() {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-xl border border-slate-100 overflow-hidden">
-        {/* Search */}
-        <div className="p-4 border-b border-slate-100">
+      {/* Search + Table */}
+      <div>
+        <div className="mb-4">
           <div className="flex items-center gap-3">
             <div className="relative flex-1">
               <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
@@ -185,99 +278,23 @@ export default function ProductsPage() {
           </div>
         </div>
 
-        {/* Loading */}
-        {isLoading && products.length === 0 && (
-          <div className="flex items-center justify-center py-20">
-            <div className="flex flex-col items-center gap-3">
-              <div className="w-8 h-8 border-2 border-pink-600 border-t-transparent rounded-full animate-spin" />
-              <p className="text-slate-500 text-sm">상품 데이터 로딩 중...</p>
-            </div>
-          </div>
-        )}
-
-        {(!isLoading || products.length > 0) && (
-          <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-100">
-              <tr>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500">이미지</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500">상품명</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500">바코드</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500">브랜드</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500">카테고리</th>
-                <th className="text-center px-4 py-3 text-xs font-medium text-slate-500">공급자</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500">생성일</th>
-                <th className="w-10"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {products.length === 0 && !isLoading ? (
-                <tr>
-                  <td colSpan={8} className="px-4 py-12 text-center text-slate-400 text-sm">
-                    상품 데이터가 없습니다
-                  </td>
-                </tr>
-              ) : (
-                products.map((product) => (
-                  <tr
-                    key={product.id}
-                    onClick={() => navigate(`/operator/products/${product.id}`)}
-                    className="hover:bg-slate-50 transition-colors cursor-pointer"
-                  >
-                    <td className="px-4 py-3">
-                      {product.primaryImage ? (
-                        <img
-                          src={product.primaryImage}
-                          alt={product.marketingName}
-                          className="w-10 h-10 rounded-lg object-cover border border-slate-200"
-                        />
-                      ) : (
-                        <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-slate-300 text-xs">
-                          N/A
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      <p className="font-medium text-slate-800 text-sm">{product.marketingName}</p>
-                      {product.regulatoryName && product.regulatoryName !== product.marketingName && (
-                        <p className="text-xs text-slate-400 mt-0.5 truncate max-w-[240px]">{product.regulatoryName}</p>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className="font-mono text-xs text-slate-600 bg-slate-50 px-2 py-1 rounded">
-                        {product.barcode}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-slate-600">
-                      {product.brandName || <span className="text-slate-300">-</span>}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-slate-600">
-                      {product.categoryName || <span className="text-slate-300">-</span>}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-medium ${
-                        product.supplierCount > 0
-                          ? 'bg-pink-100 text-pink-700'
-                          : 'bg-slate-100 text-slate-400'
-                      }`}>
-                        {product.supplierCount}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-slate-500">
-                      {formatDate(product.createdAt)}
-                    </td>
-                    <td className="px-4 py-3">
-                      <svg className="w-4 h-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        )}
+        {/* DataTable */}
+        <DataTable<ProductData>
+          columns={columns}
+          data={products}
+          rowKey="id"
+          loading={isLoading}
+          emptyMessage="상품 데이터가 없습니다"
+          onRowClick={(row) => navigate(`/operator/products/${row.id}`)}
+          tableId="cosmetics-products"
+          selectable
+          selectedKeys={selectedIds}
+          onSelectionChange={setSelectedIds}
+        />
 
         {/* Pagination */}
         {!isLoading && pagination.totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100">
+          <div className="flex items-center justify-between px-4 py-3 mt-2">
             <p className="text-sm text-slate-500">
               총 {pagination.total}개 중 {(pagination.page - 1) * pagination.limit + 1}-
               {Math.min(pagination.page * pagination.limit, pagination.total)}개 표시
@@ -293,17 +310,17 @@ export default function ProductsPage() {
               {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
                 const start = Math.max(1, Math.min(currentPage - 2, pagination.totalPages - 4));
                 return start + i;
-              }).filter(p => p <= pagination.totalPages).map((page) => (
+              }).filter(p => p <= pagination.totalPages).map((pg) => (
                 <button
-                  key={page}
-                  onClick={() => setCurrentPage(page)}
+                  key={pg}
+                  onClick={() => setCurrentPage(pg)}
                   className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
-                    currentPage === page
+                    currentPage === pg
                       ? 'bg-pink-600 text-white'
                       : 'hover:bg-slate-100 text-slate-600'
                   }`}
                 >
-                  {page}
+                  {pg}
                 </button>
               ))}
               <button

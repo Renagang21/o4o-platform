@@ -33,6 +33,9 @@ export function DataTable<T extends Record<string, any>>({
   reorderable,
   persistState,
   columnVisibility,
+  selectable,
+  selectedKeys,
+  onSelectionChange,
 }: DataTableProps<T>) {
   // Loading skeleton
   if (loading) {
@@ -66,6 +69,38 @@ export function DataTable<T extends Record<string, any>>({
     onCellClick: col.onCellClick,
   }));
 
+  // selectable → _select 체크박스 컬럼 자동 생성
+  // BaseTable은 col.key === '_select' 인 컬럼에 select-all 헤더를 자동 생성한다.
+  // body 체크박스는 이 래퍼에서 render로 제공한다.
+  if (selectable) {
+    o4oColumns.unshift({
+      key: '_select',
+      header: '',
+      system: true,
+      width: '40px',
+      align: 'center',
+      render: (_value, row, index) => {
+        const key = getRowKeyValue(row, rowKey, index);
+        const checked = selectedKeys?.has(key) ?? false;
+        return (
+          <input
+            type="checkbox"
+            checked={checked}
+            onChange={() => {
+              if (!onSelectionChange) return;
+              const next = new Set(selectedKeys);
+              if (checked) next.delete(key);
+              else next.add(key);
+              onSelectionChange(next);
+            }}
+            onClick={(e) => e.stopPropagation()}
+          />
+        );
+      },
+      onCellClick: () => {},
+    });
+  }
+
   return (
     <div className={`bg-white rounded-xl shadow-sm overflow-hidden ${className}`}>
       <BaseTable
@@ -82,6 +117,9 @@ export function DataTable<T extends Record<string, any>>({
         reorderable={reorderable}
         persistState={persistState}
         columnVisibility={columnVisibility}
+        selectable={selectable}
+        selectedKeys={selectedKeys}
+        onSelectionChange={onSelectionChange}
       />
     </div>
   );

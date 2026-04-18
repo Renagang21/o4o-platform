@@ -28,7 +28,11 @@ import {
   Copy,
   Star,
   Search,
+  Archive,
 } from 'lucide-react';
+import { ActionBar } from '@o4o/ui';
+import { DataTable } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { getAccessToken } from '../../contexts/AuthContext';
 import { assetSnapshotApi } from '../../api/assetSnapshot';
 import { RichTextEditor } from '@o4o/content-editor';
@@ -221,6 +225,8 @@ function ContentList({
   const [searchInput, setSearchInput] = useState('');
   const [pickedOnly, setPickedOnly] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
   const limit = 20;
 
   const fetchItems = useCallback(async () => {
@@ -244,7 +250,8 @@ function ContentList({
   }, [type, page, statusFilter, searchQuery, pickedOnly, refreshKey]);
 
   useEffect(() => { fetchItems(); }, [fetchItems]);
-  useEffect(() => { setPage(1); setSearchQuery(''); setSearchInput(''); }, [type]);
+  useEffect(() => { setPage(1); setSearchQuery(''); setSearchInput(''); setSelectedIds(new Set()); }, [type]);
+  useEffect(() => { setSelectedIds(new Set()); }, [statusFilter, searchQuery, pickedOnly]);
 
   async function handleStatusToggle(item: CmsContent) {
     const newStatus: ContentStatus = item.status === 'published' ? 'draft' : 'published';
@@ -318,14 +325,188 @@ function ContentList({
     }
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20 text-slate-400">
-        <Loader2 className="w-5 h-5 animate-spin mr-2" />
-        콘텐츠 목록을 불러오는 중...
-      </div>
-    );
+  // ─── Bulk Actions ───
+
+  async function handleBulkPublish() {
+    const draftIds = [...selectedIds].filter((id) => {
+      const item = items.find((i) => i.id === id);
+      return item?.status === 'draft';
+    });
+    if (draftIds.length === 0) return;
+    setIsBulkProcessing(true);
+    for (const id of draftIds) {
+      try {
+        await apiFetch(`/api/v1/kpa/news/${id}`, {
+          method: 'PUT',
+          body: JSON.stringify({ status: 'published' }),
+        });
+      } catch { /* continue */ }
+    }
+    setIsBulkProcessing(false);
+    setSelectedIds(new Set());
+    await fetchItems();
   }
+
+  async function handleBulkArchive() {
+    const archivableIds = [...selectedIds].filter((id) => {
+      const item = items.find((i) => i.id === id);
+      return item?.status !== 'archived';
+    });
+    if (archivableIds.length === 0) return;
+    setIsBulkProcessing(true);
+    for (const id of archivableIds) {
+      try {
+        await apiFetch(`/api/v1/kpa/news/${id}`, { method: 'DELETE' });
+      } catch { /* continue */ }
+    }
+    setIsBulkProcessing(false);
+    setSelectedIds(new Set());
+    onDeleted();
+  }
+
+  async function handleBulkHardDelete() {
+    const archivedIds = [...selectedIds].filter((id) => {
+      const item = items.find((i) => i.id === id);
+      return item?.status === 'archived';
+    });
+    if (archivedIds.length === 0) return;
+    if (!confirm(`${archivedIds.length}개 보관된 콘텐츠를 완전 삭제합니다. 이 작업은 되돌릴 수 없습니다.`)) return;
+    setIsBulkProcessing(true);
+    for (const id of archivedIds) {
+      try {
+        await apiFetch(`/api/v1/kpa/news/${id}/hard`, { method: 'DELETE' });
+      } catch { /* continue */ }
+    }
+    setIsBulkProcessing(false);
+    setSelectedIds(new Set());
+    onDeleted();
+  }
+
+  // ─── Bulk action counts ───
+
+  const selectedDraftCount = [...selectedIds].filter((id) => {
+    const item = items.find((i) => i.id === id);
+    return item?.status === 'draft';
+  }).length;
+
+  const selectedArchivableCount = [...selectedIds].filter((id) => {
+    const item = items.find((i) => i.id === id);
+    return item?.status !== 'archived';
+  }).length;
+
+  const selectedArchivedCount = [...selectedIds].filter((id) => {
+    const item = items.find((i) => i.id === id);
+    return item?.status === 'archived';
+  }).length;
+
+  // ─── Column Definitions ───
+
+  const contentColumns: ListColumnDef<CmsContent>[] = [
+    {
+      key: 'title',
+      header: '제목',
+      sortable: true,
+      render: (_v, row) => (
+        <div>
+          <div className="flex items-center gap-1.5">
+            <span className="font-medium text-slate-900 truncate max-w-md">{row.title}</span>
+            {row.isOperatorPicked && (
+              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-50 text-amber-700 flex-shrink-0">
+                <Star className="w-3 h-3" />
+                추천
+              </span>
+            )}
+          </div>
+          {row.summary && (
+            <div className="text-xs text-slate-400 truncate max-w-md mt-0.5">{row.summary}</div>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'status',
+      header: '상태',
+      width: '80px',
+      sortable: true,
+      render: (v) => {
+        const sc = statusConfig[v as ContentStatus];
+        return (
+          <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${sc.color} ${sc.bg}`}>
+            {sc.label}
+          </span>
+        );
+      },
+    },
+    {
+      key: 'createdAt',
+      header: '작성일',
+      width: '110px',
+      sortable: true,
+      sortAccessor: (row) => new Date(row.createdAt).getTime(),
+      render: (v) => <span className="text-slate-500">{formatDate(v)}</span>,
+    },
+    {
+      key: 'publishedAt',
+      header: '게시일',
+      width: '110px',
+      sortable: true,
+      sortAccessor: (row) => row.publishedAt ? new Date(row.publishedAt).getTime() : 0,
+      render: (v) => <span className="text-slate-500">{formatDate(v)}</span>,
+    },
+    {
+      key: '_actions',
+      header: '액션',
+      width: '130px',
+      system: true,
+      onCellClick: () => {},
+      render: (_v, row) => (
+        <>
+          {actionLoading === row.id ? (
+            <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
+          ) : row.status !== 'archived' ? (
+            <div className="flex gap-1">
+              <button
+                onClick={() => handleCopyToStore(row)}
+                className="p-1 text-green-600 hover:bg-green-50 rounded"
+                title="매장으로 복사"
+              >
+                <Copy className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => handleStatusToggle(row)}
+                className="p-1 text-slate-500 hover:bg-slate-100 rounded"
+                title={row.status === 'published' ? '비공개' : '게시'}
+              >
+                {row.status === 'published' ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+              <button
+                onClick={() => onEdit(row)}
+                className="p-1 text-blue-500 hover:bg-blue-50 rounded"
+                title="수정"
+              >
+                <Pencil className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => handleDelete(row)}
+                className="p-1 text-red-500 hover:bg-red-50 rounded"
+                title="삭제"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => handleHardDelete(row)}
+              className="p-1 text-red-500 hover:bg-red-50 rounded"
+              title="완전 삭제"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
+        </>
+      ),
+    },
+  ];
 
   if (error) {
     return (
@@ -387,108 +568,58 @@ function ContentList({
         )}
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-slate-50 text-left text-xs text-slate-500 uppercase">
-              <th className="px-4 py-3 font-medium">제목</th>
-              <th className="px-4 py-3 font-medium w-20">상태</th>
-              <th className="px-4 py-3 font-medium w-28">작성일</th>
-              <th className="px-4 py-3 font-medium w-28">게시일</th>
-              <th className="px-4 py-3 font-medium w-32">액션</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {items.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="px-4 py-12 text-center text-slate-400">
-                  {typeConfig[type].label} 콘텐츠가 없습니다.
-                </td>
-              </tr>
-            ) : (
-              items.map(item => {
-                const sc = statusConfig[item.status];
-                return (
-                  <tr key={item.id} className="hover:bg-slate-50">
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-medium text-slate-900 truncate max-w-md">{item.title}</span>
-                        {item.isOperatorPicked && (
-                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-50 text-amber-700 flex-shrink-0">
-                            <Star className="w-3 h-3" />
-                            추천
-                          </span>
-                        )}
-                      </div>
-                      {item.summary && (
-                        <div className="text-xs text-slate-400 truncate max-w-md mt-0.5">{item.summary}</div>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${sc.color} ${sc.bg}`}>
-                        {sc.label}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-slate-500">{formatDate(item.createdAt)}</td>
-                    <td className="px-4 py-3 text-slate-500">{formatDate(item.publishedAt)}</td>
-                    <td className="px-4 py-3">
-                      {actionLoading === item.id ? (
-                        <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
-                      ) : item.status !== 'archived' ? (
-                        <div className="flex gap-1">
-                          <button
-                            onClick={() => handleCopyToStore(item)}
-                            className="p-1 text-green-600 hover:bg-green-50 rounded"
-                            title="매장으로 복사"
-                          >
-                            <Copy className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleStatusToggle(item)}
-                            className="p-1 text-slate-500 hover:bg-slate-100 rounded"
-                            title={item.status === 'published' ? '비공개' : '게시'}
-                          >
-                            {item.status === 'published' ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                          </button>
-                          <button
-                            onClick={() => onEdit(item)}
-                            className="p-1 text-blue-500 hover:bg-blue-50 rounded"
-                            title="수정"
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(item)}
-                            className="p-1 text-red-500 hover:bg-red-50 rounded"
-                            title="삭제"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="flex gap-1">
-                          {actionLoading === item.id ? (
-                            <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
-                          ) : (
-                            <button
-                              onClick={() => handleHardDelete(item)}
-                              className="p-1 text-red-500 hover:bg-red-50 rounded"
-                              title="완전 삭제"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          )}
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
+      {/* Action Bar */}
+      <div className="mb-3">
+        <ActionBar
+          selectedCount={selectedIds.size}
+          onClearSelection={() => setSelectedIds(new Set())}
+          actions={[
+            ...(selectedDraftCount > 0
+              ? [{
+                  key: 'publish',
+                  label: `게시 (${selectedDraftCount})`,
+                  onClick: handleBulkPublish,
+                  variant: 'primary' as const,
+                  icon: <Eye size={14} />,
+                  loading: isBulkProcessing,
+                }]
+              : []),
+            ...(selectedArchivableCount > 0
+              ? [{
+                  key: 'archive',
+                  label: `보관 (${selectedArchivableCount})`,
+                  onClick: handleBulkArchive,
+                  variant: 'warning' as const,
+                  icon: <Archive size={14} />,
+                  loading: isBulkProcessing,
+                }]
+              : []),
+            ...(selectedArchivedCount > 0
+              ? [{
+                  key: 'hardDelete',
+                  label: `완전 삭제 (${selectedArchivedCount})`,
+                  onClick: handleBulkHardDelete,
+                  variant: 'danger' as const,
+                  icon: <Trash2 size={14} />,
+                  loading: isBulkProcessing,
+                }]
+              : []),
+          ]}
+        />
       </div>
+
+      {/* DataTable */}
+      <DataTable<CmsContent>
+        columns={contentColumns}
+        data={items}
+        rowKey="id"
+        loading={loading}
+        emptyMessage={`${typeConfig[type].label} 콘텐츠가 없습니다.`}
+        tableId={`kpa-content-${type}`}
+        selectable
+        selectedKeys={selectedIds}
+        onSelectionChange={setSelectedIds}
+      />
 
       {/* Pagination */}
       {totalPages > 1 && (
