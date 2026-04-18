@@ -26,6 +26,9 @@ export interface LibrarySelectorResult {
   title: string;
   category: string | null;
   fileUrl: string | null;
+  assetType: string;
+  url: string | null;
+  htmlContent: string | null;
 }
 
 // ── Props ──
@@ -132,6 +135,9 @@ export function StoreLibrarySelectorModal({
       title: selectedItem.title,
       category: selectedItem.category,
       fileUrl: selectedItem.fileUrl,
+      assetType: selectedItem.assetType || 'file',
+      url: selectedItem.url ?? null,
+      htmlContent: selectedItem.htmlContent ?? null,
     });
   };
 
@@ -202,13 +208,20 @@ export function StoreLibrarySelectorModal({
                   }}
                 >
                   <div style={styles.cardPreview}>
-                    <FilePreview mimeType={item.mimeType} fileUrl={item.fileUrl} />
+                    <FilePreview mimeType={item.mimeType} fileUrl={item.fileUrl} assetType={item.assetType} />
                   </div>
                   <div style={styles.cardInfo}>
                     <p style={styles.cardTitle}>{item.title}</p>
-                    {item.category && (
-                      <span style={styles.cardCategory}>{item.category}</span>
-                    )}
+                    <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' as const }}>
+                      {item.assetType && item.assetType !== 'file' && (
+                        <span style={styles.assetTypeBadge}>
+                          {item.assetType === 'content' ? '콘텐츠' : item.assetType === 'external-link' ? '링크' : item.assetType}
+                        </span>
+                      )}
+                      {item.category && (
+                        <span style={styles.cardCategory}>{item.category}</span>
+                      )}
+                    </div>
                   </div>
                   {selectedId === item.id && (
                     <div style={styles.selectedBadge}>선택됨</div>
@@ -276,10 +289,22 @@ export function StoreLibrarySelectorModal({
 function FilePreview({
   mimeType,
   fileUrl,
+  assetType,
 }: {
   mimeType: string | null;
   fileUrl: string | null;
+  assetType?: string;
 }) {
+  // Content type icon
+  if (assetType === 'content') {
+    return <FileText size={28} style={{ color: '#8b5cf6' }} />;
+  }
+
+  // External link icon
+  if (assetType === 'external-link') {
+    return <Search size={28} style={{ color: '#2563eb' }} />;
+  }
+
   if (mimeType?.startsWith('image/') && fileUrl) {
     return (
       <img
@@ -461,6 +486,16 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: colors.neutral100,
     fontSize: '11px',
     color: colors.neutral500,
+  },
+  assetTypeBadge: {
+    display: 'inline-block',
+    marginTop: '4px',
+    padding: '2px 8px',
+    borderRadius: '10px',
+    backgroundColor: '#f0fdf4',
+    color: '#16a34a',
+    fontSize: '11px',
+    fontWeight: 500,
   },
   selectedBadge: {
     position: 'absolute',

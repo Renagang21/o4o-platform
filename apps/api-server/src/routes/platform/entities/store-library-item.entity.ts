@@ -49,6 +49,18 @@ export class StoreLibraryItem {
   @Column({ type: 'varchar', length: 100, nullable: true })
   category?: string | null;
 
+  @Column({ name: 'asset_type', type: 'varchar', length: 50, default: 'file' })
+  assetType!: string;
+
+  @Column({ name: 'url', type: 'varchar', length: 1000, nullable: true })
+  url?: string | null;
+
+  @Column({ name: 'html_content', type: 'text', nullable: true })
+  htmlContent?: string | null;
+
+  @Column({ name: 'source_type', type: 'varchar', length: 50, default: 'uploaded' })
+  sourceType!: string;
+
   @Column({ name: 'is_active', type: 'boolean', default: true })
   isActive!: boolean;
 

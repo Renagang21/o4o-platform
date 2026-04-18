@@ -10,7 +10,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, ExternalLink, Search, Trash2, Edit2, Eye, FileText, Image, Film, File } from 'lucide-react';
+import { Plus, ExternalLink, Search, Trash2, Edit2, Eye, FileText, Image, Film, File, Link, FileEdit } from 'lucide-react';
 import { colors } from '../../styles/theme';
 import { getStoreLibraryItems, deleteStoreLibraryItem } from '../../api/storeLibrary';
 import type { StoreLibraryItem } from '../../api/storeLibrary';
@@ -38,12 +38,24 @@ function formatFileSize(bytes: number | null): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+const ASSET_TYPE_LABELS: Record<string, string> = {
+  file: '파일',
+  content: '콘텐츠',
+  'external-link': '외부 링크',
+};
+
 function getMimeIcon(mimeType: string | null) {
   if (!mimeType) return File;
   if (mimeType.startsWith('image/')) return Image;
   if (mimeType.startsWith('video/')) return Film;
   if (mimeType === 'application/pdf') return FileText;
   return File;
+}
+
+function getAssetIcon(assetType: string | undefined) {
+  if (assetType === 'content') return FileEdit;
+  if (assetType === 'external-link') return Link;
+  return null; // file type uses getMimeIcon instead
 }
 
 export function StoreLibraryPage() {
@@ -202,14 +214,16 @@ export function StoreLibraryPage() {
       {!loading && filteredItems.length > 0 && (
         <div style={styles.cardGrid}>
           {filteredItems.map((item) => {
+            const currentType = item.assetType || 'file';
             const MimeIcon = getMimeIcon(item.mimeType);
-            const isImage = item.mimeType?.startsWith('image/');
+            const AssetIcon = getAssetIcon(currentType);
+            const isImage = currentType === 'file' && item.mimeType?.startsWith('image/');
 
             return (
               <div key={item.id} style={styles.card}>
                 {/* Preview — clickable */}
                 <div
-                  style={{ ...styles.cardPreview, cursor: 'pointer' }}
+                  style={{ ...styles.cardPreview, cursor: 'pointer', position: 'relative' as const }}
                   onClick={() => navigate(`/store/operation/library/${item.id}`)}
                 >
                   {isImage && item.fileUrl ? (
@@ -219,8 +233,15 @@ export function StoreLibraryPage() {
                       style={styles.previewImg}
                       onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                     />
+                  ) : AssetIcon ? (
+                    <AssetIcon size={36} style={{ color: colors.neutral300 }} />
                   ) : (
                     <MimeIcon size={36} style={{ color: colors.neutral300 }} />
+                  )}
+                  {currentType !== 'file' && (
+                    <span style={styles.assetTypeBadgeOverlay}>
+                      {ASSET_TYPE_LABELS[currentType] || currentType}
+                    </span>
                   )}
                 </div>
 
@@ -234,8 +255,9 @@ export function StoreLibraryPage() {
                     <span style={styles.categoryBadge}>{item.category}</span>
                   )}
                   <div style={styles.cardMeta}>
-                    {item.mimeType && <span>{item.mimeType}</span>}
-                    {item.fileSize ? <span>{formatFileSize(item.fileSize)}</span> : null}
+                    {currentType === 'file' && item.mimeType && <span>{item.mimeType}</span>}
+                    {currentType === 'file' && item.fileSize ? <span>{formatFileSize(item.fileSize)}</span> : null}
+                    {currentType === 'external-link' && item.url && <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, maxWidth: 180, display: 'inline-block' }}>{item.url}</span>}
                   </div>
                   <p style={styles.cardDate}>{formatDate(item.createdAt)}</p>
                 </div>
@@ -457,6 +479,17 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: `${colors.primary}15`,
     color: colors.primary,
     marginBottom: '6px',
+  },
+  assetTypeBadgeOverlay: {
+    position: 'absolute' as const,
+    top: '8px',
+    right: '8px',
+    padding: '2px 8px',
+    borderRadius: '10px',
+    backgroundColor: '#f0fdf4',
+    color: '#16a34a',
+    fontSize: '11px',
+    fontWeight: 500,
   },
   cardMeta: {
     display: 'flex',

@@ -1,18 +1,30 @@
 /**
- * StoreLibraryDetailPage — 매장 자료 상세 화면
+ * StoreLibraryDetailPage — 매장 자료 상세 화면 (멀티 에셋 타입 지원)
  *
  * WO-O4O-STORE-LIBRARY-DETAIL-V1
+ * WO-STORE-LIBRARY-ASSET-EXTENSION-V1
  *
- * 파일 미리보기 + 자료 정보 + 다운로드/수정/삭제 액션
- * API: GET /api/v1/kpa/pharmacy/library/:id
+ * 타입별 미리보기:
+ * - file: 이미지/PDF/파일 미리보기 + 다운로드
+ * - content: ContentRenderer로 HTML 렌더링
+ * - external-link: 클릭 가능한 외부 링크
+ *
+ * 삭제 보호: QR 참조 시 409 에러 표시
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Download, Edit2, Trash2, FileText, Image, Film, File, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Download, Edit2, Trash2, FileText, Image, Film, File, ExternalLink, Link, FileEdit } from 'lucide-react';
+import { ContentRenderer } from '@o4o/content-editor';
 import { colors } from '../../styles/theme';
 import { getStoreLibraryItem, deleteStoreLibraryItem } from '../../api/storeLibrary';
 import type { StoreLibraryItem } from '../../api/storeLibrary';
+
+const ASSET_TYPE_LABELS: Record<string, string> = {
+  file: '파일',
+  content: '콘텐츠',
+  'external-link': '외부 링크',
+};
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
@@ -75,8 +87,14 @@ export function StoreLibraryDetailPage() {
     try {
       await deleteStoreLibraryItem(item.id);
       navigate('/store/operation/library', { replace: true });
-    } catch {
-      setError('삭제 중 오류가 발생했습니다.');
+    } catch (err: any) {
+      // QR 참조 보호: 409 Conflict 처리
+      const errorData = err?.response?.data?.error || err?.data?.error;
+      if (errorData?.code === 'QR_REFERENCE_EXISTS') {
+        setError(errorData.message || '이 자료를 참조하는 QR 코드가 있어 삭제할 수 없습니다.');
+      } else {
+        setError('삭제 중 오류가 발생했습니다.');
+      }
       setDeleting(false);
       setDeleteConfirm(false);
     }
@@ -131,6 +149,7 @@ export function StoreLibraryDetailPage() {
 
   if (!item) return null;
 
+  const currentType = item.assetType || 'file';
   const MimeIcon = getMimeIcon(item.mimeType);
 
   return (
@@ -141,7 +160,7 @@ export function StoreLibraryDetailPage() {
           <ArrowLeft size={16} /> 목록으로
         </button>
         <div style={styles.topActions}>
-          {item.fileUrl && (
+          {currentType === 'file' && item.fileUrl && (
             <button onClick={handleDownload} style={styles.actionButton}>
               <Download size={16} /> 다운로드
             </button>
@@ -167,39 +186,74 @@ export function StoreLibraryDetailPage() {
 
       {/* Main Card */}
       <div style={styles.card}>
-        {/* Preview */}
+        {/* Preview — type-aware */}
         <div style={styles.previewArea}>
-          {isImageMime(item.mimeType) && item.fileUrl ? (
-            <img
-              src={item.fileUrl}
-              alt={item.title}
-              style={styles.previewImage}
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = 'none';
-              }}
-            />
-          ) : isPdfMime(item.mimeType) && item.fileUrl ? (
-            <iframe
-              src={item.fileUrl}
-              title={item.title}
-              style={styles.previewIframe}
-            />
-          ) : (
-            <div style={styles.previewFallback}>
-              <MimeIcon size={56} style={{ color: colors.neutral300 }} />
-              {item.fileName && (
-                <p style={{ margin: '12px 0 0', fontSize: '14px', color: colors.neutral500 }}>{item.fileName}</p>
+          {currentType === 'file' ? (
+            // File preview
+            isImageMime(item.mimeType) && item.fileUrl ? (
+              <img
+                src={item.fileUrl}
+                alt={item.title}
+                style={styles.previewImage}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                }}
+              />
+            ) : isPdfMime(item.mimeType) && item.fileUrl ? (
+              <iframe
+                src={item.fileUrl}
+                title={item.title}
+                style={styles.previewIframe}
+              />
+            ) : (
+              <div style={styles.previewFallback}>
+                <MimeIcon size={56} style={{ color: colors.neutral300 }} />
+                {item.fileName && (
+                  <p style={{ margin: '12px 0 0', fontSize: '14px', color: colors.neutral500 }}>{item.fileName}</p>
+                )}
+                {item.fileUrl && (
+                  <a
+                    href={item.fileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={styles.previewLinkBtn}
+                  >
+                    <ExternalLink size={14} /> 파일 열기
+                  </a>
+                )}
+              </div>
+            )
+          ) : currentType === 'content' ? (
+            // Content preview
+            <div style={styles.contentPreview}>
+              {item.htmlContent ? (
+                <ContentRenderer html={item.htmlContent} />
+              ) : (
+                <div style={styles.previewFallback}>
+                  <FileEdit size={56} style={{ color: colors.neutral300 }} />
+                  <p style={{ margin: '12px 0 0', fontSize: '14px', color: colors.neutral500 }}>콘텐츠 없음</p>
+                </div>
               )}
-              {item.fileUrl && (
+            </div>
+          ) : currentType === 'external-link' ? (
+            // External link preview
+            <div style={styles.previewFallback}>
+              <Link size={56} style={{ color: colors.neutral300 }} />
+              {item.url && (
                 <a
-                  href={item.fileUrl}
+                  href={item.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={styles.previewLink}
+                  style={styles.externalLinkDisplay}
                 >
-                  <ExternalLink size={14} /> 파일 열기
+                  <ExternalLink size={14} />
+                  {item.url}
                 </a>
               )}
+            </div>
+          ) : (
+            <div style={styles.previewFallback}>
+              <File size={56} style={{ color: colors.neutral300 }} />
             </div>
           )}
         </div>
@@ -209,10 +263,14 @@ export function StoreLibraryDetailPage() {
           <h1 style={styles.title}>{item.title}</h1>
 
           <div style={styles.metaRow}>
+            {/* Asset type badge */}
+            <span style={styles.assetTypeBadge}>
+              {ASSET_TYPE_LABELS[currentType] || currentType}
+            </span>
             {item.category && <span style={styles.categoryBadge}>{item.category}</span>}
             <span style={styles.metaText}>{formatDate(item.createdAt)}</span>
-            {item.fileSize ? <span style={styles.metaText}>{formatFileSize(item.fileSize)}</span> : null}
-            {item.mimeType && <span style={styles.metaText}>{item.mimeType}</span>}
+            {currentType === 'file' && item.fileSize ? <span style={styles.metaText}>{formatFileSize(item.fileSize)}</span> : null}
+            {currentType === 'file' && item.mimeType && <span style={styles.metaText}>{item.mimeType}</span>}
           </div>
 
           {item.description && (
@@ -333,7 +391,7 @@ const styles: Record<string, React.CSSProperties> = {
     justifyContent: 'center',
     padding: '40px 20px',
   },
-  previewLink: {
+  previewLinkBtn: {
     display: 'inline-flex',
     alignItems: 'center',
     gap: '4px',
@@ -341,6 +399,29 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '13px',
     color: colors.primary,
     textDecoration: 'none',
+  },
+  contentPreview: {
+    width: '100%',
+    padding: '24px',
+    maxHeight: '500px',
+    overflow: 'auto',
+  },
+  externalLinkDisplay: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    marginTop: '16px',
+    padding: '10px 16px',
+    backgroundColor: '#fff',
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: '8px',
+    fontSize: '14px',
+    color: colors.primary,
+    textDecoration: 'none',
+    maxWidth: '100%',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap' as const,
   },
   // Info
   infoSection: {
@@ -359,6 +440,15 @@ const styles: Record<string, React.CSSProperties> = {
     gap: '10px',
     flexWrap: 'wrap' as const,
     marginBottom: '16px',
+  },
+  assetTypeBadge: {
+    display: 'inline-block',
+    fontSize: '12px',
+    fontWeight: 500,
+    padding: '3px 10px',
+    borderRadius: '12px',
+    backgroundColor: '#f0fdf4',
+    color: '#16a34a',
   },
   categoryBadge: {
     display: 'inline-block',

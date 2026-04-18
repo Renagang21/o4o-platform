@@ -1,22 +1,25 @@
 /**
- * StoreLibraryNewPage — 매장 자료실 등록 (Neture 프리필 지원)
+ * StoreLibraryNewPage — 매장 자료실 등록 (멀티 에셋 타입 지원)
  *
  * WO-O4O-NETURE-TO-STORE-MANUAL-FLOW-V1
  * WO-O4O-STORE-LIBRARY-API-INTEGRATION-V1
+ * WO-STORE-LIBRARY-ASSET-EXTENSION-V1
  *
  * 동작:
+ * - 에셋 타입 선택: 파일 / 콘텐츠 / 외부 링크
  * - ?fromNeture=<id> 존재 시 Neture 공개 API에서 메타데이터 조회 → 폼 프리필
  * - file_url은 비워둠 (사용자 직접 업로드 필수)
  * - 자동 DB 복사 금지, FK 연결 금지
- * - 파일 선택 시 file input으로 메타데이터 추출
  * - handleSave → POST /api/v1/kpa/pharmacy/library
  */
 
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Info, Upload, FileText, X } from 'lucide-react';
+import { ArrowLeft, Info, Upload, FileText, X, Link, FileEdit } from 'lucide-react';
+import { RichTextEditor } from '@o4o/content-editor';
 import { colors } from '../../styles/theme';
 import { getNetureLibraryItem, createStoreLibraryItem } from '../../api/storeLibrary';
+import type { AssetType } from '../../api/storeLibrary';
 
 function formatFileSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -24,11 +27,20 @@ function formatFileSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+const ASSET_TYPE_OPTIONS: { key: AssetType; label: string; icon: typeof FileText }[] = [
+  { key: 'file', label: '파일', icon: Upload },
+  { key: 'content', label: '콘텐츠', icon: FileEdit },
+  { key: 'external-link', label: '외부 링크', icon: Link },
+];
+
 export function StoreLibraryNewPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const fromNeture = searchParams.get('fromNeture');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Asset type
+  const [assetType, setAssetType] = useState<AssetType>('file');
 
   // Form state
   const [title, setTitle] = useState('');
@@ -37,8 +49,14 @@ export function StoreLibraryNewPage() {
   const [imageUrl, setImageUrl] = useState('');
   const [category, setCategory] = useState('');
 
-  // File state
+  // File state (for 'file' type)
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  // Content state (for 'content' type)
+  const [htmlContent, setHtmlContent] = useState('');
+
+  // URL state (for 'external-link' type)
+  const [externalUrl, setExternalUrl] = useState('');
 
   // UI state
   const [loading, setLoading] = useState(false);
@@ -95,7 +113,14 @@ export function StoreLibraryNewPage() {
     }
   };
 
-  const canSave = title.trim().length > 0 && selectedFile !== null && !saving;
+  // 타입별 canSave 로직
+  const canSave = (() => {
+    if (saving || title.trim().length === 0) return false;
+    if (assetType === 'file') return selectedFile !== null;
+    if (assetType === 'content') return htmlContent.trim().length > 0;
+    if (assetType === 'external-link') return externalUrl.trim().length > 0;
+    return false;
+  })();
 
   const handleSave = async () => {
     if (!canSave) return;
@@ -104,14 +129,25 @@ export function StoreLibraryNewPage() {
     setSaveError(null);
 
     try {
-      const result = await createStoreLibraryItem({
+      const params: Record<string, unknown> = {
         title: title.trim(),
         description: description.trim() || undefined,
-        fileName: selectedFile!.name,
-        fileSize: selectedFile!.size,
-        mimeType: selectedFile!.type || 'application/octet-stream',
         category: category.trim() || undefined,
-      });
+        assetType,
+        sourceType: sourceType || (fromNeture ? 'neture-prefill' : 'manual'),
+      };
+
+      if (assetType === 'file' && selectedFile) {
+        params.fileName = selectedFile.name;
+        params.fileSize = selectedFile.size;
+        params.mimeType = selectedFile.type || 'application/octet-stream';
+      } else if (assetType === 'content') {
+        params.htmlContent = htmlContent;
+      } else if (assetType === 'external-link') {
+        params.url = externalUrl.trim();
+      }
+
+      const result = await createStoreLibraryItem(params as any);
 
       if (result.success) {
         navigate('/store/operation/library', { replace: true });
@@ -180,6 +216,30 @@ export function StoreLibraryNewPage() {
 
       {/* Form */}
       <div style={styles.formCard}>
+        {/* Asset Type Selector */}
+        <div style={styles.fieldGroup}>
+          <label style={styles.label}>자료 유형 *</label>
+          <div style={styles.assetTypeTabs}>
+            {ASSET_TYPE_OPTIONS.map((opt) => {
+              const Icon = opt.icon;
+              const isActive = assetType === opt.key;
+              return (
+                <button
+                  key={opt.key}
+                  onClick={() => setAssetType(opt.key)}
+                  style={{
+                    ...styles.assetTypeTab,
+                    ...(isActive ? styles.assetTypeTabActive : {}),
+                  }}
+                >
+                  <Icon size={16} />
+                  {opt.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         {/* Title */}
         <div style={styles.fieldGroup}>
           <label style={styles.label}>제목 *</label>
@@ -232,45 +292,80 @@ export function StoreLibraryNewPage() {
           </div>
         )}
 
-        {/* File upload area */}
-        <div style={styles.fieldGroup}>
-          <label style={styles.label}>파일 업로드 *</label>
-          <input
-            ref={fileInputRef}
-            type="file"
-            onChange={handleFileSelect}
-            style={{ display: 'none' }}
-          />
-          {selectedFile ? (
-            <div style={styles.fileSelected}>
-              <div style={styles.fileInfo}>
-                <FileText size={20} style={{ color: colors.primary, flexShrink: 0 }} />
-                <div>
-                  <p style={styles.fileName}>{selectedFile.name}</p>
-                  <p style={styles.fileMeta}>
-                    {formatFileSize(selectedFile.size)} · {selectedFile.type || 'unknown'}
-                  </p>
+        {/* === Type-specific content areas === */}
+
+        {/* File upload area (file type) */}
+        {assetType === 'file' && (
+          <div style={styles.fieldGroup}>
+            <label style={styles.label}>파일 업로드 *</label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              onChange={handleFileSelect}
+              style={{ display: 'none' }}
+            />
+            {selectedFile ? (
+              <div style={styles.fileSelected}>
+                <div style={styles.fileInfo}>
+                  <FileText size={20} style={{ color: colors.primary, flexShrink: 0 }} />
+                  <div>
+                    <p style={styles.fileName}>{selectedFile.name}</p>
+                    <p style={styles.fileMeta}>
+                      {formatFileSize(selectedFile.size)} · {selectedFile.type || 'unknown'}
+                    </p>
+                  </div>
                 </div>
+                <button onClick={handleRemoveFile} style={styles.removeFileBtn} title="파일 제거">
+                  <X size={16} />
+                </button>
               </div>
-              <button onClick={handleRemoveFile} style={styles.removeFileBtn} title="파일 제거">
-                <X size={16} />
-              </button>
+            ) : (
+              <div
+                style={styles.uploadArea}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Upload size={32} style={{ color: colors.neutral400 }} />
+                <p style={styles.uploadText}>파일을 클릭하여 업로드하세요</p>
+                <p style={styles.uploadHint}>
+                  {fromNeture
+                    ? '공급자 자료의 파일은 자동으로 복사되지 않습니다. 다운로드한 파일을 여기에 업로드해주세요.'
+                    : '이미지, PDF 등 매장에서 사용할 파일을 업로드하세요.'}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Rich text editor (content type) */}
+        {assetType === 'content' && (
+          <div style={styles.fieldGroup}>
+            <label style={styles.label}>콘텐츠 작성 *</label>
+            <div style={styles.editorWrapper}>
+              <RichTextEditor
+                value={htmlContent}
+                onChange={(content) => setHtmlContent(content.html)}
+                placeholder="콘텐츠를 작성하세요..."
+              />
             </div>
-          ) : (
-            <div
-              style={styles.uploadArea}
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <Upload size={32} style={{ color: colors.neutral400 }} />
-              <p style={styles.uploadText}>파일을 클릭하여 업로드하세요</p>
-              <p style={styles.uploadHint}>
-                {fromNeture
-                  ? '공급자 자료의 파일은 자동으로 복사되지 않습니다. 다운로드한 파일을 여기에 업로드해주세요.'
-                  : '이미지, PDF 등 매장에서 사용할 파일을 업로드하세요.'}
-              </p>
-            </div>
-          )}
-        </div>
+          </div>
+        )}
+
+        {/* URL input (external-link type) */}
+        {assetType === 'external-link' && (
+          <div style={styles.fieldGroup}>
+            <label style={styles.label}>외부 링크 URL *</label>
+            <input
+              type="url"
+              value={externalUrl}
+              onChange={(e) => setExternalUrl(e.target.value)}
+              placeholder="https://example.com"
+              style={styles.input}
+            />
+            <p style={{ margin: '6px 0 0', fontSize: '12px', color: colors.neutral400 }}>
+              YouTube, 블로그 등 외부 URL을 입력하세요.
+            </p>
+          </div>
+        )}
 
         {/* Image preview (if prefilled) */}
         {imageUrl && (
@@ -405,6 +500,32 @@ const styles: Record<string, React.CSSProperties> = {
     fontFamily: 'inherit',
     boxSizing: 'border-box' as const,
   },
+  // Asset type selector
+  assetTypeTabs: {
+    display: 'flex',
+    gap: '8px',
+  },
+  assetTypeTab: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '8px 16px',
+    backgroundColor: '#fff',
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: '8px',
+    fontSize: '14px',
+    color: colors.neutral600,
+    cursor: 'pointer',
+    fontWeight: 400,
+    transition: 'all 0.15s',
+  },
+  assetTypeTabActive: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+    color: '#fff',
+    fontWeight: 500,
+  },
+  // File upload
   uploadArea: {
     display: 'flex',
     flexDirection: 'column' as const,
@@ -471,6 +592,13 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.neutral500,
     cursor: 'pointer',
     flexShrink: 0,
+  },
+  // Editor
+  editorWrapper: {
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: '8px',
+    overflow: 'hidden',
+    minHeight: '300px',
   },
   previewBox: {
     border: `1px solid ${colors.neutral200}`,

@@ -28,6 +28,8 @@ export interface NetureLibraryItem {
   imageUrl: string | null;
 }
 
+export type AssetType = 'file' | 'content' | 'external-link';
+
 export interface StoreLibraryItem {
   id: string;
   organizationId: string;
@@ -38,6 +40,10 @@ export interface StoreLibraryItem {
   fileSize: number | null;
   mimeType: string | null;
   category: string | null;
+  assetType: AssetType;
+  url: string | null;
+  htmlContent: string | null;
+  sourceType: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -51,6 +57,10 @@ export interface CreateStoreLibraryParams {
   fileSize?: number;
   mimeType?: string;
   category?: string;
+  assetType?: AssetType;
+  url?: string;
+  htmlContent?: string;
+  sourceType?: string;
 }
 
 /**
@@ -117,6 +127,8 @@ export interface UpdateStoreLibraryParams {
   fileSize?: number;
   mimeType?: string;
   category?: string;
+  url?: string;
+  htmlContent?: string;
 }
 
 /**
