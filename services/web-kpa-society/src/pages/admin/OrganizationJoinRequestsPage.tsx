@@ -3,15 +3,16 @@
  *
  * WO-CONTEXT-JOIN-REQUEST-MVP-V1
  * WO-O4O-TABLE-STANDARD-V2 — DataTable 표준 전환
+ * WO-O4O-TABLE-STANDARD-V3 — Batch API + ActionBar v2 + AI 요약
  *
  * 공통 joinRequestApi 사용
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { CheckCircle, XCircle } from 'lucide-react';
+import { CheckCircle, XCircle, Sparkles } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
-import { ActionBar } from '@o4o/ui';
-import { DataTable, Pagination } from '@o4o/operator-ux-core';
+import { ActionBar, BulkResultModal } from '@o4o/ui';
+import { DataTable, Pagination, useBatchAction } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { joinRequestApi } from '../../api/joinRequestApi';
 import type { OrganizationJoinRequest } from '../../types/joinRequest';
@@ -31,9 +32,21 @@ export function OrganizationJoinRequestsPage() {
   const [reviewNoteId, setReviewNoteId] = useState<string | null>(null);
   const [reviewNote, setReviewNote] = useState('');
 
-  // Selection & Bulk
+  // Selection
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
+
+  // V3: Batch action hook
+  const batch = useBatchAction();
+
+  // V3: AI summary state
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiSummary, setAiSummary] = useState<{
+    summary: string;
+    patterns: string[];
+    recommendations: string[];
+    warnings: string[];
+    source: 'ai' | 'rule-based';
+  } | null>(null);
 
   const loadRequests = useCallback(async () => {
     try {
@@ -57,6 +70,7 @@ export function OrganizationJoinRequestsPage() {
   // Reset selection on page change
   useEffect(() => {
     setSelectedIds(new Set());
+    setAiSummary(null);
   }, [page]);
 
   const handleApprove = async (id: string) => {
@@ -91,38 +105,70 @@ export function OrganizationJoinRequestsPage() {
     }
   };
 
-  // ─── Bulk Actions ───
+  // ─── V3: Batch Actions (single API call) ───
 
-  const handleBulkApprove = async () => {
+  const handleBatchApprove = async () => {
     if (selectedIds.size === 0) return;
-    setIsBulkProcessing(true);
-    let success = 0;
-    for (const id of selectedIds) {
-      try {
-        await joinRequestApi.approve(id);
-        success++;
-      } catch { /* continue */ }
+    const ids = Array.from(selectedIds);
+    const result = await batch.executeBatch(
+      (batchIds) => joinRequestApi.batchApprove(batchIds),
+      ids,
+    );
+    if (result.successCount > 0) {
+      setSelectedIds(new Set());
+      loadRequests();
     }
-    setIsBulkProcessing(false);
-    setSelectedIds(new Set());
-    toast.success(`${success}건 일괄 승인 완료`);
-    loadRequests();
   };
 
-  const handleBulkReject = async () => {
+  const handleBatchReject = async () => {
     if (selectedIds.size === 0) return;
-    setIsBulkProcessing(true);
-    let success = 0;
-    for (const id of selectedIds) {
-      try {
-        await joinRequestApi.reject(id, '일괄 반려');
-        success++;
-      } catch { /* continue */ }
+    const ids = Array.from(selectedIds);
+    const result = await batch.executeBatch(
+      (batchIds) => joinRequestApi.batchReject(batchIds, '일괄 반려'),
+      ids,
+    );
+    if (result.successCount > 0) {
+      setSelectedIds(new Set());
+      loadRequests();
     }
-    setIsBulkProcessing(false);
-    setSelectedIds(new Set());
-    toast.success(`${success}건 일괄 반려 완료`);
-    loadRequests();
+  };
+
+  // ─── V3: AI Summary ───
+
+  const handleAiSummarize = async () => {
+    if (selectedIds.size === 0) return;
+    setAiLoading(true);
+    try {
+      const selectedItems = requests.filter(r => selectedIds.has(r.id));
+      const items = selectedItems.map(r => ({
+        id: r.id,
+        request_type: r.request_type,
+        requested_role: r.requested_role,
+        requested_sub_role: r.requested_sub_role,
+        organization_id: r.organization_id,
+        status: r.status,
+        created_at: r.created_at,
+      }));
+      const res = await joinRequestApi.aiSummarize(items, '조직 가입/역할 요청');
+      setAiSummary(res.data);
+    } catch (err: any) {
+      toast.error('AI 요약에 실패했습니다.');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  // ─── V3: Status Info (선택 항목 분포) ───
+
+  const buildStatusInfo = (): string | undefined => {
+    if (selectedIds.size === 0) return undefined;
+    const selected = requests.filter(r => selectedIds.has(r.id));
+    const typeCounts: Record<string, number> = {};
+    for (const r of selected) {
+      const label = JOIN_REQUEST_TYPE_LABELS[r.request_type] || r.request_type;
+      typeCounts[label] = (typeCounts[label] || 0) + 1;
+    }
+    return Object.entries(typeCounts).map(([k, v]) => `${k} ${v}건`).join(' / ');
   };
 
   // ─── Column Definitions ───
@@ -239,29 +285,78 @@ export function OrganizationJoinRequestsPage() {
       <h2 className="text-xl font-bold text-slate-800 mb-2">조직 가입/역할 요청 관리</h2>
       <p className="text-sm text-slate-500 mb-6">대기 중인 가입 및 역할 요청을 확인하고 승인/반려합니다.</p>
 
-      {/* ActionBar */}
+      {/* V3: ActionBar with grouping + statusInfo */}
       <ActionBar
         selectedCount={selectedIds.size}
-        onClearSelection={() => setSelectedIds(new Set())}
+        onClearSelection={() => { setSelectedIds(new Set()); setAiSummary(null); }}
+        statusInfo={buildStatusInfo()}
         actions={[
           {
             key: 'approve',
             label: `승인 (${selectedIds.size})`,
-            onClick: handleBulkApprove,
+            onClick: handleBatchApprove,
             variant: 'primary',
             icon: <CheckCircle size={14} />,
-            loading: isBulkProcessing,
+            loading: batch.loading,
+            group: 'actions',
+            tooltip: '선택된 요청을 일괄 승인합니다',
           },
           {
             key: 'reject',
             label: `반려 (${selectedIds.size})`,
-            onClick: handleBulkReject,
+            onClick: handleBatchReject,
             variant: 'danger',
             icon: <XCircle size={14} />,
-            loading: isBulkProcessing,
+            loading: batch.loading,
+            group: 'actions',
+            tooltip: '선택된 요청을 일괄 반려합니다',
+          },
+          {
+            key: 'ai-summary',
+            label: 'AI 요약',
+            onClick: handleAiSummarize,
+            variant: 'default',
+            icon: <Sparkles size={14} />,
+            loading: aiLoading,
+            group: 'ai',
+            tooltip: '선택된 항목을 AI로 분석합니다',
+            visible: selectedIds.size >= 2,
           },
         ]}
       />
+
+      {/* V3: AI Summary Result */}
+      {aiSummary && (
+        <div className="mt-3 p-4 bg-violet-50 border border-violet-200 rounded-lg space-y-2">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-violet-600" />
+            <span className="text-sm font-medium text-violet-800">AI 분석 결과</span>
+            <span className="text-xs text-violet-500">({aiSummary.source})</span>
+            <button
+              onClick={() => setAiSummary(null)}
+              className="ml-auto text-xs text-violet-500 hover:text-violet-700"
+            >
+              닫기
+            </button>
+          </div>
+          <p className="text-sm text-slate-700">{aiSummary.summary}</p>
+          {aiSummary.patterns.length > 0 && (
+            <div className="text-xs text-slate-600">
+              <span className="font-medium">패턴:</span> {aiSummary.patterns.join(' / ')}
+            </div>
+          )}
+          {aiSummary.recommendations.length > 0 && (
+            <div className="text-xs text-blue-700">
+              <span className="font-medium">추천:</span> {aiSummary.recommendations.join(' / ')}
+            </div>
+          )}
+          {aiSummary.warnings.length > 0 && (
+            <div className="text-xs text-amber-700">
+              <span className="font-medium">주의:</span> {aiSummary.warnings.join(' / ')}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* DataTable */}
       <DataTable<OrganizationJoinRequest>
@@ -282,6 +377,16 @@ export function OrganizationJoinRequestsPage() {
         totalPages={totalPages}
         onPageChange={setPage}
         total={total}
+      />
+
+      {/* V3: BulkResultModal */}
+      <BulkResultModal
+        open={batch.showResult}
+        onClose={() => { batch.clearResult(); loadRequests(); }}
+        result={batch.result}
+        onRetry={() => {
+          batch.retryFailed();
+        }}
       />
     </div>
   );

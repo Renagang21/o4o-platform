@@ -66,4 +66,25 @@ export const joinRequestApi = {
       `/organization-join-requests/${id}/reject`,
       { reviewNote }
     ),
+
+  /** V3: 일괄 승인 */
+  batchApprove: (ids: string[], reviewNote?: string) =>
+    apiClient.post<ApiResponse<{ results: Array<{ id: string; status: 'success' | 'skipped' | 'failed'; error?: string }> }>>(
+      '/organization-join-requests/batch-approve',
+      { ids, reviewNote }
+    ),
+
+  /** V3: 일괄 반려 */
+  batchReject: (ids: string[], reviewNote?: string) =>
+    apiClient.post<ApiResponse<{ results: Array<{ id: string; status: 'success' | 'skipped' | 'failed'; error?: string }> }>>(
+      '/organization-join-requests/batch-reject',
+      { ids, reviewNote }
+    ),
+
+  /** V3: AI 선택 요약 */
+  aiSummarize: (items: Record<string, unknown>[], context?: string) =>
+    apiClient.post<ApiResponse<{ summary: string; patterns: string[]; recommendations: string[]; warnings: string[]; source: 'ai' | 'rule-based' }>>(
+      '/operator/ai/summarize-selection',
+      { items, context }
+    ),
 };

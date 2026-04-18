@@ -48,6 +48,91 @@ export function createOrganizationJoinRequestRoutes(
   const getRepo = () => dataSource.getRepository(KpaOrganizationJoinRequest);
   const getMemberService = () => new OrganizationMemberService(dataSource);
 
+  // =========================================================================
+  // Shared Helpers (extracted for single-item + batch reuse)
+  // =========================================================================
+
+  /** Apply membership + user sync + email on approval */
+  async function applyApproval(
+    userId: string, orgId: string, requestType: string, requestedRole: string,
+    requestedSubRole: string | null, reviewerUserId: string, requestId?: string,
+  ) {
+    const memberService = getMemberService();
+    try {
+      if (requestType === 'join') {
+        await memberService.addMember(orgId, {
+          userId,
+          role: requestedRole as any,
+          metadata: requestedSubRole ? { subRole: requestedSubRole } : undefined,
+        });
+      } else {
+        await memberService.updateMemberRole(orgId, userId, {
+          role: requestedRole as any,
+          metadata: requestedSubRole ? { subRole: requestedSubRole } : undefined,
+        });
+      }
+    } catch (memberError: any) {
+      logger.warn(`Member service error during approval of request ${requestId || 'batch'}: ${memberError.message}`);
+    }
+
+    try {
+      await dataSource.query(
+        `UPDATE users SET status = 'active', "isActive" = true, "approvedAt" = NOW(), "approvedBy" = $2
+         WHERE id = $1 AND status != 'active'`,
+        [userId, reviewerUserId]
+      );
+    } catch (syncError) {
+      logger.error('[WO-KPA-C-APPROVAL-USER-SYNC] User status sync failed:', syncError);
+    }
+
+    try {
+      const userRepo = dataSource.getRepository(User);
+      const appUser = await userRepo.findOne({ where: { id: userId } });
+      const applicantEmail = appUser?.email;
+      const applicantName = appUser?.name || appUser?.email || 'Unknown';
+      const decidedAt = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+      const serviceNameMap: Record<string, string> = {
+        join: 'KPA 약사회', promotion: 'KPA 역할 승격', operator: 'KPA 운영자',
+      };
+      const serviceName = serviceNameMap[requestType] || 'KPA Society';
+      if (applicantEmail && emailService.isServiceAvailable()) {
+        await emailService.sendServiceApplicationApprovedEmail(applicantEmail, {
+          serviceName, applicantName, approvedAt: decidedAt,
+          serviceUrl: process.env.KPA_URL || 'https://kpa-society.co.kr',
+          supportEmail: 'support@kpa-society.co.kr',
+        });
+        logger.info(`[KPA] Join request approval notification sent to ${applicantEmail}`);
+      }
+    } catch (emailError) {
+      logger.error('[KPA] Failed to send join request approval email:', emailError);
+    }
+  }
+
+  /** Send rejection email notification */
+  async function sendRejectionEmail(userId: string, requestType: string, note?: string) {
+    try {
+      const userRepo = dataSource.getRepository(User);
+      const appUser = await userRepo.findOne({ where: { id: userId } });
+      const applicantEmail = appUser?.email;
+      const applicantName = appUser?.name || appUser?.email || 'Unknown';
+      const decidedAt = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+      const serviceNameMap: Record<string, string> = {
+        join: 'KPA 약사회', promotion: 'KPA 역할 승격', operator: 'KPA 운영자',
+      };
+      const serviceName = serviceNameMap[requestType] || 'KPA Society';
+      if (applicantEmail && emailService.isServiceAvailable()) {
+        await emailService.sendServiceApplicationRejectedEmail(applicantEmail, {
+          serviceName, applicantName, rejectedAt: decidedAt,
+          rejectionReason: note?.trim() || undefined,
+          supportEmail: 'support@kpa-society.co.kr',
+        });
+        logger.info(`[KPA] Join request rejection notification sent to ${applicantEmail}`);
+      }
+    } catch (emailError) {
+      logger.error('[KPA] Failed to send join request rejection email:', emailError);
+    }
+  }
+
   // 모든 엔드포인트 인증 필수
   router.use(requireAuth);
 
@@ -367,70 +452,6 @@ export function createOrganizationJoinRequestRoutes(
       const { id } = req.params;
       const { reviewNote } = req.body;
 
-      // Helper: apply member and send email
-      async function applyApproval(userId: string, orgId: string, requestType: string, requestedRole: string, requestedSubRole: string | null) {
-        const memberService = getMemberService();
-        try {
-          if (requestType === 'join') {
-            await memberService.addMember(orgId, {
-              userId,
-              role: requestedRole as any,
-              metadata: requestedSubRole ? { subRole: requestedSubRole } : undefined,
-            });
-          } else {
-            await memberService.updateMemberRole(orgId, userId, {
-              role: requestedRole as any,
-              metadata: requestedSubRole ? { subRole: requestedSubRole } : undefined,
-            });
-          }
-        } catch (memberError: any) {
-          logger.warn(`Member service error during approval of request ${id}: ${memberError.message}`);
-        }
-
-        // User.status ACTIVE
-        try {
-          await dataSource.query(
-            `UPDATE users SET status = 'active', "isActive" = true, "approvedAt" = NOW(), "approvedBy" = $2
-             WHERE id = $1 AND status != 'active'`,
-            [userId, user.id]
-          );
-        } catch (syncError) {
-          logger.error('[WO-KPA-C-APPROVAL-USER-SYNC] User status sync failed:', syncError);
-        }
-
-        // Email notification
-        try {
-          const userRepo = dataSource.getRepository(User);
-          const appUser = await userRepo.findOne({ where: { id: userId } });
-          const applicantEmail = appUser?.email;
-          const applicantName = appUser?.name || appUser?.email || 'Unknown';
-          const decidedAt = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
-
-          const serviceNameMap: Record<string, string> = {
-            join: 'KPA 약사회',
-            promotion: 'KPA 역할 승격',
-            operator: 'KPA 운영자',
-          };
-          const serviceName = serviceNameMap[requestType] || 'KPA Society';
-
-          if (applicantEmail && emailService.isServiceAvailable()) {
-            await emailService.sendServiceApplicationApprovedEmail(
-              applicantEmail,
-              {
-                serviceName,
-                applicantName,
-                approvedAt: decidedAt,
-                serviceUrl: process.env.KPA_URL || 'https://kpa-society.co.kr',
-                supportEmail: 'support@kpa-society.co.kr',
-              }
-            );
-            logger.info(`[KPA] Join request approval notification sent to ${applicantEmail}`);
-          }
-        } catch (emailError) {
-          logger.error('[KPA] Failed to send join request approval email:', emailError);
-        }
-      }
-
       // Try unified table first
       const [arRow] = await dataSource.query(
         `SELECT id, requester_id, organization_id, payload, status FROM kpa_approval_requests WHERE id = $1 AND entity_type = 'membership' LIMIT 1`,
@@ -451,7 +472,7 @@ export function createOrganizationJoinRequestRoutes(
           [user.id, reviewNote?.trim() || null, id],
         );
 
-        await applyApproval(arRow.requester_id, arRow.organization_id, payload?.request_type || 'join', payload?.requested_role || 'member', payload?.requested_sub_role || null);
+        await applyApproval(arRow.requester_id, arRow.organization_id, payload?.request_type || 'join', payload?.requested_role || 'member', payload?.requested_sub_role || null, user.id, id);
 
         logger.info(`Organization join request approved (unified): ${id} by ${user.id}`);
         actionLogService?.logSuccess('kpa-society', user.id, 'kpa.operator.org_join_approve', {
@@ -489,7 +510,7 @@ export function createOrganizationJoinRequestRoutes(
       request.review_note = reviewNote?.trim() || null;
       await repo.save(request);
 
-      await applyApproval(request.user_id, request.organization_id, request.request_type, request.requested_role, request.requested_sub_role);
+      await applyApproval(request.user_id, request.organization_id, request.request_type, request.requested_role, request.requested_sub_role, user.id, id);
 
       logger.info(`Organization join request approved (legacy): ${id} by ${user.id}`);
       actionLogService?.logSuccess('kpa-society', user.id, 'kpa.operator.org_join_approve', {
@@ -519,40 +540,6 @@ export function createOrganizationJoinRequestRoutes(
       const { id } = req.params;
       const { reviewNote } = req.body;
 
-      // Helper: send rejection email
-      async function sendRejectionEmail(userId: string, requestType: string) {
-        try {
-          const userRepo = dataSource.getRepository(User);
-          const appUser = await userRepo.findOne({ where: { id: userId } });
-          const applicantEmail = appUser?.email;
-          const applicantName = appUser?.name || appUser?.email || 'Unknown';
-          const decidedAt = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
-
-          const serviceNameMap: Record<string, string> = {
-            join: 'KPA 약사회',
-            promotion: 'KPA 역할 승격',
-            operator: 'KPA 운영자',
-          };
-          const serviceName = serviceNameMap[requestType] || 'KPA Society';
-
-          if (applicantEmail && emailService.isServiceAvailable()) {
-            await emailService.sendServiceApplicationRejectedEmail(
-              applicantEmail,
-              {
-                serviceName,
-                applicantName,
-                rejectedAt: decidedAt,
-                rejectionReason: reviewNote?.trim() || undefined,
-                supportEmail: 'support@kpa-society.co.kr',
-              }
-            );
-            logger.info(`[KPA] Join request rejection notification sent to ${applicantEmail}`);
-          }
-        } catch (emailError) {
-          logger.error('[KPA] Failed to send join request rejection email:', emailError);
-        }
-      }
-
       // Try unified table first
       const [arRow] = await dataSource.query(
         `SELECT id, requester_id, payload, status FROM kpa_approval_requests WHERE id = $1 AND entity_type = 'membership' LIMIT 1`,
@@ -573,7 +560,7 @@ export function createOrganizationJoinRequestRoutes(
           [user.id, reviewNote?.trim() || null, id],
         );
 
-        await sendRejectionEmail(arRow.requester_id, payload?.request_type || 'join');
+        await sendRejectionEmail(arRow.requester_id, payload?.request_type || 'join', reviewNote);
 
         logger.info(`Organization join request rejected (unified): ${id} by ${user.id}`);
         actionLogService?.logSuccess('kpa-society', user.id, 'kpa.operator.org_join_reject', {
@@ -610,7 +597,7 @@ export function createOrganizationJoinRequestRoutes(
       request.review_note = reviewNote?.trim() || null;
       await repo.save(request);
 
-      await sendRejectionEmail(request.user_id, request.request_type);
+      await sendRejectionEmail(request.user_id, request.request_type, reviewNote);
 
       logger.info(`Organization join request rejected (legacy): ${id} by ${user.id}`);
       actionLogService?.logSuccess('kpa-society', user.id, 'kpa.operator.org_join_reject', {
@@ -628,6 +615,178 @@ export function createOrganizationJoinRequestRoutes(
         error: '반려 처리 중 오류가 발생했습니다.',
         code: 'INTERNAL_ERROR',
       });
+    }
+  });
+
+  // =========================================================================
+  // POST /batch-approve — 일괄 승인 (kpa:admin)
+  // =========================================================================
+  router.post('/batch-approve', requireScope('kpa:admin'), async (req: Request, res: Response) => {
+    try {
+      const user = (req as any).user;
+      const { ids, reviewNote } = req.body;
+
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ success: false, error: 'ids 배열이 필요합니다.', code: 'INVALID_INPUT' });
+      }
+      if (ids.length > 50) {
+        return res.status(400).json({ success: false, error: '최대 50건까지 일괄 처리 가능합니다.', code: 'TOO_MANY_ITEMS' });
+      }
+
+      const results: Array<{ id: string; status: 'success' | 'skipped' | 'failed'; error?: string }> = [];
+
+      for (const id of ids) {
+        try {
+          // Try unified table first
+          const [arRow] = await dataSource.query(
+            `SELECT id, requester_id, organization_id, payload, status FROM kpa_approval_requests WHERE id = $1 AND entity_type = 'membership' LIMIT 1`,
+            [id],
+          );
+
+          if (arRow) {
+            if (arRow.status !== 'pending') {
+              results.push({ id, status: 'skipped', error: `이미 처리됨 (${arRow.status})` });
+              continue;
+            }
+            const payload = typeof arRow.payload === 'string' ? JSON.parse(arRow.payload) : arRow.payload;
+
+            await dataSource.query(
+              `UPDATE kpa_approval_requests SET status = 'approved', reviewed_by = $1, reviewed_at = NOW(), review_comment = $2, updated_at = NOW() WHERE id = $3`,
+              [user.id, reviewNote?.trim() || null, id],
+            );
+            await applyApproval(arRow.requester_id, arRow.organization_id, payload?.request_type || 'join', payload?.requested_role || 'member', payload?.requested_sub_role || null, user.id, id);
+
+            actionLogService?.logSuccess('kpa-society', user.id, 'kpa.operator.org_join_approve', {
+              meta: { targetId: id, requestType: payload?.request_type, statusBefore: 'pending', statusAfter: 'approved', batch: true },
+            }).catch(() => {});
+
+            results.push({ id, status: 'success' });
+            continue;
+          }
+
+          // Fallback: legacy table
+          const repo = getRepo();
+          const request = await repo.findOne({ where: { id } });
+          if (!request) {
+            results.push({ id, status: 'failed', error: '요청을 찾을 수 없습니다.' });
+            continue;
+          }
+          if (request.status !== 'pending') {
+            results.push({ id, status: 'skipped', error: `이미 처리됨 (${request.status})` });
+            continue;
+          }
+
+          request.status = 'approved';
+          request.reviewed_by = user.id;
+          request.reviewed_at = new Date();
+          request.review_note = reviewNote?.trim() || null;
+          await repo.save(request);
+
+          await applyApproval(request.user_id, request.organization_id, request.request_type, request.requested_role, request.requested_sub_role, user.id, id);
+
+          actionLogService?.logSuccess('kpa-society', user.id, 'kpa.operator.org_join_approve', {
+            meta: { targetId: id, requestType: request.request_type, statusBefore: 'pending', statusAfter: 'approved', batch: true },
+          }).catch(() => {});
+
+          results.push({ id, status: 'success' });
+        } catch (itemError: any) {
+          logger.error(`[batch-approve] Failed for id=${id}:`, itemError);
+          results.push({ id, status: 'failed', error: itemError.message || '처리 중 오류' });
+        }
+      }
+
+      logger.info(`[batch-approve] Processed ${ids.length} items by ${user.id}: ${results.filter(r => r.status === 'success').length} success, ${results.filter(r => r.status === 'failed').length} failed, ${results.filter(r => r.status === 'skipped').length} skipped`);
+
+      return res.json({ success: true, data: { results } });
+    } catch (error) {
+      logger.error('Failed to batch-approve join requests:', error);
+      return res.status(500).json({ success: false, error: '일괄 승인 처리 중 오류가 발생했습니다.', code: 'INTERNAL_ERROR' });
+    }
+  });
+
+  // =========================================================================
+  // POST /batch-reject — 일괄 반려 (kpa:admin)
+  // =========================================================================
+  router.post('/batch-reject', requireScope('kpa:admin'), async (req: Request, res: Response) => {
+    try {
+      const user = (req as any).user;
+      const { ids, reviewNote } = req.body;
+
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ success: false, error: 'ids 배열이 필요합니다.', code: 'INVALID_INPUT' });
+      }
+      if (ids.length > 50) {
+        return res.status(400).json({ success: false, error: '최대 50건까지 일괄 처리 가능합니다.', code: 'TOO_MANY_ITEMS' });
+      }
+
+      const results: Array<{ id: string; status: 'success' | 'skipped' | 'failed'; error?: string }> = [];
+
+      for (const id of ids) {
+        try {
+          // Try unified table first
+          const [arRow] = await dataSource.query(
+            `SELECT id, requester_id, payload, status FROM kpa_approval_requests WHERE id = $1 AND entity_type = 'membership' LIMIT 1`,
+            [id],
+          );
+
+          if (arRow) {
+            if (arRow.status !== 'pending') {
+              results.push({ id, status: 'skipped', error: `이미 처리됨 (${arRow.status})` });
+              continue;
+            }
+            const payload = typeof arRow.payload === 'string' ? JSON.parse(arRow.payload) : arRow.payload;
+
+            await dataSource.query(
+              `UPDATE kpa_approval_requests SET status = 'rejected', reviewed_by = $1, reviewed_at = NOW(), review_comment = $2, updated_at = NOW() WHERE id = $3`,
+              [user.id, reviewNote?.trim() || null, id],
+            );
+            await sendRejectionEmail(arRow.requester_id, payload?.request_type || 'join', reviewNote);
+
+            actionLogService?.logSuccess('kpa-society', user.id, 'kpa.operator.org_join_reject', {
+              meta: { targetId: id, reason: reviewNote?.trim(), statusBefore: 'pending', statusAfter: 'rejected', batch: true },
+            }).catch(() => {});
+
+            results.push({ id, status: 'success' });
+            continue;
+          }
+
+          // Fallback: legacy table
+          const repo = getRepo();
+          const request = await repo.findOne({ where: { id } });
+          if (!request) {
+            results.push({ id, status: 'failed', error: '요청을 찾을 수 없습니다.' });
+            continue;
+          }
+          if (request.status !== 'pending') {
+            results.push({ id, status: 'skipped', error: `이미 처리됨 (${request.status})` });
+            continue;
+          }
+
+          request.status = 'rejected';
+          request.reviewed_by = user.id;
+          request.reviewed_at = new Date();
+          request.review_note = reviewNote?.trim() || null;
+          await repo.save(request);
+
+          await sendRejectionEmail(request.user_id, request.request_type, reviewNote);
+
+          actionLogService?.logSuccess('kpa-society', user.id, 'kpa.operator.org_join_reject', {
+            meta: { targetId: id, reason: reviewNote?.trim(), statusBefore: 'pending', statusAfter: 'rejected', batch: true },
+          }).catch(() => {});
+
+          results.push({ id, status: 'success' });
+        } catch (itemError: any) {
+          logger.error(`[batch-reject] Failed for id=${id}:`, itemError);
+          results.push({ id, status: 'failed', error: itemError.message || '처리 중 오류' });
+        }
+      }
+
+      logger.info(`[batch-reject] Processed ${ids.length} items by ${user.id}: ${results.filter(r => r.status === 'success').length} success, ${results.filter(r => r.status === 'failed').length} failed, ${results.filter(r => r.status === 'skipped').length} skipped`);
+
+      return res.json({ success: true, data: { results } });
+    } catch (error) {
+      logger.error('Failed to batch-reject join requests:', error);
+      return res.status(500).json({ success: false, error: '일괄 반려 처리 중 오류가 발생했습니다.', code: 'INTERNAL_ERROR' });
     }
   });
 

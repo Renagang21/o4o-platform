@@ -239,6 +239,73 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // Organization Join Request routes (WO-CONTEXT-JOIN-REQUEST-MVP-V1)
   router.use('/organization-join-requests', createOrganizationJoinRequestRoutes(dataSource, coreRequireAuth as any, requireKpaScope, kpaActionLogService));
 
+  // ── AI Selection Summary (WO-O4O-TABLE-STANDARD-V3) ──
+  router.post('/operator/ai/summarize-selection', coreRequireAuth as any, requireKpaScope('kpa:admin') as any, asyncHandler(async (req: Request, res: Response) => {
+    const { items, context } = req.body;
+    if (!Array.isArray(items) || items.length === 0) {
+      res.status(400).json({ success: false, error: 'items 배열이 필요합니다.', code: 'INVALID_INPUT' });
+      return;
+    }
+    if (items.length > 20) {
+      res.status(400).json({ success: false, error: '최대 20개 항목까지 요약 가능합니다.', code: 'TOO_MANY_ITEMS' });
+      return;
+    }
+
+    // Truncate data to ~4000 chars
+    const dataStr = JSON.stringify(items).slice(0, 4000);
+
+    const systemPrompt = `당신은 운영자 대시보드 AI 어시스턴트입니다. 선택된 항목 데이터를 분석하여 패턴, 추천, 주의사항을 한국어로 요약합니다.
+
+응답 형식 (JSON):
+{
+  "summary": "전체 요약 (1-3문장)",
+  "patterns": ["발견된 패턴 1", "패턴 2"],
+  "recommendations": ["추천 액션 1", "추천 액션 2"],
+  "warnings": ["주의사항 (있을 경우)"]
+}`;
+
+    const userPrompt = `다음 ${items.length}개 항목을 분석해 주세요.${context ? `\n맥락: ${context}` : ''}\n\n데이터:\n${dataStr}`;
+
+    try {
+      const result = await execute({
+        systemPrompt,
+        userPrompt,
+        config: buildConfigResolver(dataSource, 'store'),
+        timeoutMs: 5000,
+        meta: { service: 'kpa', callerName: 'KpaSelectionSummarize' },
+      });
+      const parsed = JSON.parse(result.content);
+      res.json({ success: true, data: { ...parsed, source: 'ai' as const } });
+    } catch (e: any) {
+      console.error('[KPA AI Selection Summarize] Failed, using rule-based fallback:', e.message);
+
+      // Rule-based fallback: count by type/organization/status
+      const statusCounts: Record<string, number> = {};
+      const orgCounts: Record<string, number> = {};
+      const typeCounts: Record<string, number> = {};
+      for (const item of items) {
+        if (item.status) statusCounts[item.status] = (statusCounts[item.status] || 0) + 1;
+        if (item.organization_id) orgCounts[item.organization_id] = (orgCounts[item.organization_id] || 0) + 1;
+        if (item.request_type) typeCounts[item.request_type] = (typeCounts[item.request_type] || 0) + 1;
+      }
+
+      const patterns: string[] = [];
+      if (Object.keys(typeCounts).length > 0) patterns.push(`유형별: ${Object.entries(typeCounts).map(([k, v]) => `${k} ${v}건`).join(', ')}`);
+      if (Object.keys(orgCounts).length > 0) patterns.push(`${Object.keys(orgCounts).length}개 조직에서 요청`);
+
+      res.json({
+        success: true,
+        data: {
+          summary: `선택된 ${items.length}개 항목 분석 결과`,
+          patterns,
+          recommendations: items.length >= 5 ? ['일괄 처리를 권장합니다'] : [],
+          warnings: [],
+          source: 'rule-based' as const,
+        },
+      });
+    }
+  }));
+
   // Pharmacy Request routes (WO-KPA-A-PHARMACY-REQUEST-STRUCTURE-REALIGN-V1)
   // 약국 서비스 신청 — 개인 신원 확장 (OrganizationJoinRequest에서 분리)
   router.use('/pharmacy-requests', createPharmacyRequestRoutes(dataSource, coreRequireAuth as any, requireKpaScope, kpaActionLogService));
