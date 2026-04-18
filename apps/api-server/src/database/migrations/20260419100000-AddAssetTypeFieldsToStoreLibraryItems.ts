@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import type { MigrationInterface, QueryRunner } from 'typeorm';
 
 /**
  * WO-STORE-LIBRARY-ASSET-EXTENSION-V1
@@ -9,8 +9,7 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
  *   - html_content: 리치 텍스트 HTML (content 타입용)
  *   - source_type: 자료 출처 ('uploaded' | 'neture-prefill' | 'manual')
  */
-export class AddAssetTypeFieldsToStoreLibraryItems1726419100000 implements MigrationInterface {
-  name = '20260419100000-AddAssetTypeFieldsToStoreLibraryItems';
+export class AddAssetTypeFieldsToStoreLibraryItems20260419100000 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     // asset_type — 기본값 'file'로 기존 데이터 호환
