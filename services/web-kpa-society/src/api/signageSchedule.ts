@@ -4,8 +4,10 @@
  * WO-KPA-SOCIETY-DIGITAL-SIGNAGE-SCHEDULE-UI-IMPLEMENTATION-V1
  *
  * Backend: /api/signage/kpa-society/schedules (requireSignageStore)
- * Auth: cookie + X-Organization-Id header
+ * Auth: Bearer token (localStorage) + X-Organization-Id header
  */
+
+import { getAccessToken } from '../contexts/AuthContext';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 const BASE = `${API_BASE}/api/signage/kpa-society`;
@@ -64,9 +66,11 @@ export interface SignagePlaylistOption {
 /* ─── Helpers ───────────────────────────────── */
 
 function headers(organizationId: string): Record<string, string> {
+  const token = getAccessToken();
   return {
     'Content-Type': 'application/json',
     'X-Organization-Id': organizationId,
+    ...(token && { 'Authorization': `Bearer ${token}` }),
   };
 }
 
@@ -88,7 +92,7 @@ export async function fetchSchedules(
   const q = sp.toString();
   const url = q ? `${BASE}/schedules?${q}` : `${BASE}/schedules`;
 
-  const res = await fetch(url, { credentials: 'include', headers: headers(organizationId) });
+  const res = await fetch(url, { headers: headers(organizationId) });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const json = await res.json();
   return json.data ?? { items: json.items ?? json, total: json.total ?? 0 };
@@ -105,8 +109,7 @@ export async function createSchedule(
   };
   const res = await fetch(`${BASE}/schedules`, {
     method: 'POST',
-    credentials: 'include',
-    headers: headers(organizationId),
+        headers: headers(organizationId),
     body: JSON.stringify(body),
   });
   if (!res.ok) {
@@ -127,8 +130,7 @@ export async function updateSchedule(
   if (body.endTime) body.endTime = toApiTime(body.endTime);
   const res = await fetch(`${BASE}/schedules/${id}`, {
     method: 'PATCH',
-    credentials: 'include',
-    headers: headers(organizationId),
+        headers: headers(organizationId),
     body: JSON.stringify(body),
   });
   if (!res.ok) {
@@ -145,8 +147,7 @@ export async function deleteSchedule(
 ): Promise<void> {
   const res = await fetch(`${BASE}/schedules/${id}`, {
     method: 'DELETE',
-    credentials: 'include',
-    headers: headers(organizationId),
+        headers: headers(organizationId),
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
 }
@@ -155,8 +156,7 @@ export async function fetchSignagePlaylists(
   organizationId: string,
 ): Promise<SignagePlaylistOption[]> {
   const res = await fetch(`${BASE}/playlists?limit=100`, {
-    credentials: 'include',
-    headers: headers(organizationId),
+        headers: headers(organizationId),
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const json = await res.json();

@@ -4,10 +4,12 @@
  * WO-KPA-STORE-SIGNAGE-SCREENS-UI-CLEANUP-V1
  *
  * Backend: /api/signage/kpa-society/media (requireSignageStore)
- * Auth: cookie + X-Organization-Id header
+ * Auth: Bearer token (localStorage) + X-Organization-Id header
  *
  * Store 소유 signage_media CRUD (URL 기반 동영상 등록)
  */
+
+import { getAccessToken } from '../contexts/AuthContext';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 const BASE = `${API_BASE}/api/signage/kpa-society/media`;
@@ -39,9 +41,11 @@ export interface CreateSignageMediaPayload {
 /* ─── Helpers ───────────────────────────────── */
 
 function headers(organizationId: string): Record<string, string> {
+  const token = getAccessToken();
   return {
     'Content-Type': 'application/json',
     'X-Organization-Id': organizationId,
+    ...(token && { 'Authorization': `Bearer ${token}` }),
   };
 }
 
@@ -51,7 +55,7 @@ export async function fetchSignageMedia(
   organizationId: string,
 ): Promise<SignageMediaItem[]> {
   const res = await fetch(`${BASE}?limit=200`, {
-    credentials: 'include',
+
     headers: headers(organizationId),
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -68,7 +72,7 @@ export async function createSignageMedia(
 ): Promise<SignageMediaItem> {
   const res = await fetch(BASE, {
     method: 'POST',
-    credentials: 'include',
+
     headers: headers(organizationId),
     body: JSON.stringify(payload),
   });
@@ -86,7 +90,7 @@ export async function deleteSignageMedia(
 ): Promise<void> {
   const res = await fetch(`${BASE}/${id}`, {
     method: 'DELETE',
-    credentials: 'include',
+
     headers: headers(organizationId),
   });
   if (!res.ok) {
