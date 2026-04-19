@@ -9,9 +9,10 @@
 
 import { apiClient } from './client';
 import { communityApi, type CommunityAd, type CommunitySponsor, type CommunityQuickLink } from './community';
+import { newsApi } from './news';
 import type { SignageHomeMedia, SignageHomePlaylist } from '@o4o/types/signage';
 import type { ForumHomePost } from '@o4o/types/forum';
-import type { ForumHubItem, ForumActivityCategory } from '../types';
+import type { ForumHubItem, ForumActivityCategory, Notice } from '../types';
 
 interface HomeNotice {
   id: string;
@@ -84,6 +85,7 @@ interface ForumActivityResponse {
 
 export interface HomePageData {
   notices: HomeNotice[];
+  newsLatest: Notice[];
   community: { posts: HomeForumPost[]; featured: HomeFeatured[] };
   signage: { media: HomeMedia[]; playlists: HomePlaylist[] };
   forumHub: ForumHubItem[];
@@ -118,22 +120,27 @@ export const homeApi = {
    * WO-KPA-A-PUBLIC-HOME-INTEGRATION-AND-MENU-SIMPLIFICATION-V1
    * WO-KPA-A-HOME-HUB-ENHANCEMENT-V1: forumCategories 제거 → 7개 병렬 호출
    * WO-KPA-A-HOME-FOOTER-LINKS-MANAGEMENT-V1: quickLinks 추가 → 8개 병렬 호출
+   * WO-KPA-MAIN-HOME-RESTRUCTURE-V1: newsLatest 추가 → 9개 병렬 호출, signage limits 확대
    */
   async prefetchAll(): Promise<HomePageData> {
-    const [noticesRes, communityRes, signageRes, forumHubRes, heroRes, pageAdRes, sponsorRes, quickLinkRes] =
+    const [noticesRes, communityRes, signageRes, forumHubRes, heroRes, pageAdRes, sponsorRes, quickLinkRes, newsLatestRes] =
       await Promise.allSettled([
         apiClient.get<NoticesResponse>('/home/notices', { limit: 5 }),
         apiClient.get<CommunityResponse>('/home/community', { postLimit: 3, featuredLimit: 3 }),
-        apiClient.get<SignageResponse>('/home/signage', { mediaLimit: 4, playlistLimit: 2 }),
+        apiClient.get<SignageResponse>('/home/signage', { mediaLimit: 5, playlistLimit: 5 }),
         apiClient.get<ForumHubResponse>('/home/forum-hub'),
         communityApi.getHeroAds(),
         communityApi.getPageAds(),
         communityApi.getSponsors(),
         communityApi.getQuickLinks(),
+        newsApi.getNotices({ limit: 5, sort: 'latest' }),
       ]);
 
     return {
       notices: noticesRes.status === 'fulfilled' ? noticesRes.value.data ?? [] : [],
+      newsLatest: newsLatestRes.status === 'fulfilled'
+        ? (newsLatestRes.value as any)?.data ?? []
+        : [],
       community: communityRes.status === 'fulfilled'
         ? { posts: communityRes.value.data?.posts ?? [], featured: communityRes.value.data?.featured ?? [] }
         : { posts: [], featured: [] },
@@ -157,4 +164,4 @@ export const homeApi = {
   },
 };
 
-export type { HomeNotice, HomeForumPost, HomeFeatured, HomeMedia, HomePlaylist };
+export type { HomeNotice, HomeForumPost, HomeFeatured, HomeMedia, HomePlaylist, Notice as HomeNewsItem };

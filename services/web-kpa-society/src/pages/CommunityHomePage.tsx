@@ -6,17 +6,17 @@
  * WO-KPA-A-HOME-HUB-ENHANCEMENT-V1: 블록 우선순위·반응형·링크 정리
  * WO-KPA-A-HOME-FOOTER-LINKS-MANAGEMENT-V1: 하단 바로가기 링크 섹션 추가
  * WO-MARKET-TRIAL-COMMUNITY-HOME-BLOCK-IMPLEMENT-V1: 마켓트라이얼 소식 블록 추가
+ * WO-KPA-MAIN-HOME-RESTRUCTURE-V1: 참여 유도형 커뮤니티 허브 전환
  *
- * /community 허브 기능을 흡수하여 단일 Home으로 통합.
- *
- * 섹션 구조 (10블록):
+ * 섹션 구조 (12블록):
  * ├─ HeroBannerSection       — 동적 광고 캐러셀 (community_ads hero)
- * ├─ NoticeSection            — 공지사항 (cms_contents type=notice)
- * ├─ MarketTrialSection       — 마켓트라이얼 소식 (gateway API 독립 호출)
- * ├─ ActivitySection           — 최근 활동 (포럼 글 + 추천 콘텐츠)
+ * ├─ HeroCtaSection          — 환영 메시지 + CTA 3개
+ * ├─ TabbedNewsSection       — 공지|새소식|약사공론 탭
+ * ├─ ActivitySection          — 최근 활동 (포럼 글 + 추천 콘텐츠)
+ * ├─ CommunityServiceSection  — 서비스 바로가기 카드 그리드
  * ├─ EducationSection         — 교육/강의 요약 (lmsApi 독립 호출)
- * ├─ SignageSection            — 디지털 사이니지 프리뷰
- * ├─ CommunityServiceSection   — 서비스 바로가기 카드 그리드
+ * ├─ SignageSection            — 디지털 사이니지 (가로 카드 + 썸네일)
+ * ├─ MarketTrialSection       — 시범판매 CTA (Neture 외부 링크)
  * ├─ AdSection                — 페이지 광고 (community_ads page)
  * ├─ SponsorBar               — 스폰서 로고 (community_sponsors)
  * ├─ FooterLinksSection       — 하단 바로가기 링크 (community_quick_links)
@@ -25,7 +25,8 @@
 
 import { useState, useEffect } from 'react';
 import { HeroBannerSection } from '../components/community/HeroBannerSection';
-import { NoticeSection } from '../components/home/NoticeSection';
+import { HeroCtaSection } from '../components/home/HeroCtaSection';
+import { TabbedNewsSection } from '../components/home/TabbedNewsSection';
 import { MarketTrialSection } from '../components/home/MarketTrialSection';
 import { EducationSection } from '../components/home/EducationSection';
 import { ActivitySection } from '../components/home/ActivitySection/ActivitySection';
@@ -56,11 +57,15 @@ export function CommunityHomePage() {
       <HeroBannerSection ads={data?.heroAds ?? []} />
 
       <div style={styles.content}>
-        {/* 2. 공지사항 */}
-        <NoticeSection prefetchedNotices={data?.notices} loading={loading} />
+        {/* 2. 환영 + CTA */}
+        <HeroCtaSection />
 
-        {/* 3. 마켓트라이얼 소식 (독립 Gateway API 호출) */}
-        <MarketTrialSection />
+        {/* 3. 탭 뉴스 (공지|새소식|약사공론) */}
+        <TabbedNewsSection
+          prefetchedNotices={data?.notices}
+          prefetchedLatestNews={data?.newsLatest}
+          loading={loading}
+        />
 
         {/* 4. 최근 활동 (포럼 글 + 추천 콘텐츠) */}
         <ActivitySection
@@ -69,29 +74,32 @@ export function CommunityHomePage() {
           loading={loading}
         />
 
-        {/* 5. 교육/강의 (독립 API 호출) */}
+        {/* 5. 서비스 바로가기 */}
+        <CommunityServiceSection />
+
+        {/* 6. 교육/강의 (독립 API 호출) */}
         <EducationSection />
 
-        {/* 6. 사이니지 미디어 */}
+        {/* 7. 사이니지 미디어 (가로 카드) */}
         <SignageSection
           prefetchedMedia={data?.signage.media}
           prefetchedPlaylists={data?.signage.playlists}
           loading={loading}
         />
 
-        {/* 7. 서비스 바로가기 */}
-        <CommunityServiceSection />
+        {/* 8. 시범판매 CTA */}
+        <MarketTrialSection />
 
-        {/* 8. 페이지 광고 */}
+        {/* 9. 페이지 광고 */}
         <AdSection ads={data?.pageAds ?? []} />
 
-        {/* 9. 스폰서 */}
+        {/* 10. 스폰서 */}
         <SponsorBar sponsors={data?.sponsors ?? []} />
 
-        {/* 10. 하단 바로가기 링크 */}
+        {/* 11. 하단 바로가기 링크 */}
         <FooterLinksSection quickLinks={data?.quickLinks ?? []} />
 
-        {/* 유틸리티 */}
+        {/* 12. 유틸리티 */}
         <UtilitySection />
       </div>
     </div>

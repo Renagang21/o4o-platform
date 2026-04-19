@@ -2,32 +2,34 @@
  * SignageSection - 디지털 사이니지 미리보기 섹션
  *
  * WO-KPA-HOME-PHASE1-V1: 메인 페이지 사이니지 콘텐츠 요약
- * homeApi.getSignage() → signage_media + signage_playlists 표시
+ * WO-KPA-MAIN-HOME-RESTRUCTURE-V1: 세로 리스트 → 가로 카드 + 썸네일
  */
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { homeApi } from '../../api/home';
 import type { HomeMedia, HomePlaylist } from '../../api/home';
+import { getMediaThumbnailUrl } from '@o4o/types/signage';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
 
-// CSS for hover effects + responsive grid (inline styles don't support :hover / @media)
-const hoverStyles = `
-  .signage-media-item:hover {
-    background-color: ${colors.neutral50};
+const scrollStyles = `
+  .signage-scroll::-webkit-scrollbar {
+    height: 6px;
   }
-  .signage-playlist-item:hover {
-    background-color: ${colors.neutral50};
+  .signage-scroll::-webkit-scrollbar-track {
+    background: transparent;
   }
-  .signage-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: ${spacing.lg};
+  .signage-scroll::-webkit-scrollbar-thumb {
+    background: ${colors.neutral200};
+    border-radius: 3px;
   }
-  @media (min-width: 768px) {
-    .signage-grid {
-      grid-template-columns: 1fr 1fr;
-    }
+  .signage-media-card:hover {
+    border-color: ${colors.neutral300};
+    box-shadow: ${shadows.md};
+  }
+  .signage-playlist-card:hover {
+    border-color: ${colors.neutral300};
+    box-shadow: ${shadows.md};
   }
 `;
 
@@ -42,13 +44,12 @@ export function SignageSection({ prefetchedMedia, prefetchedPlaylists, loading: 
   const [playlists, setPlaylists] = useState<HomePlaylist[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Inject hover styles
   useEffect(() => {
     const styleId = 'signage-section-hover-styles';
     if (!document.getElementById(styleId)) {
       const style = document.createElement('style');
       style.id = styleId;
-      style.textContent = hoverStyles;
+      style.textContent = scrollStyles;
       document.head.appendChild(style);
     }
   }, []);
@@ -60,8 +61,7 @@ export function SignageSection({ prefetchedMedia, prefetchedPlaylists, loading: 
       setLoading(false);
       return;
     }
-    // Fallback: 독립 사용 시 자체 호출
-    homeApi.getSignage(3, 2)
+    homeApi.getSignage(5, 5)
       .then((res) => {
         if (res.data) {
           setMedia(res.data.media || []);
@@ -81,75 +81,97 @@ export function SignageSection({ prefetchedMedia, prefetchedPlaylists, loading: 
         <h2 style={styles.sectionTitle}>디지털 사이니지</h2>
         <Link to="/signage" style={styles.moreLink}>사이니지 콘텐츠 보기 →</Link>
       </div>
-      <div style={styles.card}>
-        {isLoading ? (
+
+      {isLoading ? (
+        <div style={styles.card}>
           <p style={styles.empty}>불러오는 중...</p>
-        ) : !hasContent ? (
+        </div>
+      ) : !hasContent ? (
+        <div style={styles.card}>
           <div style={styles.emptyWrap}>
             <p style={styles.empty}>사이니지 콘텐츠가 준비 중입니다.</p>
             <p style={styles.emptyHint}>디지털 사이니지로 약국을 꾸며보세요.</p>
           </div>
-        ) : (
-          <div>
-            {media.length > 0 && (
-              <div>
-                <h3 style={styles.subTitle}>동영상</h3>
-                <ul style={styles.mediaList}>
-                  {media.map((item) => (
-                      <li key={item.id}>
-                        <div style={styles.mediaItem}>
-                          <div style={styles.mediaIcon}>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                              <polygon points="5 3 19 12 5 21 5 3" />
-                            </svg>
-                          </div>
-                          <div style={styles.mediaInfo}>
-                            <span style={styles.mediaItemName}>{item.name}</span>
-                            {item.duration != null && item.duration > 0 && (
-                              <span style={styles.mediaDuration}>{formatDuration(item.duration)}</span>
-                            )}
-                          </div>
-                        </div>
-                      </li>
-                    ))}
-                </ul>
+        </div>
+      ) : (
+        <>
+          {/* 동영상 가로 스크롤 */}
+          {media.length > 0 && (
+            <div>
+              <h3 style={styles.subTitle}>동영상</h3>
+              <div className="signage-scroll" style={styles.scrollRow}>
+                {media.slice(0, 5).map((item) => (
+                  <MediaCard key={item.id} item={item} />
+                ))}
               </div>
-            )}
+            </div>
+          )}
 
-            {playlists.length > 0 && (
-              <div style={media.length > 0 ? { marginTop: spacing.lg } : undefined}>
-                <h3 style={styles.subTitle}>플레이리스트</h3>
-                <ul style={styles.playlistList}>
-                  {playlists.map((pl) => (
-                    <li key={pl.id}>
-                      <div style={styles.playlistItem}>
-                        <div style={styles.playlistIcon}>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                            <line x1="8" y1="6" x2="21" y2="6" />
-                            <line x1="8" y1="12" x2="21" y2="12" />
-                            <line x1="8" y1="18" x2="21" y2="18" />
-                            <line x1="3" y1="6" x2="3.01" y2="6" />
-                            <line x1="3" y1="12" x2="3.01" y2="12" />
-                            <line x1="3" y1="18" x2="3.01" y2="18" />
-                          </svg>
-                        </div>
-                        <div style={styles.playlistInfo}>
-                          <span style={styles.playlistName}>{pl.name}</span>
-                          <span style={styles.playlistMeta}>
-                            {pl.itemCount}개 항목
-                            {pl.totalDuration > 0 && ` · ${formatDuration(pl.totalDuration)}`}
-                          </span>
-                        </div>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
+          {/* 플레이리스트 가로 스크롤 */}
+          {playlists.length > 0 && (
+            <div style={media.length > 0 ? { marginTop: spacing.lg } : undefined}>
+              <h3 style={styles.subTitle}>플레이리스트</h3>
+              <div className="signage-scroll" style={styles.scrollRow}>
+                {playlists.slice(0, 5).map((pl) => (
+                  <PlaylistCard key={pl.id} playlist={pl} />
+                ))}
               </div>
-            )}
+            </div>
+          )}
+        </>
+      )}
+    </section>
+  );
+}
+
+function MediaCard({ item }: { item: HomeMedia }) {
+  const thumbnailUrl = getMediaThumbnailUrl(item);
+
+  return (
+    <div className="signage-media-card" style={styles.mediaCard}>
+      <div style={styles.thumbnailWrap}>
+        {thumbnailUrl ? (
+          <img
+            src={thumbnailUrl}
+            alt={item.name}
+            style={styles.thumbnail}
+            loading="lazy"
+          />
+        ) : (
+          <div style={styles.thumbnailPlaceholder}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="5 3 19 12 5 21 5 3" />
+            </svg>
           </div>
         )}
+        {item.duration != null && item.duration > 0 && (
+          <span style={styles.durationBadge}>{formatDuration(item.duration)}</span>
+        )}
       </div>
-    </section>
+      <p style={styles.mediaCardName}>{item.name}</p>
+    </div>
+  );
+}
+
+function PlaylistCard({ playlist }: { playlist: HomePlaylist }) {
+  return (
+    <div className="signage-playlist-card" style={styles.playlistCard}>
+      <div style={styles.playlistIconWrap}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="8" y1="6" x2="21" y2="6" />
+          <line x1="8" y1="12" x2="21" y2="12" />
+          <line x1="8" y1="18" x2="21" y2="18" />
+          <line x1="3" y1="6" x2="3.01" y2="6" />
+          <line x1="3" y1="12" x2="3.01" y2="12" />
+          <line x1="3" y1="18" x2="3.01" y2="18" />
+        </svg>
+      </div>
+      <p style={styles.playlistCardName}>{playlist.name}</p>
+      <p style={styles.playlistCardMeta}>
+        {playlist.itemCount}개 항목
+        {playlist.totalDuration > 0 && ` · ${formatDuration(playlist.totalDuration)}`}
+      </p>
+    </div>
   );
 }
 
@@ -179,104 +201,107 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.primary,
     textDecoration: 'none',
   },
-  card: {
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.lg,
-    padding: spacing.lg,
-    boxShadow: shadows.sm,
-  },
   subTitle: {
     ...typography.headingS,
     color: colors.neutral800,
     margin: `0 0 ${spacing.sm}`,
   },
-  mediaList: {
-    listStyle: 'none',
-    margin: 0,
-    padding: 0,
-  },
-  mediaItem: {
+  scrollRow: {
     display: 'flex',
-    alignItems: 'center',
-    gap: spacing.sm,
-    padding: spacing.sm,
-    marginLeft: `-${spacing.sm}`,
-    marginRight: `-${spacing.sm}`,
-    borderRadius: borderRadius.md,
-    textDecoration: 'none',
-    color: 'inherit',
+    gap: spacing.md,
+    overflowX: 'auto',
+    paddingBottom: spacing.sm,
+    WebkitOverflowScrolling: 'touch' as any,
+  },
+  // Media card
+  mediaCard: {
+    flex: '0 0 180px',
+    minWidth: '180px',
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.lg,
+    border: `1px solid ${colors.neutral100}`,
+    overflow: 'hidden',
     cursor: 'pointer',
-    transition: 'background-color 0.15s ease',
+    transition: 'border-color 0.15s, box-shadow 0.15s',
   },
-  mediaIcon: {
-    flexShrink: 0,
+  thumbnailWrap: {
+    position: 'relative',
+    width: '100%',
+    height: '100px',
+    backgroundColor: colors.neutral100,
+    overflow: 'hidden',
+  },
+  thumbnail: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+  },
+  thumbnailPlaceholder: {
+    width: '100%',
+    height: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
     color: colors.neutral400,
-    display: 'flex',
-    alignItems: 'center',
   },
-  mediaInfo: {
-    flex: 1,
-    minWidth: 0,
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  durationBadge: {
+    position: 'absolute',
+    bottom: '4px',
+    right: '4px',
+    padding: '2px 6px',
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    color: colors.white,
+    fontSize: '0.6875rem',
+    borderRadius: borderRadius.sm,
+    fontVariantNumeric: 'tabular-nums',
   },
-  mediaItemName: {
-    fontSize: '0.875rem',
+  mediaCardName: {
+    padding: `${spacing.sm}`,
+    margin: 0,
+    fontSize: '0.8125rem',
+    fontWeight: 500,
     color: colors.neutral800,
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
   },
-  mediaDuration: {
-    fontSize: '0.75rem',
-    color: colors.neutral400,
-    whiteSpace: 'nowrap',
-    marginLeft: spacing.sm,
-  },
-  playlistList: {
-    listStyle: 'none',
-    margin: 0,
-    padding: 0,
-  },
-  playlistItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: spacing.sm,
-    padding: spacing.sm,
-    marginLeft: `-${spacing.sm}`,
-    marginRight: `-${spacing.sm}`,
-    borderRadius: borderRadius.md,
-    textDecoration: 'none',
-    color: 'inherit',
+  // Playlist card
+  playlistCard: {
+    flex: '0 0 180px',
+    minWidth: '180px',
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.lg,
+    border: `1px solid ${colors.neutral100}`,
+    padding: spacing.md,
     cursor: 'pointer',
-    transition: 'background-color 0.15s ease',
+    transition: 'border-color 0.15s, box-shadow 0.15s',
   },
-  playlistIcon: {
-    flexShrink: 0,
+  playlistIconWrap: {
     color: colors.neutral400,
+    marginBottom: spacing.sm,
     display: 'flex',
     alignItems: 'center',
   },
-  playlistInfo: {
-    flex: 1,
-    minWidth: 0,
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  playlistName: {
-    fontSize: '0.875rem',
+  playlistCardName: {
+    margin: 0,
+    fontSize: '0.8125rem',
+    fontWeight: 500,
     color: colors.neutral800,
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
   },
-  playlistMeta: {
+  playlistCardMeta: {
+    margin: `${spacing.xs} 0 0`,
     fontSize: '0.75rem',
     color: colors.neutral400,
-    whiteSpace: 'nowrap',
-    marginLeft: spacing.sm,
+  },
+  // Empty states
+  card: {
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    boxShadow: shadows.sm,
   },
   emptyWrap: {
     textAlign: 'center',
