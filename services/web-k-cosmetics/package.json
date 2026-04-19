@@ -20,6 +20,7 @@
     "@o4o/store-asset-policy-core": "workspace:*",
     "@o4o/store-ui-core": "workspace:*",
     "@o4o/operator-ux-core": "workspace:*",
+    "@o4o/shared-space-ui": "workspace:*",
     "@o4o/types": "workspace:*",
     "@o4o/ui": "workspace:*",
     "lucide-react": "^0.523.0",

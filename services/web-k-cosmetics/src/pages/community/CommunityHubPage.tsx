@@ -3,18 +3,19 @@
  *
  * WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1
  * WO-KCOS-HOME-REBASE-TO-KPA-FRAME-V1: Shared Space Frame 기준 재구성
+ * WO-SHARED-SPACE-COMPONENT-SPLIT-V1: 공통 컴포넌트 적용
  *
  * Route: /community
  *
  * 섹션 순서 (Shared Space Frame):
- *  1. Hero / Summary (매장 활용 중심 환영 + CTA 3개)
- *  2. News / Notices (공지사항)
- *  3. Activity (인기 글 3 + 최근 글 5 요약)
- *  4. App Entry (3개 서비스 카드)
- *  5. Content Highlight (최근 + 추천 콘텐츠)
- *  6. Signage Preview (사이니지 미디어 + 플레이리스트)
- *  7. CTA / Guidance (매장 활용 CTA)
- *  8. Utility (광고 + 스폰서)
+ *  1. Hero / Summary → HeroSummarySection (shared)
+ *  2. News / Notices → NewsNoticesSection (shared)
+ *  3. Activity → ActivitySection (shared)
+ *  4. App Entry → AppEntrySection (shared)
+ *  5. Content Highlight (서비스 고유)
+ *  6. Signage Preview (서비스 고유)
+ *  7. CTA / Guidance → CtaGuidanceSection (shared)
+ *  8. Utility (서비스 고유)
  */
 
 import { useState, useEffect, type CSSProperties } from 'react';
@@ -25,8 +26,20 @@ import { api } from '../../lib/apiClient';
 import { useAuth } from '../../contexts';
 import { AdSection } from '../../components/community/AdSection';
 import { SponsorBar } from '../../components/community/SponsorBar';
+import {
+  HeroSummarySection,
+  NewsNoticesSection,
+  ActivitySection,
+  AppEntrySection,
+  CtaGuidanceSection,
+} from '@o4o/shared-space-ui';
+import type { NoticeItem, FeaturedPost, RecentPost } from '@o4o/shared-space-ui';
 
-// ─── Types ──────────────────────────────────────────────────
+// ─── Constants ─────────────────────────────────────────────
+const PINK = '#DB2777';
+const PINK_BG = '#fdf2f8';
+
+// ─── Types ─────────────────────────────────────────────────
 
 interface FeedItem {
   id: string;
@@ -50,35 +63,7 @@ interface HubSignagePlaylist {
   itemCount?: number;
 }
 
-// ─── App Entry Data ──────────────────────────────────────────
-
-const appEntryCards = [
-  {
-    title: '뷰티 포럼',
-    description: '뷰티 트렌드와 스킨케어 정보를 나누세요',
-    href: '/forum',
-    emoji: '💬',
-  },
-  {
-    title: '콘텐츠 허브',
-    description: '매장 운영에 유용한 콘텐츠를 확인하세요',
-    href: '/library/content',
-    emoji: '📄',
-  },
-  {
-    title: '디지털 사이니지',
-    description: '매장 디스플레이 콘텐츠를 관리하세요',
-    href: '/partner/signage/content',
-    emoji: '🖥',
-  },
-];
-
-function formatDate(dateStr: string): string {
-  const d = new Date(dateStr);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
-
-// ─── Content Card ───────────────────────────────────────────
+// ─── Content Card ──────────────────────────────────────────
 
 function ContentCard({ item }: { item: HubContentItemResponse }) {
   const img = item.thumbnailUrl || item.imageUrl || null;
@@ -128,7 +113,7 @@ function ContentCard({ item }: { item: HubContentItemResponse }) {
   );
 }
 
-// ─── Section Wrapper ────────────────────────────────────────
+// ─── Section Wrapper ───────────────────────────────────────
 
 function Section({ title, linkTo, linkLabel, children }: {
   title: string;
@@ -149,7 +134,7 @@ function Section({ title, linkTo, linkLabel, children }: {
   );
 }
 
-// ─── Main Component ─────────────────────────────────────────
+// ─── Main Component ────────────────────────────────────────
 
 export default function CommunityHubPage() {
   const { isAuthenticated, user } = useAuth();
@@ -229,21 +214,28 @@ export default function CommunityHubPage() {
     ]).finally(() => setSignageLoading(false));
   }, []);
 
-  // Notices (category === '공지')
-  const noticeItems = feedItems.filter((i) => i.category === '공지').slice(0, 5);
+  // ── Derived data ──
+  const noticeItems: NoticeItem[] = feedItems
+    .filter((i) => i.category === '공지')
+    .slice(0, 5)
+    .map((i) => ({ id: i.id, title: i.title, date: i.date, href: `/forum/posts/${i.id}`, isPinned: true }));
 
-  // Hot posts top 3
-  const hotPosts = [...feedItems].sort((a, b) => b.viewCount - a.viewCount).slice(0, 3);
+  const featuredPosts: FeaturedPost[] = [...feedItems]
+    .sort((a, b) => b.viewCount - a.viewCount)
+    .slice(0, 3)
+    .map((i) => ({ id: i.id, title: i.title, author: i.author, viewCount: i.viewCount, category: i.category, href: `/forum/posts/${i.id}` }));
 
-  // Recent posts 5
-  const recentPosts = [...feedItems].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5);
+  const recentPostItems: RecentPost[] = [...feedItems]
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, 5)
+    .map((i) => ({ id: i.id, title: i.title, date: i.date, href: `/forum/posts/${i.id}`, category: i.category }));
 
-  // Content split: recommended (isPinned) vs recent
+  // Content split
   const recommendedContent = contentItems.filter((c) => c.isPinned).slice(0, 6);
   const recommendedIds = new Set(recommendedContent.map((c) => c.id));
   const recentContent = contentItems.filter((c) => !recommendedIds.has(c.id)).slice(0, 6);
 
-  // Hero greeting
+  // Greeting
   const greeting = isAuthenticated && user?.name
     ? `${user.name}님, 환영합니다`
     : '뷰티 매장 활용 서비스에 오신 것을 환영합니다';
@@ -252,133 +244,55 @@ export default function CommunityHubPage() {
     <div style={styles.page}>
       <div style={styles.content}>
 
-        {/* ─── 1. Hero / Summary ─── */}
-        <section style={styles.heroCard}>
-          <h1 style={styles.heroTitle}>{greeting}</h1>
-          <p style={styles.heroSubtitle}>
-            매장 홍보와 마케팅에 필요한 콘텐츠를 한 곳에서 확인하세요
-          </p>
-          <div style={styles.heroCtas}>
-            <Link to="/forum" style={styles.heroCta}>💬 포럼 참여</Link>
-            <Link to="/library/content" style={styles.heroCta}>📄 콘텐츠 보기</Link>
-            <Link to="/partner/signage/content" style={styles.heroCta}>🖥 사이니지 관리</Link>
-          </div>
-        </section>
+        {/* ─── 1. Hero / Summary (shared) ─── */}
+        <HeroSummarySection
+          greeting={greeting}
+          subtitle="매장 홍보와 마케팅에 필요한 콘텐츠를 한 곳에서 확인하세요"
+          ctas={[
+            { label: '포럼 참여', href: '/forum', icon: <span>💬</span> },
+            { label: '콘텐츠 보기', href: '/library/content', icon: <span>📄</span> },
+            { label: '사이니지 관리', href: '/partner/signage/content', icon: <span>🖥</span> },
+          ]}
+          accentColor={PINK}
+        />
 
-        {/* ─── 2. News / Notices ─── */}
-        <Section title="공지 / 새 소식" linkTo="/forum" linkLabel="전체보기 →">
-          <div style={styles.card}>
-            {feedLoading ? (
-              <p style={styles.empty}>불러오는 중...</p>
-            ) : noticeItems.length === 0 ? (
-              <div style={{ textAlign: 'center' as const, padding: '24px 16px' }}>
-                <p style={{ fontSize: 14, color: '#64748b', margin: 0 }}>아직 등록된 공지가 없습니다.</p>
-                <p style={{ fontSize: 12, color: '#94a3b8', margin: '4px 0 0 0' }}>새 소식이 등록되면 여기에 표시됩니다.</p>
-              </div>
-            ) : (
-              <>
-                {noticeItems.map((item, idx) => (
-                  <Link key={item.id} to={`/forum/posts/${item.id}`} style={{
-                    ...styles.listRow,
-                    borderTop: idx > 0 ? '1px solid #f1f5f9' : 'none',
-                  }}>
-                    <span style={styles.noticeBadge}>공지</span>
-                    <span style={styles.listTitle}>{item.title}</span>
-                    <span style={styles.listDate}>{formatDate(item.date)}</span>
-                  </Link>
-                ))}
-                <div style={{ padding: '8px 16px', textAlign: 'right' as const }}>
-                  <Link to="/forum" style={{ fontSize: 12, color: '#DB2777', textDecoration: 'none', fontWeight: 500 }}>
-                    전체 보기 →
-                  </Link>
-                </div>
-              </>
-            )}
-          </div>
-        </Section>
+        {/* ─── 2. News / Notices (shared) ─── */}
+        <NewsNoticesSection
+          title="공지 / 새 소식"
+          items={noticeItems}
+          loading={feedLoading}
+          emptyTitle="아직 등록된 공지가 없습니다."
+          emptySubtitle="새 소식이 등록되면 여기에 표시됩니다."
+          viewAllHref="/forum"
+          accentColor={PINK}
+          accentBg={PINK_BG}
+        />
 
-        {/* ─── 3. Activity (인기 글 + 최근 글) ─── */}
-        <Section title="최근 활동" linkTo="/forum" linkLabel="전체보기 →">
-          {feedLoading ? (
-            <div style={styles.card}>
-              <p style={styles.empty}>불러오는 중...</p>
-            </div>
-          ) : feedItems.length === 0 ? (
-            <div style={styles.card}>
-              <div style={{ textAlign: 'center' as const, padding: '24px 16px' }}>
-                <p style={{ fontSize: 14, color: '#64748b', margin: '0 0 8px 0' }}>아직 게시물이 없습니다.</p>
-                <Link to="/forum/write" style={{ fontSize: 13, color: '#DB2777', fontWeight: 600, textDecoration: 'none' }}>
-                  첫 글 작성하기
-                </Link>
-              </div>
-            </div>
-          ) : (
-            <>
-              {/* 인기 글 Top 3 */}
-              {hotPosts.length > 0 && (
-                <div style={{ marginBottom: 16 }}>
-                  <p style={styles.subLabel}>인기 글</p>
-                  <div style={styles.hotGrid}>
-                    {hotPosts.map((item, idx) => (
-                      <Link key={item.id} to={`/forum/posts/${item.id}`} style={styles.hotCard}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8, marginBottom: 8 }}>
-                          <span style={styles.hotRank}>{idx + 1}</span>
-                          <span style={styles.categoryBadge}>{item.category}</span>
-                        </div>
-                        <p style={styles.hotTitle}>{item.title}</p>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <span style={styles.metaText}>{item.author}</span>
-                          <span style={styles.metaText}>조회 {item.viewCount}</span>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
+        {/* ─── 3. Activity (shared) ─── */}
+        <ActivitySection
+          featuredPosts={featuredPosts}
+          recentPosts={recentPostItems}
+          loading={feedLoading}
+          emptyMessage="아직 게시물이 없습니다."
+          emptyActionLabel="첫 글 작성하기"
+          emptyActionHref="/forum/write"
+          viewAllHref="/forum"
+          accentColor={PINK}
+        />
 
-              {/* 최근 글 5개 */}
-              {recentPosts.length > 0 && (
-                <div>
-                  <p style={styles.subLabel}>최근 글</p>
-                  <div style={styles.card}>
-                    {recentPosts.map((item, idx) => (
-                      <Link key={item.id} to={`/forum/posts/${item.id}`} style={{
-                        ...styles.listRow,
-                        borderTop: idx > 0 ? '1px solid #f1f5f9' : 'none',
-                      }}>
-                        <span style={styles.categoryBadge}>{item.category}</span>
-                        <span style={styles.listTitle}>{item.title}</span>
-                        <span style={styles.listDate}>{formatDate(item.date)}</span>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-        </Section>
+        {/* ─── 4. App Entry (shared) ─── */}
+        <AppEntrySection
+          title="서비스 바로가기"
+          subtitle="각 서비스로 바로 이동하세요"
+          cards={[
+            { title: '뷰티 포럼', description: '뷰티 트렌드와 스킨케어 정보를 나누세요', href: '/forum', icon: <span>💬</span> },
+            { title: '콘텐츠 허브', description: '매장 운영에 유용한 콘텐츠를 확인하세요', href: '/library/content', icon: <span>📄</span> },
+            { title: '디지털 사이니지', description: '매장 디스플레이 콘텐츠를 관리하세요', href: '/partner/signage/content', icon: <span>🖥</span> },
+          ]}
+          accentColor={PINK}
+        />
 
-        {/* ─── 4. App Entry (서비스 바로가기) ─── */}
-        <section style={styles.section}>
-          <div style={{ marginBottom: 12 }}>
-            <h2 style={styles.sectionTitle}>서비스 바로가기</h2>
-            <p style={{ fontSize: 13, color: '#64748b', margin: '4px 0 0 0' }}>각 서비스로 바로 이동하세요</p>
-          </div>
-          <div style={styles.appEntryGrid}>
-            {appEntryCards.map((card) => (
-              <Link key={card.href} to={card.href} style={styles.appEntryCard}>
-                <span style={styles.appEntryEmoji}>{card.emoji}</span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <h3 style={styles.appEntryTitle}>{card.title}</h3>
-                  <p style={styles.appEntryDesc}>{card.description}</p>
-                </div>
-                <span style={styles.appEntryArrow}>→</span>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        {/* ─── 5. Content Highlight ─── */}
+        {/* ─── 5. Content Highlight (서비스 고유) ─── */}
         <Section title="콘텐츠" linkTo="/library/content" linkLabel="전체보기 →">
           {contentLoading ? (
             <p style={styles.empty}>불러오는 중...</p>
@@ -410,7 +324,7 @@ export default function CommunityHubPage() {
           )}
         </Section>
 
-        {/* ─── 6. Signage Preview ─── */}
+        {/* ─── 6. Signage Preview (서비스 고유) ─── */}
         <Section title="디지털 사이니지" linkTo="/partner/signage/content" linkLabel="전체보기 →">
           {signageLoading ? (
             <p style={styles.empty}>사이니지 정보를 불러오는 중...</p>
@@ -468,23 +382,18 @@ export default function CommunityHubPage() {
           )}
         </Section>
 
-        {/* ─── 7. CTA / Guidance ─── */}
-        <section style={styles.section}>
-          <Link to="/partner/signage/content" style={styles.ctaCard}>
-            <div style={styles.ctaIcon}>🖥</div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontSize: 14, fontWeight: 600, color: '#1e293b', margin: 0 }}>
-                매장 홍보에 도움이 필요하세요?
-              </p>
-              <p style={{ fontSize: 12, color: '#64748b', margin: '4px 0 0 0' }}>
-                디지털 사이니지로 매장을 꾸며보세요
-              </p>
-            </div>
-            <span style={styles.ctaLinkText}>사이니지 보기 →</span>
-          </Link>
-        </section>
+        {/* ─── 7. CTA / Guidance (shared) ─── */}
+        <CtaGuidanceSection
+          title="매장 홍보에 도움이 필요하세요?"
+          description="디지털 사이니지로 매장을 꾸며보세요"
+          href="/partner/signage/content"
+          linkLabel="사이니지 보기 →"
+          icon={<span>🖥</span>}
+          accentColor={PINK}
+          accentBg={PINK_BG}
+        />
 
-        {/* ─── 8. Utility ─── */}
+        {/* ─── 8. Utility (서비스 고유) ─── */}
         <AdSection ads={pageAds} />
         <SponsorBar sponsors={sponsors} />
 
@@ -493,10 +402,7 @@ export default function CommunityHubPage() {
   );
 }
 
-// ─── Styles ─────────────────────────────────────────────────
-
-const PINK = '#DB2777';
-const PINK_BG = '#fdf2f8';
+// ─── Styles (서비스 고유 섹션만) ──────────────────────────────
 
 const styles: Record<string, CSSProperties> = {
   page: {
@@ -529,97 +435,12 @@ const styles: Record<string, CSSProperties> = {
     textDecoration: 'none',
     fontWeight: 500,
   },
-
-  // Hero / Summary
-  heroCard: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: '24px',
-    border: '1px solid #e2e8f0',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-    marginBottom: 32,
-  },
-  heroTitle: {
-    fontSize: 18,
-    fontWeight: 600,
-    color: '#1e293b',
-    margin: '0 0 4px 0',
-  },
-  heroSubtitle: {
-    fontSize: 14,
-    color: '#64748b',
-    margin: '0 0 16px 0',
-  },
-  heroCtas: {
-    display: 'flex',
-    gap: 8,
-    flexWrap: 'wrap' as const,
-  },
-  heroCta: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: 6,
-    padding: '8px 16px',
-    fontSize: 13,
-    fontWeight: 500,
-    color: '#475569',
-    backgroundColor: 'white',
-    border: '1px solid #e2e8f0',
-    borderRadius: 8,
-    textDecoration: 'none',
-  },
-
-  // Shared card container
   card: {
     backgroundColor: 'white',
     borderRadius: 12,
     border: '1px solid #e2e8f0',
     overflow: 'hidden',
   },
-
-  // List row (notices, recent posts)
-  listRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 10,
-    padding: '12px 16px',
-    textDecoration: 'none',
-  },
-  listTitle: {
-    flex: 1,
-    fontSize: 14,
-    color: '#334155',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap' as const,
-  },
-  listDate: {
-    fontSize: 12,
-    color: '#94a3b8',
-    flexShrink: 0,
-  },
-  noticeBadge: {
-    display: 'inline-block',
-    padding: '2px 6px',
-    fontSize: 10,
-    fontWeight: 600,
-    backgroundColor: PINK_BG,
-    color: PINK,
-    borderRadius: 4,
-    flexShrink: 0,
-  },
-  categoryBadge: {
-    display: 'inline-block',
-    padding: '2px 6px',
-    fontSize: 10,
-    fontWeight: 500,
-    backgroundColor: '#f1f5f9',
-    color: '#64748b',
-    borderRadius: 4,
-    flexShrink: 0,
-  },
-
-  // Sub label
   subLabel: {
     fontSize: 12,
     fontWeight: 600,
@@ -627,86 +448,6 @@ const styles: Record<string, CSSProperties> = {
     textTransform: 'uppercase' as const,
     letterSpacing: '0.05em',
     margin: '0 0 8px 0',
-  },
-
-  // Hot posts
-  hotGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
-    gap: 12,
-  },
-  hotCard: {
-    backgroundColor: 'white',
-    border: '1px solid #e2e8f0',
-    borderRadius: 12,
-    padding: 16,
-    textDecoration: 'none',
-  },
-  hotRank: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 20,
-    height: 20,
-    borderRadius: '50%',
-    backgroundColor: '#f1f5f9',
-    color: '#64748b',
-    fontSize: 10,
-    fontWeight: 700,
-    flexShrink: 0,
-  },
-  hotTitle: {
-    fontSize: 13,
-    fontWeight: 500,
-    color: '#334155',
-    margin: '0 0 8px 0',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    display: '-webkit-box',
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: 'vertical' as any,
-  },
-  metaText: {
-    fontSize: 10,
-    color: '#94a3b8',
-  },
-
-  // App Entry
-  appEntryGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(1, 1fr)',
-    gap: 10,
-  },
-  appEntryCard: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 12,
-    padding: '16px 20px',
-    backgroundColor: 'white',
-    border: '1px solid #e2e8f0',
-    borderRadius: 12,
-    textDecoration: 'none',
-  },
-  appEntryEmoji: {
-    fontSize: 24,
-    flexShrink: 0,
-  },
-  appEntryTitle: {
-    fontSize: 15,
-    fontWeight: 600,
-    color: '#1e293b',
-    margin: 0,
-  },
-  appEntryDesc: {
-    fontSize: 12,
-    color: '#64748b',
-    margin: '2px 0 0 0',
-  },
-  appEntryArrow: {
-    fontSize: 16,
-    color: PINK,
-    fontWeight: 600,
-    flexShrink: 0,
   },
 
   // Content grid & cards
@@ -800,38 +541,6 @@ const styles: Record<string, CSSProperties> = {
     fontWeight: 600,
     color: PINK,
     textDecoration: 'none',
-    whiteSpace: 'nowrap' as const,
-    flexShrink: 0,
-  },
-
-  // CTA / Guidance
-  ctaCard: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 16,
-    padding: '20px 24px',
-    backgroundColor: 'white',
-    borderRadius: 12,
-    border: '1px solid #e2e8f0',
-    borderLeft: `3px solid ${PINK}`,
-    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-    textDecoration: 'none',
-  },
-  ctaIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
-    backgroundColor: PINK_BG,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: 20,
-    flexShrink: 0,
-  },
-  ctaLinkText: {
-    fontSize: 13,
-    fontWeight: 600,
-    color: PINK,
     whiteSpace: 'nowrap' as const,
     flexShrink: 0,
   },

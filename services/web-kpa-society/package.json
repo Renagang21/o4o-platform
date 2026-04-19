@@ -24,6 +24,7 @@
     "@o4o/store-ui-core": "workspace:*",
     "@o4o/admin-ux-core": "workspace:*",
     "@o4o/operator-ux-core": "workspace:*",
+    "@o4o/shared-space-ui": "workspace:*",
     "@o4o/types": "workspace:*",
     "@o4o/ui": "workspace:*",
     "axios": "^1.10.0",

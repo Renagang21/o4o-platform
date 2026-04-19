@@ -2804,6 +2804,22 @@ importers:
         specifier: ^5.3.0
         version: 5.9.3
 
+  packages/shared-space-ui:
+    dependencies:
+      react:
+        specifier: 19.2.0
+        version: 19.2.0
+      react-dom:
+        specifier: 19.2.0
+        version: 19.2.0(react@19.2.0)
+      react-router-dom:
+        specifier: ^6.0.0 || ^7.0.0
+        version: 7.9.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+    devDependencies:
+      typescript:
+        specifier: 5.4.5
+        version: 5.4.5
+
   packages/shortcodes:
     dependencies:
       '@o4o/auth-client':
@@ -3225,6 +3241,9 @@ importers:
       '@o4o/operator-ux-core':
         specifier: workspace:*
         version: link:../../packages/operator-ux-core
+      '@o4o/shared-space-ui':
+        specifier: workspace:*
+        version: link:../../packages/shared-space-ui
       '@o4o/store-asset-policy-core':
         specifier: workspace:*
         version: link:../../packages/store-asset-policy-core
@@ -3331,6 +3350,9 @@ importers:
       '@o4o/operator-ux-core':
         specifier: workspace:*
         version: link:../../packages/operator-ux-core
+      '@o4o/shared-space-ui':
+        specifier: workspace:*
+        version: link:../../packages/shared-space-ui
       '@o4o/store-asset-policy-core':
         specifier: workspace:*
         version: link:../../packages/store-asset-policy-core
@@ -3422,6 +3444,9 @@ importers:
       '@o4o/operator-ux-core':
         specifier: workspace:*
         version: link:../../packages/operator-ux-core
+      '@o4o/shared-space-ui':
+        specifier: workspace:*
+        version: link:../../packages/shared-space-ui
       '@o4o/store-asset-policy-core':
         specifier: workspace:*
         version: link:../../packages/store-asset-policy-core

@@ -29,6 +29,7 @@ COPY packages/ui/package.json ./packages/ui/
 COPY packages/operator-core/package.json ./packages/operator-core/
 COPY packages/hub-core/package.json ./packages/hub-core/
 COPY packages/operator-ux-core/package.json ./packages/operator-ux-core/
+COPY packages/shared-space-ui/package.json ./packages/shared-space-ui/
 COPY packages/admin-ux-core/package.json ./packages/admin-ux-core/
 COPY packages/store-ui-core/package.json ./packages/store-ui-core/
 COPY packages/store-asset-policy-core/package.json ./packages/store-asset-policy-core/
@@ -59,6 +60,7 @@ COPY packages/ui/ ./packages/ui/
 COPY packages/operator-core/ ./packages/operator-core/
 COPY packages/hub-core/ ./packages/hub-core/
 COPY packages/operator-ux-core/ ./packages/operator-ux-core/
+COPY packages/shared-space-ui/ ./packages/shared-space-ui/
 COPY packages/admin-ux-core/ ./packages/admin-ux-core/
 COPY packages/store-ui-core/ ./packages/store-ui-core/
 COPY packages/store-asset-policy-core/ ./packages/store-asset-policy-core/
