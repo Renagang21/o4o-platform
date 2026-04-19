@@ -48,3 +48,6 @@ export { ServiceProduct } from './service-product.entity.js';
 // WO-O4O-KPA-CONTENT-HUB-FOUNDATION-V1
 export { KpaContent } from './kpa-content.entity.js';
 export { KpaWorkingContent } from './kpa-working-content.entity.js';
+// WO-O4O-SIGNAGE-STORE-PLAYLIST-ENGINE-V1
+export { StorePlaylist } from './store-playlist.entity.js';
+export { StorePlaylistItem } from './store-playlist-item.entity.js';

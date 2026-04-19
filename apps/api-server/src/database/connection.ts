@@ -271,6 +271,8 @@ import {
   KpaPharmacistProfile, // WO-ROLE-NORMALIZATION-PHASE3-B-V1
   KpaStudentProfile, // WO-KPA-A-RBAC-PROFILE-NORMALIZATION-V1
   ServiceProduct, // WO-O4O-SERVICE-PRODUCT-LAYER-PREP-V1
+  StorePlaylist, // WO-O4O-SIGNAGE-STORE-PLAYLIST-ENGINE-V1
+  StorePlaylistItem, // WO-O4O-SIGNAGE-STORE-PLAYLIST-ENGINE-V1
 } from '../routes/kpa/entities/index.js';
 import { KpaExternalExpertProfile } from '../routes/kpa/entities/kpa-external-expert-profile.entity.js';
 import { KpaSupplierStaffProfile } from '../routes/kpa/entities/kpa-supplier-staff-profile.entity.js';
@@ -761,6 +763,9 @@ export const AppDataSource = new DataSource({
     InstructorProfile,
     // WO-O4O-SERVICE-PRODUCT-LAYER-PREP-V1
     ServiceProduct,
+    // WO-O4O-SIGNAGE-STORE-PLAYLIST-ENGINE-V1
+    StorePlaylist,
+    StorePlaylistItem,
     // ============================================================================
     // PARTNER DASHBOARD ENTITIES (WO-PARTNER-DASHBOARD-API-BE-IMPLEMENTATION-V1)
     // ============================================================================
