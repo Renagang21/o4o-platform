@@ -62,7 +62,6 @@ const demoMenuItems: MenuItem[] = [
     children: [
       { label: '공지사항', href: '/content' },
       { label: '소식', href: '/content' },
-      { label: '자료실', href: '/docs' },
     ],
   },
   {

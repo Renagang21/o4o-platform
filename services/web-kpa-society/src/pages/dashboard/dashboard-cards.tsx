@@ -49,7 +49,6 @@ const COMMUNITY_SHORTCUTS = [
   { label: '포럼', icon: '💬', href: '/forum' },
   { label: '공지사항', icon: '📢', href: '/content' },
   { label: '교육/연수', icon: '📚', href: '/lms' },
-  { label: '자료실', icon: '📁', href: '/docs' },
 ];
 
 function CommunityShortcutsCard(_props: CardProps) {
@@ -146,7 +145,6 @@ function AcademicCard(_props: CardProps) {
         </div>
         <div style={cardStyles.linkRow}>
           <Link to="/lms" style={cardStyles.inlineLink}>교육/연수 →</Link>
-          <Link to="/docs" style={cardStyles.inlineLink}>자료실 →</Link>
         </div>
       </div>
     </section>
@@ -279,7 +277,7 @@ const cardStyles: Record<string, React.CSSProperties> = {
   // 바로가기 그리드
   shortcutGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(4, 1fr)',
+    gridTemplateColumns: 'repeat(3, 1fr)',
     gap: spacing.md,
   },
   shortcutCard: {

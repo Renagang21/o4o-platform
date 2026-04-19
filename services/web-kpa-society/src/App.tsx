@@ -70,9 +70,6 @@ import PlaylistDetailPage from './pages/signage/PlaylistDetailPage';
 import MediaDetailPage from './pages/signage/MediaDetailPage';
 import PublicSignagePage from './pages/signage/PublicSignagePage';
 
-// Resources pages
-import { ResourcesListPage, ResourcesHomePage } from './pages/resources';
-
 // Legal pages (WO-KPA-LEGAL-PAGES-V1)
 import { PolicyPage, PrivacyPage } from './pages/legal';
 
@@ -570,10 +567,6 @@ function App() {
           {/* Events (이벤트) */}
           <Route path="/events" element={<Layout serviceName={SERVICE_NAME}><EventsHomePage /></Layout>} />
 
-          {/* Docs (자료실) */}
-          <Route path="/docs" element={<Layout serviceName={SERVICE_NAME}><ResourcesHomePage /></Layout>} />
-          <Route path="/docs/list" element={<Layout serviceName={SERVICE_NAME}><ResourcesListPage /></Layout>} />
-
           {/* Organization (약사회 소개) */}
           <Route path="/organization" element={<Layout serviceName={SERVICE_NAME}><OrganizationAboutPage /></Layout>} />
           <Route path="/organization/branches" element={<Navigate to="/organization" replace />} />
@@ -797,12 +790,7 @@ function DemoLayoutRoutes() {
         <Route path="/pharmacy" element={<Navigate to="/pharmacy" replace />} />
         <Route path="/pharmacy/*" element={<Navigate to="/pharmacy" replace />} />
 
-        {/* Docs (자료실) - WO-KPA-LMS-RESTRUCTURE-APPLY-V1: Content 집중 */}
-        <Route path="/docs" element={<ResourcesHomePage />} />
-        <Route path="/docs/list" element={<ResourcesListPage />} />
-        <Route path="/docs/forms" element={<ResourcesListPage />} />
-        <Route path="/docs/guidelines" element={<ResourcesListPage />} />
-        <Route path="/docs/policies" element={<ResourcesListPage />} />
+
 
         {/* Organization (조직소개) */}
         <Route path="/organization" element={<OrganizationAboutPage />} />

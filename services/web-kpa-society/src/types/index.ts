@@ -392,23 +392,6 @@ export interface Attachment {
   mimeType: string;
 }
 
-// 자료실
-export interface Resource {
-  id: string;
-  title: string;
-  description?: string;
-  category: string;
-  file?: Attachment;
-  fileUrl?: string;
-  fileType?: string;
-  fileSize?: string;
-  downloadCount: number;
-  authorId: string;
-  authorName: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
 // 조직
 export interface Organization {
   id: string;

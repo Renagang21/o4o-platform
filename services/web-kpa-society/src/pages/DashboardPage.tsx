@@ -74,8 +74,6 @@ const mockOfficerData = {
 const quickMenuItems = [
   { icon: '📢', label: '공지사항', href: '/content/notice', color: '#1e40af' },
   { icon: '📅', label: '분회일정', href: '/calendar', color: '#1e40af' },
-  { icon: '📁', label: '자료실', href: '/docs', color: '#1e40af' },
-  { icon: '📝', label: '회의록', href: '/docs/minutes', color: '#1e40af' },
   { icon: '💬', label: '포럼', href: '/forum', color: '#1e40af' },
   { icon: '📞', label: '문의', href: '/contact', color: '#1e40af' },
 ];
@@ -590,7 +588,7 @@ const styles: Record<string, React.CSSProperties> = {
   // Quick Menu - 6열 그리드 (kkpa.kr 참조)
   quickMenuGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(6, 1fr)',
+    gridTemplateColumns: 'repeat(4, 1fr)',
     gap: '8px',
   },
   quickMenuItem: {

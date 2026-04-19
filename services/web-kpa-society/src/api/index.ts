@@ -8,7 +8,6 @@ export { lmsApi } from './lms';
 export { eventOfferApi } from './eventOffer';
 export { eventOfferAdminApi } from './eventOfferAdmin';
 export { newsApi } from './news';
-export { resourcesApi } from './resources';
 export { organizationApi } from './organization';
 export { mypageApi, type ProfileResponse } from './mypage';
 export { adminApi } from './admin';
