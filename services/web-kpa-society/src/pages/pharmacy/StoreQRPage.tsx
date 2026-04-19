@@ -4,6 +4,7 @@
  * WO-O4O-QR-LANDING-PAGE-V1
  * WO-O4O-QR-SCAN-ANALYTICS-V1
  * WO-O4O-QR-PRINT-MODULE-V2
+ * WO-STORE-QR-UX-RESTRUCTURE-V1
  *
  * Library에서 자료를 선택 → slug/landingType/landingTargetId 설정 → 백엔드 저장.
  * QR URL: /qr/{slug} (공개)
@@ -12,10 +13,11 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { QrCode, Plus, Trash2, ExternalLink, Copy, Check, RefreshCw, BarChart3, X, Smartphone, Monitor, Tablet, Download, Printer } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { QrCode, Plus, Trash2, ExternalLink, Copy, Check, RefreshCw, BarChart3, X, Smartphone, Monitor, Tablet, Download, Printer, ArrowRight } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { colors } from '../../styles/theme';
+import { StoreQRCreateEntryModal } from '../../components/store/StoreQRCreateEntryModal';
 import { StoreLibrarySelectorModal } from '../../components/store/StoreLibrarySelectorModal';
 import type { LibrarySelectorResult } from '../../components/store/StoreLibrarySelectorModal';
 import { QrPrintTemplateModal } from './QrPrintTemplateModal';
@@ -48,9 +50,24 @@ function toSlug(text: string): string {
     .slice(0, 60) || `qr-${Date.now()}`;
 }
 
+const ASSET_TYPE_LABELS: Record<string, string> = {
+  file: '파일',
+  content: '콘텐츠',
+  'external-link': '외부 링크',
+};
+
+function autoLandingType(assetType: string): string {
+  if (assetType === 'external-link') return 'link';
+  return 'page'; // file, content → page
+}
+
 export function StoreQRPage() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [items, setItems] = useState<StoreQrCode[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showEntryModal, setShowEntryModal] = useState(false);
   const [showSelector, setShowSelector] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
@@ -118,13 +135,33 @@ export function StoreQRPage() {
     });
   }, [formLandingType, creating]);
 
+  // Router state 기반 자동 선택 (StoreLibraryNewPage에서 복귀 시)
+  useEffect(() => {
+    const state = location.state as { selectedLibraryItem?: Record<string, unknown> } | null;
+    const item = state?.selectedLibraryItem;
+    if (item && typeof item.id === 'string') {
+      handleLibrarySelect({
+        id: item.id as string,
+        title: (item.title as string) || '',
+        category: (item.category as string) || null,
+        fileUrl: (item.fileUrl as string) || null,
+        assetType: (item.assetType as string) || 'file',
+        url: (item.url as string) || null,
+        htmlContent: (item.htmlContent as string) || null,
+      });
+      // 뒤로가기 시 재트리거 방지
+      window.history.replaceState({}, document.title);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleLibrarySelect = (item: LibrarySelectorResult) => {
     setSelectedLibrary(item);
     setFormSlug(toSlug(item.title));
-    setFormLandingType('product');
-    setFormLandingTargetId('');
+    setFormLandingType(autoLandingType(item.assetType || 'file'));
+    setFormLandingTargetId(item.assetType === 'external-link' && item.url ? item.url : '');
     setFormError(null);
     setShowSelector(false);
+    setShowEntryModal(false);
     setCreating(true);
   };
 
@@ -306,7 +343,7 @@ export function StoreQRPage() {
           <h1 style={styles.title}>QR 코드 관리</h1>
           <p style={styles.subtitle}>Library 자료를 QR 코드로 연결하여 오프라인에서 온라인으로 유도합니다</p>
         </div>
-        <button onClick={() => setShowSelector(true)} style={styles.addBtn}>
+        <button onClick={() => setShowEntryModal(true)} style={styles.addBtn}>
           <Plus size={16} />
           QR 코드 생성
         </button>
@@ -341,7 +378,30 @@ export function StoreQRPage() {
       {creating && selectedLibrary && (
         <div style={styles.createForm}>
           <h3 style={styles.formTitle}>새 QR 코드 설정</h3>
-          <p style={styles.formSubtitle}>자료: {selectedLibrary.title}</p>
+
+          {/* 선택된 자료 정보 */}
+          <div style={styles.selectedLibraryCard}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                <span style={styles.assetTypeBadge}>
+                  {ASSET_TYPE_LABELS[selectedLibrary.assetType] || selectedLibrary.assetType}
+                </span>
+                {selectedLibrary.category && (
+                  <span style={styles.categoryBadge}>{selectedLibrary.category}</span>
+                )}
+              </div>
+              <p style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: colors.neutral800 }}>
+                {selectedLibrary.title}
+              </p>
+            </div>
+            <button
+              onClick={() => { setCreating(false); setSelectedLibrary(null); setShowEntryModal(true); }}
+              style={styles.changeLibraryBtn}
+            >
+              자료 변경
+              <ArrowRight size={14} />
+            </button>
+          </div>
 
           <div style={styles.formRow}>
             <label style={styles.formLabel}>슬러그 (URL 경로)</label>
@@ -563,11 +623,29 @@ export function StoreQRPage() {
         )}
       </div>
 
+      {/* Entry Modal — 2-choice (기존 자료 선택 / 새 자산 만들기) */}
+      <StoreQRCreateEntryModal
+        open={showEntryModal}
+        onSelectExisting={() => {
+          setShowEntryModal(false);
+          setShowSelector(true);
+        }}
+        onCreateNew={() => {
+          setShowEntryModal(false);
+          navigate('/store/operation/library/new?from=qr-create');
+        }}
+        onClose={() => setShowEntryModal(false)}
+      />
+
       {/* Library Selector Modal */}
       <StoreLibrarySelectorModal
         open={showSelector}
         onSelect={handleLibrarySelect}
         onClose={() => setShowSelector(false)}
+        onCreateNew={() => {
+          setShowSelector(false);
+          navigate('/store/operation/library/new?from=qr-create');
+        }}
       />
 
       {/* Print Template Modal */}
@@ -703,6 +781,49 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
     borderRadius: '6px',
     textDecoration: 'none',
+  },
+
+  // Selected library card
+  selectedLibraryCard: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    padding: '12px 16px',
+    marginBottom: '20px',
+    backgroundColor: colors.neutral50,
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: '10px',
+  },
+  assetTypeBadge: {
+    display: 'inline-block',
+    padding: '2px 8px',
+    borderRadius: '10px',
+    backgroundColor: '#f0fdf4',
+    color: '#16a34a',
+    fontSize: '11px',
+    fontWeight: 500,
+  },
+  categoryBadge: {
+    display: 'inline-block',
+    padding: '2px 8px',
+    borderRadius: '10px',
+    backgroundColor: colors.neutral100,
+    fontSize: '11px',
+    color: colors.neutral500,
+  },
+  changeLibraryBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '4px',
+    padding: '6px 12px',
+    backgroundColor: '#fff',
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: '6px',
+    fontSize: '12px',
+    color: colors.neutral600,
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
   },
 
   // Create form

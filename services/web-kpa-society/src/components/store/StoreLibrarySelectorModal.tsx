@@ -14,7 +14,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, X, FileText, Image, Film, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, X, FileText, Image, Film, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { colors } from '../../styles/theme';
 import { getStoreLibraryItems } from '../../api/storeLibrary';
 import type { StoreLibraryItem } from '../../api/storeLibrary';
@@ -37,6 +37,7 @@ interface StoreLibrarySelectorModalProps {
   open: boolean;
   onSelect: (item: LibrarySelectorResult) => void;
   onClose: () => void;
+  onCreateNew?: () => void;
 }
 
 // ── 카테고리 필터 ──
@@ -51,6 +52,13 @@ const CATEGORIES = [
   { key: 'other', label: '기타' },
 ] as const;
 
+const ASSET_TYPES = [
+  { key: 'all', label: '전체' },
+  { key: 'file', label: '파일' },
+  { key: 'content', label: '콘텐츠' },
+  { key: 'external-link', label: '링크' },
+] as const;
+
 const PAGE_SIZE = 20;
 
 // ── 컴포넌트 ──
@@ -59,11 +67,13 @@ export function StoreLibrarySelectorModal({
   open,
   onSelect,
   onClose,
+  onCreateNew,
 }: StoreLibrarySelectorModalProps) {
   const [items, setItems] = useState<StoreLibraryItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [assetTypeFilter, setAssetTypeFilter] = useState('all');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -76,6 +86,7 @@ export function StoreLibrarySelectorModal({
     if (!open) return;
     setSearch('');
     setCategoryFilter('all');
+    setAssetTypeFilter('all');
     setSelectedId(null);
     setPage(1);
     setTotal(0);
@@ -125,6 +136,12 @@ export function StoreLibrarySelectorModal({
     setPage(1);
     setSelectedId(null);
   }, []);
+
+  // 클라이언트 자산 타입 필터링
+  const displayItems = items.filter((item) => {
+    if (assetTypeFilter === 'all') return true;
+    return (item.assetType || 'file') === assetTypeFilter;
+  });
 
   const selectedItem = items.find((i) => i.id === selectedId) ?? null;
 
@@ -180,6 +197,20 @@ export function StoreLibrarySelectorModal({
               </button>
             ))}
           </div>
+          <div style={styles.filterRow}>
+            {ASSET_TYPES.map((at) => (
+              <button
+                key={at.key}
+                onClick={() => { setAssetTypeFilter(at.key); setSelectedId(null); }}
+                style={{
+                  ...styles.filterChip,
+                  ...(assetTypeFilter === at.key ? styles.filterChipActiveGreen : {}),
+                }}
+              >
+                {at.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Card Grid */}
@@ -188,17 +219,23 @@ export function StoreLibrarySelectorModal({
             <div style={styles.emptyState}>
               <p style={{ color: colors.neutral500 }}>자료를 불러오는 중...</p>
             </div>
-          ) : items.length === 0 ? (
+          ) : displayItems.length === 0 ? (
             <div style={styles.emptyState}>
               <p style={{ color: colors.neutral500 }}>
-                {search.trim() || categoryFilter !== 'all'
+                {search.trim() || categoryFilter !== 'all' || assetTypeFilter !== 'all'
                   ? '검색 결과가 없습니다'
                   : '등록된 자료가 없습니다'}
               </p>
+              {onCreateNew && items.length === 0 && !search.trim() && categoryFilter === 'all' && (
+                <button onClick={onCreateNew} style={styles.emptyCreateBtn}>
+                  <Plus size={14} />
+                  새 자산 만들기
+                </button>
+              )}
             </div>
           ) : (
             <div style={styles.grid}>
-              {items.map((item) => (
+              {displayItems.map((item) => (
                 <button
                   key={item.id}
                   onClick={() => setSelectedId(item.id)}
@@ -422,6 +459,11 @@ const styles: Record<string, React.CSSProperties> = {
     borderColor: colors.primary,
     color: '#fff',
   },
+  filterChipActiveGreen: {
+    backgroundColor: '#16a34a',
+    borderColor: '#16a34a',
+    color: '#fff',
+  },
   body: {
     flex: 1,
     overflow: 'auto',
@@ -430,9 +472,24 @@ const styles: Record<string, React.CSSProperties> = {
   },
   emptyState: {
     display: 'flex',
+    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
     height: '200px',
+    gap: '12px',
+  },
+  emptyCreateBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '8px 16px',
+    backgroundColor: colors.primary,
+    color: '#fff',
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '13px',
+    fontWeight: 500,
+    cursor: 'pointer',
   },
   grid: {
     display: 'grid',

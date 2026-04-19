@@ -37,6 +37,7 @@ export function StoreLibraryNewPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const fromNeture = searchParams.get('fromNeture');
+  const from = searchParams.get('from');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Asset type
@@ -150,7 +151,14 @@ export function StoreLibraryNewPage() {
       const result = await createStoreLibraryItem(params as any);
 
       if (result.success) {
-        navigate('/store/operation/library', { replace: true });
+        if (from === 'qr-create' && result.data) {
+          navigate('/store/marketing/qr', {
+            replace: true,
+            state: { selectedLibraryItem: result.data },
+          });
+        } else {
+          navigate('/store/operation/library', { replace: true });
+        }
       } else {
         setSaveError('자료 저장 중 오류가 발생했습니다.');
       }
@@ -184,6 +192,16 @@ export function StoreLibraryNewPage() {
 
       {/* Page header */}
       <h1 style={styles.pageTitle}>매장 자료 등록</h1>
+
+      {/* QR 복귀 안내 배너 */}
+      {from === 'qr-create' && (
+        <div style={styles.prefillBanner}>
+          <Info size={16} style={{ color: '#2563eb', flexShrink: 0, marginTop: '2px' }} />
+          <p style={{ margin: 0, fontSize: '13px', color: '#1e40af' }}>
+            자료를 저장하면 QR 생성 화면으로 자동 복귀합니다.
+          </p>
+        </div>
+      )}
 
       {/* Neture prefill banner */}
       {fromNeture && prefillDone && (
