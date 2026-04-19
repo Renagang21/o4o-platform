@@ -12,7 +12,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { CheckCircle, XCircle, Sparkles } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { ActionBar, BulkResultModal, RowActionMenu } from '@o4o/ui';
-import { DataTable, Pagination, useBatchAction } from '@o4o/operator-ux-core';
+import { DataTable, Pagination, useBatchAction, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { joinRequestApi } from '../../api/joinRequestApi';
 import type { OrganizationJoinRequest } from '../../types/joinRequest';
@@ -20,6 +20,44 @@ import {
   JOIN_REQUEST_TYPE_LABELS,
   REQUESTED_ROLE_LABELS,
 } from '../../types/joinRequest';
+
+// ─── V4-EXPANSION: Action Policy ───
+
+const joinRequestPolicy = defineActionPolicy<OrganizationJoinRequest>('kpa:join-request', {
+  inlineMax: 2,
+  rules: [
+    {
+      key: 'approve',
+      label: '승인',
+      variant: 'primary',
+      confirm: {
+        title: '승인 확인',
+        message: '이 요청을 승인하시겠습니까?',
+        confirmText: '승인',
+        showReason: true,
+        reasonPlaceholder: '처리 메모 입력 (선택)',
+      },
+    },
+    {
+      key: 'reject',
+      label: '반려',
+      variant: 'danger',
+      confirm: {
+        title: '반려 확인',
+        message: '이 요청을 반려하시겠습니까?',
+        variant: 'danger',
+        confirmText: '반려',
+        showReason: true,
+        reasonPlaceholder: '반려 사유 입력 (선택)',
+      },
+    },
+  ],
+});
+
+const JOIN_REQUEST_ICONS: Record<string, React.ReactNode> = {
+  approve: <CheckCircle className="w-4 h-4" />,
+  reject: <XCircle className="w-4 h-4" />,
+};
 
 export function OrganizationJoinRequestsPage() {
   const [requests, setRequests] = useState<OrganizationJoinRequest[]>([]);
@@ -202,10 +240,10 @@ export function OrganizationJoinRequestsPage() {
     },
     {
       key: '_actions',
-      header: '처리',
+      header: '액션',
       system: true,
       align: 'center',
-      width: '100px',
+      width: '80px',
       onCellClick: () => {},
       render: (_v, row) => (
         actionLoading === row.id ? (
@@ -214,38 +252,11 @@ export function OrganizationJoinRequestsPage() {
           </div>
         ) : (
           <RowActionMenu
-            inlineMax={2}
-            actions={[
-              {
-                key: 'approve',
-                label: '승인',
-                icon: <CheckCircle className="w-4 h-4" />,
-                onClick: (reason) => handleApprove(row.id, reason),
-                variant: 'primary',
-                confirm: {
-                  title: '승인 확인',
-                  message: '이 요청을 승인하시겠습니까?',
-                  confirmText: '승인',
-                  showReason: true,
-                  reasonPlaceholder: '처리 메모 입력 (선택)',
-                },
-              },
-              {
-                key: 'reject',
-                label: '반려',
-                icon: <XCircle className="w-4 h-4" />,
-                onClick: (reason) => handleReject(row.id, reason),
-                variant: 'danger',
-                confirm: {
-                  title: '반려 확인',
-                  message: '이 요청을 반려하시겠습니까?',
-                  variant: 'danger',
-                  confirmText: '반려',
-                  showReason: true,
-                  reasonPlaceholder: '반려 사유 입력 (선택)',
-                },
-              },
-            ]}
+            inlineMax={joinRequestPolicy.inlineMax}
+            actions={buildRowActions(joinRequestPolicy, row, {
+              approve: (reason) => handleApprove(row.id, reason),
+              reject: (reason) => handleReject(row.id, reason),
+            }, { icons: JOIN_REQUEST_ICONS })}
           />
         )
       ),
@@ -300,6 +311,12 @@ export function OrganizationJoinRequestsPage() {
             loading: batch.loading,
             group: 'actions',
             tooltip: '선택된 요청을 일괄 반려합니다',
+            confirm: {
+              title: '일괄 반려 확인',
+              message: `${selectedIds.size}개 요청을 일괄 반려합니다.`,
+              variant: 'danger',
+              confirmText: '반려',
+            },
           },
           {
             key: 'ai-summary',

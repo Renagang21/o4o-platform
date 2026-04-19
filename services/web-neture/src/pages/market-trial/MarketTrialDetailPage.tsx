@@ -21,6 +21,7 @@ import {
   type ParticipationInfo,
 } from '../../api/trial';
 import { useAuth } from '../../contexts/AuthContext';
+import { ContentRenderer } from '@o4o/content-editor';
 
 const STATUS_LABELS: Record<string, { label: string; bg: string; color: string }> = {
   draft: { label: '초안', bg: '#F3F4F6', color: '#6B7280' },
@@ -209,14 +210,55 @@ export function MarketTrialDetailPage() {
           )}
         </div>
         <h1 style={s.title}>{trial.title}</h1>
+        {trial.oneLiner && (
+          <p style={s.oneLiner}>{trial.oneLiner}</p>
+        )}
       </header>
 
-      {/* 설명 */}
+      {/* 영상 소개 */}
+      {trial.videoUrl && (() => {
+        const embed = parseVideoEmbed(trial.videoUrl);
+        if (embed.type === 'youtube' || embed.type === 'vimeo') {
+          return (
+            <section style={s.videoSection}>
+              <div style={s.videoWrapper}>
+                <iframe
+                  src={embed.src}
+                  title="영상 소개"
+                  style={s.videoIframe}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            </section>
+          );
+        }
+        return (
+          <section style={s.videoSection}>
+            <a href={trial.videoUrl} target="_blank" rel="noopener noreferrer" style={s.videoLink}>
+              영상 보기 →
+            </a>
+          </section>
+        );
+      })()}
+
+      {/* 왜 이걸 해야 하는가 (설명) */}
       {trial.description && (
         <section style={s.descBox}>
+          <h3 style={s.sectionTitle}>왜 이걸 해야 하는가</h3>
           <p style={{ fontSize: '0.9375rem', color: '#4B5563', lineHeight: 1.7, margin: 0 }}>
             {trial.description}
           </p>
+        </section>
+      )}
+
+      {/* 매장 활용 방법 */}
+      {trial.salesScenarioContent && (
+        <section style={s.scenarioBox}>
+          <h3 style={s.sectionTitle}>매장 활용 방법</h3>
+          <div style={{ fontSize: '0.9375rem', color: '#4B5563', lineHeight: 1.7 }}>
+            <ContentRenderer html={trial.salesScenarioContent} />
+          </div>
         </section>
       )}
 
@@ -469,6 +511,36 @@ export function MarketTrialDetailPage() {
 
 export default MarketTrialDetailPage;
 
+// ── 유틸 함수 ──
+
+function parseVideoEmbed(url: string): { type: 'youtube' | 'vimeo' | 'external'; src: string } {
+  try {
+    const u = new URL(url);
+    // YouTube
+    if (u.hostname.includes('youtube.com') || u.hostname.includes('youtu.be')) {
+      let videoId = '';
+      if (u.hostname.includes('youtu.be')) {
+        videoId = u.pathname.slice(1);
+      } else {
+        videoId = u.searchParams.get('v') || '';
+      }
+      if (videoId) {
+        return { type: 'youtube', src: `https://www.youtube.com/embed/${videoId}` };
+      }
+    }
+    // Vimeo
+    if (u.hostname.includes('vimeo.com')) {
+      const match = u.pathname.match(/\/(\d+)/);
+      if (match) {
+        return { type: 'vimeo', src: `https://player.vimeo.com/video/${match[1]}` };
+      }
+    }
+  } catch {
+    // invalid URL
+  }
+  return { type: 'external', src: url };
+}
+
 // ── 유틸 컴포넌트 ──
 
 function InfoGrid({ children }: { children: React.ReactNode }) {
@@ -510,6 +582,53 @@ const s: Record<string, React.CSSProperties> = {
     fontWeight: 500,
   },
   title: { fontSize: '1.5rem', fontWeight: 700, color: '#111827', margin: 0 },
+  oneLiner: {
+    fontSize: '1.0625rem',
+    color: '#374151',
+    fontWeight: 500,
+    lineHeight: 1.6,
+    margin: '10px 0 0 0',
+  },
+  sectionTitle: {
+    fontSize: '0.9375rem',
+    fontWeight: 600,
+    color: '#1F2937',
+    margin: '0 0 10px 0',
+  },
+  videoSection: { marginBottom: '20px' },
+  videoWrapper: {
+    position: 'relative' as const,
+    paddingBottom: '56.25%',
+    height: 0,
+    overflow: 'hidden',
+    borderRadius: '12px',
+    backgroundColor: '#000',
+  },
+  videoIframe: {
+    position: 'absolute' as const,
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    border: 'none',
+  },
+  videoLink: {
+    display: 'inline-block',
+    padding: '10px 20px',
+    backgroundColor: '#F3F4F6',
+    color: '#2563EB',
+    borderRadius: '8px',
+    fontSize: '0.875rem',
+    fontWeight: 600,
+    textDecoration: 'none',
+  },
+  scenarioBox: {
+    padding: '16px 20px',
+    backgroundColor: '#FFFFFF',
+    borderRadius: '12px',
+    border: '1px solid #E5E7EB',
+    marginBottom: '20px',
+  },
 
   descBox: {
     padding: '16px 20px',

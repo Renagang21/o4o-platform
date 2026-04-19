@@ -110,7 +110,7 @@ export default function HqMediaPage() {
       setFormName(''); setFormSourceUrl(''); setShowForm(false);
       fetchMedia();
     } catch (err: any) {
-      setError(err?.message || '미디어 생성에 실패했습니다');
+      setError(err?.message || '미디어 등록에 실패했습니다');
     } finally {
       setIsCreating(false);
     }
@@ -252,20 +252,15 @@ export default function HqMediaPage() {
       {/* Create Form */}
       {showForm && (
         <div className="bg-white rounded-xl border border-blue-100 p-6">
-          <h2 className="text-lg font-semibold text-slate-800 mb-4">새 HQ 미디어</h2>
+          <h2 className="text-lg font-semibold text-slate-800 mb-4">새 미디어 등록</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-medium text-slate-500 mb-1">제목 *</label>
-              <input type="text" value={formName} onChange={e => setFormName(e.target.value)} placeholder="미디어 제목" className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <input type="text" value={formName} onChange={e => setFormName(e.target.value)} placeholder="동영상 제목을 입력하세요" className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">미디어 타입</label>
-              <select value={formMediaType} onChange={e => setFormMediaType(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="video">동영상</option>
-                <option value="image">이미지</option>
-                <option value="html">HTML</option>
-                <option value="text">텍스트</option>
-              </select>
+              <label className="block text-xs font-medium text-slate-500 mb-1">동영상 URL *</label>
+              <input type="text" value={formSourceUrl} onChange={e => setFormSourceUrl(e.target.value)} placeholder="YouTube 또는 Vimeo URL" className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
             </div>
             <div>
               <label className="block text-xs font-medium text-slate-500 mb-1">소스 타입</label>
@@ -276,13 +271,18 @@ export default function HqMediaPage() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">소스 URL *</label>
-              <input type="text" value={formSourceUrl} onChange={e => setFormSourceUrl(e.target.value)} placeholder="https://..." className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <label className="block text-xs font-medium text-slate-500 mb-1">미디어 타입</label>
+              <select value={formMediaType} onChange={e => setFormMediaType(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="video">동영상</option>
+                <option value="image">이미지</option>
+                <option value="html">HTML</option>
+                <option value="text">텍스트</option>
+              </select>
             </div>
           </div>
           <div className="flex justify-end gap-2 mt-4">
             <button onClick={() => setShowForm(false)} className="px-4 py-2 border border-slate-200 rounded-lg text-sm hover:bg-slate-50">취소</button>
-            <button onClick={handleCreate} disabled={isCreating || !formName.trim() || !formSourceUrl.trim()} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50">{isCreating ? '생성 중...' : '생성'}</button>
+            <button onClick={handleCreate} disabled={isCreating || !formName.trim() || !formSourceUrl.trim()} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50">{isCreating ? '등록 중...' : '등록'}</button>
           </div>
         </div>
       )}

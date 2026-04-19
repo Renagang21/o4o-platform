@@ -67,6 +67,8 @@ export default function SupplierTrialCreatePage({
   const [salesScenarioContent, setSalesScenarioContent] = useState(initialData?.salesScenarioContent || SALES_SCENARIO_TEMPLATE);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  // WO-MARKET-TRIAL-FORM-GUIDANCE-ENHANCEMENT-V1: 인라인 에러
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   // 정산 계산 미리보기
   const settlementPreview = (() => {
@@ -94,31 +96,34 @@ export default function SupplierTrialCreatePage({
   };
 
   const handleCreate = async (autoSubmit: boolean) => {
-    if (!title.trim()) {
-      setError('제목을 입력해주세요.');
-      return;
-    }
-    if (!oneLiner.trim() || oneLiner.trim().length < 10) {
-      setError('한 줄 제안을 10자 이상 입력해주세요.');
-      return;
-    }
+    // WO-MARKET-TRIAL-FORM-GUIDANCE-ENHANCEMENT-V1: 전체 필드 검증 + 인라인 에러
+    const errors: Record<string, string> = {};
+    if (!title.trim()) errors.title = '제목을 입력해주세요.';
+    if (!oneLiner.trim() || oneLiner.trim().length < 10) errors.oneLiner = '한 줄 제안을 10자 이상 입력해주세요.';
     if (videoUrl.trim()) {
       try { new URL(videoUrl.trim()); } catch {
-        setError('영상 URL 형식이 올바르지 않습니다.');
-        return;
+        errors.videoUrl = '영상 URL 형식이 올바르지 않습니다.';
       }
     }
-    if (!fundingStartAt || !fundingEndAt) {
-      setError('모집 기간을 설정해주세요.');
+    if (!fundingStartAt || !fundingEndAt) errors.funding = '모집 기간을 설정해주세요.';
+    if (!trialPeriodDays || Number(trialPeriodDays) <= 0) errors.trialPeriodDays = 'Trial 기간(일)을 입력해주세요.';
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setError('입력 항목을 확인해주세요.');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
-    if (!trialPeriodDays || Number(trialPeriodDays) <= 0) {
-      setError('Trial 기간(일)을 입력해주세요.');
-      return;
+
+    // WO-MARKET-TRIAL-FORM-GUIDANCE-ENHANCEMENT-V1: 제출 확인
+    if (autoSubmit) {
+      const confirmed = window.confirm('제출 후에는 수정이 제한될 수 있습니다. 제출하시겠습니까?');
+      if (!confirmed) return;
     }
 
     setLoading(true);
     setError('');
+    setFieldErrors({});
 
     try {
       const scenarioHtml = salesScenarioContent?.trim();
@@ -194,8 +199,9 @@ export default function SupplierTrialCreatePage({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="예: 신제품 A 약국 시험 도입"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${fieldErrors.title ? 'border-red-400 bg-red-50' : 'border-gray-300'}`}
             />
+            {fieldErrors.title && <p className="text-xs text-red-500 mt-1">{fieldErrors.title}</p>}
           </div>
 
           {/* 한 줄 제안 */}
@@ -209,9 +215,12 @@ export default function SupplierTrialCreatePage({
               onChange={(e) => setOneLiner(e.target.value)}
               maxLength={120}
               placeholder="매장에서 바로 팔 수 있는 간 건강 제품 테스트"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${fieldErrors.oneLiner ? 'border-red-400 bg-red-50' : 'border-gray-300'}`}
             />
-            <p className="text-xs text-gray-400 mt-1 text-right">{oneLiner.length}/120</p>
+            <div className="flex justify-between mt-1">
+              {fieldErrors.oneLiner ? <p className="text-xs text-red-500">{fieldErrors.oneLiner}</p> : <span />}
+              <p className="text-xs text-gray-400">{oneLiner.length}/120</p>
+            </div>
           </div>
 
           {/* 대표 영상 — WO-MARKET-TRIAL-VIDEO-FIELD-V1 */}
@@ -222,9 +231,12 @@ export default function SupplierTrialCreatePage({
               value={videoUrl}
               onChange={(e) => setVideoUrl(e.target.value)}
               placeholder="영상 URL을 입력하세요 (YouTube, Vimeo 또는 기타 URL 가능)"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${fieldErrors.videoUrl ? 'border-red-400 bg-red-50' : 'border-gray-300'}`}
             />
-            <p className="text-xs text-gray-400 mt-1">제품 사용이나 매장 판매 모습을 보여주면 참여율이 높아집니다</p>
+            {fieldErrors.videoUrl
+              ? <p className="text-xs text-red-500 mt-1">{fieldErrors.videoUrl}</p>
+              : <p className="text-xs text-gray-400 mt-1">제품 사용이나 매장 판매 모습을 보여주면 참여율이 높아집니다</p>
+            }
           </div>
         </div>
 
@@ -232,7 +244,7 @@ export default function SupplierTrialCreatePage({
         <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
           <div>
             <h2 className="text-base font-semibold text-gray-900">왜 이걸 해야 하는가</h2>
-            <p className="text-xs text-gray-500 mt-0.5">이 제품이 어떤 고객에게 필요하고, 왜 매장에서 판매할 가치가 있는지 작성하세요</p>
+            <p className="text-xs text-gray-500 mt-0.5">제품 설명이 아니라, 매장에서 왜 이 제품을 취급해야 하는지를 중심으로 작성하세요</p>
           </div>
 
           <div>
@@ -240,8 +252,8 @@ export default function SupplierTrialCreatePage({
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              rows={4}
-              placeholder="이 제품이 어떤 고객에게 필요하고, 매장에서 판매할 가치가 있는 이유를 작성하세요."
+              rows={5}
+              placeholder={"1) 이 제품이 필요한 고객은 누구입니까?\n2) 매장에서 왜 지금 취급해야 합니까?\n3) 기존 제품과 무엇이 다릅니까?"}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
@@ -339,7 +351,10 @@ export default function SupplierTrialCreatePage({
 
           {/* 펀딩 구조 — WO-MARKET-TRIAL-CROWDFUNDING-CORE-ALIGNMENT-V1 */}
           <div className="space-y-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h3 className="text-sm font-semibold text-blue-800">펀딩 구조 설정</h3>
+            <div>
+              <h3 className="text-sm font-semibold text-blue-800">펀딩 구조 설정</h3>
+              <p className="text-xs text-blue-600 mt-1">매장이 제품 단가로 참여하면, 설정한 리워드 비율만큼 추가 혜택을 받을 수 있습니다.</p>
+            </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -422,29 +437,32 @@ export default function SupplierTrialCreatePage({
           </div>
 
           {/* 모집 기간 */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                모집 시작일 <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="date"
-                value={fundingStartAt}
-                onChange={(e) => setFundingStartAt(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
+          <div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  모집 시작일 <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  value={fundingStartAt}
+                  onChange={(e) => setFundingStartAt(e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${fieldErrors.funding ? 'border-red-400 bg-red-50' : 'border-gray-300'}`}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  모집 종료일 <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  value={fundingEndAt}
+                  onChange={(e) => setFundingEndAt(e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${fieldErrors.funding ? 'border-red-400 bg-red-50' : 'border-gray-300'}`}
+                />
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                모집 종료일 <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="date"
-                value={fundingEndAt}
-                onChange={(e) => setFundingEndAt(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
+            {fieldErrors.funding && <p className="text-xs text-red-500 mt-1">{fieldErrors.funding}</p>}
           </div>
 
           {/* Trial 기간 */}
@@ -457,8 +475,9 @@ export default function SupplierTrialCreatePage({
               value={trialPeriodDays}
               onChange={(e) => setTrialPeriodDays(e.target.value)}
               min="1"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${fieldErrors.trialPeriodDays ? 'border-red-400 bg-red-50' : 'border-gray-300'}`}
             />
+            {fieldErrors.trialPeriodDays && <p className="text-xs text-red-500 mt-1">{fieldErrors.trialPeriodDays}</p>}
           </div>
         </div>
 
@@ -477,7 +496,7 @@ export default function SupplierTrialCreatePage({
             disabled={loading}
             className="px-4 py-2 text-sm text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 disabled:opacity-50"
           >
-            {mode === 'edit' ? '저장' : '임시저장'}
+            {mode === 'edit' ? '수정 완료' : '임시저장'}
           </button>
           {mode !== 'edit' && (
             <button
@@ -486,7 +505,7 @@ export default function SupplierTrialCreatePage({
               disabled={loading}
               className="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
             >
-              {loading ? '처리 중...' : '제출하기'}
+              {loading ? '처리 중...' : '운영자 검토 요청'}
             </button>
           )}
         </div>

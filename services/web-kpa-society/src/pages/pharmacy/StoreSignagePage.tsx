@@ -312,6 +312,7 @@ export function StoreSignagePage() {
   const [regVideoTitle, setRegVideoTitle] = useState('');
   const [regVideoUrl, setRegVideoUrl] = useState('');
   const [regVideoSaving, setRegVideoSaving] = useState(false);
+  const [regVideoError, setRegVideoError] = useState('');
   const [selectedVideoKeys, setSelectedVideoKeys] = useState<string[]>([]);
 
   const fetchItems = useCallback(async () => {
@@ -489,10 +490,11 @@ export function StoreSignagePage() {
 
   // ── Video registration handler ──
   const handleRegisterVideo = async () => {
+    setRegVideoError('');
     if (!regVideoTitle.trim() || !regVideoUrl.trim()) return;
     const sourceType = detectVideoSource(regVideoUrl.trim());
     if (!sourceType) {
-      alert('YouTube 또는 Vimeo URL만 등록할 수 있습니다.');
+      setRegVideoError('올바른 YouTube 또는 Vimeo URL을 입력해 주세요.');
       return;
     }
     setRegVideoSaving(true);
@@ -505,10 +507,11 @@ export function StoreSignagePage() {
       });
       setRegVideoTitle('');
       setRegVideoUrl('');
+      setRegVideoError('');
       setShowVideoRegForm(false);
       loadSignageMedia();
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : '동영상 등록에 실패했습니다.');
+      setRegVideoError(err instanceof Error ? err.message : '동영상 등록에 실패했습니다.');
     } finally {
       setRegVideoSaving(false);
     }
@@ -1424,37 +1427,42 @@ export function StoreSignagePage() {
 
       {/* Video registration form */}
       {showVideoRegForm && (
-        <div className="flex gap-2 mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-          <input
-            type="text"
-            value={regVideoTitle}
-            onChange={e => setRegVideoTitle(e.target.value)}
-            placeholder="동영상 이름"
-            className="flex-1 px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-            autoFocus
-          />
-          <input
-            type="url"
-            value={regVideoUrl}
-            onChange={e => setRegVideoUrl(e.target.value)}
-            placeholder="YouTube 또는 Vimeo URL"
-            className="flex-1 px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-            onKeyDown={e => e.key === 'Enter' && handleRegisterVideo()}
-          />
-          <button
-            onClick={handleRegisterVideo}
-            disabled={regVideoSaving || !regVideoTitle.trim() || !regVideoUrl.trim()}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {regVideoSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-            등록
-          </button>
-          <button
-            onClick={() => { setShowVideoRegForm(false); setRegVideoTitle(''); setRegVideoUrl(''); }}
-            className="px-3 py-1.5 text-sm text-slate-600 border border-slate-300 rounded-md hover:bg-slate-50"
-          >
-            취소
-          </button>
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          {regVideoError && (
+            <p className="text-xs text-red-600 mb-2">{regVideoError}</p>
+          )}
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={regVideoTitle}
+              onChange={e => { setRegVideoTitle(e.target.value); setRegVideoError(''); }}
+              placeholder="동영상 제목을 입력하세요"
+              className="flex-1 px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+              autoFocus
+            />
+            <input
+              type="url"
+              value={regVideoUrl}
+              onChange={e => { setRegVideoUrl(e.target.value); setRegVideoError(''); }}
+              placeholder="YouTube 또는 Vimeo URL"
+              className="flex-1 px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+              onKeyDown={e => e.key === 'Enter' && handleRegisterVideo()}
+            />
+            <button
+              onClick={() => { setShowVideoRegForm(false); setRegVideoTitle(''); setRegVideoUrl(''); setRegVideoError(''); }}
+              className="px-3 py-1.5 text-sm text-slate-600 border border-slate-300 rounded-md hover:bg-slate-50"
+            >
+              취소
+            </button>
+            <button
+              onClick={handleRegisterVideo}
+              disabled={regVideoSaving || !regVideoTitle.trim() || !regVideoUrl.trim()}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {regVideoSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+              {regVideoSaving ? '등록 중...' : '등록'}
+            </button>
+          </div>
         </div>
       )}
 

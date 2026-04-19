@@ -77,6 +77,13 @@ const NEXT_ACTION: Record<string, { title: string; desc: string }> = {
   },
 };
 
+const SERVICE_KEY_LABELS: Record<string, string> = {
+  glycopharm: 'GlycoPharm',
+  'k-cosmetics': 'K-Cosmetics',
+  'kpa-society': 'KPA-a',
+  neture: 'Neture',
+};
+
 const CONVERSION_STAGES: { key: string; label: string; color: string }[] = [
   { key: 'interested',  label: '관심 있음',  color: '#3B82F6' },
   { key: 'considering', label: '취급 검토',   color: '#F59E0B' },
@@ -181,7 +188,6 @@ export default function SupplierTrialDetailPage() {
             {trial.oneLiner}
           </p>
         )}
-        {trial.description && <p style={s.desc}>{trial.description}</p>}
         <div style={s.meta}>
           <span style={s.metaItem}>등록일: {new Date(trial.createdAt).toLocaleDateString('ko-KR')}</span>
           {trial.endDate && (
@@ -221,11 +227,132 @@ export default function SupplierTrialDetailPage() {
         );
       })()}
 
+      {/* 왜 이걸 해야 하는가 (description) — WO-MARKET-TRIAL-SUPPLIER-DETAIL-PREVIEW-ENHANCEMENT-V1 */}
+      {trial.description && (
+        <div style={s.section}>
+          <h2 style={s.sectionTitle}>왜 이걸 해야 하는가</h2>
+          <p style={{ fontSize: '15px', color: '#4B5563', lineHeight: 1.7, margin: 0 }}>
+            {trial.description}
+          </p>
+        </div>
+      )}
+
       {/* 매장 활용 방법 — WO-MARKET-TRIAL-SALES-SCENARIO-EDITOR-V1 / WO-MARKET-TRIAL-PROPOSAL-STRUCTURE-V1 */}
       {trial.salesScenarioContent && (
         <div style={s.section}>
           <h2 style={s.sectionTitle}>매장 활용 방법</h2>
           <ContentRenderer html={trial.salesScenarioContent} />
+        </div>
+      )}
+
+      {/* 결과 약속 — WO-MARKET-TRIAL-SUPPLIER-DETAIL-PREVIEW-ENHANCEMENT-V1 */}
+      {trial.outcomeSnapshot?.description && (
+        <div style={s.outcomeSection}>
+          <h2 style={{ fontSize: '16px', fontWeight: 600, color: '#166534', margin: '0 0 10px 0' }}>
+            결과 약속
+          </h2>
+          <p style={{ fontSize: '15px', color: '#15803D', lineHeight: 1.6, margin: 0 }}>
+            {trial.outcomeSnapshot.description}
+          </p>
+          {trial.outcomeSnapshot.note && (
+            <p style={{ fontSize: '13px', color: '#166534', margin: '8px 0 0 0', opacity: 0.8 }}>
+              {trial.outcomeSnapshot.note}
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* 운영 정보 — WO-MARKET-TRIAL-SUPPLIER-DETAIL-PREVIEW-ENHANCEMENT-V1 */}
+      <div style={s.section}>
+        <h2 style={s.sectionTitle}>운영 정보</h2>
+        <div style={s.infoGrid}>
+          {(trial.visibleServiceKeys ?? []).length > 0 && (
+            <div style={s.infoItem}>
+              <span style={s.infoLabel}>대상 서비스</span>
+              <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                {(trial.visibleServiceKeys ?? []).map((k) => (
+                  <span key={k} style={s.serviceTag}>{SERVICE_KEY_LABELS[k] || k}</span>
+                ))}
+              </div>
+            </div>
+          )}
+          <div style={s.infoItem}>
+            <span style={s.infoLabel}>참여 현황</span>
+            <span style={s.infoValue}>
+              {trial.currentParticipants}{trial.maxParticipants ? ` / ${trial.maxParticipants}` : ''}명
+            </span>
+          </div>
+          {trial.startDate && (
+            <div style={s.infoItem}>
+              <span style={s.infoLabel}>모집 시작</span>
+              <span style={s.infoValue}>{new Date(trial.startDate).toLocaleDateString('ko-KR')}</span>
+            </div>
+          )}
+          {trial.endDate && (
+            <div style={s.infoItem}>
+              <span style={s.infoLabel}>모집 마감</span>
+              <span style={s.infoValue}>{new Date(trial.endDate).toLocaleDateString('ko-KR')}</span>
+            </div>
+          )}
+          {trial.trialPeriodDays != null && (
+            <div style={s.infoItem}>
+              <span style={s.infoLabel}>체험 기간</span>
+              <span style={s.infoValue}>{trial.trialPeriodDays}일</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* 펀딩 구조 — WO-MARKET-TRIAL-SUPPLIER-DETAIL-PREVIEW-ENHANCEMENT-V1 */}
+      {(trial.targetAmount || (trial.rewardRate != null && trial.rewardRate > 0)) && (
+        <div style={s.fundingSection}>
+          <h2 style={{ fontSize: '16px', fontWeight: 600, color: '#5B21B6', margin: '0 0 12px 0' }}>
+            펀딩 구조
+          </h2>
+          <div style={s.infoGrid}>
+            {trial.targetAmount != null && trial.targetAmount > 0 && (
+              <div style={s.infoItem}>
+                <span style={s.infoLabel}>목표 금액</span>
+                <span style={s.infoValue}>{trial.targetAmount.toLocaleString()}원</span>
+              </div>
+            )}
+            {trial.currentAmount != null && trial.currentAmount > 0 && (
+              <div style={s.infoItem}>
+                <span style={s.infoLabel}>현재 모집</span>
+                <span style={s.infoValue}>{trial.currentAmount.toLocaleString()}원</span>
+              </div>
+            )}
+            {trial.trialUnitPrice != null && trial.trialUnitPrice > 0 && (
+              <div style={s.infoItem}>
+                <span style={s.infoLabel}>제품 단가</span>
+                <span style={s.infoValue}>{trial.trialUnitPrice.toLocaleString()}원</span>
+              </div>
+            )}
+            {trial.rewardRate != null && trial.rewardRate > 0 && (
+              <div style={s.infoItem}>
+                <span style={s.infoLabel}>리워드</span>
+                <span style={s.infoValue}>+{trial.rewardRate}%</span>
+              </div>
+            )}
+          </div>
+          {trial.trialUnitPrice != null &&
+            trial.trialUnitPrice > 0 &&
+            trial.rewardRate != null &&
+            trial.rewardRate > 0 &&
+            (() => {
+              const unit = trial.trialUnitPrice!;
+              const rate = trial.rewardRate!;
+              const total = Math.round(unit * (1 + rate / 100));
+              const qty = Math.floor(total / unit);
+              const rem = total - qty * unit;
+              return (
+                <div style={s.settlementPreview}>
+                  <strong>정산 예시</strong>: 단가 {unit.toLocaleString()}원 참여 시
+                  → 총 {total.toLocaleString()}원 환원
+                  {qty > 0 && ` → 약 ${qty}개${rem > 0 ? ` + 잔액 ${rem.toLocaleString()}원` : ''}`}
+                </div>
+              );
+            })()}
         </div>
       )}
 
@@ -472,12 +599,6 @@ const s: Record<string, React.CSSProperties> = {
     color: '#fff',
     borderRadius: '20px',
   },
-  desc: {
-    fontSize: '14px',
-    color: '#6B7280',
-    margin: '0 0 12px 0',
-    lineHeight: 1.6,
-  },
   meta: {
     display: 'flex',
     gap: '16px',
@@ -629,6 +750,55 @@ const s: Record<string, React.CSSProperties> = {
   rateSub: {
     fontSize: '11px',
     color: '#6B7280',
+  },
+  outcomeSection: {
+    padding: '16px 20px',
+    backgroundColor: '#F0FDF4',
+    borderRadius: '12px',
+    border: '1px solid #BBF7D0',
+    marginBottom: '16px',
+  },
+  infoGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, 1fr)',
+    gap: '12px 24px',
+  },
+  infoItem: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '2px',
+  },
+  infoLabel: {
+    fontSize: '12px',
+    color: '#9CA3AF',
+  },
+  infoValue: {
+    fontSize: '15px',
+    color: '#1F2937',
+    fontWeight: 500,
+  },
+  serviceTag: {
+    padding: '2px 8px',
+    backgroundColor: '#F3F4F6',
+    color: '#6B7280',
+    borderRadius: '4px',
+    fontSize: '12px',
+    fontWeight: 500,
+  },
+  fundingSection: {
+    padding: '16px 20px',
+    backgroundColor: '#F5F3FF',
+    borderRadius: '12px',
+    border: '1px solid #DDD6FE',
+    marginBottom: '16px',
+  },
+  settlementPreview: {
+    marginTop: '12px',
+    padding: '10px 14px',
+    backgroundColor: '#EDE9FE',
+    borderRadius: '8px',
+    fontSize: '13px',
+    color: '#4C1D95',
   },
 };
 

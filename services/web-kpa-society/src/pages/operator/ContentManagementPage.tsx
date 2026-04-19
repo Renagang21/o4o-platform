@@ -443,7 +443,6 @@ function ContentList({
       return item?.status === 'archived';
     });
     if (archivedIds.length === 0) return;
-    if (!confirm(`${archivedIds.length}개 보관된 콘텐츠를 완전 삭제합니다. 이 작업은 되돌릴 수 없습니다.`)) return;
     const result = await batch.executeBatch(
       (batchIds) => apiFetch(`/api/v1/kpa/news/batch-hard-delete`, {
         method: 'POST',
