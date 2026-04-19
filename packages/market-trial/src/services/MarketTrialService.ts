@@ -23,6 +23,10 @@ export interface CreateTrialDto {
   supplierId: string;
   supplierName?: string;
   title: string;
+  /** One-liner proposal — WO-MARKET-TRIAL-PROPOSAL-STRUCTURE-V1 */
+  oneLiner?: string;
+  /** Representative video URL — WO-MARKET-TRIAL-VIDEO-FIELD-V1 */
+  videoUrl?: string;
   description?: string;
   outcomeSnapshot?: {
     expectedType: 'product' | 'cash';
@@ -36,6 +40,8 @@ export interface CreateTrialDto {
   targetAmount?: number;
   /** Reward rate (%) — WO-MARKET-TRIAL-CROWDFUNDING-CORE-ALIGNMENT-V1 */
   rewardRate?: number;
+  /** Rich HTML sales scenario — WO-MARKET-TRIAL-SALES-SCENARIO-EDITOR-V1 */
+  salesScenarioContent?: string;
   fundingStartAt: Date;
   fundingEndAt: Date;
   trialPeriodDays: number;
@@ -61,6 +67,29 @@ export function calculateSettlement(
   const productQty = Math.floor(totalAmount / unitPrice);
   const remainder = totalAmount - productQty * unitPrice;
   return { totalAmount, productQty, remainder };
+}
+
+/** WO-MARKET-TRIAL-EDIT-FLOW-V1 */
+export interface UpdateTrialDto {
+  title?: string;
+  oneLiner?: string;
+  videoUrl?: string;
+  description?: string;
+  salesScenarioContent?: string;
+  outcomeSnapshot?: {
+    expectedType: 'product' | 'cash';
+    description: string;
+    quantity?: number;
+    note?: string;
+  };
+  visibleServiceKeys?: string[];
+  maxParticipants?: number;
+  trialUnitPrice?: number;
+  targetAmount?: number;
+  rewardRate?: number;
+  fundingStartAt?: Date;
+  fundingEndAt?: Date;
+  trialPeriodDays?: number;
 }
 
 export interface ParticipateDto {
@@ -96,7 +125,10 @@ export class MarketTrialService {
       supplierId: dto.supplierId,
       supplierName: dto.supplierName || undefined,
       title: dto.title,
+      oneLiner: dto.oneLiner || null,
+      videoUrl: dto.videoUrl || null,
       description: dto.description || null,
+      salesScenarioContent: dto.salesScenarioContent || null,
       outcomeSnapshot: dto.outcomeSnapshot || undefined,
       visibleServiceKeys: dto.visibleServiceKeys || [],
       maxParticipants: dto.maxParticipants || undefined,
@@ -128,6 +160,34 @@ export class MarketTrialService {
       throw new Error('Only DRAFT trials can be submitted');
     }
     trial.status = TrialStatus.SUBMITTED;
+    return this.trialRepo.save(trial);
+  }
+
+  /**
+   * Update a DRAFT trial (supplier only)
+   * WO-MARKET-TRIAL-EDIT-FLOW-V1
+   */
+  async updateTrial(trialId: string, supplierId: string, dto: UpdateTrialDto): Promise<MarketTrial> {
+    const trial = await this.trialRepo.findOne({ where: { id: trialId } });
+    if (!trial) throw new Error('Market Trial not found');
+    if (trial.supplierId !== supplierId) throw new Error('Not authorized to edit this trial');
+    if (trial.status !== TrialStatus.DRAFT) throw new Error('Only DRAFT trials can be edited');
+
+    if (dto.title !== undefined) trial.title = dto.title;
+    if (dto.oneLiner !== undefined) trial.oneLiner = dto.oneLiner || null;
+    if (dto.videoUrl !== undefined) trial.videoUrl = dto.videoUrl || null;
+    if (dto.description !== undefined) trial.description = dto.description || null;
+    if (dto.salesScenarioContent !== undefined) trial.salesScenarioContent = dto.salesScenarioContent || null;
+    if (dto.outcomeSnapshot !== undefined) trial.outcomeSnapshot = dto.outcomeSnapshot;
+    if (dto.visibleServiceKeys !== undefined) trial.visibleServiceKeys = dto.visibleServiceKeys;
+    if (dto.maxParticipants !== undefined) trial.maxParticipants = dto.maxParticipants;
+    if (dto.trialUnitPrice !== undefined) trial.trialUnitPrice = dto.trialUnitPrice;
+    if (dto.targetAmount !== undefined) trial.targetAmount = dto.targetAmount;
+    if (dto.rewardRate !== undefined) trial.rewardRate = dto.rewardRate;
+    if (dto.fundingStartAt !== undefined) trial.fundingStartAt = dto.fundingStartAt;
+    if (dto.fundingEndAt !== undefined) trial.fundingEndAt = dto.fundingEndAt;
+    if (dto.trialPeriodDays !== undefined) trial.trialPeriodDays = dto.trialPeriodDays;
+
     return this.trialRepo.save(trial);
   }
 

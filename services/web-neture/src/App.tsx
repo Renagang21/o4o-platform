@@ -168,6 +168,9 @@ const SupplierTrialListPage = lazy(() =>
 const SupplierTrialDetailPage = lazy(() =>
   import('./pages/supplier').then((m) => ({ default: m.SupplierTrialDetailPage }))
 );
+const SupplierTrialEditPage = lazy(() =>
+  import('./pages/supplier').then((m) => ({ default: m.SupplierTrialEditPage }))
+);
 
 // Participant Market Trial (WO-NETURE-MARKET-TRIAL-PARTICIPANT-PAGES-V1)
 const MarketTrialHubPage = lazy(() =>
@@ -619,6 +622,7 @@ function App() {
               <Route path="/supplier/market-trial" element={<SupplierTrialListPage />} />
               <Route path="/supplier/market-trial/new" element={<SupplierTrialCreatePage />} />
               <Route path="/supplier/market-trial/:id" element={<SupplierTrialDetailPage />} />
+              <Route path="/supplier/market-trial/:id/edit" element={<SupplierTrialEditPage />} />
               <Route path="/supplier/signage/content" element={<SignageContentHubPage />} />
               <Route path="/supplier/signage/manage" element={<StoreSignagePage />} />
               <Route path="/supplier/forum" element={<ForumPage title="공급자 포럼" description="공급자 간 소통 공간" basePath="/supplier/forum" />} />

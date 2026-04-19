@@ -18,7 +18,13 @@ export type TrialStatus =
 export interface Trial {
   id: string;
   title: string;
+  // WO-MARKET-TRIAL-PROPOSAL-STRUCTURE-V1
+  oneLiner?: string | null;
+  // WO-MARKET-TRIAL-VIDEO-FIELD-V1
+  videoUrl?: string | null;
   description?: string;
+  // WO-MARKET-TRIAL-SALES-SCENARIO-EDITOR-V1
+  salesScenarioContent?: string | null;
   supplierId: string;
   supplierName?: string;
   status: TrialStatus;
@@ -127,7 +133,13 @@ export interface ParticipantListResponse {
 
 export interface CreateTrialPayload {
   title: string;
+  // WO-MARKET-TRIAL-PROPOSAL-STRUCTURE-V1
+  oneLiner?: string;
+  // WO-MARKET-TRIAL-VIDEO-FIELD-V1
+  videoUrl?: string;
   description?: string;
+  // WO-MARKET-TRIAL-SALES-SCENARIO-EDITOR-V1
+  salesScenarioContent?: string;
   visibleServiceKeys: string[];
   outcomeSnapshot?: {
     expectedType: 'product' | 'cash';
@@ -144,6 +156,9 @@ export interface CreateTrialPayload {
   trialUnitPrice?: number;
   rewardRate?: number;
 }
+
+/** WO-MARKET-TRIAL-EDIT-FLOW-V1 */
+export type UpdateTrialPayload = Partial<CreateTrialPayload>;
 
 export interface TrialResultsSummary {
   totalCount: number;
@@ -310,6 +325,12 @@ export async function saveSettlementChoice(
 
 export async function createTrial(payload: CreateTrialPayload): Promise<Trial> {
   const { data } = await api.post(`${API_BASE_URL}/api/market-trial`, payload);
+  return data.data || data;
+}
+
+/** WO-MARKET-TRIAL-EDIT-FLOW-V1 */
+export async function updateTrial(trialId: string, payload: UpdateTrialPayload): Promise<Trial> {
+  const { data } = await api.patch(`${API_BASE_URL}/api/market-trial/${trialId}`, payload);
   return data.data || data;
 }
 

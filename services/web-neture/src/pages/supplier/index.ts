@@ -17,6 +17,7 @@ export { default as SupplierPartnerCommissionsPage } from './SupplierPartnerComm
 export { default as SupplierTrialCreatePage } from './SupplierTrialCreatePage';
 export { default as SupplierTrialListPage } from './SupplierTrialListPage';
 export { default as SupplierTrialDetailPage } from './SupplierTrialDetailPage';
+export { default as SupplierTrialEditPage } from './SupplierTrialEditPage';
 export { default as SupplierCsvImportPage } from './SupplierCsvImportPage';
 export { default as MyForumDashboardPage } from './MyForumDashboardPage';
 export { default as RequestCategoryPage } from './RequestCategoryPage';

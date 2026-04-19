@@ -26,6 +26,8 @@ router.get('/gateway', optionalAuth, MarketTrialController.gateway);
 // Public routes (list and detail)
 router.get('/', optionalAuth, MarketTrialController.getTrials);
 router.get('/:id', optionalAuth, MarketTrialController.getTrialById);
+// WO-MARKET-TRIAL-EDIT-FLOW-V1: supplier update DRAFT trial
+router.patch('/:id', authenticate, MarketTrialController.updateTrial);
 
 // Authenticated routes
 router.get('/:id/participation', authenticate, MarketTrialController.getParticipation);

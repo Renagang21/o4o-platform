@@ -116,6 +116,15 @@ export default function SupplierTrialListPage() {
                   </span>
                 )}
               </div>
+              {/* WO-MARKET-TRIAL-EDIT-FLOW-V1 */}
+              {trial.status === 'draft' && (
+                <button
+                  style={s.editBtn}
+                  onClick={(e) => { e.stopPropagation(); navigate(`/supplier/market-trial/${trial.id}/edit`); }}
+                >
+                  수정
+                </button>
+              )}
             </div>
           ))}
         </div>
@@ -222,5 +231,16 @@ const s: Record<string, React.CSSProperties> = {
   metaItem: {
     fontSize: '13px',
     color: '#9CA3AF',
+  },
+  editBtn: {
+    marginTop: '8px',
+    padding: '5px 14px',
+    fontSize: '13px',
+    fontWeight: 500,
+    color: '#2563EB',
+    backgroundColor: '#EFF6FF',
+    border: '1px solid #BFDBFE',
+    borderRadius: '6px',
+    cursor: 'pointer',
   },
 };

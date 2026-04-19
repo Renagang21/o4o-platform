@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getSupplierTrialResults } from '../../api/trial';
 import type { TrialResults } from '../../api/trial';
+import { ContentRenderer } from '@o4o/content-editor';
 
 // Conversion status derived from trial.convertedProductId
 type ConversionStatus = 'not_eligible' | 'ready' | 'converted';
@@ -83,6 +84,27 @@ const CONVERSION_STAGES: { key: string; label: string; color: string }[] = [
   { key: 'first_order', label: '첫 주문',     color: '#059669' },
 ];
 
+/** WO-MARKET-TRIAL-VIDEO-FIELD-V1: URL → embed 분기 */
+function parseVideoEmbed(url: string): { type: 'youtube' | 'vimeo' | 'external'; embedUrl: string } {
+  try {
+    const parsed = new URL(url);
+    if (parsed.hostname.includes('youtube.com') || parsed.hostname.includes('youtu.be')) {
+      let videoId = '';
+      if (parsed.hostname.includes('youtu.be')) {
+        videoId = parsed.pathname.slice(1);
+      } else {
+        videoId = parsed.searchParams.get('v') || '';
+      }
+      if (videoId) return { type: 'youtube', embedUrl: `https://www.youtube.com/embed/${videoId}` };
+    }
+    if (parsed.hostname.includes('vimeo.com')) {
+      const match = parsed.pathname.match(/\/(\d+)/);
+      if (match) return { type: 'vimeo', embedUrl: `https://player.vimeo.com/video/${match[1]}` };
+    }
+  } catch { /* invalid URL */ }
+  return { type: 'external', embedUrl: url };
+}
+
 export default function SupplierTrialDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -144,7 +166,21 @@ export default function SupplierTrialDetailPage() {
           <span style={{ ...s.statusBadge, backgroundColor: statusColor }}>
             {STATUS_LABEL[trial.status] ?? trial.status}
           </span>
+          {/* WO-MARKET-TRIAL-EDIT-FLOW-V1 */}
+          {trial.status === 'draft' && (
+            <button
+              style={{ ...s.primaryBtn, padding: '6px 16px', fontSize: '13px' }}
+              onClick={() => navigate(`/supplier/market-trial/${id}/edit`)}
+            >
+              수정하기
+            </button>
+          )}
         </div>
+        {trial.oneLiner && (
+          <p style={{ fontSize: '15px', color: '#4B5563', fontWeight: 500, margin: '4px 0 8px 0', lineHeight: 1.5 }}>
+            {trial.oneLiner}
+          </p>
+        )}
         {trial.description && <p style={s.desc}>{trial.description}</p>}
         <div style={s.meta}>
           <span style={s.metaItem}>등록일: {new Date(trial.createdAt).toLocaleDateString('ko-KR')}</span>
@@ -153,6 +189,45 @@ export default function SupplierTrialDetailPage() {
           )}
         </div>
       </div>
+
+      {/* 대표 영상 — WO-MARKET-TRIAL-VIDEO-FIELD-V1 */}
+      {trial.videoUrl && (() => {
+        const video = parseVideoEmbed(trial.videoUrl);
+        if (video.type === 'youtube' || video.type === 'vimeo') {
+          return (
+            <div style={s.section}>
+              <h2 style={s.sectionTitle}>대표 영상</h2>
+              <div style={{ position: 'relative' as const, paddingBottom: '56.25%', height: 0, overflow: 'hidden', borderRadius: '8px' }}>
+                <iframe
+                  src={video.embedUrl}
+                  style={{ position: 'absolute' as const, top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            </div>
+          );
+        }
+        return (
+          <div style={s.section}>
+            <h2 style={s.sectionTitle}>대표 영상</h2>
+            <div style={{ padding: '20px', backgroundColor: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: '10px', textAlign: 'center' as const }}>
+              <p style={{ fontSize: '14px', color: '#6B7280', marginBottom: '12px' }}>이 영상은 외부 사이트에서 재생됩니다</p>
+              <a href={trial.videoUrl} target="_blank" rel="noopener noreferrer" style={s.forumLink}>
+                영상 보러가기
+              </a>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* 매장 활용 방법 — WO-MARKET-TRIAL-SALES-SCENARIO-EDITOR-V1 / WO-MARKET-TRIAL-PROPOSAL-STRUCTURE-V1 */}
+      {trial.salesScenarioContent && (
+        <div style={s.section}>
+          <h2 style={s.sectionTitle}>매장 활용 방법</h2>
+          <ContentRenderer html={trial.salesScenarioContent} />
+        </div>
+      )}
 
       {/* 다음 행동 안내 */}
       {nextAction && (
@@ -320,11 +395,17 @@ export default function SupplierTrialDetailPage() {
         </div>
       )}
 
-      {/* 초안이면 다시 편집 버튼 */}
+      {/* 초안이면 수정/새 등록 버튼 — WO-MARKET-TRIAL-EDIT-FLOW-V1 */}
       {trial.status === 'draft' && (
-        <div style={s.section}>
+        <div style={{ ...s.section, display: 'flex', gap: '12px' }}>
           <button
             style={s.primaryBtn}
+            onClick={() => navigate(`/supplier/market-trial/${id}/edit`)}
+          >
+            이 Trial 수정하기
+          </button>
+          <button
+            style={{ ...s.primaryBtn, backgroundColor: '#6B7280' }}
             onClick={() => navigate(`/supplier/market-trial/new`)}
           >
             새 Trial 등록

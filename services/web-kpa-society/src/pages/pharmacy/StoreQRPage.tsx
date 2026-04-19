@@ -626,6 +626,7 @@ export function StoreQRPage() {
       {/* Entry Modal — 2-choice (기존 자료 선택 / 새 자산 만들기) */}
       <StoreQRCreateEntryModal
         open={showEntryModal}
+        title="QR 생성 방식 선택"
         onSelectExisting={() => {
           setShowEntryModal(false);
           setShowSelector(true);

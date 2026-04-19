@@ -147,9 +147,9 @@ export class MarketTrialController {
       }
 
       const {
-        title, description, visibleServiceKeys, outcomeSnapshot,
+        title, oneLiner, videoUrl, description, visibleServiceKeys, outcomeSnapshot,
         maxParticipants, fundingStartAt, fundingEndAt, trialPeriodDays,
-        targetAmount, trialUnitPrice, rewardRate,
+        targetAmount, trialUnitPrice, rewardRate, salesScenarioContent,
       } = req.body;
 
       if (!title || !fundingStartAt || !fundingEndAt || !trialPeriodDays) {
@@ -163,6 +163,8 @@ export class MarketTrialController {
         supplierId: userId,
         supplierName: userName,
         title,
+        oneLiner: oneLiner || undefined,
+        videoUrl: videoUrl || undefined,
         description,
         visibleServiceKeys: visibleServiceKeys || [],
         outcomeSnapshot,
@@ -170,6 +172,7 @@ export class MarketTrialController {
         targetAmount: targetAmount != null ? Number(targetAmount) : undefined,
         trialUnitPrice: trialUnitPrice != null ? Number(trialUnitPrice) : undefined,
         rewardRate: rewardRate != null ? Number(rewardRate) : undefined,
+        salesScenarioContent: salesScenarioContent || undefined,
         fundingStartAt: new Date(fundingStartAt),
         fundingEndAt: new Date(fundingEndAt),
         trialPeriodDays: Number(trialPeriodDays),
@@ -199,6 +202,51 @@ export class MarketTrialController {
     } catch (error: any) {
       console.error('Submit trial error:', error);
       const msg = error.message || 'Failed to submit trial';
+      const status = msg.includes('not found') ? 404 : msg.includes('Not authorized') ? 403 : 400;
+      res.status(status).json({ success: false, message: msg });
+    }
+  }
+
+  /**
+   * PATCH /api/market-trial/:id
+   * DRAFT Trial 수정
+   * WO-MARKET-TRIAL-EDIT-FLOW-V1
+   */
+  static async updateTrial(req: AuthRequest, res: Response) {
+    try {
+      const userId = (req as any).user?.id;
+      if (!userId) {
+        return res.status(401).json({ success: false, message: 'Authentication required' });
+      }
+
+      const { id } = req.params;
+      const {
+        title, oneLiner, videoUrl, description, visibleServiceKeys, outcomeSnapshot,
+        maxParticipants, fundingStartAt, fundingEndAt, trialPeriodDays,
+        targetAmount, trialUnitPrice, rewardRate, salesScenarioContent,
+      } = req.body;
+
+      const trial = await MarketTrialController.trialService.updateTrial(id, userId, {
+        title,
+        oneLiner,
+        videoUrl,
+        description,
+        salesScenarioContent,
+        outcomeSnapshot,
+        visibleServiceKeys,
+        maxParticipants: maxParticipants != null ? Number(maxParticipants) : undefined,
+        targetAmount: targetAmount != null ? Number(targetAmount) : undefined,
+        trialUnitPrice: trialUnitPrice != null ? Number(trialUnitPrice) : undefined,
+        rewardRate: rewardRate != null ? Number(rewardRate) : undefined,
+        fundingStartAt: fundingStartAt ? new Date(fundingStartAt) : undefined,
+        fundingEndAt: fundingEndAt ? new Date(fundingEndAt) : undefined,
+        trialPeriodDays: trialPeriodDays ? Number(trialPeriodDays) : undefined,
+      });
+
+      res.json({ success: true, data: toTrialDTO(trial) });
+    } catch (error: any) {
+      console.error('Update trial error:', error);
+      const msg = error.message || 'Failed to update trial';
       const status = msg.includes('not found') ? 404 : msg.includes('Not authorized') ? 403 : 400;
       res.status(status).json({ success: false, message: msg });
     }
@@ -742,7 +790,10 @@ function toTrialDTO(trial: MarketTrial, forumPostId?: string | null): any {
   return {
     id: trial.id,
     title: trial.title,
+    oneLiner: trial.oneLiner || null,
+    videoUrl: trial.videoUrl || null,
     description: trial.description,
+    salesScenarioContent: trial.salesScenarioContent || null,
     supplierId: trial.supplierId,
     supplierName: trial.supplierName || undefined,
     eligibleRoles: trial.eligibleRoles,

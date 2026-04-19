@@ -3,12 +3,14 @@
  *
  * WO-AI-CONTENT-TRANSFORM-IMPLEMENTATION-V1
  * WO-AI-CONTENT-EDITOR-POLISH-V1
+ * WO-STORE-AI-CONTENT-ASSIST-V1
  *
- * 사용자가 텍스트를 붙여넣으면 AI가 HTML 형식 상품 설명으로 변환.
+ * 사용자가 텍스트를 붙여넣으면 AI가 HTML 형식으로 변환/요약/정리.
  * 결과를 에디터에 직접 삽입.
  *
  * - 인증: credentials: 'include' (쿠키 기반, 별도 토큰 prop 불필요)
  * - 삽입: editor.commands.setContent(html) → TipTap onUpdate → onChange 자동 트리거
+ * - 모드: 고객용 문장 정리 / 짧게 요약 / POP용 정리 / 제목 추천
  */
 
 import { useState } from 'react';
@@ -30,9 +32,17 @@ interface AiContentModalProps {
   editor: Editor | null;
 }
 
+type AiMode = 'customer_rewrite' | 'summary' | 'pop' | 'title_suggest';
 type ToneOption = 'friendly' | 'professional' | 'concise';
 type LengthOption = 'short' | 'medium' | 'long';
 type ResultTab = 'preview' | 'html';
+
+const MODE_CONFIG: { key: AiMode; label: string; outputType: string; desc: string }[] = [
+  { key: 'customer_rewrite', label: '고객용 정리', outputType: 'product_detail', desc: '고객이 읽기 쉬운 상품 설명으로 정리' },
+  { key: 'summary', label: '짧게 요약', outputType: 'summary', desc: '핵심만 남겨 3-5줄로 요약' },
+  { key: 'pop', label: 'POP용 정리', outputType: 'pop', desc: 'POP 템플릿용 짧은 문구 세트' },
+  { key: 'title_suggest', label: '제목 추천', outputType: 'title_suggest', desc: '콘텐츠/POP/QR 제목 후보 추천' },
+];
 
 const TONE_LABELS: Record<ToneOption, string> = {
   friendly: '친근함',
@@ -48,6 +58,7 @@ const LENGTH_LABELS: Record<LengthOption, string> = {
 
 export function AiContentModal({ open, onClose, editor }: AiContentModalProps) {
   const [input, setInput] = useState('');
+  const [mode, setMode] = useState<AiMode>('customer_rewrite');
   const [tone, setTone] = useState<ToneOption>('professional');
   const [length, setLength] = useState<LengthOption>('medium');
   const [loading, setLoading] = useState(false);
@@ -57,6 +68,17 @@ export function AiContentModal({ open, onClose, editor }: AiContentModalProps) {
   const [copied, setCopied] = useState(false);
 
   if (!open) return null;
+
+  const currentConfig = MODE_CONFIG.find((m) => m.key === mode)!;
+  const showToneLength = mode !== 'title_suggest';
+
+  const handleGrabFromEditor = () => {
+    if (!editor) return;
+    const text = editor.getText();
+    if (text.trim()) {
+      setInput(text.trim());
+    }
+  };
 
   const handleGenerate = async () => {
     if (!input.trim()) {
@@ -75,8 +97,8 @@ export function AiContentModal({ open, onClose, editor }: AiContentModalProps) {
         credentials: 'include',
         body: JSON.stringify({
           input: input.trim(),
-          outputType: 'product_detail',
-          options: { tone, length },
+          outputType: currentConfig.outputType,
+          options: showToneLength ? { tone, length } : {},
         }),
       });
 
@@ -174,7 +196,7 @@ export function AiContentModal({ open, onClose, editor }: AiContentModalProps) {
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ fontSize: '18px' }}>✨</span>
-            <span style={{ fontWeight: 600, fontSize: '15px', color: '#111827' }}>AI 상품 설명 정리</span>
+            <span style={{ fontWeight: 600, fontSize: '15px', color: '#111827' }}>AI 콘텐츠 정리</span>
           </div>
           <button
             type="button"
@@ -194,15 +216,67 @@ export function AiContentModal({ open, onClose, editor }: AiContentModalProps) {
 
         {/* Body */}
         <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px', overflow: 'auto' }}>
-          {/* Input */}
+          {/* Mode Selector */}
           <div>
             <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#374151', marginBottom: '6px' }}>
-              원본 텍스트 (상품 정보, 원문 등을 붙여넣으세요)
+              정리 모드
             </label>
+            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+              {MODE_CONFIG.map((m) => (
+                <button
+                  key={m.key}
+                  type="button"
+                  onClick={() => { setMode(m.key); setResult(null); setError(''); }}
+                  title={m.desc}
+                  style={{
+                    padding: '6px 12px',
+                    fontSize: '12px',
+                    border: `1px solid ${mode === m.key ? '#6366f1' : '#d1d5db'}`,
+                    borderRadius: '16px',
+                    background: mode === m.key ? '#eef2ff' : 'white',
+                    color: mode === m.key ? '#4f46e5' : '#6b7280',
+                    cursor: 'pointer',
+                    fontWeight: mode === m.key ? 600 : 400,
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {m.label}
+                </button>
+              ))}
+            </div>
+            <p style={{ fontSize: '12px', color: '#9ca3af', marginTop: '4px', margin: '4px 0 0' }}>
+              {currentConfig.desc}
+            </p>
+          </div>
+
+          {/* Input */}
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+              <label style={{ fontSize: '13px', fontWeight: 500, color: '#374151' }}>
+                원본 텍스트
+              </label>
+              {editor && (
+                <button
+                  type="button"
+                  onClick={handleGrabFromEditor}
+                  style={{
+                    padding: '3px 10px',
+                    fontSize: '11px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '4px',
+                    background: '#f9fafb',
+                    color: '#6b7280',
+                    cursor: 'pointer',
+                  }}
+                >
+                  에디터에서 가져오기
+                </button>
+              )}
+            </div>
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="예: 제품명, 성분, 효능, 사용법 등 원본 정보를 입력하세요..."
+              placeholder="원본 정보를 입력하거나 에디터에서 가져오세요..."
               rows={5}
               style={{
                 width: '100%',
@@ -217,66 +291,68 @@ export function AiContentModal({ open, onClose, editor }: AiContentModalProps) {
             />
           </div>
 
-          {/* Options */}
-          <div style={{ display: 'flex', gap: '16px' }}>
-            {/* Tone */}
-            <div style={{ flex: 1 }}>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#374151', marginBottom: '6px' }}>
-                톤
-              </label>
-              <div style={{ display: 'flex', gap: '6px' }}>
-                {(Object.keys(TONE_LABELS) as ToneOption[]).map((t) => (
-                  <button
-                    key={t}
-                    type="button"
-                    onClick={() => setTone(t)}
-                    style={{
-                      flex: 1,
-                      padding: '6px 4px',
-                      fontSize: '12px',
-                      border: `1px solid ${tone === t ? '#6366f1' : '#d1d5db'}`,
-                      borderRadius: '6px',
-                      background: tone === t ? '#eef2ff' : 'white',
-                      color: tone === t ? '#4f46e5' : '#6b7280',
-                      cursor: 'pointer',
-                      fontWeight: tone === t ? 600 : 400,
-                    }}
-                  >
-                    {TONE_LABELS[t]}
-                  </button>
-                ))}
+          {/* Options — hide for title_suggest */}
+          {showToneLength && (
+            <div style={{ display: 'flex', gap: '16px' }}>
+              {/* Tone */}
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#374151', marginBottom: '6px' }}>
+                  톤
+                </label>
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  {(Object.keys(TONE_LABELS) as ToneOption[]).map((t) => (
+                    <button
+                      key={t}
+                      type="button"
+                      onClick={() => setTone(t)}
+                      style={{
+                        flex: 1,
+                        padding: '6px 4px',
+                        fontSize: '12px',
+                        border: `1px solid ${tone === t ? '#6366f1' : '#d1d5db'}`,
+                        borderRadius: '6px',
+                        background: tone === t ? '#eef2ff' : 'white',
+                        color: tone === t ? '#4f46e5' : '#6b7280',
+                        cursor: 'pointer',
+                        fontWeight: tone === t ? 600 : 400,
+                      }}
+                    >
+                      {TONE_LABELS[t]}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Length */}
-            <div style={{ flex: 1 }}>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#374151', marginBottom: '6px' }}>
-                분량
-              </label>
-              <div style={{ display: 'flex', gap: '6px' }}>
-                {(Object.keys(LENGTH_LABELS) as LengthOption[]).map((l) => (
-                  <button
-                    key={l}
-                    type="button"
-                    onClick={() => setLength(l)}
-                    style={{
-                      flex: 1,
-                      padding: '6px 4px',
-                      fontSize: '12px',
-                      border: `1px solid ${length === l ? '#6366f1' : '#d1d5db'}`,
-                      borderRadius: '6px',
-                      background: length === l ? '#eef2ff' : 'white',
-                      color: length === l ? '#4f46e5' : '#6b7280',
-                      cursor: 'pointer',
-                      fontWeight: length === l ? 600 : 400,
-                    }}
-                  >
-                    {LENGTH_LABELS[l]}
-                  </button>
-                ))}
+              {/* Length */}
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#374151', marginBottom: '6px' }}>
+                  분량
+                </label>
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  {(Object.keys(LENGTH_LABELS) as LengthOption[]).map((l) => (
+                    <button
+                      key={l}
+                      type="button"
+                      onClick={() => setLength(l)}
+                      style={{
+                        flex: 1,
+                        padding: '6px 4px',
+                        fontSize: '12px',
+                        border: `1px solid ${length === l ? '#6366f1' : '#d1d5db'}`,
+                        borderRadius: '6px',
+                        background: length === l ? '#eef2ff' : 'white',
+                        color: length === l ? '#4f46e5' : '#6b7280',
+                        cursor: 'pointer',
+                        fontWeight: length === l ? 600 : 400,
+                      }}
+                    >
+                      {LENGTH_LABELS[l]}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Generate button */}
           <button
@@ -298,7 +374,7 @@ export function AiContentModal({ open, onClose, editor }: AiContentModalProps) {
               cursor: loading || !input.trim() ? 'not-allowed' : 'pointer',
             }}
           >
-            {loading ? '생성 중...' : '✨ AI 정리 시작'}
+            {loading ? '생성 중...' : `✨ ${currentConfig.label} 시작`}
           </button>
 
           {/* Error */}
@@ -422,6 +498,11 @@ export function AiContentModal({ open, onClose, editor }: AiContentModalProps) {
               )}
             </div>
           )}
+
+          {/* Disclaimer */}
+          <p style={{ fontSize: '11px', color: '#9ca3af', margin: 0, textAlign: 'center' }}>
+            AI가 생성한 내용은 참고용입니다. 반드시 검토 후 사용하세요.
+          </p>
         </div>
 
         {/* Footer */}

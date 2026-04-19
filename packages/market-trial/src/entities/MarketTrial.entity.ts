@@ -75,10 +75,31 @@ export class MarketTrial {
   title!: string;
 
   /**
+   * One-liner proposal message
+   * WO-MARKET-TRIAL-PROPOSAL-STRUCTURE-V1
+   */
+  @Column({ type: 'varchar', length: 120, nullable: true })
+  oneLiner?: string | null;
+
+  /**
+   * Representative video URL
+   * WO-MARKET-TRIAL-VIDEO-FIELD-V1
+   */
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  videoUrl?: string | null;
+
+  /**
    * Trial description and details
    */
   @Column({ type: 'text', nullable: true })
   description!: string | null;
+
+  /**
+   * Sales scenario content (rich HTML)
+   * WO-MARKET-TRIAL-SALES-SCENARIO-EDITOR-V1
+   */
+  @Column({ type: 'text', nullable: true })
+  salesScenarioContent?: string | null;
 
   /**
    * Price per trial unit that participants pay

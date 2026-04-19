@@ -569,7 +569,7 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
           <button
             type="button"
             onClick={() => setShowAiModal(true)}
-            title="AI로 텍스트를 상품 설명으로 재구성"
+            title="AI 콘텐츠 정리 (요약/POP/제목 추천)"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
