@@ -213,7 +213,9 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
           setError('이미 가입된 이메일입니다. 기존 계정으로 로그인해 주세요.');
         }
       } else {
-        setError(data?.error || (err instanceof Error ? err.message : '회원가입에 실패했습니다.'));
+        // WO-AUTH-ERROR-MESSAGE-SANITIZATION-V1: raw error 노출 차단
+        console.error('[RegisterModal] Registration error:', err);
+        setError('회원가입에 실패했습니다. 다시 시도해주세요.');
       }
     } finally {
       setLoading(false);

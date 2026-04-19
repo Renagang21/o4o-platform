@@ -96,12 +96,16 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
       const result = await login(email, password);
 
       if (!result.success) {
-        throw new Error(result.error || '로그인에 실패했습니다.');
+        // WO-AUTH-ERROR-MESSAGE-SANITIZATION-V1: AuthContext.login()이 이미 한국어 메시지를 반환
+        setError(result.error || '로그인에 실패했습니다.');
+        return;
       }
 
       handleLoginSuccess(result.role, result.roles);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
+      // WO-AUTH-ERROR-MESSAGE-SANITIZATION-V1: 내부 오류(TypeError 등) 사용자 노출 차단
+      console.error('[LoginModal] Login error:', err);
+      setError('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
     } finally {
       setLoading(false);
     }

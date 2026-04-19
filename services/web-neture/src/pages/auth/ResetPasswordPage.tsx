@@ -97,8 +97,9 @@ export default function ResetPasswordPage() {
         setError(data.error || data.message || '비밀번호 재설정에 실패했습니다. 링크가 만료되었을 수 있습니다.');
       }
     } catch (err: unknown) {
-      const axiosErr = err as { response?: { data?: { error?: string; message?: string } } };
-      setError(axiosErr.response?.data?.error || axiosErr.response?.data?.message || '서버와의 연결에 실패했습니다. 잠시 후 다시 시도해주세요.');
+      // WO-AUTH-ERROR-MESSAGE-SANITIZATION-V1: 백엔드 에러 문자열 직접 노출 차단
+      console.error('[ResetPassword] Reset error:', err);
+      setError('비밀번호 재설정에 실패했습니다. 잠시 후 다시 시도해주세요.');
     } finally {
       setIsLoading(false);
     }
