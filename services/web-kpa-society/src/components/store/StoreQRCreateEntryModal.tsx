@@ -1,11 +1,14 @@
 /**
- * StoreQRCreateEntryModal — QR 생성 방식 선택 모달
+ * StoreQRCreateEntryModal — 자료 추가 방식 선택 모달
  *
  * WO-STORE-QR-UX-RESTRUCTURE-V1
+ * WO-STORE-POP-ASSET-INTEGRATION-V1
  *
  * 2-choice 진입점:
  *   1) 기존 자료 선택 → StoreLibrarySelectorModal
  *   2) 새 자산 만들기 → StoreLibraryNewPage
+ *
+ * 사용처: QR 생성, POP 자료 추가 (title prop으로 구분)
  */
 
 import { X, FolderOpen, PenSquare } from 'lucide-react';
@@ -16,6 +19,7 @@ interface StoreQRCreateEntryModalProps {
   onSelectExisting: () => void;
   onCreateNew: () => void;
   onClose: () => void;
+  title?: string;
 }
 
 export function StoreQRCreateEntryModal({
@@ -23,6 +27,7 @@ export function StoreQRCreateEntryModal({
   onSelectExisting,
   onCreateNew,
   onClose,
+  title = '자료 추가 방식 선택',
 }: StoreQRCreateEntryModalProps) {
   if (!open) return null;
 
@@ -31,7 +36,7 @@ export function StoreQRCreateEntryModal({
       <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div style={styles.header}>
-          <h2 style={styles.title}>QR 생성 방식 선택</h2>
+          <h2 style={styles.title}>{title}</h2>
           <button onClick={onClose} style={styles.closeBtn} aria-label="닫기">
             <X size={20} />
           </button>
@@ -45,7 +50,7 @@ export function StoreQRCreateEntryModal({
             </div>
             <div style={styles.choiceText}>
               <p style={styles.choiceTitle}>기존 자료 선택</p>
-              <p style={styles.choiceDesc}>이미 만들어진 자료를 선택하여 QR 생성</p>
+              <p style={styles.choiceDesc}>이미 등록된 자료에서 선택합니다</p>
             </div>
           </button>
 
@@ -55,7 +60,7 @@ export function StoreQRCreateEntryModal({
             </div>
             <div style={styles.choiceText}>
               <p style={styles.choiceTitle}>새 자산 만들기</p>
-              <p style={styles.choiceDesc}>콘텐츠/링크/파일을 새로 만들고 QR 생성</p>
+              <p style={styles.choiceDesc}>새 자료를 등록한 후 사용합니다</p>
             </div>
           </button>
         </div>

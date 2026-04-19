@@ -3,17 +3,21 @@
  *
  * WO-O4O-POP-LIBRARY-INTEGRATION-V1
  * WO-O4O-QR-POP-AUTO-GENERATOR-V1
+ * WO-STORE-POP-ASSET-INTEGRATION-V1
  *
+ * 2-choice 진입: "기존 자료 선택" | "새 자산 만들기"
  * Library에서 자료를 선택 → QR 코드 연결(선택) → A4/A5 레이아웃 → POP PDF 자동 생성.
+ * 새 자산 생성 시 StoreLibraryNewPage에서 저장 후 자동 복귀.
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { Megaphone, Plus, Trash2, ExternalLink, FileDown, QrCode } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { colors } from '../../styles/theme';
 import { StoreLibrarySelectorModal } from '../../components/store/StoreLibrarySelectorModal';
 import type { LibrarySelectorResult } from '../../components/store/StoreLibrarySelectorModal';
+import { StoreQRCreateEntryModal } from '../../components/store/StoreQRCreateEntryModal';
 import { getStoreQrCodes } from '../../api/storeQr';
 import type { StoreQrCode } from '../../api/storeQr';
 
@@ -22,11 +26,22 @@ interface PopItem {
   title: string;
   category: string | null;
   fileUrl: string | null;
+  assetType: string;
+  url: string | null;
 }
 
+const ASSET_TYPE_LABELS: Record<string, string> = {
+  file: '파일',
+  content: '콘텐츠',
+  'external-link': '외부 링크',
+};
+
 export function StorePopPage() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [popItems, setPopItems] = useState<PopItem[]>([]);
   const [showSelector, setShowSelector] = useState(false);
+  const [showEntryModal, setShowEntryModal] = useState(false);
 
   // QR selection
   const [qrCodes, setQrCodes] = useState<StoreQrCode[]>([]);
@@ -51,12 +66,37 @@ export function StorePopPage() {
     fetchQrCodes();
   }, [fetchQrCodes]);
 
+  // 새 자산 생성 후 자동 복귀 (location.state에서 자료 수신)
+  useEffect(() => {
+    const state = location.state as { selectedLibraryItem?: Record<string, unknown> } | null;
+    const item = state?.selectedLibraryItem;
+    if (item && typeof item.id === 'string') {
+      const newItem: PopItem = {
+        id: item.id as string,
+        title: (item.title as string) || '',
+        category: (item.category as string) || null,
+        fileUrl: (item.fileUrl as string) || null,
+        assetType: (item.assetType as string) || 'file',
+        url: (item.url as string) || null,
+      };
+      setPopItems((prev) => prev.some((p) => p.id === newItem.id) ? prev : [...prev, newItem]);
+      window.history.replaceState({}, document.title);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleSelect = (item: LibrarySelectorResult) => {
     if (popItems.some((p) => p.id === item.id)) {
       setShowSelector(false);
       return;
     }
-    setPopItems((prev) => [...prev, item]);
+    setPopItems((prev) => [...prev, {
+      id: item.id,
+      title: item.title,
+      category: item.category,
+      fileUrl: item.fileUrl,
+      assetType: (item as any).assetType || 'file',
+      url: (item as any).url || null,
+    }]);
     setShowSelector(false);
   };
 
@@ -109,9 +149,9 @@ export function StorePopPage() {
           <h1 style={styles.title}>POP 자료 관리</h1>
           <p style={styles.subtitle}>Library 자료를 선택하고 QR 코드를 연결하여 POP 광고를 PDF로 출력합니다</p>
         </div>
-        <button onClick={() => setShowSelector(true)} style={styles.addBtn}>
+        <button onClick={() => setShowEntryModal(true)} style={styles.addBtn}>
           <Plus size={16} />
-          자료 선택
+          자료 추가
         </button>
       </div>
 
@@ -124,7 +164,7 @@ export function StorePopPage() {
               POP 디스플레이에 사용할 자료가 없습니다
             </p>
             <p style={{ color: colors.neutral400, fontSize: '13px', marginTop: '4px' }}>
-              "자료 선택" 버튼을 눌러 Library에서 자료를 추가하세요
+              "자료 추가" 버튼을 눌러 Library에서 자료를 추가하세요
             </p>
           </div>
         ) : (
@@ -136,11 +176,25 @@ export function StorePopPage() {
                     <Megaphone size={24} style={{ color: '#f59e0b' }} />
                   </div>
                   <div style={styles.cardInfo}>
-                    <p style={styles.cardTitle}>{item.title}</p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <p style={styles.cardTitle}>{item.title}</p>
+                      <span style={styles.assetTypeBadge}>
+                        {ASSET_TYPE_LABELS[item.assetType] || item.assetType}
+                      </span>
+                    </div>
                     {item.category && (
                       <span style={styles.cardCategory}>{item.category}</span>
                     )}
-                    {item.fileUrl && (
+                    {item.assetType === 'external-link' && item.url ? (
+                      <a
+                        href={item.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={styles.cardLink}
+                      >
+                        <ExternalLink size={12} /> {item.url}
+                      </a>
+                    ) : item.fileUrl ? (
                       <a
                         href={item.fileUrl}
                         target="_blank"
@@ -149,7 +203,7 @@ export function StorePopPage() {
                       >
                         <ExternalLink size={12} /> URL 열기
                       </a>
-                    )}
+                    ) : null}
                   </div>
                   <button onClick={() => handleRemove(item.id)} style={styles.removeBtn}>
                     <Trash2 size={16} />
@@ -224,11 +278,24 @@ export function StorePopPage() {
         )}
       </div>
 
+      {/* Entry Modal — 2-choice 진입 */}
+      <StoreQRCreateEntryModal
+        open={showEntryModal}
+        title="POP 자료 추가 방식"
+        onSelectExisting={() => { setShowEntryModal(false); setShowSelector(true); }}
+        onCreateNew={() => { setShowEntryModal(false); navigate('/store/operation/library/new?from=pop-create'); }}
+        onClose={() => setShowEntryModal(false)}
+      />
+
       {/* Library Selector Modal */}
       <StoreLibrarySelectorModal
         open={showSelector}
         onSelect={handleSelect}
         onClose={() => setShowSelector(false)}
+        onCreateNew={() => {
+          setShowSelector(false);
+          navigate('/store/operation/library/new?from=pop-create');
+        }}
       />
     </div>
   );
@@ -319,6 +386,17 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 600,
     color: colors.neutral800,
     margin: 0,
+  },
+  assetTypeBadge: {
+    display: 'inline-block',
+    padding: '2px 8px',
+    borderRadius: '10px',
+    backgroundColor: '#f0fdf4',
+    fontSize: '11px',
+    fontWeight: 500,
+    color: '#15803d',
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
   },
   cardCategory: {
     display: 'inline-block',

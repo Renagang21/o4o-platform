@@ -4,6 +4,7 @@
  * WO-O4O-NETURE-TO-STORE-MANUAL-FLOW-V1
  * WO-O4O-STORE-LIBRARY-API-INTEGRATION-V1
  * WO-STORE-LIBRARY-ASSET-EXTENSION-V1
+ * WO-STORE-POP-ASSET-INTEGRATION-V1
  *
  * 동작:
  * - 에셋 타입 선택: 파일 / 콘텐츠 / 외부 링크
@@ -156,6 +157,11 @@ export function StoreLibraryNewPage() {
             replace: true,
             state: { selectedLibraryItem: result.data },
           });
+        } else if (from === 'pop-create' && result.data) {
+          navigate('/store/marketing/pop', {
+            replace: true,
+            state: { selectedLibraryItem: result.data },
+          });
         } else {
           navigate('/store/operation/library', { replace: true });
         }
@@ -193,12 +199,12 @@ export function StoreLibraryNewPage() {
       {/* Page header */}
       <h1 style={styles.pageTitle}>매장 자료 등록</h1>
 
-      {/* QR 복귀 안내 배너 */}
-      {from === 'qr-create' && (
+      {/* 자동 복귀 안내 배너 */}
+      {(from === 'qr-create' || from === 'pop-create') && (
         <div style={styles.prefillBanner}>
           <Info size={16} style={{ color: '#2563eb', flexShrink: 0, marginTop: '2px' }} />
           <p style={{ margin: 0, fontSize: '13px', color: '#1e40af' }}>
-            자료를 저장하면 QR 생성 화면으로 자동 복귀합니다.
+            자료를 저장하면 {from === 'qr-create' ? 'QR 생성' : 'POP 자료'} 화면으로 자동 복귀합니다.
           </p>
         </div>
       )}
