@@ -140,7 +140,6 @@ const userActionPolicy = defineActionPolicy<UserData>('kpa:users', {
       label: '승인',
       variant: 'primary',
       visible: (row) => row.status === 'pending' || row.status === 'rejected',
-      confirm: { title: '승인 확인', message: '이 사용자를 승인 처리하시겠습니까?', confirmText: '승인' },
     },
     {
       key: 'reject',
@@ -161,12 +160,10 @@ const userActionPolicy = defineActionPolicy<UserData>('kpa:users', {
       label: '활성화',
       variant: 'primary',
       visible: (row) => row.status === 'suspended',
-      confirm: { title: '활성화 확인', message: '이 사용자를 활성화하시겠습니까?', confirmText: '활성화' },
     },
     {
       key: 'edit',
       label: '정보 수정',
-      divider: true,
     },
     {
       key: 'password',
@@ -606,6 +603,12 @@ export default function UsersPage() {
       group: 'actions',
       tooltip: '선택된 대기 회원을 일괄 거부합니다',
       visible: selectedPendingCount > 0,
+      confirm: {
+        title: '일괄 거부 확인',
+        message: `${selectedPendingCount}명의 대기 회원을 일괄 거부합니다.`,
+        variant: 'danger' as const,
+        confirmText: '거부',
+      },
     },
     {
       key: 'suspend',
@@ -617,6 +620,12 @@ export default function UsersPage() {
       group: 'danger',
       tooltip: '선택된 활성 회원을 일괄 정지합니다',
       visible: selectedSuspendableCount > 0,
+      confirm: {
+        title: '일괄 정지 확인',
+        message: `${selectedSuspendableCount}명의 활성 회원을 일괄 정지합니다.`,
+        variant: 'warning' as const,
+        confirmText: '정지',
+      },
     },
     {
       key: 'ai-summary',

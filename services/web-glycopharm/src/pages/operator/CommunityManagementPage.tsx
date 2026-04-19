@@ -9,6 +9,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { ConfirmActionDialog } from '@o4o/ui';
 import {
   Image,
   Plus,
@@ -55,18 +56,26 @@ export default function CommunityManagementPage() {
     fetchData();
   }, [fetchData]);
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('정말 삭제하시겠습니까?')) return;
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+
+  const executeDelete = async () => {
+    if (!deleteTargetId) return;
     try {
       if (tab === 'sponsors') {
-        await communityManageApi.deleteSponsor(id);
+        await communityManageApi.deleteSponsor(deleteTargetId);
       } else {
-        await communityManageApi.deleteAd(id);
+        await communityManageApi.deleteAd(deleteTargetId);
       }
       fetchData();
     } catch {
       toast.error('삭제에 실패했습니다.');
+    } finally {
+      setDeleteTargetId(null);
     }
+  };
+
+  const handleDelete = (id: string) => {
+    setDeleteTargetId(id);
   };
 
   const openCreate = () => {
@@ -172,6 +181,16 @@ export default function CommunityManagementPage() {
           onSaved={() => { setShowModal(false); fetchData(); }}
         />
       )}
+
+      <ConfirmActionDialog
+        open={!!deleteTargetId}
+        title="삭제 확인"
+        message="이 항목을 삭제하시겠습니까?"
+        variant="danger"
+        confirmText="삭제"
+        onConfirm={executeDelete}
+        onClose={() => setDeleteTargetId(null)}
+      />
     </div>
   );
 }

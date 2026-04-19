@@ -223,7 +223,7 @@ export default function ForumManagementPage() {
     },
     {
       key: '_actions',
-      header: '작업',
+      header: '액션',
       system: true,
       align: 'right',
       width: '80px',

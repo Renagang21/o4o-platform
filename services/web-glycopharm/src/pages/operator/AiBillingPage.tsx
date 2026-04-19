@@ -1,11 +1,12 @@
 /**
  * AiBillingPage — WO-O4O-AI-BILLING-DATA-SYSTEM-V1
  * WO-O4O-TABLE-STANDARD-V2 — DataTable 표준 전환
+ * WO-O4O-TABLE-STANDARD-V4-CLEANUP — ActionPolicy + confirm/alert 제거
  *
  * AI 정산 데이터 관리: 생성 / 확정 / 결제 완료 / 조정 / CSV 내보내기
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, type ReactNode } from 'react';
 import {
   FileText,
   Download,
@@ -15,8 +16,10 @@ import {
   Plus,
   Edit3,
 } from 'lucide-react';
-import { DataTable } from '@o4o/ui';
+import { DataTable, RowActionMenu } from '@o4o/ui';
 import type { Column } from '@o4o/ui';
+import { defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
+import { toast } from '@o4o/error-handling';
 import { api, API_BASE_URL } from '@/lib/apiClient';
 
 interface BillingSummary {
@@ -36,6 +39,53 @@ interface BillingSummary {
 }
 
 const AI_ADMIN_BASE = `${API_BASE_URL}/api/ai/admin`;
+
+// ─── Action Policy (V4-CLEANUP) ────────────────────────────
+
+const billingActionPolicy = defineActionPolicy<BillingSummary>('glycopharm:ai-billing', {
+  inlineMax: 2,
+  rules: [
+    {
+      key: 'adjust',
+      label: '조정',
+      visible: (b) => b.status === 'draft',
+    },
+    {
+      key: 'confirm-billing',
+      label: '확정',
+      variant: 'primary',
+      visible: (b) => b.status === 'draft',
+      confirm: {
+        title: '정산 확정',
+        message: '이 정산을 확정하시겠습니까? 확정 후 수정이 불가합니다.',
+        variant: 'warning',
+        confirmText: '확정',
+      },
+    },
+    {
+      key: 'paid',
+      label: '결제 완료',
+      variant: 'primary',
+      visible: (b) => b.status === 'confirmed',
+      confirm: {
+        title: '결제 완료 처리',
+        message: '결제 완료로 처리하시겠습니까?',
+        confirmText: '완료',
+      },
+    },
+    {
+      key: 'export',
+      label: 'CSV 내보내기',
+    },
+  ],
+});
+
+const BILLING_ACTION_ICONS: Record<string, ReactNode> = {
+  adjust: <Edit3 className="w-4 h-4" />,
+  'confirm-billing': <CheckCircle className="w-4 h-4" />,
+  paid: <CreditCard className="w-4 h-4" />,
+  export: <Download className="w-4 h-4" />,
+};
 
 export default function AiBillingPage() {
   const [billings, setBillings] = useState<BillingSummary[]>([]);
@@ -68,27 +118,25 @@ export default function AiBillingPage() {
       await api.post(`${AI_ADMIN_BASE}/billing/generate?month=${generateMonth}`);
       fetchBillings();
     } catch (err: any) {
-      alert(err.response?.data?.error || 'Generation failed');
+      toast.error(err.response?.data?.error || '정산 생성에 실패했습니다.');
     }
   };
 
-  const handleConfirm = async (id: number) => {
-    if (!confirm('이 정산을 확정하시겠습니까? 확정 후 수정이 불가합니다.')) return;
+  const executeConfirm = async (id: number) => {
     try {
       await api.put(`${AI_ADMIN_BASE}/billing/${id}/confirm`);
       fetchBillings();
     } catch (err: any) {
-      alert(err.response?.data?.error || 'Confirm failed');
+      toast.error(err.response?.data?.error || '확정에 실패했습니다.');
     }
   };
 
-  const handlePaid = async (id: number) => {
-    if (!confirm('결제 완료로 처리하시겠습니까?')) return;
+  const executePaid = async (id: number) => {
     try {
       await api.put(`${AI_ADMIN_BASE}/billing/${id}/paid`);
       fetchBillings();
     } catch (err: any) {
-      alert(err.response?.data?.error || 'Mark paid failed');
+      toast.error(err.response?.data?.error || '결제 완료 처리에 실패했습니다.');
     }
   };
 
@@ -105,7 +153,7 @@ export default function AiBillingPage() {
       a.click();
       URL.revokeObjectURL(url);
     } catch {
-      alert('Export failed');
+      toast.error('CSV 내보내기에 실패했습니다.');
     }
   };
 
@@ -121,7 +169,7 @@ export default function AiBillingPage() {
       setAdjustNote('');
       fetchBillings();
     } catch (err: any) {
-      alert(err.response?.data?.error || 'Adjustment failed');
+      toast.error(err.response?.data?.error || '조정에 실패했습니다.');
     }
   };
 
@@ -207,44 +255,19 @@ export default function AiBillingPage() {
       key: '_actions',
       title: '액션',
       align: 'center',
-      width: '120px',
+      width: '80px',
       render: (_v, b) => (
-        <div className="flex items-center justify-center gap-1">
-          {b.status === 'draft' && (
-            <>
-              <button
-                onClick={(e) => { e.stopPropagation(); setAdjustModal({ id: b.id, current: b.adjustmentAmount }); setAdjustAmount(String(b.adjustmentAmount)); }}
-                title="조정"
-                className="p-1 text-gray-400 hover:text-blue-600 rounded"
-              >
-                <Edit3 className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={(e) => { e.stopPropagation(); handleConfirm(b.id); }}
-                title="확정"
-                className="p-1 text-gray-400 hover:text-green-600 rounded"
-              >
-                <CheckCircle className="w-3.5 h-3.5" />
-              </button>
-            </>
-          )}
-          {b.status === 'confirmed' && (
-            <button
-              onClick={(e) => { e.stopPropagation(); handlePaid(b.id); }}
-              title="결제 완료"
-              className="p-1 text-gray-400 hover:text-green-600 rounded"
-            >
-              <CreditCard className="w-3.5 h-3.5" />
-            </button>
-          )}
-          <button
-            onClick={(e) => { e.stopPropagation(); handleExport(b.id); }}
-            title="CSV 내보내기"
-            className="p-1 text-gray-400 hover:text-blue-600 rounded"
-          >
-            <Download className="w-3.5 h-3.5" />
-          </button>
-        </div>
+        <RowActionMenu
+          actions={buildRowActions(billingActionPolicy, b, {
+            adjust: () => { setAdjustModal({ id: b.id, current: b.adjustmentAmount }); setAdjustAmount(String(b.adjustmentAmount)); },
+            'confirm-billing': () => executeConfirm(b.id),
+            paid: () => executePaid(b.id),
+            export: () => handleExport(b.id),
+          }, {
+            icons: BILLING_ACTION_ICONS,
+          })}
+          inlineMax={billingActionPolicy.inlineMax}
+        />
       ),
     },
   ];
