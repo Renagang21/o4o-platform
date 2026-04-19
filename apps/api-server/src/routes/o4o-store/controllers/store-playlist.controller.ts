@@ -392,26 +392,28 @@ export function createStorePlaylistController(
           res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
         }
-        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles);
-        if (!organizationId) {
+        const storeOrgId = await resolveStoreAccess(dataSource, userId, userRoles);
+        if (!storeOrgId) {
           res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
         }
 
         const { id } = req.params;
-        const { mediaId } = req.body;
+        const { mediaId, organizationId } = req.body;
+        // Use body organizationId for signage media context (matches frontend kpaMembership.organizationId)
+        const signageOrgId = organizationId || storeOrgId;
 
         if (!mediaId) {
           res.status(400).json({ success: false, error: { code: 'INVALID_INPUT', message: 'mediaId is required' } });
           return;
         }
 
-        if (!await repo.verifyOwnership(id, organizationId)) {
+        if (!await repo.verifyOwnership(id, storeOrgId)) {
           res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Playlist not found' } });
           return;
         }
 
-        const result = await repo.addItemFromSignage(id, mediaId, organizationId, userId);
+        const result = await repo.addItemFromSignage(id, mediaId, signageOrgId, userId);
         res.status(201).json({ success: true, data: result });
       } catch (error: any) {
         if (error.statusCode && error.code) {

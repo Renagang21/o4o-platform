@@ -113,10 +113,11 @@ export async function addPlaylistItemFromLibrary(
 export async function addPlaylistItemFromSignage(
   playlistId: string,
   mediaId: string,
+  organizationId: string,
 ): Promise<StorePlaylistItem> {
   const response = await apiClient.post<{ success: boolean; data: StorePlaylistItem }>(
     `/store-playlists/${playlistId}/items/from-signage`,
-    { mediaId },
+    { mediaId, organizationId },
   );
   return response.data;
 }

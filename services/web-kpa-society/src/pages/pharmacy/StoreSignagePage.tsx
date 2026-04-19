@@ -460,7 +460,7 @@ export function StoreSignagePage() {
   const handleAddFromSignage = async (mediaId: string) => {
     if (!selectedPlaylistId) return;
     try {
-      await addPlaylistItemFromSignage(selectedPlaylistId, mediaId);
+      await addPlaylistItemFromSignage(selectedPlaylistId, mediaId, organizationId);
       setShowAddPicker(false);
       loadPlaylistItems(selectedPlaylistId);
     } catch { /* user can retry */ }
