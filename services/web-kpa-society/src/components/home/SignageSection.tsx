@@ -269,6 +269,7 @@ const styles: Record<string, React.CSSProperties> = {
   playlistCard: {
     flex: '0 0 180px',
     minWidth: '180px',
+    minHeight: '100px',
     backgroundColor: colors.white,
     borderRadius: borderRadius.lg,
     border: `1px solid ${colors.neutral100}`,

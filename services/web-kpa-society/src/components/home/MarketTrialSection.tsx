@@ -8,11 +8,29 @@
  * 진입점만 유지합니다.
  */
 
+import { useEffect } from 'react';
 import { colors, spacing, borderRadius, shadows } from '../../styles/theme';
+
+const hoverStyles = `
+  .market-trial-card:hover {
+    border-color: ${colors.neutral300};
+    box-shadow: ${shadows.md};
+  }
+`;
 
 const NETURE_URL = 'https://neture.co.kr';
 
 export function MarketTrialSection() {
+  useEffect(() => {
+    const styleId = 'market-trial-hover-styles';
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.textContent = hoverStyles;
+      document.head.appendChild(style);
+    }
+  }, []);
+
   return (
     <section style={styles.container}>
       <a
@@ -20,6 +38,7 @@ export function MarketTrialSection() {
         target="_blank"
         rel="noopener noreferrer"
         style={styles.card}
+        className="market-trial-card"
       >
         <div style={styles.iconWrap}>
           <span style={styles.icon}>🧪</span>
@@ -51,6 +70,7 @@ const styles: Record<string, React.CSSProperties> = {
     textDecoration: 'none',
     color: 'inherit',
     border: `1px solid ${colors.neutral100}`,
+    transition: 'border-color 0.15s, box-shadow 0.15s',
   },
   iconWrap: {
     flex: '0 0 auto',

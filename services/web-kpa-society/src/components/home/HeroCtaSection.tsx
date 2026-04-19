@@ -7,9 +7,18 @@
  * CTA 3개: 포럼 참여, 강의 수강, 콘텐츠 허브
  */
 
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { colors, spacing, borderRadius } from '../../styles/theme';
+import { colors, spacing, borderRadius, shadows } from '../../styles/theme';
+
+const hoverStyles = `
+  .hero-cta-btn:hover {
+    border-color: ${colors.primary};
+    box-shadow: ${shadows.sm};
+    color: ${colors.primary};
+  }
+`;
 
 const ForumIconSmall = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -46,12 +55,22 @@ export function HeroCtaSection() {
     ? `${user.name}님, 환영합니다`
     : '약사 커뮤니티에 오신 것을 환영합니다';
 
+  useEffect(() => {
+    const styleId = 'hero-cta-hover-styles';
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.textContent = hoverStyles;
+      document.head.appendChild(style);
+    }
+  }, []);
+
   return (
     <section style={styles.container}>
       <p style={styles.greeting}>{greeting}</p>
       <div style={styles.ctaRow}>
         {ctaItems.map((item) => (
-          <Link key={item.href} to={item.href} style={styles.ctaButton}>
+          <Link key={item.href} to={item.href} style={styles.ctaButton} className="hero-cta-btn">
             <span style={styles.ctaIcon}>{item.icon}</span>
             <span style={styles.ctaLabel}>{item.label}</span>
           </Link>

@@ -29,6 +29,10 @@ const responsiveStyles = `
       grid-template-columns: repeat(2, 1fr);
     }
   }
+  .service-card:hover {
+    border-color: ${colors.neutral300};
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
 `;
 
 // Neutral monochrome icons (inline SVG for consistent styling)

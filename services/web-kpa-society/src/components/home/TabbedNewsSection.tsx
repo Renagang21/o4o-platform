@@ -9,11 +9,21 @@
  *  3. 약사공론  — 정적 CTA (kpanews.co.kr 외부 링크)
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import type { HomeNotice } from '../../api/home';
 import type { Notice } from '../../types';
 import { colors, spacing, borderRadius, shadows } from '../../styles/theme';
+
+const tabHoverStyles = `
+  .tabbed-news-tab:hover:not(.tabbed-news-tab-active) {
+    border-color: ${colors.neutral300};
+    background-color: ${colors.neutral50};
+  }
+  .tabbed-news-item:hover {
+    background-color: ${colors.neutral50};
+  }
+`;
 
 interface Props {
   prefetchedNotices?: HomeNotice[];
@@ -32,6 +42,16 @@ const tabs: { key: TabKey; label: string }[] = [
 export function TabbedNewsSection({ prefetchedNotices, prefetchedLatestNews, loading }: Props) {
   const [activeTab, setActiveTab] = useState<TabKey>('notices');
 
+  useEffect(() => {
+    const styleId = 'tabbed-news-hover-styles';
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.textContent = tabHoverStyles;
+      document.head.appendChild(style);
+    }
+  }, []);
+
   return (
     <section style={styles.container}>
       {/* 탭 행 */}
@@ -41,6 +61,7 @@ export function TabbedNewsSection({ prefetchedNotices, prefetchedLatestNews, loa
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             style={activeTab === tab.key ? { ...styles.tab, ...styles.tabActive } : styles.tab}
+            className={`tabbed-news-tab${activeTab === tab.key ? ' tabbed-news-tab-active' : ''}`}
           >
             {tab.label}
           </button>
@@ -80,7 +101,7 @@ function NoticesPanel({ notices, loading }: { notices: HomeNotice[]; loading: bo
     <>
       <ul style={styles.list}>
         {notices.map((item) => (
-          <li key={item.id} style={styles.listItem}>
+          <li key={item.id} style={styles.listItem} className="tabbed-news-item">
             <Link to={`/content/${item.id}`} style={styles.postLink}>
               {item.isPinned && <span style={styles.pinnedBadge}>고정</span>}
               <span style={styles.postTitle}>{item.title}</span>
@@ -115,7 +136,7 @@ function LatestNewsPanel({ news, loading }: { news: Notice[]; loading: boolean }
     <>
       <ul style={styles.list}>
         {news.map((item) => (
-          <li key={item.id} style={styles.listItem}>
+          <li key={item.id} style={styles.listItem} className="tabbed-news-item">
             <Link to={`/content/${item.id}`} style={styles.postLink}>
               <span style={styles.postTitle}>{item.title}</span>
             </Link>
@@ -165,6 +186,7 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     gap: spacing.sm,
     marginBottom: spacing.md,
+    flexWrap: 'wrap',
   },
   tab: {
     padding: `${spacing.sm} ${spacing.md}`,
@@ -188,6 +210,7 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: borderRadius.lg,
     padding: spacing.md,
     boxShadow: shadows.sm,
+    minHeight: '200px',
   },
   list: {
     listStyle: 'none',
