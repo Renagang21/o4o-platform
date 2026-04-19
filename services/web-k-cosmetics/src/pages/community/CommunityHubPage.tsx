@@ -4,6 +4,7 @@
  * WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1
  * WO-KCOS-HOME-REBASE-TO-KPA-FRAME-V1: Shared Space Frame 기준 재구성
  * WO-SHARED-SPACE-COMPONENT-SPLIT-V1: 공통 컴포넌트 적용
+ * WO-SHARED-SPACE-SIGNAGE-COMPONENT-V1: SignagePreviewSection 공통 적용
  *
  * Route: /community
  *
@@ -13,7 +14,7 @@
  *  3. Activity → ActivitySection (shared)
  *  4. App Entry → AppEntrySection (shared)
  *  5. Content Highlight (서비스 고유)
- *  6. Signage Preview (서비스 고유)
+ *  6. Signage Preview → SignagePreviewSection (shared)
  *  7. CTA / Guidance → CtaGuidanceSection (shared)
  *  8. Utility (서비스 고유)
  */
@@ -32,8 +33,9 @@ import {
   ActivitySection,
   AppEntrySection,
   CtaGuidanceSection,
+  SignagePreviewSection,
 } from '@o4o/shared-space-ui';
-import type { NoticeItem, FeaturedPost, RecentPost } from '@o4o/shared-space-ui';
+import type { NoticeItem, FeaturedPost, RecentPost, SignageMediaItem, SignagePlaylistItem } from '@o4o/shared-space-ui';
 
 // ─── Constants ─────────────────────────────────────────────
 const PINK = '#DB2777';
@@ -49,18 +51,6 @@ interface FeedItem {
   viewCount: number;
   commentCount: number;
   date: string;
-}
-
-interface HubSignageMedia {
-  id: string;
-  title: string;
-  thumbnailUrl?: string | null;
-}
-
-interface HubSignagePlaylist {
-  id: string;
-  name: string;
-  itemCount?: number;
 }
 
 // ─── Content Card ──────────────────────────────────────────
@@ -152,8 +142,8 @@ export default function CommunityHubPage() {
   const [contentLoading, setContentLoading] = useState(true);
 
   // Signage
-  const [signageMedia, setSignageMedia] = useState<HubSignageMedia[]>([]);
-  const [signagePlaylists, setSignagePlaylists] = useState<HubSignagePlaylist[]>([]);
+  const [signageMedia, setSignageMedia] = useState<SignageMediaItem[]>([]);
+  const [signagePlaylists, setSignagePlaylists] = useState<SignagePlaylistItem[]>([]);
   const [signageLoading, setSignageLoading] = useState(true);
 
   useEffect(() => {
@@ -198,6 +188,8 @@ export default function CommunityHubPage() {
             id: m.id,
             title: m.title,
             thumbnailUrl: m.thumbnailUrl,
+            href: `/store/signage?mediaId=${m.id}`,
+            actionLabel: '매장에 적용',
           })));
         })
         .catch(() => setSignageMedia([])),
@@ -207,7 +199,6 @@ export default function CommunityHubPage() {
           setSignagePlaylists(items.map((p: any) => ({
             id: p.id,
             name: p.title,
-            itemCount: undefined,
           })));
         })
         .catch(() => setSignagePlaylists([])),
@@ -324,63 +315,15 @@ export default function CommunityHubPage() {
           )}
         </Section>
 
-        {/* ─── 6. Signage Preview (서비스 고유) ─── */}
-        <Section title="디지털 사이니지" linkTo="/partner/signage/content" linkLabel="전체보기 →">
-          {signageLoading ? (
-            <p style={styles.empty}>사이니지 정보를 불러오는 중...</p>
-          ) : (
-            <div style={styles.signageColumns}>
-              {/* Media */}
-              <div>
-                <p style={styles.subLabel}>영상</p>
-                <div style={styles.card}>
-                  {signageMedia.length === 0 ? (
-                    <p style={{ ...styles.empty, padding: '16px 0' }}>등록된 사이니지 미디어가 없습니다.</p>
-                  ) : (
-                    signageMedia.map((m, idx) => (
-                      <div key={m.id} style={{
-                        display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px',
-                        borderTop: idx > 0 ? '1px solid #f1f5f9' : 'none',
-                      }}>
-                        <span style={{ color: '#94a3b8' }}>▶</span>
-                        <span style={styles.signageItemTitle}>{m.title}</span>
-                        <Link
-                          to={`/store/signage?mediaId=${m.id}`}
-                          style={styles.signageApplyLink}
-                        >
-                          매장에 적용 →
-                        </Link>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-
-              {/* Playlists */}
-              <div>
-                <p style={styles.subLabel}>플레이리스트</p>
-                <div style={styles.card}>
-                  {signagePlaylists.length === 0 ? (
-                    <p style={{ ...styles.empty, padding: '16px 0' }}>플레이리스트가 없습니다.</p>
-                  ) : (
-                    signagePlaylists.map((p, idx) => (
-                      <div key={p.id} style={{
-                        display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px',
-                        borderTop: idx > 0 ? '1px solid #f1f5f9' : 'none',
-                      }}>
-                        <span style={{ color: '#94a3b8' }}>♫</span>
-                        <span style={styles.signageItemTitle}>{p.name}</span>
-                        {p.itemCount != null && (
-                          <span style={{ fontSize: 12, color: '#94a3b8' }}>{p.itemCount}개</span>
-                        )}
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-        </Section>
+        {/* ─── 6. Signage Preview (shared) ─── */}
+        <SignagePreviewSection
+          mediaItems={signageMedia}
+          playlistItems={signagePlaylists}
+          loading={signageLoading}
+          viewAllHref="/partner/signage/content"
+          viewAllLabel="전체보기 →"
+          accentColor={PINK}
+        />
 
         {/* ─── 7. CTA / Guidance (shared) ─── */}
         <CtaGuidanceSection
@@ -520,29 +463,6 @@ const styles: Record<string, CSSProperties> = {
     fontSize: 10,
     color: '#cbd5e1',
     margin: 0,
-  },
-
-  // Signage
-  signageColumns: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, 1fr)',
-    gap: 16,
-  },
-  signageItemTitle: {
-    flex: 1,
-    fontSize: 13,
-    color: '#334155',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap' as const,
-  },
-  signageApplyLink: {
-    fontSize: 12,
-    fontWeight: 600,
-    color: PINK,
-    textDecoration: 'none',
-    whiteSpace: 'nowrap' as const,
-    flexShrink: 0,
   },
 
   // Utility

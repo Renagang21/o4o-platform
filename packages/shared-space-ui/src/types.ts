@@ -101,3 +101,43 @@ export interface CtaGuidanceSectionProps {
   accentBg?: string;
   external?: boolean;
 }
+
+/* ------------------------------------------------------------------ */
+/*  SignageMediaItem — SignagePreviewSection                           */
+/* ------------------------------------------------------------------ */
+export interface SignageMediaItem {
+  id: string;
+  title: string;
+  thumbnailUrl?: string | null;
+  duration?: number;
+  href?: string;
+  actionLabel?: string;
+}
+
+/* ------------------------------------------------------------------ */
+/*  SignagePlaylistItem — SignagePreviewSection                        */
+/* ------------------------------------------------------------------ */
+export interface SignagePlaylistItem {
+  id: string;
+  name: string;
+  itemCount?: number;
+  totalDuration?: number;
+  href?: string;
+}
+
+/* ------------------------------------------------------------------ */
+/*  SignagePreviewSectionProps                                         */
+/* ------------------------------------------------------------------ */
+export interface SignagePreviewSectionProps {
+  title?: string;
+  mediaLabel?: string;
+  playlistLabel?: string;
+  mediaItems: SignageMediaItem[];
+  playlistItems: SignagePlaylistItem[];
+  loading?: boolean;
+  emptyMessage?: string;
+  emptyHint?: string;
+  viewAllHref?: string;
+  viewAllLabel?: string;
+  accentColor?: string;
+}

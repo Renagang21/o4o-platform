@@ -5,16 +5,20 @@ export { NewsNoticesSection } from './NewsNoticesSection';
 export { ActivitySection } from './ActivitySection';
 export { AppEntrySection } from './AppEntrySection';
 export { CtaGuidanceSection } from './CtaGuidanceSection';
+export { SignagePreviewSection } from './SignagePreviewSection';
 
 export type {
   /* Data types */
   NoticeItem,
   FeaturedPost,
   RecentPost,
+  SignageMediaItem,
+  SignagePlaylistItem,
   /* Component props */
   HeroSummarySectionProps,
   NewsNoticesSectionProps,
   ActivitySectionProps,
   AppEntrySectionProps,
   CtaGuidanceSectionProps,
+  SignagePreviewSectionProps,
 } from './types';

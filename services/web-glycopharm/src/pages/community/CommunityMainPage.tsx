@@ -6,6 +6,7 @@
  * WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1: 콘텐츠 카드 그리드 + 추천/최근 섹션
  * WO-GLYCOPHARM-HOME-REBASE-TO-KPA-FRAME-V1: Shared Space Frame 기준 재구성
  * WO-SHARED-SPACE-COMPONENT-SPLIT-V1: 공통 컴포넌트 적용
+ * WO-SHARED-SPACE-SIGNAGE-COMPONENT-V1: SignagePreviewSection 공통 적용
  *
  * Route: /community
  *
@@ -15,7 +16,7 @@
  *  3. Activity → ActivitySection (shared)
  *  4. App Entry → AppEntrySection (shared)
  *  5. Content Highlight (서비스 고유 — Tailwind)
- *  6. Signage Preview (서비스 고유 — Tailwind)
+ *  6. Signage Preview → SignagePreviewSection (shared)
  *  7. CTA / Guidance → CtaGuidanceSection (shared)
  *  8. Utility (서비스 고유 — Tailwind)
  */
@@ -25,7 +26,6 @@ import { Link } from 'react-router-dom';
 import {
   FileText,
   Play,
-  ListMusic,
   ArrowRight,
   Image as ImageIcon,
   ExternalLink,
@@ -43,8 +43,9 @@ import {
   ActivitySection as SharedActivitySection,
   AppEntrySection,
   CtaGuidanceSection,
+  SignagePreviewSection,
 } from '@o4o/shared-space-ui';
-import type { NoticeItem, FeaturedPost, RecentPost } from '@o4o/shared-space-ui';
+import type { NoticeItem, FeaturedPost, RecentPost, SignageMediaItem, SignagePlaylistItem } from '@o4o/shared-space-ui';
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -79,21 +80,6 @@ interface HubContentItem {
   isPinned?: boolean;
   producer?: string;
   createdAt: string;
-}
-
-// ─── Hub Signage Types ─────────────────────────────────────
-
-interface HubSignageMedia {
-  id: string;
-  title: string;
-  mediaType?: string;
-  thumbnailUrl?: string | null;
-}
-
-interface HubSignagePlaylist {
-  id: string;
-  name: string;
-  itemCount?: number;
 }
 
 const partnerLogos = [
@@ -193,8 +179,8 @@ export default function CommunityMainPage() {
   const [contentLoading, setContentLoading] = useState(true);
 
   // Signage (from hub content API — signage domain)
-  const [signageMedia, setSignageMedia] = useState<HubSignageMedia[]>([]);
-  const [signagePlaylists, setSignagePlaylists] = useState<HubSignagePlaylist[]>([]);
+  const [signageMedia, setSignageMedia] = useState<SignageMediaItem[]>([]);
+  const [signagePlaylists, setSignagePlaylists] = useState<SignagePlaylistItem[]>([]);
   const [signageLoading, setSignageLoading] = useState(true);
 
   const loadFeed = useCallback(async () => {
@@ -234,16 +220,26 @@ export default function CommunityMainPage() {
       .finally(() => setContentLoading(false));
     // Hub signage (media + playlists)
     Promise.all([
-      apiClient.get<{ data: HubSignageMedia[] }>('/api/v1/hub/contents?serviceKey=glycopharm&sourceDomain=signage-media&limit=4')
+      apiClient.get<{ data: any[] }>('/api/v1/hub/contents?serviceKey=glycopharm&sourceDomain=signage-media&limit=4')
         .then((res) => {
           const items = Array.isArray(res.data?.data) ? res.data.data : Array.isArray(res.data) ? res.data : [];
-          setSignageMedia(items);
+          setSignageMedia(items.map((m: any) => ({
+            id: m.id,
+            title: m.title,
+            thumbnailUrl: m.thumbnailUrl,
+            href: `/signage?mediaId=${m.id}`,
+            actionLabel: '매장에 적용',
+          })));
         })
         .catch(() => setSignageMedia([])),
-      apiClient.get<{ data: HubSignagePlaylist[] }>('/api/v1/hub/contents?serviceKey=glycopharm&sourceDomain=signage-playlist&limit=4')
+      apiClient.get<{ data: any[] }>('/api/v1/hub/contents?serviceKey=glycopharm&sourceDomain=signage-playlist&limit=4')
         .then((res) => {
           const items = Array.isArray(res.data?.data) ? res.data.data : Array.isArray(res.data) ? res.data : [];
-          setSignagePlaylists(items);
+          setSignagePlaylists(items.map((p: any) => ({
+            id: p.id,
+            name: p.name ?? p.title,
+            itemCount: p.itemCount,
+          })));
         })
         .catch(() => setSignagePlaylists([])),
     ]).finally(() => setSignageLoading(false));
@@ -381,68 +377,14 @@ export default function CommunityMainPage() {
           )}
         </section>
 
-        {/* ─── 6. Signage Preview (서비스 고유) ─── */}
-        <section className="mb-8">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-bold text-slate-800">디지털 사이니지</h2>
-            <Link to="/signage" className="flex items-center gap-1 text-sm text-primary-600 hover:text-primary-700 font-medium">
-              사이니지 관리 <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-          {signageLoading ? (
-            <div className="bg-white rounded-lg border border-slate-200 px-4 py-8 text-center text-xs text-slate-400">
-              사이니지 정보를 불러오는 중...
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Media */}
-              <div>
-                <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">영상</p>
-                <div className="bg-white rounded-lg border border-slate-200 divide-y divide-slate-100">
-                  {signageMedia.length === 0 ? (
-                    <div className="px-4 py-4 text-center text-xs text-slate-400">등록된 사이니지 미디어가 없습니다.</div>
-                  ) : (
-                    signageMedia.map((media) => (
-                      <div
-                        key={media.id}
-                        className="flex items-center gap-2 px-4 py-3 hover:bg-slate-50 transition-colors"
-                      >
-                        <Play className="w-4 h-4 text-slate-400 shrink-0" />
-                        <span className="text-sm text-slate-700 truncate flex-1">{media.title}</span>
-                        <Link
-                          to={`/signage?mediaId=${media.id}`}
-                          className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-primary-600 bg-primary-50 rounded-md hover:bg-primary-100 transition-colors shrink-0"
-                        >
-                          매장에 적용 <ArrowRight className="w-3 h-3" />
-                        </Link>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-
-              {/* Playlists */}
-              <div>
-                <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">플레이리스트</p>
-                <div className="bg-white rounded-lg border border-slate-200 divide-y divide-slate-100">
-                  {signagePlaylists.length === 0 ? (
-                    <div className="px-4 py-4 text-center text-xs text-slate-400">플레이리스트가 없습니다.</div>
-                  ) : (
-                    signagePlaylists.map((p) => (
-                      <div key={p.id} className="flex items-center gap-2 px-4 py-3">
-                        <ListMusic className="w-4 h-4 text-slate-400 shrink-0" />
-                        <span className="text-sm text-slate-700 truncate flex-1">{p.name}</span>
-                        {p.itemCount != null && (
-                          <span className="text-xs text-slate-400 shrink-0">{p.itemCount}개</span>
-                        )}
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-        </section>
+        {/* ─── 6. Signage Preview (shared) ─── */}
+        <SignagePreviewSection
+          mediaItems={signageMedia}
+          playlistItems={signagePlaylists}
+          loading={signageLoading}
+          viewAllHref="/signage"
+          viewAllLabel="사이니지 관리 →"
+        />
 
         {/* ─── 7. CTA / Guidance (shared) ─── */}
         <CtaGuidanceSection

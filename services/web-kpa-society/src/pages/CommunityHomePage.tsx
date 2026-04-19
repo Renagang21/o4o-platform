@@ -8,6 +8,7 @@
  * WO-MARKET-TRIAL-COMMUNITY-HOME-BLOCK-IMPLEMENT-V1: 마켓트라이얼 소식 블록 추가
  * WO-KPA-MAIN-HOME-RESTRUCTURE-V1: 참여 유도형 커뮤니티 허브 전환
  * WO-SHARED-SPACE-COMPONENT-SPLIT-V1: 공통 컴포넌트 적용
+ * WO-SHARED-SPACE-SIGNAGE-COMPONENT-V1: SignagePreviewSection 공통 적용
  *
  * 섹션 구조 (12블록):
  * ├─ HeroBannerSection        — 동적 광고 캐러셀 (KPA 고유)
@@ -16,7 +17,7 @@
  * ├─ ActivitySection          — 최근 활동 포럼 글 (shared)
  * ├─ AppEntrySection          — 서비스 바로가기 카드 그리드 (shared)
  * ├─ EducationSection         — 교육/강의 요약 (KPA 고유)
- * ├─ SignageSection            — 디지털 사이니지 (KPA 고유)
+ * ├─ SignagePreviewSection     — 디지털 사이니지 (shared)
  * ├─ CtaGuidanceSection       — 시범판매 CTA (shared)
  * ├─ AdSection                — 페이지 광고 (KPA 고유)
  * ├─ SponsorBar               — 스폰서 로고 (KPA 고유)
@@ -27,7 +28,6 @@
 import { useState, useEffect } from 'react';
 import { HeroBannerSection } from '../components/community/HeroBannerSection';
 import { EducationSection } from '../components/home/EducationSection';
-import { SignageSection } from '../components/home/SignageSection';
 import { AdSection } from '../components/community/AdSection';
 import { SponsorBar } from '../components/community/SponsorBar';
 import { FooterLinksSection } from '../components/home/FooterLinksSection';
@@ -35,6 +35,7 @@ import { UtilitySection } from '../components/home/UtilitySection';
 import { homeApi } from '../api/home';
 import type { HomePageData } from '../api/home';
 import { useAuth } from '../contexts/AuthContext';
+import { getMediaThumbnailUrl } from '@o4o/types/signage';
 import { colors, spacing } from '../styles/theme';
 import {
   HeroSummarySection,
@@ -42,8 +43,9 @@ import {
   ActivitySection as SharedActivitySection,
   AppEntrySection,
   CtaGuidanceSection,
+  SignagePreviewSection,
 } from '@o4o/shared-space-ui';
-import type { NoticeItem, RecentPost } from '@o4o/shared-space-ui';
+import type { NoticeItem, RecentPost, SignageMediaItem, SignagePlaylistItem } from '@o4o/shared-space-ui';
 
 // ─── Inline SVG Icons (from original HeroCtaSection / CommunityServiceSection) ──
 
@@ -137,6 +139,20 @@ export function CommunityHomePage() {
     author: p.authorName ?? undefined,
   }));
 
+  // ── Signage data mapping ──
+  const signageMediaItems: SignageMediaItem[] = (data?.signage.media ?? []).map((m) => ({
+    id: m.id,
+    title: m.name,
+    thumbnailUrl: getMediaThumbnailUrl(m),
+    duration: m.duration ?? undefined,
+  }));
+  const signagePlaylistItems: SignagePlaylistItem[] = (data?.signage.playlists ?? []).map((p) => ({
+    id: p.id,
+    name: p.name,
+    itemCount: p.itemCount,
+    totalDuration: p.totalDuration,
+  }));
+
   return (
     <div style={styles.page}>
       {/* 1. Hero 배너 (동적 광고 캐러셀 — KPA 고유) */}
@@ -198,14 +214,14 @@ export function CommunityHomePage() {
           <EducationSection />
         </div>
 
-        {/* 7. 사이니지 미디어 (KPA 고유) */}
-        <div style={sectionMargin}>
-          <SignageSection
-            prefetchedMedia={data?.signage.media}
-            prefetchedPlaylists={data?.signage.playlists}
-            loading={loading}
-          />
-        </div>
+        {/* 7. 사이니지 미디어 (shared) */}
+        <SignagePreviewSection
+          mediaItems={signageMediaItems}
+          playlistItems={signagePlaylistItems}
+          loading={loading}
+          viewAllHref="/signage"
+          viewAllLabel="사이니지 콘텐츠 보기 →"
+        />
 
         {/* 8. 시범판매 CTA (shared) */}
         <CtaGuidanceSection
