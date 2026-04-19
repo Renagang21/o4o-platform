@@ -134,7 +134,7 @@ export class StorePlaylistRepository {
              'sourceType', fc.source_type,
              'embedId', fc.embed_id,
              'thumbnailUrl', fc.thumbnail_url
-           ) AS "contentJson"
+           )::jsonb AS "contentJson"
          FROM signage_forced_content fc
          LEFT JOIN signage_forced_content_positions fp
            ON fp.forced_content_id = fc.id AND fp.playlist_id = $1
