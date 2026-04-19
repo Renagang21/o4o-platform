@@ -34,7 +34,6 @@ export interface CreateTrialDto {
     quantity?: number;
     note?: string;
   };
-  visibleServiceKeys?: string[];
   maxParticipants?: number;
   trialUnitPrice?: number;
   targetAmount?: number;
@@ -82,7 +81,6 @@ export interface UpdateTrialDto {
     quantity?: number;
     note?: string;
   };
-  visibleServiceKeys?: string[];
   maxParticipants?: number;
   trialUnitPrice?: number;
   targetAmount?: number;
@@ -130,7 +128,6 @@ export class MarketTrialService {
       description: dto.description || null,
       salesScenarioContent: dto.salesScenarioContent || null,
       outcomeSnapshot: dto.outcomeSnapshot || undefined,
-      visibleServiceKeys: dto.visibleServiceKeys || [],
       maxParticipants: dto.maxParticipants || undefined,
       trialUnitPrice: dto.trialUnitPrice || 0,
       targetAmount: dto.targetAmount || 0,
@@ -179,7 +176,6 @@ export class MarketTrialService {
     if (dto.description !== undefined) trial.description = dto.description || null;
     if (dto.salesScenarioContent !== undefined) trial.salesScenarioContent = dto.salesScenarioContent || null;
     if (dto.outcomeSnapshot !== undefined) trial.outcomeSnapshot = dto.outcomeSnapshot;
-    if (dto.visibleServiceKeys !== undefined) trial.visibleServiceKeys = dto.visibleServiceKeys;
     if (dto.maxParticipants !== undefined) trial.maxParticipants = dto.maxParticipants;
     if (dto.trialUnitPrice !== undefined) trial.trialUnitPrice = dto.trialUnitPrice;
     if (dto.targetAmount !== undefined) trial.targetAmount = dto.targetAmount;

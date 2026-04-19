@@ -101,6 +101,11 @@ function ServiceCard({ card }: { card: ServiceCardData }) {
         <h3 style={styles.cardTitle}>{card.title}</h3>
         <p style={styles.cardDesc}>{card.description}</p>
       </div>
+      <div style={styles.cardArrow}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="9 18 15 12 9 6" />
+        </svg>
+      </div>
     </Link>
   );
 }
@@ -118,7 +123,10 @@ export function CommunityServiceSection() {
 
   return (
     <section style={styles.container}>
-      <h2 style={styles.sectionTitle}>서비스 바로가기</h2>
+      <div style={styles.headerWrap}>
+        <h2 style={styles.sectionTitle}>서비스 바로가기</h2>
+        <p style={styles.sectionSubtitle}>각 서비스로 바로 이동하세요</p>
+      </div>
       <div className="service-grid">
         {services.map((card) => (
           <ServiceCard key={card.href} card={card} />
@@ -132,10 +140,18 @@ const styles: Record<string, React.CSSProperties> = {
   container: {
     padding: `${spacing.xl} 0`,
   },
+  headerWrap: {
+    marginBottom: spacing.lg,
+  },
   sectionTitle: {
     ...typography.headingM,
     color: colors.neutral900,
-    marginBottom: spacing.lg,
+    margin: 0,
+  },
+  sectionSubtitle: {
+    fontSize: '0.875rem',
+    color: colors.neutral500,
+    margin: `${spacing.xs} 0 0`,
   },
   card: {
     display: 'flex',
@@ -170,5 +186,11 @@ const styles: Record<string, React.CSSProperties> = {
     margin: `${spacing.xs} 0 0`,
     fontSize: '0.813rem',
     color: colors.neutral500,
+  },
+  cardArrow: {
+    flexShrink: 0,
+    color: colors.neutral300,
+    display: 'flex',
+    alignItems: 'center',
   },
 };

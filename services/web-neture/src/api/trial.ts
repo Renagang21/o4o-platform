@@ -40,7 +40,6 @@ export interface Trial {
   };
   eligibleRoles?: string[];
   rewardOptions?: string[];
-  visibleServiceKeys?: string[];
   maxParticipants?: number;
   currentParticipants: number;
   startDate?: string;
@@ -140,7 +139,6 @@ export interface CreateTrialPayload {
   description?: string;
   // WO-MARKET-TRIAL-SALES-SCENARIO-EDITOR-V1
   salesScenarioContent?: string;
-  visibleServiceKeys: string[];
   outcomeSnapshot?: {
     expectedType: 'product' | 'cash';
     description: string;

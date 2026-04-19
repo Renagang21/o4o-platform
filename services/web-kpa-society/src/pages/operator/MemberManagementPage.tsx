@@ -7,7 +7,7 @@
  * 탭: 전체 | 약사 | 약대생 | 가입 신청
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, type ReactNode } from 'react';
 import { toast } from '@o4o/error-handling';
 import {
   Users,
@@ -25,9 +25,9 @@ import {
   AlertTriangle,
   ShieldAlert,
 } from 'lucide-react';
-import { DataTable } from '@o4o/ui';
+import { DataTable, RowActionMenu, ConfirmActionDialog } from '@o4o/ui';
 import type { Column } from '@o4o/ui';
-import { MemberListLayout, StatusBadge } from '@o4o/operator-ux-core';
+import { MemberListLayout, StatusBadge, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
 import type { MemberTab } from '@o4o/operator-ux-core';
 import { getAccessToken } from '../../contexts/AuthContext';
 
@@ -116,6 +116,71 @@ function formatDate(dateStr: string | null): string {
   if (!dateStr) return '-';
   return new Date(dateStr).toLocaleDateString('ko-KR');
 }
+
+// ─── Action Policy (V4-EXPANSION) ────────────────────────────────
+
+const memberActionPolicy = defineActionPolicy<KpaMember>('kpa:members', {
+  inlineMax: 2,
+  rules: [
+    {
+      key: 'approve',
+      label: '승인',
+      variant: 'primary',
+      visible: (m) => m.status === 'pending',
+    },
+    {
+      key: 'reject',
+      label: '반려',
+      variant: 'danger',
+      visible: (m) => m.status === 'pending',
+      confirm: {
+        title: '회원 반려',
+        message: '이 회원의 가입을 반려하시겠습니까?',
+        variant: 'danger',
+        confirmText: '반려',
+      },
+    },
+    {
+      key: 'suspend',
+      label: '정지',
+      variant: 'danger',
+      visible: (m) => m.status === 'active',
+      confirm: {
+        title: '회원 정지',
+        message: '이 회원을 정지 처리하시겠습니까?',
+        variant: 'danger',
+        confirmText: '정지',
+      },
+    },
+    {
+      key: 'restore',
+      label: '복원',
+      variant: 'primary',
+      visible: (m) => m.status === 'suspended',
+    },
+    {
+      key: 'edit',
+      label: '수정',
+      visible: (m) => m.status !== 'withdrawn',
+    },
+    {
+      key: 'delete',
+      label: '삭제',
+      variant: 'danger',
+      visible: (m) => m.status !== 'withdrawn',
+      divider: true,
+    },
+  ],
+});
+
+const MEMBER_ACTION_ICONS: Record<string, ReactNode> = {
+  approve: <UserCheck className="w-4 h-4" />,
+  reject: <UserX className="w-4 h-4" />,
+  suspend: <ShieldAlert className="w-4 h-4" />,
+  restore: <CheckCircle className="w-4 h-4" />,
+  edit: <Pencil className="w-4 h-4" />,
+  delete: <Trash2 className="w-4 h-4" />,
+};
 
 // ─── Tab Filter Config ─────────────────────────────────────────
 
@@ -242,6 +307,7 @@ function DeleteRiskModal({
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<DeleteRiskData | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [confirmMode, setConfirmMode] = useState<'soft' | 'hard' | null>(null);
 
   useEffect(() => {
     apiFetch<{ data: DeleteRiskData }>(`/api/v1/kpa/members/${memberId}/delete-risk`)
@@ -250,33 +316,19 @@ function DeleteRiskModal({
       .finally(() => setLoading(false));
   }, [memberId]);
 
-  const handleSoftDelete = async () => {
-    if (!confirm('이 회원을 탈퇴(비활성) 처리하시겠습니까?')) return;
+  const executeDelete = async () => {
+    if (!confirmMode) return;
     setDeleting(true);
     try {
-      await apiFetch(`/api/v1/kpa/members/${memberId}?mode=soft`, { method: 'DELETE' });
-      toast.success('탈퇴 처리 완료');
+      await apiFetch(`/api/v1/kpa/members/${memberId}?mode=${confirmMode}`, { method: 'DELETE' });
+      toast.success(confirmMode === 'soft' ? '탈퇴 처리 완료' : '완전 삭제 완료');
       onDeleted();
       onClose();
     } catch (e: any) {
-      toast.error(e.message || '처리 실패');
+      toast.error(e.message || (confirmMode === 'soft' ? '처리 실패' : '삭제 실패'));
     } finally {
       setDeleting(false);
-    }
-  };
-
-  const handleHardDelete = async () => {
-    if (!confirm('⚠️ 이 회원 데이터를 완전히 삭제합니다. 이 작업은 되돌릴 수 없습니다.\n정말 삭제하시겠습니까?')) return;
-    setDeleting(true);
-    try {
-      await apiFetch(`/api/v1/kpa/members/${memberId}?mode=hard`, { method: 'DELETE' });
-      toast.success('완전 삭제 완료');
-      onDeleted();
-      onClose();
-    } catch (e: any) {
-      toast.error(e.message || '삭제 실패');
-    } finally {
-      setDeleting(false);
+      setConfirmMode(null);
     }
   };
 
@@ -334,16 +386,30 @@ function DeleteRiskModal({
 
             {/* 액션 */}
             <div className="flex flex-col gap-2 pt-2">
-              <button onClick={handleSoftDelete} disabled={deleting}
+              <button onClick={() => setConfirmMode('soft')} disabled={deleting}
                 className="w-full px-4 py-2.5 text-sm font-medium text-amber-700 bg-amber-50 border border-amber-200 hover:bg-amber-100 rounded-lg disabled:opacity-50">
-                {deleting ? '처리 중...' : '탈퇴 처리 (비활성화)'}
+                탈퇴 처리 (비활성화)
               </button>
-              <button onClick={handleHardDelete} disabled={deleting || !data.canHardDelete}
+              <button onClick={() => setConfirmMode('hard')} disabled={deleting || !data.canHardDelete}
                 className="w-full px-4 py-2.5 text-sm font-medium text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed">
-                {!data.canHardDelete ? '완전삭제 불가 (연결 데이터 존재)' : deleting ? '삭제 중...' : '완전삭제 (되돌릴 수 없음)'}
+                {!data.canHardDelete ? '완전삭제 불가 (연결 데이터 존재)' : '완전삭제 (되돌릴 수 없음)'}
               </button>
               <button onClick={onClose} className="w-full px-4 py-2 text-sm text-slate-500 hover:bg-slate-50 rounded-lg">취소</button>
             </div>
+
+            {/* Delete Confirm Dialog (V4-EXPANSION) */}
+            <ConfirmActionDialog
+              open={!!confirmMode}
+              onClose={() => setConfirmMode(null)}
+              onConfirm={executeDelete}
+              title={confirmMode === 'hard' ? '완전 삭제 확인' : '탈퇴 처리 확인'}
+              message={confirmMode === 'hard'
+                ? '이 회원 데이터를 완전히 삭제합니다.\n이 작업은 되돌릴 수 없습니다.'
+                : '이 회원을 탈퇴(비활성) 처리하시겠습니까?'}
+              confirmText={confirmMode === 'hard' ? '완전 삭제' : '탈퇴 처리'}
+              variant={confirmMode === 'hard' ? 'danger' : 'warning'}
+              loading={deleting}
+            />
           </div>
         ) : (
           <p className="text-center text-sm text-red-500 py-4">리스크 정보를 불러오지 못했습니다.</p>
@@ -423,9 +489,6 @@ export default function MemberManagementPage() {
   }, [fetchMembers, activeTab]);
 
   async function handleStatusChange(memberId: string, newStatus: MemberStatus) {
-    const labels: Record<string, string> = { active: '승인', rejected: '반려', suspended: '정지', pending: '대기' };
-    const displayLabel = labels[newStatus] || newStatus;
-    if (!confirm(`회원 상태를 "${displayLabel}"(으)로 변경하시겠습니까?`)) return;
     setActionLoading(memberId);
     try {
       await apiFetch(`/api/v1/kpa/members/${memberId}/status`, {
@@ -520,35 +583,27 @@ export default function MemberManagementPage() {
       sorter: (a, b) => new Date(a.joined_at || a.created_at).getTime() - new Date(b.joined_at || b.created_at).getTime(),
     },
     {
-      key: 'actions',
+      key: '_actions',
       title: '액션',
-      width: '160px',
-      align: 'right',
+      width: '60px',
+      align: 'center',
       render: (_v, m) => (
-        <div className="flex items-center justify-end gap-1" onClick={e => e.stopPropagation()}>
-          {actionLoading === m.id ? (
-            <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
-          ) : (
-            <>
-              {m.status === 'pending' && (
-                <>
-                  <button onClick={() => handleStatusChange(m.id, 'active')} title="승인" className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"><UserCheck className="w-4 h-4" /></button>
-                  <button onClick={() => handleStatusChange(m.id, 'rejected')} title="반려" className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"><UserX className="w-4 h-4" /></button>
-                </>
-              )}
-              {m.status === 'active' && (
-                <button onClick={() => handleStatusChange(m.id, 'suspended')} className="text-xs text-red-500 hover:underline">정지</button>
-              )}
-              {m.status === 'suspended' && (
-                <button onClick={() => handleStatusChange(m.id, 'active')} className="text-xs text-green-600 hover:underline">복원</button>
-              )}
-              {m.status === 'withdrawn' && <span className="text-xs text-slate-400">-</span>}
-              <div className="w-px h-4 bg-slate-200 mx-0.5" />
-              <button onClick={() => setEditTarget(m)} title="수정" className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg"><Pencil className="w-3.5 h-3.5" /></button>
-              <button onClick={() => setDeleteTargetId(m.id)} title="삭제" className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg"><Trash2 className="w-3.5 h-3.5" /></button>
-            </>
-          )}
-        </div>
+        <RowActionMenu
+          actions={buildRowActions(memberActionPolicy, m, {
+            approve: () => handleStatusChange(m.id, 'active'),
+            reject: () => handleStatusChange(m.id, 'rejected'),
+            suspend: () => handleStatusChange(m.id, 'suspended'),
+            restore: () => handleStatusChange(m.id, 'active'),
+            edit: () => setEditTarget(m),
+            delete: () => setDeleteTargetId(m.id),
+          }, {
+            icons: MEMBER_ACTION_ICONS,
+            loading: actionLoading === m.id
+              ? { approve: true, reject: true, suspend: true, restore: true }
+              : undefined,
+          })}
+          inlineMax={memberActionPolicy.inlineMax}
+        />
       ),
     },
   ];
@@ -675,6 +730,7 @@ function ApplicationsTab({ onReviewComplete }: { onReviewComplete: () => void })
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [reviewComment, setReviewComment] = useState('');
   const [reviewTarget, setReviewTarget] = useState<string | null>(null);
+  const [pendingReview, setPendingReview] = useState<{ id: string; status: 'approved' | 'rejected' } | null>(null);
 
   const fetchApps = useCallback(async () => {
     setLoading(true);
@@ -696,17 +752,21 @@ function ApplicationsTab({ onReviewComplete }: { onReviewComplete: () => void })
 
   useEffect(() => { fetchApps(); }, [fetchApps]);
 
-  async function handleReview(appId: string, status: 'approved' | 'rejected') {
-    const label = status === 'approved' ? '승인' : '반려';
-    if (!confirm(`이 신청을 ${label}하시겠습니까?`)) return;
-    setActionLoading(appId);
+  function requestReview(appId: string, status: 'approved' | 'rejected') {
+    setPendingReview({ id: appId, status });
+  }
+
+  async function executeReview() {
+    if (!pendingReview) return;
+    setActionLoading(pendingReview.id);
     try {
-      await apiFetch(`/api/v1/kpa/applications/${appId}/review`, {
+      await apiFetch(`/api/v1/kpa/applications/${pendingReview.id}/review`, {
         method: 'PATCH',
-        body: JSON.stringify({ status, review_comment: reviewComment || undefined }),
+        body: JSON.stringify({ status: pendingReview.status, review_comment: reviewComment || undefined }),
       });
       setReviewTarget(null);
       setReviewComment('');
+      setPendingReview(null);
       await fetchApps();
       onReviewComplete();
     } catch (e: any) {
@@ -798,14 +858,14 @@ function ApplicationsTab({ onReviewComplete }: { onReviewComplete: () => void })
                           className="text-xs border border-slate-300 rounded px-2 py-1 w-36"
                         />
                         <div className="flex gap-1">
-                          <button onClick={() => handleReview(app.id, 'approved')} className="px-2 py-0.5 text-xs bg-green-600 text-white rounded hover:bg-green-700">승인</button>
-                          <button onClick={() => handleReview(app.id, 'rejected')} className="px-2 py-0.5 text-xs bg-red-500 text-white rounded hover:bg-red-600">반려</button>
+                          <button onClick={() => requestReview(app.id, 'approved')} className="px-2 py-0.5 text-xs bg-green-600 text-white rounded hover:bg-green-700">승인</button>
+                          <button onClick={() => requestReview(app.id, 'rejected')} className="px-2 py-0.5 text-xs bg-red-500 text-white rounded hover:bg-red-600">반려</button>
                           <button onClick={() => { setReviewTarget(null); setReviewComment(''); }} className="px-2 py-0.5 text-xs text-slate-500 hover:underline">취소</button>
                         </div>
                       </div>
                     ) : (
                       <div className="flex gap-1">
-                        <button onClick={() => handleReview(app.id, 'approved')} className="p-1 text-green-600 hover:bg-green-50 rounded" title="승인"><CheckCircle className="w-4 h-4" /></button>
+                        <button onClick={() => requestReview(app.id, 'approved')} className="p-1 text-green-600 hover:bg-green-50 rounded" title="승인"><CheckCircle className="w-4 h-4" /></button>
                         <button onClick={() => setReviewTarget(app.id)} className="p-1 text-red-500 hover:bg-red-50 rounded" title="반려"><XCircle className="w-4 h-4" /></button>
                       </div>
                     )
@@ -826,6 +886,20 @@ function ApplicationsTab({ onReviewComplete }: { onReviewComplete: () => void })
           <button disabled={page >= totalPages} onClick={() => setPage(p => p + 1)} className="px-3 py-1 text-sm border border-slate-300 rounded-md disabled:opacity-40">다음</button>
         </div>
       )}
+
+      {/* Review Confirm Dialog (V4-EXPANSION) */}
+      <ConfirmActionDialog
+        open={!!pendingReview}
+        onClose={() => setPendingReview(null)}
+        onConfirm={executeReview}
+        title={pendingReview?.status === 'approved' ? '가입 승인 확인' : '가입 반려 확인'}
+        message={pendingReview?.status === 'approved'
+          ? '이 가입 신청을 승인하시겠습니까?'
+          : '이 가입 신청을 반려하시겠습니까?'}
+        confirmText={pendingReview?.status === 'approved' ? '승인' : '반려'}
+        variant={pendingReview?.status === 'rejected' ? 'danger' : 'default'}
+        loading={!!actionLoading}
+      />
     </div>
   );
 }

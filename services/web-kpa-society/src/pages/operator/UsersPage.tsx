@@ -557,7 +557,7 @@ export default function UsersPage() {
     },
     {
       key: '_actions',
-      header: '관리',
+      header: '액션',
       align: 'center',
       width: '60px',
       system: true,

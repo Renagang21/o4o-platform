@@ -27,11 +27,6 @@ const SALES_SCENARIO_TEMPLATE = `<h3>1. 진열 위치 및 방법</h3>
 
 const EMPTY_HTML_PATTERN = /^(<p>(<br\s*\/?>|\s|&nbsp;)*<\/p>\s*)*$/;
 
-const SERVICE_KEY_OPTIONS = [
-  { key: 'glycopharm', label: 'GlycoPharm' },
-  { key: 'k-cosmetics', label: 'K-Cosmetics' },
-];
-
 /** WO-MARKET-TRIAL-EDIT-FLOW-V1 */
 interface SupplierTrialFormProps {
   mode?: 'create' | 'edit';
@@ -52,7 +47,6 @@ export default function SupplierTrialCreatePage({
   // WO-MARKET-TRIAL-VIDEO-FIELD-V1
   const [videoUrl, setVideoUrl] = useState(initialData?.videoUrl || '');
   const [description, setDescription] = useState(initialData?.description || '');
-  const [visibleServiceKeys, setVisibleServiceKeys] = useState<string[]>(initialData?.visibleServiceKeys || []);
   const [outcomeType, setOutcomeType] = useState<'product' | 'cash'>(initialData?.outcomeSnapshot?.expectedType || 'product');
   const [outcomeDescription, setOutcomeDescription] = useState(initialData?.outcomeSnapshot?.description || '');
   const [maxParticipants, setMaxParticipants] = useState(initialData?.maxParticipants ? String(initialData.maxParticipants) : '');
@@ -80,12 +74,6 @@ export default function SupplierTrialCreatePage({
     const rem = total - qty * unit;
     return { total: Math.round(total), qty, rem: Math.round(rem) };
   })();
-
-  const toggleServiceKey = (key: string) => {
-    setVisibleServiceKeys((prev) =>
-      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
-    );
-  };
 
   const handleSaveDraft = async () => {
     await handleCreate(false);
@@ -133,7 +121,6 @@ export default function SupplierTrialCreatePage({
         videoUrl: videoUrl.trim() || undefined,
         description: description.trim() || undefined,
         salesScenarioContent: scenarioHtml && !EMPTY_HTML_PATTERN.test(scenarioHtml) ? scenarioHtml : undefined,
-        visibleServiceKeys,
         outcomeSnapshot: outcomeDescription.trim()
           ? { expectedType: outcomeType, description: outcomeDescription.trim() }
           : undefined,
@@ -294,27 +281,6 @@ export default function SupplierTrialCreatePage({
           <div>
             <h2 className="text-base font-semibold text-gray-900">참여 조건 및 혜택</h2>
             <p className="text-xs text-gray-500 mt-0.5">매장이 참여하기 위해 필요한 조건과, 참여 시 얻는 혜택을 명확히 작성하세요</p>
-          </div>
-
-          {/* 대상 서비스 */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">대상 서비스</label>
-            <div className="flex flex-wrap gap-2">
-              {SERVICE_KEY_OPTIONS.map((opt) => (
-                <button
-                  key={opt.key}
-                  type="button"
-                  onClick={() => toggleServiceKey(opt.key)}
-                  className={`px-3 py-1.5 rounded-full text-sm border transition ${
-                    visibleServiceKeys.includes(opt.key)
-                      ? 'bg-blue-600 text-white border-blue-600'
-                      : 'bg-white text-gray-700 border-gray-300 hover:border-blue-400'
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
           </div>
 
           {/* 결과 약속 */}

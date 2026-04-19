@@ -10,7 +10,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Search, GitMerge, X, Package } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
-import { EditableTextCell, RowActionMenu } from '@o4o/ui';
+import { EditableTextCell, RowActionMenu, ConfirmActionDialog } from '@o4o/ui';
 import { DataTable } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { operatorBrandApi, type BrandItem } from '../../lib/api/operatorBrand';
@@ -26,6 +26,7 @@ export default function BrandManagementPage() {
   const [showMergeModal, setShowMergeModal] = useState(false);
   const [mergeSearch, setMergeSearch] = useState('');
   const [merging, setMerging] = useState(false);
+  const [pendingMergeTarget, setPendingMergeTarget] = useState<BrandItem | null>(null);
 
   const loadBrands = useCallback(async (q?: string) => {
     setLoading(true);
@@ -50,18 +51,22 @@ export default function BrandManagementPage() {
     setShowMergeModal(true);
   };
 
-  const handleMerge = async (target: BrandItem) => {
-    if (!mergeSource) return;
-    if (!confirm(`"${mergeSource.name}"의 상품 ${mergeSource.productCount}개를 "${target.name}"으로 이관하고\n"${mergeSource.name}" 브랜드를 삭제합니다.\n\n계속하시겠습니까?`)) return;
+  const handleMergeSelect = (target: BrandItem) => {
+    setPendingMergeTarget(target);
+  };
+
+  const executeMerge = async () => {
+    if (!mergeSource || !pendingMergeTarget) return;
 
     setMerging(true);
-    const res = await operatorBrandApi.mergeBrands(mergeSource.id, target.id);
+    const res = await operatorBrandApi.mergeBrands(mergeSource.id, pendingMergeTarget.id);
     setMerging(false);
 
     if (res.success) {
       toast.success(`병합 완료: ${res.data?.merged ?? 0}개 상품 이관`);
       setShowMergeModal(false);
       setMergeSource(null);
+      setPendingMergeTarget(null);
       loadBrands(search);
     } else {
       toast.error(res.error || '병합 실패');
@@ -118,7 +123,7 @@ export default function BrandManagementPage() {
     },
     {
       key: '_actions',
-      header: '작업',
+      header: '액션',
       system: true,
       align: 'center',
       width: '60px',
@@ -175,6 +180,20 @@ export default function BrandManagementPage() {
         tableId="neture-brand-management"
       />
 
+      {/* Merge Confirm Dialog */}
+      <ConfirmActionDialog
+        open={!!pendingMergeTarget}
+        onClose={() => setPendingMergeTarget(null)}
+        onConfirm={executeMerge}
+        title="브랜드 병합 확인"
+        message={mergeSource && pendingMergeTarget
+          ? `"${mergeSource.name}"의 상품 ${mergeSource.productCount}개를 "${pendingMergeTarget.name}"으로 이관하고\n"${mergeSource.name}" 브랜드를 삭제합니다.`
+          : ''}
+        confirmText="병합"
+        variant="warning"
+        loading={merging}
+      />
+
       {/* Merge Modal */}
       {showMergeModal && mergeSource && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -216,7 +235,7 @@ export default function BrandManagementPage() {
                   {mergeTargets.map(target => (
                     <button
                       key={target.id}
-                      onClick={() => handleMerge(target)}
+                      onClick={() => handleMergeSelect(target)}
                       disabled={merging}
                       className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg hover:bg-emerald-50 text-left transition-colors disabled:opacity-50"
                     >

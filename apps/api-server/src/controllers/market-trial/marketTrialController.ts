@@ -78,7 +78,6 @@ export class MarketTrialController {
    */
   static async gateway(req: AuthRequest, res: Response) {
     try {
-      const { serviceKey } = req.query;
       const userId = (req as any).user?.id;
 
       const emptyResponse = (accessStatus: string) =>
@@ -106,13 +105,6 @@ export class MarketTrialController {
       // 4. 해당 서비스의 오픈 trial 조회
       const qb = MarketTrialController.trialRepo.createQueryBuilder('trial')
         .where('trial.status = :status', { status: TrialStatus.RECRUITING });
-
-      if (serviceKey && typeof serviceKey === 'string') {
-        qb.andWhere(
-          `trial."visibleServiceKeys" @> :serviceKeys::jsonb`,
-          { serviceKeys: JSON.stringify([serviceKey]) },
-        );
-      }
 
       qb.orderBy('trial.createdAt', 'DESC');
       const trials = await qb.getMany();
@@ -147,7 +139,7 @@ export class MarketTrialController {
       }
 
       const {
-        title, oneLiner, videoUrl, description, visibleServiceKeys, outcomeSnapshot,
+        title, oneLiner, videoUrl, description, outcomeSnapshot,
         maxParticipants, fundingStartAt, fundingEndAt, trialPeriodDays,
         targetAmount, trialUnitPrice, rewardRate, salesScenarioContent,
       } = req.body;
@@ -166,7 +158,6 @@ export class MarketTrialController {
         oneLiner: oneLiner || undefined,
         videoUrl: videoUrl || undefined,
         description,
-        visibleServiceKeys: visibleServiceKeys || [],
         outcomeSnapshot,
         maxParticipants: maxParticipants || undefined,
         targetAmount: targetAmount != null ? Number(targetAmount) : undefined,
@@ -221,7 +212,7 @@ export class MarketTrialController {
 
       const { id } = req.params;
       const {
-        title, oneLiner, videoUrl, description, visibleServiceKeys, outcomeSnapshot,
+        title, oneLiner, videoUrl, description, outcomeSnapshot,
         maxParticipants, fundingStartAt, fundingEndAt, trialPeriodDays,
         targetAmount, trialUnitPrice, rewardRate, salesScenarioContent,
       } = req.body;
@@ -233,7 +224,6 @@ export class MarketTrialController {
         description,
         salesScenarioContent,
         outcomeSnapshot,
-        visibleServiceKeys,
         maxParticipants: maxParticipants != null ? Number(maxParticipants) : undefined,
         targetAmount: targetAmount != null ? Number(targetAmount) : undefined,
         trialUnitPrice: trialUnitPrice != null ? Number(trialUnitPrice) : undefined,
@@ -334,17 +324,9 @@ export class MarketTrialController {
    */
   static async getTrials(req: AuthRequest, res: Response) {
     try {
-      const { status, serviceKey } = req.query;
+      const { status } = req.query;
 
       const qb = MarketTrialController.trialRepo.createQueryBuilder('trial');
-
-      // WO-MARKET-TRIAL-B2B-API-UNIFICATION-V1: service-scoped visibility filter
-      if (serviceKey && typeof serviceKey === 'string') {
-        qb.andWhere(
-          `trial."visibleServiceKeys" @> :serviceKeys::jsonb`,
-          { serviceKeys: JSON.stringify([serviceKey]) },
-        );
-      }
 
       if (status === 'open' || status === 'recruiting') {
         qb.andWhere('trial.status IN (:...statuses)', { statuses: JOINABLE_STATUSES });
@@ -806,7 +788,6 @@ function toTrialDTO(trial: MarketTrial, forumPostId?: string | null): any {
     startDate: trial.fundingStartAt ? new Date(trial.fundingStartAt).toISOString() : undefined,
     endDate: trial.fundingEndAt ? new Date(trial.fundingEndAt).toISOString() : undefined,
     deadline: trial.fundingEndAt ? new Date(trial.fundingEndAt).toISOString() : undefined,
-    visibleServiceKeys: trial.visibleServiceKeys,
     forumPostId: forumPostId || undefined,
     // WO-MARKET-TRIAL-TO-PRODUCT-CONVERSION-FLOW-V1
     convertedProductId: trial.convertedProductId || null,

@@ -651,6 +651,12 @@ function ContentList({
               group: 'danger',
               tooltip: '선택된 보관 콘텐츠를 완전 삭제합니다 (되돌릴 수 없음)',
               visible: selectedArchivedCount > 0,
+              confirm: {
+                title: '완전 삭제 확인',
+                message: `${selectedArchivedCount}개 보관된 콘텐츠를 완전 삭제합니다.\n이 작업은 되돌릴 수 없습니다.`,
+                variant: 'danger' as const,
+                confirmText: '완전 삭제',
+              },
             },
           ]}
         />

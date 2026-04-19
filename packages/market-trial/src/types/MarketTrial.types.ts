@@ -56,9 +56,6 @@ export interface MarketTrialDTO {
   /** Trial 종료일 */
   endDate?: string;
 
-  /** 노출 서비스 목록 (WO-MARKET-TRIAL-B2B-API-UNIFICATION-V1) */
-  visibleServiceKeys?: string[];
-
   createdAt: string;
   updatedAt: string;
 }

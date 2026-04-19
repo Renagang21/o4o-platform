@@ -14,6 +14,7 @@ import { colors, spacing, borderRadius, shadows } from '../../styles/theme';
 const hoverStyles = `
   .market-trial-card:hover {
     border-color: ${colors.neutral300};
+    border-left-color: ${colors.accentGreen};
     box-shadow: ${shadows.md};
   }
 `;
@@ -65,11 +66,12 @@ const styles: Record<string, React.CSSProperties> = {
     gap: spacing.md,
     backgroundColor: colors.white,
     borderRadius: borderRadius.lg,
-    padding: spacing.md,
+    padding: `${spacing.lg} ${spacing.md}`,
     boxShadow: shadows.sm,
     textDecoration: 'none',
     color: 'inherit',
     border: `1px solid ${colors.neutral100}`,
+    borderLeft: `3px solid ${colors.accentGreen}`,
     transition: 'border-color 0.15s, box-shadow 0.15s',
   },
   iconWrap: {
@@ -104,7 +106,7 @@ const styles: Record<string, React.CSSProperties> = {
     flex: '0 0 auto',
     fontSize: '0.8125rem',
     fontWeight: 600,
-    color: colors.primary,
+    color: colors.accentGreen,
     whiteSpace: 'nowrap' as const,
   },
 };

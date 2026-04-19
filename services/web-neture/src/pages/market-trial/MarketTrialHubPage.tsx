@@ -39,13 +39,6 @@ function getDisplayGroup(status: string): DisplayGroup {
   }
 }
 
-const SERVICE_KEY_LABELS: Record<string, string> = {
-  glycopharm: 'GlycoPharm',
-  'k-cosmetics': 'K-Cosmetics',
-  'kpa-society': 'KPA-a',
-  neture: 'Neture',
-};
-
 const REWARD_LABELS: Record<string, string> = {
   product: '제품 보상',
   cash: '현금 보상',
@@ -278,10 +271,6 @@ function TrialCard({
     }
   })();
 
-  const serviceLabels = (trial.visibleServiceKeys || [])
-    .map((k) => SERVICE_KEY_LABELS[k] || k)
-    .filter(Boolean);
-
   return (
     <div
       style={{
@@ -313,15 +302,6 @@ function TrialCard({
           )}
           {trial.supplierName && (
             <span style={{ fontSize: '0.8125rem', color: '#9CA3AF' }}>{trial.supplierName}</span>
-          )}
-          {serviceLabels.length > 0 && (
-            <div style={{ display: 'flex', gap: '4px', marginLeft: 'auto' }}>
-              {serviceLabels.map((label) => (
-                <span key={label} style={s.serviceTag}>
-                  {label}
-                </span>
-              ))}
-            </div>
           )}
         </div>
 
@@ -465,14 +445,6 @@ const s: Record<string, React.CSSProperties> = {
     borderRadius: '12px',
     fontSize: '0.75rem',
     fontWeight: 600,
-  },
-  serviceTag: {
-    padding: '1px 6px',
-    backgroundColor: '#F3F4F6',
-    color: '#6B7280',
-    borderRadius: '4px',
-    fontSize: '0.6875rem',
-    fontWeight: 500,
   },
   cardTitle: { fontSize: '1.0625rem', fontWeight: 600, color: '#111827', margin: '0 0 6px 0' },
   cardDesc: {

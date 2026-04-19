@@ -12,7 +12,9 @@ import {
   Package, Search, RefreshCw, ChevronLeft, ChevronRight,
   X, Eye, EyeOff, FileText, FileSearch, Tag, Trash2,
 } from 'lucide-react';
+import { toast } from '@o4o/error-handling';
 import { ContentRenderer } from '@o4o/content-editor';
+import { ActionBar, ConfirmActionDialog } from '@o4o/ui';
 import { DataTable } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import {
@@ -190,6 +192,7 @@ export default function AllRegisteredProductsPage() {
   const [selectedOfferIds, setSelectedOfferIds] = useState<Set<string>>(new Set());
   const [actionLoading, setActionLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [showDetailDeleteConfirm, setShowDetailDeleteConfirm] = useState(false);
 
   const PAGE_SIZE = 50;
 
@@ -310,20 +313,19 @@ export default function AllRegisteredProductsPage() {
   const handleBulkDelete = async () => {
     const targetOffers = displayOffers.filter((o) => selectedOfferIds.has(o.id));
     if (targetOffers.length === 0) return;
-    if (!confirm(`선택한 ${targetOffers.length}개 상품을 삭제합니다. (휴지통으로 이동) 진행하시겠습니까?`)) return;
     setActionLoading(true);
     try {
       const results = await Promise.all(targetOffers.map((o) => productCleanupApi.softDelete(o.id)));
       const failed = results.filter((r) => !r.success).length;
       if (failed === 0) {
-        alert(`${targetOffers.length}개 삭제 완료 (휴지통으로 이동)`);
+        toast.success(`${targetOffers.length}개 삭제 완료 (휴지통으로 이동)`);
       } else {
-        alert(`${targetOffers.length - failed}개 삭제, ${failed}개 실패`);
+        toast.error(`${targetOffers.length - failed}개 삭제, ${failed}개 실패`);
       }
       setSelectedOfferIds(new Set());
       await fetchOffers(page);
     } catch {
-      alert('삭제 중 오류가 발생했습니다');
+      toast.error('삭제 중 오류가 발생했습니다');
     } finally {
       setActionLoading(false);
     }
@@ -332,48 +334,41 @@ export default function AllRegisteredProductsPage() {
   const handleBulkApprove = async () => {
     const ids = collectPendingApprovalIds();
     if (ids.length === 0) {
-      alert('선택한 상품 중 승인 대기 중인 항목이 없습니다.');
+      toast.error('선택한 상품 중 승인 대기 중인 항목이 없습니다.');
       return;
     }
-    if (!confirm(`선택한 ${selectedOfferIds.size}개 상품의 ${ids.length}개 승인 요청을 일괄 승인합니다. 진행하시겠습니까?`)) return;
     setActionLoading(true);
     try {
       const result = await operatorServiceApprovalApi.batchApprove(ids);
       if (result.success) {
-        alert(`승인 완료: ${result.data?.approved ?? ids.length}건`);
+        toast.success(`승인 완료: ${result.data?.approved ?? ids.length}건`);
         setSelectedOfferIds(new Set());
-        // WO-NETURE-PRODUCT-TABLE-SELECTION-AND-APPROVAL-REFRESH-FIX-V1:
-        // fetchOffers는 KPI/목록/pagination을 함께 refetch하므로 반드시 await하여
-        // actionLoading 해제(finally)가 refetch 완료 후에 발생하도록 보장.
         await fetchOffers(page);
       } else {
-        alert(`승인 실패: ${result.error || '알 수 없는 오류'}`);
+        toast.error(`승인 실패: ${result.error || '알 수 없는 오류'}`);
       }
     } catch {
-      alert('승인 중 오류가 발생했습니다');
+      toast.error('승인 중 오류가 발생했습니다');
     } finally {
       setActionLoading(false);
     }
   };
 
-  const handleBulkReject = async () => {
+  const handleBulkReject = async (reason?: string) => {
     const ids = collectPendingApprovalIds();
     if (ids.length === 0) return;
-    const reason = prompt('거절 사유를 입력하세요 (선택)') ?? '';
-    if (!confirm(`선택한 ${selectedOfferIds.size}개 상품의 ${ids.length}개 승인 요청을 일괄 거절합니다.`)) return;
     setActionLoading(true);
     try {
       const result = await operatorServiceApprovalApi.batchReject(ids, reason || undefined);
       if (result.success) {
-        alert(`거절 완료: ${result.data?.rejected ?? ids.length}건`);
+        toast.success(`거절 완료: ${result.data?.rejected ?? ids.length}건`);
         setSelectedOfferIds(new Set());
-        // WO-NETURE-PRODUCT-TABLE-SELECTION-AND-APPROVAL-REFRESH-FIX-V1: await 필수
         await fetchOffers(page);
       } else {
-        alert(`거절 실패: ${result.error || '알 수 없는 오류'}`);
+        toast.error(`거절 실패: ${result.error || '알 수 없는 오류'}`);
       }
     } catch {
-      alert('거절 중 오류가 발생했습니다');
+      toast.error('거절 중 오류가 발생했습니다');
     } finally {
       setActionLoading(false);
     }
@@ -383,20 +378,19 @@ export default function AllRegisteredProductsPage() {
     const ids = Array.from(selectedOfferIds);
     if (ids.length === 0) return;
     const label = isActive ? '활성화' : '비활성화';
-    if (!confirm(`선택한 ${ids.length}개 상품을 ${label}합니다. 진행하시겠습니까?`)) return;
     setActionLoading(true);
     try {
       const result = await operatorAllOffersApi.batchToggleActive(ids, isActive);
       const failCount = result.failed?.length || 0;
       if (failCount === 0) {
-        alert(`${ids.length}개 ${label} 완료`);
+        toast.success(`${ids.length}개 ${label} 완료`);
       } else {
-        alert(`${ids.length - failCount}개 ${label}, ${failCount}개 실패`);
+        toast.error(`${ids.length - failCount}개 ${label}, ${failCount}개 실패`);
       }
       setSelectedOfferIds(new Set());
       await fetchOffers(page);
     } catch {
-      alert(`${label} 중 오류가 발생했습니다`);
+      toast.error(`${label} 중 오류가 발생했습니다`);
     } finally {
       setActionLoading(false);
     }
@@ -802,61 +796,91 @@ export default function AllRegisteredProductsPage() {
         )}
       </div>
 
-      {/* WO-NETURE-OPERATOR-APPROVAL-LIST-SELECTION-ACTION-BAR-V1: Bulk Action Bar */}
-      {selectedOfferIds.size > 0 && (() => {
+      {/* V4-EXPANSION: Standard ActionBar */}
+      {(() => {
         const pendingCount = displayOffers.filter((o) => selectedOfferIds.has(o.id) && hasPendingApproval(o)).length;
         return (
-          <div className="flex items-center gap-3 mb-3 px-4 py-2.5 bg-blue-50 border border-blue-200 rounded-lg">
-            <span className="text-sm text-blue-700 font-medium">{selectedOfferIds.size}개 선택</span>
-            {pendingCount > 0 && (
-              <>
-                <button
-                  onClick={handleBulkApprove}
-                  disabled={actionLoading}
-                  className="px-3 py-1 text-sm text-white bg-emerald-600 hover:bg-emerald-700 rounded disabled:opacity-50"
-                >
-                  {actionLoading ? '처리 중...' : `승인 (${pendingCount})`}
-                </button>
-                <button
-                  onClick={handleBulkReject}
-                  disabled={actionLoading}
-                  className="px-3 py-1 text-sm text-white bg-red-600 hover:bg-red-700 rounded disabled:opacity-50"
-                >
-                  {`거절 (${pendingCount})`}
-                </button>
-              </>
-            )}
-            <button
-              onClick={() => handleBulkToggleActive(true)}
-              disabled={actionLoading}
-              className="px-3 py-1 text-sm text-white bg-green-600 hover:bg-green-700 rounded disabled:opacity-50 flex items-center gap-1"
-            >
-              <Eye className="w-3.5 h-3.5" />
-              {actionLoading ? '처리 중...' : `활성화 (${selectedOfferIds.size})`}
-            </button>
-            <button
-              onClick={() => handleBulkToggleActive(false)}
-              disabled={actionLoading}
-              className="px-3 py-1 text-sm text-white bg-slate-500 hover:bg-slate-600 rounded disabled:opacity-50 flex items-center gap-1"
-            >
-              <EyeOff className="w-3.5 h-3.5" />
-              {actionLoading ? '처리 중...' : `비활성화 (${selectedOfferIds.size})`}
-            </button>
-            <button
-              onClick={handleBulkDelete}
-              disabled={actionLoading}
-              className="px-3 py-1 text-sm text-white bg-slate-600 hover:bg-slate-700 rounded disabled:opacity-50 flex items-center gap-1"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-              {actionLoading ? '처리 중...' : `삭제 (${selectedOfferIds.size})`}
-            </button>
-            <button
-              onClick={() => setSelectedOfferIds(new Set())}
-              disabled={actionLoading}
-              className="px-3 py-1 text-sm text-slate-600 hover:bg-slate-100 rounded"
-            >
-              선택 해제
-            </button>
+          <div className="mb-3">
+            <ActionBar
+              selectedCount={selectedOfferIds.size}
+              onClearSelection={() => setSelectedOfferIds(new Set())}
+              actions={[
+                {
+                  key: 'approve',
+                  label: `승인 (${pendingCount})`,
+                  onClick: handleBulkApprove,
+                  variant: 'primary' as const,
+                  loading: actionLoading,
+                  group: 'approval',
+                  visible: pendingCount > 0,
+                  confirm: {
+                    title: '일괄 승인 확인',
+                    message: `${selectedOfferIds.size}개 상품의 ${pendingCount}개 승인 요청을 일괄 승인합니다.`,
+                    confirmText: '승인',
+                  },
+                },
+                {
+                  key: 'reject',
+                  label: `거절 (${pendingCount})`,
+                  onClick: handleBulkReject,
+                  variant: 'danger' as const,
+                  loading: actionLoading,
+                  group: 'approval',
+                  visible: pendingCount > 0,
+                  confirm: {
+                    title: '일괄 거절 확인',
+                    message: `${selectedOfferIds.size}개 상품의 ${pendingCount}개 승인 요청을 일괄 거절합니다.`,
+                    variant: 'danger' as const,
+                    confirmText: '거절',
+                    showReason: true,
+                    reasonPlaceholder: '거절 사유를 입력하세요 (선택)',
+                  },
+                },
+                {
+                  key: 'activate',
+                  label: `활성화 (${selectedOfferIds.size})`,
+                  onClick: () => handleBulkToggleActive(true),
+                  icon: <Eye className="w-3.5 h-3.5" />,
+                  loading: actionLoading,
+                  group: 'status',
+                  confirm: {
+                    title: '일괄 활성화 확인',
+                    message: `선택한 ${selectedOfferIds.size}개 상품을 활성화합니다.`,
+                    confirmText: '활성화',
+                  },
+                },
+                {
+                  key: 'deactivate',
+                  label: `비활성화 (${selectedOfferIds.size})`,
+                  onClick: () => handleBulkToggleActive(false),
+                  variant: 'warning' as const,
+                  icon: <EyeOff className="w-3.5 h-3.5" />,
+                  loading: actionLoading,
+                  group: 'status',
+                  confirm: {
+                    title: '일괄 비활성화 확인',
+                    message: `선택한 ${selectedOfferIds.size}개 상품을 비활성화합니다.`,
+                    variant: 'warning' as const,
+                    confirmText: '비활성화',
+                  },
+                },
+                {
+                  key: 'delete',
+                  label: `삭제 (${selectedOfferIds.size})`,
+                  onClick: handleBulkDelete,
+                  variant: 'danger' as const,
+                  icon: <Trash2 className="w-3.5 h-3.5" />,
+                  loading: actionLoading,
+                  group: 'danger',
+                  confirm: {
+                    title: '일괄 삭제 확인',
+                    message: `선택한 ${selectedOfferIds.size}개 상품을 삭제합니다. (휴지통으로 이동)`,
+                    variant: 'danger' as const,
+                    confirmText: '삭제',
+                  },
+                },
+              ]}
+            />
           </div>
         );
       })()}
@@ -994,29 +1018,42 @@ export default function AllRegisteredProductsPage() {
               <div className="pt-2 border-t border-slate-100">
                 <button
                   disabled={deleteLoading}
-                  onClick={async () => {
-                    if (!confirm(`"${detailOffer.name}" 상품을 삭제합니다. (휴지통으로 이동) 진행하시겠습니까?`)) return;
-                    setDeleteLoading(true);
-                    try {
-                      const result = await productCleanupApi.softDelete(detailOffer.id);
-                      if (result.success) {
-                        setDetailOffer(null);
-                        await fetchOffers(page);
-                      } else {
-                        alert(`삭제 실패: ${result.error || '알 수 없는 오류'}`);
-                      }
-                    } catch {
-                      alert('삭제 중 오류가 발생했습니다');
-                    } finally {
-                      setDeleteLoading(false);
-                    }
-                  }}
+                  onClick={() => setShowDetailDeleteConfirm(true)}
                   className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Trash2 className="w-4 h-4" />
-                  {deleteLoading ? '삭제 중...' : '상품 삭제 (휴지통)'}
+                  상품 삭제 (휴지통)
                 </button>
               </div>
+
+              {/* Detail Delete Confirm (V4-EXPANSION) */}
+              <ConfirmActionDialog
+                open={showDetailDeleteConfirm}
+                onClose={() => setShowDetailDeleteConfirm(false)}
+                onConfirm={async () => {
+                  setDeleteLoading(true);
+                  try {
+                    const result = await productCleanupApi.softDelete(detailOffer.id);
+                    if (result.success) {
+                      toast.success('상품이 삭제되었습니다 (휴지통으로 이동)');
+                      setShowDetailDeleteConfirm(false);
+                      setDetailOffer(null);
+                      await fetchOffers(page);
+                    } else {
+                      toast.error(`삭제 실패: ${result.error || '알 수 없는 오류'}`);
+                    }
+                  } catch {
+                    toast.error('삭제 중 오류가 발생했습니다');
+                  } finally {
+                    setDeleteLoading(false);
+                  }
+                }}
+                title="상품 삭제 확인"
+                message={`"${detailOffer.name}" 상품을 삭제합니다.\n(휴지통으로 이동)`}
+                confirmText="삭제"
+                variant="danger"
+                loading={deleteLoading}
+              />
             </div>
           </div>
         </div>

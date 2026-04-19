@@ -8,7 +8,7 @@
 
 import { useState, useEffect, useCallback, CSSProperties } from 'react';
 import type { CommunityAd } from '../../api/community';
-import { colors, spacing } from '../../styles/theme';
+import { colors } from '../../styles/theme';
 
 interface Props {
   ads: CommunityAd[];
@@ -94,7 +94,7 @@ const styles: Record<string, CSSProperties> = {
     height: 320,
     borderRadius: 16,
     overflow: 'hidden',
-    marginBottom: spacing.lg,
+    marginBottom: 0,
   },
   slideLink: {
     display: 'block',
@@ -158,7 +158,7 @@ const styles: Record<string, CSSProperties> = {
     borderRadius: 16,
     padding: '48px 32px',
     textAlign: 'center' as const,
-    marginBottom: spacing.lg,
+    marginBottom: 0,
   },
   defaultContent: {
     maxWidth: 600,

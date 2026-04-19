@@ -256,15 +256,6 @@ function TrialCard({ trial, onClick }: { trial: OperatorTrial; onClick: () => vo
         )}
       </div>
 
-      {trial.visibleServiceKeys && trial.visibleServiceKeys.length > 0 && (
-        <div className="flex gap-1 mt-2 flex-wrap">
-          {trial.visibleServiceKeys.map((key) => (
-            <span key={key} className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">
-              {key}
-            </span>
-          ))}
-        </div>
-      )}
     </div>
   );
 }

@@ -77,13 +77,6 @@ const NEXT_ACTION: Record<string, { title: string; desc: string }> = {
   },
 };
 
-const SERVICE_KEY_LABELS: Record<string, string> = {
-  glycopharm: 'GlycoPharm',
-  'k-cosmetics': 'K-Cosmetics',
-  'kpa-society': 'KPA-a',
-  neture: 'Neture',
-};
-
 const CONVERSION_STAGES: { key: string; label: string; color: string }[] = [
   { key: 'interested',  label: '관심 있음',  color: '#3B82F6' },
   { key: 'considering', label: '취급 검토',   color: '#F59E0B' },
@@ -266,16 +259,6 @@ export default function SupplierTrialDetailPage() {
       <div style={s.section}>
         <h2 style={s.sectionTitle}>운영 정보</h2>
         <div style={s.infoGrid}>
-          {(trial.visibleServiceKeys ?? []).length > 0 && (
-            <div style={s.infoItem}>
-              <span style={s.infoLabel}>대상 서비스</span>
-              <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-                {(trial.visibleServiceKeys ?? []).map((k) => (
-                  <span key={k} style={s.serviceTag}>{SERVICE_KEY_LABELS[k] || k}</span>
-                ))}
-              </div>
-            </div>
-          )}
           <div style={s.infoItem}>
             <span style={s.infoLabel}>참여 현황</span>
             <span style={s.infoValue}>
@@ -775,14 +758,6 @@ const s: Record<string, React.CSSProperties> = {
   infoValue: {
     fontSize: '15px',
     color: '#1F2937',
-    fontWeight: 500,
-  },
-  serviceTag: {
-    padding: '2px 8px',
-    backgroundColor: '#F3F4F6',
-    color: '#6B7280',
-    borderRadius: '4px',
-    fontSize: '12px',
     fontWeight: 500,
   },
   fundingSection: {

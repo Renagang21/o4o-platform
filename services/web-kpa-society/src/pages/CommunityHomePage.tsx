@@ -114,7 +114,7 @@ const styles: Record<string, React.CSSProperties> = {
   content: {
     maxWidth: '960px',
     margin: '0 auto',
-    padding: `${spacing.sectionGap} ${spacing.lg}`,
+    padding: `${spacing.md} ${spacing.lg} ${spacing.sectionGap}`,
     display: 'flex',
     flexDirection: 'column',
     gap: spacing.sectionGap,

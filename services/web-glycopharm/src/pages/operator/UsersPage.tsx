@@ -8,7 +8,7 @@
  * 기능: 검색, 정렬, 승인/거부, 비밀번호 변경, 편집, 삭제
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Users,
@@ -27,9 +27,9 @@ import {
   Eye,
   EyeOff,
 } from 'lucide-react';
-import { DataTable, ActionBar, BulkResultModal } from '@o4o/ui';
+import { DataTable, ActionBar, BulkResultModal, RowActionMenu, ConfirmActionDialog } from '@o4o/ui';
 import type { Column } from '@o4o/ui';
-import { MemberListLayout, StatusBadge, RoleBadge, ServiceBadge, useBatchAction } from '@o4o/operator-ux-core';
+import { MemberListLayout, StatusBadge, RoleBadge, ServiceBadge, useBatchAction, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
 import type { MemberTab } from '@o4o/operator-ux-core';
 import { api } from '../../lib/apiClient';
 import { toast } from '@o4o/error-handling';
@@ -108,6 +108,74 @@ const ROLE_TAB_FILTER: Record<string, string[]> = {
   pharmacy: ['glycopharm:pharmacist'],
   customer: ['customer'],
   pending: [],
+};
+
+// ─── Action Policy (V4-EXPANSION) ────────────────────────────
+
+const userActionPolicy = defineActionPolicy<UserData>('glycopharm:users', {
+  inlineMax: 2,
+  rules: [
+    {
+      key: 'approve',
+      label: '승인',
+      variant: 'primary',
+      visible: (u) => u.status === 'pending' || u.status === 'rejected',
+    },
+    {
+      key: 'reject',
+      label: '거부',
+      variant: 'danger',
+      visible: (u) => u.status === 'pending',
+      confirm: {
+        title: '회원 거부',
+        message: '이 사용자를 거부 처리하시겠습니까?',
+        variant: 'danger',
+        confirmText: '거부',
+      },
+    },
+    {
+      key: 'suspend',
+      label: '정지',
+      variant: 'warning',
+      visible: (u) => u.status === 'active' || u.status === 'approved',
+      confirm: {
+        title: '회원 정지',
+        message: '이 사용자를 정지 처리하시겠습니까?',
+        variant: 'warning',
+        confirmText: '정지',
+      },
+    },
+    {
+      key: 'activate',
+      label: '활성화',
+      variant: 'primary',
+      visible: (u) => u.status === 'suspended',
+    },
+    {
+      key: 'edit',
+      label: '정보 수정',
+    },
+    {
+      key: 'password',
+      label: '비밀번호 변경',
+    },
+    {
+      key: 'delete',
+      label: '삭제',
+      variant: 'danger',
+      divider: true,
+    },
+  ],
+});
+
+const USER_ACTION_ICONS: Record<string, ReactNode> = {
+  approve: <UserCheck className="w-4 h-4" />,
+  reject: <UserX className="w-4 h-4" />,
+  suspend: <XCircle className="w-4 h-4" />,
+  activate: <CheckCircle className="w-4 h-4" />,
+  edit: <Pencil className="w-4 h-4" />,
+  password: <KeyRound className="w-4 h-4" />,
+  delete: <Trash2 className="w-4 h-4" />,
 };
 
 // ─── Password Modal ──────────────────────────────────────────
@@ -197,6 +265,7 @@ function DeleteRiskModal({ userId, userName, userEmail, onClose, onDeleted }: {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<DeleteRiskData | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [confirmMode, setConfirmMode] = useState<'soft' | 'hard' | null>(null);
 
   useEffect(() => {
     apiFetch<{ data: DeleteRiskData }>(`/api/v1/operator/members/${userId}/delete-risk`)
@@ -205,31 +274,18 @@ function DeleteRiskModal({ userId, userName, userEmail, onClose, onDeleted }: {
       .finally(() => setLoading(false));
   }, [userId]);
 
-  const handleSoftDelete = async () => {
-    if (!confirm('이 회원을 탈퇴(비활성) 처리하시겠습니까?')) return;
+  const executeDelete = async () => {
+    if (!confirmMode) return;
     setDeleting(true);
     try {
-      await apiFetch(`/api/v1/operator/members/${userId}?mode=soft`, { method: 'DELETE' });
-      toast.success('탈퇴 처리 완료');
+      await apiFetch(`/api/v1/operator/members/${userId}?mode=${confirmMode}`, { method: 'DELETE' });
+      toast.success(confirmMode === 'soft' ? '탈퇴 처리 완료' : '완전 삭제 완료');
       onDeleted();
     } catch (e: any) {
-      toast.error(e.message || '처리 실패');
+      toast.error(e.message || (confirmMode === 'soft' ? '처리 실패' : '삭제 실패'));
     } finally {
       setDeleting(false);
-    }
-  };
-
-  const handleHardDelete = async () => {
-    if (!confirm('⚠️ 이 회원 데이터를 완전히 삭제합니다. 되돌릴 수 없습니다.\n정말 삭제하시겠습니까?')) return;
-    setDeleting(true);
-    try {
-      await apiFetch(`/api/v1/operator/members/${userId}?mode=hard`, { method: 'DELETE' });
-      toast.success('완전 삭제 완료');
-      onDeleted();
-    } catch (e: any) {
-      toast.error(e.message || '삭제 실패');
-    } finally {
-      setDeleting(false);
+      setConfirmMode(null);
     }
   };
 
@@ -279,16 +335,30 @@ function DeleteRiskModal({ userId, userName, userEmail, onClose, onDeleted }: {
             )}
 
             <div className="flex flex-col gap-2 pt-2">
-              <button onClick={handleSoftDelete} disabled={deleting}
+              <button onClick={() => setConfirmMode('soft')} disabled={deleting}
                 className="w-full px-4 py-2.5 text-sm font-medium text-amber-700 bg-amber-50 border border-amber-200 hover:bg-amber-100 rounded-lg disabled:opacity-50">
-                {deleting ? '처리 중...' : '탈퇴 처리 (비활성화)'}
+                탈퇴 처리 (비활성화)
               </button>
-              <button onClick={handleHardDelete} disabled={deleting || !data.canHardDelete}
+              <button onClick={() => setConfirmMode('hard')} disabled={deleting || !data.canHardDelete}
                 className="w-full px-4 py-2.5 text-sm font-medium text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed">
-                {!data.canHardDelete ? '완전삭제 불가 (연결 데이터 존재)' : deleting ? '삭제 중...' : '완전삭제 (되돌릴 수 없음)'}
+                {!data.canHardDelete ? '완전삭제 불가 (연결 데이터 존재)' : '완전삭제 (되돌릴 수 없음)'}
               </button>
               <button onClick={onClose} className="w-full px-4 py-2 text-sm text-slate-500 hover:bg-slate-50 rounded-lg">취소</button>
             </div>
+
+            {/* Delete Confirm Dialog (V4-EXPANSION) */}
+            <ConfirmActionDialog
+              open={!!confirmMode}
+              onClose={() => setConfirmMode(null)}
+              onConfirm={executeDelete}
+              title={confirmMode === 'hard' ? '완전 삭제 확인' : '탈퇴 처리 확인'}
+              message={confirmMode === 'hard'
+                ? '이 회원 데이터를 완전히 삭제합니다.\n이 작업은 되돌릴 수 없습니다.'
+                : '이 회원을 탈퇴(비활성) 처리하시겠습니까?'}
+              confirmText={confirmMode === 'hard' ? '완전 삭제' : '탈퇴 처리'}
+              variant={confirmMode === 'hard' ? 'danger' : 'warning'}
+              loading={deleting}
+            />
           </div>
         ) : (
           <p className="text-center text-sm text-red-500 py-4">리스크 정보를 불러오지 못했습니다.</p>
@@ -383,8 +453,6 @@ export default function UsersPage() {
   }, [activeTab, searchQuery]);
 
   const handleStatusChange = async (userId: string, status: string) => {
-    const label = status === 'approved' ? '승인' : status === 'rejected' ? '거부' : status;
-    if (!confirm(`이 사용자를 ${label} 처리하시겠습니까?`)) return;
     setActionLoading(userId);
     try {
       await apiFetch(`/api/v1/operator/members/${userId}/status`, {
@@ -528,37 +596,28 @@ export default function UsersPage() {
       render: (v) => <StatusBadge status={v} />,
     },
     {
-      key: 'actions',
-      title: '관리',
-      width: '180px',
-      align: 'right',
+      key: '_actions',
+      title: '액션',
+      width: '60px',
+      align: 'center',
       render: (_v, user) => (
-        <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
-          {actionLoading === user.id ? (
-            <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
-          ) : (
-            <>
-              {user.status === 'pending' && (
-                <>
-                  <button onClick={() => handleStatusChange(user.id, 'approved')} title="승인" className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"><UserCheck className="w-4 h-4" /></button>
-                  <button onClick={() => handleStatusChange(user.id, 'rejected')} title="거부" className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg"><UserX className="w-4 h-4" /></button>
-                </>
-              )}
-              {user.status === 'rejected' && (
-                <button onClick={() => handleStatusChange(user.id, 'approved')} title="승인" className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"><UserCheck className="w-4 h-4" /></button>
-              )}
-              {(user.status === 'active' || user.status === 'approved') && (
-                <button onClick={() => handleStatusChange(user.id, 'suspended')} title="정지" className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg"><XCircle className="w-4 h-4" /></button>
-              )}
-              {user.status === 'suspended' && (
-                <button onClick={() => handleStatusChange(user.id, 'approved')} title="활성화" className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"><CheckCircle className="w-4 h-4" /></button>
-              )}
-              <button onClick={() => setEditUser(user)} title="정보 수정" className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg"><Pencil className="w-4 h-4" /></button>
-              <button onClick={() => setPasswordUser(user)} title="비밀번호 변경" className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg"><KeyRound className="w-4 h-4" /></button>
-              <button onClick={() => handleDelete(user)} title="삭제" className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg"><Trash2 className="w-4 h-4" /></button>
-            </>
-          )}
-        </div>
+        <RowActionMenu
+          actions={buildRowActions(userActionPolicy, user, {
+            approve: () => handleStatusChange(user.id, 'approved'),
+            reject: () => handleStatusChange(user.id, 'rejected'),
+            suspend: () => handleStatusChange(user.id, 'suspended'),
+            activate: () => handleStatusChange(user.id, 'approved'),
+            edit: () => setEditUser(user),
+            password: () => setPasswordUser(user),
+            delete: () => handleDelete(user),
+          }, {
+            icons: USER_ACTION_ICONS,
+            loading: actionLoading === user.id
+              ? { approve: true, reject: true, suspend: true, activate: true }
+              : undefined,
+          })}
+          inlineMax={userActionPolicy.inlineMax}
+        />
       ),
     },
   ];
@@ -650,6 +709,12 @@ export default function UsersPage() {
                     group: 'actions',
                     tooltip: '선택된 대기 회원을 일괄 거부합니다',
                     visible: selectedPendingCount > 0,
+                    confirm: {
+                      title: '일괄 거부 확인',
+                      message: `${selectedPendingCount}명의 대기 회원을 일괄 거부합니다.`,
+                      variant: 'danger' as const,
+                      confirmText: '거부',
+                    },
                   },
                 ]}
               />

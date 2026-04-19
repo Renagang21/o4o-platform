@@ -10,7 +10,7 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { colors, spacing, borderRadius, shadows } from '../../styles/theme';
+import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
 
 const hoverStyles = `
   .hero-cta-btn:hover {
@@ -68,6 +68,7 @@ export function HeroCtaSection() {
   return (
     <section style={styles.container}>
       <p style={styles.greeting}>{greeting}</p>
+      <p style={styles.subtitle}>자주 사용하는 서비스를 빠르게 시작하세요</p>
       <div style={styles.ctaRow}>
         {ctaItems.map((item) => (
           <Link key={item.href} to={item.href} style={styles.ctaButton} className="hero-cta-btn">
@@ -82,12 +83,15 @@ export function HeroCtaSection() {
 
 const styles: Record<string, React.CSSProperties> = {
   container: {
-    padding: `${spacing.lg} 0 ${spacing.sm}`,
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.lg,
+    padding: `${spacing.lg} ${spacing.lg} ${spacing.md}`,
+    boxShadow: shadows.sm,
+    border: `1px solid ${colors.neutral100}`,
   },
   greeting: {
-    fontSize: '1rem',
-    fontWeight: 600,
-    color: colors.neutral800,
+    ...typography.headingS,
+    color: colors.neutral900,
     margin: `0 0 ${spacing.md}`,
   },
   ctaRow: {
@@ -108,6 +112,11 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '0.875rem',
     fontWeight: 500,
     transition: 'border-color 0.15s, box-shadow 0.15s',
+  },
+  subtitle: {
+    fontSize: '0.875rem',
+    color: colors.neutral500,
+    margin: `0 0 ${spacing.md}`,
   },
   ctaIcon: {
     display: 'flex',

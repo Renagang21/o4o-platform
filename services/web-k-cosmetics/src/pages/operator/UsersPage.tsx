@@ -8,7 +8,7 @@
  * 기능: 검색, 정렬, 승인/거부, 비밀번호 변경, 편집, 삭제
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Users,
@@ -21,15 +21,14 @@ import {
   KeyRound,
   Pencil,
   Trash2,
-  Loader2,
   AlertCircle,
   X,
   Eye,
   EyeOff,
 } from 'lucide-react';
-import { DataTable } from '@o4o/ui';
+import { DataTable, RowActionMenu } from '@o4o/ui';
 import type { Column } from '@o4o/ui';
-import { MemberListLayout, StatusBadge, RoleBadge, ServiceBadge } from '@o4o/operator-ux-core';
+import { MemberListLayout, StatusBadge, RoleBadge, ServiceBadge, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
 import type { MemberTab } from '@o4o/operator-ux-core';
 import { api } from '../../lib/apiClient';
 import { toast } from '@o4o/error-handling';
@@ -107,6 +106,80 @@ const ROLE_TAB_FILTER: Record<string, string[]> = {
   seller: ['seller', 'k-cosmetics:seller'],
   consumer: ['consumer', 'customer', 'k-cosmetics:consumer'],
   pending: [],
+};
+
+// ─── Action Policy (V4-EXPANSION) ────────────────────────────
+
+const userActionPolicy = defineActionPolicy<UserData>('k-cosmetics:users', {
+  inlineMax: 2,
+  rules: [
+    {
+      key: 'approve',
+      label: '승인',
+      variant: 'primary',
+      visible: (u) => u.status === 'pending' || u.status === 'rejected',
+    },
+    {
+      key: 'reject',
+      label: '거부',
+      variant: 'danger',
+      visible: (u) => u.status === 'pending',
+      confirm: {
+        title: '회원 거부',
+        message: '이 사용자를 거부 처리하시겠습니까?',
+        variant: 'danger',
+        confirmText: '거부',
+      },
+    },
+    {
+      key: 'suspend',
+      label: '정지',
+      variant: 'warning',
+      visible: (u) => u.status === 'active' || u.status === 'approved',
+      confirm: {
+        title: '회원 정지',
+        message: '이 사용자를 정지 처리하시겠습니까?',
+        variant: 'warning',
+        confirmText: '정지',
+      },
+    },
+    {
+      key: 'activate',
+      label: '활성화',
+      variant: 'primary',
+      visible: (u) => u.status === 'suspended',
+    },
+    {
+      key: 'edit',
+      label: '정보 수정',
+    },
+    {
+      key: 'password',
+      label: '비밀번호 변경',
+    },
+    {
+      key: 'delete',
+      label: '삭제',
+      variant: 'danger',
+      divider: true,
+      confirm: {
+        title: '회원 삭제 확인',
+        message: '이 사용자를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.',
+        variant: 'danger',
+        confirmText: '삭제',
+      },
+    },
+  ],
+});
+
+const USER_ACTION_ICONS: Record<string, ReactNode> = {
+  approve: <UserCheck className="w-4 h-4" />,
+  reject: <UserX className="w-4 h-4" />,
+  suspend: <XCircle className="w-4 h-4" />,
+  activate: <CheckCircle className="w-4 h-4" />,
+  edit: <Pencil className="w-4 h-4" />,
+  password: <KeyRound className="w-4 h-4" />,
+  delete: <Trash2 className="w-4 h-4" />,
 };
 
 // ─── Password Modal ──────────────────────────────────────────
@@ -256,8 +329,6 @@ export default function UsersPage() {
   useEffect(() => { fetchStats(); }, [fetchStats]);
 
   const handleStatusChange = async (userId: string, status: string) => {
-    const label = status === 'approved' ? '승인' : status === 'rejected' ? '거부' : status;
-    if (!confirm(`이 사용자를 ${label} 처리하시겠습니까?`)) return;
     setActionLoading(userId);
     try {
       await apiFetch(`/api/v1/operator/members/${userId}/status`, {
@@ -274,7 +345,6 @@ export default function UsersPage() {
   };
 
   const handleDelete = async (user: UserData) => {
-    if (!confirm(`${getUserName(user)} (${user.email}) 사용자를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
     setActionLoading(user.id);
     try {
       await apiFetch(`/api/v1/operator/members/${user.id}`, { method: 'DELETE' });
@@ -369,37 +439,28 @@ export default function UsersPage() {
       render: (v) => <StatusBadge status={v} />,
     },
     {
-      key: 'actions',
-      title: '관리',
-      width: '180px',
-      align: 'right',
+      key: '_actions',
+      title: '액션',
+      width: '60px',
+      align: 'center',
       render: (_v, user) => (
-        <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
-          {actionLoading === user.id ? (
-            <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
-          ) : (
-            <>
-              {user.status === 'pending' && (
-                <>
-                  <button onClick={() => handleStatusChange(user.id, 'approved')} title="승인" className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"><UserCheck className="w-4 h-4" /></button>
-                  <button onClick={() => handleStatusChange(user.id, 'rejected')} title="거부" className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg"><UserX className="w-4 h-4" /></button>
-                </>
-              )}
-              {user.status === 'rejected' && (
-                <button onClick={() => handleStatusChange(user.id, 'approved')} title="승인" className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"><UserCheck className="w-4 h-4" /></button>
-              )}
-              {(user.status === 'active' || user.status === 'approved') && (
-                <button onClick={() => handleStatusChange(user.id, 'suspended')} title="정지" className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg"><XCircle className="w-4 h-4" /></button>
-              )}
-              {user.status === 'suspended' && (
-                <button onClick={() => handleStatusChange(user.id, 'approved')} title="활성화" className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"><CheckCircle className="w-4 h-4" /></button>
-              )}
-              <button onClick={() => setEditUser(user)} title="정보 수정" className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg"><Pencil className="w-4 h-4" /></button>
-              <button onClick={() => setPasswordUser(user)} title="비밀번호 변경" className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg"><KeyRound className="w-4 h-4" /></button>
-              <button onClick={() => handleDelete(user)} title="삭제" className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg"><Trash2 className="w-4 h-4" /></button>
-            </>
-          )}
-        </div>
+        <RowActionMenu
+          actions={buildRowActions(userActionPolicy, user, {
+            approve: () => handleStatusChange(user.id, 'approved'),
+            reject: () => handleStatusChange(user.id, 'rejected'),
+            suspend: () => handleStatusChange(user.id, 'suspended'),
+            activate: () => handleStatusChange(user.id, 'approved'),
+            edit: () => setEditUser(user),
+            password: () => setPasswordUser(user),
+            delete: () => handleDelete(user),
+          }, {
+            icons: USER_ACTION_ICONS,
+            loading: actionLoading === user.id
+              ? { approve: true, reject: true, suspend: true, activate: true }
+              : undefined,
+          })}
+          inlineMax={userActionPolicy.inlineMax}
+        />
       ),
     },
   ];

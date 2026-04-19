@@ -188,14 +188,6 @@ export class MarketTrial {
   currentParticipants!: number;
 
   /**
-   * Service keys this trial is visible to (e.g. ['glycopharm', 'k-cosmetics'])
-   * Empty array = visible to all (or unscoped)
-   * WO-MARKET-TRIAL-B2B-API-UNIFICATION-V1
-   */
-  @Column({ type: 'jsonb', default: '[]' })
-  visibleServiceKeys!: string[];
-
-  /**
    * Linked ProductMaster ID after Trial → Product conversion
    * WO-MARKET-TRIAL-TO-PRODUCT-CONVERSION-FLOW-V1
    * Null = not yet converted, non-null = converted

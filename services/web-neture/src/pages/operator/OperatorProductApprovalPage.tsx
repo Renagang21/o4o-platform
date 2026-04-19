@@ -323,7 +323,7 @@ export default function OperatorProductApprovalPage() {
       key: '_actions',
       header: '액션',
       align: 'center',
-      width: '100px',
+      width: '80px',
       system: true,
       onCellClick: () => {},
       render: (_v, row) => (

@@ -389,18 +389,6 @@ export default function MarketTrialApprovalDetailPage() {
           </div>
         )}
 
-        {trial.visibleServiceKeys && trial.visibleServiceKeys.length > 0 && (
-          <div>
-            <span className="text-sm text-gray-500">대상 서비스</span>
-            <div className="flex gap-1 mt-1 flex-wrap">
-              {trial.visibleServiceKeys.map((key) => (
-                <span key={key} className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-xs">
-                  {key}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
         <InfoRow label="등록일" value={new Date(trial.createdAt).toLocaleString('ko-KR')} />
       </div>
 

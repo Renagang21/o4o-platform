@@ -34,13 +34,6 @@ const STATUS_LABELS: Record<string, { label: string; bg: string; color: string }
   closed: { label: '종료', bg: '#F3F4F6', color: '#6B7280' },
 };
 
-const SERVICE_KEY_LABELS: Record<string, string> = {
-  glycopharm: 'GlycoPharm',
-  'k-cosmetics': 'K-Cosmetics',
-  'kpa-society': 'KPA-a',
-  neture: 'Neture',
-};
-
 const REWARD_LABELS: Record<string, string> = {
   product: '제품 보상',
   cash: '현금 보상',
@@ -164,9 +157,6 @@ export function MarketTrialDetailPage() {
   }
 
   const statusInfo = STATUS_LABELS[trial.status] || { label: trial.status, bg: '#F3F4F6', color: '#6B7280' };
-  const serviceLabels = (trial.visibleServiceKeys || [])
-    .map((k) => SERVICE_KEY_LABELS[k] || k)
-    .filter(Boolean);
   const rewardOptions = trial.rewardOptions || [];
   const rewardLabels = rewardOptions.map((r) => REWARD_LABELS[r] || r).filter(Boolean);
 
@@ -200,13 +190,6 @@ export function MarketTrialDetailPage() {
           </span>
           {trial.supplierName && (
             <span style={{ fontSize: '0.8125rem', color: '#9CA3AF' }}>{trial.supplierName}</span>
-          )}
-          {serviceLabels.length > 0 && (
-            <div style={{ display: 'flex', gap: '4px', marginLeft: 'auto' }}>
-              {serviceLabels.map((label) => (
-                <span key={label} style={s.serviceTag}>{label}</span>
-              ))}
-            </div>
           )}
         </div>
         <h1 style={s.title}>{trial.title}</h1>
@@ -303,9 +286,6 @@ export function MarketTrialDetailPage() {
             )}
             {rewardLabels.length > 0 && (
               <InfoItem label="보상 방식" value={rewardLabels.join(', ')} />
-            )}
-            {serviceLabels.length > 0 && (
-              <InfoItem label="참여 서비스" value={serviceLabels.join(', ')} />
             )}
           </InfoGrid>
         </div>
@@ -573,14 +553,6 @@ const s: Record<string, React.CSSProperties> = {
   centered: { maxWidth: '760px', margin: '0 auto', padding: '48px 16px', textAlign: 'center' },
   breadcrumb: { fontSize: '0.8125rem', color: '#9CA3AF', textDecoration: 'none' },
   headerTopRow: { display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px', flexWrap: 'wrap' },
-  serviceTag: {
-    padding: '2px 8px',
-    backgroundColor: '#F3F4F6',
-    color: '#6B7280',
-    borderRadius: '4px',
-    fontSize: '0.6875rem',
-    fontWeight: 500,
-  },
   title: { fontSize: '1.5rem', fontWeight: 700, color: '#111827', margin: 0 },
   oneLiner: {
     fontSize: '1.0625rem',
