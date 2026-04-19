@@ -110,6 +110,17 @@ export async function addPlaylistItemFromLibrary(
   return response.data;
 }
 
+export async function addPlaylistItemFromSignage(
+  playlistId: string,
+  mediaId: string,
+): Promise<StorePlaylistItem> {
+  const response = await apiClient.post<{ success: boolean; data: StorePlaylistItem }>(
+    `/store-playlists/${playlistId}/items/from-signage`,
+    { mediaId },
+  );
+  return response.data;
+}
+
 export async function reorderPlaylistItems(
   playlistId: string,
   order: string[],

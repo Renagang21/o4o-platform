@@ -247,6 +247,18 @@ export const adminProductApi = {
       return true;
     } catch { return false; }
   },
+
+  /** V3: Batch approve */
+  async batchApprove(ids: string[]) {
+    const res = await api.post('/neture/admin/products/batch-approve', { ids });
+    return res.data;
+  },
+
+  /** V3: Batch reject */
+  async batchReject(ids: string[], reason?: string) {
+    const res = await api.post('/neture/admin/products/batch-reject', { ids, reason });
+    return res.data;
+  },
 };
 
 // ==================== Admin Master ====================

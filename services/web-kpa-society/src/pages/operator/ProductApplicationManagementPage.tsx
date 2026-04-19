@@ -15,10 +15,10 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { CheckCircle, XCircle } from 'lucide-react';
-import { OperatorConfirmModal, useOperatorAction, ActionBar } from '@o4o/ui';
+import { CheckCircle, XCircle, Sparkles } from 'lucide-react';
+import { OperatorConfirmModal, useOperatorAction, ActionBar, BulkResultModal } from '@o4o/ui';
 import { OperatorActionType } from '@o4o/types';
-import { DataTable, Pagination } from '@o4o/operator-ux-core';
+import { DataTable, Pagination, useBatchAction } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { apiClient } from '../../api/client';
 
@@ -100,9 +100,19 @@ export default function ProductApplicationManagementPage() {
   const [toastMsg, setToastMsg] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const { pendingAction, loading: actionHookLoading, requestAction, cancelAction, executeAction } = useOperatorAction();
 
-  // Selection
+  // Selection & V3 batch
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
+  const batch = useBatchAction();
+
+  // V3: AI summary state
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiSummary, setAiSummary] = useState<{
+    summary: string;
+    patterns: string[];
+    recommendations: string[];
+    warnings: string[];
+    source: 'ai' | 'rule-based';
+  } | null>(null);
 
   const loadStats = useCallback(async () => {
     try {
@@ -142,6 +152,7 @@ export default function ProductApplicationManagementPage() {
   // Reset selection on filter change
   useEffect(() => {
     setSelectedIds(new Set());
+    setAiSummary(null);
   }, [statusFilter]);
 
   // ─── Individual Actions (OperatorConfirmModal) ───
@@ -178,7 +189,7 @@ export default function ProductApplicationManagementPage() {
     setTimeout(() => setToastMsg(null), 4000);
   };
 
-  // ─── Bulk Actions ───
+  // ─── V3: Batch Actions ───
 
   const handleBulkApprove = async () => {
     const pendingIds = [...selectedIds].filter((id) => {
@@ -186,18 +197,15 @@ export default function ProductApplicationManagementPage() {
       return app?.status === 'pending';
     });
     if (pendingIds.length === 0) return;
-    setIsBulkProcessing(true);
-    for (const id of pendingIds) {
-      try {
-        await apiClient.patch(`/operator/product-applications/${id}/approve`, {});
-      } catch { /* continue */ }
+    const result = await batch.executeBatch(
+      (batchIds) => apiClient.post('/operator/product-applications/batch-approve', { ids: batchIds }),
+      pendingIds,
+    );
+    if (result.successCount > 0) {
+      setSelectedIds(new Set());
+      loadApplications();
+      loadStats();
     }
-    setIsBulkProcessing(false);
-    setSelectedIds(new Set());
-    setToastMsg({ type: 'success', message: `${pendingIds.length}건 일괄 승인 완료` });
-    loadApplications();
-    loadStats();
-    setTimeout(() => setToastMsg(null), 4000);
   };
 
   const handleBulkReject = async () => {
@@ -206,18 +214,44 @@ export default function ProductApplicationManagementPage() {
       return app?.status === 'pending';
     });
     if (pendingIds.length === 0) return;
-    setIsBulkProcessing(true);
-    for (const id of pendingIds) {
-      try {
-        await apiClient.patch(`/operator/product-applications/${id}/reject`, { reason: '일괄 거절' });
-      } catch { /* continue */ }
+    const result = await batch.executeBatch(
+      (batchIds) => apiClient.post('/operator/product-applications/batch-reject', { ids: batchIds, reason: '일괄 거절' }),
+      pendingIds,
+    );
+    if (result.successCount > 0) {
+      setSelectedIds(new Set());
+      loadApplications();
+      loadStats();
     }
-    setIsBulkProcessing(false);
-    setSelectedIds(new Set());
-    setToastMsg({ type: 'success', message: `${pendingIds.length}건 일괄 거절 완료` });
-    loadApplications();
-    loadStats();
-    setTimeout(() => setToastMsg(null), 4000);
+  };
+
+  // ─── V3: AI Summary ───
+
+  const handleAiSummarize = async () => {
+    if (selectedIds.size === 0) return;
+    setAiLoading(true);
+    try {
+      const selectedItems = applications.filter(a => selectedIds.has(a.id));
+      const items = selectedItems.map(a => ({
+        id: a.id,
+        product_name: a.product_name,
+        supplierName: a.supplierName,
+        organizationName: a.organizationName,
+        status: a.status,
+        requested_at: a.requested_at,
+        category: a.product_metadata?.category,
+      }));
+      const res = await apiClient.post<{ success: boolean; data: any }>('/operator/ai/summarize-selection', {
+        items,
+        context: '상품 판매 신청 승인/거절 관리',
+      });
+      setAiSummary(res.data);
+    } catch {
+      setToastMsg({ type: 'error', message: 'AI 요약에 실패했습니다.' });
+      setTimeout(() => setToastMsg(null), 4000);
+    } finally {
+      setAiLoading(false);
+    }
   };
 
   const handleFilterChange = (filter: StatusFilter) => {
@@ -390,28 +424,85 @@ export default function ProductApplicationManagementPage() {
         </div>
       )}
 
-      {/* ActionBar */}
+      {/* V3: ActionBar + BulkResultModal */}
       <ActionBar
         selectedCount={selectedIds.size}
-        onClearSelection={() => setSelectedIds(new Set())}
+        onClearSelection={() => { setSelectedIds(new Set()); setAiSummary(null); }}
         actions={[
-          ...(selectedPendingCount > 0 ? [{
+          {
             key: 'approve',
             label: `승인 (${selectedPendingCount})`,
             onClick: handleBulkApprove,
             variant: 'primary' as const,
             icon: <CheckCircle size={14} />,
-            loading: isBulkProcessing,
-          }] : []),
-          ...(selectedPendingCount > 0 ? [{
+            loading: batch.loading,
+            group: 'actions',
+            tooltip: '선택된 상품 신청을 일괄 승인합니다',
+            visible: selectedPendingCount > 0,
+          },
+          {
             key: 'reject',
             label: `거절 (${selectedPendingCount})`,
             onClick: handleBulkReject,
             variant: 'danger' as const,
             icon: <XCircle size={14} />,
-            loading: isBulkProcessing,
-          }] : []),
+            loading: batch.loading,
+            group: 'actions',
+            tooltip: '선택된 상품 신청을 일괄 거절합니다',
+            visible: selectedPendingCount > 0,
+          },
+          {
+            key: 'ai-summary',
+            label: 'AI 요약',
+            onClick: handleAiSummarize,
+            variant: 'default' as const,
+            icon: <Sparkles size={14} />,
+            loading: aiLoading,
+            group: 'ai',
+            tooltip: '선택된 항목을 AI로 분석합니다',
+            visible: selectedIds.size >= 2,
+          },
         ]}
+      />
+
+      {/* V3: AI Summary Result */}
+      {aiSummary && (
+        <div className="mt-3 p-4 bg-violet-50 border border-violet-200 rounded-lg space-y-2">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-violet-600" />
+            <span className="text-sm font-medium text-violet-800">AI 분석 결과</span>
+            <span className="text-xs text-violet-500">({aiSummary.source})</span>
+            <button
+              onClick={() => setAiSummary(null)}
+              className="ml-auto text-xs text-violet-500 hover:text-violet-700"
+            >
+              닫기
+            </button>
+          </div>
+          <p className="text-sm text-slate-700">{aiSummary.summary}</p>
+          {aiSummary.patterns.length > 0 && (
+            <div className="text-xs text-slate-600">
+              <span className="font-medium">패턴:</span> {aiSummary.patterns.join(' / ')}
+            </div>
+          )}
+          {aiSummary.recommendations.length > 0 && (
+            <div className="text-xs text-blue-700">
+              <span className="font-medium">추천:</span> {aiSummary.recommendations.join(' / ')}
+            </div>
+          )}
+          {aiSummary.warnings.length > 0 && (
+            <div className="text-xs text-amber-700">
+              <span className="font-medium">주의:</span> {aiSummary.warnings.join(' / ')}
+            </div>
+          )}
+        </div>
+      )}
+
+      <BulkResultModal
+        open={batch.showResult}
+        onClose={() => { batch.clearResult(); loadApplications(); loadStats(); }}
+        result={batch.result}
+        onRetry={() => { batch.retryFailed(); }}
       />
 
       {/* DataTable */}

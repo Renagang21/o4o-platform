@@ -805,6 +805,105 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     res.json({ success: true, data: updated });
   }));
 
+  // ─── V3 Batch Endpoints — WO-O4O-TABLE-STANDARD-V3-EXPANSION ───
+
+  /** POST /news/batch-publish — 일괄 발행 (draft → published) */
+  newsRouter.post('/batch-publish', authenticate, requireKpaScope('kpa:operator'), asyncHandler(async (req: Request, res: Response) => {
+    const { ids } = req.body;
+    if (!Array.isArray(ids) || ids.length === 0) {
+      res.status(400).json({ success: false, error: 'ids array is required' });
+      return;
+    }
+    if (ids.length > 50) {
+      res.status(400).json({ success: false, error: 'Maximum 50 items per batch' });
+      return;
+    }
+
+    const results: Array<{ id: string; status: 'success' | 'skipped' | 'failed'; error?: string }> = [];
+    for (const id of ids) {
+      try {
+        const item = await contentRepo.createQueryBuilder('c')
+          .where('c.id = :id', { id })
+          .andWhere('c.serviceKey IN (:...sks)', { sks: KPA_SERVICE_KEYS })
+          .getOne();
+        if (!item) { results.push({ id, status: 'failed', error: 'Not found' }); continue; }
+        if (item.status !== 'draft') { results.push({ id, status: 'skipped', error: 'Not in draft status' }); continue; }
+        item.status = 'published';
+        item.publishedAt = new Date();
+        await contentRepo.save(item);
+        await writeAuditLog((req as any).user, 'CONTENT_BATCH_PUBLISHED', 'content', id, { title: item.title });
+        results.push({ id, status: 'success' });
+      } catch (err: any) {
+        results.push({ id, status: 'failed', error: err.message || 'Unknown error' });
+      }
+    }
+    res.json({ success: true, data: { results } });
+  }));
+
+  /** POST /news/batch-archive — 일괄 보관 (any → archived) */
+  newsRouter.post('/batch-archive', authenticate, requireKpaScope('kpa:operator'), asyncHandler(async (req: Request, res: Response) => {
+    const { ids } = req.body;
+    if (!Array.isArray(ids) || ids.length === 0) {
+      res.status(400).json({ success: false, error: 'ids array is required' });
+      return;
+    }
+    if (ids.length > 50) {
+      res.status(400).json({ success: false, error: 'Maximum 50 items per batch' });
+      return;
+    }
+
+    const results: Array<{ id: string; status: 'success' | 'skipped' | 'failed'; error?: string }> = [];
+    for (const id of ids) {
+      try {
+        const item = await contentRepo.createQueryBuilder('c')
+          .where('c.id = :id', { id })
+          .andWhere('c.serviceKey IN (:...sks)', { sks: KPA_SERVICE_KEYS })
+          .getOne();
+        if (!item) { results.push({ id, status: 'failed', error: 'Not found' }); continue; }
+        if (item.status === 'archived') { results.push({ id, status: 'skipped', error: 'Already archived' }); continue; }
+        item.status = 'archived';
+        await contentRepo.save(item);
+        await writeAuditLog((req as any).user, 'CONTENT_BATCH_ARCHIVED', 'content', id, { title: item.title });
+        results.push({ id, status: 'success' });
+      } catch (err: any) {
+        results.push({ id, status: 'failed', error: err.message || 'Unknown error' });
+      }
+    }
+    res.json({ success: true, data: { results } });
+  }));
+
+  /** POST /news/batch-hard-delete — 일괄 완전 삭제 (archived only) */
+  newsRouter.post('/batch-hard-delete', authenticate, requireKpaScope('kpa:operator'), asyncHandler(async (req: Request, res: Response) => {
+    const { ids } = req.body;
+    if (!Array.isArray(ids) || ids.length === 0) {
+      res.status(400).json({ success: false, error: 'ids array is required' });
+      return;
+    }
+    if (ids.length > 50) {
+      res.status(400).json({ success: false, error: 'Maximum 50 items per batch' });
+      return;
+    }
+
+    const results: Array<{ id: string; status: 'success' | 'skipped' | 'failed'; error?: string }> = [];
+    for (const id of ids) {
+      try {
+        const item = await contentRepo.createQueryBuilder('c')
+          .where('c.id = :id', { id })
+          .andWhere('c.serviceKey IN (:...sks)', { sks: KPA_SERVICE_KEYS })
+          .getOne();
+        if (!item) { results.push({ id, status: 'failed', error: 'Not found' }); continue; }
+        if (item.status !== 'archived') { results.push({ id, status: 'skipped', error: 'Only archived items can be hard deleted' }); continue; }
+        const title = item.title;
+        await contentRepo.delete({ id });
+        await writeAuditLog((req as any).user, 'CONTENT_BATCH_HARD_DELETED', 'content', id, { title });
+        results.push({ id, status: 'success' });
+      } catch (err: any) {
+        results.push({ id, status: 'failed', error: err.message || 'Unknown error' });
+      }
+    }
+    res.json({ success: true, data: { results } });
+  }));
+
   router.use('/news', newsRouter);
 
   // ============================================================================

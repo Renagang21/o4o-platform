@@ -8,8 +8,9 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Search, Pencil, GitMerge, X, Check, Package } from 'lucide-react';
+import { Search, GitMerge, X, Package } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
+import { EditableTextCell, RowActionMenu } from '@o4o/ui';
 import { DataTable } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { operatorBrandApi, type BrandItem } from '../../lib/api/operatorBrand';
@@ -19,10 +20,6 @@ export default function BrandManagementPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const searchTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
-
-  // Inline edit state
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editName, setEditName] = useState('');
 
   // Merge state
   const [mergeSource, setMergeSource] = useState<BrandItem | null>(null);
@@ -43,30 +40,6 @@ export default function BrandManagementPage() {
     setSearch(value);
     if (searchTimer.current) clearTimeout(searchTimer.current);
     searchTimer.current = setTimeout(() => loadBrands(value), 300);
-  };
-
-  // ======== Inline Edit ========
-
-  const startEdit = (brand: BrandItem) => {
-    setEditingId(brand.id);
-    setEditName(brand.name);
-  };
-
-  const cancelEdit = () => {
-    setEditingId(null);
-    setEditName('');
-  };
-
-  const saveEdit = async () => {
-    if (!editingId || !editName.trim()) return;
-    const res = await operatorBrandApi.updateBrand(editingId, editName.trim());
-    if (res.success) {
-      toast.success('브랜드명이 수정되었습니다');
-      cancelEdit();
-      loadBrands(search);
-    } else {
-      toast.error(res.error || '수정 실패');
-    }
   };
 
   // ======== Merge ========
@@ -108,33 +81,22 @@ export default function BrandManagementPage() {
       key: 'name',
       header: '브랜드명',
       sortable: true,
-      render: (_v, row) => {
-        if (editingId === row.id) {
-          return (
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                value={editName}
-                onChange={e => setEditName(e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') saveEdit();
-                  if (e.key === 'Escape') cancelEdit();
-                }}
-                onClick={e => e.stopPropagation()}
-                className="flex-1 px-2 py-1 border border-emerald-400 rounded text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                autoFocus
-              />
-              <button onClick={saveEdit} className="p-1 text-emerald-600 hover:bg-emerald-50 rounded" title="저장">
-                <Check className="w-4 h-4" />
-              </button>
-              <button onClick={cancelEdit} className="p-1 text-slate-400 hover:bg-slate-100 rounded" title="취소">
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          );
-        }
-        return <span className="text-sm font-medium text-slate-800">{row.name}</span>;
-      },
+      render: (_v, row) => (
+        <EditableTextCell
+          value={row.name}
+          onSave={async (newName) => {
+            const res = await operatorBrandApi.updateBrand(row.id, newName);
+            if (res.success) {
+              toast.success('브랜드명이 수정되었습니다');
+              loadBrands(search);
+            } else {
+              toast.error(res.error || '수정 실패');
+              throw new Error(res.error || '수정 실패');
+            }
+          }}
+          className="font-medium text-slate-800"
+        />
+      ),
     },
     {
       key: 'productCount',
@@ -158,26 +120,22 @@ export default function BrandManagementPage() {
       key: '_actions',
       header: '작업',
       system: true,
-      align: 'right',
-      width: '100px',
+      align: 'center',
+      width: '60px',
       onCellClick: () => {},
       render: (_v, row) => (
-        <div className="flex items-center justify-end gap-1">
-          <button
-            onClick={() => startEdit(row)}
-            className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded"
-            title="이름 수정"
-          >
-            <Pencil className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => openMerge(row)}
-            className="p-1.5 text-slate-400 hover:text-orange-600 hover:bg-orange-50 rounded"
-            title="다른 브랜드로 병합"
-          >
-            <GitMerge className="w-4 h-4" />
-          </button>
-        </div>
+        <RowActionMenu
+          inlineMax={1}
+          actions={[
+            {
+              key: 'merge',
+              label: '병합',
+              icon: <GitMerge className="w-4 h-4" />,
+              onClick: () => openMerge(row),
+              variant: 'warning',
+            },
+          ]}
+        />
       ),
     },
   ];

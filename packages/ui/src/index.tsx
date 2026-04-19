@@ -621,6 +621,9 @@ export type { AddressSearchProps, AddressSearchValue } from './components/Addres
 export * from './components/table/BaseTable';
 export * from './components/table/ActionBar';
 export * from './components/table/BulkResultModal';
+export * from './components/table/RowActionMenu';
+export * from './components/table/ConfirmActionDialog';
+export * from './components/table/InlineEditCells';
 export { useTableSort } from './components/table/useTableSort';
 export type { SortOrder, SortState, UseTableSortOptions, UseTableSortReturn } from './components/table/useTableSort';
 export { useTableFilter } from './components/table/useTableFilter';

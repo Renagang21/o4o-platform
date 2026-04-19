@@ -73,6 +73,7 @@ import {
   fetchPlaylistItems,
   addPlaylistItem,
   addPlaylistItemFromLibrary,
+  addPlaylistItemFromSignage,
   deletePlaylistItem,
   reorderPlaylistItems,
   type StorePlaylist,
@@ -451,6 +452,15 @@ export function StoreSignagePage() {
     try {
       await addPlaylistItemFromLibrary(selectedPlaylistId, item.id);
       setShowLibrarySelector(false);
+      loadPlaylistItems(selectedPlaylistId);
+    } catch { /* user can retry */ }
+  };
+
+  const handleAddFromSignage = async (mediaId: string) => {
+    if (!selectedPlaylistId) return;
+    try {
+      await addPlaylistItemFromSignage(selectedPlaylistId, mediaId);
+      setShowAddPicker(false);
       loadPlaylistItems(selectedPlaylistId);
     } catch { /* user can retry */ }
   };
@@ -1036,7 +1046,7 @@ export function StoreSignagePage() {
                       Library에서 선택
                     </button>
                   </div>
-                  {signageSnapshots.length === 0 ? (
+                  {signageSnapshots.length === 0 && signageMediaItems.length === 0 ? (
                     <p className="text-xs text-slate-400">사이니지 자산이 없습니다. '내 동영상' 탭에서 동영상을 먼저 등록하세요.</p>
                   ) : (
                     <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
@@ -1047,6 +1057,16 @@ export function StoreSignagePage() {
                           className="px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-md hover:bg-blue-50 hover:border-blue-300 truncate max-w-[200px]"
                         >
                           {snap.title}
+                        </button>
+                      ))}
+                      {signageMediaItems.map(media => (
+                        <button
+                          key={`media_${media.id}`}
+                          onClick={() => handleAddFromSignage(media.id)}
+                          className="px-3 py-1.5 text-xs bg-white border border-purple-200 rounded-md hover:bg-purple-50 hover:border-purple-400 truncate max-w-[200px]"
+                        >
+                          <span className="inline-block px-1 py-0 mr-1 rounded text-[9px] font-semibold bg-purple-100 text-purple-700">{media.sourceType === 'youtube' ? 'YT' : 'VM'}</span>
+                          {media.name}
                         </button>
                       ))}
                     </div>

@@ -10,8 +10,8 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { CheckCircle, XCircle, Trash2 } from 'lucide-react';
-import { ActionBar } from '@o4o/ui';
-import { DataTable } from '@o4o/operator-ux-core';
+import { ActionBar, BulkResultModal, RowActionMenu } from '@o4o/ui';
+import { DataTable, useBatchAction, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { adminProductApi, type AdminProduct, type DistributionType } from '../../lib/api';
 import { productCleanupApi } from '../../lib/api/operatorProductCleanup';
@@ -37,6 +37,53 @@ const DIST_LABELS: Record<string, string> = {
   PUBLIC: '공개',
   SERVICE: '서비스',
   PRIVATE: '비공개',
+};
+
+// ─── V4: Action Policy ───
+
+const productApprovalPolicy = defineActionPolicy<AdminProduct>('neture:product-approval', {
+  inlineMax: 2,
+  rules: [
+    {
+      key: 'approve',
+      label: '승인',
+      variant: 'primary',
+      visible: (row) => row.approvalStatus === 'PENDING',
+      confirm: { title: '승인 확인', message: '이 상품을 승인하시겠습니까?', confirmText: '승인' },
+    },
+    {
+      key: 'reject',
+      label: '반려',
+      variant: 'danger',
+      visible: (row) => row.approvalStatus === 'PENDING',
+      confirm: (row) => ({
+        title: '상품 반려',
+        message: row.marketingName,
+        variant: 'danger',
+        confirmText: '반려 확인',
+        showReason: true,
+        reasonPlaceholder: '반려 사유를 입력하세요 (선택)',
+      }),
+    },
+    {
+      key: 'delete',
+      label: '삭제',
+      variant: 'danger',
+      visible: (row) => row.approvalStatus === 'APPROVED',
+      confirm: (row) => ({
+        title: '삭제 확인',
+        message: `"${row.marketingName}"을 삭제(휴지통 이동)하시겠습니까?`,
+        variant: 'danger',
+        confirmText: '삭제',
+      }),
+    },
+  ],
+});
+
+const PRODUCT_ACTION_ICONS: Record<string, React.ReactNode> = {
+  approve: <CheckCircle className="w-4 h-4" />,
+  reject: <XCircle className="w-4 h-4" />,
+  delete: <Trash2 className="w-4 h-4" />,
 };
 
 // ─── Helpers ───
@@ -82,7 +129,9 @@ export default function OperatorProductApprovalPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
+
+  // V3: Batch action hook
+  const batch = useBatchAction();
 
   // Drawer
   const [drawerProduct, setDrawerProduct] = useState<AdminProduct | null>(null);
@@ -132,7 +181,26 @@ export default function OperatorProductApprovalPage() {
     }
   };
 
-  // ─── Bulk Actions ───
+  /** V4: RowActionMenu용 반려 핸들러 (ConfirmActionDialog에서 사유 전달) */
+  const handleRejectDirect = async (id: string, reason?: string) => {
+    setActionLoading(id);
+    const ok = await adminProductApi.rejectProduct(id, reason);
+    setActionLoading(null);
+    if (ok) {
+      setDrawerProduct(null);
+      await loadProducts();
+    }
+  };
+
+  /** V4: RowActionMenu용 삭제 핸들러 */
+  const handleSoftDelete = async (id: string) => {
+    setActionLoading(id);
+    const res = await productCleanupApi.softDelete(id);
+    setActionLoading(null);
+    if (res.success) loadProducts();
+  };
+
+  // ─── V3: Batch Actions (single API call) ───
 
   const handleBulkApprove = async () => {
     const pendingIds = [...selectedIds].filter((id) => {
@@ -140,15 +208,14 @@ export default function OperatorProductApprovalPage() {
       return p?.approvalStatus === 'PENDING';
     });
     if (pendingIds.length === 0) return;
-    setIsBulkProcessing(true);
-    for (const id of pendingIds) {
-      try {
-        await adminProductApi.approveProduct(id);
-      } catch { /* continue */ }
+    const result = await batch.executeBatch(
+      (batchIds) => adminProductApi.batchApprove(batchIds),
+      pendingIds,
+    );
+    if (result.successCount > 0) {
+      setSelectedIds(new Set());
+      loadProducts();
     }
-    setIsBulkProcessing(false);
-    setSelectedIds(new Set());
-    await loadProducts();
   };
 
   const handleBulkReject = async () => {
@@ -157,15 +224,14 @@ export default function OperatorProductApprovalPage() {
       return p?.approvalStatus === 'PENDING';
     });
     if (pendingIds.length === 0) return;
-    setIsBulkProcessing(true);
-    for (const id of pendingIds) {
-      try {
-        await adminProductApi.rejectProduct(id, '일괄 반려');
-      } catch { /* continue */ }
+    const result = await batch.executeBatch(
+      (batchIds) => adminProductApi.batchReject(batchIds, '일괄 반려'),
+      pendingIds,
+    );
+    if (result.successCount > 0) {
+      setSelectedIds(new Set());
+      loadProducts();
     }
-    setIsBulkProcessing(false);
-    setSelectedIds(new Set());
-    await loadProducts();
   };
 
   // ─── Filtering ───
@@ -257,49 +323,24 @@ export default function OperatorProductApprovalPage() {
       key: '_actions',
       header: '액션',
       align: 'center',
-      width: '130px',
+      width: '100px',
       system: true,
       onCellClick: () => {},
       render: (_v, row) => (
-        <>
-          {row.approvalStatus === 'PENDING' && (
-            <div className="flex items-center justify-center gap-2">
-              <button
-                onClick={() => handleApprove(row.id)}
-                disabled={actionLoading === row.id}
-                className="px-2.5 py-1 bg-green-600 text-white rounded text-xs font-medium hover:bg-green-700 disabled:opacity-50"
-              >
-                승인
-              </button>
-              <button
-                onClick={() => {
-                  setRejectTarget({ id: row.id, name: row.marketingName });
-                  setRejectReason('');
-                }}
-                disabled={actionLoading === row.id}
-                className="px-2.5 py-1 bg-red-600 text-white rounded text-xs font-medium hover:bg-red-700 disabled:opacity-50"
-              >
-                반려
-              </button>
-            </div>
-          )}
-          {row.approvalStatus === 'APPROVED' && (
-            <button
-              onClick={async () => {
-                if (!confirm(`"${row.marketingName}"을 삭제(휴지통 이동)하시겠습니까?`)) return;
-                setActionLoading(row.id);
-                const res = await productCleanupApi.softDelete(row.id);
-                setActionLoading(null);
-                if (res.success) loadProducts();
-              }}
-              disabled={actionLoading === row.id}
-              className="p-1.5 rounded hover:bg-red-50 text-red-400 hover:text-red-600 disabled:opacity-50"
-              title="삭제 (휴지통으로 이동)"
-            >
-              <Trash2 size={14} />
-            </button>
-          )}
-        </>
+        actionLoading === row.id ? (
+          <div className="flex justify-center">
+            <div className="w-4 h-4 border-2 border-slate-300 border-t-blue-500 rounded-full animate-spin" />
+          </div>
+        ) : (
+          <RowActionMenu
+            inlineMax={productApprovalPolicy.inlineMax}
+            actions={buildRowActions(productApprovalPolicy, row, {
+              approve: () => handleApprove(row.id),
+              reject: (reason) => handleRejectDirect(row.id, reason),
+              delete: () => handleSoftDelete(row.id),
+            }, { icons: PRODUCT_ACTION_ICONS })}
+          />
+        )
       ),
     },
   ];
@@ -367,32 +408,34 @@ export default function OperatorProductApprovalPage() {
         />
       </div>
 
-      {/* Action Bar */}
+      {/* V3: ActionBar with grouping + tooltip */}
       <div className="mb-3">
         <ActionBar
           selectedCount={selectedIds.size}
           onClearSelection={() => setSelectedIds(new Set())}
           actions={[
-            ...(selectedPendingCount > 0
-              ? [
-                  {
-                    key: 'approve',
-                    label: `승인 (${selectedPendingCount})`,
-                    onClick: handleBulkApprove,
-                    variant: 'primary' as const,
-                    icon: <CheckCircle size={14} />,
-                    loading: isBulkProcessing,
-                  },
-                  {
-                    key: 'reject',
-                    label: `반려 (${selectedPendingCount})`,
-                    onClick: handleBulkReject,
-                    variant: 'danger' as const,
-                    icon: <XCircle size={14} />,
-                    loading: isBulkProcessing,
-                  },
-                ]
-              : []),
+            {
+              key: 'approve',
+              label: `승인 (${selectedPendingCount})`,
+              onClick: handleBulkApprove,
+              variant: 'primary' as const,
+              icon: <CheckCircle size={14} />,
+              loading: batch.loading,
+              group: 'actions',
+              tooltip: '선택된 대기 상품을 일괄 승인합니다',
+              visible: selectedPendingCount > 0,
+            },
+            {
+              key: 'reject',
+              label: `반려 (${selectedPendingCount})`,
+              onClick: handleBulkReject,
+              variant: 'danger' as const,
+              icon: <XCircle size={14} />,
+              loading: batch.loading,
+              group: 'actions',
+              tooltip: '선택된 대기 상품을 일괄 반려합니다',
+              visible: selectedPendingCount > 0,
+            },
           ]}
         />
       </div>
@@ -449,6 +492,14 @@ export default function OperatorProductApprovalPage() {
         onClose={() => setDrawerProduct(null)}
         onSaved={loadProducts}
         approvalActions={drawerApprovalActions}
+      />
+
+      {/* V3: BulkResultModal */}
+      <BulkResultModal
+        open={batch.showResult}
+        onClose={() => { batch.clearResult(); loadProducts(); }}
+        result={batch.result}
+        onRetry={() => { batch.retryFailed(); }}
       />
     </div>
   );

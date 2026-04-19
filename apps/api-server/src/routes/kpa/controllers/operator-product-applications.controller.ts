@@ -11,6 +11,8 @@
  * GET   /stats           — 상태별 통계
  * PATCH /:id/approve     — SERVICE 승인 처리 (v2 service)
  * PATCH /:id/reject      — SERVICE 거절 처리 (v2 service)
+ * POST  /batch-approve   — 일괄 승인 (V3)
+ * POST  /batch-reject    — 일괄 거절 (V3)
  *
  * 권한: kpa:admin 또는 kpa:operator
  */
@@ -229,6 +231,118 @@ export function createOperatorProductApplicationsController(
       meta: { targetId: id, reason, statusBefore: 'pending', statusAfter: 'rejected' },
     }).catch(() => {});
     res.json({ success: true, data: result.data });
+  }));
+
+  // ─── V3 Batch Endpoints — WO-O4O-TABLE-STANDARD-V3-EXPANSION ───
+
+  /** POST /batch-approve — 일괄 승인 */
+  router.post('/batch-approve', asyncHandler(async (req: Request, res: Response) => {
+    const { ids } = req.body;
+    if (!Array.isArray(ids) || ids.length === 0) {
+      res.status(400).json({ success: false, error: 'ids array is required' });
+      return;
+    }
+    if (ids.length > 50) {
+      res.status(400).json({ success: false, error: 'Maximum 50 items per batch' });
+      return;
+    }
+
+    const approvedBy = (req as any).user?.id || 'unknown';
+    const results: Array<{ id: string; status: 'success' | 'skipped' | 'failed'; error?: string }> = [];
+
+    for (const id of ids) {
+      try {
+        const result = await dataSource.transaction(async (manager) => {
+          const [approval] = await manager.query(
+            `SELECT id, offer_id, organization_id, service_key, approval_status
+             FROM product_approvals WHERE id = $1`,
+            [id],
+          );
+          if (!approval || approval.approval_status !== 'pending') {
+            return { skip: true, error: !approval ? 'Not found' : 'Already processed' };
+          }
+
+          await manager.query(
+            `UPDATE product_approvals SET approval_status = 'approved', decided_by = $2::uuid, decided_at = NOW(), updated_at = NOW()
+             WHERE id = $1 AND approval_status = 'pending'`,
+            [id, approvedBy],
+          );
+
+          const serviceKey = approval.service_key || 'kpa-society';
+          await manager.query('SAVEPOINT upsert_listing');
+          try {
+            await manager.query(
+              `INSERT INTO organization_product_listings
+                 (id, organization_id, service_key, master_id, offer_id, is_active, created_at, updated_at)
+               SELECT gen_random_uuid(), $2, $3, spo.master_id, spo.id, true, NOW(), NOW()
+               FROM supplier_product_offers spo
+               WHERE spo.id = $1
+               ON CONFLICT (organization_id, service_key, offer_id)
+               DO UPDATE SET is_active = true, updated_at = NOW()`,
+              [approval.offer_id, approval.organization_id, serviceKey],
+            );
+            await manager.query('RELEASE SAVEPOINT upsert_listing');
+          } catch {
+            await manager.query('ROLLBACK TO SAVEPOINT upsert_listing');
+          }
+
+          await manager.query(
+            `UPDATE organization_product_listings SET is_active = true, updated_at = NOW()
+             WHERE offer_id = $1 AND service_key = $2`,
+            [approval.offer_id, serviceKey],
+          );
+
+          return { skip: false };
+        });
+
+        if (result.skip) {
+          results.push({ id, status: 'skipped', error: result.error });
+        } else {
+          actionLogService?.logSuccess('kpa-society', approvedBy, 'kpa.operator.product_batch_approve', {
+            meta: { targetId: id, statusBefore: 'pending', statusAfter: 'approved' },
+          }).catch(() => {});
+          results.push({ id, status: 'success' });
+        }
+      } catch (err: any) {
+        results.push({ id, status: 'failed', error: err.message || 'Unknown error' });
+      }
+    }
+
+    res.json({ success: true, data: { results } });
+  }));
+
+  /** POST /batch-reject — 일괄 거절 */
+  router.post('/batch-reject', asyncHandler(async (req: Request, res: Response) => {
+    const { ids, reason } = req.body;
+    if (!Array.isArray(ids) || ids.length === 0) {
+      res.status(400).json({ success: false, error: 'ids array is required' });
+      return;
+    }
+    if (ids.length > 50) {
+      res.status(400).json({ success: false, error: 'Maximum 50 items per batch' });
+      return;
+    }
+
+    const rejectedBy = (req as any).user?.id || 'unknown';
+    const results: Array<{ id: string; status: 'success' | 'skipped' | 'failed'; error?: string }> = [];
+
+    for (const id of ids) {
+      try {
+        const result = await approvalV2Service.rejectServiceApproval(id, rejectedBy, reason);
+        if (!result.success) {
+          results.push({ id, status: 'skipped', error: result.error || 'Not found or not pending' });
+        } else {
+          actionLogService?.logSuccess('kpa-society', rejectedBy, 'kpa.operator.product_batch_reject', {
+            meta: { targetId: id, reason, statusBefore: 'pending', statusAfter: 'rejected' },
+          }).catch(() => {});
+          results.push({ id, status: 'success' });
+        }
+      } catch (err: any) {
+        results.push({ id, status: 'failed', error: err.message || 'Unknown error' });
+      }
+    }
+
+    res.json({ success: true, data: { results } });
   }));
 
   return router;

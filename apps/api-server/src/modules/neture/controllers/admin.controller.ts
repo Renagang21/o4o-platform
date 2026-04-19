@@ -292,6 +292,90 @@ export function createAdminController(dataSource: DataSource): Router {
     }
   });
 
+  // ─── V3 Batch Endpoints — WO-O4O-TABLE-STANDARD-V3-EXPANSION ───
+
+  /** POST /admin/products/batch-approve — 일괄 승인 (V3 표준) */
+  router.post('/products/batch-approve', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const { ids } = req.body;
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ success: false, error: 'ids array is required' });
+      }
+      if (ids.length > 50) {
+        return res.status(400).json({ success: false, error: 'Maximum 50 items per batch' });
+      }
+
+      const adminUserId = req.user?.id;
+      if (!adminUserId) {
+        return res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED' } });
+      }
+
+      const results: Array<{ id: string; status: 'success' | 'skipped' | 'failed'; error?: string }> = [];
+
+      for (const id of ids) {
+        try {
+          const result = await netureService.approveProduct(id, adminUserId);
+          if (!result.success) {
+            results.push({ id, status: 'skipped', error: result.error || 'Not pending' });
+          } else {
+            netureActionLogService.logSuccess('neture', adminUserId, 'neture.admin.product_batch_approve', {
+              meta: { productId: id },
+            }).catch(() => {});
+            results.push({ id, status: 'success' });
+          }
+        } catch (err: any) {
+          results.push({ id, status: 'failed', error: err.message || 'Unknown error' });
+        }
+      }
+
+      res.json({ success: true, data: { results } });
+    } catch (error) {
+      logger.error('[Neture API] Error batch-approving products:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to batch approve products' } });
+    }
+  });
+
+  /** POST /admin/products/batch-reject — 일괄 반려 (V3 표준) */
+  router.post('/products/batch-reject', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const { ids, reason } = req.body;
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ success: false, error: 'ids array is required' });
+      }
+      if (ids.length > 50) {
+        return res.status(400).json({ success: false, error: 'Maximum 50 items per batch' });
+      }
+
+      const adminUserId = req.user?.id;
+      if (!adminUserId) {
+        return res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED' } });
+      }
+
+      const results: Array<{ id: string; status: 'success' | 'skipped' | 'failed'; error?: string }> = [];
+
+      for (const id of ids) {
+        try {
+          const result = await netureService.rejectProduct(id, adminUserId, reason);
+          if (!result.success) {
+            results.push({ id, status: 'skipped', error: result.error || 'Not pending' });
+          } else {
+            netureActionLogService.logSuccess('neture', adminUserId, 'neture.admin.product_batch_reject', {
+              meta: { productId: id, reason },
+            }).catch(() => {});
+            results.push({ id, status: 'success' });
+          }
+        } catch (err: any) {
+          results.push({ id, status: 'failed', error: err.message || 'Unknown error' });
+        }
+      }
+
+      res.json({ success: true, data: { results } });
+    } catch (error) {
+      logger.error('[Neture API] Error batch-rejecting products:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to batch reject products' } });
+    }
+  });
+
   /**
    * GET /admin/products
    * 전체 상품 목록 (필터: supplierId, distributionType, isActive, approvalStatus)

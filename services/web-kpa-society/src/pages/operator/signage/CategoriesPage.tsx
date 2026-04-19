@@ -10,7 +10,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { getAccessToken } from '../../../contexts/AuthContext';
-import { Tag, Plus, Eye, EyeOff, RefreshCw } from 'lucide-react';
+import { Tag, Plus, RefreshCw } from 'lucide-react';
+import { EditableNumberCell, ToggleCell } from '@o4o/ui';
 import { DataTable } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 
@@ -167,13 +168,12 @@ export default function CategoriesPage() {
       sortable: true,
       sortAccessor: (row) => row.sortOrder,
       render: (_v, row) => (
-        <input
-          type="number"
-          defaultValue={row.sortOrder}
-          onBlur={(e) => handleUpdateSortOrder(row, parseInt(e.target.value))}
-          onClick={(e) => e.stopPropagation()}
-          disabled={isSaving === row.id}
-          className="w-16 px-2 py-1 text-center text-sm border border-slate-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-400 disabled:opacity-50"
+        <EditableNumberCell
+          value={row.sortOrder}
+          min={0}
+          onSave={async (newOrder) => {
+            await handleUpdateSortOrder(row, newOrder);
+          }}
         />
       ),
     },
@@ -181,39 +181,17 @@ export default function CategoriesPage() {
       key: 'isActive',
       header: '상태',
       align: 'center',
-      width: '80px',
+      width: '100px',
       render: (_v, row) => (
-        <span
-          className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-            row.isActive
-              ? 'bg-green-100 text-green-700'
-              : 'bg-slate-100 text-slate-500'
-          }`}
-        >
-          {row.isActive ? '활성' : '비활성'}
-        </span>
-      ),
-    },
-    {
-      key: '_actions',
-      header: '관리',
-      system: true,
-      align: 'right',
-      width: '60px',
-      onCellClick: () => {},
-      render: (_v, row) => (
-        <button
-          onClick={() => handleToggleActive(row)}
+        <ToggleCell
+          value={row.isActive}
+          onChange={async () => {
+            await handleToggleActive(row);
+          }}
+          labelOn="활성"
+          labelOff="비활성"
           disabled={isSaving === row.id}
-          title={row.isActive ? '비활성화' : '활성화'}
-          className="p-1.5 text-slate-400 hover:text-slate-700 rounded disabled:opacity-50"
-        >
-          {row.isActive ? (
-            <EyeOff className="w-4 h-4" />
-          ) : (
-            <Eye className="w-4 h-4" />
-          )}
-        </button>
+        />
       ),
     },
   ];

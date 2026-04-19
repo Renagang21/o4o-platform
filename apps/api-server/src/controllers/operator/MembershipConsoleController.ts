@@ -550,6 +550,132 @@ export class MembershipConsoleController {
   };
 
   /**
+   * POST /api/v1/operator/members/batch-status
+   * 일괄 상태 변경 (V3)
+   * WO-O4O-TABLE-STANDARD-V3-EXPANSION
+   */
+  batchUpdateStatus = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { ids, status: targetStatus } = req.body;
+      if (!Array.isArray(ids) || ids.length === 0) {
+        res.status(400).json({ success: false, error: 'ids array is required' });
+        return;
+      }
+      if (ids.length > 50) {
+        res.status(400).json({ success: false, error: 'Maximum 50 items per batch' });
+        return;
+      }
+      if (!targetStatus || !['approved', 'rejected', 'suspended'].includes(targetStatus)) {
+        res.status(400).json({ success: false, error: 'status must be approved, rejected, or suspended' });
+        return;
+      }
+
+      const scope: ServiceScope = (req as any).serviceScope;
+      const updatedBy = (req as any).user?.id || null;
+      const results: Array<{ id: string; status: 'success' | 'skipped' | 'failed'; error?: string }> = [];
+
+      for (const userId of ids) {
+        try {
+          // Check access
+          if (!scope.isPlatformAdmin) {
+            const hasAccess = await this.checkServiceBoundary(userId, scope.serviceKeys);
+            if (!hasAccess) {
+              results.push({ id: userId, status: 'failed', error: 'User not found or out of scope' });
+              continue;
+            }
+          }
+
+          if (targetStatus === 'approved') {
+            const pendingMemberships = scope.isPlatformAdmin
+              ? await AppDataSource.query(
+                  `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected')`,
+                  [userId]
+                )
+              : await AppDataSource.query(
+                  `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected') AND service_key = ANY($2)`,
+                  [userId, scope.serviceKeys]
+                );
+
+            if (pendingMemberships.length > 0) {
+              for (const m of pendingMemberships) {
+                await approvalService.approveMembership({
+                  membershipId: m.id,
+                  approvedBy: updatedBy,
+                  isPlatformAdmin: scope.isPlatformAdmin,
+                  serviceKeys: scope.serviceKeys,
+                });
+              }
+            } else {
+              await AppDataSource.query(
+                `UPDATE users SET status = 'active', "isActive" = true,
+                 "approvedAt" = COALESCE("approvedAt", NOW()), "approvedBy" = COALESCE("approvedBy", $1),
+                 "updatedAt" = NOW()
+                 WHERE id = $2`,
+                [updatedBy, userId]
+              );
+            }
+          } else if (targetStatus === 'suspended') {
+            const result = await approvalService.suspendMembership({
+              userId,
+              suspendedBy: updatedBy,
+              isPlatformAdmin: scope.isPlatformAdmin,
+              serviceKeys: scope.serviceKeys,
+            });
+            if (!result) {
+              results.push({ id: userId, status: 'skipped', error: 'No active memberships found' });
+              continue;
+            }
+          } else if (targetStatus === 'rejected') {
+            const pendingMemberships = scope.isPlatformAdmin
+              ? await AppDataSource.query(
+                  `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'active')`,
+                  [userId]
+                )
+              : await AppDataSource.query(
+                  `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'active') AND service_key = ANY($2)`,
+                  [userId, scope.serviceKeys]
+                );
+
+            for (const m of pendingMemberships) {
+              await approvalService.rejectMembership({
+                membershipId: m.id,
+                reason: req.body.reason || null,
+                isPlatformAdmin: scope.isPlatformAdmin,
+                serviceKeys: scope.serviceKeys,
+              });
+            }
+
+            await AppDataSource.query(
+              `UPDATE users SET status = 'rejected', "isActive" = false, "updatedAt" = NOW()
+               WHERE id = $1`,
+              [userId]
+            );
+          }
+
+          const serviceKey = scope.serviceKeys[0] || 'platform';
+          this.getActionLogService()?.logSuccess(serviceKey, updatedBy || 'unknown', `${serviceKey}.operator.member_batch_${targetStatus}`, {
+            meta: { targetId: userId, statusAfter: targetStatus },
+          }).catch(() => {});
+
+          results.push({ id: userId, status: 'success' });
+        } catch (err: any) {
+          results.push({ id: userId, status: 'failed', error: err.message || 'Unknown error' });
+        }
+      }
+
+      res.json({ success: true, data: { results } });
+    } catch (error) {
+      logger.error('[MembershipConsole] batchUpdateStatus error', {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to batch update status',
+      });
+    }
+  };
+
+  /**
    * POST /api/v1/operator/members/:userId/reactivate
    * 서비스 멤버십 재활성화 (membership + user + role_assignments atomic)
    * WO-O4O-USER-MEMBERSHIP-REACTIVATION-V1

@@ -873,6 +873,20 @@ export const forumOperatorApi = {
     const res = await api.post(`${OPERATOR_BASE}/delete-requests/${id}/reject?${SVC}`, data || {});
     return res.data;
   },
+
+  // V3 Batch
+  batchReview: async (ids: string[], action: 'approve' | 'reject', reviewComment?: string) => {
+    const res = await api.post(`${OPERATOR_BASE}/requests/batch-review?${SVC}`, { ids, action, reviewComment });
+    return res.data;
+  },
+  batchApproveDelete: async (ids: string[], reviewComment?: string) => {
+    const res = await api.post(`${OPERATOR_BASE}/delete-requests/batch-approve?${SVC}`, { ids, reviewComment });
+    return res.data;
+  },
+  batchRejectDelete: async (ids: string[], reviewComment?: string) => {
+    const res = await api.post(`${OPERATOR_BASE}/delete-requests/batch-reject?${SVC}`, { ids, reviewComment });
+    return res.data;
+  },
 };
 
 // ============================================================================

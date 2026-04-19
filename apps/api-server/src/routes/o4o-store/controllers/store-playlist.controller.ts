@@ -13,6 +13,7 @@
  *     GET    /store-playlists/:id/items    — 항목 목록
  *     POST   /store-playlists/:id/items    — 항목 추가 (snapshot)
  *     POST   /store-playlists/:id/items/from-library — Library에서 추가
+ *     POST   /store-playlists/:id/items/from-signage — Signage Media에서 추가
  *     PATCH  /store-playlists/:id/items/reorder — 순서 변경
  *     DELETE /store-playlists/:id/items/:itemId — 항목 삭제 (locked 제외)
  *
@@ -361,6 +362,56 @@ export function createStorePlaylistController(
         }
 
         const result = await repo.addItemFromLibrary(id, libraryItemId, organizationId, userId);
+        res.status(201).json({ success: true, data: result });
+      } catch (error: any) {
+        if (error.statusCode && error.code) {
+          res.status(error.statusCode).json({ success: false, error: { code: error.code, message: error.message } });
+          return;
+        }
+        res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
+      }
+    },
+  );
+
+  /**
+   * POST /store-playlists/:id/items/from-signage
+   * Signage Media에서 항목 추가 — signage_media → auto-snapshot → playlist item
+   * Body: { mediaId }
+   * WO-O4O-SIGNAGE-STORE-PLAYLIST-AUTOSNAPSHOT-IMPLEMENTATION-V1
+   */
+  router.post(
+    '/:id/items/from-signage',
+    requireAuth,
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const authReq = req as AuthRequest;
+        const userId = authReq.user?.id;
+        const userRoles = authReq.user?.roles || [];
+
+        if (!userId) {
+          res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
+          return;
+        }
+        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles);
+        if (!organizationId) {
+          res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
+          return;
+        }
+
+        const { id } = req.params;
+        const { mediaId } = req.body;
+
+        if (!mediaId) {
+          res.status(400).json({ success: false, error: { code: 'INVALID_INPUT', message: 'mediaId is required' } });
+          return;
+        }
+
+        if (!await repo.verifyOwnership(id, organizationId)) {
+          res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Playlist not found' } });
+          return;
+        }
+
+        const result = await repo.addItemFromSignage(id, mediaId, organizationId, userId);
         res.status(201).json({ success: true, data: result });
       } catch (error: any) {
         if (error.statusCode && error.code) {

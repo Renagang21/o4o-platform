@@ -11,7 +11,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { CheckCircle, XCircle, Sparkles } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
-import { ActionBar, BulkResultModal } from '@o4o/ui';
+import { ActionBar, BulkResultModal, RowActionMenu } from '@o4o/ui';
 import { DataTable, Pagination, useBatchAction } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { joinRequestApi } from '../../api/joinRequestApi';
@@ -29,8 +29,6 @@ export function OrganizationJoinRequestsPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [reviewNoteId, setReviewNoteId] = useState<string | null>(null);
-  const [reviewNote, setReviewNote] = useState('');
 
   // Selection
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -73,14 +71,10 @@ export function OrganizationJoinRequestsPage() {
     setAiSummary(null);
   }, [page]);
 
-  const handleApprove = async (id: string) => {
-    if (!confirm('이 요청을 승인하시겠습니까?')) return;
+  const handleApprove = async (id: string, reason?: string) => {
     setActionLoading(id);
     try {
-      const note = reviewNoteId === id ? reviewNote : undefined;
-      await joinRequestApi.approve(id, note);
-      setReviewNoteId(null);
-      setReviewNote('');
+      await joinRequestApi.approve(id, reason);
       await loadRequests();
     } catch (err: any) {
       toast.error(err.message || '승인에 실패했습니다.');
@@ -89,14 +83,10 @@ export function OrganizationJoinRequestsPage() {
     }
   };
 
-  const handleReject = async (id: string) => {
-    if (!confirm('이 요청을 반려하시겠습니까?')) return;
+  const handleReject = async (id: string, reason?: string) => {
     setActionLoading(id);
     try {
-      const note = reviewNoteId === id ? reviewNote : undefined;
-      await joinRequestApi.reject(id, note);
-      setReviewNoteId(null);
-      setReviewNote('');
+      await joinRequestApi.reject(id, reason);
       await loadRequests();
     } catch (err: any) {
       toast.error(err.message || '반려에 실패했습니다.');
@@ -215,49 +205,49 @@ export function OrganizationJoinRequestsPage() {
       header: '처리',
       system: true,
       align: 'center',
-      width: '220px',
+      width: '100px',
       onCellClick: () => {},
       render: (_v, row) => (
-        <div>
-          <div className="flex gap-1.5 justify-center">
-            <button
-              onClick={() =>
-                reviewNoteId === row.id
-                  ? setReviewNoteId(null)
-                  : (setReviewNoteId(row.id), setReviewNote(''))
-              }
-              className="px-2.5 py-1 text-xs bg-slate-100 border border-slate-300 rounded hover:bg-slate-200"
-            >
-              메모
-            </button>
-            <button
-              onClick={() => handleApprove(row.id)}
-              disabled={actionLoading === row.id}
-              className="px-3 py-1 text-xs font-semibold text-white bg-green-500 rounded hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              승인
-            </button>
-            <button
-              onClick={() => handleReject(row.id)}
-              disabled={actionLoading === row.id}
-              className="px-3 py-1 text-xs font-semibold text-white bg-red-500 rounded hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              반려
-            </button>
+        actionLoading === row.id ? (
+          <div className="flex justify-center">
+            <div className="w-4 h-4 border-2 border-slate-300 border-t-blue-500 rounded-full animate-spin" />
           </div>
-          {reviewNoteId === row.id && (
-            <div className="mt-2">
-              <input
-                type="text"
-                value={reviewNote}
-                onChange={(e) => setReviewNote(e.target.value)}
-                onClick={(e) => e.stopPropagation()}
-                placeholder="처리 메모 입력"
-                className="w-full px-2 py-1 text-xs border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-400"
-              />
-            </div>
-          )}
-        </div>
+        ) : (
+          <RowActionMenu
+            inlineMax={2}
+            actions={[
+              {
+                key: 'approve',
+                label: '승인',
+                icon: <CheckCircle className="w-4 h-4" />,
+                onClick: (reason) => handleApprove(row.id, reason),
+                variant: 'primary',
+                confirm: {
+                  title: '승인 확인',
+                  message: '이 요청을 승인하시겠습니까?',
+                  confirmText: '승인',
+                  showReason: true,
+                  reasonPlaceholder: '처리 메모 입력 (선택)',
+                },
+              },
+              {
+                key: 'reject',
+                label: '반려',
+                icon: <XCircle className="w-4 h-4" />,
+                onClick: (reason) => handleReject(row.id, reason),
+                variant: 'danger',
+                confirm: {
+                  title: '반려 확인',
+                  message: '이 요청을 반려하시겠습니까?',
+                  variant: 'danger',
+                  confirmText: '반려',
+                  showReason: true,
+                  reasonPlaceholder: '반려 사유 입력 (선택)',
+                },
+              },
+            ]}
+          />
+        )
       ),
     },
   ];

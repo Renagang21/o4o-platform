@@ -21,8 +21,8 @@ import {
   Loader2,
 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
-import { ActionBar } from '@o4o/ui';
-import { DataTable } from '@o4o/operator-ux-core';
+import { ActionBar, BulkResultModal } from '@o4o/ui';
+import { DataTable, useBatchAction } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { forumOperatorApi } from '../../services/forumApi';
 
@@ -78,9 +78,9 @@ export default function ForumManagementPage() {
   const [reviewComment, setReviewComment] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Selection & Bulk
+  // Selection & V3 batch
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
+  const batch = useBatchAction();
 
   useEffect(() => {
     loadRequests();
@@ -135,7 +135,7 @@ export default function ForumManagementPage() {
     }
   };
 
-  // ─── Bulk Actions ───
+  // ─── V3: Batch Actions ───
 
   const handleBulkApprove = async () => {
     const reviewableIds = [...selectedIds].filter((id) => {
@@ -143,18 +143,14 @@ export default function ForumManagementPage() {
       return r && isReviewable(r.status);
     });
     if (reviewableIds.length === 0) return;
-    setIsBulkProcessing(true);
-    let success = 0;
-    for (const id of reviewableIds) {
-      try {
-        await forumOperatorApi.review(id, { action: 'approve' });
-        success++;
-      } catch { /* continue */ }
+    const result = await batch.executeBatch(
+      (batchIds) => forumOperatorApi.batchReview(batchIds, 'approve'),
+      reviewableIds,
+    );
+    if (result.successCount > 0) {
+      setSelectedIds(new Set());
+      loadRequests();
     }
-    setIsBulkProcessing(false);
-    setSelectedIds(new Set());
-    toast.success(`${success}건 일괄 승인 완료`);
-    loadRequests();
   };
 
   const handleBulkReject = async () => {
@@ -163,18 +159,14 @@ export default function ForumManagementPage() {
       return r && isReviewable(r.status);
     });
     if (reviewableIds.length === 0) return;
-    setIsBulkProcessing(true);
-    let success = 0;
-    for (const id of reviewableIds) {
-      try {
-        await forumOperatorApi.review(id, { action: 'reject', reviewComment: '일괄 거절' });
-        success++;
-      } catch { /* continue */ }
+    const result = await batch.executeBatch(
+      (batchIds) => forumOperatorApi.batchReview(batchIds, 'reject', '일괄 거절'),
+      reviewableIds,
+    );
+    if (result.successCount > 0) {
+      setSelectedIds(new Set());
+      loadRequests();
     }
-    setIsBulkProcessing(false);
-    setSelectedIds(new Set());
-    toast.success(`${success}건 일괄 거절 완료`);
-    loadRequests();
   };
 
   const selectedReviewableCount = [...selectedIds].filter((id) => {
@@ -306,28 +298,41 @@ export default function ForumManagementPage() {
         </div>
       </div>
 
-      {/* ActionBar */}
+      {/* V3: ActionBar + BulkResultModal */}
       <ActionBar
         selectedCount={selectedIds.size}
         onClearSelection={() => setSelectedIds(new Set())}
         actions={[
-          ...(selectedReviewableCount > 0 ? [{
+          {
             key: 'approve',
             label: `승인 (${selectedReviewableCount})`,
             onClick: handleBulkApprove,
             variant: 'primary' as const,
             icon: <CheckCircle size={14} />,
-            loading: isBulkProcessing,
-          }] : []),
-          ...(selectedReviewableCount > 0 ? [{
+            loading: batch.loading,
+            group: 'actions',
+            tooltip: '선택된 요청을 일괄 승인합니다',
+            visible: selectedReviewableCount > 0,
+          },
+          {
             key: 'reject',
             label: `거절 (${selectedReviewableCount})`,
             onClick: handleBulkReject,
             variant: 'danger' as const,
             icon: <XCircle size={14} />,
-            loading: isBulkProcessing,
-          }] : []),
+            loading: batch.loading,
+            group: 'actions',
+            tooltip: '선택된 요청을 일괄 거절합니다',
+            visible: selectedReviewableCount > 0,
+          },
         ]}
+      />
+
+      <BulkResultModal
+        open={batch.showResult}
+        onClose={() => { batch.clearResult(); loadRequests(); }}
+        result={batch.result}
+        onRetry={() => { batch.retryFailed(); }}
       />
 
       {/* DataTable */}

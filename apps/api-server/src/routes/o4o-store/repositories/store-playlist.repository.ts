@@ -484,6 +484,76 @@ export class StorePlaylistRepository {
   }
 
   /**
+   * Add item from signage media — creates/reuses snapshot via AssetCopyService then adds to playlist.
+   * WO-O4O-SIGNAGE-STORE-PLAYLIST-AUTOSNAPSHOT-IMPLEMENTATION-V1
+   */
+  async addItemFromSignage(
+    playlistId: string,
+    mediaId: string,
+    organizationId: string,
+    userId: string,
+  ): Promise<{ id: string; snapshotId: string; displayOrder: number; isForced: boolean; isLocked: boolean; createdAt: Date }> {
+    // Verify signage_media belongs to this organization
+    const mediaRows = await this.dataSource.query(
+      `SELECT "id", "name", "mediaType", "sourceType", "sourceUrl",
+              "thumbnailUrl", "duration", "resolution", "content", "tags", "category", "description", "metadata"
+       FROM "signage_media"
+       WHERE "id" = $1 AND "organizationId" = $2 AND "deletedAt" IS NULL
+       LIMIT 1`,
+      [mediaId, organizationId],
+    );
+    if (mediaRows.length === 0) {
+      throw Object.assign(new Error('Signage media not found'), { statusCode: 404, code: 'NOT_FOUND' });
+    }
+
+    const media = mediaRows[0];
+
+    // Create or reuse snapshot
+    const assetCopyService = new AssetCopyService(this.dataSource);
+    let snapshotId: string;
+    try {
+      const copyResult = await assetCopyService.copyResolved({
+        sourceService: 'signage-media',
+        sourceAssetId: mediaId,
+        assetType: 'signage',
+        targetOrganizationId: organizationId,
+        createdBy: userId,
+        title: media.name,
+        contentJson: {
+          title: media.name,
+          mediaType: media.mediaType,
+          sourceType: media.sourceType,
+          sourceUrl: media.sourceUrl,
+          thumbnailUrl: media.thumbnailUrl,
+          duration: media.duration,
+          resolution: media.resolution,
+          content: media.content,
+          tags: media.tags,
+          category: media.category,
+          description: media.description,
+          metadata: media.metadata,
+          source: 'signage-media',
+        },
+      });
+      snapshotId = copyResult.snapshot.id;
+    } catch (err: any) {
+      if (err.message === 'DUPLICATE_SNAPSHOT') {
+        const existing = await this.dataSource.query(
+          `SELECT id FROM o4o_asset_snapshots
+           WHERE organization_id = $1 AND source_asset_id = $2 AND asset_type = 'signage'
+           LIMIT 1`,
+          [organizationId, mediaId],
+        );
+        snapshotId = existing[0].id;
+      } else {
+        throw err;
+      }
+    }
+
+    return this.addItem(playlistId, snapshotId);
+  }
+
+  /**
    * Delete item — checks locked status first.
    */
   async deleteItem(

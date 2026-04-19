@@ -26,12 +26,12 @@ import {
   Loader2,
   AlertCircle,
   X,
-  ChevronRight,
   Eye,
   EyeOff,
+  Sparkles,
 } from 'lucide-react';
-import { ActionBar } from '@o4o/ui';
-import { DataTable } from '@o4o/operator-ux-core';
+import { ActionBar, BulkResultModal, RowActionMenu } from '@o4o/ui';
+import { DataTable, useBatchAction, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { authClient } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
@@ -131,6 +131,72 @@ function getRoleLabel(u: UserData): string {
   return roles.join(', ');
 }
 
+// ─── V4: Action Policy ───────────────────────────────────────
+
+const userActionPolicy = defineActionPolicy<UserData>('kpa:users', {
+  rules: [
+    {
+      key: 'approve',
+      label: '승인',
+      variant: 'primary',
+      visible: (row) => row.status === 'pending' || row.status === 'rejected',
+      confirm: { title: '승인 확인', message: '이 사용자를 승인 처리하시겠습니까?', confirmText: '승인' },
+    },
+    {
+      key: 'reject',
+      label: '거부',
+      variant: 'danger',
+      visible: (row) => row.status === 'pending',
+      confirm: { title: '거부 확인', message: '이 사용자를 거부 처리하시겠습니까?', variant: 'danger', confirmText: '거부' },
+    },
+    {
+      key: 'suspend',
+      label: '정지',
+      variant: 'warning',
+      visible: (row) => row.status === 'active' || row.status === 'approved',
+      confirm: { title: '정지 확인', message: '이 사용자를 정지 처리하시겠습니까?', variant: 'warning', confirmText: '정지' },
+    },
+    {
+      key: 'activate',
+      label: '활성화',
+      variant: 'primary',
+      visible: (row) => row.status === 'suspended',
+      confirm: { title: '활성화 확인', message: '이 사용자를 활성화하시겠습니까?', confirmText: '활성화' },
+    },
+    {
+      key: 'edit',
+      label: '정보 수정',
+      divider: true,
+    },
+    {
+      key: 'password',
+      label: '비밀번호 변경',
+    },
+    {
+      key: 'delete',
+      label: '삭제',
+      variant: 'danger',
+      divider: true,
+      confirm: (row) => ({
+        title: '사용자 삭제',
+        message: `${getUserName(row)} (${row.email})\n\n이 사용자를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`,
+        variant: 'danger',
+        confirmText: '삭제',
+      }),
+    },
+  ],
+});
+
+const USER_ACTION_ICONS: Record<string, React.ReactNode> = {
+  approve: <UserCheck className="w-4 h-4" />,
+  reject: <UserX className="w-4 h-4" />,
+  suspend: <XCircle className="w-4 h-4" />,
+  activate: <CheckCircle className="w-4 h-4" />,
+  edit: <Pencil className="w-4 h-4" />,
+  password: <KeyRound className="w-4 h-4" />,
+  delete: <Trash2 className="w-4 h-4" />,
+};
+
 // ─── Password Modal ──────────────────────────────────────────
 
 function PasswordModal({ user, onClose, onSuccess }: { user: UserData; onClose: () => void; onSuccess: () => void }) {
@@ -225,7 +291,17 @@ export default function UsersPage() {
   const [passwordUser, setPasswordUser] = useState<UserData | null>(null);
   const [editUser, setEditUser] = useState<UserData | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
+  const batch = useBatchAction();
+
+  // V3: AI summary state
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiSummary, setAiSummary] = useState<{
+    summary: string;
+    patterns: string[];
+    recommendations: string[];
+    warnings: string[];
+    source: 'ai' | 'rule-based';
+  } | null>(null);
 
   // Stats
   const [stats, setStats] = useState({ total: 0, active: 0, pending: 0, rejected: 0 });
@@ -276,11 +352,10 @@ export default function UsersPage() {
   // Reset selection on tab/filter/search change
   useEffect(() => {
     setSelectedIds(new Set());
+    setAiSummary(null);
   }, [tab, statusFilter, search]);
 
   const handleStatusChange = async (userId: string, status: string) => {
-    const label = status === 'approved' ? '승인' : status === 'rejected' ? '거부' : status;
-    if (!confirm(`이 사용자를 ${label} 처리하시겠습니까?`)) return;
     setActionLoading(userId);
     try {
       await apiFetch(`/api/v1/operator/members/${userId}/status`, {
@@ -297,7 +372,6 @@ export default function UsersPage() {
   };
 
   const handleDelete = async (user: UserData) => {
-    if (!confirm(`${getUserName(user)} (${user.email}) 사용자를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
     setActionLoading(user.id);
     try {
       await apiFetch(`/api/v1/operator/members/${user.id}`, { method: 'DELETE' });
@@ -310,7 +384,7 @@ export default function UsersPage() {
     }
   };
 
-  // ─── Bulk Actions ───
+  // ─── V3: Batch Actions ───
 
   const handleBulkApprove = async () => {
     const targetIds = [...selectedIds].filter((id) => {
@@ -318,19 +392,18 @@ export default function UsersPage() {
       return u?.status === 'pending' || u?.status === 'rejected';
     });
     if (targetIds.length === 0) return;
-    setIsBulkProcessing(true);
-    for (const id of targetIds) {
-      try {
-        await apiFetch(`/api/v1/operator/members/${id}/status`, {
-          method: 'PATCH',
-          body: JSON.stringify({ status: 'approved' }),
-        });
-      } catch { /* continue */ }
+    const result = await batch.executeBatch(
+      (batchIds) => apiFetch(`/api/v1/operator/members/batch-status`, {
+        method: 'POST',
+        body: JSON.stringify({ ids: batchIds, status: 'approved' }),
+      }),
+      targetIds,
+    );
+    if (result.successCount > 0) {
+      setSelectedIds(new Set());
+      fetchUsers(pagination.page);
+      fetchStats();
     }
-    setIsBulkProcessing(false);
-    setSelectedIds(new Set());
-    fetchUsers(pagination.page);
-    fetchStats();
   };
 
   const handleBulkReject = async () => {
@@ -339,19 +412,18 @@ export default function UsersPage() {
       return u?.status === 'pending';
     });
     if (targetIds.length === 0) return;
-    setIsBulkProcessing(true);
-    for (const id of targetIds) {
-      try {
-        await apiFetch(`/api/v1/operator/members/${id}/status`, {
-          method: 'PATCH',
-          body: JSON.stringify({ status: 'rejected' }),
-        });
-      } catch { /* continue */ }
+    const result = await batch.executeBatch(
+      (batchIds) => apiFetch(`/api/v1/operator/members/batch-status`, {
+        method: 'POST',
+        body: JSON.stringify({ ids: batchIds, status: 'rejected' }),
+      }),
+      targetIds,
+    );
+    if (result.successCount > 0) {
+      setSelectedIds(new Set());
+      fetchUsers(pagination.page);
+      fetchStats();
     }
-    setIsBulkProcessing(false);
-    setSelectedIds(new Set());
-    fetchUsers(pagination.page);
-    fetchStats();
   };
 
   const handleBulkSuspend = async () => {
@@ -360,19 +432,45 @@ export default function UsersPage() {
       return u?.status === 'active' || u?.status === 'approved';
     });
     if (targetIds.length === 0) return;
-    setIsBulkProcessing(true);
-    for (const id of targetIds) {
-      try {
-        await apiFetch(`/api/v1/operator/members/${id}/status`, {
-          method: 'PATCH',
-          body: JSON.stringify({ status: 'suspended' }),
-        });
-      } catch { /* continue */ }
+    const result = await batch.executeBatch(
+      (batchIds) => apiFetch(`/api/v1/operator/members/batch-status`, {
+        method: 'POST',
+        body: JSON.stringify({ ids: batchIds, status: 'suspended' }),
+      }),
+      targetIds,
+    );
+    if (result.successCount > 0) {
+      setSelectedIds(new Set());
+      fetchUsers(pagination.page);
+      fetchStats();
     }
-    setIsBulkProcessing(false);
-    setSelectedIds(new Set());
-    fetchUsers(pagination.page);
-    fetchStats();
+  };
+
+  // ─── V3: AI Summary ───
+
+  const handleAiSummarize = async () => {
+    if (selectedIds.size === 0) return;
+    setAiLoading(true);
+    try {
+      const selectedItems = users.filter(u => selectedIds.has(u.id));
+      const items = selectedItems.map(u => ({
+        id: u.id,
+        name: getUserName(u),
+        email: u.email,
+        status: u.status,
+        role: getRoleLabel(u),
+        created_at: u.createdAt,
+      }));
+      const res = await apiFetch<{ success: boolean; data: any }>('/api/v1/kpa/operator/ai/summarize-selection', {
+        method: 'POST',
+        body: JSON.stringify({ items, context: '회원 관리 — 승인/거부/정지 대상 분석' }),
+      });
+      setAiSummary(res.data);
+    } catch {
+      toast.error('AI 요약에 실패했습니다.');
+    } finally {
+      setAiLoading(false);
+    }
   };
 
   // ─── Bulk action counts ───
@@ -460,86 +558,26 @@ export default function UsersPage() {
     {
       key: '_actions',
       header: '관리',
-      align: 'right',
-      width: '180px',
+      align: 'center',
+      width: '60px',
       system: true,
       onCellClick: () => {},
       render: (_v, row) => (
-        <div className="flex items-center justify-end gap-1">
-          {actionLoading === row.id ? (
-            <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
-          ) : (
-            <>
-              {(row.status === 'pending') && (
-                <>
-                  <button
-                    onClick={() => handleStatusChange(row.id, 'approved')}
-                    title="승인"
-                    className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"
-                  >
-                    <UserCheck className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleStatusChange(row.id, 'rejected')}
-                    title="거부"
-                    className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg"
-                  >
-                    <UserX className="w-4 h-4" />
-                  </button>
-                </>
-              )}
-              {row.status === 'rejected' && (
-                <button
-                  onClick={() => handleStatusChange(row.id, 'approved')}
-                  title="승인"
-                  className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"
-                >
-                  <UserCheck className="w-4 h-4" />
-                </button>
-              )}
-              {(row.status === 'active' || row.status === 'approved') && (
-                <button
-                  onClick={() => handleStatusChange(row.id, 'suspended')}
-                  title="정지"
-                  className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg"
-                >
-                  <XCircle className="w-4 h-4" />
-                </button>
-              )}
-              {row.status === 'suspended' && (
-                <button
-                  onClick={() => handleStatusChange(row.id, 'approved')}
-                  title="활성화"
-                  className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"
-                >
-                  <CheckCircle className="w-4 h-4" />
-                </button>
-              )}
-              <button
-                onClick={() => setEditUser(row)}
-                title="정보 수정"
-                className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg"
-              >
-                <Pencil className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => setPasswordUser(row)}
-                title="비밀번호 변경"
-                className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg"
-              >
-                <KeyRound className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => handleDelete(row)}
-                title="삭제"
-                className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-              <ChevronRight className="w-4 h-4 text-slate-300 ml-1" />
-            </>
-          )}
-        </div>
+        actionLoading === row.id ? (
+          <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
+        ) : (
+          <RowActionMenu
+            actions={buildRowActions(userActionPolicy, row, {
+              approve: () => handleStatusChange(row.id, 'approved'),
+              reject: () => handleStatusChange(row.id, 'rejected'),
+              suspend: () => handleStatusChange(row.id, 'suspended'),
+              activate: () => handleStatusChange(row.id, 'approved'),
+              edit: () => setEditUser(row),
+              password: () => setPasswordUser(row),
+              delete: () => handleDelete(row),
+            }, { icons: USER_ACTION_ICONS })}
+          />
+        )
       ),
     },
   ];
@@ -547,36 +585,50 @@ export default function UsersPage() {
   // ─── Bulk action bar actions ───
 
   const bulkActions = [
-    ...(selectedApprovableCount > 0
-      ? [{
-          key: 'approve',
-          label: `승인 (${selectedApprovableCount})`,
-          onClick: handleBulkApprove,
-          variant: 'primary' as const,
-          icon: <UserCheck size={14} />,
-          loading: isBulkProcessing,
-        }]
-      : []),
-    ...(selectedPendingCount > 0
-      ? [{
-          key: 'reject',
-          label: `거부 (${selectedPendingCount})`,
-          onClick: handleBulkReject,
-          variant: 'danger' as const,
-          icon: <UserX size={14} />,
-          loading: isBulkProcessing,
-        }]
-      : []),
-    ...(selectedSuspendableCount > 0
-      ? [{
-          key: 'suspend',
-          label: `정지 (${selectedSuspendableCount})`,
-          onClick: handleBulkSuspend,
-          variant: 'warning' as const,
-          icon: <XCircle size={14} />,
-          loading: isBulkProcessing,
-        }]
-      : []),
+    {
+      key: 'approve',
+      label: `승인 (${selectedApprovableCount})`,
+      onClick: handleBulkApprove,
+      variant: 'primary' as const,
+      icon: <UserCheck size={14} />,
+      loading: batch.loading,
+      group: 'actions',
+      tooltip: '선택된 회원을 일괄 승인합니다',
+      visible: selectedApprovableCount > 0,
+    },
+    {
+      key: 'reject',
+      label: `거부 (${selectedPendingCount})`,
+      onClick: handleBulkReject,
+      variant: 'danger' as const,
+      icon: <UserX size={14} />,
+      loading: batch.loading,
+      group: 'actions',
+      tooltip: '선택된 대기 회원을 일괄 거부합니다',
+      visible: selectedPendingCount > 0,
+    },
+    {
+      key: 'suspend',
+      label: `정지 (${selectedSuspendableCount})`,
+      onClick: handleBulkSuspend,
+      variant: 'warning' as const,
+      icon: <XCircle size={14} />,
+      loading: batch.loading,
+      group: 'danger',
+      tooltip: '선택된 활성 회원을 일괄 정지합니다',
+      visible: selectedSuspendableCount > 0,
+    },
+    {
+      key: 'ai-summary',
+      label: 'AI 요약',
+      onClick: handleAiSummarize,
+      variant: 'default' as const,
+      icon: <Sparkles size={14} />,
+      loading: aiLoading,
+      group: 'ai',
+      tooltip: '선택된 항목을 AI로 분석합니다',
+      visible: selectedIds.size >= 2,
+    },
   ];
 
   return (
@@ -676,14 +728,54 @@ export default function UsersPage() {
         </div>
       )}
 
-      {/* Action Bar */}
+      {/* V3: ActionBar + BulkResultModal */}
       <div className="mb-3">
         <ActionBar
           selectedCount={selectedIds.size}
-          onClearSelection={() => setSelectedIds(new Set())}
+          onClearSelection={() => { setSelectedIds(new Set()); setAiSummary(null); }}
           actions={bulkActions}
         />
       </div>
+
+      {/* V3: AI Summary Result */}
+      {aiSummary && (
+        <div className="mb-3 p-4 bg-violet-50 border border-violet-200 rounded-lg space-y-2">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-violet-600" />
+            <span className="text-sm font-medium text-violet-800">AI 분석 결과</span>
+            <span className="text-xs text-violet-500">({aiSummary.source})</span>
+            <button
+              onClick={() => setAiSummary(null)}
+              className="ml-auto text-xs text-violet-500 hover:text-violet-700"
+            >
+              닫기
+            </button>
+          </div>
+          <p className="text-sm text-slate-700">{aiSummary.summary}</p>
+          {aiSummary.patterns.length > 0 && (
+            <div className="text-xs text-slate-600">
+              <span className="font-medium">패턴:</span> {aiSummary.patterns.join(' / ')}
+            </div>
+          )}
+          {aiSummary.recommendations.length > 0 && (
+            <div className="text-xs text-blue-700">
+              <span className="font-medium">추천:</span> {aiSummary.recommendations.join(' / ')}
+            </div>
+          )}
+          {aiSummary.warnings.length > 0 && (
+            <div className="text-xs text-amber-700">
+              <span className="font-medium">주의:</span> {aiSummary.warnings.join(' / ')}
+            </div>
+          )}
+        </div>
+      )}
+
+      <BulkResultModal
+        open={batch.showResult}
+        onClose={() => { batch.clearResult(); fetchUsers(pagination.page); fetchStats(); }}
+        result={batch.result}
+        onRetry={() => { batch.retryFailed(); }}
+      />
 
       {/* DataTable */}
       <DataTable<UserData>

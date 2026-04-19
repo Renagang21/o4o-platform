@@ -52,4 +52,7 @@ router.delete('/:userId/roles/:role', controller.removeMemberRole);
 router.patch('/:membershipId/approve', controller.approveMembership);
 router.patch('/:membershipId/reject', controller.rejectMembership);
 
+// V3 Batch — WO-O4O-TABLE-STANDARD-V3-EXPANSION
+router.post('/batch-status', controller.batchUpdateStatus);
+
 export default router;

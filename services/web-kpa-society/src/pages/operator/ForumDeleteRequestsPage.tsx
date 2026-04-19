@@ -3,6 +3,7 @@
  *
  * WO-O4O-KPA-A-FORUM-ALIGNMENT-V1
  * WO-O4O-TABLE-STANDARD-V2 — DataTable 표준 전환
+ * WO-O4O-TABLE-STANDARD-V3 — Batch API + ActionBar v2 + BulkResultModal
  *
  * 공통 /api/v1/forum/operator/* API 사용 (forumOperatorApi)
  */
@@ -17,8 +18,8 @@ import {
   Loader2,
 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
-import { ActionBar } from '@o4o/ui';
-import { DataTable } from '@o4o/operator-ux-core';
+import { ActionBar, BulkResultModal } from '@o4o/ui';
+import { DataTable, useBatchAction } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { forumOperatorApi } from '../../api/forum';
 
@@ -64,9 +65,9 @@ export default function ForumDeleteRequestsPage() {
   const [reviewComment, setReviewComment] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Selection
+  // Selection & V3 batch
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
+  const batch = useBatchAction();
 
   useEffect(() => {
     loadRequests();
@@ -114,7 +115,7 @@ export default function ForumDeleteRequestsPage() {
     }
   };
 
-  // ─── Bulk Actions ───
+  // ─── V3: Batch Actions ───
 
   const handleBulkApprove = async () => {
     const pendingIds = [...selectedIds].filter((id) => {
@@ -122,16 +123,14 @@ export default function ForumDeleteRequestsPage() {
       return r?.deleteRequestStatus === 'pending';
     });
     if (pendingIds.length === 0) return;
-    setIsBulkProcessing(true);
-    for (const id of pendingIds) {
-      try {
-        await forumOperatorApi.approveDelete(id, {});
-      } catch { /* continue */ }
+    const result = await batch.executeBatch(
+      (batchIds) => forumOperatorApi.batchApproveDelete(batchIds),
+      pendingIds,
+    );
+    if (result.successCount > 0) {
+      setSelectedIds(new Set());
+      loadRequests();
     }
-    setIsBulkProcessing(false);
-    setSelectedIds(new Set());
-    toast.success(`${pendingIds.length}건 일괄 승인 완료`);
-    loadRequests();
   };
 
   const handleBulkReject = async () => {
@@ -140,16 +139,14 @@ export default function ForumDeleteRequestsPage() {
       return r?.deleteRequestStatus === 'pending';
     });
     if (pendingIds.length === 0) return;
-    setIsBulkProcessing(true);
-    for (const id of pendingIds) {
-      try {
-        await forumOperatorApi.rejectDelete(id, { reviewComment: '일괄 반려' });
-      } catch { /* continue */ }
+    const result = await batch.executeBatch(
+      (batchIds) => forumOperatorApi.batchRejectDelete(batchIds, '일괄 반려'),
+      pendingIds,
+    );
+    if (result.successCount > 0) {
+      setSelectedIds(new Set());
+      loadRequests();
     }
-    setIsBulkProcessing(false);
-    setSelectedIds(new Set());
-    toast.success(`${pendingIds.length}건 일괄 반려 완료`);
-    loadRequests();
   };
 
   const selectedPendingCount = [...selectedIds].filter((id) => {
@@ -269,27 +266,33 @@ export default function ForumDeleteRequestsPage() {
         ))}
       </div>
 
-      {/* ActionBar */}
+      {/* V3: ActionBar with batch */}
       <ActionBar
         selectedCount={selectedIds.size}
         onClearSelection={() => setSelectedIds(new Set())}
         actions={[
-          ...(selectedPendingCount > 0 ? [{
+          {
             key: 'approve',
             label: `삭제 승인 (${selectedPendingCount})`,
             onClick: handleBulkApprove,
             variant: 'primary' as const,
             icon: <CheckCircle size={14} />,
-            loading: isBulkProcessing,
-          }] : []),
-          ...(selectedPendingCount > 0 ? [{
+            loading: batch.loading,
+            group: 'actions',
+            tooltip: '선택된 삭제 요청을 일괄 승인합니다',
+            visible: selectedPendingCount > 0,
+          },
+          {
             key: 'reject',
             label: `반려 (${selectedPendingCount})`,
             onClick: handleBulkReject,
             variant: 'danger' as const,
             icon: <XCircle size={14} />,
-            loading: isBulkProcessing,
-          }] : []),
+            loading: batch.loading,
+            group: 'actions',
+            tooltip: '선택된 삭제 요청을 일괄 반려합니다',
+            visible: selectedPendingCount > 0,
+          },
         ]}
       />
 
@@ -312,6 +315,14 @@ export default function ForumDeleteRequestsPage() {
         selectable
         selectedKeys={selectedIds}
         onSelectionChange={setSelectedIds}
+      />
+
+      {/* V3: BulkResultModal */}
+      <BulkResultModal
+        open={batch.showResult}
+        onClose={() => { batch.clearResult(); loadRequests(); }}
+        result={batch.result}
+        onRetry={() => { batch.retryFailed(); }}
       />
 
       {/* Review Modal */}

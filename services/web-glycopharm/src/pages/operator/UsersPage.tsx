@@ -27,9 +27,9 @@ import {
   Eye,
   EyeOff,
 } from 'lucide-react';
-import { DataTable, ActionBar } from '@o4o/ui';
+import { DataTable, ActionBar, BulkResultModal } from '@o4o/ui';
 import type { Column } from '@o4o/ui';
-import { MemberListLayout, StatusBadge, RoleBadge, ServiceBadge } from '@o4o/operator-ux-core';
+import { MemberListLayout, StatusBadge, RoleBadge, ServiceBadge, useBatchAction } from '@o4o/operator-ux-core';
 import type { MemberTab } from '@o4o/operator-ux-core';
 import { api } from '../../lib/apiClient';
 import { toast } from '@o4o/error-handling';
@@ -314,7 +314,9 @@ export default function UsersPage() {
   const [editUser, setEditUser] = useState<UserData | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<UserData | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
+
+  // V3: Batch action hook
+  const batch = useBatchAction();
 
   // Stats
   const [stats, setStats] = useState({ total: 0, active: 0, pending: 0, rejected: 0, pharmacyCount: 0, customerCount: 0 });
@@ -402,7 +404,7 @@ export default function UsersPage() {
     setDeleteTarget(user);
   };
 
-  // ─── Bulk Actions ───
+  // ─── V3: Batch Actions (single API call) ───
 
   const handleBulkApprove = async () => {
     const ids = selectedIds.filter(id => {
@@ -410,19 +412,18 @@ export default function UsersPage() {
       return u?.status === 'pending' || u?.status === 'rejected';
     });
     if (ids.length === 0) return;
-    setIsBulkProcessing(true);
-    for (const id of ids) {
-      try {
-        await apiFetch(`/api/v1/operator/members/${id}/status`, {
-          method: 'PATCH',
-          body: JSON.stringify({ status: 'approved' }),
-        });
-      } catch { /* continue */ }
+    const result = await batch.executeBatch(
+      (batchIds) => apiFetch('/api/v1/operator/members/batch-status', {
+        method: 'POST',
+        body: JSON.stringify({ ids: batchIds, status: 'approved' }),
+      }),
+      ids,
+    );
+    if (result.successCount > 0) {
+      setSelectedIds([]);
+      fetchUsers(pagination.page);
+      fetchStats();
     }
-    setIsBulkProcessing(false);
-    setSelectedIds([]);
-    fetchUsers(pagination.page);
-    fetchStats();
   };
 
   const handleBulkReject = async () => {
@@ -431,19 +432,18 @@ export default function UsersPage() {
       return u?.status === 'pending';
     });
     if (ids.length === 0) return;
-    setIsBulkProcessing(true);
-    for (const id of ids) {
-      try {
-        await apiFetch(`/api/v1/operator/members/${id}/status`, {
-          method: 'PATCH',
-          body: JSON.stringify({ status: 'rejected' }),
-        });
-      } catch { /* continue */ }
+    const result = await batch.executeBatch(
+      (batchIds) => apiFetch('/api/v1/operator/members/batch-status', {
+        method: 'POST',
+        body: JSON.stringify({ ids: batchIds, status: 'rejected' }),
+      }),
+      ids,
+    );
+    if (result.successCount > 0) {
+      setSelectedIds([]);
+      fetchUsers(pagination.page);
+      fetchStats();
     }
-    setIsBulkProcessing(false);
-    setSelectedIds([]);
-    fetchUsers(pagination.page);
-    fetchStats();
   };
 
   // ─── Role tab filtering (client-side) ──────────────
@@ -613,7 +613,7 @@ export default function UsersPage() {
           </div>
         )}
 
-        {/* Bulk Actions */}
+        {/* V3: Bulk Actions with batch API */}
         {(() => {
           const selectedPendingCount = selectedIds.filter(id => {
             const u = filteredUsers.find(user => user.id === id);
@@ -629,22 +629,28 @@ export default function UsersPage() {
                 selectedCount={selectedIds.length}
                 onClearSelection={() => setSelectedIds([])}
                 actions={[
-                  ...(selectedApprovableCount > 0 ? [{
+                  {
                     key: 'approve',
                     label: `승인 (${selectedApprovableCount})`,
                     onClick: handleBulkApprove,
                     variant: 'primary' as const,
                     icon: <UserCheck size={14} />,
-                    loading: isBulkProcessing,
-                  }] : []),
-                  ...(selectedPendingCount > 0 ? [{
+                    loading: batch.loading,
+                    group: 'actions',
+                    tooltip: '선택된 회원을 일괄 승인합니다',
+                    visible: selectedApprovableCount > 0,
+                  },
+                  {
                     key: 'reject',
                     label: `거부 (${selectedPendingCount})`,
                     onClick: handleBulkReject,
                     variant: 'danger' as const,
                     icon: <UserX size={14} />,
-                    loading: isBulkProcessing,
-                  }] : []),
+                    loading: batch.loading,
+                    group: 'actions',
+                    tooltip: '선택된 대기 회원을 일괄 거부합니다',
+                    visible: selectedPendingCount > 0,
+                  },
                 ]}
               />
             </div>
@@ -700,6 +706,14 @@ export default function UsersPage() {
           onDeleted={() => { fetchUsers(pagination.page); fetchStats(); setDeleteTarget(null); }}
         />
       )}
+
+      {/* V3: BulkResultModal */}
+      <BulkResultModal
+        open={batch.showResult}
+        onClose={() => { batch.clearResult(); fetchUsers(pagination.page); fetchStats(); }}
+        result={batch.result}
+        onRetry={() => { batch.retryFailed(); }}
+      />
     </div>
   );
 }

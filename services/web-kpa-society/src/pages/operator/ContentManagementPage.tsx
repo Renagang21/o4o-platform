@@ -30,8 +30,8 @@ import {
   Search,
   Archive,
 } from 'lucide-react';
-import { ActionBar } from '@o4o/ui';
-import { DataTable } from '@o4o/operator-ux-core';
+import { ActionBar, BulkResultModal, RowActionMenu } from '@o4o/ui';
+import { DataTable, useBatchAction, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { getAccessToken } from '../../contexts/AuthContext';
 import { assetSnapshotApi } from '../../api/assetSnapshot';
@@ -93,6 +93,83 @@ function formatDate(dateStr: string | null): string {
   if (!dateStr) return '-';
   return new Date(dateStr).toLocaleDateString('ko-KR');
 }
+
+// ─── V4: Action Policy ───────────────────────────────────────
+
+const contentActionPolicy = defineActionPolicy<CmsContent>('kpa:content', {
+  rules: [
+    {
+      key: 'unpublish',
+      label: '비공개',
+      visible: (row) => row.status === 'published',
+      confirm: (row) => ({
+        title: '상태 변경',
+        message: `"${row.title}"을(를) 비공개 상태로 변경하시겠습니까?`,
+        confirmText: '비공개 전환',
+      }),
+    },
+    {
+      key: 'publish',
+      label: '게시',
+      visible: (row) => row.status === 'draft',
+      confirm: (row) => ({
+        title: '상태 변경',
+        message: `"${row.title}"을(를) 게시하시겠습니까?`,
+        confirmText: '게시',
+      }),
+    },
+    {
+      key: 'edit',
+      label: '수정',
+      variant: 'primary',
+      visible: (row) => row.status !== 'archived',
+    },
+    {
+      key: 'copy',
+      label: '매장으로 복사',
+      visible: (row) => row.status !== 'archived',
+      confirm: (row) => ({
+        title: '매장 복사',
+        message: `"${row.title}"을(를) 매장으로 복사하시겠습니까?`,
+        confirmText: '복사',
+      }),
+    },
+    {
+      key: 'archive',
+      label: '보관',
+      variant: 'danger',
+      divider: true,
+      visible: (row) => row.status !== 'archived',
+      confirm: (row) => ({
+        title: '보관 확인',
+        message: `"${row.title}"을(를) 보관 처리하시겠습니까?\n보관된 콘텐츠는 이후 완전 삭제할 수 있습니다.`,
+        variant: 'danger',
+        confirmText: '보관',
+      }),
+    },
+    {
+      key: 'hard-delete',
+      label: '완전 삭제',
+      variant: 'danger',
+      visible: (row) => row.status === 'archived',
+      confirm: (row) => ({
+        title: '완전 삭제',
+        message: `"${row.title}"\n\n보관된 콘텐츠를 완전 삭제합니다.\n이 작업은 되돌릴 수 없습니다.`,
+        variant: 'danger',
+        confirmText: '완전 삭제',
+      }),
+    },
+  ],
+});
+
+const CONTENT_ACTION_ICONS: Record<string, React.ReactNode> = {
+  unpublish: <EyeOff className="w-4 h-4" />,
+  publish: <Eye className="w-4 h-4" />,
+  edit: <Pencil className="w-4 h-4" />,
+  copy: <Copy className="w-4 h-4" />,
+  archive: <Archive className="w-4 h-4" />,
+  'hard-delete': <Trash2 className="w-4 h-4" />,
+};
 
 // ─── Component ───────────────────────────────────────────────
 
@@ -226,7 +303,7 @@ function ContentList({
   const [pickedOnly, setPickedOnly] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
+  const batch = useBatchAction();
   const limit = 20;
 
   const fetchItems = useCallback(async () => {
@@ -255,8 +332,6 @@ function ContentList({
 
   async function handleStatusToggle(item: CmsContent) {
     const newStatus: ContentStatus = item.status === 'published' ? 'draft' : 'published';
-    const label = newStatus === 'published' ? '게시' : '임시저장';
-    if (!confirm(`"${item.title}"을(를) ${label} 상태로 변경하시겠습니까?`)) return;
     setActionLoading(item.id);
     try {
       await apiFetch(`/api/v1/kpa/news/${item.id}`, {
@@ -272,7 +347,6 @@ function ContentList({
   }
 
   async function handleDelete(item: CmsContent) {
-    if (!confirm(`"${item.title}"을(를) 보관 처리하시겠습니까?\n(보관된 콘텐츠는 이후 완전 삭제할 수 있습니다)`)) return;
     setActionLoading(item.id);
     try {
       await apiFetch(`/api/v1/kpa/news/${item.id}`, { method: 'DELETE' });
@@ -285,7 +359,6 @@ function ContentList({
   }
 
   async function handleHardDelete(item: CmsContent) {
-    if (!confirm(`"${item.title}"\n\n보관된 콘텐츠를 완전 삭제합니다. 이 작업은 되돌릴 수 없습니다.\n계속하시겠습니까?`)) return;
     setActionLoading(item.id);
     try {
       await apiFetch(`/api/v1/kpa/news/${item.id}/hard`, { method: 'DELETE' });
@@ -299,7 +372,6 @@ function ContentList({
   }
 
   async function handleCopyToStore(item: CmsContent) {
-    if (!confirm(`"${item.title}"을(를) 매장으로 복사하시겠습니까?`)) return;
     setActionLoading(item.id);
     try {
       await assetSnapshotApi.copy({
@@ -325,7 +397,7 @@ function ContentList({
     }
   }
 
-  // ─── Bulk Actions ───
+  // ─── V3: Batch Actions ───
 
   async function handleBulkPublish() {
     const draftIds = [...selectedIds].filter((id) => {
@@ -333,18 +405,17 @@ function ContentList({
       return item?.status === 'draft';
     });
     if (draftIds.length === 0) return;
-    setIsBulkProcessing(true);
-    for (const id of draftIds) {
-      try {
-        await apiFetch(`/api/v1/kpa/news/${id}`, {
-          method: 'PUT',
-          body: JSON.stringify({ status: 'published' }),
-        });
-      } catch { /* continue */ }
+    const result = await batch.executeBatch(
+      (batchIds) => apiFetch(`/api/v1/kpa/news/batch-publish`, {
+        method: 'POST',
+        body: JSON.stringify({ ids: batchIds }),
+      }),
+      draftIds,
+    );
+    if (result.successCount > 0) {
+      setSelectedIds(new Set());
+      await fetchItems();
     }
-    setIsBulkProcessing(false);
-    setSelectedIds(new Set());
-    await fetchItems();
   }
 
   async function handleBulkArchive() {
@@ -353,15 +424,17 @@ function ContentList({
       return item?.status !== 'archived';
     });
     if (archivableIds.length === 0) return;
-    setIsBulkProcessing(true);
-    for (const id of archivableIds) {
-      try {
-        await apiFetch(`/api/v1/kpa/news/${id}`, { method: 'DELETE' });
-      } catch { /* continue */ }
+    const result = await batch.executeBatch(
+      (batchIds) => apiFetch(`/api/v1/kpa/news/batch-archive`, {
+        method: 'POST',
+        body: JSON.stringify({ ids: batchIds }),
+      }),
+      archivableIds,
+    );
+    if (result.successCount > 0) {
+      setSelectedIds(new Set());
+      onDeleted();
     }
-    setIsBulkProcessing(false);
-    setSelectedIds(new Set());
-    onDeleted();
   }
 
   async function handleBulkHardDelete() {
@@ -371,15 +444,17 @@ function ContentList({
     });
     if (archivedIds.length === 0) return;
     if (!confirm(`${archivedIds.length}개 보관된 콘텐츠를 완전 삭제합니다. 이 작업은 되돌릴 수 없습니다.`)) return;
-    setIsBulkProcessing(true);
-    for (const id of archivedIds) {
-      try {
-        await apiFetch(`/api/v1/kpa/news/${id}/hard`, { method: 'DELETE' });
-      } catch { /* continue */ }
+    const result = await batch.executeBatch(
+      (batchIds) => apiFetch(`/api/v1/kpa/news/batch-hard-delete`, {
+        method: 'POST',
+        body: JSON.stringify({ ids: batchIds }),
+      }),
+      archivedIds,
+    );
+    if (result.successCount > 0) {
+      setSelectedIds(new Set());
+      onDeleted();
     }
-    setIsBulkProcessing(false);
-    setSelectedIds(new Set());
-    onDeleted();
   }
 
   // ─── Bulk action counts ───
@@ -456,54 +531,25 @@ function ContentList({
     {
       key: '_actions',
       header: '액션',
-      width: '130px',
+      width: '60px',
       system: true,
+      align: 'center',
       onCellClick: () => {},
       render: (_v, row) => (
-        <>
-          {actionLoading === row.id ? (
-            <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
-          ) : row.status !== 'archived' ? (
-            <div className="flex gap-1">
-              <button
-                onClick={() => handleCopyToStore(row)}
-                className="p-1 text-green-600 hover:bg-green-50 rounded"
-                title="매장으로 복사"
-              >
-                <Copy className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => handleStatusToggle(row)}
-                className="p-1 text-slate-500 hover:bg-slate-100 rounded"
-                title={row.status === 'published' ? '비공개' : '게시'}
-              >
-                {row.status === 'published' ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
-              <button
-                onClick={() => onEdit(row)}
-                className="p-1 text-blue-500 hover:bg-blue-50 rounded"
-                title="수정"
-              >
-                <Pencil className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => handleDelete(row)}
-                className="p-1 text-red-500 hover:bg-red-50 rounded"
-                title="삭제"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => handleHardDelete(row)}
-              className="p-1 text-red-500 hover:bg-red-50 rounded"
-              title="완전 삭제"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
-          )}
-        </>
+        actionLoading === row.id ? (
+          <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
+        ) : (
+          <RowActionMenu
+            actions={buildRowActions(contentActionPolicy, row, {
+              unpublish: () => handleStatusToggle(row),
+              publish: () => handleStatusToggle(row),
+              edit: () => onEdit(row),
+              copy: () => handleCopyToStore(row),
+              archive: () => handleDelete(row),
+              'hard-delete': () => handleHardDelete(row),
+            }, { icons: CONTENT_ACTION_ICONS })}
+          />
+        )
       ),
     },
   ];
@@ -568,45 +614,55 @@ function ContentList({
         )}
       </div>
 
-      {/* Action Bar */}
+      {/* V3: ActionBar with batch + BulkResultModal */}
       <div className="mb-3">
         <ActionBar
           selectedCount={selectedIds.size}
           onClearSelection={() => setSelectedIds(new Set())}
           actions={[
-            ...(selectedDraftCount > 0
-              ? [{
-                  key: 'publish',
-                  label: `게시 (${selectedDraftCount})`,
-                  onClick: handleBulkPublish,
-                  variant: 'primary' as const,
-                  icon: <Eye size={14} />,
-                  loading: isBulkProcessing,
-                }]
-              : []),
-            ...(selectedArchivableCount > 0
-              ? [{
-                  key: 'archive',
-                  label: `보관 (${selectedArchivableCount})`,
-                  onClick: handleBulkArchive,
-                  variant: 'warning' as const,
-                  icon: <Archive size={14} />,
-                  loading: isBulkProcessing,
-                }]
-              : []),
-            ...(selectedArchivedCount > 0
-              ? [{
-                  key: 'hardDelete',
-                  label: `완전 삭제 (${selectedArchivedCount})`,
-                  onClick: handleBulkHardDelete,
-                  variant: 'danger' as const,
-                  icon: <Trash2 size={14} />,
-                  loading: isBulkProcessing,
-                }]
-              : []),
+            {
+              key: 'publish',
+              label: `게시 (${selectedDraftCount})`,
+              onClick: handleBulkPublish,
+              variant: 'primary' as const,
+              icon: <Eye size={14} />,
+              loading: batch.loading,
+              group: 'actions',
+              tooltip: '선택된 임시저장 콘텐츠를 일괄 게시합니다',
+              visible: selectedDraftCount > 0,
+            },
+            {
+              key: 'archive',
+              label: `보관 (${selectedArchivableCount})`,
+              onClick: handleBulkArchive,
+              variant: 'warning' as const,
+              icon: <Archive size={14} />,
+              loading: batch.loading,
+              group: 'actions',
+              tooltip: '선택된 콘텐츠를 일괄 보관합니다',
+              visible: selectedArchivableCount > 0,
+            },
+            {
+              key: 'hardDelete',
+              label: `완전 삭제 (${selectedArchivedCount})`,
+              onClick: handleBulkHardDelete,
+              variant: 'danger' as const,
+              icon: <Trash2 size={14} />,
+              loading: batch.loading,
+              group: 'danger',
+              tooltip: '선택된 보관 콘텐츠를 완전 삭제합니다 (되돌릴 수 없음)',
+              visible: selectedArchivedCount > 0,
+            },
           ]}
         />
       </div>
+
+      <BulkResultModal
+        open={batch.showResult}
+        onClose={() => { batch.clearResult(); fetchItems(); }}
+        result={batch.result}
+        onRetry={() => { batch.retryFailed(); }}
+      />
 
       {/* DataTable */}
       <DataTable<CmsContent>

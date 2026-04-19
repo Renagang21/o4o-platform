@@ -17,6 +17,11 @@
  *   GET    /delete-requests/pending-count  - 대기 중인 삭제 요청 수
  *   POST   /delete-requests/:id/approve    - 승인 (isActive=false)
  *   POST   /delete-requests/:id/reject     - 반려
+ *
+ * Batch (V3):
+ *   POST   /requests/batch-review           - 일괄 심사 (approve/reject)
+ *   POST   /delete-requests/batch-approve   - 일괄 삭제 승인
+ *   POST   /delete-requests/batch-reject    - 일괄 삭제 반려
  */
 
 import { Router, Request, Response } from 'express';
@@ -345,6 +350,171 @@ router.post('/delete-requests/:id/reject', async (req: Request, res: Response): 
     res.json({ success: true, data: updated });
   } catch (error: any) {
     logger.error('Error rejecting forum delete request:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ============================================================================
+// BATCH ENDPOINTS — WO-O4O-TABLE-STANDARD-V3-EXPANSION
+// ============================================================================
+
+/** POST /requests/batch-review — 일괄 심사 (ForumManagementPage) */
+router.post('/requests/batch-review', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const serviceCode = (req as any)._serviceCode;
+    const user = (req as AuthRequest).user!;
+    const { ids, action, reviewComment } = req.body;
+
+    if (!Array.isArray(ids) || ids.length === 0) {
+      res.status(400).json({ success: false, error: 'ids array is required' });
+      return;
+    }
+    if (ids.length > 50) {
+      res.status(400).json({ success: false, error: 'Maximum 50 items per batch' });
+      return;
+    }
+    if (!action || !['approve', 'reject'].includes(action)) {
+      res.status(400).json({ success: false, error: 'action must be approve or reject' });
+      return;
+    }
+
+    const results: Array<{ id: string; status: 'success' | 'skipped' | 'failed'; error?: string }> = [];
+
+    for (const id of ids) {
+      try {
+        const result = await forumCategoryRequestService.review(
+          id,
+          serviceCode,
+          { id: user.id, name: user.name, email: user.email, roles: user.roles },
+          { action, reviewComment },
+        );
+        if ('error' in result) {
+          results.push({ id, status: 'skipped', error: result.error.message });
+        } else {
+          results.push({ id, status: 'success' });
+        }
+      } catch (err: any) {
+        results.push({ id, status: 'failed', error: err.message || 'Unknown error' });
+      }
+    }
+
+    res.json({ success: true, data: { results } });
+  } catch (error: any) {
+    logger.error('Error batch reviewing forum requests:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/** POST /delete-requests/batch-approve — 일괄 삭제 승인 */
+router.post('/delete-requests/batch-approve', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const serviceCode = (req as any)._serviceCode;
+    const userId = (req as AuthRequest).user?.id;
+    const { ids, reviewComment } = req.body;
+
+    if (!Array.isArray(ids) || ids.length === 0) {
+      res.status(400).json({ success: false, error: 'ids array is required' });
+      return;
+    }
+    if (ids.length > 50) {
+      res.status(400).json({ success: false, error: 'Maximum 50 items per batch' });
+      return;
+    }
+
+    const categoryIds = await getCategoryIdsForService(serviceCode);
+    const results: Array<{ id: string; status: 'success' | 'skipped' | 'failed'; error?: string }> = [];
+
+    for (const id of ids) {
+      try {
+        if (!categoryIds.includes(id)) {
+          results.push({ id, status: 'failed', error: 'Category not found for this service' });
+          continue;
+        }
+        const category = await categoryRepo().findOne({ where: { id } });
+        if (!category) {
+          results.push({ id, status: 'failed', error: 'Category not found' });
+          continue;
+        }
+        const meta = category.metadata || {};
+        if (meta.deleteRequestStatus !== 'pending') {
+          results.push({ id, status: 'skipped', error: 'No pending delete request' });
+          continue;
+        }
+        category.isActive = false;
+        category.metadata = {
+          ...meta,
+          deleteRequestStatus: 'approved',
+          deleteReviewedAt: new Date().toISOString(),
+          deleteReviewedBy: userId,
+          deleteReviewComment: reviewComment?.trim() || null,
+          archivedAt: new Date().toISOString(),
+        };
+        await categoryRepo().save(category);
+        results.push({ id, status: 'success' });
+      } catch (err: any) {
+        results.push({ id, status: 'failed', error: err.message || 'Unknown error' });
+      }
+    }
+
+    res.json({ success: true, data: { results } });
+  } catch (error: any) {
+    logger.error('Error batch approving forum delete requests:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/** POST /delete-requests/batch-reject — 일괄 삭제 반려 */
+router.post('/delete-requests/batch-reject', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const serviceCode = (req as any)._serviceCode;
+    const userId = (req as AuthRequest).user?.id;
+    const { ids, reviewComment } = req.body;
+
+    if (!Array.isArray(ids) || ids.length === 0) {
+      res.status(400).json({ success: false, error: 'ids array is required' });
+      return;
+    }
+    if (ids.length > 50) {
+      res.status(400).json({ success: false, error: 'Maximum 50 items per batch' });
+      return;
+    }
+
+    const categoryIds = await getCategoryIdsForService(serviceCode);
+    const results: Array<{ id: string; status: 'success' | 'skipped' | 'failed'; error?: string }> = [];
+
+    for (const id of ids) {
+      try {
+        if (!categoryIds.includes(id)) {
+          results.push({ id, status: 'failed', error: 'Category not found for this service' });
+          continue;
+        }
+        const category = await categoryRepo().findOne({ where: { id } });
+        if (!category) {
+          results.push({ id, status: 'failed', error: 'Category not found' });
+          continue;
+        }
+        const meta = category.metadata || {};
+        if (meta.deleteRequestStatus !== 'pending') {
+          results.push({ id, status: 'skipped', error: 'No pending delete request' });
+          continue;
+        }
+        category.metadata = {
+          ...meta,
+          deleteRequestStatus: 'rejected',
+          deleteReviewedAt: new Date().toISOString(),
+          deleteReviewedBy: userId,
+          deleteReviewComment: reviewComment?.trim() || null,
+        };
+        await categoryRepo().save(category);
+        results.push({ id, status: 'success' });
+      } catch (err: any) {
+        results.push({ id, status: 'failed', error: err.message || 'Unknown error' });
+      }
+    }
+
+    res.json({ success: true, data: { results } });
+  } catch (error: any) {
+    logger.error('Error batch rejecting forum delete requests:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });

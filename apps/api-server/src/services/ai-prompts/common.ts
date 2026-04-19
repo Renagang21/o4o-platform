@@ -41,6 +41,16 @@ export function buildToneInstruction(
       professional: '신뢰감 있고 선명한 메시지로 작성하세요.',
       concise: '최대한 짧고 강렬하게 핵심만 작성하세요.',
     },
+    summary: {
+      friendly: '부드럽고 읽기 쉬운 어조로 요약하세요.',
+      professional: '정확하고 객관적인 어조로 요약하세요.',
+      concise: '군더더기 없이 핵심만 요약하세요.',
+    },
+    title_suggest: {
+      friendly: '친근하고 따뜻한 느낌의 제목을 추천하세요.',
+      professional: '신뢰감 있고 전문적인 느낌의 제목을 추천하세요.',
+      concise: '짧고 임팩트 있는 제목을 추천하세요.',
+    },
   };
 
   return map[outputType]?.[tone] ?? '';
@@ -60,6 +70,20 @@ export function buildLengthInstruction(
       long: '제목 1문장, shortText 2문장, longText 5문장 이내로 작성하세요.',
     };
     return map[length] ?? '';
+  }
+
+  if (outputType === 'summary') {
+    const map: Record<string, string> = {
+      short: '2~3줄 이내로 핵심만 요약하세요. 불릿은 3개 이내.',
+      medium: '3~5줄로 요약하세요. 불릿은 3~5개.',
+      long: '5~7줄로 상세히 요약하세요. 불릿은 5개 이상.',
+    };
+    return map[length] ?? '';
+  }
+
+  if (outputType === 'title_suggest') {
+    // title_suggest는 length 옵션이 의미 없으므로 빈 문자열 반환
+    return '';
   }
 
   // product_detail, blog: 문단 수 기준

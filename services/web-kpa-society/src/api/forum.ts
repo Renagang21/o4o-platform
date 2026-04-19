@@ -289,6 +289,16 @@ export const forumOperatorApi = {
     const res = await authClient.api.post(`${OPERATOR_BASE}/delete-requests/${id}/reject?${SVC}`, data || {});
     return res.data;
   },
+
+  // V3 Batch
+  batchApproveDelete: async (ids: string[], reviewComment?: string) => {
+    const res = await authClient.api.post(`${OPERATOR_BASE}/delete-requests/batch-approve?${SVC}`, { ids, reviewComment });
+    return res.data;
+  },
+  batchRejectDelete: async (ids: string[], reviewComment?: string) => {
+    const res = await authClient.api.post(`${OPERATOR_BASE}/delete-requests/batch-reject?${SVC}`, { ids, reviewComment });
+    return res.data;
+  },
 };
 
 // ============================================================================
