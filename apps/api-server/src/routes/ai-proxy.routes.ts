@@ -248,7 +248,7 @@ router.post('/content', authenticate, async (req, res: Response) => {
         contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
         generationConfig: {
           temperature: 0.5,
-          maxOutputTokens: 2000,
+          maxOutputTokens: 4096,
           responseMimeType: 'application/json',
         },
       }),

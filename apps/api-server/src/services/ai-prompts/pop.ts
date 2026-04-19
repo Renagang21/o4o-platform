@@ -48,21 +48,40 @@ export function buildPopUserPrompt(input: string): string {
   return `다음 원문을 바탕으로 POP 템플릿용 문구 세트를 재구성해 주세요. 원문에 없는 정보는 추가하지 마세요.\n\n[원문]\n${input.trim()}`;
 }
 
+/** 구조화 필드에서 POP용 HTML 생성 (html 필드가 비어 있을 때 사용) */
+function buildPopHtml(
+  title: string,
+  longText: string,
+  bullets: string[]
+): string {
+  const parts: string[] = [];
+  if (title) parts.push(`<p><strong>${title}</strong></p>`);
+  if (longText) parts.push(`<p>${longText}</p>`);
+  if (bullets.length > 0)
+    parts.push(`<ul>${bullets.map((b) => `<li>${b}</li>`).join('')}</ul>`);
+  return parts.length > 0 ? parts.join('') : '';
+}
+
 /** pop 응답 파싱 → NormalizedAiContentResponse */
 export function parsePopResponse(
   parsed: Record<string, any>,
   rawText: string
 ): Omit<NormalizedAiContentResponse, 'type'> {
+  const title = typeof parsed.title === 'string' ? parsed.title : '';
+  const longText = typeof parsed.longText === 'string' ? parsed.longText : '';
+  const bullets = Array.isArray(parsed.bullets) ? parsed.bullets : [];
+
   const html =
     parsed.html ||
+    buildPopHtml(title, longText, bullets) ||
     `<p>${rawText.replace(/\n{2,}/g, '</p><p>').replace(/\n/g, '<br>')}</p>`;
 
   return {
     html,
-    title: typeof parsed.title === 'string' ? parsed.title : '',
+    title,
     summary: typeof parsed.summary === 'string' ? parsed.summary : '',
-    bullets: Array.isArray(parsed.bullets) ? parsed.bullets : [],
+    bullets,
     shortText: typeof parsed.shortText === 'string' ? parsed.shortText : '',
-    longText: typeof parsed.longText === 'string' ? parsed.longText : '',
+    longText,
   };
 }
