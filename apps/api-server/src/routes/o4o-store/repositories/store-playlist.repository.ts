@@ -104,7 +104,7 @@ export class StorePlaylistRepository {
     if (serviceKey) {
       return this.dataSource.query(
         `SELECT
-           i.id,
+           i.id::text,
            i.snapshot_id AS "snapshotId",
            i.display_order AS "displayOrder",
            i.is_forced AS "isForced",
@@ -125,7 +125,7 @@ export class StorePlaylistRepository {
 
          SELECT
            'forced-' || fc.id AS id,
-           NULL AS "snapshotId",
+           NULL::uuid AS "snapshotId",
            COALESCE(fp.display_order, 9999) AS "displayOrder",
            true AS "isForced",
            fc.title,
