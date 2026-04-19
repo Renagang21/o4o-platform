@@ -190,12 +190,10 @@ export class MarketTrialOperatorController {
    * PATCH /api/v1/neture/operator/market-trial/:id/approve
    * WO-MARKET-TRIAL-NETURE-SINGLE-APPROVAL-TRANSITION-V1:
    * 네뚜레 운영자 단일 승인: SUBMITTED → RECRUITING (서비스별 2차 승인 제거)
-   * visibleServiceKeys = 운영자가 지정한 오픈 대상 서비스 범위
    */
   static async approve1st(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params;
-      const { visibleServiceKeys } = req.body;
 
       const trial = await MarketTrialOperatorController.trialRepo.findOne({ where: { id } });
       if (!trial) {
@@ -206,11 +204,6 @@ export class MarketTrialOperatorController {
           success: false,
           message: `Cannot approve: trial status is "${trial.status}", expected "submitted"`,
         });
-      }
-
-      // 오픈 대상 서비스 범위 지정 (운영자가 body로 전달 시)
-      if (Array.isArray(visibleServiceKeys)) {
-        trial.visibleServiceKeys = visibleServiceKeys;
       }
 
       // 단일 승인: SUBMITTED → RECRUITING (서비스별 2차 승인 없이 바로 모집 시작)
@@ -1401,7 +1394,6 @@ function toOperatorTrialDTO(trial: MarketTrial) {
     rewardOptions: trial.rewardOptions,
     maxParticipants: trial.maxParticipants || undefined,
     currentParticipants: trial.currentParticipants,
-    visibleServiceKeys: trial.visibleServiceKeys,
     startDate: trial.fundingStartAt ? new Date(trial.fundingStartAt).toISOString() : undefined,
     endDate: trial.fundingEndAt ? new Date(trial.fundingEndAt).toISOString() : undefined,
     trialPeriodDays: trial.trialPeriodDays,
