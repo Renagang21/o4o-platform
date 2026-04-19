@@ -230,17 +230,16 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
       >
         <List size={18} />
       </ToolButton>
+      <ToolButton
+        onClick={() => editor.chain().focus().toggleOrderedList().run()}
+        isActive={editor.isActive('orderedList')}
+        title="번호 매기기"
+      >
+        <ListOrdered size={18} />
+      </ToolButton>
 
       {preset === 'full' && (
         <>
-          <ToolButton
-            onClick={() => editor.chain().focus().toggleOrderedList().run()}
-            isActive={editor.isActive('orderedList')}
-            title="번호 매기기"
-          >
-            <ListOrdered size={18} />
-          </ToolButton>
-
           <Divider />
 
           {/* Headings */}
