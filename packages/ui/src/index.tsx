@@ -624,6 +624,11 @@ export * from './components/table/BulkResultModal';
 export * from './components/table/RowActionMenu';
 export * from './components/table/ConfirmActionDialog';
 export * from './components/table/InlineEditCells';
+// WO-O4O-SELECTION-TABLE-DETAIL-DRAWER-V1
+export { SelectionTable } from './components/table/SelectionTable';
+export type { SelectionTableProps } from './components/table/SelectionTable';
+export { BaseDetailDrawer } from './components/table/BaseDetailDrawer';
+export type { BaseDetailDrawerProps, DetailDrawerAction } from './components/table/BaseDetailDrawer';
 export { useTableSort } from './components/table/useTableSort';
 export type { SortOrder, SortState, UseTableSortOptions, UseTableSortReturn } from './components/table/useTableSort';
 export { useTableFilter } from './components/table/useTableFilter';

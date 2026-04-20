@@ -12,3 +12,8 @@ export { useTableFilter } from './table/useTableFilter';
 export type { FilterValue, FilterFn, UseTableFilterOptions, UseTableFilterReturn } from './table/useTableFilter';
 export { useVirtualScroll } from './table/useVirtualScroll';
 export type { UseVirtualScrollOptions, UseVirtualScrollReturn } from './table/useVirtualScroll';
+// WO-O4O-SELECTION-TABLE-DETAIL-DRAWER-V1
+export { SelectionTable } from './table/SelectionTable';
+export type { SelectionTableProps } from './table/SelectionTable';
+export { BaseDetailDrawer } from './table/BaseDetailDrawer';
+export type { BaseDetailDrawerProps, DetailDrawerAction } from './table/BaseDetailDrawer';

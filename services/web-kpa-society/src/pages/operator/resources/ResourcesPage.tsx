@@ -1,16 +1,19 @@
 /**
  * ResourcesPage — 자료실 목록
  * WO-KPA-RESOURCE-LIBRARY-AI-WORKFLOW-V1
+ * WO-O4O-SELECTION-TABLE-DETAIL-DRAWER-V1: HTML table → SelectionTable 교체
  *
  * 자유 자료 저장소 + 다중 선택 → 작업바구니 담기
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Search, Trash2, ShoppingBasket, FileText, Link, Check } from 'lucide-react';
 import { getAccessToken } from '../../../contexts/AuthContext';
 import { useWorkBasket, type WorkItem } from '../../../contexts/WorkBasketContext';
 import { toast } from '@o4o/error-handling';
+import { SelectionTable } from '@o4o/ui';
+import type { O4OColumn } from '@o4o/ui';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 
@@ -54,7 +57,7 @@ export default function ResourcesPage() {
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
-  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -87,41 +90,23 @@ export default function ResourcesPage() {
     e.preventDefault();
     setPage(1);
     setSearch(searchInput);
-    setSelected(new Set());
+    setSelectedKeys(new Set());
   };
 
-  const toggleSelect = (id: string) => {
-    setSelected(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
-
-  const toggleAll = () => {
-    if (selected.size === items.length) {
-      setSelected(new Set());
-    } else {
-      setSelected(new Set(items.map(i => i.id)));
-    }
-  };
-
-  const handleAddToBasket = () => {
-    const toAdd: WorkItem[] = items
-      .filter(i => selected.has(i.id))
-      .map(i => ({
-        id: i.id,
-        title: i.title,
-        content: i.content,
-        file_url: i.file_url,
-        external_url: i.external_url,
-        role: i.role,
-        memo: i.memo,
-      }));
+  // SelectionTable onSubmit — 선택된 row 배열 전달
+  const handleAddToBasket = (selectedRows: ResourceItem[]) => {
+    const toAdd: WorkItem[] = selectedRows.map(i => ({
+      id: i.id,
+      title: i.title,
+      content: i.content,
+      file_url: i.file_url,
+      external_url: i.external_url,
+      role: i.role,
+      memo: i.memo,
+    }));
     basket.addMany(toAdd);
     toast.success(`${toAdd.length}개 자료를 작업바구니에 담았습니다`);
-    setSelected(new Set());
+    setSelectedKeys(new Set());
   };
 
   const handleDelete = async (id: string) => {
@@ -141,6 +126,102 @@ export default function ResourcesPage() {
   const formatDate = (iso: string) =>
     new Date(iso).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
 
+  // ─── 컬럼 정의 ───
+  const columns = useMemo<O4OColumn<ResourceItem>[]>(() => [
+    {
+      key: 'title',
+      header: '제목',
+      render: (_val, row) => (
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            {basket.has(row.id) && (
+              <span title="바구니에 담김"><Check size={13} color="#7c3aed" /></span>
+            )}
+            <span
+              onClick={() => navigate(`/operator/resources/${row.id}/edit`)}
+              style={{ cursor: 'pointer', fontWeight: 500, color: '#111827' }}
+            >
+              {row.title}
+            </span>
+          </div>
+          {row.role && <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>역할: {row.role}</div>}
+        </div>
+      ),
+    },
+    {
+      key: 'type',
+      header: '유형',
+      width: 80,
+      align: 'center',
+      render: (_val, row) => (
+        <span style={{
+          display: 'inline-flex', alignItems: 'center', gap: 4,
+          padding: '2px 8px', borderRadius: 12, fontSize: 12, fontWeight: 500,
+          background: row.type === 'FILE' ? '#dbeafe' : '#f0fdf4',
+          color: row.type === 'FILE' ? '#1d4ed8' : '#16a34a',
+        }}>
+          {row.type === 'FILE' ? <FileText size={11} /> : <Link size={11} />}
+          {row.type === 'FILE' ? '파일' : '텍스트'}
+        </span>
+      ),
+    },
+    {
+      key: 'tags',
+      header: '태그',
+      render: (_val, row) => (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+          {row.tags.slice(0, 4).map(tag => (
+            <span key={tag} style={{
+              padding: '1px 7px', borderRadius: 10,
+              background: '#f3f4f6', color: '#374151', fontSize: 12,
+            }}>#{tag}</span>
+          ))}
+          {row.tags.length > 4 && (
+            <span style={{ fontSize: 12, color: '#9ca3af' }}>+{row.tags.length - 4}</span>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'created_at',
+      header: '등록일',
+      width: 100,
+      align: 'center',
+      render: (_val, row) => (
+        <span style={{ fontSize: 13, color: '#6b7280' }}>{formatDate(row.created_at)}</span>
+      ),
+    },
+    {
+      key: '_actions',
+      header: '관리',
+      width: 100,
+      align: 'center',
+      render: (_val, row) => (
+        <div style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
+          <button
+            onClick={(e) => { e.stopPropagation(); navigate(`/operator/resources/${row.id}/edit`); }}
+            style={{
+              padding: '4px 10px', borderRadius: 6, fontSize: 12,
+              background: '#f3f4f6', color: '#374151', border: 'none', cursor: 'pointer',
+            }}
+          >
+            수정
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); setDeleteTargetId(row.id); }}
+            style={{
+              padding: '4px 8px', borderRadius: 6,
+              background: 'transparent', color: '#dc2626',
+              border: '1px solid #fca5a5', cursor: 'pointer',
+            }}
+          >
+            <Trash2 size={12} />
+          </button>
+        </div>
+      ),
+    },
+  ], [basket, navigate]);
+
   return (
     <div style={{ padding: '24px', maxWidth: 1100, margin: '0 auto' }}>
       {/* Header */}
@@ -150,7 +231,6 @@ export default function ResourcesPage() {
           <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>자료를 저장하고 작업바구니에 담아 AI로 전달하세요</p>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          {/* 작업바구니 버튼 */}
           <button
             onClick={() => navigate('/operator/resources/basket')}
             style={{
@@ -199,8 +279,7 @@ export default function ResourcesPage() {
             style={{
               width: '100%', padding: '8px 12px 8px 36px',
               border: '1px solid #d1d5db', borderRadius: 8,
-              fontSize: 14, outline: 'none',
-              boxSizing: 'border-box',
+              fontSize: 14, outline: 'none', boxSizing: 'border-box',
             }}
           />
         </div>
@@ -216,175 +295,37 @@ export default function ResourcesPage() {
         </button>
       </form>
 
-      {/* 선택 액션 바 */}
-      {selected.size > 0 && (
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 12,
-          padding: '10px 16px', background: '#ede9fe',
-          border: '1px solid #c4b5fd', borderRadius: 8, marginBottom: 12,
-        }}>
-          <span style={{ fontSize: 14, color: '#5b21b6', fontWeight: 500 }}>
-            {selected.size}개 선택됨
-          </span>
-          <button
-            onClick={handleAddToBasket}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 6,
-              padding: '6px 14px', borderRadius: 6,
-              background: '#7c3aed', color: '#fff',
-              border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 500,
-            }}
-          >
-            <ShoppingBasket size={14} />
-            작업에 담기
-          </button>
-          <button
-            onClick={() => setSelected(new Set())}
-            style={{
-              padding: '6px 12px', borderRadius: 6,
-              background: 'transparent', color: '#6b7280',
-              border: '1px solid #d1d5db', cursor: 'pointer', fontSize: 13,
-            }}
-          >
-            선택 해제
-          </button>
+      {error && (
+        <div style={{ padding: '12px 16px', background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: 8, color: '#dc2626', marginBottom: 12, fontSize: 14 }}>
+          {error}
         </div>
       )}
 
-      {/* Table */}
+      {/* SelectionTable */}
       <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, overflow: 'hidden' }}>
-        {isLoading ? (
-          <div style={{ padding: 40, textAlign: 'center', color: '#6b7280' }}>불러오는 중...</div>
-        ) : error ? (
-          <div style={{ padding: 40, textAlign: 'center', color: '#dc2626' }}>{error}</div>
-        ) : items.length === 0 ? (
-          <div style={{ padding: 60, textAlign: 'center', color: '#6b7280' }}>
-            <FileText size={40} style={{ margin: '0 auto 12px', display: 'block', color: '#d1d5db' }} />
-            <p style={{ margin: 0 }}>자료가 없습니다</p>
-            <button
-              onClick={() => navigate('/operator/resources/new')}
-              style={{
-                marginTop: 16, padding: '8px 20px', borderRadius: 8,
-                background: '#2563eb', color: '#fff', border: 'none', cursor: 'pointer',
-              }}
-            >
-              첫 번째 자료 추가하기
-            </button>
-          </div>
-        ) : (
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
-                <th style={{ width: 44, padding: '10px 16px', textAlign: 'center' }}>
-                  <input
-                    type="checkbox"
-                    checked={selected.size === items.length && items.length > 0}
-                    onChange={toggleAll}
-                    style={{ cursor: 'pointer' }}
-                  />
-                </th>
-                <th style={{ padding: '10px 16px', textAlign: 'left', fontSize: 13, fontWeight: 600, color: '#374151' }}>제목</th>
-                <th style={{ width: 70, padding: '10px 12px', textAlign: 'center', fontSize: 13, fontWeight: 600, color: '#374151' }}>유형</th>
-                <th style={{ padding: '10px 16px', textAlign: 'left', fontSize: 13, fontWeight: 600, color: '#374151' }}>태그</th>
-                <th style={{ width: 100, padding: '10px 12px', textAlign: 'center', fontSize: 13, fontWeight: 600, color: '#374151' }}>등록일</th>
-                <th style={{ width: 100, padding: '10px 12px', textAlign: 'center', fontSize: 13, fontWeight: 600, color: '#374151' }}>관리</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((item, idx) => (
-                <tr
-                  key={item.id}
-                  style={{
-                    borderBottom: idx < items.length - 1 ? '1px solid #f3f4f6' : 'none',
-                    background: selected.has(item.id) ? '#faf5ff' : '#fff',
-                  }}
-                >
-                  <td style={{ padding: '10px 16px', textAlign: 'center' }}>
-                    <input
-                      type="checkbox"
-                      checked={selected.has(item.id)}
-                      onChange={() => toggleSelect(item.id)}
-                      style={{ cursor: 'pointer' }}
-                    />
-                  </td>
-                  <td style={{ padding: '10px 16px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      {basket.has(item.id) && (
-                        <span title="바구니에 담김">
-                          <Check size={14} color="#7c3aed" />
-                        </span>
-                      )}
-                      <span
-                        onClick={() => navigate(`/operator/resources/${item.id}/edit`)}
-                        style={{ fontSize: 14, color: '#1a1a1a', cursor: 'pointer', fontWeight: 500 }}
-                      >
-                        {item.title}
-                      </span>
-                    </div>
-                    {item.role && (
-                      <span style={{ fontSize: 12, color: '#6b7280', display: 'block', marginTop: 2 }}>
-                        역할: {item.role}
-                      </span>
-                    )}
-                  </td>
-                  <td style={{ padding: '10px 12px', textAlign: 'center' }}>
-                    <span style={{
-                      display: 'inline-flex', alignItems: 'center', gap: 4,
-                      padding: '2px 8px', borderRadius: 12, fontSize: 12, fontWeight: 500,
-                      background: item.type === 'FILE' ? '#dbeafe' : '#f0fdf4',
-                      color: item.type === 'FILE' ? '#1d4ed8' : '#16a34a',
-                    }}>
-                      {item.type === 'FILE' ? <FileText size={11} /> : <Link size={11} />}
-                      {item.type === 'FILE' ? '파일' : '텍스트'}
-                    </span>
-                  </td>
-                  <td style={{ padding: '10px 16px' }}>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                      {item.tags.slice(0, 4).map(tag => (
-                        <span key={tag} style={{
-                          padding: '1px 7px', borderRadius: 10,
-                          background: '#f3f4f6', color: '#374151', fontSize: 12,
-                        }}>
-                          #{tag}
-                        </span>
-                      ))}
-                      {item.tags.length > 4 && (
-                        <span style={{ fontSize: 12, color: '#9ca3af' }}>+{item.tags.length - 4}</span>
-                      )}
-                    </div>
-                  </td>
-                  <td style={{ padding: '10px 12px', textAlign: 'center', fontSize: 13, color: '#6b7280' }}>
-                    {formatDate(item.created_at)}
-                  </td>
-                  <td style={{ padding: '10px 12px', textAlign: 'center' }}>
-                    <div style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
-                      <button
-                        onClick={() => navigate(`/operator/resources/${item.id}/edit`)}
-                        style={{
-                          padding: '4px 10px', borderRadius: 6, fontSize: 12,
-                          background: '#f3f4f6', color: '#374151',
-                          border: 'none', cursor: 'pointer',
-                        }}
-                      >
-                        수정
-                      </button>
-                      <button
-                        onClick={() => setDeleteTargetId(item.id)}
-                        style={{
-                          padding: '4px 8px', borderRadius: 6,
-                          background: 'transparent', color: '#dc2626',
-                          border: '1px solid #fca5a5', cursor: 'pointer',
-                        }}
-                      >
-                        <Trash2 size={12} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+        <SelectionTable<ResourceItem>
+          columns={columns}
+          data={items}
+          rowKey="id"
+          selectedKeys={selectedKeys}
+          onSelectionChange={setSelectedKeys}
+          submitLabel="작업에 담기"
+          onSubmit={handleAddToBasket}
+          loading={isLoading}
+          emptyMessage={
+            <div style={{ padding: 60, textAlign: 'center', color: '#6b7280' }}>
+              <FileText size={40} style={{ margin: '0 auto 12px', display: 'block', color: '#d1d5db' }} />
+              <p style={{ margin: 0 }}>자료가 없습니다</p>
+              <button
+                onClick={() => navigate('/operator/resources/new')}
+                style={{ marginTop: 16, padding: '8px 20px', borderRadius: 8, background: '#2563eb', color: '#fff', border: 'none', cursor: 'pointer' }}
+              >
+                첫 번째 자료 추가하기
+              </button>
+            </div>
+          }
+          dense
+        />
       </div>
 
       {/* Pagination */}
@@ -416,13 +357,9 @@ export default function ResourcesPage() {
           position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
         }}>
-          <div style={{
-            background: '#fff', borderRadius: 12, padding: 28, maxWidth: 360, width: '90%',
-          }}>
+          <div style={{ background: '#fff', borderRadius: 12, padding: 28, maxWidth: 360, width: '90%' }}>
             <h3 style={{ margin: '0 0 12px', fontSize: 16, fontWeight: 700 }}>자료 삭제</h3>
-            <p style={{ margin: '0 0 20px', fontSize: 14, color: '#6b7280' }}>
-              선택한 자료를 삭제하시겠습니까?
-            </p>
+            <p style={{ margin: '0 0 20px', fontSize: 14, color: '#6b7280' }}>선택한 자료를 삭제하시겠습니까?</p>
             <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
               <button
                 onClick={() => setDeleteTargetId(null)}
@@ -433,11 +370,7 @@ export default function ResourcesPage() {
               <button
                 onClick={() => handleDelete(deleteTargetId)}
                 disabled={isDeleting}
-                style={{
-                  padding: '8px 16px', borderRadius: 8,
-                  background: '#dc2626', color: '#fff',
-                  border: 'none', cursor: isDeleting ? 'not-allowed' : 'pointer',
-                }}
+                style={{ padding: '8px 16px', borderRadius: 8, background: '#dc2626', color: '#fff', border: 'none', cursor: isDeleting ? 'not-allowed' : 'pointer' }}
               >
                 {isDeleting ? '삭제 중...' : '삭제'}
               </button>
