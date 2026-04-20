@@ -80,6 +80,12 @@ const SignageIcon = () => (
   </svg>
 );
 
+const ResourceLibraryIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+  </svg>
+);
+
 const NewspaperIcon = () => (
   <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2" />
@@ -228,6 +234,7 @@ export function CommunityHomePage() {
             { title: '교육 / 강의', description: '보수교육·세미나를 온라인으로 수강하세요', href: '/lms', icon: <EducationIconSvg /> },
             { title: '콘텐츠 허브', description: '공지·뉴스·이벤트를 한눈에 확인하세요', href: '/content', icon: <ContentIcon /> },
             { title: '디지털 사이니지', description: '약국 디지털 미디어를 관리하세요', href: '/signage', icon: <SignageIcon /> },
+            { title: '자료실', description: '자료를 저장하고 AI 작업에 활용하세요', href: '/operator/resources', icon: <ResourceLibraryIcon /> },
           ]}
         />
 
