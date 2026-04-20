@@ -66,6 +66,15 @@ const SignageIcon = () => (
   </svg>
 );
 
+// WO-KPA-RESOURCE-LIBRARY-AI-WORKFLOW-V1
+const ResourceIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+    <line x1="12" y1="11" x2="12" y2="17" />
+    <line x1="9" y1="14" x2="15" y2="14" />
+  </svg>
+);
+
 const services: ServiceCardData[] = [
   {
     title: '약사 포럼',
@@ -90,6 +99,13 @@ const services: ServiceCardData[] = [
     description: '약국 디지털 미디어를 관리하세요',
     href: '/signage',
     icon: <SignageIcon />,
+  },
+  // WO-KPA-RESOURCE-LIBRARY-AI-WORKFLOW-V1
+  {
+    title: '자료실',
+    description: '자료를 저장하고 AI 작업에 활용하세요',
+    href: '/operator/resources',
+    icon: <ResourceIcon />,
   },
 ];
 

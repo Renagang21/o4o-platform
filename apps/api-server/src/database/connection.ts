@@ -273,6 +273,7 @@ import {
   ServiceProduct, // WO-O4O-SERVICE-PRODUCT-LAYER-PREP-V1
   StorePlaylist, // WO-O4O-SIGNAGE-STORE-PLAYLIST-ENGINE-V1
   StorePlaylistItem, // WO-O4O-SIGNAGE-STORE-PLAYLIST-ENGINE-V1
+  KpaResource, // WO-KPA-RESOURCE-LIBRARY-AI-WORKFLOW-V1
 } from '../routes/kpa/entities/index.js';
 import { KpaExternalExpertProfile } from '../routes/kpa/entities/kpa-external-expert-profile.entity.js';
 import { KpaSupplierStaffProfile } from '../routes/kpa/entities/kpa-supplier-staff-profile.entity.js';
@@ -766,6 +767,8 @@ export const AppDataSource = new DataSource({
     // WO-O4O-SIGNAGE-STORE-PLAYLIST-ENGINE-V1
     StorePlaylist,
     StorePlaylistItem,
+    // WO-KPA-RESOURCE-LIBRARY-AI-WORKFLOW-V1
+    KpaResource,
     // ============================================================================
     // PARTNER DASHBOARD ENTITIES (WO-PARTNER-DASHBOARD-API-BE-IMPLEMENTATION-V1)
     // ============================================================================

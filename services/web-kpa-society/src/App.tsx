@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, usePa
 import { useEffect, useState } from 'react';
 import { Layout, DemoLayout } from './components';
 import { AuthProvider, OrganizationProvider } from './contexts';
+import { WorkBasketProvider } from './contexts/WorkBasketContext';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
 import { ServiceProvider } from './contexts/ServiceContext';
 import { useAuth } from './contexts/AuthContext';
@@ -323,6 +324,7 @@ function App() {
       <BrowserRouter>
         {/* WO-KPA-CONTEXT-SWITCHER-AND-ORG-RESOLUTION-V1: 라우트 기반 서비스 컨텍스트 */}
         <ServiceProvider>
+        <WorkBasketProvider>
         <O4OToastProvider />
         {/* 전역 인증 모달 (WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1, WO-O4O-AUTH-MODAL-REGISTER-STANDARD-V1) */}
         <LoginModal />
@@ -721,6 +723,7 @@ function App() {
           {/* 404 - 알 수 없는 경로 */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
+        </WorkBasketProvider>
         </ServiceProvider>
       </BrowserRouter>
       </OrganizationProvider>

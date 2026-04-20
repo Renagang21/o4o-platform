@@ -51,3 +51,5 @@ export { KpaWorkingContent } from './kpa-working-content.entity.js';
 // WO-O4O-SIGNAGE-STORE-PLAYLIST-ENGINE-V1
 export { StorePlaylist } from './store-playlist.entity.js';
 export { StorePlaylistItem } from './store-playlist-item.entity.js';
+// WO-KPA-RESOURCE-LIBRARY-AI-WORKFLOW-V1
+export { KpaResource } from './kpa-resource.entity.js';
