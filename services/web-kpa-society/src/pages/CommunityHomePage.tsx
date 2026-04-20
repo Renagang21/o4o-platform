@@ -195,6 +195,7 @@ export function CommunityHomePage() {
             { label: '포럼 참여', href: '/forum', icon: <ForumIcon /> },
             { label: '강의 수강', href: '/lms', icon: <EducationIconSvg /> },
             { label: '콘텐츠 허브', href: '/content', icon: <ContentIcon /> },
+            { label: '자료실', href: '/operator/resources', icon: <ResourceLibraryIcon /> },
           ]}
         />
 
