@@ -12,7 +12,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   FileText, ArrowLeft, Plus, Search, RefreshCw, AlertCircle,
-  Trash2, Eye, Edit2, Share2, QrCode, Printer,
+  Trash2, Eye, Edit2, Share2, QrCode,
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
@@ -267,13 +267,7 @@ export default function StoreContentListPage() {
                       >
                         <Share2 className="w-3.5 h-3.5" />
                       </button>
-                      <button
-                        onClick={() => navigate(`/store-content/${item.id}?tab=pop`)}
-                        className="flex items-center gap-1 px-2 py-1 text-xs text-gray-600 hover:text-orange-600 hover:bg-orange-50 rounded"
-                        title="POP 출력"
-                      >
-                        <Printer className="w-3.5 h-3.5" />
-                      </button>
+                      {/* POP 출력 버튼 비활성 — WO-STORE-POP-CREATION-RESTRUCTURE-V1: /store/pop 경로로 이전 */}
                       <button
                         onClick={() => navigate(`/store-content/${item.id}?tab=qr`)}
                         className="flex items-center gap-1 px-2 py-1 text-xs text-gray-600 hover:text-teal-600 hover:bg-teal-50 rounded"

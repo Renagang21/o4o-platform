@@ -40,6 +40,7 @@ import {
   Shield,
   Briefcase,
   Store,
+  Printer,
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -590,6 +591,27 @@ export const adminMenuStatic: MenuItem[] = [
         label: '템플릿 라이브러리',
         icon: <LayoutGrid className="w-4 h-4" />,
         path: '/store-content/templates',
+      },
+    ],
+  },
+
+  {
+    id: 'store-pop',
+    label: 'POP 제작',
+    icon: <Printer className="w-5 h-5" />,
+    roles: ['admin', 'super_admin'],
+    children: [
+      {
+        id: 'store-pop-list',
+        label: 'POP 목록',
+        icon: <Printer className="w-4 h-4" />,
+        path: '/store/pop',
+      },
+      {
+        id: 'store-pop-create',
+        label: '새 POP 만들기',
+        icon: <Printer className="w-4 h-4" />,
+        path: '/store/pop/create',
       },
     ],
   },

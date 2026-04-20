@@ -27,6 +27,10 @@ const StoreContentListPage = lazy(() => import('@/pages/store-content'));
 const TemplateLibraryPage = lazy(() => import('@/pages/store-content/templates'));
 const StoreContentEditorPage = lazy(() => import('@/pages/store-content/[id]'));
 
+// Store POP Pages (WO-STORE-POP-CREATION-RESTRUCTURE-V1)
+const PopListPage = lazy(() => import('@/pages/store/pop/PopListPage'));
+const PopCreatePage = lazy(() => import('@/pages/store/pop/PopCreatePage'));
+
 // Loading component
 const PageLoader = () => (
   <div className="flex items-center justify-center h-screen">
@@ -133,6 +137,22 @@ export function LmsMarketingRoutes() {
       <AdminProtectedRoute requiredRoles={['admin']}>
         <Suspense fallback={<PageLoader />}>
           <StoreContentListPage />
+        </Suspense>
+      </AdminProtectedRoute>
+    } />,
+
+    // Store POP (WO-STORE-POP-CREATION-RESTRUCTURE-V1)
+    <Route key="/store/pop/create" path="/store/pop/create" element={
+      <AdminProtectedRoute requiredRoles={['admin']}>
+        <Suspense fallback={<PageLoader />}>
+          <PopCreatePage />
+        </Suspense>
+      </AdminProtectedRoute>
+    } />,
+    <Route key="/store/pop" path="/store/pop" element={
+      <AdminProtectedRoute requiredRoles={['admin']}>
+        <Suspense fallback={<PageLoader />}>
+          <PopListPage />
         </Suspense>
       </AdminProtectedRoute>
     } />,
