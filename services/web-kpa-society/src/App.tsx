@@ -84,7 +84,7 @@ import { MyDashboardPage, MyProfilePage, MySettingsPage, MyCertificatesPage, Per
 import { AdminRoutes } from './routes/AdminRoutes';
 
 // Operator Routes (서비스 운영자)
-import { OperatorRoutes } from './routes/OperatorRoutes';
+import { OperatorRoutes, MemberResourceRoutes } from './routes/OperatorRoutes';
 
 
 // Intranet Routes (인트라넷)
@@ -509,6 +509,8 @@ function App() {
             <Route path="event-offers" element={<PharmacyOwnerOnlyGuard><KpaEventOfferPage /></PharmacyOwnerOnlyGuard>} />
             <Route path="content" element={<HubContentLibraryPage />} />
           </Route>
+          {/* 자료실 — 인증된 모든 회원 접근 (OperatorRoutes의 kpa:admin/kpa:operator 가드 우회) */}
+          <Route path="/operator/resources/*" element={<MemberResourceRoutes />} />
           {/* Operator Routes — WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: KpaOperatorLayout (standalone sidebar) */}
           <Route path="/operator/*" element={<OperatorRoutes />} />
           <Route path="/intranet/*" element={<Navigate to="/demo/intranet" replace />} />

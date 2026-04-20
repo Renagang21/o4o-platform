@@ -165,3 +165,26 @@ export function OperatorRoutes() {
     </RoleGuard>
   );
 }
+
+/**
+ * MemberResourceRoutes — 자료실 라우트 (인증된 모든 회원 접근 가능)
+ *
+ * OperatorRoutes는 kpa:admin/kpa:operator만 허용하므로,
+ * 자료실은 별도 라우트로 분리하여 일반 회원도 접근 가능하게 한다.
+ * App.tsx에서 /operator/resources/* 경로에 우선 마운트.
+ */
+export function MemberResourceRoutes() {
+  return (
+    <RoleGuard> {/* allowedRoles 없음 = 로그인만 확인 */}
+      <Routes>
+        <Route element={<KpaOperatorLayoutWrapper />}>
+          <Route index element={<ResourcesPage />} />
+          <Route path="new" element={<ResourceFormPage />} />
+          <Route path="basket" element={<WorkBasketPage />} />
+          <Route path="ai-workspace" element={<ResourceAiWorkspacePage />} />
+          <Route path=":id/edit" element={<ResourceFormPage />} />
+        </Route>
+      </Routes>
+    </RoleGuard>
+  );
+}
