@@ -9,6 +9,7 @@
  * WO-KPA-MAIN-HOME-RESTRUCTURE-V1: 참여 유도형 커뮤니티 허브 전환
  * WO-SHARED-SPACE-COMPONENT-SPLIT-V1: 공통 컴포넌트 적용
  * WO-SHARED-SPACE-SIGNAGE-COMPONENT-V1: SignagePreviewSection 공통 적용
+ * WO-SHARED-SPACE-CONTENT-COMPONENT-V1: ContentHighlightSection 공통 적용 (EducationSection 제거)
  *
  * 섹션 구조 (12블록):
  * ├─ HeroBannerSection        — 동적 광고 캐러셀 (KPA 고유)
@@ -16,7 +17,7 @@
  * ├─ NewsNoticesSection       — 공지|새소식|약사공론 탭 (shared)
  * ├─ ActivitySection          — 최근 활동 포럼 글 (shared)
  * ├─ AppEntrySection          — 서비스 바로가기 카드 그리드 (shared)
- * ├─ EducationSection         — 교육/강의 요약 (KPA 고유)
+ * ├─ ContentHighlightSection  — 교육/강의 요약 (shared)
  * ├─ SignagePreviewSection     — 디지털 사이니지 (shared)
  * ├─ CtaGuidanceSection       — 시범판매 CTA (shared)
  * ├─ AdSection                — 페이지 광고 (KPA 고유)
@@ -27,15 +28,14 @@
 
 import { useState, useEffect } from 'react';
 import { HeroBannerSection } from '../components/community/HeroBannerSection';
-import { EducationSection } from '../components/home/EducationSection';
 import { AdSection } from '../components/community/AdSection';
 import { SponsorBar } from '../components/community/SponsorBar';
 import { FooterLinksSection } from '../components/home/FooterLinksSection';
 import { UtilitySection } from '../components/home/UtilitySection';
 import { homeApi } from '../api/home';
 import type { HomePageData } from '../api/home';
+import { lmsApi } from '../api/lms';
 import { useAuth } from '../contexts/AuthContext';
-import { getMediaThumbnailUrl } from '@o4o/types/signage';
 import { colors, spacing } from '../styles/theme';
 import {
   HeroSummarySection,
@@ -44,8 +44,9 @@ import {
   AppEntrySection,
   CtaGuidanceSection,
   SignagePreviewSection,
+  ContentHighlightSection,
 } from '@o4o/shared-space-ui';
-import type { NoticeItem, RecentPost, SignageMediaItem, SignagePlaylistItem } from '@o4o/shared-space-ui';
+import type { NoticeItem, RecentPost, SignageMediaItem, SignagePlaylistItem, ContentHighlightItem } from '@o4o/shared-space-ui';
 
 // ─── Inline SVG Icons (from original HeroCtaSection / CommunityServiceSection) ──
 
@@ -93,12 +94,32 @@ export function CommunityHomePage() {
   const [data, setData] = useState<HomePageData | null>(null);
   const [loading, setLoading] = useState(true);
   const [newsTab, setNewsTab] = useState<'notices' | 'latest' | 'kpanews'>('notices');
+  const [courses, setCourses] = useState<ContentHighlightItem[]>([]);
+  const [coursesLoaded, setCoursesLoaded] = useState(false);
 
   useEffect(() => {
     homeApi.prefetchAll()
       .then(setData)
       .catch(() => {})
       .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    lmsApi.getCourses({ limit: 3 })
+      .then((res: any) => {
+        const items = res?.data?.data ?? res?.data ?? [];
+        const list: any[] = Array.isArray(items) ? items : [];
+        setCourses(list.map((c) => ({
+          id: c.id,
+          title: c.title,
+          badge: c.category,
+          thumbnailUrl: c.thumbnailUrl ?? null,
+          meta: c.instructorName,
+          href: `/lms/course/${c.id}`,
+        })));
+      })
+      .catch(() => {})
+      .finally(() => setCoursesLoaded(true));
   }, []);
 
   // ── Hero greeting ──
@@ -143,14 +164,15 @@ export function CommunityHomePage() {
   const signageMediaItems: SignageMediaItem[] = (data?.signage.media ?? []).map((m) => ({
     id: m.id,
     title: m.name,
-    thumbnailUrl: getMediaThumbnailUrl(m),
-    duration: m.duration ?? undefined,
+    mediaType: m.mediaType,
+    uploaderName: m.uploaderName,
+    createdAt: m.createdAt,
   }));
   const signagePlaylistItems: SignagePlaylistItem[] = (data?.signage.playlists ?? []).map((p) => ({
     id: p.id,
     name: p.name,
     itemCount: p.itemCount,
-    totalDuration: p.totalDuration,
+    createdAt: p.createdAt,
   }));
 
   return (
@@ -209,9 +231,17 @@ export function CommunityHomePage() {
           ]}
         />
 
-        {/* 6. 교육/강의 (KPA 고유) */}
+        {/* 6. 교육/강의 (shared) */}
         <div style={sectionMargin}>
-          <EducationSection />
+          <ContentHighlightSection
+            title="교육/강의"
+            primaryGroupTitle="교육/강의"
+            primaryItems={courses}
+            viewAllHref="/lms"
+            viewAllLabel="전체 보기 →"
+            emptyMessage="등록된 강의가 없습니다."
+            loading={!coursesLoaded}
+          />
         </div>
 
         {/* 7. 사이니지 미디어 (shared) */}

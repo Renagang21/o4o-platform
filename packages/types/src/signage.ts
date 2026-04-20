@@ -125,6 +125,8 @@ export interface SignageHomeMedia {
   thumbnailUrl: string | null;
   duration: number | null;
   metadata: Record<string, unknown>;
+  createdAt: string;
+  uploaderName: string | null;
 }
 
 /** 홈 페이지 플레이리스트 요약 */
@@ -134,6 +136,7 @@ export interface SignageHomePlaylist {
   description: string | null;
   itemCount: number;
   totalDuration: number;
+  createdAt: string;
 }
 
 /** 홈 사이니지 API 응답 */

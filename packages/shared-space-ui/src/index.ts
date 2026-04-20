@@ -6,6 +6,7 @@ export { ActivitySection } from './ActivitySection';
 export { AppEntrySection } from './AppEntrySection';
 export { CtaGuidanceSection } from './CtaGuidanceSection';
 export { SignagePreviewSection } from './SignagePreviewSection';
+export { ContentHighlightSection } from './ContentHighlightSection';
 
 export type {
   /* Data types */
@@ -14,6 +15,7 @@ export type {
   RecentPost,
   SignageMediaItem,
   SignagePlaylistItem,
+  ContentHighlightItem,
   /* Component props */
   HeroSummarySectionProps,
   NewsNoticesSectionProps,
@@ -21,4 +23,5 @@ export type {
   AppEntrySectionProps,
   CtaGuidanceSectionProps,
   SignagePreviewSectionProps,
+  ContentHighlightSectionProps,
 } from './types';

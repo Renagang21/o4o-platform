@@ -27,15 +27,17 @@ export class SignageQueryService {
     const limitIndex = sources.length + 2;
 
     const media = await this.dataSource.query(`
-      SELECT id, name, "mediaType", "sourceUrl" as url, "thumbnailUrl", duration, metadata
-      FROM signage_media
-      WHERE "serviceKey" = $1 AND source IN (${sourcePlaceholders}) AND status = 'active' AND "deletedAt" IS NULL
-      ORDER BY "createdAt" DESC
+      SELECT sm.id, sm.name, sm."mediaType", sm."sourceUrl" as url, sm."thumbnailUrl", sm.duration, sm.metadata,
+             sm."createdAt", u.name as "uploaderName"
+      FROM signage_media sm
+      LEFT JOIN users u ON u.id = sm."createdByUserId"
+      WHERE sm."serviceKey" = $1 AND sm.source IN (${sourcePlaceholders}) AND sm.status = 'active' AND sm."deletedAt" IS NULL
+      ORDER BY sm."createdAt" DESC
       LIMIT $${limitIndex}
     `, [this.config.serviceKey, ...sources, mediaLimit]);
 
     const playlists = await this.dataSource.query(`
-      SELECT id, name, description, "itemCount", "totalDuration"
+      SELECT id, name, description, "itemCount", "totalDuration", "createdAt"
       FROM signage_playlists
       WHERE "serviceKey" = $1 AND source IN (${sourcePlaceholders}) AND status = 'active' AND "deletedAt" IS NULL
       ORDER BY "createdAt" DESC

@@ -13,14 +13,13 @@
  *  2. News / Notices → NewsNoticesSection (shared)
  *  3. Activity → ActivitySection (shared)
  *  4. App Entry → AppEntrySection (shared)
- *  5. Content Highlight (서비스 고유)
+ *  5. Content Highlight → ContentHighlightSection (shared)
  *  6. Signage Preview → SignagePreviewSection (shared)
  *  7. CTA / Guidance → CtaGuidanceSection (shared)
  *  8. Utility (서비스 고유)
  */
 
 import { useState, useEffect, type CSSProperties } from 'react';
-import { Link } from 'react-router-dom';
 import { communityApi, type CommunityAd, type CommunitySponsor } from '../../services/communityApi';
 import { hubContentApi, type HubContentItemResponse } from '../../lib/api/hubContent';
 import { api } from '../../lib/apiClient';
@@ -34,8 +33,9 @@ import {
   AppEntrySection,
   CtaGuidanceSection,
   SignagePreviewSection,
+  ContentHighlightSection,
 } from '@o4o/shared-space-ui';
-import type { NoticeItem, FeaturedPost, RecentPost, SignageMediaItem, SignagePlaylistItem } from '@o4o/shared-space-ui';
+import type { NoticeItem, FeaturedPost, RecentPost, SignageMediaItem, SignagePlaylistItem, ContentHighlightItem } from '@o4o/shared-space-ui';
 
 // ─── Constants ─────────────────────────────────────────────
 const PINK = '#DB2777';
@@ -53,75 +53,18 @@ interface FeedItem {
   date: string;
 }
 
-// ─── Content Card ──────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────
 
-function ContentCard({ item }: { item: HubContentItemResponse }) {
-  const img = item.thumbnailUrl || item.imageUrl || null;
-  const hasLink = !!item.linkUrl;
-
-  return (
-    <div
-      onClick={() => { if (hasLink) window.open(item.linkUrl!, '_blank', 'noopener'); }}
-      style={{
-        ...styles.contentCard,
-        cursor: hasLink ? 'pointer' : 'default',
-        opacity: hasLink ? 1 : 0.8,
-      }}
-    >
-      {img ? (
-        <div style={styles.contentThumb}>
-          <img
-            src={img}
-            alt={item.title}
-            style={styles.thumbImg}
-            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-          />
-        </div>
-      ) : (
-        <div style={{ ...styles.contentThumb, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ fontSize: 24, color: '#cbd5e1' }}>📄</span>
-        </div>
-      )}
-      <div style={styles.contentBody}>
-        <div style={{ display: 'flex', gap: 4, marginBottom: 4 }}>
-          {item.cmsType && (
-            <span style={styles.contentBadge}>{item.cmsType}</span>
-          )}
-          {item.isPinned && (
-            <span style={styles.contentPinnedBadge}>추천</span>
-          )}
-        </div>
-        <p style={styles.contentTitle}>{item.title}</p>
-        {item.description && (
-          <p style={styles.contentDesc}>{item.description}</p>
-        )}
-        <p style={styles.contentDate}>
-          {new Date(item.createdAt).toLocaleDateString('ko-KR')}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-// ─── Section Wrapper ───────────────────────────────────────
-
-function Section({ title, linkTo, linkLabel, children }: {
-  title: string;
-  linkTo?: string;
-  linkLabel?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section style={styles.section}>
-      <div style={styles.sectionHeader}>
-        <h2 style={styles.sectionTitle}>{title}</h2>
-        {linkTo && linkLabel && (
-          <Link to={linkTo} style={styles.sectionLink}>{linkLabel}</Link>
-        )}
-      </div>
-      {children}
-    </section>
-  );
+function toContentHighlightItem(item: HubContentItemResponse): ContentHighlightItem {
+  return {
+    id: item.id,
+    title: item.title,
+    summary: item.description ?? undefined,
+    thumbnailUrl: item.thumbnailUrl || item.imageUrl || null,
+    badge: item.cmsType ?? undefined,
+    meta: new Date(item.createdAt).toLocaleDateString('ko-KR'),
+    href: item.linkUrl ?? undefined,
+  };
 }
 
 // ─── Main Component ────────────────────────────────────────
@@ -283,37 +226,19 @@ export default function CommunityHubPage() {
           accentColor={PINK}
         />
 
-        {/* ─── 5. Content Highlight (서비스 고유) ─── */}
-        <Section title="콘텐츠" linkTo="/library/content" linkLabel="전체보기 →">
-          {contentLoading ? (
-            <p style={styles.empty}>불러오는 중...</p>
-          ) : contentItems.length === 0 ? (
-            <p style={styles.empty}>등록된 콘텐츠가 없습니다.</p>
-          ) : (
-            <>
-              {recentContent.length > 0 && (
-                <div style={{ marginBottom: 20 }}>
-                  <p style={styles.subLabel}>최근 콘텐츠</p>
-                  <div style={styles.contentGrid}>
-                    {recentContent.map((item) => (
-                      <ContentCard key={item.id} item={item} />
-                    ))}
-                  </div>
-                </div>
-              )}
-              {recommendedContent.length > 0 && (
-                <div>
-                  <p style={styles.subLabel}>추천 콘텐츠</p>
-                  <div style={styles.contentGrid}>
-                    {recommendedContent.map((item) => (
-                      <ContentCard key={item.id} item={item} />
-                    ))}
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-        </Section>
+        {/* ─── 5. Content Highlight (shared) ─── */}
+        <ContentHighlightSection
+          title="콘텐츠"
+          primaryGroupTitle="최근 콘텐츠"
+          secondaryGroupTitle="추천 콘텐츠"
+          primaryItems={recentContent.map(toContentHighlightItem)}
+          secondaryItems={recommendedContent.map(toContentHighlightItem)}
+          viewAllHref="/library/content"
+          viewAllLabel="전체보기 →"
+          emptyMessage="등록된 콘텐츠가 없습니다."
+          loading={contentLoading}
+          accentColor={PINK}
+        />
 
         {/* ─── 6. Signage Preview (shared) ─── */}
         <SignagePreviewSection
@@ -345,7 +270,7 @@ export default function CommunityHubPage() {
   );
 }
 
-// ─── Styles (서비스 고유 섹션만) ──────────────────────────────
+// ─── Styles ──────────────────────────────────────────────────
 
 const styles: Record<string, CSSProperties> = {
   page: {
@@ -356,120 +281,5 @@ const styles: Record<string, CSSProperties> = {
     maxWidth: 960,
     margin: '0 auto',
     padding: '24px 16px 48px',
-  },
-  section: {
-    marginBottom: 32,
-  },
-  sectionHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 700,
-    color: '#1e293b',
-    margin: 0,
-  },
-  sectionLink: {
-    fontSize: 13,
-    color: PINK,
-    textDecoration: 'none',
-    fontWeight: 500,
-  },
-  card: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    border: '1px solid #e2e8f0',
-    overflow: 'hidden',
-  },
-  subLabel: {
-    fontSize: 12,
-    fontWeight: 600,
-    color: '#64748b',
-    textTransform: 'uppercase' as const,
-    letterSpacing: '0.05em',
-    margin: '0 0 8px 0',
-  },
-
-  // Content grid & cards
-  contentGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, 1fr)',
-    gap: 12,
-  },
-  contentCard: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    border: '1px solid #e2e8f0',
-    overflow: 'hidden',
-    transition: 'box-shadow 0.2s',
-  },
-  contentThumb: {
-    width: '100%',
-    height: 100,
-    backgroundColor: '#f1f5f9',
-    overflow: 'hidden',
-  },
-  thumbImg: {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover' as const,
-  },
-  contentBody: {
-    padding: '8px 12px 10px',
-  },
-  contentBadge: {
-    display: 'inline-block',
-    padding: '1px 6px',
-    fontSize: 10,
-    fontWeight: 500,
-    backgroundColor: '#f1f5f9',
-    color: '#64748b',
-    borderRadius: 4,
-  },
-  contentPinnedBadge: {
-    display: 'inline-block',
-    padding: '1px 6px',
-    fontSize: 10,
-    fontWeight: 500,
-    backgroundColor: PINK_BG,
-    color: PINK,
-    borderRadius: 4,
-  },
-  contentTitle: {
-    fontSize: 13,
-    fontWeight: 600,
-    color: '#334155',
-    margin: '0 0 4px 0',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    display: '-webkit-box',
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: 'vertical' as any,
-  },
-  contentDesc: {
-    fontSize: 11,
-    color: '#94a3b8',
-    margin: '0 0 4px 0',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    display: '-webkit-box',
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: 'vertical' as any,
-  },
-  contentDate: {
-    fontSize: 10,
-    color: '#cbd5e1',
-    margin: 0,
-  },
-
-  // Utility
-  empty: {
-    color: '#94a3b8',
-    fontSize: 14,
-    textAlign: 'center' as const,
-    padding: '24px 0',
   },
 };

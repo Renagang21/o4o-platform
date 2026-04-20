@@ -108,10 +108,10 @@ export interface CtaGuidanceSectionProps {
 export interface SignageMediaItem {
   id: string;
   title: string;
-  thumbnailUrl?: string | null;
-  duration?: number;
+  mediaType?: string;
+  uploaderName?: string | null;
+  createdAt?: string;
   href?: string;
-  actionLabel?: string;
 }
 
 /* ------------------------------------------------------------------ */
@@ -121,8 +121,38 @@ export interface SignagePlaylistItem {
   id: string;
   name: string;
   itemCount?: number;
-  totalDuration?: number;
+  createdAt?: string;
   href?: string;
+}
+
+/* ------------------------------------------------------------------ */
+/*  ContentHighlightItem — ContentHighlightSection                    */
+/* ------------------------------------------------------------------ */
+export interface ContentHighlightItem {
+  id: string;
+  title: string;
+  summary?: string;
+  thumbnailUrl?: string | null;
+  badge?: string;
+  meta?: string;
+  href?: string;
+}
+
+/* ------------------------------------------------------------------ */
+/*  ContentHighlightSectionProps                                       */
+/* ------------------------------------------------------------------ */
+export interface ContentHighlightSectionProps {
+  title?: string;
+  subtitle?: string;
+  primaryGroupTitle: string;
+  secondaryGroupTitle?: string;
+  primaryItems: ContentHighlightItem[];
+  secondaryItems?: ContentHighlightItem[];
+  viewAllHref?: string;
+  viewAllLabel?: string;
+  emptyMessage?: string;
+  loading?: boolean;
+  accentColor?: string;
 }
 
 /* ------------------------------------------------------------------ */

@@ -3,45 +3,59 @@
  *
  * WO-SHARED-SPACE-SIGNAGE-COMPONENT-V1
  *
- * 2-column layout (Media + Playlist), KPA reference design.
- * Horizontal scroll cards with thumbnails, duration badges.
- * Data fetch is done in the parent — this is presentation only.
+ * Standard table layout (제목 / 유형 / 등록자 / 등록일).
+ * No thumbnails. Data fetch is done in the parent — presentation only.
  */
 
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import type { SignagePreviewSectionProps, SignageMediaItem, SignagePlaylistItem } from './types';
 
-/* ─── Style injection (responsive grid + scrollbar + hover) ─── */
+/* ─── Style injection ─── */
 
 const injectedStyles = `
-  .signage-preview-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+  .signage-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
   }
-  @media (max-width: 640px) {
-    .signage-preview-grid {
-      grid-template-columns: 1fr;
-    }
+  .signage-table th {
+    text-align: left;
+    padding: 8px 12px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #64748b;
+    border-bottom: 1px solid #e2e8f0;
+    background: #f8fafc;
+    white-space: nowrap;
   }
-  .signage-scroll::-webkit-scrollbar {
-    height: 6px;
+  .signage-table td {
+    padding: 9px 12px;
+    color: #1e293b;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
   }
-  .signage-scroll::-webkit-scrollbar-track {
-    background: transparent;
+  .signage-table tbody tr:hover td {
+    background: #f8fafc;
   }
-  .signage-scroll::-webkit-scrollbar-thumb {
-    background: #e2e8f0;
-    border-radius: 3px;
+  .signage-table tbody tr:last-child td {
+    border-bottom: none;
   }
-  .signage-media-card:hover {
-    border-color: #cbd5e1 !important;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  .signage-table a {
+    color: inherit;
+    text-decoration: none;
   }
-  .signage-playlist-card:hover {
-    border-color: #cbd5e1 !important;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  .signage-table a:hover {
+    text-decoration: underline;
+  }
+  .signage-type-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background: #eff6ff;
+    color: #2563eb;
   }
 `;
 
@@ -98,118 +112,119 @@ export function SignagePreviewSection(props: SignagePreviewSectionProps) {
           </div>
         </div>
       ) : (
-        <div className="signage-preview-grid">
-          {/* Media Column */}
-          <div>
-            <h3 style={styles.subTitle}>{mediaLabel}</h3>
-            {mediaItems.length === 0 ? (
-              <div style={styles.emptyCard}>
-                <p style={styles.emptyText}>등록된 사이니지 미디어가 없습니다.</p>
+        <div style={styles.tableWrap}>
+          {/* Media Table */}
+          {mediaItems.length > 0 && (
+            <div style={styles.tableSection}>
+              <h3 style={styles.subTitle}>{mediaLabel}</h3>
+              <div style={styles.tableCard}>
+                <table className="signage-table">
+                  <thead>
+                    <tr>
+                      <th style={{ width: '40%' }}>제목</th>
+                      <th style={{ width: '15%' }}>유형</th>
+                      <th style={{ width: '25%' }}>등록자</th>
+                      <th style={{ width: '20%' }}>등록일</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {mediaItems.map((item) => (
+                      <MediaRow key={item.id} item={item} />
+                    ))}
+                  </tbody>
+                </table>
               </div>
-            ) : (
-              <div className="signage-scroll" style={styles.scrollRow}>
-                {mediaItems.map((item) => (
-                  <MediaCard key={item.id} item={item} accentColor={accentColor} />
-                ))}
-              </div>
-            )}
-          </div>
+            </div>
+          )}
 
-          {/* Playlist Column */}
-          <div>
-            <h3 style={styles.subTitle}>{playlistLabel}</h3>
-            {playlistItems.length === 0 ? (
-              <div style={styles.emptyCard}>
-                <p style={styles.emptyText}>플레이리스트가 없습니다.</p>
+          {/* Playlist Table */}
+          {playlistItems.length > 0 && (
+            <div style={styles.tableSection}>
+              <h3 style={styles.subTitle}>{playlistLabel}</h3>
+              <div style={styles.tableCard}>
+                <table className="signage-table">
+                  <thead>
+                    <tr>
+                      <th style={{ width: '55%' }}>이름</th>
+                      <th style={{ width: '25%' }}>항목 수</th>
+                      <th style={{ width: '20%' }}>등록일</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {playlistItems.map((pl) => (
+                      <PlaylistRow key={pl.id} playlist={pl} />
+                    ))}
+                  </tbody>
+                </table>
               </div>
-            ) : (
-              <div className="signage-scroll" style={styles.scrollRow}>
-                {playlistItems.map((pl) => (
-                  <PlaylistCard key={pl.id} playlist={pl} />
-                ))}
-              </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       )}
     </section>
   );
 }
 
-/* ─── Sub-components ─── */
+/* ─── Row Components ─── */
 
-function MediaCard({ item, accentColor }: { item: SignageMediaItem; accentColor: string }) {
+function MediaRow({ item }: { item: SignageMediaItem }) {
+  const titleCell = item.href ? (
+    <Link to={item.href}>{item.title}</Link>
+  ) : (
+    <span>{item.title}</span>
+  );
+
   return (
-    <div className="signage-media-card" style={styles.mediaCard}>
-      <div style={styles.thumbnailWrap}>
-        {item.thumbnailUrl ? (
-          <img src={item.thumbnailUrl} alt={item.title} style={styles.thumbnail} loading="lazy" />
-        ) : (
-          <div style={styles.thumbnailPlaceholder}>
-            <PlayIcon />
-          </div>
+    <tr>
+      <td style={styles.titleCell}>{titleCell}</td>
+      <td>
+        {item.mediaType && (
+          <span className="signage-type-badge">{formatMediaType(item.mediaType)}</span>
         )}
-        {item.duration != null && item.duration > 0 && (
-          <span style={styles.durationBadge}>{formatDuration(item.duration)}</span>
-        )}
-      </div>
-      <div style={styles.mediaCardBody}>
-        <p style={styles.mediaCardName}>{item.title}</p>
-        {item.href && item.actionLabel && (
-          <Link to={item.href} style={{ ...styles.actionLink, color: accentColor }}>
-            {item.actionLabel}
-          </Link>
-        )}
-      </div>
-    </div>
+      </td>
+      <td style={styles.metaCell}>{item.uploaderName ?? '—'}</td>
+      <td style={styles.dateCell}>{item.createdAt ? formatDate(item.createdAt) : '—'}</td>
+    </tr>
   );
 }
 
-function PlaylistCard({ playlist }: { playlist: SignagePlaylistItem }) {
-  return (
-    <div className="signage-playlist-card" style={styles.playlistCard}>
-      <div style={styles.playlistIconWrap}>
-        <ListIcon />
-      </div>
-      <p style={styles.playlistCardName}>{playlist.name}</p>
-      <p style={styles.playlistCardMeta}>
-        {playlist.itemCount != null && `${playlist.itemCount}개 항목`}
-        {playlist.itemCount != null && playlist.totalDuration != null && playlist.totalDuration > 0 && ' · '}
-        {playlist.totalDuration != null && playlist.totalDuration > 0 && formatDuration(playlist.totalDuration)}
-      </p>
-    </div>
+function PlaylistRow({ playlist }: { playlist: SignagePlaylistItem }) {
+  const nameCell = playlist.href ? (
+    <Link to={playlist.href}>{playlist.name}</Link>
+  ) : (
+    <span>{playlist.name}</span>
   );
-}
 
-/* ─── Icons ─── */
-
-function PlayIcon() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <polygon points="5 3 19 12 5 21 5 3" />
-    </svg>
-  );
-}
-
-function ListIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="8" y1="6" x2="21" y2="6" />
-      <line x1="8" y1="12" x2="21" y2="12" />
-      <line x1="8" y1="18" x2="21" y2="18" />
-      <line x1="3" y1="6" x2="3.01" y2="6" />
-      <line x1="3" y1="12" x2="3.01" y2="12" />
-      <line x1="3" y1="18" x2="3.01" y2="18" />
-    </svg>
+    <tr>
+      <td style={styles.titleCell}>{nameCell}</td>
+      <td style={styles.metaCell}>
+        {playlist.itemCount != null ? `${playlist.itemCount}개 항목` : '—'}
+      </td>
+      <td style={styles.dateCell}>{playlist.createdAt ? formatDate(playlist.createdAt) : '—'}</td>
+    </tr>
   );
 }
 
 /* ─── Helpers ─── */
 
-function formatDuration(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  return `${m}:${s.toString().padStart(2, '0')}`;
+function formatDate(iso: string): string {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '—';
+  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+}
+
+const MEDIA_TYPE_LABELS: Record<string, string> = {
+  video: '동영상',
+  image: '이미지',
+  html: 'HTML',
+  text: '텍스트',
+  rich_text: '리치텍스트',
+  link: '링크',
+};
+
+function formatMediaType(type: string): string {
+  return MEDIA_TYPE_LABELS[type] ?? type;
 }
 
 /* ─── Styles ─── */
@@ -235,110 +250,39 @@ const styles: Record<string, React.CSSProperties> = {
     textDecoration: 'none',
     fontWeight: 500,
   },
+  tableWrap: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 20,
+  },
+  tableSection: {},
   subTitle: {
     fontSize: '0.9375rem',
     fontWeight: 600,
     color: '#1e293b',
     margin: '0 0 8px',
   },
-  scrollRow: {
-    display: 'flex',
-    gap: 12,
-    overflowX: 'auto',
-    paddingBottom: 8,
-  },
-  // Media card
-  mediaCard: {
-    flex: '0 0 180px',
-    minWidth: 180,
+  tableCard: {
     backgroundColor: '#fff',
-    borderRadius: 12,
-    border: '1px solid #f1f5f9',
-    overflow: 'hidden',
-    transition: 'border-color 0.15s, box-shadow 0.15s',
-  },
-  thumbnailWrap: {
-    position: 'relative',
-    width: '100%',
-    height: 100,
-    backgroundColor: '#f1f5f9',
+    borderRadius: 10,
+    border: '1px solid #e2e8f0',
     overflow: 'hidden',
   },
-  thumbnail: {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
+  titleCell: {
+    fontWeight: 500,
+    maxWidth: 0,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   },
-  thumbnailPlaceholder: {
-    width: '100%',
-    height: '100%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+  metaCell: {
+    color: '#475569',
+  },
+  dateCell: {
     color: '#94a3b8',
-  },
-  durationBadge: {
-    position: 'absolute',
-    bottom: 4,
-    right: 4,
-    padding: '2px 6px',
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    color: '#fff',
-    fontSize: '0.6875rem',
-    borderRadius: 4,
     fontVariantNumeric: 'tabular-nums',
-  },
-  mediaCardBody: {
-    padding: 8,
-  },
-  mediaCardName: {
-    margin: 0,
-    fontSize: '0.8125rem',
-    fontWeight: 500,
-    color: '#1e293b',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
   },
-  actionLink: {
-    display: 'inline-block',
-    marginTop: 4,
-    fontSize: '0.75rem',
-    fontWeight: 600,
-    textDecoration: 'none',
-  },
-  // Playlist card
-  playlistCard: {
-    flex: '0 0 180px',
-    minWidth: 180,
-    minHeight: 100,
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    border: '1px solid #f1f5f9',
-    padding: 12,
-    transition: 'border-color 0.15s, box-shadow 0.15s',
-  },
-  playlistIconWrap: {
-    color: '#94a3b8',
-    marginBottom: 8,
-    display: 'flex',
-    alignItems: 'center',
-  },
-  playlistCardName: {
-    margin: 0,
-    fontSize: '0.8125rem',
-    fontWeight: 500,
-    color: '#1e293b',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-  },
-  playlistCardMeta: {
-    margin: '4px 0 0',
-    fontSize: '0.75rem',
-    color: '#94a3b8',
-  },
-  // Empty states
   emptyCard: {
     backgroundColor: '#fff',
     borderRadius: 12,
