@@ -121,7 +121,11 @@ export class SignagePlaylistService {
       throw new Error('Playlist not found');
     }
 
-    const media = await this.mediaRepository.findMediaById(dto.mediaId, scope);
+    // HQ 참조 아이템: organizationId 필터 없이 HQ 미디어 직접 조회 (WO-SIGNAGE-DIRECT-REFERENCE-ITEM-V1)
+    // sourceType='hq'이면 복사 없이 HQ 미디어를 플레이리스트에 직접 편성한다.
+    const media = dto.sourceType === 'hq'
+      ? await this.mediaRepository.findGlobalMediaById(dto.mediaId, scope.serviceKey)
+      : await this.mediaRepository.findMediaById(dto.mediaId, scope);
     if (!media) {
       throw new Error('Media not found');
     }

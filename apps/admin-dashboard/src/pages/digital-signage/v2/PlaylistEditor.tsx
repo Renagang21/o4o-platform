@@ -58,6 +58,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
   playlistApi,
   signageMediaApi,
+  globalContentApi,
   type SignagePlaylist,
   type SignagePlaylistItem,
   type SignageMedia,
@@ -112,8 +113,11 @@ export default function PlaylistEditor() {
 
   // Media picker
   const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
+  const [mediaTab, setMediaTab] = useState<'store' | 'hq'>('store');
   const [availableMedia, setAvailableMedia] = useState<SignageMedia[]>([]);
+  const [hqMedia, setHqMedia] = useState<SignageMedia[]>([]);
   const [loadingMedia, setLoadingMedia] = useState(false);
+  const [loadingHqMedia, setLoadingHqMedia] = useState(false);
 
   // Item settings
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -169,6 +173,21 @@ export default function PlaylistEditor() {
     }
   }, []);
 
+  // Load HQ media (WO-SIGNAGE-DIRECT-REFERENCE-ITEM-V1)
+  const loadHqMedia = useCallback(async () => {
+    setLoadingHqMedia(true);
+    try {
+      const response = await globalContentApi.listMedia('hq', undefined, { limit: 100 });
+      if (response.success && response.data) {
+        setHqMedia(response.data.items || []);
+      }
+    } catch (err) {
+      console.error('Failed to load HQ media:', err);
+    } finally {
+      setLoadingHqMedia(false);
+    }
+  }, []);
+
   useEffect(() => {
     loadAvailableMedia();
   }, [loadAvailableMedia]);
@@ -221,6 +240,7 @@ export default function PlaylistEditor() {
       // Save items
       for (const item of items) {
         if (item.isNew) {
+          const { sourceType: st, ...restSettings } = (item.settings || {}) as Record<string, unknown>;
           await playlistApi.addItem(playlistId!, {
             mediaId: item.mediaId,
             displayOrder: item.displayOrder,
@@ -228,7 +248,8 @@ export default function PlaylistEditor() {
             transitionEffect: item.transitionEffect,
             transitionDuration: item.transitionDuration,
             isForced: item.isForced,
-            settings: item.settings,
+            sourceType: (st as AddPlaylistItemDto['sourceType']) ?? 'store',
+            settings: restSettings,
           });
         } else if (item.isModified) {
           await playlistApi.updateItem(playlistId!, item.id, {
@@ -256,8 +277,8 @@ export default function PlaylistEditor() {
     }
   };
 
-  // Add media to playlist
-  const handleAddMedia = (media: SignageMedia) => {
+  // Add media to playlist (WO-SIGNAGE-DIRECT-REFERENCE-ITEM-V1: sourceType 지원)
+  const handleAddMedia = (media: SignageMedia, sourceType: 'store' | 'hq' = 'store') => {
     const newItem: EditableItem = {
       id: `temp-${Date.now()}`,
       playlistId: id || '',
@@ -268,7 +289,7 @@ export default function PlaylistEditor() {
       transitionEffect: playlist.defaultTransition || 'fade',
       transitionDuration: 300,
       isForced: false,
-      settings: {},
+      settings: { sourceType },
       isActive: true,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -526,6 +547,11 @@ export default function PlaylistEditor() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="font-medium truncate">{item.media?.name || 'Unknown Media'}</span>
+                        {(item.settings as Record<string, unknown>)?.sourceType === 'hq' && (
+                          <Badge className="bg-blue-600 text-white text-xs gap-1 hover:bg-blue-600">
+                            HQ
+                          </Badge>
+                        )}
                         {item.isForced && (
                           <Badge variant="secondary" className="gap-1">
                             <Lock className="w-3 h-3" />
@@ -589,50 +615,117 @@ export default function PlaylistEditor() {
       </div>
 
       {/* Media Picker Dialog */}
-      <Dialog open={mediaPickerOpen} onOpenChange={setMediaPickerOpen}>
+      <Dialog open={mediaPickerOpen} onOpenChange={(open) => {
+        setMediaPickerOpen(open);
+        if (open && mediaTab === 'hq' && hqMedia.length === 0) loadHqMedia();
+      }}>
         <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Add Media to Playlist</DialogTitle>
           </DialogHeader>
 
-          {loadingMedia ? (
-            <div className="grid grid-cols-3 gap-4">
-              {[1, 2, 3, 4, 5, 6].map(i => (
-                <Skeleton key={i} className="h-32" />
-              ))}
-            </div>
-          ) : availableMedia.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              No media available. Upload some media first.
-            </div>
-          ) : (
-            <div className="grid grid-cols-3 gap-4">
-              {availableMedia.map(media => {
-                const MediaIcon = MEDIA_TYPE_ICONS[media.mediaType] || Image;
-                const isAlreadyAdded = items.some(item => item.mediaId === media.id);
+          {/* Tab — 내 콘텐츠 / HQ 공용 콘텐츠 (WO-SIGNAGE-DIRECT-REFERENCE-ITEM-V1) */}
+          <div className="flex border-b mb-4">
+            <button
+              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                mediaTab === 'store' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+              onClick={() => setMediaTab('store')}
+            >
+              내 콘텐츠
+            </button>
+            <button
+              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                mediaTab === 'hq' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+              onClick={() => {
+                setMediaTab('hq');
+                if (hqMedia.length === 0) loadHqMedia();
+              }}
+            >
+              공용 콘텐츠 (HQ)
+            </button>
+          </div>
 
-                return (
-                  <button
-                    key={media.id}
-                    onClick={() => handleAddMedia(media)}
-                    disabled={isAlreadyAdded}
-                    className={`border rounded-lg p-4 text-left hover:border-primary transition-colors ${
-                      isAlreadyAdded ? 'opacity-50 cursor-not-allowed' : ''
-                    }`}
-                  >
-                    <div className="aspect-video bg-muted rounded flex items-center justify-center overflow-hidden mb-2">
-                      {media.thumbnailUrl ? (
-                        <img src={media.thumbnailUrl} alt={media.name} className="w-full h-full object-cover" />
-                      ) : (
-                        <MediaIcon className="w-8 h-8 text-muted-foreground" />
-                      )}
-                    </div>
-                    <p className="font-medium truncate">{media.name}</p>
-                    <p className="text-sm text-muted-foreground capitalize">{media.mediaType}</p>
-                  </button>
-                );
-              })}
-            </div>
+          {/* 내 콘텐츠 탭 */}
+          {mediaTab === 'store' && (
+            loadingMedia ? (
+              <div className="grid grid-cols-3 gap-4">
+                {[1, 2, 3, 4, 5, 6].map(i => <Skeleton key={i} className="h-32" />)}
+              </div>
+            ) : availableMedia.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                No media available. Upload some media first.
+              </div>
+            ) : (
+              <div className="grid grid-cols-3 gap-4">
+                {availableMedia.map(media => {
+                  const MediaIcon = MEDIA_TYPE_ICONS[media.mediaType] || Image;
+                  const isAlreadyAdded = items.some(item => item.mediaId === media.id);
+                  return (
+                    <button
+                      key={media.id}
+                      onClick={() => handleAddMedia(media, 'store')}
+                      disabled={isAlreadyAdded}
+                      className={`border rounded-lg p-4 text-left hover:border-primary transition-colors ${
+                        isAlreadyAdded ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
+                    >
+                      <div className="aspect-video bg-muted rounded flex items-center justify-center overflow-hidden mb-2">
+                        {media.thumbnailUrl ? (
+                          <img src={media.thumbnailUrl} alt={media.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <MediaIcon className="w-8 h-8 text-muted-foreground" />
+                        )}
+                      </div>
+                      <p className="font-medium truncate">{media.name}</p>
+                      <p className="text-sm text-muted-foreground capitalize">{media.mediaType}</p>
+                    </button>
+                  );
+                })}
+              </div>
+            )
+          )}
+
+          {/* HQ 공용 콘텐츠 탭 (직접 참조, 복사 없음) */}
+          {mediaTab === 'hq' && (
+            loadingHqMedia ? (
+              <div className="grid grid-cols-3 gap-4">
+                {[1, 2, 3, 4, 5, 6].map(i => <Skeleton key={i} className="h-32" />)}
+              </div>
+            ) : hqMedia.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                공용 HQ 콘텐츠가 없습니다.
+              </div>
+            ) : (
+              <div className="grid grid-cols-3 gap-4">
+                {hqMedia.map(media => {
+                  const MediaIcon = MEDIA_TYPE_ICONS[media.mediaType] || Image;
+                  const isAlreadyAdded = items.some(item => item.mediaId === media.id);
+                  return (
+                    <button
+                      key={media.id}
+                      onClick={() => handleAddMedia(media, 'hq')}
+                      disabled={isAlreadyAdded}
+                      className={`border rounded-lg p-4 text-left hover:border-primary transition-colors ${
+                        isAlreadyAdded ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
+                    >
+                      <div className="aspect-video bg-muted rounded flex items-center justify-center overflow-hidden mb-2 relative">
+                        {media.thumbnailUrl ? (
+                          <img src={media.thumbnailUrl} alt={media.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <MediaIcon className="w-8 h-8 text-muted-foreground" />
+                        )}
+                        <span className="absolute top-1 right-1 bg-blue-600 text-white text-xs px-1.5 py-0.5 rounded font-medium">HQ</span>
+                      </div>
+                      <p className="font-medium truncate">{media.name}</p>
+                      <p className="text-sm text-muted-foreground capitalize">{media.mediaType}</p>
+                    </button>
+                  );
+                })}
+              </div>
+            )
           )}
         </DialogContent>
       </Dialog>

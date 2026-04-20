@@ -19,6 +19,17 @@ export class SignageMediaRepository {
     });
   }
 
+  /**
+   * HQ/Global 미디어 조회 (WO-SIGNAGE-DIRECT-REFERENCE-ITEM-V1)
+   * organizationId 필터 없이 serviceKey + source='hq' 조건으로 조회.
+   * 매장이 복사 없이 HQ 미디어를 플레이리스트에 직접 참조할 때 사용.
+   */
+  async findGlobalMediaById(id: string, serviceKey: string): Promise<SignageMedia | null> {
+    return this.mediaRepo.findOne({
+      where: { id, serviceKey, source: 'hq' } as any,
+    });
+  }
+
   async findMedia(
     query: MediaQueryDto,
     scope: ScopeFilter,

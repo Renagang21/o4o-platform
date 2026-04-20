@@ -285,6 +285,8 @@ export interface AddPlaylistItemDto {
   transitionEffect?: TransitionEffect;
   transitionDuration?: number;
   isForced?: boolean;
+  /** WO-SIGNAGE-DIRECT-REFERENCE-ITEM-V1: 'hq'이면 HQ 미디어 직접 참조 (복사 없음) */
+  sourceType?: 'store' | 'hq' | 'platform' | 'supplier' | 'operator_ad';
   settings?: Record<string, unknown>;
 }
 
