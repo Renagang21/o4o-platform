@@ -58,6 +58,15 @@ export class NetureSupplierLibraryItem {
   @Column({ name: 'is_public', type: 'boolean', default: false })
   isPublic: boolean;
 
+  @Column({ name: 'content_type', type: 'varchar', length: 50, default: 'media' })
+  contentType: string;
+
+  @Column({ name: 'visibility', type: 'varchar', length: 20, default: 'personal' })
+  visibility: string;
+
+  @Column({ name: 'blocks', type: 'jsonb', nullable: true })
+  blocks: Record<string, unknown>[] | null;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

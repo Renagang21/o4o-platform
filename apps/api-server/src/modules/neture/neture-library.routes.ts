@@ -96,15 +96,15 @@ router.get('/library/public', async (req: Request, res: Response) => {
       page: page ? Number(page) : undefined,
       limit: limit ? Number(limit) : undefined,
     });
-    // ContentMeta (WO-CONTENT-META-API-ENRICHMENT-V1)
+    // ContentMeta (WO-NETURE-SUPPLIER-CONTENT-TABLE-MERGE-V1: DB 값 우선)
     if (result.success) {
       result.data.items = result.data.items.map((item: any) => ({
         ...item,
         producer: 'supplier' as const,
         producerRef: item.supplierId,
-        visibility: mapNetureVisibility(item.isPublic ?? true),
+        visibility: item.visibility ?? mapNetureVisibility(item.isPublic ?? true),
         serviceKey: 'neture' as const,
-        contentType: 'media' as const,
+        contentType: item.contentType ?? 'media',
         metaStatus: 'published' as const,
       }));
     }
@@ -131,16 +131,16 @@ router.get('/library', requireAuth, requireLinkedSupplier, async (req: Request, 
       page: page ? Number(page) : undefined,
       limit: limit ? Number(limit) : undefined,
     });
-    // ContentMeta (WO-CONTENT-META-API-ENRICHMENT-V1)
+    // ContentMeta (WO-NETURE-SUPPLIER-CONTENT-TABLE-MERGE-V1: DB 값 우선)
     if (result.success) {
       result.data.items = result.data.items.map((item: any) => ({
         ...item,
         producer: 'supplier' as const,
         producerRef: item.supplierId,
-        visibility: mapNetureVisibility(item.isPublic ?? false),
+        visibility: item.visibility ?? mapNetureVisibility(item.isPublic ?? false),
         serviceKey: 'neture' as const,
-        contentType: 'media' as const,
-        metaStatus: mapNetureVisibility(item.isPublic ?? false) === 'service' ? 'published' as const : 'draft' as const,
+        contentType: item.contentType ?? 'media',
+        metaStatus: (item.visibility ?? mapNetureVisibility(item.isPublic ?? false)) === 'service' ? 'published' as const : 'draft' as const,
       }));
     }
     res.json(result);
@@ -156,7 +156,7 @@ router.get('/library', requireAuth, requireLinkedSupplier, async (req: Request, 
 router.post('/library', requireAuth, requireActiveSupplier, async (req: Request, res: Response) => {
   try {
     const supplierId = (req as SupplierRequest).supplierId;
-    const { title, description, fileUrl, fileName, fileSize, mimeType, category, isPublic } = req.body;
+    const { title, description, fileUrl, fileName, fileSize, mimeType, category, isPublic, contentType, blocks } = req.body;
 
     // 입력 검증
     if (!title || typeof title !== 'string') {
@@ -189,6 +189,8 @@ router.post('/library', requireAuth, requireActiveSupplier, async (req: Request,
       mimeType: mimeType.slice(0, 100),
       category: category ? String(category).slice(0, 100) : null,
       isPublic: isPublic === true,
+      contentType: typeof contentType === 'string' ? contentType.slice(0, 50) : undefined,
+      blocks: Array.isArray(blocks) ? blocks : undefined,
     });
 
     res.status(201).json(result);
@@ -205,7 +207,7 @@ router.patch('/library/:id', requireAuth, requireActiveSupplier, async (req: Req
   try {
     const supplierId = (req as SupplierRequest).supplierId;
     const { id } = req.params;
-    const { title, description, fileUrl, fileName, fileSize, mimeType, category, isPublic } = req.body;
+    const { title, description, fileUrl, fileName, fileSize, mimeType, category, isPublic, contentType, blocks } = req.body;
 
     const input: Record<string, unknown> = {};
     if (title !== undefined) input.title = String(title).slice(0, 200);
@@ -216,6 +218,8 @@ router.patch('/library/:id', requireAuth, requireActiveSupplier, async (req: Req
     if (mimeType !== undefined) input.mimeType = String(mimeType).slice(0, 100);
     if (category !== undefined) input.category = category ? String(category).slice(0, 100) : null;
     if (isPublic !== undefined) input.isPublic = isPublic === true;
+    if (contentType !== undefined) input.contentType = String(contentType).slice(0, 50);
+    if (blocks !== undefined) input.blocks = Array.isArray(blocks) ? blocks : null;
 
     if (Object.keys(input).length === 0) {
       res.status(400).json({ success: false, error: { code: 'NO_FIELDS', message: 'At least one field to update is required' } });

@@ -26,6 +26,8 @@ interface CreateInput {
   mimeType: string;
   category?: string | null;
   isPublic?: boolean;
+  contentType?: string;
+  blocks?: Record<string, unknown>[] | null;
 }
 
 interface UpdateInput {
@@ -37,6 +39,8 @@ interface UpdateInput {
   mimeType?: string;
   category?: string | null;
   isPublic?: boolean;
+  contentType?: string;
+  blocks?: Record<string, unknown>[] | null;
 }
 
 export class NetureLibraryService {
@@ -113,6 +117,7 @@ export class NetureLibraryService {
     input: CreateInput,
   ): Promise<{ success: true; data: NetureSupplierLibraryItem }> {
     try {
+      const isPublic = input.isPublic ?? false;
       const item = this.repo.create({
         supplierId,
         title: input.title,
@@ -122,7 +127,10 @@ export class NetureLibraryService {
         fileSize: input.fileSize,
         mimeType: input.mimeType,
         category: input.category ?? null,
-        isPublic: input.isPublic ?? false,
+        isPublic,
+        contentType: input.contentType ?? 'media',
+        visibility: isPublic ? 'service' : 'personal',
+        blocks: input.blocks ?? null,
       });
 
       const saved = await this.repo.save(item);
@@ -155,7 +163,12 @@ export class NetureLibraryService {
       if (input.fileSize !== undefined) item.fileSize = input.fileSize;
       if (input.mimeType !== undefined) item.mimeType = input.mimeType;
       if (input.category !== undefined) item.category = input.category;
-      if (input.isPublic !== undefined) item.isPublic = input.isPublic;
+      if (input.isPublic !== undefined) {
+        item.isPublic = input.isPublic;
+        item.visibility = input.isPublic ? 'service' : 'personal';
+      }
+      if (input.contentType !== undefined) item.contentType = input.contentType;
+      if (input.blocks !== undefined) item.blocks = input.blocks;
 
       const saved = await this.repo.save(item);
       logger.info(`[NetureLibraryService] Item updated: ${id} by supplier ${supplierId}`);

@@ -12,7 +12,6 @@ import type { RequestHandler, Router as ExpressRouter } from 'express';
 import type { DataSource } from 'typeorm';
 import { NetureService } from './neture.service.js';
 import { SupplierStatus, PartnershipStatus } from './entities/index.js';
-import { NetureSupplierLibrary } from './entities/NetureSupplierLibrary.entity.js';
 import logger from '../../utils/logger.js';
 import { requireAuth } from '../../middleware/auth.middleware.js';
 import { requireNetureScope } from '../../middleware/neture-scope.middleware.js';
@@ -545,38 +544,6 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
     } catch (error) {
       logger.error('[Neture API] Error generating product flyer:', error);
       res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
-    }
-  });
-
-  // ==================== Public Library Item ====================
-
-  /**
-   * GET /api/v1/neture/library/public/:id
-   */
-  router.get('/library/public/:id', async (req: Request, res: Response) => {
-    try {
-      const { id } = req.params;
-      const repo = dataSource.getRepository(NetureSupplierLibrary);
-      const item = await repo.findOne({ where: { id, status: 'published' as any } });
-
-      if (!item) {
-        res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Library item not found' });
-        return;
-      }
-
-      res.json({
-        success: true,
-        data: {
-          id: item.id,
-          title: item.title,
-          description: item.description,
-          type: item.type,
-          imageUrl: item.imageUrl,
-        },
-      });
-    } catch (error) {
-      logger.error('[Neture API] Error fetching public library item:', error);
-      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch library item' });
     }
   });
 
