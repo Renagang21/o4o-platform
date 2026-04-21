@@ -100,6 +100,11 @@ export interface SupplierLibraryItem {
   isPublic: boolean;
   createdAt: string;
   updatedAt: string;
+  // ContentMeta (WO-CONTENT-META-API-ENRICHMENT-V1)
+  producer?: string;
+  visibility?: string;
+  contentType?: string;
+  metaStatus?: string;
 }
 
 export interface SupplierProduct {

@@ -57,6 +57,10 @@ interface CmsContent {
   createdBy: string | null;
   createdAt: string;
   updatedAt: string;
+  // ContentMeta (WO-CONTENT-META-API-ENRICHMENT-V1)
+  producer?: string;
+  visibility?: string;
+  metaStatus?: string;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────
@@ -500,14 +504,21 @@ function ContentList({
     {
       key: 'status',
       header: '상태',
-      width: '80px',
+      width: '120px',
       sortable: true,
-      render: (v) => {
+      render: (v, row) => {
         const sc = statusConfig[v as ContentStatus];
         return (
-          <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${sc.color} ${sc.bg}`}>
-            {sc.label}
-          </span>
+          <div className="flex flex-col gap-0.5">
+            <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${sc.color} ${sc.bg}`}>
+              {sc.label}
+            </span>
+            {row.visibility && (
+              <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium bg-sky-50 text-sky-700">
+                {{ platform: '전체', service: '서비스', store: '매장', personal: '개인' }[row.visibility] ?? row.visibility}
+              </span>
+            )}
+          </div>
         );
       },
     },

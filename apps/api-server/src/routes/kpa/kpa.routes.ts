@@ -117,7 +117,7 @@ import { asyncHandler } from '../../middleware/error-handler.js';
 import { uploadSingleMiddleware } from '../../middleware/upload.middleware.js';
 // WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: legacy role utils removed
 import { KPA_SCOPE_CONFIG } from '@o4o/security-core';
-import { mapCmsStatus } from '@o4o/types';
+import { mapCmsStatus, mapCmsAuthorRole, mapCmsVisibilityScope } from '@o4o/types';
 import { createMembershipScopeGuard } from '../../common/middleware/membership-guard.middleware.js';
 import { ActionLogService } from '@o4o/action-log-core';
 // WO-O4O-OPERATOR-ACTION-LAYER-V1
@@ -705,7 +705,17 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       .take(limit);
 
     const [data, total] = await qb.getManyAndCount();
-    res.json({ success: true, data, total, page, limit, totalPages: Math.ceil(total / limit) });
+    // ContentMeta (WO-CONTENT-META-API-ENRICHMENT-V1)
+    const enrichedData = data.map((item: any) => ({
+      ...item,
+      producer: mapCmsAuthorRole((item.authorRole as any) ?? 'service_admin'),
+      producerRef: item.createdBy ?? '',
+      visibility: mapCmsVisibilityScope((item.visibilityScope as any) ?? 'service'),
+      serviceKey: 'kpa-society' as const,
+      contentType: 'cms_block' as const,
+      metaStatus: mapCmsStatus(item.status ?? 'draft'),
+    }));
+    res.json({ success: true, data: enrichedData, total, page, limit, totalPages: Math.ceil(total / limit) });
   }));
 
   // POST /news — 새 콘텐츠 생성

@@ -26,6 +26,22 @@ import cmsAPI, { CmsContent, ContentType, ContentStatus } from '@/lib/cms';
 import toast from 'react-hot-toast';
 import ContentFormModal from './ContentFormModal';
 
+// ContentMeta display labels (WO-CONTENT-META-UI-INTEGRATION-V1)
+const PRODUCER_LABELS: Record<string, string> = {
+  platform_admin: '플랫폼 운영',
+  service_admin: '서비스 운영',
+  supplier: '공급자',
+  store_operator: '매장 운영자',
+  community: '커뮤니티',
+};
+
+const VISIBILITY_LABELS: Record<string, string> = {
+  platform: '전체',
+  service: '서비스',
+  store: '매장',
+  personal: '개인',
+};
+
 // Available services for filtering
 const SERVICES = [
   { value: '', label: 'All Services' },
@@ -333,6 +349,20 @@ export default function CMSContentList() {
                           {content.isOperatorPicked && (
                             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
                               Operator Picked
+                            </span>
+                          )}
+
+                          {/* ContentMeta: Producer Badge */}
+                          {content.producer && (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-violet-100 text-violet-800">
+                              {PRODUCER_LABELS[content.producer] ?? content.producer}
+                            </span>
+                          )}
+
+                          {/* ContentMeta: Visibility Badge */}
+                          {content.visibility && (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-sky-100 text-sky-800">
+                              {VISIBILITY_LABELS[content.visibility] ?? content.visibility}
                             </span>
                           )}
                         </div>

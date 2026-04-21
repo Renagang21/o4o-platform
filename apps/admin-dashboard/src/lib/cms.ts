@@ -716,6 +716,12 @@ export interface CmsContent {
   createdBy: string | null;
   createdAt: string;
   updatedAt: string;
+  // ContentMeta (WO-CONTENT-META-API-ENRICHMENT-V1)
+  producer?: string;
+  producerRef?: string;
+  visibility?: string;
+  contentType?: string;
+  metaStatus?: string;
 }
 
 // ========================================

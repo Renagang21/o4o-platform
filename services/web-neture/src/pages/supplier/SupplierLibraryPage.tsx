@@ -91,17 +91,31 @@ export default function SupplierLibraryPage() {
         </div>
       ),
       isPublic: (
-        <span style={{
-          display: 'inline-block',
-          padding: '2px 8px',
-          fontSize: '12px',
-          borderRadius: '4px',
-          backgroundColor: item.isPublic ? '#dcfce7' : '#f1f5f9',
-          color: item.isPublic ? '#15803d' : '#64748b',
-          fontWeight: 500,
-        }}>
-          {item.isPublic ? '공개' : '비공개'}
-        </span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+          <span style={{
+            display: 'inline-block',
+            padding: '2px 8px',
+            fontSize: '12px',
+            borderRadius: '4px',
+            backgroundColor: item.isPublic ? '#dcfce7' : '#f1f5f9',
+            color: item.isPublic ? '#15803d' : '#64748b',
+            fontWeight: 500,
+          }}>
+            {item.isPublic ? '공개' : '비공개'}
+          </span>
+          {item.visibility && (
+            <span style={{
+              display: 'inline-block',
+              padding: '1px 6px',
+              fontSize: '11px',
+              borderRadius: '4px',
+              backgroundColor: '#f0f9ff',
+              color: '#0369a1',
+            }}>
+              {{ service: '서비스', personal: '개인', platform: '전체', store: '매장' }[item.visibility] ?? item.visibility}
+            </span>
+          )}
+        </div>
       ),
     createdAt: <span style={{ fontSize: '13px', color: '#64748b' }}>{formatDate(item.createdAt)}</span>,
     actions: (
