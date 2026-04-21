@@ -1,10 +1,14 @@
 /**
  * DataTable — BaseTable Wrapper (WO-O4O-TABLE-STANDARD-ALIGNMENT-V1)
  *
- * 기존 apps DataTable API를 유지하면서 내부적으로 @o4o/ui BaseTable을 사용.
- * 28개 기존 페이지는 코드 변경 없이 BaseTable 기반으로 동작.
+ * @deprecated WO-O4O-TABLE-DATATABLE-DEPRECATION-V1
+ * 신규 페이지에서 이 컴포넌트 사용 금지.
+ * 대신 `BaseTable + O4OColumn + RowActionMenu + FilterBar` (@o4o/ui)를 직접 사용.
+ * 참조 구현: apps/admin-dashboard/src/pages/neture/ProductApprovalQueuePage.tsx
+ * 기존 페이지는 순차 마이그레이션 후 이 파일을 삭제.
  *
- * 새 페이지는 BaseTable + O4OColumn + RowActionMenu + FilterBar를 직접 사용 권장.
+ * 기존 apps DataTable API를 유지하면서 내부적으로 @o4o/ui BaseTable을 사용.
+ * 기존 페이지는 코드 변경 없이 BaseTable 기반으로 동작 (호환 레이어).
  *
  * Migration:
  * - `title: string` → `header: ReactNode`
