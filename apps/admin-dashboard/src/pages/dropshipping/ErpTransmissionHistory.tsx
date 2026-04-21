@@ -2,13 +2,10 @@
  * ERP Transmission History Page
  *
  * Phase 0: ERP 전송 내역 목록 화면
- * - 이벤트 타입, 전표 유형, 금액, 상태 표시
- * - 상태별 필터링
- * - 실패 건 재시도 기능
+ * WO-O4O-TABLE-DATATABLE-DEPRECATION-V1B — BaseTable 직접 사용으로 마이그레이션
  */
 
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import {
   CheckCircle,
   XCircle,
@@ -18,12 +15,12 @@ import {
   RotateCcw,
   FileText,
   CreditCard,
-  Settings,
 } from 'lucide-react';
 import { erpConnectorAPI, ErpTransmission } from '../../api/erp-connector';
 import { toast } from 'react-hot-toast';
 import PageHeader from '../../components/common/PageHeader';
-import { DataTable, Column } from '../../components/common/DataTable';
+import { BaseTable, RowActionMenu } from '@o4o/ui';
+import type { O4OColumn } from '@o4o/ui';
 
 const ErpTransmissionHistory: React.FC = () => {
   const [transmissions, setTransmissions] = useState<ErpTransmission[]>([]);
@@ -32,9 +29,7 @@ const ErpTransmissionHistory: React.FC = () => {
   const [filterEventType, setFilterEventType] = useState('');
   const [retrying, setRetrying] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchTransmissions();
-  }, [filterStatus, filterEventType]);
+  useEffect(() => { fetchTransmissions(); }, [filterStatus, filterEventType]);
 
   const fetchTransmissions = async () => {
     setLoading(true);
@@ -43,9 +38,7 @@ const ErpTransmissionHistory: React.FC = () => {
         status: filterStatus || undefined,
         eventType: filterEventType || undefined,
       });
-      if (response.success) {
-        setTransmissions(response.data);
-      }
+      if (response.success) setTransmissions(response.data);
     } catch (error) {
       toast.error('전송 내역을 불러오는데 실패했습니다');
     } finally {
@@ -70,22 +63,11 @@ const ErpTransmissionHistory: React.FC = () => {
     }
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('ko-KR', {
-      style: 'currency',
-      currency: 'KRW',
-    }).format(amount);
-  };
+  const formatCurrency = (amount: number) =>
+    new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(amount);
 
-  const formatDateTime = (isoString: string) => {
-    const date = new Date(isoString);
-    return date.toLocaleString('ko-KR', {
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
+  const formatDateTime = (isoString: string) =>
+    new Date(isoString).toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
 
   const getStatusBadge = (status: string) => {
     const config = {
@@ -93,14 +75,10 @@ const ErpTransmissionHistory: React.FC = () => {
       FAILURE: { color: 'bg-red-100 text-red-800', icon: XCircle, text: '실패' },
       PENDING: { color: 'bg-yellow-100 text-yellow-800', icon: Clock, text: '대기중' },
     };
-
     const cfg = config[status as keyof typeof config] || config.PENDING;
     const Icon = cfg.icon;
-
     return (
-      <span
-        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${cfg.color}`}
-      >
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${cfg.color}`}>
         <Icon className="w-3 h-3 mr-1" />
         {cfg.text}
       </span>
@@ -113,16 +91,8 @@ const ErpTransmissionHistory: React.FC = () => {
       ORDER_COMPLETED: { color: 'bg-blue-100 text-blue-800', text: '주문완료' },
       REFUND_PROCESSED: { color: 'bg-orange-100 text-orange-800', text: '환불처리' },
     };
-
     const cfg = config[eventType] || { color: 'bg-gray-100 text-gray-800', text: eventType };
-
-    return (
-      <span
-        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${cfg.color}`}
-      >
-        {cfg.text}
-      </span>
-    );
+    return <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${cfg.color}`}>{cfg.text}</span>;
   };
 
   const getVoucherTypeBadge = (voucherType: string) => {
@@ -132,19 +102,11 @@ const ErpTransmissionHistory: React.FC = () => {
       SALES: { icon: FileText, text: '매출전표' },
       RECEIPT: { icon: CreditCard, text: '입금전표' },
     };
-
     const cfg = config[voucherType] || { icon: FileText, text: voucherType };
     const Icon = cfg.icon;
-
-    return (
-      <span className="inline-flex items-center text-gray-700">
-        <Icon className="w-4 h-4 mr-1" />
-        {cfg.text}
-      </span>
-    );
+    return <span className="inline-flex items-center text-gray-700"><Icon className="w-4 h-4 mr-1" />{cfg.text}</span>;
   };
 
-  // 통계 계산
   const stats = {
     total: transmissions.length,
     success: transmissions.filter((t) => t.status === 'SUCCESS').length,
@@ -152,102 +114,86 @@ const ErpTransmissionHistory: React.FC = () => {
     pending: transmissions.filter((t) => t.status === 'PENDING').length,
   };
 
-  const headerActions = [
-    { id: 'screen-options', label: 'Screen Options', icon: <Settings className="w-4 h-4" />, onClick: () => {}, variant: 'secondary' as const },
-    { id: 'back', label: '상태 보기', icon: <ArrowLeft className="w-4 h-4" />, onClick: () => window.location.href = '/dropshipping/erp-status', variant: 'secondary' as const },
-    { id: 'refresh', label: '새로고침', icon: <RefreshCw className="w-4 h-4" />, onClick: fetchTransmissions, variant: 'primary' as const },
-  ];
-
-  const columns: Column<ErpTransmission>[] = [
+  const columns: O4OColumn<ErpTransmission>[] = [
     {
       key: 'eventType',
-      title: '이벤트 유형',
-      dataIndex: 'eventType',
-      render: (value: string) => getEventTypeBadge(value),
+      header: '이벤트 유형',
+      render: (_, row) => getEventTypeBadge(row.eventType),
     },
     {
       key: 'voucherType',
-      title: '전표 유형',
-      dataIndex: 'voucherType',
-      render: (value: string) => getVoucherTypeBadge(value),
+      header: '전표 유형',
+      render: (_, row) => getVoucherTypeBadge(row.voucherType),
     },
     {
       key: 'batchNumber',
-      title: '배치번호',
-      dataIndex: 'batchNumber',
-      render: (value: string) => (
-        <span className="font-mono text-sm">{value || '-'}</span>
-      ),
+      header: '배치번호',
+      render: (_, row) => <span className="font-mono text-sm">{row.batchNumber || '-'}</span>,
     },
     {
       key: 'supplier',
-      title: '공급사',
-      render: (_: unknown, record: ErpTransmission) => (
+      header: '공급사',
+      render: (_, row) => (
         <div className="text-sm">
-          <p className="font-medium">{record.supplierName || '-'}</p>
-          <p className="text-gray-500">{record.supplierCode}</p>
+          <p className="font-medium">{row.supplierName || '-'}</p>
+          <p className="text-gray-500">{row.supplierCode}</p>
         </div>
       ),
     },
     {
       key: 'amount',
-      title: '금액',
-      dataIndex: 'amount',
-      align: 'right' as const,
-      render: (value: number) => (
-        <span className="font-medium">{formatCurrency(value)}</span>
-      ),
+      header: '금액',
+      align: 'right',
+      sortable: true,
+      sortAccessor: (row) => row.amount,
+      render: (_, row) => <span className="font-medium">{formatCurrency(row.amount)}</span>,
     },
     {
       key: 'status',
-      title: '상태',
-      dataIndex: 'status',
-      align: 'center' as const,
-      render: (value: string, record: ErpTransmission) => (
+      header: '상태',
+      align: 'center',
+      render: (_, row) => (
         <div>
-          {getStatusBadge(value)}
-          {value === 'FAILURE' && record.errorMessage && (
-            <p className="text-xs text-red-600 mt-1 truncate" title={record.errorMessage}>
-              {record.errorMessage}
-            </p>
+          {getStatusBadge(row.status)}
+          {row.status === 'FAILURE' && row.errorMessage && (
+            <p className="text-xs text-red-600 mt-1 truncate" title={row.errorMessage}>{row.errorMessage}</p>
           )}
         </div>
       ),
     },
     {
       key: 'voucherNo',
-      title: '전표번호',
-      dataIndex: 'voucherNo',
-      render: (value: string) => value ? (
-        <span className="font-mono text-sm text-green-700">{value}</span>
-      ) : (
-        <span className="text-gray-400">-</span>
-      ),
+      header: '전표번호',
+      render: (_, row) => row.voucherNo ? (
+        <span className="font-mono text-sm text-green-700">{row.voucherNo}</span>
+      ) : <span className="text-gray-400">-</span>,
     },
     {
       key: 'createdAt',
-      title: '일시',
-      dataIndex: 'createdAt',
-      render: (value: string) => (
-        <span className="text-sm text-gray-500">{formatDateTime(value)}</span>
-      ),
+      header: '일시',
+      sortable: true,
+      sortAccessor: (row) => row.createdAt,
+      render: (_, row) => <span className="text-sm text-gray-500">{formatDateTime(row.createdAt)}</span>,
     },
     {
-      key: 'actions',
-      title: '액션',
-      align: 'center' as const,
-      render: (_: unknown, record: ErpTransmission) => (
-        record.status === 'FAILURE' ? (
+      key: '_actions',
+      header: '',
+      width: 56,
+      system: true,
+      align: 'center',
+      render: (_, row) => {
+        if (row.status !== 'FAILURE') return null;
+        return (
           <button
-            onClick={() => handleRetry(record.id)}
-            disabled={retrying === record.id}
+            onClick={() => handleRetry(row.id)}
+            disabled={retrying === row.id}
             className="p-1 text-o4o-blue hover:bg-blue-50 rounded transition disabled:opacity-50"
             title="재시도"
           >
-            <RotateCcw className={`w-4 h-4 ${retrying === record.id ? 'animate-spin' : ''}`} />
+            <RotateCcw className={`w-4 h-4 ${retrying === row.id ? 'animate-spin' : ''}`} />
           </button>
-        ) : null
-      ),
+        );
+      },
     },
   ];
 
@@ -256,26 +202,25 @@ const ErpTransmissionHistory: React.FC = () => {
       <PageHeader
         title="ERP 전송 내역"
         subtitle="ERP로 전송된 전표 내역을 확인합니다"
-        actions={headerActions}
+        actions={[
+          { id: 'back', label: '상태 보기', icon: <ArrowLeft className="w-4 h-4" />, onClick: () => window.location.href = '/dropshipping/erp-status', variant: 'secondary' as const },
+          { id: 'refresh', label: '새로고침', icon: <RefreshCw className="w-4 h-4" />, onClick: fetchTransmissions, variant: 'primary' as const },
+        ]}
       />
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-white p-4 rounded-lg border border-gray-300">
-          <p className="text-gray-600 text-sm">전체 전송</p>
-          <p className="text-2xl font-bold">{stats.total}</p>
+          <p className="text-gray-600 text-sm">전체 전송</p><p className="text-2xl font-bold">{stats.total}</p>
         </div>
         <div className="bg-white p-4 rounded-lg border border-gray-300">
-          <p className="text-gray-600 text-sm">성공</p>
-          <p className="text-2xl font-bold text-green-600">{stats.success}</p>
+          <p className="text-gray-600 text-sm">성공</p><p className="text-2xl font-bold text-green-600">{stats.success}</p>
         </div>
         <div className="bg-white p-4 rounded-lg border border-gray-300">
-          <p className="text-gray-600 text-sm">실패</p>
-          <p className="text-2xl font-bold text-red-600">{stats.failure}</p>
+          <p className="text-gray-600 text-sm">실패</p><p className="text-2xl font-bold text-red-600">{stats.failure}</p>
         </div>
         <div className="bg-white p-4 rounded-lg border border-gray-300">
-          <p className="text-gray-600 text-sm">대기중</p>
-          <p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
+          <p className="text-gray-600 text-sm">대기중</p><p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
         </div>
       </div>
 
@@ -306,13 +251,24 @@ const ErpTransmissionHistory: React.FC = () => {
         <div className="text-sm text-gray-600">총 {stats.total}건</div>
       </div>
 
-      {/* DataTable */}
-      <DataTable<ErpTransmission>
-        rowKey="id"
-        columns={columns}
-        dataSource={transmissions}
-        loading={loading}
-      />
+      {/* Table */}
+      <div className="bg-white border border-gray-300 border-t-0 rounded-b-lg overflow-hidden">
+        {loading ? (
+          <div className="animate-pulse p-4 space-y-2">
+            {[...Array(5)].map((_, i) => <div key={i} className="h-12 bg-gray-100 rounded" />)}
+          </div>
+        ) : (
+          <BaseTable<ErpTransmission>
+            columns={columns}
+            data={transmissions}
+            rowKey={(row) => row.id}
+            emptyMessage="전송 내역이 없습니다"
+            tableId="erp-transmission-history"
+            columnVisibility
+            persistState
+          />
+        )}
+      </div>
     </div>
   );
 };

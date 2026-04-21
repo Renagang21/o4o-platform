@@ -3,6 +3,7 @@
  * Phase 3: UI Integration
  *
  * Work Order 제약: 금액/수수료/정산 정보 UI 노출 절대 금지
+ * WO-O4O-TABLE-DATATABLE-DEPRECATION-V1B — BaseTable 직접 사용으로 마이그레이션
  */
 
 import { FC } from 'react';
@@ -11,7 +12,8 @@ import { ArrowLeft } from 'lucide-react';
 import { useParticipants, GroupbuyParticipant } from '@/hooks/groupbuy';
 import { useCampaignDetail } from '@/hooks/groupbuy';
 import { PermissionGuard } from '@/components/organization/PermissionGuard';
-import { DataTable, Column } from '@/components/common/DataTable';
+import { BaseTable } from '@o4o/ui';
+import type { O4OColumn } from '@o4o/ui';
 
 const GroupbuyParticipantsPage: FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -20,55 +22,51 @@ const GroupbuyParticipantsPage: FC = () => {
   const { participants, loading: participantsLoading } = useParticipants(id);
 
   // No price columns - Work Order constraint
-  const columns: Column<GroupbuyParticipant>[] = [
+  const columns: O4OColumn<GroupbuyParticipant>[] = [
     {
       key: 'pharmacyId',
-      title: '약국 ID',
-      dataIndex: 'pharmacyId',
-      render: (pharmacyId, record) => (
+      header: '약국 ID',
+      render: (_, row) => (
         <div className="flex flex-col">
-          <span className="font-medium text-gray-900">{record.pharmacyName || pharmacyId}</span>
-          <span className="text-xs text-gray-500">{pharmacyId}</span>
+          <span className="font-medium text-gray-900">{row.pharmacyName || row.pharmacyId}</span>
+          <span className="text-xs text-gray-500">{row.pharmacyId}</span>
         </div>
-      )
+      ),
     },
     {
       key: 'totalQuantity',
-      title: '주문 수량',
-      dataIndex: 'totalQuantity',
+      header: '주문 수량',
       align: 'center',
       sortable: true,
-      render: (quantity) => `${quantity}개`
+      sortAccessor: (row) => row.totalQuantity,
+      render: (_, row) => `${row.totalQuantity}개`,
     },
     {
       key: 'pendingQuantity',
-      title: '대기 수량',
-      dataIndex: 'pendingQuantity',
+      header: '대기 수량',
       align: 'center',
-      render: (quantity) => (
-        <span className={quantity > 0 ? 'text-yellow-600' : 'text-gray-400'}>
-          {quantity}개
+      render: (_, row) => (
+        <span className={row.pendingQuantity > 0 ? 'text-yellow-600' : 'text-gray-400'}>
+          {row.pendingQuantity}개
         </span>
-      )
+      ),
     },
     {
       key: 'confirmedQuantity',
-      title: '확정 수량',
-      dataIndex: 'confirmedQuantity',
+      header: '확정 수량',
       align: 'center',
-      render: (quantity) => (
-        <span className={quantity > 0 ? 'text-green-600 font-medium' : 'text-gray-400'}>
-          {quantity}개
+      render: (_, row) => (
+        <span className={row.confirmedQuantity > 0 ? 'text-green-600 font-medium' : 'text-gray-400'}>
+          {row.confirmedQuantity}개
         </span>
-      )
+      ),
     },
     {
       key: 'orderCount',
-      title: '주문 건수',
-      dataIndex: 'orderCount',
+      header: '주문 건수',
       align: 'center',
-      render: (count) => `${count}건`
-    }
+      render: (_, row) => `${row.orderCount}건`,
+    },
   ];
 
   // Calculate summary stats (quantity only, no price)
@@ -88,10 +86,7 @@ const GroupbuyParticipantsPage: FC = () => {
     return (
       <div className="flex flex-col items-center justify-center h-full">
         <p className="text-gray-500 mb-4">캠페인을 찾을 수 없습니다</p>
-        <Link
-          to="/admin/groupbuy"
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-        >
+        <Link to="/admin/groupbuy" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
           목록으로 돌아가기
         </Link>
       </div>
@@ -124,27 +119,19 @@ const GroupbuyParticipantsPage: FC = () => {
           <div className="grid grid-cols-4 gap-6">
             <div>
               <div className="text-sm text-gray-500">참여 약국</div>
-              <div className="text-2xl font-bold text-gray-900 mt-1">
-                {participants.length}개
-              </div>
+              <div className="text-2xl font-bold text-gray-900 mt-1">{participants.length}개</div>
             </div>
             <div>
               <div className="text-sm text-gray-500">총 주문 수량</div>
-              <div className="text-2xl font-bold text-gray-900 mt-1">
-                {totalQuantity}개
-              </div>
+              <div className="text-2xl font-bold text-gray-900 mt-1">{totalQuantity}개</div>
             </div>
             <div>
               <div className="text-sm text-gray-500">대기 수량</div>
-              <div className="text-2xl font-bold text-yellow-600 mt-1">
-                {totalPending}개
-              </div>
+              <div className="text-2xl font-bold text-yellow-600 mt-1">{totalPending}개</div>
             </div>
             <div>
               <div className="text-sm text-gray-500">확정 수량</div>
-              <div className="text-2xl font-bold text-green-600 mt-1">
-                {totalConfirmed}개
-              </div>
+              <div className="text-2xl font-bold text-green-600 mt-1">{totalConfirmed}개</div>
             </div>
           </div>
         </div>
@@ -152,13 +139,21 @@ const GroupbuyParticipantsPage: FC = () => {
         {/* Table */}
         <div className="flex-1 p-6 overflow-auto">
           <div className="bg-white rounded-lg shadow">
-            <DataTable
-              columns={columns}
-              dataSource={participants}
-              rowKey="pharmacyId"
-              loading={participantsLoading}
-              emptyText="참여 약국이 없습니다"
-            />
+            {participantsLoading ? (
+              <div className="animate-pulse p-4 space-y-2">
+                {[...Array(5)].map((_, i) => <div key={i} className="h-12 bg-gray-100 rounded" />)}
+              </div>
+            ) : (
+              <BaseTable<GroupbuyParticipant>
+                columns={columns}
+                data={participants}
+                rowKey={(row) => row.pharmacyId}
+                emptyMessage="참여 약국이 없습니다"
+                tableId="groupbuy-participants"
+                columnVisibility
+                persistState
+              />
+            )}
           </div>
         </div>
       </div>

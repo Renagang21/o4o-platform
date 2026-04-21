@@ -1,17 +1,18 @@
 /**
  * Active Users Page
  *
- * Refactored: PageHeader + DataTable pattern applied
+ * WO-O4O-TABLE-DATATABLE-DEPRECATION-V1B — BaseTable 직접 사용으로 마이그레이션
  */
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Activity, Users as UsersIcon, Clock, RefreshCw, Settings } from 'lucide-react';
+import { Users as UsersIcon, Clock, RefreshCw } from 'lucide-react';
 import { UserApi } from '@/api/userApi';
 import toast from 'react-hot-toast';
 import type { User } from '@/types/user';
 import PageHeader from '../../components/common/PageHeader';
-import { DataTable, Column } from '../../components/common/DataTable';
+import { BaseTable } from '@o4o/ui';
+import type { O4OColumn } from '@o4o/ui';
 
 export default function ActiveUsers() {
   const navigate = useNavigate();
@@ -63,14 +64,12 @@ export default function ActiveUsers() {
 
   const formatLastLogin = (lastLoginAt?: string) => {
     if (!lastLoginAt) return '로그인 기록 없음';
-
     const lastLogin = new Date(lastLoginAt);
     const now = new Date();
     const diffMs = now.getTime() - lastLogin.getTime();
     const diffMins = Math.floor(diffMs / (1000 * 60));
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
     if (diffMins < 1) return '방금 전';
     if (diffMins < 60) return `${diffMins}분 전`;
     if (diffHours < 24) return `${diffHours}시간 전`;
@@ -82,12 +81,10 @@ export default function ActiveUsers() {
       active: 'bg-green-100 text-green-800',
       pending: 'bg-yellow-100 text-yellow-800',
     };
-
     const statusLabels: Record<string, string> = {
       active: '활성',
       pending: '대기',
     };
-
     return (
       <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusColors[status] || 'bg-gray-100 text-gray-800'}`}>
         {statusLabels[status] || status}
@@ -95,82 +92,63 @@ export default function ActiveUsers() {
     );
   };
 
-  // DataTable column definitions
-  const columns: Column<User>[] = [
+  const columns: O4OColumn<User>[] = [
     {
       key: 'name',
-      title: '이름',
-      dataIndex: 'name',
-      render: (value: string) => (
-        <span className="font-medium">{value || '이름 없음'}</span>
-      ),
+      header: '이름',
+      sortable: true,
+      sortAccessor: (row) => (row as any).name || '',
+      render: (_, row) => <span className="font-medium">{(row as any).name || '이름 없음'}</span>,
     },
     {
       key: 'email',
-      title: '이메일',
-      dataIndex: 'email',
-      render: (value: string) => (
-        <span className="text-gray-600">{value}</span>
-      ),
+      header: '이메일',
+      sortable: true,
+      sortAccessor: (row) => (row as any).email || '',
+      render: (_, row) => <span className="text-gray-600">{(row as any).email}</span>,
     },
     {
       key: 'role',
-      title: '역할',
-      dataIndex: 'role',
+      header: '역할',
       align: 'center',
-      render: (value: string) => (
-        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getRoleBadgeColor(value)}`}>
-          {getRoleLabel(value)}
+      render: (_, row) => (
+        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getRoleBadgeColor((row as any).role)}`}>
+          {getRoleLabel((row as any).role)}
         </span>
       ),
     },
     {
       key: 'status',
-      title: '상태',
-      dataIndex: 'status',
+      header: '상태',
       align: 'center',
-      render: (value: string) => getStatusBadge(value),
+      render: (_, row) => getStatusBadge((row as any).status),
     },
     {
       key: 'lastLoginAt',
-      title: '마지막 접속',
-      dataIndex: 'lastLoginAt',
-      render: (value: string) => (
+      header: '마지막 접속',
+      render: (_, row) => (
         <div className="flex items-center gap-2 text-sm text-gray-600">
           <Clock className="w-4 h-4" />
-          {formatLastLogin(value)}
+          {formatLastLogin((row as any).lastLoginAt)}
         </div>
       ),
     },
   ];
 
-  // PageHeader actions
-  const headerActions = [
-    {
-      id: 'screen-options',
-      label: 'Screen Options',
-      icon: <Settings className="w-4 h-4" />,
-      onClick: () => {
-        // TODO: Implement screen options
-      },
-      variant: 'secondary' as const,
-    },
-    {
-      id: 'refresh',
-      label: '새로고침',
-      icon: <RefreshCw className="w-4 h-4" />,
-      onClick: fetchActiveUsers,
-      variant: 'secondary' as const,
-    },
-  ];
-
   return (
     <div className="p-6">
-      {/* PageHeader */}
       <PageHeader
         title="현재 접속자"
         subtitle="최근 활동한 사용자 목록"
-        actions={headerActions}
+        actions={[
+          {
+            id: 'refresh',
+            label: '새로고침',
+            icon: <RefreshCw className="w-4 h-4" />,
+            onClick: fetchActiveUsers,
+            variant: 'secondary' as const,
+          },
+        ]}
       />
 
       {/* Stats */}
@@ -181,16 +159,24 @@ export default function ActiveUsers() {
         </div>
       </div>
 
-      {/* Users DataTable */}
+      {/* Users Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <DataTable<User>
-          columns={columns}
-          dataSource={activeUsers}
-          rowKey="id"
-          loading={loading}
-          emptyText="현재 접속 중인 사용자가 없습니다"
-          onRowClick={(record) => navigate(`/users/${record.id}`)}
-        />
+        {loading ? (
+          <div className="animate-pulse p-4 space-y-2">
+            {[...Array(5)].map((_, i) => <div key={i} className="h-12 bg-gray-100 rounded" />)}
+          </div>
+        ) : (
+          <BaseTable<User>
+            columns={columns}
+            data={activeUsers}
+            rowKey={(row) => (row as any).id}
+            emptyMessage="현재 접속 중인 사용자가 없습니다"
+            onRowClick={(row) => navigate(`/users/${(row as any).id}`)}
+            tableId="active-users"
+            columnVisibility
+            persistState
+          />
+        )}
       </div>
     </div>
   );

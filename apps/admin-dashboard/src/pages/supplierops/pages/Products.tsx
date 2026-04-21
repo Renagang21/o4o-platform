@@ -1,14 +1,15 @@
 /**
  * SupplierOps Products Page
  *
- * Refactored: PageHeader + DataTable pattern applied
+ * WO-O4O-TABLE-DATATABLE-DEPRECATION-V1B — BaseTable 직접 사용으로 마이그레이션
  */
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, Edit, Trash2, Settings } from 'lucide-react';
+import { Plus, Search, Edit, Trash2 } from 'lucide-react';
 import PageHeader from '../../../components/common/PageHeader';
-import { DataTable, Column } from '../../../components/common/DataTable';
+import { BaseTable, RowActionMenu } from '@o4o/ui';
+import type { O4OColumn } from '@o4o/ui';
 
 interface Product {
   id: string;
@@ -75,107 +76,70 @@ const Products: React.FC = () => {
     p.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // DataTable column definitions
-  const columns: Column<Product>[] = [
+  const columns: O4OColumn<Product>[] = [
     {
       key: 'productInfo',
-      title: '상품 정보',
-      render: (_: unknown, record: Product) => (
+      header: '상품 정보',
+      render: (_, row) => (
         <div>
-          <p className="font-medium">{record.name}</p>
-          <p className="text-sm text-gray-500">{record.description}</p>
+          <p className="font-medium">{row.name}</p>
+          <p className="text-sm text-gray-500">{row.description}</p>
         </div>
       ),
     },
     {
       key: 'sku',
-      title: 'SKU',
-      dataIndex: 'sku',
-      render: (value: string) => (
-        <span className="text-sm text-gray-600">{value}</span>
-      ),
+      header: 'SKU',
+      render: (_, row) => <span className="text-sm text-gray-600">{row.sku}</span>,
     },
     {
       key: 'category',
-      title: '카테고리',
-      dataIndex: 'category',
-      render: (value: string) => (
-        <span className="text-sm text-gray-600">{value}</span>
-      ),
+      header: '카테고리',
+      render: (_, row) => <span className="text-sm text-gray-600">{row.category}</span>,
     },
     {
       key: 'basePrice',
-      title: '기본가',
-      dataIndex: 'basePrice',
+      header: '기본가',
       align: 'right',
       sortable: true,
-      render: (value: number) => (
-        <span className="font-medium">{value.toLocaleString()}원</span>
-      ),
+      sortAccessor: (row) => row.basePrice,
+      render: (_, row) => <span className="font-medium">{row.basePrice.toLocaleString()}원</span>,
     },
     {
       key: 'isActive',
-      title: '상태',
-      dataIndex: 'isActive',
+      header: '상태',
       align: 'center',
-      render: (value: boolean) => (
-        <span
-          className={`px-2 py-1 text-xs rounded-full ${
-            value
-              ? 'bg-green-100 text-green-800'
-              : 'bg-gray-100 text-gray-800'
-          }`}
-        >
-          {value ? '활성' : '비활성'}
+      render: (_, row) => (
+        <span className={`px-2 py-1 text-xs rounded-full ${row.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+          {row.isActive ? '활성' : '비활성'}
         </span>
       ),
     },
     {
-      key: 'actions',
-      title: '관리',
+      key: '_actions',
+      header: '',
+      width: 56,
+      system: true,
       align: 'center',
-      render: () => (
-        <div className="flex items-center justify-center gap-2">
-          <button className="p-1 text-blue-600 hover:bg-blue-50 rounded">
-            <Edit className="w-4 h-4" />
-          </button>
-          <button className="p-1 text-red-600 hover:bg-red-50 rounded">
-            <Trash2 className="w-4 h-4" />
-          </button>
-        </div>
+      render: (_, row) => (
+        <RowActionMenu
+          actions={[
+            { key: 'edit', label: '수정', icon: <Edit size={14} />, onClick: () => navigate(`/supplierops/products/${row.id}/edit`) },
+            { key: 'delete', label: '삭제', icon: <Trash2 size={14} />, variant: 'danger', confirm: '이 상품을 삭제하시겠습니까?', onClick: () => {} },
+          ]}
+        />
       ),
-    },
-  ];
-
-  // PageHeader actions
-  const headerActions = [
-    {
-      id: 'screen-options',
-      label: 'Screen Options',
-      icon: <Settings className="w-4 h-4" />,
-      onClick: () => {
-        // TODO: Implement screen options
-      },
-      variant: 'secondary' as const,
-    },
-    {
-      id: 'add-product',
-      label: '상품 추가',
-      icon: <Plus className="w-4 h-4" />,
-      onClick: () => {
-        navigate('/supplierops/products/new');
-      },
-      variant: 'primary' as const,
     },
   ];
 
   return (
     <div className="p-6">
-      {/* PageHeader */}
       <PageHeader
         title="상품 관리"
         subtitle="등록된 상품(ProductMaster)을 관리하세요"
-        actions={headerActions}
+        actions={[
+          { id: 'add-product', label: '상품 추가', icon: <Plus className="w-4 h-4" />, onClick: () => navigate('/supplierops/products/new'), variant: 'primary' as const },
+        ]}
       />
 
       {/* Search */}
@@ -192,15 +156,23 @@ const Products: React.FC = () => {
         </div>
       </div>
 
-      {/* Products DataTable */}
+      {/* Products Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <DataTable<Product>
-          columns={columns}
-          dataSource={filteredProducts}
-          rowKey="id"
-          loading={loading}
-          emptyText="등록된 상품이 없습니다"
-        />
+        {loading ? (
+          <div className="animate-pulse p-4 space-y-2">
+            {[...Array(5)].map((_, i) => <div key={i} className="h-12 bg-gray-100 rounded" />)}
+          </div>
+        ) : (
+          <BaseTable<Product>
+            columns={columns}
+            data={filteredProducts}
+            rowKey={(row) => row.id}
+            emptyMessage="등록된 상품이 없습니다"
+            tableId="supplierops-products"
+            columnVisibility
+            persistState
+          />
+        )}
       </div>
     </div>
   );

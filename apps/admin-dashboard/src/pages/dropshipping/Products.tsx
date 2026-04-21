@@ -1,17 +1,18 @@
 /**
  * Dropshipping Products Page
  *
- * Refactored: PageHeader + DataTable pattern applied
+ * WO-O4O-TABLE-DATATABLE-DEPRECATION-V1B — BaseTable 직접 사용으로 마이그레이션
  */
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, DollarSign, TrendingUp, Package, BarChart, Upload, Settings } from 'lucide-react';
+import { Plus, Edit2, Trash2, DollarSign, TrendingUp, Package, BarChart, Upload } from 'lucide-react';
 import { dropshippingAPI } from '../../api/dropshipping-cpt';
 import { toast } from 'react-hot-toast';
 import ProductEditor from './ProductEditor';
 import { useNavigate } from 'react-router-dom';
 import PageHeader from '../../components/common/PageHeader';
-import { DataTable, Column } from '../../components/common/DataTable';
+import { BaseTable, RowActionMenu } from '@o4o/ui';
+import type { O4OColumn } from '@o4o/ui';
 
 interface Product {
   id: string;
@@ -47,7 +48,7 @@ const Products: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showEditor, setShowEditor] = useState(false);
-  const [bulkSelection, setBulkSelection] = useState<string[]>([]);
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [filterSupplier, setFilterSupplier] = useState('');
   const [filterMargin, setFilterMargin] = useState('');
 
@@ -60,7 +61,6 @@ const Products: React.FC = () => {
     try {
       const response = await dropshippingAPI.getProducts();
       if (response.success) {
-        // Transform new API data to UI-compatible format
         const transformedProducts = response.data.map((product: any) => ({
           ...product,
           title: product.name,
@@ -75,8 +75,8 @@ const Products: React.FC = () => {
               : '0',
             shipping_days_min: 3,
             shipping_days_max: 7,
-            shipping_fee: 0
-          }
+            shipping_fee: 0,
+          },
         }));
         setProducts(transformedProducts);
       }
@@ -89,8 +89,6 @@ const Products: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('정말 삭제하시겠습니까?')) return;
-
     try {
       const response = await dropshippingAPI.deleteProduct(id);
       if (response.success) {
@@ -103,45 +101,24 @@ const Products: React.FC = () => {
   };
 
   const handleBulkDelete = async () => {
-    if (bulkSelection.length === 0) {
-      toast.error('삭제할 항목을 선택해주세요');
-      return;
-    }
-
-    if (!confirm(`${bulkSelection.length}개 상품을 삭제하시겠습니까?`)) return;
-
+    if (selectedKeys.size === 0) { toast.error('삭제할 항목을 선택해주세요'); return; }
+    if (!confirm(`${selectedKeys.size}개 상품을 삭제하시겠습니까?`)) return;
     try {
-      await Promise.all(bulkSelection.map(id => dropshippingAPI.deleteProduct(id)));
+      await Promise.all(Array.from(selectedKeys).map((id) => dropshippingAPI.deleteProduct(id)));
       toast.success('선택한 상품이 삭제되었습니다');
-      setBulkSelection([]);
+      setSelectedKeys(new Set());
       fetchProducts();
     } catch (error) {
       toast.error('일괄 삭제에 실패했습니다');
     }
   };
 
-  const handleEdit = (product: Product) => {
-    setSelectedProduct(product);
-    setShowEditor(true);
-  };
+  const handleEdit = (product: Product) => { setSelectedProduct(product); setShowEditor(true); };
+  const handleCreate = () => { setSelectedProduct(null); setShowEditor(true); };
+  const handleEditorClose = () => { setShowEditor(false); setSelectedProduct(null); fetchProducts(); };
 
-  const handleCreate = () => {
-    setSelectedProduct(null);
-    setShowEditor(true);
-  };
-
-  const handleEditorClose = () => {
-    setShowEditor(false);
-    setSelectedProduct(null);
-    fetchProducts();
-  };
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('ko-KR', {
-      style: 'currency',
-      currency: 'KRW'
-    }).format(amount);
-  };
+  const formatCurrency = (amount: number) =>
+    new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(amount);
 
   const getMarginColor = (marginRate: string) => {
     const rate = parseFloat(marginRate);
@@ -150,219 +127,143 @@ const Products: React.FC = () => {
     return 'text-green-600';
   };
 
-  // Calculate stats
   const stats = {
     total: products.length,
     avgMargin: products.length > 0
-      ? (products.reduce((sum, p) => sum + parseFloat(p.acf?.margin_rate || '0'), 0) / products.length).toFixed(1)
-      : '0',
+      ? (products.reduce((sum, p) => sum + parseFloat(p.acf?.margin_rate || '0'), 0) / products.length).toFixed(1) : '0',
     maxMargin: products.length > 0
-      ? Math.max(...products.map(p => parseFloat(p.acf?.margin_rate || '0'))).toFixed(1)
-      : '0',
+      ? Math.max(...products.map((p) => parseFloat(p.acf?.margin_rate || '0'))).toFixed(1) : '0',
     minMargin: products.length > 0
-      ? Math.min(...products.map(p => parseFloat(p.acf?.margin_rate || '0'))).toFixed(1)
-      : '0',
+      ? Math.min(...products.map((p) => parseFloat(p.acf?.margin_rate || '0'))).toFixed(1) : '0',
   };
 
-  // DataTable column definitions
-  const columns: Column<Product>[] = [
+  const columns: O4OColumn<Product>[] = [
     {
       key: 'title',
-      title: '상품명',
-      render: (_: unknown, record: Product) => (
+      header: '상품명',
+      render: (_, row) => (
         <div>
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleEdit(record);
-            }}
+            onClick={() => handleEdit(row)}
             className="font-medium text-blue-600 hover:text-blue-800 hover:underline text-left"
           >
-            {record.title}
+            {row.title}
           </button>
-          {record.excerpt && (
-            <p className="text-sm text-gray-500 mt-1">
-              {record.excerpt.substring(0, 50)}...
-            </p>
+          {row.excerpt && (
+            <p className="text-sm text-gray-500 mt-1">{row.excerpt.substring(0, 50)}...</p>
           )}
         </div>
       ),
     },
     {
       key: 'costPrice',
-      title: '공급가',
+      header: '공급가',
       align: 'right',
       sortable: true,
-      render: (_: unknown, record: Product) => (
-        <span>{formatCurrency(record.acf?.cost_price || 0)}</span>
-      ),
+      sortAccessor: (row) => row.acf?.cost_price ?? 0,
+      render: (_, row) => <span>{formatCurrency(row.acf?.cost_price || 0)}</span>,
     },
     {
       key: 'sellingPrice',
-      title: '판매가',
+      header: '판매가',
       align: 'right',
       sortable: true,
-      render: (_: unknown, record: Product) => (
-        <span>{formatCurrency(record.acf?.selling_price || 0)}</span>
-      ),
+      sortAccessor: (row) => row.acf?.selling_price ?? 0,
+      render: (_, row) => <span>{formatCurrency(row.acf?.selling_price || 0)}</span>,
     },
     {
       key: 'marginRate',
-      title: '마진율',
+      header: '마진율',
       align: 'center',
       sortable: true,
-      render: (_: unknown, record: Product) => (
-        <span className={`text-sm font-medium ${getMarginColor(record.acf?.margin_rate || '0')}`}>
-          {record.acf?.margin_rate || '0'}%
+      sortAccessor: (row) => parseFloat(row.acf?.margin_rate || '0'),
+      render: (_, row) => (
+        <span className={`text-sm font-medium ${getMarginColor(row.acf?.margin_rate || '0')}`}>
+          {row.acf?.margin_rate || '0'}%
         </span>
       ),
     },
     {
       key: 'sku',
-      title: '공급자 SKU',
-      render: (_: unknown, record: Product) => (
-        <code className="text-sm bg-gray-100 px-2 py-0.5 rounded">
-          {record.acf?.supplier_sku || '-'}
-        </code>
+      header: '공급자 SKU',
+      render: (_, row) => (
+        <code className="text-sm bg-gray-100 px-2 py-0.5 rounded">{row.acf?.supplier_sku || '-'}</code>
       ),
     },
     {
       key: 'shipping',
-      title: '배송',
-      render: (_: unknown, record: Product) => (
+      header: '배송',
+      render: (_, row) => (
         <span className="text-sm">
-          {record.acf?.shipping_days_min || 3}-{record.acf?.shipping_days_max || 7}일
-          {record.acf?.shipping_fee === 0 && (
-            <span className="text-green-600 ml-1">무료</span>
-          )}
+          {row.acf?.shipping_days_min || 3}-{row.acf?.shipping_days_max || 7}일
+          {row.acf?.shipping_fee === 0 && <span className="text-green-600 ml-1">무료</span>}
         </span>
       ),
     },
     {
       key: 'createdAt',
-      title: '등록일',
-      dataIndex: 'createdAt',
+      header: '등록일',
       sortable: true,
-      render: (value: string) => (
-        <span className="text-sm text-gray-500">
-          {new Date(value).toLocaleDateString('ko-KR')}
-        </span>
+      sortAccessor: (row) => row.createdAt,
+      render: (_, row) => (
+        <span className="text-sm text-gray-500">{new Date(row.createdAt).toLocaleDateString('ko-KR')}</span>
       ),
     },
     {
-      key: 'actions',
-      title: '작업',
+      key: '_actions',
+      header: '',
+      width: 56,
+      system: true,
       align: 'center',
-      render: (_: unknown, record: Product) => (
-        <div className="flex gap-2 justify-center">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleEdit(record);
-            }}
-            className="text-blue-600 hover:text-blue-900 p-1"
-            title="편집"
-          >
-            <Edit2 className="w-4 h-4" />
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleDelete(record.id);
-            }}
-            className="text-red-600 hover:text-red-900 p-1"
-            title="삭제"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-        </div>
+      render: (_, row) => (
+        <RowActionMenu
+          actions={[
+            { key: 'edit', label: '편집', icon: <Edit2 size={14} />, variant: 'primary', onClick: () => handleEdit(row) },
+            { key: 'delete', label: '삭제', icon: <Trash2 size={14} />, variant: 'danger', confirm: '이 상품을 삭제하시겠습니까?', onClick: () => handleDelete(row.id) },
+          ]}
+        />
       ),
-    },
-  ];
-
-  // PageHeader actions
-  const headerActions = [
-    {
-      id: 'screen-options',
-      label: 'Screen Options',
-      icon: <Settings className="w-4 h-4" />,
-      onClick: () => {
-        // TODO: Implement screen options
-      },
-      variant: 'secondary' as const,
-    },
-    {
-      id: 'bulk-import',
-      label: 'CSV 일괄 가져오기',
-      icon: <Upload className="w-4 h-4" />,
-      onClick: () => navigate('/dropshipping/products/bulk-import'),
-      variant: 'secondary' as const,
-    },
-    {
-      id: 'add-product',
-      label: '새로 추가',
-      icon: <Plus className="w-4 h-4" />,
-      onClick: handleCreate,
-      variant: 'primary' as const,
     },
   ];
 
   if (showEditor) {
-    return (
-      <ProductEditor
-        product={selectedProduct}
-        onClose={handleEditorClose}
-      />
-    );
+    return <ProductEditor product={selectedProduct} onClose={handleEditorClose} />;
   }
 
   return (
     <div className="p-6">
-      {/* PageHeader */}
       <PageHeader
         title="상품"
         subtitle="드롭쉬핑 상품 목록 관리"
-        actions={headerActions}
+        actions={[
+          { id: 'bulk-import', label: 'CSV 일괄 가져오기', icon: <Upload className="w-4 h-4" />, onClick: () => navigate('/dropshipping/products/bulk-import'), variant: 'secondary' as const },
+          { id: 'add-product', label: '새로 추가', icon: <Plus className="w-4 h-4" />, onClick: handleCreate, variant: 'primary' as const },
+        ]}
       />
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-white p-4 rounded-lg shadow">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-600 text-sm">전체 상품</p>
-              <p className="text-2xl font-bold">{stats.total}</p>
-            </div>
+            <div><p className="text-gray-600 text-sm">전체 상품</p><p className="text-2xl font-bold">{stats.total}</p></div>
             <Package className="h-8 w-8 text-gray-400" />
           </div>
         </div>
-
         <div className="bg-white p-4 rounded-lg shadow">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-600 text-sm">평균 마진율</p>
-              <p className="text-2xl font-bold">{stats.avgMargin}%</p>
-            </div>
+            <div><p className="text-gray-600 text-sm">평균 마진율</p><p className="text-2xl font-bold">{stats.avgMargin}%</p></div>
             <TrendingUp className="h-8 w-8 text-green-400" />
           </div>
         </div>
-
         <div className="bg-white p-4 rounded-lg shadow">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-600 text-sm">최고 마진 상품</p>
-              <p className="text-lg font-bold">{stats.maxMargin}%</p>
-            </div>
+            <div><p className="text-gray-600 text-sm">최고 마진 상품</p><p className="text-lg font-bold">{stats.maxMargin}%</p></div>
             <BarChart className="h-8 w-8 text-purple-400" />
           </div>
         </div>
-
         <div className="bg-white p-4 rounded-lg shadow">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-600 text-sm">최저 마진 상품</p>
-              <p className="text-lg font-bold">{stats.minMargin}%</p>
-            </div>
+            <div><p className="text-gray-600 text-sm">최저 마진 상품</p><p className="text-lg font-bold">{stats.minMargin}%</p></div>
             <DollarSign className="h-8 w-8 text-yellow-400" />
           </div>
         </div>
@@ -372,18 +273,14 @@ const Products: React.FC = () => {
       <div className="bg-white rounded-lg shadow p-4 mb-6">
         <div className="flex flex-wrap gap-4 items-center justify-between">
           <div className="flex gap-2">
-            <select className="px-3 py-2 border border-gray-300 rounded text-sm">
-              <option value="">일괄 작업</option>
-              <option value="delete">삭제</option>
-            </select>
             <button
               onClick={handleBulkDelete}
-              className="px-3 py-2 border border-gray-300 rounded text-sm hover:bg-gray-50"
+              disabled={selectedKeys.size === 0}
+              className="px-3 py-2 border border-gray-300 rounded text-sm hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              적용
+              선택 삭제 ({selectedKeys.size})
             </button>
           </div>
-
           <div className="flex gap-2 items-center">
             <select
               className="px-3 py-2 border border-gray-300 rounded text-sm"
@@ -402,26 +299,31 @@ const Products: React.FC = () => {
               <option value="medium">보통 마진 (10-20%)</option>
               <option value="high">높은 마진 (&gt; 20%)</option>
             </select>
-            <button className="px-3 py-2 border border-gray-300 rounded text-sm hover:bg-gray-50">
-              필터
-            </button>
           </div>
         </div>
       </div>
 
-      {/* Products DataTable */}
+      {/* Products Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <DataTable<Product>
-          columns={columns}
-          dataSource={products}
-          rowKey="id"
-          loading={loading}
-          emptyText="상품이 없습니다"
-          rowSelection={{
-            selectedRowKeys: bulkSelection,
-            onChange: setBulkSelection,
-          }}
-        />
+        {loading ? (
+          <div className="animate-pulse p-4 space-y-2">
+            {[...Array(5)].map((_, i) => <div key={i} className="h-12 bg-gray-100 rounded" />)}
+          </div>
+        ) : (
+          <BaseTable<Product>
+            columns={columns}
+            data={products}
+            rowKey={(row) => row.id}
+            emptyMessage="상품이 없습니다"
+            tableId="dropshipping-products"
+            columnVisibility
+            persistState
+            reorderable
+            selectable
+            selectedKeys={selectedKeys}
+            onSelectionChange={setSelectedKeys}
+          />
+        )}
       </div>
     </div>
   );

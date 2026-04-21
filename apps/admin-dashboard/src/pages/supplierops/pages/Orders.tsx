@@ -1,13 +1,14 @@
 /**
  * SupplierOps Orders Page
  *
- * Refactored: PageHeader + DataTable pattern applied
+ * WO-O4O-TABLE-DATATABLE-DEPRECATION-V1B — BaseTable 직접 사용으로 마이그레이션
  */
 
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Truck, CheckCircle, Clock, AlertCircle, Eye, Settings } from 'lucide-react';
+import { Search, Filter, Truck, CheckCircle, Clock, AlertCircle, Eye } from 'lucide-react';
 import PageHeader from '../../../components/common/PageHeader';
-import { DataTable, Column } from '../../../components/common/DataTable';
+import { BaseTable, RowActionMenu } from '@o4o/ui';
+import type { O4OColumn } from '@o4o/ui';
 
 interface OrderRelay {
   id: string;
@@ -26,7 +27,7 @@ const Orders: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [orderCounts, setOrderCounts] = useState({
+  const [orderCounts] = useState({
     pending: 3,
     dispatched: 8,
     fulfilled: 45,
@@ -77,39 +78,15 @@ const Orders: React.FC = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'pending':
-        return (
-          <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">
-            <Clock className="w-3 h-3" />
-            대기중
-          </span>
-        );
+        return <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800"><Clock className="w-3 h-3" />대기중</span>;
       case 'dispatched':
-        return (
-          <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
-            <Truck className="w-3 h-3" />
-            발송됨
-          </span>
-        );
+        return <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800"><Truck className="w-3 h-3" />발송됨</span>;
       case 'fulfilled':
-        return (
-          <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
-            <CheckCircle className="w-3 h-3" />
-            완료됨
-          </span>
-        );
+        return <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800"><CheckCircle className="w-3 h-3" />완료됨</span>;
       case 'failed':
-        return (
-          <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
-            <AlertCircle className="w-3 h-3" />
-            오류
-          </span>
-        );
+        return <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800"><AlertCircle className="w-3 h-3" />오류</span>;
       default:
-        return (
-          <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
-            {status}
-          </span>
-        );
+        return <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">{status}</span>;
     }
   };
 
@@ -117,87 +94,71 @@ const Orders: React.FC = () => {
     o.productName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // DataTable column definitions
-  const columns: Column<OrderRelay>[] = [
+  const columns: O4OColumn<OrderRelay>[] = [
     {
       key: 'orderInfo',
-      title: '주문 정보',
-      render: (_: unknown, record: OrderRelay) => (
+      header: '주문 정보',
+      render: (_, row) => (
         <div>
-          <p className="font-medium">{record.productName}</p>
-          <p className="text-xs text-gray-500">#{record.orderId}</p>
+          <p className="font-medium">{row.productName}</p>
+          <p className="text-xs text-gray-500">#{row.orderId}</p>
         </div>
       ),
     },
     {
       key: 'sellerName',
-      title: '판매자',
-      dataIndex: 'sellerName',
+      header: '판매자',
+      render: (_, row) => <span>{row.sellerName}</span>,
     },
     {
       key: 'quantity',
-      title: '수량',
-      dataIndex: 'quantity',
+      header: '수량',
       align: 'center',
       sortable: true,
+      sortAccessor: (row) => row.quantity,
+      render: (_, row) => <span>{row.quantity}</span>,
     },
     {
       key: 'totalPrice',
-      title: '금액',
-      dataIndex: 'totalPrice',
+      header: '금액',
       align: 'right',
       sortable: true,
-      render: (value: number) => (
-        <span className="font-medium">{value.toLocaleString()}원</span>
-      ),
+      sortAccessor: (row) => row.totalPrice,
+      render: (_, row) => <span className="font-medium">{row.totalPrice.toLocaleString()}원</span>,
     },
     {
       key: 'status',
-      title: '상태',
-      dataIndex: 'status',
+      header: '상태',
       align: 'center',
-      render: (value: string) => getStatusBadge(value),
+      render: (_, row) => getStatusBadge(row.status),
     },
     {
       key: 'trackingNumber',
-      title: '운송장',
-      dataIndex: 'trackingNumber',
-      render: (value: string | undefined) => (
-        <span className="text-sm text-gray-600">{value || '-'}</span>
-      ),
+      header: '운송장',
+      render: (_, row) => <span className="text-sm text-gray-600">{row.trackingNumber || '-'}</span>,
     },
     {
-      key: 'actions',
-      title: '상세',
+      key: '_actions',
+      header: '',
+      width: 56,
+      system: true,
       align: 'center',
-      render: () => (
-        <button className="text-blue-600 hover:text-blue-800">
-          <Eye className="w-4 h-4" />
-        </button>
+      render: (_, row) => (
+        <RowActionMenu
+          actions={[
+            { key: 'view', label: '상세', icon: <Eye size={14} />, onClick: () => {} },
+          ]}
+        />
       ),
-    },
-  ];
-
-  // PageHeader actions
-  const headerActions = [
-    {
-      id: 'screen-options',
-      label: 'Screen Options',
-      icon: <Settings className="w-4 h-4" />,
-      onClick: () => {
-        // TODO: Implement screen options
-      },
-      variant: 'secondary' as const,
     },
   ];
 
   return (
     <div className="p-6">
-      {/* PageHeader */}
       <PageHeader
         title="주문/Relay 모니터링"
         subtitle="주문 Relay 현황을 확인하고 배송 정보를 업데이트하세요"
-        actions={headerActions}
+        actions={[]}
       />
 
       {/* Stats Cards */}
@@ -250,15 +211,23 @@ const Orders: React.FC = () => {
         </div>
       </div>
 
-      {/* Orders DataTable */}
+      {/* Orders Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <DataTable<OrderRelay>
-          columns={columns}
-          dataSource={filteredOrders}
-          rowKey="id"
-          loading={loading}
-          emptyText="주문이 없습니다"
-        />
+        {loading ? (
+          <div className="animate-pulse p-4 space-y-2">
+            {[...Array(5)].map((_, i) => <div key={i} className="h-12 bg-gray-100 rounded" />)}
+          </div>
+        ) : (
+          <BaseTable<OrderRelay>
+            columns={columns}
+            data={filteredOrders}
+            rowKey={(row) => row.id}
+            emptyMessage="주문이 없습니다"
+            tableId="supplierops-orders"
+            columnVisibility
+            persistState
+          />
+        )}
       </div>
     </div>
   );

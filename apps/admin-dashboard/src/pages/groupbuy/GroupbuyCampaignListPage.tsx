@@ -3,6 +3,7 @@
  * Phase 3: UI Integration
  *
  * Work Order 제약: 금액/수수료/정산 정보 UI 노출 절대 금지
+ * WO-O4O-TABLE-DATATABLE-DEPRECATION-V1B — BaseTable 직접 사용으로 마이그레이션
  */
 
 import { FC, useState } from 'react';
@@ -10,7 +11,8 @@ import { Link } from 'react-router-dom';
 import { Plus, Eye, Edit2, Trash2, Users, CheckCircle, XCircle } from 'lucide-react';
 import { OrganizationSelector } from '@/components/organization/OrganizationSelector';
 import { PermissionGuard } from '@/components/organization/PermissionGuard';
-import { DataTable, Column } from '@/components/common/DataTable';
+import { BaseTable } from '@o4o/ui';
+import type { O4OColumn } from '@o4o/ui';
 import {
   GroupbuyStatusBadge,
   DeadlineCountdown
@@ -43,63 +45,28 @@ const GroupbuyCampaignListPage: FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('정말 이 캠페인을 삭제하시겠습니까?')) {
-      return;
-    }
-
-    try {
-      await deleteCampaign(id);
-    } catch (error) {
-      // Error handled in hook
-    }
+    if (!window.confirm('정말 이 캠페인을 삭제하시겠습니까?')) return;
+    try { await deleteCampaign(id); } catch (error) {}
   };
 
   const handleActivate = async (id: string) => {
-    if (!window.confirm('이 캠페인을 활성화하시겠습니까?')) {
-      return;
-    }
-
-    try {
-      await activateCampaign(id);
-    } catch (error) {
-      // Error handled in hook
-    }
+    if (!window.confirm('이 캠페인을 활성화하시겠습니까?')) return;
+    try { await activateCampaign(id); } catch (error) {}
   };
 
   const handleClose = async (id: string) => {
-    if (!window.confirm('이 캠페인을 마감하시겠습니까?')) {
-      return;
-    }
-
-    try {
-      await closeCampaign(id);
-    } catch (error) {
-      // Error handled in hook
-    }
+    if (!window.confirm('이 캠페인을 마감하시겠습니까?')) return;
+    try { await closeCampaign(id); } catch (error) {}
   };
 
   const handleComplete = async (id: string) => {
-    if (!window.confirm('이 캠페인을 완료 처리하시겠습니까?')) {
-      return;
-    }
-
-    try {
-      await completeCampaign(id);
-    } catch (error) {
-      // Error handled in hook
-    }
+    if (!window.confirm('이 캠페인을 완료 처리하시겠습니까?')) return;
+    try { await completeCampaign(id); } catch (error) {}
   };
 
   const handleCancel = async (id: string) => {
-    if (!window.confirm('정말 이 캠페인을 취소하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
-      return;
-    }
-
-    try {
-      await cancelCampaign(id);
-    } catch (error) {
-      // Error handled in hook
-    }
+    if (!window.confirm('정말 이 캠페인을 취소하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
+    try { await cancelCampaign(id); } catch (error) {}
   };
 
   const handleCreate = () => {
@@ -107,128 +74,93 @@ const GroupbuyCampaignListPage: FC = () => {
     setFormModalOpen(true);
   };
 
-  const columns: Column<GroupbuyCampaign>[] = [
+  const columns: O4OColumn<GroupbuyCampaign>[] = [
     {
       key: 'title',
-      title: '캠페인명',
-      dataIndex: 'title',
+      header: '캠페인명',
       sortable: true,
-      render: (title, record) => (
+      sortAccessor: (row) => row.title,
+      render: (_, row) => (
         <div className="flex flex-col">
-          <Link
-            to={`/admin/groupbuy/${record.id}`}
-            className="font-medium text-blue-600 hover:text-blue-800"
-          >
-            {title}
+          <Link to={`/admin/groupbuy/${row.id}`} className="font-medium text-blue-600 hover:text-blue-800">
+            {row.title}
           </Link>
-          {record.description && (
-            <span className="text-xs text-gray-500 mt-1 line-clamp-1">
-              {record.description}
-            </span>
+          {row.description && (
+            <span className="text-xs text-gray-500 mt-1 line-clamp-1">{row.description}</span>
           )}
         </div>
-      )
+      ),
     },
     {
       key: 'status',
-      title: '상태',
-      dataIndex: 'status',
-      render: (status) => <GroupbuyStatusBadge status={status} />
+      header: '상태',
+      render: (_, row) => <GroupbuyStatusBadge status={row.status} />,
     },
     {
       key: 'quantity',
-      title: '수량',
+      header: '수량',
       align: 'center',
-      render: (_, record) => (
+      render: (_, row) => (
         <div className="text-sm">
-          <span className="font-medium">{record.totalOrderedQuantity}</span>
+          <span className="font-medium">{row.totalOrderedQuantity}</span>
           <span className="text-gray-400 mx-1">/</span>
-          <span className="text-green-600">{record.totalConfirmedQuantity}</span>
+          <span className="text-green-600">{row.totalConfirmedQuantity}</span>
         </div>
-      )
+      ),
     },
     {
       key: 'deadline',
-      title: '마감',
-      dataIndex: 'endDate',
-      render: (endDate) => <DeadlineCountdown deadline={endDate} format="compact" />
+      header: '마감',
+      render: (_, row) => <DeadlineCountdown deadline={row.endDate} format="compact" />,
     },
     {
       key: 'participants',
-      title: '참여',
-      dataIndex: 'participantCount',
+      header: '참여',
       align: 'center',
-      render: (count) => `${count}명`
+      render: (_, row) => `${row.participantCount}명`,
     },
     {
-      key: 'actions',
-      title: '작업',
+      key: '_actions',
+      header: '',
+      width: 200,
+      system: true,
       align: 'center',
-      render: (_, record) => (
+      render: (_, row) => (
         <div className="flex items-center justify-center gap-1">
-          <Link
-            to={`/admin/groupbuy/${record.id}`}
-            className="p-1 text-blue-600 hover:bg-blue-50 rounded"
-            title="상세보기"
-          >
+          <Link to={`/admin/groupbuy/${row.id}`} className="p-1 text-blue-600 hover:bg-blue-50 rounded" title="상세보기">
             <Eye className="w-4 h-4" />
           </Link>
-          <Link
-            to={`/admin/groupbuy/${record.id}/participants`}
-            className="p-1 text-green-600 hover:bg-green-50 rounded"
-            title="참여자"
-          >
+          <Link to={`/admin/groupbuy/${row.id}/participants`} className="p-1 text-green-600 hover:bg-green-50 rounded" title="참여자">
             <Users className="w-4 h-4" />
           </Link>
           <PermissionGuard required={['organization.manage']} showMessage={false}>
-            <button
-              onClick={() => handleEdit(record)}
-              className="p-1 text-gray-600 hover:bg-gray-50 rounded"
-              title="수정"
-            >
+            <button onClick={() => handleEdit(row)} className="p-1 text-gray-600 hover:bg-gray-50 rounded" title="수정">
               <Edit2 className="w-4 h-4" />
             </button>
-            {record.status === 'draft' && (
-              <button
-                onClick={() => handleActivate(record.id)}
-                className="p-1 text-blue-600 hover:bg-blue-50 rounded"
-                title="활성화"
-              >
+            {row.status === 'draft' && (
+              <button onClick={() => handleActivate(row.id)} className="p-1 text-blue-600 hover:bg-blue-50 rounded" title="활성화">
                 <CheckCircle className="w-4 h-4" />
               </button>
             )}
-            {record.status === 'active' && (
-              <button
-                onClick={() => handleClose(record.id)}
-                className="p-1 text-orange-600 hover:bg-orange-50 rounded"
-                title="마감"
-              >
+            {row.status === 'active' && (
+              <button onClick={() => handleClose(row.id)} className="p-1 text-orange-600 hover:bg-orange-50 rounded" title="마감">
                 <XCircle className="w-4 h-4" />
               </button>
             )}
-            {record.status === 'closed' && (
-              <button
-                onClick={() => handleComplete(record.id)}
-                className="px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700"
-                title="완료"
-              >
+            {row.status === 'closed' && (
+              <button onClick={() => handleComplete(row.id)} className="px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700" title="완료">
                 완료
               </button>
             )}
-            {(record.status === 'draft' || record.status === 'active') && (
-              <button
-                onClick={() => handleCancel(record.id)}
-                className="p-1 text-red-600 hover:bg-red-50 rounded"
-                title="취소"
-              >
+            {(row.status === 'draft' || row.status === 'active') && (
+              <button onClick={() => handleCancel(row.id)} className="p-1 text-red-600 hover:bg-red-50 rounded" title="취소">
                 <Trash2 className="w-4 h-4" />
               </button>
             )}
           </PermissionGuard>
         </div>
       ),
-      width: '200px'
-    }
+    },
   ];
 
   return (
@@ -258,11 +190,7 @@ const GroupbuyCampaignListPage: FC = () => {
           <div className="flex gap-4">
             <div className="w-64">
               <label className="block text-sm font-medium text-gray-700 mb-1">조직</label>
-              <OrganizationSelector
-                value={selectedOrg}
-                onChange={setSelectedOrg}
-                filterByPermission
-              />
+              <OrganizationSelector value={selectedOrg} onChange={setSelectedOrg} filterByPermission />
             </div>
             <div className="w-48">
               <label className="block text-sm font-medium text-gray-700 mb-1">상태</label>
@@ -285,13 +213,21 @@ const GroupbuyCampaignListPage: FC = () => {
         {/* Table */}
         <div className="flex-1 p-6 overflow-auto">
           <div className="bg-white rounded-lg shadow">
-            <DataTable
-              columns={columns}
-              dataSource={campaigns}
-              rowKey="id"
-              loading={loading}
-              emptyText="캠페인이 없습니다"
-            />
+            {loading ? (
+              <div className="animate-pulse p-4 space-y-2">
+                {[...Array(5)].map((_, i) => <div key={i} className="h-12 bg-gray-100 rounded" />)}
+              </div>
+            ) : (
+              <BaseTable<GroupbuyCampaign>
+                columns={columns}
+                data={campaigns}
+                rowKey={(row) => row.id}
+                emptyMessage="캠페인이 없습니다"
+                tableId="groupbuy-campaigns"
+                columnVisibility
+                persistState
+              />
+            )}
           </div>
         </div>
 

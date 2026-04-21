@@ -1,23 +1,15 @@
 /**
  * SellerOps Listings Page
  *
- * Refactored: PageHeader + DataTable pattern applied
+ * WO-O4O-TABLE-DATATABLE-DEPRECATION-V1B — BaseTable 직접 사용으로 마이그레이션
  */
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Plus,
-  Edit2,
-  Trash2,
-  Power,
-  PowerOff,
-  Search,
-  Filter,
-  Settings,
-} from 'lucide-react';
+import { Plus, Edit2, Trash2, Power, PowerOff, Search, Filter } from 'lucide-react';
 import PageHeader from '../../../components/common/PageHeader';
-import { DataTable, Column } from '../../../components/common/DataTable';
+import { BaseTable, RowActionMenu } from '@o4o/ui';
+import type { O4OColumn } from '@o4o/ui';
 
 interface Listing {
   id: string;
@@ -81,11 +73,7 @@ const ListingsList: React.FC = () => {
   }, [filterActive]);
 
   const handleToggleActive = (listing: Listing) => {
-    setListings(
-      listings.map((l) =>
-        l.id === listing.id ? { ...l, isActive: !l.isActive } : l
-      )
-    );
+    setListings(listings.map((l) => l.id === listing.id ? { ...l, isActive: !l.isActive } : l));
   };
 
   const filteredListings = listings
@@ -94,143 +82,99 @@ const ListingsList: React.FC = () => {
       if (filterActive === 'inactive') return !l.isActive;
       return true;
     })
-    .filter((l) =>
-      l.productName.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    .filter((l) => l.productName.toLowerCase().includes(searchQuery.toLowerCase()));
 
-  // DataTable column definitions
-  const columns: Column<Listing>[] = [
+  const columns: O4OColumn<Listing>[] = [
     {
       key: 'productInfo',
-      title: '상품 정보',
-      render: (_: unknown, record: Listing) => (
+      header: '상품 정보',
+      render: (_, row) => (
         <div>
-          <p className="font-medium">{record.productName}</p>
-          <p className="text-sm text-gray-500">SKU: {record.sku}</p>
+          <p className="font-medium">{row.productName}</p>
+          <p className="text-sm text-gray-500">SKU: {row.sku}</p>
         </div>
       ),
     },
     {
       key: 'supplyPrice',
-      title: '공급가',
-      dataIndex: 'supplyPrice',
+      header: '공급가',
       align: 'right',
       sortable: true,
-      render: (value: number) => (
-        <span>{value.toLocaleString()}원</span>
-      ),
+      sortAccessor: (row) => row.supplyPrice,
+      render: (_, row) => <span>{row.supplyPrice.toLocaleString()}원</span>,
     },
     {
       key: 'sellingPrice',
-      title: '판매가',
-      dataIndex: 'sellingPrice',
+      header: '판매가',
       align: 'right',
       sortable: true,
-      render: (value: number) => (
-        <span className="font-medium">{value.toLocaleString()}원</span>
-      ),
+      sortAccessor: (row) => row.sellingPrice,
+      render: (_, row) => <span className="font-medium">{row.sellingPrice.toLocaleString()}원</span>,
     },
     {
       key: 'margin',
-      title: '마진',
-      render: (_: unknown, record: Listing) => (
+      header: '마진',
+      render: (_, row) => (
         <div className="text-sm">
-          <span className={`font-medium ${record.margin > 0 ? 'text-green-600' : 'text-red-600'}`}>
-            {record.margin.toLocaleString()}원
+          <span className={`font-medium ${row.margin > 0 ? 'text-green-600' : 'text-red-600'}`}>
+            {row.margin.toLocaleString()}원
           </span>
-          <span className="text-gray-500 ml-1">({record.marginRate}%)</span>
+          <span className="text-gray-500 ml-1">({row.marginRate}%)</span>
         </div>
       ),
     },
     {
       key: 'stock',
-      title: '재고',
-      dataIndex: 'stock',
+      header: '재고',
       align: 'center',
       sortable: true,
-      render: (value: number) => (
-        <span className={value < 10 ? 'text-red-600 font-medium' : ''}>
-          {value}
-        </span>
-      ),
+      sortAccessor: (row) => row.stock,
+      render: (_, row) => <span className={row.stock < 10 ? 'text-red-600 font-medium' : ''}>{row.stock}</span>,
     },
     {
       key: 'isActive',
-      title: '상태',
-      dataIndex: 'isActive',
+      header: '상태',
       align: 'center',
-      render: (value: boolean) => (
-        <span
-          className={`px-2 py-1 text-xs font-medium rounded-full ${
-            value ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-          }`}
-        >
-          {value ? '판매중' : '판매중지'}
+      render: (_, row) => (
+        <span className={`px-2 py-1 text-xs font-medium rounded-full ${row.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+          {row.isActive ? '판매중' : '판매중지'}
         </span>
       ),
     },
     {
-      key: 'actions',
-      title: '작업',
+      key: '_actions',
+      header: '',
+      width: 80,
+      system: true,
       align: 'center',
-      render: (_: unknown, record: Listing) => (
-        <div className="flex items-center justify-center gap-2">
+      render: (_, row) => (
+        <div className="flex items-center justify-center gap-1">
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleToggleActive(record);
-            }}
-            className={`p-1 rounded ${
-              record.isActive
-                ? 'text-gray-600 hover:bg-gray-100'
-                : 'text-green-600 hover:bg-green-50'
-            }`}
-            title={record.isActive ? '판매 중지' : '판매 시작'}
+            onClick={() => handleToggleActive(row)}
+            className={`p-1 rounded ${row.isActive ? 'text-gray-600 hover:bg-gray-100' : 'text-green-600 hover:bg-green-50'}`}
+            title={row.isActive ? '판매 중지' : '판매 시작'}
           >
-            {record.isActive ? (
-              <PowerOff className="w-4 h-4" />
-            ) : (
-              <Power className="w-4 h-4" />
-            )}
+            {row.isActive ? <PowerOff className="w-4 h-4" /> : <Power className="w-4 h-4" />}
           </button>
-          <button className="p-1 text-blue-600 hover:bg-blue-50 rounded">
-            <Edit2 className="w-4 h-4" />
-          </button>
-          <button className="p-1 text-red-600 hover:bg-red-50 rounded">
-            <Trash2 className="w-4 h-4" />
-          </button>
+          <RowActionMenu
+            actions={[
+              { key: 'edit', label: '수정', icon: <Edit2 size={14} />, onClick: () => navigate(`/sellerops/listings/${row.id}/edit`) },
+              { key: 'delete', label: '삭제', icon: <Trash2 size={14} />, variant: 'danger', confirm: '이 리스팅을 삭제하시겠습니까?', onClick: () => {} },
+            ]}
+          />
         </div>
       ),
     },
   ];
 
-  // PageHeader actions
-  const headerActions = [
-    {
-      id: 'screen-options',
-      label: 'Screen Options',
-      icon: <Settings className="w-4 h-4" />,
-      onClick: () => {
-        // TODO: Implement screen options
-      },
-      variant: 'secondary' as const,
-    },
-    {
-      id: 'add-listing',
-      label: '새 리스팅 등록',
-      icon: <Plus className="w-4 h-4" />,
-      onClick: () => navigate('/sellerops/listings/new'),
-      variant: 'primary' as const,
-    },
-  ];
-
   return (
     <div className="p-6">
-      {/* PageHeader */}
       <PageHeader
         title="리스팅 관리"
         subtitle="등록한 상품 리스팅 관리"
-        actions={headerActions}
+        actions={[
+          { id: 'add-listing', label: '새 리스팅 등록', icon: <Plus className="w-4 h-4" />, onClick: () => navigate('/sellerops/listings/new'), variant: 'primary' as const },
+        ]}
       />
 
       {/* Filters */}
@@ -261,15 +205,23 @@ const ListingsList: React.FC = () => {
         </div>
       </div>
 
-      {/* Listings DataTable */}
+      {/* Listings Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <DataTable<Listing>
-          columns={columns}
-          dataSource={filteredListings}
-          rowKey="id"
-          loading={loading}
-          emptyText="등록된 리스팅이 없습니다"
-        />
+        {loading ? (
+          <div className="animate-pulse p-4 space-y-2">
+            {[...Array(5)].map((_, i) => <div key={i} className="h-12 bg-gray-100 rounded" />)}
+          </div>
+        ) : (
+          <BaseTable<Listing>
+            columns={columns}
+            data={filteredListings}
+            rowKey={(row) => row.id}
+            emptyMessage="등록된 리스팅이 없습니다"
+            tableId="sellerops-listings"
+            columnVisibility
+            persistState
+          />
+        )}
       </div>
     </div>
   );

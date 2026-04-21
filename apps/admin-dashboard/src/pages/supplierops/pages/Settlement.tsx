@@ -1,14 +1,15 @@
 /**
  * SupplierOps Settlement Page
  *
- * Refactored: PageHeader + DataTable pattern applied
+ * WO-O4O-TABLE-DATATABLE-DEPRECATION-V1B — BaseTable 직접 사용으로 마이그레이션
  */
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DollarSign, TrendingUp, Clock, CheckCircle, Calendar, Download, Eye } from 'lucide-react';
 import PageHeader from '../../../components/common/PageHeader';
-import { DataTable, Column } from '../../../components/common/DataTable';
+import { BaseTable, RowActionMenu } from '@o4o/ui';
+import type { O4OColumn } from '@o4o/ui';
 
 interface SettlementBatch {
   id: string;
@@ -23,7 +24,7 @@ interface SettlementBatch {
 
 const Settlement: React.FC = () => {
   const navigate = useNavigate();
-  const [summary, setSummary] = useState({
+  const [summary] = useState({
     totalSettled: 25000000,
     pendingSettlement: 3500000,
     currentPeriodSales: 8750000,
@@ -74,124 +75,81 @@ const Settlement: React.FC = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'open':
-        return (
-          <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
-            <Clock className="w-3 h-3" />
-            진행중
-          </span>
-        );
+        return <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800"><Clock className="w-3 h-3" />진행중</span>;
       case 'closed':
-        return (
-          <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">
-            <Calendar className="w-3 h-3" />
-            마감
-          </span>
-        );
+        return <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800"><Calendar className="w-3 h-3" />마감</span>;
       case 'paid':
-        return (
-          <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
-            <CheckCircle className="w-3 h-3" />
-            지급완료
-          </span>
-        );
+        return <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800"><CheckCircle className="w-3 h-3" />지급완료</span>;
       default:
         return null;
     }
   };
 
-  // DataTable column definitions
-  const columns: Column<SettlementBatch>[] = [
+  const columns: O4OColumn<SettlementBatch>[] = [
     {
       key: 'period',
-      title: '정산 기간',
-      render: (_: unknown, record: SettlementBatch) => (
+      header: '정산 기간',
+      render: (_, row) => (
         <div>
-          <p className="font-medium">
-            {record.periodStart.toLocaleDateString()} ~{' '}
-            {record.periodEnd.toLocaleDateString()}
-          </p>
-          <p className="text-sm text-gray-500">
-            거래 {record.transactionCount}건
-          </p>
+          <p className="font-medium">{row.periodStart.toLocaleDateString()} ~ {row.periodEnd.toLocaleDateString()}</p>
+          <p className="text-sm text-gray-500">거래 {row.transactionCount}건</p>
         </div>
       ),
     },
     {
       key: 'totalAmount',
-      title: '매출',
-      dataIndex: 'totalAmount',
+      header: '매출',
       align: 'right',
       sortable: true,
-      render: (value: number) => (
-        <span>{value.toLocaleString()}원</span>
-      ),
+      sortAccessor: (row) => row.totalAmount,
+      render: (_, row) => <span>{row.totalAmount.toLocaleString()}원</span>,
     },
     {
       key: 'commissionAmount',
-      title: '수수료',
-      dataIndex: 'commissionAmount',
+      header: '수수료',
       align: 'right',
       sortable: true,
-      render: (value: number) => (
-        <span className="text-orange-600">{value.toLocaleString()}원</span>
-      ),
+      sortAccessor: (row) => row.commissionAmount,
+      render: (_, row) => <span className="text-orange-600">{row.commissionAmount.toLocaleString()}원</span>,
     },
     {
       key: 'netAmount',
-      title: '정산액',
-      dataIndex: 'netAmount',
+      header: '정산액',
       align: 'right',
       sortable: true,
-      render: (value: number) => (
-        <span className="font-medium text-blue-600">{value.toLocaleString()}원</span>
-      ),
+      sortAccessor: (row) => row.netAmount,
+      render: (_, row) => <span className="font-medium text-blue-600">{row.netAmount.toLocaleString()}원</span>,
     },
     {
       key: 'status',
-      title: '상태',
-      dataIndex: 'status',
+      header: '상태',
       align: 'center',
-      render: (value: string) => getStatusBadge(value),
+      render: (_, row) => getStatusBadge(row.status),
     },
     {
-      key: 'actions',
-      title: '상세',
+      key: '_actions',
+      header: '',
+      width: 56,
+      system: true,
       align: 'center',
-      render: (_: unknown, record: SettlementBatch) => (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            navigate(`/supplierops/settlements/${record.id}`);
-          }}
-          className="text-blue-600 hover:text-blue-900 p-1"
-          title="상세 보기"
-        >
-          <Eye className="w-4 h-4" />
-        </button>
+      render: (_, row) => (
+        <RowActionMenu
+          actions={[
+            { key: 'view', label: '상세 보기', icon: <Eye size={14} />, onClick: () => navigate(`/supplierops/settlements/${row.id}`) },
+          ]}
+        />
       ),
-    },
-  ];
-
-  // PageHeader actions
-  const headerActions = [
-    {
-      id: 'download',
-      label: '내역 다운로드',
-      icon: <Download className="w-4 h-4" />,
-      onClick: () => {
-        // TODO: Implement download settlement history
-      },
-      variant: 'secondary' as const,
     },
   ];
 
   return (
     <div className="p-6">
-      {/* PageHeader */}
       <PageHeader
         title="정산 관리"
         subtitle="정산 현황 및 수수료 내역"
-        actions={headerActions}
+        actions={[
+          { id: 'download', label: '내역 다운로드', icon: <Download className="w-4 h-4" />, onClick: () => {}, variant: 'secondary' as const },
+        ]}
       />
 
       {/* Summary Cards */}
@@ -200,60 +158,57 @@ const Settlement: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">누적 정산액</p>
-              <p className="text-2xl font-bold text-green-600">
-                {summary.totalSettled.toLocaleString()}원
-              </p>
+              <p className="text-2xl font-bold text-green-600">{summary.totalSettled.toLocaleString()}원</p>
             </div>
             <CheckCircle className="w-8 h-8 text-green-600 opacity-50" />
           </div>
         </div>
-
         <div className="bg-white rounded-lg shadow p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">정산 대기</p>
-              <p className="text-2xl font-bold text-blue-600">
-                {summary.pendingSettlement.toLocaleString()}원
-              </p>
+              <p className="text-2xl font-bold text-blue-600">{summary.pendingSettlement.toLocaleString()}원</p>
             </div>
             <Clock className="w-8 h-8 text-blue-600 opacity-50" />
           </div>
         </div>
-
         <div className="bg-white rounded-lg shadow p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">이번 기간 매출</p>
-              <p className="text-2xl font-bold">
-                {summary.currentPeriodSales.toLocaleString()}원
-              </p>
+              <p className="text-2xl font-bold">{summary.currentPeriodSales.toLocaleString()}원</p>
             </div>
             <TrendingUp className="w-8 h-8 text-purple-600 opacity-50" />
           </div>
         </div>
-
         <div className="bg-white rounded-lg shadow p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">예상 수수료</p>
-              <p className="text-2xl font-bold text-orange-600">
-                {summary.currentPeriodCommission.toLocaleString()}원
-              </p>
+              <p className="text-2xl font-bold text-orange-600">{summary.currentPeriodCommission.toLocaleString()}원</p>
             </div>
             <DollarSign className="w-8 h-8 text-orange-600 opacity-50" />
           </div>
         </div>
       </div>
 
-      {/* Settlement Batches DataTable */}
+      {/* Settlement Batches Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <DataTable<SettlementBatch>
-          columns={columns}
-          dataSource={batches}
-          rowKey="id"
-          loading={loading}
-          emptyText="정산 내역이 없습니다"
-        />
+        {loading ? (
+          <div className="animate-pulse p-4 space-y-2">
+            {[...Array(5)].map((_, i) => <div key={i} className="h-12 bg-gray-100 rounded" />)}
+          </div>
+        ) : (
+          <BaseTable<SettlementBatch>
+            columns={columns}
+            data={batches}
+            rowKey={(row) => row.id}
+            emptyMessage="정산 내역이 없습니다"
+            tableId="supplierops-settlement"
+            columnVisibility
+            persistState
+          />
+        )}
       </div>
     </div>
   );
