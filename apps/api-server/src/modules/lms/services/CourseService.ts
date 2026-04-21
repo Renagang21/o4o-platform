@@ -2,6 +2,7 @@ import { Repository } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
 import { BaseService } from '../../../common/base.service.js';
 import { Course, CourseStatus, CourseLevel } from '@o4o/lms-core';
+import { sanitizeInstructor } from '../utils/sanitize-user.js';
 import logger from '../../../utils/logger.js';
 
 export interface CreateCourseRequest {
@@ -90,10 +91,14 @@ export class CourseService extends BaseService<Course> {
   }
 
   async getCourse(id: string): Promise<Course | null> {
-    return this.courseRepository.findOne({
+    const course = await this.courseRepository.findOne({
       where: { id },
       relations: ['instructor', 'organization']
     });
+    if (course) {
+      (course as any).instructor = sanitizeInstructor((course as any).instructor);
+    }
+    return course;
   }
 
   async listCourses(filters: CourseFilters = {}): Promise<{ courses: Course[]; total: number }> {
@@ -153,6 +158,11 @@ export class CourseService extends BaseService<Course> {
     query.leftJoinAndSelect('course.organization', 'organization');
 
     const [courses, total] = await query.getManyAndCount();
+
+    // WO-KPA-LMS-INSTRUCTOR-RESPONSE-SANITIZATION-V1
+    for (const course of courses) {
+      (course as any).instructor = sanitizeInstructor((course as any).instructor);
+    }
 
     return { courses, total };
   }

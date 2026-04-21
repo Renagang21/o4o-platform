@@ -3,6 +3,7 @@ import { AppDataSource } from '../../../database/connection.js';
 import { BaseService } from '../../../common/base.service.js';
 import { Enrollment, EnrollmentStatus } from '@o4o/lms-core';
 import { CourseService } from './CourseService.js';
+import { sanitizeUserFields } from '../utils/sanitize-user.js';
 import logger from '../../../utils/logger.js';
 
 export interface EnrollCourseRequest {
@@ -153,17 +154,25 @@ export class EnrollmentService extends BaseService<Enrollment> {
   }
 
   async getEnrollment(id: string): Promise<Enrollment | null> {
-    return this.enrollmentRepository.findOne({
+    const enrollment = await this.enrollmentRepository.findOne({
       where: { id },
       relations: ['course', 'user', 'organization']
     });
+    if (enrollment) {
+      (enrollment as any).user = sanitizeUserFields((enrollment as any).user);
+    }
+    return enrollment;
   }
 
   async getEnrollmentByUserAndCourse(userId: string, courseId: string): Promise<Enrollment | null> {
-    return this.enrollmentRepository.findOne({
+    const enrollment = await this.enrollmentRepository.findOne({
       where: { userId, courseId },
       relations: ['course', 'user']
     });
+    if (enrollment) {
+      (enrollment as any).user = sanitizeUserFields((enrollment as any).user);
+    }
+    return enrollment;
   }
 
   async listEnrollments(filters: EnrollmentFilters = {}): Promise<{ enrollments: Enrollment[]; total: number }> {
@@ -207,6 +216,11 @@ export class EnrollmentService extends BaseService<Enrollment> {
     query.leftJoinAndSelect('enrollment.organization', 'organization');
 
     const [enrollments, total] = await query.getManyAndCount();
+
+    // WO-KPA-LMS-INSTRUCTOR-RESPONSE-SANITIZATION-V1
+    for (const enrollment of enrollments) {
+      (enrollment as any).user = sanitizeUserFields((enrollment as any).user);
+    }
 
     return { enrollments, total };
   }

@@ -4,6 +4,7 @@ import { BaseService } from '../../../common/base.service.js';
 import { Certificate } from '@o4o/lms-core';
 import { CourseService } from './CourseService.js';
 import { EnrollmentService } from './EnrollmentService.js';
+import { sanitizeUserFields } from '../utils/sanitize-user.js';
 import logger from '../../../utils/logger.js';
 
 export interface IssueCertificateRequest {
@@ -137,17 +138,25 @@ export class CertificateService extends BaseService<Certificate> {
   }
 
   async getCertificate(id: string): Promise<Certificate | null> {
-    return this.certificateRepository.findOne({
+    const cert = await this.certificateRepository.findOne({
       where: { id },
       relations: ['user', 'course']
     });
+    if (cert) {
+      (cert as any).user = sanitizeUserFields((cert as any).user);
+    }
+    return cert;
   }
 
   async getCertificateByNumber(certificateNumber: string): Promise<Certificate | null> {
-    return this.certificateRepository.findOne({
+    const cert = await this.certificateRepository.findOne({
       where: { certificateNumber },
       relations: ['user', 'course']
     });
+    if (cert) {
+      (cert as any).user = sanitizeUserFields((cert as any).user);
+    }
+    return cert;
   }
 
   async verifyCertificate(verificationCode: string): Promise<Certificate | null> {
@@ -170,6 +179,7 @@ export class CertificateService extends BaseService<Certificate> {
       return null;
     }
 
+    (certificate as any).user = sanitizeUserFields((certificate as any).user);
     return certificate;
   }
 
@@ -208,6 +218,11 @@ export class CertificateService extends BaseService<Certificate> {
     query.leftJoinAndSelect('certificate.course', 'course');
 
     const [certificates, total] = await query.getManyAndCount();
+
+    // WO-KPA-LMS-INSTRUCTOR-RESPONSE-SANITIZATION-V1
+    for (const cert of certificates) {
+      (cert as any).user = sanitizeUserFields((cert as any).user);
+    }
 
     return { certificates, total };
   }
