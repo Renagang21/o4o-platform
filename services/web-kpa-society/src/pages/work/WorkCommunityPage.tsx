@@ -166,10 +166,10 @@ export function WorkCommunityPage() {
         </div>
       </section>
 
-      {/* 글쓰기 버튼 */}
+      {/* 포럼 바로가기 */}
       <div style={styles.writeSection}>
-        <Link to="/forum/write" style={styles.writeButton}>
-          ✏️ 새 글 작성
+        <Link to="/forum" style={styles.writeButton}>
+          💊 포럼 둘러보기
         </Link>
       </div>
     </div>

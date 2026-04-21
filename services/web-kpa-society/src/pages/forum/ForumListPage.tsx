@@ -236,7 +236,7 @@ export function ForumListPage() {
         <div style={s.tableWrapper}>
           <table style={s.table}>
             <thead><tr>
-              <th style={{ ...s.th, width: '80px' }}>카테고리</th>
+              <th style={{ ...s.th, width: '80px' }}>포럼</th>
               <th style={s.th}>제목</th>
               <th style={{ ...s.th, width: '100px' }}>작성자</th>
               <th style={{ ...s.th, width: '100px' }}>작성일</th>
@@ -272,7 +272,7 @@ export function ForumListPage() {
             <table style={s.table}>
               <thead>
                 <tr>
-                  <th style={{ ...s.th, width: '80px' }}>카테고리</th>
+                  <th style={{ ...s.th, width: '80px' }}>포럼</th>
                   <th style={s.th}>제목</th>
                   <th style={{ ...s.th, width: '100px' }}>작성자</th>
                   <th style={{ ...s.th, width: '100px' }}>작성일</th>

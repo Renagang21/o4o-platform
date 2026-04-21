@@ -80,20 +80,20 @@ export function LmsCoursesPage() {
   };
 
   if (loading) {
-    return <LoadingSpinner message="안내 흐름을 불러오는 중..." />;
+    return <LoadingSpinner message="마케팅 콘텐츠를 불러오는 중..." />;
   }
 
   return (
     <div style={styles.container}>
       <PageHeader
-        title="안내 흐름"
-        description="콘텐츠를 순서대로 안내받으세요"
-        breadcrumb={[{ label: '홈', href: '/' }, { label: '안내' }]}
+        title="마케팅 콘텐츠"
+        description="마케팅 콘텐츠를 탐색하세요"
+        breadcrumb={[{ label: '홈', href: '/' }, { label: '마케팅 콘텐츠' }]}
       />
 
       {/* 안내 메시지 */}
       <div style={styles.infoBox}>
-        💡 이 기능은 교육·평가가 아닌, 콘텐츠를 순서대로 안내하기 위한 도구입니다.
+        💡 마케팅 콘텐츠를 순서대로 안내받고, 진행 현황을 관리할 수 있습니다.
       </div>
 
       <div style={styles.filters}>
@@ -112,8 +112,8 @@ export function LmsCoursesPage() {
       {courses.length === 0 ? (
         <EmptyState
           icon="📋"
-          title="등록된 안내 흐름이 없습니다"
-          description="곧 새로운 안내 흐름이 등록될 예정입니다."
+          title="등록된 마케팅 콘텐츠가 없습니다"
+          description="곧 새로운 마케팅 콘텐츠가 등록될 예정입니다."
         />
       ) : (
         <>

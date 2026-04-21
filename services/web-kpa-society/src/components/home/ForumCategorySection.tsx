@@ -34,7 +34,7 @@ export function ForumCategorySection({ categories, loading }: Props) {
           ))}
         </div>
       ) : (
-        <p style={styles.empty}>포럼 카테고리가 없습니다.</p>
+        <p style={styles.empty}>등록된 포럼이 없습니다.</p>
       )}
     </section>
   );
