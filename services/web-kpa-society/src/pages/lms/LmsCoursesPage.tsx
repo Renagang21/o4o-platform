@@ -40,7 +40,8 @@ export function LmsCoursesPage() {
       });
 
       setCourses(res.data || []);
-      setTotalPages(res.totalPages || 1);
+      const pag = (res as any).pagination;
+      setTotalPages(pag?.totalPages || res.totalPages || 1);
     } catch (err) {
       // API 오류 시 빈 목록 표시 (서비스 준비 중)
       console.warn('LMS API not available:', err);
@@ -136,7 +137,7 @@ export function LmsCoursesPage() {
                     <h3 style={styles.courseTitle}>{course.title}</h3>
                     <p style={styles.courseDescription}>{course.description}</p>
                     <div style={styles.courseMeta}>
-                      <span>👤 {course.instructorName}</span>
+                      <span>👤 {(course as any).instructor?.name || course.instructorName || '-'}</span>
                       <span>📖 {course.lessonCount}개 단계</span>
                       <span>⏱ {Math.floor(course.duration / 60)}시간</span>
                     </div>

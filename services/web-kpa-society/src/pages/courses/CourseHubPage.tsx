@@ -58,7 +58,8 @@ export function CourseHubPage() {
         limit: 12,
       });
       setCourses(res.data || []);
-      setTotalPages(res.totalPages || 1);
+      const pag = (res as any).pagination;
+      setTotalPages(pag?.totalPages || res.totalPages || 1);
     } catch {
       setCourses([]);
       setTotalPages(1);
@@ -209,7 +210,7 @@ export function CourseHubPage() {
                     <h3 style={styles.courseTitle}>{course.title}</h3>
                     <p style={styles.courseDescription}>{course.description}</p>
                     <div style={styles.courseMeta}>
-                      <span>👤 {course.instructorName}</span>
+                      <span>👤 {(course as any).instructor?.name || course.instructorName || '-'}</span>
                       <span>📖 {course.lessonCount}개 강의</span>
                       <span>⏱ {formatDuration(course.duration)}</span>
                     </div>

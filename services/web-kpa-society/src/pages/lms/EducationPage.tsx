@@ -51,9 +51,9 @@ const COLUMNS: O4OColumn<Course>[] = [
     header: '강사',
     width: '15%',
     sortable: true,
-    sortAccessor: (row) => row.instructorName,
+    sortAccessor: (row) => (row as any).instructor?.name || row.instructorName || '',
     render: (_v, row) => (
-      <span style={{ fontSize: '14px', color: colors.neutral700 }}>{row.instructorName}</span>
+      <span style={{ fontSize: '14px', color: colors.neutral700 }}>{(row as any).instructor?.name || row.instructorName || '-'}</span>
     ),
   },
   {
@@ -195,7 +195,8 @@ export function EducationPage() {
         limit: 20,
       });
       setCourses(res.data || []);
-      setTotalPages(res.totalPages || 1);
+      const pag = (res as any).pagination;
+      setTotalPages(pag?.totalPages || res.totalPages || 1);
     } catch {
       setCourses([]);
       setTotalPages(1);
