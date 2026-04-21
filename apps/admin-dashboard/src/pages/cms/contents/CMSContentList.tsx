@@ -69,12 +69,22 @@ const STATUSES: { value: ContentStatus | ''; label: string }[] = [
   { value: 'archived', label: 'Archived' },
 ];
 
+// Visibility scope options (WO-CONTENT-META-UI-VALIDATION-V1)
+// DB uses platform/service/organization; ContentMeta maps organization→store
+const VISIBILITY_SCOPES: { value: string; label: string }[] = [
+  { value: '', label: 'All Visibility' },
+  { value: 'platform', label: '전체 (Platform)' },
+  { value: 'service', label: '서비스 (Service)' },
+  { value: 'organization', label: '매장 (Store)' },
+];
+
 export default function CMSContentList() {
   const [contents, setContents] = useState<CmsContent[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState<ContentType | ''>('');
   const [filterService, setFilterService] = useState('');
   const [filterStatus, setFilterStatus] = useState<ContentStatus | ''>('');
+  const [filterVisibility, setFilterVisibility] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingContent, setEditingContent] = useState<CmsContent | null>(null);
   const [total, setTotal] = useState(0);
@@ -86,6 +96,7 @@ export default function CMSContentList() {
       if (filterType) params.type = filterType;
       if (filterService) params.serviceKey = filterService;
       if (filterStatus) params.status = filterStatus;
+      if (filterVisibility) params.visibilityScope = filterVisibility;
 
       const response = await cmsAPI.listContents(params);
       setContents(response.data);
@@ -96,7 +107,7 @@ export default function CMSContentList() {
     } finally {
       setLoading(false);
     }
-  }, [filterType, filterService, filterStatus]);
+  }, [filterType, filterService, filterStatus, filterVisibility]);
 
   useEffect(() => {
     loadContents();
@@ -176,9 +187,10 @@ export default function CMSContentList() {
     setFilterType('');
     setFilterService('');
     setFilterStatus('');
+    setFilterVisibility('');
   };
 
-  const hasActiveFilters = filterType || filterService || filterStatus;
+  const hasActiveFilters = filterType || filterService || filterStatus || filterVisibility;
 
   return (
     <div className="p-6">
@@ -242,6 +254,19 @@ export default function CMSContentList() {
             {STATUSES.map((status) => (
               <option key={status.value} value={status.value}>
                 {status.label}
+              </option>
+            ))}
+          </select>
+
+          {/* Visibility Filter (WO-CONTENT-META-UI-VALIDATION-V1) */}
+          <select
+            value={filterVisibility}
+            onChange={(e) => setFilterVisibility(e.target.value)}
+            className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+          >
+            {VISIBILITY_SCOPES.map((scope) => (
+              <option key={scope.value} value={scope.value}>
+                {scope.label}
               </option>
             ))}
           </select>

@@ -33,11 +33,16 @@ function formatFileSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+// Visibility filter values (WO-CONTENT-META-UI-VALIDATION-V1)
+// isPublic=true → visibility='service', isPublic=false → visibility='personal'
+type VisibilityFilter = 'all' | 'service' | 'personal';
+
 export default function SupplierLibraryPage() {
   const navigate = useNavigate();
   const [items, setItems] = useState<SupplierLibraryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [visibilityFilter, setVisibilityFilter] = useState<VisibilityFilter>('all');
 
   const fetchItems = useCallback(async () => {
     setLoading(true);
@@ -58,7 +63,14 @@ export default function SupplierLibraryPage() {
     }
   };
 
-  const dataSource = items.map((item) => ({
+  // Client-side visibility filter (maps isPublic → ContentMeta visibility)
+  const filteredItems = items.filter((item) => {
+    if (visibilityFilter === 'service') return item.isPublic === true;
+    if (visibilityFilter === 'personal') return item.isPublic === false;
+    return true;
+  });
+
+  const dataSource = filteredItems.map((item) => ({
     id: item.id,
     title: (
         <div>
@@ -169,6 +181,41 @@ export default function SupplierLibraryPage() {
           <Plus size={16} />
           자료 등록
         </button>
+      </div>
+
+      {/* Visibility Filter Bar (WO-CONTENT-META-UI-VALIDATION-V1) */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+        <span style={{ fontSize: '13px', color: '#64748b' }}>공개 범위:</span>
+        {(['all', 'service', 'personal'] as VisibilityFilter[]).map((v) => (
+          <button
+            key={v}
+            onClick={() => setVisibilityFilter(v)}
+            style={{
+              padding: '4px 12px',
+              fontSize: '12px',
+              borderRadius: '20px',
+              border: '1px solid',
+              cursor: 'pointer',
+              fontWeight: visibilityFilter === v ? 600 : 400,
+              backgroundColor: visibilityFilter === v
+                ? v === 'service' ? '#dcfce7' : v === 'personal' ? '#f1f5f9' : '#e0e7ff'
+                : '#fff',
+              color: visibilityFilter === v
+                ? v === 'service' ? '#15803d' : v === 'personal' ? '#475569' : '#4338ca'
+                : '#94a3b8',
+              borderColor: visibilityFilter === v
+                ? v === 'service' ? '#86efac' : v === 'personal' ? '#cbd5e1' : '#a5b4fc'
+                : '#e2e8f0',
+            }}
+          >
+            {{ all: '전체', service: '서비스 공개', personal: '비공개(개인)' }[v]}
+          </button>
+        ))}
+        {visibilityFilter !== 'all' && (
+          <span style={{ fontSize: '12px', color: '#94a3b8' }}>
+            {filteredItems.length}건
+          </span>
+        )}
       </div>
 
       {/* Info notice */}
