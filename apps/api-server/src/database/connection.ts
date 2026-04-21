@@ -100,6 +100,7 @@ import {
   ForumTag,
   ForumCategoryRequest,
   ForumCategoryMember,
+  ForumPostLike,
 } from '@o4o/forum-core/entities';
 
 // Forum Notification entity (Phase 13)
@@ -626,6 +627,7 @@ export const AppDataSource = new DataSource({
     ForumTag,
     ForumCategoryRequest,
     ForumCategoryMember,
+    ForumPostLike,
     // Forum Notification entity (Phase 13) - local entity
     ForumNotification,
     // Digital Signage legacy entities removed — see digital-signage-core
