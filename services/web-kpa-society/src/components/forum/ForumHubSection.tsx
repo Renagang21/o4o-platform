@@ -4,7 +4,8 @@
  * WO-KPA-FORUM-HUB-V2-PHASE1 + PHASE2
  * - 활성 카테고리를 카드형 리스트로 표시
  * - 멤버 수, 최근 활동, 최근 글 제목 표시
- * - Phase 2: 정렬 탭 (전체/최근 활동/인기) + 검색 (Enter/버튼 클릭)
+ * - Phase 2: 정렬 탭 (전체/최근 활동/인기)
+ * - WO-FORUM-SEARCH-UX-REFINEMENT-V1: 내부 검색 제거 (상단 통합 검색으로 일원화)
  * - ForumHomePage 최상단에 배치
  */
 
@@ -70,8 +71,6 @@ export function ForumHubSection({ prefetchedForums, loading: parentLoading }: Pr
   const [loading, setLoading] = useState(true);
   const [sort, setSort] = useState<string>('default');
   const sortTabs = isAuthenticated ? [...BASE_SORT_TABS, JOINED_TAB] : BASE_SORT_TABS;
-  const [searchInput, setSearchInput] = useState('');
-  const [appliedQuery, setAppliedQuery] = useState('');
   const initialLoaded = useRef(false);
 
   // Inject grid styles
@@ -94,7 +93,7 @@ export function ForumHubSection({ prefetchedForums, loading: parentLoading }: Pr
       return;
     }
     if (!initialLoaded.current) {
-      fetchForums('default', '');
+      fetchForums('default');
       initialLoaded.current = true;
     }
   }, [prefetchedForums]);
@@ -109,14 +108,13 @@ export function ForumHubSection({ prefetchedForums, loading: parentLoading }: Pr
   // Re-fetch when sort changes (after initial load)
   useEffect(() => {
     if (!initialLoaded.current) return;
-    fetchForums(sort, appliedQuery);
-  }, [sort, appliedQuery]);
+    fetchForums(sort);
+  }, [sort]);
 
-  function fetchForums(sortVal: string, query: string) {
+  function fetchForums(sortVal: string) {
     setLoading(true);
-    const params: { sort?: string; q?: string } = {};
+    const params: { sort?: string } = {};
     if (sortVal !== 'default') params.sort = sortVal;
-    if (query) params.q = query;
 
     homeApi.getForumHub(Object.keys(params).length > 0 ? params : undefined)
       .then((res) => {
@@ -124,29 +122,6 @@ export function ForumHubSection({ prefetchedForums, loading: parentLoading }: Pr
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }
-
-  function handleSearch() {
-    const trimmed = searchInput.trim();
-    if (trimmed === appliedQuery) {
-      // Same query — re-fetch anyway
-      fetchForums(sort, trimmed);
-    } else {
-      setAppliedQuery(trimmed);
-    }
-  }
-
-  function handleSearchKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  }
-
-  function handleClearSearch() {
-    setSearchInput('');
-    if (appliedQuery !== '') {
-      setAppliedQuery('');
-    }
   }
 
   const isLoading = parentLoading ?? loading;
@@ -158,54 +133,18 @@ export function ForumHubSection({ prefetchedForums, loading: parentLoading }: Pr
         <Link to="/forum/all" style={styles.moreLink}>전체 보기 →</Link>
       </div>
 
-      {/* Sort tabs + Search */}
-      <div style={styles.toolbar}>
-        <div style={styles.sortTabs}>
-          {sortTabs.map((tab) => (
-            <button
-              key={tab.key}
-              className={`forum-hub-sort-tab${sort === tab.key ? ' active' : ''}`}
-              onClick={() => setSort(tab.key)}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-        <div style={styles.searchBox}>
-          <input
-            type="text"
-            placeholder="포럼 검색..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            onKeyDown={handleSearchKeyDown}
-            style={styles.searchInput}
-          />
-          {searchInput && (
-            <button
-              onClick={handleClearSearch}
-              style={styles.clearBtn}
-              aria-label="검색 초기화"
-            >
-              ×
-            </button>
-          )}
+      {/* Sort tabs */}
+      <div style={styles.sortTabs}>
+        {sortTabs.map((tab) => (
           <button
-            onClick={handleSearch}
-            style={styles.searchBtn}
-            aria-label="검색"
+            key={tab.key}
+            className={`forum-hub-sort-tab${sort === tab.key ? ' active' : ''}`}
+            onClick={() => setSort(tab.key)}
           >
-            검색
+            {tab.label}
           </button>
-        </div>
+        ))}
       </div>
-
-      {/* Applied query indicator */}
-      {appliedQuery && (
-        <div style={styles.queryIndicator}>
-          <span>"{appliedQuery}" 검색 결과</span>
-          <button onClick={handleClearSearch} style={styles.queryReset}>초기화</button>
-        </div>
-      )}
 
       {isLoading ? (
         <div style={styles.emptyCard}>
@@ -214,8 +153,7 @@ export function ForumHubSection({ prefetchedForums, loading: parentLoading }: Pr
       ) : forums.length === 0 ? (
         <div style={styles.emptyCard}>
           <p style={styles.empty}>
-            {appliedQuery ? '검색 결과가 없습니다.'
-              : sort === 'joined' ? '참여한 포럼이 없습니다. 글이나 댓글을 작성하면 여기에 표시됩니다.'
+            {sort === 'joined' ? '참여한 포럼이 없습니다. 글이나 댓글을 작성하면 여기에 표시됩니다.'
               : '아직 개설된 포럼이 없습니다.'}
           </p>
         </div>
@@ -308,70 +246,10 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.primary,
     textDecoration: 'none',
   },
-  toolbar: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-    gap: spacing.md,
-    flexWrap: 'wrap' as const,
-  },
   sortTabs: {
     display: 'flex',
     gap: '4px',
-  },
-  searchBox: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '4px',
-    position: 'relative' as const,
-  },
-  searchInput: {
-    padding: '6px 12px',
-    fontSize: '0.813rem',
-    border: `1px solid ${colors.neutral200}`,
-    borderRadius: borderRadius.sm,
-    outline: 'none',
-    width: '180px',
-    color: colors.neutral900,
-    backgroundColor: colors.white,
-  },
-  clearBtn: {
-    background: 'none',
-    border: 'none',
-    fontSize: '1rem',
-    color: colors.neutral400,
-    cursor: 'pointer',
-    padding: '4px 6px',
-    lineHeight: 1,
-  },
-  searchBtn: {
-    padding: '6px 12px',
-    fontSize: '0.75rem',
-    fontWeight: 600,
-    color: colors.white,
-    backgroundColor: colors.primary,
-    border: 'none',
-    borderRadius: borderRadius.sm,
-    cursor: 'pointer',
-    whiteSpace: 'nowrap' as const,
-  },
-  queryIndicator: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: spacing.sm,
-    marginBottom: spacing.sm,
-    fontSize: '0.813rem',
-    color: colors.neutral500,
-  },
-  queryReset: {
-    background: 'none',
-    border: 'none',
-    fontSize: '0.75rem',
-    color: colors.primary,
-    cursor: 'pointer',
-    padding: '2px 4px',
-    textDecoration: 'underline',
+    marginBottom: spacing.md,
   },
   card: {
     backgroundColor: colors.white,

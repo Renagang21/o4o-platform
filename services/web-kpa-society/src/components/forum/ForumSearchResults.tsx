@@ -206,6 +206,11 @@ export function ForumSearchResults({ query }: ForumSearchResultsProps) {
               ))}
             </ul>
           </div>
+          <div style={styles.viewAllRow}>
+            <Link to={`/forum/all?search=${encodeURIComponent(query)}`} style={styles.viewAllLink}>
+              게시글 전체 보기 →
+            </Link>
+          </div>
         </section>
       )}
     </div>
@@ -398,6 +403,19 @@ const styles: Record<string, React.CSSProperties> = {
   },
   dot: {
     color: colors.neutral300,
+  },
+
+  // View all link
+  viewAllRow: {
+    display: 'flex',
+    justifyContent: 'center',
+    marginTop: spacing.md,
+  },
+  viewAllLink: {
+    fontSize: '0.875rem',
+    fontWeight: 500,
+    color: colors.primary,
+    textDecoration: 'none',
   },
 
   // Status cards
