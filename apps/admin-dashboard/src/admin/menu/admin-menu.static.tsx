@@ -41,6 +41,7 @@ import {
   Briefcase,
   Store,
   Printer,
+  Tablet,
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -612,6 +613,21 @@ export const adminMenuStatic: MenuItem[] = [
         label: '새 POP 만들기',
         icon: <Printer className="w-4 h-4" />,
         path: '/store/pop/create',
+      },
+    ],
+  },
+
+  {
+    id: 'store-tablet',
+    label: '타블렛 채널',
+    icon: <Tablet className="w-5 h-5" />,
+    roles: ['admin', 'super_admin'],
+    children: [
+      {
+        id: 'store-tablet-settings',
+        label: '노출 상품 설정',
+        icon: <Tablet className="w-4 h-4" />,
+        path: '/store/tablet/settings',
       },
     ],
   },

@@ -31,6 +31,13 @@ const StoreContentEditorPage = lazy(() => import('@/pages/store-content/[id]'));
 const PopListPage = lazy(() => import('@/pages/store/pop/PopListPage'));
 const PopCreatePage = lazy(() => import('@/pages/store/pop/PopCreatePage'));
 
+// Store QR Pages (WO-STORE-QR-PRODUCT-DIRECT-LINK-V1)
+const QrListPage = lazy(() => import('@/pages/store/qr/QrListPage'));
+const QrCreatePage = lazy(() => import('@/pages/store/qr/QrCreatePage'));
+
+// Store Tablet Settings (WO-TABLET-OPERATOR-UI-V1)
+const TabletChannelSettingsPage = lazy(() => import('@/pages/store/tablet/TabletChannelSettingsPage'));
+
 // Loading component
 const PageLoader = () => (
   <div className="flex items-center justify-center h-screen">
@@ -153,6 +160,31 @@ export function LmsMarketingRoutes() {
       <AdminProtectedRoute requiredRoles={['admin']}>
         <Suspense fallback={<PageLoader />}>
           <PopListPage />
+        </Suspense>
+      </AdminProtectedRoute>
+    } />,
+
+    // Store QR (WO-STORE-QR-PRODUCT-DIRECT-LINK-V1)
+    <Route key="/store/qr/create" path="/store/qr/create" element={
+      <AdminProtectedRoute requiredRoles={['admin']}>
+        <Suspense fallback={<PageLoader />}>
+          <QrCreatePage />
+        </Suspense>
+      </AdminProtectedRoute>
+    } />,
+    <Route key="/store/qr" path="/store/qr" element={
+      <AdminProtectedRoute requiredRoles={['admin']}>
+        <Suspense fallback={<PageLoader />}>
+          <QrListPage />
+        </Suspense>
+      </AdminProtectedRoute>
+    } />,
+
+    // Store Tablet Settings (WO-TABLET-OPERATOR-UI-V1)
+    <Route key="/store/tablet/settings" path="/store/tablet/settings" element={
+      <AdminProtectedRoute requiredRoles={['admin']}>
+        <Suspense fallback={<PageLoader />}>
+          <TabletChannelSettingsPage />
         </Suspense>
       </AdminProtectedRoute>
     } />,

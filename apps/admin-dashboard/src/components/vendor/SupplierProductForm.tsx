@@ -1,11 +1,12 @@
-import { ChangeEvent, FC, FormEvent, useEffect, useState } from 'react';
+import { FC, FormEvent, useEffect, useState } from 'react';
 import { Package, DollarSign, Calculator, Save, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { RichTextEditor } from '@o4o/content-editor';
+import { uploadImageForEditor } from '@/api/media-library.api';
 import { Switch } from '@/components/ui/switch';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
@@ -146,6 +147,9 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
     }
   };
 
+  const handleImageUpload = (file: File): Promise<string> =>
+    uploadImageForEditor(file, 'product');
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* 기본 정보 */}
@@ -182,12 +186,12 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
 
           <div className="space-y-2">
             <Label htmlFor="description">제품 설명</Label>
-            <Textarea
-              id="description"
+            <RichTextEditor
               value={formData.description}
-              onChange={(e: ChangeEvent<HTMLTextAreaElement>) => handleInputChange('description', e.target.value)}
+              onChange={({ html }) => handleInputChange('description', html)}
               placeholder="제품에 대한 상세 설명을 입력하세요"
-              rows={4}
+              preset="full"
+              onImageUpload={handleImageUpload}
             />
           </div>
 

@@ -4,16 +4,18 @@
  * WO-O4O-QR-LANDING-PAGE-V1
  * WO-O4O-QR-SCAN-ANALYTICS-V1
  * WO-O4O-QR-PRINT-MODULE-V2
+ * WO-STORE-QR-PRODUCT-DIRECT-LINK-V1: 공급자 상품 직접 연결 지원
  *
  * QR 코드 CRUD + 공개 랜딩 데이터 조회 + 스캔 이벤트 추적 + 출력.
  *
  * PUBLIC (no auth):
- *   GET  /qr/public/:slug  — QR 랜딩 데이터 조회 + scan event 기록
+ *   GET  /qr/public/:slug  — QR 랜딩 데이터 조회 + scan event 기록 (product 타입 시 상품 정보 포함)
  *
  * AUTHENTICATED (requireAuth + requirePharmacyOwner):
+ *   GET    /pharmacy/qr/source/products — 공급자 상품 목록 (QR 직접 연결용)
  *   GET    /pharmacy/qr              — 내 QR 코드 목록 (scanCount 포함)
  *   POST   /pharmacy/qr/print        — 선택 QR 일괄 PDF 출력
- *   POST   /pharmacy/qr              — QR 코드 생성
+ *   POST   /pharmacy/qr              — QR 코드 생성 (productId 직접 연결 지원)
  *   PUT    /pharmacy/qr/:id          — QR 코드 수정
  *   DELETE /pharmacy/qr/:id          — soft-delete
  *   GET    /pharmacy/qr/:id/analytics — QR 스캔 통계
@@ -126,12 +128,98 @@ export function createStoreQrLandingController(
         [qrData.organizationId],
       );
 
+      // WO-STORE-QR-PRODUCT-DIRECT-LINK-V1: product 타입 QR이면 상품 정보 포함
+      let productDetails: Record<string, unknown> | null = null;
+      if (qrData.landingType === 'product' && qrData.landingTargetId) {
+        const productRows = await dataSource.query(
+          `SELECT
+             COALESCE(pm.marketing_name, pm.regulatory_name, 'Unknown') AS name,
+             pm.brand_name AS "brandName",
+             spo.price_general::int AS price,
+             pm.specification AS description
+           FROM supplier_product_offers spo
+           LEFT JOIN product_masters pm ON pm.id = spo.master_id
+           WHERE spo.id = $1 AND spo.is_active = true
+           UNION
+           SELECT
+             COALESCE(pm.marketing_name, pm.regulatory_name, 'Unknown') AS name,
+             pm.brand_name AS "brandName",
+             spo.price_general::int AS price,
+             pm.specification AS description
+           FROM organization_product_listings opl
+           JOIN supplier_product_offers spo ON spo.id = opl.offer_id
+           LEFT JOIN product_masters pm ON pm.id = spo.master_id
+           WHERE opl.id = $1 AND spo.is_active = true
+           LIMIT 1`,
+          [qrData.landingTargetId],
+        );
+        productDetails = productRows[0] || null;
+      }
+
       res.json({
         success: true,
         data: {
           ...qrData,
           storeSlug: storeRows[0]?.slug || null,
+          productDetails,
         },
+      });
+    }),
+  );
+
+  // ─── GET /pharmacy/qr/source/products — 공급자 상품 목록 (직접 연결용) ─
+  // WO-STORE-QR-PRODUCT-DIRECT-LINK-V1
+  router.get(
+    '/pharmacy/qr/source/products',
+    requireAuth,
+    requirePharmacyOwner,
+    asyncHandler(async (req: Request, res: Response) => {
+      const page = Math.max(1, parseInt(req.query.page as string) || 1);
+      const limit = Math.min(50, Math.max(1, parseInt(req.query.limit as string) || 20));
+      const offset = (page - 1) * limit;
+      const search = typeof req.query.search === 'string' ? req.query.search.trim() : '';
+
+      const params: (string | number)[] = [limit, offset];
+      let searchClause = '';
+      if (search) {
+        params.push(`%${search}%`);
+        const idx = params.length;
+        searchClause = `AND (pm.marketing_name ILIKE $${idx} OR pm.brand_name ILIKE $${idx})`;
+      }
+
+      const [rows, countResult] = await Promise.all([
+        dataSource.query(
+          `SELECT
+             spo.id,
+             COALESCE(pm.marketing_name, pm.regulatory_name, 'Unknown') AS name,
+             pm.brand_name AS "brandName",
+             spo.price_general::int AS price,
+             pm.specification AS description
+           FROM supplier_product_offers spo
+           JOIN product_masters pm ON pm.id = spo.master_id
+           WHERE spo.is_active = true
+             AND spo.approval_status = 'APPROVED'
+             AND spo.distribution_type = 'PUBLIC'
+             ${searchClause}
+           ORDER BY pm.marketing_name ASC
+           LIMIT $1 OFFSET $2`,
+          params,
+        ),
+        dataSource.query(
+          `SELECT COUNT(*)::int AS total
+           FROM supplier_product_offers spo
+           JOIN product_masters pm ON pm.id = spo.master_id
+           WHERE spo.is_active = true
+             AND spo.approval_status = 'APPROVED'
+             AND spo.distribution_type = 'PUBLIC'
+             ${searchClause}`,
+          search ? [`%${search}%`] : [],
+        ),
+      ]);
+
+      res.json({
+        success: true,
+        data: { items: rows, total: countResult[0]?.total || 0, page, limit },
       });
     }),
   );
@@ -436,7 +524,8 @@ export function createStoreQrLandingController(
     requirePharmacyOwner,
     asyncHandler(async (req: Request, res: Response) => {
       const organizationId = (req as any).organizationId;
-      const { title, description, type, libraryItemId, landingType, landingTargetId, slug } = req.body;
+      // WO-STORE-QR-PRODUCT-DIRECT-LINK-V1: productId 직접 연결 지원
+      const { title, description, type, libraryItemId, landingType, landingTargetId, productId, slug } = req.body;
 
       if (!title || typeof title !== 'string' || title.trim().length === 0) {
         res.status(400).json({
@@ -460,6 +549,27 @@ export function createStoreQrLandingController(
         return;
       }
 
+      // productId 검증 (product 타입이고 productId 제공 시)
+      let resolvedLandingTargetId: string | null = landingTargetId || null;
+      if (landingType === 'product' && productId) {
+        const [productCheck] = await dataSource.query(
+          `SELECT spo.id FROM supplier_product_offers spo
+           WHERE spo.id = $1
+             AND spo.is_active = true
+             AND spo.approval_status = 'APPROVED'
+           LIMIT 1`,
+          [productId],
+        );
+        if (!productCheck) {
+          res.status(400).json({
+            success: false,
+            error: { code: 'PRODUCT_NOT_FOUND', message: 'Product not found or not available' },
+          });
+          return;
+        }
+        resolvedLandingTargetId = productId; // productId 우선
+      }
+
       const existing = await qrRepo.findOne({ where: { slug: slug.trim() } });
       if (existing) {
         res.status(409).json({
@@ -476,7 +586,7 @@ export function createStoreQrLandingController(
         description: description || null,
         libraryItemId: libraryItemId || null,
         landingType,
-        landingTargetId: landingTargetId || null,
+        landingTargetId: resolvedLandingTargetId,
         slug: slug.trim(),
         isActive: true,
       });
@@ -484,12 +594,12 @@ export function createStoreQrLandingController(
       const saved = await qrRepo.save(item);
 
       // WO-O4O-PRODUCT-MARKETING-GRAPH-V1: Auto-link QR → Product
-      if (landingType === 'product' && landingTargetId) {
+      if (landingType === 'product' && resolvedLandingTargetId) {
         dataSource.query(
           `INSERT INTO product_marketing_assets (organization_id, product_id, asset_type, asset_id)
            VALUES ($1, $2, 'qr', $3)
            ON CONFLICT (product_id, asset_type, asset_id) DO NOTHING`,
-          [organizationId, landingTargetId, saved.id],
+          [organizationId, resolvedLandingTargetId, saved.id],
         ).catch((err: unknown) => {
           console.error('[ProductMarketingGraph] Auto-link QR failed:', err);
         });
