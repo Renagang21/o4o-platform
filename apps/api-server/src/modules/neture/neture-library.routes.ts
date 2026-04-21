@@ -15,6 +15,7 @@ import { NetureService } from './neture.service.js';
 import { NetureLibraryService } from './services/neture-library.service.js';
 import { AppDataSource } from '../../database/connection.js';
 import logger from '../../utils/logger.js';
+import { mapNetureVisibility } from '@o4o/types';
 
 const router: ExpressRouter = Router();
 const netureService = new NetureService();
@@ -95,6 +96,18 @@ router.get('/library/public', async (req: Request, res: Response) => {
       page: page ? Number(page) : undefined,
       limit: limit ? Number(limit) : undefined,
     });
+    // ContentMeta (WO-CONTENT-META-API-ENRICHMENT-V1)
+    if (result.success) {
+      result.data.items = result.data.items.map((item: any) => ({
+        ...item,
+        producer: 'supplier' as const,
+        producerRef: item.supplierId,
+        visibility: mapNetureVisibility(item.isPublic ?? true),
+        serviceKey: 'neture' as const,
+        contentType: 'media' as const,
+        metaStatus: 'published' as const,
+      }));
+    }
     res.json(result);
   } catch (error) {
     logger.error('[Neture Library API] Error listing public items:', error);
@@ -118,6 +131,18 @@ router.get('/library', requireAuth, requireLinkedSupplier, async (req: Request, 
       page: page ? Number(page) : undefined,
       limit: limit ? Number(limit) : undefined,
     });
+    // ContentMeta (WO-CONTENT-META-API-ENRICHMENT-V1)
+    if (result.success) {
+      result.data.items = result.data.items.map((item: any) => ({
+        ...item,
+        producer: 'supplier' as const,
+        producerRef: item.supplierId,
+        visibility: mapNetureVisibility(item.isPublic ?? false),
+        serviceKey: 'neture' as const,
+        contentType: 'media' as const,
+        metaStatus: mapNetureVisibility(item.isPublic ?? false) === 'service' ? 'published' as const : 'draft' as const,
+      }));
+    }
     res.json(result);
   } catch (error) {
     logger.error('[Neture Library API] Error listing supplier items:', error);

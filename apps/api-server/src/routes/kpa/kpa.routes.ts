@@ -117,6 +117,7 @@ import { asyncHandler } from '../../middleware/error-handler.js';
 import { uploadSingleMiddleware } from '../../middleware/upload.middleware.js';
 // WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: legacy role utils removed
 import { KPA_SCOPE_CONFIG } from '@o4o/security-core';
+import { mapCmsStatus } from '@o4o/types';
 import { createMembershipScopeGuard } from '../../common/middleware/membership-guard.middleware.js';
 import { ActionLogService } from '@o4o/action-log-core';
 // WO-O4O-OPERATOR-ACTION-LAYER-V1
@@ -989,7 +990,16 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       res.json({
         success: true,
         data: {
-          items: rows,
+          items: rows.map((row: any) => ({
+            ...row,
+            // ContentMeta (WO-CONTENT-META-API-ENRICHMENT-V1)
+            producer: 'service_admin' as const,
+            producerRef: row.created_by ?? '',
+            visibility: 'service' as const,
+            serviceKey: 'kpa-society' as const,
+            contentType: 'document' as const,
+            metaStatus: mapCmsStatus(row.status === 'ready' ? 'pending' : (row.status ?? 'draft')),
+          })),
           total,
           page: pageNum,
           limit: limitNum,
@@ -1040,7 +1050,19 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '콘텐츠를 찾을 수 없습니다' } });
         return;
       }
-      res.json({ success: true, data: content });
+      res.json({
+        success: true,
+        data: {
+          ...content,
+          // ContentMeta (WO-CONTENT-META-API-ENRICHMENT-V1)
+          producer: 'service_admin' as const,
+          producerRef: content.created_by ?? '',
+          visibility: 'service' as const,
+          serviceKey: 'kpa-society' as const,
+          contentType: 'document' as const,
+          metaStatus: mapCmsStatus(content.status === 'ready' ? 'pending' : (content.status ?? 'draft')),
+        },
+      });
     }));
 
     // PATCH /contents/:id — 수정 (operator)

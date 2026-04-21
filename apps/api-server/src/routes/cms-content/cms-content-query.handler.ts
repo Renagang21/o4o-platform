@@ -14,6 +14,11 @@ import { Router, Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
 import { CmsContent, ContentType, ContentStatus } from '@o4o-apps/cms-core';
 import { optionalAuth } from '../../middleware/auth.middleware.js';
+import {
+  mapCmsAuthorRole,
+  mapCmsVisibilityScope,
+  mapCmsStatus,
+} from '@o4o/types';
 
 export function createCmsContentQueryRoutes(deps: {
   dataSource: DataSource;
@@ -206,23 +211,34 @@ export function createCmsContentQueryRoutes(deps: {
 
       res.json({
         success: true,
-        data: contents.map(content => ({
-          id: content.id,
-          type: content.type,
-          title: content.title,
-          summary: content.summary,
-          imageUrl: content.imageUrl,
-          linkUrl: content.linkUrl,
-          linkText: content.linkText,
-          status: content.status,
-          publishedAt: content.publishedAt,
-          isPinned: content.isPinned,
-          isOperatorPicked: content.isOperatorPicked,
-          sortOrder: content.sortOrder,
-          authorRole: (content as any).authorRole ?? 'admin',
-          visibilityScope: (content as any).visibilityScope ?? 'platform',
-          createdAt: content.createdAt,
-        })),
+        data: contents.map(content => {
+          const authorRole = (content as any).authorRole ?? 'admin';
+          const visibilityScope = (content as any).visibilityScope ?? 'platform';
+          return {
+            id: content.id,
+            type: content.type,
+            title: content.title,
+            summary: content.summary,
+            imageUrl: content.imageUrl,
+            linkUrl: content.linkUrl,
+            linkText: content.linkText,
+            status: content.status,
+            publishedAt: content.publishedAt,
+            isPinned: content.isPinned,
+            isOperatorPicked: content.isOperatorPicked,
+            sortOrder: content.sortOrder,
+            authorRole,
+            visibilityScope,
+            createdAt: content.createdAt,
+            // ContentMeta (WO-CONTENT-META-API-ENRICHMENT-V1)
+            producer: mapCmsAuthorRole(authorRole),
+            producerRef: (content as any).createdBy ?? '',
+            visibility: mapCmsVisibilityScope(visibilityScope),
+            serviceKey: (content as any).serviceKey ?? undefined,
+            contentType: 'cms_block' as const,
+            metaStatus: mapCmsStatus(content.status as any),
+          };
+        }),
         pagination: {
           total,
           limit: takeVal,
@@ -261,9 +277,20 @@ export function createCmsContentQueryRoutes(deps: {
         return;
       }
 
+      const authorRole = (content as any).authorRole ?? 'admin';
+      const visibilityScope = (content as any).visibilityScope ?? 'platform';
       res.json({
         success: true,
-        data: content,
+        data: {
+          ...content,
+          // ContentMeta (WO-CONTENT-META-API-ENRICHMENT-V1)
+          producer: mapCmsAuthorRole(authorRole),
+          producerRef: (content as any).createdBy ?? '',
+          visibility: mapCmsVisibilityScope(visibilityScope),
+          serviceKey: (content as any).serviceKey ?? undefined,
+          contentType: 'cms_block' as const,
+          metaStatus: mapCmsStatus(content.status as any),
+        },
       });
     } catch (error: any) {
       console.error('Failed to get CMS content:', error);
