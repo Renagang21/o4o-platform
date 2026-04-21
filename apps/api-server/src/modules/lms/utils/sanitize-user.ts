@@ -20,7 +20,7 @@ export function sanitizeInstructor(user: any): Record<string, any> | null {
   };
 }
 
-/** Fields that must never appear in API responses */
+/** Fields that must never appear in API responses (aligned with ForumControllerBase) */
 const SENSITIVE_USER_FIELDS = [
   'password',
   'refreshTokenFamily',
@@ -28,9 +28,13 @@ const SENSITIVE_USER_FIELDS = [
   'resetPasswordExpires',
   'loginAttempts',
   'lockedUntil',
+  'lastLoginAt',
   'lastLoginIp',
+  'businessInfo',
   'provider',
   'provider_id',
+  'approvedAt',
+  'approvedBy',
 ] as const;
 
 /** Blacklist: generic user → strip known sensitive fields (returns shallow copy) */
