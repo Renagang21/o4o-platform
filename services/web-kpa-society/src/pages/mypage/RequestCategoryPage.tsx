@@ -118,7 +118,7 @@ export default function RequestCategoryPage() {
           </div>
           <div>
             <label htmlFor="reason" className="block text-sm font-medium text-slate-700 mb-2">신청 사유 <span className="text-slate-400">(선택)</span></label>
-            <textarea id="reason" value={formData.reason} onChange={(e) => setFormData({ ...formData, reason: e.target.value })} placeholder="이 포럼이 필요한 이유를 설명해주세요 (선택사항)" rows={3}
+            <textarea id="reason" value={formData.reason} onChange={(e) => setFormData({ ...formData, reason: e.target.value })} placeholder="이 포럼이 기존 포럼과 어떻게 다른지와 개설 목적을 간단히 작성해주세요. (운영자가 중복 여부와 필요성을 검토할 때 참고합니다)" rows={3}
               className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" />
           </div>
           <div>
