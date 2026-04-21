@@ -11,7 +11,7 @@
 
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { User, LayoutDashboard, UserCircle, Settings, LogOut, Shield } from 'lucide-react';
+import { User, LayoutDashboard, Settings, LogOut, Shield } from 'lucide-react';
 import { useAuth, type User as UserType } from '../contexts';
 import { useAuthModal } from '../contexts/LoginModalContext';
 import { colors } from '../styles/theme';
@@ -232,20 +232,20 @@ export function Header({ serviceName }: { serviceName: string }) {
                       {isSuperOperator(user) ? (
                         <>
                           <Link
-                            to="/mypage/profile"
-                            style={styles.userDropdownItem}
-                            onClick={() => setShowUserDropdown(false)}
-                          >
-                            <UserCircle style={{ width: 16, height: 16, color: colors.gray500 }} />
-                            프로필
-                          </Link>
-                          <Link
                             to={isAdmin ? '/admin' : '/operator'}
                             style={styles.userDropdownItem}
                             onClick={() => setShowUserDropdown(false)}
                           >
                             <Shield style={{ width: 16, height: 16, color: '#d97706' }} />
                             {isAdmin ? '관리자 콘솔' : '운영 대시보드'}
+                          </Link>
+                          <Link
+                            to="/mypage"
+                            style={styles.userDropdownItem}
+                            onClick={() => setShowUserDropdown(false)}
+                          >
+                            <LayoutDashboard style={{ width: 16, height: 16, color: colors.gray500 }} />
+                            마이페이지
                           </Link>
                         </>
                       ) : (
@@ -257,10 +257,20 @@ export function Header({ serviceName }: { serviceName: string }) {
                          * WO-KPA-SOCIETY-DASHBOARD-TO-MYPAGE-CONSOLIDATION-V1
                          */
                         <>
+                          {/* 운영/관리 진입점 — 최상단 (WO-KPA-OPERATOR-USER-MENU-CLEANUP-V1) */}
+                          {(isAdmin || isOperator) && (
+                            <Link
+                              to={isAdmin ? '/admin' : '/operator'}
+                              style={styles.userDropdownItem}
+                              onClick={() => setShowUserDropdown(false)}
+                            >
+                              <Shield style={{ width: 16, height: 16, color: colors.gray500 }} />
+                              {isAdmin ? '관리자 콘솔' : '운영 대시보드'}
+                            </Link>
+                          )}
                           {accessibleDashboards.length >= 2 ? (
                             <>
                               <DashboardSwitcher onNavigate={() => setShowUserDropdown(false)} />
-                              <div style={styles.userDropdownDivider} />
                             </>
                           ) : (
                             <Link
@@ -272,28 +282,6 @@ export function Header({ serviceName }: { serviceName: string }) {
                               마이페이지
                             </Link>
                           )}
-                          {/* 운영/관리 진입점 (WO-KPA-A-ROLE-BASED-NAVIGATION-AND-ENTRY-REFINEMENT-V1) */}
-                          {(isAdmin || isOperator) && (
-                            <>
-                              <div style={styles.userDropdownDivider} />
-                              <Link
-                                to={isAdmin ? '/admin' : '/operator'}
-                                style={styles.userDropdownItem}
-                                onClick={() => setShowUserDropdown(false)}
-                              >
-                                <Shield style={{ width: 16, height: 16, color: colors.gray500 }} />
-                                {isAdmin ? '관리자 콘솔' : '운영 대시보드'}
-                              </Link>
-                            </>
-                          )}
-                          <Link
-                            to="/mypage/profile"
-                            style={styles.userDropdownItem}
-                            onClick={() => setShowUserDropdown(false)}
-                          >
-                            <UserCircle style={{ width: 16, height: 16, color: colors.gray500 }} />
-                            프로필
-                          </Link>
                           <Link
                             to="/mypage/settings"
                             style={styles.userDropdownItem}

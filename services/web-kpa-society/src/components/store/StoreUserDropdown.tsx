@@ -8,7 +8,7 @@
 
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { Home, User, UserCircle, Settings, LogOut, Shield } from 'lucide-react';
+import { Home, User, Settings, LogOut, Shield } from 'lucide-react';
 import { useAuth, type User as UserType } from '../../contexts';
 import { DashboardSwitcher, useAccessibleDashboards } from '../common/DashboardSwitcher';
 import { SUPER_OPERATOR_ROLES, hasAnyRole } from '../../lib/role-constants';
@@ -97,9 +97,6 @@ export function StoreUserDropdown({ homeLink = '/', onLogout }: StoreUserDropdow
               {superOp ? (
                 /* Super Operator: 간소화 메뉴 */
                 <>
-                  <DropdownLink to="/mypage/profile" icon={<UserCircle className="w-4 h-4 text-slate-500" />} onClick={() => setOpen(false)}>
-                    프로필
-                  </DropdownLink>
                   <DropdownLink
                     to={isAdmin ? '/admin' : '/operator'}
                     icon={<Shield className="w-4 h-4 text-amber-600" />}
@@ -107,37 +104,31 @@ export function StoreUserDropdown({ homeLink = '/', onLogout }: StoreUserDropdow
                   >
                     {isAdmin ? '관리자 콘솔' : '운영 대시보드'}
                   </DropdownLink>
+                  <DropdownLink to="/mypage" icon={<Home className="w-4 h-4 text-slate-500" />} onClick={() => setOpen(false)}>
+                    마이페이지
+                  </DropdownLink>
                 </>
               ) : (
-                /* 일반 사용자 */
+                /* 일반 사용자 — WO-KPA-OPERATOR-USER-MENU-CLEANUP-V1 */
                 <>
+                  {(isAdmin || isOperator) && (
+                    <DropdownLink
+                      to={isAdmin ? '/admin' : '/operator'}
+                      icon={<Shield className="w-4 h-4 text-slate-500" />}
+                      onClick={() => setOpen(false)}
+                    >
+                      {isAdmin ? '관리자 콘솔' : '운영 대시보드'}
+                    </DropdownLink>
+                  )}
                   {accessibleDashboards.length >= 2 ? (
                     <>
                       <DashboardSwitcher onNavigate={() => setOpen(false)} />
-                      <div className="h-px bg-slate-200 my-1" />
                     </>
                   ) : (
                     <DropdownLink to="/mypage" icon={<Home className="w-4 h-4 text-slate-500" />} onClick={() => setOpen(false)}>
                       마이페이지
                     </DropdownLink>
                   )}
-
-                  {(isAdmin || isOperator) && (
-                    <>
-                      <div className="h-px bg-slate-200 my-1" />
-                      <DropdownLink
-                        to={isAdmin ? '/admin' : '/operator'}
-                        icon={<Shield className="w-4 h-4 text-slate-500" />}
-                        onClick={() => setOpen(false)}
-                      >
-                        {isAdmin ? '관리자 콘솔' : '운영 대시보드'}
-                      </DropdownLink>
-                    </>
-                  )}
-
-                  <DropdownLink to="/mypage/profile" icon={<UserCircle className="w-4 h-4 text-slate-500" />} onClick={() => setOpen(false)}>
-                    프로필
-                  </DropdownLink>
                   <DropdownLink to="/mypage/settings" icon={<Settings className="w-4 h-4 text-slate-500" />} onClick={() => setOpen(false)}>
                     설정
                   </DropdownLink>

@@ -12,7 +12,7 @@
  */
 
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, UserCircle, Settings, Shield } from 'lucide-react';
+import { LayoutDashboard, Settings, Shield } from 'lucide-react';
 import { GlobalHeader, GlobalHeaderMenuItem } from '@o4o/ui';
 import { useAuth, type User as UserType } from '../contexts';
 import { useAuthModal } from '../contexts/LoginModalContext';
@@ -97,20 +97,17 @@ export function KpaGlobalHeader() {
       utilitySlot={<ServiceSwitcher currentServiceKey="kpa-society" />}
       userMenuItems={
         <>
-          <GlobalHeaderMenuItem to="/mypage" icon={<LayoutDashboard className="w-4 h-4" />}>
-            마이페이지
-          </GlobalHeaderMenuItem>
-          <GlobalHeaderMenuItem to="/mypage/profile" icon={<UserCircle className="w-4 h-4" />}>
-            프로필
-          </GlobalHeaderMenuItem>
-          <GlobalHeaderMenuItem to="/mypage/settings" icon={<Settings className="w-4 h-4" />}>
-            설정
-          </GlobalHeaderMenuItem>
           {(isAdmin || isOperator) && (
             <GlobalHeaderMenuItem to={operatorPath} icon={<Shield className="w-4 h-4" />}>
               {operatorLabel}
             </GlobalHeaderMenuItem>
           )}
+          <GlobalHeaderMenuItem to="/mypage" icon={<LayoutDashboard className="w-4 h-4" />}>
+            마이페이지
+          </GlobalHeaderMenuItem>
+          <GlobalHeaderMenuItem to="/mypage/settings" icon={<Settings className="w-4 h-4" />}>
+            설정
+          </GlobalHeaderMenuItem>
         </>
       }
     />
