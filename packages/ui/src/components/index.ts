@@ -17,3 +17,10 @@ export { SelectionTable } from './table/SelectionTable';
 export type { SelectionTableProps } from './table/SelectionTable';
 export { BaseDetailDrawer } from './table/BaseDetailDrawer';
 export type { BaseDetailDrawerProps, DetailDrawerAction } from './table/BaseDetailDrawer';
+// WO-O4O-TABLE-STANDARD-ALIGNMENT-V1
+export { RowActionMenu } from './table/RowActionMenu';
+export type { RowActionItem, RowActionMenuProps, ConfirmConfig } from './table/RowActionMenu';
+export { FilterBar } from './table/FilterBar';
+export type { FilterBarProps, FilterFieldConfig, FilterOption } from './table/FilterBar';
+export { ConfirmActionDialog } from './table/ConfirmActionDialog';
+export { ActionBar } from './table/ActionBar';

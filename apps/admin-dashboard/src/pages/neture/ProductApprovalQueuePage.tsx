@@ -2,16 +2,19 @@
  * Neture Product Approval Queue Page
  *
  * WO-O4O-ADMIN-PRODUCT-APPROVAL-UI-V1
+ * WO-O4O-TABLE-STANDARD-ALIGNMENT-V1 — BaseTable + O4OColumn + RowActionMenu + FilterBar (레퍼런스)
+ *
  * Supplier가 등록한 상품(SupplierProductOffer)의 PENDING 상태를
  * Admin이 승인/거절할 수 있는 전용 승인 큐 UI.
  */
 
-import React, { useState, useEffect } from 'react';
-import { CheckCircle, XCircle, Clock, AlertCircle, Search, RefreshCw } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { CheckCircle, XCircle, Clock, AlertCircle, RefreshCw, Edit2 } from 'lucide-react';
 import { authClient } from '@o4o/auth-client';
 import { toast } from 'react-hot-toast';
+import { BaseTable, RowActionMenu, FilterBar } from '@o4o/ui';
+import type { O4OColumn } from '@o4o/ui';
 import PageHeader from '../../components/common/PageHeader';
-import { DataTable, Column } from '../../components/common/DataTable';
 
 interface ProductOffer {
   id: string;
@@ -27,25 +30,44 @@ interface ProductOffer {
   createdAt: string;
 }
 
-const ProductApprovalQueuePage: React.FC = () => {
+const STATUS_MAP: Record<string, { icon: React.ReactNode; label: string; badge: string }> = {
+  APPROVED: {
+    icon: <CheckCircle className="w-4 h-4 text-green-500" />,
+    label: '승인됨',
+    badge: 'bg-green-100 text-green-800',
+  },
+  REJECTED: {
+    icon: <XCircle className="w-4 h-4 text-red-500" />,
+    label: '거절됨',
+    badge: 'bg-red-100 text-red-800',
+  },
+  PENDING: {
+    icon: <Clock className="w-4 h-4 text-yellow-500" />,
+    label: '대기 중',
+    badge: 'bg-yellow-100 text-yellow-800',
+  },
+};
+
+const DIST_BADGE: Record<string, string> = {
+  PUBLIC: 'bg-blue-100 text-blue-800',
+  SERVICE: 'bg-purple-100 text-purple-800',
+  PRIVATE: 'bg-gray-100 text-gray-800',
+};
+
+export default function ProductApprovalQueuePage() {
   const [products, setProducts] = useState<ProductOffer[]>([]);
   const [loading, setLoading] = useState(false);
-  const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
+  const [search, setSearch] = useState('');
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
+  useEffect(() => { fetchProducts(); }, []);
 
   const fetchProducts = async () => {
     setLoading(true);
     try {
       const response = await authClient.api.get('/api/v1/neture/admin/products');
-      if (response.data?.success) {
-        setProducts(response.data.data || []);
-      }
-    } catch (error) {
-      console.error('Error fetching products:', error);
+      if (response.data?.success) setProducts(response.data.data || []);
+    } catch {
       toast.error('상품 목록을 불러오는데 실패했습니다');
     } finally {
       setLoading(false);
@@ -54,252 +76,217 @@ const ProductApprovalQueuePage: React.FC = () => {
 
   const handleApprove = async (id: string) => {
     if (!confirm('이 상품을 승인하시겠습니까?')) return;
-
     try {
       await authClient.api.post(`/api/v1/neture/admin/products/${id}/approve`);
       toast.success('상품이 승인되었습니다');
       fetchProducts();
-    } catch (error) {
-      console.error('Error approving product:', error);
+    } catch {
       toast.error('승인 처리에 실패했습니다');
     }
   };
 
-  const handleReject = async (id: string) => {
-    const reason = prompt('거절 사유를 입력해주세요:');
-    if (!reason) return;
-
+  const handleReject = async (id: string, reason?: string) => {
+    const r = reason || prompt('거절 사유를 입력해주세요:');
+    if (!r) return;
     try {
-      await authClient.api.post(`/api/v1/neture/admin/products/${id}/reject`, { reason });
+      await authClient.api.post(`/api/v1/neture/admin/products/${id}/reject`, { reason: r });
       toast.success('상품이 거절되었습니다');
       fetchProducts();
-    } catch (error) {
-      console.error('Error rejecting product:', error);
+    } catch {
       toast.error('거절 처리에 실패했습니다');
     }
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'APPROVED':
-        return <CheckCircle className="w-5 h-5 text-green-500" />;
-      case 'REJECTED':
-        return <XCircle className="w-5 h-5 text-red-500" />;
-      case 'PENDING':
-        return <Clock className="w-5 h-5 text-yellow-500" />;
-      default:
-        return <AlertCircle className="w-5 h-5 text-gray-500" />;
+  const filteredProducts = useMemo(() => products.filter((p) => {
+    if (filterStatus && p.approvalStatus !== filterStatus) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      if (!p.masterName?.toLowerCase().includes(q) && !p.supplierName?.toLowerCase().includes(q)) return false;
     }
-  };
+    return true;
+  }), [products, filterStatus, search]);
 
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'PENDING': return '대기 중';
-      case 'APPROVED': return '승인됨';
-      case 'REJECTED': return '거절됨';
-      default: return status;
-    }
-  };
-
-  const getDistributionBadge = (type: string) => {
-    const styles: Record<string, string> = {
-      PUBLIC: 'bg-blue-100 text-blue-800',
-      SERVICE: 'bg-purple-100 text-purple-800',
-      PRIVATE: 'bg-gray-100 text-gray-800',
-    };
-    return (
-      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${styles[type] || 'bg-gray-100 text-gray-800'}`}>
-        {type}
-      </span>
-    );
-  };
-
-  const filteredProducts = products.filter(product => {
-    const matchesStatus = filterStatus === 'all' || product.approvalStatus === filterStatus;
-    const matchesSearch = !searchTerm ||
-      product.masterName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.supplierName?.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesStatus && matchesSearch;
-  });
-
-  const headerActions = [
-    { id: 'refresh', label: '새로고침', icon: <RefreshCw className="w-4 h-4" />, onClick: fetchProducts, variant: 'secondary' as const },
-  ];
-
-  const columns: Column<ProductOffer>[] = [
+  // ── O4O 표준 컬럼 정의 ─────────────────────────────
+  const columns: O4OColumn<ProductOffer>[] = [
     {
       key: 'approvalStatus',
-      title: '상태',
-      dataIndex: 'approvalStatus',
-      render: (value: string) => (
-        <div className="flex items-center">
-          {getStatusIcon(value)}
-          <span className="ml-2 text-sm">{getStatusLabel(value)}</span>
-        </div>
-      ),
+      header: '상태',
+      width: 110,
+      align: 'center',
+      sortable: true,
+      sortAccessor: (row) => row.approvalStatus,
+      render: (_, row) => {
+        const s = STATUS_MAP[row.approvalStatus] ?? STATUS_MAP.PENDING;
+        return (
+          <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${s.badge}`}>
+            {s.icon}
+            {s.label}
+          </span>
+        );
+      },
     },
     {
       key: 'masterName',
-      title: '상품명',
-      dataIndex: 'masterName',
-      render: (value: string) => (
-        <div className="text-sm font-medium text-gray-900">{value || '-'}</div>
+      header: '상품명',
+      sortable: true,
+      sortAccessor: (row) => row.masterName,
+      render: (_, row) => (
+        <span className="text-sm font-medium text-gray-900">{row.masterName || '-'}</span>
       ),
     },
     {
       key: 'supplierName',
-      title: '공급사',
-      dataIndex: 'supplierName',
-      render: (value: string) => (
-        <div className="text-sm text-gray-600">{value || '-'}</div>
+      header: '공급사',
+      sortable: true,
+      sortAccessor: (row) => row.supplierName,
+      render: (_, row) => (
+        <span className="text-sm text-gray-600">{row.supplierName || '-'}</span>
       ),
     },
     {
       key: 'distributionType',
-      title: '유통 타입',
-      dataIndex: 'distributionType',
-      align: 'center' as const,
-      render: (value: string) => getDistributionBadge(value),
+      header: '유통',
+      width: 100,
+      align: 'center',
+      sortable: true,
+      sortAccessor: (row) => row.distributionType,
+      render: (_, row) => (
+        <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${DIST_BADGE[row.distributionType] ?? 'bg-gray-100 text-gray-800'}`}>
+          {row.distributionType}
+        </span>
+      ),
     },
     {
       key: 'priceGeneral',
-      title: '가격',
-      dataIndex: 'priceGeneral',
-      align: 'right' as const,
-      render: (value: number | null) => (
-        <span className="text-sm">
-          {value != null ? `₩${value.toLocaleString()}` : '-'}
+      header: '가격',
+      width: 110,
+      align: 'right',
+      sortable: true,
+      sortAccessor: (row) => row.priceGeneral ?? -Infinity,
+      render: (_, row) => (
+        <span className="text-sm tabular-nums">
+          {row.priceGeneral != null ? `₩${row.priceGeneral.toLocaleString()}` : '-'}
         </span>
       ),
     },
     {
       key: 'createdAt',
-      title: '등록일',
-      dataIndex: 'createdAt',
-      render: (value: string) => (
+      header: '등록일',
+      width: 110,
+      sortable: true,
+      sortAccessor: (row) => row.createdAt,
+      render: (_, row) => (
         <span className="text-sm text-gray-500">
-          {value ? new Date(value).toLocaleDateString('ko-KR') : '-'}
+          {row.createdAt ? new Date(row.createdAt).toLocaleDateString('ko-KR') : '-'}
         </span>
       ),
     },
     {
-      key: 'actions',
-      title: '작업',
-      align: 'center' as const,
-      render: (_: unknown, record: ProductOffer) => (
-        record.approvalStatus === 'PENDING' ? (
-          <div className="flex gap-2 justify-center">
-            <button
-              onClick={() => handleApprove(record.id)}
-              className="text-green-600 hover:text-green-900 font-medium text-sm"
-            >
-              승인
-            </button>
-            <button
-              onClick={() => handleReject(record.id)}
-              className="text-red-600 hover:text-red-900 font-medium text-sm"
-            >
-              거절
-            </button>
-          </div>
-        ) : (
-          <span className="text-gray-400 text-sm">-</span>
-        )
+      key: '_actions',
+      header: '',
+      width: 56,
+      system: true,
+      align: 'center',
+      render: (_, row) => (
+        <RowActionMenu
+          actions={[
+            {
+              key: 'approve',
+              label: '승인',
+              icon: <CheckCircle size={14} />,
+              variant: 'primary',
+              hidden: row.approvalStatus !== 'PENDING',
+              onClick: () => handleApprove(row.id),
+            },
+            {
+              key: 'reject',
+              label: '거절',
+              icon: <XCircle size={14} />,
+              variant: 'danger',
+              hidden: row.approvalStatus !== 'PENDING',
+              confirm: { title: '거절 확인', message: '이 상품을 거절하시겠습니까?', variant: 'danger', showReason: true, reasonPlaceholder: '거절 사유를 입력해주세요' },
+              onClick: (reason) => handleReject(row.id, reason),
+            },
+            {
+              key: 'view',
+              label: '상세 보기',
+              icon: <Edit2 size={14} />,
+              onClick: () => {},
+              hidden: row.approvalStatus === 'PENDING',
+            },
+          ]}
+        />
       ),
     },
   ];
+
+  const pending = products.filter((p) => p.approvalStatus === 'PENDING').length;
+  const approved = products.filter((p) => p.approvalStatus === 'APPROVED').length;
+  const rejected = products.filter((p) => p.approvalStatus === 'REJECTED').length;
 
   return (
     <div className="p-6">
       <PageHeader
         title="상품 승인 관리"
         subtitle="Supplier가 등록한 상품의 승인/거절을 관리합니다"
-        actions={headerActions}
+        actions={[
+          { id: 'refresh', label: '새로고침', icon: <RefreshCw className="w-4 h-4" />, onClick: fetchProducts, variant: 'secondary' },
+        ]}
       />
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="flex items-center justify-between">
+      {/* Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        {[
+          { label: '대기 중', count: pending, color: 'text-yellow-600', Icon: Clock },
+          { label: '승인됨', count: approved, color: 'text-green-600', Icon: CheckCircle },
+          { label: '거절됨', count: rejected, color: 'text-red-600', Icon: XCircle },
+          { label: '전체', count: products.length, color: 'text-gray-700', Icon: AlertCircle },
+        ].map(({ label, count, color, Icon }) => (
+          <div key={label} className="bg-white rounded-lg shadow p-4 flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">대기 중</p>
-              <p className="text-2xl font-bold text-yellow-600">
-                {products.filter(p => p.approvalStatus === 'PENDING').length}
-              </p>
+              <p className="text-sm text-gray-600">{label}</p>
+              <p className={`text-2xl font-bold ${color}`}>{count}</p>
             </div>
-            <Clock className="w-8 h-8 text-yellow-600 opacity-50" />
+            <Icon className={`w-8 h-8 opacity-40 ${color}`} />
           </div>
-        </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">승인됨</p>
-              <p className="text-2xl font-bold text-green-600">
-                {products.filter(p => p.approvalStatus === 'APPROVED').length}
-              </p>
-            </div>
-            <CheckCircle className="w-8 h-8 text-green-600 opacity-50" />
-          </div>
-        </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">거절됨</p>
-              <p className="text-2xl font-bold text-red-600">
-                {products.filter(p => p.approvalStatus === 'REJECTED').length}
-              </p>
-            </div>
-            <XCircle className="w-8 h-8 text-red-600 opacity-50" />
-          </div>
-        </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">전체</p>
-              <p className="text-2xl font-bold">{products.length}</p>
-            </div>
-            <AlertCircle className="w-8 h-8 text-gray-600 opacity-50" />
-          </div>
-        </div>
+        ))}
       </div>
 
-      {/* Filters */}
-      <div className="bg-white rounded-lg shadow p-4 mb-6">
-        <div className="flex flex-wrap gap-4">
-          <div className="flex-1 min-w-[200px]">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="상품명, 공급사 검색..."
-                className="w-full pl-10 pr-4 py-2 border rounded-lg"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-          </div>
-          <select
-            className="px-4 py-2 border rounded-lg"
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-          >
-            <option value="all">모든 상태</option>
-            <option value="PENDING">대기 중</option>
-            <option value="APPROVED">승인됨</option>
-            <option value="REJECTED">거절됨</option>
-          </select>
-        </div>
+      {/* FilterBar (표준 컴포넌트) */}
+      <div className="bg-white rounded-lg shadow p-4 mb-4">
+        <FilterBar
+          searchPlaceholder="상품명, 공급사 검색..."
+          searchValue={search}
+          onSearchChange={setSearch}
+          filters={[
+            {
+              key: 'status',
+              placeholder: '모든 상태',
+              options: [
+                { value: 'PENDING', label: '대기 중' },
+                { value: 'APPROVED', label: '승인됨' },
+                { value: 'REJECTED', label: '거절됨' },
+              ],
+            },
+          ]}
+          filterValues={{ status: filterStatus }}
+          onFilterChange={(_, value) => setFilterStatus(value)}
+        />
       </div>
 
-      {/* DataTable */}
-      <DataTable<ProductOffer>
-        rowKey="id"
-        columns={columns}
-        dataSource={filteredProducts}
-        loading={loading}
-      />
+      {/* BaseTable (표준 컴포넌트) */}
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <BaseTable<ProductOffer>
+          columns={columns}
+          data={filteredProducts}
+          rowKey={(row) => row.id}
+          emptyMessage="조건에 맞는 상품이 없습니다."
+          columnVisibility
+          tableId="neture-product-approval"
+          reorderable
+          persistState
+        />
+      </div>
     </div>
   );
-};
-
-export default ProductApprovalQueuePage;
+}

@@ -317,6 +317,9 @@ importers:
       '@o4o/types':
         specifier: file:../../packages/types
         version: link:../../packages/types
+      '@o4o/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@o4o/utils':
         specifier: file:../../packages/utils
         version: file:packages/utils

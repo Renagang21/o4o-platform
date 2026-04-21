@@ -1,5 +1,24 @@
-import React, { FC, ReactNode, useState } from 'react';
+/**
+ * DataTable — BaseTable Wrapper (WO-O4O-TABLE-STANDARD-ALIGNMENT-V1)
+ *
+ * 기존 apps DataTable API를 유지하면서 내부적으로 @o4o/ui BaseTable을 사용.
+ * 28개 기존 페이지는 코드 변경 없이 BaseTable 기반으로 동작.
+ *
+ * 새 페이지는 BaseTable + O4OColumn + RowActionMenu + FilterBar를 직접 사용 권장.
+ *
+ * Migration:
+ * - `title: string` → `header: ReactNode`
+ * - `dataIndex` → `accessor`
+ * - `sorter` → `useTableSort` 내부 처리
+ * - 페이지별 정렬 상태 노출 없음 (내부 관리)
+ */
+
+import React, { FC, ReactNode, useState, useMemo } from 'react';
 import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
+import { BaseTable } from '@o4o/ui';
+import type { O4OColumn } from '@o4o/ui';
+
+// ─── Column API (기존 유지) ──────────────────────────
 
 export interface Column<T> {
   key: string;
@@ -7,6 +26,7 @@ export interface Column<T> {
   dataIndex?: keyof T | string[];
   render?: (value: any, record: T, index: number) => ReactNode;
   sortable?: boolean;
+  /** 커스텀 comparator — DataTable 내부 정렬에 사용 */
   sorter?: (a: T, b: T) => number;
   width?: string;
   align?: 'left' | 'center' | 'right';
@@ -27,7 +47,6 @@ export interface DataTableProps<T> {
     onClick?: () => void;
     className?: string;
   };
-  /** Shorthand for onRow click handler */
   onRowClick?: (record: T) => void | Promise<void>;
   rowSelection?: {
     selectedRowKeys: string[];
@@ -43,6 +62,33 @@ export interface DataTableProps<T> {
   className?: string;
 }
 
+// ─── Helpers ────────────────────────────────────────
+
+function getRowKeyFn<T>(rowKey: keyof T | ((record: T) => string)) {
+  return (row: T, index: number): string => {
+    if (typeof rowKey === 'function') return rowKey(row);
+    return String((row as any)[rowKey as string]) || `row-${index}`;
+  };
+}
+
+function getValue<T>(record: T, dataIndex: keyof T | string[] | undefined): any {
+  if (!dataIndex) return undefined;
+  if (Array.isArray(dataIndex)) {
+    return dataIndex.reduce((obj: any, key) => obj?.[key], record as any);
+  }
+  return (record as any)[dataIndex as string];
+}
+
+type SortOrder = 'asc' | 'desc' | null;
+
+function SortIcon({ columnKey, sortKey, sortOrder }: { columnKey: string; sortKey: string | null; sortOrder: SortOrder }) {
+  if (sortKey !== columnKey) return <ChevronsUpDown className="w-3.5 h-3.5 text-gray-400" />;
+  if (sortOrder === 'asc') return <ChevronUp className="w-3.5 h-3.5" />;
+  return <ChevronDown className="w-3.5 h-3.5" />;
+}
+
+// ─── DataTable ───────────────────────────────────────
+
 export function DataTable<T extends Record<string, any>>({
   columns,
   dataSource,
@@ -54,258 +100,248 @@ export function DataTable<T extends Record<string, any>>({
   rowSelection,
   expandable,
   emptyText = '데이터가 없습니다',
-  className = ''
+  className = '',
 }: DataTableProps<T>) {
   const [sortKey, setSortKey] = useState<string | null>(null);
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | null>(null);
+  const [sortOrder, setSortOrder] = useState<SortOrder>(null);
   const [internalExpandedKeys, setInternalExpandedKeys] = useState<string[]>([]);
+  const [currentPage, setCurrentPage] = useState(pagination?.current ?? 1);
 
-  const getRowKey = (record: T, index: number): string => {
-    if (typeof rowKey === 'function') {
-      return rowKey(record);
-    }
-    return String(record[rowKey]) || `row-${index}`;
-  };
+  const getKey = getRowKeyFn(rowKey);
 
-  const handleSelectAll = (checked: boolean) => {
-    if (rowSelection) {
-      if (checked) {
-        const allKeys = dataSource.map((record, index) => getRowKey(record, index));
-        rowSelection.onChange(allKeys);
-      } else {
-        rowSelection.onChange([]);
-      }
-    }
-  };
-
-  const handleSelectRow = (key: string, checked: boolean) => {
-    if (rowSelection) {
-      const selected = new Set(rowSelection.selectedRowKeys);
-      if (checked) {
-        selected.add(key);
-      } else {
-        selected.delete(key);
-      }
-      rowSelection.onChange(Array.from(selected));
-    }
-  };
-
-  const isExpanded = (record: T, index: number) => {
-    const key = getRowKey(record, index);
-    if (expandable?.expandedRowKeys) {
-      return expandable.expandedRowKeys.includes(key);
-    }
-    return internalExpandedKeys.includes(key);
-  };
-
-  const getValue = (record: T, dataIndex: keyof T | string[] | undefined): any => {
-    if (!dataIndex) return record;
-
-    if (Array.isArray(dataIndex)) {
-      return dataIndex.reduce((obj, key) => obj?.[key], record as any);
-    }
-
-    return record[dataIndex];
-  };
+  // Sync currentPage if controlled
+  const activePage = pagination?.current ?? currentPage;
 
   const handleSort = (key: string) => {
     if (sortKey === key) {
-      if (sortOrder === 'asc') {
-        setSortOrder('desc');
-      } else if (sortOrder === 'desc') {
-        setSortKey(null);
-        setSortOrder(null);
-      }
+      if (sortOrder === 'asc') setSortOrder('desc');
+      else if (sortOrder === 'desc') { setSortKey(null); setSortOrder(null); }
     } else {
       setSortKey(key);
       setSortOrder('asc');
     }
   };
 
-  const sortedData = [...dataSource];
-  if (sortKey && sortOrder) {
-    const column = columns.find(col => col.key === sortKey);
-    if (column) {
-      sortedData.sort((a, b) => {
-        const aValue = getValue(a, column.dataIndex);
-        const bValue = getValue(b, column.dataIndex);
+  // Sort
+  const sortedData = useMemo(() => {
+    if (!sortKey || !sortOrder) return dataSource;
+    const col = columns.find((c) => c.key === sortKey);
+    if (!col) return dataSource;
+    const sorted = [...dataSource];
+    sorted.sort((a, b) => {
+      if (col.sorter) {
+        const r = col.sorter(a, b);
+        return sortOrder === 'desc' ? -r : r;
+      }
+      const aVal = getValue(a, col.dataIndex);
+      const bVal = getValue(b, col.dataIndex);
+      if (aVal === bVal) return 0;
+      if (aVal == null) return 1;
+      if (bVal == null) return -1;
+      const cmp = aVal < bVal ? -1 : 1;
+      return sortOrder === 'desc' ? -cmp : cmp;
+    });
+    return sorted;
+  }, [dataSource, sortKey, sortOrder, columns]);
 
-        if (aValue === bValue) return 0;
-        if (aValue == null) return 1;
-        if (bValue == null) return -1;
+  // Paginate
+  const pageSize = pagination?.pageSize ?? 0;
+  const pagedData = useMemo(() => {
+    if (!pagination) return sortedData;
+    const start = (activePage - 1) * pageSize;
+    return sortedData.slice(start, start + pageSize);
+  }, [sortedData, pagination, activePage, pageSize]);
 
-        const comparison = aValue < bValue ? -1 : 1;
-        return sortOrder === 'asc' ? comparison : -comparison;
+  // Build O4OColumns
+  const o4oColumns: O4OColumn<T>[] = useMemo(() => {
+    const cols: O4OColumn<T>[] = [];
+
+    if (rowSelection) {
+      const allKeys = dataSource.map((r, i) => getKey(r, i));
+      const allSelected = allKeys.length > 0 && allKeys.every((k) => rowSelection.selectedRowKeys.includes(k));
+      const someSelected = allKeys.some((k) => rowSelection.selectedRowKeys.includes(k));
+      cols.push({
+        key: '_select',
+        system: true,
+        sticky: true,
+        width: 40,
+        header: (
+          <input
+            type="checkbox"
+            checked={allSelected}
+            ref={(el) => { if (el) el.indeterminate = someSelected && !allSelected; }}
+            onChange={(e) => {
+              if (e.target.checked) rowSelection.onChange(allKeys);
+              else rowSelection.onChange([]);
+            }}
+            className="rounded border-gray-300"
+            onClick={(e) => e.stopPropagation()}
+          />
+        ),
+        render: (_, row, idx) => (
+          <input
+            type="checkbox"
+            checked={rowSelection.selectedRowKeys.includes(getKey(row, idx))}
+            onChange={(e) => {
+              const k = getKey(row, idx);
+              const s = new Set(rowSelection.selectedRowKeys);
+              if (e.target.checked) s.add(k); else s.delete(k);
+              rowSelection.onChange(Array.from(s));
+            }}
+            onClick={(e) => e.stopPropagation()}
+            className="rounded border-gray-300"
+          />
+        ),
       });
     }
-  }
 
-  const renderSortIcon = (columnKey: string, sortable?: boolean) => {
-    if (!sortable) return null;
-
-    if (sortKey === columnKey) {
-      return sortOrder === 'asc' ? (
-        <ChevronUp className="w-4 h-4" />
-      ) : (
-        <ChevronDown className="w-4 h-4" />
-      );
+    for (const col of columns) {
+      const isSortable = !!col.sortable;
+      cols.push({
+        key: col.key,
+        width: col.width,
+        align: col.align,
+        header: isSortable ? (
+          <div
+            className="flex items-center gap-1 cursor-pointer select-none"
+            onClick={() => handleSort(col.key)}
+          >
+            <span>{col.title}</span>
+            <SortIcon columnKey={col.key} sortKey={sortKey} sortOrder={sortOrder} />
+          </div>
+        ) : col.title,
+        accessor: col.dataIndex
+          ? (row) => getValue(row, col.dataIndex)
+          : undefined,
+        render: col.render
+          ? (value, row, idx) => col.render!(value, row, idx)
+          : undefined,
+      });
     }
 
-    return <ChevronsUpDown className="w-4 h-4 text-gray-400" />;
+    if (expandable) {
+      cols.push({
+        key: '_expand',
+        system: true,
+        width: 40,
+        header: '',
+        render: (_, row, idx) => {
+          const k = getKey(row, idx);
+          const expanded = expandable.expandedRowKeys
+            ? expandable.expandedRowKeys.includes(k)
+            : internalExpandedKeys.includes(k);
+          const canExpand = expandable.rowExpandable ? expandable.rowExpandable(row) : true;
+          if (!canExpand) return null;
+          return (
+            <button
+              className="p-1 text-gray-400 hover:text-gray-700"
+              onClick={(e) => {
+                e.stopPropagation();
+                const next = !expanded;
+                setInternalExpandedKeys((prev) =>
+                  next ? [...prev, k] : prev.filter((x) => x !== k),
+                );
+                expandable.onExpand?.(next, row);
+              }}
+            >
+              {expanded ? '▲' : '▼'}
+            </button>
+          );
+        },
+      });
+    }
+
+    return cols;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [columns, rowSelection, dataSource, sortKey, sortOrder, internalExpandedKeys, expandable]);
+
+  // Row click handler
+  const handleRowClick = (row: T, _idx: number) => {
+    const rowProps = onRow?.(row);
+    if (rowProps?.onClick) rowProps.onClick();
+    else if (onRowClick) onRowClick(row);
   };
 
-  const getAlignClass = (align?: 'left' | 'center' | 'right') => {
-    switch (align) {
-      case 'center':
-        return 'text-center';
-      case 'right':
-        return 'text-right';
-      default:
-        return 'text-left';
-    }
-  };
+  // Expand after-row
+  const renderAfterRow = expandable
+    ? (row: T, idx: number) => {
+        const k = getKey(row, idx);
+        const expanded = expandable.expandedRowKeys
+          ? expandable.expandedRowKeys.includes(k)
+          : internalExpandedKeys.includes(k);
+        if (!expanded) return null;
+        return (
+          <tr className="bg-gray-50">
+            <td colSpan={o4oColumns.length} className="px-6 py-4">
+              {expandable.expandedRowRender(row)}
+            </td>
+          </tr>
+        );
+      }
+    : undefined;
 
   if (loading) {
     return (
-      <div className="w-full">
+      <div className={`w-full ${className}`}>
         <div className="animate-pulse">
-          <div className="h-12 bg-gray-200 rounded mb-2"></div>
+          <div className="h-10 bg-gray-200 rounded mb-2" />
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-16 bg-gray-100 rounded mb-2"></div>
+            <div key={i} className="h-14 bg-gray-100 rounded mb-1" />
           ))}
         </div>
       </div>
     );
   }
 
+  const totalPages = pagination ? Math.ceil((pagination.total || 0) / pageSize) : 0;
+
   return (
     <div className={`w-full ${className}`}>
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              {rowSelection && (
-                <th className="px-6 py-3 w-4">
-                  <input
-                    type="checkbox"
-                    checked={dataSource.length > 0 && rowSelection.selectedRowKeys.length === dataSource.length}
-                    onChange={(e) => handleSelectAll(e.target.checked)}
-                    className="rounded border-gray-300"
-                  />
-                </th>
-              )}
-              {columns.map(column => (
-                <th
-                  key={column.key}
-                  style={{ width: column.width }}
-                  className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${getAlignClass(column.align)} ${column.sortable ? 'cursor-pointer select-none hover:bg-gray-100' : ''
-                    }`}
-                  onClick={() => column.sortable && handleSort(column.key)}
-                >
-                  <div className="flex items-center gap-1">
-                    <span>{column.title}</span>
-                    {renderSortIcon(column.key, column.sortable)}
-                  </div>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {sortedData.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={columns.length + (rowSelection ? 1 : 0)}
-                  className="px-6 py-12 text-center text-sm text-gray-500"
-                >
-                  {emptyText}
-                </td>
-              </tr>
-            ) : (
-              sortedData.map((record, index) => {
-                const rowProps = onRow?.(record) || {};
-                const key = getRowKey(record, index);
-                const expanded = isExpanded(record, index);
-                // Support both onRow and onRowClick
-                const handleClick = rowProps.onClick || (onRowClick ? () => onRowClick(record) : undefined);
-
-                return (
-                  <React.Fragment key={key}>
-                    <tr
-                      onClick={handleClick}
-                      className={`hover:bg-gray-50 ${handleClick ? 'cursor-pointer' : ''} ${rowProps.className || ''
-                        }`}
-                    >
-                      {rowSelection && (
-                        <td className="px-6 py-4 whitespace-nowrap w-4">
-                          <input
-                            type="checkbox"
-                            checked={rowSelection.selectedRowKeys.includes(key)}
-                            onChange={(e) => handleSelectRow(key, e.target.checked)}
-                            onClick={(e) => e.stopPropagation()}
-                            className="rounded border-gray-300"
-                          />
-                        </td>
-                      )}
-                      {columns.map(column => {
-                        const value = getValue(record, column.dataIndex);
-                        const content = column.render
-                          ? column.render(value, record, index)
-                          : value;
-
-                        return (
-                          <td
-                            key={column.key}
-                            className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 ${getAlignClass(
-                              column.align
-                            )}`}
-                          >
-                            {content}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                    {expanded && expandable && (
-                      <tr className="bg-gray-50">
-                        <td colSpan={columns.length + (rowSelection ? 1 : 0)} className="px-6 py-4">
-                          {expandable.expandedRowRender(record)}
-                        </td>
-                      </tr>
-                    )}
-                  </React.Fragment>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
+      <BaseTable<T>
+        columns={o4oColumns}
+        data={pagedData}
+        rowKey={getKey}
+        emptyMessage={emptyText}
+        onRowClick={(onRow || onRowClick) ? handleRowClick : undefined}
+        rowClassName={(row) => onRow?.(row)?.className ?? ''}
+        renderAfterRow={renderAfterRow}
+        columnVisibility
+      />
 
       {/* Pagination */}
       {pagination && pagination.total > 0 && (
-        <div className="flex items-center justify-between px-6 py-3 bg-white border-t border-gray-200">
+        <div className="flex items-center justify-between px-4 py-3 bg-white border-t border-gray-200">
           <div className="text-sm text-gray-700">
             전체 <span className="font-medium">{pagination.total}</span>개 중{' '}
             <span className="font-medium">
-              {(pagination.current - 1) * pagination.pageSize + 1}
-            </span>
-            ~
+              {(activePage - 1) * pageSize + 1}
+            </span>–
             <span className="font-medium">
-              {Math.min(pagination.current * pagination.pageSize, pagination.total)}
+              {Math.min(activePage * pageSize, pagination.total)}
             </span>
           </div>
           <div className="flex gap-2">
             <button
-              onClick={() => pagination.onChange(pagination.current - 1, pagination.pageSize)}
-              disabled={pagination.current === 1}
+              onClick={() => {
+                const p = activePage - 1;
+                setCurrentPage(p);
+                pagination.onChange?.(p, pageSize);
+              }}
+              disabled={activePage <= 1}
               className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               이전
             </button>
             <span className="px-3 py-1 text-sm">
-              {pagination.current} / {Math.ceil(pagination.total / pagination.pageSize)}
+              {activePage} / {totalPages}
             </span>
             <button
-              onClick={() => pagination.onChange(pagination.current + 1, pagination.pageSize)}
-              disabled={pagination.current >= Math.ceil(pagination.total / pagination.pageSize)}
+              onClick={() => {
+                const p = activePage + 1;
+                setCurrentPage(p);
+                pagination.onChange?.(p, pageSize);
+              }}
+              disabled={activePage >= totalPages}
               className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               다음

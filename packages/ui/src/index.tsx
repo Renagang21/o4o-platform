@@ -624,6 +624,8 @@ export * from './components/table/BulkResultModal';
 export * from './components/table/RowActionMenu';
 export * from './components/table/ConfirmActionDialog';
 export * from './components/table/InlineEditCells';
+// WO-O4O-TABLE-STANDARD-ALIGNMENT-V1
+export * from './components/table/FilterBar';
 // WO-O4O-SELECTION-TABLE-DETAIL-DRAWER-V1
 export { SelectionTable } from './components/table/SelectionTable';
 export type { SelectionTableProps } from './components/table/SelectionTable';
