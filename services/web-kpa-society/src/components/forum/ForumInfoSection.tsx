@@ -34,7 +34,7 @@ export function ForumInfoSection() {
         <div style={styles.infoCard}>
           <h4 style={styles.infoTitle}>바로가기</h4>
           <div style={styles.linkList}>
-            <Link to={`${basePath.forum}/write`} style={styles.link}>글쓰기</Link>
+            <Link to={`${basePath.forum}/all`} style={styles.link}>포럼 목록</Link>
             <Link to="/mypage/my-forums/request" style={styles.link}>포럼 개설 신청</Link>
             <Link to={basePath.mypage} style={styles.link}>내 활동</Link>
             <Link to={basePath.policy} style={styles.link}>이용약관</Link>

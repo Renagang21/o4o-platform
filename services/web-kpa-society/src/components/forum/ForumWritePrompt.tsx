@@ -27,18 +27,18 @@ export function ForumWritePrompt() {
           <span style={styles.icon}>✏️</span>
           <div>
             <h3 style={styles.title}>
-              {isAuthenticated ? '새 글을 작성해 보세요' : '포럼에 참여해 보세요'}
+              {isAuthenticated ? '포럼에서 소통해 보세요' : '포럼에 참여해 보세요'}
             </h3>
             <p style={styles.desc}>
               {isAuthenticated
-                ? '약사 커뮤니티에 경험과 정보를 공유하세요'
+                ? '관심 있는 포럼을 선택하고 글을 작성해 보세요'
                 : '로그인 후 포럼 글을 작성하고 토론에 참여할 수 있습니다'}
             </p>
           </div>
         </div>
         {isAuthenticated ? (
-          <Link to={`${basePath}/write`} style={styles.ctaPrimary}>
-            글쓰기
+          <Link to={`${basePath}`} style={styles.ctaPrimary}>
+            포럼 둘러보기
           </Link>
         ) : (
           <Link to="/login" style={styles.ctaOutline}>

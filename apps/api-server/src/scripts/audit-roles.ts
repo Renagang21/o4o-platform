@@ -69,7 +69,6 @@ async function auditRoles(): Promise<RoleAuditResult> {
       neture: 0,
       glycopharm: 0,
       cosmetics: 0,
-      glucoseview: 0,
       lms: 0,
       none: 0
     },
@@ -84,7 +83,6 @@ async function auditRoles(): Promise<RoleAuditResult> {
       neture: 0,
       glycopharm: 0,
       cosmetics: 0,
-      glucoseview: 0,
       lms: 0,
       none: 0
     }

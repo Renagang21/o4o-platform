@@ -167,6 +167,10 @@ export function ForumListPage() {
     setSearchParams({});
   };
 
+  // WO-FORUM-POST-CONTEXT-ALIGNMENT-V1: 선택된 카테고리의 slug로 글쓰기 링크 생성
+  const selectedCategory = categories.find(c => c.id === currentCategory);
+  const writeHref = selectedCategory ? `/forum/${selectedCategory.slug}/write` : null;
+
   const pageNumbers = useMemo(() => {
     const pages: number[] = [];
     const maxVisible = 5;
@@ -211,7 +215,9 @@ export function ForumListPage() {
               >{cat.name}{cat.forumType === 'closed' && ' 🔒'}</button>
             ))}
           </div>
-          <Link to="/forum/write" style={s.writeButton}>글쓰기</Link>
+          {writeHref && (
+            <Link to={writeHref} style={s.writeButton}>글쓰기</Link>
+          )}
         </div>
         {hasFilters && (
           <div style={s.activeFilters}>
@@ -331,7 +337,13 @@ export function ForumListPage() {
                       ) : (
                         <>
                           <p style={s.emptyTitle}>아직 등록된 글이 없습니다</p>
-                          <Link to="/forum/write" style={s.emptyBtn}>글쓰기</Link>
+                          {writeHref ? (
+                            <Link to={writeHref} style={s.emptyBtn}>글쓰기</Link>
+                          ) : (
+                            <p style={{ fontSize: '13px', color: colors.neutral500 }}>
+                              포럼을 선택하면 글을 작성할 수 있습니다
+                            </p>
+                          )}
                         </>
                       )}
                     </td>

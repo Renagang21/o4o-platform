@@ -49,7 +49,6 @@ export function ForumHomePage() {
             약사 커뮤니티에서 정보를 교환하고 토론에 참여하세요
           </p>
           <div style={styles.heroActions}>
-            <Link to="/forum/write" style={styles.heroWriteBtn}>글쓰기</Link>
             <Link to="/mypage/my-forums/request" style={styles.heroRequestBtn}>새 포럼 개설 신청</Link>
           </div>
         </div>

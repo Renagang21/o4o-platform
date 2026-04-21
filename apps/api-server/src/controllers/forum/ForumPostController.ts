@@ -229,12 +229,17 @@ export class ForumPostController extends ForumControllerBase {
         category = await this.categoryRepository.findOne({ where: { slug: categorySlug } });
       }
 
+      // WO-FORUM-POST-CONTEXT-ALIGNMENT-V1: categoryId or categorySlug is required
       if (!category) {
-        // Fallback: find first active category
-        category = await this.categoryRepository.findOne({ where: { isActive: true }, order: { sortOrder: 'ASC' } });
+        res.status(400).json({
+          success: false,
+          error: 'categoryId or categorySlug is required',
+          code: 'CATEGORY_REQUIRED',
+        });
+        return;
       }
 
-      const resolvedCategoryId = category?.id || null;
+      const resolvedCategoryId = category.id;
 
       // WO-KPA-A-CLOSED-FORUM-ACCESS-CONTROL-V1
       if (category?.forumType === 'closed') {

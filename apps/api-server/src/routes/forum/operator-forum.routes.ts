@@ -621,22 +621,31 @@ router.get('/categories/:id/delete-check', async (req: Request, res: Response): 
       return;
     }
 
-    const [postCount, memberCount] = await Promise.all([
+    const [postCount, totalMemberCount, ownerCount] = await Promise.all([
       postRepo().count({ where: { categoryId: req.params.id } }),
       memberRepo().count({ where: { forumCategoryId: req.params.id } }),
+      memberRepo().count({ where: { forumCategoryId: req.params.id, role: 'owner' } }),
     ]);
+    const generalMemberCount = totalMemberCount - ownerCount;
 
+    // 운영자 hard delete: 게시글만 차단, 멤버십은 함께 삭제 가능 (WO-FORUM-HARD-DELETE-POLICY-FIX-V1)
     const blockedReasons: string[] = [];
     if (postCount > 0) blockedReasons.push(`게시글 ${postCount}건이 남아 있습니다`);
-    if (memberCount > 0) blockedReasons.push(`멤버십 ${memberCount}건이 남아 있습니다`);
+
+    const warnings: string[] = [];
+    if (generalMemberCount > 0) warnings.push(`일반 멤버 ${generalMemberCount}명의 멤버십이 함께 삭제됩니다`);
+    if (ownerCount > 0) warnings.push(`개설자 멤버십이 함께 삭제됩니다`);
 
     res.json({
       success: true,
       data: {
         postCount,
-        memberCount,
+        memberCount: totalMemberCount,
+        generalMemberCount,
+        ownerCount,
         hardDeleteAllowed: blockedReasons.length === 0,
         blockedReasons,
+        warnings,
       },
     });
   } catch (error: any) {
@@ -669,27 +678,22 @@ router.delete('/categories/:id/hard', async (req: Request, res: Response): Promi
       return;
     }
 
-    // Re-check conditions at delete time (race-condition safe)
-    const [postCount, memberCount] = await Promise.all([
-      postRepo().count({ where: { categoryId: req.params.id } }),
-      memberRepo().count({ where: { forumCategoryId: req.params.id } }),
-    ]);
+    // Re-check: 게시글만 차단 (운영자 권한: 멤버 존재는 차단하지 않음) (WO-FORUM-HARD-DELETE-POLICY-FIX-V1)
+    const postCount = await postRepo().count({ where: { categoryId: req.params.id } });
 
-    const blockedReasons: string[] = [];
-    if (postCount > 0) blockedReasons.push(`게시글 ${postCount}건이 남아 있습니다`);
-    if (memberCount > 0) blockedReasons.push(`멤버십 ${memberCount}건이 남아 있습니다`);
-
-    if (blockedReasons.length > 0) {
+    if (postCount > 0) {
       res.status(409).json({
         success: false,
         error: '연관 데이터가 있어 영구 삭제를 할 수 없습니다',
         code: 'HARD_DELETE_BLOCKED',
-        data: { blockedReasons },
+        data: { blockedReasons: [`게시글 ${postCount}건이 남아 있습니다`] },
       });
       return;
     }
 
-    logger.info(`Forum category ${category.id} (${category.name}) hard deleted by operator ${userId} (reason: ${reason.trim()})`);
+    // 멤버십 cascade 삭제 (owner 포함) → FK 위반 방지
+    const deletedMembers = await memberRepo().delete({ forumCategoryId: req.params.id });
+    logger.info(`Forum category ${category.id} (${category.name}) hard deleted by operator ${userId} (reason: ${reason.trim()}, members removed: ${deletedMembers.affected ?? 0})`);
     await categoryRepo().remove(category);
 
     res.json({ success: true, data: { id: req.params.id, name: category.name, hardDeleted: true } });

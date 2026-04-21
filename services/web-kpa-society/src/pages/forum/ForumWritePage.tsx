@@ -1,5 +1,10 @@
 /**
  * ForumWritePage - 포럼 글쓰기 페이지
+ *
+ * WO-FORUM-POST-CONTEXT-ALIGNMENT-V1:
+ * - /forum/:slug/write → 포럼 컨텍스트 고정 (slug→categoryId 자동 해석)
+ * - /forum/write (slug 없음) → /forum 리다이렉트
+ * - /forum/edit/:id → 기존 수정 모드 유지 (카테고리 변경 가능)
  */
 
 import { useState, useEffect } from 'react';
@@ -14,7 +19,7 @@ import { colors, typography } from '../../styles/theme';
 import type { ForumCategory } from '../../types';
 
 export function ForumWritePage() {
-  const { id } = useParams<{ id: string }>();
+  const { id, slug } = useParams<{ id?: string; slug?: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
   const isEdit = !!id;
@@ -32,7 +37,7 @@ export function ForumWritePage() {
 
   useEffect(() => {
     loadData();
-  }, [id]);
+  }, [id, slug]);
 
   const loadData = async () => {
     try {
@@ -54,6 +59,20 @@ export function ForumWritePage() {
           title: post.title,
           categoryId: post.categoryId,
         });
+      } else if (slug) {
+        // slug → categoryId 자동 해석
+        const matched = categoriesRes.data.find((c: ForumCategory) => c.slug === slug);
+        if (matched) {
+          setFormData(prev => ({ ...prev, categoryId: matched.id }));
+        } else {
+          toast.error('존재하지 않는 포럼입니다.');
+          navigate('/forum');
+          return;
+        }
+      } else if (!isEdit) {
+        // /forum/write (slug 없음, 편집도 아님) → 포럼 홈으로 리다이렉트
+        navigate('/forum');
+        return;
       }
     } catch (err) {
       toast.error('데이터를 불러오는데 실패했습니다.');
@@ -108,6 +127,8 @@ export function ForumWritePage() {
     return <LoadingSpinner message="로딩 중..." />;
   }
 
+  const forumName = categories.find(c => c.id === formData.categoryId)?.name;
+
   return (
     <div style={styles.container}>
       <PageHeader
@@ -115,6 +136,7 @@ export function ForumWritePage() {
         breadcrumb={[
           { label: '홈', href: '/' },
           { label: '포럼', href: '/forum' },
+          ...(forumName ? [{ label: forumName, href: `/forum/all?category=${formData.categoryId}` }] : []),
           { label: isEdit ? '수정' : '글쓰기' },
         ]}
       />
@@ -122,20 +144,26 @@ export function ForumWritePage() {
       <Card padding="large">
         <form onSubmit={handleSubmit}>
           <div style={styles.field}>
-            <label style={styles.label}>카테고리</label>
-            <select
-              style={styles.select}
-              value={formData.categoryId}
-              onChange={e => setFormData({ ...formData, categoryId: e.target.value })}
-              required
-            >
-              <option value="">카테고리 선택</option>
-              {categories.map(cat => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
+            <label style={styles.label}>포럼</label>
+            {slug ? (
+              <div style={styles.fixedForum}>
+                {forumName ?? slug}
+              </div>
+            ) : (
+              <select
+                style={styles.select}
+                value={formData.categoryId}
+                onChange={e => setFormData({ ...formData, categoryId: e.target.value })}
+                required
+              >
+                <option value="">포럼 선택</option>
+                {categories.map(cat => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
 
           <div style={styles.field}>
@@ -212,6 +240,16 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: '8px',
     fontSize: '14px',
     backgroundColor: colors.white,
+    boxSizing: 'border-box',
+  },
+  fixedForum: {
+    width: '100%',
+    padding: '12px',
+    border: `1px solid ${colors.neutral300}`,
+    borderRadius: '8px',
+    fontSize: '14px',
+    backgroundColor: colors.neutral50,
+    color: colors.neutral700,
     boxSizing: 'border-box',
   },
   input: {

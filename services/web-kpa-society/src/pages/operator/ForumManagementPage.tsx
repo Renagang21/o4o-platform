@@ -115,8 +115,11 @@ export default function ForumManagementPage() {
   interface DeleteCheckData {
     postCount: number;
     memberCount: number;
+    generalMemberCount: number;
+    ownerCount: number;
     hardDeleteAllowed: boolean;
     blockedReasons: string[];
+    warnings: string[];
   }
   const [hardDeleteTarget, setHardDeleteTarget] = useState<CategoryData | null>(null);
   const [hardDeleteCheck, setHardDeleteCheck] = useState<DeleteCheckData | null>(null);
@@ -932,21 +935,32 @@ export default function ForumManagementPage() {
 
               {hardDeleteCheck && (
                 <>
-                  <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div className="grid grid-cols-3 gap-3 text-sm">
                     <div className="p-3 rounded-lg bg-slate-50 text-center">
                       <p className="text-2xl font-bold text-slate-800">{hardDeleteCheck.postCount}</p>
                       <p className="text-slate-500 mt-0.5">게시글</p>
                     </div>
                     <div className="p-3 rounded-lg bg-slate-50 text-center">
-                      <p className="text-2xl font-bold text-slate-800">{hardDeleteCheck.memberCount}</p>
-                      <p className="text-slate-500 mt-0.5">멤버십</p>
+                      <p className="text-2xl font-bold text-slate-800">{hardDeleteCheck.generalMemberCount ?? 0}</p>
+                      <p className="text-slate-500 mt-0.5">일반 멤버</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-slate-50 text-center">
+                      <p className="text-2xl font-bold text-slate-800">{hardDeleteCheck.ownerCount ?? 0}</p>
+                      <p className="text-slate-500 mt-0.5">개설자</p>
                     </div>
                   </div>
 
                   {hardDeleteCheck.hardDeleteAllowed ? (
                     <>
+                      {hardDeleteCheck.warnings?.length > 0 && (
+                        <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg space-y-1">
+                          {hardDeleteCheck.warnings.map((w, i) => (
+                            <p key={i} className="text-sm text-amber-700">&#9888; {w}</p>
+                          ))}
+                        </div>
+                      )}
                       <div className="p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700">
-                        연관 데이터 없음 — 영구 삭제 가능합니다.
+                        운영자 권한으로 영구 삭제가 가능합니다.
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-slate-700 mb-1.5">
@@ -965,9 +979,9 @@ export default function ForumManagementPage() {
                     <div className="p-3 bg-rose-50 border border-rose-200 rounded-lg space-y-1.5">
                       <p className="text-sm font-medium text-rose-700">영구 삭제 불가</p>
                       {hardDeleteCheck.blockedReasons.map((r, i) => (
-                        <p key={i} className="text-sm text-rose-600">• {r}</p>
+                        <p key={i} className="text-sm text-rose-600">&#8226; {r}</p>
                       ))}
-                      <p className="text-xs text-rose-500 mt-2">대신 비활성화(soft delete)를 사용하세요.</p>
+                      <p className="text-xs text-rose-500 mt-2">게시글을 먼저 삭제한 뒤 다시 시도하세요.</p>
                     </div>
                   )}
                 </>
