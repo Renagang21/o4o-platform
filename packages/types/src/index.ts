@@ -87,6 +87,9 @@ export type {
 // Export forum API response types (Phase 19-B)
 export * from './forum.js';
 
+// Export unified content meta language (WO-CONTENT-META-TYPE-CONTRACT-V1)
+export * from './content-meta.js';
+
 // Export vendor management types (excluding duplicates)
 export type {
   // Types
