@@ -1,14 +1,17 @@
 /**
- * OperatorForumPage — KPA-a Operator 게시판 운영 허브
+ * OperatorForumPage — KPA-a Operator 포럼 운영 허브
  *
  * WO-KPA-A-PLACEHOLDER-PAGES-IMPLEMENTATION: 실사용 페이지 전환
  * WO-KPA-A-OPERATOR-FORUM-OPS-ENHANCEMENT-V1: 운영 처리 중심 허브 보강
+ * WO-KPA-OPERATOR-FORUM-HUB-TERMINOLOGY-AND-TABLE-REFORM-V1:
+ *   - 게시판→포럼 용어 통일
+ *   - DataTable + RowActionMenu 적용
  *
  * 구조:
  *   - 긴급 알림 배너 (삭제 요청/카테고리 요청 대기)
  *   - 포럼 현황 KPI (클릭 → 관련 페이지 이동)
  *   - 관리 바로가기 (대기 건수 표시)
- *   - 최근 게시글 목록 (상태 표시 + 게시글 이동)
+ *   - 최근 게시글 DataTable (상태 표시 + 수정/삭제 액션)
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -25,9 +28,11 @@ import {
   BarChart3,
   Eye,
   AlertTriangle,
-  ExternalLink,
   Heart,
+  Pencil,
 } from 'lucide-react';
+import { DataTable, RowActionMenu } from '@o4o/ui';
+import type { Column } from '@o4o/ui';
 import { forumApi, forumAnalyticsApi } from '../../api/forum';
 
 // ─── Types ───
@@ -59,6 +64,7 @@ export default function OperatorForumPage() {
   const [posts, setPosts] = useState<PostItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -85,7 +91,7 @@ export default function OperatorForumPage() {
             viewCount: p.viewCount ?? 0,
             likeCount: p.likeCount ?? 0,
             createdAt: p.createdAt || p.created_at || '',
-            status: p.status || 'PUBLISHED',
+            status: p.status || 'publish',
           })),
         );
       }
@@ -98,6 +104,119 @@ export default function OperatorForumPage() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  // ─── DataTable Columns ───
+  const columns: Column<PostItem>[] = [
+    {
+      key: 'categoryName',
+      title: '포럼',
+      dataIndex: 'categoryName',
+      width: '90px',
+      render: (v) => <span style={badgeStyle}>{v}</span>,
+    },
+    {
+      key: 'title',
+      title: '제목',
+      dataIndex: 'title',
+      render: (v) => (
+        <span style={{ fontWeight: 500, color: '#1e293b', maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block' }}>
+          {v}
+        </span>
+      ),
+    },
+    {
+      key: 'authorName',
+      title: '작성자',
+      dataIndex: 'authorName',
+      width: '100px',
+    },
+    {
+      key: 'viewCount',
+      title: '조회',
+      dataIndex: 'viewCount',
+      width: '70px',
+      align: 'right',
+      render: (v) => (
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, color: '#64748b' }}>
+          <Eye size={12} /> {v}
+        </span>
+      ),
+    },
+    {
+      key: 'likeCount',
+      title: '좋아요',
+      dataIndex: 'likeCount',
+      width: '70px',
+      align: 'right',
+      render: (v) => (
+        v > 0 ? (
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, color: '#ef4444' }}>
+            <Heart size={12} /> {v}
+          </span>
+        ) : null
+      ),
+    },
+    {
+      key: 'status',
+      title: '상태',
+      dataIndex: 'status',
+      width: '70px',
+      align: 'center',
+      render: (v) => (
+        <span style={{
+          ...badgeStyle,
+          backgroundColor: v === 'publish' ? '#ecfdf5' : v === 'draft' ? '#fffbeb' : '#fef2f2',
+          color: v === 'publish' ? '#059669' : v === 'draft' ? '#d97706' : '#dc2626',
+        }}>
+          {v === 'publish' ? '게시' : v === 'draft' ? '임시' : v}
+        </span>
+      ),
+    },
+    {
+      key: 'createdAt',
+      title: '작성일',
+      dataIndex: 'createdAt',
+      width: '100px',
+      render: (v) => formatDate(v),
+    },
+    {
+      key: 'actions',
+      title: '',
+      width: '50px',
+      render: (_v, row) => (
+        <RowActionMenu
+          actions={[
+            {
+              key: 'edit',
+              label: '수정',
+              icon: <Pencil size={14} />,
+              onClick: () => navigate(`/forum/posts/${row.id}/edit`),
+            },
+            {
+              key: 'delete',
+              label: '삭제',
+              icon: <Trash2 size={14} />,
+              variant: 'danger' as const,
+              confirm: {
+                title: '게시글 삭제',
+                message: `"${row.title}" 게시글을 삭제하시겠습니까?`,
+                variant: 'danger' as const,
+              },
+              onClick: async () => {
+                setActionLoading(row.id);
+                try {
+                  await forumApi.deletePost(row.id);
+                  setPosts((prev) => prev.filter((p) => p.id !== row.id));
+                } catch { /* user can retry */ }
+                setActionLoading(null);
+              },
+              loading: actionLoading === row.id,
+            },
+          ]}
+        />
+      ),
+    },
+  ];
 
   if (loading) {
     return (
@@ -131,8 +250,8 @@ export default function OperatorForumPage() {
             <MessageSquare size={20} color="#2563eb" />
           </div>
           <div>
-            <h1 style={{ fontSize: 20, fontWeight: 600, color: '#1e293b', margin: 0 }}>게시판</h1>
-            <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>커뮤니티 게시판 현황 및 운영 관리</p>
+            <h1 style={{ fontSize: 20, fontWeight: 600, color: '#1e293b', margin: 0 }}>포럼</h1>
+            <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>커뮤니티 포럼 현황 및 운영 관리</p>
           </div>
         </div>
         <button onClick={fetchData} style={refreshBtnStyle}>
@@ -152,7 +271,7 @@ export default function OperatorForumPage() {
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             {stats!.pendingRequests > 0 && (
               <button onClick={() => navigate('/operator/forum-management')} style={urgentLinkStyle}>
-                카테고리 요청 {stats!.pendingRequests}건 <ArrowRight size={12} />
+                포럼 개설 요청 {stats!.pendingRequests}건 <ArrowRight size={12} />
               </button>
             )}
             {stats!.deleteRequestsPending > 0 && (
@@ -167,11 +286,11 @@ export default function OperatorForumPage() {
       {/* KPI Cards — clickable */}
       {stats && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12, marginBottom: 24 }}>
-          <KpiCard label="총 게시판" value={stats.totalForums} onClick={() => navigate('/operator/forum-analytics')} />
-          <KpiCard label="활성 게시판" value={stats.activeForums} onClick={() => navigate('/operator/forum-analytics')} />
+          <KpiCard label="총 포럼" value={stats.totalForums} onClick={() => navigate('/operator/forum-analytics')} />
+          <KpiCard label="활성 포럼" value={stats.activeForums} onClick={() => navigate('/operator/forum-analytics')} />
           <KpiCard label="총 게시글" value={stats.totalPosts} />
           <KpiCard
-            label="카테고리 요청"
+            label="개설 요청"
             value={stats.pendingRequests}
             highlight={stats.pendingRequests > 0}
             onClick={() => navigate('/operator/forum-management')}
@@ -190,14 +309,14 @@ export default function OperatorForumPage() {
         <ShortcutCard
           icon={<LayoutGrid size={16} />}
           label="포럼 관리"
-          desc="카테고리 요청 검토 및 관리"
+          desc="포럼 개설 요청 검토 및 관리"
           count={stats?.pendingRequests}
           onClick={() => navigate('/operator/forum-management')}
         />
         <ShortcutCard
           icon={<Trash2 size={16} />}
           label="삭제 요청"
-          desc="게시판 삭제 요청 처리"
+          desc="포럼 삭제 요청 처리"
           count={stats?.deleteRequestsPending}
           onClick={() => navigate('/operator/forum-delete-requests')}
         />
@@ -237,67 +356,9 @@ export default function OperatorForumPage() {
           </div>
         </div>
       ) : (
-        <div style={{ border: '1px solid #e2e8f0', borderRadius: 12, overflow: 'hidden' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-            <thead>
-              <tr style={{ backgroundColor: '#f8fafc' }}>
-                <th style={thStyle}>게시판</th>
-                <th style={{ ...thStyle, textAlign: 'left' }}>제목</th>
-                <th style={thStyle}>작성자</th>
-                <th style={thStyle}>조회</th>
-                <th style={thStyle}>좋아요</th>
-                <th style={thStyle}>상태</th>
-                <th style={thStyle}>작성일</th>
-                <th style={thStyle}></th>
-              </tr>
-            </thead>
-            <tbody>
-              {posts.map((post) => (
-                <tr key={post.id} style={{ borderTop: '1px solid #f1f5f9' }}>
-                  <td style={tdStyle}>
-                    <span style={badgeStyle}>{post.categoryName}</span>
-                  </td>
-                  <td style={{ ...tdStyle, textAlign: 'left', fontWeight: 500, color: '#1e293b', maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {post.title}
-                  </td>
-                  <td style={tdStyle}>{post.authorName}</td>
-                  <td style={tdStyle}>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, color: '#64748b' }}>
-                      <Eye size={12} /> {post.viewCount}
-                    </span>
-                  </td>
-                  <td style={tdStyle}>
-                    {post.likeCount > 0 && (
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, color: '#ef4444' }}>
-                        <Heart size={12} /> {post.likeCount}
-                      </span>
-                    )}
-                  </td>
-                  <td style={tdStyle}>
-                    <span style={{
-                      ...badgeStyle,
-                      backgroundColor: post.status === 'PUBLISHED' ? '#ecfdf5' : post.status === 'DRAFT' ? '#fffbeb' : '#fef2f2',
-                      color: post.status === 'PUBLISHED' ? '#059669' : post.status === 'DRAFT' ? '#d97706' : '#dc2626',
-                    }}>
-                      {post.status === 'PUBLISHED' ? '게시' : post.status === 'DRAFT' ? '임시' : post.status}
-                    </span>
-                  </td>
-                  <td style={tdStyle}>{formatDate(post.createdAt)}</td>
-                  <td style={tdStyle}>
-                    <button
-                      onClick={() => window.open(`/forum/posts/${post.id}`, '_blank')}
-                      style={actionBtnStyle}
-                      title="게시글 보기"
-                    >
-                      <ExternalLink size={13} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <DataTable dataSource={posts} columns={columns} rowKey="id" />
       )}
+
     </div>
   );
 }
@@ -404,16 +465,6 @@ const emptyStyle: React.CSSProperties = {
   border: '1px dashed #e2e8f0',
 };
 
-const thStyle: React.CSSProperties = {
-  padding: '10px 14px', fontSize: 12, fontWeight: 600,
-  color: '#64748b', textAlign: 'center',
-};
-
-const tdStyle: React.CSSProperties = {
-  padding: '10px 14px', verticalAlign: 'middle',
-  textAlign: 'center', color: '#475569',
-};
-
 const badgeStyle: React.CSSProperties = {
   display: 'inline-block', padding: '2px 8px',
   backgroundColor: '#f1f5f9', color: '#475569',
@@ -448,8 +499,3 @@ const ctaBtnOutlineStyle: React.CSSProperties = {
   border: '1px solid #e2e8f0', borderRadius: 8, cursor: 'pointer',
 };
 
-const actionBtnStyle: React.CSSProperties = {
-  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-  width: 28, height: 28, border: 'none', borderRadius: 6,
-  backgroundColor: 'transparent', color: '#64748b', cursor: 'pointer',
-};

@@ -53,7 +53,7 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '포럼 관리', path: '/operator/forum-management' },
     { label: '삭제 요청', path: '/operator/forum-delete-requests' },
     { label: '포럼 분석', path: '/operator/forum-analytics' },
-    { label: '게시판', path: '/operator/forum' },
+    { label: '포럼', path: '/operator/forum' },
   ],
   analytics: [
     { label: 'AI 리포트', path: '/operator/ai-report' },
@@ -117,7 +117,7 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: '포럼 관리', path: '/operator/forum-management' },
     { label: '삭제 요청', path: '/operator/forum-delete-requests' },
     { label: '포럼 분석', path: '/operator/forum-analytics' },
-    { label: '게시판', path: '/operator/forum' },
+    { label: '포럼', path: '/operator/forum' },
   ],
   analytics: [
     { label: 'AI 리포트', path: '/operator/ai-report' },
