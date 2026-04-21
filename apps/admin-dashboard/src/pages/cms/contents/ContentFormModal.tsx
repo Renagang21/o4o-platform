@@ -13,6 +13,7 @@ import { mediaApi } from '@/services/api/postApi';
 import toast from 'react-hot-toast';
 import { RichTextEditor } from '@o4o/content-editor';
 import { htmlToBlocks, blocksToHtml } from '@o4o/forum-core';
+import { uploadImageForEditor } from '@/api/media-library.api';
 
 interface ContentFormModalProps {
   content: CmsContent | null;
@@ -352,6 +353,7 @@ export default function ContentFormModal({ content, onClose, onSave }: ContentFo
                       onChange={(content) =>
                         setFormData((prev) => ({ ...prev, editorHtml: content.html }))
                       }
+                      onImageUpload={(file) => uploadImageForEditor(file, 'blog')}
                     />
                   </div>
                 </div>

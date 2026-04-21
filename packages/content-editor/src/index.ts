@@ -5,6 +5,7 @@
 
 export { RichTextEditor, Toolbar, ContentPreview, ContentRenderer, TemplateModal, SaveTemplateModal } from './components';
 export { sanitizeHtml } from './sanitize';
+export { handleClipboardPaste, compressImage } from './utils/handleImagePaste';
 export type {
   ContentEditorProps,
   EditorContent,

@@ -21,6 +21,8 @@ import {
   FileText, LayoutTemplate,
 } from 'lucide-react';
 import { popApi, ProductListItem, AiContent, PopLayout } from '@/api/pop.api';
+import { RichTextEditor } from '@o4o/content-editor';
+import { uploadImageForEditor } from '@/api/media-library.api';
 
 // ============================================
 // Types
@@ -429,6 +431,10 @@ function Step3AiGenerate({
 // Step 4: 편집
 // ============================================
 
+async function uploadImage(file: File): Promise<string> {
+  return uploadImageForEditor(file, 'pop');
+}
+
 function Step4Edit({
   form,
   onChange,
@@ -476,12 +482,13 @@ function Step4Edit({
           <label className="block text-xs font-medium text-gray-700 mb-1">
             긴 문구 <span className="text-gray-400 font-normal">(3~5문장 권장)</span>
           </label>
-          <textarea
+          <RichTextEditor
             value={form.longText}
-            onChange={(e) => onChange({ longText: e.target.value })}
+            onChange={({ html }) => onChange({ longText: html })}
             placeholder="상품의 특징과 효능을 설명하는 문구를 입력하세요."
-            rows={4}
-            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 resize-none"
+            preset="compact"
+            minHeight="120px"
+            onImageUpload={uploadImage}
           />
         </div>
 

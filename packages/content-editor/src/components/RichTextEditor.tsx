@@ -20,6 +20,7 @@ import { Toolbar } from './Toolbar';
 import { TemplateModal } from './TemplateModal';
 import { SaveTemplateModal } from './SaveTemplateModal';
 import type { ContentEditorProps } from '../types';
+import { handleClipboardPaste } from '../utils/handleImagePaste';
 
 export function RichTextEditor({
   value = '',
@@ -45,6 +46,7 @@ export function RichTextEditor({
 }: ContentEditorProps) {
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
   const [saveModalOpen, setSaveModalOpen] = useState(false);
+  const [pasteUploading, setPasteUploading] = useState(false);
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -92,6 +94,27 @@ export function RichTextEditor({
           json: editor.getJSON(),
         });
       }
+    },
+    editorProps: {
+      handlePaste: (_view, event) => {
+        if (!onImageUpload) return false;
+        // 이미지 클립보드 항목이 있을 때만 가로챔 (WO-STORE-IMAGE-PASTE-SUPPORT-V1)
+        const hasImage = Array.from(event.clipboardData?.items ?? []).some(
+          (item) => item.type.startsWith('image/'),
+        );
+        if (!hasImage) return false;
+
+        setPasteUploading(true);
+        handleClipboardPaste(
+          event,
+          onImageUpload,
+          (url) => {
+            editor?.chain().focus().setImage({ src: url }).run();
+          },
+        ).finally(() => setPasteUploading(false));
+
+        return true; // TipTap 기본 paste 억제
+      },
     },
   });
 
@@ -143,6 +166,25 @@ export function RichTextEditor({
       }}
       onKeyDown={handleKeyDown}
     >
+      {pasteUploading && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 8,
+            right: 12,
+            zIndex: 10,
+            fontSize: 12,
+            color: '#6b7280',
+            background: '#f9fafb',
+            border: '1px solid #e5e7eb',
+            borderRadius: 4,
+            padding: '2px 8px',
+            pointerEvents: 'none',
+          }}
+        >
+          이미지 업로드 중…
+        </div>
+      )}
       {editable && <Toolbar editor={editor} preset={preset} onImageUpload={onImageUpload} existingImages={existingImages} onMediaLibraryPick={onMediaLibraryPick} />}
       <div style={{ overflow: 'hidden', borderRadius: showTemplateActions ? '0' : '0 0 8px 8px' }}>
         <EditorContent
