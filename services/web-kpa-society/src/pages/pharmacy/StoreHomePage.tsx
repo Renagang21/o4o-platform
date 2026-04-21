@@ -27,7 +27,7 @@ import { Link } from 'react-router-dom';
 import { colors } from '../../styles/theme';
 import { getMarketingAnalytics, getRecentScans } from '../../api/storeAnalytics';
 import type { MarketingAnalyticsData, RecentScanItem } from '../../api/storeAnalytics';
-import { getStoreLibraryItems } from '../../api/storeLibrary';
+import { getStoreLibraryItems } from '../../api/storeExecutionAssets';
 import { getListings } from '../../api/pharmacyProducts';
 
 export function StoreHomePage() {

@@ -195,7 +195,7 @@ export function CommunityHomePage() {
             { label: '포럼 참여', href: '/forum', icon: <ForumIcon /> },
             { label: '강의 수강', href: '/lms', icon: <EducationIconSvg /> },
             { label: '콘텐츠 허브', href: '/content', icon: <ContentIcon /> },
-            { label: '자료실', href: '/operator/resources', icon: <ResourceLibraryIcon /> },
+            { label: '자료실', href: '/resources', icon: <ResourceLibraryIcon /> },
           ]}
         />
 
@@ -235,7 +235,7 @@ export function CommunityHomePage() {
             { title: '교육 / 강의', description: '보수교육·세미나를 온라인으로 수강하세요', href: '/lms', icon: <EducationIconSvg /> },
             { title: '콘텐츠 허브', description: '공지·뉴스·이벤트를 한눈에 확인하세요', href: '/content', icon: <ContentIcon /> },
             { title: '디지털 사이니지', description: '약국 디지털 미디어를 관리하세요', href: '/signage', icon: <SignageIcon /> },
-            { title: '자료실', description: '자료를 저장하고 AI 작업에 활용하세요', href: '/operator/resources', icon: <ResourceLibraryIcon /> },
+            { title: '자료실', description: '자료를 저장하고 AI 작업에 활용하세요', href: '/resources', icon: <ResourceLibraryIcon /> },
           ]}
         />
 

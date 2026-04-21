@@ -86,7 +86,7 @@ export function createProductMarketingController(
              id, title, description, file_url AS "fileUrl",
              mime_type AS "mimeType", category, is_active AS "isActive",
              created_at AS "createdAt"
-           FROM store_library_items
+           FROM store_execution_assets
            WHERE organization_id = $1 AND id IN (${placeholders})
            ORDER BY created_at DESC`,
           [organizationId, ...libraryIds],

@@ -100,11 +100,11 @@ const services: ServiceCardData[] = [
     href: '/signage',
     icon: <SignageIcon />,
   },
-  // WO-KPA-RESOURCE-LIBRARY-AI-WORKFLOW-V1
+  // WO-KPA-RESOURCE-LIBRARY-AI-WORKFLOW-V1 / WO-KPA-RESOURCES-HUB-ENTRY-FIX-V1
   {
     title: '자료실',
     description: '자료를 저장하고 AI 작업에 활용하세요',
-    href: '/operator/resources',
+    href: '/resources',
     icon: <ResourceIcon />,
   },
 ];

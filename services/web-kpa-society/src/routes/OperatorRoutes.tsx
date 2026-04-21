@@ -43,11 +43,6 @@ import TemplateDetailPage from '../pages/operator/signage/TemplateDetailPage';
 import CategoriesPage from '../pages/operator/signage/CategoriesPage';
 import ForcedContentPage from '../pages/operator/signage/ForcedContentPage';
 import OperatorAnalyticsPage from '../pages/operator/AnalyticsPage';
-// WO-KPA-RESOURCE-LIBRARY-AI-WORKFLOW-V1
-import ResourcesPage from '../pages/operator/resources/ResourcesPage';
-import ResourceFormPage from '../pages/operator/resources/ResourceFormPage';
-import WorkBasketPage from '../pages/operator/resources/WorkBasketPage';
-import ResourceAiWorkspacePage from '../pages/operator/resources/ResourceAiWorkspacePage';
 import { RoleGuard } from '../components/auth/RoleGuard';
 import { PLATFORM_ROLES, ROLES } from '../lib/role-constants';
 // WO-O4O-OPERATOR-UI-STANDARDIZATION-V1: shared OperatorShell wrapper
@@ -145,13 +140,6 @@ export function OperatorRoutes() {
           {/* 운영 분석 (WO-O4O-AUDIT-ANALYTICS-LAYER-V1) */}
           <Route path="analytics" element={<OperatorAnalyticsPage />} />
 
-          {/* 자료실 (WO-KPA-RESOURCE-LIBRARY-AI-WORKFLOW-V1) */}
-          <Route path="resources" element={<ResourcesPage />} />
-          <Route path="resources/new" element={<ResourceFormPage />} />
-          <Route path="resources/basket" element={<WorkBasketPage />} />
-          <Route path="resources/ai-workspace" element={<ResourceAiWorkspacePage />} />
-          <Route path="resources/:id/edit" element={<ResourceFormPage />} />
-
           {/* 역할 관리 (WO-O4O-ROLE-MANAGEMENT-UI-V1) — admin-only */}
           <Route path="roles" element={<RoleGuard allowedRoles={[ROLES.KPA_ADMIN, ROLES.PLATFORM_SUPER_ADMIN]}><RoleManagementPage /></RoleGuard>} />
 
@@ -166,25 +154,3 @@ export function OperatorRoutes() {
   );
 }
 
-/**
- * MemberResourceRoutes — 자료실 라우트 (인증된 모든 회원 접근 가능)
- *
- * OperatorRoutes는 kpa:admin/kpa:operator만 허용하므로,
- * 자료실은 별도 라우트로 분리하여 일반 회원도 접근 가능하게 한다.
- * App.tsx에서 /operator/resources/* 경로에 우선 마운트.
- */
-export function MemberResourceRoutes() {
-  return (
-    <RoleGuard> {/* allowedRoles 없음 = 로그인만 확인 */}
-      <Routes>
-        <Route element={<KpaOperatorLayoutWrapper />}>
-          <Route index element={<ResourcesPage />} />
-          <Route path="new" element={<ResourceFormPage />} />
-          <Route path="basket" element={<WorkBasketPage />} />
-          <Route path="ai-workspace" element={<ResourceAiWorkspacePage />} />
-          <Route path=":id/edit" element={<ResourceFormPage />} />
-        </Route>
-      </Routes>
-    </RoleGuard>
-  );
-}

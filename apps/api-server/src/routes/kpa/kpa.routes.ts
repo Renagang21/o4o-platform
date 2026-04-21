@@ -75,7 +75,7 @@ import { createStoreAssetControlController } from '../o4o-store/controllers/stor
 import { createAdminForceAssetController } from './controllers/admin-force-asset.controller.js';
 import { createPublishedAssetsController } from '../o4o-store/controllers/published-assets.controller.js';
 import { createStoreContentController } from '../o4o-store/controllers/store-content.controller.js';
-import { createStoreLibraryController } from '../o4o-store/controllers/store-library.controller.js';
+import { createStoreExecutionAssetsController } from '../o4o-store/controllers/store-execution-assets.controller.js';
 import { createStoreQrLandingController } from '../o4o-store/controllers/store-qr-landing.controller.js';
 import { createStorePopController } from '../o4o-store/controllers/store-pop.controller.js';
 import { createStoreAnalyticsController } from '../o4o-store/controllers/store-analytics.controller.js';
@@ -351,8 +351,8 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // 컨트롤러 내부에 full path 정의됨. prefix 분리는 별도 WO에서 수행.
   // WO-KPA-B-STORE-CONTAMINATION-CLEANUP-V1 Phase 2: 문서화 완료
 
-  // Store Library routes (WO-O4O-STORE-LIBRARY-API-INTEGRATION-V1) — internal: /pharmacy/library/*
-  router.use('/', createStoreLibraryController(dataSource, coreRequireAuth as any));
+  // Store Execution Assets routes (WO-KPA-STORE-ASSET-STRUCTURE-REFACTOR-V1) — internal: /store/assets/*
+  router.use('/', createStoreExecutionAssetsController(dataSource, coreRequireAuth as any));
 
   // Store QR Landing routes (WO-O4O-QR-LANDING-PAGE-V1) — internal: /qr/public/*, /pharmacy/qr/*
   router.use('/', createStoreQrLandingController(dataSource, coreRequireAuth as any));
@@ -942,165 +942,6 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       totalPages: Math.ceil(total / limitNum),
     });
   }));
-
-  // ============================================================================
-  // Resources Routes - /api/v1/kpa/resources/*
-  // WO-KPA-RESOURCE-LIBRARY-AI-WORKFLOW-V1
-  // 자료실 CRUD — 파일/텍스트/외부링크 자료 단일 테이블 관리
-  // GET /  — 목록 (authenticated)
-  // POST / — 생성 (authenticated)
-  // PATCH /:id — 수정 (authenticated, 본인 자료만)
-  // DELETE /:id — soft delete (authenticated, 본인 자료만)
-  // ============================================================================
-  {
-    const resourcesRouter = Router();
-
-    // GET /resources — 목록
-    resourcesRouter.get('/', authenticate, asyncHandler(async (req: Request, res: Response) => {
-      const userId = (req as any).user?.id;
-      const { page = '1', limit = '20', search, tag, type: typeFilter } = req.query;
-      const pageNum = Math.max(1, Number(page));
-      const limitNum = Math.min(100, Math.max(1, Number(limit)));
-      const offset = (pageNum - 1) * limitNum;
-
-      const conditions: string[] = [`r.is_deleted = false`, `r.created_by = $1`];
-      const params: any[] = [userId];
-      let idx = 2;
-
-      if (typeFilter) { conditions.push(`r.type = $${idx++}`); params.push(typeFilter); }
-      if (search) {
-        conditions.push(`(r.title ILIKE $${idx} OR r.memo ILIKE $${idx})`);
-        params.push(`%${search}%`); idx++;
-      }
-      if (tag) {
-        conditions.push(`r.tags @> $${idx++}::jsonb`);
-        params.push(JSON.stringify([tag]));
-      }
-
-      const where = `WHERE ${conditions.join(' AND ')}`;
-      const [[{ total }], rows] = await Promise.all([
-        dataSource.query(`SELECT COUNT(*)::int as total FROM kpa_resources r ${where}`, params),
-        dataSource.query(
-          `SELECT r.id, r.title, r.content, r.file_url, r.external_url, r.type,
-                  r.tags, r.role, r.memo, r.created_by, r.created_at, r.updated_at
-           FROM kpa_resources r ${where}
-           ORDER BY r.created_at DESC
-           LIMIT $${idx} OFFSET $${idx + 1}`,
-          [...params, limitNum, offset]
-        ),
-      ]);
-
-      res.json({
-        success: true,
-        data: {
-          items: rows,
-          total,
-          page: pageNum,
-          limit: limitNum,
-          totalPages: Math.ceil(total / limitNum),
-        },
-      });
-    }));
-
-    // POST /resources — 생성
-    resourcesRouter.post('/', authenticate, asyncHandler(async (req: Request, res: Response) => {
-      const userId = (req as any).user?.id;
-      const { title, content, file_url, external_url, type, tags, role, memo } = req.body;
-
-      if (!title?.trim()) {
-        res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'title은 필수입니다' } });
-        return;
-      }
-      const resourceType = type === 'FILE' ? 'FILE' : 'TEXT';
-      if (!content && !file_url && !external_url) {
-        res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'content, file_url, external_url 중 하나는 필수입니다' } });
-        return;
-      }
-
-      const [saved] = await dataSource.query(
-        `INSERT INTO kpa_resources (title, content, file_url, external_url, type, tags, role, memo, created_by)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
-         RETURNING *`,
-        [
-          title.trim(),
-          content || null,
-          file_url || null,
-          external_url || null,
-          resourceType,
-          JSON.stringify(Array.isArray(tags) ? tags : []),
-          role || null,
-          memo || null,
-          userId,
-        ]
-      );
-      res.status(201).json({ success: true, data: saved });
-    }));
-
-    // GET /resources/:id — 상세
-    resourcesRouter.get('/:id', authenticate, asyncHandler(async (req: Request, res: Response) => {
-      const userId = (req as any).user?.id;
-      const [resource] = await dataSource.query(
-        `SELECT * FROM kpa_resources WHERE id = $1 AND created_by = $2 AND is_deleted = false LIMIT 1`,
-        [req.params.id, userId]
-      );
-      if (!resource) {
-        res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '자료를 찾을 수 없습니다' } });
-        return;
-      }
-      res.json({ success: true, data: resource });
-    }));
-
-    // PATCH /resources/:id — 수정
-    resourcesRouter.patch('/:id', authenticate, asyncHandler(async (req: Request, res: Response) => {
-      const userId = (req as any).user?.id;
-      const [existing] = await dataSource.query(
-        `SELECT * FROM kpa_resources WHERE id = $1 AND created_by = $2 AND is_deleted = false LIMIT 1`,
-        [req.params.id, userId]
-      );
-      if (!existing) {
-        res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '자료를 찾을 수 없습니다' } });
-        return;
-      }
-
-      const { title, content, file_url, external_url, type, tags, role, memo } = req.body;
-      const sets: string[] = [`updated_at = NOW()`];
-      const params: any[] = [];
-      let idx = 1;
-
-      if (title !== undefined) { sets.push(`title = $${idx++}`); params.push(title.trim()); }
-      if (content !== undefined) { sets.push(`content = $${idx++}`); params.push(content || null); }
-      if (file_url !== undefined) { sets.push(`file_url = $${idx++}`); params.push(file_url || null); }
-      if (external_url !== undefined) { sets.push(`external_url = $${idx++}`); params.push(external_url || null); }
-      if (type !== undefined) { sets.push(`type = $${idx++}`); params.push(type === 'FILE' ? 'FILE' : 'TEXT'); }
-      if (tags !== undefined) { sets.push(`tags = $${idx++}`); params.push(JSON.stringify(Array.isArray(tags) ? tags : existing.tags)); }
-      if (role !== undefined) { sets.push(`role = $${idx++}`); params.push(role || null); }
-      if (memo !== undefined) { sets.push(`memo = $${idx++}`); params.push(memo || null); }
-
-      params.push(existing.id);
-      const [updated] = await dataSource.query(
-        `UPDATE kpa_resources SET ${sets.join(', ')} WHERE id = $${idx} RETURNING *`,
-        params
-      );
-      res.json({ success: true, data: updated });
-    }));
-
-    // DELETE /resources/:id — soft delete
-    resourcesRouter.delete('/:id', authenticate, asyncHandler(async (req: Request, res: Response) => {
-      const userId = (req as any).user?.id;
-      const [existing] = await dataSource.query(
-        `SELECT id FROM kpa_resources WHERE id = $1 AND created_by = $2 AND is_deleted = false LIMIT 1`,
-        [req.params.id, userId]
-      );
-      if (!existing) {
-        res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '자료를 찾을 수 없습니다' } });
-        return;
-      }
-      await dataSource.query(`UPDATE kpa_resources SET is_deleted = true, updated_at = NOW() WHERE id = $1`, [existing.id]);
-      res.json({ success: true, data: { deleted: true, id: existing.id } });
-    }));
-
-    router.use('/resources', resourcesRouter);
-  }
 
   // ============================================================================
   // CONTENT HUB ROUTES — WO-O4O-KPA-CONTENT-HUB-FOUNDATION-V1

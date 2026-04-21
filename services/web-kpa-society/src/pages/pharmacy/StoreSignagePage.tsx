@@ -85,8 +85,8 @@ import {
   deleteSignageMedia,
   type SignageMediaItem,
 } from '../../api/signageMedia';
-import { StoreLibrarySelectorModal } from '../../components/store/StoreLibrarySelectorModal';
-import type { LibrarySelectorResult } from '../../components/store/StoreLibrarySelectorModal';
+import { StoreAssetSelectorModal } from '../../components/store/StoreAssetSelectorModal';
+import type { AssetSelectorResult as LibrarySelectorResult } from '../../components/store/StoreAssetSelectorModal';
 
 /* ─── Constants ──────────────────────────────── */
 
@@ -1747,11 +1747,12 @@ export function StoreSignagePage() {
       )}
       </>}
 
-      {/* Library Selector Modal (WO-O4O-SIGNAGE-LIBRARY-INTEGRATION-V1) */}
-      <StoreLibrarySelectorModal
+      {/* Asset Selector Modal (WO-O4O-SIGNAGE-LIBRARY-INTEGRATION-V1) */}
+      <StoreAssetSelectorModal
         open={showLibrarySelector}
         onSelect={handleAddFromLibrary}
         onClose={() => setShowLibrarySelector(false)}
+        usageType="signage"
       />
     </div>
   );

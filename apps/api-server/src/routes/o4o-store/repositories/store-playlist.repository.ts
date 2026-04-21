@@ -410,7 +410,7 @@ export class StorePlaylistRepository {
     // Verify library item
     const libItem = await this.dataSource.query(
       `SELECT id, title, file_url, file_name, mime_type, category
-       FROM store_library_items
+       FROM store_execution_assets
        WHERE id = $1 AND organization_id = $2 AND is_active = true`,
       [libraryItemId, organizationId],
     );

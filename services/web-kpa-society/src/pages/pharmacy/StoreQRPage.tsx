@@ -18,8 +18,8 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { colors } from '../../styles/theme';
 import { StoreQRCreateEntryModal } from '../../components/store/StoreQRCreateEntryModal';
-import { StoreLibrarySelectorModal } from '../../components/store/StoreLibrarySelectorModal';
-import type { LibrarySelectorResult } from '../../components/store/StoreLibrarySelectorModal';
+import { StoreAssetSelectorModal } from '../../components/store/StoreAssetSelectorModal';
+import type { AssetSelectorResult as LibrarySelectorResult } from '../../components/store/StoreAssetSelectorModal';
 import { QrPrintTemplateModal } from './QrPrintTemplateModal';
 import type { PrintTemplate } from './QrPrintTemplateModal';
 import {
@@ -638,15 +638,12 @@ export function StoreQRPage() {
         onClose={() => setShowEntryModal(false)}
       />
 
-      {/* Library Selector Modal */}
-      <StoreLibrarySelectorModal
+      {/* Asset Selector Modal */}
+      <StoreAssetSelectorModal
         open={showSelector}
         onSelect={handleLibrarySelect}
         onClose={() => setShowSelector(false)}
-        onCreateNew={() => {
-          setShowSelector(false);
-          navigate('/store/operation/library/new?from=qr-create');
-        }}
+        usageType="qr"
       />
 
       {/* Print Template Modal */}

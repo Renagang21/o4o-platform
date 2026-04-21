@@ -12,7 +12,7 @@ export { StoreLocalProduct } from './store-local-product.entity.js';
 export { StoreTablet } from './store-tablet.entity.js';
 export { StoreTabletDisplay } from './store-tablet-display.entity.js';
 export { TabletInterestRequest, InterestRequestStatus } from './tablet-interest-request.entity.js';
-export { StoreLibraryItem } from './store-library-item.entity.js';
+export { StoreExecutionAsset } from './store-execution-asset.entity.js';
 export { StoreQrCode } from './store-qr-code.entity.js';
 export { StoreQrScanEvent } from './store-qr-scan-event.entity.js';
 export { ProductMarketingAsset } from './product-marketing-asset.entity.js';

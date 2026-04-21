@@ -325,7 +325,7 @@ import {
   StoreTablet,
   StoreTabletDisplay,
   TabletInterestRequest,
-  StoreLibraryItem,
+  StoreExecutionAsset,
   StoreQrCode,
   StoreQrScanEvent,
   ProductMarketingAsset,
@@ -894,9 +894,9 @@ export const AppDataSource = new DataSource({
     // ============================================================================
     TabletInterestRequest,
     // ============================================================================
-    // STORE LIBRARY ENTITY (WO-O4O-STORE-LIBRARY-API-INTEGRATION-V1)
+    // STORE EXECUTION ASSETS ENTITY (WO-KPA-STORE-ASSET-STRUCTURE-REFACTOR-V1)
     // ============================================================================
-    StoreLibraryItem,
+    StoreExecutionAsset,
     // ============================================================================
     // STORE QR CODE ENTITY (WO-O4O-QR-LANDING-PAGE-V1)
     // ============================================================================

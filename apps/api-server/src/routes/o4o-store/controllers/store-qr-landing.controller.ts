@@ -77,7 +77,7 @@ export function createStoreQrLandingController(
            li.file_url AS "imageUrl",
            li.title AS "libraryItemTitle"
          FROM store_qr_codes qr
-         LEFT JOIN store_library_items li
+         LEFT JOIN store_execution_assets li
            ON li.id = qr.library_item_id AND li.is_active = true
          WHERE qr.slug = $1 AND qr.is_active = true
          LIMIT 1`,

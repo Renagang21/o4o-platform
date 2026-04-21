@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, usePa
 import { useEffect, useState } from 'react';
 import { Layout, DemoLayout } from './components';
 import { AuthProvider, OrganizationProvider } from './contexts';
-import { WorkBasketProvider } from './contexts/WorkBasketContext';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
 import { ServiceProvider } from './contexts/ServiceContext';
 import { useAuth } from './contexts/AuthContext';
@@ -84,7 +83,9 @@ import { MyDashboardPage, MyProfilePage, MySettingsPage, MyCertificatesPage, Per
 import { AdminRoutes } from './routes/AdminRoutes';
 
 // Operator Routes (서비스 운영자)
-import { OperatorRoutes, MemberResourceRoutes } from './routes/OperatorRoutes';
+import { OperatorRoutes } from './routes/OperatorRoutes';
+// Resources Hub (공동자료실 진입 허브 — WO-KPA-RESOURCE-SYSTEM-RESET-V1)
+import { ResourcesHubPage } from './pages/resources/ResourcesHubPage';
 
 
 // Intranet Routes (인트라넷)
@@ -109,7 +110,7 @@ import { PharmacyServicePage, ForumServicePage, LmsServicePage } from './pages/s
 import { PharmacyJoinPage } from './pages/join';
 
 // Pharmacy Management (WO-KPA-PHARMACY-MANAGEMENT-V1, WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1)
-import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyApprovalGatePage, HubContentLibraryPage, HubB2BCatalogPage, HubSignageLibraryPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage, StoreChannelsPage, StoreOrdersPage, StoreBillingPage, StoreSignagePage, StoreLibraryNewPage, StoreLibraryPage, StoreLibraryDetailPage, StoreLibraryEditPage, StoreQRPage, StorePopPage, MarketingAnalyticsPage, StoreHomePage, ProductMarketingPage, StoreLocalProductsPage, StoreTabletDisplaysPage } from './pages/pharmacy';
+import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyApprovalGatePage, HubContentLibraryPage, HubB2BCatalogPage, HubSignageLibraryPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage, StoreChannelsPage, StoreOrdersPage, StoreBillingPage, StoreSignagePage, StoreQRPage, StorePopPage, MarketingAnalyticsPage, StoreHomePage, ProductMarketingPage, StoreLocalProductsPage, StoreTabletDisplaysPage } from './pages/pharmacy';
 import { StoreOrderWorktablePage } from './pages/pharmacy/StoreOrderWorktablePage';
 import { SignagePlaybackPage } from './pages/pharmacy/SignagePlaybackPage';
 import { SignagePlayerSelectPage } from './pages/pharmacy/SignagePlayerSelectPage';
@@ -324,7 +325,6 @@ function App() {
       <BrowserRouter>
         {/* WO-KPA-CONTEXT-SWITCHER-AND-ORG-RESOLUTION-V1: 라우트 기반 서비스 컨텍스트 */}
         <ServiceProvider>
-        <WorkBasketProvider>
         <O4OToastProvider />
         {/* 전역 인증 모달 (WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1, WO-O4O-AUTH-MODAL-REGISTER-STANDARD-V1) */}
         <LoginModal />
@@ -509,8 +509,8 @@ function App() {
             <Route path="event-offers" element={<PharmacyOwnerOnlyGuard><KpaEventOfferPage /></PharmacyOwnerOnlyGuard>} />
             <Route path="content" element={<HubContentLibraryPage />} />
           </Route>
-          {/* 자료실 — 인증된 모든 회원 접근 (OperatorRoutes의 kpa:admin/kpa:operator 가드 우회) */}
-          <Route path="/operator/resources/*" element={<MemberResourceRoutes />} />
+          {/* 자료실 Hub — 공동자료실 진입점 (WO-KPA-RESOURCE-SYSTEM-RESET-V1) */}
+          <Route path="/resources" element={<Layout serviceName={SERVICE_NAME}><ResourcesHubPage /></Layout>} />
           {/* Operator Routes — WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: KpaOperatorLayout (standalone sidebar) */}
           <Route path="/operator/*" element={<OperatorRoutes />} />
           <Route path="/intranet/*" element={<Navigate to="/demo/intranet" replace />} />
@@ -634,12 +634,6 @@ function App() {
             {/* Pharmacy Info (WO-KPA-PHARMACY-HUB-NAVIGATION-RESTRUCTURE-V1) */}
             <Route path="info" element={<PharmacyInfoPage />} />
 
-            {/* Operation */}
-            <Route path="operation/library" element={<StoreLibraryPage />} />
-            <Route path="operation/library/new" element={<StoreLibraryNewPage />} />
-            <Route path="operation/library/:id" element={<StoreLibraryDetailPage />} />
-            <Route path="operation/library/:id/edit" element={<StoreLibraryEditPage />} />
-
             {/* Marketing */}
             <Route path="marketing/qr" element={<StoreQRPage />} />
             <Route path="marketing/pop" element={<StorePopPage />} />
@@ -668,8 +662,6 @@ function App() {
             {/* ── Legacy redirects (기존 URL 호환) ── */}
             <Route path="qr" element={<Navigate to="/store/marketing/qr" replace />} />
             <Route path="pop" element={<Navigate to="/store/marketing/pop" replace />} />
-            <Route path="library" element={<Navigate to="/store/operation/library" replace />} />
-            <Route path="library/new" element={<Navigate to="/store/operation/library/new" replace />} />
             <Route path="signage" element={<Navigate to="/store/marketing/signage/playlist" replace />} />
             <Route path="analytics" element={<Navigate to="/store/analytics/marketing" replace />} />
             <Route path="products" element={<Navigate to="/store/commerce/products" replace />} />
@@ -725,7 +717,6 @@ function App() {
           {/* 404 - 알 수 없는 경로 */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
-        </WorkBasketProvider>
         </ServiceProvider>
       </BrowserRouter>
       </OrganizationProvider>

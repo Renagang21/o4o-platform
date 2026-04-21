@@ -15,8 +15,8 @@ import { Megaphone, Plus, Trash2, ExternalLink, FileDown, QrCode } from 'lucide-
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { colors } from '../../styles/theme';
-import { StoreLibrarySelectorModal } from '../../components/store/StoreLibrarySelectorModal';
-import type { LibrarySelectorResult } from '../../components/store/StoreLibrarySelectorModal';
+import { StoreAssetSelectorModal } from '../../components/store/StoreAssetSelectorModal';
+import type { AssetSelectorResult as LibrarySelectorResult } from '../../components/store/StoreAssetSelectorModal';
 import { StoreQRCreateEntryModal } from '../../components/store/StoreQRCreateEntryModal';
 import { getStoreQrCodes } from '../../api/storeQr';
 import type { StoreQrCode } from '../../api/storeQr';
@@ -287,15 +287,12 @@ export function StorePopPage() {
         onClose={() => setShowEntryModal(false)}
       />
 
-      {/* Library Selector Modal */}
-      <StoreLibrarySelectorModal
+      {/* Asset Selector Modal */}
+      <StoreAssetSelectorModal
         open={showSelector}
         onSelect={handleSelect}
         onClose={() => setShowSelector(false)}
-        onCreateNew={() => {
-          setShowSelector(false);
-          navigate('/store/operation/library/new?from=pop-create');
-        }}
+        usageType="pop"
       />
     </div>
   );

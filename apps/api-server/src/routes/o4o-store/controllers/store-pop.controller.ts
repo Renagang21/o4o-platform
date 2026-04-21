@@ -14,7 +14,7 @@
 
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource, In } from 'typeorm';
-import { StoreLibraryItem } from '../../platform/entities/store-library-item.entity.js';
+import { StoreExecutionAsset } from '../../platform/entities/store-execution-asset.entity.js';
 import { StoreQrCode } from '../../platform/entities/store-qr-code.entity.js';
 import { NetureSupplierLibraryItem } from '../../../modules/neture/entities/NetureSupplierLibraryItem.entity.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
@@ -37,7 +37,7 @@ export function createStorePopController(
   requireAuth: AuthMiddleware,
 ): Router {
   const router = Router();
-  const libraryRepo = dataSource.getRepository(StoreLibraryItem);
+  const libraryRepo = dataSource.getRepository(StoreExecutionAsset);
   const qrRepo = dataSource.getRepository(StoreQrCode);
   const supplierLibraryRepo = dataSource.getRepository(NetureSupplierLibraryItem);
   const requirePharmacyOwner = createRequireStoreOwner(dataSource);
