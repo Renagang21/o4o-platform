@@ -7,7 +7,6 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { homeApi } from '../../../api/home';
 import type { HomeFeatured } from '../../../api/home';
 import { colors, spacing, typography } from '../../../styles/theme';
@@ -42,7 +41,7 @@ export function ImportantNotices({ prefetchedFeatured, loading: parentLoading }:
     <div>
       <div style={styles.header}>
         <h3 style={styles.title}>추천 콘텐츠</h3>
-        <Link to="/content" style={styles.moreLink}>추천 콘텐츠 보기 →</Link>
+        <a href="https://www.kpanews.co.kr" target="_blank" rel="noopener noreferrer" style={styles.moreLink}>추천 콘텐츠 보기 →</a>
       </div>
       {isLoading ? (
         <p style={styles.empty}>불러오는 중...</p>

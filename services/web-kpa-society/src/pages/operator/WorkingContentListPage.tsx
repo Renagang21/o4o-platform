@@ -67,7 +67,7 @@ export default function WorkingContentListPage() {
       <div>
         <h1 className="text-xl font-bold text-slate-800">내 콘텐츠</h1>
         <p className="text-sm text-slate-500 mt-1">
-          콘텐츠 허브에서 복사한 콘텐츠를 편집하고 매장에 발행할 수 있습니다.
+          운영 콘텐츠에서 복사한 콘텐츠를 편집하고 매장에 발행할 수 있습니다.
         </p>
       </div>
 
@@ -112,7 +112,7 @@ export default function WorkingContentListPage() {
               onClick={() => navigate('/operator/docs')}
               className="text-sm text-blue-500 hover:underline"
             >
-              콘텐츠 허브에서 복사하기
+              운영 콘텐츠에서 복사하기
             </button>
           )}
         </div>

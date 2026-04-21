@@ -57,14 +57,6 @@ function getUserDisplayName(user: any): string {
 const demoMenuItems: MenuItem[] = [
   { label: '홈', href: '/' },
   {
-    label: '공지/업무',
-    href: '/content',
-    children: [
-      { label: '공지사항', href: '/content' },
-      { label: '소식', href: '/content' },
-    ],
-  },
-  {
     label: '조직/운영',
     href: '/organization',
     children: [

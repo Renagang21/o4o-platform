@@ -7,7 +7,6 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { homeApi } from '../../api/home';
 import type { HomeNotice } from '../../api/home';
 import { colors, spacing, borderRadius, shadows } from '../../styles/theme';
@@ -39,7 +38,7 @@ export function NoticeSection({ prefetchedNotices, loading: parentLoading }: Pro
     <section style={styles.container}>
       <div style={styles.columnHeader}>
         <h2 style={styles.columnTitle}>공지사항</h2>
-        <Link to="/content" style={styles.moreLink}>전체 보기 →</Link>
+        <a href="https://www.kpanews.co.kr" target="_blank" rel="noopener noreferrer" style={styles.moreLink}>전체 보기 →</a>
       </div>
       <div style={styles.card}>
         <ItemList
@@ -78,12 +77,12 @@ function ItemList({ items, loading, showPinned, emptyText, emptyHint }: {
     <ul style={styles.list}>
       {items.map((item) => (
         <li key={item.id} style={styles.listItem}>
-          <Link to={`/content/${item.id}`} style={styles.postLink}>
+          <div style={styles.postLink}>
             {showPinned && item.isPinned && (
               <span style={styles.pinnedBadge}>고정</span>
             )}
             <span style={styles.postTitle}>{item.title}</span>
-          </Link>
+          </div>
           {item.summary && (
             <p style={styles.summary}>{item.summary}</p>
           )}

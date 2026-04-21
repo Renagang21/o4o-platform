@@ -63,15 +63,6 @@ const EducationIconSvg = () => (
   </svg>
 );
 
-const ContentIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-    <line x1="16" y1="2" x2="16" y2="6" />
-    <line x1="8" y1="2" x2="8" y2="6" />
-    <line x1="3" y1="10" x2="21" y2="10" />
-  </svg>
-);
-
 const SignageIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
@@ -140,7 +131,6 @@ export function CommunityHomePage() {
         id: n.id,
         title: n.title,
         date: n.publishedAt || n.createdAt,
-        href: `/content/${n.id}`,
         isPinned: n.isPinned,
       }));
     }
@@ -149,7 +139,6 @@ export function CommunityHomePage() {
         id: n.id,
         title: n.title,
         date: n.publishedAt || n.createdAt,
-        href: `/content/${n.id}`,
         isPinned: n.isPinned,
       }));
     }
@@ -194,7 +183,6 @@ export function CommunityHomePage() {
           ctas={[
             { label: '포럼 참여', href: '/forum', icon: <ForumIcon /> },
             { label: '강의 수강', href: '/lms', icon: <EducationIconSvg /> },
-            { label: '콘텐츠 허브', href: '/content', icon: <ContentIcon /> },
             { label: '자료실', href: '/resources', icon: <ResourceLibraryIcon /> },
           ]}
         />
@@ -211,7 +199,7 @@ export function CommunityHomePage() {
           onTabChange={(key) => setNewsTab(key as 'notices' | 'latest' | 'kpanews')}
           items={newsItems}
           loading={loading}
-          viewAllHref="/content"
+          viewAllHref="https://www.kpanews.co.kr"
           externalCta={newsTab === 'kpanews' ? {
             icon: <NewspaperIcon />,
             message: '약사공론에서 업계 소식을 확인하세요',
@@ -233,7 +221,6 @@ export function CommunityHomePage() {
           cards={[
             { title: '약사 포럼', description: '동료 약사와 질문·토론으로 전문성을 높이세요', href: '/forum', icon: <ForumIcon /> },
             { title: '교육 / 강의', description: '보수교육·세미나를 온라인으로 수강하세요', href: '/lms', icon: <EducationIconSvg /> },
-            { title: '콘텐츠 허브', description: '공지·뉴스·이벤트를 한눈에 확인하세요', href: '/content', icon: <ContentIcon /> },
             { title: '디지털 사이니지', description: '약국 디지털 미디어를 관리하세요', href: '/signage', icon: <SignageIcon /> },
             { title: '자료실', description: '자료를 저장하고 AI 작업에 활용하세요', href: '/resources', icon: <ResourceLibraryIcon /> },
           ]}

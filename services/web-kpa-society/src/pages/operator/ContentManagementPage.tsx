@@ -90,7 +90,7 @@ const statusConfig: Record<ContentStatus, { label: string; color: string; bg: st
 
 const typeConfig: Record<ContentType, { label: string; desc: string }> = {
   notice: { label: '공지', desc: '운영 안내, 필독 사항, 공식 알림 — 홈 공지 영역에 표시' },
-  news: { label: '뉴스', desc: '소식, 동향, 일반 안내 — 콘텐츠 허브에 표시' },
+  news: { label: '뉴스', desc: '소식, 동향, 일반 안내 — 공지/뉴스에 표시' },
 };
 
 function formatDate(dateStr: string | null): string {
@@ -857,7 +857,7 @@ function ContentEditor({
             <p className="font-medium text-slate-600">노출 위치 안내</p>
             {status === 'published' ? (
               <>
-                <p>- 콘텐츠 허브 ({typeConfig[type].label} 탭)에 노출됩니다.</p>
+                <p>- 홈 공지/뉴스 영역 ({typeConfig[type].label})에 노출됩니다.</p>
                 {type === 'notice' && <p>- 홈 공지 영역에 표시될 수 있습니다.</p>}
                 {isOperatorPicked && <p>- 홈 추천 콘텐츠 영역에 우선 노출됩니다.</p>}
               </>

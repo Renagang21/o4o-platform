@@ -176,7 +176,7 @@ export default function PlaylistDetailPage() {
     return (
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6">
         <Link to="/signage" className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700">
-          <ArrowLeft className="h-4 w-4" /> 콘텐츠 허브로 돌아가기
+          <ArrowLeft className="h-4 w-4" /> 사이니지로 돌아가기
         </Link>
         <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center text-red-600">
           {error || '플레이리스트를 찾을 수 없습니다.'}
@@ -192,7 +192,7 @@ export default function PlaylistDetailPage() {
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6">
       {/* Back link */}
       <Link to="/signage" className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700">
-        <ArrowLeft className="h-4 w-4" /> 콘텐츠 허브
+        <ArrowLeft className="h-4 w-4" /> 사이니지
       </Link>
 
       {/* Success Message */}

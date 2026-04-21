@@ -10,7 +10,6 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import type { HomeNotice } from '../../api/home';
 import type { Notice } from '../../types';
 import { colors, spacing, borderRadius, shadows } from '../../styles/theme';
@@ -102,10 +101,10 @@ function NoticesPanel({ notices, loading }: { notices: HomeNotice[]; loading: bo
       <ul style={styles.list}>
         {notices.map((item) => (
           <li key={item.id} style={styles.listItem} className="tabbed-news-item">
-            <Link to={`/content/${item.id}`} style={styles.postLink}>
+            <div style={styles.postLink}>
               {item.isPinned && <span style={styles.pinnedBadge}>고정</span>}
               <span style={styles.postTitle}>{item.title}</span>
-            </Link>
+            </div>
             <div style={styles.meta}>
               <span>{new Date(item.publishedAt || item.createdAt).toLocaleDateString()}</span>
             </div>
@@ -113,7 +112,7 @@ function NoticesPanel({ notices, loading }: { notices: HomeNotice[]; loading: bo
         ))}
       </ul>
       <div style={styles.viewAllRow}>
-        <Link to="/content" style={styles.viewAllLink}>전체 보기 →</Link>
+        <a href="https://www.kpanews.co.kr" target="_blank" rel="noopener noreferrer" style={styles.viewAllLink}>전체 보기 →</a>
       </div>
     </>
   );
@@ -137,9 +136,9 @@ function LatestNewsPanel({ news, loading }: { news: Notice[]; loading: boolean }
       <ul style={styles.list}>
         {news.map((item) => (
           <li key={item.id} style={styles.listItem} className="tabbed-news-item">
-            <Link to={`/content/${item.id}`} style={styles.postLink}>
+            <div style={styles.postLink}>
               <span style={styles.postTitle}>{item.title}</span>
-            </Link>
+            </div>
             <div style={styles.meta}>
               <span>{new Date(item.publishedAt || item.createdAt).toLocaleDateString()}</span>
             </div>
@@ -147,7 +146,7 @@ function LatestNewsPanel({ news, loading }: { news: Notice[]; loading: boolean }
         ))}
       </ul>
       <div style={styles.viewAllRow}>
-        <Link to="/content?sort=latest" style={styles.viewAllLink}>전체 보기 →</Link>
+        <a href="https://www.kpanews.co.kr" target="_blank" rel="noopener noreferrer" style={styles.viewAllLink}>전체 보기 →</a>
       </div>
     </>
   );

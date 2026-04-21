@@ -392,7 +392,7 @@ export function MyContentPage() {
           {suggestionShown && (
             <div style={styles.suggestionRow}>
               <Link
-                to="/content"
+                to="/resources"
                 style={styles.suggestionLink}
                 onClick={() => {
                   setSuggestionShown(false);
@@ -464,12 +464,12 @@ export function MyContentPage() {
           <EmptyState
             icon="📦"
             title={assets.length === 0 ? '아직 가져온 콘텐츠가 없습니다' : '해당 조건에 맞는 콘텐츠가 없습니다'}
-            description={assets.length === 0 ? '콘텐츠 허브에서 콘텐츠를 가져오세요.' : '다른 필터를 선택해보세요.'}
+            description={assets.length === 0 ? '자료실에서 콘텐츠를 관리하세요.' : '다른 필터를 선택해보세요.'}
           />
           {assets.length === 0 && (
             <div style={{ textAlign: 'center', marginTop: '-16px', paddingBottom: '24px' }}>
-              <Link to="/content" style={styles.hubLink}>
-                콘텐츠 허브로 이동 →
+              <Link to="/resources" style={styles.hubLink}>
+                자료실로 이동 →
               </Link>
             </div>
           )}

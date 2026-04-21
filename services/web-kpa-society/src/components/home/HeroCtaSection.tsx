@@ -4,7 +4,7 @@
  * WO-KPA-MAIN-HOME-RESTRUCTURE-V1
  *
  * 로그인: "{name}님, 환영합니다" / 비로그인: "약사 커뮤니티에 오신 것을 환영합니다"
- * CTA 3개: 포럼 참여, 강의 수강, 콘텐츠 허브
+ * CTA 2개: 포럼 참여, 강의 수강
  */
 
 import { useEffect } from 'react';
@@ -33,19 +33,9 @@ const EducationIconSmall = () => (
   </svg>
 );
 
-const ContentIconSmall = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-    <line x1="16" y1="2" x2="16" y2="6" />
-    <line x1="8" y1="2" x2="8" y2="6" />
-    <line x1="3" y1="10" x2="21" y2="10" />
-  </svg>
-);
-
 const ctaItems = [
   { label: '포럼 참여', href: '/forum', icon: <ForumIconSmall /> },
   { label: '강의 수강', href: '/lms', icon: <EducationIconSmall /> },
-  { label: '콘텐츠 허브', href: '/content', icon: <ContentIconSmall /> },
 ];
 
 export function HeroCtaSection() {

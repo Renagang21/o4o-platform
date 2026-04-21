@@ -4,7 +4,7 @@
  * WO-KPA-SOCIETY-COMMUNITY-CARD-TONE-DOWN-V1
  * WO-KPA-A-HOME-HUB-ENHANCEMENT-V1: 깨진 링크 수정, 반응형 CSS 추가
  *
- * 2x2 ServiceCard 그리드: 포럼, 교육, 콘텐츠, 사이니지
+ * 2x2 ServiceCard 그리드: 포럼, 교육, 사이니지, 자료실
  */
 
 import { useEffect } from 'react';
@@ -49,15 +49,6 @@ const EducationIcon = () => (
   </svg>
 );
 
-const ContentIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-    <line x1="16" y1="2" x2="16" y2="6" />
-    <line x1="8" y1="2" x2="8" y2="6" />
-    <line x1="3" y1="10" x2="21" y2="10" />
-  </svg>
-);
-
 const SignageIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
@@ -87,12 +78,6 @@ const services: ServiceCardData[] = [
     description: '보수교육·세미나를 온라인으로 수강하세요',
     href: '/lms',
     icon: <EducationIcon />,
-  },
-  {
-    title: '콘텐츠 허브',
-    description: '공지·뉴스·이벤트를 한눈에 확인하세요',
-    href: '/content',
-    icon: <ContentIcon />,
   },
   {
     title: '디지털 사이니지',

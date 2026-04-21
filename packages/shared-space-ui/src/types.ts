@@ -7,7 +7,7 @@ export interface NoticeItem {
   id: string;
   title: string;
   date: string;
-  href: string;
+  href?: string;
   isPinned?: boolean;
   category?: string;
 }

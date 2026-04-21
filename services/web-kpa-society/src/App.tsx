@@ -234,10 +234,9 @@ function RegisterRedirect() {
  * /select-function URL 접근 시 대시보드로 리다이렉트 + 모달 표시
  * (페이지 → 모달 전환 후 하위호환용)
  */
-/** Legacy /news/:id → /content/:id redirect */
+/** Legacy /news/:id → / redirect (WO-KPA-CONTENT-HUB-REMOVAL-V1) */
 function NewsIdRedirect() {
-  const { id } = useParams();
-  return <Navigate to={`/content/${id}`} replace />;
+  return <Navigate to="/" replace />;
 }
 
 /**
@@ -359,8 +358,8 @@ function App() {
 
           {/* WO-KPA-A-PUBLIC-HOME-INTEGRATION-AND-MENU-SIMPLIFICATION-V1: Home 통합 */}
           <Route path="/community" element={<Navigate to="/" replace />} />
-          {/* /library/content → /content 흡수 (WO-KPA-SOCIETY-CONTENT-VS-LIBRARY-ROLE-REALIGNMENT-V1) */}
-          <Route path="/library/content" element={<Navigate to="/content" replace />} />
+          {/* /library/content → / 리다이렉트 (WO-KPA-CONTENT-HUB-REMOVAL-V1: /content 제거) */}
+          <Route path="/library/content" element={<Navigate to="/" replace />} />
 
           {/* ========================================
            * 커뮤니티 포럼 (메인 서비스)
@@ -530,15 +529,14 @@ function App() {
           {/* My Content (내 콘텐츠 관리) - WO-APP-DATA-HUB-TO-DASHBOARD-PHASE3-V1 */}
           <Route path="/my-content" element={<Layout serviceName={SERVICE_NAME}><MyContentPage /></Layout>} />
 
-          {/* Content (콘텐츠) — 내부 CMS 콘텐츠 */}
-          <Route path="/content" element={<Layout serviceName={SERVICE_NAME}><NewsListPage /></Layout>} />
-          <Route path="/content/notice" element={<Layout serviceName={SERVICE_NAME}><NewsListPage /></Layout>} />
-          <Route path="/content/news" element={<Layout serviceName={SERVICE_NAME}><NewsListPage /></Layout>} />
-          <Route path="/content/:id" element={<Layout serviceName={SERVICE_NAME}><NewsDetailPage /></Layout>} />
+          {/* WO-KPA-CONTENT-HUB-REMOVAL-V1: /content 페이지 제거, 레거시 URL은 홈으로 리다이렉트 */}
+          <Route path="/content" element={<Navigate to="/" replace />} />
+          <Route path="/content/notice" element={<Navigate to="/" replace />} />
+          <Route path="/content/news" element={<Navigate to="/" replace />} />
 
-          {/* Legacy redirect: /news → /content */}
-          <Route path="/news" element={<Navigate to="/content" replace />} />
-          <Route path="/news/notice" element={<Navigate to="/content/notice" replace />} />
+          {/* Legacy redirect: /news → / */}
+          <Route path="/news" element={<Navigate to="/" replace />} />
+          <Route path="/news/notice" element={<Navigate to="/" replace />} />
           <Route path="/news/:id" element={<NewsIdRedirect />} />
 
           {/* Course Hub & Intro (Public-facing) - WO-CONTENT-COURSE-HUB/INTRO */}

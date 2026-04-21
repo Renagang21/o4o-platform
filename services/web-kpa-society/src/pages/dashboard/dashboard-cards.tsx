@@ -47,7 +47,7 @@ function MemberStatusCard({ user }: CardProps) {
 // ─── 2. 커뮤니티 바로가기 ─────────────────────────────
 const COMMUNITY_SHORTCUTS = [
   { label: '포럼', icon: '💬', href: '/forum' },
-  { label: '공지사항', icon: '📢', href: '/content' },
+  { label: '공지사항', icon: '📢', href: '/' },
   { label: '교육/연수', icon: '📚', href: '/lms' },
 ];
 

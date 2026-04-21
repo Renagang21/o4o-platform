@@ -99,13 +99,9 @@ export function NewsNoticesSection({
         ) : (
           <>
             <ul style={styles.list}>
-              {items.map((item, idx) => (
-                <li key={item.id} style={{ borderBottom: idx < items.length - 1 ? '1px solid #f1f5f9' : 'none' }}>
-                  <Link
-                    to={item.href}
-                    style={styles.listRow}
-                    className="ss-news-item"
-                  >
+              {items.map((item, idx) => {
+                const inner = (
+                  <>
                     {item.isPinned && (
                       <span style={{ ...styles.badge, backgroundColor: accentBg, color: accentColor }}>
                         공지
@@ -118,9 +114,22 @@ export function NewsNoticesSection({
                     <span style={styles.listDate}>
                       {new Date(item.date).toLocaleDateString('ko-KR')}
                     </span>
-                  </Link>
-                </li>
-              ))}
+                  </>
+                );
+                return (
+                  <li key={item.id} style={{ borderBottom: idx < items.length - 1 ? '1px solid #f1f5f9' : 'none' }}>
+                    {item.href ? (
+                      <Link to={item.href} style={styles.listRow} className="ss-news-item">
+                        {inner}
+                      </Link>
+                    ) : (
+                      <div style={styles.listRow} className="ss-news-item">
+                        {inner}
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
             {viewAllHref && (
               <div style={styles.footerRow}>

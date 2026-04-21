@@ -167,19 +167,31 @@ export function GlobalHeader({
 
           {/* ── PrimaryNav (desktop) ── */}
           <nav className="hidden md:flex items-center gap-1">
-            {publicNav.map((item) => (
-              <Link
-                key={item.href}
-                to={item.href}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors no-underline ${
-                  isActive(item.href, location.pathname)
-                    ? 'text-slate-900 bg-slate-100'
-                    : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
-                }`}
-              >
-                {item.label}
-              </Link>
-            ))}
+            {publicNav.map((item) =>
+              item.href.startsWith('http') ? (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 rounded-lg text-sm font-medium transition-colors no-underline text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+                >
+                  {item.label}
+                </a>
+              ) : (
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors no-underline ${
+                    isActive(item.href, location.pathname)
+                      ? 'text-slate-900 bg-slate-100'
+                      : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              )
+            )}
             {hasContextualNav && (
               <div className="w-px h-5 bg-slate-200 mx-1" aria-hidden="true" />
             )}
@@ -314,19 +326,31 @@ export function GlobalHeader({
         {mobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-slate-200">
             <nav className="flex flex-col gap-1">
-              {allNav.map((item) => (
-                <Link
-                  key={item.href}
-                  to={item.href}
-                  className={`px-4 py-3 rounded-xl text-sm font-medium no-underline transition-colors ${
-                    isActive(item.href, location.pathname)
-                      ? 'text-slate-900 bg-slate-100'
-                      : 'text-slate-500 hover:bg-slate-50'
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              ))}
+              {allNav.map((item) =>
+                item.href.startsWith('http') ? (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-3 rounded-xl text-sm font-medium no-underline transition-colors text-slate-500 hover:bg-slate-50"
+                  >
+                    {item.label}
+                  </a>
+                ) : (
+                  <Link
+                    key={item.href}
+                    to={item.href}
+                    className={`px-4 py-3 rounded-xl text-sm font-medium no-underline transition-colors ${
+                      isActive(item.href, location.pathname)
+                        ? 'text-slate-900 bg-slate-100'
+                        : 'text-slate-500 hover:bg-slate-50'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                )
+              )}
             </nav>
             <div className="mt-4 pt-4 border-t border-slate-200">
               {isAuthenticated && user ? (
