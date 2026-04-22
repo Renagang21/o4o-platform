@@ -12,6 +12,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, MessageSquare, Eye, Heart, Calendar, User, Loader2, AlertCircle } from 'lucide-react';
 import { apiClient } from '@/services/api';
+import { ContentRenderer } from '@o4o/content-editor';
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -152,9 +153,10 @@ export default function ForumPostDetailPage() {
         {/* 본문 */}
         <div className="px-6 py-6 min-h-[120px]">
           {bodyText ? (
-            <div className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap break-words">
-              {bodyText}
-            </div>
+            <ContentRenderer
+              html={bodyText}
+              className="text-sm text-slate-700 leading-relaxed"
+            />
           ) : (
             <p className="text-sm text-slate-400 italic">본문 내용이 없습니다.</p>
           )}

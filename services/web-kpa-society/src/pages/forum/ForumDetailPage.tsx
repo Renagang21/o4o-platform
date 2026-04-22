@@ -5,7 +5,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
-import { ForumBlockRenderer } from '@o4o/forum-core/public-ui';
+import { blocksToHtml } from '@o4o/forum-core/utils';
 import { PageHeader, LoadingSpinner, Card } from '../../components/common';
 import { forumApi } from '../../api';
 import { forumMembershipApi } from '../../api/forum';
@@ -266,11 +266,9 @@ export function ForumDetailPage() {
         </div>
 
         <div style={styles.content}>
-          {Array.isArray(post.content) ? (
-            <ForumBlockRenderer content={post.content} />
-          ) : (
-            <ContentRenderer html={post.content} />
-          )}
+          <ContentRenderer
+            html={Array.isArray(post.content) ? blocksToHtml(post.content) : post.content}
+          />
         </div>
 
         <div style={styles.actions}>

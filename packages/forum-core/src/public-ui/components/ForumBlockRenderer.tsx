@@ -7,6 +7,7 @@
  */
 
 import React from 'react';
+import DOMPurify from 'dompurify';
 import type { Block } from '@o4o/types';
 
 export interface ForumBlockRendererProps {
@@ -22,6 +23,8 @@ export interface ForumBlockRendererProps {
 
 /**
  * Simple paragraph block renderer
+ * Uses dangerouslySetInnerHTML to correctly render inline HTML (e.g. <br>, <strong>)
+ * that may be stored in block content from TipTap htmlToBlocks conversion.
  */
 const ParagraphBlock: React.FC<{ block: Block }> = ({ block }) => {
   const content = typeof block.content === 'string'
@@ -29,9 +32,10 @@ const ParagraphBlock: React.FC<{ block: Block }> = ({ block }) => {
     : block.content?.text || '';
 
   return (
-    <p className="forum-block-paragraph mb-4 text-gray-700 leading-relaxed">
-      {content}
-    </p>
+    <p
+      className="forum-block-paragraph mb-4 text-gray-700 leading-relaxed"
+      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content) }}
+    />
   );
 };
 
@@ -57,9 +61,10 @@ const HeadingBlock: React.FC<{ block: Block }> = ({ block }) => {
   };
 
   return (
-    <Tag className={`forum-block-heading mb-3 ${sizeClasses[level] || sizeClasses[2]}`}>
-      {content}
-    </Tag>
+    <Tag
+      className={`forum-block-heading mb-3 ${sizeClasses[level] || sizeClasses[2]}`}
+      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content) }}
+    />
   );
 };
 
@@ -101,7 +106,7 @@ const QuoteBlock: React.FC<{ block: Block }> = ({ block }) => {
 
   return (
     <blockquote className="forum-block-quote border-l-4 border-blue-500 pl-4 py-2 mb-4 italic text-gray-600">
-      <p>{content}</p>
+      <p dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content) }} />
       {citation && (
         <cite className="block mt-2 text-sm text-gray-500 not-italic">
           — {citation}

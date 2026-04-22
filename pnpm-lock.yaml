@@ -2128,6 +2128,9 @@ importers:
       class-validator:
         specifier: ^0.14.0
         version: 0.14.2
+      dompurify:
+        specifier: ^3.0.6
+        version: 3.3.0
       react:
         specifier: 19.2.0
         version: 19.2.0
@@ -2138,6 +2141,9 @@ importers:
         specifier: ^0.3.0
         version: 0.3.27(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.8.2)(pg@8.16.3)(redis@5.10.0)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.25)(typescript@5.9.3))
     devDependencies:
+      '@types/dompurify':
+        specifier: ^3.0.5
+        version: 3.2.0
       '@types/express':
         specifier: 4.17.23
         version: 4.17.23
@@ -3341,6 +3347,9 @@ importers:
       '@o4o/auth-utils':
         specifier: workspace:*
         version: link:../../packages/auth-utils
+      '@o4o/content-editor':
+        specifier: workspace:*
+        version: link:../../packages/content-editor
       '@o4o/error-handling':
         specifier: workspace:*
         version: link:../../packages/error-handling
@@ -15378,6 +15387,7 @@ snapshots:
       '@tanstack/react-query': 5.90.11(react@19.2.0)
       class-transformer: 0.5.1
       class-validator: 0.14.2
+      dompurify: 3.3.0
       react: 19.2.0
       react-router-dom: 7.9.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       typeorm: 0.3.27(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.8.2)(pg@8.16.3)(redis@5.10.0)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@24.10.1)(typescript@5.4.5))

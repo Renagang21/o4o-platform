@@ -4,14 +4,28 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { ContentRenderer } from '@o4o/content-editor';
 import {
   fetchForumPostById,
   fetchForumComments,
-  extractTextContent,
   getAuthorName,
   type ForumPost,
   type ForumComment,
 } from '../../services/forumApi';
+
+// Convert Block[] to HTML for rendering (WO-FORUM-CONTENT-RENDER-UNIFICATION-V1)
+function blocksToHtmlInline(blocks: any[]): string {
+  return blocks.map((block: any) => {
+    const content = typeof block.content === 'string' ? block.content : block.content?.text || '';
+    switch (block.type) {
+      case 'paragraph': return `<p>${content}</p>`;
+      case 'heading': return `<h${block.attributes?.level || 2}>${content}</h${block.attributes?.level || 2}>`;
+      case 'quote':
+      case 'blockquote': return `<blockquote><p>${content}</p></blockquote>`;
+      default: return content ? `<p>${content}</p>` : '';
+    }
+  }).join('');
+}
 
 function formatDate(dateString: string): string {
   const date = new Date(dateString);
@@ -87,7 +101,10 @@ export default function PostDetailPage() {
     );
   }
 
-  const content = extractTextContent(post.content);
+  // Resolve content to HTML string (WO-FORUM-CONTENT-RENDER-UNIFICATION-V1)
+  const contentHtml = Array.isArray(post.content)
+    ? blocksToHtmlInline(post.content)
+    : (post.content || '');
 
   return (
     <div style={styles.container}>
@@ -108,11 +125,7 @@ export default function PostDetailPage() {
         </header>
 
         <div style={styles.content}>
-          {content.split('\n').map((paragraph, index) => (
-            <p key={index} style={styles.paragraph}>
-              {paragraph || <br />}
-            </p>
-          ))}
+          <ContentRenderer html={contentHtml} />
         </div>
       </article>
 
@@ -133,9 +146,12 @@ export default function PostDetailPage() {
                     {formatDate(comment.createdAt)}
                   </span>
                 </div>
-                <p style={styles.commentContent}>
-                  {extractTextContent(comment.content)}
-                </p>
+                <ContentRenderer
+                  html={Array.isArray(comment.content)
+                    ? blocksToHtmlInline(comment.content)
+                    : (comment.content || '')}
+                  style={styles.commentContent}
+                />
               </div>
             ))}
           </div>
