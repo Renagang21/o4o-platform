@@ -64,6 +64,7 @@ export interface ContentListParams {
   sub_type?: string;
   sort?: 'latest' | 'popular' | 'views';
   tag?: string;
+  my?: 'true';
 }
 
 export interface ContentCreatePayload {

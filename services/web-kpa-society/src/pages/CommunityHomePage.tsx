@@ -8,19 +8,14 @@
  * WO-MARKET-TRIAL-COMMUNITY-HOME-BLOCK-IMPLEMENT-V1: 마켓트라이얼 소식 블록 추가
  * WO-KPA-MAIN-HOME-RESTRUCTURE-V1: 참여 유도형 커뮤니티 허브 전환
  * WO-SHARED-SPACE-COMPONENT-SPLIT-V1: 공통 컴포넌트 적용
- * WO-KPA-HOME-STRUCTURE-REFINEMENT-V1: 홈 구조 정리 (10블록)
+ * WO-KPA-HOME-STRUCTURE-REFINEMENT-V1: 홈 구조 정리 (4블록 허브)
  *
- * 섹션 구조 (10블록):
+ * 섹션 구조 (4블록):
  * ├─ HeroBannerSection        — 동적 광고 캐러셀 (KPA 고유)
- * ├─ HeroSummarySection       — 환영 메시지 + CTA 3개 (shared, subtitle 제거)
- * ├─ 공��� / 약사공론 뉴스     — 2-column (좌: 공지, 우: placeholder)
- * ├─ ActivitySection          — 최근 활동 포럼 글 (shared)
+ * ├─ HeroSummarySection       — 환영 메시지 + CTA 3개 (shared)
+ * ├─ 공지 / 약사공론 뉴스     — 2-column (좌: 공지, 우: placeholder)
  * ├─ AppEntrySection          — 서비스 바로가기 카드 5개 (shared)
- * ├─ CtaGuidanceSection       — Market Trial CTA (shared)
- * ├─ AdSection                — 페이지 광고 (KPA 고유)
- * ├─ SponsorBar               — 스폰서 로고 (KPA 고유)
- * ├─ FooterLinksSection       — 하단 바로가기 링크 (KPA 고유)
- * └─ UtilitySection           — 유틸리티 (KPA 고유)
+ * └─ CtaGuidanceSection       — Market Trial CTA (shared)
  */
 
 import { useState, useEffect } from 'react';
@@ -175,15 +170,7 @@ export function CommunityHomePage() {
           </div>
         </section>
 
-        {/* 4. 최근 활동 (shared) */}
-        <SharedActivitySection
-          featuredPosts={[]}
-          recentPosts={recentPosts}
-          loading={loading}
-          viewAllHref="/forum"
-        />
-
-        {/* 5. 서비스 바로가기 (shared) */}
+        {/* 4. 서비스 바로가기 (shared) */}
         <AppEntrySection
           cards={[
             { title: '포럼', description: '동료 약사와 질문·토론으로 전문성을 높이세요', href: '/forum', icon: <ForumIcon /> },
@@ -194,7 +181,7 @@ export function CommunityHomePage() {
           ]}
         />
 
-        {/* 6. Market Trial CTA (shared) */}
+        {/* 5. Market Trial CTA (shared) */}
         <CtaGuidanceSection
           title="Market Trial"
           description="서비스 참여자와 함께 제품을 다듬고, 좋은 조건의 유통 환경을 만들어가는 참여형 프로그램"
@@ -203,18 +190,6 @@ export function CommunityHomePage() {
           icon={<span>🧪</span>}
           external
         />
-
-        {/* 7. 페이지 광고 (KPA 고유) */}
-        <AdSection ads={data?.pageAds ?? []} />
-
-        {/* 8. 스폰서 (KPA 고유) */}
-        <SponsorBar sponsors={data?.sponsors ?? []} />
-
-        {/* 9. 하단 바로가기 링크 (KPA 고유) */}
-        <FooterLinksSection quickLinks={data?.quickLinks ?? []} />
-
-        {/* 10. 유틸리티 (KPA 고유) */}
-        <UtilitySection />
       </div>
     </div>
   );

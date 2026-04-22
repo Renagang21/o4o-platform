@@ -972,7 +972,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     // GET /contents — 목록 (optionalAuth: 공개 접근)
     // WO-KPA-CONTENT-HUB-FOUNDATION-V1: content_type, sub_type, sort 필터 추가
     contentRouter.get('/', optionalAuth as any, asyncHandler(async (req: Request, res: Response) => {
-      const { page = '1', limit = '20', category, search, status: statusFilter, tag, content_type: contentTypeFilter, sub_type: subTypeFilter, sort = 'latest' } = req.query;
+      const { page = '1', limit = '20', category, search, status: statusFilter, tag, content_type: contentTypeFilter, sub_type: subTypeFilter, sort = 'latest', my } = req.query;
       const pageNum = Math.max(1, Number(page));
       const limitNum = Math.min(100, Math.max(1, Number(limit)));
       const offset = (pageNum - 1) * limitNum;
@@ -982,10 +982,14 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       const params: any[] = [];
       let idx = 1;
 
-      // 비로그인 시 published만, 로그인 시 본인 draft/private도 포함
-      if (!userId) {
+      // my=true: 내 콘텐츠만 (로그인 필수)
+      if (my === 'true' && userId) {
+        conditions.push(`c.created_by = $${idx++}`);
+        params.push(userId);
+      } else if (!userId) {
         conditions.push(`c.status = 'published'`);
       } else if (!statusFilter) {
+        // 비로그인 시 published만, 로그인 시 본인 draft/private도 포함
         conditions.push(`(c.status = 'published' OR c.created_by = $${idx++})`);
         params.push(userId);
       }
