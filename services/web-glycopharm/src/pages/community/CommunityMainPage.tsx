@@ -15,7 +15,7 @@
  *  2. News / Notices → NewsNoticesSection (shared)
  *  3. Activity → ActivitySection (shared)
  *  4. App Entry → AppEntrySection (shared)
- *  5. Content Highlight (서비스 고유 — Tailwind)
+ *  5. Content Highlight → ContentHighlightSection (shared)
  *  6. Signage Preview → SignagePreviewSection (shared)
  *  7. CTA / Guidance → CtaGuidanceSection (shared)
  *  8. Utility (서비스 고유 — Tailwind)
@@ -23,7 +23,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import {
-  FileText,
   Play,
   MessageSquare,
   BookOpen,
@@ -269,10 +268,9 @@ export default function CommunityMainPage() {
           title="서비스 바로가기"
           subtitle="각 서비스로 바로 이동하세요"
           cards={[
-            { title: '약사 포럼', description: '동료 약사와 운영 노하우를 공유하세요', href: '/forum', icon: <MessageSquare size={20} /> },
-            { title: '콘텐츠 허브', description: '매장 운영에 유용한 콘텐츠를 확인하세요', href: '/library/content', icon: <FileText size={20} /> },
+            { title: '약사 포럼', description: '동료 약사와 질문·토론으로 전문성을 높이세요', href: '/forum', icon: <MessageSquare size={20} /> },
+            { title: '교육 / 강의', description: '전문 강좌를 온라인으로 수강하세요', href: '/lms', icon: <BookOpen size={20} /> },
             { title: '디지털 사이니지', description: '약국 디지털 미디어를 관리하세요', href: '/signage', icon: <Play size={20} /> },
-            { title: '강좌', description: '전문 강좌를 온라인으로 수강하세요', href: '/lms', icon: <BookOpen size={20} /> },
           ]}
         />
 
