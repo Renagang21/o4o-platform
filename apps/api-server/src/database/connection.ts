@@ -233,6 +233,11 @@ import {
   NetureContactMessage,
   OfferServiceApproval,
 } from '../modules/neture/entities/index.js';
+import {
+  NetureOrder,
+  NeturePartner,
+} from '../routes/neture/entities/index.js'; // WO-TYPEORM-ENTITY-REGISTRATION-FIX-V2
+import { KpaSteward } from '../routes/kpa/entities/kpa-steward.entity.js'; // WO-TYPEORM-ENTITY-REGISTRATION-FIX-V2
 
 // ============================================================================
 // CATALOG IMPORT ENTITIES (WO-O4O-CATALOG-IMPORT-APP-IMPLEMENTATION-V1)
@@ -732,6 +737,10 @@ export const AppDataSource = new DataSource({
     NetureSettlementOrder,
     NetureContactMessage,
     OfferServiceApproval,
+    // WO-TYPEORM-ENTITY-REGISTRATION-FIX-V2
+    NetureOrder,
+    NeturePartner,
+    KpaSteward,
     // ============================================================================
     // CATALOG IMPORT ENTITIES (WO-O4O-CATALOG-IMPORT-APP-IMPLEMENTATION-V1)
     // ============================================================================

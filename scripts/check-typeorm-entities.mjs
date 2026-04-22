@@ -91,16 +91,9 @@ const ALLOWLIST = new Set([
   // modules/partner — 연결 준비 중
   'PartnerApplication',
 
-  // ── 신규 발견 (후속 WO 처리 예정: WO-TYPEORM-ENTITY-REGISTRATION-FIX-V2) ─
-  // 아래 항목은 실사용 코드에서 getRepository() 호출 확인됨
-  // → P0 수준이나 이번 WO 범위 밖. 다음 WO에서 즉시 처리 예정.
-  // KpaSteward: routes/kpa/controllers/steward.controller.ts:36 getRepository 호출
-  'KpaSteward',
-  // NetureOrder: controllers/admin/adminDashboardController.ts:57 getRepository 호출
-  'NetureOrder',
-  // NeturePartner: adminDashboardController.ts 참조
-  'NeturePartner',
-  // NetureOrderItem, NetureProduct, NetureProductLog: 연관 엔티티 (동반 조사 필요)
+  // ── 연관 엔티티 (동반 조사 필요) ────────────────────────────
+  // NetureOrderItem, NetureProduct, NetureProductLog: NetureOrder/NeturePartner와 연관
+  // 실사용 코드 직접 참조 미확인 — IR-TYPEORM-V2에서 별도 감사 예정
   'NetureOrderItem',
   'NetureProduct',
   'NetureProductLog',
