@@ -1,9 +1,14 @@
 /**
  * QualificationRequestsPage — 자격 신청 관리 (운영자)
  * WO-O4O-QUALIFICATION-SYSTEM-V1
+ * WO-O4O-OPERATOR-LIST-TABLE-STANDARD-V3: div-table → DataTable 표준 전환
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { FileCheck } from 'lucide-react';
+import { RowActionMenu } from '@o4o/ui';
+import { DataTable, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import {
   qualificationApi,
   getQualificationLabel,
@@ -13,16 +18,10 @@ import {
 } from '../../api/qualification';
 import { colors } from '../../styles/theme';
 
-const STATUS_LABELS: Record<string, string> = {
-  pending: '검토 중',
-  approved: '승인됨',
-  rejected: '반려됨',
-};
-
-const STATUS_COLORS: Record<string, string> = {
-  pending: '#f59e0b',
-  approved: '#10b981',
-  rejected: '#ef4444',
+const statusConfig: Record<string, { text: string; cls: string }> = {
+  pending: { text: '검토 중', cls: 'bg-amber-100 text-amber-700' },
+  approved: { text: '승인됨', cls: 'bg-green-100 text-green-700' },
+  rejected: { text: '반려됨', cls: 'bg-red-100 text-red-700' },
 };
 
 const INSTRUCTOR_FIELD_LABELS: Record<string, string> = {
@@ -79,6 +78,20 @@ function InstructorRequestDetail({ data }: { data: Record<string, any> }) {
   );
 }
 
+const qualificationActionPolicy = defineActionPolicy<QualificationRequest>('kpa:qualification:requests', {
+  rules: [
+    {
+      key: 'review',
+      label: '검토',
+      visible: (row: QualificationRequest) => row.status === 'pending',
+    },
+  ],
+});
+
+const QUALIFICATION_ACTION_ICONS: Record<string, React.ReactNode> = {
+  review: <FileCheck className="w-4 h-4" />,
+};
+
 export default function QualificationRequestsPage() {
   const [requests, setRequests] = useState<QualificationRequest[]>([]);
   const [total, setTotal] = useState(0);
@@ -87,6 +100,7 @@ export default function QualificationRequestsPage() {
   const [typeFilter, setTypeFilter] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const [selectedRequest, setSelectedRequest] = useState<QualificationRequest | null>(null);
   const [reviewNote, setReviewNote] = useState('');
@@ -139,6 +153,60 @@ export default function QualificationRequestsPage() {
     }
   };
 
+  const columns: ListColumnDef<QualificationRequest>[] = [
+    {
+      key: 'user_id',
+      header: '신청자',
+      render: (_v, row) => {
+        const displayName = (row.request_data as any)?.displayName;
+        return (
+          <div>
+            {displayName && <p className="text-sm font-medium text-slate-800">{displayName}</p>}
+            <p className="text-xs text-slate-400 font-mono">{row.user_id.slice(0, 8)}...</p>
+          </div>
+        );
+      },
+    },
+    {
+      key: 'qualification_type',
+      header: '자격 유형',
+      render: (value) => <span className="text-sm text-slate-700">{getQualificationLabel(value)}</span>,
+    },
+    {
+      key: 'status',
+      header: '상태',
+      align: 'center' as const,
+      render: (value) => {
+        const sc = statusConfig[value] || { text: value, cls: 'bg-slate-100 text-slate-600' };
+        return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${sc.cls}`}>{sc.text}</span>;
+      },
+    },
+    {
+      key: 'created_at',
+      header: '신청일',
+      render: (value) => (
+        <span className="text-sm text-slate-500">
+          {new Date(value).toLocaleDateString('ko-KR')}
+        </span>
+      ),
+    },
+    {
+      key: '_actions',
+      header: '액션',
+      align: 'center' as const,
+      width: '60px',
+      system: true,
+      onCellClick: () => {},
+      render: (_v, row) => (
+        <RowActionMenu
+          actions={buildRowActions(qualificationActionPolicy, row, {
+            review: () => { setSelectedRequest(row); setReviewNote(''); setSuccess(null); },
+          }, { icons: QUALIFICATION_ACTION_ICONS })}
+        />
+      ),
+    },
+  ];
+
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>자격 신청 관리</h1>
@@ -163,44 +231,17 @@ export default function QualificationRequestsPage() {
         <span style={styles.totalBadge}>총 {total}건</span>
       </div>
 
-      {/* 목록 */}
-      {loading ? (
-        <div style={styles.loading}>불러오는 중...</div>
-      ) : requests.length === 0 ? (
-        <div style={styles.empty}>신청 내역이 없습니다.</div>
-      ) : (
-        <div style={styles.table}>
-          {/* 헤더 */}
-          <div style={styles.tableHeader}>
-            <span style={{ flex: 2 }}>신청자 ID</span>
-            <span style={{ flex: 1.5 }}>자격 유형</span>
-            <span style={{ flex: 1 }}>상태</span>
-            <span style={{ flex: 1.5 }}>신청일</span>
-            <span style={{ flex: 1 }}>관리</span>
-          </div>
-          {requests.map(r => (
-            <div key={r.id} style={styles.tableRow}>
-              <span style={{ flex: 2, fontSize: '13px', color: colors.neutral600 }}>{r.user_id.slice(0, 8)}...</span>
-              <span style={{ flex: 1.5 }}>{getQualificationLabel(r.qualification_type)}</span>
-              <span style={{ flex: 1 }}>
-                <span style={{ ...styles.statusBadge, backgroundColor: STATUS_COLORS[r.status] }}>
-                  {STATUS_LABELS[r.status]}
-                </span>
-              </span>
-              <span style={{ flex: 1.5, fontSize: '13px', color: colors.neutral500 }}>
-                {new Date(r.created_at).toLocaleDateString('ko-KR')}
-              </span>
-              <span style={{ flex: 1 }}>
-                {r.status === 'pending' && (
-                  <button style={styles.reviewBtn} onClick={() => { setSelectedRequest(r); setReviewNote(''); setSuccess(null); }}>
-                    검토
-                  </button>
-                )}
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
+      <DataTable<QualificationRequest>
+        columns={columns}
+        data={requests}
+        rowKey="id"
+        loading={loading}
+        emptyMessage="신청 내역이 없습니다"
+        tableId="kpa-qualification-requests"
+        selectable
+        selectedKeys={selectedIds}
+        onSelectionChange={setSelectedIds}
+      />
 
       {/* 페이지네이션 */}
       {totalPages > 1 && (
@@ -285,13 +326,6 @@ const styles: Record<string, React.CSSProperties> = {
   filters: { display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' as const },
   select: { padding: '8px 12px', fontSize: '14px', border: `1px solid ${colors.neutral300}`, borderRadius: '6px' },
   totalBadge: { fontSize: '14px', color: colors.neutral500, marginLeft: 'auto' },
-  loading: { padding: '40px', textAlign: 'center', color: colors.neutral400 },
-  empty: { padding: '40px', textAlign: 'center', color: colors.neutral400 },
-  table: { backgroundColor: colors.white, borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', overflow: 'hidden' },
-  tableHeader: { display: 'flex', padding: '12px 16px', backgroundColor: colors.neutral50, fontSize: '13px', fontWeight: 600, color: colors.neutral600, borderBottom: `1px solid ${colors.neutral200}` },
-  tableRow: { display: 'flex', alignItems: 'center', padding: '14px 16px', borderBottom: `1px solid ${colors.neutral100}`, fontSize: '14px', color: colors.neutral800 },
-  statusBadge: { padding: '3px 10px', borderRadius: '12px', fontSize: '12px', fontWeight: 500, color: colors.white },
-  reviewBtn: { padding: '5px 12px', fontSize: '13px', color: colors.primary, backgroundColor: 'transparent', border: `1px solid ${colors.primary}`, borderRadius: '5px', cursor: 'pointer' },
   pagination: { display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '16px', marginTop: '20px' },
   pageBtn: { padding: '8px 16px', fontSize: '14px', border: `1px solid ${colors.neutral300}`, borderRadius: '6px', cursor: 'pointer', backgroundColor: colors.white },
   pageInfo: { fontSize: '14px', color: colors.neutral600 },

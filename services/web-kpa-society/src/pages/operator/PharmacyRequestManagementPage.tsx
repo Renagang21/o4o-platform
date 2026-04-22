@@ -2,31 +2,47 @@
  * PharmacyRequestManagementPage - 약국 서비스 신청 관리 (운영자)
  *
  * WO-KPA-A-PHARMACY-REQUEST-OPERATOR-UI-V1
+ * WO-O4O-OPERATOR-LIST-TABLE-STANDARD-V3: card 목록 → DataTable 표준 전환
  *
  * 약국 개설자 신청(kpa_pharmacy_requests)을 조회하고 승인/반려합니다.
  * API: pharmacyRequestApi.getPending / approve / reject
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { OperatorConfirmModal, useOperatorAction } from '@o4o/ui';
+import { Check, X } from 'lucide-react';
+import { OperatorConfirmModal, RowActionMenu, useOperatorAction } from '@o4o/ui';
 import { OperatorActionType } from '@o4o/types';
+import { DataTable, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { pharmacyRequestApi } from '../../api/pharmacyRequestApi';
 import type { PharmacyRequest } from '../../api/pharmacyRequestApi';
 
 type TabType = 'pending' | 'processed';
+type RequestItem = PharmacyRequest & { user?: { name: string; email: string } | null };
+
+const pharmacyActionPolicy = defineActionPolicy<RequestItem>('kpa:pharmacy:requests', {
+  rules: [
+    { key: 'approve', label: '승인' },
+    { key: 'reject', label: '반려', variant: 'danger', divider: true },
+  ],
+});
+
+const PHARMACY_ACTION_ICONS: Record<string, React.ReactNode> = {
+  approve: <Check className="w-4 h-4" />,
+  reject: <X className="w-4 h-4" />,
+};
 
 export default function PharmacyRequestManagementPage() {
   const [tab, setTab] = useState<TabType>('pending');
-  const [requests, setRequests] = useState<(PharmacyRequest & { user?: { name: string; email: string } | null })[]>([]);
+  const [requests, setRequests] = useState<RequestItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [reviewNoteId, setReviewNoteId] = useState<string | null>(null);
-  const [reviewNote, setReviewNote] = useState('');
   const [actionTargetId, setActionTargetId] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const { pendingAction, loading: actionHookLoading, requestAction, cancelAction, executeAction } = useOperatorAction();
 
   const loadRequests = useCallback(async () => {
@@ -62,28 +78,23 @@ export default function PharmacyRequestManagementPage() {
     if (!actionTargetId) return;
     setActionLoading(actionTargetId);
     await executeAction(async () => {
-      const note = reviewNoteId === actionTargetId ? reviewNote : undefined;
       if (pendingAction === OperatorActionType.APPROVE) {
-        await pharmacyRequestApi.approve(actionTargetId, note);
+        await pharmacyRequestApi.approve(actionTargetId, reason);
       } else {
-        await pharmacyRequestApi.reject(actionTargetId, reason || note);
+        await pharmacyRequestApi.reject(actionTargetId, reason);
       }
-      setReviewNoteId(null);
-      setReviewNote('');
       await loadRequests();
     });
     setActionLoading(null);
     setActionTargetId(null);
   };
 
-  /** 사업자번호 포맷 (000-00-00000) */
   const formatBizNo = (num: string) => {
     const d = num.replace(/\D/g, '');
     if (d.length === 10) return `${d.slice(0, 3)}-${d.slice(3, 5)}-${d.slice(5)}`;
     return num;
   };
 
-  /** 전화번호 포맷 */
   const formatPhone = (num: string | null) => {
     if (!num) return '-';
     const d = num.replace(/\D/g, '');
@@ -91,6 +102,70 @@ export default function PharmacyRequestManagementPage() {
     if (d.length === 10) return `${d.slice(0, 2)}-${d.slice(2, 6)}-${d.slice(6)}`;
     return num;
   };
+
+  const formatDate = (d: string) => {
+    try {
+      return (
+        new Date(d).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }) +
+        ' ' +
+        new Date(d).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
+      );
+    } catch { return '-'; }
+  };
+
+  const columns: ListColumnDef<RequestItem>[] = [
+    {
+      key: 'pharmacy_name',
+      header: '약국명',
+      render: (value) => <span className="font-medium text-slate-800 text-sm">{value}</span>,
+    },
+    {
+      key: 'user',
+      header: '신청자',
+      render: (_v, row) => (
+        <div>
+          <p className="text-sm text-slate-800 font-medium">{(row as any).user?.name || '(이름 없음)'}</p>
+          <p className="text-xs text-slate-400 mt-0.5">{(row as any).user?.email || '-'}</p>
+        </div>
+      ),
+    },
+    {
+      key: 'business_number',
+      header: '사업자번호',
+      render: (value) => <span className="text-sm font-mono text-slate-600">{formatBizNo(value)}</span>,
+    },
+    {
+      key: 'pharmacy_phone',
+      header: '약국전화',
+      render: (value) => <span className="text-sm text-slate-600">{formatPhone(value)}</span>,
+    },
+    {
+      key: 'owner_phone',
+      header: '개설자 핸드폰',
+      render: (value) => <span className="text-sm text-slate-600">{formatPhone(value)}</span>,
+    },
+    {
+      key: 'created_at',
+      header: '신청일',
+      render: (value) => <span className="text-xs text-slate-500">{formatDate(value)}</span>,
+    },
+    {
+      key: '_actions',
+      header: '액션',
+      align: 'center' as const,
+      width: '60px',
+      system: true,
+      onCellClick: () => {},
+      render: (_v, row) => (
+        <RowActionMenu
+          actions={buildRowActions(pharmacyActionPolicy, row, {
+            approve: () => openApproveModal(row.id),
+            reject: () => openRejectModal(row.id),
+          }, { icons: PHARMACY_ACTION_ICONS, loading: { approve: actionLoading === row.id, reject: actionLoading === row.id } })}
+        />
+      ),
+    },
+  ];
 
   return (
     <div style={{ padding: '24px' }}>
@@ -136,225 +211,51 @@ export default function PharmacyRequestManagementPage() {
         </button>
       </div>
 
-      {loading ? (
-        <div style={{ textAlign: 'center', padding: '40px', color: '#94a3b8' }}>
-          불러오는 중...
-        </div>
-      ) : error ? (
-        <div style={{ textAlign: 'center', padding: '40px', color: '#dc2626' }}>
+      {error && (
+        <div style={{ textAlign: 'center', padding: '20px', color: '#dc2626', marginBottom: '16px' }}>
           {error}
           <button
             onClick={loadRequests}
-            style={{
-              display: 'block',
-              margin: '12px auto 0',
-              padding: '8px 16px',
-              background: '#f1f5f9',
-              border: '1px solid #cbd5e1',
-              borderRadius: '6px',
-              cursor: 'pointer',
-            }}
+            style={{ display: 'block', margin: '12px auto 0', padding: '8px 16px', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '6px', cursor: 'pointer' }}
           >
             다시 시도
           </button>
         </div>
-      ) : requests.length === 0 ? (
-        <div style={{
-          textAlign: 'center',
-          padding: '60px 20px',
-          background: '#f8fafc',
-          borderRadius: '8px',
-          color: '#94a3b8',
-        }}>
-          대기 중인 약국 서비스 신청이 없습니다.
+      )}
+
+      <DataTable<RequestItem>
+        columns={columns}
+        data={requests}
+        rowKey="id"
+        loading={loading}
+        emptyMessage="대기 중인 약국 서비스 신청이 없습니다"
+        tableId="kpa-pharmacy-requests"
+        selectable
+        selectedKeys={selectedIds}
+        onSelectionChange={setSelectedIds}
+      />
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '20px' }}>
+          <button
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page <= 1}
+            style={paginationBtnStyle(page <= 1)}
+          >
+            이전
+          </button>
+          <span style={{ padding: '6px 12px', fontSize: '14px', color: '#475569' }}>
+            {page} / {totalPages}
+          </span>
+          <button
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page >= totalPages}
+            style={paginationBtnStyle(page >= totalPages)}
+          >
+            다음
+          </button>
         </div>
-      ) : (
-        <>
-          {/* Card List */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {requests.map((req) => (
-              <div
-                key={req.id}
-                style={{
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '8px',
-                  padding: '16px',
-                  background: '#fff',
-                }}
-              >
-                {/* Header */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                  <div>
-                    <span style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a' }}>
-                      {req.pharmacy_name}
-                    </span>
-                    <span style={{
-                      marginLeft: '8px',
-                      padding: '2px 8px',
-                      background: '#fef3c7',
-                      color: '#92400e',
-                      borderRadius: '4px',
-                      fontSize: '11px',
-                      fontWeight: 600,
-                    }}>
-                      대기
-                    </span>
-                  </div>
-                  <span style={{ fontSize: '12px', color: '#94a3b8' }}>
-                    {new Date(req.created_at).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' })}
-                    {' '}
-                    {new Date(req.created_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                </div>
-
-                {/* Info Grid */}
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                  gap: '8px',
-                  marginBottom: '12px',
-                  padding: '12px',
-                  background: '#f8fafc',
-                  borderRadius: '6px',
-                  fontSize: '13px',
-                }}>
-                  <div>
-                    <span style={{ color: '#64748b' }}>신청자: </span>
-                    <span style={{ color: '#0f172a', fontWeight: 500 }}>
-                      {(req as any).user?.name || '(이름 없음)'}
-                    </span>
-                  </div>
-                  <div>
-                    <span style={{ color: '#64748b' }}>이메일: </span>
-                    <span style={{ color: '#0f172a' }}>
-                      {(req as any).user?.email || '-'}
-                    </span>
-                  </div>
-                  <div>
-                    <span style={{ color: '#64748b' }}>사업자번호: </span>
-                    <span style={{ color: '#0f172a', fontFamily: 'monospace' }}>
-                      {formatBizNo(req.business_number)}
-                    </span>
-                  </div>
-                  <div>
-                    <span style={{ color: '#64748b' }}>약국 전화: </span>
-                    <span style={{ color: '#0f172a' }}>
-                      {formatPhone(req.pharmacy_phone)}
-                    </span>
-                  </div>
-                  <div>
-                    <span style={{ color: '#64748b' }}>개설자 핸드폰: </span>
-                    <span style={{ color: '#0f172a' }}>
-                      {formatPhone(req.owner_phone)}
-                    </span>
-                  </div>
-                  <div>
-                    <span style={{ color: '#64748b' }}>세금계산서 이메일: </span>
-                    <span style={{ color: '#0f172a' }}>
-                      {req.tax_invoice_email || '-'}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-                  <button
-                    onClick={() =>
-                      reviewNoteId === req.id
-                        ? setReviewNoteId(null)
-                        : (setReviewNoteId(req.id), setReviewNote(''))
-                    }
-                    style={{
-                      padding: '6px 14px',
-                      background: '#f1f5f9',
-                      border: '1px solid #cbd5e1',
-                      borderRadius: '6px',
-                      fontSize: '13px',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    메모 {reviewNoteId === req.id ? '닫기' : '추가'}
-                  </button>
-                  <button
-                    onClick={() => openApproveModal(req.id)}
-                    disabled={actionLoading === req.id}
-                    style={{
-                      padding: '6px 16px',
-                      background: actionLoading === req.id ? '#86efac' : '#22c55e',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: '6px',
-                      fontSize: '13px',
-                      fontWeight: 600,
-                      cursor: actionLoading === req.id ? 'not-allowed' : 'pointer',
-                    }}
-                  >
-                    승인
-                  </button>
-                  <button
-                    onClick={() => openRejectModal(req.id)}
-                    disabled={actionLoading === req.id}
-                    style={{
-                      padding: '6px 16px',
-                      background: actionLoading === req.id ? '#fca5a5' : '#ef4444',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: '6px',
-                      fontSize: '13px',
-                      fontWeight: 600,
-                      cursor: actionLoading === req.id ? 'not-allowed' : 'pointer',
-                    }}
-                  >
-                    반려
-                  </button>
-                </div>
-
-                {/* Review Note Input */}
-                {reviewNoteId === req.id && (
-                  <div style={{ marginTop: '10px' }}>
-                    <input
-                      type="text"
-                      value={reviewNote}
-                      onChange={(e) => setReviewNote(e.target.value)}
-                      placeholder="처리 메모 입력 (선택사항)"
-                      style={{
-                        width: '100%',
-                        padding: '8px 12px',
-                        border: '1px solid #d1d5db',
-                        borderRadius: '6px',
-                        fontSize: '13px',
-                        boxSizing: 'border-box',
-                      }}
-                    />
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '20px' }}>
-              <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page <= 1}
-                style={paginationBtnStyle(page <= 1)}
-              >
-                이전
-              </button>
-              <span style={{ padding: '6px 12px', fontSize: '14px', color: '#475569' }}>
-                {page} / {totalPages}
-              </span>
-              <button
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={page >= totalPages}
-                style={paginationBtnStyle(page >= totalPages)}
-              >
-                다음
-              </button>
-            </div>
-          )}
-        </>
       )}
 
       {/* Action Confirm Modal (WO-O4O-OPERATOR-ACTION-STANDARDIZATION-V1) */}
