@@ -432,6 +432,7 @@ export default function OperatorForumPage() {
             selectable
             selectedKeys={selectedIds}
             onSelectionChange={setSelectedIds}
+            onRowClick={record => navigate(`/forum/post/${record.id}`)}
           />
         </>
       )}
