@@ -29,7 +29,7 @@ export function HeroSummarySection({
   return (
     <section style={styles.container}>
       <p style={styles.greeting}>{greeting}</p>
-      <p style={styles.subtitle}>{subtitle}</p>
+      {subtitle && <p style={styles.subtitle}>{subtitle}</p>}
       <div style={styles.ctaRow}>
         {ctas.map((cta) => (
           <Link

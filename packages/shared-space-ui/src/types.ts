@@ -42,7 +42,7 @@ export interface RecentPost {
 
 export interface HeroSummarySectionProps {
   greeting: string;
-  subtitle: string;
+  subtitle?: string;
   ctas: Array<{ label: string; href: string; icon?: ReactNode }>;
   accentColor?: string;
 }

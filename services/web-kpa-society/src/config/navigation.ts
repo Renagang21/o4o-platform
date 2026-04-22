@@ -16,8 +16,7 @@ import type { GlobalHeaderNavItem } from '@o4o/ui';
 export const KPA_PUBLIC_NAV: GlobalHeaderNavItem[] = [
   { label: '홈', href: '/' },
   { label: '포럼', href: '/forum' },
-  { label: '강의 / 마케팅 콘텐츠', href: '/lms' },
-  { label: '약사 뉴스', href: 'https://www.kpanews.co.kr' },
+  { label: '강의', href: '/lms' },
 ];
 
 // ─── Contextual Nav ──────────────────────────────────────────────────────────

@@ -76,7 +76,7 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   { label: '홈', href: '/' },
   { label: '포럼', href: '/forum' },
-  { label: '강의 / 마케팅 콘텐츠', href: '/lms' },
+  { label: '강의', href: '/lms' },
   { label: '약국 HUB', href: '/hub' },
   { label: '내 약국', href: '/store' },
   { label: '운영 대시보드', href: '/operator' },
