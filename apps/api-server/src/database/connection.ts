@@ -275,7 +275,11 @@ import {
   StorePlaylist, // WO-O4O-SIGNAGE-STORE-PLAYLIST-ENGINE-V1
   StorePlaylistItem, // WO-O4O-SIGNAGE-STORE-PLAYLIST-ENGINE-V1
   KpaResource, // WO-KPA-RESOURCE-LIBRARY-AI-WORKFLOW-V1
+  KpaApprovalRequest, // WO-TYPEORM-ENTITY-REGISTRATION-P1-FIX-V1
+  KpaContent, // WO-TYPEORM-ENTITY-REGISTRATION-P1-FIX-V1
+  KpaWorkingContent, // WO-TYPEORM-ENTITY-REGISTRATION-P1-FIX-V1
 } from '../routes/kpa/entities/index.js';
+import { KpaLegalDocument } from '../routes/kpa/entities/kpa-legal-document.entity.js'; // WO-TYPEORM-ENTITY-REGISTRATION-P1-FIX-V1
 import { KpaExternalExpertProfile } from '../routes/kpa/entities/kpa-external-expert-profile.entity.js';
 import { KpaSupplierStaffProfile } from '../routes/kpa/entities/kpa-supplier-staff-profile.entity.js';
 import { MemberQualification } from '../routes/kpa/entities/member-qualification.entity.js';
@@ -778,6 +782,11 @@ export const AppDataSource = new DataSource({
     StorePlaylistItem,
     // WO-KPA-RESOURCE-LIBRARY-AI-WORKFLOW-V1
     KpaResource,
+    // WO-TYPEORM-ENTITY-REGISTRATION-P1-FIX-V1 (예방 등록)
+    KpaApprovalRequest,
+    KpaContent,
+    KpaWorkingContent,
+    KpaLegalDocument,
     // ============================================================================
     // PARTNER DASHBOARD ENTITIES (WO-PARTNER-DASHBOARD-API-BE-IMPLEMENTATION-V1)
     // ============================================================================
