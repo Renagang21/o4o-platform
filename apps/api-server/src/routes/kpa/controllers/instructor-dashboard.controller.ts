@@ -1,6 +1,7 @@
 /**
  * Instructor Dashboard Controller
  * WO-O4O-INSTRUCTOR-DASHBOARD-V1
+ * WO-LMS-INSTRUCTOR-DASHBOARD-QUALIFICATION-FIX-V1: lms_creator 승인 사용자 호환
  *
  * GET  /instructor/me       — 강사 자격 + 프로필 조회 (인증 필요)
  * PATCH /instructor/profile — 프로필 수정 (인증 필요, 본인만)
@@ -8,13 +9,17 @@
 
 import { Router, Response, RequestHandler } from 'express';
 import { body, validationResult } from 'express-validator';
-import { DataSource } from 'typeorm';
+import { DataSource, In } from 'typeorm';
 import type { AuthRequest } from '../../../types/auth.js';
 import { MemberQualification } from '../entities/member-qualification.entity.js';
 import { InstructorProfile } from '../entities/instructor-profile.entity.js';
 import { QualificationRequest } from '../entities/qualification-request.entity.js';
 
 type AuthMiddleware = RequestHandler;
+
+// WO-LMS-INSTRUCTOR-DASHBOARD-QUALIFICATION-FIX-V1
+// instructor(레거시) + lms_creator(신규) 모두 대시보드 접근 허용
+const DASHBOARD_ALLOWED_QUALIFICATIONS = ['instructor', 'lms_creator'] as const;
 
 export function createInstructorDashboardController(
   dataSource: DataSource,
@@ -39,7 +44,8 @@ export function createInstructorDashboardController(
       const userId = req.user!.id;
       try {
         const qual = await qualRepo.findOne({
-          where: { user_id: userId, qualification_type: 'instructor' as any },
+          where: { user_id: userId, qualification_type: In(DASHBOARD_ALLOWED_QUALIFICATIONS) as any },
+          order: { approved_at: 'DESC' },
         });
 
         if (!qual || qual.status !== 'approved') {
@@ -55,7 +61,7 @@ export function createInstructorDashboardController(
 
         // 최근 승인된 신청 내역 (review_note 표시용)
         const latestRequest = await reqRepo.findOne({
-          where: { user_id: userId, qualification_type: 'instructor', status: 'approved' },
+          where: { user_id: userId, qualification_type: In(DASHBOARD_ALLOWED_QUALIFICATIONS) as any, status: 'approved' },
           order: { reviewed_at: 'DESC' },
         });
 
@@ -127,7 +133,8 @@ export function createInstructorDashboardController(
       try {
         // 자격 확인
         const qual = await qualRepo.findOne({
-          where: { user_id: userId, qualification_type: 'instructor' as any },
+          where: { user_id: userId, qualification_type: In(DASHBOARD_ALLOWED_QUALIFICATIONS) as any },
+          order: { approved_at: 'DESC' },
         });
         if (!qual || qual.status !== 'approved') {
           res.status(403).json({ success: false, error: '강사 자격이 없습니다.', code: 'NOT_QUALIFIED' });
