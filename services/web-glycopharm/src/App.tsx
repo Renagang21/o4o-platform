@@ -330,8 +330,6 @@ function AppRoutes() {
         <Route path="role-select" element={<RoleSelectPage />} />
         {/* WO-O4O-GLYCOPHARM-HOME-KPA-ALIGNMENT-V1: Home 직접 */}
         <Route index element={<CommunityMainPage />} />
-        {/* /community → / redirect (하위 호환) */}
-        <Route path="community" element={<Navigate to="/" replace />} />
         <Route path="forum" element={<ForumHubPage />} />
         <Route path="forum/write" element={<ForumWritePage />} />
         <Route path="forum/posts" element={<ForumPage />} />

@@ -121,8 +121,8 @@ export default function PharmacistApplyPage() {
               <span>{new Date(existing.createdAt).toLocaleDateString('ko-KR')}</span>
             </div>
           </div>
-          <Link to="/community" className="inline-block px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors text-sm font-medium">
-            커뮤니티로
+          <Link to="/" className="inline-block px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors text-sm font-medium">
+            홈으로
           </Link>
         </div>
       </div>
@@ -140,8 +140,8 @@ export default function PharmacistApplyPage() {
             약사 회원 신청이 접수되었습니다.<br />
             운영자 승인 후 약사 기능을 이용하실 수 있습니다.
           </p>
-          <Link to="/community" className="inline-block px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors text-sm font-medium">
-            커뮤니티로
+          <Link to="/" className="inline-block px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors text-sm font-medium">
+            홈으로
           </Link>
         </div>
       </div>

@@ -8,7 +8,7 @@
  * WO-SHARED-SPACE-COMPONENT-SPLIT-V1: 공통 컴포넌트 적용
  * WO-SHARED-SPACE-SIGNAGE-COMPONENT-V1: SignagePreviewSection 공통 적용
  *
- * Route: /community
+ * Route: / (Home)
  *
  * 섹션 순서 (Shared Space Frame):
  *  1. Hero / Summary → HeroSummarySection (shared)

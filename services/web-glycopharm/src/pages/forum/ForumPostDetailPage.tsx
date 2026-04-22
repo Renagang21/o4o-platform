@@ -204,10 +204,10 @@ export default function ForumPostDetailPage() {
           목록으로
         </Link>
         <Link
-          to="/community"
+          to="/"
           className="px-4 py-2 text-sm font-medium text-primary-600 bg-primary-50 rounded-lg hover:bg-primary-100 transition-colors"
         >
-          커뮤니티 홈
+          홈
         </Link>
       </div>
     </div>

@@ -53,11 +53,11 @@ export default function PharmacyPlaceholderPage() {
             {bizOpen && (
               <div className="border-t border-emerald-100 bg-emerald-50/50 space-y-1 p-2">
                 <button
-                  onClick={() => navigate('/community')}
+                  onClick={() => navigate('/forum')}
                   className="w-full py-2.5 text-sm font-medium text-slate-700 bg-white rounded-lg hover:bg-emerald-50 transition-colors flex items-center justify-center gap-2"
                 >
                   <MessageSquare className="w-4 h-4 text-emerald-600" />
-                  커뮤니티
+                  포럼
                 </button>
                 <button
                   onClick={() => navigate('/hub')}

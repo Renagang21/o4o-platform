@@ -160,11 +160,11 @@ export function HubContentListPage() {
       {/* Header */}
       <div className="mb-6">
         <Link
-          to="/community"
+          to="/"
           className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 mb-3"
         >
           <ArrowLeft className="w-4 h-4" />
-          커뮤니티
+          홈
         </Link>
         <h1 className="text-xl font-bold text-slate-900">매장에서 바로 쓰는 콘텐츠</h1>
         <p className="text-sm text-slate-500 mt-1">
