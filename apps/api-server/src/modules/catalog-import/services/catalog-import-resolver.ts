@@ -24,7 +24,7 @@ export class CatalogImportResolver {
     const manualData = {
       regulatoryName: row.parsedProductName || barcode,
       manufacturerName: row.parsedManufacturerName || 'Unknown',
-      marketingName: row.parsedProductName || undefined,
+      name: row.parsedProductName || undefined,
     };
 
     const result = await netureService.resolveOrCreateMaster(barcode, manualData);
