@@ -144,6 +144,42 @@ router.get('/requests/:id', async (req: Request, res: Response): Promise<void> =
   }
 });
 
+/** POST /requests/:id/create — 포럼 생성 실행 (approved 상태에서만) */
+router.post('/requests/:id/create', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const serviceCode = (req as any)._serviceCode;
+    const result = await forumCategoryRequestService.createForumFromRequest(req.params.id, serviceCode);
+
+    if ('error' in result) {
+      res.status(result.error.status).json({ success: false, error: result.error.message, code: result.error.code });
+      return;
+    }
+
+    res.json({ success: true, data: result.data });
+  } catch (error: any) {
+    logger.error('Error creating forum from request:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/** POST /requests/:id/recreate — 포럼 재생성 (failed 상태에서만) — create와 동일 로직, 의미 구분용 alias */
+router.post('/requests/:id/recreate', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const serviceCode = (req as any)._serviceCode;
+    const result = await forumCategoryRequestService.createForumFromRequest(req.params.id, serviceCode);
+
+    if ('error' in result) {
+      res.status(result.error.status).json({ success: false, error: result.error.message, code: result.error.code });
+      return;
+    }
+
+    res.json({ success: true, data: result.data });
+  } catch (error: any) {
+    logger.error('Error recreating forum from request:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 /** PATCH /requests/:id/review — 심사 (approve/reject/revision) */
 router.patch('/requests/:id/review', async (req: Request, res: Response): Promise<void> => {
   try {

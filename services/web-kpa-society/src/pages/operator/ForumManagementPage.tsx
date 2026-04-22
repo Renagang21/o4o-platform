@@ -21,13 +21,22 @@ import {
   AlertTriangle,
   List,
   AlertOctagon,
+  Play,
+  RefreshCw,
   Loader2 as Spinner,
 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { forumOperatorApi } from '../../api/forum';
 
 type TabType = 'requests' | 'categories';
-type CategoryRequestStatus = 'pending' | 'revision_requested' | 'approved' | 'rejected';
+type CategoryRequestStatus =
+  | 'pending'
+  | 'revision_requested'
+  | 'approved'
+  | 'creating'
+  | 'completed'
+  | 'failed'
+  | 'rejected';
 
 interface CategoryData {
   id: string;
@@ -60,6 +69,7 @@ interface RequestData {
   reviewedAt?: string;
   createdCategoryId?: string;
   createdCategorySlug?: string;
+  errorMessage?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -67,8 +77,11 @@ interface RequestData {
 const statusConfig: Record<CategoryRequestStatus, { label: string; color: string; bgColor: string }> = {
   pending: { label: '대기 중', color: 'text-yellow-700', bgColor: 'bg-yellow-100' },
   revision_requested: { label: '보완 요청', color: 'text-orange-700', bgColor: 'bg-orange-100' },
-  approved: { label: '승인됨', color: 'text-green-700', bgColor: 'bg-green-100' },
-  rejected: { label: '거절됨', color: 'text-red-700', bgColor: 'bg-red-100' },
+  approved: { label: '승인됨 (생성 전)', color: 'text-blue-700', bgColor: 'bg-blue-100' },
+  creating: { label: '생성 중', color: 'text-indigo-700', bgColor: 'bg-indigo-100' },
+  completed: { label: '생성 완료', color: 'text-green-700', bgColor: 'bg-green-100' },
+  failed: { label: '생성 실패', color: 'text-red-700', bgColor: 'bg-red-100' },
+  rejected: { label: '거절됨', color: 'text-slate-600', bgColor: 'bg-slate-100' },
 };
 
 function formatDate(dateString: string): string {
@@ -85,6 +98,14 @@ function isReviewable(status: string): boolean {
   return status === 'pending' || status === 'revision_requested';
 }
 
+function canCreateForum(status: string): boolean {
+  return status === 'approved';
+}
+
+function canRecreateForum(status: string): boolean {
+  return status === 'failed';
+}
+
 export default function ForumManagementPage() {
   // ── Tab state ──
   const [activeTab, setActiveTab] = useState<TabType>('requests');
@@ -97,6 +118,7 @@ export default function ForumManagementPage() {
   const [selectedRequest, setSelectedRequest] = useState<RequestData | null>(null);
   const [reviewComment, setReviewComment] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [creatingRequestId, setCreatingRequestId] = useState<string | null>(null);
 
   // ── Active forum categories state (WO-KPA-A-OPERATOR-FORUM-DIRECT-SOFT-DELETE-V1) ──
   const [categories, setCategories] = useState<CategoryData[]>([]);
@@ -368,7 +390,7 @@ export default function ForumManagementPage() {
         reviewComment: reviewComment || undefined,
       });
       if (result.success) {
-        toast.success(action === 'approve' ? '승인되었습니다' : action === 'reject' ? '거절되었습니다' : '보완 요청되었습니다');
+        toast.success(action === 'approve' ? '승인되었습니다 — 포럼 생성 버튼을 눌러 포럼을 생성하세요' : action === 'reject' ? '거절되었습니다' : '보완 요청되었습니다');
         setSelectedRequest(null);
         setReviewComment('');
         loadRequests();
@@ -379,6 +401,28 @@ export default function ForumManagementPage() {
       toast.error('처리 중 오류가 발생했습니다.');
     } finally {
       setIsProcessing(false);
+    }
+  };
+
+  const handleCreateForum = async (request: RequestData, isRecreate = false) => {
+    setCreatingRequestId(request.id);
+    try {
+      const result = isRecreate
+        ? await forumOperatorApi.recreateForum(request.id)
+        : await forumOperatorApi.createForum(request.id);
+      if (result.success) {
+        toast.success(`'${request.name}' 포럼이 생성되었습니다`);
+        loadRequests();
+        if (selectedRequest?.id === request.id) setSelectedRequest(null);
+      } else {
+        toast.error(result.error || '포럼 생성 실패');
+        loadRequests();
+      }
+    } catch (err: any) {
+      toast.error(err?.response?.data?.error || '포럼 생성 중 오류가 발생했습니다');
+      loadRequests();
+    } finally {
+      setCreatingRequestId(null);
     }
   };
 
@@ -459,7 +503,10 @@ export default function ForumManagementPage() {
             <option value="all">모든 상태</option>
             <option value="pending">대기 중</option>
             <option value="revision_requested">보완 요청</option>
-            <option value="approved">승인됨</option>
+            <option value="approved">승인됨 (생성 전)</option>
+            <option value="creating">생성 중</option>
+            <option value="completed">생성 완료</option>
+            <option value="failed">생성 실패</option>
             <option value="rejected">거절됨</option>
           </select>
           <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
@@ -510,6 +557,32 @@ export default function ForumManagementPage() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex justify-end gap-2">
+                      {canCreateForum(request.status) && (
+                        <button
+                          onClick={() => handleCreateForum(request)}
+                          disabled={creatingRequestId === request.id}
+                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                          title="포럼 생성"
+                        >
+                          {creatingRequestId === request.id
+                            ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            : <Play className="w-3.5 h-3.5" />}
+                          포럼 생성
+                        </button>
+                      )}
+                      {canRecreateForum(request.status) && (
+                        <button
+                          onClick={() => handleCreateForum(request, true)}
+                          disabled={creatingRequestId === request.id}
+                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-orange-500 rounded-lg hover:bg-orange-600 disabled:opacity-50"
+                          title="포럼 재생성"
+                        >
+                          {creatingRequestId === request.id
+                            ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            : <RefreshCw className="w-3.5 h-3.5" />}
+                          재생성
+                        </button>
+                      )}
                       <button
                         onClick={() => { setSelectedRequest(request); setReviewComment(''); }}
                         className="p-2 rounded-lg hover:bg-slate-100 text-slate-600"
@@ -594,11 +667,15 @@ export default function ForumManagementPage() {
               )}
 
               {!isReviewable(selectedRequest.status) && selectedRequest.reviewComment && (
-                <div className={`p-4 rounded-lg ${selectedRequest.status === 'approved' ? 'bg-green-50' : 'bg-red-50'}`}>
-                  <h4 className={`text-sm font-medium mb-1 ${selectedRequest.status === 'approved' ? 'text-green-700' : 'text-red-700'}`}>
+                <div className={`p-4 rounded-lg ${
+                  ['approved', 'creating', 'completed'].includes(selectedRequest.status) ? 'bg-green-50' : 'bg-red-50'
+                }`}>
+                  <h4 className={`text-sm font-medium mb-1 ${
+                    ['approved', 'creating', 'completed'].includes(selectedRequest.status) ? 'text-green-700' : 'text-red-700'
+                  }`}>
                     검토 의견
                   </h4>
-                  <p className={selectedRequest.status === 'approved' ? 'text-green-600' : 'text-red-600'}>
+                  <p className={['approved', 'creating', 'completed'].includes(selectedRequest.status) ? 'text-green-600' : 'text-red-600'}>
                     {selectedRequest.reviewComment}
                   </p>
                   {selectedRequest.reviewedAt && (
@@ -606,6 +683,20 @@ export default function ForumManagementPage() {
                       {selectedRequest.reviewerName} | {formatDate(selectedRequest.reviewedAt)}
                     </p>
                   )}
+                </div>
+              )}
+
+              {selectedRequest.status === 'failed' && selectedRequest.errorMessage && (
+                <div className="p-4 rounded-lg bg-red-50 border border-red-200">
+                  <h4 className="text-sm font-medium text-red-700 mb-1">생성 오류</h4>
+                  <p className="text-sm text-red-600 font-mono break-all">{selectedRequest.errorMessage}</p>
+                </div>
+              )}
+
+              {selectedRequest.status === 'completed' && selectedRequest.createdCategorySlug && (
+                <div className="p-4 rounded-lg bg-green-50 border border-green-200">
+                  <h4 className="text-sm font-medium text-green-700 mb-1">생성된 포럼</h4>
+                  <p className="text-sm text-green-600">슬러그: <span className="font-mono">{selectedRequest.createdCategorySlug}</span></p>
                 </div>
               )}
             </div>
@@ -648,6 +739,30 @@ export default function ForumManagementPage() {
                     승인
                   </button>
                 </>
+              )}
+              {canCreateForum(selectedRequest.status) && (
+                <button
+                  onClick={() => handleCreateForum(selectedRequest)}
+                  disabled={creatingRequestId === selectedRequest.id}
+                  className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
+                >
+                  {creatingRequestId === selectedRequest.id
+                    ? <Loader2 className="w-4 h-4 animate-spin" />
+                    : <Play className="w-4 h-4" />}
+                  포럼 생성
+                </button>
+              )}
+              {canRecreateForum(selectedRequest.status) && (
+                <button
+                  onClick={() => handleCreateForum(selectedRequest, true)}
+                  disabled={creatingRequestId === selectedRequest.id}
+                  className="px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-600 disabled:opacity-50 flex items-center gap-2"
+                >
+                  {creatingRequestId === selectedRequest.id
+                    ? <Loader2 className="w-4 h-4 animate-spin" />
+                    : <RefreshCw className="w-4 h-4" />}
+                  재생성
+                </button>
               )}
             </div>
           </div>

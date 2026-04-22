@@ -20,7 +20,14 @@ import {
   Index,
 } from 'typeorm';
 
-export type CategoryRequestStatus = 'pending' | 'revision_requested' | 'approved' | 'rejected';
+export type CategoryRequestStatus =
+  | 'pending'
+  | 'revision_requested'
+  | 'approved'
+  | 'creating'
+  | 'completed'
+  | 'failed'
+  | 'rejected';
 
 @Entity('forum_category_requests')
 @Index(['serviceCode', 'status'])
@@ -90,6 +97,10 @@ export class ForumCategoryRequest {
 
   @Column({ name: 'reviewed_at', type: 'timestamp', nullable: true })
   reviewedAt?: Date;
+
+  // 포럼 생성 실패 시 오류 메시지
+  @Column({ name: 'error_message', type: 'text', nullable: true })
+  errorMessage?: string;
 
   // 승인 시 생성된 카테고리 정보
   @Column({ name: 'created_category_id', type: 'uuid', nullable: true })

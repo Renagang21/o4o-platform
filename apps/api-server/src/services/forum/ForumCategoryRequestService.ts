@@ -259,19 +259,64 @@ export class ForumCategoryRequestService {
       return { data: saved };
     }
 
-    // action === 'approve' — 트랜잭션: 승인 + ForumCategory 생성
+    // action === 'approve' — 승인만 (포럼 생성은 별도 명시적 호출)
+    row.status = 'approved' as any;
+    row.reviewerId = reviewer.id;
+    row.reviewerName = reviewer.name || reviewer.email || 'Operator';
+    row.reviewComment = reviewComment || undefined;
+    row.reviewedAt = new Date();
+    // 재심사 시 이전 오류 메시지 초기화
+    row.errorMessage = undefined;
+
+    const saved = await this.requestRepo.save(row);
+    return { data: saved };
+  }
+
+  /**
+   * 포럼 생성 실행 (상태 머신: approved/failed → creating → completed/failed)
+   *
+   * WO-FORUM-CREATION-STATE-MACHINE-AND-ORPHAN-ZERO-V1
+   *
+   * - approved 또는 failed 상태의 신청에 대해서만 실행 가능
+   * - creating 중간 상태로 전이 후 포럼 생성
+   * - 성공 시 completed, 실패 시 failed + errorMessage
+   */
+  async createForumFromRequest(
+    requestId: string,
+    serviceCode: string,
+  ): Promise<ServiceResult> {
+    if (!UUID_RE.test(requestId)) {
+      return { error: { status: 400, code: 'INVALID_ID', message: 'Invalid ID' } };
+    }
+
+    const row = await this.requestRepo.findOne({
+      where: { id: requestId, serviceCode },
+    });
+    if (!row) {
+      return { error: { status: 404, code: 'NOT_FOUND', message: 'Request not found' } };
+    }
+
+    if (row.status !== 'approved' && (row.status as string) !== 'failed') {
+      return {
+        error: {
+          status: 400,
+          code: 'INVALID_STATUS',
+          message: `현재 상태(${row.status})에서는 포럼 생성을 실행할 수 없습니다. approved 또는 failed 상태에서만 가능합니다`,
+        },
+      };
+    }
+
+    // CREATING 상태로 전이
+    row.status = 'creating' as any;
+    row.errorMessage = undefined;
+    await this.requestRepo.save(row);
+
+    // ForumCategory 생성 트랜잭션
     const queryRunner = AppDataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      row.status = 'approved' as any;
-      row.reviewerId = reviewer.id;
-      row.reviewerName = reviewer.name || reviewer.email || 'Operator';
-      row.reviewComment = reviewComment || undefined;
-      row.reviewedAt = new Date();
-
-      // ForumCategory 생성
       const slug = generateSlug(row.name);
       const existingCategory = await queryRunner.manager.findOne(ForumCategory, { where: { slug } });
 
@@ -312,6 +357,7 @@ export class ForumCategoryRequestService {
         logger.info(`[ForumCategoryRequest] Created category: ${createdCategory.name} (${createdCategory.slug})`);
       }
 
+      row.status = 'completed' as any;
       await queryRunner.manager.save(ForumCategoryRequest, row);
       await queryRunner.commitTransaction();
 
@@ -322,12 +368,29 @@ export class ForumCategoryRequestService {
             id: createdCategory.id,
             name: createdCategory.name,
             slug: createdCategory.slug,
-          } : null,
+          } : { id: existingCategory!.id, name: existingCategory!.name, slug: existingCategory!.slug },
         },
       };
-    } catch (err) {
+    } catch (err: any) {
       await queryRunner.rollbackTransaction();
-      throw err;
+
+      // FAILED 상태로 전이 + 오류 메시지 기록
+      try {
+        row.status = 'failed' as any;
+        row.errorMessage = err?.message || '포럼 생성 중 알 수 없는 오류가 발생했습니다';
+        await this.requestRepo.save(row);
+      } catch (saveErr) {
+        logger.error('[ForumCategoryRequest] Failed to persist failed status:', saveErr);
+      }
+
+      logger.error('[ForumCategoryRequest] Forum creation failed:', err);
+      return {
+        error: {
+          status: 500,
+          code: 'FORUM_CREATE_FAILED',
+          message: err?.message || '포럼 생성에 실패했습니다',
+        },
+      };
     } finally {
       await queryRunner.release();
     }

@@ -234,6 +234,17 @@ export const forumOperatorApi = {
     return res.data;
   },
 
+  // WO-FORUM-CREATION-STATE-MACHINE-AND-ORPHAN-ZERO-V1
+  createForum: async (id: string) => {
+    const res = await authClient.api.post(`${OPERATOR_BASE}/requests/${id}/create?${SVC}`, {});
+    return res.data;
+  },
+
+  recreateForum: async (id: string) => {
+    const res = await authClient.api.post(`${OPERATOR_BASE}/requests/${id}/recreate?${SVC}`, {});
+    return res.data;
+  },
+
   // WO-KPA-A-OPERATOR-FORUM-DIRECT-SOFT-DELETE-V1
   getCategories: async () => {
     try {
