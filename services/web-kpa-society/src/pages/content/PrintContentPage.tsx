@@ -3,7 +3,7 @@
  *
  * WO-KPA-A-CONTENT-USAGE-MODE-EXTENSION-V1
  *
- * 경로: /content/:snapshotId/print?org=:organizationId
+ * 경로: /view/:snapshotId/print?org=:organizationId
  * 공개 페이지 — 인증 불필요
  *
  * 기능:
@@ -126,7 +126,7 @@ export default function PrintContentPage() {
   const contentJson = asset.contentJson as Record<string, unknown>;
   const usage = parseUsage(contentJson);
   const blocks = parseBlocks(contentJson);
-  const publicUrl = `${window.location.origin}/content/${snapshotId}${window.location.search}`;
+  const publicUrl = `${window.location.origin}/view/${snapshotId}${window.location.search}`;
 
   return (
     <>

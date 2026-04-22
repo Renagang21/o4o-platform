@@ -3,7 +3,7 @@
  *
  * WO-KPA-A-CONTENT-USAGE-MODE-EXTENSION-V1
  *
- * 경로: /content/:snapshotId?org=:organizationId
+ * 경로: /view/:snapshotId?org=:organizationId
  * 공개 페이지 — 인증 불필요
  *
  * content_json.usage 기반 렌더링:
@@ -304,7 +304,7 @@ function ContentFooter({
       {usage.print.enabled && (
         <div className="flex justify-center">
           <Link
-            to={`/content/${snapshotId}/print${window.location.search}`}
+            to={`/view/${snapshotId}/print${window.location.search}`}
             className="inline-flex items-center gap-2 px-4 py-2 text-sm text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50"
           >
             <Printer className="w-4 h-4" />

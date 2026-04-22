@@ -164,6 +164,9 @@ import { PaymentFailPage } from './pages/storefront/PaymentFailPage';
 // Public Content View (WO-KPA-A-CONTENT-USAGE-MODE-EXTENSION-V1)
 import { PublicContentViewPage, PrintContentPage } from './pages/content';
 
+// Contents Hub (WO-KPA-CONTENT-HUB-FOUNDATION-V1)
+import { ContentListPage, ContentDetailPage, ContentWritePage } from './pages/contents';
+
 // QR Landing Page (WO-O4O-QR-LANDING-PAGE-V1)
 import QrLandingPage from './pages/qr/QrLandingPage';
 
@@ -529,10 +532,16 @@ function App() {
           {/* My Content (내 콘텐츠 관리) - WO-APP-DATA-HUB-TO-DASHBOARD-PHASE3-V1 */}
           <Route path="/my-content" element={<Layout serviceName={SERVICE_NAME}><MyContentPage /></Layout>} />
 
-          {/* WO-KPA-CONTENT-HUB-REMOVAL-V1: /content 페이지 제거, 레거시 URL은 홈으로 리다이렉트 */}
-          <Route path="/content" element={<Navigate to="/" replace />} />
-          <Route path="/content/notice" element={<Navigate to="/" replace />} />
-          <Route path="/content/news" element={<Navigate to="/" replace />} />
+          {/* Content Hub (WO-KPA-CONTENT-HUB-FOUNDATION-V1) */}
+          <Route path="/content" element={<Layout serviceName={SERVICE_NAME}><ContentListPage /></Layout>} />
+          <Route path="/content/new" element={<Layout serviceName={SERVICE_NAME}><ContentWritePage /></Layout>} />
+          <Route path="/content/:id" element={<Layout serviceName={SERVICE_NAME}><ContentDetailPage /></Layout>} />
+          <Route path="/content/:id/edit" element={<Layout serviceName={SERVICE_NAME}><ContentWritePage /></Layout>} />
+
+          {/* Legacy redirects: /contents → /content */}
+          <Route path="/contents" element={<Navigate to="/content" replace />} />
+          <Route path="/content/notice" element={<Navigate to="/content" replace />} />
+          <Route path="/content/news" element={<Navigate to="/content" replace />} />
 
           {/* Legacy redirect: /news → / */}
           <Route path="/news" element={<Navigate to="/" replace />} />
@@ -701,8 +710,9 @@ function App() {
           <Route path="/kpa/store/:slug" element={<KpaRedirect to="/store" />} />
 
           {/* Public Content View (WO-KPA-A-CONTENT-USAGE-MODE-EXTENSION-V1) — public, no auth */}
-          <Route path="/content/:snapshotId/print" element={<PrintContentPage />} />
-          <Route path="/content/:snapshotId" element={<PublicContentViewPage />} />
+          <Route path="/view/:snapshotId/print" element={<PrintContentPage />} />
+          <Route path="/view/:snapshotId" element={<PublicContentViewPage />} />
+          {/* Legacy redirect: /content/:snapshotId was moved to /view/:snapshotId */}
 
           {/* QR Landing Page (WO-O4O-QR-LANDING-PAGE-V1) — public, no auth */}
           <Route path="/qr/:slug" element={<QrLandingPage />} />

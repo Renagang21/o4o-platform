@@ -5,12 +5,19 @@
  *   /api/v1/operator/stores/channels 기반 cross-store 채널 목록.
  *   상태 변경: APPROVED ↔ SUSPENDED → TERMINATED.
  *
+ * WO-O4O-OPERATOR-LIST-TABLE-STANDARD-V3-PHASE3B-1:
+ *   Raw HTML table → DataTable + ActionPolicy 표준 전환.
+ *
  * Bearer token auth (KPA — getAccessToken 사용).
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Check, Pause, Play, Power } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
+import { RowActionMenu } from '@o4o/ui';
+import { DataTable, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { getAccessToken } from '../../contexts/AuthContext';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
@@ -73,6 +80,49 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   return res.json();
 }
 
+// ─── Action Policy ───
+
+const channelActionPolicy = defineActionPolicy<ChannelData>('kpa:store-channels', {
+  rules: [
+    {
+      key: 'approve',
+      label: '승인',
+      visible: (row) => row.status === 'PENDING' || row.status === 'REJECTED',
+    },
+    {
+      key: 'suspend',
+      label: '비활성화',
+      variant: 'warning',
+      visible: (row) => row.status === 'APPROVED',
+    },
+    {
+      key: 'activate',
+      label: '재활성화',
+      visible: (row) => row.status === 'SUSPENDED',
+    },
+    {
+      key: 'terminate',
+      label: '종료',
+      variant: 'danger',
+      divider: true,
+      visible: (row) => row.status !== 'TERMINATED',
+      confirm: (row) => ({
+        title: '채널 종료',
+        message: `${row.storeName}의 ${CHANNEL_LABELS[row.channelType] || row.channelType} 채널을 영구 종료하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`,
+        confirmText: '종료',
+        variant: 'danger' as const,
+      }),
+    },
+  ],
+});
+
+const CHANNEL_ACTION_ICONS: Record<string, React.ReactNode> = {
+  approve: <Check className="w-4 h-4" />,
+  suspend: <Pause className="w-4 h-4" />,
+  activate: <Play className="w-4 h-4" />,
+  terminate: <Power className="w-4 h-4" />,
+};
+
 // ─── Component ───
 
 export default function OperatorStoreChannelsPage() {
@@ -124,9 +174,6 @@ export default function OperatorStoreChannelsPage() {
   };
 
   const handleStatusChange = async (channel: ChannelData, newStatus: string) => {
-    if (newStatus === 'TERMINATED' && !window.confirm(`${channel.storeName}의 ${CHANNEL_LABELS[channel.channelType] || channel.channelType} 채널을 영구 종료하시겠습니까? 이 작업은 되돌릴 수 없습니다.`)) {
-      return;
-    }
     setActionLoading(channel.id);
     try {
       await apiFetch(`/api/v1/operator/stores/${channel.storeId}/channels/${channel.id}/status`, {
@@ -153,6 +200,81 @@ export default function OperatorStoreChannelsPage() {
   const totalCount = pagination.total;
   const approvedCount = channels.filter((c) => c.status === 'APPROVED').length;
   const suspendedCount = channels.filter((c) => c.status === 'SUSPENDED').length;
+
+  const columns: ListColumnDef<ChannelData>[] = [
+    {
+      key: 'storeName',
+      header: '매장',
+      render: (_v, row) => (
+        <button
+          onClick={() => navigate(`/operator/stores/${row.storeId}`)}
+          className="text-left hover:text-blue-600 transition-colors"
+          style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+        >
+          <p className="font-medium text-sm text-slate-800" style={{ margin: 0 }}>{row.storeName}</p>
+          <p className="text-xs text-slate-400 font-mono" style={{ margin: 0 }}>{row.storeCode || '-'}</p>
+        </button>
+      ),
+    },
+    {
+      key: 'channelType',
+      header: '채널',
+      render: (value) => (
+        <span className="text-sm text-slate-700">
+          {CHANNEL_LABELS[value] || value}
+        </span>
+      ),
+    },
+    {
+      key: 'status',
+      header: '상태',
+      align: 'center' as const,
+      render: (value) => {
+        const badge = STATUS_BADGE[value] || { label: value, bg: 'bg-slate-100', text: 'text-slate-500' };
+        return (
+          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${badge.bg} ${badge.text}`}>
+            {badge.label}
+          </span>
+        );
+      },
+    },
+    {
+      key: 'createdAt',
+      header: '생성일',
+      render: (value) => <span className="text-sm text-slate-500">{formatDate(value)}</span>,
+    },
+    {
+      key: '_actions',
+      header: '액션',
+      align: 'center' as const,
+      width: '60px',
+      system: true,
+      onCellClick: () => {},
+      render: (_v, row) => {
+        if (row.status === 'TERMINATED') {
+          return <span className="text-xs text-slate-400">영구 종료</span>;
+        }
+        return (
+          <RowActionMenu
+            actions={buildRowActions(channelActionPolicy, row, {
+              approve: () => handleStatusChange(row, 'APPROVED'),
+              suspend: () => handleStatusChange(row, 'SUSPENDED'),
+              activate: () => handleStatusChange(row, 'APPROVED'),
+              terminate: () => handleStatusChange(row, 'TERMINATED'),
+            }, {
+              icons: CHANNEL_ACTION_ICONS,
+              loading: {
+                approve: actionLoading === row.id,
+                suspend: actionLoading === row.id,
+                activate: actionLoading === row.id,
+                terminate: actionLoading === row.id,
+              },
+            })}
+          />
+        );
+      },
+    },
+  ];
 
   return (
     <div className="space-y-6">
@@ -236,107 +358,14 @@ export default function OperatorStoreChannelsPage() {
           </button>
         </div>
 
-        {/* Loading */}
-        {isLoading && channels.length === 0 && (
-          <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 border-2 border-slate-600 border-t-transparent rounded-full animate-spin" />
-          </div>
-        )}
-
-        {(!isLoading || channels.length > 0) && (
-          <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-100">
-              <tr>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500">매장</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500">채널</th>
-                <th className="text-center px-4 py-3 text-xs font-medium text-slate-500">상태</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500">생성일</th>
-                <th className="text-right px-4 py-3 text-xs font-medium text-slate-500">액션</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {channels.length === 0 && !isLoading ? (
-                <tr>
-                  <td colSpan={5} className="px-4 py-12 text-center text-slate-400 text-sm">
-                    채널 데이터가 없습니다
-                  </td>
-                </tr>
-              ) : (
-                channels.map((ch) => {
-                  const badge = STATUS_BADGE[ch.status] || { label: ch.status, bg: 'bg-slate-100', text: 'text-slate-500' };
-                  const loading = actionLoading === ch.id;
-                  return (
-                    <tr key={ch.id} className="hover:bg-slate-50">
-                      <td className="px-4 py-3">
-                        <button
-                          onClick={() => navigate(`/operator/stores/${ch.storeId}`)}
-                          className="text-left hover:text-blue-600 transition-colors"
-                        >
-                          <p className="font-medium text-sm text-slate-800">{ch.storeName}</p>
-                          <p className="text-xs text-slate-400 font-mono">{ch.storeCode || '-'}</p>
-                        </button>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-slate-700">
-                        {CHANNEL_LABELS[ch.channelType] || ch.channelType}
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${badge.bg} ${badge.text}`}>
-                          {badge.label}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-slate-500">
-                        {formatDate(ch.createdAt)}
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        {ch.status !== 'TERMINATED' && (
-                          <div className="flex items-center justify-end gap-2">
-                            {ch.status === 'APPROVED' && (
-                              <button
-                                onClick={() => handleStatusChange(ch, 'SUSPENDED')}
-                                disabled={loading}
-                                className="px-3 py-1 text-xs font-medium rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-50"
-                              >
-                                비활성화
-                              </button>
-                            )}
-                            {ch.status === 'SUSPENDED' && (
-                              <button
-                                onClick={() => handleStatusChange(ch, 'APPROVED')}
-                                disabled={loading}
-                                className="px-3 py-1 text-xs font-medium rounded-lg bg-green-50 text-green-700 hover:bg-green-100 disabled:opacity-50"
-                              >
-                                재활성화
-                              </button>
-                            )}
-                            {(ch.status === 'PENDING' || ch.status === 'REJECTED') && (
-                              <button
-                                onClick={() => handleStatusChange(ch, 'APPROVED')}
-                                disabled={loading}
-                                className="px-3 py-1 text-xs font-medium rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 disabled:opacity-50"
-                              >
-                                승인
-                              </button>
-                            )}
-                            <button
-                              onClick={() => handleStatusChange(ch, 'TERMINATED')}
-                              disabled={loading}
-                              className="px-3 py-1 text-xs font-medium rounded-lg text-red-600 hover:bg-red-50 disabled:opacity-50"
-                            >
-                              종료
-                            </button>
-                          </div>
-                        )}
-                        {ch.status === 'TERMINATED' && (
-                          <span className="text-xs text-slate-400">영구 종료</span>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        )}
+        <DataTable<ChannelData>
+          columns={columns}
+          data={channels}
+          rowKey="id"
+          loading={isLoading}
+          emptyMessage="채널 데이터가 없습니다"
+          tableId="kpa-store-channels"
+        />
 
         {/* Pagination */}
         {!isLoading && pagination.totalPages > 1 && (

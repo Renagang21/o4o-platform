@@ -250,7 +250,7 @@ export default function StoreContentEditPage() {
     setUsage(prev => ({ ...prev, ...patch }));
   };
 
-  const publicUrl = snapshotId && orgId ? `${window.location.origin}/content/${snapshotId}?org=${orgId}` : '';
+  const publicUrl = snapshotId && orgId ? `${window.location.origin}/view/${snapshotId}?org=${orgId}` : '';
 
   if (loading) {
     return (
@@ -315,7 +315,7 @@ export default function StoreContentEditPage() {
             </button>
             {source === 'store' && orgId && (
               <Link
-                to={`/content/${snapshotId}?org=${orgId}`}
+                to={`/view/${snapshotId}?org=${orgId}`}
                 target="_blank"
                 className="flex items-center gap-1.5 px-3 py-2 text-sm text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50"
               >

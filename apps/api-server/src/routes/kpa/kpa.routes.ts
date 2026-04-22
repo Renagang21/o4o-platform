@@ -956,27 +956,46 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // ============================================================================
   // CONTENT HUB ROUTES — WO-O4O-KPA-CONTENT-HUB-FOUNDATION-V1
-  // Block 기반 콘텐츠 정리 허브 (기존 자료실 대체)
+  // WO-KPA-CONTENT-HUB-FOUNDATION-V1: 커뮤니티 콘텐츠 허브 확장
   // ============================================================================
   {
-    // WO-O4O-KPA-CONTENT-HUB-FOUNDATION-V1: Raw SQL (no dynamic import needed)
     const contentRouter = Router();
 
+    // Helper: check if user has kpa:operator or higher scope
+    const isKpaOperatorOrAdmin = (user: any): boolean => {
+      if (!user?.roles) return false;
+      return user.roles.some((r: string) =>
+        r === 'kpa:operator' || r === 'kpa:admin' || r === 'platform:super_admin'
+      );
+    };
+
     // GET /contents — 목록 (optionalAuth: 공개 접근)
+    // WO-KPA-CONTENT-HUB-FOUNDATION-V1: content_type, sub_type, sort 필터 추가
     contentRouter.get('/', optionalAuth as any, asyncHandler(async (req: Request, res: Response) => {
-      const { page = '1', limit = '20', category, search, status: statusFilter, tag } = req.query;
+      const { page = '1', limit = '20', category, search, status: statusFilter, tag, content_type: contentTypeFilter, sub_type: subTypeFilter, sort = 'latest' } = req.query;
       const pageNum = Math.max(1, Number(page));
       const limitNum = Math.min(100, Math.max(1, Number(limit)));
       const offset = (pageNum - 1) * limitNum;
+      const userId = (req as any).user?.id;
 
       const conditions: string[] = [`c.is_deleted = false`];
       const params: any[] = [];
       let idx = 1;
 
+      // 비로그인 시 published만, 로그인 시 본인 draft/private도 포함
+      if (!userId) {
+        conditions.push(`c.status = 'published'`);
+      } else if (!statusFilter) {
+        conditions.push(`(c.status = 'published' OR c.created_by = $${idx++})`);
+        params.push(userId);
+      }
+
       if (category) { conditions.push(`c.category = $${idx++}`); params.push(category); }
       if (statusFilter) { conditions.push(`c.status = $${idx++}`); params.push(statusFilter); }
+      if (contentTypeFilter) { conditions.push(`c.content_type = $${idx++}`); params.push(contentTypeFilter); }
+      if (subTypeFilter) { conditions.push(`c.sub_type = $${idx++}`); params.push(subTypeFilter); }
       if (search) {
-        conditions.push(`(c.title ILIKE $${idx} OR c.summary ILIKE $${idx})`);
+        conditions.push(`(c.title ILIKE $${idx} OR c.summary ILIKE $${idx} OR c.body ILIKE $${idx} OR c.author_name ILIKE $${idx} OR c.tags::text ILIKE $${idx})`);
         params.push(`%${search}%`); idx++;
       }
       if (tag) {
@@ -984,14 +1003,20 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         params.push(JSON.stringify([tag]));
       }
 
+      // Sort
+      let orderBy = 'c.created_at DESC';
+      if (sort === 'popular') orderBy = 'c.like_count DESC, c.created_at DESC';
+      else if (sort === 'views') orderBy = 'c.view_count DESC, c.created_at DESC';
+
       const where = `WHERE ${conditions.join(' AND ')}`;
       const [[{ total }], rows] = await Promise.all([
         dataSource.query(`SELECT COUNT(*)::int as total FROM kpa_contents c ${where}`, params),
         dataSource.query(
           `SELECT c.id, c.title, c.summary, c.category, c.tags, c.status,
-                  c.source_type, c.thumbnail_url, c.created_by, c.created_at, c.updated_at
+                  c.source_type, c.thumbnail_url, c.created_by, c.created_at, c.updated_at,
+                  c.content_type, c.sub_type, c.like_count, c.view_count, c.author_name
            FROM kpa_contents c ${where}
-           ORDER BY c.created_at DESC
+           ORDER BY ${orderBy}
            LIMIT $${idx} OFFSET $${idx + 1}`,
           [...params, limitNum, offset]
         ),
@@ -1008,7 +1033,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
             visibility: 'service' as const,
             serviceKey: 'kpa-society' as const,
             contentType: 'document' as const,
-            metaStatus: mapCmsStatus(row.status === 'ready' ? 'pending' : (row.status ?? 'draft')),
+            metaStatus: mapCmsStatus(row.status === 'published' ? 'pending' : (row.status ?? 'draft')),
           })),
           total,
           page: pageNum,
@@ -1018,19 +1043,26 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       });
     }));
 
-    // POST /contents — 등록 (operator)
-    contentRouter.post('/', authenticate, requireKpaScope('kpa:operator') as any, asyncHandler(async (req: Request, res: Response) => {
-      const userId = (req as any).user?.id;
-      const { title, summary, blocks, tags, category, thumbnail_url, source_type, source_url, source_file_name, status: reqStatus } = req.body;
+    // POST /contents — 등록 (인증된 사용자)
+    // WO-KPA-CONTENT-HUB-FOUNDATION-V1: 일반 사용자도 콘텐츠 생성 가능
+    contentRouter.post('/', authenticate, asyncHandler(async (req: Request, res: Response) => {
+      const user = (req as any).user;
+      const userId = user?.id;
+      const { title, summary, blocks, tags, category, thumbnail_url, source_type, source_url, source_file_name, status: reqStatus, body, content_type, sub_type } = req.body;
 
       if (!title?.trim()) {
         res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'title은 필수입니다' } });
         return;
       }
 
+      const validStatuses = ['draft', 'published', 'private'];
+      const status = validStatuses.includes(reqStatus) ? reqStatus : 'draft';
+      const validContentTypes = ['participation', 'information'];
+      const cType = validContentTypes.includes(content_type) ? content_type : 'information';
+
       const [saved] = await dataSource.query(
-        `INSERT INTO kpa_contents (title, summary, blocks, tags, category, thumbnail_url, source_type, source_url, source_file_name, status, created_by)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+        `INSERT INTO kpa_contents (title, summary, blocks, tags, category, thumbnail_url, source_type, source_url, source_file_name, status, created_by, body, content_type, sub_type, author_name)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
          RETURNING *`,
         [
           title.trim(),
@@ -1042,16 +1074,22 @@ export function createKpaRoutes(dataSource: DataSource): Router {
           source_type || 'manual',
           source_url || null,
           source_file_name || null,
-          reqStatus === 'ready' ? 'ready' : 'draft',
+          status,
           userId,
+          body || null,
+          cType,
+          sub_type || null,
+          user?.name || null,
         ]
       );
-      await writeAuditLog((req as any).user, 'CONTENT_CREATED', 'kpa_content', saved.id, { title: saved.title });
+      await writeAuditLog(user, 'CONTENT_CREATED', 'kpa_content', saved.id, { title: saved.title });
       res.status(201).json({ success: true, data: saved });
     }));
 
     // GET /contents/:id — 상세
+    // WO-KPA-CONTENT-HUB-FOUNDATION-V1: isRecommendedByMe 포함
     contentRouter.get('/:id', optionalAuth as any, asyncHandler(async (req: Request, res: Response) => {
+      const userId = (req as any).user?.id;
       const [content] = await dataSource.query(
         `SELECT * FROM kpa_contents WHERE id = $1 AND is_deleted = false LIMIT 1`,
         [req.params.id]
@@ -1060,23 +1098,38 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '콘텐츠를 찾을 수 없습니다' } });
         return;
       }
+
+      // Check recommendation status for logged-in user
+      let isRecommendedByMe = false;
+      if (userId) {
+        const rec = await dataSource.query(
+          `SELECT id FROM kpa_content_recommendations WHERE content_id = $1 AND user_id = $2 LIMIT 1`,
+          [content.id, userId]
+        ).catch(() => []);
+        isRecommendedByMe = rec.length > 0;
+      }
+
       res.json({
         success: true,
         data: {
           ...content,
+          isRecommendedByMe,
           // ContentMeta (WO-CONTENT-META-API-ENRICHMENT-V1)
           producer: 'service_admin' as const,
           producerRef: content.created_by ?? '',
           visibility: 'service' as const,
           serviceKey: 'kpa-society' as const,
           contentType: 'document' as const,
-          metaStatus: mapCmsStatus(content.status === 'ready' ? 'pending' : (content.status ?? 'draft')),
+          metaStatus: mapCmsStatus(content.status === 'published' ? 'pending' : (content.status ?? 'draft')),
         },
       });
     }));
 
-    // PATCH /contents/:id — 수정 (operator)
-    contentRouter.patch('/:id', authenticate, requireKpaScope('kpa:operator') as any, asyncHandler(async (req: Request, res: Response) => {
+    // PATCH /contents/:id — 수정 (본인 또는 운영자)
+    // WO-KPA-CONTENT-HUB-FOUNDATION-V1: 작성자 본인 또는 kpa:operator 수정 가능
+    contentRouter.patch('/:id', authenticate, asyncHandler(async (req: Request, res: Response) => {
+      const user = (req as any).user;
+      const userId = user?.id;
       const [existing] = await dataSource.query(
         `SELECT * FROM kpa_contents WHERE id = $1 AND is_deleted = false LIMIT 1`,
         [req.params.id]
@@ -1086,7 +1139,14 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         return;
       }
 
-      const { title, summary, blocks, tags, category, thumbnail_url, source_type, source_url, source_file_name, status: reqStatus } = req.body;
+      const isOwner = existing.created_by === userId;
+      const isOperator = isKpaOperatorOrAdmin(user);
+      if (!isOwner && !isOperator) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: '수정 권한이 없습니다' } });
+        return;
+      }
+
+      const { title, summary, blocks, tags, category, thumbnail_url, source_type, source_url, source_file_name, status: reqStatus, body, content_type, sub_type } = req.body;
 
       const sets: string[] = [`updated_at = NOW()`];
       const params: any[] = [];
@@ -1101,30 +1161,114 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       if (source_type !== undefined) { sets.push(`source_type = $${idx++}`); params.push(source_type); }
       if (source_url !== undefined) { sets.push(`source_url = $${idx++}`); params.push(source_url || null); }
       if (source_file_name !== undefined) { sets.push(`source_file_name = $${idx++}`); params.push(source_file_name || null); }
-      if (reqStatus !== undefined) { sets.push(`status = $${idx++}`); params.push(reqStatus === 'ready' ? 'ready' : 'draft'); }
+      if (reqStatus !== undefined) {
+        const validStatuses = ['draft', 'published', 'private'];
+        sets.push(`status = $${idx++}`);
+        params.push(validStatuses.includes(reqStatus) ? reqStatus : existing.status);
+      }
+      if (body !== undefined) { sets.push(`body = $${idx++}`); params.push(body || null); }
+      if (content_type !== undefined) {
+        const validTypes = ['participation', 'information'];
+        sets.push(`content_type = $${idx++}`);
+        params.push(validTypes.includes(content_type) ? content_type : existing.content_type);
+      }
+      if (sub_type !== undefined) { sets.push(`sub_type = $${idx++}`); params.push(sub_type || null); }
 
       params.push(existing.id);
       const [updated] = await dataSource.query(
         `UPDATE kpa_contents SET ${sets.join(', ')} WHERE id = $${idx} RETURNING *`,
         params
       );
-      await writeAuditLog((req as any).user, 'CONTENT_UPDATED', 'kpa_content', updated.id, { title: updated.title });
+      await writeAuditLog(user, 'CONTENT_UPDATED', 'kpa_content', updated.id, { title: updated.title });
       res.json({ success: true, data: updated });
     }));
 
-    // DELETE /contents/:id — soft delete (operator)
-    contentRouter.delete('/:id', authenticate, requireKpaScope('kpa:operator') as any, asyncHandler(async (req: Request, res: Response) => {
+    // DELETE /contents/:id — soft delete (본인 또는 운영자)
+    // WO-KPA-CONTENT-HUB-FOUNDATION-V1: 작성자 본인 또는 kpa:operator 삭제 가능
+    contentRouter.delete('/:id', authenticate, asyncHandler(async (req: Request, res: Response) => {
+      const user = (req as any).user;
+      const userId = user?.id;
       const [existing] = await dataSource.query(
-        `SELECT id, title FROM kpa_contents WHERE id = $1 AND is_deleted = false LIMIT 1`,
+        `SELECT id, title, created_by FROM kpa_contents WHERE id = $1 AND is_deleted = false LIMIT 1`,
         [req.params.id]
       );
       if (!existing) {
         res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '콘텐츠를 찾을 수 없습니다' } });
         return;
       }
+
+      const isOwner = existing.created_by === userId;
+      const isOperator = isKpaOperatorOrAdmin(user);
+      if (!isOwner && !isOperator) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: '삭제 권한이 없습니다' } });
+        return;
+      }
+
       await dataSource.query(`UPDATE kpa_contents SET is_deleted = true, updated_at = NOW() WHERE id = $1`, [existing.id]);
-      await writeAuditLog((req as any).user, 'CONTENT_DELETED', 'kpa_content', existing.id, { title: existing.title });
+      await writeAuditLog(user, 'CONTENT_DELETED', 'kpa_content', existing.id, { title: existing.title });
       res.json({ success: true, data: { deleted: true, id: existing.id } });
+    }));
+
+    // ── Recommend toggle (WO-KPA-CONTENT-HUB-FOUNDATION-V1) ─────────────────
+    contentRouter.post('/:id/recommend', authenticate, asyncHandler(async (req: Request, res: Response) => {
+      const userId = (req as any).user?.id;
+      if (!userId) {
+        res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+        return;
+      }
+
+      const [content] = await dataSource.query(
+        `SELECT id FROM kpa_contents WHERE id = $1 AND is_deleted = false LIMIT 1`,
+        [req.params.id]
+      );
+      if (!content) {
+        res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '콘텐츠를 찾을 수 없습니다' } });
+        return;
+      }
+
+      const existing = await dataSource.query(
+        `SELECT id FROM kpa_content_recommendations WHERE content_id = $1 AND user_id = $2`,
+        [content.id, userId]
+      );
+
+      let isRecommendedByMe: boolean;
+      if (existing.length > 0) {
+        await dataSource.query(
+          `DELETE FROM kpa_content_recommendations WHERE content_id = $1 AND user_id = $2`,
+          [content.id, userId]
+        );
+        await dataSource.query(
+          `UPDATE kpa_contents SET like_count = GREATEST(0, like_count - 1) WHERE id = $1`,
+          [content.id]
+        );
+        isRecommendedByMe = false;
+      } else {
+        await dataSource.query(
+          `INSERT INTO kpa_content_recommendations (content_id, user_id) VALUES ($1, $2)`,
+          [content.id, userId]
+        );
+        await dataSource.query(
+          `UPDATE kpa_contents SET like_count = like_count + 1 WHERE id = $1`,
+          [content.id]
+        );
+        isRecommendedByMe = true;
+      }
+
+      const [{ count }] = await dataSource.query(
+        `SELECT COUNT(*)::int as count FROM kpa_content_recommendations WHERE content_id = $1`,
+        [content.id]
+      );
+
+      res.json({ success: true, data: { recommendCount: count, isRecommendedByMe } });
+    }));
+
+    // ── View count (WO-KPA-CONTENT-HUB-FOUNDATION-V1) ────────────────────
+    contentRouter.post('/:id/view', optionalAuth as any, asyncHandler(async (req: Request, res: Response) => {
+      await dataSource.query(
+        `UPDATE kpa_contents SET view_count = view_count + 1 WHERE id = $1 AND is_deleted = false`,
+        [req.params.id]
+      );
+      res.json({ success: true });
     }));
 
     // ── AI endpoints (WO-O4O-STORE-CONTENT-USAGE-RECOMPOSE-V1: stubs → execute()) ──

@@ -104,6 +104,11 @@ export function OperatorRoutes() {
           <Route path="docs" element={<OperatorContentHubPage />} />
           <Route path="content-hub/:id" element={<OperatorContentDetailPage />} />
 
+          {/* 자료 등록/수정 (WO-KPA-RESOURCE-HUB-RESTRUCTURE-V1) */}
+          <Route path="resources" element={<Navigate to="/operator/docs" replace />} />
+          <Route path="resources/new" element={<OperatorContentHubPage />} />
+          <Route path="resources/:id/edit" element={<OperatorContentDetailPage />} />
+
           {/* 내 콘텐츠 (WO-O4O-STORE-CONTENT-USAGE-RECOMPOSE-V1) */}
           <Route path="working-content" element={<WorkingContentListPage />} />
           <Route path="working-content/:id" element={<WorkingContentEditPage />} />
