@@ -233,10 +233,9 @@ import {
   NetureContactMessage,
   OfferServiceApproval,
 } from '../modules/neture/entities/index.js';
-import {
-  NetureOrder,
-  NeturePartner,
-} from '../routes/neture/entities/index.js'; // WO-TYPEORM-ENTITY-REGISTRATION-FIX-V2
+// NetureOrder, NeturePartner 제거: routes/neture 엔티티는 NetureProduct/NetureOrderItem 의존 관계가 있어
+// 해당 의존 엔티티까지 함께 등록해야 함. 현재 미등록 상태로 DataSource 초기화 실패 발생.
+// WO-TYPEORM-ENTITY-REGISTRATION-FIX-V3에서 의존 전체 등록 또는 routes/neture 마이그레이션 필요.
 import { KpaSteward } from '../routes/kpa/entities/kpa-steward.entity.js'; // WO-TYPEORM-ENTITY-REGISTRATION-FIX-V2
 
 // ============================================================================
@@ -738,8 +737,6 @@ export const AppDataSource = new DataSource({
     NetureContactMessage,
     OfferServiceApproval,
     // WO-TYPEORM-ENTITY-REGISTRATION-FIX-V2
-    NetureOrder,
-    NeturePartner,
     KpaSteward,
     // ============================================================================
     // CATALOG IMPORT ENTITIES (WO-O4O-CATALOG-IMPORT-APP-IMPLEMENTATION-V1)
