@@ -52,6 +52,7 @@
     "// === 블록 플러그인 빌드 (별도 설치 필요) ===": "",
     "build:blocks": "cd packages/block-core && pnpm run build && cd ../blocks/text-content && pnpm run build && cd ../layout-media && pnpm run build && cd ../interactive && pnpm run build && cd ../dynamic && pnpm run build",
     "// === 테스트 & 린트 (Cross-Platform) ===": "",
+    "check:typeorm-entities": "node scripts/check-typeorm-entities.mjs",
     "type-check": "node scripts/dev.mjs type-check",
     "type-check:frontend": "node scripts/dev.mjs type-check:frontend",
     "lint": "node scripts/dev.mjs lint",
