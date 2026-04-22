@@ -514,7 +514,7 @@ export class NetureService {
         throw new Error(`Product not found: ${item.product_id}`);
       }
 
-      const productName = offer.master?.marketingName || '';
+      const productName = offer.master?.name || '';
 
       // Gate 1: 상품 활성 상태
       if (!offer.isActive) {

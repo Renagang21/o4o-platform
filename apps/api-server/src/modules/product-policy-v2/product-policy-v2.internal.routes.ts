@@ -295,7 +295,7 @@ export function createProductPolicyV2InternalRouter(dataSource: DataSource): Rou
         data: offers.map(o => ({
           id: o.id,
           masterId: o.masterId,
-          masterName: o.master?.marketingName ?? null,
+          masterName: o.master?.name ?? null,
           supplierId: o.supplierId,
           distributionType: o.distributionType,
           isActive: o.isActive,

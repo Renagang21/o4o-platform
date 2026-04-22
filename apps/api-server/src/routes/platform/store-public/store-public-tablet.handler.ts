@@ -192,7 +192,7 @@ export function createStorePublicTabletRoutes(deps: {
       const masterRepo = dataSource.getRepository(ProductMaster);
       const master = await masterRepo.findOne({
         where: { id: masterId },
-        select: ['id', 'marketingName'],
+        select: ['id', 'name'],
       });
       if (!master) {
         res.status(404).json({
@@ -207,7 +207,7 @@ export function createStorePublicTabletRoutes(deps: {
       const interest = interestRepo.create({
         organizationId: resolved.storeId,
         masterId: master.id,
-        productName: master.marketingName,
+        productName: master.name,
         customerName: customerName?.trim() || undefined,
         customerNote: customerNote?.trim() || undefined,
         status: InterestRequestStatus.REQUESTED,

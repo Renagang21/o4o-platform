@@ -525,7 +525,7 @@ export function createStoreTabletRoutes(
         profile = profileRepo.create({
           organizationId,
           masterId: master.id,
-          displayName: master.marketingName,
+          displayName: master.name,
           isActive: true,
         });
         profile = await profileRepo.save(profile);
@@ -537,7 +537,7 @@ export function createStoreTabletRoutes(
           profileId: profile.id,
           masterId: master.id,
           barcode: master.barcode,
-          marketingName: master.marketingName,
+          name: master.name,
           regulatoryName: master.regulatoryName,
           manufacturerName: master.manufacturerName,
           displayName: profile.displayName,

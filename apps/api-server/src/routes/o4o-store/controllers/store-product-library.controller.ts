@@ -73,7 +73,7 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
     const data = result.data.map((m) => ({
       id: m.id,
       barcode: m.barcode,
-      marketingName: m.marketingName,
+      name: m.name,
       regulatoryName: m.regulatoryName,
       manufacturerName: m.manufacturerName,
       specification: m.specification || null,
@@ -189,7 +189,7 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
       dataSource.query(
         `SELECT opl.id, opl.is_active AS "isActive", opl.price, opl.created_at AS "createdAt",
                 opl.updated_at AS "updatedAt",
-                pm.id AS "masterId", pm.barcode, pm.marketing_name AS "marketingName",
+                pm.id AS "masterId", pm.barcode, pm.name,
                 pm.regulatory_name AS "regulatoryName", pm.manufacturer_name AS "manufacturerName",
                 (SELECT pi.image_url FROM product_images pi
                  WHERE pi.master_id = pm.id AND pi.is_primary = true LIMIT 1) AS "primaryImage",
