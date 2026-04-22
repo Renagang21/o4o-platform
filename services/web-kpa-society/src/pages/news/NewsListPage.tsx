@@ -6,15 +6,14 @@
  * - 허브 소개 영역 + 활성 탭 표시
  * - 빈 상태 구분 (데이터 없음 vs 오류)
  *
- * UX 원칙:
- * - 리스트: 추천/조회는 숫자 표시만 (액션 없음)
- * - 리스트: 가져오기(Copy) 버튼 제거 → 상세 페이지에서만 가능
- * - 리스트: "사용 중" 상태 표시는 유지
- * - 상세 페이지에서 추천/가져오기 액션 수행
+ * WO-KPA-CONTENT-LIKE-AND-SORT-V1:
+ * - 리스트에서 좋아요(추천) 토글 가능 (optimistic update)
+ * - 인기순(popular) 정렬 추가
+ * - 비로그인 시 로그인 유도
  */
 
-import { useState, useEffect } from 'react';
-import { Link, useSearchParams, useLocation } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
+import { Link, useSearchParams, useLocation, useNavigate } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { newsApi, dashboardApi } from '../../api';
 import { useAuth } from '../../contexts/AuthContext';
@@ -33,10 +32,11 @@ const filterTypes: { type: ContentType; label: string }[] = [
   { type: 'notice', label: '공지사항' },
   { type: 'news', label: '뉴스' },
 ];
-const sortTypes: ContentSortType[] = ['latest', 'featured', 'views'];
+const sortTypes: ContentSortType[] = ['latest', 'popular', 'featured', 'views'];
 
 export function NewsListPage() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const [notices, setNotices] = useState<Notice[]>([]);
@@ -45,6 +45,8 @@ export function NewsListPage() {
   const [totalItems, setTotalItems] = useState(0);
   const [sort, setSort] = useState<ContentSortType>('latest');
   const [copiedIds, setCopiedIds] = useState<Set<string>>(new Set());
+  const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
+  const [likingId, setLikingId] = useState<string | null>(null);
 
   // Phase 3: 이미 복사한 콘텐츠 ID 로드
   useEffect(() => {
@@ -84,9 +86,14 @@ export function NewsListPage() {
         search: searchQuery || undefined,
         sort,
       });
-      setNotices(res.data || []);
+      const items = res.data || [];
+      setNotices(items);
       setTotalPages(res.totalPages || 1);
       setTotalItems(res.total || 0);
+      // WO-KPA-CONTENT-LIKE-AND-SORT-V1: 좋아요 상태 초기화
+      const liked = new Set<string>();
+      items.forEach((n: any) => { if (n.isRecommendedByMe) liked.add(n.id); });
+      setLikedIds(liked);
     } catch (err) {
       console.warn('News API not available:', err);
       setNotices([]);
@@ -111,6 +118,43 @@ export function NewsListPage() {
       return prev;
     });
   };
+
+  // WO-KPA-CONTENT-LIKE-AND-SORT-V1: 좋아요 토글 (optimistic update)
+  const handleLike = useCallback(async (id: string) => {
+    if (!user) {
+      navigate('/login', { state: { from: location.pathname + location.search } });
+      return;
+    }
+    setLikingId(id);
+    const wasLiked = likedIds.has(id);
+    // Optimistic update
+    setLikedIds(prev => {
+      const next = new Set(prev);
+      wasLiked ? next.delete(id) : next.add(id);
+      return next;
+    });
+    setNotices(prev => prev.map(n =>
+      n.id === id
+        ? { ...n, recommendCount: ((n as any).recommendCount ?? 0) + (wasLiked ? -1 : 1) }
+        : n
+    ));
+    try {
+      await newsApi.toggleRecommend(id);
+    } catch {
+      // Rollback on failure
+      setLikedIds(prev => {
+        const next = new Set(prev);
+        wasLiked ? next.add(id) : next.delete(id);
+        return next;
+      });
+      setNotices(prev => prev.map(n =>
+        n.id === id
+          ? { ...n, recommendCount: ((n as any).recommendCount ?? 0) + (wasLiked ? 1 : -1) }
+          : n
+      ));
+    }
+    setLikingId(null);
+  }, [user, likedIds, navigate, location]);
 
   const pageTitle = currentType ? CONTENT_TYPE_LABELS[currentType] : '콘텐츠';
 
@@ -165,8 +209,8 @@ export function NewsListPage() {
       <div style={{ marginBottom: '24px' }}>
         <ContentSortButtons
           value={sort}
-          onChange={handleSortChange as (sort: 'latest' | 'featured' | 'views') => void}
-          options={sortTypes as ('latest' | 'featured' | 'views')[]}
+          onChange={handleSortChange}
+          options={sortTypes}
         />
       </div>
 
@@ -211,12 +255,15 @@ export function NewsListPage() {
                   {(notice.summary || notice.excerpt) && (
                     <p style={styles.itemExcerpt}>{notice.summary || notice.excerpt}</p>
                   )}
-                  {/* 하단: 조회수, 추천수, 날짜 (표시만, 액션은 상세 페이지에서) */}
+                  {/* 하단: 조회수, 좋아요(토글), 날짜 */}
                   <div style={{ marginTop: '12px' }}>
                     <ContentMetaBar
                       viewCount={notice.viewCount || notice.views || 0}
-                      likeCount={notice.recommendCount ?? notice.likeCount ?? 0}
+                      likeCount={(notice as any).recommendCount ?? notice.likeCount ?? 0}
                       date={notice.publishedAt || notice.createdAt}
+                      isLiked={likedIds.has(notice.id)}
+                      onLikeClick={() => handleLike(notice.id)}
+                      likeLoading={likingId === notice.id}
                     />
                   </div>
                 </Card>

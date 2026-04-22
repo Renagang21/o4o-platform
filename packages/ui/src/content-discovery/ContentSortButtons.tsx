@@ -9,12 +9,13 @@
 import React from 'react';
 
 // Content types (inline to avoid module resolution issues)
-export type ContentSortType = 'latest' | 'featured' | 'views';
+export type ContentSortType = 'latest' | 'featured' | 'views' | 'popular';
 
 const CONTENT_SORT_LABELS: Record<ContentSortType, string> = {
   latest: '최신순',
   featured: '추천순',
   views: '조회순',
+  popular: '인기순',
 };
 
 export interface ContentSortButtonsProps {

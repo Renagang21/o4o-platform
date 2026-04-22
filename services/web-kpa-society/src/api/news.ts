@@ -17,7 +17,7 @@ export const newsApi = {
     page?: number;
     limit?: number;
     search?: string;
-    sort?: 'latest' | 'featured' | 'views';
+    sort?: 'latest' | 'featured' | 'views' | 'popular';
   }) =>
     apiClient.get<PaginatedResponse<Notice>>('/news', params),
 

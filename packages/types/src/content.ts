@@ -15,7 +15,7 @@
 export type ContentType = 'notice' | 'hero' | 'promo' | 'news' | 'featured' | 'event' | 'guide' | 'knowledge';
 
 /** 정렬 기준 */
-export type ContentSortType = 'latest' | 'featured' | 'views';
+export type ContentSortType = 'latest' | 'featured' | 'views' | 'popular';
 
 /** 콘텐츠 출처(작성자) 유형 */
 export type ContentSourceType = 'operator' | 'supplier' | 'pharmacist';
@@ -121,6 +121,7 @@ export const CONTENT_SORT_LABELS: Record<ContentSortType, string> = {
   latest: '최신순',
   featured: '추천순',
   views: '조회순',
+  popular: '인기순',
 };
 
 /** 출처 유형별 한글 라벨 */

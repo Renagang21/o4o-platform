@@ -42,6 +42,11 @@ export interface ContentMetaBarProps {
   onSourceClick?: (source: ContentSourceType) => void;
   onViewsClick?: () => void;
 
+  // WO-KPA-CONTENT-LIKE-AND-SORT-V1: 좋아요 토글
+  isLiked?: boolean;
+  onLikeClick?: (e: React.MouseEvent) => void;
+  likeLoading?: boolean;
+
   // 활성 필터 상태
   activeFilters?: {
     recommended?: boolean;
@@ -106,6 +111,9 @@ export function ContentMetaBar({
   onTypeClick,
   onSourceClick,
   onViewsClick,
+  isLiked,
+  onLikeClick,
+  likeLoading,
   activeFilters,
   layout = 'stacked',
   size = 'sm',
@@ -189,10 +197,31 @@ export function ContentMetaBar({
             </span>
           )}
           {likeCount !== undefined && (
-            <span style={statItemStyle}>
-              <span>👍</span>
-              <span>{formatNumber(likeCount)}</span>
-            </span>
+            onLikeClick ? (
+              <button
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); onLikeClick(e); }}
+                disabled={likeLoading}
+                style={{
+                  ...statItemStyle,
+                  cursor: likeLoading ? 'wait' : 'pointer',
+                  background: 'none',
+                  border: 'none',
+                  padding: 0,
+                  color: isLiked ? '#2563EB' : '#6B7280',
+                  fontWeight: isLiked ? 600 : 400,
+                  opacity: likeLoading ? 0.6 : 1,
+                  transition: 'color 0.15s, font-weight 0.15s',
+                }}
+              >
+                <span>👍</span>
+                <span>{formatNumber(likeCount)}</span>
+              </button>
+            ) : (
+              <span style={statItemStyle}>
+                <span>👍</span>
+                <span>{formatNumber(likeCount)}</span>
+              </span>
+            )
           )}
           {date && (
             <span style={{ color: '#9CA3AF' }}>

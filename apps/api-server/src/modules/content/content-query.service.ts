@@ -15,7 +15,7 @@ export interface ContentQueryConfig {
 
 export interface ContentListParams {
   type?: string;
-  sort?: 'latest' | 'featured' | 'views';
+  sort?: 'latest' | 'featured' | 'views' | 'popular';
   page?: number;
   limit?: number;
   /** WO-O4O-CMS-VISIBILITY-EXTENSION-PHASE1-V1: filter by author role */
@@ -72,6 +72,9 @@ export class ContentQueryService {
         break;
       case 'views':
         order = { isPinned: 'DESC', viewCount: 'DESC', createdAt: 'DESC' };
+        break;
+      case 'popular':
+        order = { isPinned: 'DESC', likeCount: 'DESC', createdAt: 'DESC' };
         break;
       default: // 'latest'
         order = { isPinned: 'DESC', createdAt: 'DESC' };
@@ -208,6 +211,11 @@ export class ContentQueryService {
         `DELETE FROM cms_content_recommendations WHERE content_id = $1 AND user_id = $2`,
         [contentId, userId],
       );
+      // WO-KPA-CONTENT-LIKE-AND-SORT-V1: 비정규화 카운터 동기화
+      await this.dataSource.query(
+        `UPDATE cms_contents SET "likeCount" = GREATEST(0, "likeCount" - 1) WHERE id = $1`,
+        [contentId],
+      ).catch(() => {}); // likeCount 컬럼 미존재 시 graceful
       isRecommendedByMe = false;
     } else {
       // 추천 추가
@@ -215,6 +223,11 @@ export class ContentQueryService {
         `INSERT INTO cms_content_recommendations (content_id, user_id) VALUES ($1, $2)`,
         [contentId, userId],
       );
+      // WO-KPA-CONTENT-LIKE-AND-SORT-V1: 비정규화 카운터 동기화
+      await this.dataSource.query(
+        `UPDATE cms_contents SET "likeCount" = "likeCount" + 1 WHERE id = $1`,
+        [contentId],
+      ).catch(() => {}); // likeCount 컬럼 미존재 시 graceful
       isRecommendedByMe = true;
     }
 
