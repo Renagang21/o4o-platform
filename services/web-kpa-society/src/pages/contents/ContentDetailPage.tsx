@@ -3,7 +3,7 @@
  *
  * WO-KPA-CONTENT-HUB-FOUNDATION-V1
  *
- * 본문(body HTML) 표시, 추천 토글, "활용" 버튼, 수정 링크
+ * 본문(body HTML) 표시, 추천 토글, 링크 복사, 수정 링크
  */
 
 import { useState, useEffect } from 'react';
@@ -38,7 +38,7 @@ export function ContentDetailPage() {
   const [isRecommended, setIsRecommended] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [recommending, setRecommending] = useState(false);
-  const [copying, setCopying] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -77,20 +77,16 @@ export function ContentDetailPage() {
     }
   };
 
-  const handleCopyToStore = async () => {
-    if (!isAuthenticated || !id) {
-      toast.error('로그인이 필요합니다');
-      return;
-    }
-    setCopying(true);
-    try {
-      await contentApi.copyToStore(id);
-      toast.success('내 공간에 복사되었습니다');
-    } catch (e: any) {
-      toast.error(e?.message || '복사에 실패했습니다');
-    } finally {
-      setCopying(false);
-    }
+  const handleCopyLink = () => {
+    if (!id) return;
+    const url = `${window.location.origin}/content/${id}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setLinkCopied(true);
+      toast.success('링크가 복사되었습니다');
+      setTimeout(() => setLinkCopied(false), 2000);
+    }).catch(() => {
+      toast.error('복사에 실패했습니다');
+    });
   };
 
   const formatDate = (d: string) => {
@@ -193,15 +189,15 @@ export function ContentDetailPage() {
             {isRecommended ? '♥' : '♡'} 추천 {likeCount}
           </button>
 
-          {isAuthenticated && (
-            <button
-              onClick={handleCopyToStore}
-              disabled={copying}
-              style={styles.actionBtn}
-            >
-              {copying ? '복사 중...' : '📋 활용'}
-            </button>
-          )}
+          <button
+            onClick={handleCopyLink}
+            style={{
+              ...styles.actionBtn,
+              ...(linkCopied ? styles.actionBtnCopied : {}),
+            }}
+          >
+            {linkCopied ? '복사됨!' : '🔗 링크 복사'}
+          </button>
 
           {isOwner && (
             <Link to={`/content/${content.id}/edit`} style={styles.editLink}>
@@ -386,6 +382,11 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#dc2626',
     borderColor: '#fecaca',
     backgroundColor: '#fef2f2',
+  },
+  actionBtnCopied: {
+    color: '#16a34a',
+    borderColor: '#bbf7d0',
+    backgroundColor: '#f0fdf4',
   },
   editLink: {
     display: 'inline-flex',

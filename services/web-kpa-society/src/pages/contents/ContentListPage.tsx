@@ -2,14 +2,16 @@
  * ContentListPage — 콘텐츠 허브 목록
  *
  * WO-KPA-CONTENT-HUB-FOUNDATION-V1
+ * WO-KPA-CONTENT-UX-REFINEMENT-V1: 테이블 뷰 + 내 콘텐츠 필터 + 행 액션(보기/수정/링크복사)
  *
- * 탭(전체/참여 프로그램/정보 콘텐츠) + 검색 + sub_type 필터 + 정렬
+ * 탭(전체/참여 프로그램/정보 콘텐츠) + 검색 + 정렬 + 내 콘텐츠 필터
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { contentApi, type ContentItem, type ContentListParams } from '../../api/content';
 import { useAuth } from '../../contexts/AuthContext';
+import { toast } from '@o4o/error-handling';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -18,11 +20,6 @@ const TABS = [
   { key: 'participation', label: '참여 프로그램' },
   { key: 'information', label: '정보 콘텐츠' },
 ] as const;
-
-const SUB_TYPES: Record<string, string[]> = {
-  participation: ['설문', '퀴즈', '이벤트', '캠페인'],
-  information: ['건강정보', '약물학정보', '복약정보', '실무정보', '자유 콘텐츠'],
-};
 
 const SORT_OPTIONS = [
   { key: 'latest', label: '최신순' },
@@ -36,19 +33,21 @@ const STATUS_BADGE: Record<string, { label: string; bg: string; color: string }>
   private: { label: '비공개', bg: '#f1f5f9', color: '#475569' },
 };
 
-const CONTENT_TYPE_BADGE: Record<string, { label: string; bg: string; color: string }> = {
-  participation: { label: '참여', bg: '#ede9fe', color: '#6d28d9' },
-  information: { label: '정보', bg: '#dbeafe', color: '#1d4ed8' },
+const CONTENT_TYPE_LABEL: Record<string, string> = {
+  participation: '참여 프로그램',
+  information: '정보 콘텐츠',
 };
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export function ContentListPage() {
-  const { isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const initialTab = searchParams.get('type') || '';
   const initialSort = (searchParams.get('sort') || 'latest') as 'latest' | 'popular' | 'views';
+  const initialMy = searchParams.get('my') === 'true';
 
   const [items, setItems] = useState<ContentItem[]>([]);
   const [total, setTotal] = useState(0);
@@ -56,19 +55,20 @@ export function ContentListPage() {
   const [loading, setLoading] = useState(true);
 
   const [activeTab, setActiveTab] = useState(initialTab);
-  const [subTypeFilter, setSubTypeFilter] = useState('');
   const [sort, setSort] = useState(initialSort);
+  const [myOnly, setMyOnly] = useState(initialMy);
   const [searchInput, setSearchInput] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(1);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const fetchItems = useCallback(async () => {
     setLoading(true);
     try {
       const params: ContentListParams = { page, limit: 20, sort };
       if (activeTab) params.content_type = activeTab;
-      if (subTypeFilter) params.sub_type = subTypeFilter;
       if (searchTerm) params.search = searchTerm;
+      if (myOnly && isAuthenticated) params.my = 'true';
 
       const res = await contentApi.list(params);
       if (res.success) {
@@ -81,7 +81,7 @@ export function ContentListPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, sort, activeTab, subTypeFilter, searchTerm]);
+  }, [page, sort, activeTab, searchTerm, myOnly, isAuthenticated]);
 
   useEffect(() => { fetchItems(); }, [fetchItems]);
 
@@ -90,12 +90,12 @@ export function ContentListPage() {
     const p = new URLSearchParams();
     if (activeTab) p.set('type', activeTab);
     if (sort !== 'latest') p.set('sort', sort);
+    if (myOnly) p.set('my', 'true');
     setSearchParams(p, { replace: true });
-  }, [activeTab, sort, setSearchParams]);
+  }, [activeTab, sort, myOnly, setSearchParams]);
 
   const handleTabChange = (key: string) => {
     setActiveTab(key);
-    setSubTypeFilter('');
     setPage(1);
   };
 
@@ -104,7 +104,16 @@ export function ContentListPage() {
     setPage(1);
   };
 
-  const availableSubTypes = activeTab ? (SUB_TYPES[activeTab] || []) : [];
+  const handleCopyLink = (item: ContentItem) => {
+    const url = `${window.location.origin}/content/${item.id}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopiedId(item.id);
+      toast.success('링크가 복사되었습니다');
+      setTimeout(() => setCopiedId(null), 2000);
+    }).catch(() => {
+      toast.error('복사에 실패했습니다');
+    });
+  };
 
   const formatDate = (d: string) => {
     try { return new Date(d).toLocaleDateString('ko-KR'); } catch { return '-'; }
@@ -120,7 +129,7 @@ export function ContentListPage() {
         </div>
         {isAuthenticated && (
           <Link to="/content/new" style={styles.writeButton}>
-            + 글쓰기
+            + 콘텐츠 제작
           </Link>
         )}
       </div>
@@ -143,18 +152,17 @@ export function ContentListPage() {
 
       {/* Filters Row */}
       <div style={styles.filterRow}>
-        {/* Sub-type filter */}
-        {availableSubTypes.length > 0 && (
-          <select
-            value={subTypeFilter}
-            onChange={(e) => { setSubTypeFilter(e.target.value); setPage(1); }}
-            style={styles.select}
+        {/* My content toggle */}
+        {isAuthenticated && (
+          <button
+            onClick={() => { setMyOnly(!myOnly); setPage(1); }}
+            style={{
+              ...styles.filterToggle,
+              ...(myOnly ? styles.filterToggleActive : {}),
+            }}
           >
-            <option value="">전체 유형</option>
-            {availableSubTypes.map((st) => (
-              <option key={st} value={st}>{st}</option>
-            ))}
-          </select>
+            {myOnly ? '● 내 콘텐츠' : '○ 내 콘텐츠'}
+          </button>
         )}
 
         {/* Sort */}
@@ -172,7 +180,7 @@ export function ContentListPage() {
         <div style={styles.searchWrap}>
           <input
             type="text"
-            placeholder="검색..."
+            placeholder="제목, 작성자 검색..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -182,64 +190,115 @@ export function ContentListPage() {
         </div>
       </div>
 
-      {/* Content List */}
-      <div style={styles.listWrap}>
+      {/* Content Table */}
+      <div style={styles.tableWrap}>
         {loading && items.length === 0 ? (
           <div style={styles.emptyState}>
             <p style={styles.emptyText}>불러오는 중...</p>
           </div>
         ) : items.length === 0 ? (
           <div style={styles.emptyState}>
-            <p style={styles.emptyText}>등록된 콘텐츠가 없습니다</p>
+            <p style={styles.emptyText}>
+              {myOnly ? '작성한 콘텐츠가 없습니다' : '등록된 콘텐츠가 없습니다'}
+            </p>
             {isAuthenticated && (
               <Link to="/content/new" style={styles.emptyLink}>첫 콘텐츠 작성하기</Link>
             )}
           </div>
         ) : (
           <>
-            {items.map((item) => {
-              const statusBadge = STATUS_BADGE[item.status] || STATUS_BADGE.draft;
-              const typeBadge = CONTENT_TYPE_BADGE[item.content_type] || CONTENT_TYPE_BADGE.information;
+            <table style={styles.table}>
+              <thead>
+                <tr style={styles.thead}>
+                  <th style={{ ...styles.th, width: '40%' }}>제목</th>
+                  <th style={{ ...styles.th, width: '10%' }}>구분</th>
+                  <th style={{ ...styles.th, width: '10%' }}>작성자</th>
+                  <th style={{ ...styles.th, width: '8%', textAlign: 'center' }}>추천</th>
+                  <th style={{ ...styles.th, width: '8%', textAlign: 'center' }}>상태</th>
+                  <th style={{ ...styles.th, width: '10%' }}>수정일</th>
+                  <th style={{ ...styles.th, width: '14%', textAlign: 'center' }}>액션</th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((item) => {
+                  const statusBadge = STATUS_BADGE[item.status] || STATUS_BADGE.draft;
+                  const isOwner = user?.id === item.created_by;
 
-              return (
-                <Link
-                  key={item.id}
-                  to={`/content/${item.id}`}
-                  style={styles.card}
-                  className="content-card"
-                >
-                  <div style={styles.cardTop}>
-                    <div style={styles.badges}>
-                      <span style={{ ...styles.badge, backgroundColor: typeBadge.bg, color: typeBadge.color }}>
-                        {typeBadge.label}
-                      </span>
-                      {item.sub_type && (
-                        <span style={styles.subTypeBadge}>{item.sub_type}</span>
-                      )}
-                      {item.status !== 'published' && (
-                        <span style={{ ...styles.badge, backgroundColor: statusBadge.bg, color: statusBadge.color }}>
+                  return (
+                    <tr key={item.id} style={styles.tr}>
+                      {/* 제목 */}
+                      <td style={styles.td}>
+                        <Link to={`/content/${item.id}`} style={styles.titleLink}>
+                          {item.title}
+                        </Link>
+                        {item.sub_type && (
+                          <span style={styles.subTypeBadge}>{item.sub_type}</span>
+                        )}
+                      </td>
+                      {/* 구분 */}
+                      <td style={styles.td}>
+                        <span style={styles.typeBadge}>
+                          {CONTENT_TYPE_LABEL[item.content_type] || item.content_type}
+                        </span>
+                      </td>
+                      {/* 작성자 */}
+                      <td style={styles.td}>
+                        <span style={styles.authorText}>{item.author_name || '익명'}</span>
+                      </td>
+                      {/* 추천 */}
+                      <td style={{ ...styles.td, textAlign: 'center' }}>
+                        <span style={styles.statText}>{item.like_count}</span>
+                      </td>
+                      {/* 상태 */}
+                      <td style={{ ...styles.td, textAlign: 'center' }}>
+                        <span style={{
+                          ...styles.statusBadge,
+                          backgroundColor: statusBadge.bg,
+                          color: statusBadge.color,
+                        }}>
                           {statusBadge.label}
                         </span>
-                      )}
-                    </div>
-                    <span style={styles.cardDate}>{formatDate(item.created_at)}</span>
-                  </div>
-
-                  <h3 style={styles.cardTitle}>{item.title}</h3>
-                  {item.summary && (
-                    <p style={styles.cardSummary}>{item.summary}</p>
-                  )}
-
-                  <div style={styles.cardBottom}>
-                    <span style={styles.cardAuthor}>{item.author_name || '익명'}</span>
-                    <div style={styles.cardStats}>
-                      <span style={styles.stat}>♥ {item.like_count}</span>
-                      <span style={styles.stat}>조회 {item.view_count}</span>
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
+                      </td>
+                      {/* 수정일 */}
+                      <td style={styles.td}>
+                        <span style={styles.dateText}>{formatDate(item.updated_at)}</span>
+                      </td>
+                      {/* 액션 */}
+                      <td style={{ ...styles.td, textAlign: 'center' }}>
+                        <div style={styles.actionGroup}>
+                          <button
+                            onClick={() => navigate(`/content/${item.id}`)}
+                            style={styles.actionBtn}
+                            title="보기"
+                          >
+                            보기
+                          </button>
+                          {isOwner && (
+                            <button
+                              onClick={() => navigate(`/content/${item.id}/edit`)}
+                              style={styles.actionBtn}
+                              title="수정"
+                            >
+                              수정
+                            </button>
+                          )}
+                          <button
+                            onClick={() => handleCopyLink(item)}
+                            style={{
+                              ...styles.actionBtn,
+                              ...(copiedId === item.id ? styles.actionBtnCopied : {}),
+                            }}
+                            title="링크 복사"
+                          >
+                            {copiedId === item.id ? '복사됨' : '링크'}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
 
             {/* Pagination */}
             {totalPages > 1 && (
@@ -352,6 +411,24 @@ const styles: Record<string, React.CSSProperties> = {
     flexWrap: 'wrap',
     alignItems: 'center',
   },
+  filterToggle: {
+    padding: '8px 14px',
+    fontSize: '0.8125rem',
+    fontWeight: 500,
+    color: '#64748b',
+    backgroundColor: '#ffffff',
+    border: '1px solid #e2e8f0',
+    borderRadius: 8,
+    cursor: 'pointer',
+    transition: 'all 0.15s',
+    whiteSpace: 'nowrap',
+  },
+  filterToggleActive: {
+    color: '#2563eb',
+    borderColor: '#2563eb',
+    backgroundColor: '#eff6ff',
+    fontWeight: 600,
+  },
   select: {
     padding: '8px 12px',
     fontSize: '0.8125rem',
@@ -385,93 +462,111 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: 8,
     cursor: 'pointer',
   },
-  listWrap: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 12,
-  },
-  card: {
-    display: 'block',
+  tableWrap: {
     backgroundColor: '#ffffff',
     borderRadius: 12,
     border: '1px solid #e2e8f0',
-    padding: '16px 20px',
-    textDecoration: 'none',
-    transition: 'border-color 0.15s, box-shadow 0.15s',
+    overflow: 'hidden',
   },
-  cardTop: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
+  table: {
+    width: '100%',
+    borderCollapse: 'collapse',
   },
-  badges: {
-    display: 'flex',
-    gap: 6,
-    flexWrap: 'wrap',
+  thead: {
+    backgroundColor: '#f8fafc',
+    borderBottom: '1px solid #e2e8f0',
   },
-  badge: {
-    display: 'inline-block',
-    padding: '2px 8px',
-    fontSize: '0.6875rem',
+  th: {
+    padding: '12px 16px',
+    fontSize: '0.75rem',
     fontWeight: 600,
-    borderRadius: 4,
+    color: '#64748b',
+    textAlign: 'left',
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.05em',
   },
-  subTypeBadge: {
+  tr: {
+    borderBottom: '1px solid #f1f5f9',
+    transition: 'background-color 0.1s',
+  },
+  td: {
+    padding: '12px 16px',
+    fontSize: '0.8125rem',
+    color: '#334155',
+    verticalAlign: 'middle',
+  },
+  titleLink: {
+    color: '#1e293b',
+    textDecoration: 'none',
+    fontWeight: 600,
+    fontSize: '0.875rem',
+    lineHeight: 1.4,
+  },
+  typeBadge: {
     display: 'inline-block',
     padding: '2px 8px',
     fontSize: '0.6875rem',
     fontWeight: 500,
     backgroundColor: '#f1f5f9',
-    color: '#64748b',
+    color: '#475569',
     borderRadius: 4,
+    whiteSpace: 'nowrap',
   },
-  cardDate: {
-    fontSize: '0.75rem',
+  subTypeBadge: {
+    display: 'inline-block',
+    marginLeft: 6,
+    padding: '2px 6px',
+    fontSize: '0.625rem',
+    fontWeight: 500,
+    backgroundColor: '#f1f5f9',
     color: '#94a3b8',
-    flexShrink: 0,
+    borderRadius: 3,
   },
-  cardTitle: {
-    fontSize: '1rem',
-    fontWeight: 600,
-    color: '#1e293b',
-    margin: '0 0 4px',
-    lineHeight: 1.4,
-  },
-  cardSummary: {
+  authorText: {
     fontSize: '0.8125rem',
     color: '#64748b',
-    margin: '0 0 12px',
-    lineHeight: 1.5,
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    display: '-webkit-box',
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: 'vertical',
   },
-  cardBottom: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  cardAuthor: {
-    fontSize: '0.75rem',
+  statText: {
+    fontSize: '0.8125rem',
     color: '#64748b',
   },
-  cardStats: {
-    display: 'flex',
-    gap: 12,
+  statusBadge: {
+    display: 'inline-block',
+    padding: '2px 8px',
+    fontSize: '0.6875rem',
+    fontWeight: 600,
+    borderRadius: 4,
   },
-  stat: {
+  dateText: {
     fontSize: '0.75rem',
     color: '#94a3b8',
+  },
+  actionGroup: {
+    display: 'flex',
+    gap: 4,
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+  },
+  actionBtn: {
+    padding: '4px 10px',
+    fontSize: '0.6875rem',
+    fontWeight: 500,
+    color: '#475569',
+    backgroundColor: '#ffffff',
+    border: '1px solid #e2e8f0',
+    borderRadius: 6,
+    cursor: 'pointer',
+    transition: 'all 0.1s',
+    whiteSpace: 'nowrap',
+  },
+  actionBtnCopied: {
+    color: '#16a34a',
+    borderColor: '#bbf7d0',
+    backgroundColor: '#f0fdf4',
   },
   emptyState: {
     textAlign: 'center',
     padding: '60px 20px',
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    border: '1px solid #e2e8f0',
   },
   emptyText: {
     fontSize: '0.9375rem',
@@ -490,7 +585,8 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: 16,
+    padding: '12px 16px',
+    borderTop: '1px solid #f1f5f9',
   },
   pageInfo: {
     fontSize: '0.8125rem',
