@@ -9,8 +9,8 @@
  *   - manualData 컬럼 지원: regulatory_name, manufacturer_name, brand (3.3)
  *   - MFDS 실패 + manualData 존재 → Master 수동 생성 (isMfdsVerified=false)
  * WO-NETURE-CSV-MASTER-CREATION-DECOUPLING-V1
- *   - marketing_name 컬럼 추가 (primary name for Master)
- *   - MFDS 의존 제거: marketing_name만 있으면 Master 생성 가능
+ *   - marketing_name 컬럼 추가 (primary name for Master → renamed to name)
+ *   - MFDS 의존 제거: name(구 marketing_name)만 있으면 Master 생성 가능
  *   - manufacturer_name 필수 해제
  * WO-NETURE-CSV-TEMPLATE-V1
  *   - supply_price 필수화
@@ -56,11 +56,11 @@ const ALLOWED_CSV_COLUMNS = [
   'description', // legacy compat
   'image_url',
   'regulatory_name', // legacy compat
-  'packaging_name', // WO-NETURE-XLSX-TEMPLATE-FINAL-V2 (→ regulatory_name 매핑)
+  'packaging_name', // legacy compat (→ regulatory_name 매핑)
   'manufacturer_name',
   'brand',
   'origin_country', // WO-NETURE-XLSX-TEMPLATE-FINAL-V2 (rawJson 보존)
-  'marketing_name',
+  'name',
   'consumer_short_description', // legacy compat
   'short_description', // WO-NETURE-XLSX-TEMPLATE-FINAL-V2 (→ consumer_short_description 매핑)
   'detail_description', // WO-NETURE-XLSX-TEMPLATE-FINAL-V2
@@ -304,11 +304,11 @@ export class CsvImportService {
 
       // 3f. 내부 Master 조회 (자동 생성 바코드는 항상 CREATE_MASTER)
       if (isAutoBarcode) {
-        // packaging_name / marketing_name 중 하나는 있어야 Master 생성 가능
+        // name / packaging_name 중 하나는 있어야 Master 생성 가능
+        const csvName = (raw.name || raw.marketing_name || '').trim();
         const packagingName = (raw.packaging_name || '').trim();
-        const marketingName = (raw.marketing_name || '').trim();
         const regulatoryName = (raw.regulatory_name || '').trim();
-        if (packagingName || marketingName || regulatoryName) {
+        if (csvName || packagingName || regulatoryName) {
           row.actionType = CsvRowActionType.CREATE_MASTER;
           row.validationStatus = CsvRowValidationStatus.VALID;
           validCount++;
@@ -342,10 +342,10 @@ export class CsvImportService {
             ...(Object.keys(suggestions2).length > 0 ? { _suggestions: suggestions2 } : {}),
           };
         } else {
+          const csvName2 = (raw.name || raw.marketing_name || '').trim();
           const packagingName = (raw.packaging_name || '').trim();
-          const marketingName = (raw.marketing_name || '').trim();
           const regulatoryName = (raw.regulatory_name || '').trim();
-          const hasProductName = !!(packagingName || marketingName || regulatoryName);
+          const hasProductName = !!(csvName2 || packagingName || regulatoryName);
 
           if (hasProductName) {
             row.actionType = CsvRowActionType.CREATE_MASTER;
@@ -589,15 +589,15 @@ export class CsvImportService {
         const mfdsResult = await verifyProductByBarcode(barcode);
         const mfds = mfdsResult.verified && mfdsResult.product ? mfdsResult.product : null;
 
-        const csvMarketingName = (raw.marketing_name || '').trim();
+        const csvName = (raw.name || raw.marketing_name || '').trim();
         const csvPackagingName = (raw.packaging_name || '').trim();
         const csvRegulatoryName = (raw.regulatory_name || csvPackagingName).trim();
         const csvManufacturerName = (raw.manufacturer_name || '').trim();
 
         master = masterRepo.create({
           barcode,
-          marketingName: csvMarketingName || csvRegulatoryName || mfds?.regulatoryName || 'UNKNOWN_PRODUCT',
-          regulatoryName: csvRegulatoryName || mfds?.regulatoryName || csvMarketingName || 'UNKNOWN',
+          name: csvName || csvRegulatoryName || mfds?.regulatoryName || 'UNKNOWN_PRODUCT',
+          regulatoryName: csvRegulatoryName || mfds?.regulatoryName || csvName || 'UNKNOWN',
           regulatoryType: mfds?.regulatoryType || 'UNKNOWN',
           manufacturerName: csvManufacturerName || mfds?.manufacturerName || 'Unknown',
           mfdsPermitNumber: mfds?.permitNumber || null,
@@ -611,7 +611,7 @@ export class CsvImportService {
       }
 
       masterId = master.id;
-      masterName = master.marketingName || master.regulatoryName;
+      masterName = master.name || master.regulatoryName;
       masterManufacturer = master.manufacturerName;
     }
 
@@ -654,7 +654,7 @@ export class CsvImportService {
 
     // WO-NETURE-CATEGORY-MAPPING-RULE-SYSTEM-V1: auto-suggest when no category_name in CSV
     if (!categoryName && masterId) {
-      const productName = (raw.marketing_name || raw.packaging_name || '').trim();
+      const productName = (raw.name || raw.marketing_name || raw.packaging_name || '').trim();
       if (productName) {
         try {
           const suggestion = await this.categoryMappingService.suggestCategory(productName);
@@ -886,7 +886,7 @@ export class CsvImportService {
   // ==================== Row Quick Edit (WO-NETURE-IMPORT-ROW-QUICK-EDIT-V1) ====================
 
   private static EDITABLE_ROW_FIELDS = [
-    'marketing_name', 'brand', 'supply_price', 'consumer_price',
+    'name', 'brand', 'supply_price', 'consumer_price',
     'stock_qty', 'distribution_type', 'short_description',
     'detail_description', 'category_name', 'manufacturer_name', 'image_url',
   ] as const;
@@ -1249,7 +1249,7 @@ export class CsvImportService {
     manufacturerCache: string[],
   ): Promise<Record<string, string>> {
     const suggestions: Record<string, string> = {};
-    const name = (raw.marketing_name || raw.packaging_name || raw.regulatory_name || '').trim();
+    const name = (raw.name || raw.marketing_name || raw.regulatory_name || '').trim();
     if (!name) return suggestions;
 
     // 1. Category suggestion via DB rules (WO-NETURE-CATEGORY-TREE-EXPANSION-V1)
@@ -1302,11 +1302,11 @@ export class CsvImportService {
    * Row 데이터 품질 평가 (WO-NETURE-IMPORT-DATA-QUALITY-GUARD-V1)
    *
    * 5차원 각 20점 = 최대 100점.
-   * marketing_name은 VALID 행이면 항상 존재하므로 base 20점.
+   * name은 VALID 행이면 항상 존재하므로 base 20점.
    */
   private assessRowQuality(raw: Record<string, string>): { score: number; warnings: string[] } {
     const warnings: string[] = [];
-    let score = 20; // base: marketing_name (required for VALID rows)
+    let score = 20; // base: name (required for VALID rows)
 
     const checks: Array<{ keys: string[]; warning: string }> = [
       { keys: ['image_url'], warning: 'MISSING_IMAGE' },

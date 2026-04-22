@@ -10,7 +10,7 @@ export class InventoryService {
   async getSupplierInventory(supplierId: string) {
     return this.dataSource.query(
       `SELECT spo.id AS offer_id, spo.master_id,
-              pm.marketing_name, pm.brand_name, pm.barcode, pm.specification,
+              pm.name, pm.brand_name, pm.barcode, pm.specification,
               pi.image_url AS primary_image_url,
               spo.price_general,
               spo.is_active,
@@ -21,7 +21,7 @@ export class InventoryService {
        JOIN product_masters pm ON pm.id = spo.master_id
        LEFT JOIN product_images pi ON pi.master_id = pm.id AND pi.is_primary = true
        WHERE spo.supplier_id = $1
-       ORDER BY spo.track_inventory DESC, pm.marketing_name ASC`,
+       ORDER BY spo.track_inventory DESC, pm.name ASC`,
       [supplierId],
     );
   }
@@ -29,7 +29,7 @@ export class InventoryService {
   async getInventoryDetail(offerId: string, supplierId: string) {
     return this.dataSource.query(
       `SELECT spo.id AS offer_id, spo.master_id,
-              pm.marketing_name, pm.brand_name, pm.barcode, pm.specification,
+              pm.name, pm.brand_name, pm.barcode, pm.specification,
               pi.image_url AS primary_image_url,
               spo.price_general,
               spo.is_active,
@@ -82,7 +82,7 @@ export class InventoryService {
     // Return updated inventory
     const updated = await this.dataSource.query(
       `SELECT spo.id AS offer_id, spo.master_id,
-              pm.marketing_name, pm.brand_name,
+              pm.name, pm.brand_name,
               spo.stock_quantity, spo.reserved_quantity,
               spo.low_stock_threshold, spo.track_inventory,
               (spo.stock_quantity - spo.reserved_quantity) AS available_stock

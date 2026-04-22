@@ -22,7 +22,7 @@ export class SellerService {
     const rows = await this.dataSource.query(
       `SELECT pa.id,
               spo.supplier_id AS "supplierId", supplier_org.name AS "supplierName",
-              pa.offer_id AS "offerId", pm.marketing_name AS "productName",
+              pa.offer_id AS "offerId", pm.name AS "productName",
               pm.brand_name AS "productCategory",
               pa.service_key AS "serviceId",
               pa.decided_at AS "approvedAt"
@@ -59,7 +59,7 @@ export class SellerService {
       approval_status: string; barcode: string; specification: string | null;
       primary_image_url: string | null;
     }> = await this.dataSource.query(
-      `SELECT spo.id, pm.marketing_name AS name, pm.brand_name AS category, '' AS description,
+      `SELECT spo.id, pm.name AS name, pm.brand_name AS category, '' AS description,
               spo.supplier_id, supplier_org.name AS supplier_name,
               spo.distribution_type,
               spo.price_general, spo.consumer_reference_price,
@@ -154,7 +154,7 @@ export class SellerService {
     const rows = await this.dataSource.query(
       `SELECT pa.id, pa.approval_status AS status,
               pa.offer_id AS "offerId",
-              pm.marketing_name AS "productName",
+              pm.name AS "productName",
               pm.brand_name AS "productCategory",
               supplier_org.name AS "supplierName",
               spo.supplier_id AS "supplierId",

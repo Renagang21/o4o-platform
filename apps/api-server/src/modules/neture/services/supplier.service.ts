@@ -430,7 +430,7 @@ export class NetureSupplierService {
         shortDescription: supplier.shortDescription,
         description: supplier.description,
         products: supplier.offers.map((p) => ({
-          id: p.id, name: p.master?.marketingName || '',
+          id: p.id, name: p.master?.name || '',
           category: p.master?.brandName || '', description: '',
         })),
         pricingPolicy: supplier.pricingPolicy,

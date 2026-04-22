@@ -94,7 +94,7 @@ export class NetureCatalogService {
       regulatoryType?: string;
       regulatoryName?: string;
       manufacturerName?: string;
-      marketingName?: string;
+      name?: string;
       mfdsPermitNumber?: string | null;
     }
   ): Promise<{ success: boolean; data?: ProductMaster; error?: string }> {
@@ -121,7 +121,7 @@ export class NetureCatalogService {
         barcode,
         regulatoryType: mfdsResult.product.regulatoryType,
         regulatoryName: mfdsResult.product.regulatoryName,
-        marketingName: mfdsResult.product.regulatoryName,
+        name: mfdsResult.product.regulatoryName,
         manufacturerName: mfdsResult.product.manufacturerName,
         mfdsPermitNumber: mfdsResult.product.permitNumber || null,
         mfdsProductId: mfdsResult.product.productId || barcode,
@@ -136,13 +136,13 @@ export class NetureCatalogService {
 
     // 4b. MFDS 미연동 + manualData 제공 → 수동 생성
     if (manualData) {
-      const effectiveRegName = manualData.regulatoryName || manualData.marketingName || 'UNKNOWN';
-      const effectiveMarketing = manualData.marketingName || manualData.regulatoryName || 'UNKNOWN';
+      const effectiveRegName = manualData.regulatoryName || manualData.name || 'UNKNOWN';
+      const effectiveName = manualData.name || manualData.regulatoryName || 'UNKNOWN';
       const master = this.masterRepo.create({
         barcode,
         regulatoryType: manualData.regulatoryType || '일반',
         regulatoryName: effectiveRegName,
-        marketingName: effectiveMarketing,
+        name: effectiveName,
         manufacturerName: manualData.manufacturerName || '',
         mfdsPermitNumber: manualData.mfdsPermitNumber ?? null,
         mfdsProductId: barcode, // MFDS 미연동 시 barcode를 ID로 사용
@@ -162,7 +162,7 @@ export class NetureCatalogService {
   /**
    * Master 업데이트 — immutable 필드 변경 차단 (런타임 Guard)
    *
-   * 변경 가능: marketingName, brandName, categoryId, brandId, specification, originCountry, tags
+   * 변경 가능: name, brandName, categoryId, brandId, specification, originCountry, tags
    * 변경 불가: barcode, regulatoryType, regulatoryName, manufacturerName, mfdsPermitNumber, mfdsProductId
    */
   async updateProductMaster(
@@ -186,8 +186,8 @@ export class NetureCatalogService {
     }
 
     // 허용 필드만 적용
-    if ('marketingName' in updates && typeof updates.marketingName === 'string') {
-      master.marketingName = updates.marketingName;
+    if ('name' in updates && typeof updates.name === 'string') {
+      master.name = updates.name;
     }
     if ('brandName' in updates) {
       master.brandName = updates.brandName as string | null;
@@ -243,7 +243,7 @@ export class NetureCatalogService {
 
     if (params.q) {
       qb.andWhere(
-        '(m.marketing_name ILIKE :q OR m.regulatory_name ILIKE :q OR m.barcode ILIKE :q OR m.manufacturer_name ILIKE :q)',
+        '(m.name ILIKE :q OR m.regulatory_name ILIKE :q OR m.barcode ILIKE :q OR m.manufacturer_name ILIKE :q)',
         { q: `%${params.q}%` },
       );
     }
@@ -254,7 +254,7 @@ export class NetureCatalogService {
       qb.andWhere('m.brand_id = :brandId', { brandId: params.brandId });
     }
 
-    qb.orderBy('m.marketing_name', 'ASC')
+    qb.orderBy('m.name', 'ASC')
       .skip(offset)
       .take(limit);
 

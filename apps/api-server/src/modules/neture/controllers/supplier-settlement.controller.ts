@@ -103,7 +103,7 @@ export function createSupplierSettlementController(dataSource: DataSource): Rout
       const rows = await dataSource.query(
         `SELECT spc.id, spc.supplier_product_id, spc.commission_per_unit,
                 spc.start_date, spc.end_date, spc.created_at,
-                COALESCE(pm.marketing_name, 'Unknown') AS product_name,
+                COALESCE(pm.name, 'Unknown') AS product_name,
                 pm.barcode
          FROM supplier_partner_commissions spc
          JOIN supplier_product_offers spo ON spo.id = spc.supplier_product_id

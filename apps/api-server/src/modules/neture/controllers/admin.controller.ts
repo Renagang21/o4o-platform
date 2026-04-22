@@ -441,7 +441,7 @@ export function createAdminController(dataSource: DataSource): Router {
    * POST /admin/masters/resolve
    * Master 생성 파이프라인: barcode → GTIN 검증 → 내부 조회 → MFDS → create
    *
-   * Body: { barcode, manualData?: { regulatoryName, manufacturerName, regulatoryType?, marketingName?, mfdsPermitNumber? } }
+   * Body: { barcode, manualData?: { regulatoryName, manufacturerName, regulatoryType?, name?, mfdsPermitNumber? } }
    */
   router.post('/masters/resolve', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
     try {
@@ -466,7 +466,7 @@ export function createAdminController(dataSource: DataSource): Router {
    * PATCH /admin/masters/:id
    * ProductMaster 수정 (immutable 필드 변경 차단)
    *
-   * 허용: marketingName, brandName, categoryId, brandId, specification, originCountry, tags
+   * 허용: name, brandName, categoryId, brandId, specification, originCountry, tags
    * 차단: barcode, regulatoryType, regulatoryName, manufacturerName, mfdsPermitNumber, mfdsProductId
    */
   router.patch('/masters/:id', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {

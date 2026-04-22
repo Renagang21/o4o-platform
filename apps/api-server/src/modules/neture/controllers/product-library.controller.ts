@@ -50,7 +50,7 @@ export function createProductLibraryController(dataSource: DataSource): Router {
       const data = result.data.map((m) => ({
         id: m.id,
         barcode: m.barcode,
-        marketingName: m.marketingName,
+        name: m.name,
         regulatoryName: m.regulatoryName,
         manufacturerName: m.manufacturerName,
         specification: m.specification || null,
@@ -102,7 +102,7 @@ export function createProductLibraryController(dataSource: DataSource): Router {
           barcode: master.barcode,
           regulatoryType: master.regulatoryType,
           regulatoryName: master.regulatoryName,
-          marketingName: master.marketingName,
+          name: master.name,
           manufacturerName: master.manufacturerName,
           brandName: master.brandName,
           specification: master.specification,

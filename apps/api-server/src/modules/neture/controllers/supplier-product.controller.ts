@@ -28,14 +28,14 @@ export function createSupplierProductController(dataSource: DataSource): Router 
   router.post('/products', requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const supplierId = (req as SupplierRequest).supplierId;
-      const { barcode, marketingName, categoryId, brandName,
+      const { barcode, name, categoryId, brandName,
               distributionType, manualData, priceGeneral, priceGold, pricePlatinum,
               consumerReferencePrice,
               consumerShortDescription, consumerDetailDescription, serviceKeys,
               // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
               isFeatured } = req.body;
       const result = await netureService.createSupplierOffer(supplierId, {
-        barcode, marketingName, categoryId, brandName,
+        barcode, name, categoryId, brandName,
         manualData, distributionType, serviceKeys,
         priceGeneral, priceGold, pricePlatinum, consumerReferencePrice,
         consumerShortDescription, consumerDetailDescription,
@@ -209,7 +209,7 @@ export function createSupplierProductController(dataSource: DataSource): Router 
       const { isActive, isPublic, distributionType, allowedSellerIds,
               priceGeneral, priceGold, pricePlatinum,
               consumerReferencePrice, stockQuantity,
-              consumerShortDescription, consumerDetailDescription, marketingName,
+              consumerShortDescription, consumerDetailDescription, name,
               categoryId, brandId, specification, originCountry, tags,
               // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
               isFeatured } = req.body;
@@ -217,7 +217,7 @@ export function createSupplierProductController(dataSource: DataSource): Router 
         isActive, isPublic, distributionType, allowedSellerIds,
         priceGeneral, priceGold, pricePlatinum,
         consumerReferencePrice, stockQuantity,
-        consumerShortDescription, consumerDetailDescription, marketingName,
+        consumerShortDescription, consumerDetailDescription, name,
         categoryId, brandId, specification, originCountry, tags,
         isFeatured,
       });
@@ -253,7 +253,7 @@ export function createSupplierProductController(dataSource: DataSource): Router 
                 spo.supplier_id AS "supplierId", supplier_org.name AS "supplierName",
                 pa.organization_id AS "sellerId",
                 pa.service_key AS "serviceId",
-                pm.marketing_name AS "productName", pa.offer_id AS "offerId",
+                pm.name AS "productName", pa.offer_id AS "offerId",
                 pa.reason AS "rejectReason",
                 pa.decided_by AS "decidedBy", pa.decided_at AS "decidedAt",
                 pa.created_at AS "requestedAt"
@@ -284,7 +284,7 @@ export function createSupplierProductController(dataSource: DataSource): Router 
                 spo.supplier_id AS "supplierId", supplier_org.name AS "supplierName",
                 pa.organization_id AS "sellerId",
                 pa.service_key AS "serviceId",
-                pm.marketing_name AS "productName", pa.offer_id AS "offerId",
+                pm.name AS "productName", pa.offer_id AS "offerId",
                 pm.brand_name AS "productCategory",
                 pa.reason AS "rejectReason",
                 pa.decided_by AS "decidedBy", pa.decided_at AS "decidedAt",

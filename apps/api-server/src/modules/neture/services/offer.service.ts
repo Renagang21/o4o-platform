@@ -155,7 +155,7 @@ export class NetureOfferService {
       return offers.map((o) => ({
         id: o.id,
         masterId: o.masterId,
-        masterName: o.master?.marketingName || '',
+        masterName: o.master?.name || '',
         supplierName: (o.supplier?.organizationId ? orgNameMap.get(o.supplier.organizationId) : '') || '',
         supplierId: o.supplierId,
         isPublic: o.isPublic,
@@ -487,7 +487,7 @@ export class NetureOfferService {
       return offers.map((o) => ({
         id: o.id,
         masterId: o.masterId,
-        masterName: o.master?.marketingName || '',
+        masterName: o.master?.name || '',
         supplierName: (o.supplier?.organizationId ? orgNameMap.get(o.supplier.organizationId) : '') || '',
         supplierId: o.supplierId,
         isPublic: o.isPublic,
@@ -560,7 +560,7 @@ export class NetureOfferService {
       return offers.map((o) => {
         const activeServiceCount = serviceMap.get(o.id) || 0;
         const pendingRequestCount = pendingMap.get(o.id) || 0;
-        const productName = o.master?.marketingName || o.master?.regulatoryName || '';
+        const productName = o.master?.name || o.master?.regulatoryName || '';
 
         const purpose = NetureOfferService.derivePurpose(o.isActive, activeServiceCount);
 
@@ -648,7 +648,7 @@ export class NetureOfferService {
   private async resolveProductMetadata(
     rawManualData: Record<string, any> | undefined,
     barcode: string,
-    marketingName: string,
+    name: string,
     categoryId: string | null,
     brandName: string | undefined,
   ): Promise<{ success: false; error: string; message?: string } | { success: true; data: { masterId: string; masterBarcode: string; manualData: Record<string, any>; isRegulated: boolean } }> {
@@ -662,7 +662,7 @@ export class NetureOfferService {
     }
 
     const manualData = { ...rawManualData };
-    const resolvedMarketingName = marketingName || manualData.marketingName || '';
+    const resolvedName = name || manualData.name || '';
 
     if (isRegulated) {
       if (!manualData.regulatoryType || !manualData.regulatoryName) {
@@ -676,9 +676,9 @@ export class NetureOfferService {
     } else {
       const resolved = resolveRegulatoryType(manualData.regulatoryType);
       manualData.regulatoryType = resolved || 'GENERAL';
-      manualData.regulatoryName = manualData.regulatoryName || resolvedMarketingName || 'UNKNOWN';
+      manualData.regulatoryName = manualData.regulatoryName || resolvedName || 'UNKNOWN';
     }
-    if (resolvedMarketingName) manualData.marketingName = resolvedMarketingName;
+    if (resolvedName) manualData.name = resolvedName;
 
     let resolvedBrandId: string | null = manualData.brandId || null;
     if (!resolvedBrandId && brandName?.trim()) {
@@ -710,7 +710,7 @@ export class NetureOfferService {
     if (manualData.specification !== undefined) extFields.specification = manualData.specification;
     if (manualData.originCountry !== undefined) extFields.originCountry = manualData.originCountry;
     if (manualData.tags !== undefined) extFields.tags = manualData.tags;
-    if (manualData.marketingName !== undefined) extFields.marketingName = manualData.marketingName;
+    if (manualData.name !== undefined) extFields.name = manualData.name;
 
     if (Object.keys(extFields).length > 0) {
       await this.catalogService.updateProductMaster(masterResult.data.id, extFields);
@@ -730,14 +730,14 @@ export class NetureOfferService {
     supplierId: string,
     data: {
       barcode?: string;
-      marketingName?: string;
+      name?: string;
       categoryId?: string;
       brandName?: string;
       manualData?: {
         regulatoryType?: string;
         regulatoryName?: string;
         manufacturerName?: string;
-        marketingName?: string;
+        name?: string;
         mfdsPermitNumber?: string | null;
         categoryId?: string | null;
         brandId?: string | null;
@@ -764,10 +764,10 @@ export class NetureOfferService {
       if ('error' in validation) return { success: false, error: validation.error, message: validation.message };
       const { barcode } = validation.data;
 
-      const marketingName = data.marketingName || data.manualData?.marketingName || '';
+      const name = data.name || data.manualData?.name || '';
       const categoryId = data.categoryId || data.manualData?.categoryId || null;
 
-      const metadata = await this.resolveProductMetadata(data.manualData, barcode, marketingName, categoryId, data.brandName);
+      const metadata = await this.resolveProductMetadata(data.manualData, barcode, name, categoryId, data.brandName);
       if ('error' in metadata) return { success: false, error: metadata.error, message: metadata.message };
 
       const { masterId, masterBarcode, manualData, isRegulated } = metadata.data;
@@ -869,7 +869,7 @@ export class NetureOfferService {
       stockQuantity?: number;
       consumerShortDescription?: string | null;
       consumerDetailDescription?: string | null;
-      marketingName?: string;
+      name?: string;
       // WO-NETURE-PRODUCT-FIELD-GAP-FIX-V1: Master-level fields
       categoryId?: string | null;
       brandId?: string | null;
@@ -940,7 +940,7 @@ export class NetureOfferService {
 
       // WO-NETURE-PRODUCT-FIELD-GAP-FIX-V1: Master-level field updates (consolidated)
       const masterUpdates: Record<string, unknown> = {};
-      if (updates.marketingName !== undefined) masterUpdates.marketingName = updates.marketingName;
+      if (updates.name !== undefined) masterUpdates.name = updates.name;
       if (updates.categoryId !== undefined) masterUpdates.categoryId = updates.categoryId;
       if (updates.brandId !== undefined) masterUpdates.brandId = updates.brandId;
       if (updates.specification !== undefined) masterUpdates.specification = updates.specification;
@@ -1108,7 +1108,7 @@ export class NetureOfferService {
     const validSortFields: Record<string, string> = {
       createdAt: 'spo.created_at',
       priceGeneral: 'spo.price_general',
-      name: 'pm.marketing_name',
+      name: 'pm.name',
       completeness: NetureOfferService.COMPLETENESS_EXPR,
     };
     const sortField = validSortFields[options.sort || ''] || 'spo.created_at';
@@ -1119,7 +1119,7 @@ export class NetureOfferService {
     let idx = 2;
 
     if (keyword) {
-      conditions.push(`(pm.marketing_name ILIKE $${idx} OR pm.barcode ILIKE $${idx} OR pm.regulatory_name ILIKE $${idx})`);
+      conditions.push(`(pm.name ILIKE $${idx} OR pm.barcode ILIKE $${idx} OR pm.regulatory_name ILIKE $${idx})`);
       params.push(`%${keyword}%`);
       idx++;
     }
@@ -1230,7 +1230,7 @@ export class NetureOfferService {
            spo.created_at AS "createdAt",
            spo.updated_at AS "updatedAt",
            pm.tags,
-           pm.marketing_name AS "masterName",
+           pm.name AS "masterName",
            pm.barcode,
            pm.specification,
            pm.origin_country AS "originCountry",
@@ -1240,7 +1240,7 @@ export class NetureOfferService {
            pm.regulatory_name AS "regulatoryName",
            pm.mfds_permit_number AS "mfdsPermitNumber",
            pm.manufacturer_name AS "manufacturerName",
-           COALESCE(pm.marketing_name, pm.regulatory_name, '') AS name,
+           COALESCE(pm.name, pm.regulatory_name, '') AS name,
            pc.name AS "categoryName",
            COALESCE(b.name, pm.brand_name) AS "brandName",
            pi_img.image_url AS "primaryImageUrl",
@@ -1516,7 +1516,7 @@ export class NetureOfferService {
         return {
           id: o.id,
           masterId: o.masterId,
-          name: o.master?.marketingName || o.master?.regulatoryName || '',
+          name: o.master?.name || o.master?.regulatoryName || '',
           distributionType: o.distributionType,
           supplierId: o.supplierId,
           supplierName: (o.supplier?.organizationId ? orgNameMap.get(o.supplier.organizationId) : '') || '',
@@ -1565,7 +1565,7 @@ export class NetureOfferService {
     const validSortFields: Record<string, string> = {
       createdAt: 'spo.created_at',
       priceGeneral: 'spo.price_general',
-      name: 'pm.marketing_name',
+      name: 'pm.name',
     };
     const sortField = validSortFields[options.sort || ''] || 'spo.created_at';
 
@@ -1575,7 +1575,7 @@ export class NetureOfferService {
     let idx = 1;
 
     if (options.keyword?.trim()) {
-      conditions.push(`(pm.marketing_name ILIKE $${idx} OR pm.barcode ILIKE $${idx} OR pm.regulatory_name ILIKE $${idx} OR o.name ILIKE $${idx})`);
+      conditions.push(`(pm.name ILIKE $${idx} OR pm.barcode ILIKE $${idx} OR pm.regulatory_name ILIKE $${idx} OR o.name ILIKE $${idx})`);
       params.push(`%${options.keyword.trim()}%`);
       idx++;
     }
@@ -1646,7 +1646,7 @@ export class NetureOfferService {
            spo.business_short_description AS "businessShortDescription",
            spo.business_detail_description AS "businessDetailDescription",
            pm.tags,
-           COALESCE(pm.marketing_name, pm.regulatory_name, '') AS name,
+           COALESCE(pm.name, pm.regulatory_name, '') AS name,
            pm.barcode,
            pm.specification,
            pm.category_id AS "categoryId",

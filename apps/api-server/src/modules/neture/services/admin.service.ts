@@ -41,7 +41,7 @@ export class AdminService {
               spo.supplier_id AS "supplierId", supplier_org.name AS "supplierName",
               pa.organization_id AS "sellerId",
               pa.service_key AS "serviceId",
-              pm.marketing_name AS "productName", pa.offer_id AS "offerId",
+              pm.name AS "productName", pa.offer_id AS "offerId",
               pa.created_at AS "requestedAt"
        FROM product_approvals pa
        JOIN supplier_product_offers spo ON spo.id = pa.offer_id
@@ -70,7 +70,7 @@ export class AdminService {
     }
     const rows = await this.dataSource.query(`
       SELECT pa.id, pa.approval_status AS status,
-        pm.marketing_name AS "productName",
+        pm.name AS "productName",
         supplier_org.name AS "supplierName",
         o.name AS "sellerOrg",
         pa.service_key AS "serviceId",

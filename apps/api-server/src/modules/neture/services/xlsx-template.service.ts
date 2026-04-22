@@ -4,15 +4,14 @@
  * WO-NETURE-BULK-IMPORT-TEMPLATE-UPGRADE-V1
  * WO-NETURE-XLSX-TEMPLATE-FINAL-V2 — 컬럼 단순화, 필수 표시 제거, 가이드 시트 재작성
  *
- * 12 컬럼 고정. barcode 텍스트 보존. 2행 설명. 가이드 시트 포함.
+ * 11 컬럼 고정. barcode 텍스트 보존. 2행 설명. 가이드 시트 포함.
  */
 import ExcelJS from 'exceljs';
 
 /** 컬럼 정의 (순서 고정) */
 const COLUMNS = [
   { key: 'barcode', header: 'barcode', width: 25, desc: '상품 바코드 (선택 입력, 없으면 자동 생성되며 이후 변경 불가)' },
-  { key: 'packaging_name', header: 'packaging_name', width: 30, desc: '포장에 인쇄된 공식 상품명 (상품 식별 기준, 필수 입력 권장)' },
-  { key: 'marketing_name', header: 'marketing_name', width: 30, desc: '구매자 표시용 상품명 (검색/노출용, 자유롭게 작성)' },
+  { key: 'name', header: 'name', width: 30, desc: '상품명 (구매자 표시용, 검색/노출용)' },
   { key: 'manufacturer_name', header: 'manufacturer_name', width: 25, desc: '제조사' },
   { key: 'brand', header: 'brand', width: 20, desc: '브랜드' },
   { key: 'origin_country', header: 'origin_country', width: 15, desc: '원산지' },
@@ -64,8 +63,7 @@ export async function generateProductTemplate(): Promise<Buffer> {
   // Row 3~4: 샘플 데이터
   ws.addRow({
     barcode: '8801234567890',
-    packaging_name: '비타민C 1000mg 60정',
-    marketing_name: '비타민C 1000mg',
+    name: '비타민C 1000mg',
     manufacturer_name: '(주)헬스케어',
     brand: '헬스브랜드',
     origin_country: '대한민국',
@@ -78,8 +76,7 @@ export async function generateProductTemplate(): Promise<Buffer> {
   });
 
   ws.addRow({
-    packaging_name: '오메가3 EPA/DHA 90캡슐',
-    marketing_name: '오메가3 EPA/DHA',
+    name: '오메가3 EPA/DHA',
     supply_price: 8000,
     consumer_price: 15000,
     stock_qty: 50,
@@ -121,7 +118,7 @@ export async function generateProductTemplate(): Promise<Buffer> {
   addSection('2. 입력 기준');
   addPair('입력 원칙', '가능한 간단하게 입력');
   addPair('필수 입력', 'supply_price');
-  addPair('권장 입력', 'packaging_name, marketing_name');
+  addPair('권장 입력', 'name');
   addPair('선택 입력', '나머지 모든 항목');
   addPair('카테고리', '입력하지 않음');
   addPair('서비스 설정', '입력하지 않음');

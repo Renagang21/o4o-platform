@@ -368,7 +368,7 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
         SELECT
           spo.id AS offer_id,
           spo.master_id,
-          COALESCE(pm.marketing_name, 'Unknown') AS product_name,
+          COALESCE(pm.name, 'Unknown') AS product_name,
           pm.manufacturer_name,
           pm.brand_name,
           pm.specification,
@@ -422,7 +422,7 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
           spo.id AS offer_id,
           spo.slug AS product_slug,
           spo.master_id,
-          COALESCE(pm.marketing_name, 'Unknown') AS product_name,
+          COALESCE(pm.name, 'Unknown') AS product_name,
           pm.manufacturer_name,
           pm.brand_name,
           pm.specification,
@@ -483,7 +483,7 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
 
       const [product] = await dataSource.query(`
         SELECT
-          COALESCE(pm.marketing_name, 'Unknown') AS product_name,
+          COALESCE(pm.name, 'Unknown') AS product_name,
           pm.brand_name,
           o.name AS supplier_name,
           spo.price_general,

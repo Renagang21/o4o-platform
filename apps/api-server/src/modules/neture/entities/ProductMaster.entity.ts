@@ -41,9 +41,9 @@ export class ProductMaster {
   @Column({ name: 'regulatory_name', type: 'varchar', length: 255 })
   regulatoryName: string;
 
-  /** 마케팅용 표시명 */
-  @Column({ name: 'marketing_name', type: 'varchar', length: 255 })
-  marketingName: string;
+  /** 상품명 (canonical) */
+  @Column({ name: 'name', type: 'varchar', length: 255 })
+  name: string;
 
   /** 브랜드명 (optional, legacy — brandId 전환 후 제거 예정) */
   @Column({ name: 'brand_name', type: 'varchar', length: 255, nullable: true })

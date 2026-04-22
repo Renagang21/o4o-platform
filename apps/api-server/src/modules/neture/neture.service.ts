@@ -280,14 +280,14 @@ export class NetureService {
     supplierId: string,
     data: {
       barcode?: string;
-      marketingName?: string;
+      name?: string;
       categoryId?: string;
       brandName?: string;
       manualData?: {
         regulatoryType?: string;
         regulatoryName?: string;
         manufacturerName?: string;
-        marketingName?: string;
+        name?: string;
         mfdsPermitNumber?: string | null;
         categoryId?: string | null;
         brandId?: string | null;
@@ -325,7 +325,7 @@ export class NetureService {
       stockQuantity?: number;
       consumerShortDescription?: string | null;
       consumerDetailDescription?: string | null;
-      marketingName?: string;
+      name?: string;
       // WO-NETURE-PRODUCT-FIELD-GAP-FIX-V1: Master-level fields
       categoryId?: string | null;
       brandId?: string | null;
@@ -367,7 +367,7 @@ export class NetureService {
       regulatoryType?: string;
       regulatoryName: string;
       manufacturerName: string;
-      marketingName?: string;
+      name?: string;
       mfdsPermitNumber?: string | null;
     }
   ): Promise<{ success: boolean; data?: ProductMaster; error?: string }> {

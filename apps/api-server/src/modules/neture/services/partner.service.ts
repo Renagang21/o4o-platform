@@ -161,7 +161,7 @@ export class PartnerService {
         spo.id AS product_id,
         spo.slug AS product_slug,
         ns.slug AS store_slug,
-        COALESCE(pm.marketing_name, 'Unknown') AS product_name,
+        COALESCE(pm.name, 'Unknown') AS product_name,
         supplier_org.name AS supplier_name,
         spc.commission_per_unit,
         spc.start_date AS commission_start_date,
@@ -232,7 +232,7 @@ export class PartnerService {
         spo.slug AS product_slug,
         ns.slug AS store_slug,
         supplier_org.name AS store_name,
-        COALESCE(pm.marketing_name, 'Unknown') AS product_name,
+        COALESCE(pm.name, 'Unknown') AS product_name,
         spo.price_general,
         spc.commission_per_unit
       FROM partner_referrals pr
@@ -411,7 +411,7 @@ export class PartnerService {
     // Recent commissions (20)
     const commissions = await this.dataSource.query(
       `SELECT pc.id, pc.order_id, pc.order_number,
-              pm.marketing_name AS product_name,
+              pm.name AS product_name,
               os.name AS store_name,
               pc.commission_amount, pc.status, pc.created_at
        FROM partner_commissions pc

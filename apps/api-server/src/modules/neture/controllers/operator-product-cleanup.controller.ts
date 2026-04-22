@@ -41,7 +41,7 @@ export function createOperatorProductCleanupController(dataSource: DataSource): 
           pm.barcode,
           COUNT(*)::int AS count,
           ARRAY_AGG(pm.id ORDER BY pm.created_at ASC) AS "masterIds",
-          ARRAY_AGG(pm.marketing_name ORDER BY pm.created_at ASC) AS names
+          ARRAY_AGG(pm.name ORDER BY pm.created_at ASC) AS names
         FROM product_masters pm
         WHERE pm.barcode IS NOT NULL AND pm.barcode != ''
         GROUP BY pm.barcode
@@ -65,14 +65,14 @@ export function createOperatorProductCleanupController(dataSource: DataSource): 
         SELECT
           pm.id,
           pm.barcode,
-          pm.marketing_name AS "marketingName",
+          pm.name AS "name",
           pm.manufacturer_name AS "manufacturerName",
           pm.brand_name AS "brandName",
           pm.regulatory_type AS "regulatoryType",
           (SELECT COUNT(*)::int FROM supplier_product_offers spo WHERE spo.master_id = pm.id) AS "offerCount"
         FROM product_masters pm
         WHERE pm.category_id IS NULL
-        ORDER BY pm.marketing_name ASC
+        ORDER BY pm.name ASC
         LIMIT 200
       `);
       res.json({ success: true, data: rows });
@@ -92,14 +92,14 @@ export function createOperatorProductCleanupController(dataSource: DataSource): 
         SELECT
           pm.id,
           pm.barcode,
-          pm.marketing_name AS "marketingName",
+          pm.name AS "name",
           pm.manufacturer_name AS "manufacturerName",
           pm.brand_name AS "brandName",
           pm.regulatory_type AS "regulatoryType",
           (SELECT COUNT(*)::int FROM supplier_product_offers spo WHERE spo.master_id = pm.id) AS "offerCount"
         FROM product_masters pm
         WHERE pm.brand_id IS NULL
-        ORDER BY pm.marketing_name ASC
+        ORDER BY pm.name ASC
         LIMIT 200
       `);
       res.json({ success: true, data: rows });
@@ -130,14 +130,14 @@ export function createOperatorProductCleanupController(dataSource: DataSource): 
 
       // Verify both exist
       const [source] = await dataSource.query(
-        `SELECT id, barcode, marketing_name FROM product_masters WHERE id = $1`, [sourceMasterId],
+        `SELECT id, barcode, name FROM product_masters WHERE id = $1`, [sourceMasterId],
       );
       if (!source) {
         res.status(404).json({ success: false, error: 'SOURCE_MASTER_NOT_FOUND' });
         return;
       }
       const [target] = await dataSource.query(
-        `SELECT id, barcode, marketing_name FROM product_masters WHERE id = $1`, [targetMasterId],
+        `SELECT id, barcode, name FROM product_masters WHERE id = $1`, [targetMasterId],
       );
       if (!target) {
         res.status(404).json({ success: false, error: 'TARGET_MASTER_NOT_FOUND' });
@@ -167,7 +167,7 @@ export function createOperatorProductCleanupController(dataSource: DataSource): 
 
         await queryRunner.commitTransaction();
         logger.info(
-          `[Product Cleanup] Merged master ${source.marketing_name} → ${target.marketing_name}: ` +
+          `[Product Cleanup] Merged master ${source.name} → ${target.name}: ` +
           `${offersMigrated} offers, ${imagesMigrated} images migrated`,
         );
         res.json({ success: true, data: { offersMigrated, imagesMigrated } });
@@ -379,7 +379,7 @@ export function createOperatorProductCleanupController(dataSource: DataSource): 
         dataSource.query(`
           SELECT o.id, o.master_id, o.supplier_id, o.approval_status,
                  o.price_general, o.deleted_at, o.deleted_by, o.delete_reason,
-                 m.marketing_name, m.barcode, m.regulatory_type,
+                 m.name, m.barcode, m.regulatory_type,
                  s.company_name AS supplier_name,
                  u.name AS deleted_by_name
           FROM supplier_product_offers o

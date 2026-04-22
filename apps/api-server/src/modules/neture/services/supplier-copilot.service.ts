@@ -95,7 +95,7 @@ export class SupplierCopilotService {
       const rows = await this.dataSource.query(
         `SELECT
            pm.id AS "productId",
-           pm.marketing_name AS "productName",
+           pm.name AS "productName",
            COUNT(DISTINCT o.id)::int AS orders,
            COALESCE(SUM((item->>'subtotal')::int), 0)::int AS revenue,
            0 AS "qrScans"
@@ -106,7 +106,7 @@ export class SupplierCopilotService {
          LEFT JOIN LATERAL jsonb_array_elements(o.items) AS item
            ON (item->>'productId')::uuid = spo.id
          WHERE spo.supplier_id = $1
-         GROUP BY pm.id, pm.marketing_name
+         GROUP BY pm.id, pm.name
          ORDER BY revenue DESC
          LIMIT $2`,
         [supplierId, limit]
@@ -122,7 +122,7 @@ export class SupplierCopilotService {
     } catch {
       // checkout_orders table may not exist — return products with 0 order metrics
       const rows = await this.dataSource.query(
-        `SELECT pm.id AS "productId", pm.marketing_name AS "productName"
+        `SELECT pm.id AS "productId", pm.name AS "productName"
          FROM supplier_product_offers spo
          JOIN product_masters pm ON pm.id = spo.master_id
          WHERE spo.supplier_id = $1
@@ -144,7 +144,7 @@ export class SupplierCopilotService {
     const rows = await this.dataSource.query(
       `SELECT
          pm.id AS "productId",
-         pm.marketing_name AS "productName",
+         pm.name AS "productName",
          COUNT(DISTINCT opl.organization_id)::int AS "storeCount",
          COUNT(DISTINCT opl.organization_id) FILTER (
            WHERE opl.created_at >= CURRENT_DATE - INTERVAL '7 days'
@@ -153,7 +153,7 @@ export class SupplierCopilotService {
        JOIN product_masters pm ON pm.id = spo.master_id
        JOIN organization_product_listings opl ON opl.offer_id = spo.id AND opl.is_active = true
        WHERE spo.supplier_id = $1
-       GROUP BY pm.id, pm.marketing_name
+       GROUP BY pm.id, pm.name
        ORDER BY "storeCount" DESC`,
       [supplierId]
     );
@@ -193,7 +193,7 @@ export class SupplierCopilotService {
            GROUP BY (item->>'productId')
          )
          SELECT
-           pm.marketing_name AS "productName",
+           pm.name AS "productName",
            COALESCE(cp.orders, 0)::int AS "currentOrders",
            COALESCE(pp.orders, 0)::int AS "previousOrders",
            CASE WHEN COALESCE(pp.orders, 0) > 0

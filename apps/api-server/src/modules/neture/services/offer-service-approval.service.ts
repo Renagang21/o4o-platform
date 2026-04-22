@@ -81,7 +81,7 @@ export class OfferServiceApprovalService {
     }
     if (search) {
       const like = `%${search}%`;
-      conditions.push(`(pm.marketing_name ILIKE $${idx} OR pm.regulatory_name ILIKE $${idx} OR pm.barcode ILIKE $${idx} OR supplier_org.name ILIKE $${idx})`);
+      conditions.push(`(pm.name ILIKE $${idx} OR pm.regulatory_name ILIKE $${idx} OR pm.barcode ILIKE $${idx} OR supplier_org.name ILIKE $${idx})`);
       params.push(like);
       idx++;
     }
@@ -165,7 +165,7 @@ export class OfferServiceApprovalService {
            osa.approval_status AS "approvalStatus",
            osa.decided_by AS "decidedBy", osa.decided_at AS "decidedAt",
            osa.reason, osa.created_at AS "createdAt",
-           COALESCE(pm.marketing_name, pm.regulatory_name, '') AS "productName",
+           COALESCE(pm.name, pm.regulatory_name, '') AS "productName",
            pm.barcode,
            supplier_org.name AS "supplierName",
            pm.regulatory_type AS "regulatoryType",
@@ -518,7 +518,7 @@ export class OfferServiceApprovalService {
     try {
       // offer → supplier → user
       const rows = await this.dataSource.query(
-        `SELECT ns.user_id, COALESCE(pm.marketing_name, pm.regulatory_name, '') AS product_name
+        `SELECT ns.user_id, COALESCE(pm.name, pm.regulatory_name, '') AS product_name
          FROM supplier_product_offers spo
          JOIN neture_suppliers ns ON ns.id = spo.supplier_id
          JOIN product_masters pm ON pm.id = spo.master_id
