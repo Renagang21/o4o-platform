@@ -25,6 +25,10 @@ import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
 
 const REMEMBER_EMAIL_KEY = 'glycopharm_remember_email';
 
+const TEST_ACCOUNTS = [
+  { label: 'pharmacist_test', email: 'pharmacist_test@glycopharm.co.kr', password: 'O4oTestPass@1' },
+];
+
 export default function LoginModal() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -192,6 +196,21 @@ export default function LoginModal() {
             <label htmlFor="rememberEmail" className="ml-2 text-sm text-slate-600">
               이메일 저장
             </label>
+          </div>
+
+          {/* 테스트 계정 퀵필 */}
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-slate-400">테스트 계정:</span>
+            {TEST_ACCOUNTS.map((acc) => (
+              <button
+                key={acc.email}
+                type="button"
+                onClick={() => { setEmail(acc.email); setPassword(acc.password); }}
+                className="px-2 py-1 text-xs font-mono text-primary-700 bg-primary-50 border border-primary-200 rounded hover:bg-primary-100 transition-colors"
+              >
+                {acc.label}
+              </button>
+            ))}
           </div>
 
           <button
