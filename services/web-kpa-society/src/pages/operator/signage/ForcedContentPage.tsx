@@ -1,6 +1,7 @@
 /**
  * Forced Content Management Page — Signage Console (KPA Society)
  * WO-KPA-SIGNAGE-FORCED-CONTENT-IMPLEMENTATION-V1
+ * WO-O4O-SIGNAGE-TABLE-STANDARD-V1: O4O 표준 테이블 (체크 선택 + bulk delete + RowActionMenu)
  *
  * Operator creates forced content that is automatically injected
  * into ALL store playlists during the specified period.
@@ -10,7 +11,9 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getAccessToken } from '../../../contexts/AuthContext';
 import { Shield, RefreshCw, Plus, Trash2, Search, Edit2, X, Check } from 'lucide-react';
-import { DataTable, type Column } from '@o4o/ui';
+import { ActionBar, BulkResultModal, RowActionMenu } from '@o4o/ui';
+import { DataTable, useBatchAction, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 const SERVICE_KEY = 'kpa-society';
@@ -55,15 +58,53 @@ const fmtDate = (d: string) => {
   } catch { return '-'; }
 };
 
+const forcedContentActionPolicy = defineActionPolicy<ForcedContentItem>('kpa:signage:forced-content', {
+  rules: [
+    {
+      key: 'activate',
+      label: '활성화',
+      visible: (row) => !row.isActive,
+    },
+    {
+      key: 'deactivate',
+      label: '비활성화',
+      visible: (row) => row.isActive,
+    },
+    {
+      key: 'edit',
+      label: '수정',
+    },
+    {
+      key: 'delete',
+      label: '삭제',
+      variant: 'danger',
+      divider: true,
+      confirm: (row) => ({
+        title: '강제 콘텐츠 삭제',
+        message: `"${row.title}"\n\n삭제 후 즉시 모든 매장 플레이리스트에서 제거됩니다.`,
+        variant: 'danger' as const,
+        confirmText: '삭제',
+      }),
+    },
+  ],
+});
+
+const FORCED_CONTENT_ACTION_ICONS: Record<string, React.ReactNode> = {
+  activate: <Check className="w-4 h-4" />,
+  deactivate: <X className="w-4 h-4" />,
+  edit: <Edit2 className="w-4 h-4" />,
+  delete: <Trash2 className="w-4 h-4" />,
+};
+
 export default function ForcedContentPage() {
   const [items, setItems] = useState<ForcedContentItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
-  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; title: string } | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const batch = useBatchAction();
 
   // Form state
   const [formTitle, setFormTitle] = useState('');
@@ -125,7 +166,6 @@ export default function ForcedContentPage() {
     setFormTitle(item.title);
     setFormVideoUrl(item.videoUrl);
     setFormThumbnailUrl(item.thumbnailUrl || '');
-    // Convert ISO to datetime-local format
     setFormStartAt(item.startAt.slice(0, 16));
     setFormEndAt(item.endAt.slice(0, 16));
     setFormNote(item.note || '');
@@ -181,19 +221,29 @@ export default function ForcedContentPage() {
     }
   };
 
-  const handleDeleteConfirmed = async () => {
-    if (!deleteConfirm) return;
-    setIsDeleting(true);
-    try {
-      await apiFetch(`/api/signage/${SERVICE_KEY}/hq/forced-content/${deleteConfirm.id}`, { method: 'DELETE' });
-      setDeleteConfirm(null);
-      fetchItems();
-    } catch (err: any) {
-      setError(err?.message || '삭제에 실패했습니다');
-      setDeleteConfirm(null);
-    } finally {
-      setIsDeleting(false);
-    }
+  const deleteOne = useCallback(async (id: string) => {
+    await apiFetch(`/api/signage/${SERVICE_KEY}/hq/forced-content/${id}`, { method: 'DELETE' });
+  }, [apiFetch]);
+
+  const handleBulkDelete = async () => {
+    const targetIds = [...selectedIds];
+    await batch.executeBatch(
+      async (ids) => {
+        const results: Array<{ id: string; status: 'success' | 'failed'; error?: string }> = [];
+        for (const id of ids) {
+          try {
+            await deleteOne(id);
+            results.push({ id, status: 'success' });
+          } catch (err: any) {
+            results.push({ id, status: 'failed', error: err?.message || '삭제 실패' });
+          }
+        }
+        return { data: { results } };
+      },
+      targetIds,
+    );
+    setSelectedIds(new Set());
+    fetchItems();
   };
 
   const filtered = useMemo(() => {
@@ -215,22 +265,20 @@ export default function ForcedContentPage() {
     expired: items.filter(i => new Date() > new Date(i.endAt)).length,
   };
 
-  const columns: Column<ForcedContentItem>[] = [
+  const columns: ListColumnDef<ForcedContentItem>[] = [
     {
       key: 'title',
-      title: '제목',
-      dataIndex: 'title',
+      header: '제목',
       render: (value) => <span className="font-medium text-slate-800 text-sm">{value}</span>,
     },
     {
       key: 'sourceType',
-      title: '소스',
-      dataIndex: 'sourceType',
+      header: '소스',
       render: (value) => <span className="text-sm text-slate-600">{sourceTypeLabel[value] || value}</span>,
     },
     {
       key: 'status',
-      title: '상태',
+      header: '상태',
       align: 'center',
       render: (_value, record) => {
         const badge = statusBadge(record);
@@ -239,7 +287,7 @@ export default function ForcedContentPage() {
     },
     {
       key: 'period',
-      title: '적용 기간',
+      header: '적용 기간',
       render: (_value, record) => (
         <div className="text-xs text-slate-500">
           <div>{fmtDate(record.startAt)}</div>
@@ -248,35 +296,42 @@ export default function ForcedContentPage() {
       ),
     },
     {
-      key: 'actions',
-      title: '',
-      width: '100px',
-      align: 'right',
-      render: (_value, record) => (
-        <div className="flex items-center justify-end gap-1">
-          <button
-            onClick={e => { e.stopPropagation(); handleToggleActive(record); }}
-            className={`p-1.5 rounded transition-colors ${record.isActive ? 'text-green-600 hover:bg-green-50' : 'text-slate-400 hover:bg-slate-50'}`}
-            title={record.isActive ? '비활성화' : '활성화'}
-          >
-            <Check className="w-4 h-4" />
-          </button>
-          <button
-            onClick={e => { e.stopPropagation(); openEditForm(record); }}
-            className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-            title="수정"
-          >
-            <Edit2 className="w-4 h-4" />
-          </button>
-          <button
-            onClick={e => { e.stopPropagation(); setDeleteConfirm({ id: record.id, title: record.title }); }}
-            className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-            title="삭제"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-        </div>
+      key: '_actions',
+      header: '액션',
+      align: 'center',
+      width: '60px',
+      system: true,
+      onCellClick: () => {},
+      render: (_v, row) => (
+        <RowActionMenu
+          actions={buildRowActions(forcedContentActionPolicy, row, {
+            activate: () => handleToggleActive(row),
+            deactivate: () => handleToggleActive(row),
+            edit: () => openEditForm(row),
+            delete: () => deleteOne(row.id).then(fetchItems).catch((err: any) => setError(err?.message || '삭제 실패')),
+          }, { icons: FORCED_CONTENT_ACTION_ICONS })}
+        />
       ),
+    },
+  ];
+
+  const bulkActions = [
+    {
+      key: 'delete',
+      label: `삭제 (${selectedIds.size})`,
+      onClick: handleBulkDelete,
+      variant: 'danger' as const,
+      icon: <Trash2 size={14} />,
+      loading: batch.loading,
+      group: 'danger',
+      tooltip: '선택된 강제 콘텐츠를 일괄 삭제합니다',
+      visible: selectedIds.size > 0,
+      confirm: {
+        title: '일괄 삭제 확인',
+        message: `${selectedIds.size}개의 강제 콘텐츠를 삭제합니다. 삭제 후 즉시 모든 매장 플레이리스트에서 제거됩니다.`,
+        variant: 'danger' as const,
+        confirmText: '삭제',
+      },
     },
   ];
 
@@ -424,33 +479,32 @@ export default function ForcedContentPage() {
         />
       </div>
 
+      {/* Bulk Action Bar */}
+      <ActionBar
+        selectedCount={selectedIds.size}
+        onClearSelection={() => setSelectedIds(new Set())}
+        actions={bulkActions}
+      />
+
+      <BulkResultModal
+        open={batch.showResult}
+        onClose={() => { batch.clearResult(); fetchItems(); }}
+        result={batch.result}
+        onRetry={() => { batch.retryFailed(); }}
+      />
+
       {/* Table */}
       <DataTable<ForcedContentItem>
         columns={columns}
-        dataSource={filtered}
+        data={filtered}
         rowKey="id"
         loading={isLoading}
-        emptyText="등록된 강제 콘텐츠가 없습니다"
+        emptyMessage="등록된 강제 콘텐츠가 없습니다"
+        tableId="kpa-forced-content"
+        selectable
+        selectedKeys={selectedIds}
+        onSelectionChange={setSelectedIds}
       />
-
-      {/* Delete Confirmation Modal */}
-      {deleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4">
-            <h3 className="text-lg font-semibold text-slate-800 mb-1">강제 콘텐츠 삭제</h3>
-            <p className="text-sm text-slate-500 mb-4">삭제 후 즉시 모든 매장 플레이리스트에서 제거됩니다.</p>
-            <div className="bg-slate-50 rounded-lg p-3 mb-4 text-sm">
-              <p className="font-medium text-slate-700">{deleteConfirm.title}</p>
-            </div>
-            <div className="flex justify-end gap-2">
-              <button onClick={() => setDeleteConfirm(null)} disabled={isDeleting} className="px-4 py-2 border border-slate-200 rounded-lg text-sm hover:bg-slate-50 disabled:opacity-50">취소</button>
-              <button onClick={handleDeleteConfirmed} disabled={isDeleting} className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 disabled:opacity-50">
-                {isDeleting ? '삭제 중...' : '삭제'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

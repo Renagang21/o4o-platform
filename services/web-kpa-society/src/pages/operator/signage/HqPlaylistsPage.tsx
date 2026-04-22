@@ -2,13 +2,16 @@
  * HQ Playlists Management Page — Signage Console (KPA Society)
  * WO-O4O-SIGNAGE-CONSOLE-V1
  * WO-KPA-SIGNAGE-UI-RESTRUCTURE-V1: 검색바 추가 + DataTable 전환
+ * WO-O4O-SIGNAGE-TABLE-STANDARD-V1: O4O 표준 테이블 (체크 선택 + bulk delete + RowActionMenu)
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAccessToken } from '../../../contexts/AuthContext';
-import { ListMusic, RefreshCw, Plus, ChevronRight, Trash2, Search } from 'lucide-react';
-import { DataTable, type Column } from '@o4o/ui';
+import { ListMusic, RefreshCw, Plus, Trash2, Search, Eye } from 'lucide-react';
+import { ActionBar, BulkResultModal, RowActionMenu } from '@o4o/ui';
+import { DataTable, useBatchAction, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 const SERVICE_KEY = 'kpa-society';
@@ -31,6 +34,32 @@ const statusConfig: Record<string, { text: string; cls: string }> = {
   archived: { text: '아카이브', cls: 'bg-slate-100 text-slate-500' },
 };
 
+const playlistActionPolicy = defineActionPolicy<PlaylistItem>('kpa:signage:hq-playlists', {
+  rules: [
+    {
+      key: 'view',
+      label: '상세 보기',
+    },
+    {
+      key: 'delete',
+      label: '삭제',
+      variant: 'danger',
+      divider: true,
+      confirm: (row) => ({
+        title: '플레이리스트 완전 삭제',
+        message: `"${row.name}"\n\n삭제 시 모든 재생 항목도 함께 제거됩니다.\n이 작업은 되돌릴 수 없습니다.`,
+        variant: 'danger' as const,
+        confirmText: '완전 삭제',
+      }),
+    },
+  ],
+});
+
+const PLAYLIST_ACTION_ICONS: Record<string, React.ReactNode> = {
+  view: <Eye className="w-4 h-4" />,
+  delete: <Trash2 className="w-4 h-4" />,
+};
+
 export default function HqPlaylistsPage() {
   const navigate = useNavigate();
 
@@ -38,9 +67,9 @@ export default function HqPlaylistsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
-  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const batch = useBatchAction();
 
   const [formName, setFormName] = useState('');
   const [formLoop, setFormLoop] = useState(true);
@@ -102,19 +131,29 @@ export default function HqPlaylistsPage() {
     }
   };
 
-  const handleDeleteConfirmed = async () => {
-    if (!deleteConfirm) return;
-    setIsDeleting(true);
-    try {
-      await apiFetch(`/api/signage/${SERVICE_KEY}/hq/playlists/${deleteConfirm.id}`, { method: 'DELETE' });
-      setDeleteConfirm(null);
-      fetchPlaylists();
-    } catch (err: any) {
-      setError(err?.message || '삭제에 실패했습니다');
-      setDeleteConfirm(null);
-    } finally {
-      setIsDeleting(false);
-    }
+  const deleteOne = useCallback(async (id: string) => {
+    await apiFetch(`/api/signage/${SERVICE_KEY}/hq/playlists/${id}`, { method: 'DELETE' });
+  }, [apiFetch]);
+
+  const handleBulkDelete = async () => {
+    const targetIds = [...selectedIds];
+    await batch.executeBatch(
+      async (ids) => {
+        const results: Array<{ id: string; status: 'success' | 'failed'; error?: string }> = [];
+        for (const id of ids) {
+          try {
+            await deleteOne(id);
+            results.push({ id, status: 'success' });
+          } catch (err: any) {
+            results.push({ id, status: 'failed', error: err?.message || '삭제 실패' });
+          }
+        }
+        return { data: { results } };
+      },
+      targetIds,
+    );
+    setSelectedIds(new Set());
+    fetchPlaylists();
   };
 
   const formatDate = (d: string) => {
@@ -135,17 +174,15 @@ export default function HqPlaylistsPage() {
     return playlists.filter(p => p.name.toLowerCase().includes(kw));
   }, [playlists, searchKeyword]);
 
-  const columns: Column<PlaylistItem>[] = [
+  const columns: ListColumnDef<PlaylistItem>[] = [
     {
       key: 'name',
-      title: '이름',
-      dataIndex: 'name',
+      header: '이름',
       render: (value) => <span className="font-medium text-slate-800 text-sm">{value}</span>,
     },
     {
       key: 'itemCount',
-      title: '항목 수',
-      dataIndex: 'itemCount',
+      header: '항목 수',
       align: 'center',
       render: (value) => (
         <span className="inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-medium bg-blue-100 text-blue-700">{value}</span>
@@ -153,21 +190,18 @@ export default function HqPlaylistsPage() {
     },
     {
       key: 'totalDuration',
-      title: '총 시간',
-      dataIndex: 'totalDuration',
+      header: '총 시간',
       render: (value) => <span className="text-sm text-slate-600">{formatDuration(value)}</span>,
     },
     {
       key: 'loopEnabled',
-      title: '루프',
-      dataIndex: 'loopEnabled',
+      header: '루프',
       align: 'center',
       render: (value) => <span className="text-sm">{value ? 'O' : '-'}</span>,
     },
     {
       key: 'status',
-      title: '상태',
-      dataIndex: 'status',
+      header: '상태',
       align: 'center',
       render: (value) => {
         const sc = statusConfig[value] || { text: value, cls: 'bg-slate-100 text-slate-600' };
@@ -176,27 +210,44 @@ export default function HqPlaylistsPage() {
     },
     {
       key: 'createdAt',
-      title: '생성일',
-      dataIndex: 'createdAt',
+      header: '생성일',
       render: (value) => <span className="text-sm text-slate-500">{formatDate(value)}</span>,
     },
     {
-      key: 'actions',
-      title: '',
+      key: '_actions',
+      header: '액션',
+      align: 'center',
       width: '60px',
-      align: 'right',
-      render: (_value, record) => (
-        <div className="flex items-center justify-end gap-1">
-          <button
-            onClick={e => { e.stopPropagation(); setDeleteConfirm({ id: record.id, name: record.name }); }}
-            className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-            title="완전 삭제"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-          <ChevronRight className="w-4 h-4 text-slate-300" />
-        </div>
+      system: true,
+      onCellClick: () => {},
+      render: (_v, row) => (
+        <RowActionMenu
+          actions={buildRowActions(playlistActionPolicy, row, {
+            view: () => navigate(`/operator/signage/hq-playlists/${row.id}`),
+            delete: () => deleteOne(row.id).then(fetchPlaylists).catch((err: any) => setError(err?.message || '삭제 실패')),
+          }, { icons: PLAYLIST_ACTION_ICONS })}
+        />
       ),
+    },
+  ];
+
+  const bulkActions = [
+    {
+      key: 'delete',
+      label: `삭제 (${selectedIds.size})`,
+      onClick: handleBulkDelete,
+      variant: 'danger' as const,
+      icon: <Trash2 size={14} />,
+      loading: batch.loading,
+      group: 'danger',
+      tooltip: '선택된 플레이리스트를 일괄 삭제합니다',
+      visible: selectedIds.size > 0,
+      confirm: {
+        title: '일괄 삭제 확인',
+        message: `${selectedIds.size}개의 플레이리스트를 삭제합니다. 이 작업은 되돌릴 수 없습니다.`,
+        variant: 'danger' as const,
+        confirmText: '삭제',
+      },
     },
   ];
 
@@ -269,35 +320,33 @@ export default function HqPlaylistsPage() {
         />
       </div>
 
+      {/* Bulk Action Bar */}
+      <ActionBar
+        selectedCount={selectedIds.size}
+        onClearSelection={() => setSelectedIds(new Set())}
+        actions={bulkActions}
+      />
+
+      <BulkResultModal
+        open={batch.showResult}
+        onClose={() => { batch.clearResult(); fetchPlaylists(); }}
+        result={batch.result}
+        onRetry={() => { batch.retryFailed(); }}
+      />
+
       {/* Table */}
       <DataTable<PlaylistItem>
         columns={columns}
-        dataSource={filteredPlaylists}
+        data={filteredPlaylists}
         rowKey="id"
         loading={isLoading}
         onRowClick={record => navigate(`/operator/signage/hq-playlists/${record.id}`)}
-        emptyText="HQ 플레이리스트가 없습니다"
+        emptyMessage="HQ 플레이리스트가 없습니다"
+        tableId="kpa-hq-playlists"
+        selectable
+        selectedKeys={selectedIds}
+        onSelectionChange={setSelectedIds}
       />
-
-      {/* Delete Confirmation Modal */}
-      {deleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4">
-            <h3 className="text-lg font-semibold text-slate-800 mb-1">플레이리스트 완전 삭제</h3>
-            <p className="text-sm text-slate-500 mb-4">이 작업은 되돌릴 수 없습니다.</p>
-            <div className="bg-slate-50 rounded-lg p-3 mb-4 text-sm">
-              <p className="font-medium text-slate-700">{deleteConfirm.name}</p>
-              <p className="text-slate-400 text-xs mt-1">타입: HQ 플레이리스트 · 삭제 시 모든 재생 항목도 함께 제거됩니다</p>
-            </div>
-            <div className="flex justify-end gap-2">
-              <button onClick={() => setDeleteConfirm(null)} disabled={isDeleting} className="px-4 py-2 border border-slate-200 rounded-lg text-sm hover:bg-slate-50 disabled:opacity-50">취소</button>
-              <button onClick={handleDeleteConfirmed} disabled={isDeleting} className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 disabled:opacity-50">
-                {isDeleting ? '삭제 중...' : '완전 삭제'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
