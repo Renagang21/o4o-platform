@@ -6,7 +6,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, Edit, Trash2 } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Upload } from 'lucide-react';
 import PageHeader from '../../../components/common/PageHeader';
 import { BaseTable, RowActionMenu } from '@o4o/ui';
 import type { O4OColumn } from '@o4o/ui';
@@ -138,6 +138,7 @@ const Products: React.FC = () => {
         title="상품 관리"
         subtitle="등록된 상품(ProductMaster)을 관리하세요"
         actions={[
+          { id: 'bulk-import', label: '대량 등록', icon: <Upload className="w-4 h-4" />, onClick: () => navigate('/supplierops/products/bulk-import'), variant: 'secondary' as const },
           { id: 'add-product', label: '상품 추가', icon: <Plus className="w-4 h-4" />, onClick: () => navigate('/supplierops/products/new'), variant: 'primary' as const },
         ]}
       />

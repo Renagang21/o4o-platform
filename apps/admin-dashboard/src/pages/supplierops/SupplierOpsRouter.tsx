@@ -13,6 +13,7 @@ const Profile = lazy(() => import('./pages/Profile'));
 const Products = lazy(() => import('./pages/Products'));
 const ProductSearchPage = lazy(() => import('./pages/ProductSearchPage'));
 const ProductCreatePage = lazy(() => import('./pages/ProductCreatePage'));
+const BulkImportPage = lazy(() => import('./pages/BulkImportPage'));
 const Offers = lazy(() => import('./pages/Offers'));
 const Orders = lazy(() => import('./pages/Orders'));
 const Settlement = lazy(() => import('./pages/Settlement'));
@@ -36,6 +37,7 @@ const SupplierOpsRouter: React.FC = () => {
         <Route path="products" element={<Products />} />
         <Route path="products/new" element={<ProductSearchPage />} />
         <Route path="products/create" element={<ProductCreatePage />} />
+        <Route path="products/bulk-import" element={<BulkImportPage />} />
         <Route path="offers" element={<Offers />} />
         <Route path="offers/new" element={<Offers />} />
         <Route path="orders" element={<Orders />} />

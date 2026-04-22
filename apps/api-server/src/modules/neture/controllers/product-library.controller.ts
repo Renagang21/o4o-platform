@@ -10,11 +10,15 @@ import type { Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
 import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { NetureService } from '../neture.service.js';
+import { BulkMatchService } from '../services/bulk-match.service.js';
+import { uploadSingleMiddleware } from '../../../middleware/upload.middleware.js';
+import { parseXlsxToRecords } from '../services/xlsx-parser.service.js';
 import logger from '../../../utils/logger.js';
 
 export function createProductLibraryController(dataSource: DataSource): Router {
   const router = Router();
   const netureService = new NetureService();
+  const bulkMatchService = new BulkMatchService(dataSource);
 
   /**
    * GET /products/library/search
@@ -126,6 +130,68 @@ export function createProductLibraryController(dataSource: DataSource): Router {
       res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch product detail' });
     }
   });
+
+  /**
+   * POST /products/bulk-match
+   *
+   * WO-O4O-BULK-MATCHING-NORMALIZATION-V1
+   *
+   * 이름 목록(JSON) 또는 XLSX 파일을 받아 ProductMaster 매칭 결과를 반환한다.
+   * 배치 레코드 생성 없음 — 순수 preview 전용.
+   *
+   * Body (JSON): { names: string[] }
+   * OR multipart file upload (XLSX/CSV): name 컬럼에서 추출
+   *
+   * Response: { success: true, data: MatchResult[], total: number }
+   */
+  router.post(
+    '/products/bulk-match',
+    requireAuth,
+    uploadSingleMiddleware('file'),
+    async (req: Request, res: Response) => {
+      try {
+        let names: string[];
+
+        const uploadedFile = (req as any).file as Express.Multer.File | undefined;
+        if (uploadedFile) {
+          // File upload path: parse XLSX/CSV → extract name column
+          const records: Array<Record<string, string>> = parseXlsxToRecords(uploadedFile.buffer);
+          names = records
+            .map((r) => (r['name'] || r['marketing_name'] || r['packaging_name'] || '').trim())
+            .filter(Boolean);
+        } else {
+          // JSON path
+          const body = req.body as { names?: unknown };
+          if (!Array.isArray(body.names)) {
+            return res.status(400).json({ success: false, error: 'INVALID_INPUT', message: 'names array required' });
+          }
+          names = (body.names as unknown[])
+            .map((n) => String(n ?? '').trim())
+            .filter(Boolean);
+        }
+
+        if (names.length === 0) {
+          return res.status(400).json({ success: false, error: 'NO_NAMES', message: 'No names provided' });
+        }
+        if (names.length > 200) {
+          return res.status(400).json({ success: false, error: 'TOO_MANY', message: 'Maximum 200 names per request' });
+        }
+
+        const data = await bulkMatchService.matchNames(names);
+        const summary = {
+          total: data.length,
+          exactMatch: data.filter((r) => r.status === 'EXACT_MATCH').length,
+          similarMatch: data.filter((r) => r.status === 'SIMILAR_MATCH').length,
+          notFound: data.filter((r) => r.status === 'NOT_FOUND').length,
+        };
+
+        res.json({ success: true, data, summary });
+      } catch (error) {
+        logger.error('[ProductLibrary] Error in bulk-match:', error);
+        res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Bulk match failed' });
+      }
+    },
+  );
 
   return router;
 }

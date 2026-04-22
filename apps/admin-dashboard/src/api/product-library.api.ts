@@ -47,3 +47,62 @@ export async function searchProductMaster(
   }>(`/neture/products/library/search?q=${encodeURIComponent(q.trim())}&limit=${limit}`);
   return res.data?.data ?? [];
 }
+
+// ─── Bulk Match ───────────────────────────────────────────────────────────────
+
+export type MatchStatus = 'EXACT_MATCH' | 'SIMILAR_MATCH' | 'NOT_FOUND';
+
+export interface MasterCandidate {
+  id: string;
+  name: string;
+  regulatoryName: string;
+  manufacturerName: string;
+  barcode: string;
+}
+
+export interface MatchResult {
+  rawName: string;
+  normalizedName: string;
+  status: MatchStatus;
+  master?: MasterCandidate;
+  candidates?: MasterCandidate[];
+}
+
+export interface BulkMatchResponse {
+  success: boolean;
+  data: MatchResult[];
+  summary: {
+    total: number;
+    exactMatch: number;
+    similarMatch: number;
+    notFound: number;
+  };
+}
+
+/**
+ * XLSX/CSV 파일 또는 이름 배열로 ProductMaster 매칭 결과를 반환한다.
+ * 배치 레코드 생성 없음 — 순수 preview 전용.
+ */
+export async function bulkMatchProducts(file: File): Promise<BulkMatchResponse> {
+  const formData = new FormData();
+  formData.append('file', file);
+  const res = await authClient.api.post<BulkMatchResponse>(
+    '/neture/products/bulk-match',
+    formData,
+  );
+  if (!res.data?.success) {
+    throw new Error('Bulk match failed');
+  }
+  return res.data;
+}
+
+export async function bulkMatchNames(names: string[]): Promise<BulkMatchResponse> {
+  const res = await authClient.api.post<BulkMatchResponse>(
+    '/neture/products/bulk-match',
+    { names },
+  );
+  if (!res.data?.success) {
+    throw new Error('Bulk match failed');
+  }
+  return res.data;
+}
