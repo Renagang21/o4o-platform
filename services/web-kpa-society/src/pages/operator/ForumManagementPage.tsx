@@ -3,10 +3,13 @@
  *
  * WO-O4O-KPA-A-FORUM-ALIGNMENT-V1
  * WO-KPA-A-OPERATOR-FORUM-DIRECT-SOFT-DELETE-V1
+ * WO-O4O-OPERATOR-LIST-TABLE-STANDARD-V3-PHASE3B-2:
+ *   Raw HTML table → DataTable + ActionPolicy 표준 전환.
+ *
  * 공통 /api/v1/forum/operator/* API 사용 (forumOperatorApi)
  */
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   FileCheck,
   Search,
@@ -26,6 +29,9 @@ import {
   Loader2 as Spinner,
 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
+import { RowActionMenu } from '@o4o/ui';
+import { DataTable, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { forumOperatorApi } from '../../api/forum';
 
 type TabType = 'requests' | 'categories';
@@ -116,6 +122,58 @@ function canRecreateForum(status: string): boolean {
   return status === 'failed';
 }
 
+// ─── Action Policies ───
+
+const forumRequestPolicy = defineActionPolicy<RequestData>('kpa:forum:requests', {
+  rules: [
+    {
+      key: 'createForum',
+      label: '포럼 생성',
+      visible: (row) => canCreateForum(row.status),
+    },
+    {
+      key: 'recreateForum',
+      label: '재생성',
+      variant: 'warning',
+      visible: (row) => canRecreateForum(row.status),
+    },
+    {
+      key: 'review',
+      label: '상세보기',
+    },
+  ],
+});
+
+const REQUEST_ACTION_ICONS: Record<string, React.ReactNode> = {
+  createForum: <Play className="w-4 h-4" />,
+  recreateForum: <RefreshCw className="w-4 h-4" />,
+  review: <Eye className="w-4 h-4" />,
+};
+
+const forumCategoryPolicy = defineActionPolicy<CategoryData>('kpa:forum:categories', {
+  rules: [
+    {
+      key: 'deactivate',
+      label: '비활성화',
+      variant: 'warning',
+      visible: (row) => row.isActive,
+    },
+    {
+      key: 'hardDelete',
+      label: '완전 삭제',
+      variant: 'danger',
+      visible: (row) => !row.isActive,
+    },
+  ],
+});
+
+const CATEGORY_ACTION_ICONS: Record<string, React.ReactNode> = {
+  deactivate: <Trash2 className="w-4 h-4" />,
+  hardDelete: <AlertOctagon className="w-4 h-4" />,
+};
+
+// ─── Component ───
+
 export default function ForumManagementPage() {
   // ── Tab state ──
   const [activeTab, setActiveTab] = useState<TabType>('requests');
@@ -140,7 +198,7 @@ export default function ForumManagementPage() {
   const [deactivateReason, setDeactivateReason] = useState('');
   const [isDeactivating, setIsDeactivating] = useState(false);
 
-  // ── WO-KPA-A-OPERATOR-FORUM-MANAGEMENT-DATATABLE-BULK-ACTION-V1 ──
+  // ── Selection (DataTable selectable) ──
   const [selectedCatIds, setSelectedCatIds] = useState<Set<string>>(new Set());
   const [isBulkProcessing, setIsBulkProcessing] = useState(false);
 
@@ -266,26 +324,6 @@ export default function ForumManagementPage() {
 
   // Reset selection on filter change
   useEffect(() => { setSelectedCatIds(new Set()); }, [catSearch, catStatusFilter]);
-
-  const toggleSelectCat = useCallback((id: string) => {
-    setSelectedCatIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }, []);
-
-  const allCatsSelected = filteredCategories.length > 0 && filteredCategories.every((c) => selectedCatIds.has(c.id));
-  const someCatsSelected = filteredCategories.some((c) => selectedCatIds.has(c.id));
-
-  const toggleSelectAllCats = useCallback(() => {
-    if (allCatsSelected) {
-      setSelectedCatIds(new Set());
-    } else {
-      setSelectedCatIds(new Set(filteredCategories.map((c) => c.id)));
-    }
-  }, [allCatsSelected, filteredCategories]);
 
   // ── Bulk soft delete (비활성화): 선택된 활성 포럼만 대상 ──
   const handleBulkSoftDelete = async () => {
@@ -439,6 +477,156 @@ export default function ForumManagementPage() {
     }
   };
 
+  // ── Tab 1: Column definitions ──
+  const requestColumns: ListColumnDef<RequestData>[] = [
+    {
+      key: 'name',
+      header: '포럼명',
+      render: (_v, row) => (
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-slate-800">{row.name}</span>
+            {row.forumType === 'closed' ? (
+              <span className="px-1.5 py-0.5 text-xs font-medium rounded bg-slate-100 text-slate-600">비공개</span>
+            ) : (
+              <span className="px-1.5 py-0.5 text-xs font-medium rounded bg-blue-50 text-blue-600">공개</span>
+            )}
+          </div>
+          <div className="text-sm text-slate-500 line-clamp-1">{row.description}</div>
+          {row.tags && row.tags.length > 0 && (
+            <div className="flex items-center gap-1 mt-1.5">
+              {row.tags.slice(0, 2).map((tag) => (
+                <span key={tag} className="px-2 py-0.5 text-xs font-medium rounded-full bg-slate-100 text-slate-600">
+                  {tag}
+                </span>
+              ))}
+              {row.tags.length > 2 && (
+                <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-slate-100 text-slate-500">
+                  +{row.tags.length - 2}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'requesterName',
+      header: '신청자',
+      render: (_v, row) => (
+        <div>
+          <div className="text-slate-800">{row.requesterName}</div>
+          {row.requesterEmail && (
+            <div className="text-sm text-slate-500">{row.requesterEmail}</div>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'createdAt',
+      header: '신청일',
+      render: (value) => <span className="text-sm text-slate-600">{formatDate(value)}</span>,
+    },
+    {
+      key: 'status',
+      header: '상태',
+      render: (value) => {
+        const sc = statusConfig[value as CategoryRequestStatus] || statusConfig.pending;
+        return (
+          <span className={`px-3 py-1 text-xs font-medium rounded-full ${sc.bgColor} ${sc.color}`}>
+            {sc.label}
+          </span>
+        );
+      },
+    },
+    {
+      key: '_actions',
+      header: '작업',
+      align: 'center' as const,
+      width: '120px',
+      system: true,
+      onCellClick: () => {},
+      render: (_v, row) => (
+        <RowActionMenu
+          actions={buildRowActions(forumRequestPolicy, row, {
+            createForum: () => handleCreateForum(row),
+            recreateForum: () => handleCreateForum(row, true),
+            review: () => { setSelectedRequest(row); setReviewComment(''); },
+          }, {
+            icons: REQUEST_ACTION_ICONS,
+            loading: {
+              createForum: creatingRequestId === row.id,
+              recreateForum: creatingRequestId === row.id,
+            },
+          })}
+        />
+      ),
+    },
+  ];
+
+  // ── Tab 2: Column definitions ──
+  const categoryColumns: ListColumnDef<CategoryData>[] = [
+    {
+      key: 'name',
+      header: '포럼명',
+      render: (_v, row) => (
+        <div>
+          <div className="flex items-center gap-2">
+            <span className={`font-medium ${row.isActive ? 'text-slate-800' : 'text-slate-500'}`}>{row.name}</span>
+            {row.forumType === 'closed' ? (
+              <span className="px-1.5 py-0.5 text-xs font-medium rounded bg-slate-100 text-slate-600">비공개</span>
+            ) : (
+              <span className="px-1.5 py-0.5 text-xs font-medium rounded bg-blue-50 text-blue-600">공개</span>
+            )}
+          </div>
+          {row.description && (
+            <div className="text-sm text-slate-400 line-clamp-1 mt-0.5">{row.description}</div>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'creatorName',
+      header: '개설자',
+      render: (value) => <span className="text-sm text-slate-600">{value || '-'}</span>,
+    },
+    {
+      key: 'postCount',
+      header: '게시글',
+      render: (value) => <span className="text-sm text-slate-600">{value}</span>,
+    },
+    {
+      key: 'isActive',
+      header: '상태',
+      render: (value) => value
+        ? <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700">활성</span>
+        : <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-slate-100 text-slate-500">비활성</span>,
+    },
+    {
+      key: 'createdAt',
+      header: '생성일',
+      render: (value) => <span className="text-sm text-slate-500">{formatDate(value)}</span>,
+    },
+    {
+      key: '_actions',
+      header: '작업',
+      align: 'center' as const,
+      width: '60px',
+      system: true,
+      onCellClick: () => {},
+      render: (_v, row) => (
+        <RowActionMenu
+          actions={buildRowActions(forumCategoryPolicy, row, {
+            deactivate: () => { setDeactivateTarget(row); setDeactivateReason(''); },
+            hardDelete: () => openHardDeleteModal(row),
+          }, {
+            icons: CATEGORY_ACTION_ICONS,
+          })}
+        />
+      ),
+    },
+  ];
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       {/* Header */}
@@ -487,525 +675,320 @@ export default function ForumManagementPage() {
       </div>
 
       {/* ── Tab: 신청 관리 ── */}
-      {activeTab === 'requests' && isLoading && (
-        <div className="flex items-center justify-center py-12">
-          <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
-          <span className="ml-2 text-slate-600">로딩 중...</span>
-        </div>
-      )}
+      {activeTab === 'requests' && (
+        <>
+          {/* Filters */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <input
+                type="text"
+                placeholder="포럼명 또는 신청자 검색..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="relative">
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value as CategoryRequestStatus | 'all')}
+                className="pl-4 pr-8 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
+              >
+                <option value="all">모든 상태</option>
+                <option value="pending">대기 중</option>
+                <option value="revision_requested">보완 요청</option>
+                <option value="approved">승인됨 (생성 전)</option>
+                <option value="creating">생성 중</option>
+                <option value="completed">생성 완료</option>
+                <option value="failed">생성 실패</option>
+                <option value="rejected">거절됨</option>
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+            </div>
+            <div className="relative">
+              <select
+                value={tagFilter}
+                onChange={(e) => setTagFilter(e.target.value)}
+                className="pl-4 pr-8 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
+              >
+                <option value="">모든 태그</option>
+                {ALL_FORUM_TAGS.map((tag) => (
+                  <option key={tag} value={tag}>{tag}</option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+            </div>
+          </div>
 
-      {activeTab === 'requests' && !isLoading && (
-      <>{/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-          <input
-            type="text"
-            placeholder="포럼명 또는 신청자 검색..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          {/* DataTable */}
+          <DataTable<RequestData>
+            columns={requestColumns}
+            data={filteredRequests}
+            rowKey="id"
+            loading={isLoading}
+            emptyMessage="신청 내역이 없습니다"
+            tableId="kpa-forum-requests"
           />
-        </div>
-        <div className="relative">
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as CategoryRequestStatus | 'all')}
-            className="pl-4 pr-8 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
-          >
-            <option value="all">모든 상태</option>
-            <option value="pending">대기 중</option>
-            <option value="revision_requested">보완 요청</option>
-            <option value="approved">승인됨 (생성 전)</option>
-            <option value="creating">생성 중</option>
-            <option value="completed">생성 완료</option>
-            <option value="failed">생성 실패</option>
-            <option value="rejected">거절됨</option>
-          </select>
-          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-        </div>
-        <div className="relative">
-          <select
-            value={tagFilter}
-            onChange={(e) => setTagFilter(e.target.value)}
-            className="pl-4 pr-8 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
-          >
-            <option value="">모든 태그</option>
-            {ALL_FORUM_TAGS.map((tag) => (
-              <option key={tag} value={tag}>{tag}</option>
-            ))}
-          </select>
-          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-        </div>
-      </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-slate-50 border-b border-slate-200">
-            <tr>
-              <th className="px-6 py-3 text-left text-sm font-medium text-slate-600">포럼명</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-slate-600">신청자</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-slate-600">신청일</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-slate-600">상태</th>
-              <th className="px-6 py-3 text-right text-sm font-medium text-slate-600">작업</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {filteredRequests.map((request) => {
-              const status = statusConfig[request.status] || statusConfig.pending;
-              return (
-                <tr key={request.id} className="hover:bg-slate-50">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-slate-800">{request.name}</span>
-                      {request.forumType === 'closed' ? (
-                        <span className="px-1.5 py-0.5 text-xs font-medium rounded bg-slate-100 text-slate-600">비공개</span>
+          {/* Review Modal */}
+          {selectedRequest && (
+            <>
+              <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setSelectedRequest(null)} />
+              <div className="fixed inset-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-lg bg-white rounded-xl shadow-xl z-50 overflow-hidden flex flex-col max-h-[90vh]">
+                <div className="px-6 py-4 border-b border-slate-200">
+                  <h2 className="text-lg font-semibold text-slate-800">포럼 신청 상세</h2>
+                </div>
+                <div className="p-6 overflow-y-auto flex-1 space-y-4">
+                  <div>
+                    <h4 className="text-sm font-medium text-slate-500 mb-1">포럼 이름</h4>
+                    <p className="text-slate-800 font-medium">{selectedRequest.name}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-slate-500 mb-1">포럼 유형</h4>
+                    <p className="text-slate-800">
+                      {selectedRequest.forumType === 'closed' ? (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-sm font-medium rounded-lg bg-slate-100 text-slate-700">비공개 포럼</span>
                       ) : (
-                        <span className="px-1.5 py-0.5 text-xs font-medium rounded bg-blue-50 text-blue-600">공개</span>
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-sm font-medium rounded-lg bg-blue-50 text-blue-700">공개 포럼</span>
                       )}
-                    </div>
-                    <div className="text-sm text-slate-500 line-clamp-1">{request.description}</div>
-                    {request.tags && request.tags.length > 0 && (
-                      <div className="flex items-center gap-1 mt-1.5">
-                        {request.tags.slice(0, 2).map((tag) => (
-                          <span key={tag} className="px-2 py-0.5 text-xs font-medium rounded-full bg-slate-100 text-slate-600">
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-slate-500 mb-1">포럼 설명</h4>
+                    <p className="text-slate-800">{selectedRequest.description}</p>
+                  </div>
+                  {selectedRequest.tags && selectedRequest.tags.length > 0 && (
+                    <div>
+                      <h4 className="text-sm font-medium text-slate-500 mb-2">태그</h4>
+                      <div className="flex flex-wrap gap-1.5">
+                        {selectedRequest.tags.map((tag) => (
+                          <span key={tag} className="px-2.5 py-1 text-xs font-medium rounded-full bg-blue-50 text-blue-700">
                             {tag}
                           </span>
                         ))}
-                        {request.tags.length > 2 && (
-                          <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-slate-100 text-slate-500">
-                            +{request.tags.length - 2}
-                          </span>
-                        )}
                       </div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-slate-800">{request.requesterName}</div>
-                    {request.requesterEmail && (
-                      <div className="text-sm text-slate-500">{request.requesterEmail}</div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-slate-600">
-                    {formatDate(request.createdAt)}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-3 py-1 text-xs font-medium rounded-full ${status.bgColor} ${status.color}`}>
-                      {status.label}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex justify-end gap-2">
-                      {canCreateForum(request.status) && (
-                        <button
-                          onClick={() => handleCreateForum(request)}
-                          disabled={creatingRequestId === request.id}
-                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
-                          title="포럼 생성"
-                        >
-                          {creatingRequestId === request.id
-                            ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                            : <Play className="w-3.5 h-3.5" />}
-                          포럼 생성
-                        </button>
+                    </div>
+                  )}
+                  {selectedRequest.reason && (
+                    <div>
+                      <h4 className="text-sm font-medium text-slate-500 mb-1">신청 사유</h4>
+                      <p className="text-slate-800">{selectedRequest.reason}</p>
+                    </div>
+                  )}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="text-sm font-medium text-slate-500 mb-1">신청자</h4>
+                      <p className="text-slate-800">{selectedRequest.requesterName}</p>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-slate-500 mb-1">신청일</h4>
+                      <p className="text-slate-800">{formatDate(selectedRequest.createdAt)}</p>
+                    </div>
+                  </div>
+
+                  {isReviewable(selectedRequest.status) && (
+                    <div className="pt-4 border-t border-slate-200">
+                      <label className="block text-sm font-medium text-slate-700 mb-2">검토 의견</label>
+                      <textarea
+                        value={reviewComment}
+                        onChange={(e) => setReviewComment(e.target.value)}
+                        placeholder="승인/거절/보완 요청 사유를 입력하세요 (선택)"
+                        rows={3}
+                        className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                      />
+                    </div>
+                  )}
+
+                  {!isReviewable(selectedRequest.status) && selectedRequest.reviewComment && (
+                    <div className={`p-4 rounded-lg ${
+                      ['approved', 'creating', 'completed'].includes(selectedRequest.status) ? 'bg-green-50' : 'bg-red-50'
+                    }`}>
+                      <h4 className={`text-sm font-medium mb-1 ${
+                        ['approved', 'creating', 'completed'].includes(selectedRequest.status) ? 'text-green-700' : 'text-red-700'
+                      }`}>
+                        검토 의견
+                      </h4>
+                      <p className={['approved', 'creating', 'completed'].includes(selectedRequest.status) ? 'text-green-600' : 'text-red-600'}>
+                        {selectedRequest.reviewComment}
+                      </p>
+                      {selectedRequest.reviewedAt && (
+                        <p className="text-xs text-slate-500 mt-2">
+                          {selectedRequest.reviewerName} | {formatDate(selectedRequest.reviewedAt)}
+                        </p>
                       )}
-                      {canRecreateForum(request.status) && (
-                        <button
-                          onClick={() => handleCreateForum(request, true)}
-                          disabled={creatingRequestId === request.id}
-                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-orange-500 rounded-lg hover:bg-orange-600 disabled:opacity-50"
-                          title="포럼 재생성"
-                        >
-                          {creatingRequestId === request.id
-                            ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                            : <RefreshCw className="w-3.5 h-3.5" />}
-                          재생성
-                        </button>
-                      )}
+                    </div>
+                  )}
+
+                  {selectedRequest.status === 'failed' && selectedRequest.errorMessage && (
+                    <div className="p-4 rounded-lg bg-red-50 border border-red-200">
+                      <h4 className="text-sm font-medium text-red-700 mb-1">생성 오류</h4>
+                      <p className="text-sm text-red-600 font-mono break-all">{selectedRequest.errorMessage}</p>
+                    </div>
+                  )}
+
+                  {selectedRequest.status === 'completed' && selectedRequest.createdCategorySlug && (
+                    <div className="p-4 rounded-lg bg-green-50 border border-green-200">
+                      <h4 className="text-sm font-medium text-green-700 mb-1">생성된 포럼</h4>
+                      <p className="text-sm text-green-600">슬러그: <span className="font-mono">{selectedRequest.createdCategorySlug}</span></p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="px-6 py-4 border-t border-slate-200 flex gap-3">
+                  <button
+                    onClick={() => setSelectedRequest(null)}
+                    className="flex-1 px-4 py-2 text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
+                  >
+                    닫기
+                  </button>
+                  {isReviewable(selectedRequest.status) && (
+                    <>
                       <button
-                        onClick={() => { setSelectedRequest(request); setReviewComment(''); }}
-                        className="p-2 rounded-lg hover:bg-slate-100 text-slate-600"
-                        title="상세보기"
+                        onClick={() => handleReview('reject')}
+                        disabled={isProcessing}
+                        className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 flex items-center gap-2"
                       >
-                        <Eye className="w-4 h-4" />
+                        <XCircle className="w-4 h-4" />
+                        거절
                       </button>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-
-        {filteredRequests.length === 0 && (
-          <div className="text-center py-12">
-            <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto">
-              <FileCheck className="w-8 h-8 text-slate-400" />
-            </div>
-            <h3 className="mt-4 text-lg font-medium text-slate-800">신청 내역이 없습니다</h3>
-            <p className="mt-2 text-slate-500">포럼 생성 요청이 들어오면 여기에 표시됩니다</p>
-          </div>
-        )}
-      </div>
-
-      {/* Review Modal */}
-      {selectedRequest && (
-        <>
-          <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setSelectedRequest(null)} />
-          <div className="fixed inset-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-lg bg-white rounded-xl shadow-xl z-50 overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="px-6 py-4 border-b border-slate-200">
-              <h2 className="text-lg font-semibold text-slate-800">포럼 신청 상세</h2>
-            </div>
-            <div className="p-6 overflow-y-auto flex-1 space-y-4">
-              <div>
-                <h4 className="text-sm font-medium text-slate-500 mb-1">포럼 이름</h4>
-                <p className="text-slate-800 font-medium">{selectedRequest.name}</p>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium text-slate-500 mb-1">포럼 유형</h4>
-                <p className="text-slate-800">
-                  {selectedRequest.forumType === 'closed' ? (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-sm font-medium rounded-lg bg-slate-100 text-slate-700">비공개 포럼</span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-sm font-medium rounded-lg bg-blue-50 text-blue-700">공개 포럼</span>
+                      <button
+                        onClick={() => handleReview('revision')}
+                        disabled={isProcessing}
+                        className="px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-600 disabled:opacity-50 flex items-center gap-2"
+                      >
+                        <RotateCcw className="w-4 h-4" />
+                        보완
+                      </button>
+                      <button
+                        onClick={() => handleReview('approve')}
+                        disabled={isProcessing}
+                        className="px-4 py-2 text-white bg-green-600 rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center gap-2"
+                      >
+                        {isProcessing ? (
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        ) : (
+                          <CheckCircle className="w-4 h-4" />
+                        )}
+                        승인
+                      </button>
+                    </>
                   )}
-                </p>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium text-slate-500 mb-1">포럼 설명</h4>
-                <p className="text-slate-800">{selectedRequest.description}</p>
-              </div>
-              {selectedRequest.tags && selectedRequest.tags.length > 0 && (
-                <div>
-                  <h4 className="text-sm font-medium text-slate-500 mb-2">태그</h4>
-                  <div className="flex flex-wrap gap-1.5">
-                    {selectedRequest.tags.map((tag) => (
-                      <span key={tag} className="px-2.5 py-1 text-xs font-medium rounded-full bg-blue-50 text-blue-700">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {selectedRequest.reason && (
-                <div>
-                  <h4 className="text-sm font-medium text-slate-500 mb-1">신청 사유</h4>
-                  <p className="text-slate-800">{selectedRequest.reason}</p>
-                </div>
-              )}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <h4 className="text-sm font-medium text-slate-500 mb-1">신청자</h4>
-                  <p className="text-slate-800">{selectedRequest.requesterName}</p>
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium text-slate-500 mb-1">신청일</h4>
-                  <p className="text-slate-800">{formatDate(selectedRequest.createdAt)}</p>
-                </div>
-              </div>
-
-              {isReviewable(selectedRequest.status) && (
-                <div className="pt-4 border-t border-slate-200">
-                  <label className="block text-sm font-medium text-slate-700 mb-2">검토 의견</label>
-                  <textarea
-                    value={reviewComment}
-                    onChange={(e) => setReviewComment(e.target.value)}
-                    placeholder="승인/거절/보완 요청 사유를 입력하세요 (선택)"
-                    rows={3}
-                    className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                  />
-                </div>
-              )}
-
-              {!isReviewable(selectedRequest.status) && selectedRequest.reviewComment && (
-                <div className={`p-4 rounded-lg ${
-                  ['approved', 'creating', 'completed'].includes(selectedRequest.status) ? 'bg-green-50' : 'bg-red-50'
-                }`}>
-                  <h4 className={`text-sm font-medium mb-1 ${
-                    ['approved', 'creating', 'completed'].includes(selectedRequest.status) ? 'text-green-700' : 'text-red-700'
-                  }`}>
-                    검토 의견
-                  </h4>
-                  <p className={['approved', 'creating', 'completed'].includes(selectedRequest.status) ? 'text-green-600' : 'text-red-600'}>
-                    {selectedRequest.reviewComment}
-                  </p>
-                  {selectedRequest.reviewedAt && (
-                    <p className="text-xs text-slate-500 mt-2">
-                      {selectedRequest.reviewerName} | {formatDate(selectedRequest.reviewedAt)}
-                    </p>
-                  )}
-                </div>
-              )}
-
-              {selectedRequest.status === 'failed' && selectedRequest.errorMessage && (
-                <div className="p-4 rounded-lg bg-red-50 border border-red-200">
-                  <h4 className="text-sm font-medium text-red-700 mb-1">생성 오류</h4>
-                  <p className="text-sm text-red-600 font-mono break-all">{selectedRequest.errorMessage}</p>
-                </div>
-              )}
-
-              {selectedRequest.status === 'completed' && selectedRequest.createdCategorySlug && (
-                <div className="p-4 rounded-lg bg-green-50 border border-green-200">
-                  <h4 className="text-sm font-medium text-green-700 mb-1">생성된 포럼</h4>
-                  <p className="text-sm text-green-600">슬러그: <span className="font-mono">{selectedRequest.createdCategorySlug}</span></p>
-                </div>
-              )}
-            </div>
-
-            <div className="px-6 py-4 border-t border-slate-200 flex gap-3">
-              <button
-                onClick={() => setSelectedRequest(null)}
-                className="flex-1 px-4 py-2 text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
-              >
-                닫기
-              </button>
-              {isReviewable(selectedRequest.status) && (
-                <>
-                  <button
-                    onClick={() => handleReview('reject')}
-                    disabled={isProcessing}
-                    className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 flex items-center gap-2"
-                  >
-                    <XCircle className="w-4 h-4" />
-                    거절
-                  </button>
-                  <button
-                    onClick={() => handleReview('revision')}
-                    disabled={isProcessing}
-                    className="px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-600 disabled:opacity-50 flex items-center gap-2"
-                  >
-                    <RotateCcw className="w-4 h-4" />
-                    보완
-                  </button>
-                  <button
-                    onClick={() => handleReview('approve')}
-                    disabled={isProcessing}
-                    className="px-4 py-2 text-white bg-green-600 rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center gap-2"
-                  >
-                    {isProcessing ? (
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    ) : (
-                      <CheckCircle className="w-4 h-4" />
-                    )}
-                    승인
-                  </button>
-                </>
-              )}
-              {canCreateForum(selectedRequest.status) && (
-                <button
-                  onClick={() => handleCreateForum(selectedRequest)}
-                  disabled={creatingRequestId === selectedRequest.id}
-                  className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
-                >
-                  {creatingRequestId === selectedRequest.id
-                    ? <Loader2 className="w-4 h-4 animate-spin" />
-                    : <Play className="w-4 h-4" />}
-                  포럼 생성
-                </button>
-              )}
-              {canRecreateForum(selectedRequest.status) && (
-                <button
-                  onClick={() => handleCreateForum(selectedRequest, true)}
-                  disabled={creatingRequestId === selectedRequest.id}
-                  className="px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-600 disabled:opacity-50 flex items-center gap-2"
-                >
-                  {creatingRequestId === selectedRequest.id
-                    ? <Loader2 className="w-4 h-4 animate-spin" />
-                    : <RefreshCw className="w-4 h-4" />}
-                  재생성
-                </button>
-              )}
-            </div>
-          </div>
-        </>
-      )}
-      </>)}
-
-      {/* ── Tab: 포럼 목록 (WO-KPA-A-OPERATOR-FORUM-MANAGEMENT-DATATABLE-BULK-ACTION-V1) ── */}
-      {activeTab === 'categories' && (
-        <>
-          {isCatsLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
-              <span className="ml-2 text-slate-600">로딩 중...</span>
-            </div>
-          ) : (
-            <>
-              {/* 검색 + 상태 필터 */}
-              <div className="flex flex-col sm:flex-row gap-3">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                  <input
-                    type="text"
-                    placeholder="포럼명 또는 개설자 검색..."
-                    value={catSearch}
-                    onChange={(e) => setCatSearch(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div className="relative">
-                  <select
-                    value={catStatusFilter}
-                    onChange={(e) => setCatStatusFilter(e.target.value as 'all' | 'active' | 'inactive')}
-                    className="pl-4 pr-8 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white text-sm"
-                  >
-                    <option value="all">모든 상태</option>
-                    <option value="active">활성</option>
-                    <option value="inactive">비활성</option>
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-                </div>
-              </div>
-
-              {/* Bulk Action Bar */}
-              {selectedCatIds.size > 0 && (
-                <div className="flex items-center gap-3 px-4 py-2.5 bg-blue-50 border border-blue-200 rounded-lg">
-                  <span className="text-sm text-blue-700 font-medium">{selectedCatIds.size}개 선택</span>
-                  <div className="h-4 w-px bg-blue-200" />
-                  {selectedActiveCount > 0 && (
+                  {canCreateForum(selectedRequest.status) && (
                     <button
-                      onClick={handleBulkSoftDelete}
-                      disabled={isBulkProcessing}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-amber-600 hover:bg-amber-700 rounded disabled:opacity-50 transition-colors"
+                      onClick={() => handleCreateForum(selectedRequest)}
+                      disabled={creatingRequestId === selectedRequest.id}
+                      className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
                     >
-                      {isBulkProcessing ? <Spinner className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
-                      비활성화 ({selectedActiveCount})
+                      {creatingRequestId === selectedRequest.id
+                        ? <Loader2 className="w-4 h-4 animate-spin" />
+                        : <Play className="w-4 h-4" />}
+                      포럼 생성
                     </button>
                   )}
-                  {selectedInactiveCount > 0 && (
+                  {canRecreateForum(selectedRequest.status) && (
                     <button
-                      onClick={handleBulkHardDelete}
-                      disabled={isBulkProcessing}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-rose-600 hover:bg-rose-700 rounded disabled:opacity-50 transition-colors"
+                      onClick={() => handleCreateForum(selectedRequest, true)}
+                      disabled={creatingRequestId === selectedRequest.id}
+                      className="px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-600 disabled:opacity-50 flex items-center gap-2"
                     >
-                      {isBulkProcessing ? <Spinner className="w-3.5 h-3.5 animate-spin" /> : <AlertOctagon className="w-3.5 h-3.5" />}
-                      완전 삭제 ({selectedInactiveCount})
+                      {creatingRequestId === selectedRequest.id
+                        ? <Loader2 className="w-4 h-4 animate-spin" />
+                        : <RefreshCw className="w-4 h-4" />}
+                      재생성
                     </button>
                   )}
-                  <button
-                    onClick={() => setSelectedCatIds(new Set())}
-                    className="ml-auto text-sm text-slate-500 hover:text-slate-700"
-                  >
-                    선택 해제
-                  </button>
                 </div>
-              )}
-
-              {/* DataTable */}
-              <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-                <table className="w-full">
-                  <thead className="bg-slate-50 border-b border-slate-200">
-                    <tr>
-                      <th className="px-3 py-3 w-10">
-                        <input
-                          type="checkbox"
-                          checked={allCatsSelected}
-                          ref={(el) => { if (el) el.indeterminate = !allCatsSelected && someCatsSelected; }}
-                          onChange={toggleSelectAllCats}
-                          disabled={filteredCategories.length === 0}
-                          className="w-4 h-4 accent-blue-600 cursor-pointer disabled:opacity-30"
-                        />
-                      </th>
-                      <th className="px-4 py-3 text-left text-sm font-medium text-slate-600">포럼명</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium text-slate-600">개설자</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium text-slate-600">게시글</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium text-slate-600">상태</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium text-slate-600">생성일</th>
-                      <th className="px-4 py-3 text-right text-sm font-medium text-slate-600">작업</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {filteredCategories.map((cat) => (
-                      <tr key={cat.id} className={`hover:bg-slate-50 ${!cat.isActive ? 'bg-slate-50/50' : ''}`}>
-                        <td className="px-3 py-3">
-                          <input
-                            type="checkbox"
-                            checked={selectedCatIds.has(cat.id)}
-                            onChange={() => toggleSelectCat(cat.id)}
-                            className="w-4 h-4 accent-blue-600 cursor-pointer"
-                          />
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-2">
-                            <span className={`font-medium ${cat.isActive ? 'text-slate-800' : 'text-slate-500'}`}>{cat.name}</span>
-                            {cat.forumType === 'closed' ? (
-                              <span className="px-1.5 py-0.5 text-xs font-medium rounded bg-slate-100 text-slate-600">비공개</span>
-                            ) : (
-                              <span className="px-1.5 py-0.5 text-xs font-medium rounded bg-blue-50 text-blue-600">공개</span>
-                            )}
-                          </div>
-                          {cat.description && (
-                            <div className="text-sm text-slate-400 line-clamp-1 mt-0.5">{cat.description}</div>
-                          )}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-slate-600">
-                          {cat.creatorName || '-'}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-slate-600">
-                          {cat.postCount}
-                        </td>
-                        <td className="px-4 py-3">
-                          {cat.isActive ? (
-                            <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700">활성</span>
-                          ) : (
-                            <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-slate-100 text-slate-500">비활성</span>
-                          )}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-slate-500">
-                          {formatDate(cat.createdAt)}
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="flex justify-end gap-1">
-                            {cat.isActive && (
-                              <button
-                                onClick={() => { setDeactivateTarget(cat); setDeactivateReason(''); }}
-                                className="p-2 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-600 transition-colors"
-                                title="비활성화 (soft delete)"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
-                            )}
-                            {/* WO-KPA-A-OPERATOR-FORUM-HARD-DELETE-ICON-V1: 비활성 포럼에만 hard delete 아이콘 노출 */}
-                            {!cat.isActive && (
-                              <button
-                                onClick={() => openHardDeleteModal(cat)}
-                                className="p-2 rounded-lg hover:bg-rose-100 text-red-400 hover:text-rose-700 transition-colors"
-                                title="완전 삭제 (복구 불가)"
-                              >
-                                <AlertOctagon className="w-4 h-4" />
-                              </button>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-
-                {filteredCategories.length === 0 && (
-                  <div className="text-center py-12">
-                    <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto">
-                      <List className="w-8 h-8 text-slate-400" />
-                    </div>
-                    <h3 className="mt-4 text-lg font-medium text-slate-800">포럼이 없습니다</h3>
-                    <p className="mt-2 text-slate-500">
-                      {catStatusFilter !== 'all' ? '조건에 맞는 포럼이 없습니다' : '승인된 포럼이 여기에 표시됩니다'}
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {/* 목록 하단 요약 */}
-              <div className="flex items-center justify-between text-sm text-slate-500">
-                <span>총 {filteredCategories.length}개 포럼</span>
-                <span>
-                  활성 {categories.filter((c) => c.isActive).length} /
-                  비활성 {categories.filter((c) => !c.isActive).length}
-                </span>
               </div>
             </>
           )}
+        </>
+      )}
+
+      {/* ── Tab: 포럼 목록 ── */}
+      {activeTab === 'categories' && (
+        <>
+          {/* 검색 + 상태 필터 */}
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <input
+                type="text"
+                placeholder="포럼명 또는 개설자 검색..."
+                value={catSearch}
+                onChange={(e) => setCatSearch(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="relative">
+              <select
+                value={catStatusFilter}
+                onChange={(e) => setCatStatusFilter(e.target.value as 'all' | 'active' | 'inactive')}
+                className="pl-4 pr-8 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white text-sm"
+              >
+                <option value="all">모든 상태</option>
+                <option value="active">활성</option>
+                <option value="inactive">비활성</option>
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+            </div>
+          </div>
+
+          {/* Bulk Action Bar */}
+          {selectedCatIds.size > 0 && (
+            <div className="flex items-center gap-3 px-4 py-2.5 bg-blue-50 border border-blue-200 rounded-lg">
+              <span className="text-sm text-blue-700 font-medium">{selectedCatIds.size}개 선택</span>
+              <div className="h-4 w-px bg-blue-200" />
+              {selectedActiveCount > 0 && (
+                <button
+                  onClick={handleBulkSoftDelete}
+                  disabled={isBulkProcessing}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-amber-600 hover:bg-amber-700 rounded disabled:opacity-50 transition-colors"
+                >
+                  {isBulkProcessing ? <Spinner className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                  비활성화 ({selectedActiveCount})
+                </button>
+              )}
+              {selectedInactiveCount > 0 && (
+                <button
+                  onClick={handleBulkHardDelete}
+                  disabled={isBulkProcessing}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-rose-600 hover:bg-rose-700 rounded disabled:opacity-50 transition-colors"
+                >
+                  {isBulkProcessing ? <Spinner className="w-3.5 h-3.5 animate-spin" /> : <AlertOctagon className="w-3.5 h-3.5" />}
+                  완전 삭제 ({selectedInactiveCount})
+                </button>
+              )}
+              <button
+                onClick={() => setSelectedCatIds(new Set())}
+                className="ml-auto text-sm text-slate-500 hover:text-slate-700"
+              >
+                선택 해제
+              </button>
+            </div>
+          )}
+
+          {/* DataTable (selectable) */}
+          <DataTable<CategoryData>
+            columns={categoryColumns}
+            data={filteredCategories}
+            rowKey="id"
+            loading={isCatsLoading}
+            emptyMessage={catStatusFilter !== 'all' ? '조건에 맞는 포럼이 없습니다' : '승인된 포럼이 여기에 표시됩니다'}
+            tableId="kpa-forum-categories"
+            selectable
+            selectedKeys={selectedCatIds}
+            onSelectionChange={setSelectedCatIds}
+          />
+
+          {/* 목록 하단 요약 */}
+          <div className="flex items-center justify-between text-sm text-slate-500">
+            <span>총 {filteredCategories.length}개 포럼</span>
+            <span>
+              활성 {categories.filter((c) => c.isActive).length} /
+              비활성 {categories.filter((c) => !c.isActive).length}
+            </span>
+          </div>
         </>
       )}
 

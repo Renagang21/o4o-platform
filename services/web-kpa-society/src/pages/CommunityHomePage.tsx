@@ -25,10 +25,6 @@
 
 import { useState, useEffect } from 'react';
 import { HeroBannerSection } from '../components/community/HeroBannerSection';
-import { AdSection } from '../components/community/AdSection';
-import { SponsorBar } from '../components/community/SponsorBar';
-import { FooterLinksSection } from '../components/home/FooterLinksSection';
-import { UtilitySection } from '../components/home/UtilitySection';
 import { homeApi } from '../api/home';
 import type { HomePageData } from '../api/home';
 import { useAuth } from '../contexts/AuthContext';
@@ -36,11 +32,10 @@ import { colors, spacing } from '../styles/theme';
 import {
   HeroSummarySection,
   NewsNoticesSection,
-  ActivitySection as SharedActivitySection,
   AppEntrySection,
   CtaGuidanceSection,
 } from '@o4o/shared-space-ui';
-import type { NoticeItem, RecentPost } from '@o4o/shared-space-ui';
+import type { NoticeItem } from '@o4o/shared-space-ui';
 
 // ─── Inline SVG Icons ──────────────────────────────────────
 
@@ -127,16 +122,6 @@ export function CommunityHomePage() {
     title: n.title,
     date: n.publishedAt || n.createdAt,
     isPinned: n.isPinned,
-  }));
-
-  // ── Activity data mapping ──
-  const recentPosts: RecentPost[] = (data?.community.posts ?? []).map((p) => ({
-    id: p.id,
-    title: p.title,
-    date: p.createdAt,
-    href: `/forum/post/${p.id}`,
-    category: p.categoryName ?? undefined,
-    author: p.authorName ?? undefined,
   }));
 
   return (
