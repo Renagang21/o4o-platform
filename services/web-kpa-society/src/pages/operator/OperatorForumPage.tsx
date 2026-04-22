@@ -31,8 +31,8 @@ import {
   Heart,
   Pencil,
 } from 'lucide-react';
-import { DataTable, RowActionMenu } from '@o4o/ui';
-import type { Column } from '@o4o/ui';
+import { BaseTable, RowActionMenu } from '@o4o/ui';
+import type { O4OColumn } from '@o4o/ui';
 import { forumApi, forumAnalyticsApi } from '../../api/forum';
 
 // ─── Types ───
@@ -105,19 +105,17 @@ export default function OperatorForumPage() {
     fetchData();
   }, [fetchData]);
 
-  // ─── DataTable Columns ───
-  const columns: Column<PostItem>[] = [
+  // ─── BaseTable Columns ───
+  const columns: O4OColumn<PostItem>[] = [
     {
       key: 'categoryName',
-      title: '포럼',
-      dataIndex: 'categoryName',
+      header: '포럼',
       width: '90px',
       render: (v) => <span style={badgeStyle}>{v}</span>,
     },
     {
       key: 'title',
-      title: '제목',
-      dataIndex: 'title',
+      header: '제목',
       render: (v) => (
         <span style={{ fontWeight: 500, color: '#1e293b', maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block' }}>
           {v}
@@ -126,14 +124,12 @@ export default function OperatorForumPage() {
     },
     {
       key: 'authorName',
-      title: '작성자',
-      dataIndex: 'authorName',
+      header: '작성자',
       width: '100px',
     },
     {
       key: 'viewCount',
-      title: '조회',
-      dataIndex: 'viewCount',
+      header: '조회',
       width: '70px',
       align: 'right',
       render: (v) => (
@@ -144,8 +140,7 @@ export default function OperatorForumPage() {
     },
     {
       key: 'likeCount',
-      title: '좋아요',
-      dataIndex: 'likeCount',
+      header: '좋아요',
       width: '70px',
       align: 'right',
       render: (v) => (
@@ -158,8 +153,7 @@ export default function OperatorForumPage() {
     },
     {
       key: 'status',
-      title: '상태',
-      dataIndex: 'status',
+      header: '상태',
       width: '70px',
       align: 'center',
       render: (v) => (
@@ -174,14 +168,13 @@ export default function OperatorForumPage() {
     },
     {
       key: 'createdAt',
-      title: '작성일',
-      dataIndex: 'createdAt',
+      header: '작성일',
       width: '100px',
       render: (v) => formatDate(v),
     },
     {
       key: 'actions',
-      title: '',
+      header: '',
       width: '50px',
       render: (_v, row) => (
         <RowActionMenu
@@ -190,7 +183,7 @@ export default function OperatorForumPage() {
               key: 'edit',
               label: '수정',
               icon: <Pencil size={14} />,
-              onClick: () => navigate(`/forum/posts/${row.id}/edit`),
+              onClick: () => navigate(`/forum/edit/${row.id}`),
             },
             {
               key: 'delete',
@@ -250,7 +243,7 @@ export default function OperatorForumPage() {
             <MessageSquare size={20} color="#2563eb" />
           </div>
           <div>
-            <h1 style={{ fontSize: 20, fontWeight: 600, color: '#1e293b', margin: 0 }}>포럼</h1>
+            <h1 style={{ fontSize: 20, fontWeight: 600, color: '#1e293b', margin: 0 }}>포럼 운영</h1>
             <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>커뮤니티 포럼 현황 및 운영 관리</p>
           </div>
         </div>
@@ -356,7 +349,7 @@ export default function OperatorForumPage() {
           </div>
         </div>
       ) : (
-        <DataTable dataSource={posts} columns={columns} rowKey="id" />
+        <BaseTable data={posts} columns={columns} rowKey={(row) => row.id} />
       )}
 
     </div>
