@@ -407,6 +407,13 @@ import {
 import {
   InstructorApplication,
 } from '@o4o/lms-core/entities';
+import { CourseCompletion } from '../modules/lms/entities/CourseCompletion.js';
+
+// ============================================================================
+// CREDIT MODULE ENTITIES (WO-TYPEORM-ENTITY-REGISTRATION-FIX-V1)
+// ============================================================================
+import { CreditBalance } from '../modules/credit/entities/CreditBalance.js';
+import { CreditTransaction } from '../modules/credit/entities/CreditTransaction.js';
 
 // ============================================================================
 // INTERACTIVE-CONTENT-CORE ENTITIES (Phase 1 + Phase 2)
@@ -821,6 +828,12 @@ export const AppDataSource = new DataSource({
     // LMS-CORE ENTITIES (reduced after Phase 2)
     // ============================================================================
     InstructorApplication,
+    CourseCompletion,
+    // ============================================================================
+    // CREDIT MODULE ENTITIES (WO-TYPEORM-ENTITY-REGISTRATION-FIX-V1)
+    // ============================================================================
+    CreditBalance,
+    CreditTransaction,
     // ============================================================================
     // INTERACTIVE-CONTENT-CORE ENTITIES (Phase 1 + Phase 2)
     // ============================================================================
