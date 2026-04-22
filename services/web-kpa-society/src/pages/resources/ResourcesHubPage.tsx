@@ -1,12 +1,17 @@
 /**
  * ResourcesHubPage — 공동자료실 Hub
  * WO-KPA-RESOURCE-SYSTEM-RESET-V1
+ * WO-KPA-RESOURCES-HUB-LIVE-CONNECTION-V1
  *
- * 개인 자료실 시스템 제거 후 공동자료실 재설계를 위한 진입 허브.
- * 실제 기능은 WO-KPA-COMMON-RESOURCE-MINIMAL-V1 에서 구현 예정.
+ * 권한 분기:
+ *   - 운영자(kpa:admin / kpa:operator): 실제 기능 경로로 이동 가능
+ *   - 일반 회원: "운영자 전용" 표시 (현재 기능은 운영자 도구)
  */
 
-import { BookOpen, Users, Cpu } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { BookOpen, PlusCircle, Cpu, Lock } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
+import { hasAnyRole, PLATFORM_ROLES } from '../../lib/role-constants';
 
 const s = {
   page: {
@@ -33,13 +38,6 @@ const s = {
     gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
     gap: '16px',
   } as React.CSSProperties,
-  card: {
-    padding: '28px 22px',
-    background: '#fff',
-    border: '1px solid #e5e7eb',
-    borderRadius: '12px',
-    cursor: 'default',
-  } as React.CSSProperties,
   iconWrap: {
     width: '44px',
     height: '44px',
@@ -62,7 +60,9 @@ const s = {
     lineHeight: 1.5,
   } as React.CSSProperties,
   badge: {
-    display: 'inline-block',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '4px',
     marginTop: '10px',
     fontSize: '11px',
     color: '#9ca3af',
@@ -82,7 +82,43 @@ const s = {
   } as React.CSSProperties,
 };
 
+interface CardConfig {
+  bg: string;
+  icon: React.ReactNode;
+  title: string;
+  desc: string;
+  path: string;
+}
+
+const CARDS: CardConfig[] = [
+  {
+    bg: '#d1fae5',
+    icon: <BookOpen size={22} color="#059669" />,
+    title: '공동자료실',
+    desc: '카테고리별 자료를 확인하고 활용하세요',
+    path: '/operator/resources',
+  },
+  {
+    bg: '#dbeafe',
+    icon: <PlusCircle size={22} color="#2563eb" />,
+    title: '자료 등록',
+    desc: '새 자료를 등록하고 관리하세요',
+    path: '/operator/resources/new',
+  },
+  {
+    bg: '#ede9fe',
+    icon: <Cpu size={22} color="#7c3aed" />,
+    title: 'AI 활용',
+    desc: '선택한 자료를 바탕으로 AI 작업을 진행하세요',
+    path: '/operator/resources/basket',
+  },
+];
+
 export function ResourcesHubPage() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const isOperator = hasAnyRole(user?.roles ?? [], PLATFORM_ROLES);
+
   return (
     <div style={s.page}>
       <div style={s.header}>
@@ -93,37 +129,68 @@ export function ResourcesHubPage() {
       </div>
 
       <div style={s.grid}>
-        <div style={s.card}>
-          <div style={{ ...s.iconWrap, background: '#d1fae5' }}>
-            <BookOpen size={22} color="#059669" />
-          </div>
-          <p style={s.cardTitle}>공동자료실</p>
-          <p style={s.cardDesc}>카테고리별로 분류된 공개 자료를 열람합니다</p>
-          <span style={s.badge}>준비 중</span>
-        </div>
-
-        <div style={s.card}>
-          <div style={{ ...s.iconWrap, background: '#dbeafe' }}>
-            <Users size={22} color="#2563eb" />
-          </div>
-          <p style={s.cardTitle}>자료 등록</p>
-          <p style={s.cardDesc}>새 자료를 등록하고 공유합니다</p>
-          <span style={s.badge}>준비 중</span>
-        </div>
-
-        <div style={s.card}>
-          <div style={{ ...s.iconWrap, background: '#ede9fe' }}>
-            <Cpu size={22} color="#7c3aed" />
-          </div>
-          <p style={s.cardTitle}>AI 활용</p>
-          <p style={s.cardDesc}>자료를 AI로 정리하고 가공합니다</p>
-          <span style={s.badge}>준비 중</span>
-        </div>
+        {CARDS.map((card) =>
+          isOperator ? (
+            /* 운영자: 클릭 가능한 카드 */
+            <button
+              key={card.title}
+              onClick={() => navigate(card.path)}
+              style={{
+                padding: '28px 22px',
+                background: '#fff',
+                border: '1px solid #e5e7eb',
+                borderRadius: '12px',
+                cursor: 'pointer',
+                textAlign: 'left',
+                transition: 'box-shadow 0.15s, border-color 0.15s',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)';
+                (e.currentTarget as HTMLButtonElement).style.borderColor = '#c7d2fe';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.boxShadow = 'none';
+                (e.currentTarget as HTMLButtonElement).style.borderColor = '#e5e7eb';
+              }}
+            >
+              <div style={{ ...s.iconWrap, background: card.bg }}>
+                {card.icon}
+              </div>
+              <p style={s.cardTitle}>{card.title}</p>
+              <p style={s.cardDesc}>{card.desc}</p>
+            </button>
+          ) : (
+            /* 일반 회원: 비활성 카드 */
+            <div
+              key={card.title}
+              style={{
+                padding: '28px 22px',
+                background: '#fafafa',
+                border: '1px solid #f0f0f0',
+                borderRadius: '12px',
+                cursor: 'default',
+                opacity: 0.75,
+              }}
+            >
+              <div style={{ ...s.iconWrap, background: card.bg, opacity: 0.6 }}>
+                {card.icon}
+              </div>
+              <p style={{ ...s.cardTitle, color: '#9ca3af' }}>{card.title}</p>
+              <p style={s.cardDesc}>{card.desc}</p>
+              <span style={s.badge}>
+                <Lock size={10} />
+                운영자 전용
+              </span>
+            </div>
+          )
+        )}
       </div>
 
-      <div style={s.notice}>
-        공동자료실 기능이 준비되고 있습니다. 곧 이용하실 수 있습니다.
-      </div>
+      {!isOperator && (
+        <div style={s.notice}>
+          현재 자료실 기능은 운영자만 이용할 수 있습니다. 회원 공개 기능은 추후 제공될 예정입니다.
+        </div>
+      )}
     </div>
   );
 }
