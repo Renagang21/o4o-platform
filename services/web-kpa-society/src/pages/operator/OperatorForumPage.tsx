@@ -6,6 +6,7 @@
  * WO-KPA-OPERATOR-FORUM-HUB-TERMINOLOGY-AND-TABLE-REFORM-V1:
  *   - 게시판→포럼 용어 통일
  *   - DataTable + RowActionMenu 적용
+ * WO-O4O-OPERATOR-LIST-TABLE-STANDARD-V2: DataTable 표준 전환 + 선택 기능
  *
  * 구조:
  *   - 긴급 알림 배너 (삭제 요청/카테고리 요청 대기)
@@ -31,8 +32,9 @@ import {
   Heart,
   Pencil,
 } from 'lucide-react';
-import { BaseTable, RowActionMenu } from '@o4o/ui';
-import type { O4OColumn } from '@o4o/ui';
+import { ActionBar, BulkResultModal, RowActionMenu } from '@o4o/ui';
+import { DataTable, useBatchAction, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { forumApi, forumAnalyticsApi } from '../../api/forum';
 
 // ─── Types ───
@@ -56,6 +58,39 @@ interface PostItem {
   status: string;
 }
 
+// ─── Action Policy (module-level) ───
+
+const postStatusConfig: Record<string, { text: string; cls: string }> = {
+  publish: { text: '게시', cls: 'bg-green-50 text-green-700' },
+  draft: { text: '임시', cls: 'bg-amber-50 text-amber-600' },
+};
+
+const postActionPolicy = defineActionPolicy<PostItem>('kpa:forum:posts', {
+  rules: [
+    {
+      key: 'edit',
+      label: '수정',
+    },
+    {
+      key: 'delete',
+      label: '삭제',
+      variant: 'danger',
+      divider: true,
+      confirm: (row) => ({
+        title: '게시글 삭제',
+        message: `"${row.title}" 게시글을 삭제하시겠습니까?`,
+        variant: 'danger' as const,
+        confirmText: '삭제',
+      }),
+    },
+  ],
+});
+
+const POST_ACTION_ICONS: Record<string, React.ReactNode> = {
+  edit: <Pencil className="w-4 h-4" />,
+  delete: <Trash2 className="w-4 h-4" />,
+};
+
 // ─── Component ───
 
 export default function OperatorForumPage() {
@@ -64,7 +99,8 @@ export default function OperatorForumPage() {
   const [posts, setPosts] = useState<PostItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const batch = useBatchAction();
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -105,27 +141,51 @@ export default function OperatorForumPage() {
     fetchData();
   }, [fetchData]);
 
-  // ─── BaseTable Columns ───
-  const columns: O4OColumn<PostItem>[] = [
+  const handleBulkDelete = async () => {
+    const targetIds = [...selectedIds];
+    await batch.executeBatch(
+      async (ids) => {
+        const results: Array<{ id: string; status: 'success' | 'failed'; error?: string }> = [];
+        for (const id of ids) {
+          try {
+            await forumApi.deletePost(id);
+            results.push({ id, status: 'success' });
+          } catch (err: any) {
+            results.push({ id, status: 'failed', error: err?.message || '삭제 실패' });
+          }
+        }
+        return { data: { results } };
+      },
+      targetIds,
+    );
+    setSelectedIds(new Set());
+    fetchData();
+  };
+
+  // ─── Column Definitions ───
+  const columns: ListColumnDef<PostItem>[] = [
     {
       key: 'categoryName',
       header: '포럼',
       width: '90px',
-      render: (v) => <span style={badgeStyle}>{v}</span>,
+      render: (v) => (
+        <span className="inline-block px-2 py-0.5 bg-slate-100 text-slate-500 rounded text-xs font-medium">
+          {v}
+        </span>
+      ),
     },
     {
       key: 'title',
       header: '제목',
       render: (v) => (
-        <span style={{ fontWeight: 500, color: '#1e293b', maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block' }}>
-          {v}
-        </span>
+        <span className="font-medium text-slate-800 text-sm block truncate max-w-xs">{v}</span>
       ),
     },
     {
       key: 'authorName',
       header: '작성자',
       width: '100px',
+      render: (v) => <span className="text-sm text-slate-600">{v}</span>,
     },
     {
       key: 'viewCount',
@@ -133,7 +193,7 @@ export default function OperatorForumPage() {
       width: '70px',
       align: 'right',
       render: (v) => (
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, color: '#64748b' }}>
+        <span className="inline-flex items-center gap-1 text-sm text-slate-500">
           <Eye size={12} /> {v}
         </span>
       ),
@@ -143,71 +203,73 @@ export default function OperatorForumPage() {
       header: '좋아요',
       width: '70px',
       align: 'right',
-      render: (v) => (
+      render: (v) =>
         v > 0 ? (
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, color: '#ef4444' }}>
+          <span className="inline-flex items-center gap-1 text-sm text-red-400">
             <Heart size={12} /> {v}
           </span>
-        ) : null
-      ),
+        ) : (
+          <span className="text-sm text-slate-300">-</span>
+        ),
     },
     {
       key: 'status',
       header: '상태',
       width: '70px',
       align: 'center',
-      render: (v) => (
-        <span style={{
-          ...badgeStyle,
-          backgroundColor: v === 'publish' ? '#ecfdf5' : v === 'draft' ? '#fffbeb' : '#fef2f2',
-          color: v === 'publish' ? '#059669' : v === 'draft' ? '#d97706' : '#dc2626',
-        }}>
-          {v === 'publish' ? '게시' : v === 'draft' ? '임시' : v}
-        </span>
-      ),
+      render: (v) => {
+        const sc = postStatusConfig[v] || { text: v, cls: 'bg-slate-100 text-slate-600' };
+        return (
+          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${sc.cls}`}>
+            {sc.text}
+          </span>
+        );
+      },
     },
     {
       key: 'createdAt',
       header: '작성일',
       width: '100px',
-      render: (v) => formatDate(v),
+      render: (v) => <span className="text-sm text-slate-500">{formatDate(v)}</span>,
     },
     {
-      key: 'actions',
+      key: '_actions',
       header: '',
-      width: '50px',
+      align: 'center',
+      width: '60px',
+      system: true,
+      onCellClick: () => {},
       render: (_v, row) => (
         <RowActionMenu
-          actions={[
-            {
-              key: 'edit',
-              label: '수정',
-              icon: <Pencil size={14} />,
-              onClick: () => navigate(`/forum/edit/${row.id}`),
+          actions={buildRowActions(postActionPolicy, row, {
+            edit: () => navigate(`/forum/edit/${row.id}`),
+            delete: async () => {
+              await forumApi.deletePost(row.id);
+              setPosts((prev) => prev.filter((p) => p.id !== row.id));
             },
-            {
-              key: 'delete',
-              label: '삭제',
-              icon: <Trash2 size={14} />,
-              variant: 'danger' as const,
-              confirm: {
-                title: '게시글 삭제',
-                message: `"${row.title}" 게시글을 삭제하시겠습니까?`,
-                variant: 'danger' as const,
-              },
-              onClick: async () => {
-                setActionLoading(row.id);
-                try {
-                  await forumApi.deletePost(row.id);
-                  setPosts((prev) => prev.filter((p) => p.id !== row.id));
-                } catch { /* user can retry */ }
-                setActionLoading(null);
-              },
-              loading: actionLoading === row.id,
-            },
-          ]}
+          }, { icons: POST_ACTION_ICONS })}
         />
       ),
+    },
+  ];
+
+  const bulkActions = [
+    {
+      key: 'delete',
+      label: `삭제 (${selectedIds.size})`,
+      onClick: handleBulkDelete,
+      variant: 'danger' as const,
+      icon: <Trash2 size={14} />,
+      loading: batch.loading,
+      group: 'danger',
+      tooltip: '선택된 게시글을 일괄 삭제합니다',
+      visible: selectedIds.size > 0,
+      confirm: {
+        title: '일괄 삭제 확인',
+        message: `${selectedIds.size}개의 게시글을 삭제합니다. 이 작업은 되돌릴 수 없습니다.`,
+        variant: 'danger' as const,
+        confirmText: '삭제',
+      },
     },
   ];
 
@@ -349,9 +411,30 @@ export default function OperatorForumPage() {
           </div>
         </div>
       ) : (
-        <BaseTable data={posts} columns={columns} rowKey={(row) => row.id} />
+        <>
+          <ActionBar
+            selectedCount={selectedIds.size}
+            onClearSelection={() => setSelectedIds(new Set())}
+            actions={bulkActions}
+          />
+          <BulkResultModal
+            open={batch.showResult}
+            onClose={() => { batch.clearResult(); fetchData(); }}
+            result={batch.result}
+            onRetry={() => { batch.retryFailed(); }}
+          />
+          <DataTable<PostItem>
+            columns={columns}
+            data={posts}
+            rowKey="id"
+            emptyMessage="등록된 게시글이 없습니다"
+            tableId="kpa-forum-posts"
+            selectable
+            selectedKeys={selectedIds}
+            onSelectionChange={setSelectedIds}
+          />
+        </>
       )}
-
     </div>
   );
 }
@@ -458,12 +541,6 @@ const emptyStyle: React.CSSProperties = {
   border: '1px dashed #e2e8f0',
 };
 
-const badgeStyle: React.CSSProperties = {
-  display: 'inline-block', padding: '2px 8px',
-  backgroundColor: '#f1f5f9', color: '#475569',
-  borderRadius: 4, fontSize: 11, fontWeight: 500,
-};
-
 const urgentBannerStyle: React.CSSProperties = {
   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
   padding: '12px 16px', marginBottom: 20,
@@ -491,4 +568,3 @@ const ctaBtnOutlineStyle: React.CSSProperties = {
   color: '#475569', backgroundColor: '#f1f5f9',
   border: '1px solid #e2e8f0', borderRadius: 8, cursor: 'pointer',
 };
-

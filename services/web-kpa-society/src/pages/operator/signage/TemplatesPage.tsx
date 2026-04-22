@@ -2,11 +2,15 @@
  * Signage Templates Page — Signage Console (KPA Society)
  * WO-O4O-SIGNAGE-CONSOLE-V1
  * WO-KPA-SOCIETY-DIGITAL-SIGNAGE-TEMPLATE-CRUD-UI-V1: CRUD 확장
+ * WO-O4O-OPERATOR-LIST-TABLE-STANDARD-V2: O4O 표준 테이블 전환
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LayoutTemplate, RefreshCw, ChevronRight, Plus, Trash2 } from 'lucide-react';
+import { LayoutTemplate, RefreshCw, Plus, Trash2, Eye } from 'lucide-react';
+import { ActionBar, BulkResultModal, RowActionMenu } from '@o4o/ui';
+import { DataTable, useBatchAction, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import {
   fetchTemplates as apiFetchTemplates,
   createTemplate,
@@ -21,12 +25,40 @@ const statusConfig: Record<string, { text: string; cls: string }> = {
   inactive: { text: '비활성', cls: 'bg-amber-100 text-amber-600' },
 };
 
+const templateActionPolicy = defineActionPolicy<SignageTemplateItem>('kpa:signage:templates', {
+  rules: [
+    {
+      key: 'view',
+      label: '상세 보기',
+    },
+    {
+      key: 'delete',
+      label: '삭제',
+      variant: 'danger',
+      divider: true,
+      confirm: (row) => ({
+        title: '템플릿 삭제',
+        message: `"${row.name}" 템플릿을 삭제하시겠습니까?`,
+        variant: 'danger' as const,
+        confirmText: '삭제',
+      }),
+    },
+  ],
+});
+
+const TEMPLATE_ACTION_ICONS: Record<string, React.ReactNode> = {
+  view: <Eye className="w-4 h-4" />,
+  delete: <Trash2 className="w-4 h-4" />,
+};
+
 export default function TemplatesPage() {
   const navigate = useNavigate();
 
   const [templates, setTemplates] = useState<SignageTemplateItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const batch = useBatchAction();
 
   // Create form state
   const [showForm, setShowForm] = useState(false);
@@ -82,15 +114,29 @@ export default function TemplatesPage() {
     }
   };
 
-  const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`"${name}" 템플릿을 삭제하시겠습니까?`)) return;
-    setError(null);
-    try {
-      await deleteTemplate(id);
-      loadTemplates();
-    } catch (err: any) {
-      setError(err?.message || '템플릿 삭제에 실패했습니다');
-    }
+  const deleteOne = useCallback(async (id: string) => {
+    await deleteTemplate(id);
+  }, []);
+
+  const handleBulkDelete = async () => {
+    const targetIds = [...selectedIds];
+    await batch.executeBatch(
+      async (ids) => {
+        const results: Array<{ id: string; status: 'success' | 'failed'; error?: string }> = [];
+        for (const id of ids) {
+          try {
+            await deleteOne(id);
+            results.push({ id, status: 'success' });
+          } catch (err: any) {
+            results.push({ id, status: 'failed', error: err?.message || '삭제 실패' });
+          }
+        }
+        return { data: { results } };
+      },
+      targetIds,
+    );
+    setSelectedIds(new Set());
+    loadTemplates();
   };
 
   const formatDate = (d: string) => {
@@ -104,6 +150,86 @@ export default function TemplatesPage() {
     draft: templates.filter(t => t.status === 'draft').length,
     inactive: templates.filter(t => t.status === 'inactive').length,
   };
+
+  const columns: ListColumnDef<SignageTemplateItem>[] = [
+    {
+      key: 'name',
+      header: '이름',
+      render: (value, row) => (
+        <div>
+          <p className="font-medium text-slate-800 text-sm">{value}</p>
+          {row.description && <p className="text-xs text-slate-400 mt-0.5 truncate max-w-xs">{row.description}</p>}
+        </div>
+      ),
+    },
+    {
+      key: 'category',
+      header: '카테고리',
+      render: (value) => <span className="text-sm text-slate-600">{value || '-'}</span>,
+    },
+    {
+      key: 'isPublic',
+      header: '공개',
+      align: 'center',
+      render: (value) => <span className="text-sm">{value ? 'O' : '-'}</span>,
+    },
+    {
+      key: 'isSystem',
+      header: '시스템',
+      align: 'center',
+      render: (value) => <span className="text-sm">{value ? 'O' : '-'}</span>,
+    },
+    {
+      key: 'status',
+      header: '상태',
+      align: 'center',
+      render: (value) => {
+        const sc = statusConfig[value] || { text: value, cls: 'bg-slate-100 text-slate-600' };
+        return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${sc.cls}`}>{sc.text}</span>;
+      },
+    },
+    {
+      key: 'createdAt',
+      header: '생성일',
+      render: (value) => <span className="text-sm text-slate-500">{formatDate(value)}</span>,
+    },
+    {
+      key: '_actions',
+      header: '액션',
+      align: 'center',
+      width: '60px',
+      system: true,
+      onCellClick: () => {},
+      render: (_v, row) => (
+        <RowActionMenu
+          actions={buildRowActions(templateActionPolicy, row, {
+            view: () => navigate(`/operator/signage/templates/${row.id}`),
+            delete: () => deleteOne(row.id).then(loadTemplates).catch((err: any) => setError(err?.message || '삭제 실패')),
+          }, { icons: TEMPLATE_ACTION_ICONS })}
+        />
+      ),
+    },
+  ];
+
+  const bulkActions = [
+    {
+      key: 'delete',
+      label: `삭제 (${selectedIds.size})`,
+      onClick: handleBulkDelete,
+      variant: 'danger' as const,
+      icon: <Trash2 size={14} />,
+      loading: batch.loading,
+      group: 'danger',
+      tooltip: '선택된 템플릿을 일괄 삭제합니다',
+      visible: selectedIds.size > 0,
+      confirm: {
+        title: '일괄 삭제 확인',
+        message: `${selectedIds.size}개의 템플릿을 삭제합니다. 이 작업은 되돌릴 수 없습니다.`,
+        variant: 'danger' as const,
+        confirmText: '삭제',
+      },
+    },
+  ];
 
   return (
     <div className="space-y-6">
@@ -200,61 +326,33 @@ export default function TemplatesPage() {
         </div>
       )}
 
+      {/* Bulk Action Bar */}
+      <ActionBar
+        selectedCount={selectedIds.size}
+        onClearSelection={() => setSelectedIds(new Set())}
+        actions={bulkActions}
+      />
+
+      <BulkResultModal
+        open={batch.showResult}
+        onClose={() => { batch.clearResult(); loadTemplates(); }}
+        result={batch.result}
+        onRetry={() => { batch.retryFailed(); }}
+      />
+
       {/* Table */}
-      <div className="bg-white rounded-xl border border-blue-100 overflow-hidden">
-        {isLoading && templates.length === 0 ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
-          </div>
-        ) : (
-          <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-100">
-              <tr>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500">이름</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500">카테고리</th>
-                <th className="text-center px-4 py-3 text-xs font-medium text-slate-500">공개</th>
-                <th className="text-center px-4 py-3 text-xs font-medium text-slate-500">시스템</th>
-                <th className="text-center px-4 py-3 text-xs font-medium text-slate-500">상태</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500">생성일</th>
-                <th className="w-10"></th>
-                <th className="w-10"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {templates.length === 0 ? (
-                <tr><td colSpan={8} className="px-4 py-12 text-center text-slate-400 text-sm">템플릿이 없습니다</td></tr>
-              ) : templates.map(t => {
-                const sc = statusConfig[t.status] || { text: t.status, cls: 'bg-slate-100 text-slate-600' };
-                return (
-                  <tr key={t.id} onClick={() => navigate(`/operator/signage/templates/${t.id}`)} className="hover:bg-slate-50 transition-colors cursor-pointer">
-                    <td className="px-4 py-3">
-                      <p className="font-medium text-slate-800 text-sm">{t.name}</p>
-                      {t.description && <p className="text-xs text-slate-400 mt-0.5 truncate max-w-xs">{t.description}</p>}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-slate-600">{t.category || '-'}</td>
-                    <td className="px-4 py-3 text-center text-sm">{t.isPublic ? 'O' : '-'}</td>
-                    <td className="px-4 py-3 text-center text-sm">{t.isSystem ? 'O' : '-'}</td>
-                    <td className="px-4 py-3 text-center">
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${sc.cls}`}>{sc.text}</span>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-slate-500">{formatDate(t.createdAt)}</td>
-                    <td className="px-4 py-3">
-                      <button
-                        onClick={(e) => { e.stopPropagation(); handleDelete(t.id, t.name); }}
-                        className="text-slate-400 hover:text-red-500 transition-colors"
-                        title="삭제"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </td>
-                    <td className="px-4 py-3"><ChevronRight className="w-4 h-4 text-slate-300" /></td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
-      </div>
+      <DataTable<SignageTemplateItem>
+        columns={columns}
+        data={templates}
+        rowKey="id"
+        loading={isLoading}
+        onRowClick={record => navigate(`/operator/signage/templates/${record.id}`)}
+        emptyMessage="템플릿이 없습니다"
+        tableId="kpa-signage-templates"
+        selectable
+        selectedKeys={selectedIds}
+        onSelectionChange={setSelectedIds}
+      />
     </div>
   );
 }
