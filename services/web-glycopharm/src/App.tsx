@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { AuthProvider, useAuth, GLYCOPHARM_ROLES } from '@/contexts/AuthContext';
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { GLYCOPHARM_ROLES } from '@/lib/role-constants';
 import { LoginModalProvider } from '@/contexts/LoginModalContext';
 import LoginModal from '@/components/common/LoginModal';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
@@ -304,12 +305,17 @@ function OperatorAreaLayout() {
   return <OperatorLayoutWrapper />;
 }
 
+/** /education/:id → /lms/:id (하위 호환 redirect) */
+function EducationRedirect() {
+  const { id } = useParams<{ id: string }>();
+  return <Navigate to={`/lms/${id}`} replace />;
+}
+
 // App Routes
 function AppRoutes() {
   return (
     <Routes>
-      {/* WO-O4O-GLYCOPHARM-HOME-TO-COMMUNITY-V1: Home = 커뮤니티 */}
-      <Route index element={<Navigate to="/community" replace />} />
+      {/* WO-O4O-GLYCOPHARM-HOME-KPA-ALIGNMENT-V1: / = Home 직접 연결 */}
       <Route path="handoff" element={<HandoffPage />} />
       <Route path="login" element={<LoginPage />} />
       <Route path="register" element={<RegisterPage />} />
@@ -322,8 +328,10 @@ function AppRoutes() {
       {/* Public Routes with MainLayout */}
       <Route element={<MainLayout />}>
         <Route path="role-select" element={<RoleSelectPage />} />
-        {/* WO-GLYCOPHARM-COMMUNITY-MAIN-PAGE-V1 */}
-        <Route path="community" element={<CommunityMainPage />} />
+        {/* WO-O4O-GLYCOPHARM-HOME-KPA-ALIGNMENT-V1: Home 직접 */}
+        <Route index element={<CommunityMainPage />} />
+        {/* /community → / redirect (하위 호환) */}
+        <Route path="community" element={<Navigate to="/" replace />} />
         <Route path="forum" element={<ForumHubPage />} />
         <Route path="forum/write" element={<ForumWritePage />} />
         <Route path="forum/posts" element={<ForumPage />} />
@@ -334,8 +342,12 @@ function AppRoutes() {
         {/* Forum Extension */}
         <Route path="forum-ext" element={<ForumListPage />} />
         <Route path="forum-ext/:forumId" element={<ForumFeedPage />} />
-        <Route path="education" element={<EducationPage />} />
-        <Route path="education/:id" element={<CourseDetailPage />} />
+        {/* WO-O4O-GLYCOPHARM-HOME-KPA-ALIGNMENT-V1: /lms 통일 */}
+        <Route path="lms" element={<EducationPage />} />
+        <Route path="lms/:id" element={<CourseDetailPage />} />
+        {/* /education → /lms redirect (하위 호환) */}
+        <Route path="education" element={<Navigate to="/lms" replace />} />
+        <Route path="education/:id" element={<EducationRedirect />} />
         {/* Instructor Dashboard — WO-GLYCOPHARM-INSTRUCTOR-OPERATOR-V1 */}
         <Route path="instructor" element={
           <RoleGuard allowedRoles={['lms:instructor', 'glycopharm:admin', 'platform:super_admin']}>

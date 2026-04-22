@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { useAuth, GLYCOPHARM_ROLES, GLYCOPHARM_DASHBOARD_MAP } from '@/contexts/AuthContext';
+import { useAuth, GLYCOPHARM_DASHBOARD_MAP } from '@/contexts/AuthContext';
+import { GLYCOPHARM_ROLES } from '@/lib/role-constants';
 import {
   Building2,
   Shield,

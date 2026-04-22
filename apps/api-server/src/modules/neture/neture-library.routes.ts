@@ -157,36 +157,47 @@ router.post('/library', requireAuth, requireActiveSupplier, async (req: Request,
   try {
     const supplierId = (req as SupplierRequest).supplierId;
     const { title, description, fileUrl, fileName, fileSize, mimeType, category, isPublic, contentType, blocks } = req.body;
+    const isDocument = contentType === 'document';
 
     // 입력 검증
     if (!title || typeof title !== 'string') {
       res.status(400).json({ success: false, error: { code: 'MISSING_TITLE', message: 'title is required' } });
       return;
     }
-    if (!fileUrl || typeof fileUrl !== 'string') {
-      res.status(400).json({ success: false, error: { code: 'MISSING_FILE_URL', message: 'fileUrl is required' } });
-      return;
-    }
-    if (!fileName || typeof fileName !== 'string') {
-      res.status(400).json({ success: false, error: { code: 'MISSING_FILE_NAME', message: 'fileName is required' } });
-      return;
-    }
-    if (fileSize === undefined || fileSize === null || typeof fileSize !== 'number') {
-      res.status(400).json({ success: false, error: { code: 'MISSING_FILE_SIZE', message: 'fileSize is required (number)' } });
-      return;
-    }
-    if (!mimeType || typeof mimeType !== 'string') {
-      res.status(400).json({ success: false, error: { code: 'MISSING_MIME_TYPE', message: 'mimeType is required' } });
-      return;
+
+    if (isDocument) {
+      // document 타입: blocks 필수, file 필드 불필요
+      if (!Array.isArray(blocks) || blocks.length === 0) {
+        res.status(400).json({ success: false, error: { code: 'MISSING_BLOCKS', message: 'blocks are required for document type' } });
+        return;
+      }
+    } else {
+      // media 타입: file 필드 필수
+      if (!fileUrl || typeof fileUrl !== 'string') {
+        res.status(400).json({ success: false, error: { code: 'MISSING_FILE_URL', message: 'fileUrl is required' } });
+        return;
+      }
+      if (!fileName || typeof fileName !== 'string') {
+        res.status(400).json({ success: false, error: { code: 'MISSING_FILE_NAME', message: 'fileName is required' } });
+        return;
+      }
+      if (fileSize === undefined || fileSize === null || typeof fileSize !== 'number') {
+        res.status(400).json({ success: false, error: { code: 'MISSING_FILE_SIZE', message: 'fileSize is required (number)' } });
+        return;
+      }
+      if (!mimeType || typeof mimeType !== 'string') {
+        res.status(400).json({ success: false, error: { code: 'MISSING_MIME_TYPE', message: 'mimeType is required' } });
+        return;
+      }
     }
 
     const result = await libraryService.create(supplierId, {
       title: title.slice(0, 200),
       description: description ?? null,
-      fileUrl,
-      fileName: fileName.slice(0, 255),
-      fileSize,
-      mimeType: mimeType.slice(0, 100),
+      fileUrl: !isDocument ? fileUrl : '',
+      fileName: !isDocument ? fileName.slice(0, 255) : '',
+      fileSize: !isDocument ? fileSize : 0,
+      mimeType: !isDocument ? mimeType.slice(0, 100) : 'text/html',
       category: category ? String(category).slice(0, 100) : null,
       isPublic: isPublic === true,
       contentType: typeof contentType === 'string' ? contentType.slice(0, 50) : undefined,

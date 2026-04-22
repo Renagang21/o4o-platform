@@ -105,6 +105,8 @@ export interface SupplierLibraryItem {
   visibility?: string;
   contentType?: string;
   metaStatus?: string;
+  // document type (WO-NETURE-CONTENT-META-DOCUMENT-PATH-COMPLETION-V1)
+  blocks?: Record<string, unknown>[] | null;
 }
 
 export interface SupplierProduct {
@@ -720,12 +722,14 @@ export const supplierApi = {
   async createLibraryItem(data: {
     title: string;
     description?: string;
-    fileUrl: string;
-    fileName: string;
-    fileSize: number;
-    mimeType: string;
+    fileUrl?: string;
+    fileName?: string;
+    fileSize?: number;
+    mimeType?: string;
     category?: string;
     isPublic?: boolean;
+    contentType?: string;
+    blocks?: Record<string, unknown>[];
   }): Promise<{ success: boolean; error?: string; data?: SupplierLibraryItem }> {
     try {
       const response = await api.post('/neture/library', data);
@@ -744,6 +748,8 @@ export const supplierApi = {
     mimeType?: string;
     category?: string | null;
     isPublic?: boolean;
+    contentType?: string;
+    blocks?: Record<string, unknown>[];
   }): Promise<{ success: boolean; error?: string; data?: SupplierLibraryItem }> {
     try {
       const response = await api.patch(`/neture/library/${id}`, data);

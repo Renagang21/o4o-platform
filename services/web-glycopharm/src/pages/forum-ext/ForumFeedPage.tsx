@@ -25,7 +25,8 @@ import {
   X,
   Loader2,
 } from 'lucide-react';
-import { useAuth, GLYCOPHARM_ROLES } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { GLYCOPHARM_ROLES } from '@/lib/role-constants';
 import { apiClient } from '@/services/api';
 import { toast } from '@o4o/error-handling';
 import { RichTextEditor } from '@o4o/content-editor';

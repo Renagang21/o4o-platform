@@ -20,10 +20,10 @@ interface ListOptions {
 interface CreateInput {
   title: string;
   description?: string | null;
-  fileUrl: string;
-  fileName: string;
-  fileSize: number;
-  mimeType: string;
+  fileUrl?: string;
+  fileName?: string;
+  fileSize?: number;
+  mimeType?: string;
   category?: string | null;
   isPublic?: boolean;
   contentType?: string;
@@ -122,10 +122,10 @@ export class NetureLibraryService {
         supplierId,
         title: input.title,
         description: input.description ?? null,
-        fileUrl: input.fileUrl,
-        fileName: input.fileName,
-        fileSize: input.fileSize,
-        mimeType: input.mimeType,
+        fileUrl: input.fileUrl ?? '',
+        fileName: input.fileName ?? '',
+        fileSize: input.fileSize ?? 0,
+        mimeType: input.mimeType ?? '',
         category: input.category ?? null,
         isPublic,
         contentType: input.contentType ?? 'media',

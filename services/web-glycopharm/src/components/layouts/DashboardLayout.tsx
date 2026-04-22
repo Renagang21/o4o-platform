@@ -1,6 +1,7 @@
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useState } from 'react';
-import { useAuth, GLYCOPHARM_ROLES } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { GLYCOPHARM_ROLES } from '@/lib/role-constants';
 import type { UserRole } from '@/types';
 import { GlycoGlobalHeader } from '../GlycoGlobalHeader';
 import {

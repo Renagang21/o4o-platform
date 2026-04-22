@@ -22,16 +22,13 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
 import {
   FileText,
   Play,
-  ArrowRight,
-  Image as ImageIcon,
-  ExternalLink,
   MessageSquare,
   BookOpen,
   Newspaper,
+  GraduationCap,
 } from 'lucide-react';
 import { HUB_PRODUCER_LABELS, type HubProducer } from '@o4o/types/hub-content';
 import { apiClient } from '@/services/api';
@@ -44,8 +41,9 @@ import {
   AppEntrySection,
   CtaGuidanceSection,
   SignagePreviewSection,
+  ContentHighlightSection,
 } from '@o4o/shared-space-ui';
-import type { NoticeItem, FeaturedPost, RecentPost, SignageMediaItem, SignagePlaylistItem } from '@o4o/shared-space-ui';
+import type { NoticeItem, FeaturedPost, RecentPost, SignageMediaItem, SignagePlaylistItem, ContentHighlightItem } from '@o4o/shared-space-ui';
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -93,69 +91,17 @@ const partnerLogos = [
   { id: '8', name: 'Partner H' },
 ];
 
-function formatFeedDate(dateStr: string): string {
-  const d = new Date(dateStr);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
-
-// ─── Content Card ───────────────────────────────────────────
-
-function ContentCard({ item }: { item: HubContentItem }) {
-  const img = item.thumbnailUrl || item.imageUrl || null;
-  const hasLink = !!item.linkUrl;
-
-  return (
-    <div
-      onClick={() => { if (hasLink) window.open(item.linkUrl!, '_blank', 'noopener'); }}
-      className={`bg-white rounded-lg border border-slate-200 overflow-hidden transition-all ${
-        hasLink ? 'cursor-pointer hover:shadow-md hover:border-primary-200' : 'opacity-80'
-      }`}
-    >
-      {img ? (
-        <div className="aspect-[16/9] bg-slate-100 overflow-hidden">
-          <img
-            src={img}
-            alt={item.title}
-            className="w-full h-full object-cover"
-            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-          />
-        </div>
-      ) : (
-        <div className="aspect-[16/9] bg-slate-50 flex items-center justify-center">
-          <ImageIcon className="w-8 h-8 text-slate-200" />
-        </div>
-      )}
-      <div className="p-3">
-        <div className="flex items-center gap-1.5 mb-1.5">
-          {item.cmsType && (
-            <span className="inline-block px-2 py-0.5 text-[10px] font-medium bg-slate-100 text-slate-500 rounded">
-              {item.cmsType}
-            </span>
-          )}
-          {item.isPinned && (
-            <span className="inline-block px-2 py-0.5 text-[10px] font-medium bg-primary-50 text-primary-600 rounded">
-              추천
-            </span>
-          )}
-        </div>
-        <h3 className="text-sm font-semibold text-slate-800 line-clamp-2 mb-1">{item.title}</h3>
-        {item.description && (
-          <p className="text-xs text-slate-500 line-clamp-2 mb-1.5">{item.description}</p>
-        )}
-        <div className="flex items-center justify-between">
-          <span className="text-[10px] text-slate-400">{formatFeedDate(item.createdAt)}</span>
-          <div className="flex items-center gap-1">
-            {item.producer && (
-              <span className="text-[10px] text-slate-400">
-                {HUB_PRODUCER_LABELS[item.producer as HubProducer] ?? item.producer}
-              </span>
-            )}
-            {hasLink && <ExternalLink className="w-3 h-3 text-slate-300" />}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+/** HubContentItem → ContentHighlightItem adapter (shared-space-ui 기준) */
+function toHighlightItem(c: HubContentItem): ContentHighlightItem {
+  return {
+    id: c.id,
+    title: c.title,
+    thumbnailUrl: c.thumbnailUrl || c.imageUrl || null,
+    badge: c.isPinned ? '추천' : (c.cmsType || undefined),
+    summary: c.description || undefined,
+    meta: c.producer ? (HUB_PRODUCER_LABELS[c.producer as HubProducer] ?? c.producer) : undefined,
+    href: c.linkUrl || undefined,
+  };
 }
 
 // ─── Main Component ─────────────────────────────────────────
@@ -281,7 +227,7 @@ export default function CommunityMainPage() {
           subtitle="매장 운영에 필요한 정보와 콘텐츠를 한 곳에서 확인하세요"
           ctas={[
             { label: '포럼 참여', href: '/forum', icon: <MessageSquare size={16} /> },
-            { label: '콘텐츠 보기', href: '/library/content', icon: <FileText size={16} /> },
+            { label: '강의 수강', href: '/lms', icon: <GraduationCap size={16} /> },
             { label: '사이니지 관리', href: '/signage', icon: <Play size={16} /> },
           ]}
         />
@@ -326,56 +272,22 @@ export default function CommunityMainPage() {
             { title: '약사 포럼', description: '동료 약사와 운영 노하우를 공유하세요', href: '/forum', icon: <MessageSquare size={20} /> },
             { title: '콘텐츠 허브', description: '매장 운영에 유용한 콘텐츠를 확인하세요', href: '/library/content', icon: <FileText size={20} /> },
             { title: '디지털 사이니지', description: '약국 디지털 미디어를 관리하세요', href: '/signage', icon: <Play size={20} /> },
-            { title: '강좌', description: '전문 강좌를 온라인으로 수강하세요', href: '/education', icon: <BookOpen size={20} /> },
+            { title: '강좌', description: '전문 강좌를 온라인으로 수강하세요', href: '/lms', icon: <BookOpen size={20} /> },
           ]}
         />
 
-        {/* ─── 5. Content Highlight (서비스 고유) ─── */}
-        <section className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-slate-800">콘텐츠</h2>
-            <Link to="/library/content" className="flex items-center gap-1 text-sm text-primary-600 hover:text-primary-700 font-medium">
-              전체보기 <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-
-          {contentLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600" />
-            </div>
-          ) : contentItems.length === 0 ? (
-            <div className="text-center py-12">
-              <FileText className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-              <p className="text-sm text-slate-400">등록된 콘텐츠가 없습니다.</p>
-            </div>
-          ) : (
-            <>
-              {/* 최근 콘텐츠 */}
-              {recentContent.length > 0 && (
-                <div className="mb-6">
-                  <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-3">최근 콘텐츠</p>
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {recentContent.map((item) => (
-                      <ContentCard key={item.id} item={item} />
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* 추천 콘텐츠 */}
-              {recommendedContent.length > 0 && (
-                <div>
-                  <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-3">추천 콘텐츠</p>
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {recommendedContent.map((item) => (
-                      <ContentCard key={item.id} item={item} />
-                    ))}
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-        </section>
+        {/* ─── 5. Content Highlight (shared) ─── */}
+        <ContentHighlightSection
+          title="콘텐츠"
+          primaryGroupTitle="최근 콘텐츠"
+          secondaryGroupTitle={recommendedContent.length > 0 ? '추천 콘텐츠' : undefined}
+          primaryItems={recentContent.map(toHighlightItem)}
+          secondaryItems={recommendedContent.map(toHighlightItem)}
+          viewAllHref="/lms"
+          viewAllLabel="전체보기 →"
+          loading={contentLoading}
+          emptyMessage="등록된 콘텐츠가 없습니다."
+        />
 
         {/* ─── 6. Signage Preview (shared) ─── */}
         <SignagePreviewSection

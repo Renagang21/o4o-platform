@@ -14,7 +14,8 @@
 import { useNavigate } from 'react-router-dom';
 import { LayoutDashboard, UserCircle, Settings, Shield } from 'lucide-react';
 import { GlobalHeader, GlobalHeaderMenuItem } from '@o4o/ui';
-import { useAuth, isPharmacistRole } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { isPharmacistRole } from '@/lib/role-constants';
 import { useLoginModal } from '@/contexts/LoginModalContext';
 import {
   GLYCO_PUBLIC_NAV,

@@ -98,8 +98,24 @@ export default function SupplierLibraryPage() {
       ),
       fileName: (
         <div style={{ fontSize: '13px' }}>
-          <div>{item.fileName}</div>
-          <div style={{ fontSize: '11px', color: '#94a3b8' }}>{formatFileSize(item.fileSize)}</div>
+          {item.contentType === 'document' ? (
+            <span style={{
+              display: 'inline-block',
+              padding: '2px 8px',
+              fontSize: '11px',
+              borderRadius: '4px',
+              backgroundColor: '#f0f9ff',
+              color: '#0369a1',
+              fontWeight: 500,
+            }}>
+              문서 (Document)
+            </span>
+          ) : (
+            <>
+              <div>{item.fileName || '-'}</div>
+              <div style={{ fontSize: '11px', color: '#94a3b8' }}>{item.fileSize > 0 ? formatFileSize(item.fileSize) : ''}</div>
+            </>
+          )}
         </div>
       ),
       isPublic: (

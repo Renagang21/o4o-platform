@@ -20,7 +20,7 @@ import {
   X,
 } from 'lucide-react';
 import type { Forum, ForumApplication, ForumStatus, ForumApplicationStatus, UserRole } from '@/types';
-import { GLYCOPHARM_ROLES, ROLE_LABELS } from '@/contexts/AuthContext';
+import { GLYCOPHARM_ROLES, ROLE_LABELS } from '@/lib/role-constants';
 import { toast } from '@o4o/error-handling';
 
 // Mock 포럼 신청 데이터 (WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed roles)

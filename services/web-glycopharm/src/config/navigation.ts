@@ -16,7 +16,7 @@ import type { GlobalHeaderNavItem } from '@o4o/ui';
 export const GLYCO_PUBLIC_NAV: GlobalHeaderNavItem[] = [
   { label: '홈', href: '/' },
   { label: '포럼', href: '/forum' },
-  { label: '강의 / 마케팅 콘텐츠', href: '/education' },
+  { label: '강의 / 마케팅 콘텐츠', href: '/lms' },
 ];
 
 // ─── Contextual Nav ──────────────────────────────────────────────────────────

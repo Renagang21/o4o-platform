@@ -8,7 +8,8 @@
 
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { useAuth, isPharmacistRole } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { isPharmacistRole } from '@/lib/role-constants';
 import { useLoginModal } from '@/contexts/LoginModalContext';
 import {
   Menu,
@@ -20,8 +21,9 @@ import {
   Home,
   MessageSquare,
   Store,
-  LayoutDashboard,
   GraduationCap,
+  Settings,
+  Shield,
 } from 'lucide-react';
 
 import ServiceSwitcher from '../ServiceSwitcher';
@@ -58,12 +60,10 @@ export default function Header() {
   const isAdmin = isAuthenticated && user?.roles?.some(r => r === 'glycopharm:admin' || r === 'platform:super_admin');
   const isOperator = isAuthenticated && user?.roles?.some(r => r === 'glycopharm:operator' || r === 'glycopharm:admin' || r === 'platform:super_admin');
 
-  // Role-based dashboard links for profile dropdown
-  const roleDashboardLinks = isAuthenticated ? [
-    ...(isAdmin ? [{ label: '관리자 대시보드', path: '/admin' }] : []),
-    ...(isOperator ? [{ label: '운영자 대시보드', path: '/operator' }] : []),
-    ...(isPharmacy ? [{ label: '약국 관리', path: '/store' }] : []),
-  ] : [];
+  // KPA canonical: Shield 단일 진입 (admin > operator 우선)
+  const showDashboard = isAdmin || isOperator;
+  const dashboardPath = isAdmin ? '/admin' : '/operator';
+  const dashboardLabel = isAdmin ? '관리자 콘솔' : '운영 대시보드';
 
   const handleLogout = () => {
     logout();
@@ -165,24 +165,31 @@ export default function Header() {
                         </p>
                         <p className="text-xs text-slate-500">{user?.email}</p>
                       </div>
-                      {roleDashboardLinks.map((link) => (
+                      {showDashboard && (
                         <NavLink
-                          key={link.path}
-                          to={link.path}
-                          className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                          to={dashboardPath}
+                          className="flex items-center gap-2 px-4 py-2 text-sm text-blue-700 hover:bg-blue-50"
                           onClick={() => setUserMenuOpen(false)}
                         >
-                          <LayoutDashboard className="w-4 h-4" />
-                          {link.label}
+                          <Shield className="w-4 h-4" />
+                          {dashboardLabel}
                         </NavLink>
-                      ))}
+                      )}
                       <NavLink
                         to="/mypage"
                         className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
                         onClick={() => setUserMenuOpen(false)}
                       >
-                        <LayoutDashboard className="w-4 h-4" />
+                        <User className="w-4 h-4" />
                         마이페이지
+                      </NavLink>
+                      <NavLink
+                        to="/mypage/settings"
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <Settings className="w-4 h-4" />
+                        설정
                       </NavLink>
                       {/* Account Center — 임시 숨김: account.neture.co.kr 서비스 미배포/SSL 미구성 (WO-O4O-ACCOUNT-CENTER-LINK-VISIBILITY-POLICY-ALIGNMENT-V1) */}
                       <button
@@ -271,17 +278,32 @@ export default function Header() {
             <div className="mt-4 pt-4 border-t">
               {isAuthenticated ? (
                 <div className="flex flex-col gap-1">
-                  {roleDashboardLinks.map((link) => (
+                  {showDashboard && (
                     <NavLink
-                      key={link.path}
-                      to={link.path}
-                      className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-primary-600"
+                      to={dashboardPath}
+                      className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-blue-700"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      <LayoutDashboard className="w-5 h-5" />
-                      {link.label}
+                      <Shield className="w-5 h-5" />
+                      {dashboardLabel}
                     </NavLink>
-                  ))}
+                  )}
+                  <NavLink
+                    to="/mypage"
+                    className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-600"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <User className="w-5 h-5" />
+                    마이페이지
+                  </NavLink>
+                  <NavLink
+                    to="/mypage/settings"
+                    className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-600"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Settings className="w-5 h-5" />
+                    설정
+                  </NavLink>
                   <button
                     onClick={handleLogout}
                     className="flex items-center gap-3 w-full px-4 py-3 text-sm font-medium text-red-600"
