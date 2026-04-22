@@ -175,7 +175,7 @@ export const forumRequestApi = {
     }
   },
 
-  create: async (data: { name: string; description: string; reason?: string; forumType?: string }): Promise<{ success: boolean; data?: any; error?: string }> => {
+  create: async (data: { name: string; description: string; reason?: string; forumType?: string; tags?: string[] }): Promise<{ success: boolean; data?: any; error?: string }> => {
     try {
       const response = await authClient.api.post('/forum/category-requests', {
         ...data,
