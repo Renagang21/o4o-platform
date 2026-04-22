@@ -256,7 +256,7 @@ export class CertificateController extends BaseController {
       const frontendBase =
         process.env.KPA_FRONTEND_URL ||
         process.env.FRONTEND_URL ||
-        'https://yaksa.site';
+        'https://kpa-society.co.kr';
       const verificationUrl = `${frontendBase}/certificate/verify/${certificate.id}`;
 
       const pdfBuffer = await generateCertificatePdf({

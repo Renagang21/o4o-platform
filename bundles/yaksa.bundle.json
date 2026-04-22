@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "약사 조직 및 지점 관리에 최적화된 앱 조합 (B2B, 포럼, 교육)",
   "type": "service-bundle",
-  "targetService": "yaksa.site",
+  "targetService": "kpa-society",
 
   "apps": [
     {
