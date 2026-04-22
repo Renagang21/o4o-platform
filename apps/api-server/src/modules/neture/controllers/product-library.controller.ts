@@ -11,6 +11,7 @@ import type { DataSource } from 'typeorm';
 import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { NetureService } from '../neture.service.js';
 import { BulkMatchService } from '../services/bulk-match.service.js';
+import { AliasService, AliasSource } from '../services/alias.service.js';
 import { uploadSingleMiddleware } from '../../../middleware/upload.middleware.js';
 import { parseXlsxToRecords } from '../services/xlsx-parser.service.js';
 import logger from '../../../utils/logger.js';
@@ -19,6 +20,7 @@ export function createProductLibraryController(dataSource: DataSource): Router {
   const router = Router();
   const netureService = new NetureService();
   const bulkMatchService = new BulkMatchService(dataSource);
+  const aliasService = new AliasService(dataSource);
 
   /**
    * GET /products/library/search
@@ -192,6 +194,31 @@ export function createProductLibraryController(dataSource: DataSource): Router {
       }
     },
   );
+
+  /**
+   * POST /products/library/select
+   *
+   * WO-O4O-PRODUCT-ALIAS-FOUNDATION-V1
+   *
+   * 사용자가 검색 결과에서 ProductMaster를 선택할 때 호출.
+   * 검색어가 상품명과 다르면 alias로 저장하여 향후 검색 품질을 향상시킨다.
+   *
+   * Body: { masterId: string, searchTerm: string }
+   */
+  router.post('/products/library/select', requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { masterId, searchTerm } = req.body as { masterId?: string; searchTerm?: string };
+      if (!masterId || !searchTerm) {
+        return res.status(400).json({ success: false, error: 'INVALID_INPUT' });
+      }
+      // best-effort — 실패해도 사용자 흐름에 영향 없음
+      aliasService.upsertAlias(masterId, searchTerm, AliasSource.SEARCH).catch(() => {});
+      res.json({ success: true });
+    } catch (error) {
+      logger.error('[ProductLibrary] Error recording select:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+    }
+  });
 
   return router;
 }

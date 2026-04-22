@@ -1,5 +1,6 @@
 export { NetureSupplier, SupplierStatus, ContactVisibility } from './NetureSupplier.entity.js';
 export { ProductMaster } from './ProductMaster.entity.js';
+export { ProductAlias, AliasSource } from './ProductAlias.entity.js';
 export { ProductCategory } from './ProductCategory.entity.js';
 export { Brand } from './Brand.entity.js';
 export { SupplierProductOffer, OfferDistributionType, OfferApprovalStatus } from './SupplierProductOffer.entity.js';

@@ -242,10 +242,30 @@ export class NetureCatalogService {
       .leftJoinAndSelect('m.brand', 'b');
 
     if (params.q) {
+      // WO-O4O-PRODUCT-ALIAS-FOUNDATION-V1: alias 포함 검색
       qb.andWhere(
-        '(m.name ILIKE :q OR m.regulatory_name ILIKE :q OR m.barcode ILIKE :q OR m.manufacturer_name ILIKE :q)',
+        `(m.name ILIKE :q
+          OR m.regulatory_name ILIKE :q
+          OR m.barcode ILIKE :q
+          OR m.manufacturer_name ILIKE :q
+          OR EXISTS (
+            SELECT 1 FROM product_aliases pa
+            WHERE pa.product_master_id = m.id AND pa.alias ILIKE :q
+          ))`,
         { q: `%${params.q}%` },
       );
+      // 점수 기반 정렬: name 정확 일치 → alias 일치 → 부분 일치
+      qb.orderBy(
+        `CASE
+           WHEN LOWER(m.name) = LOWER(:exactQ) THEN 0
+           WHEN EXISTS (SELECT 1 FROM product_aliases pa WHERE pa.product_master_id = m.id AND LOWER(pa.alias) = LOWER(:exactQ)) THEN 1
+           ELSE 2
+         END`,
+        'ASC',
+      ).addOrderBy('m.name', 'ASC');
+      qb.setParameter('exactQ', params.q);
+    } else {
+      qb.orderBy('m.name', 'ASC');
     }
     if (params.categoryId) {
       qb.andWhere('m.category_id = :categoryId', { categoryId: params.categoryId });
@@ -254,9 +274,7 @@ export class NetureCatalogService {
       qb.andWhere('m.brand_id = :brandId', { brandId: params.brandId });
     }
 
-    qb.orderBy('m.name', 'ASC')
-      .skip(offset)
-      .take(limit);
+    qb.skip(offset).take(limit);
 
     const [data, total] = await qb.getManyAndCount();
     return { data, total };

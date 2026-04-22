@@ -232,6 +232,7 @@ import {
   NetureSettlementOrder,
   NetureContactMessage,
   OfferServiceApproval,
+  ProductAlias,
 } from '../modules/neture/entities/index.js';
 // NetureOrder, NeturePartner 제거: routes/neture 엔티티는 NetureProduct/NetureOrderItem 의존 관계가 있어
 // 해당 의존 엔티티까지 함께 등록해야 함. 현재 미등록 상태로 DataSource 초기화 실패 발생.
@@ -736,6 +737,7 @@ export const AppDataSource = new DataSource({
     NetureSettlementOrder,
     NetureContactMessage,
     OfferServiceApproval,
+    ProductAlias,
     // WO-TYPEORM-ENTITY-REGISTRATION-FIX-V2
     KpaSteward,
     // ============================================================================
