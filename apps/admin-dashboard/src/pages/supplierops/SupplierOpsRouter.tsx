@@ -11,6 +11,8 @@ import { Routes, Route } from 'react-router-dom';
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Profile = lazy(() => import('./pages/Profile'));
 const Products = lazy(() => import('./pages/Products'));
+const ProductSearchPage = lazy(() => import('./pages/ProductSearchPage'));
+const ProductCreatePage = lazy(() => import('./pages/ProductCreatePage'));
 const Offers = lazy(() => import('./pages/Offers'));
 const Orders = lazy(() => import('./pages/Orders'));
 const Settlement = lazy(() => import('./pages/Settlement'));
@@ -32,7 +34,8 @@ const SupplierOpsRouter: React.FC = () => {
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="profile" element={<Profile />} />
         <Route path="products" element={<Products />} />
-        <Route path="products/new" element={<Products />} />
+        <Route path="products/new" element={<ProductSearchPage />} />
+        <Route path="products/create" element={<ProductCreatePage />} />
         <Route path="offers" element={<Offers />} />
         <Route path="offers/new" element={<Offers />} />
         <Route path="orders" element={<Orders />} />

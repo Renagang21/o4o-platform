@@ -15,6 +15,8 @@ const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Profile = lazy(() => import('./pages/Profile'));
 const SuppliersList = lazy(() => import('./pages/SuppliersList'));
 const ListingsList = lazy(() => import('./pages/ListingsList'));
+const ProductSearchPage = lazy(() => import('./pages/ProductSearchPage'));
+const ListingCreatePage = lazy(() => import('./pages/ListingCreatePage'));
 const OrdersList = lazy(() => import('./pages/OrdersList'));
 const SettlementDashboard = lazy(() => import('./pages/SettlementDashboard'));
 const NoticePage = lazy(() => import('./pages/NoticePage'));
@@ -33,7 +35,8 @@ const SellerOpsRouter: React.FC = () => {
         <Route path="profile" element={<Profile />} />
         <Route path="suppliers" element={<SuppliersList />} />
         <Route path="listings" element={<ListingsList />} />
-        <Route path="listings/new" element={<ListingsList />} />
+        <Route path="listings/new" element={<ProductSearchPage />} />
+        <Route path="listings/create" element={<ListingCreatePage />} />
         <Route path="orders" element={<OrdersList />} />
         <Route path="orders/:id" element={<OrdersList />} />
         <Route path="settlement" element={<SettlementDashboard />} />
