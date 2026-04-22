@@ -260,7 +260,22 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 
 ---
 
-## 13. APP 표준화 (Baseline Lock)
+## 13. O4O 공통 구조 원칙
+
+> O4O의 **forum, lms, signage는 서비스별 기능이 아니라 플랫폼 공통 구조**이며,
+> 각 서비스는 동일한 구조 위에서 자신의 데이터를 노출한다.
+
+- KPA-Society는 공통 구조의 **reference implementation** — 구조 관련 작업 시 KPA 기준으로 먼저 조사
+- 서비스별로 Forum/LMS/Signage를 재구현하거나 독립 테이블 생성 금지
+- 구조는 공유, 데이터는 serviceKey 기반으로 격리
+
+> 📄 상세: `docs/o4o-common-structure.md`
+
+모든 Forum/LMS/Signage 관련 구조 작업(IR, WO, 구현)은 해당 문서를 기준으로 판단한다.
+
+---
+
+## 13-A. APP 표준화 (Baseline Lock)
 
 모든 APP = `@o4o/types/{app}` + `{App}QueryService` + 표준 UI 패턴
 
@@ -333,9 +348,10 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | **Operator Dashboard 표준** | `docs/platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md` |
 | **디버그 SSR 테스트 페이지** | `docs/platform/debug/DEBUG-SSR-TEST-PAGE-GUIDE-V1.md` |
 | **User/Operator Freeze** | `docs/architecture/USER-OPERATOR-FREEZE-V1.md` |
+| **O4O 공통 구조 원칙** | `docs/o4o-common-structure.md` |
 
 ---
 
-*Updated: 2026-03-17*
-*Version: 7.1*
+*Updated: 2026-04-22*
+*Version: 7.2*
 *Status: Active Constitution*
