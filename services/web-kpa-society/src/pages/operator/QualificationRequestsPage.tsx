@@ -6,9 +6,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   qualificationApi,
+  getQualificationLabel,
+  QUALIFICATION_TYPE_LABELS,
   type QualificationRequest,
   type QualificationType,
-  QUALIFICATION_TYPE_LABELS,
 } from '../../api/qualification';
 import { colors } from '../../styles/theme';
 
@@ -180,7 +181,7 @@ export default function QualificationRequestsPage() {
           {requests.map(r => (
             <div key={r.id} style={styles.tableRow}>
               <span style={{ flex: 2, fontSize: '13px', color: colors.neutral600 }}>{r.user_id.slice(0, 8)}...</span>
-              <span style={{ flex: 1.5 }}>{QUALIFICATION_TYPE_LABELS[r.qualification_type]}</span>
+              <span style={{ flex: 1.5 }}>{getQualificationLabel(r.qualification_type)}</span>
               <span style={{ flex: 1 }}>
                 <span style={{ ...styles.statusBadge, backgroundColor: STATUS_COLORS[r.status] }}>
                   {STATUS_LABELS[r.status]}
@@ -222,7 +223,7 @@ export default function QualificationRequestsPage() {
 
             <div style={styles.detailRow}>
               <span style={styles.detailLabel}>자격 유형</span>
-              <span>{QUALIFICATION_TYPE_LABELS[selectedRequest.qualification_type]}</span>
+              <span>{getQualificationLabel(selectedRequest.qualification_type)}</span>
             </div>
             <div style={styles.detailRow}>
               <span style={styles.detailLabel}>신청일</span>

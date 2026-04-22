@@ -9,7 +9,7 @@
  * - ForumHomePage 최상단에 배치
  */
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { homeApi } from '../../api/home';
 import { useAuth } from '../../contexts/AuthContext';
@@ -50,6 +50,27 @@ const gridStyles = `
     color: ${colors.primary};
     background-color: #EFF6FF;
   }
+  .forum-hub-tag-chip {
+    background: none;
+    border: 1px solid ${colors.neutral200};
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: ${colors.neutral500};
+    cursor: pointer;
+    border-radius: 999px;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+  .forum-hub-tag-chip:hover {
+    border-color: ${colors.primary};
+    color: ${colors.primary};
+  }
+  .forum-hub-tag-chip.active {
+    background-color: #EFF6FF;
+    border-color: ${colors.primary};
+    color: ${colors.primary};
+  }
 `;
 
 const BASE_SORT_TABS = [
@@ -70,8 +91,22 @@ export function ForumHubSection({ prefetchedForums, loading: parentLoading }: Pr
   const [forums, setForums] = useState<ForumHubItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [sort, setSort] = useState<string>('default');
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const sortTabs = isAuthenticated ? [...BASE_SORT_TABS, JOINED_TAB] : BASE_SORT_TABS;
   const initialLoaded = useRef(false);
+
+  // 현재 허브 데이터에서 실제 사용 중인 태그를 유니크 추출
+  const availableTags = useMemo(() => {
+    const set = new Set<string>();
+    forums.forEach((f) => (f.tags || []).forEach((t) => set.add(t)));
+    return Array.from(set).sort();
+  }, [forums]);
+
+  // 정렬 결과에 태그 필터 후처리
+  const filteredForums = useMemo(() => {
+    if (!selectedTag) return forums;
+    return forums.filter((f) => (f.tags || []).includes(selectedTag));
+  }, [forums, selectedTag]);
 
   // Inject grid styles
   useEffect(() => {
@@ -146,20 +181,44 @@ export function ForumHubSection({ prefetchedForums, loading: parentLoading }: Pr
         ))}
       </div>
 
+      {/* Tag filter bar */}
+      {availableTags.length > 0 && (
+        <div style={styles.tagFilterBar}>
+          <button
+            className={`forum-hub-tag-chip${selectedTag === null ? ' active' : ''}`}
+            onClick={() => setSelectedTag(null)}
+          >
+            전체
+          </button>
+          {availableTags.map((tag) => (
+            <button
+              key={tag}
+              className={`forum-hub-tag-chip${selectedTag === tag ? ' active' : ''}`}
+              onClick={() => setSelectedTag(selectedTag === tag ? null : tag)}
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
+      )}
+
       {isLoading ? (
         <div style={styles.emptyCard}>
           <p style={styles.empty}>불러오는 중...</p>
         </div>
-      ) : forums.length === 0 ? (
+      ) : filteredForums.length === 0 ? (
         <div style={styles.emptyCard}>
           <p style={styles.empty}>
-            {sort === 'joined' ? '참여한 포럼이 없습니다. 글이나 댓글을 작성하면 여기에 표시됩니다.'
-              : '아직 개설된 포럼이 없습니다.'}
+            {selectedTag
+              ? `'${selectedTag}' 태그에 해당하는 포럼이 없습니다.`
+              : sort === 'joined'
+                ? '참여한 포럼이 없습니다. 글이나 댓글을 작성하면 여기에 표시됩니다.'
+                : '아직 개설된 포럼이 없습니다.'}
           </p>
         </div>
       ) : (
         <div className="forum-hub-grid">
-          {forums.map((forum) => (
+          {filteredForums.map((forum) => (
             <Link
               key={forum.id}
               to={`/forum/all?category=${forum.id}`}
@@ -181,6 +240,17 @@ export function ForumHubSection({ prefetchedForums, loading: parentLoading }: Pr
 
                 {forum.description && (
                   <p style={styles.description}>{forum.description}</p>
+                )}
+
+                {forum.tags && forum.tags.length > 0 && (
+                  <div style={styles.tagRow}>
+                    {forum.tags.slice(0, 3).map((tag) => (
+                      <span key={tag} style={styles.tagChip}>{tag}</span>
+                    ))}
+                    {forum.tags.length > 3 && (
+                      <span style={styles.tagMore}>+{forum.tags.length - 3}</span>
+                    )}
+                  </div>
                 )}
 
                 <div style={styles.cardMeta}>
@@ -249,6 +319,12 @@ const styles: Record<string, React.CSSProperties> = {
   sortTabs: {
     display: 'flex',
     gap: '4px',
+    marginBottom: spacing.sm,
+  },
+  tagFilterBar: {
+    display: 'flex',
+    flexWrap: 'wrap' as const,
+    gap: '6px',
     marginBottom: spacing.md,
   },
   card: {
@@ -302,6 +378,30 @@ const styles: Record<string, React.CSSProperties> = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
+  },
+  tagRow: {
+    display: 'flex',
+    flexWrap: 'wrap' as const,
+    gap: '4px',
+    marginTop: spacing.sm,
+  },
+  tagChip: {
+    fontSize: '0.688rem',
+    fontWeight: 500,
+    color: '#3B82F6',
+    backgroundColor: '#EFF6FF',
+    padding: '2px 7px',
+    borderRadius: '999px',
+    whiteSpace: 'nowrap' as const,
+  },
+  tagMore: {
+    fontSize: '0.688rem',
+    fontWeight: 500,
+    color: colors.neutral400,
+    backgroundColor: colors.neutral100,
+    padding: '2px 7px',
+    borderRadius: '999px',
+    whiteSpace: 'nowrap' as const,
   },
   cardMeta: {
     display: 'flex',

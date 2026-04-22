@@ -1,24 +1,41 @@
 /**
  * Qualification API
  * WO-O4O-QUALIFICATION-SYSTEM-V1
+ * WO-LMS-CREATOR-QUALIFICATION-FLOW-REFORM-V1: 단일 자격(LMS 제작자)으로 통합
  */
 
 import { authClient } from '../contexts/AuthContext';
 
-export type QualificationType = 'instructor' | 'content_provider' | 'survey_operator' | 'reviewer';
+export type QualificationType = 'lms_creator';
 export type QualificationStatus = 'pending' | 'approved' | 'rejected';
 
 export const QUALIFICATION_TYPE_LABELS: Record<QualificationType, string> = {
+  lms_creator: 'LMS 제작자',
+};
+
+/**
+ * 자격 유형 표시 이름 반환 (레거시 타입 포함)
+ * DB에 기존 instructor / content_provider 등이 있을 수 있으므로 fallback 처리
+ */
+const LEGACY_LABELS: Record<string, string> = {
   instructor: '강사',
   content_provider: '콘텐츠 제공자',
   survey_operator: '설문 운영자',
   reviewer: '검토자',
 };
 
+export function getQualificationLabel(type: string): string {
+  return (
+    QUALIFICATION_TYPE_LABELS[type as QualificationType] ??
+    LEGACY_LABELS[type] ??
+    type
+  );
+}
+
 export interface MemberQualification {
   id: string;
   user_id: string;
-  qualification_type: QualificationType;
+  qualification_type: string;
   status: QualificationStatus;
   requested_at: string | null;
   approved_at: string | null;
@@ -31,7 +48,7 @@ export interface MemberQualification {
 export interface QualificationRequest {
   id: string;
   user_id: string;
-  qualification_type: QualificationType;
+  qualification_type: string;
   status: QualificationStatus;
   request_data: Record<string, any>;
   review_note: string | null;

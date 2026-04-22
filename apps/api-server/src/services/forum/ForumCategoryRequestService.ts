@@ -347,6 +347,7 @@ export class ForumCategoryRequestService {
           createdBy: row.requesterId,
           organizationId: row.organizationId || undefined,
           isOrganizationExclusive: !!row.organizationId,
+          tags: row.tags && row.tags.length > 0 ? row.tags : null,
         });
         createdCategory = await queryRunner.manager.save(ForumCategory, category);
 

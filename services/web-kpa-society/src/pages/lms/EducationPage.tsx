@@ -11,7 +11,7 @@ import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { BaseTable, type O4OColumn } from '@o4o/ui';
 import { Pagination } from '../../components/common';
 import { lmsApi } from '../../api';
-import { instructorApi } from '../../api/instructor';
+import { qualificationApi } from '../../api/qualification';
 import { useAuth } from '../../contexts/AuthContext';
 import { colors, spacing, typography } from '../../styles/theme';
 import type { Course } from '../../types';
@@ -162,8 +162,8 @@ export function EducationPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
 
-  // Instructor qualification
-  const [isInstructor, setIsInstructor] = useState(false);
+  // LMS 제작자 자격 확인
+  const [hasLmsCreator, setHasLmsCreator] = useState(false);
   const [showQualificationPrompt, setShowQualificationPrompt] = useState(false);
 
   const currentPage = parseInt(searchParams.get('page') || '1');
@@ -171,11 +171,18 @@ export function EducationPage() {
   const currentSearch = searchParams.get('search') || '';
   const [searchInput, setSearchInput] = useState(currentSearch);
 
-  // Check instructor qualification
+  // LMS 제작자 자격 확인 (WO-LMS-CREATOR-QUALIFICATION-FLOW-REFORM-V1)
   useEffect(() => {
     if (isAuthenticated) {
-      instructorApi.getMe()
-        .then((res: any) => { if (res.data.success) setIsInstructor(true); })
+      qualificationApi.getMyQualifications()
+        .then((res: any) => {
+          if (res.data.success) {
+            const approved = (res.data.data as any[]).some(
+              (q) => q.qualification_type === 'lms_creator' && q.status === 'approved',
+            );
+            setHasLmsCreator(approved);
+          }
+        })
         .catch(() => {});
     }
   }, [isAuthenticated]);
@@ -232,7 +239,7 @@ export function EducationPage() {
   };
 
   const handleCreateClick = () => {
-    if (isInstructor) {
+    if (hasLmsCreator) {
       navigate('/instructor/courses/new');
     } else {
       setShowQualificationPrompt(true);
@@ -311,21 +318,21 @@ export function EducationPage() {
         </>
       )}
 
-      {/* Qualification prompt modal */}
+      {/* Qualification prompt modal (WO-LMS-CREATOR-QUALIFICATION-FLOW-REFORM-V1) */}
       {showQualificationPrompt && (
         <div style={styles.overlay} onClick={() => setShowQualificationPrompt(false)}>
           <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <h3 style={styles.modalTitle}>강사 자격이 필요합��다</h3>
+            <h3 style={styles.modalTitle}>LMS 제작자 자격이 필요합니다</h3>
             <p style={styles.modalDesc}>
-              강의를 등록하려면 강사 자격이 필요합니다.<br />
-              강사 신청 후 관리자 승인을 받으시면 강의를 등록할 수 있습니다.
+              LMS에서 강의, 콘텐츠, 설문/퀴즈를 등록하려면<br />
+              제작자 자격이 필요합니다.
             </p>
             <div style={styles.modalActions}>
               <button onClick={() => setShowQualificationPrompt(false)} style={styles.modalCancelBtn}>
                 닫기
               </button>
               <Link to="/mypage/qualifications" style={styles.modalApplyBtn}>
-                강사 신청하기
+                자격 신청하기
               </Link>
             </div>
           </div>

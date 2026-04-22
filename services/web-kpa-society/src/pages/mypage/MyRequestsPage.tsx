@@ -101,6 +101,7 @@ function normalizeForumRequest(raw: any): UnifiedRequestItem {
       description: raw.description,
       reason: raw.reason,
       forumType: raw.forumType || raw.forum_type || raw.payload?.forumType,
+      tags: raw.tags || raw.payload?.tags || undefined,
     },
   };
 }
@@ -323,6 +324,20 @@ export default function MyRequestsPage() {
                           }`}>
                             {forumType === 'closed' ? '비공개 포럼' : '공개 포럼'}
                           </span>
+                        </div>
+                      )}
+
+                      {/* Tags (forum-specific) */}
+                      {item.entityType === 'forum_category' && item.payload?.tags && (item.payload.tags as string[]).length > 0 && (
+                        <div>
+                          <div className="text-xs font-medium text-slate-500 mb-1.5">태그</div>
+                          <div className="flex flex-wrap gap-1.5">
+                            {(item.payload.tags as string[]).map((tag: string) => (
+                              <span key={tag} className="px-2.5 py-0.5 text-xs font-medium rounded-full bg-blue-50 text-blue-700">
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
                         </div>
                       )}
 

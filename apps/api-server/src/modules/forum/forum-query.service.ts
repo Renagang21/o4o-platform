@@ -90,7 +90,7 @@ export class ForumQueryService {
         SELECT
           c.id, c.name, c.slug, c.description, c.color, c."iconEmoji",
           c."postCount", c."sortOrder", c."isPinned",
-          c.forum_type AS "forumType",
+          c.forum_type AS "forumType", c.tags,
           COUNT(DISTINCT p.author_id)::int as "memberCount",
           MAX(p.created_at) as "lastActivityAt",
           (SELECT p2.title FROM forum_post p2
@@ -118,7 +118,7 @@ export class ForumQueryService {
       SELECT
         c.id, c.name, c.slug, c.description, c.color, c."iconEmoji",
         c."postCount", c."sortOrder", c."isPinned",
-        c.forum_type AS "forumType",
+        c.forum_type AS "forumType", c.tags,
         COUNT(DISTINCT p.author_id)::int as "memberCount",
         MAX(p.created_at) as "lastActivityAt",
         (SELECT p2.title FROM forum_post p2
@@ -161,7 +161,7 @@ export class ForumQueryService {
         SELECT
           c.id, c.name, c.slug, c.description, c.color, c."iconEmoji",
           c."postCount", c."sortOrder", c."isPinned",
-          c.forum_type AS "forumType",
+          c.forum_type AS "forumType", c.tags,
           COUNT(DISTINCT p.author_id)::int AS "memberCount",
           MAX(p.created_at) AS "lastActivityAt",
           (SELECT p2.title FROM forum_post p2
@@ -200,7 +200,7 @@ export class ForumQueryService {
       SELECT
         c.id, c.name, c.slug, c.description, c.color, c."iconEmoji",
         c."postCount", c."sortOrder", c."isPinned",
-        c.forum_type AS "forumType",
+        c.forum_type AS "forumType", c.tags,
         COUNT(DISTINCT p.author_id)::int AS "memberCount",
         MAX(p.created_at) AS "lastActivityAt",
         (SELECT p2.title FROM forum_post p2

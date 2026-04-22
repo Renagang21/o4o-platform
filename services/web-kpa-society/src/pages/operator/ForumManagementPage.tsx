@@ -58,6 +58,7 @@ interface RequestData {
   description: string;
   reason?: string;
   forumType?: string;
+  tags?: string[];
   status: CategoryRequestStatus;
   serviceCode: string;
   requesterId: string;
@@ -73,6 +74,15 @@ interface RequestData {
   createdAt: string;
   updatedAt: string;
 }
+
+// 전체 태그 목록 (WO-FORUM-TAG-SELECTION-UI-V1과 동기화)
+const ALL_FORUM_TAGS = [
+  '약국경영', '매장운영', '고객응대', '직원관리',
+  '의약품', '건강기능식품', '의료기기', '의약외품',
+  '마케팅', '진열/POP', '디지털사이니지', '이벤트',
+  'AI활용', '데이터', '자동화', 'RPA',
+  '법/규정', '보험', '청구', '인증',
+];
 
 const statusConfig: Record<CategoryRequestStatus, { label: string; color: string; bgColor: string }> = {
   pending: { label: '대기 중', color: 'text-yellow-700', bgColor: 'bg-yellow-100' },
@@ -119,6 +129,7 @@ export default function ForumManagementPage() {
   const [reviewComment, setReviewComment] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [creatingRequestId, setCreatingRequestId] = useState<string | null>(null);
+  const [tagFilter, setTagFilter] = useState<string>('');
 
   // ── Active forum categories state (WO-KPA-A-OPERATOR-FORUM-DIRECT-SOFT-DELETE-V1) ──
   const [categories, setCategories] = useState<CategoryData[]>([]);
@@ -376,7 +387,9 @@ export default function ForumManagementPage() {
 
   const filteredRequests = requests.filter((r) => {
     const q = searchQuery.toLowerCase();
-    return r.name.toLowerCase().includes(q) || r.requesterName.toLowerCase().includes(q);
+    const matchesSearch = r.name.toLowerCase().includes(q) || r.requesterName.toLowerCase().includes(q);
+    const matchesTag = !tagFilter || (r.tags || []).includes(tagFilter);
+    return matchesSearch && matchesTag;
   });
 
   const pendingCount = requests.filter((r) => isReviewable(r.status)).length;
@@ -511,6 +524,19 @@ export default function ForumManagementPage() {
           </select>
           <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
         </div>
+        <div className="relative">
+          <select
+            value={tagFilter}
+            onChange={(e) => setTagFilter(e.target.value)}
+            className="pl-4 pr-8 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
+          >
+            <option value="">모든 태그</option>
+            {ALL_FORUM_TAGS.map((tag) => (
+              <option key={tag} value={tag}>{tag}</option>
+            ))}
+          </select>
+          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+        </div>
       </div>
 
       {/* Table */}
@@ -540,6 +566,20 @@ export default function ForumManagementPage() {
                       )}
                     </div>
                     <div className="text-sm text-slate-500 line-clamp-1">{request.description}</div>
+                    {request.tags && request.tags.length > 0 && (
+                      <div className="flex items-center gap-1 mt-1.5">
+                        {request.tags.slice(0, 2).map((tag) => (
+                          <span key={tag} className="px-2 py-0.5 text-xs font-medium rounded-full bg-slate-100 text-slate-600">
+                            {tag}
+                          </span>
+                        ))}
+                        {request.tags.length > 2 && (
+                          <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-slate-100 text-slate-500">
+                            +{request.tags.length - 2}
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </td>
                   <td className="px-6 py-4">
                     <div className="text-slate-800">{request.requesterName}</div>
@@ -636,6 +676,18 @@ export default function ForumManagementPage() {
                 <h4 className="text-sm font-medium text-slate-500 mb-1">포럼 설명</h4>
                 <p className="text-slate-800">{selectedRequest.description}</p>
               </div>
+              {selectedRequest.tags && selectedRequest.tags.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-medium text-slate-500 mb-2">태그</h4>
+                  <div className="flex flex-wrap gap-1.5">
+                    {selectedRequest.tags.map((tag) => (
+                      <span key={tag} className="px-2.5 py-1 text-xs font-medium rounded-full bg-blue-50 text-blue-700">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
               {selectedRequest.reason && (
                 <div>
                   <h4 className="text-sm font-medium text-slate-500 mb-1">신청 사유</h4>

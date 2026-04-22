@@ -16,7 +16,7 @@ import {
 } from 'typeorm';
 import type { User } from '../../../modules/auth/entities/User.js';
 
-export const QUALIFICATION_TYPES = ['instructor', 'content_provider', 'survey_operator', 'reviewer'] as const;
+export const QUALIFICATION_TYPES = ['lms_creator', 'instructor', 'content_provider', 'survey_operator', 'reviewer'] as const;
 export type QualificationType = (typeof QUALIFICATION_TYPES)[number];
 
 export type QualificationStatus = 'pending' | 'approved' | 'rejected';

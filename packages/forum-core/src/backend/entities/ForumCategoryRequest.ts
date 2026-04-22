@@ -54,7 +54,7 @@ export class ForumCategoryRequest {
   @Column({ name: 'icon_url', type: 'varchar', length: 500, nullable: true })
   iconUrl?: string;
 
-  @Column({ name: 'tags', type: 'simple-array', nullable: true })
+  @Column({ name: 'tags', type: 'text', array: true, nullable: true })
   tags?: string[];
 
   @Column({ name: 'metadata', type: 'jsonb', nullable: true, default: '{}' })

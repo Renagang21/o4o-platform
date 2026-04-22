@@ -98,6 +98,7 @@ export interface ForumHubItem {
   lastActivityAt: string | null;
   lastPostTitle: string | null;
   forumType?: string;
+  tags?: string[] | null;
 }
 
 // 포럼 활동 섹션 (WO-KPA-FORUM-HUB-V2-PHASE3)

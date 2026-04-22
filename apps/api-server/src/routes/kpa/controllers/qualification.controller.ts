@@ -50,7 +50,7 @@ export function createQualificationController(
     '/apply',
     requireAuth,
     [
-      body('qualificationType').isIn(QUALIFICATION_TYPES),
+      body('qualificationType').isIn(['lms_creator']), // WO-LMS-CREATOR-QUALIFICATION-FLOW-REFORM-V1: 신규 신청은 lms_creator만 허용
       body('data').optional().isObject(),
       handleValidationErrors,
     ],
@@ -58,22 +58,6 @@ export function createQualificationController(
       const userId = req.user!.id;
       const qualType = req.body.qualificationType as string;
       const requestData = req.body.data || {};
-
-      // WO-O4O-INSTRUCTOR-APPLICATION-V1: instructor 필수 필드 검증
-      if (qualType === 'instructor') {
-        const missing: string[] = [];
-        if (!requestData.displayName?.trim()) missing.push('displayName');
-        if (!Array.isArray(requestData.expertise) || requestData.expertise.length === 0) missing.push('expertise');
-        if (!requestData.lecturePlanSummary?.trim()) missing.push('lecturePlanSummary');
-        if (missing.length > 0) {
-          res.status(400).json({
-            success: false,
-            error: '강사 신청 필수 항목이 누락되었습니다.',
-            details: missing.map(f => ({ field: f, message: `${f} is required for instructor application` })),
-          });
-          return;
-        }
-      }
 
       try {
         // 이미 approved 또는 pending 자격이 있으면 중복 방지
@@ -271,16 +255,16 @@ export function createQualificationController(
           await qualRepo.save(qual);
         }
 
-        // WO-O4O-INSTRUCTOR-APPLICATION-V1: instructor 승인 시 profile 생성
-        // WO-O4O-LMS-FOUNDATION-V1: lms:instructor 역할 부여
-        if (newStatus === 'approved' && qReq.qualification_type === 'instructor') {
+        // WO-O4O-INSTRUCTOR-APPLICATION-V1 + WO-LMS-CREATOR-QUALIFICATION-FLOW-REFORM-V1
+        // instructor 또는 lms_creator 승인 시: instructor_profile 생성 + lms:instructor 역할 부여
+        if (newStatus === 'approved' && (qReq.qualification_type === 'instructor' || qReq.qualification_type === 'lms_creator')) {
           try {
             const rd = qReq.request_data as Record<string, any>;
             const existingProfile = await profileRepo.findOne({ where: { user_id: qReq.user_id } });
             if (!existingProfile) {
               const profile = profileRepo.create({
                 user_id: qReq.user_id,
-                display_name: rd.displayName || '',
+                display_name: rd.displayName || rd.bio?.slice(0, 50) || '',
                 organization: rd.organization || null,
                 job_title: rd.jobTitle || null,
                 expertise: Array.isArray(rd.expertise) ? rd.expertise : [],
