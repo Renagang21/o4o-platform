@@ -156,7 +156,7 @@ export function StoreHomePage() {
               <span style={{ ...styles.stepLabel, color: '#059669' }}>콘텐츠 만들기</span>
             </div>
             <div style={styles.stepLinks}>
-              <Link to="/store/operation/library" style={styles.stepLink}>
+              <Link to="/store/content" style={styles.stepLink}>
                 <BookOpen size={16} style={{ color: '#059669' }} />
                 <span>자료실</span>
               </Link>

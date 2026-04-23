@@ -246,7 +246,7 @@ export function ProductMarketingPage() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     {lib.id && (
                       <Link
-                        to={`/store/operation/library/${lib.id}`}
+                        to={`/store/content/${lib.id}/edit`}
                         style={styles.assetAction}
                         title="자료 상세"
                       >

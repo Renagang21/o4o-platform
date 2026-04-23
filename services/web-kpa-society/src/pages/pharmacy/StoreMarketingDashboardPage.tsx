@@ -268,7 +268,7 @@ export function StoreMarketingDashboardPage() {
             <p style={styles.quickLabel}>POP 자료</p>
             <p style={styles.quickDesc}>POP 광고 PDF 생성</p>
           </Link>
-          <Link to="/store/operation/library" style={styles.quickCard}>
+          <Link to="/store/content" style={styles.quickCard}>
             <BookOpen size={24} style={{ color: '#059669' }} />
             <p style={styles.quickLabel}>자료실</p>
             <p style={styles.quickDesc}>매장 자료 관리</p>

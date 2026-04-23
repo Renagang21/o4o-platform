@@ -633,7 +633,7 @@ export function StoreQRPage() {
         }}
         onCreateNew={() => {
           setShowEntryModal(false);
-          navigate('/store/operation/library/new?from=qr-create');
+          navigate('/store/content');
         }}
         onClose={() => setShowEntryModal(false)}
       />

@@ -283,7 +283,7 @@ export function StorePopPage() {
         open={showEntryModal}
         title="POP 자료 추가 방식"
         onSelectExisting={() => { setShowEntryModal(false); setShowSelector(true); }}
-        onCreateNew={() => { setShowEntryModal(false); navigate('/store/operation/library/new?from=pop-create'); }}
+        onCreateNew={() => { setShowEntryModal(false); navigate('/store/content'); }}
         onClose={() => setShowEntryModal(false)}
       />
 
