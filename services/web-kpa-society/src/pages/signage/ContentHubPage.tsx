@@ -33,6 +33,11 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 const SERVICE_KEY = 'kpa-society';
 const PAGE_LIMIT = 20;
 
+const DEFAULT_TAG_SUGGESTIONS = [
+  '복약지도', '당뇨', '혈압', '면역', '건강기능식품',
+  '의약외품', '이벤트', '프로모션', '신제품', '추천상품',
+];
+
 // ─── Types ─────────────────────────────────────────────
 
 interface MediaItem {
@@ -114,6 +119,8 @@ export default function ContentHubPage() {
   const [createForm, setCreateForm] = useState({ name: '', description: '', sourceUrl: '', category: '' });
   const [isCreating, setIsCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
+  const [formTags, setFormTags] = useState<string[]>([]);
+  const [formTagInput, setFormTagInput] = useState('');
 
   // Debounce keyword
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -206,10 +213,21 @@ export default function ContentHubPage() {
   };
 
   // ── Community create ──
+  const addTag = (value: string) => {
+    const tag = value.trim().replace(/^#/, '');
+    if (!tag || formTags.includes(tag)) return;
+    setFormTags(prev => [...prev, tag]);
+  };
+
+  const removeTag = (tag: string) => {
+    setFormTags(prev => prev.filter(t => t !== tag));
+  };
+
   const handleCreate = async () => {
     if (!createModal) return;
     if (!createForm.name.trim()) { setCreateError('제목을 입력하세요'); return; }
     if (!createForm.sourceUrl.trim()) { setCreateError('URL을 입력하세요'); return; }
+    if (formTags.length === 0) { setCreateError('태그를 최소 1개 이상 입력해주세요'); return; }
     setIsCreating(true);
     setCreateError(null);
     try {
@@ -219,12 +237,14 @@ export default function ContentHubPage() {
           name: createForm.name.trim(),
           description: createForm.description.trim() || undefined,
           sourceUrl: createForm.sourceUrl.trim(),
-          category: createForm.category.trim() || undefined,
+          tags: formTags,
           mediaType: 'youtube',
         }),
       });
       setCreateModal(null);
       setCreateForm({ name: '', description: '', sourceUrl: '', category: '' });
+      setFormTags([]);
+      setFormTagInput('');
       loadMedia();
       showToast('커뮤니티 콘텐츠가 등록되었습니다.', 'success');
     } catch (err: any) {
@@ -271,7 +291,7 @@ export default function ContentHubPage() {
         </div>
         {user && (
           <button
-            onClick={() => { setCreateForm({ name: '', description: '', sourceUrl: '', category: '' }); setCreateError(null); setCreateModal({ type: 'media' }); }}
+            onClick={() => { setCreateForm({ name: '', description: '', sourceUrl: '', category: '' }); setFormTags([]); setFormTagInput(''); setCreateError(null); setCreateModal({ type: 'media' }); }}
             className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
           >
             <PlusCircle className="h-4 w-4" />
@@ -359,7 +379,7 @@ export default function ContentHubPage() {
             <p>{selectedTags.length > 0 ? '선택한 태그에 해당하는 콘텐츠가 없습니다' : '등록된 콘텐츠가 없습니다'}</p>
             {user && (
               <button
-                onClick={() => { setCreateForm({ name: '', description: '', sourceUrl: '', category: '' }); setCreateError(null); setCreateModal({ type: 'media' }); }}
+                onClick={() => { setCreateForm({ name: '', description: '', sourceUrl: '', category: '' }); setFormTags([]); setFormTagInput(''); setCreateError(null); setCreateModal({ type: 'media' }); }}
                 className="mt-1 text-blue-600 hover:underline"
               >
                 첫 번째 커뮤니티 콘텐츠를 등록해보세요
@@ -556,19 +576,6 @@ export default function ContentHubPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">카테고리 (선택)</label>
-                <select
-                  value={createForm.category}
-                  onChange={(e) => setCreateForm(f => ({ ...f, category: e.target.value }))}
-                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400 bg-white"
-                >
-                  <option value="">카테고리 선택</option>
-                  {categories.map((cat) => (
-                    <option key={cat.id} value={cat.name}>{cat.name}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">설명 (선택)</label>
                 <textarea
                   value={createForm.description}
@@ -577,6 +584,43 @@ export default function ContentHubPage() {
                   rows={2}
                   className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400 resize-none"
                 />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-500 mb-1">태그 * (최소 1개)</label>
+                <div className="flex flex-wrap gap-1 mb-2 min-h-[28px]">
+                  {formTags.map(tag => (
+                    <span key={tag} className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">
+                      #{tag}
+                      <button type="button" onClick={() => removeTag(tag)} className="ml-0.5 hover:text-blue-900">×</button>
+                    </span>
+                  ))}
+                </div>
+                <input
+                  type="text"
+                  value={formTagInput}
+                  onChange={(e) => setFormTagInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ',') {
+                      e.preventDefault();
+                      addTag(formTagInput);
+                      setFormTagInput('');
+                    }
+                  }}
+                  placeholder="태그 입력 후 Enter 또는 쉼표"
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {DEFAULT_TAG_SUGGESTIONS.filter(t => !formTags.includes(t)).map(t => (
+                    <button
+                      key={t}
+                      type="button"
+                      onClick={() => addTag(t)}
+                      className="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded-full hover:bg-blue-100 hover:text-blue-700 transition-colors"
+                    >
+                      #{t}
+                    </button>
+                  ))}
+                </div>
               </div>
               {createError && (
                 <p className="text-xs text-red-600 flex items-center gap-1">
@@ -594,7 +638,7 @@ export default function ContentHubPage() {
               </button>
               <button
                 onClick={handleCreate}
-                disabled={isCreating}
+                disabled={isCreating || formTags.length === 0}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50"
               >
                 {isCreating ? '등록 중...' : '등록'}

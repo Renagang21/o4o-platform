@@ -20,6 +20,11 @@ import AiContentGenerationModal from './AiContentGenerationModal';
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 const SERVICE_KEY = 'kpa-society';
 
+const DEFAULT_TAG_SUGGESTIONS = [
+  '복약지도', '당뇨', '혈압', '면역', '건강기능식품',
+  '의약외품', '이벤트', '프로모션', '신제품', '추천상품',
+];
+
 interface MediaItem {
   id: string;
   name: string;
@@ -90,6 +95,8 @@ export default function HqMediaPage() {
   const [formSourceType, setFormSourceType] = useState('url');
   const [formSourceUrl, setFormSourceUrl] = useState('');
   const [isCreating, setIsCreating] = useState(false);
+  const [formTags, setFormTags] = useState<string[]>([]);
+  const [formTagInput, setFormTagInput] = useState('');
 
   const apiFetch = useCallback(async (path: string, options?: RequestInit) => {
     const token = getAccessToken();
@@ -123,8 +130,22 @@ export default function HqMediaPage() {
 
   useEffect(() => { fetchMedia(); }, [fetchMedia]);
 
+  const addTag = (value: string) => {
+    const tag = value.trim().replace(/^#/, '');
+    if (!tag || formTags.includes(tag)) return;
+    setFormTags(prev => [...prev, tag]);
+  };
+
+  const removeTag = (tag: string) => {
+    setFormTags(prev => prev.filter(t => t !== tag));
+  };
+
   const handleCreate = async () => {
     if (!formName.trim() || !formSourceUrl.trim()) return;
+    if (formTags.length === 0) {
+      setError('태그를 최소 1개 이상 입력해주세요');
+      return;
+    }
     setIsCreating(true);
     try {
       await apiFetch(`/api/signage/${SERVICE_KEY}/hq/media`, {
@@ -134,9 +155,12 @@ export default function HqMediaPage() {
           mediaType: formMediaType,
           sourceType: formSourceType,
           sourceUrl: formSourceUrl.trim(),
+          tags: formTags,
         }),
       });
       setFormName(''); setFormSourceUrl(''); setShowForm(false);
+      setFormTags([]);
+      setFormTagInput('');
       fetchMedia();
     } catch (err: any) {
       setError(err?.message || '미디어 등록에 실패했습니다');
@@ -331,10 +355,47 @@ export default function HqMediaPage() {
                 <option value="text">텍스트</option>
               </select>
             </div>
+            <div className="md:col-span-2">
+              <label className="block text-xs font-medium text-slate-500 mb-1">태그 * (최소 1개)</label>
+              <div className="flex flex-wrap gap-1 mb-2 min-h-[28px]">
+                {formTags.map(tag => (
+                  <span key={tag} className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">
+                    #{tag}
+                    <button type="button" onClick={() => removeTag(tag)} className="ml-0.5 hover:text-blue-900">×</button>
+                  </span>
+                ))}
+              </div>
+              <input
+                type="text"
+                value={formTagInput}
+                onChange={(e) => setFormTagInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ',') {
+                    e.preventDefault();
+                    addTag(formTagInput);
+                    setFormTagInput('');
+                  }
+                }}
+                placeholder="태그 입력 후 Enter 또는 쉼표"
+                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <div className="flex flex-wrap gap-1 mt-2">
+                {DEFAULT_TAG_SUGGESTIONS.filter(t => !formTags.includes(t)).map(t => (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => addTag(t)}
+                    className="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded-full hover:bg-blue-100 hover:text-blue-700 transition-colors"
+                  >
+                    #{t}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
           <div className="flex justify-end gap-2 mt-4">
             <button onClick={() => setShowForm(false)} className="px-4 py-2 border border-slate-200 rounded-lg text-sm hover:bg-slate-50">취소</button>
-            <button onClick={handleCreate} disabled={isCreating || !formName.trim() || !formSourceUrl.trim()} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50">{isCreating ? '등록 중...' : '등록'}</button>
+            <button onClick={handleCreate} disabled={isCreating || !formName.trim() || !formSourceUrl.trim() || formTags.length === 0} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50">{isCreating ? '등록 중...' : '등록'}</button>
           </div>
         </div>
       )}

@@ -63,6 +63,14 @@ export class SignagePlaylistService {
     scope: ScopeFilter,
     userId?: string,
   ): Promise<PlaylistResponseDto> {
+    // Tags validation
+    if (!dto.tags || dto.tags.length === 0) {
+      throw Object.assign(new Error('태그를 최소 1개 이상 입력해주세요'), {
+        code: 'TAGS_REQUIRED',
+        statusCode: 400,
+      });
+    }
+
     const playlist = await this.repository.createPlaylist({
       ...dto,
       serviceKey: scope.serviceKey,
