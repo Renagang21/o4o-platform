@@ -18,6 +18,8 @@ export const MODEL_WHITELIST = {
   gemini: [
     'gemini-3.0-flash',
     'gemini-3.0-pro',
+    'gemini-2.5-flash',
+    'gemini-2.5-pro',
     'gemini-2.0-flash',
     'gemini-2.0-flash-lite',
     'gemini-1.5-flash',
@@ -78,6 +80,21 @@ export interface AIGenerateResponse {
     blocks: any[];
   };
   error?: string;
+  requestId?: string;
+}
+
+// Raw content response (for non-block outputType routes)
+export interface AIRawContentResponse {
+  success: boolean;
+  provider: AIProvider;
+  model: string;
+  usage?: {
+    promptTokens?: number;
+    completionTokens?: number;
+    totalTokens?: number;
+  };
+  parsed: Record<string, any>;
+  rawText: string;
   requestId?: string;
 }
 

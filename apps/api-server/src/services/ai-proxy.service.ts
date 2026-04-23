@@ -20,6 +20,7 @@ import {
   AIProvider,
   AIGenerateRequest,
   AIGenerateResponse,
+  AIRawContentResponse,
   AIProxyError,
   MODEL_WHITELIST,
   PARAMETER_LIMITS,
@@ -27,6 +28,18 @@ import {
   GeminiResponse,
   ClaudeResponse,
 } from '../types/ai-proxy.types.js';
+
+// Internal: raw HTTP result from Gemini before normalization
+interface GeminiHttpResult {
+  content: string;
+  parsed: any;
+  model: string;
+  usageMetadata?: {
+    promptTokenCount?: number;
+    candidatesTokenCount?: number;
+    totalTokenCount?: number;
+  };
+}
 import { AppDataSource } from '../database/connection.js';
 import { AIUsageLog, AIProvider as UsageProvider, AIUsageStatus } from '../entities/AIUsageLog.js';
 import { resolveAiApiKey } from '../utils/ai-key.util.js';
@@ -429,22 +442,23 @@ class AIProxyService {
    * - https://ai.google.dev/gemini-api/docs/structured-output
    * - https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/control-generated-output
    */
-  private async callGemini(
+  /**
+   * Shared Gemini HTTP fetch — returns raw content before any normalization.
+   * Used by both callGemini() (blocks path) and generateRawContent() (raw path).
+   */
+  private async fetchGeminiContent(
     request: AIGenerateRequest,
-    requestId: string
-  ): Promise<AIGenerateResponse> {
+    requestId: string,
+  ): Promise<GeminiHttpResult> {
     const apiKey = await this.getApiKey('gemini');
     const { model, systemPrompt, userPrompt, temperature = 0.7, maxTokens = 32000, topP = 0.95, topK = 40 } = request;
 
-    // Determine API version (v1beta for structured output support)
-    const apiVersion = model.includes('2.5') ? 'v1beta' : 'v1beta';
-    const useStructuredOutput = model.includes('2.5');
+    const useStructuredOutput = model.includes('2.5') || model.includes('3.0');
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.DEFAULT_TIMEOUT);
 
     try {
-      // Build generation config
       const generationConfig: any = {
         temperature,
         topK,
@@ -452,15 +466,12 @@ class AIProxyService {
         maxOutputTokens: maxTokens,
       };
 
-      // Add structured output for Gemini 2.5+ (use v1beta for full support)
-      // Only use responseMimeType to enforce JSON format
-      // Don't use responseSchema - it's too restrictive and causes empty content
       if (useStructuredOutput) {
         generationConfig.responseMimeType = 'application/json';
       }
 
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/${apiVersion}/models/${model}:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -481,11 +492,9 @@ class AIProxyService {
         const retryAfter = this.parseRetryAfter(response.headers.get('Retry-After'));
         throw this.createError('RATE_LIMIT_ERROR', 'Gemini rate limit exceeded', true, retryAfter);
       }
-
       if (response.status === 503) {
         throw this.createError('PROVIDER_ERROR', 'Gemini service unavailable', true);
       }
-
       if (!response.ok) {
         const error = await response.json();
         throw this.createError('PROVIDER_ERROR', error.error?.message || 'Gemini API error', false);
@@ -498,14 +507,11 @@ class AIProxyService {
         throw this.createError('PROVIDER_ERROR', 'No response from Gemini', false);
       }
 
-      // With structured output, response is guaranteed to be valid JSON
       let parsed: any;
       try {
         if (useStructuredOutput) {
-          // Direct parse - no regex needed with structured output
           parsed = JSON.parse(content);
         } else {
-          // Fallback for older models - extract JSON from markdown
           const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/\{[\s\S]*\}/);
           const jsonContent = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : content;
           parsed = JSON.parse(jsonContent);
@@ -516,7 +522,6 @@ class AIProxyService {
           model,
           content: content.substring(0, 500),
           error: parseError.message,
-          stack: parseError.stack,
         });
         throw this.createError(
           'PROVIDER_ERROR',
@@ -525,85 +530,200 @@ class AIProxyService {
         );
       }
 
-      // Debug logging - AI 응답 형식 확인
-      logger.info('Gemini AI Response Format Debug', {
-        requestId,
-        model,
-        hasBlocksField: !!parsed.blocks,
-        isArray: Array.isArray(parsed),
-        parsedType: typeof parsed,
-        parsedKeys: typeof parsed === 'object' && !Array.isArray(parsed) ? Object.keys(parsed) : null,
-        blocksLength: parsed.blocks?.length || (Array.isArray(parsed) ? parsed.length : 0),
-      });
-
-      // 안전한 응답 형식 정규화
-      let normalizedResult: { blocks: any[] };
-
-      if (parsed.blocks && Array.isArray(parsed.blocks)) {
-        // Case 1: {blocks: [...]} 형식 (정상)
-        normalizedResult = { blocks: parsed.blocks };
-
-        // DEBUG: Log first 3 blocks to see what AI generated
-        logger.info('Gemini AI Generated Blocks (first 3)', {
-          requestId,
-          blocks: parsed.blocks.slice(0, 3).map((b: any) => ({
-            type: b.type,
-            hasContent: !!b.content,
-            contentKeys: typeof b.content === 'object' ? Object.keys(b.content) : null,
-            hasAttributes: !!b.attributes,
-            attributeKeys: typeof b.attributes === 'object' ? Object.keys(b.attributes) : null,
-          })),
-          totalBlocks: parsed.blocks.length,
-        });
-
-      } else if (parsed.layout?.blocks && Array.isArray(parsed.layout.blocks)) {
-        // Case 1-B: {layout: {blocks: [...]}} 형식 (Gemini 2.5+ 응답)
-        normalizedResult = { blocks: parsed.layout.blocks };
-
-        logger.info('Gemini AI response with layout wrapper', {
-          requestId,
-          totalBlocks: parsed.layout.blocks.length,
-          firstBlockType: parsed.layout.blocks[0]?.type,
-        });
-      } else if (Array.isArray(parsed)) {
-        // Case 2: [...] 형식 (배열을 blocks로 감싸기)
-        normalizedResult = { blocks: parsed };
-      } else {
-        // Case 3: 그 외 형식 - 에러 발생
-        logger.error('Invalid Gemini response format', {
-          requestId,
-          model,
-          parsed: JSON.stringify(parsed).substring(0, 500),
-        });
-        throw this.createError(
-          'PROVIDER_ERROR',
-          'Invalid response format: expected {blocks: [...]} or [...], but got ' + typeof parsed,
-          false
-        );
-      }
-
-      return {
-        success: true,
-        provider: 'gemini',
-        model,
-        usage: {
-          promptTokens: data.usageMetadata?.promptTokenCount,
-          completionTokens: data.usageMetadata?.candidatesTokenCount,
-          totalTokens: data.usageMetadata?.totalTokenCount,
-        },
-        result: normalizedResult,
-        requestId,
-      };
+      return { content, parsed, model, usageMetadata: data.usageMetadata };
 
     } catch (error: any) {
       clearTimeout(timeoutId);
-
       if (error.name === 'AbortError') {
         throw this.createError('TIMEOUT_ERROR', 'Gemini request timeout (120s)', true);
       }
-
       throw error;
     }
+  }
+
+  private async callGemini(
+    request: AIGenerateRequest,
+    requestId: string
+  ): Promise<AIGenerateResponse> {
+    const { content, parsed, model, usageMetadata } = await this.fetchGeminiContent(request, requestId);
+
+    // Debug logging — blocks format check
+    logger.info('Gemini AI Response Format Debug', {
+      requestId,
+      model,
+      hasBlocksField: !!parsed.blocks,
+      isArray: Array.isArray(parsed),
+      parsedType: typeof parsed,
+      parsedKeys: typeof parsed === 'object' && !Array.isArray(parsed) ? Object.keys(parsed) : null,
+      blocksLength: parsed.blocks?.length || (Array.isArray(parsed) ? parsed.length : 0),
+    });
+
+    let normalizedResult: { blocks: any[] };
+
+    if (parsed.blocks && Array.isArray(parsed.blocks)) {
+      // Case 1: {blocks: [...]}
+      normalizedResult = { blocks: parsed.blocks };
+      logger.info('Gemini AI Generated Blocks (first 3)', {
+        requestId,
+        blocks: parsed.blocks.slice(0, 3).map((b: any) => ({
+          type: b.type,
+          hasContent: !!b.content,
+          contentKeys: typeof b.content === 'object' ? Object.keys(b.content) : null,
+          hasAttributes: !!b.attributes,
+          attributeKeys: typeof b.attributes === 'object' ? Object.keys(b.attributes) : null,
+        })),
+        totalBlocks: parsed.blocks.length,
+      });
+    } else if (parsed.layout?.blocks && Array.isArray(parsed.layout.blocks)) {
+      // Case 1-B: {layout: {blocks: [...]}}
+      normalizedResult = { blocks: parsed.layout.blocks };
+      logger.info('Gemini AI response with layout wrapper', {
+        requestId,
+        totalBlocks: parsed.layout.blocks.length,
+        firstBlockType: parsed.layout.blocks[0]?.type,
+      });
+    } else if (Array.isArray(parsed)) {
+      // Case 2: plain array
+      normalizedResult = { blocks: parsed };
+    } else {
+      // Case 3: unexpected format
+      logger.error('Invalid Gemini response format', {
+        requestId,
+        model,
+        parsed: JSON.stringify(parsed).substring(0, 500),
+      });
+      throw this.createError(
+        'PROVIDER_ERROR',
+        'Invalid response format: expected {blocks: [...]} or [...], but got ' + typeof parsed,
+        false
+      );
+    }
+
+    return {
+      success: true,
+      provider: 'gemini',
+      model,
+      usage: {
+        promptTokens: usageMetadata?.promptTokenCount,
+        completionTokens: usageMetadata?.candidatesTokenCount,
+        totalTokens: usageMetadata?.totalTokenCount,
+      },
+      result: normalizedResult,
+      requestId,
+    };
+  }
+
+  /**
+   * Generate raw JSON content via Gemini — for outputType-based routes (not blocks).
+   * Provides full retry, telemetry, and usage logging identical to generateContent().
+   */
+  async generateRawContent(
+    request: AIGenerateRequest,
+    userId: string,
+    requestId: string,
+  ): Promise<AIRawContentResponse> {
+    const startTime = Date.now();
+
+    if (request.provider !== 'gemini') {
+      throw this.createError('VALIDATION_ERROR', 'generateRawContent only supports gemini provider', false);
+    }
+
+    const resolvedModel = this.resolveModel(request.provider, request.model);
+    request = { ...request, model: resolvedModel };
+    this.validateRequest(request);
+
+    const promptSize = (request.systemPrompt + request.userPrompt).length;
+    logger.info('AI raw content request started', {
+      requestId,
+      userId,
+      provider: request.provider,
+      model: request.model,
+      promptSize,
+      temperature: request.temperature,
+      maxTokens: request.maxTokens,
+    });
+
+    let lastError: any;
+    let rawResult: GeminiHttpResult | undefined;
+
+    for (let attempt = 0; attempt <= this.MAX_RETRIES; attempt++) {
+      try {
+        rawResult = await this.fetchGeminiContent(request, requestId);
+        break;
+      } catch (error: any) {
+        lastError = error;
+        if (error.retryable === false) break;
+        if (attempt === this.MAX_RETRIES) break;
+        const backoff = this.calculateBackoff(attempt, error.retryAfter);
+        logger.warn('AI raw content retry', {
+          requestId,
+          attempt: attempt + 1,
+          maxRetries: this.MAX_RETRIES,
+          backoffMs: backoff,
+          error: error.message,
+        });
+        await this.sleep(backoff);
+      }
+    }
+
+    const duration = Date.now() - startTime;
+
+    if (!rawResult) {
+      logger.error('AI raw content request failed', {
+        requestId,
+        userId,
+        provider: request.provider,
+        model: request.model,
+        error: lastError?.message,
+        duration: `${duration}ms`,
+      });
+      await this.saveUsageLog({
+        userId,
+        provider: request.provider as UsageProvider,
+        model: request.model,
+        requestId,
+        durationMs: duration,
+        status: AIUsageStatus.ERROR,
+        errorMessage: lastError?.message || 'Unknown error',
+        errorType: lastError?.type || 'UNKNOWN_ERROR',
+      });
+      throw lastError;
+    }
+
+    logger.info('AI raw content request completed', {
+      requestId,
+      userId,
+      provider: request.provider,
+      model: request.model,
+      status: 'success',
+      duration: `${duration}ms`,
+    });
+
+    await this.saveUsageLog({
+      userId,
+      provider: request.provider as UsageProvider,
+      model: request.model,
+      requestId,
+      promptTokens: rawResult.usageMetadata?.promptTokenCount || 0,
+      completionTokens: rawResult.usageMetadata?.candidatesTokenCount || 0,
+      totalTokens: rawResult.usageMetadata?.totalTokenCount || 0,
+      durationMs: duration,
+      status: AIUsageStatus.SUCCESS,
+    });
+
+    return {
+      success: true,
+      provider: 'gemini',
+      model: rawResult.model,
+      usage: {
+        promptTokens: rawResult.usageMetadata?.promptTokenCount,
+        completionTokens: rawResult.usageMetadata?.candidatesTokenCount,
+        totalTokens: rawResult.usageMetadata?.totalTokenCount,
+      },
+      parsed: rawResult.parsed as Record<string, any>,
+      rawText: rawResult.content,
+      requestId,
+    };
   }
 
   /**

@@ -209,60 +209,32 @@ router.post('/content', authenticate, async (req, res: Response) => {
   const requestId = crypto.randomUUID();
 
   try {
-    const apiKey = await resolveAiApiKey(AppDataSource, 'gemini');
-    if (!apiKey) throw new Error('Gemini API key not configured. Set GEMINI_API_KEY or configure in AI Settings.');
-    const model = 'gemini-2.5-flash';
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+    const rawResponse = await aiProxyService.generateRawContent(
+      {
+        provider: 'gemini',
+        model: 'gemini-2.5-flash',
+        systemPrompt,
+        userPrompt,
+        temperature: 0.5,
+        maxTokens: 4096,
+      },
+      userId,
+      requestId,
+    );
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000);
+    const normalized = parseResponse(outputType, rawResponse.parsed, rawResponse.rawText);
 
-    const geminiRes = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        system_instruction: { parts: [{ text: systemPrompt }] },
-        contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
-        generationConfig: {
-          temperature: 0.5,
-          maxOutputTokens: 4096,
-          responseMimeType: 'application/json',
-        },
-      }),
-      signal: controller.signal,
-    });
-
-    clearTimeout(timeoutId);
-
-    if (!geminiRes.ok) {
-      const errBody = await geminiRes.text();
-      logger.error('AI content: Gemini error', { requestId, status: geminiRes.status, body: errBody });
-      return res.status(502).json({ success: false, error: 'AI 서비스 오류가 발생했습니다.', requestId });
-    }
-
-    const data = await geminiRes.json();
-    const rawText: string = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
-
-    if (!rawText) {
-      return res.status(502).json({ success: false, error: 'AI 응답이 비어 있습니다.', requestId });
-    }
-
-    let parsedJson: Record<string, any> = {};
-    try {
-      const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-      if (jsonMatch) parsedJson = JSON.parse(jsonMatch[0]);
-    } catch {
-      parsedJson = {};
-    }
-
-    const normalized = parseResponse(outputType, parsedJson, rawText);
-
-    logger.info('AI content generated', { requestId, userId, outputType, model });
+    logger.info('AI content generated', { requestId, userId, outputType, model: rawResponse.model });
 
     return res.json({ success: true, ...normalized, requestId });
   } catch (error: any) {
-    logger.error('AI content generate error', { requestId, error: error.message });
-    return res.status(500).json({
+    const status = error.type === 'RATE_LIMIT_ERROR' ? 429
+                 : error.type === 'AUTH_ERROR' ? 401
+                 : error.type === 'VALIDATION_ERROR' ? 400
+                 : error.type === 'TIMEOUT_ERROR' ? 504
+                 : 500;
+    logger.error('AI content generate error', { requestId, error: error.message, type: error.type });
+    return res.status(status).json({
       success: false,
       error: error.message || 'AI 콘텐츠 생성 중 오류가 발생했습니다.',
       requestId,
