@@ -21,6 +21,7 @@ const PAGE_SIZE = 9;
 export default function ContentHubPage() {
   const navigate = useNavigate();
   const [contentType, setContentType] = useState<ContentType>('playlists');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   // Data states
   const [allPlaylists, setAllPlaylists] = useState<SignagePlaylist[]>([]);
@@ -33,6 +34,7 @@ export default function ContentHubPage() {
   useEffect(() => {
     loadContent();
     setCurrentPage(1);
+    setSelectedTags([]);
   }, [contentType]);
 
   const loadContent = async () => {
@@ -63,18 +65,41 @@ export default function ContentHubPage() {
     }
   };
 
-  // Paginated data
+  // Tag helpers
+  const availableTags = useMemo(() => {
+    const all = [...allPlaylists, ...allMedia].flatMap((item) => item.tags ?? []);
+    return [...new Set(all)].sort();
+  }, [allPlaylists, allMedia]);
+
+  const toggleTag = (tag: string) => {
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+    );
+    setCurrentPage(1);
+  };
+
+  // Filtered + paginated data
+  const filteredPlaylists = useMemo(() => {
+    if (selectedTags.length === 0) return allPlaylists;
+    return allPlaylists.filter((p) => selectedTags.some((tag) => (p.tags ?? []).includes(tag)));
+  }, [allPlaylists, selectedTags]);
+
+  const filteredMedia = useMemo(() => {
+    if (selectedTags.length === 0) return allMedia;
+    return allMedia.filter((m) => selectedTags.some((tag) => (m.tags ?? []).includes(tag)));
+  }, [allMedia, selectedTags]);
+
   const playlists = useMemo(() => {
     const start = (currentPage - 1) * PAGE_SIZE;
-    return allPlaylists.slice(start, start + PAGE_SIZE);
-  }, [allPlaylists, currentPage]);
+    return filteredPlaylists.slice(start, start + PAGE_SIZE);
+  }, [filteredPlaylists, currentPage]);
 
   const media = useMemo(() => {
     const start = (currentPage - 1) * PAGE_SIZE;
-    return allMedia.slice(start, start + PAGE_SIZE);
-  }, [allMedia, currentPage]);
+    return filteredMedia.slice(start, start + PAGE_SIZE);
+  }, [filteredMedia, currentPage]);
 
-  const totalItems = contentType === 'playlists' ? allPlaylists.length : allMedia.length;
+  const totalItems = contentType === 'playlists' ? filteredPlaylists.length : filteredMedia.length;
   const totalPages = Math.ceil(totalItems / PAGE_SIZE);
 
   const handlePageChange = (page: number) => {
@@ -116,6 +141,16 @@ export default function ContentHubPage() {
             <span className="font-medium">{new Date(playlist.createdAt).toLocaleDateString()}</span>
           </div>
         </div>
+        {(playlist.tags ?? []).length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-3">
+            {(playlist.tags ?? []).slice(0, 3).map((tag) => (
+              <span key={tag} className="text-[11px] px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full">#{tag}</span>
+            ))}
+            {(playlist.tags ?? []).length > 3 && (
+              <span className="text-[11px] text-slate-400">+{(playlist.tags ?? []).length - 3}</span>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -163,6 +198,16 @@ export default function ContentHubPage() {
             <span className="font-medium">{new Date(item.createdAt).toLocaleDateString()}</span>
           </div>
         </div>
+        {(item.tags ?? []).length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-3">
+            {(item.tags ?? []).slice(0, 3).map((tag) => (
+              <span key={tag} className="text-[11px] px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full">#{tag}</span>
+            ))}
+            {(item.tags ?? []).length > 3 && (
+              <span className="text-[11px] text-slate-400">+{(item.tags ?? []).length - 3}</span>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -198,7 +243,7 @@ export default function ContentHubPage() {
       return (
         <div className="text-center py-12 bg-white rounded-xl border border-slate-200">
           <p className="text-slate-500">
-            {contentType === 'playlists' ? '플레이리스트가' : '미디어가'} 없습니다.
+            {contentType === 'playlists' ? '플레이리스트가' : '개별 영상이'} 없습니다.
           </p>
         </div>
       );
@@ -239,6 +284,33 @@ export default function ContentHubPage() {
       {/* Content */}
       <div className="bg-white rounded-xl border border-slate-200">
         <div className="p-6 space-y-6">
+          {/* Tag Filter */}
+          {availableTags.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2">
+              {availableTags.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => toggleTag(tag)}
+                  className={`px-3 py-1 text-xs font-medium rounded-full border transition-colors ${
+                    selectedTags.includes(tag)
+                      ? 'bg-blue-600 text-white border-blue-600'
+                      : 'bg-white text-slate-600 border-slate-200 hover:border-blue-400'
+                  }`}
+                >
+                  #{tag}
+                </button>
+              ))}
+              {selectedTags.length > 0 && (
+                <button
+                  onClick={() => setSelectedTags([])}
+                  className="px-2 py-1 text-xs text-slate-400 hover:text-slate-600 transition-colors"
+                >
+                  초기화
+                </button>
+              )}
+            </div>
+          )}
+
           {/* Content Type Toggle */}
           <div className="flex gap-2">
             <button

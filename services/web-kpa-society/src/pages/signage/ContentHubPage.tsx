@@ -10,7 +10,7 @@
  *  - 커뮤니티 등록 / 본인 콘텐츠 삭제 지원
  */
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import {
   Search,
   AlertCircle,
@@ -95,11 +95,8 @@ export default function ContentHubPage() {
   // Filter state
   const [keyword, setKeyword] = useState('');
   const [debouncedKeyword, setDebouncedKeyword] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [page, setPage] = useState(1);
-
-  // Category list
-  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
 
   // Data
   const [items, setItems] = useState<MediaItem[]>([]);
@@ -129,11 +126,6 @@ export default function ContentHubPage() {
     }, 350);
   };
 
-  const handleCategoryChange = (cat: string) => {
-    setSelectedCategory(cat);
-    setPage(1);
-  };
-
   // Load media
   const loadMedia = useCallback(async () => {
     setLoading(true);
@@ -143,7 +135,6 @@ export default function ContentHubPage() {
         page,
         limit: PAGE_LIMIT,
         search: debouncedKeyword || undefined,
-        category: selectedCategory || undefined,
       });
       if (res.success && res.data) {
         setItems((res.data as any).items ?? []);
@@ -156,19 +147,9 @@ export default function ContentHubPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, debouncedKeyword, selectedCategory]);
+  }, [page, debouncedKeyword]);
 
   useEffect(() => { loadMedia(); }, [loadMedia]);
-
-  // Load categories once
-  useEffect(() => {
-    fetch(`${API_BASE}/api/signage/${SERVICE_KEY}/categories`, {
-      headers: getAccessToken() ? { Authorization: `Bearer ${getAccessToken()}` } : {},
-    })
-      .then(r => r.ok ? r.json() : null)
-      .then(json => { if (json?.data) setCategories(json.data); })
-      .catch(() => {});
-  }, []);
 
   // ── Auth fetch helper ──
   const apiFetch = useCallback(async (path: string, options?: RequestInit) => {
@@ -253,6 +234,23 @@ export default function ContentHubPage() {
     }
   };
 
+  // Tag helpers
+  const availableTags = useMemo(() => {
+    const all = items.flatMap((item) => item.tags ?? []);
+    return [...new Set(all)].sort();
+  }, [items]);
+
+  const toggleTag = (tag: string) => {
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+    );
+  };
+
+  const displayedItems = useMemo(() => {
+    if (selectedTags.length === 0) return items;
+    return items.filter((item) => selectedTags.some((tag) => (item.tags ?? []).includes(tag)));
+  }, [items, selectedTags]);
+
   const showToast = (msg: string, type: 'success' | 'error') => {
     setToast({ msg, type });
     setTimeout(() => setToast(null), 3000);
@@ -295,32 +293,44 @@ export default function ContentHubPage() {
       )}
 
       {/* Filter Bar */}
-      <div className="bg-white rounded-xl border border-slate-200 p-4">
-        {/* Keyword search + category */}
-        <div className="flex flex-wrap gap-2">
-          <div className="relative flex-1 min-w-[200px] max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input
-              type="text"
-              value={keyword}
-              onChange={(e) => handleKeywordChange(e.target.value)}
-              placeholder="제목 또는 설명으로 검색..."
-              className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-blue-400"
-            />
-          </div>
-          {categories.length > 0 && (
-            <select
-              value={selectedCategory}
-              onChange={(e) => handleCategoryChange(e.target.value)}
-              className="py-2 pl-3 pr-8 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-blue-400 bg-white"
-            >
-              <option value="">전체 카테고리</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.name}>{cat.name}</option>
-              ))}
-            </select>
-          )}
+      <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-3">
+        {/* Keyword search */}
+        <div className="relative max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <input
+            type="text"
+            value={keyword}
+            onChange={(e) => handleKeywordChange(e.target.value)}
+            placeholder="제목 또는 설명으로 검색..."
+            className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-blue-400"
+          />
         </div>
+        {/* Tag filter */}
+        {availableTags.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2">
+            {availableTags.map((tag) => (
+              <button
+                key={tag}
+                onClick={() => toggleTag(tag)}
+                className={`px-3 py-1 text-xs font-medium rounded-full border transition-colors ${
+                  selectedTags.includes(tag)
+                    ? 'bg-blue-600 text-white border-blue-600'
+                    : 'bg-white text-slate-600 border-slate-200 hover:border-blue-400'
+                }`}
+              >
+                #{tag}
+              </button>
+            ))}
+            {selectedTags.length > 0 && (
+              <button
+                onClick={() => setSelectedTags([])}
+                className="px-2 py-1 text-xs text-slate-400 hover:text-slate-600 transition-colors"
+              >
+                초기화
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Table */}
@@ -343,10 +353,10 @@ export default function ContentHubPage() {
             <AlertCircle className="h-5 w-5" />
             {error}
           </div>
-        ) : items.length === 0 ? (
+        ) : displayedItems.length === 0 ? (
           <div className="py-16 text-center text-sm text-slate-400 flex flex-col items-center gap-2">
             <VideoIcon className="h-8 w-8 text-slate-200" />
-            <p>등록된 콘텐츠가 없습니다</p>
+            <p>{selectedTags.length > 0 ? '선택한 태그에 해당하는 콘텐츠가 없습니다' : '등록된 콘텐츠가 없습니다'}</p>
             {user && (
               <button
                 onClick={() => { setCreateForm({ name: '', description: '', sourceUrl: '', category: '' }); setCreateError(null); setCreateModal({ type: 'media' }); }}
@@ -371,7 +381,7 @@ export default function ContentHubPage() {
                 </tr>
               </thead>
               <tbody>
-                {items.map((item) => {
+                {displayedItems.map((item) => {
                   const isOwn = !!user && item.source === 'community' && item.createdByUserId === user.id;
                   return (
                     <tr key={item.id} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
