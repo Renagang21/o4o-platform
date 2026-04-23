@@ -6,6 +6,9 @@
  *   - KPI 4칸: QR-only → 운영 혼합형 (자료실, 활성 QR, 진열 상품, 이번주 스캔)
  *   - 하단 콘텐츠 균형 조정 (마케팅 성과 → 홍보 성과 요약, 비중 축소)
  *   - 문구/섹션 제목 종합 홈 성격으로 보정
+ *
+ * WO-O4O-STORE-UX-STRUCTURE-ALIGNMENT-V1:
+ *   - "주요 바로가기" → "실행 흐름" 3-step 구조로 재편
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -125,40 +128,73 @@ export function StoreHomePage() {
         </div>
       </div>
 
-      {/* ── 주요 바로가기 ── */}
+      {/* ── 실행 흐름 (WO-O4O-STORE-UX-STRUCTURE-ALIGNMENT-V1) ── */}
       <div style={styles.section}>
-        <h2 style={styles.sectionTitle}>주요 바로가기</h2>
-        <div style={styles.quickGrid}>
-          <Link to="/store/operation/library" style={styles.quickCard}>
-            <BookOpen size={24} style={{ color: '#059669' }} />
-            <p style={styles.quickLabel}>자료실</p>
-            <p style={styles.quickDesc}>매장 자료 관리</p>
-          </Link>
-          <Link to="/store/marketing/qr" style={styles.quickCard}>
-            <QrCode size={24} style={{ color: colors.primary }} />
-            <p style={styles.quickLabel}>QR 관리</p>
-            <p style={styles.quickDesc}>QR 코드 생성 및 관리</p>
-          </Link>
-          <Link to="/store/marketing/pop" style={styles.quickCard}>
-            <Megaphone size={24} style={{ color: '#f59e0b' }} />
-            <p style={styles.quickLabel}>POP 자료</p>
-            <p style={styles.quickDesc}>POP 광고 PDF 생성</p>
-          </Link>
-          <Link to="/store/marketing/signage" style={styles.quickCard}>
-            <Monitor size={24} style={{ color: '#2563eb' }} />
-            <p style={styles.quickLabel}>사이니지</p>
-            <p style={styles.quickDesc}>디지털 디스플레이 관리</p>
-          </Link>
-          <Link to="/store/content/blog" style={styles.quickCard}>
-            <Newspaper size={24} style={{ color: '#ec4899' }} />
-            <p style={styles.quickLabel}>블로그</p>
-            <p style={styles.quickDesc}>약국 블로그 관리</p>
-          </Link>
-          <Link to="/store/commerce/products" style={styles.quickCard}>
-            <Package size={24} style={{ color: '#7c3aed' }} />
-            <p style={styles.quickLabel}>상품 관리</p>
-            <p style={styles.quickDesc}>B2B 상품 관리</p>
-          </Link>
+        <h2 style={styles.sectionTitle}>실행 흐름</h2>
+        <div style={styles.stepFlow}>
+
+          {/* Step 1: 상품 선택 */}
+          <div style={styles.stepGroup}>
+            <div style={styles.stepHeader}>
+              <span style={{ ...styles.stepBadge, backgroundColor: '#2563eb' }}>1</span>
+              <span style={{ ...styles.stepLabel, color: '#2563eb' }}>상품 선택</span>
+            </div>
+            <div style={styles.stepLinks}>
+              <Link to="/store/commerce/products" style={styles.stepLink}>
+                <Package size={16} style={{ color: '#7c3aed' }} />
+                <span>상품 관리</span>
+              </Link>
+            </div>
+          </div>
+
+          <div style={styles.stepDivider} />
+
+          {/* Step 2: 콘텐츠 만들기 */}
+          <div style={styles.stepGroup}>
+            <div style={styles.stepHeader}>
+              <span style={{ ...styles.stepBadge, backgroundColor: '#059669' }}>2</span>
+              <span style={{ ...styles.stepLabel, color: '#059669' }}>콘텐츠 만들기</span>
+            </div>
+            <div style={styles.stepLinks}>
+              <Link to="/store/operation/library" style={styles.stepLink}>
+                <BookOpen size={16} style={{ color: '#059669' }} />
+                <span>자료실</span>
+              </Link>
+              <Link to="/store/marketing/qr" style={styles.stepLink}>
+                <QrCode size={16} style={{ color: colors.primary }} />
+                <span>QR 관리</span>
+              </Link>
+              <Link to="/store/marketing/pop" style={styles.stepLink}>
+                <Megaphone size={16} style={{ color: '#f59e0b' }} />
+                <span>POP 자료</span>
+              </Link>
+              <Link to="/store/content/blog" style={styles.stepLink}>
+                <Newspaper size={16} style={{ color: '#ec4899' }} />
+                <span>블로그</span>
+              </Link>
+            </div>
+          </div>
+
+          <div style={styles.stepDivider} />
+
+          {/* Step 3: 매장에 적용하기 */}
+          <div style={styles.stepGroup}>
+            <div style={styles.stepHeader}>
+              <span style={{ ...styles.stepBadge, backgroundColor: '#7c3aed' }}>3</span>
+              <span style={{ ...styles.stepLabel, color: '#7c3aed' }}>매장에 적용하기</span>
+            </div>
+            <div style={styles.stepLinks}>
+              <Link to="/store/marketing/signage" style={styles.stepLink}>
+                <Monitor size={16} style={{ color: '#2563eb' }} />
+                <span>사이니지</span>
+              </Link>
+              <Link to="/store/channels" style={styles.stepLink}>
+                <BarChart3 size={16} style={{ color: '#7c3aed' }} />
+                <span>채널 관리</span>
+              </Link>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -444,34 +480,63 @@ const styles: Record<string, React.CSSProperties> = {
     marginTop: '2px',
   },
 
-  // Quick Actions — 3×2 grid
-  quickGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
-    gap: '12px',
-  },
-  quickCard: {
+  // 실행 흐름 — 3-step structure
+  stepFlow: {
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'column' as const,
+    gap: '0',
+  },
+  stepGroup: {
+    paddingTop: '12px',
+    paddingBottom: '12px',
+  },
+  stepHeader: {
+    display: 'flex',
     alignItems: 'center',
-    padding: '20px 12px',
+    gap: '8px',
+    marginBottom: '10px',
+  },
+  stepBadge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '22px',
+    height: '22px',
+    borderRadius: '50%',
+    fontSize: '11px',
+    fontWeight: 700,
+    color: '#fff',
+    flexShrink: 0,
+  },
+  stepLabel: {
+    fontSize: '13px',
+    fontWeight: 600,
+    letterSpacing: '0.02em',
+  },
+  stepLinks: {
+    display: 'flex',
+    flexWrap: 'wrap' as const,
+    gap: '8px',
+    paddingLeft: '30px',
+  },
+  stepLink: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '6px 14px',
     border: `1px solid ${colors.neutral200}`,
-    borderRadius: '10px',
+    borderRadius: '8px',
     backgroundColor: colors.neutral50,
     textDecoration: 'none',
-    textAlign: 'center',
-    transition: 'border-color 0.15s',
+    fontSize: '13px',
+    fontWeight: 500,
+    color: colors.neutral700,
     cursor: 'pointer',
+    transition: 'border-color 0.15s',
   },
-  quickLabel: {
-    fontSize: '14px',
-    fontWeight: 600,
-    color: colors.neutral800,
-    margin: '10px 0 2px',
-  },
-  quickDesc: {
-    fontSize: '11px',
-    color: colors.neutral500,
-    margin: 0,
+  stepDivider: {
+    height: '1px',
+    backgroundColor: colors.neutral100,
+    margin: '0',
   },
 };
