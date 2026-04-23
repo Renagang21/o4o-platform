@@ -103,8 +103,14 @@ export default function ContentLibraryPage() {
     onCopy: async (item) => {
       try {
         await apiClient.post('/api/v1/glycopharm/signage/my-signage', { contentId: item.id });
-      } catch {
-        // silently handle (toast is shown by template)
+        toast.success('내 콘텐츠에 추가되었습니다.');
+      } catch (e: any) {
+        const msg = e?.message || '';
+        if (msg.includes('DUPLICATE') || msg.includes('already')) {
+          toast.error('이미 가져간 콘텐츠입니다.');
+        } else {
+          toast.error('가져오기에 실패했습니다.');
+        }
       }
     },
     sourceLabels: GLYCO_SOURCE_LABELS,

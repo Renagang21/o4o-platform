@@ -125,8 +125,9 @@ export default function ForumHubPage() {
   const { isAuthenticated } = useAuth();
 
   const config: ForumHubConfig = {
-    title: 'GlycoPharm 포럼',
-    subtitle: '의약품과 건강기능식품에 대한 정보를 교환하고 토론에 참여하세요',
+    serviceKey: 'glycopharm',
+    heroTitle: 'GlycoPharm 포럼',
+    heroDesc: '의약품과 건강기능식품에 대한 정보를 교환하고 토론에 참여하세요',
     categoryPath: (id) => `/forum?category=${id}`,
     listPath: '/forum',
 

@@ -40,9 +40,9 @@ function ForumRequestButton() {
 
   const handleClick = () => {
     if (!isAuthenticated) {
-      navigate('/login', { state: { from: '/mypage/my-forums/request' } });
+      navigate('/login', { state: { from: '/forum/request' } });
     } else {
-      navigate('/mypage/my-forums/request');
+      navigate('/forum/request');
     }
   };
 
@@ -56,8 +56,9 @@ function ForumRequestButton() {
 // ─── KPA Config ────────────────────────────────────────────────────────────────
 
 const kpaForumConfig: ForumHubConfig = {
-  title: '💊 약사회 포럼',
-  subtitle: '약사 커뮤니티에서 정보를 교환하고 토론에 참여하세요',
+  serviceKey: 'kpa-society',
+  heroTitle: '💊 약사회 포럼',
+  heroDesc: '약사 커뮤니티에서 정보를 교환하고 토론에 참여하세요',
   categoryPath: (id) => `/forum/all?category=${id}`,
   listPath: '/forum/all',
 
@@ -83,11 +84,11 @@ const kpaForumConfig: ForumHubConfig = {
   renderWritePrompt: () => <ForumWritePrompt />,
 
   // WO-KPA-FORUM-REQUEST-BUTTON-ON-FORUM-V1: Hero 우측 개설신청 버튼
-  renderHeroAction: () => <ForumRequestButton />,
+  headerAction: <ForumRequestButton />,
 
   infoLinks: [
     { label: '포럼 목록', href: '/forum/all' },
-    { label: '포럼 개설 신청', href: '/mypage/my-forums/request' },
+    { label: '포럼 개설 신청', href: '/forum/request' },
     { label: '내 활동', href: '/mypage' },
     { label: '이용약관', href: '/policy' },
   ],

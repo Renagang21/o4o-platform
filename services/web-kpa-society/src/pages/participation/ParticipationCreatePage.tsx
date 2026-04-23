@@ -30,7 +30,26 @@ interface QuestionDraft extends Omit<ParticipationQuestion, 'id'> {
   tempId: string;
 }
 
-export function ParticipationCreatePage() {
+interface ParticipationCreatePageProps {
+  /** Override page title */
+  pageTitle?: string;
+  /** Override page description */
+  pageDescription?: string;
+  /** Override breadcrumb */
+  breadcrumb?: Array<{ label: string; href?: string }>;
+  /** Override cancel/success navigation target */
+  returnTo?: string;
+  /** Limit visible question type buttons */
+  allowedQuestionTypes?: QuestionType[];
+}
+
+export function ParticipationCreatePage({
+  pageTitle,
+  pageDescription,
+  breadcrumb,
+  returnTo,
+  allowedQuestionTypes,
+}: ParticipationCreatePageProps = {}) {
   const navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -179,7 +198,7 @@ export function ParticipationCreatePage() {
         status: asDraft ? ParticipationStatus.DRAFT : ParticipationStatus.ACTIVE,
       });
 
-      navigate('/participation');
+      navigate(returnTo ?? '/participation');
     } catch (err) {
       console.error('Failed to create participation set:', err);
       setError('저장 중 오류가 발생했습니다.');
@@ -191,9 +210,9 @@ export function ParticipationCreatePage() {
   return (
     <div style={styles.container}>
       <PageHeader
-        title="새 참여 만들기"
-        description="설문이나 퀴즈를 만들어보세요"
-        breadcrumb={[
+        title={pageTitle ?? "새 참여 만들기"}
+        description={pageDescription ?? "설문이나 퀴즈를 만들어보세요"}
+        breadcrumb={breadcrumb ?? [
           { label: '홈', href: '/' },
           { label: '참여', href: '/participation' },
           { label: '새로 만들기' },
@@ -337,30 +356,38 @@ export function ParticipationCreatePage() {
 
         {/* 질문 추가 버튼들 */}
         <div style={styles.addQuestionButtons}>
-          <button
-            onClick={() => addQuestion(QuestionType.SINGLE_CHOICE)}
-            style={styles.addQuestionButton}
-          >
-            + 단일 선택
-          </button>
-          <button
-            onClick={() => addQuestion(QuestionType.MULTIPLE_CHOICE)}
-            style={styles.addQuestionButton}
-          >
-            + 복수 선택
-          </button>
-          <button
-            onClick={() => addQuestion(QuestionType.FREE_TEXT)}
-            style={styles.addQuestionButton}
-          >
-            + 자유 응답
-          </button>
-          <button
-            onClick={() => addQuestion(QuestionType.QUIZ)}
-            style={styles.addQuestionButton}
-          >
-            + 퀴즈
-          </button>
+          {(!allowedQuestionTypes || allowedQuestionTypes.includes(QuestionType.SINGLE_CHOICE)) && (
+            <button
+              onClick={() => addQuestion(QuestionType.SINGLE_CHOICE)}
+              style={styles.addQuestionButton}
+            >
+              + 단일 선택
+            </button>
+          )}
+          {(!allowedQuestionTypes || allowedQuestionTypes.includes(QuestionType.MULTIPLE_CHOICE)) && (
+            <button
+              onClick={() => addQuestion(QuestionType.MULTIPLE_CHOICE)}
+              style={styles.addQuestionButton}
+            >
+              + 복수 선택
+            </button>
+          )}
+          {(!allowedQuestionTypes || allowedQuestionTypes.includes(QuestionType.FREE_TEXT)) && (
+            <button
+              onClick={() => addQuestion(QuestionType.FREE_TEXT)}
+              style={styles.addQuestionButton}
+            >
+              + 자유 응답
+            </button>
+          )}
+          {(!allowedQuestionTypes || allowedQuestionTypes.includes(QuestionType.QUIZ)) && (
+            <button
+              onClick={() => addQuestion(QuestionType.QUIZ)}
+              style={styles.addQuestionButton}
+            >
+              + 퀴즈
+            </button>
+          )}
         </div>
       </div>
 
@@ -464,7 +491,7 @@ export function ParticipationCreatePage() {
       {/* 저장 버튼 */}
       <div style={styles.actions}>
         <button
-          onClick={() => navigate('/participation')}
+          onClick={() => navigate(returnTo ?? '/participation')}
           style={styles.cancelButton}
           disabled={saving}
         >

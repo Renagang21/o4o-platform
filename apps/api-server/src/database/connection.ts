@@ -279,7 +279,6 @@ import {
   ServiceProduct, // WO-O4O-SERVICE-PRODUCT-LAYER-PREP-V1
   StorePlaylist, // WO-O4O-SIGNAGE-STORE-PLAYLIST-ENGINE-V1
   StorePlaylistItem, // WO-O4O-SIGNAGE-STORE-PLAYLIST-ENGINE-V1
-  KpaResource, // WO-KPA-RESOURCE-LIBRARY-AI-WORKFLOW-V1
   KpaApprovalRequest, // WO-TYPEORM-ENTITY-REGISTRATION-P1-FIX-V1
   KpaContent, // WO-TYPEORM-ENTITY-REGISTRATION-P1-FIX-V1
   KpaWorkingContent, // WO-TYPEORM-ENTITY-REGISTRATION-P1-FIX-V1
@@ -788,8 +787,6 @@ export const AppDataSource = new DataSource({
     // WO-O4O-SIGNAGE-STORE-PLAYLIST-ENGINE-V1
     StorePlaylist,
     StorePlaylistItem,
-    // WO-KPA-RESOURCE-LIBRARY-AI-WORKFLOW-V1
-    KpaResource,
     // WO-TYPEORM-ENTITY-REGISTRATION-P1-FIX-V1 (예방 등록)
     KpaApprovalRequest,
     KpaContent,

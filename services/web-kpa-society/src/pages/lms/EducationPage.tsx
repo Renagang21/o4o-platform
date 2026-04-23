@@ -38,8 +38,9 @@ export function EducationPage() {
   const { user } = useAuth();
 
   const config: LmsHubConfig = {
-    title: '강의',
-    subtitle: '보수교육, 온라인 세미나, 실무 강의',
+    serviceKey: 'kpa-society',
+    heroTitle: '강의',
+    heroDesc: '보수교육, 온라인 세미나, 실무 강의',
     courseDetailPath: (id) => `/lms/course/${id}`,
 
     fetchCourses: async (params) => {

@@ -19,8 +19,8 @@ function useGlycoResourcesConfig(): ResourcesHubConfig {
     serviceKey: 'glycopharm',
     tableId: 'glyco-resources',
 
-    title: '자료실',
-    subtitle: '자료를 저장하고 AI 작업에 활용하세요.',
+    heroTitle: '자료실',
+    heroDesc: '자료를 저장하고 AI 작업에 활용하세요.',
     searchPlaceholder: '자료를 검색하세요 (제목, 등록자)',
 
     fetchItems: async ({ page, limit, search }) => {

@@ -14,8 +14,8 @@ import { StoreHubTemplate, type StoreHubConfig } from '@o4o/shared-space-ui';
 const glycoStoreHubConfig: StoreHubConfig = {
   serviceKey: 'glycopharm',
 
-  summaryTitle: '매장 운영 허브',
-  summaryDesc: '혈당관리 전문 플랫폼이 제공하는 상품·콘텐츠·사이니지를 탐색하고, 내 매장으로 가져가 운영에 활용합니다.',
+  heroTitle: '매장 운영 허브',
+  heroDesc: '혈당관리 전문 플랫폼이 제공하는 상품·콘텐츠·사이니지를 탐색하고, 내 매장으로 가져가 운영에 활용합니다.',
   storeCta: {
     label: '내 약국 관리 →',
     href: '/store',

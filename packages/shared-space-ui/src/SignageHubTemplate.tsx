@@ -11,11 +11,10 @@
  *   2. Search/Filter  — 키워드 검색(350ms debounce) + 필터 탭 + 태그 칩
  *   3. Content Table  — 기본 테이블 (출처·유형 뱃지 + 액션) + 페이지네이션
  *   4. Info Block     — 하단 안내 (optional)
- *   5. Toast          — 내장 알림 (3초 자동 소멸)
  *
  * 핵심 경계:
  *   template  — 블록 순서, 레이아웃, 상태 관리, 기본 테이블 렌더링
- *   adapter   — fetchItems(), onCopy(), onDelete(), 뱃지 매핑
+ *   adapter   — fetchItems(), onCopy(), onDelete(), 뱃지 매핑, 알림(toast)
  */
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
@@ -131,14 +130,6 @@ export function SignageHubTemplate({ config }: { config: SignageHubConfig }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Toast
-  const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
-
-  const showToast = useCallback((msg: string, type: 'success' | 'error') => {
-    setToast({ msg, type });
-    setTimeout(() => setToast(null), 3000);
-  }, []);
-
   // Keyword debounce
   const handleKeywordChange = useCallback((v: string) => {
     setKeyword(v);
@@ -199,31 +190,15 @@ export function SignageHubTemplate({ config }: { config: SignageHubConfig }) {
     return items.filter((item) => selectedTags.some((tag) => (item.tags ?? []).includes(tag)));
   }, [items, selectedTags]);
 
-  // Copy handler
-  const handleCopy = useCallback(async (item: SignageHubItem) => {
-    if (!config.onCopy) return;
-    try {
-      await config.onCopy(item);
-      showToast('내 콘텐츠에 추가되었습니다.', 'success');
-    } catch (e: any) {
-      const msg = e?.message || '';
-      if (msg.includes('DUPLICATE') || msg.includes('already')) {
-        showToast('이미 가져간 콘텐츠입니다.', 'error');
-      } else {
-        showToast('가져오기에 실패했습니다.', 'error');
-      }
-    }
-  }, [config.onCopy, showToast]);
-
   const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
   const hasFilters = !!debouncedKeyword || activeFilter !== firstFilterKey || selectedTags.length > 0;
 
   const renderCtx: SignageHubRenderContext = useMemo(() => ({
-    onCopy: config.onCopy ? handleCopy : undefined,
+    onCopy: config.onCopy,
     onDelete: config.onDelete,
     sourceLabels: srcLabels,
     mediaTypeLabels: typeLabels,
-  }), [config.onCopy, config.onDelete, handleCopy, srcLabels, typeLabels]);
+  }), [config.onCopy, config.onDelete, srcLabels, typeLabels]);
 
   return (
     <div style={st.container}>
@@ -238,18 +213,6 @@ export function SignageHubTemplate({ config }: { config: SignageHubConfig }) {
           <div style={st.heroRight}>{config.headerAction}</div>
         )}
       </header>
-
-      {/* Toast */}
-      {toast && (
-        <div style={{
-          ...st.toast,
-          backgroundColor: toast.type === 'success' ? '#f0fdf4' : '#fef2f2',
-          borderColor: toast.type === 'success' ? '#bbf7d0' : '#fecaca',
-          color: toast.type === 'success' ? '#15803d' : '#b91c1c',
-        }}>
-          {toast.msg}
-        </div>
-      )}
 
       {/* ── Block 2: Search + Filter ──────────────────────────────────────── */}
       <div style={st.filterCard}>
@@ -330,7 +293,7 @@ export function SignageHubTemplate({ config }: { config: SignageHubConfig }) {
             items={displayedItems}
             srcLabels={srcLabels}
             typeLabels={typeLabels}
-            onCopy={config.onCopy ? handleCopy : undefined}
+            onCopy={config.onCopy}
             onDelete={config.onDelete}
           />
         )}
@@ -622,13 +585,6 @@ const st: Record<string, React.CSSProperties> = {
   heroRight: { flexShrink: 0 },
   heroTitle: { margin: 0, fontSize: '1.5rem', fontWeight: 700, color: NEUTRAL900 },
   heroDesc: { margin: '4px 0 0', fontSize: '0.875rem', color: NEUTRAL500 },
-
-  // Toast
-  toast: {
-    display: 'flex', alignItems: 'center', gap: '8px',
-    padding: '10px 14px', borderRadius: '8px',
-    border: '1px solid', fontSize: '14px', marginBottom: '16px',
-  },
 
   // Filter card
   filterCard: {

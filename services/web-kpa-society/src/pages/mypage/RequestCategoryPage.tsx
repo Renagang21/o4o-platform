@@ -175,10 +175,10 @@ export default function RequestCategoryPage() {
 
       <div className="mb-8">
         <NavLink
-          to="/mypage/my-forums"
+          to="/forum"
           className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-800 mb-4"
         >
-          <ArrowLeft className="w-4 h-4" />내 포럼으로 돌아가기
+          <ArrowLeft className="w-4 h-4" />포럼으로 돌아가기
         </NavLink>
         <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
           <MessageSquarePlus className="w-7 h-7 text-blue-600" />새 포럼 신청
@@ -421,7 +421,7 @@ export default function RequestCategoryPage() {
         {/* 버튼 */}
         <div className="flex gap-3">
           <NavLink
-            to="/mypage/my-forums"
+            to="/forum"
             className="flex-1 px-6 py-3 text-center text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors font-medium"
           >
             취소

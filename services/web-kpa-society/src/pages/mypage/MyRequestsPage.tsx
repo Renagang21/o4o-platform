@@ -204,7 +204,7 @@ export default function MyRequestsPage() {
         <div className="text-sm font-semibold text-blue-800 mb-2">새 신청하기</div>
         <div className="flex flex-wrap gap-2">
           <Link
-            to="/mypage/my-forums/request"
+            to="/forum/request"
             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-blue-200 rounded-lg text-sm text-blue-700 hover:bg-blue-100 transition-colors"
           >
             <MessageSquare className="w-3.5 h-3.5" />
@@ -258,7 +258,7 @@ export default function MyRequestsPage() {
           </h3>
           <p className="mt-1 text-sm text-slate-500">새 포럼이나 강좌를 신청하면 여기에 표시됩니다</p>
           <Link
-            to="/mypage/my-forums/request"
+            to="/forum/request"
             className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
           >
             <MessageSquare className="w-4 h-4" />새 포럼 신청
