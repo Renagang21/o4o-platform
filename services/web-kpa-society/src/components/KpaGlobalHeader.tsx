@@ -12,7 +12,7 @@
  */
 
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Settings } from 'lucide-react';
+import { LayoutDashboard, Settings, Shield } from 'lucide-react';
 import { GlobalHeader, GlobalHeaderMenuItem } from '@o4o/ui';
 import { useAuth, type User as UserType } from '../contexts';
 import { useAuthModal } from '../contexts/LoginModalContext';
@@ -93,6 +93,11 @@ export function KpaGlobalHeader() {
       utilitySlot={<ServiceSwitcher currentServiceKey="kpa-society" />}
       userMenuItems={
         <>
+          {(isOperator || isAdmin) && (
+            <GlobalHeaderMenuItem to="/operator" icon={<Shield className="w-4 h-4" />}>
+              운영 대시보드
+            </GlobalHeaderMenuItem>
+          )}
           <GlobalHeaderMenuItem to="/mypage" icon={<LayoutDashboard className="w-4 h-4" />}>
             마이페이지
           </GlobalHeaderMenuItem>

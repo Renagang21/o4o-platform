@@ -20,6 +20,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { HubPagination } from './HubPagination';
 
 // ─── Data Types ───────────────────────────────────────────────────────────────
 
@@ -318,16 +319,12 @@ export function ContentHubTemplate({ config }: { config: ContentHubConfig }) {
       )}
 
       {/* Pagination */}
-      {!loading && !error && totalPages > 1 && (
-        <div style={st.pagination}>
-          <PageButton onClick={() => setPage(1)} disabled={page === 1}>&laquo;</PageButton>
-          <PageButton onClick={() => setPage(p => p - 1)} disabled={page === 1}>&lsaquo;</PageButton>
-          {buildPageNumbers(page, totalPages).map(p => (
-            <PageButton key={p} onClick={() => setPage(p)} active={p === page}>{p}</PageButton>
-          ))}
-          <PageButton onClick={() => setPage(p => p + 1)} disabled={page === totalPages}>&rsaquo;</PageButton>
-          <PageButton onClick={() => setPage(totalPages)} disabled={page === totalPages}>&raquo;</PageButton>
-        </div>
+      {!loading && !error && (
+        <HubPagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+        />
       )}
 
       {/* ── Block 4: Usage/CTA ────────────────────────────────────────────── */}
@@ -535,29 +532,6 @@ function EmptyView({ hasFilters, emptyMessage, emptyFilteredMessage, activeFilte
   );
 }
 
-function PageButton({ onClick, disabled, active, children }: {
-  onClick: () => void; disabled?: boolean; active?: boolean; children: React.ReactNode;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      style={{ ...st.pageBtn, ...(active ? st.pageBtnActive : {}), ...(disabled ? st.pageBtnDisabled : {}) }}
-    >
-      {children}
-    </button>
-  );
-}
-
-function buildPageNumbers(current: number, total: number): number[] {
-  const maxVisible = 5;
-  let start = Math.max(1, current - Math.floor(maxVisible / 2));
-  const end = Math.min(total, start + maxVisible - 1);
-  if (end - start + 1 < maxVisible) start = Math.max(1, end - maxVisible + 1);
-  const pages: number[] = [];
-  for (let i = start; i <= end; i++) pages.push(i);
-  return pages;
-}
 
 // ─── Style Constants ──────────────────────────────────────────────────────────
 
@@ -693,21 +667,6 @@ const st: Record<string, React.CSSProperties> = {
     textDecoration: 'none', display: 'inline-block',
   },
   copiedLabel: { fontSize: '12px', fontWeight: 500, color: '#059669' },
-
-  // Pagination
-  pagination: {
-    display: 'flex', justifyContent: 'center',
-    alignItems: 'center', gap: '4px', padding: '24px 0',
-  },
-  pageBtn: {
-    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-    minWidth: '36px', height: '36px', padding: '0 8px',
-    fontSize: '14px', fontWeight: 500, color: '#475569',
-    backgroundColor: WHITE, border: `1px solid ${NEUTRAL200}`,
-    borderRadius: '6px', cursor: 'pointer', transition: 'all 0.15s',
-  } as React.CSSProperties,
-  pageBtnActive: { backgroundColor: PRIMARY, color: WHITE, borderColor: PRIMARY },
-  pageBtnDisabled: { color: NEUTRAL300, cursor: 'default', opacity: 0.5 },
 
   // Usage/CTA
   usageBlock: {

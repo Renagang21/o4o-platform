@@ -18,6 +18,7 @@
  */
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { HubPagination } from './HubPagination';
 
 // ─── Data Types ───────────────────────────────────────────────────────────────
 
@@ -299,17 +300,12 @@ export function SignageHubTemplate({ config }: { config: SignageHubConfig }) {
         )}
 
         {/* Pagination */}
-        {!loading && !error && totalPages > 1 && (
-          <div style={st.pagination}>
-            <span style={st.pageInfo}>{page} / {totalPages} 페이지</span>
-            <div style={st.pageButtons}>
-              <PageButton onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}>&lsaquo;</PageButton>
-              {buildPageNumbers(page, totalPages).map(p => (
-                <PageButton key={p} onClick={() => setPage(p)} active={p === page}>{p}</PageButton>
-              ))}
-              <PageButton onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}>&rsaquo;</PageButton>
-            </div>
-          </div>
+        {!loading && !error && (
+          <HubPagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
         )}
       </div>
 
@@ -530,34 +526,6 @@ function EmptyView({ hasFilters, emptyMessage, emptyFilteredMessage }: {
       </p>
     </div>
   );
-}
-
-function PageButton({ onClick, disabled, active, children }: {
-  onClick: () => void; disabled?: boolean; active?: boolean; children: React.ReactNode;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      style={{
-        ...st.pageBtn,
-        ...(active ? st.pageBtnActive : {}),
-        ...(disabled ? st.pageBtnDisabled : {}),
-      }}
-    >
-      {children}
-    </button>
-  );
-}
-
-function buildPageNumbers(current: number, total: number): number[] {
-  const maxVisible = 5;
-  let start = Math.max(1, current - Math.floor(maxVisible / 2));
-  const end = Math.min(total, start + maxVisible - 1);
-  if (end - start + 1 < maxVisible) start = Math.max(1, end - maxVisible + 1);
-  const pages: number[] = [];
-  for (let i = start; i <= end; i++) pages.push(i);
-  return pages;
 }
 
 // ─── Style Constants ──────────────────────────────────────────────────────────

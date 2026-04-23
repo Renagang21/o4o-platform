@@ -8,6 +8,10 @@ export { CtaGuidanceSection } from './CtaGuidanceSection';
 export { SignagePreviewSection } from './SignagePreviewSection';
 export { ContentHighlightSection } from './ContentHighlightSection';
 
+/* HUB common components */
+export { HubPagination } from './HubPagination';
+export type { HubPaginationProps } from './HubPagination';
+
 /* HUB page templates */
 export { LmsHubTemplate } from './LmsHubTemplate';
 export type { LmsHubCourse, LmsHubFetchParams, LmsHubConfig } from './LmsHubTemplate';
