@@ -21,7 +21,8 @@ import { useState, useEffect } from 'react';
 import { HeroBannerSection } from '../components/community/HeroBannerSection';
 import { homeApi } from '../api/home';
 import type { HomePageData } from '../api/home';
-import { colors, spacing } from '../styles/theme';
+import { colors } from '../styles/theme';
+import { PageHero, PageSection } from '@o4o/ui';
 import {
   NewsNoticesSection,
   AppEntrySection,
@@ -113,13 +114,13 @@ export function CommunityHomePage() {
   return (
     <div style={styles.page}>
       {/* 1. Hero 배너 (동적 광고 캐러셀 — KPA 고유) */}
-      <div style={{ marginBottom: spacing.xxl }}>
+      <PageHero>
         <HeroBannerSection ads={data?.heroAds ?? []} />
-      </div>
+      </PageHero>
 
       <div style={styles.content}>
         {/* 2. 공지 / 약사공론 뉴스 (2-column) */}
-        <section style={twoColStyles.section}>
+        <PageSection>
           <div style={twoColStyles.row} className="kpa-home-two-col">
             {/* Left: 공지사항 */}
             <div style={twoColStyles.col}>
@@ -151,37 +152,38 @@ export function CommunityHomePage() {
               </div>
             </div>
           </div>
-        </section>
+        </PageSection>
 
         {/* 4. 서비스 바로가기 (shared) */}
-        <AppEntrySection
-          cards={[
-            { title: '포럼', description: '동료 약사와 질문·토론으로 전문성을 높이세요', href: '/forum', icon: <ForumIcon /> },
-            { title: '강의', description: '보수교육·세미나를 온라인으로 수강하세요', href: '/lms', icon: <EducationIconSvg /> },
-            { title: '콘텐츠', description: '플랫폼 콘텐츠를 검색하고 활용하세요', href: '/content', icon: <ContentIcon /> },
-            { title: '디지털 사이니지', description: '약국 디지털 미디어를 관리하세요', href: '/signage', icon: <SignageIcon /> },
-            { title: '자료실', description: '자료를 저장하고 AI 작업에 활용하세요', href: '/resources', icon: <ResourceLibraryIcon /> },
-          ]}
-        />
+        <PageSection>
+          <AppEntrySection
+            cards={[
+              { title: '포럼', description: '동료 약사와 질문·토론으로 전문성을 높이세요', href: '/forum', icon: <ForumIcon /> },
+              { title: '강의', description: '보수교육·세미나를 온라인으로 수강하세요', href: '/lms', icon: <EducationIconSvg /> },
+              { title: '콘텐츠', description: '플랫폼 콘텐츠를 검색하고 활용하세요', href: '/content', icon: <ContentIcon /> },
+              { title: '디지털 사이니지', description: '약국 디지털 미디어를 관리하세요', href: '/signage', icon: <SignageIcon /> },
+              { title: '자료실', description: '자료를 저장하고 AI 작업에 활용하세요', href: '/resources', icon: <ResourceLibraryIcon /> },
+            ]}
+          />
+        </PageSection>
 
         {/* 5. Market Trial CTA (shared) */}
-        <CtaGuidanceSection
-          title="Market Trial"
-          description="서비스 참여자와 함께 제품을 다듬고, 좋은 조건의 유통 환경을 만들어가는 참여형 프로그램"
-          href="https://neture.co.kr"
-          linkLabel="Neture에서 보기 →"
-          icon={<span>🧪</span>}
-          external
-        />
+        <PageSection last>
+          <CtaGuidanceSection
+            title="Market Trial"
+            description="서비스 참여자와 함께 제품을 다듬고, 좋은 조건의 유통 환경을 만들어가는 참여형 프로그램"
+            href="https://neture.co.kr"
+            linkLabel="Neture에서 보기 →"
+            icon={<span>🧪</span>}
+            external
+          />
+        </PageSection>
       </div>
     </div>
   );
 }
 
 const twoColStyles: Record<string, React.CSSProperties> = {
-  section: {
-    marginBottom: 32,
-  },
   row: {
     display: 'flex',
     gap: 16,
@@ -233,7 +235,7 @@ const styles: Record<string, React.CSSProperties> = {
   content: {
     maxWidth: '960px',
     margin: '0 auto',
-    padding: `${spacing.md} ${spacing.lg} ${spacing.sectionGap}`,
+    padding: '16px 24px 32px',
   },
 };
 
