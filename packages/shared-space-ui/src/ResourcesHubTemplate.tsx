@@ -221,7 +221,7 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
         prev.set('page', '1');
         return prev;
       });
-    }, 500);
+    }, 350);
   };
 
   const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {

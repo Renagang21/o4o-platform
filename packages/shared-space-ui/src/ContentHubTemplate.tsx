@@ -18,7 +18,7 @@
  *   adapter   — fetchItems(), loadCopiedIds(), onCopy() — 서비스별 API + 응답 변환
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
 // ─── Data Types ───────────────────────────────────────────────────────────────
@@ -137,6 +137,7 @@ export function ContentHubTemplate({ config }: { config: ContentHubConfig }) {
   const [copiedIds, setCopiedIds] = useState<Set<string>>(new Set());
   const [copyingId, setCopyingId] = useState<string | null>(null);
   const [justCopiedId, setJustCopiedId] = useState<string | null>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Initial copied IDs (service-specific adapter)
   useEffect(() => {
@@ -172,12 +173,19 @@ export function ContentHubTemplate({ config }: { config: ContentHubConfig }) {
     setJustCopiedId(null);
   };
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSearchQuery(searchInput.trim());
-    setPage(1);
-    setJustCopiedId(null);
+  const handleSearchChange = (value: string) => {
+    setSearchInput(value);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      setSearchQuery(value.trim());
+      setPage(1);
+      setJustCopiedId(null);
+    }, 350);
   };
+
+  useEffect(() => {
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+  }, []);
 
   const handleClearSearch = () => {
     setSearchInput('');
@@ -233,16 +241,15 @@ export function ContentHubTemplate({ config }: { config: ContentHubConfig }) {
 
       {/* ── Block 2: Search + Filter ──────────────────────────────────────── */}
       {config.showSearch !== false && (
-        <form style={st.searchForm} onSubmit={handleSearch}>
+        <div style={st.searchForm}>
           <input
             type="text"
             value={searchInput}
-            onChange={e => setSearchInput(e.target.value)}
+            onChange={e => handleSearchChange(e.target.value)}
             placeholder={config.searchPlaceholder ?? '콘텐츠 검색'}
             style={st.searchInput}
           />
-          <button type="submit" style={st.searchBtn}>검색</button>
-        </form>
+        </div>
       )}
 
       {config.filters && config.filters.length > 1 && (
@@ -580,12 +587,6 @@ const st: Record<string, React.CSSProperties> = {
     border: `1px solid ${NEUTRAL200}`, borderRadius: '6px',
     outline: 'none', backgroundColor: WHITE, boxSizing: 'border-box',
   } as React.CSSProperties,
-  searchBtn: {
-    padding: '8px 18px', fontSize: '14px', fontWeight: 500,
-    color: WHITE, backgroundColor: PRIMARY,
-    border: 'none', borderRadius: '6px', cursor: 'pointer', whiteSpace: 'nowrap',
-  } as React.CSSProperties,
-
   // Filter
   filterBar: { display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' } as React.CSSProperties,
   filterBtn: {

@@ -56,7 +56,20 @@ const styles: Record<string, React.CSSProperties> = {
   error: { color: '#ef4444', fontSize: 13 },
 };
 
-export default function CourseNewPage() {
+interface CourseNewPageProps {
+  /** Override page title (default: "새 강의 만들기") */
+  pageTitle?: string;
+  /** Override back link text (default: "← 강의 목록") */
+  backLinkText?: string;
+  /** Override cancel/back navigation target (default: "/instructor/courses") */
+  returnTo?: string;
+}
+
+export default function CourseNewPage({
+  pageTitle,
+  backLinkText,
+  returnTo,
+}: CourseNewPageProps = {}) {
   const navigate = useNavigate();
   const [form, setForm] = useState({ title: '', description: '', level: 'beginner' as CourseLevel });
   const [tags, setTags] = useState<string[]>([]);
@@ -101,8 +114,8 @@ export default function CourseNewPage() {
 
   return (
     <div style={styles.page}>
-      <span style={styles.backLink} onClick={() => navigate('/instructor/courses')}>← 강의 목록</span>
-      <h1 style={styles.title}>새 강의 만들기</h1>
+      <span style={styles.backLink} onClick={() => navigate(returnTo ?? '/instructor/courses')}>{backLinkText ?? '← 강의 목록'}</span>
+      <h1 style={styles.title}>{pageTitle ?? '새 강의 만들기'}</h1>
 
       <form style={styles.form} onSubmit={handleSubmit}>
         <div style={styles.field}>
@@ -164,7 +177,7 @@ export default function CourseNewPage() {
         {error && <p style={styles.error}>{error}</p>}
 
         <div style={styles.actions}>
-          <button type="button" style={styles.cancelBtn} onClick={() => navigate('/instructor/courses')}>
+          <button type="button" style={styles.cancelBtn} onClick={() => navigate(returnTo ?? '/instructor/courses')}>
             취소
           </button>
           <button type="submit" style={styles.submitBtn(!isValid || submitting)} disabled={!isValid || submitting}>

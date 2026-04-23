@@ -10,7 +10,7 @@
  *   <LmsHubTemplate config={serviceConfig} />
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Link2 } from 'lucide-react';
 import {
@@ -102,6 +102,7 @@ export function LmsHubTemplate({ config }: { config: LmsHubConfig }) {
   const currentPage = parseInt(searchParams.get('page') || '1');
   const currentSearch = searchParams.get('search') || '';
   const [searchInput, setSearchInput] = useState(currentSearch);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const loadCourses = useCallback(async () => {
     setLoading(true);
@@ -125,15 +126,22 @@ export function LmsHubTemplate({ config }: { config: LmsHubConfig }) {
 
   // ── Handlers ──
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSearchParams((prev) => {
-      if (searchInput.trim()) prev.set('search', searchInput.trim());
-      else prev.delete('search');
-      prev.set('page', '1');
-      return prev;
-    });
+  const handleSearchChange = (value: string) => {
+    setSearchInput(value);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      setSearchParams((prev) => {
+        if (value.trim()) prev.set('search', value.trim());
+        else prev.delete('search');
+        prev.set('page', '1');
+        return prev;
+      });
+    }, 350);
   };
+
+  useEffect(() => {
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+  }, []);
 
   const handlePageChange = (page: number) => {
     setSearchParams((prev) => {
@@ -257,16 +265,15 @@ export function LmsHubTemplate({ config }: { config: LmsHubConfig }) {
         </div>
 
         {/* Search bar */}
-        <form onSubmit={handleSearch} style={styles.searchRow}>
+        <div style={styles.searchRow}>
           <input
             type="text"
             value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
             placeholder="강의 검색..."
             style={styles.searchInput}
           />
-          <button type="submit" style={styles.searchBtn}>검색</button>
-        </form>
+        </div>
 
         {/* Bulk ActionBar (선택 시에만 표시) */}
         {selectedKeys.size > 0 && (
@@ -395,17 +402,6 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: '8px',
     fontSize: '14px',
     outline: 'none',
-  },
-  searchBtn: {
-    padding: '10px 20px',
-    backgroundColor: '#2563eb',
-    color: '#ffffff',
-    border: 'none',
-    borderRadius: '8px',
-    fontSize: '14px',
-    fontWeight: 500,
-    cursor: 'pointer',
-    flexShrink: 0,
   },
   tableWrap: {
     backgroundColor: '#ffffff',

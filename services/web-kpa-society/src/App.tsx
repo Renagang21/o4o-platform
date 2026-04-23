@@ -54,6 +54,7 @@ import {
   ParticipationCreatePage,
   ParticipationRespondPage,
   ParticipationResultPage,
+  QuestionType,
 } from './pages/participation';
 
 // Event Offer pages
@@ -169,7 +170,7 @@ import { PaymentFailPage } from './pages/storefront/PaymentFailPage';
 import { PublicContentViewPage, PrintContentPage } from './pages/content';
 
 // Contents Hub (WO-KPA-CONTENT-HUB-FOUNDATION-V1 / WO-CONTENT-HUB-STRUCTURE-AND-TABLE-FOUNDATION-V1)
-import { ContentListPage, ContentDetailPage, ContentWritePage, ContentTypeSelectPage, ContentCreatorPlaceholder } from './pages/contents';
+import { ContentListPage, ContentDetailPage, ContentWritePage, ContentTypeSelectPage } from './pages/contents';
 
 // QR Landing Page (WO-O4O-QR-LANDING-PAGE-V1)
 import QrLandingPage from './pages/qr/QrLandingPage';
@@ -550,10 +551,52 @@ function App() {
           <Route path="/content/new" element={<Layout serviceName={SERVICE_NAME}><ContentTypeSelectPage /></Layout>} />
           {/* 문서 제작기 (기존 RichTextEditor) */}
           <Route path="/content/write" element={<Layout serviceName={SERVICE_NAME}><ContentWritePage /></Layout>} />
-          {/* 비문서 타입 제작기 (준비 중 placeholder) */}
-          <Route path="/content/new/survey" element={<Layout serviceName={SERVICE_NAME}><ContentCreatorPlaceholder type="설문" /></Layout>} />
-          <Route path="/content/new/quiz" element={<Layout serviceName={SERVICE_NAME}><ContentCreatorPlaceholder type="퀴즈" /></Layout>} />
-          <Route path="/content/new/lecture" element={<Layout serviceName={SERVICE_NAME}><ContentCreatorPlaceholder type="강의" /></Layout>} />
+          {/* 설문 제작기 — ParticipationCreatePage (survey mode) */}
+          <Route path="/content/new/survey" element={
+            <Layout serviceName={SERVICE_NAME}>
+              <ParticipationCreatePage
+                pageTitle="새 설문 만들기"
+                pageDescription="구성원 의견을 수집하는 설문을 만듭니다"
+                breadcrumb={[
+                  { label: '홈', href: '/' },
+                  { label: '콘텐츠', href: '/content' },
+                  { label: '타입 선택', href: '/content/new' },
+                  { label: '설문 만들기' },
+                ]}
+                returnTo="/content/new"
+                allowedQuestionTypes={[QuestionType.SINGLE_CHOICE, QuestionType.MULTIPLE_CHOICE, QuestionType.FREE_TEXT]}
+              />
+            </Layout>
+          } />
+          {/* 퀴즈 제작기 — ParticipationCreatePage (quiz mode) */}
+          <Route path="/content/new/quiz" element={
+            <Layout serviceName={SERVICE_NAME}>
+              <ParticipationCreatePage
+                pageTitle="새 퀴즈 만들기"
+                pageDescription="지식을 테스트하는 퀴즈를 만듭니다"
+                breadcrumb={[
+                  { label: '홈', href: '/' },
+                  { label: '콘텐츠', href: '/content' },
+                  { label: '타입 선택', href: '/content/new' },
+                  { label: '퀴즈 만들기' },
+                ]}
+                returnTo="/content/new"
+                allowedQuestionTypes={[QuestionType.QUIZ]}
+              />
+            </Layout>
+          } />
+          {/* 코스형 자료 제작기 — CourseNewPage (content context) */}
+          <Route path="/content/new/course" element={
+            <Layout serviceName={SERVICE_NAME}>
+              <CourseNewPage
+                pageTitle="새 코스형 자료 만들기"
+                backLinkText="← 타입 선택으로"
+                returnTo="/content/new"
+              />
+            </Layout>
+          } />
+          {/* 레거시 리다이렉트: /content/new/lecture → /content/new/course */}
+          <Route path="/content/new/lecture" element={<Navigate to="/content/new/course" replace />} />
           <Route path="/content/:id" element={<Layout serviceName={SERVICE_NAME}><ContentDetailPage /></Layout>} />
           <Route path="/content/:id/edit" element={<Layout serviceName={SERVICE_NAME}><ContentWritePage /></Layout>} />
 
@@ -629,6 +672,7 @@ function App() {
 
           {/* Participation (참여) */}
           <Route path="/participation" element={<Layout serviceName={SERVICE_NAME}><ParticipationListPage /></Layout>} />
+          <Route path="/participation/create" element={<Layout serviceName={SERVICE_NAME}><ParticipationCreatePage /></Layout>} />
           <Route path="/participation/:id/respond" element={<Layout serviceName={SERVICE_NAME}><ParticipationRespondPage /></Layout>} />
           <Route path="/participation/:id/results" element={<Layout serviceName={SERVICE_NAME}><ParticipationResultPage /></Layout>} />
 

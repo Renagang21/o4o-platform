@@ -7,4 +7,4 @@
 export { ContentListPage } from './ContentListPage';
 export { ContentDetailPage } from './ContentDetailPage';
 export { ContentWritePage } from './ContentWritePage';
-export { ContentTypeSelectPage, ContentCreatorPlaceholder } from './ContentTypeSelectPage';
+export { ContentTypeSelectPage } from './ContentTypeSelectPage';

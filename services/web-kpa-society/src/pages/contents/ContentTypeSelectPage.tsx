@@ -2,18 +2,19 @@
  * ContentTypeSelectPage — 콘텐츠 타입 선택
  *
  * WO-CONTENT-HUB-STRUCTURE-AND-TABLE-FOUNDATION-V1
+ * WO-KPA-CONTENT-CREATE-TYPE-CARDS-EXPANSION-AND-RENAMING-V1
  *
  * /content/new → 타입 선택 화면
- *   - 문서  → /content/write (RichTextEditor)
- *   - 설문  → /content/new/survey (준비 중)
- *   - 퀴즈  → /content/new/quiz (준비 중)
- *   - 강의  → /content/new/lecture (준비 중)
+ *   - 문서       → /content/write (RichTextEditor)
+ *   - 설문       → /content/new/survey (ParticipationCreatePage)
+ *   - 퀴즈       → /content/new/quiz (ParticipationCreatePage — quiz mode)
+ *   - 코스형 자료 → /content/new/course (CourseNewPage)
  *
  * content_type은 생성 시 확정되며 이후 변경 불가.
  */
 
 import { useNavigate } from 'react-router-dom';
-import { FileText, ClipboardList, HelpCircle, GraduationCap, ArrowLeft, Clock } from 'lucide-react';
+import { FileText, ClipboardList, HelpCircle, GraduationCap, ArrowLeft } from 'lucide-react';
 
 // ─── Type Cards ──────────────────────────────────────────────
 
@@ -37,22 +38,22 @@ const TYPE_CARDS: TypeCard[] = [
     label: '설문',
     description: '구성원 의견을 수집하는 설문을 만듭니다',
     icon: <ClipboardList size={28} />,
-    available: false,
+    available: true,
     route: '/content/new/survey',
   },
   {
     label: '퀴즈',
     description: '지식을 테스트하는 퀴즈를 만듭니다',
     icon: <HelpCircle size={28} />,
-    available: false,
+    available: true,
     route: '/content/new/quiz',
   },
   {
-    label: '강의',
-    description: '동영상·자료를 포함한 강의를 제작합니다',
+    label: '코스형 자료',
+    description: '주제가 있는 분량 많은 콘텐츠를 목록형으로 구성하여 제작합니다',
     icon: <GraduationCap size={28} />,
-    available: false,
-    route: '/content/new/lecture',
+    available: true,
+    route: '/content/new/course',
   },
 ];
 
@@ -89,34 +90,8 @@ export function ContentTypeSelectPage() {
             </div>
             <div style={styles.cardLabel}>{card.label}</div>
             <div style={styles.cardDesc}>{card.description}</div>
-            {!card.available && (
-              <div style={styles.comingSoon}>
-                <Clock size={12} />
-                준비 중
-              </div>
-            )}
           </button>
         ))}
-      </div>
-    </div>
-  );
-}
-
-// ─── ContentCreatorPlaceholder ───────────────────────────────
-// 설문 / 퀴즈 / 강의 제작기 준비 중 페이지
-
-export function ContentCreatorPlaceholder({ type }: { type: string }) {
-  const navigate = useNavigate();
-
-  return (
-    <div style={styles.page}>
-      <button onClick={() => navigate('/content/new')} style={styles.back}>
-        <ArrowLeft size={16} /> 타입 선택으로
-      </button>
-      <div style={styles.placeholder}>
-        <Clock size={40} style={{ color: '#94a3b8', marginBottom: 16 }} />
-        <h2 style={styles.placeholderTitle}>{type} 제작기 준비 중</h2>
-        <p style={styles.placeholderDesc}>현재 개발 중입니다. 곧 만나보실 수 있습니다.</p>
       </div>
     </div>
   );
@@ -205,33 +180,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '0.875rem',
     color: '#64748b',
     lineHeight: 1.5,
-  },
-  comingSoon: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: 4,
-    marginTop: 12,
-    fontSize: '0.75rem',
-    color: '#94a3b8',
-  },
-  placeholder: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: '40vh',
-    textAlign: 'center',
-  },
-  placeholderTitle: {
-    fontSize: '1.25rem',
-    fontWeight: 700,
-    color: '#334155',
-    margin: '0 0 8px',
-  },
-  placeholderDesc: {
-    fontSize: '0.9375rem',
-    color: '#64748b',
-    margin: 0,
   },
 };
 
