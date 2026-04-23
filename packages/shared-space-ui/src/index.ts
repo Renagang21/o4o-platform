@@ -21,6 +21,9 @@ export type { StoreHubResourceCard, StoreHubFlowStep, StoreHubConfig, StoreHubTe
 export { ContentHubTemplate } from './ContentHubTemplate';
 export type { ContentHubItem, ContentHubFilter, ContentHubFetchParams, ContentHubFetchResult, ContentHubItemContext, ContentHubConfig } from './ContentHubTemplate';
 
+export { ResourcesHubTemplate } from './ResourcesHubTemplate';
+export type { ResourcesHubItem, ResourcesHubFetchParams, ResourcesHubFetchResult, ResourcesHubConfig } from './ResourcesHubTemplate';
+
 export type {
   /* Data types */
   NoticeItem,
