@@ -268,7 +268,7 @@ export default function ContentHubPage() {
         <div>
           <h1 className="text-2xl font-bold text-slate-800">안내 영상 · 자료</h1>
           <p className="text-slate-500 mt-1 text-sm">
-            약사회 및 커뮤니티에서 제공하는 안내·교육 영상을 탐색하고 내 매장에서 활용하세요
+            영상과 플레이리스트를 검색하고 활용하세요
           </p>
         </div>
         {user && (

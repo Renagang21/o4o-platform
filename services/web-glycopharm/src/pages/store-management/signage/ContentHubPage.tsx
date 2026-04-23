@@ -230,9 +230,9 @@ export default function ContentHubPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-800">디지털 사이니지 콘텐츠</h1>
+        <h1 className="text-2xl font-bold text-slate-800">안내 영상 · 자료</h1>
         <p className="text-slate-500 mt-1">
-          동영상과 플레이리스트를 탐색할 수 있습니다
+          영상과 플레이리스트를 검색하고 활용하세요
         </p>
       </div>
 
@@ -261,7 +261,7 @@ export default function ContentHubPage() {
               }`}
             >
               <VideoIcon className="h-4 w-4" />
-              동영상
+              개별 영상
             </button>
           </div>
 
