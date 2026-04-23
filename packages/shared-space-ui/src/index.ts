@@ -15,6 +15,9 @@ export type { LmsHubCourse, LmsHubFetchParams, LmsHubConfig } from './LmsHubTemp
 export { ForumHubTemplate } from './ForumHubTemplate';
 export type { ForumHubCategory, ForumHubPost, ForumHubConfig } from './ForumHubTemplate';
 
+export { StoreHubTemplate } from './StoreHubTemplate';
+export type { StoreHubResourceCard, StoreHubFlowStep, StoreHubConfig, StoreHubTemplateProps } from './StoreHubTemplate';
+
 export type {
   /* Data types */
   NoticeItem,

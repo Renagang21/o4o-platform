@@ -2818,6 +2818,9 @@ importers:
       '@o4o/ui':
         specifier: workspace:*
         version: link:../ui
+      lucide-react:
+        specifier: '>=0.300.0'
+        version: 0.523.0(react@19.2.0)
       react:
         specifier: 19.2.0
         version: 19.2.0
