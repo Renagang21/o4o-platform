@@ -13,7 +13,6 @@ import { MyPageNavigation } from '@o4o/account-ui';
 import { KPA_MYPAGE_NAV_ITEMS } from './navItems';
 import {
   MessageSquare,
-  MessageSquarePlus,
   ExternalLink,
   Loader2,
   AlertCircle,
@@ -150,16 +149,7 @@ export default function MyForumDashboardPage() {
         <p className="text-slate-500 mt-1">내가 운영하는 포럼을 관리합니다</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-        <Link to="/mypage/my-forums/request" className="flex items-center gap-3 p-4 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition-colors">
-          <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-            <MessageSquarePlus className="w-5 h-5 text-blue-700" />
-          </div>
-          <div>
-            <div className="font-semibold text-blue-800">포럼 개설 신청</div>
-            <div className="text-sm text-blue-600">새로운 포럼을 요청합니다</div>
-          </div>
-        </Link>
+      <div className="grid grid-cols-1 gap-3 mb-6">
         <Link to="/forum" className="flex items-center gap-3 p-4 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors">
           <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
             <ExternalLink className="w-5 h-5 text-slate-600" />
@@ -171,9 +161,9 @@ export default function MyForumDashboardPage() {
         </Link>
       </div>
 
-      {/* 신청 내역 안내 → 통합 신청함 */}
+      {/* 신청 내역 안내 → 통합 신청함 (WO-MYPAGE-STATE-BASED-IA-REDEFINITION-V1) */}
       <div className="mb-6 p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
-        <div className="text-sm text-slate-600">포럼 신청 내역은 <strong>내 신청</strong> 탭에서 확인하세요</div>
+        <div className="text-sm text-slate-600">포럼 개설 신청 및 진행 상태는 <strong>내 신청</strong> 탭에서 확인하세요</div>
         <Link to="/mypage/my-requests?entityType=forum_category" className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors">
           내 신청 바로가기 →
         </Link>

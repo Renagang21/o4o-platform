@@ -6,6 +6,8 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { MyPageNavigation } from '@o4o/account-ui';
+import { KPA_MYPAGE_NAV_ITEMS } from './navItems';
 import {
   qualificationApi,
   getQualificationLabel,
@@ -102,6 +104,7 @@ export function MyQualificationsPage() {
 
   return (
     <div style={styles.container}>
+      <MyPageNavigation items={KPA_MYPAGE_NAV_ITEMS} />
       <h1 style={styles.title}>내 자격</h1>
 
       {error && <div style={styles.errorBanner}>{error}</div>}

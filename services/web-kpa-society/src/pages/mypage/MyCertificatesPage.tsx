@@ -1,5 +1,6 @@
 /**
- * MyCertificatesPage - 수료증 관리 페이지
+ * MyCertificatesPage - 학습 결과 페이지 (수료증 관리)
+ * WO-MYPAGE-STATE-BASED-IA-REDEFINITION-V1: 이수현황 → 학습 결과 명칭 변경
  */
 
 import { useState, useEffect } from 'react';
@@ -110,12 +111,12 @@ export function MyCertificatesPage() {
   return (
     <div style={styles.container}>
       <PageHeader
-        title="이수현황"
-        description="수료한 교육 과정의 수료증을 확인하세요"
+        title="학습 결과"
+        description="수료한 교육 과정의 수료증과 학습 결과를 확인하세요"
         breadcrumb={[
           { label: '홈', href: '/' },
           { label: '마이페이지', href: `/mypage` },
-          { label: '이수현황' },
+          { label: '학습 결과' },
         ]}
       />
       <MyPageNavigation items={KPA_MYPAGE_NAV_ITEMS} />

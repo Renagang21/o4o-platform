@@ -56,10 +56,14 @@ export interface LmsHubFetchParams {
 // ─── Config Interface ─────────────────────────────────────────────────────────
 
 export interface LmsHubConfig {
-  /** 페이지 제목 */
-  title: string;
-  /** 페이지 부제 */
-  subtitle: string;
+  serviceKey: string;
+
+  /** Block 1: Hero */
+  heroTitle: string;
+  heroDesc: string;
+  /** Hero 우측 액션 버튼 슬롯 */
+  headerAction?: React.ReactNode;
+
   /** 강의 상세 경로 생성 함수 */
   courseDetailPath: (courseId: string) => string;
   /** 강의 목록 조회 함수 — 서비스별 API 어댑터 */
@@ -246,9 +250,10 @@ export function LmsHubTemplate({ config }: { config: LmsHubConfig }) {
         {/* Header */}
         <div style={styles.header}>
           <div>
-            <h1 style={styles.title}>{config.title}</h1>
-            <p style={styles.subtitle}>{config.subtitle}</p>
+            <h1 style={styles.title}>{config.heroTitle}</h1>
+            <p style={styles.subtitle}>{config.heroDesc}</p>
           </div>
+          {config.headerAction}
         </div>
 
         {/* Search bar */}

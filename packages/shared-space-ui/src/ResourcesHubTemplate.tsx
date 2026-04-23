@@ -37,12 +37,12 @@ import type { O4OColumn, ActionBarAction, RowActionItem } from '@o4o/ui';
 import {
   Search,
   ExternalLink,
-  FileText,
   Download,
   File,
   Link2,
   Trash2,
   Plus,
+  Heart,
 } from 'lucide-react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -63,6 +63,9 @@ export interface ResourcesHubItem {
   actionType?: 'view' | 'download' | 'external';
   // Correction 2: 파일 형식 — 미제공 시 source_file_name 확장자에서 자동 파생
   fileType?: 'pdf' | 'image' | 'doc' | 'video' | 'etc';
+  // WO-KPA-RESOURCES-MINOR-REFINEMENT-V1: 좋아요
+  like_count?: number;
+  isRecommendedByMe?: boolean;
 }
 
 export interface ResourcesHubFetchParams {
@@ -82,8 +85,10 @@ export interface ResourcesHubConfig {
   tableId: string;
 
   // Block 1: Hero / Intro
-  title?: string;
-  subtitle?: string;
+  heroTitle?: string;
+  heroDesc?: string;
+  /** Hero 우측 액션 버튼 슬롯 */
+  headerAction?: React.ReactNode;
 
   // Block 2: Search
   searchPlaceholder?: string;
@@ -98,9 +103,6 @@ export interface ResourcesHubConfig {
 
   // Operator: create — omit to hide create button
   createAction?: { label: string; href: string };
-
-  // Hero 우측 커스텀 액션 (createAction 대신 사용, auth 로직 포함 가능)
-  renderHeroAction?: () => React.ReactNode;
 
   // Operator: row edit/delete — omit to disable
   getEditHref?: (id: string) => string;
@@ -119,6 +121,9 @@ export interface ResourcesHubConfig {
 
   // Hide bulk delete action even if onDelete is provided
   hideBulkDelete?: boolean;
+
+  // WO-KPA-RESOURCES-MINOR-REFINEMENT-V1: 좋아요 토글
+  onToggleRecommend?: (id: string) => Promise<{ recommendCount: number; isRecommendedByMe: boolean }>;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -286,6 +291,22 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
     }
   }, [config, selectedKeys, loadData]);
 
+  // ─── Like toggle ─────────────────────────────────────────────────────────
+
+  const handleToggleRecommend = useCallback(async (id: string) => {
+    if (!config.onToggleRecommend) return;
+    try {
+      const res = await config.onToggleRecommend(id);
+      setItems(prev => prev.map(item =>
+        item.id === id
+          ? { ...item, like_count: res.recommendCount, isRecommendedByMe: res.isRecommendedByMe }
+          : item,
+      ));
+    } catch {
+      // adapter handles error display
+    }
+  }, [config]);
+
   // ─── Columns ─────────────────────────────────────────────────────────────
 
   const columns = useMemo((): O4OColumn<ResourcesHubItem>[] => {
@@ -348,6 +369,28 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
           <span style={{ color: '#6B7280', fontSize: 13 }}>{row.view_count ?? 0}</span>
         ),
       },
+      // WO-KPA-RESOURCES-MINOR-REFINEMENT-V1: 좋아요 컬럼
+      ...(config.onToggleRecommend ? [{
+        key: 'like_count' as keyof ResourcesHubItem,
+        header: '좋아요',
+        width: 70,
+        align: 'center' as const,
+        sortable: true,
+        sortAccessor: (row: ResourcesHubItem) => row.like_count ?? 0,
+        render: (_v: unknown, row: ResourcesHubItem) => (
+          <button
+            onClick={(e) => { e.stopPropagation(); handleToggleRecommend(row.id); }}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 3,
+              background: 'none', border: 'none', cursor: 'pointer', padding: '2px 4px',
+              color: row.isRecommendedByMe ? '#EF4444' : '#9CA3AF', fontSize: 13,
+            }}
+          >
+            <Heart size={14} fill={row.isRecommendedByMe ? '#EF4444' : 'none'} />
+            {row.like_count ?? 0}
+          </button>
+        ),
+      }] : []),
       {
         key: '_actions' as keyof ResourcesHubItem,
         header: '',
@@ -398,7 +441,7 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
         },
       },
     ];
-  }, [config, navigate, openDrawer, handleDeleteItem]);
+  }, [config, navigate, openDrawer, handleDeleteItem, handleToggleRecommend]);
 
   // ─── Bulk ActionBar ───────────────────────────────────────────────────────
 
@@ -438,10 +481,10 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
       {/* Block 1: Hero / Intro */}
       <div style={st.header}>
         <div>
-          <h1 style={st.title}>{config.title ?? '자료실'}</h1>
-          {config.subtitle && <p style={st.subtitle}>{config.subtitle}</p>}
+          <h1 style={st.title}>{config.heroTitle ?? '자료실'}</h1>
+          {config.heroDesc && <p style={st.subtitle}>{config.heroDesc}</p>}
         </div>
-        {config.renderHeroAction?.() ?? (
+        {config.headerAction ?? (
           config.createAction && (
             <button onClick={() => navigate(config.createAction!.href)} style={st.createBtn}>
               <Plus size={16} />
@@ -482,16 +525,6 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
             {config.loadingMessage ?? '자료를 불러오는 중...'}
           </p>
         </div>
-      ) : items.length === 0 ? (
-        <div style={st.center}>
-          <FileText size={40} color="#D1D5DB" />
-          <p style={{ color: '#6B7280', marginTop: 12, fontSize: 15, textAlign: 'center' }}>
-            {searchQuery
-              ? (config.emptyFilteredMessage ?? '검색 결과가 없습니다.')
-              : (config.emptyMessage ?? '등록된 자료가 없습니다.')}
-          </p>
-          {!searchQuery && config.renderEmptyAction?.()}
-        </div>
       ) : (
         <>
           <BaseTable<ResourcesHubItem>
@@ -503,21 +536,27 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
             selectable
             selectedKeys={selectedKeys}
             onSelectionChange={setSelectedKeys}
-            emptyMessage={config.emptyMessage ?? '등록된 자료가 없습니다.'}
+            emptyMessage={
+              searchQuery
+                ? (config.emptyFilteredMessage ?? '검색 결과가 없습니다.')
+                : (config.emptyMessage ?? '등록된 자료가 없습니다.')
+            }
             rowClassName={() => config.fetchDetail ? 'cursor-pointer' : ''}
           />
-          <div style={{ marginTop: 20 }}>
-            <ContentPagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={(page) =>
-                setSearchParams(prev => { prev.set('page', String(page)); return prev; })
-              }
-              showItemRange
-              totalItems={totalItems}
-              pageSize={limit}
-            />
-          </div>
+          {totalPages > 1 && (
+            <div style={{ marginTop: 20 }}>
+              <ContentPagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={(page) =>
+                  setSearchParams(prev => { prev.set('page', String(page)); return prev; })
+                }
+                showItemRange
+                totalItems={totalItems}
+                pageSize={limit}
+              />
+            </div>
+          )}
         </>
       )}
 

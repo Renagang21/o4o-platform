@@ -199,6 +199,20 @@ export default function MyRequestsPage() {
         </div>
       )}
 
+      {/* WO-MYPAGE-STATE-BASED-IA-REDEFINITION-V1: 새 신청하기 섹션 */}
+      <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+        <div className="text-sm font-semibold text-blue-800 mb-2">새 신청하기</div>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            to="/mypage/my-forums/request"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-blue-200 rounded-lg text-sm text-blue-700 hover:bg-blue-100 transition-colors"
+          >
+            <MessageSquare className="w-3.5 h-3.5" />
+            포럼 개설 신청
+          </Link>
+        </div>
+      </div>
+
       {/* Type filter tabs */}
       <div className="flex gap-2 mb-4 flex-wrap">
         {ENTITY_TYPE_TABS.map(tab => (

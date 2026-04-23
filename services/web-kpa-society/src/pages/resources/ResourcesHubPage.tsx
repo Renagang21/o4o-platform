@@ -75,8 +75,8 @@ function useKpaResourcesConfig(isOperator: boolean): ResourcesHubConfig {
     serviceKey: 'kpa-society',
     tableId: 'kpa-resources',
 
-    title: '자료실',
-    subtitle: '회원들이 함께 이용하는 공동자료실입니다.',
+    heroTitle: '자료실',
+    heroDesc: '회원들이 함께 이용하는 공동자료실입니다.',
     searchPlaceholder: '자료를 검색하세요 (제목, 내용, 등록자)',
 
     fetchItems: async ({ page, limit, search }) => {
@@ -96,8 +96,14 @@ function useKpaResourcesConfig(isOperator: boolean): ResourcesHubConfig {
 
     trackView: (id) => { resourcesApi.trackView(id).catch(() => {}); },
 
+    // WO-KPA-RESOURCES-MINOR-REFINEMENT-V1: 좋아요 토글
+    onToggleRecommend: async (id) => {
+      const res = await resourcesApi.toggleRecommend(id);
+      return res.data;
+    },
+
     // WO-KPA-RESOURCES-UPLOAD-BUTTON-ON-RESOURCES-V1: 모든 사용자에게 등록 버튼 노출
-    renderHeroAction: () => <ResourceUploadButton variant="hero" />,
+    headerAction: <ResourceUploadButton variant="hero" />,
     renderEmptyAction: () => <ResourceUploadButton variant="empty" />,
 
     // Operator-only: row edit/delete

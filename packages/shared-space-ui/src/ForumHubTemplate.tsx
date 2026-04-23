@@ -49,10 +49,11 @@ export interface ForumHubPost {
 // ─── Config Interface ─────────────────────────────────────────────────────────
 
 export interface ForumHubConfig {
-  /** 페이지 제목 */
-  title: string;
-  /** 페이지 부제 */
-  subtitle: string;
+  serviceKey: string;
+
+  /** Block 1: Hero */
+  heroTitle: string;
+  heroDesc: string;
 
   /** 카테고리 상세 경로 생성 */
   categoryPath: (categoryId: string) => string;
@@ -118,11 +119,8 @@ export interface ForumHubConfig {
    */
   renderWritePrompt?: () => React.ReactNode;
 
-  /**
-   * Hero 우측 액션 버튼.
-   * KPA: () => <ForumRequestButton /> (포럼 개설신청)
-   */
-  renderHeroAction?: () => React.ReactNode;
+  /** Hero 우측 액션 버튼 슬롯 */
+  headerAction?: React.ReactNode;
 }
 
 // ─── Default Category Section ─────────────────────────────────────────────────
@@ -416,10 +414,10 @@ export function ForumHubTemplate({ config, isAuthenticated = false }: ForumHubTe
           <PageContainer>
             <div style={pageSt.heroRow}>
               <div>
-                <h1 style={pageSt.heroTitle}>{config.title}</h1>
-                <p style={pageSt.heroDesc}>{config.subtitle}</p>
+                <h1 style={pageSt.heroTitle}>{config.heroTitle}</h1>
+                <p style={pageSt.heroDesc}>{config.heroDesc}</p>
               </div>
-              {config.renderHeroAction?.()}
+              {config.headerAction}
             </div>
           </PageContainer>
         </div>

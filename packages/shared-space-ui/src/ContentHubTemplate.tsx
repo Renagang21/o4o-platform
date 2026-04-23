@@ -76,6 +76,8 @@ export interface ContentHubConfig {
   /** Block 1: Hero */
   heroTitle: string;
   heroDesc: string;
+  /** Hero 우측 액션 버튼 슬롯 */
+  headerAction?: React.ReactNode;
 
   /** Block 2: Search/Filter */
   showSearch?: boolean;
@@ -222,8 +224,11 @@ export function ContentHubTemplate({ config }: { config: ContentHubConfig }) {
 
       {/* ── Block 1: Hero ─────────────────────────────────────────────────── */}
       <header style={st.hero}>
-        <h1 style={st.heroTitle}>{config.heroTitle}</h1>
-        <p style={st.heroDesc}>{config.heroDesc}</p>
+        <div>
+          <h1 style={st.heroTitle}>{config.heroTitle}</h1>
+          <p style={st.heroDesc}>{config.heroDesc}</p>
+        </div>
+        {config.headerAction}
       </header>
 
       {/* ── Block 2: Search + Filter ──────────────────────────────────────── */}
@@ -564,7 +569,7 @@ const st: Record<string, React.CSSProperties> = {
   container: { maxWidth: '1100px', margin: '0 auto', padding: '24px' },
 
   // Hero
-  hero: { marginBottom: '20px', paddingBottom: '16px', borderBottom: `2px solid ${NEUTRAL200}` },
+  hero: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px', paddingBottom: '16px', borderBottom: `2px solid ${NEUTRAL200}` },
   heroTitle: { margin: 0, fontSize: '1.5rem', fontWeight: 700, color: NEUTRAL900 },
   heroDesc: { margin: '6px 0 0', fontSize: '0.875rem', color: NEUTRAL500 },
 

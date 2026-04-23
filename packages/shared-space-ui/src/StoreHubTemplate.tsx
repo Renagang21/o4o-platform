@@ -44,9 +44,11 @@ export interface StoreHubFlowStep {
 export interface StoreHubConfig {
   serviceKey: string;
 
-  /** Summary Block */
-  summaryTitle: string;
-  summaryDesc: string;
+  /** Block 1: Hero */
+  heroTitle: string;
+  heroDesc: string;
+  /** Hero 우측 액션 버튼 슬롯 */
+  headerAction?: React.ReactNode;
   storeCta: {
     label: string;
     href: string;
@@ -96,8 +98,9 @@ export interface StoreHubTemplateProps {
 
 export function StoreHubTemplate({ config }: StoreHubTemplateProps) {
   const {
-    summaryTitle,
-    summaryDesc,
+    heroTitle,
+    heroDesc,
+    headerAction,
     storeCta,
     resourceSectionTitle = '자원 탐색',
     resourceSectionDesc = '플랫폼 자원을 탐색하고 내 매장으로 가져가세요',
@@ -116,15 +119,18 @@ export function StoreHubTemplate({ config }: StoreHubTemplateProps) {
   return (
     <div style={st.page}>
 
-      {/* ── Block 1: Summary ───────────────────────────────────────────────── */}
+      {/* ── Block 1: Hero ────────────────────────────────────────────────── */}
       <section style={st.summaryBlock}>
         <div style={st.summaryTextWrap}>
-          <h1 style={st.summaryTitle}>{summaryTitle}</h1>
-          <p style={st.summaryDesc}>{summaryDesc}</p>
+          <h1 style={st.summaryTitle}>{heroTitle}</h1>
+          <p style={st.summaryDesc}>{heroDesc}</p>
         </div>
-        <Link to={storeCta.href} style={st.storeCta}>
-          {storeCta.label}
-        </Link>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+          {headerAction}
+          <Link to={storeCta.href} style={st.storeCta}>
+            {storeCta.label}
+          </Link>
+        </div>
       </section>
 
       {/* ── Block 2: Resource Discovery ────────────────────────────────────── */}

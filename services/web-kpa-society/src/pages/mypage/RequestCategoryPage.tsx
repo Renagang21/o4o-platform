@@ -140,7 +140,7 @@ export default function RequestCategoryPage() {
       }
       setIsSubmitting(false);
       setIsSuccess(true);
-      setTimeout(() => navigate('/mypage/my-forums'), 3000);
+      setTimeout(() => navigate('/mypage/my-requests?entityType=forum_category'), 3000);
     } catch {
       setSubmitError('신청 중 오류가 발생했습니다. 다시 시도해주세요.');
       setIsSubmitting(false);
@@ -157,7 +157,7 @@ export default function RequestCategoryPage() {
           <h2 className="mt-4 text-xl font-bold text-slate-800">신청이 완료되었습니다</h2>
           <p className="mt-2 text-slate-500">
             관리자 검토 후 결과를 알려드리겠습니다.
-            <br />내 포럼 페이지로 이동합니다...
+            <br />내 신청에서 진행 상태를 확인할 수 있습니다.
           </p>
         </div>
       </div>
@@ -413,7 +413,7 @@ export default function RequestCategoryPage() {
             <ul className="mt-1 space-y-1 list-disc list-inside text-blue-600">
               <li>신청 후 관리자 검토까지 1-2일이 소요될 수 있습니다</li>
               <li>유사한 포럼이 이미 있는 경우 거절될 수 있습니다</li>
-              <li>신청 결과는 내 포럼 페이지에서 확인할 수 있습니다</li>
+              <li>신청 결과는 내 신청 탭에서 확인할 수 있습니다</li>
             </ul>
           </div>
         </div>

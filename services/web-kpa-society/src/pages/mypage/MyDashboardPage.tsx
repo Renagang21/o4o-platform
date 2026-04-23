@@ -321,7 +321,11 @@ export function MyDashboardPage() {
         </Link>
         <Link to={`/mypage/certificates`} style={styles.quickLink}>
           <span style={styles.quickLinkIcon}>🎓</span>
-          <span>이수현황</span>
+          <span>학습 결과</span>
+        </Link>
+        <Link to={`/mypage/qualifications`} style={styles.quickLink}>
+          <span style={styles.quickLinkIcon}>📜</span>
+          <span>내 자격</span>
         </Link>
         <Link to={`/mypage/settings`} style={styles.quickLink}>
           <span style={styles.quickLinkIcon}>⚙️</span>
