@@ -148,7 +148,7 @@ export class SignageMediaRepository {
   async findMediaLibrary(
     scope: ScopeFilter,
     mediaType?: string,
-    category?: string,
+    _category?: string,
     search?: string,
     limit: number = 50,
   ): Promise<{

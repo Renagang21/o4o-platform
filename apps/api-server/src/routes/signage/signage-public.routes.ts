@@ -17,7 +17,6 @@ interface PublicQueryParams {
   limit?: string;
   page?: string;
   search?: string;
-  category?: string;
 }
 
 /**
@@ -41,7 +40,7 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
   router.get('/media', async (req: Request, res: Response, next: NextFunction) => {
     try {
       const serviceKey = req.params.serviceKey;
-      const { source, limit = '20', page = '1', search, category } = req.query as PublicQueryParams;
+      const { source, limit = '20', page = '1', search } = req.query as PublicQueryParams;
 
       const limitNum = Math.min(parseInt(limit) || 20, 50);
       const pageNum = parseInt(page) || 1;
@@ -63,11 +62,6 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
         conditions.push(`(m.name ILIKE $${params.length} OR m.description ILIKE $${params.length})`);
       }
 
-      if (category && category.trim()) {
-        params.push(category.trim());
-        conditions.push(`m.category = $${params.length}`);
-      }
-
       const whereClause = conditions.join(' AND ');
 
       const limitIndex = params.length + 1;
@@ -76,7 +70,7 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
 
       const media = await dataSource.query(`
         SELECT
-          m.id, m.name, m.description, m.category,
+          m.id, m.name, m.description,
           m."mediaType", m."sourceUrl" as url, m."thumbnailUrl",
           m.duration, m.tags, m.metadata, m.source, m."createdByUserId",
           m."createdAt", m."updatedAt",

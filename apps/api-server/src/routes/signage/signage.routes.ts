@@ -279,74 +279,7 @@ export function createSignageRoutes(dataSource: DataSource): Router {
   // WO-O4O-CONTENT-SNAPSHOT-UNIFICATION-V1: clone routes removed
   // Content copy is now handled via asset-snapshot-copy (assetSnapshotApi.copy)
 
-  // ========== Category Routes (WO-O4O-SIGNAGE-CONTENT-CENTERED-REFACTOR-V1 Phase 4) ==========
-  // GET /api/signage/:serviceKey/categories — list categories (operator sees all, others see active only)
-  router.get('/categories', allowSignageStoreRead, async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { serviceKey } = req.params;
-      const userRoles: string[] = (req as any).user?.roles || [];
-      const isOperator = userRoles.some((r: string) => ['operator', 'admin', 'super_admin', 'kpa:operator', 'kpa:admin'].includes(r));
-      const activeFilter = isOperator ? '' : `AND "isActive" = true`;
-      const rows = await dataSource.query(
-        `SELECT id, name, "sortOrder", "isActive", "createdAt" FROM signage_categories WHERE "serviceKey" = $1 ${activeFilter} ORDER BY "sortOrder", name`,
-        [serviceKey],
-      );
-      res.json({ data: rows });
-    } catch (error) { next(error); }
-  });
-
-  // POST /api/signage/:serviceKey/categories — create category (operator only)
-  router.post('/categories', requireSignageOperator, async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { serviceKey } = req.params;
-      const { name, sortOrder = 0 } = req.body;
-      if (!name?.trim()) { res.status(400).json({ error: 'name required' }); return; }
-      const rows = await dataSource.query(
-        `INSERT INTO signage_categories ("serviceKey", name, "sortOrder") VALUES ($1, $2, $3)
-         ON CONFLICT ("serviceKey", name) DO UPDATE SET "sortOrder" = $3, "isActive" = true, "updatedAt" = NOW()
-         RETURNING id, name, "sortOrder"`,
-        [serviceKey, name.trim(), sortOrder],
-      );
-      res.status(201).json({ data: rows[0] });
-    } catch (error) { next(error); }
-  });
-
-  // PATCH /api/signage/:serviceKey/categories/:id — update isActive or sortOrder (operator only)
-  router.patch('/categories/:id', requireSignageOperator, async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { serviceKey, id } = req.params;
-      const { isActive, sortOrder } = req.body;
-      const sets: string[] = [`"updatedAt" = NOW()`];
-      const params: any[] = [id, serviceKey];
-      if (isActive !== undefined) {
-        params.push(isActive);
-        sets.push(`"isActive" = $${params.length}`);
-      }
-      if (sortOrder !== undefined) {
-        params.push(sortOrder);
-        sets.push(`"sortOrder" = $${params.length}`);
-      }
-      if (sets.length === 1) { res.status(400).json({ error: 'Nothing to update' }); return; }
-      const rows = await dataSource.query(
-        `UPDATE signage_categories SET ${sets.join(', ')} WHERE id = $1 AND "serviceKey" = $2 RETURNING id, name, "sortOrder", "isActive"`,
-        params,
-      );
-      if (!rows.length) { res.status(404).json({ error: 'Category not found' }); return; }
-      res.json({ data: rows[0] });
-    } catch (error) { next(error); }
-  });
-
-  // DELETE /api/signage/:serviceKey/categories/:id — deactivate category (operator only)
-  router.delete('/categories/:id', requireSignageOperator, async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { serviceKey, id } = req.params;
-      await dataSource.query(
-        `UPDATE signage_categories SET "isActive" = false, "updatedAt" = NOW() WHERE id = $1 AND "serviceKey" = $2`,
-        [id, serviceKey],
-      );
-      res.json({ success: true });
-    } catch (error) { next(error); }
-  });
+  // WO-O4O-SIGNAGE-CATEGORY-FIELD-REMOVAL-PHASE2-V1: /categories CRUD removed (tag-only model)
 
   return router;
 }

@@ -101,13 +101,13 @@ export class SignageMediaService {
   async getMediaLibrary(
     scope: ScopeFilter,
     mediaType?: string,
-    category?: string,
+    _category?: string,
     search?: string,
   ): Promise<MediaLibraryResponseDto> {
     const { platform, organization } = await this.repository.findMediaLibrary(
       scope,
       mediaType,
-      category,
+      undefined,
       search,
     );
 
