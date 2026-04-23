@@ -24,6 +24,9 @@ export type { ContentHubItem, ContentHubFilter, ContentHubFetchParams, ContentHu
 export { ResourcesHubTemplate } from './ResourcesHubTemplate';
 export type { ResourcesHubItem, ResourcesHubFetchParams, ResourcesHubFetchResult, ResourcesHubConfig } from './ResourcesHubTemplate';
 
+export { SignageHubTemplate } from './SignageHubTemplate';
+export type { SignageHubItem, SignageHubFilter, SignageHubFetchParams, SignageHubFetchResult, SignageHubRenderContext, SignageHubConfig } from './SignageHubTemplate';
+
 export type {
   /* Data types */
   NoticeItem,

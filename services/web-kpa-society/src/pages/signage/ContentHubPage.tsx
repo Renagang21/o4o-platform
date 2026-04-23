@@ -1,44 +1,46 @@
 /**
- * Signage Content Hub Page — Table UI
+ * Signage Content Hub Page — KPA-Society
  *
  * WO-O4O-SIGNAGE-CONTENT-CENTERED-REFACTOR-V1
- *
- * 구조:
- *  - Media 중심 (Playlist 글로벌 노출 제거)
- *  - Table 기반 리스트 + 필터 (소스 / 키워드 / 카테고리)
- *  - 가져가기 (assetSnapshotApi.copy) 중심
- *  - 커뮤니티 등록 / 본인 콘텐츠 삭제 지원
+ * WO-O4O-SIGNAGE-HUB-TEMPLATE-FOUNDATION-V1:
+ *   인라인 구현 → SignageHubTemplate + kpaSignageConfig 구조로 전환.
+ *   커뮤니티 등록 모달 / 삭제 확인 모달은 서비스 코드에 보존.
  */
 
-import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
-import {
-  Search,
-  AlertCircle,
-  PlusCircle,
-  X,
-  ExternalLink,
-  Download,
-  Trash2,
-  ChevronLeft,
-  ChevronRight,
-  Video as VideoIcon,
-  Globe,
-  Tag,
-} from 'lucide-react';
+import { useState, useCallback } from 'react';
+import { SignageHubTemplate } from '@o4o/shared-space-ui';
+import type { SignageHubConfig, SignageHubItem } from '@o4o/shared-space-ui';
 import { publicContentApi } from '../../lib/api/signageV2';
 import { assetSnapshotApi } from '../../api/assetSnapshot';
 import { getAccessToken, useAuth } from '../../contexts/AuthContext';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 const SERVICE_KEY = 'kpa-society';
-const PAGE_LIMIT = 20;
 
 const DEFAULT_TAG_SUGGESTIONS = [
   '복약지도', '당뇨', '혈압', '면역', '건강기능식품',
   '의약외품', '이벤트', '프로모션', '신제품', '추천상품',
 ];
 
-// ─── Types ─────────────────────────────────────────────
+// ─── Badge Mappings ───────────────────────────────────────
+
+const KPA_SOURCE_LABELS: Record<string, { label: string; bg: string; text: string }> = {
+  hq:        { label: '운영자',  bg: '#dbeafe', text: '#1d4ed8' },
+  community: { label: '커뮤니티', bg: '#dcfce7', text: '#15803d' },
+  supplier:  { label: '공급자',  bg: '#fef3c7', text: '#b45309' },
+};
+
+const KPA_MEDIA_TYPE_LABELS: Record<string, { label: string; bg: string; text: string }> = {
+  youtube:   { label: 'YouTube',   bg: '#fee2e2', text: '#b91c1c' },
+  video:     { label: '영상',      bg: '#f3e8ff', text: '#7e22ce' },
+  image:     { label: '이미지',    bg: '#e0f2fe', text: '#0369a1' },
+  url:       { label: 'URL',       bg: '#f1f5f9', text: '#475569' },
+  html:      { label: 'HTML',      bg: '#ffedd5', text: '#c2410c' },
+  text:      { label: '텍스트',    bg: '#ccfbf1', text: '#0f766e' },
+  rich_text: { label: 'Rich Text', bg: '#ccfbf1', text: '#0f766e' },
+};
+
+// ─── Types ────────────────────────────────────────────────
 
 interface MediaItem {
   id: string;
@@ -56,109 +58,27 @@ interface MediaItem {
   creatorName?: string;
 }
 
-// ─── Badges ────────────────────────────────────────────
-
-const SOURCE_LABEL: Record<string, { label: string; cls: string }> = {
-  hq:        { label: '운영자',  cls: 'bg-blue-100 text-blue-700' },
-  community: { label: '커뮤니티', cls: 'bg-green-100 text-green-700' },
-  supplier:  { label: '공급자',  cls: 'bg-amber-100 text-amber-700' },
-};
-
-const MEDIA_TYPE_LABEL: Record<string, { label: string; cls: string }> = {
-  youtube:   { label: 'YouTube', cls: 'bg-red-100 text-red-700' },
-  video:     { label: '영상',    cls: 'bg-purple-100 text-purple-700' },
-  image:     { label: '이미지',  cls: 'bg-sky-100 text-sky-700' },
-  url:       { label: 'URL',     cls: 'bg-slate-100 text-slate-600' },
-  html:      { label: 'HTML',    cls: 'bg-orange-100 text-orange-700' },
-  text:      { label: '텍스트',  cls: 'bg-teal-100 text-teal-700' },
-  rich_text: { label: 'Rich Text', cls: 'bg-teal-100 text-teal-700' },
-};
-
-function SourceBadge({ source }: { source: string }) {
-  const cfg = SOURCE_LABEL[source] ?? { label: source, cls: 'bg-slate-100 text-slate-600' };
-  return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${cfg.cls}`}>
-      {cfg.label}
-    </span>
-  );
-}
-
-function TypeBadge({ type }: { type: string }) {
-  const cfg = MEDIA_TYPE_LABEL[type] ?? { label: type, cls: 'bg-slate-100 text-slate-600' };
-  return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${cfg.cls}`}>
-      {cfg.label}
-    </span>
-  );
-}
-
-// ─── Main Component ────────────────────────────────────
+// ─── Main Component ───────────────────────────────────────
 
 export default function ContentHubPage() {
   const { user } = useAuth();
 
-  // Filter state
-  const [keyword, setKeyword] = useState('');
-  const [debouncedKeyword, setDebouncedKeyword] = useState('');
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [page, setPage] = useState(1);
-
-  // Data
-  const [items, setItems] = useState<MediaItem[]>([]);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // Toast
-  const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
-
   // Modals
+  const [createModal, setCreateModal] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [createModal, setCreateModal] = useState<{ type: 'media' } | null>(null);
-  const [createForm, setCreateForm] = useState({ name: '', description: '', sourceUrl: '', category: '' });
+
+  // Create modal state
+  const [createForm, setCreateForm] = useState({ name: '', description: '', sourceUrl: '' });
   const [isCreating, setIsCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
   const [formTags, setFormTags] = useState<string[]>([]);
   const [formTagInput, setFormTagInput] = useState('');
 
-  // Debounce keyword
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const handleKeywordChange = (v: string) => {
-    setKeyword(v);
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
-      setDebouncedKeyword(v);
-      setPage(1);
-    }, 350);
-  };
+  // Reload trigger
+  const [reloadKey, setReloadKey] = useState(0);
 
-  // Load media
-  const loadMedia = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await publicContentApi.listMedia(undefined, SERVICE_KEY, {
-        page,
-        limit: PAGE_LIMIT,
-        search: debouncedKeyword || undefined,
-      });
-      if (res.success && res.data) {
-        setItems((res.data as any).items ?? []);
-        setTotal((res.data as any).total ?? 0);
-      } else {
-        setError('콘텐츠를 불러오는 데 실패했습니다.');
-      }
-    } catch {
-      setError('콘텐츠를 불러오는 중 오류가 발생했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  }, [page, debouncedKeyword]);
-
-  useEffect(() => { loadMedia(); }, [loadMedia]);
-
-  // ── Auth fetch helper ──
+  // Auth fetch helper
   const apiFetch = useCallback(async (path: string, options?: RequestInit) => {
     const token = getAccessToken();
     const res = await fetch(`${API_BASE}${path}`, {
@@ -176,43 +96,87 @@ export default function ContentHubPage() {
     return res.json();
   }, []);
 
-  // ── 가져가기 ──
-  const handleTake = async (item: MediaItem) => {
-    try {
+  // ── Config ──
+  const config: SignageHubConfig = {
+    serviceKey: SERVICE_KEY,
+    heroTitle: '안내 영상 · 자료',
+    heroDesc: '영상과 플레이리스트를 검색하고 활용하세요',
+    headerAction: user ? (
+      <button
+        onClick={() => {
+          setCreateForm({ name: '', description: '', sourceUrl: '' });
+          setFormTags([]);
+          setFormTagInput('');
+          setCreateError(null);
+          setCreateModal(true);
+        }}
+        style={modalStyles.createBtn}
+      >
+        + 콘텐츠 등록
+      </button>
+    ) : undefined,
+    searchPlaceholder: '제목 또는 설명으로 검색...',
+    showTagFilter: true,
+    pageLimit: 20,
+    fetchItems: async (params) => {
+      const res = await publicContentApi.listMedia(undefined, SERVICE_KEY, {
+        page: params.page,
+        limit: params.limit,
+        search: params.search || undefined,
+      });
+      if (res.success && res.data) {
+        const raw = (res.data as any).items ?? [];
+        const items: SignageHubItem[] = raw.map((m: MediaItem) => ({
+          id: m.id,
+          name: m.name,
+          description: m.description || null,
+          mediaType: m.mediaType,
+          source: m.source,
+          tags: m.tags,
+          creatorName: m.creatorName || null,
+          createdAt: m.createdAt,
+          url: m.url || null,
+          canDelete: !!user && m.source === 'community' && m.createdByUserId === user.id,
+        }));
+        return { items, total: (res.data as any).total ?? 0 };
+      }
+      throw new Error('콘텐츠를 불러오는 데 실패했습니다.');
+    },
+    onCopy: async (item) => {
       await assetSnapshotApi.copy({
         sourceService: 'kpa',
         sourceAssetId: item.id,
         assetType: 'signage',
       });
-      showToast('내 콘텐츠에 추가되었습니다.', 'success');
-    } catch (e: any) {
-      const msg = e?.message || '';
-      if (msg.includes('DUPLICATE') || msg.includes('already')) {
-        showToast('이미 가져간 콘텐츠입니다.', 'error');
-      } else {
-        showToast('가져오기에 실패했습니다.', 'error');
-      }
-    }
+    },
+    onDelete: (item) => {
+      setDeleteConfirm({ id: item.id, name: item.name });
+    },
+    sourceLabels: KPA_SOURCE_LABELS,
+    mediaTypeLabels: KPA_MEDIA_TYPE_LABELS,
+    showInfoBlock: true,
+    infoTitle: '가져가기 안내',
+    infoDesc: '콘텐츠를 가져가기하면 내 매장 콘텐츠 보관함에 독립적으로 저장됩니다. 원본이 변경되어도 영향 없으며, 매장에서 직접 수정·삭제 가능합니다.',
+    emptyMessage: '등록된 콘텐츠가 없습니다',
+    emptyFilteredMessage: '선택한 태그에 해당하는 콘텐츠가 없습니다',
   };
 
-  // ── Delete ──
+  // ── Delete handler ──
   const handleDeleteConfirmed = async () => {
     if (!deleteConfirm) return;
     setIsDeleting(true);
     try {
       await apiFetch(`/api/signage/${SERVICE_KEY}/community/media/${deleteConfirm.id}`, { method: 'DELETE' });
       setDeleteConfirm(null);
-      loadMedia();
-      showToast('삭제되었습니다.', 'success');
-    } catch (err: any) {
-      showToast(err?.message || '삭제에 실패했습니다', 'error');
+      setReloadKey(k => k + 1);
+    } catch {
       setDeleteConfirm(null);
     } finally {
       setIsDeleting(false);
     }
   };
 
-  // ── Community create ──
+  // ── Create handlers ──
   const addTag = (value: string) => {
     const tag = value.trim().replace(/^#/, '');
     if (!tag || formTags.includes(tag)) return;
@@ -224,7 +188,6 @@ export default function ContentHubPage() {
   };
 
   const handleCreate = async () => {
-    if (!createModal) return;
     if (!createForm.name.trim()) { setCreateError('제목을 입력하세요'); return; }
     if (!createForm.sourceUrl.trim()) { setCreateError('URL을 입력하세요'); return; }
     if (formTags.length === 0) { setCreateError('태그를 최소 1개 이상 입력해주세요'); return; }
@@ -241,12 +204,8 @@ export default function ContentHubPage() {
           mediaType: 'youtube',
         }),
       });
-      setCreateModal(null);
-      setCreateForm({ name: '', description: '', sourceUrl: '', category: '' });
-      setFormTags([]);
-      setFormTagInput('');
-      loadMedia();
-      showToast('커뮤니티 콘텐츠가 등록되었습니다.', 'success');
+      setCreateModal(false);
+      setReloadKey(k => k + 1);
     } catch (err: any) {
       setCreateError(err?.message || '등록에 실패했습니다');
     } finally {
@@ -254,344 +213,56 @@ export default function ContentHubPage() {
     }
   };
 
-  // Tag helpers
-  const availableTags = useMemo(() => {
-    const all = items.flatMap((item) => item.tags ?? []);
-    return [...new Set(all)].sort();
-  }, [items]);
-
-  const toggleTag = (tag: string) => {
-    setSelectedTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
-    );
-  };
-
-  const displayedItems = useMemo(() => {
-    if (selectedTags.length === 0) return items;
-    return items.filter((item) => selectedTags.some((tag) => (item.tags ?? []).includes(tag)));
-  }, [items, selectedTags]);
-
-  const showToast = (msg: string, type: 'success' | 'error') => {
-    setToast({ msg, type });
-    setTimeout(() => setToast(null), 3000);
-  };
-
-  const totalPages = Math.ceil(total / PAGE_LIMIT);
-
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+    <>
+      <SignageHubTemplate key={reloadKey} config={config} />
 
-      {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">안내 영상 · 자료</h1>
-          <p className="text-slate-500 mt-1 text-sm">
-            영상과 플레이리스트를 검색하고 활용하세요
-          </p>
-        </div>
-        {user && (
-          <button
-            onClick={() => { setCreateForm({ name: '', description: '', sourceUrl: '', category: '' }); setFormTags([]); setFormTagInput(''); setCreateError(null); setCreateModal({ type: 'media' }); }}
-            className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <PlusCircle className="h-4 w-4" />
-            콘텐츠 등록
-          </button>
-        )}
-      </div>
-
-      {/* Toast */}
-      {toast && (
-        <div className={`flex items-center gap-2 rounded-lg p-3 text-sm border ${
-          toast.type === 'success'
-            ? 'bg-green-50 border-green-200 text-green-700'
-            : 'bg-red-50 border-red-200 text-red-700'
-        }`}>
-          <AlertCircle className="h-4 w-4 flex-shrink-0" />
-          {toast.msg}
-        </div>
-      )}
-
-      {/* Filter Bar */}
-      <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-3">
-        {/* Keyword search */}
-        <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-          <input
-            type="text"
-            value={keyword}
-            onChange={(e) => handleKeywordChange(e.target.value)}
-            placeholder="제목 또는 설명으로 검색..."
-            className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-blue-400"
-          />
-        </div>
-        {/* Tag filter */}
-        {availableTags.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2">
-            {availableTags.map((tag) => (
-              <button
-                key={tag}
-                onClick={() => toggleTag(tag)}
-                className={`px-3 py-1 text-xs font-medium rounded-full border transition-colors ${
-                  selectedTags.includes(tag)
-                    ? 'bg-blue-600 text-white border-blue-600'
-                    : 'bg-white text-slate-600 border-slate-200 hover:border-blue-400'
-                }`}
-              >
-                #{tag}
-              </button>
-            ))}
-            {selectedTags.length > 0 && (
-              <button
-                onClick={() => setSelectedTags([])}
-                className="px-2 py-1 text-xs text-slate-400 hover:text-slate-600 transition-colors"
-              >
-                초기화
-              </button>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Table */}
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-3 border-b border-slate-100">
-          <h2 className="font-semibold text-slate-800 flex items-center gap-2 text-sm">
-            <VideoIcon className="h-4 w-4 text-purple-600" />
-            콘텐츠 목록
-          </h2>
-          <span className="text-xs text-slate-400">총 {total.toLocaleString()}건</span>
-        </div>
-
-        {loading ? (
-          <div className="py-16 text-center">
-            <div className="inline-block h-6 w-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
-            <p className="text-sm text-slate-400 mt-2">불러오는 중...</p>
-          </div>
-        ) : error ? (
-          <div className="py-12 text-center text-sm text-red-500 flex flex-col items-center gap-2">
-            <AlertCircle className="h-5 w-5" />
-            {error}
-          </div>
-        ) : displayedItems.length === 0 ? (
-          <div className="py-16 text-center text-sm text-slate-400 flex flex-col items-center gap-2">
-            <VideoIcon className="h-8 w-8 text-slate-200" />
-            <p>{selectedTags.length > 0 ? '선택한 태그에 해당하는 콘텐츠가 없습니다' : '등록된 콘텐츠가 없습니다'}</p>
-            {user && (
-              <button
-                onClick={() => { setCreateForm({ name: '', description: '', sourceUrl: '', category: '' }); setFormTags([]); setFormTagInput(''); setCreateError(null); setCreateModal({ type: 'media' }); }}
-                className="mt-1 text-blue-600 hover:underline"
-              >
-                첫 번째 커뮤니티 콘텐츠를 등록해보세요
-              </button>
-            )}
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-slate-100 bg-slate-50">
-                  <th className="text-left px-4 py-2.5 font-medium text-slate-600 w-auto">제목</th>
-                  <th className="text-left px-4 py-2.5 font-medium text-slate-600 w-24 hidden sm:table-cell">유형</th>
-                  <th className="text-left px-4 py-2.5 font-medium text-slate-600 w-24">출처</th>
-                  <th className="text-left px-4 py-2.5 font-medium text-slate-600 hidden md:table-cell">태그</th>
-                  <th className="text-left px-4 py-2.5 font-medium text-slate-600 w-28 hidden lg:table-cell">등록자</th>
-                  <th className="text-left px-4 py-2.5 font-medium text-slate-600 w-24 hidden lg:table-cell">등록일</th>
-                  <th className="text-right px-4 py-2.5 font-medium text-slate-600 w-36">액션</th>
-                </tr>
-              </thead>
-              <tbody>
-                {displayedItems.map((item) => {
-                  const isOwn = !!user && item.source === 'community' && item.createdByUserId === user.id;
-                  return (
-                    <tr key={item.id} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
-                      {/* 제목 */}
-                      <td className="px-4 py-3">
-                        <div className="flex items-start gap-2">
-                          <div className="min-w-0">
-                            {item.url ? (
-                              <a
-                                href={item.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="font-medium text-slate-800 hover:text-blue-600 line-clamp-1 transition-colors"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                {item.name}
-                              </a>
-                            ) : (
-                              <span className="font-medium text-slate-800 line-clamp-1">{item.name}</span>
-                            )}
-                            {item.description && (
-                              <p className="text-xs text-slate-400 mt-0.5 line-clamp-1">{item.description}</p>
-                            )}
-                            {item.category && (
-                              <span className="inline-flex items-center gap-1 text-[10px] text-slate-500 mt-0.5">
-                                <Tag className="h-2.5 w-2.5" />{item.category}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </td>
-                      {/* 유형 */}
-                      <td className="px-4 py-3 hidden sm:table-cell">
-                        <TypeBadge type={item.mediaType} />
-                      </td>
-                      {/* 출처 */}
-                      <td className="px-4 py-3">
-                        <SourceBadge source={item.source} />
-                      </td>
-                      {/* 태그 */}
-                      <td className="px-4 py-3 hidden md:table-cell">
-                        <div className="flex flex-wrap gap-1 max-w-[160px]">
-                          {(item.tags ?? []).slice(0, 2).map((tag) => (
-                            <span key={tag} className="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">
-                              {tag}
-                            </span>
-                          ))}
-                          {(item.tags ?? []).length > 2 && (
-                            <span className="text-[10px] text-slate-400">+{(item.tags ?? []).length - 2}</span>
-                          )}
-                        </div>
-                      </td>
-                      {/* 등록자 */}
-                      <td className="px-4 py-3 hidden lg:table-cell">
-                        <span className="text-xs text-slate-500 truncate block max-w-[100px]">{item.creatorName || '-'}</span>
-                      </td>
-                      {/* 등록일 */}
-                      <td className="px-4 py-3 hidden lg:table-cell">
-                        <span className="text-xs text-slate-400">
-                          {new Date(item.createdAt).toLocaleDateString('ko-KR')}
-                        </span>
-                      </td>
-                      {/* 액션 */}
-                      <td className="px-4 py-3">
-                        <div className="flex items-center justify-end gap-1">
-                          {item.url && (
-                            <a
-                              href={item.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                              title="새 창에서 보기"
-                            >
-                              <ExternalLink className="h-4 w-4" />
-                            </a>
-                          )}
-                          {user && (
-                            <button
-                              onClick={() => handleTake(item)}
-                              className="p-1.5 text-slate-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
-                              title="가져가기"
-                            >
-                              <Download className="h-4 w-4" />
-                            </button>
-                          )}
-                          {isOwn && (
-                            <button
-                              onClick={() => setDeleteConfirm({ id: item.id, name: item.name })}
-                              className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                              title="삭제"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between px-5 py-3 border-t border-slate-100">
-            <span className="text-xs text-slate-400">
-              {page} / {totalPages} 페이지
-            </span>
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => setPage(p => Math.max(1, p - 1))}
-                disabled={page === 1}
-                className="p-1.5 rounded hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-              >
-                <ChevronLeft className="h-4 w-4 text-slate-600" />
-              </button>
-              <button
-                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                disabled={page === totalPages}
-                className="p-1.5 rounded hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-              >
-                <ChevronRight className="h-4 w-4 text-slate-600" />
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Community link info */}
-      <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex items-start gap-3">
-        <Globe className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
-        <div className="text-sm text-blue-700">
-          <p className="font-medium mb-0.5">가져가기 안내</p>
-          <p className="text-blue-600">
-            콘텐츠를 <strong>가져가기</strong>하면 내 매장 콘텐츠 보관함에 독립적으로 저장됩니다.
-            원본이 변경되어도 영향 없으며, 매장에서 직접 수정·삭제 가능합니다.
-          </p>
-        </div>
-      </div>
-
-      {/* Community Content Creation Modal */}
+      {/* ── Community Content Creation Modal ── */}
       {createModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-slate-800">커뮤니티 콘텐츠 등록</h3>
-              <button onClick={() => setCreateModal(null)} className="text-slate-400 hover:text-slate-600">
-                <X className="h-5 w-5" />
-              </button>
+        <div style={modalStyles.overlay}>
+          <div style={modalStyles.dialog}>
+            <div style={modalStyles.dialogHeader}>
+              <h3 style={modalStyles.dialogTitle}>커뮤니티 콘텐츠 등록</h3>
+              <button onClick={() => setCreateModal(false)} style={modalStyles.closeBtn}>✕</button>
             </div>
-            <div className="space-y-3">
+            <div style={modalStyles.dialogBody}>
               <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">제목 *</label>
+                <label style={modalStyles.label}>제목 *</label>
                 <input
                   type="text"
                   value={createForm.name}
                   onChange={(e) => setCreateForm(f => ({ ...f, name: e.target.value }))}
                   placeholder="예: 약사회 건강 안내 영상"
-                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
+                  style={modalStyles.input}
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">YouTube URL *</label>
+                <label style={modalStyles.label}>YouTube URL *</label>
                 <input
                   type="url"
                   value={createForm.sourceUrl}
                   onChange={(e) => setCreateForm(f => ({ ...f, sourceUrl: e.target.value }))}
                   placeholder="https://www.youtube.com/watch?v=..."
-                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
+                  style={modalStyles.input}
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">설명 (선택)</label>
+                <label style={modalStyles.label}>설명 (선택)</label>
                 <textarea
                   value={createForm.description}
                   onChange={(e) => setCreateForm(f => ({ ...f, description: e.target.value }))}
                   placeholder="간단한 설명을 입력하세요"
                   rows={2}
-                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400 resize-none"
+                  style={modalStyles.textarea}
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-500 mb-1">태그 * (최소 1개)</label>
-                <div className="flex flex-wrap gap-1 mb-2 min-h-[28px]">
+                <label style={modalStyles.label}>태그 * (최소 1개)</label>
+                <div style={modalStyles.tagsWrap}>
                   {formTags.map(tag => (
-                    <span key={tag} className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">
+                    <span key={tag} style={modalStyles.tagChip}>
                       #{tag}
-                      <button type="button" onClick={() => removeTag(tag)} className="ml-0.5 hover:text-blue-900">×</button>
+                      <button type="button" onClick={() => removeTag(tag)} style={modalStyles.tagRemove}>×</button>
                     </span>
                   ))}
                 </div>
@@ -607,15 +278,15 @@ export default function ContentHubPage() {
                     }
                   }}
                   placeholder="태그 입력 후 Enter 또는 쉼표"
-                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  style={modalStyles.input}
                 />
-                <div className="flex flex-wrap gap-1 mt-2">
+                <div style={modalStyles.suggestRow}>
                   {DEFAULT_TAG_SUGGESTIONS.filter(t => !formTags.includes(t)).map(t => (
                     <button
                       key={t}
                       type="button"
                       onClick={() => addTag(t)}
-                      className="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded-full hover:bg-blue-100 hover:text-blue-700 transition-colors"
+                      style={modalStyles.suggestBtn}
                     >
                       #{t}
                     </button>
@@ -623,24 +294,14 @@ export default function ContentHubPage() {
                 </div>
               </div>
               {createError && (
-                <p className="text-xs text-red-600 flex items-center gap-1">
-                  <AlertCircle className="h-3 w-3" />{createError}
-                </p>
+                <p style={modalStyles.errorText}>{createError}</p>
               )}
             </div>
-            <div className="flex justify-end gap-2 mt-4">
-              <button
-                onClick={() => setCreateModal(null)}
-                disabled={isCreating}
-                className="px-4 py-2 border border-slate-200 rounded-lg text-sm hover:bg-slate-50 disabled:opacity-50"
-              >
+            <div style={modalStyles.dialogFooter}>
+              <button onClick={() => setCreateModal(false)} disabled={isCreating} style={modalStyles.cancelBtn}>
                 취소
               </button>
-              <button
-                onClick={handleCreate}
-                disabled={isCreating || formTags.length === 0}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50"
-              >
+              <button onClick={handleCreate} disabled={isCreating || formTags.length === 0} style={modalStyles.submitBtn}>
                 {isCreating ? '등록 중...' : '등록'}
               </button>
             </div>
@@ -648,35 +309,128 @@ export default function ContentHubPage() {
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
+      {/* ── Delete Confirmation Modal ── */}
       {deleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm mx-4">
-            <h3 className="text-base font-semibold text-slate-800 mb-2">콘텐츠 삭제</h3>
-            <p className="text-sm text-slate-500 mb-3">삭제하면 커뮤니티에서 더 이상 표시되지 않습니다.</p>
-            <div className="bg-slate-50 rounded-lg p-3 mb-4">
-              <p className="text-sm font-medium text-slate-700 truncate">{deleteConfirm.name}</p>
-              <p className="text-xs text-slate-400 mt-0.5">내가 등록한 커뮤니티 콘텐츠</p>
+        <div style={modalStyles.overlay}>
+          <div style={{ ...modalStyles.dialog, maxWidth: '380px' }}>
+            <h3 style={modalStyles.dialogTitle}>콘텐츠 삭제</h3>
+            <p style={modalStyles.deleteDesc}>삭제하면 커뮤니티에서 더 이상 표시되지 않습니다.</p>
+            <div style={modalStyles.deleteNameBox}>
+              <p style={modalStyles.deleteName}>{deleteConfirm.name}</p>
+              <p style={modalStyles.deleteHint}>내가 등록한 커뮤니티 콘텐츠</p>
             </div>
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => setDeleteConfirm(null)}
-                disabled={isDeleting}
-                className="px-4 py-2 border border-slate-200 rounded-lg text-sm hover:bg-slate-50 disabled:opacity-50"
-              >
+            <div style={modalStyles.dialogFooter}>
+              <button onClick={() => setDeleteConfirm(null)} disabled={isDeleting} style={modalStyles.cancelBtn}>
                 취소
               </button>
-              <button
-                onClick={handleDeleteConfirmed}
-                disabled={isDeleting}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 disabled:opacity-50"
-              >
+              <button onClick={handleDeleteConfirmed} disabled={isDeleting} style={modalStyles.deleteBtn}>
                 {isDeleting ? '삭제 중...' : '삭제'}
               </button>
             </div>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
+
+// ─── Modal Styles ─────────────────────────────────────────
+
+const modalStyles: Record<string, React.CSSProperties> = {
+  overlay: {
+    position: 'fixed', inset: 0, zIndex: 50,
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.4)',
+  },
+  dialog: {
+    backgroundColor: '#fff', borderRadius: '12px',
+    boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
+    padding: '24px', width: '100%', maxWidth: '420px', margin: '0 16px',
+  },
+  dialogHeader: {
+    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+    marginBottom: '16px',
+  },
+  dialogTitle: { margin: 0, fontSize: '18px', fontWeight: 600, color: '#1e293b' },
+  closeBtn: {
+    background: 'none', border: 'none', fontSize: '18px',
+    color: '#94a3b8', cursor: 'pointer', padding: '4px',
+  },
+  dialogBody: { display: 'flex', flexDirection: 'column', gap: '12px' } as React.CSSProperties,
+  dialogFooter: {
+    display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '16px',
+  },
+  label: {
+    display: 'block', fontSize: '12px', fontWeight: 500,
+    color: '#64748b', marginBottom: '4px',
+  },
+  input: {
+    width: '100%', padding: '8px 12px', fontSize: '14px',
+    border: '1px solid #e2e8f0', borderRadius: '8px',
+    outline: 'none', boxSizing: 'border-box',
+  } as React.CSSProperties,
+  textarea: {
+    width: '100%', padding: '8px 12px', fontSize: '14px',
+    border: '1px solid #e2e8f0', borderRadius: '8px',
+    outline: 'none', resize: 'none', boxSizing: 'border-box',
+  } as React.CSSProperties,
+  tagsWrap: {
+    display: 'flex', flexWrap: 'wrap', gap: '4px',
+    marginBottom: '8px', minHeight: '28px',
+  } as React.CSSProperties,
+  tagChip: {
+    display: 'inline-flex', alignItems: 'center', gap: '4px',
+    padding: '2px 8px', backgroundColor: '#dbeafe', color: '#1d4ed8',
+    fontSize: '12px', borderRadius: '12px',
+  },
+  tagRemove: {
+    background: 'none', border: 'none', color: '#1d4ed8',
+    cursor: 'pointer', fontSize: '14px', fontWeight: 700, padding: 0,
+  },
+  suggestRow: {
+    display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '8px',
+  } as React.CSSProperties,
+  suggestBtn: {
+    padding: '2px 8px', fontSize: '12px',
+    backgroundColor: '#f1f5f9', color: '#475569', borderRadius: '12px',
+    border: 'none', cursor: 'pointer',
+  },
+  errorText: {
+    margin: 0, fontSize: '12px', color: '#dc2626',
+  },
+  cancelBtn: {
+    padding: '8px 16px', fontSize: '14px',
+    border: '1px solid #e2e8f0', borderRadius: '8px',
+    backgroundColor: '#fff', color: '#475569', cursor: 'pointer',
+  },
+  submitBtn: {
+    padding: '8px 16px', fontSize: '14px', fontWeight: 500,
+    border: 'none', borderRadius: '8px',
+    backgroundColor: '#2563eb', color: '#fff', cursor: 'pointer',
+  },
+  deleteBtn: {
+    padding: '8px 16px', fontSize: '14px', fontWeight: 500,
+    border: 'none', borderRadius: '8px',
+    backgroundColor: '#dc2626', color: '#fff', cursor: 'pointer',
+  },
+  createBtn: {
+    display: 'inline-flex', alignItems: 'center', gap: '6px',
+    padding: '8px 14px', fontSize: '14px', fontWeight: 500,
+    backgroundColor: '#2563eb', color: '#fff', border: 'none',
+    borderRadius: '8px', cursor: 'pointer',
+  },
+  deleteDesc: {
+    margin: '0 0 12px', fontSize: '14px', color: '#64748b',
+  },
+  deleteNameBox: {
+    backgroundColor: '#f8fafc', borderRadius: '8px', padding: '12px',
+    marginBottom: '4px',
+  },
+  deleteName: {
+    margin: 0, fontSize: '14px', fontWeight: 500, color: '#334155',
+    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+  } as React.CSSProperties,
+  deleteHint: {
+    margin: '4px 0 0', fontSize: '12px', color: '#94a3b8',
+  },
+};
