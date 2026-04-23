@@ -30,7 +30,10 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '조직 가입 요청', path: '/operator/organization-requests' },
     { label: '약국 서비스 신청', path: '/operator/pharmacy-requests' },
   ],
-  approvals: [{ label: '상품 신청 관리', path: '/operator/product-applications' }],
+  approvals: [
+    { label: '상품 신청 관리', path: '/operator/product-applications' },
+    { label: '자격 신청 관리', path: '/operator/qualification-requests' },
+  ],
   stores: [
     { label: '매장 관리', path: '/operator/stores' },
     { label: '채널 관리', path: '/operator/store-channels' },
@@ -94,7 +97,10 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: '조직 가입 요청', path: '/operator/organization-requests' },
     { label: '약국 서비스 신청', path: '/operator/pharmacy-requests' },
   ],
-  approvals: [{ label: '상품 신청 관리', path: '/operator/product-applications' }],
+  approvals: [
+    { label: '상품 신청 관리', path: '/operator/product-applications' },
+    { label: '자격 신청 관리', path: '/operator/qualification-requests' },
+  ],
   stores: [
     { label: '매장 관리', path: '/operator/stores' },
     { label: '채널 관리', path: '/operator/store-channels' },
