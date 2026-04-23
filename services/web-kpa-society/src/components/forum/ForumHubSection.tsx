@@ -162,7 +162,7 @@ export function ForumHubSection({ prefetchedForums, loading: parentLoading }: Pr
   const isLoading = parentLoading ?? loading;
 
   return (
-    <section style={styles.container}>
+    <section id="forum-hub" style={styles.container}>
       <div style={styles.header}>
         <h2 style={styles.sectionTitle}>포럼</h2>
         <Link to="/forum/all" style={styles.moreLink}>전체 보기 →</Link>

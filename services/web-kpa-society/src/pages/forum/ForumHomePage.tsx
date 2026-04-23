@@ -24,7 +24,6 @@ import { ForumActivitySection } from '../../components/forum/ForumActivitySectio
 import { ForumSearchBar } from '../../components/forum/ForumSearchBar';
 import { ForumSearchResults } from '../../components/forum/ForumSearchResults';
 import { ForumWritePrompt } from '../../components/forum/ForumWritePrompt';
-import { ForumInfoSection } from '../../components/forum/ForumInfoSection';
 import { colors, spacing, typography } from '../../styles/theme';
 
 export function ForumHomePage() {
@@ -63,7 +62,6 @@ export function ForumHomePage() {
         )}
 
         <ForumWritePrompt />
-        <ForumInfoSection />
       </div>
     </div>
   );

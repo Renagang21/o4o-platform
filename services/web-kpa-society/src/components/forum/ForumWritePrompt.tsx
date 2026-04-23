@@ -9,15 +9,14 @@
 
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+
+function scrollToForumHub() {
+  document.getElementById('forum-hub')?.scrollIntoView({ behavior: 'smooth' });
+}
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
 
-// 포럼 베이스 경로
-function useForumBasePath(): string {
-  return '/forum';
-}
 
 export function ForumWritePrompt() {
-  const basePath = useForumBasePath();
   const { isAuthenticated } = useAuth();
 
   return (
@@ -37,9 +36,9 @@ export function ForumWritePrompt() {
           </div>
         </div>
         {isAuthenticated ? (
-          <Link to={`${basePath}`} style={styles.ctaPrimary}>
+          <button onClick={scrollToForumHub} style={styles.ctaPrimary}>
             포럼 둘러보기
-          </Link>
+          </button>
         ) : (
           <Link to="/login" style={styles.ctaOutline}>
             로그인
