@@ -104,12 +104,12 @@ export default function PlaylistEditorPage() {
           setDescription(d.description || '');
           setTags(d.metadata?.tags || []);
           const loadedItems: PlaylistItem[] = (d.items || [])
-            .sort((a: any, b: any) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
+            .sort((a: any, b: any) => (a.displayOrder ?? a.sortOrder ?? 0) - (b.displayOrder ?? b.sortOrder ?? 0))
             .map((item: any) => ({
               key: nextKey(),
-              sourceUrl: item.media?.sourceUrl || '',
+              sourceUrl: item.media?.sourceUrl || item.media?.url || '',
               name: item.media?.name || '',
-              durationInput: secToDurationInput(item.duration || item.media?.duration || 0),
+              durationInput: secToDurationInput(item.displayDuration || item.duration || item.media?.duration || 0),
             }));
           setItems(loadedItems);
         }
