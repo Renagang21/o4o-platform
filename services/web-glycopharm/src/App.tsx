@@ -175,6 +175,8 @@ const MyRequestsPage = lazy(() => import('@/pages/forum/MyRequestsPage'));
 const ForumFeedbackPage = lazy(() => import('@/pages/forum/ForumFeedbackPage'));
 const EducationPage = lazy(() => import('@/pages/education/EducationPage'));
 const CourseDetailPage = lazy(() => import('@/pages/education/CourseDetailPage'));
+// WO-O4O-GLYCOPHARM-CONTENT-RESOURCES-ROUTE-ALIGNMENT-V1
+const ResourcesPage = lazy(() => import('@/pages/resources/ResourcesPage').then(m => ({ default: m.ResourcesPage })));
 // WO-GLYCOPHARM-INSTRUCTOR-OPERATOR-V1
 const InstructorDashboardPage = lazy(() => import('@/pages/instructor/InstructorDashboardPage'));
 const LmsCoursesPage = lazy(() => import('@/pages/operator/LmsCoursesPage'));
@@ -346,6 +348,9 @@ function AppRoutes() {
         {/* /education → /lms redirect (하위 호환) */}
         <Route path="education" element={<Navigate to="/lms" replace />} />
         <Route path="education/:id" element={<EducationRedirect />} />
+        {/* WO-O4O-GLYCOPHARM-CONTENT-RESOURCES-ROUTE-ALIGNMENT-V1: top-level canonical paths */}
+        <Route path="content" element={<HubContentListPage />} />
+        <Route path="resources" element={<ResourcesPage />} />
         {/* Instructor Dashboard — WO-GLYCOPHARM-INSTRUCTOR-OPERATOR-V1 */}
         <Route path="instructor" element={
           <RoleGuard allowedRoles={['lms:instructor', 'glycopharm:admin', 'platform:super_admin']}>
