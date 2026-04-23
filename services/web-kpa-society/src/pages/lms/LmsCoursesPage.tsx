@@ -22,11 +22,10 @@ export function LmsCoursesPage() {
 
   const currentPage = parseInt(searchParams.get('page') || '1');
   const currentCategory = searchParams.get('category') || '';
-  const currentLevel = searchParams.get('level') || '';
 
   useEffect(() => {
     loadData();
-  }, [currentPage, currentCategory, currentLevel]);
+  }, [currentPage, currentCategory]);
 
   const loadData = async () => {
     try {
@@ -34,7 +33,6 @@ export function LmsCoursesPage() {
 
       const res = await lmsApi.getCourses({
         category: currentCategory || undefined,
-        level: currentLevel || undefined,
         page: currentPage,
         limit: 12,
       });
@@ -71,15 +69,6 @@ export function LmsCoursesPage() {
     });
   };
 
-  const getLevelLabel = (level: string) => {
-    const labels: Record<string, string> = {
-      beginner: '입문',
-      intermediate: '중급',
-      advanced: '고급',
-    };
-    return labels[level] || level;
-  };
-
   if (loading) {
     return <LoadingSpinner message="마케팅 콘텐츠를 불러오는 중..." />;
   }
@@ -95,19 +84,6 @@ export function LmsCoursesPage() {
       {/* 안내 메시지 */}
       <div style={styles.infoBox}>
         💡 마케팅 콘텐츠를 순서대로 안내받고, 진행 현황을 관리할 수 있습니다.
-      </div>
-
-      <div style={styles.filters}>
-        <select
-          style={styles.filterSelect}
-          value={currentLevel}
-          onChange={e => handleFilterChange('level', e.target.value)}
-        >
-          <option value="">전체 레벨</option>
-          <option value="beginner">입문</option>
-          <option value="intermediate">중급</option>
-          <option value="advanced">고급</option>
-        </select>
       </div>
 
       {courses.length === 0 ? (
@@ -131,7 +107,6 @@ export function LmsCoursesPage() {
                   </div>
                   <div style={styles.courseContent}>
                     <div style={styles.courseHeader}>
-                      <span style={styles.levelBadge}>{getLevelLabel(course.level)}</span>
                       <span style={styles.categoryBadge}>{course.category}</span>
                     </div>
                     <h3 style={styles.courseTitle}>{course.title}</h3>
@@ -177,18 +152,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '14px',
     marginBottom: '24px',
   },
-  filters: {
-    display: 'flex',
-    gap: '12px',
-    marginBottom: '24px',
-  },
-  filterSelect: {
-    padding: '10px 16px',
-    border: `1px solid ${colors.neutral300}`,
-    borderRadius: '6px',
-    fontSize: '14px',
-    backgroundColor: colors.white,
-  },
   courseGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
@@ -223,13 +186,6 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     gap: '8px',
     marginBottom: '12px',
-  },
-  levelBadge: {
-    padding: '2px 8px',
-    backgroundColor: colors.primary,
-    color: colors.white,
-    borderRadius: '4px',
-    fontSize: '12px',
   },
   categoryBadge: {
     padding: '2px 8px',

@@ -16,14 +16,6 @@ import { useAuth } from '../../contexts/AuthContext';
 import { colors, spacing, typography } from '../../styles/theme';
 import type { Course } from '../../types';
 
-type LevelFilter = 'all' | 'beginner' | 'intermediate' | 'advanced';
-
-const LEVEL_LABELS: Record<string, string> = {
-  beginner: '입문',
-  intermediate: '중급',
-  advanced: '고급',
-};
-
 const STATUS_LABELS: Record<string, string> = {
   draft: '준비중',
   published: '공���',
@@ -70,25 +62,6 @@ const COLUMNS: O4OColumn<Course>[] = [
         fontWeight: 500,
       }}>
         {row.category || '-'}
-      </span>
-    ),
-  },
-  {
-    key: 'level',
-    header: '레벨',
-    width: '10%',
-    sortable: true,
-    sortAccessor: (row) => row.level,
-    render: (_v, row) => (
-      <span style={{
-        padding: '2px 8px',
-        backgroundColor: '#e0f2fe',
-        color: '#0369a1',
-        borderRadius: '4px',
-        fontSize: '12px',
-        fontWeight: 500,
-      }}>
-        {LEVEL_LABELS[row.level] || row.level}
       </span>
     ),
   },
@@ -167,7 +140,6 @@ export function EducationPage() {
   const [showQualificationPrompt, setShowQualificationPrompt] = useState(false);
 
   const currentPage = parseInt(searchParams.get('page') || '1');
-  const currentLevel = (searchParams.get('level') || 'all') as LevelFilter;
   const currentSearch = searchParams.get('search') || '';
   const [searchInput, setSearchInput] = useState(currentSearch);
 
@@ -190,13 +162,12 @@ export function EducationPage() {
   // Load courses
   useEffect(() => {
     loadCourses();
-  }, [currentPage, currentLevel, currentSearch]);
+  }, [currentPage, currentSearch]);
 
   const loadCourses = async () => {
     try {
       setLoading(true);
       const res = await lmsApi.getCourses({
-        level: currentLevel !== 'all' ? currentLevel : undefined,
         search: currentSearch || undefined,
         page: currentPage,
         limit: 20,
@@ -217,15 +188,6 @@ export function EducationPage() {
     setSearchParams((prev) => {
       if (searchInput.trim()) prev.set('search', searchInput.trim());
       else prev.delete('search');
-      prev.set('page', '1');
-      return prev;
-    });
-  };
-
-  const handleLevelFilter = (level: LevelFilter) => {
-    setSearchParams((prev) => {
-      if (level === 'all') prev.delete('level');
-      else prev.set('level', level);
       prev.set('page', '1');
       return prev;
     });
@@ -272,22 +234,6 @@ export function EducationPage() {
         />
         <button type="submit" style={styles.searchBtn}>검색</button>
       </form>
-
-      {/* Level filter chips */}
-      <div style={styles.filterRow}>
-        {(['all', 'beginner', 'intermediate', 'advanced'] as LevelFilter[]).map((level) => (
-          <button
-            key={level}
-            onClick={() => handleLevelFilter(level)}
-            style={{
-              ...styles.filterChip,
-              ...(currentLevel === level ? styles.filterChipActive : {}),
-            }}
-          >
-            {level === 'all' ? '전체' : LEVEL_LABELS[level]}
-          </button>
-        ))}
-      </div>
 
       {/* Table */}
       {loading ? (
@@ -399,26 +345,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 500,
     cursor: 'pointer',
     flexShrink: 0,
-  },
-  filterRow: {
-    display: 'flex',
-    gap: '8px',
-    marginBottom: '20px',
-  },
-  filterChip: {
-    padding: '6px 16px',
-    border: `1px solid ${colors.neutral300}`,
-    borderRadius: '20px',
-    backgroundColor: colors.white,
-    color: colors.neutral600,
-    fontSize: '13px',
-    fontWeight: 500,
-    cursor: 'pointer',
-  },
-  filterChipActive: {
-    backgroundColor: colors.primary,
-    color: colors.white,
-    borderColor: colors.primary,
   },
   tableWrap: {
     backgroundColor: colors.white,
