@@ -33,8 +33,7 @@ export function FeaturedSection() {
 
   return (
     <section className="py-16 bg-white">
-      <div className="max-w-5xl mx-auto px-4">
-        {/* Featured Suppliers */}
+      {/* Featured Suppliers */}
         <div className="mb-12">
           <div className="flex items-center gap-2 mb-6">
             <Shield className="w-5 h-5 text-primary-600" />
@@ -110,7 +109,6 @@ export function FeaturedSection() {
             ))}
           </div>
         </div>
-      </div>
     </section>
   );
 }

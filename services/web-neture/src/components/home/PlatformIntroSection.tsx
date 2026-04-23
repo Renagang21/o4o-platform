@@ -13,7 +13,6 @@ import { Package, Store, Megaphone, ArrowRight } from 'lucide-react';
 export function PlatformIntroSection() {
   return (
     <section className="py-20 bg-white">
-      <div className="max-w-5xl mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">
             Neture 플랫폼 구조
@@ -84,7 +83,6 @@ export function PlatformIntroSection() {
             </p>
           </div>
         </div>
-      </div>
     </section>
   );
 }

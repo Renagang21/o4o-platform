@@ -14,8 +14,7 @@ import { Package, Megaphone, ArrowRight } from 'lucide-react';
 export function HomeCtaSection() {
   return (
     <section className="py-20 bg-gray-900">
-      <div className="max-w-5xl mx-auto px-4">
-        <div className="text-center mb-12">
+      <div className="text-center mb-12">
           <h2 className="text-2xl font-bold text-white mb-3">
             Neture와 함께 성장하세요
           </h2>
@@ -65,7 +64,6 @@ export function HomeCtaSection() {
             </Link>
           </div>
         </div>
-      </div>
     </section>
   );
 }

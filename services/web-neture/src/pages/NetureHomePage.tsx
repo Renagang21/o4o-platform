@@ -169,14 +169,14 @@ export default function NetureHomePage() {
   return (
     <div className="min-h-screen">
       <PageHero><HeroSlider /></PageHero>
-      <PageSection><PlatformIntroSection /></PageSection>
-      <PageSection><HomepageAds /></PageSection>
+      <PageSection><PageContainer><PlatformIntroSection /></PageContainer></PageSection>
+      <PageSection><PageContainer><HomepageAds /></PageContainer></PageSection>
       <PageSection><MarketTrialSection /></PageSection>
-      <PageSection><LatestUpdatesSection /></PageSection>
-      <PageSection><CommunityPreviewSection /></PageSection>
-      <PageSection><FeaturedSection /></PageSection>
+      <PageSection><PageContainer><LatestUpdatesSection /></PageContainer></PageSection>
+      <PageSection><PageContainer><CommunityPreviewSection /></PageContainer></PageSection>
+      <PageSection><PageContainer><FeaturedSection /></PageContainer></PageSection>
       <PageSection><PartnerLogoCarousel /></PageSection>
-      <PageSection last><HomeCtaSection /></PageSection>
+      <PageSection last><PageContainer><HomeCtaSection /></PageContainer></PageSection>
     </div>
   );
 }

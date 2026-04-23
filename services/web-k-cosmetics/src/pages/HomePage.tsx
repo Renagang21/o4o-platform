@@ -69,14 +69,7 @@ function HeroSection({ slides }: { slides: HomeHeroSlide[] }) {
             }}
           >
             <div style={{ height: '100%', background: slide.bgGradient }}>
-              <div style={{
-                maxWidth: '1200px',
-                margin: '0 auto',
-                padding: '0 24px',
-                height: '100%',
-                display: 'flex',
-                alignItems: 'center',
-              }}>
+              <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8" style={{ height: '100%', display: 'flex', alignItems: 'center' }}>
                 <div style={{ maxWidth: '600px' }}>
                   {/* WO-GLOBAL-ALPHA-STATUS-HERO-V080: 운영형 알파 상태 표시 (첫 번째 슬라이드에만) */}
                   {index === 0 && (

@@ -67,22 +67,20 @@ export function LatestUpdatesSection() {
   if (loading) {
     return (
       <section className="py-16 bg-white">
-        <div className="max-w-3xl mx-auto px-4">
-          <div className="text-center mb-8">
-            <Activity className="w-8 h-8 text-gray-400 mx-auto mb-3" />
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Latest Updates</h2>
-          </div>
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg animate-pulse">
-                <div className="w-10 h-10 bg-gray-200 rounded-full" />
-                <div className="flex-1">
-                  <div className="h-4 bg-gray-200 rounded w-40 mb-1" />
-                  <div className="h-3 bg-gray-100 rounded w-24" />
-                </div>
+        <div className="text-center mb-8">
+          <Activity className="w-8 h-8 text-gray-400 mx-auto mb-3" />
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Latest Updates</h2>
+        </div>
+        <div className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg animate-pulse">
+              <div className="w-10 h-10 bg-gray-200 rounded-full" />
+              <div className="flex-1">
+                <div className="h-4 bg-gray-200 rounded w-40 mb-1" />
+                <div className="h-3 bg-gray-100 rounded w-24" />
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </section>
     );
@@ -92,31 +90,29 @@ export function LatestUpdatesSection() {
 
   return (
     <section className="py-16 bg-white">
-      <div className="max-w-3xl mx-auto px-4">
-        <div className="text-center mb-8">
-          <Activity className="w-8 h-8 text-primary-500 mx-auto mb-3" />
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Latest Updates</h2>
-          <p className="text-sm text-gray-500">플랫폼 최근 활동</p>
-        </div>
+      <div className="text-center mb-8">
+        <Activity className="w-8 h-8 text-primary-500 mx-auto mb-3" />
+        <h2 className="text-xl font-bold text-gray-900 mb-2">Latest Updates</h2>
+        <p className="text-sm text-gray-500">플랫폼 최근 활동</p>
+      </div>
 
-        <div className="space-y-3">
-          {items.map((item) => (
-            <div key={item.id} className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                item.icon === 'supplier' ? 'bg-blue-100' : 'bg-emerald-100'
-              }`}>
-                {item.icon === 'supplier'
-                  ? <Building2 className="w-5 h-5 text-blue-600" />
-                  : <Handshake className="w-5 h-5 text-emerald-600" />
-                }
-              </div>
-              <div>
-                <span className="text-sm font-medium text-gray-900">{item.name}</span>
-                <span className="text-sm text-gray-500"> — {item.role}</span>
-              </div>
+      <div className="space-y-3">
+        {items.map((item) => (
+          <div key={item.id} className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+              item.icon === 'supplier' ? 'bg-blue-100' : 'bg-emerald-100'
+            }`}>
+              {item.icon === 'supplier'
+                ? <Building2 className="w-5 h-5 text-blue-600" />
+                : <Handshake className="w-5 h-5 text-emerald-600" />
+              }
             </div>
-          ))}
-        </div>
+            <div>
+              <span className="text-sm font-medium text-gray-900">{item.name}</span>
+              <span className="text-sm text-gray-500"> — {item.role}</span>
+            </div>
+          </div>
+        ))}
       </div>
     </section>
   );

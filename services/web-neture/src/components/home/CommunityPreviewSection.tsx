@@ -71,8 +71,7 @@ export function CommunityPreviewSection() {
 
   return (
     <section className="py-16 bg-gray-50">
-      <div className="max-w-5xl mx-auto px-4">
-        <div className="text-center mb-10">
+      <div className="text-center mb-10">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Community</h2>
           <p className="text-gray-600">포럼과 자료실에서 정보를 공유합니다</p>
         </div>
@@ -158,7 +157,6 @@ export function CommunityPreviewSection() {
             </div>
           </div>
         </div>
-      </div>
     </section>
   );
 }
