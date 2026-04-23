@@ -25,7 +25,7 @@ import {
   Globe,
   Tag,
 } from 'lucide-react';
-import { publicContentApi, type ContentSource } from '../../lib/api/signageV2';
+import { publicContentApi } from '../../lib/api/signageV2';
 import { assetSnapshotApi } from '../../api/assetSnapshot';
 import { getAccessToken, useAuth } from '../../contexts/AuthContext';
 
@@ -87,22 +87,12 @@ function TypeBadge({ type }: { type: string }) {
   );
 }
 
-// ─── Source tabs ───────────────────────────────────────
-
-const SOURCE_TABS: { key: ContentSource | 'all'; label: string }[] = [
-  { key: 'all',       label: '전체' },
-  { key: 'hq',        label: '운영자 제공' },
-  { key: 'community', label: '커뮤니티' },
-  { key: 'supplier',  label: '공급자' },
-];
-
 // ─── Main Component ────────────────────────────────────
 
 export default function ContentHubPage() {
   const { user } = useAuth();
 
   // Filter state
-  const [source, setSource] = useState<ContentSource | 'all'>('all');
   const [keyword, setKeyword] = useState('');
   const [debouncedKeyword, setDebouncedKeyword] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -139,12 +129,6 @@ export default function ContentHubPage() {
     }, 350);
   };
 
-  // Source tab change resets page
-  const handleSourceChange = (s: ContentSource | 'all') => {
-    setSource(s);
-    setPage(1);
-  };
-
   const handleCategoryChange = (cat: string) => {
     setSelectedCategory(cat);
     setPage(1);
@@ -155,8 +139,7 @@ export default function ContentHubPage() {
     setLoading(true);
     setError(null);
     try {
-      const src = source === 'all' ? undefined : source;
-      const res = await publicContentApi.listMedia(src, SERVICE_KEY, {
+      const res = await publicContentApi.listMedia(undefined, SERVICE_KEY, {
         page,
         limit: PAGE_LIMIT,
         search: debouncedKeyword || undefined,
@@ -173,7 +156,7 @@ export default function ContentHubPage() {
     } finally {
       setLoading(false);
     }
-  }, [source, page, debouncedKeyword, selectedCategory]);
+  }, [page, debouncedKeyword, selectedCategory]);
 
   useEffect(() => { loadMedia(); }, [loadMedia]);
 
@@ -312,23 +295,7 @@ export default function ContentHubPage() {
       )}
 
       {/* Filter Bar */}
-      <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-3">
-        {/* Source tabs */}
-        <div className="flex flex-wrap gap-2">
-          {SOURCE_TABS.map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => handleSourceChange(tab.key)}
-              className={`px-3 py-1.5 text-sm font-medium rounded-full border transition-colors ${
-                source === tab.key
-                  ? 'bg-blue-600 border-blue-600 text-white'
-                  : 'bg-white border-slate-300 text-slate-600 hover:bg-slate-50'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+      <div className="bg-white rounded-xl border border-slate-200 p-4">
         {/* Keyword search + category */}
         <div className="flex flex-wrap gap-2">
           <div className="relative flex-1 min-w-[200px] max-w-md">
@@ -380,7 +347,7 @@ export default function ContentHubPage() {
           <div className="py-16 text-center text-sm text-slate-400 flex flex-col items-center gap-2">
             <VideoIcon className="h-8 w-8 text-slate-200" />
             <p>등록된 콘텐츠가 없습니다</p>
-            {user && source === 'community' && (
+            {user && (
               <button
                 onClick={() => { setCreateForm({ name: '', description: '', sourceUrl: '', category: '' }); setCreateError(null); setCreateModal({ type: 'media' }); }}
                 className="mt-1 text-blue-600 hover:underline"

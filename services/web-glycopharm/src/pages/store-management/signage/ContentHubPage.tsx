@@ -12,7 +12,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Video as VideoIcon, List, AlertCircle } from 'lucide-react';
-import { publicContentApi, type SignagePlaylist, type SignageMedia, type ContentSource } from '@/lib/api/signageV2';
+import { publicContentApi, type SignagePlaylist, type SignageMedia } from '@/lib/api/signageV2';
 import { ContentPagination } from '@o4o/ui';
 
 type ContentType = 'playlists' | 'media';
@@ -20,7 +20,6 @@ const PAGE_SIZE = 9;
 
 export default function ContentHubPage() {
   const navigate = useNavigate();
-  const [activeSource, setActiveSource] = useState<ContentSource>('community');
   const [contentType, setContentType] = useState<ContentType>('playlists');
 
   // Data states
@@ -30,11 +29,11 @@ export default function ContentHubPage() {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Load content when source or type changes
+  // Load content when type changes
   useEffect(() => {
     loadContent();
     setCurrentPage(1);
-  }, [activeSource, contentType]);
+  }, [contentType]);
 
   const loadContent = async () => {
     setLoading(true);
@@ -42,14 +41,14 @@ export default function ContentHubPage() {
 
     try {
       if (contentType === 'playlists') {
-        const result = await publicContentApi.listPlaylists(activeSource, 'glycopharm', { page: 1, limit: 50 });
+        const result = await publicContentApi.listPlaylists(undefined, 'glycopharm', { page: 1, limit: 50 });
         if (result.success && result.data) {
           setAllPlaylists(result.data.items || []);
         } else {
           setError(result.error || 'Failed to load playlists');
         }
       } else {
-        const result = await publicContentApi.listMedia(activeSource, 'glycopharm', { page: 1, limit: 50 });
+        const result = await publicContentApi.listMedia(undefined, 'glycopharm', { page: 1, limit: 50 });
         if (result.success && result.data) {
           setAllMedia(result.data.items || []);
         } else {
@@ -81,24 +80,6 @@ export default function ContentHubPage() {
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const getSourceLabel = (source: ContentSource): string => {
-    switch (source) {
-      case 'hq':
-        return '운영자 콘텐츠';
-      case 'community':
-        return '커뮤니티 콘텐츠';
-    }
-  };
-
-  const getSourceDescription = (source: ContentSource): string => {
-    switch (source) {
-      case 'hq':
-        return 'HQ 및 서비스 운영자가 제작한 공식 콘텐츠';
-      case 'community':
-        return '포럼 및 커뮤니티에서 공유된 콘텐츠';
-    }
   };
 
   const renderPlaylistCard = (playlist: SignagePlaylist) => (
@@ -255,32 +236,9 @@ export default function ContentHubPage() {
         </p>
       </div>
 
-      {/* Tabs */}
+      {/* Content */}
       <div className="bg-white rounded-xl border border-slate-200">
-        <div className="border-b border-slate-200">
-          <div className="flex">
-            {(['community', 'hq'] as ContentSource[]).map((source) => (
-              <button
-                key={source}
-                onClick={() => setActiveSource(source)}
-                className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
-                  activeSource === source
-                    ? 'text-primary-700 border-b-2 border-primary-700 bg-primary-50'
-                    : 'text-slate-600 hover:text-slate-800 hover:bg-slate-50'
-                }`}
-              >
-                {getSourceLabel(source)}
-              </button>
-            ))}
-          </div>
-        </div>
-
         <div className="p-6 space-y-6">
-          {/* Source Description */}
-          <div className="bg-slate-50 rounded-lg p-4">
-            <p className="text-sm text-slate-600">{getSourceDescription(activeSource)}</p>
-          </div>
-
           {/* Content Type Toggle */}
           <div className="flex gap-2">
             <button
