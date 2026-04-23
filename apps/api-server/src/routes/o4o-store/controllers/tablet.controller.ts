@@ -57,7 +57,7 @@ async function queryTabletVisibleProducts(
   }
 
   if (options.q && options.q.length >= 2) {
-    conditions.push(`(pm.marketing_name ILIKE $${paramIdx})`);
+    conditions.push(`(pm.name ILIKE $${paramIdx})`);
     params.push(`%${options.q}%`);
     paramIdx++;
   }
@@ -66,7 +66,7 @@ async function queryTabletVisibleProducts(
 
   const sortMap: Record<string, string> = {
     created_at: 'spo.created_at',
-    name: 'pm.marketing_name',
+    name: 'pm.name',
     price: 'spo.price_general',
     sort_order: 'opl.created_at',
   };
@@ -99,7 +99,7 @@ async function queryTabletVisibleProducts(
 
   const data = await dataSource.query(
     `SELECT DISTINCT ON (spo.id)
-       spo.id, pm.marketing_name AS name,
+       spo.id, pm.name AS name,
        '' AS sku, pm.brand_name AS category,
        spo.price_general AS price, NULL::int AS sale_price,
        0 AS stock_quantity, '[]'::jsonb AS images,

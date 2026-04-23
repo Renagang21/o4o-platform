@@ -47,7 +47,7 @@ export function createNetureOperatorTrialRoutes(): Router {
       let idx = 1;
 
       if (keyword) {
-        conditions.push(`(COALESCE(pm.marketing_name, pm.regulatory_name, '') ILIKE $${idx})`);
+        conditions.push(`(COALESCE(pm.name, pm.regulatory_name, '') ILIKE $${idx})`);
         params.push(`%${keyword}%`);
         idx++;
       }
@@ -74,7 +74,7 @@ export function createNetureOperatorTrialRoutes(): Router {
         ds.query(
           `SELECT
              spo.id,
-             COALESCE(pm.marketing_name, pm.regulatory_name, '') AS name,
+             COALESCE(pm.name, pm.regulatory_name, '') AS name,
              COALESCE(o.name, '') AS "supplierName",
              COALESCE(pc.name, '') AS "categoryName",
              COALESCE(pm.regulatory_type, '') AS "regulatoryType",

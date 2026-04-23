@@ -148,7 +148,7 @@ export function createTabletOperatorController(
 
         if (search) {
           conditions.push(
-            `(pm.marketing_name ILIKE $${idx} OR pm.regulatory_name ILIKE $${idx} OR ns.company_name ILIKE $${idx})`,
+            `(pm.name ILIKE $${idx} OR pm.regulatory_name ILIKE $${idx} OR ns.company_name ILIKE $${idx})`,
           );
           params.push(`%${search}%`);
           idx++;
@@ -190,7 +190,7 @@ export function createTabletOperatorController(
              opl.master_id AS "masterId",
              opl.is_active AS "listingActive",
              opl.service_key AS "serviceKey",
-             pm.marketing_name AS "productName",
+             pm.name AS "productName",
              pm.regulatory_name AS "regulatoryName",
              pm.specification,
              ns.company_name AS "supplierName",
@@ -207,7 +207,7 @@ export function createTabletOperatorController(
            LEFT JOIN neture_suppliers ns ON ns.id = spo.supplier_id
            ${channelJoin}
            WHERE ${whereClause} ${visibleFilter}
-           ORDER BY pm.marketing_name ASC NULLS LAST, opl.created_at DESC
+           ORDER BY pm.name ASC NULLS LAST, opl.created_at DESC
            LIMIT $${idx} OFFSET $${idx + 1}`,
           [...params, limit, offset],
         );

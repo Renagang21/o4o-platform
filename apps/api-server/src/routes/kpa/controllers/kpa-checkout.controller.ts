@@ -279,7 +279,7 @@ export function createKpaCheckoutController(
           price_general: number;
           stock_quantity: number;
           track_inventory: boolean;
-          marketing_name: string;
+          name: string;
           barcode: string;
           distribution_type: string;
           allowed_seller_ids: string[] | null;
@@ -290,7 +290,7 @@ export function createKpaCheckoutController(
                   spo.price_general,
                   spo.stock_quantity,
                   spo.track_inventory,
-                  pm.marketing_name,
+                  pm.name,
                   pm.barcode,
                   spo.distribution_type,
                   spo.allowed_seller_ids
@@ -411,7 +411,7 @@ export function createKpaCheckoutController(
 
           orderItems.push({
             productId: product.id,
-            productName: product.marketing_name,
+            productName: product.name,
             sku: product.barcode,
             quantity: item.quantity,
             unitPrice,

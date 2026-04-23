@@ -92,7 +92,7 @@ export function createStoreChannelProductsController(
              opc.display_order AS "displayOrder",
              opc.created_at AS "createdAt",
              opl.id AS "productListingId",
-             pm.marketing_name AS "productName",
+             pm.name AS "productName",
              spo.price_general AS "retailPrice",
              opl.service_key AS "serviceKey",
              opl.is_active AS "listingActive"
@@ -130,7 +130,7 @@ export function createStoreChannelProductsController(
         const available = await dataSource.query(
           `SELECT
              opl.id,
-             pm.marketing_name AS "productName",
+             pm.name AS "productName",
              spo.price_general AS "retailPrice",
              opl.service_key AS "serviceKey",
              opl.created_at AS "createdAt"
@@ -144,7 +144,7 @@ export function createStoreChannelProductsController(
                FROM organization_product_channels
                WHERE channel_id = $2 AND is_active = true
              )
-           ORDER BY pm.marketing_name ASC`,
+           ORDER BY pm.name ASC`,
           [organizationId, channelId]
         );
 
