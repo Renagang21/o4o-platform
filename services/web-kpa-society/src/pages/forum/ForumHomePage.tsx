@@ -7,6 +7,7 @@
  * 서비스 고유 서브섹션(sort/tag/search)은 renderXxx props로 주입.
  */
 
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { ForumHubTemplate, type ForumHubConfig } from '@o4o/shared-space-ui';
 import { ForumHubSection } from '../../components/forum/ForumHubSection';
@@ -14,6 +15,43 @@ import { ForumActivitySection } from '../../components/forum/ForumActivitySectio
 import { ForumSearchBar } from '../../components/forum/ForumSearchBar';
 import { ForumSearchResults } from '../../components/forum/ForumSearchResults';
 import { ForumWritePrompt } from '../../components/forum/ForumWritePrompt';
+
+// ─── Forum Request Button ─────────────────────────────────────────────────────
+
+const requestBtnStyle: React.CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 6,
+  padding: '10px 18px',
+  backgroundColor: '#2563eb',
+  color: '#ffffff',
+  fontSize: '0.875rem',
+  fontWeight: 600,
+  borderRadius: 8,
+  border: 'none',
+  cursor: 'pointer',
+  whiteSpace: 'nowrap',
+  textDecoration: 'none',
+};
+
+function ForumRequestButton() {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    if (!isAuthenticated) {
+      navigate('/login', { state: { from: '/mypage/my-forums/request' } });
+    } else {
+      navigate('/mypage/my-forums/request');
+    }
+  };
+
+  return (
+    <button onClick={handleClick} style={requestBtnStyle}>
+      + 포럼 개설신청
+    </button>
+  );
+}
 
 // ─── KPA Config ────────────────────────────────────────────────────────────────
 
@@ -43,6 +81,9 @@ const kpaForumConfig: ForumHubConfig = {
 
   // KPA-specific: auth-aware CTA (내부에서 useAuth 사용)
   renderWritePrompt: () => <ForumWritePrompt />,
+
+  // WO-KPA-FORUM-REQUEST-BUTTON-ON-FORUM-V1: Hero 우측 개설신청 버튼
+  renderHeroAction: () => <ForumRequestButton />,
 
   infoLinks: [
     { label: '포럼 목록', href: '/forum/all' },

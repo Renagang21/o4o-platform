@@ -117,6 +117,12 @@ export interface ForumHubConfig {
    * 미제공 시 기본 CTA 렌더러 사용 (isAuthenticated prop 기반)
    */
   renderWritePrompt?: () => React.ReactNode;
+
+  /**
+   * Hero 우측 액션 버튼.
+   * KPA: () => <ForumRequestButton /> (포럼 개설신청)
+   */
+  renderHeroAction?: () => React.ReactNode;
 }
 
 // ─── Default Category Section ─────────────────────────────────────────────────
@@ -408,8 +414,13 @@ export function ForumHubTemplate({ config, isAuthenticated = false }: ForumHubTe
       <PageHero>
         <div style={pageSt.heroInner}>
           <PageContainer>
-            <h1 style={pageSt.heroTitle}>{config.title}</h1>
-            <p style={pageSt.heroDesc}>{config.subtitle}</p>
+            <div style={pageSt.heroRow}>
+              <div>
+                <h1 style={pageSt.heroTitle}>{config.title}</h1>
+                <p style={pageSt.heroDesc}>{config.subtitle}</p>
+              </div>
+              {config.renderHeroAction?.()}
+            </div>
           </PageContainer>
         </div>
       </PageHero>
@@ -473,6 +484,12 @@ const pageSt: Record<string, React.CSSProperties> = {
     backgroundColor: '#FFFFFF',
     borderBottom: '1px solid #E2E8F0',
     padding: '24px 0',
+  },
+  heroRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    gap: 16,
   },
   heroTitle: {
     fontSize: '1.5rem',
