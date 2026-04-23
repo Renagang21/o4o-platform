@@ -315,9 +315,11 @@ function Step2LayoutSelect({
 function Step3AiGenerate({
   productId,
   onGenerated,
+  onSkip,
 }: {
   productId: string;
   onGenerated: (contents: AiContent[]) => void;
+  onSkip: () => void;
 }) {
   const [generating, setGenerating] = useState(false);
   const [polling, setPolling] = useState(false);
@@ -396,6 +398,14 @@ function Step3AiGenerate({
               </>
             )}
           </button>
+          {!generating && !polling && (
+            <button
+              onClick={onSkip}
+              className="mt-3 text-xs text-gray-400 hover:text-gray-600 underline underline-offset-2"
+            >
+              HUB 자료로 직접 작성할 경우 건너뛰기
+            </button>
+          )}
         </div>
       )}
 
@@ -438,13 +448,35 @@ async function uploadImage(file: File): Promise<string> {
 function Step4Edit({
   form,
   onChange,
+  aiContents,
 }: {
   form: PopCreationState['form'];
   onChange: (updates: Partial<PopCreationState['form']>) => void;
+  aiContents: AiContent[];
 }) {
+  const handleApplyAi = () => {
+    const short = aiContents.find((c) => c.contentType === 'pop_short');
+    const long = aiContents.find((c) => c.contentType === 'pop_long');
+    const updates: Partial<PopCreationState['form']> = {};
+    if (short?.content) updates.shortText = short.content;
+    if (long?.content) updates.longText = `<p>${long.content}</p>`;
+    if (Object.keys(updates).length > 0) onChange(updates);
+  };
+
   return (
     <div>
-      <h2 className="text-lg font-semibold text-gray-800 mb-1">편집</h2>
+      <div className="flex items-center justify-between mb-1">
+        <h2 className="text-lg font-semibold text-gray-800">편집</h2>
+        {aiContents.length > 0 && (
+          <button
+            onClick={handleApplyAi}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-orange-700 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-colors"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            AI 결과 적용
+          </button>
+        )}
+      </div>
       <p className="text-sm text-gray-500 mb-5">POP에 표시될 내용을 수정하세요.</p>
 
       <div className="space-y-4">
@@ -710,6 +742,7 @@ export default function PopCreatePage() {
         {step === 3 && state.productId && (
           <Step3AiGenerate
             productId={state.productId}
+            onSkip={next}
             onGenerated={(contents) => {
               const short = contents.find((c) => c.contentType === 'pop_short');
               const long = contents.find((c) => c.contentType === 'pop_long');
@@ -725,7 +758,7 @@ export default function PopCreatePage() {
           />
         )}
         {step === 4 && (
-          <Step4Edit form={state.form} onChange={updateForm} />
+          <Step4Edit form={state.form} onChange={updateForm} aiContents={state.aiContents} />
         )}
         {step === 5 && (
           <Step5Output state={state} />
