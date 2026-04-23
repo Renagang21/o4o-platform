@@ -141,7 +141,7 @@ async function loadProductContentInput(
       `SELECT
          pm.id,
          pm.regulatory_name AS "regulatoryName",
-         pm.marketing_name AS "marketingName",
+         pm.name AS "marketingName",
          pm.specification,
          pm.manufacturer_name AS "manufacturerName",
          pm.tags,

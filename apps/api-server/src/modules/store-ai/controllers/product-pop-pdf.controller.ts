@@ -36,7 +36,7 @@ export function createProductPopPdfRouter(dataSource: DataSource): Router {
       const productRows = await dataSource.query(
         `SELECT
            pm.id,
-           pm.marketing_name AS "marketingName",
+           pm.name AS "marketingName",
            pm.regulatory_name AS "regulatoryName"
          FROM product_masters pm
          WHERE pm.id = $1`,

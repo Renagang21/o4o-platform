@@ -55,7 +55,7 @@ export class ProductConsoleController {
 
       if (search) {
         conditions.push(
-          `(pm.marketing_name ILIKE $${paramIdx} OR pm.regulatory_name ILIKE $${paramIdx} OR pm.barcode ILIKE $${paramIdx} OR pm.manufacturer_name ILIKE $${paramIdx} OR b.name ILIKE $${paramIdx})`
+          `(pm.name ILIKE $${paramIdx} OR pm.regulatory_name ILIKE $${paramIdx} OR pm.barcode ILIKE $${paramIdx} OR pm.manufacturer_name ILIKE $${paramIdx} OR b.name ILIKE $${paramIdx})`
         );
         params.push(`%${search}%`);
         paramIdx++;
@@ -72,7 +72,7 @@ export class ProductConsoleController {
       // Sorting
       const validSortFields: Record<string, string> = {
         createdAt: 'pm.created_at',
-        marketingName: 'pm.marketing_name',
+        marketingName: 'pm.name',
         barcode: 'pm.barcode',
         supplierCount: 'supplier_count',
       };
@@ -92,7 +92,7 @@ export class ProductConsoleController {
 
       // Fetch products
       const products = await AppDataSource.query(
-        `SELECT pm.id, pm.barcode, pm.marketing_name, pm.regulatory_name,
+        `SELECT pm.id, pm.barcode, pm.name, pm.regulatory_name,
                 pm.manufacturer_name, pm.specification, pm.created_at,
                 pm.brand_id, pm.category_id,
                 b.name as brand_name,
@@ -138,7 +138,7 @@ export class ProductConsoleController {
         products: products.map((p: any) => ({
           id: p.id,
           barcode: p.barcode,
-          marketingName: p.marketing_name,
+          marketingName: p.name,
           regulatoryName: p.regulatory_name,
           manufacturerName: p.manufacturer_name,
           specification: p.specification,
@@ -182,7 +182,7 @@ export class ProductConsoleController {
         `SELECT pm.barcode, COUNT(*)::int as count,
                 JSON_AGG(JSON_BUILD_OBJECT(
                   'id', pm.id,
-                  'marketingName', pm.marketing_name,
+                  'marketingName', pm.name,
                   'regulatoryName', pm.regulatory_name,
                   'manufacturerName', pm.manufacturer_name,
                   'createdAt', pm.created_at
@@ -230,7 +230,7 @@ export class ProductConsoleController {
       // Fetch product
       const productRows = await AppDataSource.query(
         `SELECT pm.id, pm.barcode, pm.regulatory_type, pm.regulatory_name,
-                pm.marketing_name, pm.brand_name as legacy_brand_name,
+                pm.name, pm.brand_name as legacy_brand_name,
                 pm.manufacturer_name, pm.specification, pm.origin_country,
                 pm.tags, pm.mfds_permit_number, pm.mfds_product_id,
                 pm.is_mfds_verified, pm.mfds_synced_at,
@@ -268,7 +268,7 @@ export class ProductConsoleController {
           barcode: p.barcode,
           regulatoryType: p.regulatory_type,
           regulatoryName: p.regulatory_name,
-          marketingName: p.marketing_name,
+          marketingName: p.name,
           legacyBrandName: p.legacy_brand_name,
           manufacturerName: p.manufacturer_name,
           specification: p.specification,

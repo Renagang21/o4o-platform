@@ -173,7 +173,7 @@ async function loadProductTagInput(
       `SELECT
          pm.id,
          pm.regulatory_name AS "regulatoryName",
-         pm.marketing_name AS "marketingName",
+         pm.name AS "marketingName",
          pm.specification,
          pm.manufacturer_name AS "manufacturerName",
          pm.regulatory_type AS "regulatoryType",
@@ -237,7 +237,7 @@ async function loadProductContentInput(
       `SELECT
          pm.id,
          pm.regulatory_name AS "regulatoryName",
-         pm.marketing_name AS "marketingName",
+         pm.name AS "marketingName",
          pm.specification,
          pm.manufacturer_name AS "manufacturerName",
          pm.tags,

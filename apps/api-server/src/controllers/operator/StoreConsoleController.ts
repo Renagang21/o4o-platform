@@ -354,7 +354,7 @@ export class StoreConsoleController {
 
       const products = await AppDataSource.query(
         `SELECT opl.id, opl.is_active, opl.price, opl.created_at, opl.updated_at,
-                pm.id as master_id, pm.barcode, pm.marketing_name, pm.regulatory_name,
+                pm.id as master_id, pm.barcode, pm.name, pm.regulatory_name,
                 pm.manufacturer_name,
                 (SELECT pi.image_url FROM product_images pi WHERE pi.master_id = pm.id AND pi.is_primary = true LIMIT 1) as primary_image,
                 spo.price_general as offer_price, spo.distribution_type
@@ -375,7 +375,7 @@ export class StoreConsoleController {
           price: p.price,
           masterId: p.master_id,
           barcode: p.barcode,
-          marketingName: p.marketing_name,
+          marketingName: p.name,
           regulatoryName: p.regulatory_name,
           manufacturerName: p.manufacturer_name,
           primaryImage: p.primary_image,

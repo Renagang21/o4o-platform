@@ -33,7 +33,7 @@ export class ProductAiSearchService {
       `SELECT
          pm.id,
          pm.regulatory_name AS "regulatoryName",
-         pm.marketing_name AS "marketingName",
+         pm.name AS "marketingName",
          pm.tags,
          pm.specification,
          pc.name AS "categoryName",
@@ -46,11 +46,11 @@ export class ProductAiSearchService {
          ON pat.product_id = pm.id AND pat.tag ILIKE $1
        WHERE
          pat.product_id IS NOT NULL
-         OR pm.marketing_name ILIKE $1
+         OR pm.name ILIKE $1
          OR pm.regulatory_name ILIKE $1
-       GROUP BY pm.id, pm.regulatory_name, pm.marketing_name, pm.tags,
+       GROUP BY pm.id, pm.regulatory_name, pm.name, pm.tags,
                 pm.specification, pc.name, b.name
-       ORDER BY score DESC, pm.marketing_name ASC
+       ORDER BY score DESC, pm.name ASC
        LIMIT 20`,
       [pattern],
     );

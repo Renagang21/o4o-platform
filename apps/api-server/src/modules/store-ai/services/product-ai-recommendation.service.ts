@@ -39,7 +39,7 @@ export class ProductAiRecommendationService {
       `SELECT
          pm.id,
          pm.regulatory_name AS "regulatoryName",
-         pm.marketing_name AS "marketingName",
+         pm.name AS "marketingName",
          pm.tags,
          pm.specification,
          pc.name AS "categoryName",
@@ -58,7 +58,7 @@ export class ProductAiRecommendationService {
          WHERE snapshot_date >= CURRENT_DATE - INTERVAL '30 days'
          GROUP BY product_id
        ) snap ON snap.product_id = pm.id
-       GROUP BY pm.id, pm.regulatory_name, pm.marketing_name, pm.tags,
+       GROUP BY pm.id, pm.regulatory_name, pm.name, pm.tags,
                 pm.specification, pc.name, b.name, snap.total_orders
        ORDER BY "matchingTags" DESC, avg_confidence DESC, popularity DESC
        LIMIT $2`,
@@ -90,7 +90,7 @@ export class ProductAiRecommendationService {
        SELECT
          pm.id,
          pm.regulatory_name AS "regulatoryName",
-         pm.marketing_name AS "marketingName",
+         pm.name AS "marketingName",
          pm.tags,
          pm.specification,
          pc.name AS "categoryName",
@@ -104,7 +104,7 @@ export class ProductAiRecommendationService {
        INNER JOIN product_ai_tags pat
          ON pat.product_id = pm.id AND pat.tag IN (SELECT tag FROM store_tags)
        WHERE pm.id NOT IN (SELECT product_master_id FROM store_products WHERE product_master_id IS NOT NULL)
-       GROUP BY pm.id, pm.regulatory_name, pm.marketing_name, pm.tags,
+       GROUP BY pm.id, pm.regulatory_name, pm.name, pm.tags,
                 pm.specification, pc.name, b.name
        ORDER BY "matchingTags" DESC, avg_confidence DESC
        LIMIT $2`,

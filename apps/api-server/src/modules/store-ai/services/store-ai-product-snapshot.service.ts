@@ -111,12 +111,12 @@ export class StoreAiProductSnapshotService {
       const rows = await this.dataSource.query(
         `SELECT
            opl.offer_id AS product_id,
-           COALESCE(pm.marketing_name, pm.regulatory_name, 'Unknown') AS product_name
+           COALESCE(pm.name, pm.regulatory_name, 'Unknown') AS product_name
          FROM organization_product_listings opl
          LEFT JOIN supplier_product_offers spo ON spo.id = opl.offer_id
          LEFT JOIN product_masters pm ON pm.id = spo.product_master_id
          WHERE opl.organization_id = $1 AND opl.is_active = true
-         ORDER BY pm.marketing_name ASC
+         ORDER BY pm.name ASC
          LIMIT 100`,
         [organizationId],
       );

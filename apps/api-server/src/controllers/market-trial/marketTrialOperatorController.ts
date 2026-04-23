@@ -1154,7 +1154,7 @@ export class MarketTrialOperatorController {
         // A안: supplier_product_offers.id 기준으로 연결 (neture 도메인 기준)
         const rows: Array<{ id: string; name: string }> = await ds.query(
           `SELECT spo.id,
-                  COALESCE(pm.marketing_name, pm.regulatory_name, '') AS name
+                  COALESCE(pm.name, pm.regulatory_name, '') AS name
            FROM supplier_product_offers spo
            JOIN product_masters pm ON pm.id = spo.master_id
            WHERE spo.id = $1 AND spo.deleted_at IS NULL
