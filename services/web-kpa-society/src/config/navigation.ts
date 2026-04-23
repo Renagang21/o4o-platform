@@ -30,8 +30,8 @@ export interface KpaContextualNavItem extends GlobalHeaderNavItem {
 export const KPA_CONTEXTUAL_NAV: KpaContextualNavItem[] = [
   { label: '약국 HUB', href: '/hub', visibleWhen: 'pharmacyRelated' },
   { label: '내 약국', href: '/store', visibleWhen: 'storeOwner' },
-  { label: '운영 대시보드', href: '/operator', visibleWhen: 'operator' },
-  // admin은 "운영 대시보드"를 "관리자 콘솔"로 대체 (filterContextualNav에서 처리)
+  // 운영자/관리자 진입은 상단 공용 nav가 아닌 유저 드롭다운(방패 아이콘)으로만 제공
+  // WO-KPA-OPERATOR-HEADER-HOME-LINK-ALIGNMENT-V1
 ];
 
 // ─── Filter Helper ───────────────────────────────────────────────────────────

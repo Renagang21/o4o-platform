@@ -27,7 +27,8 @@ export interface KCosContextualNavItem extends GlobalHeaderNavItem {
 export const KCOS_CONTEXTUAL_NAV: KCosContextualNavItem[] = [
   { label: '매장 관리', href: '/store', visibleWhen: 'storeManager' },
   { label: '파트너', href: '/partner', visibleWhen: 'partner' },
-  { label: '운영 대시보드', href: '/operator', visibleWhen: 'operator' },
+  // 운영자/관리자 진입은 상단 공용 nav가 아닌 유저 드롭다운으로만 제공
+  // WO-O4O-OPERATOR-CONTEXTUAL-NAV-SEPARATION-V1
 ];
 
 // ─── Filter Helper ───────────────────────────────────────────────────────────

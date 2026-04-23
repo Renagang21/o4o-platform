@@ -30,7 +30,8 @@ export interface GlycoContextualNavItem extends GlobalHeaderNavItem {
 export const GLYCO_CONTEXTUAL_NAV: GlycoContextualNavItem[] = [
   { label: '약국 HUB', href: '/hub', visibleWhen: 'pharmacyRelated' },
   { label: '내 약국', href: '/store', visibleWhen: 'storeOwner' },
-  { label: '운영 대시보드', href: '/operator', visibleWhen: 'operator' },
+  // 운영자/관리자 진입은 상단 공용 nav가 아닌 유저 드롭다운으로만 제공
+  // WO-O4O-OPERATOR-CONTEXTUAL-NAV-SEPARATION-V1
 ];
 
 // ─── Filter Helper ───────────────────────────────────────────────────────────
