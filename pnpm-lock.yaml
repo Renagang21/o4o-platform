@@ -2815,6 +2815,9 @@ importers:
 
   packages/shared-space-ui:
     dependencies:
+      '@o4o/ui':
+        specifier: workspace:*
+        version: link:../ui
       react:
         specifier: 19.2.0
         version: 19.2.0
