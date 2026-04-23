@@ -255,6 +255,7 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | Navigation | `docs/platform/navigation/OPERATOR-DASHBOARD-NAVIGATION.md` |
 | Extension | `docs/platform/extensions/EXTENSION-GENERAL-GUIDE.md` |
 | **Operator Dashboard** | `docs/platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md` |
+| **HUB Template Standard** | `docs/platform/hub/O4O-HUB-TEMPLATE-STANDARD-V1.md` |
 
 핵심: Content 단일 출처 / Core 불변 / 데이터 소유권 분리 / 이벤트 기반 통신
 
@@ -349,9 +350,10 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | **디버그 SSR 테스트 페이지** | `docs/platform/debug/DEBUG-SSR-TEST-PAGE-GUIDE-V1.md` |
 | **User/Operator Freeze** | `docs/architecture/USER-OPERATOR-FREEZE-V1.md` |
 | **O4O 공통 구조 원칙** | `docs/o4o-common-structure.md` |
+| **HUB Template Standard** | `docs/platform/hub/O4O-HUB-TEMPLATE-STANDARD-V1.md` |
 
 ---
 
-*Updated: 2026-04-22*
-*Version: 7.2*
+*Updated: 2026-04-23*
+*Version: 7.3*
 *Status: Active Constitution*
