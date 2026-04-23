@@ -1,76 +1,67 @@
 /**
  * ContentListPage — 콘텐츠 허브 목록
  *
- * WO-KPA-CONTENT-HUB-FOUNDATION-V1
- * WO-KPA-CONTENT-UX-REFINEMENT-V1: 테이블 뷰 + 내 콘텐츠 필터 + 행 액션(보기/수정/링크복사)
+ * WO-CONTENT-HUB-STRUCTURE-AND-TABLE-FOUNDATION-V1
+ * (기존) WO-KPA-CONTENT-HUB-FOUNDATION-V1
+ * (기존) WO-KPA-CONTENT-UX-REFINEMENT-V1
  *
- * 탭(전체/참여 프로그램/정보 콘텐츠) + 검색 + 정렬 + 내 콘텐츠 필터
+ * O4O 표준 HUB 구조:
+ * - BaseTable (selectable) + ActionBar (bulk)
+ * - RowActionMenu (row-level)
+ * - 검색 전용 toolbar (정렬/탭 필터 제외)
+ * - Bulk: [복사(URL)] [삭제]
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Link, useSearchParams, useNavigate } from 'react-router-dom';
-import { contentApi, type ContentItem, type ContentListParams } from '../../api/content';
+import { useNavigate } from 'react-router-dom';
+import { Search, Plus, Trash2, Link2 } from 'lucide-react';
+import { BaseTable, ActionBar, RowActionMenu } from '@o4o/ui';
+import type { O4OColumn, ActionBarAction, RowActionItem } from '@o4o/ui';
+import { contentApi, type ContentItem } from '../../api/content';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
 
-// ─── Constants ───────────────────────────────────────────────────────────────
+// ─── Helpers ─────────────────────────────────────────────────
 
-const TABS = [
-  { key: '', label: '전체' },
-  { key: 'participation', label: '참여 프로그램' },
-  { key: 'information', label: '정보 콘텐츠' },
-] as const;
+interface TypeBadgeInfo { label: string; color: string; bg: string }
 
-const SORT_OPTIONS = [
-  { key: 'latest', label: '최신순' },
-  { key: 'popular', label: '인기순' },
-  { key: 'views', label: '조회순' },
-] as const;
+function getTypeBadge(item: ContentItem): TypeBadgeInfo {
+  if (item.content_type === 'participation') {
+    if (item.sub_type === '설문') return { label: '설문', color: '#7c3aed', bg: '#f5f3ff' };
+    if (item.sub_type === '퀴즈') return { label: '퀴즈', color: '#0891b2', bg: '#ecfeff' };
+    return { label: '참여', color: '#7c3aed', bg: '#f5f3ff' };
+  }
+  return { label: '문서', color: '#1d4ed8', bg: '#eff6ff' };
+}
 
-const STATUS_BADGE: Record<string, { label: string; bg: string; color: string }> = {
-  published: { label: '공개', bg: '#dcfce7', color: '#166534' },
-  draft: { label: '초안', bg: '#fef3c7', color: '#92400e' },
-  private: { label: '비공개', bg: '#f1f5f9', color: '#475569' },
-};
+function formatDate(d: string) {
+  try { return new Date(d).toLocaleDateString('ko-KR'); } catch { return '-'; }
+}
 
-const CONTENT_TYPE_LABEL: Record<string, string> = {
-  participation: '참여 프로그램',
-  information: '정보 콘텐츠',
-};
-
-// ─── Component ───────────────────────────────────────────────────────────────
+// ─── Component ───────────────────────────────────────────────
 
 export function ContentListPage() {
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  const initialTab = searchParams.get('type') || '';
-  const initialSort = (searchParams.get('sort') || 'latest') as 'latest' | 'popular' | 'views';
-  const initialMy = searchParams.get('my') === 'true';
 
   const [items, setItems] = useState<ContentItem[]>([]);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
-
-  const [activeTab, setActiveTab] = useState(initialTab);
-  const [sort, setSort] = useState(initialSort);
-  const [myOnly, setMyOnly] = useState(initialMy);
+  const [page, setPage] = useState(1);
   const [searchInput, setSearchInput] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [page, setPage] = useState(1);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
 
   const fetchItems = useCallback(async () => {
     setLoading(true);
     try {
-      const params: ContentListParams = { page, limit: 20, sort };
-      if (activeTab) params.content_type = activeTab;
-      if (searchTerm) params.search = searchTerm;
-      if (myOnly && isAuthenticated) params.my = 'true';
-
-      const res = await contentApi.list(params);
+      const res = await contentApi.list({
+        page,
+        limit: 20,
+        sort: 'latest',
+        ...(searchTerm ? { search: searchTerm } : {}),
+      });
       if (res.success) {
         setItems(res.data.items);
         setTotal(res.data.total);
@@ -81,43 +72,198 @@ export function ContentListPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, sort, activeTab, searchTerm, myOnly, isAuthenticated]);
+  }, [page, searchTerm]);
 
   useEffect(() => { fetchItems(); }, [fetchItems]);
 
-  // Sync URL params
-  useEffect(() => {
-    const p = new URLSearchParams();
-    if (activeTab) p.set('type', activeTab);
-    if (sort !== 'latest') p.set('sort', sort);
-    if (myOnly) p.set('my', 'true');
-    setSearchParams(p, { replace: true });
-  }, [activeTab, sort, myOnly, setSearchParams]);
-
-  const handleTabChange = (key: string) => {
-    setActiveTab(key);
-    setPage(1);
-  };
+  // ── Handlers ──
 
   const handleSearch = () => {
     setSearchTerm(searchInput);
     setPage(1);
+    setSelectedKeys(new Set());
   };
 
-  const handleCopyLink = (item: ContentItem) => {
-    const url = `${window.location.origin}/content/${item.id}`;
-    navigator.clipboard.writeText(url).then(() => {
-      setCopiedId(item.id);
-      toast.success('링크가 복사되었습니다');
-      setTimeout(() => setCopiedId(null), 2000);
-    }).catch(() => {
-      toast.error('복사에 실패했습니다');
-    });
-  };
+  const handleDelete = useCallback(async (id: string) => {
+    try {
+      await contentApi.remove(id);
+      toast.success('삭제되었습니다');
+      setSelectedKeys((prev) => { const next = new Set(prev); next.delete(id); return next; });
+      fetchItems();
+    } catch {
+      toast.error('삭제에 실패했습니다');
+    }
+  }, [fetchItems]);
 
-  const formatDate = (d: string) => {
-    try { return new Date(d).toLocaleDateString('ko-KR'); } catch { return '-'; }
-  };
+  const handleBulkCopy = useCallback(() => {
+    const urls = Array.from(selectedKeys)
+      .map((id) => `${window.location.origin}/content/${id}`)
+      .join('\n');
+    navigator.clipboard.writeText(urls)
+      .then(() => toast.success(`${selectedKeys.size}개 링크가 복사되었습니다`))
+      .catch(() => toast.error('복사에 실패했습니다'));
+  }, [selectedKeys]);
+
+  const handleBulkDelete = useCallback(async () => {
+    try {
+      await Promise.all(Array.from(selectedKeys).map((id) => contentApi.remove(id)));
+      toast.success(`${selectedKeys.size}개가 삭제되었습니다`);
+      setSelectedKeys(new Set());
+      fetchItems();
+    } catch {
+      toast.error('삭제에 실패했습니다');
+    }
+  }, [selectedKeys, fetchItems]);
+
+  // ── Columns ──
+
+  const columns: O4OColumn<ContentItem>[] = [
+    {
+      key: 'content_type',
+      header: '타입',
+      width: 72,
+      render: (_, row) => {
+        const b = getTypeBadge(row);
+        return (
+          <span style={{
+            display: 'inline-block',
+            padding: '2px 8px',
+            fontSize: '0.6875rem',
+            fontWeight: 600,
+            borderRadius: 4,
+            backgroundColor: b.bg,
+            color: b.color,
+            whiteSpace: 'nowrap',
+          }}>
+            {b.label}
+          </span>
+        );
+      },
+    },
+    {
+      key: 'title',
+      header: '제목',
+      render: (_, row) => (
+        <button
+          onClick={() => navigate(`/content/${row.id}`)}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            textAlign: 'left',
+            fontWeight: 600,
+            fontSize: '0.875rem',
+            color: '#1e293b',
+            padding: 0,
+          }}
+        >
+          {row.title}
+        </button>
+      ),
+    },
+    {
+      key: 'author_name',
+      header: '작성자',
+      width: 100,
+      render: (val) => (
+        <span style={{ fontSize: '0.8125rem', color: '#64748b' }}>
+          {val || '익명'}
+        </span>
+      ),
+    },
+    {
+      key: 'created_at',
+      header: '생성일',
+      width: 100,
+      render: (val) => (
+        <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+          {formatDate(val)}
+        </span>
+      ),
+    },
+    {
+      key: 'like_count',
+      header: '👍',
+      width: 56,
+      align: 'center',
+      render: (val) => (
+        <span style={{ fontSize: '0.8125rem', color: '#64748b' }}>{val ?? 0}</span>
+      ),
+    },
+    {
+      key: 'view_count',
+      header: '👁',
+      width: 56,
+      align: 'center',
+      render: (val) => (
+        <span style={{ fontSize: '0.8125rem', color: '#64748b' }}>{val ?? 0}</span>
+      ),
+    },
+    {
+      key: '_comment_count',
+      header: '💬',
+      width: 56,
+      align: 'center',
+      accessor: (row) => (row as any).comment_count,
+      render: (val) => (
+        <span style={{ fontSize: '0.8125rem', color: '#64748b' }}>{val ?? '-'}</span>
+      ),
+    },
+    {
+      key: '_actions',
+      header: '',
+      width: 52,
+      align: 'center',
+      render: (_, row) => {
+        const isOwner = user?.id === row.created_by;
+        if (!isOwner) return null;
+        const actions: RowActionItem[] = [
+          {
+            key: 'edit',
+            label: '수정',
+            onClick: () => navigate(`/content/${row.id}/edit`),
+          },
+          {
+            key: 'delete',
+            label: '삭제',
+            variant: 'danger',
+            onClick: () => handleDelete(row.id),
+            confirm: {
+              title: '삭제 확인',
+              message: '이 콘텐츠를 삭제하시겠습니까?',
+              variant: 'danger',
+            },
+          },
+        ];
+        return <RowActionMenu actions={actions} />;
+      },
+    },
+  ];
+
+  // ── Bulk Actions ──
+
+  const bulkActions: ActionBarAction[] = [
+    {
+      key: 'copy',
+      label: '복사',
+      icon: <Link2 size={14} />,
+      onClick: handleBulkCopy,
+    },
+    {
+      key: 'delete',
+      label: '삭제',
+      variant: 'danger',
+      icon: <Trash2 size={14} />,
+      onClick: handleBulkDelete,
+      confirm: {
+        title: '삭제 확인',
+        message: `선택한 ${selectedKeys.size}개를 삭제하시겠습니까?`,
+        variant: 'danger',
+      },
+    },
+  ];
+
+  // ── Render ──
 
   return (
     <div style={styles.page}>
@@ -125,59 +271,20 @@ export function ContentListPage() {
       <div style={styles.header}>
         <div>
           <h1 style={styles.title}>콘텐츠</h1>
-          <p style={styles.subtitle}>커뮤니티 콘텐츠를 탐색하고 참여하세요</p>
+          <p style={styles.subtitle}>콘텐츠를 탐색하고 관리하세요</p>
         </div>
         {isAuthenticated && (
-          <Link to="/content/new" style={styles.writeButton}>
-            + 콘텐츠 제작
-          </Link>
+          <button onClick={() => navigate('/content/new')} style={styles.newBtn}>
+            <Plus size={16} />
+            콘텐츠 제작
+          </button>
         )}
       </div>
 
-      {/* Tabs */}
-      <div style={styles.tabRow}>
-        {TABS.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => handleTabChange(tab.key)}
-            style={{
-              ...styles.tab,
-              ...(activeTab === tab.key ? styles.tabActive : {}),
-            }}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Filters Row */}
-      <div style={styles.filterRow}>
-        {/* My content toggle */}
-        {isAuthenticated && (
-          <button
-            onClick={() => { setMyOnly(!myOnly); setPage(1); }}
-            style={{
-              ...styles.filterToggle,
-              ...(myOnly ? styles.filterToggleActive : {}),
-            }}
-          >
-            {myOnly ? '● 내 콘텐츠' : '○ 내 콘텐츠'}
-          </button>
-        )}
-
-        {/* Sort */}
-        <select
-          value={sort}
-          onChange={(e) => { setSort(e.target.value as any); setPage(1); }}
-          style={styles.select}
-        >
-          {SORT_OPTIONS.map((opt) => (
-            <option key={opt.key} value={opt.key}>{opt.label}</option>
-          ))}
-        </select>
-
-        {/* Search */}
+      {/* Toolbar: 검색 */}
+      <div style={styles.toolbar}>
         <div style={styles.searchWrap}>
+          <Search size={15} style={{ color: '#94a3b8', flexShrink: 0 }} />
           <input
             type="text"
             placeholder="제목, 작성자 검색..."
@@ -190,161 +297,82 @@ export function ContentListPage() {
         </div>
       </div>
 
-      {/* Content Table */}
+      {/* Bulk ActionBar (선택 시에만 표시) */}
+      {selectedKeys.size > 0 && (
+        <ActionBar
+          selectedCount={selectedKeys.size}
+          actions={bulkActions}
+          onClearSelection={() => setSelectedKeys(new Set())}
+        />
+      )}
+
+      {/* Table */}
       <div style={styles.tableWrap}>
         {loading && items.length === 0 ? (
-          <div style={styles.emptyState}>
-            <p style={styles.emptyText}>불러오는 중...</p>
-          </div>
-        ) : items.length === 0 ? (
-          <div style={styles.emptyState}>
-            <p style={styles.emptyText}>
-              {myOnly ? '작성한 콘텐츠가 없습니다' : '등록된 콘텐츠가 없습니다'}
-            </p>
-            {isAuthenticated && (
-              <Link to="/content/new" style={styles.emptyLink}>첫 콘텐츠 작성하기</Link>
-            )}
+          <div style={styles.loadingState}>
+            <p style={styles.loadingText}>불러오는 중...</p>
           </div>
         ) : (
-          <>
-            <table style={styles.table}>
-              <thead>
-                <tr style={styles.thead}>
-                  <th style={{ ...styles.th, width: '40%' }}>제목</th>
-                  <th style={{ ...styles.th, width: '10%' }}>구분</th>
-                  <th style={{ ...styles.th, width: '10%' }}>작성자</th>
-                  <th style={{ ...styles.th, width: '8%', textAlign: 'center' }}>추천</th>
-                  <th style={{ ...styles.th, width: '8%', textAlign: 'center' }}>상태</th>
-                  <th style={{ ...styles.th, width: '10%' }}>수정일</th>
-                  <th style={{ ...styles.th, width: '14%', textAlign: 'center' }}>액션</th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((item) => {
-                  const statusBadge = STATUS_BADGE[item.status] || STATUS_BADGE.draft;
-                  const isOwner = user?.id === item.created_by;
-
-                  return (
-                    <tr key={item.id} style={styles.tr}>
-                      {/* 제목 */}
-                      <td style={styles.td}>
-                        <Link to={`/content/${item.id}`} style={styles.titleLink}>
-                          {item.title}
-                        </Link>
-                        {item.sub_type && (
-                          <span style={styles.subTypeBadge}>{item.sub_type}</span>
-                        )}
-                      </td>
-                      {/* 구분 */}
-                      <td style={styles.td}>
-                        <span style={styles.typeBadge}>
-                          {CONTENT_TYPE_LABEL[item.content_type] || item.content_type}
-                        </span>
-                      </td>
-                      {/* 작성자 */}
-                      <td style={styles.td}>
-                        <span style={styles.authorText}>{item.author_name || '익명'}</span>
-                      </td>
-                      {/* 추천 */}
-                      <td style={{ ...styles.td, textAlign: 'center' }}>
-                        <span style={styles.statText}>{item.like_count}</span>
-                      </td>
-                      {/* 상태 */}
-                      <td style={{ ...styles.td, textAlign: 'center' }}>
-                        <span style={{
-                          ...styles.statusBadge,
-                          backgroundColor: statusBadge.bg,
-                          color: statusBadge.color,
-                        }}>
-                          {statusBadge.label}
-                        </span>
-                      </td>
-                      {/* 수정일 */}
-                      <td style={styles.td}>
-                        <span style={styles.dateText}>{formatDate(item.updated_at)}</span>
-                      </td>
-                      {/* 액션 */}
-                      <td style={{ ...styles.td, textAlign: 'center' }}>
-                        <div style={styles.actionGroup}>
-                          <button
-                            onClick={() => navigate(`/content/${item.id}`)}
-                            style={styles.actionBtn}
-                            title="보기"
-                          >
-                            보기
-                          </button>
-                          {isOwner && (
-                            <button
-                              onClick={() => navigate(`/content/${item.id}/edit`)}
-                              style={styles.actionBtn}
-                              title="수정"
-                            >
-                              수정
-                            </button>
-                          )}
-                          <button
-                            onClick={() => handleCopyLink(item)}
-                            style={{
-                              ...styles.actionBtn,
-                              ...(copiedId === item.id ? styles.actionBtnCopied : {}),
-                            }}
-                            title="링크 복사"
-                          >
-                            {copiedId === item.id ? '복사됨' : '링크'}
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div style={styles.pagination}>
-                <span style={styles.pageInfo}>총 {total}개</span>
-                <div style={styles.pageButtons}>
-                  <button
-                    onClick={() => setPage(Math.max(1, page - 1))}
-                    disabled={page === 1}
-                    style={styles.pageBtn}
-                  >
-                    ‹
+          <BaseTable
+            columns={columns}
+            data={items}
+            rowKey={(row) => row.id}
+            selectable
+            selectedKeys={selectedKeys}
+            onSelectionChange={setSelectedKeys}
+            emptyMessage={
+              <div style={styles.emptyState}>
+                <p style={styles.emptyText}>등록된 콘텐츠가 없습니다.</p>
+                {isAuthenticated && (
+                  <button onClick={() => navigate('/content/new')} style={styles.emptyLink}>
+                    첫 콘텐츠 제작하기
                   </button>
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    const start = Math.max(1, Math.min(page - 2, totalPages - 4));
-                    return start + i;
-                  }).filter(p => p <= totalPages).map(p => (
-                    <button
-                      key={p}
-                      onClick={() => setPage(p)}
-                      style={{
-                        ...styles.pageBtn,
-                        ...(page === p ? styles.pageBtnActive : {}),
-                      }}
-                    >
-                      {p}
-                    </button>
-                  ))}
-                  <button
-                    onClick={() => setPage(Math.min(totalPages, page + 1))}
-                    disabled={page === totalPages}
-                    style={styles.pageBtn}
-                  >
-                    ›
-                  </button>
-                </div>
+                )}
               </div>
-            )}
-          </>
+            }
+          />
         )}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div style={styles.pagination}>
+          <span style={styles.pageInfo}>총 {total}개</span>
+          <div style={styles.pageButtons}>
+            <button
+              onClick={() => setPage(Math.max(1, page - 1))}
+              disabled={page === 1}
+              style={styles.pageBtn}
+            >
+              ‹
+            </button>
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              const start = Math.max(1, Math.min(page - 2, totalPages - 4));
+              return start + i;
+            }).filter((p) => p <= totalPages).map((p) => (
+              <button
+                key={p}
+                onClick={() => setPage(p)}
+                style={{ ...styles.pageBtn, ...(page === p ? styles.pageBtnActive : {}) }}
+              >
+                {p}
+              </button>
+            ))}
+            <button
+              onClick={() => setPage(Math.min(totalPages, page + 1))}
+              disabled={page === totalPages}
+              style={styles.pageBtn}
+            >
+              ›
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-// ─── Styles ──────────────────────────────────────────────────────────────────
+// ─── Styles ──────────────────────────────────────────────────
 
 const styles: Record<string, React.CSSProperties> = {
   page: {
@@ -356,7 +384,7 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 24,
+    marginBottom: 20,
   },
   title: {
     fontSize: '1.5rem',
@@ -369,97 +397,51 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#64748b',
     margin: '4px 0 0',
   },
-  writeButton: {
+  newBtn: {
     display: 'inline-flex',
     alignItems: 'center',
-    padding: '10px 20px',
+    gap: 6,
+    padding: '10px 18px',
     backgroundColor: '#2563eb',
     color: '#ffffff',
     fontSize: '0.875rem',
     fontWeight: 600,
     borderRadius: 8,
-    textDecoration: 'none',
+    border: 'none',
+    cursor: 'pointer',
     whiteSpace: 'nowrap',
   },
-  tabRow: {
+  toolbar: {
     display: 'flex',
     gap: 8,
-    marginBottom: 16,
-    flexWrap: 'wrap',
-  },
-  tab: {
-    padding: '8px 16px',
-    fontSize: '0.875rem',
-    fontWeight: 500,
-    color: '#475569',
-    backgroundColor: 'transparent',
-    border: '1px solid #e2e8f0',
-    borderRadius: 8,
-    cursor: 'pointer',
-    transition: 'all 0.15s',
-  },
-  tabActive: {
-    backgroundColor: '#2563eb',
-    borderColor: '#2563eb',
-    color: '#ffffff',
-    fontWeight: 600,
-  },
-  filterRow: {
-    display: 'flex',
-    gap: 8,
-    marginBottom: 20,
-    flexWrap: 'wrap',
+    marginBottom: 12,
     alignItems: 'center',
-  },
-  filterToggle: {
-    padding: '8px 14px',
-    fontSize: '0.8125rem',
-    fontWeight: 500,
-    color: '#64748b',
-    backgroundColor: '#ffffff',
-    border: '1px solid #e2e8f0',
-    borderRadius: 8,
-    cursor: 'pointer',
-    transition: 'all 0.15s',
-    whiteSpace: 'nowrap',
-  },
-  filterToggleActive: {
-    color: '#2563eb',
-    borderColor: '#2563eb',
-    backgroundColor: '#eff6ff',
-    fontWeight: 600,
-  },
-  select: {
-    padding: '8px 12px',
-    fontSize: '0.8125rem',
-    border: '1px solid #e2e8f0',
-    borderRadius: 8,
-    color: '#334155',
-    backgroundColor: '#ffffff',
-    cursor: 'pointer',
   },
   searchWrap: {
     display: 'flex',
     flex: 1,
-    minWidth: 200,
-    gap: 4,
+    alignItems: 'center',
+    gap: 8,
+    padding: '8px 12px',
+    border: '1px solid #e2e8f0',
+    borderRadius: 8,
+    backgroundColor: '#ffffff',
   },
   searchInput: {
     flex: 1,
-    padding: '8px 12px',
-    fontSize: '0.8125rem',
-    border: '1px solid #e2e8f0',
-    borderRadius: 8,
+    border: 'none',
     outline: 'none',
+    fontSize: '0.8125rem',
+    color: '#334155',
   },
   searchBtn: {
-    padding: '8px 16px',
+    padding: '4px 12px',
     fontSize: '0.8125rem',
     fontWeight: 600,
     backgroundColor: '#334155',
     color: '#ffffff',
     border: 'none',
-    borderRadius: 8,
+    borderRadius: 6,
     cursor: 'pointer',
   },
   tableWrap: {
@@ -467,102 +449,16 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: 12,
     border: '1px solid #e2e8f0',
     overflow: 'hidden',
+    marginBottom: 12,
   },
-  table: {
-    width: '100%',
-    borderCollapse: 'collapse',
+  loadingState: {
+    textAlign: 'center',
+    padding: '60px 20px',
   },
-  thead: {
-    backgroundColor: '#f8fafc',
-    borderBottom: '1px solid #e2e8f0',
-  },
-  th: {
-    padding: '12px 16px',
-    fontSize: '0.75rem',
-    fontWeight: 600,
-    color: '#64748b',
-    textAlign: 'left',
-    textTransform: 'uppercase' as const,
-    letterSpacing: '0.05em',
-  },
-  tr: {
-    borderBottom: '1px solid #f1f5f9',
-    transition: 'background-color 0.1s',
-  },
-  td: {
-    padding: '12px 16px',
-    fontSize: '0.8125rem',
-    color: '#334155',
-    verticalAlign: 'middle',
-  },
-  titleLink: {
-    color: '#1e293b',
-    textDecoration: 'none',
-    fontWeight: 600,
-    fontSize: '0.875rem',
-    lineHeight: 1.4,
-  },
-  typeBadge: {
-    display: 'inline-block',
-    padding: '2px 8px',
-    fontSize: '0.6875rem',
-    fontWeight: 500,
-    backgroundColor: '#f1f5f9',
-    color: '#475569',
-    borderRadius: 4,
-    whiteSpace: 'nowrap',
-  },
-  subTypeBadge: {
-    display: 'inline-block',
-    marginLeft: 6,
-    padding: '2px 6px',
-    fontSize: '0.625rem',
-    fontWeight: 500,
-    backgroundColor: '#f1f5f9',
+  loadingText: {
+    fontSize: '0.9375rem',
     color: '#94a3b8',
-    borderRadius: 3,
-  },
-  authorText: {
-    fontSize: '0.8125rem',
-    color: '#64748b',
-  },
-  statText: {
-    fontSize: '0.8125rem',
-    color: '#64748b',
-  },
-  statusBadge: {
-    display: 'inline-block',
-    padding: '2px 8px',
-    fontSize: '0.6875rem',
-    fontWeight: 600,
-    borderRadius: 4,
-  },
-  dateText: {
-    fontSize: '0.75rem',
-    color: '#94a3b8',
-  },
-  actionGroup: {
-    display: 'flex',
-    gap: 4,
-    justifyContent: 'center',
-    flexWrap: 'wrap',
-  },
-  actionBtn: {
-    padding: '4px 10px',
-    fontSize: '0.6875rem',
-    fontWeight: 500,
-    color: '#475569',
-    backgroundColor: '#ffffff',
-    border: '1px solid #e2e8f0',
-    borderRadius: 6,
-    cursor: 'pointer',
-    transition: 'all 0.1s',
-    whiteSpace: 'nowrap',
-  },
-  actionBtnCopied: {
-    color: '#16a34a',
-    borderColor: '#bbf7d0',
-    backgroundColor: '#f0fdf4',
+    margin: 0,
   },
   emptyState: {
     textAlign: 'center',
@@ -571,22 +467,22 @@ const styles: Record<string, React.CSSProperties> = {
   emptyText: {
     fontSize: '0.9375rem',
     color: '#64748b',
-    margin: 0,
+    margin: '0 0 12px',
   },
   emptyLink: {
     display: 'inline-block',
-    marginTop: 12,
     fontSize: '0.875rem',
     fontWeight: 600,
     color: '#2563eb',
-    textDecoration: 'none',
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
   },
   pagination: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '12px 16px',
-    borderTop: '1px solid #f1f5f9',
+    padding: '12px 0',
   },
   pageInfo: {
     fontSize: '0.8125rem',

@@ -164,8 +164,8 @@ import { PaymentFailPage } from './pages/storefront/PaymentFailPage';
 // Public Content View (WO-KPA-A-CONTENT-USAGE-MODE-EXTENSION-V1)
 import { PublicContentViewPage, PrintContentPage } from './pages/content';
 
-// Contents Hub (WO-KPA-CONTENT-HUB-FOUNDATION-V1)
-import { ContentListPage, ContentDetailPage, ContentWritePage } from './pages/contents';
+// Contents Hub (WO-KPA-CONTENT-HUB-FOUNDATION-V1 / WO-CONTENT-HUB-STRUCTURE-AND-TABLE-FOUNDATION-V1)
+import { ContentListPage, ContentDetailPage, ContentWritePage, ContentTypeSelectPage, ContentCreatorPlaceholder } from './pages/contents';
 
 // QR Landing Page (WO-O4O-QR-LANDING-PAGE-V1)
 import QrLandingPage from './pages/qr/QrLandingPage';
@@ -532,9 +532,16 @@ function App() {
           {/* My Content (내 콘텐츠 관리) - WO-APP-DATA-HUB-TO-DASHBOARD-PHASE3-V1 */}
           <Route path="/my-content" element={<Layout serviceName={SERVICE_NAME}><MyContentPage /></Layout>} />
 
-          {/* Content Hub (WO-KPA-CONTENT-HUB-FOUNDATION-V1) */}
+          {/* Content Hub (WO-KPA-CONTENT-HUB-FOUNDATION-V1 / WO-CONTENT-HUB-STRUCTURE-AND-TABLE-FOUNDATION-V1) */}
           <Route path="/content" element={<Layout serviceName={SERVICE_NAME}><ContentListPage /></Layout>} />
-          <Route path="/content/new" element={<Layout serviceName={SERVICE_NAME}><ContentWritePage /></Layout>} />
+          {/* 타입 선택 → /content/new */}
+          <Route path="/content/new" element={<Layout serviceName={SERVICE_NAME}><ContentTypeSelectPage /></Layout>} />
+          {/* 문서 제작기 (기존 RichTextEditor) */}
+          <Route path="/content/write" element={<Layout serviceName={SERVICE_NAME}><ContentWritePage /></Layout>} />
+          {/* 비문서 타입 제작기 (준비 중 placeholder) */}
+          <Route path="/content/new/survey" element={<Layout serviceName={SERVICE_NAME}><ContentCreatorPlaceholder type="설문" /></Layout>} />
+          <Route path="/content/new/quiz" element={<Layout serviceName={SERVICE_NAME}><ContentCreatorPlaceholder type="퀴즈" /></Layout>} />
+          <Route path="/content/new/lecture" element={<Layout serviceName={SERVICE_NAME}><ContentCreatorPlaceholder type="강의" /></Layout>} />
           <Route path="/content/:id" element={<Layout serviceName={SERVICE_NAME}><ContentDetailPage /></Layout>} />
           <Route path="/content/:id/edit" element={<Layout serviceName={SERVICE_NAME}><ContentWritePage /></Layout>} />
 
