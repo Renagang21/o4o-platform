@@ -664,11 +664,27 @@ router.get('/categories/:id/delete-check', async (req: Request, res: Response): 
     ]);
     const generalMemberCount = totalMemberCount - ownerCount;
 
-    // 운영자 hard delete: 게시글만 차단, 멤버십은 함께 삭제 가능 (WO-FORUM-HARD-DELETE-POLICY-FIX-V1)
+    // 고아 게시글 판별: authorId가 NULL이거나 users 테이블에 존재하지 않는 게시글
+    // WO-KPA-FORUM-ORPHAN-POST-FORCE-CLEANUP-V1
+    let orphanPostCount = 0;
+    if (postCount > 0) {
+      const orphanRows = await AppDataSource.query(
+        `SELECT COUNT(*)::int AS count
+         FROM forum_post fp
+         LEFT JOIN users u ON u.id = fp."authorId"
+         WHERE fp."categoryId" = $1 AND u.id IS NULL`,
+        [req.params.id],
+      );
+      orphanPostCount = parseInt(orphanRows[0]?.count ?? '0', 10);
+    }
+    const normalPostCount = postCount - orphanPostCount;
+
+    // 운영자 hard delete: 정상 게시글만 차단, 고아 게시글은 자동 정리 허용 (WO-KPA-FORUM-ORPHAN-POST-FORCE-CLEANUP-V1)
     const blockedReasons: string[] = [];
-    if (postCount > 0) blockedReasons.push(`게시글 ${postCount}건이 남아 있습니다`);
+    if (normalPostCount > 0) blockedReasons.push(`정상 게시글 ${normalPostCount}건이 남아 있어 삭제할 수 없습니다`);
 
     const warnings: string[] = [];
+    if (orphanPostCount > 0) warnings.push(`고아 게시글 ${orphanPostCount}건이 자동 정리됩니다 (작성자 계정 없음)`);
     if (generalMemberCount > 0) warnings.push(`일반 멤버 ${generalMemberCount}명의 멤버십이 함께 삭제됩니다`);
     if (ownerCount > 0) warnings.push(`개설자 멤버십이 함께 삭제됩니다`);
 
@@ -676,6 +692,8 @@ router.get('/categories/:id/delete-check', async (req: Request, res: Response): 
       success: true,
       data: {
         postCount,
+        normalPostCount,
+        orphanPostCount,
         memberCount: totalMemberCount,
         generalMemberCount,
         ownerCount,
@@ -714,17 +732,34 @@ router.delete('/categories/:id/hard', async (req: Request, res: Response): Promi
       return;
     }
 
-    // Re-check: 게시글만 차단 (운영자 권한: 멤버 존재는 차단하지 않음) (WO-FORUM-HARD-DELETE-POLICY-FIX-V1)
+    // Re-check: 정상 게시글만 차단, 고아 게시글은 자동 정리 허용 (WO-KPA-FORUM-ORPHAN-POST-FORCE-CLEANUP-V1)
     const postCount = await postRepo().count({ where: { categoryId: req.params.id } });
 
     if (postCount > 0) {
-      res.status(409).json({
-        success: false,
-        error: '연관 데이터가 있어 영구 삭제를 할 수 없습니다',
-        code: 'HARD_DELETE_BLOCKED',
-        data: { blockedReasons: [`게시글 ${postCount}건이 남아 있습니다`] },
-      });
-      return;
+      // 고아 게시글 판별
+      const orphanRows = await AppDataSource.query(
+        `SELECT COUNT(*)::int AS count
+         FROM forum_post fp
+         LEFT JOIN users u ON u.id = fp."authorId"
+         WHERE fp."categoryId" = $1 AND u.id IS NULL`,
+        [req.params.id],
+      );
+      const orphanPostCount = parseInt(orphanRows[0]?.count ?? '0', 10);
+      const normalPostCount = postCount - orphanPostCount;
+
+      if (normalPostCount > 0) {
+        res.status(409).json({
+          success: false,
+          error: '정상 게시글이 남아 있어 영구 삭제를 할 수 없습니다',
+          code: 'HARD_DELETE_BLOCKED',
+          data: { blockedReasons: [`정상 게시글 ${normalPostCount}건이 남아 있습니다`], normalPostCount, orphanPostCount },
+        });
+        return;
+      }
+
+      // 고아 게시글만 남은 경우 → 자동 정리 후 진행
+      const deletedPosts = await postRepo().delete({ categoryId: req.params.id });
+      logger.info(`Forum category ${category.id} (${category.name}): 고아 게시글 ${deletedPosts.affected ?? 0}건 자동 정리 (operator: ${userId})`);
     }
 
     // 멤버십 cascade 삭제 (owner 포함) → FK 위반 방지

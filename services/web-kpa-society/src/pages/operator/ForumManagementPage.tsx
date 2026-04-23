@@ -211,6 +211,8 @@ export default function ForumManagementPage() {
     hardDeleteAllowed: boolean;
     blockedReasons: string[];
     warnings: string[];
+    normalPostCount?: number;
+    orphanPostCount?: number;
   }
   const [hardDeleteTarget, setHardDeleteTarget] = useState<CategoryData | null>(null);
   const [hardDeleteCheck, setHardDeleteCheck] = useState<DeleteCheckData | null>(null);
@@ -403,11 +405,11 @@ export default function ForumManagementPage() {
       if (success > 0) parts.push(`${success}건 삭제`);
       if (blocked > 0) parts.push(`${blocked}건 차단`);
       if (failed > 0) parts.push(`${failed}건 실패`);
-      const detail = blockedItems.map((b) => `${b.name}: ${b.reasons.join(', ')}`).join('\n');
       if (blocked > 0) {
-        alert(`처리 결과: ${parts.join(', ')}\n\n차단 사유:\n${detail}`);
+        const detail = blockedItems.map((b) => `${b.name}: ${b.reasons.join(', ')}`).join('\n');
+        alert(`처리 결과: ${parts.join(', ')}\n\n차단 사유 (정상 게시글 잔존):\n${detail}`);
       }
-      toast.success(parts.join(', '));
+      toast.error(parts.join(', '));
     }
     setSelectedCatIds(new Set());
     loadCategories();
@@ -1126,12 +1128,19 @@ export default function ForumManagementPage() {
                       </div>
                     </>
                   ) : (
-                    <div className="p-3 bg-rose-50 border border-rose-200 rounded-lg space-y-1.5">
-                      <p className="text-sm font-medium text-rose-700">영구 삭제 불가</p>
-                      {hardDeleteCheck.blockedReasons.map((r, i) => (
-                        <p key={i} className="text-sm text-rose-600">&#8226; {r}</p>
-                      ))}
-                      <p className="text-xs text-rose-500 mt-2">게시글을 먼저 삭제한 뒤 다시 시도하세요.</p>
+                    <div className="space-y-2">
+                      <div className="p-3 bg-rose-50 border border-rose-200 rounded-lg space-y-1.5">
+                        <p className="text-sm font-medium text-rose-700">영구 삭제 불가</p>
+                        {hardDeleteCheck.blockedReasons.map((r: string, i: number) => (
+                          <p key={i} className="text-sm text-rose-600">&#8226; {r}</p>
+                        ))}
+                        <p className="text-xs text-rose-500 mt-2">정상 게시글을 먼저 삭제한 뒤 다시 시도하세요.</p>
+                      </div>
+                      {(hardDeleteCheck.orphanPostCount ?? 0) > 0 && (
+                        <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                          <p className="text-xs text-amber-700">&#8226; 고아 게시글 {hardDeleteCheck.orphanPostCount}건 감지 (작성자 계정 없음) — 정상 게시글 정리 후 재시도 시 자동 처리됩니다</p>
+                        </div>
+                      )}
                     </div>
                   )}
                 </>
