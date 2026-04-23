@@ -61,6 +61,12 @@ export function LmsCourseDetailPage() {
   };
 
   const handleEnroll = async () => {
+    // WO-LMS-ARCHIVED-COURSE-ACCESS-POLICY-V1: archived 강의 수강 신청 차단
+    if ((course as any)?.status === 'archived') {
+      toast.error('종료된 강의는 새로 수강 신청할 수 없습니다.');
+      return;
+    }
+
     if (!user) {
       toast.error('로그인이 필요합니다.');
       return;
@@ -104,6 +110,9 @@ export function LmsCourseDetailPage() {
     );
   }
 
+  // WO-LMS-ARCHIVED-COURSE-ACCESS-POLICY-V1
+  const isArchived = (course as any).status === 'archived';
+
   return (
     <div style={styles.container}>
       <PageHeader
@@ -115,12 +124,28 @@ export function LmsCourseDetailPage() {
         ]}
       />
 
+      {/* WO-LMS-ARCHIVED-COURSE-ACCESS-POLICY-V1: 종료 배너 */}
+      {isArchived && (
+        <div style={styles.archivedBanner}>
+          <span style={{ fontSize: '18px' }}>🔒</span>
+          <div>
+            <strong style={{ fontSize: '15px' }}>이 강의는 종료된 강의입니다.</strong>
+            <p style={{ margin: '4px 0 0', fontSize: '13px', opacity: 0.85 }}>
+              기존 수강 기록은 보존되며 신규 신청은 불가합니다.
+            </p>
+          </div>
+        </div>
+      )}
+
       <div style={styles.content}>
         <div style={styles.main}>
           <Card padding="large">
             <div style={styles.courseHeader}>
               <span style={styles.levelBadge}>{getLevelLabel(course.level)}</span>
               <span style={styles.categoryBadge}>{course.category}</span>
+              {isArchived && (
+                <span style={styles.archivedBadge}>종료</span>
+              )}
             </div>
 
             <h1 style={styles.title}>{course.title}</h1>
@@ -187,7 +212,23 @@ export function LmsCourseDetailPage() {
               <div style={styles.thumbnailPlaceholder}>📚</div>
             )}
 
-            {enrollment ? (
+            {/* WO-LMS-ARCHIVED-COURSE-ACCESS-POLICY-V1: archived → 모든 CTA 비활성화 */}
+            {isArchived ? (
+              <div style={styles.archivedCtaBox}>
+                <p style={styles.archivedCtaText}>이 강의는 종료되어 수강 신청이 불가합니다.</p>
+                {enrollment && (
+                  <>
+                    <div style={styles.progressBar}>
+                      <div style={{ ...styles.progressFill, width: `${enrollment.progress}%` }} />
+                    </div>
+                    <p style={styles.progressText}>진도율: {enrollment.progress}%</p>
+                    {(enrollment as any).status === 'completed' && (
+                      <Link to="/mypage/certificates" style={styles.certButton}>수료증 보기</Link>
+                    )}
+                  </>
+                )}
+              </div>
+            ) : enrollment ? (
               // WO-LMS-COMPLETION-AND-CERTIFICATE-UX-REFINEMENT-V1
               (enrollment as any).status === 'completed' ? (
                 <div style={styles.enrolledInfo}>
@@ -415,6 +456,39 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 500,
     textAlign: 'center',
     boxSizing: 'border-box',
+  },
+  // WO-LMS-ARCHIVED-COURSE-ACCESS-POLICY-V1
+  archivedBanner: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: '12px',
+    padding: '14px 20px',
+    backgroundColor: '#fef3c7',
+    border: '1px solid #fde68a',
+    borderRadius: '10px',
+    marginBottom: '20px',
+    color: '#92400e',
+  },
+  archivedBadge: {
+    padding: '4px 10px',
+    backgroundColor: '#f1f5f9',
+    color: '#64748b',
+    borderRadius: '4px',
+    fontSize: '13px',
+    fontWeight: 500,
+  },
+  archivedCtaBox: {
+    padding: '16px',
+    backgroundColor: '#f8fafc',
+    border: '1px solid #e2e8f0',
+    borderRadius: '8px',
+    textAlign: 'center' as const,
+  },
+  archivedCtaText: {
+    fontSize: '13px',
+    color: '#64748b',
+    margin: '0 0 12px',
+    lineHeight: 1.5,
   },
   // WO-LMS-COMPLETION-AND-CERTIFICATE-UX-REFINEMENT-V1
   completedBadge: {
