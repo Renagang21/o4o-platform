@@ -95,7 +95,7 @@ export class GroupbuyService {
          opl.updated_at AS "updatedAt",
          spo.supplier_id AS "supplierId",
          COALESCE(spo.price_general, opl.price)::numeric AS "unitPrice",
-         COALESCE(pm.marketing_name, '(상품명 없음)') AS "productName",
+         COALESCE(pm.name, '(상품명 없음)') AS "productName",
          COALESCE(org.name, '(공급사 없음)') AS "supplierName"
        FROM organization_product_listings opl
        LEFT JOIN supplier_product_offers spo ON spo.id = opl.offer_id
@@ -213,7 +213,7 @@ export class GroupbuyService {
     const productRows = await this.dataSource.query(
       `SELECT spo.id AS spo_id, spo.supplier_id, spo.price_general, spo.is_active,
               spo.approval_status, s.status AS supplier_status,
-              pm.marketing_name
+              pm.name
        FROM supplier_product_offers spo
        JOIN neture_suppliers s ON s.id = spo.supplier_id
        JOIN product_masters pm ON pm.id = spo.master_id
@@ -240,7 +240,7 @@ export class GroupbuyService {
       supplierId: product.supplier_id,
       items: [{
         productId: listing.offer_id,
-        productName: product.marketing_name || '',
+        productName: product.name || '',
         quantity,
         unitPrice,
         subtotal,
@@ -248,7 +248,7 @@ export class GroupbuyService {
       metadata: {
         serviceKey: listing.service_key,
         productListingId: listing.id,
-        productName: product.marketing_name || '',
+        productName: product.name || '',
         productId: listing.offer_id,
       },
     });

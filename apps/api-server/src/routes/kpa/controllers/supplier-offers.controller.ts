@@ -86,7 +86,7 @@ export function createSupplierOffersController(
           SELECT
             spo.id,
             spo.master_id AS "masterId",
-            COALESCE(pm.marketing_name, '(상품명 없음)') AS title,
+            COALESCE(pm.name, '(상품명 없음)') AS title,
             COALESCE(org.name, '(공급사 없음)') AS "supplierName",
             spo.price_general::numeric AS price,
             spo.approval_status AS "approvalStatus"
@@ -102,7 +102,7 @@ export function createSupplierOffersController(
               FROM organization_product_listings
               WHERE service_key = 'kpa-groupbuy'
             )
-          ORDER BY pm.marketing_name ASC
+          ORDER BY pm.name ASC
           LIMIT 50
         `, [supplierId]);
 
@@ -193,7 +193,7 @@ export function createSupplierOffersController(
             opl.offer_id AS "offerId",
             opl.is_active AS "isActive",
             opl.created_at AS "proposedAt",
-            COALESCE(pm.marketing_name, '(상품명 없음)') AS title,
+            COALESCE(pm.name, '(상품명 없음)') AS title,
             COALESCE(org.name, '(공급사 없음)') AS "supplierName",
             spo.price_general::numeric AS price
           FROM organization_product_listings opl
@@ -254,7 +254,7 @@ export function createSupplierOffersController(
         const offerRows = await dataSource.query(
           `SELECT spo.id, spo.master_id, spo.price_general,
                   spo.approval_status, spo.is_active,
-                  pm.marketing_name, org.name AS org_name
+                  pm.name, org.name AS org_name
            FROM supplier_product_offers spo
            JOIN neture_suppliers ns ON ns.id = spo.supplier_id
            LEFT JOIN organizations org ON org.id = ns.organization_id
@@ -322,7 +322,7 @@ export function createSupplierOffersController(
           data: {
             id: saved.id,
             offerId,
-            title: offer.marketing_name || '(상품명 없음)',
+            title: offer.name || '(상품명 없음)',
             supplierName: offer.org_name || '(공급사 없음)',
             status: 'pending',
             isActive: false,

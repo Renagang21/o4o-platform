@@ -123,7 +123,7 @@ export function createGroupbuyOperatorController(
         const offers: AvailableOffer[] = await dataSource.query(`
           SELECT
             spo.id,
-            COALESCE(pm.marketing_name, '(상품명 없음)') AS title,
+            COALESCE(pm.name, '(상품명 없음)') AS title,
             COALESCE(org.name, '(공급사 없음)') AS "supplierName",
             spo.price_general::numeric AS price
           FROM supplier_product_offers spo
@@ -137,7 +137,7 @@ export function createGroupbuyOperatorController(
               FROM organization_product_listings
               WHERE service_key = 'kpa-groupbuy'
             )
-          ORDER BY pm.marketing_name ASC
+          ORDER BY pm.name ASC
           LIMIT 100
         `);
 
@@ -169,7 +169,7 @@ export function createGroupbuyOperatorController(
             opl.offer_id AS "offerId",
             opl.is_active AS "isVisible",
             opl.created_at AS "startDate",
-            COALESCE(pm.marketing_name, '(상품명 없음)') AS title,
+            COALESCE(pm.name, '(상품명 없음)') AS title,
             COALESCE(org.name, '(공급사 없음)') AS "supplierName",
             CONCAT('단가: ', COALESCE(spo.price_general::text, '미정'), '원') AS "conditionSummary",
             COALESCE(oc.order_count, 0)::int AS "orderCount",
@@ -309,7 +309,7 @@ export function createGroupbuyOperatorController(
         // offer 정보 조회
         const offerRows = await dataSource.query(
           `SELECT spo.master_id, spo.price_general,
-                  pm.marketing_name,
+                  pm.name,
                   org.name AS org_name
            FROM supplier_product_offers spo
            LEFT JOIN product_masters pm ON pm.id = spo.master_id
@@ -347,7 +347,7 @@ export function createGroupbuyOperatorController(
           data: {
             id: saved.id,
             offerId,
-            title: offer.marketing_name || '(상품명 없음)',
+            title: offer.name || '(상품명 없음)',
             supplierName: offer.org_name || '(공급사 없음)',
             conditionSummary: `단가: ${offer.price_general ?? '미정'}원`,
             orderCount: 0,
