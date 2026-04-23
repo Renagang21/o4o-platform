@@ -10,9 +10,8 @@
  * WO-SHARED-SPACE-COMPONENT-SPLIT-V1: 공통 컴포넌트 적용
  * WO-KPA-HOME-STRUCTURE-REFINEMENT-V1: 홈 구조 정리 (4블록 허브)
  *
- * 섹션 구조 (4블록):
+ * 섹션 구조 (3블록):
  * ├─ HeroBannerSection        — 동적 광고 캐러셀 (KPA 고유)
- * ├─ HeroSummarySection       — 환영 메시지 + CTA 3개 (shared)
  * ├─ 공지 / 약사공론 뉴스     — 2-column (좌: 공지, 우: placeholder)
  * ├─ AppEntrySection          — 서비스 바로가기 카드 5개 (shared)
  * └─ CtaGuidanceSection       — Market Trial CTA (shared)
@@ -22,10 +21,8 @@ import { useState, useEffect } from 'react';
 import { HeroBannerSection } from '../components/community/HeroBannerSection';
 import { homeApi } from '../api/home';
 import type { HomePageData } from '../api/home';
-import { useAuth } from '../contexts/AuthContext';
 import { colors, spacing } from '../styles/theme';
 import {
-  HeroSummarySection,
   NewsNoticesSection,
   AppEntrySection,
   CtaGuidanceSection,
@@ -80,7 +77,6 @@ const NewspaperIcon = () => (
 // ─── Main Component ─────────────────────────────────────────
 
 export function CommunityHomePage() {
-  const { isAuthenticated, user } = useAuth();
   const [data, setData] = useState<HomePageData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -106,11 +102,6 @@ export function CommunityHomePage() {
     return () => { document.getElementById(id)?.remove(); };
   }, []);
 
-  // ── Hero greeting ──
-  const greeting = isAuthenticated && user?.name
-    ? `${user.name}님, 환영합니다`
-    : '약사 커뮤니티에 오신 것을 환영합니다';
-
   // ── Notice items ──
   const noticeItems: NoticeItem[] = (data?.notices ?? []).map((n) => ({
     id: n.id,
@@ -125,17 +116,7 @@ export function CommunityHomePage() {
       <HeroBannerSection ads={data?.heroAds ?? []} />
 
       <div style={styles.content}>
-        {/* 2. 환영 + CTA (shared) */}
-        <HeroSummarySection
-          greeting={greeting}
-          ctas={[
-            { label: '포럼 참여', href: '/forum', icon: <ForumIcon /> },
-            { label: '강의 수강', href: '/lms', icon: <EducationIconSvg /> },
-            { label: '자료실', href: '/resources', icon: <ResourceLibraryIcon /> },
-          ]}
-        />
-
-        {/* 3. 공지 / 약사공론 뉴스 (2-column) */}
+        {/* 2. 공지 / 약사공론 뉴스 (2-column) */}
         <section style={twoColStyles.section}>
           <div style={twoColStyles.row} className="kpa-home-two-col">
             {/* Left: 공지사항 */}
