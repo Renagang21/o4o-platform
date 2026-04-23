@@ -17,3 +17,5 @@ export { default as PharmacyRequestManagementPage } from './PharmacyRequestManag
 export { default as ProductApplicationManagementPage } from './ProductApplicationManagementPage';
 export { default as CommunityManagementPage } from './CommunityManagementPage';
 export { default as QualificationRequestsPage } from './QualificationRequestsPage';
+// WO-KPA-OPERATOR-LMS-MENU-AND-MANAGEMENT-PAGE-RESTORE-V1
+export { default as OperatorLmsCoursesPage } from './OperatorLmsCoursesPage';

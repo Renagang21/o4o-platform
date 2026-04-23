@@ -16,7 +16,7 @@
  */
 
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { OperatorAiReportPage, ForumManagementPage, ForumDeleteRequestsPage, LegalManagementPage, ForumAnalyticsDashboard, ContentManagementPage, AuditLogPage, MemberManagementPage, PharmacyRequestManagementPage, ProductApplicationManagementPage, CommunityManagementPage, QualificationRequestsPage } from '../pages/operator';
+import { OperatorAiReportPage, ForumManagementPage, ForumDeleteRequestsPage, LegalManagementPage, ForumAnalyticsDashboard, ContentManagementPage, AuditLogPage, MemberManagementPage, PharmacyRequestManagementPage, ProductApplicationManagementPage, CommunityManagementPage, QualificationRequestsPage, OperatorLmsCoursesPage } from '../pages/operator';
 // WO-KPA-A-OPERATOR-DASHBOARD-FIRST-STABILIZATION-V1: UsersPage → /operator/members redirect
 import UserDetailPage from '../pages/operator/UserDetailPage';
 import RoleManagementPage from '../pages/operator/RoleManagementPage';
@@ -131,6 +131,9 @@ export function OperatorRoutes() {
 
           {/* 자격 신청 관리 (WO-O4O-QUALIFICATION-SYSTEM-V1) */}
           <Route path="qualification-requests" element={<QualificationRequestsPage />} />
+
+          {/* LMS 강의 관리 (WO-KPA-OPERATOR-LMS-MENU-AND-MANAGEMENT-PAGE-RESTORE-V1) */}
+          <Route path="lms/courses" element={<OperatorLmsCoursesPage />} />
 
           {/* 매장 관리 (WO-O4O-STORE-HUB-OPERATOR-INTEGRATION-V1) */}
           <Route path="stores" element={<OperatorStoresPage />} />

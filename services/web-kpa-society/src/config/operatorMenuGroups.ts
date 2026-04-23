@@ -42,6 +42,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: 'Home 편집', path: '/operator/community' },
     { label: '콘텐츠 허브', path: '/operator/docs' },
     { label: '콘텐츠 관리', path: '/operator/content' },
+    // WO-KPA-OPERATOR-LMS-MENU-AND-MANAGEMENT-PAGE-RESTORE-V1
+    { label: '강의 관리', path: '/operator/lms/courses' },
   ],
   signage: [
 
@@ -108,6 +110,8 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: 'Home 편집', path: '/operator/community' },
     { label: '콘텐츠 허브', path: '/operator/docs' },
     { label: '콘텐츠 관리', path: '/operator/content' },
+    // WO-KPA-OPERATOR-LMS-MENU-AND-MANAGEMENT-PAGE-RESTORE-V1
+    { label: '강의 관리', path: '/operator/lms/courses' },
   ],
   signage: [
 
