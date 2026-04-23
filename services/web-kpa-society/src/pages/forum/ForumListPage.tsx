@@ -202,21 +202,23 @@ export function ForumListPage() {
           <button type="submit" style={s.searchBtn}>검색</button>
         </form>
         <div style={s.filterRow}>
-          <div style={s.categories}>
-            <button
-              style={{ ...s.catBtn, ...(currentCategory === '' ? s.catBtnActive : {}) }}
-              onClick={() => updateParam('category', '')}
-            >전체</button>
-            {categories.map(cat => (
+          {!currentCategory && (
+            <div style={s.categories}>
               <button
-                key={cat.id}
-                style={{ ...s.catBtn, ...(currentCategory === cat.id ? s.catBtnActive : {}) }}
-                onClick={() => updateParam('category', cat.id)}
-              >{cat.name}{cat.forumType === 'closed' && ' 🔒'}</button>
-            ))}
-          </div>
+                style={{ ...s.catBtn, ...s.catBtnActive }}
+                onClick={() => updateParam('category', '')}
+              >전체</button>
+              {categories.map(cat => (
+                <button
+                  key={cat.id}
+                  style={s.catBtn}
+                  onClick={() => updateParam('category', cat.id)}
+                >{cat.name}{cat.forumType === 'closed' && ' 🔒'}</button>
+              ))}
+            </div>
+          )}
           {writeHref && (
-            <Link to={writeHref} style={s.writeButton}>글쓰기</Link>
+            <Link to={writeHref} style={{ ...s.writeButton, marginLeft: 'auto' }}>글쓰기</Link>
           )}
         </div>
         {hasFilters && (
