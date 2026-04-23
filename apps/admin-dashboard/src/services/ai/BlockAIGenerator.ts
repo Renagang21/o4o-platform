@@ -6,7 +6,7 @@
  */
 
 import { authClient } from '@o4o/auth-client';
-import { buildBlockRefineSystem } from '@o4o/ai-prompts/admin';
+import { buildBlockRefineSystem, BLOCK_ACTION_PROMPTS } from '@o4o/ai-prompts/admin';
 import { Block } from '@/types/post.types';
 import { devLog, devError } from '@/utils/logger';
 
@@ -169,68 +169,42 @@ Translate the content to natural English. Consider cultural context and ensure t
    * Helper: Refine block with "make it concise" preset
    */
   async makeBlockConcise(block: Block, customInstructions?: string): Promise<BlockRefineResult> {
-    return this.refineBlock(block, {
-      type: 'refine',
-      prompt: '이 블록의 내용을 더 간결하고 명확하게 다시 작성해주세요. 핵심 메시지는 유지하되, 불필요한 단어나 문장을 제거해주세요.',
-      customInstructions,
-    });
+    return this.refineBlock(block, { type: 'refine', prompt: BLOCK_ACTION_PROMPTS['refine'], customInstructions });
   }
 
   /**
    * Helper: Refine block with "make it detailed" preset
    */
   async makeBlockDetailed(block: Block, customInstructions?: string): Promise<BlockRefineResult> {
-    return this.refineBlock(block, {
-      type: 'improve',
-      prompt: '이 블록의 내용을 더 설명적이고 자세하게 확장해주세요. 독자가 이해하기 쉽도록 예시나 세부사항을 추가해주세요.',
-      customInstructions,
-    });
+    return this.refineBlock(block, { type: 'improve', prompt: BLOCK_ACTION_PROMPTS['improve'], customInstructions });
   }
 
   /**
    * Helper: Translate block to Korean
    */
   async translateBlockToKorean(block: Block, customInstructions?: string): Promise<BlockRefineResult> {
-    return this.refineBlock(block, {
-      type: 'translate-ko',
-      prompt: '이 블록의 내용을 자연스러운 한국어로 번역해주세요. 문화적 맥락을 고려하여 번역해주세요.',
-      targetLang: 'ko',
-      customInstructions,
-    });
+    return this.refineBlock(block, { type: 'translate-ko', prompt: BLOCK_ACTION_PROMPTS['translate-ko'], targetLang: 'ko', customInstructions });
   }
 
   /**
    * Helper: Translate block to English
    */
   async translateBlockToEnglish(block: Block, customInstructions?: string): Promise<BlockRefineResult> {
-    return this.refineBlock(block, {
-      type: 'translate-en',
-      prompt: 'Translate this block\'s content to natural English. Consider cultural context when translating.',
-      targetLang: 'en',
-      customInstructions,
-    });
+    return this.refineBlock(block, { type: 'translate-en', prompt: BLOCK_ACTION_PROMPTS['translate-en'], targetLang: 'en', customInstructions });
   }
 
   /**
    * Helper: Enhance CTA in block
    */
   async enhanceBlockCTA(block: Block, customInstructions?: string): Promise<BlockRefineResult> {
-    return this.refineBlock(block, {
-      type: 'cta',
-      prompt: '이 블록의 CTA(Call-to-Action)를 더 강력하고 설득력있게 만들어주세요. 행동을 유도하는 명확한 메시지로 개선해주세요.',
-      customInstructions,
-    });
+    return this.refineBlock(block, { type: 'cta', prompt: BLOCK_ACTION_PROMPTS['cta'], customInstructions });
   }
 
   /**
    * Helper: Optimize block for SEO
    */
   async optimizeBlockForSEO(block: Block, customInstructions?: string): Promise<BlockRefineResult> {
-    return this.refineBlock(block, {
-      type: 'seo',
-      prompt: '이 블록의 내용을 SEO에 최적화된 형태로 개선해주세요. 키워드를 자연스럽게 포함하고, 검색엔진 친화적인 구조로 만들어주세요.',
-      customInstructions,
-    });
+    return this.refineBlock(block, { type: 'seo', prompt: BLOCK_ACTION_PROMPTS['seo'], customInstructions });
   }
 }
 

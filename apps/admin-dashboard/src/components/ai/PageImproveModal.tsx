@@ -14,6 +14,7 @@ import { Loader2, Sparkles, CheckCircle, AlertCircle, FileText, ArrowRight, Arro
 import { Block } from '@/types/post.types';
 import { cn } from '@/lib/utils';
 import { pageAIImprover, PageImproveOptions } from '@/services/ai/PageAIImprover';
+import { PAGE_ACTION_PROMPTS } from '@o4o/ai-prompts/admin';
 
 interface PageImproveModalProps {
   isOpen: boolean;
@@ -37,31 +38,31 @@ const PAGE_ACTIONS: PageAction[] = [
     type: 'optimize-order',
     label: '섹션 순서 최적화',
     description: '섹션을 더 논리적인 순서로 재배치합니다',
-    prompt: '이 페이지의 섹션 순서를 사용자 여정을 고려하여 최적화해주세요. 논리적 흐름을 개선하고, 각 섹션이 자연스럽게 연결되도록 재배치해주세요.',
+    prompt: PAGE_ACTION_PROMPTS['optimize-order'],
   },
   {
     type: 'remove-duplicates',
     label: '중복 제거',
     description: '중복되거나 불필요한 내용을 제거합니다',
-    prompt: '이 페이지에서 중복되는 내용이나 불필요한 섹션을 찾아 제거하거나 통합해주세요. 핵심 메시지는 유지하되, 군더더기를 없애주세요.',
+    prompt: PAGE_ACTION_PROMPTS['remove-duplicates'],
   },
   {
     type: 'improve-flow',
     label: '논리적 흐름 개선',
     description: '페이지 전체의 논리적 흐름을 개선합니다',
-    prompt: '페이지 전체의 논리적 흐름을 개선해주세요. 각 섹션이 자연스럽게 이어지고, 사용자가 페이지를 읽으면서 자연스럽게 다음 단계로 이동할 수 있도록 만들어주세요.',
+    prompt: PAGE_ACTION_PROMPTS['improve-flow'],
   },
   {
     type: 'enhance-cta',
     label: 'CTA 강화',
     description: 'Call-to-Action을 페이지 전체에서 강화합니다',
-    prompt: '페이지 전체의 CTA(Call-to-Action)를 강화해주세요. 각 섹션에서 사용자의 행동을 유도하고, 최종 전환으로 이어질 수 있도록 개선해주세요.',
+    prompt: PAGE_ACTION_PROMPTS['enhance-cta'],
   },
   {
     type: 'overall-quality',
     label: '전체 품질 향상',
     description: '페이지의 전반적인 품질을 종합적으로 개선합니다',
-    prompt: '페이지의 전반적인 품질을 종합적으로 개선해주세요. 내용의 명확성, 설득력, 가독성을 높이고, 사용자 경험을 향상시켜주세요.',
+    prompt: PAGE_ACTION_PROMPTS['overall-quality'],
   },
 ];
 

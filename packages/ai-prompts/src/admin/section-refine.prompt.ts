@@ -3,6 +3,17 @@
  * Multi-block section restructuring
  */
 
+/** Action-level user prompt strings — single source of truth for Section AI */
+export const SECTION_ACTION_PROMPTS: Record<
+  'restructure' | 'problem-solution-cta' | 'enhance-cta' | 'add-block',
+  string
+> = {
+  'restructure': '이 섹션의 블록들을 더 효과적인 구조로 재구성해주세요. 논리적 흐름을 개선하고, 중복을 제거하며, 가독성을 높여주세요.',
+  'problem-solution-cta': '이 섹션을 Problem(문제 제기) → Solution(해결책 제시) → CTA(행동 유도) 구조로 재구성해주세요. 각 단계가 명확하게 구분되도록 해주세요.',
+  'enhance-cta': '이 섹션의 CTA(Call-to-Action)를 더 강력하고 설득력있게 만들어주세요. 명확한 행동 유도와 긴박감을 추가해주세요.',
+  'add-block': '이 섹션에 부족한 요소를 파악하고, 섹션을 완성하는 데 도움이 되는 새로운 블록을 추가해주세요.',
+};
+
 export const SECTION_ROLE_DESCRIPTIONS: Record<string, string> = {
   hero: 'Hero Section - 페이지의 첫인상을 결정하는 메인 영역. 강력한 헤드라인, 명확한 가치 제안, 시각적 임팩트가 중요',
   feature: 'Feature Section - 제품/서비스의 핵심 기능과 장점을 명확하게 전달. 각 기능은 구체적이고 이해하기 쉬워야 함',

@@ -15,6 +15,7 @@ import { Loader2, Sparkles, CheckCircle, AlertCircle, Layers } from 'lucide-reac
 import { Block } from '@/types/post.types';
 import { cn } from '@/lib/utils';
 import { sectionAIGenerator, SectionRefineOptions } from '@/services/ai/SectionAIGenerator';
+import { SECTION_ACTION_PROMPTS } from '@o4o/ai-prompts/admin';
 
 interface SectionAIModalProps {
   isOpen: boolean;
@@ -48,25 +49,25 @@ const SECTION_ACTIONS: SectionAction[] = [
     type: 'restructure',
     label: '섹션 재구성',
     description: '블록 구조와 흐름을 개선합니다',
-    prompt: '이 섹션의 블록들을 더 효과적인 구조로 재구성해주세요. 논리적 흐름을 개선하고, 중복을 제거하며, 가독성을 높여주세요.',
+    prompt: SECTION_ACTION_PROMPTS['restructure'],
   },
   {
     type: 'problem-solution-cta',
     label: '문제→해결→CTA 구조',
     description: '설득력 있는 Problem-Solution-CTA 흐름으로 변환',
-    prompt: '이 섹션을 Problem(문제 제기) → Solution(해결책 제시) → CTA(행동 유도) 구조로 재구성해주세요. 각 단계가 명확하게 구분되도록 해주세요.',
+    prompt: SECTION_ACTION_PROMPTS['problem-solution-cta'],
   },
   {
     type: 'enhance-cta',
     label: 'CTA 강화',
     description: 'Call-to-Action을 더 강력하게 만듭니다',
-    prompt: '이 섹션의 CTA(Call-to-Action)를 더 강력하고 설득력있게 만들어주세요. 명확한 행동 유도와 긴박감을 추가해주세요.',
+    prompt: SECTION_ACTION_PROMPTS['enhance-cta'],
   },
   {
     type: 'add-block',
     label: '새 블록 추가',
     description: '섹션에 유용한 블록을 추가합니다',
-    prompt: '이 섹션에 부족한 요소를 파악하고, 섹션을 완성하는 데 도움이 되는 새로운 블록을 추가해주세요.',
+    prompt: SECTION_ACTION_PROMPTS['add-block'],
   },
 ];
 

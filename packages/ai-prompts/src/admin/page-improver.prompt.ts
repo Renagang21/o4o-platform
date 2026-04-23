@@ -3,6 +3,18 @@
  * Full-page optimization with action-type specific guidance
  */
 
+/** Action-level user prompt strings — single source of truth for Page AI */
+export const PAGE_ACTION_PROMPTS: Record<
+  'optimize-order' | 'remove-duplicates' | 'improve-flow' | 'enhance-cta' | 'overall-quality',
+  string
+> = {
+  'optimize-order': '이 페이지의 섹션 순서를 사용자 여정을 고려하여 최적화해주세요. 논리적 흐름을 개선하고, 각 섹션이 자연스럽게 연결되도록 재배치해주세요.',
+  'remove-duplicates': '이 페이지에서 중복되는 내용이나 불필요한 섹션을 찾아 제거하거나 통합해주세요. 핵심 메시지는 유지하되, 군더더기를 없애주세요.',
+  'improve-flow': '페이지 전체의 논리적 흐름을 개선해주세요. 각 섹션이 자연스럽게 이어지고, 사용자가 페이지를 읽으면서 자연스럽게 다음 단계로 이동할 수 있도록 만들어주세요.',
+  'enhance-cta': '페이지 전체의 CTA(Call-to-Action)를 강화해주세요. 각 섹션에서 사용자의 행동을 유도하고, 최종 전환으로 이어질 수 있도록 개선해주세요.',
+  'overall-quality': '페이지의 전반적인 품질을 종합적으로 개선해주세요. 내용의 명확성, 설득력, 가독성을 높이고, 사용자 경험을 향상시켜주세요.',
+};
+
 export function buildPageImproverSystem(blockTypes: string): string {
   return `You are an expert content strategist and UX designer specializing in optimizing full-page experiences.
 

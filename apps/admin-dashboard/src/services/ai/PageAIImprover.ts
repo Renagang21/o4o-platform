@@ -6,7 +6,7 @@
  */
 
 import { authClient } from '@o4o/auth-client';
-import { buildPageImproverSystem, PAGE_ACTION_GUIDANCE } from '@o4o/ai-prompts/admin';
+import { PAGE_ACTION_PROMPTS, buildPageImproverSystem, PAGE_ACTION_GUIDANCE } from '@o4o/ai-prompts/admin';
 import { Block } from '@/types/post.types';
 import { devLog, devError } from '@/utils/logger';
 
@@ -181,60 +181,35 @@ ${options.customInstructions}`;
    * Helper: Optimize section order
    */
   async optimizeSectionOrder(blocks: Block[], documentTitle?: string, customInstructions?: string): Promise<PageImproveResult> {
-    return this.improvePage(blocks, {
-      type: 'optimize-order',
-      prompt: '이 페이지의 섹션 순서를 사용자 여정을 고려하여 최적화해주세요. 논리적 흐름을 개선하고, 각 섹션이 자연스럽게 연결되도록 재배치해주세요.',
-      documentTitle,
-      customInstructions,
-    });
+    return this.improvePage(blocks, { type: 'optimize-order', prompt: PAGE_ACTION_PROMPTS['optimize-order'], documentTitle, customInstructions });
   }
 
   /**
    * Helper: Remove duplicates
    */
   async removeDuplicates(blocks: Block[], documentTitle?: string, customInstructions?: string): Promise<PageImproveResult> {
-    return this.improvePage(blocks, {
-      type: 'remove-duplicates',
-      prompt: '이 페이지에서 중복되는 내용이나 불필요한 섹션을 찾아 제거하거나 통합해주세요. 핵심 메시지는 유지하되, 군더더기를 없애주세요.',
-      documentTitle,
-      customInstructions,
-    });
+    return this.improvePage(blocks, { type: 'remove-duplicates', prompt: PAGE_ACTION_PROMPTS['remove-duplicates'], documentTitle, customInstructions });
   }
 
   /**
    * Helper: Improve logical flow
    */
   async improveFlow(blocks: Block[], documentTitle?: string, customInstructions?: string): Promise<PageImproveResult> {
-    return this.improvePage(blocks, {
-      type: 'improve-flow',
-      prompt: '페이지 전체의 논리적 흐름을 개선해주세요. 각 섹션이 자연스럽게 이어지고, 사용자가 페이지를 읽으면서 자연스럽게 다음 단계로 이동할 수 있도록 만들어주세요.',
-      documentTitle,
-      customInstructions,
-    });
+    return this.improvePage(blocks, { type: 'improve-flow', prompt: PAGE_ACTION_PROMPTS['improve-flow'], documentTitle, customInstructions });
   }
 
   /**
    * Helper: Enhance CTA
    */
   async enhanceCTA(blocks: Block[], documentTitle?: string, customInstructions?: string): Promise<PageImproveResult> {
-    return this.improvePage(blocks, {
-      type: 'enhance-cta',
-      prompt: '페이지 전체의 CTA(Call-to-Action)를 강화해주세요. 각 섹션에서 사용자의 행동을 유도하고, 최종 전환으로 이어질 수 있도록 개선해주세요.',
-      documentTitle,
-      customInstructions,
-    });
+    return this.improvePage(blocks, { type: 'enhance-cta', prompt: PAGE_ACTION_PROMPTS['enhance-cta'], documentTitle, customInstructions });
   }
 
   /**
    * Helper: Overall quality improvement
    */
   async improveOverallQuality(blocks: Block[], documentTitle?: string, customInstructions?: string): Promise<PageImproveResult> {
-    return this.improvePage(blocks, {
-      type: 'overall-quality',
-      prompt: '페이지의 전반적인 품질을 종합적으로 개선해주세요. 내용의 명확성, 설득력, 가독성을 높이고, 사용자 경험을 향상시켜주세요.',
-      documentTitle,
-      customInstructions,
-    });
+    return this.improvePage(blocks, { type: 'overall-quality', prompt: PAGE_ACTION_PROMPTS['overall-quality'], documentTitle, customInstructions });
   }
 }
 

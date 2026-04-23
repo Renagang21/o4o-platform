@@ -6,7 +6,7 @@
  */
 
 import { authClient } from '@o4o/auth-client';
-import { SECTION_ROLE_DESCRIPTIONS, buildSectionRefineSystem } from '@o4o/ai-prompts/admin';
+import { SECTION_ACTION_PROMPTS, SECTION_ROLE_DESCRIPTIONS, buildSectionRefineSystem } from '@o4o/ai-prompts/admin';
 import { Block } from '@/types/post.types';
 import { devLog, devError } from '@/utils/logger';
 
@@ -206,44 +206,28 @@ Analyze what's missing from this section and add blocks to:
    * Helper: Restructure section for better flow
    */
   async restructureSection(blocks: Block[], customInstructions?: string): Promise<SectionRefineResult> {
-    return this.refineSection(blocks, {
-      type: 'restructure',
-      prompt: '이 섹션의 블록들을 더 효과적인 구조로 재구성해주세요. 논리적 흐름을 개선하고, 중복을 제거하며, 가독성을 높여주세요.',
-      customInstructions,
-    });
+    return this.refineSection(blocks, { type: 'restructure', prompt: SECTION_ACTION_PROMPTS['restructure'], customInstructions });
   }
 
   /**
    * Helper: Convert to Problem-Solution-CTA structure
    */
   async convertToProblemSolutionCTA(blocks: Block[], customInstructions?: string): Promise<SectionRefineResult> {
-    return this.refineSection(blocks, {
-      type: 'problem-solution-cta',
-      prompt: '이 섹션을 Problem(문제 제기) → Solution(해결책 제시) → CTA(행동 유도) 구조로 재구성해주세요. 각 단계가 명확하게 구분되도록 해주세요.',
-      customInstructions,
-    });
+    return this.refineSection(blocks, { type: 'problem-solution-cta', prompt: SECTION_ACTION_PROMPTS['problem-solution-cta'], customInstructions });
   }
 
   /**
    * Helper: Enhance CTA in section
    */
   async enhanceSectionCTA(blocks: Block[], customInstructions?: string): Promise<SectionRefineResult> {
-    return this.refineSection(blocks, {
-      type: 'enhance-cta',
-      prompt: '이 섹션의 CTA(Call-to-Action)를 더 강력하고 설득력있게 만들어주세요. 명확한 행동 유도와 긴박감을 추가해주세요.',
-      customInstructions,
-    });
+    return this.refineSection(blocks, { type: 'enhance-cta', prompt: SECTION_ACTION_PROMPTS['enhance-cta'], customInstructions });
   }
 
   /**
    * Helper: Add useful blocks to section
    */
   async addBlocksToSection(blocks: Block[], customInstructions?: string): Promise<SectionRefineResult> {
-    return this.refineSection(blocks, {
-      type: 'add-block',
-      prompt: '이 섹션에 부족한 요소를 파악하고, 섹션을 완성하는 데 도움이 되는 새로운 블록을 추가해주세요.',
-      customInstructions,
-    });
+    return this.refineSection(blocks, { type: 'add-block', prompt: SECTION_ACTION_PROMPTS['add-block'], customInstructions });
   }
 }
 
