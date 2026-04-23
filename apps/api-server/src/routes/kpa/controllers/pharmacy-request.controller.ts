@@ -7,6 +7,7 @@
  * OrganizationJoinRequest와 완전 분리.
  *
  * WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반 relation-based ownership
+ * WO-KPA-PHARMACY-APPROVAL-ENSURE-STORE-LINK-V1: 승인 시 pharmacy organization + member 연결 보장
  *
  * POST /                — 신청 생성
  * GET  /pending         — 대기 목록 (operator)
@@ -185,19 +186,40 @@ export function createPharmacyRequestRoutes(
       request.review_note = req.body.reviewNote || null;
       await repo.save(request);
 
-      // WO-ROLE-NORMALIZATION-PHASE3-A-V1: relation-based ownership via organization_members
-      const [kpaMember] = await dataSource.query(
-        `SELECT organization_id FROM kpa_members WHERE user_id = $1 LIMIT 1`,
-        [request.user_id]
+      // WO-KPA-PHARMACY-APPROVAL-ENSURE-STORE-LINK-V1
+      // 승인 = 권한 부여 + 실제 매장 연결 완료 (승인 후 isStoreOwner=true + storeSlug 보장)
+
+      // 1. pharmacy organization ensure (멱등 — business_number 기반 code)
+      const orgCode = `kpa-pharm-${request.business_number.replace(/[^0-9]/g, '')}`;
+      const orgResult = await organizationOpsService.ensureOrganization({
+        name: request.pharmacy_name,
+        code: orgCode,
+        type: 'pharmacy',
+        createdByUserId: request.user_id,
+      });
+
+      // 2. kpa_members.organization_id — null인 경우에만 업데이트 (기존 분회 연결 보호)
+      await dataSource.query(
+        `UPDATE kpa_members SET organization_id = $1, updated_at = NOW()
+         WHERE user_id = $2 AND organization_id IS NULL`,
+        [orgResult.id, request.user_id],
       );
-      if (kpaMember?.organization_id) {
-        await organizationOpsService.addMember({
-          organizationId: kpaMember.organization_id,
-          userId: request.user_id,
-          role: 'owner',
-          isPrimary: false,
-        });
-      }
+
+      // 3. organization_members — role=owner (멱등)
+      await organizationOpsService.addMember({
+        organizationId: orgResult.id,
+        userId: request.user_id,
+        role: 'owner',
+        isPrimary: false,
+      });
+
+      // 4. kpa_pharmacist_profiles.activity_type upsert (isStoreOwner fallback 경로 보장)
+      await dataSource.query(
+        `INSERT INTO kpa_pharmacist_profiles (id, user_id, activity_type, created_at, updated_at)
+         VALUES (gen_random_uuid(), $1, 'pharmacy_owner', NOW(), NOW())
+         ON CONFLICT (user_id) DO UPDATE SET activity_type = 'pharmacy_owner', updated_at = NOW()`,
+        [request.user_id],
+      );
 
       actionLogService?.logSuccess('kpa-society', user.id, 'kpa.operator.pharmacy_approve', {
         meta: { targetId: req.params.id, statusBefore: 'pending', statusAfter: 'approved' },
