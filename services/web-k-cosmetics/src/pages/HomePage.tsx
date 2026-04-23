@@ -23,6 +23,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { PageHero, PageSection } from '@o4o/ui';
 import { useAuth } from '../contexts';
 import { BusinessOnboardingBanner } from '../components/onboarding/BusinessOnboardingBanner';
 import { NoticeSection } from '../components/home/NoticeSection';
@@ -469,33 +470,53 @@ export function HomePage() {
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#fff' }}>
       {/* 1. Hero / Campaign Slider (V3: CMS 연동, 정적 fallback) */}
-      <HeroSection slides={activeHeroSlides} />
+      <PageHero><HeroSection slides={activeHeroSlides} /></PageHero>
 
       {/* Business Onboarding Banner */}
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '24px 24px 0' }}>
-        <BusinessOnboardingBanner />
-      </div>
+      <PageSection>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
+          <BusinessOnboardingBanner />
+        </div>
+      </PageSection>
 
       {/* 2. Quick Action — 운영 도구 요약 (V4 tune: products/tourist-hub 실수치, trial 링크 수정) */}
-      <QuickActionSection
-        productsVisibleCount={productsVisibleCount}
-        touristHubActiveStores={homeData?.touristHubActiveStores ?? null}
-      />
+      <PageSection>
+        <QuickActionSection
+          productsVisibleCount={productsVisibleCount}
+          touristHubActiveStores={homeData?.touristHubActiveStores ?? null}
+        />
+      </PageSection>
 
       {/* 3. Now Running — Market Trial (V2 동적화 완료) */}
-      <NowRunningSection items={homeData?.runningTrials ?? []} loading={loading} />
+      {(loading || (homeData?.runningTrials ?? []).length > 0) && (
+        <PageSection>
+          <NowRunningSection items={homeData?.runningTrials ?? []} loading={loading} />
+        </PageSection>
+      )}
 
       {/* 4. 운영 공지 (V1 동적화 완료) */}
-      <NoticeSection prefetchedNotices={homeData?.notices} loading={loading} />
+      <PageSection>
+        <NoticeSection prefetchedNotices={homeData?.notices} loading={loading} />
+      </PageSection>
 
       {/* 커뮤니티 진입 CTA (WO-KCOS-COMMUNITY-CONTENT-INTEGRATION-V1) */}
-      <CommunityCTASection />
+      <PageSection>
+        <CommunityCTASection />
+      </PageSection>
 
       {/* CTA for Non-authenticated Users */}
-      <CTASection />
+      {!isAuthenticated && (
+        <PageSection>
+          <CTASection />
+        </PageSection>
+      )}
 
       {/* 5. 협력 브랜드 신뢰 Zone (V2 동적화 완료) */}
-      <PartnerTrustSection partners={homeData?.partners ?? []} />
+      {(homeData?.partners ?? []).length > 0 && (
+        <PageSection last>
+          <PartnerTrustSection partners={homeData?.partners ?? []} />
+        </PageSection>
+      )}
     </div>
   );
 }

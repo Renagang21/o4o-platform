@@ -20,6 +20,7 @@
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { PageHero, PageSection } from '@o4o/ui';
 import HeroSlider from '../components/home/HeroSlider';
 import { PlatformIntroSection } from '../components/home/PlatformIntroSection';
 import HomepageAds from '../components/home/HomepageAds';
@@ -168,15 +169,15 @@ const mts: Record<string, React.CSSProperties> = {
 export default function NetureHomePage() {
   return (
     <div className="min-h-screen">
-      <HeroSlider />
-      <PlatformIntroSection />
-      <HomepageAds />
-      <MarketTrialSection />
-      <LatestUpdatesSection />
-      <CommunityPreviewSection />
-      <FeaturedSection />
-      <PartnerLogoCarousel />
-      <HomeCtaSection />
+      <PageHero><HeroSlider /></PageHero>
+      <PageSection><PlatformIntroSection /></PageSection>
+      <PageSection><HomepageAds /></PageSection>
+      <PageSection><MarketTrialSection /></PageSection>
+      <PageSection><LatestUpdatesSection /></PageSection>
+      <PageSection><CommunityPreviewSection /></PageSection>
+      <PageSection><FeaturedSection /></PageSection>
+      <PageSection><PartnerLogoCarousel /></PageSection>
+      <PageSection last><HomeCtaSection /></PageSection>
     </div>
   );
 }

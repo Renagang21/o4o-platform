@@ -43,6 +43,7 @@ import {
   ContentHighlightSection,
 } from '@o4o/shared-space-ui';
 import type { NoticeItem, FeaturedPost, RecentPost, SignageMediaItem, SignagePlaylistItem, ContentHighlightItem } from '@o4o/shared-space-ui';
+import { PageHero, PageSection } from '@o4o/ui';
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -221,95 +222,109 @@ export default function CommunityMainPage() {
       <div className="max-w-4xl mx-auto px-4 py-6">
 
         {/* ─── 1. Hero / Summary (shared) ─── */}
-        <HeroSummarySection
-          greeting={greeting}
-          subtitle="매장 운영에 필요한 정보와 콘텐츠를 한 곳에서 확인하세요"
-          ctas={[
-            { label: '포럼 참여', href: '/forum', icon: <MessageSquare size={16} /> },
-            { label: '강의 수강', href: '/lms', icon: <GraduationCap size={16} /> },
-            { label: '사이니지 관리', href: '/signage', icon: <Play size={16} /> },
-          ]}
-        />
+        <PageHero>
+          <HeroSummarySection
+            greeting={greeting}
+            subtitle="매장 운영에 필요한 정보와 콘텐츠를 한 곳에서 확인하세요"
+            ctas={[
+              { label: '포럼 참여', href: '/forum', icon: <MessageSquare size={16} /> },
+              { label: '강의 수강', href: '/lms', icon: <GraduationCap size={16} /> },
+              { label: '사이니지 관리', href: '/signage', icon: <Play size={16} /> },
+            ]}
+          />
+        </PageHero>
 
         {/* ─── 2. News / Notices (shared) ─── */}
-        <NewsNoticesSection
-          tabs={[
-            { key: 'notices', label: '공지사항' },
-            { key: 'yakup', label: '약업신문' },
-          ]}
-          activeTab={newsTab}
-          onTabChange={(key) => setNewsTab(key as 'notices' | 'yakup')}
-          items={noticeItems}
-          loading={feedLoading}
-          emptyTitle="아직 등록된 공지가 없습니다."
-          emptySubtitle="새 소식이 등록되면 여기에 표시됩니다."
-          viewAllHref="/forum/posts?category=공지"
-          externalCta={newsTab === 'yakup' ? {
-            icon: <Newspaper size={32} />,
-            message: '약업신문에서 업계 소식을 확인하세요',
-            href: 'https://www.yakup.com',
-            linkLabel: '약업신문 바로가기 →',
-          } : undefined}
-        />
+        <PageSection>
+          <NewsNoticesSection
+            tabs={[
+              { key: 'notices', label: '공지사항' },
+              { key: 'yakup', label: '약업신문' },
+            ]}
+            activeTab={newsTab}
+            onTabChange={(key) => setNewsTab(key as 'notices' | 'yakup')}
+            items={noticeItems}
+            loading={feedLoading}
+            emptyTitle="아직 등록된 공지가 없습니다."
+            emptySubtitle="새 소식이 등록되면 여기에 표시됩니다."
+            viewAllHref="/forum/posts?category=공지"
+            externalCta={newsTab === 'yakup' ? {
+              icon: <Newspaper size={32} />,
+              message: '약업신문에서 업계 소식을 확인하세요',
+              href: 'https://www.yakup.com',
+              linkLabel: '약업신문 바로가기 →',
+            } : undefined}
+          />
+        </PageSection>
 
         {/* ─── 3. Activity (shared) ─── */}
-        <SharedActivitySection
-          featuredPosts={featuredPosts}
-          recentPosts={recentPostItems}
-          loading={feedLoading}
-          emptyMessage="아직 게시물이 없습니다."
-          emptyActionLabel="첫 글 작성하기"
-          emptyActionHref="/forum/write"
-          viewAllHref="/forum/posts"
-        />
+        <PageSection>
+          <SharedActivitySection
+            featuredPosts={featuredPosts}
+            recentPosts={recentPostItems}
+            loading={feedLoading}
+            emptyMessage="아직 게시물이 없습니다."
+            emptyActionLabel="첫 글 작성하기"
+            emptyActionHref="/forum/write"
+            viewAllHref="/forum/posts"
+          />
+        </PageSection>
 
         {/* ─── 4. App Entry (shared) ─── */}
-        <AppEntrySection
-          title="서비스 바로가기"
-          subtitle="각 서비스로 바로 이동하세요"
-          cards={[
-            { title: '약사 포럼', description: '동료 약사와 질문·토론으로 전문성을 높이세요', href: '/forum', icon: <MessageSquare size={20} /> },
-            { title: '교육 / 강의', description: '전문 강좌를 온라인으로 수강하세요', href: '/lms', icon: <BookOpen size={20} /> },
-            { title: '디지털 사이니지', description: '약국 디지털 미디어를 관리하세요', href: '/signage', icon: <Play size={20} /> },
-          ]}
-        />
+        <PageSection>
+          <AppEntrySection
+            title="서비스 바로가기"
+            subtitle="각 서비스로 바로 이동하세요"
+            cards={[
+              { title: '약사 포럼', description: '동료 약사와 질문·토론으로 전문성을 높이세요', href: '/forum', icon: <MessageSquare size={20} /> },
+              { title: '교육 / 강의', description: '전문 강좌를 온라인으로 수강하세요', href: '/lms', icon: <BookOpen size={20} /> },
+              { title: '디지털 사이니지', description: '약국 디지털 미디어를 관리하세요', href: '/signage', icon: <Play size={20} /> },
+            ]}
+          />
+        </PageSection>
 
         {/* ─── 5. Content Highlight (shared) ─── */}
-        <ContentHighlightSection
-          title="콘텐츠"
-          primaryGroupTitle="최근 콘텐츠"
-          secondaryGroupTitle={recommendedContent.length > 0 ? '추천 콘텐츠' : undefined}
-          primaryItems={recentContent.map(toHighlightItem)}
-          secondaryItems={recommendedContent.map(toHighlightItem)}
-          viewAllHref="/lms"
-          viewAllLabel="전체보기 →"
-          loading={contentLoading}
-          emptyMessage="등록된 콘텐츠가 없습니다."
-        />
+        <PageSection>
+          <ContentHighlightSection
+            title="콘텐츠"
+            primaryGroupTitle="최근 콘텐츠"
+            secondaryGroupTitle={recommendedContent.length > 0 ? '추천 콘텐츠' : undefined}
+            primaryItems={recentContent.map(toHighlightItem)}
+            secondaryItems={recommendedContent.map(toHighlightItem)}
+            viewAllHref="/lms"
+            viewAllLabel="전체보기 →"
+            loading={contentLoading}
+            emptyMessage="등록된 콘텐츠가 없습니다."
+          />
+        </PageSection>
 
         {/* ─── 6. Signage Preview (shared) ─── */}
-        <SignagePreviewSection
-          mediaItems={signageMedia}
-          playlistItems={signagePlaylists}
-          loading={signageLoading}
-          viewAllHref="/signage"
-          viewAllLabel="사이니지 관리 →"
-        />
+        <PageSection>
+          <SignagePreviewSection
+            mediaItems={signageMedia}
+            playlistItems={signagePlaylists}
+            loading={signageLoading}
+            viewAllHref="/signage"
+            viewAllLabel="사이니지 관리 →"
+          />
+        </PageSection>
 
         {/* ─── 7. CTA / Guidance (shared) ─── */}
-        <CtaGuidanceSection
-          title="매장 운영에 도움이 필요하세요?"
-          description="디지털 사이니지로 약국을 꾸며보세요"
-          href="/signage"
-          linkLabel="사이니지 보기 →"
-          icon={<Play size={20} />}
-        />
+        <PageSection>
+          <CtaGuidanceSection
+            title="매장 운영에 도움이 필요하세요?"
+            description="디지털 사이니지로 약국을 꾸며보세요"
+            href="/signage"
+            linkLabel="사이니지 보기 →"
+            icon={<Play size={20} />}
+          />
+        </PageSection>
 
         {/* ─── 8. Utility (서비스 고유) ─── */}
 
         {/* 광고 */}
         {ads.length > 0 && (
-          <section className="mb-8">
+          <PageSection>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {ads.map((ad) => (
                 <a
@@ -321,12 +336,12 @@ export default function CommunityMainPage() {
                 </a>
               ))}
             </div>
-          </section>
+          </PageSection>
         )}
 
         {/* 스폰서 */}
         {sponsors.length > 0 && (
-          <section className="mb-8">
+          <PageSection>
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-sm font-semibold text-slate-700">스폰서</h2>
             </div>
@@ -347,24 +362,26 @@ export default function CommunityMainPage() {
                 </a>
               ))}
             </div>
-          </section>
+          </PageSection>
         )}
 
         {/* 파트너 로고 슬라이드 */}
-        <section className="overflow-hidden">
-          <div className="relative group">
-            <div className="flex animate-marquee group-hover:[animation-play-state:paused]">
-              {[...partnerLogos, ...partnerLogos].map((logo, idx) => (
-                <div
-                  key={`${logo.id}-${idx}`}
-                  className="flex items-center justify-center w-28 h-12 mx-3 bg-white border border-slate-200 rounded-lg shrink-0"
-                >
-                  <span className="text-xs text-slate-400 font-medium">{logo.name}</span>
-                </div>
-              ))}
+        <PageSection last>
+          <div className="overflow-hidden">
+            <div className="relative group">
+              <div className="flex animate-marquee group-hover:[animation-play-state:paused]">
+                {[...partnerLogos, ...partnerLogos].map((logo, idx) => (
+                  <div
+                    key={`${logo.id}-${idx}`}
+                    className="flex items-center justify-center w-28 h-12 mx-3 bg-white border border-slate-200 rounded-lg shrink-0"
+                  >
+                    <span className="text-xs text-slate-400 font-medium">{logo.name}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        </section>
+        </PageSection>
 
       </div>
     </div>
