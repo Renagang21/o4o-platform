@@ -2,6 +2,7 @@
  * ResourcesHubPage — KPA 자료실
  *
  * WO-O4O-RESOURCES-HUB-TEMPLATE-FOUNDATION-V1
+ * WO-KPA-RESOURCES-UPLOAD-BUTTON-ON-RESOURCES-V1: 자료 등록 버튼 추가
  *
  * ResourcesHubTemplate + KPA adapter.
  * KPA 전용 API(resourcesApi), operator 조건, 문구는
@@ -9,11 +10,63 @@
  */
 
 import { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ResourcesHubTemplate, type ResourcesHubConfig, type ResourcesHubItem } from '@o4o/shared-space-ui';
 import { toast } from '@o4o/error-handling';
 import { resourcesApi } from '../../api';
 import { useAuth } from '../../contexts/AuthContext';
 import { hasAnyRole, PLATFORM_ROLES } from '../../lib/role-constants';
+
+// ─── Resource Upload Button ──────────────────────────────────────────────────
+
+const uploadBtnStyle: React.CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 6,
+  padding: '10px 18px',
+  backgroundColor: '#2563eb',
+  color: '#ffffff',
+  fontSize: '0.875rem',
+  fontWeight: 600,
+  borderRadius: 8,
+  border: 'none',
+  cursor: 'pointer',
+  whiteSpace: 'nowrap',
+};
+
+const emptyUploadBtnStyle: React.CSSProperties = {
+  display: 'inline-block',
+  marginTop: 12,
+  padding: '8px 16px',
+  backgroundColor: '#2563eb',
+  color: '#ffffff',
+  fontSize: '0.875rem',
+  fontWeight: 600,
+  borderRadius: 8,
+  border: 'none',
+  cursor: 'pointer',
+};
+
+function ResourceUploadButton({ variant = 'hero' }: { variant?: 'hero' | 'empty' }) {
+  const { isAuthenticated, user } = useAuth();
+  const navigate = useNavigate();
+  const isOperator = hasAnyRole(user?.roles ?? [], PLATFORM_ROLES);
+  const targetPath = isOperator ? '/operator/resources/new' : '/content/new';
+
+  const handleClick = () => {
+    if (!isAuthenticated) {
+      navigate('/login', { state: { from: targetPath } });
+    } else {
+      navigate(targetPath);
+    }
+  };
+
+  return (
+    <button onClick={handleClick} style={variant === 'hero' ? uploadBtnStyle : emptyUploadBtnStyle}>
+      {variant === 'hero' ? '+ 자료 등록' : '자료 등록하기'}
+    </button>
+  );
+}
 
 // ─── KPA Config ───────────────────────────────────────────────────────────────
 
@@ -43,10 +96,11 @@ function useKpaResourcesConfig(isOperator: boolean): ResourcesHubConfig {
 
     trackView: (id) => { resourcesApi.trackView(id).catch(() => {}); },
 
-    createAction: isOperator
-      ? { label: '자료 등록', href: '/operator/resources/new' }
-      : undefined,
+    // WO-KPA-RESOURCES-UPLOAD-BUTTON-ON-RESOURCES-V1: 모든 사용자에게 등록 버튼 노출
+    renderHeroAction: () => <ResourceUploadButton variant="hero" />,
+    renderEmptyAction: () => <ResourceUploadButton variant="empty" />,
 
+    // Operator-only: row edit/delete
     getEditHref: isOperator
       ? (id) => `/operator/resources/${id}/edit`
       : undefined,

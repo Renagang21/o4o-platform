@@ -99,6 +99,9 @@ export interface ResourcesHubConfig {
   // Operator: create — omit to hide create button
   createAction?: { label: string; href: string };
 
+  // Hero 우측 커스텀 액션 (createAction 대신 사용, auth 로직 포함 가능)
+  renderHeroAction?: () => React.ReactNode;
+
   // Operator: row edit/delete — omit to disable
   getEditHref?: (id: string) => string;
   onDelete?: (id: string) => Promise<void>;
@@ -110,6 +113,9 @@ export interface ResourcesHubConfig {
   emptyMessage?: string;
   emptyFilteredMessage?: string;
   loadingMessage?: string;
+
+  // 빈 상태 CTA (등록 유도)
+  renderEmptyAction?: () => React.ReactNode;
 
   // Hide bulk delete action even if onDelete is provided
   hideBulkDelete?: boolean;
@@ -435,11 +441,13 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
           <h1 style={st.title}>{config.title ?? '자료실'}</h1>
           {config.subtitle && <p style={st.subtitle}>{config.subtitle}</p>}
         </div>
-        {config.createAction && (
-          <button onClick={() => navigate(config.createAction!.href)} style={st.createBtn}>
-            <Plus size={16} />
-            {config.createAction.label}
-          </button>
+        {config.renderHeroAction?.() ?? (
+          config.createAction && (
+            <button onClick={() => navigate(config.createAction!.href)} style={st.createBtn}>
+              <Plus size={16} />
+              {config.createAction.label}
+            </button>
+          )
         )}
       </div>
 
@@ -482,6 +490,7 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
               ? (config.emptyFilteredMessage ?? '검색 결과가 없습니다.')
               : (config.emptyMessage ?? '등록된 자료가 없습니다.')}
           </p>
+          {!searchQuery && config.renderEmptyAction?.()}
         </div>
       ) : (
         <>
