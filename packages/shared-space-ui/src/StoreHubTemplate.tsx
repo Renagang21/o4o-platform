@@ -244,14 +244,9 @@ function DefaultAiPlaceholder({ aiBlock }: DefaultAiPlaceholderProps) {
 
 const PRIMARY = '#2563EB';
 const WHITE = '#FFFFFF';
-const NEUTRAL50 = '#F8FAFC';
-const NEUTRAL100 = '#F1F5F9';
 const NEUTRAL200 = '#E2E8F0';
 const NEUTRAL300 = '#CBD5E1';
-const NEUTRAL400 = '#94A3B8';
 const NEUTRAL500 = '#64748B';
-const NEUTRAL600 = '#475569';
-const NEUTRAL700 = '#334155';
 const NEUTRAL900 = '#0F172A';
 
 const st: Record<string, React.CSSProperties> = {

@@ -18,6 +18,9 @@ export type { ForumHubCategory, ForumHubPost, ForumHubConfig } from './ForumHubT
 export { StoreHubTemplate } from './StoreHubTemplate';
 export type { StoreHubResourceCard, StoreHubFlowStep, StoreHubConfig, StoreHubTemplateProps } from './StoreHubTemplate';
 
+export { ContentHubTemplate } from './ContentHubTemplate';
+export type { ContentHubItem, ContentHubFilter, ContentHubFetchParams, ContentHubFetchResult, ContentHubItemContext, ContentHubConfig } from './ContentHubTemplate';
+
 export type {
   /* Data types */
   NoticeItem,
