@@ -12,6 +12,9 @@ export { ContentHighlightSection } from './ContentHighlightSection';
 export { LmsHubTemplate } from './LmsHubTemplate';
 export type { LmsHubCourse, LmsHubFetchParams, LmsHubConfig } from './LmsHubTemplate';
 
+export { ForumHubTemplate } from './ForumHubTemplate';
+export type { ForumHubCategory, ForumHubPost, ForumHubConfig } from './ForumHubTemplate';
+
 export type {
   /* Data types */
   NoticeItem,
