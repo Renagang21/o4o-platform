@@ -28,8 +28,8 @@ import {
   ClaudeResponse,
 } from '../types/ai-proxy.types.js';
 import { AppDataSource } from '../database/connection.js';
-import { AiSettings } from '../entities/AiSettings.js';
 import { AIUsageLog, AIProvider as UsageProvider, AIUsageStatus } from '../entities/AIUsageLog.js';
+import { resolveAiApiKey } from '../utils/ai-key.util.js';
 
 class AIProxyService {
   private static instance: AIProxyService;
@@ -52,36 +52,12 @@ class AIProxyService {
    * 3. Throw error if not found
    */
   private async getApiKey(provider: AIProvider): Promise<string> {
-    try {
-      // Try to load from database first
-      if (AppDataSource.isInitialized) {
-        const aiSettingsRepo = AppDataSource.getRepository(AiSettings);
-        const setting = await aiSettingsRepo.findOne({
-          where: { provider, isActive: true }
-        });
-
-        if (setting?.apiKey) {
-          logger.debug(`Using database API key for ${provider}`);
-          return setting.apiKey;
-        }
-      }
-    } catch (error) {
-      logger.warn(`Failed to load API key from database for ${provider}:`, error);
+    const key = await resolveAiApiKey(AppDataSource, provider);
+    if (key) {
+      logger.debug(`Using API key for ${provider}`);
+      return key;
     }
 
-    // Fallback to environment variables
-    const envKey = provider === 'openai'
-      ? process.env.OPENAI_API_KEY
-      : provider === 'gemini'
-      ? process.env.GEMINI_API_KEY
-      : process.env.CLAUDE_API_KEY;
-
-    if (envKey) {
-      logger.debug(`Using environment API key for ${provider}`);
-      return envKey;
-    }
-
-    // No key found
     throw this.createError(
       'AUTH_ERROR',
       `${provider} API key not configured. Please add it in Settings → AI API.`,
@@ -580,16 +556,6 @@ class AIProxyService {
           totalBlocks: parsed.blocks.length,
         });
 
-        // DEBUG: Save full AI response to file for debugging
-        try {
-          const fs = require('fs');
-          const debugPath = `/tmp/ai-response-${requestId}.json`;
-          fs.writeFileSync(debugPath, JSON.stringify(parsed.blocks, null, 2));
-          logger.info('AI response saved to file', { requestId, debugPath });
-        } catch (debugError: any) {
-          // Ignore file write errors - not critical for AI generation
-          logger.warn('Failed to save debug file', { requestId, error: debugError.message });
-        }
       } else if (parsed.layout?.blocks && Array.isArray(parsed.layout.blocks)) {
         // Case 1-B: {layout: {blocks: [...]}} 형식 (Gemini 2.5+ 응답)
         normalizedResult = { blocks: parsed.layout.blocks };

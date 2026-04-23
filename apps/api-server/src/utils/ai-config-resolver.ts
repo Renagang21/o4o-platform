@@ -13,6 +13,7 @@
 import type { DataSource } from 'typeorm';
 import type { AIProviderConfig } from '@o4o/ai-core';
 // AiModelSetting removed — WO-O4O-GLYCOPHARM-CARE-REMOVAL-V1
+import { resolveAiApiKey } from './ai-key.util.js';
 
 export function buildConfigResolver(
   dataSource: DataSource,
@@ -23,24 +24,7 @@ export function buildConfigResolver(
     const model = 'gemini-2.5-flash';
     const temperature = 0.3;
     const maxTokens = overrides?.maxTokens ?? 2048;
-
-    // 2. ai_settings → apiKey
-    let apiKey = '';
-    try {
-      const rows = await dataSource.query(
-        `SELECT apikey FROM ai_settings WHERE provider = 'gemini' AND isactive = true LIMIT 1`,
-      );
-      if (rows[0]?.apikey) {
-        apiKey = rows[0].apikey;
-      }
-    } catch {
-      // DB read failed — fall through to env
-    }
-
-    if (!apiKey) {
-      apiKey = process.env.GEMINI_API_KEY || '';
-    }
-
+    const apiKey = await resolveAiApiKey(dataSource, 'gemini');
     return { apiKey, model, temperature, maxTokens };
   };
 }

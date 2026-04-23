@@ -13,10 +13,9 @@ import { Router, Response } from 'express';
 import { authenticate } from '../middleware/auth.middleware.js';
 import { aiProxyService } from '../services/ai-proxy.service.js';
 import { AppDataSource } from '../database/connection.js';
-import { AiSettings } from '../entities/AiSettings.js';
 import type { AuthRequest } from '../types/auth.js';
-import type { AIProvider } from '../types/ai-proxy.types.js';
 import logger from '../utils/logger.js';
+import { resolveAiApiKey } from '../utils/ai-key.util.js';
 import {
   isSupportedOutputType,
   buildSystemPrompt,
@@ -98,7 +97,8 @@ router.post('/vision/analyze', authenticate, async (req, res: Response) => {
   }
 
   try {
-    const apiKey = await getGeminiApiKey();
+    const apiKey = await resolveAiApiKey(AppDataSource, 'gemini');
+    if (!apiKey) throw new Error('Gemini API key not configured. Set GEMINI_API_KEY or configure in AI Settings.');
 
     const systemPrompt = prompt || `이미지를 분석하고 다음 JSON 형식으로 응답하세요:
 {
@@ -180,30 +180,6 @@ router.post('/vision/analyze', authenticate, async (req, res: Response) => {
   }
 });
 
-/**
- * Get Gemini API key (same pattern as ai-proxy.service.ts)
- * 1. Check database (AiSettings)
- * 2. Fallback to GEMINI_API_KEY env var
- */
-async function getGeminiApiKey(): Promise<string> {
-  try {
-    if (AppDataSource.isInitialized) {
-      const repo = AppDataSource.getRepository(AiSettings);
-      const setting = await repo.findOne({
-        where: { provider: 'gemini' as any, isActive: true },
-      });
-      if (setting?.apiKey) return setting.apiKey;
-    }
-  } catch (error) {
-    logger.warn('Failed to load Gemini API key from database:', error);
-  }
-
-  const envKey = process.env.GEMINI_API_KEY;
-  if (envKey) return envKey;
-
-  throw new Error('Gemini API key not configured. Set GEMINI_API_KEY or configure in AI Settings.');
-}
-
 // ===========================================
 // POST /api/ai/content — outputType 기반 콘텐츠 변환
 // WO-AI-CONTENT-TRANSFORM-IMPLEMENTATION-V1
@@ -233,7 +209,8 @@ router.post('/content', authenticate, async (req, res: Response) => {
   const requestId = crypto.randomUUID();
 
   try {
-    const apiKey = await getGeminiApiKey();
+    const apiKey = await resolveAiApiKey(AppDataSource, 'gemini');
+    if (!apiKey) throw new Error('Gemini API key not configured. Set GEMINI_API_KEY or configure in AI Settings.');
     const model = 'gemini-2.5-flash';
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 

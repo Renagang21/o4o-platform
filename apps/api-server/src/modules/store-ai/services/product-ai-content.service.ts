@@ -1,6 +1,7 @@
 import type { DataSource, Repository } from 'typeorm';
 import { GeminiProvider } from '@o4o/ai-core';
 import type { AIProviderConfig } from '@o4o/ai-core';
+import { resolveAiApiKey } from '../../../utils/ai-key.util.js';
 import { PRODUCT_CONTENT_PROMPTS } from '@o4o/ai-prompts/store';
 import type { ProductContentInput } from '@o4o/ai-prompts/store';
 import { ProductAiContent } from '../entities/product-ai-content.entity.js';
@@ -173,23 +174,7 @@ export class ProductAiContentService {
     const model = 'gemini-3.0-flash';
     const temperature = 0.3;
     const maxTokens = 2048;
-
-    let apiKey = '';
-    try {
-      const rows = await this.dataSource.query(
-        `SELECT apikey FROM ai_settings WHERE provider = 'gemini' AND isactive = true LIMIT 1`,
-      );
-      if (rows[0]?.apikey) {
-        apiKey = rows[0].apikey;
-      }
-    } catch {
-      // DB read failed, fall through to env
-    }
-
-    if (!apiKey) {
-      apiKey = process.env.GEMINI_API_KEY || '';
-    }
-
+    const apiKey = await resolveAiApiKey(this.dataSource, 'gemini');
     return { apiKey, model, temperature, maxTokens };
   }
 }

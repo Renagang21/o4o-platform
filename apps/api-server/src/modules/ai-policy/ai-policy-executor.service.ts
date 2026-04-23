@@ -21,6 +21,7 @@ import type { AiPolicyScope } from './ai-policy-scope.js';
 import { AiLlmPolicy } from './entities/ai-llm-policy.entity.js';
 import { AIUsageLog, AIProvider, AIUsageStatus } from '../../entities/AIUsageLog.js';
 import type { AiQuotaService } from './ai-quota.service.js';
+import { resolveAiApiKey } from '../../utils/ai-key.util.js';
 
 // ─────────────────────────────────────────────────────
 // Cache
@@ -32,13 +33,6 @@ interface CachedPolicy {
 }
 
 const CACHE_TTL_MS = 60_000; // 1분
-
-// Provider → env key 매핑
-const API_KEY_ENV: Record<string, string> = {
-  gemini: 'GEMINI_API_KEY',
-  openai: 'OPENAI_API_KEY',
-  claude: 'CLAUDE_API_KEY',
-};
 
 // ─────────────────────────────────────────────────────
 // Overrides (서비스가 호출 시 개별 설정 변경 가능)
@@ -324,26 +318,6 @@ export class AiPolicyExecutorService {
   }
 
   private async resolveApiKey(provider: string): Promise<string> {
-    // 1. ai_settings 테이블
-    try {
-      const rows = await this.dataSource.query(
-        `SELECT apikey FROM ai_settings WHERE provider = $1 AND isactive = true LIMIT 1`,
-        [provider],
-      );
-      if (rows[0]?.apikey) {
-        return rows[0].apikey;
-      }
-    } catch {
-      // DB read failed — fall through to env
-    }
-
-    // 2. Environment variable
-    const envKey = API_KEY_ENV[provider];
-    if (envKey) {
-      const value = process.env[envKey];
-      if (value) return value;
-    }
-
-    return '';
+    return resolveAiApiKey(this.dataSource, provider);
   }
 }
