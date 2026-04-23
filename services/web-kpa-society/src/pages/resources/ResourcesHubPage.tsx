@@ -1,48 +1,20 @@
 /**
- * ResourcesHubPage — 자료실 (테이블 기반 자료 목록)
+ * ResourcesHubPage — 자료실 (파일 보관소 + 검색 중심)
  *
- * WO-KPA-RESOURCE-HUB-RESTRUCTURE-V1
+ * WO-KPA-RESOURCES-HUB-SIMPLIFICATION-V1
  *
- * kpa_contents 테이블 기반. BaseTable + BaseDetailDrawer.
- * 검색 / 자료 종류 필터 / 좋아요 / 복사 / Drawer 상세 조회.
+ * 검색 + 파일 리스트 + 다운로드. 분류/태그/좋아요 제거.
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
-import { BaseTable, BaseDetailDrawer, ContentSortButtons, ContentPagination } from '@o4o/ui';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { BaseTable, BaseDetailDrawer, ContentPagination } from '@o4o/ui';
 import type { O4OColumn } from '@o4o/ui';
-import { Search, Plus, Heart, Copy, ExternalLink, FileText, Image, Link2, File } from 'lucide-react';
+import { Search, Plus, ExternalLink, FileText, Download, File } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { hasAnyRole, PLATFORM_ROLES } from '../../lib/role-constants';
 import { resourcesApi } from '../../api';
 import type { ResourceItem } from '../../api/resources';
-
-// ─── Constants ──────────────────────────────────────────────────────────────
-
-const SUB_TYPE_FILTERS = [
-  { value: '', label: '전체' },
-  { value: 'image', label: '이미지' },
-  { value: 'file', label: '파일' },
-  { value: 'document', label: '문서' },
-  { value: 'url', label: 'URL' },
-] as const;
-
-const SUB_TYPE_LABELS: Record<string, string> = {
-  image: '이미지',
-  file: '파일',
-  document: '문서',
-  url: 'URL',
-};
-
-const SUB_TYPE_COLORS: Record<string, string> = {
-  image: '#8B5CF6',
-  file: '#2563EB',
-  document: '#059669',
-  url: '#D97706',
-};
-
-type SortType = 'latest' | 'popular' | 'views';
-const SORT_OPTIONS: SortType[] = ['latest', 'popular', 'views'];
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -54,93 +26,66 @@ function formatDate(dateStr: string): string {
   return `${y}.${m}.${day}`;
 }
 
-function deriveSubType(item: ResourceItem): string {
-  if (item.sub_type) return item.sub_type;
-  if (item.source_type === 'external') return 'url';
-  if (item.source_type === 'upload') {
-    const ext = (item.source_file_name || item.source_url || '').toLowerCase();
-    if (/\.(jpg|jpeg|png|gif|webp|svg|bmp)/.test(ext)) return 'image';
-    return 'file';
-  }
-  return 'document';
-}
-
-function subTypeIcon(type: string) {
-  switch (type) {
-    case 'image': return <Image size={13} />;
-    case 'file': return <File size={13} />;
-    case 'url': return <Link2 size={13} />;
-    default: return <FileText size={13} />;
-  }
+function isExternal(item: ResourceItem): boolean {
+  return item.source_type === 'external';
 }
 
 // ─── Component ──────────────────────────────────────────────────────────────
 
 export function ResourcesHubPage() {
   const navigate = useNavigate();
-  const location = useLocation();
   const { user } = useAuth();
   const isOperator = hasAnyRole(user?.roles ?? [], PLATFORM_ROLES);
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // State
   const [items, setItems] = useState<ResourceItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const [sort, setSort] = useState<SortType>('latest');
-  const [subTypeFilter, setSubTypeFilter] = useState('');
   const [searchInput, setSearchInput] = useState('');
-  const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
-  const [likingId, setLikingId] = useState<string | null>(null);
 
-  // Drawer
   const [drawerItem, setDrawerItem] = useState<ResourceItem | null>(null);
   const [drawerLoading, setDrawerLoading] = useState(false);
-  const [copyFeedback, setCopyFeedback] = useState(false);
 
-  // Search debounce
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const currentPage = parseInt(searchParams.get('page') || '1');
   const searchQuery = searchParams.get('search') || '';
 
-  // ─── Data Loading ───────────────────────────────────────────────
+  // Sync input with URL
+  useEffect(() => {
+    setSearchInput(searchQuery);
+  }, [searchQuery]);
+
+  // ─── Data Loading ─────────────────────────────────────────────────────────
 
   useEffect(() => {
-    loadData();
-  }, [currentPage, searchQuery, sort, subTypeFilter]);
+    const load = async () => {
+      try {
+        setLoading(true);
+        const res = await resourcesApi.list({
+          page: currentPage,
+          limit: 20,
+          search: searchQuery || undefined,
+          sort: 'latest',
+        });
+        const data = res.data;
+        setItems(data.items || []);
+        setTotalPages(data.totalPages || 1);
+        setTotalItems(data.total || 0);
+      } catch (err) {
+        console.warn('Resources API error:', err);
+        setItems([]);
+        setTotalPages(1);
+        setTotalItems(0);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, [currentPage, searchQuery]);
 
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      const res = await resourcesApi.list({
-        page: currentPage,
-        limit: 20,
-        search: searchQuery || undefined,
-        sub_type: subTypeFilter || undefined,
-        sort,
-      });
-      const data = res.data;
-      const list = data.items || [];
-      setItems(list);
-      setTotalPages(data.totalPages || 1);
-      setTotalItems(data.total || 0);
-      // Init liked state
-      const liked = new Set<string>();
-      list.forEach((item: any) => { if (item.isRecommendedByMe) liked.add(item.id); });
-      setLikedIds(liked);
-    } catch (err) {
-      console.warn('Resources API error:', err);
-      setItems([]);
-      setTotalPages(1);
-      setTotalItems(0);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // ─── Search ─────────────────────────────────────────────────────
+  // ─── Search ──────────────────────────────────────────────────────────────
 
   const handleSearchChange = (value: string) => {
     setSearchInput(value);
@@ -155,68 +100,25 @@ export function ResourcesHubPage() {
     }, 500);
   };
 
-  // ─── Pagination & Sort ──────────────────────────────────────────
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      setSearchParams(prev => {
+        if (searchInput) prev.set('search', searchInput);
+        else prev.delete('search');
+        prev.set('page', '1');
+        return prev;
+      });
+    }
+  };
+
+  // ─── Pagination ──────────────────────────────────────────────────────────
 
   const handlePageChange = (page: number) => {
     setSearchParams(prev => { prev.set('page', String(page)); return prev; });
   };
 
-  const handleSortChange = (newSort: SortType) => {
-    setSort(newSort);
-    setSearchParams(prev => { prev.set('page', '1'); return prev; });
-  };
-
-  const handleSubTypeChange = (value: string) => {
-    setSubTypeFilter(value);
-    setSearchParams(prev => { prev.set('page', '1'); return prev; });
-  };
-
-  // ─── Like Toggle (Optimistic) ───────────────────────────────────
-
-  const handleLike = useCallback(async (id: string) => {
-    if (!user) {
-      navigate('/login', { state: { from: location.pathname + location.search } });
-      return;
-    }
-    setLikingId(id);
-    const wasLiked = likedIds.has(id);
-    // Optimistic update
-    setLikedIds(prev => {
-      const next = new Set(prev);
-      wasLiked ? next.delete(id) : next.add(id);
-      return next;
-    });
-    setItems(prev => prev.map(item =>
-      item.id === id
-        ? { ...item, like_count: item.like_count + (wasLiked ? -1 : 1) }
-        : item
-    ));
-    // Update drawer if showing same item
-    if (drawerItem?.id === id) {
-      setDrawerItem(prev => prev ? { ...prev, like_count: prev.like_count + (wasLiked ? -1 : 1), isRecommendedByMe: !wasLiked } : prev);
-    }
-    try {
-      await resourcesApi.toggleRecommend(id);
-    } catch {
-      // Rollback
-      setLikedIds(prev => {
-        const next = new Set(prev);
-        wasLiked ? next.add(id) : next.delete(id);
-        return next;
-      });
-      setItems(prev => prev.map(item =>
-        item.id === id
-          ? { ...item, like_count: item.like_count + (wasLiked ? 1 : -1) }
-          : item
-      ));
-      if (drawerItem?.id === id) {
-        setDrawerItem(prev => prev ? { ...prev, like_count: prev.like_count + (wasLiked ? 1 : -1), isRecommendedByMe: wasLiked } : prev);
-      }
-    }
-    setLikingId(null);
-  }, [user, likedIds, navigate, location, drawerItem]);
-
-  // ─── Drawer ─────────────────────────────────────────────────────
+  // ─── Drawer ──────────────────────────────────────────────────────────────
 
   const openDrawer = async (item: ResourceItem) => {
     setDrawerItem(item);
@@ -224,10 +126,6 @@ export function ResourcesHubPage() {
     try {
       const res = await resourcesApi.getDetail(item.id);
       setDrawerItem(res.data);
-      if (res.data.isRecommendedByMe) {
-        setLikedIds(prev => new Set(prev).add(item.id));
-      }
-      // Track view
       resourcesApi.trackView(item.id).catch(() => {});
     } catch {
       // Keep summary data
@@ -236,32 +134,12 @@ export function ResourcesHubPage() {
     }
   };
 
-  const handleCopy = async () => {
-    if (!drawerItem) return;
-    const text = drawerItem.body || drawerItem.summary || drawerItem.title;
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopyFeedback(true);
-      setTimeout(() => setCopyFeedback(false), 2000);
-    } catch {
-      // Fallback
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-      setCopyFeedback(true);
-      setTimeout(() => setCopyFeedback(false), 2000);
-    }
-  };
-
-  // ─── Table Columns ──────────────────────────────────────────────
+  // ─── Table Columns ────────────────────────────────────────────────────────
 
   const columns: O4OColumn<ResourceItem>[] = [
     {
       key: 'title',
-      header: '제목',
+      header: '파일명 / 제목',
       width: '40%',
       render: (_v, row) => (
         <span style={{ color: '#111827', fontWeight: 500, cursor: 'pointer' }}>{row.title}</span>
@@ -270,46 +148,18 @@ export function ResourcesHubPage() {
       sortable: true,
     },
     {
-      key: 'sub_type',
-      header: '자료 종류',
-      width: 100,
-      align: 'center',
-      render: (_v, row) => {
-        const type = deriveSubType(row);
-        const color = SUB_TYPE_COLORS[type] || '#6B7280';
-        return (
-          <span style={{
-            display: 'inline-flex', alignItems: 'center', gap: 4,
-            padding: '2px 8px', borderRadius: 4,
-            fontSize: 12, fontWeight: 500,
-            color, background: `${color}14`,
-          }}>
-            {subTypeIcon(type)}
-            {SUB_TYPE_LABELS[type] || type}
-          </span>
-        );
-      },
-    },
-    {
-      key: 'tags',
-      header: '태그',
-      width: '18%',
-      render: (_v, row) => {
-        if (!row.tags?.length) return <span style={{ color: '#d1d5db' }}>-</span>;
-        return (
-          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-            {row.tags.slice(0, 3).map((tag, i) => (
-              <span key={i} style={{
-                fontSize: 11, color: '#6B7280', background: '#F3F4F6',
-                borderRadius: 3, padding: '1px 6px',
-              }}>#{tag}</span>
-            ))}
-            {row.tags.length > 3 && (
-              <span style={{ fontSize: 11, color: '#9CA3AF' }}>+{row.tags.length - 3}</span>
-            )}
-          </div>
-        );
-      },
+      key: 'summary',
+      header: '설명',
+      width: '28%',
+      render: (_v, row) => (
+        <span style={{
+          color: '#6B7280', fontSize: 13,
+          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          display: 'block', maxWidth: 260,
+        }}>
+          {row.summary || '-'}
+        </span>
+      ),
     },
     {
       key: 'author_name',
@@ -319,34 +169,6 @@ export function ResourcesHubPage() {
         <span style={{ color: '#374151', fontSize: 13 }}>{row.author_name || '-'}</span>
       ),
       sortable: true,
-    },
-    {
-      key: 'like_count',
-      header: '좋아요',
-      width: 80,
-      align: 'center',
-      render: (_v, row) => {
-        const liked = likedIds.has(row.id);
-        return (
-          <button
-            onClick={(e) => { e.stopPropagation(); handleLike(row.id); }}
-            disabled={likingId === row.id}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 3,
-              background: 'none', border: 'none', cursor: 'pointer',
-              fontSize: 13, fontWeight: liked ? 600 : 400,
-              color: liked ? '#DC2626' : '#9CA3AF',
-              padding: '2px 4px',
-              opacity: likingId === row.id ? 0.5 : 1,
-            }}
-          >
-            <Heart size={14} fill={liked ? '#DC2626' : 'none'} />
-            {row.like_count}
-          </button>
-        );
-      },
-      sortable: true,
-      sortAccessor: (row) => row.like_count,
     },
     {
       key: 'created_at',
@@ -359,9 +181,40 @@ export function ResourcesHubPage() {
       sortable: true,
       sortAccessor: (row) => new Date(row.created_at).getTime(),
     },
+    {
+      key: '_actions' as any,
+      header: '다운로드',
+      width: 96,
+      align: 'center',
+      render: (_v, row) => {
+        if (!row.source_url) {
+          return <span style={{ color: '#D1D5DB', fontSize: 12 }}>-</span>;
+        }
+        const ext = isExternal(row);
+        return (
+          <a
+            href={row.source_url}
+            target={ext ? '_blank' : '_self'}
+            rel="noopener noreferrer"
+            download={!ext ? (row.source_file_name || true) : undefined}
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 4,
+              padding: '4px 10px',
+              background: '#EFF6FF', color: '#2563EB',
+              borderRadius: 6, fontSize: 12, fontWeight: 500,
+              textDecoration: 'none',
+            }}
+          >
+            {ext ? <ExternalLink size={12} /> : <Download size={12} />}
+            {ext ? '바로가기' : '다운로드'}
+          </a>
+        );
+      },
+    },
   ];
 
-  // ─── Render ─────────────────────────────────────────────────────
+  // ─── Render ───────────────────────────────────────────────────────────────
 
   return (
     <div style={st.container}>
@@ -379,40 +232,16 @@ export function ResourcesHubPage() {
         )}
       </div>
 
-      {/* Search + Filter */}
-      <div style={st.toolbar}>
-        <div style={st.searchWrap}>
-          <Search size={16} color="#9CA3AF" style={{ flexShrink: 0 }} />
-          <input
-            type="text"
-            placeholder="제목, 내용, 태그, 등록자 검색"
-            value={searchInput}
-            onChange={e => handleSearchChange(e.target.value)}
-            style={st.searchInput}
-          />
-        </div>
-        <div style={st.filterTabs}>
-          {SUB_TYPE_FILTERS.map(f => (
-            <button
-              key={f.value}
-              onClick={() => handleSubTypeChange(f.value)}
-              style={{
-                ...st.filterTab,
-                ...(subTypeFilter === f.value ? st.filterTabActive : {}),
-              }}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Sort */}
-      <div style={{ marginBottom: 16 }}>
-        <ContentSortButtons
-          value={sort}
-          onChange={handleSortChange as any}
-          options={SORT_OPTIONS}
+      {/* Search */}
+      <div style={st.searchWrap}>
+        <Search size={16} color="#9CA3AF" style={{ flexShrink: 0 }} />
+        <input
+          type="text"
+          placeholder="자료를 검색하세요 (제목, 내용, 등록자)"
+          value={searchInput}
+          onChange={e => handleSearchChange(e.target.value)}
+          onKeyDown={handleSearchKeyDown}
+          style={st.searchInput}
         />
       </div>
 
@@ -426,9 +255,12 @@ export function ResourcesHubPage() {
       ) : items.length === 0 ? (
         <div style={st.empty}>
           <FileText size={40} color="#D1D5DB" />
-          <p style={{ color: '#6B7280', marginTop: 12, fontSize: 15 }}>
-            {searchQuery || subTypeFilter ? '검색 결과가 없습니다.' : '등록된 자료가 없습니다.'}
+          <p style={{ color: '#6B7280', marginTop: 12, fontSize: 15, textAlign: 'center' }}>
+            {searchQuery ? '검색 결과가 없습니다.' : '등록된 자료가 없습니다.'}
           </p>
+          {!searchQuery && (
+            <p style={{ color: '#9CA3AF', fontSize: 13, marginTop: 4 }}>자료를 등록해 보세요.</p>
+          )}
         </div>
       ) : (
         <>
@@ -441,7 +273,6 @@ export function ResourcesHubPage() {
             emptyMessage="등록된 자료가 없습니다."
             rowClassName={() => 'cursor-pointer'}
           />
-
           <div style={{ marginTop: 20 }}>
             <ContentPagination
               currentPage={currentPage}
@@ -462,82 +293,45 @@ export function ResourcesHubPage() {
         title={drawerItem?.title}
         width="60vw"
         loading={drawerLoading}
-        footer={drawerItem ? (
-          <div style={{ display: 'flex', gap: 8, width: '100%', justifyContent: 'space-between' }}>
-            <button
-              onClick={() => handleLike(drawerItem.id)}
-              disabled={likingId === drawerItem.id}
-              style={{
-                ...st.drawerBtn,
-                color: likedIds.has(drawerItem.id) ? '#DC2626' : '#6B7280',
-                fontWeight: likedIds.has(drawerItem.id) ? 600 : 400,
-              }}
-            >
-              <Heart size={16} fill={likedIds.has(drawerItem.id) ? '#DC2626' : 'none'} />
-              좋아요 {drawerItem.like_count}
-            </button>
-            <button onClick={handleCopy} style={{ ...st.drawerBtn, color: '#2563EB' }}>
-              <Copy size={16} />
-              {copyFeedback ? '복사됨!' : '복사'}
-            </button>
-          </div>
+        footer={drawerItem?.source_url ? (
+          <a
+            href={drawerItem.source_url}
+            target={isExternal(drawerItem) ? '_blank' : '_self'}
+            rel="noopener noreferrer"
+            download={!isExternal(drawerItem) ? (drawerItem.source_file_name || true) : undefined}
+            style={{ ...st.drawerDownloadBtn, textDecoration: 'none' }}
+          >
+            {isExternal(drawerItem) ? <ExternalLink size={16} /> : <Download size={16} />}
+            {isExternal(drawerItem) ? '바로가기' : '다운로드'}
+          </a>
         ) : undefined}
       >
         {drawerItem && (
           <div>
             {/* Meta */}
             <div style={st.drawerMeta}>
-              <span style={{
-                display: 'inline-flex', alignItems: 'center', gap: 4,
-                padding: '2px 8px', borderRadius: 4, fontSize: 12, fontWeight: 500,
-                color: SUB_TYPE_COLORS[deriveSubType(drawerItem)] || '#6B7280',
-                background: `${SUB_TYPE_COLORS[deriveSubType(drawerItem)] || '#6B7280'}14`,
-              }}>
-                {subTypeIcon(deriveSubType(drawerItem))}
-                {SUB_TYPE_LABELS[deriveSubType(drawerItem)] || deriveSubType(drawerItem)}
-              </span>
               {drawerItem.author_name && (
                 <span style={{ color: '#374151', fontSize: 13 }}>{drawerItem.author_name}</span>
               )}
               <span style={{ color: '#9CA3AF', fontSize: 13 }}>{formatDate(drawerItem.created_at)}</span>
-              <span style={{ color: '#9CA3AF', fontSize: 13 }}>
-                조회 {drawerItem.view_count ?? 0}
-              </span>
+              <span style={{ color: '#9CA3AF', fontSize: 13 }}>조회 {drawerItem.view_count ?? 0}</span>
             </div>
 
-            {/* Tags */}
-            {drawerItem.tags?.length > 0 && (
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 16 }}>
-                {drawerItem.tags.map((tag, i) => (
-                  <span key={i} style={{
-                    fontSize: 12, color: '#4B5563', background: '#F3F4F6',
-                    borderRadius: 4, padding: '3px 8px',
-                  }}>#{tag}</span>
-                ))}
-              </div>
-            )}
-
-            {/* Summary (memo) */}
+            {/* Summary */}
             {drawerItem.summary && (
-              <div style={{
-                padding: '12px 16px', background: '#F9FAFB', borderRadius: 8,
-                marginBottom: 16, fontSize: 14, color: '#374151', lineHeight: 1.6,
-              }}>
+              <div style={st.drawerSummary}>
                 {drawerItem.summary}
               </div>
             )}
 
             {/* Body */}
             {drawerItem.body && (
-              <div style={{
-                fontSize: 14, color: '#1F2937', lineHeight: 1.8,
-                marginBottom: 16, whiteSpace: 'pre-wrap',
-              }}>
+              <div style={st.drawerBody}>
                 {drawerItem.body}
               </div>
             )}
 
-            {/* Blocks (structured content) */}
+            {/* Blocks */}
             {drawerItem.blocks?.length > 0 && !drawerItem.body && (
               <div style={{ marginBottom: 16 }}>
                 {drawerItem.blocks.map((block: any, i: number) => (
@@ -562,11 +356,8 @@ export function ResourcesHubPage() {
 
             {/* Attachment */}
             {drawerItem.source_url && (
-              <div style={{
-                padding: '12px 16px', background: '#EFF6FF', borderRadius: 8,
-                display: 'flex', alignItems: 'center', gap: 8,
-              }}>
-                {drawerItem.source_type === 'external' ? (
+              <div style={st.drawerAttachment}>
+                {isExternal(drawerItem) ? (
                   <>
                     <ExternalLink size={16} color="#2563EB" />
                     <a href={drawerItem.source_url} target="_blank" rel="noopener noreferrer"
@@ -604,7 +395,7 @@ const st: Record<string, React.CSSProperties> = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 28,
+    marginBottom: 24,
   },
   title: {
     fontSize: 26,
@@ -631,23 +422,16 @@ const st: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
     whiteSpace: 'nowrap',
   },
-  toolbar: {
-    display: 'flex',
-    gap: 12,
-    alignItems: 'center',
-    marginBottom: 16,
-    flexWrap: 'wrap' as const,
-  },
   searchWrap: {
     display: 'flex',
     alignItems: 'center',
     gap: 8,
-    padding: '8px 14px',
+    padding: '10px 16px',
     border: '1px solid #E5E7EB',
     borderRadius: 8,
     background: '#fff',
-    flex: '1 1 280px',
-    maxWidth: 400,
+    marginBottom: 20,
+    maxWidth: 520,
   },
   searchInput: {
     border: 'none',
@@ -656,27 +440,6 @@ const st: Record<string, React.CSSProperties> = {
     color: '#111827',
     width: '100%',
     background: 'transparent',
-  },
-  filterTabs: {
-    display: 'flex',
-    gap: 6,
-    flexWrap: 'wrap' as const,
-  },
-  filterTab: {
-    padding: '6px 14px',
-    background: '#F3F4F6',
-    color: '#6B7280',
-    border: 'none',
-    borderRadius: 6,
-    fontSize: 13,
-    fontWeight: 400,
-    cursor: 'pointer',
-    transition: 'all 0.15s',
-  },
-  filterTabActive: {
-    background: '#2563EB',
-    color: '#fff',
-    fontWeight: 500,
   },
   loadingWrap: {
     display: 'flex',
@@ -707,15 +470,43 @@ const st: Record<string, React.CSSProperties> = {
     marginBottom: 16,
     flexWrap: 'wrap' as const,
   },
-  drawerBtn: {
+  drawerSummary: {
+    padding: '12px 16px',
+    background: '#F9FAFB',
+    borderRadius: 8,
+    marginBottom: 16,
+    fontSize: 14,
+    color: '#374151',
+    lineHeight: 1.6,
+  },
+  drawerBody: {
+    fontSize: 14,
+    color: '#1F2937',
+    lineHeight: 1.8,
+    marginBottom: 16,
+    whiteSpace: 'pre-wrap' as const,
+  },
+  drawerAttachment: {
+    padding: '12px 16px',
+    background: '#EFF6FF',
+    borderRadius: 8,
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+  },
+  drawerDownloadBtn: {
     display: 'inline-flex',
     alignItems: 'center',
     gap: 6,
-    background: 'none',
-    border: '1px solid #E5E7EB',
+    padding: '10px 20px',
+    background: '#2563EB',
+    color: '#fff',
+    border: 'none',
     borderRadius: 8,
-    padding: '8px 16px',
     fontSize: 14,
+    fontWeight: 500,
     cursor: 'pointer',
   },
 };
+
+export default ResourcesHubPage;
