@@ -12,7 +12,7 @@
  */
 
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Settings, Shield } from 'lucide-react';
+import { LayoutDashboard, Settings } from 'lucide-react';
 import { GlobalHeader, GlobalHeaderMenuItem } from '@o4o/ui';
 import { useAuth } from '@/contexts/AuthContext';
 import { isPharmacistRole } from '@/lib/role-constants';
@@ -79,10 +79,6 @@ export function GlycoGlobalHeader() {
     navigate('/');
   };
 
-  // 운영/관리 진입 경로
-  const operatorPath = isAdmin ? '/admin' : '/operator';
-  const operatorLabel = isAdmin ? '관리자 콘솔' : '운영 대시보드';
-
   return (
     <GlobalHeader
       brand={{
@@ -100,11 +96,6 @@ export function GlycoGlobalHeader() {
       utilitySlot={<ServiceSwitcher currentServiceKey="glycopharm" />}
       userMenuItems={
         <>
-          {(isAdmin || isOperator) && (
-            <GlobalHeaderMenuItem to={operatorPath} icon={<Shield className="w-4 h-4" />}>
-              {operatorLabel}
-            </GlobalHeaderMenuItem>
-          )}
           <GlobalHeaderMenuItem to="/mypage" icon={<LayoutDashboard className="w-4 h-4" />}>
             마이페이지
           </GlobalHeaderMenuItem>

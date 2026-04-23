@@ -12,7 +12,7 @@
  */
 
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, UserCircle, Settings, Shield } from 'lucide-react';
+import { LayoutDashboard, UserCircle, Settings } from 'lucide-react';
 import { GlobalHeader, GlobalHeaderMenuItem } from '@o4o/ui';
 import { useAuth, getKCosmeticsDashboardRoute } from '@/contexts/AuthContext';
 import { useLoginModal } from '@/contexts/LoginModalContext';
@@ -71,8 +71,6 @@ export function KCosGlobalHeader() {
   };
 
   const dashboardPath = user?.roles ? getKCosmeticsDashboardRoute(user.roles) : '/';
-  const operatorPath = isAdmin ? '/admin' : '/operator';
-  const operatorLabel = isAdmin ? '관리자 콘솔' : '운영 대시보드';
 
   return (
     <GlobalHeader
@@ -100,11 +98,6 @@ export function KCosGlobalHeader() {
           <GlobalHeaderMenuItem to="/mypage/settings" icon={<Settings className="w-4 h-4" />}>
             설정
           </GlobalHeaderMenuItem>
-          {(isAdmin || isOperator) && (
-            <GlobalHeaderMenuItem to={operatorPath} icon={<Shield className="w-4 h-4" />}>
-              {operatorLabel}
-            </GlobalHeaderMenuItem>
-          )}
         </>
       }
     />

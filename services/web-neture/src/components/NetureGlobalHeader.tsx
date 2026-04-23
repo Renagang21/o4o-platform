@@ -12,7 +12,7 @@
  */
 
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Settings, Shield } from 'lucide-react';
+import { LayoutDashboard, Settings } from 'lucide-react';
 import { GlobalHeader, GlobalHeaderMenuItem } from '@o4o/ui';
 import { useAuth } from '../contexts/AuthContext';
 import { useLoginModal } from '../contexts/LoginModalContext';
@@ -73,9 +73,6 @@ export function NetureGlobalHeader() {
     navigate('/');
   };
 
-  const operatorPath = isAdmin ? '/admin' : '/operator';
-  const operatorLabel = isAdmin ? '관리자 콘솔' : '운영 대시보드';
-
   return (
     <GlobalHeader
       brand={{
@@ -99,11 +96,6 @@ export function NetureGlobalHeader() {
           <GlobalHeaderMenuItem to="/mypage/settings" icon={<Settings className="w-4 h-4" />}>
             설정
           </GlobalHeaderMenuItem>
-          {(isAdmin || isOperator) && (
-            <GlobalHeaderMenuItem to={operatorPath} icon={<Shield className="w-4 h-4" />}>
-              {operatorLabel}
-            </GlobalHeaderMenuItem>
-          )}
         </>
       }
     />
