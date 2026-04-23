@@ -35,6 +35,7 @@ export interface CreatePlaylistDto {
   transitionDuration?: number;
   isPublic?: boolean;
   metadata?: Record<string, any>;
+  tags?: string[];
 }
 
 export interface UpdatePlaylistDto {
