@@ -2,18 +2,21 @@
  * ResourcesHubPage — 자료실 (파일 보관소 + 검색 중심)
  *
  * WO-KPA-RESOURCES-HUB-SIMPLIFICATION-V1
+ * WO-RESOURCES-HUB-TABLE-PARTIAL-V1: selectable + ActionBar + RowActionMenu 추가
  *
- * 검색 + 파일 리스트 + 다운로드. 분류/태그/좋아요 제거.
+ * 드로어 UX 유지 + 선택/bulk copy 부분 표준화.
+ * 👍/💬 미적용 (ResourceItem 타입 미지원).
  */
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { BaseTable, BaseDetailDrawer, ContentPagination } from '@o4o/ui';
-import type { O4OColumn } from '@o4o/ui';
-import { Search, Plus, ExternalLink, FileText, Download, File } from 'lucide-react';
+import { BaseTable, BaseDetailDrawer, ContentPagination, ActionBar, RowActionMenu } from '@o4o/ui';
+import type { O4OColumn, ActionBarAction, RowActionItem } from '@o4o/ui';
+import { Search, Plus, ExternalLink, FileText, Download, File, Link2, Trash2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { hasAnyRole, PLATFORM_ROLES } from '../../lib/role-constants';
 import { resourcesApi } from '../../api';
+import { toast } from '@o4o/error-handling';
 import type { ResourceItem } from '../../api/resources';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -43,6 +46,7 @@ export function ResourcesHubPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [searchInput, setSearchInput] = useState('');
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
 
   const [drawerItem, setDrawerItem] = useState<ResourceItem | null>(null);
   const [drawerLoading, setDrawerLoading] = useState(false);
@@ -59,31 +63,30 @@ export function ResourcesHubPage() {
 
   // ─── Data Loading ─────────────────────────────────────────────────────────
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        setLoading(true);
-        const res = await resourcesApi.list({
-          page: currentPage,
-          limit: 20,
-          search: searchQuery || undefined,
-          sort: 'latest',
-        });
-        const data = res.data;
-        setItems(data.items || []);
-        setTotalPages(data.totalPages || 1);
-        setTotalItems(data.total || 0);
-      } catch (err) {
-        console.warn('Resources API error:', err);
-        setItems([]);
-        setTotalPages(1);
-        setTotalItems(0);
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
+  const loadData = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await resourcesApi.list({
+        page: currentPage,
+        limit: 20,
+        search: searchQuery || undefined,
+        sort: 'latest',
+      });
+      const data = res.data;
+      setItems(data.items || []);
+      setTotalPages(data.totalPages || 1);
+      setTotalItems(data.total || 0);
+    } catch (err) {
+      console.warn('Resources API error:', err);
+      setItems([]);
+      setTotalPages(1);
+      setTotalItems(0);
+    } finally {
+      setLoading(false);
+    }
   }, [currentPage, searchQuery]);
+
+  useEffect(() => { loadData(); }, [loadData]);
 
   // ─── Search ──────────────────────────────────────────────────────────────
 
@@ -120,7 +123,7 @@ export function ResourcesHubPage() {
 
   // ─── Drawer ──────────────────────────────────────────────────────────────
 
-  const openDrawer = async (item: ResourceItem) => {
+  const openDrawer = useCallback(async (item: ResourceItem) => {
     setDrawerItem(item);
     setDrawerLoading(true);
     try {
@@ -132,11 +135,48 @@ export function ResourcesHubPage() {
     } finally {
       setDrawerLoading(false);
     }
-  };
+  }, []);
+
+  // ─── Delete ───────────────────────────────────────────────────────────────
+
+  const handleDeleteItem = useCallback(async (id: string) => {
+    try {
+      await resourcesApi.delete(id);
+      toast.success('자료가 삭제되었습니다');
+      setSelectedKeys(prev => { const next = new Set(prev); next.delete(id); return next; });
+      if (drawerItem?.id === id) setDrawerItem(null);
+      loadData();
+    } catch {
+      toast.error('삭제에 실패했습니다');
+    }
+  }, [drawerItem, loadData]);
+
+  // ─── Bulk Actions ─────────────────────────────────────────────────────────
+
+  const handleBulkCopy = useCallback(() => {
+    const urls = items
+      .filter(item => selectedKeys.has(item.id))
+      .map(item => item.source_url || `${window.location.origin}/resources`)
+      .join('\n');
+    navigator.clipboard.writeText(urls)
+      .then(() => toast.success(`${selectedKeys.size}개 링크가 복사되었습니다`))
+      .catch(() => toast.error('복사에 실패했습니다'));
+  }, [items, selectedKeys]);
+
+  const handleBulkDelete = useCallback(async () => {
+    try {
+      await Promise.all(Array.from(selectedKeys).map(id => resourcesApi.delete(id)));
+      toast.success(`${selectedKeys.size}개가 삭제되었습니다`);
+      setSelectedKeys(new Set());
+      loadData();
+    } catch {
+      toast.error('삭제에 실패했습니다');
+    }
+  }, [selectedKeys, loadData]);
 
   // ─── Table Columns ────────────────────────────────────────────────────────
 
-  const columns: O4OColumn<ResourceItem>[] = [
+  const columns = useMemo((): O4OColumn<ResourceItem>[] => [
     {
       key: 'title',
       header: '파일명 / 제목',
@@ -146,20 +186,6 @@ export function ResourcesHubPage() {
       ),
       onCellClick: (row) => openDrawer(row),
       sortable: true,
-    },
-    {
-      key: 'summary',
-      header: '설명',
-      width: '28%',
-      render: (_v, row) => (
-        <span style={{
-          color: '#6B7280', fontSize: 13,
-          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-          display: 'block', maxWidth: 260,
-        }}>
-          {row.summary || '-'}
-        </span>
-      ),
     },
     {
       key: 'author_name',
@@ -182,34 +208,89 @@ export function ResourcesHubPage() {
       sortAccessor: (row) => new Date(row.created_at).getTime(),
     },
     {
-      key: '_actions' as any,
-      header: '다운로드',
-      width: 96,
+      key: 'view_count',
+      header: '👁',
+      width: 60,
       align: 'center',
+      sortable: true,
+      sortAccessor: (row) => row.view_count,
+      render: (_v, row) => (
+        <span style={{ color: '#6B7280', fontSize: 13 }}>{row.view_count ?? 0}</span>
+      ),
+    },
+    {
+      key: '_actions' as any,
+      header: '',
+      width: 150,
+      align: 'center',
+      system: true,
       render: (_v, row) => {
-        if (!row.source_url) {
-          return <span style={{ color: '#D1D5DB', fontSize: 12 }}>-</span>;
-        }
-        const ext = isExternal(row);
+        const rowActions: RowActionItem[] = isOperator ? [
+          {
+            key: 'edit',
+            label: '수정',
+            onClick: () => navigate(`/operator/resources/${row.id}/edit`),
+          },
+          {
+            key: 'delete',
+            label: '삭제',
+            variant: 'danger',
+            onClick: () => handleDeleteItem(row.id),
+            confirm: {
+              title: '자료 삭제',
+              message: '이 자료를 삭제하시겠습니까?',
+              variant: 'danger',
+            },
+          },
+        ] : [];
+
         return (
-          <a
-            href={row.source_url}
-            target={ext ? '_blank' : '_self'}
-            rel="noopener noreferrer"
-            download={!ext ? (row.source_file_name || true) : undefined}
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 4,
-              padding: '4px 10px',
-              background: '#EFF6FF', color: '#2563EB',
-              borderRadius: 6, fontSize: 12, fontWeight: 500,
-              textDecoration: 'none',
-            }}
-          >
-            {ext ? <ExternalLink size={12} /> : <Download size={12} />}
-            {ext ? '바로가기' : '다운로드'}
-          </a>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}>
+            {row.source_url && (
+              <a
+                href={row.source_url}
+                target={isExternal(row) ? '_blank' : '_self'}
+                rel="noopener noreferrer"
+                download={!isExternal(row) ? (row.source_file_name || true) : undefined}
+                onClick={(e) => e.stopPropagation()}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
+                  padding: '4px 10px',
+                  background: '#EFF6FF', color: '#2563EB',
+                  borderRadius: 6, fontSize: 12, fontWeight: 500,
+                  textDecoration: 'none',
+                }}
+              >
+                {isExternal(row) ? <ExternalLink size={12} /> : <Download size={12} />}
+                {isExternal(row) ? '바로가기' : '다운로드'}
+              </a>
+            )}
+            {isOperator && <RowActionMenu actions={rowActions} />}
+          </div>
         );
+      },
+    },
+  ], [isOperator, navigate, openDrawer, handleDeleteItem]);
+
+  // ─── Bulk ActionBar ───────────────────────────────────────────────────────
+
+  const bulkActions: ActionBarAction[] = [
+    {
+      key: 'copy',
+      label: '링크 복사',
+      icon: <Link2 size={14} />,
+      onClick: handleBulkCopy,
+    },
+    {
+      key: 'delete',
+      label: '삭제',
+      variant: 'danger',
+      icon: <Trash2 size={14} />,
+      onClick: handleBulkDelete,
+      confirm: {
+        title: '삭제 확인',
+        message: `선택한 ${selectedKeys.size}개를 삭제하시겠습니까?`,
+        variant: 'danger',
       },
     },
   ];
@@ -245,6 +326,15 @@ export function ResourcesHubPage() {
         />
       </div>
 
+      {/* Bulk ActionBar (선택 시에만) */}
+      {selectedKeys.size > 0 && (
+        <ActionBar
+          selectedCount={selectedKeys.size}
+          actions={isOperator ? bulkActions : bulkActions.filter(a => a.key !== 'delete')}
+          onClearSelection={() => setSelectedKeys(new Set())}
+        />
+      )}
+
       {/* Table */}
       {loading ? (
         <div style={st.loadingWrap}>
@@ -264,12 +354,15 @@ export function ResourcesHubPage() {
         </div>
       ) : (
         <>
-          <BaseTable
+          <BaseTable<ResourceItem>
             columns={columns}
             data={items}
             rowKey={(row) => row.id}
             tableId="kpa-resources"
             onRowClick={(row) => openDrawer(row)}
+            selectable
+            selectedKeys={selectedKeys}
+            onSelectionChange={setSelectedKeys}
             emptyMessage="등록된 자료가 없습니다."
             rowClassName={() => 'cursor-pointer'}
           />

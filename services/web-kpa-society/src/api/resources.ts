@@ -63,4 +63,7 @@ export const resourcesApi = {
 
   trackView: (id: string) =>
     apiClient.post<ApiResponse<void>>(`/contents/${id}/view`),
+
+  delete: (id: string) =>
+    apiClient.delete<{ success: boolean }>(`/contents/${id}`),
 };
