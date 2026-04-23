@@ -3,6 +3,7 @@
  *
  * WO-O4O-RESOURCES-HUB-TEMPLATE-FOUNDATION-V1
  * WO-KPA-RESOURCES-UPLOAD-BUTTON-ON-RESOURCES-V1: 자료 등록 버튼 추가
+ * WO-KPA-RESOURCES-UPLOAD-ENTRY-AND-FORM-SEPARATION-V1: CTA → /resources/new
  *
  * ResourcesHubTemplate + KPA adapter.
  * KPA 전용 API(resourcesApi), operator 조건, 문구는
@@ -51,7 +52,7 @@ function ResourceUploadButton({ variant = 'hero' }: { variant?: 'hero' | 'empty'
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const isOperator = hasAnyRole(user?.roles ?? [], PLATFORM_ROLES);
-  const targetPath = isOperator ? '/operator/resources/new' : '/content/new';
+  const targetPath = isOperator ? '/operator/resources/new' : '/resources/new';
 
   const handleClick = () => {
     if (!isAuthenticated) {

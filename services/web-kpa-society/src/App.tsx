@@ -87,6 +87,7 @@ import { AdminRoutes } from './routes/AdminRoutes';
 import { OperatorRoutes } from './routes/OperatorRoutes';
 // Resources Hub (공동자료실 진입 허브 — WO-KPA-RESOURCE-SYSTEM-RESET-V1)
 import { ResourcesHubPage } from './pages/resources/ResourcesHubPage';
+import { ResourceWritePage } from './pages/resources/ResourceWritePage';
 
 
 // Intranet Routes (인트라넷)
@@ -380,6 +381,8 @@ function App() {
           <Route path="/forum/:slug/write" element={<Layout serviceName={SERVICE_NAME}><ForumWritePage /></Layout>} />
           <Route path="/forum/write" element={<Layout serviceName={SERVICE_NAME}><ForumWritePage /></Layout>} />
           <Route path="/forum/edit/:id" element={<Layout serviceName={SERVICE_NAME}><ForumWritePage /></Layout>} />
+          {/* WO-FORUM-REQUEST-ROUTE-EXTRACTION-FROM-MYPAGE-V1: 포럼 개설 신청 → /forum 소속 */}
+          <Route path="/forum/request" element={<Layout serviceName={SERVICE_NAME}><KpaRequestCategoryPage /></Layout>} />
 
           {/* Market Trial — WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1
               실행은 Neture 단독. 기존 URL은 backward-compat을 위해 redirect 유지. */}
@@ -520,6 +523,9 @@ function App() {
           </Route>
           {/* 자료실 Hub — 공동자료실 진입점 (WO-KPA-RESOURCE-SYSTEM-RESET-V1) */}
           <Route path="/resources" element={<Layout serviceName={SERVICE_NAME}><ResourcesHubPage /></Layout>} />
+          {/* 자료 등록/수정 (WO-KPA-RESOURCES-UPLOAD-ENTRY-AND-FORM-SEPARATION-V1) */}
+          <Route path="/resources/new" element={<Layout serviceName={SERVICE_NAME}><ResourceWritePage /></Layout>} />
+          <Route path="/resources/:id/edit" element={<Layout serviceName={SERVICE_NAME}><ResourceWritePage /></Layout>} />
           {/* Operator Routes — WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: KpaOperatorLayout (standalone sidebar) */}
           <Route path="/operator/*" element={<OperatorRoutes />} />
           <Route path="/intranet/*" element={<Navigate to="/demo/intranet" replace />} />
@@ -607,7 +613,8 @@ function App() {
           <Route path="/mypage/certificates" element={<Layout serviceName={SERVICE_NAME}><MyCertificatesPage /></Layout>} />
           {/* WO-O4O-FORUM-MY-FORUM-EXPANSION-V1 */}
           <Route path="/mypage/my-forums" element={<Layout serviceName={SERVICE_NAME}><MyForumDashboardPage /></Layout>} />
-          <Route path="/mypage/my-forums/request" element={<Layout serviceName={SERVICE_NAME}><KpaRequestCategoryPage /></Layout>} />
+          {/* WO-FORUM-REQUEST-ROUTE-EXTRACTION-FROM-MYPAGE-V1: 레거시 리다이렉트 */}
+          <Route path="/mypage/my-forums/request" element={<Navigate to="/forum/request" replace />} />
           {/* WO-KPA-A-FORUM-OWNER-MEMBER-MANAGEMENT-UI-V1: 포럼 회원 관리 */}
           <Route path="/mypage/my-forums/:forumId/members" element={<Layout serviceName={SERVICE_NAME}><ForumMemberManagementPage /></Layout>} />
           {/* WO-KPA-A-MYPAGE-UNIFIED-REQUEST-INBOX-V1 */}

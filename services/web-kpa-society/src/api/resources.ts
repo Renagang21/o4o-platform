@@ -1,6 +1,7 @@
 /**
  * Resources API 서비스
  * WO-KPA-RESOURCE-HUB-RESTRUCTURE-V1
+ * WO-KPA-RESOURCES-UPLOAD-ENTRY-AND-FORM-SEPARATION-V1: create/update 추가
  *
  * kpa_contents 기반 자료실 API 래핑.
  */
@@ -66,4 +67,28 @@ export const resourcesApi = {
 
   delete: (id: string) =>
     apiClient.delete<{ success: boolean }>(`/contents/${id}`),
+
+  create: (data: {
+    title: string;
+    summary?: string;
+    body?: string;
+    tags?: string[];
+    source_type?: 'manual' | 'upload' | 'external';
+    source_url?: string;
+    source_file_name?: string;
+    status?: 'draft' | 'published';
+  }) =>
+    apiClient.post<ApiResponse<ResourceItem>>('/contents', data),
+
+  update: (id: string, data: {
+    title?: string;
+    summary?: string;
+    body?: string;
+    tags?: string[];
+    source_type?: string;
+    source_url?: string;
+    source_file_name?: string;
+    status?: string;
+  }) =>
+    apiClient.patch<ApiResponse<ResourceItem>>(`/contents/${id}`, data),
 };
