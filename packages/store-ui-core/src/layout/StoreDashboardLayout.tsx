@@ -105,8 +105,11 @@ export function StoreDashboardLayout({
         {/* Main content */}
         <div className="flex-1 min-w-0">
           <main className="p-4 md:p-6">
-            {banner}
-            <Outlet />
+            {/* WO-O4O-STORE-LAYOUT-WIDTH-OVERFLOW-FIX-V1: max-width constraint prevents full-bleed on wide screens */}
+            <div className="max-w-[1200px] mx-auto w-full">
+              {banner}
+              <Outlet />
+            </div>
           </main>
         </div>
       </div>

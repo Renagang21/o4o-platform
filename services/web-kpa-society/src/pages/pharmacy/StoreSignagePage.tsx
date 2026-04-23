@@ -733,7 +733,8 @@ export function StoreSignagePage() {
   }, [schedules]);
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8">
+    {/* WO-O4O-STORE-LAYOUT-WIDTH-OVERFLOW-FIX-V1: max-w/mx-auto 제거 — StoreDashboardLayout이 max-w-[1200px] 관리 */}
+    <div className="w-full">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>

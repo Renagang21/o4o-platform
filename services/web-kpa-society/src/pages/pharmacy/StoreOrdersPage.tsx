@@ -224,19 +224,22 @@ export function StoreOrdersPage() {
           </div>
         </div>
       ) : (
-        <DataTable<StoreOrder>
-          columns={columns}
-          dataSource={orders}
-          rowKey="id"
-          onRowClick={(row) => setSelectedOrderId(row.id)}
-          pagination={{
-            current: page,
-            pageSize: PAGE_SIZE,
-            total,
-            onChange: (p: number) => setPage(p),
-          }}
-          emptyText="주문이 없습니다"
-        />
+        /* WO-O4O-STORE-LAYOUT-WIDTH-OVERFLOW-FIX-V1: table overflow → horizontal scroll */
+        <div style={{ overflowX: 'auto' }}>
+          <DataTable<StoreOrder>
+            columns={columns}
+            dataSource={orders}
+            rowKey="id"
+            onRowClick={(row) => setSelectedOrderId(row.id)}
+            pagination={{
+              current: page,
+              pageSize: PAGE_SIZE,
+              total,
+              onChange: (p: number) => setPage(p),
+            }}
+            emptyText="주문이 없습니다"
+          />
+        </div>
       )}
 
       {/* Order Detail Drawer */}
