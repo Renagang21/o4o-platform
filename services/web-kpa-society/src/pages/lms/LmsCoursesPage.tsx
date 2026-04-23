@@ -59,18 +59,6 @@ export function LmsCoursesPage() {
     });
   };
 
-  const handleFilterChange = (key: string, value: string) => {
-    setSearchParams(prev => {
-      if (value) {
-        prev.set(key, value);
-      } else {
-        prev.delete(key);
-      }
-      prev.set('page', '1');
-      return prev;
-    });
-  };
-
   if (loading) {
     return <LoadingSpinner message="마케팅 콘텐츠를 불러오는 중..." />;
   }
@@ -83,11 +71,6 @@ export function LmsCoursesPage() {
         description="마케팅 콘텐츠를 탐색하세요"
         breadcrumb={[{ label: '홈', href: '/' }, { label: '마케팅 콘텐츠' }]}
       />
-
-      {/* 안내 메시지 */}
-      <div style={styles.infoBox}>
-        💡 마케팅 콘텐츠를 순서대로 안내받고, 진행 현황을 관리할 수 있습니다.
-      </div>
 
       {courses.length === 0 ? (
         <EmptyState

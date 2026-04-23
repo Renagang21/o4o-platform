@@ -206,22 +206,11 @@ function HeroHeader() {
   return (
     <header className="bg-white border-b border-slate-200">
       <PageContainer>
-        <div className="py-8 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900">GlycoPharm 포럼</h1>
-            <p className="mt-1.5 text-sm text-slate-500">
-              의약품과 건강기능식품에 대한 정보를 교환하고 토론에 참여하세요
-            </p>
-          </div>
-          <Link
-            to="/forum"
-            className="hidden md:inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition-colors"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            글쓰기
-          </Link>
+        <div className="py-8">
+          <h1 className="text-2xl font-bold text-slate-900">GlycoPharm 포럼</h1>
+          <p className="mt-1.5 text-sm text-slate-500">
+            의약품과 건강기능식품에 대한 정보를 교환하고 토론에 참여하세요
+          </p>
         </div>
       </PageContainer>
     </header>
@@ -419,13 +408,11 @@ function WritePrompt() {
             ✏️
           </div>
           <div>
-            <h3 className="text-sm font-bold text-slate-800">
-              {isAuthenticated ? '새 글을 작성해 보세요' : '포럼에 참여해 보세요'}
-            </h3>
+            <h3 className="text-sm font-bold text-slate-800">포럼에 참여해 보세요</h3>
             <p className="mt-0.5 text-xs text-slate-500">
               {isAuthenticated
-                ? '의견, 질문, 피드백을 자유롭게 공유하세요'
-                : '로그인 후 글을 작성하고 토론에 참여할 수 있습니다'}
+                ? '의견, 질문, 피드백을 자유롭게 나눠보세요'
+                : '로그인 후 토론에 참여할 수 있습니다'}
             </p>
           </div>
         </div>
@@ -434,7 +421,7 @@ function WritePrompt() {
             to="/forum"
             className="px-5 py-2.5 text-sm font-semibold text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition-colors whitespace-nowrap"
           >
-            글쓰기
+            포럼 보기
           </Link>
         ) : (
           <Link
@@ -452,27 +439,14 @@ function WritePrompt() {
 /** 이용안내 */
 function InfoSection() {
   return (
-    <section className="py-6 border-t border-slate-200">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">이용안내</h4>
-          <ul className="space-y-1.5 text-xs text-slate-400 list-disc pl-4">
-            <li>질문, 의견, 피드백을 자유롭게 남겨주세요</li>
-            <li>상품 홍보나 고객 문의 용도가 아닌 공간입니다</li>
-            <li>개인정보 보호에 유의해 주세요</li>
-          </ul>
-        </div>
-        <div>
-          <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">바로가기</h4>
-          <div className="flex flex-wrap gap-2">
-            <Link to="/forum" className="text-xs text-slate-400 hover:text-emerald-600 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-emerald-50 transition-colors">
-              전체 글
-            </Link>
-            <Link to="/forum/feedback" className="text-xs text-slate-400 hover:text-emerald-600 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-emerald-50 transition-colors">
-              피드백
-            </Link>
-          </div>
-        </div>
+    <section className="py-4 border-t border-slate-200">
+      <div className="flex flex-wrap gap-2">
+        <Link to="/forum" className="text-xs text-slate-400 hover:text-emerald-600 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-emerald-50 transition-colors">
+          전체 글
+        </Link>
+        <Link to="/forum/feedback" className="text-xs text-slate-400 hover:text-emerald-600 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-emerald-50 transition-colors">
+          피드백
+        </Link>
       </div>
     </section>
   );

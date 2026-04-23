@@ -17,7 +17,6 @@ import { BaseTable, ActionBar, RowActionMenu, PageSection, PageContainer, type O
 import { Pagination } from '../../components/common';
 import { lmsApi } from '../../api';
 import { lmsInstructorApi } from '../../api/lms-instructor';
-import { qualificationApi } from '../../api/qualification';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
 import { colors, spacing, typography } from '../../styles/theme';
@@ -31,7 +30,7 @@ const STATUS_LABELS: Record<string, string> = {
 
 export function EducationPage() {
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuth();
+  const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [courses, setCourses] = useState<Course[]>([]);
@@ -39,29 +38,9 @@ export function EducationPage() {
   const [loading, setLoading] = useState(true);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
 
-  // LMS 제작자 자격 확인
-  const [hasLmsCreator, setHasLmsCreator] = useState(false);
-  const [showQualificationPrompt, setShowQualificationPrompt] = useState(false);
-
   const currentPage = parseInt(searchParams.get('page') || '1');
   const currentSearch = searchParams.get('search') || '';
   const [searchInput, setSearchInput] = useState(currentSearch);
-
-  // LMS 제작자 자격 확인 (WO-LMS-CREATOR-QUALIFICATION-FLOW-REFORM-V1)
-  useEffect(() => {
-    if (isAuthenticated) {
-      qualificationApi.getMyQualifications()
-        .then((res: any) => {
-          if (res.data.success) {
-            const approved = (res.data.data as any[]).some(
-              (q) => q.qualification_type === 'lms_creator' && q.status === 'approved',
-            );
-            setHasLmsCreator(approved);
-          }
-        })
-        .catch(() => {});
-    }
-  }, [isAuthenticated]);
 
   const loadCourses = useCallback(async () => {
     try {
@@ -102,14 +81,6 @@ export function EducationPage() {
       prev.set('page', String(page));
       return prev;
     });
-  };
-
-  const handleCreateClick = () => {
-    if (hasLmsCreator) {
-      navigate('/instructor/courses/new');
-    } else {
-      setShowQualificationPrompt(true);
-    }
   };
 
   const handleDeleteCourse = useCallback(async (id: string) => {
@@ -310,11 +281,6 @@ export function EducationPage() {
           <h1 style={styles.title}>강의</h1>
           <p style={styles.subtitle}>보수교육, 온라인 세미나, 실무 강의</p>
         </div>
-        {isAuthenticated && (
-          <button onClick={handleCreateClick} style={styles.createBtn}>
-            + 강의 등록
-          </button>
-        )}
       </div>
 
       {/* Search bar */}
@@ -370,26 +336,6 @@ export function EducationPage() {
         </>
       )}
 
-      {/* Qualification prompt modal (WO-LMS-CREATOR-QUALIFICATION-FLOW-REFORM-V1) */}
-      {showQualificationPrompt && (
-        <div style={styles.overlay} onClick={() => setShowQualificationPrompt(false)}>
-          <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <h3 style={styles.modalTitle}>LMS 제작자 자격이 필요합니다</h3>
-            <p style={styles.modalDesc}>
-              LMS에서 강의, 콘텐츠, 설문/퀴즈를 등록하려면<br />
-              제작자 자격이 필요합니다.
-            </p>
-            <div style={styles.modalActions}>
-              <button onClick={() => setShowQualificationPrompt(false)} style={styles.modalCancelBtn}>
-                닫기
-              </button>
-              <Link to="/mypage/qualifications" style={styles.modalApplyBtn}>
-                자격 신청하기
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
       </PageContainer>
     </PageSection>
   );
@@ -418,16 +364,6 @@ const styles: Record<string, React.CSSProperties> = {
     margin: `${spacing.xs} 0 0`,
     fontSize: '0.875rem',
     color: colors.neutral500,
-  },
-  createBtn: {
-    padding: '10px 20px',
-    fontSize: '14px',
-    fontWeight: 600,
-    color: colors.white,
-    backgroundColor: colors.primary,
-    border: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
   },
   searchRow: {
     display: 'flex',
@@ -466,61 +402,6 @@ const styles: Record<string, React.CSSProperties> = {
   },
   paginationWrap: {
     marginTop: spacing.lg,
-  },
-  // Modal
-  overlay: {
-    position: 'fixed',
-    inset: 0,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1000,
-  },
-  modal: {
-    backgroundColor: colors.white,
-    borderRadius: '16px',
-    padding: '32px',
-    maxWidth: '400px',
-    width: '90%',
-    textAlign: 'center',
-  },
-  modalTitle: {
-    fontSize: '18px',
-    fontWeight: 700,
-    color: colors.neutral900,
-    margin: '0 0 12px',
-  },
-  modalDesc: {
-    fontSize: '14px',
-    color: colors.neutral600,
-    lineHeight: 1.6,
-    margin: '0 0 24px',
-  },
-  modalActions: {
-    display: 'flex',
-    gap: '12px',
-    justifyContent: 'center',
-  },
-  modalCancelBtn: {
-    padding: '10px 24px',
-    fontSize: '14px',
-    fontWeight: 500,
-    color: colors.neutral600,
-    backgroundColor: colors.neutral100,
-    border: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-  },
-  modalApplyBtn: {
-    display: 'inline-block',
-    padding: '10px 24px',
-    fontSize: '14px',
-    fontWeight: 600,
-    color: colors.white,
-    backgroundColor: colors.primary,
-    textDecoration: 'none',
-    borderRadius: '8px',
   },
 };
 

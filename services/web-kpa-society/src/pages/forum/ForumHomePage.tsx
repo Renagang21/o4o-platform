@@ -18,7 +18,6 @@
  */
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { PageHero, PageSection, PageContainer } from '@o4o/ui';
 import { ForumHubSection } from '../../components/forum/ForumHubSection';
 import { ForumActivitySection } from '../../components/forum/ForumActivitySection';
@@ -41,9 +40,6 @@ export function ForumHomePage() {
             <p style={styles.heroDesc}>
               약사 커뮤니티에서 정보를 교환하고 토론에 참여하세요
             </p>
-            <div style={styles.heroActions}>
-              <Link to="/mypage/my-forums/request" style={styles.heroRequestBtn}>새 포럼 개설 신청</Link>
-            </div>
           </PageContainer>
         </div>
       </PageHero>
@@ -91,23 +87,6 @@ const styles: Record<string, React.CSSProperties> = {
     ...typography.bodyM,
     color: colors.neutral500,
     margin: `${spacing.sm} 0 0`,
-  },
-  heroActions: {
-    display: 'flex',
-    gap: '12px',
-    marginTop: spacing.md,
-  },
-  heroRequestBtn: {
-    display: 'inline-block',
-    padding: '10px 20px',
-    backgroundColor: 'transparent',
-    color: colors.primary,
-    border: `1px solid ${colors.primary}`,
-    borderRadius: '8px',
-    fontSize: '14px',
-    fontWeight: 600,
-    textDecoration: 'none',
-    transition: 'background-color 0.2s',
   },
 };
 

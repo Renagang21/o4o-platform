@@ -55,7 +55,6 @@ interface ForumHubPageProps {
   title?: string;
   description?: string;
   basePath?: string;
-  guidelines?: string[];
 }
 
 // ============================================================================
@@ -160,24 +159,13 @@ function ForumIcon({ category, size = 48 }: { category: ForumCategory; size?: nu
 }
 
 /** Hero Header — 포럼 아이덴티티 */
-function HeroHeader({ title, description, basePath }: { title: string; description: string; basePath: string }) {
+function HeroHeader({ title, description }: { title: string; description: string }) {
   return (
     <header className="bg-white border-b border-slate-200">
       <PageContainer>
-        <div className="py-8 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900">{title}</h1>
-            <p className="mt-1.5 text-sm text-slate-500">{description}</p>
-          </div>
-          <Link
-            to={`${basePath}/write`}
-            className="hidden md:inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            글쓰기
-          </Link>
+        <div className="py-8">
+          <h1 className="text-2xl font-bold text-slate-900">{title}</h1>
+          <p className="mt-1.5 text-sm text-slate-500">{description}</p>
         </div>
       </PageContainer>
     </header>
@@ -385,22 +373,20 @@ function WritePrompt({ basePath }: { basePath: string }) {
             ✏️
           </div>
           <div>
-            <h3 className="text-sm font-bold text-slate-800">
-              {isAuthenticated ? '새 글을 작성해 보세요' : '포럼에 참여해 보세요'}
-            </h3>
+            <h3 className="text-sm font-bold text-slate-800">포럼에 참여해 보세요</h3>
             <p className="mt-0.5 text-xs text-slate-500">
               {isAuthenticated
-                ? '의견, 질문, 피드백을 자유롭게 공유하세요'
-                : '로그인 후 글을 작성하고 토론에 참여할 수 있습니다'}
+                ? '의견, 질문, 피드백을 자유롭게 나눠보세요'
+                : '로그인 후 토론에 참여할 수 있습니다'}
             </p>
           </div>
         </div>
         {isAuthenticated ? (
           <Link
-            to={`${basePath}/write`}
+            to={basePath}
             className="px-5 py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap"
           >
-            글쓰기
+            포럼 보기
           </Link>
         ) : (
           <Link
@@ -416,32 +402,16 @@ function WritePrompt({ basePath }: { basePath: string }) {
 }
 
 /** 이용안내 */
-function InfoSection({ basePath, guidelines }: { basePath: string; guidelines: string[] }) {
+function InfoSection({ basePath }: { basePath: string }) {
   return (
-    <section className="py-6 border-t border-slate-200">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">이용안내</h4>
-          <ul className="space-y-1.5 text-xs text-slate-400 list-disc pl-4">
-            {guidelines.map((text, i) => (
-              <li key={i}>{text}</li>
-            ))}
-          </ul>
-        </div>
-        <div>
-          <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">바로가기</h4>
-          <div className="flex flex-wrap gap-2">
-            <Link to={`${basePath}/write`} className="text-xs text-slate-400 hover:text-blue-600 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-blue-50 transition-colors">
-              글쓰기
-            </Link>
-            <Link to={`${basePath}?sort=popular`} className="text-xs text-slate-400 hover:text-blue-600 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-blue-50 transition-colors">
-              인기 글
-            </Link>
-            <Link to={`${basePath}?type=announcement`} className="text-xs text-slate-400 hover:text-blue-600 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-blue-50 transition-colors">
-              공지사항
-            </Link>
-          </div>
-        </div>
+    <section className="py-4 border-t border-slate-200">
+      <div className="flex flex-wrap gap-2">
+        <Link to={`${basePath}?sort=popular`} className="text-xs text-slate-400 hover:text-blue-600 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-blue-50 transition-colors">
+          인기 글
+        </Link>
+        <Link to={`${basePath}?type=announcement`} className="text-xs text-slate-400 hover:text-blue-600 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-blue-50 transition-colors">
+          공지사항
+        </Link>
       </div>
     </section>
   );
@@ -451,17 +421,10 @@ function InfoSection({ basePath, guidelines }: { basePath: string; guidelines: s
 // Main Component
 // ============================================================================
 
-const DEFAULT_GUIDELINES = [
-  '질문, 의견, 피드백을 자유롭게 남겨주세요',
-  '상품 홍보나 고객 문의 용도가 아닌 공간입니다',
-  '개인정보 보호에 유의해 주세요',
-];
-
 export default function ForumHubPage({
   title = 'o4o · 네뚜레 포럼',
   description = 'o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간입니다',
   basePath = '/forum',
-  guidelines = DEFAULT_GUIDELINES,
 }: ForumHubPageProps) {
   const [categories, setCategories] = useState<ForumCategory[]>([]);
   const [activityMap, setActivityMap] = useState<Record<string, CategoryActivity>>({});
@@ -527,7 +490,7 @@ export default function ForumHubPage({
   return (
     <div className="bg-slate-50 min-h-[calc(100vh-200px)]">
       <PageHero>
-        <HeroHeader title={title} description={description} basePath={basePath} />
+        <HeroHeader title={title} description={description} />
       </PageHero>
 
       <PageSection>
@@ -550,7 +513,7 @@ export default function ForumHubPage({
 
       <PageSection last>
         <PageContainer>
-          <InfoSection basePath={basePath} guidelines={guidelines} />
+          <InfoSection basePath={basePath} />
         </PageContainer>
       </PageSection>
     </div>
