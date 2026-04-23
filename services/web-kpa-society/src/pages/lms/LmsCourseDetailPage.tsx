@@ -188,23 +188,37 @@ export function LmsCourseDetailPage() {
             )}
 
             {enrollment ? (
-              <div style={styles.enrolledInfo}>
-                <div style={styles.progressBar}>
-                  <div
-                    style={{
-                      ...styles.progressFill,
-                      width: `${enrollment.progress}%`,
-                    }}
-                  />
+              // WO-LMS-COMPLETION-AND-CERTIFICATE-UX-REFINEMENT-V1
+              (enrollment as any).status === 'completed' ? (
+                <div style={styles.enrolledInfo}>
+                  <div style={styles.completedBadge}>수료 완료</div>
+                  <p style={styles.progressText}>진도율: 100%</p>
+                  <Link
+                    to="/mypage/certificates"
+                    style={styles.certButton}
+                  >
+                    수료증 보기
+                  </Link>
                 </div>
-                <p style={styles.progressText}>진도율: {enrollment.progress}%</p>
-                <Link
-                  to={`/lms/course/${course.id}/lesson/${lessons[0]?.id || ''}`}
-                  style={styles.continueButton}
-                >
-                  계속 보기
-                </Link>
-              </div>
+              ) : (
+                <div style={styles.enrolledInfo}>
+                  <div style={styles.progressBar}>
+                    <div
+                      style={{
+                        ...styles.progressFill,
+                        width: `${enrollment.progress}%`,
+                      }}
+                    />
+                  </div>
+                  <p style={styles.progressText}>진도율: {enrollment.progress}%</p>
+                  <Link
+                    to={`/lms/course/${course.id}/lesson/${lessons[0]?.id || ''}`}
+                    style={styles.continueButton}
+                  >
+                    계속 보기
+                  </Link>
+                </div>
+              )
             ) : (
               <button
                 style={styles.enrollButton}
@@ -394,6 +408,33 @@ const styles: Record<string, React.CSSProperties> = {
     width: '100%',
     padding: '14px',
     backgroundColor: colors.primary,
+    color: colors.white,
+    textDecoration: 'none',
+    borderRadius: '8px',
+    fontSize: '16px',
+    fontWeight: 500,
+    textAlign: 'center',
+    boxSizing: 'border-box',
+  },
+  // WO-LMS-COMPLETION-AND-CERTIFICATE-UX-REFINEMENT-V1
+  completedBadge: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '6px',
+    padding: '10px',
+    backgroundColor: '#ecfdf5',
+    color: '#059669',
+    borderRadius: '8px',
+    fontSize: '15px',
+    fontWeight: 600,
+    marginBottom: '8px',
+  },
+  certButton: {
+    display: 'block',
+    width: '100%',
+    padding: '14px',
+    backgroundColor: '#059669',
     color: colors.white,
     textDecoration: 'none',
     borderRadius: '8px',

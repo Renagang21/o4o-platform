@@ -36,6 +36,7 @@ const s: Record<string, React.CSSProperties> = {
     border: 'none', borderRadius: 7, fontSize: 13, fontWeight: 600, cursor: 'pointer',
   }),
   deleteBtn: { padding: '8px 16px', background: '#fee2e2', color: '#dc2626', border: 'none', borderRadius: 7, fontSize: 13, cursor: 'pointer' },
+  archiveBtn: { padding: '8px 16px', background: '#fef3c7', color: '#92400e', border: 'none', borderRadius: 7, fontSize: 13, cursor: 'pointer', fontWeight: 600 },
   lessonCard: {
     background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 8,
     padding: '12px 16px', marginBottom: 10, display: 'flex', gap: 12, alignItems: 'flex-start',
@@ -57,9 +58,11 @@ const s: Record<string, React.CSSProperties> = {
   modalActions: { display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 20 },
   cancelBtn: { padding: '8px 18px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: 7, fontSize: 13, cursor: 'pointer' },
   error: { color: '#ef4444', fontSize: 13, marginTop: 8 },
-  statusBadge: (published: boolean) => ({
+  statusBadge: (status: string) => ({
     display: 'inline-block', padding: '3px 10px', borderRadius: 999, fontSize: 11, fontWeight: 600,
-    color: '#fff', background: published ? '#10b981' : '#6b7280', marginLeft: 10,
+    color: '#fff',
+    background: status === 'published' ? '#10b981' : status === 'archived' ? '#f59e0b' : '#6b7280',
+    marginLeft: 10,
   }),
   tagContainer: { display: 'flex', flexWrap: 'wrap', gap: 6, padding: '7px 10px', border: '1px solid #d1d5db', borderRadius: 7, minHeight: 40, alignItems: 'center' },
   tag: { display: 'inline-flex', alignItems: 'center', gap: 4, padding: '2px 8px', background: '#ede9fe', color: '#5b21b6', borderRadius: 999, fontSize: 12, fontWeight: 500 },
@@ -270,6 +273,17 @@ export default function CourseEditPage() {
     }
   };
 
+  const handleArchive = async () => {
+    if (!id || !course) return;
+    if (!confirm('이 강의를 종료(보관) 처리하시겠습니까?\n종료된 강의는 사용자 목록에서 보이지 않습니다.')) return;
+    try {
+      await lmsInstructorApi.archiveCourse(id);
+      await loadData();
+    } catch (e: any) {
+      alert(e?.response?.data?.error || '처리 실패');
+    }
+  };
+
   const handleDeleteLesson = async (lessonId: string) => {
     if (!confirm('이 레슨을 삭제하시겠습니까?')) return;
     try {
@@ -299,8 +313,8 @@ export default function CourseEditPage() {
       <div style={s.section}>
         <div style={s.sectionTitle}>
           강의 정보
-          <span style={s.statusBadge(course.status === 'published')}>
-            {course.status === 'published' ? '발행됨' : course.status === 'archived' ? '보관됨' : '초안'}
+          <span style={s.statusBadge(course.status)}>
+            {course.status === 'published' ? '공개 중' : course.status === 'archived' ? '종료됨' : '초안'}
           </span>
         </div>
         <div style={s.card}>
@@ -341,9 +355,16 @@ export default function CourseEditPage() {
             <button style={s.saveBtn(saving || !form.title.trim())} disabled={saving || !form.title.trim()} onClick={handleSaveCourse}>
               {saving ? '저장 중...' : '저장'}
             </button>
-            <button style={s.publishBtn(course.status === 'published')} onClick={handlePublish}>
-              {course.status === 'published' ? '발행 취소' : '발행하기'}
-            </button>
+            {course.status !== 'archived' && (
+              <button style={s.publishBtn(course.status === 'published')} onClick={handlePublish}>
+                {course.status === 'published' ? '비공개 전환' : '발행하기'}
+              </button>
+            )}
+            {course.status !== 'archived' && (
+              <button style={s.archiveBtn} onClick={handleArchive}>
+                강의 종료
+              </button>
+            )}
             {saveMsg && <span style={{ fontSize: 13, color: saveMsg === '저장되었습니다.' ? '#10b981' : '#ef4444' }}>{saveMsg}</span>}
           </div>
         </div>

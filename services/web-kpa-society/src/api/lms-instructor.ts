@@ -150,6 +150,10 @@ export const lmsInstructorApi = {
   unpublishCourse: (id: string) =>
     authClient.api.post<{ success: boolean; data: Course }>(`/lms/courses/${id}/unpublish`, {}),
 
+  /** 강의 아카이브 (종료/보관) */
+  archiveCourse: (id: string) =>
+    authClient.api.post<{ success: boolean; data: Course }>(`/lms/courses/${id}/archive`, {}),
+
   // ── 대시보드 (WO-O4O-LMS-INSTRUCTOR-DASHBOARD-MVP-V1) ──────────
 
   /** 강의별 운영 지표 */

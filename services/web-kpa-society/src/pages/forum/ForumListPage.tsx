@@ -10,7 +10,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Link2, Trash2 } from 'lucide-react';
+import { Link2, Trash2, Sparkles } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { BaseTable, ActionBar, RowActionMenu, PageSection, PageContainer, type O4OColumn, type ActionBarAction, type RowActionItem } from '@o4o/ui';
 import { PageHeader } from '../../components/common';
@@ -19,6 +19,7 @@ import { forumMembershipApi } from '../../api/forum';
 import { useAuth } from '../../contexts';
 import { colors } from '../../styles/theme';
 import type { ForumPost, ForumCategory } from '../../types';
+import { buildAiClipboardText, stripHtml, blocksToText } from '../../utils/ai-clipboard';
 
 const PAGE_SIZE = 10;
 
@@ -192,6 +193,26 @@ export function ForumListPage() {
       .catch(() => toast.error('복사에 실패했습니다'));
   }, [selectedKeys]);
 
+  const handleBulkAiCopy = useCallback(() => {
+    const selected = posts.filter((post) => selectedKeys.has(post.id));
+    const aiItems = selected.map((post, i) => {
+      const rawContent = post.content;
+      const content = Array.isArray(rawContent)
+        ? blocksToText(rawContent)
+        : stripHtml(String(rawContent || post.excerpt || ''));
+      return {
+        index: i + 1,
+        title: post.title,
+        url: `${window.location.origin}/forum/post/${post.id}`,
+        content,
+      };
+    });
+    const text = buildAiClipboardText(aiItems);
+    navigator.clipboard.writeText(text)
+      .then(() => toast.success(`${selected.length}개 AI용 텍스트가 복사되었습니다`))
+      .catch(() => toast.error('복사에 실패했습니다'));
+  }, [selectedKeys, posts]);
+
   const handleBulkDelete = useCallback(async () => {
     try {
       await Promise.all(Array.from(selectedKeys).map((id) => forumApi.deletePost(id)));
@@ -317,9 +338,15 @@ export function ForumListPage() {
   const bulkActions: ActionBarAction[] = [
     {
       key: 'copy',
-      label: '복사',
+      label: '링크 복사',
       icon: <Link2 size={14} />,
       onClick: handleBulkCopy,
+    },
+    {
+      key: 'ai_copy',
+      label: 'AI용 텍스트 복사',
+      icon: <Sparkles size={14} />,
+      onClick: handleBulkAiCopy,
     },
     {
       key: 'delete',

@@ -29,6 +29,9 @@ export function LmsLessonPage() {
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
+  // WO-LMS-COMPLETION-AND-CERTIFICATE-UX-REFINEMENT-V1
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
+
   useEffect(() => {
     if (courseId && lessonId) loadData();
   }, [courseId, lessonId]);
@@ -101,7 +104,15 @@ export function LmsLessonPage() {
         const nextLesson = lessons[currentIndex + 1];
         navigate(`/lms/course/${courseId}/lesson/${nextLesson.id}`);
       } else {
-        toast.success('모든 단계를 완료했습니다!');
+        // WO-LMS-COMPLETION-AND-CERTIFICATE-UX-REFINEMENT-V1: 마지막 레슨 완료 → 수료 모달
+        const isCourseDone = (updatedEnrollment as any)?.status === 'completed'
+          || (updatedEnrollment as any)?.progressPercentage >= 100
+          || (updatedEnrollment as any)?.progress >= 100;
+        if (isCourseDone) {
+          setShowCompletionModal(true);
+        } else {
+          toast.success('모든 단계를 완료했습니다!');
+        }
       }
     } catch (err) {
       toast.error('진도 업데이트에 실패했습니다.');
@@ -414,6 +425,34 @@ export function LmsLessonPage() {
           )}
         </div>
       </main>
+
+      {/* WO-LMS-COMPLETION-AND-CERTIFICATE-UX-REFINEMENT-V1: 수료 축하 모달 */}
+      {showCompletionModal && (
+        <div style={styles.modalOverlay}>
+          <div style={styles.modalBox}>
+            <div style={styles.modalIcon}>🎉</div>
+            <h2 style={styles.modalTitle}>수료를 축하합니다!</h2>
+            <p style={styles.modalBody}>
+              <strong>{course?.title}</strong>의 모든 단계를 완료했습니다.<br />
+              수료증이 발급되었습니다.
+            </p>
+            <div style={styles.modalActions}>
+              <Link
+                to="/mypage/certificates"
+                style={styles.modalCertBtn}
+              >
+                수료증 보기
+              </Link>
+              <button
+                style={styles.modalCloseBtn}
+                onClick={() => { setShowCompletionModal(false); navigate(`/lms/course/${courseId}`); }}
+              >
+                강의 페이지로
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -627,6 +666,66 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.neutral700,
     border: `1px solid ${colors.neutral300}`,
     borderRadius: '6px',
+    fontSize: '14px',
+    cursor: 'pointer',
+  },
+  // WO-LMS-COMPLETION-AND-CERTIFICATE-UX-REFINEMENT-V1
+  modalOverlay: {
+    position: 'fixed',
+    inset: 0,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1000,
+  },
+  modalBox: {
+    backgroundColor: colors.white,
+    borderRadius: '16px',
+    padding: '48px 40px',
+    maxWidth: '440px',
+    width: '90%',
+    textAlign: 'center',
+    boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+  },
+  modalIcon: {
+    fontSize: '56px',
+    marginBottom: '16px',
+  },
+  modalTitle: {
+    fontSize: '24px',
+    fontWeight: 700,
+    color: colors.neutral900,
+    marginBottom: '12px',
+  },
+  modalBody: {
+    fontSize: '15px',
+    color: colors.neutral600,
+    lineHeight: 1.7,
+    marginBottom: '32px',
+  },
+  modalActions: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '12px',
+  },
+  modalCertBtn: {
+    display: 'block',
+    padding: '14px',
+    backgroundColor: colors.primary,
+    color: colors.white,
+    textDecoration: 'none',
+    borderRadius: '8px',
+    fontSize: '16px',
+    fontWeight: 600,
+    textAlign: 'center',
+  },
+  modalCloseBtn: {
+    padding: '12px',
+    backgroundColor: colors.neutral100,
+    color: colors.neutral700,
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: '8px',
     fontSize: '14px',
     cursor: 'pointer',
   },

@@ -86,11 +86,11 @@ export function EducationPage() {
   const handleDeleteCourse = useCallback(async (id: string) => {
     try {
       await lmsInstructorApi.deleteCourse(id);
-      toast.success('강의가 삭제되었습니다');
+      toast.success('강의가 종료 처리되었습니다');
       setSelectedKeys((prev) => { const next = new Set(prev); next.delete(id); return next; });
       loadCourses();
     } catch {
-      toast.error('삭제에 실패했습니다');
+      toast.error('처리에 실패했습니다');
     }
   }, [loadCourses]);
 
@@ -106,11 +106,11 @@ export function EducationPage() {
   const handleBulkDelete = useCallback(async () => {
     try {
       await Promise.all(Array.from(selectedKeys).map((id) => lmsInstructorApi.deleteCourse(id)));
-      toast.success(`${selectedKeys.size}개가 삭제되었습니다`);
+      toast.success(`${selectedKeys.size}개가 종료 처리되었습니다`);
       setSelectedKeys(new Set());
       loadCourses();
     } catch {
-      toast.error('삭제에 실패했습니다');
+      toast.error('처리에 실패했습니다');
     }
   }, [selectedKeys, loadCourses]);
 
@@ -215,12 +215,12 @@ export function EducationPage() {
           },
           {
             key: 'delete',
-            label: '삭제',
+            label: '강의 종료',
             variant: 'danger',
             onClick: () => handleDeleteCourse(row.id),
             confirm: {
-              title: '강의 삭제',
-              message: '이 강의를 삭제하시겠습니까?',
+              title: '강의 종료',
+              message: '이 강의를 종료(보관) 처리하시겠습니까?',
               variant: 'danger',
             },
           },
@@ -260,13 +260,13 @@ export function EducationPage() {
     },
     {
       key: 'delete',
-      label: '삭제',
+      label: '강의 종료',
       variant: 'danger',
       icon: <Trash2 size={14} />,
       onClick: handleBulkDelete,
       confirm: {
-        title: '삭제 확인',
-        message: `선택한 ${selectedKeys.size}개를 삭제하시겠습니까?`,
+        title: '강의 종료 확인',
+        message: `선택한 ${selectedKeys.size}개를 종료(보관) 처리하시겠습니까?`,
         variant: 'danger',
       },
     },

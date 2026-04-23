@@ -85,11 +85,17 @@ const qualificationActionPolicy = defineActionPolicy<QualificationRequest>('kpa:
       label: '검토',
       visible: (row: QualificationRequest) => row.status === 'pending',
     },
+    {
+      key: 'detail',
+      label: '상세보기',
+      visible: (row: QualificationRequest) => row.status !== 'pending',
+    },
   ],
 });
 
 const QUALIFICATION_ACTION_ICONS: Record<string, React.ReactNode> = {
   review: <FileCheck className="w-4 h-4" />,
+  detail: <FileCheck className="w-4 h-4" />,
 };
 
 export default function QualificationRequestsPage() {
@@ -191,6 +197,25 @@ export default function QualificationRequestsPage() {
       ),
     },
     {
+      key: 'reviewed_at',
+      header: '검토일',
+      render: (_v, row) => (
+        <span className="text-sm text-slate-500">
+          {row.reviewed_at ? new Date(row.reviewed_at).toLocaleDateString('ko-KR') : '-'}
+        </span>
+      ),
+    },
+    {
+      key: 'review_note',
+      header: '검토 의견',
+      render: (_v, row) => {
+        const note = row.review_note;
+        if (!note) return <span className="text-sm text-slate-400">-</span>;
+        const truncated = note.length > 30 ? note.slice(0, 30) + '…' : note;
+        return <span className="text-sm text-slate-600" title={note}>{truncated}</span>;
+      },
+    },
+    {
       key: '_actions',
       header: '액션',
       align: 'center' as const,
@@ -201,6 +226,7 @@ export default function QualificationRequestsPage() {
         <RowActionMenu
           actions={buildRowActions(qualificationActionPolicy, row, {
             review: () => { setSelectedRequest(row); setReviewNote(''); setSuccess(null); },
+            detail: () => { setSelectedRequest(row); setReviewNote(''); setSuccess(null); },
           }, { icons: QUALIFICATION_ACTION_ICONS })}
         />
       ),
@@ -260,7 +286,9 @@ export default function QualificationRequestsPage() {
       {selectedRequest && (
         <div style={styles.modalOverlay} onClick={() => setSelectedRequest(null)}>
           <div style={styles.modal} onClick={e => e.stopPropagation()}>
-            <h2 style={styles.modalTitle}>자격 신청 검토</h2>
+            <h2 style={styles.modalTitle}>
+              {selectedRequest.status === 'pending' ? '자격 신청 검토' : '자격 신청 상세'}
+            </h2>
 
             <div style={styles.detailRow}>
               <span style={styles.detailLabel}>신청 유형</span>
@@ -269,6 +297,13 @@ export default function QualificationRequestsPage() {
             <div style={styles.detailRow}>
               <span style={styles.detailLabel}>신청일</span>
               <span>{new Date(selectedRequest.created_at).toLocaleDateString('ko-KR')}</span>
+            </div>
+            <div style={styles.detailRow}>
+              <span style={styles.detailLabel}>상태</span>
+              {(() => {
+                const sc = statusConfig[selectedRequest.status] || { text: selectedRequest.status, cls: 'bg-slate-100 text-slate-600' };
+                return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${sc.cls}`}>{sc.text}</span>;
+              })()}
             </div>
 
             {selectedRequest.qualification_type === 'instructor'
@@ -281,36 +316,59 @@ export default function QualificationRequestsPage() {
                 ))
             }
 
-            <div style={styles.formGroup}>
-              <label style={styles.label}>검토 의견 (선택)</label>
-              <textarea
-                value={reviewNote}
-                onChange={e => setReviewNote(e.target.value)}
-                placeholder="승인/반려 사유를 입력해 주세요"
-                style={styles.textarea}
-                rows={3}
-              />
-            </div>
-
-            <div style={styles.modalActions}>
-              <button style={styles.cancelBtn} onClick={() => setSelectedRequest(null)}>
-                취소
-              </button>
-              <button
-                style={{ ...styles.rejectBtn, ...(reviewing ? styles.disabledBtn : {}) }}
-                onClick={() => handleReview('rejected')}
-                disabled={reviewing}
-              >
-                반려
-              </button>
-              <button
-                style={{ ...styles.approveBtn, ...(reviewing ? styles.disabledBtn : {}) }}
-                onClick={() => handleReview('approved')}
-                disabled={reviewing}
-              >
-                {reviewing ? '처리 중...' : '승인'}
-              </button>
-            </div>
+            {selectedRequest.status !== 'pending' ? (
+              <>
+                <div style={{ ...styles.formGroup, borderTop: `1px solid ${colors.neutral200}`, paddingTop: '16px', marginTop: '8px' }}>
+                  <div style={styles.detailRow}>
+                    <span style={styles.detailLabel}>검토일</span>
+                    <span style={styles.detailValue}>
+                      {selectedRequest.reviewed_at
+                        ? new Date(selectedRequest.reviewed_at).toLocaleDateString('ko-KR')
+                        : '-'}
+                    </span>
+                  </div>
+                  <div style={styles.detailRow}>
+                    <span style={styles.detailLabel}>검토 의견</span>
+                    <span style={styles.detailValue}>{selectedRequest.review_note || '-'}</span>
+                  </div>
+                </div>
+                <div style={styles.modalActions}>
+                  <button style={styles.cancelBtn} onClick={() => setSelectedRequest(null)}>닫기</button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div style={styles.formGroup}>
+                  <label style={styles.label}>검토 의견 (선택)</label>
+                  <textarea
+                    value={reviewNote}
+                    onChange={e => setReviewNote(e.target.value)}
+                    placeholder="승인/반려 사유를 입력해 주세요"
+                    style={styles.textarea}
+                    rows={3}
+                  />
+                </div>
+                <div style={styles.modalActions}>
+                  <button style={styles.cancelBtn} onClick={() => setSelectedRequest(null)}>
+                    취소
+                  </button>
+                  <button
+                    style={{ ...styles.rejectBtn, ...(reviewing ? styles.disabledBtn : {}) }}
+                    onClick={() => handleReview('rejected')}
+                    disabled={reviewing}
+                  >
+                    반려
+                  </button>
+                  <button
+                    style={{ ...styles.approveBtn, ...(reviewing ? styles.disabledBtn : {}) }}
+                    onClick={() => handleReview('approved')}
+                    disabled={reviewing}
+                  >
+                    {reviewing ? '처리 중...' : '승인'}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}

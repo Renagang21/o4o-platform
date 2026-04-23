@@ -24,6 +24,7 @@ export const lmsApi = {
   getCourses: (params?: {
     category?: string;
     level?: string;
+    status?: string;
     page?: number;
     limit?: number;
     search?: string;

@@ -14,12 +14,13 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Plus, Trash2, Link2 } from 'lucide-react';
+import { Search, Plus, Trash2, Link2, Sparkles } from 'lucide-react';
 import { BaseTable, ActionBar, RowActionMenu } from '@o4o/ui';
 import type { O4OColumn, ActionBarAction, RowActionItem } from '@o4o/ui';
 import { contentApi, type ContentItem } from '../../api/content';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
+import { buildAiClipboardText, stripHtml } from '../../utils/ai-clipboard';
 
 // ─── Helpers ─────────────────────────────────────────────────
 
@@ -103,6 +104,20 @@ export function ContentListPage() {
       .then(() => toast.success(`${selectedKeys.size}개 링크가 복사되었습니다`))
       .catch(() => toast.error('복사에 실패했습니다'));
   }, [selectedKeys]);
+
+  const handleBulkAiCopy = useCallback(() => {
+    const selected = items.filter((item) => selectedKeys.has(item.id));
+    const aiItems = selected.map((item, i) => ({
+      index: i + 1,
+      title: item.title,
+      url: `${window.location.origin}/content/${item.id}`,
+      content: stripHtml(item.body || item.summary || ''),
+    }));
+    const text = buildAiClipboardText(aiItems);
+    navigator.clipboard.writeText(text)
+      .then(() => toast.success(`${selected.length}개 AI용 텍스트가 복사되었습니다`))
+      .catch(() => toast.error('복사에 실패했습니다'));
+  }, [selectedKeys, items]);
 
   const handleBulkDelete = useCallback(async () => {
     try {
@@ -245,9 +260,15 @@ export function ContentListPage() {
   const bulkActions: ActionBarAction[] = [
     {
       key: 'copy',
-      label: '복사',
+      label: '링크 복사',
       icon: <Link2 size={14} />,
       onClick: handleBulkCopy,
+    },
+    {
+      key: 'ai_copy',
+      label: 'AI용 텍스트 복사',
+      icon: <Sparkles size={14} />,
+      onClick: handleBulkAiCopy,
     },
     {
       key: 'delete',
