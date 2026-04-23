@@ -209,7 +209,7 @@ export function GlycoPharmHubPage() {
   const coreServiceBanners: CoreServiceBanner[] = useMemo(() => [
     { id: 'b2b', icon: '🛒', title: 'B2B 상품 리스트', description: '공급사 상품을 탐색하고 약국 매장에 신청합니다.', onClick: () => navigate('/store-hub/b2b') },
     { id: 'content', icon: '📝', title: '플랫폼 콘텐츠', description: 'CMS 콘텐츠를 탐색하고 내 매장에 복사합니다.', onClick: () => navigate('/store') },
-    { id: 'signage', icon: '🖥️', title: '디지털 사이니지', description: '매장 디스플레이에 활용할 미디어를 탐색합니다.', onClick: () => navigate('/signage') },
+    { id: 'signage', icon: '🖥️', title: '디지털 사이니지', description: '매장 디스플레이에 활용할 미디어를 탐색합니다.', onClick: () => navigate('/store/signage/library') },
     { id: 'campaign', icon: '📋', title: '캠페인', description: '플랫폼 캠페인에 참여합니다.', badge: '준비중' },
   ], [navigate]);
 

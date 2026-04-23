@@ -35,7 +35,7 @@ const glycoStoreHubConfig: StoreHubConfig = {
       icon: '🖥️',
       title: '디지털 사이니지',
       desc: '혈당관리 관련 사이니지 미디어를 탐색해 매장에 추가합니다',
-      href: '/store-hub/signage',
+      href: '/store/signage/library',
       actionLabel: '사이니지 탐색',
     },
     {

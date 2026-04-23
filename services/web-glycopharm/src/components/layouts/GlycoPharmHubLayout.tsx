@@ -34,7 +34,7 @@ const HUB_MENU = [
     label: '사이니지',
     desc: '매장 디스플레이에 활용할 미디어를 탐색합니다',
     icon: Monitor,
-    to: '/store-hub/signage',
+    to: '/store/signage/library',
     end: false,
   },
   {

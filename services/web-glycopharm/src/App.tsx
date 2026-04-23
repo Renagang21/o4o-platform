@@ -364,8 +364,8 @@ function AppRoutes() {
         <Route path="apply/my-applications" element={<MyApplicationsPage />} />
         {/* B2B Supply */}
         <Route path="b2b/supply" element={<SupplyPage />} />
-        {/* Signage Public (WO-SIGNAGE-CONTENT-HUB-V1) */}
-        <Route path="signage" element={<ContentLibraryPage />} />
+        {/* Signage → Store canonical redirect (WO-O4O-GLYCOPHARM-SIGNAGE-STRUCTURE-ALIGNMENT-TO-KPA-V1) */}
+        <Route path="signage" element={<Navigate to="/store/signage/library" replace />} />
         {/* Hub Exploration — sidebar layout (WO-O4O-GLYCOPHARM-KPA-STYLE-UX-REFINE-P1-V1) */}
         {/* WO-O4O-HUB-TO-STORE-HUB-RENAMING-V1: /hub → /store-hub */}
         <Route path="hub" element={<Navigate to="/store-hub" replace />} />
