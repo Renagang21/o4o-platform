@@ -19,6 +19,7 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { PageHero, PageSection, PageContainer } from '@o4o/ui';
 import { ForumHubSection } from '../../components/forum/ForumHubSection';
 import { ForumActivitySection } from '../../components/forum/ForumActivitySection';
 import { ForumSearchBar } from '../../components/forum/ForumSearchBar';
@@ -33,36 +34,40 @@ export function ForumHomePage() {
   return (
     <div style={styles.page}>
       {/* Hero Header */}
-      <div style={styles.heroHeader}>
-        <div style={styles.heroContent}>
-          <h1 style={styles.heroTitle}>💊 약사회 포럼</h1>
-          <p style={styles.heroDesc}>
-            약사 커뮤니티에서 정보를 교환하고 토론에 참여하세요
-          </p>
-          <div style={styles.heroActions}>
-            <Link to="/mypage/my-forums/request" style={styles.heroRequestBtn}>새 포럼 개설 신청</Link>
-          </div>
+      <PageHero>
+        <div style={styles.heroHeader}>
+          <PageContainer>
+            <h1 style={styles.heroTitle}>💊 약사회 포럼</h1>
+            <p style={styles.heroDesc}>
+              약사 커뮤니티에서 정보를 교환하고 토론에 참여하세요
+            </p>
+            <div style={styles.heroActions}>
+              <Link to="/mypage/my-forums/request" style={styles.heroRequestBtn}>새 포럼 개설 신청</Link>
+            </div>
+          </PageContainer>
         </div>
-      </div>
+      </PageHero>
 
-      <div style={styles.content}>
-        <ForumSearchBar
-          onSearch={setSearchQuery}
-          onClear={() => setSearchQuery('')}
-          isSearching={isSearchMode}
-        />
+      <PageSection last>
+        <PageContainer>
+          <ForumSearchBar
+            onSearch={setSearchQuery}
+            onClear={() => setSearchQuery('')}
+            isSearching={isSearchMode}
+          />
 
-        {isSearchMode ? (
-          <ForumSearchResults query={searchQuery} />
-        ) : (
-          <>
-            <ForumHubSection />
-            <ForumActivitySection />
-          </>
-        )}
+          {isSearchMode ? (
+            <ForumSearchResults query={searchQuery} />
+          ) : (
+            <>
+              <ForumHubSection />
+              <ForumActivitySection />
+            </>
+          )}
 
-        <ForumWritePrompt />
-      </div>
+          <ForumWritePrompt />
+        </PageContainer>
+      </PageSection>
     </div>
   );
 }
@@ -76,11 +81,6 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: colors.white,
     borderBottom: `1px solid ${colors.neutral200}`,
     padding: `${spacing.xl} 0`,
-  },
-  heroContent: {
-    maxWidth: '960px',
-    margin: '0 auto',
-    padding: `0 ${spacing.lg}`,
   },
   heroTitle: {
     ...typography.headingXL,
@@ -108,11 +108,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 600,
     textDecoration: 'none',
     transition: 'background-color 0.2s',
-  },
-  content: {
-    maxWidth: '960px',
-    margin: '0 auto',
-    padding: `0 ${spacing.lg} ${spacing.xl}`,
   },
 };
 

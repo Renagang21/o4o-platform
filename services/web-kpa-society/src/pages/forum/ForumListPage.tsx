@@ -12,7 +12,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Link2, Trash2 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
-import { BaseTable, ActionBar, RowActionMenu, type O4OColumn, type ActionBarAction, type RowActionItem } from '@o4o/ui';
+import { BaseTable, ActionBar, RowActionMenu, PageSection, PageContainer, type O4OColumn, type ActionBarAction, type RowActionItem } from '@o4o/ui';
 import { PageHeader } from '../../components/common';
 import { forumApi } from '../../api';
 import { forumMembershipApi } from '../../api/forum';
@@ -398,7 +398,8 @@ export function ForumListPage() {
   }, [currentPage, totalPages]);
 
   return (
-    <div style={s.container}>
+    <PageSection last>
+      <PageContainer>
       <PageHeader
         title="포럼"
         description="회원들과 자유롭게 의견을 나눠보세요"
@@ -500,7 +501,8 @@ export function ForumListPage() {
             style={{ ...s.pageBtn, ...(currentPage === totalPages ? s.pageBtnDisabled : {}) }}>&raquo;</button>
         </div>
       )}
-    </div>
+      </PageContainer>
+    </PageSection>
   );
 }
 

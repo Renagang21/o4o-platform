@@ -7,6 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { PageHero, PageSection, PageContainer } from '@o4o/ui';
 import { apiClient } from '@/services/api';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -204,8 +205,8 @@ function ForumIcon({ category, size = 48 }: { category: ForumCategory; size?: nu
 function HeroHeader() {
   return (
     <header className="bg-white border-b border-slate-200">
-      <div className="max-w-[1040px] mx-auto px-4 md:px-6 py-8">
-        <div className="flex items-center justify-between">
+      <PageContainer>
+        <div className="py-8 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-slate-900">GlycoPharm 포럼</h1>
             <p className="mt-1.5 text-sm text-slate-500">
@@ -222,7 +223,7 @@ function HeroHeader() {
             글쓰기
           </Link>
         </div>
-      </div>
+      </PageContainer>
     </header>
   );
 }
@@ -506,21 +507,33 @@ export default function ForumHubPage() {
 
   return (
     <div className="bg-slate-50 min-h-[calc(100vh-200px)]">
-      <HeroHeader />
+      <PageHero>
+        <HeroHeader />
+      </PageHero>
 
-      <div className="max-w-[1040px] mx-auto px-4 md:px-6 pb-12">
-        {/* 1차 콘텐츠: 포럼(카테고리) 카드 + 활동 신호 */}
-        <ForumCardGrid categories={categories} activityMap={activityMap} />
+      <PageSection>
+        <PageContainer>
+          <ForumCardGrid categories={categories} activityMap={activityMap} />
+        </PageContainer>
+      </PageSection>
 
-        {/* 2차 콘텐츠: 인기 글 + 최근 글 */}
-        <ActivitySection />
+      <PageSection>
+        <PageContainer>
+          <ActivitySection />
+        </PageContainer>
+      </PageSection>
 
-        {/* 글쓰기 유도 */}
-        <WritePrompt />
+      <PageSection>
+        <PageContainer>
+          <WritePrompt />
+        </PageContainer>
+      </PageSection>
 
-        {/* 이용안내 */}
-        <InfoSection />
-      </div>
+      <PageSection last>
+        <PageContainer>
+          <InfoSection />
+        </PageContainer>
+      </PageSection>
     </div>
   );
 }

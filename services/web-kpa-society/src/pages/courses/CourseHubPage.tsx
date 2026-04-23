@@ -12,6 +12,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { PageSection, PageContainer } from '@o4o/ui';
 import { PageHeader, LoadingSpinner, EmptyState, Pagination, Card } from '../../components/common';
 import { lmsApi } from '../../api';
 import { useAuth } from '../../contexts';
@@ -118,16 +119,18 @@ export function CourseHubPage() {
   // 미인증 상태
   if (!isAuthenticated && !loading) {
     return (
-      <div style={styles.container}>
-        <div style={styles.loginPrompt}>
-          <div style={styles.loginIcon}>📚</div>
-          <h2 style={styles.loginTitle}>강좌를 탐색하려면</h2>
-          <p style={styles.loginSubtitle}>로그인이 필요합니다</p>
-          <button style={styles.loginButton} onClick={openLoginModal}>
-            로그인
-          </button>
-        </div>
-      </div>
+      <PageSection last>
+        <PageContainer>
+          <div style={styles.loginPrompt}>
+            <div style={styles.loginIcon}>📚</div>
+            <h2 style={styles.loginTitle}>강좌를 탐색하려면</h2>
+            <p style={styles.loginSubtitle}>로그인이 필요합니다</p>
+            <button style={styles.loginButton} onClick={openLoginModal}>
+              로그인
+            </button>
+          </div>
+        </PageContainer>
+      </PageSection>
     );
   }
 
@@ -136,7 +139,8 @@ export function CourseHubPage() {
   }
 
   return (
-    <div style={styles.container}>
+    <PageSection last>
+      <PageContainer>
       <PageHeader
         title="강좌"
         description="플랫폼 교육 콘텐츠를 탐색하세요"
@@ -235,7 +239,8 @@ export function CourseHubPage() {
           )}
         </>
       )}
-    </div>
+      </PageContainer>
+    </PageSection>
   );
 }
 

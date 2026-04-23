@@ -9,6 +9,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { PageSection, PageContainer } from '@o4o/ui';
 import {
   fetchForumPosts,
   fetchPinnedPosts,
@@ -204,7 +205,8 @@ export default function ForumPage() {
   }, [currentPage, totalPages]);
 
   return (
-    <div style={s.container}>
+    <PageSection last>
+      <PageContainer>
       {/* Header */}
       <header style={s.header}>
         <div style={s.headerRow}>
@@ -405,7 +407,8 @@ export default function ForumPage() {
       <div style={s.footer}>
         <Link to="/" style={s.backLink}>&larr; 홈으로 돌아가기</Link>
       </div>
-    </div>
+      </PageContainer>
+    </PageSection>
   );
 }
 

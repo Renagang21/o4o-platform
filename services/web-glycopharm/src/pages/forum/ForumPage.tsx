@@ -9,6 +9,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
+import { PageSection, PageContainer } from '@o4o/ui';
 import { apiClient } from '@/services/api';
 
 interface ForumPostAuthor {
@@ -186,7 +187,8 @@ export default function ForumPage() {
   }, [currentPage, totalPages]);
 
   return (
-    <div className="max-w-[960px] mx-auto py-10 px-5">
+    <PageSection last>
+      <PageContainer>
       {/* Header */}
       <header className="mb-6">
         <div className="flex justify-between items-start gap-5">
@@ -417,6 +419,7 @@ export default function ForumPage() {
       <div className="mt-6 text-center">
         <Link to="/" className="text-sm text-slate-500 no-underline hover:text-primary-600">&larr; 홈으로 돌아가기</Link>
       </div>
-    </div>
+      </PageContainer>
+    </PageSection>
   );
 }

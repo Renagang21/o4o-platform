@@ -17,6 +17,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { PageContainer } from '@o4o/ui';
 import {
   Bell,
   MessageSquare,
@@ -118,18 +119,20 @@ export default function CommunityPage() {
     <div className="min-h-screen">
       {/* Hero */}
       <section className="bg-gradient-to-br from-primary-600 to-primary-800 text-white py-16">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-3xl font-bold mb-3">Community</h1>
-          <p className="text-lg text-white/80">
-            공지사항, 콘텐츠, 포럼에서 정보를 공유합니다
-          </p>
-        </div>
+        <PageContainer>
+          <div className="text-center">
+            <h1 className="text-3xl font-bold mb-3">Community</h1>
+            <p className="text-lg text-white/80">
+              공지사항, 콘텐츠, 포럼에서 정보를 공유합니다
+            </p>
+          </div>
+        </PageContainer>
       </section>
 
       {/* 공지사항 */}
       {notices.length > 0 && (
         <section className="py-12 bg-white">
-          <div className="max-w-5xl mx-auto px-4">
+          <PageContainer>
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
                 <Bell className="w-5 h-5 text-amber-600" />
@@ -166,14 +169,14 @@ export default function CommunityPage() {
                 </Link>
               ))}
             </div>
-          </div>
+          </PageContainer>
         </section>
       )}
 
       {/* 콘텐츠 (WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1) */}
       {hubContents.length > 0 && (
         <section className="py-12 bg-gray-50">
-          <div className="max-w-5xl mx-auto px-4">
+          <PageContainer>
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
                 <FileText className="w-5 h-5 text-primary-600" />
@@ -211,14 +214,14 @@ export default function CommunityPage() {
                 </div>
               </div>
             )}
-          </div>
+          </PageContainer>
         </section>
       )}
 
       {/* Articles (WO-O4O-COMMUNITY-ARTICLE-SYSTEM-V1) */}
       {articles.length > 0 && (
         <section className="py-12 bg-white">
-          <div className="max-w-5xl mx-auto px-4">
+          <PageContainer>
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
                 <PenSquare className="w-5 h-5 text-primary-600" />
@@ -267,14 +270,14 @@ export default function CommunityPage() {
                 </Link>
               ))}
             </div>
-          </div>
+          </PageContainer>
         </section>
       )}
 
       {/* Knowledge (WO-O4O-KNOWLEDGE-LIBRARY-V1) */}
       {knowledges.length > 0 && (
         <section className="py-12 bg-gray-50">
-          <div className="max-w-5xl mx-auto px-4">
+          <PageContainer>
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-primary-600" />
@@ -315,14 +318,14 @@ export default function CommunityPage() {
                 </Link>
               ))}
             </div>
-          </div>
+          </PageContainer>
         </section>
       )}
 
       {/* 최근 포럼 글 */}
       {recentPosts.length > 0 && (
         <section className="py-12 bg-white">
-          <div className="max-w-5xl mx-auto px-4">
+          <PageContainer>
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
                 <MessageSquare className="w-5 h-5 text-primary-600" />
@@ -368,14 +371,14 @@ export default function CommunityPage() {
                 </Link>
               ))}
             </div>
-          </div>
+          </PageContainer>
         </section>
       )}
 
       {/* 인기 포럼 카테고리 */}
       {popularCategories.length > 0 && (
         <section className="py-12 bg-gray-50">
-          <div className="max-w-5xl mx-auto px-4">
+          <PageContainer>
             <div className="flex items-center gap-2 mb-6">
               <TrendingUp className="w-5 h-5 text-primary-600" />
               <h2 className="text-xl font-bold text-gray-900">인기 포럼</h2>
@@ -407,14 +410,14 @@ export default function CommunityPage() {
                 </Link>
               ))}
             </div>
-          </div>
+          </PageContainer>
         </section>
       )}
 
       {/* 커뮤니티 통계 */}
       {(totalPosts7d > 0 || totalComments7d > 0) && (
         <section className="py-12 bg-white">
-          <div className="max-w-5xl mx-auto px-4">
+          <PageContainer>
             <div className="flex items-center gap-2 mb-6">
               <Layers className="w-5 h-5 text-primary-600" />
               <h2 className="text-xl font-bold text-gray-900">이번 주 활동</h2>
@@ -436,13 +439,13 @@ export default function CommunityPage() {
                 <p className="text-xs text-gray-500 mt-1">활성 포럼</p>
               </div>
             </div>
-          </div>
+          </PageContainer>
         </section>
       )}
 
       {/* Digital Signage 안내 */}
       <section className="py-12 bg-gray-50">
-        <div className="max-w-5xl mx-auto px-4">
+        <PageContainer>
           <Link
             to="/community/signage"
             className="flex items-center gap-6 p-8 bg-white rounded-2xl border border-gray-200 hover:border-violet-300 hover:shadow-lg transition-all group"
@@ -458,7 +461,7 @@ export default function CommunityPage() {
             </div>
             <ArrowRight className="shrink-0 w-5 h-5 text-gray-400 group-hover:text-violet-600 transition-colors" />
           </Link>
-        </div>
+        </PageContainer>
       </section>
     </div>
   );

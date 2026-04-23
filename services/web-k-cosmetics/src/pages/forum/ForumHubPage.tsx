@@ -7,6 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { PageHero, PageSection, PageContainer } from '@o4o/ui';
 import { useAuth } from '../../contexts/AuthContext';
 import {
   fetchForumPosts,
@@ -142,8 +143,8 @@ function ForumIcon({ forum, size = 48 }: { forum: PopularForum; size?: number })
 function HeroHeader({ basePath }: { basePath: string }) {
   return (
     <header className="bg-white border-b border-slate-200">
-      <div className="max-w-[1040px] mx-auto px-4 md:px-6 py-8">
-        <div className="flex items-center justify-between">
+      <PageContainer>
+        <div className="py-8 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-slate-900">K-Cosmetics 포럼</h1>
             <p className="mt-1.5 text-sm text-slate-500">
@@ -160,7 +161,7 @@ function HeroHeader({ basePath }: { basePath: string }) {
             글쓰기
           </Link>
         </div>
-      </div>
+      </PageContainer>
     </header>
   );
 }
@@ -451,14 +452,33 @@ export function ForumHubPage() {
 
   return (
     <div className="bg-slate-50 min-h-[calc(100vh-200px)]">
-      <HeroHeader basePath={basePath} />
+      <PageHero>
+        <HeroHeader basePath={basePath} />
+      </PageHero>
 
-      <div className="max-w-[1040px] mx-auto px-4 md:px-6 pb-12">
-        <ForumCardGrid forums={forums} basePath={basePath} activityMap={activityMap} />
-        <ActivitySection basePath={basePath} />
-        <WritePrompt basePath={basePath} />
-        <InfoSection basePath={basePath} />
-      </div>
+      <PageSection>
+        <PageContainer>
+          <ForumCardGrid forums={forums} basePath={basePath} activityMap={activityMap} />
+        </PageContainer>
+      </PageSection>
+
+      <PageSection>
+        <PageContainer>
+          <ActivitySection basePath={basePath} />
+        </PageContainer>
+      </PageSection>
+
+      <PageSection>
+        <PageContainer>
+          <WritePrompt basePath={basePath} />
+        </PageContainer>
+      </PageSection>
+
+      <PageSection last>
+        <PageContainer>
+          <InfoSection basePath={basePath} />
+        </PageContainer>
+      </PageSection>
     </div>
   );
 }

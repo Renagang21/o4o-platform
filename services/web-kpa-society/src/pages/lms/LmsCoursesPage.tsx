@@ -9,6 +9,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { PageSection, PageContainer } from '@o4o/ui';
 import { PageHeader, LoadingSpinner, EmptyState, Pagination, Card } from '../../components/common';
 import { lmsApi } from '../../api';
 import { colors, typography } from '../../styles/theme';
@@ -32,6 +33,7 @@ export function LmsCoursesPage() {
       setLoading(true);
 
       const res = await lmsApi.getCourses({
+        status: 'published',
         category: currentCategory || undefined,
         page: currentPage,
         limit: 12,
@@ -74,7 +76,8 @@ export function LmsCoursesPage() {
   }
 
   return (
-    <div style={styles.container}>
+    <PageSection last>
+      <PageContainer>
       <PageHeader
         title="마케팅 콘텐츠"
         description="마케팅 콘텐츠를 탐색하세요"
@@ -134,7 +137,8 @@ export function LmsCoursesPage() {
           />
         </>
       )}
-    </div>
+      </PageContainer>
+    </PageSection>
   );
 }
 

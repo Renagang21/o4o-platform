@@ -20,6 +20,7 @@
  */
 
 import { useState, useEffect, type CSSProperties } from 'react';
+import { PageSection, PageContainer } from '@o4o/ui';
 import { communityApi, type CommunityAd, type CommunitySponsor } from '../../services/communityApi';
 import { hubContentApi, type HubContentItemResponse } from '../../lib/api/hubContent';
 import { api } from '../../lib/apiClient';
@@ -176,7 +177,8 @@ export default function CommunityHubPage() {
 
   return (
     <div style={styles.page}>
-      <div style={styles.content}>
+      <PageSection last>
+        <PageContainer>
 
         {/* ─── 1. Hero / Summary (shared) ─── */}
         <HeroSummarySection
@@ -265,7 +267,8 @@ export default function CommunityHubPage() {
         <AdSection ads={pageAds} />
         <SponsorBar sponsors={sponsors} />
 
-      </div>
+        </PageContainer>
+      </PageSection>
     </div>
   );
 }
@@ -276,10 +279,5 @@ const styles: Record<string, CSSProperties> = {
   page: {
     minHeight: '60vh',
     backgroundColor: '#f8fafc',
-  },
-  content: {
-    maxWidth: 960,
-    margin: '0 auto',
-    padding: '24px 16px 48px',
   },
 };

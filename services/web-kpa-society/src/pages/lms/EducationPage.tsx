@@ -13,7 +13,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { Link2, Trash2 } from 'lucide-react';
-import { BaseTable, ActionBar, RowActionMenu, type O4OColumn, type ActionBarAction, type RowActionItem } from '@o4o/ui';
+import { BaseTable, ActionBar, RowActionMenu, PageSection, PageContainer, type O4OColumn, type ActionBarAction, type RowActionItem } from '@o4o/ui';
 import { Pagination } from '../../components/common';
 import { lmsApi } from '../../api';
 import { lmsInstructorApi } from '../../api/lms-instructor';
@@ -67,6 +67,7 @@ export function EducationPage() {
     try {
       setLoading(true);
       const res = await lmsApi.getCourses({
+        status: 'published',
         search: currentSearch || undefined,
         page: currentPage,
         limit: 20,
@@ -301,7 +302,8 @@ export function EducationPage() {
   ];
 
   return (
-    <div style={styles.container}>
+    <PageSection last>
+      <PageContainer>
       {/* Header */}
       <div style={styles.header}>
         <div>
@@ -388,7 +390,8 @@ export function EducationPage() {
           </div>
         </div>
       )}
-    </div>
+      </PageContainer>
+    </PageSection>
   );
 }
 
