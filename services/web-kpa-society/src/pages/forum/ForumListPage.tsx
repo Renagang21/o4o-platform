@@ -1,15 +1,18 @@
 /**
- * ForumListPage - KPA Society 포럼 게시글 목록 (테이블 + 페이지네이션)
+ * ForumListPage - KPA Society 포럼 게시글 목록
  *
  * Phase 22-F: 테이블 형태 + 20건 단위 페이지 넘김
+ * WO-FORUM-HUB-TABLE-STANDARD-V1: 커스텀 table → BaseTable + selectable + ActionBar + RowActionMenu
  *
- * 컬럼: 카테고리 | 제목 | 작성자 | 작성일 | 좋아요 | 조회 | 댓글
- * 검색 + 카테고리 필터
+ * 컬럼: 포럼 | 제목 | 작성자 | 작성일 | 👍 | 👁 | 💬 | 액션
+ * 검색 + 카테고리 필터 (category 선택 시 칩 목록 숨김)
  */
 
-import { useState, useEffect, useMemo } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link2, Trash2 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
+import { BaseTable, ActionBar, RowActionMenu, type O4OColumn, type ActionBarAction, type RowActionItem } from '@o4o/ui';
 import { PageHeader } from '../../components/common';
 import { forumApi } from '../../api';
 import { forumMembershipApi } from '../../api/forum';
@@ -34,6 +37,7 @@ function formatDate(dateString: string): string {
 
 export function ForumListPage() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const { user } = useAuth();
 
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
@@ -47,6 +51,7 @@ export function ForumListPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   // WO-KPA-A-PRIVATE-FORUM-JOIN-UX-CONNECT-V1: 비공개 포럼 접근 거부 상태
   const [closedCategoryAccess, setClosedCategoryAccess] = useState<{
     denied: boolean;
@@ -57,11 +62,7 @@ export function ForumListPage() {
 
   useEffect(() => { setSearchInput(searchQuery); }, [searchQuery]);
 
-  useEffect(() => {
-    loadData();
-  }, [currentPage, currentCategory, searchQuery]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
       setClosedCategoryAccess(null);
@@ -117,7 +118,9 @@ export function ForumListPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, currentCategory, searchQuery, user]);
+
+  useEffect(() => { loadData(); }, [loadData]);
 
   // WO-KPA-A-PRIVATE-FORUM-JOIN-UX-CONNECT-V1: 가입 신청 핸들러
   const handleJoinRequest = async () => {
@@ -149,6 +152,7 @@ export function ForumListPage() {
     else next.delete(key);
     if (key !== 'page') next.delete('page');
     setSearchParams(next);
+    setSelectedKeys(new Set());
   };
 
   const goToPage = (p: number) => {
@@ -165,11 +169,223 @@ export function ForumListPage() {
   const handleClearAll = () => {
     setSearchInput('');
     setSearchParams({});
+    setSelectedKeys(new Set());
   };
+
+  const handleDeletePost = useCallback(async (id: string) => {
+    try {
+      await forumApi.deletePost(id);
+      toast.success('게시글이 삭제되었습니다');
+      setSelectedKeys((prev) => { const next = new Set(prev); next.delete(id); return next; });
+      loadData();
+    } catch {
+      toast.error('삭제에 실패했습니다');
+    }
+  }, [loadData]);
+
+  const handleBulkCopy = useCallback(() => {
+    const urls = Array.from(selectedKeys)
+      .map((id) => `${window.location.origin}/forum/post/${id}`)
+      .join('\n');
+    navigator.clipboard.writeText(urls)
+      .then(() => toast.success(`${selectedKeys.size}개 링크가 복사되었습니다`))
+      .catch(() => toast.error('복사에 실패했습니다'));
+  }, [selectedKeys]);
+
+  const handleBulkDelete = useCallback(async () => {
+    try {
+      await Promise.all(Array.from(selectedKeys).map((id) => forumApi.deletePost(id)));
+      toast.success(`${selectedKeys.size}개가 삭제되었습니다`);
+      setSelectedKeys(new Set());
+      loadData();
+    } catch {
+      toast.error('삭제에 실패했습니다');
+    }
+  }, [selectedKeys, loadData]);
 
   // WO-FORUM-POST-CONTEXT-ALIGNMENT-V1: 선택된 카테고리의 slug로 글쓰기 링크 생성
   const selectedCategory = categories.find(c => c.id === currentCategory);
   const writeHref = selectedCategory ? `/forum/${selectedCategory.slug}/write` : null;
+
+  // ── Columns ──
+
+  const columns = useMemo((): O4OColumn<ForumPost>[] => [
+    {
+      key: 'categoryName',
+      header: '포럼',
+      width: '80px',
+      align: 'center',
+      render: (val) => (
+        <span style={s.catBadge}>{val || '-'}</span>
+      ),
+    },
+    {
+      key: 'title',
+      header: '제목',
+      render: (_v, row) => (
+        <Link to={`/forum/post/${row.id}`} style={s.postLink}>
+          {row.isPinned && <span style={s.pinnedTag}>공지</span>}
+          <span style={{
+            ...s.titleText,
+            backgroundColor: row.isPinned ? '#fffbeb' : undefined,
+          }}>
+            {row.title}
+          </span>
+          {(row.commentCount ?? 0) > 0 && (
+            <span style={s.commentBadge}>[{row.commentCount}]</span>
+          )}
+        </Link>
+      ),
+    },
+    {
+      key: 'authorName',
+      header: '작성자',
+      width: '100px',
+      render: (val) => (
+        <span style={{ fontSize: '13px', color: colors.neutral500 }}>{val || '-'}</span>
+      ),
+    },
+    {
+      key: 'createdAt',
+      header: '작성일',
+      width: '100px',
+      render: (val) => (
+        <span style={{ fontSize: '13px', color: colors.neutral400 }}>{formatDate(val)}</span>
+      ),
+    },
+    {
+      key: 'likeCount',
+      header: '👍',
+      width: '50px',
+      align: 'center',
+      render: (val) => (
+        <span style={{ fontSize: '13px', color: colors.neutral500 }}>{(val ?? 0) > 0 ? val : ''}</span>
+      ),
+    },
+    {
+      key: 'viewCount',
+      header: '👁',
+      width: '50px',
+      align: 'center',
+      render: (val) => (
+        <span style={{ fontSize: '13px', color: colors.neutral500 }}>{val ?? 0}</span>
+      ),
+    },
+    {
+      key: 'commentCount',
+      header: '💬',
+      width: '50px',
+      align: 'center',
+      render: (val) => (
+        <span style={{ fontSize: '13px', color: colors.neutral500 }}>{val ?? 0}</span>
+      ),
+    },
+    {
+      key: '_actions',
+      header: '',
+      width: '52px',
+      align: 'center',
+      system: true,
+      render: (_v, row) => {
+        const isOwner = !!(user && row.authorId === user.id);
+        if (!isOwner) return null;
+        const actions: RowActionItem[] = [
+          {
+            key: 'edit',
+            label: '수정',
+            onClick: () => navigate(`/forum/edit/${row.id}`),
+          },
+          {
+            key: 'delete',
+            label: '삭제',
+            variant: 'danger',
+            onClick: () => handleDeletePost(row.id),
+            confirm: {
+              title: '게시글 삭제',
+              message: '이 게시글을 삭제하시겠습니까?',
+              variant: 'danger',
+            },
+          },
+        ];
+        return <RowActionMenu actions={actions} />;
+      },
+    },
+  ], [user, navigate, handleDeletePost]);
+
+  // ── Bulk Actions ──
+
+  const bulkActions: ActionBarAction[] = [
+    {
+      key: 'copy',
+      label: '복사',
+      icon: <Link2 size={14} />,
+      onClick: handleBulkCopy,
+    },
+    {
+      key: 'delete',
+      label: '삭제',
+      variant: 'danger',
+      icon: <Trash2 size={14} />,
+      onClick: handleBulkDelete,
+      confirm: {
+        title: '삭제 확인',
+        message: `선택한 ${selectedKeys.size}개를 삭제하시겠습니까?`,
+        variant: 'danger',
+      },
+    },
+  ];
+
+  // ── Empty Message (비공개 포럼 포함) ──
+
+  const emptyMessage = (
+    <div style={s.emptyCell}>
+      {closedCategoryAccess?.denied ? (
+        <div>
+          <p style={s.emptyTitle}>🔒 비공개 포럼</p>
+          <p style={{ fontSize: '13px', color: colors.neutral500, margin: '4px 0 16px' }}>
+            회원만 열람할 수 있습니다
+          </p>
+          {user ? (
+            closedCategoryAccess.joinStatus === 'loading' ? (
+              <p style={{ fontSize: '13px', color: colors.neutral500 }}>상태 확인 중...</p>
+            ) : closedCategoryAccess.joinStatus === 'pending' ? (
+              <p style={{ fontSize: '13px', color: '#d97706' }}>
+                가입 신청이 진행 중입니다. 승인을 기다려주세요.
+              </p>
+            ) : closedCategoryAccess.joinStatus === 'member' ? (
+              <button onClick={() => window.location.reload()} style={s.emptyBtn}>새로고침</button>
+            ) : (
+              <button onClick={handleJoinRequest} disabled={isRequesting} style={s.emptyBtn}>
+                {isRequesting ? '신청 중...' : '가입 신청'}
+              </button>
+            )
+          ) : (
+            <p style={{ fontSize: '13px', color: colors.neutral500 }}>
+              가입 신청을 하려면 로그인해주세요
+            </p>
+          )}
+        </div>
+      ) : hasFilters ? (
+        <>
+          <p style={s.emptyTitle}>검색 결과가 없습니다</p>
+          <button onClick={handleClearAll} style={s.emptyBtn}>전체 목록 보기</button>
+        </>
+      ) : (
+        <>
+          <p style={s.emptyTitle}>아직 등록된 글이 없습니다</p>
+          {writeHref ? (
+            <Link to={writeHref} style={s.emptyBtn}>글쓰기</Link>
+          ) : (
+            <p style={{ fontSize: '13px', color: colors.neutral500 }}>
+              포럼을 선택하면 글을 작성할 수 있습니다
+            </p>
+          )}
+        </>
+      )}
+    </div>
+  );
+
+  // ── Pagination numbers ──
 
   const pageNumbers = useMemo(() => {
     const pages: number[] = [];
@@ -233,146 +449,56 @@ export function ForumListPage() {
         )}
       </div>
 
-      {/* Loading */}
-      {loading && (
-        <div style={s.tableWrapper}>
-          <table style={s.table}>
-            <thead><tr>
-              <th style={{ ...s.th, width: '80px' }}>포럼</th>
-              <th style={s.th}>제목</th>
-              <th style={{ ...s.th, width: '100px' }}>작성자</th>
-              <th style={{ ...s.th, width: '100px' }}>작성일</th>
-              <th style={{ ...s.th, width: '50px' }}>좋아요</th>
-              <th style={{ ...s.th, width: '50px' }}>조회</th>
-              <th style={{ ...s.th, width: '50px' }}>댓글</th>
-            </tr></thead>
-            <tbody>
-              {[1,2,3,4,5].map(i => (
-                <tr key={i}><td colSpan={7} style={s.td}>
-                  <div style={{ height: '14px', backgroundColor: colors.neutral200, borderRadius: '4px', width: `${50 + i * 8}%` }} />
-                </td></tr>
-              ))}
-            </tbody>
-          </table>
+      {/* Bulk ActionBar */}
+      {selectedKeys.size > 0 && (
+        <ActionBar
+          selectedCount={selectedKeys.size}
+          actions={bulkActions}
+          onClearSelection={() => setSelectedKeys(new Set())}
+        />
+      )}
+
+      {/* Info bar */}
+      {!loading && (
+        <div style={s.infoBar}>
+          <span style={s.totalCount}>
+            {hasFilters ? `검색 결과 ${totalCount}건` : `총 ${totalCount}개의 게시글`}
+          </span>
+          {totalPages > 1 && (
+            <span style={s.pageInfo}>{currentPage} / {totalPages} 페이지</span>
+          )}
         </div>
       )}
 
       {/* Table */}
-      {!loading && (
-        <>
-          {/* Info bar */}
-          <div style={s.infoBar}>
-            <span style={s.totalCount}>
-              {hasFilters ? `검색 결과 ${totalCount}건` : `총 ${totalCount}개의 게시글`}
-            </span>
-            {totalPages > 1 && (
-              <span style={s.pageInfo}>{currentPage} / {totalPages} 페이지</span>
-            )}
-          </div>
+      <div style={s.tableWrapper}>
+        <BaseTable<ForumPost>
+          columns={columns}
+          data={posts}
+          rowKey={(row) => row.id}
+          selectable
+          selectedKeys={selectedKeys}
+          onSelectionChange={setSelectedKeys}
+          emptyMessage={emptyMessage}
+        />
+      </div>
 
-          <div style={s.tableWrapper}>
-            <table style={s.table}>
-              <thead>
-                <tr>
-                  <th style={{ ...s.th, width: '80px' }}>포럼</th>
-                  <th style={s.th}>제목</th>
-                  <th style={{ ...s.th, width: '100px' }}>작성자</th>
-                  <th style={{ ...s.th, width: '100px' }}>작성일</th>
-                  <th style={{ ...s.th, width: '50px' }}>좋아요</th>
-                  <th style={{ ...s.th, width: '50px' }}>조회</th>
-                  <th style={{ ...s.th, width: '50px' }}>댓글</th>
-                </tr>
-              </thead>
-              <tbody>
-                {posts.length > 0 ? posts.map(post => (
-                  <tr key={post.id} style={post.isPinned ? s.pinnedRow : s.row}>
-                    <td style={{ ...s.td, width: '80px', textAlign: 'center' }}>
-                      <span style={s.catBadge}>{post.categoryName}</span>
-                    </td>
-                    <td style={s.td}>
-                      <Link to={`/forum/post/${post.id}`} style={s.postLink}>
-                        {post.isPinned && <span style={s.pinnedTag}>공지</span>}
-                        <span style={s.titleText}>{post.title}</span>
-                        {post.commentCount > 0 && <span style={s.commentBadge}>[{post.commentCount}]</span>}
-                      </Link>
-                    </td>
-                    <td style={{ ...s.td, width: '100px', color: colors.neutral500, fontSize: '13px' }}>{post.authorName}</td>
-                    <td style={{ ...s.td, width: '100px', color: colors.neutral400, fontSize: '13px' }}>{formatDate(post.createdAt)}</td>
-                    <td style={{ ...s.td, width: '50px', textAlign: 'center', color: colors.neutral500, fontSize: '13px' }}>{post.likeCount > 0 ? post.likeCount : ''}</td>
-                    <td style={{ ...s.td, width: '50px', textAlign: 'center', color: colors.neutral500, fontSize: '13px' }}>{post.viewCount}</td>
-                    <td style={{ ...s.td, width: '50px', textAlign: 'center', color: colors.neutral500, fontSize: '13px' }}>{post.commentCount}</td>
-                  </tr>
-                )) : (
-                  <tr>
-                    <td colSpan={7} style={s.emptyCell}>
-                      {closedCategoryAccess?.denied ? (
-                        <div>
-                          <p style={s.emptyTitle}>🔒 비공개 포럼</p>
-                          <p style={{ fontSize: '13px', color: colors.neutral500, margin: '4px 0 16px' }}>
-                            회원만 열람할 수 있습니다
-                          </p>
-                          {user ? (
-                            closedCategoryAccess.joinStatus === 'loading' ? (
-                              <p style={{ fontSize: '13px', color: colors.neutral500 }}>상태 확인 중...</p>
-                            ) : closedCategoryAccess.joinStatus === 'pending' ? (
-                              <p style={{ fontSize: '13px', color: '#d97706' }}>
-                                가입 신청이 진행 중입니다. 승인을 기다려주세요.
-                              </p>
-                            ) : closedCategoryAccess.joinStatus === 'member' ? (
-                              <button onClick={() => window.location.reload()} style={s.emptyBtn}>새로고침</button>
-                            ) : (
-                              <button onClick={handleJoinRequest} disabled={isRequesting} style={s.emptyBtn}>
-                                {isRequesting ? '신청 중...' : '가입 신청'}
-                              </button>
-                            )
-                          ) : (
-                            <p style={{ fontSize: '13px', color: colors.neutral500 }}>
-                              가입 신청을 하려면 로그인해주세요
-                            </p>
-                          )}
-                        </div>
-                      ) : hasFilters ? (
-                        <>
-                          <p style={s.emptyTitle}>검색 결과가 없습니다</p>
-                          <button onClick={handleClearAll} style={s.emptyBtn}>전체 목록 보기</button>
-                        </>
-                      ) : (
-                        <>
-                          <p style={s.emptyTitle}>아직 등록된 글이 없습니다</p>
-                          {writeHref ? (
-                            <Link to={writeHref} style={s.emptyBtn}>글쓰기</Link>
-                          ) : (
-                            <p style={{ fontSize: '13px', color: colors.neutral500 }}>
-                              포럼을 선택하면 글을 작성할 수 있습니다
-                            </p>
-                          )}
-                        </>
-                      )}
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div style={s.pagination}>
-              <button onClick={() => goToPage(1)} disabled={currentPage === 1}
-                style={{ ...s.pageBtn, ...(currentPage === 1 ? s.pageBtnDisabled : {}) }}>&laquo;</button>
-              <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}
-                style={{ ...s.pageBtn, ...(currentPage === 1 ? s.pageBtnDisabled : {}) }}>&lsaquo;</button>
-              {pageNumbers.map(p => (
-                <button key={p} onClick={() => goToPage(p)}
-                  style={{ ...s.pageBtn, ...(p === currentPage ? s.pageBtnActive : {}) }}>{p}</button>
-              ))}
-              <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages}
-                style={{ ...s.pageBtn, ...(currentPage === totalPages ? s.pageBtnDisabled : {}) }}>&rsaquo;</button>
-              <button onClick={() => goToPage(totalPages)} disabled={currentPage === totalPages}
-                style={{ ...s.pageBtn, ...(currentPage === totalPages ? s.pageBtnDisabled : {}) }}>&raquo;</button>
-            </div>
-          )}
-        </>
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div style={s.pagination}>
+          <button onClick={() => goToPage(1)} disabled={currentPage === 1}
+            style={{ ...s.pageBtn, ...(currentPage === 1 ? s.pageBtnDisabled : {}) }}>&laquo;</button>
+          <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}
+            style={{ ...s.pageBtn, ...(currentPage === 1 ? s.pageBtnDisabled : {}) }}>&lsaquo;</button>
+          {pageNumbers.map(p => (
+            <button key={p} onClick={() => goToPage(p)}
+              style={{ ...s.pageBtn, ...(p === currentPage ? s.pageBtnActive : {}) }}>{p}</button>
+          ))}
+          <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages}
+            style={{ ...s.pageBtn, ...(currentPage === totalPages ? s.pageBtnDisabled : {}) }}>&rsaquo;</button>
+          <button onClick={() => goToPage(totalPages)} disabled={currentPage === totalPages}
+            style={{ ...s.pageBtn, ...(currentPage === totalPages ? s.pageBtnDisabled : {}) }}>&raquo;</button>
+        </div>
       )}
     </div>
   );
@@ -420,22 +546,16 @@ const s: Record<string, React.CSSProperties> = {
     fontSize: '12px', color: '#1d4ed8', background: 'none', border: 'none',
     cursor: 'pointer', textDecoration: 'underline', padding: '2px 4px',
   } as React.CSSProperties,
-
+  infoBar: {
+    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+    padding: '8px 0', marginBottom: '4px',
+  },
+  totalCount: { fontSize: '13px', color: colors.neutral500 },
+  pageInfo: { fontSize: '13px', color: colors.neutral400 },
   tableWrapper: {
     backgroundColor: colors.white, borderRadius: '8px', border: `1px solid ${colors.neutral200}`,
     overflow: 'hidden', marginBottom: '8px',
   },
-  table: { width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' } as React.CSSProperties,
-  th: {
-    padding: '10px 12px', fontSize: '12px', fontWeight: 600, color: colors.neutral500,
-    backgroundColor: colors.neutral50, borderBottom: `1px solid ${colors.neutral200}`, textAlign: 'left',
-  } as React.CSSProperties,
-  td: {
-    padding: '12px', fontSize: '14px', color: colors.neutral900, borderBottom: `1px solid ${colors.neutral100}`,
-    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-  } as React.CSSProperties,
-  row: { cursor: 'pointer', transition: 'background-color 0.1s' },
-  pinnedRow: { cursor: 'pointer', backgroundColor: '#fffbeb', transition: 'background-color 0.1s' },
   catBadge: {
     display: 'inline-block', padding: '2px 8px', fontSize: '11px', fontWeight: 500,
     borderRadius: '4px', backgroundColor: colors.neutral100, color: colors.neutral700,
@@ -447,14 +567,6 @@ const s: Record<string, React.CSSProperties> = {
   },
   titleText: { fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } as React.CSSProperties,
   commentBadge: { marginLeft: '6px', fontSize: '13px', color: colors.primary, fontWeight: 500, flexShrink: 0 },
-
-  infoBar: {
-    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-    padding: '8px 0', marginBottom: '4px',
-  },
-  totalCount: { fontSize: '13px', color: colors.neutral500 },
-  pageInfo: { fontSize: '13px', color: colors.neutral400 },
-
   pagination: {
     display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '4px', padding: '24px 0',
   },
@@ -467,7 +579,6 @@ const s: Record<string, React.CSSProperties> = {
   } as React.CSSProperties,
   pageBtnActive: { backgroundColor: colors.primary, color: colors.white, borderColor: colors.primary },
   pageBtnDisabled: { color: colors.neutral300, cursor: 'default', opacity: 0.5 },
-
   emptyCell: { padding: '60px 20px', textAlign: 'center' } as React.CSSProperties,
   emptyTitle: { fontSize: '15px', color: colors.neutral500, margin: '0 0 12px 0' },
   emptyBtn: {
