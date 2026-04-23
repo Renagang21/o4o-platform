@@ -732,8 +732,8 @@ export function StoreSignagePage() {
     return new Set(schedules.filter(s => isScheduleNowActive(s, now)).map(s => s.playlistId));
   }, [schedules]);
 
+  // WO-O4O-STORE-LAYOUT-WIDTH-OVERFLOW-FIX-V1: max-w/mx-auto 제거 — StoreDashboardLayout이 max-w-[1200px] 관리
   return (
-    {/* WO-O4O-STORE-LAYOUT-WIDTH-OVERFLOW-FIX-V1: max-w/mx-auto 제거 — StoreDashboardLayout이 max-w-[1200px] 관리 */}
     <div className="w-full">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
