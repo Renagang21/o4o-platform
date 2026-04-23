@@ -213,7 +213,7 @@ export function StoreMarketingDashboardPage() {
             <Link to="/event-offers/history" style={styles.seeAllLink}>
               이력 보기 <ArrowRight size={12} />
             </Link>
-            <Link to="/hub/event-offers" style={styles.eventHubLink}>
+            <Link to="/store-hub/event-offers" style={styles.eventHubLink}>
               이벤트/특가 보러가기 <ArrowRight size={12} />
             </Link>
           </div>
@@ -222,7 +222,7 @@ export function StoreMarketingDashboardPage() {
           <div style={styles.eventEmptyState}>
             <Tag size={32} style={{ color: colors.neutral300, marginBottom: '8px' }} />
             <p style={styles.emptyText}>참여한 이벤트가 없습니다.</p>
-            <Link to="/hub/event-offers" style={styles.eventEmptyBtn}>
+            <Link to="/store-hub/event-offers" style={styles.eventEmptyBtn}>
               이벤트/특가 확인하기
             </Link>
           </div>

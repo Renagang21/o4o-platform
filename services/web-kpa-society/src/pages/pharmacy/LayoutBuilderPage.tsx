@@ -150,7 +150,7 @@ export function LayoutBuilderPage() {
           </p>
           <div style={{ marginTop: '20px' }}>
             <button
-              onClick={() => navigate('/hub')}
+              onClick={() => navigate('/store-hub')}
               style={{
                 padding: '8px 20px',
                 borderRadius: '8px',

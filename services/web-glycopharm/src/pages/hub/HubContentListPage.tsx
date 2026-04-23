@@ -89,7 +89,7 @@ export function HubContentListPage() {
       });
       setCopiedIds(prev => new Set(prev).add(item.id));
       if (confirm('내 콘텐츠에 복사되었습니다.\n내 콘텐츠로 이동하시겠습니까?')) {
-        navigate('/hub/content');
+        navigate('/store-hub/content');
       }
     } catch (err: any) {
       alert(err.message || '복사 중 오류가 발생했습니다.');

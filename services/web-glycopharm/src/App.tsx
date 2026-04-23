@@ -366,7 +366,10 @@ function AppRoutes() {
         {/* Signage Public (WO-SIGNAGE-CONTENT-HUB-V1) */}
         <Route path="signage" element={<ContentLibraryPage />} />
         {/* Hub Exploration — sidebar layout (WO-O4O-GLYCOPHARM-KPA-STYLE-UX-REFINE-P1-V1) */}
-        <Route path="hub" element={<GlycoPharmHubLayout />}>
+        {/* WO-O4O-HUB-TO-STORE-HUB-RENAMING-V1: /hub → /store-hub */}
+        <Route path="hub" element={<Navigate to="/store-hub" replace />} />
+        <Route path="hub/*" element={<Navigate to="/store-hub" replace />} />
+        <Route path="store-hub" element={<GlycoPharmHubLayout />}>
           <Route index element={<GlycoPharmHubPage />} />
           <Route path="b2b" element={<HubB2BCatalogPage />} />
           <Route path="content" element={<HubContentListPage />} />

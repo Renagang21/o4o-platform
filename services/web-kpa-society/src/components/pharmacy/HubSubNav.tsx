@@ -20,11 +20,11 @@ interface HubNavItem {
 }
 
 const HUB_NAV_ITEMS: HubNavItem[] = [
-  { label: 'HUB 마켓', path: '/hub', matchExact: true },
-  { label: '콘텐츠', path: '/hub/content' },
-  { label: '상품 카탈로그', path: '/hub/b2b' },
-  { label: '사이니지', path: '/hub/signage' },
-  { label: '이벤트/특가', path: '/hub/event-offers' },
+  { label: 'HUB 마켓', path: '/store-hub', matchExact: true },
+  { label: '콘텐츠', path: '/store-hub/content' },
+  { label: '상품 카탈로그', path: '/store-hub/b2b' },
+  { label: '사이니지', path: '/store-hub/signage' },
+  { label: '이벤트/특가', path: '/store-hub/event-offers' },
   { label: '서비스', path: '/services/pharmacy' },
 ];
 

@@ -72,7 +72,7 @@ export default function Header() {
                WO-KCOS-COMMUNITY-FORUM-STRUCTURE-ALIGN-V1: 포럼 제거 (커뮤니티 내부 전문 영역) */}
           <nav style={styles.nav}>
             <Link to="/" style={styles.navLink}>홈</Link>
-            <Link to="/hub" style={styles.navLink}>허브</Link>
+            <Link to="/store-hub" style={styles.navLink}>허브</Link>
             <Link to="/community" style={styles.navLink}>커뮤니티</Link>
             {isAuthenticated && (
               <Link to="/store" style={styles.navLinkAccent}>매장 관리</Link>
@@ -154,7 +154,7 @@ export default function Header() {
           <div style={styles.mobileMenu}>
             <nav style={styles.mobileNav}>
               <Link to="/" style={styles.mobileNavLink} onClick={() => setMobileMenuOpen(false)}>홈</Link>
-              <Link to="/hub" style={styles.mobileNavLink} onClick={() => setMobileMenuOpen(false)}>허브</Link>
+              <Link to="/store-hub" style={styles.mobileNavLink} onClick={() => setMobileMenuOpen(false)}>허브</Link>
               <Link to="/community" style={styles.mobileNavLink} onClick={() => setMobileMenuOpen(false)}>커뮤니티</Link>
               {isAuthenticated && (
                 <Link to="/store" style={styles.mobileNavLink} onClick={() => setMobileMenuOpen(false)}>매장 관리</Link>

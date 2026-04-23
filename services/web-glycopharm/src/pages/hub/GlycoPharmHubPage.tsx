@@ -78,7 +78,7 @@ function catalogToB2BItem(p: CatalogProduct, navigate: (path: string) => void): 
     imageUrl: p.supplierLogoUrl ?? undefined,
     badge: p.category ?? undefined,
     supplierName: p.supplierName,
-    onClick: () => navigate('/hub/b2b'),
+    onClick: () => navigate('/store-hub/b2b'),
   };
 }
 
@@ -207,7 +207,7 @@ export function GlycoPharmHubPage() {
   }, [navigate]);
 
   const coreServiceBanners: CoreServiceBanner[] = useMemo(() => [
-    { id: 'b2b', icon: '🛒', title: 'B2B 상품 리스트', description: '공급사 상품을 탐색하고 약국 매장에 신청합니다.', onClick: () => navigate('/hub/b2b') },
+    { id: 'b2b', icon: '🛒', title: 'B2B 상품 리스트', description: '공급사 상품을 탐색하고 약국 매장에 신청합니다.', onClick: () => navigate('/store-hub/b2b') },
     { id: 'content', icon: '📝', title: '플랫폼 콘텐츠', description: 'CMS 콘텐츠를 탐색하고 내 매장에 복사합니다.', onClick: () => navigate('/store') },
     { id: 'signage', icon: '🖥️', title: '디지털 사이니지', description: '매장 디스플레이에 활용할 미디어를 탐색합니다.', onClick: () => navigate('/signage') },
     { id: 'campaign', icon: '📋', title: '캠페인', description: '플랫폼 캠페인에 참여합니다.', badge: '준비중' },
@@ -217,7 +217,7 @@ export function GlycoPharmHubPage() {
     <HubExplorationLayout
       theme={{ primaryColor: '#0d9488', maxWidth: '100%' }}
       hero={{ slides: heroSlides, autoInterval: heroSlides.length > 1 ? 5000 : 0 }}
-      b2bRevenue={b2bItems.length > 0 ? { items: b2bItems, title: 'B2B', ctaLabel: 'B2B 전체 보기', onCtaClick: () => navigate('/hub/b2b') } : undefined}
+      b2bRevenue={b2bItems.length > 0 ? { items: b2bItems, title: 'B2B', ctaLabel: 'B2B 전체 보기', onCtaClick: () => navigate('/store-hub/b2b') } : undefined}
       ads={ads.length > 0 ? { ads } : undefined}
       productDevelopment={{ items: productDevItems, title: '제품개발 참여' }}
       platformContent={{ items: contentItems, title: '플랫폼 콘텐츠', authorTabs: CONTENT_AUTHOR_TABS, activeAuthorTab, onAuthorTabChange: setActiveAuthorTab }}

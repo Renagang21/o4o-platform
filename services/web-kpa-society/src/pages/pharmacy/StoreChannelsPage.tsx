@@ -594,7 +594,7 @@ export function StoreChannelsPage() {
       {/* ─── [C] Quick Actions ───────────────────── */}
       <div className="flex gap-2 mb-6">
         <button
-          onClick={() => navigate('/hub')}
+          onClick={() => navigate('/store-hub')}
           className="px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100"
         >
           약국 HUB으로 이동

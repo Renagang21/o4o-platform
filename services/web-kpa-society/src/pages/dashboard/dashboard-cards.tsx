@@ -101,7 +101,7 @@ function EventOfferCard(_props: CardProps) {
             <p style={cardStyles.featureDesc}>약사회 회원 전용 이벤트 상품을 확인하세요.</p>
           </div>
         </div>
-        <Link to="/hub/event-offers" style={cardStyles.actionButtonSecondary}>
+        <Link to="/store-hub/event-offers" style={cardStyles.actionButtonSecondary}>
           이벤트 보기 →
         </Link>
       </div>

@@ -44,7 +44,7 @@ const publicMenuItems = [
  *   내 약국 → /store (약국 운영 진입점)
  */
 const pharmacyMenuItems = [
-  { label: '약국 HUB', icon: LayoutDashboard, path: '/hub', end: false },
+  { label: '약국 HUB', icon: LayoutDashboard, path: '/store-hub', end: false },
   { label: '내 약국', icon: Store, path: '/store', end: false },
 ];
 

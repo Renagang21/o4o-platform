@@ -4,7 +4,7 @@
  */
 
 import { lazy, Suspense, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { AuthProvider, useAuth, getKCosmeticsDashboardRoute } from '@/contexts/AuthContext';
 import { LoginModalProvider } from '@/contexts/LoginModalContext';
 import LoginModal from '@/components/common/LoginModal';
@@ -281,7 +281,9 @@ function AppRoutes() {
         <Route path="b2b/supply" element={<SupplyPage />} />
 
         {/* Hub (WO-O4O-HUB-EXPLORATION-UNIFORM-STRUCTURE-V1) */}
-        <Route path="hub" element={<KCosmeticsHubPage />} />
+        {/* WO-O4O-HUB-TO-STORE-HUB-RENAMING-V1: /hub → /store-hub */}
+        <Route path="hub" element={<Navigate to="/store-hub" replace />} />
+        <Route path="store-hub" element={<KCosmeticsHubPage />} />
 
         {/* Services Routes */}
         <Route path="services/tourists" element={<TouristHubPage />} />

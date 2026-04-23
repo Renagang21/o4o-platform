@@ -60,7 +60,7 @@ export default function PharmacyPlaceholderPage() {
                   포럼
                 </button>
                 <button
-                  onClick={() => navigate('/hub')}
+                  onClick={() => navigate('/store-hub')}
                   className="w-full py-2.5 text-sm font-medium text-slate-700 bg-white rounded-lg hover:bg-emerald-50 transition-colors flex items-center justify-center gap-2"
                 >
                   <LayoutGrid className="w-4 h-4 text-emerald-600" />

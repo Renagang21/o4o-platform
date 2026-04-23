@@ -14,7 +14,7 @@ import type { GlobalHeaderNavItem } from '@o4o/ui';
 
 export const KCOS_PUBLIC_NAV: GlobalHeaderNavItem[] = [
   { label: '홈', href: '/' },
-  { label: '허브', href: '/hub' },
+  { label: '허브', href: '/store-hub' },
   { label: '커뮤니티', href: '/community' },
 ];
 

@@ -215,7 +215,7 @@ export function PharmacyStorePage() {
           <span style={{ fontSize: '48px', marginBottom: '16px' }}>🏪</span>
           <h2 style={S.accessDeniedTitle}>매장이 설정되지 않았습니다</h2>
           <p style={S.accessDeniedText}>매장 설정을 완료한 후 레이아웃을 관리할 수 있습니다.</p>
-          <Link to="/hub" style={S.backButton}>약국 HUB로 이동</Link>
+          <Link to="/store-hub" style={S.backButton}>약국 HUB로 이동</Link>
         </div>
       </div>
     );

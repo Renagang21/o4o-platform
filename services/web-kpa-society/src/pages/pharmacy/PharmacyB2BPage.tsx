@@ -61,7 +61,7 @@ type ErrorType = 'network' | 'unauthorized' | 'forbidden' | 'invalid_key' | 'ser
 const EMPTY_STATE_CONFIG: Record<string, { title: string; desc: string; linkTo: string; linkLabel: string }> = {
   all: { title: '현재 구매 가능한 상품이 없습니다', desc: '공급자 승인 및 진열 여부를 확인하세요.', linkTo: '/store/sell', linkLabel: '상품 판매 관리 →' },
   kpa: { title: '일반 B2B 상품이 아직 없습니다', desc: '상품 판매 관리에서 상품을 등록하세요.', linkTo: '/store/sell', linkLabel: '상품 판매 관리 →' },
-  'kpa-groupbuy': { title: '이벤트 상품이 아직 등록되지 않았습니다', desc: '이벤트 홈에서 안내를 확인하세요.', linkTo: '/hub/event-offers', linkLabel: '이벤트 홈 →' },
+  'kpa-groupbuy': { title: '이벤트 상품이 아직 등록되지 않았습니다', desc: '이벤트 홈에서 안내를 확인하세요.', linkTo: '/store-hub/event-offers', linkLabel: '이벤트 홈 →' },
   glycopharm: { title: '혈당관리 서비스 상품이 아직 없습니다', desc: '상품 판매 관리에서 상품을 등록하세요.', linkTo: '/store/sell', linkLabel: '상품 판매 관리 →' },
   cosmetics: { title: '화장품 서비스 상품이 아직 없습니다', desc: '상품 판매 관리에서 상품을 등록하세요.', linkTo: '/store/sell', linkLabel: '상품 판매 관리 →' },
 };
@@ -362,7 +362,7 @@ export function PharmacyB2BPage() {
       {activeTab === 'kpa-groupbuy' && (
         <div style={styles.crossNavBanner}>
           <span>이벤트 전용 카탈로그에서 더 자세한 정보를 확인하세요.</span>
-          <Link to="/hub/event-offers" style={styles.crossNavLink}>이벤트 홈으로 이동 &rarr;</Link>
+          <Link to="/store-hub/event-offers" style={styles.crossNavLink}>이벤트 홈으로 이동 &rarr;</Link>
         </div>
       )}
 

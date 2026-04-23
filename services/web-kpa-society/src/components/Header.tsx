@@ -77,7 +77,7 @@ const menuItems: MenuItem[] = [
   { label: '홈', href: '/' },
   { label: '포럼', href: '/forum' },
   { label: '강의', href: '/lms' },
-  { label: '약국 HUB', href: '/hub' },
+  { label: '약국 HUB', href: '/store-hub' },
   { label: '내 약국', href: '/store' },
   { label: '운영 대시보드', href: '/operator' },
 ];
@@ -113,7 +113,7 @@ export function Header({ serviceName }: { serviceName: string }) {
     .filter(item => {
       if (item.href === '/operator') return isOperator;
       if (item.href === '/admin') return isAdmin;
-      if (item.href === '/hub') return isPharmacyRelated;
+      if (item.href === '/store-hub') return isPharmacyRelated;
       if (item.href === '/store') return isStoreOwner;
       return true;
     });

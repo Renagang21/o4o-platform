@@ -247,7 +247,7 @@ export function KpaEventOfferPage() {
       <PageHeader
         title="이벤트/특가"
         description="kpa-society 전용 이벤트 상품"
-        breadcrumb={[{ label: '약국 HUB', href: '/hub' }, { label: '이벤트/특가' }]}
+        breadcrumb={[{ label: '약국 HUB', href: '/store-hub' }, { label: '이벤트/특가' }]}
       />
 
       {/* 운영자 통계 카드 */}

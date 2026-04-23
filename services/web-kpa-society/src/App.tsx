@@ -407,7 +407,7 @@ function App() {
           <Route path="/pharmacy" element={<Layout serviceName={SERVICE_NAME}><PharmacyPage /></Layout>} />
           {/* /pharmacy/* → /store/* 리다이렉트 */}
           <Route path="/pharmacy/dashboard" element={<Navigate to="/store" replace />} />
-          <Route path="/pharmacy/hub" element={<Navigate to="/hub" replace />} />
+          <Route path="/pharmacy/hub" element={<Navigate to="/store-hub" replace />} />
           <Route path="/pharmacy/store" element={<Navigate to="/store" replace />} />
           <Route path="/pharmacy/store/layout" element={<Navigate to="/store/settings/layout" replace />} />
           <Route path="/pharmacy/store/template" element={<Navigate to="/store/settings/template" replace />} />
@@ -505,8 +505,11 @@ function App() {
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/admin/*" element={<AdminRoutes />} />
           {/* 약국 HUB — WO-KPA-PHARMACY-HUB-SIDEBAR-LAYOUT-AND-PRODUCT-TABS-FIX-V1: 좌측 사이드바 레이아웃 */}
-          <Route path="/hub" element={<Layout serviceName={SERVICE_NAME}><HubGuard><PharmacyHubLayout /></HubGuard></Layout>}>
-            <Route index element={<Navigate to="/hub/b2b" replace />} />
+          {/* WO-O4O-HUB-TO-STORE-HUB-RENAMING-V1: /hub → /store-hub */}
+          <Route path="/hub" element={<Navigate to="/store-hub" replace />} />
+          <Route path="/hub/*" element={<Navigate to="/store-hub" replace />} />
+          <Route path="/store-hub" element={<Layout serviceName={SERVICE_NAME}><HubGuard><PharmacyHubLayout /></HubGuard></Layout>}>
+            <Route index element={<Navigate to="/store-hub/b2b" replace />} />
             <Route path="b2b" element={<HubB2BCatalogPage />} />
             <Route path="signage" element={<HubSignageLibraryPage />} />
             <Route path="event-offers" element={<PharmacyOwnerOnlyGuard><KpaEventOfferPage /></PharmacyOwnerOnlyGuard>} />
@@ -618,8 +621,8 @@ function App() {
           <Route path="/participation/:id/results" element={<Layout serviceName={SERVICE_NAME}><ParticipationResultPage /></Layout>} />
 
           {/* Event Offers (이벤트) */}
-          <Route path="/groupbuy" element={<Navigate to="/hub/event-offers" replace />} />
-          <Route path="/event-offers" element={<Navigate to="/hub/event-offers" replace />} />
+          <Route path="/groupbuy" element={<Navigate to="/store-hub/event-offers" replace />} />
+          <Route path="/event-offers" element={<Navigate to="/store-hub/event-offers" replace />} />
           <Route path="/event-offers/:id" element={<Layout serviceName={SERVICE_NAME}><PharmacyOwnerOnlyGuard><EventOfferDetailPage /></PharmacyOwnerOnlyGuard></Layout>} />
 
           {/* Function Gate → /setup-activity 리다이렉트 (WO-KPA-A-AUTH-UX-STATE-UNIFICATION-V1) */}
@@ -660,7 +663,7 @@ function App() {
             <Route path="marketing/signage/play/:playlistId" element={<SignagePlaybackPage />} />
 
             {/* Commerce — WO-KPA-PHARMACY-HUB-NAVIGATION-RESTRUCTURE-V1: orderable → /hub/b2b canonical */}
-            <Route path="commerce/orderable" element={<Navigate to="/hub/b2b" replace />} />
+            <Route path="commerce/orderable" element={<Navigate to="/store-hub/b2b" replace />} />
             <Route path="commerce/products" element={<PharmacyB2BPage />} />
             <Route path="commerce/products/b2c" element={<PharmacySellPage />} />
             <Route path="commerce/products/suppliers" element={<SupplierListPage />} />
