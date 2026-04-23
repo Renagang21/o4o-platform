@@ -133,7 +133,7 @@ export function createStoreQrLandingController(
       if (qrData.landingType === 'product' && qrData.landingTargetId) {
         const productRows = await dataSource.query(
           `SELECT
-             COALESCE(pm.marketing_name, pm.regulatory_name, 'Unknown') AS name,
+             COALESCE(pm.name, pm.regulatory_name, 'Unknown') AS name,
              pm.brand_name AS "brandName",
              spo.price_general::int AS price,
              pm.specification AS description
@@ -142,7 +142,7 @@ export function createStoreQrLandingController(
            WHERE spo.id = $1 AND spo.is_active = true
            UNION
            SELECT
-             COALESCE(pm.marketing_name, pm.regulatory_name, 'Unknown') AS name,
+             COALESCE(pm.name, pm.regulatory_name, 'Unknown') AS name,
              pm.brand_name AS "brandName",
              spo.price_general::int AS price,
              pm.specification AS description
@@ -184,14 +184,14 @@ export function createStoreQrLandingController(
       if (search) {
         params.push(`%${search}%`);
         const idx = params.length;
-        searchClause = `AND (pm.marketing_name ILIKE $${idx} OR pm.brand_name ILIKE $${idx})`;
+        searchClause = `AND (pm.name ILIKE $${idx} OR pm.brand_name ILIKE $${idx})`;
       }
 
       const [rows, countResult] = await Promise.all([
         dataSource.query(
           `SELECT
              spo.id,
-             COALESCE(pm.marketing_name, pm.regulatory_name, 'Unknown') AS name,
+             COALESCE(pm.name, pm.regulatory_name, 'Unknown') AS name,
              pm.brand_name AS "brandName",
              spo.price_general::int AS price,
              pm.specification AS description
@@ -201,7 +201,7 @@ export function createStoreQrLandingController(
              AND spo.approval_status = 'APPROVED'
              AND spo.distribution_type = 'PUBLIC'
              ${searchClause}
-           ORDER BY pm.marketing_name ASC
+           ORDER BY pm.name ASC
            LIMIT $1 OFFSET $2`,
           params,
         ),
@@ -463,7 +463,7 @@ export function createStoreQrLandingController(
       const targetId = qr.landingTargetId;
       const [productRow] = await dataSource.query(
         `SELECT
-           COALESCE(pm.marketing_name, 'Unknown') AS product_name,
+           COALESCE(pm.name, 'Unknown') AS product_name,
            pm.brand_name,
            spo.price_general,
            spo.id AS offer_id
@@ -472,7 +472,7 @@ export function createStoreQrLandingController(
          WHERE spo.id = $1 AND spo.is_active = true
          UNION
          SELECT
-           COALESCE(pm.marketing_name, 'Unknown') AS product_name,
+           COALESCE(pm.name, 'Unknown') AS product_name,
            pm.brand_name,
            spo.price_general,
            spo.id AS offer_id

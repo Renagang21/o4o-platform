@@ -60,7 +60,7 @@ export function createOperatorProductApplicationsController(
     const data = await dataSource.query(
       `SELECT pa.id, pa.organization_id, pa.service_key,
               pa.offer_id,
-              pm.marketing_name AS product_name,
+              pm.name AS product_name,
               pa.metadata AS product_metadata,
               pa.approval_status AS status,
               pa.reason AS reject_reason,
