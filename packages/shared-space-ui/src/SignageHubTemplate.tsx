@@ -673,23 +673,6 @@ const st: Record<string, React.CSSProperties> = {
     cursor: 'pointer', transition: 'background-color 0.15s',
   } as React.CSSProperties,
 
-  // Pagination
-  pagination: {
-    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-    padding: '12px 20px', borderTop: `1px solid ${NEUTRAL100}`,
-  },
-  pageInfo: { fontSize: '12px', color: NEUTRAL400 },
-  pageButtons: { display: 'flex', alignItems: 'center', gap: '4px' },
-  pageBtn: {
-    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-    minWidth: '32px', height: '32px', padding: '0 6px',
-    fontSize: '13px', fontWeight: 500, color: NEUTRAL700,
-    backgroundColor: WHITE, border: `1px solid ${NEUTRAL200}`,
-    borderRadius: '6px', cursor: 'pointer',
-  } as React.CSSProperties,
-  pageBtnActive: { backgroundColor: PRIMARY, color: WHITE, borderColor: PRIMARY },
-  pageBtnDisabled: { color: NEUTRAL300, cursor: 'default', opacity: 0.5 },
-
   // Info block
   infoBlock: {
     display: 'flex', alignItems: 'flex-start', gap: '12px',
