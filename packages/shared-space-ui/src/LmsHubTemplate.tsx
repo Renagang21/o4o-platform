@@ -13,6 +13,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Link2 } from 'lucide-react';
+import { HubPagination } from './HubPagination';
 import {
   BaseTable,
   ActionBar,
@@ -298,32 +299,33 @@ export function LmsHubTemplate({ config }: { config: LmsHubConfig }) {
                 selectedKeys={selectedKeys}
                 onSelectionChange={setSelectedKeys}
                 emptyMessage={
-                  <div style={{ padding: '40px 0', textAlign: 'center', color: '#94a3b8' }}>
-                    {currentSearch
-                      ? `"${currentSearch}"에 대한 검색 결과가 없습니다`
-                      : '등록된 강의가 없습니다'}
+                  <div style={styles.emptyState}>
+                    <div style={styles.emptyIcon}>
+                      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="1.5">
+                        <path d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                      </svg>
+                    </div>
+                    <p style={styles.emptyTitle}>
+                      {currentSearch
+                        ? `"${currentSearch}"에 대한 검색 결과가 없습니다`
+                        : '등록된 강의가 없습니다'}
+                    </p>
+                    <p style={styles.emptyDesc}>
+                      {currentSearch
+                        ? '검색어를 변경하거나 전체 목록을 확인해 보세요.'
+                        : '강의가 등록되면 이곳에 표시됩니다.'}
+                    </p>
                   </div>
                 }
               />
             </div>
-            {totalPages > 1 && (
-              <div style={styles.paginationWrap}>
-                <div style={styles.paginationRow}>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                    <button
-                      key={p}
-                      onClick={() => handlePageChange(p)}
-                      style={{
-                        ...styles.pageBtn,
-                        ...(p === currentPage ? styles.pageBtnActive : {}),
-                      }}
-                    >
-                      {p}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+            <div style={styles.paginationWrap}>
+              <HubPagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </div>
           </>
         )}
       </PageContainer>
@@ -417,24 +419,23 @@ const styles: Record<string, React.CSSProperties> = {
   paginationWrap: {
     marginTop: '16px',
   },
-  paginationRow: {
-    display: 'flex',
-    gap: '4px',
-    justifyContent: 'center',
+  emptyState: {
+    textAlign: 'center' as const,
+    padding: '60px 20px',
   },
-  pageBtn: {
-    padding: '6px 12px',
-    border: '1px solid #e2e8f0',
-    borderRadius: '6px',
-    backgroundColor: '#ffffff',
+  emptyIcon: {
+    marginBottom: '12px',
+  },
+  emptyTitle: {
+    fontSize: '15px',
+    fontWeight: 600,
     color: '#475569',
-    fontSize: '13px',
-    cursor: 'pointer',
+    margin: '0 0 6px 0',
   },
-  pageBtnActive: {
-    backgroundColor: '#2563eb',
-    color: '#ffffff',
-    borderColor: '#2563eb',
+  emptyDesc: {
+    fontSize: '13px',
+    color: '#94a3b8',
+    margin: 0,
   },
 };
 

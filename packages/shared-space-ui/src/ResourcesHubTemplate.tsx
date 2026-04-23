@@ -29,10 +29,10 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   BaseTable,
   BaseDetailDrawer,
-  ContentPagination,
   ActionBar,
   RowActionMenu,
 } from '@o4o/ui';
+import { HubPagination } from './HubPagination';
 import type { O4OColumn, ActionBarAction, RowActionItem } from '@o4o/ui';
 import {
   Search,
@@ -543,20 +543,15 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
             }
             rowClassName={() => config.fetchDetail ? 'cursor-pointer' : ''}
           />
-          {totalPages > 1 && (
-            <div style={{ marginTop: 20 }}>
-              <ContentPagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={(page) =>
-                  setSearchParams(prev => { prev.set('page', String(page)); return prev; })
-                }
-                showItemRange
-                totalItems={totalItems}
-                pageSize={limit}
-              />
-            </div>
-          )}
+          <div style={{ marginTop: 20 }}>
+            <HubPagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={(page) =>
+                setSearchParams(prev => { prev.set('page', String(page)); return prev; })
+              }
+            />
+          </div>
         </>
       )}
 

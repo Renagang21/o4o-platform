@@ -524,6 +524,11 @@ function EmptyView({ hasFilters, emptyMessage, emptyFilteredMessage }: {
           ? (emptyFilteredMessage ?? '조건에 맞는 콘텐츠가 없습니다')
           : (emptyMessage ?? '등록된 콘텐츠가 없습니다')}
       </p>
+      <p style={st.emptyDesc}>
+        {hasFilters
+          ? '검색어를 변경하거나 필터를 초기화해 보세요.'
+          : '콘텐츠가 등록되면 이곳에 표시됩니다.'}
+      </p>
     </div>
   );
 }
@@ -686,7 +691,8 @@ const st: Record<string, React.CSSProperties> = {
   // Empty / Error / Skeleton
   emptyState: { textAlign: 'center' as const, padding: '60px 20px' },
   emptyIcon: { marginBottom: '12px' },
-  emptyTitle: { fontSize: '14px', fontWeight: 500, color: NEUTRAL400, margin: 0 },
+  emptyTitle: { fontSize: '15px', fontWeight: 600, color: '#475569', margin: '0 0 6px 0' },
+  emptyDesc: { fontSize: '13px', color: NEUTRAL400, margin: 0 },
   retryBtn: {
     padding: '6px 16px', fontSize: '13px',
     color: PRIMARY, backgroundColor: 'transparent',
