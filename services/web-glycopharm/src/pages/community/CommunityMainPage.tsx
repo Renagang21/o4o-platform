@@ -43,7 +43,7 @@ import {
   ContentHighlightSection,
 } from '@o4o/shared-space-ui';
 import type { NoticeItem, FeaturedPost, RecentPost, SignageMediaItem, SignagePlaylistItem, ContentHighlightItem } from '@o4o/shared-space-ui';
-import { PageHero, PageSection } from '@o4o/ui';
+import { PageHero, PageSection, PageContainer } from '@o4o/ui';
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -219,7 +219,7 @@ export default function CommunityMainPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <PageContainer>
 
         {/* ─── 1. Hero / Summary (shared) ─── */}
         <PageHero>
@@ -383,7 +383,7 @@ export default function CommunityMainPage() {
           </div>
         </PageSection>
 
-      </div>
+      </PageContainer>
     </div>
   );
 }

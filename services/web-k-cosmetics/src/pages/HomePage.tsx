@@ -23,7 +23,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { PageHero, PageSection } from '@o4o/ui';
+import { PageHero, PageSection, PageContainer } from '@o4o/ui';
 import { useAuth } from '../contexts';
 import { BusinessOnboardingBanner } from '../components/onboarding/BusinessOnboardingBanner';
 import { NoticeSection } from '../components/home/NoticeSection';
@@ -207,7 +207,7 @@ function QuickActionSection({
   } as const;
 
   return (
-    <section style={{ padding: '40px 24px', maxWidth: '1200px', margin: '0 auto' }}>
+    <section style={{ padding: '40px 0' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <div>
           <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#1e293b', marginBottom: '4px' }}>운영 도구</h2>
@@ -278,7 +278,7 @@ function QuickActionSection({
 function NowRunningSection({ items, loading }: { items: HomeRunningTrial[]; loading: boolean }) {
   if (loading) {
     return (
-      <section style={{ padding: '40px 24px', maxWidth: '1200px', margin: '0 auto' }}>
+      <section style={{ padding: '40px 0' }}>
         <p style={{ color: '#94a3b8', fontSize: '13px', textAlign: 'center' }}>불러오는 중...</p>
       </section>
     );
@@ -287,7 +287,7 @@ function NowRunningSection({ items, loading }: { items: HomeRunningTrial[]; load
   if (items.length === 0) return null;
 
   return (
-    <section style={{ padding: '40px 24px', maxWidth: '1200px', margin: '0 auto' }}>
+    <section style={{ padding: '40px 0' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <div>
           <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#1e293b', marginBottom: '4px' }}>Now Running</h2>
@@ -346,7 +346,7 @@ function PartnerTrustSection({ partners }: { partners: HomePartner[] }) {
   if (partners.length === 0) return null;
 
   return (
-    <section style={{ padding: '40px 24px', maxWidth: '1200px', margin: '0 auto' }}>
+    <section style={{ padding: '40px 0' }}>
       <p style={{ textAlign: 'center', fontSize: '13px', color: '#64748b', marginBottom: '20px' }}>
         신뢰할 수 있는 브랜드와 함께합니다
       </p>
@@ -384,7 +384,7 @@ function PartnerTrustSection({ partners }: { partners: HomePartner[] }) {
 // WO-KCOS-COMMUNITY-CONTENT-INTEGRATION-V1: Home → 커뮤니티 진입 경로 추가
 function CommunityCTASection() {
   return (
-    <section style={{ padding: '0 24px 40px', maxWidth: '1200px', margin: '0 auto' }}>
+    <section style={{ padding: '0 0 40px' }}>
       <div style={{
         backgroundColor: '#f8fafc', borderRadius: '8px', padding: '24px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -410,7 +410,7 @@ function CTASection() {
   if (isAuthenticated) return null;
 
   return (
-    <section style={{ padding: '40px 24px', maxWidth: '1200px', margin: '0 auto' }}>
+    <section style={{ padding: '40px 0' }}>
       <div style={{ backgroundColor: '#1e293b', borderRadius: '8px', padding: '40px', textAlign: 'center' }}>
         <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#fff', marginBottom: '8px' }}>
           K-Cosmetics와 함께하세요
@@ -474,47 +474,59 @@ export function HomePage() {
 
       {/* Business Onboarding Banner */}
       <PageSection>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
+        <PageContainer>
           <BusinessOnboardingBanner />
-        </div>
+        </PageContainer>
       </PageSection>
 
       {/* 2. Quick Action — 운영 도구 요약 (V4 tune: products/tourist-hub 실수치, trial 링크 수정) */}
       <PageSection>
-        <QuickActionSection
-          productsVisibleCount={productsVisibleCount}
-          touristHubActiveStores={homeData?.touristHubActiveStores ?? null}
-        />
+        <PageContainer>
+          <QuickActionSection
+            productsVisibleCount={productsVisibleCount}
+            touristHubActiveStores={homeData?.touristHubActiveStores ?? null}
+          />
+        </PageContainer>
       </PageSection>
 
       {/* 3. Now Running — Market Trial (V2 동적화 완료) */}
       {(loading || (homeData?.runningTrials ?? []).length > 0) && (
         <PageSection>
-          <NowRunningSection items={homeData?.runningTrials ?? []} loading={loading} />
+          <PageContainer>
+            <NowRunningSection items={homeData?.runningTrials ?? []} loading={loading} />
+          </PageContainer>
         </PageSection>
       )}
 
       {/* 4. 운영 공지 (V1 동적화 완료) */}
       <PageSection>
-        <NoticeSection prefetchedNotices={homeData?.notices} loading={loading} />
+        <PageContainer>
+          <NoticeSection prefetchedNotices={homeData?.notices} loading={loading} />
+        </PageContainer>
       </PageSection>
 
       {/* 커뮤니티 진입 CTA (WO-KCOS-COMMUNITY-CONTENT-INTEGRATION-V1) */}
       <PageSection>
-        <CommunityCTASection />
+        <PageContainer>
+          <CommunityCTASection />
+        </PageContainer>
       </PageSection>
 
       {/* CTA for Non-authenticated Users */}
       {!isAuthenticated && (
         <PageSection>
-          <CTASection />
+          <PageContainer>
+            <CTASection />
+          </PageContainer>
         </PageSection>
       )}
 
       {/* 5. 협력 브랜드 신뢰 Zone (V2 동적화 완료) */}
       {(homeData?.partners ?? []).length > 0 && (
         <PageSection last>
-          <PartnerTrustSection partners={homeData?.partners ?? []} />
+          <PageContainer>
+            <PartnerTrustSection partners={homeData?.partners ?? []} />
+          </PageContainer>
         </PageSection>
       )}
     </div>

@@ -20,7 +20,7 @@
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { PageHero, PageSection } from '@o4o/ui';
+import { PageHero, PageSection, PageContainer } from '@o4o/ui';
 import HeroSlider from '../components/home/HeroSlider';
 import { PlatformIntroSection } from '../components/home/PlatformIntroSection';
 import HomepageAds from '../components/home/HomepageAds';
@@ -51,7 +51,7 @@ function MarketTrialSection() {
 
   return (
     <section style={mts.section}>
-      <div style={mts.container}>
+      <PageContainer>
         {/* 헤더 */}
         <div style={mts.headerRow}>
           <div>
@@ -108,14 +108,13 @@ function MarketTrialSection() {
             시범판매 제안하기 →
           </Link>
         </div>
-      </div>
+      </PageContainer>
     </section>
   );
 }
 
 const mts: Record<string, React.CSSProperties> = {
   section: { padding: '48px 0', backgroundColor: '#FAFAFA' },
-  container: { maxWidth: '1120px', margin: '0 auto', padding: '0 16px' },
   headerRow: {
     display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
     flexWrap: 'wrap', gap: '12px', marginBottom: '24px',

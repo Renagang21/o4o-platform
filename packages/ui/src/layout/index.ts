@@ -46,6 +46,12 @@ export * from './AGSection';
 export * from './Section';
 
 // ═══════════════════════════════════════════════════════════════════════════
+// Horizontal Spacing / Container Standard
+// WO-O4O-HORIZONTAL-SPACING-AND-CONTAINER-STANDARD-V1
+// ═══════════════════════════════════════════════════════════════════════════
+export * from './Container';
+
+// ═══════════════════════════════════════════════════════════════════════════
 // Admin Layout System - 관리자 레이아웃 (표준)
 // ═══════════════════════════════════════════════════════════════════════════
 export * from './AGHeader';

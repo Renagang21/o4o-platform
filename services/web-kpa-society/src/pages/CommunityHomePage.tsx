@@ -22,7 +22,7 @@ import { HeroBannerSection } from '../components/community/HeroBannerSection';
 import { homeApi } from '../api/home';
 import type { HomePageData } from '../api/home';
 import { colors } from '../styles/theme';
-import { PageHero, PageSection } from '@o4o/ui';
+import { PageHero, PageSection, PageContainer } from '@o4o/ui';
 import {
   NewsNoticesSection,
   AppEntrySection,
@@ -118,9 +118,9 @@ export function CommunityHomePage() {
         <HeroBannerSection ads={data?.heroAds ?? []} />
       </PageHero>
 
-      <div style={styles.content}>
-        {/* 2. 공지 / 약사공론 뉴스 (2-column) */}
-        <PageSection>
+      {/* 2. 공지 / 약사공론 뉴스 (2-column) */}
+      <PageSection>
+        <PageContainer>
           <div style={twoColStyles.row} className="kpa-home-two-col">
             {/* Left: 공지사항 */}
             <div style={twoColStyles.col}>
@@ -152,10 +152,12 @@ export function CommunityHomePage() {
               </div>
             </div>
           </div>
-        </PageSection>
+        </PageContainer>
+      </PageSection>
 
-        {/* 4. 서비스 바로가기 (shared) */}
-        <PageSection>
+      {/* 4. 서비스 바로가기 (shared) */}
+      <PageSection>
+        <PageContainer>
           <AppEntrySection
             cards={[
               { title: '포럼', description: '동료 약사와 질문·토론으로 전문성을 높이세요', href: '/forum', icon: <ForumIcon /> },
@@ -165,10 +167,12 @@ export function CommunityHomePage() {
               { title: '자료실', description: '자료를 저장하고 AI 작업에 활용하세요', href: '/resources', icon: <ResourceLibraryIcon /> },
             ]}
           />
-        </PageSection>
+        </PageContainer>
+      </PageSection>
 
-        {/* 5. Market Trial CTA (shared) */}
-        <PageSection last>
+      {/* 5. Market Trial CTA (shared) */}
+      <PageSection last>
+        <PageContainer>
           <CtaGuidanceSection
             title="Market Trial"
             description="서비스 참여자와 함께 제품을 다듬고, 좋은 조건의 유통 환경을 만들어가는 참여형 프로그램"
@@ -177,8 +181,8 @@ export function CommunityHomePage() {
             icon={<span>🧪</span>}
             external
           />
-        </PageSection>
-      </div>
+        </PageContainer>
+      </PageSection>
     </div>
   );
 }
@@ -231,11 +235,6 @@ const styles: Record<string, React.CSSProperties> = {
   page: {
     minHeight: '100vh',
     backgroundColor: colors.neutral50,
-  },
-  content: {
-    maxWidth: '960px',
-    margin: '0 auto',
-    padding: '16px 24px 32px',
   },
 };
 
