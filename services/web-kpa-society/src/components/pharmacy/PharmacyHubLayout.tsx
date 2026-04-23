@@ -18,6 +18,7 @@ interface HubMenuItem {
 }
 
 const HUB_MENU_ITEMS: HubMenuItem[] = [
+  { label: '홈', path: '/store-hub', icon: '\u{1F3E0}', description: '자원 탐색 허브 · 운영 흐름 안내' },
   { label: '상품 카탈로그', path: '/store-hub/b2b', icon: '\u{1F6D2}', description: '공급 가능 상품 탐색 · 취급 신청' },
   { label: '디지털 사이니지', path: '/store-hub/signage', icon: '\u{1F5A5}\uFE0F', description: '사이니지 미디어 · 플레이리스트' },
   { label: '이벤트/특가', path: '/store-hub/event-offers', icon: '\u{1F6CD}\uFE0F', description: 'KPA-Society 이벤트 상품' },
@@ -25,8 +26,8 @@ const HUB_MENU_ITEMS: HubMenuItem[] = [
 ];
 
 function isMenuActive(pathname: string, menuPath: string): boolean {
-  if (menuPath === '/store-hub/b2b') {
-    return pathname === '/store-hub/b2b' || pathname === '/store-hub';
+  if (menuPath === '/store-hub') {
+    return pathname === '/store-hub';
   }
   return pathname.startsWith(menuPath);
 }
@@ -39,7 +40,7 @@ export function PharmacyHubLayout() {
       {/* Sidebar */}
       <aside style={layoutStyles.sidebar}>
         <div style={layoutStyles.sidebarHeader}>
-          <h2 style={layoutStyles.sidebarTitle}>약국 HUB</h2>
+          <h2 style={layoutStyles.sidebarTitle}>매장 운영 허브</h2>
           <p style={layoutStyles.sidebarSubtitle}>
             플랫폼이 제공하는 자원을 탐색하고 내 매장으로 가져갑니다
           </p>
@@ -77,7 +78,7 @@ export function PharmacyHubLayout() {
 
         <div style={layoutStyles.sidebarFooter}>
           <span style={layoutStyles.footerNote}>
-            선택한 콘텐츠 · 상품 · 서비스는 내 매장관리에서 관리할 수 있습니다.
+  탐색한 자원은 내 약국 (/store)에서 설정·운영합니다.
           </span>
         </div>
       </aside>

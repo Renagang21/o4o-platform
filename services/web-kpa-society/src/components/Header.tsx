@@ -71,13 +71,13 @@ interface MenuItem {
  *   - 프로필 드롭다운 = 개인 영역 / 상단 네비게이션 = 서비스 진입 영역
  *
  * 공개 기본: 홈 / 포럼 / 강의
- * 역할 조건부: 약국 HUB (pharmacy_owner) / 내 약국 (isStoreOwner) / 운영 대시보드 (operator/admin)
+ * 역할 조건부: 매장 운영 허브 (pharmacy_owner) / 내 약국 (isStoreOwner) / 운영 대시보드 (operator/admin)
  */
 const menuItems: MenuItem[] = [
   { label: '홈', href: '/' },
   { label: '포럼', href: '/forum' },
   { label: '강의', href: '/lms' },
-  { label: '약국 HUB', href: '/store-hub' },
+  { label: '매장 운영 허브', href: '/store-hub' },
   { label: '내 약국', href: '/store' },
   { label: '운영 대시보드', href: '/operator' },
 ];

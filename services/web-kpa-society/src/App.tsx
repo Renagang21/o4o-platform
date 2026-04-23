@@ -118,6 +118,8 @@ import { SignagePlayerSelectPage } from './pages/pharmacy/SignagePlayerSelectPag
 import { PharmacyHubLayout } from './components/pharmacy/PharmacyHubLayout';
 // WO-KPA-PHARMACY-HUB-NAVIGATION-RESTRUCTURE-V1: PharmacyInfoPage + HubGuard
 import { PharmacyInfoPage } from './pages/pharmacy/PharmacyInfoPage';
+// WO-O4O-KPA-STORE-HUB-CANONICAL-REFINEMENT-V1: 매장 운영 허브 인덱스
+import { StoreHubPage } from './pages/pharmacy/StoreHubPage';
 
 // WO-PHARMACY-MANAGEMENT-CONSOLIDATION-V1 Phase 2: Store Core v1.0 통합
 import { StoreDashboardLayout, KPA_SOCIETY_STORE_CONFIG } from '@o4o/store-ui-core';
@@ -509,7 +511,7 @@ function App() {
           <Route path="/hub" element={<Navigate to="/store-hub" replace />} />
           <Route path="/hub/*" element={<Navigate to="/store-hub" replace />} />
           <Route path="/store-hub" element={<Layout serviceName={SERVICE_NAME}><HubGuard><PharmacyHubLayout /></HubGuard></Layout>}>
-            <Route index element={<Navigate to="/store-hub/b2b" replace />} />
+            <Route index element={<StoreHubPage />} />
             <Route path="b2b" element={<HubB2BCatalogPage />} />
             <Route path="signage" element={<HubSignageLibraryPage />} />
             <Route path="event-offers" element={<PharmacyOwnerOnlyGuard><KpaEventOfferPage /></PharmacyOwnerOnlyGuard>} />
