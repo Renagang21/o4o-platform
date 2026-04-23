@@ -113,7 +113,9 @@ export function CommunityHomePage() {
   return (
     <div style={styles.page}>
       {/* 1. Hero 배너 (동적 광고 캐러셀 — KPA 고유) */}
-      <HeroBannerSection ads={data?.heroAds ?? []} />
+      <div style={{ marginBottom: spacing.xxl }}>
+        <HeroBannerSection ads={data?.heroAds ?? []} />
+      </div>
 
       <div style={styles.content}>
         {/* 2. 공지 / 약사공론 뉴스 (2-column) */}
