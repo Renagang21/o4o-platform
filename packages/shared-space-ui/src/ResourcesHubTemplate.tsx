@@ -6,6 +6,16 @@
  * KPA canonical 기준 추출. 구조/렌더링 책임만 가진다.
  * 서비스별 fetch/API/문구/operator 조건은 ResourcesHubConfig에만.
  *
+ * ⚠️  경계 원칙 (CONTENT-RESOURCES BOUNDARY):
+ *   /resources는 파일/문서/다운로드 가능한 자료를 중심으로 구성하며,
+ *   HTML 콘텐츠(/content)와 구조적으로 혼합하지 않는다.
+ *   읽는 것(콘텐츠) vs 받는 것(자료)이 기준이다.
+ *
+ * ⚠️  render override 원칙:
+ *   이 템플릿은 renderItems override를 의도적으로 제공하지 않는다.
+ *   카드 레이아웃이 근본적으로 다른 경우에만 별도 페이지를 만들 것.
+ *   기본 테이블 렌더링이 항상 우선이다.
+ *
  * 블록 구조:
  *   1. Hero / Intro (title, subtitle, create CTA)
  *   2. Search
@@ -49,6 +59,10 @@ export interface ResourcesHubItem {
   view_count: number;
   author_name?: string | null;
   created_at: string;
+  // Correction 2: 다운로드/열람 액션 타입 — 미제공 시 source_type에서 자동 파생
+  actionType?: 'view' | 'download' | 'external';
+  // Correction 2: 파일 형식 — 미제공 시 source_file_name 확장자에서 자동 파생
+  fileType?: 'pdf' | 'image' | 'doc' | 'video' | 'etc';
 }
 
 export interface ResourcesHubFetchParams {
@@ -111,9 +125,32 @@ function formatDate(dateStr: string): string {
   return `${y}.${m}.${day}`;
 }
 
-function isExternal(item: ResourcesHubItem): boolean {
-  return item.source_type === 'external';
+/** actionType 파생: 명시 값 우선, 없으면 source_type/source_url에서 추론 */
+function getActionType(item: ResourcesHubItem): 'view' | 'download' | 'external' {
+  if (item.actionType) return item.actionType;
+  if (!item.source_url) return 'view';
+  return item.source_type === 'external' ? 'external' : 'download';
 }
+
+/** fileType 파생: 명시 값 우선, 없으면 확장자에서 추론 */
+function getFileType(item: ResourcesHubItem): 'pdf' | 'image' | 'doc' | 'video' | 'etc' {
+  if (item.fileType) return item.fileType;
+  const name = item.source_file_name || '';
+  const ext = name.split('.').pop()?.toLowerCase() ?? '';
+  if (ext === 'pdf') return 'pdf';
+  if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext)) return 'image';
+  if (['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'hwp'].includes(ext)) return 'doc';
+  if (['mp4', 'webm', 'mov', 'avi'].includes(ext)) return 'video';
+  return 'etc';
+}
+
+const FILE_TYPE_BADGE: Record<string, { label: string; bg: string; color: string }> = {
+  pdf:   { label: 'PDF',   bg: '#FEE2E2', color: '#B91C1C' },
+  image: { label: 'IMG',   bg: '#DBEAFE', color: '#1D4ED8' },
+  doc:   { label: 'DOC',   bg: '#D1FAE5', color: '#065F46' },
+  video: { label: 'VID',   bg: '#EDE9FE', color: '#6D28D9' },
+  etc:   { label: 'FILE',  bg: '#F3F4F6', color: '#374151' },
+};
 
 // ─── Template ─────────────────────────────────────────────────────────────────
 
@@ -255,11 +292,23 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
         header: '파일명 / 제목',
         width: '40%',
         sortable: true,
-        render: (_v, row) => (
-          <span style={{ color: '#111827', fontWeight: 500, cursor: hasDrawer ? 'pointer' : 'default' }}>
-            {row.title}
-          </span>
-        ),
+        render: (_v, row) => {
+          const ft = getFileType(row);
+          const badge = FILE_TYPE_BADGE[ft];
+          return (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, cursor: hasDrawer ? 'pointer' : 'default' }}>
+              {row.source_url && (
+                <span style={{
+                  padding: '1px 5px', borderRadius: 4, fontSize: 10, fontWeight: 600,
+                  background: badge.bg, color: badge.color, flexShrink: 0,
+                }}>
+                  {badge.label}
+                </span>
+              )}
+              <span style={{ color: '#111827', fontWeight: 500 }}>{row.title}</span>
+            </span>
+          );
+        },
         ...(hasDrawer ? { onCellClick: (row: ResourcesHubItem) => openDrawer(row) } : {}),
       },
       {
@@ -321,19 +370,20 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
               },
             });
           }
+          const actionType = getActionType(row);
           return (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}>
               {row.source_url && (
                 <a
                   href={row.source_url}
-                  target={isExternal(row) ? '_blank' : '_self'}
+                  target={actionType === 'external' ? '_blank' : '_self'}
                   rel="noopener noreferrer"
-                  download={!isExternal(row) ? (row.source_file_name || true) : undefined}
+                  download={actionType === 'download' ? (row.source_file_name || true) : undefined}
                   onClick={(e) => e.stopPropagation()}
                   style={st.actionBtn}
                 >
-                  {isExternal(row) ? <ExternalLink size={12} /> : <Download size={12} />}
-                  {isExternal(row) ? '바로가기' : '다운로드'}
+                  {actionType === 'external' ? <ExternalLink size={12} /> : <Download size={12} />}
+                  {actionType === 'external' ? '바로가기' : '다운로드'}
                 </a>
               )}
               {hasRowActions && <RowActionMenu actions={rowActions} />}
@@ -470,18 +520,21 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
           title={drawerItem?.title}
           width="60vw"
           loading={drawerLoading}
-          footer={drawerItem?.source_url ? (
-            <a
-              href={drawerItem.source_url}
-              target={isExternal(drawerItem) ? '_blank' : '_self'}
-              rel="noopener noreferrer"
-              download={!isExternal(drawerItem) ? (drawerItem.source_file_name || true) : undefined}
-              style={{ ...st.drawerDownloadBtn, textDecoration: 'none' }}
-            >
-              {isExternal(drawerItem) ? <ExternalLink size={16} /> : <Download size={16} />}
-              {isExternal(drawerItem) ? '바로가기' : '다운로드'}
-            </a>
-          ) : undefined}
+          footer={drawerItem?.source_url ? (() => {
+            const at = getActionType(drawerItem);
+            return (
+              <a
+                href={drawerItem.source_url!}
+                target={at === 'external' ? '_blank' : '_self'}
+                rel="noopener noreferrer"
+                download={at === 'download' ? (drawerItem.source_file_name || true) : undefined}
+                style={{ ...st.drawerDownloadBtn, textDecoration: 'none' }}
+              >
+                {at === 'external' ? <ExternalLink size={16} /> : <Download size={16} />}
+                {at === 'external' ? '바로가기' : '다운로드'}
+              </a>
+            );
+          })() : undefined}
         >
           {drawerItem && (
             <div>
@@ -529,7 +582,7 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
 
               {drawerItem.source_url && (
                 <div style={st.drawerAttachment}>
-                  {isExternal(drawerItem) ? (
+                  {getActionType(drawerItem) === 'external' ? (
                     <>
                       <ExternalLink size={16} color="#2563EB" />
                       <a
