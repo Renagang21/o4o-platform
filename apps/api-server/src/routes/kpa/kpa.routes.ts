@@ -1407,6 +1407,251 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     router.use('/contents', contentRouter);
   }
 
+  // ============================================================================
+  // Signage Community Management Routes — /api/v1/kpa/signage
+  // WO-KPA-SIGNAGE-VIDEO-PLAYLIST-STRUCTURE-REFORM-V2
+  // ============================================================================
+  {
+    const signageRouter = Router();
+
+    // ── helpers ──
+    function detectVideoSource(url: string): { sourceType: string; embedId: string | null; mediaType: string } {
+      const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
+      if (ytMatch) return { sourceType: 'youtube', embedId: ytMatch[1], mediaType: 'youtube' };
+      const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+      if (vimeoMatch) return { sourceType: 'vimeo', embedId: vimeoMatch[1], mediaType: 'video' };
+      return { sourceType: 'url', embedId: null, mediaType: 'video' };
+    }
+
+    function isSignageOperatorOrAdmin(user: any): boolean {
+      if (!user?.roles) return false;
+      return user.roles.some((r: string) =>
+        r === 'kpa:operator' || r === 'kpa:admin' || r === 'platform:super_admin'
+      );
+    }
+
+    // POST /signage/media — 동영상 등록
+    signageRouter.post('/media', authenticate, asyncHandler(async (req: Request, res: Response) => {
+      const userId = (req as any).user?.id;
+      if (!userId) return res.status(401).json({ success: false, error: 'Unauthorized' });
+
+      const { name, sourceUrl, description, tags, duration } = req.body;
+      if (!name?.trim()) return res.status(400).json({ success: false, error: '제목을 입력하세요' });
+      if (!sourceUrl?.trim()) return res.status(400).json({ success: false, error: 'URL을 입력하세요' });
+
+      const { sourceType, embedId, mediaType } = detectVideoSource(sourceUrl.trim());
+      const tagArray = Array.isArray(tags) ? tags : [];
+      const durationSec = duration && Number(duration) > 0 ? Number(duration) : null;
+
+      const result = await dataSource.query(
+        `INSERT INTO signage_media
+          ("serviceKey", "organizationId", name, description, "mediaType", "sourceType", "sourceUrl", "embedId", duration, tags, source, scope, status, "createdByUserId", "createdAt", "updatedAt")
+         VALUES ($1, NULL, $2, $3, $4, $5, $6, $7, $8, $9, 'community', 'global', 'active', $10, now(), now())
+         RETURNING *`,
+        ['kpa-society', name.trim(), description?.trim() || null, mediaType, sourceType, sourceUrl.trim(), embedId, durationSec, tagArray, userId]
+      );
+      res.status(201).json({ success: true, data: result[0] });
+    }));
+
+    // POST /signage/playlists — 플레이리스트 생성
+    signageRouter.post('/playlists', authenticate, asyncHandler(async (req: Request, res: Response) => {
+      const userId = (req as any).user?.id;
+      if (!userId) return res.status(401).json({ success: false, error: 'Unauthorized' });
+
+      const { name, description, tags, items } = req.body;
+      if (!name?.trim()) return res.status(400).json({ success: false, error: '제목을 입력하세요' });
+      if (!Array.isArray(items) || items.length === 0) return res.status(400).json({ success: false, error: '항목을 추가하세요' });
+
+      const queryRunner = dataSource.createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+      try {
+        // 1. Create playlist
+        const tagArray = Array.isArray(tags) ? tags : [];
+        const plResult = await queryRunner.query(
+          `INSERT INTO signage_playlists
+            ("serviceKey", "organizationId", name, description, status, source, scope, "loopEnabled", "itemCount", "totalDuration", "createdByUserId", metadata, "createdAt", "updatedAt")
+           VALUES ('kpa-society', NULL, $1, $2, 'active', 'community', 'global', false, 0, 0, $3, $4, now(), now())
+           RETURNING *`,
+          [name.trim(), description?.trim() || null, userId, JSON.stringify({ tags: tagArray })]
+        );
+        const playlist = plResult[0];
+
+        // 2. Create items
+        let totalDuration = 0;
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i];
+          const itemUrl = item.sourceUrl?.trim();
+          if (!itemUrl) continue;
+
+          const { sourceType, embedId, mediaType } = detectVideoSource(itemUrl);
+          const itemDuration = item.duration && Number(item.duration) > 0 ? Number(item.duration) : 0;
+          const itemName = item.name?.trim() || itemUrl;
+
+          // Find or create media
+          const existing = await queryRunner.query(
+            `SELECT id FROM signage_media WHERE "sourceUrl" = $1 AND "serviceKey" = 'kpa-society' AND "deletedAt" IS NULL LIMIT 1`,
+            [itemUrl]
+          );
+
+          let mediaId: string;
+          if (existing.length > 0) {
+            mediaId = existing[0].id;
+          } else {
+            const mediaResult = await queryRunner.query(
+              `INSERT INTO signage_media
+                ("serviceKey", "organizationId", name, "mediaType", "sourceType", "sourceUrl", "embedId", duration, source, scope, status, "createdByUserId", "createdAt", "updatedAt")
+               VALUES ('kpa-society', NULL, $1, $2, $3, $4, $5, $6, 'community', 'global', 'active', $7, now(), now())
+               RETURNING id`,
+              [itemName, mediaType, sourceType, itemUrl, embedId, itemDuration || null, userId]
+            );
+            mediaId = mediaResult[0].id;
+          }
+
+          // Create playlist item
+          await queryRunner.query(
+            `INSERT INTO signage_playlist_items ("playlistId", "mediaId", "sortOrder", duration, "isActive", "sourceType", "createdAt", "updatedAt")
+             VALUES ($1, $2, $3, $4, true, 'community', now(), now())`,
+            [playlist.id, mediaId, i, itemDuration]
+          );
+          totalDuration += itemDuration;
+        }
+
+        // 3. Update totals
+        await queryRunner.query(
+          `UPDATE signage_playlists SET "itemCount" = $1, "totalDuration" = $2, "updatedAt" = now() WHERE id = $3`,
+          [items.length, totalDuration, playlist.id]
+        );
+
+        await queryRunner.commitTransaction();
+
+        // Return playlist with items
+        const full = await dataSource.query(
+          `SELECT p.*, json_agg(json_build_object(
+              'id', pi.id, 'mediaId', pi."mediaId", 'sortOrder', pi."sortOrder", 'duration', pi.duration,
+              'media', json_build_object('id', m.id, 'name', m.name, 'sourceUrl', m."sourceUrl", 'sourceType', m."sourceType", 'duration', m.duration)
+            ) ORDER BY pi."sortOrder") AS items
+           FROM signage_playlists p
+           LEFT JOIN signage_playlist_items pi ON pi."playlistId" = p.id
+           LEFT JOIN signage_media m ON m.id = pi."mediaId"
+           WHERE p.id = $1
+           GROUP BY p.id`,
+          [playlist.id]
+        );
+        res.status(201).json({ success: true, data: full[0] });
+      } catch (err) {
+        await queryRunner.rollbackTransaction();
+        throw err;
+      } finally {
+        await queryRunner.release();
+      }
+    }));
+
+    // PATCH /signage/playlists/:id — 플레이리스트 수정
+    signageRouter.patch('/playlists/:id', authenticate, asyncHandler(async (req: Request, res: Response) => {
+      const userId = (req as any).user?.id;
+      if (!userId) return res.status(401).json({ success: false, error: 'Unauthorized' });
+
+      const playlistId = req.params.id;
+      const { name, description, tags, items } = req.body;
+
+      // Ownership check
+      const existing = await dataSource.query(
+        `SELECT id, "createdByUserId" FROM signage_playlists WHERE id = $1 AND "deletedAt" IS NULL`,
+        [playlistId]
+      );
+      if (existing.length === 0) return res.status(404).json({ success: false, error: '플레이리스트를 찾을 수 없습니다' });
+      if (existing[0].createdByUserId !== userId) {
+        const isOp = isSignageOperatorOrAdmin((req as any).user);
+        if (!isOp) return res.status(403).json({ success: false, error: '수정 권한이 없습니다' });
+      }
+
+      const queryRunner = dataSource.createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+      try {
+        // 1. Update metadata
+        const tagArray = Array.isArray(tags) ? tags : [];
+        if (name?.trim()) {
+          await queryRunner.query(
+            `UPDATE signage_playlists SET name = $1, description = $2, metadata = $3, "updatedAt" = now() WHERE id = $4`,
+            [name.trim(), description?.trim() || null, JSON.stringify({ tags: tagArray }), playlistId]
+          );
+        }
+
+        // 2. Replace items
+        if (Array.isArray(items)) {
+          await queryRunner.query(`DELETE FROM signage_playlist_items WHERE "playlistId" = $1`, [playlistId]);
+
+          let totalDuration = 0;
+          for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            const itemUrl = item.sourceUrl?.trim();
+            if (!itemUrl) continue;
+
+            const { sourceType, embedId, mediaType } = detectVideoSource(itemUrl);
+            const itemDuration = item.duration && Number(item.duration) > 0 ? Number(item.duration) : 0;
+            const itemName = item.name?.trim() || itemUrl;
+
+            const existingMedia = await queryRunner.query(
+              `SELECT id FROM signage_media WHERE "sourceUrl" = $1 AND "serviceKey" = 'kpa-society' AND "deletedAt" IS NULL LIMIT 1`,
+              [itemUrl]
+            );
+
+            let mediaId: string;
+            if (existingMedia.length > 0) {
+              mediaId = existingMedia[0].id;
+            } else {
+              const mediaResult = await queryRunner.query(
+                `INSERT INTO signage_media
+                  ("serviceKey", "organizationId", name, "mediaType", "sourceType", "sourceUrl", "embedId", duration, source, scope, status, "createdByUserId", "createdAt", "updatedAt")
+                 VALUES ('kpa-society', NULL, $1, $2, $3, $4, $5, $6, 'community', 'global', 'active', $7, now(), now())
+                 RETURNING id`,
+                [itemName, mediaType, sourceType, itemUrl, embedId, itemDuration || null, userId]
+              );
+              mediaId = mediaResult[0].id;
+            }
+
+            await queryRunner.query(
+              `INSERT INTO signage_playlist_items ("playlistId", "mediaId", "sortOrder", duration, "isActive", "sourceType", "createdAt", "updatedAt")
+               VALUES ($1, $2, $3, $4, true, 'community', now(), now())`,
+              [playlistId, mediaId, i, itemDuration]
+            );
+            totalDuration += itemDuration;
+          }
+
+          await queryRunner.query(
+            `UPDATE signage_playlists SET "itemCount" = $1, "totalDuration" = $2, "updatedAt" = now() WHERE id = $3`,
+            [items.length, totalDuration, playlistId]
+          );
+        }
+
+        await queryRunner.commitTransaction();
+
+        const full = await dataSource.query(
+          `SELECT p.*, json_agg(json_build_object(
+              'id', pi.id, 'mediaId', pi."mediaId", 'sortOrder', pi."sortOrder", 'duration', pi.duration,
+              'media', json_build_object('id', m.id, 'name', m.name, 'sourceUrl', m."sourceUrl", 'sourceType', m."sourceType", 'duration', m.duration)
+            ) ORDER BY pi."sortOrder") AS items
+           FROM signage_playlists p
+           LEFT JOIN signage_playlist_items pi ON pi."playlistId" = p.id
+           LEFT JOIN signage_media m ON m.id = pi."mediaId"
+           WHERE p.id = $1
+           GROUP BY p.id`,
+          [playlistId]
+        );
+        res.json({ success: true, data: full[0] });
+      } catch (err) {
+        await queryRunner.rollbackTransaction();
+        throw err;
+      } finally {
+        await queryRunner.release();
+      }
+    }));
+
+    router.use('/signage', signageRouter);
+  }
+
   // Groupbuy Routes (WO-O4O-ROUTES-REFACTOR-V1)
   router.use('/groupbuy', createGroupbuyController(dataSource, authenticate as any, optionalAuth as any, requireKpaScope));
 

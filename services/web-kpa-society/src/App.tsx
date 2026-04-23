@@ -66,6 +66,7 @@ import { NewsListPage, NewsDetailPage, GalleryPage } from './pages/news';
 
 // Signage pages
 import ContentHubPage from './pages/signage/ContentHubPage';
+import PlaylistEditorPage from './pages/signage/PlaylistEditorPage';
 import PlaylistDetailPage from './pages/signage/PlaylistDetailPage';
 import MediaDetailPage from './pages/signage/MediaDetailPage';
 import PublicSignagePage from './pages/signage/PublicSignagePage';
@@ -77,7 +78,7 @@ import { PolicyPage, PrivacyPage } from './pages/legal';
 import { OrganizationAboutPage, OfficersPage, ContactPage } from './pages/organization';
 
 // MyPage pages
-import { MyDashboardPage, MyProfilePage, MySettingsPage, MyCertificatesPage, PersonalStatusReportPage, AnnualReportFormPage, MyForumDashboardPage, RequestCategoryPage as KpaRequestCategoryPage, MyRequestsPage, ForumMemberManagementPage, MyQualificationsPage, MyEnrollmentsPage, MyCreditsPage, MyCompletionsPage } from './pages/mypage';
+import { MyDashboardPage, MyProfilePage, MySettingsPage, MyCertificatesPage, PersonalStatusReportPage, AnnualReportFormPage, MyForumDashboardPage, RequestCategoryPage as KpaRequestCategoryPage, MyRequestsPage, ForumMemberManagementPage, MyQualificationsPage, MyEnrollmentsPage, MyCreditsPage } from './pages/mypage';
 
 // Admin Routes (지부 관리자)
 import { AdminRoutes } from './routes/AdminRoutes';
@@ -585,6 +586,8 @@ function App() {
 
           {/* Signage (디지털 사이니지) */}
           <Route path="/signage" element={<Layout serviceName={SERVICE_NAME}><ContentHubPage /></Layout>} />
+          <Route path="/signage/playlist/new" element={<Layout serviceName={SERVICE_NAME}><PlaylistEditorPage /></Layout>} />
+          <Route path="/signage/playlist/:id/edit" element={<Layout serviceName={SERVICE_NAME}><PlaylistEditorPage /></Layout>} />
           <Route path="/signage/playlist/:id" element={<Layout serviceName={SERVICE_NAME}><PlaylistDetailPage /></Layout>} />
           <Route path="/signage/media/:id" element={<Layout serviceName={SERVICE_NAME}><MediaDetailPage /></Layout>} />
 
@@ -614,8 +617,8 @@ function App() {
           <Route path="/mypage/enrollments" element={<Layout serviceName={SERVICE_NAME}><MyEnrollmentsPage /></Layout>} />
           {/* WO-O4O-CREDIT-SYSTEM-V1 */}
           <Route path="/mypage/credits" element={<Layout serviceName={SERVICE_NAME}><MyCreditsPage /></Layout>} />
-          {/* WO-O4O-COMPLETION-V1 */}
-          <Route path="/mypage/completions" element={<Layout serviceName={SERVICE_NAME}><MyCompletionsPage /></Layout>} />
+          {/* WO-MYPAGE-STATE-BASED-IA-REDEFINITION-V1: completions → certificates redirect */}
+          <Route path="/mypage/completions" element={<Navigate to="/mypage/certificates" replace />} />
 
           {/* Participation (참여) */}
           <Route path="/participation" element={<Layout serviceName={SERVICE_NAME}><ParticipationListPage /></Layout>} />
@@ -823,7 +826,7 @@ function DemoLayoutRoutes() {
         <Route path="/mypage/settings" element={<MySettingsPage />} />
         <Route path="/mypage/certificates" element={<MyCertificatesPage />} />
         <Route path="/mypage/credits" element={<MyCreditsPage />} />
-        <Route path="/mypage/completions" element={<MyCompletionsPage />} />
+        <Route path="/mypage/completions" element={<Navigate to="/demo/mypage/certificates" replace />} />
         <Route path="/mypage/status-report" element={<PersonalStatusReportPage />} />
         <Route path="/mypage/annual-report" element={<AnnualReportFormPage />} />
 

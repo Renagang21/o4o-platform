@@ -1,55 +1,54 @@
 /**
  * Signage Content Hub Page — KPA-Society
  *
- * WO-O4O-SIGNAGE-CONTENT-CENTERED-REFACTOR-V1
- * WO-O4O-SIGNAGE-HUB-TEMPLATE-FOUNDATION-V1:
- *   인라인 구현 → SignageHubTemplate + kpaSignageConfig 구조로 전환.
- *   커뮤니티 등록 모달 / 삭제 확인 모달은 서비스 코드에 보존.
+ * WO-KPA-SIGNAGE-VIDEO-PLAYLIST-STRUCTURE-REFORM-V2
+ *   "콘텐츠 기반" → "동영상 / 플레이리스트 기반" 탭 구조 재구성.
+ *   SignageHubTemplate 제거, 탭 UI 직접 구현.
  */
 
-import { useState, useCallback } from 'react';
-import { SignageHubTemplate } from '@o4o/shared-space-ui';
-import type { SignageHubConfig, SignageHubItem } from '@o4o/shared-space-ui';
+import { useState, useEffect, useCallback } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { publicContentApi } from '../../lib/api/signageV2';
-import { assetSnapshotApi } from '../../api/assetSnapshot';
 import { getAccessToken, useAuth } from '../../contexts/AuthContext';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 const SERVICE_KEY = 'kpa-society';
+const PAGE_LIMIT = 20;
 
 const DEFAULT_TAG_SUGGESTIONS = [
   '복약지도', '당뇨', '혈압', '면역', '건강기능식품',
   '의약외품', '이벤트', '프로모션', '신제품', '추천상품',
 ];
 
-// ─── Badge Mappings ───────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────
 
-const KPA_SOURCE_LABELS: Record<string, { label: string; bg: string; text: string }> = {
-  hq:        { label: '운영자',  bg: '#dbeafe', text: '#1d4ed8' },
-  community: { label: '커뮤니티', bg: '#dcfce7', text: '#15803d' },
-  supplier:  { label: '공급자',  bg: '#fef3c7', text: '#b45309' },
-};
+function formatDuration(sec: number | null | undefined): string {
+  if (!sec || sec <= 0) return '-';
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const s = sec % 60;
+  if (h > 0) return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  return `${m}:${String(s).padStart(2, '0')}`;
+}
 
-const KPA_MEDIA_TYPE_LABELS: Record<string, { label: string; bg: string; text: string }> = {
-  youtube:   { label: 'YouTube',   bg: '#fee2e2', text: '#b91c1c' },
-  video:     { label: '영상',      bg: '#f3e8ff', text: '#7e22ce' },
-  image:     { label: '이미지',    bg: '#e0f2fe', text: '#0369a1' },
-  url:       { label: 'URL',       bg: '#f1f5f9', text: '#475569' },
-  html:      { label: 'HTML',      bg: '#ffedd5', text: '#c2410c' },
-  text:      { label: '텍스트',    bg: '#ccfbf1', text: '#0f766e' },
-  rich_text: { label: 'Rich Text', bg: '#ccfbf1', text: '#0f766e' },
-};
+function parseDurationInput(input: string): number {
+  const parts = input.trim().split(':').map(Number);
+  if (parts.some(isNaN)) return 0;
+  if (parts.length === 2) return parts[0] * 60 + parts[1];
+  if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+  return 0;
+}
 
-// ─── Types ────────────────────────────────────────────────
+// ─── Types ───────────────────────────────────────────────
 
 interface MediaItem {
   id: string;
   name: string;
   description?: string;
-  category?: string;
   mediaType: string;
+  sourceType?: string;
+  sourceUrl?: string;
   url?: string;
-  thumbnailUrl?: string;
   duration?: number;
   tags?: string[];
   source: string;
@@ -58,18 +57,51 @@ interface MediaItem {
   creatorName?: string;
 }
 
-// ─── Main Component ───────────────────────────────────────
+interface PlaylistItem {
+  id: string;
+  name: string;
+  description?: string;
+  itemCount: number;
+  totalDuration: number;
+  source: string;
+  createdByUserId?: string;
+  createdAt: string;
+  updatedAt: string;
+  metadata?: { tags?: string[] };
+}
+
+type TabType = 'videos' | 'playlists';
+
+// ─── Main Component ──────────────────────────────────────
 
 export default function ContentHubPage() {
   const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Tab
+  const initialTab = (searchParams.get('tab') === 'playlists' ? 'playlists' : 'videos') as TabType;
+  const [activeTab, setActiveTab] = useState<TabType>(initialTab);
+
+  // Search
+  const [keyword, setKeyword] = useState('');
+  const [debouncedKeyword, setDebouncedKeyword] = useState('');
+
+  // Data
+  const [videos, setVideos] = useState<MediaItem[]>([]);
+  const [playlists, setPlaylists] = useState<PlaylistItem[]>([]);
+  const [videoTotal, setVideoTotal] = useState(0);
+  const [playlistTotal, setPlaylistTotal] = useState(0);
+  const [videoPage, setVideoPage] = useState(1);
+  const [playlistPage, setPlaylistPage] = useState(1);
+  const [loading, setLoading] = useState(false);
 
   // Modals
   const [createModal, setCreateModal] = useState(false);
-  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string; type: 'video' | 'playlist' } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Create modal state
-  const [createForm, setCreateForm] = useState({ name: '', description: '', sourceUrl: '' });
+  // Create form
+  const [createForm, setCreateForm] = useState({ name: '', description: '', sourceUrl: '', durationInput: '' });
   const [isCreating, setIsCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
   const [formTags, setFormTags] = useState<string[]>([]);
@@ -78,7 +110,7 @@ export default function ContentHubPage() {
   // Reload trigger
   const [reloadKey, setReloadKey] = useState(0);
 
-  // Auth fetch helper
+  // ── Auth fetch helper ──
   const apiFetch = useCallback(async (path: string, options?: RequestInit) => {
     const token = getAccessToken();
     const res = await fetch(`${API_BASE}${path}`, {
@@ -96,112 +128,79 @@ export default function ContentHubPage() {
     return res.json();
   }, []);
 
-  // ── Config ──
-  const config: SignageHubConfig = {
-    serviceKey: SERVICE_KEY,
-    heroTitle: '안내 영상 · 자료',
-    heroDesc: '영상과 플레이리스트를 검색하고 활용하세요',
-    headerAction: user ? (
-      <button
-        onClick={() => {
-          setCreateForm({ name: '', description: '', sourceUrl: '' });
-          setFormTags([]);
-          setFormTagInput('');
-          setCreateError(null);
-          setCreateModal(true);
-        }}
-        style={modalStyles.createBtn}
-      >
-        + 콘텐츠 등록
-      </button>
-    ) : undefined,
-    searchPlaceholder: '제목 또는 설명으로 검색...',
-    showTagFilter: true,
-    pageLimit: 20,
-    fetchItems: async (params) => {
-      const res = await publicContentApi.listMedia(undefined, SERVICE_KEY, {
-        page: params.page,
-        limit: params.limit,
-        search: params.search || undefined,
-      });
-      if (res.success && res.data) {
-        const raw = (res.data as any).items ?? [];
-        const items: SignageHubItem[] = raw.map((m: MediaItem) => ({
-          id: m.id,
-          name: m.name,
-          description: m.description || null,
-          mediaType: m.mediaType,
-          source: m.source,
-          tags: m.tags,
-          creatorName: m.creatorName || null,
-          createdAt: m.createdAt,
-          url: m.url || null,
-          canDelete: !!user && m.source === 'community' && m.createdByUserId === user.id,
-        }));
-        return { items, total: (res.data as any).total ?? 0 };
-      }
-      throw new Error('콘텐츠를 불러오는 데 실패했습니다.');
-    },
-    onCopy: async (item) => {
-      await assetSnapshotApi.copy({
-        sourceService: 'kpa',
-        sourceAssetId: item.id,
-        assetType: 'signage',
-      });
-    },
-    onDelete: (item) => {
-      setDeleteConfirm({ id: item.id, name: item.name });
-    },
-    sourceLabels: KPA_SOURCE_LABELS,
-    mediaTypeLabels: KPA_MEDIA_TYPE_LABELS,
-    showInfoBlock: true,
-    infoTitle: '가져가기 안내',
-    infoDesc: '콘텐츠를 가져가기하면 내 매장 콘텐츠 보관함에 독립적으로 저장됩니다. 원본이 변경되어도 영향 없으며, 매장에서 직접 수정·삭제 가능합니다.',
-    emptyMessage: '등록된 콘텐츠가 없습니다',
-    emptyFilteredMessage: '선택한 태그에 해당하는 콘텐츠가 없습니다',
+  // ── Debounce search ──
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedKeyword(keyword), 350);
+    return () => clearTimeout(timer);
+  }, [keyword]);
+
+  // ── Tab change → sync URL ──
+  const handleTabChange = (tab: TabType) => {
+    setActiveTab(tab);
+    setSearchParams(tab === 'playlists' ? { tab: 'playlists' } : {});
   };
 
-  // ── Delete handler ──
-  const handleDeleteConfirmed = async () => {
-    if (!deleteConfirm) return;
-    setIsDeleting(true);
-    try {
-      await apiFetch(`/api/signage/${SERVICE_KEY}/community/media/${deleteConfirm.id}`, { method: 'DELETE' });
-      setDeleteConfirm(null);
-      setReloadKey(k => k + 1);
-    } catch {
-      setDeleteConfirm(null);
-    } finally {
-      setIsDeleting(false);
-    }
-  };
+  // ── Fetch videos ──
+  useEffect(() => {
+    if (activeTab !== 'videos') return;
+    setLoading(true);
+    publicContentApi.listMedia(undefined, SERVICE_KEY, {
+      page: videoPage,
+      limit: PAGE_LIMIT,
+      search: debouncedKeyword || undefined,
+    })
+      .then((res: any) => {
+        if (res.success && res.data) {
+          setVideos((res.data as any).items ?? []);
+          setVideoTotal((res.data as any).total ?? 0);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [activeTab, videoPage, debouncedKeyword, reloadKey]);
 
-  // ── Create handlers ──
+  // ── Fetch playlists ──
+  useEffect(() => {
+    if (activeTab !== 'playlists') return;
+    setLoading(true);
+    publicContentApi.listPlaylists(undefined, SERVICE_KEY, {
+      page: playlistPage,
+      limit: PAGE_LIMIT,
+    })
+      .then((res: any) => {
+        if (res.success && res.data) {
+          setPlaylists((res.data as any).items ?? []);
+          setPlaylistTotal((res.data as any).total ?? 0);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [activeTab, playlistPage, debouncedKeyword, reloadKey]);
+
+  // ── Tags ──
   const addTag = (value: string) => {
     const tag = value.trim().replace(/^#/, '');
     if (!tag || formTags.includes(tag)) return;
     setFormTags(prev => [...prev, tag]);
   };
+  const removeTag = (tag: string) => setFormTags(prev => prev.filter(t => t !== tag));
 
-  const removeTag = (tag: string) => {
-    setFormTags(prev => prev.filter(t => t !== tag));
-  };
-
-  const handleCreate = async () => {
+  // ── Create video ──
+  const handleCreateVideo = async () => {
     if (!createForm.name.trim()) { setCreateError('제목을 입력하세요'); return; }
     if (!createForm.sourceUrl.trim()) { setCreateError('URL을 입력하세요'); return; }
-    if (formTags.length === 0) { setCreateError('태그를 최소 1개 이상 입력해주세요'); return; }
     setIsCreating(true);
     setCreateError(null);
     try {
-      await apiFetch(`/api/signage/${SERVICE_KEY}/community/media`, {
+      const durationSec = parseDurationInput(createForm.durationInput);
+      await apiFetch(`/api/v1/kpa/signage/media`, {
         method: 'POST',
         body: JSON.stringify({
           name: createForm.name.trim(),
-          description: createForm.description.trim() || undefined,
           sourceUrl: createForm.sourceUrl.trim(),
-          tags: formTags,
-          mediaType: 'youtube',
+          description: createForm.description.trim() || undefined,
+          tags: formTags.length > 0 ? formTags : undefined,
+          duration: durationSec > 0 ? durationSec : undefined,
         }),
       });
       setCreateModal(false);
@@ -213,51 +212,228 @@ export default function ContentHubPage() {
     }
   };
 
-  return (
-    <>
-      <SignageHubTemplate key={reloadKey} config={config} />
+  // ── Delete ──
+  const handleDeleteConfirmed = async () => {
+    if (!deleteConfirm) return;
+    setIsDeleting(true);
+    try {
+      const path = deleteConfirm.type === 'video'
+        ? `/api/signage/${SERVICE_KEY}/community/media/${deleteConfirm.id}`
+        : `/api/signage/${SERVICE_KEY}/community/playlists/${deleteConfirm.id}`;
+      await apiFetch(path, { method: 'DELETE' });
+      setDeleteConfirm(null);
+      setReloadKey(k => k + 1);
+    } catch {
+      setDeleteConfirm(null);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
-      {/* ── Community Content Creation Modal ── */}
+  // ── Pagination ──
+  const currentPage = activeTab === 'videos' ? videoPage : playlistPage;
+  const total = activeTab === 'videos' ? videoTotal : playlistTotal;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
+  const setPage = activeTab === 'videos' ? setVideoPage : setPlaylistPage;
+
+  return (
+    <div style={styles.page}>
+      <div style={styles.container}>
+        {/* Header */}
+        <div style={styles.header}>
+          <div>
+            <h1 style={styles.title}>디지털 사이니지</h1>
+            <p style={styles.desc}>동영상과 플레이리스트를 관리하세요</p>
+          </div>
+          {user && (
+            <div>
+              {activeTab === 'videos' ? (
+                <button onClick={() => {
+                  setCreateForm({ name: '', description: '', sourceUrl: '', durationInput: '' });
+                  setFormTags([]);
+                  setFormTagInput('');
+                  setCreateError(null);
+                  setCreateModal(true);
+                }} style={styles.primaryBtn}>+ 동영상 등록</button>
+              ) : (
+                <Link to="/signage/playlist/new" style={{ ...styles.primaryBtn, textDecoration: 'none' }}>+ 플레이리스트 등록</Link>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Tabs */}
+        <div style={styles.tabBar}>
+          <button
+            onClick={() => handleTabChange('videos')}
+            style={activeTab === 'videos' ? styles.tabActive : styles.tab}
+          >동영상</button>
+          <button
+            onClick={() => handleTabChange('playlists')}
+            style={activeTab === 'playlists' ? styles.tabActive : styles.tab}
+          >플레이리스트</button>
+        </div>
+
+        {/* Search */}
+        <div style={styles.searchBar}>
+          <input
+            type="text"
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            placeholder="제목으로 검색..."
+            style={styles.searchInput}
+          />
+        </div>
+
+        {/* Content */}
+        {loading ? (
+          <div style={styles.emptyBox}><p style={styles.emptyText}>불러오는 중...</p></div>
+        ) : activeTab === 'videos' ? (
+          videos.length === 0 ? (
+            <div style={styles.emptyBox}><p style={styles.emptyText}>등록된 동영상이 없습니다</p></div>
+          ) : (
+            <div style={styles.tableWrap}>
+              <table style={styles.table}>
+                <thead>
+                  <tr>
+                    <th style={styles.th}>제목</th>
+                    <th style={{ ...styles.th, width: 200 }}>URL</th>
+                    <th style={{ ...styles.th, width: 80 }}>재생시간</th>
+                    <th style={{ ...styles.th, width: 140 }}>태그</th>
+                    <th style={{ ...styles.th, width: 90 }}>등록일</th>
+                    <th style={{ ...styles.th, width: 100 }}>액션</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {videos.map(v => (
+                    <tr key={v.id} style={styles.tr}>
+                      <td style={styles.td}>
+                        <span style={styles.cellTitle}>{v.name}</span>
+                        {v.description && <span style={styles.cellDesc}>{v.description}</span>}
+                      </td>
+                      <td style={styles.td}>
+                        <span style={styles.urlText}>{v.sourceUrl || v.url || '-'}</span>
+                      </td>
+                      <td style={{ ...styles.td, textAlign: 'center' }}>{formatDuration(v.duration)}</td>
+                      <td style={styles.td}>
+                        <div style={styles.tagRow}>
+                          {(v.tags ?? []).slice(0, 2).map(t => (
+                            <span key={t} style={styles.tagBadge}>#{t}</span>
+                          ))}
+                        </div>
+                      </td>
+                      <td style={{ ...styles.td, fontSize: 13, color: '#64748b' }}>
+                        {v.createdAt ? new Date(v.createdAt).toLocaleDateString('ko-KR') : '-'}
+                      </td>
+                      <td style={styles.td}>
+                        <div style={styles.actionRow}>
+                          {(v.sourceUrl || v.url) && (
+                            <button onClick={() => window.open(v.sourceUrl || v.url, '_blank')} style={styles.actionBtn} title="새창 재생">▶</button>
+                          )}
+                          {user && v.source === 'community' && v.createdByUserId === user.id && (
+                            <button onClick={() => setDeleteConfirm({ id: v.id, name: v.name, type: 'video' })} style={styles.deleteActionBtn} title="삭제">✕</button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )
+        ) : (
+          playlists.length === 0 ? (
+            <div style={styles.emptyBox}><p style={styles.emptyText}>등록된 플레이리스트가 없습니다</p></div>
+          ) : (
+            <div style={styles.tableWrap}>
+              <table style={styles.table}>
+                <thead>
+                  <tr>
+                    <th style={styles.th}>제목</th>
+                    <th style={{ ...styles.th, width: 80 }}>영상 수</th>
+                    <th style={{ ...styles.th, width: 100 }}>총 재생시간</th>
+                    <th style={{ ...styles.th, width: 140 }}>태그</th>
+                    <th style={{ ...styles.th, width: 90 }}>수정일</th>
+                    <th style={{ ...styles.th, width: 100 }}>액션</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {playlists.map(p => {
+                    const tags = p.metadata?.tags ?? [];
+                    return (
+                      <tr key={p.id} style={styles.tr}>
+                        <td style={styles.td}>
+                          <span style={styles.cellTitle}>{p.name}</span>
+                          {p.description && <span style={styles.cellDesc}>{p.description}</span>}
+                        </td>
+                        <td style={{ ...styles.td, textAlign: 'center' }}>{p.itemCount}</td>
+                        <td style={{ ...styles.td, textAlign: 'center' }}>{formatDuration(p.totalDuration)}</td>
+                        <td style={styles.td}>
+                          <div style={styles.tagRow}>
+                            {tags.slice(0, 2).map((t: string) => (
+                              <span key={t} style={styles.tagBadge}>#{t}</span>
+                            ))}
+                          </div>
+                        </td>
+                        <td style={{ ...styles.td, fontSize: 13, color: '#64748b' }}>
+                          {p.updatedAt ? new Date(p.updatedAt).toLocaleDateString('ko-KR') : '-'}
+                        </td>
+                        <td style={styles.td}>
+                          <div style={styles.actionRow}>
+                            {user && p.source === 'community' && p.createdByUserId === user.id && (
+                              <>
+                                <Link to={`/signage/playlist/${p.id}/edit`} style={styles.actionBtn} title="수정">✎</Link>
+                                <button onClick={() => setDeleteConfirm({ id: p.id, name: p.name, type: 'playlist' })} style={styles.deleteActionBtn} title="삭제">✕</button>
+                              </>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )
+        )}
+
+        {/* Pagination */}
+        {total > PAGE_LIMIT && (
+          <div style={styles.pagination}>
+            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={currentPage <= 1} style={styles.pageBtn}>이전</button>
+            <span style={styles.pageInfo}>{currentPage} / {totalPages}</span>
+            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={currentPage >= totalPages} style={styles.pageBtn}>다음</button>
+          </div>
+        )}
+      </div>
+
+      {/* ── Create Video Modal ── */}
       {createModal && (
         <div style={modalStyles.overlay}>
           <div style={modalStyles.dialog}>
             <div style={modalStyles.dialogHeader}>
-              <h3 style={modalStyles.dialogTitle}>커뮤니티 콘텐츠 등록</h3>
+              <h3 style={modalStyles.dialogTitle}>동영상 등록</h3>
               <button onClick={() => setCreateModal(false)} style={modalStyles.closeBtn}>✕</button>
             </div>
             <div style={modalStyles.dialogBody}>
               <div>
                 <label style={modalStyles.label}>제목 *</label>
-                <input
-                  type="text"
-                  value={createForm.name}
-                  onChange={(e) => setCreateForm(f => ({ ...f, name: e.target.value }))}
-                  placeholder="예: 약사회 건강 안내 영상"
-                  style={modalStyles.input}
-                />
+                <input type="text" value={createForm.name} onChange={(e) => setCreateForm(f => ({ ...f, name: e.target.value }))} placeholder="예: 약사회 건강 안내 영상" style={modalStyles.input} />
               </div>
               <div>
-                <label style={modalStyles.label}>YouTube URL *</label>
-                <input
-                  type="url"
-                  value={createForm.sourceUrl}
-                  onChange={(e) => setCreateForm(f => ({ ...f, sourceUrl: e.target.value }))}
-                  placeholder="https://www.youtube.com/watch?v=..."
-                  style={modalStyles.input}
-                />
+                <label style={modalStyles.label}>URL *</label>
+                <input type="url" value={createForm.sourceUrl} onChange={(e) => setCreateForm(f => ({ ...f, sourceUrl: e.target.value }))} placeholder="https://www.youtube.com/watch?v=..." style={modalStyles.input} />
+              </div>
+              <div>
+                <label style={modalStyles.label}>재생시간 (선택, mm:ss)</label>
+                <input type="text" value={createForm.durationInput} onChange={(e) => setCreateForm(f => ({ ...f, durationInput: e.target.value }))} placeholder="예: 10:30" style={modalStyles.input} />
               </div>
               <div>
                 <label style={modalStyles.label}>설명 (선택)</label>
-                <textarea
-                  value={createForm.description}
-                  onChange={(e) => setCreateForm(f => ({ ...f, description: e.target.value }))}
-                  placeholder="간단한 설명을 입력하세요"
-                  rows={2}
-                  style={modalStyles.textarea}
-                />
+                <textarea value={createForm.description} onChange={(e) => setCreateForm(f => ({ ...f, description: e.target.value }))} placeholder="간단한 설명을 입력하세요" rows={2} style={modalStyles.textarea} />
               </div>
               <div>
-                <label style={modalStyles.label}>태그 * (최소 1개)</label>
+                <label style={modalStyles.label}>태그 (선택)</label>
                 <div style={modalStyles.tagsWrap}>
                   {formTags.map(tag => (
                     <span key={tag} style={modalStyles.tagChip}>
@@ -266,44 +442,20 @@ export default function ContentHubPage() {
                     </span>
                   ))}
                 </div>
-                <input
-                  type="text"
-                  value={formTagInput}
-                  onChange={(e) => setFormTagInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ',') {
-                      e.preventDefault();
-                      addTag(formTagInput);
-                      setFormTagInput('');
-                    }
-                  }}
-                  placeholder="태그 입력 후 Enter 또는 쉼표"
-                  style={modalStyles.input}
-                />
+                <input type="text" value={formTagInput} onChange={(e) => setFormTagInput(e.target.value)} onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addTag(formTagInput); setFormTagInput(''); }
+                }} placeholder="태그 입력 후 Enter" style={modalStyles.input} />
                 <div style={modalStyles.suggestRow}>
-                  {DEFAULT_TAG_SUGGESTIONS.filter(t => !formTags.includes(t)).map(t => (
-                    <button
-                      key={t}
-                      type="button"
-                      onClick={() => addTag(t)}
-                      style={modalStyles.suggestBtn}
-                    >
-                      #{t}
-                    </button>
+                  {DEFAULT_TAG_SUGGESTIONS.filter(t => !formTags.includes(t)).slice(0, 6).map(t => (
+                    <button key={t} type="button" onClick={() => addTag(t)} style={modalStyles.suggestBtn}>#{t}</button>
                   ))}
                 </div>
               </div>
-              {createError && (
-                <p style={modalStyles.errorText}>{createError}</p>
-              )}
+              {createError && <p style={modalStyles.errorText}>{createError}</p>}
             </div>
             <div style={modalStyles.dialogFooter}>
-              <button onClick={() => setCreateModal(false)} disabled={isCreating} style={modalStyles.cancelBtn}>
-                취소
-              </button>
-              <button onClick={handleCreate} disabled={isCreating || formTags.length === 0} style={modalStyles.submitBtn}>
-                {isCreating ? '등록 중...' : '등록'}
-              </button>
+              <button onClick={() => setCreateModal(false)} disabled={isCreating} style={modalStyles.cancelBtn}>취소</button>
+              <button onClick={handleCreateVideo} disabled={isCreating} style={modalStyles.submitBtn}>{isCreating ? '등록 중...' : '등록'}</button>
             </div>
           </div>
         </div>
@@ -313,26 +465,84 @@ export default function ContentHubPage() {
       {deleteConfirm && (
         <div style={modalStyles.overlay}>
           <div style={{ ...modalStyles.dialog, maxWidth: '380px' }}>
-            <h3 style={modalStyles.dialogTitle}>콘텐츠 삭제</h3>
-            <p style={modalStyles.deleteDesc}>삭제하면 커뮤니티에서 더 이상 표시되지 않습니다.</p>
+            <h3 style={modalStyles.dialogTitle}>{deleteConfirm.type === 'video' ? '동영상 삭제' : '플레이리스트 삭제'}</h3>
+            <p style={modalStyles.deleteDesc}>삭제하면 더 이상 표시되지 않습니다.</p>
             <div style={modalStyles.deleteNameBox}>
               <p style={modalStyles.deleteName}>{deleteConfirm.name}</p>
-              <p style={modalStyles.deleteHint}>내가 등록한 커뮤니티 콘텐츠</p>
             </div>
             <div style={modalStyles.dialogFooter}>
-              <button onClick={() => setDeleteConfirm(null)} disabled={isDeleting} style={modalStyles.cancelBtn}>
-                취소
-              </button>
-              <button onClick={handleDeleteConfirmed} disabled={isDeleting} style={modalStyles.deleteBtn}>
-                {isDeleting ? '삭제 중...' : '삭제'}
-              </button>
+              <button onClick={() => setDeleteConfirm(null)} disabled={isDeleting} style={modalStyles.cancelBtn}>취소</button>
+              <button onClick={handleDeleteConfirmed} disabled={isDeleting} style={modalStyles.deleteBtn}>{isDeleting ? '삭제 중...' : '삭제'}</button>
             </div>
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
+
+// ─── Page Styles ──────────────────────────────────────────
+
+const styles: Record<string, React.CSSProperties> = {
+  page: { minHeight: '100vh', backgroundColor: '#f8fafc' },
+  container: { maxWidth: 960, margin: '0 auto', padding: '24px 16px 48px' },
+  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 },
+  title: { margin: 0, fontSize: 24, fontWeight: 700, color: '#1e293b' },
+  desc: { margin: '4px 0 0', fontSize: 14, color: '#64748b' },
+  primaryBtn: {
+    display: 'inline-flex', alignItems: 'center', gap: 6,
+    padding: '8px 14px', fontSize: 14, fontWeight: 500,
+    backgroundColor: '#2563eb', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer',
+  },
+  tabBar: { display: 'flex', gap: 0, borderBottom: '2px solid #e2e8f0', marginBottom: 16 },
+  tab: {
+    padding: '10px 20px', fontSize: 14, fontWeight: 500, color: '#64748b',
+    backgroundColor: 'transparent', border: 'none', borderBottom: '2px solid transparent',
+    marginBottom: -2, cursor: 'pointer',
+  },
+  tabActive: {
+    padding: '10px 20px', fontSize: 14, fontWeight: 600, color: '#2563eb',
+    backgroundColor: 'transparent', border: 'none', borderBottom: '2px solid #2563eb',
+    marginBottom: -2, cursor: 'pointer',
+  },
+  searchBar: { marginBottom: 16 },
+  searchInput: {
+    width: '100%', padding: '8px 12px', fontSize: 14,
+    border: '1px solid #e2e8f0', borderRadius: 8, outline: 'none', boxSizing: 'border-box' as const,
+  },
+  emptyBox: {
+    display: 'flex', justifyContent: 'center', alignItems: 'center',
+    minHeight: 200, backgroundColor: '#fff', borderRadius: 12, border: '1px solid #e2e8f0',
+  },
+  emptyText: { fontSize: 14, color: '#94a3b8' },
+  tableWrap: { overflowX: 'auto' as const, backgroundColor: '#fff', borderRadius: 12, border: '1px solid #e2e8f0' },
+  table: { width: '100%', borderCollapse: 'collapse' as const, fontSize: 14 },
+  th: { textAlign: 'left' as const, padding: '10px 12px', fontSize: 12, fontWeight: 600, color: '#64748b', borderBottom: '1px solid #e2e8f0', backgroundColor: '#f8fafc' },
+  tr: { borderBottom: '1px solid #f1f5f9' },
+  td: { padding: '10px 12px', verticalAlign: 'middle' as const },
+  cellTitle: { display: 'block', fontWeight: 500, color: '#1e293b', marginBottom: 2 },
+  cellDesc: { display: 'block', fontSize: 12, color: '#94a3b8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, maxWidth: 300 },
+  urlText: { fontSize: 12, color: '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, display: 'block', maxWidth: 180 },
+  tagRow: { display: 'flex', flexWrap: 'wrap' as const, gap: 4 },
+  tagBadge: { fontSize: 11, padding: '1px 6px', backgroundColor: '#f1f5f9', color: '#475569', borderRadius: 10 },
+  actionRow: { display: 'flex', gap: 4 },
+  actionBtn: {
+    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+    width: 28, height: 28, fontSize: 14, color: '#2563eb',
+    backgroundColor: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 6, cursor: 'pointer', textDecoration: 'none',
+  },
+  deleteActionBtn: {
+    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+    width: 28, height: 28, fontSize: 14, color: '#dc2626',
+    backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: 6, cursor: 'pointer',
+  },
+  pagination: { display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 12, marginTop: 16 },
+  pageBtn: {
+    padding: '6px 14px', fontSize: 13, color: '#475569',
+    backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: 6, cursor: 'pointer',
+  },
+  pageInfo: { fontSize: 13, color: '#64748b' },
+};
 
 // ─── Modal Styles ─────────────────────────────────────────
 
@@ -343,94 +553,52 @@ const modalStyles: Record<string, React.CSSProperties> = {
     backgroundColor: 'rgba(0,0,0,0.4)',
   },
   dialog: {
-    backgroundColor: '#fff', borderRadius: '12px',
+    backgroundColor: '#fff', borderRadius: 12,
     boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
-    padding: '24px', width: '100%', maxWidth: '420px', margin: '0 16px',
+    padding: 24, width: '100%', maxWidth: 420, margin: '0 16px',
   },
-  dialogHeader: {
-    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-    marginBottom: '16px',
-  },
-  dialogTitle: { margin: 0, fontSize: '18px', fontWeight: 600, color: '#1e293b' },
-  closeBtn: {
-    background: 'none', border: 'none', fontSize: '18px',
-    color: '#94a3b8', cursor: 'pointer', padding: '4px',
-  },
-  dialogBody: { display: 'flex', flexDirection: 'column', gap: '12px' } as React.CSSProperties,
-  dialogFooter: {
-    display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '16px',
-  },
-  label: {
-    display: 'block', fontSize: '12px', fontWeight: 500,
-    color: '#64748b', marginBottom: '4px',
-  },
+  dialogHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 },
+  dialogTitle: { margin: 0, fontSize: 18, fontWeight: 600, color: '#1e293b' },
+  closeBtn: { background: 'none', border: 'none', fontSize: 18, color: '#94a3b8', cursor: 'pointer', padding: 4 },
+  dialogBody: { display: 'flex', flexDirection: 'column' as const, gap: 12 },
+  dialogFooter: { display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 16 },
+  label: { display: 'block', fontSize: 12, fontWeight: 500, color: '#64748b', marginBottom: 4 },
   input: {
-    width: '100%', padding: '8px 12px', fontSize: '14px',
-    border: '1px solid #e2e8f0', borderRadius: '8px',
-    outline: 'none', boxSizing: 'border-box',
-  } as React.CSSProperties,
+    width: '100%', padding: '8px 12px', fontSize: 14,
+    border: '1px solid #e2e8f0', borderRadius: 8, outline: 'none', boxSizing: 'border-box' as const,
+  },
   textarea: {
-    width: '100%', padding: '8px 12px', fontSize: '14px',
-    border: '1px solid #e2e8f0', borderRadius: '8px',
-    outline: 'none', resize: 'none', boxSizing: 'border-box',
-  } as React.CSSProperties,
-  tagsWrap: {
-    display: 'flex', flexWrap: 'wrap', gap: '4px',
-    marginBottom: '8px', minHeight: '28px',
-  } as React.CSSProperties,
+    width: '100%', padding: '8px 12px', fontSize: 14,
+    border: '1px solid #e2e8f0', borderRadius: 8, outline: 'none', resize: 'none' as const, boxSizing: 'border-box' as const,
+  },
+  tagsWrap: { display: 'flex', flexWrap: 'wrap' as const, gap: 4, marginBottom: 8, minHeight: 28 },
   tagChip: {
-    display: 'inline-flex', alignItems: 'center', gap: '4px',
-    padding: '2px 8px', backgroundColor: '#dbeafe', color: '#1d4ed8',
-    fontSize: '12px', borderRadius: '12px',
+    display: 'inline-flex', alignItems: 'center', gap: 4,
+    padding: '2px 8px', backgroundColor: '#dbeafe', color: '#1d4ed8', fontSize: 12, borderRadius: 12,
   },
-  tagRemove: {
-    background: 'none', border: 'none', color: '#1d4ed8',
-    cursor: 'pointer', fontSize: '14px', fontWeight: 700, padding: 0,
-  },
-  suggestRow: {
-    display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '8px',
-  } as React.CSSProperties,
+  tagRemove: { background: 'none', border: 'none', color: '#1d4ed8', cursor: 'pointer', fontSize: 14, fontWeight: 700, padding: 0 },
+  suggestRow: { display: 'flex', flexWrap: 'wrap' as const, gap: 4, marginTop: 8 },
   suggestBtn: {
-    padding: '2px 8px', fontSize: '12px',
-    backgroundColor: '#f1f5f9', color: '#475569', borderRadius: '12px',
-    border: 'none', cursor: 'pointer',
+    padding: '2px 8px', fontSize: 12,
+    backgroundColor: '#f1f5f9', color: '#475569', borderRadius: 12, border: 'none', cursor: 'pointer',
   },
-  errorText: {
-    margin: 0, fontSize: '12px', color: '#dc2626',
-  },
+  errorText: { margin: 0, fontSize: 12, color: '#dc2626' },
   cancelBtn: {
-    padding: '8px 16px', fontSize: '14px',
-    border: '1px solid #e2e8f0', borderRadius: '8px',
-    backgroundColor: '#fff', color: '#475569', cursor: 'pointer',
+    padding: '8px 16px', fontSize: 14,
+    border: '1px solid #e2e8f0', borderRadius: 8, backgroundColor: '#fff', color: '#475569', cursor: 'pointer',
   },
   submitBtn: {
-    padding: '8px 16px', fontSize: '14px', fontWeight: 500,
-    border: 'none', borderRadius: '8px',
-    backgroundColor: '#2563eb', color: '#fff', cursor: 'pointer',
+    padding: '8px 16px', fontSize: 14, fontWeight: 500,
+    border: 'none', borderRadius: 8, backgroundColor: '#2563eb', color: '#fff', cursor: 'pointer',
   },
   deleteBtn: {
-    padding: '8px 16px', fontSize: '14px', fontWeight: 500,
-    border: 'none', borderRadius: '8px',
-    backgroundColor: '#dc2626', color: '#fff', cursor: 'pointer',
+    padding: '8px 16px', fontSize: 14, fontWeight: 500,
+    border: 'none', borderRadius: 8, backgroundColor: '#dc2626', color: '#fff', cursor: 'pointer',
   },
-  createBtn: {
-    display: 'inline-flex', alignItems: 'center', gap: '6px',
-    padding: '8px 14px', fontSize: '14px', fontWeight: 500,
-    backgroundColor: '#2563eb', color: '#fff', border: 'none',
-    borderRadius: '8px', cursor: 'pointer',
-  },
-  deleteDesc: {
-    margin: '0 0 12px', fontSize: '14px', color: '#64748b',
-  },
-  deleteNameBox: {
-    backgroundColor: '#f8fafc', borderRadius: '8px', padding: '12px',
-    marginBottom: '4px',
-  },
+  deleteDesc: { margin: '0 0 12px', fontSize: 14, color: '#64748b' },
+  deleteNameBox: { backgroundColor: '#f8fafc', borderRadius: 8, padding: 12, marginBottom: 4 },
   deleteName: {
-    margin: 0, fontSize: '14px', fontWeight: 500, color: '#334155',
-    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-  } as React.CSSProperties,
-  deleteHint: {
-    margin: '4px 0 0', fontSize: '12px', color: '#94a3b8',
+    margin: 0, fontSize: 14, fontWeight: 500, color: '#334155',
+    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
   },
 };
