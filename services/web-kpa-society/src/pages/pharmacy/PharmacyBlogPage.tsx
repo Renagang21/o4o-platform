@@ -18,6 +18,7 @@ import {
   deleteBlogPost,
   type StaffBlogPost,
 } from '../../api/blogStaff';
+import { useNavigate } from 'react-router-dom';
 import { getStoreSlug } from '../../api/pharmacyInfo';
 
 type ViewMode = 'list' | 'editor';
@@ -35,6 +36,7 @@ function formatDate(dateStr: string): string {
 }
 
 export function PharmacyBlogPage({ service }: { service?: string }) {
+  const navigate = useNavigate();
   const [slug, setSlug] = useState<string | null>(null);
   const [posts, setPosts] = useState<StaffBlogPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -58,10 +60,13 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
         if (resolved) {
           setSlug(resolved);
         } else {
-          setError('매장 정보를 찾을 수 없습니다.');
+          // WO-KPA-PHARMACY-OWNER-WITHOUT-STORE-HANDLING-V1: 매장 미연결 → 게이트로
+          navigate('/pharmacy', { replace: true });
+          return;
         }
       } catch {
-        setError('매장 정보를 불러올 수 없습니다.');
+        navigate('/pharmacy', { replace: true });
+        return;
       }
     };
     fetchSlug();

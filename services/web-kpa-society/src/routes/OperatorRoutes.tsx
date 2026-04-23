@@ -31,7 +31,6 @@ import OperatorContentHubPage from '../pages/operator/OperatorContentHubPage';
 import OperatorContentDetailPage from '../pages/operator/OperatorContentDetailPage';
 import WorkingContentListPage from '../pages/operator/WorkingContentListPage';
 import WorkingContentEditPage from '../pages/operator/WorkingContentEditPage';
-import { OrganizationJoinRequestsPage } from '../pages/admin/OrganizationJoinRequestsPage';
 // ContentHubPage import removed (WO-KPA-SIGNAGE-UI-RESTRUCTURE-V1) — community-only page, no operator route
 // Signage Operator Console (WO-O4O-SIGNAGE-CONSOLE-V1)
 import HqMediaPage from '../pages/operator/signage/HqMediaPage';
@@ -40,7 +39,6 @@ import HqPlaylistsPage from '../pages/operator/signage/HqPlaylistsPage';
 import HqPlaylistDetailPage from '../pages/operator/signage/HqPlaylistDetailPage';
 import TemplatesPage from '../pages/operator/signage/TemplatesPage';
 import TemplateDetailPage from '../pages/operator/signage/TemplateDetailPage';
-import CategoriesPage from '../pages/operator/signage/CategoriesPage';
 import ForcedContentPage from '../pages/operator/signage/ForcedContentPage';
 import OperatorAnalyticsPage from '../pages/operator/AnalyticsPage';
 import { RoleGuard } from '../components/auth/RoleGuard';
@@ -84,8 +82,6 @@ export function OperatorRoutes() {
           <Route path="signage/hq-playlists/:playlistId" element={<HqPlaylistDetailPage />} />
           <Route path="signage/templates" element={<TemplatesPage />} />
           <Route path="signage/templates/:templateId" element={<TemplateDetailPage />} />
-          {/* 사이니지 카테고리 관리 (WO-O4O-SIGNAGE-REGISTRATION-AND-CATEGORY-REFINE-V1) */}
-          <Route path="signage/categories" element={<CategoriesPage />} />
           {/* 강제 콘텐츠 관리 (WO-KPA-SIGNAGE-FORCED-CONTENT-IMPLEMENTATION-V1) */}
           <Route path="signage/forced-content" element={<ForcedContentPage />} />
 

@@ -178,7 +178,6 @@ export default function HqMediaDetailPage() {
           {media.embedId && <InfoRow label="Embed ID" value={media.embedId} mono />}
           {media.duration && <InfoRow label="재생 시간" value={`${media.duration}초`} />}
           {media.resolution && <InfoRow label="해상도" value={media.resolution} />}
-          {media.category && <InfoRow label="카테고리" value={media.category} />}
           <InfoRow label="생성일" value={formatDate(media.createdAt)} />
           <InfoRow label="수정일" value={formatDate(media.updatedAt)} />
         </div>

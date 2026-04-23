@@ -46,7 +46,6 @@ export class SignageContentController {
         limit: parseInt(req.query.limit as string) || 20,
         blockType: req.query.blockType as string,
         status: req.query.status as any,
-        category: req.query.category as string,
         search: req.query.search as string,
         sortBy: req.query.sortBy as any,
         sortOrder: req.query.sortOrder as any,
@@ -132,7 +131,6 @@ export class SignageContentController {
       const query: LayoutPresetQueryDto = {
         page: parseInt(req.query.page as string) || 1,
         limit: parseInt(req.query.limit as string) || 20,
-        category: req.query.category as string,
         isSystem: req.query.isSystem === 'true' ? true : req.query.isSystem === 'false' ? false : undefined,
         isActive: req.query.isActive === 'true' ? true : req.query.isActive === 'false' ? false : undefined,
         search: req.query.search as string,

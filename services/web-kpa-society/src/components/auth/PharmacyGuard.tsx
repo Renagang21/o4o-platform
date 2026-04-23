@@ -70,6 +70,12 @@ export function PharmacyGuard({ children }: PharmacyGuardProps) {
     return <Navigate to="/operator" replace />;
   }
 
+  // WO-KPA-STORE-ACCESS-GATE-ALIGNMENT-BY-ACTIVITYTYPE-V1
+  // 비경영자 선차단: activityType이 pharmacy_owner가 아니면 접근 불가
+  if (user.activityType !== 'pharmacy_owner') {
+    return <Navigate to="/pharmacy" replace />;
+  }
+
   // Fast path: isStoreOwner면 즉시 통과
   if (user.isStoreOwner) {
     return <>{children}</>;

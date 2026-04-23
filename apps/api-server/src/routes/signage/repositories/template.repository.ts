@@ -53,9 +53,6 @@ export class SignageTemplateRepository {
     if (query.isSystem !== undefined) {
       qb.andWhere('template.isSystem = :isSystem', { isSystem: query.isSystem });
     }
-    if (query.category) {
-      qb.andWhere('template.category = :category', { category: query.category });
-    }
     if (query.search) {
       qb.andWhere('(template.name ILIKE :search OR template.description ILIKE :search)', {
         search: `%${query.search}%`,

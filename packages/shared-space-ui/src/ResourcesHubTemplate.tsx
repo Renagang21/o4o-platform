@@ -172,7 +172,6 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
   const [items, setItems] = useState<ResourcesHubItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
   const [searchInput, setSearchInput] = useState('');
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [drawerItem, setDrawerItem] = useState<ResourcesHubItem | null>(null);
@@ -198,11 +197,9 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
       });
       setItems(res.items);
       setTotalPages(res.totalPages);
-      setTotalItems(res.total);
     } catch {
       setItems([]);
       setTotalPages(1);
-      setTotalItems(0);
     } finally {
       setLoading(false);
     }

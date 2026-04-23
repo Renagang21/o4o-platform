@@ -145,7 +145,6 @@ export interface CreateMediaDto {
   mimeType?: string;
   content?: string;
   tags?: string[];
-  category?: string;
   metadata?: Record<string, any>;
 }
 
@@ -156,7 +155,6 @@ export interface UpdateMediaDto {
   duration?: number;
   content?: string;
   tags?: string[];
-  category?: string;
   status?: SignageStatus;
   metadata?: Record<string, any>;
 }
@@ -167,7 +165,6 @@ export interface MediaQueryDto {
   mediaType?: 'video' | 'image' | 'html' | 'text' | 'rich_text' | 'link';
   sourceType?: 'youtube' | 'vimeo' | 'url' | 'cms';
   status?: SignageStatus;
-  category?: string;
   tags?: string[];
   search?: string;
   sortBy?: 'name' | 'createdAt' | 'updatedAt' | 'mediaType';
@@ -191,7 +188,6 @@ export interface MediaResponseDto {
   mimeType: string | null;
   content: string | null;
   tags: string[];
-  category: string | null;
   status: string;
   createdAt: string;
   updatedAt: string;
@@ -282,7 +278,6 @@ export interface CreateTemplateDto {
   name: string;
   description?: string;
   layoutConfig: TemplateLayoutConfig;
-  category?: string;
   tags?: string[];
   thumbnailUrl?: string;
   status?: 'active' | 'inactive' | 'draft';
@@ -295,7 +290,6 @@ export interface UpdateTemplateDto {
   name?: string;
   description?: string;
   layoutConfig?: TemplateLayoutConfig;
-  category?: string;
   tags?: string[];
   thumbnailUrl?: string;
   status?: 'active' | 'inactive' | 'draft';
@@ -309,7 +303,6 @@ export interface TemplateQueryDto {
   status?: 'active' | 'inactive' | 'draft';
   isPublic?: boolean;
   isSystem?: boolean;
-  category?: string;
   search?: string;
   sortBy?: 'name' | 'createdAt' | 'updatedAt';
   sortOrder?: 'asc' | 'desc';
@@ -322,7 +315,6 @@ export interface TemplateResponseDto {
   name: string;
   description: string | null;
   layoutConfig: TemplateLayoutConfig;
-  category: string | null;
   tags: string[];
   thumbnailUrl: string | null;
   status: string;
@@ -422,7 +414,6 @@ export interface CreateContentBlockDto {
   mediaId?: string;
   settings?: ContentBlockSettings;
   status?: 'active' | 'inactive' | 'draft';
-  category?: string;
   tags?: string[];
   metadata?: Record<string, any>;
 }
@@ -435,7 +426,6 @@ export interface UpdateContentBlockDto {
   mediaId?: string;
   settings?: ContentBlockSettings;
   status?: 'active' | 'inactive' | 'draft';
-  category?: string;
   tags?: string[];
   metadata?: Record<string, any>;
 }
@@ -445,7 +435,6 @@ export interface ContentBlockQueryDto {
   limit?: number;
   blockType?: string;
   status?: 'active' | 'inactive' | 'draft';
-  category?: string;
   search?: string;
   sortBy?: 'name' | 'createdAt' | 'updatedAt' | 'blockType';
   sortOrder?: 'asc' | 'desc';
@@ -462,7 +451,6 @@ export interface ContentBlockResponseDto {
   mediaId: string | null;
   settings: ContentBlockSettings;
   status: string;
-  category: string | null;
   tags: string[];
   createdByUserId: string | null;
   createdAt: string;
@@ -487,7 +475,6 @@ export interface CreateLayoutPresetDto {
   name: string;
   description?: string;
   presetData: LayoutPresetData;
-  category?: string;
   tags?: string[];
   thumbnailUrl?: string;
   isSystem?: boolean;
@@ -500,7 +487,6 @@ export interface UpdateLayoutPresetDto {
   name?: string;
   description?: string;
   presetData?: LayoutPresetData;
-  category?: string;
   tags?: string[];
   thumbnailUrl?: string;
   isActive?: boolean;
@@ -511,7 +497,6 @@ export interface UpdateLayoutPresetDto {
 export interface LayoutPresetQueryDto {
   page?: number;
   limit?: number;
-  category?: string;
   isSystem?: boolean;
   isActive?: boolean;
   search?: string;
@@ -525,7 +510,6 @@ export interface LayoutPresetResponseDto {
   name: string;
   description: string | null;
   presetData: LayoutPresetData;
-  category: string | null;
   tags: string[];
   thumbnailUrl: string | null;
   isSystem: boolean;
@@ -570,7 +554,6 @@ export interface MediaLibraryQueryDto {
   limit?: number;
   source?: 'platform' | 'organization' | 'supplier' | 'all';
   mediaType?: 'video' | 'image' | 'html' | 'text';
-  category?: string;
   search?: string;
 }
 
@@ -674,7 +657,6 @@ export interface GlobalContentQueryDto {
   limit?: number;
   source?: ContentSource;
   mediaType?: 'video' | 'image' | 'html' | 'text' | 'rich_text' | 'link';
-  category?: string;
   tags?: string[];
   search?: string;
   sortBy?: 'name' | 'createdAt' | 'updatedAt' | 'likeCount' | 'downloadCount';

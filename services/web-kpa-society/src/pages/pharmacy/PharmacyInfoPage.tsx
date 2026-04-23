@@ -9,7 +9,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { colors, shadows, borderRadius } from '../../styles/theme';
 import {
   getPharmacyInfo,
@@ -154,15 +154,9 @@ export function PharmacyInfoPage() {
     );
   }
 
+  // WO-KPA-PHARMACY-OWNER-WITHOUT-STORE-HANDLING-V1: 데이터 없음 → 게이트로 리다이렉트
   if (loadState === 'error' || !data) {
-    return (
-      <div style={styles.container}>
-        <div style={styles.errorBox}>
-          <p style={styles.errorText}>약국 정보를 불러올 수 없습니다.</p>
-          <Link to="/store" style={styles.backButton}>돌아가기</Link>
-        </div>
-      </div>
-    );
+    return <Navigate to="/pharmacy" replace />;
   }
 
   // ─── View / Edit Mode ───

@@ -58,9 +58,6 @@ export class SignageContentRepository {
     if (query.status) {
       qb.andWhere('block.status = :status', { status: query.status });
     }
-    if (query.category) {
-      qb.andWhere('block.category = :category', { category: query.category });
-    }
     if (query.search) {
       qb.andWhere('(block.name ILIKE :search OR block.description ILIKE :search)', {
         search: `%${query.search}%`,
@@ -138,9 +135,6 @@ export class SignageContentRepository {
     }
     if (query.isActive !== undefined) {
       qb.andWhere('preset.isActive = :isActive', { isActive: query.isActive });
-    }
-    if (query.category) {
-      qb.andWhere('preset.category = :category', { category: query.category });
     }
     if (query.search) {
       qb.andWhere('(preset.name ILIKE :search OR preset.description ILIKE :search)', {

@@ -26,14 +26,16 @@ import {
   Smartphone,
   Tablet as TabletIcon,
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { colors } from '../../styles/theme';
 import { getMarketingAnalytics, getRecentScans } from '../../api/storeAnalytics';
 import type { MarketingAnalyticsData, RecentScanItem } from '../../api/storeAnalytics';
 import { getStoreLibraryItems } from '../../api/storeExecutionAssets';
 import { getListings } from '../../api/pharmacyProducts';
+import { getStoreSlug } from '../../api/pharmacyInfo';
 
 export function StoreHomePage() {
+  const navigate = useNavigate();
   const [analytics, setAnalytics] = useState<MarketingAnalyticsData | null>(null);
   const [recentScans, setRecentScans] = useState<RecentScanItem[]>([]);
   const [libraryCount, setLibraryCount] = useState<number | null>(null);
@@ -43,6 +45,10 @@ export function StoreHomePage() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
+      // WO-KPA-PHARMACY-OWNER-WITHOUT-STORE-HANDLING-V1: 매장 미연결 → 게이트로
+      const storeSlug = await getStoreSlug();
+      if (!storeSlug) { navigate('/pharmacy', { replace: true }); return; }
+
       const [analyticsRes, scansRes, libraryRes, listingsRes] = await Promise.all([
         getMarketingAnalytics().catch(() => null),
         getRecentScans().catch(() => null),
@@ -66,7 +72,7 @@ export function StoreHomePage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     fetchData();

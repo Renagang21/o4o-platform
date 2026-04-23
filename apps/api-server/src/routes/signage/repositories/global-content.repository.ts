@@ -40,10 +40,6 @@ export class SignageGlobalContentRepository {
       });
     }
 
-    if (query.category) {
-      qb.andWhere("playlist.metadata->>'category' = :category", { category: query.category });
-    }
-
     const sortBy = query.sortBy || 'createdAt';
     const sortOrder = query.sortOrder?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
 
@@ -82,10 +78,6 @@ export class SignageGlobalContentRepository {
 
     if (query.mediaType) {
       qb.andWhere('media.mediaType = :mediaType', { mediaType: query.mediaType });
-    }
-
-    if (query.category) {
-      qb.andWhere('media.category = :category', { category: query.category });
     }
 
     if (query.tags && query.tags.length > 0) {

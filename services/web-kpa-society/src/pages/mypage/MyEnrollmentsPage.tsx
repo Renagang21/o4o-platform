@@ -213,7 +213,7 @@ export function MyEnrollmentsPage() {
 
         {/* 메인 */}
         <div style={{ flex: 1, minWidth: 0 }}>
-          <PageHeader title="내 수강 목록" subtitle="신청하거나 진행 중인 강의를 확인하세요." />
+          <PageHeader title="내 수강 목록" description="신청하거나 진행 중인 강의를 확인하세요." />
 
           {/* 필터 탭 */}
           <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>

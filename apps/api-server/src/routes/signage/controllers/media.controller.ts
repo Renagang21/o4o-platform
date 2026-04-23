@@ -41,7 +41,6 @@ export class SignageMediaController {
         mediaType: req.query.mediaType as any,
         sourceType: req.query.sourceType as any,
         status: req.query.status as any,
-        category: req.query.category as string,
         tags: req.query.tags ? (req.query.tags as string).split(',') : undefined,
         search: req.query.search as string,
         sortBy: req.query.sortBy as any,
@@ -126,10 +125,9 @@ export class SignageMediaController {
     try {
       const scope = extractScope(req);
       const mediaType = req.query.mediaType as string;
-      const category = req.query.category as string;
       const search = req.query.search as string;
 
-      const library = await this.service.getMediaLibrary(scope, mediaType, category, search);
+      const library = await this.service.getMediaLibrary(scope, mediaType, undefined, search);
       res.json({ data: library });
     } catch (error) {
       next(error);

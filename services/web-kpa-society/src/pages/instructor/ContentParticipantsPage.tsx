@@ -157,7 +157,7 @@ export default function ContentParticipantsPage() {
   useEffect(() => {
     if (!courseId) return;
     lmsInstructorApi.participantsSummary(courseId)
-      .then(res => setRewardSummary((res as any).data ?? null))
+      .then((res: any) => setRewardSummary(res?.data ?? null))
       .catch(() => {/* summary 실패는 무시 */});
   }, [courseId]);
 

@@ -41,7 +41,6 @@ export default function TemplateDetailPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [editName, setEditName] = useState('');
   const [editDescription, setEditDescription] = useState('');
-  const [editCategory, setEditCategory] = useState('');
   const [editWidth, setEditWidth] = useState('');
   const [editHeight, setEditHeight] = useState('');
   const [editOrientation, setEditOrientation] = useState('');
@@ -72,7 +71,6 @@ export default function TemplateDetailPage() {
     if (!template) return;
     setEditName(template.name);
     setEditDescription(template.description || '');
-    setEditCategory(template.category || '');
     setEditWidth(String(template.layoutConfig?.width || ''));
     setEditHeight(String(template.layoutConfig?.height || ''));
     setEditOrientation(template.layoutConfig?.orientation || 'landscape');
@@ -94,7 +92,6 @@ export default function TemplateDetailPage() {
       const payload: UpdateTemplatePayload = {};
       if (editName.trim() !== template.name) payload.name = editName.trim();
       if ((editDescription || '') !== (template.description || '')) payload.description = editDescription;
-      if ((editCategory || '') !== (template.category || '')) payload.category = editCategory || undefined;
       if (editStatus !== template.status) payload.status = editStatus as 'active' | 'inactive' | 'draft';
       if (editIsPublic !== template.isPublic) payload.isPublic = editIsPublic;
 
@@ -248,10 +245,6 @@ export default function TemplateDetailPage() {
                 <input type="text" value={editName} onChange={e => setEditName(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-500 mb-1">카테고리</label>
-                <input type="text" value={editCategory} onChange={e => setEditCategory(e.target.value)} placeholder="예: pharmacy, retail" className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-              </div>
-              <div>
                 <label className="block text-xs font-medium text-slate-500 mb-1">공개 여부</label>
                 <select value={editIsPublic ? 'true' : 'false'} onChange={e => setEditIsPublic(e.target.value === 'true')} className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                   <option value="false">비공개</option>
@@ -291,7 +284,6 @@ export default function TemplateDetailPage() {
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-8">
               <InfoRow label="이름" value={template.name} />
-              <InfoRow label="카테고리" value={template.category || '-'} />
               <InfoRow label="공개 여부" value={template.isPublic ? '공개' : '비공개'} />
               <InfoRow label="시스템 템플릿" value={template.isSystem ? '예' : '아니오'} />
               {template.layoutConfig?.width && <InfoRow label="너비" value={`${template.layoutConfig.width}px`} />}

@@ -50,7 +50,6 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: 'HQ 미디어', path: '/operator/signage/hq-media' },
     { label: 'HQ 플레이리스트', path: '/operator/signage/hq-playlists' },
     { label: '템플릿', path: '/operator/signage/templates' },
-    { label: '카테고리 관리', path: '/operator/signage/categories' },
     { label: '강제 콘텐츠', path: '/operator/signage/forced-content' },
   ],
   forum: [
@@ -118,7 +117,6 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: 'HQ 미디어', path: '/operator/signage/hq-media' },
     { label: 'HQ 플레이리스트', path: '/operator/signage/hq-playlists' },
     { label: '템플릿', path: '/operator/signage/templates' },
-    { label: '카테고리 관리', path: '/operator/signage/categories' },
     { label: '강제 콘텐츠', path: '/operator/signage/forced-content' },
   ],
   forum: [

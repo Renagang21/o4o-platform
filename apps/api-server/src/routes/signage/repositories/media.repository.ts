@@ -58,9 +58,6 @@ export class SignageMediaRepository {
     if (query.status) {
       qb.andWhere('media.status = :status', { status: query.status });
     }
-    if (query.category) {
-      qb.andWhere('media.category = :category', { category: query.category });
-    }
     if (query.tags && query.tags.length > 0) {
       qb.andWhere('media.tags && :tags', { tags: query.tags });
     }
@@ -163,9 +160,6 @@ export class SignageMediaRepository {
       qb.andWhere('media.status = :status', { status: 'active' });
       if (mediaType) {
         qb.andWhere('media.mediaType = :mediaType', { mediaType });
-      }
-      if (category) {
-        qb.andWhere('media.category = :category', { category });
       }
       if (search) {
         qb.andWhere('(media.name ILIKE :search OR media.description ILIKE :search)', {

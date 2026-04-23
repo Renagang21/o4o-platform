@@ -204,7 +204,6 @@ export default function TemplateDetailPage() {
         <h2 className="text-lg font-semibold text-slate-800 mb-4">템플릿 정보</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
           <InfoRow label="이름" value={template.name} />
-          <InfoRow label="카테고리" value={template.category || '-'} />
           <InfoRow label="공개 여부" value={template.isPublic ? '공개' : '비공개'} />
           <InfoRow label="시스템 템플릿" value={template.isSystem ? '예' : '아니오'} />
           {template.layoutConfig && (

@@ -133,6 +133,32 @@ export function PharmacyPage() {
     );
   }
 
+  // 2.5 비경영자 → 약국 개설약사만 이용 가능
+  // WO-KPA-STORE-ACCESS-GATE-ALIGNMENT-BY-ACTIVITYTYPE-V1
+  if (user.activityType !== 'pharmacy_owner') {
+    return (
+      <div style={styles.page}>
+        <div style={styles.container}>
+          <div style={styles.card}>
+            <div style={styles.iconWrap}>
+              <span style={styles.icon}>💊</span>
+            </div>
+            <h1 style={styles.title}>약국 개설약사만 이용 가능합니다</h1>
+            <p style={styles.desc}>
+              내 매장 기능은 약국을 운영하는 개설약사에게만 제공됩니다.<br />
+              직역 변경이 필요하시면 마이페이지에서 수정해 주세요.
+            </p>
+            <div style={styles.actions}>
+              <button type="button" onClick={() => navigate(-1)} style={styles.backBtn}>
+                돌아가기
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // 3. API 로딩 중
   if (approvalStatus === 'loading') {
     return (
@@ -146,9 +172,45 @@ export function PharmacyPage() {
     );
   }
 
-  // 4. 승인 완료 → 내 매장관리로 이동 (pharmacistRole 무관, DB 기준)
+  // 4. 승인 완료
   if (approvalStatus === 'approved') {
-    return <Navigate to="/store" replace />;
+    // WO-KPA-PHARMACY-OWNER-WITHOUT-STORE-HANDLING-V1: isStoreOwner면 /store, 아니면 안내
+    if (user.isStoreOwner) {
+      return <Navigate to="/store" replace />;
+    }
+    // 승인 완료이지만 매장 연결 미완 → 안내 (루프 방지)
+    return (
+      <div style={styles.page}>
+        <div style={styles.container}>
+          <div style={styles.card}>
+            <div style={styles.iconWrap}>
+              <span style={styles.icon}>✅</span>
+            </div>
+            <h1 style={styles.title}>승인이 완료되었습니다</h1>
+            <p style={styles.desc}>
+              약국 서비스 이용이 승인되었으나, 매장 연결이 아직 반영되지 않았습니다.<br />
+              잠시 후 페이지를 새로고침해 주세요.
+            </p>
+            <div style={styles.actions}>
+              <button
+                type="button"
+                onClick={() => window.location.reload()}
+                style={styles.joinBtn}
+              >
+                새로고침
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate(-1)}
+                style={styles.backBtn}
+              >
+                돌아가기
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   // 5. 대기 중 → 대기 안내 화면

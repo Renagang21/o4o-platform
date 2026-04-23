@@ -44,7 +44,6 @@ export class SignageTemplateController {
         status: req.query.status as any,
         isPublic: req.query.isPublic === 'true' ? true : req.query.isPublic === 'false' ? false : undefined,
         isSystem: req.query.isSystem === 'true' ? true : req.query.isSystem === 'false' ? false : undefined,
-        category: req.query.category as string,
         search: req.query.search as string,
         sortBy: req.query.sortBy as any,
         sortOrder: req.query.sortOrder as any,

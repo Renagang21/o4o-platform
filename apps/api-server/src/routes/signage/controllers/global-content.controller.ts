@@ -35,7 +35,7 @@ export class SignageGlobalContentController {
         page: parseInt(req.query.page as string) || 1,
         limit: parseInt(req.query.limit as string) || 20,
         source: req.query.source as ContentSource,
-        category: req.query.category as string,
+
         search: req.query.search as string,
         sortBy: req.query.sortBy as any,
         sortOrder: req.query.sortOrder as any,
@@ -62,7 +62,7 @@ export class SignageGlobalContentController {
         page: parseInt(req.query.page as string) || 1,
         limit: parseInt(req.query.limit as string) || 20,
         source,
-        category: req.query.category as string,
+
         search: req.query.search as string,
         sortBy: req.query.sortBy as any,
         sortOrder: req.query.sortOrder as any,
@@ -83,7 +83,7 @@ export class SignageGlobalContentController {
         limit: parseInt(req.query.limit as string) || 20,
         source: req.query.source as ContentSource,
         mediaType: req.query.mediaType as any,
-        category: req.query.category as string,
+
         tags: req.query.tags ? (req.query.tags as string).split(',') : undefined,
         search: req.query.search as string,
         sortBy: req.query.sortBy as any,
@@ -112,7 +112,7 @@ export class SignageGlobalContentController {
         limit: parseInt(req.query.limit as string) || 20,
         source,
         mediaType: req.query.mediaType as any,
-        category: req.query.category as string,
+
         search: req.query.search as string,
         sortBy: req.query.sortBy as any,
         sortOrder: req.query.sortOrder as any,

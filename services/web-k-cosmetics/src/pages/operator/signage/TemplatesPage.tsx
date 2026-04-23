@@ -137,7 +137,6 @@ export default function TemplatesPage() {
             <thead className="bg-slate-50 border-b border-slate-100">
               <tr>
                 <th className="text-left px-4 py-3 text-xs font-medium text-slate-500">이름</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500">카테고리</th>
                 <th className="text-center px-4 py-3 text-xs font-medium text-slate-500">공개</th>
                 <th className="text-center px-4 py-3 text-xs font-medium text-slate-500">시스템</th>
                 <th className="text-center px-4 py-3 text-xs font-medium text-slate-500">상태</th>
@@ -148,7 +147,7 @@ export default function TemplatesPage() {
             <tbody className="divide-y divide-slate-100">
               {templates.length === 0 && !isLoading ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-12 text-center text-slate-400 text-sm">
+                  <td colSpan={6} className="px-4 py-12 text-center text-slate-400 text-sm">
                     템플릿이 없습니다
                   </td>
                 </tr>
@@ -163,9 +162,6 @@ export default function TemplatesPage() {
                     >
                       <td className="px-4 py-3">
                         <p className="font-medium text-slate-800 text-sm">{t.name}</p>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-slate-600">
-                        {t.category || '-'}
                       </td>
                       <td className="px-4 py-3 text-center">
                         {t.isPublic ? (

@@ -70,8 +70,8 @@ export function CourseIntroPage() {
 
       // 3. Enrollment (별도 try — 미등록 시 실패)
       try {
-        const enrollmentRes = await lmsApi.getEnrollment(courseId);
-        setEnrollment(enrollmentRes.data);
+        const enrollmentRes = await lmsApi.getEnrollmentByCourse(courseId);
+        setEnrollment(enrollmentRes.data?.enrollment ?? null);
       } catch {
         setEnrollment(null);
       }
@@ -95,7 +95,7 @@ export function CourseIntroPage() {
     try {
       setEnrolling(true);
       const res = await lmsApi.enrollCourse(courseId);
-      setEnrollment(res.data);
+      setEnrollment(res.data?.enrollment ?? null);
       // 등록 성공 후 lessons 재조회
       try {
         const lessonsRes = await lmsApi.getLessons(courseId);

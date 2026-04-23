@@ -67,7 +67,6 @@ export default function TemplatesPage() {
   const [formWidth, setFormWidth] = useState('1920');
   const [formHeight, setFormHeight] = useState('1080');
   const [formOrientation, setFormOrientation] = useState<'landscape' | 'portrait'>('landscape');
-  const [formCategory, setFormCategory] = useState('');
   const [formStatus, setFormStatus] = useState<'draft' | 'active'>('draft');
   const [formIsPublic, setFormIsPublic] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
@@ -101,10 +100,9 @@ export default function TemplatesPage() {
         isPublic: formIsPublic,
       };
       if (formDescription.trim()) payload.description = formDescription.trim();
-      if (formCategory.trim()) payload.category = formCategory.trim();
       await createTemplate(payload);
       setFormName(''); setFormDescription(''); setFormWidth('1920'); setFormHeight('1080');
-      setFormOrientation('landscape'); setFormCategory(''); setFormStatus('draft'); setFormIsPublic(false);
+      setFormOrientation('landscape'); setFormStatus('draft'); setFormIsPublic(false);
       setShowForm(false);
       loadTemplates();
     } catch (err: any) {
@@ -161,11 +159,6 @@ export default function TemplatesPage() {
           {row.description && <p className="text-xs text-slate-400 mt-0.5 truncate max-w-xs">{row.description}</p>}
         </div>
       ),
-    },
-    {
-      key: 'category',
-      header: '카테고리',
-      render: (value) => <span className="text-sm text-slate-600">{value || '-'}</span>,
     },
     {
       key: 'isPublic',
@@ -297,10 +290,6 @@ export default function TemplatesPage() {
                 <option value="landscape">가로 (Landscape)</option>
                 <option value="portrait">세로 (Portrait)</option>
               </select>
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">카테고리</label>
-              <input type="text" value={formCategory} onChange={e => setFormCategory(e.target.value)} placeholder="예: pharmacy, retail" className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
             </div>
             <div>
               <label className="block text-xs font-medium text-slate-500 mb-1">상태</label>

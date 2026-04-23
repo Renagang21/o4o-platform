@@ -104,6 +104,11 @@ export function PharmacyApprovalGatePage() {
     return <Navigate to="/login?returnTo=/pharmacy/approval" replace />;
   }
 
+  // WO-KPA-STORE-ACCESS-GATE-ALIGNMENT-BY-ACTIVITYTYPE-V1: 비경영자 차단
+  if (user.activityType !== 'pharmacy_owner') {
+    return <Navigate to="/pharmacy" replace />;
+  }
+
   // 신청 완료
   if (state === 'success') {
     return (

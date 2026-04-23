@@ -19,7 +19,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { colors, shadows, borderRadius } from '../../styles/theme';
 import { useAuth, TestUser } from '../../contexts/AuthContext';
 import { isPharmacyOwner, PharmacistFeeCategory } from '../../types';
@@ -65,6 +65,7 @@ const DEVICES: Array<{ id: PreviewDevice; name: string; icon: string; maxWidth: 
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export function PharmacyStorePage() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const testUser = user as TestUser | null;
 
@@ -76,7 +77,6 @@ export function PharmacyStorePage() {
   // ── Store state ──────────────────────────────────────────────────────────
   const [slug, setSlug] = useState<string | null>(null);
   const [pharmacyName, setPharmacyName] = useState('내 약국');
-  const [noStore, setNoStore] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Settings state
@@ -96,7 +96,8 @@ export function PharmacyStorePage() {
     (async () => {
       try {
         const resolved = await getStoreSlug();
-        if (!resolved) { setNoStore(true); setLoading(false); return; }
+        // WO-KPA-PHARMACY-OWNER-WITHOUT-STORE-HANDLING-V1: 매장 미연결 → 게이트로
+        if (!resolved) { navigate('/pharmacy', { replace: true }); return; }
         if (cancelled) return;
         setSlug(resolved);
 
@@ -198,24 +199,6 @@ export function PharmacyStorePage() {
           <h2 style={S.accessDeniedTitle}>접근 권한 없음</h2>
           <p style={S.accessDeniedText}>매장 설정은 개설약사만 변경할 수 있습니다.</p>
           <Link to="/store" style={S.backButton}>돌아가기</Link>
-        </div>
-      </div>
-    );
-  }
-
-  // ── No store ──────────────────────────────────────────────────────────────
-  if (noStore) {
-    return (
-      <div style={S.container}>
-        <header style={S.header}>
-          <Link to="/store" style={S.backLink}>&larr; 내 매장관리</Link>
-          <h1 style={S.pageTitle}>매장 설정</h1>
-        </header>
-        <div style={S.accessDenied}>
-          <span style={{ fontSize: '48px', marginBottom: '16px' }}>🏪</span>
-          <h2 style={S.accessDeniedTitle}>매장이 설정되지 않았습니다</h2>
-          <p style={S.accessDeniedText}>매장 설정을 완료한 후 레이아웃을 관리할 수 있습니다.</p>
-          <Link to="/store-hub" style={S.backButton}>약국 HUB로 이동</Link>
         </div>
       </div>
     );
