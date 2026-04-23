@@ -118,7 +118,7 @@ export function buildKpaOperatorConfig(
         label: '서비스 신청',
         value: serviceApplicationCount,
         status: serviceApplicationCount > 0 ? 'warning' as const : 'neutral' as const,
-        link: '/operator/organization-requests',
+        link: '/operator/pharmacy-requests',
       },
     ] : []),
   ];
@@ -254,7 +254,7 @@ export function buildKpaOperatorConfig(
       id: 'aq-service-apps',
       label: '서비스 신청 검토',
       count: serviceApplicationCount,
-      link: '/operator/organization-requests',
+      link: '/operator/pharmacy-requests',
     });
   }
 
@@ -289,7 +289,7 @@ export function buildKpaOperatorConfig(
     member_join: '/operator/members',
     pharmacy_request: '/operator/pharmacy-requests',
     application: '/operator/members',
-    org_join: '/operator/organization-requests',
+    org_join: '/operator/members',
   };
   for (const evt of summary.recentActivity ?? []) {
     activityLog.push({
@@ -319,7 +319,6 @@ export function buildKpaOperatorConfig(
     { id: 'qa-stores', label: '매장 관리', link: '/operator/stores', icon: '🏪' },
     // Admin 추가 4개
     ...(isAdmin ? [
-      { id: 'qa-requests', label: '조직 가입 요청', link: '/operator/organization-requests', icon: '👥' },
       { id: 'qa-community', label: 'Home 편집', link: '/operator/community', icon: '🏠' },
       { id: 'qa-roles', label: '역할 관리', link: '/operator/roles', icon: '🔑' },
       { id: 'qa-audit', label: '감사 로그', link: '/operator/audit-logs', icon: '📋' },

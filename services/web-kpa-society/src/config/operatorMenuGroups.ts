@@ -27,7 +27,6 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   dashboard: [{ label: '대시보드', path: '/operator', exact: true }],
   users: [
     { label: '회원 관리', path: '/operator/members' },
-    { label: '조직 가입 요청', path: '/operator/organization-requests' },
     { label: '약국 서비스 신청', path: '/operator/pharmacy-requests' },
   ],
   approvals: [
@@ -94,7 +93,6 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
   dashboard: [{ label: '대시보드', path: '/operator', exact: true }],
   users: [
     { label: '회원 관리', path: '/operator/members' },
-    { label: '조직 가입 요청', path: '/operator/organization-requests' },
     { label: '약국 서비스 신청', path: '/operator/pharmacy-requests' },
   ],
   approvals: [

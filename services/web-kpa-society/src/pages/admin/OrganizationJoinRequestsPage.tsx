@@ -1,6 +1,11 @@
 /**
  * OrganizationJoinRequestsPage - 조직 가입/역할 요청 관리 (운영자)
  *
+ * @deprecated WO-REMOVE-ORGANIZATION-REQUEST-UI-V1
+ * Organization Request 기능은 현재 O4O에서 사용하지 않습니다.
+ * 권한 관리는 admin.neture.co.kr 또는 role_assignments 기반 RBAC에서 수행합니다.
+ * 이 파일은 Soft Deprecation 상태 — 라우트는 /operator 리다이렉트로 차단됨.
+ *
  * WO-CONTEXT-JOIN-REQUEST-MVP-V1
  * WO-O4O-TABLE-STANDARD-V2 — DataTable 표준 전환
  * WO-O4O-TABLE-STANDARD-V3 — Batch API + ActionBar v2 + AI 요약
