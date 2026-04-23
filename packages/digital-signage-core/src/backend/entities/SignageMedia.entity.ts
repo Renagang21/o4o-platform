@@ -25,7 +25,6 @@ import type { SignagePlaylistItem } from './SignagePlaylistItem.entity.js';
 @Index(['serviceKey', 'mediaType'])
 @Index(['sourceType'])
 @Index(['status'])
-@Index(['category'])
 export class SignageMedia {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -90,9 +89,6 @@ export class SignageMedia {
   // ========== Categorization ==========
   @Column({ type: 'text', array: true, default: '{}' })
   tags!: string[];
-
-  @Column({ type: 'varchar', length: 100, nullable: true })
-  category!: string | null;
 
   // ========== Status ==========
   // WO-O4O-SIGNAGE-APPROVAL-IMPLEMENTATION-V1: draft → pending → active → archived
