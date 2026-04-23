@@ -1,12 +1,10 @@
 import type { DataSource, Repository } from 'typeorm';
-import { GeminiProvider } from '@o4o/ai-core';
-import type { AIProviderConfig } from '@o4o/ai-core';
-import { resolveAiApiKey } from '../../../utils/ai-key.util.js';
 import { PRODUCT_CONTENT_PROMPTS } from '@o4o/ai-prompts/store';
 import type { ProductContentInput } from '@o4o/ai-prompts/store';
 import { ProductAiContent } from '../entities/product-ai-content.entity.js';
 import type { ProductAiContentType } from '../entities/product-ai-content.entity.js';
-// AiModelSetting removed — WO-O4O-GLYCOPHARM-CARE-REMOVAL-V1
+import { createPolicyExecutor } from '../../ai-policy/ai-policy-factory.js';
+import type { AiPolicyExecutorService } from '../../ai-policy/ai-policy-executor.service.js';
 
 /**
  * ProductAiContentService — WO-O4O-PRODUCT-AI-CONTENT-PIPELINE-V1
@@ -16,13 +14,9 @@ import type { ProductAiContentType } from '../entities/product-ai-content.entity
  *
  * 핵심 원칙:
  * - fire-and-forget: 실패해도 상품 데이터에 영향 없음
- * - 1회 retry (2초 delay) — Store AI 패턴
- * - Gemini 3.0 Flash primary, 환경변수/DB에서 API key 조회
+ * - retry: AiPolicyExecutorService 정책 위임 (PRODUCT_CONTENT scope, fallback retryMax: 2)
  * - OCR 텍스트가 있으면 프롬프트에 포함하여 더 정확한 콘텐츠 생성
  */
-
-const RETRY_DELAY_MS = 2_000;
-const MAX_ATTEMPTS = 2;
 
 // Re-export ProductContentInput for backward compatibility
 export type { ProductContentInput } from '@o4o/ai-prompts/store';
@@ -33,11 +27,11 @@ interface LlmContentResponse {
 
 export class ProductAiContentService {
   private contentRepo: Repository<ProductAiContent>;
-  private gemini: GeminiProvider;
+  private aiPolicyExecutor: AiPolicyExecutorService;
 
   constructor(private dataSource: DataSource) {
     this.contentRepo = dataSource.getRepository(ProductAiContent);
-    this.gemini = new GeminiProvider();
+    this.aiPolicyExecutor = createPolicyExecutor(dataSource);
   }
 
   /**
@@ -48,12 +42,6 @@ export class ProductAiContentService {
     contentType: ProductAiContentType,
   ): Promise<ProductAiContent | null> {
     try {
-      const config = await this.buildProviderConfig();
-      if (!config.apiKey) {
-        console.warn('[ProductAiContent] No API key configured, skipping');
-        return null;
-      }
-
       const prompt = PRODUCT_CONTENT_PROMPTS[contentType];
       if (!prompt) {
         console.error(`[ProductAiContent] Unknown content type: ${contentType}`);
@@ -62,64 +50,44 @@ export class ProductAiContentService {
 
       const userPrompt = prompt.user(product);
 
-      let lastError: unknown = null;
-      for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-        try {
-          const response = await this.gemini.complete(prompt.system, userPrompt, config);
-          const parsed = JSON.parse(response.content) as LlmContentResponse;
+      // LLM 호출: AiPolicyExecutorService가 retry / key 해석 / usage logging 담당
+      const result = await this.aiPolicyExecutor.execute('PRODUCT_CONTENT', prompt.system, userPrompt);
 
-          if (!parsed.content || typeof parsed.content !== 'string') {
-            console.error('[ProductAiContent] Invalid LLM response: missing content', {
-              productId: product.id,
-              contentType,
-              raw: response.content.slice(0, 200),
-            });
-            return null;
-          }
-
-          // upsert: 같은 product + content_type이면 교체
-          const existing = await this.contentRepo.findOne({
-            where: { productId: product.id, contentType },
-          });
-
-          if (existing) {
-            existing.content = parsed.content;
-            existing.model = response.model;
-            return await this.contentRepo.save(existing);
-          }
-
-          const entity = this.contentRepo.create({
-            productId: product.id,
-            contentType,
-            content: parsed.content,
-            model: response.model,
-          });
-          return await this.contentRepo.save(entity);
-        } catch (err) {
-          lastError = err;
-          const msg = err instanceof Error ? err.message : String(err);
-
-          if (msg.includes('not configured') || msg.includes('INVALID_ARGUMENT')) {
-            console.error('[ProductAiContent] non-retryable error:', { productId: product.id, error: msg });
-            return null;
-          }
-
-          if (attempt < MAX_ATTEMPTS) {
-            console.warn(`[ProductAiContent] attempt ${attempt} failed, retrying in ${RETRY_DELAY_MS}ms:`, msg);
-            await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
-          }
-        }
+      const parsed = JSON.parse(result.content) as LlmContentResponse;
+      if (!parsed.content || typeof parsed.content !== 'string') {
+        console.error('[ProductAiContent] Invalid LLM response: missing content', {
+          productId: product.id,
+          contentType,
+          raw: result.content.slice(0, 200),
+        });
+        return null;
       }
 
-      const errMsg = lastError instanceof Error ? lastError.message : String(lastError);
-      console.error('[ProductAiContent] generation failed after all attempts:', {
+      // upsert: 같은 product + content_type이면 교체
+      const existing = await this.contentRepo.findOne({
+        where: { productId: product.id, contentType },
+      });
+
+      if (existing) {
+        existing.content = parsed.content;
+        existing.model = result.model;
+        return await this.contentRepo.save(existing);
+      }
+
+      const entity = this.contentRepo.create({
         productId: product.id,
         contentType,
-        lastError: errMsg,
+        content: parsed.content,
+        model: result.model,
       });
-      return null;
+      return await this.contentRepo.save(entity);
     } catch (error) {
-      console.error('[ProductAiContent] unexpected error:', error);
+      const msg = error instanceof Error ? error.message : String(error);
+      console.error('[ProductAiContent] generation failed:', {
+        productId: product.id,
+        contentType,
+        error: msg,
+      });
       return null;
     }
   }
@@ -170,11 +138,4 @@ export class ProductAiContentService {
     await this.contentRepo.delete({ id, productId });
   }
 
-  private async buildProviderConfig(): Promise<AIProviderConfig> {
-    const model = 'gemini-3.0-flash';
-    const temperature = 0.3;
-    const maxTokens = 2048;
-    const apiKey = await resolveAiApiKey(this.dataSource, 'gemini');
-    return { apiKey, model, temperature, maxTokens };
-  }
 }
