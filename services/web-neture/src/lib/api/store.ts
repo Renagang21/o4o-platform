@@ -119,7 +119,7 @@ export interface SupplierOrderKpi {
 export interface InventoryItem {
   offer_id: string;
   master_id: string;
-  marketing_name: string;
+  name: string;
   brand_name: string | null;
   barcode: string | null;
   specification: string | null;

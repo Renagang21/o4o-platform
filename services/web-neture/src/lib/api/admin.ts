@@ -268,7 +268,7 @@ export interface AdminMaster {
   barcode: string;
   regulatoryType: string;
   regulatoryName: string;
-  marketingName: string;
+  name: string;
   brandName: string | null;
   manufacturerName: string;
   mfdsPermitNumber: string | null;

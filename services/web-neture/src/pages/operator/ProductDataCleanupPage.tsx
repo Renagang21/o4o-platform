@@ -315,7 +315,7 @@ export default function ProductDataCleanupPage() {
                               className="w-4 h-4 rounded border-slate-300 text-emerald-600"
                             />
                           </td>
-                          <td className="px-4 py-3 text-sm text-slate-800">{item.marketingName}</td>
+                          <td className="px-4 py-3 text-sm text-slate-800">{item.name}</td>
                           <td className="px-4 py-3 text-sm font-mono text-slate-600">{item.barcode}</td>
                           <td className="px-4 py-3 text-sm text-slate-500">{item.regulatoryType}</td>
                           <td className="px-4 py-3 text-center text-sm text-slate-500">{item.offerCount}</td>
@@ -388,7 +388,7 @@ export default function ProductDataCleanupPage() {
                               className="w-4 h-4 rounded border-slate-300 text-emerald-600"
                             />
                           </td>
-                          <td className="px-4 py-3 text-sm text-slate-800">{item.marketingName}</td>
+                          <td className="px-4 py-3 text-sm text-slate-800">{item.name}</td>
                           <td className="px-4 py-3 text-sm font-mono text-slate-600">{item.barcode}</td>
                           <td className="px-4 py-3 text-sm text-slate-500">{item.brandName || '—'}</td>
                           <td className="px-4 py-3 text-center text-sm text-slate-500">{item.offerCount}</td>
@@ -433,7 +433,7 @@ export default function ProductDataCleanupPage() {
                 <tbody className="divide-y divide-slate-100">
                   {recycleBin.map((item) => (
                     <tr key={item.id} className="hover:bg-slate-50">
-                      <td className="px-4 py-3 text-sm text-slate-800">{item.marketing_name || '-'}</td>
+                      <td className="px-4 py-3 text-sm text-slate-800">{item.name || '-'}</td>
                       <td className="px-4 py-3 text-sm font-mono text-slate-600">{item.barcode}</td>
                       <td className="px-4 py-3 text-sm text-slate-600">{item.supplier_name || '-'}</td>
                       <td className="px-4 py-3 text-sm text-slate-500">{item.deleted_at ? new Date(item.deleted_at).toLocaleDateString('ko-KR') : '-'}</td>
@@ -443,7 +443,7 @@ export default function ProductDataCleanupPage() {
                         <div className="flex items-center justify-center gap-1">
                           <button
                             onClick={async () => {
-                              if (!confirm(`"${item.marketing_name}"을 복구하시겠습니까?`)) return;
+                              if (!confirm(`"${item.name}"을 복구하시겠습니까?`)) return;
                               const res = await productCleanupApi.restore(item.id);
                               if (res.success) { toast.success('복구 완료'); loadData('recycle-bin'); }
                               else toast.error(res.error || '복구 실패');
@@ -454,7 +454,7 @@ export default function ProductDataCleanupPage() {
                           </button>
                           <button
                             onClick={async () => {
-                              if (!confirm(`"${item.marketing_name}"을 완전 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
+                              if (!confirm(`"${item.name}"을 완전 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
                               const res = await productCleanupApi.hardDelete(item.id);
                               if (res.success) { toast.success('완전 삭제 완료'); loadData('recycle-bin'); }
                               else toast.error(res.blockReasons ? `삭제 불가: ${res.blockReasons.join(', ')}` : (res.error || '삭제 실패'));

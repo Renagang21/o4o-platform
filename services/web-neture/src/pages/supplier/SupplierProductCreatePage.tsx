@@ -255,7 +255,7 @@ export default function SupplierProductCreatePage() {
 
     const result = await supplierApi.createProduct({
       barcode: form.barcode.trim() || undefined,
-      marketingName: form.marketingName.trim(),
+      name: form.marketingName.trim(),
       categoryId: form.categoryId,
       brandName: form.brandName.trim() || undefined,
       distributionType: form.distributionType,

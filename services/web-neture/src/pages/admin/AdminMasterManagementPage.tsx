@@ -51,7 +51,7 @@ export default function AdminMasterManagementPage() {
 
   const handleEdit = (master: AdminMaster) => {
     setEditModal(master);
-    setEditName(master.marketingName || '');
+    setEditName(master.name || '');
     setEditBrand(master.brandName || '');
   };
 
@@ -59,7 +59,7 @@ export default function AdminMasterManagementPage() {
     if (!editModal) return;
     setEditSaving(true);
     const ok = await adminMasterApi.updateMaster(editModal.id, {
-      marketingName: editName,
+      name: editName,
       brandName: editBrand,
     });
     setEditSaving(false);
@@ -75,7 +75,7 @@ export default function AdminMasterManagementPage() {
     const ok = await adminMasterApi.resolveMaster({
       barcode: resolveBarcode.trim(),
       manualData: {
-        marketingName: resolveName || undefined,
+        name: resolveName || undefined,
         brandName: resolveBrand || undefined,
       },
     });
@@ -94,7 +94,7 @@ export default function AdminMasterManagementPage() {
     return (
       !term ||
       m.barcode.toLowerCase().includes(term) ||
-      (m.marketingName || '').toLowerCase().includes(term) ||
+      (m.name || '').toLowerCase().includes(term) ||
       (m.brandName || '').toLowerCase().includes(term)
     );
   });
@@ -142,7 +142,7 @@ export default function AdminMasterManagementPage() {
             <div className="mt-3 p-3 rounded-lg bg-slate-50">
               {barcodeResult ? (
                 <div className="text-sm">
-                  <p className="font-medium text-slate-800">{barcodeResult.marketingName || '(이름 없음)'}</p>
+                  <p className="font-medium text-slate-800">{barcodeResult.name || '(이름 없음)'}</p>
                   <p className="text-slate-500">{barcodeResult.brandName} · {barcodeResult.barcode}</p>
                 </div>
               ) : (
@@ -189,7 +189,7 @@ export default function AdminMasterManagementPage() {
                 <tr key={m.id} className="hover:bg-slate-50 transition-colors">
                   <td className="px-6 py-4 text-sm font-mono text-slate-700">{m.barcode}</td>
                   <td className="px-6 py-4">
-                    <p className="font-medium text-slate-800">{m.marketingName || '(이름 없음)'}</p>
+                    <p className="font-medium text-slate-800">{m.name || '(이름 없음)'}</p>
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-600">{m.brandName || '-'}</td>
                   <td className="px-6 py-4 text-sm text-slate-600">{m.category?.name || '-'}</td>

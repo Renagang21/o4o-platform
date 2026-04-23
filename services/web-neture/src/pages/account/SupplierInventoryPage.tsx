@@ -67,7 +67,7 @@ export default function SupplierInventoryPage() {
             : i
         )
       );
-      setMessage({ text: `${item.marketing_name} 재고 추적 ${!item.track_inventory ? '활성화' : '비활성화'}`, type: 'success' });
+      setMessage({ text: `${item.name} 재고 추적 ${!item.track_inventory ? '활성화' : '비활성화'}`, type: 'success' });
     } else {
       setMessage({ text: result.error || '업데이트 실패', type: 'error' });
     }
@@ -199,7 +199,7 @@ export default function SupplierInventoryPage() {
                   {/* Product Info */}
                   <div style={styles.itemInfo}>
                     <div style={styles.itemNameRow}>
-                      <h3 style={styles.itemName}>{item.marketing_name}</h3>
+                      <h3 style={styles.itemName}>{item.name}</h3>
                       <span
                         style={{
                           ...styles.statusBadge,

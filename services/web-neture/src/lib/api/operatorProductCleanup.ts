@@ -15,7 +15,7 @@ export interface DuplicateMaster {
 export interface MissingFieldItem {
   id: string;
   barcode: string;
-  marketingName: string;
+  name: string;
   manufacturerName: string;
   brandName: string | null;
   regulatoryType: string;
@@ -122,7 +122,7 @@ export interface RecycleBinItem {
   deleted_at: string;
   deleted_by: string | null;
   delete_reason: string | null;
-  marketing_name: string;
+  name: string;
   barcode: string;
   regulatory_type: string | null;
   supplier_name: string | null;

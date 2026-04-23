@@ -252,7 +252,7 @@ function InventoryAlerts({ items, loading }: { items: InventoryItem[]; loading: 
             >
               <div style={{ flex: 1, minWidth: 0 }}>
                 <p style={{ fontSize: '14px', fontWeight: 500, color: '#1e293b', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {item.marketing_name}
+                  {item.name}
                 </p>
                 {item.brand_name && (
                   <p style={{ fontSize: '12px', color: '#64748b', margin: '2px 0 0 0' }}>{item.brand_name}</p>

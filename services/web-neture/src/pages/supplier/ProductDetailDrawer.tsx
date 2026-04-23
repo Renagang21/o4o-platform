@@ -334,7 +334,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
     try {
       // 1. 기본 필드 + isPublic + Master 필드 업데이트
       const payload = {
-        marketingName: form.marketingName || undefined,
+        name: form.marketingName || undefined,
         priceGeneral: form.priceGeneral ?? undefined,
         priceGold: form.priceGold,
         consumerReferencePrice: form.consumerReferencePrice,

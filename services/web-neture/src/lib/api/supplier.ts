@@ -614,7 +614,7 @@ export const supplierApi = {
 
   async createProduct(data: {
     barcode?: string;
-    marketingName?: string;
+    name?: string;
     categoryId?: string;
     brandName?: string;
     distributionType?: string;
@@ -656,7 +656,7 @@ export const supplierApi = {
       businessShortDescription?: string | null;
       businessDetailDescription?: string | null;
       stockQuantity?: number;
-      marketingName?: string;
+      name?: string;
       // WO-NETURE-PRODUCT-FIELD-GAP-FIX-V1: Master-level fields
       categoryId?: string | null;
       brandId?: string | null;
