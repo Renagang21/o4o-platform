@@ -3,6 +3,7 @@ import { BaseController } from '../../../common/base.controller.js';
 import { EnrollmentService } from '../services/EnrollmentService.js';
 import { AppDataSource } from '../../../database/connection.js';
 import logger from '../../../utils/logger.js';
+import { CompletionService } from '../services/CompletionService.js';
 
 /**
  * EnrollmentController
@@ -226,15 +227,42 @@ export class EnrollmentController extends BaseController {
             .andWhere('lesson.isPublished = :isPublished', { isPublished: true })
             .getCount();
           const totalLessons = currentTotalLessons || enrollment.totalLessons || 1;
+          const completedLessons = completedIds.length;
+          // WO-LMS-PROGRESS-COMPLETION-AUTO-CHAIN-V1: progressPercentage 자동 계산
+          const progressPercentage = totalLessons > 0
+            ? Math.floor((completedLessons / totalLessons) * 100)
+            : 0;
           await service.updateEnrollment(enrollment.id, {
-            completedLessons: completedIds.length,
+            completedLessons,
             totalLessons,
+            progressPercentage,
           });
           // Save metadata separately via repo.update
           const repo = (service as any).enrollmentRepository;
           await repo.update(enrollment.id, {
             metadata: { ...enrollment.metadata, completedLessonIds: completedIds },
           });
+
+          // WO-LMS-PROGRESS-COMPLETION-AUTO-CHAIN-V1: 마지막 레슨 완료 시 자동 수료 체인
+          if (completedLessons >= totalLessons && enrollment.status !== 'completed') {
+            try {
+              const completedEnrollment = await service.completeEnrollment(enrollment.id);
+              const completionService = CompletionService.getInstance();
+              await completionService.createCompletion(
+                userId,
+                courseId,
+                completedEnrollment.id,
+              );
+              logger.info('[LMS] Auto-completion chain triggered', { userId, courseId });
+            } catch (chainErr) {
+              // 체인 실패는 진도 저장을 롤백하지 않음 — 로그만 기록
+              logger.warn('[LMS] Auto-completion chain error', {
+                error: (chainErr as Error).message,
+                userId,
+                courseId,
+              });
+            }
+          }
         }
       }
 

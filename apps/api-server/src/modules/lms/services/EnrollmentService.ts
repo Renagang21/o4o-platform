@@ -3,6 +3,7 @@ import { AppDataSource } from '../../../database/connection.js';
 import { BaseService } from '../../../common/base.service.js';
 import { Enrollment, EnrollmentStatus } from '@o4o/lms-core';
 import { CourseService } from './CourseService.js';
+import { CompletionService } from './CompletionService.js';
 import { sanitizeUserFields } from '../utils/sanitize-user.js';
 import logger from '../../../utils/logger.js';
 
@@ -261,10 +262,31 @@ export class EnrollmentService extends BaseService<Enrollment> {
       throw new Error(`Enrollment not found: ${id}`);
     }
 
+    // idempotent: 이미 completed면 재처리 없이 반환
+    if (enrollment.status === EnrollmentStatus.COMPLETED) {
+      return enrollment;
+    }
+
     enrollment.complete(finalScore);
     const updated = await this.enrollmentRepository.save(enrollment);
 
     logger.info(`[LMS] Enrollment completed`, { id: updated.id, finalScore });
+
+    // WO-LMS-PROGRESS-COMPLETION-AUTO-CHAIN-V1: CompletionService → 인증서 자동 발급
+    try {
+      const completionService = CompletionService.getInstance();
+      await completionService.createCompletion(
+        updated.userId,
+        updated.courseId,
+        updated.id,
+      );
+    } catch (chainErr) {
+      // 수료/인증서 실패는 완료 상태 롤백 없이 로그만 기록
+      logger.warn('[LMS] Completion chain error after completeEnrollment', {
+        enrollmentId: id,
+        error: (chainErr as Error).message,
+      });
+    }
 
     return updated;
   }
