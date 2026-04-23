@@ -132,7 +132,8 @@ const ReportsPage = lazy(() => import('@/pages/operator/ReportsPage'));
 const BillingPreviewPage = lazy(() => import('@/pages/operator/BillingPreviewPage'));
 const InvoicesPage = lazy(() => import('@/pages/operator/InvoicesPage'));
 // Hub Exploration (WO-O4O-HUB-EXPLORATION-CORE-V1 / WO-O4O-GLYCOPHARM-KPA-STYLE-UX-REFINE-P1-V1)
-const GlycoPharmHubPage = lazy(() => import('@/pages/hub/GlycoPharmHubPage').then(m => ({ default: m.GlycoPharmHubPage })));
+// WO-O4O-GLYCOPHARM-STORE-HUB-PORT-V1: index → StoreHubTemplate 기반 페이지로 교체
+const GlycoStoreHubPage = lazy(() => import('@/pages/hub/StoreHubPage').then(m => ({ default: m.StoreHubPage })));
 const HubB2BCatalogPage = lazy(() => import('@/pages/hub/HubB2BCatalogPage').then(m => ({ default: m.HubB2BCatalogPage })));
 const HubContentListPage = lazy(() => import('@/pages/hub/HubContentListPage').then(m => ({ default: m.HubContentListPage })));
 import { GlycoPharmHubLayout } from '@/components/layouts/GlycoPharmHubLayout';
@@ -370,7 +371,7 @@ function AppRoutes() {
         <Route path="hub" element={<Navigate to="/store-hub" replace />} />
         <Route path="hub/*" element={<Navigate to="/store-hub" replace />} />
         <Route path="store-hub" element={<GlycoPharmHubLayout />}>
-          <Route index element={<GlycoPharmHubPage />} />
+          <Route index element={<GlycoStoreHubPage />} />
           <Route path="b2b" element={<HubB2BCatalogPage />} />
           <Route path="content" element={<HubContentListPage />} />
         </Route>

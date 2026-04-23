@@ -1,39 +1,49 @@
 /**
- * GlycoPharmHubLayout — Hub 탐색 레이아웃
+ * GlycoPharmHubLayout — 매장 운영 허브 탐색 레이아웃
  *
- * WO-O4O-GLYCOPHARM-KPA-STYLE-UX-REFINE-P1-V1
+ * WO-O4O-GLYCOPHARM-STORE-HUB-PORT-V1
  *
- * KPA PharmacyHubLayout 패턴 참고:
- * - 좌측 고정 사이드바 (메뉴 4개)
+ * KPA PharmacyHubLayout 패턴:
+ * - 좌측 고정 사이드바 (홈 + 메뉴 4개)
  * - 우측 Outlet (메뉴별 페이지)
  * - NavLink 활성 상태 표시기
  */
 
 import { NavLink, Outlet } from 'react-router-dom';
-import { ShoppingCart, Monitor, FileText, Megaphone } from 'lucide-react';
+import { Home, ShoppingCart, Monitor, FileText, Megaphone } from 'lucide-react';
 
 const HUB_MENU = [
+  {
+    key: 'home',
+    label: '홈',
+    desc: '자원 탐색 허브 · 운영 흐름 안내',
+    icon: Home,
+    to: '/store-hub',
+    end: true,
+  },
   {
     key: 'b2b',
     label: 'B2B 상품',
     desc: '공급사 상품을 탐색하고 약국에 신청합니다',
     icon: ShoppingCart,
-    to: '/hub/b2b',
+    to: '/store-hub/b2b',
+    end: false,
   },
   {
     key: 'signage',
     label: '사이니지',
     desc: '매장 디스플레이에 활용할 미디어를 탐색합니다',
     icon: Monitor,
-    to: '/store/signage',
-    external: true,
+    to: '/store-hub/signage',
+    end: false,
   },
   {
     key: 'content',
     label: '콘텐츠',
     desc: '플랫폼 콘텐츠를 탐색하고 내 매장에 적용합니다',
     icon: FileText,
-    to: '/hub/content',
+    to: '/store-hub/content',
+    end: false,
   },
   {
     key: 'campaign',
@@ -41,6 +51,7 @@ const HUB_MENU = [
     desc: '플랫폼 캠페인에 참여합니다',
     icon: Megaphone,
     to: '#',
+    end: false,
     badge: '준비중',
   },
 ];
@@ -53,7 +64,7 @@ export function GlycoPharmHubLayout() {
           {/* ── 좌측 사이드바 ── */}
           <aside className="w-52 shrink-0 bg-white border border-slate-200 rounded-xl overflow-hidden sticky top-20">
             <div className="px-4 py-4 border-b border-slate-100">
-              <h2 className="text-sm font-bold text-slate-800">약국 HUB</h2>
+              <h2 className="text-sm font-bold text-slate-800">매장 운영 허브</h2>
               <p className="text-xs text-slate-400 mt-0.5">플랫폼 자원을 탐색하고 내 매장에 가져갑니다</p>
             </div>
 
@@ -80,26 +91,11 @@ export function GlycoPharmHubLayout() {
                   );
                 }
 
-                if (item.external) {
-                  return (
-                    <NavLink
-                      key={item.key}
-                      to={item.to}
-                      className="flex items-start gap-3 px-4 py-3 hover:bg-slate-50 transition-colors group"
-                    >
-                      <Icon className="w-4 h-4 text-slate-400 mt-0.5 shrink-0 group-hover:text-teal-600" />
-                      <div className="flex-1 min-w-0">
-                        <span className="text-sm text-slate-700 group-hover:text-teal-700">{item.label}</span>
-                        <p className="text-xs text-slate-400 mt-0.5 line-clamp-2">{item.desc}</p>
-                      </div>
-                    </NavLink>
-                  );
-                }
-
                 return (
                   <NavLink
                     key={item.key}
                     to={item.to}
+                    end={item.end}
                     className={({ isActive }) =>
                       `flex items-start gap-3 px-4 py-3 transition-colors relative ${
                         isActive
@@ -131,7 +127,7 @@ export function GlycoPharmHubLayout() {
 
             <div className="px-4 py-3 border-t border-slate-100">
               <p className="text-[11px] text-slate-400 leading-relaxed">
-                선택한 콘텐츠·상품·서비스는 내 매장관리에서 관리할 수 있습니다.
+                탐색한 자원은 내 약국 (/store)에서 설정·운영합니다.
               </p>
             </div>
           </aside>
