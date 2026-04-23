@@ -10,7 +10,7 @@ export type QualificationType = 'lms_creator';
 export type QualificationStatus = 'pending' | 'approved' | 'rejected';
 
 export const QUALIFICATION_TYPE_LABELS: Record<QualificationType, string> = {
-  lms_creator: 'LMS 제작자',
+  lms_creator: '강사 신청',
 };
 
 /**

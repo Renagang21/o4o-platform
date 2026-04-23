@@ -169,7 +169,7 @@ export default function QualificationRequestsPage() {
     },
     {
       key: 'qualification_type',
-      header: '자격 유형',
+      header: '신청 유형',
       render: (value) => <span className="text-sm text-slate-700">{getQualificationLabel(value)}</span>,
     },
     {
@@ -263,7 +263,7 @@ export default function QualificationRequestsPage() {
             <h2 style={styles.modalTitle}>자격 신청 검토</h2>
 
             <div style={styles.detailRow}>
-              <span style={styles.detailLabel}>자격 유형</span>
+              <span style={styles.detailLabel}>신청 유형</span>
               <span>{getQualificationLabel(selectedRequest.qualification_type)}</span>
             </div>
             <div style={styles.detailRow}>
