@@ -33,10 +33,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '상품 신청 관리', path: '/operator/product-applications' },
     { label: '자격 신청 관리', path: '/operator/qualification-requests' },
   ],
-  stores: [
-    { label: '매장 관리', path: '/operator/stores' },
-    { label: '채널 관리', path: '/operator/store-channels' },
-  ],
+  // WO-KPA-OPERATOR-STORES-MENU-HIDE-V1: stores 메뉴 노출 제거
+  // stores: [ ... ] — 라우트/페이지/API/DB는 유지
   content: [
     { label: '공지사항', path: '/operator/news' },
     { label: 'Home 편집', path: '/operator/community' },
@@ -100,10 +98,7 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: '상품 신청 관리', path: '/operator/product-applications' },
     { label: '자격 신청 관리', path: '/operator/qualification-requests' },
   ],
-  stores: [
-    { label: '매장 관리', path: '/operator/stores' },
-    { label: '채널 관리', path: '/operator/store-channels' },
-  ],
+  // WO-KPA-OPERATOR-STORES-MENU-HIDE-V1: stores 메뉴 노출 제거
   content: [
     { label: '공지사항', path: '/operator/news' },
     { label: 'Home 편집', path: '/operator/community' },

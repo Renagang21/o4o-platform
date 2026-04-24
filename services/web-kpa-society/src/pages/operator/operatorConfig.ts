@@ -43,7 +43,7 @@ export function buildKpaOperatorConfig(
   data: KpaExtendedData,
   isAdmin: boolean,
 ): OperatorDashboardConfig {
-  const { summary, pendingMembers, totalMembers, serviceApplicationCount, pharmacyRequestCount, storeStats, productApplicationPendingCount } = data;
+  const { summary, pendingMembers, totalMembers, serviceApplicationCount, pharmacyRequestCount, productApplicationPendingCount } = data;
 
   if (!summary) {
     return { kpis: [], actionQueue: [], activityLog: [], quickActions: [] };
@@ -98,13 +98,7 @@ export function buildKpaOperatorConfig(
       status: productApplicationPendingCount > 0 ? 'warning' : 'neutral',
       link: '/operator/product-applications',
     },
-    ...(storeStats ? [{
-      key: 'stores',
-      label: '매장 현황',
-      value: `${storeStats.activeStores}/${storeStats.totalStores}`,
-      status: 'neutral' as const,
-      link: '/operator/stores',
-    }] : []),
+    // WO-KPA-OPERATOR-STORES-MENU-HIDE-V1: 매장 현황 KPI 카드 제거 (stores 메뉴 숨김과 일관성)
     ...(isAdmin ? [
       {
         key: 'total-members',
@@ -316,7 +310,7 @@ export function buildKpaOperatorConfig(
     { id: 'qa-news', label: '공지사항', link: '/operator/news', icon: '📢' },
     { id: 'qa-forum', label: '포럼 관리', link: '/operator/forum-management', icon: '💬' },
     { id: 'qa-signage', label: '사이니지', link: '/operator/signage/content', icon: '🖥️' },
-    { id: 'qa-stores', label: '매장 관리', link: '/operator/stores', icon: '🏪' },
+    // WO-KPA-OPERATOR-STORES-MENU-HIDE-V1: 매장 관리 quick action 제거
     // Admin 추가 4개
     ...(isAdmin ? [
       { id: 'qa-community', label: 'Home 편집', link: '/operator/community', icon: '🏠' },
