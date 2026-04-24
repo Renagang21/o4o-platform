@@ -29,9 +29,7 @@ import { DataTable, RowActionMenu, ConfirmActionDialog } from '@o4o/ui';
 import type { Column } from '@o4o/ui';
 import { MemberListLayout, StatusBadge, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
 import type { MemberTab } from '@o4o/operator-ux-core';
-import { getAccessToken } from '../../contexts/AuthContext';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+import { apiClient } from '../../api/client';
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -81,23 +79,6 @@ interface ApplicationStats {
 }
 
 // ─── Helpers ─────────────────────────────────────────────────
-
-async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
-  const token = getAccessToken();
-  const res = await fetch(`${API_BASE_URL}${path}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...options?.headers,
-    },
-  });
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new Error(body?.error?.message || `API error ${res.status}`);
-  }
-  return res.json();
-}
 
 const roleLabels: Record<MemberRole, string> = {
   member: '회원',
@@ -226,10 +207,7 @@ function EditMemberModal({
   const handleSave = async () => {
     setSaving(true);
     try {
-      await apiFetch(`/api/v1/kpa/members/${member.id}/info`, {
-        method: 'PATCH',
-        body: JSON.stringify(form),
-      });
+      await apiClient.patch(`/members/${member.id}/info`, form);
       toast.success('회원 정보가 수정되었습니다.');
       onSaved();
       onClose();
@@ -310,7 +288,7 @@ function DeleteRiskModal({
   const [confirmMode, setConfirmMode] = useState<'soft' | 'hard' | null>(null);
 
   useEffect(() => {
-    apiFetch<{ data: DeleteRiskData }>(`/api/v1/kpa/members/${memberId}/delete-risk`)
+    apiClient.get<{ data: DeleteRiskData }>(`/members/${memberId}/delete-risk`)
       .then(r => setData(r.data))
       .catch(e => toast.error(e.message))
       .finally(() => setLoading(false));
@@ -320,7 +298,7 @@ function DeleteRiskModal({
     if (!confirmMode) return;
     setDeleting(true);
     try {
-      await apiFetch(`/api/v1/kpa/members/${memberId}?mode=${confirmMode}`, { method: 'DELETE' });
+      await apiClient.delete(`/members/${memberId}?mode=${confirmMode}`);
       toast.success(confirmMode === 'soft' ? '탈퇴 처리 완료' : '완전 삭제 완료');
       onDeleted();
       onClose();
@@ -445,7 +423,7 @@ export default function MemberManagementPage() {
 
   // Stats fetch (application stats only — member counts are fetched in fetchMembers)
   useEffect(() => {
-    apiFetch<{ data: ApplicationStats }>('/api/v1/kpa/applications/admin/stats')
+    apiClient.get<{ data: ApplicationStats }>('/applications/admin/stats')
       .then(r => setStats(r.data))
       .catch(() => {});
   }, []);
@@ -455,19 +433,19 @@ export default function MemberManagementPage() {
     setMemberLoading(true);
     setMemberError(null);
     try {
-      const params = new URLSearchParams({ page: String(page), limit: '20' });
-      if (searchQuery) params.set('search', searchQuery);
+      const reqParams: Record<string, string | number | boolean | undefined> = { page, limit: 20 };
+      if (searchQuery) reqParams.search = searchQuery;
       // 상태 기반 탭이면 서버사이드 필터
       const statusFilter = STATUS_TAB_FILTER[activeTab] || '';
-      if (statusFilter) params.set('status', statusFilter);
-      const res = await apiFetch<{ data: KpaMember[]; total: number; totalPages: number }>(
-        `/api/v1/kpa/members?${params}`,
+      if (statusFilter) reqParams.status = statusFilter;
+      const res = await apiClient.get<{ data: KpaMember[]; total: number; totalPages: number }>(
+        '/members', reqParams,
       );
       setMembers(res.data);
       setMemberTotal(res.total);
 
       // Count by membership_type + status (한 번만 조회)
-      const allRes = await apiFetch<{ data: KpaMember[]; total: number }>('/api/v1/kpa/members?limit=1000');
+      const allRes = await apiClient.get<{ data: KpaMember[]; total: number }>('/members', { limit: 1000 });
       const all = allRes.data || [];
       setPharmacistCount(all.filter(m => m.membership_type === 'pharmacist').length);
       setStudentCount(all.filter(m => m.membership_type === 'student').length);
@@ -491,10 +469,7 @@ export default function MemberManagementPage() {
   async function handleStatusChange(memberId: string, newStatus: MemberStatus) {
     setActionLoading(memberId);
     try {
-      await apiFetch(`/api/v1/kpa/members/${memberId}/status`, {
-        method: 'PATCH',
-        body: JSON.stringify({ status: newStatus }),
-      });
+      await apiClient.patch(`/members/${memberId}/status`, { status: newStatus });
       await fetchMembers(memberPage);
     } catch (e: any) {
       toast.error(e.message || '상태 변경에 실패했습니다.');
@@ -669,7 +644,7 @@ export default function MemberManagementPage() {
       >
         {activeTab === 'applications' ? (
           <ApplicationsTab onReviewComplete={() => {
-            apiFetch<{ data: ApplicationStats }>('/api/v1/kpa/applications/admin/stats')
+            apiClient.get<{ data: ApplicationStats }>('/applications/admin/stats')
               .then(r => setStats(r.data))
               .catch(() => {});
           }} />
@@ -736,10 +711,10 @@ function ApplicationsTab({ onReviewComplete }: { onReviewComplete: () => void })
     setLoading(true);
     setError(null);
     try {
-      const params = new URLSearchParams({ page: String(page), limit: '20' });
-      if (statusFilter) params.set('status', statusFilter);
-      const res = await apiFetch<{ data: KpaApplication[]; total: number; totalPages: number }>(
-        `/api/v1/kpa/applications/admin/all?${params}`,
+      const reqParams: Record<string, string | number | boolean | undefined> = { page, limit: 20 };
+      if (statusFilter) reqParams.status = statusFilter;
+      const res = await apiClient.get<{ data: KpaApplication[]; total: number; totalPages: number }>(
+        '/applications/admin/all', reqParams,
       );
       setApps(res.data);
       setTotalPages(res.totalPages);
@@ -760,9 +735,8 @@ function ApplicationsTab({ onReviewComplete }: { onReviewComplete: () => void })
     if (!pendingReview) return;
     setActionLoading(pendingReview.id);
     try {
-      await apiFetch(`/api/v1/kpa/applications/${pendingReview.id}/review`, {
-        method: 'PATCH',
-        body: JSON.stringify({ status: pendingReview.status, review_comment: reviewComment || undefined }),
+      await apiClient.patch(`/applications/${pendingReview.id}/review`, {
+        status: pendingReview.status, review_comment: reviewComment || undefined,
       });
       setReviewTarget(null);
       setReviewComment('');

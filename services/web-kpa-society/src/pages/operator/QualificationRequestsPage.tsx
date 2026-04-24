@@ -5,9 +5,9 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { FileCheck } from 'lucide-react';
-import { RowActionMenu } from '@o4o/ui';
-import { DataTable, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
+import { FileCheck, Trash2 } from 'lucide-react';
+import { RowActionMenu, ActionBar } from '@o4o/ui';
+import { DataTable, defineActionPolicy, buildRowActions, useBatchAction } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import {
   qualificationApi,
@@ -90,12 +90,18 @@ const qualificationActionPolicy = defineActionPolicy<QualificationRequest>('kpa:
       label: '상세보기',
       visible: (row: QualificationRequest) => row.status !== 'pending',
     },
+    {
+      key: 'delete',
+      label: '삭제',
+      visible: () => true,
+    },
   ],
 });
 
 const QUALIFICATION_ACTION_ICONS: Record<string, React.ReactNode> = {
   review: <FileCheck className="w-4 h-4" />,
   detail: <FileCheck className="w-4 h-4" />,
+  delete: <Trash2 className="w-4 h-4" />,
 };
 
 export default function QualificationRequestsPage() {
@@ -113,6 +119,7 @@ export default function QualificationRequestsPage() {
   const [reviewing, setReviewing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const batch = useBatchAction();
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -158,6 +165,34 @@ export default function QualificationRequestsPage() {
       setReviewing(false);
     }
   };
+
+  const handleDelete = useCallback(async (id: string) => {
+    if (!window.confirm('이 신청 이력을 삭제하시겠습니까?\n승인된 자격 및 역할은 유지됩니다.')) return;
+    setError(null);
+    try {
+      await qualificationApi.deleteRequest(id);
+      setSuccess('삭제되었습니다.');
+      setSelectedIds(prev => { const next = new Set(prev); next.delete(id); return next; });
+      await load();
+    } catch (err: any) {
+      setError(err?.response?.data?.error || '삭제에 실패했습니다.');
+    }
+  }, [load]);
+
+  const handleBulkDelete = useCallback(async () => {
+    if (selectedIds.size === 0) return;
+    if (!window.confirm(`선택한 ${selectedIds.size}건의 신청 이력을 삭제하시겠습니까?\n승인된 자격 및 역할은 유지됩니다.`)) return;
+    const ids = [...selectedIds];
+    const result = await batch.executeBatch(
+      (batchIds) => qualificationApi.batchDeleteRequests(batchIds),
+      ids,
+    );
+    if (result) {
+      setSelectedIds(new Set());
+      setSuccess(`${ids.length}건 삭제가 완료되었습니다.`);
+      await load();
+    }
+  }, [selectedIds, batch, load]);
 
   const columns: ListColumnDef<QualificationRequest>[] = [
     {
@@ -227,6 +262,7 @@ export default function QualificationRequestsPage() {
           actions={buildRowActions(qualificationActionPolicy, row, {
             review: () => { setSelectedRequest(row); setReviewNote(''); setSuccess(null); },
             detail: () => { setSelectedRequest(row); setReviewNote(''); setSuccess(null); },
+            delete: () => handleDelete(row.id),
           }, { icons: QUALIFICATION_ACTION_ICONS })}
         />
       ),
@@ -256,6 +292,24 @@ export default function QualificationRequestsPage() {
         </select>
         <span style={styles.totalBadge}>총 {total}건</span>
       </div>
+
+      <ActionBar
+        selectedCount={selectedIds.size}
+        onClearSelection={() => setSelectedIds(new Set())}
+        actions={[
+          {
+            key: 'bulk-delete',
+            label: `선택 삭제 (${selectedIds.size})`,
+            onClick: handleBulkDelete,
+            variant: 'danger' as const,
+            icon: <Trash2 size={14} />,
+            loading: batch.loading,
+            group: 'danger',
+            tooltip: '선택된 신청 이력을 삭제합니다. 승인된 자격 및 역할은 유지됩니다.',
+            visible: selectedIds.size > 0,
+          },
+        ]}
+      />
 
       <DataTable<QualificationRequest>
         columns={columns}

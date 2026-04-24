@@ -202,6 +202,69 @@ export function createQualificationController(
   );
 
   /**
+   * DELETE /qualifications/requests/:id
+   * 신청 이력 삭제 (operator 전용)
+   * qualification_requests record만 삭제. 부여된 role/qualification 결과는 보존.
+   * WO-KPA-OPERATOR-QUALIFICATION-REQUEST-BULK-DELETE-V1
+   */
+  router.delete(
+    '/requests/:id',
+    requireAuth,
+    requireScope('kpa:operator'),
+    [param('id').isUUID(), handleValidationErrors],
+    async (req: AuthRequest, res: Response): Promise<void> => {
+      try {
+        const existing = await reqRepo.findOne({ where: { id: req.params.id } });
+        if (!existing) {
+          res.status(404).json({ success: false, error: '신청 이력을 찾을 수 없습니다.', code: 'NOT_FOUND' });
+          return;
+        }
+        await reqRepo.delete({ id: req.params.id });
+        res.json({ success: true, data: { id: req.params.id, deleted: true } });
+      } catch (error: any) {
+        console.error('[Qualification] delete request failed:', error);
+        res.status(500).json({ success: false, error: 'Failed to delete request' });
+      }
+    },
+  );
+
+  /**
+   * POST /qualifications/requests/batch-delete
+   * 일괄 삭제 (operator 전용, 최대 50건)
+   * WO-KPA-OPERATOR-QUALIFICATION-REQUEST-BULK-DELETE-V1
+   */
+  router.post(
+    '/requests/batch-delete',
+    requireAuth,
+    requireScope('kpa:operator'),
+    [
+      body('ids').isArray({ min: 1, max: 50 }),
+      body('ids.*').isUUID(),
+      handleValidationErrors,
+    ],
+    async (req: AuthRequest, res: Response): Promise<void> => {
+      const { ids } = req.body as { ids: string[] };
+      const results: Array<{ id: string; status: 'success' | 'skipped' | 'failed'; error?: string }> = [];
+
+      for (const id of ids) {
+        try {
+          const existing = await reqRepo.findOne({ where: { id } });
+          if (!existing) {
+            results.push({ id, status: 'skipped', error: 'Not found' });
+            continue;
+          }
+          await reqRepo.delete({ id });
+          results.push({ id, status: 'success' });
+        } catch (err: any) {
+          results.push({ id, status: 'failed', error: err.message || 'Unknown error' });
+        }
+      }
+
+      res.json({ success: true, data: { results } });
+    },
+  );
+
+  /**
    * PATCH /qualifications/requests/:id
    * 승인 / 거절 (operator 전용)
    */

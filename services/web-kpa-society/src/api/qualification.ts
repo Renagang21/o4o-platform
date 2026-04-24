@@ -101,4 +101,17 @@ export const qualificationApi = {
       `/kpa/qualifications/requests/${id}`,
       payload,
     ),
+
+  /** 이력 삭제 (operator) — WO-KPA-OPERATOR-QUALIFICATION-REQUEST-BULK-DELETE-V1 */
+  deleteRequest: (id: string) =>
+    authClient.api.delete<{ success: boolean; data: { id: string; deleted: boolean } }>(
+      `/kpa/qualifications/requests/${id}`,
+    ),
+
+  /** 일괄 삭제 (operator, 최대 50건) — WO-KPA-OPERATOR-QUALIFICATION-REQUEST-BULK-DELETE-V1 */
+  batchDeleteRequests: (ids: string[]) =>
+    authClient.api.post<{
+      success: boolean;
+      data: { results: Array<{ id: string; status: 'success' | 'skipped' | 'failed'; error?: string }> };
+    }>('/kpa/qualifications/requests/batch-delete', { ids }),
 };
