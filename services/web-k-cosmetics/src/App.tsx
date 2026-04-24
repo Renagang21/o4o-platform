@@ -3,9 +3,9 @@
  * Based on GlycoPharm App structure
  */
 
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import { AuthProvider, useAuth, getKCosmeticsDashboardRoute } from '@/contexts/AuthContext';
+import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { LoginModalProvider } from '@/contexts/LoginModalContext';
 import LoginModal from '@/components/common/LoginModal';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
@@ -149,26 +149,9 @@ function PageLoading() {
  */
 const ProtectedRoute = RoleGuard;
 
-/**
- * RoleBasedHome - WO-K-COSMETICS-ROLE-BASED-LANDING-V1
- * / 접근 시 역할 기반 자동 리다이렉트
- * operator → /operator, partner → /partner, 기타 → / (HomePage 유지)
- */
-function RoleBasedHome() {
-  const { user } = useAuth();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (user?.roles[0]) {
-      const target = getKCosmeticsDashboardRoute(user.roles);
-      if (target && target !== '/') {
-        navigate(target, { replace: true });
-      }
-    }
-  }, [user, navigate]);
-
-  return <HomePage />;
-}
+// WO-K-COSMETICS-ROLEBASED-HOME-REMOVAL-V1:
+// RoleBasedHome 제거 — "/" 는 항상 사이트 홈 (역할 기반 자동 redirect 없음)
+// 역할별 대시보드 이동은 Header 사용자 드롭다운 "대시보드" 링크로만 제공 (KCosGlobalHeader.tsx)
 
 /** Store Dashboard Layout Wrapper - connects auth context to shared layout */
 function StoreLayoutWrapper() {
@@ -197,8 +180,7 @@ function AppRoutes() {
     <Routes>
       {/* Public Routes with MainLayout */}
       <Route element={<MainLayout />}>
-        {/* WO-K-COSMETICS-ROLE-BASED-LANDING-V1: 역할 기반 자동 리다이렉트 */}
-        <Route index element={<RoleBasedHome />} />
+        <Route index element={<HomePage />} />
         <Route path="handoff" element={<HandoffPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
