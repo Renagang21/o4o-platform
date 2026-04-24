@@ -155,7 +155,11 @@ export function createUserDebugRouter(dataSource: DataSource): Router {
       // 6. HTML 렌더링
       const body = `
         <h1>User Debug — ${esc(email)}</h1>
-        <div class="nav"><a href="/__debug__/user">&larr; Back to Search</a></div>
+        <div class="nav">
+          <a href="/__debug__/user">&larr; Back to Search</a> |
+          <a href="/__debug__/user/sync-role?email=${encodeURIComponent(email)}" style="color:#00ff88">Sync Roles from Memberships</a> |
+          <a href="/__debug__/user/missing-roles?service=neture">Missing Roles (Neture)</a>
+        </div>
 
         <h2>Summary</h2>
         <div class="card">
@@ -296,6 +300,157 @@ export function createUserDebugRouter(dataSource: DataSource): Router {
         <h1 class="err">Activate Failed</h1>
         <div class="card"><pre>${esc(error.message)}</pre></div>
         <a href="/__debug__/user?email=${encodeURIComponent(email)}">&larr; Back</a>
+      `));
+    }
+  });
+
+  // ── Sync Role: service_memberships → role_assignments 보정 ──
+  // GET /__debug__/user/sync-role?email=xxx
+  // 활성화된 service_memberships.role을 role_assignments에 반영 (없으면 생성)
+  router.get('/sync-role', async (req: Request, res: Response): Promise<void> => {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+
+    if (!dataSource.isInitialized) {
+      res.status(503).send(page('DB Error', '<h1>Database not initialized</h1>'));
+      return;
+    }
+
+    const email = (req.query.email as string)?.trim() || '';
+    if (!email) {
+      res.status(400).send(page('Error', '<h1 class="err">email required</h1>'));
+      return;
+    }
+
+    try {
+      const users = await dataSource.query(
+        `SELECT id, email, status FROM users WHERE email = $1 LIMIT 1`,
+        [email],
+      );
+      if (!users[0]) {
+        res.send(page('Not Found', `<h1 class="err">User not found: ${esc(email)}</h1><a href="/__debug__/user">&larr; Back</a>`));
+        return;
+      }
+
+      const userId = users[0].id;
+
+      // Before: 현재 role_assignments
+      const beforeRoles = await dataSource.query(
+        `SELECT role, is_active FROM role_assignments WHERE user_id = $1 ORDER BY role`,
+        [userId],
+      );
+
+      // Active memberships with non-null roles
+      const memberships = await dataSource.query(
+        `SELECT service_key, role, status FROM service_memberships WHERE user_id = $1 AND status = 'active' AND role IS NOT NULL AND role != ''`,
+        [userId],
+      );
+
+      // Insert missing role_assignments (idempotent)
+      const inserted: string[] = [];
+      for (const m of memberships) {
+        const result = await dataSource.query(
+          `INSERT INTO role_assignments (user_id, role, assigned_by, is_active, valid_from, created_at, updated_at)
+           VALUES ($1, $2, 'debug-sync', true, NOW(), NOW(), NOW())
+           ON CONFLICT ON CONSTRAINT "unique_active_role_per_user" DO UPDATE SET updated_at = NOW()
+           RETURNING role`,
+          [userId, m.role],
+        );
+        if (result?.length) {
+          inserted.push(`${m.role} (from ${m.service_key})`);
+        }
+      }
+
+      // After: 갱신된 role_assignments
+      const afterRoles = await dataSource.query(
+        `SELECT role, is_active FROM role_assignments WHERE user_id = $1 ORDER BY role`,
+        [userId],
+      );
+
+      res.send(page('Sync Role', `
+        <h1>Role Sync — ${esc(email)}</h1>
+        <div class="card">
+          <table>
+            <tr><th>항목</th><th>값</th></tr>
+            <tr><td>User ID</td><td>${esc(userId)}</td></tr>
+            <tr><td>Active Memberships (source)</td><td>${memberships.map((m: any) => `${esc(m.service_key)}:${esc(m.role)}`).join(', ') || 'none'}</td></tr>
+            <tr><td>Processed</td><td class="ok">${inserted.length} role(s)</td></tr>
+          </table>
+        </div>
+        <h2>Before Role Assignments (${beforeRoles.length})</h2>
+        <div class="card">${tableHtml(beforeRoles)}</div>
+        <h2>After Role Assignments (${afterRoles.length})</h2>
+        <div class="card">${tableHtml(afterRoles)}</div>
+        <div class="nav">
+          <a href="/__debug__/user?email=${encodeURIComponent(email)}">&larr; Back to User</a>
+        </div>
+      `));
+    } catch (error: any) {
+      console.error('DEBUG SYNC-ROLE ERROR:', error);
+      res.status(500).send(page('Error', `
+        <h1 class="err">Sync Failed</h1>
+        <div class="card"><pre>${esc(error.message)}</pre></div>
+        <a href="/__debug__/user?email=${encodeURIComponent(email)}">&larr; Back</a>
+      `));
+    }
+  });
+
+  // ── Missing Roles: 활성 멤버십 있지만 role_assignment 없는 Neture 공급자 진단 ──
+  // GET /__debug__/user/missing-roles?service=neture
+  router.get('/missing-roles', async (req: Request, res: Response): Promise<void> => {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+
+    if (!dataSource.isInitialized) {
+      res.status(503).send(page('DB Error', '<h1>Database not initialized</h1>'));
+      return;
+    }
+
+    const serviceKey = (req.query.service as string)?.trim() || 'neture';
+
+    try {
+      const rows = await dataSource.query(
+        `SELECT u.id, u.email, u.status, sm.role AS sm_role, sm.status AS sm_status,
+                ARRAY_AGG(ra.role) FILTER (WHERE ra.is_active = true) AS active_roles
+         FROM users u
+         JOIN service_memberships sm ON sm.user_id = u.id AND sm.service_key = $1 AND sm.status = 'active'
+         LEFT JOIN role_assignments ra ON ra.user_id = u.id AND ra.is_active = true
+         GROUP BY u.id, u.email, u.status, sm.role, sm.status
+         HAVING ARRAY_AGG(ra.role) FILTER (WHERE ra.is_active = true) IS NULL
+            OR NOT (sm.role = ANY(ARRAY_AGG(ra.role) FILTER (WHERE ra.is_active = true)))
+         ORDER BY u.email`,
+        [serviceKey],
+      );
+
+      const rowsHtml = rows.map((r: any) =>
+        `<tr>
+          <td>${esc(r.email)}</td>
+          <td>${esc(r.status)}</td>
+          <td>${esc(r.sm_role)}</td>
+          <td>${esc((r.active_roles || []).join(', ') || 'none')}</td>
+          <td>
+            <a href="/__debug__/user?email=${encodeURIComponent(r.email)}">View</a> |
+            <a href="/__debug__/user/sync-role?email=${encodeURIComponent(r.email)}" style="color:#00ff88">Sync</a>
+          </td>
+        </tr>`
+      ).join('');
+
+      res.send(page('Missing Roles', `
+        <h1>Missing Role Assignments — service: ${esc(serviceKey)}</h1>
+        <p style="color:#888;margin-bottom:16px">활성 service_membership 있지만 matching role_assignment가 없는 사용자</p>
+        <div class="card">
+          <table>
+            <tr><th>Email</th><th>User Status</th><th>Membership Role</th><th>Active RA Roles</th><th>Actions</th></tr>
+            ${rows.length ? rowsHtml : '<tr><td colspan="5" class="ok">No missing roles found</td></tr>'}
+          </table>
+        </div>
+        <div class="nav">
+          <a href="/__debug__/user">&larr; User Search</a>
+        </div>
+      `));
+    } catch (error: any) {
+      console.error('DEBUG MISSING-ROLES ERROR:', error);
+      res.status(500).send(page('Error', `
+        <h1 class="err">Query Failed</h1>
+        <div class="card"><pre>${esc(error.message)}\n\n${esc(error.stack)}</pre></div>
       `));
     }
   });
