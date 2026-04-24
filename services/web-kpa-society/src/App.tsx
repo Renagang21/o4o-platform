@@ -141,8 +141,7 @@ import { PendingApprovalPage } from './pages/PendingApprovalPage';
 // WO-KPA-SOCIETY-DASHBOARD-TO-MYPAGE-CONSOLIDATION-V1: UserDashboardPage 제거 (/dashboard → /mypage 리다이렉트)
 import { MyContentPage } from './pages/dashboard';
 
-// WO-KPA-A-ROLE-BASED-REDIRECT-V1
-import { getDefaultRouteByRole } from './lib/auth-utils';
+// WO-O4O-ROLEBASED-HOME-REMOVAL-AND-ROUTING-NORMALIZATION-V1: getDefaultRouteByRole 사용 제거
 
 // WO-O4O-GUARD-PATTERN-NORMALIZATION-V1: 통일된 Guard 인터페이스
 import { PharmacyGuard } from './components/auth/PharmacyGuard';
@@ -247,36 +246,11 @@ function NewsIdRedirect() {
   return <Navigate to="/" replace />;
 }
 
-/**
- * WO-KPA-A-DEFAULT-ROUTE-FIX-V2
- * / 접근 시 로그인된 관리자/운영자는 적절한 경로로 자동 리다이렉트
- * 일반 사용자 및 비로그인 → CommunityHomePage 표시
- */
-function RoleBasedHome() {
-  const { user, isLoading } = useAuth();
-  const navigate = useNavigate();
-  const [checked, setChecked] = useState(false);
-
-  useEffect(() => {
-    if (isLoading || checked) return;
-    setChecked(true);
-
-    if (user?.roles) {
-      const target = getDefaultRouteByRole(user.roles);
-      // WO-KPA-SOCIETY-DASHBOARD-TO-MYPAGE-CONSOLIDATION-V1: /mypage가 기본값
-      if (target !== '/mypage' && target !== '/login') {
-        navigate(target, { replace: true });
-      }
-    }
-  }, [user, isLoading, navigate, checked]);
-
-  return <Layout serviceName={SERVICE_NAME}><CommunityHomePage /></Layout>;
-}
-
+// WO-O4O-ROLEBASED-HOME-REMOVAL-AND-ROUTING-NORMALIZATION-V1:
+// RoleBasedHome 제거 — "/" 는 항상 커뮤니티 홈 (역할 기반 자동 redirect 없음)
+// 역할별 대시보드 진입은 Header 드롭다운("운영 대시보드" 등) 명시적 링크로만 제공
 // WO-KPA-SOCIETY-DASHBOARD-TO-MYPAGE-CONSOLIDATION-V1:
 // DashboardRoute 제거 — /dashboard는 /mypage로 리다이렉트 처리
-// 기존 DashboardRoute (WO-KPA-C-ROLE-SYNC-NORMALIZATION-V1) 역할은
-// /mypage 자체 + getDefaultRouteByRole 변경으로 대체됨
 
 // FunctionGateRedirect removed — WO-KPA-A-AUTH-UX-STATE-UNIFICATION-V1
 // /select-function → /setup-activity 리다이렉트로 대체
@@ -356,7 +330,7 @@ function App() {
            * WO-KPA-DEMO-SCOPE-SEPARATION-AND-IMPLEMENTATION-V1
            * WO-KPA-SOCIETY-PHASE4-ADJUSTMENT-V1
            * ========================================================= */}
-          <Route path="/" element={<AuthGate><RoleBasedHome /></AuthGate>} />
+          <Route path="/" element={<AuthGate><Layout serviceName={SERVICE_NAME}><CommunityHomePage /></Layout></AuthGate>} />
           {/* WO-KPA-SOCIETY-DASHBOARD-TO-MYPAGE-CONSOLIDATION-V1: 기존 북마크 호환 리다이렉트 */}
           <Route path="/dashboard" element={<Navigate to="/mypage" replace />} />
 
