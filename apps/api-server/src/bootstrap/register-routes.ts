@@ -829,6 +829,15 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Pharmacy Debug routes:', pharmacyDebugError);
     }
 
+    // Forum Post Cleanup endpoint (WO-KPA-FORUM-LEGACY-TEST-POST-HARD-DELETE-V1)
+    try {
+      const { createForumPostCleanupRouter } = await import('../routes/debug/forum-post-cleanup.controller.js');
+      app.use('/__debug__/forum-post-cleanup', createForumPostCleanupRouter(dataSource));
+      logger.info('✅ Forum Post Cleanup endpoint registered at /__debug__/forum-post-cleanup');
+    } catch (forumCleanupError) {
+      logger.error('Failed to register Forum Post Cleanup routes:', forumCleanupError);
+    }
+
     // 38. Register Platform Hub routes (WO-PLATFORM-GLOBAL-HUB-V1)
     try {
       const { createPlatformHubController } = await import('../modules/platform/platform-hub.controller.js');
