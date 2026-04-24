@@ -251,7 +251,6 @@ async function copySignageMedia(
     mimeType: original.mimeType,
     content: original.content,
     tags: original.tags,
-    category: original.category,
     source: 'store',
     scope: 'store',
     status: 'draft',
