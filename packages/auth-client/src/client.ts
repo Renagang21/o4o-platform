@@ -141,6 +141,12 @@ export class AuthClient {
           originalRequest._retry = true;
           this.isRefreshing = true;
 
+          // WO-NETURE-TOKEN-RACE-FIX-V1:
+          // Capture current access token before refresh attempt.
+          // If a concurrent login stores a new token while this refresh is in flight,
+          // the catch block should NOT clear the newly stored token.
+          const tokenBeforeRefresh = this.strategy === 'localStorage' ? getAccessToken() : null;
+
           try {
             // Phase 6-7: Cookie Auth Primary
             // For cookie strategy, refresh token is sent via cookie automatically
@@ -185,13 +191,20 @@ export class AuthClient {
           } catch (refreshError) {
             // Refresh failed, clear tokens
             if (this.strategy === 'localStorage') {
-              clearAllTokens();
-              // Notify React layer (AuthContext) to set user=null.
-              // auth:token-cleared is already handled by AuthContext.tsx listener.
-              // Using window.dispatchEvent (not localStorage event) so it only affects
-              // the current tab — no cross-tab side-effects.
-              if (typeof window !== 'undefined') {
-                window.dispatchEvent(new CustomEvent('auth:token-cleared'));
+              // WO-NETURE-TOKEN-RACE-FIX-V1:
+              // Only clear tokens if no concurrent login stored a new one while refresh was in flight.
+              // Comparing current token to the one captured before refresh prevents wiping a fresh login token.
+              const currentToken = getAccessToken();
+              const freshLoginOccurred = tokenBeforeRefresh !== currentToken && currentToken !== null;
+              if (!freshLoginOccurred) {
+                clearAllTokens();
+                // Notify React layer (AuthContext) to set user=null.
+                // auth:token-cleared is already handled by AuthContext.tsx listener.
+                // Using window.dispatchEvent (not localStorage event) so it only affects
+                // the current tab — no cross-tab side-effects.
+                if (typeof window !== 'undefined') {
+                  window.dispatchEvent(new CustomEvent('auth:token-cleared'));
+                }
               }
             }
 
@@ -247,6 +260,15 @@ export class AuthClient {
         setRefreshToken(refreshToken);
       }
       updateAuthStorage(accessToken, refreshToken);
+      // WO-NETURE-TOKEN-RACE-FIX-V1:
+      // Notify any queued subscribers with the new token so they can retry their requests.
+      // Also reset refresh state so the concurrent stale refresh's catch block
+      // won't mistake the new token as its own (tokenBeforeRefresh !== currentToken guard).
+      if (this.isRefreshing) {
+        this.refreshSubscribers.forEach(cb => cb(accessToken));
+        this.refreshSubscribers = [];
+        this.isRefreshing = false;
+      }
     }
 
     // Return flattened AuthResponse for client consumption
