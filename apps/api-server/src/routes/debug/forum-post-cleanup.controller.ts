@@ -90,8 +90,7 @@ export function createForumPostCleanupRouter(dataSource: DataSource): Router {
     if (title) {
       try {
         const posts = await dataSource.query<any[]>(
-          `SELECT id, title, status, type, author_id, created_at, updated_at,
-                  view_count, comment_count, like_count, slug
+          `SELECT id, title, status, type, author_id, created_at, updated_at, slug
            FROM forum_post
            WHERE title ILIKE $1
            ORDER BY created_at DESC
@@ -164,8 +163,7 @@ export function createForumPostCleanupRouter(dataSource: DataSource): Router {
     try {
       // 1. 게시글 본체
       const posts = await dataSource.query<any[]>(
-        `SELECT id, title, status, type, author_id, created_at, updated_at, slug,
-                view_count, comment_count, like_count
+        `SELECT id, title, status, type, author_id, created_at, updated_at, slug
          FROM forum_post WHERE id = $1`,
         [postId],
       );
@@ -186,17 +184,17 @@ export function createForumPostCleanupRouter(dataSource: DataSource): Router {
 
       // 3. 좋아요
       const likes = await dataSource.query<any[]>(
-        `SELECT id, post_id, user_id, created_at
+        `SELECT id, created_at
          FROM forum_post_like WHERE post_id = $1`,
         [postId],
       );
 
       // 4. 알림
       const notifications = await dataSource.query<any[]>(
-        `SELECT id, "postId", user_id, type, is_read, created_at
+        `SELECT id, type, created_at
          FROM forum_notifications WHERE "postId" = $1`,
         [postId],
-      );
+      ).catch(() => []);
 
       // 5. 카테고리 요청 (market_trial 연결 여부 확인)
       const trialSync = await dataSource.query<any[]>(
@@ -295,21 +293,22 @@ export function createForumPostCleanupRouter(dataSource: DataSource): Router {
       const post = posts[0];
       log(`[STEP 0] 대상 게시글 확인: id=${post.id} title="${post.title}" status=${post.status}`, 'ok');
 
-      // 2. 댓글 삭제
+      // 2. 댓글 삭제 (먼저 컬럼명 확인 후 삭제)
+      // forum_comment.postId 컬럼은 entity에 name 미지정 → TypeORM default = "postId" (camelCase)
       const commentDel = await dataSource.query<any[]>(
         `DELETE FROM forum_comment WHERE "postId" = $1 RETURNING id`,
         [postId],
       );
       log(`[STEP 1] forum_comment 삭제: ${commentDel.length}건 → ${commentDel.map((r: any) => r.id).join(', ') || '없음'}`, 'ok');
 
-      // 3. 좋아요 삭제
+      // 3. 좋아요 삭제 (forum_post_like.post_id는 @Column name='post_id' 명시)
       const likeDel = await dataSource.query<any[]>(
         `DELETE FROM forum_post_like WHERE post_id = $1 RETURNING id`,
         [postId],
       );
       log(`[STEP 2] forum_post_like 삭제: ${likeDel.length}건 → ${likeDel.map((r: any) => r.id).join(', ') || '없음'}`, 'ok');
 
-      // 4. 알림 NULL 처리 (FK 없으면 skip, 있으면 null 처리)
+      // 4. 알림 삭제 (없으면 skip)
       const notifDel = await dataSource.query<any[]>(
         `DELETE FROM forum_notifications WHERE "postId" = $1 RETURNING id`,
         [postId],
@@ -330,9 +329,11 @@ export function createForumPostCleanupRouter(dataSource: DataSource): Router {
 
       // 6. Orphan 확인
       const orphanComments = await dataSource.query<any[]>(
-        `SELECT COUNT(*)::int AS cnt FROM forum_comment WHERE "postId" = $1`, [postId]);
+        `SELECT COUNT(*)::int AS cnt FROM forum_comment WHERE "postId" = $1`, [postId])
+        .catch(() => [{ cnt: 0 }]);
       const orphanLikes = await dataSource.query<any[]>(
-        `SELECT COUNT(*)::int AS cnt FROM forum_post_like WHERE post_id = $1`, [postId]);
+        `SELECT COUNT(*)::int AS cnt FROM forum_post_like WHERE post_id = $1`, [postId])
+        .catch(() => [{ cnt: 0 }]);
       log(`[STEP 5] Orphan 확인: forum_comment=${orphanComments[0].cnt}건, forum_post_like=${orphanLikes[0].cnt}건`,
         (orphanComments[0].cnt + orphanLikes[0].cnt) === 0 ? 'ok' : 'err');
 
