@@ -27,13 +27,14 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   dashboard: [{ label: '대시보드', path: '/operator', exact: true }],
   users: [
     { label: '회원 관리', path: '/operator/members' },
-    { label: '약국 서비스 신청', path: '/operator/pharmacy-requests' },
+    // WO-KPA-OPERATOR-STORE-RELATED-MENU-HIDE-V1: 약국 서비스 신청 메뉴 제거 (라우트/API/DB 유지)
   ],
   approvals: [
     { label: '상품 신청 관리', path: '/operator/product-applications' },
     { label: '자격 신청 관리', path: '/operator/qualification-requests' },
   ],
   // WO-KPA-OPERATOR-STORES-MENU-HIDE-V1: stores 메뉴 노출 제거
+  // WO-KPA-OPERATOR-STORE-RELATED-MENU-HIDE-V1: 확인 (매장 관리, 채널 관리 제거 유지)
   // stores: [ ... ] — 라우트/페이지/API/DB는 유지
   content: [
     { label: '공지사항', path: '/operator/news' },
@@ -92,13 +93,13 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
   dashboard: [{ label: '대시보드', path: '/operator', exact: true }],
   users: [
     { label: '회원 관리', path: '/operator/members' },
-    { label: '약국 서비스 신청', path: '/operator/pharmacy-requests' },
+    // WO-KPA-OPERATOR-STORE-RELATED-MENU-HIDE-V1: 약국 서비스 신청 메뉴 제거 (라우트/API/DB 유지)
   ],
   approvals: [
     { label: '상품 신청 관리', path: '/operator/product-applications' },
     { label: '자격 신청 관리', path: '/operator/qualification-requests' },
   ],
-  // WO-KPA-OPERATOR-STORES-MENU-HIDE-V1: stores 메뉴 노출 제거
+  // WO-KPA-OPERATOR-STORES-MENU-HIDE-V1 + WO-KPA-OPERATOR-STORE-RELATED-MENU-HIDE-V1: stores 메뉴 노출 제거
   content: [
     { label: '공지사항', path: '/operator/news' },
     { label: 'Home 편집', path: '/operator/community' },
