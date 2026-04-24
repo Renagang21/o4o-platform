@@ -21,6 +21,7 @@ import {
   NETURE_CONTEXTUAL_NAV,
   filterContextualNav,
 } from '../config/navigation';
+import { getNetureDashboardRoute, ROLE_LABELS } from '../config/dashboard';
 import ServiceSwitcher from './ServiceSwitcher';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -57,6 +58,13 @@ export function NetureGlobalHeader() {
     (r: string) => r === 'neture:partner' || r === 'partner',
   );
 
+  const hasDashboardRole = isAdmin || isOperator || isSupplier || isPartner;
+  const dashboardPath = hasDashboardRole && user?.roles
+    ? getNetureDashboardRoute(user.roles)
+    : '/';
+  const activeRole = user?.roles?.[0];
+  const roleLabel = (activeRole && ROLE_LABELS[activeRole]) || '사용자';
+
   const contextualNav = filterContextualNav(NETURE_CONTEXTUAL_NAV, {
     isAdmin: !!isAdmin,
     isOperator: !!isOperator,
@@ -90,6 +98,11 @@ export function NetureGlobalHeader() {
       utilitySlot={<ServiceSwitcher currentServiceKey="neture" />}
       userMenuItems={
         <>
+          {hasDashboardRole && (
+            <GlobalHeaderMenuItem to={dashboardPath} icon={<LayoutDashboard className="w-4 h-4" />}>
+              {roleLabel} 대시보드
+            </GlobalHeaderMenuItem>
+          )}
           <GlobalHeaderMenuItem to="/mypage" icon={<LayoutDashboard className="w-4 h-4" />}>
             마이페이지
           </GlobalHeaderMenuItem>
