@@ -3,20 +3,25 @@
  *
  * WO-O4O-PRODUCT-APPROVAL-WORKFLOW-V1
  * WO-O4O-TABLE-STANDARD-V2 — DataTable 표준 전환
+ * WO-KPA-OPERATOR-PRODUCT-APPLICATION-DELETE-V1 — 이력 삭제 기능 추가
  *
- * /hub/b2b에서 약국이 신청한 상품을 조회하고 승인/거절합니다.
+ * /hub/b2b에서 약국이 신청한 상품을 조회하고 승인/거절/삭제합니다.
  * 승인 시 organization_product_listings에 자동 생성됩니다.
+ * 삭제는 product_approvals record만 제거 (listing/상품/공급사 보존).
  *
  * API:
- *   GET   /operator/product-applications         — 목록 조회
- *   GET   /operator/product-applications/stats    — 통계
- *   PATCH /operator/product-applications/:id/approve — 승인
- *   PATCH /operator/product-applications/:id/reject  — 거절
+ *   GET    /operator/product-applications         — 목록 조회
+ *   GET    /operator/product-applications/stats    — 통계
+ *   PATCH  /operator/product-applications/:id/approve — 승인
+ *   PATCH  /operator/product-applications/:id/reject  — 거절
+ *   DELETE /operator/product-applications/:id         — 이력 삭제
+ *   POST   /operator/product-applications/batch-delete — 일괄 삭제
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { CheckCircle, XCircle, Sparkles } from 'lucide-react';
-import { OperatorConfirmModal, useOperatorAction, ActionBar, BulkResultModal } from '@o4o/ui';
+import { CheckCircle, XCircle, Sparkles, Trash2 } from 'lucide-react';
+import { OperatorConfirmModal, useOperatorAction, ActionBar, BulkResultModal, RowActionMenu } from '@o4o/ui';
+import type { RowActionItem } from '@o4o/ui';
 import { OperatorActionType } from '@o4o/types';
 import { DataTable, Pagination, useBatchAction } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
@@ -103,6 +108,8 @@ export default function ProductApplicationManagementPage() {
   // Selection & V3 batch
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const batch = useBatchAction();
+
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // V3: AI summary state
   const [aiLoading, setAiLoading] = useState(false);
@@ -225,6 +232,37 @@ export default function ProductApplicationManagementPage() {
     }
   };
 
+  // ─── Delete Handlers ───
+
+  const handleDeleteItem = useCallback(async (id: string) => {
+    setDeleteLoading(true);
+    try {
+      await apiClient.delete(`/operator/product-applications/${id}`);
+      setToastMsg({ type: 'success', message: '신청 이력이 삭제되었습니다.' });
+      loadApplications();
+      loadStats();
+    } catch {
+      setToastMsg({ type: 'error', message: '삭제에 실패했습니다.' });
+    } finally {
+      setDeleteLoading(false);
+      setTimeout(() => setToastMsg(null), 4000);
+    }
+  }, [loadApplications, loadStats]);
+
+  const handleBulkDelete = useCallback(async () => {
+    if (selectedIds.size === 0) return;
+    const ids = [...selectedIds];
+    const result = await batch.executeBatch(
+      (batchIds) => apiClient.post('/operator/product-applications/batch-delete', { ids: batchIds }),
+      ids,
+    );
+    if (result.successCount > 0) {
+      setSelectedIds(new Set());
+      loadApplications();
+      loadStats();
+    }
+  }, [selectedIds, batch, loadApplications, loadStats]);
+
   // ─── V3: AI Summary ───
 
   const handleAiSummarize = async () => {
@@ -337,18 +375,38 @@ export default function ProductApplicationManagementPage() {
       header: '액션',
       system: true,
       align: 'center',
-      width: '120px',
+      width: '150px',
       onCellClick: () => {},
       render: (_v, row) => {
+        const rowActions: RowActionItem[] = [
+          {
+            key: 'delete',
+            label: '삭제',
+            variant: 'danger',
+            loading: deleteLoading,
+            onClick: () => handleDeleteItem(row.id),
+            confirm: {
+              title: '신청 이력 삭제',
+              message: '이 신청 이력을 삭제하시겠습니까?\n승인된 경우 매장 진열 상품은 유지됩니다.',
+              variant: 'danger',
+            },
+          },
+        ];
+
         if (row.status !== 'pending') {
-          if (row.status === 'approved' && row.reviewed_at) {
-            return <span className="text-xs text-slate-400">{new Date(row.reviewed_at).toLocaleDateString('ko-KR')}</span>;
-          }
-          return null;
+          const reviewedDate = row.status === 'approved' && row.reviewed_at
+            ? <span className="text-xs text-slate-400">{new Date(row.reviewed_at).toLocaleDateString('ko-KR')}</span>
+            : null;
+          return (
+            <div className="flex items-center gap-1.5 justify-center">
+              {reviewedDate}
+              <RowActionMenu actions={rowActions} />
+            </div>
+          );
         }
         const isTarget = actionLoading === row.id;
         return (
-          <div className="flex gap-1.5 justify-center">
+          <div className="flex gap-1.5 justify-center items-center">
             <button
               onClick={() => openApproveModal(row.id)}
               disabled={isTarget}
@@ -363,6 +421,7 @@ export default function ProductApplicationManagementPage() {
             >
               거절
             </button>
+            <RowActionMenu actions={rowActions} />
           </div>
         );
       },
@@ -461,6 +520,17 @@ export default function ProductApplicationManagementPage() {
             group: 'ai',
             tooltip: '선택된 항목을 AI로 분석합니다',
             visible: selectedIds.size >= 2,
+          },
+          {
+            key: 'bulk-delete',
+            label: `선택 삭제 (${selectedIds.size})`,
+            onClick: handleBulkDelete,
+            variant: 'danger' as const,
+            icon: <Trash2 size={14} />,
+            loading: batch.loading,
+            group: 'danger',
+            tooltip: '선택된 신청 이력을 삭제합니다. 승인된 매장 진열 상품은 유지됩니다.',
+            visible: selectedIds.size > 0,
           },
         ]}
       />

@@ -4,15 +4,18 @@
  * WO-O4O-PRODUCT-APPROVAL-WORKFLOW-V1
  * WO-PRODUCT-POLICY-V2-APPLICATION-DEPRECATION-V1: v2 product_approvals 전환
  * WO-NETURE-TIER2-SERVICE-USABILITY-BETA-V1: approve/reject 복원 (v2 service 호출)
+ * WO-KPA-OPERATOR-PRODUCT-APPLICATION-DELETE-V1: 이력 삭제 기능 추가
  *
  * Operator 전용 — 상품 승인 조회 + 승인/거절 (v2: product_approvals)
  *
- * GET   /                — 전체 승인 목록 (필터: status)
- * GET   /stats           — 상태별 통계
- * PATCH /:id/approve     — SERVICE 승인 처리 (v2 service)
- * PATCH /:id/reject      — SERVICE 거절 처리 (v2 service)
- * POST  /batch-approve   — 일괄 승인 (V3)
- * POST  /batch-reject    — 일괄 거절 (V3)
+ * GET    /                — 전체 승인 목록 (필터: status)
+ * GET    /stats           — 상태별 통계
+ * PATCH  /:id/approve     — SERVICE 승인 처리 (v2 service)
+ * PATCH  /:id/reject      — SERVICE 거절 처리 (v2 service)
+ * DELETE /:id             — 이력 삭제 (product_approvals record만, listing 유지)
+ * POST   /batch-approve   — 일괄 승인 (V3)
+ * POST   /batch-reject    — 일괄 거절 (V3)
+ * POST   /batch-delete    — 일괄 삭제 (V3)
  *
  * 권한: kpa:admin 또는 kpa:operator
  */
@@ -309,6 +312,70 @@ export function createOperatorProductApplicationsController(
     }
 
     res.json({ success: true, data: { results } });
+  }));
+
+  // ─── DELETE /:id — 이력 삭제 ──────────────────────────────────────────────
+  // WO-KPA-OPERATOR-PRODUCT-APPLICATION-DELETE-V1
+  // product_approvals record만 삭제. organization_product_listings/상품/공급사 데이터 보존.
+  router.delete('/:id', asyncHandler(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const deletedBy = (req as any).user?.id || 'unknown';
+
+    const [existing] = await dataSource.query(
+      `SELECT id, approval_status FROM product_approvals WHERE id = $1`,
+      [id],
+    );
+    if (!existing) {
+      return res.status(404).json({ success: false, error: '신청 이력을 찾을 수 없습니다.', code: 'NOT_FOUND' });
+    }
+
+    await dataSource.query(
+      `DELETE FROM product_approvals WHERE id = $1`,
+      [id],
+    );
+
+    actionLogService?.logSuccess('kpa-society', deletedBy, 'kpa.operator.product_application_delete', {
+      meta: { targetId: id, statusDeleted: existing.approval_status },
+    }).catch(() => {});
+
+    return res.json({ success: true, data: { id, deleted: true } });
+  }));
+
+  // ─── POST /batch-delete — 일괄 삭제 ─────────────────────────────────────
+  // WO-KPA-OPERATOR-PRODUCT-APPLICATION-DELETE-V1
+  router.post('/batch-delete', asyncHandler(async (req: Request, res: Response) => {
+    const { ids } = req.body;
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ success: false, error: 'ids array is required' });
+    }
+    if (ids.length > 50) {
+      return res.status(400).json({ success: false, error: 'Maximum 50 items per batch' });
+    }
+
+    const deletedBy = (req as any).user?.id || 'unknown';
+    const results: Array<{ id: string; status: 'success' | 'skipped' | 'failed'; error?: string }> = [];
+
+    for (const id of ids) {
+      try {
+        const [existing] = await dataSource.query(
+          `SELECT id FROM product_approvals WHERE id = $1`,
+          [id],
+        );
+        if (!existing) {
+          results.push({ id, status: 'skipped', error: 'Not found' });
+          continue;
+        }
+        await dataSource.query(`DELETE FROM product_approvals WHERE id = $1`, [id]);
+        actionLogService?.logSuccess('kpa-society', deletedBy, 'kpa.operator.product_application_batch_delete', {
+          meta: { targetId: id },
+        }).catch(() => {});
+        results.push({ id, status: 'success' });
+      } catch (err: any) {
+        results.push({ id, status: 'failed', error: err.message || 'Unknown error' });
+      }
+    }
+
+    return res.json({ success: true, data: { results } });
   }));
 
   /** POST /batch-reject — 일괄 거절 */
