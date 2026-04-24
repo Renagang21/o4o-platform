@@ -90,8 +90,8 @@ export function createForumPostCleanupRouter(dataSource: DataSource): Router {
     if (title) {
       try {
         const posts = await dataSource.query<any[]>(
-          `SELECT id, title, status, type, author_id, "categoryId", "organizationId",
-                  created_at, updated_at, view_count, comment_count, like_count, slug
+          `SELECT id, title, status, type, author_id, created_at, updated_at,
+                  view_count, comment_count, like_count, slug
            FROM forum_post
            WHERE title ILIKE $1
            ORDER BY created_at DESC
@@ -164,8 +164,8 @@ export function createForumPostCleanupRouter(dataSource: DataSource): Router {
     try {
       // 1. 게시글 본체
       const posts = await dataSource.query<any[]>(
-        `SELECT id, title, status, type, author_id, "categoryId", "organizationId",
-                created_at, updated_at, slug
+        `SELECT id, title, status, type, author_id, created_at, updated_at, slug,
+                view_count, comment_count, like_count
          FROM forum_post WHERE id = $1`,
         [postId],
       );
