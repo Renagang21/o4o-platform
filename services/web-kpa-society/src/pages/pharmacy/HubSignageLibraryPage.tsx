@@ -33,8 +33,16 @@ import { assetSnapshotApi } from '../../api/assetSnapshot';
 import { hubContentApi } from '../../api/hubContent';
 import type { HubContentItemResponse } from '@o4o/types/hub-content';
 import { SIGNAGE_MEDIA_TYPE_LABELS } from '@o4o/types/signage';
-import { HUB_PRODUCER_TABS, type HubProducer } from '@o4o/hub-exploration-core';
 import { HUB_PRODUCER_LABELS } from '@o4o/types/hub-content';
+
+// Inlined from @o4o/hub-exploration-core (WO-O4O-HUB-EXPLORATION-CORE-REMOVAL-PREP-V1)
+type HubProducer = 'operator' | 'supplier' | 'community';
+const HUB_PRODUCER_TABS: readonly { key: string; label: string }[] = [
+  { key: 'all', label: '전체' },
+  { key: 'operator', label: '운영자' },
+  { key: 'supplier', label: '공급자' },
+  { key: 'community', label: '커뮤니티' },
+] as const;
 import { colors, borderRadius } from '../../styles/theme';
 
 // ============================================

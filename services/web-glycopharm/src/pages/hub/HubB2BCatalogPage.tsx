@@ -2,18 +2,12 @@
  * HubB2BCatalogPage — GlycoPharm B2B 상품 카탈로그 (테이블 형태)
  *
  * WO-O4O-B2B-OPERATION-TABLE-STRUCTURE-V1
- *
- * B2BTableList 공용 컴포넌트를 사용하여
- * 플랫폼 B2B 카탈로그를 테이블 형태로 탐색.
+ * WO-O4O-HUB-EXPLORATION-CORE-REMOVAL-PREP-V1: 로컬 B2BTableList로 전환
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  B2BTableList,
-  type B2BTableItem,
-  type B2BTableSortKey,
-} from '@o4o/hub-exploration-core';
+import { B2BTableList, type B2BTableItem, type B2BTableSortKey } from './B2BTableList';
 import { getCatalog } from '../../api/pharmacyProducts';
 import type { CatalogProduct } from '../../api/pharmacyProducts';
 import { apiClient } from '@/services/api';
