@@ -183,7 +183,7 @@ export class ForumQueryService {
     let keywordFilter = '';
     if (keyword) {
       params.push(`%${keyword}%`);
-      keywordFilter = `AND c.name ILIKE $${params.length}`;
+      keywordFilter = `AND (c.name ILIKE $${params.length} OR c.description ILIKE $${params.length} OR c.tags::text ILIKE $${params.length})`;
     }
 
     return this.dataSource.query(`
