@@ -128,9 +128,9 @@ export function OperatorRoutes() {
           {/* 자격 신청 관리 (WO-O4O-QUALIFICATION-SYSTEM-V1) */}
           <Route path="qualification-requests" element={<QualificationRequestsPage />} />
 
-          {/* LMS 강의 관리 (WO-KPA-OPERATOR-LMS-MENU-AND-MANAGEMENT-PAGE-RESTORE-V1) */}
-          <Route path="lms" element={<Navigate to="/operator/lms/courses" replace />} />
-          <Route path="lms/courses" element={<OperatorLmsCoursesPage />} />
+          {/* LMS 강의 관리 (WO-KPA-OPERATOR-LMS-ROUTE-CANONICAL-FIX-V1: /operator/lms를 canonical route로 변경) */}
+          <Route path="lms" element={<OperatorLmsCoursesPage />} />
+          <Route path="lms/courses" element={<Navigate to="/operator/lms" replace />} />
 
           {/* 매장 관리 (WO-O4O-STORE-HUB-OPERATOR-INTEGRATION-V1) */}
           <Route path="stores" element={<OperatorStoresPage />} />

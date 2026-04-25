@@ -19,7 +19,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, RefreshCw, AlertCircle, Search, Loader2, Archive, EyeOff } from 'lucide-react';
 import { RowActionMenu } from '@o4o/ui';
-import { DataTable, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
+import { DataTable, Pagination, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { lmsApi } from '../../api';
 import { lmsInstructorApi } from '../../api/lms-instructor';
@@ -288,18 +288,22 @@ export default function OperatorLmsCoursesPage() {
           </p>
         </div>
       ) : (
-        <DataTable<Course>
-          columns={columns}
-          dataSource={courses}
-          rowKey="id"
-          pagination={{
-            current: page,
-            pageSize: PAGE_SIZE,
-            total,
-            onChange: (p: number) => setPage(p),
-          }}
-          emptyText="강의가 없습니다"
-        />
+        <>
+          <DataTable<Course>
+            columns={columns}
+            data={courses}
+            rowKey="id"
+            emptyMessage="강의가 없습니다"
+          />
+          {total > PAGE_SIZE && (
+            <Pagination
+              page={page}
+              totalPages={Math.ceil(total / PAGE_SIZE)}
+              onPageChange={setPage}
+              total={total}
+            />
+          )}
+        </>
       )}
     </div>
   );
