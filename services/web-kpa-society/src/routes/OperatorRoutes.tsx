@@ -93,8 +93,8 @@ export function OperatorRoutes() {
 
           {/* ── 콘텐츠 CRUD (WO-KPA-ADMIN-OPERATOR-MENU-REALIGNMENT-V1: Admin에서 이동) ── */}
 
-          {/* 공지사항 → 콘텐츠 관리로 리다이렉트 */}
-          <Route path="news" element={<Navigate to="content" replace />} />
+          {/* 공지사항 → 콘텐츠 관리로 리다이렉트 (절대경로로 명확화) */}
+          <Route path="news" element={<Navigate to="/operator/content" replace />} />
 
           {/* 자료실 → 콘텐츠 허브로 전환 (WO-O4O-KPA-CONTENT-HUB-FOUNDATION-V1) */}
           <Route path="docs" element={<OperatorContentHubPage />} />
@@ -129,6 +129,7 @@ export function OperatorRoutes() {
           <Route path="qualification-requests" element={<QualificationRequestsPage />} />
 
           {/* LMS 강의 관리 (WO-KPA-OPERATOR-LMS-MENU-AND-MANAGEMENT-PAGE-RESTORE-V1) */}
+          <Route path="lms" element={<Navigate to="/operator/lms/courses" replace />} />
           <Route path="lms/courses" element={<OperatorLmsCoursesPage />} />
 
           {/* 매장 관리 (WO-O4O-STORE-HUB-OPERATOR-INTEGRATION-V1) */}
