@@ -160,7 +160,8 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
   enabledMenus: ['dashboard'],
   menuSections: [
     { label: '', items: [
-      { key: 'home', label: '홈', subPath: '' },
+      { key: 'home',     label: '홈',       subPath: '' },
+      { key: 'channels', label: '채널 관리', subPath: '/channels' },
     ]},
     { label: '상품/주문', items: [
       { key: 'products', label: '상품 관리', subPath: '/commerce/products' },
@@ -176,9 +177,8 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'qr',  label: 'QR 코드', subPath: '/marketing/qr' },
       { key: 'pop', label: 'POP 자료', subPath: '/marketing/pop' },
     ]},
-    { label: '채널', items: [
+    { label: '콘텐츠/태블릿', items: [
       { key: 'tablet-displays', label: '태블릿 진열', subPath: '/commerce/tablet-displays' },
-      { key: 'channels',        label: 'B2B 사이트',  subPath: '/channels' },
       { key: 'blog',            label: '블로그',       subPath: '/content/blog' },
     ]},
     { label: '자료/분석', items: [
