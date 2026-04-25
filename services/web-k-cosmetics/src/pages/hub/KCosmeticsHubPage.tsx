@@ -1,239 +1,106 @@
 /**
- * KCosmeticsHubPage - K-Cosmetics 공용공간 (Market Layer)
+ * KCosmeticsHubPage — K-Cosmetics 매장 운영 허브 랜딩
  *
- * WO-O4O-HUB-EXPLORATION-CORE-V1
- * WO-O4O-HUB-EXPLORATION-UNIFORM-STRUCTURE-V1
- * WO-O4O-HUB-DATA-UNIFICATION-V1: CMS 슬롯 연동
- * WO-O4O-HUB-CMS-SLOT-STRUCTURE-ALIGNMENT-V1: 공통 슬롯 키 + 광고 연동
+ * WO-O4O-EXPLORATION-HUB-REMOVAL-V1
  *
- * hub-exploration-core thin wrapper.
- * 서비스별 데이터만 다르고 구조는 플랫폼 공통.
+ * StoreHubTemplate + K-Cosmetics config.
+ * HubExplorationLayout 제거 → StoreHubTemplate 기반 Entry 구조로 통일.
  */
 
-import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import {
-  HubExplorationLayout,
-  HUB_FIXED_TABS,
-  type HeroSlide,
-  type CoreServiceBanner,
-  type PromotionBanner,
-  type AdItem,
-  type B2BPreviewItem,
-  type ProductDevItem,
-  type PlatformContentItem,
-  type ContentAuthorTab,
-} from '@o4o/hub-exploration-core';
-import { cmsApi } from '@/api/cms';
-import type { CmsSlot } from '@/api/cms';
+import { StoreHubTemplate, type StoreHubConfig } from '@o4o/shared-space-ui';
 
-// ── CMS 매핑 ──
+// ─── K-Cosmetics Config ──────────────────────────────────────────────────────
 
-function cmsSlotToHeroSlide(slot: CmsSlot, navigate: (path: string) => void): HeroSlide {
-  return {
-    id: slot.content?.id ?? slot.id,
-    title: slot.content?.title ?? '',
-    subtitle: slot.content?.summary ?? undefined,
-    backgroundImage: slot.content?.imageUrl ?? undefined,
-    backgroundColor: slot.content?.metadata?.backgroundColor ?? undefined,
-    ctaLabel: slot.content?.linkText ?? undefined,
-    onCtaClick: slot.content?.linkUrl
-      ? () => navigate(slot.content!.linkUrl!)
-      : undefined,
-  };
-}
+const kcosStoreHubConfig: StoreHubConfig = {
+  serviceKey: 'k-cosmetics',
 
-function cmsSlotToPromo(slot: CmsSlot, navigate: (path: string) => void): PromotionBanner {
-  return {
-    id: slot.content?.id ?? slot.id,
-    imageUrl: slot.content?.imageUrl ?? '',
-    alt: slot.content?.title ?? '',
-    title: slot.content?.title,
-    subtitle: slot.content?.summary ?? undefined,
-    onClick: slot.content?.linkUrl
-      ? () => navigate(slot.content!.linkUrl!)
-      : undefined,
-  };
-}
+  heroTitle: '매장 운영 허브',
+  heroDesc: 'K-뷰티 플랫폼이 제공하는 상품·콘텐츠·사이니지를 탐색하고, 내 매장으로 가져가 운영에 활용합니다.',
+  storeCta: {
+    label: '내 매장 관리 →',
+    href: '/store',
+  },
 
-function cmsSlotToAdItem(slot: CmsSlot, tier: 'premium' | 'normal', navigate: (path: string) => void): AdItem {
-  return {
-    id: slot.content?.id ?? slot.id,
-    tier,
-    imageUrl: slot.content?.imageUrl ?? '',
-    alt: slot.content?.title ?? '',
-    onClick: slot.content?.linkUrl
-      ? () => navigate(slot.content!.linkUrl!)
-      : undefined,
-  };
-}
+  resourceSectionTitle: '자원 탐색',
+  resourceSectionDesc: '플랫폼 자원을 탐색하고 내 매장으로 가져가세요',
+  resourceCards: [
+    {
+      icon: '🛒',
+      title: 'B2B 상품 리스트',
+      desc: '공급사 상품을 탐색하고 매장에 신청합니다',
+      href: '/b2b/supply',
+      actionLabel: '상품 탐색',
+    },
+    {
+      icon: '🖥️',
+      title: '디지털 사이니지',
+      desc: '매장 디스플레이에 활용할 미디어를 탐색합니다',
+      href: '/store/signage',
+      actionLabel: '사이니지 탐색',
+    },
+    {
+      icon: '📄',
+      title: '콘텐츠/자료',
+      desc: 'CMS 콘텐츠를 탐색하고 내 매장에 복사합니다',
+      href: '/library/content',
+      actionLabel: '콘텐츠 탐색',
+    },
+    {
+      icon: '📋',
+      title: '캠페인 · 이벤트',
+      desc: '플랫폼 캠페인에 참여합니다',
+      href: '/community',
+      actionLabel: '이벤트 보기',
+    },
+  ],
 
-// ── CMS Slot → B2BPreviewItem 매핑 (K-Cosmetics: CMS Slot 대체) ──
+  aiBlock: {
+    title: 'AI 맞춤 추천',
+    badge: '준비 중',
+    desc: '매장 운영 데이터를 기반으로 지금 필요한 상품·콘텐츠·사이니지를 자동으로 추천하는 기능을 준비 중입니다.',
+    features: [
+      '취급 신청 후 오래된 화장품 상품 상태 안내',
+      '미복사 콘텐츠 중 현재 시즌 뷰티 관련 항목 제안',
+      '사이니지 업데이트 주기 기반 교체 제안',
+    ],
+  },
 
-function cmsSlotToB2BItem(slot: CmsSlot, navigate: (path: string) => void): B2BPreviewItem {
-  return {
-    id: slot.content?.id ?? slot.id,
-    name: slot.content?.title ?? '',
-    imageUrl: slot.content?.imageUrl ?? undefined,
-    badge: (slot.content?.metadata?.badge as string) ?? undefined,
-    badgeColor: (slot.content?.metadata?.badgeColor as string) ?? undefined,
-    price: (slot.content?.metadata?.price as string) ?? undefined,
-    supplierName: slot.content?.summary ?? undefined,
-    onClick: slot.content?.linkUrl
-      ? () => navigate(slot.content!.linkUrl!)
-      : undefined,
-  };
-}
+  storeCtaBlock: {
+    icon: '💄',
+    title: '내 매장으로 이동',
+    desc: '탐색한 상품·콘텐츠·사이니지의 실제 설정과 운영은 내 매장에서 합니다',
+    buttonLabel: '내 매장 관리 →',
+    href: '/store',
+  },
 
-// ── CMS Slot → ProductDevItem 매핑 ──
+  flowSectionTitle: '운영 흐름',
+  flowSectionDesc: '매장 운영 허브 → 내 매장 순서로 작업합니다',
+  operationSteps: [
+    {
+      step: '1',
+      title: '탐색',
+      desc: '상품·사이니지·콘텐츠를 이곳에서 탐색합니다',
+      where: '매장 운영 허브',
+    },
+    {
+      step: '2',
+      title: '복사 · 신청',
+      desc: '"내 매장에 추가" 또는 "취급 신청"으로 가져옵니다',
+      where: '매장 운영 허브',
+    },
+    {
+      step: '3',
+      title: '실행',
+      desc: '내 매장에서 게시, 스케줄, 판매 설정을 완료합니다',
+      where: '내 매장 (/store)',
+    },
+  ],
+};
 
-function cmsSlotToProductDev(slot: CmsSlot, navigate: (path: string) => void): ProductDevItem {
-  return {
-    id: slot.content?.id ?? slot.id,
-    title: slot.content?.title ?? '',
-    description: slot.content?.summary ?? undefined,
-    imageUrl: slot.content?.imageUrl ?? undefined,
-    badge: (slot.content?.metadata?.badge as string) ?? undefined,
-    onClick: slot.content?.linkUrl
-      ? () => navigate(slot.content!.linkUrl!)
-      : undefined,
-  };
-}
-
-// ── Author tabs (WO-O4O-CMS-VISIBILITY-EXTENSION-PHASE1-V1) ──
-
-const CONTENT_AUTHOR_TABS: ContentAuthorTab[] = [
-  { key: 'all', label: '전체' },
-  { key: 'admin', label: '관리자' },
-  { key: 'service_admin', label: '운영자' },
-  { key: 'supplier', label: '공급자' },
-];
-
-// ── Default Hero (fallback) ──
-
-const DEFAULT_HERO: HeroSlide[] = [{
-  id: 'main',
-  backgroundColor: '#DB2777',
-  title: 'K-Cosmetics HUB',
-  subtitle: 'K-뷰티 플랫폼이 제공하는 자원을 탐색하세요',
-}];
+// ─── Page Component ────────────────────────────────────────────────────────────
 
 export function KCosmeticsHubPage() {
-  const navigate = useNavigate();
-
-  const [heroSlides, setHeroSlides] = useState<HeroSlide[]>(DEFAULT_HERO);
-  const [promos, setPromos] = useState<PromotionBanner[]>([]);
-  const [ads, setAds] = useState<AdItem[]>([]);
-  const [b2bItems, setB2bItems] = useState<B2BPreviewItem[]>([]);
-  const [productDevItems, setProductDevItems] = useState<ProductDevItem[]>([]);
-  const [contentItems, setContentItems] = useState<PlatformContentItem[]>([]);
-  const [activeAuthorTab, setActiveAuthorTab] = useState('all');
-
-  // CMS 슬롯 로드 (1회) — 공통 슬롯 키, serviceKey로 분기
-  useEffect(() => {
-    let cancelled = false;
-
-    cmsApi.getSlots('hub-hero', { serviceKey: 'cosmetics' })
-      .then(res => {
-        if (!cancelled && res.data.length > 0) {
-          setHeroSlides(res.data
-            .filter(s => s.content)
-            .map(s => cmsSlotToHeroSlide(s, navigate)));
-        }
-      })
-      .catch(() => {});
-
-    cmsApi.getSlots('hub-promotion', { serviceKey: 'cosmetics' })
-      .then(res => {
-        if (!cancelled) {
-          setPromos(res.data
-            .filter(s => s.content)
-            .map(s => cmsSlotToPromo(s, navigate)));
-        }
-      })
-      .catch(() => {});
-
-    // Ads (premium + normal)
-    Promise.allSettled([
-      cmsApi.getSlots('hub-ad-premium', { serviceKey: 'cosmetics' }),
-      cmsApi.getSlots('hub-ad-normal', { serviceKey: 'cosmetics' }),
-    ]).then(results => {
-      if (cancelled) return;
-      const premium = results[0].status === 'fulfilled'
-        ? results[0].value.data.filter(s => s.content).map(s => cmsSlotToAdItem(s, 'premium', navigate))
-        : [];
-      const normal = results[1].status === 'fulfilled'
-        ? results[1].value.data.filter(s => s.content).map(s => cmsSlotToAdItem(s, 'normal', navigate))
-        : [];
-      setAds([...premium, ...normal]);
-    });
-
-    // B2B 공급 기회 (CMS Slot 대체 — K-Cosmetics는 카탈로그 API 없음)
-    cmsApi.getSlots('hub-b2b-feature', { serviceKey: 'cosmetics' })
-      .then(res => {
-        if (!cancelled) {
-          setB2bItems(res.data
-            .filter(s => s.content)
-            .map(s => cmsSlotToB2BItem(s, navigate)));
-        }
-      })
-      .catch(() => {});
-
-    // 제품개발 참여 (CMS Slot)
-    cmsApi.getSlots('hub-product-dev', { serviceKey: 'cosmetics' })
-      .then(res => {
-        if (!cancelled) {
-          setProductDevItems(res.data
-            .filter(s => s.content)
-            .map(s => cmsSlotToProductDev(s, navigate)));
-        }
-      })
-      .catch(() => {});
-
-    // 플랫폼 콘텐츠
-    cmsApi.getContents({ serviceKey: 'cosmetics', status: 'published', limit: 20, offset: 0 })
-      .then(res => {
-        if (!cancelled) {
-          setContentItems(res.data.map(c => ({
-            id: c.id,
-            icon: '📄',
-            title: c.title,
-            description: c.summary ?? undefined,
-            date: c.publishedAt
-              ? new Date(c.publishedAt).toLocaleDateString('ko-KR')
-              : undefined,
-            authorRole: c.authorRole,
-          })));
-        }
-      })
-      .catch(() => {});
-
-    return () => { cancelled = true; };
-  }, [navigate]);
-
-  // ── Core Services ──
-  const coreServiceBanners: CoreServiceBanner[] = useMemo(() => [
-    { id: 'b2b', icon: '🛒', title: 'B2B 상품 리스트', description: '공급사 상품을 탐색하고 매장에 신청합니다.', onClick: () => navigate('/b2b/supply') },
-    { id: 'content', icon: '📝', title: '플랫폼 콘텐츠', description: 'CMS 콘텐츠를 탐색하고 내 매장에 복사합니다.', onClick: () => navigate('/store') },
-    { id: 'signage', icon: '🖥️', title: '디지털 사이니지', description: '매장 디스플레이에 활용할 미디어를 탐색합니다.', badge: '준비중' },
-    { id: 'campaign', icon: '📋', title: '캠페인 · 이벤트', description: '플랫폼 캠페인에 참여합니다.', badge: '준비중' },
-  ], [navigate]);
-
-  return (
-    <HubExplorationLayout
-      theme={{ primaryColor: '#DB2777', maxWidth: '1100px' }}
-      hero={{ slides: heroSlides, autoInterval: heroSlides.length > 1 ? 5000 : 0 }}
-      b2bRevenue={b2bItems.length > 0 ? { items: b2bItems, title: 'B2B', ctaLabel: 'B2B 전체 보기', onCtaClick: () => navigate('/b2b/supply') } : undefined}
-      ads={ads.length > 0 ? { ads } : undefined}
-      productDevelopment={{ items: productDevItems, title: '제품개발 참여' }}
-      platformContent={{ items: contentItems, title: '플랫폼 콘텐츠', authorTabs: CONTENT_AUTHOR_TABS, activeAuthorTab, onAuthorTabChange: setActiveAuthorTab }}
-      recentUpdates={{ tabs: [...HUB_FIXED_TABS], items: [] }}
-      coreServices={{ banners: coreServiceBanners, title: '핵심 서비스' }}
-      promotions={promos.length > 0 ? { banners: promos, title: '프로모션' } : undefined}
-      aiPlaceholder={{ title: 'AI 추천 예정', description: 'AI 기반 맞춤 상품·콘텐츠 추천이 준비 중입니다' }}
-      footerNote="여기서 선택한 콘텐츠·상품·서비스는 내 매장관리에서 관리할 수 있습니다."
-    />
-  );
+  return <StoreHubTemplate config={kcosStoreHubConfig} />;
 }
 
 export default KCosmeticsHubPage;

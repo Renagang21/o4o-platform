@@ -46,7 +46,7 @@ const MySettingsPage = lazy(() => import('@/pages/mypage/MySettingsPage'));
 // Partner Application (WO-PARTNER-APPLICATION-V1)
 const PartnerApplyPage = lazy(() => import('@/pages/partners/ApplyPage'));
 
-// Hub (WO-O4O-HUB-EXPLORATION-UNIFORM-STRUCTURE-V1)
+// Hub (WO-O4O-EXPLORATION-HUB-REMOVAL-V1: StoreHubTemplate 기반)
 const KCosmeticsHubPage = lazy(() => import('@/pages/hub/KCosmeticsHubPage'));
 
 // Forum Pages
@@ -272,7 +272,7 @@ function AppRoutes() {
         {/* B2B Routes */}
         <Route path="b2b/supply" element={<SupplyPage />} />
 
-        {/* Hub (WO-O4O-HUB-EXPLORATION-UNIFORM-STRUCTURE-V1) */}
+        {/* Hub (WO-O4O-EXPLORATION-HUB-REMOVAL-V1: StoreHubTemplate 기반) */}
         {/* WO-O4O-HUB-TO-STORE-HUB-RENAMING-V1: /hub → /store-hub */}
         <Route path="hub" element={<Navigate to="/store-hub" replace />} />
         <Route path="store-hub" element={<KCosmeticsHubPage />} />
