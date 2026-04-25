@@ -53,6 +53,11 @@ export interface BlogPostPreview {
   publishedAt?: string;
 }
 
+// ── Theme ──────────────────────────────────────────────────────────────────
+
+/** WO-O4O-STORE-THEME-PIPELINE-FOUNDATION-V1 */
+export type StoreTheme = 'professional' | 'neutral' | 'clean' | 'modern';
+
 // ── Channel State ───────────────────────────────────────────────────────────
 
 export interface StoreChannels {
@@ -73,6 +78,8 @@ export interface BlockRenderContext {
   signagePrefix: string;
   storeId: string;
   channels: StoreChannels;
+  /** WO-O4O-STORE-THEME-PIPELINE-FOUNDATION-V1: theme from storefront_config */
+  theme?: StoreTheme;
 }
 
 // ── Block Component Props ───────────────────────────────────────────────────

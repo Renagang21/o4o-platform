@@ -1440,7 +1440,14 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       if (!sourceUrl?.trim()) return res.status(400).json({ success: false, error: 'URL을 입력하세요' });
 
       const { sourceType, embedId, mediaType } = detectVideoSource(sourceUrl.trim());
-      const tagArray = Array.isArray(tags) ? tags : [];
+      const tagArray = (Array.isArray(tags) ? tags : [])
+        .map((t: string) => String(t).trim().replace(/^#/, ''))
+        .filter(Boolean)
+        .filter((t: string) => t.length <= 30);
+      const uniqueTags = [...new Set(tagArray)];
+      if (uniqueTags.length === 0) {
+        return res.status(400).json({ success: false, error: '태그를 최소 1개 이상 입력해주세요' });
+      }
       const durationSec = duration && Number(duration) > 0 ? Number(duration) : null;
 
       const result = await dataSource.query(
@@ -1448,7 +1455,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
           ("serviceKey", "organizationId", name, description, "mediaType", "sourceType", "sourceUrl", "embedId", duration, tags, source, scope, status, "createdByUserId", "createdAt", "updatedAt")
          VALUES ($1, NULL, $2, $3, $4, $5, $6, $7, $8, $9, 'community', 'global', 'active', $10, now(), now())
          RETURNING *`,
-        ['kpa-society', name.trim(), description?.trim() || null, mediaType, sourceType, sourceUrl.trim(), embedId, durationSec, tagArray, userId]
+        ['kpa-society', name.trim(), description?.trim() || null, mediaType, sourceType, sourceUrl.trim(), embedId, durationSec, uniqueTags, userId]
       );
       res.status(201).json({ success: true, data: result[0] });
     }));
@@ -1467,13 +1474,13 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       await queryRunner.startTransaction();
       try {
         // 1. Create playlist
-        const tagArray = Array.isArray(tags) ? tags : [];
+        const tagArray = Array.isArray(tags) ? tags.map((t: string) => String(t).trim()).filter(Boolean) : [];
         const plResult = await queryRunner.query(
           `INSERT INTO signage_playlists
-            ("serviceKey", "organizationId", name, description, status, source, scope, "loopEnabled", "itemCount", "totalDuration", "createdByUserId", metadata, "createdAt", "updatedAt")
-           VALUES ('kpa-society', NULL, $1, $2, 'active', 'community', 'global', false, 0, 0, $3, $4, now(), now())
+            ("serviceKey", "organizationId", name, description, status, source, scope, "loopEnabled", "itemCount", "totalDuration", "createdByUserId", tags, "createdAt", "updatedAt")
+           VALUES ('kpa-society', NULL, $1, $2, 'active', 'community', 'global', false, 0, 0, $3, $4::text[], now(), now())
            RETURNING *`,
-          [name.trim(), description?.trim() || null, userId, JSON.stringify({ tags: tagArray })]
+          [name.trim(), description?.trim() || null, userId, tagArray]
         );
         const playlist = plResult[0];
 
@@ -1570,12 +1577,12 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       await queryRunner.connect();
       await queryRunner.startTransaction();
       try {
-        // 1. Update metadata
-        const tagArray = Array.isArray(tags) ? tags : [];
+        // 1. Update playlist fields
+        const tagArray = Array.isArray(tags) ? tags.map((t: string) => String(t).trim()).filter(Boolean) : [];
         if (name?.trim()) {
           await queryRunner.query(
-            `UPDATE signage_playlists SET name = $1, description = $2, metadata = $3, "updatedAt" = now() WHERE id = $4`,
-            [name.trim(), description?.trim() || null, JSON.stringify({ tags: tagArray }), playlistId]
+            `UPDATE signage_playlists SET name = $1, description = $2, tags = $3::text[], "updatedAt" = now() WHERE id = $4`,
+            [name.trim(), description?.trim() || null, tagArray, playlistId]
           );
         }
 

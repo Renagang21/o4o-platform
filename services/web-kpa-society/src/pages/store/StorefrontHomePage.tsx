@@ -19,6 +19,7 @@ import {
   StoreBlockRegistry,
   type StoreBlock,
   type StoreBlockType,
+  type StoreTheme,
   type StoreChannels,
   type BlockRenderContext,
   type StoreData,
@@ -65,6 +66,8 @@ export function StorefrontHomePage() {
   const [blogPosts, setBlogPosts] = useState<BlogPostPreview[]>([]);
   const [storeId, setStoreId] = useState('');
   const [channels, setChannels] = useState<StoreChannels>({ B2C: true, TABLET: true, SIGNAGE: true });
+  // WO-O4O-STORE-THEME-PIPELINE-FOUNDATION-V1
+  const [theme, setTheme] = useState<StoreTheme>('professional');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -94,6 +97,8 @@ export function StorefrontHomePage() {
         setBlocks(layoutBlocks);
         setStoreId(layoutRes.data.storeId || '');
         setChannels(layoutRes.data.channels || { B2C: true, TABLET: true, SIGNAGE: true });
+        // WO-O4O-STORE-THEME-PIPELINE-FOUNDATION-V1
+        if (layoutRes.data.theme) setTheme(layoutRes.data.theme);
 
         // Fetch data for enabled blocks
         const promises: Promise<void>[] = [];
@@ -164,6 +169,7 @@ export function StorefrontHomePage() {
     signagePrefix: '/signage',
     storeId,
     channels,
+    theme,
   };
 
   // Registry-based block renderer — no switch/case, with visibility guard
@@ -178,7 +184,7 @@ export function StorefrontHomePage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc' }}>
+    <div data-theme={theme} style={{ minHeight: '100vh', backgroundColor: '#f8fafc' }}>
       {/* Header */}
       <header style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#fff', borderBottom: '1px solid #e2e8f0' }}>
         <div style={{ maxWidth: '640px', margin: '0 auto', padding: '0 16px', height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

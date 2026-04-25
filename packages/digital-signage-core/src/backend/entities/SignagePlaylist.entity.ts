@@ -133,6 +133,10 @@ export class SignagePlaylist {
   @Column({ type: 'jsonb', default: '{}' })
   metadata!: Record<string, any>;
 
+  // ========== Tags ==========
+  @Column({ type: 'text', array: true, default: '{}' })
+  tags!: string[];
+
   // ========== Timestamps ==========
   @CreateDateColumn()
   createdAt!: Date;

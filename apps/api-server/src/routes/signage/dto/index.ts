@@ -48,6 +48,7 @@ export interface UpdatePlaylistDto {
   transitionDuration?: number;
   isPublic?: boolean;
   metadata?: Record<string, any>;
+  tags?: string[];
 }
 
 export interface PlaylistQueryDto {
@@ -56,6 +57,7 @@ export interface PlaylistQueryDto {
   status?: SignageStatus;
   isPublic?: boolean;
   search?: string;
+  tags?: string[];
   sortBy?: 'name' | 'createdAt' | 'updatedAt' | 'itemCount';
   sortOrder?: 'asc' | 'desc';
 }
@@ -76,6 +78,7 @@ export interface PlaylistResponseDto {
   isPublic: boolean;
   likeCount: number;
   downloadCount: number;
+  tags: string[];
   createdByUserId: string | null;
   createdAt: string;
   updatedAt: string;

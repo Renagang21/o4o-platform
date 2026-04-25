@@ -55,6 +55,9 @@ export class SignagePlaylistRepository {
         search: `%${query.search}%`,
       });
     }
+    if (query.tags && query.tags.length > 0) {
+      qb.andWhere('playlist.tags && :tags', { tags: query.tags });
+    }
 
     const sortBy = query.sortBy || 'createdAt';
     const sortOrder = query.sortOrder?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';

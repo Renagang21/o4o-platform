@@ -15,6 +15,7 @@ export type {
   StoreBlockType,
   StoreBlock,
   StoreBlockDefinition,
+  StoreTheme,
   StoreChannels,
   BlockRenderContext,
   BlockComponentProps,

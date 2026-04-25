@@ -27,6 +27,7 @@ export interface SignageMediaItem {
   thumbnailUrl: string | null;
   status: string;
   source: string;
+  tags?: string[];
   createdAt: string;
   updatedAt: string;
 }
@@ -36,6 +37,7 @@ export interface CreateSignageMediaPayload {
   mediaType: 'video';
   sourceType: 'youtube' | 'vimeo';
   sourceUrl: string;
+  tags?: string[];
 }
 
 /* ─── Helpers ───────────────────────────────── */

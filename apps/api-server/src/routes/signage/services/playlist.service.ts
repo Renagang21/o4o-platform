@@ -71,8 +71,10 @@ export class SignagePlaylistService {
       });
     }
 
+    const validatedTags = (dto.tags || []).map(t => t.trim()).filter(Boolean);
     const playlist = await this.repository.createPlaylist({
       ...dto,
+      tags: validatedTags,
       serviceKey: scope.serviceKey,
       organizationId: scope.organizationId || null,
       createdByUserId: userId || null,
@@ -89,7 +91,11 @@ export class SignagePlaylistService {
     dto: UpdatePlaylistDto,
     scope: ScopeFilter,
   ): Promise<PlaylistResponseDto | null> {
-    const playlist = await this.repository.updatePlaylist(id, dto, scope);
+    const updateData = { ...dto } as Record<string, any>;
+    if (dto.tags) {
+      updateData.tags = dto.tags.map(t => t.trim()).filter(Boolean);
+    }
+    const playlist = await this.repository.updatePlaylist(id, updateData, scope);
     if (!playlist) return null;
     return toPlaylistResponse(playlist);
   }

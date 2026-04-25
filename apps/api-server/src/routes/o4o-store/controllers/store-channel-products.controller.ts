@@ -12,6 +12,9 @@
  *  GET    /:channelId/available — 등록 가능한 제품 목록
  *  POST   /:channelId           — 제품 등록
  *  PATCH  /:channelId/:productChannelId/deactivate — 제품 비활성화
+ *  PATCH  /:channelId/:productChannelId/activate  — 제품 활성화
+ *  DELETE /:channelId/:productChannelId            — 제품 삭제 (hard delete)
+ *  POST   /:channelId/bulk-action                  — 벌크 작업 (activate/deactivate/delete)
  */
 
 import { Router, Request, Response } from 'express';
@@ -324,6 +327,144 @@ export function createStoreChannelProductsController(
         await pcRepo.save(pc);
 
         res.json({ success: true, data: { id: pc.id, isActive: false } });
+      } catch (error: any) {
+        res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
+      }
+    }
+  );
+
+  // ─── PATCH /:channelId/:productChannelId/activate — 제품 활성화 ───
+  router.patch(
+    '/:channelId/:productChannelId/activate',
+    requireAuth,
+    requirePharmacyOwner,
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const organizationId = req.organizationId!;
+        const { channelId, productChannelId } = req.params;
+
+        const channelType = await validateChannel(channelId, organizationId, res, true);
+        if (!channelType) return;
+
+        const pcRepo = dataSource.getRepository(OrganizationProductChannel);
+        const pc = await pcRepo.findOne({
+          where: { id: productChannelId, channel_id: channelId },
+        });
+
+        if (!pc) {
+          res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Product channel mapping not found' } });
+          return;
+        }
+
+        if (pc.is_active) {
+          res.status(400).json({ success: false, error: { code: 'ALREADY_ACTIVE', message: 'Product is already active' } });
+          return;
+        }
+
+        pc.is_active = true;
+        await pcRepo.save(pc);
+
+        res.json({ success: true, data: { id: pc.id, isActive: true } });
+      } catch (error: any) {
+        res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
+      }
+    }
+  );
+
+  // ─── DELETE /:channelId/:productChannelId — 제품 삭제 (hard delete) ───
+  router.delete(
+    '/:channelId/:productChannelId',
+    requireAuth,
+    requirePharmacyOwner,
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const organizationId = req.organizationId!;
+        const { channelId, productChannelId } = req.params;
+
+        const channelType = await validateChannel(channelId, organizationId, res, true);
+        if (!channelType) return;
+
+        const pcRepo = dataSource.getRepository(OrganizationProductChannel);
+        const pc = await pcRepo.findOne({
+          where: { id: productChannelId, channel_id: channelId },
+        });
+
+        if (!pc) {
+          res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Product channel mapping not found' } });
+          return;
+        }
+
+        await pcRepo.remove(pc);
+
+        res.json({ success: true, data: { id: productChannelId, deleted: true } });
+      } catch (error: any) {
+        res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
+      }
+    }
+  );
+
+  // ─── POST /:channelId/bulk-action — 벌크 작업 ───
+  router.post(
+    '/:channelId/bulk-action',
+    requireAuth,
+    requirePharmacyOwner,
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const organizationId = req.organizationId!;
+        const { channelId } = req.params;
+        const { action, ids } = req.body;
+
+        if (!['activate', 'deactivate', 'delete'].includes(action)) {
+          res.status(400).json({ success: false, error: { code: 'INVALID_ACTION', message: 'action must be activate, deactivate, or delete' } });
+          return;
+        }
+        if (!Array.isArray(ids) || ids.length === 0) {
+          res.status(400).json({ success: false, error: { code: 'INVALID_INPUT', message: 'ids array is required and must not be empty' } });
+          return;
+        }
+        if (ids.length > 50) {
+          res.status(400).json({ success: false, error: { code: 'TOO_MANY_ITEMS', message: 'Maximum 50 items per bulk action' } });
+          return;
+        }
+
+        const channelType = await validateChannel(channelId, organizationId, res, true);
+        if (!channelType) return;
+
+        // Verify all ids belong to this channel
+        const pcRepo = dataSource.getRepository(OrganizationProductChannel);
+        const existing = await pcRepo
+          .createQueryBuilder('opc')
+          .where('opc.id IN (:...ids)', { ids })
+          .andWhere('opc.channel_id = :channelId', { channelId })
+          .getMany();
+
+        const validIds = existing.map(e => e.id);
+
+        if (validIds.length === 0) {
+          res.status(400).json({ success: false, error: { code: 'NO_VALID_ITEMS', message: 'No valid items found for this channel' } });
+          return;
+        }
+
+        await dataSource.transaction(async (manager) => {
+          if (action === 'delete') {
+            await manager
+              .createQueryBuilder()
+              .delete()
+              .from(OrganizationProductChannel)
+              .where('id IN (:...validIds)', { validIds })
+              .execute();
+          } else {
+            const isActive = action === 'activate';
+            await manager
+              .createQueryBuilder()
+              .update(OrganizationProductChannel)
+              .set({ is_active: isActive })
+              .where('id IN (:...validIds)', { validIds })
+              .execute();
+          }
+        });
+
+        res.json({ success: true, data: { requested: ids.length, processed: validIds.length } });
       } catch (error: any) {
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }

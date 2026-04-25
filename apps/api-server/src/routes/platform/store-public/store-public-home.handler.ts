@@ -79,11 +79,16 @@ export function createStorePublicHomeRoutes(deps: {
         : generateDefaultBlocks((pharmacy.template_profile || 'BASIC') as TemplateProfile);
       const channels = await deriveChannels(dataSource, pharmacy.id);
 
+      // WO-O4O-STORE-THEME-PIPELINE-FOUNDATION-V1: include theme in layout response
+      const storefrontConfig = pharmacy.storefront_config as Record<string, any> | null;
+      const theme = storefrontConfig?.theme || 'professional';
+
       res.json({
         success: true,
         data: {
           storeId: pharmacy.id,
           templateProfile: pharmacy.template_profile || 'BASIC',
+          theme,
           blocks,
           isDefault: !hasCustomBlocks,
           channels,

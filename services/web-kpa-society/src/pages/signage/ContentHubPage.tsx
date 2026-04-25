@@ -67,6 +67,7 @@ interface PlaylistItem {
   createdByUserId?: string;
   createdAt: string;
   updatedAt: string;
+  tags?: string[];
   metadata?: { tags?: string[] };
 }
 
@@ -189,6 +190,7 @@ export default function ContentHubPage() {
   const handleCreateVideo = async () => {
     if (!createForm.name.trim()) { setCreateError('제목을 입력하세요'); return; }
     if (!createForm.sourceUrl.trim()) { setCreateError('URL을 입력하세요'); return; }
+    if (formTags.length === 0) { setCreateError('태그를 최소 1개 입력하세요'); return; }
     setIsCreating(true);
     setCreateError(null);
     try {
@@ -320,6 +322,9 @@ export default function ContentHubPage() {
                           {(v.tags ?? []).slice(0, 2).map(t => (
                             <span key={t} style={styles.tagBadge}>#{t}</span>
                           ))}
+                          {(v.tags ?? []).length > 2 && (
+                            <span style={styles.tagBadge}>+{(v.tags ?? []).length - 2}</span>
+                          )}
                         </div>
                       </td>
                       <td style={{ ...styles.td, fontSize: 13, color: '#64748b' }}>
@@ -359,7 +364,7 @@ export default function ContentHubPage() {
                 </thead>
                 <tbody>
                   {playlists.map(p => {
-                    const tags = p.metadata?.tags ?? [];
+                    const tags = p.tags ?? [];
                     return (
                       <tr key={p.id} style={styles.tr}>
                         <td style={styles.td}>
@@ -373,6 +378,9 @@ export default function ContentHubPage() {
                             {tags.slice(0, 2).map((t: string) => (
                               <span key={t} style={styles.tagBadge}>#{t}</span>
                             ))}
+                            {tags.length > 2 && (
+                              <span style={styles.tagBadge}>+{tags.length - 2}</span>
+                            )}
                           </div>
                         </td>
                         <td style={{ ...styles.td, fontSize: 13, color: '#64748b' }}>

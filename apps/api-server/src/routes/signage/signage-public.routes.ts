@@ -59,7 +59,7 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
 
       if (search && search.trim()) {
         params.push(`%${search.trim()}%`);
-        conditions.push(`(m.name ILIKE $${params.length} OR m.description ILIKE $${params.length})`);
+        conditions.push(`(m.name ILIKE $${params.length} OR m.description ILIKE $${params.length} OR array_to_string(m.tags, ' ') ILIKE $${params.length})`);
       }
 
       const whereClause = conditions.join(' AND ');
@@ -145,7 +145,7 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
           p."totalDuration", p."itemCount",
           (p.status = 'active') as "isActive",
           p."loopEnabled" as "isLoop",
-          p.metadata, p.source, p."createdByUserId",
+          p.tags, p.metadata, p.source, p."createdByUserId",
           p."createdAt", p."updatedAt",
           COALESCE(o.name, u.name, u.email) as "creatorName"
         FROM signage_playlists p
@@ -233,7 +233,7 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
           p."totalDuration", p."itemCount",
           (p.status = 'active') as "isActive",
           p."loopEnabled" as "isLoop",
-          p.metadata, p.source,
+          p.tags, p.metadata, p.source,
           p."createdAt", p."updatedAt",
           COALESCE(o.name, u.name, u.email) as "creatorName"
         FROM signage_playlists p

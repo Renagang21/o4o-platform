@@ -29,10 +29,14 @@ import {
   Plus,
   X,
   Package,
-  MinusCircle,
   ChevronUp,
   ChevronDown,
   ExternalLink,
+  MoreVertical,
+  Trash2,
+  Copy,
+  Link2,
+  AlertCircle,
 } from 'lucide-react';
 import {
   fetchChannelOverviewWithCode,
@@ -52,6 +56,8 @@ import {
   fetchAvailableProducts,
   addProductToChannel,
   deactivateChannelProduct,
+  activateChannelProduct,
+  bulkChannelProductAction,
   reorderChannelProducts,
   type ChannelProduct,
   type AvailableProduct,
@@ -226,6 +232,127 @@ function AddProductModal({
   );
 }
 
+/* ─── ChannelPublicUrlCard (WO-O4O-STORE-CHANNEL-PUBLIC-URL-GUIDE-V1) ── */
+
+function ChannelPublicUrlCard({
+  channelType,
+  orgCode,
+  showToast,
+}: {
+  channelType: ChannelType;
+  orgCode: string | null;
+  showToast: (type: 'success' | 'error', message: string) => void;
+}) {
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+
+  // Determine URL and guidance per channel type
+  const getChannelUrl = (): { url: string | null; label: string; guidance: string | null; guidanceLink: string | null } => {
+    if (channelType === 'B2C') {
+      if (!orgCode) return { url: null, label: '온라인 스토어', guidance: null, guidanceLink: null };
+      return { url: `${origin}/store/${orgCode}`, label: '온라인 스토어', guidance: null, guidanceLink: null };
+    }
+    if (channelType === 'TABLET') {
+      if (!orgCode) return { url: null, label: '태블릿', guidance: null, guidanceLink: null };
+      return { url: `${origin}/tablet/${orgCode}`, label: '태블릿 주문 화면', guidance: null, guidanceLink: null };
+    }
+    if (channelType === 'KIOSK') {
+      return {
+        url: null,
+        label: '키오스크',
+        guidance: '키오스크는 별도 공개 URL이 없습니다. B2C 스토어 또는 태블릿 채널을 통해 고객이 접근합니다.',
+        guidanceLink: null,
+      };
+    }
+    // SIGNAGE
+    return {
+      url: null,
+      label: '사이니지',
+      guidance: '재생 화면은 사이니지 관리에서 플레이리스트를 선택하여 실행합니다.',
+      guidanceLink: '/store/marketing/signage/player',
+    };
+  };
+
+  const { url, label, guidance, guidanceLink } = getChannelUrl();
+
+  const handleCopy = async () => {
+    if (!url) return;
+    try {
+      await navigator.clipboard.writeText(url);
+      showToast('success', '공개 주소가 클립보드에 복사되었습니다.');
+    } catch {
+      showToast('error', '복사에 실패했습니다. 주소를 직접 복사해 주세요.');
+    }
+  };
+
+  // No slug case for B2C/TABLET
+  if ((channelType === 'B2C' || channelType === 'TABLET') && !orgCode) {
+    return (
+      <div className="flex items-center gap-3 p-4 mb-6 rounded-lg border border-amber-200 bg-amber-50">
+        <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0" />
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-amber-800">공개 주소가 아직 설정되지 않았습니다</p>
+          <p className="text-xs text-amber-600 mt-0.5">매장 설정에서 약국 코드를 등록하면 공개 URL이 생성됩니다.</p>
+        </div>
+        <Link
+          to="/store/settings"
+          className="flex-shrink-0 px-3 py-1.5 text-xs font-medium text-amber-700 bg-white border border-amber-300 rounded-lg hover:bg-amber-100"
+        >
+          설정으로 이동
+        </Link>
+      </div>
+    );
+  }
+
+  // KIOSK / SIGNAGE guidance
+  if (guidance) {
+    return (
+      <div className="flex items-center gap-3 p-4 mb-6 rounded-lg border border-slate-200 bg-slate-50">
+        <Link2 className="w-5 h-5 text-slate-400 flex-shrink-0" />
+        <div className="flex-1 min-w-0">
+          <p className="text-sm text-slate-600">{guidance}</p>
+        </div>
+        {guidanceLink && (
+          <Link
+            to={guidanceLink}
+            className="flex-shrink-0 inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-700 bg-white border border-blue-200 rounded-lg hover:bg-blue-50"
+          >
+            사이니지 재생 <ExternalLink className="w-3 h-3" />
+          </Link>
+        )}
+      </div>
+    );
+  }
+
+  // B2C / TABLET with valid URL
+  return (
+    <div className="flex items-center gap-3 p-4 mb-6 rounded-lg border border-slate-200 bg-white">
+      <Link2 className="w-5 h-5 text-blue-500 flex-shrink-0" />
+      <div className="flex-1 min-w-0">
+        <div className="text-xs text-slate-500 mb-0.5">{label} 공개 주소</div>
+        <div className="text-sm font-mono text-slate-800 truncate">{url}</div>
+      </div>
+      <div className="flex items-center gap-1.5 flex-shrink-0">
+        <button
+          onClick={handleCopy}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200"
+          title="주소 복사"
+        >
+          <Copy className="w-3.5 h-3.5" /> 복사
+        </button>
+        <a
+          href={url!}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100"
+          title="새 탭에서 열기"
+        >
+          <ExternalLink className="w-3.5 h-3.5" /> 열기
+        </a>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Main Component ─────────────────────────── */
 
 export function StoreChannelsPage() {
@@ -240,10 +367,20 @@ export function StoreChannelsPage() {
   const [channelProducts, setChannelProducts] = useState<ChannelProduct[]>([]);
   const [productLoading, setProductLoading] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [deactivatingId, setDeactivatingId] = useState<string | null>(null);
+  // deactivatingId removed — replaced by actionLoading + confirmModal (WO-KPA-STORE-CHANNEL-PRODUCT-LIST-SELECTION-ACTIONS-V1)
   const [reordering, setReordering] = useState(false);
   const [orgCode, setOrgCode] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
+
+  // WO-KPA-STORE-CHANNEL-PRODUCT-LIST-SELECTION-ACTIONS-V1
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [confirmModal, setConfirmModal] = useState<{
+    type: 'delete' | 'deactivate' | 'activate';
+    ids: string[];
+    isBulk: boolean;
+  } | null>(null);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [actionMenuId, setActionMenuId] = useState<string | null>(null);
 
   // WO-STORE-CHANNEL-BETA-READINESS-V1: user feedback + operational visibility
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -298,6 +435,8 @@ export function StoreChannelsPage() {
   }, [showToast]);
 
   useEffect(() => {
+    setSelectedIds(new Set());
+    setActionMenuId(null);
     if (isProductChannel && currentChannel?.id) {
       loadChannelProducts(currentChannel.id);
     } else {
@@ -364,22 +503,6 @@ export function StoreChannelsPage() {
     }
   };
 
-  // Deactivate product handler
-  const handleDeactivateProduct = async (productChannelId: string) => {
-    if (!currentChannel) return;
-    setDeactivatingId(productChannelId);
-    try {
-      await deactivateChannelProduct(currentChannel.id, productChannelId);
-      await loadChannelProducts(currentChannel.id);
-      fetchChannelOverview().then(setChannels).catch(() => {});
-      showToast('success', '제품이 채널에서 제거되었습니다.');
-    } catch {
-      showToast('error', '제품 제거에 실패했습니다.');
-    } finally {
-      setDeactivatingId(null);
-    }
-  };
-
   // Product added callback
   const handleProductAdded = () => {
     if (currentChannel) {
@@ -413,6 +536,88 @@ export function StoreChannelsPage() {
       await loadChannelProducts(currentChannel.id);
     } finally {
       setReordering(false);
+    }
+  };
+
+  // ─── Selection helpers ───
+  const allProducts = useMemo(() => [...activeProducts, ...inactiveProducts], [activeProducts, inactiveProducts]);
+  const allSelected = allProducts.length > 0 && allProducts.every(p => selectedIds.has(p.id));
+  const someSelected = selectedIds.size > 0;
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (allSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(allProducts.map(p => p.id)));
+    }
+  };
+
+  // ─── Single row action handler ───
+  const handleSingleAction = async (type: 'activate' | 'deactivate' | 'delete', productChannelId: string) => {
+    if (!currentChannel) return;
+    setActionMenuId(null);
+    if (type === 'delete') {
+      setConfirmModal({ type: 'delete', ids: [productChannelId], isBulk: false });
+      return;
+    }
+    setActionLoading(true);
+    try {
+      if (type === 'deactivate') {
+        await deactivateChannelProduct(currentChannel.id, productChannelId);
+        showToast('success', '제품이 비활성화되었습니다.');
+      } else {
+        await activateChannelProduct(currentChannel.id, productChannelId);
+        showToast('success', '제품이 활성화되었습니다.');
+      }
+      await loadChannelProducts(currentChannel.id);
+      fetchChannelOverview().then(setChannels).catch(() => {});
+      setSelectedIds(prev => { const n = new Set(prev); n.delete(productChannelId); return n; });
+    } catch {
+      showToast('error', type === 'deactivate' ? '비활성화에 실패했습니다.' : '활성화에 실패했습니다.');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // ─── Bulk action handler ───
+  const handleBulkAction = (type: 'activate' | 'deactivate' | 'delete') => {
+    const ids = Array.from(selectedIds);
+    if (ids.length === 0) return;
+    if (type === 'delete') {
+      setConfirmModal({ type: 'delete', ids, isBulk: true });
+    } else {
+      setConfirmModal({ type, ids, isBulk: true });
+    }
+  };
+
+  // ─── Confirm modal execute ───
+  const handleConfirmAction = async () => {
+    if (!confirmModal || !currentChannel) return;
+    setActionLoading(true);
+    try {
+      const result = await bulkChannelProductAction(currentChannel.id, confirmModal.type, confirmModal.ids);
+      const labels = { delete: '삭제', deactivate: '비활성화', activate: '활성화' };
+      if (result.requested === result.processed) {
+        showToast('success', `${result.processed}개 제품이 ${labels[confirmModal.type]}되었습니다.`);
+      } else {
+        showToast('error', `${result.requested}개 중 ${result.processed}개 처리 완료 (일부 실패)`);
+      }
+      await loadChannelProducts(currentChannel.id);
+      fetchChannelOverview().then(setChannels).catch(() => {});
+      setSelectedIds(new Set());
+    } catch {
+      showToast('error', '작업에 실패했습니다.');
+    } finally {
+      setActionLoading(false);
+      setConfirmModal(null);
     }
   };
 
@@ -591,6 +796,15 @@ export function StoreChannelsPage() {
         </div>
       </div>
 
+      {/* ─── Public URL Card (WO-O4O-STORE-CHANNEL-PUBLIC-URL-GUIDE-V1) ─── */}
+      {currentChannel && (
+        <ChannelPublicUrlCard
+          channelType={activeTab}
+          orgCode={orgCode}
+          showToast={showToast}
+        />
+      )}
+
       {/* ─── [C] Quick Actions ───────────────────── */}
       <div className="flex gap-2 mb-6">
         <button
@@ -690,21 +904,73 @@ export function StoreChannelsPage() {
             </div>
           ) : (
             <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
+              {/* ─── Selection Action Bar ─── */}
+              {someSelected && (
+                <div className="flex items-center gap-2 px-4 py-2.5 bg-blue-50 border-b border-blue-200">
+                  <span className="text-xs font-medium text-blue-700">{selectedIds.size}개 선택됨</span>
+                  <div className="flex items-center gap-1.5 ml-auto">
+                    <button
+                      onClick={() => setSelectedIds(new Set())}
+                      className="px-2.5 py-1 text-xs font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50"
+                    >
+                      선택 해제
+                    </button>
+                    <button
+                      onClick={() => handleBulkAction('deactivate')}
+                      disabled={actionLoading}
+                      className="px-2.5 py-1 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-300 rounded-lg hover:bg-amber-100 disabled:opacity-50"
+                    >
+                      <EyeOff className="w-3 h-3 inline mr-1" />비활성화
+                    </button>
+                    <button
+                      onClick={() => handleBulkAction('activate')}
+                      disabled={actionLoading}
+                      className="px-2.5 py-1 text-xs font-medium text-green-700 bg-green-50 border border-green-300 rounded-lg hover:bg-green-100 disabled:opacity-50"
+                    >
+                      <Eye className="w-3 h-3 inline mr-1" />활성화
+                    </button>
+                    <button
+                      onClick={() => handleBulkAction('delete')}
+                      disabled={actionLoading}
+                      className="px-2.5 py-1 text-xs font-medium text-red-700 bg-red-50 border border-red-300 rounded-lg hover:bg-red-100 disabled:opacity-50"
+                    >
+                      <Trash2 className="w-3 h-3 inline mr-1" />삭제
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-slate-50 text-left text-xs text-slate-500 uppercase">
-                    <th className="px-4 py-3 font-medium w-16">#</th>
+                    <th className="px-3 py-3 w-10">
+                      <input
+                        type="checkbox"
+                        checked={allSelected}
+                        onChange={toggleSelectAll}
+                        className="rounded border-slate-300"
+                      />
+                    </th>
+                    <th className="px-4 py-3 font-medium w-12">#</th>
                     <th className="px-4 py-3 font-medium">상품명</th>
                     <th className="px-4 py-3 font-medium w-20">유형</th>
                     <th className="px-4 py-3 font-medium w-28">가격</th>
                     <th className="px-4 py-3 font-medium w-20">상태</th>
                     <th className="px-4 py-3 font-medium w-16">순서</th>
-                    <th className="px-4 py-3 font-medium w-20">액션</th>
+                    <th className="px-4 py-3 font-medium w-16">액션</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {activeProducts.map((product, idx) => (
-                    <tr key={product.id} className="hover:bg-slate-50">
+                    <tr key={product.id} className={`hover:bg-slate-50 ${selectedIds.has(product.id) ? 'bg-blue-50/50' : ''}`}>
+                      <td className="px-3 py-3">
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.has(product.id)}
+                          onChange={() => toggleSelect(product.id)}
+                          className="rounded border-slate-300"
+                        />
+                      </td>
                       <td className="px-4 py-3 text-slate-400">{idx + 1}</td>
                       <td className="px-4 py-3">
                         <div className="font-medium text-slate-900 truncate max-w-sm">
@@ -748,32 +1014,49 @@ export function StoreChannelsPage() {
                           </button>
                         </div>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 relative">
                         <button
-                          onClick={() => handleDeactivateProduct(product.id)}
-                          disabled={deactivatingId === product.id}
-                          className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 disabled:opacity-50"
-                          title="채널에서 제거"
+                          onClick={() => setActionMenuId(actionMenuId === product.id ? null : product.id)}
+                          className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-600"
                         >
-                          {deactivatingId === product.id ? (
-                            <Loader2 className="w-3 h-3 animate-spin" />
-                          ) : (
-                            <MinusCircle className="w-3 h-3" />
-                          )}
-                          제거
+                          <MoreVertical className="w-4 h-4" />
                         </button>
+                        {actionMenuId === product.id && (
+                          <div className="absolute right-4 top-10 z-20 bg-white border border-slate-200 rounded-lg shadow-lg py-1 min-w-[120px]">
+                            <button
+                              onClick={() => handleSingleAction('deactivate', product.id)}
+                              className="w-full text-left px-3 py-2 text-xs text-amber-700 hover:bg-amber-50 flex items-center gap-2"
+                            >
+                              <EyeOff className="w-3.5 h-3.5" /> 비활성화
+                            </button>
+                            <button
+                              onClick={() => handleSingleAction('delete', product.id)}
+                              className="w-full text-left px-3 py-2 text-xs text-red-600 hover:bg-red-50 flex items-center gap-2"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" /> 삭제
+                            </button>
+                          </div>
+                        )}
                       </td>
                     </tr>
                   ))}
                   {inactiveProducts.length > 0 && (
                     <>
                       <tr className="bg-slate-50/50">
-                        <td colSpan={7} className="px-4 py-2 text-xs text-slate-400">
+                        <td colSpan={8} className="px-4 py-2 text-xs text-slate-400">
                           비활성 제품 ({inactiveProducts.length})
                         </td>
                       </tr>
                       {inactiveProducts.map(product => (
-                        <tr key={product.id} className="opacity-50">
+                        <tr key={product.id} className={`${selectedIds.has(product.id) ? 'bg-blue-50/30' : 'opacity-50'}`}>
+                          <td className="px-3 py-2">
+                            <input
+                              type="checkbox"
+                              checked={selectedIds.has(product.id)}
+                              onChange={() => toggleSelect(product.id)}
+                              className="rounded border-slate-300"
+                            />
+                          </td>
                           <td className="px-4 py-2 text-slate-300">-</td>
                           <td className="px-4 py-2 text-slate-400 line-through truncate max-w-sm">
                             {product.productName}
@@ -792,7 +1075,30 @@ export function StoreChannelsPage() {
                             </span>
                           </td>
                           <td className="px-4 py-2" />
-                          <td className="px-4 py-2" />
+                          <td className="px-4 py-2 relative">
+                            <button
+                              onClick={() => setActionMenuId(actionMenuId === product.id ? null : product.id)}
+                              className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-600"
+                            >
+                              <MoreVertical className="w-4 h-4" />
+                            </button>
+                            {actionMenuId === product.id && (
+                              <div className="absolute right-4 top-8 z-20 bg-white border border-slate-200 rounded-lg shadow-lg py-1 min-w-[120px]">
+                                <button
+                                  onClick={() => handleSingleAction('activate', product.id)}
+                                  className="w-full text-left px-3 py-2 text-xs text-green-700 hover:bg-green-50 flex items-center gap-2"
+                                >
+                                  <Eye className="w-3.5 h-3.5" /> 활성화
+                                </button>
+                                <button
+                                  onClick={() => handleSingleAction('delete', product.id)}
+                                  className="w-full text-left px-3 py-2 text-xs text-red-600 hover:bg-red-50 flex items-center gap-2"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" /> 삭제
+                                </button>
+                              </div>
+                            )}
+                          </td>
                         </tr>
                       ))}
                     </>
@@ -932,6 +1238,60 @@ export function StoreChannelsPage() {
           onProductAdded={handleProductAdded}
           onError={(msg) => showToast('error', msg)}
         />
+      )}
+
+      {/* ─── Confirm Action Modal (WO-KPA-STORE-CHANNEL-PRODUCT-LIST-SELECTION-ACTIONS-V1) ─── */}
+      {confirmModal && (
+        <>
+          <div className="fixed inset-0 bg-black/50 z-[1000]" onClick={() => !actionLoading && setConfirmModal(null)} />
+          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-2xl z-[1001] w-full max-w-sm">
+            <div className="px-6 py-5">
+              <h3 className="text-base font-semibold text-slate-900 mb-2">
+                {confirmModal.type === 'delete' ? '제품 삭제 확인' : confirmModal.type === 'deactivate' ? '제품 비활성화 확인' : '제품 활성화 확인'}
+              </h3>
+              <p className="text-sm text-slate-600">
+                {confirmModal.type === 'delete' ? (
+                  <>
+                    {confirmModal.isBulk ? `선택한 ${confirmModal.ids.length}개` : '이'} 제품을 채널에서 완전히 삭제하시겠습니까?
+                    <span className="block mt-1 text-xs text-slate-400">삭제된 제품은 "제품 추가"로 다시 등록해야 합니다.</span>
+                  </>
+                ) : confirmModal.type === 'deactivate' ? (
+                  <>선택한 {confirmModal.ids.length}개 제품을 비활성화하시겠습니까?</>
+                ) : (
+                  <>선택한 {confirmModal.ids.length}개 제품을 활성화하시겠습니까?</>
+                )}
+              </p>
+            </div>
+            <div className="flex justify-end gap-2 px-6 py-4 border-t border-slate-200">
+              <button
+                onClick={() => setConfirmModal(null)}
+                disabled={actionLoading}
+                className="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200 disabled:opacity-50"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleConfirmAction}
+                disabled={actionLoading}
+                className={`px-4 py-2 text-sm font-medium text-white rounded-lg disabled:opacity-50 flex items-center gap-1.5 ${
+                  confirmModal.type === 'delete'
+                    ? 'bg-red-600 hover:bg-red-700'
+                    : confirmModal.type === 'deactivate'
+                    ? 'bg-amber-600 hover:bg-amber-700'
+                    : 'bg-green-600 hover:bg-green-700'
+                }`}
+              >
+                {actionLoading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                {confirmModal.type === 'delete' ? '삭제' : confirmModal.type === 'deactivate' ? '비활성화' : '활성화'}
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ─── Click-outside handler for action menu ─── */}
+      {actionMenuId && (
+        <div className="fixed inset-0 z-10" onClick={() => setActionMenuId(null)} />
       )}
     </div>
   );

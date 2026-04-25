@@ -78,3 +78,34 @@ export async function reorderChannelProducts(
     { items }
   );
 }
+
+export async function activateChannelProduct(
+  channelId: string,
+  productChannelId: string,
+): Promise<void> {
+  await apiClient.patch<{ success: boolean; data: { id: string; isActive: boolean } }>(
+    `/store-hub/channel-products/${channelId}/${productChannelId}/activate`,
+    {}
+  );
+}
+
+export async function deleteChannelProduct(
+  channelId: string,
+  productChannelId: string,
+): Promise<void> {
+  await apiClient.delete<{ success: boolean; data: { id: string; deleted: boolean } }>(
+    `/store-hub/channel-products/${channelId}/${productChannelId}`
+  );
+}
+
+export async function bulkChannelProductAction(
+  channelId: string,
+  action: 'activate' | 'deactivate' | 'delete',
+  ids: string[],
+): Promise<{ requested: number; processed: number }> {
+  const response = await apiClient.post<{ success: boolean; data: { requested: number; processed: number } }>(
+    `/store-hub/channel-products/${channelId}/bulk-action`,
+    { action, ids }
+  );
+  return response.data;
+}

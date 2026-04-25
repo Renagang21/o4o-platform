@@ -102,7 +102,7 @@ export default function PlaylistEditorPage() {
           const d = res.data;
           setTitle(d.name || '');
           setDescription(d.description || '');
-          setTags(d.metadata?.tags || []);
+          setTags(d.tags || []);
           const loadedItems: PlaylistItem[] = (d.items || [])
             .sort((a: any, b: any) => (a.displayOrder ?? a.sortOrder ?? 0) - (b.displayOrder ?? b.sortOrder ?? 0))
             .map((item: any) => ({

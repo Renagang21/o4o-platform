@@ -47,6 +47,7 @@ export function toPlaylistResponse(playlist: SignagePlaylist): PlaylistResponseD
     isPublic: playlist.isPublic,
     likeCount: playlist.likeCount,
     downloadCount: playlist.downloadCount,
+    tags: playlist.tags || [],
     createdByUserId: playlist.createdByUserId,
     createdAt: playlist.createdAt?.toISOString(),
     updatedAt: playlist.updatedAt?.toISOString(),
