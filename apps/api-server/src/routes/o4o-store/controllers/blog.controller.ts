@@ -108,47 +108,9 @@ export function createBlogController(
   });
 
   // ============================================================================
-  // PUBLIC — 게시글 상세 (by postSlug)
-  // GET /stores/:slug/blog/:postSlug
-  // Must be registered AFTER /stores/:slug/blog/staff to avoid collision
-  // ============================================================================
-  router.get('/:slug/blog/:postSlug', async (req: Request, res: Response) => {
-    try {
-      const { slug, postSlug } = req.params;
-
-      // "staff" is handled by the staff route above
-      if (postSlug === 'staff') return;
-
-      const pharmacy = await resolvePharmacy(slug);
-      if (!pharmacy) {
-        res.status(404).json({ success: false, error: { code: 'STORE_NOT_FOUND', message: 'Store not found' } });
-        return;
-      }
-
-      const post = await blogRepo.findOne({
-        where: {
-          storeId: pharmacy.id,
-          serviceKey,
-          slug: postSlug,
-          status: 'published' as StoreBlogPostStatus,
-          publishedAt: LessThanOrEqual(new Date()),
-        },
-      });
-
-      if (!post) {
-        res.status(404).json({ success: false, error: { code: 'POST_NOT_FOUND', message: 'Blog post not found' } });
-        return;
-      }
-
-      res.json({ success: true, data: post });
-    } catch (err: any) {
-      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: err.message } });
-    }
-  });
-
-  // ============================================================================
   // STAFF — 전체 게시글 목록 (draft 포함)
   // GET /stores/:slug/blog/staff
+  // MUST be registered BEFORE /:slug/blog/:postSlug to avoid wildcard collision
   // ============================================================================
   router.get('/:slug/blog/staff', requireAuth, async (req: Request, res: Response) => {
     try {
@@ -399,6 +361,42 @@ export function createBlogController(
 
       await blogRepo.remove(post);
       res.json({ success: true, data: { id, deleted: true } });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: err.message } });
+    }
+  });
+
+  // ============================================================================
+  // PUBLIC — 게시글 상세 (by postSlug)
+  // GET /stores/:slug/blog/:postSlug
+  // MUST be registered AFTER all /blog/staff routes to avoid wildcard collision
+  // ============================================================================
+  router.get('/:slug/blog/:postSlug', async (req: Request, res: Response) => {
+    try {
+      const { slug, postSlug } = req.params;
+
+      const pharmacy = await resolvePharmacy(slug);
+      if (!pharmacy) {
+        res.status(404).json({ success: false, error: { code: 'STORE_NOT_FOUND', message: 'Store not found' } });
+        return;
+      }
+
+      const post = await blogRepo.findOne({
+        where: {
+          storeId: pharmacy.id,
+          serviceKey,
+          slug: postSlug,
+          status: 'published' as StoreBlogPostStatus,
+          publishedAt: LessThanOrEqual(new Date()),
+        },
+      });
+
+      if (!post) {
+        res.status(404).json({ success: false, error: { code: 'POST_NOT_FOUND', message: 'Blog post not found' } });
+        return;
+      }
+
+      res.json({ success: true, data: post });
     } catch (err: any) {
       res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: err.message } });
     }
