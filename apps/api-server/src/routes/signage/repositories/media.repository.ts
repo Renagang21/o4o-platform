@@ -62,7 +62,7 @@ export class SignageMediaRepository {
       qb.andWhere('media.tags && :tags', { tags: query.tags });
     }
     if (query.search) {
-      qb.andWhere('(media.name ILIKE :search OR media.description ILIKE :search)', {
+      qb.andWhere('(media.name ILIKE :search OR media.description ILIKE :search OR media.tags::text ILIKE :search)', {
         search: `%${query.search}%`,
       });
     }
@@ -162,7 +162,7 @@ export class SignageMediaRepository {
         qb.andWhere('media.mediaType = :mediaType', { mediaType });
       }
       if (search) {
-        qb.andWhere('(media.name ILIKE :search OR media.description ILIKE :search)', {
+        qb.andWhere('(media.name ILIKE :search OR media.description ILIKE :search OR media.tags::text ILIKE :search)', {
           search: `%${search}%`,
         });
       }

@@ -69,6 +69,7 @@ export default function WorkingContentEditPage() {
 
   const handleSave = async () => {
     if (!id) return;
+    if (tags.length === 0) { toast.error('태그를 1개 이상 입력해주세요'); return; }
     setIsSaving(true);
     try {
       await updateWorkingContent(id, {
@@ -87,6 +88,7 @@ export default function WorkingContentEditPage() {
 
   const handlePublish = async () => {
     if (!id) return;
+    if (tags.length === 0) { toast.error('태그를 1개 이상 입력해주세요'); return; }
     if (!window.confirm('이 콘텐츠를 매장에 발행하시겠습니까?')) return;
     setIsPublishing(true);
     try {
@@ -127,10 +129,9 @@ export default function WorkingContentEditPage() {
   };
 
   const addTag = () => {
-    const t = tagInput.trim();
-    if (t && !tags.includes(t)) {
-      setTags(prev => [...prev, t]);
-    }
+    const t = tagInput.trim().replace(/^#/, '');
+    if (!t || t.length > 30 || tags.includes(t)) { setTagInput(''); return; }
+    setTags(prev => [...prev, t]);
     setTagInput('');
   };
 

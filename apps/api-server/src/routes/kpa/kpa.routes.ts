@@ -85,7 +85,6 @@ import { createStoreChannelProductsController } from '../o4o-store/controllers/s
 import { createKpaStoreTemplateController } from '../o4o-store/controllers/kpa-store-template.controller.js';
 import { createKpaCheckoutController } from './controllers/kpa-checkout.controller.js'; // WO-O4O-KPA-CUSTOMER-COMMERCE-LOOP-V1
 import { createKpaPaymentController } from './controllers/kpa-payment.controller.js'; // WO-O4O-KPA-CUSTOMER-COMMERCE-LOOP-V1
-import { createTabletController } from '../o4o-store/controllers/tablet.controller.js';
 import { createBlogController } from '../o4o-store/controllers/blog.controller.js';
 import { createLayoutController } from '../o4o-store/controllers/layout.controller.js'; // WO-STORE-BLOCK-ENGINE-V1
 import { createStoreSettingsController } from '../o4o-store/controllers/store-settings.controller.js'; // WO-STORE-COMMON-SETTINGS-FOUNDATION-V1
@@ -370,12 +369,11 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // ============================================================================
   // Store Channel Routes — WO-KPA-STORE-CHANNEL-INTEGRATION-V1
   // organizations 테이블 단일 참조 (Phase C 전환 완료)
-  // Tablet/Blog/Template 채널을 KPA 네임스페이스에서 제공
-  // /api/v1/kpa/stores/:slug/tablet|blog|template
+  // Blog/Template 채널을 KPA 네임스페이스에서 제공
+  // /api/v1/kpa/stores/:slug/blog|template
+  // WO-O4O-STORE-TABLET-LEGACY-CLEANUP-V1: Removed legacy tablet controller
+  // Tablet product/interest APIs use unified store-public routes (/api/v1/stores/:slug/tablet/*)
   // ============================================================================
-  const kpaTabletController = createTabletController(dataSource, coreRequireAuth as any, 'kpa');
-  router.use('/stores', kpaTabletController);
-
   const kpaBlogController = createBlogController(dataSource, coreRequireAuth as any, 'kpa');
   router.use('/stores', kpaBlogController);
 
@@ -1059,6 +1057,20 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         return;
       }
 
+      // O4O Tag Policy V1 — sanitize + 최소 1개 필수
+      const sanitizeContentTags = (t: unknown): string[] => {
+        if (!Array.isArray(t)) return [];
+        return [...new Set<string>(
+          t.map((v: any) => String(v).trim().replace(/^#/, ''))
+            .filter(Boolean).filter((v: string) => v.length <= 30)
+        )];
+      };
+      const sanitizedTags = sanitizeContentTags(tags);
+      if (sanitizedTags.length === 0) {
+        res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: '태그를 1개 이상 입력해주세요' } });
+        return;
+      }
+
       const validStatuses = ['draft', 'published', 'private'];
       const status = validStatuses.includes(reqStatus) ? reqStatus : 'draft';
       const validContentTypes = ['participation', 'information'];
@@ -1072,7 +1084,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
           title.trim(),
           summary || null,
           JSON.stringify(Array.isArray(blocks) ? blocks : []),
-          JSON.stringify(Array.isArray(tags) ? tags : []),
+          JSON.stringify(sanitizedTags),
           category || null,
           thumbnail_url || null,
           source_type || 'manual',
@@ -1159,7 +1171,21 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       if (title !== undefined) { sets.push(`title = $${idx++}`); params.push(title.trim()); }
       if (summary !== undefined) { sets.push(`summary = $${idx++}`); params.push(summary || null); }
       if (blocks !== undefined) { sets.push(`blocks = $${idx++}`); params.push(JSON.stringify(Array.isArray(blocks) ? blocks : existing.blocks)); }
-      if (tags !== undefined) { sets.push(`tags = $${idx++}`); params.push(JSON.stringify(Array.isArray(tags) ? tags : existing.tags)); }
+      if (tags !== undefined) {
+        const sanitizeTags = (t: unknown): string[] => {
+          if (!Array.isArray(t)) return [];
+          return [...new Set<string>(
+            t.map((v: any) => String(v).trim().replace(/^#/, ''))
+              .filter(Boolean).filter((v: string) => v.length <= 30)
+          )];
+        };
+        const sanitized = sanitizeTags(tags);
+        if (sanitized.length === 0) {
+          res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: '태그를 1개 이상 입력해주세요' } });
+          return;
+        }
+        sets.push(`tags = $${idx++}`); params.push(JSON.stringify(sanitized));
+      }
       if (category !== undefined) { sets.push(`category = $${idx++}`); params.push(category || null); }
       if (thumbnail_url !== undefined) { sets.push(`thumbnail_url = $${idx++}`); params.push(thumbnail_url || null); }
       if (source_type !== undefined) { sets.push(`source_type = $${idx++}`); params.push(source_type); }

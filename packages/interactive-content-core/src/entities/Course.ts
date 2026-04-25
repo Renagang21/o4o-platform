@@ -114,8 +114,8 @@ export class Course {
   @Column({ type: 'jsonb', nullable: true })
   metadata?: Record<string, any>;
 
-  @Column({ type: 'simple-array', nullable: true })
-  tags?: string[];
+  @Column({ type: 'text', array: true, default: '{}' })
+  tags!: string[];
 
   // Timestamps
   @CreateDateColumn()

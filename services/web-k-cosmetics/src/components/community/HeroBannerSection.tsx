@@ -91,7 +91,7 @@ const styles: Record<string, CSSProperties> = {
     height: 320,
     borderRadius: 16,
     overflow: 'hidden',
-    marginBottom: 24,
+    marginBottom: 0,
   },
   slideLink: {
     display: 'block',
@@ -155,7 +155,7 @@ const styles: Record<string, CSSProperties> = {
     borderRadius: 16,
     padding: '48px 32px',
     textAlign: 'center' as const,
-    marginBottom: 24,
+    marginBottom: 0,
   },
   defaultContent: {
     maxWidth: 600,

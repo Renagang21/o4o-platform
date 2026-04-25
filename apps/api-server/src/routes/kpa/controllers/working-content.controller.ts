@@ -19,6 +19,16 @@ import { isStoreOwner } from '../../../utils/store-owner.utils.js';
 
 type AuthMiddleware = RequestHandler;
 
+/** O4O Tag Policy V1 — sanitize (trim / #strip / 30char / dedup) */
+function sanitizeContentTags(tags: unknown): string[] {
+  if (!Array.isArray(tags)) return [];
+  return [...new Set<string>(
+    tags.map((t: any) => String(t).trim().replace(/^#/, ''))
+      .filter(Boolean)
+      .filter((t: string) => t.length <= 30)
+  )];
+}
+
 export function createWorkingContentController(
   dataSource: DataSource,
   requireAuth: AuthMiddleware,
@@ -44,7 +54,7 @@ export function createWorkingContentController(
     let idx = 2;
 
     if (search) {
-      where += ` AND title ILIKE $${idx}`;
+      where += ` AND (title ILIKE $${idx} OR tags::text ILIKE $${idx})`;
       params.push(`%${search}%`);
       idx++;
     }
@@ -112,13 +122,22 @@ export function createWorkingContentController(
 
     const { title, edited_blocks, tags, category } = req.body;
 
+    // O4O Tag Policy V1 — sanitize + 최소 1개 필수
+    if (tags !== undefined) {
+      const sanitized = sanitizeContentTags(tags);
+      if (sanitized.length === 0) {
+        res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: '태그를 1개 이상 입력해주세요' } });
+        return;
+      }
+    }
+
     const sets: string[] = [];
     const params: any[] = [];
     let idx = 1;
 
     if (title !== undefined) { sets.push(`title = $${idx++}`); params.push(title); }
     if (edited_blocks !== undefined) { sets.push(`edited_blocks = $${idx++}`); params.push(JSON.stringify(edited_blocks)); }
-    if (tags !== undefined) { sets.push(`tags = $${idx++}`); params.push(JSON.stringify(tags)); }
+    if (tags !== undefined) { sets.push(`tags = $${idx++}`); params.push(JSON.stringify(sanitizeContentTags(tags))); }
     if (category !== undefined) { sets.push(`category = $${idx++}`); params.push(category || null); }
 
     if (sets.length === 0) {

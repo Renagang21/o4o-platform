@@ -5,6 +5,16 @@ import { Course, CourseStatus, CourseLevel } from '@o4o/lms-core';
 import { sanitizeInstructor } from '../utils/sanitize-user.js';
 import logger from '../../../utils/logger.js';
 
+/** O4O Tag Policy V1 — sanitize (trim / #strip / 30char / dedup) */
+function sanitizeCourseTags(tags: unknown): string[] {
+  if (!Array.isArray(tags)) return [];
+  return [...new Set<string>(
+    tags.map((t: any) => String(t).trim().replace(/^#/, ''))
+      .filter(Boolean)
+      .filter((t: string) => t.length <= 30)
+  )];
+}
+
 export interface CreateCourseRequest {
   title: string;
   description: string;
@@ -76,8 +86,15 @@ export class CourseService extends BaseService<Course> {
       }
     }
 
+    // O4O Tag Policy V1 — sanitize + required
+    const sanitizedTags = sanitizeCourseTags(data.tags);
+    if (sanitizedTags.length === 0) {
+      throw new Error('태그를 1개 이상 입력해주세요');
+    }
+
     const course = this.courseRepository.create({
       ...data,
+      tags: sanitizedTags,
       status: CourseStatus.DRAFT,
       currentEnrollments: 0,
       isPublished: false
@@ -138,7 +155,7 @@ export class CourseService extends BaseService<Course> {
     }
 
     if (search) {
-      query.andWhere('(course.title ILIKE :search OR course.description ILIKE :search)', {
+      query.andWhere('(course.title ILIKE :search OR course.description ILIKE :search OR course.tags::text ILIKE :search)', {
         search: `%${search}%`
       });
     }
@@ -191,6 +208,15 @@ export class CourseService extends BaseService<Course> {
       if (!willRequireApproval && (!price || Number(price) <= 0)) {
         throw new Error('유료 과정은 가격이 필수입니다 (강사 승인 모델 제외)');
       }
+    }
+
+    // O4O Tag Policy V1 — sanitize + required (when tags provided)
+    if (data.tags !== undefined) {
+      const sanitizedTags = sanitizeCourseTags(data.tags);
+      if (sanitizedTags.length === 0) {
+        throw new Error('태그를 1개 이상 입력해주세요');
+      }
+      data.tags = sanitizedTags;
     }
 
     // Update fields

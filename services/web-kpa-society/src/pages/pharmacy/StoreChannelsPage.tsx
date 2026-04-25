@@ -44,6 +44,7 @@ import {
 import {
   fetchChannelOverviewWithCode,
   createChannel,
+  fetchLiveSignals,
   type ChannelOverview,
   type ChannelType,
   type ChannelStatus,
@@ -256,7 +257,7 @@ function ChannelPublicUrlCard({
     }
     if (channelType === 'TABLET') {
       if (!orgCode) return { url: null, label: '태블릿', guidance: null, guidanceLink: null };
-      return { url: `${origin}/tablet/${orgCode}`, label: '태블릿 주문 화면', guidance: null, guidanceLink: null };
+      return { url: `${origin}/tablet/${orgCode}`, label: '태블릿 상품 안내', guidance: null, guidanceLink: null };
     }
     if (channelType === 'KIOSK') {
       return {
@@ -386,6 +387,9 @@ export function StoreChannelsPage() {
   const [actionLoading, setActionLoading] = useState(false);
   const [actionMenuId, setActionMenuId] = useState<string | null>(null);
 
+  // WO-O4O-STORE-CHANNEL-ACTION-ENHANCEMENT-V1: 대기 관심 요청 카운트
+  const [pendingInterestCount, setPendingInterestCount] = useState(0);
+
   // WO-STORE-CHANNEL-BETA-READINESS-V1: user feedback + operational visibility
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [lastFetched, setLastFetched] = useState<Date | null>(null);
@@ -447,6 +451,14 @@ export function StoreChannelsPage() {
       setChannelProducts([]);
     }
   }, [isProductChannel, currentChannel?.id, loadChannelProducts]);
+
+  // WO-O4O-STORE-CHANNEL-ACTION-ENHANCEMENT-V1: Fetch pending interest count for TABLET tab
+  useEffect(() => {
+    if (activeTab !== 'TABLET') return;
+    fetchLiveSignals()
+      .then(signals => setPendingInterestCount(signals.pendingTabletRequests))
+      .catch(() => { /* graceful degradation */ });
+  }, [activeTab]);
 
   // Active products for display
   const activeProducts = useMemo(
@@ -771,7 +783,7 @@ export function StoreChannelsPage() {
           <p className="text-sm text-slate-500 mt-0.5">
             {activeTab === 'B2C' && '고객이 온라인으로 상품을 확인하고 구매할 수 있는 스토어프론트'}
             {activeTab === 'KIOSK' && '매장 내 키오스크에서 고객이 직접 상품을 조회합니다'}
-            {activeTab === 'TABLET' && '매장 내 태블릿에서 상품 조회 및 주문 요청을 처리합니다'}
+            {activeTab === 'TABLET' && '매장 내 태블릿에서 상품 안내 및 관심 요청을 처리합니다'}
             {activeTab === 'SIGNAGE' && '매장 내 디지털 사이니지에 콘텐츠를 표시합니다'}
           </p>
         </div>
@@ -798,7 +810,7 @@ export function StoreChannelsPage() {
 
       {/* ─── [B] Channel KPI ─────────────────────── */}
       {currentChannel && (
-        <div className={`grid ${forcedAssets.length > 0 ? 'grid-cols-3' : 'grid-cols-2'} gap-4 mb-6`}>
+        <div className={`grid ${forcedAssets.length > 0 || activeTab === 'TABLET' ? 'grid-cols-3' : 'grid-cols-2'} gap-4 mb-6`}>
           <div className="rounded-lg border border-slate-200 p-4 bg-white">
             <div className="text-xs text-slate-500 mb-1">노출 상품</div>
             <div className="text-2xl font-bold text-slate-900">
@@ -821,6 +833,15 @@ export function StoreChannelsPage() {
             <div className="rounded-lg border border-red-200 p-4 bg-red-50">
               <div className="text-xs text-red-500 mb-1">강제노출</div>
               <div className="text-2xl font-bold text-red-700">{forcedAssets.length}</div>
+            </div>
+          )}
+          {activeTab === 'TABLET' && (
+            <div
+              className="rounded-lg border border-emerald-200 p-4 bg-emerald-50 cursor-pointer hover:bg-emerald-100 transition-colors"
+              onClick={() => navigate('/store/channels/tablet')}
+            >
+              <div className="text-xs text-emerald-600 mb-1">대기 관심 요청</div>
+              <div className="text-2xl font-bold text-emerald-700">{pendingInterestCount}</div>
             </div>
           )}
         </div>
@@ -865,9 +886,14 @@ export function StoreChannelsPage() {
               </button>
               <button
                 onClick={() => navigate('/store/channels/tablet')}
-                className="px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100"
+                className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100"
               >
-                주문 요청 확인
+                관심 요청 확인
+                {pendingInterestCount > 0 && (
+                  <span className="px-1.5 py-0.5 text-[10px] font-bold text-white bg-red-500 rounded-full leading-none">
+                    {pendingInterestCount}
+                  </span>
+                )}
               </button>
             </>
           )}
@@ -1246,8 +1272,8 @@ export function StoreChannelsPage() {
                 onClick={() => navigate('/store/channels/tablet')}
                 className="flex flex-col items-start gap-1 p-4 rounded-lg border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-left"
               >
-                <span className="text-sm font-semibold text-emerald-700">태블릿 주문 요청</span>
-                <span className="text-xs text-emerald-500">태블릿에서 들어온 주문 요청을 확인하고 처리합니다</span>
+                <span className="text-sm font-semibold text-emerald-700">태블릿 관심 요청</span>
+                <span className="text-xs text-emerald-500">태블릿에서 들어온 관심 요청을 확인하고 처리합니다</span>
               </button>
             </div>
           </div>

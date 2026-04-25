@@ -21,7 +21,6 @@ import { createCockpitController } from './controllers/cockpit.controller.js';
 import { createOperatorController } from './controllers/operator.controller.js';
 import { createPublicController } from './controllers/public.controller.js';
 import { createStoreController } from './controllers/store.controller.js'; // WO-O4O-STOREFRONT-ACTIVATION-V1
-import { createTabletController } from '../o4o-store/controllers/tablet.controller.js'; // WO-STORE-TABLET-REQUEST-CHANNEL-V1
 import { createBlogController } from '../o4o-store/controllers/blog.controller.js'; // WO-STORE-BLOG-CHANNEL-V1
 import { createLayoutController } from '../o4o-store/controllers/layout.controller.js'; // WO-STORE-BLOCK-ENGINE-V1
 import { createStoreSettingsController } from '../o4o-store/controllers/store-settings.controller.js'; // WO-STORE-COMMON-SETTINGS-FOUNDATION-V1
@@ -384,13 +383,8 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   // Published Assets
   router.use('/published-assets', createPublishedAssetsController(dataSource));
 
-  // ============================================================================
-  // Tablet Request Channel Routes (WO-STORE-TABLET-REQUEST-CHANNEL-V1)
-  // /api/v1/glycopharm/stores/:slug/tablet/*
-  // Must be registered BEFORE storeController for path priority
-  // ============================================================================
-  const tabletController = createTabletController(dataSource, coreRequireAuth as any);
-  router.use('/stores', tabletController);
+  // WO-O4O-STORE-TABLET-LEGACY-CLEANUP-V1: Removed legacy tablet controller
+  // Tablet product/interest APIs use unified store-public routes (/api/v1/stores/:slug/tablet/*)
 
   // ============================================================================
   // Store Blog Channel Routes (WO-STORE-BLOG-CHANNEL-V1)

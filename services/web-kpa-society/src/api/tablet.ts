@@ -4,6 +4,7 @@
  * WO-STORE-TABLET-REQUEST-CHANNEL-V1
  * WO-STORE-SLUG-UNIFICATION-V1: unified /api/v1/stores namespace
  * WO-O4O-TABLET-INTEREST-UX-REFACTOR-V1: Interest-based consultation flow
+ * WO-O4O-STORE-TABLET-LEGACY-CLEANUP-V1: Removed legacy service request functions
  *
  * Calls /api/v1/stores/:slug/tablet/* endpoints directly.
  * No authentication required for tablet kiosk mode.
@@ -25,24 +26,6 @@ export interface TabletProduct {
   description?: string;
   short_description?: string;
   channel_price?: number;
-}
-
-export interface TabletRequestResult {
-  requestId: string;
-  status: string;
-  createdAt: string;
-}
-
-export interface TabletRequestDetail {
-  id: string;
-  status: 'requested' | 'acknowledged' | 'served' | 'cancelled';
-  items: Array<{ productId: string; quantity: number; productName: string; price: number }>;
-  note?: string;
-  customerName?: string;
-  createdAt: string;
-  acknowledgedAt?: string;
-  servedAt?: string;
-  cancelledAt?: string;
 }
 
 export async function fetchTabletProducts(
@@ -110,32 +93,3 @@ export async function checkTabletInterestStatus(
   return json.data;
 }
 
-// ==================== Service Request API (Legacy) ====================
-
-/** @deprecated Use submitTabletInterest instead */
-export async function submitTabletRequest(
-  slug: string,
-  body: { items: Array<{ productId: string; quantity: number }>; note?: string; customerName?: string },
-): Promise<TabletRequestResult> {
-  const url = `${getApiBase()}/${encodeURIComponent(slug)}/tablet/requests`;
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  const json = await res.json();
-  if (!json.success) throw new Error(json.error?.message || '요청 생성에 실패했습니다.');
-  return json.data;
-}
-
-/** @deprecated Use checkTabletInterestStatus instead */
-export async function checkTabletRequestStatus(
-  slug: string,
-  requestId: string,
-): Promise<TabletRequestDetail> {
-  const url = `${getApiBase()}/${encodeURIComponent(slug)}/tablet/requests/${requestId}`;
-  const res = await fetch(url);
-  const json = await res.json();
-  if (!json.success) throw new Error(json.error?.message || '요청 조회에 실패했습니다.');
-  return json.data;
-}

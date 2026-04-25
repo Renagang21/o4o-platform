@@ -522,16 +522,16 @@ export function createStoreHubController(
           } catch { /* checkout_orders may not exist */ }
         }
 
-        // 2. Pending tablet requests (via pharmacy ownership)
-        if (userId) {
+        // 2. Pending tablet interest requests
+        // WO-O4O-STORE-TABLET-LEGACY-CLEANUP-V1: tablet_service_requests → tablet_interest_requests
+        if (organizationId) {
           try {
             const rows = await dataSource.query(
               `SELECT COUNT(*)::int AS count
-               FROM tablet_service_requests tsr
-               JOIN glycopharm_pharmacies gp ON gp.id = tsr.pharmacy_id
-               WHERE gp.created_by_user_id = $1
-                 AND tsr.status = 'requested'`,
-              [userId]
+               FROM tablet_interest_requests
+               WHERE organization_id = $1
+                 AND status = 'REQUESTED'`,
+              [organizationId]
             );
             signals.pendingTabletRequests = rows[0]?.count || 0;
           } catch { /* table may not exist */ }

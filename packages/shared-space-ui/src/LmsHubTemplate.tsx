@@ -44,6 +44,8 @@ export interface LmsHubCourse {
   instructorName?: string;
   /** 강사 ID (소유 여부 판정용) */
   instructorId?: string | null;
+  /** 태그 (O4O Tag Policy V1) */
+  tags?: string[];
   createdAt?: string;
 }
 
@@ -68,7 +70,7 @@ export interface LmsHubConfig {
   /** 강의 상세 경로 생성 함수 */
   courseDetailPath: (courseId: string) => string;
   /** 강의 목록 조회 함수 — 서비스별 API 어댑터 */
-  fetchCourses: (params: LmsHubFetchParams) => Promise<{ data: LmsHubCourse[]; totalPages: number }>;
+  fetchCourses: (params: LmsHubFetchParams) => Promise<{ data: LmsHubCourse[]; totalPages: number; total?: number }>;
   /**
    * 행(row) 단위 추가 액션 렌더러 (optional)
    * KPA instructor 소유 강의 수정/종료 버튼 등 서비스 고유 기능에 사용.
@@ -97,6 +99,7 @@ export function LmsHubTemplate({ config }: { config: LmsHubConfig }) {
 
   const [courses, setCourses] = useState<LmsHubCourse[]>([]);
   const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
 
@@ -115,9 +118,11 @@ export function LmsHubTemplate({ config }: { config: LmsHubConfig }) {
       });
       setCourses(result.data);
       setTotalPages(result.totalPages);
+      setTotal(result.total ?? result.data.length);
     } catch {
       setCourses([]);
       setTotalPages(1);
+      setTotal(0);
     } finally {
       setLoading(false);
     }
@@ -138,6 +143,18 @@ export function LmsHubTemplate({ config }: { config: LmsHubConfig }) {
         return prev;
       });
     }, 350);
+  };
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      setSearchParams((prev) => {
+        if (searchInput.trim()) prev.set('search', searchInput.trim());
+        else prev.delete('search');
+        prev.set('page', '1');
+        return prev;
+      });
+    }
   };
 
   useEffect(() => {
@@ -168,12 +185,20 @@ export function LmsHubTemplate({ config }: { config: LmsHubConfig }) {
       sortable: true,
       sortAccessor: (row) => row.title,
       render: (_v, row) => (
-        <Link
-          to={config.courseDetailPath(row.id)}
-          style={colStyles.titleLink}
-        >
-          {row.title}
-        </Link>
+        <div>
+          <Link
+            to={config.courseDetailPath(row.id)}
+            style={colStyles.titleLink}
+          >
+            {row.title}
+          </Link>
+          {row.tags && row.tags.length > 0 && (
+            <span style={colStyles.tagHint}>
+              {row.tags.slice(0, 2).join(', ')}
+              {row.tags.length > 2 && ` +${row.tags.length - 2}`}
+            </span>
+          )}
+        </div>
       ),
     },
     {
@@ -271,10 +296,18 @@ export function LmsHubTemplate({ config }: { config: LmsHubConfig }) {
             type="text"
             value={searchInput}
             onChange={(e) => handleSearchChange(e.target.value)}
-            placeholder="강의 검색..."
+            onKeyDown={handleSearchKeyDown}
+            placeholder="제목, 내용, 태그로 검색"
             style={styles.searchInput}
           />
         </div>
+
+        {/* Result count */}
+        {!loading && (
+          <div style={styles.resultInfo}>
+            {currentSearch ? `검색 결과 ${total}건` : `총 ${total}개의 강의`}
+          </div>
+        )}
 
         {/* Bulk ActionBar (선택 시에만 표시) */}
         {selectedKeys.size > 0 && (
@@ -360,6 +393,12 @@ const colStyles: Record<string, React.CSSProperties> = {
     gap: 6,
     justifyContent: 'center',
   },
+  tagHint: {
+    display: 'block',
+    fontSize: '11px',
+    color: '#94a3b8',
+    marginTop: '2px',
+  },
   enrollBtn: {
     padding: '4px 12px',
     fontSize: '13px',
@@ -404,6 +443,11 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: '8px',
     fontSize: '14px',
     outline: 'none',
+  },
+  resultInfo: {
+    fontSize: '13px',
+    color: '#64748b',
+    marginBottom: '8px',
   },
   tableWrap: {
     backgroundColor: '#ffffff',

@@ -58,8 +58,10 @@ const ForumWritePage = lazy(() => import('@/pages/forum/ForumWritePage'));
 const MyForumDashboardPage = lazy(() => import('@/pages/forum/MyForumDashboardPage'));
 const ForumRequestCategoryPage = lazy(() => import('@/pages/forum/RequestCategoryPage'));
 
-// LMS Hub (WO-KCOS-KPA-LMS-STEP1-ENABLE-V1)
+// LMS (WO-KCOS-KPA-LMS-STEP1-ENABLE-V1 / WO-KCOS-KPA-LMS-STEP3-LESSON-PLAYER-V1)
 const EducationPage = lazy(() => import('@/pages/lms/EducationPage'));
+const LmsCourseDetailPage = lazy(() => import('@/pages/lms/LmsCourseDetailPage'));
+const LmsLessonPage = lazy(() => import('@/pages/lms/LmsLessonPage'));
 
 // Community Hub (WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1)
 const CommunityHubPage = lazy(() => import('@/pages/community/CommunityHubPage'));
@@ -228,8 +230,10 @@ function AppRoutes() {
           }
         />
 
-        {/* LMS Hub (WO-KCOS-KPA-LMS-STEP1-ENABLE-V1) */}
+        {/* LMS (WO-KCOS-KPA-LMS-STEP1-ENABLE-V1 / WO-KCOS-KPA-LMS-STEP3-LESSON-PLAYER-V1) */}
         <Route path="lms" element={<EducationPage />} />
+        <Route path="lms/course/:id" element={<LmsCourseDetailPage />} />
+        <Route path="lms/course/:courseId/lesson/:lessonId" element={<LmsLessonPage />} />
 
         {/* MyPage 3-split (WO-O4O-KCOSMETICS-MYPAGE-SPLIT-V1) */}
         <Route

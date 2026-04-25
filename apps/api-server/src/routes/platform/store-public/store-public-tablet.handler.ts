@@ -1,22 +1,17 @@
 /**
- * Store Public Tablet Handler — Tablet products, requests, interest
+ * Store Public Tablet Handler — Tablet products + interest requests
  *
  * WO-O4O-UNIFIED-STORE-PUBLIC-ROUTES-SPLIT-V1
- * Extracted from unified-store-public.routes.ts
+ * WO-O4O-STORE-TABLET-LEGACY-CLEANUP-V1: Removed legacy service request endpoints
  *
  * Endpoints:
  *   GET  /:slug/tablet/products      — Tablet channel products (supplier + local)
- *   POST /:slug/tablet/requests      — Tablet request submission (rate-limited)
  *   POST /:slug/tablet/interest      — Interest request creation (rate-limited)
  *   GET  /:slug/tablet/interest/:id  — Interest request status (kiosk polling)
- *   GET  /:slug/tablet/requests/:id  — Tablet request status
  */
 
 import { Router, Request, Response } from 'express';
-import type { DataSource, Repository } from 'typeorm';
-import { GlycopharmProduct } from '../../glycopharm/entities/glycopharm-product.entity.js';
-import { TabletServiceRequest } from '../../glycopharm/entities/tablet-service-request.entity.js';
-import type { TabletServiceRequestStatus, TabletRequestItem } from '../../glycopharm/entities/tablet-service-request.entity.js';
+import type { DataSource } from 'typeorm';
 import { TabletInterestRequest, InterestRequestStatus } from '../entities/tablet-interest-request.entity.js';
 import { ProductMaster } from '../../../modules/neture/entities/ProductMaster.entity.js';
 import {
@@ -27,11 +22,9 @@ import {
 
 export function createStorePublicTabletRoutes(deps: {
   dataSource: DataSource;
-  productRepo: Repository<GlycopharmProduct>;
-  requestRepo: Repository<TabletServiceRequest>;
 }): Router {
   const router = Router();
-  const { dataSource, productRepo, requestRepo } = deps;
+  const { dataSource } = deps;
 
   // GET /:slug/tablet/products — TABLET channel products (supplier + local)
   // WO-STORE-LOCAL-PRODUCT-DISPLAY-V1: local products 추가
@@ -80,93 +73,6 @@ export function createStorePublicTabletRoutes(deps: {
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch tablet products' },
-      });
-    }
-  });
-
-  // POST /:slug/tablet/requests — Tablet request submission (rate-limited)
-  router.post('/:slug/tablet/requests', tabletRequestLimiter as any, async (req: Request, res: Response): Promise<void> => {
-    try {
-      const resolved = await resolvePublicStore(dataSource, req.params.slug, req, res);
-      if (!resolved) return;
-
-      const { items, note, customerName } = req.body;
-
-      if (!Array.isArray(items) || items.length === 0) {
-        res.status(400).json({
-          success: false,
-          error: { code: 'INVALID_ITEMS', message: '상품을 1개 이상 선택해주세요.' },
-        });
-        return;
-      }
-      if (items.length > 20) {
-        res.status(400).json({
-          success: false,
-          error: { code: 'TOO_MANY_ITEMS', message: '한 번에 최대 20개 상품까지 요청 가능합니다.' },
-        });
-        return;
-      }
-
-      const enrichedItems: TabletRequestItem[] = [];
-      for (const item of items) {
-        if (!item.productId || typeof item.productId !== 'string') {
-          res.status(400).json({
-            success: false,
-            error: { code: 'INVALID_ITEM', message: '각 항목에 productId가 필요합니다.' },
-          });
-          return;
-        }
-        const qty = Number(item.quantity);
-        if (!qty || qty < 1 || qty > 99) {
-          res.status(400).json({
-            success: false,
-            error: { code: 'INVALID_QUANTITY', message: '수량은 1~99 사이여야 합니다.' },
-          });
-          return;
-        }
-
-        const product = await productRepo.findOne({
-          where: { id: item.productId, pharmacy_id: resolved.pharmacy.id, status: 'active' },
-        });
-        if (!product) {
-          res.status(400).json({
-            success: false,
-            error: { code: 'PRODUCT_NOT_FOUND', message: `상품을 찾을 수 없습니다: ${item.productId}` },
-          });
-          return;
-        }
-
-        enrichedItems.push({
-          productId: product.id,
-          quantity: qty,
-          productName: product.name,
-          price: Number(product.sale_price || product.price || 0),
-        });
-      }
-
-      const request = requestRepo.create({
-        pharmacyId: resolved.pharmacy.id,
-        items: enrichedItems,
-        note: note?.trim() || undefined,
-        customerName: customerName?.trim() || undefined,
-        status: 'requested' as TabletServiceRequestStatus,
-      });
-
-      const saved = await requestRepo.save(request);
-
-      res.status(201).json({
-        success: true,
-        data: {
-          requestId: saved.id,
-          status: saved.status,
-          createdAt: saved.createdAt,
-        },
-      });
-    } catch (error: any) {
-      console.error('[UnifiedStore] POST /:slug/tablet/requests error:', error);
-      res.status(500).json({
-        success: false,
-        error: { code: 'INTERNAL_ERROR', message: '요청 생성에 실패했습니다.' },
       });
     }
   });
@@ -271,49 +177,6 @@ export function createStorePublicTabletRoutes(deps: {
       });
     } catch (error: any) {
       console.error('[UnifiedStore] GET /:slug/tablet/interest/:id error:', error);
-      res.status(500).json({
-        success: false,
-        error: { code: 'INTERNAL_ERROR', message: '요청 조회에 실패했습니다.' },
-      });
-    }
-  });
-
-  // GET /:slug/tablet/requests/:id — Tablet request status
-  // WO-TABLET-BOUNDARY-FIX-V1: slug → pharmacyId 복합 조건 (Boundary Policy §7 Rule 1)
-  router.get('/:slug/tablet/requests/:id', async (req: Request, res: Response): Promise<void> => {
-    try {
-      const { id } = req.params;
-
-      const resolved = await resolvePublicStore(dataSource, req.params.slug, req, res);
-      if (!resolved) return;
-
-      const request = await requestRepo.findOne({
-        where: { id, pharmacyId: resolved.pharmacy.id },
-      });
-      if (!request) {
-        res.status(404).json({
-          success: false,
-          error: { code: 'REQUEST_NOT_FOUND', message: '요청을 찾을 수 없습니다.' },
-        });
-        return;
-      }
-
-      res.json({
-        success: true,
-        data: {
-          id: request.id,
-          status: request.status,
-          items: request.items,
-          note: request.note,
-          customerName: request.customerName,
-          createdAt: request.createdAt,
-          acknowledgedAt: request.acknowledgedAt,
-          servedAt: request.servedAt,
-          cancelledAt: request.cancelledAt,
-        },
-      });
-    } catch (error: any) {
-      console.error('[UnifiedStore] GET /:slug/tablet/requests/:id error:', error);
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: '요청 조회에 실패했습니다.' },

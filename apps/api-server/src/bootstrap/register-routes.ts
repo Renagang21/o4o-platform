@@ -283,14 +283,7 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     app.use('/api/v1/store', createStoreTabletRoutes(dataSource));
     logger.info('✅ Store Local Product & Tablet Display routes registered at /api/v1/store/*');
 
-    // 8.13. Register Tablet Operator routes (WO-TABLET-OPERATOR-UI-V1)
-    try {
-      const { createTabletOperatorController } = await import('../routes/o4o-store/controllers/tablet-operator.controller.js');
-      app.use('/api/v1/store', createTabletOperatorController(dataSource));
-      logger.info('✅ Tablet Operator routes registered at /api/v1/store/tablet/operator/*');
-    } catch (tabletOpError) {
-      logger.error('Failed to register Tablet Operator routes:', tabletOpError);
-    }
+    // WO-O4O-STORE-TABLET-LEGACY-CLEANUP-V1: Removed tablet-operator.controller.ts (unused by any frontend)
 
     // 9. Register User Role routes
     app.use('/api/v1/userRole', userRoleRoutes);

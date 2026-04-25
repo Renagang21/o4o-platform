@@ -171,6 +171,7 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
 
   const [items, setItems] = useState<ResourcesHubItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [searchInput, setSearchInput] = useState('');
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
@@ -196,9 +197,11 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
         search: searchQuery || undefined,
       });
       setItems(res.items);
+      setTotal(res.total);
       setTotalPages(res.totalPages);
     } catch {
       setItems([]);
+      setTotal(0);
       setTotalPages(1);
     } finally {
       setLoading(false);
@@ -504,6 +507,13 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
         />
       </div>
 
+      {/* Result count */}
+      {!loading && (
+        <div style={st.resultInfo}>
+          {searchQuery ? `검색 결과 ${total}건` : `총 ${total}개의 자료`}
+        </div>
+      )}
+
       {/* Block 3: ActionBar (선택 시) */}
       {selectedKeys.size > 0 && (
         <ActionBar
@@ -714,6 +724,11 @@ const st: Record<string, React.CSSProperties> = {
     color: '#111827',
     width: '100%',
     background: 'transparent',
+  },
+  resultInfo: {
+    fontSize: 13,
+    color: '#64748b',
+    marginBottom: 8,
   },
   center: {
     display: 'flex',

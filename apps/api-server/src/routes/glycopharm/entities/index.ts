@@ -60,12 +60,8 @@ export {
 // GlycopharmOrder, GlycopharmOrderItem entities removed
 // New orders will use E-commerce Core with OrderType.GLYCOPHARM
 
-// Tablet Service Request (WO-STORE-TABLET-REQUEST-CHANNEL-V1)
-export {
-  TabletServiceRequest,
-  type TabletServiceRequestStatus,
-  type TabletRequestItem,
-} from './tablet-service-request.entity.js';
+// TabletServiceRequest — REMOVED (WO-O4O-STORE-TABLET-LEGACY-CLEANUP-V1)
+// Legacy order-based tablet flow replaced by tablet_interest_requests
 
 // Store Blog Post (WO-STORE-BLOG-CHANNEL-V1)
 export {

@@ -27,6 +27,7 @@ function mapCourse(c: Course): LmsHubCourse {
     status: c.status,
     instructorName: (c as any).instructor?.name || c.instructorName || undefined,
     instructorId: (c as any).instructor?.id || undefined,
+    tags: c.tags,
     createdAt: (c as any).createdAt,
   };
 }
@@ -54,6 +55,7 @@ export function EducationPage() {
       return {
         data: (res.data || []).map(mapCourse),
         totalPages: pag?.totalPages || (res as any).totalPages || 1,
+        total: pag?.totalItems ?? pag?.total,
       };
     },
 

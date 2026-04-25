@@ -78,8 +78,9 @@ export default function CourseNewPage({
   const [error, setError] = useState<string | null>(null);
 
   const addTag = () => {
-    const t = tagInput.trim();
-    if (t && !tags.includes(t)) setTags((prev) => [...prev, t]);
+    const t = tagInput.trim().replace(/^#/, '');
+    if (!t || t.length > 30 || tags.includes(t)) { setTagInput(''); return; }
+    setTags((prev) => [...prev, t]);
     setTagInput('');
   };
 
@@ -88,6 +89,7 @@ export default function CourseNewPage({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.title.trim() || !form.description.trim()) return;
+    if (tags.length === 0) { setError('태그를 1개 이상 입력해주세요'); return; }
     setSubmitting(true);
     setError(null);
     try {

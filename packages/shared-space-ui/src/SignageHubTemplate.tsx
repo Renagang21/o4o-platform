@@ -141,6 +141,14 @@ export function SignageHubTemplate({ config }: { config: SignageHubConfig }) {
     }, 350);
   }, []);
 
+  const handleKeywordKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      setDebouncedKeyword(keyword);
+      setPage(1);
+    }
+  }, [keyword]);
+
   useEffect(() => {
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
   }, []);
@@ -223,7 +231,8 @@ export function SignageHubTemplate({ config }: { config: SignageHubConfig }) {
             type="text"
             value={keyword}
             onChange={(e) => handleKeywordChange(e.target.value)}
-            placeholder={config.searchPlaceholder ?? '검색...'}
+            onKeyDown={handleKeywordKeyDown}
+            placeholder={config.searchPlaceholder ?? '제목, 설명, 태그로 검색'}
             style={st.searchInput}
           />
         </div>

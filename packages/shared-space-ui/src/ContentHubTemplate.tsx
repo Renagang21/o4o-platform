@@ -184,6 +184,15 @@ export function ContentHubTemplate({ config }: { config: ContentHubConfig }) {
     }, 350);
   };
 
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      setSearchQuery(searchInput.trim());
+      setPage(1);
+      setJustCopiedId(null);
+    }
+  };
+
   useEffect(() => {
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
   }, []);
@@ -247,7 +256,8 @@ export function ContentHubTemplate({ config }: { config: ContentHubConfig }) {
             type="text"
             value={searchInput}
             onChange={e => handleSearchChange(e.target.value)}
-            placeholder={config.searchPlaceholder ?? '콘텐츠 검색'}
+            onKeyDown={handleSearchKeyDown}
+            placeholder={config.searchPlaceholder ?? '제목, 내용, 태그로 검색'}
             style={st.searchInput}
           />
         </div>

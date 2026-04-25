@@ -1,7 +1,7 @@
 /**
  * LMS API Client — K-Cosmetics
  *
- * WO-KCOS-KPA-LMS-STEP1-ENABLE-V1
+ * WO-KCOS-KPA-LMS-STEP1-ENABLE-V1 / WO-KCOS-KPA-LMS-STEP3-LESSON-PLAYER-V1
  *
  * KPA-Society lmsApi 구조 기준.
  * K-Cosmetics api(Axios) 래퍼를 사용하되, 호출 시그니처와 반환 타입은 KPA와 동일하게 유지한다.
@@ -10,7 +10,7 @@
 
 import { api } from '../lib/apiClient';
 
-// ─── Types (KPA types/Course 기준 최소 정의) ────────────────────────────────
+// ─── Types (KPA types 기준) ─────────────────────────────────────────────────
 
 export interface LmsCourse {
   id: string;
@@ -22,10 +22,62 @@ export interface LmsCourse {
   status?: string;
   duration?: number;
   lessonCount?: number;
+  enrollmentCount?: number;
   instructorId?: string | null;
   instructorName?: string;
   instructor?: { id: string; name: string };
   createdAt?: string;
+}
+
+export interface LmsLesson {
+  id: string;
+  courseId: string;
+  title: string;
+  description?: string;
+  order: number;
+  duration: number;
+  videoUrl?: string;
+  content?: string;
+  isPreview: boolean;
+  isFree?: boolean;
+  type?: 'video' | 'article' | 'quiz' | 'assignment' | 'live';
+}
+
+export interface LmsEnrollment {
+  id: string;
+  userId: string;
+  courseId: string;
+  progress: number;
+  completedLessons: string[];
+  startedAt: string;
+  completedAt?: string;
+  status?: string;
+  metadata?: { completedLessonIds: string[] };
+}
+
+export interface LmsQuizQuestion {
+  id: string;
+  question: string;
+  type: 'single' | 'multi' | 'text';
+  options?: string[];
+  points?: number;
+  order: number;
+}
+
+export interface LmsQuiz {
+  id: string;
+  title: string;
+  description?: string;
+  questions: LmsQuizQuestion[];
+  passingScore: number;
+}
+
+export interface LmsQuizResult {
+  score: number;
+  passed: boolean;
+  correctCount: number;
+  total: number;
+  creditsEarned: number;
 }
 
 interface PaginatedResponse<T> {
@@ -34,12 +86,15 @@ interface PaginatedResponse<T> {
   totalPages?: number;
 }
 
+interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+}
+
 // ─── API ─────────────────────────────────────────────────────────────────────
 
 export const lmsApi = {
-  /**
-   * 강의 목록 조회 — KPA lmsApi.getCourses 동일 시그니처
-   */
+  // 강의 목록
   getCourses: async (params?: {
     category?: string;
     level?: string;
@@ -49,6 +104,57 @@ export const lmsApi = {
     search?: string;
   }): Promise<PaginatedResponse<LmsCourse>> => {
     const { data } = await api.get<PaginatedResponse<LmsCourse>>('/lms/courses', { params });
+    return data;
+  },
+
+  // 강의 상세
+  getCourse: async (id: string): Promise<ApiResponse<LmsCourse>> => {
+    const { data } = await api.get<ApiResponse<LmsCourse>>(`/lms/courses/${id}`);
+    return data;
+  },
+
+  // 레슨 목록
+  getLessons: async (courseId: string): Promise<ApiResponse<LmsLesson[]>> => {
+    const { data } = await api.get<ApiResponse<LmsLesson[]>>(`/lms/courses/${courseId}/lessons`);
+    return data;
+  },
+
+  // 레슨 상세
+  getLesson: async (_courseId: string, lessonId: string): Promise<ApiResponse<{ lesson: LmsLesson }>> => {
+    const { data } = await api.get<ApiResponse<{ lesson: LmsLesson }>>(`/lms/lessons/${lessonId}`);
+    return data;
+  },
+
+  // 수강 상태 조회
+  getEnrollmentByCourse: async (courseId: string): Promise<ApiResponse<{ enrollment: LmsEnrollment }>> => {
+    const { data } = await api.get<ApiResponse<{ enrollment: LmsEnrollment }>>(`/lms/enrollments/me/course/${courseId}`);
+    return data;
+  },
+
+  // 수강 신청
+  enrollCourse: async (courseId: string): Promise<ApiResponse<{ enrollment: LmsEnrollment }>> => {
+    const { data } = await api.post<ApiResponse<{ enrollment: LmsEnrollment }>>(`/lms/courses/${courseId}/enroll`);
+    return data;
+  },
+
+  // 진행률 업데이트
+  updateProgress: async (courseId: string, lessonId: string, completed: boolean): Promise<ApiResponse<{ enrollment: LmsEnrollment }>> => {
+    const { data } = await api.post<ApiResponse<{ enrollment: LmsEnrollment }>>(`/lms/enrollments/${courseId}/progress`, {
+      lessonId,
+      completed,
+    });
+    return data;
+  },
+
+  // 퀴즈 조회
+  getQuizForLesson: async (lessonId: string): Promise<ApiResponse<{ quiz: LmsQuiz }>> => {
+    const { data } = await api.get<ApiResponse<{ quiz: LmsQuiz }>>(`/lms/lessons/${lessonId}/quiz`);
+    return data;
+  },
+
+  // 퀴즈 제출
+  submitQuiz: async (quizId: string, answers: Array<{ questionId: string; answer: string | string[] }>): Promise<ApiResponse<LmsQuizResult>> => {
+    const { data } = await api.post<ApiResponse<LmsQuizResult>>(`/lms/quizzes/${quizId}/submit`, { answers });
     return data;
   },
 };

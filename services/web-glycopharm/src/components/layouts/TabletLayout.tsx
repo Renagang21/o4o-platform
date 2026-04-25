@@ -2,8 +2,10 @@
  * Tablet Layout
  * 직원 보조 태블릿 전용 레이아웃
  * - 키오스크보다 더 많은 정보 표시
- * - 직원 보조 주문
- * - 비로그인 주문
+ * - 직원 보조 안내
+ * - 비로그인 상품 안내
+ *
+ * WO-O4O-STORE-TABLET-UX-CONSOLIDATION-V1: 주문 → 관심/안내 용어 통일
  */
 
 import { Outlet, useParams, NavLink } from 'react-router-dom';
@@ -35,13 +37,13 @@ type RequestDialogState = 'closed' | 'select' | 'confirm' | 'submitting' | 'done
 const PURPOSE_OPTIONS: { purpose: RequestPurpose; label: string; icon: typeof MessageCircle }[] = [
   { purpose: 'consultation', label: '상담', icon: MessageCircle },
   { purpose: 'sample', label: '샘플', icon: PackageIcon },
-  { purpose: 'order', label: '주문', icon: ShoppingBag },
+  { purpose: 'order', label: '구매 관심', icon: ShoppingBag },
 ];
 
 const PURPOSE_MESSAGES: Record<RequestPurpose, string> = {
   consultation: '직원에게 상담을 요청하시겠습니까?',
   sample: '샘플 신청은 직원 확인 후 진행됩니다.',
-  order: '주문 요청 단계이며, 결제는 이후 진행됩니다.',
+  order: '직원에게 구매 관심을 전달합니다.',
 };
 
 // 태블릿 헤더 컴포넌트
@@ -111,7 +113,7 @@ function TabletHeader({ store }: { store: PharmacyStore }) {
       {/* 상단 바 */}
       <div className="bg-primary-600 text-white py-2 px-6">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium">태블릿 주문 모드</span>
+          <span className="text-sm font-medium">태블릿 안내 모드</span>
           <span className="text-sm">{store.name}</span>
         </div>
       </div>
@@ -126,7 +128,7 @@ function TabletHeader({ store }: { store: PharmacyStore }) {
             </div>
             <div>
               <h1 className="font-bold text-xl text-slate-800">{store.name}</h1>
-              <p className="text-sm text-slate-500">직원 보조 주문</p>
+              <p className="text-sm text-slate-500">직원 보조 안내</p>
             </div>
           </NavLink>
 
@@ -152,7 +154,7 @@ function TabletHeader({ store }: { store: PharmacyStore }) {
               className="relative flex items-center gap-2 px-5 py-3 bg-primary-600 text-white rounded-xl text-lg font-semibold hover:bg-primary-700 transition-colors"
             >
               <ShoppingCart className="w-6 h-6" />
-              <span>장바구니</span>
+              <span>관심 상품</span>
               {cartCount > 0 && (
                 <span className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 text-white text-sm rounded-full flex items-center justify-center">
                   {cartCount}
@@ -330,7 +332,7 @@ function TabletFooter({ store }: { store: PharmacyStore }) {
             <span>사업자등록번호: {store.businessNumber}</span>
           )}
         </div>
-        <p>본 주문은 약국에서 직접 처리합니다.</p>
+        <p>본 요청은 약국에서 직접 처리합니다.</p>
       </div>
     </footer>
   );

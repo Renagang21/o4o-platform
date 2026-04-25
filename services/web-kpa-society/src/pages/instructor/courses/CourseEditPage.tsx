@@ -241,6 +241,7 @@ export default function CourseEditPage() {
 
   const handleSaveCourse = async () => {
     if (!id || !form.title.trim()) return;
+    if (tags.length === 0) { setSaveMsg('태그를 1개 이상 입력해주세요'); return; }
     setSaving(true);
     setSaveMsg(null);
     try {
@@ -295,8 +296,9 @@ export default function CourseEditPage() {
   };
 
   const addTag = () => {
-    const t = tagInput.trim();
-    if (t && !tags.includes(t)) setTags((prev) => [...prev, t]);
+    const t = tagInput.trim().replace(/^#/, '');
+    if (!t || t.length > 30 || tags.includes(t)) { setTagInput(''); return; }
+    setTags((prev) => [...prev, t]);
     setTagInput('');
   };
 

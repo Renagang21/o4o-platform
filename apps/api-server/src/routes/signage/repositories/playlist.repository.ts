@@ -51,7 +51,7 @@ export class SignagePlaylistRepository {
       qb.andWhere('playlist.isPublic = :isPublic', { isPublic: query.isPublic });
     }
     if (query.search) {
-      qb.andWhere('(playlist.name ILIKE :search OR playlist.description ILIKE :search)', {
+      qb.andWhere('(playlist.name ILIKE :search OR playlist.description ILIKE :search OR playlist.tags::text ILIKE :search)', {
         search: `%${query.search}%`,
       });
     }

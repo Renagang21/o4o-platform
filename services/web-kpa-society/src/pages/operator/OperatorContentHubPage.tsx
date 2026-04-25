@@ -179,6 +179,13 @@ export default function OperatorContentHubPage() {
 
   const handleSave = async () => {
     if (!form.title.trim()) { toast.error('제목은 필수입니다'); return; }
+
+    // O4O Tag Policy V1 — sanitize + 최소 1개 필수
+    const sanitizedTags = [...new Set(
+      form.tags.split(',').map(t => t.trim().replace(/^#/, '')).filter(Boolean).filter(t => t.length <= 30)
+    )];
+    if (sanitizedTags.length === 0) { toast.error('태그를 1개 이상 입력해주세요'); return; }
+
     setSaving(true);
     try {
       let parsedBlocks: object[] = [];
@@ -188,7 +195,7 @@ export default function OperatorContentHubPage() {
         title: form.title.trim(),
         summary: form.summary || null,
         category: form.category || null,
-        tags: form.tags.split(',').map(t => t.trim()).filter(Boolean),
+        tags: sanitizedTags,
         status: form.status,
         source_type: form.source_type,
         source_url: form.source_url || null,

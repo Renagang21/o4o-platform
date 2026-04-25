@@ -93,7 +93,7 @@ export function TabletDry({ pharmacyName = '우리약국', scale = 1 }: Template
           { label: '01 — 약품 검색', desc: 'SEARCH MEDICINE' },
           { label: '02 — 처방전 접수', desc: 'PRESCRIPTION' },
           { label: '03 — 건강 상담 예약', desc: 'CONSULTATION' },
-          { label: '04 — 건강식품 구매', desc: 'HEALTH FOOD' },
+          { label: '04 — 건강식품 안내', desc: 'HEALTH FOOD' },
           { label: '05 — 공지사항', desc: 'NOTICE' },
         ].map((item, i) => (
           <div key={i} style={{ padding: '14px 16px', borderBottom: '1px solid #E5E5E5', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
