@@ -38,6 +38,7 @@ const LANDING_TYPE_OPTIONS: { value: string; label: string }[] = [
   { value: 'promotion', label: '행사' },
   { value: 'page', label: '콘텐츠' },
   { value: 'link', label: '외부 링크' },
+  { value: 'tablet', label: '상담 요청' },
 ];
 
 function toSlug(text: string): string {
@@ -430,32 +431,35 @@ export function StoreQRPage() {
             </select>
           </div>
 
-          <div style={styles.formRow}>
-            <label style={styles.formLabel}>
-              {formLandingType === 'product' ? '연결 상품 (선택)' : formLandingType === 'link' ? '랜딩 대상 (URL)' : '랜딩 대상 ID (선택)'}
-            </label>
-            {formLandingType === 'product' ? (
-              <select
-                value={formLandingTargetId}
-                onChange={(e) => setFormLandingTargetId(e.target.value)}
-                style={styles.select}
-                disabled={loadingProducts}
-              >
-                <option value="">{loadingProducts ? '상품 목록 로딩 중...' : '상품 선택 (선택사항)'}</option>
-                {productOptions.map((p) => (
-                  <option key={p.id} value={p.id}>{p.name}</option>
-                ))}
-              </select>
-            ) : (
-              <input
-                type="text"
-                value={formLandingTargetId}
-                onChange={(e) => setFormLandingTargetId(e.target.value)}
-                style={styles.input}
-                placeholder={formLandingType === 'link' ? 'https://example.com' : '대상 ID (비워두면 자료 페이지로 이동)'}
-              />
-            )}
-          </div>
+          {/* WO-O4O-STORE-QR-TO-INTEREST-FLOW-V1: tablet 타입은 landingTargetId 불필요 (storeSlug 자동 사용) */}
+          {formLandingType !== 'tablet' && (
+            <div style={styles.formRow}>
+              <label style={styles.formLabel}>
+                {formLandingType === 'product' ? '연결 상품 (선택)' : formLandingType === 'link' ? '랜딩 대상 (URL)' : '랜딩 대상 ID (선택)'}
+              </label>
+              {formLandingType === 'product' ? (
+                <select
+                  value={formLandingTargetId}
+                  onChange={(e) => setFormLandingTargetId(e.target.value)}
+                  style={styles.select}
+                  disabled={loadingProducts}
+                >
+                  <option value="">{loadingProducts ? '상품 목록 로딩 중...' : '상품 선택 (선택사항)'}</option>
+                  {productOptions.map((p) => (
+                    <option key={p.id} value={p.id}>{p.name}</option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  type="text"
+                  value={formLandingTargetId}
+                  onChange={(e) => setFormLandingTargetId(e.target.value)}
+                  style={styles.input}
+                  placeholder={formLandingType === 'link' ? 'https://example.com' : '대상 ID (비워두면 자료 페이지로 이동)'}
+                />
+              )}
+            </div>
+          )}
 
           {formError && <p style={styles.formError}>{formError}</p>}
 

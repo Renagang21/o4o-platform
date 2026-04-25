@@ -65,24 +65,26 @@ export function createSignageRoutes(dataSource: DataSource): Router {
   // DELETE /api/signage/:serviceKey/playlists/:id - Delete playlist (soft delete)
   router.delete('/playlists/:id', requireSignageStore, playlistCtrl.deletePlaylist);
 
-  // ========== Playlist Item Routes (Store content) ==========
+  // ========== Playlist Item Routes (Store + Operator) ==========
+  // WO-KPA-OPERATOR-HQ-PLAYLIST-CREATE-FLOW-REFINE-V1: requireSignageStore → requireSignageOperatorOrStore
+  // HQ operators need item management for global playlists (no organizationId)
   // GET /api/signage/:serviceKey/playlists/:playlistId/items - List playlist items
   router.get('/playlists/:playlistId/items', requireSignageOperatorOrStore, playlistCtrl.getPlaylistItems);
 
   // POST /api/signage/:serviceKey/playlists/:playlistId/items - Add item to playlist
-  router.post('/playlists/:playlistId/items', requireSignageStore, playlistCtrl.addPlaylistItem);
+  router.post('/playlists/:playlistId/items', requireSignageOperatorOrStore, playlistCtrl.addPlaylistItem);
 
   // POST /api/signage/:serviceKey/playlists/:playlistId/items/bulk - Bulk add items
-  router.post('/playlists/:playlistId/items/bulk', requireSignageStore, playlistCtrl.addPlaylistItemsBulk);
+  router.post('/playlists/:playlistId/items/bulk', requireSignageOperatorOrStore, playlistCtrl.addPlaylistItemsBulk);
 
   // POST /api/signage/:serviceKey/playlists/:playlistId/items/reorder - Reorder items
-  router.post('/playlists/:playlistId/items/reorder', requireSignageStore, playlistCtrl.reorderPlaylistItems);
+  router.post('/playlists/:playlistId/items/reorder', requireSignageOperatorOrStore, playlistCtrl.reorderPlaylistItems);
 
   // PATCH /api/signage/:serviceKey/playlists/:playlistId/items/:itemId - Update item
-  router.patch('/playlists/:playlistId/items/:itemId', requireSignageStore, playlistCtrl.updatePlaylistItem);
+  router.patch('/playlists/:playlistId/items/:itemId', requireSignageOperatorOrStore, playlistCtrl.updatePlaylistItem);
 
   // DELETE /api/signage/:serviceKey/playlists/:playlistId/items/:itemId - Delete item
-  router.delete('/playlists/:playlistId/items/:itemId', requireSignageStore, playlistCtrl.deletePlaylistItem);
+  router.delete('/playlists/:playlistId/items/:itemId', requireSignageOperatorOrStore, playlistCtrl.deletePlaylistItem);
 
   // ========== Store Media Routes (Store-owned media) ==========
   // GET /api/signage/:serviceKey/media - List media (filtered by org)

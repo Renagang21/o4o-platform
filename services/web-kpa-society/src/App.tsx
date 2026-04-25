@@ -717,9 +717,12 @@ function App() {
             <Route path="products/suppliers" element={<Navigate to="/store/commerce/products/suppliers" replace />} />
             <Route path="orders" element={<Navigate to="/store/commerce/orders" replace />} />
 
+            {/* ── WO-O4O-STORE-REQUESTS-UNIFIED-MENU-V1: 상담 요청 독립 메뉴 ── */}
+            <Route path="requests" element={<TabletRequestsPage />} />
+
             {/* ── Hidden routes (사이드바 미표시, URL 직접 접근 유지) ── */}
             <Route path="channels" element={<StoreChannelsPage />} />
-            <Route path="channels/tablet" element={<TabletRequestsPage />} />
+            <Route path="channels/tablet" element={<Navigate to="/store/requests" replace />} />
             <Route path="content" element={<StoreAssetsPage />} />
             <Route path="content/blog" element={<PharmacyBlogPage />} />
             <Route path="content/:snapshotId/edit" element={<StoreContentEditPage />} />

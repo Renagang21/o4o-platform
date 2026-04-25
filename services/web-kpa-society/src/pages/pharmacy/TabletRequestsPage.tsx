@@ -1,12 +1,13 @@
 /**
- * TabletRequestsPage — Staff Tablet Interest Request Management
+ * TabletRequestsPage — Staff Consultation Request Management
  *
  * WO-STORE-TABLET-REQUEST-CHANNEL-V1
  * WO-O4O-TABLET-INTEREST-UX-REFACTOR-V1: Interest-only view
  * WO-O4O-STORE-TABLET-LEGACY-CLEANUP-V1: Removed legacy service request tab
+ * WO-O4O-STORE-REQUESTS-UNIFIED-MENU-V1: 상담 요청 통합 메뉴 승격
  *
  * 구조:
- * └─ 관심 요청 목록 (5초 polling)
+ * └─ 상담 요청 목록 (5초 polling)
  */
 
 import { useEffect, useState, useRef, useCallback } from 'react';
@@ -21,6 +22,13 @@ function formatElapsed(createdAt: string): string {
   if (diff < 60) return `${diff}초 전`;
   if (diff < 3600) return `${Math.floor(diff / 60)}분 전`;
   return `${Math.floor(diff / 3600)}시간 전`;
+}
+
+function formatDuration(from: string, to: string): string {
+  const diff = Math.floor((new Date(to).getTime() - new Date(from).getTime()) / 1000);
+  if (diff < 60) return `${diff}초`;
+  if (diff < 3600) return `${Math.floor(diff / 60)}분`;
+  return `${Math.floor(diff / 3600)}시간`;
 }
 
 export function TabletRequestsPage() {
@@ -70,11 +78,28 @@ export function TabletRequestsPage() {
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
       <div style={{ marginBottom: '24px' }}>
-        <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#1e293b' }}>태블릿 관심 요청</h1>
+        <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#1e293b' }}>상담 요청</h1>
         <p style={{ fontSize: '14px', color: '#64748b', marginTop: '4px' }}>
-          매장 태블릿에서 접수된 관심 요청을 관리합니다.
+          매장에서 접수된 상담 요청을 관리합니다.
         </p>
       </div>
+
+      {/* WO-O4O-STORE-REQUEST-CONTEXT-LIGHT-V1: 요약 카운트 바 */}
+      {!loading && interestRequests.length > 0 && (() => {
+        const pendingCount = interestRequests.filter(r => r.status === 'REQUESTED').length;
+        const acknowledgedCount = interestRequests.filter(r => r.status === 'ACKNOWLEDGED').length;
+        return (
+          <div style={{ display: 'flex', gap: '12px', marginBottom: '16px', fontSize: '14px', color: '#475569' }}>
+            {pendingCount > 0 && (
+              <span style={{ fontWeight: 600, color: '#d97706' }}>대기 {pendingCount}건</span>
+            )}
+            {pendingCount > 0 && acknowledgedCount > 0 && <span>·</span>}
+            {acknowledgedCount > 0 && (
+              <span style={{ fontWeight: 600, color: '#2563eb' }}>확인 {acknowledgedCount}건</span>
+            )}
+          </div>
+        );
+      })()}
 
       {error && (
         <div style={{ padding: '12px 16px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', color: '#dc2626', fontSize: '14px', marginBottom: '16px' }}>
@@ -90,19 +115,22 @@ export function TabletRequestsPage() {
         <div style={{ textAlign: 'center', padding: '48px 0' }}>
           <div style={{ fontSize: '40px', marginBottom: '12px' }}>💡</div>
           <p style={{ color: '#94a3b8', fontSize: '15px' }}>
-            현재 대기 중인 관심 요청이 없습니다
+            현재 대기 중인 상담 요청이 없습니다
           </p>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {interestRequests.map((req) => {
             const isNew = req.status === 'REQUESTED';
+            const elapsed = Math.floor((Date.now() - new Date(req.createdAt).getTime()) / 1000);
+            const urgency = isNew ? (elapsed >= 600 ? 'urgent' : elapsed >= 300 ? 'warning' : 'normal') : 'normal';
+            const urgencyBorder = urgency === 'urgent' ? '2px solid #ef4444' : urgency === 'warning' ? '2px solid #f97316' : isNew ? '2px solid #f59e0b' : '1px solid #e2e8f0';
             return (
               <div
                 key={req.id}
                 style={{
                   backgroundColor: '#fff',
-                  border: isNew ? '2px solid #f59e0b' : '1px solid #e2e8f0',
+                  border: urgencyBorder,
                   borderRadius: '12px',
                   padding: '16px',
                 }}
@@ -110,7 +138,17 @@ export function TabletRequestsPage() {
                 {/* Header */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    {isNew && (
+                    {isNew && urgency === 'urgent' && (
+                      <span style={{ fontSize: '11px', fontWeight: 700, backgroundColor: '#fef2f2', color: '#dc2626', padding: '2px 8px', borderRadius: '4px' }}>
+                        10분+
+                      </span>
+                    )}
+                    {isNew && urgency === 'warning' && (
+                      <span style={{ fontSize: '11px', fontWeight: 700, backgroundColor: '#fff7ed', color: '#ea580c', padding: '2px 8px', borderRadius: '4px' }}>
+                        5분+
+                      </span>
+                    )}
+                    {isNew && urgency === 'normal' && (
                       <span style={{ fontSize: '11px', fontWeight: 700, backgroundColor: '#fef3c7', color: '#d97706', padding: '2px 8px', borderRadius: '4px' }}>
                         NEW
                       </span>
@@ -118,6 +156,11 @@ export function TabletRequestsPage() {
                     {req.status === 'ACKNOWLEDGED' && (
                       <span style={{ fontSize: '11px', fontWeight: 700, backgroundColor: '#dbeafe', color: '#2563eb', padding: '2px 8px', borderRadius: '4px' }}>
                         확인됨
+                      </span>
+                    )}
+                    {req.status === 'ACKNOWLEDGED' && req.acknowledgedAt && (
+                      <span style={{ fontSize: '11px', color: '#64748b' }}>
+                        응답 {formatDuration(req.createdAt, req.acknowledgedAt)}
                       </span>
                     )}
                     {req.customerName && (

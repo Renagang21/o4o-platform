@@ -134,7 +134,7 @@ export default function HqPlaylistsPage() {
     }
     setIsCreating(true);
     try {
-      await apiFetch(`/api/signage/${SERVICE_KEY}/hq/playlists`, {
+      const result = await apiFetch(`/api/signage/${SERVICE_KEY}/hq/playlists`, {
         method: 'POST',
         body: JSON.stringify({
           name: formName.trim(),
@@ -144,10 +144,9 @@ export default function HqPlaylistsPage() {
           tags: formTags,
         }),
       });
-      setFormName(''); setShowForm(false);
-      setFormTags([]);
-      setFormTagInput('');
-      fetchPlaylists();
+      const created = result.data || result;
+      // Navigate to detail page for item composition
+      navigate(`/operator/signage/hq-playlists/${created.id}`);
     } catch (err: any) {
       setError(err?.message || '플레이리스트 생성에 실패했습니다');
     } finally {

@@ -838,9 +838,9 @@ export function StoreChannelsPage() {
           {activeTab === 'TABLET' && (
             <div
               className="rounded-lg border border-emerald-200 p-4 bg-emerald-50 cursor-pointer hover:bg-emerald-100 transition-colors"
-              onClick={() => navigate('/store/channels/tablet')}
+              onClick={() => navigate('/store/requests')}
             >
-              <div className="text-xs text-emerald-600 mb-1">대기 관심 요청</div>
+              <div className="text-xs text-emerald-600 mb-1">대기 상담 요청</div>
               <div className="text-2xl font-bold text-emerald-700">{pendingInterestCount}</div>
             </div>
           )}
@@ -885,10 +885,10 @@ export function StoreChannelsPage() {
                 태블릿 진열
               </button>
               <button
-                onClick={() => navigate('/store/channels/tablet')}
+                onClick={() => navigate('/store/requests')}
                 className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100"
               >
-                관심 요청 확인
+                상담 요청 확인
                 {pendingInterestCount > 0 && (
                   <span className="px-1.5 py-0.5 text-[10px] font-bold text-white bg-red-500 rounded-full leading-none">
                     {pendingInterestCount}
@@ -1269,11 +1269,11 @@ export function StoreChannelsPage() {
                 <span className="text-xs text-indigo-500">태블릿에 어떤 상품을 표시할지 디바이스별로 구성합니다</span>
               </button>
               <button
-                onClick={() => navigate('/store/channels/tablet')}
+                onClick={() => navigate('/store/requests')}
                 className="flex flex-col items-start gap-1 p-4 rounded-lg border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-left"
               >
-                <span className="text-sm font-semibold text-emerald-700">태블릿 관심 요청</span>
-                <span className="text-xs text-emerald-500">태블릿에서 들어온 관심 요청을 확인하고 처리합니다</span>
+                <span className="text-sm font-semibold text-emerald-700">상담 요청</span>
+                <span className="text-xs text-emerald-500">매장에서 접수된 상담 요청을 확인하고 처리합니다</span>
               </button>
             </div>
           </div>

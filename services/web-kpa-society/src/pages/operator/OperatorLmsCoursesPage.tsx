@@ -18,8 +18,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, RefreshCw, AlertCircle, Search, Loader2, Archive, EyeOff } from 'lucide-react';
-import { RowActionMenu } from '@o4o/ui';
-import { DataTable, Pagination, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
+import { ActionBar, BulkResultModal, RowActionMenu } from '@o4o/ui';
+import { DataTable, Pagination, defineActionPolicy, buildRowActions, useBatchAction } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { lmsApi } from '../../api';
 import { lmsInstructorApi } from '../../api/lms-instructor';
@@ -87,6 +87,8 @@ export default function OperatorLmsCoursesPage() {
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [page, setPage] = useState(1);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const batch = useBatchAction();
   const PAGE_SIZE = 20;
 
   const fetchCourses = useCallback(async () => {
@@ -117,7 +119,11 @@ export default function OperatorLmsCoursesPage() {
     e.preventDefault();
     setSearch(searchInput.trim());
     setPage(1);
+    setSelectedIds(new Set());
   };
+
+  // 페이지 변경 시 선택 초기화
+  useEffect(() => { setSelectedIds(new Set()); }, [page]);
 
   const handleUnpublish = async (course: Course) => {
     try {
@@ -138,6 +144,100 @@ export default function OperatorLmsCoursesPage() {
       toast.error(err?.message?.includes('Forbidden') ? '권한이 없습니다 (강사 본인 또는 관리자만 가능)' : '종료 처리에 실패했습니다');
     }
   };
+
+  // ─── Bulk Actions ───
+
+  const handleBulkUnpublish = async () => {
+    const targetIds = [...selectedIds].filter((id) => {
+      const c = courses.find((course) => course.id === id);
+      return c?.status === 'published';
+    });
+    if (targetIds.length === 0) return;
+
+    const result = await batch.executeBatch(
+      async (ids) => {
+        const results: { id: string; status: string; error?: string }[] = [];
+        for (const id of ids) {
+          try {
+            await lmsInstructorApi.unpublishCourse(id);
+            results.push({ id, status: 'success' });
+          } catch (err: any) {
+            results.push({ id, status: 'failed', error: err?.message?.includes('Forbidden') ? '권한 없음' : '처리 실패' });
+          }
+        }
+        return { data: { results } };
+      },
+      targetIds,
+    );
+
+    if (result.successCount > 0) {
+      setSelectedIds(new Set());
+      fetchCourses();
+    }
+  };
+
+  const handleBulkArchive = async () => {
+    const targetIds = [...selectedIds].filter((id) => {
+      const c = courses.find((course) => course.id === id);
+      return c && c.status !== 'archived';
+    });
+    if (targetIds.length === 0) return;
+
+    const result = await batch.executeBatch(
+      async (ids) => {
+        const results: { id: string; status: string; error?: string }[] = [];
+        for (const id of ids) {
+          try {
+            await lmsInstructorApi.archiveCourse(id);
+            results.push({ id, status: 'success' });
+          } catch (err: any) {
+            results.push({ id, status: 'failed', error: err?.message?.includes('Forbidden') ? '권한 없음' : '처리 실패' });
+          }
+        }
+        return { data: { results } };
+      },
+      targetIds,
+    );
+
+    if (result.successCount > 0) {
+      setSelectedIds(new Set());
+      fetchCourses();
+    }
+  };
+
+  const selectedPublishedCount = [...selectedIds].filter((id) => courses.find((c) => c.id === id)?.status === 'published').length;
+  const selectedArchivableCount = [...selectedIds].filter((id) => { const c = courses.find((co) => co.id === id); return c != null && c.status !== 'archived'; }).length;
+
+  const bulkActions = [
+    {
+      key: 'unpublish',
+      label: `비공개 처리 (${selectedPublishedCount})`,
+      onClick: handleBulkUnpublish,
+      variant: 'default' as const,
+      icon: <EyeOff size={14} />,
+      loading: batch.loading,
+      group: 'actions',
+      tooltip: '선택된 공개 강의를 일괄 비공개 처리합니다',
+      visible: selectedPublishedCount > 0,
+    },
+    {
+      key: 'archive',
+      label: `강의 종료 (${selectedArchivableCount})`,
+      onClick: handleBulkArchive,
+      variant: 'danger' as const,
+      icon: <Archive size={14} />,
+      loading: batch.loading,
+      group: 'danger',
+      tooltip: '선택된 강의를 일괄 종료(보관) 처리합니다',
+      visible: selectedArchivableCount > 0,
+      confirm: {
+        title: '일괄 강의 종료',
+        message: `${selectedArchivableCount}개 강의를 종료(보관) 처리합니다.\n공개 목록에서 제거되며, 수강 기록은 유지됩니다.`,
+        variant: 'danger' as const,
+        confirmText: '종료 처리',
+      },
+    },
+  ];
 
   // ─── Columns ───
 
@@ -279,6 +379,15 @@ export default function OperatorLmsCoursesPage() {
         )}
       </form>
 
+      {/* Bulk Actions */}
+      <div style={{ marginBottom: selectedIds.size > 0 ? 12 : 0 }}>
+        <ActionBar
+          selectedCount={selectedIds.size}
+          onClearSelection={() => setSelectedIds(new Set())}
+          actions={bulkActions}
+        />
+      </div>
+
       {/* Table */}
       {courses.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '60px 0', color: '#94a3b8' }}>
@@ -294,6 +403,9 @@ export default function OperatorLmsCoursesPage() {
             data={courses}
             rowKey="id"
             emptyMessage="강의가 없습니다"
+            selectable
+            selectedKeys={selectedIds}
+            onSelectionChange={setSelectedIds}
           />
           {total > PAGE_SIZE && (
             <Pagination
@@ -305,6 +417,13 @@ export default function OperatorLmsCoursesPage() {
           )}
         </>
       )}
+
+      <BulkResultModal
+        open={batch.showResult}
+        onClose={() => { batch.clearResult(); fetchCourses(); }}
+        result={batch.result}
+        onRetry={() => batch.retryFailed()}
+      />
     </div>
   );
 }

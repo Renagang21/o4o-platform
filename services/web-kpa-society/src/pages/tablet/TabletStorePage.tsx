@@ -73,6 +73,8 @@ function mapLocalProduct(p: any): DisplayProduct {
 
 export function TabletStorePage() {
   const { slug } = useParams<{ slug: string }>();
+  // WO-O4O-STORE-REQUEST-CONTEXT-LIGHT-V1: QR 접속 경로 감지
+  const fromQr = new URLSearchParams(window.location.search).get('from') === 'qr';
   const [viewMode, setViewMode] = useState<ViewMode>('browse');
   const [displayProducts, setDisplayProducts] = useState<DisplayProduct[]>([]);
   const [loading, setLoading] = useState(true);
@@ -312,7 +314,14 @@ export function TabletStorePage() {
     <div style={styles.fullscreen}>
       {/* Header */}
       <div style={styles.header}>
-        <h1 style={{ fontSize: '20px', fontWeight: 700 }}>상품 안내</h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <h1 style={{ fontSize: '20px', fontWeight: 700 }}>상품 안내</h1>
+          {fromQr && (
+            <span style={{ fontSize: '11px', fontWeight: 600, backgroundColor: '#f0fdf4', color: '#16a34a', padding: '2px 8px', borderRadius: '4px' }}>
+              QR 코드로 접속
+            </span>
+          )}
+        </div>
         <span style={{ fontSize: '14px', color: '#64748b' }}>관심 있는 상품을 터치해주세요</span>
       </div>
 

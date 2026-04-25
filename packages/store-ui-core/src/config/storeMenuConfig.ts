@@ -177,6 +177,7 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
     { label: '', items: [
       { key: 'home',     label: '홈',       subPath: '' },
       { key: 'channels', label: '채널 관리', subPath: '/channels' },
+      { key: 'requests', label: '상담 요청', subPath: '/requests' },
     ]},
     { label: '상품/주문', items: [
       { key: 'products', label: '상품 관리', subPath: '/commerce/products' },

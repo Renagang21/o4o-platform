@@ -20,6 +20,7 @@ const LANDING_TYPE_CONFIG: Record<string, { label: string; icon: 'arrow' | 'exte
   promotion: { label: '행사 보기', icon: 'arrow' },
   page: { label: '콘텐츠 보기', icon: 'arrow' },
   link: { label: '바로가기', icon: 'external' },
+  tablet: { label: '상담 요청하기', icon: 'arrow' },
 };
 
 export default function QrLandingPage() {
@@ -58,6 +59,13 @@ export default function QrLandingPage() {
     if (!data) return;
 
     const { landingType, landingTargetId, storeSlug } = data;
+
+    // WO-O4O-STORE-QR-TO-INTEREST-FLOW-V1: QR → tablet 상담 요청 흐름
+    // WO-O4O-STORE-REQUEST-CONTEXT-LIGHT-V1: ?from=qr 경로 힌트
+    if (landingType === 'tablet' && storeSlug) {
+      navigate(`/tablet/${storeSlug}?from=qr`);
+      return;
+    }
 
     if (landingType === 'link' && landingTargetId) {
       window.open(landingTargetId, '_blank', 'noopener,noreferrer');
@@ -112,7 +120,7 @@ export default function QrLandingPage() {
   }
 
   const config = LANDING_TYPE_CONFIG[data.landingType] || LANDING_TYPE_CONFIG.link;
-  const hasAction = !!data.landingTargetId;
+  const hasAction = !!data.landingTargetId || (data.landingType === 'tablet' && !!data.storeSlug);
 
   return (
     <div style={styles.page}>
