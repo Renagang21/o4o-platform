@@ -2260,19 +2260,6 @@ importers:
         specifier: 5.4.5
         version: 5.4.5
 
-  packages/hub-exploration-core:
-    dependencies:
-      react:
-        specifier: 19.2.0
-        version: 19.2.0
-      react-dom:
-        specifier: 19.2.0
-        version: 19.2.0(react@19.2.0)
-    devDependencies:
-      typescript:
-        specifier: 5.4.5
-        version: 5.4.5
-
   packages/interactive-content-core:
     dependencies:
       '@o4o/types':
