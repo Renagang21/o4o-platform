@@ -11,11 +11,10 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAccessToken } from '../../../contexts/AuthContext';
-import { Film, RefreshCw, Plus, Sparkles, Trash2, Search, Eye } from 'lucide-react';
+import { Film, RefreshCw, Plus, Trash2, Search, Eye } from 'lucide-react';
 import { ActionBar, BulkResultModal, RowActionMenu } from '@o4o/ui';
 import { DataTable, useBatchAction, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
-import AiContentGenerationModal from './AiContentGenerationModal';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 const SERVICE_KEY = 'kpa-society';
@@ -84,7 +83,6 @@ export default function HqMediaPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
-  const [showAiModal, setShowAiModal] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const batch = useBatchAction();
@@ -294,9 +292,6 @@ export default function HqMediaPage() {
           <p className="text-slate-500 text-sm mt-1">운영자 제공 사이니지 미디어 콘텐츠</p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => setShowAiModal(true)} className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium">
-            <Sparkles className="w-4 h-4" /> AI 초안 생성
-          </button>
           <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
             <Plus className="w-4 h-4" /> 새 미디어
           </button>
@@ -440,13 +435,6 @@ export default function HqMediaPage() {
         onSelectionChange={setSelectedIds}
       />
 
-      {showAiModal && (
-        <AiContentGenerationModal
-          open={showAiModal}
-          onClose={() => setShowAiModal(false)}
-          onSaved={() => { setShowAiModal(false); fetchMedia(); }}
-        />
-      )}
     </div>
   );
 }
