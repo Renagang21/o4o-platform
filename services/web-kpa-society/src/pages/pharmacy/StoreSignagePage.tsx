@@ -657,7 +657,7 @@ export function StoreSignagePage() {
   const openEditSchedule = (sch: SignageScheduleItem) => {
     setEditingSchedule(sch);
     setSchName(sch.name);
-    setSchPlaylistId(sch.playlistId);
+    setSchPlaylistId(sch.storePlaylistId || sch.playlistId || '');
     setSchDays([...sch.daysOfWeek]);
     setSchStartTime(sch.startTime.slice(0, 5)); // HH:MM:SS → HH:MM
     setSchEndTime(sch.endTime.slice(0, 5));
@@ -675,7 +675,7 @@ export function StoreSignagePage() {
       if (editingSchedule) {
         await updateSchedule(organizationId, editingSchedule.id, {
           name: schName.trim(),
-          playlistId: schPlaylistId,
+          storePlaylistId: schPlaylistId,
           daysOfWeek: schDays,
           startTime: schStartTime,
           endTime: schEndTime,
@@ -687,7 +687,7 @@ export function StoreSignagePage() {
       } else {
         const payload: CreateSchedulePayload = {
           name: schName.trim(),
-          playlistId: schPlaylistId,
+          storePlaylistId: schPlaylistId,
           daysOfWeek: schDays,
           startTime: schStartTime,
           endTime: schEndTime,
@@ -810,7 +810,8 @@ export function StoreSignagePage() {
           {currentSchedule ? (
             <div>
               <p className="text-sm font-semibold text-slate-900 truncate">
-                {currentSchedule.playlist?.name
+                {playlists.find(p => p.id === currentSchedule.storePlaylistId)?.name
+                  || currentSchedule.playlist?.name
                   || playlists.find(p => p.id === currentSchedule.playlistId)?.name
                   || signagePlaylists.find(p => p.id === currentSchedule.playlistId)?.name
                   || '플레이리스트'}
@@ -829,7 +830,8 @@ export function StoreSignagePage() {
           <div className="flex-shrink-0 border-l border-slate-200 pl-4">
             <p className="text-xs font-medium text-slate-400 mb-0.5">다음 예정</p>
             <p className="text-sm font-medium text-slate-700 truncate max-w-[180px]">
-              {nextSchedule.playlist?.name
+              {playlists.find(p => p.id === nextSchedule.storePlaylistId)?.name
+                || nextSchedule.playlist?.name
                 || playlists.find(p => p.id === nextSchedule.playlistId)?.name
                 || nextSchedule.name}
             </p>
@@ -1168,16 +1170,23 @@ export function StoreSignagePage() {
 
               {/* Row 2: Playlist + Priority */}
               <div className="flex gap-3">
-                <select
-                  value={schPlaylistId}
-                  onChange={e => setSchPlaylistId(e.target.value)}
-                  className="flex-1 px-3 py-1.5 text-sm border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
-                >
-                  <option value="">플레이리스트 선택 *</option>
-                  {signagePlaylists.map(pl => (
-                    <option key={pl.id} value={pl.id}>{pl.name}</option>
-                  ))}
-                </select>
+                <div className="flex-1">
+                  {playlists.filter(p => p.publishStatus === 'published').length === 0 && (
+                    <p className="text-xs text-amber-600 mb-1">
+                      게시된 플레이리스트가 없습니다. &lsquo;내 플레이리스트&rsquo; 탭에서 플레이리스트를 게시해주세요.
+                    </p>
+                  )}
+                  <select
+                    value={schPlaylistId}
+                    onChange={e => setSchPlaylistId(e.target.value)}
+                    className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  >
+                    <option value="">플레이리스트 선택 *</option>
+                    {playlists.filter(p => p.publishStatus === 'published').map(pl => (
+                      <option key={pl.id} value={pl.id}>{pl.name}</option>
+                    ))}
+                  </select>
+                </div>
                 <div className="flex items-center gap-1.5">
                   <label className="text-xs text-slate-500 whitespace-nowrap">우선순위</label>
                   <input
@@ -1311,7 +1320,7 @@ export function StoreSignagePage() {
                   title: '플레이리스트',
                   render: (_v, sch) => (
                     <span className="text-slate-600 text-xs">
-                      {sch.playlist?.name || signagePlaylists.find(p => p.id === sch.playlistId)?.name || playlists.find(p => p.id === sch.playlistId)?.name || sch.playlistId.slice(0, 8)}
+                      {playlists.find(p => p.id === sch.storePlaylistId)?.name || sch.playlist?.name || signagePlaylists.find(p => p.id === sch.playlistId)?.name || playlists.find(p => p.id === sch.playlistId)?.name || sch.name}
                     </span>
                   ),
                 },
@@ -1415,7 +1424,7 @@ export function StoreSignagePage() {
       {/* ═══ Assets Tab (내 동영상) ════════════════ */}
       {activeTab === 'assets' && <>
 
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-2">
         <h2 className="text-lg font-semibold text-slate-800">내 동영상</h2>
         <button
           onClick={() => setShowVideoRegForm(true)}
@@ -1425,6 +1434,9 @@ export function StoreSignagePage() {
           동영상 등록
         </button>
       </div>
+      <p className="text-xs text-slate-400 mb-4">
+        &lsquo;활용 위치&rsquo;는 콘텐츠를 어디에 활용할지 표시하는 용도입니다. TV 재생과 스케줄은 플레이리스트/스케줄 설정에서 관리됩니다.
+      </p>
 
       {/* Video registration form */}
       {showVideoRegForm && (
@@ -1648,7 +1660,7 @@ export function StoreSignagePage() {
               },
               {
                 key: 'channelMap',
-                title: '채널 배치',
+                title: '활용 위치',
                 render: (_v, v) => {
                   if (v.source === 'direct') {
                     return <span className="text-xs text-slate-300">—</span>;
@@ -1669,7 +1681,7 @@ export function StoreSignagePage() {
                                 ? `bg-${ch.color}-100 text-${ch.color}-700 border border-${ch.color}-300`
                                 : 'bg-slate-50 text-slate-400 border border-slate-200'
                             } ${disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:opacity-80'}`}
-                            title={`${ch.label} 채널 ${isOn ? 'OFF' : 'ON'}`}
+                            title={ch.tooltip}
                           >
                             {isOn ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
                             {ch.label}
@@ -1794,8 +1806,8 @@ function KpiCard({ label, count, color, warning }: {
 
 
 const CHANNEL_DEFS = [
-  { key: 'signage', label: '사이니지', Icon: Tv, color: 'purple' },
-  { key: 'home', label: '홈', Icon: Home, color: 'blue' },
-  { key: 'promotion', label: '프로모션', Icon: Megaphone, color: 'emerald' },
+  { key: 'signage', label: '사이니지', Icon: Tv, color: 'purple', tooltip: 'TV 재생용 콘텐츠로 표시 (실제 재생은 플레이리스트/스케줄에서 관리)' },
+  { key: 'home', label: '홈', Icon: Home, color: 'blue', tooltip: '매장 홈 화면 활용 후보로 표시' },
+  { key: 'promotion', label: '프로모션', Icon: Megaphone, color: 'emerald', tooltip: '홍보 영역 활용 후보로 표시' },
 ] as const;
 

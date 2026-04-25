@@ -75,10 +75,10 @@ export class ForumPostController extends ForumControllerBase {
       // Forum context filter (service-bound visibility)
       this.applyContextFilter(queryBuilder, 'post', this.getForumContext(req));
 
-      // Search filter (search in title and excerpt, since content is JSONB)
+      // Search filter (search in title, excerpt, and tags)
       if (query) {
         queryBuilder.andWhere(
-          '(post.title ILIKE :query OR post.excerpt ILIKE :query)',
+          '(post.title ILIKE :query OR post.excerpt ILIKE :query OR array_to_string(post.tags, \' \') ILIKE :query)',
           { query: `%${query}%` }
         );
       }
@@ -274,7 +274,7 @@ export class ForumPostController extends ForumControllerBase {
         excerpt: postExcerpt,
         categoryId: resolvedCategoryId,
         type,
-        tags,
+        tags: tags ? [...new Set<string>(tags.map((t: string) => String(t).trim().replace(/^#/, '')).filter(Boolean).filter((t: string) => t.length <= 30))] : undefined,
         isPinned,
         allowComments: allowComments !== false,
         metadata: normalizedMeta,
@@ -358,7 +358,9 @@ export class ForumPostController extends ForumControllerBase {
       if (categoryId !== undefined) post.categoryId = categoryId;
       if (type !== undefined) post.type = type;
       if (status !== undefined) post.status = status;
-      if (tags !== undefined) post.tags = tags;
+      if (tags !== undefined) {
+        post.tags = [...new Set<string>(tags.map((t: string) => String(t).trim().replace(/^#/, '')).filter(Boolean).filter((t: string) => t.length <= 30))];
+      }
       if (isPinned !== undefined) post.isPinned = isPinned;
       if (isLocked !== undefined) post.isLocked = isLocked;
       if (allowComments !== undefined) post.allowComments = allowComments;

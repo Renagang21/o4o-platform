@@ -18,7 +18,6 @@ export const CORE_TABLES_REGISTRY: Record<string, string[]> = {
     'forum_post',
     'forum_category',
     'forum_comment',
-    'forum_tag',
     'forum_like',
     'forum_bookmark',
   ],
@@ -36,7 +35,6 @@ export const CORE_CPT_REGISTRY: Record<string, string[]> = {
     'forum_post',
     'forum_category',
     'forum_comment',
-    'forum_tag',
   ],
   // Future core apps:
   // 'dropshipping-core': ['ds_product', 'ds_supplier', 'ds_partner', ...],

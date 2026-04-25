@@ -27,6 +27,8 @@ import {
   Play,
   RefreshCw,
   Loader2 as Spinner,
+  X,
+  Pencil,
 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { RowActionMenu } from '@o4o/ui';
@@ -52,6 +54,7 @@ interface CategoryData {
   isActive: boolean;
   postCount: number;
   forumType: string;
+  tags?: string[];
   createdBy?: string;
   creatorName?: string | null;
   createdAt: string;
@@ -80,15 +83,6 @@ interface RequestData {
   createdAt: string;
   updatedAt: string;
 }
-
-// 전체 태그 목록 (WO-FORUM-TAG-SELECTION-UI-V1과 동기화)
-const ALL_FORUM_TAGS = [
-  '약국경영', '매장운영', '고객응대', '직원관리',
-  '의약품', '건강기능식품', '의료기기', '의약외품',
-  '마케팅', '진열/POP', '디지털사이니지', '이벤트',
-  'AI활용', '데이터', '자동화', 'RPA',
-  '법/규정', '보험', '청구', '인증',
-];
 
 const statusConfig: Record<CategoryRequestStatus, { label: string; color: string; bgColor: string }> = {
   pending: { label: '대기 중', color: 'text-yellow-700', bgColor: 'bg-yellow-100' },
@@ -153,6 +147,10 @@ const REQUEST_ACTION_ICONS: Record<string, React.ReactNode> = {
 const forumCategoryPolicy = defineActionPolicy<CategoryData>('kpa:forum:categories', {
   rules: [
     {
+      key: 'editTags',
+      label: '태그 수정',
+    },
+    {
       key: 'deactivate',
       label: '비활성화',
       variant: 'warning',
@@ -168,6 +166,7 @@ const forumCategoryPolicy = defineActionPolicy<CategoryData>('kpa:forum:categori
 });
 
 const CATEGORY_ACTION_ICONS: Record<string, React.ReactNode> = {
+  editTags: <Pencil className="w-4 h-4" />,
   deactivate: <Trash2 className="w-4 h-4" />,
   hardDelete: <AlertOctagon className="w-4 h-4" />,
 };
@@ -219,6 +218,12 @@ export default function ForumManagementPage() {
   const [isCheckLoading, setIsCheckLoading] = useState(false);
   const [hardDeleteReason, setHardDeleteReason] = useState('');
   const [isHardDeleting, setIsHardDeleting] = useState(false);
+
+  // ── Tag edit modal state ──
+  const [tagEditTarget, setTagEditTarget] = useState<CategoryData | null>(null);
+  const [tagEditTags, setTagEditTags] = useState<string[]>([]);
+  const [tagEditInput, setTagEditInput] = useState('');
+  const [isTagSaving, setIsTagSaving] = useState(false);
 
   useEffect(() => {
     loadRequests();
@@ -312,6 +317,43 @@ export default function ForumManagementPage() {
       toast.error(reasons ? `삭제 불가: ${reasons.join(', ')}` : msg);
     } finally {
       setIsHardDeleting(false);
+    }
+  };
+
+  // ── Tag edit handlers ──
+  const openTagEditModal = (cat: CategoryData) => {
+    setTagEditTarget(cat);
+    setTagEditTags([...(cat.tags || [])]);
+    setTagEditInput('');
+  };
+
+  const addEditTag = (value: string) => {
+    const tag = value.trim().replace(/^#/, '');
+    if (!tag || tag.length > 30 || tagEditTags.includes(tag)) return;
+    setTagEditTags((prev) => [...prev, tag]);
+    setTagEditInput('');
+  };
+
+  const removeEditTag = (tag: string) => {
+    setTagEditTags((prev) => prev.filter((t) => t !== tag));
+  };
+
+  const handleTagEditSave = async () => {
+    if (!tagEditTarget) return;
+    setIsTagSaving(true);
+    try {
+      const result = await forumOperatorApi.updateCategory(tagEditTarget.id, { tags: tagEditTags });
+      if (result.success) {
+        toast.success(`'${tagEditTarget.name}' 태그가 수정되었습니다`);
+        setTagEditTarget(null);
+        loadCategories();
+      } else {
+        toast.error(result.error || '태그 수정 실패');
+      }
+    } catch (err: any) {
+      toast.error(err?.response?.data?.error || '태그 수정 중 오류가 발생했습니다');
+    } finally {
+      setIsTagSaving(false);
     }
   };
 
@@ -428,7 +470,8 @@ export default function ForumManagementPage() {
   const filteredRequests = requests.filter((r) => {
     const q = searchQuery.toLowerCase();
     const matchesSearch = r.name.toLowerCase().includes(q) || r.requesterName.toLowerCase().includes(q);
-    const matchesTag = !tagFilter || (r.tags || []).includes(tagFilter);
+    const tq = tagFilter.toLowerCase();
+    const matchesTag = !tq || (r.tags || []).some((t) => t.toLowerCase().includes(tq));
     return matchesSearch && matchesTag;
   });
 
@@ -584,6 +627,16 @@ export default function ForumManagementPage() {
           {row.description && (
             <div className="text-sm text-slate-400 line-clamp-1 mt-0.5">{row.description}</div>
           )}
+          {row.tags && row.tags.length > 0 && (
+            <div className="flex items-center gap-1 mt-1">
+              {row.tags.slice(0, 2).map((tag) => (
+                <span key={tag} className="px-2 py-0.5 text-xs font-medium rounded-full bg-slate-100 text-slate-600">{tag}</span>
+              ))}
+              {row.tags.length > 2 && (
+                <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-slate-100 text-slate-500">+{row.tags.length - 2}</span>
+              )}
+            </div>
+          )}
         </div>
       ),
     },
@@ -619,6 +672,7 @@ export default function ForumManagementPage() {
       render: (_v, row) => (
         <RowActionMenu
           actions={buildRowActions(forumCategoryPolicy, row, {
+            editTags: () => openTagEditModal(row),
             deactivate: () => { setDeactivateTarget(row); setDeactivateReason(''); },
             hardDelete: () => openHardDeleteModal(row),
           }, {
@@ -708,19 +762,13 @@ export default function ForumManagementPage() {
               </select>
               <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
             </div>
-            <div className="relative">
-              <select
-                value={tagFilter}
-                onChange={(e) => setTagFilter(e.target.value)}
-                className="pl-4 pr-8 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
-              >
-                <option value="">모든 태그</option>
-                {ALL_FORUM_TAGS.map((tag) => (
-                  <option key={tag} value={tag}>{tag}</option>
-                ))}
-              </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-            </div>
+            <input
+              type="text"
+              placeholder="태그 검색..."
+              value={tagFilter}
+              onChange={(e) => setTagFilter(e.target.value)}
+              className="pl-4 pr-4 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm w-40"
+            />
           </div>
 
           {/* DataTable */}
@@ -1055,6 +1103,76 @@ export default function ForumManagementPage() {
           </div>
         </>
       )}
+      {/* ── 태그 수정 모달 (WO-FORUM-TAG-POLICY-ALIGNMENT-PHASE2-V1) ── */}
+      {tagEditTarget && (
+        <>
+          <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setTagEditTarget(null)} />
+          <div className="fixed inset-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-md bg-white rounded-xl shadow-xl z-50 overflow-hidden">
+            <div className="px-6 py-4 border-b border-slate-200">
+              <h2 className="text-lg font-semibold text-slate-800">태그 수정</h2>
+              <p className="text-sm text-slate-500 mt-0.5">{tagEditTarget.name}</p>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">태그</label>
+                <div className="flex flex-wrap gap-2 items-center px-3 py-2 rounded-lg border border-slate-200 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent bg-white min-h-[44px]">
+                  {tagEditTags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-medium"
+                    >
+                      {tag}
+                      <button
+                        type="button"
+                        onClick={() => removeEditTag(tag)}
+                        className="ml-0.5 hover:text-blue-900 transition-colors"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </span>
+                  ))}
+                  <input
+                    type="text"
+                    value={tagEditInput}
+                    onChange={(e) => setTagEditInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ',') {
+                        e.preventDefault();
+                        addEditTag(tagEditInput);
+                      }
+                    }}
+                    onBlur={() => { if (tagEditInput.trim()) addEditTag(tagEditInput); }}
+                    placeholder={tagEditTags.length === 0 ? '태그 입력 (Enter/쉼표)' : ''}
+                    className="flex-1 min-w-[120px] py-1 text-sm outline-none bg-transparent"
+                  />
+                </div>
+                <p className="text-xs text-slate-400 mt-1.5">Enter 또는 쉼표로 태그를 추가합니다. 30자 이내.</p>
+              </div>
+            </div>
+            <div className="px-6 py-4 border-t border-slate-200 flex gap-3">
+              <button
+                onClick={() => setTagEditTarget(null)}
+                className="flex-1 px-4 py-2 text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleTagEditSave}
+                disabled={isTagSaving}
+                className="px-6 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2 transition-colors"
+              >
+                {isTagSaving ? (
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <CheckCircle className="w-4 h-4" />
+                )}
+                저장
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
       {/* ── Hard Delete 모달 (WO-KPA-A-OPERATOR-FORUM-HARD-DELETE-SAFE-GUARD-V1) ── */}
       {hardDeleteTarget && (
         <>

@@ -17,7 +17,8 @@ const BASE = `${API_BASE}/api/signage/kpa-society`;
 export interface SignageScheduleItem {
   id: string;
   name: string;
-  playlistId: string;
+  playlistId: string | null;
+  storePlaylistId: string | null;
   channelId: string | null;
   daysOfWeek: number[];
   startTime: string; // HH:MM:SS
@@ -34,7 +35,8 @@ export interface SignageScheduleItem {
 
 export interface CreateSchedulePayload {
   name: string;
-  playlistId: string;
+  playlistId?: string;
+  storePlaylistId?: string;
   channelId?: string | null;
   daysOfWeek: number[];
   startTime: string; // HH:MM
@@ -48,6 +50,7 @@ export interface CreateSchedulePayload {
 export interface UpdateSchedulePayload {
   name?: string;
   playlistId?: string;
+  storePlaylistId?: string | null;
   channelId?: string | null;
   daysOfWeek?: number[];
   startTime?: string;
@@ -61,6 +64,27 @@ export interface UpdateSchedulePayload {
 export interface SignagePlaylistOption {
   id: string;
   name: string;
+}
+
+/* ─── Active Content Resolution ────────────── */
+
+export interface StorePlaylistActiveItem {
+  id: string;
+  snapshotId: string;
+  displayOrder: number;
+  isForced: boolean;
+  isLocked: boolean;
+  title: string;
+  contentJson: Record<string, unknown>;
+  assetType: string;
+}
+
+export interface ActiveContentResult {
+  schedule: SignageScheduleItem | null;
+  playlist: unknown;
+  items: StorePlaylistActiveItem[];
+  resolvedAt: string;
+  nextScheduleChange: string | null;
 }
 
 /* ─── Helpers ───────────────────────────────── */
@@ -150,6 +174,20 @@ export async function deleteSchedule(
         headers: headers(organizationId),
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
+}
+
+export async function fetchActiveContent(
+  organizationId: string,
+  channelId?: string,
+): Promise<ActiveContentResult> {
+  const sp = new URLSearchParams();
+  if (channelId) sp.append('channelId', channelId);
+  const q = sp.toString();
+  const url = q ? `${BASE}/active-content?${q}` : `${BASE}/active-content`;
+  const res = await fetch(url, { headers: headers(organizationId) });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const json = await res.json();
+  return json.data ?? json;
 }
 
 export async function fetchSignagePlaylists(

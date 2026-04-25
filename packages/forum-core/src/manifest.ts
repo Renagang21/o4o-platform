@@ -26,7 +26,6 @@ export const forumManifest = {
     'forum_post',
     'forum_category',
     'forum_comment',
-    'forum_tag',
     'forum_like',
     'forum_bookmark',
   ],
@@ -44,7 +43,6 @@ export const forumManifest = {
       'ForumPost',
       'ForumCategory',
       'ForumComment',
-      'ForumTag',
       'ForumLike',
       'ForumBookmark',
     ],
@@ -167,7 +165,7 @@ export const forumManifest = {
   // ===== 외부 노출 =====
   exposes: {
     services: ['ForumService', 'PostService', 'CategoryService', 'CommentService'],
-    types: ['ForumPost', 'ForumCategory', 'ForumComment', 'ForumTag'],
+    types: ['ForumPost', 'ForumCategory', 'ForumComment'],
     events: ['post.created', 'post.updated', 'post.deleted', 'comment.created', 'comment.deleted'],
   },
 

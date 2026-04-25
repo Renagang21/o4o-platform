@@ -1,22 +1,35 @@
 /**
  * SignagePlayerSelectPage — KPA Society
  * WO-KPA-STORE-SIGNAGE-IA-RESTRUCTURE-V2
+ * WO-KPA-STORE-SIGNAGE-SCHEDULE-PLAYBACK-SYNC-V1
  *
  * /store/marketing/signage/player
  * 게시된 플레이리스트 목록 → 새 탭 fullscreen 재생
+ * + 현재 활성 스케줄 배너 → 스케줄 기준 재생
  */
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Search, Play, ListVideo, AlertCircle } from 'lucide-react';
+import { Search, Play, ListVideo, AlertCircle, Calendar, Tv } from 'lucide-react';
 import { DataTable, type Column } from '@o4o/ui';
 import { fetchStorePlaylists, type StorePlaylist } from '../../api/storePlaylist';
+import { fetchActiveContent, type ActiveContentResult } from '../../api/signageSchedule';
+import { useAuth } from '../../contexts';
+
+/** HH:MM:SS → HH:MM */
+function toHHMM(t: string): string {
+  return t?.slice(0, 5) ?? '';
+}
 
 export function SignagePlayerSelectPage() {
+  const { user } = useAuth();
+  const organizationId = user?.kpaMembership?.organizationId || '';
+
   const [playlists, setPlaylists] = useState<StorePlaylist[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [keyword, setKeyword] = useState('');
   const [selectedPlayerKeys, setSelectedPlayerKeys] = useState<string[]>([]);
+  const [activeContent, setActiveContent] = useState<ActiveContentResult | null>(null);
 
   const loadPlaylists = useCallback(async () => {
     setLoading(true);
@@ -32,6 +45,18 @@ export function SignagePlayerSelectPage() {
     }
   }, []);
 
+  // Load active schedule
+  useEffect(() => {
+    if (!organizationId) return;
+    fetchActiveContent(organizationId)
+      .then((result) => {
+        if (result.schedule && result.items.length > 0) {
+          setActiveContent(result);
+        }
+      })
+      .catch(() => { /* no active schedule — banner hidden */ });
+  }, [organizationId]);
+
   useEffect(() => {
     loadPlaylists();
   }, [loadPlaylists]);
@@ -44,6 +69,10 @@ export function SignagePlayerSelectPage() {
 
   const handlePlay = (playlistId: string) => {
     window.open(`/store/marketing/signage/play/${playlistId}`, '_blank');
+  };
+
+  const handleSchedulePlay = () => {
+    window.open('/store/marketing/signage/play/_schedule', '_blank');
   };
 
   const columns: Column<StorePlaylist>[] = [
@@ -116,6 +145,36 @@ export function SignagePlayerSelectPage() {
           </p>
         </div>
       </div>
+
+      {/* Active Schedule Banner */}
+      {activeContent?.schedule && (
+        <div className="bg-teal-50 border border-teal-200 rounded-lg p-4">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 min-w-0">
+              <Calendar className="w-5 h-5 text-teal-600 flex-shrink-0" />
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-teal-900 truncate">
+                  현재 활성 스케줄: {activeContent.schedule.name}
+                </p>
+                <p className="text-xs text-teal-600 mt-0.5">
+                  {toHHMM(activeContent.schedule.startTime)} ~ {toHHMM(activeContent.schedule.endTime)}
+                  {' · '}항목 {activeContent.items.length}개
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={handleSchedulePlay}
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg bg-teal-600 text-white hover:bg-teal-700 transition-colors flex-shrink-0"
+            >
+              <Tv className="w-4 h-4" />
+              현재 스케줄로 TV 재생
+            </button>
+          </div>
+          <p className="text-xs text-teal-500 mt-2">
+            스케줄 변경은 TV 화면을 새로고침하거나 다시 열면 반영됩니다.
+          </p>
+        </div>
+      )}
 
       {/* Search */}
       <div className="relative max-w-sm">

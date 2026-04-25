@@ -16,8 +16,8 @@ function ProductGridBlockComponent({ block, context }: BlockComponentProps) {
   return (
     <div style={{ padding: '0 16px', marginBottom: '24px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-        <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#1e293b' }}>추천 상품</h2>
-        <Link to={`${storePrefix}/${slug}/products`} style={{ fontSize: '13px', color: '#3b82f6', textDecoration: 'none' }}>
+        <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--sf-heading, #1e293b)' }}>추천 상품</h2>
+        <Link to={`${storePrefix}/${slug}/products`} style={{ fontSize: '13px', color: 'var(--sf-primary, #3b82f6)', textDecoration: 'none' }}>
           전체보기
         </Link>
       </div>
@@ -27,9 +27,9 @@ function ProductGridBlockComponent({ block, context }: BlockComponentProps) {
             key={p.id}
             onClick={() => navigate(`${storePrefix}/${slug}/products/${p.id}`)}
             style={{
-              backgroundColor: '#fff',
+              backgroundColor: 'var(--sf-surface, #fff)',
               borderRadius: '10px',
-              border: '1px solid #e2e8f0',
+              border: '1px solid var(--sf-border, #e2e8f0)',
               overflow: 'hidden',
               textAlign: 'left',
               cursor: 'pointer',
@@ -44,10 +44,10 @@ function ProductGridBlockComponent({ block, context }: BlockComponentProps) {
               )}
             </div>
             <div style={{ padding: '10px' }}>
-              <p style={{ fontSize: '13px', fontWeight: 500, color: '#1e293b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <p style={{ fontSize: '13px', fontWeight: 500, color: 'var(--sf-text, #1e293b)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {p.name}
               </p>
-              <p style={{ fontSize: '14px', fontWeight: 700, color: '#2563eb', marginTop: '4px' }}>
+              <p style={{ fontSize: '14px', fontWeight: 700, color: 'var(--sf-primary, #2563eb)', marginTop: '4px' }}>
                 {(p.sale_price || p.price).toLocaleString()}원
               </p>
             </div>

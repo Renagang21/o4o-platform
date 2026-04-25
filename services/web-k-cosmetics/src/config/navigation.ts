@@ -14,8 +14,9 @@ import type { GlobalHeaderNavItem } from '@o4o/ui';
 
 export const KCOS_PUBLIC_NAV: GlobalHeaderNavItem[] = [
   { label: '홈', href: '/' },
-  { label: '허브', href: '/store-hub' },
-  { label: '커뮤니티', href: '/community' },
+  { label: '포럼', href: '/forum' },
+  { label: '강의', href: '/lms' },
+  { label: '매장 HUB', href: '/store-hub' },
 ];
 
 // ─── Contextual Nav ──────────────────────────────────────────────────────────
@@ -25,7 +26,7 @@ export interface KCosContextualNavItem extends GlobalHeaderNavItem {
 }
 
 export const KCOS_CONTEXTUAL_NAV: KCosContextualNavItem[] = [
-  { label: '매장 관리', href: '/store', visibleWhen: 'storeManager' },
+  { label: '내 매장', href: '/store', visibleWhen: 'storeManager' },
   { label: '파트너', href: '/partner', visibleWhen: 'partner' },
   // 운영자/관리자 진입은 상단 공용 nav가 아닌 유저 드롭다운으로만 제공
   // WO-O4O-OPERATOR-CONTEXTUAL-NAV-SEPARATION-V1

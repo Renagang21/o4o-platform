@@ -25,8 +25,10 @@ import type {
 export class SignageScheduleService {
   private repository: SignageScheduleRepository;
   private playlistRepository: SignagePlaylistRepository;
+  private dataSource: DataSource;
 
   constructor(dataSource: DataSource) {
+    this.dataSource = dataSource;
     this.repository = new SignageScheduleRepository(dataSource);
     this.playlistRepository = new SignagePlaylistRepository(dataSource);
   }
@@ -63,15 +65,33 @@ export class SignageScheduleService {
     dto: CreateScheduleDto,
     scope: ScopeFilter,
   ): Promise<ScheduleResponseDto> {
-    const playlist = await this.playlistRepository.findPlaylistById(dto.playlistId, scope);
-    if (!playlist) {
-      throw new Error('Playlist not found');
+    // At least one playlist reference is required
+    if (!dto.playlistId && !dto.storePlaylistId) {
+      throw new Error('playlistId or storePlaylistId is required');
+    }
+
+    // Validate Core playlist (if provided)
+    if (dto.playlistId) {
+      const playlist = await this.playlistRepository.findPlaylistById(dto.playlistId, scope);
+      if (!playlist) {
+        throw new Error('Playlist not found');
+      }
+    }
+
+    // Validate Store playlist (if provided)
+    if (dto.storePlaylistId) {
+      const exists = await this.checkStorePlaylist(dto.storePlaylistId, scope);
+      if (!exists) {
+        throw new Error('Store playlist not found');
+      }
     }
 
     const schedule = await this.repository.createSchedule({
       ...dto,
       serviceKey: scope.serviceKey,
       organizationId: scope.organizationId || null,
+      playlistId: dto.playlistId || null,
+      storePlaylistId: dto.storePlaylistId || null,
       channelId: dto.channelId || null,
       validFrom: dto.validFrom ? new Date(dto.validFrom) : null,
       validUntil: dto.validUntil ? new Date(dto.validUntil) : null,
@@ -90,6 +110,13 @@ export class SignageScheduleService {
       const playlist = await this.playlistRepository.findPlaylistById(dto.playlistId, scope);
       if (!playlist) {
         throw new Error('Playlist not found');
+      }
+    }
+
+    if (dto.storePlaylistId) {
+      const exists = await this.checkStorePlaylist(dto.storePlaylistId, scope);
+      if (!exists) {
+        throw new Error('Store playlist not found');
       }
     }
 
@@ -121,7 +148,7 @@ export class SignageScheduleService {
     const resolveTime = currentTime || new Date();
     const schedule = await this.repository.findActiveSchedule(channelId, scope, resolveTime);
 
-    if (!schedule || !schedule.playlist) {
+    if (!schedule) {
       return {
         playlist: null,
         schedule: null,
@@ -131,7 +158,39 @@ export class SignageScheduleService {
       };
     }
 
-    const items = await this.playlistRepository.findPlaylistItems(schedule.playlistId);
+    // Store playlist takes priority
+    if (schedule.storePlaylistId) {
+      const storeItems = await this.dataSource.query(
+        `SELECT spi.id, spi.snapshot_id AS "snapshotId", spi.display_order AS "displayOrder",
+                spi.is_forced AS "isForced", spi.is_locked AS "isLocked",
+                snap.title, snap.content_json AS "contentJson", snap.asset_type AS "assetType"
+         FROM store_playlist_items spi
+         JOIN o4o_asset_snapshots snap ON snap.id = spi.snapshot_id
+         WHERE spi.playlist_id = $1
+         ORDER BY spi.display_order ASC`,
+        [schedule.storePlaylistId],
+      );
+      return {
+        playlist: null,
+        schedule: toScheduleResponse(schedule),
+        items: storeItems,
+        resolvedAt: resolveTime.toISOString(),
+        nextScheduleChange: schedule.endTime,
+      };
+    }
+
+    // Core playlist fallback
+    if (!schedule.playlist) {
+      return {
+        playlist: null,
+        schedule: toScheduleResponse(schedule),
+        items: [],
+        resolvedAt: resolveTime.toISOString(),
+        nextScheduleChange: null,
+      };
+    }
+
+    const items = await this.playlistRepository.findPlaylistItems(schedule.playlistId!);
 
     return {
       playlist: toPlaylistResponse(schedule.playlist),
@@ -140,6 +199,18 @@ export class SignageScheduleService {
       resolvedAt: resolveTime.toISOString(),
       nextScheduleChange: schedule.endTime,
     };
+  }
+
+  private async checkStorePlaylist(
+    storePlaylistId: string,
+    scope: ScopeFilter,
+  ): Promise<boolean> {
+    const result = await this.dataSource.query(
+      `SELECT id FROM store_playlists
+       WHERE id = $1 AND organization_id = $2 AND publish_status = 'published' AND is_active = true`,
+      [storePlaylistId, scope.organizationId],
+    );
+    return result.length > 0;
   }
 
   async getScheduleCalendar(
@@ -169,6 +240,7 @@ export class SignageScheduleService {
             scheduleId: schedule.id,
             scheduleName: schedule.name,
             playlistId: schedule.playlistId,
+            storePlaylistId: schedule.storePlaylistId || null,
             playlistName: schedule.playlist?.name || 'Unknown',
             startTime: schedule.startTime,
             endTime: schedule.endTime,

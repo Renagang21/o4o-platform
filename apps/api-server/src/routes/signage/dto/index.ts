@@ -200,7 +200,8 @@ export interface MediaResponseDto {
 export interface CreateScheduleDto {
   name: string;
   channelId?: string;
-  playlistId: string;
+  playlistId?: string;
+  storePlaylistId?: string;
   daysOfWeek: number[];
   startTime: string;
   endTime: string;
@@ -215,6 +216,7 @@ export interface UpdateScheduleDto {
   name?: string;
   channelId?: string;
   playlistId?: string;
+  storePlaylistId?: string | null;
   daysOfWeek?: number[];
   startTime?: string;
   endTime?: string;
@@ -241,7 +243,8 @@ export interface ScheduleResponseDto {
   organizationId: string | null;
   name: string;
   channelId: string | null;
-  playlistId: string;
+  playlistId: string | null;
+  storePlaylistId: string | null;
   daysOfWeek: number[];
   startTime: string;
   endTime: string;
@@ -622,7 +625,8 @@ export interface ScheduleCalendarQueryDto {
 export interface ScheduleCalendarEventDto {
   scheduleId: string;
   scheduleName: string;
-  playlistId: string;
+  playlistId: string | null;
+  storePlaylistId: string | null;
   playlistName: string;
   startTime: string;
   endTime: string;

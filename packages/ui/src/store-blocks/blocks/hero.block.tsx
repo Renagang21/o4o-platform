@@ -28,7 +28,7 @@ function HeroBlockComponent({ context }: BlockComponentProps) {
         style={{
           padding: '32px 24px',
           color: '#fff',
-          ...(store.hero_image ? {} : { background: 'linear-gradient(135deg, #3b82f6, #2563eb)' }),
+          ...(store.hero_image ? {} : { background: 'linear-gradient(135deg, var(--sf-primary-light, #3b82f6), var(--sf-primary, #2563eb))' }),
         }}
       >
         {store.logo && (

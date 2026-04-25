@@ -91,6 +91,16 @@ export class ForumCategoryRequestService {
       return { error: { status: 400, code: 'TAGS_TOO_MANY', message: '태그는 최대 5개까지 선택할 수 있습니다' } };
     }
 
+    // Sanitize tags: trim, # 제거, 빈값 제거, 30자 제한, 중복 제거
+    const sanitizedTags = [...new Set(
+      tags.map((t: string) => String(t).trim().replace(/^#/, ''))
+        .filter(Boolean)
+        .filter((t: string) => t.length <= 30)
+    )];
+    if (sanitizedTags.length === 0) {
+      return { error: { status: 400, code: 'TAGS_REQUIRED', message: '유효한 태그를 1개 이상 입력해주세요' } };
+    }
+
     const entity = this.requestRepo.create({
       serviceCode,
       organizationId: organizationId || undefined,
@@ -100,7 +110,7 @@ export class ForumCategoryRequestService {
       forumType: forumType || 'open',
       iconEmoji: iconEmoji || undefined,
       iconUrl: iconUrl || undefined,
-      tags: tags || undefined,
+      tags: sanitizedTags,
       metadata: metadata || undefined,
       status: 'pending' as any,
       requesterId: user.id,

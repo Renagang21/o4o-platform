@@ -113,7 +113,7 @@ export class ForumPost {
   @Column({ type: 'int', default: 0 })
   likeCount!: number;
 
-  @Column({ type: 'simple-array', nullable: true })
+  @Column({ type: 'text', array: true, nullable: true })
   tags?: string[];
 
   @Column({ type: 'jsonb', nullable: true })

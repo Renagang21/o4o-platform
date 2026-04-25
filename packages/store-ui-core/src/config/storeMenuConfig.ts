@@ -68,16 +68,31 @@ export const ALL_STORE_MENUS: StoreMenuItemDef[] = [
 
 /**
  * K-Cosmetics Store Config
- * WO-KCOS-MENU-STRUCTURE-ALIGN-V1: placeholder 메뉴 비노출
- *   제거: products, orders, billing, content, settings (StorePlaceholderPage)
- *   유지: dashboard, local-products, channels (실구현 완료)
+ * WO-KCOS-KPA-CANONICAL-MENU-ALIGN-V1: flat → section mode 전환
+ *   KPA canonical 기준 5섹션 구조
  */
 export const COSMETICS_STORE_CONFIG: StoreDashboardConfig = {
   serviceKey: 'cosmetics',
   serviceName: 'K-Cosmetics',
   basePath: '/store',
-  enabledMenus: [
-    'dashboard', 'local-products', 'channels',
+  enabledMenus: ['dashboard'],   // section 모드에서는 미사용, 하위 호환용으로 유지
+  menuSections: [
+    { label: '', items: [
+      { key: 'home',     label: '홈',       subPath: '' },
+      { key: 'channels', label: '채널 관리', subPath: '/channels' },
+    ]},
+    { label: '상품', items: [
+      { key: 'local-products', label: '자체 상품', subPath: '/local-products' },
+    ]},
+    { label: '디지털 사이니지', items: [
+      { key: 'signage', label: '사이니지', subPath: '/signage' },
+    ]},
+    { label: '콘텐츠/태블릿', items: [
+      { key: 'tablet-displays', label: '태블릿 진열', subPath: '/tablet-displays' },
+    ]},
+    { label: '설정', items: [
+      { key: 'settings', label: '매장 설정', subPath: '/settings' },
+    ]},
   ],
 };
 

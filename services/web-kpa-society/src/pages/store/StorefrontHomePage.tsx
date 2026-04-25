@@ -54,6 +54,65 @@ function getBlockConfig(blocks: StoreBlock[], type: StoreBlockType): Record<stri
 }
 
 // ============================================================================
+// Theme CSS Variables — WO-O4O-STORE-THEME-VISUAL-APPLICATION-V1
+// ============================================================================
+
+const THEME_CSS = `
+[data-theme="professional"] {
+  --sf-bg: #f8fafc;
+  --sf-surface: #ffffff;
+  --sf-text: #0f172a;
+  --sf-text-secondary: #64748b;
+  --sf-text-muted: #94a3b8;
+  --sf-heading: #1e293b;
+  --sf-primary: #2563eb;
+  --sf-primary-light: #3b82f6;
+  --sf-primary-dark: #1d4ed8;
+  --sf-border: #e2e8f0;
+  --sf-header-bg: #ffffff;
+}
+[data-theme="neutral"] {
+  --sf-bg: #fafafa;
+  --sf-surface: #ffffff;
+  --sf-text: #374151;
+  --sf-text-secondary: #9ca3af;
+  --sf-text-muted: #d1d5db;
+  --sf-heading: #1f2937;
+  --sf-primary: #6b7280;
+  --sf-primary-light: #9ca3af;
+  --sf-primary-dark: #4b5563;
+  --sf-border: #e5e7eb;
+  --sf-header-bg: #ffffff;
+}
+[data-theme="clean"] {
+  --sf-bg: #f0fdf4;
+  --sf-surface: #ffffff;
+  --sf-text: #111827;
+  --sf-text-secondary: #6b7280;
+  --sf-text-muted: #9ca3af;
+  --sf-heading: #064e3b;
+  --sf-primary: #10b981;
+  --sf-primary-light: #34d399;
+  --sf-primary-dark: #059669;
+  --sf-border: #d1fae5;
+  --sf-header-bg: #ffffff;
+}
+[data-theme="modern"] {
+  --sf-bg: #0f172a;
+  --sf-surface: #1e293b;
+  --sf-text: #f1f5f9;
+  --sf-text-secondary: #94a3b8;
+  --sf-text-muted: #64748b;
+  --sf-heading: #e2e8f0;
+  --sf-primary: #6366f1;
+  --sf-primary-light: #818cf8;
+  --sf-primary-dark: #4f46e5;
+  --sf-border: #334155;
+  --sf-header-bg: #1e293b;
+}
+`;
+
+// ============================================================================
 // Main Page Component
 // ============================================================================
 
@@ -184,34 +243,37 @@ export function StorefrontHomePage() {
   };
 
   return (
-    <div data-theme={theme} style={{ minHeight: '100vh', backgroundColor: '#f8fafc' }}>
-      {/* Header */}
-      <header style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#fff', borderBottom: '1px solid #e2e8f0' }}>
-        <div style={{ maxWidth: '640px', margin: '0 auto', padding: '0 16px', height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            {store.logo ? (
-              <img src={store.logo} alt={store.name} style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #e2e8f0' }} />
-            ) : (
-              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, #3b82f6, #2563eb)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ color: '#fff', fontSize: '14px', fontWeight: 600 }}>{store.name.charAt(0)}</span>
-              </div>
-            )}
-            <span style={{ fontWeight: 600, color: '#1e293b', fontSize: '15px' }}>{store.name}</span>
+    <>
+      <style>{THEME_CSS}</style>
+      <div data-theme={theme} style={{ minHeight: '100vh', backgroundColor: 'var(--sf-bg, #f8fafc)', color: 'var(--sf-text, #0f172a)' }}>
+        {/* Header */}
+        <header style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: 'var(--sf-header-bg, #fff)', borderBottom: '1px solid var(--sf-border, #e2e8f0)' }}>
+          <div style={{ maxWidth: '640px', margin: '0 auto', padding: '0 16px', height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              {store.logo ? (
+                <img src={store.logo} alt={store.name} style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--sf-border, #e2e8f0)' }} />
+              ) : (
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--sf-primary-light, #3b82f6), var(--sf-primary, #2563eb))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ color: '#fff', fontSize: '14px', fontWeight: 600 }}>{store.name.charAt(0)}</span>
+                </div>
+              )}
+              <span style={{ fontWeight: 600, color: 'var(--sf-heading, #1e293b)', fontSize: '15px' }}>{store.name}</span>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* Content — registry-based block rendering */}
-      <main style={{ maxWidth: '640px', margin: '0 auto' }}>
-        {blocks.map(renderBlock)}
-      </main>
+        {/* Content — registry-based block rendering */}
+        <main style={{ maxWidth: '640px', margin: '0 auto' }}>
+          {blocks.map(renderBlock)}
+        </main>
 
-      {/* Footer */}
-      <footer style={{ marginTop: '48px', padding: '24px 16px', borderTop: '1px solid #e2e8f0', backgroundColor: '#fff', textAlign: 'center' }}>
-        <p style={{ fontSize: '13px', color: '#94a3b8' }}>{store.name}의 스토어프론트</p>
-        <p style={{ fontSize: '11px', color: '#cbd5e1', marginTop: '4px' }}>Powered by O4O Platform</p>
-      </footer>
-    </div>
+        {/* Footer */}
+        <footer style={{ marginTop: '48px', padding: '24px 16px', borderTop: '1px solid var(--sf-border, #e2e8f0)', backgroundColor: 'var(--sf-header-bg, #fff)', textAlign: 'center' }}>
+          <p style={{ fontSize: '13px', color: 'var(--sf-text-muted, #94a3b8)' }}>{store.name}의 스토어프론트</p>
+          <p style={{ fontSize: '11px', color: 'var(--sf-text-muted, #cbd5e1)', marginTop: '4px' }}>Powered by O4O Platform</p>
+        </footer>
+      </div>
+    </>
   );
 }
 

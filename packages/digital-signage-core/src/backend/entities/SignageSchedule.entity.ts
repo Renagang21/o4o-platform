@@ -25,6 +25,7 @@ import type { SignagePlaylist } from './SignagePlaylist.entity.js';
 @Index(['serviceKey', 'organizationId'])
 @Index(['channelId'])
 @Index(['playlistId'])
+@Index(['storePlaylistId'])
 @Index(['isActive'])
 @Index(['priority'])
 export class SignageSchedule {
@@ -49,9 +50,14 @@ export class SignageSchedule {
   @Index()
   channelId!: string | null; // null = applies to all channels in scope
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'uuid', nullable: true })
   @Index()
-  playlistId!: string;
+  playlistId!: string | null;
+
+  // ========== Store Playlist Bridge ==========
+  @Column({ type: 'uuid', nullable: true })
+  @Index()
+  storePlaylistId!: string | null;
 
   // ========== Time Rules ==========
   @Column({ type: 'int', array: true })
@@ -96,7 +102,7 @@ export class SignageSchedule {
   version!: number;
 
   // ========== Relations (string-based for ESM) ==========
-  @ManyToOne('SignagePlaylist', { onDelete: 'CASCADE' })
+  @ManyToOne('SignagePlaylist', { onDelete: 'SET NULL', nullable: true })
   @JoinColumn({ name: 'playlistId' })
-  playlist!: SignagePlaylist;
+  playlist!: SignagePlaylist | null;
 }

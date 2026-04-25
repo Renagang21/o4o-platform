@@ -11,9 +11,9 @@ function InfoSectionBlockComponent({ context }: BlockComponentProps) {
 
   return (
     <div style={{ padding: '0 16px', marginBottom: '24px' }}>
-      <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#1e293b', marginBottom: '12px' }}>매장 소개</h2>
-      <div style={{ backgroundColor: '#fff', borderRadius: '10px', border: '1px solid #e2e8f0', padding: '16px' }}>
-        <p style={{ fontSize: '14px', color: '#475569', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
+      <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--sf-heading, #1e293b)', marginBottom: '12px' }}>매장 소개</h2>
+      <div style={{ backgroundColor: 'var(--sf-surface, #fff)', borderRadius: '10px', border: '1px solid var(--sf-border, #e2e8f0)', padding: '16px' }}>
+        <p style={{ fontSize: '14px', color: 'var(--sf-text-secondary, #475569)', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
           {store.description}
         </p>
       </div>

@@ -50,7 +50,6 @@ async function checkForumTablesExist(dataSource: any): Promise<boolean> {
       'forum_post',
       'forum_category',
       'forum_comment',
-      'forum_tag',
     ];
 
     return forumTables.every((tableName) =>

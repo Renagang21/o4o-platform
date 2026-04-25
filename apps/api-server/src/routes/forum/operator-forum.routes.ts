@@ -586,6 +586,7 @@ router.get('/categories', async (req: Request, res: Response): Promise<void> => 
       isActive: cat.isActive,
       postCount: cat.postCount,
       forumType: cat.forumType,
+      tags: cat.tags || [],
       createdBy: cat.createdBy,
       creatorName: (cat as any).creator?.name || null,
       createdAt: cat.createdAt,
@@ -595,6 +596,55 @@ router.get('/categories', async (req: Request, res: Response): Promise<void> => 
     res.json({ success: true, data, count: data.length });
   } catch (error: any) {
     logger.error('Error listing forum categories:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/** PATCH /categories/:id — operator category info update (name, description, tags) */
+router.patch('/categories/:id', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const serviceCode = (req as any)._serviceCode;
+    const { name, description, tags } = req.body;
+
+    const categoryIds = await getCategoryIdsForService(serviceCode);
+    if (!categoryIds.includes(req.params.id)) {
+      res.status(404).json({ success: false, error: 'Category not found for this service' });
+      return;
+    }
+
+    const category = await categoryRepo().findOne({ where: { id: req.params.id } });
+    if (!category) {
+      res.status(404).json({ success: false, error: 'Category not found' });
+      return;
+    }
+
+    if (name !== undefined) {
+      const trimmed = String(name).trim();
+      if (!trimmed || trimmed.length < 2 || trimmed.length > 50) {
+        res.status(400).json({ success: false, error: '포럼 이름은 2~50자여야 합니다' });
+        return;
+      }
+      category.name = trimmed;
+    }
+
+    if (description !== undefined) {
+      category.description = description ? String(description).trim() : null as any;
+    }
+
+    if (tags !== undefined) {
+      const sanitized = [...new Set<string>(
+        (Array.isArray(tags) ? tags : [])
+          .map((t: string) => String(t).trim().replace(/^#/, ''))
+          .filter(Boolean)
+          .filter((t: string) => t.length <= 30)
+      )];
+      category.tags = sanitized as any;
+    }
+
+    const updated = await categoryRepo().save(category);
+    res.json({ success: true, data: updated });
+  } catch (error: any) {
+    logger.error('Error updating forum category:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });

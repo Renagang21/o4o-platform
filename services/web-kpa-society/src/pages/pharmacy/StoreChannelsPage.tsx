@@ -37,6 +37,9 @@ import {
   Copy,
   Link2,
   AlertCircle,
+  BookOpen,
+  PenLine,
+  Settings2,
 } from 'lucide-react';
 import {
   fetchChannelOverviewWithCode,
@@ -328,8 +331,9 @@ function ChannelPublicUrlCard({
     <div className="flex items-center gap-3 p-4 mb-6 rounded-lg border border-slate-200 bg-white">
       <Link2 className="w-5 h-5 text-blue-500 flex-shrink-0" />
       <div className="flex-1 min-w-0">
-        <div className="text-xs text-slate-500 mb-0.5">{label} 공개 주소</div>
-        <div className="text-sm font-mono text-slate-800 truncate">{url}</div>
+        <div className="text-xs text-slate-500 mb-1">{label} 공개 주소</div>
+        <div className="text-[15px] font-mono font-medium text-slate-900 truncate">{url}</div>
+        <div className="text-xs text-slate-400 mt-1">이 주소로 고객이 매장 화면에 접속합니다</div>
       </div>
       <div className="flex items-center gap-1.5 flex-shrink-0">
         <button
@@ -741,59 +745,46 @@ export function StoreChannelsPage() {
         </div>
       )}
 
-      {/* ─── [B] Channel KPI ─────────────────────── */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
-        <div className="rounded-lg border border-slate-200 p-4 bg-white">
-          <div className="text-xs text-slate-500 mb-1">채널 상태</div>
-          {currentChannel ? (
-            <>
+      {/* ─── Channel Detail Header ────────────────── */}
+      <div className="flex items-center gap-4 mb-6 p-5 bg-white rounded-xl border border-slate-200">
+        <div
+          className="flex items-center justify-center w-12 h-12 rounded-xl"
+          style={currentChannel ? { backgroundColor: st!.bg } : { backgroundColor: '#f1f5f9' }}
+        >
+          <currentTab.Icon
+            className="w-6 h-6"
+            style={currentChannel ? { color: st!.color } : { color: '#94a3b8' }}
+          />
+        </div>
+        <div className="flex-1">
+          <div className="flex items-center gap-2.5">
+            <h2 className="text-lg font-bold text-slate-900">{currentTab.label} 채널</h2>
+            {st && (
               <span
-                className="inline-flex px-2.5 py-1 rounded text-sm font-semibold"
-                style={{ background: st!.bg, color: st!.color }}
+                className="px-2.5 py-1 rounded-full text-xs font-semibold"
+                style={{ background: st.bg, color: st.color }}
               >
-                {st!.label}
+                {st.label}
               </span>
-              <div className="text-[10px] text-slate-400 mt-2">
-                수정: {formatDate(currentChannel.updatedAt)}
-              </div>
-            </>
-          ) : (
-            <button
-              onClick={handleCreateChannel}
-              disabled={creating}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
-            >
-              {creating ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              ) : (
-                <Plus className="w-3.5 h-3.5" />
-              )}
-              채널 만들기
-            </button>
-          )}
-        </div>
-        <div className="rounded-lg border border-slate-200 p-4 bg-white">
-          <div className="text-xs text-slate-500 mb-1">노출 상품</div>
-          <div className="text-2xl font-bold text-slate-900">
-            {currentChannel ? currentChannel.visibleProductCount : 0}
-            <span className="text-sm font-normal text-slate-400 ml-1">
-              / {currentChannel ? currentChannel.totalProductCount : 0}
-            </span>
+            )}
           </div>
+          <p className="text-sm text-slate-500 mt-0.5">
+            {activeTab === 'B2C' && '고객이 온라인으로 상품을 확인하고 구매할 수 있는 스토어프론트'}
+            {activeTab === 'KIOSK' && '매장 내 키오스크에서 고객이 직접 상품을 조회합니다'}
+            {activeTab === 'TABLET' && '매장 내 태블릿에서 상품 조회 및 주문 요청을 처리합니다'}
+            {activeTab === 'SIGNAGE' && '매장 내 디지털 사이니지에 콘텐츠를 표시합니다'}
+          </p>
         </div>
-        <div className="rounded-lg border border-slate-200 p-4 bg-white">
-          <div className="text-xs text-slate-500 mb-1">노출 콘텐츠</div>
-          <div className="text-2xl font-bold text-slate-900">
-            {publishedAssets.length}
-            <span className="text-sm font-normal text-slate-400 ml-1">
-              / {channelAssets.length}
-            </span>
-          </div>
-        </div>
-        <div className="rounded-lg border border-slate-200 p-4 bg-red-50">
-          <div className="text-xs text-red-500 mb-1">강제노출</div>
-          <div className="text-2xl font-bold text-red-700">{forcedAssets.length}</div>
-        </div>
+        {!currentChannel && (
+          <button
+            onClick={handleCreateChannel}
+            disabled={creating}
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+          >
+            {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+            채널 만들기
+          </button>
+        )}
       </div>
 
       {/* ─── Public URL Card (WO-O4O-STORE-CHANNEL-PUBLIC-URL-GUIDE-V1) ─── */}
@@ -805,56 +796,95 @@ export function StoreChannelsPage() {
         />
       )}
 
+      {/* ─── [B] Channel KPI ─────────────────────── */}
+      {currentChannel && (
+        <div className={`grid ${forcedAssets.length > 0 ? 'grid-cols-3' : 'grid-cols-2'} gap-4 mb-6`}>
+          <div className="rounded-lg border border-slate-200 p-4 bg-white">
+            <div className="text-xs text-slate-500 mb-1">노출 상품</div>
+            <div className="text-2xl font-bold text-slate-900">
+              {currentChannel.visibleProductCount}
+              <span className="text-sm font-normal text-slate-400 ml-1">
+                / {currentChannel.totalProductCount}
+              </span>
+            </div>
+          </div>
+          <div className="rounded-lg border border-slate-200 p-4 bg-white">
+            <div className="text-xs text-slate-500 mb-1">노출 콘텐츠</div>
+            <div className="text-2xl font-bold text-slate-900">
+              {publishedAssets.length}
+              <span className="text-sm font-normal text-slate-400 ml-1">
+                / {channelAssets.length}
+              </span>
+            </div>
+          </div>
+          {forcedAssets.length > 0 && (
+            <div className="rounded-lg border border-red-200 p-4 bg-red-50">
+              <div className="text-xs text-red-500 mb-1">강제노출</div>
+              <div className="text-2xl font-bold text-red-700">{forcedAssets.length}</div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* ─── [C] Quick Actions ───────────────────── */}
-      <div className="flex gap-2 mb-6">
-        <button
-          onClick={() => navigate('/store-hub')}
-          className="px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100"
-        >
-          약국 HUB으로 이동
-        </button>
-        <button
-          onClick={() => navigate('/store/content')}
-          className="px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-50 border border-slate-200 rounded-lg hover:bg-slate-100"
-        >
-          전체 자산 보기
-        </button>
-        {activeTab === 'SIGNAGE' && (
+      {currentChannel && (
+        <div className="flex flex-wrap gap-2 mb-6">
+          {activeTab === 'B2C' && orgCode && (
+            <a
+              href={`/store/${orgCode}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100"
+            >
+              <ExternalLink className="w-3.5 h-3.5" /> 스토어 보기
+            </a>
+          )}
+          {activeTab === 'SIGNAGE' && (
+            <>
+              <button
+                onClick={() => navigate('/store/signage')}
+                className="px-3 py-1.5 text-xs font-medium text-purple-700 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100"
+              >
+                사이니지 콘텐츠
+              </button>
+              <button
+                onClick={() => navigate('/store/marketing/signage/player')}
+                className="px-3 py-1.5 text-xs font-medium text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100"
+              >
+                재생 실행
+              </button>
+            </>
+          )}
+          {activeTab === 'TABLET' && (
+            <>
+              <button
+                onClick={() => navigate('/store/commerce/tablet-displays')}
+                className="px-3 py-1.5 text-xs font-medium text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100"
+              >
+                태블릿 진열
+              </button>
+              <button
+                onClick={() => navigate('/store/channels/tablet')}
+                className="px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100"
+              >
+                주문 요청 확인
+              </button>
+            </>
+          )}
           <button
-            onClick={() => navigate('/store/signage')}
-            className="px-3 py-1.5 text-xs font-medium text-purple-700 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100"
+            onClick={() => navigate('/store-hub')}
+            className="px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-50 border border-slate-200 rounded-lg hover:bg-slate-100"
           >
-            사이니지 운영
+            약국 HUB
           </button>
-        )}
-        {activeTab === 'TABLET' && (
-          <>
-            <button
-              onClick={() => navigate('/store/commerce/tablet-displays')}
-              className="px-3 py-1.5 text-xs font-medium text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100"
-            >
-              태블릿 진열
-            </button>
-            <button
-              onClick={() => navigate('/store/channels/tablet')}
-              className="px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100"
-            >
-              태블릿 주문 요청
-            </button>
-          </>
-        )}
-        {activeTab === 'B2C' && orgCode && (
-          <a
-            href={`/store/${orgCode}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-teal-700 bg-teal-50 border border-teal-200 rounded-lg hover:bg-teal-100"
+          <button
+            onClick={() => navigate('/store/content')}
+            className="px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-50 border border-slate-200 rounded-lg hover:bg-slate-100"
           >
-            <ExternalLink className="w-3.5 h-3.5" />
-            스토어 미리보기
-          </a>
-        )}
-      </div>
+            전체 자산
+          </button>
+        </div>
+      )}
 
       {/* ─── [D] Channel Product List (B2C/KIOSK only) ─── */}
       {isProductChannel && (
@@ -1228,6 +1258,112 @@ export function StoreChannelsPage() {
           </div>
         )
       )}
+
+      {/* ─── [F] Blog 유사 채널 (WO-O4O-STORE-BLOG-CHANNEL-CLARITY-V1) ─── */}
+      <div className="mt-10 pt-8 border-t border-slate-200">
+        <div className="flex items-center gap-4 mb-4 p-5 bg-white rounded-xl border border-slate-200">
+          <div
+            className="flex items-center justify-center w-12 h-12 rounded-xl"
+            style={{ backgroundColor: '#eff6ff' }}
+          >
+            <BookOpen className="w-6 h-6" style={{ color: '#2563eb' }} />
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2.5">
+              <h2 className="text-lg font-bold text-slate-900">블로그</h2>
+              <span
+                className="px-2.5 py-1 rounded-full text-xs font-semibold"
+                style={{ background: '#dcfce7', color: '#166534' }}
+              >
+                사용 가능
+              </span>
+            </div>
+            <p className="text-sm text-slate-500 mt-0.5">
+              블로그는 상품과 함께 매장 정보를 전달하는 콘텐츠 채널입니다
+            </p>
+          </div>
+        </div>
+
+        {/* Blog URL */}
+        {orgCode ? (
+          <div className="flex items-center gap-3 p-4 mb-4 rounded-lg border border-slate-200 bg-white">
+            <Link2 className="w-5 h-5 text-blue-500 flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <div className="text-xs text-slate-500 mb-1">블로그 공개 주소</div>
+              <div className="text-[15px] font-mono font-medium text-slate-900 truncate">
+                {typeof window !== 'undefined' ? window.location.origin : ''}/store/{orgCode}/blog
+              </div>
+              <div className="text-xs text-slate-400 mt-1">이 주소로 고객이 매장 블로그에 접속합니다</div>
+            </div>
+            <div className="flex items-center gap-1.5 flex-shrink-0">
+              <button
+                onClick={async () => {
+                  const blogUrl = `${window.location.origin}/store/${orgCode}/blog`;
+                  try {
+                    await navigator.clipboard.writeText(blogUrl);
+                    showToast('success', '블로그 주소가 클립보드에 복사되었습니다.');
+                  } catch {
+                    showToast('error', '복사에 실패했습니다. 주소를 직접 복사해 주세요.');
+                  }
+                }}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200"
+                title="주소 복사"
+              >
+                <Copy className="w-3.5 h-3.5" /> 복사
+              </button>
+              <a
+                href={`/store/${orgCode}/blog`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100"
+                title="새 탭에서 열기"
+              >
+                <ExternalLink className="w-3.5 h-3.5" /> 열기
+              </a>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 p-4 mb-4 rounded-lg border border-amber-200 bg-amber-50">
+            <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-amber-800">블로그 주소가 아직 설정되지 않았습니다</p>
+              <p className="text-xs text-amber-600 mt-0.5">매장 설정에서 약국 코드를 등록하면 블로그 URL이 생성됩니다.</p>
+            </div>
+            <Link
+              to="/store/settings"
+              className="flex-shrink-0 px-3 py-1.5 text-xs font-medium text-amber-700 bg-white border border-amber-300 rounded-lg hover:bg-amber-100"
+            >
+              설정으로 이동
+            </Link>
+          </div>
+        )}
+
+        {/* Blog Quick Actions */}
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => navigate('/store/content/blog')}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100"
+          >
+            <PenLine className="w-3.5 h-3.5" /> 글 작성
+          </button>
+          <button
+            onClick={() => navigate('/store/content/blog')}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-50 border border-slate-200 rounded-lg hover:bg-slate-100"
+          >
+            <Settings2 className="w-3.5 h-3.5" /> 블로그 관리
+          </button>
+          {orgCode && (
+            <a
+              href={`/store/${orgCode}/blog`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-50 border border-slate-200 rounded-lg hover:bg-slate-100"
+            >
+              <ExternalLink className="w-3.5 h-3.5" /> 미리보기
+            </a>
+          )}
+        </div>
+      </div>
 
       {/* ─── Add Product Modal ───────────────────── */}
       {currentChannel && (

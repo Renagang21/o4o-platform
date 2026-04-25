@@ -255,6 +255,11 @@ export const forumOperatorApi = {
     }
   },
 
+  updateCategory: async (id: string, data: { name?: string; description?: string; tags?: string[] }) => {
+    const res = await authClient.api.patch(`${OPERATOR_BASE}/categories/${id}?${SVC}`, data);
+    return res.data;
+  },
+
   directDeactivate: async (id: string, data: { reason: string }) => {
     const res = await authClient.api.post(`${OPERATOR_BASE}/categories/${id}/deactivate?${SVC}`, data);
     return res.data;

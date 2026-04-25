@@ -2,7 +2,6 @@ import { MoreThanOrEqual, DataSource } from 'typeorm';
 import { ForumCategory } from '../entities/ForumCategory.js';
 import { ForumPost, PostStatus, PostType } from '../entities/ForumPost.js';
 import { ForumComment, CommentStatus } from '../entities/ForumComment.js';
-import { ForumTag } from '../entities/ForumTag.js';
 import { canCreatePost, canManagePost, canCreateCategory, canManageCategory, canCreateComment, canManageComment } from '../utils/forumPermissions.js';
 
 // DataSource and CacheService are injected at runtime from api-server
@@ -51,7 +50,6 @@ export class ForumService {
   private get categoryRepository() { return AppDataSource.getRepository(ForumCategory); }
   private get postRepository() { return AppDataSource.getRepository(ForumPost); }
   private get commentRepository() { return AppDataSource.getRepository(ForumComment); }
-  private get tagRepository() { return AppDataSource.getRepository(ForumTag); }
   // User repository is accessed via raw query since User entity is in api-server
 
   // Category Methods
@@ -183,11 +181,6 @@ export class ForumService {
       publishedAt: category.requireApproval ? undefined : new Date()
     });
 
-    // 태그 처리
-    if (data.tags && data.tags.length > 0) {
-      await this.processTags(data.tags);
-    }
-
     const savedPost = await this.postRepository.save(post);
 
     // 카테고리 통계 업데이트
@@ -222,11 +215,6 @@ export class ForumService {
 
     if (data.title && data.title !== post.title) {
       data.slug = this.generateSlug(data.title);
-    }
-
-    // 태그 처리
-    if (data.tags) {
-      await this.processTags(data.tags);
     }
 
     await this.postRepository.update(postId, data);
@@ -505,7 +493,7 @@ export class ForumService {
           createdAt: MoreThanOrEqual(today)
         } 
       }),
-      this.getPopularTags(10),
+      Promise.resolve([]),
       this.getActiveCategories(10),
       this.getTopContributors(10)
     ]);
@@ -536,27 +524,6 @@ export class ForumService {
       .replace(/-+/g, '-')
       .replace(/^-|-$/g, '')
       .substring(0, 200);
-  }
-
-  private async processTags(tags: string[]): Promise<void> {
-    for (const tagName of tags) {
-      const slug = ForumTag.generateSlug(tagName);
-      
-      let tag = await this.tagRepository.findOne({ where: { slug } });
-      
-      if (!tag) {
-        tag = this.tagRepository.create({
-          name: tagName,
-          slug,
-          usageCount: 1
-        });
-        await this.tagRepository.save(tag);
-      } else {
-        await this.tagRepository.update(tag.id, {
-          usageCount: tag.usageCount + 1
-        });
-      }
-    }
   }
 
   private async updateCategoryStats(categoryId: string, action: 'increment_post' | 'increment_comment' | 'decrement_post' | 'decrement_comment'): Promise<void> {
@@ -619,19 +586,6 @@ export class ForumService {
     await this.postRepository.update(postId, {
       viewCount: () => 'viewCount + 1'
     });
-  }
-
-  private async getPopularTags(limit: number): Promise<Array<{ name: string; count: number }>> {
-    const tags = await this.tagRepository.find({
-      where: { isActive: true },
-      order: { usageCount: 'DESC' },
-      take: limit
-    });
-
-    return tags.map((tag: any) => ({
-      name: tag.name,
-      count: tag.usageCount
-    }));
   }
 
   private async getActiveCategories(limit: number): Promise<Array<{ name: string; postCount: number }>> {

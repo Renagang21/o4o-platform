@@ -50,7 +50,6 @@ async function purgeForumData(dataSource: any, logger: any): Promise<void> {
       'forum_like',
       'forum_bookmark',
       'forum_comment',
-      'forum_tag',
       'forum_post',
       'forum_category',
     ];

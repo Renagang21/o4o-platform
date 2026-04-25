@@ -1,11 +1,11 @@
 /**
  * RequestCategoryPage - 포럼 개설 신청 (KPA Society)
  *
- * WO-FORUM-TAG-SELECTION-UI-V1
- * 태그 기반 분류 선택 UI 추가
+ * WO-FORUM-TAG-POLICY-ALIGNMENT-PHASE2-V1
+ * 자유입력 태그 (O4O Tag Policy V1)
  */
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import {
   MessageSquarePlus,
@@ -13,7 +13,6 @@ import {
   Send,
   AlertCircle,
   CheckCircle,
-  Search,
   X,
 } from 'lucide-react';
 import { forumRequestApi } from '../../api/forum';
@@ -26,40 +25,6 @@ interface CategoryRequestForm {
   reason?: string;
   forumType: ForumType;
 }
-
-// ============================================================================
-// 태그 그룹 정의
-// ============================================================================
-
-interface TagGroup {
-  label: string;
-  tags: string[];
-}
-
-const TAG_GROUPS: TagGroup[] = [
-  {
-    label: '경영/운영',
-    tags: ['약국경영', '매장운영', '고객응대', '직원관리'],
-  },
-  {
-    label: '상품/카테고리',
-    tags: ['의약품', '건강기능식품', '의료기기', '의약외품'],
-  },
-  {
-    label: '마케팅/진열',
-    tags: ['마케팅', '진열/POP', '디지털사이니지', '이벤트'],
-  },
-  {
-    label: '기술/도구',
-    tags: ['AI활용', '데이터', '자동화', 'RPA'],
-  },
-  {
-    label: '정책/규정',
-    tags: ['법/규정', '보험', '청구', '인증'],
-  },
-];
-
-const MAX_TAGS = 5;
 
 export default function RequestCategoryPage() {
   const navigate = useNavigate();
@@ -74,38 +39,27 @@ export default function RequestCategoryPage() {
   });
   const [errors, setErrors] = useState<Partial<CategoryRequestForm & { tags: string }>>({});
 
-  // 태그 상태
+  // 태그 상태 (자유입력)
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [tagSearch, setTagSearch] = useState('');
-  const [tagLimitToast, setTagLimitToast] = useState(false);
+  const [tagInput, setTagInput] = useState('');
 
-  // 검색 필터링된 태그 그룹
-  const filteredGroups = useMemo<TagGroup[]>(() => {
-    if (!tagSearch.trim()) return TAG_GROUPS;
-    const q = tagSearch.trim().toLowerCase();
-    return TAG_GROUPS.map((group) => ({
-      ...group,
-      tags: group.tags.filter((t) => t.toLowerCase().includes(q)),
-    })).filter((g) => g.tags.length > 0);
-  }, [tagSearch]);
-
-  const handleTagToggle = (tag: string) => {
-    if (selectedTags.includes(tag)) {
-      setSelectedTags(selectedTags.filter((t) => t !== tag));
-    } else {
-      if (selectedTags.length >= MAX_TAGS) {
-        setTagLimitToast(true);
-        setTimeout(() => setTagLimitToast(false), 2500);
-        return;
-      }
-      setSelectedTags([...selectedTags, tag]);
-    }
-    // 태그 에러 해제
+  const addTag = (value: string) => {
+    const tag = value.trim().replace(/^#/, '');
+    if (!tag || tag.length > 30 || selectedTags.includes(tag)) return;
+    setSelectedTags((prev) => [...prev, tag]);
+    setTagInput('');
     if (errors.tags) setErrors((prev) => ({ ...prev, tags: undefined }));
   };
 
-  const handleRemoveTag = (tag: string) => {
-    setSelectedTags(selectedTags.filter((t) => t !== tag));
+  const removeTag = (tag: string) => {
+    setSelectedTags((prev) => prev.filter((t) => t !== tag));
+  };
+
+  const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      addTag(tagInput);
+    }
   };
 
   const validateForm = (): boolean => {
@@ -115,7 +69,7 @@ export default function RequestCategoryPage() {
     else if (formData.name.length > 50) newErrors.name = '포럼 이름은 50자 이하여야 합니다';
     if (!formData.description.trim()) newErrors.description = '포럼 설명을 입력해주세요';
     else if (formData.description.length < 10) newErrors.description = '포럼 설명은 10자 이상이어야 합니다';
-    if (selectedTags.length === 0) newErrors.tags = '태그를 1개 이상 선택해주세요';
+    if (selectedTags.length === 0) newErrors.tags = '태그를 1개 이상 입력해주세요';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -166,13 +120,6 @@ export default function RequestCategoryPage() {
 
   return (
     <div className="max-w-2xl mx-auto py-8 px-4">
-      {/* 상단 한도 초과 토스트 */}
-      {tagLimitToast && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-slate-800 text-white text-sm px-5 py-3 rounded-xl shadow-lg">
-          태그는 최대 {MAX_TAGS}개까지 선택할 수 있습니다
-        </div>
-      )}
-
       <div className="mb-8">
         <NavLink
           to="/forum"
@@ -248,89 +195,45 @@ export default function RequestCategoryPage() {
           </div>
 
           {/* ================================================================
-              태그 선택 (WO-FORUM-TAG-SELECTION-UI-V1)
+              태그 입력 (자유입력 — O4O Tag Policy V1)
           ================================================================ */}
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm font-medium text-slate-700">
-                태그 선택 <span className="text-red-500">*</span>
-              </label>
-              <span className={`text-xs font-medium ${selectedTags.length >= MAX_TAGS ? 'text-orange-600' : 'text-slate-400'}`}>
-                {selectedTags.length}/{MAX_TAGS}
-              </span>
-            </div>
-            <p className="text-xs text-slate-500 mb-3">포럼의 주제를 나타내는 태그를 1~5개 선택해주세요.</p>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              태그 <span className="text-red-500">*</span>
+            </label>
+            <p className="text-xs text-slate-500 mb-3">포럼의 주제를 나타내는 태그를 자유롭게 입력해주세요. Enter 또는 쉼표로 추가합니다.</p>
 
-            {/* 선택된 태그 chips */}
-            {selectedTags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-3">
-                {selectedTags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-medium"
+            {/* 선택된 태그 chips + 입력 */}
+            <div
+              className={`flex flex-wrap gap-2 items-center px-3 py-2 rounded-lg border ${
+                errors.tags ? 'border-red-300' : 'border-slate-200'
+              } focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent bg-white min-h-[44px]`}
+            >
+              {selectedTags.map((tag) => (
+                <span
+                  key={tag}
+                  className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-medium"
+                >
+                  {tag}
+                  <button
+                    type="button"
+                    onClick={() => removeTag(tag)}
+                    className="ml-0.5 hover:text-blue-900 transition-colors"
+                    aria-label={`${tag} 제거`}
                   >
-                    {tag}
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveTag(tag)}
-                      className="ml-0.5 hover:text-blue-900 transition-colors"
-                      aria-label={`${tag} 제거`}
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {/* 태그 검색 */}
-            <div className="relative mb-3">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </span>
+              ))}
               <input
                 type="text"
-                value={tagSearch}
-                onChange={(e) => setTagSearch(e.target.value)}
-                placeholder="태그 검색"
-                className="w-full pl-9 pr-4 py-2 text-sm rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={handleTagKeyDown}
+                onBlur={() => { if (tagInput.trim()) addTag(tagInput); }}
+                placeholder={selectedTags.length === 0 ? '태그 입력 (예: 약국경영, 마케팅)' : ''}
+                className="flex-1 min-w-[120px] py-1 text-sm outline-none bg-transparent"
               />
-            </div>
-
-            {/* 태그 그룹 목록 */}
-            <div
-              className={`rounded-lg border ${errors.tags ? 'border-red-300' : 'border-slate-200'} p-4 space-y-4 max-h-72 overflow-y-auto`}
-            >
-              {filteredGroups.length === 0 ? (
-                <p className="text-sm text-slate-400 text-center py-4">검색 결과가 없습니다</p>
-              ) : (
-                filteredGroups.map((group) => (
-                  <div key={group.label}>
-                    <p className="text-xs font-semibold text-slate-500 mb-2">{group.label}</p>
-                    <div className="flex flex-wrap gap-2">
-                      {group.tags.map((tag) => {
-                        const isSelected = selectedTags.includes(tag);
-                        const isDisabled = !isSelected && selectedTags.length >= MAX_TAGS;
-                        return (
-                          <button
-                            key={tag}
-                            type="button"
-                            onClick={() => handleTagToggle(tag)}
-                            disabled={isDisabled}
-                            className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
-                              isSelected
-                                ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700'
-                                : isDisabled
-                                  ? 'bg-slate-50 text-slate-300 border-slate-200 cursor-not-allowed'
-                                  : 'bg-white text-slate-700 border-slate-300 hover:border-blue-400 hover:text-blue-600'
-                            }`}
-                          >
-                            {tag}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))
-              )}
             </div>
 
             {errors.tags && (

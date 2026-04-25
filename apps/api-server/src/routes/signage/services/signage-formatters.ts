@@ -109,6 +109,7 @@ export function toScheduleResponse(schedule: SignageSchedule): ScheduleResponseD
     name: schedule.name,
     channelId: schedule.channelId,
     playlistId: schedule.playlistId,
+    storePlaylistId: schedule.storePlaylistId || null,
     daysOfWeek: schedule.daysOfWeek,
     startTime: schedule.startTime,
     endTime: schedule.endTime,

@@ -1460,6 +1460,73 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       res.status(201).json({ success: true, data: result[0] });
     }));
 
+    // PATCH /signage/media/:id — 동영상 수정
+    signageRouter.patch('/media/:id', authenticate, asyncHandler(async (req: Request, res: Response) => {
+      const userId = (req as any).user?.id;
+      if (!userId) return res.status(401).json({ success: false, error: 'Unauthorized' });
+
+      const { id } = req.params;
+
+      // 1. 존재 + 소유권 확인
+      const existing = await dataSource.query(
+        `SELECT id, "createdByUserId" FROM signage_media WHERE id = $1 AND "deletedAt" IS NULL`, [id]
+      );
+      if (!existing.length) return res.status(404).json({ success: false, error: '동영상을 찾을 수 없습니다' });
+      if (existing[0].createdByUserId !== userId && !isSignageOperatorOrAdmin((req as any).user)) {
+        return res.status(403).json({ success: false, error: '수정 권한이 없습니다' });
+      }
+
+      // 2. 수정 가능 필드 추출
+      const { name, description, sourceUrl, duration, tags } = req.body;
+
+      // 3. 동적 SET 절 구성
+      const sets: string[] = [];
+      const params: any[] = [];
+      let idx = 1;
+
+      if (name !== undefined) {
+        if (!name.trim()) return res.status(400).json({ success: false, error: '제목을 입력하세요' });
+        sets.push(`name = $${idx++}`); params.push(name.trim());
+      }
+      if (description !== undefined) {
+        sets.push(`description = $${idx++}`); params.push(description?.trim() || null);
+      }
+      if (sourceUrl !== undefined) {
+        if (!sourceUrl.trim()) return res.status(400).json({ success: false, error: 'URL을 입력하세요' });
+        const { sourceType, embedId, mediaType } = detectVideoSource(sourceUrl.trim());
+        sets.push(`"sourceUrl" = $${idx++}`); params.push(sourceUrl.trim());
+        sets.push(`"sourceType" = $${idx++}`); params.push(sourceType);
+        sets.push(`"embedId" = $${idx++}`); params.push(embedId);
+        sets.push(`"mediaType" = $${idx++}`); params.push(mediaType);
+      }
+      if (duration !== undefined) {
+        sets.push(`duration = $${idx++}`); params.push(duration && Number(duration) > 0 ? Number(duration) : null);
+      }
+      if (tags !== undefined) {
+        const tagArray = (Array.isArray(tags) ? tags : [])
+          .map((t: string) => String(t).trim().replace(/^#/, ''))
+          .filter(Boolean)
+          .filter((t: string) => t.length <= 30);
+        const uniqueTags = [...new Set(tagArray)];
+        if (uniqueTags.length === 0) {
+          return res.status(400).json({ success: false, error: '태그를 최소 1개 이상 입력해주세요' });
+        }
+        sets.push(`tags = $${idx++}`); params.push(uniqueTags);
+      }
+
+      if (sets.length === 0) {
+        return res.status(400).json({ success: false, error: '수정할 내용이 없습니다' });
+      }
+
+      sets.push(`"updatedAt" = now()`);
+      params.push(id);
+      const result = await dataSource.query(
+        `UPDATE signage_media SET ${sets.join(', ')} WHERE id = $${idx} AND "deletedAt" IS NULL RETURNING *`,
+        params
+      );
+      res.json({ success: true, data: result[0] });
+    }));
+
     // POST /signage/playlists — 플레이리스트 생성
     signageRouter.post('/playlists', authenticate, asyncHandler(async (req: Request, res: Response) => {
       const userId = (req as any).user?.id;

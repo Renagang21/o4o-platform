@@ -15,8 +15,8 @@ function BlogListBlockComponent({ block, context }: BlockComponentProps) {
   return (
     <div style={{ padding: '0 16px', marginBottom: '24px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-        <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#1e293b' }}>블로그</h2>
-        <Link to={`${storePrefix}/${slug}/blog`} style={{ fontSize: '13px', color: '#3b82f6', textDecoration: 'none' }}>
+        <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--sf-heading, #1e293b)' }}>블로그</h2>
+        <Link to={`${storePrefix}/${slug}/blog`} style={{ fontSize: '13px', color: 'var(--sf-primary, #3b82f6)', textDecoration: 'none' }}>
           전체보기
         </Link>
       </div>
@@ -28,16 +28,16 @@ function BlogListBlockComponent({ block, context }: BlockComponentProps) {
             style={{
               display: 'block',
               padding: '12px 16px',
-              backgroundColor: '#fff',
+              backgroundColor: 'var(--sf-surface, #fff)',
               borderRadius: '10px',
-              border: '1px solid #e2e8f0',
+              border: '1px solid var(--sf-border, #e2e8f0)',
               textDecoration: 'none',
               color: 'inherit',
             }}
           >
-            <p style={{ fontSize: '14px', fontWeight: 600, color: '#1e293b', marginBottom: '4px' }}>{post.title}</p>
+            <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--sf-text, #1e293b)', marginBottom: '4px' }}>{post.title}</p>
             {post.excerpt && (
-              <p style={{ fontSize: '13px', color: '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <p style={{ fontSize: '13px', color: 'var(--sf-text-secondary, #64748b)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {post.excerpt}
               </p>
             )}

@@ -108,6 +108,15 @@ export default function ContentHubPage() {
   const [formTags, setFormTags] = useState<string[]>([]);
   const [formTagInput, setFormTagInput] = useState('');
 
+  // Edit form
+  const [editModal, setEditModal] = useState(false);
+  const [editMediaId, setEditMediaId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState({ name: '', description: '', sourceUrl: '', durationInput: '' });
+  const [isEditing, setIsEditing] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
+  const [editTags, setEditTags] = useState<string[]>([]);
+  const [editTagInput, setEditTagInput] = useState('');
+
   // Reload trigger
   const [reloadKey, setReloadKey] = useState(0);
 
@@ -186,6 +195,13 @@ export default function ContentHubPage() {
   };
   const removeTag = (tag: string) => setFormTags(prev => prev.filter(t => t !== tag));
 
+  const addEditTag = (value: string) => {
+    const tag = value.trim().replace(/^#/, '');
+    if (!tag || editTags.includes(tag)) return;
+    setEditTags(prev => [...prev, tag]);
+  };
+  const removeEditTag = (tag: string) => setEditTags(prev => prev.filter(t => t !== tag));
+
   // ── Create video ──
   const handleCreateVideo = async () => {
     if (!createForm.name.trim()) { setCreateError('제목을 입력하세요'); return; }
@@ -211,6 +227,48 @@ export default function ContentHubPage() {
       setCreateError(err?.message || '등록에 실패했습니다');
     } finally {
       setIsCreating(false);
+    }
+  };
+
+  // ── Edit video ──
+  const openEditModal = (v: MediaItem) => {
+    setEditMediaId(v.id);
+    setEditForm({
+      name: v.name,
+      description: v.description || '',
+      sourceUrl: v.sourceUrl || v.url || '',
+      durationInput: v.duration ? formatDuration(v.duration) : '',
+    });
+    setEditTags(v.tags ?? []);
+    setEditTagInput('');
+    setEditError(null);
+    setEditModal(true);
+  };
+
+  const handleEditVideo = async () => {
+    if (!editForm.name.trim()) { setEditError('제목을 입력하세요'); return; }
+    if (!editForm.sourceUrl.trim()) { setEditError('URL을 입력하세요'); return; }
+    if (editTags.length === 0) { setEditError('태그를 최소 1개 입력하세요'); return; }
+    setIsEditing(true);
+    setEditError(null);
+    try {
+      const durationSec = parseDurationInput(editForm.durationInput);
+      await apiFetch(`/api/v1/kpa/signage/media/${editMediaId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          name: editForm.name.trim(),
+          sourceUrl: editForm.sourceUrl.trim(),
+          description: editForm.description.trim() || undefined,
+          tags: editTags,
+          duration: durationSec > 0 ? durationSec : undefined,
+        }),
+      });
+      setEditModal(false);
+      setReloadKey(k => k + 1);
+    } catch (err: any) {
+      setEditError(err?.message || '수정에 실패했습니다');
+    } finally {
+      setIsEditing(false);
     }
   };
 
@@ -336,7 +394,10 @@ export default function ContentHubPage() {
                             <button onClick={() => window.open(v.sourceUrl || v.url, '_blank')} style={styles.actionBtn} title="새창 재생">▶</button>
                           )}
                           {user && v.source === 'community' && v.createdByUserId === user.id && (
-                            <button onClick={() => setDeleteConfirm({ id: v.id, name: v.name, type: 'video' })} style={styles.deleteActionBtn} title="삭제">✕</button>
+                            <>
+                              <button onClick={() => openEditModal(v)} style={styles.actionBtn} title="수정">✎</button>
+                              <button onClick={() => setDeleteConfirm({ id: v.id, name: v.name, type: 'video' })} style={styles.deleteActionBtn} title="삭제">✕</button>
+                            </>
                           )}
                         </div>
                       </td>
@@ -441,7 +502,7 @@ export default function ContentHubPage() {
                 <textarea value={createForm.description} onChange={(e) => setCreateForm(f => ({ ...f, description: e.target.value }))} placeholder="간단한 설명을 입력하세요" rows={2} style={modalStyles.textarea} />
               </div>
               <div>
-                <label style={modalStyles.label}>태그 (선택)</label>
+                <label style={modalStyles.label}>태그 *</label>
                 <div style={modalStyles.tagsWrap}>
                   {formTags.map(tag => (
                     <span key={tag} style={modalStyles.tagChip}>
@@ -464,6 +525,60 @@ export default function ContentHubPage() {
             <div style={modalStyles.dialogFooter}>
               <button onClick={() => setCreateModal(false)} disabled={isCreating} style={modalStyles.cancelBtn}>취소</button>
               <button onClick={handleCreateVideo} disabled={isCreating} style={modalStyles.submitBtn}>{isCreating ? '등록 중...' : '등록'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Edit Video Modal ── */}
+      {editModal && (
+        <div style={modalStyles.overlay}>
+          <div style={modalStyles.dialog}>
+            <div style={modalStyles.dialogHeader}>
+              <h3 style={modalStyles.dialogTitle}>동영상 수정</h3>
+              <button onClick={() => setEditModal(false)} style={modalStyles.closeBtn}>✕</button>
+            </div>
+            <div style={modalStyles.dialogBody}>
+              <div>
+                <label style={modalStyles.label}>제목 *</label>
+                <input type="text" value={editForm.name} onChange={(e) => setEditForm(f => ({ ...f, name: e.target.value }))} placeholder="예: 약사회 건강 안내 영상" style={modalStyles.input} />
+              </div>
+              <div>
+                <label style={modalStyles.label}>URL *</label>
+                <input type="url" value={editForm.sourceUrl} onChange={(e) => setEditForm(f => ({ ...f, sourceUrl: e.target.value }))} placeholder="https://www.youtube.com/watch?v=..." style={modalStyles.input} />
+              </div>
+              <div>
+                <label style={modalStyles.label}>재생시간 (선택, mm:ss)</label>
+                <input type="text" value={editForm.durationInput} onChange={(e) => setEditForm(f => ({ ...f, durationInput: e.target.value }))} placeholder="예: 10:30" style={modalStyles.input} />
+              </div>
+              <div>
+                <label style={modalStyles.label}>설명 (선택)</label>
+                <textarea value={editForm.description} onChange={(e) => setEditForm(f => ({ ...f, description: e.target.value }))} placeholder="간단한 설명을 입력하세요" rows={2} style={modalStyles.textarea} />
+              </div>
+              <div>
+                <label style={modalStyles.label}>태그 *</label>
+                <div style={modalStyles.tagsWrap}>
+                  {editTags.map(tag => (
+                    <span key={tag} style={modalStyles.tagChip}>
+                      #{tag}
+                      <button type="button" onClick={() => removeEditTag(tag)} style={modalStyles.tagRemove}>×</button>
+                    </span>
+                  ))}
+                </div>
+                <input type="text" value={editTagInput} onChange={(e) => setEditTagInput(e.target.value)} onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addEditTag(editTagInput); setEditTagInput(''); }
+                }} placeholder="태그 입력 후 Enter" style={modalStyles.input} />
+                <div style={modalStyles.suggestRow}>
+                  {DEFAULT_TAG_SUGGESTIONS.filter(t => !editTags.includes(t)).slice(0, 6).map(t => (
+                    <button key={t} type="button" onClick={() => addEditTag(t)} style={modalStyles.suggestBtn}>#{t}</button>
+                  ))}
+                </div>
+              </div>
+              {editError && <p style={modalStyles.errorText}>{editError}</p>}
+            </div>
+            <div style={modalStyles.dialogFooter}>
+              <button onClick={() => setEditModal(false)} disabled={isEditing} style={modalStyles.cancelBtn}>취소</button>
+              <button onClick={handleEditVideo} disabled={isEditing} style={modalStyles.submitBtn}>{isEditing ? '저장 중...' : '저장'}</button>
             </div>
           </div>
         </div>
