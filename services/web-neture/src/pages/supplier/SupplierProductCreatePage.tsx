@@ -26,6 +26,7 @@ import { ProductForm, type ProductFormData } from '../../components/product';
 import { useContentTemplates } from '../../hooks/useContentTemplates';
 import { useAuth } from '../../contexts';
 import MediaPickerModal from '../../components/common/MediaPickerModal';
+import { loadAndClearDraft } from '../../lib/product-import/storage';
 
 const STEPS = ['기본 정보', '가격 / 유통', '이미지 / 설명'];
 
@@ -69,24 +70,27 @@ export default function SupplierProductCreatePage() {
   const [searchParams] = useSearchParams();
   const autoSearchDone = useRef(false);
 
+  // WO-O4O-PRODUCT-IMPORT-ASSISTANT-V1: Import Assistant에서 전달된 초안 읽기 (single-use)
+  const importDraft = useMemo(() => loadAndClearDraft(), []);
+
   const [currentStep, setCurrentStep] = useState(1);
   const [form, setForm] = useState<FormData>({
     barcode: '',
     packagingName: '',
-    marketingName: '',
+    marketingName: importDraft?.marketingName ?? '',
     categoryId: '',
-    brandName: '',
-    manufacturerName: '',
+    brandName: importDraft?.brandName ?? '',
+    manufacturerName: importDraft?.manufacturerName ?? '',
     distributionType: 'PRIVATE',
     serviceKeys: [],
     priceGeneral: '',
-    consumerReferencePrice: '',
+    consumerReferencePrice: importDraft?.consumerReferencePrice ?? '',
     stockQty: '',
     regulatoryType: 'GENERAL',
     regulatoryName: '',
     mfdsPermitNumber: '',
-    specification: '',
-    originCountry: '',
+    specification: importDraft?.specification ?? '',
+    originCountry: importDraft?.originCountry ?? '',
     // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
     isFeatured: false,
   });
@@ -99,19 +103,26 @@ export default function SupplierProductCreatePage() {
   // Reference data
   const [categories, setCategories] = useState<CategoryTreeItem[]>([]);
 
-  // Description editors
-  const [consumerShortDesc, setConsumerShortDesc] = useState('');
-  const [consumerDetailDesc, setConsumerDetailDesc] = useState('');
+  // Description editors — WO-O4O-PRODUCT-IMPORT-ASSISTANT-V1: draft 초기값 지원
+  const [consumerShortDesc, setConsumerShortDesc] = useState(importDraft?.consumerShortDesc ?? '');
+  const [consumerDetailDesc, setConsumerDetailDesc] = useState(importDraft?.consumerDetailDesc ?? '');
 
   // Images — WO-NETURE-IMAGE-ASSET-STRUCTURE-V1: 3구역 분리
   // WO-NETURE-PRODUCT-PRIMARY-IMAGE-MEDIA-LIBRARY-INTEGRATION-V1: 라이브러리 선택 지원
   // WO-NETURE-SUPPLIER-CREATE-IMAGE-LIBRARY-ALIGNMENT-V1: 상세/성분도 라이브러리 지원
   type ThumbnailSource = { kind: 'file'; file: File; preview: string } | { kind: 'library'; url: string } | null;
   type ImageItem = { kind: 'file'; file: File; preview: string } | { kind: 'library'; url: string };
-  const [thumbnailSource, setThumbnailSource] = useState<ThumbnailSource>(null);
+  // WO-O4O-PRODUCT-IMPORT-ASSISTANT-V1: draft 이미지 URL → library 항목으로 초기화
+  const [thumbnailSource, setThumbnailSource] = useState<ThumbnailSource>(
+    importDraft?.thumbnailUrl ? { kind: 'library', url: importDraft.thumbnailUrl } : null,
+  );
   const [showThumbnailPicker, setShowThumbnailPicker] = useState(false);
-  const [detailItems, setDetailItems] = useState<ImageItem[]>([]);
-  const [contentItems, setContentItems] = useState<ImageItem[]>([]);
+  const [detailItems, setDetailItems] = useState<ImageItem[]>(
+    importDraft?.detailImageUrls?.map((url) => ({ kind: 'library' as const, url })) ?? [],
+  );
+  const [contentItems, setContentItems] = useState<ImageItem[]>(
+    importDraft?.contentImageUrls?.map((url) => ({ kind: 'library' as const, url })) ?? [],
+  );
   // detail/content 라이브러리 선택 대상
   const [imagePickerTarget, setImagePickerTarget] = useState<'detail' | 'content' | null>(null);
   // 에디터 인라인 이미지 라이브러리 선택 콜백
@@ -362,6 +373,13 @@ export default function SupplierProductCreatePage() {
         <h1 className="text-2xl font-bold text-slate-800">상품 등록</h1>
         <p className="text-slate-500 mt-1">상품 정보를 입력하여 새 상품을 등록합니다</p>
       </div>
+
+      {/* WO-O4O-PRODUCT-IMPORT-ASSISTANT-V1: Import Assistant 초안 알림 */}
+      {importDraft && (
+        <div className="rounded-lg bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm text-emerald-800">
+          Import Assistant에서 가져온 데이터입니다. 검토 후 등록해주세요.
+        </div>
+      )}
 
       {/* ==================== Step Indicator ==================== */}
       <div className="flex items-center gap-2">

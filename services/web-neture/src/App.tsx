@@ -206,6 +206,9 @@ const SignageContentHubPage = lazy(() => import('./pages/seller/SignageContentHu
 // Supplier Product Create
 const SupplierProductCreatePage = lazy(() => import('./pages/supplier/SupplierProductCreatePage'));
 
+// WO-O4O-PRODUCT-IMPORT-ASSISTANT-V1: Import Assistant
+const SupplierProductImportPage = lazy(() => import('./pages/supplier/SupplierProductImportPage'));
+
 // Supplier Product Library (WO-O4O-GLOBAL-PRODUCT-LIBRARY-SEARCH-V1)
 const SupplierProductLibraryPage = lazy(() => import('./pages/supplier/SupplierProductLibraryPage'));
 
@@ -595,6 +598,7 @@ function App() {
               <Route path="/supplier/dashboard" element={<SupplierDashboardPage />} />
               <Route path="/supplier/products" element={<SupplierProductsPage />} />
               <Route path="/supplier/products/library" element={<SupplierProductLibraryPage />} />
+              <Route path="/supplier/products/import-assistant" element={<SupplierProductImportPage />} />
               <Route path="/supplier/products/new" element={<SupplierProductCreatePage />} />
               <Route path="/supplier/orders" element={<SupplierOrdersPage />} />
               <Route path="/supplier/library" element={<SupplierLibraryPage />} />
