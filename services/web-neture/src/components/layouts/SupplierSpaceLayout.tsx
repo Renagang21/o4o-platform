@@ -52,7 +52,6 @@ const SUPPLIER_SIDEBAR_GROUPS: SidebarGroup[] = [
     icon: Package,
     items: [
       { label: '상품 관리', path: '/supplier/products' },
-      { label: 'Offers', path: '/supplier/offers' },
       { label: 'CSV Import', path: '/supplier/csv-import' },
       { label: 'B2B 콘텐츠', path: '/supplier/b2b-content' },
     ],

@@ -10,14 +10,13 @@
  */
 
 import { Link, Outlet, useLocation, Navigate } from 'react-router-dom';
-import { LayoutDashboard, Package, FileCheck, ShoppingCart } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { NetureGlobalHeader } from '../NetureGlobalHeader';
 
 const SIDEBAR_ITEMS = [
   { label: 'Dashboard', path: '/account/supplier', icon: LayoutDashboard, exact: true },
   { label: 'Products', path: '/account/supplier/products', icon: Package },
-  { label: 'Offers', path: '/supplier/offers', icon: FileCheck },
   { label: 'Orders', path: '/account/supplier/orders', icon: ShoppingCart },
 ];
 

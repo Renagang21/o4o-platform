@@ -136,20 +136,11 @@ import ForumHubPage from './pages/forum/ForumHubPage';
 const SupplierDashboardPage = lazy(() =>
   import('./pages/supplier').then((m) => ({ default: m.SupplierDashboardPage }))
 );
-const SellerRequestsPage = lazy(() =>
-  import('./pages/supplier').then((m) => ({ default: m.SellerRequestsPage }))
-);
-const SellerRequestDetailPage = lazy(() =>
-  import('./pages/supplier').then((m) => ({ default: m.SellerRequestDetailPage }))
-);
 const SupplierProductsPage = lazy(() =>
   import('./pages/supplier').then((m) => ({ default: m.SupplierProductsPage }))
 );
 const SupplierOrdersPage = lazy(() =>
   import('./pages/supplier').then((m) => ({ default: m.SupplierOrdersPage }))
-);
-const SupplyRequestsPage = lazy(() =>
-  import('./pages/supplier').then((m) => ({ default: m.SupplyRequestsPage }))
 );
 const SupplierProfilePage = lazy(() =>
   import('./pages/supplier').then((m) => ({ default: m.SupplierProfilePage }))
@@ -605,10 +596,7 @@ function App() {
               <Route path="/supplier/products" element={<SupplierProductsPage />} />
               <Route path="/supplier/products/library" element={<SupplierProductLibraryPage />} />
               <Route path="/supplier/products/new" element={<SupplierProductCreatePage />} />
-              <Route path="/supplier/offers" element={<SupplyRequestsPage />} />
               <Route path="/supplier/orders" element={<SupplierOrdersPage />} />
-              <Route path="/supplier/requests" element={<SellerRequestsPage />} />
-              <Route path="/supplier/requests/:id" element={<SellerRequestDetailPage />} />
               <Route path="/supplier/library" element={<SupplierLibraryPage />} />
               <Route path="/supplier/library/new" element={<SupplierLibraryFormPage />} />
               <Route path="/supplier/library/:id/edit" element={<SupplierLibraryFormPage />} />
@@ -928,7 +916,6 @@ function App() {
             <Route path="/workspace/supplier/requests" element={<Navigate to="/supplier/requests" replace />} />
             <Route path="/workspace/supplier/library" element={<Navigate to="/supplier/library" replace />} />
             <Route path="/workspace/supplier/profile" element={<Navigate to="/supplier/profile" replace />} />
-            <Route path="/workspace/supplier/supply-requests" element={<Navigate to="/supplier/offers" replace />} />
             <Route path="/workspace/supplier/*" element={<Navigate to="/supplier" replace />} />
 
             {/* Partner Dashboard 리다이렉트 */}

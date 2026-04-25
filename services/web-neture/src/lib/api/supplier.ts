@@ -41,51 +41,6 @@ export type SupplierProductPurpose = 'CATALOG' | 'APPLICATION' | 'ACTIVE_SALES';
 
 export type DistributionType = 'PUBLIC' | 'SERVICE' | 'PRIVATE';
 
-export type SupplierRequestStatus = 'pending' | 'approved' | 'rejected' | 'suspended' | 'revoked' | 'expired';
-
-export interface SupplierRequest {
-  id: string;
-  status: SupplierRequestStatus;
-  sellerName: string;
-  sellerEmail: string;
-  serviceName: string;
-  serviceId: string;
-  productName: string;
-  productId: string;
-  productPurpose: string;
-  requestedAt: string;
-}
-
-export interface SupplierRequestDetail {
-  id: string;
-  status: SupplierRequestStatus;
-  seller: {
-    id: string;
-    name: string;
-    email: string;
-    phone: string;
-    storeUrl: string;
-  };
-  service: {
-    id: string;
-    name: string;
-  };
-  product: {
-    id: string;
-    name: string;
-    category: string;
-    purpose: string;
-  };
-  decidedBy: string | null;
-  decidedAt: string | null;
-  rejectReason: string | null;
-  suspendedAt: string | null;
-  revokedAt: string | null;
-  expiredAt: string | null;
-  relationNote: string | null;
-  effectiveUntil: string | null;
-  createdAt: string;
-}
 
 export interface SupplierLibraryItem {
   id: string;
@@ -410,79 +365,6 @@ export interface ProfileCompleteness {
 // ==================== Supplier API ====================
 
 export const supplierApi = {
-  async getRequests(filters?: { status?: SupplierRequestStatus; serviceId?: string }): Promise<SupplierRequest[]> {
-    try {
-      const params = new URLSearchParams();
-      if (filters?.status) params.append('status', filters.status);
-      if (filters?.serviceId) params.append('serviceId', filters.serviceId);
-
-      const url = `/neture/supplier/requests${params.toString() ? `?${params}` : ''}`;
-
-      const response = await api.get(url);
-      const result = response.data;
-      return result.data || [];
-    } catch (error) {
-      console.warn('[Supplier API] Failed to fetch requests:', error);
-      return [];
-    }
-  },
-
-  async getRequestById(id: string): Promise<SupplierRequestDetail | null> {
-    try {
-      const response = await api.get(`/neture/supplier/requests/${id}`);
-      const result = response.data;
-      return result.data;
-    } catch (error) {
-      console.warn('[Supplier API] Failed to fetch request detail:', error);
-      return null;
-    }
-  },
-
-  async approveRequest(id: string): Promise<{ success: boolean; error?: string; data?: any }> {
-    try {
-      const response = await api.post(`/neture/supplier/requests/${id}/approve`, {});
-      return response.data;
-    } catch (error) {
-      return { success: false, error: extractApiError(error) };
-    }
-  },
-
-  async rejectRequest(id: string, reason?: string): Promise<{ success: boolean; error?: string; data?: any }> {
-    try {
-      const response = await api.post(`/neture/supplier/requests/${id}/reject`, { reason });
-      return response.data;
-    } catch (error) {
-      return { success: false, error: extractApiError(error) };
-    }
-  },
-
-  async suspendRequest(id: string, note?: string): Promise<{ success: boolean; error?: string; data?: any }> {
-    try {
-      const response = await api.post(`/neture/supplier/requests/${id}/suspend`, { note });
-      return response.data;
-    } catch (error) {
-      return { success: false, error: extractApiError(error) };
-    }
-  },
-
-  async reactivateRequest(id: string, note?: string): Promise<{ success: boolean; error?: string; data?: any }> {
-    try {
-      const response = await api.post(`/neture/supplier/requests/${id}/reactivate`, { note });
-      return response.data;
-    } catch (error) {
-      return { success: false, error: extractApiError(error) };
-    }
-  },
-
-  async revokeRequest(id: string, note?: string): Promise<{ success: boolean; error?: string; data?: any }> {
-    try {
-      const response = await api.post(`/neture/supplier/requests/${id}/revoke`, { note });
-      return response.data;
-    } catch (error) {
-      return { success: false, error: extractApiError(error) };
-    }
-  },
-
   async getProducts(): Promise<SupplierProduct[]> {
     try {
       const response = await api.get('/neture/supplier/products');

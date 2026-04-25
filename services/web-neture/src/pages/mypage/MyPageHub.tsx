@@ -17,7 +17,6 @@ import {
   Plus,
   Package,
   ShoppingCart,
-  FileCheck,
   FlaskConical,
   DollarSign,
   ArrowRight,
@@ -42,7 +41,6 @@ const SUPPLIER_ACTIONS: QuickAction[] = [
   { label: '상품 등록', path: '/supplier/products/new', icon: Plus, color: '#3b82f6' },
   { label: '상품 관리', path: '/supplier/products', icon: Package, color: '#6366f1' },
   { label: '주문 관리', path: '/supplier/orders', icon: ShoppingCart, color: '#0891b2' },
-  { label: '공급 요청', path: '/supplier/offers', icon: FileCheck, color: '#059669' },
   { label: 'Market Trial', path: '/supplier/market-trial', icon: FlaskConical, color: '#8b5cf6' },
   { label: '정산 관리', path: '/account/supplier/settlements', icon: DollarSign, color: '#d97706' },
 ];

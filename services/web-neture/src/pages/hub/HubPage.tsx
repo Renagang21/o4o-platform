@@ -66,14 +66,6 @@ const HUB_SECTIONS: HubSectionDefinition[] = [
         signalKey: 'settlements',
       },
       {
-        id: 'services',
-        title: '연결 서비스',
-        description: '연결된 서비스 상태와 공급 요청을 확인합니다.',
-        href: '/workspace/supplier/supply-requests',
-        icon: '🔗',
-        signalKey: 'supplier',
-      },
-      {
         id: 'ai-report',
         title: 'AI 리포트',
         description: 'AI 기반 운영 분석 리포트를 확인합니다.',
