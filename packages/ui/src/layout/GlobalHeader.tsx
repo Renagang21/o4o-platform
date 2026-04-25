@@ -285,7 +285,7 @@ export function GlobalHeader({
               <div className="flex items-center gap-2">
                 {onLogin && (
                   <button
-                    onClick={onLogin}
+                    onClick={() => onLogin?.()}
                     className="px-4 py-2 text-sm font-medium text-slate-500 bg-transparent border-none cursor-pointer hover:text-slate-700 transition-colors"
                   >
                     로그인

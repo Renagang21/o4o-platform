@@ -26,7 +26,8 @@ export function LoginModalProvider({ children }: { children: ReactNode }) {
   const [loginReturnUrl, setLoginReturnUrl] = useState<string | undefined>();
 
   const openLoginModal = useCallback((returnUrl?: string) => {
-    setLoginReturnUrl(returnUrl);
+    // WO-O4O-LOGIN-ONCLICK-EVENT-LEAK-FIX-V1: 비문자열 인자 차단
+    setLoginReturnUrl(typeof returnUrl === 'string' ? returnUrl : undefined);
     setActiveModal('login');
   }, []);
 
