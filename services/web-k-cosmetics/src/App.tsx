@@ -58,6 +58,9 @@ const ForumWritePage = lazy(() => import('@/pages/forum/ForumWritePage'));
 const MyForumDashboardPage = lazy(() => import('@/pages/forum/MyForumDashboardPage'));
 const ForumRequestCategoryPage = lazy(() => import('@/pages/forum/RequestCategoryPage'));
 
+// LMS Hub (WO-KCOS-KPA-LMS-STEP1-ENABLE-V1)
+const EducationPage = lazy(() => import('@/pages/lms/EducationPage'));
+
 // Community Hub (WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1)
 const CommunityHubPage = lazy(() => import('@/pages/community/CommunityHubPage'));
 
@@ -224,6 +227,9 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
+
+        {/* LMS Hub (WO-KCOS-KPA-LMS-STEP1-ENABLE-V1) */}
+        <Route path="lms" element={<EducationPage />} />
 
         {/* MyPage 3-split (WO-O4O-KCOSMETICS-MYPAGE-SPLIT-V1) */}
         <Route
