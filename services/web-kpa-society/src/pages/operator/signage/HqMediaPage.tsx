@@ -235,7 +235,15 @@ export default function HqMediaPage() {
       align: 'center',
       render: (value) => {
         const sc = statusConfig[value] || { text: value, cls: 'bg-slate-100 text-slate-600' };
-        return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${sc.cls}`}>{sc.text}</span>;
+        const isHubExposed = value === 'active';
+        return (
+          <div className="flex flex-col items-center gap-0.5">
+            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${sc.cls}`}>{sc.text}</span>
+            <span className={`text-[10px] ${isHubExposed ? 'text-green-600' : 'text-slate-400'}`}>
+              {isHubExposed ? 'HUB 노출 중' : 'HUB 미노출'}
+            </span>
+          </div>
+        );
       },
     },
     {
@@ -290,6 +298,7 @@ export default function HqMediaPage() {
             <Film className="w-6 h-6 text-blue-600" /> HQ 미디어 관리
           </h1>
           <p className="text-slate-500 text-sm mt-1">운영자 제공 사이니지 미디어 콘텐츠</p>
+          <p className="text-xs text-slate-400 mt-0.5">활성 상태의 미디어만 매장 HUB에 노출됩니다</p>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">

@@ -191,6 +191,18 @@ export default function HqMediaDetailPage() {
             </button>
           ))}
         </div>
+        {/* HUB Visibility Indicator */}
+        <div className={`mt-4 px-4 py-3 rounded-lg text-sm ${
+          media.status === 'active'
+            ? 'bg-green-50 border border-green-200 text-green-700'
+            : 'bg-slate-50 border border-slate-200 text-slate-500'
+        }`}>
+          {media.status === 'active' ? (
+            <p><span className="font-medium">매장 HUB 노출 중</span> — 이 미디어는 매장 HUB 사이니지 라이브러리의 "운영자" 탭에 표시됩니다.</p>
+          ) : (
+            <p><span className="font-medium">매장 HUB 미노출</span> — 활성 상태로 변경하면 매장 HUB 사이니지 라이브러리에 노출됩니다.</p>
+          )}
+        </div>
       </div>
 
       {/* Media Info */}
