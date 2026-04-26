@@ -16,14 +16,16 @@ import { OperatorShell } from '@o4o/ui';
 import { useAuth } from '../../contexts/AuthContext';
 import { ENABLED_CAPABILITIES } from '../../config/operatorCapabilities';
 import { UNIFIED_MENU, filterMenuByRole } from '../../config/operatorMenuGroups';
+import { ROLES } from '../../lib/role-constants';
 import { KpaGlobalHeader } from '../KpaGlobalHeader';
 
 export default function KpaOperatorLayoutWrapper() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
+  // WO-KPA-OPERATOR-AUTH-QUICK-FIX-PHASE1-V1: kpa-society:admin → ROLES.KPA_ADMIN 상수 사용
   const isAdmin = user?.roles?.some(
-    (r: string) => r === 'kpa-society:admin' || r === 'platform:super_admin',
+    (r: string) => r === ROLES.KPA_ADMIN || r === ROLES.PLATFORM_SUPER_ADMIN,
   ) ?? false;
 
   const menuItems = useMemo(

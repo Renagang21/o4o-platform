@@ -48,7 +48,7 @@ import KpaOperatorLayoutWrapper from '../components/kpa-operator/KpaOperatorLayo
 
 export function OperatorRoutes() {
   return (
-    <RoleGuard allowedRoles={[...PLATFORM_ROLES]}>
+    <RoleGuard allowedRoles={[...PLATFORM_ROLES]} accessDeniedMessage="이 기능은 운영자(Operator) 권한이 필요합니다.">
       <Routes>
         {/* WO-O4O-OPERATOR-UI-STANDARDIZATION-V1: shared OperatorShell wrapper */}
         <Route element={<KpaOperatorLayoutWrapper />}>
