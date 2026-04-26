@@ -94,4 +94,8 @@ export const lmsApi = {
 
   operatorArchiveCourse: (id: string) =>
     apiClient.post<ApiResponse<{ course: Course }>>(`/lms/operator/courses/${id}/archive`),
+
+  // WO-LMS-COURSE-HARD-DELETE-V1: 운영자 강의 완전 삭제
+  operatorHardDeleteCourse: (id: string) =>
+    apiClient.delete<ApiResponse<{ deleted: boolean }>>(`/lms/operator/courses/${id}/hard`),
 };

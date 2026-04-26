@@ -534,6 +534,33 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     res.json({ success: true, data: { course: updated } });
   }));
 
+  // WO-LMS-COURSE-HARD-DELETE-V1: Operator 강의 완전 삭제 (archived 상태만)
+  lmsRouter.delete('/operator/courses/:id/hard', authenticate, requireKpaScope('kpa:operator'), asyncHandler(async (req: Request, res: Response) => {
+    const service = CourseService.getInstance();
+    const course = await service.getCourse(req.params.id);
+    if (!course) { res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); return; }
+    if (course.status !== 'archived') {
+      res.status(400).json({ success: false, error: '종료(보관) 상태의 강의만 완전 삭제할 수 있습니다.' });
+      return;
+    }
+    const courseId = course.id;
+    const title = course.title;
+
+    // FK cascade 순서: 자식 → 부모
+    await dataSource.query(`DELETE FROM lms_progress WHERE "enrollmentId" IN (SELECT id FROM lms_enrollments WHERE "courseId" = $1)`, [courseId]);
+    await dataSource.query(`DELETE FROM lms_progress WHERE "lessonId" IN (SELECT id FROM lms_lessons WHERE "courseId" = $1)`, [courseId]);
+    await dataSource.query(`DELETE FROM lms_quiz_attempts WHERE "quizId" IN (SELECT id FROM lms_quizzes WHERE "courseId" = $1)`, [courseId]);
+    await dataSource.query(`DELETE FROM lms_quizzes WHERE "courseId" = $1`, [courseId]);
+    await dataSource.query(`DELETE FROM lms_certificates WHERE "courseId" = $1`, [courseId]);
+    await dataSource.query(`DELETE FROM lms_enrollments WHERE "courseId" = $1`, [courseId]);
+    await dataSource.query(`DELETE FROM lms_events WHERE "courseId" = $1`, [courseId]);
+    await dataSource.query(`DELETE FROM lms_lessons WHERE "courseId" = $1`, [courseId]);
+    await dataSource.query(`DELETE FROM lms_courses WHERE id = $1`, [courseId]);
+
+    await writeAuditLog((req as any).user, 'COURSE_HARD_DELETED', 'content', courseId, { title });
+    res.json({ success: true, data: { deleted: true, id: courseId, title } });
+  }));
+
   router.use('/lms', lmsRouter);
 
   // ============================================================================

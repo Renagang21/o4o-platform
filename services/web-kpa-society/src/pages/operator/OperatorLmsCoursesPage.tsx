@@ -6,8 +6,8 @@
  * 구조:
  *   - 상단 헤더 + 검색
  *   - 강의 목록 DataTable (모든 상태 포함 — draft/published/archived)
- *   - RowActionMenu: 상세 이동 / 비공개 처리 / 아카이브(종료)
- *   - soft delete만 허용 (course.status → archived)
+ *   - RowActionMenu: 상세 이동 / 비공개 처리 / 아카이브(종료) / 완전 삭제
+ *   - archived 강의만 완전 삭제 가능 (cascade: lessons, enrollments, certificates 등)
  *
  * WO-KPA-OPERATOR-LMS-BULK-ACTION-FIX-V1:
  *   - 운영자 전용 API 사용 (/kpa/lms/operator/courses/:id/archive)
@@ -17,7 +17,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, RefreshCw, AlertCircle, Search, Loader2, Archive, EyeOff } from 'lucide-react';
+import { BookOpen, RefreshCw, AlertCircle, Search, Loader2, Archive, EyeOff, Trash2 } from 'lucide-react';
 import { ActionBar, BulkResultModal, RowActionMenu } from '@o4o/ui';
 import { DataTable, Pagination, defineActionPolicy, buildRowActions, useBatchAction } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
@@ -59,6 +59,18 @@ const courseActionPolicy = defineActionPolicy<Course>('kpa:lms:courses', {
         confirmText: '종료 처리',
       }),
     },
+    {
+      key: 'hard-delete',
+      label: '완전 삭제',
+      variant: 'danger',
+      visible: (row) => row.status === 'archived',
+      confirm: (row) => ({
+        title: '완전 삭제',
+        message: `"${row.title}"\n\n종��된 강의를 완전 삭제합니다.\n레슨, 수강 기록, 수료증 등 모든 관련 데이터가 함께 삭제됩니다.\n이 작업은 되돌릴 수 없습니다.`,
+        variant: 'danger' as const,
+        confirmText: '완전 삭제',
+      }),
+    },
   ],
 });
 
@@ -66,6 +78,7 @@ const COURSE_ACTION_ICONS: Record<string, React.ReactNode> = {
   view: <BookOpen className="w-4 h-4" />,
   unpublish: <EyeOff className="w-4 h-4" />,
   archive: <Archive className="w-4 h-4" />,
+  'hard-delete': <Trash2 className="w-4 h-4" />,
 };
 
 // ─── Helpers ───
@@ -146,6 +159,17 @@ export default function OperatorLmsCoursesPage() {
     }
   };
 
+  const handleHardDelete = async (course: Course) => {
+    try {
+      await lmsApi.operatorHardDeleteCourse(course.id);
+      toast.success(`"${course.title}" 강의가 완전 삭제되었습니다`);
+      fetchCourses();
+    } catch (err: any) {
+      const reason = (err as any)?.data?.error || err?.message || '완전 삭제에 실패했습니다';
+      toast.error(reason);
+    }
+  };
+
   // ─── Bulk Actions ───
 
   const handleBulkUnpublish = async () => {
@@ -212,8 +236,38 @@ export default function OperatorLmsCoursesPage() {
     }
   };
 
+  const handleBulkHardDelete = async () => {
+    const targetIds = [...selectedIds].filter((id) => courses.find((c) => c.id === id)?.status === 'archived');
+    if (targetIds.length === 0) return;
+
+    const result = await batch.executeBatch(
+      async (ids) => {
+        const results: { id: string; status: string; error?: string }[] = [];
+        for (const id of ids) {
+          try {
+            await lmsApi.operatorHardDeleteCourse(id);
+            results.push({ id, status: 'success' });
+          } catch (err: any) {
+            const c = courses.find((co) => co.id === id);
+            const serverError = (err as any)?.data?.error;
+            const reason = serverError || err?.message || '삭제 실패';
+            results.push({ id, status: 'failed', error: c ? `${c.title}: ${reason}` : reason });
+          }
+        }
+        return { data: { results } };
+      },
+      targetIds,
+    );
+
+    if (result.successCount > 0) {
+      setSelectedIds(new Set());
+      fetchCourses();
+    }
+  };
+
   const selectedPublishedCount = [...selectedIds].filter((id) => courses.find((c) => c.id === id)?.status === 'published').length;
   const selectedArchivableCount = [...selectedIds].filter((id) => { const c = courses.find((co) => co.id === id); return c != null && c.status !== 'archived'; }).length;
+  const selectedArchivedCount = [...selectedIds].filter((id) => courses.find((c) => c.id === id)?.status === 'archived').length;
 
   const bulkActions = [
     {
@@ -242,6 +296,23 @@ export default function OperatorLmsCoursesPage() {
         message: `${selectedArchivableCount}개 강의를 종료(보관) 처리합니다.\n공개 목록에서 제거되며, 수강 기록은 유지됩니다.`,
         variant: 'danger' as const,
         confirmText: '종료 처리',
+      },
+    },
+    {
+      key: 'hard-delete',
+      label: `완전 삭제 (${selectedArchivedCount})`,
+      onClick: handleBulkHardDelete,
+      variant: 'danger' as const,
+      icon: <Trash2 size={14} />,
+      loading: batch.loading,
+      group: 'danger',
+      tooltip: '선택된 종료 강의를 일괄 완전 삭제합니다 (되돌릴 수 없음)',
+      visible: selectedArchivedCount > 0,
+      confirm: {
+        title: '일괄 완전 삭제',
+        message: `${selectedArchivedCount}개 종료 강의를 완전 삭제합니다.\n레슨, 수강 기록, 수료증 등 모든 관련 데이터가 함께 삭제됩니다.\n이 작업은 되돌릴 수 없습니다.`,
+        variant: 'danger' as const,
+        confirmText: '완전 삭제',
       },
     },
   ];
@@ -316,6 +387,7 @@ export default function OperatorLmsCoursesPage() {
             view: () => navigate(`/lms/course/${row.id}`),
             unpublish: () => handleUnpublish(row),
             archive: () => handleArchive(row),
+            'hard-delete': () => handleHardDelete(row),
           }, { icons: COURSE_ACTION_ICONS })}
         />
       ),
@@ -363,7 +435,7 @@ export default function OperatorLmsCoursesPage() {
 
       {/* 정책 안내 */}
       <div style={{ padding: '10px 14px', backgroundColor: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: 8, marginBottom: 16, fontSize: 13, color: '#0c4a6e' }}>
-        강의 데이터와 수강 기록 보존을 위해 삭제 대신 <strong>종료(보관)</strong> 처리합니다.
+        강의 데이터와 수강 기록 보존을 위해 <strong>종료(보관)</strong> 처리합니다. 종료된 강의는 <strong>완전 삭제</strong>할 수 있습니다.
       </div>
 
       {/* Search */}
