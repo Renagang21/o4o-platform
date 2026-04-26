@@ -14,16 +14,39 @@ import type { Request, Response, NextFunction } from 'express';
 import type { AuthContext } from '../auth/auth-context.js';
 
 /**
- * organization_members 기반 store 접근 권한 확인 (relation-based)
+ * Store 접근 권한 확인
  *
- * role IN ('owner', 'admin', 'manager') → store 접근 허용
- * Phase 3A 마이그레이션에서 KPA 약국소유자/admin/operator에 대해
- * organization_members 레코드가 생성됨.
+ * WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1:
+ *   PRIMARY: role_assignments에서 kpa:store_owner 확인
+ *   FALLBACK: organization_members 기반 (legacy — Phase 7에서 제거 예정)
  */
 export async function isStoreOwner(
   dataSource: DataSource,
   userId: string
 ): Promise<{ isOwner: boolean; organizationId: string | null; memberRole: string }> {
+  // PRIMARY: role_assignments 기반
+  try {
+    const [raRecord] = await dataSource.query(
+      `SELECT 1 FROM role_assignments WHERE user_id = $1 AND role = 'kpa:store_owner' AND is_active = true LIMIT 1`,
+      [userId]
+    );
+    if (raRecord) {
+      // Role confirmed — get org info from organization_members
+      const rows = await dataSource.query(
+        `SELECT organization_id, role FROM organization_members
+         WHERE user_id = $1 AND role IN ('owner', 'admin', 'manager') AND left_at IS NULL LIMIT 1`,
+        [userId]
+      );
+      if (rows.length > 0) {
+        return { isOwner: true, organizationId: rows[0].organization_id, memberRole: rows[0].role };
+      }
+      // Has role but no org yet (recently approved, org not created yet)
+      return { isOwner: true, organizationId: null, memberRole: '' };
+    }
+  } catch { /* role_assignments table issue */ }
+
+  // FALLBACK (legacy): organization_members only
+  // TODO: WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1 Phase 7 — remove after transition
   const rows = await dataSource.query(
     `SELECT organization_id, role
      FROM organization_members
@@ -32,6 +55,7 @@ export async function isStoreOwner(
     [userId]
   );
   if (rows.length > 0) {
+    console.warn(`[isStoreOwner] Legacy fallback: org_members only for user ${userId}`);
     return { isOwner: true, organizationId: rows[0].organization_id, memberRole: rows[0].role };
   }
   return { isOwner: false, organizationId: null, memberRole: '' };
@@ -72,7 +96,8 @@ export function createRequireStoreOwner(dataSource: DataSource) {
       return;
     }
 
-    // Fallback: activity_type='pharmacy_owner' (매장 미개설 약국 개설약사)
+    // Fallback (legacy): activity_type='pharmacy_owner' (매장 미개설 약국 개설약사)
+    // TODO: WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1 Phase 7 — remove after transition
     // WO-KPA-A-PHARMACIST-ACTIVITY-TYPE-BUSINESS-INFO-FLOW-V1
     try {
       const [profile] = await dataSource.query(

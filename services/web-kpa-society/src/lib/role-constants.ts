@@ -16,6 +16,9 @@ export const ROLES = {
   KPA_ADMIN: 'kpa:admin',
   KPA_OPERATOR: 'kpa:operator',
 
+  // WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1
+  KPA_STORE_OWNER: 'kpa:store_owner',
+
   // 플랫폼 Super
   PLATFORM_ADMIN: 'platform:admin',
   PLATFORM_OPERATOR: 'platform:operator',
@@ -44,6 +47,11 @@ export const INTRANET_ROLES: readonly string[] = [
 export const FUNCTION_GATE_EXEMPT_ROLES: readonly string[] = [
   ...PLATFORM_ROLES,
 ];
+
+/** WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1: store owner 역할 */
+export const STORE_OWNER_ROLES = [
+  ROLES.KPA_STORE_OWNER,
+] as const;
 
 /** Super Operator 감지용 (Header) */
 export const SUPER_OPERATOR_ROLES = [

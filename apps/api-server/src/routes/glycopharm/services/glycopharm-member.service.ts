@@ -90,6 +90,15 @@ export class GlycopharmMemberService {
       assignedBy: operatorId,
     });
 
+    // WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1: pharmacy_owner → glycopharm:store_owner
+    if (member.subRole === 'pharmacy_owner') {
+      await this.roleAssignmentService.assignRole({
+        userId: member.userId,
+        role: 'glycopharm:store_owner',
+        assignedBy: operatorId,
+      });
+    }
+
     return member;
   }
 

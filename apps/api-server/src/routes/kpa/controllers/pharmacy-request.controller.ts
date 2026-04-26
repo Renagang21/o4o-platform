@@ -22,6 +22,7 @@ import type { DataSource } from 'typeorm';
 import type { ActionLogService } from '@o4o/action-log-core';
 import { KpaPharmacyRequest } from '../entities/kpa-pharmacy-request.entity.js';
 import { organizationOpsService } from '../../../modules/organization/services/organization-ops.service.js';
+import { RoleAssignmentService } from '../../../modules/auth/services/role-assignment.service.js';
 
 export function createPharmacyRequestRoutes(
   dataSource: DataSource,
@@ -220,6 +221,14 @@ export function createPharmacyRequestRoutes(
          ON CONFLICT (user_id) DO UPDATE SET activity_type = 'pharmacy_owner', updated_at = NOW()`,
         [request.user_id],
       );
+
+      // 5. WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1: kpa:store_owner 역할 부여
+      const roleAssignmentService = new RoleAssignmentService();
+      await roleAssignmentService.assignRole({
+        userId: request.user_id,
+        role: 'kpa:store_owner',
+        assignedBy: user.id,
+      });
 
       actionLogService?.logSuccess('kpa-society', user.id, 'kpa.operator.pharmacy_approve', {
         meta: { targetId: req.params.id, statusBefore: 'pending', statusAfter: 'approved' },

@@ -18,7 +18,7 @@
 
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { hasAnyRole, PLATFORM_ROLES } from '../../lib/role-constants';
+import { hasAnyRole, PLATFORM_ROLES, STORE_OWNER_ROLES } from '../../lib/role-constants';
 
 interface HubGuardProps {
   children: React.ReactNode;
@@ -45,7 +45,14 @@ export function HubGuard({ children }: HubGuardProps) {
     return <Navigate to="/operator" replace />;
   }
 
-  // 승인 완료된 약국 → 통과
+  // WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1
+  // PRIMARY: role_assignments 기반 (kpa:store_owner)
+  if (hasAnyRole(user.roles, STORE_OWNER_ROLES)) {
+    return <>{children}</>;
+  }
+
+  // FALLBACK (legacy): 승인 완료된 약국 → 통과
+  // TODO: WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1 Phase 7 — remove after transition
   if (user.isStoreOwner) {
     return <>{children}</>;
   }

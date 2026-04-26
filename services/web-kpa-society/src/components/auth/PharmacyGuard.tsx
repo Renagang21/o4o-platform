@@ -17,7 +17,7 @@
 import { useState, useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { hasAnyRole, PLATFORM_ROLES } from '../../lib/role-constants';
+import { hasAnyRole, PLATFORM_ROLES, STORE_OWNER_ROLES } from '../../lib/role-constants';
 import { getMyRequestsCached } from '../../api/pharmacyRequestApi';
 
 interface PharmacyGuardProps {
@@ -25,23 +25,24 @@ interface PharmacyGuardProps {
 }
 
 export function PharmacyGuard({ children }: PharmacyGuardProps) {
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated, isLoading, checkAuth } = useAuth();
   const location = useLocation();
   const [apiCheck, setApiCheck] = useState<'idle' | 'loading' | 'approved' | 'denied'>('idle');
 
-  // isStoreOwner가 아닐 때 API로 확인 (모듈 레벨 캐시 사용)
-  const needsApiCheck = !!user && !hasAnyRole(user.roles, PLATFORM_ROLES) && !user.isStoreOwner;
+  // WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1: role check 추가
+  const hasStoreRole = !!user && hasAnyRole(user.roles, STORE_OWNER_ROLES);
+
+  // role도 없고 isStoreOwner도 아닐 때 API로 확인 (모듈 레벨 캐시 사용)
+  const needsApiCheck = !!user && !hasAnyRole(user.roles, PLATFORM_ROLES) && !hasStoreRole && !user.isStoreOwner;
 
   useEffect(() => {
     if (!needsApiCheck) return;
-    // apiCheck이 이미 approved/denied면 재요청 불필요
     if (apiCheck === 'approved' || apiCheck === 'denied') return;
     setApiCheck('loading');
 
     let cancelled = false;
     (async () => {
       try {
-        // getMyRequestsCached: 모듈 레벨 캐시 + in-flight dedup
         const items = await getMyRequestsCached();
         if (cancelled) return;
         const approved = items.find((r) => r.status === 'approved');
@@ -52,6 +53,14 @@ export function PharmacyGuard({ children }: PharmacyGuardProps) {
     })();
     return () => { cancelled = true; };
   }, [needsApiCheck, apiCheck]);
+
+  // WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1 Phase 6: 세션 갱신
+  // API에서 승인 확인됐는데 JWT에 kpa:store_owner가 없으면 세션 갱신 → 다음 렌더에서 role-based fast path
+  useEffect(() => {
+    if (apiCheck === 'approved' && !hasStoreRole) {
+      checkAuth();
+    }
+  }, [apiCheck, hasStoreRole, checkAuth]);
 
   if (isLoading) {
     return (
@@ -70,13 +79,20 @@ export function PharmacyGuard({ children }: PharmacyGuardProps) {
     return <Navigate to="/operator" replace />;
   }
 
+  // WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1
+  // PRIMARY: role_assignments 기반 (kpa:store_owner)
+  if (hasAnyRole(user.roles, STORE_OWNER_ROLES)) {
+    return <>{children}</>;
+  }
+
   // WO-KPA-STORE-ACCESS-GATE-ALIGNMENT-BY-ACTIVITYTYPE-V1
   // 비경영자 선차단: activityType이 pharmacy_owner가 아니면 접근 불가
   if (user.activityType !== 'pharmacy_owner') {
     return <Navigate to="/pharmacy" replace />;
   }
 
-  // Fast path: isStoreOwner면 즉시 통과
+  // FALLBACK (legacy): isStoreOwner면 즉시 통과
+  // TODO: WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1 Phase 7 — remove after transition
   if (user.isStoreOwner) {
     return <>{children}</>;
   }

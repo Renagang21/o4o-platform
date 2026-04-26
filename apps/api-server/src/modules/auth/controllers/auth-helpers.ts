@@ -53,15 +53,31 @@ export async function derivePharmacistQualification(userId: string): Promise<{
   pharmacistFunction: string | null;
   isStoreOwner: boolean;
 }> {
-  // 1. Check organization_members for owner status (table may not exist in production)
+  // WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1
+  // PRIMARY: role_assignments 기반 store owner 판정
   let isStoreOwner = false;
   try {
-    const [ownerRecord] = await AppDataSource.query(
-      `SELECT 1 FROM organization_members WHERE user_id = $1 AND role = 'owner' AND left_at IS NULL LIMIT 1`,
+    const [raRecord] = await AppDataSource.query(
+      `SELECT 1 FROM role_assignments WHERE user_id = $1 AND role = 'kpa:store_owner' AND is_active = true LIMIT 1`,
       [userId]
     );
-    isStoreOwner = !!ownerRecord;
-  } catch { /* table may not exist */ }
+    isStoreOwner = !!raRecord;
+  } catch { /* role_assignments table issue */ }
+
+  // FALLBACK (legacy): organization_members + activity_type
+  // TODO: WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1 Phase 7 — remove after full transition
+  if (!isStoreOwner) {
+    try {
+      const [ownerRecord] = await AppDataSource.query(
+        `SELECT 1 FROM organization_members WHERE user_id = $1 AND role = 'owner' AND left_at IS NULL LIMIT 1`,
+        [userId]
+      );
+      if (ownerRecord) {
+        isStoreOwner = true;
+        console.warn(`[derivePharmacistQualification] Legacy fallback: org_members.role=owner for user ${userId}`);
+      }
+    } catch { /* table may not exist */ }
+  }
 
   // 2. Query kpa_pharmacist_profiles for activity_type
   const [profile] = await AppDataSource.query(
@@ -70,8 +86,6 @@ export async function derivePharmacistQualification(userId: string): Promise<{
   );
 
   // 3. Derive pharmacistRole (backward compatible)
-  // WO-O4O-KPA-A-ACTIVITY-TYPE-NORMALIZATION-V1:
-  //   isStoreOwner → 'pharmacy_owner', otherwise activityType 기반 단순 분기
   let pharmacistRole: string | null = null;
   if (isStoreOwner) {
     pharmacistRole = 'pharmacy_owner';
@@ -79,15 +93,14 @@ export async function derivePharmacistQualification(userId: string): Promise<{
     if (profile.activity_type === 'pharmacy_owner') {
       pharmacistRole = 'pharmacy_owner';
       isStoreOwner = true;
+      // TODO: WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1 Phase 7 — remove legacy path
+      console.warn(`[derivePharmacistQualification] Legacy fallback: activity_type=pharmacy_owner for user ${userId}`);
     } else {
       pharmacistRole = 'general';
     }
   }
 
   // 4. pharmacistFunction = activityType 직통 (SSOT 정합성)
-  // WO-O4O-KPA-A-ACTIVITY-TYPE-NORMALIZATION-V1:
-  //   기존 lossy mapping 제거 (manufacturer→industry 등 불일치 해소)
-  //   activityType이 유일한 기준, pharmacistFunction은 API 호환 필드
   const pharmacistFunction: string | null = profile?.activity_type || null;
 
   return { pharmacistRole, pharmacistFunction, isStoreOwner };

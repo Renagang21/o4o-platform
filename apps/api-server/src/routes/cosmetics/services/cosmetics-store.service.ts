@@ -16,6 +16,7 @@ import {
 } from '../entities/index.js';
 import { CosmeticsProduct } from '../entities/index.js';
 import { organizationOpsService } from '../../../modules/organization/services/organization-ops.service.js';
+import { RoleAssignmentService } from '../../../modules/auth/services/role-assignment.service.js';
 
 export class CosmeticsStoreService {
   private repository: CosmeticsStoreRepository;
@@ -198,6 +199,18 @@ export class CosmeticsStoreService {
         }, queryRunner);
 
         await queryRunner.commitTransaction();
+
+        // WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1: cosmetics:store_owner 역할 부여 (트랜잭션 후)
+        try {
+          const roleAssignmentService = new RoleAssignmentService();
+          await roleAssignmentService.assignRole({
+            userId: application.applicantUserId,
+            role: 'cosmetics:store_owner',
+            assignedBy: reviewedBy,
+          });
+        } catch (err) {
+          console.error('[CosmeticsStoreService] Failed to assign cosmetics:store_owner role:', err);
+        }
 
         return { data: { application: { ...application, status: 'approved' }, store: savedStore } };
       } catch (error) {

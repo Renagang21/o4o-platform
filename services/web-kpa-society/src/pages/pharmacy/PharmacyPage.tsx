@@ -18,6 +18,7 @@ import { useEffect, useState } from 'react';
 import { Navigate, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { getMyRequestsCached } from '../../api/pharmacyRequestApi';
+import { hasAnyRole, STORE_OWNER_ROLES } from '../../lib/role-constants';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
 
 /** Admin/operator roles that should NOT see pharmacist function selection */
@@ -26,10 +27,13 @@ const NON_PHARMACIST_ROLES = ['admin', 'super_admin', 'district_admin', 'branch_
 export function PharmacyPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [approvalStatus, setApprovalStatus] = useState<'loading' | 'approved' | 'pending' | 'none' | 'error'>('loading');
+  const [approvalStatus, setApprovalStatus] = useState<'loading' | 'approved' | 'pending' | 'rejected' | 'none' | 'error'>('loading');
   const [approvalError, setApprovalError] = useState<string | null>(null);
 
   const isAdminOrOperator = user?.roles.some(r => NON_PHARMACIST_ROLES.includes(r)) ?? false;
+
+  // WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1: role check 우선
+  const hasStoreRole = !!user && hasAnyRole(user.roles, STORE_OWNER_ROLES);
 
   // WO-KPA-A-PHARMACY-TOKEN-STALE-FIX-V1:
   // 모든 인증된 비관리자 사용자에 대해 API로 승인 상태를 직접 확인.
@@ -53,6 +57,9 @@ export function PharmacyPage() {
           setApprovalStatus('approved');
         } else if (items.some((r) => r.status === 'pending')) {
           setApprovalStatus('pending');
+        } else if (items.some((r) => r.status === 'rejected')) {
+          // WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1: rejected 상태 분리
+          setApprovalStatus('rejected');
         } else {
           setApprovalStatus('none');
         }
@@ -131,6 +138,11 @@ export function PharmacyPage() {
         </div>
       </div>
     );
+  }
+
+  // WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1: role 기반 즉시 리다이렉트
+  if (hasStoreRole) {
+    return <Navigate to="/store" replace />;
   }
 
   // 2.5 비경영자 → 약국 개설약사만 이용 가능
@@ -228,6 +240,39 @@ export function PharmacyPage() {
               운영자 승인 후 이용하실 수 있습니다.
             </p>
             <div style={styles.actions}>
+              <button
+                type="button"
+                onClick={() => navigate(-1)}
+                style={styles.backBtn}
+              >
+                돌아가기
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 5.5 반려 → 재신청 안내
+  // WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1
+  if (approvalStatus === 'rejected') {
+    return (
+      <div style={styles.page}>
+        <div style={styles.container}>
+          <div style={styles.card}>
+            <div style={styles.iconWrap}>
+              <span style={styles.icon}>❌</span>
+            </div>
+            <h1 style={styles.title}>신청이 반려되었습니다</h1>
+            <p style={styles.desc}>
+              약국 서비스 신청이 반려되었습니다.<br />
+              반려 사유를 확인하신 후 다시 신청해 주세요.
+            </p>
+            <div style={styles.actions}>
+              <Link to="/pharmacy/approval" style={styles.joinBtn}>
+                다시 신청하기
+              </Link>
               <button
                 type="button"
                 onClick={() => navigate(-1)}

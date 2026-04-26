@@ -42,6 +42,7 @@ export type KpaRole =
   | 'kpa:district_admin'   // District-level admin
   | 'kpa:branch_admin'     // Branch-level admin
   | 'kpa:branch_operator'  // Branch-level operator
+  | 'kpa:store_owner'      // KPA pharmacy store owner (WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1)
   | 'kpa:pharmacist'       // General pharmacist/member
   | 'kpa:student';         // Student member
 
@@ -59,25 +60,27 @@ export type NetureRole =
  * GlycoPharm service roles
  */
 export type GlycoPharmRole =
-  | 'glycopharm:admin'       // GlycoPharm admin
-  | 'glycopharm:operator'    // GlycoPharm operator
-  | 'glycopharm:pharmacist'  // GlycoPharm 약사 (WO-GLYCOPHARM-ROLE-PREFIX-MIGRATION-V1)
-  | 'pharmacy'               // DEPRECATED → glycopharm:pharmacist (호환용 유지)
-  | 'supplier'               // 공급자
-  | 'partner'                // 파트너
-  | 'customer';              // 당뇨인 (정규)
+  | 'glycopharm:admin'        // GlycoPharm admin
+  | 'glycopharm:operator'     // GlycoPharm operator
+  | 'glycopharm:pharmacist'   // GlycoPharm 약사 (WO-GLYCOPHARM-ROLE-PREFIX-MIGRATION-V1)
+  | 'glycopharm:store_owner'  // GlycoPharm pharmacy store owner (WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1)
+  | 'pharmacy'                // DEPRECATED → glycopharm:pharmacist (호환용 유지)
+  | 'supplier'                // 공급자
+  | 'partner'                 // 파트너
+  | 'customer';               // 당뇨인 (정규)
 
 /**
  * K-Cosmetics service roles
  */
 export type CosmeticsRole =
-  | 'cosmetics:admin'      // K-Cosmetics admin
-  | 'cosmetics:operator'   // K-Cosmetics operator
-  | 'cosmetics:pharmacist' // K-Cosmetics 약사
-  | 'cosmetics:user'       // K-Cosmetics 사용자
-  | 'cosmetics:supplier'   // K-Cosmetics supplier
-  | 'cosmetics:seller'     // K-Cosmetics seller/retailer
-  | 'cosmetics:partner';   // K-Cosmetics partner
+  | 'cosmetics:admin'        // K-Cosmetics admin
+  | 'cosmetics:operator'     // K-Cosmetics operator
+  | 'cosmetics:pharmacist'   // K-Cosmetics 약사
+  | 'cosmetics:user'         // K-Cosmetics 사용자
+  | 'cosmetics:supplier'     // K-Cosmetics supplier
+  | 'cosmetics:store_owner'  // K-Cosmetics store owner (WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1)
+  | 'cosmetics:seller'       // DEPRECATED → cosmetics:store_owner (WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1)
+  | 'cosmetics:partner';     // K-Cosmetics partner
 
 /**
  * LMS roles
@@ -286,6 +289,14 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
     category: 'service',
     deprecated: false
   },
+  'kpa:store_owner': {
+    role: 'kpa:store_owner',
+    label: 'KPA Store Owner',
+    description: 'KPA pharmacy store owner (WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1)',
+    service: 'kpa',
+    category: 'commerce',
+    deprecated: false
+  },
   'kpa:pharmacist': {
     role: 'kpa:pharmacist',
     label: 'Pharmacist',
@@ -370,6 +381,14 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
     category: 'service',
     deprecated: false
   },
+  'glycopharm:store_owner': {
+    role: 'glycopharm:store_owner',
+    label: 'GlycoPharm Store Owner',
+    description: 'GlycoPharm pharmacy store owner (WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1)',
+    service: 'glycopharm',
+    category: 'commerce',
+    deprecated: false
+  },
   'pharmacy': {
     role: 'pharmacy',
     label: '약국',
@@ -444,13 +463,21 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
     category: 'commerce',
     deprecated: false
   },
-  'cosmetics:seller': {
-    role: 'cosmetics:seller',
-    label: 'K-Cosmetics Seller',
-    description: 'K-Cosmetics seller/retailer',
+  'cosmetics:store_owner': {
+    role: 'cosmetics:store_owner',
+    label: 'K-Cosmetics Store Owner',
+    description: 'K-Cosmetics store owner (WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1)',
     service: 'cosmetics',
     category: 'commerce',
     deprecated: false
+  },
+  'cosmetics:seller': {
+    role: 'cosmetics:seller',
+    label: 'K-Cosmetics Seller',
+    description: 'K-Cosmetics seller/retailer — DEPRECATED → cosmetics:store_owner',
+    service: 'cosmetics',
+    category: 'commerce',
+    deprecated: true
   },
   'cosmetics:partner': {
     role: 'cosmetics:partner',

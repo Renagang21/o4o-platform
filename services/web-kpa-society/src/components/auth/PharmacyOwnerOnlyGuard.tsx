@@ -17,7 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { LoadingSpinner } from '../common';
 import { colors } from '../../styles/theme';
-import { PLATFORM_ROLES, hasAnyRole } from '../../lib/role-constants';
+import { PLATFORM_ROLES, STORE_OWNER_ROLES, hasAnyRole } from '../../lib/role-constants';
 
 interface PharmacyOwnerOnlyGuardProps {
   children: React.ReactNode;
@@ -40,7 +40,14 @@ export function PharmacyOwnerOnlyGuard({ children }: PharmacyOwnerOnlyGuardProps
     return <>{children}</>;
   }
 
-  // Pharmacy owner check
+  // WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1
+  // PRIMARY: role_assignments 기반 (kpa:store_owner)
+  if (hasAnyRole(user.roles, STORE_OWNER_ROLES)) {
+    return <>{children}</>;
+  }
+
+  // FALLBACK (legacy): isStoreOwner / activityType
+  // TODO: WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1 Phase 7 — remove after transition
   if (user.isStoreOwner || user.activityType === 'pharmacy_owner') {
     return <>{children}</>;
   }
