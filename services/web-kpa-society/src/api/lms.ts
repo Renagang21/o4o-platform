@@ -87,4 +87,11 @@ export const lmsApi = {
   // 강사 공개 프로필 - WO-CONTENT-INSTRUCTOR-PUBLIC-PROFILE-V1
   getInstructorProfile: (userId: string) =>
     apiClient.get<ApiResponse<InstructorPublicProfile>>(`/lms/instructors/${userId}/public-profile`),
+
+  // WO-KPA-OPERATOR-LMS-BULK-ACTION-FIX-V1: 운영자 강의 상태 변경
+  operatorUnpublishCourse: (id: string) =>
+    apiClient.post<ApiResponse<{ course: Course }>>(`/lms/operator/courses/${id}/unpublish`),
+
+  operatorArchiveCourse: (id: string) =>
+    apiClient.post<ApiResponse<{ course: Course }>>(`/lms/operator/courses/${id}/archive`),
 };

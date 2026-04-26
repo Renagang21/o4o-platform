@@ -9,10 +9,10 @@
  *   - RowActionMenu: 상세 이동 / 비공개 처리 / 아카이브(종료)
  *   - soft delete만 허용 (course.status → archived)
  *
- * 삭제 정책:
- *   - DELETE /lms/courses/:id → status=archived (soft delete)
+ * WO-KPA-OPERATOR-LMS-BULK-ACTION-FIX-V1:
+ *   - 운영자 전용 API 사용 (/kpa/lms/operator/courses/:id/archive)
+ *   - requireKpaScope('kpa:operator') 기반 — 타인 강의 종료 가능
  *   - 수강 기록이 있는 강의도 아카이브 가능 (데이터 보존)
- *   - kpa:admin만 다른 강사 강의 아카이브 가능
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -22,7 +22,6 @@ import { ActionBar, BulkResultModal, RowActionMenu } from '@o4o/ui';
 import { DataTable, Pagination, defineActionPolicy, buildRowActions, useBatchAction } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { lmsApi } from '../../api';
-import { lmsInstructorApi } from '../../api/lms-instructor';
 import { toast } from '@o4o/error-handling';
 import type { Course } from '../../types';
 
@@ -127,21 +126,23 @@ export default function OperatorLmsCoursesPage() {
 
   const handleUnpublish = async (course: Course) => {
     try {
-      await lmsInstructorApi.unpublishCourse(course.id);
+      await lmsApi.operatorUnpublishCourse(course.id);
       toast.success(`"${course.title}" 비공개 처리되었습니다`);
       fetchCourses();
     } catch (err: any) {
-      toast.error(err?.message?.includes('Forbidden') ? '권한이 없습니다 (강사 본인 또는 관리자만 가능)' : '비공개 처리에 실패했습니다');
+      const reason = (err as any)?.data?.error || err?.message || '비공개 처리에 실패했습니다';
+      toast.error(reason);
     }
   };
 
   const handleArchive = async (course: Course) => {
     try {
-      await lmsInstructorApi.archiveCourse(course.id);
+      await lmsApi.operatorArchiveCourse(course.id);
       toast.success(`"${course.title}" 강의가 종료 처리되었습니다`);
       fetchCourses();
     } catch (err: any) {
-      toast.error(err?.message?.includes('Forbidden') ? '권한이 없습니다 (강사 본인 또는 관리자만 가능)' : '종료 처리에 실패했습니다');
+      const reason = (err as any)?.data?.error || err?.message || '종료 처리에 실패했습니다';
+      toast.error(reason);
     }
   };
 
@@ -159,10 +160,13 @@ export default function OperatorLmsCoursesPage() {
         const results: { id: string; status: string; error?: string }[] = [];
         for (const id of ids) {
           try {
-            await lmsInstructorApi.unpublishCourse(id);
+            await lmsApi.operatorUnpublishCourse(id);
             results.push({ id, status: 'success' });
           } catch (err: any) {
-            results.push({ id, status: 'failed', error: err?.message?.includes('Forbidden') ? '권한 없음' : '처리 실패' });
+            const c = courses.find((co) => co.id === id);
+            const serverError = (err as any)?.data?.error;
+            const reason = serverError || err?.message || '처리 실패';
+            results.push({ id, status: 'failed', error: c ? `${c.title}: ${reason}` : reason });
           }
         }
         return { data: { results } };
@@ -188,10 +192,13 @@ export default function OperatorLmsCoursesPage() {
         const results: { id: string; status: string; error?: string }[] = [];
         for (const id of ids) {
           try {
-            await lmsInstructorApi.archiveCourse(id);
+            await lmsApi.operatorArchiveCourse(id);
             results.push({ id, status: 'success' });
           } catch (err: any) {
-            results.push({ id, status: 'failed', error: err?.message?.includes('Forbidden') ? '권한 없음' : '처리 실패' });
+            const c = courses.find((co) => co.id === id);
+            const serverError = (err as any)?.data?.error;
+            const reason = serverError || err?.message || '처리 실패';
+            results.push({ id, status: 'failed', error: c ? `${c.title}: ${reason}` : reason });
           }
         }
         return { data: { results } };
@@ -354,9 +361,9 @@ export default function OperatorLmsCoursesPage() {
         </button>
       </div>
 
-      {/* 권한 안내 */}
-      <div style={{ padding: '10px 14px', backgroundColor: '#fffbeb', border: '1px solid #fde68a', borderRadius: 8, marginBottom: 16, fontSize: 13, color: '#92400e' }}>
-        비공개/종료 처리는 <strong>강사 본인</strong> 또는 <strong>kpa:admin</strong> 역할만 가능합니다. 권한이 없으면 403 오류가 표시됩니다.
+      {/* 정책 안내 */}
+      <div style={{ padding: '10px 14px', backgroundColor: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: 8, marginBottom: 16, fontSize: 13, color: '#0c4a6e' }}>
+        강의 데이터와 수강 기록 보존을 위해 삭제 대신 <strong>종료(보관)</strong> 처리합니다.
       </div>
 
       {/* Search */}

@@ -133,6 +133,8 @@ import { LessonController } from '../../modules/lms/controllers/LessonController
 import { EnrollmentController } from '../../modules/lms/controllers/EnrollmentController.js';
 import { CertificateController } from '../../modules/lms/controllers/CertificateController.js';
 import { InstructorPublicController } from '../../modules/lms/controllers/InstructorPublicController.js';
+// WO-KPA-OPERATOR-LMS-BULK-ACTION-FIX-V1
+import { CourseService } from '../../modules/lms/services/CourseService.js';
 // WO-O4O-CREDIT-SYSTEM-V1
 import { CreditController } from '../../modules/credit/controllers/CreditController.js';
 // WO-O4O-COMPLETION-V1
@@ -513,6 +515,24 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // WO-O4O-COMPLETION-V1: Completions
   lmsRouter.get('/completions/me', authenticate, asyncHandler(CompletionController.getMyCompletions));
+
+  // WO-KPA-OPERATOR-LMS-BULK-ACTION-FIX-V1: Operator 강의 상태 변경
+  // requireInstructor/isOwnerOrAdmin 우회 — kpa:operator 이상 역할이면 모든 강의 상태 변경 가능
+  lmsRouter.post('/operator/courses/:id/unpublish', authenticate, requireKpaScope('kpa:operator'), asyncHandler(async (req: Request, res: Response) => {
+    const service = CourseService.getInstance();
+    const course = await service.getCourse(req.params.id);
+    if (!course) { res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); return; }
+    const updated = await service.unpublishCourse(req.params.id);
+    res.json({ success: true, data: { course: updated } });
+  }));
+
+  lmsRouter.post('/operator/courses/:id/archive', authenticate, requireKpaScope('kpa:operator'), asyncHandler(async (req: Request, res: Response) => {
+    const service = CourseService.getInstance();
+    const course = await service.getCourse(req.params.id);
+    if (!course) { res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); return; }
+    const updated = await service.archiveCourse(req.params.id);
+    res.json({ success: true, data: { course: updated } });
+  }));
 
   router.use('/lms', lmsRouter);
 

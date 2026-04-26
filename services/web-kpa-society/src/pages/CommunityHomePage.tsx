@@ -109,6 +109,7 @@ export function CommunityHomePage() {
     title: n.title,
     date: n.publishedAt || n.createdAt,
     isPinned: n.isPinned,
+    href: `/content/${n.id}`,
   }));
 
   return (
@@ -128,7 +129,6 @@ export function CommunityHomePage() {
                 title="공지"
                 items={noticeItems}
                 loading={loading}
-                viewAllHref="/forum"
               />
             </div>
             {/* Right: 약사공론 뉴스 Placeholder */}
