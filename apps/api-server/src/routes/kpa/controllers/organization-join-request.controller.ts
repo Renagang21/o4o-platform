@@ -4,27 +4,21 @@
  * WO-CONTEXT-JOIN-REQUEST-MVP-V1
  * WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: requireKpaScope 표준화
  * WO-PLATFORM-APPROVAL-ENGINE-UNIFICATION-V1: → kpa_approval_requests (entity_type='membership')
+ * WO-KPA-AFFILIATION-TEXT-DECOUPLING-PHASE1-V1: legacy dual-query 제거, unified table only
  *
  * 조직 가입 / 역할 승격 / 운영자 요청 API
- * 신규 요청은 kpa_approval_requests에 기록.
- * 기존 kpa_organization_join_requests 데이터는 읽기 전용으로 유지 (dual-query).
+ * 모든 요청은 kpa_approval_requests(entity_type='membership')에서 처리.
  *
  * Endpoints:
- * - POST   /                 요청 생성 (인증 필수) → kpa_approval_requests
- * - GET    /my               내 요청 목록 (dual-query)
- * - GET    /pending          운영자용 대기 목록 (kpa:admin, dual-query)
- * - PATCH  /:id/approve      승인 (kpa:admin, dual-table lookup)
- * - PATCH  /:id/reject       반려 (kpa:admin, dual-table lookup)
+ * - POST   /                 요청 생성 (인증 필수)
+ * - GET    /my               내 요청 목록
+ * - GET    /pending          운영자용 대기 목록 (kpa:admin)
+ * - PATCH  /:id/approve      승인 (kpa:admin)
+ * - PATCH  /:id/reject       반려 (kpa:admin)
  */
 
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
-import {
-  KpaOrganizationJoinRequest,
-  JoinRequestType,
-  JoinRequestStatus,
-  RequestedRole,
-} from '../entities/kpa-organization-join-request.entity.js';
 import { OrganizationMemberService } from '@o4o/organization-core';
 import { User } from '../../../modules/auth/entities/User.js';
 import { emailService } from '../../../services/email.service.js';
@@ -33,7 +27,7 @@ import type { ActionLogService } from '@o4o/action-log-core';
 import logger from '../../../utils/logger.js';
 
 const VALID_REQUEST_TYPES: string[] = ['join', 'promotion', 'operator'];
-const VALID_ROLES: RequestedRole[] = ['admin', 'manager', 'member', 'moderator'];
+const VALID_ROLES: string[] = ['admin', 'manager', 'member', 'moderator'];
 
 /**
  * Create Organization Join Request Routes
@@ -45,7 +39,6 @@ export function createOrganizationJoinRequestRoutes(
   actionLogService?: ActionLogService,
 ): Router {
   const router = Router();
-  const getRepo = () => dataSource.getRepository(KpaOrganizationJoinRequest);
   const getMemberService = () => new OrganizationMemberService(dataSource);
 
   // =========================================================================
@@ -192,23 +185,6 @@ export function createOrganizationJoinRequestRoutes(
         });
       }
 
-      const legacyRepo = getRepo();
-      const existingLegacy = await legacyRepo.findOne({
-        where: {
-          user_id: user.id,
-          organization_id: organizationId,
-          request_type: requestType as JoinRequestType,
-          status: 'pending' as JoinRequestStatus,
-        },
-      });
-      if (existingLegacy) {
-        return res.status(409).json({
-          success: false,
-          error: '이미 처리 대기 중인 동일한 요청이 있습니다.',
-          code: 'DUPLICATE_PENDING_REQUEST',
-        });
-      }
-
       // join 요청 시: 이미 멤버인지 확인
       if (requestType === 'join') {
         try {
@@ -325,7 +301,7 @@ export function createOrganizationJoinRequestRoutes(
   });
 
   // =========================================================================
-  // GET /my — 내 요청 목록 (dual-query)
+  // GET /my — 내 요청 목록
   // =========================================================================
   router.get('/my', async (req: Request, res: Response) => {
     try {
@@ -347,24 +323,11 @@ export function createOrganizationJoinRequestRoutes(
       }
       sqlNew += ` ORDER BY created_at DESC`;
 
-      // Legacy table
-      const repo = getRepo();
-      const qb = repo
-        .createQueryBuilder('r')
-        .where('r.user_id = :userId', { userId: user.id });
-      if (status && ['pending', 'approved', 'rejected'].includes(status as string)) {
-        qb.andWhere('r.status = :status', { status });
-      }
-      qb.orderBy('r.created_at', 'DESC');
-
-      const [newItems, legacyItems] = await Promise.all([
-        dataSource.query(sqlNew, paramsNew),
-        qb.getMany(),
-      ]);
+      const items = await dataSource.query(sqlNew, paramsNew);
 
       return res.json({
         success: true,
-        data: [...newItems, ...legacyItems],
+        data: items,
       });
     } catch (error) {
       logger.error('Failed to list my join requests:', error);
@@ -377,7 +340,7 @@ export function createOrganizationJoinRequestRoutes(
   });
 
   // =========================================================================
-  // GET /pending — 관리자용 대기 목록 (kpa:admin scope, dual-query)
+  // GET /pending — 관리자용 대기 목록 (kpa:admin)
   // =========================================================================
   router.get('/pending', requireScope('kpa:admin'), async (req: Request, res: Response) => {
     try {
@@ -402,22 +365,7 @@ export function createOrganizationJoinRequestRoutes(
       }
       sqlNew += ` ORDER BY created_at ASC`;
 
-      // Legacy table
-      const repo = getRepo();
-      const qb = repo
-        .createQueryBuilder('r')
-        .where('r.status = :status', { status: 'pending' });
-      if (organizationId) {
-        qb.andWhere('r.organization_id = :organizationId', { organizationId });
-      }
-      qb.orderBy('r.created_at', 'ASC');
-
-      const [newItems, legacyItems] = await Promise.all([
-        dataSource.query(sqlNew, paramsNew),
-        qb.getMany(),
-      ]);
-
-      const allItems = [...newItems, ...legacyItems];
+      const allItems = await dataSource.query(sqlNew, paramsNew);
       const total = allItems.length;
       const paged = allItems.slice((pageNum - 1) * limitNum, pageNum * limitNum);
 
@@ -444,7 +392,7 @@ export function createOrganizationJoinRequestRoutes(
   });
 
   // =========================================================================
-  // PATCH /:id/approve — 승인 (dual-table lookup)
+  // PATCH /:id/approve — 승인 (kpa:admin)
   // =========================================================================
   router.patch('/:id/approve', requireScope('kpa:admin'), async (req: Request, res: Response) => {
     try {
@@ -484,42 +432,10 @@ export function createOrganizationJoinRequestRoutes(
         return res.json({ success: true, data: updated });
       }
 
-      // Fallback: legacy table
-      const repo = getRepo();
-      const request = await repo.findOne({ where: { id } });
-
-      if (!request) {
-        return res.status(404).json({
-          success: false,
-          error: '요청을 찾을 수 없습니다.',
-          code: 'NOT_FOUND',
-        });
-      }
-
-      if (request.status !== 'pending') {
-        return res.status(409).json({
-          success: false,
-          error: `이미 처리된 요청입니다. (현재 상태: ${request.status})`,
-          code: 'ALREADY_PROCESSED',
-        });
-      }
-
-      request.status = 'approved';
-      request.reviewed_by = user.id;
-      request.reviewed_at = new Date();
-      request.review_note = reviewNote?.trim() || null;
-      await repo.save(request);
-
-      await applyApproval(request.user_id, request.organization_id, request.request_type, request.requested_role, request.requested_sub_role, user.id, id);
-
-      logger.info(`Organization join request approved (legacy): ${id} by ${user.id}`);
-      actionLogService?.logSuccess('kpa-society', user.id, 'kpa.operator.org_join_approve', {
-        meta: { targetId: id, requestType: request.request_type, statusBefore: 'pending', statusAfter: 'approved' },
-      }).catch(() => {});
-
-      return res.json({
-        success: true,
-        data: request,
+      return res.status(404).json({
+        success: false,
+        error: '요청을 찾을 수 없습니다.',
+        code: 'NOT_FOUND',
       });
     } catch (error) {
       logger.error('Failed to approve join request:', error);
@@ -532,7 +448,7 @@ export function createOrganizationJoinRequestRoutes(
   });
 
   // =========================================================================
-  // PATCH /:id/reject — 반려 (dual-table lookup)
+  // PATCH /:id/reject — 반려 (kpa:admin)
   // =========================================================================
   router.patch('/:id/reject', requireScope('kpa:admin'), async (req: Request, res: Response) => {
     try {
@@ -571,42 +487,10 @@ export function createOrganizationJoinRequestRoutes(
         return res.json({ success: true, data: updated });
       }
 
-      // Fallback: legacy table
-      const repo = getRepo();
-      const request = await repo.findOne({ where: { id } });
-
-      if (!request) {
-        return res.status(404).json({
-          success: false,
-          error: '요청을 찾을 수 없습니다.',
-          code: 'NOT_FOUND',
-        });
-      }
-
-      if (request.status !== 'pending') {
-        return res.status(409).json({
-          success: false,
-          error: `이미 처리된 요청입니다. (현재 상태: ${request.status})`,
-          code: 'ALREADY_PROCESSED',
-        });
-      }
-
-      request.status = 'rejected';
-      request.reviewed_by = user.id;
-      request.reviewed_at = new Date();
-      request.review_note = reviewNote?.trim() || null;
-      await repo.save(request);
-
-      await sendRejectionEmail(request.user_id, request.request_type, reviewNote);
-
-      logger.info(`Organization join request rejected (legacy): ${id} by ${user.id}`);
-      actionLogService?.logSuccess('kpa-society', user.id, 'kpa.operator.org_join_reject', {
-        meta: { targetId: id, reason: reviewNote?.trim(), statusBefore: 'pending', statusAfter: 'rejected' },
-      }).catch(() => {});
-
-      return res.json({
-        success: true,
-        data: request,
+      return res.status(404).json({
+        success: false,
+        error: '요청을 찾을 수 없습니다.',
+        code: 'NOT_FOUND',
       });
     } catch (error) {
       logger.error('Failed to reject join request:', error);
@@ -664,31 +548,7 @@ export function createOrganizationJoinRequestRoutes(
             continue;
           }
 
-          // Fallback: legacy table
-          const repo = getRepo();
-          const request = await repo.findOne({ where: { id } });
-          if (!request) {
-            results.push({ id, status: 'failed', error: '요청을 찾을 수 없습니다.' });
-            continue;
-          }
-          if (request.status !== 'pending') {
-            results.push({ id, status: 'skipped', error: `이미 처리됨 (${request.status})` });
-            continue;
-          }
-
-          request.status = 'approved';
-          request.reviewed_by = user.id;
-          request.reviewed_at = new Date();
-          request.review_note = reviewNote?.trim() || null;
-          await repo.save(request);
-
-          await applyApproval(request.user_id, request.organization_id, request.request_type, request.requested_role, request.requested_sub_role, user.id, id);
-
-          actionLogService?.logSuccess('kpa-society', user.id, 'kpa.operator.org_join_approve', {
-            meta: { targetId: id, requestType: request.request_type, statusBefore: 'pending', statusAfter: 'approved', batch: true },
-          }).catch(() => {});
-
-          results.push({ id, status: 'success' });
+          results.push({ id, status: 'failed', error: '요청을 찾을 수 없습니다.' });
         } catch (itemError: any) {
           logger.error(`[batch-approve] Failed for id=${id}:`, itemError);
           results.push({ id, status: 'failed', error: itemError.message || '처리 중 오류' });
@@ -750,31 +610,7 @@ export function createOrganizationJoinRequestRoutes(
             continue;
           }
 
-          // Fallback: legacy table
-          const repo = getRepo();
-          const request = await repo.findOne({ where: { id } });
-          if (!request) {
-            results.push({ id, status: 'failed', error: '요청을 찾을 수 없습니다.' });
-            continue;
-          }
-          if (request.status !== 'pending') {
-            results.push({ id, status: 'skipped', error: `이미 처리됨 (${request.status})` });
-            continue;
-          }
-
-          request.status = 'rejected';
-          request.reviewed_by = user.id;
-          request.reviewed_at = new Date();
-          request.review_note = reviewNote?.trim() || null;
-          await repo.save(request);
-
-          await sendRejectionEmail(request.user_id, request.request_type, reviewNote);
-
-          actionLogService?.logSuccess('kpa-society', user.id, 'kpa.operator.org_join_reject', {
-            meta: { targetId: id, reason: reviewNote?.trim(), statusBefore: 'pending', statusAfter: 'rejected', batch: true },
-          }).catch(() => {});
-
-          results.push({ id, status: 'success' });
+          results.push({ id, status: 'failed', error: '요청을 찾을 수 없습니다.' });
         } catch (itemError: any) {
           logger.error(`[batch-reject] Failed for id=${id}:`, itemError);
           results.push({ id, status: 'failed', error: itemError.message || '처리 중 오류' });

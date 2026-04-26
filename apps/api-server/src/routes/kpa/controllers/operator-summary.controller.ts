@@ -17,10 +17,8 @@ import { authenticate } from '../../../middleware/auth.middleware.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import { KPA_SCOPE_CONFIG } from '@o4o/security-core';
 import { createMembershipScopeGuard } from '../../../common/middleware/membership-guard.middleware.js';
-import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 import { KpaMember } from '../entities/kpa-member.entity.js';
 import { KpaApplication } from '../entities/kpa-application.entity.js';
-import { KpaOrganizationJoinRequest } from '../entities/kpa-organization-join-request.entity.js';
 // WO-KPA-A-OPERATOR-DASHBOARD-FIRST-STABILIZATION-V1: CopilotEngineService import 제거
 // /operator/dashboard 엔드포인트 삭제 — 프론트엔드 미사용 (프론트는 /operator/summary 사용)
 
@@ -137,10 +135,10 @@ export function createOperatorSummaryController(
         SELECT COUNT(*) AS count FROM kpa_approval_requests
         WHERE entity_type = 'course' AND status = 'pending'
       `).catch(() => [{ count: '0' }]),
-      // Membership pending (organization join requests)
+      // Membership pending (kpa_approval_requests)
       dataSource.query(`
-        SELECT COUNT(*) AS count FROM kpa_organization_join_requests
-        WHERE status = 'pending'
+        SELECT COUNT(*) AS count FROM kpa_approval_requests
+        WHERE entity_type = 'membership' AND status = 'pending'
       `),
       // WO-HUB-RISK-LOOP-COMPLETION-V1: 강제노출 만료 임박 — 테이블 미존재 시 safe fallback
       dataSource.query(`
@@ -169,9 +167,10 @@ export function createOperatorSummaryController(
         ORDER BY a.created_at DESC LIMIT 5
       `).catch(() => []),
       dataSource.query(`
-        SELECT r.id, u.name, r.request_type, r.status, r.created_at
-        FROM kpa_organization_join_requests r
-        LEFT JOIN users u ON u.id = r.user_id
+        SELECT r.id, r.requester_name AS name,
+               r.payload->>'request_type' AS request_type, r.status, r.created_at
+        FROM kpa_approval_requests r
+        WHERE r.entity_type = 'membership'
         ORDER BY r.created_at DESC LIMIT 5
       `).catch(() => []),
     ]);
@@ -270,29 +269,19 @@ export function createOperatorSummaryController(
    * Operator scope에서 직접 조회.
    */
   router.get('/district-summary', asyncHandler(async (req: Request, res: Response) => {
-    const orgRepo = dataSource.getRepository(OrganizationStore);
     const memberRepo = dataSource.getRepository(KpaMember);
     const appRepo = dataSource.getRepository(KpaApplication);
-    const joinReqRepo = dataSource.getRepository(KpaOrganizationJoinRequest);
 
     const limit = Math.min(parseInt(req.query.limit as string) || 10, 50);
 
-    // WO-PLATFORM-APPROVAL-ENGINE-UNIFICATION-V1: dual-query (unified + legacy)
+    // WO-KPA-AFFILIATION-TEXT-DECOUPLING-PHASE1-V1: unified table only
     const [
       totalMembers,
       pendingApprovals,
-      pendingJoinResult,
       pendingJoinUnifiedRows,
     ] = await Promise.all([
       memberRepo.count({ where: { status: 'active' } }),
       appRepo.count({ where: { status: 'submitted' } }),
-      joinReqRepo
-        .createQueryBuilder('r')
-        .where('r.status = :status', { status: 'pending' })
-        .orderBy('r.created_at', 'ASC')
-        .take(limit)
-        .getManyAndCount(),
-      // WO-KPA-A-OPERATOR-DASHBOARD-RECOVERY-V1: kpa_approval_requests 테이블 복구 — 실제 쿼리
       dataSource.query(`
         SELECT id, entity_type, organization_id, status, requester_id, requester_name, requester_email, created_at
         FROM kpa_approval_requests
@@ -302,11 +291,8 @@ export function createOperatorSummaryController(
       `, [limit]).catch(() => []),
     ]);
 
-    const [pendingLegacyItems, pendingLegacyTotal] = pendingJoinResult;
-    const pendingItems = [...pendingJoinUnifiedRows, ...pendingLegacyItems]
-      .sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
-      .slice(0, limit);
-    const pendingTotal = pendingLegacyTotal + pendingJoinUnifiedRows.length;
+    const pendingItems = pendingJoinUnifiedRows;
+    const pendingTotal = pendingJoinUnifiedRows.length;
 
     res.json({
       success: true,

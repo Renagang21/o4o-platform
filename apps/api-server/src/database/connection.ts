@@ -262,11 +262,9 @@ import {
 // KPA ENTITIES (Pharmacist Association SaaS)
 // ============================================================================
 import {
-  KpaOrganization,
   KpaMember,
   KpaApplication,
   KpaJoinInquiry,
-  KpaOrganizationJoinRequest,
   KpaMemberService,
   KpaAuditLog,
   KpaStoreAssetControl,
@@ -754,11 +752,9 @@ export const AppDataSource = new DataSource({
     // ============================================================================
     // KPA ENTITIES (Pharmacist Association SaaS)
     // ============================================================================
-    KpaOrganization,
     KpaMember,
     KpaApplication,
     KpaJoinInquiry,
-    KpaOrganizationJoinRequest,
     KpaMemberService,
     KpaAuditLog,
     // WO-KPA-A-ASSET-CONTROL-EXTENSION-V1

@@ -1806,52 +1806,6 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   router.use('/mypage', createMypageController(dataSource, authenticate as any));
 
   // ============================================================================
-  // Organization Info Routes - /api/v1/kpa/organization (public)
-  // Public organization information (different from /organizations admin API)
-  // ============================================================================
-  const orgInfoRouter = Router();
-
-  orgInfoRouter.get('/', (req: Request, res: Response) => {
-    res.json({
-      success: true,
-      data: {
-        name: '대한약사회',
-        description: '대한민국 약사들의 권익 보호 및 국민 건강 증진을 위한 전문직 단체',
-        established: '1953-04-25',
-        memberCount: 0,
-        branchCount: 0
-      }
-    });
-  });
-
-  orgInfoRouter.get('/branches', (req: Request, res: Response) => {
-    res.json({ success: true, data: [] });
-  });
-
-  orgInfoRouter.get('/branches/:id', (req: Request, res: Response) => {
-    res.status(404).json({ success: false, error: { message: 'Branch not found' } });
-  });
-
-  orgInfoRouter.get('/officers', (req: Request, res: Response) => {
-    res.json({ success: true, data: [] });
-  });
-
-  orgInfoRouter.get('/contact', (req: Request, res: Response) => {
-    res.json({
-      success: true,
-      data: {
-        address: '',
-        phone: '',
-        fax: '',
-        email: '',
-        workingHours: '평일 09:00 - 18:00'
-      }
-    });
-  });
-
-  router.use('/organization', orgInfoRouter);
-
-  // ============================================================================
   // Checkout Routes — WO-O4O-KPA-CUSTOMER-COMMERCE-LOOP-V1
   // POST /api/v1/kpa/checkout — 주문 생성
   // GET  /api/v1/kpa/checkout/orders — 내 주문 목록

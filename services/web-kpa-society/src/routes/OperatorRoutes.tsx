@@ -115,10 +115,6 @@ export function OperatorRoutes() {
           {/* WO-KPA-C-REQUEST-KPI-SYNC-AUDIT-V1: 회원 관리 (KpaMember 기반) */}
           <Route path="members" element={<MemberManagementPage />} />
 
-          {/* WO-REMOVE-ORGANIZATION-REQUEST-UI-V1: 조직 가입 요청 기능 제거 (Soft Deprecation) */}
-          {/* organization-requests → /operator 리다이렉트 (메뉴에서도 제거됨) */}
-          <Route path="organization-requests" element={<Navigate to="/operator" replace />} />
-
           {/* 약국 서비스 신청 관리 (WO-KPA-A-PHARMACY-REQUEST-OPERATOR-UI-V1) */}
           <Route path="pharmacy-requests" element={<PharmacyRequestManagementPage />} />
 

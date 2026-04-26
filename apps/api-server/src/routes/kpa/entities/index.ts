@@ -2,12 +2,9 @@
  * KPA Entities Index
  */
 
-export * from './kpa-organization.entity.js';
 export * from './kpa-member.entity.js';
 export * from './kpa-application.entity.js';
 export * from './kpa-join-inquiry.entity.js';
-/** @deprecated WO-PLATFORM-APPROVAL-ENGINE-UNIFICATION-V1: Use KpaApprovalRequest (entity_type='membership'). Kept for legacy data reads. */
-export * from './kpa-organization-join-request.entity.js';
 export * from './kpa-steward.entity.js';
 export * from './kpa-member-service.entity.js';
 export * from './kpa-audit-log.entity.js';

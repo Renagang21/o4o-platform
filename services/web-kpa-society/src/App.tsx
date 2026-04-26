@@ -45,9 +45,6 @@ import ContentParticipantsPage from './pages/instructor/ContentParticipantsPage'
 // Events pages (WO-KPA-COMMUNITY-HOME-V1)
 import { EventsHomePage } from './pages/events/EventsHomePage';
 
-// Organization Service page (WO-KPA-COMMUNITY-HOME-V1)
-import { OrganizationServicePage } from './pages/OrganizationServicePage';
-
 // Participation pages (WO-KPA-PARTICIPATION-APP-V1)
 import {
   ParticipationListPage,
@@ -74,9 +71,6 @@ import PublicSignagePage from './pages/signage/PublicSignagePage';
 
 // Legal pages (WO-KPA-LEGAL-PAGES-V1)
 import { PolicyPage, PrivacyPage } from './pages/legal';
-
-// Organization pages
-import { OrganizationAboutPage, OfficersPage, ContactPage } from './pages/organization';
 
 // MyPage pages
 import { MyDashboardPage, MyProfilePage, MySettingsPage, MyCertificatesPage, PersonalStatusReportPage, AnnualReportFormPage, MyForumDashboardPage, RequestCategoryPage as KpaRequestCategoryPage, MyRequestsPage, ForumMemberManagementPage, MyQualificationsPage, MyEnrollmentsPage, MyCreditsPage } from './pages/mypage';
@@ -617,12 +611,6 @@ function App() {
           {/* Events (이벤트) */}
           <Route path="/events" element={<Layout serviceName={SERVICE_NAME}><EventsHomePage /></Layout>} />
 
-          {/* Organization (약사회 소개) */}
-          <Route path="/organization" element={<Layout serviceName={SERVICE_NAME}><OrganizationAboutPage /></Layout>} />
-          <Route path="/organization/branches" element={<Navigate to="/organization" replace />} />
-          <Route path="/organization/officers" element={<Layout serviceName={SERVICE_NAME}><OfficersPage /></Layout>} />
-          <Route path="/organization/contact" element={<Layout serviceName={SERVICE_NAME}><ContactPage /></Layout>} />
-
           {/* MyPage (마이페이지) */}
           <Route path="/mypage" element={<Layout serviceName={SERVICE_NAME}><MyDashboardPage /></Layout>} />
           <Route path="/mypage/profile" element={<Layout serviceName={SERVICE_NAME}><MyProfilePage /></Layout>} />
@@ -841,13 +829,6 @@ function DemoLayoutRoutes() {
 
 
 
-        {/* Organization (조직소개) */}
-        <Route path="/organization" element={<OrganizationAboutPage />} />
-        <Route path="/organization/branches" element={<Navigate to="/organization" replace />} />
-        <Route path="/organization/branches/:id" element={<Navigate to="/organization" replace />} />
-        <Route path="/organization/officers" element={<OfficersPage />} />
-        <Route path="/organization/contact" element={<ContactPage />} />
-
         {/* MyPage (마이페이지) */}
         <Route path="/mypage" element={<MyDashboardPage />} />
         <Route path="/mypage/profile" element={<MyProfilePage />} />
@@ -860,9 +841,6 @@ function DemoLayoutRoutes() {
 
         {/* Events (이벤트) - WO-KPA-COMMUNITY-HOME-V1 */}
         <Route path="/events" element={<EventsHomePage />} />
-
-        {/* Organization Service (약사회 서비스 데모) - WO-KPA-COMMUNITY-HOME-V1 */}
-        <Route path="/organization-service" element={<OrganizationServicePage />} />
 
         {/* Legacy routes (for backward compatibility) */}
         <Route path="/member/apply" element={<MemberApplyPage />} />
