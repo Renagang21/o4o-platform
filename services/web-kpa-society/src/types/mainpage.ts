@@ -36,7 +36,6 @@ export interface PartnerLink {
   linkUrl: string;
   order: number;
   isActive: boolean;
-  branchId: string; // 지부 ID (분회는 관리 불가)
 }
 
 /**

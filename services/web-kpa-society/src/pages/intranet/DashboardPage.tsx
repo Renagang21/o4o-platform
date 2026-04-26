@@ -120,11 +120,11 @@ export function DashboardPage() {
 
   // 협력업체 샘플 데이터 (지부 전용)
   const [partnerLinks] = useState<PartnerLink[]>([
-    { id: 'p1', name: '대한제약', logoUrl: '', linkUrl: 'https://example.com', order: 1, isActive: true, branchId: 'branch-1' },
-    { id: 'p2', name: '한국의약', logoUrl: '', linkUrl: 'https://example.com', order: 2, isActive: true, branchId: 'branch-1' },
-    { id: 'p3', name: '서울약품', logoUrl: '', linkUrl: 'https://example.com', order: 3, isActive: true, branchId: 'branch-1' },
-    { id: 'p4', name: '동아제약', logoUrl: '', linkUrl: 'https://example.com', order: 4, isActive: true, branchId: 'branch-1' },
-    { id: 'p5', name: '유한양행', logoUrl: '', linkUrl: 'https://example.com', order: 5, isActive: true, branchId: 'branch-1' },
+    { id: 'p1', name: '대한제약', logoUrl: '', linkUrl: 'https://example.com', order: 1, isActive: true },
+    { id: 'p2', name: '한국의약', logoUrl: '', linkUrl: 'https://example.com', order: 2, isActive: true },
+    { id: 'p3', name: '서울약품', logoUrl: '', linkUrl: 'https://example.com', order: 3, isActive: true },
+    { id: 'p4', name: '동아제약', logoUrl: '', linkUrl: 'https://example.com', order: 4, isActive: true },
+    { id: 'p5', name: '유한양행', logoUrl: '', linkUrl: 'https://example.com', order: 5, isActive: true },
   ]);
 
   // 약사공론 기사 (API 연동 구조)
