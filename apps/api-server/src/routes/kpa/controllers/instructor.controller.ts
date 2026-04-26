@@ -14,19 +14,20 @@ import { InstructorService } from '../services/instructor.service.js';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-/** Branch admin 권한 검증 helper */
+/** KPA admin 권한 검증 helper
+ * WO-KPA-AFFILIATION-TEXT-DECOUPLING-PHASE2-V1: organization_id 인가 조건 제거
+ */
 async function verifyBranchAdmin(
   ds: DataSource,
   userId: string,
-  branchId: string,
   userRoles: string[],
 ): Promise<boolean> {
   // kpa:admin / kpa:district_admin → bypass
   if (userRoles.some(r => r === 'kpa:admin' || r === 'kpa:district_admin')) return true;
-  // 분회 소속 admin 확인
+  // KPA 활성 admin 확인
   const [member] = await ds.query(
-    `SELECT id FROM kpa_members WHERE user_id = $1 AND organization_id = $2 AND status = 'active' AND role = 'admin' LIMIT 1`,
-    [userId, branchId],
+    `SELECT id FROM kpa_members WHERE user_id = $1 AND status = 'active' AND role = 'admin' LIMIT 1`,
+    [userId],
   );
   return !!member;
 }
@@ -103,12 +104,12 @@ export function createInstructorController(
       const { branchId } = req.params;
       const user = (req as any).user;
       if (!UUID_RE.test(branchId)) { res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid branch ID' } }); return; }
-      if (!(await verifyBranchAdmin(dataSource, user.id, branchId, user.roles || []))) {
+      if (!(await verifyBranchAdmin(dataSource, user.id, user.roles || []))) {
         res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Branch admin access required' } }); return;
       }
 
       const { status: statusFilter } = req.query;
-      const data = await service.listQualifications(branchId, { status: statusFilter as string | undefined });
+      const data = await service.listQualifications({ status: statusFilter as string | undefined });
       res.json({ success: true, data });
     }),
   );
@@ -122,11 +123,11 @@ export function createInstructorController(
       const { branchId } = req.params;
       const user = (req as any).user;
       if (!UUID_RE.test(branchId)) { res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid branch ID' } }); return; }
-      if (!(await verifyBranchAdmin(dataSource, user.id, branchId, user.roles || []))) {
+      if (!(await verifyBranchAdmin(dataSource, user.id, user.roles || []))) {
         res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Branch admin access required' } }); return;
       }
 
-      const data = await service.getPendingQualifications(branchId);
+      const data = await service.getPendingQualifications();
       res.json({ success: true, data });
     }),
   );
@@ -140,11 +141,11 @@ export function createInstructorController(
       const { branchId, id } = req.params;
       const user = (req as any).user;
       if (!UUID_RE.test(branchId) || !UUID_RE.test(id)) { res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid ID' } }); return; }
-      if (!(await verifyBranchAdmin(dataSource, user.id, branchId, user.roles || []))) {
+      if (!(await verifyBranchAdmin(dataSource, user.id, user.roles || []))) {
         res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Branch admin access required' } }); return;
       }
 
-      const result = await service.approveQualification(branchId, id, user.id, req.body.reviewComment || null);
+      const result = await service.approveQualification(id, user.id, req.body.reviewComment || null);
 
       if (isServiceError(result)) {
         res.status(result.error.httpStatus).json({ success: false, error: { code: result.error.code, message: result.error.message } });
@@ -166,11 +167,11 @@ export function createInstructorController(
       const { rejectionReason } = req.body;
       if (!UUID_RE.test(branchId) || !UUID_RE.test(id)) { res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid ID' } }); return; }
       if (!rejectionReason) { res.status(400).json({ success: false, error: { code: 'REASON_REQUIRED', message: 'rejectionReason is required' } }); return; }
-      if (!(await verifyBranchAdmin(dataSource, user.id, branchId, user.roles || []))) {
+      if (!(await verifyBranchAdmin(dataSource, user.id, user.roles || []))) {
         res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Branch admin access required' } }); return;
       }
 
-      const result = await service.rejectQualification(branchId, id, user.id, rejectionReason);
+      const result = await service.rejectQualification(id, user.id, rejectionReason);
 
       if (isServiceError(result)) {
         res.status(result.error.httpStatus).json({ success: false, error: { code: result.error.code, message: result.error.message } });
@@ -192,11 +193,11 @@ export function createInstructorController(
       const { revokeReason } = req.body;
       if (!UUID_RE.test(branchId) || !UUID_RE.test(id)) { res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid ID' } }); return; }
       if (!revokeReason) { res.status(400).json({ success: false, error: { code: 'REASON_REQUIRED', message: 'revokeReason is required' } }); return; }
-      if (!(await verifyBranchAdmin(dataSource, user.id, branchId, user.roles || []))) {
+      if (!(await verifyBranchAdmin(dataSource, user.id, user.roles || []))) {
         res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Branch admin access required' } }); return;
       }
 
-      const result = await service.revokeQualification(branchId, id, user.id, revokeReason);
+      const result = await service.revokeQualification(id, user.id, revokeReason);
 
       if (isServiceError(result)) {
         res.status(result.error.httpStatus).json({ success: false, error: { code: result.error.code, message: result.error.message } });

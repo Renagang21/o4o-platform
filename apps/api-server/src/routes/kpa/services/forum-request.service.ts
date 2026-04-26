@@ -9,32 +9,34 @@ import type { DataSource } from 'typeorm';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-/** Branch admin 권한 검증 helper */
+/** KPA admin 권한 검증 helper
+ * WO-KPA-AFFILIATION-TEXT-DECOUPLING-PHASE2-V1: organization_id 인가 조건 제거
+ */
 async function verifyBranchAdmin(
   ds: DataSource,
   userId: string,
-  branchId: string,
   userRoles: string[],
 ): Promise<boolean> {
   // kpa:admin / kpa:district_admin → bypass
   if (userRoles.some(r => r === 'kpa:admin' || r === 'kpa:district_admin')) return true;
-  // 분회 소속 admin 확인
+  // KPA 활성 admin 확인
   const [member] = await ds.query(
-    `SELECT id FROM kpa_members WHERE user_id = $1 AND organization_id = $2 AND status = 'active' AND role = 'admin' LIMIT 1`,
-    [userId, branchId],
+    `SELECT id FROM kpa_members WHERE user_id = $1 AND status = 'active' AND role = 'admin' LIMIT 1`,
+    [userId],
   );
   return !!member;
 }
 
-/** 활성 회원 검증 helper */
+/** 활성 회원 검증 helper
+ * WO-KPA-AFFILIATION-TEXT-DECOUPLING-PHASE2-V1: organization_id 인가 조건 제거
+ */
 async function verifyActiveMember(
   ds: DataSource,
   userId: string,
-  organizationId: string,
 ): Promise<{ memberId: string } | null> {
   const [member] = await ds.query(
-    `SELECT id FROM kpa_members WHERE user_id = $1 AND organization_id = $2 AND status = 'active' LIMIT 1`,
-    [userId, organizationId],
+    `SELECT id FROM kpa_members WHERE user_id = $1 AND status = 'active' LIMIT 1`,
+    [userId],
   );
   return member ? { memberId: member.id } : null;
 }
@@ -91,7 +93,7 @@ export class ForumRequestService {
       return { error: { status: 400, code: 'INVALID_DESC', message: 'description은 5자 이상 필수' } };
     }
 
-    const member = await verifyActiveMember(this.dataSource, userId, organizationId);
+    const member = await verifyActiveMember(this.dataSource, userId);
     if (!member) {
       return { error: { status: 403, code: 'NOT_MEMBER', message: '해당 조직의 활성 회원이 아닙니다' } };
     }
@@ -145,7 +147,7 @@ export class ForumRequestService {
     const userRoles: string[] = user.roles || [];
     const isOwner = row.requester_id === user.id;
     const isKpaAdmin = userRoles.includes('kpa:admin');
-    const isBranchAdmin = await verifyBranchAdmin(this.dataSource, user.id, row.organization_id, userRoles);
+    const isBranchAdmin = await verifyBranchAdmin(this.dataSource, user.id, userRoles);
 
     if (!isOwner && !isKpaAdmin && !isBranchAdmin) {
       return { error: { status: 403, code: 'FORBIDDEN', message: 'Access denied' } };
@@ -185,12 +187,11 @@ export class ForumRequestService {
     return { data: rows, total, page, limit, totalPages: Math.ceil(total / limit) };
   }
 
-  /** F5: 분회 대기 요청 */
-  async listPending(branchId: string, user: ForumRequestUser): Promise<any> {
-    if (!UUID_RE.test(branchId)) {
-      return { error: { status: 400, code: 'INVALID_ID', message: 'Invalid branch ID' } };
-    }
-    if (!(await verifyBranchAdmin(this.dataSource, user.id, branchId, user.roles || []))) {
+  /** F5: 대기 요청
+   * WO-KPA-AFFILIATION-TEXT-DECOUPLING-PHASE2-V1: branchId 제거 — 서비스 레벨 조회
+   */
+  async listPending(user: ForumRequestUser): Promise<any> {
+    if (!(await verifyBranchAdmin(this.dataSource, user.id, user.roles || []))) {
       return { error: { status: 403, code: 'FORBIDDEN', message: 'Branch admin access required' } };
     }
 
@@ -198,25 +199,26 @@ export class ForumRequestService {
       `SELECT ar.*, u.name as requester_display_name, u.email as requester_display_email
        FROM kpa_approval_requests ar
        LEFT JOIN users u ON u.id = ar.requester_id
-       WHERE ar.entity_type = 'forum_category' AND ar.organization_id = $1 AND ar.status = 'pending'
+       WHERE ar.entity_type = 'forum_category' AND ar.status = 'pending'
        ORDER BY ar.created_at ASC`,
-      [branchId],
     );
     return { data: rows };
   }
 
-  /** F6: 승인 (ForumCategory 생성) — TRANSACTION */
-  async approve(branchId: string, requestId: string, user: ForumRequestUser, reviewComment?: string): Promise<any> {
-    if (!UUID_RE.test(branchId) || !UUID_RE.test(requestId)) {
+  /** F6: 승인 (ForumCategory 생성) — TRANSACTION
+   * WO-KPA-AFFILIATION-TEXT-DECOUPLING-PHASE2-V1: branchId 제거, organization_id는 fetched row에서 추출
+   */
+  async approve(requestId: string, user: ForumRequestUser, reviewComment?: string): Promise<any> {
+    if (!UUID_RE.test(requestId)) {
       return { error: { status: 400, code: 'INVALID_ID', message: 'Invalid ID' } };
     }
-    if (!(await verifyBranchAdmin(this.dataSource, user.id, branchId, user.roles || []))) {
+    if (!(await verifyBranchAdmin(this.dataSource, user.id, user.roles || []))) {
       return { error: { status: 403, code: 'FORBIDDEN', message: 'Branch admin access required' } };
     }
 
     const [ar] = await this.dataSource.query(
-      `SELECT id, status, payload, organization_id FROM kpa_approval_requests WHERE id = $1 AND organization_id = $2 AND entity_type = 'forum_category' LIMIT 1`,
-      [requestId, branchId],
+      `SELECT id, status, payload, organization_id FROM kpa_approval_requests WHERE id = $1 AND entity_type = 'forum_category' LIMIT 1`,
+      [requestId],
     );
     if (!ar) {
       return { error: { status: 404, code: 'NOT_FOUND', message: 'Request not found' } };
@@ -246,7 +248,7 @@ export class ForumRequestService {
           (id, name, description, slug, icon_emoji, is_active, require_approval, access_level, created_by, organization_id, is_organization_exclusive, created_at, updated_at)
          VALUES (gen_random_uuid(), $1, $2, $3, $4, true, false, 'all', $5, $6, true, NOW(), NOW())
          RETURNING id, slug`,
-        [payload.name, payload.description, slug, payload.iconEmoji || null, user.id, branchId],
+        [payload.name, payload.description, slug, payload.iconEmoji || null, user.id, ar.organization_id],
       );
 
       // 2b. Owner를 forum_category_members에 등록
@@ -274,18 +276,20 @@ export class ForumRequestService {
     }
   }
 
-  /** F7: 거절 */
-  async reject(branchId: string, requestId: string, user: ForumRequestUser, rejectionReason?: string): Promise<any> {
-    if (!UUID_RE.test(branchId) || !UUID_RE.test(requestId)) {
+  /** F7: 거절
+   * WO-KPA-AFFILIATION-TEXT-DECOUPLING-PHASE2-V1: branchId 제거
+   */
+  async reject(requestId: string, user: ForumRequestUser, rejectionReason?: string): Promise<any> {
+    if (!UUID_RE.test(requestId)) {
       return { error: { status: 400, code: 'INVALID_ID', message: 'Invalid ID' } };
     }
-    if (!(await verifyBranchAdmin(this.dataSource, user.id, branchId, user.roles || []))) {
+    if (!(await verifyBranchAdmin(this.dataSource, user.id, user.roles || []))) {
       return { error: { status: 403, code: 'FORBIDDEN', message: 'Branch admin access required' } };
     }
 
     const [ar] = await this.dataSource.query(
-      `SELECT id, status FROM kpa_approval_requests WHERE id = $1 AND organization_id = $2 AND entity_type = 'forum_category' LIMIT 1`,
-      [requestId, branchId],
+      `SELECT id, status FROM kpa_approval_requests WHERE id = $1 AND entity_type = 'forum_category' LIMIT 1`,
+      [requestId],
     );
     if (!ar) {
       return { error: { status: 404, code: 'NOT_FOUND', message: 'Request not found' } };
@@ -301,21 +305,23 @@ export class ForumRequestService {
     return { data: { requestId, status: 'rejected' } };
   }
 
-  /** F8: 보완 요청 */
-  async requestRevision(branchId: string, requestId: string, user: ForumRequestUser, revisionNote: string): Promise<any> {
-    if (!UUID_RE.test(branchId) || !UUID_RE.test(requestId)) {
+  /** F8: 보완 요청
+   * WO-KPA-AFFILIATION-TEXT-DECOUPLING-PHASE2-V1: branchId 제거
+   */
+  async requestRevision(requestId: string, user: ForumRequestUser, revisionNote: string): Promise<any> {
+    if (!UUID_RE.test(requestId)) {
       return { error: { status: 400, code: 'INVALID_ID', message: 'Invalid ID' } };
     }
     if (!revisionNote) {
       return { error: { status: 400, code: 'NOTE_REQUIRED', message: 'revisionNote is required' } };
     }
-    if (!(await verifyBranchAdmin(this.dataSource, user.id, branchId, user.roles || []))) {
+    if (!(await verifyBranchAdmin(this.dataSource, user.id, user.roles || []))) {
       return { error: { status: 403, code: 'FORBIDDEN', message: 'Branch admin access required' } };
     }
 
     const [ar] = await this.dataSource.query(
-      `SELECT id, status FROM kpa_approval_requests WHERE id = $1 AND organization_id = $2 AND entity_type = 'forum_category' LIMIT 1`,
-      [requestId, branchId],
+      `SELECT id, status FROM kpa_approval_requests WHERE id = $1 AND entity_type = 'forum_category' LIMIT 1`,
+      [requestId],
     );
     if (!ar) {
       return { error: { status: 404, code: 'NOT_FOUND', message: 'Request not found' } };

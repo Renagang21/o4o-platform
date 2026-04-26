@@ -15,35 +15,37 @@ export class InstructorService {
 
   // ── Helpers ──────────────────────────────────────────────────────
 
-  /** 강사 자격 — active KPA 회원 확인 helper */
+  /** 강사 자격 — active KPA 회원 확인 helper
+   * WO-KPA-AFFILIATION-TEXT-DECOUPLING-PHASE2-V1: organization_id 인가 조건 제거
+   */
   async verifyActiveMember(
     userId: string,
-    organizationId: string,
   ): Promise<{ memberId: string } | null> {
     const [member] = await this.dataSource.query(
-      `SELECT id FROM kpa_members WHERE user_id = $1 AND organization_id = $2 AND status = 'active' LIMIT 1`,
-      [userId, organizationId],
+      `SELECT id FROM kpa_members WHERE user_id = $1 AND status = 'active' LIMIT 1`,
+      [userId],
     );
     return member ? { memberId: member.id } : null;
   }
 
-  /** 강사 자격 — approved qualification 확인 helper (dual-query: legacy + unified) */
+  /** 강사 자격 — approved qualification 확인 helper (dual-query: legacy + unified)
+   * WO-KPA-AFFILIATION-TEXT-DECOUPLING-PHASE2-V1: organization_id 인가 조건 제거
+   */
   async verifyQualifiedInstructor(
     userId: string,
-    organizationId: string,
     userRoles: string[],
   ): Promise<{ qualificationId: string } | null> {
     if (userRoles.some(r => r === 'kpa:admin')) return { qualificationId: 'admin-bypass' };
     // 1. Check unified table first
     const [qNew] = await this.dataSource.query(
-      `SELECT id FROM kpa_approval_requests WHERE requester_id = $1 AND organization_id = $2 AND entity_type = 'instructor_qualification' AND status = 'approved' LIMIT 1`,
-      [userId, organizationId],
+      `SELECT id FROM kpa_approval_requests WHERE requester_id = $1 AND entity_type = 'instructor_qualification' AND status = 'approved' LIMIT 1`,
+      [userId],
     );
     if (qNew) return { qualificationId: qNew.id };
     // 2. Fallback to legacy table (transition period)
     const [qLegacy] = await this.dataSource.query(
-      `SELECT id FROM kpa_instructor_qualifications WHERE user_id = $1 AND organization_id = $2 AND status = 'approved' LIMIT 1`,
-      [userId, organizationId],
+      `SELECT id FROM kpa_instructor_qualifications WHERE user_id = $1 AND status = 'approved' LIMIT 1`,
+      [userId],
     );
     return qLegacy ? { qualificationId: qLegacy.id } : null;
   }
@@ -65,23 +67,24 @@ export class InstructorService {
     },
   ): Promise<{ qualificationId: string; status: string } | { error: { code: string; message: string; httpStatus: number } }> {
     // 활성 회원 확인
-    const memberCheck = await this.verifyActiveMember(userId, organizationId);
+    const memberCheck = await this.verifyActiveMember(userId);
     if (!memberCheck) {
       return { error: { code: 'NOT_ACTIVE_MEMBER', message: '해당 분회의 활성 회원만 강사 자격을 신청할 수 있습니다', httpStatus: 403 } };
     }
 
     // 중복 확인 — dual-query (legacy + unified)
+    // WO-KPA-AFFILIATION-TEXT-DECOUPLING-PHASE2-V1: organization_id 인가 조건 제거
     const [existingNew] = await this.dataSource.query(
-      `SELECT id, status FROM kpa_approval_requests WHERE requester_id = $1 AND organization_id = $2 AND entity_type = 'instructor_qualification' AND status IN ('pending', 'approved') LIMIT 1`,
-      [userId, organizationId],
+      `SELECT id, status FROM kpa_approval_requests WHERE requester_id = $1 AND entity_type = 'instructor_qualification' AND status IN ('pending', 'approved') LIMIT 1`,
+      [userId],
     );
     if (existingNew) {
       const msg = existingNew.status === 'pending' ? '이미 대기 중인 신청이 있습니다' : '이미 승인된 자격이 있습니다';
       return { error: { code: 'DUPLICATE', message: msg, httpStatus: 409 } };
     }
     const [existingLegacy] = await this.dataSource.query(
-      `SELECT id, status FROM kpa_instructor_qualifications WHERE user_id = $1 AND organization_id = $2 AND status IN ('pending', 'approved') LIMIT 1`,
-      [userId, organizationId],
+      `SELECT id, status FROM kpa_instructor_qualifications WHERE user_id = $1 AND status IN ('pending', 'approved') LIMIT 1`,
+      [userId],
     );
     if (existingLegacy) {
       const msg = existingLegacy.status === 'pending' ? '이미 대기 중인 신청이 있습니다' : '이미 승인된 자격이 있습니다';
@@ -144,7 +147,8 @@ export class InstructorService {
 
   // ── Q3: 분회 내 자격 목록 ──────────────────────────────────────
 
-  async listQualifications(branchId: string, filters: { status?: string }): Promise<any[]> {
+  // WO-KPA-AFFILIATION-TEXT-DECOUPLING-PHASE2-V1: branchId 제거 — 서비스 레벨 조회
+  async listQualifications(filters: { status?: string }): Promise<any[]> {
     const validStatuses = ['pending', 'approved', 'rejected', 'revoked'];
 
     // Unified table
@@ -161,10 +165,10 @@ export class InstructorService {
                          u.name AS user_name, u.email AS user_email
                   FROM kpa_approval_requests ar
                   LEFT JOIN users u ON u.id = ar.requester_id
-                  WHERE ar.entity_type = 'instructor_qualification' AND ar.organization_id = $1`;
-    const paramsNew: any[] = [branchId];
+                  WHERE ar.entity_type = 'instructor_qualification'`;
+    const paramsNew: any[] = [];
     if (filters.status && typeof filters.status === 'string' && validStatuses.includes(filters.status)) {
-      sqlNew += ` AND ar.status = $2`;
+      sqlNew += ` AND ar.status = $1`;
       paramsNew.push(filters.status);
     }
     sqlNew += ` ORDER BY ar.created_at DESC`;
@@ -175,10 +179,10 @@ export class InstructorService {
                             u.name AS user_name, u.email AS user_email
                      FROM kpa_instructor_qualifications q
                      LEFT JOIN users u ON u.id = q.user_id
-                     WHERE q.organization_id = $1`;
-    const paramsLegacy: any[] = [branchId];
+                     WHERE 1=1`;
+    const paramsLegacy: any[] = [];
     if (filters.status && typeof filters.status === 'string' && validStatuses.includes(filters.status)) {
-      sqlLegacy += ` AND q.status = $2`;
+      sqlLegacy += ` AND q.status = $1`;
       paramsLegacy.push(filters.status);
     }
     sqlLegacy += ` ORDER BY q.created_at DESC`;
@@ -192,7 +196,8 @@ export class InstructorService {
 
   // ── Q4: 대기 중 자격만 ──────────────────────────────────────────
 
-  async getPendingQualifications(branchId: string): Promise<any[]> {
+  // WO-KPA-AFFILIATION-TEXT-DECOUPLING-PHASE2-V1: branchId 제거 — 서비스 레벨 조회
+  async getPendingQualifications(): Promise<any[]> {
     // Unified table
     const newRows = await this.dataSource.query(
       `SELECT ar.id, ar.requester_id AS user_id,
@@ -206,9 +211,8 @@ export class InstructorService {
               u.name AS user_name, u.email AS user_email
        FROM kpa_approval_requests ar
        LEFT JOIN users u ON u.id = ar.requester_id
-       WHERE ar.entity_type = 'instructor_qualification' AND ar.organization_id = $1 AND ar.status = 'pending'
+       WHERE ar.entity_type = 'instructor_qualification' AND ar.status = 'pending'
        ORDER BY ar.created_at ASC`,
-      [branchId],
     );
     // Legacy table (transition period)
     const legacyRows = await this.dataSource.query(
@@ -217,25 +221,24 @@ export class InstructorService {
               u.name AS user_name, u.email AS user_email
        FROM kpa_instructor_qualifications q
        LEFT JOIN users u ON u.id = q.user_id
-       WHERE q.organization_id = $1 AND q.status = 'pending'
+       WHERE q.status = 'pending'
        ORDER BY q.created_at ASC`,
-      [branchId],
     );
     return [...newRows, ...legacyRows];
   }
 
   // ── Q5: 승인 (TRANSACTION with role assignment) ──────────────────
 
+  // WO-KPA-AFFILIATION-TEXT-DECOUPLING-PHASE2-V1: branchId 제거
   async approveQualification(
-    branchId: string,
     qualificationId: string,
     reviewerId: string,
     reviewComment?: string,
   ): Promise<{ qualificationId: string; status: string; roleAssigned: string } | { error: { code: string; message: string; httpStatus: number } }> {
     // Try unified table first
     const [arRow] = await this.dataSource.query(
-      `SELECT id, requester_id, status FROM kpa_approval_requests WHERE id = $1 AND organization_id = $2 AND entity_type = 'instructor_qualification' LIMIT 1`,
-      [qualificationId, branchId],
+      `SELECT id, requester_id, status FROM kpa_approval_requests WHERE id = $1 AND entity_type = 'instructor_qualification' LIMIT 1`,
+      [qualificationId],
     );
     if (arRow) {
       if (arRow.status !== 'pending') {
@@ -262,8 +265,8 @@ export class InstructorService {
 
     // Fallback: legacy table
     const [qual] = await this.dataSource.query(
-      `SELECT id, user_id, status FROM kpa_instructor_qualifications WHERE id = $1 AND organization_id = $2 LIMIT 1`,
-      [qualificationId, branchId],
+      `SELECT id, user_id, status FROM kpa_instructor_qualifications WHERE id = $1 LIMIT 1`,
+      [qualificationId],
     );
     if (!qual) {
       return { error: { code: 'NOT_FOUND', message: 'Qualification not found', httpStatus: 404 } };
@@ -293,16 +296,16 @@ export class InstructorService {
 
   // ── Q6: 거절 ──────────────────────────────────────────────────
 
+  // WO-KPA-AFFILIATION-TEXT-DECOUPLING-PHASE2-V1: branchId 제거
   async rejectQualification(
-    branchId: string,
     qualificationId: string,
     reviewerId: string,
     reason?: string,
   ): Promise<{ qualificationId: string; status: string } | { error: { code: string; message: string; httpStatus: number } }> {
     // Try unified table first
     const [arRow] = await this.dataSource.query(
-      `SELECT id, status FROM kpa_approval_requests WHERE id = $1 AND organization_id = $2 AND entity_type = 'instructor_qualification' LIMIT 1`,
-      [qualificationId, branchId],
+      `SELECT id, status FROM kpa_approval_requests WHERE id = $1 AND entity_type = 'instructor_qualification' LIMIT 1`,
+      [qualificationId],
     );
     if (arRow) {
       if (arRow.status !== 'pending') {
@@ -317,8 +320,8 @@ export class InstructorService {
 
     // Fallback: legacy table
     const [qual] = await this.dataSource.query(
-      `SELECT id, status FROM kpa_instructor_qualifications WHERE id = $1 AND organization_id = $2 LIMIT 1`,
-      [qualificationId, branchId],
+      `SELECT id, status FROM kpa_instructor_qualifications WHERE id = $1 LIMIT 1`,
+      [qualificationId],
     );
     if (!qual) {
       return { error: { code: 'NOT_FOUND', message: 'Qualification not found', httpStatus: 404 } };
@@ -336,16 +339,16 @@ export class InstructorService {
 
   // ── Q7: 해지 (TRANSACTION with role removal) ──────────────────
 
+  // WO-KPA-AFFILIATION-TEXT-DECOUPLING-PHASE2-V1: branchId 제거
   async revokeQualification(
-    branchId: string,
     qualificationId: string,
     reviewerId: string,
     reason?: string,
   ): Promise<{ qualificationId: string; status: string } | { error: { code: string; message: string; httpStatus: number } }> {
     // Try unified table first
     const [arRow] = await this.dataSource.query(
-      `SELECT id, requester_id, status FROM kpa_approval_requests WHERE id = $1 AND organization_id = $2 AND entity_type = 'instructor_qualification' LIMIT 1`,
-      [qualificationId, branchId],
+      `SELECT id, requester_id, status FROM kpa_approval_requests WHERE id = $1 AND entity_type = 'instructor_qualification' LIMIT 1`,
+      [qualificationId],
     );
     if (arRow) {
       if (arRow.status !== 'approved') {
@@ -374,8 +377,8 @@ export class InstructorService {
 
     // Fallback: legacy table
     const [qual] = await this.dataSource.query(
-      `SELECT id, user_id, status FROM kpa_instructor_qualifications WHERE id = $1 AND organization_id = $2 LIMIT 1`,
-      [qualificationId, branchId],
+      `SELECT id, user_id, status FROM kpa_instructor_qualifications WHERE id = $1 LIMIT 1`,
+      [qualificationId],
     );
     if (!qual) {
       return { error: { code: 'NOT_FOUND', message: 'Qualification not found', httpStatus: 404 } };

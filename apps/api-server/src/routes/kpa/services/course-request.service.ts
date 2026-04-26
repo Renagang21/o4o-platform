@@ -17,51 +17,54 @@ export class CourseRequestService {
 
   // ── Helpers ──
 
-  /** 강사 자격 — active KPA 회원 확인 helper */
+  /** 강사 자격 — active KPA 회원 확인 helper
+   * WO-KPA-AFFILIATION-TEXT-DECOUPLING-PHASE2-V1: organization_id 인가 조건 제거
+   */
   async verifyActiveMember(
     userId: string,
-    organizationId: string,
   ): Promise<{ memberId: string } | null> {
     const [member] = await this.dataSource.query(
-      `SELECT id FROM kpa_members WHERE user_id = $1 AND organization_id = $2 AND status = 'active' LIMIT 1`,
-      [userId, organizationId],
+      `SELECT id FROM kpa_members WHERE user_id = $1 AND status = 'active' LIMIT 1`,
+      [userId],
     );
     return member ? { memberId: member.id } : null;
   }
 
-  /** 강사 자격 — approved qualification 확인 helper (dual-query: legacy + unified) */
+  /** 강사 자격 — approved qualification 확인 helper (dual-query: legacy + unified)
+   * WO-KPA-AFFILIATION-TEXT-DECOUPLING-PHASE2-V1: organization_id 인가 조건 제거
+   */
   async verifyQualifiedInstructor(
     userId: string,
-    organizationId: string,
     userRoles: string[],
   ): Promise<{ qualificationId: string } | null> {
     if (userRoles.some(r => r === 'kpa:admin')) return { qualificationId: 'admin-bypass' };
     // 1. Check unified table first
     const [qNew] = await this.dataSource.query(
-      `SELECT id FROM kpa_approval_requests WHERE requester_id = $1 AND organization_id = $2 AND entity_type = 'instructor_qualification' AND status = 'approved' LIMIT 1`,
-      [userId, organizationId],
+      `SELECT id FROM kpa_approval_requests WHERE requester_id = $1 AND entity_type = 'instructor_qualification' AND status = 'approved' LIMIT 1`,
+      [userId],
     );
     if (qNew) return { qualificationId: qNew.id };
     // 2. Fallback to legacy table (transition period)
     const [qLegacy] = await this.dataSource.query(
-      `SELECT id FROM kpa_instructor_qualifications WHERE user_id = $1 AND organization_id = $2 AND status = 'approved' LIMIT 1`,
-      [userId, organizationId],
+      `SELECT id FROM kpa_instructor_qualifications WHERE user_id = $1 AND status = 'approved' LIMIT 1`,
+      [userId],
     );
     return qLegacy ? { qualificationId: qLegacy.id } : null;
   }
 
-  /** Branch admin 권한 검증 helper */
+  /** KPA admin 권한 검증 helper
+   * WO-KPA-AFFILIATION-TEXT-DECOUPLING-PHASE2-V1: organization_id 인가 조건 제거
+   */
   private async verifyBranchAdmin(
     userId: string,
-    branchId: string,
     userRoles: string[],
   ): Promise<boolean> {
     // kpa:admin / kpa:district_admin → bypass
     if (userRoles.some(r => r === 'kpa:admin' || r === 'kpa:district_admin')) return true;
-    // 분회 소속 admin 확인
+    // KPA 활성 admin 확인
     const [member] = await this.dataSource.query(
-      `SELECT id FROM kpa_members WHERE user_id = $1 AND organization_id = $2 AND status = 'active' AND role = 'admin' LIMIT 1`,
-      [userId, branchId],
+      `SELECT id FROM kpa_members WHERE user_id = $1 AND status = 'active' AND role = 'admin' LIMIT 1`,
+      [userId],
     );
     return !!member;
   }
@@ -94,7 +97,7 @@ export class CourseRequestService {
     }
 
     // qualification 확인 (dual-query: unified + legacy)
-    const qualCheck = await this.verifyQualifiedInstructor(userId, organizationId, userRoles || []);
+    const qualCheck = await this.verifyQualifiedInstructor(userId, userRoles || []);
     if (!qualCheck) {
       return { success: false, error: { code: 'NOT_QUALIFIED', message: '승인된 강사 자격이 필요합니다' }, status: 403 };
     }
@@ -173,7 +176,7 @@ export class CourseRequestService {
     );
     if (arRow) {
       if (arRow.requester_id !== userId) {
-        if (!(await this.verifyBranchAdmin(userId, arRow.organization_id, userRoles))) {
+        if (!(await this.verifyBranchAdmin(userId, userRoles))) {
           return { success: false, error: { code: 'FORBIDDEN', message: 'Access denied' }, status: 403 };
         }
       }
@@ -189,7 +192,7 @@ export class CourseRequestService {
       return { success: false, error: { code: 'NOT_FOUND', message: 'Course request not found' }, status: 404 };
     }
     if (row.instructor_id !== userId) {
-      if (!(await this.verifyBranchAdmin(userId, row.organization_id, userRoles))) {
+      if (!(await this.verifyBranchAdmin(userId, userRoles))) {
         return { success: false, error: { code: 'FORBIDDEN', message: 'Access denied' }, status: 403 };
       }
     }
@@ -378,15 +381,12 @@ export class CourseRequestService {
 
   // ── C7: 분회 내 기획안 목록 ──
 
+  // WO-KPA-AFFILIATION-TEXT-DECOUPLING-PHASE2-V1: branchId 제거 — 서비스 레벨 조회
   async listByBranch(
-    branchId: string,
     userId: string,
     userRoles: string[],
   ): Promise<{ success: true; data: any } | { success: false; error: any; status: number }> {
-    if (!UUID_RE.test(branchId)) {
-      return { success: false, error: { code: 'INVALID_ID', message: 'Invalid branch ID' }, status: 400 };
-    }
-    if (!(await this.verifyBranchAdmin(userId, branchId, userRoles))) {
+    if (!(await this.verifyBranchAdmin(userId, userRoles))) {
       return { success: false, error: { code: 'FORBIDDEN', message: 'Branch admin access required' }, status: 403 };
     }
 
@@ -404,9 +404,8 @@ export class CourseRequestService {
                 u.name AS instructor_name, u.email AS instructor_email
          FROM kpa_approval_requests ar
          LEFT JOIN users u ON u.id = ar.requester_id
-         WHERE ar.entity_type = 'course' AND ar.organization_id = $1
+         WHERE ar.entity_type = 'course'
          ORDER BY ar.created_at DESC`,
-        [branchId],
       ),
       this.dataSource.query(
         `SELECT cr.id, cr.instructor_id, cr.proposed_title, cr.proposed_level, cr.proposed_duration, cr.proposed_credits,
@@ -414,9 +413,7 @@ export class CourseRequestService {
                 u.name AS instructor_name, u.email AS instructor_email
          FROM kpa_course_requests cr
          LEFT JOIN users u ON u.id = cr.instructor_id
-         WHERE cr.organization_id = $1
          ORDER BY cr.created_at DESC`,
-        [branchId],
       ),
     ]);
     return { success: true, data: [...newRows, ...legacyRows] };
@@ -424,15 +421,12 @@ export class CourseRequestService {
 
   // ── C8: 제출된 기획안만 ──
 
+  // WO-KPA-AFFILIATION-TEXT-DECOUPLING-PHASE2-V1: branchId 제거 — 서비스 레벨 조회
   async listPending(
-    branchId: string,
     userId: string,
     userRoles: string[],
   ): Promise<{ success: true; data: any } | { success: false; error: any; status: number }> {
-    if (!UUID_RE.test(branchId)) {
-      return { success: false, error: { code: 'INVALID_ID', message: 'Invalid branch ID' }, status: 400 };
-    }
-    if (!(await this.verifyBranchAdmin(userId, branchId, userRoles))) {
+    if (!(await this.verifyBranchAdmin(userId, userRoles))) {
       return { success: false, error: { code: 'FORBIDDEN', message: 'Branch admin access required' }, status: 403 };
     }
 
@@ -448,9 +442,8 @@ export class CourseRequestService {
                 u.name AS instructor_name, u.email AS instructor_email
          FROM kpa_approval_requests ar
          LEFT JOIN users u ON u.id = ar.requester_id
-         WHERE ar.entity_type = 'course' AND ar.organization_id = $1 AND ar.status = 'submitted'
+         WHERE ar.entity_type = 'course' AND ar.status = 'submitted'
          ORDER BY ar.submitted_at ASC`,
-        [branchId],
       ),
       this.dataSource.query(
         `SELECT cr.id, cr.instructor_id, cr.proposed_title, cr.proposed_description, cr.proposed_level, cr.proposed_duration,
@@ -458,9 +451,8 @@ export class CourseRequestService {
                 u.name AS instructor_name, u.email AS instructor_email
          FROM kpa_course_requests cr
          LEFT JOIN users u ON u.id = cr.instructor_id
-         WHERE cr.organization_id = $1 AND cr.status = 'submitted'
+         WHERE cr.status = 'submitted'
          ORDER BY cr.submitted_at ASC`,
-        [branchId],
       ),
     ]);
     return { success: true, data: [...newRows, ...legacyRows] };
@@ -468,24 +460,24 @@ export class CourseRequestService {
 
   // ── C9: 승인 → Course 생성 (TRANSACTION) ──
 
+  // WO-KPA-AFFILIATION-TEXT-DECOUPLING-PHASE2-V1: branchId 제거, organization_id는 fetched row에서 추출
   async approve(
-    branchId: string,
     requestId: string,
     reviewerId: string,
     userRoles: string[],
     reviewComment?: string,
   ): Promise<{ success: true; data: any } | { success: false; error: any; status: number }> {
-    if (!UUID_RE.test(branchId) || !UUID_RE.test(requestId)) {
+    if (!UUID_RE.test(requestId)) {
       return { success: false, error: { code: 'INVALID_ID', message: 'Invalid ID' }, status: 400 };
     }
-    if (!(await this.verifyBranchAdmin(reviewerId, branchId, userRoles))) {
+    if (!(await this.verifyBranchAdmin(reviewerId, userRoles))) {
       return { success: false, error: { code: 'FORBIDDEN', message: 'Branch admin access required' }, status: 403 };
     }
 
     // Try unified table first
     const [arRow] = await this.dataSource.query(
-      `SELECT * FROM kpa_approval_requests WHERE id = $1 AND organization_id = $2 AND entity_type = 'course' LIMIT 1`,
-      [requestId, branchId],
+      `SELECT * FROM kpa_approval_requests WHERE id = $1 AND entity_type = 'course' LIMIT 1`,
+      [requestId],
     );
     if (arRow) {
       if (arRow.status !== 'submitted') {
@@ -510,7 +502,7 @@ export class CourseRequestService {
           credits: Number(payload.proposed_credits) || 0,
           tags: payload.proposed_tags || [],
           instructorId: payload.instructor_id || arRow.requester_id,
-          organizationId: branchId,
+          organizationId: arRow.organization_id,
           isOrganizationExclusive: true,
           metadata: { kpaCourseRequestId: requestId, createdVia: 'kpa_extension' },
         });
@@ -530,8 +522,8 @@ export class CourseRequestService {
 
     // Fallback: legacy table
     const [cr] = await this.dataSource.query(
-      `SELECT * FROM kpa_course_requests WHERE id = $1 AND organization_id = $2 LIMIT 1`,
-      [requestId, branchId],
+      `SELECT * FROM kpa_course_requests WHERE id = $1 LIMIT 1`,
+      [requestId],
     );
     if (!cr) {
       return { success: false, error: { code: 'NOT_FOUND', message: 'Course request not found' }, status: 404 };
@@ -557,7 +549,7 @@ export class CourseRequestService {
         credits: Number(cr.proposed_credits) || 0,
         tags: cr.proposed_tags || [],
         instructorId: cr.instructor_id,
-        organizationId: branchId,
+        organizationId: cr.organization_id,
         isOrganizationExclusive: true,
         metadata: { kpaCourseRequestId: requestId, createdVia: 'kpa_extension' },
       });
@@ -577,27 +569,27 @@ export class CourseRequestService {
 
   // ── C10: 거절 ──
 
+  // WO-KPA-AFFILIATION-TEXT-DECOUPLING-PHASE2-V1: branchId 제거
   async reject(
-    branchId: string,
     requestId: string,
     reviewerId: string,
     userRoles: string[],
     rejectionReason?: string,
   ): Promise<{ success: true; data: any } | { success: false; error: any; status: number }> {
-    if (!UUID_RE.test(branchId) || !UUID_RE.test(requestId)) {
+    if (!UUID_RE.test(requestId)) {
       return { success: false, error: { code: 'INVALID_ID', message: 'Invalid ID' }, status: 400 };
     }
     if (!rejectionReason) {
       return { success: false, error: { code: 'REASON_REQUIRED', message: 'rejectionReason is required' }, status: 400 };
     }
-    if (!(await this.verifyBranchAdmin(reviewerId, branchId, userRoles))) {
+    if (!(await this.verifyBranchAdmin(reviewerId, userRoles))) {
       return { success: false, error: { code: 'FORBIDDEN', message: 'Branch admin access required' }, status: 403 };
     }
 
     // Try unified table first
     const [arRow] = await this.dataSource.query(
-      `SELECT id, status FROM kpa_approval_requests WHERE id = $1 AND organization_id = $2 AND entity_type = 'course' LIMIT 1`,
-      [requestId, branchId],
+      `SELECT id, status FROM kpa_approval_requests WHERE id = $1 AND entity_type = 'course' LIMIT 1`,
+      [requestId],
     );
     if (arRow) {
       if (arRow.status !== 'submitted') {
@@ -612,8 +604,8 @@ export class CourseRequestService {
 
     // Fallback: legacy table
     const [cr] = await this.dataSource.query(
-      `SELECT id, status FROM kpa_course_requests WHERE id = $1 AND organization_id = $2 LIMIT 1`,
-      [requestId, branchId],
+      `SELECT id, status FROM kpa_course_requests WHERE id = $1 LIMIT 1`,
+      [requestId],
     );
     if (!cr) {
       return { success: false, error: { code: 'NOT_FOUND', message: 'Course request not found' }, status: 404 };
@@ -630,27 +622,27 @@ export class CourseRequestService {
 
   // ── C11: 보완 요청 ──
 
+  // WO-KPA-AFFILIATION-TEXT-DECOUPLING-PHASE2-V1: branchId 제거
   async requestRevision(
-    branchId: string,
     requestId: string,
     reviewerId: string,
     userRoles: string[],
     revisionNote?: string,
   ): Promise<{ success: true; data: any } | { success: false; error: any; status: number }> {
-    if (!UUID_RE.test(branchId) || !UUID_RE.test(requestId)) {
+    if (!UUID_RE.test(requestId)) {
       return { success: false, error: { code: 'INVALID_ID', message: 'Invalid ID' }, status: 400 };
     }
     if (!revisionNote) {
       return { success: false, error: { code: 'NOTE_REQUIRED', message: 'revisionNote is required' }, status: 400 };
     }
-    if (!(await this.verifyBranchAdmin(reviewerId, branchId, userRoles))) {
+    if (!(await this.verifyBranchAdmin(reviewerId, userRoles))) {
       return { success: false, error: { code: 'FORBIDDEN', message: 'Branch admin access required' }, status: 403 };
     }
 
     // Try unified table first
     const [arRow] = await this.dataSource.query(
-      `SELECT id, status FROM kpa_approval_requests WHERE id = $1 AND organization_id = $2 AND entity_type = 'course' LIMIT 1`,
-      [requestId, branchId],
+      `SELECT id, status FROM kpa_approval_requests WHERE id = $1 AND entity_type = 'course' LIMIT 1`,
+      [requestId],
     );
     if (arRow) {
       if (arRow.status !== 'submitted') {
@@ -665,8 +657,8 @@ export class CourseRequestService {
 
     // Fallback: legacy table
     const [cr] = await this.dataSource.query(
-      `SELECT id, status FROM kpa_course_requests WHERE id = $1 AND organization_id = $2 LIMIT 1`,
-      [requestId, branchId],
+      `SELECT id, status FROM kpa_course_requests WHERE id = $1 LIMIT 1`,
+      [requestId],
     );
     if (!cr) {
       return { success: false, error: { code: 'NOT_FOUND', message: 'Course request not found' }, status: 404 };

@@ -167,7 +167,7 @@ export function createCourseRequestController(
       const { branchId } = req.params;
       const user = (req as any).user;
 
-      const result = await service.listByBranch(branchId, user.id, user.roles || []);
+      const result = await service.listByBranch(user.id, user.roles || []);
 
       if (isServiceError(result)) {
         res.status(result.status).json({ success: false, error: result.error });
@@ -185,7 +185,7 @@ export function createCourseRequestController(
       const { branchId } = req.params;
       const user = (req as any).user;
 
-      const result = await service.listPending(branchId, user.id, user.roles || []);
+      const result = await service.listPending(user.id, user.roles || []);
 
       if (isServiceError(result)) {
         res.status(result.status).json({ success: false, error: result.error });
@@ -203,7 +203,7 @@ export function createCourseRequestController(
       const { branchId, id } = req.params;
       const user = (req as any).user;
 
-      const result = await service.approve(branchId, id, user.id, user.roles || [], req.body.reviewComment);
+      const result = await service.approve(id, user.id, user.roles || [], req.body.reviewComment);
 
       if (isServiceError(result)) {
         res.status(result.status).json({ success: false, error: result.error });
@@ -222,7 +222,7 @@ export function createCourseRequestController(
       const user = (req as any).user;
       const { rejectionReason } = req.body;
 
-      const result = await service.reject(branchId, id, user.id, user.roles || [], rejectionReason);
+      const result = await service.reject(id, user.id, user.roles || [], rejectionReason);
 
       if (isServiceError(result)) {
         res.status(result.status).json({ success: false, error: result.error });
@@ -241,7 +241,7 @@ export function createCourseRequestController(
       const user = (req as any).user;
       const { revisionNote } = req.body;
 
-      const result = await service.requestRevision(branchId, id, user.id, user.roles || [], revisionNote);
+      const result = await service.requestRevision(id, user.id, user.roles || [], revisionNote);
 
       if (isServiceError(result)) {
         res.status(result.status).json({ success: false, error: result.error });

@@ -39,15 +39,25 @@ async function isKpaOrganization(orgId: string): Promise<boolean> {
 }
 
 /**
- * Verify that user has approved KPA instructor qualification for the org.
+ * Verify that user has approved KPA instructor qualification.
+ * WO-KPA-AFFILIATION-TEXT-DECOUPLING-PHASE2-V1: organization_id 인가 조건 제거, dual-query 추가
  */
-async function hasKpaQualification(userId: string, orgId: string): Promise<boolean> {
+async function hasKpaQualification(userId: string): Promise<boolean> {
   try {
+    // 1. Check unified table first
+    const [arRow] = await AppDataSource.query(
+      `SELECT id FROM kpa_approval_requests
+       WHERE requester_id = $1 AND entity_type = 'instructor_qualification' AND status = 'approved'
+       LIMIT 1`,
+      [userId],
+    );
+    if (arRow) return true;
+    // 2. Fallback to legacy table (transition period)
     const [row] = await AppDataSource.query(
       `SELECT id FROM kpa_instructor_qualifications
-       WHERE user_id = $1 AND organization_id = $2 AND status = 'approved'
+       WHERE user_id = $1 AND status = 'approved'
        LIMIT 1`,
-      [userId, orgId],
+      [userId],
     );
     return !!row;
   } catch {
@@ -107,7 +117,7 @@ export function kpaLmsScopeGuard(req: Request, res: Response, next: NextFunction
       if (!isKpa) return next();
 
       // KPA org → require qualification
-      const qualified = await hasKpaQualification(user.id, organizationId);
+      const qualified = await hasKpaQualification(user.id);
       if (!qualified) {
         logger.warn('[kpaLmsScopeGuard] KPA course operation blocked — no qualification', {
           userId: user.id,

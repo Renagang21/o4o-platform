@@ -108,7 +108,7 @@ export function createForumRequestController(
       const user = (req as any).user;
       const { branchId } = req.params;
 
-      const result = await service.listPending(branchId, user);
+      const result = await service.listPending(user);
 
       if (result.error) {
         res.status(result.error.status).json({
@@ -131,7 +131,7 @@ export function createForumRequestController(
       const { branchId, id } = req.params;
       const { reviewComment } = req.body;
 
-      const result = await service.approve(branchId, id, user, reviewComment);
+      const result = await service.approve(id, user, reviewComment);
 
       if (result.error) {
         res.status(result.error.status).json({
@@ -154,7 +154,7 @@ export function createForumRequestController(
       const { branchId, id } = req.params;
       const { rejectionReason } = req.body;
 
-      const result = await service.reject(branchId, id, user, rejectionReason);
+      const result = await service.reject(id, user, rejectionReason);
 
       if (result.error) {
         res.status(result.error.status).json({
@@ -177,7 +177,7 @@ export function createForumRequestController(
       const { branchId, id } = req.params;
       const { revisionNote } = req.body;
 
-      const result = await service.requestRevision(branchId, id, user, revisionNote);
+      const result = await service.requestRevision(id, user, revisionNote);
 
       if (result.error) {
         res.status(result.error.status).json({
