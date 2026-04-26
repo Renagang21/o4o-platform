@@ -53,55 +53,31 @@ export async function derivePharmacistQualification(userId: string): Promise<{
   pharmacistFunction: string | null;
   isStoreOwner: boolean;
 }> {
-  // WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1
-  // PRIMARY: role_assignments 기반 store owner 판정
-  let isStoreOwner = false;
-  try {
-    const [raRecord] = await AppDataSource.query(
-      `SELECT 1 FROM role_assignments WHERE user_id = $1 AND role = 'kpa:store_owner' AND is_active = true LIMIT 1`,
-      [userId]
-    );
-    isStoreOwner = !!raRecord;
-  } catch { /* role_assignments table issue */ }
+  // WO-O4O-STORE-OWNER-LEGACY-CLEANUP-V1
+  // role_assignments는 store_owner 판단의 단일 소스다.
+  const [raRecord] = await AppDataSource.query(
+    `SELECT 1 FROM role_assignments
+     WHERE user_id = $1
+       AND role IN ('kpa:store_owner', 'glycopharm:store_owner', 'cosmetics:store_owner')
+       AND is_active = true
+     LIMIT 1`,
+    [userId]
+  );
+  const isStoreOwner = !!raRecord;
 
-  // FALLBACK (legacy): organization_members + activity_type
-  // TODO: WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1 Phase 7 — remove after full transition
-  if (!isStoreOwner) {
-    try {
-      const [ownerRecord] = await AppDataSource.query(
-        `SELECT 1 FROM organization_members WHERE user_id = $1 AND role = 'owner' AND left_at IS NULL LIMIT 1`,
-        [userId]
-      );
-      if (ownerRecord) {
-        isStoreOwner = true;
-        console.warn(`[derivePharmacistQualification] Legacy fallback: org_members.role=owner for user ${userId}`);
-      }
-    } catch { /* table may not exist */ }
-  }
-
-  // 2. Query kpa_pharmacist_profiles for activity_type
   const [profile] = await AppDataSource.query(
     `SELECT activity_type FROM kpa_pharmacist_profiles WHERE user_id = $1 LIMIT 1`,
     [userId]
   );
 
-  // 3. Derive pharmacistRole (backward compatible)
+  const pharmacistFunction: string | null = profile?.activity_type || null;
+
   let pharmacistRole: string | null = null;
   if (isStoreOwner) {
     pharmacistRole = 'pharmacy_owner';
   } else if (profile?.activity_type) {
-    if (profile.activity_type === 'pharmacy_owner') {
-      pharmacistRole = 'pharmacy_owner';
-      isStoreOwner = true;
-      // TODO: WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1 Phase 7 — remove legacy path
-      console.warn(`[derivePharmacistQualification] Legacy fallback: activity_type=pharmacy_owner for user ${userId}`);
-    } else {
-      pharmacistRole = 'general';
-    }
+    pharmacistRole = 'general';
   }
-
-  // 4. pharmacistFunction = activityType 직통 (SSOT 정합성)
-  const pharmacistFunction: string | null = profile?.activity_type || null;
 
   return { pharmacistRole, pharmacistFunction, isStoreOwner };
 }

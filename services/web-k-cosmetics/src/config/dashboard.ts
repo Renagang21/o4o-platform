@@ -12,7 +12,7 @@ export const ROLE_LABELS: Record<string, string> = {
   'k-cosmetics:admin': '관리자',
   'k-cosmetics:operator': '운영자',
   'k-cosmetics:supplier': '공급자',
-  'k-cosmetics:seller': '판매자',
+  'cosmetics:store_owner': '매장 운영자',
   'k-cosmetics:partner': '파트너',
   user: '사용자',
 };
@@ -23,8 +23,7 @@ export const KCOSMETICS_ROLE_PRIORITY = [
   'k-cosmetics:operator',
   'k-cosmetics:supplier',
   'k-cosmetics:partner',
-  'k-cosmetics:seller',
-  'seller',              // legacy: 가입 시 seller로 저장됨
+  'cosmetics:store_owner',
   'consumer',            // legacy: 가입 시 consumer로 저장됨
   'customer',            // legacy: 가입 시 customer로 저장됨
 ] as const;
@@ -35,8 +34,7 @@ export const KCOSMETICS_DASHBOARD_MAP: Record<string, string> = {
   'k-cosmetics:operator': '/operator',
   'k-cosmetics:supplier': '/',
   'k-cosmetics:partner': '/partner',
-  'k-cosmetics:seller': '/',
-  'seller': '/',             // legacy
+  'cosmetics:store_owner': '/',
   'consumer': '/',           // legacy
   'customer': '/',           // legacy
 };

@@ -1,16 +1,8 @@
 /**
  * PharmacyOwnerOnlyGuard - 약국 개설자 전용 접근 가드
  *
- * WO-O4O-KPA-B-C-ACCESS-POLICY-IMPLEMENTATION-V1
- *
- * 공동구매 라우트 접근을 약국 개설자(activityType === 'pharmacy_owner')로 제한.
- *
- * 검증 순서:
- * 1. 로딩 중 → LoadingSpinner
- * 2. 미인증 → 로그인 안내
- * 3. PLATFORM_ROLES (kpa:admin, kpa:operator) → bypass
- * 4. isStoreOwner 또는 activityType === 'pharmacy_owner' → 통과
- * 5. 그 외 → 차단
+ * WO-O4O-STORE-OWNER-LEGACY-CLEANUP-V1:
+ *   STORE_OWNER_ROLES 또는 PLATFORM_ROLES 보유자만 통과한다.
  */
 
 import { useNavigate } from 'react-router-dom';
@@ -35,20 +27,11 @@ export function PharmacyOwnerOnlyGuard({ children }: PharmacyOwnerOnlyGuardProps
     return renderError('로그인이 필요합니다.', navigate, true);
   }
 
-  // Platform roles bypass (kpa:admin, kpa:operator)
   if (hasAnyRole(user.roles, PLATFORM_ROLES)) {
     return <>{children}</>;
   }
 
-  // WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1
-  // PRIMARY: role_assignments 기반 (kpa:store_owner)
   if (hasAnyRole(user.roles, STORE_OWNER_ROLES)) {
-    return <>{children}</>;
-  }
-
-  // FALLBACK (legacy): isStoreOwner / activityType
-  // TODO: WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1 Phase 7 — remove after transition
-  if (user.isStoreOwner || user.activityType === 'pharmacy_owner') {
     return <>{children}</>;
   }
 

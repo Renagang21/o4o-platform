@@ -1,19 +1,8 @@
 /**
- * HubGuard — 약국 HUB 접근 제어 (PharmacyGuard보다 관대)
+ * HubGuard — 약국 HUB 접근 제어
  *
- * WO-KPA-PHARMACY-HUB-NAVIGATION-RESTRUCTURE-V1
- *
- * 정책:
- * - 미인증 → /login
- * - admin/operator → /operator
- * - isStoreOwner === true → 통과 (승인 완료)
- * - activityType === 'pharmacy_owner' → 통과 (미승인이라도 HUB 탐색 가능)
- * - 그 외 → /pharmacy (게이트 페이지)
- *
- * PharmacyGuard와의 차이:
- * PharmacyGuard는 isStoreOwner 또는 API 승인 확인이 필요하지만,
- * HubGuard는 activityType만으로도 HUB 접근을 허용한다.
- * 이는 약국 개설약사가 승인 전에도 플랫폼 자원을 탐색할 수 있게 하기 위함.
+ * WO-O4O-STORE-OWNER-LEGACY-CLEANUP-V1:
+ *   STORE_OWNER_ROLES 보유 여부가 유일한 통과 조건이다.
  */
 
 import { Navigate, useLocation } from 'react-router-dom';
@@ -40,28 +29,13 @@ export function HubGuard({ children }: HubGuardProps) {
     return <Navigate to="/login" state={{ from: location.pathname + location.search }} replace />;
   }
 
-  // admin/operator → Operator dashboard
   if (hasAnyRole(user.roles, PLATFORM_ROLES)) {
     return <Navigate to="/operator" replace />;
   }
 
-  // WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1
-  // PRIMARY: role_assignments 기반 (kpa:store_owner)
   if (hasAnyRole(user.roles, STORE_OWNER_ROLES)) {
     return <>{children}</>;
   }
 
-  // FALLBACK (legacy): 승인 완료된 약국 → 통과
-  // TODO: WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1 Phase 7 — remove after transition
-  if (user.isStoreOwner) {
-    return <>{children}</>;
-  }
-
-  // pharmacy_owner 직역 → HUB 탐색 허용 (미승인이라도)
-  if ((user as any).activityType === 'pharmacy_owner') {
-    return <>{children}</>;
-  }
-
-  // 그 외 → 게이트 페이지
   return <Navigate to="/pharmacy" replace />;
 }

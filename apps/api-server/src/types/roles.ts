@@ -78,8 +78,7 @@ export type CosmeticsRole =
   | 'cosmetics:pharmacist'   // K-Cosmetics 약사
   | 'cosmetics:user'         // K-Cosmetics 사용자
   | 'cosmetics:supplier'     // K-Cosmetics supplier
-  | 'cosmetics:store_owner'  // K-Cosmetics store owner (WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1)
-  | 'cosmetics:seller'       // DEPRECATED → cosmetics:store_owner (WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1)
+  | 'cosmetics:store_owner'  // K-Cosmetics store owner
   | 'cosmetics:partner';     // K-Cosmetics partner
 
 /**
@@ -466,18 +465,10 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
   'cosmetics:store_owner': {
     role: 'cosmetics:store_owner',
     label: 'K-Cosmetics Store Owner',
-    description: 'K-Cosmetics store owner (WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1)',
+    description: 'K-Cosmetics store owner',
     service: 'cosmetics',
     category: 'commerce',
     deprecated: false
-  },
-  'cosmetics:seller': {
-    role: 'cosmetics:seller',
-    label: 'K-Cosmetics Seller',
-    description: 'K-Cosmetics seller/retailer — DEPRECATED → cosmetics:store_owner',
-    service: 'cosmetics',
-    category: 'commerce',
-    deprecated: true
   },
   'cosmetics:partner': {
     role: 'cosmetics:partner',
