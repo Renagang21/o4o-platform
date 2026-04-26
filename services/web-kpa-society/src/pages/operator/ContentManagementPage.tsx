@@ -215,8 +215,8 @@ export default function ContentManagementPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">콘텐츠 관리</h1>
-          <p className="text-sm text-slate-500 mt-1">공지사항 및 뉴스 콘텐츠 생성/수정/관리</p>
+          <h1 className="text-2xl font-bold text-slate-900">공지사항/뉴스 관리</h1>
+          <p className="text-sm text-slate-500 mt-1">공지사항 및 뉴스 콘텐츠 생성 · 수정 · 관리</p>
         </div>
         <button
           onClick={handleCreate}

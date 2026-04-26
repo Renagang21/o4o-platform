@@ -36,11 +36,11 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   // WO-KPA-OPERATOR-STORES-MENU-HIDE-V1: stores 메뉴 노출 제거
   // WO-KPA-OPERATOR-STORE-RELATED-MENU-HIDE-V1: 확인 (매장 관리, 채널 관리 제거 유지)
   // stores: [ ... ] — 라우트/페이지/API/DB는 유지
+  // WO-KPA-OPERATOR-CONTENT-NOTICE-NEWS-MENU-NORMALIZATION-V1: "공지사항" + "콘텐츠 관리" → "공지사항/뉴스" 통합
   content: [
-    { label: '공지사항', path: '/operator/news' },
+    { label: '공지사항/뉴스', path: '/operator/content' },
     { label: 'Home 편집', path: '/operator/community' },
     { label: '콘텐츠 허브', path: '/operator/docs' },
-    { label: '콘텐츠 관리', path: '/operator/content' },
     // WO-KPA-OPERATOR-LMS-MENU-AND-MANAGEMENT-PAGE-RESTORE-V1
     { label: '강의 관리', path: '/operator/lms' },
   ],
@@ -100,11 +100,11 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: '자격 신청 관리', path: '/operator/qualification-requests' },
   ],
   // WO-KPA-OPERATOR-STORES-MENU-HIDE-V1 + WO-KPA-OPERATOR-STORE-RELATED-MENU-HIDE-V1: stores 메뉴 노출 제거
+  // WO-KPA-OPERATOR-CONTENT-NOTICE-NEWS-MENU-NORMALIZATION-V1: "공지사항" + "콘텐츠 관리" → "공지사항/뉴스" 통합
   content: [
-    { label: '공지사항', path: '/operator/news' },
+    { label: '공지사항/뉴스', path: '/operator/content' },
     { label: 'Home 편집', path: '/operator/community' },
     { label: '콘텐츠 허브', path: '/operator/docs' },
-    { label: '콘텐츠 관리', path: '/operator/content' },
     // WO-KPA-OPERATOR-LMS-MENU-AND-MANAGEMENT-PAGE-RESTORE-V1
     { label: '강의 관리', path: '/operator/lms' },
   ],
