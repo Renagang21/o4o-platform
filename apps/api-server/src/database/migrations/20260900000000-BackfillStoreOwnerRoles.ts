@@ -88,14 +88,11 @@ export class BackfillStoreOwnerRoles20260900000000 implements MigrationInterface
     `);
     console.log(`[Migration] K-Cosmetics service_memberships seller → cosmetics:store_owner: ${cosSmResult[1] ?? 0} rows updated`);
 
-    // Update roles catalog: seller → cosmetics:store_owner (for cosmetics service_key)
+    // Remove old 'seller' catalog entry (cosmetics:store_owner already created in Section 0)
     const cosRolesResult = await queryRunner.query(`
-      UPDATE roles SET name = 'cosmetics:store_owner', role_key = 'store_owner',
-             display_name = 'Store Owner', description = 'K-Cosmetics store owner',
-             updated_at = NOW()
-      WHERE name = 'seller' AND service_key = 'cosmetics'
+      DELETE FROM roles WHERE name = 'seller' AND service_key = 'cosmetics'
     `);
-    console.log(`[Migration] K-Cosmetics roles catalog seller → cosmetics:store_owner: ${cosRolesResult[1] ?? 0} rows updated`);
+    console.log(`[Migration] K-Cosmetics roles catalog: removed old 'seller' entry: ${cosRolesResult[1] ?? 0} rows deleted`);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
@@ -120,14 +117,14 @@ export class BackfillStoreOwnerRoles20260900000000 implements MigrationInterface
       UPDATE service_memberships SET role = 'seller', updated_at = NOW()
       WHERE role = 'cosmetics:store_owner' AND service_key = 'k-cosmetics'
     `);
+    // Recreate old 'seller' catalog entry
     await queryRunner.query(`
-      UPDATE roles SET name = 'seller', role_key = 'seller',
-             display_name = 'Seller', description = 'K-Cosmetics seller/retailer',
-             updated_at = NOW()
-      WHERE name = 'cosmetics:store_owner' AND service_key = 'cosmetics'
+      INSERT INTO roles (name, display_name, description, service_key, role_key, is_system, is_admin_role, is_assignable, is_active)
+      VALUES ('seller', 'Seller', 'K-Cosmetics seller/retailer', 'cosmetics', 'seller', false, false, true, true)
+      ON CONFLICT (name) DO NOTHING
     `);
 
-    // Remove catalog entries
+    // Remove new catalog entries
     await queryRunner.query(`
       DELETE FROM roles WHERE name IN ('kpa:store_owner', 'glycopharm:store_owner', 'cosmetics:store_owner')
     `);
