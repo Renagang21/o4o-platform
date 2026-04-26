@@ -1481,6 +1481,166 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   }
 
   // ============================================================================
+  // OPERATOR RESOURCES MANAGEMENT — WO-KPA-OPERATOR-RESOURCES-MANAGEMENT-MENU-V1
+  // 자료실 운영 관리 전용 라우트. kpa_contents 테이블 재사용 (member-driven content).
+  // /operator/docs(콘텐츠 허브)와 분리된 운영 진입점.
+  // ============================================================================
+  {
+    const opResourcesRouter = Router();
+
+    // GET /operator/resources — 운영자 자료실 목록 (모든 status 포함)
+    opResourcesRouter.get(
+      '/',
+      authenticate,
+      requireKpaScope('kpa:operator') as any,
+      asyncHandler(async (req: Request, res: Response) => {
+        const {
+          page = '1',
+          limit = '20',
+          search,
+          source_type: sourceTypeFilter,
+          status: statusFilter,
+        } = req.query;
+        const pageNum = Math.max(1, Number(page));
+        const limitNum = Math.min(100, Math.max(1, Number(limit)));
+        const offset = (pageNum - 1) * limitNum;
+
+        const conditions: string[] = [`c.is_deleted = false`];
+        const params: any[] = [];
+        let idx = 1;
+
+        if (sourceTypeFilter) {
+          conditions.push(`c.source_type = $${idx++}`);
+          params.push(sourceTypeFilter);
+        }
+        if (statusFilter) {
+          conditions.push(`c.status = $${idx++}`);
+          params.push(statusFilter);
+        }
+        if (search) {
+          conditions.push(
+            `(c.title ILIKE $${idx} OR c.summary ILIKE $${idx} OR c.tags::text ILIKE $${idx})`,
+          );
+          params.push(`%${search}%`);
+          idx++;
+        }
+
+        const where = `WHERE ${conditions.join(' AND ')}`;
+        const [[{ total }], rows] = await Promise.all([
+          dataSource.query(
+            `SELECT COUNT(*)::int as total FROM kpa_contents c ${where}`,
+            params,
+          ),
+          dataSource.query(
+            `SELECT c.id, c.title, c.summary, c.tags, c.category, c.status,
+                    c.source_type, c.source_url, c.source_file_name,
+                    c.thumbnail_url, c.created_by, c.author_name,
+                    c.view_count, c.like_count, c.created_at, c.updated_at
+             FROM kpa_contents c ${where}
+             ORDER BY c.created_at DESC
+             LIMIT $${idx} OFFSET $${idx + 1}`,
+            [...params, limitNum, offset],
+          ),
+        ]);
+
+        res.json({
+          success: true,
+          data: {
+            items: rows,
+            total,
+            page: pageNum,
+            limit: limitNum,
+            totalPages: Math.ceil(total / limitNum),
+          },
+        });
+      }),
+    );
+
+    // PATCH /operator/resources/:id/status — 상태 변경 (숨김/노출)
+    opResourcesRouter.patch(
+      '/:id/status',
+      authenticate,
+      requireKpaScope('kpa:operator') as any,
+      asyncHandler(async (req: Request, res: Response) => {
+        const user = (req as any).user;
+        const { status: newStatus } = req.body;
+        const validStatuses = ['draft', 'published', 'private'];
+        if (!newStatus || !validStatuses.includes(newStatus)) {
+          res.status(400).json({
+            success: false,
+            error: {
+              code: 'VALIDATION_ERROR',
+              message: `status must be one of: ${validStatuses.join(', ')}`,
+            },
+          });
+          return;
+        }
+
+        const [existing] = await dataSource.query(
+          `SELECT id, title, status FROM kpa_contents WHERE id = $1 AND is_deleted = false LIMIT 1`,
+          [req.params.id],
+        );
+        if (!existing) {
+          res.status(404).json({
+            success: false,
+            error: { code: 'NOT_FOUND', message: '자료를 찾을 수 없습니다' },
+          });
+          return;
+        }
+
+        const [updated] = await dataSource.query(
+          `UPDATE kpa_contents SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING *`,
+          [newStatus, existing.id],
+        );
+        await writeAuditLog(
+          user,
+          'RESOURCE_STATUS_CHANGED',
+          'kpa_content',
+          updated.id,
+          { title: updated.title, from: existing.status, to: newStatus },
+        );
+        res.json({ success: true, data: updated });
+      }),
+    );
+
+    // DELETE /operator/resources/:id — soft delete
+    opResourcesRouter.delete(
+      '/:id',
+      authenticate,
+      requireKpaScope('kpa:operator') as any,
+      asyncHandler(async (req: Request, res: Response) => {
+        const user = (req as any).user;
+        const [existing] = await dataSource.query(
+          `SELECT id, title FROM kpa_contents WHERE id = $1 AND is_deleted = false LIMIT 1`,
+          [req.params.id],
+        );
+        if (!existing) {
+          res.status(404).json({
+            success: false,
+            error: { code: 'NOT_FOUND', message: '자료를 찾을 수 없습니다' },
+          });
+          return;
+        }
+
+        await dataSource.query(
+          `UPDATE kpa_contents SET is_deleted = true, updated_at = NOW() WHERE id = $1`,
+          [existing.id],
+        );
+        await writeAuditLog(
+          user,
+          'RESOURCE_DELETED',
+          'kpa_content',
+          existing.id,
+          { title: existing.title },
+        );
+        res.json({ success: true, data: { deleted: true, id: existing.id } });
+      }),
+    );
+
+    router.use('/operator/resources', opResourcesRouter);
+  }
+
+  // ============================================================================
   // Signage Community Management Routes — /api/v1/kpa/signage
   // WO-KPA-SIGNAGE-VIDEO-PLAYLIST-STRUCTURE-REFORM-V2
   // ============================================================================

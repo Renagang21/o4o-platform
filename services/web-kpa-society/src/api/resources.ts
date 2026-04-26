@@ -91,4 +91,20 @@ export const resourcesApi = {
     status?: string;
   }) =>
     apiClient.patch<ApiResponse<ResourceItem>>(`/contents/${id}`, data),
+
+  // WO-KPA-OPERATOR-RESOURCES-MANAGEMENT-MENU-V1: 운영자 자료실 관리 API
+  operatorList: (params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    source_type?: 'manual' | 'upload' | 'external';
+    status?: 'draft' | 'published' | 'private';
+  }) =>
+    apiClient.get<ResourceListResponse>('/operator/resources', params),
+
+  operatorUpdateStatus: (id: string, status: 'draft' | 'published' | 'private') =>
+    apiClient.patch<ApiResponse<ResourceItem>>(`/operator/resources/${id}/status`, { status }),
+
+  operatorDelete: (id: string) =>
+    apiClient.delete<ApiResponse<{ deleted: boolean; id: string }>>(`/operator/resources/${id}`),
 };

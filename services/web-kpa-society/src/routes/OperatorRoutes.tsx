@@ -16,7 +16,7 @@
  */
 
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { OperatorAiReportPage, ForumManagementPage, ForumDeleteRequestsPage, LegalManagementPage, ForumAnalyticsDashboard, ContentManagementPage, AuditLogPage, MemberManagementPage, PharmacyRequestManagementPage, ProductApplicationManagementPage, CommunityManagementPage, QualificationRequestsPage, OperatorLmsCoursesPage } from '../pages/operator';
+import { OperatorAiReportPage, ForumManagementPage, ForumDeleteRequestsPage, LegalManagementPage, ForumAnalyticsDashboard, ContentManagementPage, AuditLogPage, MemberManagementPage, PharmacyRequestManagementPage, ProductApplicationManagementPage, CommunityManagementPage, QualificationRequestsPage, OperatorLmsCoursesPage, OperatorResourcesPage } from '../pages/operator';
 // WO-KPA-A-OPERATOR-DASHBOARD-FIRST-STABILIZATION-V1: UsersPage → /operator/members redirect
 import UserDetailPage from '../pages/operator/UserDetailPage';
 import RoleManagementPage from '../pages/operator/RoleManagementPage';
@@ -96,12 +96,13 @@ export function OperatorRoutes() {
           {/* 공지사항 → 콘텐츠 관리로 리다이렉트 (절대경로로 명확화) */}
           <Route path="news" element={<Navigate to="/operator/content" replace />} />
 
-          {/* 자료실 → 콘텐츠 허브로 전환 (WO-O4O-KPA-CONTENT-HUB-FOUNDATION-V1) */}
+          {/* 콘텐츠 허브 (WO-O4O-KPA-CONTENT-HUB-FOUNDATION-V1) — 운영자 콘텐츠 허브 관리 영역 */}
           <Route path="docs" element={<OperatorContentHubPage />} />
           <Route path="content-hub/:id" element={<OperatorContentDetailPage />} />
 
+          {/* 자료실 관리 (WO-KPA-OPERATOR-RESOURCES-MANAGEMENT-MENU-V1) — 콘텐츠 허브와 분리된 신규 진입점 */}
+          <Route path="resources" element={<OperatorResourcesPage />} />
           {/* 자료 등록/수정 (WO-KPA-RESOURCE-HUB-RESTRUCTURE-V1) */}
-          <Route path="resources" element={<Navigate to="/operator/docs" replace />} />
           <Route path="resources/new" element={<OperatorContentHubPage />} />
           <Route path="resources/:id/edit" element={<OperatorContentDetailPage />} />
 
