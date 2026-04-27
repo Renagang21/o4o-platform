@@ -26,7 +26,6 @@ const requireOperatorOrAdmin = requireRole([
   'neture:admin', 'neture:operator',
   'glycopharm:admin', 'glycopharm:operator',
   'kpa-society:admin', 'kpa-society:operator',
-  'glucoseview:admin', 'glucoseview:operator',
 ]);
 
 export function createOperatorAnalyticsRoutes(dataSource: DataSource): Router {

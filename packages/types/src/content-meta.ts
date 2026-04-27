@@ -27,7 +27,6 @@
 export type ContentServiceKey =
   | 'neture'
   | 'glycopharm'
-  | 'glucoseview'
   | 'kpa-society'
   | 'k-cosmetics';
 

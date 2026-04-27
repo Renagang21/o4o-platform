@@ -127,7 +127,6 @@ import type { RelatedEntity } from './related.entity.js';
 | `o4o-core-api` | API 서버 |
 | `neture-web` | 네처 메인 |
 | `glycopharm-web` | 글라이코팜 |
-| `glucoseview-web` | 글루코스뷰 |
 | `k-cosmetics-web` | K-화장품 |
 | `kpa-society-web` | 약사회 SaaS |
 

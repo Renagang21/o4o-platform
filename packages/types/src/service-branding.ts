@@ -21,7 +21,6 @@ export interface ServiceBrandingInfo {
 export const SERVICE_BRANDING: Record<string, ServiceBrandingInfo> = {
   'kpa-society': { displayName: 'KPA-Society', subtitle: '약사 전문 플랫폼' },
   glycopharm:    { displayName: 'GlycoPharm',  subtitle: '혈당 관리 플랫폼' },
-  glucoseview:   { displayName: 'GlucoseView' },
   neture:        { displayName: 'Neture',      subtitle: 'B2B 유통 플랫폼' },
   'k-cosmetics': { displayName: 'K-Cosmetics', subtitle: 'K-Beauty 전문 플랫폼' },
   platform:      { displayName: 'O4O 플랫폼' },

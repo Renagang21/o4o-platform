@@ -18,7 +18,6 @@ const OPERATOR_ROLES = [
   'platform:admin', 'platform:super_admin',
   'neture:admin', 'neture:operator',
   'glycopharm:admin', 'glycopharm:operator',
-  'glucoseview:admin', 'glucoseview:operator',
   'k-cosmetics:admin', 'k-cosmetics:operator',
   'kpa-society:admin', 'kpa-society:operator',
 ];

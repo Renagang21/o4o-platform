@@ -84,12 +84,6 @@ export class NetureDashboardService {
           supportEmail: 'support@k-cosmetics.kr',
           features: ['주문관리', '배송조회'],
         },
-        glucoseview: {
-          url: 'https://glucoseview.neture.co.kr',
-          ordersPath: '/supplier/orders',
-          supportEmail: 'support@glucoseview.kr',
-          features: ['주문관리', '구독관리'],
-        },
       };
 
       // 기본 설정 (타입 안전성을 위해)

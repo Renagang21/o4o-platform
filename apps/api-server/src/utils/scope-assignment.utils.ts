@@ -25,11 +25,6 @@ export interface ScopeAssignmentContext {
   serviceCode?: string;
   /** 추가 스코프 (수동 부여) */
   additionalScopes?: string[];
-  /** 약사 정보 (GlucoseView용) */
-  pharmacistInfo?: {
-    role?: 'pharmacist' | 'operator' | 'admin';
-    approvalStatus?: 'pending' | 'approved' | 'rejected';
-  };
 }
 
 // ============================================================================
@@ -95,22 +90,6 @@ function rolesToScopeLevel(role: string, roles?: string[]): ScopeLevel {
 // ============================================================================
 
 /**
- * 약사 정보에서 서비스 컨텍스트 도출
- */
-function detectServiceFromPharmacist(
-  pharmacistInfo?: ScopeAssignmentContext['pharmacistInfo']
-): string | null {
-  if (!pharmacistInfo) return null;
-
-  // 약사가 승인되면 glucoseview 서비스 컨텍스트
-  if (pharmacistInfo.approvalStatus === 'approved') {
-    return 'glucoseview';
-  }
-
-  return null;
-}
-
-/**
  * 역할에서 서비스 컨텍스트 힌트
  */
 function detectServiceFromRole(role: string, roles?: string[]): string[] {
@@ -141,7 +120,7 @@ function detectServiceFromRole(role: string, roles?: string[]): string[] {
  * 4. 추가 스코프 병합
  */
 export function deriveUserScopes(context: ScopeAssignmentContext): string[] {
-  const { role, roles, serviceCode, additionalScopes, pharmacistInfo } = context;
+  const { role, roles, serviceCode, additionalScopes } = context;
   const scopeLevel = rolesToScopeLevel(role, roles);
   const scopes = new Set<string>();
 
@@ -151,12 +130,6 @@ export function deriveUserScopes(context: ScopeAssignmentContext): string[] {
   if (serviceCode) {
     // 명시적 서비스 컨텍스트
     targetServices = [serviceCode];
-  } else if (pharmacistInfo) {
-    // 약사 정보에서 서비스 도출
-    const detectedService = detectServiceFromPharmacist(pharmacistInfo);
-    if (detectedService) {
-      targetServices = [detectedService];
-    }
   }
 
   // Admin은 명시적 서비스가 없으면 모든 서비스 접근
@@ -184,22 +157,7 @@ export function deriveUserScopes(context: ScopeAssignmentContext): string[] {
     }
   }
 
-  // 3. 약사 특수 처리
-  if (pharmacistInfo?.approvalStatus === 'approved') {
-    // 승인된 약사는 pharmacist 스코프 부여
-    if (pharmacistInfo.role === 'operator') {
-      // operator 역할 약사
-      getScopesByLevel('glucoseview', 'operator').forEach(scope => scopes.add(scope));
-    } else if (pharmacistInfo.role === 'admin') {
-      // admin 역할 약사
-      getScopesByLevel('glucoseview', 'admin').forEach(scope => scopes.add(scope));
-    } else {
-      // 일반 약사 (member 레벨)
-      getScopesByLevel('glucoseview', 'member').forEach(scope => scopes.add(scope));
-    }
-  }
-
-  // 4. 추가 스코프 병합
+  // 3. 추가 스코프 병합
   if (additionalScopes) {
     additionalScopes.forEach(scope => scopes.add(scope));
   }
@@ -221,22 +179,6 @@ export function getOperatorScopesForService(serviceCode: string): string[] {
   return deriveUserScopes({
     role: 'operator',
     serviceCode,
-  });
-}
-
-/**
- * GlucoseView 약사 스코프 조회
- */
-export function getPharmacistScopes(
-  pharmacistRole: 'pharmacist' | 'operator' | 'admin',
-  approved: boolean = true
-): string[] {
-  return deriveUserScopes({
-    role: pharmacistRole === 'pharmacist' ? 'member' : pharmacistRole,
-    pharmacistInfo: {
-      role: pharmacistRole,
-      approvalStatus: approved ? 'approved' : 'pending',
-    },
   });
 }
 
