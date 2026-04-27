@@ -78,15 +78,18 @@ export default function SupplierProductCreatePage() {
     barcode: '',
     packagingName: '',
     marketingName: importDraft?.marketingName ?? '',
-    categoryId: '',
+    // WO-O4O-SUPPLIER-IMPORT-O4O-SETTINGS-STEP-V1: O4O 등록 설정 pre-fill
+    categoryId: importDraft?.categoryId ?? '',
     brandName: importDraft?.brandName ?? '',
     manufacturerName: importDraft?.manufacturerName ?? '',
-    distributionType: 'PRIVATE',
-    serviceKeys: [],
-    priceGeneral: '',
+    distributionType: importDraft?.isPublic
+      ? 'PUBLIC'
+      : (importDraft?.serviceKeys?.length ? 'SERVICE' : 'PRIVATE'),
+    serviceKeys: importDraft?.serviceKeys ?? [],
+    priceGeneral: importDraft?.priceGeneral ?? '',
     consumerReferencePrice: importDraft?.consumerReferencePrice ?? '',
     stockQty: '',
-    regulatoryType: 'GENERAL',
+    regulatoryType: importDraft?.regulatoryType ?? 'GENERAL',
     regulatoryName: '',
     mfdsPermitNumber: '',
     specification: importDraft?.specification ?? '',
@@ -191,6 +194,7 @@ export default function SupplierProductCreatePage() {
     priceGeneral: form.priceGeneral ? Number(form.priceGeneral) : null,
     consumerReferencePrice: form.consumerReferencePrice ? Number(form.consumerReferencePrice) : null,
     stockQuantity: Number(form.stockQty) || 0,
+    isPublic: form.distributionType === 'PUBLIC',
     distributionType: form.distributionType,
     serviceKeys: form.serviceKeys,
   }), [currentStep]); // only recompute when step changes (remount)

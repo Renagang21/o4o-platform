@@ -29,6 +29,13 @@ export interface ImportDraft {
   // Metadata
   sourceUrl: string;
   importedAt: string; // ISO timestamp
+
+  // O4O 등록 설정 (WO-O4O-SUPPLIER-IMPORT-O4O-SETTINGS-STEP-V1)
+  categoryId?: string;
+  priceGeneral?: string;
+  isPublic?: boolean;
+  serviceKeys?: string[];
+  regulatoryType?: string;
 }
 
 /** parseProductHtml 반환 타입 */
