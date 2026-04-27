@@ -167,11 +167,19 @@ export default function SupplierProductImportPage() {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-xl font-bold text-slate-900">
-          상품 Import Assistant
+          상품 등록 도우미
         </h1>
-        <p className="mt-1 text-sm text-slate-500">
-          외부 상품 페이지의 HTML을 붙여넣으면 상품 정보를 자동으로 추출합니다.
-        </p>
+        <div className="mt-2">
+          <strong className="text-sm text-slate-700">사용 방법</strong>
+          <ol className="mt-1 ml-4 list-decimal text-sm text-slate-500 space-y-0.5">
+            <li>외부 쇼핑몰 상품 페이지를 엽니다</li>
+            <li>Ctrl+A → Ctrl+C 로 전체 복사합니다</li>
+            <li>아래에 붙여넣고 [분석하기]를 클릭합니다</li>
+          </ol>
+          <p className="mt-2 text-sm text-slate-400">
+            외부 상품 정보를 기반으로 빠르게 등록할 수 있습니다
+          </p>
+        </div>
       </div>
 
       {/* Input Card */}

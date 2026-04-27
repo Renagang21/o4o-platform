@@ -1053,6 +1053,12 @@ export default function SupplierProductsPage() {
             <Plus size={16} />
             상품 등록
           </button>
+          <button
+            onClick={() => navigate('/supplier/products/import-assistant')}
+            className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700"
+          >
+            ⚡ 상품 정보 가져오기 (HTML)
+          </button>
         </div>
       </div>
 
