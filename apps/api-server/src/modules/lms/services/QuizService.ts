@@ -56,7 +56,7 @@ export class QuizService {
    */
   async getQuizForLesson(lessonId: string): Promise<Quiz | null> {
     const quiz = await this.quizRepository.findOne({
-      where: { lessonId, isPublished: true },
+      where: { lessonId, isPublished: true } as any,
     });
 
     if (!quiz) return null;
@@ -155,8 +155,9 @@ export class QuizService {
 
     // Update lesson progress if quiz is linked to a lesson
     let lessonCompleted = false;
-    if (quiz.lessonId && passed) {
-      lessonCompleted = await this.completeLessonProgress(quiz.lessonId, quiz.courseId, userId, score);
+    const quizAny = quiz as any;
+    if (quizAny.lessonId && passed) {
+      lessonCompleted = await this.completeLessonProgress(quizAny.lessonId, quiz.courseId, userId, score);
     }
 
     // WO-O4O-CREDIT-SYSTEM-V1: Award credits for quiz pass
