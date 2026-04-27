@@ -13,13 +13,14 @@ import type { GlobalHeaderNavItem } from '@o4o/ui';
 // ─── Public Nav ──────────────────────────────────────────────────────────────
 // 모든 사용자에게 노출
 
+// WO-O4O-GLOBAL-MENU-UPDATE-V1: About → O4O 플랫폼 소개 (위치 유지, /about → /o4o)
 export const NETURE_PUBLIC_NAV: GlobalHeaderNavItem[] = [
   { label: 'Home', href: '/' },
   { label: 'Market Trial', href: '/market-trial' },
   { label: 'Supplier', href: '/supplier' },
   { label: 'Partner', href: '/partner' },
   { label: 'Contact Us', href: '/contact' },
-  { label: 'About', href: '/about' },
+  { label: 'O4O 플랫폼 소개', href: '/o4o' },
 ];
 
 // ─── Contextual Nav ──────────────────────────────────────���───────────────────

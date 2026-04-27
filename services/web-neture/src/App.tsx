@@ -39,7 +39,6 @@ import { RoleGuard, OperatorRoute, AdminRoute, SupplierRoute } from './component
 // ============================================================================
 // NetureHomePage removed — Community promoted to Home (WO-NETURE-HOME-COMMUNITY-PROMOTION-V1)
 import HandoffPage from './pages/HandoffPage';
-import AboutPage from './pages/AboutPage';
 import LegalPage from './pages/LegalPage';
 import CommunityPage from './pages/CommunityPage';
 import {
@@ -553,7 +552,8 @@ function App() {
               <Route path="/my" element={<Navigate to="/mypage" replace />} />
               <Route path="/supplier" element={<SupplierLandingPage />} />
               <Route path="/partner" element={<PartnerLandingPage />} />
-              <Route path="/about" element={<AboutPage />} />
+              {/* WO-O4O-GLOBAL-MENU-UPDATE-V1: /about → /o4o redirect (backward compat) */}
+              <Route path="/about" element={<Navigate to="/o4o" replace />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/terms" element={<LegalPage slug="terms-of-service" title="이용약관" />} />
               <Route path="/privacy" element={<LegalPage slug="privacy-policy" title="개인정보처리방침" />} />
