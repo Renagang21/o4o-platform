@@ -942,8 +942,7 @@ function App() {
             <Route path="/partners/requests/:id" element={<RedirectPartnershipRequestDetail />} />
             <Route path="/partners/info" element={<Navigate to="/workspace/partners/info" replace />} />
             <Route path="/platform/principles" element={<Navigate to="/o4o/principles" replace />} />
-            <Route path="/content" element={<Navigate to="/partner/contents" replace />} />
-            <Route path="/content/:id" element={<RedirectContentDetail />} />
+            {/* /content, /content/:id — NetureLayout 내 /content 라우트로 처리됨 (레거시 redirect 제거) */}
             <Route path="/my-content" element={<Navigate to="/workspace/my-content" replace />} />
 
             {/* Hub/Workspace 리다이렉트 — WO-O4O-ROLE-ROUTE-ISOLATION-V1 */}
