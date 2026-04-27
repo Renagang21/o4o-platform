@@ -11,18 +11,19 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Package, Search, RefreshCw, ChevronLeft, ChevronRight,
   X, Eye, EyeOff, FileText, FileSearch, Tag, Trash2,
+  CheckCircle, XCircle,
 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { ContentRenderer } from '@o4o/content-editor';
-import { ActionBar, ConfirmActionDialog } from '@o4o/ui';
-import { DataTable } from '@o4o/operator-ux-core';
+import { ActionBar, ConfirmActionDialog, RowActionMenu } from '@o4o/ui';
+import { DataTable, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import {
   operatorAllOffersApi,
+  adminProductApi,
   type AllRegisteredOffer,
   type AllOffersKpi,
 } from '../../lib/api';
-import { operatorServiceApprovalApi } from '../../lib/api/serviceApproval';
 import { productCleanupApi } from '../../lib/api/operatorProductCleanup';
 import {
   DISTRIBUTION_TYPE_LABELS,
@@ -165,6 +166,45 @@ function TagsPreviewModal({
   );
 }
 
+// WO-NETURE-OPERATOR-PRODUCT-APPROVAL-ACTION-V1: 행별 승인/반려 액션 정책
+// - 대상: offer-level approvalStatus (PENDING/APPROVED/REJECTED). 화면 badge와 일치
+// - 행별/Bulk 모두 offer-level adminProductApi 사용으로 일치 (post-review 보정)
+const productApprovalActionPolicy = defineActionPolicy<AllRegisteredOffer>('neture:all-products-approval', {
+  inlineMax: 2,
+  rules: [
+    {
+      key: 'approve',
+      label: '승인',
+      variant: 'primary',
+      visible: (row) => row.approvalStatus === 'PENDING',
+      confirm: (row) => ({
+        title: '승인 확인',
+        message: `"${row.name || row.id}"을(를) 승인하시겠습니까?`,
+        confirmText: '승인',
+      }),
+    },
+    {
+      key: 'reject',
+      label: '반려',
+      variant: 'danger',
+      visible: (row) => row.approvalStatus === 'PENDING',
+      confirm: (row) => ({
+        title: '상품 반려',
+        message: row.name || row.id,
+        variant: 'danger',
+        confirmText: '반려',
+        showReason: true,
+        reasonPlaceholder: '반려 사유를 입력하세요 (선택)',
+      }),
+    },
+  ],
+});
+
+const PRODUCT_APPROVAL_ACTION_ICONS: Record<string, React.ReactNode> = {
+  approve: <CheckCircle className="w-4 h-4" />,
+  reject: <XCircle className="w-4 h-4" />,
+};
+
 export default function AllRegisteredProductsPage() {
   const [offers, setOffers] = useState<AllRegisteredOffer[]>([]);
   const [kpi, setKpi] = useState<AllOffersKpi | null>(null);
@@ -264,9 +304,9 @@ export default function AllRegisteredProductsPage() {
 
   // WO-NETURE-OPERATOR-APPROVAL-LIST-SELECTION-ACTION-BAR-V1
   // 선택 가능한 offer = 모든 offer (승인/거절은 내부에서 pending 필터, 삭제는 전체 대상)
+  // WO-NETURE-OPERATOR-PRODUCT-APPROVAL-ACTION-V1 (보정): pending 판정을 offer-level로 통일
   const isSelectable = (_o: AllRegisteredOffer) => true;
-  const hasPendingApproval = (o: AllRegisteredOffer) =>
-    (o.serviceApprovals || []).some((a) => a.status === 'pending' && a.id);
+  const hasPendingApproval = (o: AllRegisteredOffer) => o.approvalStatus === 'PENDING';
 
   const selectableIds = useMemo(
     () => displayOffers.filter(isSelectable).map((o) => o.id),
@@ -298,14 +338,13 @@ export default function AllRegisteredProductsPage() {
     setSelectedOfferIds(new Set());
   }, [page, search, distFilter, activeFilter, approvalFilter, regulatoryFilter, primaryTab, supplySubTab, serviceTab]);
 
-  // 선택된 offer들에서 pending service approval id 추출
-  const collectPendingApprovalIds = (): string[] => {
+  // WO-NETURE-OPERATOR-PRODUCT-APPROVAL-ACTION-V1 (보정):
+  // 선택된 offer 중 PENDING(offer-level approvalStatus) offer id 추출
+  const collectPendingOfferIds = (): string[] => {
     const ids: string[] = [];
     for (const o of displayOffers) {
       if (!selectedOfferIds.has(o.id)) continue;
-      for (const a of o.serviceApprovals || []) {
-        if (a.status === 'pending' && a.id) ids.push(a.id);
-      }
+      if (o.approvalStatus === 'PENDING') ids.push(o.id);
     }
     return ids;
   };
@@ -331,44 +370,84 @@ export default function AllRegisteredProductsPage() {
     }
   };
 
+  // WO-NETURE-OPERATOR-PRODUCT-APPROVAL-ACTION-V1 (보정):
+  // Bulk도 offer-level adminProductApi로 일치. service-level 호출 제거.
+  // 응답 형태: { success, data: { results: [{ id, status: success|skipped|failed }] } }
   const handleBulkApprove = async () => {
-    const ids = collectPendingApprovalIds();
+    const ids = collectPendingOfferIds();
     if (ids.length === 0) {
       toast.error('선택한 상품 중 승인 대기 중인 항목이 없습니다.');
       return;
     }
     setActionLoading(true);
     try {
-      const result = await operatorServiceApprovalApi.batchApprove(ids);
-      if (result.success) {
-        toast.success(`승인 완료: ${result.data?.approved ?? ids.length}건`);
-        setSelectedOfferIds(new Set());
-        await fetchOffers(page);
+      const result = await adminProductApi.batchApprove(ids);
+      const results: Array<{ status: string }> = result?.data?.results ?? [];
+      const successCount = results.filter((r) => r.status === 'success').length;
+      const failedCount = results.filter((r) => r.status === 'failed').length;
+      if (failedCount === 0) {
+        toast.success(`승인 완료: ${successCount}건`);
       } else {
-        toast.error(`승인 실패: ${result.error || '알 수 없는 오류'}`);
+        toast.error(`${successCount}건 승인, ${failedCount}건 실패`);
       }
-    } catch {
-      toast.error('승인 중 오류가 발생했습니다');
+      setSelectedOfferIds(new Set());
+      await fetchOffers(page);
+    } catch (err: any) {
+      toast.error(err?.response?.data?.error || '승인 중 오류가 발생했습니다');
     } finally {
       setActionLoading(false);
     }
   };
 
   const handleBulkReject = async (reason?: string) => {
-    const ids = collectPendingApprovalIds();
+    const ids = collectPendingOfferIds();
     if (ids.length === 0) return;
     setActionLoading(true);
     try {
-      const result = await operatorServiceApprovalApi.batchReject(ids, reason || undefined);
-      if (result.success) {
-        toast.success(`거절 완료: ${result.data?.rejected ?? ids.length}건`);
-        setSelectedOfferIds(new Set());
+      const result = await adminProductApi.batchReject(ids, reason || undefined);
+      const results: Array<{ status: string }> = result?.data?.results ?? [];
+      const successCount = results.filter((r) => r.status === 'success').length;
+      const failedCount = results.filter((r) => r.status === 'failed').length;
+      if (failedCount === 0) {
+        toast.success(`반려 완료: ${successCount}건`);
+      } else {
+        toast.error(`${successCount}건 반려, ${failedCount}건 실패`);
+      }
+      setSelectedOfferIds(new Set());
+      await fetchOffers(page);
+    } catch (err: any) {
+      toast.error(err?.response?.data?.error || '반려 중 오류가 발생했습니다');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // WO-NETURE-OPERATOR-PRODUCT-APPROVAL-ACTION-V1: 행별 승인/반려 (offer-level)
+  const handleRowApprove = async (offer: AllRegisteredOffer) => {
+    setActionLoading(true);
+    try {
+      const ok = await adminProductApi.approveProduct(offer.id);
+      if (ok) {
+        toast.success(`"${offer.name || '상품'}" 승인되었습니다`);
         await fetchOffers(page);
       } else {
-        toast.error(`거절 실패: ${result.error || '알 수 없는 오류'}`);
+        toast.error('승인에 실패했습니다');
       }
-    } catch {
-      toast.error('거절 중 오류가 발생했습니다');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleRowReject = async (offer: AllRegisteredOffer, reason?: string) => {
+    setActionLoading(true);
+    try {
+      const ok = await adminProductApi.rejectProduct(offer.id, reason);
+      if (ok) {
+        toast.success(`"${offer.name || '상품'}" 반려되었습니다`);
+        await fetchOffers(page);
+      } else {
+        toast.error('반려에 실패했습니다');
+      }
     } finally {
       setActionLoading(false);
     }
@@ -616,6 +695,28 @@ export default function AllRegisteredProductsPage() {
           </button>
         );
       },
+    },
+    // WO-NETURE-OPERATOR-PRODUCT-APPROVAL-ACTION-V1: 행별 승인/반려 메뉴
+    {
+      key: '_actions',
+      header: '',
+      align: 'center',
+      width: '60px',
+      system: true,
+      onCellClick: () => { /* swallow row click */ },
+      render: (_v, row) => (
+        <RowActionMenu
+          actions={buildRowActions(
+            productApprovalActionPolicy,
+            row,
+            {
+              approve: () => handleRowApprove(row),
+              reject: (reason?: string) => handleRowReject(row, reason),
+            },
+            { icons: PRODUCT_APPROVAL_ACTION_ICONS },
+          )}
+        />
+      ),
     },
   ], [selectedOfferIds, allSelected, someSelected, selectableIds.length]);
 
