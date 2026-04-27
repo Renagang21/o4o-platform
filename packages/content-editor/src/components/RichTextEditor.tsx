@@ -373,7 +373,7 @@ const editorStyles = `
     max-width: 100%;
     height: auto;
     border-radius: 8px;
-    margin: 1em 0;
+    margin: 1em auto;
     display: block;
   }
 
