@@ -148,7 +148,7 @@ export function CommunityPreviewSection() {
 
             <div className="mt-4">
               <Link
-                to="/library/content"
+                to="/content"
                 className="inline-flex items-center text-sm font-medium text-emerald-600 hover:text-emerald-700"
               >
                 자료실 보기

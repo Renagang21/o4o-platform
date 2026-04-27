@@ -191,7 +191,7 @@ export default function CommunityPage() {
               <ArrowRight className="ml-auto shrink-0 w-4 h-4 text-gray-300 group-hover:text-primary-600" />
             </Link>
             <Link
-              to="/library/content"
+              to="/content"
               className="flex items-center gap-4 p-5 bg-gray-50 rounded-xl border border-gray-100 hover:border-primary-200 hover:shadow-sm transition-all group"
             >
               <div className="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center shrink-0">
@@ -261,7 +261,7 @@ export default function CommunityPage() {
                 <h2 className="text-xl font-bold text-gray-900">콘텐츠</h2>
               </div>
               <Link
-                to="/library/content"
+                to="/content"
                 className="inline-flex items-center text-sm font-medium text-primary-600 hover:text-primary-700"
               >
                 전체보기
@@ -362,7 +362,7 @@ export default function CommunityPage() {
                 <h2 className="text-xl font-bold text-gray-900">Knowledge</h2>
               </div>
               <Link
-                to="/library/content"
+                to="/content"
                 className="inline-flex items-center text-sm font-medium text-primary-600 hover:text-primary-700"
               >
                 더보기
@@ -373,7 +373,7 @@ export default function CommunityPage() {
               {knowledges.map(item => (
                 <Link
                   key={item.id}
-                  to={`/library/content`}
+                  to={`/content`}
                   className="flex items-center justify-between p-4 rounded-lg hover:bg-white transition-colors group"
                 >
                   <div className="min-w-0 flex-1">

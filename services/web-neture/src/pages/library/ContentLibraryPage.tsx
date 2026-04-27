@@ -3,7 +3,7 @@
  *
  * WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1
  *
- * Route: /library/content
+ * Route: /content
  * API: GET /api/v1/hub/contents?serviceKey=neture&sourceDomain=cms
  */
 

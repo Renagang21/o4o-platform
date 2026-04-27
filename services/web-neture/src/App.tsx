@@ -567,7 +567,7 @@ function App() {
               <Route path="/notices/:id" element={<CommunityAnnouncementDetailPage />} />
 
               {/* WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1 */}
-              <Route path="/library/content" element={<ContentLibraryPage />} />
+              <Route path="/content" element={<ContentLibraryPage />} />
 
               {/* Market Trial Participant (WO-NETURE-MARKET-TRIAL-PARTICIPANT-PAGES-V1) */}
               <Route path="/market-trial" element={<MarketTrialHubPage />} />

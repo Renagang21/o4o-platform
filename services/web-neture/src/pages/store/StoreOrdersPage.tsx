@@ -236,7 +236,7 @@ export default function StoreOrdersPage() {
           <Package size={48} color="#cbd5e1" />
           <h3 style={styles.emptyTitle}>주문 내역이 없습니다</h3>
           <p style={styles.emptyText}>상품을 둘러보고 첫 주문을 시작해보세요.</p>
-          <Link to="/library/content" style={styles.browseBtn}>상품 둘러보기</Link>
+          <Link to="/content" style={styles.browseBtn}>상품 둘러보기</Link>
         </div>
       )}
 
