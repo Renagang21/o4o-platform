@@ -5,6 +5,7 @@ export { NewsNoticesSection } from './NewsNoticesSection';
 export { ActivitySection } from './ActivitySection';
 export { AppEntrySection } from './AppEntrySection';
 export { CtaGuidanceSection } from './CtaGuidanceSection';
+export { O4OHelpSection } from './O4OHelpSection';
 export { SignagePreviewSection } from './SignagePreviewSection';
 export { ContentHighlightSection } from './ContentHighlightSection';
 
@@ -48,6 +49,9 @@ export type {
   ActivitySectionProps,
   AppEntrySectionProps,
   CtaGuidanceSectionProps,
+  O4OHelpSectionProps,
+  O4OHelpUsageItem,
+  O4OHelpServiceItem,
   SignagePreviewSectionProps,
   ContentHighlightSectionProps,
 } from './types';

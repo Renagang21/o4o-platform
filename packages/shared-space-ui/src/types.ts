@@ -158,6 +158,27 @@ export interface ContentHighlightSectionProps {
 /* ------------------------------------------------------------------ */
 /*  SignagePreviewSectionProps                                         */
 /* ------------------------------------------------------------------ */
+export interface O4OHelpUsageItem {
+  title: string;
+  description: string;
+  href: string;
+}
+
+export interface O4OHelpServiceItem {
+  title: string;
+  description: string;
+  href: string;
+  external?: boolean;
+}
+
+export interface O4OHelpSectionProps {
+  usageTitle?: string;
+  usageItems?: O4OHelpUsageItem[];
+  servicesTitle?: string;
+  serviceItems?: O4OHelpServiceItem[];
+}
+
+/* ------------------------------------------------------------------ */
 export interface SignagePreviewSectionProps {
   title?: string;
   mediaLabel?: string;
