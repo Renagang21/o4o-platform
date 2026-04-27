@@ -11,7 +11,7 @@
  * landingType:
  * - product → /store/{storeSlug}/product/{landingTargetId} 또는 /store/product/{landingTargetId}
  * - promotion → /partner/contents/{landingTargetId}
- * - page → /community/knowledge/{landingTargetId}
+ * - page → /knowledge/{landingTargetId}
  * - link → 외부 URL
  */
 
@@ -75,7 +75,7 @@ export default function QrLandingPage() {
           }
           case 'page': {
             if (qr.landingTargetId) {
-              navigate(`/community/knowledge/${qr.landingTargetId}`, { replace: true });
+              navigate(`/knowledge/${qr.landingTargetId}`, { replace: true });
             } else {
               setError('QR 코드에 페이지 정보가 없습니다.');
             }

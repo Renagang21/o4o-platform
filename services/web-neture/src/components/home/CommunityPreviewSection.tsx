@@ -98,7 +98,7 @@ export function CommunityPreviewSection() {
                 {posts.map((post) => (
                   <Link
                     key={post.id}
-                    to={`/community/forum/post/${post.slug}`}
+                    to={`/forum/post/${post.slug}`}
                     className="block p-4 bg-white rounded-lg border border-gray-200 hover:border-primary-300 hover:shadow-sm transition-all"
                   >
                     <p className="text-sm font-medium text-gray-900 mb-1 truncate">
@@ -118,7 +118,7 @@ export function CommunityPreviewSection() {
 
             <div className="mt-4">
               <Link
-                to="/community/forum"
+                to="/forum"
                 className="inline-flex items-center text-sm font-medium text-primary-600 hover:text-primary-700"
               >
                 포럼 보기
@@ -148,7 +148,7 @@ export function CommunityPreviewSection() {
 
             <div className="mt-4">
               <Link
-                to="/community/knowledge"
+                to="/knowledge"
                 className="inline-flex items-center text-sm font-medium text-emerald-600 hover:text-emerald-700"
               >
                 자료실 보기

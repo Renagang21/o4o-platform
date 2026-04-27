@@ -122,11 +122,11 @@ export default function ContentLibraryPage() {
       {/* Header */}
       <div className="mb-6">
         <Link
-          to="/community"
+          to="/"
           className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-3"
         >
           <ArrowLeft className="w-4 h-4" />
-          커뮤니티
+          Home
         </Link>
         <h1 className="text-xl font-bold text-gray-900">콘텐츠 라이브러리</h1>
         <p className="text-sm text-gray-500 mt-1">

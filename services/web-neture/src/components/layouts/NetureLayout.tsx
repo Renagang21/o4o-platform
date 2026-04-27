@@ -4,7 +4,7 @@
  * WO-O4O-NETURE-UI-REFACTORING-V1
  * WO-O4O-GLOBAL-LAYOUT-UNIFICATION-V1: Header → NetureGlobalHeader 교체
  *
- * 스코프: /, /about, /community, /contact
+ * 스코프: /, /about, /forum, /notices, /contact
  */
 
 import { Link, Outlet } from 'react-router-dom';

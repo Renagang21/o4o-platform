@@ -21,7 +21,6 @@ import { PageContainer } from '@o4o/ui';
 import {
   Bell,
   MessageSquare,
-  Monitor,
   ArrowRight,
   FileText,
   Heart,
@@ -121,10 +120,89 @@ export default function CommunityPage() {
       <section className="bg-gradient-to-br from-primary-600 to-primary-800 text-white py-16">
         <PageContainer>
           <div className="text-center">
-            <h1 className="text-3xl font-bold mb-3">Community</h1>
+            <h1 className="text-3xl font-bold mb-3">Neture</h1>
             <p className="text-lg text-white/80">
-              공지사항, 콘텐츠, 포럼에서 정보를 공유합니다
+              유통 · 콘텐츠 · 커뮤니티 플랫폼
             </p>
+          </div>
+        </PageContainer>
+      </section>
+
+      {/* AppEntrySection — 2단 진입 구조 */}
+      <section className="py-10 bg-white border-b border-gray-100">
+        <PageContainer>
+          {/* Primary */}
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">핵심 기능</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+            <Link
+              to="/market-trial"
+              className="flex items-center gap-4 p-5 bg-primary-50 rounded-xl border border-primary-100 hover:border-primary-300 hover:shadow-sm transition-all group"
+            >
+              <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center shrink-0">
+                <TrendingUp className="w-5 h-5 text-primary-600" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-gray-900 group-hover:text-primary-600">유통 참여형 펀딩</p>
+                <p className="text-xs text-gray-500">Market Trial</p>
+              </div>
+              <ArrowRight className="ml-auto shrink-0 w-4 h-4 text-gray-300 group-hover:text-primary-600" />
+            </Link>
+            <Link
+              to="/supplier"
+              className="flex items-center gap-4 p-5 bg-gray-50 rounded-xl border border-gray-100 hover:border-primary-200 hover:shadow-sm transition-all group"
+            >
+              <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center shrink-0">
+                <Layers className="w-5 h-5 text-gray-600" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-gray-900 group-hover:text-primary-600">Supplier</p>
+                <p className="text-xs text-gray-500">공급자 공간</p>
+              </div>
+              <ArrowRight className="ml-auto shrink-0 w-4 h-4 text-gray-300 group-hover:text-primary-600" />
+            </Link>
+            <Link
+              to="/partner"
+              className="flex items-center gap-4 p-5 bg-gray-50 rounded-xl border border-gray-100 hover:border-primary-200 hover:shadow-sm transition-all group"
+            >
+              <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center shrink-0">
+                <Users className="w-5 h-5 text-gray-600" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-gray-900 group-hover:text-primary-600">Partner</p>
+                <p className="text-xs text-gray-500">파트너 공간</p>
+              </div>
+              <ArrowRight className="ml-auto shrink-0 w-4 h-4 text-gray-300 group-hover:text-primary-600" />
+            </Link>
+          </div>
+          {/* Secondary */}
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">확장 기능</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Link
+              to="/forum"
+              className="flex items-center gap-4 p-5 bg-gray-50 rounded-xl border border-gray-100 hover:border-primary-200 hover:shadow-sm transition-all group"
+            >
+              <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center shrink-0">
+                <MessageSquare className="w-5 h-5 text-blue-600" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-gray-900 group-hover:text-primary-600">Forum</p>
+                <p className="text-xs text-gray-500">커뮤니티 포럼</p>
+              </div>
+              <ArrowRight className="ml-auto shrink-0 w-4 h-4 text-gray-300 group-hover:text-primary-600" />
+            </Link>
+            <Link
+              to="/library/content"
+              className="flex items-center gap-4 p-5 bg-gray-50 rounded-xl border border-gray-100 hover:border-primary-200 hover:shadow-sm transition-all group"
+            >
+              <div className="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center shrink-0">
+                <FileText className="w-5 h-5 text-emerald-600" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-gray-900 group-hover:text-primary-600">Content</p>
+                <p className="text-xs text-gray-500">자료 · 콘텐츠</p>
+              </div>
+              <ArrowRight className="ml-auto shrink-0 w-4 h-4 text-gray-300 group-hover:text-primary-600" />
+            </Link>
           </div>
         </PageContainer>
       </section>
@@ -139,7 +217,7 @@ export default function CommunityPage() {
                 <h2 className="text-xl font-bold text-gray-900">공지사항</h2>
               </div>
               <Link
-                to="/community/announcements"
+                to="/notices"
                 className="inline-flex items-center text-sm font-medium text-amber-600 hover:text-amber-700"
               >
                 전체 보기
@@ -150,7 +228,7 @@ export default function CommunityPage() {
               {notices.map(notice => (
                 <Link
                   key={notice.id}
-                  to={`/community/announcements/${notice.id}`}
+                  to={`/notices/${notice.id}`}
                   className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-amber-50 transition-colors group"
                 >
                   <div className="flex items-center gap-3 min-w-0">
@@ -230,7 +308,7 @@ export default function CommunityPage() {
               <div className="flex items-center gap-3">
                 {isAuthenticated && (
                   <Link
-                    to="/community/write"
+                    to="/article/write"
                     className="inline-flex items-center text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 px-3 py-1.5 rounded-lg transition-colors"
                   >
                     글쓰기
@@ -242,7 +320,7 @@ export default function CommunityPage() {
               {articles.map(post => (
                 <Link
                   key={post.id}
-                  to={`/community/article/${post.slug}`}
+                  to={`/article/${post.slug}`}
                   className="flex items-center justify-between p-4 rounded-lg hover:bg-gray-50 transition-colors group"
                 >
                   <div className="min-w-0 flex-1">
@@ -332,7 +410,7 @@ export default function CommunityPage() {
                 <h2 className="text-xl font-bold text-gray-900">최근 포럼 글</h2>
               </div>
               <Link
-                to="/community/forum"
+                to="/forum"
                 className="inline-flex items-center text-sm font-medium text-primary-600 hover:text-primary-700"
               >
                 포럼 보기
@@ -343,7 +421,7 @@ export default function CommunityPage() {
               {recentPosts.map(post => (
                 <Link
                   key={post.id}
-                  to={`/community/forum/post/${post.slug}`}
+                  to={`/forum/post/${post.slug}`}
                   className="flex items-center justify-between p-4 rounded-lg hover:bg-gray-50 transition-colors group"
                 >
                   <div className="min-w-0 flex-1">
@@ -387,7 +465,7 @@ export default function CommunityPage() {
               {popularCategories.map(cat => (
                 <Link
                   key={cat.id}
-                  to="/community/forum"
+                  to="/forum"
                   className="p-5 bg-white rounded-xl border border-gray-200 hover:border-primary-300 hover:shadow-sm transition-all group"
                 >
                   <div className="flex items-center gap-3 mb-2">
@@ -443,26 +521,6 @@ export default function CommunityPage() {
         </section>
       )}
 
-      {/* Digital Signage 안내 */}
-      <section className="py-12 bg-gray-50">
-        <PageContainer>
-          <Link
-            to="/community/signage"
-            className="flex items-center gap-6 p-8 bg-white rounded-2xl border border-gray-200 hover:border-violet-300 hover:shadow-lg transition-all group"
-          >
-            <div className="shrink-0 w-14 h-14 bg-violet-100 rounded-xl flex items-center justify-center">
-              <Monitor className="w-7 h-7 text-violet-600" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h2 className="text-lg font-bold text-gray-900 mb-1">Digital Signage</h2>
-              <p className="text-sm text-gray-600">
-                매장에서 사용하는 디지털 콘텐츠 안내
-              </p>
-            </div>
-            <ArrowRight className="shrink-0 w-5 h-5 text-gray-400 group-hover:text-violet-600 transition-colors" />
-          </Link>
-        </PageContainer>
-      </section>
     </div>
   );
 }

@@ -68,7 +68,7 @@ export default function CommunityAnnouncementDetailPage() {
         <h1 className="text-2xl font-bold text-gray-900 mb-4">
           {error ? `오류: ${error}` : '공지사항을 찾을 수 없습니다'}
         </h1>
-        <Link to="/community/announcements" className="text-primary-600 hover:text-primary-700">
+        <Link to="/notices" className="text-primary-600 hover:text-primary-700">
           공지사항 목록으로 돌아가기
         </Link>
       </div>
@@ -82,7 +82,7 @@ export default function CommunityAnnouncementDetailPage() {
     <div className="max-w-3xl mx-auto px-4 py-12">
       {/* Back */}
       <Link
-        to="/community/announcements"
+        to="/notices"
         className="inline-flex items-center text-primary-600 hover:text-primary-700 mb-8 text-sm"
       >
         <ArrowLeft className="w-4 h-4 mr-1" />
@@ -178,7 +178,7 @@ export default function CommunityAnnouncementDetailPage() {
       {/* Navigation */}
       <div className="mt-6 text-center">
         <Link
-          to="/community/announcements"
+          to="/notices"
           className="inline-flex items-center text-gray-600 hover:text-gray-900 text-sm"
         >
           공지사항 전체 보기 →

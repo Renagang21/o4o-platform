@@ -35,11 +35,11 @@ export default function CommunityAnnouncementsPage() {
     <div className="max-w-4xl mx-auto px-4 py-12">
       {/* Back nav */}
       <Link
-        to="/community"
+        to="/"
         className="inline-flex items-center text-primary-600 hover:text-primary-700 mb-8 text-sm"
       >
         <ArrowLeft className="w-4 h-4 mr-1" />
-        Community
+        Home
       </Link>
 
       <h1 className="text-3xl font-bold text-gray-900 mb-2">Announcements</h1>
@@ -73,7 +73,7 @@ export default function CommunityAnnouncementsPage() {
           {notices.map((notice) => (
             <Link
               key={notice.id}
-              to={`/community/announcements/${notice.id}`}
+              to={`/notices/${notice.id}`}
               className="flex items-start gap-4 bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md hover:border-primary-200 transition-all"
             >
               <div className="w-10 h-10 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center flex-shrink-0">

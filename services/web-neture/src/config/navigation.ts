@@ -16,7 +16,6 @@ import type { GlobalHeaderNavItem } from '@o4o/ui';
 export const NETURE_PUBLIC_NAV: GlobalHeaderNavItem[] = [
   { label: 'Home', href: '/' },
   { label: 'Market Trial', href: '/market-trial' },
-  { label: 'Community', href: '/community' },
   { label: 'Supplier', href: '/supplier' },
   { label: 'Partner', href: '/partner' },
   { label: 'Contact Us', href: '/contact' },

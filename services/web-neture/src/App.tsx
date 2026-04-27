@@ -37,7 +37,7 @@ import { RoleGuard, OperatorRoute, AdminRoute, SupplierRoute } from './component
 // ============================================================================
 // Neture 메인 페이지 (항상 로드)
 // ============================================================================
-import NetureHomePage from './pages/NetureHomePage';
+// NetureHomePage removed — Community promoted to Home (WO-NETURE-HOME-COMMUNITY-PROMOTION-V1)
 import HandoffPage from './pages/HandoffPage';
 import AboutPage from './pages/AboutPage';
 import LegalPage from './pages/LegalPage';
@@ -47,7 +47,6 @@ import KnowledgeDetailPage from './pages/knowledge/KnowledgeDetailPage';
 import {
   CommunityAnnouncementsPage,
   CommunityAnnouncementDetailPage,
-  CommunitySignagePage,
 } from './pages/community';
 import ContactPage from './pages/ContactPage';
 import SupplierLandingPage from './pages/SupplierLandingPage';
@@ -469,7 +468,7 @@ function ModalRenderer() {
 
 // Legacy redirect helpers
 function RedirectSupplierDetail() {
-  return <Navigate to="/community" replace />;
+  return <Navigate to="/" replace />;
 }
 function RedirectPartnershipRequestDetail() {
   const { id } = useParams();
@@ -545,7 +544,7 @@ function App() {
                 WO-O4O-NETURE-UI-REFACTORING-V1
             ================================================================ */}
             <Route element={<NetureLayout />}>
-              <Route path="/" element={<NetureHomePage />} />
+              <Route path="/" element={<CommunityPage />} />
               {/* MyPage 3-split (WO-O4O-NETURE-MYPAGE-SPLIT-V1) */}
               <Route path="/mypage" element={<MyPageHub />} />
               <Route path="/mypage/profile" element={<MyProfilePage />} />
@@ -558,19 +557,19 @@ function App() {
               <Route path="/terms" element={<LegalPage slug="terms-of-service" title="이용약관" />} />
               <Route path="/privacy" element={<LegalPage slug="privacy-policy" title="개인정보처리방침" />} />
 
-              {/* Community (WO-O4O-NETURE-COMMUNITY-PAGE-V1) */}
-              <Route path="/community" element={<CommunityPage />} />
-              <Route path="/community/announcements" element={<CommunityAnnouncementsPage />} />
-              <Route path="/community/announcements/:id" element={<CommunityAnnouncementDetailPage />} />
-              <Route path="/community/signage" element={<CommunitySignagePage />} />
-              <Route path="/community/forum" element={<ForumHubPage title="네뚜레 포럼" description="o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간입니다" basePath="/community/forum" />} />
-              <Route path="/community/forum/posts" element={<ForumPage title="네뚜레 포럼" description="o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간입니다" />} />
-              <Route path="/community/forum/write" element={<ForumWritePage />} />
-              <Route path="/community/forum/post/:slug" element={<ForumPostPage />} />
+              {/* Forum — O4O 공통 구조 (WO-NETURE-HOME-COMMUNITY-PROMOTION-V1) */}
+              <Route path="/forum" element={<ForumHubPage title="네뚜레 포럼" description="o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간입니다" basePath="/forum" />} />
+              <Route path="/forum/posts" element={<ForumPage title="네뚜레 포럼" description="o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간입니다" />} />
+              <Route path="/forum/write" element={<ForumWritePage />} />
+              <Route path="/forum/post/:slug" element={<ForumPostPage />} />
 
-              {/* Community Articles (WO-O4O-COMMUNITY-ARTICLE-SYSTEM-V1) */}
-              <Route path="/community/write" element={<ForumWritePage categorySlug="article" backPath="/community" postSegment="article" />} />
-              <Route path="/community/article/:slug" element={<ForumPostPage />} />
+              {/* Articles */}
+              <Route path="/article/write" element={<ForumWritePage categorySlug="article" backPath="/" postSegment="article" />} />
+              <Route path="/article/:slug" element={<ForumPostPage />} />
+
+              {/* Notices */}
+              <Route path="/notices" element={<CommunityAnnouncementsPage />} />
+              <Route path="/notices/:id" element={<CommunityAnnouncementDetailPage />} />
 
               {/* Knowledge (WO-O4O-KNOWLEDGE-LIBRARY-V1) */}
               <Route path="/knowledge" element={<KnowledgePage />} />
@@ -908,7 +907,7 @@ function App() {
             ================================================================ */}
             {/* Workspace → 새 경로 */}
             <Route path="/workspace" element={<Navigate to="/" replace />} />
-            <Route path="/workspace/suppliers" element={<Navigate to="/community" replace />} />
+            <Route path="/workspace/suppliers" element={<Navigate to="/" replace />} />
             <Route path="/workspace/suppliers/:slug" element={<RedirectSupplierDetail />} />
             <Route path="/workspace/content" element={<Navigate to="/partner/contents" replace />} />
             <Route path="/workspace/content/:id" element={<RedirectContentDetail />} />
@@ -931,7 +930,7 @@ function App() {
             <Route path="/workspace/partner/*" element={<Navigate to="/partner/dashboard" replace />} />
 
             {/* 기존 최상위 경로 리다이렉트 */}
-            <Route path="/suppliers" element={<Navigate to="/community" replace />} />
+            <Route path="/suppliers" element={<Navigate to="/" replace />} />
             <Route path="/suppliers/:slug" element={<RedirectSupplierDetail />} />
             <Route path="/partners/requests" element={<Navigate to="/workspace/partners/requests" replace />} />
             <Route path="/partners/requests/:id" element={<RedirectPartnershipRequestDetail />} />

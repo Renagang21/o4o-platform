@@ -470,7 +470,7 @@ export function MarketTrialDetailPage() {
               </p>
             </div>
             <Link
-              to={`/community/forum/post/${trial.forumPostId}`}
+              to={`/forum/post/${trial.forumPostId}`}
               style={s.forumLink}
             >
               포럼 글 보기 →

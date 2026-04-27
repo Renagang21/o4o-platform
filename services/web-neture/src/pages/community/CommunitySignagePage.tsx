@@ -75,11 +75,11 @@ export default function CommunitySignagePage() {
       {/* Back nav */}
       <div className="max-w-5xl mx-auto px-4 pt-8">
         <Link
-          to="/community"
+          to="/"
           className="inline-flex items-center text-primary-600 hover:text-primary-700 text-sm"
         >
           <ArrowLeft className="w-4 h-4 mr-1" />
-          Community
+          Home
         </Link>
       </div>
 
