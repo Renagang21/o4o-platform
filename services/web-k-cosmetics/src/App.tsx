@@ -63,6 +63,9 @@ const EducationPage = lazy(() => import('@/pages/lms/EducationPage'));
 const LmsCourseDetailPage = lazy(() => import('@/pages/lms/LmsCourseDetailPage'));
 const LmsLessonPage = lazy(() => import('@/pages/lms/LmsLessonPage'));
 
+// Resources Hub (WO-KCOS-RESOURCES-HUB-IMPLEMENTATION-V1)
+const ResourcesPage = lazy(() => import('@/pages/resources/ResourcesPage').then(m => ({ default: m.ResourcesPage })));
+
 // Community Hub (WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1)
 const CommunityHubPage = lazy(() => import('@/pages/community/CommunityHubPage'));
 
@@ -194,6 +197,9 @@ function AppRoutes() {
         <Route path="contact" element={<ContactPage />} />
         <Route path="partners" element={<PartnerInfoPage />} />
         <Route path="partners/apply" element={<PartnerApplyPage />} />
+
+        {/* Resources Hub (WO-KCOS-RESOURCES-HUB-IMPLEMENTATION-V1) */}
+        <Route path="resources" element={<ResourcesPage />} />
 
         {/* Community Hub (WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1) */}
         <Route path="community" element={<CommunityHubPage />} />

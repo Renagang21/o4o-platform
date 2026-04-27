@@ -16,6 +16,7 @@ export const KCOS_PUBLIC_NAV: GlobalHeaderNavItem[] = [
   { label: '홈', href: '/' },
   { label: '포럼', href: '/forum' },
   { label: '강의', href: '/lms' },
+  { label: '자료실', href: '/resources' },
   { label: '매장 HUB', href: '/store-hub' },
 ];
 
