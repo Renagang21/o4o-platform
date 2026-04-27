@@ -2,23 +2,25 @@
  * StoreCartPage — O4O B2B 장바구니
  *
  * WO-O4O-STORE-CART-PAGE-V1
+ * WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1: 공급자별 주문 조건 가시화
  *
  * 구성:
  * - 공급자별 그룹화된 장바구니
  * - 수량 조절 / 삭제
- * - 배송비 자동 계산 (≥50,000원 무료, <50,000원 → 3,000원)
+ * - 공급자별 최소 주문 금액 / 미달 시 물류비 안내 (실제 결제 반영 ✗)
  * - 공급자별 주문하기 (배송 정보 입력 → POST /seller/orders)
  * - 모바일 반응형
  */
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Trash2, Minus, Plus, Package, X, Truck } from 'lucide-react';
+import { ShoppingCart, Trash2, Minus, Plus, Package, X, Truck, AlertCircle, CheckCircle2, Info } from 'lucide-react';
 import { useCart } from '../../lib/cart';
-import { storeApi } from '../../lib/api';
-import type { StoreOrderShipping } from '../../lib/api';
+import { storeApi, supplierProfileApi } from '../../lib/api';
+import type { StoreOrderShipping, SupplierOrderCondition } from '../../lib/api';
 import type { SupplierGroup, CartItem } from '../../lib/cart';
 import { getReferralToken, clearReferralToken } from '../../lib/referral';
+import SupplierConditionModal from '../../components/common/SupplierConditionModal';
 
 // ============================================================================
 // Helpers
@@ -26,10 +28,6 @@ import { getReferralToken, clearReferralToken } from '../../lib/referral';
 
 function formatPrice(value: number): string {
   return value.toLocaleString('ko-KR');
-}
-
-function calcShippingFee(subtotal: number): number {
-  return subtotal >= 50000 ? 0 : 3000;
 }
 
 // ============================================================================
@@ -204,19 +202,27 @@ function ShippingModal({ onSubmit, onClose, loading }: {
 // Supplier Group Card
 // ============================================================================
 
-function SupplierGroupCard({ supplierId, group, onUpdateQty, onRemove, onOrder }: {
+function SupplierGroupCard({ supplierId, group, condition, onUpdateQty, onRemove, onOrder, onShowCondition }: {
   supplierId: string;
   group: SupplierGroup;
+  condition: SupplierOrderCondition | null | undefined;
   onUpdateQty: (offerId: string, qty: number) => void;
   onRemove: (offerId: string) => void;
   onOrder: (supplierId: string) => void;
+  onShowCondition: () => void;
 }) {
   const subtotal = useMemo(
     () => group.items.reduce((sum, i) => sum + i.priceGeneral * i.quantity, 0),
     [group.items],
   );
-  const shippingFee = calcShippingFee(subtotal);
-  const total = subtotal + shippingFee;
+
+  const minOrder = condition?.minOrderAmount ?? null;
+  const surcharge = condition?.minOrderSurcharge ?? null;
+  const note = condition?.note ?? null;
+  const hasMinOrder = minOrder != null && minOrder > 0;
+  const hasSurcharge = surcharge != null && surcharge > 0;
+  const shortfall = hasMinOrder ? Math.max(0, minOrder - subtotal) : 0;
+  const isMet = !hasMinOrder || subtotal >= minOrder;
 
   return (
     <div style={styles.groupCard}>
@@ -224,7 +230,13 @@ function SupplierGroupCard({ supplierId, group, onUpdateQty, onRemove, onOrder }
       <div style={styles.groupHeader}>
         <div style={styles.groupName}>
           <Truck size={18} color="#6366f1" />
-          <span style={{ marginLeft: 8 }}>{group.supplierName}</span>
+          <button
+            type="button"
+            onClick={onShowCondition}
+            style={styles.supplierNameBtn}
+          >
+            {group.supplierName}
+          </button>
           <span style={styles.groupCount}>{group.items.length}개 상품</span>
         </div>
       </div>
@@ -245,23 +257,58 @@ function SupplierGroupCard({ supplierId, group, onUpdateQty, onRemove, onOrder }
       <div style={styles.groupSummary}>
         <div style={styles.summaryRow}>
           <span>소계</span>
-          <span>₩{formatPrice(subtotal)}</span>
+          <span style={styles.summarySubtotal}>₩{formatPrice(subtotal)}</span>
         </div>
-        <div style={styles.summaryRow}>
-          <span>배송비</span>
-          <span style={shippingFee === 0 ? { color: '#15803d', fontWeight: 600 } : {}}>
-            {shippingFee === 0 ? '무료' : `₩${formatPrice(shippingFee)}`}
-          </span>
-        </div>
-        {shippingFee > 0 && (
-          <div style={styles.shippingHint}>
-            ₩{formatPrice(50000 - subtotal)} 더 주문 시 무료배송
+
+        {/* 공급자 주문 조건 — WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1 */}
+        {(hasMinOrder || hasSurcharge || note) ? (
+          <div style={styles.conditionBox}>
+            <div style={styles.conditionHeader}>
+              <Info size={13} color="#475569" />
+              <span style={{ marginLeft: 4 }}>공급자 주문 조건</span>
+            </div>
+
+            {hasMinOrder && (
+              <div style={styles.summaryRow}>
+                <span>최소 주문 금액</span>
+                <span>
+                  ₩{formatPrice(minOrder)}
+                  {isMet ? (
+                    <span style={styles.metBadge}>
+                      <CheckCircle2 size={12} /> 충족
+                    </span>
+                  ) : (
+                    <span style={styles.shortBadge}>
+                      <AlertCircle size={12} /> ₩{formatPrice(shortfall)} 부족
+                    </span>
+                  )}
+                </span>
+              </div>
+            )}
+
+            {hasSurcharge && (
+              <div style={styles.summaryRow}>
+                <span>미달 시 물류비</span>
+                <span style={!isMet ? styles.activeSurcharge : styles.inactiveSurcharge}>
+                  +₩{formatPrice(surcharge)}
+                </span>
+              </div>
+            )}
+
+            {note && (
+              <div style={styles.conditionNote}>{note}</div>
+            )}
+
+            <div style={styles.conditionDisclaimer}>
+              ※ 안내 정보입니다. 실제 결제 반영은 별도 단계에서 처리됩니다.
+            </div>
+          </div>
+        ) : (
+          <div style={styles.noConditionBox}>
+            이 공급자는 주문 조건이 설정되어 있지 않습니다.
           </div>
         )}
-        <div style={styles.summaryTotal}>
-          <span>합계</span>
-          <span>₩{formatPrice(total)}</span>
-        </div>
+
         <button style={styles.orderBtn} onClick={() => onOrder(supplierId)}>
           주문하기
         </button>
@@ -298,11 +345,35 @@ export default function StoreCartPage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
+  const [conditions, setConditions] = useState<Map<string, SupplierOrderCondition | null>>(new Map());
+  const [conditionTarget, setConditionTarget] = useState<{ id: string; name: string } | null>(null);
+
+  // 공급자별 주문 조건 일괄 조회 (장바구니에 포함된 공급자만)
+  useEffect(() => {
+    const supplierIds = Array.from(grouped.keys()).filter((id) => !conditions.has(id));
+    if (supplierIds.length === 0) return;
+    let cancelled = false;
+    Promise.all(
+      supplierIds.map((id) =>
+        supplierProfileApi.getOrderCondition(id).then((c) => [id, c] as const),
+      ),
+    ).then((results) => {
+      if (cancelled) return;
+      setConditions((prev) => {
+        const next = new Map(prev);
+        for (const [id, c] of results) next.set(id, c);
+        return next;
+      });
+    });
+    return () => { cancelled = true; };
+  }, [grouped, conditions]);
+
+  // 결제 반영 X — 단순 소계 합산 (안내 가이드라인 준수)
   const grandTotal = useMemo(() => {
     let total = 0;
     for (const [, group] of grouped) {
-      const sub = group.items.reduce((s, i) => s + i.priceGeneral * i.quantity, 0);
-      total += sub + calcShippingFee(sub);
+      total += group.items.reduce((s, i) => s + i.priceGeneral * i.quantity, 0);
     }
     return total;
   }, [grouped]);
@@ -389,16 +460,18 @@ export default function StoreCartPage() {
           key={supplierId}
           supplierId={supplierId}
           group={group}
+          condition={conditions.get(supplierId)}
           onUpdateQty={updateQty}
           onRemove={remove}
           onOrder={handleOrder}
+          onShowCondition={() => setConditionTarget({ id: supplierId, name: group.supplierName })}
         />
       ))}
 
-      {/* Grand Total */}
+      {/* Grand Total — 소계 합산 (결제 반영 X) */}
       {items.length > 0 && (
         <div style={styles.grandTotal}>
-          <span style={styles.grandTotalLabel}>전체 합계 ({supplierEntries.length}개 공급자)</span>
+          <span style={styles.grandTotalLabel}>전체 소계 ({supplierEntries.length}개 공급자)</span>
           <span style={styles.grandTotalValue}>₩{formatPrice(grandTotal)}</span>
         </div>
       )}
@@ -411,6 +484,14 @@ export default function StoreCartPage() {
           onSubmit={handleSubmitOrder}
         />
       )}
+
+      {/* Supplier condition modal — WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1 */}
+      <SupplierConditionModal
+        open={!!conditionTarget}
+        supplierId={conditionTarget?.id ?? null}
+        fallbackName={conditionTarget?.name}
+        onClose={() => setConditionTarget(null)}
+      />
 
       {/* Error message inside modal area */}
       {errorMessage && orderingSupplierId && (
@@ -602,20 +683,97 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#475569',
     marginBottom: 6,
   },
-  shippingHint: {
+  summarySubtotal: {
+    fontSize: 15,
+    fontWeight: 600,
+    color: '#0f172a',
+  },
+  supplierNameBtn: {
+    marginLeft: 8,
+    padding: 0,
+    fontSize: 15,
+    fontWeight: 600,
+    color: '#1e293b',
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    textDecoration: 'underline',
+    textDecorationColor: 'rgba(99,102,241,0.3)',
+    textUnderlineOffset: 3,
+  },
+  conditionBox: {
+    marginTop: 12,
+    padding: 12,
+    backgroundColor: '#f8fafc',
+    border: '1px solid #e2e8f0',
+    borderRadius: 8,
+    marginBottom: 12,
+  },
+  conditionHeader: {
+    display: 'flex',
+    alignItems: 'center',
     fontSize: 12,
-    color: '#6366f1',
-    textAlign: 'right' as const,
+    fontWeight: 600,
+    color: '#475569',
     marginBottom: 8,
   },
-  summaryTotal: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    fontSize: 16,
-    fontWeight: 700,
-    color: '#0f172a',
-    paddingTop: 8,
-    borderTop: '1px solid #e2e8f0',
+  metBadge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 3,
+    marginLeft: 8,
+    padding: '2px 6px',
+    fontSize: 11,
+    fontWeight: 600,
+    color: '#15803d',
+    backgroundColor: '#dcfce7',
+    borderRadius: 4,
+  },
+  shortBadge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 3,
+    marginLeft: 8,
+    padding: '2px 6px',
+    fontSize: 11,
+    fontWeight: 600,
+    color: '#b45309',
+    backgroundColor: '#fef3c7',
+    borderRadius: 4,
+  },
+  activeSurcharge: {
+    color: '#b45309',
+    fontWeight: 600,
+  },
+  inactiveSurcharge: {
+    color: '#94a3b8',
+  },
+  conditionNote: {
+    marginTop: 8,
+    padding: 8,
+    fontSize: 12,
+    color: '#475569',
+    backgroundColor: '#fff',
+    border: '1px solid #e2e8f0',
+    borderRadius: 6,
+    whiteSpace: 'pre-line' as const,
+    lineHeight: 1.5,
+  },
+  conditionDisclaimer: {
+    marginTop: 8,
+    fontSize: 11,
+    color: '#94a3b8',
+    lineHeight: 1.4,
+  },
+  noConditionBox: {
+    marginTop: 12,
+    padding: 10,
+    fontSize: 12,
+    color: '#94a3b8',
+    backgroundColor: '#f8fafc',
+    border: '1px dashed #e2e8f0',
+    borderRadius: 8,
+    textAlign: 'center' as const,
     marginBottom: 12,
   },
 

@@ -212,6 +212,24 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
   });
 
   /**
+   * GET /api/v1/neture/suppliers/:id/order-condition
+   * WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
+   */
+  router.get('/suppliers/:id/order-condition', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const { id } = req.params;
+      const condition = await netureService.getSupplierOrderCondition(id);
+      if (!condition) {
+        return res.status(404).json({ success: false, error: 'SUPPLIER_NOT_FOUND' });
+      }
+      res.json({ success: true, data: condition });
+    } catch (error) {
+      logger.error('[Neture API] Error fetching supplier order condition:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+    }
+  });
+
+  /**
    * GET /api/v1/neture/suppliers/:slug
    */
   router.get('/suppliers/:slug', requireAuth, async (req: AuthenticatedRequest, res: Response) => {

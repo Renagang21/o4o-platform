@@ -15,6 +15,7 @@ import {
   storeApi,
   type StoreListingItem,
 } from '../../lib/api';
+import SupplierConditionModal from '../../components/common/SupplierConditionModal';
 
 function formatPrice(value: number | null): string {
   if (value == null) return '-';
@@ -36,6 +37,9 @@ export default function StoreListingsPage() {
 
   // Message
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Supplier condition modal — WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
+  const [conditionTarget, setConditionTarget] = useState<{ id: string; name: string } | null>(null);
 
   const fetchListings = useCallback(async (p: number) => {
     setLoading(true);
@@ -171,7 +175,19 @@ export default function StoreListingsPage() {
                 <p className="text-xs text-slate-400 mt-0.5">{listing.barcode} · {listing.manufacturerName}</p>
                 <div className="flex items-center gap-3 mt-1.5 flex-wrap">
                   <span className="text-xs text-slate-500">
-                    공급: {listing.supplierName} · {formatPrice(listing.offerPrice)}
+                    공급:{' '}
+                    {listing.supplierId ? (
+                      <button
+                        type="button"
+                        onClick={() => setConditionTarget({ id: listing.supplierId!, name: listing.supplierName })}
+                        className="text-primary-600 hover:underline font-medium"
+                      >
+                        {listing.supplierName}
+                      </button>
+                    ) : (
+                      listing.supplierName
+                    )}
+                    {' · '}{formatPrice(listing.offerPrice)}
                   </span>
                   <span className="inline-block px-1.5 py-0.5 text-xs bg-slate-100 text-slate-500 rounded">
                     {listing.distributionType === 'PUBLIC' ? '공개' : '비공개'}
@@ -257,6 +273,14 @@ export default function StoreListingsPage() {
           </button>
         </div>
       )}
+
+      {/* Supplier condition modal — WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1 */}
+      <SupplierConditionModal
+        open={!!conditionTarget}
+        supplierId={conditionTarget?.id ?? null}
+        fallbackName={conditionTarget?.name}
+        onClose={() => setConditionTarget(null)}
+      />
     </div>
   );
 }

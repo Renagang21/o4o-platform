@@ -354,6 +354,19 @@ export interface SupplierProfile {
   contactPhoneVisibility: ContactVisibility;
   contactWebsiteVisibility: ContactVisibility;
   contactKakaoVisibility: ContactVisibility;
+  // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
+  minOrderAmount: number | null;
+  minOrderSurcharge: number | null;
+  orderConditionNote: string | null;
+}
+
+// WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
+export interface SupplierOrderCondition {
+  supplierId: string;
+  supplierName: string;
+  minOrderAmount: number | null;
+  minOrderSurcharge: number | null;
+  note: string | null;
 }
 
 export interface ProfileCompleteness {
@@ -912,12 +925,27 @@ export const supplierProfileApi = {
     managerPhone?: string;
     businessType?: string;
     taxEmail?: string;
+    // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
+    minOrderAmount?: number | null;
+    minOrderSurcharge?: number | null;
+    orderConditionNote?: string | null;
   }): Promise<{ success: boolean; error?: string }> {
     try {
       const response = await api.patch('/neture/supplier/profile', data);
       return response.data;
     } catch (error) {
       return { success: false, error: extractApiError(error) };
+    }
+  },
+
+  // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
+  async getOrderCondition(supplierId: string): Promise<SupplierOrderCondition | null> {
+    try {
+      const response = await api.get(`/neture/suppliers/${encodeURIComponent(supplierId)}/order-condition`);
+      return response.data?.data ?? null;
+    } catch (error) {
+      console.warn('[Supplier API] Failed to fetch order condition:', error);
+      return null;
     }
   },
 };

@@ -440,12 +440,34 @@ export class NetureSupplierService {
           island: supplier.shippingIsland,
           mountain: supplier.shippingMountain,
         },
+        // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
+        orderCondition: {
+          minOrderAmount: supplier.minOrderAmount ?? null,
+          minOrderSurcharge: supplier.minOrderSurcharge ?? null,
+          note: supplier.orderConditionNote ?? null,
+        },
         contact, contactHints, trustSignals,
       };
     } catch (error) {
       logger.error('[NetureSupplierService] Error fetching supplier by slug:', error);
       throw error;
     }
+  }
+
+  // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
+  async getSupplierOrderCondition(supplierId: string) {
+    const supplier = await this.supplierRepo.findOne({
+      where: { id: supplierId, status: SupplierStatus.ACTIVE },
+    });
+    if (!supplier) return null;
+    const org = await this.getOrgData(supplier.organizationId);
+    return {
+      supplierId: supplier.id,
+      supplierName: org?.name ?? '',
+      minOrderAmount: supplier.minOrderAmount ?? null,
+      minOrderSurcharge: supplier.minOrderSurcharge ?? null,
+      note: supplier.orderConditionNote ?? null,
+    };
   }
 
   // ==================== Supplier Profile ====================
@@ -514,6 +536,10 @@ export class NetureSupplierService {
         contactPhoneVisibility: supplier.contactPhoneVisibility,
         contactWebsiteVisibility: supplier.contactWebsiteVisibility,
         contactKakaoVisibility: supplier.contactKakaoVisibility,
+        // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
+        minOrderAmount: supplier.minOrderAmount ?? null,
+        minOrderSurcharge: supplier.minOrderSurcharge ?? null,
+        orderConditionNote: supplier.orderConditionNote ?? null,
       };
     } catch (error) {
       logger.error('[NetureSupplierService] Error fetching supplier profile:', error);
@@ -543,6 +569,10 @@ export class NetureSupplierService {
       managerPhone?: string;
       businessType?: string;
       taxEmail?: string;
+      // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
+      minOrderAmount?: number | null;
+      minOrderSurcharge?: number | null;
+      orderConditionNote?: string | null;
     },
   ) {
     try {
@@ -566,6 +596,17 @@ export class NetureSupplierService {
       if (data.managerPhone !== undefined) supplier.managerPhone = data.managerPhone ? data.managerPhone.replace(/\D/g, '') : null;
       if (data.businessType !== undefined) supplier.businessType = data.businessType || null;
       if (data.taxEmail !== undefined) supplier.taxEmail = data.taxEmail || null;
+
+      // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1: B2B order condition
+      if (data.minOrderAmount !== undefined) {
+        supplier.minOrderAmount = data.minOrderAmount === null || data.minOrderAmount === 0 ? null : data.minOrderAmount;
+      }
+      if (data.minOrderSurcharge !== undefined) {
+        supplier.minOrderSurcharge = data.minOrderSurcharge === null || data.minOrderSurcharge === 0 ? null : data.minOrderSurcharge;
+      }
+      if (data.orderConditionNote !== undefined) {
+        supplier.orderConditionNote = data.orderConditionNote ? data.orderConditionNote.trim() : null;
+      }
 
       // WO-O4O-NETURE-SUPPLIER-DEPRECATION-V1 Phase 5-B: org-only write (no supplier reverse-sync)
       const orgWriteNeeded =
@@ -625,6 +666,10 @@ export class NetureSupplierService {
         contactPhoneVisibility: supplier.contactPhoneVisibility,
         contactWebsiteVisibility: supplier.contactWebsiteVisibility,
         contactKakaoVisibility: supplier.contactKakaoVisibility,
+        // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
+        minOrderAmount: supplier.minOrderAmount ?? null,
+        minOrderSurcharge: supplier.minOrderSurcharge ?? null,
+        orderConditionNote: supplier.orderConditionNote ?? null,
       };
     } catch (error) {
       logger.error('[NetureSupplierService] Error updating supplier profile:', error);

@@ -194,7 +194,7 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
                 (SELECT pi.image_url FROM product_images pi
                  WHERE pi.master_id = pm.id AND pi.is_primary = true LIMIT 1) AS "primaryImage",
                 spo.price_general AS "offerPrice", spo.distribution_type AS "distributionType",
-                o.name AS "supplierName"
+                s.id AS "supplierId", o.name AS "supplierName"
          FROM organization_product_listings opl
          LEFT JOIN product_masters pm ON opl.master_id = pm.id
          LEFT JOIN supplier_product_offers spo ON opl.offer_id = spo.id

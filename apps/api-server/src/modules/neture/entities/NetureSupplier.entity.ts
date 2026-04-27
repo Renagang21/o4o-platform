@@ -97,6 +97,17 @@ export class NetureSupplier {
   @Column({ name: 'tax_email', type: 'varchar', length: 255, nullable: true })
   taxEmail: string | null;
 
+  // === B2B Order Condition (WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1) ===
+
+  @Column({ name: 'min_order_amount', type: 'integer', nullable: true })
+  minOrderAmount: number | null;
+
+  @Column({ name: 'min_order_surcharge', type: 'integer', nullable: true })
+  minOrderSurcharge: number | null;
+
+  @Column({ name: 'order_condition_note', type: 'text', nullable: true })
+  orderConditionNote: string | null;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

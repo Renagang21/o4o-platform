@@ -7,6 +7,17 @@ import { api } from '../apiClient';
 
 // ==================== Store Order Types ====================
 
+// IR-NETURE-B2B-DIRECT-SHIPPING-ORDER-FLOW-AUDIT-V1 Phase 3
+// Backend NetureOrderType / NetureCustomerInfo와 1:1 매핑
+export type NetureOrderType = 'STORE_RESTOCK' | 'DIRECT_TO_CUSTOMER';
+
+export interface NetureCustomerInfo {
+  name: string;
+  phone: string;
+  email?: string;
+  consent_at: string; // ISO datetime
+}
+
 export interface StoreOrderShipping {
   recipient_name: string;
   phone: string;
@@ -24,6 +35,9 @@ export interface CreateStoreOrderRequest {
   orderer_email?: string;
   note?: string;
   referral_token?: string;
+  // IR-NETURE-B2B-DIRECT-SHIPPING-ORDER-FLOW-AUDIT-V1 Phase 3
+  order_type?: NetureOrderType; // 미지정 시 STORE_RESTOCK
+  customer_info?: NetureCustomerInfo; // DIRECT_TO_CUSTOMER 시 필수
 }
 
 export interface StoreOrderItem {
@@ -65,6 +79,9 @@ export interface StoreOrder {
     address_detail?: string;
     delivery_note?: string;
   } | null;
+  // IR-NETURE-B2B-DIRECT-SHIPPING-ORDER-FLOW-AUDIT-V1 Phase 3
+  order_type?: NetureOrderType;
+  customer_info?: NetureCustomerInfo | null;
   created_at: string;
   updated_at: string;
   items?: StoreOrderItem[];
@@ -98,6 +115,9 @@ export interface SupplierOrderSummary {
   note: string | null;
   region: string | null;
   item_count: number;
+  // IR-NETURE-B2B-DIRECT-SHIPPING-ORDER-FLOW-AUDIT-V1 Phase 3
+  order_type?: NetureOrderType;
+  customer_info?: NetureCustomerInfo | null;
   created_at: string;
   updated_at: string;
 }
@@ -298,6 +318,7 @@ export interface StoreListingItem {
   primaryImage: string | null;
   offerPrice: number;
   distributionType: string;
+  supplierId: string | null;
   supplierName: string;
 }
 

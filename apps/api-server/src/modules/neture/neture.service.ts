@@ -175,6 +175,11 @@ export class NetureService {
     return this.supplierService.getSupplierProfile(supplierId);
   }
 
+  // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
+  async getSupplierOrderCondition(supplierId: string) {
+    return this.supplierService.getSupplierOrderCondition(supplierId);
+  }
+
   async updateSupplierProfile(
     supplierId: string,
     data: {
@@ -196,6 +201,10 @@ export class NetureService {
       managerPhone?: string;
       businessType?: string;
       taxEmail?: string;
+      // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
+      minOrderAmount?: number | null;
+      minOrderSurcharge?: number | null;
+      orderConditionNote?: string | null;
     },
   ) {
     return this.supplierService.updateSupplierProfile(supplierId, data);

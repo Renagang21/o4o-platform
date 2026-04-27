@@ -23,6 +23,7 @@ import {
   FileText,
   MapPin,
   Info,
+  ShoppingCart,
 } from 'lucide-react';
 import { supplierProfileApi, type SupplierProfile, type ContactVisibility } from '../../lib/api';
 import { AddressSearch } from '@o4o/ui';
@@ -88,6 +89,11 @@ export default function SupplierProfilePage() {
   const [websiteVisibility, setWebsiteVisibility] = useState<ContactVisibility>('public');
   const [kakaoVisibility, setKakaoVisibility] = useState<ContactVisibility>('partners');
 
+  // Section D: B2B 주문 조건 (WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1)
+  const [minOrderAmount, setMinOrderAmount] = useState('');
+  const [minOrderSurcharge, setMinOrderSurcharge] = useState('');
+  const [orderConditionNote, setOrderConditionNote] = useState('');
+
   // Pre-fill indicator
   const [prefilled, setPrefilled] = useState(false);
 
@@ -117,6 +123,10 @@ export default function SupplierProfilePage() {
         setPhoneVisibility(data.contactPhoneVisibility || 'private');
         setWebsiteVisibility(data.contactWebsiteVisibility || 'public');
         setKakaoVisibility(data.contactKakaoVisibility || 'partners');
+        // Section D: B2B 주문 조건
+        setMinOrderAmount(data.minOrderAmount != null ? String(data.minOrderAmount) : '');
+        setMinOrderSurcharge(data.minOrderSurcharge != null ? String(data.minOrderSurcharge) : '');
+        setOrderConditionNote(data.orderConditionNote || '');
         // Pre-fill
         setPrefilled(!!data._prefilled);
       }
@@ -151,6 +161,10 @@ export default function SupplierProfilePage() {
       contactPhoneVisibility: phoneVisibility,
       contactWebsiteVisibility: websiteVisibility,
       contactKakaoVisibility: kakaoVisibility,
+      // Section D: B2B 주문 조건
+      minOrderAmount: minOrderAmount.trim() === '' ? null : Number(minOrderAmount.replace(/[^\d]/g, '')),
+      minOrderSurcharge: minOrderSurcharge.trim() === '' ? null : Number(minOrderSurcharge.replace(/[^\d]/g, '')),
+      orderConditionNote: orderConditionNote.trim() === '' ? null : orderConditionNote,
     });
 
     setSaving(false);
@@ -400,6 +414,60 @@ export default function SupplierProfilePage() {
               className={inputClass}
             />
             <VisibilitySelector value={kakaoVisibility} onChange={setKakaoVisibility} />
+          </div>
+        </div>
+      </div>
+
+      {/* Section D: B2B 주문 조건 — WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1 */}
+      <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4">
+        <h2 className="flex items-center gap-2 text-base font-semibold text-gray-800 mb-2">
+          <ShoppingCart className="w-5 h-5 text-gray-500" />
+          B2B 주문 조건
+        </h2>
+        <p className="text-xs text-gray-500 mb-5">
+          매장 주문자가 장바구니/제품 리스트에서 확인할 수 있는 주문 조건입니다. 비워두면 “조건 없음”으로 표시됩니다.
+        </p>
+        <div className="space-y-5">
+          {/* 최소 주문 금액 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">최소 주문 금액 (원)</label>
+            <input
+              type="text"
+              inputMode="numeric"
+              value={minOrderAmount}
+              onChange={(e) => setMinOrderAmount(e.target.value.replace(/[^\d]/g, ''))}
+              placeholder="예: 50000"
+              className={inputClass}
+            />
+            <p className="mt-1 text-xs text-gray-400">미설정 시 매장 주문자에게 “조건 없음”으로 표시됩니다.</p>
+          </div>
+
+          {/* 미달 시 물류비 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">최소 주문 금액 미달 시 물류비 (원)</label>
+            <input
+              type="text"
+              inputMode="numeric"
+              value={minOrderSurcharge}
+              onChange={(e) => setMinOrderSurcharge(e.target.value.replace(/[^\d]/g, ''))}
+              placeholder="예: 3000"
+              className={inputClass}
+            />
+            <p className="mt-1 text-xs text-gray-400">매장 주문자에게 “미달 시 물류비”로 안내됩니다. 실제 결제 반영은 별도 작업입니다.</p>
+          </div>
+
+          {/* 안내 문구 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">주문 조건 안내 문구 (선택)</label>
+            <textarea
+              value={orderConditionNote}
+              onChange={(e) => setOrderConditionNote(e.target.value)}
+              placeholder="예: 도서/산간 지역은 별도 협의가 필요합니다."
+              rows={3}
+              maxLength={500}
+              className={inputClass}
+            />
+            <p className="mt-1 text-xs text-gray-400">주문 조건 모달과 장바구니에 함께 표시됩니다.</p>
           </div>
         </div>
       </div>

@@ -185,6 +185,8 @@ export function createSupplierManagementController(dataSource: DataSource): Rout
         // WO-O4O-POSTAL-CODE-ADDRESS-V1
         businessZipCode, businessAddressDetail,
         managerName, managerPhone, businessType, taxEmail,
+        // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
+        minOrderAmount, minOrderSurcharge, orderConditionNote,
       } = req.body;
       const result = await netureService.updateSupplierProfile(supplierId, {
         contactEmail, contactPhone, contactWebsite, contactKakao,
@@ -193,6 +195,7 @@ export function createSupplierManagementController(dataSource: DataSource): Rout
         businessNumber, representativeName, businessAddress,
         businessZipCode, businessAddressDetail,
         managerName, managerPhone, businessType, taxEmail,
+        minOrderAmount, minOrderSurcharge, orderConditionNote,
       });
       if (!result) {
         return res.status(404).json({ success: false, error: 'SUPPLIER_NOT_FOUND' });

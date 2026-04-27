@@ -70,6 +70,7 @@ export {
   type OrderSummaryResponse,
   type OrderSummary,
   type SupplierProfile,
+  type SupplierOrderCondition,
   type ProfileCompleteness,
   type SupplierPartnerCommission,
   supplierCopilotApi,

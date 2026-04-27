@@ -18,6 +18,7 @@ import {
   type CategoryTreeItem,
   type BrandItem,
 } from '../../lib/api';
+import SupplierConditionModal from '../../components/common/SupplierConditionModal';
 
 function flattenCategories(
   categories: CategoryTreeItem[],
@@ -44,12 +45,14 @@ function OfferModal({
   offers,
   loading,
   onSelect,
+  onShowCondition,
   onClose,
 }: {
   master: StoreProductSearchResult;
   offers: StoreOfferItem[];
   loading: boolean;
   onSelect: (offerId: string) => void;
+  onShowCondition: (supplierId: string, supplierName: string) => void;
   onClose: () => void;
 }) {
   return (
@@ -93,7 +96,13 @@ function OfferModal({
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
-                      <p className="font-medium text-slate-800 text-sm">{offer.supplierName}</p>
+                      <button
+                        type="button"
+                        onClick={() => onShowCondition(offer.supplierId, offer.supplierName)}
+                        className="font-medium text-slate-800 text-sm text-left hover:text-primary-600 hover:underline"
+                      >
+                        {offer.supplierName}
+                      </button>
                       {offer.brandName && (
                         <p className="text-xs text-blue-600 mt-0.5">{offer.brandName}</p>
                       )}
@@ -161,6 +170,9 @@ export default function StoreProductLibraryPage() {
 
   // Message
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Supplier condition modal — WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
+  const [conditionTarget, setConditionTarget] = useState<{ id: string; name: string } | null>(null);
 
   useEffect(() => {
     productApi.getCategories().then(setCategories);
@@ -412,9 +424,18 @@ export default function StoreProductLibraryPage() {
           offers={offers}
           loading={offersLoading}
           onSelect={handleSelectOffer}
+          onShowCondition={(supplierId, supplierName) => setConditionTarget({ id: supplierId, name: supplierName })}
           onClose={() => setSelectedMaster(null)}
         />
       )}
+
+      {/* Supplier condition modal — WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1 */}
+      <SupplierConditionModal
+        open={!!conditionTarget}
+        supplierId={conditionTarget?.id ?? null}
+        fallbackName={conditionTarget?.name}
+        onClose={() => setConditionTarget(null)}
+      />
     </div>
   );
 }
