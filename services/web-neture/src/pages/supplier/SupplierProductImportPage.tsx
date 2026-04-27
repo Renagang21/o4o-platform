@@ -116,10 +116,9 @@ export default function SupplierProductImportPage() {
     setOriginCountry(result.originCountry ?? '');
     setPrice(result.price ? String(result.price) : '');
 
-    // Select all images by default
-    const allIdxs = new Set(result.imageUrls.map((_, i) => i));
-    setSelectedImages(allIdxs);
-    setThumbnailIdx(result.imageUrls.length > 0 ? 0 : null);
+    // WO-PRODUCT-HELPER-IMAGE-SELECTION-DEFAULT-OFF-V1: 기본 미선택
+    setSelectedImages(new Set());
+    setThumbnailIdx(null);
   }, [html, sourceUrl]);
 
   /* ---------------------------------------------------------------- */
@@ -187,11 +186,24 @@ export default function SupplierProductImportPage() {
   /*  Image toggle                                                     */
   /* ---------------------------------------------------------------- */
 
+  // WO-PRODUCT-HELPER-IMAGE-SELECTION-DEFAULT-OFF-V1:
+  // 선택 시 첫 번째 선택 이미지를 자동으로 대표 이미지로 지정
   const toggleImage = useCallback((idx: number) => {
     setSelectedImages((prev) => {
       const next = new Set(prev);
-      if (next.has(idx)) next.delete(idx);
-      else next.add(idx);
+      if (next.has(idx)) {
+        next.delete(idx);
+        // 대표 이미지 해제 시 다음 선택 이미지를 대표로
+        setThumbnailIdx((prevThumb) => {
+          if (prevThumb !== idx) return prevThumb;
+          const remaining = [...next].sort((a, b) => a - b);
+          return remaining.length > 0 ? remaining[0] : null;
+        });
+      } else {
+        next.add(idx);
+        // 첫 번째 선택 이미지면 대표로 자동 지정
+        setThumbnailIdx((prevThumb) => (prevThumb === null ? idx : prevThumb));
+      }
       return next;
     });
   }, []);
@@ -342,10 +354,14 @@ export default function SupplierProductImportPage() {
               <h3 className="mb-2 text-sm font-semibold text-slate-700">
                 이미지 ({selectedImages.size}/{parsed.imageUrls.length} 선택)
               </h3>
-              <p className="mb-3 text-xs text-slate-500">
-                체크박스로 포함할 이미지를 선택하세요. 별표(★)를 클릭하면
-                대표 이미지로 지정됩니다.
+              <p className="mb-1 text-xs text-slate-500">
+                등록할 이미지를 직접 선택하세요. 별표(★)로 대표 이미지를 지정합니다.
               </p>
+              {selectedImages.size === 0 && (
+                <p className="mb-3 text-xs text-amber-600 bg-amber-50 px-3 py-1.5 rounded-lg">
+                  선택된 이미지 없음 — 등록 페이지에 이미지가 전달되지 않습니다.
+                </p>
+              )}
               <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
                 {parsed.imageUrls.map((url, idx) => (
                   <div
