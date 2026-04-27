@@ -183,6 +183,9 @@ export {
   type SupplierOrderSummary,
   type SupplierOrdersResponse,
   type SupplierOrderKpi,
+  // IR-NETURE-B2B-DIRECT-SHIPPING-ORDER-FLOW-AUDIT-V1 Phase 3
+  type NetureOrderType,
+  type NetureCustomerInfo,
   type InventoryItem,
   type InventoryStatus,
   type Shipment,

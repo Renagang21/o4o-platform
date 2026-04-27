@@ -16,7 +16,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Store, Package, Truck, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Store, Package, Truck, ExternalLink, User, ShieldCheck } from 'lucide-react';
 import { supplierApi, CARRIERS, getTrackingUrl, SHIPMENT_STATUS_LABELS } from '../../lib/api';
 import type { StoreOrder, StoreOrderItem, Shipment } from '../../lib/api';
 
@@ -271,27 +271,82 @@ export default function SupplierOrderDetailPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {/* Left Column */}
         <div style={styles.colStack}>
-          {/* 2. Store Information */}
-          <SectionCard title="매장 정보" icon={<Store size={18} style={{ color: '#64748b' }} />}>
-            <div style={styles.infoGrid}>
-              <div style={styles.infoItem}>
-                <span style={styles.infoLabel}>매장명</span>
-                <span style={styles.infoValue}>{order.orderer_name || '-'}</span>
+          {/* IR-NETURE-B2B-DIRECT-SHIPPING-ORDER-FLOW-AUDIT-V1 Phase 3 */}
+          {/* order_type 기반 라벨 분기:
+                STORE_RESTOCK → "매장 정보" (기존)
+                DIRECT_TO_CUSTOMER → "최종 수령 고객" + 별도 "주문 접수 매장" 섹션
+          */}
+          {order.order_type === 'DIRECT_TO_CUSTOMER' ? (
+            <>
+              {/* 2-A. 최종 수령 고객 (직배송) */}
+              <SectionCard title="최종 수령 고객" icon={<User size={18} style={{ color: '#6366f1' }} />}>
+                <div style={styles.infoGrid}>
+                  <div style={styles.infoItem}>
+                    <span style={styles.infoLabel}>고객 이름</span>
+                    <span style={styles.infoValue}>
+                      {order.customer_info?.name || order.shipping?.recipient_name || '-'}
+                    </span>
+                  </div>
+                  <div style={styles.infoItem}>
+                    <span style={styles.infoLabel}>지역</span>
+                    <span style={styles.infoValue}>{extractRegion(order.shipping?.address)}</span>
+                  </div>
+                  <div style={styles.infoItem}>
+                    <span style={styles.infoLabel}>고객 연락처</span>
+                    <span style={styles.infoValue}>
+                      {order.customer_info?.phone || order.shipping?.phone || '-'}
+                    </span>
+                  </div>
+                  <div style={styles.infoItem}>
+                    <span style={styles.infoLabel}>배송지</span>
+                    <span style={styles.infoValue}>{fullAddress}</span>
+                  </div>
+                </div>
+                {order.customer_info?.consent_at && (
+                  <div style={styles.consentBadge}>
+                    <ShieldCheck size={14} style={{ marginRight: 6, flexShrink: 0 }} />
+                    <span>개인정보 처리 동의: {formatDate(order.customer_info.consent_at)}</span>
+                  </div>
+                )}
+              </SectionCard>
+
+              {/* 2-B. 주문 접수 매장 (별도 섹션 유지) */}
+              <SectionCard title="주문 접수 매장" icon={<Store size={18} style={{ color: '#64748b' }} />}>
+                <div style={styles.infoGrid}>
+                  <div style={styles.infoItem}>
+                    <span style={styles.infoLabel}>매장명</span>
+                    <span style={styles.infoValue}>{order.orderer_name || '-'}</span>
+                  </div>
+                  <div style={styles.infoItem}>
+                    <span style={styles.infoLabel}>매장 연락처</span>
+                    <span style={styles.infoValue}>{order.orderer_phone || '-'}</span>
+                  </div>
+                </div>
+              </SectionCard>
+            </>
+          ) : (
+            /* 2. Store Information (STORE_RESTOCK 기존 동작) */
+            <SectionCard title="매장 정보" icon={<Store size={18} style={{ color: '#64748b' }} />}>
+              <div style={styles.infoGrid}>
+                <div style={styles.infoItem}>
+                  <span style={styles.infoLabel}>매장명</span>
+                  <span style={styles.infoValue}>{order.orderer_name || '-'}</span>
+                </div>
+                <div style={styles.infoItem}>
+                  <span style={styles.infoLabel}>지역</span>
+                  <span style={styles.infoValue}>{extractRegion(order.shipping?.address)}</span>
+                </div>
+                <div style={styles.infoItem}>
+                  <span style={styles.infoLabel}>연락처</span>
+                  <span style={styles.infoValue}>{order.orderer_phone || '-'}</span>
+                </div>
+                <div style={styles.infoItem}>
+                  <span style={styles.infoLabel}>주소</span>
+                  <span style={styles.infoValue}>{fullAddress}</span>
+                </div>
               </div>
-              <div style={styles.infoItem}>
-                <span style={styles.infoLabel}>지역</span>
-                <span style={styles.infoValue}>{extractRegion(order.shipping?.address)}</span>
-              </div>
-              <div style={styles.infoItem}>
-                <span style={styles.infoLabel}>연락처</span>
-                <span style={styles.infoValue}>{order.orderer_phone || '-'}</span>
-              </div>
-              <div style={styles.infoItem}>
-                <span style={styles.infoLabel}>주소</span>
-                <span style={styles.infoValue}>{fullAddress}</span>
-              </div>
-            </div>
-          </SectionCard>
+            </SectionCard>
+          )}
 
           {/* 3. Order Products */}
           <SectionCard title={`주문 제품 (${items.length}개)`} icon={<Package size={18} style={{ color: '#64748b' }} />}>
@@ -632,6 +687,19 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '14px',
     fontWeight: 500,
     color: '#1e293b',
+  },
+
+  // IR-NETURE-B2B-DIRECT-SHIPPING-ORDER-FLOW-AUDIT-V1 Phase 3
+  consentBadge: {
+    display: 'flex',
+    alignItems: 'center',
+    marginTop: '12px',
+    padding: '8px 12px',
+    backgroundColor: '#dcfce7',
+    color: '#15803d',
+    borderRadius: '6px',
+    fontSize: '12px',
+    fontWeight: 500,
   },
 
   // Product Table

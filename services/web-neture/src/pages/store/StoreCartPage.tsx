@@ -14,10 +14,10 @@
 
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Trash2, Minus, Plus, Package, X, Truck, AlertCircle, CheckCircle2, Info } from 'lucide-react';
+import { ShoppingCart, Trash2, Minus, Plus, Package, X, Truck, AlertCircle, CheckCircle2, Info, Store as StoreIcon, User } from 'lucide-react';
 import { useCart } from '../../lib/cart';
 import { storeApi, supplierProfileApi } from '../../lib/api';
-import type { StoreOrderShipping, SupplierOrderCondition } from '../../lib/api';
+import type { StoreOrderShipping, SupplierOrderCondition, NetureOrderType, NetureCustomerInfo } from '../../lib/api';
 import type { SupplierGroup, CartItem } from '../../lib/cart';
 import { getReferralToken, clearReferralToken } from '../../lib/referral';
 import SupplierConditionModal from '../../components/common/SupplierConditionModal';
@@ -126,8 +126,18 @@ const INITIAL_SHIPPING: StoreOrderShipping = {
   delivery_note: '',
 };
 
+// IR-NETURE-B2B-DIRECT-SHIPPING-ORDER-FLOW-AUDIT-V1 Phase 3
+// 주문 시 입력받는 모든 정보를 단일 객체로 부모에 전달
+export interface ShippingModalSubmitData {
+  shipping: StoreOrderShipping;
+  ordererName: string;
+  ordererPhone: string;
+  orderType: NetureOrderType;
+  customerInfo?: NetureCustomerInfo; // DIRECT_TO_CUSTOMER 시에만
+}
+
 function ShippingModal({ onSubmit, onClose, loading }: {
-  onSubmit: (shipping: StoreOrderShipping, ordererName: string, ordererPhone: string) => void;
+  onSubmit: (data: ShippingModalSubmitData) => void;
   onClose: () => void;
   loading: boolean;
 }) {
@@ -135,7 +145,46 @@ function ShippingModal({ onSubmit, onClose, loading }: {
   const [ordererName, setOrdererName] = useState('');
   const [ordererPhone, setOrdererPhone] = useState('');
 
-  const isValid = shipping.recipient_name && shipping.phone && shipping.postal_code && shipping.address && ordererName && ordererPhone;
+  // IR-NETURE-B2B-DIRECT-SHIPPING-ORDER-FLOW-AUDIT-V1 Phase 3
+  const [orderType, setOrderType] = useState<NetureOrderType>('STORE_RESTOCK');
+  const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [consent, setConsent] = useState(false);
+
+  // 직배송 모드 진입 시 customer_info를 shipping 정보로 prefill (사용자 수정 가능)
+  useEffect(() => {
+    if (orderType === 'DIRECT_TO_CUSTOMER') {
+      setCustomerName((prev) => prev || shipping.recipient_name || '');
+      setCustomerPhone((prev) => prev || shipping.phone || '');
+    }
+  }, [orderType, shipping.recipient_name, shipping.phone]);
+
+  const isShippingValid =
+    !!shipping.recipient_name && !!shipping.phone && !!shipping.postal_code && !!shipping.address;
+  const isOrdererValid = !!ordererName && !!ordererPhone;
+  const isCustomerInfoValid =
+    orderType === 'STORE_RESTOCK' ||
+    (customerName.trim().length > 0 && customerPhone.trim().length > 0 && consent);
+
+  const isValid = isShippingValid && isOrdererValid && isCustomerInfoValid;
+
+  const handleSubmit = () => {
+    const data: ShippingModalSubmitData = {
+      shipping,
+      ordererName,
+      ordererPhone,
+      orderType,
+      customerInfo:
+        orderType === 'DIRECT_TO_CUSTOMER'
+          ? {
+              name: customerName.trim(),
+              phone: customerPhone.trim(),
+              consent_at: new Date().toISOString(),
+            }
+          : undefined,
+    };
+    onSubmit(data);
+  };
 
   return (
     <div style={styles.modalOverlay} onClick={onClose}>
@@ -146,7 +195,48 @@ function ShippingModal({ onSubmit, onClose, loading }: {
         </div>
 
         <div style={styles.modalBody}>
-          <div style={styles.sectionLabel}>주문자 정보</div>
+          {/* IR-NETURE-B2B-DIRECT-SHIPPING-ORDER-FLOW-AUDIT-V1 Phase 3: 주문 유형 선택 */}
+          <div style={styles.sectionLabel}>주문 유형</div>
+          <div style={styles.orderTypeRow}>
+            <label
+              style={{
+                ...styles.orderTypeOption,
+                ...(orderType === 'STORE_RESTOCK' ? styles.orderTypeOptionActive : {}),
+              }}
+            >
+              <input
+                type="radio"
+                name="orderType"
+                value="STORE_RESTOCK"
+                checked={orderType === 'STORE_RESTOCK'}
+                onChange={() => setOrderType('STORE_RESTOCK')}
+                style={styles.radioInput}
+              />
+              <StoreIcon size={16} style={{ marginRight: 6 }} />
+              <span style={styles.orderTypeLabel}>매장 입고</span>
+              <span style={styles.orderTypeHint}>매장으로 배송</span>
+            </label>
+            <label
+              style={{
+                ...styles.orderTypeOption,
+                ...(orderType === 'DIRECT_TO_CUSTOMER' ? styles.orderTypeOptionActive : {}),
+              }}
+            >
+              <input
+                type="radio"
+                name="orderType"
+                value="DIRECT_TO_CUSTOMER"
+                checked={orderType === 'DIRECT_TO_CUSTOMER'}
+                onChange={() => setOrderType('DIRECT_TO_CUSTOMER')}
+                style={styles.radioInput}
+              />
+              <User size={16} style={{ marginRight: 6 }} />
+              <span style={styles.orderTypeLabel}>고객 직배송</span>
+              <span style={styles.orderTypeHint}>고객 주소로 배송</span>
+            </label>
+          </div>
+
+          <div style={{ ...styles.sectionLabel, marginTop: 20 }}>주문자 정보</div>
           <div style={styles.formRow}>
             <label style={styles.label}>이름 *</label>
             <input style={styles.input} value={ordererName} onChange={(e) => setOrdererName(e.target.value)} placeholder="주문자 이름" />
@@ -181,6 +271,44 @@ function ShippingModal({ onSubmit, onClose, loading }: {
             <label style={styles.label}>배송메모</label>
             <input style={styles.input} value={shipping.delivery_note || ''} onChange={(e) => setShipping({ ...shipping, delivery_note: e.target.value })} placeholder="배송 시 요청사항" />
           </div>
+
+          {/* IR-NETURE-B2B-DIRECT-SHIPPING-ORDER-FLOW-AUDIT-V1 Phase 3: 직배송 시 고객 정보 */}
+          {orderType === 'DIRECT_TO_CUSTOMER' && (
+            <>
+              <div style={{ ...styles.sectionLabel, marginTop: 20 }}>고객 정보 (개인정보 처리)</div>
+              <div style={styles.customerInfoNote}>
+                <Info size={14} style={{ marginRight: 6, flexShrink: 0 }} />
+                <span>고객 직배송 시 고객 개인정보 수집·이용에 대한 동의가 필요합니다.</span>
+              </div>
+              <div style={styles.formRow}>
+                <label style={styles.label}>고객 이름 *</label>
+                <input
+                  style={styles.input}
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                  placeholder="고객 이름"
+                />
+              </div>
+              <div style={styles.formRow}>
+                <label style={styles.label}>고객 연락처 *</label>
+                <input
+                  style={styles.input}
+                  value={customerPhone}
+                  onChange={(e) => setCustomerPhone(e.target.value)}
+                  placeholder="010-0000-0000"
+                />
+              </div>
+              <label style={styles.consentLabel}>
+                <input
+                  type="checkbox"
+                  checked={consent}
+                  onChange={(e) => setConsent(e.target.checked)}
+                  style={styles.consentCheckbox}
+                />
+                <span>고객의 개인정보(이름·연락처) 수집 및 직배송 처리에 동의합니다. *</span>
+              </label>
+            </>
+          )}
         </div>
 
         <div style={styles.modalFooter}>
@@ -188,7 +316,7 @@ function ShippingModal({ onSubmit, onClose, loading }: {
           <button
             style={{ ...styles.orderBtn, opacity: isValid && !loading ? 1 : 0.5 }}
             disabled={!isValid || loading}
-            onClick={() => onSubmit(shipping, ordererName, ordererPhone)}
+            onClick={handleSubmit}
           >
             {loading ? '주문 처리 중...' : '주문하기'}
           </button>
@@ -383,11 +511,8 @@ export default function StoreCartPage() {
     setErrorMessage(null);
   }, []);
 
-  const handleSubmitOrder = useCallback(async (
-    shipping: StoreOrderShipping,
-    ordererName: string,
-    ordererPhone: string,
-  ) => {
+  // IR-NETURE-B2B-DIRECT-SHIPPING-ORDER-FLOW-AUDIT-V1 Phase 3: order_type/customer_info 전송
+  const handleSubmitOrder = useCallback(async (data: ShippingModalSubmitData) => {
     if (!orderingSupplierId) return;
     const group = grouped.get(orderingSupplierId);
     if (!group) return;
@@ -398,9 +523,11 @@ export default function StoreCartPage() {
     const referralToken = getReferralToken();
     const result = await storeApi.createOrder({
       items: group.items.map((i) => ({ product_id: i.offerId, quantity: i.quantity })),
-      shipping,
-      orderer_name: ordererName,
-      orderer_phone: ordererPhone,
+      shipping: data.shipping,
+      orderer_name: data.ordererName,
+      orderer_phone: data.ordererPhone,
+      order_type: data.orderType,
+      ...(data.customerInfo ? { customer_info: data.customerInfo } : {}),
       ...(referralToken ? { referral_token: referralToken } : {}),
     });
 
@@ -928,6 +1055,72 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: 8,
     outline: 'none',
     boxSizing: 'border-box' as const,
+  },
+
+  // IR-NETURE-B2B-DIRECT-SHIPPING-ORDER-FLOW-AUDIT-V1 Phase 3: 주문 유형 선택 + 동의
+  orderTypeRow: {
+    display: 'flex',
+    gap: 8,
+  },
+  orderTypeOption: {
+    flex: 1,
+    display: 'flex',
+    alignItems: 'center',
+    flexWrap: 'wrap' as const,
+    padding: '12px 14px',
+    border: '1px solid #e2e8f0',
+    borderRadius: 8,
+    cursor: 'pointer',
+    backgroundColor: '#fff',
+    transition: 'all 0.15s',
+  },
+  orderTypeOptionActive: {
+    borderColor: '#6366f1',
+    backgroundColor: '#eef2ff',
+  },
+  radioInput: {
+    marginRight: 8,
+    cursor: 'pointer',
+  },
+  orderTypeLabel: {
+    fontSize: 14,
+    fontWeight: 600,
+    color: '#1e293b',
+  },
+  orderTypeHint: {
+    flexBasis: '100%',
+    fontSize: 11,
+    color: '#94a3b8',
+    marginTop: 4,
+    marginLeft: 30,
+  },
+  customerInfoNote: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    padding: '10px 12px',
+    backgroundColor: '#fef3c7',
+    color: '#92400e',
+    borderRadius: 8,
+    fontSize: 12,
+    marginBottom: 12,
+    lineHeight: 1.5,
+  },
+  consentLabel: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: 8,
+    padding: '10px 12px',
+    backgroundColor: '#f8fafc',
+    border: '1px solid #e2e8f0',
+    borderRadius: 8,
+    fontSize: 13,
+    color: '#475569',
+    cursor: 'pointer',
+  },
+  consentCheckbox: {
+    marginTop: 2,
+    flexShrink: 0,
+    cursor: 'pointer',
   },
 
   // Messages
