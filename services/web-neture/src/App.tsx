@@ -440,6 +440,8 @@ const HomepageCmsPage = lazy(() => import('./pages/operator/HomepageCmsPage'));
 
 // Content Library (WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1)
 const ContentLibraryPage = lazy(() => import('./pages/library/ContentLibraryPage'));
+// Resources (O4O 공통 구조 — /resources)
+const NetureResourcesPage = lazy(() => import('./pages/resources/NetureResourcesPage'));
 
 // Loading fallback
 function PageLoading() {
@@ -568,6 +570,7 @@ function App() {
 
               {/* WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1 */}
               <Route path="/content" element={<ContentLibraryPage />} />
+              <Route path="/resources" element={<NetureResourcesPage />} />
 
               {/* Market Trial Participant (WO-NETURE-MARKET-TRIAL-PARTICIPANT-PAGES-V1) */}
               <Route path="/market-trial" element={<MarketTrialHubPage />} />

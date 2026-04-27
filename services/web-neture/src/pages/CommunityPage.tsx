@@ -176,7 +176,7 @@ export default function CommunityPage() {
           </div>
           {/* Secondary */}
           <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">확장 기능</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <Link
               to="/forum"
               className="flex items-center gap-4 p-5 bg-gray-50 rounded-xl border border-gray-100 hover:border-primary-200 hover:shadow-sm transition-all group"
@@ -199,7 +199,20 @@ export default function CommunityPage() {
               </div>
               <div className="min-w-0">
                 <p className="text-sm font-bold text-gray-900 group-hover:text-primary-600">Content</p>
-                <p className="text-xs text-gray-500">자료 · 콘텐츠</p>
+                <p className="text-xs text-gray-500">콘텐츠</p>
+              </div>
+              <ArrowRight className="ml-auto shrink-0 w-4 h-4 text-gray-300 group-hover:text-primary-600" />
+            </Link>
+            <Link
+              to="/resources"
+              className="flex items-center gap-4 p-5 bg-gray-50 rounded-xl border border-gray-100 hover:border-primary-200 hover:shadow-sm transition-all group"
+            >
+              <div className="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center shrink-0">
+                <BookOpen className="w-5 h-5 text-amber-600" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-gray-900 group-hover:text-primary-600">Resources</p>
+                <p className="text-xs text-gray-500">자료실</p>
               </div>
               <ArrowRight className="ml-auto shrink-0 w-4 h-4 text-gray-300 group-hover:text-primary-600" />
             </Link>
