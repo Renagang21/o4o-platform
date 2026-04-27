@@ -31,6 +31,9 @@ export type { ResourcesHubItem, ResourcesHubFetchParams, ResourcesHubFetchResult
 export { SignageHubTemplate } from './SignageHubTemplate';
 export type { SignageHubItem, SignageHubFilter, SignageHubFetchParams, SignageHubFetchResult, SignageHubRenderContext, SignageHubConfig } from './SignageHubTemplate';
 
+export { SignageManagerTemplate } from './SignageManagerTemplate';
+export type { SignageHubVideo, SignageHubPlaylist, SignageManagerConfig } from './SignageManagerTemplate';
+
 export type {
   /* Data types */
   NoticeItem,
