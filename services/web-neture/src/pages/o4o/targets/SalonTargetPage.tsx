@@ -8,6 +8,10 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, Monitor, Tablet, Tv, GraduationCap, Package, Truck, Building2, Megaphone } from 'lucide-react';
 
 export default function SalonTargetPage() {
+  const trackEvent = (eventData: { event: string; target: string; action: string; position: string }) => {
+    console.log('[O4O_TRACK]', { ...eventData, timestamp: Date.now() });
+  };
+
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
@@ -21,6 +25,9 @@ export default function SalonTargetPage() {
             화장품, 미용용품을 취급하는 미용실 네트워크를 대상으로
             <br />
             비즈니스하는 사업자를 위한 플랫폼
+          </p>
+          <p className="mt-4 text-sm text-white/60 italic">
+            체험이 일어나는 순간, 구매는 이미 시작됩니다.
           </p>
         </div>
       </div>
@@ -161,6 +168,90 @@ export default function SalonTargetPage() {
             <br />
             o4o를 통해 채널을 확보하고 비즈니스를 확장합니다.
           </p>
+        </div>
+
+        {/* 실행 시나리오 */}
+        <div className="mt-10">
+          <h2 className="text-xl font-bold text-gray-900 mb-6 text-center">실제로 이렇게 작동합니다</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="p-5 bg-slate-50 rounded-xl border border-slate-200">
+              <p className="text-xs font-semibold text-primary-600 mb-2">1. 노출</p>
+              <p className="text-gray-700 text-sm leading-relaxed">시술 중 사용하는 제품과 홈케어 방법을 화면·POP·QR로 안내합니다.</p>
+            </div>
+            <div className="p-5 bg-slate-50 rounded-xl border border-slate-200">
+              <p className="text-xs font-semibold text-primary-600 mb-2">2. 반응</p>
+              <p className="text-gray-700 text-sm leading-relaxed">고객이 직접 체험한 제품을 확인하고 관심을 표시합니다.</p>
+            </div>
+            <div className="p-5 bg-slate-50 rounded-xl border border-slate-200">
+              <p className="text-xs font-semibold text-primary-600 mb-2">3. 실행</p>
+              <p className="text-gray-700 text-sm leading-relaxed">매장은 재고 부담 없이 구매·재주문·상담 흐름으로 연결합니다.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* 중간 CTA */}
+        <div className="mt-10 rounded-xl border border-gray-200 p-6">
+          <p className="font-medium text-gray-900">이 업종에 맞는 O4O 활용을 시작해 보세요.</p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link
+              to="/supplier"
+              onClick={() => trackEvent({ event: 'mid_cta_click', target: 'salon', action: 'supplier', position: 'mid' })}
+              className="inline-flex items-center justify-center px-5 py-2.5 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors text-sm"
+            >
+              제품 공급자로 참여하기
+            </Link>
+            <Link
+              to="/partner"
+              onClick={() => trackEvent({ event: 'mid_cta_click', target: 'salon', action: 'partner', position: 'mid' })}
+              className="inline-flex items-center justify-center px-5 py-2.5 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors text-sm"
+            >
+              운영 파트너로 참여하기
+            </Link>
+          </div>
+        </div>
+
+        {/* 신뢰 섹션 */}
+        <div className="mt-10">
+          <h2 className="text-xl font-bold text-gray-900 mb-6 text-center">이 방식으로 달라집니다</h2>
+          <ul className="space-y-3">
+            <li className="flex items-start gap-3 p-4 bg-white rounded-xl border border-gray-100">
+              <span className="mt-0.5 w-1.5 h-1.5 rounded-full bg-primary-500 flex-shrink-0" />
+              <p className="text-gray-700 text-sm leading-relaxed">시술 경험이 자연스럽게 제품 구매로 이어집니다.</p>
+            </li>
+            <li className="flex items-start gap-3 p-4 bg-white rounded-xl border border-gray-100">
+              <span className="mt-0.5 w-1.5 h-1.5 rounded-full bg-primary-500 flex-shrink-0" />
+              <p className="text-gray-700 text-sm leading-relaxed">재고 부담 없이 판매 흐름을 만들 수 있습니다.</p>
+            </li>
+            <li className="flex items-start gap-3 p-4 bg-white rounded-xl border border-gray-100">
+              <span className="mt-0.5 w-1.5 h-1.5 rounded-full bg-primary-500 flex-shrink-0" />
+              <p className="text-gray-700 text-sm leading-relaxed">고객과의 접점이 지속적인 구매로 연결됩니다.</p>
+            </li>
+          </ul>
+        </div>
+
+        {/* CTA */}
+        <div className="mt-8 flex flex-col sm:flex-row gap-3">
+          <Link
+            to="/supplier"
+            onClick={() => trackEvent({ event: 'final_cta_click', target: 'salon', action: 'supplier', position: 'final' })}
+            className="inline-flex items-center justify-center px-5 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors text-sm"
+          >
+            제품 공급자로 참여하기
+          </Link>
+          <Link
+            to="/partner"
+            onClick={() => trackEvent({ event: 'final_cta_click', target: 'salon', action: 'partner', position: 'final' })}
+            className="inline-flex items-center justify-center px-5 py-3 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors text-sm"
+          >
+            운영 파트너로 참여하기
+          </Link>
+          <Link
+            to="/contact"
+            onClick={() => trackEvent({ event: 'final_cta_click', target: 'salon', action: 'contact', position: 'final' })}
+            className="inline-flex items-center justify-center px-5 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors text-sm"
+          >
+            도입 문의하기
+          </Link>
         </div>
       </div>
 

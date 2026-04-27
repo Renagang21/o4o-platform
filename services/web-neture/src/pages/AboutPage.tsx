@@ -6,13 +6,13 @@
  * 기존 소개 페이지들을 연결하는 Hub 구조.
  * 새 콘텐츠를 작성하지 않고, 이미 존재하는 페이지들을 정리하여 연결한다.
  *
- * 구조:
+ * 구조 (WO-O4O-ABOUT-IA-RESTRUCTURE-V1):
  * 1. Hero - About Neture
  * 2. 플랫폼 소개 - /o4o, /o4o/intro
- * 3. 플랫폼 개념 - /manual/concepts, /workspace/platform/principles
- * 4. 플랫폼 구조 - /channel/structure, /manual/concepts/channel-map
- * 5. 대상 산업 - /o4o/targets/*
- * 6. 유통 채널 - /channel/*
+ * 3. 플랫폼 개념 - /o4o/concepts, /o4o/principles
+ * 4. 플랫폼 구조 - /o4o/structure, /o4o/channel-map
+ * 5. 대상 산업 - /o4o/targets/* (6개 업종, B2B 공급자/파트너 진입)
+ *    각 Target 페이지 내에서 매장 운영자용 Channel 페이지로 연결
  */
 
 import { Link } from 'react-router-dom';
@@ -21,12 +21,12 @@ import {
   BookOpen,
   Network,
   Building2,
-  Truck,
   ArrowRight,
   Pill,
   Stethoscope,
   Scissors,
   Glasses,
+  Smile,
   MoreHorizontal,
 } from 'lucide-react';
 
@@ -49,17 +49,11 @@ const platformStructure = [
 
 const targetIndustries = [
   { icon: Pill, title: '약국', desc: '약국 채널 안내', to: '/o4o/targets/pharmacy', color: { bg: 'bg-blue-50', text: 'text-blue-600' } },
-  { icon: Stethoscope, title: '의원', desc: '의원 채널 안내', to: '/o4o/targets/clinic', color: { bg: 'bg-emerald-50', text: 'text-emerald-600' } },
+  { icon: Stethoscope, title: '의료기관', desc: '병원·의원 채널 안내', to: '/o4o/targets/clinic', color: { bg: 'bg-emerald-50', text: 'text-emerald-600' } },
+  { icon: Smile, title: '치과', desc: '치과 채널 안내', to: '/o4o/targets/dental', color: { bg: 'bg-rose-50', text: 'text-rose-600' } },
   { icon: Scissors, title: '미용실', desc: '미용실 채널 안내', to: '/o4o/targets/salon', color: { bg: 'bg-violet-50', text: 'text-violet-600' } },
-  { icon: Glasses, title: '안경점', desc: '안경점 채널 안내', to: '/o4o/targets/optical', color: { bg: 'bg-amber-50', text: 'text-amber-600' } },
+  { icon: Glasses, title: '안경원', desc: '안경원 채널 안내', to: '/o4o/targets/optical', color: { bg: 'bg-amber-50', text: 'text-amber-600' } },
   { icon: MoreHorizontal, title: '기타 업종', desc: '기타 대상 업종', to: '/o4o/other-targets', color: { bg: 'bg-gray-50', text: 'text-gray-600' } },
-];
-
-const channels = [
-  { title: '약국 채널', desc: '약국 유통 채널 구조를 설명합니다.', to: '/o4o/channels/pharmacy' },
-  { title: '안경점 채널', desc: '안경점 유통 채널 구조를 설명합니다.', to: '/o4o/channels/optical' },
-  { title: '의료기기 채널', desc: '의료기기 유통 채널 구조를 설명합니다.', to: '/o4o/channels/medical' },
-  { title: '치과 채널', desc: '치과 유통 채널 구조를 설명합니다.', to: '/o4o/channels/dental' },
 ];
 
 /* ── 공통 카드 링크 컴포넌트 ── */
@@ -161,10 +155,10 @@ export default function AboutPage() {
           <SectionHeader
             icon={Building2}
             title="대상 산업"
-            desc="Neture 플랫폼이 활용되는 산업 분야"
+            desc="공급자·파트너가 채널을 확보할 수 있는 매장 업종"
             color="bg-emerald-100 text-emerald-600"
           />
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {targetIndustries.map((t) => (
               <Link
                 key={t.to}
@@ -181,20 +175,6 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* ── 6. 유통 채널 ── */}
-        <section>
-          <SectionHeader
-            icon={Truck}
-            title="유통 채널"
-            desc="산업별 유통 채널 구조 설명"
-            color="bg-amber-100 text-amber-600"
-          />
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {channels.map((item) => (
-              <LinkCard key={item.to} {...item} />
-            ))}
-          </div>
-        </section>
       </div>
 
       {/* ── CTA ── */}

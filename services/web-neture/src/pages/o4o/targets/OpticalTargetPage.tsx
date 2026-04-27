@@ -5,9 +5,13 @@
  */
 
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Monitor, Tablet, Tv, GraduationCap, Package, Truck, Building2, Megaphone } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Monitor, Tablet, Tv, GraduationCap, Package, Truck, Building2, Megaphone } from 'lucide-react';
 
 export default function OpticalTargetPage() {
+  const trackEvent = (eventData: { event: string; target: string; action: string; position: string }) => {
+    console.log('[O4O_TRACK]', { ...eventData, timestamp: Date.now() });
+  };
+
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
@@ -21,6 +25,9 @@ export default function OpticalTargetPage() {
             안경, 렌즈 관련 상품을 취급하는 안경원 네트워크를 대상으로
             <br />
             비즈니스하는 사업자를 위한 플랫폼
+          </p>
+          <p className="mt-4 text-sm text-white/60 italic">
+            시력 교정은 정보와 경험이 결합되는 대표적인 매장 서비스입니다.
           </p>
         </div>
       </div>
@@ -155,12 +162,112 @@ export default function OpticalTargetPage() {
         </div>
 
         {/* 핵심 가치 */}
-        <div className="bg-primary-50 rounded-xl p-8 border border-primary-200 text-center">
+        <div className="bg-primary-50 rounded-xl p-8 border border-primary-200 text-center mb-8">
           <p className="text-primary-800 leading-relaxed">
             <strong>안경원 네트워크를 대상으로 비즈니스하는 사업자</strong>가
             <br />
             o4o를 통해 채널을 확보하고 비즈니스를 확장합니다.
           </p>
+        </div>
+
+        {/* 매장 운영자용 채널 안내 */}
+        <div className="rounded-xl border border-gray-200 p-6">
+          <p className="text-sm text-gray-500 mb-3">이 흐름을 실제 매장에서 운영하는 방법을 확인하세요.</p>
+          <Link
+            to="/o4o/channels/optical"
+            onClick={() => trackEvent({ event: 'channel_click', target: 'optical', action: 'channel', position: 'mid' })}
+            className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium text-sm"
+          >
+            매장 운영 방식 보기
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+          <p className="text-xs text-gray-400 mt-2">
+            안경원 원장·운영자가 실제 채널 구조를 확인하는 자료
+          </p>
+        </div>
+
+        {/* 실행 시나리오 */}
+        <div className="mt-10">
+          <h2 className="text-xl font-bold text-gray-900 mb-6 text-center">실제로 이렇게 작동합니다</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="p-5 bg-slate-50 rounded-xl border border-slate-200">
+              <p className="text-xs font-semibold text-primary-600 mb-2">1. 노출</p>
+              <p className="text-gray-700 text-sm leading-relaxed">렌즈, 안경, 눈 건강 관련 정보를 매장 화면과 QR로 안내합니다.</p>
+            </div>
+            <div className="p-5 bg-slate-50 rounded-xl border border-slate-200">
+              <p className="text-xs font-semibold text-primary-600 mb-2">2. 반응</p>
+              <p className="text-gray-700 text-sm leading-relaxed">고객이 비교 정보와 관리 방법을 확인하고 상담을 요청합니다.</p>
+            </div>
+            <div className="p-5 bg-slate-50 rounded-xl border border-slate-200">
+              <p className="text-xs font-semibold text-primary-600 mb-2">3. 실행</p>
+              <p className="text-gray-700 text-sm leading-relaxed">안경원은 제품 설명, 맞춤 추천, 재방문 안내를 강화합니다.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* 중간 CTA */}
+        <div className="mt-10 rounded-xl border border-gray-200 p-6">
+          <p className="font-medium text-gray-900">이 업종에 맞는 O4O 활용을 시작해 보세요.</p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link
+              to="/supplier"
+              onClick={() => trackEvent({ event: 'mid_cta_click', target: 'optical', action: 'supplier', position: 'mid' })}
+              className="inline-flex items-center justify-center px-5 py-2.5 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors text-sm"
+            >
+              제품 공급자로 참여하기
+            </Link>
+            <Link
+              to="/partner"
+              onClick={() => trackEvent({ event: 'mid_cta_click', target: 'optical', action: 'partner', position: 'mid' })}
+              className="inline-flex items-center justify-center px-5 py-2.5 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors text-sm"
+            >
+              운영 파트너로 참여하기
+            </Link>
+          </div>
+        </div>
+
+        {/* 신뢰 섹션 */}
+        <div className="mt-10">
+          <h2 className="text-xl font-bold text-gray-900 mb-6 text-center">이 방식으로 달라집니다</h2>
+          <ul className="space-y-3">
+            <li className="flex items-start gap-3 p-4 bg-white rounded-xl border border-gray-100">
+              <span className="mt-0.5 w-1.5 h-1.5 rounded-full bg-primary-500 flex-shrink-0" />
+              <p className="text-gray-700 text-sm leading-relaxed">제품 설명과 비교가 고객 중심으로 이루어집니다.</p>
+            </li>
+            <li className="flex items-start gap-3 p-4 bg-white rounded-xl border border-gray-100">
+              <span className="mt-0.5 w-1.5 h-1.5 rounded-full bg-primary-500 flex-shrink-0" />
+              <p className="text-gray-700 text-sm leading-relaxed">상담 시간이 더 효율적으로 사용됩니다.</p>
+            </li>
+            <li className="flex items-start gap-3 p-4 bg-white rounded-xl border border-gray-100">
+              <span className="mt-0.5 w-1.5 h-1.5 rounded-full bg-primary-500 flex-shrink-0" />
+              <p className="text-gray-700 text-sm leading-relaxed">재방문과 추가 구매 흐름이 자연스럽게 이어집니다.</p>
+            </li>
+          </ul>
+        </div>
+
+        {/* CTA */}
+        <div className="mt-8 flex flex-col sm:flex-row gap-3">
+          <Link
+            to="/supplier"
+            onClick={() => trackEvent({ event: 'final_cta_click', target: 'optical', action: 'supplier', position: 'final' })}
+            className="inline-flex items-center justify-center px-5 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors text-sm"
+          >
+            제품 공급자로 참여하기
+          </Link>
+          <Link
+            to="/partner"
+            onClick={() => trackEvent({ event: 'final_cta_click', target: 'optical', action: 'partner', position: 'final' })}
+            className="inline-flex items-center justify-center px-5 py-3 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors text-sm"
+          >
+            운영 파트너로 참여하기
+          </Link>
+          <Link
+            to="/contact"
+            onClick={() => trackEvent({ event: 'final_cta_click', target: 'optical', action: 'contact', position: 'final' })}
+            className="inline-flex items-center justify-center px-5 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors text-sm"
+          >
+            도입 문의하기
+          </Link>
         </div>
       </div>
 

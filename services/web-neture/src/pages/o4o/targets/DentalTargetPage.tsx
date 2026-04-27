@@ -1,13 +1,16 @@
 /**
- * PharmacyTargetPage - 약국 네트워크 대상 사업자 안내
+ * DentalTargetPage - 치과 네트워크 대상 사업자 안내
  *
- * 관점: 약국을 대상으로 비즈니스하는 사업자 (공급자, 본부, 파트너)
+ * WO-O4O-ABOUT-IA-RESTRUCTURE-V1
+ *
+ * 관점: 치과를 대상으로 비즈니스하는 사업자 (본부, 파트너)
+ * 참고: 치과는 신뢰 공간 특성상 무재고 상품 공급 제외
  */
 
 import { Link } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Monitor, Tablet, Tv, GraduationCap, Package, Truck, Building2, Megaphone } from 'lucide-react';
+import { ArrowLeft, Monitor, Tablet, Tv, GraduationCap, Building2, Megaphone, ArrowRight } from 'lucide-react';
 
-export default function PharmacyTargetPage() {
+export default function DentalTargetPage() {
   const trackEvent = (eventData: { event: string; target: string; action: string; position: string }) => {
     console.log('[O4O_TRACK]', { ...eventData, timestamp: Date.now() });
   };
@@ -18,16 +21,16 @@ export default function PharmacyTargetPage() {
       <div className="bg-slate-900 text-white py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <p className="text-primary-400 text-sm font-medium mb-3">
-            O4O Platform · 대상 매장 업종
+            O4O Platform · 대상 업종
           </p>
-          <h1 className="text-3xl font-bold mb-4">약국 네트워크</h1>
+          <h1 className="text-3xl font-bold mb-4">치과 네트워크</h1>
           <p className="text-slate-300 leading-relaxed">
-            건강기능식품, 의약외품을 취급하는 약국 네트워크를 대상으로
+            치과 네트워크를 대상으로
             <br />
             비즈니스하는 사업자를 위한 플랫폼
           </p>
           <p className="mt-4 text-sm text-white/60 italic">
-            약국의 대기 공간은 이미 가장 강력한 정보 전달 채널입니다.
+            치과 진료 전후의 시간은 환자 교육과 선택을 결정짓는 핵심 구간입니다.
           </p>
         </div>
       </div>
@@ -35,31 +38,20 @@ export default function PharmacyTargetPage() {
       {/* 대상 사업자 */}
       <div className="max-w-4xl mx-auto px-4 py-12">
         <h2 className="text-xl font-bold text-gray-900 mb-2 text-center">
-          약국 네트워크를 대상으로 비즈니스하는 사업자
+          치과 네트워크를 대상으로 비즈니스하는 사업자
         </h2>
         <p className="text-gray-500 text-sm text-center mb-8">
-          o4o를 통해 약국 채널을 확보하고 비즈니스를 확장합니다
+          o4o를 통해 치과 채널을 확보하고 비즈니스를 확장합니다
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <div className="p-6 bg-slate-50 rounded-xl border border-slate-200 text-center">
-            <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center mx-auto mb-4 border border-slate-200">
-              <Truck className="w-6 h-6 text-slate-600" />
-            </div>
-            <h3 className="font-semibold text-gray-900 mb-2">공급자</h3>
-            <p className="text-gray-600 text-sm">
-              건강기능식품, 의약외품 공급사가
-              <br />
-              약국 판매 채널을 확보합니다
-            </p>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
           <div className="p-6 bg-slate-50 rounded-xl border border-slate-200 text-center">
             <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center mx-auto mb-4 border border-slate-200">
               <Building2 className="w-6 h-6 text-slate-600" />
             </div>
-            <h3 className="font-semibold text-gray-900 mb-2">본부 / 프랜차이즈</h3>
+            <h3 className="font-semibold text-gray-900 mb-2">본부 / 네트워크</h3>
             <p className="text-gray-600 text-sm">
-              약국 체인 본부가 가맹점에
+              치과 네트워크 본부가 소속 치과에
               <br />
               통합 채널 환경을 제공합니다
             </p>
@@ -70,7 +62,7 @@ export default function PharmacyTargetPage() {
             </div>
             <h3 className="font-semibold text-gray-900 mb-2">마케팅 파트너</h3>
             <p className="text-gray-600 text-sm">
-              약국 대상 마케팅·콘텐츠
+              치과 대상 마케팅·콘텐츠
               <br />
               서비스를 제공합니다
             </p>
@@ -79,10 +71,10 @@ export default function PharmacyTargetPage() {
 
         {/* 제공 가능한 채널 */}
         <h2 className="text-xl font-bold text-gray-900 mb-2 text-center">
-          약국에 제공할 수 있는 채널
+          치과에 제공할 수 있는 채널
         </h2>
         <p className="text-gray-500 text-sm text-center mb-8">
-          사업자가 약국 네트워크에 제공하는 채널 환경
+          사업자가 치과 네트워크에 제공하는 채널 환경
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
@@ -95,9 +87,9 @@ export default function PharmacyTargetPage() {
               <h3 className="font-semibold text-gray-900">웹 / 앱</h3>
             </div>
             <p className="text-gray-600 text-sm leading-relaxed">
-              약국 전용 웹사이트와 앱을 제공합니다.
-              상품 안내, 예약, 상담 접수 기능을 탑재하여
-              고객이 온라인에서 약국과 연결됩니다.
+              치과 전용 웹사이트와 앱을 제공합니다.
+              진료 안내, 건강 정보, 예약 접수 기능을 탑재하여
+              환자가 온라인에서 치과와 연결됩니다.
             </p>
           </div>
 
@@ -110,9 +102,9 @@ export default function PharmacyTargetPage() {
               <h3 className="font-semibold text-gray-900">키오스크 / 태블릿</h3>
             </div>
             <p className="text-gray-600 text-sm leading-relaxed">
-              매장 내 키오스크와 태블릿을 제공합니다.
-              고객이 대기 중 상품 정보를 검색하고
-              건강 관련 콘텐츠를 확인합니다.
+              대기실 키오스크와 태블릿을 제공합니다.
+              환자가 대기 중 구강 건강 정보를 검색하고
+              진료 안내 콘텐츠를 확인합니다.
             </p>
           </div>
 
@@ -125,8 +117,8 @@ export default function PharmacyTargetPage() {
               <h3 className="font-semibold text-gray-900">디지털 사이니지</h3>
             </div>
             <p className="text-gray-600 text-sm leading-relaxed">
-              매장 내 TV/모니터로 방송 채널을 운영합니다.
-              건강 정보, 상품 안내, 프로모션 콘텐츠를
+              대기실 TV/모니터로 방송 채널을 운영합니다.
+              구강 건강 정보, 진료 안내 콘텐츠를
               직접 편성하여 송출합니다.
             </p>
           </div>
@@ -141,22 +133,8 @@ export default function PharmacyTargetPage() {
             </div>
             <p className="text-gray-600 text-sm leading-relaxed">
               자체 교육 콘텐츠를 제작하여 제공합니다.
-              건강기능식품 복용법, 질환별 관리 방법 등을
-              약국 직원과 고객에게 전달합니다.
-            </p>
-          </div>
-
-          {/* 무재고 상품 공급 */}
-          <div className="p-6 bg-slate-50 rounded-xl border border-slate-200 md:col-span-2">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center border border-slate-200">
-                <Package className="w-5 h-5 text-slate-600" />
-              </div>
-              <h3 className="font-semibold text-gray-900">무재고 상품 공급</h3>
-            </div>
-            <p className="text-gray-600 text-sm leading-relaxed">
-              약국이 재고 부담 없이 상품을 판매합니다. 주문 시 공급사에서 직접 배송합니다.
-              공급자는 약국 네트워크를 판매 채널로 활용하고, 약국은 추가 수익을 얻습니다.
+              구강 관리법, 치료 후 관리, 구강 위생 지식 등을
+              치과 직원과 환자에게 전달합니다.
             </p>
           </div>
         </div>
@@ -164,7 +142,7 @@ export default function PharmacyTargetPage() {
         {/* 핵심 가치 */}
         <div className="bg-primary-50 rounded-xl p-8 border border-primary-200 text-center mb-8">
           <p className="text-primary-800 leading-relaxed">
-            <strong>약국 네트워크를 대상으로 비즈니스하는 사업자</strong>가
+            <strong>치과 네트워크를 대상으로 비즈니스하는 사업자</strong>가
             <br />
             o4o를 통해 채널을 확보하고 비즈니스를 확장합니다.
           </p>
@@ -174,15 +152,15 @@ export default function PharmacyTargetPage() {
         <div className="rounded-xl border border-gray-200 p-6">
           <p className="text-sm text-gray-500 mb-3">이 흐름을 실제 매장에서 운영하는 방법을 확인하세요.</p>
           <Link
-            to="/o4o/channels/pharmacy"
-            onClick={() => trackEvent({ event: 'channel_click', target: 'pharmacy', action: 'channel', position: 'mid' })}
+            to="/o4o/channels/dental"
+            onClick={() => trackEvent({ event: 'channel_click', target: 'dental', action: 'channel', position: 'mid' })}
             className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium text-sm"
           >
             매장 운영 방식 보기
             <ArrowRight className="w-4 h-4" />
           </Link>
           <p className="text-xs text-gray-400 mt-2">
-            약국 원장·운영자가 실제 채널 구조를 확인하는 자료
+            치과 원장·운영자가 실제 채널 구조를 확인하는 자료
           </p>
         </div>
 
@@ -192,15 +170,15 @@ export default function PharmacyTargetPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="p-5 bg-slate-50 rounded-xl border border-slate-200">
               <p className="text-xs font-semibold text-primary-600 mb-2">1. 노출</p>
-              <p className="text-gray-700 text-sm leading-relaxed">약국 TV, POP, QR에서 제품과 건강 정보를 안내합니다.</p>
+              <p className="text-gray-700 text-sm leading-relaxed">진료 전후 대기 시간에 구강관리 제품과 관리 정보를 안내합니다.</p>
             </div>
             <div className="p-5 bg-slate-50 rounded-xl border border-slate-200">
               <p className="text-xs font-semibold text-primary-600 mb-2">2. 반응</p>
-              <p className="text-gray-700 text-sm leading-relaxed">고객이 대기 중 QR을 스캔하거나 관심 제품을 확인합니다.</p>
+              <p className="text-gray-700 text-sm leading-relaxed">환자가 QR이나 안내 화면을 통해 필요한 제품과 정보를 확인합니다.</p>
             </div>
             <div className="p-5 bg-slate-50 rounded-xl border border-slate-200">
               <p className="text-xs font-semibold text-primary-600 mb-2">3. 실행</p>
-              <p className="text-gray-700 text-sm leading-relaxed">약국은 설명 기반 상담, 무재고 주문, 재방문 안내로 연결합니다.</p>
+              <p className="text-gray-700 text-sm leading-relaxed">치과는 환자 교육, 사후관리, 제품 안내를 자연스럽게 연결합니다.</p>
             </div>
           </div>
         </div>
@@ -211,14 +189,14 @@ export default function PharmacyTargetPage() {
           <div className="mt-4 flex flex-wrap gap-3">
             <Link
               to="/supplier"
-              onClick={() => trackEvent({ event: 'mid_cta_click', target: 'pharmacy', action: 'supplier', position: 'mid' })}
+              onClick={() => trackEvent({ event: 'mid_cta_click', target: 'dental', action: 'supplier', position: 'mid' })}
               className="inline-flex items-center justify-center px-5 py-2.5 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors text-sm"
             >
               제품 공급자로 참여하기
             </Link>
             <Link
               to="/partner"
-              onClick={() => trackEvent({ event: 'mid_cta_click', target: 'pharmacy', action: 'partner', position: 'mid' })}
+              onClick={() => trackEvent({ event: 'mid_cta_click', target: 'dental', action: 'partner', position: 'mid' })}
               className="inline-flex items-center justify-center px-5 py-2.5 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors text-sm"
             >
               운영 파트너로 참여하기
@@ -232,15 +210,15 @@ export default function PharmacyTargetPage() {
           <ul className="space-y-3">
             <li className="flex items-start gap-3 p-4 bg-white rounded-xl border border-gray-100">
               <span className="mt-0.5 w-1.5 h-1.5 rounded-full bg-primary-500 flex-shrink-0" />
-              <p className="text-gray-700 text-sm leading-relaxed">대기 시간이 단순 대기가 아니라 정보 전달 시간이 됩니다.</p>
+              <p className="text-gray-700 text-sm leading-relaxed">환자 교육이 진료 흐름 안에서 자연스럽게 이루어집니다.</p>
             </li>
             <li className="flex items-start gap-3 p-4 bg-white rounded-xl border border-gray-100">
               <span className="mt-0.5 w-1.5 h-1.5 rounded-full bg-primary-500 flex-shrink-0" />
-              <p className="text-gray-700 text-sm leading-relaxed">반복 설명이 줄고, 고객 스스로 이해하는 구조가 만들어집니다.</p>
+              <p className="text-gray-700 text-sm leading-relaxed">사후 관리 안내가 체계적으로 전달됩니다.</p>
             </li>
             <li className="flex items-start gap-3 p-4 bg-white rounded-xl border border-gray-100">
               <span className="mt-0.5 w-1.5 h-1.5 rounded-full bg-primary-500 flex-shrink-0" />
-              <p className="text-gray-700 text-sm leading-relaxed">추가 재고 없이도 새로운 매출 흐름을 만들 수 있습니다.</p>
+              <p className="text-gray-700 text-sm leading-relaxed">반복적인 설명 업무가 줄어듭니다.</p>
             </li>
           </ul>
         </div>
@@ -249,21 +227,21 @@ export default function PharmacyTargetPage() {
         <div className="mt-8 flex flex-col sm:flex-row gap-3">
           <Link
             to="/supplier"
-            onClick={() => trackEvent({ event: 'final_cta_click', target: 'pharmacy', action: 'supplier', position: 'final' })}
+            onClick={() => trackEvent({ event: 'final_cta_click', target: 'dental', action: 'supplier', position: 'final' })}
             className="inline-flex items-center justify-center px-5 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors text-sm"
           >
             제품 공급자로 참여하기
           </Link>
           <Link
             to="/partner"
-            onClick={() => trackEvent({ event: 'final_cta_click', target: 'pharmacy', action: 'partner', position: 'final' })}
+            onClick={() => trackEvent({ event: 'final_cta_click', target: 'dental', action: 'partner', position: 'final' })}
             className="inline-flex items-center justify-center px-5 py-3 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors text-sm"
           >
             운영 파트너로 참여하기
           </Link>
           <Link
             to="/contact"
-            onClick={() => trackEvent({ event: 'final_cta_click', target: 'pharmacy', action: 'contact', position: 'final' })}
+            onClick={() => trackEvent({ event: 'final_cta_click', target: 'dental', action: 'contact', position: 'final' })}
             className="inline-flex items-center justify-center px-5 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors text-sm"
           >
             도입 문의하기

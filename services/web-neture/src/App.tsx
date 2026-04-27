@@ -82,6 +82,7 @@ import {
   ClinicTargetPage,
   SalonTargetPage,
   OpticalTargetPage,
+  DentalTargetPage,
 } from './pages/o4o/targets';
 import ConceptsPage from './pages/manual/concepts/ConceptsPage';
 import ChannelMapPage from './pages/manual/concepts/ChannelMapPage';
@@ -587,6 +588,7 @@ function App() {
               <Route path="/o4o/targets/clinic" element={<ClinicTargetPage />} />
               <Route path="/o4o/targets/salon" element={<SalonTargetPage />} />
               <Route path="/o4o/targets/optical" element={<OpticalTargetPage />} />
+              <Route path="/o4o/targets/dental" element={<DentalTargetPage />} />
               <Route path="/o4o/business-inquiry" element={<BusinessInquiryPage />} />
               <Route path="/o4o/consultation" element={<ConsultationRequestPage />} />
               {/* 시맨틱 URL: About → /o4o/* 통일 */}
