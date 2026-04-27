@@ -11,7 +11,7 @@
  * - GET /api/ai/admin/usage - 사용량 통계
  * - GET /api/ai/admin/ops/summary - AI 운영 요약 (WO-O4O-AI-OBSERVABILITY-MINIMUM-V1)
  * - GET /api/ai/admin/ops/errors - 최근 AI 오류 (WO-O4O-AI-OBSERVABILITY-MINIMUM-V1)
- * - GET /api/ai/admin/ops/care-status - Care AI 상태 (WO-O4O-AI-OBSERVABILITY-MINIMUM-V1)
+ * WO-O4O-GLYCOPHARM-CARE-DEAD-CODE-REMOVAL-PHASE2-V1: /ops/care-status 제거
  */
 
 import { Router, Response } from 'express';
@@ -179,7 +179,8 @@ router.get('/usage', authenticate, requireAdmin, async (req, res: Response) => {
 
 /**
  * GET /api/ai/admin/ops/summary
- * AI 운영 상태 요약: provider별 호출/에러, Care 생성 건수, 토큰 사용량
+ * AI 운영 상태 요약: provider별 호출/에러, 토큰 사용량
+ * WO-O4O-GLYCOPHARM-CARE-DEAD-CODE-REMOVAL-PHASE2-V1: Care 집계 블록 제거
  */
 router.get('/ops/summary', authenticate, requireAdmin, async (_req, res: Response) => {
   try {
@@ -206,24 +207,6 @@ router.get('/ops/summary', authenticate, requireAdmin, async (_req, res: Respons
       }
     } catch { /* table may not exist */ }
 
-    // Care AI 생성 건수
-    let totalInsights = 0;
-    let totalDrafts = 0;
-    let lastInsightAt: string | null = null;
-    try {
-      const rows = await ds.query(
-        `SELECT COUNT(*)::int AS cnt, MAX(created_at) AS last_at FROM care_llm_insights`,
-      );
-      totalInsights = rows[0]?.cnt || 0;
-      lastInsightAt = rows[0]?.last_at ? new Date(rows[0].last_at).toISOString() : null;
-    } catch { /* table may not exist */ }
-    try {
-      const rows = await ds.query(
-        `SELECT COUNT(*)::int AS cnt FROM care_coaching_drafts`,
-      );
-      totalDrafts = rows[0]?.cnt || 0;
-    } catch { /* table may not exist */ }
-
     // 토큰 사용량 합계
     let promptTokens = 0;
     let completionTokens = 0;
@@ -241,7 +224,6 @@ router.get('/ops/summary', authenticate, requireAdmin, async (_req, res: Respons
       success: true,
       data: {
         providers,
-        care: { totalInsights, totalDrafts, lastInsightAt },
         tokens: { prompt: promptTokens, completion: completionTokens },
       },
     });
@@ -284,82 +266,6 @@ router.get('/ops/errors', authenticate, requireAdmin, async (req, res: Response)
     });
   } catch (error) {
     return res.status(500).json({ success: false, error: 'AI error list failed' });
-  }
-});
-
-/**
- * GET /api/ai/admin/ops/care-status
- * Care AI 생성 상태: insights/drafts 건수, 최근 생성 시각, 모델 설정
- */
-router.get('/ops/care-status', authenticate, requireAdmin, async (_req, res: Response) => {
-  try {
-    const ds = AppDataSource;
-
-    // Insights
-    let insightsGenerated = 0;
-    let lastInsightAt: string | null = null;
-    try {
-      const rows = await ds.query(
-        `SELECT COUNT(*)::int AS cnt, MAX(created_at) AS last_at FROM care_llm_insights`,
-      );
-      insightsGenerated = rows[0]?.cnt || 0;
-      lastInsightAt = rows[0]?.last_at ? new Date(rows[0].last_at).toISOString() : null;
-    } catch { /* table may not exist */ }
-
-    // Drafts (by status)
-    let draftsGenerated = 0;
-    let draftsApproved = 0;
-    let draftsDiscarded = 0;
-    let lastDraftAt: string | null = null;
-    try {
-      const rows = await ds.query(`
-        SELECT status, COUNT(*)::int AS cnt, MAX(created_at) AS last_at
-        FROM care_coaching_drafts
-        GROUP BY status
-      `);
-      for (const r of rows) {
-        if (r.status === 'draft') draftsGenerated += r.cnt;
-        if (r.status === 'approved') draftsApproved += r.cnt;
-        if (r.status === 'discarded') draftsDiscarded += r.cnt;
-        const ts = r.last_at ? new Date(r.last_at).toISOString() : null;
-        if (ts && (!lastDraftAt || ts > lastDraftAt)) lastDraftAt = ts;
-      }
-    } catch { /* table may not exist */ }
-
-    // Model settings
-    let model = 'gemini-3.0-flash';
-    let temperature = 0.3;
-    let maxTokens = 2048;
-    try {
-      const rows = await ds.query(
-        `SELECT model, temperature, max_tokens FROM ai_model_settings WHERE service = 'care' LIMIT 1`,
-      );
-      if (rows[0]?.model) model = rows[0].model;
-      if (rows[0]?.temperature != null) temperature = Number(rows[0].temperature);
-      if (rows[0]?.max_tokens != null) maxTokens = Number(rows[0].max_tokens);
-    } catch { /* table may not exist */ }
-
-    // Gemini key status
-    const envKeySet = !!(process.env.GEMINI_API_KEY || process.env.GOOGLE_AI_API_KEY);
-
-    return res.json({
-      success: true,
-      data: {
-        insightsGenerated,
-        lastInsightAt,
-        drafts: {
-          total: draftsGenerated + draftsApproved + draftsDiscarded,
-          pending: draftsGenerated,
-          approved: draftsApproved,
-          discarded: draftsDiscarded,
-        },
-        lastDraftAt,
-        modelConfig: { model, temperature, maxTokens },
-        geminiKeyConfigured: envKeySet,
-      },
-    });
-  } catch (error) {
-    return res.status(500).json({ success: false, error: 'Care AI status failed' });
   }
 });
 
