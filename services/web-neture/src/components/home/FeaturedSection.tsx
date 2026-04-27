@@ -60,7 +60,7 @@ export function FeaturedSection() {
               {suppliers.map((supplier) => (
                 <Link
                   key={supplier.id}
-                  to={`/knowledge`}
+                  to={`/library/content`}
                   className="p-6 bg-gray-50 rounded-xl border border-gray-200 hover:border-primary-300 hover:shadow-md transition-all"
                 >
                   <div className="flex items-center gap-4 mb-3">

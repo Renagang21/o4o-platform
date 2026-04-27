@@ -308,7 +308,7 @@ export default function CommunityPage() {
               <div className="flex items-center gap-3">
                 {isAuthenticated && (
                   <Link
-                    to="/article/write"
+                    to="/forum/write"
                     className="inline-flex items-center text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 px-3 py-1.5 rounded-lg transition-colors"
                   >
                     글쓰기
@@ -320,7 +320,7 @@ export default function CommunityPage() {
               {articles.map(post => (
                 <Link
                   key={post.id}
-                  to={`/article/${post.slug}`}
+                  to={`/forum/post/${post.slug}`}
                   className="flex items-center justify-between p-4 rounded-lg hover:bg-gray-50 transition-colors group"
                 >
                   <div className="min-w-0 flex-1">
@@ -362,7 +362,7 @@ export default function CommunityPage() {
                 <h2 className="text-xl font-bold text-gray-900">Knowledge</h2>
               </div>
               <Link
-                to="/knowledge"
+                to="/library/content"
                 className="inline-flex items-center text-sm font-medium text-primary-600 hover:text-primary-700"
               >
                 더보기
@@ -373,7 +373,7 @@ export default function CommunityPage() {
               {knowledges.map(item => (
                 <Link
                   key={item.id}
-                  to={`/knowledge/${item.id}`}
+                  to={`/library/content`}
                   className="flex items-center justify-between p-4 rounded-lg hover:bg-white transition-colors group"
                 >
                   <div className="min-w-0 flex-1">

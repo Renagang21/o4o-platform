@@ -280,7 +280,7 @@ function EmptyCart() {
       <ShoppingCart size={48} color="#cbd5e1" />
       <h3 style={styles.emptyTitle}>장바구니가 비어있습니다</h3>
       <p style={styles.emptyText}>공급 상품을 둘러보고 장바구니에 담아보세요.</p>
-      <Link to="/knowledge" style={styles.browseBtn}>
+      <Link to="/library/content" style={styles.browseBtn}>
         상품 둘러보기
       </Link>
     </div>

@@ -42,8 +42,7 @@ import HandoffPage from './pages/HandoffPage';
 import AboutPage from './pages/AboutPage';
 import LegalPage from './pages/LegalPage';
 import CommunityPage from './pages/CommunityPage';
-import KnowledgePage from './pages/knowledge/KnowledgePage';
-import KnowledgeDetailPage from './pages/knowledge/KnowledgeDetailPage';
+// KnowledgePage/KnowledgeDetailPage 제거 — /knowledge 경로 흡수됨 (WO-NETURE-HOME-IA-V1)
 import {
   CommunityAnnouncementsPage,
   CommunityAnnouncementDetailPage,
@@ -563,17 +562,9 @@ function App() {
               <Route path="/forum/write" element={<ForumWritePage />} />
               <Route path="/forum/post/:slug" element={<ForumPostPage />} />
 
-              {/* Articles */}
-              <Route path="/article/write" element={<ForumWritePage categorySlug="article" backPath="/" postSegment="article" />} />
-              <Route path="/article/:slug" element={<ForumPostPage />} />
-
               {/* Notices */}
               <Route path="/notices" element={<CommunityAnnouncementsPage />} />
               <Route path="/notices/:id" element={<CommunityAnnouncementDetailPage />} />
-
-              {/* Knowledge (WO-O4O-KNOWLEDGE-LIBRARY-V1) */}
-              <Route path="/knowledge" element={<KnowledgePage />} />
-              <Route path="/knowledge/:id" element={<KnowledgeDetailPage />} />
 
               {/* WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1 */}
               <Route path="/library/content" element={<ContentLibraryPage />} />
