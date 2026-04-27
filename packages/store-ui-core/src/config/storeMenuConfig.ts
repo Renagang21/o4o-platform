@@ -167,6 +167,13 @@ export const GLYCOPHARM_STORE_CONFIG: StoreDashboardConfig = {
  *   - 자체 상품·매장 진열 상품 사이드바 제거 (라우트 유지)
  *   - 라벨 변경: QR 관리→QR 코드, 채널 현황→B2B 사이트, 매장 사이니지→디지털 사이니지
  *   - 약국 정보 설정 그룹으로 이동
+ * WO-KPA-STORE-MENU-NORMALIZATION-V1:
+ *   - "상품 관리" → "공급 상품" 명칭 변경
+ *   - "주문 관리" → "주문 내역" 명칭 변경
+ *   - "내 매장 상품" (/commerce/local-products) 메뉴 추가 (기존 라우트 활성화)
+ *   - "자료실" 제거 (route 미연결 상태)
+ *   - 채널 관리/상담 요청 → 매장 실행 그룹으로 이동
+ *   - 태블릿 진열/블로그 → 매장 실행 그룹으로 통합
  */
 export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
   serviceKey: 'kpa-society',
@@ -175,13 +182,12 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
   enabledMenus: ['dashboard'],
   menuSections: [
     { label: '', items: [
-      { key: 'home',     label: '홈',       subPath: '' },
-      { key: 'channels', label: '채널 관리', subPath: '/channels' },
-      { key: 'requests', label: '상담 요청', subPath: '/requests' },
+      { key: 'home', label: '홈', subPath: '' },
     ]},
-    { label: '상품/주문', items: [
-      { key: 'products', label: '상품 관리', subPath: '/commerce/products' },
-      { key: 'orders',   label: '주문 관리', subPath: '/commerce/orders' },
+    { label: '상품', items: [
+      { key: 'products',       label: '공급 상품',    subPath: '/commerce/products' },
+      { key: 'local-products', label: '내 매장 상품', subPath: '/commerce/local-products' },
+      { key: 'orders',         label: '주문 내역',    subPath: '/commerce/orders' },
     ]},
     { label: '디지털 사이니지', items: [
       { key: 'signage-playlist',  label: '플레이리스트', subPath: '/marketing/signage/playlist' },
@@ -190,21 +196,19 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'signage-player',    label: '재생',         subPath: '/marketing/signage/player' },
     ]},
     { label: '매장 실행', items: [
-      { key: 'qr',  label: 'QR 코드', subPath: '/marketing/qr' },
-      { key: 'pop', label: 'POP 자료', subPath: '/marketing/pop' },
-    ]},
-    { label: '콘텐츠/태블릿', items: [
+      { key: 'channels',        label: '채널 관리', subPath: '/channels' },
       { key: 'tablet-displays', label: '태블릿 진열', subPath: '/commerce/tablet-displays' },
-      { key: 'blog',            label: '블로그',       subPath: '/content/blog' },
+      { key: 'qr',              label: 'QR 코드',   subPath: '/marketing/qr' },
+      { key: 'pop',             label: 'POP 자료',  subPath: '/marketing/pop' },
+      { key: 'blog',            label: '블로그',    subPath: '/content/blog' },
+      { key: 'requests',        label: '상담 요청', subPath: '/requests' },
     ]},
-    { label: '자료/분석', items: [
-      { key: 'library',            label: '자료실',     subPath: '/operation/library' },
+    { label: '분석', items: [
       { key: 'analytics-marketing', label: '마케팅 분석', subPath: '/analytics/marketing' },
     ]},
     { label: '설정', items: [
-      { key: 'pharmacy-info',  label: '약국 정보',      subPath: '/info' },
-      { key: 'store-settings', label: '매장 설정',      subPath: '/settings' },
-      { key: 'layout-builder', label: '레이아웃 빌더', subPath: '/settings/layout' },
+      { key: 'pharmacy-info',  label: '약국 정보', subPath: '/info' },
+      { key: 'store-settings', label: '매장 설정', subPath: '/settings' },
     ]},
   ],
 };
