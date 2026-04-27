@@ -42,7 +42,6 @@ import HandoffPage from './pages/HandoffPage';
 import AboutPage from './pages/AboutPage';
 import LegalPage from './pages/LegalPage';
 import CommunityPage from './pages/CommunityPage';
-// KnowledgePage/KnowledgeDetailPage 제거 — /knowledge 경로 흡수됨 (WO-NETURE-HOME-IA-V1)
 import {
   CommunityAnnouncementsPage,
   CommunityAnnouncementDetailPage,
@@ -576,6 +575,29 @@ function App() {
               <Route path="/market-trial" element={<MarketTrialHubPage />} />
               <Route path="/market-trial/my" element={<MyParticipationsPage />} />
               <Route path="/market-trial/:id" element={<MarketTrialDetailPage />} />
+
+              {/* ── O4O 소개 영역 — WO-O4O-ABOUT-URL-SEMANTIC-ALIGNMENT-V1 ──
+                  NetureLayout 통일: About 이동 후 레이아웃 이탈 방지
+               */}
+              <Route path="/o4o" element={<O4OMainPage />} />
+              <Route path="/o4o/intro" element={<O4OIntroPage />} />
+              <Route path="/o4o/other-targets" element={<OtherTargetsPage />} />
+              <Route path="/o4o/site-operator" element={<SiteOperatorPage />} />
+              <Route path="/o4o/targets/pharmacy" element={<PharmacyTargetPage />} />
+              <Route path="/o4o/targets/clinic" element={<ClinicTargetPage />} />
+              <Route path="/o4o/targets/salon" element={<SalonTargetPage />} />
+              <Route path="/o4o/targets/optical" element={<OpticalTargetPage />} />
+              <Route path="/o4o/business-inquiry" element={<BusinessInquiryPage />} />
+              <Route path="/o4o/consultation" element={<ConsultationRequestPage />} />
+              {/* 시맨틱 URL: About → /o4o/* 통일 */}
+              <Route path="/o4o/concepts" element={<ConceptsPage />} />
+              <Route path="/o4o/channel-map" element={<ChannelMapPage />} />
+              <Route path="/o4o/principles" element={<PlatformPrinciplesPage />} />
+              <Route path="/o4o/structure" element={<ChannelSalesStructurePage />} />
+              <Route path="/o4o/channels/pharmacy" element={<PharmacyChannelExplanationPage />} />
+              <Route path="/o4o/channels/optical" element={<OpticalChannelExplanationPage />} />
+              <Route path="/o4o/channels/medical" element={<MedicalChannelExplanationPage />} />
+              <Route path="/o4o/channels/dental" element={<DentalChannelExplanationPage />} />
             </Route>
 
             {/* ================================================================
@@ -688,28 +710,18 @@ function App() {
             </Route>
 
             {/* ================================================================
-                o4o 공통 영역 (MainLayout)
+                공통 영역 (MainLayout) — store/seller/partner-info/forum
+                ※ /o4o/* 는 NetureLayout으로 이동 (WO-O4O-ABOUT-URL-SEMANTIC-ALIGNMENT-V1)
             ================================================================ */}
             <Route element={<MainLayout />}>
-              <Route path="/o4o" element={<O4OMainPage />} />
-              <Route path="/o4o/intro" element={<O4OIntroPage />} />
-              <Route path="/o4o/other-targets" element={<OtherTargetsPage />} />
-              <Route path="/o4o/site-operator" element={<SiteOperatorPage />} />
-              <Route path="/o4o/targets/pharmacy" element={<PharmacyTargetPage />} />
-              <Route path="/o4o/targets/clinic" element={<ClinicTargetPage />} />
-              <Route path="/o4o/targets/salon" element={<SalonTargetPage />} />
-              <Route path="/o4o/targets/optical" element={<OpticalTargetPage />} />
-              <Route path="/o4o/business-inquiry" element={<BusinessInquiryPage />} />
-              <Route path="/o4o/consultation" element={<ConsultationRequestPage />} />
-              <Route path="/manual/concepts" element={<ConceptsPage />} />
-              <Route path="/manual/concepts/channel-map" element={<ChannelMapPage />} />
-
-              {/* 채널 구조 설명 */}
-              <Route path="/channel/structure" element={<ChannelSalesStructurePage />} />
-              <Route path="/channel/dental" element={<DentalChannelExplanationPage />} />
-              <Route path="/channel/pharmacy" element={<PharmacyChannelExplanationPage />} />
-              <Route path="/channel/optical" element={<OpticalChannelExplanationPage />} />
-              <Route path="/channel/medical" element={<MedicalChannelExplanationPage />} />
+              {/* 레거시 redirect — /manual, /channel → /o4o/* */}
+              <Route path="/manual/concepts" element={<Navigate to="/o4o/concepts" replace />} />
+              <Route path="/manual/concepts/channel-map" element={<Navigate to="/o4o/channel-map" replace />} />
+              <Route path="/channel/structure" element={<Navigate to="/o4o/structure" replace />} />
+              <Route path="/channel/dental" element={<Navigate to="/o4o/channels/dental" replace />} />
+              <Route path="/channel/pharmacy" element={<Navigate to="/o4o/channels/pharmacy" replace />} />
+              <Route path="/channel/optical" element={<Navigate to="/o4o/channels/optical" replace />} />
+              <Route path="/channel/medical" element={<Navigate to="/o4o/channels/medical" replace />} />
 
               {/* 판매자 개요 */}
               <Route path="/seller/overview" element={<SellerOverviewPage />} />
@@ -757,7 +769,7 @@ function App() {
               <Route path="/workspace/partners/requests/new" element={<PartnershipRequestCreatePage />} />
               <Route path="/workspace/partners/requests/:id" element={<PartnershipRequestDetailPage />} />
               <Route path="/workspace/partners/info" element={<PartnerInfoPage />} />
-              <Route path="/workspace/platform/principles" element={<PlatformPrinciplesPage />} />
+              <Route path="/workspace/platform/principles" element={<Navigate to="/o4o/principles" replace />} />
               <Route path="/workspace/my-content" element={<MyContentPage />} />
 
               {/* Workspace 포럼 */}
@@ -929,7 +941,7 @@ function App() {
             <Route path="/partners/requests" element={<Navigate to="/workspace/partners/requests" replace />} />
             <Route path="/partners/requests/:id" element={<RedirectPartnershipRequestDetail />} />
             <Route path="/partners/info" element={<Navigate to="/workspace/partners/info" replace />} />
-            <Route path="/platform/principles" element={<Navigate to="/workspace/platform/principles" replace />} />
+            <Route path="/platform/principles" element={<Navigate to="/o4o/principles" replace />} />
             <Route path="/content" element={<Navigate to="/partner/contents" replace />} />
             <Route path="/content/:id" element={<RedirectContentDetail />} />
             <Route path="/my-content" element={<Navigate to="/workspace/my-content" replace />} />

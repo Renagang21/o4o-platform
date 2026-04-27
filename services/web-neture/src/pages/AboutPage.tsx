@@ -38,13 +38,13 @@ const platformIntro = [
 ];
 
 const platformConcepts = [
-  { title: '플랫폼 개념 설명', desc: 'O4O 플랫폼의 핵심 개념을 설명합니다.', to: '/manual/concepts' },
-  { title: '플랫폼 운영 원칙', desc: 'Neture 플랫폼의 운영 원칙을 안내합니다.', to: '/workspace/platform/principles' },
+  { title: '플랫폼 개념 설명', desc: 'O4O 플랫폼의 핵심 개념을 설명합니다.', to: '/o4o/concepts' },
+  { title: '플랫폼 운영 원칙', desc: 'Neture 플랫폼의 운영 원칙을 안내합니다.', to: '/o4o/principles' },
 ];
 
 const platformStructure = [
-  { title: '유통 채널 구조', desc: '공급자에서 매장까지의 유통 흐름을 설명합니다.', to: '/channel/structure' },
-  { title: '채널 맵', desc: '전체 채널 구조를 시각적으로 보여줍니다.', to: '/manual/concepts/channel-map' },
+  { title: '유통 채널 구조', desc: '공급자에서 매장까지의 유통 흐름을 설명합니다.', to: '/o4o/structure' },
+  { title: '채널 맵', desc: '전체 채널 구조를 시각적으로 보여줍니다.', to: '/o4o/channel-map' },
 ];
 
 const targetIndustries = [
@@ -56,10 +56,10 @@ const targetIndustries = [
 ];
 
 const channels = [
-  { title: '약국 채널', desc: '약국 유통 채널 구조를 설명합니다.', to: '/channel/pharmacy' },
-  { title: '안경점 채널', desc: '안경점 유통 채널 구조를 설명합니다.', to: '/channel/optical' },
-  { title: '의료기기 채널', desc: '의료기기 유통 채널 구조를 설명합니다.', to: '/channel/medical' },
-  { title: '치과 채널', desc: '치과 유통 채널 구조를 설명합니다.', to: '/channel/dental' },
+  { title: '약국 채널', desc: '약국 유통 채널 구조를 설명합니다.', to: '/o4o/channels/pharmacy' },
+  { title: '안경점 채널', desc: '안경점 유통 채널 구조를 설명합니다.', to: '/o4o/channels/optical' },
+  { title: '의료기기 채널', desc: '의료기기 유통 채널 구조를 설명합니다.', to: '/o4o/channels/medical' },
+  { title: '치과 채널', desc: '치과 유통 채널 구조를 설명합니다.', to: '/o4o/channels/dental' },
 ];
 
 /* ── 공통 카드 링크 컴포넌트 ── */
