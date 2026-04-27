@@ -23,6 +23,7 @@ import { NetureLogAction } from '../entities/neture-product-log.entity.js';
 import {
   NetureOrder,
   NetureOrderStatus,
+  NetureOrderType,
   NeturePaymentMethod,
 } from '../entities/neture-order.entity.js';
 import { NetureOrderItem } from '../entities/neture-order-item.entity.js';
@@ -471,6 +472,9 @@ export class NetureService {
       orderer_phone: order.ordererPhone || null,
       orderer_email: order.ordererEmail || null,
       note: order.note || null,
+      // IR-NETURE-B2B-DIRECT-SHIPPING-ORDER-FLOW-AUDIT-V1 Phase 2
+      order_type: order.orderType ?? NetureOrderType.STORE_RESTOCK,
+      customer_info: order.customerInfo || null,
       cancelled_at: order.cancelledAt?.toISOString() || null,
       cancel_reason: order.cancelReason || null,
       created_at: order.createdAt.toISOString(),
@@ -498,6 +502,36 @@ export class NetureService {
     userId: string,
     organizationId?: string | null
   ): Promise<OrderDto> {
+    // === IR-NETURE-B2B-DIRECT-SHIPPING-ORDER-FLOW-AUDIT-V1 Phase 2 ===
+    // Pre-Gate A: order_type 분기 검증
+    const orderType: NetureOrderType = data.order_type ?? NetureOrderType.STORE_RESTOCK;
+
+    if (orderType === NetureOrderType.DIRECT_TO_CUSTOMER) {
+      if (!data.customer_info) {
+        throw new Error('customer_info is required for DIRECT_TO_CUSTOMER order');
+      }
+      const ci = data.customer_info;
+      if (!ci.name?.trim()) throw new Error('customer_info.name is required');
+      if (!ci.phone?.trim()) throw new Error('customer_info.phone is required');
+      if (!ci.consent_at?.trim()) throw new Error('customer_info.consent_at is required');
+      if (Number.isNaN(Date.parse(ci.consent_at))) {
+        throw new Error('customer_info.consent_at must be a valid ISO datetime');
+      }
+    }
+
+    // Pre-Gate B: note 우회 입력 차단 (모든 order_type 공통)
+    // 매장이 고객 주소/연락처를 note에 우회 입력하지 못하도록 휴대폰 패턴 거부.
+    // 직배송이 필요하면 order_type=DIRECT_TO_CUSTOMER + customer_info를 사용해야 한다.
+    if (data.note) {
+      if (data.note.length > 500) {
+        throw new Error('note exceeds maximum length of 500 characters');
+      }
+      // 한국 휴대폰 번호 패턴: 010-XXXX-XXXX (하이픈/공백/없음 모두)
+      if (/01[0-9][- ]?\d{3,4}[- ]?\d{4}/.test(data.note)) {
+        throw new Error('note must not contain a phone number; use customer_info for direct-to-customer orders');
+      }
+    }
+
     // 1. B2B 공급자 상품 조회 (supplier 관계 포함)
     const productIds = data.items.map((item) => item.product_id);
     const supplierProducts = await this.repository.findSupplierOffersByIds(productIds);
@@ -605,6 +639,15 @@ export class NetureService {
         ordererPhone: data.orderer_phone ? data.orderer_phone.replace(/\D/g, '') : data.orderer_phone,
         ordererEmail: data.orderer_email,
         note: data.note,
+        // IR-NETURE-B2B-DIRECT-SHIPPING-ORDER-FLOW-AUDIT-V1 Phase 2
+        orderType,
+        customerInfo:
+          orderType === NetureOrderType.DIRECT_TO_CUSTOMER && data.customer_info
+            ? {
+                ...data.customer_info,
+                phone: data.customer_info.phone.replace(/\D/g, ''),
+              }
+            : null,
       });
       const savedOrder = await orderRepo.save(newOrder);
 

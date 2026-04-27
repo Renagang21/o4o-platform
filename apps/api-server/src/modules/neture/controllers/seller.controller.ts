@@ -399,7 +399,8 @@ export function createSellerController(dataSource: DataSource): Router {
         return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
       }
 
-      const { items, shipping, orderer_name, orderer_phone, orderer_email, note, referral_token } = req.body;
+      // IR-NETURE-B2B-DIRECT-SHIPPING-ORDER-FLOW-AUDIT-V1 Phase 2: order_type, customer_info pass-through
+      const { items, shipping, orderer_name, orderer_phone, orderer_email, note, referral_token, order_type, customer_info } = req.body;
 
       if (!items || !Array.isArray(items) || items.length === 0) {
         return res.status(400).json({ success: false, error: 'VALIDATION_ERROR', message: 'Items required' });
@@ -409,7 +410,7 @@ export function createSellerController(dataSource: DataSource): Router {
       }
 
       const order = await legacyNetureService.createOrder(
-        { items, shipping, orderer_name, orderer_phone, orderer_email, note },
+        { items, shipping, orderer_name, orderer_phone, orderer_email, note, order_type, customer_info },
         userId,
       );
 

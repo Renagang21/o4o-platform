@@ -20,6 +20,8 @@ import {
 import { NetureLogAction } from '../entities/neture-product-log.entity.js';
 import {
   NetureOrderStatus,
+  NetureOrderType,
+  NetureCustomerInfo,
   NeturePaymentMethod,
   NetureShippingAddress,
 } from '../entities/neture-order.entity.js';
@@ -257,6 +259,9 @@ export interface OrderDto {
   orderer_phone: string | null;
   orderer_email: string | null;
   note: string | null;
+  // IR-NETURE-B2B-DIRECT-SHIPPING-ORDER-FLOW-AUDIT-V1 Phase 2
+  order_type: NetureOrderType;
+  customer_info: NetureCustomerInfo | null;
   cancelled_at: string | null;
   cancel_reason: string | null;
   created_at: string;
@@ -277,6 +282,10 @@ export interface CreateOrderRequestDto {
   orderer_phone: string;
   orderer_email?: string;
   note?: string;
+  // IR-NETURE-B2B-DIRECT-SHIPPING-ORDER-FLOW-AUDIT-V1 Phase 2
+  // 미지정 시 STORE_RESTOCK 기본값. DIRECT_TO_CUSTOMER 시 customer_info 필수.
+  order_type?: NetureOrderType;
+  customer_info?: NetureCustomerInfo;
 }
 
 export interface CreateOrderResponseDto {
