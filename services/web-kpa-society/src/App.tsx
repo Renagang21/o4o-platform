@@ -119,7 +119,8 @@ import { PharmacyInfoPage } from './pages/pharmacy/PharmacyInfoPage';
 import { StoreHubPage } from './pages/pharmacy/StoreHubPage';
 
 // WO-PHARMACY-MANAGEMENT-CONSOLIDATION-V1 Phase 2: Store Core v1.0 통합
-import { StoreDashboardLayout, KPA_SOCIETY_STORE_CONFIG } from '@o4o/store-ui-core';
+import { StoreDashboardLayout, KPA_SOCIETY_STORE_CONFIG, resolveStoreMenu } from '@o4o/store-ui-core';
+import { useStoreCapabilities } from './hooks/useStoreCapabilities';
 import { KpaGlobalHeader } from './components/KpaGlobalHeader';
 import { SupplierListPage, SupplierDetailPage } from './pages/pharmacy/b2b';
 
@@ -268,11 +269,15 @@ function KpaStoreLayoutWrapper() {
     return () => { cancelled = true; };
   }, []);
 
+  // WO-O4O-STORE-CAPABILITY-CONSISTENCY-FIX-V1: GlycoPharm/K-Cosmetics와 동일한 capability 필터링 적용
+  const enabledCaps = useStoreCapabilities();
+  const resolvedConfig = resolveStoreMenu(KPA_SOCIETY_STORE_CONFIG, enabledCaps);
+
   return (
     <div className="min-h-screen flex flex-col">
       <KpaGlobalHeader />
       <StoreDashboardLayout
-        config={KPA_SOCIETY_STORE_CONFIG}
+        config={resolvedConfig}
         userName={user?.name || user?.email || ''}
         homeLink="/"
         orgName={pharmacyName}
