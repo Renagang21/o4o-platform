@@ -2,13 +2,12 @@
  * Home Preview Controller
  *
  * WO-HOME-LIVE-PREVIEW-V1
+ * WO-O4O-GLYCOPHARM-CARE-DEAD-CODE-REMOVAL-V1: Care 집계 제거
  *
  * Public API: GET /api/v1/home/preview
  * - 인증 선택적: 토큰 있으면 pharmacy-scoped, 없으면 global aggregate
- * - Care + Store 운영 데이터 집계
- * - 개인정보(이름, 전화번호, patient_id) 반환 금지
- *
- * 패턴: care-dashboard.controller.ts의 buildDashboard 재사용
+ * - Store 운영 데이터 집계 (Care 제거됨)
+ * - 개인정보(이름, 전화번호) 반환 금지
  */
 
 import { Router } from 'express';
@@ -32,24 +31,6 @@ interface SafeQueryResult {
   outcome: QueryOutcome;
 }
 
-interface HomePreviewCare {
-  totalPatients: number;
-  totalPatientsStatus: MetricStatus;
-  highRiskCount: number;
-  highRiskCountStatus: MetricStatus;
-  recentCoaching: number;
-  recentCoachingStatus: MetricStatus;
-  recentAnalysis: number;
-  recentAnalysisStatus: MetricStatus;
-  avgTimeInRange: number;
-  avgTimeInRangeStatus: MetricStatus;
-  recentChanges: Array<{
-    tirChange?: number;
-    cvChange?: number;
-    riskTrend: 'improving' | 'stable' | 'worsening';
-  }>;
-}
-
 interface HomePreviewStore {
   monthlyOrders: number;
   monthlyOrdersStatus: MetricStatus;
@@ -62,7 +43,6 @@ interface HomePreviewStore {
 }
 
 interface HomePreviewData {
-  care: HomePreviewCare;
   store: HomePreviewStore;
 }
 
@@ -108,163 +88,6 @@ async function safeQuery(ds: DataSource, sql: string, params?: any[]): Promise<S
 function deriveStatus(outcome: QueryOutcome, value: number): MetricStatus {
   if (outcome === 'TABLE_MISSING') return 'TABLE_MISSING';
   return value > 0 ? 'OK' : 'ZERO';
-}
-
-async function buildCarePreview(
-  ds: DataSource,
-  pharmacyId: string | null,
-  _userId: string | null,
-): Promise<HomePreviewCare> {
-  // WO-CARE-ORG-SCOPE-MIGRATION-V1: Care는 organization_id(=pharmacyId) 기준 약국 단위 모델
-  const isGlobal = !pharmacyId;
-
-  // A. Total patients
-  const totalResult = isGlobal
-    ? await safeQuery(ds, `SELECT COUNT(*)::int AS count FROM glucoseview_customers`)
-    : await safeQuery(ds,
-        `SELECT COUNT(*)::int AS count FROM glucoseview_customers WHERE organization_id = $1`,
-        [pharmacyId]
-      );
-  const totalPatients = totalResult.rows[0]?.count ?? 0;
-  const totalPatientsStatus = deriveStatus(totalResult.outcome, totalPatients);
-
-  // B. High risk count (latest snapshot per patient)
-  const highRiskResult = isGlobal
-    ? await safeQuery(ds, `
-        SELECT COUNT(*)::int AS count
-        FROM care_kpi_snapshots s
-        INNER JOIN (
-          SELECT patient_id, MAX(created_at) AS max_at
-          FROM care_kpi_snapshots GROUP BY patient_id
-        ) latest ON s.patient_id = latest.patient_id AND s.created_at = latest.max_at
-        WHERE s.risk_level = 'high'
-      `)
-    : await safeQuery(ds, `
-        SELECT COUNT(*)::int AS count
-        FROM care_kpi_snapshots s
-        JOIN glucoseview_customers c ON s.patient_id = c.id
-        INNER JOIN (
-          SELECT patient_id, MAX(created_at) AS max_at
-          FROM care_kpi_snapshots GROUP BY patient_id
-        ) latest ON s.patient_id = latest.patient_id AND s.created_at = latest.max_at
-        WHERE c.organization_id = $1 AND s.risk_level = 'high'
-      `, [pharmacyId]);
-  const highRiskCount = highRiskResult.rows[0]?.count ?? 0;
-  const highRiskCountStatus = deriveStatus(highRiskResult.outcome, highRiskCount);
-
-  // C. Recent coaching (last 7 days)
-  const coachingResult = isGlobal
-    ? await safeQuery(ds, `
-        SELECT COUNT(*)::int AS count FROM care_coaching_sessions
-        WHERE created_at >= NOW() - INTERVAL '7 days'
-      `)
-    : await safeQuery(ds, `
-        SELECT COUNT(*)::int AS count FROM care_coaching_sessions
-        WHERE created_at >= NOW() - INTERVAL '7 days' AND pharmacy_id = $1
-      `, [pharmacyId]);
-  const recentCoaching = coachingResult.rows[0]?.count ?? 0;
-  const recentCoachingStatus = deriveStatus(coachingResult.outcome, recentCoaching);
-
-  // D. Recent analysis (distinct patients with snapshots in last 7 days)
-  const analysisResult = isGlobal
-    ? await safeQuery(ds, `
-        SELECT COUNT(DISTINCT patient_id)::int AS count FROM care_kpi_snapshots
-        WHERE created_at >= NOW() - INTERVAL '7 days'
-      `)
-    : await safeQuery(ds, `
-        SELECT COUNT(DISTINCT s.patient_id)::int AS count FROM care_kpi_snapshots s
-        JOIN glucoseview_customers c ON s.patient_id = c.id
-        WHERE s.created_at >= NOW() - INTERVAL '7 days' AND c.organization_id = $1
-      `, [pharmacyId]);
-  const recentAnalysis = analysisResult.rows[0]?.count ?? 0;
-  const recentAnalysisStatus = deriveStatus(analysisResult.outcome, recentAnalysis);
-
-  // E. Average Time-in-Range (latest snapshot per patient)
-  const tirResult = isGlobal
-    ? await safeQuery(ds, `
-        SELECT COALESCE(AVG(s.tir), 0)::numeric(5,1) AS avg_tir
-        FROM care_kpi_snapshots s
-        INNER JOIN (
-          SELECT patient_id, MAX(created_at) AS max_at
-          FROM care_kpi_snapshots GROUP BY patient_id
-        ) latest ON s.patient_id = latest.patient_id AND s.created_at = latest.max_at
-      `)
-    : await safeQuery(ds, `
-        SELECT COALESCE(AVG(s.tir), 0)::numeric(5,1) AS avg_tir
-        FROM care_kpi_snapshots s
-        JOIN glucoseview_customers c ON s.patient_id = c.id
-        INNER JOIN (
-          SELECT patient_id, MAX(created_at) AS max_at
-          FROM care_kpi_snapshots GROUP BY patient_id
-        ) latest ON s.patient_id = latest.patient_id AND s.created_at = latest.max_at
-        WHERE c.organization_id = $1
-      `, [pharmacyId]);
-  const avgTimeInRange = parseFloat(tirResult.rows[0]?.avg_tir ?? '0');
-  const avgTimeInRangeStatus = deriveStatus(tirResult.outcome, avgTimeInRange);
-
-  // F. Recent changes (anonymous, 3 most recent patients with 2+ snapshots)
-  const changesQuery = isGlobal
-    ? `
-      WITH ranked AS (
-        SELECT patient_id, tir, cv,
-               ROW_NUMBER() OVER (PARTITION BY patient_id ORDER BY created_at DESC) AS rn
-        FROM care_kpi_snapshots
-      )
-      SELECT
-        r1.tir - r2.tir AS "tirChange",
-        r1.cv - r2.cv AS "cvChange",
-        CASE
-          WHEN r1.tir > r2.tir THEN 'improving'
-          WHEN r1.tir < r2.tir THEN 'worsening'
-          ELSE 'stable'
-        END AS "riskTrend"
-      FROM ranked r1
-      JOIN ranked r2 ON r1.patient_id = r2.patient_id AND r1.rn = 1 AND r2.rn = 2
-      ORDER BY r1.tir - r2.tir DESC
-      LIMIT 3
-    `
-    : `
-      WITH ranked AS (
-        SELECT s.patient_id, s.tir, s.cv,
-               ROW_NUMBER() OVER (PARTITION BY s.patient_id ORDER BY s.created_at DESC) AS rn
-        FROM care_kpi_snapshots s
-        JOIN glucoseview_customers c ON s.patient_id = c.id
-        WHERE c.organization_id = $1
-      )
-      SELECT
-        r1.tir - r2.tir AS "tirChange",
-        r1.cv - r2.cv AS "cvChange",
-        CASE
-          WHEN r1.tir > r2.tir THEN 'improving'
-          WHEN r1.tir < r2.tir THEN 'worsening'
-          ELSE 'stable'
-        END AS "riskTrend"
-      FROM ranked r1
-      JOIN ranked r2 ON r1.patient_id = r2.patient_id AND r1.rn = 1 AND r2.rn = 2
-      ORDER BY r1.tir - r2.tir DESC
-      LIMIT 3
-    `;
-  const changesResult = isGlobal
-    ? await safeQuery(ds, changesQuery)
-    : await safeQuery(ds, changesQuery, [pharmacyId]);
-
-  return {
-    totalPatients,
-    totalPatientsStatus,
-    highRiskCount,
-    highRiskCountStatus,
-    recentCoaching,
-    recentCoachingStatus,
-    recentAnalysis,
-    recentAnalysisStatus,
-    avgTimeInRange,
-    avgTimeInRangeStatus,
-    recentChanges: changesResult.rows.map((r: any) => ({
-      tirChange: r.tirChange,
-      cvChange: r.cvChange,
-      riskTrend: r.riskTrend,
-    })),
-  };
 }
 
 async function buildStorePreview(
@@ -364,37 +187,23 @@ export function createHomePreviewRouter(dataSource: DataSource): Router {
           GLOBAL_CACHE_KEY,
           GLOBAL_CACHE_TTL,
           async () => {
-            const [care, store] = await Promise.all([
-              buildCarePreview(dataSource, null, null),
-              buildStorePreview(dataSource, null, null),
-            ]);
-            return { care, store };
+            const store = await buildStorePreview(dataSource, null, null);
+            return { store };
           },
         );
         return res.json({ success: true, data });
       }
 
       // Pharmacy-scoped: 캐시 없이 실시간
-      const [care, store] = await Promise.all([
-        buildCarePreview(dataSource, pharmacyId, userId),
-        buildStorePreview(dataSource, pharmacyId, userId),
-      ]);
+      const store = await buildStorePreview(dataSource, pharmacyId, userId);
 
-      res.json({ success: true, data: { care, store } });
+      res.json({ success: true, data: { store } });
     } catch (error) {
       logger.error('[HomePreview] Aggregation error:', error);
       // Fallback: return zeros with TABLE_MISSING status instead of 500
       res.json({
         success: true,
         data: {
-          care: {
-            totalPatients: 0, totalPatientsStatus: 'TABLE_MISSING',
-            highRiskCount: 0, highRiskCountStatus: 'TABLE_MISSING',
-            recentCoaching: 0, recentCoachingStatus: 'TABLE_MISSING',
-            recentAnalysis: 0, recentAnalysisStatus: 'TABLE_MISSING',
-            avgTimeInRange: 0, avgTimeInRangeStatus: 'TABLE_MISSING',
-            recentChanges: [],
-          },
           store: {
             monthlyOrders: 0, monthlyOrdersStatus: 'TABLE_MISSING',
             pendingRequests: 0, pendingRequestsStatus: 'TABLE_MISSING',

@@ -11,7 +11,7 @@ import { AlertTriangle, AlertCircle, Info } from 'lucide-react';
 
 interface OperatorAlertItem {
   id: string;
-  type: 'network' | 'commerce' | 'care' | 'system';
+  type: 'network' | 'commerce' | 'system';
   level: 'info' | 'warning' | 'critical';
   title: string;
   message: string;

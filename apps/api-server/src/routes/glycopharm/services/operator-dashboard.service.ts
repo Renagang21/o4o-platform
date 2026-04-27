@@ -15,12 +15,9 @@ import type { KpiItem, ActionItem, ActivityItem, QuickActionItem, OperatorDashbo
 import { computeOperatorAlerts } from '../../../utils/operator-alert.utils.js';
 import logger from '../../../utils/logger.js';
 import {
-  fetchCareMetrics,
   fetchRecentAuditActions,
-  buildCareActivityItems,
   buildAuditActivityItems,
   mergeActivityLog,
-  type CareMetrics,
 } from '../../../utils/operator-dashboard-queries.js';
 
 export async function buildGlycoPharmDashboardConfig(
@@ -31,7 +28,8 @@ export async function buildGlycoPharmDashboardConfig(
   const applicationRepo = dataSource.getRepository(GlycopharmApplication);
   const productRepo = dataSource.getRepository(GlycopharmProduct);
 
-  // === Parallel data fetch (service-specific + shared care/audit) ===
+  // === Parallel data fetch (service-specific + shared audit) ===
+  // WO-O4O-GLYCOPHARM-CARE-DEAD-CODE-REMOVAL-V1: care/patient_health_profiles 쿼리 제거
   const [
     pharmacyCounts,
     pendingApprovals,
@@ -39,8 +37,6 @@ export async function buildGlycoPharmDashboardConfig(
     activeProducts,
     draftProducts,
     recentApplications,
-    totalPatients,
-    care,
     recentAuditActions,
   // WO-O4O-DASHBOARD-QUERY-STABILITY-V1: individual .catch() per query
   ] = await Promise.all([
@@ -60,33 +56,19 @@ export async function buildGlycoPharmDashboardConfig(
       order: { submittedAt: 'DESC' },
       take: 5,
     }).catch((e) => { logger.warn('[GlycoPharmDashboard] recentApplications failed:', e.message); return []; }),
-    dataSource.query(`
-      SELECT COUNT(*)::int AS cnt FROM patient_health_profiles
-    `).catch((e) => { logger.warn('[GlycoPharmDashboard] totalPatients failed:', e.message); return [{ cnt: 0 }]; }) as Promise<Array<{ cnt: number }>>,
-    fetchCareMetrics(dataSource, 'glycopharm').catch((e) => {
-      logger.warn('[GlycoPharmDashboard] careMetrics failed:', e.message);
-      return { highRiskPatients: 0, openCareAlerts: 0, recentCareAlerts: [], careEnabledPharmacies: 0, weeklyCareActivity: 0 } as CareMetrics;
-    }),
     fetchRecentAuditActions(dataSource, 'glycopharm').catch((e) => { logger.warn('[GlycoPharmDashboard] auditActions failed:', e.message); return []; }),
   ]);
 
   const activePharmacies = pharmacyCounts.find(r => r.is_active === true)?.cnt || 0;
   const inactivePharmacies = pharmacyCounts.find(r => r.is_active === false)?.cnt || 0;
-  const totalPatientsCount = totalPatients[0]?.cnt || 0;
-  const totalPharmacies = pharmacyCounts.reduce((sum, r) => sum + r.cnt, 0);
-  const careAdoptionRate = totalPharmacies > 0
-    ? Math.round((care.careEnabledPharmacies / totalPharmacies) * 100) : 0;
 
-  // Block 1: KPIs (8개 — Network / Commerce / Care)
+  // Block 1: KPIs (Network / Commerce)
+  // WO-O4O-GLYCOPHARM-CARE-DEAD-CODE-REMOVAL-V1: Care KPI 항목 제거
   const kpis: KpiItem[] = [
     { key: 'active-pharmacies', label: '활성 약국', value: activePharmacies, status: 'neutral' },
     { key: 'pending-applications', label: '입점 대기', value: pendingApprovals, status: pendingApprovals > 0 ? 'warning' : 'neutral' },
     { key: 'active-products', label: '판매 상품', value: activeProducts, status: 'neutral' },
     { key: 'total-orders', label: '총 주문', value: 0, status: 'neutral' }, // STUB: E-commerce Core 미통합
-    { key: 'total-patients', label: '등록 환자', value: totalPatientsCount, status: 'neutral' },
-    { key: 'high-risk-patients', label: '고위험 환자', value: care.highRiskPatients, status: care.highRiskPatients > 0 ? 'warning' : 'neutral' },
-    { key: 'care-adoption-rate', label: 'Care 도입률', value: `${careAdoptionRate}%`, status: careAdoptionRate < 30 ? 'warning' : 'neutral' },
-    { key: 'open-care-alerts', label: '미처리 알림', value: care.openCareAlerts, status: care.openCareAlerts > 0 ? 'warning' : 'neutral' },
   ];
 
   // Block 2: AI Summary (Copilot Engine)
@@ -94,13 +76,6 @@ export async function buildGlycoPharmDashboardConfig(
     pharmacies: { active: activePharmacies, inactive: inactivePharmacies },
     applications: { pending: pendingApprovals },
     products: { active: activeProducts, draft: draftProducts, total: totalProducts },
-    care: {
-      patients: totalPatientsCount,
-      highRisk: care.highRiskPatients,
-      openAlerts: care.openCareAlerts,
-      adoptionRate: careAdoptionRate,
-      weeklyActivity: care.weeklyCareActivity,
-    },
   };
   const { insights: aiSummary } = await copilotEngine.generateInsights(
     'glycopharm', copilotMetrics, { id: userId, role: 'glycopharm:operator' },
@@ -110,7 +85,6 @@ export async function buildGlycoPharmDashboardConfig(
   const actionQueue: ActionItem[] = [
     { id: 'pending-apps', label: '입점 신청 대기', count: pendingApprovals, link: '/operator/applications' },
     { id: 'draft-products', label: '임시저장 상품', count: draftProducts, link: '/operator/products?status=draft' },
-    { id: 'care-alerts', label: '케어 알림 미확인', count: care.openCareAlerts, link: '/operator/care/alerts' },
   ];
 
   // Block 4: Activity Log
@@ -121,7 +95,6 @@ export async function buildGlycoPharmDashboardConfig(
   }));
   const activityLog = mergeActivityLog(
     applicationItems,
-    buildCareActivityItems(care.recentCareAlerts),
     buildAuditActivityItems(recentAuditActions, 'glycopharm'),
   );
 
@@ -130,16 +103,16 @@ export async function buildGlycoPharmDashboardConfig(
     { id: 'manage-pharmacies', label: '약국 관리', link: '/operator/pharmacies', icon: 'store' },
     { id: 'manage-products', label: '상품 관리', link: '/operator/products', icon: 'package' },
     { id: 'manage-applications', label: '입점 심사', link: '/operator/applications', icon: 'clipboard' },
-    { id: 'manage-care', label: '케어 관리', link: '/operator/care', icon: 'heart' },
     { id: 'manage-content', label: '콘텐츠 관리', link: '/operator/content', icon: 'file-text' },
   ];
 
   // Block 6: Operator Alerts
+  // WO-O4O-GLYCOPHARM-CARE-DEAD-CODE-REMOVAL-V1: Care 메트릭 → 0 (operator-alert.utils Phase 2에서 제거)
   const operatorAlerts = computeOperatorAlerts({
-    openCareAlerts: care.openCareAlerts,
-    careAdoptionRate,
-    highRiskPatients: care.highRiskPatients,
-    weeklyCareActivity: care.weeklyCareActivity,
+    openCareAlerts: 0,
+    careAdoptionRate: 0,
+    highRiskPatients: 0,
+    weeklyCareActivity: 0,
     pendingApplications: pendingApprovals,
     draftProducts,
   });

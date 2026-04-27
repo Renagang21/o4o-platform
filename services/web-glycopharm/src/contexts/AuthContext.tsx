@@ -11,8 +11,6 @@ import type { User, UserRole } from '@/types';
 import { parseAuthResponse, normalizeUser, resolveAuthError, extractRoles } from '@o4o/auth-utils';
 import { getAccessToken } from '@o4o/auth-client';
 import { authClient, api } from '../lib/apiClient';
-import { clearCareSession } from '@/utils/clearCareSession';
-
 // Re-export for backward compatibility (API files, pages 등에서 import)
 export { getAccessToken } from '@o4o/auth-client';
 
@@ -134,8 +132,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string) => {
-    // WO-O4O-CARE-AI-SESSION-ISOLATION-V1: 이전 사용자 AI 세션 제거
-    clearCareSession();
     // WO-O4O-AUTH-TOKEN-STORAGE-HOTFIX-V1: use authClient.login()
     // which stores tokens to localStorage (api.post() alone does not)
     try {
@@ -170,8 +166,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = async () => {
-    // WO-O4O-CARE-AI-SESSION-ISOLATION-V1: AI 세션 데이터 제거
-    clearCareSession();
     // WO-O4O-AUTH-CLIENT-API-HARDENING-V1: authClient.logout() handles API call + token cleanup
     await authClient.logout();
     setUser(null);

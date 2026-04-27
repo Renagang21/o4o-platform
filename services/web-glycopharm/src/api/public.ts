@@ -50,24 +50,8 @@ export interface PublicApiResponse<T> {
 export type MetricStatus = 'OK' | 'ZERO' | 'TABLE_MISSING' | 'NOT_ACTIVATED';
 
 // WO-HOME-LIVE-PREVIEW-V1: Home Preview 데이터 타입
+// WO-O4O-GLYCOPHARM-CARE-DEAD-CODE-REMOVAL-V1: care 필드 제거
 export interface HomePreviewData {
-  care: {
-    totalPatients: number;
-    totalPatientsStatus?: MetricStatus;
-    highRiskCount: number;
-    highRiskCountStatus?: MetricStatus;
-    recentCoaching: number;
-    recentCoachingStatus?: MetricStatus;
-    recentAnalysis: number;
-    recentAnalysisStatus?: MetricStatus;
-    avgTimeInRange?: number;
-    avgTimeInRangeStatus?: MetricStatus;
-    recentChanges: Array<{
-      tirChange?: number;
-      cvChange?: number;
-      riskTrend: 'improving' | 'stable' | 'worsening';
-    }>;
-  };
   store: {
     monthlyOrders: number;
     monthlyOrdersStatus?: MetricStatus;
@@ -206,7 +190,6 @@ class PublicApiClient {
    */
   async getHomePreview(_accessToken?: string | null): Promise<HomePreviewData> {
     const fallback: HomePreviewData = {
-      care: { totalPatients: 0, highRiskCount: 0, recentCoaching: 0, recentAnalysis: 0, recentChanges: [] },
       store: { monthlyOrders: 0, pendingRequests: 0, activeProducts: 0, monthlyRevenue: 0 },
     };
 
