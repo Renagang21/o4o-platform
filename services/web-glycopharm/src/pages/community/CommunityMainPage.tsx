@@ -17,6 +17,7 @@ import {
   NewsNoticesSection,
   AppEntrySection,
   CtaGuidanceSection,
+  O4OHelpSection,
 } from '@o4o/shared-space-ui';
 import type { NoticeItem } from '@o4o/shared-space-ui';
 import { PageSection, PageContainer } from '@o4o/ui';
@@ -172,7 +173,7 @@ export default function CommunityMainPage() {
       </PageSection>
 
       {/* 3. CTA (shared) */}
-      <PageSection last>
+      <PageSection>
         <PageContainer>
           <CtaGuidanceSection
             title="매장 운영에 도움이 필요하세요?"
@@ -181,6 +182,13 @@ export default function CommunityMainPage() {
             linkLabel="사이니지 보기 →"
             icon={<SignageIcon />}
           />
+        </PageContainer>
+      </PageSection>
+
+      {/* 4. O4O 도움 + 다른 서비스 (shared) */}
+      <PageSection last>
+        <PageContainer>
+          <O4OHelpSection />
         </PageContainer>
       </PageSection>
     </div>

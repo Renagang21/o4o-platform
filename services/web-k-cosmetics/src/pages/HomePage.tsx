@@ -19,6 +19,7 @@ import {
   NewsNoticesSection,
   AppEntrySection,
   CtaGuidanceSection,
+  O4OHelpSection,
 } from '@o4o/shared-space-ui';
 import type { NoticeItem } from '@o4o/shared-space-ui';
 
@@ -179,7 +180,7 @@ export function HomePage() {
       </PageSection>
 
       {/* 4. Market Trial CTA (shared) */}
-      <PageSection last>
+      <PageSection>
         <PageContainer>
           <CtaGuidanceSection
             title="Market Trial"
@@ -189,6 +190,13 @@ export function HomePage() {
             icon={<span>🧪</span>}
             external
           />
+        </PageContainer>
+      </PageSection>
+
+      {/* 5. O4O 도움 + 다른 서비스 (shared) */}
+      <PageSection last>
+        <PageContainer>
+          <O4OHelpSection />
         </PageContainer>
       </PageSection>
     </div>
