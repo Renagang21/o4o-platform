@@ -32,6 +32,36 @@ export enum NetureOrderStatus {
 }
 
 /**
+ * Order Type Enum
+ *
+ * IR-NETURE-B2B-DIRECT-SHIPPING-ORDER-FLOW-AUDIT-V1 Phase 1
+ *
+ * STORE_RESTOCK       — 매장 입고용 주문 (기존 동작, 기본값)
+ *                       shipping = 매장 주소
+ * DIRECT_TO_CUSTOMER  — 고객 직배송 주문
+ *                       shipping = 최종 고객 주소
+ *                       customer_info에 고객 PII + consent_at 저장
+ */
+export enum NetureOrderType {
+  STORE_RESTOCK = 'STORE_RESTOCK',
+  DIRECT_TO_CUSTOMER = 'DIRECT_TO_CUSTOMER',
+}
+
+/**
+ * Customer Info Interface (DIRECT_TO_CUSTOMER 전용)
+ *
+ * IR-NETURE-B2B-DIRECT-SHIPPING-ORDER-FLOW-AUDIT-V1 Phase 1
+ *
+ * 직배송 시 매장이 입력한 최종 고객 정보. PII이므로 consent_at 필수.
+ */
+export interface NetureCustomerInfo {
+  name: string;
+  phone: string;
+  email?: string;
+  consent_at: string; // ISO datetime, 매장이 동의 체크한 시점
+}
+
+/**
  * Payment Method Enum
  */
 export enum NeturePaymentMethod {
@@ -116,6 +146,20 @@ export class NetureOrder {
 
   @Column({ type: 'text', nullable: true })
   note?: string | null;
+
+  // IR-NETURE-B2B-DIRECT-SHIPPING-ORDER-FLOW-AUDIT-V1 Phase 1: 매장 입고 vs 고객 직배송 구분
+  @Column({
+    name: 'order_type',
+    type: 'varchar',
+    length: 30,
+    default: NetureOrderType.STORE_RESTOCK,
+  })
+  @Index()
+  orderType!: NetureOrderType;
+
+  // 직배송 전용 고객 PII (STORE_RESTOCK은 NULL)
+  @Column({ name: 'customer_info', type: 'jsonb', nullable: true })
+  customerInfo?: NetureCustomerInfo | null;
 
   @Column({ type: 'jsonb', nullable: true })
   metadata?: Record<string, any> | null;
