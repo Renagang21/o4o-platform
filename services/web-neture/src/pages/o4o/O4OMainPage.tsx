@@ -263,7 +263,7 @@ function DetailEntrySection() {
     { name: '핵심 개념', desc: '구조를 이루는 개념들', href: '/o4o/concepts' },
     { name: '플랫폼 원칙', desc: '운영 원칙과 기준', href: '/o4o/principles' },
     { name: '판매 구조', desc: '실행 방식의 구조', href: '/o4o/structure' },
-    { name: '서비스 맵', desc: '서비스 전체 지도', href: '/o4o/channel-map' },
+    { name: 'O4O 서비스', desc: '매장에서 사용하는 서비스', href: '/o4o/services' },
     { name: '대상별 매장', desc: '업종별 적용 사례', href: '/o4o/targets/pharmacy' },
   ];
 

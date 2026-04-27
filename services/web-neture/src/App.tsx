@@ -52,7 +52,7 @@ import PartnerLandingPage from './pages/PartnerLandingPage';
 // ============================================================================
 // o4o 공통 페이지 (항상 로드)
 // ============================================================================
-import O4OIntroPage from './pages/O4OIntroPage';
+import O4OIntroPage from './pages/o4o/O4OIntroPage';
 import SellerOverviewPage from './pages/SellerOverviewPage';
 import SellerQRGuidePage from './pages/SellerQRGuidePage';
 import {
@@ -67,7 +67,6 @@ import {
   PharmacyChannelExplanationPage,
   OpticalChannelExplanationPage,
   MedicalChannelExplanationPage,
-  ChannelSalesStructurePage,
 } from './pages/channel';
 
 // Test Guide Pages (o4o 공통 - 다중 서비스) — removed
@@ -83,7 +82,12 @@ import {
   OpticalTargetPage,
   DentalTargetPage,
 } from './pages/o4o/targets';
-import ConceptsPage from './pages/manual/concepts/ConceptsPage';
+// WO-O4O-CONCEPTS-PAGE-V1: /o4o/concepts → 신규 O4OConceptsPage(철학 페이지)로 교체.
+// 레거시 ConceptsPage(채널 개념 문서)는 사용 중단.
+import O4OConceptsPage from './pages/o4o/O4OConceptsPage';
+// WO-O4O-STRUCTURE-PAGE-V1: /o4o/structure → 신규 O4OStructurePage(흐름 중심)로 교체.
+// 레거시 ChannelSalesStructurePage(채널·판매 구조)는 사용 중단.
+import O4OStructurePage from './pages/o4o/O4OStructurePage';
 import ChannelMapPage from './pages/manual/concepts/ChannelMapPage';
 import BusinessInquiryPage from './pages/o4o/BusinessInquiryPage';
 import ConsultationRequestPage from './pages/o4o/ConsultationRequestPage';
@@ -113,7 +117,8 @@ import PartnershipRequestListPage from './pages/partners/requests/PartnershipReq
 import PartnershipRequestDetailPage from './pages/partners/requests/PartnershipRequestDetailPage';
 import PartnershipRequestCreatePage from './pages/partners/requests/PartnershipRequestCreatePage';
 import PartnerInfoPage from './pages/PartnerInfoPage';
-import PlatformPrinciplesPage from './pages/PlatformPrinciplesPage';
+import O4OPrinciplesPage from './pages/o4o/O4OPrinciplesPage';
+import O4OServicesPage from './pages/o4o/O4OServicesPage';
 import ContentListPage from './pages/content/ContentListPage';
 import ContentDetailPage from './pages/content/ContentDetailPage';
 import MyContentPage from './pages/dashboard/MyContentPage';
@@ -592,10 +597,12 @@ function App() {
               <Route path="/o4o/business-inquiry" element={<BusinessInquiryPage />} />
               <Route path="/o4o/consultation" element={<ConsultationRequestPage />} />
               {/* 시맨틱 URL: About → /o4o/* 통일 */}
-              <Route path="/o4o/concepts" element={<ConceptsPage />} />
+              {/* WO-O4O-CONCEPTS-PAGE-V1: 철학 페이지로 교체 */}
+              <Route path="/o4o/concepts" element={<O4OConceptsPage />} />
               <Route path="/o4o/channel-map" element={<ChannelMapPage />} />
-              <Route path="/o4o/principles" element={<PlatformPrinciplesPage />} />
-              <Route path="/o4o/structure" element={<ChannelSalesStructurePage />} />
+              <Route path="/o4o/principles" element={<O4OPrinciplesPage />} />
+              <Route path="/o4o/structure" element={<O4OStructurePage />} />
+              <Route path="/o4o/services" element={<O4OServicesPage />} />
               <Route path="/o4o/channels/pharmacy" element={<PharmacyChannelExplanationPage />} />
               <Route path="/o4o/channels/optical" element={<OpticalChannelExplanationPage />} />
               <Route path="/o4o/channels/medical" element={<MedicalChannelExplanationPage />} />
