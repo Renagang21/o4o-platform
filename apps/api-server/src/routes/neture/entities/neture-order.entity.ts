@@ -83,7 +83,7 @@ export interface NetureShippingAddress {
   delivery_note?: string;
 }
 
-@Entity({ name: 'neture_orders', schema: 'neture' })
+@Entity({ name: 'neture_orders' })
 export class NetureOrder {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
