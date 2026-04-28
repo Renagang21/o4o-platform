@@ -12,7 +12,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { X, Pencil, Trash2, ImagePlus, Loader2, Sparkles, Plus, Briefcase, ChevronDown, ChevronRight } from 'lucide-react';
+import { X, Pencil, Trash2, ImagePlus, Loader2, Sparkles, Plus, ChevronDown, ChevronRight } from 'lucide-react';
 import { supplierApi, type SupplierProduct, productApi, type ProductImage, type CategoryTreeItem, type BrandItem, type SpotPricePolicy } from '../../lib/api';
 import { ProductForm, type ProductFormData, CategorySelect } from '../../components/product';
 import { RichTextEditor, ContentRenderer } from '@o4o/content-editor';
@@ -86,21 +86,6 @@ function formatDate(dateString: string | null | undefined): string {
   if (!dateString) return '-';
   const date = new Date(dateString);
   return date.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
-}
-
-// WO-NETURE-PRODUCT-FIELD-GAP-FIX-V1: flatten category tree for <select>
-function flattenCategories(
-  categories: CategoryTreeItem[],
-  depth = 0,
-): { id: string; name: string; depth: number }[] {
-  const result: { id: string; name: string; depth: number }[] = [];
-  for (const cat of categories) {
-    result.push({ id: cat.id, name: cat.name, depth });
-    if (cat.children?.length) {
-      result.push(...flattenCategories(cat.children, depth + 1));
-    }
-  }
-  return result;
 }
 
 function toFormData(p: SupplierProduct): Partial<ProductFormData> {
@@ -648,19 +633,19 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                   onClick={() => startEdit('b2c')}
                   className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-blue-600 hover:bg-blue-50 rounded-lg"
                   title="소비자 공개 정보 편집 (공통 + B2C)"
-                  aria-label="공개/B2C 편집"
+                  aria-label="B2C 편집"
                 >
                   <Pencil size={14} />
-                  <span className="hidden sm:inline">공개</span>
+                  <span className="hidden sm:inline">B2C</span>
                 </button>
                 <button
                   onClick={() => startEdit('b2b')}
                   className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-teal-700 hover:bg-teal-50 rounded-lg"
                   title="판매자 지원 정보 편집 (B2B)"
-                  aria-label="판매/B2B 편집"
+                  aria-label="B2B 편집"
                 >
-                  <Briefcase size={14} />
-                  <span className="hidden sm:inline">판매</span>
+                  <Pencil size={14} />
+                  <span className="hidden sm:inline">B2B</span>
                 </button>
               </div>
             )}
@@ -682,8 +667,8 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
             <div className={`mb-4 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 ${
               editMode === 'b2c' ? 'bg-blue-50 text-blue-700' : 'bg-teal-50 text-teal-700'
             }`}>
-              {editMode === 'b2c' ? <Pencil size={14} /> : <Briefcase size={14} />}
-              {editMode === 'b2c' ? '공개/B2C 편집 모드' : '판매/B2B 편집 모드'}
+              <Pencil size={14} />
+              {editMode === 'b2c' ? 'B2C 편집 모드' : 'B2B 편집 모드'}
             </div>
           )}
 

@@ -971,7 +971,7 @@ export const supplierKpaEventOfferApi = {
       .get<{ success: boolean; data: SupplierEventOfferStats }>(
         '/kpa/supplier/event-offers/stats'
       )
-      .then(res => res.data.data),
+      .then((res: { data: { success: boolean; data: SupplierEventOfferStats } }) => res.data.data),
 };
 
 /** WO-NETURE-SPOT-PRICE-POLICY-FOUNDATION-V1 */

@@ -269,6 +269,7 @@ export interface AdminMaster {
   regulatoryType: string;
   regulatoryName: string;
   name: string;
+  marketingName?: string | null;
   brandName: string | null;
   manufacturerName: string;
   mfdsPermitNumber: string | null;

@@ -117,7 +117,7 @@ export default function ContentListPage() {
       <div className="mb-6">
         <ContentSortButtons
           value={sort}
-          onChange={handleSortChange as (sort: 'latest' | 'featured' | 'views') => void}
+          onChange={handleSortChange}
           options={['latest', 'featured', 'views'] as ('latest' | 'featured' | 'views')[]}
         />
       </div>

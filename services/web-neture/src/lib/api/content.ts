@@ -130,7 +130,7 @@ export const contentAssetApi = {
 export const cmsApi = {
   async getContents(params?: {
     type?: string;
-    sort?: 'latest' | 'featured' | 'views';
+    sort?: 'latest' | 'featured' | 'views' | 'popular';
     page?: number;
     limit?: number;
   }): Promise<{ data: CmsContent[]; pagination: { page: number; limit: number; total: number; totalPages: number } }> {

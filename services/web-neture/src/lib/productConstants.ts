@@ -97,7 +97,7 @@ export const VISIBILITY_STATUS: Record<VisibilityStatusKey, {
 /** 통합 유통 정책 배지 목록 산정 */
 export function getSupplyPolicyBadges(product: {
   isPublic?: boolean;
-  distributionType?: string;
+  distributionType?: string | null;
   serviceKeys?: string[] | null;
   allowedSellerIds?: string[] | null;
 }): Array<{ label: string; bg: string; text: string }> {
