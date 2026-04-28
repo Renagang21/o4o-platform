@@ -501,10 +501,9 @@ export const glycopharmGuideFeaturesProps: GuideFeaturesPageProps = {
       primaryRoute: '/content',
       description: '당뇨 관련 안내 자료, 학습 자료, 마케팅 자료. 플랫폼 공통 콘텐츠를 열람합니다.',
       items: [
-        { label: '콘텐츠 목록', route: '/content' },
-        { label: '콘텐츠 작성', route: '/content/new' },
+        { label: '콘텐츠 이용 방법', route: '/guide/features/content' },
       ],
-      linkTo: '/content',
+      linkTo: '/guide/features/content',
     },
     {
       step: '03',
@@ -558,6 +557,79 @@ export const glycopharmGuideFeaturesProps: GuideFeaturesPageProps = {
   ],
   bottomNav: {
     prev: { label: '← 서비스 활용 방법', to: '/guide/usage' },
+    home: { label: '홈으로', to: '/' },
+  },
+};
+
+// ─── /guide/features/content ───────────────────────────────────────────
+
+export const glycopharmGuideFeatureContentProps: GuideFeatureManualPageProps = {
+  hero: {
+    eyebrow: '기능별 이용 방법',
+    title: '콘텐츠 이용 방법',
+    description: '문서형 콘텐츠, 안내 자료, 매장 설명 자료',
+    primaryAction: { label: '콘텐츠로 이동 →', to: '/content' },
+    flowBarTitle: '이용 흐름',
+    flowLabels: ['콘텐츠 이동', '콘텐츠 찾기', '콘텐츠 활용', '콘텐츠 작성', 'AI 활용 기준'],
+  },
+  sections: [
+    {
+      step: '01',
+      title: '콘텐츠 이동',
+      routeLabel: '/content',
+      description: '콘텐츠 목록으로 진입해 카테고리·태그·검색으로 자료를 탐색합니다.',
+      items: [
+        { label: '콘텐츠 진입', detail: '/content 로 이동하면 콘텐츠 목록이 표시됩니다.' },
+        { label: '콘텐츠 목록', detail: '카테고리별, 최신순으로 콘텐츠를 확인합니다.' },
+        { label: '검색과 목록 탐색', detail: '키워드 검색과 태그 필터로 원하는 콘텐츠를 찾습니다.' },
+      ],
+    },
+    {
+      step: '02',
+      title: '콘텐츠 찾기',
+      description: '키워드와 태그로 매장 응대에 필요한 콘텐츠를 빠르게 확인합니다.',
+      items: [
+        { label: '키워드 검색', detail: '제목·본문·태그 키워드로 콘텐츠를 검색합니다.' },
+        { label: '태그 확인', detail: '관련 태그로 동일 주제 콘텐츠를 묶어 봅니다.' },
+        { label: '콘텐츠 상세 보기', detail: '본문·이미지·작성자·등록일을 확인합니다.' },
+      ],
+    },
+    {
+      step: '03',
+      title: '콘텐츠 활용',
+      description: '확인한 콘텐츠를 매장 응대와 운영에 직접 사용합니다.',
+      items: [
+        { label: '고객 설명', detail: '상담 시 콘텐츠 본문을 직접 보여주며 설명합니다.' },
+        { label: '매장 안내', detail: '매장 진열·POP·서비스 안내에 콘텐츠를 활용합니다.' },
+        { label: '링크 공유', detail: 'QR·메신저·SNS로 콘텐츠 링크를 고객에게 전달합니다.' },
+        { label: '운영 참고', detail: '운영 의사결정·교육·상담 매뉴얼 작성에 참고합니다.' },
+      ],
+    },
+    {
+      step: '04',
+      title: '콘텐츠 작성',
+      description: '매장에서 작성한 콘텐츠를 등록해 회원과 공유합니다.',
+      items: [
+        { label: '제목 입력', detail: '검색에 노출되는 핵심 키워드를 포함한 제목을 작성합니다.' },
+        { label: '본문 작성', detail: '에디터에서 텍스트·이미지·링크를 정리합니다.' },
+        { label: '태그 입력', detail: '관련 태그를 추가해 분류와 검색 노출을 지원합니다.' },
+        { label: '게시', detail: '게시 상태로 전환하면 공개 콘텐츠 목록에 반영됩니다.' },
+      ],
+    },
+    {
+      step: '05',
+      title: 'AI 활용 기준',
+      description: '콘텐츠를 AI로 가공해 매장 응대에 맞는 형태로 변환합니다. 사용 전 검토는 필수입니다.',
+      items: [
+        { label: '콘텐츠 요약', detail: '긴 콘텐츠를 핵심 요약으로 변환해 응대 시간에 맞춰 사용합니다.' },
+        { label: '설명 문구 생성', detail: '본문에서 고객 설명용 문장을 자동 생성합니다.' },
+        { label: '매장용 문장 변환', detail: '전문 표현을 매장 응대에 적합한 문장으로 다듬습니다.' },
+        { label: '검토 후 사용', detail: 'AI 결과는 약사·매장 책임자가 반드시 검토한 뒤 활용합니다.' },
+      ],
+    },
+  ],
+  bottomNav: {
+    prev: { label: '← 기능별 이용 방법', to: '/guide/features' },
     home: { label: '홈으로', to: '/' },
   },
 };
