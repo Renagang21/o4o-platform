@@ -48,6 +48,7 @@ export {
   kpaGuideFeatureForumProps,
   kpaGuideFeatureResourcesProps,
   kpaGuideFeatureContentProps,
+  kpaGuideFeatureSignageProps,
 } from './copy/kpa.js';
 
 export {
@@ -61,4 +62,5 @@ export {
   glycopharmGuideFeatureForumProps,
   glycopharmGuideFeatureResourcesProps,
   glycopharmGuideFeatureContentProps,
+  glycopharmGuideFeatureSignageProps,
 } from './copy/glycopharm.js';

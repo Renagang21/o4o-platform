@@ -12,7 +12,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { User, LogOut, LayoutDashboard } from 'lucide-react';
 
-import { useAuth, ROLE_LABELS, getNetureDashboardRoute, useLoginModal } from '../contexts';
+import { useAuth, getNetureDashboardRoute, getNetureRoleLabel, useLoginModal } from '../contexts';
 
 export default function AccountMenu() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -76,8 +76,8 @@ export default function AccountMenu() {
 
   // WO-O4O-NETURE-AUTH-ROLE-REDIRECT-FIX-V1: 전체 roles로 대시보드 경로 결정
   const dashboardPath = getNetureDashboardRoute(user.roles);
-  const activeRole = user.roles[0];
-  const roleLabel = ROLE_LABELS[activeRole] || '사용자';
+  // 우선순위 기반 라벨 — roles[0] 단독 사용 시 Operator에게도 '사용자'가 표시되는 문제 방지
+  const roleLabel = getNetureRoleLabel(user.roles);
 
   // WO-O4O-AUTH-RBAC-CLEANUP-V1: 대시보드 대상 판별 (prefixed + unprefixed)
   const DASHBOARD_ROLES = ['supplier', 'partner', 'seller'];

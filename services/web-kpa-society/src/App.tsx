@@ -105,6 +105,7 @@ import { GuideFeaturesPage } from './pages/guide/GuideFeaturesPage';
 import { GuideFeatureForumPage } from './pages/guide/GuideFeatureForumPage';
 import { GuideFeatureResourcesPage } from './pages/guide/GuideFeatureResourcesPage';
 import { GuideFeatureContentPage } from './pages/guide/GuideFeatureContentPage';
+import { GuideFeatureSignagePage } from './pages/guide/GuideFeatureSignagePage';
 
 // Community Home (WO-KPA-COMMUNITY-HOME-V1)
 import { CommunityHomePage } from './pages/CommunityHomePage';
@@ -388,6 +389,7 @@ function App() {
           <Route path="/guide/features/forum" element={<Layout serviceName={SERVICE_NAME}><GuideFeatureForumPage /></Layout>} />
           <Route path="/guide/features/resources" element={<Layout serviceName={SERVICE_NAME}><GuideFeatureResourcesPage /></Layout>} />
           <Route path="/guide/features/content" element={<Layout serviceName={SERVICE_NAME}><GuideFeatureContentPage /></Layout>} />
+          <Route path="/guide/features/signage" element={<Layout serviceName={SERVICE_NAME}><GuideFeatureSignagePage /></Layout>} />
 
           {/* Service Detail Pages (WO-KPA-HOME-SERVICE-SECTION-V1) */}
           <Route path="/services/branch" element={<Navigate to="/" replace />} />

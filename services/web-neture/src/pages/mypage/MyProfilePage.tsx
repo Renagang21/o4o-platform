@@ -9,7 +9,7 @@
 import { useState } from 'react';
 import { User, Mail, Shield } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
-import { useAuth, ROLE_LABELS } from '../../contexts';
+import { useAuth, getNetureRoleLabel } from '../../contexts';
 import { useLoginModal } from '../../contexts/LoginModalContext';
 import { api } from '../../lib/apiClient';
 import {
@@ -47,8 +47,7 @@ export default function MyProfilePage() {
     );
   }
 
-  const activeRole = user.roles[0];
-  const roleLabel = ROLE_LABELS[activeRole] || '사용자';
+  const roleLabel = getNetureRoleLabel(user.roles);
 
   const handleSave = async () => {
     setSaving(true);

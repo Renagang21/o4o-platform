@@ -47,3 +47,20 @@ export const NETURE_DASHBOARD_MAP: Record<string, string> = {
 export function getNetureDashboardRoute(roles: string[]): string {
   return getPrimaryDashboardRoute(roles, NETURE_ROLE_PRIORITY, NETURE_DASHBOARD_MAP);
 }
+
+/**
+ * 사용자의 역할 배열에서 가장 우선순위가 높은 역할의 한글 라벨을 반환.
+ *
+ * `user.roles[0]`만 사용하면 배열 순서가 우선순위와 무관할 수 있어
+ * Operator/Admin 사용자에게도 '사용자' 라벨이 노출되는 문제가 있다.
+ * NETURE_ROLE_PRIORITY 순서로 매칭하여 ROLE_LABELS에서 라벨을 찾는다.
+ */
+export function getNetureRoleLabel(roles: string[] | undefined | null): string {
+  if (!roles || roles.length === 0) return '사용자';
+  for (const role of NETURE_ROLE_PRIORITY) {
+    if (roles.includes(role)) {
+      return ROLE_LABELS[role] ?? '사용자';
+    }
+  }
+  return '사용자';
+}

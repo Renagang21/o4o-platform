@@ -21,7 +21,7 @@ import {
   NETURE_CONTEXTUAL_NAV,
   filterContextualNav,
 } from '../config/navigation';
-import { getNetureDashboardRoute, ROLE_LABELS } from '../config/dashboard';
+import { getNetureDashboardRoute, getNetureRoleLabel } from '../config/dashboard';
 import ServiceSwitcher from './ServiceSwitcher';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -62,8 +62,8 @@ export function NetureGlobalHeader() {
   const dashboardPath = hasDashboardRole && user?.roles
     ? getNetureDashboardRoute(user.roles)
     : '/';
-  const activeRole = user?.roles?.[0];
-  const roleLabel = (activeRole && ROLE_LABELS[activeRole]) || '사용자';
+  // 우선순위 기반 라벨 — roles[0]만 보면 Operator에게도 '사용자'가 표시될 수 있음
+  const roleLabel = getNetureRoleLabel(user?.roles);
 
   const contextualNav = filterContextualNav(NETURE_CONTEXTUAL_NAV, {
     isAdmin: !!isAdmin,

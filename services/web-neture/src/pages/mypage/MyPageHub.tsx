@@ -23,7 +23,7 @@ import {
   BarChart3,
   Users,
 } from 'lucide-react';
-import { useAuth, ROLE_LABELS, getNetureDashboardRoute } from '../../contexts';
+import { useAuth, getNetureDashboardRoute, getNetureRoleLabel } from '../../contexts';
 import { useLoginModal } from '../../contexts/LoginModalContext';
 import { MyPageLayout, QuickActionsSection } from '@o4o/account-ui';
 import { Link } from 'react-router-dom';
@@ -79,9 +79,10 @@ export default function MyPageHub() {
     );
   }
 
-  const activeRole = user.roles[0];
   const dashboardPath = getNetureDashboardRoute(user.roles);
-  const roleLabel = ROLE_LABELS[activeRole] || '사용자';
+  const roleLabel = getNetureRoleLabel(user.roles);
+  // dashboardPath가 '/'이면 대시보드 대상 역할이 없음
+  const hasDashboard = dashboardPath !== '/';
 
   const isSupplier = user.roles.some(
     (r: string) => r === 'neture:supplier' || r === 'supplier',
@@ -184,8 +185,8 @@ export default function MyPageHub() {
       {/* Quick Actions (Dashboard + Logout) */}
       <QuickActionsSection
         dashboardPath={dashboardPath}
-        dashboardLabel={isSupplier ? '공급자 대시보드' : isPartner ? '파트너 대시보드' : '내 대시보드'}
-        showDashboard={activeRole !== 'user'}
+        dashboardLabel={`${roleLabel} 대시보드`}
+        showDashboard={hasDashboard}
         onLogout={handleLogout}
       />
     </MyPageLayout>

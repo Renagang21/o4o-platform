@@ -15,7 +15,7 @@ import { authClient, api } from '../lib/apiClient';
 export { getAccessToken };
 
 // WO-O4O-AUTH-FLOW-SIMPLIFICATION-V1: dashboard config → config/dashboard.ts로 분리, 하위 호환 re-export
-export { ROLE_LABELS, NETURE_ROLE_PRIORITY, NETURE_DASHBOARD_MAP, getNetureDashboardRoute } from '../config/dashboard';
+export { ROLE_LABELS, NETURE_ROLE_PRIORITY, NETURE_DASHBOARD_MAP, getNetureDashboardRoute, getNetureRoleLabel } from '../config/dashboard';
 
 /**
  * WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed role format

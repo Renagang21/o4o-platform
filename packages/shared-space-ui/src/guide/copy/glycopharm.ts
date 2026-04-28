@@ -536,11 +536,9 @@ export const glycopharmGuideFeaturesProps: GuideFeaturesPageProps = {
       primaryRoute: '/store/marketing/signage/playlist',
       description: '매장 디스플레이에 재생할 콘텐츠를 플레이리스트로 구성하고 스케줄을 설정합니다.',
       items: [
-        { label: '플레이리스트 관리', route: '/store/marketing/signage/playlist' },
-        { label: '자료실 (매장)', route: '/store/content' },
-        { label: 'POP 자료', route: '/store/marketing/pop' },
+        { label: '디지털 사이니지 이용 방법', route: '/guide/features/signage' },
       ],
-      linkTo: '/store/marketing/signage/playlist',
+      linkTo: '/guide/features/signage',
     },
     {
       step: '06',
@@ -557,6 +555,87 @@ export const glycopharmGuideFeaturesProps: GuideFeaturesPageProps = {
   ],
   bottomNav: {
     prev: { label: '← 서비스 활용 방법', to: '/guide/usage' },
+    home: { label: '홈으로', to: '/' },
+  },
+};
+
+// ─── /guide/features/signage ───────────────────────────────────────────
+
+export const glycopharmGuideFeatureSignageProps: GuideFeatureManualPageProps = {
+  hero: {
+    eyebrow: '기능별 이용 방법',
+    title: '디지털 사이니지 이용 방법',
+    description: '영상 콘텐츠, 플레이리스트, 매장 TV 노출',
+    primaryAction: { label: '플레이리스트 관리로 이동 →', to: '/store/marketing/signage/playlist' },
+    flowBarTitle: '이용 흐름',
+    flowLabels: ['사이니지 이동', '콘텐츠 준비', '플레이리스트 구성', '매장 적용', '운영 기준', 'AI 활용 기준'],
+  },
+  sections: [
+    {
+      step: '01',
+      title: '사이니지 이동',
+      routeLabel: '/store/marketing/signage/playlist',
+      description: '플레이리스트 관리 화면으로 진입해 사이니지 운영을 시작합니다.',
+      items: [
+        { label: '플레이리스트 진입', detail: '/store/marketing/signage/playlist 로 이동합니다.' },
+        { label: '플레이리스트 목록', detail: '매장에 등록된 플레이리스트와 상태를 확인합니다.' },
+        { label: '사이니지 관리 화면', detail: '플레이리스트별 콘텐츠 구성과 적용 매장을 관리합니다.' },
+      ],
+    },
+    {
+      step: '02',
+      title: '콘텐츠 준비',
+      description: '재생할 영상 URL과 콘텐츠를 미리 정리합니다.',
+      items: [
+        { label: '영상 URL (YouTube/Vimeo)', detail: '재생할 외부 영상의 공유 URL을 확보합니다.' },
+        { label: '영상 목록 구성', detail: '주제·매장 사용 시점별로 영상 목록을 정리합니다.' },
+        { label: '콘텐츠 선택', detail: '플레이리스트에 추가할 콘텐츠를 선택합니다.' },
+      ],
+    },
+    {
+      step: '03',
+      title: '플레이리스트 구성',
+      description: '선택한 콘텐츠를 플레이리스트로 묶고 재생 순서를 정합니다.',
+      items: [
+        { label: '영상 추가', detail: '플레이리스트에 영상 URL 또는 콘텐츠를 추가합니다.' },
+        { label: '순서 변경', detail: '드래그 또는 순서 입력으로 재생 순서를 조정합니다.' },
+        { label: '삭제 / 재정렬', detail: '불필요한 항목을 제거하거나 묶음을 다시 정리합니다.' },
+      ],
+    },
+    {
+      step: '04',
+      title: '매장 적용',
+      description: '구성한 플레이리스트를 매장 디스플레이에 적용해 재생합니다.',
+      items: [
+        { label: '매장 플레이리스트 선택', detail: '매장에서 사용할 플레이리스트를 지정합니다.' },
+        { label: 'TV 재생', detail: '매장 TV·디스플레이에서 사이니지 재생 화면을 엽니다.' },
+        { label: '전체 화면 재생', detail: '브라우저 전체 화면 모드로 매장 노출 화면을 구성합니다.' },
+      ],
+    },
+    {
+      step: '05',
+      title: '운영 기준',
+      description: '매장 특성에 맞게 사이니지를 운영합니다.',
+      items: [
+        { label: '매장 맞춤 구성', detail: '매장 위치·고객 연령대·시간대에 맞춰 콘텐츠를 구성합니다.' },
+        { label: '콘텐츠 주기적 업데이트', detail: '계절·시즌·재고 변화에 따라 정기적으로 갱신합니다.' },
+        { label: '운영자 콘텐츠 활용', detail: '운영자가 배포한 공식 콘텐츠를 우선 활용합니다.' },
+      ],
+    },
+    {
+      step: '06',
+      title: 'AI 활용 기준',
+      description: 'AI로 사이니지 운영을 지원합니다. 사용 전 검토는 필수입니다.',
+      items: [
+        { label: '콘텐츠 추천', detail: '매장 특성·계절·재고 기반으로 콘텐츠를 추천받습니다.' },
+        { label: '플레이리스트 구성 제안', detail: '시간대·고객 흐름을 반영한 재생 순서를 제안받습니다.' },
+        { label: '설명 문구 생성', detail: '재생 콘텐츠에 부속할 자막·설명 문구를 생성합니다.' },
+        { label: '검토 후 적용', detail: 'AI 결과는 약사·매장 책임자가 반드시 검토한 뒤 적용합니다.' },
+      ],
+    },
+  ],
+  bottomNav: {
+    prev: { label: '← 기능별 이용 방법', to: '/guide/features' },
     home: { label: '홈으로', to: '/' },
   },
 };
