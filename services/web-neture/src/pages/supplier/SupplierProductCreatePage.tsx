@@ -115,19 +115,31 @@ export default function SupplierProductCreatePage() {
   // WO-NETURE-SUPPLIER-CREATE-IMAGE-LIBRARY-ALIGNMENT-V1: 상세/성분도 라이브러리 지원
   type ThumbnailSource = { kind: 'file'; file: File; preview: string } | { kind: 'library'; url: string } | null;
   type ImageItem = { kind: 'file'; file: File; preview: string } | { kind: 'library'; url: string };
+
+  function dataUrlToFile(dataUrl: string, filename: string): File {
+    const [header, b64] = dataUrl.split(',');
+    const mime = header.match(/:(.*?);/)![1];
+    const bytes = atob(b64);
+    const arr = new Uint8Array(bytes.length);
+    for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+    return new File([arr], filename, { type: mime });
+  }
+
   // WO-O4O-PRODUCT-IMPORT-ASSISTANT-V1: draft 이미지 URL → library 항목으로 초기화
-  const [thumbnailSource, setThumbnailSource] = useState<ThumbnailSource>(
-    importDraft?.thumbnailUrl ? { kind: 'library', url: importDraft.thumbnailUrl } : null,
-  );
+  // WO-NETURE-PRODUCT-IMPORT-ASSISTANT-USABILITY-FIX-V1: 보정 data URL 지원
+  const [thumbnailSource, setThumbnailSource] = useState<ThumbnailSource>(() => {
+    if (importDraft?.thumbnailCorrectedDataUrl) {
+      const file = dataUrlToFile(importDraft.thumbnailCorrectedDataUrl, 'thumbnail-corrected.jpg');
+      return { kind: 'file', file, preview: importDraft.thumbnailCorrectedDataUrl };
+    }
+    return importDraft?.thumbnailUrl ? { kind: 'library', url: importDraft.thumbnailUrl } : null;
+  });
   const [showThumbnailPicker, setShowThumbnailPicker] = useState(false);
-  const [detailItems, setDetailItems] = useState<ImageItem[]>(
-    importDraft?.detailImageUrls?.map((url) => ({ kind: 'library' as const, url })) ?? [],
-  );
   const [contentItems, setContentItems] = useState<ImageItem[]>(
     importDraft?.contentImageUrls?.map((url) => ({ kind: 'library' as const, url })) ?? [],
   );
-  // detail/content 라이브러리 선택 대상
-  const [imagePickerTarget, setImagePickerTarget] = useState<'detail' | 'content' | null>(null);
+  // content 라이브러리 선택 대상
+  const [imagePickerTarget, setImagePickerTarget] = useState<'content' | null>(null);
   // 에디터 인라인 이미지 라이브러리 선택 콜백
   const [mediaPickerTarget, setMediaPickerTarget] = useState<((url: string) => void) | null>(null);
 
@@ -295,13 +307,6 @@ export default function SupplierProductCreatePage() {
           await productApi.registerImageFromUrl(masterId, thumbnailSource.url, 'thumbnail');
         }
         // WO-NETURE-SUPPLIER-CREATE-IMAGE-LIBRARY-ALIGNMENT-V1: file/library 분기
-        for (const item of detailItems) {
-          if (item.kind === 'file') {
-            await productApi.uploadProductImage(masterId, item.file, 'detail');
-          } else {
-            await productApi.registerImageFromUrl(masterId, item.url, 'detail');
-          }
-        }
         for (const item of contentItems) {
           if (item.kind === 'file') {
             await productApi.uploadProductImage(masterId, item.file, 'content');
@@ -311,7 +316,6 @@ export default function SupplierProductCreatePage() {
         }
       }
       if (thumbnailSource?.kind === 'file') URL.revokeObjectURL(thumbnailSource.preview);
-      detailItems.forEach((item) => { if (item.kind === 'file') URL.revokeObjectURL(item.preview); });
       contentItems.forEach((item) => { if (item.kind === 'file') URL.revokeObjectURL(item.preview); });
       navigate('/supplier/products');
     } else {
@@ -663,42 +667,7 @@ export default function SupplierProductCreatePage() {
               )}
             </div>
 
-            {/* 2. 상세 이미지 — WO-NETURE-SUPPLIER-CREATE-IMAGE-LIBRARY-ALIGNMENT-V1 */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-slate-700">상세 이미지</span>
-                <span className="text-xs text-slate-400">상품 다각도, 포장 등 (여러 장 가능)</span>
-              </div>
-              {detailItems.length > 0 && (
-                <div className="grid grid-cols-4 gap-3">
-                  {detailItems.map((item, idx) => (
-                    <div key={idx} className="relative group aspect-square rounded-lg overflow-hidden border border-slate-200">
-                      <img src={item.kind === 'file' ? item.preview : item.url} alt={`상세 ${idx + 1}`} className="w-full h-full object-cover" />
-                      {item.kind === 'library' && <span className="absolute bottom-1 left-1 bg-blue-500 text-white text-[9px] px-1 py-0.5 rounded">LIB</span>}
-                      <button type="button" onClick={() => removeImageItem(idx, detailItems, setDetailItems)} className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">X</button>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <div className="flex gap-2">
-                <label className="flex-1 block border-2 border-dashed border-slate-200 rounded-lg p-4 text-center cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/30 transition-colors">
-                  <input type="file" accept="image/*" multiple onChange={(e) => handleMultiImageSelect(e, setDetailItems)} className="hidden" />
-                  <div className="text-slate-400 text-sm">
-                    <p className="font-medium">파일에서 추가</p>
-                    {detailItems.length > 0 && <p className="mt-1 text-xs text-emerald-600">{detailItems.length}장 선택됨</p>}
-                  </div>
-                </label>
-                <button
-                  type="button"
-                  onClick={() => setImagePickerTarget('detail')}
-                  className="px-4 py-3 text-xs font-medium text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded-lg border border-emerald-200 transition-colors whitespace-nowrap"
-                >
-                  라이브러리에서<br />선택
-                </button>
-              </div>
-            </div>
-
-            {/* 3. 성분/라벨 이미지 (콘텐츠) — WO-NETURE-SUPPLIER-CREATE-IMAGE-LIBRARY-ALIGNMENT-V1 */}
+            {/* 2. 성분/라벨 이미지 (콘텐츠) — WO-NETURE-SUPPLIER-CREATE-IMAGE-LIBRARY-ALIGNMENT-V1 */}
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium text-slate-700">성분/라벨 이미지</span>
@@ -857,19 +826,15 @@ export default function SupplierProductCreatePage() {
         title="대표 이미지 선택"
         defaultFolder="product-thumbnail"
       />
-      {/* WO-NETURE-SUPPLIER-CREATE-IMAGE-LIBRARY-ALIGNMENT-V1: 상세/성분 이미지 라이브러리 선택 */}
+      {/* WO-NETURE-SUPPLIER-CREATE-IMAGE-LIBRARY-ALIGNMENT-V1: 성분 이미지 라이브러리 선택 */}
       <MediaPickerModal
         open={imagePickerTarget !== null}
         onClose={() => setImagePickerTarget(null)}
         onSelect={(asset) => {
-          if (imagePickerTarget === 'detail') {
-            setDetailItems(prev => [...prev, { kind: 'library', url: asset.url }]);
-          } else if (imagePickerTarget === 'content') {
-            setContentItems(prev => [...prev, { kind: 'library', url: asset.url }]);
-          }
+          setContentItems(prev => [...prev, { kind: 'library', url: asset.url }]);
           setImagePickerTarget(null);
         }}
-        title={imagePickerTarget === 'detail' ? '상세 이미지 선택' : '성분/라벨 이미지 선택'}
+        title="성분/라벨 이미지 선택"
         defaultFolder="description"
       />
       {/* WO-NETURE-SUPPLIER-CREATE-IMAGE-LIBRARY-ALIGNMENT-V1: 에디터 인라인 이미지 라이브러리 선택 */}

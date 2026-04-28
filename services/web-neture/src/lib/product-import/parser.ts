@@ -183,10 +183,26 @@ function extractSpecification(text: string): string | null {
 /*  레이블 기반 추출 (브랜드, 제조사, 원산지)                               */
 /* ------------------------------------------------------------------ */
 
+// 레이아웃/네비게이션에서 온 쓰레기 값 패턴
+const JUNK_REGEXPS = [/={3,}/, /[-─━]{3,}/];
+const JUNK_KEYWORDS = [
+  'navigation', 'header', 'footer', 'menu', 'html_header', 'html_footer',
+  'gnb', 'lnb', 'sitemap', '네비게이션', '메뉴', 'start', 'end',
+];
+
+function cleanExtractedValue(value: string | null): string | null {
+  if (!value) return null;
+  if (JUNK_REGEXPS.some((r) => r.test(value))) return null;
+  const lower = value.toLowerCase();
+  if (JUNK_KEYWORDS.some((kw) => lower.includes(kw))) return null;
+  return value;
+}
+
 function extractByLabel(text: string, label: string): string | null {
   const re = new RegExp(`${label}\\s*[:：]?\\s*([^\\n]{1,60})`);
   const m = text.match(re);
-  return m?.[1]?.trim() || null;
+  const raw = m?.[1]?.trim() ?? null;
+  return cleanExtractedValue(raw);
 }
 
 /* ------------------------------------------------------------------ */

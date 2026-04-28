@@ -6,8 +6,9 @@
  * 외부 상품 페이지 HTML → 파싱 → 프리뷰/편집 → 등록 페이지 자동 채움
  */
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { RichTextEditor } from '@o4o/content-editor';
 import { parseProductHtml } from '../../lib/product-import/parser';
 import { saveDraft } from '../../lib/product-import/storage';
 import type { ParsedProductData, ImportDraft } from '../../lib/product-import/types';
@@ -65,9 +66,19 @@ export default function SupplierProductImportPage() {
   const [originCountry, setOriginCountry] = useState('');
   const [price, setPrice] = useState('');
 
+  // Editable detail description
+  const [detailDesc, setDetailDesc] = useState('');
+
   // Image selection
   const [selectedImages, setSelectedImages] = useState<Set<number>>(new Set());
   const [thumbnailIdx, setThumbnailIdx] = useState<number | null>(null);
+
+  // Thumbnail correction
+  const [thumbNaturalSize, setThumbNaturalSize] = useState<{ w: number; h: number } | null>(null);
+  const [correctionMode, setCorrectionMode] = useState<'crop' | 'pad' | 'resize'>('crop');
+  const [correctedDataUrl, setCorrectedDataUrl] = useState<string | null>(null);
+  const [correctionStatus, setCorrectionStatus] = useState<'idle' | 'applied' | 'cors-blocked'>('idle');
+  const correctionImgRef = useRef<HTMLImageElement | null>(null);
 
   // UI state
   const [error, setError] = useState('');
@@ -115,10 +126,14 @@ export default function SupplierProductImportPage() {
     setSpecification(result.specification ?? '');
     setOriginCountry(result.originCountry ?? '');
     setPrice(result.price ? String(result.price) : '');
+    setDetailDesc(result.detailDescription ?? '');
 
     // WO-PRODUCT-HELPER-IMAGE-SELECTION-DEFAULT-OFF-V1: 기본 미선택
     setSelectedImages(new Set());
     setThumbnailIdx(null);
+    setCorrectedDataUrl(null);
+    setCorrectionStatus('idle');
+    setThumbNaturalSize(null);
   }, [html, sourceUrl]);
 
   /* ---------------------------------------------------------------- */
@@ -147,8 +162,9 @@ export default function SupplierProductImportPage() {
       originCountry,
       consumerReferencePrice: price,
       consumerShortDesc: parsed.shortDescription ?? '',
-      consumerDetailDesc: parsed.detailDescription ?? '',
-      thumbnailUrl: thumbUrl,
+      consumerDetailDesc: detailDesc,
+      thumbnailUrl: correctionStatus === 'applied' ? null : thumbUrl,
+      thumbnailCorrectedDataUrl: correctionStatus === 'applied' && correctedDataUrl ? correctedDataUrl : undefined,
       detailImageUrls: detailUrls.slice(0, 10),
       contentImageUrls: [],
       sourceUrl: sourceUrl || '',
@@ -171,8 +187,11 @@ export default function SupplierProductImportPage() {
     specification,
     originCountry,
     price,
+    detailDesc,
     selectedImages,
     thumbnailIdx,
+    correctionStatus,
+    correctedDataUrl,
     sourceUrl,
     navigate,
     o4oCategoryId,
@@ -181,6 +200,70 @@ export default function SupplierProductImportPage() {
     o4oServiceKeys,
     o4oRegulatoryType,
   ]);
+
+  /* ---------------------------------------------------------------- */
+  /*  Thumbnail dimension check                                        */
+  /* ---------------------------------------------------------------- */
+
+  useEffect(() => {
+    setThumbNaturalSize(null);
+    setCorrectedDataUrl(null);
+    setCorrectionStatus('idle');
+
+    if (thumbnailIdx === null || !parsed) return;
+    const url = parsed.imageUrls[thumbnailIdx];
+    if (!url) return;
+
+    const img = new Image();
+    img.onload = () => {
+      const w = img.naturalWidth;
+      const h = img.naturalHeight;
+      setThumbNaturalSize(w === 1000 && h === 1000 ? null : { w, h });
+    };
+    img.onerror = () => setThumbNaturalSize(null);
+    img.src = url;
+  }, [thumbnailIdx, parsed]);
+
+  const applyThumbnailCorrection = useCallback(() => {
+    if (thumbnailIdx === null || !parsed || !thumbNaturalSize) return;
+    const url = parsed.imageUrls[thumbnailIdx];
+
+    const canvas = document.createElement('canvas');
+    canvas.width = 1000;
+    canvas.height = 1000;
+    const ctx = canvas.getContext('2d')!;
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    correctionImgRef.current = img;
+
+    img.onload = () => {
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, 1000, 1000);
+      const { w, h } = thumbNaturalSize;
+
+      if (correctionMode === 'crop') {
+        const size = Math.min(w, h);
+        ctx.drawImage(img, (w - size) / 2, (h - size) / 2, size, size, 0, 0, 1000, 1000);
+      } else if (correctionMode === 'pad') {
+        const scale = Math.min(1000 / w, 1000 / h);
+        const dw = w * scale;
+        const dh = h * scale;
+        ctx.drawImage(img, 0, 0, w, h, (1000 - dw) / 2, (1000 - dh) / 2, dw, dh);
+      } else {
+        ctx.drawImage(img, 0, 0, 1000, 1000);
+      }
+
+      try {
+        setCorrectedDataUrl(canvas.toDataURL('image/jpeg', 0.92));
+        setCorrectionStatus('applied');
+      } catch {
+        setCorrectionStatus('cors-blocked');
+      }
+    };
+    img.onerror = () => setCorrectionStatus('cors-blocked');
+    img.src = url;
+  }, [thumbnailIdx, parsed, thumbNaturalSize, correctionMode]);
 
   /* ---------------------------------------------------------------- */
   /*  Image toggle                                                     */
@@ -222,8 +305,12 @@ export default function SupplierProductImportPage() {
     setSpecification('');
     setOriginCountry('');
     setPrice('');
+    setDetailDesc('');
     setSelectedImages(new Set());
     setThumbnailIdx(null);
+    setThumbNaturalSize(null);
+    setCorrectedDataUrl(null);
+    setCorrectionStatus('idle');
     setError('');
     setO4oCategoryId('');
     setO4oPriceGeneral('');
@@ -408,23 +495,92 @@ export default function SupplierProductImportPage() {
                   </div>
                 ))}
               </div>
+
+              {/* Thumbnail correction panel */}
+              {thumbnailIdx !== null && thumbNaturalSize !== null && (
+                <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
+                  <p className="mb-3 text-sm font-medium text-amber-800">
+                    ⚠ 대표 이미지 규격 불일치 — {thumbNaturalSize.w}×{thumbNaturalSize.h}px
+                    (기준: 1000×1000)
+                  </p>
+
+                  <div className="flex gap-6">
+                    {/* CSS preview */}
+                    <div className="flex-shrink-0">
+                      <p className="mb-1 text-xs text-slate-500">보정 미리보기</p>
+                      <div className="h-28 w-28 overflow-hidden rounded border border-slate-300 bg-white">
+                        <img
+                          src={parsed.imageUrls[thumbnailIdx]}
+                          alt="보정 미리보기"
+                          className={`h-full w-full ${
+                            correctionMode === 'crop'
+                              ? 'object-cover'
+                              : correctionMode === 'pad'
+                              ? 'object-contain'
+                              : 'object-fill'
+                          }`}
+                        />
+                      </div>
+                      {correctionStatus === 'applied' && (
+                        <p className="mt-1 text-xs text-emerald-600">✓ 1000×1000 보정 완료</p>
+                      )}
+                      {correctionStatus === 'cors-blocked' && (
+                        <p className="mt-1 text-xs text-slate-400">원본 이미지로 전달됩니다</p>
+                      )}
+                    </div>
+
+                    {/* Mode selector + button */}
+                    <div className="flex flex-col gap-2">
+                      <p className="text-xs font-medium text-slate-700">보정 방식</p>
+                      {(['crop', 'pad', 'resize'] as const).map((mode) => (
+                        <label key={mode} className="flex cursor-pointer items-center gap-2 text-sm">
+                          <input
+                            type="radio"
+                            name="correctionMode"
+                            value={mode}
+                            checked={correctionMode === mode}
+                            onChange={() => {
+                              setCorrectionMode(mode);
+                              setCorrectionStatus('idle');
+                              setCorrectedDataUrl(null);
+                            }}
+                            className="accent-amber-600"
+                          />
+                          <span className="text-slate-700">
+                            {mode === 'crop' && '정사각형 크롭 (중앙 기준)'}
+                            {mode === 'pad' && '여백 추가 (흰 배경)'}
+                            {mode === 'resize' && '1000×1000 리사이즈'}
+                          </span>
+                        </label>
+                      ))}
+                      <button
+                        onClick={applyThumbnailCorrection}
+                        className="mt-2 rounded-lg bg-amber-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-amber-700"
+                      >
+                        보정 적용
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
-          {/* Description Preview */}
-          {parsed.detailDescription && (
-            <div className="mt-6">
-              <h3 className="mb-2 text-sm font-semibold text-slate-700">
-                상세 설명 프리뷰
-              </h3>
-              <div
-                className="max-h-60 overflow-auto rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm"
-                dangerouslySetInnerHTML={{
-                  __html: parsed.detailDescription,
-                }}
-              />
-            </div>
-          )}
+          {/* Detail Description Editor */}
+          <div className="mt-6">
+            <h3 className="mb-2 text-sm font-semibold text-slate-700">
+              상세 설명{' '}
+              <span className="ml-1 text-xs font-normal text-slate-400">
+                (직접 수정 가능 — 등록 페이지로 그대로 전달됩니다)
+              </span>
+            </h3>
+            <RichTextEditor
+              value={detailDesc}
+              onChange={(c) => setDetailDesc(c.html)}
+              placeholder="상세 설명이 없습니다"
+              minHeight="200px"
+            />
+          </div>
 
           {/* Short Description Preview */}
           {parsed.shortDescription && (

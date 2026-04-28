@@ -23,6 +23,8 @@ export interface ImportDraft {
 
   // Images (external URLs)
   thumbnailUrl: string | null;
+  /** canvas 보정 후 data URL (CORS 허용 이미지에만 생성됨) */
+  thumbnailCorrectedDataUrl?: string;
   detailImageUrls: string[];
   contentImageUrls: string[];
 
