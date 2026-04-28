@@ -111,7 +111,7 @@ function toDrawerProduct(p: AdminProduct): SupplierProduct {
     brandName: null,
     specification: null,
     primaryImageUrl: null,
-    approvalStatus: p.approvalStatus?.toLowerCase() || 'pending',
+    approvalStatus: p.approvalStatus || 'PENDING',
     priceGeneral: 0,
     priceGold: null,
     consumerReferencePrice: null,

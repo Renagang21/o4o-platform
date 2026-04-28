@@ -1485,12 +1485,12 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
             </InfoRow>
             <InfoRow label="승인">
               <Badge className={
-                product.approvalStatus === 'approved' ? 'bg-green-50 text-green-700'
-                  : product.approvalStatus === 'pending' ? 'bg-amber-50 text-amber-700'
-                  : product.approvalStatus === 'rejected' ? 'bg-red-50 text-red-700'
+                product.approvalStatus === 'APPROVED' ? 'bg-green-50 text-green-700'
+                  : product.approvalStatus === 'PENDING' ? 'bg-amber-50 text-amber-700'
+                  : product.approvalStatus === 'REJECTED' ? 'bg-red-50 text-red-700'
                   : 'bg-slate-100 text-slate-600'
               }>
-                {product.approvalStatus === 'approved' ? '승인' : product.approvalStatus === 'pending' ? '대기' : product.approvalStatus === 'rejected' ? '거부' : product.approvalStatus || '-'}
+                {product.approvalStatus === 'APPROVED' ? '승인' : product.approvalStatus === 'PENDING' ? '대기' : product.approvalStatus === 'REJECTED' ? '거부' : (typeof product.approvalStatus === 'string' ? product.approvalStatus : '') || '-'}
               </Badge>
             </InfoRow>
             <InfoRow label="완성도">
@@ -1590,7 +1590,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
         )}
 
         {/* Footer — 승인 모드 (Operator 승인 페이지용) */}
-        {!isEditing && approvalActions && product?.approvalStatus === 'pending' && (
+        {!isEditing && approvalActions && product?.approvalStatus === 'PENDING' && (
           <div className="px-6 py-4 border-t border-slate-200 flex justify-end gap-2 bg-slate-50">
             <button
               onClick={approvalActions.onReject}
