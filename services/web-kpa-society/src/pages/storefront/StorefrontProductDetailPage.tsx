@@ -361,7 +361,7 @@ export function StorefrontProductDetailPage() {
               </label>
               <RichTextEditor
                 value={editDesc}
-                onChange={setEditDesc}
+                onChange={(content) => setEditDesc(content.html)}
                 placeholder="상세 상품 설명을 입력하세요..."
                 minHeight="250px"
                 preset="compact"
