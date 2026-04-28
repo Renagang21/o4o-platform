@@ -82,6 +82,10 @@ export {
   type SpotPricePolicy,
   supplierKpaEventOfferApi,
   type SupplierEventOfferStats,
+  // WO-O4O-EVENT-OFFER-SUPPLIER-UI-V1
+  type ProposableOffer,
+  type ProposeOfferResult,
+  type SupplierEventOfferErrorCode,
 } from './supplier.js';
 
 // Seller API

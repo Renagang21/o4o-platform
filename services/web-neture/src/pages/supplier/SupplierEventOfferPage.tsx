@@ -1,22 +1,26 @@
 /**
- * SupplierEventOfferPage — 공급자 이벤트 오퍼 현황
+ * SupplierEventOfferPage — 공급자 이벤트 오퍼 현황 + 제안
  *
  * WO-O4O-EVENT-OFFER-NETURE-ROLE-UX-ALIGNMENT-V1
+ * WO-O4O-EVENT-OFFER-SUPPLIER-UI-V1: "이벤트 제안" 진입점 추가
  *
  * Neture는 Event Offer의 "지원 허브"이다 (DOC-O4O-EVENT-OFFER-NETURE-ROLE-CLARIFICATION-V1).
- * 이 화면은 공급자 관점의 등록 현황 확인 화면이며,
+ * 이 화면은 공급자 관점의 등록 현황 확인 + 제안 화면이며,
  * "매장 상품 확보" 또는 "참여/구매" 흐름을 포함하지 않는다.
  *
  * 역할:
  * - 등록된 이벤트 오퍼 현황 조회 (상태 / 수량 / 기간)
  * - 공급자가 제안한 상품의 노출 상태 확인
  * - 운영 관리 연결 (operator 승인 흐름과 연결)
+ * - 신규: 자기 SPO 중에서 KPA 이벤트로 제안 (POST /kpa/supplier/event-offers)
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Tag, ChevronLeft, ChevronRight, Package } from 'lucide-react';
-import { netureEventOfferApi } from '../../lib/api';
+import { Tag, ChevronLeft, ChevronRight, Package, Plus, X, Loader2 } from 'lucide-react';
+import { toast } from '@o4o/error-handling';
+import { netureEventOfferApi, supplierKpaEventOfferApi } from '../../lib/api';
+import type { ProposableOffer } from '../../lib/api';
 
 type StatusTab = 'active' | 'ended' | 'all';
 
@@ -53,6 +57,21 @@ const STATUS_LABEL: Record<string, { label: string; cls: string }> = {
   canceled: { label: '취소',    cls: 'bg-red-100 text-red-500' },
 };
 
+// WO-O4O-EVENT-OFFER-SUPPLIER-UI-V1: 서버 에러 코드 → 사용자 메시지 매핑
+const PROPOSE_ERROR_MESSAGES: Record<string, string> = {
+  ALREADY_PROPOSED: '이미 제안된 이벤트 상품입니다.',
+  OFFER_NOT_OWNED: '해당 상품에 대한 권한이 없습니다.',
+  OFFER_NOT_FOUND: '공급자 상품을 찾을 수 없습니다.',
+  SUPPLIER_NOT_FOUND: '공급자 계정이 연결되어 있지 않습니다.',
+  ORG_UNAVAILABLE: 'KPA 조직 정보를 확인할 수 없습니다. 관리자에게 문의하세요.',
+  INVALID_PARAMS: '필수 정보가 누락되었습니다.',
+};
+
+function extractErrorCode(err: unknown): string | null {
+  const e = err as { response?: { data?: { error?: { code?: string } } } };
+  return e?.response?.data?.error?.code ?? null;
+}
+
 export default function SupplierEventOfferPage() {
   const navigate = useNavigate();
 
@@ -62,6 +81,12 @@ export default function SupplierEventOfferPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
+
+  // WO-O4O-EVENT-OFFER-SUPPLIER-UI-V1: 제안 모달 상태
+  const [proposeOpen, setProposeOpen] = useState(false);
+  const [proposableOffers, setProposableOffers] = useState<ProposableOffer[]>([]);
+  const [proposableLoading, setProposableLoading] = useState(false);
+  const [proposingId, setProposingId] = useState<string | null>(null);
 
   const fetchItems = useCallback(async (p: number, status: StatusTab) => {
     setLoading(true);
@@ -78,6 +103,58 @@ export default function SupplierEventOfferPage() {
       setLoading(false);
     }
   }, []);
+
+  // WO-O4O-EVENT-OFFER-SUPPLIER-UI-V1: 제안 가능한 SPO 목록 로드
+  const loadProposableOffers = useCallback(async () => {
+    setProposableLoading(true);
+    try {
+      const offers = await supplierKpaEventOfferApi.listMyOffers();
+      setProposableOffers(offers);
+    } catch (err: unknown) {
+      const code = extractErrorCode(err);
+      const msg = code && PROPOSE_ERROR_MESSAGES[code]
+        ? PROPOSE_ERROR_MESSAGES[code]
+        : '제안 가능한 상품을 불러오지 못했습니다.';
+      toast.error(msg);
+      setProposableOffers([]);
+    } finally {
+      setProposableLoading(false);
+    }
+  }, []);
+
+  const handleOpenPropose = useCallback(() => {
+    setProposeOpen(true);
+    loadProposableOffers();
+  }, [loadProposableOffers]);
+
+  const handleClosePropose = useCallback(() => {
+    setProposeOpen(false);
+    setProposableOffers([]);
+    setProposingId(null);
+  }, []);
+
+  const handlePropose = useCallback(async (offerId: string, title: string) => {
+    setProposingId(offerId);
+    try {
+      await supplierKpaEventOfferApi.proposeOffer(offerId);
+      toast.success(`"${title}" 이(가) 이벤트로 제안되었습니다. 운영자 승인 후 노출됩니다.`);
+      // 제안 성공 → 모달 닫고 현재 탭 새로고침
+      handleClosePropose();
+      fetchItems(page, activeTab);
+    } catch (err: unknown) {
+      const code = extractErrorCode(err);
+      const msg = code && PROPOSE_ERROR_MESSAGES[code]
+        ? PROPOSE_ERROR_MESSAGES[code]
+        : '제안에 실패했습니다.';
+      toast.error(msg);
+      // ALREADY_PROPOSED는 목록에서 자동 제거되어야 함 → 다시 로드
+      if (code === 'ALREADY_PROPOSED') {
+        loadProposableOffers();
+      }
+    } finally {
+      setProposingId(null);
+    }
+  }, [page, activeTab, fetchItems, handleClosePropose, loadProposableOffers]);
 
   useEffect(() => {
     fetchItems(1, activeTab);
@@ -99,7 +176,17 @@ export default function SupplierEventOfferPage() {
             </div>
           </div>
         </div>
-        <span className="text-sm text-slate-500">총 {total}건</span>
+        {/* WO-O4O-EVENT-OFFER-SUPPLIER-UI-V1: 이벤트 제안 진입점 */}
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-slate-500">총 {total}건</span>
+          <button
+            onClick={handleOpenPropose}
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors"
+          >
+            <Plus size={16} />
+            이벤트 제안
+          </button>
+        </div>
       </div>
 
       {/* Status Tabs */}
@@ -223,6 +310,100 @@ export default function SupplierEventOfferPage() {
           >
             <ChevronRight size={16} />
           </button>
+        </div>
+      )}
+
+      {/* WO-O4O-EVENT-OFFER-SUPPLIER-UI-V1: 이벤트 제안 모달 */}
+      {proposeOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+          onClick={handleClosePropose}
+        >
+          <div
+            className="bg-white rounded-xl shadow-xl w-full max-w-2xl mx-4 max-h-[85vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-800">이벤트 제안</h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  공급 중인 상품을 KPA 이벤트로 제안합니다. 운영자 승인 후 노출됩니다.
+                </p>
+              </div>
+              <button
+                onClick={handleClosePropose}
+                className="p-1 text-slate-400 hover:text-slate-600"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="flex-1 overflow-y-auto px-6 py-4">
+              {proposableLoading ? (
+                <div className="flex justify-center py-12">
+                  <Loader2 size={24} className="animate-spin text-indigo-600" />
+                </div>
+              ) : proposableOffers.length === 0 ? (
+                <div className="text-center py-12 text-slate-500">
+                  <Package size={36} className="mx-auto mb-3 text-slate-300" />
+                  <p className="font-medium text-sm">제안 가능한 상품이 없습니다.</p>
+                  <p className="text-xs mt-1 text-slate-400">
+                    승인 완료된 활성 상품 중 아직 제안하지 않은 상품만 표시됩니다.
+                  </p>
+                </div>
+              ) : (
+                <ul className="divide-y divide-slate-100">
+                  {proposableOffers.map((offer) => (
+                    <li
+                      key={offer.id}
+                      className="flex items-center justify-between gap-4 py-3"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-slate-800 truncate">
+                          {offer.title}
+                        </p>
+                        <p className="text-xs text-slate-500 truncate mt-0.5">
+                          {offer.supplierName}
+                          {offer.price != null && (
+                            <span className="ml-2 text-slate-700">
+                              · ₩{Number(offer.price).toLocaleString()}
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => handlePropose(offer.id, offer.title)}
+                        disabled={proposingId !== null}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
+                      >
+                        {proposingId === offer.id ? (
+                          <>
+                            <Loader2 size={12} className="animate-spin" />
+                            제안 중...
+                          </>
+                        ) : (
+                          '제안'
+                        )}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex items-center justify-end px-6 py-3 border-t border-slate-200">
+              <button
+                onClick={handleClosePropose}
+                disabled={proposingId !== null}
+                className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg disabled:opacity-40"
+              >
+                닫기
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

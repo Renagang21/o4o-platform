@@ -961,9 +961,41 @@ export interface SupplierEventOfferStats {
   totalRevenue: number;
 }
 
+// WO-O4O-EVENT-OFFER-SUPPLIER-UI-V1
+export interface ProposableOffer {
+  id: string;
+  masterId: string;
+  title: string;
+  supplierName: string;
+  price: number | null;
+  approvalStatus: string;
+}
+
+export interface ProposeOfferResult {
+  id: string;
+  offerId: string;
+  title: string;
+  supplierName: string;
+  status: 'pending' | 'approved';
+  isActive: boolean;
+  proposedAt: string;
+}
+
+/** Backend 응답 에러 코드 (supplier-offers.controller.ts ERROR_CODES와 동일) */
+export type SupplierEventOfferErrorCode =
+  | 'INTERNAL_ERROR'
+  | 'SUPPLIER_NOT_FOUND'
+  | 'OFFER_NOT_FOUND'
+  | 'OFFER_NOT_OWNED'
+  | 'ALREADY_PROPOSED'
+  | 'ORG_UNAVAILABLE'
+  | 'INVALID_PARAMS';
+
 /**
- * 공급자 KPA 이벤트/특가 성과 집계 API
- * GET /api/v1/kpa/supplier/event-offers/stats
+ * 공급자 KPA 이벤트/특가 API
+ * - GET  /api/v1/kpa/supplier/event-offers/stats — 성과 집계
+ * - GET  /api/v1/kpa/supplier/my-offers          — 제안 가능한 SPO 목록 (WO-O4O-EVENT-OFFER-SUPPLIER-UI-V1)
+ * - POST /api/v1/kpa/supplier/event-offers       — Event Offer 제안 (WO-O4O-EVENT-OFFER-SUPPLIER-UI-V1)
  */
 export const supplierKpaEventOfferApi = {
   getStats: (): Promise<SupplierEventOfferStats> =>
@@ -972,6 +1004,26 @@ export const supplierKpaEventOfferApi = {
         '/kpa/supplier/event-offers/stats'
       )
       .then((res: { data: { success: boolean; data: SupplierEventOfferStats } }) => res.data.data),
+
+  listMyOffers: (): Promise<ProposableOffer[]> =>
+    api
+      .get<{ success: boolean; data: { offers: ProposableOffer[]; supplierId: string } }>(
+        '/kpa/supplier/my-offers'
+      )
+      .then(
+        (res: { data: { success: boolean; data: { offers: ProposableOffer[]; supplierId: string } } }) =>
+          res.data.data.offers || [],
+      ),
+
+  proposeOffer: (offerId: string): Promise<ProposeOfferResult> =>
+    api
+      .post<{ success: boolean; data: ProposeOfferResult }>(
+        '/kpa/supplier/event-offers',
+        { offerId }
+      )
+      .then(
+        (res: { data: { success: boolean; data: ProposeOfferResult } }) => res.data.data,
+      ),
 };
 
 /** WO-NETURE-SPOT-PRICE-POLICY-FOUNDATION-V1 */
