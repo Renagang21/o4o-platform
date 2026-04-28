@@ -20,28 +20,29 @@ export class AddOrderTypeAndCustomerInfoToNetureOrders20260903000000
   implements MigrationInterface
 {
   public async up(queryRunner: QueryRunner): Promise<void> {
+    // neture_orders 테이블은 neture 스키마에 위치함
     await queryRunner.query(`
-      ALTER TABLE neture_orders
+      ALTER TABLE neture.neture_orders
         ADD COLUMN IF NOT EXISTS order_type varchar(30) NOT NULL DEFAULT 'STORE_RESTOCK',
         ADD COLUMN IF NOT EXISTS customer_info jsonb
     `);
 
     // 방어적 백필 — DEFAULT가 적용되지만 NULL이 남은 경우 대비
     await queryRunner.query(`
-      UPDATE neture_orders SET order_type = 'STORE_RESTOCK' WHERE order_type IS NULL
+      UPDATE neture.neture_orders SET order_type = 'STORE_RESTOCK' WHERE order_type IS NULL
     `);
 
     await queryRunner.query(`
-      CREATE INDEX IF NOT EXISTS idx_neture_orders_order_type ON neture_orders(order_type)
+      CREATE INDEX IF NOT EXISTS idx_neture_orders_order_type ON neture.neture_orders(order_type)
     `);
 
-    console.log('[Migration] neture_orders: added order_type, customer_info + idx_neture_orders_order_type');
+    console.log('[Migration] neture.neture_orders: added order_type, customer_info + idx_neture_orders_order_type');
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`DROP INDEX IF EXISTS idx_neture_orders_order_type`);
+    await queryRunner.query(`DROP INDEX IF EXISTS neture.idx_neture_orders_order_type`);
     await queryRunner.query(`
-      ALTER TABLE neture_orders
+      ALTER TABLE neture.neture_orders
         DROP COLUMN IF EXISTS customer_info,
         DROP COLUMN IF EXISTS order_type
     `);
