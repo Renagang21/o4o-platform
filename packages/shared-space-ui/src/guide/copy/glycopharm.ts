@@ -15,6 +15,7 @@ import type {
   GuideIntroConceptPageProps,
   GuideUsagePageProps,
   GuideFeaturesPageProps,
+  GuideFeatureManualPageProps,
 } from '../types.js';
 
 // ─── /guide/intro ──────────────────────────────────────────────────────
@@ -490,9 +491,9 @@ export const glycopharmGuideFeaturesProps: GuideFeaturesPageProps = {
       primaryRoute: '/community',
       description: '당뇨인과 약사가 질문·답변·경험을 공유합니다. 카테고리별 게시판에서 정보를 나눕니다.',
       items: [
-        { label: '커뮤니티 홈', route: '/community' },
+        { label: '커뮤니티 이용 방법', route: '/guide/features/forum' },
       ],
-      linkTo: '/community',
+      linkTo: '/guide/features/forum',
     },
     {
       step: '02',
@@ -557,6 +558,78 @@ export const glycopharmGuideFeaturesProps: GuideFeaturesPageProps = {
   ],
   bottomNav: {
     prev: { label: '← 서비스 활용 방법', to: '/guide/usage' },
+    home: { label: '홈으로', to: '/' },
+  },
+};
+
+// ─── /guide/features/forum (GlycoPharm: /community 연결) ───────────────
+
+export const glycopharmGuideFeatureForumProps: GuideFeatureManualPageProps = {
+  hero: {
+    eyebrow: '기능별 이용 방법',
+    title: '커뮤니티 이용 방법',
+    description: '질문·답변·경험 공유 기반 커뮤니티 이용',
+    primaryAction: { label: '커뮤니티로 이동 →', to: '/community' },
+    flowBarTitle: '이용 흐름',
+    flowLabels: ['커뮤니티 이동', '글 찾기', '글 작성', '댓글 참여', '활용 기준'],
+  },
+  sections: [
+    {
+      step: '01',
+      title: '커뮤니티 이동',
+      routeLabel: '/community',
+      description: '커뮤니티 글 목록으로 진입해 검색과 탐색을 시작합니다.',
+      items: [
+        { label: '커뮤니티 진입', detail: '/community 로 이동하면 카테고리별 글 목록이 표시됩니다.' },
+        { label: '커뮤니티 글 목록', detail: '최신 글, 인기 글, 카테고리별 글을 확인합니다.' },
+        { label: '검색과 목록 탐색', detail: '키워드 검색과 카테고리 필터로 원하는 글을 찾습니다.' },
+      ],
+    },
+    {
+      step: '02',
+      title: '글 찾기',
+      description: '키워드와 태그로 관심 주제의 글을 빠르게 찾습니다.',
+      items: [
+        { label: '키워드 검색', detail: '제목·본문 키워드로 글을 검색합니다.' },
+        { label: '태그 확인', detail: '글에 부착된 태그로 관련 주제를 탐색합니다.' },
+        { label: '글 상세 보기', detail: '제목 클릭 시 본문·댓글을 한 화면에 확인합니다.' },
+      ],
+    },
+    {
+      step: '03',
+      title: '글 작성',
+      description: '제목, 내용, 태그를 입력해 새 글을 등록합니다.',
+      items: [
+        { label: '제목 입력', detail: '검색에 노출되는 핵심 키워드를 포함한 제목을 작성합니다.' },
+        { label: '내용 작성', detail: '본문에 질문·경험·근거를 정리합니다.' },
+        { label: '태그 입력', detail: '관련 태그를 추가해 분류 및 노출 범위를 설정합니다.' },
+        { label: '등록', detail: '저장하면 카테고리 글 목록과 검색에 반영됩니다.' },
+      ],
+    },
+    {
+      step: '04',
+      title: '댓글 참여',
+      description: '댓글로 답변하고 다른 회원의 응답을 확인합니다.',
+      items: [
+        { label: '댓글 작성', detail: '본문 하단에서 답변을 등록합니다.' },
+        { label: '답변 확인', detail: '내 글·내 댓글에 달린 답변을 추적합니다.' },
+        { label: '경험 공유', detail: '실제 사례·근거 자료를 댓글로 보충합니다.' },
+      ],
+    },
+    {
+      step: '05',
+      title: '활용 기준',
+      description: '커뮤니티 정보를 매장 운영과 고객 응대에 활용합니다.',
+      items: [
+        { label: '제품 정보 확인', detail: '실제 사용 후기와 약사 의견을 통해 제품 이해도를 높입니다.' },
+        { label: '사례 확인', detail: '동일 상황의 사례를 검색해 적용 방향을 정합니다.' },
+        { label: '매장 운영 참고', detail: '진열·상담·판매에 적용할 노하우를 모읍니다.' },
+        { label: '커뮤니티 정보 축적', detail: '경험과 답변이 매장 운영 자산으로 누적됩니다.' },
+      ],
+    },
+  ],
+  bottomNav: {
+    prev: { label: '← 기능별 이용 방법', to: '/guide/features' },
     home: { label: '홈으로', to: '/' },
   },
 };

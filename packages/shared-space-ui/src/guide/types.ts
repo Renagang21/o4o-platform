@@ -212,3 +212,29 @@ export interface GuideFeaturesPageProps {
     home: GuideNavLink;     // '홈으로'
   };
 }
+
+// ─── /guide/features/* (개별 기능 상세 매뉴얼) ─────────────────────────
+
+export interface GuideFeatureManualSection {
+  step: string;            // '01'
+  title: string;           // '포럼 이동'
+  routeLabel?: string;     // 표시용 라우트 라벨 (선택)
+  description: string;
+  items: GuideLabelDetailItem[];
+}
+
+export interface GuideFeatureManualPageProps {
+  hero: {
+    eyebrow: string;                  // '기능별 이용 방법'
+    title: string;                    // '포럼 이용 방법'
+    description: string;
+    primaryAction: GuideNavLink;      // { label: '포럼으로 이동 →', to: '/forum' }
+    flowBarTitle?: string;
+    flowLabels?: string[];
+  };
+  sections: GuideFeatureManualSection[];
+  bottomNav: {
+    prev: GuideNavLink;     // '← 기능별 이용 방법'
+    home: GuideNavLink;
+  };
+}

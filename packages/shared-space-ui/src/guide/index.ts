@@ -22,6 +22,8 @@ export type {
   GuideFeatureItem,
   GuideFeatureGroup,
   GuideFeaturesPageProps,
+  GuideFeatureManualSection,
+  GuideFeatureManualPageProps,
 } from './types.js';
 
 // Pages
@@ -32,6 +34,7 @@ export { GuideIntroOperationPage } from './GuideIntroOperationPage.js';
 export { GuideIntroConceptPage } from './GuideIntroConceptPage.js';
 export { GuideUsagePage } from './GuideUsagePage.js';
 export { GuideFeaturesPage } from './GuideFeaturesPage.js';
+export { GuideFeatureManualPage } from './GuideFeatureManualPage.js';
 
 // Copy
 export {
@@ -42,6 +45,7 @@ export {
   kpaGuideIntroConceptProps,
   kpaGuideUsageProps,
   kpaGuideFeaturesProps,
+  kpaGuideFeatureForumProps,
 } from './copy/kpa.js';
 
 export {
@@ -52,4 +56,5 @@ export {
   glycopharmGuideIntroConceptProps,
   glycopharmGuideUsageProps,
   glycopharmGuideFeaturesProps,
+  glycopharmGuideFeatureForumProps,
 } from './copy/glycopharm.js';

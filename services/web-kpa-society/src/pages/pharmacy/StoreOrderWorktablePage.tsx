@@ -419,12 +419,12 @@ export function StoreOrderWorktablePage() {
         <div style={S.stateCenter}>
           <Package size={48} style={{ color: colors.neutral300 }} />
           <p style={{ color: colors.neutral700, fontSize: '15px', fontWeight: 600, marginTop: '16px' }}>
-            등록된 관심상품이 없습니다
+            내 매장에 추가된 상품이 없습니다
           </p>
           <p style={{ color: colors.neutral500, fontSize: '13px', marginTop: '4px' }}>
-            상품 관리에서 B2B 상품을 신청하고 승인받으면 이 화면에서 주문 수량을 관리할 수 있습니다.
+            B2B 카탈로그에서 상품을 내 매장에 추가하면 이 화면에서 주문 수량을 관리할 수 있습니다.
           </p>
-          <Link to="/store/commerce/products" style={S.linkBtn}>상품 관리 바로가기 →</Link>
+          <Link to="/store-hub/b2b" style={S.linkBtn}>B2B 카탈로그 →</Link>
         </div>
       </div>
     );
