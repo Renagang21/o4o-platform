@@ -22,7 +22,6 @@ export interface TabletProduct {
   sale_price?: number;
   images?: Array<{ url: string }>;
   category: string;
-  stock_quantity: number;
   description?: string;
   short_description?: string;
   channel_price?: number;

@@ -62,9 +62,6 @@ export class StoreProduct {
   @Column({ type: 'integer', nullable: true })
   price: number | null;
 
-  @Column({ name: 'stock_quantity', type: 'integer', nullable: true })
-  stockQuantity: number | null;
-
   @Column({ name: 'short_description', type: 'text', nullable: true })
   shortDescription: string | null;
 
