@@ -53,9 +53,35 @@ export async function resolveOrganizationForEventOffer(
     }
   }
 
+  // ── K-Cosmetics Event Offer (k-cosmetics-event-offer) ────────────────────
+  // WO-O4O-EVENT-OFFER-KCOS-CREATE-V1
+  if (serviceKey === SERVICE_KEYS.K_COSMETICS_EVENT_OFFER) {
+    if (roleType === 'operator') {
+      // 사용자가 멤버인 organization 중 K-Cos에 enroll된 active 조직을 매핑.
+      // KPA의 kpa_members와 달리 K-Cos는 단일 매핑 테이블이 없으므로
+      // organization_members + organization_service_enrollments를 join.
+      const rows = await dataSource.query(
+        `SELECT om.organization_id
+         FROM organization_members om
+         JOIN organization_service_enrollments ose
+           ON ose.organization_id = om.organization_id
+          AND ose.service_code = $2
+          AND ose.status = 'active'
+         WHERE om.user_id = $1
+           AND om.role IN ('owner','admin','manager')
+           AND om.left_at IS NULL
+         LIMIT 1`,
+        [userId, SERVICE_KEYS.K_COSMETICS],
+      );
+      return rows[0]?.organization_id ?? null;
+    }
+    // supplier 분기는 K-Cos supplier 매핑 메커니즘이 명확해질 때까지 미구현
+    // (별도 IR에서 결정 — WO-O4O-EVENT-OFFER-KCOS-CREATE-V1 §2)
+    return null;
+  }
+
   // ── 향후 추가 ─────────────────────────────────────────────────────────────
-  // if (serviceKey === SERVICE_KEYS.K_COSMETICS_EVENT_OFFER) { ... }
-  // if (serviceKey === SERVICE_KEYS.EVENT_OFFER_NETURE)      { ... }
+  // if (serviceKey === SERVICE_KEYS.EVENT_OFFER_NETURE) { ... }
 
   return null;
 }

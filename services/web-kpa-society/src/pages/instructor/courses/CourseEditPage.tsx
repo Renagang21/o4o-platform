@@ -15,6 +15,8 @@ const LESSON_TYPE_LABEL: Record<LessonType, string> = {
 };
 
 /* ──────────────── styles ──────────────── */
+// 함수형 style은 별도 함수로 분리. (Record<string, CSSProperties>에 함수 값을 넣으면
+// 객체 키가 함수로 잘못 좁혀져 TS2560/TS2349 발생)
 const s: Record<string, React.CSSProperties> = {
   page: { maxWidth: 860, margin: '0 auto', padding: '32px 20px' },
   backLink: { fontSize: 13, color: '#6b7280', cursor: 'pointer', marginBottom: 20, display: 'inline-block' },
@@ -27,14 +29,6 @@ const s: Record<string, React.CSSProperties> = {
   textarea: { padding: '9px 13px', border: '1px solid #d1d5db', borderRadius: 7, fontSize: 14, color: '#111827', outline: 'none', resize: 'vertical', minHeight: 80 },
   select: { padding: '9px 13px', border: '1px solid #d1d5db', borderRadius: 7, fontSize: 14, color: '#111827', background: '#fff', outline: 'none' },
   row: { display: 'flex', gap: 12, alignItems: 'center' },
-  saveBtn: (disabled: boolean) => ({
-    padding: '8px 18px', background: disabled ? '#c4b5fd' : '#4f46e5', color: '#fff',
-    border: 'none', borderRadius: 7, fontSize: 13, fontWeight: 600, cursor: disabled ? 'not-allowed' : 'pointer',
-  }),
-  publishBtn: (pub: boolean) => ({
-    padding: '8px 18px', background: pub ? '#f59e0b' : '#10b981', color: '#fff',
-    border: 'none', borderRadius: 7, fontSize: 13, fontWeight: 600, cursor: 'pointer',
-  }),
   deleteBtn: { padding: '8px 16px', background: '#fee2e2', color: '#dc2626', border: 'none', borderRadius: 7, fontSize: 13, cursor: 'pointer' },
   archiveBtn: { padding: '8px 16px', background: '#fef3c7', color: '#92400e', border: 'none', borderRadius: 7, fontSize: 13, cursor: 'pointer', fontWeight: 600 },
   lessonCard: {
@@ -58,17 +52,28 @@ const s: Record<string, React.CSSProperties> = {
   modalActions: { display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 20 },
   cancelBtn: { padding: '8px 18px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: 7, fontSize: 13, cursor: 'pointer' },
   error: { color: '#ef4444', fontSize: 13, marginTop: 8 },
-  statusBadge: (status: string) => ({
-    display: 'inline-block', padding: '3px 10px', borderRadius: 999, fontSize: 11, fontWeight: 600,
-    color: '#fff',
-    background: status === 'published' ? '#10b981' : status === 'archived' ? '#f59e0b' : '#6b7280',
-    marginLeft: 10,
-  }),
   tagContainer: { display: 'flex', flexWrap: 'wrap', gap: 6, padding: '7px 10px', border: '1px solid #d1d5db', borderRadius: 7, minHeight: 40, alignItems: 'center' },
   tag: { display: 'inline-flex', alignItems: 'center', gap: 4, padding: '2px 8px', background: '#ede9fe', color: '#5b21b6', borderRadius: 999, fontSize: 12, fontWeight: 500 },
   tagRemove: { cursor: 'pointer', fontSize: 13, color: '#7c3aed' },
   tagInput: { border: 'none', outline: 'none', fontSize: 13, flex: 1, minWidth: 60, color: '#111827' },
 };
+
+const saveBtnStyle = (disabled: boolean): React.CSSProperties => ({
+  padding: '8px 18px', background: disabled ? '#c4b5fd' : '#4f46e5', color: '#fff',
+  border: 'none', borderRadius: 7, fontSize: 13, fontWeight: 600, cursor: disabled ? 'not-allowed' : 'pointer',
+});
+
+const publishBtnStyle = (pub: boolean): React.CSSProperties => ({
+  padding: '8px 18px', background: pub ? '#f59e0b' : '#10b981', color: '#fff',
+  border: 'none', borderRadius: 7, fontSize: 13, fontWeight: 600, cursor: 'pointer',
+});
+
+const statusBadgeStyle = (status: string): React.CSSProperties => ({
+  display: 'inline-block', padding: '3px 10px', borderRadius: 999, fontSize: 11, fontWeight: 600,
+  color: '#fff',
+  background: status === 'published' ? '#10b981' : status === 'archived' ? '#f59e0b' : '#6b7280',
+  marginLeft: 10,
+});
 
 /* ──────────────── LessonModal ──────────────── */
 interface LessonModalProps {
@@ -182,7 +187,7 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
 
         <div style={s.modalActions}>
           <button style={s.cancelBtn} onClick={onClose}>취소</button>
-          <button style={s.saveBtn(saving || !form.title.trim())} disabled={saving || !form.title.trim()} onClick={handleSave}>
+          <button style={saveBtnStyle(saving || !form.title.trim())} disabled={saving || !form.title.trim()} onClick={handleSave}>
             {saving ? '저장 중...' : '저장'}
           </button>
         </div>
@@ -315,7 +320,7 @@ export default function CourseEditPage() {
       <div style={s.section}>
         <div style={s.sectionTitle}>
           강의 정보
-          <span style={s.statusBadge(course.status)}>
+          <span style={statusBadgeStyle(course.status)}>
             {course.status === 'published' ? '공개 중' : course.status === 'archived' ? '종료됨' : '초안'}
           </span>
         </div>
@@ -354,11 +359,11 @@ export default function CourseEditPage() {
             </div>
           </div>
           <div style={s.row}>
-            <button style={s.saveBtn(saving || !form.title.trim())} disabled={saving || !form.title.trim()} onClick={handleSaveCourse}>
+            <button style={saveBtnStyle(saving || !form.title.trim())} disabled={saving || !form.title.trim()} onClick={handleSaveCourse}>
               {saving ? '저장 중...' : '저장'}
             </button>
             {course.status !== 'archived' && (
-              <button style={s.publishBtn(course.status === 'published')} onClick={handlePublish}>
+              <button style={publishBtnStyle(course.status === 'published')} onClick={handlePublish}>
                 {course.status === 'published' ? '비공개 전환' : '발행하기'}
               </button>
             )}

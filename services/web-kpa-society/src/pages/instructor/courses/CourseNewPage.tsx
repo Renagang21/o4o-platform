@@ -48,13 +48,14 @@ const styles: Record<string, React.CSSProperties> = {
     padding: '10px 20px', background: '#f3f4f6', color: '#374151',
     border: 'none', borderRadius: 8, fontSize: 14, cursor: 'pointer',
   },
-  submitBtn: (disabled: boolean) => ({
-    padding: '10px 24px', background: disabled ? '#c4b5fd' : '#4f46e5', color: '#fff',
-    border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600,
-    cursor: disabled ? 'not-allowed' : 'pointer',
-  }),
   error: { color: '#ef4444', fontSize: 13 },
 };
+
+const submitBtnStyle = (disabled: boolean): React.CSSProperties => ({
+  padding: '10px 24px', background: disabled ? '#c4b5fd' : '#4f46e5', color: '#fff',
+  border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600,
+  cursor: disabled ? 'not-allowed' : 'pointer',
+});
 
 interface CourseNewPageProps {
   /** Override page title (default: "새 강의 만들기") */
@@ -182,7 +183,7 @@ export default function CourseNewPage({
           <button type="button" style={styles.cancelBtn} onClick={() => navigate(returnTo ?? '/instructor/courses')}>
             취소
           </button>
-          <button type="submit" style={styles.submitBtn(!isValid || submitting)} disabled={!isValid || submitting}>
+          <button type="submit" style={submitBtnStyle(!isValid || submitting)} disabled={!isValid || submitting}>
             {submitting ? '생성 중...' : '강의 생성'}
           </button>
         </div>

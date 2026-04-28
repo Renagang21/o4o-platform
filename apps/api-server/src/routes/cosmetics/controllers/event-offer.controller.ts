@@ -2,6 +2,7 @@
  * Cosmetics Event Offer Controller
  *
  * WO-O4O-EVENT-OFFER-KCOS-ADOPTION-V1
+ * WO-O4O-EVENT-OFFER-KCOS-CREATE-V1: operator create endpoint 추가
  *
  * 공통 EventOfferService를 K-Cosmetics service_key로 호출하는 thin controller.
  * - service 인스턴스 자체는 KPA와 동일한 EventOfferService 재사용 (코드 복사 X)
@@ -15,13 +16,22 @@
  * - GET  /stats             (auth + cosmetics:operator) — Operator stats
  * - GET  /my-participations (authenticate)              — My participations
  * - GET  /:id               (optionalAuth)              — Detail (+ availability if logged in)
+ * - POST /                  (auth + cosmetics:operator) — Create event offer (operator)
  * - POST /:id/participate   (authenticate)              — Create participation order
+ *
+ * NOTE: Supplier create endpoint는 미구현 — K-Cos supplier ↔ organization 매핑
+ *       메커니즘이 명확하지 않아 IR로 분리 (WO-O4O-EVENT-OFFER-KCOS-CREATE-V1 §2).
  */
 
 import { Router, Request, Response, RequestHandler } from 'express';
 import type { DataSource } from 'typeorm';
 import { asyncHandler } from '../../../middleware/error-handler.js';
-import { EventOfferService, EventOfferError } from '../../kpa/services/event-offer.service.js';
+import {
+  EventOfferService,
+  EventOfferError,
+  EventOfferCreateError,
+} from '../../kpa/services/event-offer.service.js';
+import { resolveOrganizationForEventOffer } from '../../kpa/helpers/event-offer-organization.helper.js';
 import { SERVICE_KEYS } from '../../../constants/service-keys.js';
 
 export function createCosmeticsEventOfferController(
@@ -134,6 +144,109 @@ export function createCosmeticsEventOfferController(
         : null;
 
       res.json({ success: true, data: listing, ...(availability ? { availability } : {}) });
+    }),
+  );
+
+  /**
+   * POST / — Create event offer (operator)
+   *
+   * WO-O4O-EVENT-OFFER-KCOS-CREATE-V1: thin wrapper over EventOfferService.createListing()
+   *
+   * organizationId는 helper(resolveOrganizationForEventOffer)에서 결정.
+   * 운영자 직접 등록 → status='approved', is_active=true (즉시 노출).
+   *
+   * 응답 형태는 KPA operator 응답을 차용한 K-Cos 표준 형태(EventOfferProduct-like)로 정렬.
+   */
+  router.post(
+    '/',
+    authenticate,
+    requireCosmeticsScope('cosmetics:operator'),
+    asyncHandler(async (req: Request, res: Response) => {
+      const user = (req as any).user;
+      if (!user?.id) {
+        res.status(401).json({ success: false, error: { message: 'Unauthorized' } });
+        return;
+      }
+
+      const { offerId } = req.body ?? {};
+      if (!offerId) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_PARAMS', message: '필수 파라미터가 없습니다.' },
+        });
+        return;
+      }
+
+      // body에 organizationId가 명시되면 우선 사용, 아니면 helper로 결정
+      let organizationId: string | undefined = req.body?.organizationId;
+      if (!organizationId) {
+        const resolved = await resolveOrganizationForEventOffer({
+          dataSource,
+          userId: user.id,
+          roleType: 'operator',
+          serviceKey: SK,
+        });
+        organizationId = resolved ?? undefined;
+        if (!organizationId) {
+          res.status(400).json({
+            success: false,
+            error: {
+              code: 'ORG_NOT_FOUND',
+              message: 'K-Cosmetics 운영자 조직 정보를 찾을 수 없습니다.',
+            },
+          });
+          return;
+        }
+      }
+
+      try {
+        const result = await service.createListing({
+          offerId,
+          serviceKey: SK,
+          organizationId,
+          roleType: 'operator',
+        });
+
+        res.status(201).json({
+          success: true,
+          data: {
+            id: result.id,
+            offerId: result.offerId,
+            title: result.title,
+            supplierName: result.supplierName,
+            conditionSummary: `단가: ${result.price ?? '미정'}원`,
+            status: result.status,
+            isActive: result.isActive,
+            startAt: null,
+            endAt: null,
+            totalQuantity: null,
+            createdAt: result.createdAt,
+          },
+        });
+      } catch (err) {
+        if (err instanceof EventOfferCreateError) {
+          // 기존 K-Cos 패턴(KPA operator와 동일)으로 ALREADY_LISTED → ALREADY_REGISTERED 매핑
+          const codeMap: Record<string, string> = {
+            OFFER_NOT_FOUND: 'OFFER_NOT_FOUND',
+            OFFER_NOT_OWNED: 'OFFER_NOT_OWNED',
+            ALREADY_LISTED: 'ALREADY_REGISTERED',
+            INTERNAL_ERROR: 'INTERNAL_ERROR',
+          };
+          const messageMap: Record<string, string> = {
+            OFFER_NOT_FOUND: '공급자 상품을 찾을 수 없습니다.',
+            OFFER_NOT_OWNED: '해당 상품에 대한 권한이 없습니다.',
+            ALREADY_REGISTERED: '이미 등록된 이벤트 상품입니다.',
+            INTERNAL_ERROR: '서버 오류가 발생했습니다.',
+          };
+          const code = codeMap[err.code] ?? 'INTERNAL_ERROR';
+          res.status(err.statusCode).json({
+            success: false,
+            error: { code, message: messageMap[code] ?? err.message },
+          });
+          return;
+        }
+        throw err;
+      }
     }),
   );
 

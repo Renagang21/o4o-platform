@@ -51,13 +51,14 @@ const styles: Record<string, React.CSSProperties> = {
   cardTitle: { fontSize: 16, fontWeight: 600, color: '#111827', marginBottom: 4 },
   cardDesc: { fontSize: 13, color: '#6b7280', marginBottom: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
   cardMeta: { display: 'flex', gap: 12, alignItems: 'center' },
-  badge: (color: string) => ({
-    display: 'inline-block', padding: '2px 8px', borderRadius: 999,
-    fontSize: 11, fontWeight: 600, color: '#fff', background: color,
-  }),
   metaText: { fontSize: 12, color: '#9ca3af' },
   error: { color: '#ef4444', padding: '20px 0', textAlign: 'center' },
 };
+
+const badgeStyle = (color: string): React.CSSProperties => ({
+  display: 'inline-block', padding: '2px 8px', borderRadius: 999,
+  fontSize: 11, fontWeight: 600, color: '#fff', background: color,
+});
 
 export default function CourseListPage() {
   const navigate = useNavigate();
@@ -119,7 +120,7 @@ export default function CourseListPage() {
             <div style={styles.cardTitle}>{course.title}</div>
             <div style={styles.cardDesc}>{course.description}</div>
             <div style={styles.cardMeta}>
-              <span style={styles.badge(STATUS_COLOR[course.status] || '#6b7280')}>
+              <span style={badgeStyle(STATUS_COLOR[course.status] || '#6b7280')}>
                 {STATUS_LABEL[course.status] || course.status}
               </span>
               <span style={styles.metaText}>{LEVEL_LABEL[course.level] || course.level}</span>
