@@ -533,5 +533,30 @@ export function createPharmacyProductsController(
     res.json({ success: true, data: { updated: channelSettings.length } });
   }));
 
+  // ─── DELETE /by-offer/:offerId — 내 매장에서 상품 제외 ────────────────
+  // WO-O4O-STORE-HUB-B2B-UI-REFINEMENT-V1
+  // offer ID 기반으로 product_approvals + organization_product_listings 모두 제거.
+  // 제거 후 카탈로그에서 해당 상품이 'available' 상태로 복귀됨.
+  router.delete('/by-offer/:offerId', requireAuth, requirePharmacyOwner, asyncHandler(async (req: Request, res: Response) => {
+    const organizationId = (req as any).organizationId;
+    const { offerId } = req.params;
+
+    // 1. product_approvals 삭제 (SERVICE / PRIVATE 흐름)
+    await dataSource.query(
+      `DELETE FROM product_approvals
+       WHERE organization_id = $1 AND offer_id = $2::uuid`,
+      [organizationId, offerId],
+    );
+
+    // 2. organization_product_listings 삭제 (PUBLIC 흐름 + auto-expand 결과)
+    await dataSource.query(
+      `DELETE FROM organization_product_listings
+       WHERE organization_id = $1 AND offer_id = $2::uuid`,
+      [organizationId, offerId],
+    );
+
+    res.json({ success: true });
+  }));
+
   return router;
 }

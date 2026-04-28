@@ -112,6 +112,14 @@ export async function applyBySupplyProductId(supplyProductId: string): Promise<{
 }
 
 /**
+ * 내 매장에서 상품 제외 (offer ID 기반)
+ * WO-O4O-STORE-HUB-B2B-UI-REFINEMENT-V1
+ */
+export async function cancelProductByOfferId(offerId: string): Promise<{ success: boolean }> {
+  return apiClient.delete(`/pharmacy/products/by-offer/${offerId}`);
+}
+
+/**
  * 상품 판매 신청 (레거시 — 수동 입력)
  */
 export async function applyProduct(params: {

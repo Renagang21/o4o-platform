@@ -3,20 +3,23 @@
  *
  * WO-O4O-HUB-B2B-CATALOG-V1
  * WO-O4O-HUB-B2B-STATE-VISIBILITY-V1: 상태 배지 + 버튼 정비 + 요약 영역
+ * WO-O4O-STORE-HUB-B2B-UI-REFINEMENT-V1: 내 매장에 추가/제외 UX 정비
  *
  * Hub 공용공간에서 플랫폼 공급자 상품을 탐색하고
- * "판매 신청" 버튼으로 내 매장 상품 신청을 진행하는 페이지.
+ * "내 매장에 추가" 버튼으로 내 매장 상품 신청을 진행하는 페이지.
  *
  * 사용 API:
  *   - getCatalog() : 플랫폼 B2B 상품 카탈로그 (neture_supplier_products PUBLIC)
- *   - applyBySupplyProductId() : 카탈로그 기반 상품 판매 신청
+ *   - applyBySupplyProductId() : 카탈로그 기반 상품 추가
+ *   - cancelProductByOfferId() : 내 매장에서 상품 제외
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   getCatalog,
   applyBySupplyProductId,
+  cancelProductByOfferId,
   type CatalogProduct,
 } from '../../api/pharmacyProducts';
 import { colors, shadows, borderRadius } from '../../styles/theme';
@@ -80,7 +83,6 @@ function getProductState(item: CatalogProduct): ProductState {
 // ============================================
 
 export function HubB2BCatalogPage() {
-  const navigate = useNavigate();
   const [products, setProducts] = useState<CatalogProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -88,6 +90,8 @@ export function HubB2BCatalogPage() {
   const [offset, setOffset] = useState(0);
   const [total, setTotal] = useState(0);
   const [applyingId, setApplyingId] = useState<string | null>(null);
+  const [removingId, setRemovingId] = useState<string | null>(null);
+  const [removeConfirmId, setRemoveConfirmId] = useState<string | null>(null);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // 정렬 상태
@@ -135,7 +139,7 @@ export function HubB2BCatalogPage() {
     setToast(null);
     try {
       await applyBySupplyProductId(product.id);
-      setToast({ type: 'success', message: `"${product.name}" 취급 신청이 완료되었습니다.` });
+      setToast({ type: 'success', message: `"${product.name}" 내 매장에 추가되었습니다.` });
       // 로컬 상태 즉시 반영 (재조회 없이)
       setProducts(prev => prev.map(p =>
         p.id === product.id ? { ...p, isApplied: true } : p,
@@ -143,12 +147,33 @@ export function HubB2BCatalogPage() {
     } catch (e: any) {
       const code = e?.response?.data?.error?.code || e?.code;
       if (code === 'DUPLICATE_APPLICATION') {
-        setToast({ type: 'error', message: '이미 취급 신청된 상품입니다.' });
+        setToast({ type: 'error', message: '이미 내 매장에 추가된 상품입니다.' });
       } else {
-        setToast({ type: 'error', message: e.message || '취급 신청에 실패했습니다.' });
+        setToast({ type: 'error', message: e.message || '상품 추가에 실패했습니다.' });
       }
     } finally {
       setApplyingId(null);
+      setTimeout(() => setToast(null), 4000);
+    }
+  };
+
+  const handleRemove = async (product: CatalogProduct) => {
+    if (removingId) return;
+    setRemovingId(product.id);
+    setRemoveConfirmId(null);
+    setToast(null);
+    try {
+      await cancelProductByOfferId(product.id);
+      setToast({ type: 'success', message: `"${product.name}"을(를) 내 매장에서 제외했습니다.` });
+      setProducts(prev => prev.map(p =>
+        p.id === product.id
+          ? { ...p, isApplied: false, isApproved: false, isListed: false, isListingInactive: false }
+          : p,
+      ));
+    } catch (e: any) {
+      setToast({ type: 'error', message: e.message || '상품 제외에 실패했습니다.' });
+    } finally {
+      setRemovingId(null);
       setTimeout(() => setToast(null), 4000);
     }
   };
@@ -211,11 +236,35 @@ export function HubB2BCatalogPage() {
 
   return (
     <div style={styles.container}>
+      {/* 제거 확인 다이얼로그 */}
+      {removeConfirmId && (() => {
+        const target = products.find(p => p.id === removeConfirmId);
+        if (!target) return null;
+        return (
+          <div style={styles.confirmOverlay}>
+            <div style={styles.confirmBox}>
+              <p style={styles.confirmText}>이 상품을 내 매장에서 제외하시겠습니까?</p>
+              <p style={styles.confirmProductName}>{target.name}</p>
+              <div style={styles.confirmActions}>
+                <button onClick={() => setRemoveConfirmId(null)} style={styles.confirmCancel}>취소</button>
+                <button
+                  onClick={() => handleRemove(target)}
+                  disabled={!!removingId}
+                  style={{ ...styles.confirmOk, opacity: removingId ? 0.6 : 1 }}
+                >
+                  {removingId === target.id ? '처리 중...' : '제외'}
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Hero */}
       <header style={styles.hero}>
         <h1 style={styles.heroTitle}>상품 카탈로그</h1>
         <p style={styles.heroDesc}>
-          현재 활성 공급자가 제공 중인 상품을 탐색하고 취급 신청할 수 있습니다.
+          현재 활성 공급자가 제공 중인 상품을 탐색하고 내 매장에 추가할 수 있습니다.
         </p>
       </header>
 
@@ -301,7 +350,7 @@ export function HubB2BCatalogPage() {
       ) : products.length === 0 ? (
         <div style={styles.emptyState}>
           {distributionFilter === 'operator'
-            ? '운영자 승인 흐름에 참여 중인 상품이 없습니다. B2B 탭에서 상품을 확인하고 취급 신청을 해보세요.'
+            ? '운영자 승인 흐름에 참여 중인 상품이 없습니다. B2B 탭에서 상품을 확인하고 내 매장에 추가해보세요.'
             : distributionFilter === 'all'
               ? '현재 공급 가능한 상품이 없습니다.'
               : `"${DISTRIBUTION_TABS.find(t => t.key === distributionFilter)?.label}" 유형의 상품이 없습니다.`}
@@ -339,12 +388,18 @@ export function HubB2BCatalogPage() {
               const state = getProductState(item);
               const stateInfo = STATE_CONFIG[state];
               const isApplying = applyingId === item.id;
+              const isAdded = state !== 'available';
 
               return (
                 <div key={item.id} style={styles.tableRow}>
                   {/* 상품명 */}
                   <div style={{ ...styles.td, flex: 2, minWidth: 0 }}>
-                    <span style={styles.rowTitle}>{item.name}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
+                      <span style={styles.rowTitle}>{item.name}</span>
+                      {isAdded && (
+                        <span style={styles.myStoreBadge}>내 매장</span>
+                      )}
+                    </div>
                     {item.description && (
                       <span style={styles.rowDesc}>{item.description}</span>
                     )}
@@ -369,7 +424,7 @@ export function HubB2BCatalogPage() {
                     )}
                   </div>
 
-                  {/* 공급가 */}
+                  {/* 공급가 + 권장 소비자가 */}
                   <div style={{ ...styles.td, flex: 0.8, alignItems: 'flex-end' }}>
                     <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: colors.neutral900 }}>
                       {formatKpaPrice(item)}
@@ -377,6 +432,11 @@ export function HubB2BCatalogPage() {
                     {getPriceSublabel(item) && (
                       <span style={{ fontSize: '0.625rem', color: colors.neutral400, marginTop: 1 }}>
                         {getPriceSublabel(item)}
+                      </span>
+                    )}
+                    {item.consumerReferencePrice != null && (
+                      <span style={{ fontSize: '0.625rem', color: colors.neutral400, marginTop: 2 }}>
+                        권장 소비자가 {item.consumerReferencePrice.toLocaleString('ko-KR')}원
                       </span>
                     )}
                   </div>
@@ -401,26 +461,64 @@ export function HubB2BCatalogPage() {
                   </div>
 
                   {/* 액션 */}
-                  <div style={{ ...styles.td, flex: 1, justifyContent: 'flex-end' }}>
-                    {state === 'listed' ? (
-                      <button onClick={() => navigate('/store/products/b2c')} style={styles.buttonNavigate}>매장 관리</button>
-                    ) : state === 'ready' ? (
-                      <button disabled style={styles.buttonReady}>판매 준비 중</button>
-                    ) : state === 'approved' ? (
-                      <button onClick={() => navigate('/store/products/b2c')} style={styles.buttonNavigate}>매장 관리</button>
-                    ) : state === 'pending' ? (
-                      <button disabled style={styles.buttonDisabled}>승인 대기</button>
+                  <div style={{ ...styles.td, flex: 1, justifyContent: 'flex-end', flexDirection: 'row', gap: '6px', alignItems: 'center' }}>
+                    {isAdded ? (
+                      <>
+                        {/* 추가됨 표시 아이콘 */}
+                        <button
+                          disabled
+                          title="이미 내 매장에 추가됨"
+                          aria-label="이미 내 매장에 추가됨"
+                          style={styles.iconButtonAdded}
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="20 6 9 17 4 12" />
+                          </svg>
+                        </button>
+                        {/* 제외 버튼 */}
+                        <button
+                          onClick={() => setRemoveConfirmId(item.id)}
+                          disabled={removingId === item.id}
+                          title="내 매장에서 제외"
+                          aria-label="내 매장에서 제외"
+                          style={{
+                            ...styles.iconButtonRemove,
+                            opacity: removingId === item.id ? 0.5 : 1,
+                            cursor: removingId === item.id ? 'not-allowed' : 'pointer',
+                          }}
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="3 6 5 6 21 6" />
+                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                            <path d="M10 11v6M14 11v6" />
+                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                          </svg>
+                        </button>
+                      </>
                     ) : (
+                      /* 내 매장에 추가 버튼 */
                       <button
                         onClick={() => handleApply(item)}
                         disabled={isApplying}
+                        title={isApplying ? '추가 중...' : '내 매장에 추가'}
+                        aria-label="내 매장에 추가"
                         style={{
-                          ...styles.applyButton,
+                          ...styles.iconButtonAdd,
                           opacity: isApplying ? 0.6 : 1,
                           cursor: isApplying ? 'not-allowed' : 'pointer',
                         }}
                       >
-                        {isApplying ? '신청 중...' : '취급 신청'}
+                        {isApplying ? (
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ animation: 'spin 1s linear infinite' }}>
+                            <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                          </svg>
+                        ) : (
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="8" x2="12" y2="16" />
+                            <line x1="8" y1="12" x2="16" y2="12" />
+                          </svg>
+                        )}
                       </button>
                     )}
                   </div>
@@ -464,7 +562,7 @@ export function HubB2BCatalogPage() {
       <div style={styles.notice}>
         <span style={styles.noticeIcon}>💡</span>
         <span>
-          취급 신청 후 운영자 승인이 완료되면{' '}
+          내 매장에 추가 후 운영자 승인이 완료되면{' '}
           <Link to="/store/commerce/orderable" style={{ color: colors.primary }}>내 매장관리 &gt; 주문 가능 상품</Link>
           에서 상품을 관리할 수 있습니다.
           "판매 준비" 상태는 운영자 승인 대기 중인 상품입니다.
@@ -706,7 +804,115 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: '4px',
   },
 
-  // Buttons
+  // Icon Buttons (WO-O4O-STORE-HUB-B2B-UI-REFINEMENT-V1)
+  iconButtonAdd: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '32px',
+    height: '32px',
+    color: colors.white,
+    backgroundColor: colors.primary,
+    border: 'none',
+    borderRadius: '8px',
+    transition: 'opacity 0.15s',
+    flexShrink: 0,
+  },
+  iconButtonAdded: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '32px',
+    height: '32px',
+    color: '#059669',
+    backgroundColor: '#d1fae5',
+    border: '1px solid #6ee7b7',
+    borderRadius: '8px',
+    cursor: 'default',
+    flexShrink: 0,
+  },
+  iconButtonRemove: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '28px',
+    height: '28px',
+    color: '#dc2626',
+    backgroundColor: '#fff1f2',
+    border: '1px solid #fecaca',
+    borderRadius: '6px',
+    transition: 'opacity 0.15s',
+    flexShrink: 0,
+  },
+  myStoreBadge: {
+    display: 'inline-block',
+    padding: '1px 6px',
+    fontSize: '0.625rem',
+    fontWeight: 600,
+    color: colors.primary,
+    backgroundColor: colors.primary + '15',
+    border: `1px solid ${colors.primary}30`,
+    borderRadius: '4px',
+    whiteSpace: 'nowrap' as const,
+    flexShrink: 0,
+  },
+
+  // Confirm dialog
+  confirmOverlay: {
+    position: 'fixed' as const,
+    inset: 0,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    zIndex: 100,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  confirmBox: {
+    backgroundColor: '#fff',
+    borderRadius: '12px',
+    padding: '24px',
+    width: '340px',
+    boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+  },
+  confirmText: {
+    margin: '0 0 8px',
+    fontSize: '0.9375rem',
+    fontWeight: 600,
+    color: colors.neutral900,
+  },
+  confirmProductName: {
+    margin: '0 0 20px',
+    fontSize: '0.8125rem',
+    color: colors.neutral500,
+    wordBreak: 'break-word' as const,
+  },
+  confirmActions: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    gap: '8px',
+  },
+  confirmCancel: {
+    padding: '8px 16px',
+    fontSize: '0.8125rem',
+    color: colors.neutral600,
+    backgroundColor: colors.neutral100,
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: '8px',
+    cursor: 'pointer',
+  },
+  confirmOk: {
+    padding: '8px 16px',
+    fontSize: '0.8125rem',
+    fontWeight: 600,
+    color: '#fff',
+    backgroundColor: '#dc2626',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    transition: 'opacity 0.15s',
+  },
+
+  // Legacy button styles (kept for reference, not used in main flow)
   applyButton: {
     padding: '6px 14px',
     fontSize: '0.75rem',

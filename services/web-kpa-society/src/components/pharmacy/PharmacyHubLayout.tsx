@@ -19,7 +19,7 @@ interface HubMenuItem {
 
 const HUB_MENU_ITEMS: HubMenuItem[] = [
   { label: '홈', path: '/store-hub', icon: '\u{1F3E0}', description: '자원 탐색 허브 · 운영 흐름 안내' },
-  { label: '상품 카탈로그', path: '/store-hub/b2b', icon: '\u{1F6D2}', description: '공급 가능 상품 탐색 · 취급 신청' },
+  { label: '상품 카탈로그', path: '/store-hub/b2b', icon: '\u{1F6D2}', description: '공급 가능 상품 탐색 · 내 매장에 추가' },
   { label: '디지털 사이니지', path: '/store-hub/signage', icon: '\u{1F5A5}\uFE0F', description: '사이니지 미디어 · 플레이리스트' },
   { label: '이벤트/특가', path: '/store-hub/event-offers', icon: '\u{1F6CD}\uFE0F', description: 'KPA-Society 이벤트 상품' },
   { label: '콘텐츠/자료', path: '/store-hub/content', icon: '\u{1F4C4}', description: 'CMS 콘텐츠 탐색 · 복사' },
