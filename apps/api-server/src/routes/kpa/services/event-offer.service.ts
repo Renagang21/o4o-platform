@@ -20,6 +20,17 @@ import { OrganizationProductListing } from '../../../modules/store-core/entities
 import { SERVICE_KEYS } from '../../../constants/service-keys.js';
 import { CheckoutOrder } from '../../../entities/checkout/CheckoutOrder.entity.js';
 import { checkoutService } from '../../../services/checkout.service.js';
+import { resolveStoreAccess } from '../../../utils/store-owner.utils.js';
+
+// ─── WO-O4O-EVENT-OFFER-STORE-PRODUCT-LINK-V1 ───────────────────────────────
+// Event Offer service_key → Store(매장 진열) service_key 매핑.
+// 매핑된 항목만 참여 후 매장 진열 등록 후처리를 실행한다.
+// 새 서비스 도입 시(K-Cosmetics, Neture 등) 이 맵에 항목 추가만으로 확장 가능.
+const STORE_SERVICE_KEY_MAP: Record<string, string> = {
+  [SERVICE_KEYS.KPA_GROUPBUY]: SERVICE_KEYS.KPA,
+  // 후속 WO에서 추가:
+  // [SERVICE_KEYS.EVENT_OFFER_NETURE]: ?,  // Neture는 적용 제외 (WO 명시)
+};
 
 // ─── 상태 계산 ───────────────────────────────────────────────────────────────
 
@@ -435,7 +446,7 @@ export class EventOfferService {
     // (supplier 정보는 별도 row라 lock 범위 밖에서 조회해도 안전)
     // → listing 먼저 찾아서 offer_id 확보
     const preLockRows = await this.dataSource.query(
-      `SELECT opl.id, opl.offer_id, opl.organization_id, opl.service_key,
+      `SELECT opl.id, opl.offer_id, opl.master_id, opl.organization_id, opl.service_key,
               opl.status, opl.start_at, opl.end_at
        FROM organization_product_listings opl
        WHERE opl.id = $1
@@ -591,6 +602,19 @@ export class EventOfferService {
         },
       });
 
+      // ── Step 6: 매장 진열 자동 등록 (best-effort) ────────────────────
+      // WO-O4O-EVENT-OFFER-STORE-PRODUCT-LINK-V1
+      // 주문 트랜잭션은 이미 commit됨. 매장 등록 실패는 non-blocking — 사용자에게는
+      // 주문 성공이 우선. 실패 시 trace만 남기고 계속 진행한다.
+      // service_key 매핑이 없으면 (예: Neture event-offer) 후처리 자체를 skip.
+      await this.tryLinkStoreProduct({
+        userId,
+        eventServiceKey: serviceKey,
+        eventListingId: preListing.id,
+        masterId: preListing.master_id,
+        offerId: preListing.offer_id,
+      });
+
       return {
         orderId: savedOrder.id,
         orderNumber: savedOrder.orderNumber,
@@ -613,6 +637,135 @@ export class EventOfferService {
       }
       throw orderErr;
     }
+  }
+
+  // ─── WO-O4O-EVENT-OFFER-STORE-PRODUCT-LINK-V1 ─────────────────────────────
+  // Event Offer 참여 후, 참여자의 매장(organization)에 해당 상품을 진열용
+  // organization_product_listings row로 자동 등록한다.
+  //
+  // 정책:
+  //   - service_key 매핑이 없으면 skip (Neture 등 미적용 서비스)
+  //   - user → organization_id 매핑 실패 시 skip (권한 없는 사용자)
+  //   - INSERT는 ON CONFLICT DO NOTHING — 이미 매장에 있는 경우 skip
+  //   - 모든 실패는 non-blocking. trace 정보를 console.warn으로 남긴다.
+  //
+  // TODO: 추후 retry/repair API 도입 시 주문 → 매장 등록 누락 케이스 일괄 보정.
+  // TODO: 이미 매장에 있는 listing의 price 필드 갱신 정책 결정 (현재는 skip 유지).
+
+  private async tryLinkStoreProduct(params: {
+    userId: string;
+    eventServiceKey: string;
+    eventListingId: string;
+    masterId: string;
+    offerId: string;
+  }): Promise<void> {
+    const targetServiceKey = STORE_SERVICE_KEY_MAP[params.eventServiceKey];
+    if (!targetServiceKey) {
+      // 매핑되지 않은 service_key (예: neture-event-offer) — 매장 등록 미적용
+      return;
+    }
+
+    // Entity상 master_id는 NOT NULL이지만, 레거시 데이터/예외 케이스 안전장치.
+    if (!params.masterId || !params.offerId) {
+      console.warn(
+        '[EventOfferService] tryLinkStoreProduct: skipped (missing master_id or offer_id on event listing)',
+        {
+          userId: params.userId,
+          eventListingId: params.eventListingId,
+          eventServiceKey: params.eventServiceKey,
+          hasMasterId: !!params.masterId,
+          hasOfferId: !!params.offerId,
+        },
+      );
+      return;
+    }
+
+    let organizationId: string | null = null;
+    try {
+      organizationId = await resolveStoreAccess(this.dataSource, params.userId, []);
+    } catch (resolveErr) {
+      console.warn(
+        '[EventOfferService] tryLinkStoreProduct: resolveStoreAccess failed (non-blocking)',
+        {
+          userId: params.userId,
+          eventListingId: params.eventListingId,
+          eventServiceKey: params.eventServiceKey,
+          message: (resolveErr as Error)?.message,
+        },
+      );
+      return;
+    }
+
+    if (!organizationId) {
+      // 사용자가 매장 owner가 아님 — 매장 등록 대상 아님
+      console.warn(
+        '[EventOfferService] tryLinkStoreProduct: skipped (no store organization for user)',
+        {
+          userId: params.userId,
+          eventListingId: params.eventListingId,
+          eventServiceKey: params.eventServiceKey,
+        },
+      );
+      return;
+    }
+
+    try {
+      await this.ensureStoreProduct({
+        organizationId,
+        targetServiceKey,
+        masterId: params.masterId,
+        offerId: params.offerId,
+        sourceEventOfferId: params.eventListingId,
+      });
+    } catch (linkErr) {
+      console.warn(
+        '[EventOfferService] tryLinkStoreProduct: ensureStoreProduct failed (non-blocking)',
+        {
+          userId: params.userId,
+          organizationId,
+          eventListingId: params.eventListingId,
+          eventServiceKey: params.eventServiceKey,
+          targetServiceKey,
+          masterId: params.masterId,
+          offerId: params.offerId,
+          message: (linkErr as Error)?.message,
+        },
+      );
+    }
+  }
+
+  /**
+   * organization_product_listings에 매장 진열 row를 INSERT한다.
+   * 이미 (organization_id, service_key, offer_id) 조합이 존재하면 ON CONFLICT DO NOTHING.
+   *
+   * 신규 row 의미:
+   *   - is_active = true       — 즉시 매장 진열 활성화
+   *   - status = 'pending'     — entity default. 이벤트 SQL(status='approved')에 안 잡힘
+   *   - source_type = 'event-offer'
+   *   - source_id   = 참여한 event offer listing의 id
+   */
+  private async ensureStoreProduct(params: {
+    organizationId: string;
+    targetServiceKey: string;
+    masterId: string;
+    offerId: string;
+    sourceEventOfferId: string;
+  }): Promise<void> {
+    await this.dataSource.query(
+      `INSERT INTO organization_product_listings
+         (id, organization_id, service_key, master_id, offer_id,
+          is_active, status, source_type, source_id, created_at, updated_at)
+       VALUES (gen_random_uuid(), $1, $2, $3, $4,
+               true, 'pending', 'event-offer', $5, NOW(), NOW())
+       ON CONFLICT (organization_id, service_key, offer_id) DO NOTHING`,
+      [
+        params.organizationId,
+        params.targetServiceKey,
+        params.masterId,
+        params.offerId,
+        params.sourceEventOfferId,
+      ],
+    );
   }
 }
 
