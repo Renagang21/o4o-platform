@@ -31,10 +31,10 @@ export const heroSlides: HeroSlide[] = [
   {
     // WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1: Market Trial은 Neture 통합 허브로 진입
     id: 'trial',
-    title: '신상품 시범판매\nNeture 허브에서 참여하세요',
+    title: '유통 참여형 펀딩 (Market Trial)\nNeture 허브에서 참여하세요',
     subtitle: '브랜드의 신상품을 먼저 체험하고 피드백을 공유하세요',
     bgGradient: '#334155',
-    cta: { label: 'Neture에서 시범판매 보기', link: 'https://neture.co.kr/market-trial', variant: 'primary' },
+    cta: { label: 'Neture에서 보기', link: 'https://neture.co.kr/market-trial', variant: 'primary' },
   },
   {
     id: 'tourist',
@@ -94,9 +94,9 @@ export const quickActionCards: QuickActionCard[] = [
     // WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1: Market Trial 진입은 Neture 허브로 (외부 링크)
     // WO-KCOS-HOME-QUICK-ACTION-STATUS-TUNE-V1: 잘못된 /platform/stores 링크 → Neture 외부 URL 수정
     id: 'trial',
-    title: 'Market Trial',
+    title: '유통 참여형 펀딩 (Market Trial)',
     subtitle: '신상품 체험',
-    description: '브랜드의 신상품 Trial에 참여하세요',
+    description: '브랜드의 신상품 유통 참여형 펀딩에 참여하세요',
     icon: '🎯',
     link: 'https://neture.co.kr/market-trial',
     color: '#e2e8f0',

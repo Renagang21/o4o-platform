@@ -4,7 +4,7 @@
  * WO-O4O-NETURE-UI-REFACTORING-V1
  * WO-O4O-NETURE-HOME-CONTENT-V1: CMS 기반 콘텐츠 전환
  * WO-NETURE-MARKET-TRIAL-PAGE-SEPARATION-AND-HOME-RESTRUCTURE-V1:
- *   MarketTrialBanner → MarketTrialSection (모집중 시범판매 카드 표시)
+ *   MarketTrialBanner → MarketTrialSection (모집중 유통 참여형 펀딩 카드 표시)
  *
  * 구조:
  * 1. Hero Slider (CMS → 정적 폴백)
@@ -33,7 +33,7 @@ import { getTrials, type Trial } from '../api/trial';
 
 /**
  * WO-NETURE-MARKET-TRIAL-PAGE-SEPARATION-AND-HOME-RESTRUCTURE-V1:
- * 참여자 관점 — 모집중 시범판매 카드 + 공급자 CTA
+ * 참여자 관점 — 모집중 유통 참여형 펀딩 카드 + 공급자 CTA
  */
 function MarketTrialSection() {
   const [trials, setTrials] = useState<Trial[]>([]);
@@ -55,7 +55,7 @@ function MarketTrialSection() {
         {/* 헤더 */}
         <div style={mts.headerRow}>
           <div>
-            <h2 style={mts.heading}>시범판매 (Market Trial)</h2>
+            <h2 style={mts.heading}>유통 참여형 펀딩 (Market Trial)</h2>
             <p style={mts.subheading}>
               공급자가 제안한 신제품을 매장에서 먼저 체험하고, 현장 의견을 공유하는 참여형 프로그램입니다.
             </p>
@@ -94,9 +94,9 @@ function MarketTrialSection() {
           </div>
         ) : (
           <div style={mts.emptyBox}>
-            <p style={mts.emptyText}>현재 모집 중인 시범판매가 없습니다.</p>
+            <p style={mts.emptyText}>현재 모집 중인 유통 참여형 펀딩이 없습니다.</p>
             <Link to="/market-trial" style={mts.emptyLink}>
-              지난 시범판매 보기 →
+              지난 유통 참여형 펀딩 보기 →
             </Link>
           </div>
         )}
@@ -105,7 +105,7 @@ function MarketTrialSection() {
         <div style={mts.supplierCta}>
           <span style={mts.supplierCtaText}>공급자이신가요?</span>
           <Link to="/supplier/market-trial/new" style={mts.supplierCtaLink}>
-            시범판매 제안하기 →
+            유통 참여형 펀딩 제안하기 →
           </Link>
         </div>
       </PageContainer>

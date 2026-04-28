@@ -47,7 +47,7 @@ const ALL_SERVICE_ITEMS: O4OHelpServiceItem[] = [
   },
   {
     serviceKey: 'market-trial',
-    title: 'Market Trial',
+    title: '유통 참여형 펀딩 (Market Trial)',
     description: '신제품 체험과 공동구매를 통해 새로운 상품 기회를 확인할 수 있습니다',
     href: 'https://neture.co.kr/market-trial',
     external: true,

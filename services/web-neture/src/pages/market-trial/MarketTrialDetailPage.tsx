@@ -1,5 +1,5 @@
 /**
- * MarketTrialDetailPage — Neture 시범판매 상세
+ * MarketTrialDetailPage — Neture 유통 참여형 펀딩(Market Trial) 상세
  *
  * WO-NETURE-MARKET-TRIAL-PARTICIPANT-PAGES-V1
  * KPA-Society MarketTrialDetailPage.tsx → Neture canonical 이식
@@ -71,7 +71,7 @@ export function MarketTrialDetailPage() {
           if (active && partData) setParticipation(partData);
         }
       } catch {
-        if (active) setError('시범판매를 찾을 수 없습니다.');
+        if (active) setError('유통 참여형 펀딩을 찾을 수 없습니다.');
       } finally {
         if (active) setIsLoading(false);
       }
@@ -118,7 +118,7 @@ export function MarketTrialDetailPage() {
         return;
       }
       if (msg.includes('Already participated')) {
-        setJoinError('이미 참여 신청한 시범판매입니다.');
+        setJoinError('이미 참여 신청한 유통 참여형 펀딩입니다.');
       } else if (msg.includes('not accepting')) {
         setJoinError('현재 참여 신청을 받고 있지 않습니다.');
       } else if (msg.includes('maximum participants')) {
@@ -147,10 +147,10 @@ export function MarketTrialDetailPage() {
     return (
       <div style={s.centered}>
         <p style={{ color: '#6B7280', fontSize: '1rem', marginBottom: '16px' }}>
-          {error || '시범판매를 찾을 수 없습니다.'}
+          {error || '유통 참여형 펀딩을 찾을 수 없습니다.'}
         </p>
         <Link to="/market-trial" style={{ color: '#10B981', fontSize: '0.875rem', textDecoration: 'none' }}>
-          ← 시범판매 허브로 돌아가기
+          ← 유통 참여형 펀딩 허브로 돌아가기
         </Link>
       </div>
     );
@@ -169,7 +169,7 @@ export function MarketTrialDetailPage() {
       {/* 상단 네비게이션 */}
       <nav style={{ marginBottom: '24px' }}>
         <Link to="/market-trial" style={s.breadcrumb}>
-          ← 시범판매 허브
+          ← 유통 참여형 펀딩 허브
         </Link>
       </nav>
 
@@ -375,7 +375,7 @@ export function MarketTrialDetailPage() {
           <div>
             <p style={{ fontSize: '0.8125rem', color: '#6B7280', lineHeight: 1.5, marginBottom: '14px' }}>
               {isAuthenticated
-                ? '이 시범판매에 참여하시겠습니까? 보상 방식을 선택한 후 신청해 주세요.'
+                ? '이 유통 참여형 펀딩에 참여하시겠습니까? 보상 방식을 선택한 후 신청해 주세요.'
                 : '참여 신청은 로그인이 필요합니다. 신청 버튼을 누르면 로그인 화면으로 이동합니다.'}
             </p>
 
@@ -434,7 +434,7 @@ export function MarketTrialDetailPage() {
                 : !isAuthenticated
                 ? '로그인하고 참여하기'
                 : selectedReward
-                ? '시범판매 참여 신청'
+                ? '유통 참여형 펀딩 참여 신청'
                 : '보상 방식을 선택해 주세요'}
             </button>
           </div>
@@ -466,7 +466,7 @@ export function MarketTrialDetailPage() {
                 포럼 토론
               </h3>
               <p style={{ fontSize: '0.8125rem', color: '#6B7280', margin: 0 }}>
-                이 시범판매에 관한 공지 및 토론을 포럼에서 확인하세요.
+                이 유통 참여형 펀딩에 관한 공지 및 토론을 포럼에서 확인하세요.
               </p>
             </div>
             <Link
@@ -482,7 +482,7 @@ export function MarketTrialDetailPage() {
       {/* 하단: 허브 복귀 */}
       <div style={{ textAlign: 'center', marginTop: '24px' }}>
         <Link to="/market-trial" style={{ fontSize: '0.8125rem', color: '#9CA3AF', textDecoration: 'none' }}>
-          ← 시범판매 허브로 돌아가기
+          ← 유통 참여형 펀딩 허브로 돌아가기
         </Link>
       </div>
     </div>

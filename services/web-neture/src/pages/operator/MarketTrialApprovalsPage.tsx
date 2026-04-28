@@ -49,7 +49,7 @@ export default function MarketTrialApprovalsPage() {
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-5">
-        <h1 className="text-xl font-bold text-gray-900">Market Trial 관리</h1>
+        <h1 className="text-xl font-bold text-gray-900">유통 참여형 펀딩 (Market Trial) 관리</h1>
       </div>
 
       {/* 상단 페이지 탭 */}

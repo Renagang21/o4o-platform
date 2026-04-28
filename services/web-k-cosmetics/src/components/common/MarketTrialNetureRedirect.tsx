@@ -28,7 +28,7 @@ export default function MarketTrialNetureRedirect() {
   return (
     <div style={styles.container}>
       <div style={styles.icon}>🧪</div>
-      <h1 style={styles.title}>Market Trial은 Neture에서 운영됩니다</h1>
+      <h1 style={styles.title}>유통 참여형 펀딩 (Market Trial)은 Neture에서 운영됩니다</h1>
       <p style={styles.description}>Neture 통합 허브로 이동 중입니다...</p>
       <a href={target} style={styles.link}>
         자동 이동되지 않으면 여기를 클릭하세요 →

@@ -520,7 +520,7 @@ export default function ForumFeedPage() {
                     }`}
                   >
                     <Tag className="w-4 h-4" />
-                    Market Trial
+                    유통 참여형 펀딩
                   </button>
                   <button
                     onClick={() => setNewPost({ ...newPost, linkedSignageId: newPost.linkedSignageId ? '' : 'c1' })}

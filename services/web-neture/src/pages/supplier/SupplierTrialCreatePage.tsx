@@ -158,7 +158,7 @@ export default function SupplierTrialCreatePage({
   return (
     <div className="max-w-2xl mx-auto p-6">
       <h1 className="text-2xl font-bold text-gray-900 mb-2">
-        {mode === 'edit' ? 'Market Trial 수정' : 'Market Trial 등록'}
+        {mode === 'edit' ? '유통 참여형 펀딩 수정' : '유통 참여형 펀딩 등록'}
       </h1>
       <p className="text-sm text-gray-500 mb-6">매장 참여를 설득하는 제안서를 작성하세요.</p>
 

@@ -133,10 +133,10 @@ export function ExternalServiceSection() {
             Market Trial 실행은 Neture로 통합. KPA에서는 외부 진입점만 유지. */}
         <ServiceBanner
           icon="🧪"
-          title="시범판매 참여"
+          title="유통 참여형 펀딩 (Market Trial) 참여"
           description="공급자의 신제품을 먼저 체험하고 의견을 공유하세요. (Neture 통합 허브)"
           linkUrl="https://neture.co.kr/market-trial"
-          linkText="Neture에서 시범판매 보기"
+          linkText="Neture에서 보기"
           variant="secondary"
           showDisclaimer={false}
           isInternal={false}

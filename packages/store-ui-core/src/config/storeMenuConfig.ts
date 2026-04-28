@@ -137,7 +137,7 @@ export const GLYCOPHARM_STORE_CONFIG: StoreDashboardConfig = {
     {
       label: '마케팅·콘텐츠',
       items: [
-        { key: 'market-trial', label: 'Market Trial', subPath: '/market-trial' },
+        { key: 'market-trial', label: '유통 참여형 펀딩', subPath: '/market-trial' },
         { key: 'funnel',       label: '전환 퍼널',      subPath: '/funnel' },
         { key: 'content',      label: '콘텐츠 가져오기', subPath: '/content' },
         { key: 'channels',     label: '채널 관리',      subPath: '/channels' },

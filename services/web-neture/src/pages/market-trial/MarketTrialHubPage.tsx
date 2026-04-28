@@ -1,5 +1,5 @@
 /**
- * MarketTrialHubPage — Neture 시범판매 허브
+ * MarketTrialHubPage — Neture 유통 참여형 펀딩(Market Trial) 허브
  *
  * WO-NETURE-MARKET-TRIAL-PARTICIPANT-PAGES-V1
  * KPA-Society MarketTrialHubPage.tsx → Neture canonical 이식
@@ -7,7 +7,7 @@
  * 구조:
  * 1. 헤더 + 허브 설명
  * 2. 참여 안내 (3단 흐름)
- * 3. 내가 참여한 시범판매 (로그인 시)
+ * 3. 내가 참여한 유통 참여형 펀딩 (로그인 시)
  * 4. 모집 중 / 진행 중 / 종료 섹션
  * 5. 포럼/안내 풋터
  */
@@ -88,7 +88,7 @@ export function MarketTrialHubPage() {
     <div style={s.container}>
       {/* 1. 헤더 */}
       <header style={s.header}>
-        <h1 style={s.title}>시범판매 (Market Trial)</h1>
+        <h1 style={s.title}>유통 참여형 펀딩 (Market Trial)</h1>
         <p style={s.subtitle}>
           공급자가 제안한 신제품을 매장에서 먼저 체험하고,
           현장 의견을 공유하는 참여형 프로그램입니다. 모집부터 정산까지 이 공간에서 확인할 수 있습니다.
@@ -98,8 +98,8 @@ export function MarketTrialHubPage() {
       {/* 2. 참여 안내 */}
       <section style={s.guideGrid}>
         {[
-          { step: '1', label: '공급자 제안', desc: '공급자가 신제품 시범판매를 제안하고, 운영자 검토를 거쳐 모집이 오픈됩니다.' },
-          { step: '2', label: '매장 참여', desc: '모집 중인 시범판매에 참여 신청하고, 제품을 직접 체험합니다.' },
+          { step: '1', label: '공급자 제안', desc: '공급자가 신제품 유통 참여형 펀딩을 제안하고, 운영자 검토를 거쳐 모집이 오픈됩니다.' },
+          { step: '2', label: '매장 참여', desc: '모집 중인 유통 참여형 펀딩에 참여 신청하고, 제품을 직접 체험합니다.' },
           { step: '3', label: '결과/정산', desc: '체험 결과를 정리하고, 제품 또는 현금 보상을 선택하여 정산받습니다.' },
         ].map((item) => (
           <div key={item.step} style={s.guideCard}>
@@ -110,9 +110,9 @@ export function MarketTrialHubPage() {
         ))}
       </section>
 
-      {/* 3. 내가 참여한 시범판매 */}
+      {/* 3. 내가 참여한 유통 참여형 펀딩 */}
       {isAuthenticated && myTrials.length > 0 && (
-        <Section title="내가 참여한 시범판매" count={myTrials.length} accentColor="#7C3AED">
+        <Section title="내가 참여한 유통 참여형 펀딩" count={myTrials.length} accentColor="#7C3AED">
           {myTrials.map((trial) => (
             <TrialCard
               key={`my-${trial.id}`}
@@ -177,9 +177,9 @@ export function MarketTrialHubPage() {
       <footer style={s.footer}>
         <div style={s.footerRow}>
           <div>
-            <p style={s.footerTitle}>시범판매 안내</p>
+            <p style={s.footerTitle}>유통 참여형 펀딩 안내</p>
             <p style={s.footerDesc}>
-              개별 시범판매의 토론과 공지는 각 시범판매 상세 페이지에서 확인할 수 있습니다.
+              개별 유통 참여형 펀딩의 토론과 공지는 각 상세 페이지에서 확인할 수 있습니다.
               참여 후 진행 상황과 정산은 "내 참여 내역"에서 추적됩니다.
             </p>
           </div>
@@ -189,8 +189,8 @@ export function MarketTrialHubPage() {
         </div>
         <div style={s.footerNote}>
           <p style={{ fontSize: '0.75rem', color: '#9CA3AF', margin: 0, lineHeight: 1.5 }}>
-            이 공간은 Neture 통합 시범판매 허브입니다.
-            서비스(GlycoPharm / K-Cosmetics / KPA-a 등)에서 노출되는 시범판매도 이곳에서 통합 운영됩니다.
+            이 공간은 Neture 통합 유통 참여형 펀딩 허브입니다.
+            서비스(GlycoPharm / K-Cosmetics / KPA-a 등)에서 노출되는 유통 참여형 펀딩도 이곳에서 통합 운영됩니다.
           </p>
         </div>
       </footer>
@@ -384,10 +384,10 @@ function EmptySection({ isAuthenticated }: { isAuthenticated: boolean }) {
   return (
     <div style={s.emptyBox}>
       <div style={s.emptyIcon}>🧪</div>
-      <p style={s.emptyTitle}>현재 모집 중인 시범판매가 없습니다</p>
+      <p style={s.emptyTitle}>현재 모집 중인 유통 참여형 펀딩이 없습니다</p>
       <p style={s.emptyDesc}>
-        공급자의 새로운 시범판매가 등록되면 이곳에 표시됩니다.
-        시범판매는 운영자 검토를 거쳐 오픈되며, 모집 기간 동안 참여할 수 있습니다.
+        공급자의 새로운 유통 참여형 펀딩이 등록되면 이곳에 표시됩니다.
+        운영자 검토를 거쳐 오픈되며, 모집 기간 동안 참여할 수 있습니다.
       </p>
       {!isAuthenticated && (
         <Link to="/login?redirect=/market-trial" style={s.emptyCta}>

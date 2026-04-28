@@ -1,5 +1,5 @@
 /**
- * MyParticipationsPage — Neture 내 시범판매 참여 내역
+ * MyParticipationsPage — Neture 내 유통 참여형 펀딩(Market Trial) 참여 내역
  *
  * WO-NETURE-MARKET-TRIAL-PARTICIPANT-PAGES-V1
  * KPA-Society MyParticipationsPage.tsx → Neture canonical 이식
@@ -386,10 +386,10 @@ export function MyParticipationsPage() {
     <div style={{ maxWidth: '820px', margin: '0 auto', padding: '32px 16px 64px' }}>
       <div style={{ marginBottom: '24px' }}>
         <Link to="/market-trial" style={{ fontSize: '0.875rem', color: '#6B7280', textDecoration: 'none' }}>
-          ← 시범판매 허브
+          ← 유통 참여형 펀딩 허브
         </Link>
         <h1 style={{ margin: '8px 0 4px', fontSize: '1.5rem', fontWeight: 700, color: '#111827' }}>
-          내가 참여한 시범판매
+          내가 참여한 유통 참여형 펀딩
         </h1>
         <p style={{ margin: 0, color: '#6B7280', fontSize: '0.9375rem' }}>
           참여 내역, 예상 정산 정보, 선택 현황을 확인합니다.
@@ -428,10 +428,10 @@ export function MyParticipationsPage() {
             color: '#9CA3AF',
           }}
         >
-          참여한 시범판매가 없습니다.
+          참여한 유통 참여형 펀딩이 없습니다.
           <div style={{ marginTop: '12px' }}>
             <Link to="/market-trial" style={{ color: '#10B981', fontWeight: 600, textDecoration: 'none' }}>
-              시범판매 허브 →
+              유통 참여형 펀딩 허브 →
             </Link>
           </div>
         </div>

@@ -179,9 +179,9 @@ export default function SupplierDashboardPage() {
               <FlaskConical size={20} color="#fff" />
             </div>
             <div>
-              <h2 className="text-base font-semibold text-violet-900">Market Trial</h2>
+              <h2 className="text-base font-semibold text-violet-900">유통 참여형 펀딩 (Market Trial)</h2>
               <p className="text-sm text-violet-600 mt-0.5">
-                시범 판매를 통해 매장 반응을 확인하고 참여 매장을 모집할 수 있습니다.
+                참여 매장을 모집해 신제품 반응을 확인하고 유통 파트너십을 확보할 수 있습니다.
               </p>
             </div>
           </div>
@@ -423,7 +423,7 @@ function EventKpiCard({
 const QUICK_LINKS = [
   { label: '상품 관리', path: '/supplier/products' },
   { label: '주문 관리', path: '/supplier/orders' },
-  { label: 'Market Trial', path: '/supplier/market-trial' },
+  { label: '유통 참여형 펀딩 (Market Trial)', path: '/supplier/market-trial' },
   { label: '라이브러리', path: '/supplier/library' },
   { label: '판매자 신청', path: '/supplier/requests' },
   { label: '정산 현황', path: '/supplier/orders' },

@@ -63,9 +63,9 @@ const SUPPLIER_SIDEBAR_GROUPS: SidebarGroup[] = [
     items: [{ label: '주문 현황', path: '/supplier/orders' }],
   },
   {
-    label: 'Market Trial',
+    label: '유통 참여형 펀딩',
     icon: FlaskConical,
-    items: [{ label: 'Market Trial', path: '/supplier/market-trial' }],
+    items: [{ label: '유통 참여형 펀딩', path: '/supplier/market-trial' }],
   },
   {
     label: 'Finance',

@@ -16,7 +16,7 @@ import type { GlobalHeaderNavItem } from '@o4o/ui';
 // WO-O4O-GLOBAL-MENU-UPDATE-V1: About → O4O 플랫폼 소개 (위치 유지, /about → /o4o)
 export const NETURE_PUBLIC_NAV: GlobalHeaderNavItem[] = [
   { label: 'Home', href: '/' },
-  { label: 'Market Trial', href: '/market-trial' },
+  { label: '유통 참여형 펀딩', href: '/market-trial' },
   { label: 'Supplier', href: '/supplier' },
   { label: 'Partner', href: '/partner' },
   { label: 'Contact Us', href: '/contact' },

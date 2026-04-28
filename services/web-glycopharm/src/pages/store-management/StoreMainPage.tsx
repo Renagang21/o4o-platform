@@ -52,7 +52,7 @@ import { logStoreAction } from '@/utils/store-action-log';
 const QUICK_ACTIONS = [
   { label: 'B2B 주문', icon: Truck, desc: '공급사 상품 주문 확인', path: '/store/b2b-order', color: '#059669' },
   // WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1: Market Trial은 Neture 통합 허브로 진입
-  { label: 'Market Trial', icon: Tag, desc: 'Neture 시범판매 보기', path: '/store/market-trial', color: '#0d9488' },
+  { label: '유통 참여형 펀딩 (Market Trial)', icon: Tag, desc: 'Neture 허브에서 참여', path: '/store/market-trial', color: '#0d9488' },
   { label: '상품 관리', icon: Package, desc: '상품 목록 및 등록', path: '/store/products', color: '#7c3aed' },
   { label: '사이니지', icon: Tv, desc: '디지털 디스플레이 관리', path: '/store/signage', color: '#2563eb' },
   { label: '콘텐츠', icon: FileText, desc: '콘텐츠 가져오기', path: '/store/content', color: '#ec4899' },

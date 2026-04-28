@@ -183,7 +183,7 @@ export function HomePage() {
       <PageSection>
         <PageContainer>
           <CtaGuidanceSection
-            title="Market Trial"
+            title="유통 참여형 펀딩 (Market Trial)"
             description="서비스 참여자와 함께 제품을 다듬고, 좋은 조건의 유통 환경을 만들어가는 참여형 프로그램"
             href="https://neture.co.kr"
             linkLabel="Neture에서 보기 →"

@@ -45,7 +45,7 @@ export function MarketTrialSection() {
           <span style={styles.icon}>🧪</span>
         </div>
         <div style={styles.content}>
-          <div style={styles.headline}>신제품 시범판매 참여</div>
+          <div style={styles.headline}>유통 참여형 펀딩 (Market Trial) 참여</div>
           <div style={styles.subline}>
             공급자가 제안한 신제품을 먼저 체험해 보세요.
           </div>

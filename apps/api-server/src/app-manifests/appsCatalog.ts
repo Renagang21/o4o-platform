@@ -562,11 +562,11 @@ export const APPS_CATALOG: AppCatalogItem[] = [
   // ============================================
   {
     appId: 'market-trial',
-    name: 'Market Trial',
+    name: '유통 참여형 펀딩 (Market Trial)',
     version: '1.0.0',
-    description: '공급자 상품 시범판매 펀딩 - 판매자/파트너 참여형 시장 테스트 (운영 실험 목적, 자동화 기능 미포함, 정책 변경 가능성 있음)',
+    description: '공급자 상품 유통 참여형 펀딩 - 판매자/파트너 참여형 시장 테스트 (운영 실험 목적, 자동화 기능 미포함, 정책 변경 가능성 있음)',
     category: 'commerce',
-    tags: ['market-trial', '시범판매', 'trial', 'funding', '펀딩', 'supplier', 'seller', 'partner', 'experimental'],
+    tags: ['market-trial', '유통-참여형-펀딩', 'trial', 'funding', '펀딩', 'supplier', 'seller', 'partner', 'experimental'],
     type: 'extension',
     status: 'experimental',
     dependencies: {},

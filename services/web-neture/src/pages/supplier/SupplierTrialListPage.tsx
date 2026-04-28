@@ -65,11 +65,11 @@ export default function SupplierTrialListPage() {
     <div style={s.container}>
       <div style={s.header}>
         <div>
-          <h1 style={s.title}>내 Market Trial</h1>
+          <h1 style={s.title}>내 유통 참여형 펀딩</h1>
           <p style={s.subtitle}>등록한 체험단 목록을 확인하고 결과를 조회합니다.</p>
         </div>
         <button style={s.createBtn} onClick={() => navigate('/supplier/market-trial/new')}>
-          + 새 Trial 등록
+          + 새 펀딩 등록
         </button>
       </div>
 

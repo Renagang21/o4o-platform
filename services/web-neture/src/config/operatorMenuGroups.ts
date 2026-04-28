@@ -35,7 +35,7 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   ],
   approvals: [
     { label: '가입 승인', path: '/operator/applications' },
-    { label: 'Market Trial', path: '/operator/market-trial' },
+    { label: '유통 참여형 펀딩', path: '/operator/market-trial' },
     { label: '서비스 승인', path: '/operator/service-approvals', adminOnly: true },
     { label: '공급사 승인', path: '/operator/admin-suppliers' },
   ],
@@ -135,7 +135,7 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
   users: [{ label: '회원 관리', path: '/operator/users' }],
   approvals: [
     { label: '가입 승인', path: '/operator/applications' },
-    { label: 'Market Trial', path: '/operator/market-trial' },
+    { label: '유통 참여형 펀딩', path: '/operator/market-trial' },
   ],
   // WO-NETURE-OPERATOR-PRODUCTS-UNIFIED-LIST-FINAL-V1: Products 영역 단일 통합
   products: [
