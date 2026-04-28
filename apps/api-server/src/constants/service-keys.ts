@@ -16,6 +16,8 @@ export const SERVICE_KEYS = {
   GLYCOPHARM: 'glycopharm',
   // Event Offer keys (WO-O4O-EVENT-OFFER-NETURE-ADOPTION-V1)
   EVENT_OFFER_NETURE: 'neture-event-offer',
+  // WO-O4O-EVENT-OFFER-KCOS-ADOPTION-V1: K-Cosmetics Event Offer key
+  K_COSMETICS_EVENT_OFFER: 'k-cosmetics-event-offer',
   // Platform-level keys
   KPA_SOCIETY: 'kpa-society',
   K_COSMETICS: 'k-cosmetics',

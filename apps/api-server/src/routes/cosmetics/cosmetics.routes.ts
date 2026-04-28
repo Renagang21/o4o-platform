@@ -37,6 +37,9 @@ import { createStoreSettingsController } from '../o4o-store/controllers/store-se
 import { createCosmeticsCommunityHubController } from './controllers/cosmetics-community-hub.controller.js';
 // WO-KCOS-TOURIST-HUB-STATS-BACKEND-IMPL-V1
 import { createCosmeticsTouristHubController } from './controllers/cosmetics-tourist-hub.controller.js';
+// WO-O4O-EVENT-OFFER-KCOS-ADOPTION-V1
+import { createCosmeticsEventOfferController } from './controllers/event-offer.controller.js';
+import { authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 // WO-O4O-OPERATOR-ACTION-LAYER-V1
 import { createActionQueueRouter } from '../../common/action-queue/index.js';
 import { cosmeticsActionConfig } from './action-definitions.js';
@@ -132,6 +135,14 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
 
   // Tourist Hub — stats (WO-KCOS-TOURIST-HUB-STATS-BACKEND-IMPL-V1)
   router.use('/tourist-hub', createCosmeticsTouristHubController(dataSource));
+
+  // Event Offer (WO-O4O-EVENT-OFFER-KCOS-ADOPTION-V1)
+  // 공통 EventOfferService에 K_COSMETICS_EVENT_OFFER service_key로 호출.
+  // participate() 후처리(STORE_SERVICE_KEY_MAP)에 의해 'k-cosmetics' 매장 진열 자동 연결.
+  router.use(
+    '/event-offers',
+    createCosmeticsEventOfferController(dataSource, authenticate, optionalAuth, requireCosmeticsScope),
+  );
 
   return router;
 }

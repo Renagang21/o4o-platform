@@ -25,11 +25,12 @@ import { resolveStoreAccess } from '../../../utils/store-owner.utils.js';
 // ─── WO-O4O-EVENT-OFFER-STORE-PRODUCT-LINK-V1 ───────────────────────────────
 // Event Offer service_key → Store(매장 진열) service_key 매핑.
 // 매핑된 항목만 참여 후 매장 진열 등록 후처리를 실행한다.
-// 새 서비스 도입 시(K-Cosmetics, Neture 등) 이 맵에 항목 추가만으로 확장 가능.
+// 새 서비스 도입 시 이 맵에 항목 추가만으로 확장 가능.
 const STORE_SERVICE_KEY_MAP: Record<string, string> = {
   [SERVICE_KEYS.KPA_GROUPBUY]: SERVICE_KEYS.KPA,
-  // 후속 WO에서 추가:
-  // [SERVICE_KEYS.EVENT_OFFER_NETURE]: ?,  // Neture는 적용 제외 (WO 명시)
+  // WO-O4O-EVENT-OFFER-KCOS-ADOPTION-V1: K-Cosmetics 적용
+  [SERVICE_KEYS.K_COSMETICS_EVENT_OFFER]: SERVICE_KEYS.K_COSMETICS,
+  // [SERVICE_KEYS.EVENT_OFFER_NETURE]: ?,  // Neture는 적용 제외 (지원 허브)
 };
 
 // ─── 상태 계산 ───────────────────────────────────────────────────────────────
