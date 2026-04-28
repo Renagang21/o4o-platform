@@ -22,21 +22,34 @@ const DEFAULT_USAGE_ITEMS: O4OHelpUsageItem[] = [
   { title: '콘텐츠 활용', description: '매장용 디지털 콘텐츠를 검색하고 활용하세요', href: '#' },
 ];
 
-const DEFAULT_SERVICE_ITEMS: O4OHelpServiceItem[] = [
+/** 전체 서비스 목록. currentServiceKey와 일치하는 항목은 렌더링에서 제외된다. */
+const ALL_SERVICE_ITEMS: O4OHelpServiceItem[] = [
   {
+    serviceKey: 'kpa-society',
+    title: 'KPA Society',
+    description: '약사회 회원을 위한 커뮤니티·학술·서비스 통합 플랫폼입니다',
+    href: 'https://kpa-society.co.kr/',
+    external: true,
+  },
+  {
+    serviceKey: 'glycopharm',
     title: 'GlycoPharm',
     description: '약국 고객의 혈당 관리와 상담을 체계적으로 지원하는 서비스입니다',
-    href: 'https://glycopharm.co.kr',
+    href: 'https://www.glycopharm.co.kr',
+    external: true,
   },
   {
+    serviceKey: 'k-cosmetics',
     title: 'K-Cosmetics',
     description: '약국에서 취급할 수 있는 다양한 제품과 판매 확장을 돕는 서비스입니다',
-    href: 'https://cosmetics.neture.co.kr',
+    href: 'https://www.k-cosmetics.site/',
+    external: true,
   },
   {
+    serviceKey: 'market-trial',
     title: 'Market Trial',
     description: '신제품 체험과 공동구매를 통해 새로운 상품 기회를 확인할 수 있습니다',
-    href: 'https://neture.co.kr',
+    href: 'https://neture.co.kr/market-trial',
     external: true,
   },
 ];
@@ -47,8 +60,13 @@ export function O4OHelpSection({
   usageTitle = '이렇게 사용할 수 있습니다',
   usageItems = DEFAULT_USAGE_ITEMS,
   servicesTitle = '다른 서비스 보기',
-  serviceItems = DEFAULT_SERVICE_ITEMS,
+  serviceItems,
+  currentServiceKey,
 }: O4OHelpSectionProps) {
+  const resolvedServiceItems = serviceItems
+    ?? (currentServiceKey
+      ? ALL_SERVICE_ITEMS.filter((item) => item.serviceKey !== currentServiceKey)
+      : ALL_SERVICE_ITEMS);
   useEffect(() => {
     const id = 'shared-o4ohelp-styles';
     if (document.getElementById(id)) return;
@@ -97,7 +115,7 @@ export function O4OHelpSection({
       <div style={styles.block}>
         <h2 style={styles.blockTitle}>{servicesTitle}</h2>
         <div className="ss-help-service-grid">
-          {serviceItems.map((item) => (
+          {resolvedServiceItems.map((item) => (
             <ServiceCard key={item.title} item={item} />
           ))}
         </div>

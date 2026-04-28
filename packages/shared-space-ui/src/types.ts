@@ -165,6 +165,7 @@ export interface O4OHelpUsageItem {
 }
 
 export interface O4OHelpServiceItem {
+  serviceKey?: string;
   title: string;
   description: string;
   href: string;
@@ -176,6 +177,8 @@ export interface O4OHelpSectionProps {
   usageItems?: O4OHelpUsageItem[];
   servicesTitle?: string;
   serviceItems?: O4OHelpServiceItem[];
+  /** 현재 서비스 키. 일치하는 카드는 목록에서 제외된다. */
+  currentServiceKey?: string;
 }
 
 /* ------------------------------------------------------------------ */

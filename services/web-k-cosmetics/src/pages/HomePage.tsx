@@ -196,7 +196,7 @@ export function HomePage() {
       {/* 5. O4O 도움 + 다른 서비스 (shared) */}
       <PageSection last>
         <PageContainer>
-          <O4OHelpSection />
+          <O4OHelpSection currentServiceKey="k-cosmetics" />
         </PageContainer>
       </PageSection>
     </div>

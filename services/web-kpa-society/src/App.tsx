@@ -94,6 +94,8 @@ import RegisterPendingPage from './pages/auth/RegisterPendingPage';
 
 // Manual Pages (WO-KPA-A-MANUAL-MAIN-PAGE-V1)
 
+// Guide Pages (WO-KPA-GUIDE-INTRO-PAGE-V1)
+import { GuideIntroPage } from './pages/guide/GuideIntroPage';
 
 // Community Home (WO-KPA-COMMUNITY-HOME-V1)
 import { CommunityHomePage } from './pages/CommunityHomePage';
@@ -365,6 +367,9 @@ function App() {
           <Route path="/market-trial/:id" element={<Layout serviceName={SERVICE_NAME}><MarketTrialNetureRedirect /></Layout>} />
 
 
+
+          {/* Guide Pages (WO-KPA-GUIDE-INTRO-PAGE-V1) — public, no auth */}
+          <Route path="/guide/intro" element={<Layout serviceName={SERVICE_NAME}><GuideIntroPage /></Layout>} />
 
           {/* Service Detail Pages (WO-KPA-HOME-SERVICE-SECTION-V1) */}
           <Route path="/services/branch" element={<Navigate to="/" replace />} />
