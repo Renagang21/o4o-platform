@@ -823,7 +823,7 @@ export default function SupplierProductsPage() {
           type="button"
           onClick={(e) => { e.stopPropagation(); setDrawerProduct(row); }}
           className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-600"
-          title="상세 보기"
+          title="상세보기/수정"
         >
           <Eye size={15} />
         </button>
