@@ -18,8 +18,10 @@
 
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
-import { OrganizationProductListing } from '../../../modules/store-core/entities/organization-product-listing.entity.js';
 import { SERVICE_KEYS } from '../../../constants/service-keys.js';
+// WO-O4O-EVENT-OFFER-CREATE-SERVICE-CAPSULE-V1
+import { EventOfferService, EventOfferCreateError } from '../services/event-offer.service.js';
+import { resolveOrganizationForEventOffer } from '../helpers/event-offer-organization.helper.js';
 
 type AuthMiddleware = RequestHandler;
 
@@ -47,16 +49,8 @@ async function resolveSupplierIdByUser(dataSource: DataSource, userId: string): 
   return rows[0]?.id ?? null;
 }
 
-/**
- * KPA 운영자 조직 ID 조회
- * 공급자 제안 OPL의 organization_id로 사용 (KPA Society 관리 조직)
- */
-async function resolveKpaOrgId(dataSource: DataSource): Promise<string | null> {
-  const rows = await dataSource.query(
-    `SELECT organization_id FROM kpa_members WHERE role = 'operator' AND organization_id IS NOT NULL LIMIT 1`
-  );
-  return rows[0]?.organization_id ?? null;
-}
+// WO-O4O-EVENT-OFFER-CREATE-SERVICE-CAPSULE-V1: resolveKpaOrgId() →
+// helpers/event-offer-organization.helper.ts의 resolveOrganizationForEventOffer()로 이동.
 
 export function createSupplierOffersController(
   dataSource: DataSource,
@@ -233,6 +227,10 @@ export function createSupplierOffersController(
   /**
    * POST /kpa/supplier/event-offers
    * SPO → KPA 이벤트 제안 (OPL is_active=false 생성)
+   *
+   * WO-O4O-EVENT-OFFER-CREATE-SERVICE-CAPSULE-V1:
+   *   생성 로직은 EventOfferService.createListing()에 캡슐화됨.
+   *   controller는 입력 파싱 / organization 결정(helper) / 응답 변환만 담당.
    */
   router.post(
     '/event-offers',
@@ -246,95 +244,60 @@ export function createSupplierOffersController(
           return;
         }
 
-        // 공급자 확인
+        // 공급자 계정 연결 확인 (UI fast-fail)
         const supplierId = await resolveSupplierIdByUser(dataSource, userId);
         if (!supplierId) {
           err(res, 403, 'SUPPLIER_NOT_FOUND');
           return;
         }
 
-        // offer 존재 및 소유권 확인
-        const offerRows = await dataSource.query(
-          `SELECT spo.id, spo.master_id, spo.price_general,
-                  spo.approval_status, spo.is_active,
-                  pm.name, org.name AS org_name
-           FROM supplier_product_offers spo
-           JOIN neture_suppliers ns ON ns.id = spo.supplier_id
-           LEFT JOIN organizations org ON org.id = ns.organization_id
-           LEFT JOIN product_masters pm ON pm.id = spo.master_id
-           WHERE spo.id = $1`,
-          [offerId]
-        );
-
-        if (!offerRows.length) {
-          err(res, 404, 'OFFER_NOT_FOUND');
-          return;
-        }
-
-        const offer = offerRows[0];
-
-        // 소유권 검증 — 이 offer가 요청 공급자 소유인지 (join으로 확인)
-        const ownerRows = await dataSource.query(
-          `SELECT spo.id FROM supplier_product_offers spo
-           JOIN neture_suppliers ns ON ns.id = spo.supplier_id
-           WHERE spo.id = $1 AND ns.user_id = $2 LIMIT 1`,
-          [offerId, userId]
-        );
-        if (!ownerRows.length) {
-          err(res, 403, 'OFFER_NOT_OWNED');
-          return;
-        }
-
-        // 중복 제안 방지
-        const dupCheck = await dataSource.query(
-          `SELECT id FROM organization_product_listings
-           WHERE offer_id = $1 AND service_key = $2 LIMIT 1`,
-          [offerId, SERVICE_KEYS.KPA_GROUPBUY]
-        );
-        if (dupCheck.length) {
-          err(res, 409, 'ALREADY_PROPOSED');
-          return;
-        }
-
-        // KPA 조직 ID 조회
-        const orgId = await resolveKpaOrgId(dataSource);
-        if (!orgId) {
+        // 조직 결정 (서비스별 정책은 helper에 위치)
+        const organizationId = await resolveOrganizationForEventOffer({
+          dataSource,
+          userId,
+          roleType: 'supplier',
+          serviceKey: SERVICE_KEYS.KPA_GROUPBUY,
+        });
+        if (!organizationId) {
           err(res, 503, 'ORG_UNAVAILABLE');
           return;
         }
 
-        // OPL 생성 (is_active=false, status='pending' — 운영자가 승인 필요)
-        // WO-O4O-EVENT-OFFER-CORE-REFORM-V1
-        const listingRepo = dataSource.getRepository(OrganizationProductListing);
-        const listing = listingRepo.create({
-          organization_id: orgId,
-          master_id: offer.master_id,
-          offer_id: offerId,
-          service_key: SERVICE_KEYS.KPA_GROUPBUY,
-          is_active: false,
-          status: 'pending',
-          price: offer.price_general ? Number(offer.price_general) : null,
-        } as Partial<OrganizationProductListing>);
-
-        const saved = await listingRepo.save(listing);
-        const proposedAt = (saved.created_at instanceof Date
-          ? saved.created_at
-          : new Date(saved.created_at)
-        ).toISOString();
+        // 생성 — 검증/소유권/중복/INSERT 모두 service에서 처리
+        const service = new EventOfferService(dataSource);
+        const result = await service.createListing({
+          offerId,
+          serviceKey: SERVICE_KEYS.KPA_GROUPBUY,
+          organizationId,
+          roleType: 'supplier',
+          ownerUserId: userId,
+        });
 
         res.status(201).json({
           success: true,
           data: {
-            id: saved.id,
-            offerId,
-            title: offer.name || '(상품명 없음)',
-            supplierName: offer.org_name || '(공급사 없음)',
-            status: 'pending',
-            isActive: false,
-            proposedAt,
+            id: result.id,
+            offerId: result.offerId,
+            title: result.title,
+            supplierName: result.supplierName,
+            status: result.status,
+            isActive: result.isActive,
+            proposedAt: result.createdAt,
           },
         });
       } catch (error: any) {
+        if (error instanceof EventOfferCreateError) {
+          // service 에러 코드를 controller 응답 코드로 매핑 (기존 에러코드 호환)
+          const map: Record<string, keyof typeof ERROR_CODES> = {
+            OFFER_NOT_FOUND: 'OFFER_NOT_FOUND',
+            OFFER_NOT_OWNED: 'OFFER_NOT_OWNED',
+            ALREADY_LISTED: 'ALREADY_PROPOSED',
+            INTERNAL_ERROR: 'INTERNAL_ERROR',
+          };
+          const mapped = map[error.code] ?? 'INTERNAL_ERROR';
+          err(res, error.statusCode, mapped);
+          return;
+        }
         console.error('[supplier/event-offers POST] error:', error);
         err(res, 500, 'INTERNAL_ERROR');
       }

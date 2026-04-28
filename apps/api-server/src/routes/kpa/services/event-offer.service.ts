@@ -768,6 +768,122 @@ export class EventOfferService {
       ],
     );
   }
+
+  // ─── WO-O4O-EVENT-OFFER-CREATE-SERVICE-CAPSULE-V1 ─────────────────────────
+  // Event Offer (organization_product_listing) 생성을 service에 캡슐화.
+  // 두 controller(supplier-offers, event-offer-operator)에 흩어진 INSERT 로직을 통합.
+  //
+  // 책임:
+  //   service: offer 검증 / 소유권 검증(supplier) / 중복 체크 / 정책 분기 / INSERT
+  //   controller: organizationId 결정(helper 호출) / 응답 포맷 변환
+  //
+  // 정책:
+  //   roleType='supplier'  → status='pending',  is_active=false (운영자 승인 대기)
+  //   roleType='operator'  → status='approved', is_active=true  (즉시 노출)
+  //
+  // 중복 방지: (organization_id, service_key, offer_id)
+
+  async createListing(input: {
+    offerId: string;
+    serviceKey: string;
+    organizationId: string;
+    roleType: 'supplier' | 'operator';
+    /** roleType='supplier'일 때 offer 소유권 검증용 (해당 offer의 supplier가 이 user에 매핑되는지) */
+    ownerUserId?: string;
+  }): Promise<{
+    id: string;
+    offerId: string;
+    masterId: string;
+    title: string;
+    supplierName: string;
+    status: 'pending' | 'approved';
+    isActive: boolean;
+    price: number | null;
+    createdAt: string;
+  }> {
+    // 1. Offer 조회 (master_id, supplier_id, price, name, supplier org_name)
+    const offerRows = await this.dataSource.query(
+      `SELECT spo.id, spo.master_id, spo.supplier_id, spo.price_general,
+              pm.name AS product_name,
+              org.name AS org_name
+       FROM supplier_product_offers spo
+       LEFT JOIN product_masters pm ON pm.id = spo.master_id
+       LEFT JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+       LEFT JOIN organizations org   ON org.id = ns.organization_id
+       WHERE spo.id = $1
+       LIMIT 1`,
+      [input.offerId],
+    );
+    if (!offerRows.length) {
+      throw new EventOfferCreateError(404, 'Offer not found', 'OFFER_NOT_FOUND');
+    }
+    const offer = offerRows[0];
+
+    // 2. roleType='supplier'이면 소유권 검증
+    if (input.roleType === 'supplier') {
+      if (!input.ownerUserId) {
+        throw new EventOfferCreateError(
+          403,
+          'ownerUserId required for supplier role',
+          'OFFER_NOT_OWNED',
+        );
+      }
+      const ownerRows = await this.dataSource.query(
+        `SELECT 1 FROM neture_suppliers
+         WHERE id = $1 AND user_id = $2 LIMIT 1`,
+        [offer.supplier_id, input.ownerUserId],
+      );
+      if (!ownerRows.length) {
+        throw new EventOfferCreateError(403, 'Offer not owned', 'OFFER_NOT_OWNED');
+      }
+    }
+
+    // 3. 중복 체크 (organization_id, service_key, offer_id)
+    const dup = await this.dataSource.query(
+      `SELECT id FROM organization_product_listings
+       WHERE organization_id = $1 AND service_key = $2 AND offer_id = $3
+       LIMIT 1`,
+      [input.organizationId, input.serviceKey, input.offerId],
+    );
+    if (dup.length) {
+      throw new EventOfferCreateError(409, 'Already listed', 'ALREADY_LISTED');
+    }
+
+    // 4. 정책 분기 (status / is_active)
+    const status: 'pending' | 'approved' =
+      input.roleType === 'operator' ? 'approved' : 'pending';
+    const isActive = input.roleType === 'operator';
+
+    // 5. INSERT
+    const listingRepo = this.dataSource.getRepository(OrganizationProductListing);
+    const listing = listingRepo.create({
+      organization_id: input.organizationId,
+      master_id: offer.master_id,
+      offer_id: input.offerId,
+      service_key: input.serviceKey,
+      is_active: isActive,
+      status,
+      price: offer.price_general != null ? Number(offer.price_general) : null,
+    } as Partial<OrganizationProductListing>);
+
+    const saved = await listingRepo.save(listing);
+    const createdAt = (saved.created_at instanceof Date
+      ? saved.created_at
+      : new Date(saved.created_at)
+    ).toISOString();
+
+    return {
+      id: saved.id,
+      offerId: input.offerId,
+      masterId: offer.master_id,
+      title: offer.product_name || '(상품명 없음)',
+      supplierName: offer.org_name || '(공급사 없음)',
+      status,
+      isActive,
+      price: offer.price_general != null ? Number(offer.price_general) : null,
+      createdAt,
+    };
+  }
 }
 
 /**
@@ -781,5 +897,26 @@ export class EventOfferError extends Error {
   ) {
     super(message);
     this.name = 'EventOfferError';
+  }
+}
+
+/**
+ * WO-O4O-EVENT-OFFER-CREATE-SERVICE-CAPSULE-V1
+ * Typed error for createListing() — controller가 statusCode + code를 응답에 매핑.
+ */
+export type EventOfferCreateErrorCode =
+  | 'OFFER_NOT_FOUND'
+  | 'OFFER_NOT_OWNED'
+  | 'ALREADY_LISTED'
+  | 'INTERNAL_ERROR';
+
+export class EventOfferCreateError extends Error {
+  constructor(
+    public readonly statusCode: number,
+    message: string,
+    public readonly code: EventOfferCreateErrorCode,
+  ) {
+    super(message);
+    this.name = 'EventOfferCreateError';
   }
 }
