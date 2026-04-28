@@ -298,49 +298,52 @@ export class GroupbuyService {
    * POST /:id/participate — Create groupbuy order via checkoutService
    *
    * WO-EVENT-OFFER-FIX-V1: checkout_orders 사용, metadata.serviceKey 전파
-   * WO-O4O-EVENT-OFFER-CORE-REFORM-V1: total_quantity 검증 추가
+   * WO-O4O-EVENT-OFFER-CORE-REFORM-V1: total_quantity 검증
+   * WO-O4O-EVENT-OFFER-QUANTITY-LIMITS-V1:
+   *   - per_order_limit: 1회 주문 수량 상한
+   *   - per_store_limit: 매장별 누적 구매 상한
+   *   - total_quantity: 원자적 차감 (SELECT FOR UPDATE → UPDATE)
+   *   - 주문 실패 시 차감량 보상 (compensation increment)
    */
   async participate(
     listingId: string,
     userId: string,
     data: { quantity?: number },
   ): Promise<{ orderId: string; orderNumber: string; status: string; totalAmount: number }> {
-    // 1. listing 조회 (status + 날짜 조건 적용)
-    const listingRows = await this.dataSource.query(
-      `SELECT opl.*
+    const quantity = Math.max(1, parseInt(String(data?.quantity)) || 1);
+
+    // ── Step 1: Supplier product 정보 사전 조회 (lock 전) ──────────────────
+    // listing은 lock 이후 재조회하므로 여기서는 supplier 정보만 가져옴
+    // (supplier 정보는 별도 row라 lock 범위 밖에서 조회해도 안전)
+    // → listing 먼저 찾아서 offer_id 확보
+    const preLockRows = await this.dataSource.query(
+      `SELECT opl.id, opl.offer_id, opl.organization_id, opl.service_key,
+              opl.status, opl.start_at, opl.end_at
        FROM organization_product_listings opl
        WHERE opl.id = $1
          AND opl.service_key = $2
-         AND ${ACTIVE_OFFER_CLAUSE}
+         AND opl.status = 'approved'
+         AND (opl.start_at IS NULL OR NOW() >= opl.start_at)
+         AND (opl.end_at   IS NULL OR NOW() <= opl.end_at)
        LIMIT 1`,
       [listingId, SERVICE_KEYS.KPA_GROUPBUY],
     );
-    if (!listingRows.length) {
-      throw new GroupbuyError(404, 'Product not found');
+    if (!preLockRows.length) {
+      throw new GroupbuyError(404, '이벤트를 찾을 수 없거나 진행 중이 아닙니다.');
     }
-    const listing = listingRows[0];
+    const preListing = preLockRows[0];
 
-    // 2. 총 수량 소진 검증 (1차: total_quantity만 적용)
-    if (listing.total_quantity !== null && listing.total_quantity <= 0) {
-      throw new GroupbuyError(400, '판매 종료된 이벤트입니다.', 'SOLD_OUT');
-    }
-
-    const quantity = Math.max(1, parseInt(String(data?.quantity)) || 1);
-
-    // 3. Supplier product 활성/승인 검증 + 가격 조회
+    // ── Step 2: Supplier product 검증 ────────────────────────────────────
     const productRows = await this.dataSource.query(
       `SELECT spo.id AS spo_id, spo.supplier_id, spo.price_general, spo.is_active,
-              spo.approval_status, s.status AS supplier_status,
-              pm.name
+              spo.approval_status, s.status AS supplier_status, pm.name
        FROM supplier_product_offers spo
-       JOIN neture_suppliers s ON s.id = spo.supplier_id
-       JOIN product_masters pm ON pm.id = spo.master_id
+       JOIN neture_suppliers s  ON s.id  = spo.supplier_id
+       JOIN product_masters pm  ON pm.id = spo.master_id
        WHERE spo.id = $1`,
-      [listing.offer_id],
+      [preListing.offer_id],
     );
-    if (!productRows.length) {
-      throw new GroupbuyError(404, 'Supplier product not found');
-    }
+    if (!productRows.length) throw new GroupbuyError(404, 'Supplier product not found');
     const product = productRows[0];
     if (!product.is_active) throw new GroupbuyError(400, 'Product is not active', 'PRODUCT_INACTIVE');
     if (product.approval_status !== 'APPROVED') throw new GroupbuyError(400, 'Product is not approved', 'PRODUCT_NOT_APPROVED');
@@ -349,34 +352,149 @@ export class GroupbuyService {
     const unitPrice = Number(product.price_general ?? 0);
     if (unitPrice <= 0) throw new GroupbuyError(400, 'Invalid product price', 'INVALID_PRICE');
 
-    const subtotal = quantity * unitPrice;
+    // ── Step 3: 수량 제한 검증 + total_quantity 원자적 차감 ──────────────
+    // SELECT FOR UPDATE → 동시 주문 시 race condition 방지
+    const qr = this.dataSource.createQueryRunner();
+    await qr.connect();
+    await qr.startTransaction();
 
-    // 4. 주문 생성 (checkoutService 경유 — CLAUDE.md 규칙)
-    const savedOrder = await checkoutService.createOrder({
-      buyerId: userId,
-      sellerId: listing.organization_id,
-      supplierId: product.supplier_id,
-      items: [{
-        productId: listing.offer_id,
-        productName: product.name || '',
-        quantity,
-        unitPrice,
-        subtotal,
-      }],
-      metadata: {
-        serviceKey: listing.service_key,
-        productListingId: listing.id,
-        productName: product.name || '',
-        productId: listing.offer_id,
-      },
-    });
+    let decremented = false;
 
-    return {
-      orderId: savedOrder.id,
-      orderNumber: savedOrder.orderNumber,
-      status: savedOrder.status,
-      totalAmount: savedOrder.totalAmount,
-    };
+    try {
+      // Row 잠금 + 최신 수량 정보 획득
+      const [listing] = await qr.query(
+        `SELECT id, offer_id, organization_id, service_key, status,
+                start_at, end_at, total_quantity, per_store_limit, per_order_limit
+         FROM organization_product_listings
+         WHERE id = $1 AND service_key = $2
+           AND status = 'approved'
+           AND (start_at IS NULL OR NOW() >= start_at)
+           AND (end_at   IS NULL OR NOW() <= end_at)
+         FOR UPDATE`,
+        [listingId, SERVICE_KEYS.KPA_GROUPBUY],
+      );
+      if (!listing) {
+        await qr.rollbackTransaction();
+        throw new GroupbuyError(404, '이벤트를 찾을 수 없거나 진행 중이 아닙니다.');
+      }
+
+      // (A) per_order_limit: 1회 주문 수량 상한
+      if (listing.per_order_limit !== null && quantity > Number(listing.per_order_limit)) {
+        await qr.rollbackTransaction();
+        throw new GroupbuyError(
+          400,
+          `1회 최대 ${listing.per_order_limit}개까지 주문 가능합니다.`,
+          'PER_ORDER_LIMIT_EXCEEDED',
+        );
+      }
+
+      // (B) total_quantity: 잔여 수량 검증
+      if (listing.total_quantity !== null) {
+        const remaining = Number(listing.total_quantity);
+        if (remaining <= 0) {
+          await qr.rollbackTransaction();
+          throw new GroupbuyError(400, '판매 종료된 이벤트입니다.', 'SOLD_OUT');
+        }
+        if (remaining < quantity) {
+          await qr.rollbackTransaction();
+          throw new GroupbuyError(
+            400,
+            `잔여 수량이 ${remaining}개입니다. 수량을 줄여 다시 시도해 주세요.`,
+            'INSUFFICIENT_QUANTITY',
+          );
+        }
+      }
+
+      // (C) per_store_limit: 매장별 누적 구매 상한
+      if (listing.per_store_limit !== null) {
+        const [storeRow] = await qr.query(
+          `SELECT COALESCE(
+             SUM((elem->>'quantity')::int), 0
+           )::int AS total_ordered
+           FROM checkout_orders co
+           CROSS JOIN jsonb_array_elements(co.items) AS elem
+           WHERE co."buyerId" = $1
+             AND co.metadata->>'productListingId' = $2
+             AND co.status NOT IN ('canceled', 'failed')`,
+          [userId, listingId],
+        );
+        const alreadyOrdered = Number(storeRow?.total_ordered ?? 0);
+        const perStoreLimit = Number(listing.per_store_limit);
+        if (alreadyOrdered + quantity > perStoreLimit) {
+          const canOrder = perStoreLimit - alreadyOrdered;
+          await qr.rollbackTransaction();
+          throw new GroupbuyError(
+            400,
+            canOrder <= 0
+              ? '매장 구매 한도를 이미 초과하였습니다.'
+              : `매장 구매 한도까지 ${canOrder}개 더 주문 가능합니다.`,
+            'PER_STORE_LIMIT_EXCEEDED',
+          );
+        }
+      }
+
+      // (D) total_quantity 원자적 차감 (수량 있는 경우만)
+      if (listing.total_quantity !== null) {
+        await qr.query(
+          `UPDATE organization_product_listings
+           SET total_quantity = total_quantity - $1, updated_at = NOW()
+           WHERE id = $2`,
+          [quantity, listingId],
+        );
+        decremented = true;
+      }
+
+      await qr.commitTransaction();
+    } catch (e) {
+      if (qr.isTransactionActive) await qr.rollbackTransaction();
+      throw e;
+    } finally {
+      await qr.release();
+    }
+
+    // ── Step 4: 주문 생성 (checkoutService 경유 — CLAUDE.md 규칙) ────────
+    try {
+      const savedOrder = await checkoutService.createOrder({
+        buyerId: userId,
+        sellerId: preListing.organization_id,
+        supplierId: product.supplier_id,
+        items: [{
+          productId: preListing.offer_id,
+          productName: product.name || '',
+          quantity,
+          unitPrice,
+          subtotal: quantity * unitPrice,
+        }],
+        metadata: {
+          serviceKey: preListing.service_key,
+          productListingId: preListing.id,
+          productName: product.name || '',
+          productId: preListing.offer_id,
+        },
+      });
+
+      return {
+        orderId: savedOrder.id,
+        orderNumber: savedOrder.orderNumber,
+        status: savedOrder.status,
+        totalAmount: savedOrder.totalAmount,
+      };
+    } catch (orderErr) {
+      // ── Step 5: 주문 실패 시 차감량 보상 (compensation) ────────────────
+      if (decremented) {
+        try {
+          await this.dataSource.query(
+            `UPDATE organization_product_listings
+             SET total_quantity = total_quantity + $1, updated_at = NOW()
+             WHERE id = $2`,
+            [quantity, listingId],
+          );
+        } catch (compErr) {
+          console.error('[GroupbuyService] Compensation increment failed:', compErr);
+        }
+      }
+      throw orderErr;
+    }
   }
 }
 
