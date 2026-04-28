@@ -94,8 +94,12 @@ import RegisterPendingPage from './pages/auth/RegisterPendingPage';
 
 // Manual Pages (WO-KPA-A-MANUAL-MAIN-PAGE-V1)
 
-// Guide Pages (WO-KPA-GUIDE-INTRO-PAGE-V1)
+// Guide Pages (WO-KPA-GUIDE-INTRO-PAGE-V1 / WO-KPA-GUIDE-INTRO-SUBPAGES-V1)
 import { GuideIntroPage } from './pages/guide/GuideIntroPage';
+import { GuideIntroStructurePage } from './pages/guide/GuideIntroStructurePage';
+import { GuideIntroKpaPage } from './pages/guide/GuideIntroKpaPage';
+import { GuideIntroOperationPage } from './pages/guide/GuideIntroOperationPage';
+import { GuideIntroConceptPage } from './pages/guide/GuideIntroConceptPage';
 
 // Community Home (WO-KPA-COMMUNITY-HOME-V1)
 import { CommunityHomePage } from './pages/CommunityHomePage';
@@ -368,8 +372,12 @@ function App() {
 
 
 
-          {/* Guide Pages (WO-KPA-GUIDE-INTRO-PAGE-V1) — public, no auth */}
+          {/* Guide Pages (WO-KPA-GUIDE-INTRO-PAGE-V1 / WO-KPA-GUIDE-INTRO-SUBPAGES-V1) — public, no auth */}
           <Route path="/guide/intro" element={<Layout serviceName={SERVICE_NAME}><GuideIntroPage /></Layout>} />
+          <Route path="/guide/intro/structure" element={<Layout serviceName={SERVICE_NAME}><GuideIntroStructurePage /></Layout>} />
+          <Route path="/guide/intro/kpa" element={<Layout serviceName={SERVICE_NAME}><GuideIntroKpaPage /></Layout>} />
+          <Route path="/guide/intro/operation" element={<Layout serviceName={SERVICE_NAME}><GuideIntroOperationPage /></Layout>} />
+          <Route path="/guide/intro/concept" element={<Layout serviceName={SERVICE_NAME}><GuideIntroConceptPage /></Layout>} />
 
           {/* Service Detail Pages (WO-KPA-HOME-SERVICE-SECTION-V1) */}
           <Route path="/services/branch" element={<Navigate to="/" replace />} />
