@@ -19,6 +19,7 @@ import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { OrganizationProductListing } from '../../../modules/store-core/entities/organization-product-listing.entity.js';
 import { supplierStatsService } from '../services/supplier-stats.service.js';
+import { resolveEventStatus } from '../services/groupbuy.service.js';
 import { KPA_SCOPE_CONFIG } from '@o4o/security-core';
 import { createMembershipScopeGuard } from '../../../common/middleware/membership-guard.middleware.js';
 
@@ -37,7 +38,10 @@ interface GroupbuyProduct {
   order: number;
   startDate: string;
   endDate: string;
-  status: 'upcoming' | 'active' | 'ended';
+  status: 'pending' | 'approved' | 'active' | 'ended' | 'canceled';
+  startAt: string | null;
+  endAt: string | null;
+  totalQuantity: number | null;
 }
 
 interface AvailableOffer {
@@ -166,23 +170,27 @@ export function createGroupbuyOperatorController(
         const rows = await dataSource.query(`
           SELECT
             opl.id,
-            opl.offer_id AS "offerId",
-            opl.is_active AS "isVisible",
-            opl.created_at AS "startDate",
-            COALESCE(pm.name, '(상품명 없음)') AS title,
+            opl.offer_id        AS "offerId",
+            opl.is_active       AS "isVisible",
+            opl.status          AS "dbStatus",
+            opl.start_at        AS "startAt",
+            opl.end_at          AS "endAt",
+            opl.total_quantity  AS "totalQuantity",
+            opl.created_at      AS "startDate",
+            COALESCE(pm.name, '(상품명 없음)')  AS title,
             COALESCE(org.name, '(공급사 없음)') AS "supplierName",
             CONCAT('단가: ', COALESCE(spo.price_general::text, '미정'), '원') AS "conditionSummary",
-            COALESCE(oc.order_count, 0)::int AS "orderCount",
-            COALESCE(oc.participant_count, 0)::int AS "participantCount"
+            COALESCE(oc.order_count, 0)::int        AS "orderCount",
+            COALESCE(oc.participant_count, 0)::int  AS "participantCount"
           FROM organization_product_listings opl
           LEFT JOIN supplier_product_offers spo ON spo.id = opl.offer_id
-          LEFT JOIN neture_suppliers ns ON ns.id = spo.supplier_id
-          LEFT JOIN organizations org ON org.id = ns.organization_id
-          LEFT JOIN product_masters pm ON pm.id = opl.master_id
+          LEFT JOIN neture_suppliers ns          ON ns.id  = spo.supplier_id
+          LEFT JOIN organizations org            ON org.id = ns.organization_id
+          LEFT JOIN product_masters pm           ON pm.id  = opl.master_id
           LEFT JOIN (
             SELECT
               metadata->>'productListingId' AS listing_id,
-              COUNT(*)::int AS order_count,
+              COUNT(*)::int                  AS order_count,
               COUNT(DISTINCT "buyerId")::int AS participant_count
             FROM checkout_orders
             WHERE metadata->>'serviceKey' = 'kpa-groupbuy'
@@ -208,7 +216,10 @@ export function createGroupbuyOperatorController(
             order: idx,
             startDate: dateStr,
             endDate: dateStr,
-            status: 'active' as const,
+            status: resolveEventStatus({ status: r.dbStatus, start_at: r.startAt, end_at: r.endAt }),
+            startAt: r.startAt ? new Date(r.startAt).toISOString() : null,
+            endAt: r.endAt ? new Date(r.endAt).toISOString() : null,
+            totalQuantity: r.totalQuantity !== null ? Number(r.totalQuantity) : null,
           };
         });
 
@@ -231,12 +242,14 @@ export function createGroupbuyOperatorController(
         const { id } = req.params;
         const { isVisible } = req.body;
 
+        // WO-O4O-EVENT-OFFER-CORE-REFORM-V1: is_active + status 동시 업데이트
+        const newStatus = isVisible ? 'approved' : 'canceled';
         const result = await dataSource.query(
           `UPDATE organization_product_listings
-           SET is_active = $1, updated_at = NOW()
-           WHERE id = $2 AND service_key = 'kpa-groupbuy'
+           SET is_active = $1, status = $2, updated_at = NOW()
+           WHERE id = $3 AND service_key = 'kpa-groupbuy'
            RETURNING id, is_active`,
-          [isVisible, id]
+          [isVisible, newStatus, id]
         );
 
         if (!result.length) {
@@ -327,12 +340,14 @@ export function createGroupbuyOperatorController(
         const offer = offerRows[0];
         const listingRepo = dataSource.getRepository(OrganizationProductListing);
 
+        // WO-O4O-EVENT-OFFER-CORE-REFORM-V1: 운영자 직접 추가 → status='approved' (즉시 노출)
         const listing = listingRepo.create({
           organization_id: organizationId,
           master_id: offer.master_id,
           offer_id: offerId,
           service_key: 'kpa-groupbuy',
           is_active: true,
+          status: 'approved',
           price: offer.price_general ? Number(offer.price_general) : null,
         } as Partial<OrganizationProductListing>);
 
@@ -356,7 +371,10 @@ export function createGroupbuyOperatorController(
             order: 0,
             startDate: createdAt,
             endDate: createdAt,
-            status: 'active' as const,
+            status: 'approved' as const,
+            startAt: null,
+            endAt: null,
+            totalQuantity: null,
           } as GroupbuyProduct,
         });
       } catch (error: any) {
@@ -376,9 +394,10 @@ export function createGroupbuyOperatorController(
       try {
         const { id } = req.params;
 
+        // WO-O4O-EVENT-OFFER-CORE-REFORM-V1: 소프트 삭제 → is_active=false + status='canceled'
         const result = await dataSource.query(
           `UPDATE organization_product_listings
-           SET is_active = false, updated_at = NOW()
+           SET is_active = false, status = 'canceled', updated_at = NOW()
            WHERE id = $1 AND service_key = 'kpa-groupbuy'
            RETURNING id`,
           [id]

@@ -301,11 +301,16 @@ export interface GroupbuyProduct {
 }
 
 // 이벤트 상품 (Enriched, WO-EVENT-OFFER-HUB-TABLE-AND-DIRECT-ORDER-REFINE-V1)
+// WO-O4O-EVENT-OFFER-CORE-REFORM-V1: status / startAt / endAt 추가
 export interface EventOfferItem {
   id: string;
   offerId: string;
   price: number | null;
   isActive: boolean;
+  /** 런타임 계산 상태: pending | approved(곧 시작) | active(진행중) | ended(종료) | canceled */
+  status: 'pending' | 'approved' | 'active' | 'ended' | 'canceled';
+  startAt: string | null;
+  endAt: string | null;
   createdAt: string;
   updatedAt: string;
   supplierId: string;

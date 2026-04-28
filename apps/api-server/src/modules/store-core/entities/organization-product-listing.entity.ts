@@ -41,6 +41,34 @@ export class OrganizationProductListing {
   @Column({ type: 'boolean', default: false })
   is_active: boolean;
 
+  /**
+   * WO-O4O-EVENT-OFFER-CORE-REFORM-V1
+   * 이벤트 상태: pending(대기) | approved(승인) | canceled(취소)
+   * active/ended는 start_at/end_at 기반 런타임 계산값
+   */
+  @Column({ type: 'varchar', length: 20, default: 'pending' })
+  status: string;
+
+  /** 이벤트 시작일시 (null = 즉시 시작) */
+  @Column({ name: 'start_at', type: 'timestamp', nullable: true })
+  start_at: Date | null;
+
+  /** 이벤트 종료일시 (null = 무기한) */
+  @Column({ name: 'end_at', type: 'timestamp', nullable: true })
+  end_at: Date | null;
+
+  /** 총 수량 제한 (null = 무제한) */
+  @Column({ name: 'total_quantity', type: 'integer', nullable: true })
+  total_quantity: number | null;
+
+  /** 매장별 구매 제한 (null = 무제한) */
+  @Column({ name: 'per_store_limit', type: 'integer', nullable: true })
+  per_store_limit: number | null;
+
+  /** 1회 구매 제한 (null = 무제한) */
+  @Column({ name: 'per_order_limit', type: 'integer', nullable: true })
+  per_order_limit: number | null;
+
   @Column({ name: 'master_id', type: 'uuid' })
   master_id: string;
 

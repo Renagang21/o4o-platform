@@ -25,6 +25,15 @@ import {
 
 type StatusFilter = 'all' | 'visible' | 'hidden';
 
+// WO-O4O-EVENT-OFFER-CORE-REFORM-V1: 상태별 배지 정의
+const STATUS_BADGE: Record<string, { label: string; bg: string; color: string }> = {
+  pending:  { label: '대기중', bg: '#FEF3C7', color: '#D97706' },
+  approved: { label: '승인',   bg: '#D1FAE5', color: '#059669' },
+  active:   { label: '진행중', bg: '#D1FAE5', color: '#059669' },
+  ended:    { label: '종료',   bg: '#F3F4F6', color: '#6B7280' },
+  canceled: { label: '취소',   bg: '#FEE2E2', color: '#DC2626' },
+};
+
 const PAGE_TEXT = {
   title: '이벤트 관리',
   subtitle: '서비스에 노출할 이벤트를 등록하고 표시 상태를 관리합니다.',
@@ -423,9 +432,22 @@ export function EventOfferManagePage() {
                       {product.participantCount}곳
                     </span>
                     <span style={{ ...styles.colCenter, width: 80 }}>
-                      <span style={product.isVisible ? styles.badgeVisible : styles.badgeHidden}>
-                        {product.isVisible ? PAGE_TEXT.filterVisible : PAGE_TEXT.filterHidden}
-                      </span>
+                      {(() => {
+                        const b = STATUS_BADGE[product.status] ?? STATUS_BADGE.pending;
+                        return (
+                          <span style={{
+                            display: 'inline-block',
+                            padding: '3px 8px',
+                            borderRadius: '12px',
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            backgroundColor: b.bg,
+                            color: b.color,
+                          }}>
+                            {b.label}
+                          </span>
+                        );
+                      })()}
                     </span>
                     <span style={{ ...styles.colCenter, width: 64, fontSize: 12, color: colors.neutral500 }}>
                       {formatDate(product.startDate)}

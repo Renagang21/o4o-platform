@@ -187,20 +187,22 @@ export function createSupplierOffersController(
           return;
         }
 
+        // WO-O4O-EVENT-OFFER-CORE-REFORM-V1: DB status 필드를 직접 노출
         const rows = await dataSource.query(`
           SELECT
             opl.id,
-            opl.offer_id AS "offerId",
-            opl.is_active AS "isActive",
+            opl.offer_id   AS "offerId",
+            opl.is_active  AS "isActive",
+            opl.status,
             opl.created_at AS "proposedAt",
-            COALESCE(pm.name, '(상품명 없음)') AS title,
+            COALESCE(pm.name, '(상품명 없음)')  AS title,
             COALESCE(org.name, '(공급사 없음)') AS "supplierName",
-            spo.price_general::numeric AS price
+            spo.price_general::numeric          AS price
           FROM organization_product_listings opl
           JOIN supplier_product_offers spo ON spo.id = opl.offer_id
-          JOIN neture_suppliers ns ON ns.id = spo.supplier_id
-          LEFT JOIN organizations org ON org.id = ns.organization_id
-          LEFT JOIN product_masters pm ON pm.id = spo.master_id
+          JOIN neture_suppliers ns          ON ns.id  = spo.supplier_id
+          LEFT JOIN organizations org       ON org.id = ns.organization_id
+          LEFT JOIN product_masters pm      ON pm.id  = spo.master_id
           WHERE opl.service_key = 'kpa-groupbuy'
             AND spo.supplier_id = $1
           ORDER BY opl.created_at DESC
@@ -213,7 +215,7 @@ export function createSupplierOffersController(
           supplierName: r.supplierName,
           price: r.price,
           isActive: r.isActive,
-          status: r.isActive ? 'active' : 'pending',
+          status: r.status,   // DB 값 직접 노출 (pending | approved | canceled)
           proposedAt: r.proposedAt instanceof Date
             ? r.proposedAt.toISOString()
             : String(r.proposedAt || ''),
@@ -300,7 +302,8 @@ export function createSupplierOffersController(
           return;
         }
 
-        // OPL 생성 (is_active=false — 운영자가 활성화 필요)
+        // OPL 생성 (is_active=false, status='pending' — 운영자가 승인 필요)
+        // WO-O4O-EVENT-OFFER-CORE-REFORM-V1
         const listingRepo = dataSource.getRepository(OrganizationProductListing);
         const listing = listingRepo.create({
           organization_id: orgId,
@@ -308,6 +311,7 @@ export function createSupplierOffersController(
           offer_id: offerId,
           service_key: 'kpa-groupbuy',
           is_active: false,
+          status: 'pending',
           price: offer.price_general ? Number(offer.price_general) : null,
         } as Partial<OrganizationProductListing>);
 

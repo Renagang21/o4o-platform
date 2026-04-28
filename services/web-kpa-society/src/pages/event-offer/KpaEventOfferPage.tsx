@@ -227,9 +227,18 @@ export function KpaEventOfferPage() {
   const formatDate = (dateStr: string) => new Date(dateStr).toLocaleDateString('ko-KR');
 
   const formatPeriod = (item: EventOfferItem) => {
-    const start = formatDate(item.createdAt);
-    if (item.isActive) return `${start} ~`;
-    return `${start} ~ ${formatDate(item.updatedAt)}`;
+    const start = item.startAt ? formatDate(item.startAt) : formatDate(item.createdAt);
+    const end = item.endAt ? formatDate(item.endAt) : null;
+    if (item.status === 'active' || (item.status === 'approved' && !item.startAt)) return `${start} ~`;
+    if (end) return `${start} ~ ${end}`;
+    return `${start} ~`;
+  };
+
+  // WO-O4O-EVENT-OFFER-CORE-REFORM-V1: 런타임 상태 기반 배지
+  const getStatusBadge = (item: EventOfferItem): { style: React.CSSProperties; label: string } => {
+    if (item.status === 'approved') return { style: styles.badgeSoon, label: '곧 시작' };
+    if (item.status === 'active' || item.isActive) return { style: styles.badgeActive, label: '진행중' };
+    return { style: styles.badgeEnded, label: '종료' };
   };
 
   const getGroupSubtotal = (groupItems: EventOfferItem[]) =>
@@ -416,9 +425,7 @@ export function KpaEventOfferPage() {
                   {formatPeriod(item)}
                 </span>
                 <span style={{ ...styles.colCenter, width: 80 }}>
-                  <span style={item.isActive ? styles.badgeActive : styles.badgeEnded}>
-                    {item.isActive ? '진행중' : '종료'}
-                  </span>
+                  {(() => { const b = getStatusBadge(item); return <span style={b.style}>{b.label}</span>; })()}
                 </span>
                 <span style={{ ...styles.colCenter, width: 100 }}>
                   {item.isActive && hasStore ? (
@@ -720,6 +727,15 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 600,
     backgroundColor: '#D1FAE5',
     color: '#059669',
+  },
+  badgeSoon: {
+    display: 'inline-block',
+    padding: '3px 8px',
+    borderRadius: '12px',
+    fontSize: '11px',
+    fontWeight: 600,
+    backgroundColor: '#FEF3C7',
+    color: '#D97706',
   },
   badgeEnded: {
     display: 'inline-block',

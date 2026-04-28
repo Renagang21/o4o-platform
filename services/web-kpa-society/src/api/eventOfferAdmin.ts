@@ -14,6 +14,7 @@
 import { apiClient } from './client';
 
 // Types
+// WO-O4O-EVENT-OFFER-CORE-REFORM-V1: status 확장 + startAt/endAt/totalQuantity 추가
 export interface GroupbuyProduct {
   id: string;
   offerId: string;
@@ -26,7 +27,10 @@ export interface GroupbuyProduct {
   order: number;
   startDate: string;
   endDate: string;
-  status: 'upcoming' | 'active' | 'ended';
+  status: 'pending' | 'approved' | 'active' | 'ended' | 'canceled';
+  startAt: string | null;
+  endAt: string | null;
+  totalQuantity: number | null;
 }
 
 export interface AvailableOffer {
