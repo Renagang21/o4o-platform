@@ -1,5 +1,5 @@
 /**
- * KPA Groupbuy Service
+ * KPA Event Offer Service
  *
  * WO-O4O-ROUTES-REFACTOR-V1: Extracted from kpa.routes.ts
  * WO-EVENT-OFFER-FIX-V1: checkout_orders 테이블 사용, ecommerce_orders 제거
@@ -7,9 +7,10 @@
  *   - resolveEventStatus() 추가
  *   - 매장 경영자 조회: is_active → status + 날짜 + 수량 복합 조건
  *   - participate: total_quantity 검증 추가
+ * WO-O4O-EVENT-OFFER-BACKEND-NAMING-ALIGNMENT-V1: GroupbuyService → EventOfferService
  *
  * Responsibilities:
- * - Groupbuy listing queries (public, with optional auth)
+ * - Event offer listing queries (public, with optional auth)
  * - Operator stats aggregation
  * - User participation (order creation via checkoutService)
  */
@@ -64,7 +65,7 @@ const ACTIVE_OFFER_CLAUSE = `
 
 // ─── Service ─────────────────────────────────────────────────────────────────
 
-export class GroupbuyService {
+export class EventOfferService {
   private listingRepo: Repository<OrganizationProductListing>;
 
   constructor(private dataSource: DataSource) {
@@ -72,7 +73,7 @@ export class GroupbuyService {
   }
 
   /**
-   * GET / — Public groupbuy listing (paginated)
+   * GET / — Public event offer listing (paginated)
    * WO-O4O-EVENT-OFFER-CORE-REFORM-V1: status + 날짜 + 수량 조건으로 변경
    */
   async listGroupbuys(page: number, limit: number): Promise<{ data: OrganizationProductListing[]; total: number }> {
@@ -225,15 +226,15 @@ export class GroupbuyService {
              FROM jsonb_array_elements(items) AS elem)
           ), 0)::int AS "totalQuantity"
         FROM checkout_orders
-        WHERE metadata->>'serviceKey' = 'kpa-groupbuy'
+        WHERE metadata->>'serviceKey' = $1
           AND status = 'paid'
-      `),
+      `, [SERVICE_KEYS.KPA_GROUPBUY]),
       this.dataSource.query(`
         SELECT COUNT(DISTINCT "buyerId")::int AS "participatingStores"
         FROM checkout_orders
-        WHERE metadata->>'serviceKey' = 'kpa-groupbuy'
+        WHERE metadata->>'serviceKey' = $1
           AND status = 'paid'
-      `),
+      `, [SERVICE_KEYS.KPA_GROUPBUY]),
       this.dataSource.query(
         `SELECT COUNT(*)::int AS cnt
          FROM organization_product_listings opl
@@ -252,14 +253,14 @@ export class GroupbuyService {
   }
 
   /**
-   * GET /my-participations — Authenticated user's groupbuy orders
+   * GET /my-participations — Authenticated user's event offer orders
    */
   async getMyParticipations(userId: string): Promise<{ data: any[]; total: number }> {
     const orderRepo = this.dataSource.getRepository(CheckoutOrder);
     const [orders, total] = await orderRepo
       .createQueryBuilder('o')
       .where('o.buyerId = :buyerId', { buyerId: userId })
-      .andWhere("o.metadata->>'serviceKey' = :sk", { sk: 'kpa-groupbuy' })
+      .andWhere("o.metadata->>'serviceKey' = :sk", { sk: SERVICE_KEYS.KPA_GROUPBUY })
       .orderBy('o.createdAt', 'DESC')
       .take(20)
       .getManyAndCount();
@@ -278,7 +279,7 @@ export class GroupbuyService {
   }
 
   /**
-   * GET /:id — Groupbuy detail (public)
+   * GET /:id — Event offer detail (public)
    * WO-O4O-EVENT-OFFER-CORE-REFORM-V1: status + 날짜 조건으로 변경
    */
   async getGroupbuyDetail(id: string): Promise<Record<string, any> | null> {
@@ -295,7 +296,7 @@ export class GroupbuyService {
   }
 
   /**
-   * POST /:id/participate — Create groupbuy order via checkoutService
+   * POST /:id/participate — Create event offer order via checkoutService
    *
    * WO-EVENT-OFFER-FIX-V1: checkout_orders 사용, metadata.serviceKey 전파
    * WO-O4O-EVENT-OFFER-CORE-REFORM-V1: total_quantity 검증
@@ -329,7 +330,7 @@ export class GroupbuyService {
       [listingId, SERVICE_KEYS.KPA_GROUPBUY],
     );
     if (!preLockRows.length) {
-      throw new GroupbuyError(404, '이벤트를 찾을 수 없거나 진행 중이 아닙니다.');
+      throw new EventOfferError(404, '이벤트를 찾을 수 없거나 진행 중이 아닙니다.');
     }
     const preListing = preLockRows[0];
 
@@ -343,14 +344,14 @@ export class GroupbuyService {
        WHERE spo.id = $1`,
       [preListing.offer_id],
     );
-    if (!productRows.length) throw new GroupbuyError(404, 'Supplier product not found');
+    if (!productRows.length) throw new EventOfferError(404, 'Supplier product not found');
     const product = productRows[0];
-    if (!product.is_active) throw new GroupbuyError(400, 'Product is not active', 'PRODUCT_INACTIVE');
-    if (product.approval_status !== 'APPROVED') throw new GroupbuyError(400, 'Product is not approved', 'PRODUCT_NOT_APPROVED');
-    if (product.supplier_status !== 'ACTIVE') throw new GroupbuyError(400, 'Supplier is not active', 'SUPPLIER_INACTIVE');
+    if (!product.is_active) throw new EventOfferError(400, 'Product is not active', 'PRODUCT_INACTIVE');
+    if (product.approval_status !== 'APPROVED') throw new EventOfferError(400, 'Product is not approved', 'PRODUCT_NOT_APPROVED');
+    if (product.supplier_status !== 'ACTIVE') throw new EventOfferError(400, 'Supplier is not active', 'SUPPLIER_INACTIVE');
 
     const unitPrice = Number(product.price_general ?? 0);
-    if (unitPrice <= 0) throw new GroupbuyError(400, 'Invalid product price', 'INVALID_PRICE');
+    if (unitPrice <= 0) throw new EventOfferError(400, 'Invalid product price', 'INVALID_PRICE');
 
     // ── Step 3: 수량 제한 검증 + total_quantity 원자적 차감 ──────────────
     // SELECT FOR UPDATE → 동시 주문 시 race condition 방지
@@ -375,13 +376,13 @@ export class GroupbuyService {
       );
       if (!listing) {
         await qr.rollbackTransaction();
-        throw new GroupbuyError(404, '이벤트를 찾을 수 없거나 진행 중이 아닙니다.');
+        throw new EventOfferError(404, '이벤트를 찾을 수 없거나 진행 중이 아닙니다.');
       }
 
       // (A) per_order_limit: 1회 주문 수량 상한
       if (listing.per_order_limit !== null && quantity > Number(listing.per_order_limit)) {
         await qr.rollbackTransaction();
-        throw new GroupbuyError(
+        throw new EventOfferError(
           400,
           `1회 최대 ${listing.per_order_limit}개까지 주문 가능합니다.`,
           'PER_ORDER_LIMIT_EXCEEDED',
@@ -393,11 +394,11 @@ export class GroupbuyService {
         const remaining = Number(listing.total_quantity);
         if (remaining <= 0) {
           await qr.rollbackTransaction();
-          throw new GroupbuyError(400, '판매 종료된 이벤트입니다.', 'SOLD_OUT');
+          throw new EventOfferError(400, '판매 종료된 이벤트입니다.', 'SOLD_OUT');
         }
         if (remaining < quantity) {
           await qr.rollbackTransaction();
-          throw new GroupbuyError(
+          throw new EventOfferError(
             400,
             `잔여 수량이 ${remaining}개입니다. 수량을 줄여 다시 시도해 주세요.`,
             'INSUFFICIENT_QUANTITY',
@@ -423,7 +424,7 @@ export class GroupbuyService {
         if (alreadyOrdered + quantity > perStoreLimit) {
           const canOrder = perStoreLimit - alreadyOrdered;
           await qr.rollbackTransaction();
-          throw new GroupbuyError(
+          throw new EventOfferError(
             400,
             canOrder <= 0
               ? '매장 구매 한도를 이미 초과하였습니다.'
@@ -490,7 +491,7 @@ export class GroupbuyService {
             [quantity, listingId],
           );
         } catch (compErr) {
-          console.error('[GroupbuyService] Compensation increment failed:', compErr);
+          console.error('[EventOfferService] Compensation increment failed:', compErr);
         }
       }
       throw orderErr;
@@ -499,15 +500,15 @@ export class GroupbuyService {
 }
 
 /**
- * Typed error for groupbuy operations
+ * Typed error for event offer operations
  */
-export class GroupbuyError extends Error {
+export class EventOfferError extends Error {
   constructor(
     public readonly statusCode: number,
     message: string,
     public readonly code?: string,
   ) {
     super(message);
-    this.name = 'GroupbuyError';
+    this.name = 'EventOfferError';
   }
 }

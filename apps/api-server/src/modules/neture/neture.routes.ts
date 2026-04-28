@@ -38,6 +38,7 @@ import { createNetureAssetSnapshotController } from './controllers/neture-asset-
 import { createNetureHubTriggerController } from './controllers/hub-trigger.controller.js';
 import { createNeureTier1TestController } from './controllers/neture-tier1-test.controller.js';
 import { createOperatorServiceApprovalController } from './controllers/operator-service-approval.controller.js';
+import { createOperatorProductApprovalController } from './controllers/operator-product-approval.controller.js';
 // WO-NETURE-CURATION-PHASE3-FULL-REMOVAL-V1: createOperatorCurationController 제거
 import { createOperatorActionQueueController } from './controllers/operator-action-queue.controller.js';
 import { createAdminDashboardController } from './controllers/admin-dashboard.controller.js';
@@ -151,6 +152,8 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
   router.use('/operator/product-cleanup', createOperatorProductCleanupController(dataSource));
   // WO-NETURE-PRODUCT-APPROVAL-FLOW-V1
   router.use('/operator', createOperatorServiceApprovalController(dataSource));
+  // WO-O4O-NETURE-OPERATOR-PRODUCT-API-SCOPE-FIX-V1
+  router.use('/operator', createOperatorProductApprovalController(dataSource));
   // WO-NETURE-CURATION-PHASE3-FULL-REMOVAL-V1: operator-curation 라우터 제거
   // WO-O4O-OPERATOR-ACTION-QUEUE-V1
   router.use('/operator', createOperatorActionQueueController(dataSource));

@@ -19,6 +19,7 @@
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { OrganizationProductListing } from '../../../modules/store-core/entities/organization-product-listing.entity.js';
+import { SERVICE_KEYS } from '../../../constants/service-keys.js';
 
 type AuthMiddleware = RequestHandler;
 
@@ -100,11 +101,11 @@ export function createSupplierOffersController(
             AND spo.id NOT IN (
               SELECT offer_id
               FROM organization_product_listings
-              WHERE service_key = 'kpa-groupbuy'
+              WHERE service_key = $2
             )
           ORDER BY pm.name ASC
           LIMIT 50
-        `, [supplierId]);
+        `, [supplierId, SERVICE_KEYS.KPA_GROUPBUY]);
 
         res.json({ success: true, data: { offers, supplierId } });
       } catch (error: any) {
@@ -148,11 +149,11 @@ export function createSupplierOffersController(
           JOIN neture_suppliers ns          ON ns.id  = spo.supplier_id
           LEFT JOIN checkout_orders co
             ON  co.metadata->>'productListingId' = opl.id::text
-            AND co.metadata->>'serviceKey'       = 'kpa-groupbuy'
+            AND co.metadata->>'serviceKey'       = $2
             AND co.status = 'paid'
-          WHERE opl.service_key = 'kpa-groupbuy'
+          WHERE opl.service_key = $2
             AND ns.user_id = $1
-        `, [userId]);
+        `, [userId, SERVICE_KEYS.KPA_GROUPBUY]);
 
         res.json({
           success: true,
@@ -203,10 +204,10 @@ export function createSupplierOffersController(
           JOIN neture_suppliers ns          ON ns.id  = spo.supplier_id
           LEFT JOIN organizations org       ON org.id = ns.organization_id
           LEFT JOIN product_masters pm      ON pm.id  = spo.master_id
-          WHERE opl.service_key = 'kpa-groupbuy'
+          WHERE opl.service_key = $2
             AND spo.supplier_id = $1
           ORDER BY opl.created_at DESC
-        `, [supplierId]);
+        `, [supplierId, SERVICE_KEYS.KPA_GROUPBUY]);
 
         const proposals = rows.map((r: any) => ({
           id: r.id,
@@ -287,8 +288,8 @@ export function createSupplierOffersController(
         // 중복 제안 방지
         const dupCheck = await dataSource.query(
           `SELECT id FROM organization_product_listings
-           WHERE offer_id = $1 AND service_key = 'kpa-groupbuy' LIMIT 1`,
-          [offerId]
+           WHERE offer_id = $1 AND service_key = $2 LIMIT 1`,
+          [offerId, SERVICE_KEYS.KPA_GROUPBUY]
         );
         if (dupCheck.length) {
           err(res, 409, 'ALREADY_PROPOSED');
@@ -309,7 +310,7 @@ export function createSupplierOffersController(
           organization_id: orgId,
           master_id: offer.master_id,
           offer_id: offerId,
-          service_key: 'kpa-groupbuy',
+          service_key: SERVICE_KEYS.KPA_GROUPBUY,
           is_active: false,
           status: 'pending',
           price: offer.price_general ? Number(offer.price_general) : null,

@@ -1,12 +1,13 @@
 /**
- * KPA Groupbuy Operator Controller
+ * KPA Event Offer Operator Controller
  *
- * WO-KPA-GROUPBUY-OPERATOR-UI-V1: 공동구매 운영자용 API
+ * WO-KPA-GROUPBUY-OPERATOR-UI-V1: 이벤트 운영자용 API
  * WO-KPA-GROUPBUY-OPERATION-STABILIZATION-V1: 안정화
  * WO-KPA-GROUPBUY-SUPPLIER-STATS-DRYRUN-V1: 공급자 통계 연계 드라이런
  * WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: requireKpaScope('kpa:operator') 표준화
  * WO-EVENT-OFFER-MINIMAL-COMPLETION-V1: stub → OrganizationProductListing 실 구현
  * WO-EVENT-OFFER-OPERATOR-UX-REFINE-V1: 운영자 UX 개선 (available-offers, 중복방지, 조직 자동주입)
+ * WO-O4O-EVENT-OFFER-BACKEND-NAMING-ALIGNMENT-V1: createGroupbuyOperatorController → createEventOfferOperatorController
  *
  * 책임 경계:
  * - 상품 노출 관리 (추가/제거/토글/순서)
@@ -19,14 +20,15 @@ import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { OrganizationProductListing } from '../../../modules/store-core/entities/organization-product-listing.entity.js';
 import { supplierStatsService } from '../services/supplier-stats.service.js';
-import { resolveEventStatus } from '../services/groupbuy.service.js';
+import { resolveEventStatus } from '../services/event-offer.service.js';
+import { SERVICE_KEYS } from '../../../constants/service-keys.js';
 import { KPA_SCOPE_CONFIG } from '@o4o/security-core';
 import { createMembershipScopeGuard } from '../../../common/middleware/membership-guard.middleware.js';
 
 type AuthMiddleware = RequestHandler;
 
 // Types
-interface GroupbuyProduct {
+interface EventOfferProduct {
   id: string;
   offerId: string;
   title: string;
@@ -51,7 +53,7 @@ interface AvailableOffer {
   price: number | null;
 }
 
-interface GroupbuyStats {
+interface EventOfferStats {
   totalOrders: number;
   totalParticipants: number;
   dailyOrders: { date: string; count: number }[];
@@ -101,7 +103,7 @@ async function resolveOperatorOrgId(
 
 const requireKpaScope = createMembershipScopeGuard(KPA_SCOPE_CONFIG);
 
-export function createGroupbuyOperatorController(
+export function createEventOfferOperatorController(
   dataSource: DataSource,
   requireAuth: AuthMiddleware
 ): Router {
@@ -139,11 +141,11 @@ export function createGroupbuyOperatorController(
             AND spo.id NOT IN (
               SELECT offer_id
               FROM organization_product_listings
-              WHERE service_key = 'kpa-groupbuy'
+              WHERE service_key = $1
             )
           ORDER BY pm.name ASC
           LIMIT 100
-        `);
+        `, [SERVICE_KEYS.KPA_GROUPBUY]);
 
         res.json({
           success: true,
@@ -193,14 +195,14 @@ export function createGroupbuyOperatorController(
               COUNT(*)::int                  AS order_count,
               COUNT(DISTINCT "buyerId")::int AS participant_count
             FROM checkout_orders
-            WHERE metadata->>'serviceKey' = 'kpa-groupbuy'
+            WHERE metadata->>'serviceKey' = $1
             GROUP BY metadata->>'productListingId'
           ) oc ON oc.listing_id = opl.id::text
-          WHERE opl.service_key = 'kpa-groupbuy'
+          WHERE opl.service_key = $1
           ORDER BY opl.created_at ASC
-        `);
+        `, [SERVICE_KEYS.KPA_GROUPBUY]);
 
-        const products: GroupbuyProduct[] = rows.map((r: any, idx: number) => {
+        const products: EventOfferProduct[] = rows.map((r: any, idx: number) => {
           const dateStr = r.startDate instanceof Date
             ? r.startDate.toISOString()
             : String(r.startDate || '');
@@ -225,7 +227,7 @@ export function createGroupbuyOperatorController(
 
         res.json({ success: true, data: products });
       } catch (error: any) {
-        console.error('Failed to get groupbuy products:', error);
+        console.error('Failed to get event offer products:', error);
         createErrorResponse(res, 500, 'INTERNAL_ERROR');
       }
     }
@@ -247,9 +249,9 @@ export function createGroupbuyOperatorController(
         const result = await dataSource.query(
           `UPDATE organization_product_listings
            SET is_active = $1, status = $2, updated_at = NOW()
-           WHERE id = $3 AND service_key = 'kpa-groupbuy'
+           WHERE id = $3 AND service_key = $4
            RETURNING id, is_active`,
-          [isVisible, newStatus, id]
+          [isVisible, newStatus, id, SERVICE_KEYS.KPA_GROUPBUY]
         );
 
         if (!result.length) {
@@ -259,7 +261,7 @@ export function createGroupbuyOperatorController(
 
         res.json({ success: true, data: { id, isVisible: result[0].is_active } });
       } catch (error: any) {
-        console.error('Failed to update product visibility:', error);
+        console.error('Failed to update event offer visibility:', error);
         createErrorResponse(res, 500, 'INTERNAL_ERROR');
       }
     }
@@ -310,9 +312,9 @@ export function createGroupbuyOperatorController(
         // 중복 등록 방지
         const duplicateCheck = await dataSource.query(
           `SELECT id FROM organization_product_listings
-           WHERE offer_id = $1 AND service_key = 'kpa-groupbuy'
+           WHERE offer_id = $1 AND service_key = $2
            LIMIT 1`,
-          [offerId]
+          [offerId, SERVICE_KEYS.KPA_GROUPBUY]
         );
         if (duplicateCheck.length > 0) {
           createErrorResponse(res, 409, 'ALREADY_REGISTERED');
@@ -345,7 +347,7 @@ export function createGroupbuyOperatorController(
           organization_id: organizationId,
           master_id: offer.master_id,
           offer_id: offerId,
-          service_key: 'kpa-groupbuy',
+          service_key: SERVICE_KEYS.KPA_GROUPBUY,
           is_active: true,
           status: 'approved',
           price: offer.price_general ? Number(offer.price_general) : null,
@@ -375,10 +377,10 @@ export function createGroupbuyOperatorController(
             startAt: null,
             endAt: null,
             totalQuantity: null,
-          } as GroupbuyProduct,
+          } as EventOfferProduct,
         });
       } catch (error: any) {
-        console.error('Failed to add groupbuy product:', error);
+        console.error('Failed to add event offer product:', error);
         createErrorResponse(res, 500, 'INTERNAL_ERROR');
       }
     }
@@ -398,9 +400,9 @@ export function createGroupbuyOperatorController(
         const result = await dataSource.query(
           `UPDATE organization_product_listings
            SET is_active = false, status = 'canceled', updated_at = NOW()
-           WHERE id = $1 AND service_key = 'kpa-groupbuy'
+           WHERE id = $1 AND service_key = $2
            RETURNING id`,
-          [id]
+          [id, SERVICE_KEYS.KPA_GROUPBUY]
         );
 
         if (!result.length) {
@@ -410,7 +412,7 @@ export function createGroupbuyOperatorController(
 
         res.json({ success: true, data: { id, removed: true } });
       } catch (error: any) {
-        console.error('Failed to remove groupbuy product:', error);
+        console.error('Failed to remove event offer product:', error);
         createErrorResponse(res, 500, 'INTERNAL_ERROR');
       }
     }
@@ -428,7 +430,7 @@ export function createGroupbuyOperatorController(
         const now = new Date();
         const cacheValidUntil = new Date(now.getTime() + 30 * 60 * 1000);
 
-        const stats: GroupbuyStats = {
+        const stats: EventOfferStats = {
           totalOrders: supplierResult.data?.totalOrders ?? 0,
           totalParticipants: supplierResult.data?.totalPharmacies ?? 0,
           dailyOrders: supplierResult.data?.daily?.map(d => ({
@@ -454,7 +456,7 @@ export function createGroupbuyOperatorController(
           },
         });
       } catch (error: any) {
-        console.error('Failed to get groupbuy stats:', error);
+        console.error('Failed to get event offer stats:', error);
         createErrorResponse(res, 503, 'STATS_UNAVAILABLE');
       }
     }

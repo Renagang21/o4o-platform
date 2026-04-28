@@ -4,7 +4,7 @@
  * WO-O4O-NETURE-PRODUCT-APPROVAL-UI-V1
  * WO-O4O-TABLE-STANDARD-V1 — Raw HTML → DataTable + Selection + Bulk Action
  *
- * 기존 adminProductApi 재사용 + ProductDetailDrawer로 검토.
+ * WO-O4O-NETURE-OPERATOR-PRODUCT-API-SCOPE-FIX-V1: operatorProductApi로 교체 (neture:operator 스코프)
  * AdminProductApprovalPage 대비: Drawer 기반 상세, 이미지 포함.
  */
 
@@ -13,7 +13,8 @@ import { CheckCircle, XCircle, Trash2 } from 'lucide-react';
 import { ActionBar, BulkResultModal, RowActionMenu } from '@o4o/ui';
 import { DataTable, useBatchAction, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
-import { adminProductApi, type AdminProduct, type DistributionType } from '../../lib/api';
+import { type AdminProduct, type DistributionType } from '../../lib/api';
+import { operatorProductApi } from '../../lib/api/operatorProductApi';
 import { productCleanupApi } from '../../lib/api/operatorProductCleanup';
 import type { SupplierProduct } from '../../lib/api';
 import ProductDetailDrawer from '../supplier/ProductDetailDrawer';
@@ -142,7 +143,7 @@ export default function OperatorProductApprovalPage() {
 
   const loadProducts = useCallback(async () => {
     setLoading(true);
-    const data = await adminProductApi.getProducts();
+    const data = await operatorProductApi.getProducts();
     setProducts(data || []);
     setLoading(false);
   }, []);
@@ -160,7 +161,7 @@ export default function OperatorProductApprovalPage() {
 
   const handleApprove = async (id: string) => {
     setActionLoading(id);
-    const ok = await adminProductApi.approveProduct(id);
+    const ok = await operatorProductApi.approveProduct(id);
     setActionLoading(null);
     if (ok) {
       setDrawerProduct(null);
@@ -171,7 +172,7 @@ export default function OperatorProductApprovalPage() {
   const handleRejectConfirm = async () => {
     if (!rejectTarget) return;
     setActionLoading(rejectTarget.id);
-    const ok = await adminProductApi.rejectProduct(rejectTarget.id, rejectReason || undefined);
+    const ok = await operatorProductApi.rejectProduct(rejectTarget.id, rejectReason || undefined);
     setActionLoading(null);
     if (ok) {
       setRejectTarget(null);
@@ -184,7 +185,7 @@ export default function OperatorProductApprovalPage() {
   /** V4: RowActionMenu용 반려 핸들러 (ConfirmActionDialog에서 사유 전달) */
   const handleRejectDirect = async (id: string, reason?: string) => {
     setActionLoading(id);
-    const ok = await adminProductApi.rejectProduct(id, reason);
+    const ok = await operatorProductApi.rejectProduct(id, reason);
     setActionLoading(null);
     if (ok) {
       setDrawerProduct(null);
@@ -209,7 +210,7 @@ export default function OperatorProductApprovalPage() {
     });
     if (pendingIds.length === 0) return;
     const result = await batch.executeBatch(
-      (batchIds) => adminProductApi.batchApprove(batchIds),
+      (batchIds) => operatorProductApi.batchApprove(batchIds),
       pendingIds,
     );
     if (result.successCount > 0) {
@@ -225,7 +226,7 @@ export default function OperatorProductApprovalPage() {
     });
     if (pendingIds.length === 0) return;
     const result = await batch.executeBatch(
-      (batchIds) => adminProductApi.batchReject(batchIds, '일괄 반려'),
+      (batchIds) => operatorProductApi.batchReject(batchIds, '일괄 반려'),
       pendingIds,
     );
     if (result.successCount > 0) {

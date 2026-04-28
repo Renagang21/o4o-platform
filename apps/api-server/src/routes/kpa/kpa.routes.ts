@@ -59,7 +59,7 @@ import { createMemberController } from './controllers/member.controller.js';
 import { createApplicationController } from './controllers/application.controller.js';
 import { createAdminDashboardController } from './controllers/admin-dashboard.controller.js';
 import { createOperatorSummaryController } from './controllers/operator-summary.controller.js';
-import { createGroupbuyOperatorController } from './controllers/groupbuy-operator.controller.js';
+import { createEventOfferOperatorController } from './controllers/event-offer-operator.controller.js';
 import { createSupplierOffersController } from './controllers/supplier-offers.controller.js';
 import { createJoinInquiryAdminRoutes, createJoinInquiryPublicRoutes } from './controllers/join-inquiry.controller.js';
 import { createOrganizationJoinRequestRoutes } from './controllers/organization-join-request.controller.js';
@@ -95,7 +95,7 @@ import { createForumRequestController } from './controllers/forum-request.contro
 import { createForumMembershipController } from './controllers/forum-membership.controller.js';
 import { createCommunityHubController } from './controllers/community-hub.controller.js';
 import { createLegalDocumentsController } from './controllers/legal-documents.controller.js';
-import { createGroupbuyController } from './controllers/groupbuy.controller.js';
+import { createEventOfferController } from './controllers/event-offer.controller.js';
 import { createMypageController } from './controllers/mypage.controller.js';
 import { createQualificationController } from './controllers/qualification.controller.js'; // WO-O4O-QUALIFICATION-SYSTEM-V1
 import { createInstructorDashboardController } from './controllers/instructor-dashboard.controller.js'; // WO-O4O-INSTRUCTOR-DASHBOARD-V1
@@ -230,7 +230,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   router.use('/operator/product-applications', createOperatorProductApplicationsController(dataSource, coreRequireAuth as any, requireKpaScope, kpaActionLogService));
 
   // Groupbuy Operator routes (WO-KPA-GROUPBUY-OPERATOR-UI-V1)
-  router.use('/groupbuy-admin', createGroupbuyOperatorController(dataSource, coreRequireAuth as any));
+  router.use('/groupbuy-admin', createEventOfferOperatorController(dataSource, coreRequireAuth as any));
 
   // Supplier Event Offer proposal routes (WO-EVENT-OFFER-SUPPLIER-PROPOSAL-PATH-V1)
   router.use('/supplier', createSupplierOffersController(dataSource, coreRequireAuth as any));
@@ -1960,7 +1960,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   }
 
   // Groupbuy Routes (WO-O4O-ROUTES-REFACTOR-V1)
-  router.use('/groupbuy', createGroupbuyController(dataSource, authenticate as any, optionalAuth as any, requireKpaScope));
+  router.use('/groupbuy', createEventOfferController(dataSource, authenticate as any, optionalAuth as any, requireKpaScope));
 
   // MyPage Routes (WO-O4O-ROUTES-REFACTOR-V1)
   router.use('/mypage', createMypageController(dataSource, authenticate as any));
