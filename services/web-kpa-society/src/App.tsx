@@ -101,6 +101,7 @@ import { GuideIntroKpaPage } from './pages/guide/GuideIntroKpaPage';
 import { GuideIntroOperationPage } from './pages/guide/GuideIntroOperationPage';
 import { GuideIntroConceptPage } from './pages/guide/GuideIntroConceptPage';
 import { GuideUsagePage } from './pages/guide/GuideUsagePage';
+import { GuideFeaturesPage } from './pages/guide/GuideFeaturesPage';
 
 // Community Home (WO-KPA-COMMUNITY-HOME-V1)
 import { CommunityHomePage } from './pages/CommunityHomePage';
@@ -380,6 +381,7 @@ function App() {
           <Route path="/guide/intro/operation" element={<Layout serviceName={SERVICE_NAME}><GuideIntroOperationPage /></Layout>} />
           <Route path="/guide/intro/concept" element={<Layout serviceName={SERVICE_NAME}><GuideIntroConceptPage /></Layout>} />
           <Route path="/guide/usage" element={<Layout serviceName={SERVICE_NAME}><GuideUsagePage /></Layout>} />
+          <Route path="/guide/features" element={<Layout serviceName={SERVICE_NAME}><GuideFeaturesPage /></Layout>} />
 
           {/* Service Detail Pages (WO-KPA-HOME-SERVICE-SECTION-V1) */}
           <Route path="/services/branch" element={<Navigate to="/" replace />} />
