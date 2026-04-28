@@ -1,72 +1,180 @@
 /**
  * GuideIntroOperationPage — 운영 구조
  *
- * WO-KPA-GUIDE-INTRO-SUBPAGES-V1
+ * WO-KPA-GUIDE-INTRO-SUBPAGES-V1 (최종 사용자 기준 버전)
+ *
+ * 핵심 메시지: 운영자는 구성하고, 매장은 실행하고, 커뮤니티는 확장한다
  */
 
 import type { CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import { PageSection, PageContainer } from '@o4o/ui';
 
-const STEPS = [
-  {
-    step: '1단계',
-    label: '운영자 중심 구조',
-    detail:
-      '운영자는 플랫폼 전체의 규칙을 설정합니다. 공급자 심사, 매장 승인, 커미션 정책, 콘텐츠 품질 기준이 여기서 결정됩니다. 운영자의 결정이 플랫폼 전체에 영향을 줍니다.',
-    items: ['공급자·매장 승인 및 자격 관리', '커미션·정산 정책 설정', '콘텐츠 품질 기준 및 모더레이션'],
-  },
-  {
-    step: '2단계',
-    label: '매장 실행 구조',
-    detail:
-      '매장(약국)은 운영자가 설정한 구조 안에서 실제 서비스를 운영합니다. 공급자의 상품을 취급하고 고객에게 전달하며, 매장 자체의 콘텐츠와 채널을 관리합니다.',
-    items: ['공급자 카탈로그에서 상품 선택 및 취급', '사이니지·블로그 등 매장 채널 운영', '고객 주문 처리 및 서비스 제공'],
-  },
-  {
-    step: '3단계',
-    label: '커뮤니티 확장 구조',
-    detail:
-      '매장에서 쌓인 경험과 지식이 커뮤니티로 돌아옵니다. 포럼에서 공유된 사례가 다른 매장의 운영 개선으로 이어지며, 교육 콘텐츠가 다시 매장 경쟁력을 높입니다.',
-    items: ['포럼에서 운영 노하우·임상 사례 공유', '교육을 통한 전문성 강화 및 이수 인증', '자료실 공동 자산이 네트워크 전체에 공유'],
-  },
+const OPERATOR_CARDS = [
+  { label: '상품 구성',   summary: '상품 선택 · 구성' },
+  { label: '콘텐츠 구성', summary: '자료 정리 · 콘텐츠 구성' },
+  { label: '매장 지원',   summary: '진열 · 설명 · 운영 지원' },
+];
+
+const STORE_CARDS = [
+  { label: '상품 선택', summary: '구성된 상품 선택' },
+  { label: '매장 진열', summary: '채널별 상품 진열' },
+  { label: '고객 대응', summary: '상담 · 설명 · 판매' },
+];
+
+const COMMUNITY_CARDS = [
+  { label: '정보 공유', summary: '질문 · 답변 · 사례' },
+  { label: '경험 축적', summary: '사용 경험 · 적용 사례' },
+  { label: '확산 구조', summary: '정보 → 공유 → 확산' },
+];
+
+const FLOW_ROWS = [
+  { from: '상품',   mid: '구성', to: '판매' },
+  { from: '콘텐츠', mid: '정리', to: '활용' },
+  { from: '경험',   mid: '공유', to: '확산' },
+];
+
+const FEATURES = [
+  '운영자 중심 구조',
+  '매장 실행 부담 분리',
+  '커뮤니티 기반 확장',
+  '실행과 관리 분리 구조',
 ];
 
 export function GuideIntroOperationPage() {
   return (
     <div>
+      {/* ── Hero ── */}
       <div style={styles.hero}>
         <div style={styles.heroInner}>
           <p style={styles.heroEyebrow}>O4O 개요</p>
           <h1 style={styles.heroTitle}>운영 구조</h1>
-          <p style={styles.heroDesc}>
-            운영자 설정 → 매장 실행 → 커뮤니티 확장, 세 단계가 순환하며 플랫폼이 성장합니다.
-          </p>
+          <p style={styles.heroDesc}>운영자 · 매장 · 커뮤니티 흐름</p>
+
+          <div style={styles.heroContext}>
+            <div style={styles.heroContextRow}>
+              <span style={styles.heroContextLabel}>운영자</span>
+              <span style={styles.heroContextValue}>구성 · 지원 · 실행 분리</span>
+            </div>
+            <div style={styles.heroContextRow}>
+              <span style={styles.heroContextLabel}>매장</span>
+              <span style={styles.heroContextValue}>선택 · 활용 · 판매</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      {STEPS.map((step, idx) => (
-        <PageSection key={step.label} last={idx === STEPS.length - 1}>
-          <PageContainer>
-            <div style={styles.block}>
-              <div style={styles.blockHeader}>
-                <span style={styles.stepBadge}>{step.step}</span>
-                <h2 style={styles.blockTitle}>{step.label}</h2>
-              </div>
-              <p style={styles.blockDesc}>{step.detail}</p>
-              <ul style={styles.list}>
-                {step.items.map((it) => (
-                  <li key={it} style={styles.listItem}>
-                    <span style={styles.listDot} />
-                    {it}
-                  </li>
-                ))}
-              </ul>
+      {/* ── Section 1: 운영자 ── */}
+      <PageSection>
+        <PageContainer>
+          <div style={styles.sectionWrap}>
+            <h2 style={styles.sectionTitle}>운영자 — 무엇을 준비하는가</h2>
+            <div style={styles.cardGrid}>
+              {OPERATOR_CARDS.map((card) => (
+                <div key={card.label} style={styles.overviewCard}>
+                  <p style={styles.overviewLabel}>{card.label}</p>
+                  <p style={styles.overviewSummary}>{card.summary}</p>
+                </div>
+              ))}
             </div>
-          </PageContainer>
-        </PageSection>
-      ))}
+          </div>
+        </PageContainer>
+      </PageSection>
 
+      {/* ── Section 2: 매장 ── */}
+      <PageSection>
+        <PageContainer>
+          <div style={styles.sectionWrap}>
+            <h2 style={styles.sectionTitle}>매장 — 무엇을 실행하는가</h2>
+            <div style={styles.cardGrid}>
+              {STORE_CARDS.map((card) => (
+                <div key={card.label} style={styles.overviewCard}>
+                  <p style={styles.overviewLabel}>{card.label}</p>
+                  <p style={styles.overviewSummary}>{card.summary}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </PageContainer>
+      </PageSection>
+
+      {/* ── Section 3: 커뮤니티 ── */}
+      <PageSection>
+        <PageContainer>
+          <div style={styles.sectionWrap}>
+            <h2 style={styles.sectionTitle}>커뮤니티 — 무엇이 축적되는가</h2>
+            <div style={styles.cardGrid}>
+              {COMMUNITY_CARDS.map((card) => (
+                <div key={card.label} style={styles.overviewCard}>
+                  <p style={styles.overviewLabel}>{card.label}</p>
+                  <p style={styles.overviewSummary}>{card.summary}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </PageContainer>
+      </PageSection>
+
+      {/* ── Section 4: 흐름 ── */}
+      <PageSection>
+        <PageContainer>
+          <div style={styles.sectionWrap}>
+            <h2 style={styles.sectionTitle}>흐름</h2>
+
+            {/* 기본 흐름 */}
+            <div style={styles.mainFlow}>
+              {['운영자', '매장', '커뮤니티'].map((node, idx, arr) => (
+                <div key={node} style={styles.mainFlowStep}>
+                  <span style={styles.mainFlowNode}>{node}</span>
+                  {idx < arr.length - 1 && <span style={styles.mainFlowArrow}>→</span>}
+                </div>
+              ))}
+            </div>
+
+            {/* 순환 구조 */}
+            <div style={styles.cycleRow}>
+              {['구성', '실행', '공유'].map((step, idx, arr) => (
+                <div key={step} style={styles.mainFlowStep}>
+                  <span style={styles.cycleNode}>{step}</span>
+                  {idx < arr.length - 1 && <span style={styles.cycleArrow}>→</span>}
+                </div>
+              ))}
+            </div>
+
+            {/* 보조 흐름 */}
+            <div style={styles.subFlowList}>
+              {FLOW_ROWS.map((row) => (
+                <div key={row.from} style={styles.subFlowRow}>
+                  <span style={styles.subFlowNode}>{row.from}</span>
+                  <span style={styles.subFlowArrow}>→</span>
+                  <span style={styles.subFlowNode}>{row.mid}</span>
+                  <span style={styles.subFlowArrow}>→</span>
+                  <span style={styles.subFlowNode}>{row.to}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </PageContainer>
+      </PageSection>
+
+      {/* ── Section 5: 핵심 특징 ── */}
+      <PageSection last>
+        <PageContainer>
+          <div style={styles.sectionWrap}>
+            <h2 style={styles.sectionTitle}>핵심 특징 — 왜 이 구조가 중요한가</h2>
+            <ul style={styles.featureList}>
+              {FEATURES.map((f) => (
+                <li key={f} style={styles.featureItem}>
+                  <span style={styles.featureDot} />
+                  {f}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </PageContainer>
+      </PageSection>
+
+      {/* ── Bottom Nav ── */}
       <div style={styles.bottomNav}>
         <PageContainer>
           <div style={styles.bottomNavInner}>
@@ -86,21 +194,79 @@ const styles: Record<string, CSSProperties> = {
     fontSize: '0.8125rem', fontWeight: 500, color: '#94a3b8',
     margin: '0 0 10px 0', textTransform: 'uppercase', letterSpacing: '0.08em',
   },
-  heroTitle: { fontSize: '1.875rem', fontWeight: 700, color: '#f8fafc', margin: '0 0 12px 0', lineHeight: 1.25 },
-  heroDesc: { fontSize: '1rem', color: '#94a3b8', lineHeight: 1.7, margin: 0 },
-  block: { paddingTop: 4, paddingBottom: 4 },
-  blockHeader: { display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 },
-  stepBadge: {
-    fontSize: '0.75rem', fontWeight: 700, color: '#2563eb',
-    backgroundColor: '#eff6ff', borderRadius: 4, padding: '2px 8px',
+  heroTitle: {
+    fontSize: '1.875rem', fontWeight: 700, color: '#f8fafc',
+    margin: '0 0 8px 0', lineHeight: 1.25,
   },
-  blockTitle: { fontSize: '1.125rem', fontWeight: 700, color: '#0f172a', margin: 0 },
-  blockDesc: { fontSize: '0.9375rem', color: '#475569', lineHeight: 1.7, margin: '0 0 14px 0', maxWidth: 600 },
-  list: { margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 8 },
-  listItem: { display: 'flex', alignItems: 'center', gap: 10, fontSize: '0.9375rem', color: '#334155' },
-  listDot: { width: 6, height: 6, borderRadius: '50%', backgroundColor: '#2563eb', flexShrink: 0 },
+  heroDesc: { fontSize: '1.0625rem', color: '#94a3b8', margin: '0 0 20px 0', lineHeight: 1.6 },
+  heroContext: {
+    display: 'flex', flexDirection: 'column', gap: 8,
+    borderLeft: '2px solid #3b82f6', paddingLeft: 14,
+  },
+  heroContextRow: { display: 'flex', gap: 10, alignItems: 'flex-start', flexWrap: 'wrap' },
+  heroContextLabel: {
+    fontSize: '0.75rem', fontWeight: 600, color: '#60a5fa',
+    backgroundColor: 'rgba(96,165,250,0.12)', borderRadius: 4,
+    padding: '2px 8px', flexShrink: 0, whiteSpace: 'nowrap',
+  },
+  heroContextValue: { fontSize: '0.875rem', color: '#cbd5e1', lineHeight: 1.6 },
+
+  sectionWrap: { paddingTop: 4, paddingBottom: 4 },
+  sectionTitle: {
+    fontSize: '0.8125rem', fontWeight: 700, color: '#94a3b8',
+    margin: '0 0 16px 0', textTransform: 'uppercase', letterSpacing: '0.08em',
+  },
+
+  cardGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 12 },
+  overviewCard: {
+    backgroundColor: '#f8fafc', border: '1px solid #e2e8f0',
+    borderRadius: 8, padding: '18px 20px',
+  },
+  overviewLabel: { fontSize: '1rem', fontWeight: 700, color: '#0f172a', margin: '0 0 6px 0' },
+  overviewSummary: { fontSize: '0.875rem', color: '#475569', lineHeight: 1.6, margin: 0 },
+
+  mainFlow: {
+    display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap',
+    backgroundColor: '#eff6ff', borderRadius: 10,
+    padding: '18px 24px', marginBottom: 12,
+  },
+  mainFlowStep: { display: 'flex', alignItems: 'center', gap: 12 },
+  mainFlowNode: { fontSize: '1.0625rem', fontWeight: 700, color: '#1d4ed8' },
+  mainFlowArrow: { fontSize: '1.125rem', color: '#60a5fa' },
+
+  cycleRow: {
+    display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap',
+    marginBottom: 14,
+  },
+  cycleNode: {
+    fontSize: '0.875rem', fontWeight: 600, color: '#1d4ed8',
+    backgroundColor: '#eff6ff', borderRadius: 6, padding: '4px 12px',
+  },
+  cycleArrow: { fontSize: '0.9375rem', color: '#60a5fa' },
+
+  subFlowList: { display: 'flex', flexDirection: 'column', gap: 8 },
+  subFlowRow: { display: 'flex', alignItems: 'center', gap: 8 },
+  subFlowNode: {
+    fontSize: '0.8125rem', color: '#475569',
+    backgroundColor: '#f1f5f9', borderRadius: 4, padding: '3px 10px',
+  },
+  subFlowArrow: { fontSize: '0.8125rem', color: '#94a3b8' },
+
+  featureList: { margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 10 },
+  featureItem: {
+    display: 'flex', alignItems: 'flex-start', gap: 10,
+    fontSize: '0.9375rem', color: '#334155', lineHeight: 1.6,
+  },
+  featureDot: {
+    width: 6, height: 6, borderRadius: '50%',
+    backgroundColor: '#2563eb', flexShrink: 0, marginTop: 6,
+  },
+
   bottomNav: { borderTop: '1px solid #e2e8f0', backgroundColor: '#f8fafc', padding: '20px 0' },
-  bottomNavInner: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 },
+  bottomNavInner: {
+    display: 'flex', justifyContent: 'space-between',
+    alignItems: 'center', flexWrap: 'wrap', gap: 12,
+  },
   navPrimary: { fontSize: '0.875rem', fontWeight: 600, color: '#2563eb', textDecoration: 'none' },
   navMuted: { fontSize: '0.875rem', color: '#64748b', textDecoration: 'none' },
 };
