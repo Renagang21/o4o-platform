@@ -353,6 +353,8 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | **Event Offer 공통 도메인** | `docs/baseline/EVENT-OFFER-COMMON-DOMAIN-V1.md` |
 | **Event Offer Store 통합** | `docs/baseline/EVENT-OFFER-STORE-INTEGRATION-V1.md` |
 | **Event Offer Neture 역할 구분** | `docs/baseline/EVENT-OFFER-NETURE-ROLE-CLARIFICATION-V1.md` |
+| **O4O Table Standard (Aspirational)** | `docs/baseline/O4O-TABLE-STANDARD-BASELINE-V1.md` |
+| **O4O Form Standard (Aspirational)** | `docs/baseline/O4O-FORM-STANDARD-BASELINE-V1.md` |
 
 ---
 

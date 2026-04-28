@@ -28,7 +28,8 @@ import {
   Trash2,
   ExternalLink,
 } from 'lucide-react';
-import { RowActionMenu } from '@o4o/ui';
+// WO-KPA-OPERATOR-RESOURCES-TABLE-STANDARD-COMPLIANCE-V1: ActionBar 추가
+import { RowActionMenu, ActionBar } from '@o4o/ui';
 import {
   DataTable,
   Pagination,
@@ -122,6 +123,9 @@ export default function OperatorResourcesPage() {
   const [statusFilter, setStatusFilter] = useState<'' | 'draft' | 'published' | 'private'>('');
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 20;
+  // WO-KPA-OPERATOR-RESOURCES-TABLE-STANDARD-COMPLIANCE-V1: 선택 상태
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkLoading, setBulkLoading] = useState(false);
 
   const fetchItems = useCallback(async () => {
     setLoading(true);
@@ -185,6 +189,51 @@ export default function OperatorResourcesPage() {
       toast.error(err?.message || '삭제에 실패했습니다');
     }
   };
+
+  // ─── Bulk actions (WO-KPA-OPERATOR-RESOURCES-TABLE-STANDARD-COMPLIANCE-V1) ───
+  // 기존 단건 API를 병렬 호출. bulk 엔드포인트 추가는 본 WO 금지 사항.
+
+  const runBulk = async (
+    op: (id: string) => Promise<unknown>,
+    successMsg: (n: number) => string,
+    failureMsg: string,
+  ) => {
+    const ids = [...selectedIds];
+    if (ids.length === 0) return;
+    setBulkLoading(true);
+    try {
+      const results = await Promise.allSettled(ids.map((id) => op(id)));
+      const okCount = results.filter((r) => r.status === 'fulfilled').length;
+      const failCount = results.length - okCount;
+      if (okCount > 0) toast.success(successMsg(okCount));
+      if (failCount > 0) toast.error(`${failCount}건 ${failureMsg}`);
+      setSelectedIds(new Set());
+      await fetchItems();
+    } finally {
+      setBulkLoading(false);
+    }
+  };
+
+  const handleBulkDelete = () =>
+    runBulk(
+      (id) => resourcesApi.operatorDelete(id),
+      (n) => `${n}건 삭제되었습니다`,
+      '삭제에 실패했습니다',
+    );
+
+  const handleBulkPublish = () =>
+    runBulk(
+      (id) => resourcesApi.operatorUpdateStatus(id, 'published'),
+      (n) => `${n}건 노출 처리되었습니다`,
+      '노출 처리에 실패했습니다',
+    );
+
+  const handleBulkHide = () =>
+    runBulk(
+      (id) => resourcesApi.operatorUpdateStatus(id, 'private'),
+      (n) => `${n}건 숨김 처리되었습니다`,
+      '숨김 처리에 실패했습니다',
+    );
 
   // ─── Columns ───
 
@@ -253,6 +302,16 @@ export default function OperatorResourcesPage() {
         return <span className="text-xs text-slate-300">-</span>;
       },
     },
+    // WO-KPA-OPERATOR-RESOURCES-TABLE-STANDARD-COMPLIANCE-V1:
+    // 표준 컬럼 순서 — main → meta → status → createdAt → actions.
+    // view_count 는 meta 영역으로 이동 (status 이전).
+    {
+      key: 'view_count',
+      header: '조회수',
+      width: '70px',
+      align: 'center',
+      render: (v) => <span className="text-sm text-slate-500">{(v as number) ?? 0}</span>,
+    },
     {
       key: 'status',
       header: '상태',
@@ -266,13 +325,6 @@ export default function OperatorResourcesPage() {
           </span>
         );
       },
-    },
-    {
-      key: 'view_count',
-      header: '조회수',
-      width: '70px',
-      align: 'center',
-      render: (v) => <span className="text-sm text-slate-500">{(v as number) ?? 0}</span>,
     },
     {
       key: 'created_at',
@@ -444,6 +496,58 @@ export default function OperatorResourcesPage() {
         </div>
       )}
 
+      {/* WO-KPA-OPERATOR-RESOURCES-TABLE-STANDARD-COMPLIANCE-V1: ActionBar (선택 ≥ 1) */}
+      {!error && items.length > 0 && (
+        <div style={{ marginBottom: 12 }}>
+          <ActionBar
+            selectedCount={selectedIds.size}
+            onClearSelection={() => setSelectedIds(new Set())}
+            actions={[
+              {
+                key: 'publish',
+                label: '노출',
+                onClick: handleBulkPublish,
+                variant: 'primary',
+                icon: <Eye size={14} />,
+                loading: bulkLoading,
+                confirm: {
+                  title: '선택 자료 노출',
+                  message: `${selectedIds.size}건을 노출 처리합니다.`,
+                  confirmText: '노출',
+                },
+              },
+              {
+                key: 'hide',
+                label: '숨김',
+                onClick: handleBulkHide,
+                variant: 'default',
+                icon: <EyeOff size={14} />,
+                loading: bulkLoading,
+                confirm: {
+                  title: '선택 자료 숨김',
+                  message: `${selectedIds.size}건을 숨김 처리합니다. 사용자 자료실에서 보이지 않게 됩니다.`,
+                  confirmText: '숨김',
+                },
+              },
+              {
+                key: 'delete',
+                label: '삭제',
+                onClick: handleBulkDelete,
+                variant: 'danger',
+                icon: <Trash2 size={14} />,
+                loading: bulkLoading,
+                confirm: {
+                  title: '선택 자료 삭제',
+                  message: `${selectedIds.size}건을 삭제합니다. 사용자 자료실에서 즉시 사라집니다.`,
+                  variant: 'danger',
+                  confirmText: '삭제',
+                },
+              },
+            ]}
+          />
+        </div>
+      )}
+
       {/* Table */}
       {!error && items.length > 0 && (
         <>
@@ -452,6 +556,9 @@ export default function OperatorResourcesPage() {
             data={items}
             rowKey="id"
             emptyMessage="자료가 없습니다"
+            selectable
+            selectedKeys={selectedIds}
+            onSelectionChange={setSelectedIds}
           />
           {total > PAGE_SIZE && (
             <Pagination

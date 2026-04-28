@@ -16,6 +16,9 @@ import { X, Pencil, Trash2, ImagePlus, Loader2, Sparkles, Plus, ChevronDown, Che
 import { supplierApi, type SupplierProduct, productApi, type ProductImage, type CategoryTreeItem, type BrandItem, type SpotPricePolicy } from '../../lib/api';
 import { ProductForm, type ProductFormData, CategorySelect } from '../../components/product';
 import { RichTextEditor, ContentRenderer } from '@o4o/content-editor';
+// WO-NETURE-PRODUCT-DRAWER-FORM-STANDARD-COMPLIANCE-V1: O4O Form Standard primitives
+import { Section, InfoRow, FormField } from '@o4o/operator-ux-core';
+import { toast } from '@o4o/error-handling';
 import { useContentTemplates } from '../../hooks/useContentTemplates';
 import { useAuth } from '../../contexts';
 import MediaPickerModal from '../../components/common/MediaPickerModal';
@@ -41,24 +44,9 @@ interface ProductDetailDrawerProps {
 }
 
 // ─── Helpers ───
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="border-b border-slate-100 pb-4 mb-4 last:border-0 last:mb-0 last:pb-0">
-      <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">{title}</h4>
-      <div className="space-y-2">{children}</div>
-    </div>
-  );
-}
-
-function InfoRow({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="flex items-start justify-between gap-4">
-      <span className="text-sm text-slate-500 shrink-0">{label}</span>
-      <span className="text-sm text-slate-900 text-right">{children}</span>
-    </div>
-  );
-}
+// WO-NETURE-PRODUCT-DRAWER-FORM-STANDARD-COMPLIANCE-V1:
+//   Section / InfoRow → @o4o/operator-ux-core 로 이동
+//   Badge → 본 WO 범위 외 (Form Standard §11 D7), 인라인 유지
 
 function Badge({ children, className }: { children: React.ReactNode; className: string }) {
   return (
@@ -108,6 +96,10 @@ function toFormData(p: SupplierProduct): Partial<ProductFormData> {
 // ─── Component ───
 
 const ACCEPTED_IMAGE_TYPES = 'image/jpeg,image/png,image/webp';
+
+// WO-NETURE-PRODUCT-DRAWER-FORM-STANDARD-COMPLIANCE-V1: 공통 input 스타일
+const INPUT_CLASS =
+  'w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-50';
 
 export default function ProductDetailDrawer({ product, open, onClose, onSaved, approvalActions }: ProductDetailDrawerProps) {
   // WO-NETURE-PRODUCT-DRAWER-DUAL-EDIT-ENTRY-V1: dual edit mode
@@ -294,7 +286,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
           businessDetailDescription: bizDetail,
         });
         if (!bizResult.success) {
-          alert(`저장 실패: ${bizResult.error || '알 수 없는 오류'}`);
+          toast.error(`저장 실패: ${bizResult.error || '알 수 없는 오류'}`);
         } else {
           setEditMode(null);
           setShowSecondaryEdit(false);
@@ -302,7 +294,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
         }
       } catch (error) {
         console.error('[ProductDetailDrawer] B2B save error:', error);
-        alert('저장 중 오류가 발생했습니다');
+        toast.error('저장 중 오류가 발생했습니다');
       } finally {
         setSaving(false);
       }
@@ -345,7 +337,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
       console.log('[ProductDetailDrawer] save result:', result);
 
       if (!result.success) {
-        alert(`저장 실패: ${result.error || '알 수 없는 오류'}`);
+        toast.error(`저장 실패: ${result.error || '알 수 없는 오류'}`);
         setSaving(false);
         return;
       }
@@ -377,7 +369,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
       onSaved?.();
     } catch (error) {
       console.error('[ProductDetailDrawer] save error:', error);
-      alert('저장 중 오류가 발생했습니다');
+      toast.error('저장 중 오류가 발생했습니다');
     } finally {
       setSaving(false);
     }
@@ -390,8 +382,22 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
     supplierApi.listSpotPolicies(product.id).then(setSpotPolicies).finally(() => setSpotLoading(false));
   }, [product?.id, open]);
 
+  // WO-NETURE-PRODUCT-DRAWER-FORM-STANDARD-COMPLIANCE-V1: validation 분리
+  const validateSpotForm = (): string | null => {
+    if (!spotForm.policyName.trim()) return '정책명을 입력하세요';
+    if (!spotForm.spotPrice) return '스팟 가격을 입력하세요';
+    if (!spotForm.startAt) return '시작일을 입력하세요';
+    if (!spotForm.endAt) return '종료일을 입력하세요';
+    return null;
+  };
+
   const handleSpotCreate = async () => {
     if (!product?.id) return;
+    const validationError = validateSpotForm();
+    if (validationError) {
+      toast.error(validationError);
+      return;
+    }
     setSpotSaving(true);
     const result = await supplierApi.createSpotPolicy({
       offerId: product.id,
@@ -406,7 +412,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
       const updated = await supplierApi.listSpotPolicies(product.id);
       setSpotPolicies(updated);
     } else {
-      alert(result.error || '스팟 정책 생성 실패');
+      toast.error(result.error || '스팟 정책 생성 실패');
     }
     setSpotSaving(false);
   };
@@ -418,7 +424,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
       const updated = await supplierApi.listSpotPolicies(product.id);
       setSpotPolicies(updated);
     } else {
-      alert(result.error || '상태 변경 실패');
+      toast.error(result.error || '상태 변경 실패');
     }
   };
 
@@ -677,8 +683,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
             <div ref={b2bEditRef} className="mb-5 p-4 bg-teal-50/40 border border-teal-200 rounded-xl space-y-4">
               <h4 className="text-xs font-semibold text-teal-600 uppercase tracking-wider">판매자 지원 설명 (B2B)</h4>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">B2B 간단 소개</label>
+              <FormField label="B2B 간단 소개">
                 <RichTextEditor
                   value={editBizShort}
                   onChange={(c) => setEditBizShort(c.html)}
@@ -689,10 +694,9 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                   onMediaLibraryPick={(insertImage) => setMediaPickerTarget(() => insertImage)}
                   existingImages={images.filter((i) => i.type !== 'thumbnail').map((i) => ({ id: i.id, url: i.imageUrl }))}
                 />
-              </div>
+              </FormField>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">B2B 상세 설명</label>
+              <FormField label="B2B 상세 설명">
                 <RichTextEditor
                   value={editBizDetail}
                   onChange={(c) => setEditBizDetail(c.html)}
@@ -713,7 +717,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                   onUseTemplate={tpl.recordUse}
                   canCreatePublicTemplate={canCreatePublicTemplate}
                 />
-              </div>
+              </FormField>
             </div>
           )}
 
@@ -734,57 +738,53 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
               <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">기본 정보</h4>
 
               {/* 카테고리 — WO-NETURE-CATEGORY-SELECT-TWO-LEVEL-AND-SEARCH-REFINE-V1 */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">카테고리</label>
+              <FormField label="카테고리">
                 <CategorySelect
                   categories={categories}
                   value={editCategory}
                   onChange={setEditCategory}
                   disabled={saving}
                 />
-              </div>
+              </FormField>
 
               {/* 브랜드 */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">브랜드</label>
+              <FormField label="브랜드">
                 <select
                   value={editBrand || ''}
                   onChange={(e) => setEditBrand(e.target.value || null)}
                   disabled={saving}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-50"
+                  className={INPUT_CLASS}
                 >
                   <option value="">선택 안함</option>
                   {brands.map((b) => (
                     <option key={b.id} value={b.id}>{b.name}</option>
                   ))}
                 </select>
-              </div>
+              </FormField>
 
               {/* 사양 */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">사양</label>
+              <FormField label="사양">
                 <input
                   type="text"
                   value={editSpec}
                   onChange={(e) => setEditSpec(e.target.value)}
                   disabled={saving}
                   placeholder="예: 500mg × 60정"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-50"
+                  className={INPUT_CLASS}
                 />
-              </div>
+              </FormField>
 
               {/* 원산지 */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">원산지</label>
+              <FormField label="원산지">
                 <input
                   type="text"
                   value={editOrigin}
                   onChange={(e) => setEditOrigin(e.target.value)}
                   disabled={saving}
                   placeholder="예: 대한민국"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-50"
+                  className={INPUT_CLASS}
                 />
-              </div>
+              </FormField>
             </div>
           )}
 
@@ -806,8 +806,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
             <div className="mb-5 p-4 bg-emerald-50/40 border border-emerald-200 rounded-xl space-y-4">
               <h4 className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">소비자 공개 설명 (B2C)</h4>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">소비자 간단 소개</label>
+              <FormField label="소비자 간단 소개">
                 <RichTextEditor
                   value={editConsumerShort}
                   onChange={(c) => setEditConsumerShort(c.html)}
@@ -818,10 +817,9 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                   onMediaLibraryPick={(insertImage) => setMediaPickerTarget(() => insertImage)}
                   existingImages={images.filter((i) => i.type !== 'thumbnail').map((i) => ({ id: i.id, url: i.imageUrl }))}
                 />
-              </div>
+              </FormField>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">소비자 상세 설명</label>
+              <FormField label="소비자 상세 설명">
                 <RichTextEditor
                   value={editConsumerDetail}
                   onChange={(c) => setEditConsumerDetail(c.html)}
@@ -842,7 +840,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                   onUseTemplate={tpl.recordUse}
                   canCreatePublicTemplate={canCreatePublicTemplate}
                 />
-              </div>
+              </FormField>
             </div>
           )}
 
@@ -851,8 +849,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
             <div className="mb-5 p-4 bg-slate-50/60 border border-slate-200 rounded-xl space-y-4">
               <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">판매자 지원 설명 (B2B)</h4>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">B2B 간단 소개</label>
+              <FormField label="B2B 간단 소개">
                 <RichTextEditor
                   value={editBizShort}
                   onChange={(c) => setEditBizShort(c.html)}
@@ -863,10 +860,9 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                   onMediaLibraryPick={(insertImage) => setMediaPickerTarget(() => insertImage)}
                   existingImages={images.filter((i) => i.type !== 'thumbnail').map((i) => ({ id: i.id, url: i.imageUrl }))}
                 />
-              </div>
+              </FormField>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">B2B 상세 설명</label>
+              <FormField label="B2B 상세 설명">
                 <RichTextEditor
                   value={editBizDetail}
                   onChange={(c) => setEditBizDetail(c.html)}
@@ -887,7 +883,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                   onUseTemplate={tpl.recordUse}
                   canCreatePublicTemplate={canCreatePublicTemplate}
                 />
-              </div>
+              </FormField>
             </div>
           )}
 
@@ -1448,7 +1444,8 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                       </div>
                     </div>
                     <div className="flex gap-2 pt-1">
-                      <button onClick={handleSpotCreate} disabled={spotSaving || !spotForm.policyName || !spotForm.spotPrice || !spotForm.startAt || !spotForm.endAt} className="px-3 py-1.5 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 disabled:opacity-50">
+                      {/* WO-NETURE-PRODUCT-DRAWER-FORM-STANDARD-COMPLIANCE-V1: validation 은 handleSpotCreate 내부 */}
+                      <button onClick={handleSpotCreate} disabled={spotSaving} className="px-3 py-1.5 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 disabled:opacity-50">
                         {spotSaving ? '저장 중...' : '생성'}
                       </button>
                       <button onClick={() => { setSpotFormOpen(false); setSpotForm({ policyName: '', spotPrice: '', startAt: '', endAt: '' }); }} className="px-3 py-1.5 bg-slate-100 text-slate-600 text-xs rounded hover:bg-slate-200">취소</button>

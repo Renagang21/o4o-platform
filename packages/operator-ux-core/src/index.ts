@@ -31,3 +31,6 @@ export * from './list/index';
 
 // Member List Module (WO-O4O-MEMBER-LIST-STANDARDIZATION-V1)
 export * from './member-list/index';
+
+// Form Module (WO-O4O-FORM-PRIMITIVES-EXTRACTION-V1)
+export * from './form/index';
