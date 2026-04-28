@@ -17,6 +17,7 @@ import { Router, Request, Response, RequestHandler } from 'express';
 import type { DataSource } from 'typeorm';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import { EventOfferService, EventOfferError } from '../services/event-offer.service.js';
+import { SERVICE_KEYS } from '../../../constants/service-keys.js';
 
 export function createEventOfferController(
   dataSource: DataSource,
@@ -101,6 +102,7 @@ export function createEventOfferController(
 
   /**
    * GET /:id — Event offer detail (public)
+   * WO-O4O-EVENT-OFFER-QUANTITY-LIMITS-V2: 인증 사용자 시 availability 포함
    */
   router.get('/:id', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
     const listing = await service.getGroupbuyDetail(req.params.id);
@@ -108,7 +110,13 @@ export function createEventOfferController(
       res.status(404).json({ success: false, error: { message: 'Event offer not found' } });
       return;
     }
-    res.json({ success: true, data: listing });
+
+    const user = (req as any).user;
+    const availability = user?.id
+      ? await service.getListingAvailability(req.params.id, user.id, SERVICE_KEYS.KPA_GROUPBUY)
+      : null;
+
+    res.json({ success: true, data: listing, ...(availability ? { availability } : {}) });
   }));
 
   /**

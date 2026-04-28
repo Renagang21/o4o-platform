@@ -8,11 +8,11 @@ import { PageHeader, LoadingSpinner, EmptyState, Pagination, Card } from '../../
 import { eventOfferApi } from '../../api';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
-import type { GroupbuyParticipation } from '../../types';
+import type { EventOfferParticipation } from '../../types';
 
 export function EventOfferHistoryPage() {
   const { user } = useAuth();
-  const [participations, setParticipations] = useState<GroupbuyParticipation[]>([]);
+  const [participations, setParticipations] = useState<EventOfferParticipation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);

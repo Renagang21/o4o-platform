@@ -75,8 +75,13 @@ export class EventOfferService {
   /**
    * GET / — Public event offer listing (paginated)
    * WO-O4O-EVENT-OFFER-CORE-REFORM-V1: status + 날짜 + 수량 조건으로 변경
+   * WO-O4O-EVENT-OFFER-NETURE-ADOPTION-V1: serviceKey 파라미터 추가 (기본값: KPA_GROUPBUY)
    */
-  async listGroupbuys(page: number, limit: number): Promise<{ data: OrganizationProductListing[]; total: number }> {
+  async listGroupbuys(
+    page: number,
+    limit: number,
+    serviceKey: string = SERVICE_KEYS.KPA_GROUPBUY,
+  ): Promise<{ data: OrganizationProductListing[]; total: number }> {
     const safePage = page || 1;
     const safeLimit = Math.min(limit || 12, 50);
     const offset = (safePage - 1) * safeLimit;
@@ -87,7 +92,7 @@ export class EventOfferService {
          FROM organization_product_listings opl
          WHERE opl.service_key = $1
            AND ${ACTIVE_OFFER_CLAUSE}`,
-        [SERVICE_KEYS.KPA_GROUPBUY],
+        [serviceKey],
       ),
       this.dataSource.query(
         `SELECT opl.*
@@ -96,7 +101,7 @@ export class EventOfferService {
            AND ${ACTIVE_OFFER_CLAUSE}
          ORDER BY opl.created_at ASC
          LIMIT $2 OFFSET $3`,
-        [SERVICE_KEYS.KPA_GROUPBUY, safeLimit, offset],
+        [serviceKey, safeLimit, offset],
       ),
     ]);
 
@@ -113,6 +118,7 @@ export class EventOfferService {
     page: number,
     limit: number,
     status?: 'active' | 'ended' | 'all',
+    serviceKey: string = SERVICE_KEYS.KPA_GROUPBUY,
   ): Promise<{
     data: Array<{
       id: string;
@@ -128,6 +134,10 @@ export class EventOfferService {
       unitPrice: number | null;
       productName: string;
       supplierName: string;
+      // WO-O4O-EVENT-OFFER-QUANTITY-LIMITS-V2: 수량 정보
+      totalQuantity: number | null;
+      perOrderLimit: number | null;
+      perStoreLimit: number | null;
     }>;
     total: number;
   }> {
@@ -155,7 +165,7 @@ export class EventOfferService {
       `SELECT COUNT(*)::int AS total
        FROM organization_product_listings opl
        WHERE opl.service_key = $1 AND ${filterClause}`,
-      [SERVICE_KEYS.KPA_GROUPBUY],
+      [serviceKey],
     );
     const total = countResult[0]?.total ?? 0;
 
@@ -170,6 +180,9 @@ export class EventOfferService {
          opl.end_at          AS "endAt",
          opl.created_at      AS "createdAt",
          opl.updated_at      AS "updatedAt",
+         opl.total_quantity  AS "totalQuantity",
+         opl.per_order_limit AS "perOrderLimit",
+         opl.per_store_limit AS "perStoreLimit",
          spo.supplier_id     AS "supplierId",
          COALESCE(spo.price_general, opl.price)::numeric AS "unitPrice",
          COALESCE(pm.name, '(상품명 없음)')  AS "productName",
@@ -182,7 +195,7 @@ export class EventOfferService {
        WHERE opl.service_key = $1 AND ${filterClause}
        ORDER BY org.name ASC, opl.created_at ASC
        LIMIT $2 OFFSET $3`,
-      [SERVICE_KEYS.KPA_GROUPBUY, safeLimit, offset],
+      [serviceKey, safeLimit, offset],
     );
 
     return {
@@ -200,6 +213,10 @@ export class EventOfferService {
         unitPrice: r.unitPrice !== null ? Number(r.unitPrice) : null,
         productName: r.productName,
         supplierName: r.supplierName,
+        // WO-O4O-EVENT-OFFER-QUANTITY-LIMITS-V2: 수량 정보
+        totalQuantity: r.totalQuantity !== null ? Number(r.totalQuantity) : null,
+        perOrderLimit: r.perOrderLimit !== null ? Number(r.perOrderLimit) : null,
+        perStoreLimit: r.perStoreLimit !== null ? Number(r.perStoreLimit) : null,
       })),
       total,
     };
@@ -209,7 +226,9 @@ export class EventOfferService {
    * GET /stats — Operator stats (orders, quantity, revenue, stores, listings)
    * WO-O4O-EVENT-OFFER-CORE-REFORM-V1: registeredProducts → status='approved' 기준
    */
-  async getGroupbuyStats(): Promise<{
+  async getGroupbuyStats(
+    serviceKey: string = SERVICE_KEYS.KPA_GROUPBUY,
+  ): Promise<{
     totalOrders: number;
     totalQuantity: number;
     totalRevenue: number;
@@ -228,18 +247,18 @@ export class EventOfferService {
         FROM checkout_orders
         WHERE metadata->>'serviceKey' = $1
           AND status = 'paid'
-      `, [SERVICE_KEYS.KPA_GROUPBUY]),
+      `, [serviceKey]),
       this.dataSource.query(`
         SELECT COUNT(DISTINCT "buyerId")::int AS "participatingStores"
         FROM checkout_orders
         WHERE metadata->>'serviceKey' = $1
           AND status = 'paid'
-      `, [SERVICE_KEYS.KPA_GROUPBUY]),
+      `, [serviceKey]),
       this.dataSource.query(
         `SELECT COUNT(*)::int AS cnt
          FROM organization_product_listings opl
          WHERE opl.service_key = $1 AND ${ACTIVE_OFFER_CLAUSE}`,
-        [SERVICE_KEYS.KPA_GROUPBUY],
+        [serviceKey],
       ),
     ]);
 
@@ -253,14 +272,107 @@ export class EventOfferService {
   }
 
   /**
-   * GET /my-participations — Authenticated user's event offer orders
+   * GET /:id availability — 인증 사용자 기준 가용 수량 계산
+   *
+   * WO-O4O-EVENT-OFFER-QUANTITY-LIMITS-V2
+   *
+   * participate()의 서버 검증(V1)을 조회 응답에 연결하는 메서드.
+   * participate() 트랜잭션 로직은 변경하지 않는다.
+   *
+   * maxOrderable 계산:
+   *   candidates = [perOrderLimit, availableForStore, totalQuantity] (null 제외)
+   *   maxOrderable = candidates.length > 0 ? Math.min(...candidates) : 999
    */
-  async getMyParticipations(userId: string): Promise<{ data: any[]; total: number }> {
+  async getListingAvailability(
+    listingId: string,
+    userId: string,
+    serviceKey: string,
+  ): Promise<{
+    totalQuantity: number | null;
+    perOrderLimit: number | null;
+    perStoreLimit: number | null;
+    alreadyOrdered: number;
+    availableForStore: number | null;
+    maxOrderable: number;
+    isSoldOut: boolean;
+  }> {
+    // 1. listing 수량 정보 조회 (serviceKey 격리)
+    const [row] = await this.dataSource.query(
+      `SELECT total_quantity, per_order_limit, per_store_limit
+       FROM organization_product_listings
+       WHERE id = $1 AND service_key = $2
+       LIMIT 1`,
+      [listingId, serviceKey],
+    );
+
+    if (!row) {
+      return {
+        totalQuantity: null, perOrderLimit: null, perStoreLimit: null,
+        alreadyOrdered: 0, availableForStore: null, maxOrderable: 999, isSoldOut: false,
+      };
+    }
+
+    const totalQuantity = row.total_quantity !== null ? Number(row.total_quantity) : null;
+    const perOrderLimit = row.per_order_limit !== null ? Number(row.per_order_limit) : null;
+    const perStoreLimit = row.per_store_limit !== null ? Number(row.per_store_limit) : null;
+
+    // 2. 매장 누적 주문량 조회
+    let alreadyOrdered = 0;
+    if (perStoreLimit !== null) {
+      const [storeRow] = await this.dataSource.query(
+        `SELECT COALESCE(
+           SUM((elem->>'quantity')::int), 0
+         )::int AS total_ordered
+         FROM checkout_orders co
+         CROSS JOIN jsonb_array_elements(co.items) AS elem
+         WHERE co."buyerId" = $1
+           AND co.metadata->>'productListingId' = $2
+           AND co.status NOT IN ('canceled', 'failed')`,
+        [userId, listingId],
+      );
+      alreadyOrdered = Number(storeRow?.total_ordered ?? 0);
+    }
+
+    // 3. 매장별 잔여 한도
+    const availableForStore = perStoreLimit !== null
+      ? Math.max(0, perStoreLimit - alreadyOrdered)
+      : null;
+
+    // 4. maxOrderable: null이 아닌 후보값 중 최솟값
+    const candidates: number[] = [];
+    if (perOrderLimit !== null) candidates.push(perOrderLimit);
+    if (availableForStore !== null) candidates.push(availableForStore);
+    if (totalQuantity !== null) candidates.push(totalQuantity);
+    const maxOrderable = candidates.length > 0 ? Math.min(...candidates) : 999;
+
+    // 5. 품절 판단
+    const isSoldOut = (totalQuantity !== null && totalQuantity <= 0)
+      || (availableForStore !== null && availableForStore <= 0);
+
+    return {
+      totalQuantity,
+      perOrderLimit,
+      perStoreLimit,
+      alreadyOrdered,
+      availableForStore,
+      maxOrderable,
+      isSoldOut,
+    };
+  }
+
+  /**
+   * GET /my-participations — Authenticated user's event offer orders
+   * WO-O4O-EVENT-OFFER-NETURE-ADOPTION-V1: serviceKey 파라미터 추가
+   */
+  async getMyParticipations(
+    userId: string,
+    serviceKey: string = SERVICE_KEYS.KPA_GROUPBUY,
+  ): Promise<{ data: any[]; total: number }> {
     const orderRepo = this.dataSource.getRepository(CheckoutOrder);
     const [orders, total] = await orderRepo
       .createQueryBuilder('o')
       .where('o.buyerId = :buyerId', { buyerId: userId })
-      .andWhere("o.metadata->>'serviceKey' = :sk", { sk: SERVICE_KEYS.KPA_GROUPBUY })
+      .andWhere("o.metadata->>'serviceKey' = :sk", { sk: serviceKey })
       .orderBy('o.createdAt', 'DESC')
       .take(20)
       .getManyAndCount();
@@ -281,8 +393,12 @@ export class EventOfferService {
   /**
    * GET /:id — Event offer detail (public)
    * WO-O4O-EVENT-OFFER-CORE-REFORM-V1: status + 날짜 조건으로 변경
+   * WO-O4O-EVENT-OFFER-NETURE-ADOPTION-V1: serviceKey 파라미터 추가
    */
-  async getGroupbuyDetail(id: string): Promise<Record<string, any> | null> {
+  async getGroupbuyDetail(
+    id: string,
+    serviceKey: string = SERVICE_KEYS.KPA_GROUPBUY,
+  ): Promise<Record<string, any> | null> {
     const rows = await this.dataSource.query(
       `SELECT opl.*
        FROM organization_product_listings opl
@@ -290,7 +406,7 @@ export class EventOfferService {
          AND opl.service_key = $2
          AND ${ACTIVE_OFFER_CLAUSE}
        LIMIT 1`,
-      [id, SERVICE_KEYS.KPA_GROUPBUY],
+      [id, serviceKey],
     );
     return rows[0] ?? null;
   }
@@ -310,6 +426,7 @@ export class EventOfferService {
     listingId: string,
     userId: string,
     data: { quantity?: number },
+    serviceKey: string = SERVICE_KEYS.KPA_GROUPBUY,
   ): Promise<{ orderId: string; orderNumber: string; status: string; totalAmount: number }> {
     const quantity = Math.max(1, parseInt(String(data?.quantity)) || 1);
 
@@ -327,7 +444,7 @@ export class EventOfferService {
          AND (opl.start_at IS NULL OR NOW() >= opl.start_at)
          AND (opl.end_at   IS NULL OR NOW() <= opl.end_at)
        LIMIT 1`,
-      [listingId, SERVICE_KEYS.KPA_GROUPBUY],
+      [listingId, serviceKey],
     );
     if (!preLockRows.length) {
       throw new EventOfferError(404, '이벤트를 찾을 수 없거나 진행 중이 아닙니다.');
@@ -372,7 +489,7 @@ export class EventOfferService {
            AND (start_at IS NULL OR NOW() >= start_at)
            AND (end_at   IS NULL OR NOW() <= end_at)
          FOR UPDATE`,
-        [listingId, SERVICE_KEYS.KPA_GROUPBUY],
+        [listingId, serviceKey],
       );
       if (!listing) {
         await qr.rollbackTransaction();

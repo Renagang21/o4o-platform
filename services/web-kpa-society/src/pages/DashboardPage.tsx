@@ -86,7 +86,7 @@ const mockSchedule = [
 ];
 
 // Mock activity data
-// WO-KPA-MENU-CLEANUP-V1: ongoingCourses, activeGroupbuys 제거
+// WO-KPA-MENU-CLEANUP-V1: ongoingCourses, activeEventOffers 제거
 const mockActivity = {
   unreadNotices: 3,
   recentForumPosts: [
@@ -108,7 +108,7 @@ const mockKpaNews = [
   { id: 3, title: '전국 약사회 정기총회 결과 보고', date: '2024-12-15' },
 ];
 
-// WO-KPA-MENU-CLEANUP-V1: mockCourses, mockGroupbuys 제거 (배너 전환)
+// WO-KPA-MENU-CLEANUP-V1: mockCourses, mockEventOffers 제거 (배너 전환)
 
 export function DashboardPage() {
   const { user } = useAuth();

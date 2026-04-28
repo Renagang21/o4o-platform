@@ -12,13 +12,13 @@ import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/c
 import { eventOfferApi } from '../../api';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
-import type { GroupbuyProduct } from '../../types';
+import type { EventOfferProduct } from '../../types';
 
 export function EventOfferDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [product, setProduct] = useState<GroupbuyProduct | null>(null);
+  const [product, setProduct] = useState<EventOfferProduct | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [participating, setParticipating] = useState(false);
@@ -33,7 +33,7 @@ export function EventOfferDetailPage() {
     try {
       setLoading(true);
       setError(null);
-      const res = await eventOfferApi.getGroupbuyProduct(id!);
+      const res = await eventOfferApi.getEventOfferProduct(id!);
       setProduct(res.data);
     } catch (err) {
       setError(err instanceof Error ? err.message : '상품을 불러오는데 실패했습니다.');

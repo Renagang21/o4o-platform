@@ -276,8 +276,8 @@ export interface CourseCompletionItem {
   completedAt: string;
 }
 
-// 공동구매 통계 (WO-KPA-GROUPBUY-STATS-V1)
-export interface GroupbuyStats {
+// 이벤트 오퍼 통계 (WO-KPA-GROUPBUY-STATS-V1)
+export interface EventOfferStats {
   totalOrders: number;
   totalQuantity: number;
   totalRevenue: number;
@@ -285,8 +285,8 @@ export interface GroupbuyStats {
   registeredProducts: number;
 }
 
-// 공동구매 상품 (OrganizationProductListing 기반, WO-KPA-GROUPBUY-PAGE-V1)
-export interface GroupbuyProduct {
+// 이벤트 오퍼 상품 (OrganizationProductListing 기반, WO-KPA-GROUPBUY-PAGE-V1)
+export interface EventOfferProduct {
   id: string;
   organization_id: string;
   service_key: string;
@@ -302,6 +302,7 @@ export interface GroupbuyProduct {
 
 // 이벤트 상품 (Enriched, WO-EVENT-OFFER-HUB-TABLE-AND-DIRECT-ORDER-REFINE-V1)
 // WO-O4O-EVENT-OFFER-CORE-REFORM-V1: status / startAt / endAt 추가
+// WO-O4O-EVENT-OFFER-QUANTITY-LIMITS-V2: 수량 필드 추가
 export interface EventOfferItem {
   id: string;
   offerId: string;
@@ -317,13 +318,17 @@ export interface EventOfferItem {
   unitPrice: number | null;
   productName: string;
   supplierName: string;
+  // 수량 제한 정보 (null = 무제한)
+  totalQuantity: number | null;
+  perOrderLimit: number | null;
+  perStoreLimit: number | null;
 }
 
 // 이벤트 상태 (WO-EVENT-OFFER-HUB-TIME-WINDOW-FILTER-HOTFIX-V1)
 export type EventOfferStatus = 'active' | 'ended' | 'all';
 
-// 공동구매 (캠페인 모델 - legacy)
-export interface Groupbuy {
+// 이벤트 오퍼 (캠페인 모델 - legacy)
+export interface LegacyEventOffer {
   id: string;
   title: string;
   description: string;
@@ -344,10 +349,10 @@ export interface Groupbuy {
   organizerName: string;
 }
 
-export interface GroupbuyParticipation {
+export interface EventOfferParticipation {
   id: string;
   groupbuyId: string;
-  groupbuy: Groupbuy;
+  groupbuy: LegacyEventOffer;
   userId: string;
   quantity: number;
   totalPrice: number;

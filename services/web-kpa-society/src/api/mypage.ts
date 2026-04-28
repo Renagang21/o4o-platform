@@ -7,7 +7,7 @@ import { authClient } from '../contexts/AuthContext';
 import type {
   Enrollment,
   Certificate,
-  GroupbuyParticipation,
+  EventOfferParticipation,
   ApiResponse,
   PaginatedResponse,
 } from '../types';
@@ -161,9 +161,9 @@ export const mypageApi = {
   getMyCertificates: (params?: { page?: number; limit?: number }) =>
     apiClient.get<PaginatedResponse<Certificate>>('/mypage/certificates', params),
 
-  // 내 공동구매
-  getMyGroupbuys: (params?: { status?: string; page?: number; limit?: number }) =>
-    apiClient.get<PaginatedResponse<GroupbuyParticipation>>('/mypage/groupbuys', params),
+  // 내 이벤트 오퍼
+  getMyEventOffers: (params?: { status?: string; page?: number; limit?: number }) =>
+    apiClient.get<PaginatedResponse<EventOfferParticipation>>('/mypage/groupbuys', params),
 
   // 통합 승인 요청 — WO-KPA-A-MYPAGE-UNIFIED-REQUEST-INBOX-V1
   getMyApprovalRequests: (params?: { entityType?: string; status?: string }) =>

@@ -24,7 +24,7 @@ const mockSupplierDetail = {
   reviewCount: 234,
   minOrderAmount: 100000,
   deliveryDays: '1-2일',
-  tradeTypes: ['b2b', 'groupbuy'],
+  tradeTypes: ['b2b', 'event-offer'],
   categories: [
     { id: 'cat-1', name: '소화기계', productCount: 45 },
     { id: 'cat-2', name: '순환기계', productCount: 32 },
@@ -41,7 +41,7 @@ const mockSupplierDetail = {
     { id: 'prod-2', name: '베아제', spec: '50mg x 60정', price: 8500 },
     { id: 'prod-3', name: '이가탄', spec: '500mg x 30정', price: 12000 },
   ],
-  activeGroupbuys: [
+  activeEventOffers: [
     { id: 'gb-1', productName: '우루사 100정', targetQty: 100, currentQty: 67, deadline: '2025-02-15' },
   ],
 };
@@ -96,8 +96,8 @@ export function SupplierDetailPage() {
                   {supplier.tradeTypes.includes('b2b') && (
                     <span style={styles.tradeTypeBadge}>일반 B2B</span>
                   )}
-                  {supplier.tradeTypes.includes('groupbuy') && (
-                    <span style={{ ...styles.tradeTypeBadge, ...styles.groupbuyBadge }}>
+                  {supplier.tradeTypes.includes('event-offer') && (
+                    <span style={{ ...styles.tradeTypeBadge, ...styles.eventOfferBadge }}>
                       이벤트
                     </span>
                   )}
@@ -163,12 +163,12 @@ export function SupplierDetailPage() {
         {/* 우측: 사이드바 */}
         <div style={styles.sidebar}>
           {/* 진행중 이벤트 */}
-          {supplier.activeGroupbuys.length > 0 && (
+          {supplier.activeEventOffers.length > 0 && (
             <section style={styles.sideCard}>
               <h3 style={styles.sideCardTitle}>🔥 진행중 이벤트</h3>
-              {supplier.activeGroupbuys.map((gb) => (
-                <div key={gb.id} style={styles.groupbuyItem}>
-                  <span style={styles.groupbuyName}>{gb.productName}</span>
+              {supplier.activeEventOffers.map((gb) => (
+                <div key={gb.id} style={styles.eventOfferItem}>
+                  <span style={styles.eventOfferName}>{gb.productName}</span>
                   <div style={styles.progressSection}>
                     <div style={styles.progressBar}>
                       <div
@@ -182,7 +182,7 @@ export function SupplierDetailPage() {
                       {gb.currentQty}/{gb.targetQty}
                     </span>
                   </div>
-                  <span style={styles.groupbuyDeadline}>
+                  <span style={styles.eventOfferDeadline}>
                     마감: {gb.deadline}
                   </span>
                   {isOwner ? (
@@ -212,7 +212,7 @@ export function SupplierDetailPage() {
               >
                 📦 상품 목록
               </Link>
-              {supplier.tradeTypes.includes('groupbuy') && (
+              {supplier.tradeTypes.includes('event-offer') && (
                 <Link
                   to={`/event-offers?supplier=${supplierId}`}
                   style={styles.actionButton}
@@ -382,7 +382,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '0.75rem',
     fontWeight: 500,
   },
-  groupbuyBadge: {
+  eventOfferBadge: {
     backgroundColor: colors.primary + '15',
     color: colors.primary,
   },
@@ -469,13 +469,13 @@ const styles: Record<string, React.CSSProperties> = {
     margin: '0 0 16px 0',
   },
 
-  // Groupbuy
-  groupbuyItem: {
+  // Event Offer
+  eventOfferItem: {
     display: 'flex',
     flexDirection: 'column',
     gap: '10px',
   },
-  groupbuyName: {
+  eventOfferName: {
     fontSize: '0.9375rem',
     fontWeight: 500,
     color: colors.neutral800,
@@ -503,7 +503,7 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.neutral600,
     minWidth: '50px',
   },
-  groupbuyDeadline: {
+  eventOfferDeadline: {
     fontSize: '0.8125rem',
     color: colors.neutral500,
   },

@@ -4,10 +4,10 @@
 
 import { apiClient } from './client';
 import type {
-  Groupbuy,
-  GroupbuyProduct,
-  GroupbuyStats,
-  GroupbuyParticipation,
+  LegacyEventOffer,
+  EventOfferProduct,
+  EventOfferStats,
+  EventOfferParticipation,
   EventOfferItem,
   PaginatedResponse,
   ApiResponse,
@@ -15,27 +15,27 @@ import type {
 
 export const eventOfferApi = {
   // 이벤트 상품 목록 (product listing 기반, WO-KPA-GROUPBUY-PAGE-V1)
-  getGroupbuyProducts: (params?: {
+  getEventOfferProducts: (params?: {
     page?: number;
     limit?: number;
   }) =>
     apiClient.get<{
       success: boolean;
-      data: GroupbuyProduct[];
+      data: EventOfferProduct[];
       pagination: { page: number; limit: number; total: number; totalPages: number };
     }>('/groupbuy', params),
 
   // 이벤트 상품 상세 (WO-KPA-GROUPBUY-PAGE-V1)
-  getGroupbuyProduct: (id: string) =>
-    apiClient.get<{ success: boolean; data: GroupbuyProduct }>(`/groupbuy/${id}`),
+  getEventOfferProduct: (id: string) =>
+    apiClient.get<{ success: boolean; data: EventOfferProduct }>(`/groupbuy/${id}`),
 
   // 이벤트 운영 통계 (WO-KPA-GROUPBUY-STATS-V1)
-  getGroupbuyStats: () =>
-    apiClient.get<{ success: boolean; data: GroupbuyStats }>('/groupbuy/stats'),
+  getEventOfferStats: () =>
+    apiClient.get<{ success: boolean; data: EventOfferStats }>('/groupbuy/stats'),
 
   // 이벤트 상품 목록 (enriched, WO-EVENT-OFFER-HUB-TABLE-AND-DIRECT-ORDER-REFINE-V1)
   // WO-EVENT-OFFER-HUB-TIME-WINDOW-FILTER-HOTFIX-V1: status 필터 추가
-  getEnrichedGroupbuys: (params?: {
+  getEnrichedOffers: (params?: {
     page?: number;
     limit?: number;
     status?: 'active' | 'ended' | 'all';
@@ -47,22 +47,22 @@ export const eventOfferApi = {
     }>('/groupbuy/enriched', params),
 
   // 이벤트 목록 (legacy campaign)
-  getGroupbuys: (params?: {
+  getOffers: (params?: {
     status?: 'upcoming' | 'active' | 'ended';
     category?: string;
     page?: number;
     limit?: number;
     search?: string;
   }) =>
-    apiClient.get<PaginatedResponse<Groupbuy>>('/groupbuy', params),
+    apiClient.get<PaginatedResponse<LegacyEventOffer>>('/groupbuy', params),
 
   // 이벤트 상세
-  getGroupbuy: (id: string) =>
-    apiClient.get<ApiResponse<Groupbuy>>(`/groupbuy/${id}`),
+  getOffer: (id: string) =>
+    apiClient.get<ApiResponse<LegacyEventOffer>>(`/groupbuy/${id}`),
 
   // 참여하기
   participate: (id: string, quantity: number) =>
-    apiClient.post<ApiResponse<GroupbuyParticipation>>(`/groupbuy/${id}/participate`, {
+    apiClient.post<ApiResponse<EventOfferParticipation>>(`/groupbuy/${id}/participate`, {
       quantity,
     }),
 
@@ -76,9 +76,9 @@ export const eventOfferApi = {
     page?: number;
     limit?: number;
   }) =>
-    apiClient.get<PaginatedResponse<GroupbuyParticipation>>('/groupbuy/my-participations', params),
+    apiClient.get<PaginatedResponse<EventOfferParticipation>>('/groupbuy/my-participations', params),
 
   // 참여 상세
-  getParticipation: (groupbuyId: string) =>
-    apiClient.get<ApiResponse<GroupbuyParticipation>>(`/groupbuy/${groupbuyId}/my-participation`),
+  getParticipation: (offerId: string) =>
+    apiClient.get<ApiResponse<EventOfferParticipation>>(`/groupbuy/${offerId}/my-participation`),
 };

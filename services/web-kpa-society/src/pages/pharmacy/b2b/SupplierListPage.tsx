@@ -20,7 +20,7 @@ const mockSuppliers = [
     category: '의약품',
     description: '국내 대표 제약사, 다양한 전문의약품 공급',
     productCount: 156,
-    tradeTypes: ['b2b', 'groupbuy'],
+    tradeTypes: ['b2b', 'event-offer'],
     status: 'active',
     rating: 4.8,
     minOrderAmount: 100000,
@@ -44,7 +44,7 @@ const mockSuppliers = [
     category: '의약품',
     description: '아로나민 등 인기 의약품 공급',
     productCount: 203,
-    tradeTypes: ['b2b', 'groupbuy'],
+    tradeTypes: ['b2b', 'event-offer'],
     status: 'active',
     rating: 4.7,
     minOrderAmount: 150000,
@@ -68,7 +68,7 @@ const mockSuppliers = [
     category: '의약품/잡화',
     description: '약국 운영물품 종합 도매',
     productCount: 2340,
-    tradeTypes: ['b2b', 'groupbuy'],
+    tradeTypes: ['b2b', 'event-offer'],
     status: 'active',
     rating: 4.3,
     minOrderAmount: 30000,
@@ -80,7 +80,7 @@ const mockSuppliers = [
     category: '약국잡화',
     description: '약국 인테리어/소모품 전문',
     productCount: 567,
-    tradeTypes: ['groupbuy'],
+    tradeTypes: ['event-offer'],
     status: 'active',
     rating: 4.4,
     minOrderAmount: 50000,
@@ -128,7 +128,7 @@ export function SupplierListPage() {
           <select style={styles.filterSelect}>
             <option value="all">전체 거래유형</option>
             <option value="b2b">일반 B2B</option>
-            <option value="groupbuy">이벤트</option>
+            <option value="event-offer">이벤트</option>
           </select>
           <select style={styles.filterSelect}>
             <option value="all">전체 카테고리</option>
@@ -182,8 +182,8 @@ export function SupplierListPage() {
                 {supplier.tradeTypes.includes('b2b') && (
                   <span style={styles.tradeTypeBadge}>일반 B2B</span>
                 )}
-                {supplier.tradeTypes.includes('groupbuy') && (
-                  <span style={{ ...styles.tradeTypeBadge, ...styles.groupbuyBadge }}>
+                {supplier.tradeTypes.includes('event-offer') && (
+                  <span style={{ ...styles.tradeTypeBadge, ...styles.eventOfferBadge }}>
                     이벤트
                   </span>
                 )}
@@ -421,7 +421,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '0.75rem',
     fontWeight: 500,
   },
-  groupbuyBadge: {
+  eventOfferBadge: {
     backgroundColor: colors.primary + '15',
     color: colors.primary,
   },

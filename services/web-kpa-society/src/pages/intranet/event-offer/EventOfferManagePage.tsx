@@ -17,9 +17,9 @@ import { toast } from '@o4o/error-handling';
 import { colors } from '../../../styles/theme';
 import {
   eventOfferAdminApi,
-  type GroupbuyProduct,
-  type GroupbuyStats,
-  type GroupbuyApiError,
+  type EventOfferAdminProduct,
+  type EventOfferAdminStats,
+  type EventOfferApiError,
   type AvailableOffer,
 } from '../../../api/eventOfferAdmin';
 
@@ -76,7 +76,7 @@ const PAGE_TEXT = {
 
 export function EventOfferManagePage() {
   // 목록 상태
-  const [products, setProducts] = useState<GroupbuyProduct[]>([]);
+  const [products, setProducts] = useState<EventOfferAdminProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [permissionDenied, setPermissionDenied] = useState(false);
@@ -97,7 +97,7 @@ export function EventOfferManagePage() {
   const [actionLoading, setActionLoading] = useState<Record<string, boolean>>({});
 
   // 통계
-  const [stats, setStats] = useState<GroupbuyStats | null>(null);
+  const [stats, setStats] = useState<EventOfferAdminStats | null>(null);
   const [statsLoading, setStatsLoading] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [statsError, setStatsError] = useState<string | null>(null);
@@ -107,7 +107,7 @@ export function EventOfferManagePage() {
   }, []);
 
   const isPermissionError = (err: any): boolean => {
-    const apiError = err?.response?.data?.error as GroupbuyApiError | undefined;
+    const apiError = err?.response?.data?.error as EventOfferApiError | undefined;
     return (
       err?.response?.status === 401 ||
       err?.response?.status === 403 ||
@@ -117,7 +117,7 @@ export function EventOfferManagePage() {
   };
 
   const isStatsUnavailable = (err: any): boolean => {
-    const apiError = err?.response?.data?.error as GroupbuyApiError | undefined;
+    const apiError = err?.response?.data?.error as EventOfferApiError | undefined;
     return apiError?.code === 'STATS_UNAVAILABLE';
   };
 
@@ -179,7 +179,7 @@ export function EventOfferManagePage() {
         closeAddForm();
       }
     } catch (err: any) {
-      const apiErr = err?.response?.data?.error as GroupbuyApiError | undefined;
+      const apiErr = err?.response?.data?.error as EventOfferApiError | undefined;
       if (apiErr?.code === 'ALREADY_REGISTERED') {
         setCreateError('이미 등록된 이벤트입니다. 목록을 새로고침해 주세요.');
       } else {
@@ -193,7 +193,7 @@ export function EventOfferManagePage() {
   const setRowLoading = (id: string, value: boolean) =>
     setActionLoading(prev => ({ ...prev, [id]: value }));
 
-  const handleToggleVisibility = async (product: GroupbuyProduct) => {
+  const handleToggleVisibility = async (product: EventOfferAdminProduct) => {
     if (actionLoading[product.id]) return;
     setRowLoading(product.id, true);
     try {
@@ -209,7 +209,7 @@ export function EventOfferManagePage() {
     }
   };
 
-  const handleRemove = async (product: GroupbuyProduct) => {
+  const handleRemove = async (product: EventOfferAdminProduct) => {
     if (actionLoading[product.id]) return;
     if (!window.confirm(PAGE_TEXT.confirmRemove(product.title))) return;
     setRowLoading(product.id, true);

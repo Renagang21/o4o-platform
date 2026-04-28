@@ -231,6 +231,8 @@ const StoreBlogPage = lazy(() => import('./pages/store/StoreBlogPage'));
 // Store Owner Manage (WO-O4O-STORE-PRODUCT-LIBRARY-INTEGRATION-V1)
 const StoreListingsPage = lazy(() => import('./pages/store/StoreListingsPage'));
 const StoreProductLibraryPage = lazy(() => import('./pages/store/StoreProductLibraryPage'));
+// Neture Event Offer — 공급자 현황 허브 (WO-O4O-EVENT-OFFER-NETURE-ROLE-UX-ALIGNMENT-V1)
+const SupplierEventOfferPage = lazy(() => import('./pages/supplier/SupplierEventOfferPage'));
 
 // Partner Account
 const PartnerAccountDashboardPage = lazy(() =>
@@ -635,6 +637,8 @@ function App() {
               <Route path="/supplier/b2b-content" element={<SupplierB2BContentPage />} />
               <Route path="/supplier/profile" element={<SupplierProfilePage />} />
               {/* WO-O4O-MARKET-TRIAL-PHASE1-V1 + WO-MARKET-TRIAL-SUPPLIER-RESULTS-AND-FEEDBACK-V1 */}
+              {/* Event Offer 현황 — 공급자 지원 허브 (WO-O4O-EVENT-OFFER-NETURE-ROLE-UX-ALIGNMENT-V1) */}
+              <Route path="/supplier/event-offers" element={<SupplierEventOfferPage />} />
               <Route path="/supplier/market-trial" element={<SupplierTrialListPage />} />
               <Route path="/supplier/market-trial/new" element={<SupplierTrialCreatePage />} />
               <Route path="/supplier/market-trial/:id" element={<SupplierTrialDetailPage />} />
@@ -716,6 +720,7 @@ function App() {
               {/* Store Owner Manage (WO-O4O-STORE-PRODUCT-LIBRARY-INTEGRATION-V1) */}
               <Route path="/store/manage/products" element={<StoreListingsPage />} />
               <Route path="/store/manage/products/library" element={<StoreProductLibraryPage />} />
+              {/* removed: /store/event-offers — WO-O4O-EVENT-OFFER-NETURE-ROLE-UX-ALIGNMENT-V1 */}
             </Route>
 
             {/* ================================================================

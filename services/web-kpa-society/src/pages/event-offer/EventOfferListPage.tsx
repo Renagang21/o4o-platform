@@ -7,11 +7,11 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Pagination, Card } from '../../components/common';
 import { eventOfferApi } from '../../api';
 import { colors, typography } from '../../styles/theme';
-import type { Groupbuy } from '../../types';
+import type { LegacyEventOffer } from '../../types';
 
 export function EventOfferListPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [groupbuys, setGroupbuys] = useState<Groupbuy[]>([]);
+  const [eventOffers, setEventOffers] = useState<LegacyEventOffer[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
 
@@ -26,18 +26,18 @@ export function EventOfferListPage() {
     try {
       setLoading(true);
 
-      const res = await eventOfferApi.getGroupbuys({
+      const res = await eventOfferApi.getOffers({
         status: currentStatus,
         page: currentPage,
         limit: 10,
       });
 
-      setGroupbuys(res.data || []);
+      setEventOffers(res.data || []);
       setTotalPages(res.totalPages || 1);
     } catch (err) {
       // API 오류 시 빈 목록 표시 (서비스 준비 중)
-      console.warn('Groupbuy API not available:', err);
-      setGroupbuys([]);
+      console.warn('Event offer API not available:', err);
+      setEventOffers([]);
       setTotalPages(1);
     } finally {
       setLoading(false);
@@ -123,7 +123,7 @@ export function EventOfferListPage() {
         </button>
       </div>
 
-      {groupbuys.length === 0 ? (
+      {eventOffers.length === 0 ? (
         <EmptyState
           icon="🛒"
           title="이벤트가 없습니다"
@@ -132,7 +132,7 @@ export function EventOfferListPage() {
       ) : (
         <>
           <div style={styles.grid}>
-            {groupbuys.map(item => {
+            {eventOffers.map(item => {
               const badge = getStatusBadge(item.status);
               const discount = calculateDiscount(item.originalPrice, item.groupPrice);
 

@@ -15,6 +15,8 @@ import { requireNetureScope } from '../../middleware/neture-scope.middleware.js'
 import { createAssetSnapshotController } from '../o4o-store/controllers/asset-snapshot.controller.js';
 import { createStoreAssetControlController } from '../o4o-store/controllers/store-asset-control.controller.js';
 import { createStorePlaylistController } from '../o4o-store/controllers/store-playlist.controller.js';
+// WO-O4O-EVENT-OFFER-NETURE-ADOPTION-V1
+import { createNetureEventOfferController } from './controllers/event-offer.controller.js';
 
 export function createNetureRoutes(dataSource: DataSource): Router {
   const router = Router();
@@ -41,6 +43,12 @@ export function createNetureRoutes(dataSource: DataSource): Router {
   router.use('/assets', createAssetSnapshotController(dataSource, requireAuth as any));
   router.use('/store-assets', createStoreAssetControlController(dataSource, requireAuth as any));
   router.use('/store-playlists', createStorePlaylistController(dataSource, requireAuth as any));
+
+  // ============================================================================
+  // Event Offer Routes — WO-O4O-EVENT-OFFER-NETURE-ADOPTION-V1
+  // /api/v1/neture/event-offers/*
+  // ============================================================================
+  router.use('/event-offers', createNetureEventOfferController(dataSource, requireAuth as any));
 
   return router;
 }

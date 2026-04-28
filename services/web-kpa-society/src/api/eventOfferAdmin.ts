@@ -15,7 +15,7 @@ import { apiClient } from './client';
 
 // Types
 // WO-O4O-EVENT-OFFER-CORE-REFORM-V1: status 확장 + startAt/endAt/totalQuantity 추가
-export interface GroupbuyProduct {
+export interface EventOfferAdminProduct {
   id: string;
   offerId: string;
   title: string;
@@ -45,7 +45,7 @@ export interface AvailableOffersData {
   offers: AvailableOffer[];
 }
 
-export interface GroupbuyStats {
+export interface EventOfferAdminStats {
   totalOrders: number;
   totalParticipants: number;
   dailyOrders: { date: string; count: number }[];
@@ -55,12 +55,12 @@ export interface GroupbuyStats {
 }
 
 /** API 에러 응답 */
-export interface GroupbuyApiError {
+export interface EventOfferApiError {
   code: string;
   message: string;
 }
 
-export interface CreateGroupbuyProductDto {
+export interface CreateEventOfferProductDto {
   offerId: string;
   // organizationId는 서버에서 kpa_members로 자동 주입
 }
@@ -97,13 +97,13 @@ export const eventOfferAdminApi = {
    * 이벤트 상품 목록
    */
   getProducts: () =>
-    apiClient.get<{ data: GroupbuyProduct[] }>('/groupbuy-admin/products'),
+    apiClient.get<{ data: EventOfferAdminProduct[] }>('/groupbuy-admin/products'),
 
   /**
    * 이벤트 상품 추가 (offerId만 전달, organizationId는 서버 자동 주입)
    */
-  addProduct: (data: CreateGroupbuyProductDto) =>
-    apiClient.post<{ data: GroupbuyProduct }>('/groupbuy-admin/products', data),
+  addProduct: (data: CreateEventOfferProductDto) =>
+    apiClient.post<{ data: EventOfferAdminProduct }>('/groupbuy-admin/products', data),
 
   /**
    * 이벤트 상품 제외 (소프트 삭제)
@@ -133,7 +133,7 @@ export const eventOfferAdminApi = {
    * 이벤트 통계
    */
   getStats: () =>
-    apiClient.get<{ data: GroupbuyStats; _meta?: StatsMetaInfo }>('/groupbuy-admin/stats'),
+    apiClient.get<{ data: EventOfferAdminStats; _meta?: StatsMetaInfo }>('/groupbuy-admin/stats'),
 
   /**
    * 공급자 연계 상태 확인

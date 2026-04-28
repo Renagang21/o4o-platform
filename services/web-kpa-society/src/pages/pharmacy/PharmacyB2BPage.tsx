@@ -21,6 +21,7 @@ import { toast } from '@o4o/error-handling';
 import { getListings, getCatalog } from '../../api/pharmacyProducts';
 import type { CatalogProduct } from '../../api/pharmacyProducts';
 import { colors, borderRadius } from '../../styles/theme';
+import { EventOfferContentPanel } from '../../components/event-offer/EventOfferContentPanel';
 
 // ── 병합 타입 ──
 
@@ -42,7 +43,7 @@ interface B2BProduct {
 const DOMAIN_TABS = [
   { id: 'all', label: '전체', serviceKey: undefined },
   { id: 'kpa', label: '일반 B2B', serviceKey: 'kpa' },
-  { id: 'kpa-groupbuy', label: '이벤트', serviceKey: 'kpa-groupbuy' },
+  { id: 'kpa-groupbuy', label: 'Event Offer', serviceKey: 'kpa-groupbuy' },
   { id: 'glycopharm', label: '혈당관리', serviceKey: 'glycopharm' },
   { id: 'cosmetics', label: '화장품', serviceKey: 'cosmetics' },
 ] as const;
@@ -358,81 +359,80 @@ export function PharmacyB2BPage() {
         ))}
       </div>
 
-      {/* 이벤트 탭 크로스 네비게이션 */}
-      {activeTab === 'kpa-groupbuy' && (
-        <div style={styles.crossNavBanner}>
-          <span>이벤트 전용 카탈로그에서 더 자세한 정보를 확인하세요.</span>
-          <Link to="/store-hub/event-offers" style={styles.crossNavLink}>이벤트 홈으로 이동 &rarr;</Link>
-        </div>
-      )}
-
-      {/* 결과 카운트 + 작업대 담기 */}
-      <div style={styles.resultBar}>
-        <span style={styles.resultCount}>
-          {loading ? '불러오는 중...' : `${products.length}개 상품`}
-          {selectedIds.size > 0 && ` · ${selectedIds.size}개 선택`}
-        </span>
-        {selectedIds.size > 0 && (
-          <button onClick={handleAddToWorktable} style={styles.worktableButton}>
-            {selectedCount > 0 ? `선택 상품 ${selectedCount}건 작업대 담기` : '작업대 담기'}
-          </button>
-        )}
-      </div>
-
-      {/* 상품 테이블 */}
-      {loading ? (
-        <div style={styles.loadingState}>
-          <span style={styles.loadingText}>상품을 불러오는 중...</span>
-        </div>
-      ) : error ? (
-        <div style={styles.emptyState}>
-          <span style={styles.emptyIcon}>
-            {error === 'network' ? '🌐' : error === 'unauthorized' ? '🔒' : error === 'forbidden' ? '🚫' : '⚠️'}
-          </span>
-          <h3 style={styles.emptyTitle}>
-            {error === 'network' && '네트워크 연결을 확인해주세요'}
-            {error === 'unauthorized' && '로그인이 필요합니다'}
-            {error === 'forbidden' && '매장 등록 후 이용할 수 있습니다'}
-            {error === 'invalid_key' && '잘못된 도메인 요청입니다'}
-            {error === 'server' && '일시적인 오류가 발생했습니다'}
-          </h3>
-          <p style={styles.emptyDesc}>
-            {error === 'network' && '인터넷 연결 상태를 확인한 후 다시 시도해주세요.'}
-            {error === 'unauthorized' && '상품을 조회하려면 로그인이 필요합니다.'}
-            {error === 'forbidden' && '약국 매장 등록이 완료된 후 상품을 조회할 수 있습니다.'}
-            {error === 'invalid_key' && '링크가 잘못되었을 수 있습니다.'}
-            {error === 'server' && '잠시 후 다시 시도해주세요.'}
-          </p>
-          {(error === 'network' || error === 'server') && (
-            <button onClick={loadData} style={styles.retryButton}>다시 시도</button>
-          )}
-          {error === 'unauthorized' && (
-            <Link to="/" style={styles.emptyAction}>로그인</Link>
-          )}
-          {error === 'invalid_key' && (
-            <button onClick={() => handleTabChange('all')} style={styles.retryButton}>전체 보기</button>
-          )}
-        </div>
-      ) : products.length === 0 ? (
-        <div style={styles.emptyState}>
-          <span style={styles.emptyIcon}>📦</span>
-          <h3 style={styles.emptyTitle}>
-            {EMPTY_STATE_CONFIG[activeTab]?.title || '등록된 상품이 없습니다'}
-          </h3>
-          <p style={styles.emptyDesc}>
-            {EMPTY_STATE_CONFIG[activeTab]?.desc || '상품 판매 관리에서 상품을 등록하세요.'}
-          </p>
-          <Link to={EMPTY_STATE_CONFIG[activeTab]?.linkTo || '/store/sell'} style={styles.emptyAction}>
-            {EMPTY_STATE_CONFIG[activeTab]?.linkLabel || '상품 판매 관리 →'}
-          </Link>
-        </div>
+      {/* Event Offer 탭: 인라인 패널 / 일반 B2B 탭: 상품 테이블 */}
+      {activeTab === 'kpa-groupbuy' ? (
+        <EventOfferContentPanel compact />
       ) : (
-        <DataTable<B2BProduct>
-          columns={columns}
-          dataSource={products}
-          rowKey="listingId"
-          emptyText="등록된 상품이 없습니다"
-        />
+        <>
+          {/* 결과 카운트 + 작업대 담기 */}
+          <div style={styles.resultBar}>
+            <span style={styles.resultCount}>
+              {loading ? '불러오는 중...' : `${products.length}개 상품`}
+              {selectedIds.size > 0 && ` · ${selectedIds.size}개 선택`}
+            </span>
+            {selectedIds.size > 0 && (
+              <button onClick={handleAddToWorktable} style={styles.worktableButton}>
+                {selectedCount > 0 ? `선택 상품 ${selectedCount}건 작업대 담기` : '작업대 담기'}
+              </button>
+            )}
+          </div>
+
+          {/* 상품 테이블 */}
+          {loading ? (
+            <div style={styles.loadingState}>
+              <span style={styles.loadingText}>상품을 불러오는 중...</span>
+            </div>
+          ) : error ? (
+            <div style={styles.emptyState}>
+              <span style={styles.emptyIcon}>
+                {error === 'network' ? '🌐' : error === 'unauthorized' ? '🔒' : error === 'forbidden' ? '🚫' : '⚠️'}
+              </span>
+              <h3 style={styles.emptyTitle}>
+                {error === 'network' && '네트워크 연결을 확인해주세요'}
+                {error === 'unauthorized' && '로그인이 필요합니다'}
+                {error === 'forbidden' && '매장 등록 후 이용할 수 있습니다'}
+                {error === 'invalid_key' && '잘못된 도메인 요청입니다'}
+                {error === 'server' && '일시적인 오류가 발생했습니다'}
+              </h3>
+              <p style={styles.emptyDesc}>
+                {error === 'network' && '인터넷 연결 상태를 확인한 후 다시 시도해주세요.'}
+                {error === 'unauthorized' && '상품을 조회하려면 로그인이 필요합니다.'}
+                {error === 'forbidden' && '약국 매장 등록이 완료된 후 상품을 조회할 수 있습니다.'}
+                {error === 'invalid_key' && '링크가 잘못되었을 수 있습니다.'}
+                {error === 'server' && '잠시 후 다시 시도해주세요.'}
+              </p>
+              {(error === 'network' || error === 'server') && (
+                <button onClick={loadData} style={styles.retryButton}>다시 시도</button>
+              )}
+              {error === 'unauthorized' && (
+                <Link to="/" style={styles.emptyAction}>로그인</Link>
+              )}
+              {error === 'invalid_key' && (
+                <button onClick={() => handleTabChange('all')} style={styles.retryButton}>전체 보기</button>
+              )}
+            </div>
+          ) : products.length === 0 ? (
+            <div style={styles.emptyState}>
+              <span style={styles.emptyIcon}>📦</span>
+              <h3 style={styles.emptyTitle}>
+                {EMPTY_STATE_CONFIG[activeTab]?.title || '등록된 상품이 없습니다'}
+              </h3>
+              <p style={styles.emptyDesc}>
+                {EMPTY_STATE_CONFIG[activeTab]?.desc || '상품 판매 관리에서 상품을 등록하세요.'}
+              </p>
+              <Link to={EMPTY_STATE_CONFIG[activeTab]?.linkTo || '/store/sell'} style={styles.emptyAction}>
+                {EMPTY_STATE_CONFIG[activeTab]?.linkLabel || '상품 판매 관리 →'}
+              </Link>
+            </div>
+          ) : (
+            <DataTable<B2BProduct>
+              columns={columns}
+              dataSource={products}
+              rowKey="listingId"
+              emptyText="등록된 상품이 없습니다"
+            />
+          )}
+        </>
       )}
 
       {/* 페이지 안내 */}
@@ -534,26 +534,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 600,
     color: '#2563EB',
     borderBottom: '2px solid #2563EB',
-  },
-
-  // Cross-nav banner
-  crossNavBanner: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '14px 20px',
-    backgroundColor: '#F5F3FF',
-    border: '1px solid #DDD6FE',
-    borderRadius: '8px',
-    marginBottom: '20px',
-    fontSize: '0.875rem',
-    color: '#5B21B6',
-  },
-  crossNavLink: {
-    color: '#7C3AED',
-    fontWeight: 600,
-    textDecoration: 'none',
-    whiteSpace: 'nowrap',
   },
 
   // Result bar

@@ -32,12 +32,12 @@ import { colors } from '../../styles/theme';
 import { getMarketingAnalytics, getRecentScans } from '../../api/storeAnalytics';
 import type { MarketingAnalyticsData, RecentScanItem } from '../../api/storeAnalytics';
 import { eventOfferApi } from '../../api';
-import type { GroupbuyParticipation } from '../../types';
+import type { EventOfferParticipation } from '../../types';
 
 export function StoreMarketingDashboardPage() {
   const [analytics, setAnalytics] = useState<MarketingAnalyticsData | null>(null);
   const [recentScans, setRecentScans] = useState<RecentScanItem[]>([]);
-  const [participations, setParticipations] = useState<GroupbuyParticipation[]>([]);
+  const [participations, setParticipations] = useState<EventOfferParticipation[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async () => {

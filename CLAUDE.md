@@ -350,9 +350,12 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | **User/Operator Freeze** | `docs/architecture/USER-OPERATOR-FREEZE-V1.md` |
 | **O4O 공통 구조 원칙** | `docs/o4o-common-structure.md` |
 | **HUB Template Standard** | `docs/platform/hub/O4O-HUB-TEMPLATE-STANDARD-V1.md` |
+| **Event Offer 공통 도메인** | `docs/baseline/EVENT-OFFER-COMMON-DOMAIN-V1.md` |
+| **Event Offer Store 통합** | `docs/baseline/EVENT-OFFER-STORE-INTEGRATION-V1.md` |
+| **Event Offer Neture 역할 구분** | `docs/baseline/EVENT-OFFER-NETURE-ROLE-CLARIFICATION-V1.md` |
 
 ---
 
-*Updated: 2026-04-23*
-*Version: 7.3*
+*Updated: 2026-04-28*
+*Version: 7.4*
 *Status: Active Constitution*

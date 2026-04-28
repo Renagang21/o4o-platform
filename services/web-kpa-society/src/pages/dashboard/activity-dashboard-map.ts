@@ -22,7 +22,7 @@ export type DashboardCardKey =
 /**
  * activityType → 카드 배열 매핑
  *
- * - pharmacy_owner: 경영 중심 (store + groupbuy + community + education)
+ * - pharmacy_owner: 경영 중심 (store + event-offer + community + education)
  * - pharmacy_employee: 커뮤니티 중심
  * - hospital: 학술 중심
  * - manufacturer/wholesaler: 파트너/산업 중심

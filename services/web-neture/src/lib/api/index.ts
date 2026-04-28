@@ -205,3 +205,6 @@ export {
 
 // Media Library (WO-O4O-COMMON-MEDIA-PICKER-UPLOADER-V1)
 export { mediaApi, type MediaAssetItem } from './media.js';
+
+// Neture Event Offer API (WO-O4O-EVENT-OFFER-NETURE-ADOPTION-V1)
+export { netureEventOfferApi } from './eventOffer.js';

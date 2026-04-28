@@ -32,13 +32,13 @@ import {
   type QuickActionItem,
 } from '@o4o/operator-ux-core';
 import { operatorApi, type DistrictOperatorSummary } from '../../api/operator';
-import { eventOfferAdminApi, type GroupbuyProduct, type GroupbuyStats } from '../../api/eventOfferAdmin';
+import { eventOfferAdminApi, type EventOfferAdminProduct, type EventOfferAdminStats } from '../../api/eventOfferAdmin';
 import { JOIN_REQUEST_TYPE_LABELS } from '../../types/joinRequest';
 import type { JoinRequestType } from '../../types/joinRequest';
 
 interface EventOfferSnapshot {
-  products: GroupbuyProduct[];
-  stats: GroupbuyStats | null;
+  products: EventOfferAdminProduct[];
+  stats: EventOfferAdminStats | null;
 }
 
 // ─── Data Transformer ───

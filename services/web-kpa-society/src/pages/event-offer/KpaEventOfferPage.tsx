@@ -20,7 +20,7 @@ import { eventOfferApi } from '../../api';
 import { useAuth } from '../../contexts';
 import { colors } from '../../styles/theme';
 import { PLATFORM_ROLES, hasAnyRole } from '../../lib/role-constants';
-import type { EventOfferItem, EventOfferStatus, GroupbuyStats } from '../../types';
+import type { EventOfferItem, EventOfferStatus, EventOfferStats } from '../../types';
 
 interface OrderResult {
   itemId: string;
@@ -43,7 +43,7 @@ export function KpaEventOfferPage() {
   const [items, setItems] = useState<EventOfferItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
-  const [stats, setStats] = useState<GroupbuyStats | null>(null);
+  const [stats, setStats] = useState<EventOfferStats | null>(null);
 
   // Selection
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -65,7 +65,7 @@ export function KpaEventOfferPage() {
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await eventOfferApi.getEnrichedGroupbuys({
+      const res = await eventOfferApi.getEnrichedOffers({
         page: currentPage,
         limit: 20,
         status: statusFilter,
@@ -73,7 +73,7 @@ export function KpaEventOfferPage() {
       setItems(res.data || []);
       setTotalPages(res.pagination?.totalPages || 1);
     } catch (err) {
-      console.warn('Enriched groupbuy API not available:', err);
+      console.warn('Enriched event offer API not available:', err);
       setItems([]);
       setTotalPages(1);
     } finally {
@@ -82,7 +82,7 @@ export function KpaEventOfferPage() {
 
     if (isOperator) {
       try {
-        const statsRes = await eventOfferApi.getGroupbuyStats();
+        const statsRes = await eventOfferApi.getEventOfferStats();
         setStats(statsRes.data);
       } catch {
         // 통계 실패 시 무시
