@@ -512,9 +512,9 @@ export const glycopharmGuideFeaturesProps: GuideFeaturesPageProps = {
       primaryRoute: '/resources',
       description: '파일 자료, 원본 자료, 매장 활용 자료. 다운로드 가능한 형태로 공유됩니다.',
       items: [
-        { label: '자료실', route: '/resources' },
+        { label: '자료실 이용 방법', route: '/guide/features/resources' },
       ],
-      linkTo: '/resources',
+      linkTo: '/guide/features/resources',
     },
     {
       step: '04',
@@ -558,6 +558,78 @@ export const glycopharmGuideFeaturesProps: GuideFeaturesPageProps = {
   ],
   bottomNav: {
     prev: { label: '← 서비스 활용 방법', to: '/guide/usage' },
+    home: { label: '홈으로', to: '/' },
+  },
+};
+
+// ─── /guide/features/resources ─────────────────────────────────────────
+
+export const glycopharmGuideFeatureResourcesProps: GuideFeatureManualPageProps = {
+  hero: {
+    eyebrow: '기능별 이용 방법',
+    title: '자료실 이용 방법',
+    description: '파일 자료, 원본 자료, 매장 활용 자료',
+    primaryAction: { label: '자료실로 이동 →', to: '/resources' },
+    flowBarTitle: '이용 흐름',
+    flowLabels: ['자료실 이동', '자료 찾기', '자료 활용', '자료 등록', 'AI 활용 기준'],
+  },
+  sections: [
+    {
+      step: '01',
+      title: '자료실 이동',
+      routeLabel: '/resources',
+      description: '자료실 진입 후 카테고리·태그·검색으로 자료를 탐색합니다.',
+      items: [
+        { label: '자료실 진입', detail: '/resources 로 이동하면 자료 목록이 표시됩니다.' },
+        { label: '자료 목록', detail: '카테고리별, 최신순으로 자료를 확인합니다.' },
+        { label: '검색과 태그 탐색', detail: '키워드 검색과 태그 필터로 원하는 자료를 찾습니다.' },
+      ],
+    },
+    {
+      step: '02',
+      title: '자료 찾기',
+      description: '키워드와 태그로 매장 응대에 필요한 자료를 빠르게 확인합니다.',
+      items: [
+        { label: '키워드 검색', detail: '제목·설명·태그 키워드로 자료를 검색합니다.' },
+        { label: '태그 확인', detail: '관련 태그로 동일 주제 자료를 묶어 봅니다.' },
+        { label: '자료 상세 확인', detail: '자료를 열어 본문·첨부·등록일을 확인합니다.' },
+      ],
+    },
+    {
+      step: '03',
+      title: '자료 활용',
+      description: '확인한 자료를 매장 응대와 운영에 직접 사용합니다.',
+      items: [
+        { label: 'PDF / 이미지 / 파일 확인', detail: '본문 미리보기 또는 다운로드로 내용을 확인합니다.' },
+        { label: '고객 설명 자료', detail: '상담 시 화면 또는 출력물로 고객에게 직접 제시합니다.' },
+        { label: '매장 운영 참고', detail: '진열·재고·POP 자료 작성에 참고합니다.' },
+      ],
+    },
+    {
+      step: '04',
+      title: '자료 등록',
+      description: '매장에서 작성한 자료를 업로드해 회원과 공유합니다.',
+      items: [
+        { label: '파일 업로드', detail: 'PDF·이미지·문서 파일을 자료실에 업로드합니다.' },
+        { label: '제목 입력', detail: '검색에 노출되는 핵심 키워드를 포함한 제목을 작성합니다.' },
+        { label: '태그 입력', detail: '관련 태그를 추가해 분류와 검색 노출을 지원합니다.' },
+        { label: '등록', detail: '저장하면 자료실 목록에 즉시 반영됩니다.' },
+      ],
+    },
+    {
+      step: '05',
+      title: 'AI 활용 기준',
+      description: 'Raw 자료를 AI로 가공해 매장 응대에 활용합니다. 사용 전 검토는 필수입니다.',
+      items: [
+        { label: 'Raw 데이터 기반 설명 생성', detail: '원본 자료를 입력해 고객용 설명문을 생성합니다.' },
+        { label: '요약', detail: '긴 문서를 핵심 요약으로 변환해 응대 시간에 맞춰 사용합니다.' },
+        { label: '상담 문구 작성', detail: '고객 상황에 맞는 상담 응답 초안을 생성합니다.' },
+        { label: '검토 후 사용', detail: 'AI 결과는 약사·매장 책임자가 반드시 검토한 뒤 활용합니다.' },
+      ],
+    },
+  ],
+  bottomNav: {
+    prev: { label: '← 기능별 이용 방법', to: '/guide/features' },
     home: { label: '홈으로', to: '/' },
   },
 };
