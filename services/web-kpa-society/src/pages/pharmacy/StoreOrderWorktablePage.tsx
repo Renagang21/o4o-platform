@@ -92,9 +92,9 @@ export function StoreOrderWorktablePage() {
       const catalogProducts = catalogRes.data || [];
       const listings = listingsRes.data || [];
 
-      // Filter to "관심상품": listed or approved
+      // Filter to "관심상품": 내 매장에 추가된 상품
       const interestProducts = catalogProducts.filter(
-        (p: CatalogProduct) => p.isListed || p.isApproved,
+        (p: CatalogProduct) => p.isAdded,
       );
 
       // Build price map from listings (by product name)

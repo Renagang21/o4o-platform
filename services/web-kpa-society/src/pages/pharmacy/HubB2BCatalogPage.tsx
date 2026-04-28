@@ -2,8 +2,8 @@
  * HubB2BCatalogPage - 플랫폼 B2B 상품 카탈로그
  *
  * WO-O4O-HUB-B2B-CATALOG-V1
- * WO-O4O-HUB-B2B-STATE-VISIBILITY-V1: 상태 배지 + 버튼 정비 + 요약 영역
  * WO-O4O-STORE-HUB-B2B-UI-REFINEMENT-V1: 내 매장에 추가/제외 UX 정비
+ * WO-O4O-STORE-PRODUCT-STATUS-REMOVAL-V1: 매장 상품 상태 제거 — 단순 취급 목록 모델
  *
  * Hub 공용공간에서 플랫폼 공급자 상품을 탐색하고
  * "내 매장에 추가" 버튼으로 내 매장 상품 신청을 진행하는 페이지.
@@ -15,7 +15,6 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Link } from 'react-router-dom';
 import {
   getCatalog,
   applyBySupplyProductId,
@@ -55,30 +54,6 @@ const DISTRIBUTION_TABS: { key: string; label: string }[] = [
 const PAGE_LIMIT = 20;
 
 // ============================================
-// 상태 정의
-// WO-O4O-HUB-B2B-STATE-VISIBILITY-V1
-// WO-KPA-HUB-OPERATOR-TAB-AND-STATUS-ALIGNMENT-V1: '판매 준비' 상태 추가, isListed 수정 반영
-// ============================================
-
-type ProductState = 'listed' | 'ready' | 'approved' | 'pending' | 'available';
-
-const STATE_CONFIG: Record<ProductState, { label: string; color: string; bg: string; border: string }> = {
-  listed:    { label: '판매 중',   color: '#065f46', bg: '#d1fae5', border: '#6ee7b7' },
-  ready:     { label: '판매 준비', color: '#7c3aed', bg: '#ede9fe', border: '#c4b5fd' },
-  approved:  { label: '승인 완료', color: '#1e40af', bg: '#dbeafe', border: '#93c5fd' },
-  pending:   { label: '승인 대기', color: '#92400e', bg: '#fef3c7', border: '#fcd34d' },
-  available: { label: '신청 가능', color: '#6b7280', bg: '#f3f4f6', border: '#d1d5db' },
-};
-
-function getProductState(item: CatalogProduct): ProductState {
-  if (item.isListed) return 'listed';
-  if (item.isApproved) return 'approved';
-  if (item.isApplied) return 'pending';
-  if (item.isListingInactive) return 'ready';
-  return 'available';
-}
-
-// ============================================
 // 컴포넌트
 // ============================================
 
@@ -95,7 +70,7 @@ export function HubB2BCatalogPage() {
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // 정렬 상태
-  type SortKey = 'name' | 'supplier' | 'category' | 'status' | 'date';
+  type SortKey = 'name' | 'supplier';
   type SortOrder = 'asc' | 'desc';
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
@@ -142,7 +117,7 @@ export function HubB2BCatalogPage() {
       setToast({ type: 'success', message: `"${product.name}" 내 매장에 추가되었습니다.` });
       // 로컬 상태 즉시 반영 (재조회 없이)
       setProducts(prev => prev.map(p =>
-        p.id === product.id ? { ...p, isApplied: true } : p,
+        p.id === product.id ? { ...p, isAdded: true } : p,
       ));
     } catch (e: any) {
       const code = e?.response?.data?.error?.code || e?.code;
@@ -166,9 +141,7 @@ export function HubB2BCatalogPage() {
       await cancelProductByOfferId(product.id);
       setToast({ type: 'success', message: `"${product.name}"을(를) 내 매장에서 제외했습니다.` });
       setProducts(prev => prev.map(p =>
-        p.id === product.id
-          ? { ...p, isApplied: false, isApproved: false, isListed: false, isListingInactive: false }
-          : p,
+        p.id === product.id ? { ...p, isAdded: false } : p,
       ));
     } catch (e: any) {
       setToast({ type: 'error', message: e.message || '상품 제외에 실패했습니다.' });
@@ -177,24 +150,6 @@ export function HubB2BCatalogPage() {
       setTimeout(() => setToast(null), 4000);
     }
   };
-
-  // 상태 요약
-  // WO-O4O-HUB-B2B-STATE-VISIBILITY-V1 §4
-  // WO-KPA-HUB-OPERATOR-TAB-AND-STATUS-ALIGNMENT-V1: ready 상태 추가
-  const summary = useMemo(() => {
-    let listed = 0;
-    let ready = 0;
-    let approved = 0;
-    let pending = 0;
-    for (const p of products) {
-      const s = getProductState(p);
-      if (s === 'listed') listed++;
-      else if (s === 'ready') ready++;
-      else if (s === 'approved') approved++;
-      else if (s === 'pending') pending++;
-    }
-    return { listed, ready, approved, pending };
-  }, [products]);
 
   // 정렬 적용
   const sortedProducts = useMemo(() => {
@@ -206,12 +161,6 @@ export function HubB2BCatalogPage() {
       switch (sortKey) {
         case 'name': va = a.name || ''; vb = b.name || ''; break;
         case 'supplier': va = a.supplierName || ''; vb = b.supplierName || ''; break;
-        case 'category': va = a.category || ''; vb = b.category || ''; break;
-        case 'status': {
-          const order: Record<ProductState, number> = { listed: 0, ready: 1, approved: 2, pending: 3, available: 4 };
-          return (order[getProductState(a)] - order[getProductState(b)]) * dir;
-        }
-        case 'date': va = a.updatedAt || ''; vb = b.updatedAt || ''; break;
       }
       return va.localeCompare(vb, 'ko') * dir;
     });
@@ -267,40 +216,6 @@ export function HubB2BCatalogPage() {
           현재 활성 공급자가 제공 중인 상품을 탐색하고 내 매장에 추가할 수 있습니다.
         </p>
       </header>
-
-      {/* Summary Box */}
-      {!loading && !error && products.length > 0 && (summary.listed > 0 || summary.ready > 0 || summary.pending > 0 || summary.approved > 0) && (
-        <div style={styles.summaryBox}>
-          {summary.listed > 0 && (
-            <div style={styles.summaryItem}>
-              <span style={{ ...styles.summaryDot, backgroundColor: STATE_CONFIG.listed.border }} />
-              <span style={styles.summaryLabel}>판매 중</span>
-              <span style={styles.summaryCount}>{summary.listed}건</span>
-            </div>
-          )}
-          {summary.ready > 0 && (
-            <div style={styles.summaryItem}>
-              <span style={{ ...styles.summaryDot, backgroundColor: STATE_CONFIG.ready.border }} />
-              <span style={styles.summaryLabel}>판매 준비</span>
-              <span style={styles.summaryCount}>{summary.ready}건</span>
-            </div>
-          )}
-          {summary.approved > 0 && (
-            <div style={styles.summaryItem}>
-              <span style={{ ...styles.summaryDot, backgroundColor: STATE_CONFIG.approved.border }} />
-              <span style={styles.summaryLabel}>승인 완료</span>
-              <span style={styles.summaryCount}>{summary.approved}건</span>
-            </div>
-          )}
-          {summary.pending > 0 && (
-            <div style={styles.summaryItem}>
-              <span style={{ ...styles.summaryDot, backgroundColor: STATE_CONFIG.pending.border }} />
-              <span style={styles.summaryLabel}>승인 대기</span>
-              <span style={styles.summaryCount}>{summary.pending}건</span>
-            </div>
-          )}
-        </div>
-      )}
 
       {/* Toast */}
       {toast && (
@@ -366,29 +281,21 @@ export function HubB2BCatalogPage() {
                 상품명{sortIndicator('name')}
               </span>
               <span style={{ ...styles.th, flex: 1.2, cursor: 'pointer' }} onClick={() => handleSort('supplier')}>
-                공급사{sortIndicator('supplier')}
+                공급자{sortIndicator('supplier')}
               </span>
-              <span style={{ ...styles.th, flex: 0.8, cursor: 'pointer' }} onClick={() => handleSort('category')}>
-                카테고리{sortIndicator('category')}
-              </span>
-              <span style={{ ...styles.th, flex: 0.8, textAlign: 'right' }}>
+              <span style={{ ...styles.th, flex: 1, textAlign: 'right' }}>
                 공급가
               </span>
-              <span style={{ ...styles.th, flex: 0.8, cursor: 'pointer' }} onClick={() => handleSort('status')}>
-                상태{sortIndicator('status')}
-              </span>
-              <span style={{ ...styles.th, flex: 0.8, cursor: 'pointer' }} onClick={() => handleSort('date')}>
-                등록일{sortIndicator('date')}
+              <span style={{ ...styles.th, flex: 1, textAlign: 'right' }}>
+                권장 소비자가
               </span>
               <span style={{ ...styles.th, flex: 1, textAlign: 'right' }}>액션</span>
             </div>
 
             {/* Table Rows */}
             {sortedProducts.map(item => {
-              const state = getProductState(item);
-              const stateInfo = STATE_CONFIG[state];
               const isApplying = applyingId === item.id;
-              const isAdded = state !== 'available';
+              const isAdded = item.isAdded;
 
               return (
                 <div key={item.id} style={styles.tableRow}>
@@ -405,7 +312,7 @@ export function HubB2BCatalogPage() {
                     )}
                   </div>
 
-                  {/* 공급사 */}
+                  {/* 공급자 */}
                   <div style={{ ...styles.td, flex: 1.2 }}>
                     <div style={styles.supplierCell}>
                       {item.supplierLogoUrl ? (
@@ -417,15 +324,8 @@ export function HubB2BCatalogPage() {
                     </div>
                   </div>
 
-                  {/* 카테고리 */}
-                  <div style={{ ...styles.td, flex: 0.8 }}>
-                    {item.category && (
-                      <span style={styles.categoryBadge}>{item.category}</span>
-                    )}
-                  </div>
-
-                  {/* 공급가 + 권장 소비자가 */}
-                  <div style={{ ...styles.td, flex: 0.8, alignItems: 'flex-end' }}>
+                  {/* 공급가 */}
+                  <div style={{ ...styles.td, flex: 1, alignItems: 'flex-end' }}>
                     <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: colors.neutral900 }}>
                       {formatKpaPrice(item)}
                     </span>
@@ -434,29 +334,14 @@ export function HubB2BCatalogPage() {
                         {getPriceSublabel(item)}
                       </span>
                     )}
-                    {item.consumerReferencePrice != null && (
-                      <span style={{ fontSize: '0.625rem', color: colors.neutral400, marginTop: 2 }}>
-                        권장 소비자가 {item.consumerReferencePrice.toLocaleString('ko-KR')}원
-                      </span>
-                    )}
                   </div>
 
-                  {/* 상태 */}
-                  <div style={{ ...styles.td, flex: 0.8 }}>
-                    <span style={{
-                      ...styles.stateBadge,
-                      color: stateInfo.color,
-                      backgroundColor: stateInfo.bg,
-                      borderColor: stateInfo.border,
-                    }}>
-                      {stateInfo.label}
-                    </span>
-                  </div>
-
-                  {/* 등록일 */}
-                  <div style={{ ...styles.td, flex: 0.8 }}>
-                    <span style={styles.rowDate}>
-                      {new Date(item.updatedAt).toLocaleDateString('ko-KR')}
+                  {/* 권장 소비자가 */}
+                  <div style={{ ...styles.td, flex: 1, alignItems: 'flex-end' }}>
+                    <span style={{ fontSize: '0.8125rem', color: colors.neutral700 }}>
+                      {item.consumerReferencePrice != null
+                        ? item.consumerReferencePrice.toLocaleString('ko-KR') + '원'
+                        : '-'}
                     </span>
                   </div>
 
@@ -562,10 +447,7 @@ export function HubB2BCatalogPage() {
       <div style={styles.notice}>
         <span style={styles.noticeIcon}>💡</span>
         <span>
-          내 매장에 추가 후 운영자 승인이 완료되면{' '}
-          <Link to="/store/commerce/orderable" style={{ color: colors.primary }}>내 매장관리 &gt; 주문 가능 상품</Link>
-          에서 상품을 관리할 수 있습니다.
-          "판매 준비" 상태는 운영자 승인 대기 중인 상품입니다.
+          내 매장에 추가하면 주문 시 빠르게 사용할 수 있습니다.
         </span>
       </div>
     </div>
@@ -603,38 +485,6 @@ const styles: Record<string, React.CSSProperties> = {
     margin: '8px 0 0',
     fontSize: '0.95rem',
     color: colors.neutral500,
-  },
-
-  // Summary Box
-  summaryBox: {
-    display: 'flex',
-    gap: '24px',
-    padding: '14px 20px',
-    marginBottom: '16px',
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.lg,
-    border: `1px solid ${colors.neutral200}`,
-    boxShadow: shadows.sm,
-  },
-  summaryItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-  },
-  summaryDot: {
-    width: '8px',
-    height: '8px',
-    borderRadius: '50%',
-    flexShrink: 0,
-  },
-  summaryLabel: {
-    fontSize: '0.8125rem',
-    color: colors.neutral500,
-  },
-  summaryCount: {
-    fontSize: '0.875rem',
-    fontWeight: 600,
-    color: colors.neutral900,
   },
 
   // Toast
@@ -750,10 +600,6 @@ const styles: Record<string, React.CSSProperties> = {
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
   } as React.CSSProperties,
-  rowDate: {
-    fontSize: '0.75rem',
-    color: colors.neutral400,
-  },
   supplierCell: {
     display: 'flex',
     alignItems: 'center',
@@ -781,27 +627,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '0.8125rem',
     color: colors.neutral600,
     fontWeight: 500,
-  },
-
-  // State Badge
-  stateBadge: {
-    display: 'inline-block',
-    padding: '3px 10px',
-    fontSize: '0.6875rem',
-    fontWeight: 600,
-    borderRadius: '10px',
-    border: '1px solid',
-    whiteSpace: 'nowrap' as const,
-  },
-
-  categoryBadge: {
-    display: 'inline-block',
-    padding: '2px 8px',
-    fontSize: '0.6875rem',
-    fontWeight: 500,
-    color: colors.neutral600,
-    backgroundColor: colors.neutral100,
-    borderRadius: '4px',
   },
 
   // Icon Buttons (WO-O4O-STORE-HUB-B2B-UI-REFINEMENT-V1)
@@ -910,50 +735,6 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: '8px',
     cursor: 'pointer',
     transition: 'opacity 0.15s',
-  },
-
-  // Legacy button styles (kept for reference, not used in main flow)
-  applyButton: {
-    padding: '6px 14px',
-    fontSize: '0.75rem',
-    fontWeight: 600,
-    color: colors.white,
-    backgroundColor: colors.primary,
-    border: 'none',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    transition: 'opacity 0.15s',
-  },
-  buttonDisabled: {
-    padding: '6px 14px',
-    fontSize: '0.75rem',
-    fontWeight: 500,
-    color: colors.neutral400,
-    backgroundColor: colors.neutral100,
-    border: `1px solid ${colors.neutral200}`,
-    borderRadius: '6px',
-    cursor: 'not-allowed',
-  },
-  buttonNavigate: {
-    padding: '6px 14px',
-    fontSize: '0.75rem',
-    fontWeight: 600,
-    color: '#1e40af',
-    backgroundColor: '#eff6ff',
-    border: '1px solid #bfdbfe',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    transition: 'opacity 0.15s',
-  },
-  buttonReady: {
-    padding: '6px 14px',
-    fontSize: '0.75rem',
-    fontWeight: 500,
-    color: '#7c3aed',
-    backgroundColor: '#f5f3ff',
-    border: '1px solid #ddd6fe',
-    borderRadius: '6px',
-    cursor: 'not-allowed',
   },
 
   // Pagination

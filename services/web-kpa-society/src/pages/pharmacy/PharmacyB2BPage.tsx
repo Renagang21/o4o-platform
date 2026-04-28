@@ -31,7 +31,6 @@ interface B2BProduct {
   productName: string;
   serviceKey: string;
   retailPrice: number | null;
-  isActive: boolean;
   supplierId: string;
   supplierName: string;
   category: string | null;
@@ -111,7 +110,6 @@ export function PharmacyB2BPage() {
           productName: l.product_name,
           serviceKey: l.service_key,
           retailPrice: l.retail_price,
-          isActive: l.is_active,
           supplierId: cat?.supplierId || '',
           supplierName: cat?.supplierName || '—',
           category: cat?.category || null,
@@ -291,24 +289,6 @@ export function PharmacyB2BPage() {
           onClick={e => e.stopPropagation()}
           style={styles.qtyInput}
         />
-      ),
-    },
-    {
-      key: 'isActive',
-      title: '상태',
-      width: '80px',
-      sortable: true,
-      render: (_v, row) => (
-        <span style={{
-          padding: '2px 8px',
-          borderRadius: '4px',
-          fontSize: '0.6875rem',
-          fontWeight: 500,
-          color: row.isActive ? '#047857' : '#6B7280',
-          backgroundColor: row.isActive ? '#D1FAE5' : '#F3F4F6',
-        }}>
-          {row.isActive ? '활성' : '비활성'}
-        </span>
       ),
     },
     {

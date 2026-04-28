@@ -23,9 +23,8 @@ export interface CatalogProduct {
   supplierName: string;
   supplierLogoUrl: string | null;
   supplierCategory: string | null;
-  isApplied: boolean;
-  isApproved: boolean;
-  isListed: boolean;
+  /** 내 매장 취급 여부 (WO-O4O-STORE-PRODUCT-STATUS-REMOVAL-V1) */
+  isAdded: boolean;
 }
 
 export interface CatalogResponse {

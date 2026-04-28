@@ -62,8 +62,8 @@ export function HubB2BCatalogPage() {
         productId,
         service_key: 'glycopharm',
       });
-      // Optimistically mark as applied
-      setProducts(prev => prev.map(p => p.id === productId ? { ...p, isApplied: true } : p));
+      // Optimistically mark as added
+      setProducts(prev => prev.map(p => p.id === productId ? { ...p, isAdded: true } : p));
     } catch (err: any) {
       const msg = err?.response?.data?.message || err?.message || '신청 중 오류가 발생했습니다.';
       alert(msg);
@@ -79,11 +79,8 @@ export function HubB2BCatalogPage() {
     legalCategory: p.category ?? undefined,
     createdAt: p.createdAt,
     note: p.description ?? undefined,
-    isApplied: p.isApplied,
-    isApproved: p.isApproved,
-    onApply: (!p.isApplied && !p.isApproved)
-      ? () => handleApply(p.id)
-      : undefined,
+    isAdded: p.isAdded,
+    onApply: !p.isAdded ? () => handleApply(p.id) : undefined,
   }));
 
   return (

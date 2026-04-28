@@ -24,10 +24,8 @@ export interface B2BTableItem {
   legalCategory?: string;
   note?: string;
   createdAt?: string;
-  isApplied?: boolean;
-  isApproved?: boolean;
-  status?: 'available' | 'pending' | 'soldout';
-  stockRemaining?: number;
+  /** 내 매장 취급 여부 (WO-O4O-STORE-PRODUCT-STATUS-REMOVAL-V1) */
+  isAdded?: boolean;
   onApply?: () => void;
   onClick?: () => void;
 }
@@ -57,7 +55,6 @@ const NEUTRALS: Record<number, string> = {
 
 const PRIMARY = '#2563EB';
 const EMERALD = '#059669';
-const AMBER = '#D97706';
 const RED = '#DC2626';
 
 // ─── Style Inject ────────────────────────────────────────────────────────────
@@ -89,13 +86,8 @@ function formatPrice(n?: number): string {
   return n.toLocaleString('ko-KR') + '원';
 }
 
-function isLimited(item: B2BTableItem): boolean {
-  return item.stockRemaining != null && item.stockRemaining <= 10 && item.stockRemaining > 0;
-}
-
-function isSoldout(item: B2BTableItem): boolean {
-  return item.status === 'soldout' || (item.stockRemaining != null && item.stockRemaining <= 0);
-}
+// WO-O4O-STORE-PRODUCT-STATUS-REMOVAL-V1: 매장 상품 상태(품절/대기/마감임박) 개념 제거.
+// 공급자 상품의 공급 가능 여부는 백엔드에서 이미 필터링되어 카탈로그에 반영됨.
 
 // ��── Component ───────────────────────────────────────────────────────────────
 
@@ -166,8 +158,8 @@ export function B2BTableList({
     return pages;
   }
 
-  function rowStyle(item: B2BTableItem): React.CSSProperties {
-    return isSoldout(item) ? { ...S.tr, opacity: 0.5 } : S.tr;
+  function rowStyle(_item: B2BTableItem): React.CSSProperties {
+    return S.tr;
   }
 
   return (
@@ -219,10 +211,9 @@ export function B2BTableList({
                     <td style={{ ...S.td, maxWidth: '260px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <span style={{ fontWeight: 500, color: NEUTRALS[800] }}>{item.name}</span>
-                        {renderStatusPill(item)}
+                        {item.isAdded && <span style={S.myStoreBadge}>내 매장</span>}
                       </div>
                       {item.description && <div style={S.tdDesc}>{item.description}</div>}
-                      {renderStockSignal(item)}
                     </td>
                     <td style={S.td}>{item.unit || '-'}</td>
                     <td style={S.td}>
@@ -261,15 +252,14 @@ export function B2BTableList({
           {/* Mobile Cards */}
           <div className="b2b-table-mobile" style={S.mobileWrap}>
             {paged.map(item => (
-              <div key={item.id} className="b2b-table-row" style={isSoldout(item) ? { ...S.mobileCard, opacity: 0.5 } : S.mobileCard}>
+              <div key={item.id} className="b2b-table-row" style={S.mobileCard}>
                 <div style={S.mobileRow1}>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      {renderStatusPill(item)}
+                      {item.isAdded && <span style={S.myStoreBadge}>내 매장</span>}
                       <span style={S.mobileName}>{item.name}</span>
                     </div>
                     {item.description && <div style={S.mobileDesc}>{item.description}</div>}
-                    {renderStockSignal(item)}
                   </div>
                   {item.legalCategory && <span style={S.categoryBadge}>{item.legalCategory}</span>}
                 </div>
@@ -311,33 +301,18 @@ export function B2BTableList({
 }
 
 // ─── Helper renderers ────────────────────────────────────────────────────────
-
-function renderStatusPill(item: B2BTableItem) {
-  if (isSoldout(item)) return <span style={S.pillSoldout}>품절</span>;
-  if (isLimited(item)) return <span style={S.pillLimited}>마감임박</span>;
-  if (item.status === 'pending') return <span style={S.pillPending}>대기중</span>;
-  return null;
-}
-
-function renderStockSignal(item: B2BTableItem) {
-  if (item.stockRemaining == null || isSoldout(item)) return null;
-  if (item.stockRemaining <= 10) return <div style={S.stockSignal}>잔여 {item.stockRemaining}개</div>;
-  return null;
-}
+// WO-O4O-STORE-PRODUCT-STATUS-REMOVAL-V1: 매장 상품 상태 뱃지/액션 분기 제거.
+// 액션은 단순화: 추가 전 → "내 매장에 추가" 버튼 / 추가 후 → 표시 없음 (행에 [내 매장] 배지만)
 
 function renderAction(item: B2BTableItem) {
-  if (isSoldout(item)) return <span style={S.statusSoldout}>품절</span>;
-  if (item.isApproved) return <span style={S.statusApproved}>✓ 승인됨</span>;
-  if (item.isApplied) return <span style={S.statusPending}>신청중</span>;
-  if (item.onApply) return <button type="button" style={S.applyBtn} onClick={(e) => { e.stopPropagation(); item.onApply!(); }}>판매 신청</button>;
+  if (item.isAdded) return <span style={S.statusAdded}>✓ 내 매장</span>;
+  if (item.onApply) return <button type="button" style={S.applyBtn} onClick={(e) => { e.stopPropagation(); item.onApply!(); }}>내 매장에 추가</button>;
   return null;
 }
 
 function renderMobileAction(item: B2BTableItem) {
-  if (isSoldout(item)) return <span style={{ ...S.mobileActionFull, ...S.mobileActionDisabled }}>품절</span>;
-  if (item.isApproved) return <span style={{ ...S.mobileActionFull, color: EMERALD, borderColor: EMERALD }}>✓ 승인됨</span>;
-  if (item.isApplied) return <span style={{ ...S.mobileActionFull, color: AMBER, borderColor: AMBER }}>신청중</span>;
-  if (item.onApply) return <button type="button" style={S.applyBtnMobile} onClick={(e) => { e.stopPropagation(); item.onApply!(); }}>판매 신청</button>;
+  if (item.isAdded) return <span style={{ ...S.mobileActionFull, color: EMERALD, borderColor: EMERALD }}>✓ 내 매장</span>;
+  if (item.onApply) return <button type="button" style={S.applyBtnMobile} onClick={(e) => { e.stopPropagation(); item.onApply!(); }}>내 매장에 추가</button>;
   return null;
 }
 
@@ -367,10 +342,7 @@ const S: Record<string, React.CSSProperties> = {
   priceStrikethrough: { color: NEUTRALS[400], textDecoration: 'line-through', fontSize: '0.75rem' },
   discountBadge: { display: 'inline-block', padding: '1px 5px', fontSize: '0.625rem', fontWeight: 700, borderRadius: '3px', backgroundColor: `${RED}12`, color: RED },
   verifiedIcon: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '14px', height: '14px', borderRadius: '50%', backgroundColor: EMERALD, color: '#ffffff', fontSize: '0.5rem', fontWeight: 700, flexShrink: 0 },
-  pillSoldout: { display: 'inline-block', padding: '1px 6px', fontSize: '0.625rem', fontWeight: 700, borderRadius: '3px', backgroundColor: NEUTRALS[200], color: NEUTRALS[500], flexShrink: 0 },
-  pillLimited: { display: 'inline-block', padding: '1px 6px', fontSize: '0.625rem', fontWeight: 700, borderRadius: '3px', backgroundColor: `${RED}12`, color: RED, flexShrink: 0 },
-  pillPending: { display: 'inline-block', padding: '1px 6px', fontSize: '0.625rem', fontWeight: 700, borderRadius: '3px', backgroundColor: `${AMBER}15`, color: AMBER, flexShrink: 0 },
-  stockSignal: { fontSize: '0.625rem', fontWeight: 600, color: RED, marginTop: '2px' },
+  myStoreBadge: { display: 'inline-block', padding: '1px 6px', fontSize: '0.625rem', fontWeight: 600, borderRadius: '4px', backgroundColor: `${PRIMARY}15`, color: PRIMARY, border: `1px solid ${PRIMARY}30`, whiteSpace: 'nowrap' as const, flexShrink: 0 },
   categoryBadge: { display: 'inline-block', padding: '2px 8px', fontSize: '0.6875rem', fontWeight: 600, borderRadius: '10px', backgroundColor: NEUTRALS[100], color: NEUTRALS[600], whiteSpace: 'nowrap' as const },
   actionGroup: { display: 'flex', gap: '6px', justifyContent: 'center', alignItems: 'center' },
   mobileWrap: { display: 'none', flexDirection: 'column' as const, gap: '8px' },
@@ -386,14 +358,11 @@ const S: Record<string, React.CSSProperties> = {
   mobilePrice: { fontSize: '0.6875rem', color: NEUTRALS[400], textDecoration: 'line-through' },
   mobileActionRow: { display: 'flex', gap: '8px' },
   mobileActionFull: { flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '8px 0', fontSize: '0.8125rem', fontWeight: 600, borderRadius: '6px', border: `1px solid ${NEUTRALS[300]}`, color: NEUTRALS[600] },
-  mobileActionDisabled: { color: NEUTRALS[400], borderColor: NEUTRALS[200], backgroundColor: NEUTRALS[50] },
   detailBtn: { padding: '4px 10px', background: 'transparent', color: NEUTRALS[600], border: `1px solid ${NEUTRALS[300]}`, borderRadius: '4px', fontSize: '0.75rem', fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' as const },
   detailBtnMobile: { flex: 1, padding: '8px 0', background: 'transparent', color: NEUTRALS[600], border: `1px solid ${NEUTRALS[300]}`, borderRadius: '6px', fontSize: '0.8125rem', fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'center' as const },
   applyBtn: { padding: '4px 10px', background: PRIMARY, color: '#ffffff', border: 'none', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' as const },
   applyBtnMobile: { flex: 1, padding: '8px 0', background: PRIMARY, color: '#ffffff', border: 'none', borderRadius: '6px', fontSize: '0.8125rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'center' as const },
-  statusApproved: { display: 'inline-flex', alignItems: 'center', gap: '3px', fontSize: '0.75rem', fontWeight: 600, color: EMERALD },
-  statusPending: { display: 'inline-flex', alignItems: 'center', gap: '3px', fontSize: '0.75rem', fontWeight: 600, color: AMBER },
-  statusSoldout: { fontSize: '0.75rem', fontWeight: 600, color: NEUTRALS[400] },
+  statusAdded: { display: 'inline-flex', alignItems: 'center', gap: '3px', fontSize: '0.75rem', fontWeight: 600, color: EMERALD },
   pagination: { display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '4px', marginTop: '16px' },
   pageBtn: { padding: '6px 10px', background: '#ffffff', border: `1px solid ${NEUTRALS[300]}`, borderRadius: '6px', fontSize: '0.875rem', fontWeight: 500, color: NEUTRALS[700], cursor: 'pointer', fontFamily: 'inherit', lineHeight: 1 },
   pageBtnDisabled: { color: NEUTRALS[300], cursor: 'default', borderColor: NEUTRALS[200] },

@@ -57,11 +57,11 @@ export function createPharmacyProductsController(
   // ─── GET /catalog — 플랫폼 B2B 상품 카탈로그 ─────────────────────
   // WO-O4O-API-PHARMACY-B2B-CATALOG-V1
   // WO-KPA-HUB-PRODUCT-TABS-DATA-CRITERIA-REALIGNMENT-V1: recommended 필터 추가
-  // WO-KPA-HUB-OPERATOR-TAB-AND-STATUS-ALIGNMENT-V1:
-  //   - isListed 버그 수정 (opl.is_active=true 체크 추가)
-  //   - isListingInactive 필드 추가 (auto-expand 후 미활성 listing 식별)
-  //   - operatorView 필터 추가 (운영자 승인 흐름 관련 상품만 표시)
-  // supplier_product_offers (PUBLIC + active) + 내 신청/진열 상태 조인
+  // WO-O4O-STORE-PRODUCT-STATUS-REMOVAL-V1:
+  //   - 매장 상품 상태(판매 준비/판매중/비활성) 개념 제거
+  //   - isApplied/isApproved/isListed/isListingInactive 4개 boolean → 단일 isAdded
+  //   - operatorView 필터는 운영자 흐름 식별용으로 유지
+  // supplier_product_offers (PUBLIC + active) + 내 매장 취급 여부 조인
   router.get('/catalog', requireAuth, requirePharmacyOwner, asyncHandler(async (req: Request, res: Response) => {
     const organizationId = (req as any).organizationId;
     const category = req.query.category as string | undefined;
@@ -114,38 +114,16 @@ export function createPharmacyProductsController(
          o.name AS "supplierName",
          s.logo_url AS "supplierLogoUrl",
          s.category AS "supplierCategory",
-         -- 내 신청/진열 상태 (v2: product_approvals)
+         -- 내 매장 취급 여부 (신청 또는 진열 어느 하나라도 존재)
          (EXISTS(
            SELECT 1 FROM product_approvals pa2
            WHERE pa2.organization_id = $1
              AND pa2.offer_id = spo.id
-             AND pa2.approval_status IN ('pending','approved')
-         )) AS "isApplied",
-         (EXISTS(
-           SELECT 1 FROM product_approvals pa2
-           WHERE pa2.organization_id = $1
-             AND pa2.offer_id = spo.id
-             AND pa2.approval_status = 'approved'
-         )) AS "isApproved",
-         -- WO-KPA-HUB-OPERATOR-TAB-AND-STATUS-ALIGNMENT-V1: isListed = is_active=true인 경우만
-         (EXISTS(
+         ) OR EXISTS(
            SELECT 1 FROM organization_product_listings opl
            WHERE opl.organization_id = $1
              AND opl.offer_id = spo.id
-             AND opl.is_active = true
-         )) AS "isListed",
-         -- 판매 준비 상태: listing 존재하지만 is_active=false (auto-expand 후 미활성)
-         (EXISTS(
-           SELECT 1 FROM organization_product_listings opl
-           WHERE opl.organization_id = $1
-             AND opl.offer_id = spo.id
-             AND opl.is_active = false
-         ) AND NOT EXISTS(
-           SELECT 1 FROM organization_product_listings opl
-           WHERE opl.organization_id = $1
-             AND opl.offer_id = spo.id
-             AND opl.is_active = true
-         )) AS "isListingInactive"
+         )) AS "isAdded"
        FROM supplier_product_offers spo
        JOIN product_masters pm ON pm.id = spo.master_id
        JOIN neture_suppliers s ON s.id = spo.supplier_id
