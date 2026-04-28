@@ -87,7 +87,7 @@ const SECTIONS = [
   },
   {
     step: '04',
-    title: '상담 요청',
+    title: '고객 요청',
     route: '/tablet/:slug',
     routeLabel: '/tablet/:slug (고객 화면)',
     description:
@@ -189,8 +189,9 @@ export function GuideUsagePage() {
             약국 매장 운영의 실제 흐름입니다. 상품 확보부터 고객 상담 대응, 콘텐츠 활용까지 단계별로 설명합니다.
           </p>
           {/* 흐름 요약 */}
+          <p style={styles.flowBarTitle}>매장 운영 흐름</p>
           <div style={styles.flowBar}>
-            {['상품 확보', '채널 진열', '고객 유입', '상담 요청', '고객 대응', '콘텐츠 활용', '사이니지'].map(
+            {['상품 확보', '채널 진열', '고객 유입', '고객 요청', '고객 대응', '콘텐츠 활용', '사이니지'].map(
               (label, idx, arr) => (
                 <span key={label} style={styles.flowBarItem}>
                   <span style={styles.flowBarLabel}>{label}</span>
@@ -274,12 +275,20 @@ const styles: Record<string, CSSProperties> = {
     lineHeight: 1.7,
     margin: '0 0 24px 0',
   },
+  flowBarTitle: {
+    fontSize: '0.75rem',
+    fontWeight: 600,
+    color: '#64748b',
+    margin: '0 0 8px 0',
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.06em',
+  },
   flowBar: {
     display: 'flex',
     flexWrap: 'wrap',
     alignItems: 'center',
     gap: 4,
-    marginTop: 4,
+    marginTop: 0,
   },
   flowBarItem: {
     display: 'flex',
