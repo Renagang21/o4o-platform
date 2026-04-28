@@ -205,7 +205,7 @@ export default function CommunityMainPage() {
               },
               {
                 title: '기능별 이용 방법',
-                description: '포럼, 강의, 자료실, 약국 기능 구성',
+                description: '커뮤니티, 콘텐츠, 자료실, 약국 운영 기능 구성',
                 href: '/guide/features',
               },
             ]}

@@ -138,6 +138,24 @@ const HubB2BCatalogPage = lazy(() => import('@/pages/hub/HubB2BCatalogPage').the
 const HubContentListPage = lazy(() => import('@/pages/hub/HubContentListPage').then(m => ({ default: m.HubContentListPage })));
 import { GlycoPharmHubLayout } from '@/components/layouts/GlycoPharmHubLayout';
 
+// Guide pages (shared components — WO-O4O-GUIDE-COMMON-AND-GLYCOPHARM-HOME-V1)
+import {
+  GuideIntroPage,
+  GuideIntroStructurePage,
+  GuideIntroKpaPage,
+  GuideIntroOperationPage,
+  GuideIntroConceptPage,
+  GuideUsagePage,
+  GuideFeaturesPage,
+  glycopharmGuideIntroProps,
+  glycopharmGuideIntroStructureProps,
+  glycopharmGuideIntroKpaProps,
+  glycopharmGuideIntroOperationProps,
+  glycopharmGuideIntroConceptProps,
+  glycopharmGuideUsageProps,
+  glycopharmGuideFeaturesProps,
+} from '@o4o/shared-space-ui';
+
 // Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
 import { StoreDashboardLayout, GLYCOPHARM_STORE_CONFIG, resolveStoreMenu } from '@o4o/store-ui-core';
 import { GlycoGlobalHeader } from './components/GlycoGlobalHeader';
@@ -359,6 +377,16 @@ function AppRoutes() {
           </RoleGuard>
         } />
         <Route path="contact" element={<ContactPage />} />
+
+        {/* Guide pages — WO-O4O-GUIDE-COMMON-AND-GLYCOPHARM-HOME-V1 */}
+        <Route path="guide/intro" element={<GuideIntroPage {...glycopharmGuideIntroProps} />} />
+        <Route path="guide/intro/structure" element={<GuideIntroStructurePage {...glycopharmGuideIntroStructureProps} />} />
+        <Route path="guide/intro/kpa" element={<GuideIntroKpaPage {...glycopharmGuideIntroKpaProps} />} />
+        <Route path="guide/intro/operation" element={<GuideIntroOperationPage {...glycopharmGuideIntroOperationProps} />} />
+        <Route path="guide/intro/concept" element={<GuideIntroConceptPage {...glycopharmGuideIntroConceptProps} />} />
+        <Route path="guide/usage" element={<GuideUsagePage {...glycopharmGuideUsageProps} />} />
+        <Route path="guide/features" element={<GuideFeaturesPage {...glycopharmGuideFeaturesProps} />} />
+
         <Route path="apply" element={<PharmacyApplyPage />} />
         <Route path="apply/pharmacist" element={<PharmacistApplyPage />} />
         <Route path="apply/my-applications" element={<MyApplicationsPage />} />
