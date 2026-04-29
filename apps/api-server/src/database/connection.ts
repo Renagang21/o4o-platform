@@ -317,9 +317,6 @@ import {
   SiteGuideUsageSummary,
   SiteGuideExecutionLog,
 } from '../routes/siteguide/entities/index.js';
-// Guide Inline Edit entity (WO-O4O-GUIDE-INLINE-EDIT-V1)
-import { GuideContent } from '../routes/guide/entities/guide-content.entity.js';
-
 // ============================================================================
 // MARKET-TRIAL CORE ENTITIES (WO-MARKET-TRIAL-DB-PERSISTENCE-INTEGRATION-V1)
 // ============================================================================
@@ -821,8 +818,6 @@ export const AppDataSource = new DataSource({
     SiteGuideApiKey,
     SiteGuideUsageSummary,
     SiteGuideExecutionLog,
-    // GUIDE INLINE EDIT (WO-O4O-GUIDE-INLINE-EDIT-V1)
-    GuideContent,
     // ============================================================================
     // CONTENT TEMPLATE ENTITY (WO-O4O-CONTENT-TEMPLATE-SYSTEM-V1)
     // ============================================================================
