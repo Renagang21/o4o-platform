@@ -35,10 +35,8 @@ function getForumBasePath(): string {
 }
 
 export const forumApi = {
-  // 카테고리
-  getCategories: () =>
-    apiClient.get<ApiResponse<ForumCategory[]>>(`${getForumBasePath()}/categories`),
-
+  // 카테고리 — getCategories() 제거 (WO-O4O-FORUM-CATEGORY-REMNANT-CLEANUP-V1: DB 완전 제거됨)
+  // getCategory()는 ForumDetailPage 비공개 포럼 소유자 검증에 필수
   getCategory: (id: string) =>
     apiClient.get<ApiResponse<ForumCategory>>(`${getForumBasePath()}/categories/${id}`),
 
@@ -48,8 +46,15 @@ export const forumApi = {
     page?: number;
     limit?: number;
     search?: string;
+    tag?: string;
   }) =>
     apiClient.get<PaginatedResponse<ForumPost>>(`${getForumBasePath()}/posts`, params),
+
+  getPopularTags: (limit?: number) =>
+    apiClient.get<ApiResponse<{ tag: string; count: number }[]>>(
+      `${getForumBasePath()}/posts/tags/popular`,
+      limit ? { limit } : undefined,
+    ),
 
   getPost: (id: string) =>
     apiClient.get<ApiResponse<ForumPost>>(`${getForumBasePath()}/posts/${id}`),

@@ -53,6 +53,9 @@ router.get('/icon-samples', moderationController.getIconSamples.bind(moderationC
 // List posts (public with optional auth for personalized results)
 router.get('/posts', optionalAuth, postController.listPosts.bind(postController));
 
+// Get popular tags — must be before /posts/:id to avoid param conflict
+router.get('/posts/tags/popular', optionalAuth, postController.getPopularTags.bind(postController));
+
 // Get single post (public with optional auth for view tracking)
 router.get('/posts/:id', optionalAuth, postController.getPost.bind(postController));
 

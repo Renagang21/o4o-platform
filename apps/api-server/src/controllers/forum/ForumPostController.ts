@@ -23,6 +23,7 @@ export class ForumPostController extends ForumControllerBase {
 
       const categoryId = req.query.categoryId as string || req.query.category as string;
       const query = req.query.search as string || req.query.query as string;
+      const tag = req.query.tag as string;
       const status = req.query.status as PostStatus;
       const sortBy = (req.query.sortBy as string) || 'latest';
 
@@ -75,7 +76,12 @@ export class ForumPostController extends ForumControllerBase {
       // Forum context filter (service-bound visibility)
       this.applyContextFilter(queryBuilder, 'post', this.getForumContext(req));
 
-      // Search filter (search in title, excerpt, and tags)
+      // Tag filter (exact match against tags array)
+      if (tag) {
+        queryBuilder.andWhere(':tag = ANY(post.tags)', { tag });
+      }
+
+      // Search filter (title, excerpt, tags full-text)
       if (query) {
         queryBuilder.andWhere(
           '(post.title ILIKE :query OR post.excerpt ILIKE :query OR array_to_string(post.tags, \' \') ILIKE :query)',
@@ -563,4 +569,54 @@ export class ForumPostController extends ForumControllerBase {
       });
     }
   }
+
+
+  /**
+   * GET /forum/posts/tags/popular
+   * Top tags by frequency across published posts (scoped via forum context).
+   */
+  async getPopularTags(req: Request, res: Response): Promise<void> {
+    try {
+      const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
+      const ctx = this.getForumContext(req);
+
+      const params: any[] = [];
+      let scopeCondition = '';
+
+      if (ctx?.scope === 'community') {
+        scopeCondition = 'AND p.organization_id IS NULL';
+      } else if (ctx?.scope === 'organization' && ctx.organizationId) {
+        scopeCondition = 'AND p.organization_id = $1';
+        params.push(ctx.organizationId);
+      } else if (ctx?.scope === 'demo') {
+        res.json({ success: true, data: [] });
+        return;
+      }
+
+      params.push(limit);
+      const limitIdx = params.length;
+
+      const rows: { tag: string; count: number }[] = await this.postRepository.query(
+        `SELECT unnest(p.tags) AS tag, COUNT(*)::int AS count
+         FROM forum_post p
+         WHERE p.status = 'publish'
+           AND p.tags IS NOT NULL
+           AND array_length(p.tags, 1) > 0
+           ${scopeCondition}
+         GROUP BY tag
+         ORDER BY count DESC
+         LIMIT $${limitIdx}`,
+        params,
+      );
+
+      res.json({
+        success: true,
+        data: rows.map((r) => ({ tag: r.tag, count: Number(r.count) })),
+      });
+    } catch (error: any) {
+      logger.warn('Error fetching popular tags:', error.message);
+      res.json({ success: true, data: [] });
+    }
+  }
+
 }

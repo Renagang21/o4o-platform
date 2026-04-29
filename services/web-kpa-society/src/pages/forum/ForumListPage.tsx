@@ -4,12 +4,15 @@
  * WO-O4O-FORUM-CATEGORY-REMOVE-AND-ORPHAN-CLEANUP-V1:
  * 카테고리 구조 제거 — 단일 피드 뷰, 검색만 지원
  *
- * 컬럼: 포럼 | 제목 | 작성자 | 작성일 | 👍 | 👁 | 💬 | 액션
+ * WO-O4O-FORUM-TAG-UX-AND-SEARCH-V1:
+ * 태그 필터 + 인기 태그 바 추가
+ *
+ * 컬럼: 제목 (태그 포함) | 작성자 | 작성일 | 👍 | 👁 | 💬 | 액션
  */
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Link2, Trash2, Sparkles } from 'lucide-react';
+import { Link2, Trash2, Sparkles, Tag } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { BaseTable, ActionBar, RowActionMenu, PageSection, PageContainer, type O4OColumn, type ActionBarAction, type RowActionItem } from '@o4o/ui';
 import { PageHeader } from '../../components/common';
@@ -41,7 +44,8 @@ export function ForumListPage() {
 
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
   const searchQuery = searchParams.get('search') || '';
-  const hasFilters = !!searchQuery;
+  const activeTag = searchParams.get('tag') || '';
+  const hasFilters = !!(searchQuery || activeTag);
 
   const [searchInput, setSearchInput] = useState(searchQuery);
   const [posts, setPosts] = useState<ForumPost[]>([]);
@@ -49,8 +53,16 @@ export function ForumListPage() {
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  const [popularTags, setPopularTags] = useState<{ tag: string; count: number }[]>([]);
 
   useEffect(() => { setSearchInput(searchQuery); }, [searchQuery]);
+
+  // Load popular tags once on mount
+  useEffect(() => {
+    forumApi.getPopularTags(15)
+      .then((res) => { if (res?.data) setPopularTags(res.data); })
+      .catch(() => {});
+  }, []);
 
   const loadData = useCallback(async () => {
     try {
@@ -60,6 +72,7 @@ export function ForumListPage() {
         page: currentPage,
         limit: PAGE_SIZE,
         search: searchQuery || undefined,
+        tag: activeTag || undefined,
       });
       setPosts(postsRes.data || []);
       setTotalPages(postsRes.totalPages || 1);
@@ -71,7 +84,7 @@ export function ForumListPage() {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, searchQuery]);
+  }, [currentPage, searchQuery, activeTag]);
 
   useEffect(() => { loadData(); }, [loadData]);
 
@@ -93,6 +106,18 @@ export function ForumListPage() {
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     updateParam('search', searchInput.trim());
+  };
+
+  const handleTagClick = (tag: string) => {
+    if (activeTag === tag) {
+      updateParam('tag', '');
+    } else {
+      const next = new URLSearchParams(searchParams);
+      next.set('tag', tag);
+      next.delete('page');
+      setSearchParams(next);
+      setSelectedKeys(new Set());
+    }
   };
 
   const handleClearAll = () => {
@@ -160,18 +185,36 @@ export function ForumListPage() {
       key: 'title',
       header: '제목',
       render: (_v, row) => (
-        <Link to={`/forum/post/${row.id}`} style={s.postLink}>
-          {row.isPinned && <span style={s.pinnedTag}>공지</span>}
-          <span style={{
-            ...s.titleText,
-            backgroundColor: row.isPinned ? '#fffbeb' : undefined,
-          }}>
-            {row.title}
-          </span>
-          {(row.commentCount ?? 0) > 0 && (
-            <span style={s.commentBadge}>[{row.commentCount}]</span>
+        <div>
+          <Link to={`/forum/post/${row.id}`} style={s.postLink}>
+            {row.isPinned && <span style={s.pinnedTag}>공지</span>}
+            <span style={{
+              ...s.titleText,
+              backgroundColor: row.isPinned ? '#fffbeb' : undefined,
+            }}>
+              {row.title}
+            </span>
+            {(row.commentCount ?? 0) > 0 && (
+              <span style={s.commentBadge}>[{row.commentCount}]</span>
+            )}
+          </Link>
+          {Array.isArray((row as any).tags) && (row as any).tags.length > 0 && (
+            <div style={s.tagRow}>
+              {((row as any).tags as string[]).slice(0, 3).map((tag) => (
+                <button
+                  key={tag}
+                  onClick={(e) => { e.stopPropagation(); handleTagClick(tag); }}
+                  style={{
+                    ...s.tagChip,
+                    ...(activeTag === tag ? s.tagChipActive : {}),
+                  }}
+                >
+                  #{tag}
+                </button>
+              ))}
+            </div>
           )}
-        </Link>
+        </div>
       ),
     },
     {
@@ -247,7 +290,7 @@ export function ForumListPage() {
         return <RowActionMenu actions={actions} />;
       },
     },
-  ], [user, navigate, handleDeletePost]);
+  ], [user, navigate, handleDeletePost, activeTag]);
 
   // ── Bulk Actions ──
 
@@ -285,7 +328,7 @@ export function ForumListPage() {
       {hasFilters ? (
         <>
           <p style={s.emptyTitle}>검색 결과가 없습니다</p>
-          <button onClick={handleClearAll} style={s.emptyBtn}>전체 목록 보기</button>
+          <button onClick={handleClearAll} style={s.emptyBtn}>전체 보기</button>
         </>
       ) : (
         <>
@@ -319,6 +362,30 @@ export function ForumListPage() {
         breadcrumb={[{ label: '홈', href: '/' }, { label: '포럼', href: '/forum' }, { label: '전체 글' }]}
       />
 
+      {/* Popular Tags Bar */}
+      {popularTags.length > 0 && (
+        <div style={s.popularTagsBar}>
+          <span style={s.popularTagsLabel}>
+            <Tag size={12} style={{ marginRight: '4px' }} />
+            인기 태그
+          </span>
+          <div style={s.popularTagsList}>
+            {popularTags.map(({ tag }) => (
+              <button
+                key={tag}
+                onClick={() => handleTagClick(tag)}
+                style={{
+                  ...s.popularTagBtn,
+                  ...(activeTag === tag ? s.popularTagBtnActive : {}),
+                }}
+              >
+                #{tag}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Search + Filters */}
       <div style={s.toolbar}>
         <form style={s.searchForm} onSubmit={handleSearchSubmit}>
@@ -338,8 +405,12 @@ export function ForumListPage() {
         </div>
         {hasFilters && (
           <div style={s.activeFilters}>
-            <span style={s.activeLabel}>{searchQuery && `"${searchQuery}"`}</span>
-            <button onClick={handleClearAll} style={s.clearBtn}>초기화</button>
+            <span style={s.activeLabel}>
+              {searchQuery && `"${searchQuery}"`}
+              {searchQuery && activeTag && ' + '}
+              {activeTag && `#${activeTag}`}
+            </span>
+            <button onClick={handleClearAll} style={s.clearBtn}>전체 보기</button>
           </div>
         )}
       </div>
@@ -406,6 +477,26 @@ export function ForumListPage() {
 
 const s: Record<string, React.CSSProperties> = {
   container: { maxWidth: '1000px', margin: '0 auto', padding: '0 20px 40px' },
+  popularTagsBar: {
+    display: 'flex', alignItems: 'center', gap: '10px',
+    padding: '10px 14px', marginBottom: '12px',
+    backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px',
+    flexWrap: 'wrap',
+  } as React.CSSProperties,
+  popularTagsLabel: {
+    display: 'inline-flex', alignItems: 'center',
+    fontSize: '12px', fontWeight: 600, color: '#64748b', whiteSpace: 'nowrap', flexShrink: 0,
+  } as React.CSSProperties,
+  popularTagsList: { display: 'flex', gap: '6px', flexWrap: 'wrap' } as React.CSSProperties,
+  popularTagBtn: {
+    padding: '3px 10px', fontSize: '12px', fontWeight: 500,
+    border: '1px solid #cbd5e1', borderRadius: '12px',
+    backgroundColor: '#fff', color: '#475569', cursor: 'pointer',
+    transition: 'all 0.15s',
+  } as React.CSSProperties,
+  popularTagBtnActive: {
+    backgroundColor: colors.primary, borderColor: colors.primary, color: '#fff',
+  },
   toolbar: { marginBottom: '16px' },
   searchForm: { display: 'flex', gap: '8px', marginBottom: '12px' },
   searchInput: {
@@ -420,15 +511,6 @@ const s: Record<string, React.CSSProperties> = {
     display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px',
     flexWrap: 'wrap', marginBottom: '8px',
   } as React.CSSProperties,
-  categories: { display: 'flex', gap: '8px', flexWrap: 'wrap' } as React.CSSProperties,
-  catBtn: {
-    padding: '6px 14px', fontSize: '13px', fontWeight: 500,
-    border: `1px solid ${colors.neutral300}`, borderRadius: '20px',
-    backgroundColor: colors.white, color: colors.neutral700, cursor: 'pointer',
-  } as React.CSSProperties,
-  catBtnActive: {
-    backgroundColor: colors.primary, borderColor: colors.primary, color: colors.white,
-  },
   writeButton: {
     padding: '10px 20px', backgroundColor: colors.primary, color: colors.white,
     textDecoration: 'none', borderRadius: '6px', fontSize: '14px', fontWeight: 500, whiteSpace: 'nowrap',
@@ -452,10 +534,6 @@ const s: Record<string, React.CSSProperties> = {
     backgroundColor: colors.white, borderRadius: '8px', border: `1px solid ${colors.neutral200}`,
     overflow: 'hidden', marginBottom: '8px',
   },
-  catBadge: {
-    display: 'inline-block', padding: '2px 8px', fontSize: '11px', fontWeight: 500,
-    borderRadius: '4px', backgroundColor: colors.neutral100, color: colors.neutral700,
-  },
   postLink: { display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none', color: 'inherit' },
   pinnedTag: {
     display: 'inline-block', padding: '1px 6px', fontSize: '11px', fontWeight: 600,
@@ -463,6 +541,16 @@ const s: Record<string, React.CSSProperties> = {
   },
   titleText: { fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } as React.CSSProperties,
   commentBadge: { marginLeft: '6px', fontSize: '13px', color: colors.primary, fontWeight: 500, flexShrink: 0 },
+  tagRow: { display: 'flex', gap: '4px', marginTop: '4px', flexWrap: 'wrap' } as React.CSSProperties,
+  tagChip: {
+    padding: '2px 8px', fontSize: '11px', fontWeight: 500,
+    border: '1px solid #e2e8f0', borderRadius: '10px',
+    backgroundColor: '#f8fafc', color: '#64748b', cursor: 'pointer',
+    transition: 'all 0.15s',
+  } as React.CSSProperties,
+  tagChipActive: {
+    backgroundColor: colors.primary, borderColor: colors.primary, color: '#fff',
+  },
   pagination: {
     display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '4px', padding: '24px 0',
   },
