@@ -30,21 +30,26 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     // WO-KPA-OPERATOR-STORE-RELATED-MENU-HIDE-V1: 약국 서비스 신청 메뉴 제거 (라우트/API/DB 유지)
   ],
   approvals: [
+    // WO-KPA-LMS-INSTRUCTOR-APPROVAL-RELOCATE-V1: 자격 신청 관리 → lms 그룹으로 이동
     { label: '상품 신청 관리', path: '/operator/product-applications' },
-    { label: '자격 신청 관리', path: '/operator/qualification-requests' },
   ],
   // WO-KPA-OPERATOR-STORES-MENU-HIDE-V1: stores 메뉴 노출 제거
-  // WO-KPA-OPERATOR-STORE-RELATED-MENU-HIDE-V1: 확인 (매장 관리, 채널 관리 제거 유지)
   // stores: [ ... ] — 라우트/페이지/API/DB는 유지
   // WO-KPA-OPERATOR-CONTENT-NOTICE-NEWS-MENU-NORMALIZATION-V1: "공지사항" + "콘텐츠 관리" → "공지사항/뉴스" 통합
-  // WO-KPA-OPERATOR-RESOURCES-MANAGEMENT-MENU-V1: "자료실 관리" 별도 진입점 추가 (콘텐츠 허브와 분리)
+  // WO-KPA-LMS-INSTRUCTOR-APPROVAL-RELOCATE-V1: 자료실 관리 → resources 그룹으로, 강의 관리 → lms 그룹으로 이동
   content: [
     { label: '공지사항/뉴스', path: '/operator/content' },
-    { label: '자료실 관리', path: '/operator/resources' },
     { label: 'Home 편집', path: '/operator/community' },
     { label: '콘텐츠 허브', path: '/operator/docs' },
-    // WO-KPA-OPERATOR-LMS-MENU-AND-MANAGEMENT-PAGE-RESTORE-V1
+  ],
+  // WO-KPA-LMS-INSTRUCTOR-APPROVAL-RELOCATE-V1: 자료실 독립 최상위 그룹
+  resources: [
+    { label: '자료실 관리', path: '/operator/resources' },
+  ],
+  // WO-KPA-LMS-INSTRUCTOR-APPROVAL-RELOCATE-V1: 강의 독립 그룹 (강의 관리 + 강사 승인)
+  lms: [
     { label: '강의 관리', path: '/operator/lms' },
+    { label: '강사 승인', path: '/operator/qualification-requests' },
   ],
   signage: [
 
@@ -98,19 +103,22 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     // WO-KPA-OPERATOR-STORE-RELATED-MENU-HIDE-V1: 약국 서비스 신청 메뉴 제거 (라우트/API/DB 유지)
   ],
   approvals: [
+    // WO-KPA-LMS-INSTRUCTOR-APPROVAL-RELOCATE-V1: 자격 신청 관리 → lms 그룹으로 이동
     { label: '상품 신청 관리', path: '/operator/product-applications' },
-    { label: '자격 신청 관리', path: '/operator/qualification-requests' },
   ],
-  // WO-KPA-OPERATOR-STORES-MENU-HIDE-V1 + WO-KPA-OPERATOR-STORE-RELATED-MENU-HIDE-V1: stores 메뉴 노출 제거
-  // WO-KPA-OPERATOR-CONTENT-NOTICE-NEWS-MENU-NORMALIZATION-V1: "공지사항" + "콘텐츠 관리" → "공지사항/뉴스" 통합
-  // WO-KPA-OPERATOR-RESOURCES-MANAGEMENT-MENU-V1: "자료실 관리" 별도 진입점 추가 (콘텐츠 허브와 분리)
+  // WO-KPA-OPERATOR-STORES-MENU-HIDE-V1: stores 메뉴 노출 제거
+  // WO-KPA-LMS-INSTRUCTOR-APPROVAL-RELOCATE-V1: 자료실/강의 독립 그룹 분리
   content: [
     { label: '공지사항/뉴스', path: '/operator/content' },
-    { label: '자료실 관리', path: '/operator/resources' },
     { label: 'Home 편집', path: '/operator/community' },
     { label: '콘텐츠 허브', path: '/operator/docs' },
-    // WO-KPA-OPERATOR-LMS-MENU-AND-MANAGEMENT-PAGE-RESTORE-V1
+  ],
+  resources: [
+    { label: '자료실 관리', path: '/operator/resources' },
+  ],
+  lms: [
     { label: '강의 관리', path: '/operator/lms' },
+    { label: '강사 승인', path: '/operator/qualification-requests' },
   ],
   signage: [
 

@@ -13,6 +13,8 @@ import {
   Store,
   ShoppingCart,
   FileText,
+  Archive,
+  BookOpen,
   Monitor,
   MessageSquare,
   BarChart3,
@@ -43,6 +45,9 @@ export const STANDARD_GROUPS: StandardGroup[] = [
   { key: 'stores', label: 'Stores', icon: Store, capability: OperatorCapability.STORE_MANAGEMENT },
   { key: 'orders', label: 'Orders', icon: ShoppingCart, capability: OperatorCapability.STORE_MANAGEMENT },
   { key: 'content', label: 'Content', icon: FileText, capability: OperatorCapability.CONTENT_MANAGEMENT },
+  // WO-KPA-LMS-INSTRUCTOR-APPROVAL-RELOCATE-V1
+  { key: 'resources', label: 'Resources', icon: Archive, capability: OperatorCapability.CONTENT_MANAGEMENT },
+  { key: 'lms', label: 'LMS', icon: BookOpen, capability: OperatorCapability.CONTENT_MANAGEMENT },
   { key: 'signage', label: 'Signage', icon: Monitor, capability: OperatorCapability.SIGNAGE },
   { key: 'forum', label: 'Forum', icon: MessageSquare, capability: OperatorCapability.COMMUNITY },
   { key: 'analytics', label: 'Analytics', icon: BarChart3, capability: OperatorCapability.ANALYTICS },

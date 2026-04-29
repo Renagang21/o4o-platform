@@ -21,8 +21,9 @@ export interface OperatorMenuItem {
 }
 
 /**
- * 11-Capability Group 키.
+ * Capability Group 키.
  * CLAUDE.md Section 11 표준 순서.
+ * resources, lms — WO-KPA-LMS-INSTRUCTOR-APPROVAL-RELOCATE-V1 추가
  */
 export type OperatorGroupKey =
   | 'dashboard'
@@ -32,6 +33,8 @@ export type OperatorGroupKey =
   | 'stores'
   | 'orders'
   | 'content'
+  | 'resources'
+  | 'lms'
   | 'signage'
   | 'forum'
   | 'analytics'
