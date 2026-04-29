@@ -23,3 +23,4 @@ export { NetureContactMessage } from './NetureContactMessage.entity.js';
 export { OfferServiceApproval } from './OfferServiceApproval.entity.js';
 // WO-NETURE-CURATION-PHASE3-FULL-REMOVAL-V1: OfferCuration entity 제거
 export { CategoryMappingRule } from './CategoryMappingRule.entity.js';
+export { SpotPricePolicy } from './SpotPricePolicy.entity.js';

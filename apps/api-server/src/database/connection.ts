@@ -232,10 +232,22 @@ import {
   NetureContactMessage,
   OfferServiceApproval,
   ProductAlias,
+  CategoryMappingRule,
+  SpotPricePolicy,
 } from '../modules/neture/entities/index.js';
-// NetureOrder, NeturePartner 제거: routes/neture 엔티티는 NetureProduct/NetureOrderItem 의존 관계가 있어
-// 해당 의존 엔티티까지 함께 등록해야 함. 현재 미등록 상태로 DataSource 초기화 실패 발생.
-// WO-TYPEORM-ENTITY-REGISTRATION-FIX-V3에서 의존 전체 등록 또는 routes/neture 마이그레이션 필요.
+// ============================================================================
+// NETURE ROUTES ENTITIES (WO-TYPEORM-ENTITY-REGISTRATION-FIX-V3)
+// Phase G-3: 주문/결제 + Phase D-1: 파트너/상품
+// 의존 관계: NetureOrder ↔ NetureOrderItem, NeturePartner ↔ NetureProduct
+// 전체 5개를 함께 등록해야 "No metadata found" 오류가 발생하지 않음
+// ============================================================================
+import {
+  NetureOrder,
+  NetureOrderItem,
+  NeturePartner,
+  NetureProduct,
+  NetureProductLog,
+} from '../routes/neture/entities/index.js';
 import { KpaSteward } from '../routes/kpa/entities/kpa-steward.entity.js'; // WO-TYPEORM-ENTITY-REGISTRATION-FIX-V2
 
 // ============================================================================
@@ -305,6 +317,8 @@ import {
   SiteGuideUsageSummary,
   SiteGuideExecutionLog,
 } from '../routes/siteguide/entities/index.js';
+// Guide Inline Edit entity (WO-O4O-GUIDE-INLINE-EDIT-V1)
+import { GuideContent } from '../routes/guide/entities/guide-content.entity.js';
 
 // ============================================================================
 // MARKET-TRIAL CORE ENTITIES (WO-MARKET-TRIAL-DB-PERSISTENCE-INTEGRATION-V1)
@@ -733,6 +747,14 @@ export const AppDataSource = new DataSource({
     NetureContactMessage,
     OfferServiceApproval,
     ProductAlias,
+    CategoryMappingRule,
+    SpotPricePolicy,
+    // WO-TYPEORM-ENTITY-REGISTRATION-FIX-V3: routes/neture 전체 등록
+    NetureOrder,
+    NetureOrderItem,
+    NeturePartner,
+    NetureProduct,
+    NetureProductLog,
     // WO-TYPEORM-ENTITY-REGISTRATION-FIX-V2
     KpaSteward,
     // ============================================================================
@@ -799,6 +821,8 @@ export const AppDataSource = new DataSource({
     SiteGuideApiKey,
     SiteGuideUsageSummary,
     SiteGuideExecutionLog,
+    // GUIDE INLINE EDIT (WO-O4O-GUIDE-INLINE-EDIT-V1)
+    GuideContent,
     // ============================================================================
     // CONTENT TEMPLATE ENTITY (WO-O4O-CONTENT-TEMPLATE-SYSTEM-V1)
     // ============================================================================
