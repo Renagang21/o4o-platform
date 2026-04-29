@@ -43,6 +43,7 @@ import {
   Trash2,
   Plus,
   Heart,
+  Copy,
 } from 'lucide-react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -59,8 +60,10 @@ export interface ResourcesHubItem {
   view_count: number;
   author_name?: string | null;
   created_at: string;
+  created_by?: string | null;    // WO-KPA-RESOURCES-OWNER-ACTIONS-AND-TAKE-V1: 등록자 ID
+  usage_type?: string | null;    // WO-KPA-RESOURCES-OWNER-ACTIONS-AND-TAKE-V1: READ|LINK|DOWNLOAD|COPY
   // Correction 2: 다운로드/열람 액션 타입 — 미제공 시 source_type에서 자동 파생
-  actionType?: 'view' | 'download' | 'external';
+  actionType?: 'view' | 'download' | 'external' | 'copy';
   // Correction 2: 파일 형식 — 미제공 시 source_file_name 확장자에서 자동 파생
   fileType?: 'pdf' | 'image' | 'doc' | 'video' | 'etc';
   // WO-KPA-RESOURCES-MINOR-REFINEMENT-V1: 좋아요
@@ -124,6 +127,11 @@ export interface ResourcesHubConfig {
 
   // WO-KPA-RESOURCES-MINOR-REFINEMENT-V1: 좋아요 토글
   onToggleRecommend?: (id: string) => Promise<{ recommendCount: number; isRecommendedByMe: boolean }>;
+
+  // WO-KPA-RESOURCES-OWNER-ACTIONS-AND-TAKE-V1: 등록자 자기 수정/삭제
+  getCurrentUserId?: () => string | null;
+  getOwnerEditHref?: (id: string) => string;
+  onOwnerDelete?: (id: string) => Promise<void>;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -137,7 +145,7 @@ function formatDate(dateStr: string): string {
 }
 
 /** actionType 파생: 명시 값 우선, 없으면 source_type/source_url에서 추론 */
-function getActionType(item: ResourcesHubItem): 'view' | 'download' | 'external' {
+function getActionType(item: ResourcesHubItem): 'view' | 'download' | 'external' | 'copy' {
   if (item.actionType) return item.actionType;
   if (!item.source_url) return 'view';
   return item.source_type === 'external' ? 'external' : 'download';
@@ -177,6 +185,7 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [drawerItem, setDrawerItem] = useState<ResourcesHubItem | null>(null);
   const [drawerLoading, setDrawerLoading] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -266,6 +275,50 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
     }
   }, [config, drawerItem, loadData]);
 
+  // WO-KPA-RESOURCES-OWNER-ACTIONS-AND-TAKE-V1
+  const handleOwnerDeleteItem = useCallback(async (id: string) => {
+    if (!config.onOwnerDelete) return;
+    try {
+      await config.onOwnerDelete(id);
+      setSelectedKeys(prev => { const n = new Set(prev); n.delete(id); return n; });
+      if (drawerItem?.id === id) setDrawerItem(null);
+      loadData();
+    } catch {
+      // adapter handles error display
+    }
+  }, [config, drawerItem, loadData]);
+
+  const handleTakeAction = useCallback(async (row: ResourcesHubItem, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const at = getActionType(row);
+    if (at === 'external' && row.source_url) {
+      window.open(row.source_url, '_blank', 'noopener,noreferrer');
+    } else if (at === 'download' && row.source_url) {
+      const a = document.createElement('a');
+      a.href = row.source_url;
+      if (row.source_file_name) a.download = row.source_file_name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } else if (at === 'copy') {
+      let text = row.body ?? '';
+      if (!text && config.fetchDetail) {
+        try { const d = await config.fetchDetail(row.id); text = d.body ?? ''; } catch { /* ignore */ }
+      }
+      if (text) {
+        try {
+          await navigator.clipboard.writeText(text);
+          setCopiedId(row.id);
+          setTimeout(() => setCopiedId(prev => prev === row.id ? null : prev), 1500);
+        } catch { /* ignore */ }
+      } else if (config.fetchDetail) {
+        openDrawer(row);
+      }
+    } else {
+      if (config.fetchDetail) openDrawer(row);
+    }
+  }, [config, openDrawer]);
+
   // ─── Bulk ─────────────────────────────────────────────────────────────────
 
   const handleBulkCopy = useCallback(() => {
@@ -311,7 +364,7 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
 
   const columns = useMemo((): O4OColumn<ResourcesHubItem>[] => {
     const hasDrawer = !!config.fetchDetail;
-    const hasRowActions = !!(config.getEditHref || config.onDelete);
+    const hasRowActions = !!(config.getEditHref || config.onDelete || config.getOwnerEditHref || config.onOwnerDelete);
 
     return [
       {
@@ -393,55 +446,69 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
       }] : []),
       {
         key: '_actions' as keyof ResourcesHubItem,
-        header: '',
-        width: hasRowActions ? 150 : 110,
+        header: '작업',
+        width: hasRowActions ? 160 : 120,
         align: 'center',
         system: true,
         render: (_v, row) => {
+          const currentUserId = config.getCurrentUserId?.() ?? null;
+          const isOwner = currentUserId !== null && row.created_by === currentUserId;
+          const actionType = getActionType(row);
+
+          // ⋯ 메뉴 구성
           const rowActions: RowActionItem[] = [];
+          // 수정: operator 우선, 없으면 본인
           if (config.getEditHref) {
-            rowActions.push({
-              key: 'edit',
-              label: '수정',
-              onClick: () => navigate(config.getEditHref!(row.id)),
-            });
+            rowActions.push({ key: 'edit', label: '수정', onClick: () => navigate(config.getEditHref!(row.id)) });
+          } else if (isOwner && config.getOwnerEditHref) {
+            rowActions.push({ key: 'edit', label: '수정', onClick: () => navigate(config.getOwnerEditHref!(row.id)) });
           }
+          // 삭제: operator 우선, 없으면 본인
           if (config.onDelete) {
             rowActions.push({
-              key: 'delete',
-              label: '삭제',
-              variant: 'danger',
+              key: 'delete', label: '삭제', variant: 'danger',
               onClick: () => handleDeleteItem(row.id),
-              confirm: {
-                title: '자료 삭제',
-                message: '이 자료를 삭제하시겠습니까?',
-                variant: 'danger',
-              },
+              confirm: { title: '자료 삭제', message: '이 자료를 삭제하시겠습니까?', variant: 'danger' },
+            });
+          } else if (isOwner && config.onOwnerDelete) {
+            rowActions.push({
+              key: 'delete', label: '삭제', variant: 'danger',
+              onClick: () => handleOwnerDeleteItem(row.id),
+              confirm: { title: '자료 삭제', message: '본인이 등록한 자료를 삭제하시겠습니까?', variant: 'danger' },
             });
           }
-          const actionType = getActionType(row);
+          // 링크 복사 (source_url 있을 때)
+          if (row.source_url) {
+            rowActions.push({
+              key: 'copy-link', label: '링크 복사',
+              onClick: () => navigator.clipboard.writeText(row.source_url!).catch(() => {}),
+            });
+          }
+
+          // 가져가기 버튼 아이콘/라벨
+          const isCopied = copiedId === row.id;
+          const takeIcon = actionType === 'external' ? <ExternalLink size={12} />
+            : actionType === 'download' ? <Download size={12} />
+            : actionType === 'copy' ? <Copy size={12} />
+            : null;
+          const takeLabel = isCopied ? '복사됨!' : '가져가기';
+
           return (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}>
-              {row.source_url && (
-                <a
-                  href={row.source_url}
-                  target={actionType === 'external' ? '_blank' : '_self'}
-                  rel="noopener noreferrer"
-                  download={actionType === 'download' ? (row.source_file_name || true) : undefined}
-                  onClick={(e) => e.stopPropagation()}
-                  style={st.actionBtn}
-                >
-                  {actionType === 'external' ? <ExternalLink size={12} /> : <Download size={12} />}
-                  {actionType === 'external' ? '바로가기' : '다운로드'}
-                </a>
-              )}
-              {hasRowActions && <RowActionMenu actions={rowActions} />}
+              <button
+                onClick={(e) => handleTakeAction(row, e)}
+                style={{ ...st.actionBtn, ...(isCopied ? { background: '#D1FAE5', color: '#065F46' } : {}) }}
+              >
+                {takeIcon}
+                {takeLabel}
+              </button>
+              {rowActions.length > 0 && <RowActionMenu actions={rowActions} />}
             </div>
           );
         },
       },
     ];
-  }, [config, navigate, openDrawer, handleDeleteItem, handleToggleRecommend]);
+  }, [config, navigate, openDrawer, handleDeleteItem, handleOwnerDeleteItem, handleTakeAction, handleToggleRecommend, copiedId]);
 
   // ─── Bulk ActionBar ───────────────────────────────────────────────────────
 

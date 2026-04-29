@@ -4,6 +4,7 @@
  * WO-O4O-RESOURCES-HUB-TEMPLATE-FOUNDATION-V1
  * WO-KPA-RESOURCES-UPLOAD-BUTTON-ON-RESOURCES-V1: 자료 등록 버튼 추가
  * WO-KPA-RESOURCES-UPLOAD-ENTRY-AND-FORM-SEPARATION-V1: CTA → /resources/new
+ * WO-KPA-RESOURCES-OWNER-ACTIONS-AND-TAKE-V1: 등록자 수정/삭제 + 가져가기 액션
  *
  * ResourcesHubTemplate + KPA adapter.
  * KPA 전용 API(resourcesApi), operator 조건, 문구는
@@ -71,7 +72,7 @@ function ResourceUploadButton({ variant = 'hero' }: { variant?: 'hero' | 'empty'
 
 // ─── KPA Config ───────────────────────────────────────────────────────────────
 
-function useKpaResourcesConfig(isOperator: boolean): ResourcesHubConfig {
+function useKpaResourcesConfig(isOperator: boolean, userId: string | null | undefined): ResourcesHubConfig {
   return useMemo(() => ({
     serviceKey: 'kpa-society',
     tableId: 'kpa-resources',
@@ -85,10 +86,11 @@ function useKpaResourcesConfig(isOperator: boolean): ResourcesHubConfig {
       const d = res.data;
       // WO-O4O-KPA-RESOURCES-USAGE-TYPE-V1: usage_type → actionType 매핑
       const items = (d.items || []).map((item) => {
-        let actionType: 'view' | 'download' | 'external' | undefined;
+        let actionType: 'view' | 'download' | 'external' | 'copy' | undefined;
         if (item.usage_type === 'LINK') actionType = 'external';
         else if (item.usage_type === 'DOWNLOAD') actionType = 'download';
-        else actionType = 'view'; // READ / COPY / undefined → drawer 읽기
+        else if (item.usage_type === 'COPY') actionType = 'copy';
+        else actionType = 'view'; // READ / undefined → drawer 읽기
         return { ...item, actionType } as ResourcesHubItem;
       });
       return {
@@ -134,10 +136,18 @@ function useKpaResourcesConfig(isOperator: boolean): ResourcesHubConfig {
         }
       : undefined,
 
+    // WO-KPA-RESOURCES-OWNER-ACTIONS-AND-TAKE-V1: 등록자 본인 액션
+    getCurrentUserId: () => userId ?? null,
+    getOwnerEditHref: (id) => `/resources/${id}/edit`,
+    onOwnerDelete: async (id) => {
+      await resourcesApi.delete(id);
+      toast.success('자료가 삭제되었습니다');
+    },
+
     emptyMessage: '등록된 자료가 없습니다.',
     emptyFilteredMessage: '검색 결과가 없습니다.',
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }), [isOperator]);
+  }), [isOperator, userId]);
 }
 
 // ─── Page Component ───────────────────────────────────────────────────────────
@@ -145,7 +155,7 @@ function useKpaResourcesConfig(isOperator: boolean): ResourcesHubConfig {
 export function ResourcesHubPage() {
   const { user } = useAuth();
   const isOperator = hasAnyRole(user?.roles ?? [], PLATFORM_ROLES);
-  const config = useKpaResourcesConfig(isOperator);
+  const config = useKpaResourcesConfig(isOperator, user?.id);
   return <ResourcesHubTemplate config={config} />;
 }
 
