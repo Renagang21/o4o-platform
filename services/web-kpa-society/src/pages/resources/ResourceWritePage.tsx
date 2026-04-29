@@ -2,12 +2,13 @@
  * ResourceWritePage — 자료 등록/수정
  *
  * WO-KPA-RESOURCES-UPLOAD-ENTRY-AND-FORM-SEPARATION-V1
+ * WO-O4O-KPA-RESOURCES-DATA-GUARD-AND-RETEST-V1: usage_type별 입력 가드
  *
- * 두 가지 등록 모드:
- * - 파일 등록: mediaApi.upload → source_type='upload'
- * - 편집기 등록: RichTextEditor → source_type='manual'
- *
- * DB/API는 기존 kpa_contents / POST /contents를 그대로 사용.
+ * usage_type 기반 입력 제약:
+ *   LINK     → externalUrl 필수, source_type='external'
+ *   DOWNLOAD → uploadedFile 필수, source_type='upload'
+ *   COPY     → body 필수, source_type='manual'
+ *   READ     → 별도 제약 없음, source_type='manual'
  */
 
 import { useState, useEffect, useRef } from 'react';
@@ -65,6 +66,8 @@ export function ResourceWritePage() {
   // WO-O4O-KPA-RESOURCES-USAGE-TYPE-V1: usage_type + 자동동기화 플래그
   const [usageType, setUsageType] = useState<UsageType>('DOWNLOAD'); // file 모드 기본
   const [autoSyncUsageType, setAutoSyncUsageType] = useState(true);
+  // WO-O4O-KPA-RESOURCES-DATA-GUARD-AND-RETEST-V1: LINK 타입 외부 URL
+  const [externalUrl, setExternalUrl] = useState('');
 
   // ── Auth guard ──
   useEffect(() => {
@@ -93,7 +96,11 @@ export function ResourceWritePage() {
           setTags((item.tags || []).join(', '));
 
           // Determine mode from source_type
-          if (item.source_type === 'upload' || item.source_type === 'external') {
+          if (item.source_type === 'external') {
+            // LINK type: URL input
+            setExternalUrl(item.source_url || '');
+            setMode('file');
+          } else if (item.source_type === 'upload') {
             setMode('file');
             if (item.source_url) {
               setUploadedFile({
@@ -156,35 +163,42 @@ export function ResourceWritePage() {
       toast.error('제목을 입력해주세요');
       return;
     }
-    if (mode === 'file' && !uploadedFile) {
-      toast.error('파일을 선택해주세요');
-      return;
+    // WO-O4O-KPA-RESOURCES-DATA-GUARD-AND-RETEST-V1: usage_type별 입력 가드
+    if (usageType === 'LINK') {
+      if (!externalUrl.trim()) {
+        toast.error('링크를 입력해야 합니다');
+        return;
+      }
+    } else if (usageType === 'DOWNLOAD') {
+      if (!uploadedFile) {
+        toast.error('다운로드할 파일이 필요합니다');
+        return;
+      }
+    } else if (usageType === 'COPY') {
+      if (!body.trim()) {
+        toast.error('복사할 내용이 없습니다');
+        return;
+      }
     }
 
     setSaving(true);
     try {
       const tagArr = tags.split(',').map((t) => t.trim()).filter(Boolean);
+      const base = {
+        title: title.trim(),
+        summary: summary || undefined,
+        tags: tagArr.length > 0 ? tagArr : undefined,
+        status: saveStatus,
+        usage_type: usageType,
+      };
 
-      const payload = mode === 'file'
-        ? {
-            title: title.trim(),
-            summary: summary || undefined,
-            tags: tagArr.length > 0 ? tagArr : undefined,
-            source_type: 'upload' as const,
-            source_url: uploadedFile!.url,
-            source_file_name: uploadedFile!.fileName,
-            status: saveStatus,
-            usage_type: usageType,
-          }
-        : {
-            title: title.trim(),
-            summary: summary || undefined,
-            body: body || undefined,
-            tags: tagArr.length > 0 ? tagArr : undefined,
-            source_type: 'manual' as const,
-            status: saveStatus,
-            usage_type: usageType,
-          };
+      // source_type은 usage_type으로 결정 (mode 탭이 아님)
+      const payload =
+        usageType === 'LINK'
+          ? { ...base, source_type: 'external' as const, source_url: externalUrl.trim() }
+          : usageType === 'DOWNLOAD'
+          ? { ...base, source_type: 'upload' as const, source_url: uploadedFile!.url, source_file_name: uploadedFile!.fileName }
+          : { ...base, source_type: 'manual' as const, body: body || undefined };
 
       if (isEditMode && id) {
         const res = await resourcesApi.update(id, payload);
@@ -238,35 +252,7 @@ export function ResourceWritePage() {
       </h1>
 
       <div style={styles.card}>
-        {/* Mode Tabs */}
-        {!isEditMode && (
-          <div style={styles.modeTabs}>
-            <button
-              onClick={() => {
-                setMode('file');
-                if (autoSyncUsageType) setUsageType('DOWNLOAD');
-              }}
-              style={{
-                ...styles.modeTab,
-                ...(mode === 'file' ? styles.modeTabActive : {}),
-              }}
-            >
-              파일 등록
-            </button>
-            <button
-              onClick={() => {
-                setMode('editor');
-                if (autoSyncUsageType) setUsageType('READ');
-              }}
-              style={{
-                ...styles.modeTab,
-                ...(mode === 'editor' ? styles.modeTabActive : {}),
-              }}
-            >
-              편집기 등록
-            </button>
-          </div>
-        )}
+        {/* Mode tabs 제거: usage_type 선택이 입력 방식을 결정함 (WO-O4O-KPA-RESOURCES-DATA-GUARD-AND-RETEST-V1) */}
 
         {/* Title */}
         <div style={styles.field}>
@@ -292,10 +278,73 @@ export function ResourceWritePage() {
           />
         </div>
 
-        {/* File Upload Mode */}
-        {mode === 'file' && (
+        {/* Usage Type — WO-O4O-KPA-RESOURCES-USAGE-TYPE-V1 / DATA-GUARD-AND-RETEST-V1 */}
+        <div style={styles.field}>
+          <label style={styles.label}>자료 활용 방식 <span style={styles.required}>*</span></label>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' as const }}>
+            {USAGE_TYPE_OPTIONS.map((opt) => (
+              <label
+                key={opt.value}
+                title={opt.desc}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '8px 14px',
+                  border: `1px solid ${usageType === opt.value ? '#2563eb' : '#e2e8f0'}`,
+                  borderRadius: 8,
+                  backgroundColor: usageType === opt.value ? '#eff6ff' : '#fff',
+                  cursor: 'pointer',
+                  fontSize: '0.8125rem',
+                  fontWeight: usageType === opt.value ? 600 : 400,
+                  color: usageType === opt.value ? '#1d4ed8' : '#475569',
+                  transition: 'all 0.15s',
+                }}
+              >
+                <input
+                  type="radio"
+                  name="usage_type"
+                  value={opt.value}
+                  checked={usageType === opt.value}
+                  onChange={() => {
+                    setUsageType(opt.value);
+                    setAutoSyncUsageType(false);
+                    // mode 자동 전환: DOWNLOAD→file, 나머지→editor
+                    if (opt.value === 'DOWNLOAD') setMode('file');
+                    else if (opt.value !== 'LINK') setMode('editor');
+                  }}
+                  style={{ display: 'none' }}
+                />
+                {opt.label}
+              </label>
+            ))}
+          </div>
+          <p style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: 6, marginBottom: 0 }}>
+            {USAGE_TYPE_OPTIONS.find(o => o.value === usageType)?.desc}
+          </p>
+        </div>
+
+        {/* LINK: URL 입력 */}
+        {usageType === 'LINK' && (
           <div style={styles.field}>
-            <label style={styles.label}>파일</label>
+            <label style={styles.label}>링크 URL <span style={styles.required}>*</span></label>
+            <input
+              type="url"
+              value={externalUrl}
+              onChange={(e) => setExternalUrl(e.target.value)}
+              placeholder="https://..."
+              style={styles.input}
+            />
+            <p style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: 4, marginBottom: 0 }}>
+              클릭 시 외부 웹페이지가 새 탭에서 열립니다
+            </p>
+          </div>
+        )}
+
+        {/* DOWNLOAD: 파일 업로드 */}
+        {usageType === 'DOWNLOAD' && (
+          <div style={styles.field}>
+            <label style={styles.label}>파일 <span style={styles.required}>*</span></label>
             {!uploadedFile ? (
               <div style={styles.uploadArea}>
                 <input
@@ -332,59 +381,21 @@ export function ResourceWritePage() {
           </div>
         )}
 
-        {/* Editor Mode */}
-        {mode === 'editor' && (
+        {/* READ / COPY: 본문 편집기 */}
+        {(usageType === 'READ' || usageType === 'COPY') && (
           <div style={styles.field}>
-            <label style={styles.label}>본문</label>
+            <label style={styles.label}>
+              본문 {usageType === 'COPY' && <span style={styles.required}>*</span>}
+            </label>
             <RichTextEditor
               value={body}
               onChange={(content) => setBody(content.html)}
               onImageUpload={handleImageUpload}
-              placeholder="내용을 입력하세요"
+              placeholder={usageType === 'COPY' ? '복사해서 활용할 내용을 입력하세요' : '내용을 입력하세요'}
               minHeight="300px"
             />
           </div>
         )}
-
-        {/* Usage Type — WO-O4O-KPA-RESOURCES-USAGE-TYPE-V1 */}
-        <div style={styles.field}>
-          <label style={styles.label}>자료 활용 방식</label>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' as const }}>
-            {USAGE_TYPE_OPTIONS.map((opt) => (
-              <label
-                key={opt.value}
-                title={opt.desc}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  padding: '8px 14px',
-                  border: `1px solid ${usageType === opt.value ? '#2563eb' : '#e2e8f0'}`,
-                  borderRadius: 8,
-                  backgroundColor: usageType === opt.value ? '#eff6ff' : '#fff',
-                  cursor: 'pointer',
-                  fontSize: '0.8125rem',
-                  fontWeight: usageType === opt.value ? 600 : 400,
-                  color: usageType === opt.value ? '#1d4ed8' : '#475569',
-                  transition: 'all 0.15s',
-                }}
-              >
-                <input
-                  type="radio"
-                  name="usage_type"
-                  value={opt.value}
-                  checked={usageType === opt.value}
-                  onChange={() => {
-                    setUsageType(opt.value);
-                    setAutoSyncUsageType(false); // 수동 선택 → autoSync 비활성
-                  }}
-                  style={{ display: 'none' }}
-                />
-                {opt.label}
-              </label>
-            ))}
-          </div>
-        </div>
 
         {/* Tags */}
         <div style={styles.field}>
