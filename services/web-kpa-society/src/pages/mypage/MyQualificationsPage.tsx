@@ -175,6 +175,11 @@ export function MyQualificationsPage() {
             </ul>
           </div>
 
+          {/* 승인 소요 안내 */}
+          <div style={styles.noticeBox}>
+            강사 신청 후 운영자 승인까지 1~2일 소요될 수 있습니다.
+          </div>
+
           <LmsCreatorForm form={form} onChange={setForm} />
 
           <div style={styles.formActions}>
@@ -284,6 +289,7 @@ const styles: Record<string, React.CSSProperties> = {
   requestHeader: { display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' },
   requestMeta: { fontSize: '12px', color: colors.neutral400 },
   reviewNote: { marginTop: '8px', fontSize: '13px', color: colors.neutral600, padding: '8px', backgroundColor: colors.white, borderRadius: '4px' },
+  noticeBox: { padding: '10px 14px', backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '6px', fontSize: '13px', color: '#15803d', marginBottom: '20px' },
 };
 
 export default MyQualificationsPage;
