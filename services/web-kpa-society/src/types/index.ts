@@ -126,7 +126,6 @@ export interface ForumActivityCategory {
 export interface CreatePostRequest {
   title: string;
   content: string | any[]; // Block[] or string for backward compatibility
-  categoryId?: string | null;
 }
 
 // LMS
