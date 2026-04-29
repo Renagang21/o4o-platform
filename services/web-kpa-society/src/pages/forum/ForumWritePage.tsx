@@ -69,11 +69,8 @@ export function ForumWritePage() {
           navigate('/forum');
           return;
         }
-      } else if (!isEdit) {
-        // /forum/write (slug 없음, 편집도 아님) → 포럼 홈으로 리다이렉트
-        navigate('/forum');
-        return;
       }
+      // slug 없이 /forum/write 접근 → 카테고리 select로 작성 (isEdit이 아닌 경우)
     } catch (err) {
       toast.error('데이터를 불러오는데 실패했습니다.');
     } finally {
@@ -136,7 +133,7 @@ export function ForumWritePage() {
         breadcrumb={[
           { label: '홈', href: '/' },
           { label: '포럼', href: '/forum' },
-          ...(forumName ? [{ label: forumName, href: `/forum/all?category=${formData.categoryId}` }] : []),
+          ...(forumName ? [{ label: forumName, href: '/forum' }] : []),
           { label: isEdit ? '수정' : '글쓰기' },
         ]}
       />

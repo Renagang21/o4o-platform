@@ -1,11 +1,10 @@
 /**
  * ForumListPage - KPA Society 포럼 게시글 목록
  *
- * Phase 22-F: 테이블 형태 + 20건 단위 페이지 넘김
- * WO-FORUM-HUB-TABLE-STANDARD-V1: 커스텀 table → BaseTable + selectable + ActionBar + RowActionMenu
+ * WO-O4O-FORUM-CATEGORY-REMOVE-AND-ORPHAN-CLEANUP-V1:
+ * 카테고리 구조 제거 — 단일 피드 뷰, 검색만 지원
  *
  * 컬럼: 포럼 | 제목 | 작성자 | 작성일 | 👍 | 👁 | 💬 | 액션
- * 검색 + 카테고리 필터 (category 선택 시 칩 목록 숨김)
  */
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
@@ -15,10 +14,9 @@ import { toast } from '@o4o/error-handling';
 import { BaseTable, ActionBar, RowActionMenu, PageSection, PageContainer, type O4OColumn, type ActionBarAction, type RowActionItem } from '@o4o/ui';
 import { PageHeader } from '../../components/common';
 import { forumApi } from '../../api';
-import { forumMembershipApi } from '../../api/forum';
 import { useAuth } from '../../contexts';
 import { colors } from '../../styles/theme';
-import type { ForumPost, ForumCategory } from '../../types';
+import type { ForumPost } from '../../types';
 import { buildAiClipboardText, stripHtml, blocksToText } from '../../utils/ai-clipboard';
 
 const PAGE_SIZE = 10;
@@ -42,110 +40,40 @@ export function ForumListPage() {
   const { user } = useAuth();
 
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
-  const currentCategory = searchParams.get('category') || '';
   const searchQuery = searchParams.get('search') || '';
-  const hasFilters = !!searchQuery || !!currentCategory;
+  const hasFilters = !!searchQuery;
 
   const [searchInput, setSearchInput] = useState(searchQuery);
   const [posts, setPosts] = useState<ForumPost[]>([]);
-  const [categories, setCategories] = useState<ForumCategory[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
-  // WO-KPA-A-PRIVATE-FORUM-JOIN-UX-CONNECT-V1: 비공개 포럼 접근 거부 상태
-  const [closedCategoryAccess, setClosedCategoryAccess] = useState<{
-    denied: boolean;
-    categoryId: string;
-    joinStatus: 'none' | 'pending' | 'member' | 'loading';
-  } | null>(null);
-  const [isRequesting, setIsRequesting] = useState(false);
 
   useEffect(() => { setSearchInput(searchQuery); }, [searchQuery]);
 
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
-      setClosedCategoryAccess(null);
 
-      // 카테고리 목록은 항상 로드 (403과 무관)
-      try {
-        const categoriesRes = await forumApi.getCategories();
-        setCategories(categoriesRes.data || []);
-      } catch {
-        setCategories([]);
-      }
-
-      // 게시글 로드 (비공개 카테고리 필터 시 403 가능)
-      try {
-        const postsRes = await forumApi.getPosts({
-          categoryId: currentCategory || undefined,
-          page: currentPage,
-          limit: PAGE_SIZE,
-          search: searchQuery || undefined,
-        });
-        setPosts(postsRes.data || []);
-        setTotalPages(postsRes.totalPages || 1);
-        setTotalCount(postsRes.total || postsRes.data?.length || 0);
-      } catch (err: any) {
-        const code = err?.code;
-        if (code === 'CLOSED_FORUM_ACCESS_DENIED' && currentCategory) {
-          setPosts([]);
-          setTotalPages(1);
-          setTotalCount(0);
-          // 멤버십 상태 확인
-          if (user) {
-            setClosedCategoryAccess({ denied: true, categoryId: currentCategory, joinStatus: 'loading' });
-            try {
-              const statusRes = await forumMembershipApi.getMembershipStatus(currentCategory);
-              const d = statusRes.data;
-              setClosedCategoryAccess({
-                denied: true,
-                categoryId: currentCategory,
-                joinStatus: d.isMember ? 'member' : d.pendingRequest ? 'pending' : 'none',
-              });
-            } catch {
-              setClosedCategoryAccess({ denied: true, categoryId: currentCategory, joinStatus: 'none' });
-            }
-          } else {
-            setClosedCategoryAccess({ denied: true, categoryId: currentCategory, joinStatus: 'none' });
-          }
-        } else {
-          setPosts([]);
-          setTotalPages(1);
-          setTotalCount(0);
-        }
-      }
+      const postsRes = await forumApi.getPosts({
+        page: currentPage,
+        limit: PAGE_SIZE,
+        search: searchQuery || undefined,
+      });
+      setPosts(postsRes.data || []);
+      setTotalPages(postsRes.totalPages || 1);
+      setTotalCount(postsRes.total || postsRes.data?.length || 0);
+    } catch {
+      setPosts([]);
+      setTotalPages(1);
+      setTotalCount(0);
     } finally {
       setLoading(false);
     }
-  }, [currentPage, currentCategory, searchQuery, user]);
+  }, [currentPage, searchQuery]);
 
   useEffect(() => { loadData(); }, [loadData]);
-
-  // WO-KPA-A-PRIVATE-FORUM-JOIN-UX-CONNECT-V1: 가입 신청 핸들러
-  const handleJoinRequest = async () => {
-    if (!closedCategoryAccess || isRequesting) return;
-    setIsRequesting(true);
-    try {
-      await forumMembershipApi.requestJoin(closedCategoryAccess.categoryId);
-      setClosedCategoryAccess({ ...closedCategoryAccess, joinStatus: 'pending' });
-      toast.success('가입 신청이 완료되었습니다. 포럼 운영자의 승인을 기다려주세요.');
-    } catch (err: any) {
-      const errCode = err?.code;
-      if (errCode === 'ALREADY_MEMBER') {
-        toast.info('이미 회원입니다.');
-        setClosedCategoryAccess({ ...closedCategoryAccess, joinStatus: 'member' });
-      } else if (errCode === 'PENDING_REQUEST') {
-        toast.info('이미 가입 신청이 진행 중입니다.');
-        setClosedCategoryAccess({ ...closedCategoryAccess, joinStatus: 'pending' });
-      } else {
-        toast.error(err?.message || '가입 신청에 실패했습니다.');
-      }
-    } finally {
-      setIsRequesting(false);
-    }
-  };
 
   const updateParam = (key: string, value: string) => {
     const next = new URLSearchParams(searchParams);
@@ -224,9 +152,6 @@ export function ForumListPage() {
     }
   }, [selectedKeys, loadData]);
 
-  // WO-FORUM-POST-CONTEXT-ALIGNMENT-V1: 선택된 카테고리의 slug로 글쓰기 링크 생성
-  const selectedCategory = categories.find(c => c.id === currentCategory);
-  const writeHref = selectedCategory ? `/forum/${selectedCategory.slug}/write` : null;
 
   // ── Columns ──
 
@@ -362,37 +287,11 @@ export function ForumListPage() {
     },
   ];
 
-  // ── Empty Message (비공개 포럼 포함) ──
+  // ── Empty Message ──
 
   const emptyMessage = (
     <div style={s.emptyCell}>
-      {closedCategoryAccess?.denied ? (
-        <div>
-          <p style={s.emptyTitle}>🔒 비공개 포럼</p>
-          <p style={{ fontSize: '13px', color: colors.neutral500, margin: '4px 0 16px' }}>
-            회원만 열람할 수 있습니다
-          </p>
-          {user ? (
-            closedCategoryAccess.joinStatus === 'loading' ? (
-              <p style={{ fontSize: '13px', color: colors.neutral500 }}>상태 확인 중...</p>
-            ) : closedCategoryAccess.joinStatus === 'pending' ? (
-              <p style={{ fontSize: '13px', color: '#d97706' }}>
-                가입 신청이 진행 중입니다. 승인을 기다려주세요.
-              </p>
-            ) : closedCategoryAccess.joinStatus === 'member' ? (
-              <button onClick={() => window.location.reload()} style={s.emptyBtn}>새로고침</button>
-            ) : (
-              <button onClick={handleJoinRequest} disabled={isRequesting} style={s.emptyBtn}>
-                {isRequesting ? '신청 중...' : '가입 신청'}
-              </button>
-            )
-          ) : (
-            <p style={{ fontSize: '13px', color: colors.neutral500 }}>
-              가입 신청을 하려면 로그인해주세요
-            </p>
-          )}
-        </div>
-      ) : hasFilters ? (
+      {hasFilters ? (
         <>
           <p style={s.emptyTitle}>검색 결과가 없습니다</p>
           <button onClick={handleClearAll} style={s.emptyBtn}>전체 목록 보기</button>
@@ -400,12 +299,8 @@ export function ForumListPage() {
       ) : (
         <>
           <p style={s.emptyTitle}>아직 등록된 글이 없습니다</p>
-          {writeHref ? (
-            <Link to={writeHref} style={s.emptyBtn}>글쓰기</Link>
-          ) : (
-            <p style={{ fontSize: '13px', color: colors.neutral500 }}>
-              포럼을 선택하면 글을 작성할 수 있습니다
-            </p>
+          {user && (
+            <Link to="/forum/write" style={s.emptyBtn}>글쓰기</Link>
           )}
         </>
       )}
@@ -446,32 +341,13 @@ export function ForumListPage() {
           <button type="submit" style={s.searchBtn}>검색</button>
         </form>
         <div style={s.filterRow}>
-          {!currentCategory && (
-            <div style={s.categories}>
-              <button
-                style={{ ...s.catBtn, ...s.catBtnActive }}
-                onClick={() => updateParam('category', '')}
-              >전체</button>
-              {categories.map(cat => (
-                <button
-                  key={cat.id}
-                  style={s.catBtn}
-                  onClick={() => updateParam('category', cat.id)}
-                >{cat.name}{cat.forumType === 'closed' && ' 🔒'}</button>
-              ))}
-            </div>
-          )}
-          {writeHref && (
-            <Link to={writeHref} style={{ ...s.writeButton, marginLeft: 'auto' }}>글쓰기</Link>
+          {user && (
+            <Link to="/forum/write" style={{ ...s.writeButton, marginLeft: 'auto' }}>글쓰기</Link>
           )}
         </div>
         {hasFilters && (
           <div style={s.activeFilters}>
-            <span style={s.activeLabel}>
-              {searchQuery && `"${searchQuery}" `}
-              {currentCategory && categories.find(c => c.id === currentCategory)?.name
-                ? `${categories.find(c => c.id === currentCategory)!.name}` : ''}
-            </span>
+            <span style={s.activeLabel}>{searchQuery && `"${searchQuery}"`}</span>
             <button onClick={handleClearAll} style={s.clearBtn}>초기화</button>
           </div>
         )}
