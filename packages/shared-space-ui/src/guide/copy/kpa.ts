@@ -533,6 +533,7 @@ export const kpaGuideFeaturesProps: GuideFeaturesPageProps = {
       primaryRoute: '/store',
       description: '약국 매장의 상품·채널·고객 요청을 통합 관리합니다. 승인된 약사 계정 필요.',
       items: [
+        { label: '매장 운영 이용 방법', route: '/guide/features/store' },
         { label: '운영 홈', route: '/store' },
         { label: '상품 구성', route: '/store/commerce/products' },
         { label: 'B2C 가격 설정', route: '/store/commerce/products/b2c' },
@@ -540,7 +541,7 @@ export const kpaGuideFeaturesProps: GuideFeaturesPageProps = {
         { label: '고객 요청 관리', route: '/store/requests' },
         { label: '주문 관리', route: '/store/commerce/orders' },
       ],
-      linkTo: '/store',
+      linkTo: '/guide/features/store',
     },
     {
       step: '06',
@@ -871,6 +872,91 @@ export const kpaGuideFeatureQrTabletProps: GuideFeatureManualPageProps = {
         { label: '상담 보조 흐름', detail: 'Tablet은 결제·주문·배송과 직접 연결되지 않습니다. 관심 요청/상담 보조 목적으로만 사용합니다.' },
         { label: '결제·주문 분리', detail: '결제와 주문은 별도 채널(B2C 스토어 등)에서 처리합니다. Tablet 요청만으로 주문이 생성되지 않습니다.' },
         { label: '채널 승인 필요', detail: 'TABLET 채널에 상품이 진열되어 있어야 고객 화면에 상품이 표시됩니다. 승인 전에는 노출되지 않습니다.' },
+      ],
+    },
+  ],
+  bottomNav: {
+    prev: { label: '← 기능별 이용 방법', to: '/guide/features' },
+    home: { label: '홈으로', to: '/' },
+  },
+};
+
+// ─── /guide/features/store ─────────────────────────────────────────────
+
+export const kpaGuideFeatureStoreProps: GuideFeatureManualPageProps = {
+  hero: {
+    eyebrow: '기능별 이용 방법',
+    title: '매장 운영 이용 방법',
+    description: '약국 매장의 상품·채널·고객 요청을 한 곳에서 관리하는 운영·상담·노출 허브입니다',
+    primaryAction: { label: '매장 운영 홈으로 이동 →', to: '/store' },
+    flowBarTitle: '이용 흐름',
+    flowLabels: ['운영 개요', '진입 경로', '채널 이해', '상품/콘텐츠 운영', '고객 대응', '운영 시나리오'],
+  },
+  sections: [
+    {
+      step: '01',
+      title: '매장 운영 개요',
+      description: '약사 계정이 승인되면 "내 매장"이 자동 생성됩니다. 별도의 매장 개설 절차는 없습니다. 매장은 상품 진열·고객 응대·사이니지 노출을 통합하는 오프라인 경쟁력 강화 허브이며, O4O 구조에서 매장은 공급자의 상품과 콘텐츠를 받아 고객에게 직접 전달하는 실행 주체입니다.',
+      items: [
+        { label: '자동 생성 매장', detail: '계정 승인 시 내 매장이 자동으로 생성됩니다. 별도 개설 단계 없음.' },
+        { label: '운영·상담·노출 허브', detail: '주문/결제 시스템이 아니라 상품 진열, 고객 상담 보조, 사이니지 노출을 관리하는 공간입니다.' },
+        { label: 'O4O 매장 역할', detail: '공급자 카탈로그에서 상품을 받아 채널별로 노출하고, 고객 관심 요청에 직원이 대응합니다.' },
+      ],
+    },
+    {
+      step: '02',
+      title: '매장 진입 경로',
+      routeLabel: '/store',
+      description: '매장 운영은 여러 경로로 접근합니다. 각 경로는 역할이 구분되어 있습니다.',
+      items: [
+        { label: '/store (대시보드)', detail: '매장 전체 현황을 한눈에 확인합니다. 최근 요청·채널 상태·상품 수가 표시됩니다.' },
+        { label: '/store-hub (운영 허브)', detail: '상품·콘텐츠·사이니지를 통합 관리하는 허브 화면입니다.' },
+        { label: '/store/channels (채널 관리)', detail: 'B2C·TABLET·KIOSK·SIGNAGE 채널별 진열 상품을 설정합니다.' },
+        { label: '/store/requests (관심 요청)', detail: '태블릿·QR에서 접수된 고객 관심 요청을 확인하고 처리합니다.' },
+      ],
+    },
+    {
+      step: '03',
+      title: '채널(Channel) 이해',
+      routeLabel: '/store/channels',
+      description: '채널은 상품이 고객에게 노출되는 방식을 구분한 개념입니다. 같은 상품도 채널에 따라 다른 방식으로 보입니다.',
+      items: [
+        { label: 'B2C — 공개 URL', detail: '일반 고객이 웹 URL로 접근하는 온라인 매장 채널입니다. B2C 가격이 별도로 설정됩니다.' },
+        { label: 'TABLET — 태블릿 키오스크', detail: '매장 내 태블릿에서 고객이 직접 상품을 탐색하는 채널입니다. QR로 연결됩니다.' },
+        { label: 'KIOSK — 키오스크', detail: '독립형 키오스크 화면에서 상품을 표시하는 채널입니다.' },
+        { label: 'SIGNAGE — 사이니지 TV', detail: '매장 디스플레이에 콘텐츠와 상품을 노출하는 채널입니다. 플레이리스트로 구성합니다.' },
+      ],
+    },
+    {
+      step: '04',
+      title: '상품/콘텐츠 운영 흐름',
+      routeLabel: '/store-hub',
+      description: '매장 운영은 상품·콘텐츠·사이니지 3축으로 구성됩니다. 각 축은 공급자에서 매장으로 흐릅니다.',
+      items: [
+        { label: '상품 축 — 공급자 카탈로그', detail: '공급자 카탈로그에서 상품을 내 매장에 추가(B2B)하고, 채널별로 진열합니다.' },
+        { label: '콘텐츠 축 — CMS 복사/활용', detail: '플랫폼 콘텐츠(CMS)를 매장 허브로 복사해 고객 상담과 설명 자료로 활용합니다.' },
+        { label: '사이니지 축 — 플레이리스트', detail: '콘텐츠와 상품 이미지를 사이니지 플레이리스트로 구성해 매장 TV에 노출합니다.' },
+      ],
+    },
+    {
+      step: '05',
+      title: '고객 대응 흐름',
+      routeLabel: '/store/requests',
+      description: '고객이 QR·Tablet으로 관심 요청을 생성하면, 직원이 /store/requests에서 확인하고 처리합니다. 이 흐름은 주문이 아닌 상담/관심 관리입니다.',
+      items: [
+        { label: 'Tablet/QR → 관심 요청 생성', detail: '고객이 태블릿에서 상품을 탐색하고 "관심 있어요"를 선택하면 요청이 생성됩니다.' },
+        { label: '/store/requests — 직원 확인', detail: '직원 화면에서 NEW 요청을 실시간으로 확인합니다. 5초마다 자동 갱신됩니다.' },
+        { label: 'NEW → ACKNOWLEDGED → COMPLETED', detail: '확인 → 상담 진행 → 완료 순으로 상태를 처리합니다. 주문/결제는 별도 흐름입니다.' },
+      ],
+    },
+    {
+      step: '06',
+      title: '매장 운영 시나리오',
+      description: '매장의 물리적 공간과 디지털 채널을 연계하는 운영 시나리오입니다.',
+      items: [
+        { label: '진열대 + QR + Tablet 연계', detail: '진열대 옆에 QR을 부착해 고객이 태블릿 상담 화면으로 이동하고, 직원이 관심 요청을 받아 즉시 응대합니다.' },
+        { label: 'TV(사이니지) + 상품 설명 연결', detail: '사이니지 플레이리스트에 상품 설명 콘텐츠를 추가해 고객이 TV로 정보를 확인하는 흐름을 만듭니다.' },
+        { label: '관심 요청 → 상담 이어가기', detail: '/store/requests에서 요청을 확인한 직원이 고객에게 직접 접근해 상담을 이어가며 상담 완료 후 COMPLETED로 처리합니다.' },
       ],
     },
   ],
