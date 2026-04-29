@@ -10,13 +10,17 @@ import { getPharmacyInfo } from './api/pharmacyInfo';
 import { LoginModalProvider, useAuthModal } from './contexts/LoginModalContext';
 import LoginModal from './components/LoginModal';
 import RegisterModal from './components/RegisterModal';
-import { DashboardPage } from './pages/DashboardPage';
-import HandoffPage from './pages/HandoffPage';
-import AccountRecoveryPage from './pages/auth/AccountRecoveryPage';
-import ResetPasswordPage from './pages/auth/ResetPasswordPage';
+// Phase 2 lazy: DashboardPage + auth flow
+const DashboardPage = lazy(() => import('./pages/DashboardPage').then(m => ({ default: m.DashboardPage })));
+const HandoffPage = lazy(() => import('./pages/HandoffPage'));
+const AccountRecoveryPage = lazy(() => import('./pages/auth/AccountRecoveryPage'));
+const ResetPasswordPage = lazy(() => import('./pages/auth/ResetPasswordPage'));
 
-// Forum pages
-import { ForumHomePage, ForumListPage, ForumDetailPage, ForumWritePage } from './pages/forum';
+// Forum pages — Phase 2 lazy (barrel unwound)
+const ForumHomePage = lazy(() => import('./pages/forum/ForumHomePage').then(m => ({ default: m.ForumHomePage })));
+const ForumListPage = lazy(() => import('./pages/forum/ForumListPage').then(m => ({ default: m.ForumListPage })));
+const ForumDetailPage = lazy(() => import('./pages/forum/ForumDetailPage').then(m => ({ default: m.ForumDetailPage })));
+const ForumWritePage = lazy(() => import('./pages/forum/ForumWritePage').then(m => ({ default: m.ForumWritePage })));
 
 // Market Trial — WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1
 // 실행은 Neture 단독. KPA는 entry → Neture redirect 만 유지.
@@ -28,14 +32,15 @@ const LmsCoursesPage = lazy(() => import('./pages/lms/LmsCoursesPage').then(m =>
 const LmsCourseDetailPage = lazy(() => import('./pages/lms/LmsCourseDetailPage').then(m => ({ default: m.LmsCourseDetailPage })));
 const LmsLessonPage = lazy(() => import('./pages/lms/LmsLessonPage').then(m => ({ default: m.LmsLessonPage })));
 const LmsCertificatesPage = lazy(() => import('./pages/lms/LmsCertificatesPage').then(m => ({ default: m.LmsCertificatesPage })));
-// Certificate Verification (WO-O4O-LMS-CERTIFICATE-VERIFICATION-V1) — public, no auth
-import CertificateVerifyPage from './pages/lms/CertificateVerifyPage';
+// Certificate Verification (WO-O4O-LMS-CERTIFICATE-VERIFICATION-V1) — public, no auth — Phase 2 lazy
+const CertificateVerifyPage = lazy(() => import('./pages/lms/CertificateVerifyPage'));
 
-// Course pages (Public-facing) - WO-CONTENT-COURSE-HUB/INTRO
-import { CourseHubPage, CourseIntroPage } from './pages/courses';
+// Course pages (Public-facing) — Phase 2 lazy (barrel unwound)
+const CourseHubPage = lazy(() => import('./pages/courses/CourseHubPage').then(m => ({ default: m.CourseHubPage })));
+const CourseIntroPage = lazy(() => import('./pages/courses/CourseIntroPage').then(m => ({ default: m.CourseIntroPage })));
 
-// Instructor pages - WO-CONTENT-INSTRUCTOR-PUBLIC-PROFILE-V1
-import { InstructorProfilePage } from './pages/instructors/InstructorProfilePage';
+// Instructor public profile — Phase 2 lazy
+const InstructorProfilePage = lazy(() => import('./pages/instructors/InstructorProfilePage').then(m => ({ default: m.InstructorProfilePage })));
 // Instructor pages — WO-KPA-SOCIETY-APP-ROUTE-CODE-SPLITTING-V1: lazy
 const InstructorDashboardPage = lazy(() => import('./pages/instructor/InstructorDashboardPage'));
 const CourseListPage = lazy(() => import('./pages/instructor/courses/CourseListPage'));
@@ -44,25 +49,28 @@ const CourseEditPage = lazy(() => import('./pages/instructor/courses/CourseEditP
 const InstructorCourseDashboardPage = lazy(() => import('./pages/instructor/InstructorCourseDashboardPage'));
 const ContentParticipantsPage = lazy(() => import('./pages/instructor/ContentParticipantsPage'));
 
-// Events pages (WO-KPA-COMMUNITY-HOME-V1)
-import { EventsHomePage } from './pages/events/EventsHomePage';
+// Events pages — Phase 2 lazy
+const EventsHomePage = lazy(() => import('./pages/events/EventsHomePage').then(m => ({ default: m.EventsHomePage })));
 
-// Participation pages (WO-KPA-PARTICIPATION-APP-V1)
-import {
-  ParticipationListPage,
-  ParticipationCreatePage,
-  ParticipationRespondPage,
-  ParticipationResultPage,
-  QuestionType,
-} from './pages/participation';
+// Participation pages — Phase 2 lazy (barrel unwound). QuestionType은 enum이라 별도 유지.
+const ParticipationListPage = lazy(() => import('./pages/participation/ParticipationListPage').then(m => ({ default: m.ParticipationListPage })));
+const ParticipationCreatePage = lazy(() => import('./pages/participation/ParticipationCreatePage').then(m => ({ default: m.ParticipationCreatePage })));
+const ParticipationRespondPage = lazy(() => import('./pages/participation/ParticipationRespondPage').then(m => ({ default: m.ParticipationRespondPage })));
+const ParticipationResultPage = lazy(() => import('./pages/participation/ParticipationResultPage').then(m => ({ default: m.ParticipationResultPage })));
+import { QuestionType } from './pages/participation/types';
 
-// Event Offer pages
-import { EventOfferListPage, EventOfferDetailPage, EventOfferHistoryPage, KpaEventOfferPage } from './pages/event-offer';
-// Supplier pages
-import { SupplierEventOfferPage } from './pages/supplier/SupplierEventOfferPage';
+// Event Offer pages — Phase 2 lazy (barrel unwound)
+const EventOfferListPage = lazy(() => import('./pages/event-offer/EventOfferListPage').then(m => ({ default: m.EventOfferListPage })));
+const EventOfferDetailPage = lazy(() => import('./pages/event-offer/EventOfferDetailPage').then(m => ({ default: m.EventOfferDetailPage })));
+const EventOfferHistoryPage = lazy(() => import('./pages/event-offer/EventOfferHistoryPage').then(m => ({ default: m.EventOfferHistoryPage })));
+const KpaEventOfferPage = lazy(() => import('./pages/event-offer/KpaEventOfferPage').then(m => ({ default: m.KpaEventOfferPage })));
+// Supplier pages — Phase 2 lazy
+const SupplierEventOfferPage = lazy(() => import('./pages/supplier/SupplierEventOfferPage').then(m => ({ default: m.SupplierEventOfferPage })));
 
-// News pages
-import { NewsListPage, NewsDetailPage, GalleryPage } from './pages/news';
+// News pages — Phase 2 lazy (barrel unwound)
+const NewsListPage = lazy(() => import('./pages/news/NewsListPage').then(m => ({ default: m.NewsListPage })));
+const NewsDetailPage = lazy(() => import('./pages/news/NewsDetailPage').then(m => ({ default: m.NewsDetailPage })));
+const GalleryPage = lazy(() => import('./pages/news/GalleryPage').then(m => ({ default: m.GalleryPage })));
 
 // Signage pages — WO-KPA-SOCIETY-APP-ROUTE-CODE-SPLITTING-V1: lazy
 const ContentHubPage = lazy(() => import('./pages/signage/ContentHubPage'));
@@ -71,87 +79,130 @@ const PlaylistDetailPage = lazy(() => import('./pages/signage/PlaylistDetailPage
 const MediaDetailPage = lazy(() => import('./pages/signage/MediaDetailPage'));
 const PublicSignagePage = lazy(() => import('./pages/signage/PublicSignagePage'));
 
-// Legal pages (WO-KPA-LEGAL-PAGES-V1)
-import { PolicyPage, PrivacyPage } from './pages/legal';
+// Legal pages — Phase 2 lazy (barrel unwound)
+const PolicyPage = lazy(() => import('./pages/legal/PolicyPage').then(m => ({ default: m.PolicyPage })));
+const PrivacyPage = lazy(() => import('./pages/legal/PrivacyPage').then(m => ({ default: m.PrivacyPage })));
 
-// MyPage pages
-import { MyDashboardPage, MyProfilePage, MySettingsPage, MyCertificatesPage, PersonalStatusReportPage, AnnualReportFormPage, MyForumDashboardPage, RequestCategoryPage as KpaRequestCategoryPage, MyRequestsPage, ForumMemberManagementPage, MyQualificationsPage, MyEnrollmentsPage, MyCreditsPage } from './pages/mypage';
+// MyPage pages — Phase 2 lazy (barrel unwound; 9 named + 4 default-as-named)
+const MyDashboardPage = lazy(() => import('./pages/mypage/MyDashboardPage').then(m => ({ default: m.MyDashboardPage })));
+const MyProfilePage = lazy(() => import('./pages/mypage/MyProfilePage').then(m => ({ default: m.MyProfilePage })));
+const MySettingsPage = lazy(() => import('./pages/mypage/MySettingsPage').then(m => ({ default: m.MySettingsPage })));
+const MyCertificatesPage = lazy(() => import('./pages/mypage/MyCertificatesPage').then(m => ({ default: m.MyCertificatesPage })));
+const PersonalStatusReportPage = lazy(() => import('./pages/mypage/PersonalStatusReportPage').then(m => ({ default: m.PersonalStatusReportPage })));
+const AnnualReportFormPage = lazy(() => import('./pages/mypage/AnnualReportFormPage').then(m => ({ default: m.AnnualReportFormPage })));
+const MyQualificationsPage = lazy(() => import('./pages/mypage/MyQualificationsPage').then(m => ({ default: m.MyQualificationsPage })));
+const MyEnrollmentsPage = lazy(() => import('./pages/mypage/MyEnrollmentsPage').then(m => ({ default: m.MyEnrollmentsPage })));
+const MyCreditsPage = lazy(() => import('./pages/mypage/MyCreditsPage').then(m => ({ default: m.MyCreditsPage })));
+// default-as-named (wrapper 불필요)
+const MyForumDashboardPage = lazy(() => import('./pages/mypage/MyForumDashboardPage'));
+const KpaRequestCategoryPage = lazy(() => import('./pages/mypage/RequestCategoryPage'));
+const MyRequestsPage = lazy(() => import('./pages/mypage/MyRequestsPage'));
+const ForumMemberManagementPage = lazy(() => import('./pages/mypage/ForumMemberManagementPage'));
 
 // Admin Routes (지부 관리자) — WO-KPA-SOCIETY-APP-ROUTE-CODE-SPLITTING-V1: lazy
 const AdminRoutes = lazy(() => import('./routes/AdminRoutes').then(m => ({ default: m.AdminRoutes })));
 
 // Operator Routes (서비스 운영자) — WO-KPA-SOCIETY-APP-ROUTE-CODE-SPLITTING-V1: lazy
 const OperatorRoutes = lazy(() => import('./routes/OperatorRoutes').then(m => ({ default: m.OperatorRoutes })));
-// Resources Hub (공동자료실 진입 허브 — WO-KPA-RESOURCE-SYSTEM-RESET-V1)
-import { ResourcesHubPage } from './pages/resources/ResourcesHubPage';
-import { ResourceWritePage } from './pages/resources/ResourceWritePage';
+// Resources Hub — Phase 2 lazy
+const ResourcesHubPage = lazy(() => import('./pages/resources/ResourcesHubPage').then(m => ({ default: m.ResourcesHubPage })));
+const ResourceWritePage = lazy(() => import('./pages/resources/ResourceWritePage').then(m => ({ default: m.ResourceWritePage })));
 
+// Intranet Routes — Phase 2 lazy (resolves Phase 1 ContentHubPage warning)
+const IntranetRoutes = lazy(() => import('./routes/IntranetRoutes').then(m => ({ default: m.IntranetRoutes })));
 
-// Intranet Routes (인트라넷)
-import { IntranetRoutes } from './routes/IntranetRoutes';
-
-// Login & Register pages - legacy imports (페이지는 제거, 모달로 대체)
-// WO-O4O-AUTH-LEGACY-LOGIN-REGISTER-PAGE-REMOVAL-V1
-import RegisterPendingPage from './pages/auth/RegisterPendingPage';
+// Auth/Register — Phase 2 lazy
+const RegisterPendingPage = lazy(() => import('./pages/auth/RegisterPendingPage'));
 
 // Manual Pages (WO-KPA-A-MANUAL-MAIN-PAGE-V1)
 
-// Guide Pages (WO-KPA-GUIDE-INTRO-PAGE-V1 / WO-KPA-GUIDE-INTRO-SUBPAGES-V1)
-import { GuideIntroPage } from './pages/guide/GuideIntroPage';
-import { GuideIntroStructurePage } from './pages/guide/GuideIntroStructurePage';
-import { GuideIntroKpaPage } from './pages/guide/GuideIntroKpaPage';
-import { GuideIntroOperationPage } from './pages/guide/GuideIntroOperationPage';
-import { GuideIntroConceptPage } from './pages/guide/GuideIntroConceptPage';
-import { GuideUsagePage } from './pages/guide/GuideUsagePage';
-import { GuideFeaturesPage } from './pages/guide/GuideFeaturesPage';
-import { GuideFeatureForumPage } from './pages/guide/GuideFeatureForumPage';
-import { GuideFeatureResourcesPage } from './pages/guide/GuideFeatureResourcesPage';
-import { GuideFeatureContentPage } from './pages/guide/GuideFeatureContentPage';
-import { GuideFeatureSignagePage } from './pages/guide/GuideFeatureSignagePage';
-import { GuideFeatureQrTabletPage } from './pages/guide/GuideFeatureQrTabletPage';
-import { GuideFeatureStorePage } from './pages/guide/GuideFeatureStorePage';
-import { GuideFeatureLmsPage } from './pages/guide/GuideFeatureLmsPage';
+// Guide Pages — Phase 2 lazy (14 pages)
+const GuideIntroPage = lazy(() => import('./pages/guide/GuideIntroPage').then(m => ({ default: m.GuideIntroPage })));
+const GuideIntroStructurePage = lazy(() => import('./pages/guide/GuideIntroStructurePage').then(m => ({ default: m.GuideIntroStructurePage })));
+const GuideIntroKpaPage = lazy(() => import('./pages/guide/GuideIntroKpaPage').then(m => ({ default: m.GuideIntroKpaPage })));
+const GuideIntroOperationPage = lazy(() => import('./pages/guide/GuideIntroOperationPage').then(m => ({ default: m.GuideIntroOperationPage })));
+const GuideIntroConceptPage = lazy(() => import('./pages/guide/GuideIntroConceptPage').then(m => ({ default: m.GuideIntroConceptPage })));
+const GuideUsagePage = lazy(() => import('./pages/guide/GuideUsagePage').then(m => ({ default: m.GuideUsagePage })));
+const GuideFeaturesPage = lazy(() => import('./pages/guide/GuideFeaturesPage').then(m => ({ default: m.GuideFeaturesPage })));
+const GuideFeatureForumPage = lazy(() => import('./pages/guide/GuideFeatureForumPage').then(m => ({ default: m.GuideFeatureForumPage })));
+const GuideFeatureResourcesPage = lazy(() => import('./pages/guide/GuideFeatureResourcesPage').then(m => ({ default: m.GuideFeatureResourcesPage })));
+const GuideFeatureContentPage = lazy(() => import('./pages/guide/GuideFeatureContentPage').then(m => ({ default: m.GuideFeatureContentPage })));
+const GuideFeatureSignagePage = lazy(() => import('./pages/guide/GuideFeatureSignagePage').then(m => ({ default: m.GuideFeatureSignagePage })));
+const GuideFeatureQrTabletPage = lazy(() => import('./pages/guide/GuideFeatureQrTabletPage').then(m => ({ default: m.GuideFeatureQrTabletPage })));
+const GuideFeatureStorePage = lazy(() => import('./pages/guide/GuideFeatureStorePage').then(m => ({ default: m.GuideFeatureStorePage })));
+const GuideFeatureLmsPage = lazy(() => import('./pages/guide/GuideFeatureLmsPage').then(m => ({ default: m.GuideFeatureLmsPage })));
 
 // Community Home (WO-KPA-COMMUNITY-HOME-V1)
 import { CommunityHomePage } from './pages/CommunityHomePage';
 
 // Community Hub — /community는 Home으로 리다이렉트 (WO-KPA-A-PUBLIC-HOME-INTEGRATION-AND-MENU-SIMPLIFICATION-V1)
 
-// Service Detail Pages (WO-KPA-HOME-SERVICE-SECTION-V1)
-import { PharmacyServicePage, ForumServicePage, LmsServicePage } from './pages/services';
+// Service Detail Pages — Phase 2 lazy (barrel unwound)
+const PharmacyServicePage = lazy(() => import('./pages/services/PharmacyServicePage').then(m => ({ default: m.PharmacyServicePage })));
+const ForumServicePage = lazy(() => import('./pages/services/ForumServicePage').then(m => ({ default: m.ForumServicePage })));
+const LmsServicePage = lazy(() => import('./pages/services/LmsServicePage').then(m => ({ default: m.LmsServicePage })));
 
-// Join/Participation Pages (WO-KPA-HOME-SERVICE-SECTION-V1)
-import { PharmacyJoinPage } from './pages/join';
+// Join Pages — Phase 2 lazy (barrel unwound)
+const PharmacyJoinPage = lazy(() => import('./pages/join/PharmacyJoinPage').then(m => ({ default: m.PharmacyJoinPage })));
 
-// Pharmacy Management (WO-KPA-PHARMACY-MANAGEMENT-V1, WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1)
-import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyApprovalGatePage, HubContentLibraryPage, HubB2BCatalogPage, HubSignageLibraryPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage, StoreChannelsPage, StoreOrdersPage, StoreBillingPage, StoreSignagePage, StoreQRPage, StorePopPage, MarketingAnalyticsPage, StoreHomePage, ProductMarketingPage, StoreLocalProductsPage, StoreTabletDisplaysPage } from './pages/pharmacy';
-import { StoreOrderWorktablePage } from './pages/pharmacy/StoreOrderWorktablePage';
-import { SignagePlaybackPage } from './pages/pharmacy/SignagePlaybackPage';
-import { SignagePlayerSelectPage } from './pages/pharmacy/SignagePlayerSelectPage';
-// WO-KPA-PHARMACY-HUB-SIDEBAR-LAYOUT-AND-PRODUCT-TABS-FIX-V1: 약국 HUB 사이드바 레이아웃
+// Pharmacy Management — Phase 2 lazy (barrel unwound; 20 named + 4 default-as-named)
+const PharmacyPage = lazy(() => import('./pages/pharmacy/PharmacyPage').then(m => ({ default: m.PharmacyPage })));
+const PharmacyB2BPage = lazy(() => import('./pages/pharmacy/PharmacyB2BPage').then(m => ({ default: m.PharmacyB2BPage })));
+const PharmacyStorePage = lazy(() => import('./pages/pharmacy/PharmacyStorePage').then(m => ({ default: m.PharmacyStorePage })));
+const PharmacyApprovalGatePage = lazy(() => import('./pages/pharmacy/PharmacyApprovalGatePage').then(m => ({ default: m.PharmacyApprovalGatePage })));
+const HubContentLibraryPage = lazy(() => import('./pages/pharmacy/HubContentLibraryPage').then(m => ({ default: m.HubContentLibraryPage })));
+const HubB2BCatalogPage = lazy(() => import('./pages/pharmacy/HubB2BCatalogPage').then(m => ({ default: m.HubB2BCatalogPage })));
+const HubSignageLibraryPage = lazy(() => import('./pages/pharmacy/HubSignageLibraryPage').then(m => ({ default: m.HubSignageLibraryPage })));
+const PharmacySellPage = lazy(() => import('./pages/pharmacy/PharmacySellPage').then(m => ({ default: m.PharmacySellPage })));
+const TabletRequestsPage = lazy(() => import('./pages/pharmacy/TabletRequestsPage').then(m => ({ default: m.TabletRequestsPage })));
+const PharmacyBlogPage = lazy(() => import('./pages/pharmacy/PharmacyBlogPage').then(m => ({ default: m.PharmacyBlogPage })));
+const PharmacyTemplatePage = lazy(() => import('./pages/pharmacy/PharmacyTemplatePage').then(m => ({ default: m.PharmacyTemplatePage })));
+const StoreChannelsPage = lazy(() => import('./pages/pharmacy/StoreChannelsPage').then(m => ({ default: m.StoreChannelsPage })));
+const StoreOrdersPage = lazy(() => import('./pages/pharmacy/StoreOrdersPage').then(m => ({ default: m.StoreOrdersPage })));
+const StoreBillingPage = lazy(() => import('./pages/pharmacy/StoreBillingPage').then(m => ({ default: m.StoreBillingPage })));
+const StoreSignagePage = lazy(() => import('./pages/pharmacy/StoreSignagePage').then(m => ({ default: m.StoreSignagePage })));
+const StoreQRPage = lazy(() => import('./pages/pharmacy/StoreQRPage').then(m => ({ default: m.StoreQRPage })));
+const StorePopPage = lazy(() => import('./pages/pharmacy/StorePopPage').then(m => ({ default: m.StorePopPage })));
+const MarketingAnalyticsPage = lazy(() => import('./pages/pharmacy/MarketingAnalyticsPage').then(m => ({ default: m.MarketingAnalyticsPage })));
+const StoreHomePage = lazy(() => import('./pages/pharmacy/StoreHomePage').then(m => ({ default: m.StoreHomePage })));
+const ProductMarketingPage = lazy(() => import('./pages/pharmacy/ProductMarketingPage').then(m => ({ default: m.ProductMarketingPage })));
+// default-as-named (wrapper 불필요)
+const StoreAssetsPage = lazy(() => import('./pages/pharmacy/StoreAssetsPage'));
+const StoreContentEditPage = lazy(() => import('./pages/pharmacy/StoreContentEditPage'));
+const StoreLocalProductsPage = lazy(() => import('./pages/pharmacy/StoreLocalProductsPage'));
+const StoreTabletDisplaysPage = lazy(() => import('./pages/pharmacy/StoreTabletDisplaysPage'));
+// Pharmacy specific (not in barrel)
+const StoreOrderWorktablePage = lazy(() => import('./pages/pharmacy/StoreOrderWorktablePage').then(m => ({ default: m.StoreOrderWorktablePage })));
+const SignagePlaybackPage = lazy(() => import('./pages/pharmacy/SignagePlaybackPage').then(m => ({ default: m.SignagePlaybackPage })));
+const SignagePlayerSelectPage = lazy(() => import('./pages/pharmacy/SignagePlayerSelectPage').then(m => ({ default: m.SignagePlayerSelectPage })));
+const PharmacyInfoPage = lazy(() => import('./pages/pharmacy/PharmacyInfoPage').then(m => ({ default: m.PharmacyInfoPage })));
+const StoreHubPage = lazy(() => import('./pages/pharmacy/StoreHubPage').then(m => ({ default: m.StoreHubPage })));
+// PharmacyHubLayout는 정적 유지 (Layout)
 import { PharmacyHubLayout } from './components/pharmacy/PharmacyHubLayout';
-// WO-KPA-PHARMACY-HUB-NAVIGATION-RESTRUCTURE-V1: PharmacyInfoPage + HubGuard
-import { PharmacyInfoPage } from './pages/pharmacy/PharmacyInfoPage';
-// WO-O4O-KPA-STORE-HUB-CANONICAL-REFINEMENT-V1: 매장 운영 허브 인덱스
-import { StoreHubPage } from './pages/pharmacy/StoreHubPage';
 
 // WO-PHARMACY-MANAGEMENT-CONSOLIDATION-V1 Phase 2: Store Core v1.0 통합
 import { StoreDashboardLayout, KPA_SOCIETY_STORE_CONFIG, resolveStoreMenu } from '@o4o/store-ui-core';
 import { useStoreCapabilities } from './hooks/useStoreCapabilities';
 import { KpaGlobalHeader } from './components/KpaGlobalHeader';
-import { SupplierListPage, SupplierDetailPage } from './pages/pharmacy/b2b';
+// Pharmacy B2B — Phase 2 lazy (barrel unwound)
+const SupplierListPage = lazy(() => import('./pages/pharmacy/b2b/SupplierListPage').then(m => ({ default: m.SupplierListPage })));
+const SupplierDetailPage = lazy(() => import('./pages/pharmacy/b2b/SupplierDetailPage').then(m => ({ default: m.SupplierDetailPage })));
 
-// Work Pages (WO-KPA-WORK-IMPLEMENT-V1) - 근무약사 전용 업무 화면
-import { WorkPage, WorkTasksPage, WorkLearningPage, WorkDisplayPage, WorkCommunityPage } from './pages/work';
+// Work Pages — Phase 2 lazy (barrel unwound)
+const WorkPage = lazy(() => import('./pages/work/WorkPage').then(m => ({ default: m.WorkPage })));
+const WorkTasksPage = lazy(() => import('./pages/work/WorkTasksPage').then(m => ({ default: m.WorkTasksPage })));
+const WorkLearningPage = lazy(() => import('./pages/work/WorkLearningPage').then(m => ({ default: m.WorkLearningPage })));
+const WorkDisplayPage = lazy(() => import('./pages/work/WorkDisplayPage').then(m => ({ default: m.WorkDisplayPage })));
+const WorkCommunityPage = lazy(() => import('./pages/work/WorkCommunityPage').then(m => ({ default: m.WorkCommunityPage })));
 
-// WO-KPA-A-AUTH-UX-STATE-UNIFICATION-V1: 상태 기반 AuthGate
+// AuthGate는 정적 유지 (Guard)
 import { AuthGate } from './components/auth/AuthGate';
-import { ActivitySetupPage } from './pages/ActivitySetupPage';
-import { PendingApprovalPage } from './pages/PendingApprovalPage';
+// ActivitySetupPage / PendingApprovalPage — Phase 2 lazy
+const ActivitySetupPage = lazy(() => import('./pages/ActivitySetupPage').then(m => ({ default: m.ActivitySetupPage })));
+const PendingApprovalPage = lazy(() => import('./pages/PendingApprovalPage').then(m => ({ default: m.PendingApprovalPage })));
 
-// User Dashboard (WO-KPA-SOCIETY-PHASE4-DASHBOARD-IMPLEMENTATION-V1)
-// WO-KPA-SOCIETY-DASHBOARD-TO-MYPAGE-CONSOLIDATION-V1: UserDashboardPage 제거 (/dashboard → /mypage 리다이렉트)
-import { MyContentPage } from './pages/dashboard';
+// MyContentPage — Phase 2 lazy
+const MyContentPage = lazy(() => import('./pages/dashboard/MyContentPage').then(m => ({ default: m.MyContentPage })));
 
 // WO-O4O-ROLEBASED-HOME-REMOVAL-AND-ROUTING-NORMALIZATION-V1: getDefaultRouteByRole 사용 제거
 
@@ -161,36 +212,38 @@ import { PharmacyOwnerOnlyGuard } from './components/auth/PharmacyOwnerOnlyGuard
 // WO-KPA-PHARMACY-HUB-NAVIGATION-RESTRUCTURE-V1: HUB용 완화 가드
 import { HubGuard } from './components/auth/HubGuard';
 
-// Tablet Kiosk (WO-STORE-TABLET-REQUEST-CHANNEL-V1)
-import { TabletStorePage } from './pages/tablet/TabletStorePage';
+// Tablet Kiosk — Phase 2 lazy
+const TabletStorePage = lazy(() => import('./pages/tablet/TabletStorePage').then(m => ({ default: m.TabletStorePage })));
 
-// Store Blog (WO-STORE-BLOG-CHANNEL-V1)
-import { StoreBlogPage } from './pages/store/StoreBlogPage';
-import { StoreBlogPostPage } from './pages/store/StoreBlogPostPage';
+// Store Blog — Phase 2 lazy
+const StoreBlogPage = lazy(() => import('./pages/store/StoreBlogPage').then(m => ({ default: m.StoreBlogPage })));
+const StoreBlogPostPage = lazy(() => import('./pages/store/StoreBlogPostPage').then(m => ({ default: m.StoreBlogPostPage })));
 
-// Store Home (WO-STORE-TEMPLATE-PROFILE-V1)
-import { StorefrontHomePage } from './pages/store/StorefrontHomePage';
+// Storefront Home — Phase 2 lazy
+const StorefrontHomePage = lazy(() => import('./pages/store/StorefrontHomePage').then(m => ({ default: m.StorefrontHomePage })));
 
-// WO-O4O-KPA-CUSTOMER-COMMERCE-LOOP-V1: Storefront Commerce Pages
-import { StorefrontProductDetailPage } from './pages/storefront/StorefrontProductDetailPage';
-import { CheckoutPage } from './pages/storefront/CheckoutPage';
-import { PaymentSuccessPage } from './pages/storefront/PaymentSuccessPage';
-import { PaymentFailPage } from './pages/storefront/PaymentFailPage';
+// Storefront Commerce — Phase 2 lazy
+const StorefrontProductDetailPage = lazy(() => import('./pages/storefront/StorefrontProductDetailPage').then(m => ({ default: m.StorefrontProductDetailPage })));
+const CheckoutPage = lazy(() => import('./pages/storefront/CheckoutPage').then(m => ({ default: m.CheckoutPage })));
+const PaymentSuccessPage = lazy(() => import('./pages/storefront/PaymentSuccessPage').then(m => ({ default: m.PaymentSuccessPage })));
+const PaymentFailPage = lazy(() => import('./pages/storefront/PaymentFailPage').then(m => ({ default: m.PaymentFailPage })));
 
-// Public Content View (WO-KPA-A-CONTENT-USAGE-MODE-EXTENSION-V1)
-import { PublicContentViewPage, PrintContentPage } from './pages/content';
+// Public Content View — Phase 2 lazy (default-as-named, wrapper 불필요)
+const PublicContentViewPage = lazy(() => import('./pages/content/PublicContentViewPage'));
+const PrintContentPage = lazy(() => import('./pages/content/PrintContentPage'));
 
-// Contents Hub (WO-KPA-CONTENT-HUB-FOUNDATION-V1 / WO-CONTENT-HUB-STRUCTURE-AND-TABLE-FOUNDATION-V1)
-import { ContentListPage, ContentDetailPage, ContentWritePage, ContentTypeSelectPage } from './pages/contents';
+// Contents Hub — Phase 2 lazy (barrel unwound)
+const ContentListPage = lazy(() => import('./pages/contents/ContentListPage').then(m => ({ default: m.ContentListPage })));
+const ContentDetailPage = lazy(() => import('./pages/contents/ContentDetailPage').then(m => ({ default: m.ContentDetailPage })));
+const ContentWritePage = lazy(() => import('./pages/contents/ContentWritePage').then(m => ({ default: m.ContentWritePage })));
+const ContentTypeSelectPage = lazy(() => import('./pages/contents/ContentTypeSelectPage').then(m => ({ default: m.ContentTypeSelectPage })));
 
-// QR Landing Page (WO-O4O-QR-LANDING-PAGE-V1)
-import QrLandingPage from './pages/qr/QrLandingPage';
+// QR Landing Page — Phase 2 lazy
+const QrLandingPage = lazy(() => import('./pages/qr/QrLandingPage'));
 
-// Legacy pages (for backward compatibility)
-import {
-  MemberApplyPage,
-  MyApplicationsPage,
-} from './pages';
+// Legacy pages — Phase 2 lazy (root barrel unwound)
+const MemberApplyPage = lazy(() => import('./pages/MemberApplyPage').then(m => ({ default: m.MemberApplyPage })));
+const MyApplicationsPage = lazy(() => import('./pages/MyApplicationsPage').then(m => ({ default: m.MyApplicationsPage })));
 
 /**
  * KPA Society - 약사회 SaaS
