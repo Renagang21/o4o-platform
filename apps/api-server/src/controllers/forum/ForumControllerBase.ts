@@ -173,6 +173,21 @@ export class ForumControllerBase {
     }
   }
 
+  /**
+   * Flatten joined author/category relations into flat fields expected by frontend.
+   * authorName = author.nickname ?? author.name ?? '시스템'
+   * categoryName = category.name ?? null
+   */
+  protected flattenPostFields(post: any): any {
+    const author = post.author;
+    const category = post.category;
+    return {
+      ...post,
+      authorName: author?.nickname ?? author?.name ?? '시스템',
+      categoryName: category?.name ?? null,
+    };
+  }
+
   protected generateSlug(text: string): string {
     const timestamp = Date.now().toString(36);
     const baseSlug = text

@@ -106,9 +106,12 @@ export class ForumPostController extends ForumControllerBase {
       // WO-KPA-A-FORUM-CREATOR-SENSITIVE-FIELDS-EXPOSURE-HOTFIX-V1
       posts.forEach(p => this.sanitizeUser((p as any).author));
 
+      // Flatten author/category into expected flat fields for frontend contract
+      const mappedPosts = posts.map((p) => this.flattenPostFields(p));
+
       res.json({
         success: true,
-        data: posts,
+        data: mappedPosts,
         pagination: {
           page,
           limit,
@@ -188,7 +191,7 @@ export class ForumPostController extends ForumControllerBase {
 
       res.json({
         success: true,
-        data: post,
+        data: this.flattenPostFields(post),
       });
     } catch (error: any) {
       logger.error('Error getting forum post:', error);
