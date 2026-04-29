@@ -4,6 +4,7 @@
 
 // Types
 export type {
+  GuideTextRenderer,
   GuideNavLink,
   GuideContextItem,
   GuideCardItem,

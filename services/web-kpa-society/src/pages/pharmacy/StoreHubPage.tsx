@@ -2,27 +2,41 @@
  * StoreHubPage — KPA 매장 운영 허브 랜딩
  *
  * WO-O4O-STORE-HUB-TEMPLATE-FOUNDATION-V1
+ * WO-O4O-SERVICE-CONFIG-INTRODUCTION-V1: kpaConfig 기반 텍스트 치환
  *
  * StoreHubTemplate + KPA config.
  * KPA 전용 문구/링크/카드/단계는 kpaStoreHubConfig에만 위치한다.
  */
 
 import { StoreHubTemplate, type StoreHubConfig } from '@o4o/shared-space-ui';
+import { kpaConfig } from '@o4o/operator-ux-core';
+import { GuideEditableSection } from '../../components/guide';
+
+const { terminology, uiText } = kpaConfig;
+
+// WO-O4O-SERVICE-INLINE-EDIT-EXPANSION-V1: 서비스 페이지 설명 영역 인라인 편집
+const PAGE_KEY = 'store-hub';
+
+function editable(sectionKey: string, defaultText: string) {
+  return (
+    <GuideEditableSection pageKey={PAGE_KEY} sectionKey={sectionKey} defaultContent={defaultText} />
+  );
+}
 
 // ─── KPA Config ────────────────────────────────────────────────────────────────
 
 const kpaStoreHubConfig: StoreHubConfig = {
   serviceKey: 'kpa-society',
 
-  heroTitle: '매장 운영 허브',
-  heroDesc: '플랫폼이 제공하는 상품·콘텐츠·사이니지를 탐색하고, 내 매장으로 가져가 운영에 활용합니다.',
+  heroTitle: terminology.storeHubLabel,
+  heroDesc: editable('hero-description', `플랫폼이 제공하는 상품·콘텐츠·사이니지를 탐색하고, ${terminology.myStoreLabel}으로 가져가 운영에 활용합니다.`),
   storeCta: {
-    label: '내 약국 관리 →',
+    label: `${terminology.myStoreLabel} 관리 →`,
     href: '/store',
   },
 
   resourceSectionTitle: '자원 탐색',
-  resourceSectionDesc: '플랫폼 자원을 탐색하고 내 매장으로 가져가세요',
+  resourceSectionDesc: editable('resource-section-description', `플랫폼 자원을 탐색하고 ${terminology.myStoreLabel}으로 가져가세요`),
   resourceCards: [
     {
       icon: '🛒',
@@ -67,32 +81,32 @@ const kpaStoreHubConfig: StoreHubConfig = {
 
   storeCtaBlock: {
     icon: '🏪',
-    title: '내 약국으로 이동',
-    desc: '탐색한 상품·콘텐츠·사이니지의 실제 설정과 운영은 내 약국에서 합니다',
-    buttonLabel: '내 약국 관리 →',
+    title: `${terminology.myStoreLabel}으로 이동`,
+    desc: `탐색한 상품·콘텐츠·사이니지의 실제 설정과 운영은 ${terminology.myStoreLabel}에서 합니다`,
+    buttonLabel: `${terminology.myStoreLabel} 관리 →`,
     href: '/store',
   },
 
   flowSectionTitle: '운영 흐름',
-  flowSectionDesc: '매장 운영 허브 → 내 약국 순서로 작업합니다',
+  flowSectionDesc: uiText.storeHubFlow,
   operationSteps: [
     {
       step: '1',
       title: '탐색',
       desc: '상품·사이니지·콘텐츠를 이곳에서 탐색합니다',
-      where: '매장 운영 허브',
+      where: terminology.storeHubLabel,
     },
     {
       step: '2',
       title: '복사 · 신청',
       desc: '"내 매장에 추가" 또는 "취급 신청"으로 가져옵니다',
-      where: '매장 운영 허브',
+      where: terminology.storeHubLabel,
     },
     {
       step: '3',
       title: '실행',
-      desc: '내 매장에서 게시, 스케줄, 판매 설정을 완료합니다',
-      where: '내 약국 (/store)',
+      desc: `${terminology.myStoreLabel}에서 게시, 스케줄, 판매 설정을 완료합니다`,
+      where: `${terminology.myStoreLabel} (/store)`,
     },
   ],
 };

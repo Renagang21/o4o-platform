@@ -9,7 +9,7 @@ import { PageSection, PageContainer } from '@o4o/ui';
 import type { GuideIntroPageProps } from './types.js';
 import { heroStyles, sectionStyles, cardStyles, bottomNavStyles } from './styles.js';
 
-export function GuideIntroPage({ hero, sections, bottomNav }: GuideIntroPageProps) {
+export function GuideIntroPage({ hero, sections, bottomNav, renderText }: GuideIntroPageProps) {
   return (
     <div>
       {/* Hero */}
@@ -17,7 +17,9 @@ export function GuideIntroPage({ hero, sections, bottomNav }: GuideIntroPageProp
         <div style={heroStyles.heroInner}>
           <p style={heroStyles.eyebrow}>{hero.eyebrow}</p>
           <h1 style={heroStyles.titleLg}>{hero.title}</h1>
-          <p style={heroStyles.desc}>{hero.description}</p>
+          <p style={heroStyles.desc}>
+            {renderText ? renderText('hero-desc', hero.description) : hero.description}
+          </p>
           <div style={heroStyles.heroNav}>
             <Link to={hero.nextLink.to} style={heroStyles.heroNavLink}>{hero.nextLink.label}</Link>
           </div>
@@ -36,7 +38,9 @@ export function GuideIntroPage({ hero, sections, bottomNav }: GuideIntroPageProp
                   <span style={sectionStyles.arrow}>→</span>
                 </Link>
               </div>
-              <p style={sectionStyles.desc}>{section.description}</p>
+              <p style={sectionStyles.desc}>
+                {renderText ? renderText(`section-${idx}-desc`, section.description) : section.description}
+              </p>
               <div style={cardStyles.gridLg}>
                 {section.items.map((item) => (
                   <div key={item.label} style={cardStyles.basic}>

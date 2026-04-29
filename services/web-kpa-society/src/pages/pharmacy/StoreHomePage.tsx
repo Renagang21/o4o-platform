@@ -28,11 +28,13 @@ import {
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { colors } from '../../styles/theme';
+import { kpaConfig } from '@o4o/operator-ux-core';
 import { getMarketingAnalytics, getRecentScans } from '../../api/storeAnalytics';
 import type { MarketingAnalyticsData, RecentScanItem } from '../../api/storeAnalytics';
 import { getStoreLibraryItems } from '../../api/storeExecutionAssets';
 import { getListings } from '../../api/pharmacyProducts';
 import { getStoreSlug } from '../../api/pharmacyInfo';
+import { GuideEditableSection } from '../../components/guide';
 
 export function StoreHomePage() {
   const navigate = useNavigate();
@@ -101,8 +103,8 @@ export function StoreHomePage() {
       {/* Header */}
       <div style={styles.header}>
         <div>
-          <h1 style={styles.title}>내 약국 홈</h1>
-          <p style={styles.subtitle}>약국 운영 현황을 한눈에 파악합니다</p>
+          <h1 style={styles.title}>{kpaConfig.uiText.storeHomeTitle}</h1>
+          <p style={styles.subtitle}>{kpaConfig.uiText.storeHomeSubtitle}</p>
         </div>
         <button onClick={fetchData} style={styles.refreshBtn}>
           <RefreshCw size={14} />
@@ -215,7 +217,13 @@ export function StoreHomePage() {
             </Link>
           </div>
           {!analytics || analytics.topQrCodes.length === 0 ? (
-            <p style={styles.emptyText}>아직 홍보 성과 데이터가 없습니다</p>
+            <p style={styles.emptyText}>
+              <GuideEditableSection
+                pageKey="store"
+                sectionKey="empty-marketing"
+                defaultContent="아직 홍보 성과 데이터가 없습니다"
+              />
+            </p>
           ) : (
             <div style={styles.topList}>
               {analytics.topQrCodes.slice(0, 3).map((qr, idx) => (
@@ -237,7 +245,13 @@ export function StoreHomePage() {
             <h2 style={styles.sectionTitle}>최근 활동</h2>
           </div>
           {recentScans.length === 0 ? (
-            <p style={styles.emptyText}>최근 활동 기록이 없습니다</p>
+            <p style={styles.emptyText}>
+              <GuideEditableSection
+                pageKey="store"
+                sectionKey="empty-activity"
+                defaultContent="최근 활동 기록이 없습니다"
+              />
+            </p>
           ) : (
             <div style={styles.recentList}>
               {recentScans.slice(0, 6).map((scan, idx) => (

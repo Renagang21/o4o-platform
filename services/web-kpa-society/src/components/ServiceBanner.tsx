@@ -9,6 +9,7 @@
 
 import { Link } from 'react-router-dom';
 import { colors, borderRadius } from '../styles/theme';
+import { kpaConfig } from '@o4o/operator-ux-core';
 
 interface ServiceBannerProps {
   icon: string;
@@ -93,10 +94,10 @@ export function ExternalServiceSection() {
       <div style={{ marginBottom: '24px' }}>
         <ServiceBanner
           icon="💊"
-          title="내 약국 운영하기"
+          title={kpaConfig.uiText.homePrimaryCTA}
           description="B2B 구매, 약국 몰 관리, 연결 서비스를 통합 관리합니다."
           linkUrl="/pharmacy"
-          linkText="내 약국 운영하기"
+          linkText={kpaConfig.uiText.homePrimaryCTA}
           variant="primary"
           showDisclaimer={false}
           isInternal={true}

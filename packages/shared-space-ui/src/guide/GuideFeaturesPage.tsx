@@ -9,7 +9,7 @@ import { PageSection, PageContainer } from '@o4o/ui';
 import type { GuideFeaturesPageProps } from './types.js';
 import { heroStyles, sectionStyles, cardStyles, bottomNavStyles } from './styles.js';
 
-export function GuideFeaturesPage({ hero, groups, bottomNav }: GuideFeaturesPageProps) {
+export function GuideFeaturesPage({ hero, groups, bottomNav, renderText }: GuideFeaturesPageProps) {
   return (
     <div>
       {/* Hero */}
@@ -17,7 +17,9 @@ export function GuideFeaturesPage({ hero, groups, bottomNav }: GuideFeaturesPage
         <div style={heroStyles.heroInner}>
           <p style={heroStyles.eyebrow}>{hero.eyebrow}</p>
           <h1 style={heroStyles.titleLg}>{hero.title}</h1>
-          <p style={heroStyles.desc}>{hero.description}</p>
+          <p style={heroStyles.desc}>
+            {renderText ? renderText('hero-desc', hero.description) : hero.description}
+          </p>
           <p style={heroStyles.flowBarTitle}>{hero.flowBarTitle}</p>
           <div style={heroStyles.flowBar}>
             {hero.flowLabels.map((label, idx, arr) => (
@@ -40,7 +42,9 @@ export function GuideFeaturesPage({ hero, groups, bottomNav }: GuideFeaturesPage
                 <h2 style={sectionStyles.titleLg}>{group.title}</h2>
                 <span style={sectionStyles.routeBadge}>{group.primaryRoute}</span>
               </div>
-              <p style={sectionStyles.desc}>{group.description}</p>
+              <p style={sectionStyles.desc}>
+                {renderText ? renderText(`group-${idx}-desc`, group.description) : group.description}
+              </p>
               <div style={cardStyles.gridFeature}>
                 {group.items.map((item) => (
                   <Link

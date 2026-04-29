@@ -20,6 +20,7 @@ import { eventOfferApi } from '../../api';
 import { useAuth } from '../../contexts';
 import { colors } from '../../styles/theme';
 import { PLATFORM_ROLES, hasAnyRole } from '../../lib/role-constants';
+import { kpaConfig } from '@o4o/operator-ux-core';
 import type { EventOfferItem, EventOfferStatus, EventOfferStats } from '../../types';
 
 interface OrderResult {
@@ -256,7 +257,7 @@ export function KpaEventOfferPage() {
       <PageHeader
         title="이벤트/특가"
         description="kpa-society 전용 이벤트 상품"
-        breadcrumb={[{ label: '약국 HUB', href: '/store-hub' }, { label: '이벤트/특가' }]}
+        breadcrumb={[{ label: kpaConfig.uiText.appEntry.storeHubTitle, href: '/store-hub' }, { label: '이벤트/특가' }]}
       />
 
       {/* 운영자 통계 카드 */}

@@ -9,6 +9,7 @@
  */
 
 import type { GlobalHeaderNavItem } from '@o4o/ui';
+import { kcosmeticsConfig } from '@o4o/operator-ux-core';
 
 // ─── Public Nav ──────────────────────────────────────────────────────────────
 
@@ -17,7 +18,7 @@ export const KCOS_PUBLIC_NAV: GlobalHeaderNavItem[] = [
   { label: '포럼', href: '/forum' },
   { label: '강의', href: '/lms' },
   { label: '자료실', href: '/resources' },
-  { label: '매장 HUB', href: '/store-hub' },
+  { label: kcosmeticsConfig.terminology.storeHubLabel, href: '/store-hub' },
 ];
 
 // ─── Contextual Nav ──────────────────────────────────────────────────────────
@@ -27,7 +28,7 @@ export interface KCosContextualNavItem extends GlobalHeaderNavItem {
 }
 
 export const KCOS_CONTEXTUAL_NAV: KCosContextualNavItem[] = [
-  { label: '내 매장', href: '/store', visibleWhen: 'storeManager' },
+  { label: kcosmeticsConfig.terminology.myStoreLabel, href: '/store', visibleWhen: 'storeManager' },
   { label: '파트너', href: '/partner', visibleWhen: 'partner' },
   // 운영자/관리자 진입은 상단 공용 nav가 아닌 유저 드롭다운으로만 제공
   // WO-O4O-OPERATOR-CONTEXTUAL-NAV-SEPARATION-V1

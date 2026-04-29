@@ -7,6 +7,13 @@
  * 서비스(KPA / GlycoPharm)별 copy 파일이 이 타입을 따라 데이터를 제공한다.
  */
 
+// ─── 편집 가능 텍스트 렌더러 (WO-O4O-GUIDE-INLINE-EDIT-V1) ───────────
+// 서비스별로 description 영역을 동적 콘텐츠로 대체할 수 있도록 하는 렌더 함수 타입.
+// 인자: sectionKey (페이지 내 고유값), defaultText (기본 copy)
+// 반환: React.ReactNode — null 이면 기본 텍스트 그대로 표시.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type GuideTextRenderer = (sectionKey: string, defaultText: string) => any;
+
 // ─── 공통 building blocks ─────────────────────────────────────────────
 
 export interface GuideNavLink {
@@ -62,6 +69,8 @@ export interface GuideIntroPageProps {
     next: GuideNavLink;       // '서비스 활용 방법 →'
     features: GuideNavLink;   // '기능별 이용 방법'
   };
+  /** WO-O4O-GUIDE-INLINE-EDIT-V1: 선택적 텍스트 렌더러. 설명 영역을 동적 콘텐츠로 대체할 때 사용 */
+  renderText?: GuideTextRenderer;
 }
 
 // ─── /guide/intro/structure ────────────────────────────────────────────
@@ -73,6 +82,8 @@ export interface GuideIntroStructurePageProps {
     description: string;
     context: GuideContextItem[];
   };
+  /** WO-O4O-GUIDE-INLINE-EDIT-V1 */
+  renderText?: GuideTextRenderer;
   overview: { sectionTitle: string; cards: GuideCardItem[] };
   roleDetail: { sectionTitle: string; roles: GuideRoleItem[] };
   relations: {
@@ -95,6 +106,8 @@ export interface GuideIntroKpaPageProps {
     description: string;
     context: GuideContextItem[];
   };
+  /** WO-O4O-GUIDE-INLINE-EDIT-V1 */
+  renderText?: GuideTextRenderer;
   community: { sectionTitle: string; cards: GuideCardItem[] };
   network: { sectionTitle: string; cards: GuideCardItem[] };
   storeConnection: {
@@ -117,6 +130,8 @@ export interface GuideIntroOperationPageProps {
     description: string;
     context: GuideContextItem[];
   };
+  /** WO-O4O-GUIDE-INLINE-EDIT-V1 */
+  renderText?: GuideTextRenderer;
   operator: { sectionTitle: string; cards: GuideCardItem[] };
   store: { sectionTitle: string; cards: GuideCardItem[] };
   community: { sectionTitle: string; cards: GuideCardItem[] };
@@ -145,6 +160,8 @@ export interface GuideIntroConceptPageProps {
     description: string;
     context: GuideContextItem[];
   };
+  /** WO-O4O-GUIDE-INLINE-EDIT-V1 */
+  renderText?: GuideTextRenderer;
   solidarity: { sectionTitle: string; cards: GuideCardItem[] };
   structure: { sectionTitle: string; cards: GuideCardItem[] };
   info: { sectionTitle: string; cards: GuideCardItem[] };
@@ -180,6 +197,8 @@ export interface GuideUsagePageProps {
     prev: GuideNavLink;     // '← O4O 개요'
     next: GuideNavLink;     // '기능별 이용 방법 →'
   };
+  /** WO-O4O-GUIDE-INLINE-EDIT-V1: 선택적 텍스트 렌더러 */
+  renderText?: GuideTextRenderer;
 }
 
 // ─── /guide/features ───────────────────────────────────────────────────
@@ -211,6 +230,8 @@ export interface GuideFeaturesPageProps {
     prev: GuideNavLink;     // '← 서비스 활용 방법'
     home: GuideNavLink;     // '홈으로'
   };
+  /** WO-O4O-GUIDE-INLINE-EDIT-V1: 선택적 텍스트 렌더러 */
+  renderText?: GuideTextRenderer;
 }
 
 // ─── /guide/features/* (개별 기능 상세 매뉴얼) ─────────────────────────
@@ -237,4 +258,6 @@ export interface GuideFeatureManualPageProps {
     prev: GuideNavLink;     // '← 기능별 이용 방법'
     home: GuideNavLink;
   };
+  /** WO-O4O-GUIDE-INLINE-EDIT-V1: 선택적 텍스트 렌더러 */
+  renderText?: GuideTextRenderer;
 }

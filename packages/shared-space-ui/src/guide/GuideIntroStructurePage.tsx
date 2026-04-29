@@ -23,6 +23,7 @@ export function GuideIntroStructurePage({
   relations,
   features,
   bottomNav,
+  renderText,
 }: GuideIntroStructurePageProps) {
   return (
     <div>
@@ -31,7 +32,9 @@ export function GuideIntroStructurePage({
         <div style={heroStyles.heroInner}>
           <p style={heroStyles.eyebrow}>{hero.eyebrow}</p>
           <h1 style={heroStyles.title}>{hero.title}</h1>
-          <p style={heroStyles.descCompact}>{hero.description}</p>
+          <p style={heroStyles.descCompact}>
+            {renderText ? renderText('hero-desc', hero.description) : hero.description}
+          </p>
           <div style={heroStyles.context}>
             {hero.context.map((row) => (
               <div key={row.label} style={heroStyles.contextRow}>

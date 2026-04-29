@@ -10,6 +10,7 @@ import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { isPharmacistRole } from '@/lib/role-constants';
+import { glycopharmConfig } from '@o4o/operator-ux-core';
 import { useLoginModal } from '@/contexts/LoginModalContext';
 import {
   Menu,
@@ -45,7 +46,7 @@ const publicMenuItems = [
  */
 const pharmacyMenuItems = [
   { label: '약국 HUB', icon: LayoutDashboard, path: '/store-hub', end: false },
-  { label: '내 약국', icon: Store, path: '/store', end: false },
+  { label: glycopharmConfig.terminology.myStoreLabel, icon: Store, path: '/store', end: false },
 ];
 
 export default function Header() {

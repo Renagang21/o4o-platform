@@ -12,7 +12,7 @@ import { PageSection, PageContainer } from '@o4o/ui';
 import type { GuideFeatureManualPageProps } from './types.js';
 import { heroStyles, sectionStyles, cardStyles, bottomNavStyles } from './styles.js';
 
-export function GuideFeatureManualPage({ hero, sections, bottomNav }: GuideFeatureManualPageProps) {
+export function GuideFeatureManualPage({ hero, sections, bottomNav, renderText }: GuideFeatureManualPageProps) {
   return (
     <div>
       {/* Hero */}
@@ -20,7 +20,9 @@ export function GuideFeatureManualPage({ hero, sections, bottomNav }: GuideFeatu
         <div style={heroStyles.heroInner}>
           <p style={heroStyles.eyebrow}>{hero.eyebrow}</p>
           <h1 style={heroStyles.titleLg}>{hero.title}</h1>
-          <p style={heroStyles.desc}>{hero.description}</p>
+          <p style={heroStyles.desc}>
+            {renderText ? renderText('hero-desc', hero.description) : hero.description}
+          </p>
 
           {/* Optional flow bar */}
           {hero.flowLabels && hero.flowLabels.length > 0 && (
@@ -58,7 +60,9 @@ export function GuideFeatureManualPage({ hero, sections, bottomNav }: GuideFeatu
                   <span style={sectionStyles.routeBadge}>{section.routeLabel}</span>
                 )}
               </div>
-              <p style={sectionStyles.desc}>{section.description}</p>
+              <p style={sectionStyles.desc}>
+                {renderText ? renderText(`section-${idx}-desc`, section.description) : section.description}
+              </p>
               <div style={cardStyles.gridLg}>
                 {section.items.map((item) => (
                   <div key={item.label} style={cardStyles.basic}>

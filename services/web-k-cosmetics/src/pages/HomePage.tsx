@@ -15,6 +15,7 @@ import { HeroBannerSection } from '../components/community/HeroBannerSection';
 import { homeApi } from '../api/home';
 import type { HomePageData } from '../api/home';
 import { PageHero, PageSection, PageContainer } from '@o4o/ui';
+import { kcosmeticsConfig } from '@o4o/operator-ux-core';
 import {
   NewsNoticesSection,
   AppEntrySection,
@@ -171,7 +172,7 @@ export function HomePage() {
               { title: '포럼', description: 'K-Beauty 전문가와 토론하고 소통하세요', href: '/forum', icon: <ForumIcon /> },
               { title: '강의', description: 'K-Beauty 교육 콘텐츠를 온라인으로 수강하세요', href: '/lms', icon: <EducationIconSvg /> },
               { title: '자료실', description: 'K-Beauty 관련 자료를 검색하고 활용하세요', href: '/resources', icon: <ResourcesIcon /> },
-              { title: '매장 HUB', description: '매장 채널과 상품을 관리하세요', href: '/store-hub', icon: <StoreHubIcon /> },
+              { title: kcosmeticsConfig.uiText.appEntry.storeHubTitle, description: '매장 채널과 상품을 관리하세요', href: '/store-hub', icon: <StoreHubIcon /> },
               { title: '콘텐츠', description: '플랫폼 콘텐츠를 검색하고 활용하세요', href: '/library/content', icon: <ContentIcon /> },
               { title: '커뮤니티', description: '공지, 광고, 후원 정보를 확인하세요', href: '/community', icon: <CommunityIcon /> },
             ]}

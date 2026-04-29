@@ -9,6 +9,7 @@
  */
 
 import type { GlobalHeaderNavItem } from '@o4o/ui';
+import { kpaConfig } from '@o4o/operator-ux-core';
 
 // ─── Public Nav ──────────────────────────────────────────────────────────────
 // 모든 사용자에게 노출
@@ -28,8 +29,8 @@ export interface KpaContextualNavItem extends GlobalHeaderNavItem {
 }
 
 export const KPA_CONTEXTUAL_NAV: KpaContextualNavItem[] = [
-  { label: '매장 운영 허브', href: '/store-hub', visibleWhen: 'pharmacyRelated' },
-  { label: '내 약국', href: '/store', visibleWhen: 'storeOwner' },
+  { label: kpaConfig.terminology.storeHubLabel, href: '/store-hub', visibleWhen: 'pharmacyRelated' },
+  { label: kpaConfig.terminology.myStoreLabel, href: '/store', visibleWhen: 'storeOwner' },
   // 운영자/관리자 진입은 상단 공용 nav가 아닌 유저 드롭다운(방패 아이콘)으로만 제공
   // WO-KPA-OPERATOR-HEADER-HOME-LINK-ALIGNMENT-V1
 ];

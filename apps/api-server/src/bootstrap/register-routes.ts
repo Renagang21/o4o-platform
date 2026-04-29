@@ -95,6 +95,7 @@ import createNetureModuleRoutes from '../modules/neture/neture.routes.js';
 import netureLibraryRoutes from '../modules/neture/neture-library.routes.js';
 import { createCatalogImportRoutes } from '../modules/catalog-import/catalog-import.routes.js';
 import { createDropshippingAdminRoutes } from '../routes/dropshipping-admin/dropshipping-admin.routes.js';
+import { createGuideContentsRouter } from '../routes/guide/index.js';
 import { createCmsContentRoutes } from '../routes/cms-content/cms-content.routes.js';
 import { createContentAssetsRoutes } from '../routes/content/content-assets.routes.js';
 import { createDashboardAssetsRoutes } from '../routes/dashboard/dashboard-assets.routes.js';
@@ -640,6 +641,15 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.info('✅ Store Product Library routes registered at /api/v1/store/products');
     } catch (storeProductLibError) {
       logger.error('Failed to register Store Product Library routes:', storeProductLibError);
+    }
+
+    // 31-g. Register Guide Contents routes (WO-O4O-GUIDE-INLINE-EDIT-V1)
+    try {
+      const guideContentsRoutes = createGuideContentsRouter(dataSource);
+      app.use('/api/v1/guide', guideContentsRoutes);
+      logger.info('✅ Guide Contents routes registered at /api/v1/guide');
+    } catch (guideContentsError) {
+      logger.error('Failed to register Guide Contents routes:', guideContentsError);
     }
 
     // 32. Register CMS Content routes (WO-P2-IMPLEMENT-CONTENT)

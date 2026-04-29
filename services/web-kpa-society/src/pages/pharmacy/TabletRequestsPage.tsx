@@ -11,6 +11,7 @@
  */
 
 import { useEffect, useState, useRef, useCallback } from 'react';
+import { GuideEditableSection } from '../../components/guide';
 import {
   fetchStaffInterestRequests,
   updateInterestAction,
@@ -80,7 +81,11 @@ export function TabletRequestsPage() {
       <div style={{ marginBottom: '24px' }}>
         <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#1e293b' }}>상담 요청</h1>
         <p style={{ fontSize: '14px', color: '#64748b', marginTop: '4px' }}>
-          매장에서 접수된 상담 요청을 관리합니다.
+          <GuideEditableSection
+            pageKey="store/requests"
+            sectionKey="hero-description"
+            defaultContent="매장에서 접수된 상담 요청을 관리합니다."
+          />
         </p>
       </div>
 
@@ -115,7 +120,11 @@ export function TabletRequestsPage() {
         <div style={{ textAlign: 'center', padding: '48px 0' }}>
           <div style={{ fontSize: '40px', marginBottom: '12px' }}>💡</div>
           <p style={{ color: '#94a3b8', fontSize: '15px' }}>
-            현재 대기 중인 상담 요청이 없습니다
+            <GuideEditableSection
+              pageKey="store/requests"
+              sectionKey="empty-description"
+              defaultContent="현재 대기 중인 상담 요청이 없습니다"
+            />
           </p>
         </div>
       ) : (

@@ -46,7 +46,8 @@ export interface StoreHubConfig {
 
   /** Block 1: Hero */
   heroTitle: string;
-  heroDesc: string;
+  /** WO-O4O-SERVICE-INLINE-EDIT-EXPANSION-V1: ReactNode 허용 (string도 유효) */
+  heroDesc: React.ReactNode;
   /** Hero 우측 액션 버튼 슬롯 */
   headerAction?: React.ReactNode;
   storeCta: {
@@ -56,7 +57,8 @@ export interface StoreHubConfig {
 
   /** Resource Discovery Block */
   resourceSectionTitle?: string;
-  resourceSectionDesc?: string;
+  /** WO-O4O-SERVICE-INLINE-EDIT-EXPANSION-V1: ReactNode 허용 */
+  resourceSectionDesc?: React.ReactNode;
   resourceCards: StoreHubResourceCard[];
 
   /** AI Recommendation Block */

@@ -25,6 +25,7 @@ import {
 import { useAuth } from '../../contexts';
 import { AiSummaryButton } from '../../components/ai';
 import { api } from '../../lib/apiClient';
+import { kcosmeticsConfig } from '@o4o/operator-ux-core';
 
 interface DashboardStats {
   todaySales: number;
@@ -149,7 +150,7 @@ export default function StoresPage() {
         <div className="max-w-6xl mx-auto px-4 py-6">
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-slate-800">매장 대시보드</h1>
+              <h1 className="text-2xl font-bold text-slate-800">{kcosmeticsConfig.uiText.storeHomeTitle}</h1>
               <p className="text-slate-500 mt-1">
                 {user?.name || '매장'}님의 운영 현황을 확인하세요
               </p>

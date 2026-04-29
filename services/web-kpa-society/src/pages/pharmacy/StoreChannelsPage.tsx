@@ -67,6 +67,8 @@ import {
   type AvailableProduct,
 } from '../../api/channelProducts';
 import { fetchChannelOverview } from '../../api/storeHub';
+import { GuideEditableSection } from '../../components/guide';
+import { kpaConfig } from '@o4o/operator-ux-core';
 
 /* ─── Constants ──────────────────────────────── */
 
@@ -692,7 +694,13 @@ export function StoreChannelsPage() {
             <Link to="/store" className="text-blue-600 hover:underline">&larr; 대시보드</Link>
           </div>
           <h1 className="text-2xl font-bold text-slate-900">채널 관리</h1>
-          <p className="text-sm text-slate-500 mt-1">각 채널의 제품 진열과 콘텐츠 노출을 관리합니다</p>
+          <p className="text-sm text-slate-500 mt-1">
+            <GuideEditableSection
+              pageKey="store/channels"
+              sectionKey="hero-description"
+              defaultContent="각 채널의 제품 진열과 콘텐츠 노출을 관리합니다"
+            />
+          </p>
         </div>
         <div className="flex items-center gap-3">
           {lastFetched && (
@@ -901,7 +909,7 @@ export function StoreChannelsPage() {
             onClick={() => navigate('/store-hub')}
             className="px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-50 border border-slate-200 rounded-lg hover:bg-slate-100"
           >
-            약국 HUB
+            {kpaConfig.uiText.appEntry.storeHubTitle}
           </button>
           <button
             onClick={() => navigate('/store/content')}

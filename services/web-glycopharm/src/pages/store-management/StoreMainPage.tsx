@@ -47,6 +47,7 @@ import type {
   ProductSnapshotData,
 } from '@/api/pharmacy';
 import { logStoreAction } from '@/utils/store-action-log';
+import { glycopharmConfig } from '@o4o/operator-ux-core';
 
 // ─── 주요 바로가기 (KPA StoreHomePage 3×2 그리드 패턴) ────
 const QUICK_ACTIONS = [
@@ -245,8 +246,8 @@ export default function StoreMainPage() {
       {/* ── 페이지 헤더 ── */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-xl font-bold text-slate-800">내 약국 홈</h1>
-          <p className="text-sm text-slate-500 mt-0.5">약국 운영 현황을 한눈에 파악합니다</p>
+          <h1 className="text-xl font-bold text-slate-800">{glycopharmConfig.uiText.storeHomeTitle}</h1>
+          <p className="text-sm text-slate-500 mt-0.5">{glycopharmConfig.uiText.storeHomeSubtitle}</p>
         </div>
         <button
           onClick={() => fetchData(true)}

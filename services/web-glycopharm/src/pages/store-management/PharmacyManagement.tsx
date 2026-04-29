@@ -8,6 +8,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { apiClient } from '@/services/api';
+import { glycopharmConfig } from '@o4o/operator-ux-core';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   MessageSquare,
@@ -281,7 +282,7 @@ function HubShortcutCard() {
         <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
           <ShoppingBag className="w-4 h-4 text-blue-600" />
         </div>
-        <h3 className="text-sm font-bold text-slate-800">매장 HUB</h3>
+        <h3 className="text-sm font-bold text-slate-800">{glycopharmConfig.uiText.appEntry.storeHubTitle}</h3>
       </div>
       <p className="text-xs text-slate-500 leading-relaxed mb-3">
         상품, POP 자료, 제품 설명, QR 콘텐츠를 한 곳에서 탐색하세요
@@ -290,7 +291,7 @@ function HubShortcutCard() {
         to="/store/hub"
         className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
       >
-        매장 HUB 이동 <ArrowRight className="w-3 h-3" />
+        {glycopharmConfig.uiText.appEntry.storeHubTitle} 이동 <ArrowRight className="w-3 h-3" />
       </Link>
     </div>
   );

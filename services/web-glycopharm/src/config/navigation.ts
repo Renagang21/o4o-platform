@@ -9,6 +9,7 @@
  */
 
 import type { GlobalHeaderNavItem } from '@o4o/ui';
+import { glycopharmConfig } from '@o4o/operator-ux-core';
 
 // ─── Public Nav ──────────────────────────────────────────────────────────────
 // 모든 사용자에게 노출
@@ -28,8 +29,8 @@ export interface GlycoContextualNavItem extends GlobalHeaderNavItem {
 }
 
 export const GLYCO_CONTEXTUAL_NAV: GlycoContextualNavItem[] = [
-  { label: '매장 운영 허브', href: '/store-hub', visibleWhen: 'pharmacyRelated' },
-  { label: '내 약국', href: '/store', visibleWhen: 'storeOwner' },
+  { label: glycopharmConfig.terminology.storeHubLabel, href: '/store-hub', visibleWhen: 'pharmacyRelated' },
+  { label: glycopharmConfig.terminology.myStoreLabel, href: '/store', visibleWhen: 'storeOwner' },
   // 운영자/관리자 진입은 상단 공용 nav가 아닌 유저 드롭다운으로만 제공
   // WO-O4O-OPERATOR-CONTEXTUAL-NAV-SEPARATION-V1
 ];

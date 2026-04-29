@@ -17,6 +17,7 @@ import { useAuthModal } from '../contexts/LoginModalContext';
 import { colors } from '../styles/theme';
 import { DashboardSwitcher, useAccessibleDashboards } from './common/DashboardSwitcher';
 import { SUPER_OPERATOR_ROLES, hasAnyRole } from '../lib/role-constants';
+import { kpaConfig } from '@o4o/operator-ux-core';
 import ServiceSwitcher from './ServiceSwitcher';
 
 /**
@@ -77,8 +78,8 @@ const menuItems: MenuItem[] = [
   { label: '홈', href: '/' },
   { label: '포럼', href: '/forum' },
   { label: '강의', href: '/lms' },
-  { label: '매장 운영 허브', href: '/store-hub' },
-  { label: '내 약국', href: '/store' },
+  { label: kpaConfig.terminology.storeHubLabel, href: '/store-hub' },
+  { label: kpaConfig.terminology.myStoreLabel, href: '/store' },
   { label: '운영 대시보드', href: '/operator' },
 ];
 
