@@ -57,6 +57,12 @@ const CommunityIcon = () => (
   </svg>
 );
 
+const ResourcesIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+  </svg>
+);
+
 
 const TrendIcon = () => (
   <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -159,6 +165,7 @@ export function HomePage() {
               { title: '포럼', description: 'K-Beauty 전문가와 토론하고 소통하세요', href: '/forum', icon: <ForumIcon /> },
               { title: '강의', description: 'K-Beauty 교육 콘텐츠를 온라인으로 수강하세요', href: '/lms', icon: <EducationIconSvg /> },
               { title: '콘텐츠', description: '플랫폼 콘텐츠를 검색하고 활용하세요', href: '/library/content', icon: <ContentIcon /> },
+              { title: '자료실', description: 'K-Beauty 관련 자료를 검색하고 활용하세요', href: '/resources', icon: <ResourcesIcon /> },
               { title: '커뮤니티', description: '공지, 광고, 후원 정보를 확인하세요', href: '/community', icon: <CommunityIcon /> },
             ]}
           />
