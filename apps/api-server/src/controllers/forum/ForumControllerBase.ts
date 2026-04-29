@@ -174,17 +174,16 @@ export class ForumControllerBase {
   }
 
   /**
-   * Flatten joined author/category relations into flat fields expected by frontend.
+   * Flatten joined author relation into flat field expected by frontend.
    * authorName = author.nickname ?? author.name ?? '시스템'
-   * categoryName = category.name ?? null
+   *
+   * Note: categoryName intentionally omitted — category structure removed.
    */
   protected flattenPostFields(post: any): any {
     const author = post.author;
-    const category = post.category;
     return {
       ...post,
       authorName: author?.nickname ?? author?.name ?? '시스템',
-      categoryName: category?.name ?? null,
     };
   }
 
