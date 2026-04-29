@@ -75,8 +75,9 @@ export function GuideEditableSection({ pageKey, sectionKey, defaultContent }: Pr
     setSaving(true);
     setSaveError(null);
     try {
-      await saveGuideContent(SERVICE_KEY, pageKey, sectionKey, editorValue);
-      setDbContent(editorValue);
+      const content = typeof editorValue === 'string' ? editorValue : String(editorValue ?? '');
+      await saveGuideContent(SERVICE_KEY, pageKey, sectionKey, content);
+      setDbContent(content);
       setModalOpen(false);
     } catch (e: unknown) {
       setSaveError(e instanceof Error ? e.message : '저장 오류');
@@ -95,8 +96,8 @@ export function GuideEditableSection({ pageKey, sectionKey, defaultContent }: Pr
       >
         {/* DB HTML 콘텐츠 — sanitizeHtml로 XSS 방어 후 렌더링 */}
         {dbContent !== null ? (
-          dbContent.trim() ? (
-            <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(dbContent) }} />
+          String(dbContent).trim() ? (
+            <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(String(dbContent)) }} />
           ) : (
             /* 빈 DB 값: 운영자에게만 플레이스홀더 표시 */
             canEdit ? (

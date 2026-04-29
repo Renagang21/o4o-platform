@@ -64,8 +64,9 @@ export function GuideEditableSection({ pageKey, sectionKey, defaultContent }: Pr
     setSaving(true);
     setSaveError(null);
     try {
-      await saveGuideContent(SERVICE_KEY, pageKey, sectionKey, editorValue);
-      setDbContent(editorValue);
+      const content = typeof editorValue === 'string' ? editorValue : String(editorValue ?? '');
+      await saveGuideContent(SERVICE_KEY, pageKey, sectionKey, content);
+      setDbContent(content);
       setModalOpen(false);
     } catch (e: unknown) {
       setSaveError(e instanceof Error ? e.message : '저장 오류');
@@ -82,8 +83,8 @@ export function GuideEditableSection({ pageKey, sectionKey, defaultContent }: Pr
         onMouseLeave={() => setHovered(false)}
       >
         {dbContent !== null ? (
-          dbContent.trim() ? (
-            <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(dbContent) }} />
+          String(dbContent).trim() ? (
+            <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(String(dbContent)) }} />
           ) : (
             canEdit ? (
               <span style={{ color: '#aaa', fontStyle: 'italic' }}>
