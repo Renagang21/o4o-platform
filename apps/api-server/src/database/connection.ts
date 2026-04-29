@@ -250,7 +250,7 @@ import {
 } from '../routes/neture/entities/index.js';
 import { KpaSteward } from '../routes/kpa/entities/kpa-steward.entity.js'; // WO-TYPEORM-ENTITY-REGISTRATION-FIX-V2
 // Guide Inline Edit entity (WO-O4O-GUIDE-CONTENT-DATASOURCE-REGISTER-V1)
-import { GuideContent } from '../routes/guide/index.js';
+import { GuideContent } from '../routes/guide/entities/guide-content.entity.js';
 
 // ============================================================================
 // CATALOG IMPORT ENTITIES (WO-O4O-CATALOG-IMPORT-APP-IMPLEMENTATION-V1)
