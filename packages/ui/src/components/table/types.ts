@@ -32,8 +32,12 @@ export interface O4OColumn<T> {
   /** 컬럼 폭 드래그 리사이즈 허용 */
   resizable?: boolean;
 
-  /** 시스템 컬럼 — reorder/visibility 대상 제외, sticky 적용 가능 */
-  system?: boolean;
+  /**
+   * 시스템 컬럼 — reorder/visibility 대상 제외
+   * true: 항상 앞 배치 (선택 체크박스 등)
+   * 'last': 항상 뒤 배치 (작업/액션 컬럼 등)
+   */
+  system?: boolean | 'last';
   /** sticky 고정 (left: 0) */
   sticky?: boolean;
 

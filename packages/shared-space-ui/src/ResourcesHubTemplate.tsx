@@ -495,7 +495,7 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
         header: '작업',
         width: hasRowActions ? 160 : 120,
         align: 'center',
-        system: true,
+        system: 'last',
         render: (_v, row) => {
           const currentUserId = config.getCurrentUserId?.() ?? null;
           const isOwner = currentUserId !== null && row.created_by === currentUserId;

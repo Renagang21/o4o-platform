@@ -160,14 +160,17 @@ export function BaseTable<T extends Record<string, any>>({
   }, [columns]);
 
   // Apply order + visibility to get effective columns
-  // System columns (sticky/selection) are always first, never reordered or hidden
+  // system=true  → 항상 앞 배치 (선택 체크박스 등)
+  // system='last' → 항상 뒤 배치 (작업/액션 컬럼 등)
+  // 둘 다 reorder/visibility 대상 제외
   const effectiveColumns = useMemo(() => {
     const colMap = new Map(columns.map((c) => [c.key, c]));
-    const systemCols = columns.filter((c) => c.system);
+    const systemFirstCols = columns.filter((c) => c.system === true);
+    const systemLastCols = columns.filter((c) => c.system === 'last');
     const regularCols = columnOrder
       .filter((key) => colMap.has(key) && !hiddenKeys.has(key) && !colMap.get(key)!.system)
       .map((key) => colMap.get(key)!);
-    return [...systemCols, ...regularCols];
+    return [...systemFirstCols, ...regularCols, ...systemLastCols];
   }, [columns, columnOrder, hiddenKeys]);
 
   // ─── Frontend sorting (WO-O4O-BASETABLE-FRONTEND-SORTING-V1) ───
