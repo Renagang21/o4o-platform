@@ -179,8 +179,8 @@ export function GuideEditableSection({ pageKey, sectionKey, defaultContent }: Pr
             <div style={{ flex: 1, overflow: 'auto', minHeight: 200 }}>
               <RichTextEditor
                 value={editorValue}
-                onChange={setEditorValue}
-                preset="simple"
+                onChange={(content) => setEditorValue(content.html)}
+                preset="compact"
                 minHeight="200px"
               />
             </div>

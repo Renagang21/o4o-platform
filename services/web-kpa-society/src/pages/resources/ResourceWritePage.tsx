@@ -24,13 +24,6 @@ import { toast } from '@o4o/error-handling';
 type WriteMode = 'file' | 'editor';
 type UsageType = 'READ' | 'LINK' | 'DOWNLOAD' | 'COPY';
 
-// source_type → 기본 usage_type 파생
-function deriveUsageType(sourceType: 'upload' | 'external' | 'manual'): UsageType {
-  if (sourceType === 'external') return 'LINK';
-  if (sourceType === 'upload') return 'DOWNLOAD';
-  return 'READ';
-}
-
 const USAGE_TYPE_OPTIONS: { value: UsageType; label: string; desc: string }[] = [
   { value: 'READ',     label: '📄 읽기',       desc: '화면에서 내용을 읽는 자료' },
   { value: 'LINK',     label: '🔗 링크 열기',  desc: '외부 웹페이지로 이동하는 자료' },
@@ -54,7 +47,7 @@ export function ResourceWritePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // ── State ──
-  const [mode, setMode] = useState<WriteMode>('file');
+  const [_mode, setMode] = useState<WriteMode>('file');
   const [title, setTitle] = useState('');
   const [summary, setSummary] = useState('');
   const [body, setBody] = useState('');
@@ -65,7 +58,7 @@ export function ResourceWritePage() {
   const [uploadedFile, setUploadedFile] = useState<UploadedFile | null>(null);
   // WO-O4O-KPA-RESOURCES-USAGE-TYPE-V1: usage_type + 자동동기화 플래그
   const [usageType, setUsageType] = useState<UsageType>('DOWNLOAD'); // file 모드 기본
-  const [autoSyncUsageType, setAutoSyncUsageType] = useState(true);
+  const [_autoSyncUsageType, setAutoSyncUsageType] = useState(true);
   // WO-O4O-KPA-RESOURCES-DATA-GUARD-AND-RETEST-V1: LINK 타입 외부 URL
   const [externalUrl, setExternalUrl] = useState('');
 
