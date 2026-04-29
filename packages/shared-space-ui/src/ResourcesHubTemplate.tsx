@@ -2,6 +2,7 @@
  * ResourcesHubTemplate — 자료실 HUB 공통 템플릿
  *
  * WO-O4O-RESOURCES-HUB-TEMPLATE-FOUNDATION-V1
+ * WO-KPA-RESOURCES-VIEW-AND-COPY-SEPARATION-FIX-V1
  *
  * KPA canonical 기준 추출. 구조/렌더링 책임만 가진다.
  * 서비스별 fetch/API/문구/operator 조건은 ResourcesHubConfig에만.
@@ -25,6 +26,7 @@
  */
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import DOMPurify from 'dompurify';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   BaseTable,
@@ -163,6 +165,31 @@ function getFileType(item: ResourcesHubItem): 'pdf' | 'image' | 'doc' | 'video' 
   return 'etc';
 }
 
+// ─── HTML 처리 유틸 (WO-KPA-RESOURCES-VIEW-AND-COPY-SEPARATION-FIX-V1) ─────────
+
+/** body HTML을 드로어에 안전하게 렌더링 (DOMPurify sanitize) */
+function safeHtml(html: string): string {
+  return DOMPurify.sanitize(html, {
+    ADD_ATTR: ['target', 'rel'],
+    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 's', 'ul', 'ol', 'li', 'a', 'img', 'blockquote', 'h1', 'h2', 'h3', 'h4', 'pre', 'code', 'span', 'div'],
+  });
+}
+
+/** HTML → 순수 텍스트 추출 (COPY용) */
+function extractTextFromHtml(html: string): string {
+  const div = document.createElement('div');
+  div.innerHTML = DOMPurify.sanitize(html);
+  return (div.textContent || div.innerText || '').trim();
+}
+
+/** HTML body에서 첫 번째 href 추출 (LINK fallback) */
+function extractFirstLinkFromHtml(html: string): string | null {
+  const div = document.createElement('div');
+  div.innerHTML = DOMPurify.sanitize(html);
+  const a = div.querySelector('a[href]');
+  return a ? (a as HTMLAnchorElement).href : null;
+}
+
 const FILE_TYPE_BADGE: Record<string, { label: string; bg: string; color: string }> = {
   pdf:   { label: 'PDF',   bg: '#FEE2E2', color: '#B91C1C' },
   image: { label: 'IMG',   bg: '#DBEAFE', color: '#1D4ED8' },
@@ -291,8 +318,23 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
   const handleTakeAction = useCallback(async (row: ResourcesHubItem, e: React.MouseEvent) => {
     e.stopPropagation();
     const at = getActionType(row);
-    if (at === 'external' && row.source_url) {
-      window.open(row.source_url, '_blank', 'noopener,noreferrer');
+
+    if (at === 'external') {
+      // source_url 우선, 없으면 body에서 첫 번째 링크 추출
+      const url = row.source_url || (row.body ? extractFirstLinkFromHtml(row.body) : null);
+      if (url) {
+        window.open(url, '_blank', 'noopener,noreferrer');
+      } else if (config.fetchDetail) {
+        // body 없으면 detail fetch 후 재시도
+        try {
+          const d = await config.fetchDetail(row.id);
+          const fallback = d.source_url || (d.body ? extractFirstLinkFromHtml(d.body) : null);
+          if (fallback) window.open(fallback, '_blank', 'noopener,noreferrer');
+          else openDrawer(row);
+        } catch { openDrawer(row); }
+      } else {
+        openDrawer(row);
+      }
     } else if (at === 'download' && row.source_url) {
       const a = document.createElement('a');
       a.href = row.source_url;
@@ -301,20 +343,24 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
       a.click();
       document.body.removeChild(a);
     } else if (at === 'copy') {
-      let text = row.body ?? '';
-      if (!text && config.fetchDetail) {
-        try { const d = await config.fetchDetail(row.id); text = d.body ?? ''; } catch { /* ignore */ }
+      // body HTML → 순수 텍스트 추출 (메타정보 제외)
+      let rawBody = row.body ?? '';
+      if (!rawBody && config.fetchDetail) {
+        try { const d = await config.fetchDetail(row.id); rawBody = d.body ?? ''; } catch { /* ignore */ }
       }
+      const text = rawBody ? extractTextFromHtml(rawBody) : '';
       if (text) {
         try {
           await navigator.clipboard.writeText(text);
           setCopiedId(row.id);
           setTimeout(() => setCopiedId(prev => prev === row.id ? null : prev), 1500);
         } catch { /* ignore */ }
-      } else if (config.fetchDetail) {
-        openDrawer(row);
+      } else {
+        // 복사할 내용 없음 → 드로어로 보여줌
+        if (config.fetchDetail) openDrawer(row);
       }
     } else {
+      // READ 또는 기타 → 보기(드로어)
       if (config.fetchDetail) openDrawer(row);
     }
   }, [config, openDrawer]);
@@ -594,7 +640,12 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
       {loading ? (
         <div style={st.center}>
           <div style={st.spinner} />
-          <style>{`@keyframes o4o-rhub-spin { to { transform: rotate(360deg); } }`}</style>
+          <style>{`@keyframes o4o-rhub-spin { to { transform: rotate(360deg); } }
+.o4o-drawer-body a { color: #2563EB; text-decoration: underline; }
+.o4o-drawer-body a:hover { color: #1D4ED8; }
+.o4o-drawer-body p { margin: 0 0 0.75em; }
+.o4o-drawer-body ul, .o4o-drawer-body ol { padding-left: 1.25em; margin: 0 0 0.75em; }
+`}</style>
           <p style={{ color: '#6B7280', marginTop: 12 }}>
             {config.loadingMessage ?? '자료를 불러오는 중...'}
           </p>
@@ -637,11 +688,34 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
           title={drawerItem?.title}
           width="60vw"
           loading={drawerLoading}
-          footer={drawerItem?.source_url ? (() => {
+          footer={(() => {
+            if (!drawerItem) return undefined;
             const at = getActionType(drawerItem);
+            if (at === 'copy') {
+              const rawBody = drawerItem.body ?? '';
+              const text = rawBody ? extractTextFromHtml(rawBody) : '';
+              return (
+                <button
+                  onClick={async () => {
+                    if (text) {
+                      try {
+                        await navigator.clipboard.writeText(text);
+                        setCopiedId(drawerItem.id);
+                        setTimeout(() => setCopiedId(prev => prev === drawerItem.id ? null : prev), 1500);
+                      } catch { /* ignore */ }
+                    }
+                  }}
+                  style={{ ...st.drawerDownloadBtn, ...(copiedId === drawerItem.id ? { background: '#059669' } : {}) }}
+                >
+                  <Copy size={16} />
+                  {copiedId === drawerItem.id ? '복사됨!' : '내용 복사'}
+                </button>
+              );
+            }
+            if (!drawerItem.source_url) return undefined;
             return (
               <a
-                href={drawerItem.source_url!}
+                href={drawerItem.source_url}
                 target={at === 'external' ? '_blank' : '_self'}
                 rel="noopener noreferrer"
                 download={at === 'download' ? (drawerItem.source_file_name || true) : undefined}
@@ -651,7 +725,7 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
                 {at === 'external' ? '바로가기' : '다운로드'}
               </a>
             );
-          })() : undefined}
+          })()}
         >
           {drawerItem && (
             <div>
@@ -668,7 +742,11 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
               )}
 
               {drawerItem.body && (
-                <div style={st.drawerBody}>{drawerItem.body}</div>
+                <div
+                  className="o4o-drawer-body"
+                  style={st.drawerBody}
+                  dangerouslySetInnerHTML={{ __html: safeHtml(drawerItem.body) }}
+                />
               )}
 
               {(drawerItem.blocks?.length ?? 0) > 0 && !drawerItem.body && (
@@ -845,7 +923,6 @@ const st: Record<string, React.CSSProperties> = {
     color: '#1F2937',
     lineHeight: 1.8,
     marginBottom: 16,
-    whiteSpace: 'pre-wrap' as const,
   },
   drawerAttachment: {
     padding: '12px 16px',
