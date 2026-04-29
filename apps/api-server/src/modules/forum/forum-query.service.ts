@@ -23,16 +23,17 @@ export class ForumQueryService {
 
   /**
    * 홈 페이지용 최근 게시글 요약
+   * WO-O4O-FORUM-CATEGORY-CLEANUP-V1: forum_category → forum_category_requests (forum_id 기반)
    */
   async listRecentPosts(limit = 5) {
     if (this.config.scope === 'community') {
       return this.dataSource.query(`
-        SELECT p.id, p.title, COALESCE(u.nickname, u.name) as "authorName", p.created_at as "createdAt", c.name as "categoryName"
+        SELECT p.id, p.title, COALESCE(u.nickname, u.name) as "authorName", p.created_at as "createdAt", f.name as "categoryName"
         FROM forum_post p
-        LEFT JOIN forum_category c ON p."categoryId" = c.id
+        LEFT JOIN forum_category_requests f ON p.forum_id = f.id AND f.status = 'completed'
         LEFT JOIN users u ON p.author_id = u.id
         WHERE p.status = 'publish' AND p.organization_id IS NULL
-          AND (c.forum_type IS NULL OR c.forum_type != 'closed')
+          AND (f.forum_type IS NULL OR f.forum_type != 'closed')
         ORDER BY p.created_at DESC
         LIMIT $1
       `, [limit]);
@@ -40,12 +41,12 @@ export class ForumQueryService {
 
     // organization scope
     return this.dataSource.query(`
-      SELECT p.id, p.title, COALESCE(u.nickname, u.name) as "authorName", p.created_at as "createdAt", c.name as "categoryName"
+      SELECT p.id, p.title, COALESCE(u.nickname, u.name) as "authorName", p.created_at as "createdAt", f.name as "categoryName"
       FROM forum_post p
-      LEFT JOIN forum_category c ON p."categoryId" = c.id
+      LEFT JOIN forum_category_requests f ON p.forum_id = f.id AND f.status = 'completed'
       LEFT JOIN users u ON p.author_id = u.id
       WHERE p.status = 'publish' AND p.organization_id = $1
-        AND (c.forum_type IS NULL OR c.forum_type != 'closed')
+        AND (f.forum_type IS NULL OR f.forum_type != 'closed')
       ORDER BY p.created_at DESC
       LIMIT $2
     `, [this.config.organizationId, limit]);
@@ -214,8 +215,9 @@ export class ForumQueryService {
   }
 
   /**
-   * 포럼 활동 섹션 — 카테고리별 최근 게시글 (서버 집계)
-   * Phase 3: LATERAL JOIN으로 카테고리별 top-N 게시글 집계
+   * 포럼 활동 섹션 — 포럼별 최근 게시글 (서버 집계)
+   * Phase 3: LATERAL JOIN으로 포럼별 top-N 게시글 집계
+   * WO-O4O-FORUM-CATEGORY-CLEANUP-V1: forum_category → forum_category_requests (forum_id 기반)
    * sort: recent(default) / popular(viewCount) / recommended(likeCount)
    */
   async listForumActivity(options?: { sort?: string; limit?: number }) {
@@ -238,8 +240,8 @@ export class ForumQueryService {
       const rows: any[] = await this.dataSource.query(`
         SELECT
           c.id AS "categoryId", c.name AS "categoryName", c.slug AS "categorySlug",
-          c.color AS "categoryColor", c."iconEmoji" AS "categoryIconEmoji",
-          c."postCount" AS "categoryPostCount",
+          NULL AS "categoryColor", c.icon_emoji AS "categoryIconEmoji",
+          (SELECT COUNT(*)::int FROM forum_post p2 WHERE p2.forum_id = c.id AND p2.status = 'publish') AS "categoryPostCount",
           lp.post_id AS "postId", lp.post_title AS "postTitle",
           lp.post_is_pinned AS "postIsPinned",
           lp.post_view_count AS "postViewCount",
@@ -247,7 +249,7 @@ export class ForumQueryService {
           lp.post_like_count AS "postLikeCount",
           lp.post_created_at AS "postCreatedAt",
           COALESCE(u.nickname, u.name) AS "postAuthorName"
-        FROM forum_category c
+        FROM forum_category_requests c
         CROSS JOIN LATERAL (
           SELECT p.id as post_id, p.title as post_title,
                  p."isPinned" as post_is_pinned,
@@ -257,16 +259,15 @@ export class ForumQueryService {
                  p.created_at as post_created_at,
                  p.author_id
           FROM forum_post p
-          WHERE p."categoryId" = c.id
+          WHERE p.forum_id = c.id
             AND p.status = 'publish' AND p.organization_id IS NULL
           ORDER BY ${postOrderBy}
           LIMIT $1
         ) lp
         LEFT JOIN users u ON lp.author_id = u.id
-        WHERE c."isActive" = true AND c."accessLevel" = 'all' AND c."organizationId" IS NULL
+        WHERE c.status = 'completed' AND c.organization_id IS NULL
           AND (c.forum_type IS NULL OR c.forum_type != 'closed')
-        ORDER BY c."isPinned" DESC, c."pinnedOrder" ASC NULLS LAST,
-                 c."sortOrder" ASC, c.name ASC
+        ORDER BY c.created_at DESC
       `, [limit]);
 
       return this.groupActivityRows(rows);
@@ -276,8 +277,8 @@ export class ForumQueryService {
     const rows: any[] = await this.dataSource.query(`
       SELECT
         c.id AS "categoryId", c.name AS "categoryName", c.slug AS "categorySlug",
-        c.color AS "categoryColor", c."iconEmoji" AS "categoryIconEmoji",
-        c."postCount" AS "categoryPostCount",
+        NULL AS "categoryColor", c.icon_emoji AS "categoryIconEmoji",
+        (SELECT COUNT(*)::int FROM forum_post p2 WHERE p2.forum_id = c.id AND p2.status = 'publish') AS "categoryPostCount",
         lp.post_id AS "postId", lp.post_title AS "postTitle",
         lp.post_is_pinned AS "postIsPinned",
         lp.post_view_count AS "postViewCount",
@@ -285,7 +286,7 @@ export class ForumQueryService {
         lp.post_like_count AS "postLikeCount",
         lp.post_created_at AS "postCreatedAt",
         COALESCE(u.nickname, u.name) AS "postAuthorName"
-      FROM forum_category c
+      FROM forum_category_requests c
       CROSS JOIN LATERAL (
         SELECT p.id as post_id, p.title as post_title,
                p."isPinned" as post_is_pinned,
@@ -295,16 +296,15 @@ export class ForumQueryService {
                p.created_at as post_created_at,
                p.author_id
         FROM forum_post p
-        WHERE p."categoryId" = c.id
+        WHERE p.forum_id = c.id
           AND p.status = 'publish' AND p.organization_id = $2
         ORDER BY ${postOrderBy}
         LIMIT $1
       ) lp
       LEFT JOIN users u ON lp.author_id = u.id
-      WHERE c."isActive" = true AND c."accessLevel" = 'all' AND c."organizationId" = $2
+      WHERE c.status = 'completed' AND c.organization_id = $2
         AND (c.forum_type IS NULL OR c.forum_type != 'closed')
-      ORDER BY c."isPinned" DESC, c."pinnedOrder" ASC NULLS LAST,
-               c."sortOrder" ASC, c.name ASC
+      ORDER BY c.created_at DESC
     `, [limit, this.config.organizationId]);
 
     return this.groupActivityRows(rows);
@@ -341,6 +341,7 @@ export class ForumQueryService {
   /**
    * 운영자용 포럼 통계 — KPI 4개 + Top 5 활성 + 무활동 포럼
    * 3개 병렬 쿼리로 집계
+   * WO-O4O-FORUM-CATEGORY-CLEANUP-V1: forum_category → forum_category_requests (forum_id 기반)
    */
   async getForumAnalytics() {
     const isCommunity = this.config.scope === 'community';
@@ -349,8 +350,8 @@ export class ForumQueryService {
       ? 'p.organization_id IS NULL'
       : 'p.organization_id = $1';
     const catScopeFilter = isCommunity
-      ? 'c."organizationId" IS NULL'
-      : 'c."organizationId" = $1';
+      ? 'c.organization_id IS NULL'
+      : 'c.organization_id = $1';
     const commentScopeFilter = isCommunity
       ? 'p.organization_id IS NULL'
       : 'p.organization_id = $1';
@@ -359,14 +360,14 @@ export class ForumQueryService {
       // Query 1: KPI 4개
       this.dataSource.query(`
         SELECT
-          (SELECT COUNT(*)::int FROM forum_category c
-           WHERE c."isActive" = true AND c."accessLevel" = 'all' AND ${catScopeFilter}
+          (SELECT COUNT(*)::int FROM forum_category_requests c
+           WHERE c.status = 'completed' AND ${catScopeFilter}
           ) AS "totalForums",
-          (SELECT COUNT(DISTINCT p."categoryId")::int FROM forum_post p
+          (SELECT COUNT(DISTINCT p.forum_id)::int FROM forum_post p
            WHERE p.status = 'publish' AND ${scopeFilter}
              AND p.created_at >= NOW() - INTERVAL '7 days'
           ) AS "activeForumsByPost7d",
-          (SELECT COUNT(DISTINCT p."categoryId")::int
+          (SELECT COUNT(DISTINCT p.forum_id)::int
            FROM forum_comment fc
            JOIN forum_post p ON fc."postId" = p.id
            WHERE ${commentScopeFilter}
@@ -386,13 +387,13 @@ export class ForumQueryService {
       // Query 2: Top 5 활성 포럼 (30일)
       this.dataSource.query(`
         SELECT
-          c.id, c.name, c."iconEmoji",
+          c.id, c.name, c.icon_emoji AS "iconEmoji",
           COUNT(DISTINCT CASE WHEN p.created_at >= NOW() - INTERVAL '30 days' THEN p.id END)::int AS "posts30d",
           COUNT(DISTINCT CASE WHEN fc.created_at >= NOW() - INTERVAL '30 days' THEN fc.id END)::int AS "comments30d"
-        FROM forum_category c
-        LEFT JOIN forum_post p ON p."categoryId" = c.id AND p.status = 'publish' AND ${scopeFilter}
+        FROM forum_category_requests c
+        LEFT JOIN forum_post p ON p.forum_id = c.id AND p.status = 'publish' AND ${scopeFilter}
         LEFT JOIN forum_comment fc ON fc."postId" = p.id
-        WHERE c."isActive" = true AND c."accessLevel" = 'all' AND ${catScopeFilter}
+        WHERE c.status = 'completed' AND ${catScopeFilter}
         GROUP BY c.id
         HAVING COUNT(DISTINCT CASE WHEN p.created_at >= NOW() - INTERVAL '30 days' THEN p.id END) > 0
             OR COUNT(DISTINCT CASE WHEN fc.created_at >= NOW() - INTERVAL '30 days' THEN fc.id END) > 0
@@ -404,11 +405,11 @@ export class ForumQueryService {
       `, params),
       // Query 3: 30일 무활동 포럼
       this.dataSource.query(`
-        SELECT c.id, c.name, c."iconEmoji",
+        SELECT c.id, c.name, c.icon_emoji AS "iconEmoji",
           MAX(p.created_at) AS "lastActivityAt"
-        FROM forum_category c
-        LEFT JOIN forum_post p ON p."categoryId" = c.id AND p.status = 'publish' AND ${scopeFilter}
-        WHERE c."isActive" = true AND c."accessLevel" = 'all' AND ${catScopeFilter}
+        FROM forum_category_requests c
+        LEFT JOIN forum_post p ON p.forum_id = c.id AND p.status = 'publish' AND ${scopeFilter}
+        WHERE c.status = 'completed' AND ${catScopeFilter}
         GROUP BY c.id
         HAVING MAX(p.created_at) IS NULL
             OR MAX(p.created_at) < NOW() - INTERVAL '30 days'
@@ -443,16 +444,17 @@ export class ForumQueryService {
 
   /**
    * 홈 페이지용 고정(pinned) 게시글
+   * WO-O4O-FORUM-CATEGORY-CLEANUP-V1: forum_category → forum_category_requests (forum_id 기반)
    */
   async listPinnedPosts(limit = 3) {
     if (this.config.scope === 'community') {
       return this.dataSource.query(`
-        SELECT p.id, p.title, COALESCE(u.nickname, u.name) as "authorName", p.created_at as "createdAt", c.name as "categoryName"
+        SELECT p.id, p.title, COALESCE(u.nickname, u.name) as "authorName", p.created_at as "createdAt", f.name as "categoryName"
         FROM forum_post p
-        LEFT JOIN forum_category c ON p."categoryId" = c.id
+        LEFT JOIN forum_category_requests f ON p.forum_id = f.id AND f.status = 'completed'
         LEFT JOIN users u ON p.author_id = u.id
         WHERE p.status = 'publish' AND p."isPinned" = true AND p.organization_id IS NULL
-          AND (c.forum_type IS NULL OR c.forum_type != 'closed')
+          AND (f.forum_type IS NULL OR f.forum_type != 'closed')
         ORDER BY p.created_at DESC
         LIMIT $1
       `, [limit]);
@@ -460,12 +462,12 @@ export class ForumQueryService {
 
     // organization scope
     return this.dataSource.query(`
-      SELECT p.id, p.title, COALESCE(u.nickname, u.name) as "authorName", p.created_at as "createdAt", c.name as "categoryName"
+      SELECT p.id, p.title, COALESCE(u.nickname, u.name) as "authorName", p.created_at as "createdAt", f.name as "categoryName"
       FROM forum_post p
-      LEFT JOIN forum_category c ON p."categoryId" = c.id
+      LEFT JOIN forum_category_requests f ON p.forum_id = f.id AND f.status = 'completed'
       LEFT JOIN users u ON p.author_id = u.id
       WHERE p.status = 'publish' AND p."isPinned" = true AND p.organization_id = $1
-        AND (c.forum_type IS NULL OR c.forum_type != 'closed')
+        AND (f.forum_type IS NULL OR f.forum_type != 'closed')
       ORDER BY p.created_at DESC
       LIMIT $2
     `, [this.config.organizationId, limit]);

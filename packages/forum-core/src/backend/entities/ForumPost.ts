@@ -79,12 +79,17 @@ export class ForumPost {
   @Column({ type: 'enum', enum: PostStatus, default: PostStatus.PUBLISHED })
   status!: PostStatus;
 
+  /**
+   * @deprecated WO-O4O-FORUM-CATEGORY-CLEANUP-V1
+   * forum_category 구조 폐기로 더 이상 사용하지 않음.
+   * 컬럼은 WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1에서 DROP 예정.
+   * 모든 쿼리는 forumId 사용.
+   */
   @Column({ type: 'uuid', nullable: true })
   categoryId?: string | null;
 
   // WO-O4O-FORUM-MULTI-STRUCTURE-RECONSTRUCTION-V1
-  // 멀티 포럼 구조에서 forum_category_requests.id 참조. 카테고리 폐기 후 게시글이 속한
-  // 포럼을 식별하는 SSOT. 기존 categoryId는 점진적 제거 예정.
+  // forum_category_requests.id 참조 — 게시글이 속한 포럼의 SSOT.
   @Column({ name: 'forum_id', type: 'uuid', nullable: true })
   forumId?: string | null;
 
