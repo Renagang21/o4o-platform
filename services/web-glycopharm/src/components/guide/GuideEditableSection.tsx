@@ -64,9 +64,12 @@ export function GuideEditableSection({ pageKey, sectionKey, defaultContent }: Pr
     setSaving(true);
     setSaveError(null);
     try {
-      const content = typeof editorValue === 'string' ? editorValue : String(editorValue ?? '');
-      await saveGuideContent(SERVICE_KEY, pageKey, sectionKey, content);
-      setDbContent(content);
+      if (typeof editorValue !== 'string') {
+        setSaveError('편집기 오류: 내용을 다시 입력해주세요.');
+        return;
+      }
+      await saveGuideContent(SERVICE_KEY, pageKey, sectionKey, editorValue);
+      setDbContent(editorValue);
       setModalOpen(false);
     } catch (e: unknown) {
       setSaveError(e instanceof Error ? e.message : '저장 오류');
