@@ -26,7 +26,7 @@ const CONTENT_TYPES = [
 const SUB_TYPES: Record<string, { value: string; label: string }[]> = {
   participation: [
     { value: '설문', label: '설문' },
-    { value: '퀴즈', label: '퀴즈' },
+    // 퀴즈 제거 (WO-KPA-CONTENT-QUIZ-REMOVE-V1): 퀴즈는 LMS 레슨(QUIZ 타입) 전용
     { value: '이벤트', label: '이벤트' },
     { value: '캠페인', label: '캠페인' },
   ],

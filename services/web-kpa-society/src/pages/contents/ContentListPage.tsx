@@ -29,8 +29,7 @@ const TYPE_COLORS: Record<string, { bg: string; text: string }> = {
 
 function mapContentItem(item: ContentItem): ContentHubItem {
   const subLabel = item.sub_type === '설문' ? '설문'
-    : item.sub_type === '퀴즈' ? '퀴즈'
-    : TYPE_LABELS[item.content_type] ?? '문서';
+    : TYPE_LABELS[item.content_type] ?? '문서'; // WO-KPA-CONTENT-QUIZ-REMOVE-V1: 퀴즈 레이블 제거
   return {
     id: item.id,
     title: item.title,

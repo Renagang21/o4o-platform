@@ -3,18 +3,19 @@
  *
  * WO-CONTENT-HUB-STRUCTURE-AND-TABLE-FOUNDATION-V1
  * WO-KPA-CONTENT-CREATE-TYPE-CARDS-EXPANSION-AND-RENAMING-V1
+ * WO-KPA-CONTENT-QUIZ-REMOVE-V1: 퀴즈 제거 (LMS 전용 기능으로 분리)
  *
  * /content/new → 타입 선택 화면
  *   - 문서       → /content/write (RichTextEditor)
  *   - 설문       → /content/new/survey (ParticipationCreatePage)
- *   - 퀴즈       → /content/new/quiz (ParticipationCreatePage — quiz mode)
  *   - 코스형 자료 → /content/new/course (CourseNewPage)
  *
+ * 퀴즈는 /lms 영역 전용 (강의 레슨 타입 QUIZ). 콘텐츠 허브에서 생성 불가.
  * content_type은 생성 시 확정되며 이후 변경 불가.
  */
 
 import { useNavigate } from 'react-router-dom';
-import { FileText, ClipboardList, HelpCircle, GraduationCap, ArrowLeft } from 'lucide-react';
+import { FileText, ClipboardList, GraduationCap, ArrowLeft } from 'lucide-react';
 
 // ─── Type Cards ──────────────────────────────────────────────
 
@@ -40,13 +41,6 @@ const TYPE_CARDS: TypeCard[] = [
     icon: <ClipboardList size={28} />,
     available: true,
     route: '/content/new/survey',
-  },
-  {
-    label: '퀴즈',
-    description: '지식을 테스트하는 퀴즈를 만듭니다',
-    icon: <HelpCircle size={28} />,
-    available: true,
-    route: '/content/new/quiz',
   },
   {
     label: '코스형 자료',

@@ -572,23 +572,8 @@ function App() {
               />
             </Layout>
           } />
-          {/* 퀴즈 제작기 — ParticipationCreatePage (quiz mode) */}
-          <Route path="/content/new/quiz" element={
-            <Layout serviceName={SERVICE_NAME}>
-              <ParticipationCreatePage
-                pageTitle="새 퀴즈 만들기"
-                pageDescription="지식을 테스트하는 퀴즈를 만듭니다"
-                breadcrumb={[
-                  { label: '홈', href: '/' },
-                  { label: '콘텐츠', href: '/content' },
-                  { label: '타입 선택', href: '/content/new' },
-                  { label: '퀴즈 만들기' },
-                ]}
-                returnTo="/content/new"
-                allowedQuestionTypes={[QuestionType.QUIZ]}
-              />
-            </Layout>
-          } />
+          {/* 퀴즈는 LMS 전용 (WO-KPA-CONTENT-QUIZ-REMOVE-V1) — /lms로 리다이렉트 */}
+          <Route path="/content/new/quiz" element={<Navigate to="/lms" replace />} />
           {/* 코스형 자료 제작기 — CourseNewPage (content context) */}
           <Route path="/content/new/course" element={
             <Layout serviceName={SERVICE_NAME}>
