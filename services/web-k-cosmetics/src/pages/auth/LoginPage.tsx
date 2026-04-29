@@ -119,7 +119,7 @@ export default function LoginPage() {
           <button
             type="button"
             disabled={loading}
-            onClick={() => { setEmail('phamacy1@o4o.com'); setPassword('O4oTestPass@1'); setError(null); }}
+            onClick={() => { setEmail('store_manager@k-cosmetics.co.kr'); setPassword('O4oTestPass@1'); setError(null); }}
             style={{
               width: '100%',
               padding: '8px',
