@@ -157,15 +157,6 @@ export function ForumListPage() {
 
   const columns = useMemo((): O4OColumn<ForumPost>[] => [
     {
-      key: 'categoryName',
-      header: '포럼',
-      width: '80px',
-      align: 'center',
-      render: (val) => (
-        <span style={s.catBadge}>{val || '-'}</span>
-      ),
-    },
-    {
       key: 'title',
       header: '제목',
       render: (_v, row) => (

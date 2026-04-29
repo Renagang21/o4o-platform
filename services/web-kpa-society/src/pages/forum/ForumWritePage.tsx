@@ -1,10 +1,8 @@
 /**
  * ForumWritePage - 포럼 글쓰기 페이지
  *
- * WO-FORUM-POST-CONTEXT-ALIGNMENT-V1:
- * - /forum/:slug/write → 포럼 컨텍스트 고정 (slug→categoryId 자동 해석)
- * - /forum/write (slug 없음) → /forum 리다이렉트
- * - /forum/edit/:id → 기존 수정 모드 유지 (카테고리 변경 가능)
+ * WO-O4O-FORUM-CATEGORY-FULL-REMOVAL-V2:
+ * 카테고리 완전 제거 — 제목 + 내용만 작성
  */
 
 import { useState, useEffect } from 'react';
@@ -16,86 +14,43 @@ import { PageHeader, LoadingSpinner, Card } from '../../components/common';
 import { forumApi } from '../../api';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
-import type { ForumCategory } from '../../types';
 
 export function ForumWritePage() {
-  const { id, slug } = useParams<{ id?: string; slug?: string }>();
+  const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
   const isEdit = !!id;
 
-  const [categories, setCategories] = useState<ForumCategory[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(isEdit);
   const [submitting, setSubmitting] = useState(false);
-
-  const [formData, setFormData] = useState({
-    title: '',
-    categoryId: '',
-  });
-
+  const [title, setTitle] = useState('');
   const [editorHtml, setEditorHtml] = useState('');
 
   useEffect(() => {
-    loadData();
-  }, [id, slug]);
-
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      const categoriesRes = await forumApi.getCategories();
-      setCategories(categoriesRes.data);
-
-      if (isEdit && id) {
-        const postRes = await forumApi.getPost(id);
-        const post = postRes.data;
-
-        // Convert Block[] to HTML for editor
+    if (!isEdit || !id) return;
+    forumApi.getPost(id)
+      .then((res) => {
+        const post = res.data;
         const htmlContent = Array.isArray(post.content)
           ? blocksToHtml(post.content)
           : (typeof post.content === 'string' ? post.content : '');
-
+        setTitle(post.title);
         setEditorHtml(htmlContent);
-        setFormData({
-          title: post.title,
-          categoryId: post.categoryId,
-        });
-      } else if (slug) {
-        // slug → categoryId 자동 해석
-        const matched = categoriesRes.data.find((c: ForumCategory) => c.slug === slug);
-        if (matched) {
-          setFormData(prev => ({ ...prev, categoryId: matched.id }));
-        } else {
-          toast.error('존재하지 않는 포럼입니다.');
-          navigate('/forum');
-          return;
-        }
-      }
-      // slug 없이 /forum/write 접근 → 카테고리 select로 작성 (isEdit이 아닌 경우)
-    } catch (err) {
-      toast.error('데이터를 불러오는데 실패했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  };
+      })
+      .catch(() => toast.error('데이터를 불러오는데 실패했습니다.'))
+      .finally(() => setLoading(false));
+  }, [id, isEdit]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!formData.title.trim() || !editorHtml.trim() || !formData.categoryId) {
-      toast.error('모든 필드를 입력해주세요.');
+    if (!title.trim() || !editorHtml.trim()) {
+      toast.error('제목과 내용을 모두 입력해주세요.');
       return;
     }
-
     try {
       setSubmitting(true);
-
-      // Convert HTML to Block[]
       const blocks = htmlToBlocks(editorHtml);
-      const submitData = {
-        ...formData,
-        content: blocks,
-      };
-
+      const submitData = { title, content: blocks };
       if (isEdit && id) {
         await forumApi.updatePost(id, submitData);
         navigate(`/forum/post/${id}`);
@@ -103,7 +58,7 @@ export function ForumWritePage() {
         const res = await forumApi.createPost(submitData);
         navigate(`/forum/post/${res.data.id}`);
       }
-    } catch (err) {
+    } catch {
       toast.error('저장에 실패했습니다.');
     } finally {
       setSubmitting(false);
@@ -124,8 +79,6 @@ export function ForumWritePage() {
     return <LoadingSpinner message="로딩 중..." />;
   }
 
-  const forumName = categories.find(c => c.id === formData.categoryId)?.name;
-
   return (
     <div style={styles.container}>
       <PageHeader
@@ -133,7 +86,6 @@ export function ForumWritePage() {
         breadcrumb={[
           { label: '홈', href: '/' },
           { label: '포럼', href: '/forum' },
-          ...(forumName ? [{ label: forumName, href: '/forum' }] : []),
           { label: isEdit ? '수정' : '글쓰기' },
         ]}
       />
@@ -141,35 +93,12 @@ export function ForumWritePage() {
       <Card padding="large">
         <form onSubmit={handleSubmit}>
           <div style={styles.field}>
-            <label style={styles.label}>포럼</label>
-            {slug ? (
-              <div style={styles.fixedForum}>
-                {forumName ?? slug}
-              </div>
-            ) : (
-              <select
-                style={styles.select}
-                value={formData.categoryId}
-                onChange={e => setFormData({ ...formData, categoryId: e.target.value })}
-                required
-              >
-                <option value="">포럼 선택</option>
-                {categories.map(cat => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
-            )}
-          </div>
-
-          <div style={styles.field}>
             <label style={styles.label}>제목</label>
             <input
               type="text"
               style={styles.input}
-              value={formData.title}
-              onChange={e => setFormData({ ...formData, title: e.target.value })}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
               placeholder="제목을 입력하세요"
               required
             />
@@ -230,41 +159,12 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.neutral700,
     fontSize: '14px',
   },
-  select: {
-    width: '100%',
-    padding: '12px',
-    border: `1px solid ${colors.neutral300}`,
-    borderRadius: '8px',
-    fontSize: '14px',
-    backgroundColor: colors.white,
-    boxSizing: 'border-box',
-  },
-  fixedForum: {
-    width: '100%',
-    padding: '12px',
-    border: `1px solid ${colors.neutral300}`,
-    borderRadius: '8px',
-    fontSize: '14px',
-    backgroundColor: colors.neutral50,
-    color: colors.neutral700,
-    boxSizing: 'border-box',
-  },
   input: {
     width: '100%',
     padding: '12px',
     border: `1px solid ${colors.neutral300}`,
     borderRadius: '8px',
     fontSize: '14px',
-    boxSizing: 'border-box',
-  },
-  textarea: {
-    width: '100%',
-    padding: '12px',
-    border: `1px solid ${colors.neutral300}`,
-    borderRadius: '8px',
-    fontSize: '14px',
-    resize: 'vertical',
-    lineHeight: 1.6,
     boxSizing: 'border-box',
   },
   actions: {

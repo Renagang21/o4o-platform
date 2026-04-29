@@ -219,45 +219,10 @@ export class ForumPostController extends ForumControllerBase {
         return;
       }
 
-      const { title, content, excerpt, categoryId, categorySlug, type, tags, isPinned, allowComments, metadata, showContactOnPost } = req.body;
+      const { title, content, excerpt, type, tags, isPinned, allowComments, metadata, showContactOnPost } = req.body;
 
       // Generate slug from title
       const slug = this.generateSlug(title);
-
-      // Resolve category by ID or slug
-      let category;
-      if (categoryId) {
-        category = await this.categoryRepository.findOne({ where: { id: categoryId } });
-      } else if (categorySlug) {
-        category = await this.categoryRepository.findOne({ where: { slug: categorySlug } });
-      }
-
-      // WO-FORUM-POST-CONTEXT-ALIGNMENT-V1: categoryId or categorySlug is required
-      if (!category) {
-        res.status(400).json({
-          success: false,
-          error: 'categoryId or categorySlug is required',
-          code: 'CATEGORY_REQUIRED',
-        });
-        return;
-      }
-
-      const resolvedCategoryId = category.id;
-
-      // WO-KPA-A-CLOSED-FORUM-ACCESS-CONTROL-V1
-      if (category?.forumType === 'closed') {
-        const { userId: cuid, roles: croles } = this.getUserFromReq(req);
-        const access = await this.checkClosedForumAccess(category.id, cuid, croles);
-        if (!access.allowed) {
-          res.status(403).json({
-            success: false,
-            error: 'Membership is required to post in this closed forum.',
-            code: 'CLOSED_FORUM_ACCESS_DENIED',
-            data: { categoryId: category.id },
-          });
-          return;
-        }
-      }
 
       // Normalize content to Block[] format
       const normalizedContent = normalizeContent(content);
@@ -275,7 +240,7 @@ export class ForumPostController extends ForumControllerBase {
         title,
         content: normalizedContent,
         excerpt: postExcerpt,
-        categoryId: resolvedCategoryId,
+        categoryId: null,
         type,
         tags: tags ? [...new Set<string>(tags.map((t: string) => String(t).trim().replace(/^#/, '')).filter(Boolean).filter((t: string) => t.length <= 30))] : undefined,
         isPinned,
@@ -284,8 +249,8 @@ export class ForumPostController extends ForumControllerBase {
         showContactOnPost: showContactOnPost || false,
         authorId: userId,
         slug,
-        status: category?.requireApproval ? PostStatus.PENDING : PostStatus.PUBLISHED,
-        publishedAt: category?.requireApproval ? undefined : new Date(),
+        status: PostStatus.PUBLISHED,
+        publishedAt: new Date(),
         ...(ctx?.organizationId ? { organizationId: ctx.organizationId } : {}),
       });
 
@@ -340,14 +305,14 @@ export class ForumPostController extends ForumControllerBase {
         return;
       }
 
-      const { title, content, excerpt, categoryId, type, status, tags, isPinned, isLocked, allowComments, metadata } = req.body;
+      const { title, content, excerpt, type, status, tags, isPinned, isLocked, allowComments, metadata } = req.body;
 
       // Update slug if title changed
       if (title && title !== post.title) {
         post.slug = this.generateSlug(title);
       }
 
-      // Update fields
+      // Update fields (categoryId intentionally excluded — categories removed)
       if (title !== undefined) post.title = title;
       if (content !== undefined) {
         // Normalize content to Block[] format
@@ -358,7 +323,6 @@ export class ForumPostController extends ForumControllerBase {
         }
       }
       if (excerpt !== undefined) post.excerpt = excerpt;
-      if (categoryId !== undefined) post.categoryId = categoryId;
       if (type !== undefined) post.type = type;
       if (status !== undefined) post.status = status;
       if (tags !== undefined) {
