@@ -13,6 +13,7 @@ import { SignageManagerTemplate } from '@o4o/shared-space-ui';
 import type { SignageHubVideo, SignageHubPlaylist } from '@o4o/shared-space-ui';
 import { publicContentApi } from '../../lib/api/signageV2';
 import { getAccessToken, useAuth } from '../../contexts/AuthContext';
+import { hasAnyRole, PLATFORM_ROLES } from '../../lib/role-constants';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 const SERVICE_KEY = 'kpa-society';
@@ -42,6 +43,7 @@ function parseDurationInput(input: string): number {
 
 export default function ContentHubPage() {
   const { user } = useAuth();
+  const isOperator = hasAnyRole(user?.roles ?? [], PLATFORM_ROLES);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -64,7 +66,7 @@ export default function ContentHubPage() {
 
   // Modals
   const [createModal, setCreateModal] = useState(false);
-  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string; type: 'video' | 'playlist' } | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string; type: 'video' | 'playlist'; operatorDelete: boolean } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
   // Create form
@@ -112,7 +114,11 @@ export default function ContentHubPage() {
     })
       .then((res: any) => {
         if (res.success && res.data) {
-          setVideos((res.data as any).items ?? []);
+          const items = ((res.data as any).items ?? []).map((v: any) => ({
+            ...v,
+            creatorName: user && v.createdByUserId === user.id ? '나' : '-',
+          }));
+          setVideos(items);
           setVideoTotal((res.data as any).total ?? 0);
         }
       })
@@ -130,7 +136,11 @@ export default function ContentHubPage() {
     })
       .then((res: any) => {
         if (res.success && res.data) {
-          setPlaylists((res.data as any).items ?? []);
+          const items = ((res.data as any).items ?? []).map((p: any) => ({
+            ...p,
+            creatorName: user && p.createdByUserId === user.id ? '나' : '-',
+          }));
+          setPlaylists(items);
           setPlaylistTotal((res.data as any).total ?? 0);
         }
       })
@@ -229,9 +239,15 @@ export default function ContentHubPage() {
     if (!deleteConfirm) return;
     setIsDeleting(true);
     try {
+      // 운영자: 일반 소프트 삭제 엔드포인트 (모든 source 항목 처리 가능)
+      // 본인(커뮤니티): 커뮤니티 전용 엔드포인트
       const path = deleteConfirm.type === 'video'
-        ? `/api/signage/${SERVICE_KEY}/community/media/${deleteConfirm.id}`
-        : `/api/signage/${SERVICE_KEY}/community/playlists/${deleteConfirm.id}`;
+        ? deleteConfirm.operatorDelete
+          ? `/api/signage/${SERVICE_KEY}/media/${deleteConfirm.id}`
+          : `/api/signage/${SERVICE_KEY}/community/media/${deleteConfirm.id}`
+        : deleteConfirm.operatorDelete
+          ? `/api/signage/${SERVICE_KEY}/playlists/${deleteConfirm.id}`
+          : `/api/signage/${SERVICE_KEY}/community/playlists/${deleteConfirm.id}`;
       await apiFetch(path, { method: 'DELETE' });
       setDeleteConfirm(null);
       setReloadKey(k => k + 1);
@@ -264,8 +280,8 @@ export default function ContentHubPage() {
           setCreateModal(true);
         } : undefined,
         onEditVideo: (v) => openEditModal(v),
-        onDeleteVideo: (v) => setDeleteConfirm({ id: v.id, name: v.name, type: 'video' }),
-        canEditVideo: (v) => !!user && v.source === 'community' && v.createdByUserId === user.id,
+        onDeleteVideo: (v) => setDeleteConfirm({ id: v.id, name: v.name, type: 'video', operatorDelete: isOperator }),
+        canEditVideo: (v) => isOperator || (!!user && v.source === 'community' && v.createdByUserId === user.id),
 
         // ── 플레이리스트 탭 ──
         playlists,
@@ -276,8 +292,8 @@ export default function ContentHubPage() {
         onPlaylistPageChange: (p) => setPlaylistPage(p),
         onAddPlaylist: user ? () => navigate('/signage/playlist/new') : undefined,
         onEditPlaylist: (p) => navigate(`/signage/playlist/${p.id}/edit`),
-        onDeletePlaylist: (p) => setDeleteConfirm({ id: p.id, name: p.name, type: 'playlist' }),
-        canEditPlaylist: (p) => !!user && p.source === 'community' && p.createdByUserId === user?.id,
+        onDeletePlaylist: (p) => setDeleteConfirm({ id: p.id, name: p.name, type: 'playlist', operatorDelete: isOperator }),
+        canEditPlaylist: (p) => isOperator || (!!user && p.source === 'community' && p.createdByUserId === user?.id),
 
         // ── 탭 제어 ──
         initialTab,

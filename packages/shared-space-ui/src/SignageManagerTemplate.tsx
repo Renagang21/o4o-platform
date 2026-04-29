@@ -35,6 +35,8 @@ export interface SignageHubVideo {
   source?: string | null;
   createdAt?: string | null;
   createdByUserId?: string | null;
+  /** 표시용 등록자명. 없으면 '-' */
+  creatorName?: string | null;
 }
 
 export interface SignageHubPlaylist {
@@ -49,6 +51,8 @@ export interface SignageHubPlaylist {
   createdAt?: string | null;
   updatedAt?: string | null;
   createdByUserId?: string | null;
+  /** 표시용 등록자명. 없으면 '-' */
+  creatorName?: string | null;
 }
 
 export interface SignageManagerConfig {
@@ -267,6 +271,7 @@ function VideoTable({ config }: { config: SignageManagerConfig }) {
             <th style={{ ...st.th, width: 180 }}>영상 링크</th>
             <th style={{ ...st.th, width: 80, textAlign: 'center' as const }}>재생시간</th>
             <th style={{ ...st.th, width: 70, textAlign: 'center' as const }}>상태</th>
+            <th style={{ ...st.th, width: 80 }}>등록자</th>
             <th style={{ ...st.th, width: 90 }}>등록일</th>
             <th style={{ ...st.th, width: 100, textAlign: 'right' as const }}>액션</th>
           </tr>
@@ -305,6 +310,9 @@ function VideoTable({ config }: { config: SignageManagerConfig }) {
                 </td>
                 <td style={{ ...st.td, textAlign: 'center' as const }}>
                   <StatusBadge status={v.status} />
+                </td>
+                <td style={{ ...st.td, fontSize: 13, color: N500 }}>
+                  {v.creatorName ?? '-'}
                 </td>
                 <td style={{ ...st.td, fontSize: 13, color: N500 }}>
                   {v.createdAt ? new Date(v.createdAt).toLocaleDateString('ko-KR') : '-'}
@@ -358,6 +366,7 @@ function PlaylistTable({ config }: { config: SignageManagerConfig }) {
             <th style={{ ...st.th, width: 80, textAlign: 'center' as const }}>영상 수</th>
             <th style={{ ...st.th, width: 100, textAlign: 'center' as const }}>총 재생시간</th>
             <th style={{ ...st.th, width: 70, textAlign: 'center' as const }}>상태</th>
+            <th style={{ ...st.th, width: 80 }}>등록자</th>
             <th style={{ ...st.th, width: 90 }}>수정일</th>
             <th style={{ ...st.th, width: 100, textAlign: 'right' as const }}>액션</th>
           </tr>
@@ -393,6 +402,9 @@ function PlaylistTable({ config }: { config: SignageManagerConfig }) {
                 </td>
                 <td style={{ ...st.td, textAlign: 'center' as const }}>
                   <StatusBadge status={p.status} />
+                </td>
+                <td style={{ ...st.td, fontSize: 13, color: N500 }}>
+                  {p.creatorName ?? '-'}
                 </td>
                 <td style={{ ...st.td, fontSize: 13, color: N500 }}>
                   {(p.updatedAt || p.createdAt)
