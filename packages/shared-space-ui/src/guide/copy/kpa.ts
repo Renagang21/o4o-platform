@@ -501,11 +501,12 @@ export const kpaGuideFeaturesProps: GuideFeaturesPageProps = {
       primaryRoute: '/lms',
       description: '약사 전문 교육 강의 조회 및 수강. 강의별 커리큘럼과 학습 진행 상황을 확인합니다.',
       items: [
+        { label: '강의(LMS) 이용 방법', route: '/guide/features/lms' },
         { label: '강의 홈', route: '/lms' },
         { label: '강의 목록', route: '/lms/courses' },
         { label: '강의 상세·수강', route: '/lms/course/:id' },
       ],
-      linkTo: '/lms',
+      linkTo: '/guide/features/lms',
     },
     {
       step: '03',
@@ -872,6 +873,87 @@ export const kpaGuideFeatureQrTabletProps: GuideFeatureManualPageProps = {
         { label: '상담 보조 흐름', detail: 'Tablet은 결제·주문·배송과 직접 연결되지 않습니다. 관심 요청/상담 보조 목적으로만 사용합니다.' },
         { label: '결제·주문 분리', detail: '결제와 주문은 별도 채널(B2C 스토어 등)에서 처리합니다. Tablet 요청만으로 주문이 생성되지 않습니다.' },
         { label: '채널 승인 필요', detail: 'TABLET 채널에 상품이 진열되어 있어야 고객 화면에 상품이 표시됩니다. 승인 전에는 노출되지 않습니다.' },
+      ],
+    },
+  ],
+  bottomNav: {
+    prev: { label: '← 기능별 이용 방법', to: '/guide/features' },
+    home: { label: '홈으로', to: '/' },
+  },
+};
+
+// ─── /guide/features/lms ──────────────────────────────────────────────
+
+export const kpaGuideFeatureLmsProps: GuideFeatureManualPageProps = {
+  hero: {
+    eyebrow: '기능별 이용 방법',
+    title: '강의(LMS) 이용 방법',
+    description: '약사 대상 전문 강의를 수강하고 학습 진행·수료 상태를 관리하는 교육 허브입니다',
+    primaryAction: { label: '강의 목록으로 이동 →', to: '/lms' },
+    flowBarTitle: '이용 흐름',
+    flowLabels: ['LMS 개요', '진입 경로', '강의 구성', '학습 진행', '수료/인증', '활용 시나리오'],
+  },
+  sections: [
+    {
+      step: '01',
+      title: 'LMS 개요',
+      description: '강의(LMS)는 단순 콘텐츠 열람이 아니라 수강 → 레슨 학습 → 완료 → 수료 흐름이 있는 학습 관리 기능입니다. 약사 대상 전문 교육과 지식 공유를 위한 커뮤니티 기반 교육 플랫폼으로, 운영/교육/지식 공유 관점에서 활용합니다.',
+      items: [
+        { label: '학습 관리 기능', detail: '강의 수강부터 레슨 완료, 수료증 발급까지 학습 전 과정을 관리합니다.' },
+        { label: '약사 전문 교육', detail: '약사 커뮤니티를 기반으로 보수교육, 제품 교육, 전문 지식 강의가 제공됩니다.' },
+        { label: '운영/교육/지식 공유 도구', detail: '강의는 단순 시청이 아니라 진행률·완료 상태가 관리되는 교육 도구입니다.' },
+      ],
+    },
+    {
+      step: '02',
+      title: '강의 진입 경로',
+      routeLabel: '/lms',
+      description: '강의는 목록 → 상세 → 학습 순서로 진입합니다. 각 경로는 역할이 구분됩니다.',
+      items: [
+        { label: '/lms — 강의 목록', detail: '수강 가능한 강의 전체 목록이 표시됩니다. 카테고리·키워드로 탐색합니다.' },
+        { label: '/lms/:courseId — 강의 상세', detail: '강의 소개, 챕터 구성, 수강 시작 버튼이 있습니다. 수강 신청 후 학습이 시작됩니다.' },
+        { label: '/lms/:courseId/lessons/:lessonId — 학습', detail: '레슨 단위로 학습이 진행됩니다. 텍스트·영상·자료 형태로 제공됩니다.' },
+      ],
+    },
+    {
+      step: '03',
+      title: '강의 구성 이해',
+      description: '강의는 강의 → 챕터 → 레슨 3단계 구조로 구성됩니다. 레슨 단위로 학습이 진행되며, 각 레슨은 텍스트·영상·자료 형태로 제공됩니다.',
+      items: [
+        { label: '강의(Course)', detail: '최상위 학습 단위입니다. 강의명·설명·수료 기준이 설정됩니다.' },
+        { label: '챕터(Chapter)', detail: '강의 내 주제 구분입니다. 순서대로 학습하거나 원하는 챕터를 선택할 수 있습니다.' },
+        { label: '레슨(Lesson)', detail: '가장 작은 학습 단위입니다. 텍스트·영상·첨부 자료로 구성되며, 완료 처리가 가능합니다.' },
+      ],
+    },
+    {
+      step: '04',
+      title: '학습 진행 흐름',
+      routeLabel: '/lms/:courseId/lessons/:lessonId',
+      description: '강의 선택 후 수강을 시작하면 레슨 단위로 학습이 진행됩니다. 마지막 레슨 완료 시 진행률이 100%로 처리되고 수료 상태로 전환됩니다.',
+      items: [
+        { label: '강의 선택 → 수강 시작', detail: '강의 상세 페이지에서 수강 신청 후 첫 레슨으로 이동합니다.' },
+        { label: '레슨 학습 → 완료 처리', detail: '레슨 내용을 확인하고 완료 버튼을 누르면 진행률이 업데이트됩니다.' },
+        { label: '전체 레슨 완료 → 수료', detail: '마지막 레슨 완료 시 진행률 100%와 함께 수료(completion) 상태로 자동 전환됩니다.' },
+      ],
+    },
+    {
+      step: '05',
+      title: '수료 및 인증',
+      description: '모든 레슨을 완료하면 수료 상태가 생성됩니다. 수료증은 자동 발급되며, 공개 검증(verify)이 가능한 구조를 지원합니다.',
+      items: [
+        { label: '수료증 자동 발급', detail: '수료 상태로 전환되면 수료증이 자동으로 생성됩니다. 수료 일시와 강의명이 포함됩니다.' },
+        { label: '공개 검증(verify)', detail: '수료증 링크를 통해 외부에서 수료 사실을 확인할 수 있습니다.' },
+        { label: '강의 상태 구분', detail: 'draft(초안)는 수강 불가, published(공개)는 수강 가능, archived(보관)는 신규 수강이 중단된 상태입니다.' },
+      ],
+    },
+    {
+      step: '06',
+      title: '활용 시나리오',
+      description: '강의는 운영/교육/지식 공유 도구로 다양하게 활용할 수 있습니다.',
+      items: [
+        { label: '약사 교육 프로그램', detail: '보수교육·세미나를 강의 형태로 제공해 약사 회원이 시간과 장소에 구애받지 않고 수강합니다.' },
+        { label: '제품/서비스 교육', detail: '약국에서 취급하는 제품의 사용법·특성을 강의로 제공해 직원 교육과 고객 응대 품질을 높입니다.' },
+        { label: '커뮤니티 지식 공유', detail: '현장 약사가 직접 강의를 구성해 노하우와 전문 지식을 커뮤니티 전체와 공유합니다.' },
       ],
     },
   ],
