@@ -23,7 +23,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { colors, shadows, borderRadius } from '../../styles/theme';
 import { useAuth, TestUser } from '../../contexts/AuthContext';
 import { isPharmacyOwner, PharmacistFeeCategory } from '../../types';
-import { getStoreSlug } from '../../api/pharmacyInfo';
+import { getStoreSlug, getPharmacyInfo } from '../../api/pharmacyInfo';
 import { apiClient } from '../../api/client';
 import { StoreBlockRegistry, type StoreBlock, type StoreBlockType } from '@o4o/ui';
 
@@ -127,7 +127,6 @@ export function PharmacyStorePage() {
   useEffect(() => {
     (async () => {
       try {
-        const { getPharmacyInfo } = await import('../../api/pharmacyInfo');
         const info = await getPharmacyInfo();
         if (info?.name) setPharmacyName(info.name);
       } catch { /* ignore */ }
