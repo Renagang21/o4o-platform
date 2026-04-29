@@ -55,6 +55,13 @@ const SOURCE_CONFIG: Record<string, { text: string; cls: string }> = {
   external: { text: '외부 링크', cls: 'bg-purple-50 text-purple-600' },
 };
 
+const USAGE_CONFIG: Record<string, { text: string; cls: string }> = {
+  READ:     { text: '📄 읽기',      cls: 'bg-slate-100 text-slate-600' },
+  LINK:     { text: '🔗 링크',      cls: 'bg-blue-50 text-blue-600' },
+  DOWNLOAD: { text: '⬇ 다운로드',  cls: 'bg-green-50 text-green-600' },
+  COPY:     { text: '📋 복사',      cls: 'bg-amber-50 text-amber-600' },
+};
+
 // ─── Action Policy ───
 
 const resourceActionPolicy = defineActionPolicy<ResourceItem>('kpa:resources', {
@@ -121,6 +128,7 @@ export default function OperatorResourcesPage() {
   const [search, setSearch] = useState('');
   const [sourceTypeFilter, setSourceTypeFilter] = useState<'' | 'manual' | 'upload' | 'external'>('');
   const [statusFilter, setStatusFilter] = useState<'' | 'draft' | 'published' | 'private'>('');
+  const [usageTypeFilter, setUsageTypeFilter] = useState<'' | 'READ' | 'LINK' | 'DOWNLOAD' | 'COPY'>('');
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 20;
   // WO-KPA-OPERATOR-RESOURCES-TABLE-STANDARD-COMPLIANCE-V1: 선택 상태
@@ -137,6 +145,7 @@ export default function OperatorResourcesPage() {
         search: search || undefined,
         source_type: sourceTypeFilter || undefined,
         status: statusFilter || undefined,
+        usage_type: usageTypeFilter || undefined,
       });
       const d = res.data;
       setItems(d?.items || []);
@@ -146,7 +155,7 @@ export default function OperatorResourcesPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, sourceTypeFilter, statusFilter]);
+  }, [page, search, sourceTypeFilter, statusFilter, usageTypeFilter]);
 
   useEffect(() => {
     fetchItems();
@@ -265,6 +274,20 @@ export default function OperatorResourcesPage() {
       align: 'center',
       render: (v) => {
         const cfg = SOURCE_CONFIG[v as string] || { text: v as string, cls: 'bg-slate-100 text-slate-500' };
+        return (
+          <span className={`px-2 py-0.5 rounded text-xs font-medium ${cfg.cls}`}>
+            {cfg.text}
+          </span>
+        );
+      },
+    },
+    {
+      key: 'usage_type',
+      header: '활용방식',
+      width: '110px',
+      align: 'center',
+      render: (v) => {
+        const cfg = USAGE_CONFIG[v as string] || { text: (v as string) || '-', cls: 'bg-slate-100 text-slate-500' };
         return (
           <span className={`px-2 py-0.5 rounded text-xs font-medium ${cfg.cls}`}>
             {cfg.text}
@@ -445,10 +468,24 @@ export default function OperatorResourcesPage() {
           <option value="draft">초안</option>
           <option value="private">숨김</option>
         </select>
+        <select
+          value={usageTypeFilter}
+          onChange={(e) => {
+            setUsageTypeFilter(e.target.value as typeof usageTypeFilter);
+            setPage(1);
+          }}
+          style={selectStyle}
+        >
+          <option value="">전체 활용방식</option>
+          <option value="READ">📄 읽기</option>
+          <option value="LINK">🔗 링크</option>
+          <option value="DOWNLOAD">⬇ 다운로드</option>
+          <option value="COPY">📋 복사</option>
+        </select>
         <button type="submit" style={searchBtnStyle}>
           검색
         </button>
-        {(search || sourceTypeFilter || statusFilter) && (
+        {(search || sourceTypeFilter || statusFilter || usageTypeFilter) && (
           <button
             type="button"
             onClick={() => {
@@ -456,6 +493,7 @@ export default function OperatorResourcesPage() {
               setSearchInput('');
               setSourceTypeFilter('');
               setStatusFilter('');
+              setUsageTypeFilter('');
               setPage(1);
             }}
             style={clearBtnStyle}

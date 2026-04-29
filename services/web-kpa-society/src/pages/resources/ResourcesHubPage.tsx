@@ -83,8 +83,16 @@ function useKpaResourcesConfig(isOperator: boolean): ResourcesHubConfig {
     fetchItems: async ({ page, limit, search }) => {
       const res = await resourcesApi.list({ page, limit, search, sort: 'latest' });
       const d = res.data;
+      // WO-O4O-KPA-RESOURCES-USAGE-TYPE-V1: usage_type → actionType 매핑
+      const items = (d.items || []).map((item) => {
+        let actionType: 'view' | 'download' | 'external' | undefined;
+        if (item.usage_type === 'LINK') actionType = 'external';
+        else if (item.usage_type === 'DOWNLOAD') actionType = 'download';
+        else actionType = 'view'; // READ / COPY / undefined → drawer 읽기
+        return { ...item, actionType } as ResourcesHubItem;
+      });
       return {
-        items: (d.items || []) as ResourcesHubItem[],
+        items,
         total: d.total || 0,
         totalPages: d.totalPages || 1,
       };

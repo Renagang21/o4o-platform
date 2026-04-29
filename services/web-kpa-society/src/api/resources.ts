@@ -19,6 +19,7 @@ export interface ResourceItem {
   category: string | null;
   thumbnail_url: string | null;
   source_type: string;
+  usage_type?: string | null;
   source_url: string | null;
   source_file_name: string | null;
   status: string;
@@ -77,6 +78,7 @@ export const resourcesApi = {
     source_url?: string;
     source_file_name?: string;
     status?: 'draft' | 'published';
+    usage_type?: 'READ' | 'LINK' | 'DOWNLOAD' | 'COPY';
   }) =>
     apiClient.post<ApiResponse<ResourceItem>>('/contents', data),
 
@@ -89,6 +91,7 @@ export const resourcesApi = {
     source_url?: string;
     source_file_name?: string;
     status?: string;
+    usage_type?: 'READ' | 'LINK' | 'DOWNLOAD' | 'COPY';
   }) =>
     apiClient.patch<ApiResponse<ResourceItem>>(`/contents/${id}`, data),
 
@@ -99,6 +102,7 @@ export const resourcesApi = {
     search?: string;
     source_type?: 'manual' | 'upload' | 'external';
     status?: 'draft' | 'published' | 'private';
+    usage_type?: 'READ' | 'LINK' | 'DOWNLOAD' | 'COPY';
   }) =>
     apiClient.get<ResourceListResponse>('/operator/resources', params),
 

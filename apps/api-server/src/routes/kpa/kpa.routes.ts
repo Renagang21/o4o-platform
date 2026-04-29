@@ -1062,7 +1062,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         dataSource.query(`SELECT COUNT(*)::int as total FROM kpa_contents c ${where}`, params),
         dataSource.query(
           `SELECT c.id, c.title, c.summary, c.category, c.tags, c.status,
-                  c.source_type, c.thumbnail_url, c.created_by, c.created_at, c.updated_at,
+                  c.source_type, c.usage_type, c.thumbnail_url, c.created_by, c.created_at, c.updated_at,
                   c.content_type, c.sub_type, c.like_count, c.view_count, c.author_name
            FROM kpa_contents c ${where}
            ORDER BY ${orderBy}
@@ -1097,7 +1097,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     contentRouter.post('/', authenticate, asyncHandler(async (req: Request, res: Response) => {
       const user = (req as any).user;
       const userId = user?.id;
-      const { title, summary, blocks, tags, category, thumbnail_url, source_type, source_url, source_file_name, status: reqStatus, body, content_type, sub_type } = req.body;
+      const { title, summary, blocks, tags, category, thumbnail_url, source_type, source_url, source_file_name, status: reqStatus, body, content_type, sub_type, usage_type: reqUsageType } = req.body;
 
       if (!title?.trim()) {
         res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'title은 필수입니다' } });
@@ -1123,9 +1123,28 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       const validContentTypes = ['participation', 'information'];
       const cType = validContentTypes.includes(content_type) ? content_type : 'information';
 
+      // WO-O4O-KPA-RESOURCES-USAGE-TYPE-V1: usage_type 결정
+      const VALID_USAGE_TYPES = ['READ', 'LINK', 'DOWNLOAD', 'COPY'];
+      const derivedUsageType = (() => {
+        if (reqUsageType && VALID_USAGE_TYPES.includes(reqUsageType)) return reqUsageType;
+        if (source_type === 'external') return 'LINK';
+        if (source_type === 'upload') return 'DOWNLOAD';
+        return 'READ';
+      })();
+
+      // 보정 1: COPY 타입은 blocks 또는 body 중 최소 1개 필수
+      if (derivedUsageType === 'COPY') {
+        const hasBlocks = Array.isArray(blocks) && blocks.length > 0;
+        const hasBody = typeof body === 'string' && body.trim().length > 0;
+        if (!hasBlocks && !hasBody) {
+          res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'COPY 타입은 본문(blocks 또는 body)이 필요합니다' } });
+          return;
+        }
+      }
+
       const [saved] = await dataSource.query(
-        `INSERT INTO kpa_contents (title, summary, blocks, tags, category, thumbnail_url, source_type, source_url, source_file_name, status, created_by, body, content_type, sub_type, author_name)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
+        `INSERT INTO kpa_contents (title, summary, blocks, tags, category, thumbnail_url, source_type, source_url, source_file_name, status, created_by, body, content_type, sub_type, author_name, usage_type)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
          RETURNING *`,
         [
           title.trim(),
@@ -1143,6 +1162,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
           cType,
           sub_type || null,
           user?.name || null,
+          derivedUsageType,
         ]
       );
       await writeAuditLog(user, 'CONTENT_CREATED', 'kpa_content', saved.id, { title: saved.title });
@@ -1209,7 +1229,19 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         return;
       }
 
-      const { title, summary, blocks, tags, category, thumbnail_url, source_type, source_url, source_file_name, status: reqStatus, body, content_type, sub_type } = req.body;
+      const { title, summary, blocks, tags, category, thumbnail_url, source_type, source_url, source_file_name, status: reqStatus, body, content_type, sub_type, usage_type: reqUsageType } = req.body;
+
+      // WO-O4O-KPA-RESOURCES-USAGE-TYPE-V1: COPY 보정 — 수정 시에도 blocks/body 필수
+      if (reqUsageType === 'COPY') {
+        const newBlocks = blocks !== undefined ? blocks : existing.blocks;
+        const newBody = body !== undefined ? body : existing.body;
+        const hasBlocks = Array.isArray(newBlocks) && newBlocks.length > 0;
+        const hasBody = typeof newBody === 'string' && newBody.trim().length > 0;
+        if (!hasBlocks && !hasBody) {
+          res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'COPY 타입은 본문(blocks 또는 body)이 필요합니다' } });
+          return;
+        }
+      }
 
       const sets: string[] = [`updated_at = NOW()`];
       const params: any[] = [];
@@ -1250,6 +1282,11 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         params.push(validTypes.includes(content_type) ? content_type : existing.content_type);
       }
       if (sub_type !== undefined) { sets.push(`sub_type = $${idx++}`); params.push(sub_type || null); }
+      if (reqUsageType !== undefined) {
+        const VALID_USAGE_TYPES = ['READ', 'LINK', 'DOWNLOAD', 'COPY'];
+        sets.push(`usage_type = $${idx++}`);
+        params.push(VALID_USAGE_TYPES.includes(reqUsageType) ? reqUsageType : existing.usage_type);
+      }
 
       params.push(existing.id);
       const [updated] = await dataSource.query(
@@ -1500,6 +1537,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
           search,
           source_type: sourceTypeFilter,
           status: statusFilter,
+          usage_type: usageTypeFilter,
         } = req.query;
         const pageNum = Math.max(1, Number(page));
         const limitNum = Math.min(100, Math.max(1, Number(limit)));
@@ -1517,6 +1555,10 @@ export function createKpaRoutes(dataSource: DataSource): Router {
           conditions.push(`c.status = $${idx++}`);
           params.push(statusFilter);
         }
+        if (usageTypeFilter) {
+          conditions.push(`c.usage_type = $${idx++}`);
+          params.push(usageTypeFilter);
+        }
         if (search) {
           conditions.push(
             `(c.title ILIKE $${idx} OR c.summary ILIKE $${idx} OR c.tags::text ILIKE $${idx})`,
@@ -1533,7 +1575,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
           ),
           dataSource.query(
             `SELECT c.id, c.title, c.summary, c.tags, c.category, c.status,
-                    c.source_type, c.source_url, c.source_file_name,
+                    c.source_type, c.usage_type, c.source_url, c.source_file_name,
                     c.thumbnail_url, c.created_by, c.author_name,
                     c.view_count, c.like_count, c.created_at, c.updated_at
              FROM kpa_contents c ${where}

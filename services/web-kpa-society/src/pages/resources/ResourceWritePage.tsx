@@ -21,6 +21,21 @@ import { toast } from '@o4o/error-handling';
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type WriteMode = 'file' | 'editor';
+type UsageType = 'READ' | 'LINK' | 'DOWNLOAD' | 'COPY';
+
+// source_type → 기본 usage_type 파생
+function deriveUsageType(sourceType: 'upload' | 'external' | 'manual'): UsageType {
+  if (sourceType === 'external') return 'LINK';
+  if (sourceType === 'upload') return 'DOWNLOAD';
+  return 'READ';
+}
+
+const USAGE_TYPE_OPTIONS: { value: UsageType; label: string; desc: string }[] = [
+  { value: 'READ',     label: '📄 읽기',       desc: '화면에서 내용을 읽는 자료' },
+  { value: 'LINK',     label: '🔗 링크 열기',  desc: '외부 웹페이지로 이동하는 자료' },
+  { value: 'DOWNLOAD', label: '⬇ 다운로드',   desc: '파일을 저장해서 사용하는 자료' },
+  { value: 'COPY',     label: '📋 내용 복사',  desc: '내용을 복사해서 활용하는 자료' },
+];
 
 interface UploadedFile {
   url: string;
@@ -47,6 +62,9 @@ export function ResourceWritePage() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<UploadedFile | null>(null);
+  // WO-O4O-KPA-RESOURCES-USAGE-TYPE-V1: usage_type + 자동동기화 플래그
+  const [usageType, setUsageType] = useState<UsageType>('DOWNLOAD'); // file 모드 기본
+  const [autoSyncUsageType, setAutoSyncUsageType] = useState(true);
 
   // ── Auth guard ──
   useEffect(() => {
@@ -86,6 +104,11 @@ export function ResourceWritePage() {
             }
           } else {
             setMode('editor');
+          }
+          // 수정 모드: 저장된 usage_type 복원 (autoSync 비활성)
+          if (item.usage_type && ['READ','LINK','DOWNLOAD','COPY'].includes(item.usage_type)) {
+            setUsageType(item.usage_type as UsageType);
+            setAutoSyncUsageType(false);
           }
         }
       })
@@ -151,6 +174,7 @@ export function ResourceWritePage() {
             source_url: uploadedFile!.url,
             source_file_name: uploadedFile!.fileName,
             status: saveStatus,
+            usage_type: usageType,
           }
         : {
             title: title.trim(),
@@ -159,6 +183,7 @@ export function ResourceWritePage() {
             tags: tagArr.length > 0 ? tagArr : undefined,
             source_type: 'manual' as const,
             status: saveStatus,
+            usage_type: usageType,
           };
 
       if (isEditMode && id) {
@@ -217,7 +242,10 @@ export function ResourceWritePage() {
         {!isEditMode && (
           <div style={styles.modeTabs}>
             <button
-              onClick={() => setMode('file')}
+              onClick={() => {
+                setMode('file');
+                if (autoSyncUsageType) setUsageType('DOWNLOAD');
+              }}
               style={{
                 ...styles.modeTab,
                 ...(mode === 'file' ? styles.modeTabActive : {}),
@@ -226,7 +254,10 @@ export function ResourceWritePage() {
               파일 등록
             </button>
             <button
-              onClick={() => setMode('editor')}
+              onClick={() => {
+                setMode('editor');
+                if (autoSyncUsageType) setUsageType('READ');
+              }}
               style={{
                 ...styles.modeTab,
                 ...(mode === 'editor' ? styles.modeTabActive : {}),
@@ -314,6 +345,46 @@ export function ResourceWritePage() {
             />
           </div>
         )}
+
+        {/* Usage Type — WO-O4O-KPA-RESOURCES-USAGE-TYPE-V1 */}
+        <div style={styles.field}>
+          <label style={styles.label}>자료 활용 방식</label>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' as const }}>
+            {USAGE_TYPE_OPTIONS.map((opt) => (
+              <label
+                key={opt.value}
+                title={opt.desc}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '8px 14px',
+                  border: `1px solid ${usageType === opt.value ? '#2563eb' : '#e2e8f0'}`,
+                  borderRadius: 8,
+                  backgroundColor: usageType === opt.value ? '#eff6ff' : '#fff',
+                  cursor: 'pointer',
+                  fontSize: '0.8125rem',
+                  fontWeight: usageType === opt.value ? 600 : 400,
+                  color: usageType === opt.value ? '#1d4ed8' : '#475569',
+                  transition: 'all 0.15s',
+                }}
+              >
+                <input
+                  type="radio"
+                  name="usage_type"
+                  value={opt.value}
+                  checked={usageType === opt.value}
+                  onChange={() => {
+                    setUsageType(opt.value);
+                    setAutoSyncUsageType(false); // 수동 선택 → autoSync 비활성
+                  }}
+                  style={{ display: 'none' }}
+                />
+                {opt.label}
+              </label>
+            ))}
+          </div>
+        </div>
 
         {/* Tags */}
         <div style={styles.field}>

@@ -72,6 +72,13 @@ export class KpaContent {
   source_file_name: string | null;
 
   /**
+   * 활용 방식: READ | LINK | DOWNLOAD | COPY
+   * WO-O4O-KPA-RESOURCES-USAGE-TYPE-V1
+   */
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  usage_type: string | null;
+
+  /**
    * draft | ready
    */
   @Column({ type: 'varchar', length: 20, default: 'draft' })
