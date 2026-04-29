@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { Layout, DemoLayout } from './components';
+import { LoadingSpinner } from './components/common/LoadingSpinner';
 import { AuthProvider, OrganizationProvider } from './contexts';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
 import { ServiceProvider } from './contexts/ServiceContext';
@@ -21,8 +22,12 @@ import { ForumHomePage, ForumListPage, ForumDetailPage, ForumWritePage } from '.
 // 실행은 Neture 단독. KPA는 entry → Neture redirect 만 유지.
 import { MarketTrialNetureRedirect } from './components/MarketTrialNetureRedirect';
 
-// LMS pages
-import { EducationPage, LmsCoursesPage, LmsCourseDetailPage, LmsLessonPage, LmsCertificatesPage } from './pages/lms';
+// LMS pages — WO-KPA-SOCIETY-APP-ROUTE-CODE-SPLITTING-V1: lazy (barrel unwound)
+const EducationPage = lazy(() => import('./pages/lms/EducationPage').then(m => ({ default: m.EducationPage })));
+const LmsCoursesPage = lazy(() => import('./pages/lms/LmsCoursesPage').then(m => ({ default: m.LmsCoursesPage })));
+const LmsCourseDetailPage = lazy(() => import('./pages/lms/LmsCourseDetailPage').then(m => ({ default: m.LmsCourseDetailPage })));
+const LmsLessonPage = lazy(() => import('./pages/lms/LmsLessonPage').then(m => ({ default: m.LmsLessonPage })));
+const LmsCertificatesPage = lazy(() => import('./pages/lms/LmsCertificatesPage').then(m => ({ default: m.LmsCertificatesPage })));
 // Certificate Verification (WO-O4O-LMS-CERTIFICATE-VERIFICATION-V1) — public, no auth
 import CertificateVerifyPage from './pages/lms/CertificateVerifyPage';
 
@@ -31,16 +36,13 @@ import { CourseHubPage, CourseIntroPage } from './pages/courses';
 
 // Instructor pages - WO-CONTENT-INSTRUCTOR-PUBLIC-PROFILE-V1
 import { InstructorProfilePage } from './pages/instructors/InstructorProfilePage';
-// Instructor Dashboard - WO-O4O-INSTRUCTOR-DASHBOARD-V1
-import InstructorDashboardPage from './pages/instructor/InstructorDashboardPage';
-// LMS Instructor pages - WO-O4O-LMS-FOUNDATION-V1
-import CourseListPage from './pages/instructor/courses/CourseListPage';
-import CourseNewPage from './pages/instructor/courses/CourseNewPage';
-import CourseEditPage from './pages/instructor/courses/CourseEditPage';
-// Instructor Course Dashboard - WO-O4O-LMS-INSTRUCTOR-DASHBOARD-MVP-V1
-import InstructorCourseDashboardPage from './pages/instructor/InstructorCourseDashboardPage';
-// Content Participants Page - WO-O4O-MARKETING-CONTENT-OPERATIONS-MVP-V1
-import ContentParticipantsPage from './pages/instructor/ContentParticipantsPage';
+// Instructor pages — WO-KPA-SOCIETY-APP-ROUTE-CODE-SPLITTING-V1: lazy
+const InstructorDashboardPage = lazy(() => import('./pages/instructor/InstructorDashboardPage'));
+const CourseListPage = lazy(() => import('./pages/instructor/courses/CourseListPage'));
+const CourseNewPage = lazy(() => import('./pages/instructor/courses/CourseNewPage'));
+const CourseEditPage = lazy(() => import('./pages/instructor/courses/CourseEditPage'));
+const InstructorCourseDashboardPage = lazy(() => import('./pages/instructor/InstructorCourseDashboardPage'));
+const ContentParticipantsPage = lazy(() => import('./pages/instructor/ContentParticipantsPage'));
 
 // Events pages (WO-KPA-COMMUNITY-HOME-V1)
 import { EventsHomePage } from './pages/events/EventsHomePage';
@@ -62,12 +64,12 @@ import { SupplierEventOfferPage } from './pages/supplier/SupplierEventOfferPage'
 // News pages
 import { NewsListPage, NewsDetailPage, GalleryPage } from './pages/news';
 
-// Signage pages
-import ContentHubPage from './pages/signage/ContentHubPage';
-import PlaylistEditorPage from './pages/signage/PlaylistEditorPage';
-import PlaylistDetailPage from './pages/signage/PlaylistDetailPage';
-import MediaDetailPage from './pages/signage/MediaDetailPage';
-import PublicSignagePage from './pages/signage/PublicSignagePage';
+// Signage pages — WO-KPA-SOCIETY-APP-ROUTE-CODE-SPLITTING-V1: lazy
+const ContentHubPage = lazy(() => import('./pages/signage/ContentHubPage'));
+const PlaylistEditorPage = lazy(() => import('./pages/signage/PlaylistEditorPage'));
+const PlaylistDetailPage = lazy(() => import('./pages/signage/PlaylistDetailPage'));
+const MediaDetailPage = lazy(() => import('./pages/signage/MediaDetailPage'));
+const PublicSignagePage = lazy(() => import('./pages/signage/PublicSignagePage'));
 
 // Legal pages (WO-KPA-LEGAL-PAGES-V1)
 import { PolicyPage, PrivacyPage } from './pages/legal';
@@ -75,11 +77,11 @@ import { PolicyPage, PrivacyPage } from './pages/legal';
 // MyPage pages
 import { MyDashboardPage, MyProfilePage, MySettingsPage, MyCertificatesPage, PersonalStatusReportPage, AnnualReportFormPage, MyForumDashboardPage, RequestCategoryPage as KpaRequestCategoryPage, MyRequestsPage, ForumMemberManagementPage, MyQualificationsPage, MyEnrollmentsPage, MyCreditsPage } from './pages/mypage';
 
-// Admin Routes (지부 관리자)
-import { AdminRoutes } from './routes/AdminRoutes';
+// Admin Routes (지부 관리자) — WO-KPA-SOCIETY-APP-ROUTE-CODE-SPLITTING-V1: lazy
+const AdminRoutes = lazy(() => import('./routes/AdminRoutes').then(m => ({ default: m.AdminRoutes })));
 
-// Operator Routes (서비스 운영자)
-import { OperatorRoutes } from './routes/OperatorRoutes';
+// Operator Routes (서비스 운영자) — WO-KPA-SOCIETY-APP-ROUTE-CODE-SPLITTING-V1: lazy
+const OperatorRoutes = lazy(() => import('./routes/OperatorRoutes').then(m => ({ default: m.OperatorRoutes })));
 // Resources Hub (공동자료실 진입 허브 — WO-KPA-RESOURCE-SYSTEM-RESET-V1)
 import { ResourcesHubPage } from './pages/resources/ResourcesHubPage';
 import { ResourceWritePage } from './pages/resources/ResourceWritePage';
@@ -311,6 +313,15 @@ function KpaRedirect({ to, suffix }: { to: string; suffix?: string }) {
   return <Navigate to={target} replace />;
 }
 
+// WO-KPA-SOCIETY-APP-ROUTE-CODE-SPLITTING-V1: lazy fallback
+function PageLoader() {
+  return (
+    <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <LoadingSpinner size="large" />
+    </div>
+  );
+}
+
 function App() {
   return (
     <O4OErrorBoundary>
@@ -324,6 +335,7 @@ function App() {
         {/* 전역 인증 모달 (WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1, WO-O4O-AUTH-MODAL-REGISTER-STANDARD-V1) */}
         <LoginModal />
         <RegisterModal />
+        <Suspense fallback={<PageLoader />}>
         <Routes>
           {/* =========================================================
            * SVC-A: 커뮤니티 서비스 (Community Service)
@@ -778,6 +790,7 @@ function App() {
           {/* 404 - 알 수 없는 경로 */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
+        </Suspense>
         </ServiceProvider>
       </BrowserRouter>
       </OrganizationProvider>
