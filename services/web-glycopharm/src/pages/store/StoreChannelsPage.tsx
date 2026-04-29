@@ -55,6 +55,7 @@ import {
   type ChannelProduct,
   type AvailableProduct,
 } from '@/api/channelProducts';
+import { GuideEditableSection } from '@/components/guide';
 
 /* ─── Constants ──────────────────────────────── */
 
@@ -449,7 +450,13 @@ export function StoreChannelsPage() {
             <Link to="/store/hub" className="text-blue-600 hover:underline">&larr; 대시보드</Link>
           </div>
           <h1 className="text-2xl font-bold text-slate-900">채널 관리</h1>
-          <p className="text-sm text-slate-500 mt-1">각 채널의 제품 진열과 콘텐츠 노출을 관리합니다</p>
+          <p className="text-sm text-slate-500 mt-1">
+            <GuideEditableSection
+              pageKey="store/channels"
+              sectionKey="hero-description"
+              defaultContent="각 채널의 제품 진열과 콘텐츠 노출을 관리합니다"
+            />
+          </p>
         </div>
         <div className="flex items-center gap-3">
           {lastFetched && (

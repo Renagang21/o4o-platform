@@ -15,6 +15,7 @@ import {
   updateInterestAction,
   type StaffInterestRequest,
 } from '../../api/tabletInterest';
+import { GuideEditableSection } from '../../components/guide';
 
 function formatElapsed(createdAt: string): string {
   const diff = Math.floor((Date.now() - new Date(createdAt).getTime()) / 1000);
@@ -70,7 +71,11 @@ export default function InterestRequestsPage() {
       <div style={{ marginBottom: '24px' }}>
         <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#1e293b' }}>관심 요청 관리</h1>
         <p style={{ fontSize: '14px', color: '#64748b', marginTop: '4px' }}>
-          매장 태블릿에서 접수된 관심 요청을 관리합니다.
+          <GuideEditableSection
+            pageKey="store/requests"
+            sectionKey="hero-description"
+            defaultContent="매장 태블릿에서 접수된 관심 요청을 관리합니다."
+          />
         </p>
       </div>
 
@@ -88,7 +93,11 @@ export default function InterestRequestsPage() {
         <div style={{ textAlign: 'center', padding: '48px 0' }}>
           <div style={{ fontSize: '40px', marginBottom: '12px' }}>💡</div>
           <p style={{ color: '#94a3b8', fontSize: '15px' }}>
-            현재 대기 중인 관심 요청이 없습니다
+            <GuideEditableSection
+              pageKey="store/requests"
+              sectionKey="empty-description"
+              defaultContent="현재 대기 중인 관심 요청이 없습니다"
+            />
           </p>
         </div>
       ) : (

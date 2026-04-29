@@ -40,6 +40,7 @@ import {
   updateInterestAction,
   type StaffInterestRequest,
 } from '@/api/tabletInterest';
+import { GuideEditableSection } from '@/components/guide';
 
 /** 요청 목적 */
 type CustomerRequestPurpose =
@@ -336,7 +337,13 @@ export default function CustomerRequestsPage() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h1 className="text-2xl font-bold text-slate-800">관심 요청</h1>
-              <p className="text-slate-500 mt-1">태블릿에서 접수된 상품 관심 요청을 관리합니다.</p>
+              <p className="text-slate-500 mt-1">
+                <GuideEditableSection
+                  pageKey="store/requests"
+                  sectionKey="hero-description"
+                  defaultContent="태블릿에서 접수된 상품 관심 요청을 관리합니다."
+                />
+              </p>
             </div>
           </div>
 
@@ -353,7 +360,13 @@ export default function CustomerRequestsPage() {
           ) : interestRequests.length === 0 ? (
             <div className="bg-white rounded-xl shadow-sm p-12 text-center">
               <AlertCircle className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-              <p className="text-slate-400">현재 대기 중인 관심 요청이 없습니다</p>
+              <p className="text-slate-400">
+                <GuideEditableSection
+                  pageKey="store/requests"
+                  sectionKey="empty-description"
+                  defaultContent="현재 대기 중인 관심 요청이 없습니다"
+                />
+              </p>
             </div>
           ) : (
             <div className="space-y-3">

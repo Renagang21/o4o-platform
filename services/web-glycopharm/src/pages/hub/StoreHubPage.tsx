@@ -10,8 +10,18 @@
 
 import { StoreHubTemplate, type StoreHubConfig } from '@o4o/shared-space-ui';
 import { glycopharmConfig } from '@o4o/operator-ux-core';
+import { GuideEditableSection } from '../../components/guide';
 
 const { terminology, uiText } = glycopharmConfig;
+
+// WO-O4O-SERVICE-INLINE-EDIT-PORT-GK-V1: 서비스 페이지 설명 영역 인라인 편집
+const PAGE_KEY = 'store-hub';
+
+function editable(sectionKey: string, defaultText: string) {
+  return (
+    <GuideEditableSection pageKey={PAGE_KEY} sectionKey={sectionKey} defaultContent={defaultText} />
+  );
+}
 
 // ─── GlycoPharm Config ────────────────────────────────────────────────────────
 
@@ -19,14 +29,14 @@ const glycoStoreHubConfig: StoreHubConfig = {
   serviceKey: 'glycopharm',
 
   heroTitle: terminology.storeHubLabel,
-  heroDesc: `혈당관리 전문 플랫폼이 제공하는 상품·콘텐츠·사이니지를 탐색하고, ${terminology.myStoreLabel}으로 가져가 운영에 활용합니다.`,
+  heroDesc: editable('hero-description', `혈당관리 전문 플랫폼이 제공하는 상품·콘텐츠·사이니지를 탐색하고, ${terminology.myStoreLabel}으로 가져가 운영에 활용합니다.`),
   storeCta: {
     label: `${terminology.myStoreLabel} 관리 →`,
     href: '/store',
   },
 
   resourceSectionTitle: '자원 탐색',
-  resourceSectionDesc: `플랫폼 자원을 탐색하고 ${terminology.myStoreLabel}으로 가져가세요`,
+  resourceSectionDesc: editable('resource-section-description', `플랫폼 자원을 탐색하고 ${terminology.myStoreLabel}으로 가져가세요`),
   resourceCards: [
     {
       icon: '🛒',
