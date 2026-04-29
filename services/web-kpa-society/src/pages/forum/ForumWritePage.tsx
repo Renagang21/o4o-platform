@@ -16,7 +16,7 @@ import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 
 export function ForumWritePage() {
-  const { id } = useParams<{ id?: string }>();
+  const { id, slug: forumSlug } = useParams<{ id?: string; slug?: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
   const isEdit = !!id;
@@ -50,13 +50,21 @@ export function ForumWritePage() {
     try {
       setSubmitting(true);
       const blocks = htmlToBlocks(editorHtml);
-      const submitData = { title, content: blocks };
+      // WO-O4O-FORUM-MULTI-STRUCTURE-RECONSTRUCTION-V1: forumSlug 전달 → 백엔드에서 forum_id 매핑
+      const submitData = forumSlug
+        ? { title, content: blocks, forumSlug }
+        : { title, content: blocks };
       if (isEdit && id) {
         await forumApi.updatePost(id, submitData);
         navigate(`/forum/post/${id}`);
       } else {
         const res = await forumApi.createPost(submitData);
-        navigate(`/forum/post/${res.data.id}`);
+        // 글이 속한 포럼 피드로 이동 (forum slug 있으면 포럼 피드, 없으면 게시글 상세)
+        if (forumSlug) {
+          navigate(`/forum/${forumSlug}`);
+        } else {
+          navigate(`/forum/post/${res.data.id}`);
+        }
       }
     } catch {
       toast.error('저장에 실패했습니다.');

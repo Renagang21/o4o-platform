@@ -82,6 +82,12 @@ export class ForumPost {
   @Column({ type: 'uuid', nullable: true })
   categoryId?: string | null;
 
+  // WO-O4O-FORUM-MULTI-STRUCTURE-RECONSTRUCTION-V1
+  // 멀티 포럼 구조에서 forum_category_requests.id 참조. 카테고리 폐기 후 게시글이 속한
+  // 포럼을 식별하는 SSOT. 기존 categoryId는 점진적 제거 예정.
+  @Column({ name: 'forum_id', type: 'uuid', nullable: true })
+  forumId?: string | null;
+
   @Column({ name: 'author_id', type: 'uuid', nullable: true })
   authorId?: string | null;
 

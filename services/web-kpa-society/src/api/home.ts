@@ -112,6 +112,16 @@ export const homeApi = {
   getForumHub: (params?: { sort?: string; q?: string }) =>
     apiClient.get<ForumHubResponse>('/home/forum-hub', params),
 
+  // WO-O4O-FORUM-MULTI-STRUCTURE-RECONSTRUCTION-V1: 포럼 단건 + 게시글 목록
+  getForumDetail: (slug: string, params?: { limit?: number; offset?: number }) =>
+    apiClient.get<{
+      success: boolean;
+      data: {
+        forum: { id: string; name: string; slug: string; description: string; iconEmoji: string | null; forumType: string | null; tags: string[] | null; organizationId: string | null };
+        posts: Array<{ id: string; title: string; slug: string; excerpt: string; tags: string[] | null; createdAt: string; viewCount: number; likeCount: number; commentCount: number; authorId: string | null; authorName: string | null }>;
+      };
+    }>(`/home/forum/${encodeURIComponent(slug)}/posts`, params),
+
   getForumActivity: (params?: { sort?: string; limit?: number }) =>
     apiClient.get<ForumActivityResponse>('/home/forum-activity', params),
 

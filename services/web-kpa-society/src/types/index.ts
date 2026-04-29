@@ -126,6 +126,9 @@ export interface ForumActivityCategory {
 export interface CreatePostRequest {
   title: string;
   content: string | any[]; // Block[] or string for backward compatibility
+  // WO-O4O-FORUM-MULTI-STRUCTURE-RECONSTRUCTION-V1: 멀티 포럼 — slug로 forum_id 매핑
+  forumSlug?: string;
+  forumId?: string;
 }
 
 // LMS

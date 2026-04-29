@@ -225,7 +225,7 @@ export class ForumPostController extends ForumControllerBase {
         return;
       }
 
-      const { title, content, excerpt, type, tags, isPinned, allowComments, metadata, showContactOnPost } = req.body;
+      const { title, content, excerpt, type, tags, isPinned, allowComments, metadata, showContactOnPost, forumSlug, forumId: forumIdFromBody } = req.body;
 
       // Generate slug from title
       const slug = this.generateSlug(title);
@@ -242,11 +242,26 @@ export class ForumPostController extends ForumControllerBase {
       // Auto-set organizationId from forum context
       const ctx = this.getForumContext(req);
 
+      // WO-O4O-FORUM-MULTI-STRUCTURE-RECONSTRUCTION-V1: forum_id resolution
+      // 1) request body forumId 직접 지정 우선
+      // 2) 없으면 forumSlug → forum_category_requests.id 조회
+      let resolvedForumId: string | null = null;
+      if (forumIdFromBody && typeof forumIdFromBody === 'string') {
+        resolvedForumId = forumIdFromBody;
+      } else if (forumSlug && typeof forumSlug === 'string') {
+        const rows = await this.postRepository.manager.query(
+          `SELECT id FROM forum_category_requests WHERE slug = $1 AND status = 'completed' LIMIT 1`,
+          [forumSlug],
+        );
+        resolvedForumId = rows[0]?.id ?? null;
+      }
+
       const post = this.postRepository.create({
         title,
         content: normalizedContent,
         excerpt: postExcerpt,
         categoryId: null,
+        ...(resolvedForumId ? { forumId: resolvedForumId } : {}),
         type,
         tags: tags ? [...new Set<string>(tags.map((t: string) => String(t).trim().replace(/^#/, '')).filter(Boolean).filter((t: string) => t.length <= 30))] : undefined,
         isPinned,

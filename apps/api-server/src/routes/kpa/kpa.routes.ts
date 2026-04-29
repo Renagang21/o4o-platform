@@ -606,7 +606,8 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     res.json({ success: true, data });
   }));
 
-  // GET /home/forum-hub - 포럼 카테고리 허브 요약 (APP-FORUM Phase 2+4: ForumQueryService)
+  // GET /home/forum-hub - 포럼 허브 요약 (멀티 포럼 — forum_category_requests 기반)
+  // WO-O4O-FORUM-MULTI-STRUCTURE-RECONSTRUCTION-V1
   // ?sort=default|recent|popular|joined  ?q=검색어
   homeRouter.get('/forum-hub', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
     const sort = (req.query.sort as string) || 'default';
@@ -614,6 +615,41 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     const userId = sort === 'joined' ? (req as any).user?.id : undefined;
     const data = await forumService.listForumHub({ sort, keyword, userId });
     res.json({ success: true, data });
+  }));
+
+  // GET /home/forum/:slug - 포럼 단건 조회 (멀티 포럼)
+  // WO-O4O-FORUM-MULTI-STRUCTURE-RECONSTRUCTION-V1
+  homeRouter.get('/forum/:slug', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
+    const slug = String(req.params.slug || '').trim();
+    if (!slug) {
+      res.status(400).json({ success: false, error: 'INVALID_SLUG' });
+      return;
+    }
+    const forum = await forumService.getForumBySlug(slug);
+    if (!forum) {
+      res.status(404).json({ success: false, error: 'FORUM_NOT_FOUND' });
+      return;
+    }
+    res.json({ success: true, data: forum });
+  }));
+
+  // GET /home/forum/:slug/posts - 포럼의 게시글 목록 (멀티 포럼)
+  // WO-O4O-FORUM-MULTI-STRUCTURE-RECONSTRUCTION-V1
+  homeRouter.get('/forum/:slug/posts', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
+    const slug = String(req.params.slug || '').trim();
+    const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
+    const offset = Math.max(parseInt(req.query.offset as string) || 0, 0);
+    if (!slug) {
+      res.status(400).json({ success: false, error: 'INVALID_SLUG' });
+      return;
+    }
+    const forum = await forumService.getForumBySlug(slug);
+    if (!forum) {
+      res.status(404).json({ success: false, error: 'FORUM_NOT_FOUND' });
+      return;
+    }
+    const posts = await forumService.listForumPosts(forum.id, { limit, offset });
+    res.json({ success: true, data: { forum, posts } });
   }));
 
   // GET /home/forum-activity - 포럼 카테고리별 최근 활동 (APP-FORUM Phase 3: ForumQueryService)

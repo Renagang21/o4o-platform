@@ -52,166 +52,162 @@ export class ForumQueryService {
   }
 
   /**
-   * 포럼 허브 — 카테고리별 요약 (멤버 수, 최근 활동, 최근 글 제목)
-   * Phase 2: sort(default|recent|popular) + keyword 검색
+   * 포럼 허브 — 멀티 포럼 목록 (forum_category_requests 기반)
+   *
+   * WO-O4O-FORUM-MULTI-STRUCTURE-RECONSTRUCTION-V1
+   * 카테고리 폐기 후 forum_category_requests를 포럼 엔티티로 사용.
+   * status = 'completed' 인 행이 활성 포럼.
+   *
+   * 기존 응답 shape (id, name, slug, description, iconEmoji, postCount, forumType, tags,
+   * memberCount, lastActivityAt, lastPostTitle)은 호환 유지.
    */
   async listForumHub(options?: { sort?: string; keyword?: string; userId?: string }) {
     const sort = options?.sort || 'default';
     const keyword = options?.keyword?.trim() || '';
     const userId = options?.userId?.trim() || '';
 
-    // "joined" sort: filter to categories where user authored posts or comments
     if (sort === 'joined' && userId) {
       return this.listForumHubJoined(userId, keyword);
     }
 
-    // Pinned categories always come first, then pinnedOrder, then sort-specific order
     let orderBy: string;
     switch (sort) {
       case 'recent':
-        orderBy = 'c."isPinned" DESC, c."pinnedOrder" ASC NULLS LAST, MAX(p.created_at) DESC NULLS LAST';
+        orderBy = 'MAX(p.created_at) DESC NULLS LAST';
         break;
       case 'popular':
-        orderBy = 'c."isPinned" DESC, c."pinnedOrder" ASC NULLS LAST, c."postCount" DESC';
+        orderBy = 'COUNT(p.id) DESC NULLS LAST';
         break;
       default:
-        orderBy = 'c."isPinned" DESC, c."pinnedOrder" ASC NULLS LAST, c."sortOrder" ASC, MAX(p.created_at) DESC NULLS LAST';
+        orderBy = 'MAX(p.created_at) DESC NULLS LAST, c.created_at DESC';
     }
 
-    if (this.config.scope === 'community') {
-      const params: any[] = [];
-      let keywordFilter = '';
-      if (keyword) {
-        params.push(`%${keyword}%`);
-        keywordFilter = `AND (c.name ILIKE $${params.length} OR c.description ILIKE $${params.length} OR c.tags::text ILIKE $${params.length})`;
-      }
-
-      return this.dataSource.query(`
-        SELECT
-          c.id, c.name, c.slug, c.description, c.color, c."iconEmoji",
-          c."postCount", c."sortOrder", c."isPinned",
-          c.forum_type AS "forumType", c.tags,
-          COUNT(DISTINCT p.author_id)::int as "memberCount",
-          MAX(p.created_at) as "lastActivityAt",
-          (SELECT p2.title FROM forum_post p2
-           WHERE p2."categoryId" = c.id AND p2.status = 'publish'
-             AND p2.organization_id IS NULL
-           ORDER BY p2.created_at DESC LIMIT 1) as "lastPostTitle"
-        FROM forum_category c
-        LEFT JOIN forum_post p ON p."categoryId" = c.id
-          AND p.status = 'publish' AND p.organization_id IS NULL
-        WHERE c."isActive" = true AND c."accessLevel" = 'all' AND c."organizationId" IS NULL ${keywordFilter}
-        GROUP BY c.id
-        ORDER BY ${orderBy}
-      `, params);
-    }
-
-    // organization scope
-    const params: any[] = [this.config.organizationId];
+    const params: any[] = [];
     let keywordFilter = '';
     if (keyword) {
       params.push(`%${keyword}%`);
       keywordFilter = `AND (c.name ILIKE $${params.length} OR c.description ILIKE $${params.length} OR c.tags::text ILIKE $${params.length})`;
     }
 
+    let scopeFilter: string;
+    if (this.config.scope === 'community') {
+      scopeFilter = 'c.organization_id IS NULL';
+    } else {
+      params.push(this.config.organizationId);
+      scopeFilter = `c.organization_id = $${params.length}`;
+    }
+
     return this.dataSource.query(`
       SELECT
-        c.id, c.name, c.slug, c.description, c.color, c."iconEmoji",
-        c."postCount", c."sortOrder", c."isPinned",
-        c.forum_type AS "forumType", c.tags,
-        COUNT(DISTINCT p.author_id)::int as "memberCount",
-        MAX(p.created_at) as "lastActivityAt",
+        c.id,
+        c.name,
+        c.slug,
+        c.description,
+        NULL AS color,
+        c.icon_emoji AS "iconEmoji",
+        COUNT(p.id)::int AS "postCount",
+        0 AS "sortOrder",
+        false AS "isPinned",
+        c.forum_type AS "forumType",
+        c.tags,
+        COUNT(DISTINCT p.author_id)::int AS "memberCount",
+        MAX(p.created_at) AS "lastActivityAt",
         (SELECT p2.title FROM forum_post p2
-         WHERE p2."categoryId" = c.id AND p2.status = 'publish'
-           AND p2.organization_id = $1
-         ORDER BY p2.created_at DESC LIMIT 1) as "lastPostTitle"
-      FROM forum_category c
-      LEFT JOIN forum_post p ON p."categoryId" = c.id
-        AND p.status = 'publish' AND p.organization_id = $1
-      WHERE c."isActive" = true AND c."accessLevel" = 'all' AND c."organizationId" = $1 ${keywordFilter}
+         WHERE p2.forum_id = c.id AND p2.status = 'publish'
+         ORDER BY p2.created_at DESC LIMIT 1) AS "lastPostTitle"
+      FROM forum_category_requests c
+      LEFT JOIN forum_post p ON p.forum_id = c.id AND p.status = 'publish'
+      WHERE c.status = 'completed' AND ${scopeFilter} ${keywordFilter}
       GROUP BY c.id
       ORDER BY ${orderBy}
     `, params);
   }
 
   /**
-   * "내가 참여한 포럼" — 사용자가 글 또는 댓글을 작성한 카테고리만 반환
-   * Phase 4: CTE로 사용자 참여 카테고리를 먼저 추출 후 동일 허브 쿼리 적용
+   * Forum 단건 조회 — slug 기반.
+   * WO-O4O-FORUM-MULTI-STRUCTURE-RECONSTRUCTION-V1
+   */
+  async getForumBySlug(slug: string) {
+    const rows = await this.dataSource.query(`
+      SELECT
+        c.id, c.name, c.slug, c.description,
+        c.icon_emoji AS "iconEmoji",
+        c.forum_type AS "forumType",
+        c.tags,
+        c.organization_id AS "organizationId"
+      FROM forum_category_requests c
+      WHERE c.status = 'completed' AND c.slug = $1
+      LIMIT 1
+    `, [slug]);
+    return rows[0] || null;
+  }
+
+  /**
+   * Forum의 게시글 목록 — forum_id 기반.
+   * WO-O4O-FORUM-MULTI-STRUCTURE-RECONSTRUCTION-V1
+   */
+  async listForumPosts(forumId: string, options?: { limit?: number; offset?: number }) {
+    const limit = options?.limit ?? 20;
+    const offset = options?.offset ?? 0;
+    return this.dataSource.query(`
+      SELECT
+        p.id, p.title, p.slug, p.excerpt, p.tags,
+        p.created_at AS "createdAt",
+        p."viewCount", p."likeCount", p."commentCount",
+        p.author_id AS "authorId",
+        COALESCE(u.nickname, u.name) AS "authorName"
+      FROM forum_post p
+      LEFT JOIN users u ON p.author_id = u.id
+      WHERE p.forum_id = $1 AND p.status = 'publish'
+      ORDER BY p.created_at DESC
+      LIMIT $2 OFFSET $3
+    `, [forumId, limit, offset]);
+  }
+
+  /**
+   * "내가 참여한 포럼" — 사용자가 글 또는 댓글을 작성한 forum_category_requests만 반환
+   * WO-O4O-FORUM-MULTI-STRUCTURE-RECONSTRUCTION-V1: forum_id 기반 재구성
    */
   private async listForumHubJoined(userId: string, keyword: string) {
-    if (this.config.scope === 'community') {
-      const params: any[] = [userId];
-      let keywordFilter = '';
-      if (keyword) {
-        params.push(`%${keyword}%`);
-        keywordFilter = `AND (c.name ILIKE $${params.length} OR c.description ILIKE $${params.length} OR c.tags::text ILIKE $${params.length})`;
-      }
-
-      return this.dataSource.query(`
-        WITH my_categories AS (
-          SELECT DISTINCT p."categoryId" AS id
-          FROM forum_post p
-          WHERE p.author_id = $1 AND p.status = 'publish' AND p.organization_id IS NULL
-          UNION
-          SELECT DISTINCT p."categoryId" AS id
-          FROM forum_comment fc
-          JOIN forum_post p ON fc."postId" = p.id
-          WHERE fc.author_id = $1 AND p.organization_id IS NULL
-        )
-        SELECT
-          c.id, c.name, c.slug, c.description, c.color, c."iconEmoji",
-          c."postCount", c."sortOrder", c."isPinned",
-          c.forum_type AS "forumType", c.tags,
-          COUNT(DISTINCT p.author_id)::int AS "memberCount",
-          MAX(p.created_at) AS "lastActivityAt",
-          (SELECT p2.title FROM forum_post p2
-           WHERE p2."categoryId" = c.id AND p2.status = 'publish'
-             AND p2.organization_id IS NULL
-           ORDER BY p2.created_at DESC LIMIT 1) AS "lastPostTitle"
-        FROM forum_category c
-        INNER JOIN my_categories mc ON mc.id = c.id
-        LEFT JOIN forum_post p ON p."categoryId" = c.id
-          AND p.status = 'publish' AND p.organization_id IS NULL
-        WHERE c."isActive" = true AND c."accessLevel" = 'all' AND c."organizationId" IS NULL ${keywordFilter}
-        GROUP BY c.id
-        ORDER BY MAX(p.created_at) DESC NULLS LAST
-      `, params);
-    }
-
-    // organization scope
-    const params: any[] = [this.config.organizationId, userId];
+    const params: any[] = [userId];
     let keywordFilter = '';
     if (keyword) {
       params.push(`%${keyword}%`);
       keywordFilter = `AND (c.name ILIKE $${params.length} OR c.description ILIKE $${params.length} OR c.tags::text ILIKE $${params.length})`;
     }
 
+    let scopeFilter: string;
+    if (this.config.scope === 'community') {
+      scopeFilter = 'c.organization_id IS NULL';
+    } else {
+      params.push(this.config.organizationId);
+      scopeFilter = `c.organization_id = $${params.length}`;
+    }
+
     return this.dataSource.query(`
-      WITH my_categories AS (
-        SELECT DISTINCT p."categoryId" AS id
-        FROM forum_post p
-        WHERE p.author_id = $2 AND p.status = 'publish' AND p.organization_id = $1
+      WITH my_forums AS (
+        SELECT DISTINCT p.forum_id AS id FROM forum_post p
+        WHERE p.author_id = $1 AND p.status = 'publish' AND p.forum_id IS NOT NULL
         UNION
-        SELECT DISTINCT p."categoryId" AS id
-        FROM forum_comment fc
+        SELECT DISTINCT p.forum_id AS id FROM forum_comment fc
         JOIN forum_post p ON fc."postId" = p.id
-        WHERE fc.author_id = $2 AND p.organization_id = $1
+        WHERE fc.author_id = $1 AND p.forum_id IS NOT NULL
       )
       SELECT
-        c.id, c.name, c.slug, c.description, c.color, c."iconEmoji",
-        c."postCount", c."sortOrder", c."isPinned",
+        c.id, c.name, c.slug, c.description,
+        NULL AS color, c.icon_emoji AS "iconEmoji",
+        COUNT(p.id)::int AS "postCount",
+        0 AS "sortOrder", false AS "isPinned",
         c.forum_type AS "forumType", c.tags,
         COUNT(DISTINCT p.author_id)::int AS "memberCount",
         MAX(p.created_at) AS "lastActivityAt",
         (SELECT p2.title FROM forum_post p2
-         WHERE p2."categoryId" = c.id AND p2.status = 'publish'
-           AND p2.organization_id = $1
+         WHERE p2.forum_id = c.id AND p2.status = 'publish'
          ORDER BY p2.created_at DESC LIMIT 1) AS "lastPostTitle"
-      FROM forum_category c
-      INNER JOIN my_categories mc ON mc.id = c.id
-      LEFT JOIN forum_post p ON p."categoryId" = c.id
-        AND p.status = 'publish' AND p.organization_id = $1
-      WHERE c."isActive" = true AND c."accessLevel" = 'all' AND c."organizationId" = $1 ${keywordFilter}
+      FROM forum_category_requests c
+      INNER JOIN my_forums mf ON mf.id = c.id
+      LEFT JOIN forum_post p ON p.forum_id = c.id AND p.status = 'publish'
+      WHERE c.status = 'completed' AND ${scopeFilter} ${keywordFilter}
       GROUP BY c.id
       ORDER BY MAX(p.created_at) DESC NULLS LAST
     `, params);

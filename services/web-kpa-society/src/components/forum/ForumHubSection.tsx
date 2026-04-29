@@ -221,7 +221,7 @@ export function ForumHubSection({ prefetchedForums, loading: parentLoading }: Pr
           {filteredForums.map((forum) => (
             <Link
               key={forum.id}
-              to={`/forum/all?category=${forum.id}`}
+              to={`/forum/${forum.slug}`}
               style={{ textDecoration: 'none', color: 'inherit' }}
             >
               <div className="forum-hub-card" style={styles.card}>

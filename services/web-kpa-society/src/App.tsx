@@ -21,6 +21,8 @@ const ForumHomePage = lazy(() => import('./pages/forum/ForumHomePage').then(m =>
 const ForumListPage = lazy(() => import('./pages/forum/ForumListPage').then(m => ({ default: m.ForumListPage })));
 const ForumDetailPage = lazy(() => import('./pages/forum/ForumDetailPage').then(m => ({ default: m.ForumDetailPage })));
 const ForumWritePage = lazy(() => import('./pages/forum/ForumWritePage').then(m => ({ default: m.ForumWritePage })));
+// WO-O4O-FORUM-MULTI-STRUCTURE-RECONSTRUCTION-V1
+const ForumFeedPage = lazy(() => import('./pages/forum/ForumFeedPage').then(m => ({ default: m.ForumFeedPage })));
 
 // Market Trial — WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1
 // 실행은 Neture 단독. KPA는 entry → Neture redirect 만 유지.
@@ -437,6 +439,8 @@ function App() {
           <Route path="/forum/edit/:id" element={<Layout serviceName={SERVICE_NAME}><ForumWritePage /></Layout>} />
           {/* WO-FORUM-REQUEST-ROUTE-EXTRACTION-FROM-MYPAGE-V1: 포럼 개설 신청 → /forum 소속 */}
           <Route path="/forum/request" element={<Layout serviceName={SERVICE_NAME}><KpaRequestCategoryPage /></Layout>} />
+          {/* WO-O4O-FORUM-MULTI-STRUCTURE-RECONSTRUCTION-V1: 포럼 피드 (slug). 모든 literal 라우트 뒤에 위치 */}
+          <Route path="/forum/:slug" element={<Layout serviceName={SERVICE_NAME}><ForumFeedPage /></Layout>} />
 
           {/* Market Trial — WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1
               실행은 Neture 단독. 기존 URL은 backward-compat을 위해 redirect 유지. */}
@@ -889,6 +893,8 @@ function DemoLayoutRoutes() {
         <Route path="/forum/:slug/write" element={<ForumWritePage />} />
         <Route path="/forum/write" element={<ForumWritePage />} />
         <Route path="/forum/edit/:id" element={<ForumWritePage />} />
+        {/* WO-O4O-FORUM-MULTI-STRUCTURE-RECONSTRUCTION-V1: 포럼 피드 */}
+        <Route path="/forum/:slug" element={<ForumFeedPage />} />
 
         {/* LMS (교육) - WO-KPA-COMMUNITY-HOME-V1 */}
         <Route path="/lms" element={<EducationPage />} />

@@ -109,6 +109,12 @@ export class ForumCategoryRequest {
   @Column({ name: 'created_category_slug', type: 'varchar', length: 200, nullable: true })
   createdCategorySlug?: string;
 
+  // WO-O4O-FORUM-MULTI-STRUCTURE-RECONSTRUCTION-V1
+  // 멀티 포럼 구조에서 forum의 URL slug. 카테고리 폐기 후 forum_category_requests를
+  // 포럼 엔티티로 승격하면서 도입.
+  @Column({ name: 'slug', type: 'varchar', length: 200, nullable: true })
+  slug?: string;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
