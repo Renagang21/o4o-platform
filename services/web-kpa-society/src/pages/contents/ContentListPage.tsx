@@ -152,6 +152,7 @@ export function ContentListPage() {
           sort: 'latest',
           search: search || undefined,
           content_type: filter !== 'all' ? filter : undefined,
+          sub_type: 'content', // WO-KPA-CONTENT-RESOURCE-SUBTYPE-SEPARATION-V1
         });
         return {
           items: (res.data?.items ?? []).map(mapContentItem),

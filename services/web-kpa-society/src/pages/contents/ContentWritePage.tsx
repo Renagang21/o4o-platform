@@ -106,7 +106,7 @@ export function ContentWritePage() {
         body: body || undefined,
         summary: summary || undefined,
         content_type: contentType as 'participation' | 'information',
-        sub_type: subType || undefined,
+        sub_type: 'content', // WO-KPA-CONTENT-RESOURCE-SUBTYPE-SEPARATION-V1: 콘텐츠 허브 항목 고정
         tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
         status: saveStatus,
       };

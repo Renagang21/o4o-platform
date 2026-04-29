@@ -55,7 +55,8 @@ export const resourcesApi = {
     tag?: string;
     sort?: 'latest' | 'popular' | 'views';
   }) =>
-    apiClient.get<ResourceListResponse>('/contents', params),
+    // WO-KPA-CONTENT-RESOURCE-SUBTYPE-SEPARATION-V1: 자료실 항목만 반환
+    apiClient.get<ResourceListResponse>('/contents', { ...params, sub_type: 'resource' }),
 
   getDetail: (id: string) =>
     apiClient.get<ApiResponse<ResourceItem>>(`/contents/${id}`),

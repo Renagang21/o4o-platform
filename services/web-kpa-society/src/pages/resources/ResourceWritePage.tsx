@@ -190,6 +190,7 @@ export function ResourceWritePage() {
         tags: tagArr.length > 0 ? tagArr : undefined,
         status: saveStatus,
         usage_type: usageType,
+        sub_type: 'resource', // WO-KPA-CONTENT-RESOURCE-SUBTYPE-SEPARATION-V1: 자료실 항목 고정
       };
 
       // source_type은 usage_type으로 결정 (mode 탭이 아님)

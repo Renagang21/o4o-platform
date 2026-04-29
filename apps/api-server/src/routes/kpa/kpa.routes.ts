@@ -1543,7 +1543,8 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         const limitNum = Math.min(100, Math.max(1, Number(limit)));
         const offset = (pageNum - 1) * limitNum;
 
-        const conditions: string[] = [`c.is_deleted = false`];
+        // WO-KPA-CONTENT-RESOURCE-SUBTYPE-SEPARATION-V1: 자료실 항목만 조회
+        const conditions: string[] = [`c.is_deleted = false`, `c.sub_type = 'resource'`];
         const params: any[] = [];
         let idx = 1;
 
