@@ -50,6 +50,7 @@ export {
   kpaGuideFeatureResourcesProps,
   kpaGuideFeatureContentProps,
   kpaGuideFeatureSignageProps,
+  kpaGuideFeatureQrTabletProps,
 } from './copy/kpa.js';
 
 export {

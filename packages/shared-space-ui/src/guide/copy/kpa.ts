@@ -558,11 +558,12 @@ export const kpaGuideFeaturesProps: GuideFeaturesPageProps = {
       primaryRoute: '/store/marketing/qr',
       description: 'QR 코드로 고객을 유입하고 태블릿 키오스크로 상담 요청을 연결합니다.',
       items: [
+        { label: 'QR · Tablet 이용 방법', route: '/guide/features/qr' },
         { label: 'QR 코드 관리', route: '/store/marketing/qr' },
         { label: '태블릿 키오스크', route: '/tablet/:slug' },
         { label: '마케팅 분석', route: '/store/analytics/marketing' },
       ],
-      linkTo: '/store/marketing/qr',
+      linkTo: '/guide/features/qr',
     },
   ],
   bottomNav: {
@@ -788,6 +789,88 @@ export const kpaGuideFeatureResourcesProps: GuideFeatureManualPageProps = {
         { label: '요약', detail: '긴 문서를 핵심 요약으로 변환해 응대 시간에 맞춰 사용합니다.' },
         { label: '상담 문구 작성', detail: '고객 상황에 맞는 상담 응답 초안을 생성합니다.' },
         { label: '검토 후 사용', detail: 'AI 결과는 약사·매장 책임자가 반드시 검토한 뒤 활용합니다.' },
+      ],
+    },
+  ],
+  bottomNav: {
+    prev: { label: '← 기능별 이용 방법', to: '/guide/features' },
+    home: { label: '홈으로', to: '/' },
+  },
+};
+
+// ─── /guide/features/qr ────────────────────────────────────────────────
+
+export const kpaGuideFeatureQrTabletProps: GuideFeatureManualPageProps = {
+  hero: {
+    eyebrow: '기능별 이용 방법',
+    title: 'QR · Tablet 이용 방법',
+    description: 'QR 코드로 고객을 유입하고 태블릿 키오스크로 상담 요청을 연결합니다',
+    primaryAction: { label: 'QR 코드 관리로 이동 →', to: '/store/marketing/qr' },
+    flowBarTitle: '이용 흐름',
+    flowLabels: ['기능 개요', 'QR 진입', 'Tablet 화면', '직원 처리', '활용 시나리오', '주의 사항'],
+  },
+  sections: [
+    {
+      step: '01',
+      title: 'QR · Tablet 기능 개요',
+      description: 'QR 코드와 태블릿 키오스크를 연계해 매장 고객 접점을 디지털화합니다. 고객이 QR을 스캔하면 태블릿 상담 화면으로 이동하고, 상담 요청이 직원에게 실시간 전달됩니다.',
+      items: [
+        { label: 'QR 코드', detail: '매장 진열·POP·TV에 부착해 고객 접근 경로를 만듭니다.' },
+        { label: '태블릿 키오스크', detail: '고객이 직접 상품을 탐색하고 관심 표시·상담 요청을 제출합니다.' },
+        { label: '직원 처리 화면', detail: '접수된 요청을 실시간으로 확인하고 상태를 처리합니다.' },
+      ],
+    },
+    {
+      step: '02',
+      title: 'QR 코드 진입 흐름',
+      routeLabel: '/store/marketing/qr',
+      description: '고객이 QR을 스캔하면 /qr/:slug 랜딩 페이지로 진입한 뒤 태블릿 화면으로 연결됩니다. QR 코드는 /store/marketing/qr에서 생성하고 출력합니다.',
+      items: [
+        { label: '고객이 QR 스캔', detail: '매장에 부착된 QR 코드를 스마트폰으로 스캔합니다.' },
+        { label: '/qr/:slug 진입', detail: '스캔 후 QR 랜딩 페이지로 이동해 매장 정보가 표시됩니다.' },
+        { label: '태블릿 화면으로 연결', detail: '랜딩에서 태블릿 상담 화면(/tablet/:slug)으로 자동 이동합니다.' },
+      ],
+    },
+    {
+      step: '03',
+      title: 'Tablet 고객 화면 흐름',
+      routeLabel: '/tablet/:slug',
+      description: '고객이 태블릿에서 상품을 탐색하고 관심 요청을 제출합니다. 인증 없이 접근 가능하며, 제출 후 처리 상태를 실시간으로 확인합니다.',
+      items: [
+        { label: '상품 탐색', detail: 'TABLET 채널에 진열된 상품이 그리드로 표시됩니다. 상품을 탭하면 상세 정보가 열립니다.' },
+        { label: '관심 있어요 요청 생성', detail: '이름·메모를 입력해 상담 요청을 제출합니다. 이름과 메모는 선택 사항입니다.' },
+        { label: '상태 실시간 확인', detail: '요청 후 처리 상태(대기 중 → 확인됨 → 완료)를 3초 간격으로 자동 갱신합니다.' },
+      ],
+    },
+    {
+      step: '04',
+      title: '직원 처리 흐름',
+      routeLabel: '/store/requests',
+      description: '직원 화면에서 고객 요청을 실시간으로 확인하고 상태를 처리합니다. 요청은 NEW → ACKNOWLEDGED → COMPLETED / CANCELED 순으로 진행됩니다.',
+      items: [
+        { label: 'NEW — 새 요청', detail: '태블릿에서 접수된 요청이 목록 상단에 NEW 뱃지와 함께 표시됩니다.' },
+        { label: 'ACKNOWLEDGED — 확인', detail: '"확인" 버튼을 누르면 고객 화면에 확인됨 상태가 표시됩니다.' },
+        { label: 'COMPLETED / CANCELED', detail: '상담 완료 후 "완료"로 처리하거나, 취소 사유 발생 시 "취소"로 처리합니다.' },
+      ],
+    },
+    {
+      step: '05',
+      title: '매장 활용 시나리오',
+      description: 'QR · Tablet 기능을 매장 운영에 맞게 활용합니다.',
+      items: [
+        { label: '진열 상품 상담', detail: '진열대 옆 QR로 태블릿 상담을 연결해 직원이 즉시 응대합니다.' },
+        { label: 'TV / POP / QR 연계', detail: '사이니지 TV에 QR을 표시해 고객이 상품 정보 확인과 상담 요청을 한 번에 처리합니다.' },
+        { label: '고객 관심 요청 확인', detail: '/store/requests에서 요청 목록을 5초마다 자동 갱신해 대기 고객을 놓치지 않습니다.' },
+      ],
+    },
+    {
+      step: '06',
+      title: '주의 사항',
+      description: 'QR · Tablet 기능 이용 시 반드시 확인해야 할 사항입니다.',
+      items: [
+        { label: '상담 보조 흐름', detail: 'Tablet은 결제·주문·배송과 직접 연결되지 않습니다. 관심 요청/상담 보조 목적으로만 사용합니다.' },
+        { label: '결제·주문 분리', detail: '결제와 주문은 별도 채널(B2C 스토어 등)에서 처리합니다. Tablet 요청만으로 주문이 생성되지 않습니다.' },
+        { label: '채널 승인 필요', detail: 'TABLET 채널에 상품이 진열되어 있어야 고객 화면에 상품이 표시됩니다. 승인 전에는 노출되지 않습니다.' },
       ],
     },
   ],
