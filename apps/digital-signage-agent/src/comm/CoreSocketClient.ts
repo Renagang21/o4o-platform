@@ -40,6 +40,13 @@ export interface ActionExecutePayload {
     embedId?: string;
     playerType: string;
     duration?: number;
+    /** WO-O4O-SIGNAGE-PLAYBACK-LOG-FORCED-CONTENT-FIX-V1
+     * forced_content에서 연결된 signage_media.id.
+     * 운영자 수동 강제 삽입은 null, 공급자 캠페인 승인은 UUID.
+     */
+    forcedMediaId?: string | null;
+    /** forced_content 항목 여부 (id가 'forced-{uuid}' 형식인 경우 true) */
+    isForced?: boolean;
   };
   scheduleId?: string;
 }

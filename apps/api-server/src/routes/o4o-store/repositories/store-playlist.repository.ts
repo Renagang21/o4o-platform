@@ -58,6 +58,12 @@ export interface PlaylistItemDto {
   title?: string;
   contentJson?: unknown;
   assetType?: string;
+  /** WO-O4O-SIGNAGE-PLAYBACK-LOG-FORCED-CONTENT-FIX-V1
+   * forced_content에서 연결된 signage_media.id.
+   * 운영자 수동 강제 삽입은 null, 공급자 캠페인 승인은 UUID.
+   * Player는 이 값이 있으면 playback log에 사용한다.
+   */
+  forcedMediaId?: string | null;
 }
 
 export interface PublicPlaylistDto {
@@ -134,7 +140,8 @@ export class StorePlaylistRepository {
              'sourceType', fc.source_type,
              'embedId', fc.embed_id,
              'thumbnailUrl', fc.thumbnail_url
-           )::jsonb AS "contentJson"
+           )::jsonb AS "contentJson",
+           fc.media_id AS "forcedMediaId"
          FROM signage_forced_content fc
          LEFT JOIN signage_forced_content_positions fp
            ON fp.forced_content_id = fc.id AND fp.playlist_id = $1
@@ -344,7 +351,8 @@ export class StorePlaylistRepository {
            'embedId', fc.embed_id,
            'thumbnailUrl', fc.thumbnail_url
          ) AS "contentJson",
-         'signage' AS "assetType"
+         'signage' AS "assetType",
+         fc.media_id AS "forcedMediaId"
        FROM signage_forced_content fc
        LEFT JOIN signage_forced_content_positions fp
          ON fp.forced_content_id = fc.id AND fp.playlist_id = $1

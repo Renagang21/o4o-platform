@@ -125,7 +125,13 @@ export class ActionHandler extends EventEmitter<ActionHandlerEvents> {
 
       // WO-O4O-SIGNAGE-CAMPAIGN-ANALYTICS-DATA-COLLECTION-V1
       // 재생 시작 로그 — fire and forget (UX 영향 없음)
-      this.logPlaybackStart(mediaSource.id, payload.scheduleId ?? null);
+      // WO-O4O-SIGNAGE-PLAYBACK-LOG-FORCED-CONTENT-FIX-V1
+      // forced_content: id = 'forced-{uuid}' (UUID 아님) → forcedMediaId 사용
+      // 운영자 수동 강제 삽입(forcedMediaId=null)은 로그 skip
+      const logMediaId = mediaSource.forcedMediaId ?? (mediaSource.isForced ? null : mediaSource.id);
+      if (logMediaId) {
+        this.logPlaybackStart(logMediaId, payload.scheduleId ?? null);
+      }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       this.updateActionStatus(actionExecutionId, 'failed', errorMessage);
