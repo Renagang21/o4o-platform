@@ -1,8 +1,10 @@
 /**
- * ForumCategoryRequestService
+ * ForumRequestService
  *
  * WO-O4O-FORUM-REQUEST-UNIFICATION-PHASE1-V1
- * 포럼 카테고리 생성 요청 공통 서비스
+ * WO-O4O-FORUM-NAMING-CLEANUP-V1: ForumCategoryRequestService → ForumRequestService
+ *
+ * 포럼 생성 신청 공통 서비스
  *
  * - forum_category_requests 테이블 사용 (serviceCode 격리)
  * - 신청자 CRUD: create, listMy, getDetail, update
@@ -65,11 +67,10 @@ export interface ReviewInput {
 
 type ServiceResult<T = any> = { data: T } | { error: { status: number; code: string; message: string } };
 
-export class ForumCategoryRequestService {
+export class ForumRequestService {
   private get requestRepo() {
     return AppDataSource.getRepository(ForumCategoryRequest);
   }
-  // categoryRepo removed — WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1
 
   /** 신청 생성 */
   async create(user: RequestUser, input: CreateRequestInput): Promise<ServiceResult> {
@@ -347,7 +348,7 @@ export class ForumCategoryRequestService {
       row.status = 'completed' as any;
       await this.requestRepo.save(row);
 
-      logger.info(`[ForumCategoryRequest] Forum completed: ${row.name} (id: ${row.id}, slug: ${row.slug})`);
+      logger.info(`[ForumRequest] Forum completed: ${row.name} (id: ${row.id}, slug: ${row.slug})`);
 
       return {
         data: {
@@ -366,10 +367,10 @@ export class ForumCategoryRequestService {
         row.errorMessage = err?.message || '포럼 생성 중 알 수 없는 오류가 발생했습니다';
         await this.requestRepo.save(row);
       } catch (saveErr) {
-        logger.error('[ForumCategoryRequest] Failed to persist failed status:', saveErr);
+        logger.error('[ForumRequest] Failed to persist failed status:', saveErr);
       }
 
-      logger.error('[ForumCategoryRequest] Forum creation failed:', err);
+      logger.error('[ForumRequest] Forum creation failed:', err);
       return {
         error: {
           status: 500,
@@ -382,4 +383,4 @@ export class ForumCategoryRequestService {
 }
 
 /** Singleton instance */
-export const forumCategoryRequestService = new ForumCategoryRequestService();
+export const forumRequestService = new ForumRequestService();

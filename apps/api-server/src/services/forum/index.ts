@@ -38,10 +38,10 @@ export {
 } from './ForumRecommendationService.js';
 
 export {
-  ForumCategoryRequestService,
-  forumCategoryRequestService,
+  ForumRequestService,
+  forumRequestService,
   type RequestUser,
   type CreateRequestInput,
   type ListRequestsFilter,
   type ReviewInput,
-} from './ForumCategoryRequestService.js';
+} from './ForumRequestService.js';

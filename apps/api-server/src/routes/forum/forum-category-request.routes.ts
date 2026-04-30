@@ -15,7 +15,7 @@
 
 import { Router, Request, Response } from 'express';
 import { authenticate } from '../../middleware/auth.middleware.js';
-import { forumCategoryRequestService } from '../../services/forum/ForumCategoryRequestService.js';
+import { forumRequestService } from '../../services/forum/ForumRequestService.js';
 import type { AuthRequest } from '../../types/auth.js';
 import { isServiceAdmin } from '../../utils/role.utils.js';
 import type { ServiceKey } from '../../types/roles.js';
@@ -37,7 +37,7 @@ router.post('/', authenticate, async (req: Request, res: Response): Promise<void
       return;
     }
 
-    const result = await forumCategoryRequestService.create(
+    const result = await forumRequestService.create(
       { id: user.id, name: user.name, email: user.email },
       { serviceCode, organizationId, name, description, reason, forumType, iconEmoji, iconUrl, tags, metadata },
     );
@@ -65,7 +65,7 @@ router.get('/my', authenticate, async (req: Request, res: Response): Promise<voi
       return;
     }
 
-    const result = await forumCategoryRequestService.listMy(user.id, serviceCode, organizationId);
+    const result = await forumRequestService.listMy(user.id, serviceCode, organizationId);
 
     if ('error' in result) {
       res.status(result.error.status).json({ success: false, error: result.error.message });
@@ -89,7 +89,7 @@ router.get('/:id', authenticate, async (req: Request, res: Response): Promise<vo
       return;
     }
 
-    const result = await forumCategoryRequestService.getDetail(req.params.id, serviceCode);
+    const result = await forumRequestService.getDetail(req.params.id, serviceCode);
 
     if ('error' in result) {
       res.status(result.error.status).json({ success: false, error: result.error.message, code: result.error.code });
@@ -121,7 +121,7 @@ router.patch('/:id', authenticate, async (req: Request, res: Response): Promise<
       return;
     }
 
-    const result = await forumCategoryRequestService.update(
+    const result = await forumRequestService.update(
       req.params.id,
       user.id,
       serviceCode,

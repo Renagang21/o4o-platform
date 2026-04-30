@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { ForumPostController } from '../../controllers/forum/ForumPostController.js';
-import { ForumCategoryController } from '../../controllers/forum/ForumCategoryController.js';
+import { ForumDirectoryController } from '../../controllers/forum/ForumDirectoryController.js';
 import { ForumCommentController } from '../../controllers/forum/ForumCommentController.js';
 import { ForumModerationController } from '../../controllers/forum/ForumModerationController.js';
 // @deprecated WO-PLATFORM-FORUM-APPROVAL-CORE-DECOUPLING-V1: Forum category request approval moved to KPA Extension (/api/v1/kpa/forum-requests/*)
@@ -14,7 +14,7 @@ import operatorForumRoutes from './operator-forum.routes.js';
 
 const router: Router = Router();
 const postController = new ForumPostController();
-const categoryController = new ForumCategoryController();
+const forumDirectoryController = new ForumDirectoryController();
 const commentController = new ForumCommentController();
 const moderationController = new ForumModerationController();
 
@@ -93,34 +93,35 @@ router.put('/comments/:id', authenticate, commentController.updateComment.bind(c
 router.delete('/comments/:id', authenticate, commentController.deleteComment.bind(commentController));
 
 // ============================================================================
-// Categories — Named routes BEFORE :id to avoid parameter matching
+// Forum Directory — Named routes BEFORE :id to avoid parameter matching
+// (API path /categories kept for backwards compatibility)
 // ============================================================================
-// List categories (public)
-router.get('/categories', categoryController.listCategories.bind(categoryController));
+// List forums (public)
+router.get('/categories', forumDirectoryController.listForums.bind(forumDirectoryController));
 
-// Popular categories by activity score (public) - must be before :id
-router.get('/categories/popular', categoryController.getPopularForums.bind(categoryController));
+// Popular forums by activity score (public) - must be before :id
+router.get('/categories/popular', forumDirectoryController.getPopularForums.bind(forumDirectoryController));
 
-// My categories (authenticated, owner) — WO-MY-CATEGORIES-API-V1
-router.get('/categories/mine', authenticate, categoryController.listMyCategories.bind(categoryController));
+// My forums (authenticated, owner) — WO-MY-CATEGORIES-API-V1
+router.get('/categories/mine', authenticate, forumDirectoryController.listMyForums.bind(forumDirectoryController));
 
-// Get single category (public)
-router.get('/categories/:id', categoryController.getCategory.bind(categoryController));
+// Get single forum (public)
+router.get('/categories/:id', forumDirectoryController.getForum.bind(forumDirectoryController));
 
 // Owner edit (authenticated, owner only) — WO-FORUM-OWNER-BASIC-EDIT-V1
-router.patch('/categories/:id/owner', authenticate, categoryController.updateMyCategory.bind(categoryController));
+router.patch('/categories/:id/owner', authenticate, forumDirectoryController.updateMyForum.bind(forumDirectoryController));
 
 // Delete request (authenticated, owner only) — WO-O4O-FORUM-DELETE-REQUEST-V1
-router.post('/categories/:id/delete-request', authenticate, categoryController.requestDeleteCategory.bind(categoryController));
+router.post('/categories/:id/delete-request', authenticate, forumDirectoryController.requestDeleteForum.bind(forumDirectoryController));
 
-// Create category (authenticated - admin only)
-router.post('/categories', authenticate, categoryController.createCategory.bind(categoryController));
+// Create forum — direct creation no longer supported (410)
+router.post('/categories', authenticate, forumDirectoryController.createForum.bind(forumDirectoryController));
 
-// Update category (authenticated - admin only)
-router.put('/categories/:id', authenticate, categoryController.updateCategory.bind(categoryController));
+// Update forum — direct update no longer supported (410)
+router.put('/categories/:id', authenticate, forumDirectoryController.updateForum.bind(forumDirectoryController));
 
-// Delete category (authenticated - admin only)
-router.delete('/categories/:id', authenticate, categoryController.deleteCategory.bind(categoryController));
+// Delete forum — direct delete no longer supported (410)
+router.delete('/categories/:id', authenticate, forumDirectoryController.deleteForum.bind(forumDirectoryController));
 
 // ============================================================================
 // Moderation (authenticated - admin/manager only)

@@ -14,7 +14,7 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { forumCategoryRequestService } from '../../../services/forum/ForumCategoryRequestService.js';
+import { forumRequestService } from '../../../services/forum/ForumRequestService.js';
 import type { AuthRequest } from '../../../types/auth.js';
 
 const SERVICE_CODE = 'glycopharm';
@@ -30,7 +30,7 @@ export function createOperatorForumRequestController(): Router {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
 
-      const result = await forumCategoryRequestService.listByService({
+      const result = await forumRequestService.listByService({
         serviceCode: SERVICE_CODE,
         status,
         page,
@@ -51,7 +51,7 @@ export function createOperatorForumRequestController(): Router {
   /** GET /pending-count — 대기 중인 신청 수 */
   router.get('/pending-count', async (req: Request, res: Response): Promise<void> => {
     try {
-      const result = await forumCategoryRequestService.getPendingCount(SERVICE_CODE);
+      const result = await forumRequestService.getPendingCount(SERVICE_CODE);
 
       if ('error' in result) {
         res.status(result.error.status).json({ success: false, error: result.error.message });
@@ -67,7 +67,7 @@ export function createOperatorForumRequestController(): Router {
   /** GET /:id — 신청 상세 */
   router.get('/:id', async (req: Request, res: Response): Promise<void> => {
     try {
-      const result = await forumCategoryRequestService.getDetail(req.params.id, SERVICE_CODE);
+      const result = await forumRequestService.getDetail(req.params.id, SERVICE_CODE);
 
       if ('error' in result) {
         res.status(result.error.status).json({ success: false, error: result.error.message, code: result.error.code });
@@ -91,7 +91,7 @@ export function createOperatorForumRequestController(): Router {
         return;
       }
 
-      const result = await forumCategoryRequestService.review(
+      const result = await forumRequestService.review(
         req.params.id,
         SERVICE_CODE,
         { id: user.id, name: user.name, email: user.email, roles: user.roles },

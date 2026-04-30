@@ -478,17 +478,18 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   forumRouter.get('/posts/:postId/comments', forumController.listComments.bind(forumController));
   forumRouter.post('/comments', authenticate, forumController.createComment.bind(forumController));
 
-  // Categories (읽기: 공개, 쓰기: admin scope — WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1)
-  forumRouter.get('/categories', forumController.listCategories.bind(forumController));
+  // Forum Directory (읽기: 공개, 쓰기: admin scope — WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1)
+  // (path /categories kept for compat — WO-O4O-FORUM-NAMING-CLEANUP-V1)
+  forumRouter.get('/categories', forumController.listForums.bind(forumController));
   // Owner routes — WO-O4O-FORUM-MY-FORUM-EXPANSION-V1 (before :id to avoid param matching)
-  forumRouter.get('/categories/mine', authenticate, forumController.listMyCategories.bind(forumController));
-  forumRouter.patch('/categories/:id/owner', authenticate, forumController.updateMyCategory.bind(forumController));
-  forumRouter.post('/categories/:id/delete-request', authenticate, forumController.requestDeleteCategory.bind(forumController));
-  forumRouter.get('/categories/:id', forumController.getCategory.bind(forumController));
-  // Structure creation/modification/deletion → Admin only
-  forumRouter.post('/categories', authenticate, requireKpaScope('kpa:admin'), forumController.createCategory.bind(forumController));
-  forumRouter.put('/categories/:id', authenticate, requireKpaScope('kpa:admin'), forumController.updateCategory.bind(forumController));
-  forumRouter.delete('/categories/:id', authenticate, requireKpaScope('kpa:admin'), forumController.deleteCategory.bind(forumController));
+  forumRouter.get('/categories/mine', authenticate, forumController.listMyForums.bind(forumController));
+  forumRouter.patch('/categories/:id/owner', authenticate, forumController.updateMyForum.bind(forumController));
+  forumRouter.post('/categories/:id/delete-request', authenticate, forumController.requestDeleteForum.bind(forumController));
+  forumRouter.get('/categories/:id', forumController.getForum.bind(forumController));
+  // Structure creation/modification/deletion → Admin only (410 stubs)
+  forumRouter.post('/categories', authenticate, requireKpaScope('kpa:admin'), forumController.createForum.bind(forumController));
+  forumRouter.put('/categories/:id', authenticate, requireKpaScope('kpa:admin'), forumController.updateForum.bind(forumController));
+  forumRouter.delete('/categories/:id', authenticate, requireKpaScope('kpa:admin'), forumController.deleteForum.bind(forumController));
 
   // Moderation (operator scope — WO-KPA-A-OPERATOR-SECURITY-ALIGNMENT-PHASE1)
   forumRouter.get('/moderation', authenticate, requireKpaScope('kpa:operator'), forumController.getModerationQueue.bind(forumController));

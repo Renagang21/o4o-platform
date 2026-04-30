@@ -178,15 +178,15 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   forumRouter.get('/posts/:postId/comments', forumController.listComments.bind(forumController));
   forumRouter.post('/comments', authenticate, forumController.createComment.bind(forumController));
 
-  // Categories — Named routes BEFORE :id
-  forumRouter.get('/categories', forumController.listCategories.bind(forumController));
-  forumRouter.get('/categories/mine', authenticate, forumController.listMyCategories.bind(forumController));
-  forumRouter.get('/categories/:id', forumController.getCategory.bind(forumController));
-  forumRouter.patch('/categories/:id/owner', authenticate, forumController.updateMyCategory.bind(forumController));
-  forumRouter.post('/categories/:id/delete-request', authenticate, forumController.requestDeleteCategory.bind(forumController));
-  forumRouter.post('/categories', authenticate, forumController.createCategory.bind(forumController));
-  forumRouter.put('/categories/:id', authenticate, forumController.updateCategory.bind(forumController));
-  forumRouter.delete('/categories/:id', authenticate, forumController.deleteCategory.bind(forumController));
+  // Forum Directory — Named routes BEFORE :id (path /categories kept for compat)
+  forumRouter.get('/categories', forumController.listForums.bind(forumController));
+  forumRouter.get('/categories/mine', authenticate, forumController.listMyForums.bind(forumController));
+  forumRouter.get('/categories/:id', forumController.getForum.bind(forumController));
+  forumRouter.patch('/categories/:id/owner', authenticate, forumController.updateMyForum.bind(forumController));
+  forumRouter.post('/categories/:id/delete-request', authenticate, forumController.requestDeleteForum.bind(forumController));
+  forumRouter.post('/categories', authenticate, forumController.createForum.bind(forumController));
+  forumRouter.put('/categories/:id', authenticate, forumController.updateForum.bind(forumController));
+  forumRouter.delete('/categories/:id', authenticate, forumController.deleteForum.bind(forumController));
 
   // Moderation
   forumRouter.get('/moderation', authenticate, forumController.getModerationQueue.bind(forumController));

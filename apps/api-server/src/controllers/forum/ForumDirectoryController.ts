@@ -7,23 +7,24 @@ import logger from '../../utils/logger.js';
 import { ForumControllerBase } from './ForumControllerBase.js';
 
 /**
- * ForumCategoryController
+ * ForumDirectoryController
  *
  * WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1: forum_category 테이블 제거.
+ * WO-O4O-FORUM-NAMING-CLEANUP-V1: ForumCategoryController → ForumDirectoryController
+ *
  * forum_category_requests (status='completed') = active forum SSOT.
  *
  * Handles forum listing, single forum lookup,
  * popular forums ranking, owner management, and delete requests.
  */
-export class ForumCategoryController extends ForumControllerBase {
+export class ForumDirectoryController extends ForumControllerBase {
 
-  private get requestRepo() {
+  private get forumRequestRepo() {
     return AppDataSource.getRepository(ForumCategoryRequest);
   }
 
   /**
    * Apply organization/scope filter to a ForumCategoryRequest query.
-   * Replaces applyContextFilter (which uses isOrganizationExclusive, not on FCR).
    */
   private applyForumContextFilter(
     qb: any,
@@ -52,12 +53,12 @@ export class ForumCategoryController extends ForumControllerBase {
    * GET /forum/categories
    * List all active forums (status = 'completed')
    */
-  async listCategories(req: Request, res: Response): Promise<void> {
+  async listForums(req: Request, res: Response): Promise<void> {
     try {
       const includeInactive = req.query.includeInactive === 'true';
       const ctx = this.getForumContext(req);
 
-      const qb = this.requestRepo.createQueryBuilder('forum');
+      const qb = this.forumRequestRepo.createQueryBuilder('forum');
 
       if (!includeInactive) {
         qb.where('forum.status = :status', { status: 'completed' });
@@ -90,20 +91,20 @@ export class ForumCategoryController extends ForumControllerBase {
    * GET /forum/categories/:id
    * Get single forum by ID or slug
    */
-  async getCategory(req: Request, res: Response): Promise<void> {
+  async getForum(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
 
       const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
-      let forum = isUuid ? await this.requestRepo.findOne({ where: { id } }) : null;
+      let forum = isUuid ? await this.forumRequestRepo.findOne({ where: { id } }) : null;
       if (!forum) {
-        forum = await this.requestRepo.findOne({ where: { slug: id } });
+        forum = await this.forumRequestRepo.findOne({ where: { slug: id } });
       }
 
       if (!forum) {
         res.status(404).json({
           success: false,
-          error: 'Category not found',
+          error: 'Forum not found',
         });
         return;
       }
@@ -116,7 +117,7 @@ export class ForumCategoryController extends ForumControllerBase {
           success: false,
           error: 'This is a closed forum. Membership is required.',
           code: 'CLOSED_FORUM_ACCESS_DENIED',
-          data: { categoryId: forum.id },
+          data: { forumId: forum.id },
         });
         return;
       }
@@ -129,7 +130,7 @@ export class ForumCategoryController extends ForumControllerBase {
       logger.error('Error getting forum:', error);
       res.status(500).json({
         success: false,
-        error: error.message || 'Failed to get category',
+        error: error.message || 'Failed to get forum',
       });
     }
   }
@@ -139,7 +140,7 @@ export class ForumCategoryController extends ForumControllerBase {
    * Forum creation now goes through the request/approval flow.
    * Direct creation is no longer supported.
    */
-  async createCategory(req: Request, res: Response): Promise<void> {
+  async createForum(req: Request, res: Response): Promise<void> {
     res.status(410).json({
       success: false,
       error: '포럼 직접 생성은 더 이상 지원되지 않습니다. 포럼 신청을 통해 생성하세요.',
@@ -151,7 +152,7 @@ export class ForumCategoryController extends ForumControllerBase {
    * PUT /forum/categories/:id
    * Forum direct update is no longer supported.
    */
-  async updateCategory(req: Request, res: Response): Promise<void> {
+  async updateForum(req: Request, res: Response): Promise<void> {
     res.status(410).json({
       success: false,
       error: '포럼 직접 수정은 더 이상 지원되지 않습니다.',
@@ -163,7 +164,7 @@ export class ForumCategoryController extends ForumControllerBase {
    * DELETE /forum/categories/:id
    * Forum direct delete is no longer supported.
    */
-  async deleteCategory(req: Request, res: Response): Promise<void> {
+  async deleteForum(req: Request, res: Response): Promise<void> {
     res.status(410).json({
       success: false,
       error: '포럼 직접 삭제는 더 이상 지원되지 않습니다.',
@@ -228,7 +229,7 @@ export class ForumCategoryController extends ForumControllerBase {
 
       let forums: ForumCategoryRequest[] = [];
       if (topForumIds.length > 0) {
-        const popQb = this.requestRepo
+        const popQb = this.forumRequestRepo
           .createQueryBuilder('forum')
           .where('forum.id IN (:...ids)', { ids: topForumIds })
           .andWhere('forum.status = :status', { status: 'completed' });
@@ -238,9 +239,8 @@ export class ForumCategoryController extends ForumControllerBase {
 
       // Fallback: fill with active forums by creation date
       if (forums.length < limit) {
-        const remaining = limit - forums.length;
         const existingIds = new Set(forums.map((f) => f.id));
-        const fallbackQb = this.requestRepo
+        const fallbackQb = this.forumRequestRepo
           .createQueryBuilder('forum')
           .where('forum.status = :status', { status: 'completed' })
           .orderBy('forum.createdAt', 'DESC')
@@ -292,7 +292,7 @@ export class ForumCategoryController extends ForumControllerBase {
    * GET /forum/categories/mine
    * List forums created by the authenticated user
    */
-  async listMyCategories(req: Request, res: Response): Promise<void> {
+  async listMyForums(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user?.id;
       if (!userId) {
@@ -301,7 +301,7 @@ export class ForumCategoryController extends ForumControllerBase {
       }
 
       const ctx = this.getForumContext(req);
-      const qb = this.requestRepo
+      const qb = this.forumRequestRepo
         .createQueryBuilder('forum')
         .where('forum.requesterId = :userId', { userId })
         .andWhere('forum.status IN (:...statuses)', { statuses: ['completed', 'archived'] });
@@ -314,7 +314,7 @@ export class ForumCategoryController extends ForumControllerBase {
       res.json({ success: true, data: forums, count: forums.length });
     } catch (error: any) {
       logger.error('Error listing my forums:', error);
-      res.status(500).json({ success: false, error: error.message || 'Failed to list my categories' });
+      res.status(500).json({ success: false, error: error.message || 'Failed to list my forums' });
     }
   }
 
@@ -322,7 +322,7 @@ export class ForumCategoryController extends ForumControllerBase {
    * PATCH /forum/categories/:id/owner
    * Owner can update limited fields: name, description, iconEmoji, iconUrl
    */
-  async updateMyCategory(req: Request, res: Response): Promise<void> {
+  async updateMyForum(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user?.id;
       if (!userId) {
@@ -331,10 +331,10 @@ export class ForumCategoryController extends ForumControllerBase {
       }
 
       const { id } = req.params;
-      const forum = await this.requestRepo.findOne({ where: { id } });
+      const forum = await this.forumRequestRepo.findOne({ where: { id } });
 
       if (!forum) {
-        res.status(404).json({ success: false, error: 'Category not found' });
+        res.status(404).json({ success: false, error: 'Forum not found' });
         return;
       }
       if (forum.requesterId !== userId) {
@@ -353,11 +353,11 @@ export class ForumCategoryController extends ForumControllerBase {
         forum.slug = this.generateSlug(req.body.name);
       }
 
-      const saved = await this.requestRepo.save(forum);
+      const saved = await this.forumRequestRepo.save(forum);
       res.json({ success: true, data: saved });
     } catch (error: any) {
       logger.error('Error updating my forum:', error);
-      res.status(500).json({ success: false, error: error.message || 'Failed to update category' });
+      res.status(500).json({ success: false, error: error.message || 'Failed to update forum' });
     }
   }
 
@@ -369,7 +369,7 @@ export class ForumCategoryController extends ForumControllerBase {
    * POST /forum/categories/:id/delete-request
    * Forum owner submits a delete request (stored in metadata jsonb)
    */
-  async requestDeleteCategory(req: Request, res: Response): Promise<void> {
+  async requestDeleteForum(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user?.id;
       if (!userId) {
@@ -378,10 +378,10 @@ export class ForumCategoryController extends ForumControllerBase {
       }
 
       const { id } = req.params;
-      const forum = await this.requestRepo.findOne({ where: { id } });
+      const forum = await this.forumRequestRepo.findOne({ where: { id } });
 
       if (!forum) {
-        res.status(404).json({ success: false, error: 'Category not found' });
+        res.status(404).json({ success: false, error: 'Forum not found' });
         return;
       }
       if (forum.requesterId !== userId) {
@@ -408,7 +408,7 @@ export class ForumCategoryController extends ForumControllerBase {
         deleteReviewComment: null,
       };
 
-      const saved = await this.requestRepo.save(forum);
+      const saved = await this.forumRequestRepo.save(forum);
       res.json({ success: true, data: saved });
     } catch (error: any) {
       logger.error('Error requesting forum deletion:', error);

@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import { ForumPostController } from './ForumPostController.js';
-import { ForumCategoryController } from './ForumCategoryController.js';
+import { ForumDirectoryController } from './ForumDirectoryController.js';
 import { ForumCommentController } from './ForumCommentController.js';
 import { ForumModerationController } from './ForumModerationController.js';
 
@@ -11,14 +11,16 @@ import { ForumModerationController } from './ForumModerationController.js';
  * Kept so that existing consumers (kpa.routes, glycopharm.routes,
  * forum.routes) can continue to `new ForumController()` without changes.
  *
+ * WO-O4O-FORUM-NAMING-CLEANUP-V1: ForumCategoryController → ForumDirectoryController
+ *
  * @see ForumPostController
- * @see ForumCategoryController
+ * @see ForumDirectoryController
  * @see ForumCommentController
  * @see ForumModerationController
  */
 export class ForumController {
   private posts = new ForumPostController();
-  private categories = new ForumCategoryController();
+  private forums = new ForumDirectoryController();
   private comments = new ForumCommentController();
   private moderation = new ForumModerationController();
 
@@ -34,19 +36,19 @@ export class ForumController {
   deletePost = (req: Request, res: Response) => this.posts.deletePost(req, res);
   toggleLike = (req: Request, res: Response) => this.posts.toggleLike(req, res);
 
-  // ---- Categories ----
-  listCategories = (req: Request, res: Response) => this.categories.listCategories(req, res);
-  getCategory = (req: Request, res: Response) => this.categories.getCategory(req, res);
-  createCategory = (req: Request, res: Response) => this.categories.createCategory(req, res);
-  updateCategory = (req: Request, res: Response) => this.categories.updateCategory(req, res);
-  deleteCategory = (req: Request, res: Response) => this.categories.deleteCategory(req, res);
-  getPopularForums = (req: Request, res: Response) => this.categories.getPopularForums(req, res);
-  // ---- Owner Category APIs (WO-MY-CATEGORIES-API-V1 / WO-FORUM-OWNER-BASIC-EDIT-V1) ----
-  listMyCategories = (req: Request, res: Response) => this.categories.listMyCategories(req, res);
-  updateMyCategory = (req: Request, res: Response) => this.categories.updateMyCategory(req, res);
+  // ---- Forum Directory (formerly Categories) ----
+  listForums = (req: Request, res: Response) => this.forums.listForums(req, res);
+  getForum = (req: Request, res: Response) => this.forums.getForum(req, res);
+  createForum = (req: Request, res: Response) => this.forums.createForum(req, res);
+  updateForum = (req: Request, res: Response) => this.forums.updateForum(req, res);
+  deleteForum = (req: Request, res: Response) => this.forums.deleteForum(req, res);
+  getPopularForums = (req: Request, res: Response) => this.forums.getPopularForums(req, res);
+  // ---- Owner Forum APIs (WO-MY-CATEGORIES-API-V1 / WO-FORUM-OWNER-BASIC-EDIT-V1) ----
+  listMyForums = (req: Request, res: Response) => this.forums.listMyForums(req, res);
+  updateMyForum = (req: Request, res: Response) => this.forums.updateMyForum(req, res);
 
   // ---- Delete Request (WO-O4O-FORUM-DELETE-REQUEST-V1) ----
-  requestDeleteCategory = (req: Request, res: Response) => this.categories.requestDeleteCategory(req, res);
+  requestDeleteForum = (req: Request, res: Response) => this.forums.requestDeleteForum(req, res);
 
   // ---- Comments ----
   listComments = (req: Request, res: Response) => this.comments.listComments(req, res);

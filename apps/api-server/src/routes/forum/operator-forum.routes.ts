@@ -31,7 +31,7 @@
 
 import { Router, Request, Response } from 'express';
 import { authenticate } from '../../middleware/auth.middleware.js';
-import { forumCategoryRequestService } from '../../services/forum/ForumCategoryRequestService.js';
+import { forumRequestService } from '../../services/forum/ForumRequestService.js';
 import { isServiceOperator } from '../../utils/role.utils.js';
 import { AppDataSource } from '../../database/connection.js';
 import { ForumPost, ForumCategoryMember } from '@o4o/forum-core/entities';
@@ -83,7 +83,7 @@ function requireServiceOperator(req: Request, res: Response, next: Function): vo
 router.use(requireServiceOperator);
 
 // ============================================================================
-// REQUEST REVIEW — delegates to ForumCategoryRequestService
+// REQUEST REVIEW — delegates to ForumRequestService
 // ============================================================================
 
 /** GET /requests — 전체 신청 목록 */
@@ -94,7 +94,7 @@ router.get('/requests', async (req: Request, res: Response): Promise<void> => {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 20;
 
-    const result = await forumCategoryRequestService.listByService({
+    const result = await forumRequestService.listByService({
       serviceCode,
       status,
       page,
@@ -117,7 +117,7 @@ router.get('/requests', async (req: Request, res: Response): Promise<void> => {
 router.get('/requests/pending-count', async (req: Request, res: Response): Promise<void> => {
   try {
     const serviceCode = (req as any)._serviceCode;
-    const result = await forumCategoryRequestService.getPendingCount(serviceCode);
+    const result = await forumRequestService.getPendingCount(serviceCode);
 
     if ('error' in result) {
       res.status(result.error.status).json({ success: false, error: result.error.message });
@@ -135,7 +135,7 @@ router.get('/requests/pending-count', async (req: Request, res: Response): Promi
 router.get('/requests/:id', async (req: Request, res: Response): Promise<void> => {
   try {
     const serviceCode = (req as any)._serviceCode;
-    const result = await forumCategoryRequestService.getDetail(req.params.id, serviceCode);
+    const result = await forumRequestService.getDetail(req.params.id, serviceCode);
 
     if ('error' in result) {
       res.status(result.error.status).json({ success: false, error: result.error.message, code: result.error.code });
@@ -153,7 +153,7 @@ router.get('/requests/:id', async (req: Request, res: Response): Promise<void> =
 router.post('/requests/:id/create', async (req: Request, res: Response): Promise<void> => {
   try {
     const serviceCode = (req as any)._serviceCode;
-    const result = await forumCategoryRequestService.createForumFromRequest(req.params.id, serviceCode);
+    const result = await forumRequestService.createForumFromRequest(req.params.id, serviceCode);
 
     if ('error' in result) {
       res.status(result.error.status).json({ success: false, error: result.error.message, code: result.error.code });
@@ -171,7 +171,7 @@ router.post('/requests/:id/create', async (req: Request, res: Response): Promise
 router.post('/requests/:id/recreate', async (req: Request, res: Response): Promise<void> => {
   try {
     const serviceCode = (req as any)._serviceCode;
-    const result = await forumCategoryRequestService.createForumFromRequest(req.params.id, serviceCode);
+    const result = await forumRequestService.createForumFromRequest(req.params.id, serviceCode);
 
     if ('error' in result) {
       res.status(result.error.status).json({ success: false, error: result.error.message, code: result.error.code });
@@ -197,7 +197,7 @@ router.patch('/requests/:id/review', async (req: Request, res: Response): Promis
       return;
     }
 
-    const result = await forumCategoryRequestService.review(
+    const result = await forumRequestService.review(
       req.params.id,
       serviceCode,
       { id: user.id, name: user.name, email: user.email, roles: user.roles },
@@ -417,7 +417,7 @@ router.post('/requests/batch-review', async (req: Request, res: Response): Promi
 
     for (const id of ids) {
       try {
-        const result = await forumCategoryRequestService.review(
+        const result = await forumRequestService.review(
           id,
           serviceCode,
           { id: user.id, name: user.name, email: user.email, roles: user.roles },
