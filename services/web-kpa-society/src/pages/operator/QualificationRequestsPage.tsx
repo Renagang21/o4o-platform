@@ -202,13 +202,30 @@ export default function QualificationRequestsPage() {
         const accountName = row.user_name;
         const displayName = (row.request_data as any)?.displayName;
         const name = accountName || displayName;
+        const openDetail = () => { setSelectedRequest(row); setReviewNote(''); setSuccess(null); };
         return (
           <div>
-            {name && <p className="text-sm font-medium text-slate-800">{name}</p>}
+            {name
+              ? (
+                <button
+                  type="button"
+                  onClick={openDetail}
+                  style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left' as const }}
+                >
+                  <p className="text-sm font-medium text-blue-600 hover:underline">{name}</p>
+                </button>
+              )
+              : (
+                <button
+                  type="button"
+                  onClick={openDetail}
+                  style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left' as const }}
+                >
+                  <p className="text-xs text-blue-400 font-mono hover:underline">{row.user_id.slice(0, 8)}...</p>
+                </button>
+              )
+            }
             {row.user_email && <p className="text-xs text-slate-500">{row.user_email}</p>}
-            {!name && !row.user_email && (
-              <p className="text-xs text-slate-400 font-mono">{row.user_id.slice(0, 8)}...</p>
-            )}
           </div>
         );
       },
