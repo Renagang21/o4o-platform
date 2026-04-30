@@ -496,6 +496,9 @@ export function LmsLessonPage() {
               <strong>{course?.title}</strong>의 모든 단계를 완료했습니다.<br />
               수료증이 발급되었습니다.
             </p>
+            <div style={{ marginBottom: '16px', padding: '10px 16px', backgroundColor: '#fefce8', border: '1px solid #fde047', borderRadius: '8px', fontSize: '14px', color: '#854d0e', textAlign: 'center' as const }}>
+              ⭐ +50 크레딧이 적립되었습니다
+            </div>
             <div style={styles.modalActions}>
               <Link
                 to="/mypage/certificates"

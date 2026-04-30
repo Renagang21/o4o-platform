@@ -11,7 +11,8 @@
  *   - 사용자 드롭다운 메뉴 구성
  */
 
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { LayoutDashboard, Settings, Shield } from 'lucide-react';
 import { GlobalHeader, GlobalHeaderMenuItem } from '@o4o/ui';
 import { useAuth, type User as UserType } from '../contexts';
@@ -22,6 +23,7 @@ import {
   filterContextualNav,
 } from '../config/navigation';
 import ServiceSwitcher from './ServiceSwitcher';
+import { creditApi } from '../api/credit';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -48,6 +50,17 @@ export function KpaGlobalHeader() {
   const { user, logout } = useAuth();
   const { openLoginModal, openRegisterModal } = useAuthModal();
   const navigate = useNavigate();
+  const [creditBalance, setCreditBalance] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!user) { setCreditBalance(null); return; }
+    creditApi.getMyBalance()
+      .then((res: any) => {
+        const bal = res?.data?.data?.balance ?? res?.data?.balance ?? null;
+        if (typeof bal === 'number') setCreditBalance(bal);
+      })
+      .catch(() => { /* 실패 시 뱃지 숨김 */ });
+  }, [user]);
 
   // 역할 판정
   const isAdmin = user ? user.roles.includes('kpa:admin') : false;
@@ -90,7 +103,26 @@ export function KpaGlobalHeader() {
       onLogin={openLoginModal}
       onRegister={openRegisterModal}
       onLogout={handleLogout}
-      utilitySlot={<ServiceSwitcher currentServiceKey="kpa-society" />}
+      utilitySlot={
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {user && creditBalance !== null && (
+            <Link
+              to="/mypage/credits"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 4,
+                padding: '4px 10px', borderRadius: 999,
+                background: '#fef9c3', color: '#854d0e',
+                fontSize: 13, fontWeight: 600, textDecoration: 'none',
+                border: '1px solid #fde047',
+              }}
+              title="크레딧 잔액 — 클릭하면 이력을 확인할 수 있습니다"
+            >
+              ⭐ {creditBalance.toLocaleString()} C
+            </Link>
+          )}
+          <ServiceSwitcher currentServiceKey="kpa-society" />
+        </div>
+      }
       userMenuItems={
         <>
           {(isOperator || isAdmin) && (
