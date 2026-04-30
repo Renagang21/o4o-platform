@@ -123,11 +123,28 @@ export function LmsLessonPage() {
     setSelectedAnswers(prev => ({ ...prev, [questionId]: answer }));
   };
 
+  const handleMultiToggle = (questionId: string, option: string) => {
+    setSelectedAnswers(prev => {
+      const cur = prev[questionId];
+      const arr: string[] = Array.isArray(cur) ? cur : [];
+      const next = arr.includes(option) ? arr.filter(a => a !== option) : [...arr, option];
+      return { ...prev, [questionId]: next };
+    });
+  };
+
+  const handleTextInput = (questionId: string, value: string) => {
+    setSelectedAnswers(prev => ({ ...prev, [questionId]: value }));
+  };
+
   const handleQuizSubmit = async () => {
     if (!quiz) return;
 
-    // Check all questions answered
-    const unanswered = quiz.questions.filter(q => !selectedAnswers[q.id]);
+    // Check all questions answered (single/text: truthy string, multi: non-empty array)
+    const unanswered = quiz.questions.filter(q => {
+      const ans = selectedAnswers[q.id];
+      if (q.type === 'multi') return !Array.isArray(ans) || ans.length === 0;
+      return !ans;
+    });
     if (unanswered.length > 0) {
       toast.error(`${unanswered.length}개 문제를 아직 풀지 않았습니다.`);
       return;
@@ -324,27 +341,64 @@ export function LmsLessonPage() {
                       ({question.points}점)
                     </span>
                   )}
+                  {question.type === 'multi' && (
+                    <span style={{ ...typography.bodyS, color: colors.neutral500, marginLeft: '8px', fontWeight: 400 }}>
+                      (복수 선택)
+                    </span>
+                  )}
                 </h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {question.options?.map((option, oIndex) => {
-                    const isSelected = selectedAnswers[question.id] === option;
-                    return (
-                      <button
-                        key={oIndex}
-                        onClick={() => handleAnswerSelect(question.id, option)}
-                        style={{
-                          ...styles.optionButton,
-                          ...(isSelected ? styles.optionButtonSelected : {}),
-                        }}
-                      >
-                        <span style={styles.optionLabel}>
-                          {String.fromCharCode(65 + oIndex)}
-                        </span>
-                        <span>{option}</span>
-                      </button>
-                    );
-                  })}
-                </div>
+
+                {/* single: 기존 버튼 UI */}
+                {(question.type === 'single' || !question.type) && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {question.options?.map((option, oIndex) => {
+                      const isSelected = selectedAnswers[question.id] === option;
+                      return (
+                        <button
+                          key={oIndex}
+                          onClick={() => handleAnswerSelect(question.id, option)}
+                          style={{ ...styles.optionButton, ...(isSelected ? styles.optionButtonSelected : {}) }}
+                        >
+                          <span style={styles.optionLabel}>{String.fromCharCode(65 + oIndex)}</span>
+                          <span>{option}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* multi: 체크박스 UI */}
+                {question.type === 'multi' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {question.options?.map((option, oIndex) => {
+                      const selected = Array.isArray(selectedAnswers[question.id])
+                        && (selectedAnswers[question.id] as string[]).includes(option);
+                      return (
+                        <button
+                          key={oIndex}
+                          onClick={() => handleMultiToggle(question.id, option)}
+                          style={{ ...styles.optionButton, ...(selected ? styles.optionButtonSelected : {}) }}
+                        >
+                          <span style={styles.optionLabel}>
+                            {selected ? '✓' : String.fromCharCode(65 + oIndex)}
+                          </span>
+                          <span>{option}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* text: 주관식 입력 */}
+                {question.type === 'text' && (
+                  <input
+                    type="text"
+                    value={(selectedAnswers[question.id] as string) || ''}
+                    onChange={(e) => handleTextInput(question.id, e.target.value)}
+                    placeholder="답을 입력하세요"
+                    style={styles.textAnswerInput}
+                  />
+                )}
               </Card>
             ))}
 
@@ -674,6 +728,16 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: '6px',
     fontSize: '14px',
     cursor: 'pointer',
+  },
+  textAnswerInput: {
+    width: '100%',
+    padding: '12px 16px',
+    border: `1px solid ${colors.neutral300}`,
+    borderRadius: '8px',
+    fontSize: '14px',
+    color: colors.neutral700,
+    outline: 'none',
+    boxSizing: 'border-box' as const,
   },
   // WO-LMS-COMPLETION-AND-CERTIFICATE-UX-REFINEMENT-V1
   modalOverlay: {
