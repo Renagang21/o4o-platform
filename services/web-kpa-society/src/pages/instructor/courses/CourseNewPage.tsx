@@ -5,13 +5,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { lmsInstructorApi, CourseLevel } from '../../../api/lms-instructor';
-
-const LEVELS: { value: CourseLevel; label: string }[] = [
-  { value: 'beginner', label: '입문' },
-  { value: 'intermediate', label: '중급' },
-  { value: 'advanced', label: '고급' },
-];
+import { lmsInstructorApi } from '../../../api/lms-instructor';
 
 const styles: Record<string, React.CSSProperties> = {
   page: { maxWidth: 680, margin: '0 auto', padding: '32px 20px' },
@@ -27,10 +21,6 @@ const styles: Record<string, React.CSSProperties> = {
   textarea: {
     padding: '10px 14px', border: '1px solid #d1d5db', borderRadius: 8,
     fontSize: 14, color: '#111827', outline: 'none', resize: 'vertical', minHeight: 100,
-  },
-  select: {
-    padding: '10px 14px', border: '1px solid #d1d5db', borderRadius: 8,
-    fontSize: 14, color: '#111827', outline: 'none', background: '#fff',
   },
   tagContainer: {
     display: 'flex', flexWrap: 'wrap', gap: 6, padding: '8px 10px',
@@ -72,7 +62,7 @@ export default function CourseNewPage({
   returnTo,
 }: CourseNewPageProps = {}) {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ title: '', description: '', level: 'beginner' as CourseLevel });
+  const [form, setForm] = useState({ title: '', description: '' });
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -97,11 +87,10 @@ export default function CourseNewPage({
       const res: any = await lmsInstructorApi.createCourse({
         title: form.title.trim(),
         description: form.description.trim(),
-        level: form.level,
         tags: tags.length > 0 ? tags : undefined,
       });
-      // API returns { success, data: { course: Course } }
-      const courseId = res.data?.data?.course?.id;
+      // API returns { success, data: Course }
+      const courseId = res.data?.data?.id;
       if (courseId) {
         navigate(`/instructor/courses/${courseId}`);
       } else {
@@ -141,19 +130,6 @@ export default function CourseNewPage({
             onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
             placeholder="강의 내용과 목표를 설명해 주세요"
           />
-        </div>
-
-        <div style={styles.field}>
-          <label style={styles.label}>난이도</label>
-          <select
-            style={styles.select}
-            value={form.level}
-            onChange={(e) => setForm((f) => ({ ...f, level: e.target.value as CourseLevel }))}
-          >
-            {LEVELS.map((l) => (
-              <option key={l.value} value={l.value}>{l.label}</option>
-            ))}
-          </select>
         </div>
 
         <div style={styles.field}>
