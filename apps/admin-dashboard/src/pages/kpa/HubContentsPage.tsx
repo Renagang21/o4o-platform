@@ -1,0 +1,202 @@
+/**
+ * HubContentsPage — HUB 콘텐츠 목록
+ *
+ * WO-O4O-STORE-CONTENT-HUB-SHARE-UI-PHASE2-V1
+ *
+ * 경로: /operator/hub-contents
+ * 기능: 탭별 HUB 콘텐츠 조회 [전체] [공급자 자료] [매장 활용 사례]
+ */
+
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { authClient } from '@o4o/auth-client';
+import { BaseTable } from '@o4o/ui';
+import type { O4OColumn } from '@o4o/ui';
+import { RefreshCw } from 'lucide-react';
+import {
+  HUB_PRODUCER_LABELS,
+  HUB_SOURCE_DOMAIN_LABELS,
+} from '@o4o/types/hub-content';
+import type { HubContentItemResponse, HubProducer } from '@o4o/types/hub-content';
+import PageHeader from '../../components/common/PageHeader';
+
+// ── Constants ────────────────────────────────────────────────────────────────
+
+const SERVICE_KEY = 'kpa-society';
+const API_BASE = '/api/v1/hub/contents';
+
+type TabKey = 'all' | 'supplier' | 'store';
+
+const TABS: { key: TabKey; label: string; producer?: HubProducer }[] = [
+  { key: 'all',      label: '전체' },
+  { key: 'supplier', label: '공급자 자료',    producer: 'supplier' },
+  { key: 'store',    label: '매장 활용 사례', producer: 'store' },
+];
+
+const EMPTY_MESSAGES: Record<TabKey, string> = {
+  all:      'HUB에 등록된 콘텐츠가 없습니다.',
+  supplier: '등록된 공급자 자료가 없습니다.',
+  store:    '승인된 매장 활용 사례가 없습니다.',
+};
+
+const PRODUCER_BADGE_CLASS: Record<string, string> = {
+  operator: 'bg-gray-100 text-gray-600',
+  supplier: 'bg-purple-50 text-purple-700',
+  community: 'bg-blue-50 text-blue-700',
+  store: 'bg-teal-50 text-teal-700',
+};
+
+// ── API ──────────────────────────────────────────────────────────────────────
+
+interface ListResponse {
+  success: boolean;
+  data: HubContentItemResponse[];
+  pagination: { page: number; limit: number; total: number; totalPages: number };
+}
+
+async function fetchHubContents(
+  producer: HubProducer | undefined,
+  page: number,
+): Promise<ListResponse> {
+  const params: Record<string, any> = { serviceKey: SERVICE_KEY, page, limit: 20 };
+  if (producer) params.producer = producer;
+  const res = await authClient.api.get<ListResponse>(API_BASE, { params });
+  return res.data;
+}
+
+// ── Component ────────────────────────────────────────────────────────────────
+
+export default function HubContentsPage() {
+  const [tab, setTab] = useState<TabKey>('all');
+  const [page, setPage] = useState(1);
+
+  const activeTab = TABS.find((t) => t.key === tab)!;
+
+  const { data, isLoading, isError, refetch } = useQuery({
+    queryKey: ['hub-contents', tab, page],
+    queryFn: () => fetchHubContents(activeTab.producer, page),
+  });
+
+  const handleTabChange = (key: TabKey) => {
+    setTab(key);
+    setPage(1);
+  };
+
+  const columns: O4OColumn<HubContentItemResponse>[] = [
+    {
+      key: 'title',
+      header: '제목',
+      render: (row) => (
+        <span className="text-sm font-medium text-gray-900">{row.title}</span>
+      ),
+    },
+    {
+      key: 'producer',
+      header: '제작 주체',
+      width: 120,
+      render: (row) => (
+        <span
+          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+            PRODUCER_BADGE_CLASS[row.producer] ?? 'bg-gray-100 text-gray-600'
+          }`}
+        >
+          {HUB_PRODUCER_LABELS[row.producer] ?? row.producer}
+        </span>
+      ),
+    },
+    {
+      key: 'sourceDomain',
+      header: '출처',
+      width: 150,
+      render: (row) => (
+        <span className="text-xs text-gray-500">
+          {HUB_SOURCE_DOMAIN_LABELS[row.sourceDomain] ?? row.sourceDomain}
+        </span>
+      ),
+    },
+    {
+      key: 'createdAt',
+      header: '등록일',
+      width: 120,
+      render: (row) => (
+        <span className="text-sm text-gray-500">
+          {new Date(row.createdAt).toLocaleDateString('ko-KR')}
+        </span>
+      ),
+    },
+  ];
+
+  return (
+    <div className="p-6">
+      <PageHeader
+        title="HUB 콘텐츠"
+        subtitle="공급자 자료, 운영자 자료, 매장 활용 사례를 통합 조회합니다."
+        actions={[
+          { id: 'refresh', label: '새로고침', icon: <RefreshCw size={14} />, onClick: () => refetch() },
+        ]}
+      />
+
+      {/* 탭 */}
+      <div className="mb-4 border-b border-gray-200">
+        <div className="flex gap-1">
+          {TABS.map((t) => (
+            <button
+              key={t.key}
+              onClick={() => handleTabChange(t.key)}
+              className={`px-4 py-2.5 text-sm font-medium transition-colors ${
+                tab === t.key
+                  ? 'border-b-2 border-blue-600 text-blue-600'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              {t.label}
+              {data && tab === t.key && (
+                <span className="ml-1.5 rounded-full bg-gray-100 px-1.5 py-0.5 text-xs text-gray-600">
+                  {data.pagination.total}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* 콘텐츠 테이블 */}
+      {isLoading ? (
+        <div className="py-12 text-center text-sm text-gray-400">불러오는 중...</div>
+      ) : isError ? (
+        <div className="rounded border border-red-200 bg-red-50 p-6 text-center text-sm text-red-600">
+          데이터를 불러오는 중 오류가 발생했습니다.
+        </div>
+      ) : (
+        <BaseTable<HubContentItemResponse>
+          columns={columns}
+          data={data?.data ?? []}
+          emptyMessage={EMPTY_MESSAGES[tab]}
+        />
+      )}
+
+      {/* 페이지네이션 */}
+      {data && data.pagination.totalPages > 1 && (
+        <div className="mt-4 flex justify-center gap-2">
+          <button
+            className="rounded border px-3 py-1 text-sm disabled:opacity-40"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page <= 1}
+          >
+            이전
+          </button>
+          <span className="px-3 py-1 text-sm text-gray-600">
+            {page} / {data.pagination.totalPages}
+          </span>
+          <button
+            className="rounded border px-3 py-1 text-sm disabled:opacity-40"
+            onClick={() => setPage((p) => Math.min(data.pagination.totalPages, p + 1))}
+            disabled={page >= data.pagination.totalPages}
+          >
+            다음
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}

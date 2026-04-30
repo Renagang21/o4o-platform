@@ -575,6 +575,12 @@ export const adminMenuStatic: MenuItem[] = [
         icon: <Package className="w-4 h-4" />,
         path: '/supplierops/products',
       },
+      {
+        id: 'kpa-my-store-contents',
+        label: '내 매장 콘텐츠',
+        icon: <Store className="w-4 h-4" />,
+        path: '/kpa/my-store-contents',
+      },
     ],
   },
 
@@ -622,6 +628,12 @@ export const adminMenuStatic: MenuItem[] = [
         label: '템플릿 라이브러리',
         icon: <LayoutGrid className="w-4 h-4" />,
         path: '/store-content/templates',
+      },
+      {
+        id: 'hub-contents',
+        label: 'HUB 콘텐츠',
+        icon: <Store className="w-4 h-4" />,
+        path: '/operator/hub-contents',
       },
     ],
   },

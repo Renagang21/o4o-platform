@@ -25,6 +25,10 @@ const AuthAnalyticsPage = lazy(() => import('@/pages/operator/AuthAnalyticsPage'
 // Content Approvals (WO-O4O-OPERATOR-CONTENT-APPROVAL-PHASE1-V1)
 const ContentApprovalsPage = lazy(() => import('@/pages/operator/ContentApprovalsPage'));
 
+// KPA HUB & Store Content (WO-O4O-STORE-CONTENT-HUB-SHARE-UI-PHASE2-V1)
+const HubContentsPage = lazy(() => import('@/pages/kpa/HubContentsPage'));
+const MyStoreContentsPage = lazy(() => import('@/pages/kpa/MyStoreContentsPage'));
+
 // Loading component
 const PageLoader = () => (
   <div className="flex items-center justify-center h-screen">
@@ -126,6 +130,24 @@ export function PlatformRoutes() {
       <AdminProtectedRoute requiredRoles={['admin', 'super_admin', 'operator']}>
         <Suspense fallback={<PageLoader />}>
           <ContentApprovalsPage />
+        </Suspense>
+      </AdminProtectedRoute>
+    } />,
+
+    // HUB 콘텐츠 목록 (WO-O4O-STORE-CONTENT-HUB-SHARE-UI-PHASE2-V1)
+    <Route key="/operator/hub-contents" path="/operator/hub-contents" element={
+      <AdminProtectedRoute requiredRoles={['admin', 'super_admin', 'operator']}>
+        <Suspense fallback={<PageLoader />}>
+          <HubContentsPage />
+        </Suspense>
+      </AdminProtectedRoute>
+    } />,
+
+    // 내 매장 콘텐츠 (WO-O4O-STORE-CONTENT-HUB-SHARE-UI-PHASE2-V1)
+    <Route key="/kpa/my-store-contents" path="/kpa/my-store-contents" element={
+      <AdminProtectedRoute requiredRoles={['admin', 'super_admin', 'operator', 'supplier']}>
+        <Suspense fallback={<PageLoader />}>
+          <MyStoreContentsPage />
         </Suspense>
       </AdminProtectedRoute>
     } />,
