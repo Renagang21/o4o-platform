@@ -3,9 +3,10 @@
  *
  * WO-O4O-STORE-CONTENT-HUB-SHARE-UI-PHASE2-V1
  * WO-O4O-HUB-PRODUCER-FILTERING-PHASE3-V1
+ * WO-O4O-HUB-NOTICE-SYSTEM-V1
  *
  * 경로: /operator/hub-contents
- * 기능: [전체][공급자 자료][매장 활용 사례] 탭 + 출처 라벨 통일
+ * 기능: 상단 공지 영역 + [전체][공급자 자료][매장 활용 사례] 탭 + 출처 라벨 통일
  */
 
 import { useState } from 'react';
@@ -13,7 +14,7 @@ import { useQuery } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
 import { BaseTable } from '@o4o/ui';
 import type { O4OColumn } from '@o4o/ui';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Pin } from 'lucide-react';
 import type { HubContentItemResponse, HubProducer } from '@o4o/types/hub-content';
 import PageHeader from '../../components/common/PageHeader';
 
@@ -81,6 +82,20 @@ interface ListResponse {
   pagination: { page: number; limit: number; total: number; totalPages: number };
 }
 
+interface NoticeItem {
+  id: string;
+  title: string;
+  summary: string | null;
+  isPinned: boolean;
+  publishedAt: string | null;
+  expiresAt: string | null;
+}
+
+interface NoticeResponse {
+  success: boolean;
+  data: NoticeItem[];
+}
+
 async function fetchHubContents(
   producer: HubProducer | undefined,
   page: number,
@@ -91,6 +106,11 @@ async function fetchHubContents(
   return res.data;
 }
 
+async function fetchNotices(): Promise<NoticeItem[]> {
+  const res = await authClient.api.get<NoticeResponse>('/api/v1/kpa/notices');
+  return res.data?.data ?? [];
+}
+
 // ── Component ────────────────────────────────────────────────────────────────
 
 export default function HubContentsPage() {
@@ -98,6 +118,12 @@ export default function HubContentsPage() {
   const [page, setPage] = useState(1);
 
   const activeTab = TABS.find((t) => t.key === tab)!;
+
+  const { data: noticesData } = useQuery({
+    queryKey: ['hub-notices-banner'],
+    queryFn: fetchNotices,
+    staleTime: 60_000,
+  });
 
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['hub-contents', tab, page],
@@ -157,6 +183,37 @@ export default function HubContentsPage() {
           { id: 'refresh', label: '새로고침', icon: <RefreshCw size={14} />, onClick: () => refetch() },
         ]}
       />
+
+      {/* 공지 배너 — 최대 3개, isPinned 우선 */}
+      {noticesData && noticesData.length > 0 && (
+        <div className="mb-4 space-y-2">
+          {noticesData.map((notice) => (
+            <div
+              key={notice.id}
+              className={`flex items-start gap-2 rounded-lg border px-4 py-3 text-sm ${
+                notice.isPinned
+                  ? 'border-amber-200 bg-amber-50'
+                  : 'border-blue-100 bg-blue-50'
+              }`}
+            >
+              {notice.isPinned && (
+                <Pin size={14} className="mt-0.5 shrink-0 text-amber-500" />
+              )}
+              <div>
+                <span className="font-medium text-gray-900">{notice.title}</span>
+                {notice.summary && (
+                  <span className="ml-2 text-gray-500">{notice.summary}</span>
+                )}
+              </div>
+              {notice.expiresAt && (
+                <span className="ml-auto shrink-0 text-xs text-gray-400">
+                  ~{new Date(notice.expiresAt).toLocaleDateString('ko-KR')}
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* 탭 */}
       <div className="border-b border-gray-200">

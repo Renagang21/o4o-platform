@@ -810,7 +810,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // POST /news — 새 콘텐츠 생성
   newsRouter.post('/', authenticate, requireKpaScope('kpa:operator'), asyncHandler(async (req: Request, res: Response) => {
-    const { title, content, type, status: reqStatus, summary, isOperatorPicked } = req.body;
+    const { title, content, type, status: reqStatus, summary, isOperatorPicked, isPinned, expiresAt } = req.body;
     if (!title || !type) {
       res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'title and type are required' } });
       return;
@@ -832,6 +832,8 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       publishedAt: validStatus === 'published' ? new Date() : null,
       createdBy: userId,
       isOperatorPicked: isOperatorPicked === true,
+      isPinned: isPinned === true,
+      expiresAt: expiresAt ? new Date(expiresAt) : null,
     });
 
     const saved = await contentRepo.save(entity);
@@ -857,6 +859,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     if (type !== undefined && ALLOWED_TYPES.includes(type)) existing.type = type;
     if (isOperatorPicked !== undefined) existing.isOperatorPicked = isOperatorPicked === true;
     if (req.body.isPinned !== undefined) existing.isPinned = req.body.isPinned === true;
+    if (req.body.expiresAt !== undefined) {
+      existing.expiresAt = req.body.expiresAt ? new Date(req.body.expiresAt) : null;
+    }
     if (reqStatus !== undefined && ['draft', 'published', 'archived'].includes(reqStatus)) {
       if (reqStatus === 'published' && existing.status !== 'published') {
         existing.publishedAt = new Date();
@@ -1006,6 +1011,40 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   }));
 
   router.use('/news', newsRouter);
+
+  // ============================================================================
+  // HUB Notices - /api/v1/kpa/notices
+  // WO-O4O-HUB-NOTICE-SYSTEM-V1
+  //
+  // 매장 HUB 상단 공지 조회 전용 엔드포인트.
+  // published + 기간 내 + 최대 3개, isPinned DESC → createdAt DESC 정렬.
+  // 기존 /news 엔드포인트에 영향 없음.
+  // ============================================================================
+  router.get('/notices', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
+    const now = new Date();
+    const rows = await contentRepo.createQueryBuilder('c')
+      .where('c.serviceKey IN (:...sks)', { sks: KPA_SERVICE_KEYS })
+      .andWhere('c.type = :type', { type: 'notice' })
+      .andWhere('c.status = :status', { status: 'published' })
+      .andWhere('(c.publishedAt IS NULL OR c.publishedAt <= :now)', { now })
+      .andWhere('(c.expiresAt IS NULL OR c.expiresAt > :now)', { now })
+      .orderBy('c.isPinned', 'DESC')
+      .addOrderBy('c.createdAt', 'DESC')
+      .take(3)
+      .getMany();
+
+    res.json({
+      success: true,
+      data: rows.map((c: any) => ({
+        id: c.id,
+        title: c.title,
+        summary: c.summary,
+        isPinned: c.isPinned,
+        publishedAt: c.publishedAt,
+        expiresAt: c.expiresAt,
+      })),
+    });
+  }));
 
   // ============================================================================
   // Operator Audit Log Routes - /api/v1/kpa/operator/audit-logs

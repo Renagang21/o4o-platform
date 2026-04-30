@@ -635,6 +635,12 @@ export const adminMenuStatic: MenuItem[] = [
         icon: <Store className="w-4 h-4" />,
         path: '/operator/hub-contents',
       },
+      {
+        id: 'hub-notices',
+        label: 'HUB 공지 관리',
+        icon: <FileText className="w-4 h-4" />,
+        path: '/operator/hub-notices',
+      },
     ],
   },
 

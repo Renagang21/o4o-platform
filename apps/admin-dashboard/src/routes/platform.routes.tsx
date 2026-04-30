@@ -29,6 +29,9 @@ const ContentApprovalsPage = lazy(() => import('@/pages/operator/ContentApproval
 const HubContentsPage = lazy(() => import('@/pages/kpa/HubContentsPage'));
 const MyStoreContentsPage = lazy(() => import('@/pages/kpa/MyStoreContentsPage'));
 
+// KPA HUB Notice (WO-O4O-HUB-NOTICE-SYSTEM-V1)
+const HubNoticeListPage = lazy(() => import('@/pages/kpa/HubNoticeListPage'));
+
 // Loading component
 const PageLoader = () => (
   <div className="flex items-center justify-center h-screen">
@@ -148,6 +151,15 @@ export function PlatformRoutes() {
       <AdminProtectedRoute requiredRoles={['admin', 'super_admin', 'operator', 'supplier']}>
         <Suspense fallback={<PageLoader />}>
           <MyStoreContentsPage />
+        </Suspense>
+      </AdminProtectedRoute>
+    } />,
+
+    // HUB 공지 관리 (WO-O4O-HUB-NOTICE-SYSTEM-V1)
+    <Route key="/operator/hub-notices" path="/operator/hub-notices" element={
+      <AdminProtectedRoute requiredRoles={['admin', 'super_admin', 'operator']}>
+        <Suspense fallback={<PageLoader />}>
+          <HubNoticeListPage />
         </Suspense>
       </AdminProtectedRoute>
     } />,
