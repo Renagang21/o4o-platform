@@ -3,6 +3,7 @@
  *
  * WO-KPA-CONTENT-LIST-UX-ALIGNMENT-V1
  * WO-O4O-CONTENT-HUB-TEMPLATE-TYPE-ALIGNMENT-V1
+ * WO-KPA-CONTENT-LIST-TABS-ALIGN-WITH-CREATE-TYPES-V1: 리스트 탭을 생성 타입(문서/설문/코스형 자료)과 일치
  *
  * ContentHubTemplate 기반 공통 구조.
  * 컬럼: [유형] [제목] [작성자] [작성일] [조회수] [좋아요] [액션]
@@ -19,25 +20,40 @@ import { useAuth } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
 
 // ─── Type Mapping ─────────────────────────────────────────────────────────────
+// WO-KPA-CONTENT-LIST-TABS-ALIGN-WITH-CREATE-TYPES-V1
+// 생성 타입(/content/new): 문서 / 설문 / 코스형 자료
+// 리스트 탭: 전체 / 문서 / 설문 / 코스형 자료
+//
+// 데이터 모델:
+//   - content_type='information' + sub_type='content'  → 문서 (ContentWritePage 저장)
+//   - content_type='participation'                     → 설문 (sub_type 무관, legacy 포함)
+//   - sub_type='course'                                → 코스형 자료 (향후 호환)
+//
+// 설문/코스 신규 생성은 별도 도메인 API(participation/lms-instructor)로 가지만,
+// content_type='participation' 또는 sub_type='course'로 contents 테이블에 들어 있는
+// 항목은 본 리스트에서 함께 보여 일관성을 유지한다.
 
 const TYPE_LABELS: Record<string, string> = {
   information: '문서',
-  participation: '참여',
+  participation: '설문',
 };
 
 const TYPE_COLORS: Record<string, { bg: string; text: string }> = {
   information: { bg: '#eff6ff', text: '#1d4ed8' },
   participation: { bg: '#f5f3ff', text: '#7c3aed' },
+  course: { bg: '#ecfdf5', text: '#047857' },
 };
 
 function mapContentItem(item: ContentItem): ContentHubItem {
-  const subLabel = item.sub_type === '설문' ? '설문'
-    : TYPE_LABELS[item.content_type] ?? '문서';
+  // sub_type='course'면 코스형 자료로 우선 분류
+  const isCourse = item.sub_type === 'course';
+  const label = isCourse ? '코스형 자료' : (TYPE_LABELS[item.content_type] ?? '문서');
+  const color = isCourse ? TYPE_COLORS.course : TYPE_COLORS[item.content_type];
   return {
     id: item.id,
     title: item.title,
-    type: subLabel,
-    typeColor: TYPE_COLORS[item.content_type],
+    type: label,
+    typeColor: color,
     date: item.created_at,
     // WO-O4O-CONTENT-HUB-TEMPLATE-TYPE-ALIGNMENT-V1: 확장 필드
     authorName: item.author_name ?? null,
@@ -46,6 +62,16 @@ function mapContentItem(item: ContentItem): ContentHubItem {
     likeCount: item.like_count ?? 0,
   };
 }
+
+// 탭 키 → API query 매핑. 탭별로 content_type / sub_type을 다르게 적용한다.
+// 'all' 탭은 기존 sub_type='content' 고정을 유지해 자료실(sub_type='resource') 분리를 보존
+// (WO-KPA-CONTENT-RESOURCE-SUBTYPE-SEPARATION-V1).
+const FILTER_QUERY: Record<string, { content_type?: string; sub_type?: string }> = {
+  all: { sub_type: 'content' },
+  information: { content_type: 'information', sub_type: 'content' },
+  participation: { content_type: 'participation' },
+  course: { sub_type: 'course' },
+};
 
 function formatDate(d: string) {
   try { return new Date(d).toLocaleDateString('ko-KR'); } catch { return '-'; }
@@ -275,18 +301,20 @@ export function ContentListPage() {
     filters: [
       { key: 'all', label: '전체' },
       { key: 'information', label: '문서' },
-      { key: 'participation', label: '참여' },
+      { key: 'participation', label: '설문' },
+      { key: 'course', label: '코스형 자료' },
     ],
     pageLimit: 20,
     fetchItems: async ({ filter, search, page, limit }) => {
       try {
+        const query = FILTER_QUERY[filter] ?? FILTER_QUERY.all;
         const res = await contentApi.list({
           page,
           limit,
           sort: 'latest',
           search: search || undefined,
-          content_type: filter !== 'all' ? filter : undefined,
-          sub_type: 'content', // WO-KPA-CONTENT-RESOURCE-SUBTYPE-SEPARATION-V1
+          content_type: query.content_type,
+          sub_type: query.sub_type,
         });
         return {
           items: (res.data?.items ?? []).map(mapContentItem),
