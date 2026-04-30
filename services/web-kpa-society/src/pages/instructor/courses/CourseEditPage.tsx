@@ -7,6 +7,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { RichTextEditor } from '@o4o/content-editor';
 import { lmsInstructorApi, Course, Lesson, LessonType } from '../../../api/lms-instructor';
 
 const LEVEL_LABEL: Record<string, string> = { beginner: '입문', intermediate: '중급', advanced: '고급' };
@@ -93,9 +94,15 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
     videoUrl: lesson?.videoUrl || '',
     duration: lesson?.duration ?? 0,
   });
-  const [content, setContent] = useState<string>(
-    lesson?.content ? JSON.stringify(lesson.content) : '',
-  );
+  const [content, setContent] = useState<string>(() => {
+    if (!lesson?.content) return '';
+    if (typeof lesson.content === 'string') return lesson.content;
+    // 레거시 JSON 객체 호환: { html: "..." } 또는 { text: "..." }
+    const c = lesson.content as any;
+    if (c.html) return c.html;
+    if (c.text) return `<p>${c.text}</p>`;
+    return '';
+  });
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
@@ -104,15 +111,12 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
     setSaving(true);
     setErr(null);
     try {
-      let parsedContent: Record<string, any> | null = null;
-      if (content.trim()) {
-        try { parsedContent = JSON.parse(content); } catch { parsedContent = { text: content }; }
-      }
+      const htmlContent = content.trim() || null;
       if (isEdit && lesson) {
         await lmsInstructorApi.updateLesson(lesson.id, {
           title: form.title.trim(),
           description: form.description || null,
-          content: parsedContent,
+          content: htmlContent,
           videoUrl: form.videoUrl || null,
           duration: form.duration,
         });
@@ -121,7 +125,7 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
           title: form.title.trim(),
           type: form.type,
           description: form.description || null,
-          content: parsedContent,
+          content: htmlContent,
           videoUrl: form.videoUrl || null,
           order: nextOrder,
           duration: form.duration,
@@ -168,12 +172,13 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
         )}
 
         <div style={s.field}>
-          <label style={s.label}>본문 (JSON 또는 텍스트)</label>
-          <textarea
-            style={{ ...s.textarea, minHeight: 120, fontFamily: 'monospace', fontSize: 12 }}
+          <label style={s.label}>본문</label>
+          <RichTextEditor
             value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder={'{ "blocks": [...] }  또는 일반 텍스트'}
+            onChange={(c) => setContent(c.html)}
+            placeholder="레슨 본문을 입력하세요"
+            minHeight="200px"
+            preset="compact"
           />
         </div>
 

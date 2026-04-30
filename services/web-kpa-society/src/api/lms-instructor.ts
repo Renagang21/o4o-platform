@@ -38,7 +38,7 @@ export interface Lesson {
   title: string;
   description: string | null;
   type: LessonType;
-  content: Record<string, any> | null;
+  content: string | null;
   videoUrl: string | null;
   order: number;
   duration: number;
@@ -82,7 +82,7 @@ export interface CreateLessonDto {
   title: string;
   type: LessonType;
   description?: string | null;
-  content?: Record<string, any> | null;
+  content?: string | null;
   videoUrl?: string | null;
   order?: number;
   duration?: number;
@@ -91,7 +91,7 @@ export interface CreateLessonDto {
 export interface UpdateLessonDto {
   title?: string;
   description?: string | null;
-  content?: Record<string, any> | null;
+  content?: string | null;
   videoUrl?: string | null;
   order?: number;
   duration?: number;
