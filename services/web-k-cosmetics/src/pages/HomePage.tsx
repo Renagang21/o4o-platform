@@ -2,11 +2,12 @@
  * HomePage - K-Cosmetics 통합 Home 허브
  *
  * WO-KCOS-KPA-HOME-PORT-V1: KPA CommunityHomePage 4블록 구조 이식
+ * WO-O4O-KCOS-HOME-DESIGN-APPLY-V1: 브랜드/감성 테마 적용
  *
  * 섹션 구조 (KPA canonical):
- * ├─ HeroBannerSection        — 동적 광고 캐러셀 (community ads)
+ * ├─ HeroBannerSection        — 동적 광고 캐러셀 / 브랜드 Hero (기본)
  * ├─ 공지 / K-Beauty 트렌드   — 2-column (좌: 공지, 우: placeholder)
- * ├─ AppEntrySection          — 서비스 바로가기 카드 (shared)
+ * ├─ AppEntrySection          — 서비스 바로가기 카드 (brand-card style, shared)
  * └─ CtaGuidanceSection       — Market Trial CTA (shared)
  */
 
@@ -37,7 +38,6 @@ const EducationIconSvg = () => (
     <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
   </svg>
 );
-
 
 const ContentIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -70,7 +70,6 @@ const StoreHubIcon = () => (
   </svg>
 );
 
-
 const TrendIcon = () => (
   <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
@@ -78,10 +77,23 @@ const TrendIcon = () => (
   </svg>
 );
 
-// ─── Accent color ──────────────────────────────────────────
+// ─── Icon wrapper — brand card style (circular pill bg) ─────
 
-const ACCENT = '#db2777';
-const ACCENT_BG = '#fdf2f8';
+const IconWrap = ({ children }: { children: React.ReactNode }) => (
+  <span style={iconWrapStyle}>{children}</span>
+);
+
+const iconWrapStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: 44,
+  height: 44,
+  borderRadius: '50%',
+  backgroundColor: '#fdf2f8', /* pink-50 = primary/10 */
+  color: 'var(--color-primary)',
+  flexShrink: 0,
+};
 
 // ─── Main Component ─────────────────────────────────────────
 
@@ -121,7 +133,7 @@ export function HomePage() {
 
   return (
     <div style={styles.page}>
-      {/* 1. Hero 배너 (동적 광고 캐러셀) */}
+      {/* 1. Hero 배너 (동적 광고 캐러셀 / 브랜드 Hero) */}
       <PageHero>
         <HeroBannerSection ads={data?.heroAds ?? []} />
       </PageHero>
@@ -137,8 +149,8 @@ export function HomePage() {
                 items={noticeItems}
                 loading={loading}
                 viewAllHref="/forum"
-                accentColor={ACCENT}
-                accentBg={ACCENT_BG}
+                accentColor="var(--color-primary)"
+                accentBg="var(--color-primary-light, #fdf2f8)"
               />
             </div>
             {/* Right: K-Beauty 트렌드 Placeholder */}
@@ -163,18 +175,18 @@ export function HomePage() {
         </PageContainer>
       </PageSection>
 
-      {/* 3. 서비스 바로가기 (shared) */}
+      {/* 3. 서비스 바로가기 — brand-card style */}
       <PageSection>
         <PageContainer>
           <AppEntrySection
-            accentColor={ACCENT}
+            accentColor="var(--color-primary)"
             cards={[
-              { title: '포럼', description: 'K-Beauty 전문가와 토론하고 소통하세요', href: '/forum', icon: <ForumIcon /> },
-              { title: '강의', description: 'K-Beauty 교육 콘텐츠를 온라인으로 수강하세요', href: '/lms', icon: <EducationIconSvg /> },
-              { title: '콘텐츠', description: '플랫폼 콘텐츠를 검색하고 활용하세요', href: '/library/content', icon: <ContentIcon /> },
-              { title: '매장 운영 허브', description: 'B2B 상품, 사이니지, 콘텐츠를 탐색하고 매장에 연결하세요', href: '/store-hub', icon: <StoreHubIcon /> },
-              { title: '자료실', description: 'K-Beauty 관련 자료를 검색하고 활용하세요', href: '/resources', icon: <ResourcesIcon /> },
-              { title: '커뮤니티', description: '공지, 광고, 후원 정보를 확인하세요', href: '/community', icon: <CommunityIcon /> },
+              { title: '포럼', description: 'K-Beauty 전문가와 토론하고 소통하세요', href: '/forum', icon: <IconWrap><ForumIcon /></IconWrap> },
+              { title: '강의', description: 'K-Beauty 교육 콘텐츠를 온라인으로 수강하세요', href: '/lms', icon: <IconWrap><EducationIconSvg /></IconWrap> },
+              { title: '콘텐츠', description: '플랫폼 콘텐츠를 검색하고 활용하세요', href: '/library/content', icon: <IconWrap><ContentIcon /></IconWrap> },
+              { title: '매장 운영 허브', description: 'B2B 상품, 사이니지, 콘텐츠를 탐색하고 매장에 연결하세요', href: '/store-hub', icon: <IconWrap><StoreHubIcon /></IconWrap> },
+              { title: '자료실', description: 'K-Beauty 관련 자료를 검색하고 활용하세요', href: '/resources', icon: <IconWrap><ResourcesIcon /></IconWrap> },
+              { title: '커뮤니티', description: '공지, 광고, 후원 정보를 확인하세요', href: '/community', icon: <IconWrap><CommunityIcon /></IconWrap> },
             ]}
           />
         </PageContainer>
@@ -189,6 +201,8 @@ export function HomePage() {
             href="https://neture.co.kr"
             linkLabel="Neture에서 보기 →"
             icon={<span>🧪</span>}
+            accentColor="var(--color-primary)"
+            accentBg="var(--color-primary-light, #fdf2f8)"
             external
           />
         </PageContainer>
@@ -204,10 +218,12 @@ export function HomePage() {
   );
 }
 
+// ─── Two-column Styles ───────────────────────────────────────
+
 const twoColStyles: Record<string, React.CSSProperties> = {
   row: {
     display: 'flex',
-    gap: 16,
+    gap: 20,
   },
   col: {
     flex: 1,
@@ -219,39 +235,42 @@ const twoColStyles: Record<string, React.CSSProperties> = {
   placeholderTitle: {
     fontSize: 18,
     fontWeight: 700,
-    color: '#1e293b',
+    color: 'var(--color-text-primary, #1e293b)',
     margin: 0,
   },
   placeholderCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    border: '1px solid #e2e8f0',
-    padding: '40px 16px',
+    backgroundColor: 'var(--color-bg-primary, #ffffff)',
+    borderRadius: 16,
+    border: '1px solid var(--color-border-default, #e2e8f0)',
+    padding: '56px 16px',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 200,
+    minHeight: 220,
   },
   placeholderText: {
     fontSize: '0.9375rem',
     fontWeight: 500,
-    color: '#334155',
-    margin: '12px 0',
+    color: 'var(--color-text-secondary, #475569)',
+    margin: '14px 0',
     textAlign: 'center',
+    lineHeight: 1.6,
   },
   placeholderLink: {
     fontSize: '0.875rem',
     fontWeight: 600,
-    color: '#db2777',
+    color: 'var(--color-primary, #DB2777)',
     textDecoration: 'none',
   },
 };
 
+// ─── Page Styles ─────────────────────────────────────────────
+
 const styles: Record<string, React.CSSProperties> = {
   page: {
     minHeight: '100vh',
-    backgroundColor: '#f8fafc',
+    backgroundColor: 'var(--color-bg-secondary, #f8fafc)',
   },
 };
 
