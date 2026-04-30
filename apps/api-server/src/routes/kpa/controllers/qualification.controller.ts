@@ -173,22 +173,43 @@ export function createQualificationController(
         const pageNum = parseInt(page) || 1;
         const limitNum = parseInt(limit) || 20;
 
-        const qb = reqRepo.createQueryBuilder('r')
-          .leftJoin('users', 'u', 'u.id = r.user_id')
-          .addSelect(['u.name', 'u.email']);
+        const conditions: string[] = [];
+        const params: any[] = [];
+        let pidx = 1;
 
-        if (status) qb.andWhere('r.status = :status', { status });
-        if (qualificationType) qb.andWhere('r.qualification_type = :qt', { qt: qualificationType });
+        if (status) {
+          conditions.push(`r.status = $${pidx++}`);
+          params.push(status);
+        }
+        if (qualificationType) {
+          conditions.push(`r.qualification_type = $${pidx++}`);
+          params.push(qualificationType);
+        }
 
-        qb.orderBy('r.created_at', 'DESC')
-          .skip((pageNum - 1) * limitNum)
-          .take(limitNum);
+        const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+        const offset = (pageNum - 1) * limitNum;
 
-        const [requests, total] = await qb.getManyAndCount();
+        const [rows, countRows] = await Promise.all([
+          dataSource.query(
+            `SELECT r.*, u.name AS user_name, u.email AS user_email
+             FROM qualification_requests r
+             LEFT JOIN users u ON u.id = r.user_id
+             ${where}
+             ORDER BY r.created_at DESC
+             LIMIT $${pidx} OFFSET $${pidx + 1}`,
+            [...params, limitNum, offset],
+          ),
+          dataSource.query(
+            `SELECT COUNT(*)::int AS count FROM qualification_requests r ${where}`,
+            params,
+          ),
+        ]);
+
+        const total = countRows[0]?.count ?? 0;
 
         res.json({
           success: true,
-          data: requests,
+          data: rows,
           total,
           page: pageNum,
           limit: limitNum,

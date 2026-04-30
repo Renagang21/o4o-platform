@@ -48,6 +48,8 @@ export interface MemberQualification {
 export interface QualificationRequest {
   id: string;
   user_id: string;
+  user_name: string | null;
+  user_email: string | null;
   qualification_type: string;
   status: QualificationStatus;
   request_data: Record<string, any>;

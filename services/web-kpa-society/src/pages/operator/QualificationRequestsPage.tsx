@@ -199,11 +199,16 @@ export default function QualificationRequestsPage() {
       key: 'user_id',
       header: '신청자',
       render: (_v, row) => {
+        const accountName = row.user_name;
         const displayName = (row.request_data as any)?.displayName;
+        const name = accountName || displayName;
         return (
           <div>
-            {displayName && <p className="text-sm font-medium text-slate-800">{displayName}</p>}
-            <p className="text-xs text-slate-400 font-mono">{row.user_id.slice(0, 8)}...</p>
+            {name && <p className="text-sm font-medium text-slate-800">{name}</p>}
+            {row.user_email && <p className="text-xs text-slate-500">{row.user_email}</p>}
+            {!name && !row.user_email && (
+              <p className="text-xs text-slate-400 font-mono">{row.user_id.slice(0, 8)}...</p>
+            )}
           </div>
         );
       },
@@ -343,6 +348,17 @@ export default function QualificationRequestsPage() {
             <h2 style={styles.modalTitle}>
               {selectedRequest.status === 'pending' ? '자격 신청 검토' : '자격 신청 상세'}
             </h2>
+
+            {/* 신청자 정보 */}
+            <div style={{ padding: '12px 16px', backgroundColor: '#f8fafc', borderRadius: '8px', marginBottom: '16px' }}>
+              <p style={{ fontSize: '12px', fontWeight: 600, color: '#64748b', marginBottom: '6px', textTransform: 'uppercase' as const, letterSpacing: '0.05em' }}>신청자</p>
+              <p style={{ fontSize: '15px', fontWeight: 600, color: '#1e293b', marginBottom: '2px' }}>
+                {selectedRequest.user_name || (selectedRequest.request_data as any)?.displayName || '-'}
+              </p>
+              {selectedRequest.user_email && (
+                <p style={{ fontSize: '13px', color: '#64748b' }}>{selectedRequest.user_email}</p>
+              )}
+            </div>
 
             <div style={styles.detailRow}>
               <span style={styles.detailLabel}>신청 유형</span>
