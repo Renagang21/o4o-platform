@@ -93,6 +93,7 @@ import { createInstructorController } from './controllers/instructor.controller.
 import { createCourseRequestController } from './controllers/course-request.controller.js';
 import { createForumRequestController } from './controllers/forum-request.controller.js';
 import { createForumMembershipController } from './controllers/forum-membership.controller.js';
+import { createContentApprovalController } from './controllers/content-approval.controller.js';
 import { createCommunityHubController } from './controllers/community-hub.controller.js';
 import { createLegalDocumentsController } from './controllers/legal-documents.controller.js';
 import { createEventOfferController } from './controllers/event-offer.controller.js';
@@ -225,6 +226,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // WO-O4O-OPERATOR-ACTION-LAYER-V1: Action Queue endpoints
   // WO-O4O-ACTION-SCOPE-GUARD-V1: execute endpoint admin-only scope guard
   router.use('/operator', coreRequireAuth as any, createActionQueueRouter(dataSource, kpaActionConfig, requireKpaScope('kpa:admin')));
+
+  // Content Approval — hub_content_submission / store_share_to_hub (WO-O4O-OPERATOR-CONTENT-APPROVAL-PHASE1-V1)
+  router.use('/operator/approvals', createContentApprovalController(dataSource, coreRequireAuth as any, requireKpaScope));
 
   // Product Application Management (WO-O4O-PRODUCT-APPROVAL-WORKFLOW-V1)
   router.use('/operator/product-applications', createOperatorProductApplicationsController(dataSource, coreRequireAuth as any, requireKpaScope, kpaActionLogService));

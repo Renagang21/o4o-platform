@@ -22,6 +22,9 @@ const ServiceOverview = lazy(() => import('@/pages/services/ServiceOverview'));
 // Auth Analytics (WO-O4O-AUTH-ANALYTICS-UI-V1)
 const AuthAnalyticsPage = lazy(() => import('@/pages/operator/AuthAnalyticsPage'));
 
+// Content Approvals (WO-O4O-OPERATOR-CONTENT-APPROVAL-PHASE1-V1)
+const ContentApprovalsPage = lazy(() => import('@/pages/operator/ContentApprovalsPage'));
+
 // Loading component
 const PageLoader = () => (
   <div className="flex items-center justify-center h-screen">
@@ -114,6 +117,15 @@ export function PlatformRoutes() {
       <AdminProtectedRoute requiredRoles={['admin', 'super_admin', 'operator']}>
         <Suspense fallback={<PageLoader />}>
           <AuthAnalyticsPage />
+        </Suspense>
+      </AdminProtectedRoute>
+    } />,
+
+    // Content Approvals (WO-O4O-OPERATOR-CONTENT-APPROVAL-PHASE1-V1)
+    <Route key="/operator/approvals" path="/operator/approvals" element={
+      <AdminProtectedRoute requiredRoles={['admin', 'super_admin', 'operator']}>
+        <Suspense fallback={<PageLoader />}>
+          <ContentApprovalsPage />
         </Suspense>
       </AdminProtectedRoute>
     } />,
