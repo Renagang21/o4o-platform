@@ -682,6 +682,9 @@ function App() {
           <Route path="/content/:id/edit" element={<Layout serviceName={SERVICE_NAME}><ContentWritePage /></Layout>} />
 
           {/* Legacy redirects → 신규 섹션 라우트 */}
+          {/* WO-KPA-CONTENT-ROUTE-CLEANUP-AFTER-SECTIONS-V1: /content/documents 목록 페이지는
+              의도적으로 만들지 않음(메인 허브 1번 섹션이 동일 역할). 직접 접근 시 안전망 redirect. */}
+          <Route path="/content/documents" element={<Navigate to="/content" replace />} />
           <Route path="/content/new" element={<Navigate to="/content/documents/new" replace />} />
           <Route path="/content/write" element={<Navigate to="/content/documents/new" replace />} />
           <Route path="/content/new/survey" element={<Navigate to="/content/surveys/new" replace />} />
