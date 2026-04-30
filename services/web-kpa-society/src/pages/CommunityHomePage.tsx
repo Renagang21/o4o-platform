@@ -21,7 +21,6 @@ import { useState, useEffect } from 'react';
 import { HeroBannerSection } from '../components/community/HeroBannerSection';
 import { homeApi } from '../api/home';
 import type { HomePageData } from '../api/home';
-import { colors } from '../styles/theme';
 import { PageHero, PageSection, PageContainer } from '@o4o/ui';
 import {
   NewsNoticesSection,
@@ -130,6 +129,8 @@ export function CommunityHomePage() {
                 title="공지"
                 items={noticeItems}
                 loading={loading}
+                accentColor="var(--color-primary)"
+                accentBg="var(--color-primary-light, #eff6ff)"
               />
             </div>
             {/* Right: 약사공론 뉴스 Placeholder */}
@@ -160,12 +161,13 @@ export function CommunityHomePage() {
       <PageSection>
         <PageContainer>
           <AppEntrySection
+            accentColor="var(--color-primary)"
             cards={[
-              { title: '포럼', description: '동료 약사와 질문·토론으로 전문성을 높이세요', href: '/forum', icon: <ForumIcon /> },
-              { title: '강의', description: '보수교육·세미나를 온라인으로 수강하세요', href: '/lms', icon: <EducationIconSvg /> },
-              { title: '콘텐츠', description: '플랫폼 콘텐츠를 검색하고 활용하세요', href: '/content', icon: <ContentIcon /> },
-              { title: '디지털 사이니지', description: '약국 디지털 미디어를 관리하세요', href: '/signage', icon: <SignageIcon /> },
-              { title: '자료실', description: '자료를 저장하고 AI 작업에 활용하세요', href: '/resources', icon: <ResourceLibraryIcon /> },
+              { title: '포럼', description: '동료 약사와 질문·토론으로 전문성을 높이세요', href: '/forum', icon: <span style={iconStyle}><ForumIcon /></span> },
+              { title: '강의', description: '보수교육·세미나를 온라인으로 수강하세요', href: '/lms', icon: <span style={iconStyle}><EducationIconSvg /></span> },
+              { title: '콘텐츠', description: '플랫폼 콘텐츠를 검색하고 활용하세요', href: '/content', icon: <span style={iconStyle}><ContentIcon /></span> },
+              { title: '디지털 사이니지', description: '약국 디지털 미디어를 관리하세요', href: '/signage', icon: <span style={iconStyle}><SignageIcon /></span> },
+              { title: '자료실', description: '자료를 저장하고 AI 작업에 활용하세요', href: '/resources', icon: <span style={iconStyle}><ResourceLibraryIcon /></span> },
             ]}
           />
         </PageContainer>
@@ -180,6 +182,8 @@ export function CommunityHomePage() {
             href="https://neture.co.kr"
             linkLabel="Neture에서 보기 →"
             icon={<span>🧪</span>}
+            accentColor="var(--color-primary)"
+            accentBg="var(--color-primary-light, #eff6ff)"
             external
           />
         </PageContainer>
@@ -215,6 +219,12 @@ export function CommunityHomePage() {
   );
 }
 
+const iconStyle: React.CSSProperties = {
+  color: 'var(--color-primary)',
+  display: 'flex',
+  alignItems: 'center',
+};
+
 const twoColStyles: Record<string, React.CSSProperties> = {
   row: {
     display: 'flex',
@@ -230,14 +240,14 @@ const twoColStyles: Record<string, React.CSSProperties> = {
   placeholderTitle: {
     fontSize: 18,
     fontWeight: 700,
-    color: '#1e293b',
+    color: 'var(--color-text-primary, #1e293b)',
     margin: 0,
   },
   placeholderCard: {
-    backgroundColor: '#ffffff',
+    backgroundColor: 'var(--color-bg-primary, #ffffff)',
     borderRadius: 12,
-    border: '1px solid #e2e8f0',
-    padding: '40px 16px',
+    border: '1px solid var(--color-border-default, #e2e8f0)',
+    padding: '48px 16px',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -247,14 +257,14 @@ const twoColStyles: Record<string, React.CSSProperties> = {
   placeholderText: {
     fontSize: '0.9375rem',
     fontWeight: 500,
-    color: '#334155',
+    color: 'var(--color-text-secondary, #475569)',
     margin: '12px 0',
     textAlign: 'center',
   },
   placeholderLink: {
     fontSize: '0.875rem',
     fontWeight: 600,
-    color: '#2563EB',
+    color: 'var(--color-primary, #2563EB)',
     textDecoration: 'none',
   },
 };
@@ -262,7 +272,7 @@ const twoColStyles: Record<string, React.CSSProperties> = {
 const styles: Record<string, React.CSSProperties> = {
   page: {
     minHeight: '100vh',
-    backgroundColor: colors.neutral50,
+    backgroundColor: 'var(--color-bg-secondary, #f8fafc)',
   },
 };
 

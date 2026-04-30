@@ -8,7 +8,6 @@
 
 import { useState, useEffect, useCallback, CSSProperties } from 'react';
 import type { CommunityAd } from '../../api/community';
-import { colors } from '../../styles/theme';
 
 interface Props {
   ads: CommunityAd[];
@@ -154,9 +153,10 @@ const styles: Record<string, CSSProperties> = {
     padding: 0,
   },
   defaultHero: {
-    background: `linear-gradient(135deg, ${colors.primary}, ${colors.primaryDark})`,
+    background: 'var(--color-bg-secondary, #f8fafc)',
     borderRadius: 16,
-    padding: '48px 32px',
+    border: '1px solid var(--color-border-default, #e2e8f0)',
+    padding: '64px 32px',
     textAlign: 'center' as const,
     marginBottom: 0,
   },
@@ -166,22 +166,22 @@ const styles: Record<string, CSSProperties> = {
   },
   badge: {
     display: 'inline-block',
-    background: 'rgba(255,255,255,0.2)',
+    background: 'var(--color-primary, #2563EB)',
     color: 'white',
     fontSize: 12,
     fontWeight: 600,
     padding: '4px 12px',
     borderRadius: 20,
-    marginBottom: 12,
+    marginBottom: 16,
   },
   title: {
-    color: 'white',
+    color: 'var(--color-primary, #2563EB)',
     fontSize: 28,
     fontWeight: 700,
-    margin: '0 0 8px',
+    margin: '0 0 12px',
   },
   subtitle: {
-    color: 'rgba(255,255,255,0.8)',
+    color: '#475569',
     fontSize: 16,
     margin: 0,
   },
