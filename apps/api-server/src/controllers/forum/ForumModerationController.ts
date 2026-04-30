@@ -95,7 +95,6 @@ export class ForumModerationController extends ForumControllerBase {
           todayComments,
           activeCategories: activeCategories.map(cat => ({
             name: cat.name,
-            postCount: cat.postCount,
           })),
         },
       });

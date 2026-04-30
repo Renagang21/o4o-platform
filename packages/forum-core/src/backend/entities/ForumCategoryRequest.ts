@@ -27,7 +27,8 @@ export type CategoryRequestStatus =
   | 'creating'
   | 'completed'
   | 'failed'
-  | 'rejected';
+  | 'rejected'
+  | 'archived'; // WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1: deactivated forum
 
 @Entity('forum_category_requests')
 @Index(['serviceCode', 'status'])
