@@ -55,12 +55,16 @@ function formatDate(d: string) {
 
 function RowActionMenu({
   onView,
+  onCopyLink,
   onEdit,
   onDelete,
+  isOwner,
 }: {
   onView: () => void;
+  onCopyLink: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  isOwner: boolean;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -88,16 +92,26 @@ function RowActionMenu({
             </button>
             <button
               style={styles.dropdownItem}
-              onClick={(e) => { e.stopPropagation(); setOpen(false); onEdit(); }}
+              onClick={(e) => { e.stopPropagation(); setOpen(false); onCopyLink(); }}
             >
-              수정
+              링크 복사
             </button>
-            <button
-              style={{ ...styles.dropdownItem, color: '#ef4444' }}
-              onClick={(e) => { e.stopPropagation(); setOpen(false); onDelete(); }}
-            >
-              삭제
-            </button>
+            {isOwner && (
+              <button
+                style={styles.dropdownItem}
+                onClick={(e) => { e.stopPropagation(); setOpen(false); onEdit(); }}
+              >
+                수정
+              </button>
+            )}
+            {isOwner && (
+              <button
+                style={{ ...styles.dropdownItem, color: '#ef4444' }}
+                onClick={(e) => { e.stopPropagation(); setOpen(false); onDelete(); }}
+              >
+                삭제
+              </button>
+            )}
           </div>
         </>
       )}
@@ -111,12 +125,14 @@ function ContentTable({
   items,
   currentUserId,
   onNavigate,
+  onCopyLink,
   onEdit,
   onDelete,
 }: {
   items: ContentHubItem[];
   currentUserId: string | undefined;
   onNavigate: (id: string) => void;
+  onCopyLink: (id: string) => void;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
 }) {
@@ -194,13 +210,13 @@ function ContentTable({
                   style={{ ...styles.td, textAlign: 'center' }}
                   onClick={(e) => e.stopPropagation()}
                 >
-                  {isOwner && (
-                    <RowActionMenu
-                      onView={() => onNavigate(item.id)}
-                      onEdit={() => onEdit(item.id)}
-                      onDelete={() => onDelete(item.id)}
-                    />
-                  )}
+                  <RowActionMenu
+                    isOwner={isOwner}
+                    onView={() => onNavigate(item.id)}
+                    onCopyLink={() => onCopyLink(item.id)}
+                    onEdit={() => onEdit(item.id)}
+                    onDelete={() => onDelete(item.id)}
+                  />
                 </td>
               </tr>
             );
@@ -219,6 +235,13 @@ export function ContentListPage() {
 
   // 삭제 후 ContentHubTemplate 재마운트로 목록 갱신
   const [refreshKey, setRefreshKey] = useState(0);
+
+  const handleCopyLink = useCallback((id: string) => {
+    const url = `${window.location.origin}/content/${id}`;
+    navigator.clipboard.writeText(url)
+      .then(() => toast.success('링크가 복사되었습니다'))
+      .catch(() => toast.error('링크 복사에 실패했습니다'));
+  }, []);
 
   const handleDelete = useCallback(async (id: string) => {
     if (!window.confirm('이 콘텐츠를 삭제하시겠습니까?')) return;
@@ -278,6 +301,7 @@ export function ContentListPage() {
         items={items}
         currentUserId={user?.id}
         onNavigate={(id) => navigate(`/content/${id}`)}
+        onCopyLink={handleCopyLink}
         onEdit={(id) => navigate(`/content/${id}/edit`)}
         onDelete={handleDelete}
       />
@@ -286,7 +310,7 @@ export function ContentListPage() {
     emptyFilteredMessage: '검색 결과가 없습니다',
     showUsageBlock: false,
     showInfoBlock: false,
-  }), [isAuthenticated, user?.id, navigate, handleDelete]);
+  }), [isAuthenticated, user?.id, navigate, handleCopyLink, handleDelete]);
 
   return <ContentHubTemplate key={refreshKey} config={config} />;
 }
