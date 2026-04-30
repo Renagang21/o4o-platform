@@ -31,7 +31,8 @@ import {
   Pencil,
 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
-import { RowActionMenu } from '@o4o/ui';
+// WO-KPA-OPERATOR-FORUM-REQUESTS-TABLE-COMPLIANCE-V1: ActionBar 추가
+import { RowActionMenu, ActionBar } from '@o4o/ui';
 import { DataTable, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { forumOperatorApi } from '../../api/forum';
@@ -101,6 +102,15 @@ function formatDate(dateString: string): string {
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+  });
+}
+
+// WO-KPA-OPERATOR-FORUM-REQUESTS-TABLE-COMPLIANCE-V1: 신청일은 날짜만
+function formatDateOnly(dateString: string): string {
+  return new Date(dateString).toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
   });
 }
 
@@ -200,6 +210,10 @@ export default function ForumManagementPage() {
   // ── Selection (DataTable selectable) ──
   const [selectedCatIds, setSelectedCatIds] = useState<Set<string>>(new Set());
   const [isBulkProcessing, setIsBulkProcessing] = useState(false);
+
+  // WO-KPA-OPERATOR-FORUM-REQUESTS-TABLE-COMPLIANCE-V1: 신청 관리 탭 selection
+  const [selectedRequestIds, setSelectedRequestIds] = useState<Set<string>>(new Set());
+  const [isBulkRequestProcessing, setIsBulkRequestProcessing] = useState(false);
 
   // ── Hard delete 모달 (WO-KPA-A-OPERATOR-FORUM-HARD-DELETE-SAFE-GUARD-V1) ──
   interface DeleteCheckData {
@@ -477,6 +491,45 @@ export default function ForumManagementPage() {
 
   const pendingCount = requests.filter((r) => isReviewable(r.status)).length;
 
+  // WO-KPA-OPERATOR-FORUM-REQUESTS-TABLE-COMPLIANCE-V1: filter 변경 시 selection 초기화
+  useEffect(() => { setSelectedRequestIds(new Set()); }, [searchQuery, statusFilter, tagFilter]);
+
+  // WO-KPA-OPERATOR-FORUM-REQUESTS-TABLE-COMPLIANCE-V1: bulk 승인/거부.
+  // 신규 bulk endpoint 신설 금지 — 기존 단건 review API를 Promise.allSettled 병렬 호출.
+  // 단건 "삭제" API는 존재하지 않으므로 ActionBar의 삭제 액션은 본 WO 범위에서 제외.
+  const runRequestBulk = async (
+    action: 'approve' | 'reject',
+    successLabel: string,
+  ) => {
+    const ids = [...selectedRequestIds].filter((id) => {
+      const row = requests.find((r) => r.id === id);
+      return row ? isReviewable(row.status) : false;
+    });
+    if (ids.length === 0) {
+      toast.error('처리할 수 있는 대기 항목이 선택되지 않았습니다');
+      return;
+    }
+    setIsBulkRequestProcessing(true);
+    try {
+      const results = await Promise.allSettled(
+        ids.map((id) => forumOperatorApi.review(id, { action })),
+      );
+      const okCount = results.filter(
+        (r) => r.status === 'fulfilled' && (r.value as any)?.success !== false,
+      ).length;
+      const failCount = results.length - okCount;
+      if (okCount > 0) toast.success(`${okCount}건 ${successLabel} 처리되었습니다`);
+      if (failCount > 0) toast.error(`${failCount}건 처리 실패`);
+      setSelectedRequestIds(new Set());
+      loadRequests();
+    } finally {
+      setIsBulkRequestProcessing(false);
+    }
+  };
+
+  const handleBulkApprove = () => runRequestBulk('approve', '승인');
+  const handleBulkReject = () => runRequestBulk('reject', '거부');
+
   const handleReview = async (action: 'approve' | 'reject' | 'revision') => {
     if (!selectedRequest) return;
     setIsProcessing(true);
@@ -523,30 +576,33 @@ export default function ForumManagementPage() {
   };
 
   // ── Tab 1: Column definitions ──
+  // WO-KPA-OPERATOR-FORUM-REQUESTS-TABLE-COMPLIANCE-V1: row 1줄 중심.
+  //   포럼명 + 공개/비공개 + 태그를 1줄에 inline으로 배치하고 description은 tooltip(title=)으로 보조.
+  //   신청자 email은 tooltip으로 demote.
   const requestColumns: ListColumnDef<RequestData>[] = [
     {
       key: 'name',
       header: '포럼명',
       render: (_v, row) => (
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="font-medium text-slate-800">{row.name}</span>
-            {row.forumType === 'closed' ? (
-              <span className="px-1.5 py-0.5 text-xs font-medium rounded bg-slate-100 text-slate-600">비공개</span>
-            ) : (
-              <span className="px-1.5 py-0.5 text-xs font-medium rounded bg-blue-50 text-blue-600">공개</span>
-            )}
-          </div>
-          <div className="text-sm text-slate-500 line-clamp-1">{row.description}</div>
+        <div
+          className="flex items-center gap-2 min-w-0"
+          title={row.description || undefined}
+        >
+          <span className="font-medium text-slate-800 truncate">{row.name}</span>
+          {row.forumType === 'closed' ? (
+            <span className="shrink-0 px-1.5 py-0.5 text-xs font-medium rounded bg-slate-100 text-slate-600">비공개</span>
+          ) : (
+            <span className="shrink-0 px-1.5 py-0.5 text-xs font-medium rounded bg-blue-50 text-blue-600">공개</span>
+          )}
           {row.tags && row.tags.length > 0 && (
-            <div className="flex items-center gap-1 mt-1.5">
+            <div className="flex items-center gap-1 shrink-0">
               {row.tags.slice(0, 2).map((tag) => (
-                <span key={tag} className="px-2 py-0.5 text-xs font-medium rounded-full bg-slate-100 text-slate-600">
+                <span key={tag} className="px-1.5 py-0.5 text-xs font-medium rounded-full bg-slate-100 text-slate-600">
                   {tag}
                 </span>
               ))}
               {row.tags.length > 2 && (
-                <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-slate-100 text-slate-500">
+                <span className="px-1.5 py-0.5 text-xs font-medium rounded-full bg-slate-100 text-slate-500">
                   +{row.tags.length - 2}
                 </span>
               )}
@@ -559,18 +615,19 @@ export default function ForumManagementPage() {
       key: 'requesterName',
       header: '신청자',
       render: (_v, row) => (
-        <div>
-          <div className="text-slate-800">{row.requesterName}</div>
-          {row.requesterEmail && (
-            <div className="text-sm text-slate-500">{row.requesterEmail}</div>
-          )}
-        </div>
+        <span
+          className="text-sm text-slate-800"
+          title={row.requesterEmail || undefined}
+        >
+          {row.requesterName}
+        </span>
       ),
     },
     {
       key: 'createdAt',
       header: '신청일',
-      render: (value) => <span className="text-sm text-slate-600">{formatDate(value)}</span>,
+      width: '110px',
+      render: (value) => <span className="text-sm text-slate-600">{formatDateOnly(value)}</span>,
     },
     {
       key: 'status',
@@ -697,10 +754,15 @@ export default function ForumManagementPage() {
           </p>
         </div>
         {pendingCount > 0 && activeTab === 'requests' && (
-          <div className="flex items-center gap-2 px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg">
+          <button
+            type="button"
+            onClick={() => setStatusFilter('pending')}
+            className="flex items-center gap-2 px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-400"
+            title="대기 중 항목으로 필터링"
+          >
             <Clock className="w-5 h-5" />
             <span className="font-medium">{pendingCount}건 심사 대기</span>
-          </div>
+          </button>
         )}
       </div>
 
@@ -771,6 +833,43 @@ export default function ForumManagementPage() {
             />
           </div>
 
+          {/* WO-KPA-OPERATOR-FORUM-REQUESTS-TABLE-COMPLIANCE-V1: ActionBar (선택 ≥ 1) */}
+          <ActionBar
+            selectedCount={selectedRequestIds.size}
+            onClearSelection={() => setSelectedRequestIds(new Set())}
+            actions={[
+              {
+                key: 'approve',
+                label: '승인',
+                onClick: handleBulkApprove,
+                variant: 'primary',
+                icon: <CheckCircle size={14} />,
+                loading: isBulkRequestProcessing,
+                tooltip: '선택된 대기 항목을 일괄 승인합니다',
+                confirm: {
+                  title: '선택 신청 일괄 승인',
+                  message: `${selectedRequestIds.size}건의 대기 항목을 승인합니다. (대기 외 상태는 제외됩니다)`,
+                  confirmText: '승인',
+                },
+              },
+              {
+                key: 'reject',
+                label: '거부',
+                onClick: handleBulkReject,
+                variant: 'danger',
+                icon: <XCircle size={14} />,
+                loading: isBulkRequestProcessing,
+                tooltip: '선택된 대기 항목을 일괄 거부합니다',
+                confirm: {
+                  title: '선택 신청 일괄 거부',
+                  message: `${selectedRequestIds.size}건의 대기 항목을 거부합니다. (대기 외 상태는 제외됩니다)`,
+                  variant: 'danger' as const,
+                  confirmText: '거부',
+                },
+              },
+            ]}
+          />
+
           {/* DataTable */}
           <DataTable<RequestData>
             columns={requestColumns}
@@ -779,6 +878,9 @@ export default function ForumManagementPage() {
             loading={isLoading}
             emptyMessage="신청 내역이 없습니다"
             tableId="kpa-forum-requests"
+            selectable
+            selectedKeys={selectedRequestIds}
+            onSelectionChange={setSelectedRequestIds}
           />
 
           {/* Review Modal */}
