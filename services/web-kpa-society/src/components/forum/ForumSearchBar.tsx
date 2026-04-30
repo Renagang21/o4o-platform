@@ -62,7 +62,7 @@ export function ForumSearchBar({ onSearch, onClear, isSearching }: ForumSearchBa
         <SearchIcon />
         <input
           type="text"
-          placeholder="포럼 또는 게시글 검색..."
+          placeholder="포럼 이름 또는 게시글 검색..."
           value={inputValue}
           onChange={handleChange}
           onKeyDown={handleKeyDown}

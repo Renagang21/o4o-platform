@@ -224,6 +224,7 @@ export function ForumHubSection({ prefetchedForums, loading: parentLoading }: Pr
               to={`/forum/${forum.slug}`}
               style={{ textDecoration: 'none', color: 'inherit' }}
             >
+              {/* WO-O4O-FORUM-HUB-FULL-REBUILD-V1: name+count → desc → lastPost → tags */}
               <div className="forum-hub-card" style={styles.card}>
                 <div style={styles.cardTop}>
                   <div style={styles.cardTitleRow}>
@@ -242,31 +243,22 @@ export function ForumHubSection({ prefetchedForums, loading: parentLoading }: Pr
                   <p style={styles.description}>{forum.description}</p>
                 )}
 
+                <p style={styles.lastPostLine}>
+                  {forum.lastPostTitle ? (
+                    <span style={styles.lastPostTitle}>{forum.lastPostTitle}</span>
+                  ) : (
+                    <span style={styles.lastPostEmpty}>최근 글 없음</span>
+                  )}
+                </p>
+
                 {forum.tags && forum.tags.length > 0 && (
                   <div style={styles.tagRow}>
                     {forum.tags.slice(0, 3).map((tag) => (
-                      <span key={tag} style={styles.tagChip}>{tag}</span>
+                      <span key={tag} style={styles.tagChip}>#{tag}</span>
                     ))}
                     {forum.tags.length > 3 && (
                       <span style={styles.tagMore}>+{forum.tags.length - 3}</span>
                     )}
-                  </div>
-                )}
-
-                <div style={styles.cardMeta}>
-                  <span>참여자 {forum.memberCount}명</span>
-                  {forum.lastActivityAt && (
-                    <>
-                      <span style={styles.dot}>·</span>
-                      <span>{formatRelativeTime(forum.lastActivityAt)}</span>
-                    </>
-                  )}
-                </div>
-
-                {forum.lastPostTitle && (
-                  <div style={styles.lastPost}>
-                    <span style={styles.lastPostLabel}>최근 글</span>
-                    <span style={styles.lastPostTitle}>{forum.lastPostTitle}</span>
                   </div>
                 )}
               </div>
@@ -276,24 +268,6 @@ export function ForumHubSection({ prefetchedForums, loading: parentLoading }: Pr
       )}
     </section>
   );
-}
-
-function formatRelativeTime(dateStr: string): string {
-  const now = Date.now();
-  const date = new Date(dateStr).getTime();
-  const diffMs = now - date;
-  const diffMin = Math.floor(diffMs / 60000);
-
-  if (diffMin < 1) return '방금 전';
-  if (diffMin < 60) return `${diffMin}분 전`;
-
-  const diffHour = Math.floor(diffMin / 60);
-  if (diffHour < 24) return `${diffHour}시간 전`;
-
-  const diffDay = Math.floor(diffHour / 24);
-  if (diffDay < 7) return `${diffDay}일 전`;
-
-  return new Date(dateStr).toLocaleDateString();
 }
 
 const styles: Record<string, React.CSSProperties> = {
@@ -335,6 +309,11 @@ const styles: Record<string, React.CSSProperties> = {
     padding: spacing.lg,
     transition: 'box-shadow 0.15s ease',
     cursor: 'pointer',
+    // WO-O4O-FORUM-HUB-FULL-REBUILD-V1: 카드 높이 일정 유지
+    display: 'flex',
+    flexDirection: 'column',
+    gap: spacing.sm,
+    minHeight: 160,
   },
   cardTop: {
     display: 'flex',
@@ -374,16 +353,33 @@ const styles: Record<string, React.CSSProperties> = {
   description: {
     fontSize: '0.813rem',
     color: colors.neutral500,
-    margin: `${spacing.xs} 0 0`,
+    margin: 0,
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
+  },
+  lastPostLine: {
+    margin: 0,
+    fontSize: '0.813rem',
+    color: colors.neutral700,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    // gap from above element comes from parent flex gap
+  },
+  lastPostTitle: {
+    color: colors.neutral700,
+  },
+  lastPostEmpty: {
+    color: colors.neutral400,
+    fontStyle: 'italic',
   },
   tagRow: {
     display: 'flex',
     flexWrap: 'wrap' as const,
     gap: '4px',
-    marginTop: spacing.sm,
+    // WO-O4O-FORUM-HUB-FULL-REBUILD-V1: 태그 영역은 카드 하단에 고정
+    marginTop: 'auto',
   },
   tagChip: {
     fontSize: '0.688rem',
@@ -402,41 +398,6 @@ const styles: Record<string, React.CSSProperties> = {
     padding: '2px 7px',
     borderRadius: '999px',
     whiteSpace: 'nowrap' as const,
-  },
-  cardMeta: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: spacing.xs,
-    marginTop: spacing.sm,
-    fontSize: '0.75rem',
-    color: colors.neutral400,
-  },
-  dot: {
-    color: colors.neutral300,
-  },
-  lastPost: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: spacing.xs,
-    marginTop: spacing.sm,
-    padding: `${spacing.xs} ${spacing.sm}`,
-    backgroundColor: colors.neutral50,
-    borderRadius: borderRadius.sm,
-    overflow: 'hidden',
-  },
-  lastPostLabel: {
-    fontSize: '0.688rem',
-    fontWeight: 500,
-    color: colors.neutral400,
-    whiteSpace: 'nowrap',
-    flexShrink: 0,
-  },
-  lastPostTitle: {
-    fontSize: '0.75rem',
-    color: colors.neutral600,
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
   },
   emptyCard: {
     backgroundColor: colors.white,
