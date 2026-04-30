@@ -16,13 +16,13 @@ import { authClient } from '@o4o/auth-client';
 import { BaseTable, RowActionMenu } from '@o4o/ui';
 import type { O4OColumn } from '@o4o/ui';
 import { toast } from 'react-hot-toast';
-import { CheckCircle, XCircle, Clock, RefreshCw, FileText, Store } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, RefreshCw, FileText, Store, Monitor } from 'lucide-react';
 import PageHeader from '@/components/common/PageHeader';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
 type ApprovalStatus = 'pending' | 'approved' | 'rejected';
-type EntityType = 'hub_content_submission' | 'store_share_to_hub';
+type EntityType = 'hub_content_submission' | 'store_share_to_hub' | 'signage_campaign_request';
 
 interface ApprovalRequest {
   id: string;
@@ -56,6 +56,7 @@ const ENTITY_TYPE_TABS = [
   { value: 'all', label: '전체' },
   { value: 'hub_content_submission', label: '공급자 자료' },
   { value: 'store_share_to_hub', label: '매장 공유' },
+  { value: 'signage_campaign_request', label: '사이니지 캠페인' },
 ] as const;
 
 const STATUS_FILTERS = [
@@ -68,6 +69,7 @@ const STATUS_FILTERS = [
 const ENTITY_TYPE_LABEL: Record<EntityType, string> = {
   hub_content_submission: '공급자 자료',
   store_share_to_hub: '매장 공유',
+  signage_campaign_request: '사이니지 캠페인',
 };
 
 const STATUS_BADGE: Record<ApprovalStatus, { label: string; className: string }> = {
@@ -250,12 +252,15 @@ export default function ContentApprovalsPage() {
     {
       key: 'entity_type',
       header: '유형',
-      width: 120,
+      width: 130,
       render: (row) => {
+        const isCampaign = row.entity_type === 'signage_campaign_request';
         const isSupplier = row.entity_type === 'hub_content_submission';
         return (
           <span className="flex items-center gap-1 text-sm">
-            {isSupplier ? (
+            {isCampaign ? (
+              <Monitor size={14} className="text-teal-500" />
+            ) : isSupplier ? (
               <FileText size={14} className="text-blue-500" />
             ) : (
               <Store size={14} className="text-purple-500" />
@@ -267,13 +272,39 @@ export default function ContentApprovalsPage() {
     },
     {
       key: 'title',
-      header: '제목',
+      header: '제목 / 상세',
       accessor: (row) => row.payload?.title ?? '(제목 없음)',
-      render: (row) => (
-        <span className="max-w-xs truncate text-sm font-medium text-gray-900">
-          {row.payload?.title ?? <span className="text-gray-400">(제목 없음)</span>}
-        </span>
-      ),
+      render: (row) => {
+        const isCampaign = row.entity_type === 'signage_campaign_request';
+        const title = row.payload?.title ?? '(제목 없음)';
+
+        if (isCampaign) {
+          const services: string[] = row.payload?.targetServices ?? [];
+          const startAt = row.payload?.startAt
+            ? new Date(row.payload.startAt).toLocaleDateString('ko-KR')
+            : '-';
+          const endAt = row.payload?.endAt
+            ? new Date(row.payload.endAt).toLocaleDateString('ko-KR')
+            : '-';
+          return (
+            <div>
+              <p className="text-sm font-medium text-gray-900">{title}</p>
+              <p className="mt-0.5 text-xs text-gray-400">
+                서비스: {services.join(', ') || '-'} · {startAt} ~ {endAt}
+              </p>
+              {row.payload?.note && (
+                <p className="mt-0.5 text-xs text-gray-400 truncate max-w-xs">{row.payload.note}</p>
+              )}
+            </div>
+          );
+        }
+
+        return (
+          <span className="max-w-xs truncate text-sm font-medium text-gray-900">
+            {title}
+          </span>
+        );
+      },
     },
     {
       key: 'requester_name',
@@ -357,7 +388,7 @@ export default function ContentApprovalsPage() {
     <div className="p-6">
       <PageHeader
         title="콘텐츠 승인 관리"
-        subtitle="공급자 자료 제출 및 매장 HUB 공유 요청을 검토하고 승인합니다."
+        subtitle="공급자 자료 제출, 매장 HUB 공유 요청, 사이니지 캠페인 요청을 검토하고 승인합니다."
         actions={[
           { id: 'refresh', label: '새로고침', icon: <RefreshCw size={14} />, onClick: () => refetch() },
         ]}

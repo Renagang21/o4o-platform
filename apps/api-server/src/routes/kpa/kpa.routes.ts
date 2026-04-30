@@ -96,6 +96,7 @@ import { createForumMembershipController } from './controllers/forum-membership.
 import { createContentApprovalController } from './controllers/content-approval.controller.js';
 import { createSupplierContentController } from './controllers/supplier-content.controller.js';
 import { createSupplierSignageReportController } from './controllers/supplier-signage-report.controller.js';
+import { createSupplierCampaignRequestController } from './controllers/supplier-campaign-request.controller.js';
 import { createCommunityHubController } from './controllers/community-hub.controller.js';
 import { createLegalDocumentsController } from './controllers/legal-documents.controller.js';
 import { createEventOfferController } from './controllers/event-offer.controller.js';
@@ -243,6 +244,10 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Supplier Marketing Content Submission (WO-O4O-SUPPLIER-CONTENT-SUBMISSION-PHASE1-V1)
   router.use('/supplier/content-submissions', createSupplierContentController(dataSource, coreRequireAuth as any));
+
+  // Supplier Signage Campaign Requests (WO-O4O-SIGNAGE-SUPPLIER-CAMPAIGN-REQUEST-V1)
+  // NOTE: 더 구체적인 경로를 먼저 등록 (Express prefix matching)
+  router.use('/supplier/signage/campaign-requests', createSupplierCampaignRequestController(dataSource, coreRequireAuth as any));
 
   // Supplier Signage Campaign Report (WO-O4O-SIGNAGE-SUPPLIER-CAMPAIGN-REPORT-API-V1)
   router.use('/supplier/signage', createSupplierSignageReportController(dataSource, coreRequireAuth as any));

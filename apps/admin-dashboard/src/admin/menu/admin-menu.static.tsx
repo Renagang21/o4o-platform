@@ -587,6 +587,12 @@ export const adminMenuStatic: MenuItem[] = [
         icon: <BarChart2 className="w-4 h-4" />,
         path: '/supplierops/signage-reports',
       },
+      {
+        id: 'supplier-signage-campaign-requests',
+        label: '사이니지 캠페인 요청',
+        icon: <Monitor className="w-4 h-4" />,
+        path: '/supplierops/signage-campaign-requests',
+      },
     ],
   },
 

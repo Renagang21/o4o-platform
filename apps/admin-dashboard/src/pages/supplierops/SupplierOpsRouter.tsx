@@ -22,6 +22,8 @@ const MarketingMaterials = lazy(() => import('./pages/MarketingMaterials'));
 const MarketingMaterialsCreate = lazy(() => import('./pages/MarketingMaterialsCreate'));
 // Signage Report (WO-O4O-SIGNAGE-SUPPLIER-REPORT-UI-V1)
 const SignageReport = lazy(() => import('./pages/SignageReport'));
+// Signage Campaign Request (WO-O4O-SIGNAGE-SUPPLIER-CAMPAIGN-REQUEST-V1)
+const CampaignRequestPage = lazy(() => import('./pages/CampaignRequestPage'));
 
 // Loading component
 const PageLoader: React.FC = () => (
@@ -53,6 +55,8 @@ const SupplierOpsRouter: React.FC = () => {
         <Route path="marketing-materials/new" element={<MarketingMaterialsCreate />} />
         {/* Signage Report (WO-O4O-SIGNAGE-SUPPLIER-REPORT-UI-V1) */}
         <Route path="signage-reports" element={<SignageReport />} />
+        {/* Signage Campaign Request (WO-O4O-SIGNAGE-SUPPLIER-CAMPAIGN-REQUEST-V1) */}
+        <Route path="signage-campaign-requests" element={<CampaignRequestPage />} />
         <Route path="*" element={<Dashboard />} />
       </Routes>
     </Suspense>

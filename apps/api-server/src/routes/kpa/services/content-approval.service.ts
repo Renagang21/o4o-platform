@@ -2,13 +2,15 @@
  * Content Approval Service
  *
  * WO-O4O-OPERATOR-CONTENT-APPROVAL-PHASE1-V1
+ * WO-O4O-SIGNAGE-SUPPLIER-CAMPAIGN-REQUEST-V1
  *
- * hub_content_submission / store_share_to_hub entity_type 승인 처리.
+ * hub_content_submission / store_share_to_hub / signage_campaign_request entity_type 승인 처리.
  * KpaApprovalRequest 재사용 — 신규 테이블 없음.
  *
  * entity_type 매핑:
- *   hub_content_submission — 공급자가 HUB 노출 요청한 CMS/Signage 콘텐츠
- *   store_share_to_hub    — 매장 경영자가 편집 후 HUB 공유 요청한 콘텐츠
+ *   hub_content_submission    — 공급자가 HUB 노출 요청한 CMS/Signage 콘텐츠
+ *   store_share_to_hub        — 매장 경영자가 편집 후 HUB 공유 요청한 콘텐츠
+ *   signage_campaign_request  — 공급자가 강제 삽입 캠페인 집행 요청
  *
  * payload 구조 (hub_content_submission):
  *   { domain: 'cms'|'signage-media'|'kpa-content', contentId: uuid, title: string }
@@ -16,6 +18,12 @@
  * payload 구조 (store_share_to_hub):
  *   { sourceContentId: uuid, title: string, editedContentJson?: object }
  *   → 승인 시 콘텐츠 신규 생성은 WO-O4O-STORE-CONTENT-HUB-SHARE-PHASE1-V1에서 처리
+ *
+ * payload 구조 (signage_campaign_request):
+ *   { mediaId: uuid, mediaSourceUrl: string, mediaSourceType: string, mediaEmbedId: string|null,
+ *     mediaThumbnailUrl: string|null, title: string, targetServices: string[],
+ *     startAt: string, endAt: string, note: string|null }
+ *   → 승인 시 targetServices × signage_forced_content row 생성
  */
 
 import type { DataSource, QueryRunner } from 'typeorm';
@@ -25,6 +33,7 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 export const CONTENT_APPROVAL_ENTITY_TYPES = [
   'hub_content_submission',
   'store_share_to_hub',
+  'signage_campaign_request',
 ] as const;
 
 export type ContentApprovalEntityType = (typeof CONTENT_APPROVAL_ENTITY_TYPES)[number];
@@ -158,6 +167,11 @@ export class ContentApprovalService {
         }
       }
 
+      // signage_campaign_request: targetServices별 signage_forced_content row 생성
+      if (ar.entity_type === 'signage_campaign_request') {
+        await this.createCampaignForcedContent(qr, requestId, payload);
+      }
+
       await qr.commitTransaction();
       return { data: { requestId, status: 'approved' } };
     } catch (err) {
@@ -234,6 +248,66 @@ export class ContentApprovalService {
   }
 
   // ── private ──────────────────────────────────────────────────────────────────
+
+  /**
+   * signage_campaign_request 승인 시 서비스별 forced_content 생성.
+   *
+   * payload 필드:
+   *   mediaId, mediaSourceUrl, mediaSourceType, mediaEmbedId, mediaThumbnailUrl
+   *   title, targetServices[], startAt, endAt, note
+   *
+   * 생성 결과: targetServices.length 개의 signage_forced_content row
+   * 각 row에 media_id, campaign_request_id 저장.
+   */
+  private async createCampaignForcedContent(
+    qr: QueryRunner,
+    requestId: string,
+    payload: Record<string, any>,
+  ): Promise<void> {
+    const {
+      mediaId,
+      mediaSourceUrl,
+      mediaSourceType,
+      mediaEmbedId,
+      mediaThumbnailUrl,
+      title,
+      targetServices,
+      startAt,
+      endAt,
+      note,
+    } = payload;
+
+    if (!mediaId || !UUID_RE.test(mediaId)) return;
+    if (!Array.isArray(targetServices) || targetServices.length === 0) return;
+    if (!mediaSourceUrl || !mediaSourceType) return;
+    if (!title || !startAt || !endAt) return;
+
+    for (const serviceKey of targetServices) {
+      if (typeof serviceKey !== 'string' || !serviceKey.trim()) continue;
+
+      await qr.query(
+        `INSERT INTO signage_forced_content
+           (service_key, title, video_url, source_type, embed_id, thumbnail_url,
+            start_at, end_at, is_active, note, created_by_user_id,
+            media_id, campaign_request_id)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true, $9, $10, $11, $12)`,
+        [
+          serviceKey.trim(),
+          title,
+          mediaSourceUrl,
+          mediaSourceType,
+          mediaEmbedId || null,
+          mediaThumbnailUrl || null,
+          startAt,
+          endAt,
+          note || null,
+          null, // created_by_user_id — 운영자가 승인했으므로 NULL (공급자 ID는 payload에서 별도 추적)
+          mediaId,
+          requestId,
+        ],
+      );
+    }
+  }
 
   /**
    * 도메인에 따라 콘텐츠 상태를 HUB 노출 가능 상태로 전환.
