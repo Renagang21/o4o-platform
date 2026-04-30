@@ -450,6 +450,17 @@ export function HubB2BCatalogPage() {
           내 매장에 추가하면 주문 시 빠르게 사용할 수 있습니다.
         </span>
       </div>
+
+      {/* 채널 진열 CTA — 추가된 상품이 있을 때 표시 */}
+      {products.some(p => p.isAdded) && (
+        <div style={styles.channelCta}>
+          <span style={styles.noticeIcon}>✅</span>
+          <span>
+            추가된 상품은 <strong>채널에서 진열</strong>하면 고객에게 보여집니다.{' '}
+            <a href="/store/channels" style={styles.channelCtaLink}>채널 관리로 이동 →</a>
+          </span>
+        </div>
+      )}
     </div>
   );
 }
@@ -798,5 +809,25 @@ const styles: Record<string, React.CSSProperties> = {
   noticeIcon: {
     fontSize: '18px',
     flexShrink: 0,
+  },
+  channelCta: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: '12px',
+    padding: '18px 22px',
+    backgroundColor: '#f0fdf4',
+    borderRadius: borderRadius.lg,
+    border: '1px solid #bbf7d0',
+    fontSize: '0.875rem',
+    color: colors.neutral600,
+    lineHeight: 1.5,
+    marginTop: '12px',
+  },
+  channelCtaLink: {
+    marginLeft: '6px',
+    color: colors.primary,
+    fontWeight: 600,
+    textDecoration: 'underline',
+    textUnderlineOffset: '2px',
   },
 };

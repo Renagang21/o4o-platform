@@ -22,6 +22,7 @@ import { requireCosmeticsScope } from '../../middleware/cosmetics-scope.middlewa
 // WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1: Store HUB controllers
 import { createStoreHubController } from '../o4o-store/controllers/store-hub.controller.js';
 import { createStoreChannelProductsController } from '../o4o-store/controllers/store-channel-products.controller.js';
+import { createPharmacyProductsController } from '../o4o-store/controllers/pharmacy-products.controller.js';
 import { createStoreAnalyticsController } from '../o4o-store/controllers/store-analytics.controller.js';
 import { createStoreContentController } from '../o4o-store/controllers/store-content.controller.js';
 import { createStorePlaylistController } from '../o4o-store/controllers/store-playlist.controller.js';
@@ -99,6 +100,9 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
 
   // Channel Product Management — 채널별 상품 진열 관리
   router.use('/store-hub/channel-products', createStoreChannelProductsController(dataSource, coreRequireAuth as any));
+
+  // B2B Supply Catalog — 공급자 상품 카탈로그 + 신청 (WO-O4O-HUB-TO-STORE-UX-BRIDGE-V1)
+  router.use('/pharmacy/products', createPharmacyProductsController(dataSource, coreRequireAuth as any));
 
   // Asset Snapshot
   router.use('/assets', createAssetSnapshotController(dataSource, coreRequireAuth as any));

@@ -128,6 +128,17 @@ export function HubB2BCatalogPage() {
           승인 후 <Link to="/store/management/b2b" className="text-teal-700 underline underline-offset-2 hover:text-teal-800">매장 B2B 관리</Link>에서 확인하세요.
         </span>
       </div>
+
+      {/* 채널 진열 CTA — 추가된 상품이 있을 때 표시 */}
+      {products.some(p => p.isAdded) && (
+        <div className="flex items-start gap-3 px-5 py-4 bg-green-50 border border-green-200 rounded-xl mt-3 text-sm text-slate-600 leading-relaxed">
+          <span className="text-lg shrink-0">✅</span>
+          <span>
+            추가된 상품은 <strong>채널에서 진열</strong>하면 고객에게 보여집니다.{' '}
+            <Link to="/store/channels" className="text-teal-700 font-semibold underline underline-offset-2 hover:text-teal-800">채널 관리로 이동 →</Link>
+          </span>
+        </div>
+      )}
     </div>
   );
 }
