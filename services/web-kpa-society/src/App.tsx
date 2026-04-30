@@ -238,7 +238,6 @@ const PrintContentPage = lazy(() => import('./pages/content/PrintContentPage'));
 const ContentListPage = lazy(() => import('./pages/contents/ContentListPage').then(m => ({ default: m.ContentListPage })));
 const ContentDetailPage = lazy(() => import('./pages/contents/ContentDetailPage').then(m => ({ default: m.ContentDetailPage })));
 const ContentWritePage = lazy(() => import('./pages/contents/ContentWritePage').then(m => ({ default: m.ContentWritePage })));
-const ContentTypeSelectPage = lazy(() => import('./pages/contents/ContentTypeSelectPage').then(m => ({ default: m.ContentTypeSelectPage })));
 
 // QR Landing Page — Phase 2 lazy
 const QrLandingPage = lazy(() => import('./pages/qr/QrLandingPage'));
@@ -618,14 +617,19 @@ function App() {
           {/* My Content (내 콘텐츠 관리) - WO-APP-DATA-HUB-TO-DASHBOARD-PHASE3-V1 */}
           <Route path="/my-content" element={<Layout serviceName={SERVICE_NAME}><MyContentPage /></Layout>} />
 
-          {/* Content Hub (WO-KPA-CONTENT-HUB-FOUNDATION-V1 / WO-CONTENT-HUB-STRUCTURE-AND-TABLE-FOUNDATION-V1) */}
+          {/* ──────────────────────────────────────────────────────────────────
+              Content Hub
+              WO-KPA-CONTENT-HUB-FOUNDATION-V1 / WO-CONTENT-HUB-STRUCTURE-AND-TABLE-FOUNDATION-V1
+              WO-KPA-CONTENT-SECTION-CREATE-FLOW-ALIGN-V1 (Phase 1):
+                섹션별 등록 라우트(/content/{documents,surveys,courses}/new) 도입.
+                저장 후 returnTo/redirectAfterCreate가 content hub 섹션으로 복귀.
+                레거시 /content/new* 는 신규 라우트로 redirect.
+              ────────────────────────────────────────────────────────────────── */}
           <Route path="/content" element={<Layout serviceName={SERVICE_NAME}><ContentListPage /></Layout>} />
-          {/* 타입 선택 → /content/new */}
-          <Route path="/content/new" element={<Layout serviceName={SERVICE_NAME}><ContentTypeSelectPage /></Layout>} />
-          {/* 문서 제작기 (기존 RichTextEditor) */}
-          <Route path="/content/write" element={<Layout serviceName={SERVICE_NAME}><ContentWritePage /></Layout>} />
-          {/* 설문 제작기 — ParticipationCreatePage (survey mode) */}
-          <Route path="/content/new/survey" element={
+
+          {/* 섹션별 등록 — Phase 1 신규 라우트 */}
+          <Route path="/content/documents/new" element={<Layout serviceName={SERVICE_NAME}><ContentWritePage /></Layout>} />
+          <Route path="/content/surveys/new" element={
             <Layout serviceName={SERVICE_NAME}>
               <ParticipationCreatePage
                 pageTitle="새 설문 만들기"
@@ -633,30 +637,43 @@ function App() {
                 breadcrumb={[
                   { label: '홈', href: '/' },
                   { label: '콘텐츠', href: '/content' },
-                  { label: '타입 선택', href: '/content/new' },
-                  { label: '설문 만들기' },
+                  { label: '설문', href: '/content/surveys' },
+                  { label: '새 설문' },
                 ]}
-                returnTo="/content/new"
+                returnTo="/content/surveys"
                 allowedQuestionTypes={[QuestionType.SINGLE_CHOICE, QuestionType.MULTIPLE_CHOICE, QuestionType.FREE_TEXT]}
               />
             </Layout>
           } />
-          {/* 퀴즈는 LMS 전용 (WO-KPA-CONTENT-QUIZ-REMOVE-V1) — /lms로 리다이렉트 */}
-          <Route path="/content/new/quiz" element={<Navigate to="/lms" replace />} />
-          {/* 코스형 자료 제작기 — CourseNewPage (content context) */}
-          <Route path="/content/new/course" element={
+          <Route path="/content/courses/new" element={
             <Layout serviceName={SERVICE_NAME}>
               <CourseNewPage
                 pageTitle="새 코스형 자료 만들기"
-                backLinkText="← 타입 선택으로"
-                returnTo="/content/new"
+                backLinkText="← 콘텐츠 허브"
+                returnTo="/content/courses"
+                redirectAfterCreate={(id) => `/content/courses/${id}`}
+                redirectAfterCreateFallback="/content/courses"
               />
             </Layout>
           } />
-          {/* 레거시 리다이렉트: /content/new/lecture → /content/new/course */}
-          <Route path="/content/new/lecture" element={<Navigate to="/content/new/course" replace />} />
+
+          {/* 섹션 목록 — Phase 2까지 임시 redirect로 사용자가 만든 항목을 즉시 확인 */}
+          <Route path="/content/surveys" element={<Navigate to="/participation" replace />} />
+          <Route path="/content/courses" element={<Navigate to="/instructor/courses" replace />} />
+          <Route path="/content/courses/:id" element={<Navigate to="/instructor/courses" replace />} />
+
+          {/* 콘텐츠 상세/수정 (sub_type='content' 문서) */}
           <Route path="/content/:id" element={<Layout serviceName={SERVICE_NAME}><ContentDetailPage /></Layout>} />
           <Route path="/content/:id/edit" element={<Layout serviceName={SERVICE_NAME}><ContentWritePage /></Layout>} />
+
+          {/* Legacy redirects → 신규 섹션 라우트 */}
+          <Route path="/content/new" element={<Navigate to="/content/documents/new" replace />} />
+          <Route path="/content/write" element={<Navigate to="/content/documents/new" replace />} />
+          <Route path="/content/new/survey" element={<Navigate to="/content/surveys/new" replace />} />
+          <Route path="/content/new/course" element={<Navigate to="/content/courses/new" replace />} />
+          <Route path="/content/new/lecture" element={<Navigate to="/content/courses/new" replace />} />
+          {/* 퀴즈는 LMS 전용 (WO-KPA-CONTENT-QUIZ-REMOVE-V1) — /lms로 리다이렉트 */}
+          <Route path="/content/new/quiz" element={<Navigate to="/lms" replace />} />
 
           {/* Legacy redirects: /contents → /content */}
           <Route path="/contents" element={<Navigate to="/content" replace />} />

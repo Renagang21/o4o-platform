@@ -54,12 +54,22 @@ interface CourseNewPageProps {
   backLinkText?: string;
   /** Override cancel/back navigation target (default: "/instructor/courses") */
   returnTo?: string;
+  /**
+   * 저장 성공 후 이동할 경로를 반환.
+   * 미지정 시 기본 LMS 흐름(`/instructor/courses/${id}`)을 따른다.
+   * WO-KPA-CONTENT-SECTION-CREATE-FLOW-ALIGN-V1: content hub 진입 시 hub 섹션으로 복귀.
+   */
+  redirectAfterCreate?: (courseId: string) => string;
+  /** id 없이 저장 성공 시(이론상 없음) 이동할 fallback. 미지정 시 returnTo, 그것도 없으면 /instructor/courses. */
+  redirectAfterCreateFallback?: string;
 }
 
 export default function CourseNewPage({
   pageTitle,
   backLinkText,
   returnTo,
+  redirectAfterCreate,
+  redirectAfterCreateFallback,
 }: CourseNewPageProps = {}) {
   const navigate = useNavigate();
   const [form, setForm] = useState({ title: '', description: '' });
@@ -92,9 +102,10 @@ export default function CourseNewPage({
       // API returns { success, data: Course }
       const courseId = res.data?.data?.id;
       if (courseId) {
-        navigate(`/instructor/courses/${courseId}`);
+        const target = redirectAfterCreate ? redirectAfterCreate(courseId) : `/instructor/courses/${courseId}`;
+        navigate(target);
       } else {
-        navigate('/instructor/courses');
+        navigate(redirectAfterCreateFallback ?? returnTo ?? '/instructor/courses');
       }
     } catch (err: any) {
       setError(err?.response?.data?.error || '강의 생성에 실패했습니다.');
