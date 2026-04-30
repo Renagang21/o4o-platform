@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
-import { ForumCategory } from '@o4o/forum-core/entities';
+// ForumCategory removed — WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1
+import { ForumCategoryRequest } from '@o4o/forum-core/entities';
 import { PostStatus } from '@o4o/forum-core/entities';
 import logger from '../../utils/logger.js';
 import { ForumControllerBase } from './ForumControllerBase.js';
@@ -8,45 +9,75 @@ import { ForumControllerBase } from './ForumControllerBase.js';
 /**
  * ForumCategoryController
  *
- * Handles category CRUD, popular forums ranking,
- * owner category management, and delete requests.
+ * WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1: forum_category 테이블 제거.
+ * forum_category_requests (status='completed') = active forum SSOT.
+ *
+ * Handles forum listing, single forum lookup,
+ * popular forums ranking, owner management, and delete requests.
  */
 export class ForumCategoryController extends ForumControllerBase {
+
+  private get requestRepo() {
+    return AppDataSource.getRepository(ForumCategoryRequest);
+  }
+
+  /**
+   * Apply organization/scope filter to a ForumCategoryRequest query.
+   * Replaces applyContextFilter (which uses isOrganizationExclusive, not on FCR).
+   */
+  private applyForumContextFilter(
+    qb: any,
+    alias: string,
+    ctx: ReturnType<typeof this.getForumContext>,
+  ): void {
+    if (!ctx) return;
+    if (ctx.scope === 'demo') {
+      qb.andWhere('1 = 0');
+      return;
+    }
+    if (ctx.scope === 'community') {
+      qb.andWhere(`${alias}.organizationId IS NULL`);
+      return;
+    }
+    if (ctx.scope === 'organization' && ctx.organizationId) {
+      qb.andWhere(`${alias}.organizationId = :ctxOrgId`, { ctxOrgId: ctx.organizationId });
+      return;
+    }
+    if (ctx.organizationId) {
+      qb.andWhere(`${alias}.organizationId = :ctxOrgId`, { ctxOrgId: ctx.organizationId });
+    }
+  }
+
   /**
    * GET /forum/categories
-   * List all categories
+   * List all active forums (status = 'completed')
    */
   async listCategories(req: Request, res: Response): Promise<void> {
     try {
       const includeInactive = req.query.includeInactive === 'true';
       const ctx = this.getForumContext(req);
 
-      const qb = this.categoryRepository
-        .createQueryBuilder('cat')
-        .leftJoinAndSelect('cat.creator', 'creator');
+      const qb = this.requestRepo.createQueryBuilder('forum');
 
       if (!includeInactive) {
-        qb.where('cat.isActive = :isActive', { isActive: true });
+        qb.where('forum.status = :status', { status: 'completed' });
+      } else {
+        qb.where('forum.status IN (:...statuses)', { statuses: ['completed', 'archived'] });
       }
 
-      this.applyContextFilter(qb, 'cat', ctx);
+      this.applyForumContextFilter(qb, 'forum', ctx);
 
-      qb.orderBy('cat.isPinned', 'DESC')
-        .addOrderBy('cat.pinnedOrder', 'ASC')
-        .addOrderBy('cat.sortOrder', 'ASC')
-        .addOrderBy('cat.name', 'ASC');
+      qb.orderBy('forum.createdAt', 'ASC');
 
-      const categories = await qb.getMany();
-      // WO-KPA-A-FORUM-CREATOR-SENSITIVE-FIELDS-EXPOSURE-HOTFIX-V1
-      categories.forEach(c => this.sanitizeUser((c as any).creator));
+      const forums = await qb.getMany();
 
       res.json({
         success: true,
-        data: categories,
-        count: categories.length,
+        data: forums,
+        count: forums.length,
       });
     } catch (error: any) {
-      logger.warn('Error listing forum categories (returning empty):', error.message);
+      logger.warn('Error listing forums (returning empty):', error.message);
       res.json({
         success: true,
         data: [],
@@ -57,27 +88,18 @@ export class ForumCategoryController extends ForumControllerBase {
 
   /**
    * GET /forum/categories/:id
-   * Get single category by ID or slug
+   * Get single forum by ID or slug
    */
   async getCategory(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
 
-      // Try to find by ID
-      let category = await this.categoryRepository.findOne({
-        where: { id },
-        relations: ['creator'],
-      });
-
-      // If not found, try by slug
-      if (!category) {
-        category = await this.categoryRepository.findOne({
-          where: { slug: id },
-          relations: ['creator'],
-        });
+      let forum = await this.requestRepo.findOne({ where: { id } });
+      if (!forum) {
+        forum = await this.requestRepo.findOne({ where: { slug: id } });
       }
 
-      if (!category) {
+      if (!forum) {
         res.status(404).json({
           success: false,
           error: 'Category not found',
@@ -87,26 +109,23 @@ export class ForumCategoryController extends ForumControllerBase {
 
       // WO-KPA-A-CLOSED-FORUM-ACCESS-CONTROL-V1
       const { userId, roles } = this.getUserFromReq(req);
-      const access = await this.checkClosedForumAccess(category.id, userId, roles);
+      const access = await this.checkClosedForumAccess(forum.id, userId, roles);
       if (!access.allowed) {
         res.status(403).json({
           success: false,
           error: 'This is a closed forum. Membership is required.',
           code: 'CLOSED_FORUM_ACCESS_DENIED',
-          data: { categoryId: category.id },
+          data: { categoryId: forum.id },
         });
         return;
       }
 
-      // WO-KPA-A-FORUM-CREATOR-SENSITIVE-FIELDS-EXPOSURE-HOTFIX-V1
-      this.sanitizeUser((category as any).creator);
-
       res.json({
         success: true,
-        data: category,
+        data: forum,
       });
     } catch (error: any) {
-      logger.error('Error getting forum category:', error);
+      logger.error('Error getting forum:', error);
       res.status(500).json({
         success: false,
         error: error.message || 'Failed to get category',
@@ -116,174 +135,44 @@ export class ForumCategoryController extends ForumControllerBase {
 
   /**
    * POST /forum/categories
-   * Create new category
+   * Forum creation now goes through the request/approval flow.
+   * Direct creation is no longer supported.
    */
   async createCategory(req: Request, res: Response): Promise<void> {
-    try {
-      const userId = (req as any).user?.id;
-
-      if (!userId) {
-        res.status(401).json({
-          success: false,
-          error: 'Unauthorized',
-        });
-        return;
-      }
-
-      const { name, description, color, iconUrl, iconEmoji, sortOrder, isActive, isPinned, pinnedOrder, requireApproval, accessLevel } = req.body;
-
-      const slug = this.generateSlug(name);
-
-      // Auto-set organizationId from forum context
-      const ctx = this.getForumContext(req);
-
-      const category = this.categoryRepository.create({
-        name,
-        description,
-        slug,
-        color,
-        iconUrl,
-        iconEmoji,
-        sortOrder: sortOrder || 0,
-        isActive: isActive !== false,
-        isPinned: isPinned || false,
-        pinnedOrder: pinnedOrder ?? null,
-        requireApproval: requireApproval || false,
-        accessLevel: accessLevel || 'all',
-        createdBy: userId,
-        ...(ctx?.organizationId ? { organizationId: ctx.organizationId } : {}),
-      });
-
-      const savedCategory = await this.categoryRepository.save(category);
-
-      // WO-KPA-A-FORUM-OWNER-MEMBERSHIP-AUTO-SYNC-V1
-      await AppDataSource.query(
-        `INSERT INTO forum_category_members (forum_category_id, user_id, role, joined_at, created_at, updated_at)
-         VALUES ($1, $2, 'owner', NOW(), NOW(), NOW())
-         ON CONFLICT (forum_category_id, user_id) DO NOTHING`,
-        [savedCategory.id, userId],
-      );
-
-      res.status(201).json({
-        success: true,
-        data: savedCategory,
-      });
-    } catch (error: any) {
-      logger.error('Error creating forum category:', error);
-      res.status(500).json({
-        success: false,
-        error: error.message || 'Failed to create category',
-      });
-    }
+    res.status(410).json({
+      success: false,
+      error: '포럼 직접 생성은 더 이상 지원되지 않습니다. 포럼 신청을 통해 생성하세요.',
+      code: 'DIRECT_CREATE_REMOVED',
+    });
   }
 
   /**
    * PUT /forum/categories/:id
-   * Update existing category
+   * Forum direct update is no longer supported.
    */
   async updateCategory(req: Request, res: Response): Promise<void> {
-    try {
-      const { id } = req.params;
-      const userId = (req as any).user?.id;
-
-      if (!userId) {
-        res.status(401).json({
-          success: false,
-          error: 'Unauthorized',
-        });
-        return;
-      }
-
-      const category = await this.categoryRepository.findOne({ where: { id } });
-      if (!category) {
-        res.status(404).json({
-          success: false,
-          error: 'Category not found',
-        });
-        return;
-      }
-
-      const { name, description, color, iconUrl, iconEmoji, sortOrder, isActive, isPinned, pinnedOrder, requireApproval, accessLevel } = req.body;
-
-      // Update slug if name changed
-      if (name && name !== category.name) {
-        category.slug = this.generateSlug(name);
-      }
-
-      // Update fields
-      if (name !== undefined) category.name = name;
-      if (description !== undefined) category.description = description;
-      if (color !== undefined) category.color = color;
-      if (iconUrl !== undefined) category.iconUrl = iconUrl;
-      if (iconEmoji !== undefined) category.iconEmoji = iconEmoji;
-      if (sortOrder !== undefined) category.sortOrder = sortOrder;
-      if (isActive !== undefined) category.isActive = isActive;
-      if (isPinned !== undefined) category.isPinned = isPinned;
-      if (pinnedOrder !== undefined) category.pinnedOrder = pinnedOrder;
-      if (requireApproval !== undefined) category.requireApproval = requireApproval;
-      if (accessLevel !== undefined) category.accessLevel = accessLevel;
-
-      const updatedCategory = await this.categoryRepository.save(category);
-
-      res.json({
-        success: true,
-        data: updatedCategory,
-      });
-    } catch (error: any) {
-      logger.error('Error updating forum category:', error);
-      res.status(500).json({
-        success: false,
-        error: error.message || 'Failed to update category',
-      });
-    }
+    res.status(410).json({
+      success: false,
+      error: '포럼 직접 수정은 더 이상 지원되지 않습니다.',
+      code: 'DIRECT_UPDATE_REMOVED',
+    });
   }
 
   /**
    * DELETE /forum/categories/:id
-   * Deactivate a category
+   * Forum direct delete is no longer supported.
    */
   async deleteCategory(req: Request, res: Response): Promise<void> {
-    try {
-      const { id } = req.params;
-      const userId = (req as any).user?.id;
-
-      if (!userId) {
-        res.status(401).json({
-          success: false,
-          error: 'Unauthorized',
-        });
-        return;
-      }
-
-      const category = await this.categoryRepository.findOne({ where: { id } });
-      if (!category) {
-        res.status(404).json({
-          success: false,
-          error: 'Category not found',
-        });
-        return;
-      }
-
-      // Deactivate instead of hard delete
-      category.isActive = false;
-      await this.categoryRepository.save(category);
-
-      res.json({
-        success: true,
-        message: 'Category deleted successfully',
-      });
-    } catch (error: any) {
-      logger.error('Error deleting forum category:', error);
-      res.status(500).json({
-        success: false,
-        error: error.message || 'Failed to delete category',
-      });
-    }
+    res.status(410).json({
+      success: false,
+      error: '포럼 직접 삭제는 더 이상 지원되지 않습니다.',
+      code: 'DIRECT_DELETE_REMOVED',
+    });
   }
 
   /**
    * GET /forum/categories/popular
-   * Returns categories ranked by activity score over last 7 days
+   * Returns forums ranked by activity score over last 7 days
    * Score = (posts×3) + (comments×2) + (views×1) + recency_bonus
    */
   async getPopularForums(req: Request, res: Response): Promise<void> {
@@ -291,35 +180,22 @@ export class ForumCategoryController extends ForumControllerBase {
       const limit = Math.min(parseInt(req.query.limit as string) || 6, 20);
       const ctx = this.getForumContext(req);
 
-      // 1. Fetch pinned categories first (always at top)
-      const pinnedQb = this.categoryRepository
-        .createQueryBuilder('cat')
-        .where('cat.isActive = :isActive', { isActive: true })
-        .andWhere('cat.isPinned = :isPinned', { isPinned: true })
-        .orderBy('cat.pinnedOrder', 'ASC')
-        .addOrderBy('cat.sortOrder', 'ASC');
-      this.applyContextFilter(pinnedQb, 'cat', ctx);
-      const pinnedCategories = await pinnedQb.getMany();
-
-      const pinnedIds = new Set(pinnedCategories.map((c) => c.id));
-      const remainingSlots = Math.max(0, limit - pinnedCategories.length);
-
-      // 2. Aggregate activity per category over last 7 days
+      // Aggregate activity per forum over last 7 days (using forumId)
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
       const activityQb = this.postRepository
         .createQueryBuilder('post')
-        .select('post.categoryId', 'categoryId')
+        .select('post.forumId', 'forumId')
         .addSelect('COUNT(post.id)', 'postCount7d')
         .addSelect('COALESCE(SUM(post."commentCount"), 0)', 'commentSum7d')
         .addSelect('COALESCE(SUM(post."viewCount"), 0)', 'viewSum7d')
         .addSelect('MAX(post.createdAt)', 'lastPostAt')
         .where('post.status = :status', { status: PostStatus.PUBLISHED })
         .andWhere('post.createdAt >= :since', { since: sevenDaysAgo })
-        .andWhere('post."categoryId" IS NOT NULL');
+        .andWhere('post.forumId IS NOT NULL');
       this.applyContextFilter(activityQb, 'post', ctx);
-      activityQb.groupBy('post.categoryId');
+      activityQb.groupBy('post.forumId');
       const result = await activityQb.getRawMany();
 
       // Calculate scores with recency bonus
@@ -336,7 +212,7 @@ export class ForumCategoryController extends ForumControllerBase {
         else if (hoursSinceLastPost <= 72) recencyBonus = 5;
 
         return {
-          categoryId: row.categoryId,
+          forumId: row.forumId,
           postCount7d: parseInt(row.postCount7d),
           commentSum7d: parseInt(row.commentSum7d),
           viewSum7d: parseInt(row.viewSum7d),
@@ -344,70 +220,59 @@ export class ForumCategoryController extends ForumControllerBase {
         };
       });
 
-      const scoreMap = new Map(scored.map((s) => [s.categoryId, s]));
+      scored.sort((a, b) => b.popularScore - a.popularScore);
+      const scoreMap = new Map(scored.map((s) => [s.forumId, s]));
 
-      // Helper to format category output
-      const formatCategory = (cat: ForumCategory, isPinnedItem: boolean) => {
-        const s = scoreMap.get(cat.id);
+      const topForumIds = scored.slice(0, limit).map((s) => s.forumId);
+
+      let forums: ForumCategoryRequest[] = [];
+      if (topForumIds.length > 0) {
+        const popQb = this.requestRepo
+          .createQueryBuilder('forum')
+          .where('forum.id IN (:...ids)', { ids: topForumIds })
+          .andWhere('forum.status = :status', { status: 'completed' });
+        this.applyForumContextFilter(popQb, 'forum', ctx);
+        forums = await popQb.getMany();
+      }
+
+      // Fallback: fill with active forums by creation date
+      if (forums.length < limit) {
+        const remaining = limit - forums.length;
+        const existingIds = new Set(forums.map((f) => f.id));
+        const fallbackQb = this.requestRepo
+          .createQueryBuilder('forum')
+          .where('forum.status = :status', { status: 'completed' })
+          .orderBy('forum.createdAt', 'DESC')
+          .take(limit);
+        this.applyForumContextFilter(fallbackQb, 'forum', ctx);
+        const fallback = await fallbackQb.getMany();
+        for (const f of fallback) {
+          if (!existingIds.has(f.id) && forums.length < limit) {
+            forums.push(f);
+          }
+        }
+      }
+
+      const data = forums.map((forum) => {
+        const s = scoreMap.get(forum.id);
         return {
-          id: cat.id,
-          name: cat.name,
-          description: cat.description,
-          slug: cat.slug,
-          color: cat.color,
-          iconUrl: cat.iconUrl || null,
-          iconEmoji: cat.iconEmoji || null,
-          isPinned: isPinnedItem,
-          postCount: cat.postCount,
+          id: forum.id,
+          name: forum.name,
+          description: forum.description,
+          slug: forum.slug,
+          iconUrl: forum.iconUrl || null,
+          iconEmoji: forum.iconEmoji || null,
+          isPinned: false,
           popularScore: s?.popularScore || 0,
           postCount7d: s?.postCount7d || 0,
           commentSum7d: s?.commentSum7d || 0,
           viewSum7d: s?.viewSum7d || 0,
         };
-      };
-
-      // 3. Build pinned results
-      const pinnedResults = pinnedCategories.map((cat) => formatCategory(cat, true));
-
-      // 4. Build popular results (exclude pinned)
-      scored.sort((a, b) => b.popularScore - a.popularScore);
-      const popularCategoryIds = scored
-        .filter((s) => !pinnedIds.has(s.categoryId))
-        .slice(0, remainingSlots)
-        .map((s) => s.categoryId);
-
-      let popularResults: ReturnType<typeof formatCategory>[] = [];
-
-      if (popularCategoryIds.length > 0) {
-        const popCatQb = this.categoryRepository
-          .createQueryBuilder('cat')
-          .where('cat.id IN (:...ids)', { ids: popularCategoryIds })
-          .andWhere('cat.isActive = true');
-        this.applyContextFilter(popCatQb, 'cat', ctx);
-        const popularCategories = await popCatQb.getMany();
-
-        popularResults = popularCategories
-          .map((cat) => formatCategory(cat, false))
-          .sort((a, b) => b.popularScore - a.popularScore);
-      } else if (remainingSlots > 0) {
-        // Fallback: fill with active categories by postCount
-        const fallbackQb = this.categoryRepository
-          .createQueryBuilder('cat')
-          .where('cat.isActive = true')
-          .orderBy('cat.postCount', 'DESC')
-          .take(remainingSlots + pinnedCategories.length);
-        this.applyContextFilter(fallbackQb, 'cat', ctx);
-        const fallback = await fallbackQb.getMany();
-
-        popularResults = fallback
-          .filter((cat) => !pinnedIds.has(cat.id))
-          .slice(0, remainingSlots)
-          .map((cat) => formatCategory(cat, false));
-      }
+      });
 
       res.json({
         success: true,
-        data: [...pinnedResults, ...popularResults],
+        data,
       });
     } catch (error: any) {
       logger.error('Error getting popular forums:', error);
@@ -424,7 +289,7 @@ export class ForumCategoryController extends ForumControllerBase {
 
   /**
    * GET /forum/categories/mine
-   * List categories created by the authenticated user
+   * List forums created by the authenticated user
    */
   async listMyCategories(req: Request, res: Response): Promise<void> {
     try {
@@ -435,18 +300,19 @@ export class ForumCategoryController extends ForumControllerBase {
       }
 
       const ctx = this.getForumContext(req);
-      const qb = this.categoryRepository
-        .createQueryBuilder('cat')
-        .where('cat.createdBy = :userId', { userId });
+      const qb = this.requestRepo
+        .createQueryBuilder('forum')
+        .where('forum.requesterId = :userId', { userId })
+        .andWhere('forum.status IN (:...statuses)', { statuses: ['completed', 'archived'] });
 
-      this.applyContextFilter(qb, 'cat', ctx);
-      qb.orderBy('cat.createdAt', 'DESC');
+      this.applyForumContextFilter(qb, 'forum', ctx);
+      qb.orderBy('forum.createdAt', 'DESC');
 
-      const categories = await qb.getMany();
+      const forums = await qb.getMany();
 
-      res.json({ success: true, data: categories, count: categories.length });
+      res.json({ success: true, data: forums, count: forums.length });
     } catch (error: any) {
-      logger.error('Error listing my categories:', error);
+      logger.error('Error listing my forums:', error);
       res.status(500).json({ success: false, error: error.message || 'Failed to list my categories' });
     }
   }
@@ -464,13 +330,13 @@ export class ForumCategoryController extends ForumControllerBase {
       }
 
       const { id } = req.params;
-      const category = await this.categoryRepository.findOne({ where: { id } });
+      const forum = await this.requestRepo.findOne({ where: { id } });
 
-      if (!category) {
+      if (!forum) {
         res.status(404).json({ success: false, error: 'Category not found' });
         return;
       }
-      if (category.createdBy !== userId) {
+      if (forum.requesterId !== userId) {
         res.status(403).json({ success: false, error: 'Only the forum owner can edit this forum' });
         return;
       }
@@ -478,18 +344,18 @@ export class ForumCategoryController extends ForumControllerBase {
       const ALLOWED_FIELDS = ['name', 'description', 'iconEmoji', 'iconUrl'] as const;
       for (const field of ALLOWED_FIELDS) {
         if (req.body[field] !== undefined) {
-          (category as any)[field] = req.body[field];
+          (forum as any)[field] = req.body[field];
         }
       }
 
-      if (req.body.name && req.body.name !== category.name) {
-        category.slug = this.generateSlug(req.body.name);
+      if (req.body.name && req.body.name !== forum.name) {
+        forum.slug = this.generateSlug(req.body.name);
       }
 
-      const saved = await this.categoryRepository.save(category);
+      const saved = await this.requestRepo.save(forum);
       res.json({ success: true, data: saved });
     } catch (error: any) {
-      logger.error('Error updating my category:', error);
+      logger.error('Error updating my forum:', error);
       res.status(500).json({ success: false, error: error.message || 'Failed to update category' });
     }
   }
@@ -511,19 +377,18 @@ export class ForumCategoryController extends ForumControllerBase {
       }
 
       const { id } = req.params;
-      const category = await this.categoryRepository.findOne({ where: { id } });
+      const forum = await this.requestRepo.findOne({ where: { id } });
 
-      if (!category) {
+      if (!forum) {
         res.status(404).json({ success: false, error: 'Category not found' });
         return;
       }
-      if (category.createdBy !== userId) {
+      if (forum.requesterId !== userId) {
         res.status(403).json({ success: false, error: 'Only the forum owner can request deletion' });
         return;
       }
 
-      // Check for existing pending request
-      const meta = (category.metadata as any) || {};
+      const meta = (forum.metadata as any) || {};
       if (meta.deleteRequestStatus === 'pending') {
         res.status(409).json({ success: false, error: 'A delete request is already pending for this forum' });
         return;
@@ -531,7 +396,7 @@ export class ForumCategoryController extends ForumControllerBase {
 
       const { reason } = req.body;
 
-      category.metadata = {
+      forum.metadata = {
         ...meta,
         deleteRequestStatus: 'pending',
         deleteRequestedAt: new Date().toISOString(),
@@ -542,10 +407,10 @@ export class ForumCategoryController extends ForumControllerBase {
         deleteReviewComment: null,
       };
 
-      const saved = await this.categoryRepository.save(category);
+      const saved = await this.requestRepo.save(forum);
       res.json({ success: true, data: saved });
     } catch (error: any) {
-      logger.error('Error requesting category deletion:', error);
+      logger.error('Error requesting forum deletion:', error);
       res.status(500).json({ success: false, error: error.message || 'Failed to request deletion' });
     }
   }

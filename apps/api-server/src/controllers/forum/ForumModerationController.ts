@@ -57,12 +57,12 @@ export class ForumModerationController extends ForumControllerBase {
         .andWhere('post.createdAt >= :today', { today });
       this.applyContextFilter(todayPostsQb, 'post', ctx);
 
+      // WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1: forum_category removed; use forum_category_requests
       const activeCatQb = this.categoryRepository
         .createQueryBuilder('cat')
-        .where('cat.isActive = true')
-        .orderBy('cat.postCount', 'DESC')
+        .where('cat.status = :status', { status: 'completed' })
+        .orderBy('cat.createdAt', 'DESC')
         .take(10);
-      this.applyContextFilter(activeCatQb, 'cat', ctx);
 
       const [
         totalPosts,

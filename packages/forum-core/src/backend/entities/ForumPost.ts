@@ -8,7 +8,6 @@ import {
   JoinColumn,
   Index
 } from 'typeorm';
-import type { ForumCategory } from './ForumCategory.js';
 import type { Block } from '@o4o/types';
 import type { ForumPostMetadata } from '../types/index.js';
 
@@ -55,7 +54,7 @@ export enum PostType {
 }
 
 @Entity('forum_post')
-@Index(['categoryId', 'status', 'isPinned', 'createdAt'])
+@Index(['forumId', 'status', 'isPinned', 'createdAt'])
 @Index(['organizationId', 'status', 'createdAt'])
 export class ForumPost {
   @PrimaryGeneratedColumn('uuid')
@@ -79,15 +78,7 @@ export class ForumPost {
   @Column({ type: 'enum', enum: PostStatus, default: PostStatus.PUBLISHED })
   status!: PostStatus;
 
-  /**
-   * @deprecated WO-O4O-FORUM-CATEGORY-CLEANUP-V1
-   * forum_category 구조 폐기로 더 이상 사용하지 않음.
-   * 컬럼은 WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1에서 DROP 예정.
-   * 모든 쿼리는 forumId 사용.
-   */
-  @Column({ type: 'uuid', nullable: true })
-  categoryId?: string | null;
-
+  // WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1: categoryId column removed from DB
   // WO-O4O-FORUM-MULTI-STRUCTURE-RECONSTRUCTION-V1
   // forum_category_requests.id 참조 — 게시글이 속한 포럼의 SSOT.
   @Column({ name: 'forum_id', type: 'uuid', nullable: true })
@@ -146,10 +137,6 @@ export class ForumPost {
   updatedAt!: Date;
 
   // Relations
-  @ManyToOne('ForumCategory', { lazy: true })
-  @JoinColumn({ name: 'categoryId' })
-  category?: Promise<ForumCategory>;
-
   @ManyToOne('User')
   @JoinColumn({ name: 'author_id' })
   author?: any; // Type resolved at runtime via TypeORM

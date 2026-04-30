@@ -29,7 +29,6 @@ export class ForumPostController extends ForumControllerBase {
 
       let queryBuilder = this.postRepository
         .createQueryBuilder('post')
-        .leftJoinAndSelect('post.category', 'category')
         .leftJoinAndSelect('post.author', 'author');
 
       // Status filter
@@ -149,7 +148,6 @@ export class ForumPostController extends ForumControllerBase {
 
       const qb = this.postRepository
         .createQueryBuilder('post')
-        .leftJoinAndSelect('post.category', 'category')
         .leftJoinAndSelect('post.author', 'author');
 
       if (isUuid) {
@@ -260,7 +258,6 @@ export class ForumPostController extends ForumControllerBase {
         title,
         content: normalizedContent,
         excerpt: postExcerpt,
-        categoryId: null,
         ...(resolvedForumId ? { forumId: resolvedForumId } : {}),
         type,
         tags: tags ? [...new Set<string>(tags.map((t: string) => String(t).trim().replace(/^#/, '')).filter(Boolean).filter((t: string) => t.length <= 30))] : undefined,

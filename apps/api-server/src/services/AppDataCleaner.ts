@@ -20,7 +20,7 @@ export interface PurgeOptions {
 const CORE_TABLES_REGISTRY: Record<string, string[]> = {
   'forum-core': [
     'forum_post',
-    'forum_category',
+    // forum_category removed — WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1
     'forum_comment',
     'forum_tag',
     'forum_like',

@@ -7,12 +7,12 @@
  * - forum_category_requests 테이블 사용 (serviceCode 격리)
  * - 신청자 CRUD: create, listMy, getDetail, update
  * - 운영자 심사: review (approve/reject/revision)
- * - 승인 시 ForumCategory 자동 생성 (트랜잭션)
+ * - 승인 시 forum_category_requests.status → 'completed' 전이 (WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1)
  */
 
 import { AppDataSource } from '../../database/connection.js';
 import { ForumCategoryRequest } from '@o4o/forum-core/entities';
-import { ForumCategory } from '@o4o/forum-core/entities';
+// ForumCategory removed — WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1
 import logger from '../../utils/logger.js';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -69,10 +69,7 @@ export class ForumCategoryRequestService {
   private get requestRepo() {
     return AppDataSource.getRepository(ForumCategoryRequest);
   }
-
-  private get categoryRepo() {
-    return AppDataSource.getRepository(ForumCategory);
-  }
+  // categoryRepo removed — WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1
 
   /** 신청 생성 */
   async create(user: RequestUser, input: CreateRequestInput): Promise<ServiceResult> {
@@ -322,75 +319,47 @@ export class ForumCategoryRequestService {
       };
     }
 
+    // WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1
+    // forum_category 테이블 제거 — forum_category_requests 자체가 forum SSOT.
+    // ForumCategory 생성 불필요; slug 확정 후 status → 'completed'
+
     // CREATING 상태로 전이
     row.status = 'creating' as any;
     row.errorMessage = undefined;
     await this.requestRepo.save(row);
 
-    // ForumCategory 생성 트랜잭션
-    const queryRunner = AppDataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
     try {
-      const slug = generateSlug(row.name);
-      const existingCategory = await queryRunner.manager.findOne(ForumCategory, { where: { slug } });
-
-      let createdCategory = null;
-      if (existingCategory) {
-        row.createdCategoryId = existingCategory.id;
-        row.createdCategorySlug = existingCategory.slug;
-        logger.info(`[ForumCategoryRequest] Category already exists: ${slug}`);
-      } else {
-        const category = queryRunner.manager.create(ForumCategory, {
-          name: row.name,
-          description: row.description,
-          slug,
-          color: '#3B82F6',
-          iconEmoji: row.iconEmoji || undefined,
-          iconUrl: row.iconUrl || undefined,
-          sortOrder: 100,
-          isActive: true,
-          requireApproval: false,
-          accessLevel: 'all',
-          forumType: row.forumType || 'open',
-          createdBy: row.requesterId,
-          organizationId: row.organizationId || undefined,
-          isOrganizationExclusive: !!row.organizationId,
-          tags: row.tags && row.tags.length > 0 ? row.tags : null,
-        });
-        createdCategory = await queryRunner.manager.save(ForumCategory, category);
-
-        // WO-KPA-A-FORUM-OWNER-MEMBERSHIP-AUTO-SYNC-V1
-        await queryRunner.query(
-          `INSERT INTO forum_category_members (forum_category_id, user_id, role, joined_at, created_at, updated_at)
-           VALUES ($1, $2, 'owner', NOW(), NOW(), NOW())
-           ON CONFLICT (forum_category_id, user_id) DO NOTHING`,
-          [createdCategory.id, row.requesterId],
-        );
-
-        row.createdCategoryId = createdCategory.id;
-        row.createdCategorySlug = createdCategory.slug;
-        logger.info(`[ForumCategoryRequest] Created category: ${createdCategory.name} (${createdCategory.slug})`);
+      // Ensure slug is set on the request entity
+      if (!row.slug) {
+        row.slug = generateSlug(row.name);
       }
 
+      // WO-KPA-A-FORUM-OWNER-MEMBERSHIP-AUTO-SYNC-V1
+      // Register requester as owner in forum_category_members
+      // (forum_category_requests.id is used as forum_category_id — FK constraint removed after table drop)
+      await AppDataSource.query(
+        `INSERT INTO forum_category_members (forum_category_id, user_id, role, joined_at, created_at, updated_at)
+         VALUES ($1, $2, 'owner', NOW(), NOW(), NOW())
+         ON CONFLICT (forum_category_id, user_id) DO NOTHING`,
+        [row.id, row.requesterId],
+      );
+
       row.status = 'completed' as any;
-      await queryRunner.manager.save(ForumCategoryRequest, row);
-      await queryRunner.commitTransaction();
+      await this.requestRepo.save(row);
+
+      logger.info(`[ForumCategoryRequest] Forum completed: ${row.name} (id: ${row.id}, slug: ${row.slug})`);
 
       return {
         data: {
           request: row,
-          category: createdCategory ? {
-            id: createdCategory.id,
-            name: createdCategory.name,
-            slug: createdCategory.slug,
-          } : { id: existingCategory!.id, name: existingCategory!.name, slug: existingCategory!.slug },
+          forum: {
+            id: row.id,
+            name: row.name,
+            slug: row.slug,
+          },
         },
       };
     } catch (err: any) {
-      await queryRunner.rollbackTransaction();
-
       // FAILED 상태로 전이 + 오류 메시지 기록
       try {
         row.status = 'failed' as any;
@@ -408,8 +377,6 @@ export class ForumCategoryRequestService {
           message: err?.message || '포럼 생성에 실패했습니다',
         },
       };
-    } finally {
-      await queryRunner.release();
     }
   }
 }

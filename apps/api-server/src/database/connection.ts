@@ -95,7 +95,7 @@ import { KycDocument } from '../entities/KycDocument.js';
 // ============================================================================
 import {
   ForumPost,
-  ForumCategory,
+  // ForumCategory removed — WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1
   ForumComment,
   ForumCategoryRequest,
   ForumCategoryMember,
@@ -647,7 +647,7 @@ export const AppDataSource = new DataSource({
     // FORUM-CORE ENTITIES (Phase 4: Entities-only Re-introduction)
     // ============================================================================
     ForumPost,
-    ForumCategory,
+    // ForumCategory removed — WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1
     ForumComment,
     ForumCategoryRequest,
     ForumCategoryMember,

@@ -14,7 +14,7 @@ import { body, param, query, validationResult } from 'express-validator';
 import { DataSource } from 'typeorm';
 import { GlycopharmForumCategoryRequest } from '../entities/index.js';
 import type { AuthRequest } from '../../../types/auth.js';
-import { ForumCategory } from '@o4o/forum-core/entities';
+// ForumCategory removed — WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1
 import logger from '../../../utils/logger.js';
 import { isServiceAdmin } from '../../../utils/role.utils.js';
 
@@ -51,7 +51,7 @@ export function createForumRequestController(
 ): Router {
   const router = Router();
   const requestRepo = dataSource.getRepository(GlycopharmForumCategoryRequest);
-  const categoryRepo = dataSource.getRepository(ForumCategory);
+  // categoryRepo removed — WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1
 
   // ============================================================================
   // USER ROUTES
@@ -230,65 +230,17 @@ export function createForumRequestController(
         request.reviewer_name = req.user!.name || req.user!.email || 'Admin';
         request.reviewed_at = new Date();
 
-        let createdCategory = null;
-
-        // 승인 시 실제 포럼 카테고리 생성
+        // WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1: forum_category 제거 — 카테고리 생성 로직 제거됨
+        // 이 레거시 컨트롤러는 @deprecated 상태. 신규 요청은 /api/v1/forum/category-requests 사용.
         if (req.body.status === 'approved') {
-          try {
-            const slug = generateSlug(request.name);
-
-            // Check if category with same slug already exists
-            const existingCategory = await categoryRepo.findOne({ where: { slug } });
-
-            if (existingCategory) {
-              // Category already exists - just link it
-              request.created_category_slug = slug;
-              logger.info(`[Forum Request] Category already exists: ${slug}`);
-            } else {
-              // Create new forum category
-              const category = categoryRepo.create({
-                name: request.name,
-                description: request.description,
-                slug,
-                color: '#3B82F6', // Default blue color
-                sortOrder: 100, // Default sort order
-                isActive: true,
-                requireApproval: false,
-                accessLevel: 'all',
-                createdBy: request.requester_id,
-              });
-
-              createdCategory = await categoryRepo.save(category);
-              request.created_category_slug = slug;
-
-              // WO-KPA-A-FORUM-OWNER-MEMBERSHIP-AUTO-SYNC-V1
-              await dataSource.query(
-                `INSERT INTO forum_category_members (forum_category_id, user_id, role, joined_at, created_at, updated_at)
-                 VALUES ($1, $2, 'owner', NOW(), NOW(), NOW())
-                 ON CONFLICT (forum_category_id, user_id) DO NOTHING`,
-                [createdCategory.id, request.requester_id],
-              );
-
-              logger.info(
-                `[Forum Request] Created forum category: ${createdCategory.name} (${createdCategory.slug}) for request ${request.id}`
-              );
-            }
-          } catch (error: any) {
-            logger.error(`[Forum Request] Failed to create category: ${error.message}`, error);
-            // Continue with approval even if category creation fails
-            // Admin can manually create category later
-          }
+          request.created_category_slug = generateSlug(request.name);
         }
 
         const saved = await requestRepo.save(request);
 
         res.json({
           data: saved,
-          category: createdCategory ? {
-            id: createdCategory.id,
-            name: createdCategory.name,
-            slug: createdCategory.slug,
-          } : null,
+          category: null,
         });
       } catch (error: any) {
         console.error('Failed to review request:', error);
@@ -302,96 +254,13 @@ export function createForumRequestController(
     '/admin/create-missing-categories',
     requireAuth,
     requireScope('glycopharm:admin'),
-    async (req: AuthRequest, res: Response): Promise<void> => {
-      try {
-        // Find all approved requests without created_category_slug
-        const approvedRequests = await requestRepo.find({
-          where: { status: 'approved' },
-        });
-
-        const results = [];
-        let created = 0;
-        let skipped = 0;
-        let errors = 0;
-
-        for (const request of approvedRequests) {
-          try {
-            // Skip if category already linked
-            if (request.created_category_slug) {
-              const existingCat = await categoryRepo.findOne({
-                where: { slug: request.created_category_slug },
-              });
-              if (existingCat) {
-                results.push({
-                  requestId: request.id,
-                  requestName: request.name,
-                  status: 'skipped',
-                  reason: 'Category already exists',
-                  categorySlug: request.created_category_slug,
-                });
-                skipped++;
-                continue;
-              }
-            }
-
-            // Create category
-            const slug = generateSlug(request.name);
-            const category = categoryRepo.create({
-              name: request.name,
-              description: request.description,
-              slug,
-              color: '#3B82F6',
-              sortOrder: 100,
-              isActive: true,
-              requireApproval: false,
-              accessLevel: 'all',
-              createdBy: request.requester_id,
-            });
-
-            const savedCategory = await categoryRepo.save(category);
-
-            // Update request
-            request.created_category_slug = slug;
-            await requestRepo.save(request);
-
-            results.push({
-              requestId: request.id,
-              requestName: request.name,
-              status: 'created',
-              categoryId: savedCategory.id,
-              categorySlug: savedCategory.slug,
-            });
-            created++;
-
-            logger.info(
-              `[Forum Request] Created missing category: ${savedCategory.name} (${savedCategory.slug}) for request ${request.id}`
-            );
-          } catch (error: any) {
-            results.push({
-              requestId: request.id,
-              requestName: request.name,
-              status: 'error',
-              error: error.message,
-            });
-            errors++;
-            logger.error(`[Forum Request] Failed to create category for request ${request.id}:`, error);
-          }
-        }
-
-        res.json({
-          success: true,
-          summary: {
-            total: approvedRequests.length,
-            created,
-            skipped,
-            errors,
-          },
-          results,
-        });
-      } catch (error: any) {
-        console.error('Failed to create missing categories:', error);
-        res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: error.message } });
-      }
+    async (_req: AuthRequest, res: Response): Promise<void> => {
+      // WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1: forum_category 제거 — 이 엔드포인트는 더 이상 동작하지 않음
+      res.status(410).json({
+        success: false,
+        error: 'forum_category 테이블이 제거되었습니다. 이 엔드포인트는 더 이상 지원되지 않습니다.',
+        code: 'FORUM_CATEGORY_REMOVED',
+      });
     }
   );
 

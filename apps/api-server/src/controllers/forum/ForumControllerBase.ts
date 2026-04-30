@@ -1,7 +1,8 @@
 import { Request } from 'express';
 import { AppDataSource } from '../../database/connection.js';
 import { ForumPost, ForumPostLike } from '@o4o/forum-core/entities';
-import { ForumCategory } from '@o4o/forum-core/entities';
+// ForumCategory removed — WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1
+import { ForumCategoryRequest } from '@o4o/forum-core/entities';
 import { ForumComment } from '@o4o/forum-core/entities';
 import { User } from '../../modules/auth/entities/User.js';
 import type { SelectQueryBuilder } from 'typeorm';
@@ -18,8 +19,9 @@ export class ForumControllerBase {
     return AppDataSource.getRepository(ForumPost);
   }
 
+  // WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1: categoryRepository now points to ForumCategoryRequest
   protected get categoryRepository() {
-    return AppDataSource.getRepository(ForumCategory);
+    return AppDataSource.getRepository(ForumCategoryRequest);
   }
 
   protected get commentRepository() {

@@ -46,7 +46,7 @@ export async function getPersonalizedRecommendations(
     .limit(limit * 3);
 
   if (categoryId) {
-    queryBuilder.andWhere('post.categoryId = :categoryId', { categoryId });
+    queryBuilder.andWhere('post.forumId = :forumId', { forumId: categoryId });
   }
 
   if (userContext.organizationId) {
@@ -160,7 +160,7 @@ export async function getTrendingPosts(
     .limit(limit);
 
   if (categoryId) {
-    queryBuilder.andWhere('post.categoryId = :categoryId', { categoryId });
+    queryBuilder.andWhere('post.forumId = :forumId', { forumId: categoryId });
   }
 
   const posts = await queryBuilder.getMany();
@@ -195,9 +195,9 @@ export async function getRelatedPosts(
     .orderBy('post.createdAt', 'DESC')
     .limit(limit * 3);
 
-  if (sourcePost.categoryId) {
-    queryBuilder.andWhere('post.categoryId = :categoryId', {
-      categoryId: sourcePost.categoryId,
+  if (sourcePost.forumId) {
+    queryBuilder.andWhere('post.forumId = :forumId', {
+      forumId: sourcePost.forumId,
     });
   }
 

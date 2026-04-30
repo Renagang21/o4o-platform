@@ -4,6 +4,11 @@
  * WO-O4O-FORUM-OPERATOR-UNIFICATION-V1
  * 서비스 공통 포럼 운영자 API — serviceCode 기반 격리
  *
+ * WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1
+ * forum_category 테이블 제거 후 forum_category_requests 기반으로 전환.
+ * forum_category_requests.id = forum identifier (SSOT)
+ * status: 'completed' = active forum, 'archived' = deactivated forum
+ *
  * Mount: /api/v1/forum/operator
  *
  * Request Review:
@@ -15,7 +20,7 @@
  * Delete Request Review:
  *   GET    /delete-requests                - 삭제 요청 목록
  *   GET    /delete-requests/pending-count  - 대기 중인 삭제 요청 수
- *   POST   /delete-requests/:id/approve    - 승인 (isActive=false)
+ *   POST   /delete-requests/:id/approve    - 승인 (status → archived)
  *   POST   /delete-requests/:id/reject     - 반려
  *
  * Batch (V3):
@@ -29,7 +34,7 @@ import { authenticate } from '../../middleware/auth.middleware.js';
 import { forumCategoryRequestService } from '../../services/forum/ForumCategoryRequestService.js';
 import { isServiceOperator } from '../../utils/role.utils.js';
 import { AppDataSource } from '../../database/connection.js';
-import { ForumCategory, ForumPost, ForumCategoryMember } from '@o4o/forum-core/entities';
+import { ForumPost, ForumCategoryMember } from '@o4o/forum-core/entities';
 import { ForumCategoryRequest } from '@o4o/forum-core/entities';
 import type { AuthRequest } from '../../types/auth.js';
 import type { ServiceKey } from '../../types/roles.js';
@@ -212,28 +217,26 @@ router.patch('/requests/:id/review', async (req: Request, res: Response): Promis
 });
 
 // ============================================================================
-// DELETE REQUEST REVIEW — direct DB queries on forum_category metadata
-// Scoped via forum_category_requests.serviceCode join
+// DELETE REQUEST REVIEW — forum_category_requests metadata-based deletion flow
+// WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1: categoryRepo() removed, uses requestRepo()
 // ============================================================================
 
-const categoryRepo = () => AppDataSource.getRepository(ForumCategory);
 const requestRepo = () => AppDataSource.getRepository(ForumCategoryRequest);
 const postRepo = () => AppDataSource.getRepository(ForumPost);
 const memberRepo = () => AppDataSource.getRepository(ForumCategoryMember);
 
 /**
- * Find category IDs that belong to a specific service.
- * Uses forum_category_requests.createdCategoryId for serviceCode scoping.
- * Also includes categories directly linked via organizationId for backward compat.
+ * Find forum IDs (forum_category_requests.id) that belong to a specific service.
+ * Returns all completed/archived forums for the service.
  */
-async function getCategoryIdsForService(serviceCode: string): Promise<string[]> {
+async function getForumIdsForService(serviceCode: string): Promise<string[]> {
   const rows = await requestRepo()
     .createQueryBuilder('r')
-    .select('r.createdCategoryId', 'catId')
+    .select('r.id', 'forumId')
     .where('r.serviceCode = :serviceCode', { serviceCode })
-    .andWhere('r.createdCategoryId IS NOT NULL')
+    .andWhere('r.status IN (:...statuses)', { statuses: ['completed', 'archived'] })
     .getRawMany();
-  return rows.map((r: any) => r.catId).filter(Boolean);
+  return rows.map((r: any) => r.forumId).filter(Boolean);
 }
 
 /** GET /delete-requests — 삭제 요청 목록 */
@@ -242,35 +245,33 @@ router.get('/delete-requests', async (req: Request, res: Response): Promise<void
     const serviceCode = (req as any)._serviceCode;
     const statusFilter = req.query.status as string || 'pending';
 
-    const categoryIds = await getCategoryIdsForService(serviceCode);
-    if (categoryIds.length === 0) {
+    const forumIds = await getForumIdsForService(serviceCode);
+    if (forumIds.length === 0) {
       res.json({ success: true, data: [], count: 0 });
       return;
     }
 
-    const qb = categoryRepo()
-      .createQueryBuilder('cat')
-      .leftJoinAndSelect('cat.creator', 'creator')
-      .where(`cat.metadata->>'deleteRequestStatus' = :status`, { status: statusFilter })
-      .andWhere('cat.id IN (:...categoryIds)', { categoryIds })
-      .orderBy(`cat.metadata->>'deleteRequestedAt'`, 'DESC');
+    const forums = await requestRepo()
+      .createQueryBuilder('forum')
+      .where(`forum.metadata->>'deleteRequestStatus' = :status`, { status: statusFilter })
+      .andWhere('forum.id IN (:...forumIds)', { forumIds })
+      .orderBy(`forum.metadata->>'deleteRequestedAt'`, 'DESC')
+      .getMany();
 
-    const categories = await qb.getMany();
-
-    const data = categories.map((cat) => ({
-      id: cat.id,
-      name: cat.name,
-      description: cat.description,
-      slug: cat.slug,
-      isActive: cat.isActive,
-      postCount: cat.postCount,
-      createdBy: cat.createdBy,
-      creatorName: (cat as any).creator?.name || null,
-      deleteRequestStatus: cat.metadata?.deleteRequestStatus,
-      deleteRequestedAt: cat.metadata?.deleteRequestedAt,
-      deleteRequestReason: cat.metadata?.deleteRequestReason,
-      deleteReviewedAt: cat.metadata?.deleteReviewedAt,
-      deleteReviewComment: cat.metadata?.deleteReviewComment,
+    const data = forums.map((forum) => ({
+      id: forum.id,
+      name: forum.name,
+      description: forum.description,
+      slug: forum.slug,
+      isActive: forum.status === 'completed',
+      postCount: null, // computed on demand — use delete-check endpoint
+      createdBy: forum.requesterId,
+      creatorName: forum.requesterName,
+      deleteRequestStatus: forum.metadata?.deleteRequestStatus,
+      deleteRequestedAt: forum.metadata?.deleteRequestedAt,
+      deleteRequestReason: forum.metadata?.deleteRequestReason,
+      deleteReviewedAt: forum.metadata?.deleteReviewedAt,
+      deleteReviewComment: forum.metadata?.deleteReviewComment,
     }));
 
     res.json({ success: true, data, count: data.length });
@@ -284,17 +285,17 @@ router.get('/delete-requests', async (req: Request, res: Response): Promise<void
 router.get('/delete-requests/pending-count', async (req: Request, res: Response): Promise<void> => {
   try {
     const serviceCode = (req as any)._serviceCode;
-    const categoryIds = await getCategoryIdsForService(serviceCode);
+    const forumIds = await getForumIdsForService(serviceCode);
 
-    if (categoryIds.length === 0) {
+    if (forumIds.length === 0) {
       res.json({ success: true, data: { count: 0 } });
       return;
     }
 
-    const count = await categoryRepo()
-      .createQueryBuilder('cat')
-      .where(`cat.metadata->>'deleteRequestStatus' = :status`, { status: 'pending' })
-      .andWhere('cat.id IN (:...categoryIds)', { categoryIds })
+    const count = await requestRepo()
+      .createQueryBuilder('forum')
+      .where(`forum.metadata->>'deleteRequestStatus' = :status`, { status: 'pending' })
+      .andWhere('forum.id IN (:...forumIds)', { forumIds })
       .getCount();
 
     res.json({ success: true, data: { count } });
@@ -304,34 +305,33 @@ router.get('/delete-requests/pending-count', async (req: Request, res: Response)
   }
 });
 
-/** POST /delete-requests/:id/approve — 승인 (isActive=false 처리) */
+/** POST /delete-requests/:id/approve — 승인 (status → archived) */
 router.post('/delete-requests/:id/approve', async (req: Request, res: Response): Promise<void> => {
   try {
     const serviceCode = (req as any)._serviceCode;
     const userId = (req as AuthRequest).user?.id;
     const { reviewComment } = req.body;
 
-    // Verify category belongs to this service
-    const categoryIds = await getCategoryIdsForService(serviceCode);
-    if (!categoryIds.includes(req.params.id)) {
-      res.status(404).json({ success: false, error: 'Category not found for this service' });
+    const forumIds = await getForumIdsForService(serviceCode);
+    if (!forumIds.includes(req.params.id)) {
+      res.status(404).json({ success: false, error: 'Forum not found for this service' });
       return;
     }
 
-    const category = await categoryRepo().findOne({ where: { id: req.params.id } });
-    if (!category) {
-      res.status(404).json({ success: false, error: 'Category not found' });
+    const forum = await requestRepo().findOne({ where: { id: req.params.id } });
+    if (!forum) {
+      res.status(404).json({ success: false, error: 'Forum not found' });
       return;
     }
 
-    const meta = category.metadata || {};
+    const meta = forum.metadata || {};
     if (meta.deleteRequestStatus !== 'pending') {
-      res.status(400).json({ success: false, error: 'No pending delete request for this category' });
+      res.status(400).json({ success: false, error: 'No pending delete request for this forum' });
       return;
     }
 
-    category.isActive = false;
-    category.metadata = {
+    forum.status = 'archived';
+    forum.metadata = {
       ...meta,
       deleteRequestStatus: 'approved',
       deleteReviewedAt: new Date().toISOString(),
@@ -340,7 +340,7 @@ router.post('/delete-requests/:id/approve', async (req: Request, res: Response):
       archivedAt: new Date().toISOString(),
     };
 
-    const updated = await categoryRepo().save(category);
+    const updated = await requestRepo().save(forum);
     res.json({ success: true, data: updated });
   } catch (error: any) {
     logger.error('Error approving forum delete request:', error);
@@ -355,26 +355,25 @@ router.post('/delete-requests/:id/reject', async (req: Request, res: Response): 
     const userId = (req as AuthRequest).user?.id;
     const { reviewComment } = req.body;
 
-    // Verify category belongs to this service
-    const categoryIds = await getCategoryIdsForService(serviceCode);
-    if (!categoryIds.includes(req.params.id)) {
-      res.status(404).json({ success: false, error: 'Category not found for this service' });
+    const forumIds = await getForumIdsForService(serviceCode);
+    if (!forumIds.includes(req.params.id)) {
+      res.status(404).json({ success: false, error: 'Forum not found for this service' });
       return;
     }
 
-    const category = await categoryRepo().findOne({ where: { id: req.params.id } });
-    if (!category) {
-      res.status(404).json({ success: false, error: 'Category not found' });
+    const forum = await requestRepo().findOne({ where: { id: req.params.id } });
+    if (!forum) {
+      res.status(404).json({ success: false, error: 'Forum not found' });
       return;
     }
 
-    const meta = category.metadata || {};
+    const meta = forum.metadata || {};
     if (meta.deleteRequestStatus !== 'pending') {
-      res.status(400).json({ success: false, error: 'No pending delete request for this category' });
+      res.status(400).json({ success: false, error: 'No pending delete request for this forum' });
       return;
     }
 
-    category.metadata = {
+    forum.metadata = {
       ...meta,
       deleteRequestStatus: 'rejected',
       deleteReviewedAt: new Date().toISOString(),
@@ -382,7 +381,7 @@ router.post('/delete-requests/:id/reject', async (req: Request, res: Response): 
       deleteReviewComment: reviewComment?.trim() || null,
     };
 
-    const updated = await categoryRepo().save(category);
+    const updated = await requestRepo().save(forum);
     res.json({ success: true, data: updated });
   } catch (error: any) {
     logger.error('Error rejecting forum delete request:', error);
@@ -457,27 +456,27 @@ router.post('/delete-requests/batch-approve', async (req: Request, res: Response
       return;
     }
 
-    const categoryIds = await getCategoryIdsForService(serviceCode);
+    const forumIds = await getForumIdsForService(serviceCode);
     const results: Array<{ id: string; status: 'success' | 'skipped' | 'failed'; error?: string }> = [];
 
     for (const id of ids) {
       try {
-        if (!categoryIds.includes(id)) {
-          results.push({ id, status: 'failed', error: 'Category not found for this service' });
+        if (!forumIds.includes(id)) {
+          results.push({ id, status: 'failed', error: 'Forum not found for this service' });
           continue;
         }
-        const category = await categoryRepo().findOne({ where: { id } });
-        if (!category) {
-          results.push({ id, status: 'failed', error: 'Category not found' });
+        const forum = await requestRepo().findOne({ where: { id } });
+        if (!forum) {
+          results.push({ id, status: 'failed', error: 'Forum not found' });
           continue;
         }
-        const meta = category.metadata || {};
+        const meta = forum.metadata || {};
         if (meta.deleteRequestStatus !== 'pending') {
           results.push({ id, status: 'skipped', error: 'No pending delete request' });
           continue;
         }
-        category.isActive = false;
-        category.metadata = {
+        forum.status = 'archived';
+        forum.metadata = {
           ...meta,
           deleteRequestStatus: 'approved',
           deleteReviewedAt: new Date().toISOString(),
@@ -485,7 +484,7 @@ router.post('/delete-requests/batch-approve', async (req: Request, res: Response
           deleteReviewComment: reviewComment?.trim() || null,
           archivedAt: new Date().toISOString(),
         };
-        await categoryRepo().save(category);
+        await requestRepo().save(forum);
         results.push({ id, status: 'success' });
       } catch (err: any) {
         results.push({ id, status: 'failed', error: err.message || 'Unknown error' });
@@ -515,33 +514,33 @@ router.post('/delete-requests/batch-reject', async (req: Request, res: Response)
       return;
     }
 
-    const categoryIds = await getCategoryIdsForService(serviceCode);
+    const forumIds = await getForumIdsForService(serviceCode);
     const results: Array<{ id: string; status: 'success' | 'skipped' | 'failed'; error?: string }> = [];
 
     for (const id of ids) {
       try {
-        if (!categoryIds.includes(id)) {
-          results.push({ id, status: 'failed', error: 'Category not found for this service' });
+        if (!forumIds.includes(id)) {
+          results.push({ id, status: 'failed', error: 'Forum not found for this service' });
           continue;
         }
-        const category = await categoryRepo().findOne({ where: { id } });
-        if (!category) {
-          results.push({ id, status: 'failed', error: 'Category not found' });
+        const forum = await requestRepo().findOne({ where: { id } });
+        if (!forum) {
+          results.push({ id, status: 'failed', error: 'Forum not found' });
           continue;
         }
-        const meta = category.metadata || {};
+        const meta = forum.metadata || {};
         if (meta.deleteRequestStatus !== 'pending') {
           results.push({ id, status: 'skipped', error: 'No pending delete request' });
           continue;
         }
-        category.metadata = {
+        forum.metadata = {
           ...meta,
           deleteRequestStatus: 'rejected',
           deleteReviewedAt: new Date().toISOString(),
           deleteReviewedBy: userId,
           deleteReviewComment: reviewComment?.trim() || null,
         };
-        await categoryRepo().save(category);
+        await requestRepo().save(forum);
         results.push({ id, status: 'success' });
       } catch (err: any) {
         results.push({ id, status: 'failed', error: err.message || 'Unknown error' });
@@ -556,65 +555,56 @@ router.post('/delete-requests/batch-reject', async (req: Request, res: Response)
 });
 
 // ============================================================================
-// DIRECT CATEGORY MANAGEMENT — operator direct deactivation
+// DIRECT FORUM MANAGEMENT — operator direct deactivation
 // WO-KPA-A-OPERATOR-FORUM-DIRECT-SOFT-DELETE-V1
+// WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1: uses forum_category_requests
 // ============================================================================
 
-/** GET /categories — all forum categories for service (active + inactive) */
+/** GET /categories — all forums for service (active + inactive) */
 router.get('/categories', async (req: Request, res: Response): Promise<void> => {
   try {
     const serviceCode = (req as any)._serviceCode;
-    const categoryIds = await getCategoryIdsForService(serviceCode);
 
-    if (categoryIds.length === 0) {
-      res.json({ success: true, data: [], count: 0 });
-      return;
-    }
-
-    const categories = await categoryRepo()
-      .createQueryBuilder('cat')
-      .leftJoinAndSelect('cat.creator', 'creator')
-      .where('cat.id IN (:...categoryIds)', { categoryIds })
-      .orderBy('cat.createdAt', 'DESC')
+    const forums = await requestRepo()
+      .createQueryBuilder('forum')
+      .where('forum.serviceCode = :serviceCode', { serviceCode })
+      .andWhere('forum.status IN (:...statuses)', { statuses: ['completed', 'archived'] })
+      .orderBy('forum.createdAt', 'DESC')
       .getMany();
 
-    const data = categories.map((cat) => ({
-      id: cat.id,
-      name: cat.name,
-      description: cat.description,
-      slug: cat.slug,
-      isActive: cat.isActive,
-      postCount: cat.postCount,
-      forumType: cat.forumType,
-      tags: cat.tags || [],
-      createdBy: cat.createdBy,
-      creatorName: (cat as any).creator?.name || null,
-      createdAt: cat.createdAt,
-      updatedAt: cat.updatedAt,
+    const data = forums.map((forum) => ({
+      id: forum.id,
+      name: forum.name,
+      description: forum.description,
+      slug: forum.slug,
+      isActive: forum.status === 'completed',
+      status: forum.status,
+      forumType: forum.forumType,
+      tags: forum.tags || [],
+      createdBy: forum.requesterId,
+      creatorName: forum.requesterName,
+      createdAt: forum.createdAt,
+      updatedAt: forum.updatedAt,
     }));
 
     res.json({ success: true, data, count: data.length });
   } catch (error: any) {
-    logger.error('Error listing forum categories:', error);
+    logger.error('Error listing forums:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-/** PATCH /categories/:id — operator category info update (name, description, tags) */
+/** PATCH /categories/:id — operator forum info update (name, description, tags) */
 router.patch('/categories/:id', async (req: Request, res: Response): Promise<void> => {
   try {
     const serviceCode = (req as any)._serviceCode;
     const { name, description, tags } = req.body;
 
-    const categoryIds = await getCategoryIdsForService(serviceCode);
-    if (!categoryIds.includes(req.params.id)) {
-      res.status(404).json({ success: false, error: 'Category not found for this service' });
-      return;
-    }
-
-    const category = await categoryRepo().findOne({ where: { id: req.params.id } });
-    if (!category) {
-      res.status(404).json({ success: false, error: 'Category not found' });
+    const forum = await requestRepo().findOne({
+      where: { id: req.params.id, serviceCode },
+    });
+    if (!forum || !['completed', 'archived'].includes(forum.status)) {
+      res.status(404).json({ success: false, error: 'Forum not found for this service' });
       return;
     }
 
@@ -624,11 +614,11 @@ router.patch('/categories/:id', async (req: Request, res: Response): Promise<voi
         res.status(400).json({ success: false, error: '포럼 이름은 2~50자여야 합니다' });
         return;
       }
-      category.name = trimmed;
+      forum.name = trimmed;
     }
 
     if (description !== undefined) {
-      category.description = description ? String(description).trim() : null as any;
+      forum.description = description ? String(description).trim() : '';
     }
 
     if (tags !== undefined) {
@@ -638,18 +628,18 @@ router.patch('/categories/:id', async (req: Request, res: Response): Promise<voi
           .filter(Boolean)
           .filter((t: string) => t.length <= 30)
       )];
-      category.tags = sanitized as any;
+      forum.tags = sanitized;
     }
 
-    const updated = await categoryRepo().save(category);
+    const updated = await requestRepo().save(forum);
     res.json({ success: true, data: updated });
   } catch (error: any) {
-    logger.error('Error updating forum category:', error);
+    logger.error('Error updating forum:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-/** POST /categories/:id/deactivate — operator direct soft delete */
+/** POST /categories/:id/deactivate — operator direct soft delete (status → archived) */
 router.post('/categories/:id/deactivate', async (req: Request, res: Response): Promise<void> => {
   try {
     const serviceCode = (req as any)._serviceCode;
@@ -661,26 +651,22 @@ router.post('/categories/:id/deactivate', async (req: Request, res: Response): P
       return;
     }
 
-    const categoryIds = await getCategoryIdsForService(serviceCode);
-    if (!categoryIds.includes(req.params.id)) {
-      res.status(404).json({ success: false, error: 'Category not found for this service' });
+    const forum = await requestRepo().findOne({
+      where: { id: req.params.id, serviceCode },
+    });
+    if (!forum || !['completed', 'archived'].includes(forum.status)) {
+      res.status(404).json({ success: false, error: 'Forum not found for this service' });
       return;
     }
 
-    const category = await categoryRepo().findOne({ where: { id: req.params.id } });
-    if (!category) {
-      res.status(404).json({ success: false, error: 'Category not found' });
-      return;
-    }
-
-    if (!category.isActive) {
+    if (forum.status !== 'completed') {
       res.status(400).json({ success: false, error: '이미 비활성화된 포럼입니다', code: 'ALREADY_INACTIVE' });
       return;
     }
 
-    const meta = category.metadata || {};
-    category.isActive = false;
-    category.metadata = {
+    const meta = forum.metadata || {};
+    forum.status = 'archived';
+    forum.metadata = {
       ...meta,
       directDeactivatedAt: new Date().toISOString(),
       directDeactivatedBy: userId,
@@ -688,11 +674,11 @@ router.post('/categories/:id/deactivate', async (req: Request, res: Response): P
       archivedAt: new Date().toISOString(),
     };
 
-    await categoryRepo().save(category);
-    logger.info(`Forum category ${category.id} deactivated by operator ${userId} (reason: ${reason.trim()})`);
-    res.json({ success: true, data: { id: category.id, isActive: false } });
+    await requestRepo().save(forum);
+    logger.info(`Forum ${forum.id} deactivated by operator ${userId} (reason: ${reason.trim()})`);
+    res.json({ success: true, data: { id: forum.id, isActive: false } });
   } catch (error: any) {
-    logger.error('Error deactivating forum category:', error);
+    logger.error('Error deactivating forum:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
@@ -701,14 +687,17 @@ router.post('/categories/:id/deactivate', async (req: Request, res: Response): P
 router.get('/categories/:id/delete-check', async (req: Request, res: Response): Promise<void> => {
   try {
     const serviceCode = (req as any)._serviceCode;
-    const categoryIds = await getCategoryIdsForService(serviceCode);
-    if (!categoryIds.includes(req.params.id)) {
-      res.status(404).json({ success: false, error: 'Category not found for this service' });
+
+    const forum = await requestRepo().findOne({
+      where: { id: req.params.id, serviceCode },
+    });
+    if (!forum || !['completed', 'archived'].includes(forum.status)) {
+      res.status(404).json({ success: false, error: 'Forum not found for this service' });
       return;
     }
 
     const [postCount, totalMemberCount, ownerCount] = await Promise.all([
-      postRepo().count({ where: { categoryId: req.params.id } }),
+      postRepo().count({ where: { forumId: req.params.id } }),
       memberRepo().count({ where: { forumCategoryId: req.params.id } }),
       memberRepo().count({ where: { forumCategoryId: req.params.id, role: 'owner' } }),
     ]);
@@ -721,15 +710,15 @@ router.get('/categories/:id/delete-check', async (req: Request, res: Response): 
       const orphanRows = await AppDataSource.query(
         `SELECT COUNT(*)::int AS count
          FROM forum_post fp
-         LEFT JOIN users u ON u.id = fp."authorId"
-         WHERE fp."categoryId" = $1 AND u.id IS NULL`,
+         LEFT JOIN users u ON u.id = fp.author_id
+         WHERE fp.forum_id = $1 AND u.id IS NULL`,
         [req.params.id],
       );
       orphanPostCount = parseInt(orphanRows[0]?.count ?? '0', 10);
     }
     const normalPostCount = postCount - orphanPostCount;
 
-    // 운영자 hard delete: 정상 게시글만 차단, 고아 게시글은 자동 정리 허용 (WO-KPA-FORUM-ORPHAN-POST-FORCE-CLEANUP-V1)
+    // 운영자 hard delete: 정상 게시글만 차단, 고아 게시글은 자동 정리 허용
     const blockedReasons: string[] = [];
     if (normalPostCount > 0) blockedReasons.push(`정상 게시글 ${normalPostCount}건이 남아 있어 삭제할 수 없습니다`);
 
@@ -758,7 +747,7 @@ router.get('/categories/:id/delete-check', async (req: Request, res: Response): 
   }
 });
 
-/** DELETE /categories/:id/hard — operator permanent hard delete (WO-KPA-A-OPERATOR-FORUM-HARD-DELETE-SAFE-GUARD-V1) */
+/** DELETE /categories/:id/hard — operator permanent hard delete */
 router.delete('/categories/:id/hard', async (req: Request, res: Response): Promise<void> => {
   try {
     const serviceCode = (req as any)._serviceCode;
@@ -770,28 +759,23 @@ router.delete('/categories/:id/hard', async (req: Request, res: Response): Promi
       return;
     }
 
-    const categoryIds = await getCategoryIdsForService(serviceCode);
-    if (!categoryIds.includes(req.params.id)) {
-      res.status(404).json({ success: false, error: 'Category not found for this service' });
+    const forum = await requestRepo().findOne({
+      where: { id: req.params.id, serviceCode },
+    });
+    if (!forum || !['completed', 'archived'].includes(forum.status)) {
+      res.status(404).json({ success: false, error: 'Forum not found for this service' });
       return;
     }
 
-    const category = await categoryRepo().findOne({ where: { id: req.params.id } });
-    if (!category) {
-      res.status(404).json({ success: false, error: 'Category not found' });
-      return;
-    }
-
-    // Re-check: 정상 게시글만 차단, 고아 게시글은 자동 정리 허용 (WO-KPA-FORUM-ORPHAN-POST-FORCE-CLEANUP-V1)
-    const postCount = await postRepo().count({ where: { categoryId: req.params.id } });
+    // Re-check: 정상 게시글만 차단, 고아 게시글은 자동 정리 허용
+    const postCount = await postRepo().count({ where: { forumId: req.params.id } });
 
     if (postCount > 0) {
-      // 고아 게시글 판별
       const orphanRows = await AppDataSource.query(
         `SELECT COUNT(*)::int AS count
          FROM forum_post fp
-         LEFT JOIN users u ON u.id = fp."authorId"
-         WHERE fp."categoryId" = $1 AND u.id IS NULL`,
+         LEFT JOIN users u ON u.id = fp.author_id
+         WHERE fp.forum_id = $1 AND u.id IS NULL`,
         [req.params.id],
       );
       const orphanPostCount = parseInt(orphanRows[0]?.count ?? '0', 10);
@@ -808,18 +792,18 @@ router.delete('/categories/:id/hard', async (req: Request, res: Response): Promi
       }
 
       // 고아 게시글만 남은 경우 → 자동 정리 후 진행
-      const deletedPosts = await postRepo().delete({ categoryId: req.params.id });
-      logger.info(`Forum category ${category.id} (${category.name}): 고아 게시글 ${deletedPosts.affected ?? 0}건 자동 정리 (operator: ${userId})`);
+      const deletedPosts = await postRepo().delete({ forumId: req.params.id });
+      logger.info(`Forum ${forum.id} (${forum.name}): 고아 게시글 ${deletedPosts.affected ?? 0}건 자동 정리 (operator: ${userId})`);
     }
 
     // 멤버십 cascade 삭제 (owner 포함) → FK 위반 방지
     const deletedMembers = await memberRepo().delete({ forumCategoryId: req.params.id });
-    logger.info(`Forum category ${category.id} (${category.name}) hard deleted by operator ${userId} (reason: ${reason.trim()}, members removed: ${deletedMembers.affected ?? 0})`);
-    await categoryRepo().remove(category);
+    logger.info(`Forum ${forum.id} (${forum.name}) hard deleted by operator ${userId} (reason: ${reason.trim()}, members removed: ${deletedMembers.affected ?? 0})`);
+    await requestRepo().remove(forum);
 
-    res.json({ success: true, data: { id: req.params.id, name: category.name, hardDeleted: true } });
+    res.json({ success: true, data: { id: req.params.id, name: forum.name, hardDeleted: true } });
   } catch (error: any) {
-    logger.error('Error hard deleting forum category:', error);
+    logger.error('Error hard deleting forum:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
@@ -834,26 +818,30 @@ router.get('/analytics/summary', async (req: Request, res: Response): Promise<vo
   try {
     const serviceCode = (req as any)._serviceCode;
 
-    // Category stats (scoped via approved requests)
-    const categoryIds = await getCategoryIdsForService(serviceCode);
-    let totalForums = 0;
-    let activeForums = 0;
-    let totalPosts = 0;
+    // Forum stats from forum_category_requests
+    const forumStats = await requestRepo()
+      .createQueryBuilder('forum')
+      .select('COUNT(*) FILTER (WHERE forum.status IN (\'completed\', \'archived\'))::int', 'total')
+      .addSelect('COUNT(*) FILTER (WHERE forum.status = \'completed\')::int', 'active')
+      .where('forum.serviceCode = :serviceCode', { serviceCode })
+      .getRawOne();
 
-    if (categoryIds.length > 0) {
-      const catStats = await categoryRepo()
-        .createQueryBuilder('cat')
+    const totalForums = forumStats?.total || 0;
+    const activeForums = forumStats?.active || 0;
+
+    // Post count — count posts by forum_id scoped to service forums
+    const forumIds = await getForumIdsForService(serviceCode);
+    let totalPosts = 0;
+    if (forumIds.length > 0) {
+      const postStats = await postRepo()
+        .createQueryBuilder('post')
         .select('COUNT(*)::int', 'total')
-        .addSelect('COUNT(*) FILTER (WHERE cat.isActive = true)::int', 'active')
-        .addSelect('COALESCE(SUM(cat.postCount), 0)::int', 'posts')
-        .where('cat.id IN (:...categoryIds)', { categoryIds })
+        .where('post.forumId IN (:...forumIds)', { forumIds })
         .getRawOne();
-      totalForums = catStats?.total || 0;
-      activeForums = catStats?.active || 0;
-      totalPosts = catStats?.posts || 0;
+      totalPosts = postStats?.total || 0;
     }
 
-    // Request stats (scoped by serviceCode)
+    // Request stats (all statuses, scoped by serviceCode)
     const reqStats = await requestRepo()
       .createQueryBuilder('r')
       .select('r.status', 'status')
@@ -867,13 +855,13 @@ router.get('/analytics/summary', async (req: Request, res: Response): Promise<vo
       statusCounts[row.status] = row.cnt;
     }
 
-    // Delete request stats
+    // Delete request stats — forums with pending delete request
     let deleteRequestsPending = 0;
-    if (categoryIds.length > 0) {
-      deleteRequestsPending = await categoryRepo()
-        .createQueryBuilder('cat')
-        .where(`cat.metadata->>'deleteRequestStatus' = :status`, { status: 'pending' })
-        .andWhere('cat.id IN (:...categoryIds)', { categoryIds })
+    if (forumIds.length > 0) {
+      deleteRequestsPending = await requestRepo()
+        .createQueryBuilder('forum')
+        .where(`forum.metadata->>'deleteRequestStatus' = :status`, { status: 'pending' })
+        .andWhere('forum.id IN (:...forumIds)', { forumIds })
         .getCount();
     }
 

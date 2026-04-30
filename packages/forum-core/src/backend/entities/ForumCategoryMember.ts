@@ -16,8 +16,9 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
+// Note: ManyToOne/JoinColumn retained for User relation below
 
-import type { ForumCategory } from './ForumCategory.js';
+// ForumCategory removed — WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1
 
 @Entity('forum_category_members')
 @Unique(['forumCategoryId', 'userId'])
@@ -44,10 +45,7 @@ export class ForumCategoryMember {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
 
-  // ESM Entity Rules: string-based relation
-  @ManyToOne('ForumCategory')
-  @JoinColumn({ name: 'forum_category_id' })
-  forumCategory?: ForumCategory;
+  // WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1: ForumCategory relation removed (table dropped)
 
   @ManyToOne('User')
   @JoinColumn({ name: 'user_id' })
