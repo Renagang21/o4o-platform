@@ -196,7 +196,7 @@ function DocumentsSection({
       <SectionHeader
         title="문서형 콘텐츠"
         description="리치 텍스트 편집기로 작성한 문서"
-        primaryAction={isAuthenticated ? { label: '+ 새 문서', to: '/content/documents/new' } : undefined}
+        primaryAction={isAuthenticated ? { label: '문서 등록', to: '/content/documents/new' } : undefined}
       />
 
       <div style={styles.tableWrap}>
@@ -288,7 +288,7 @@ function CoursesSection({ isAuthenticated }: { isAuthenticated: boolean }) {
       <SectionHeader
         title="코스형 자료"
         description="목록형으로 구성된 분량 많은 콘텐츠"
-        primaryAction={isAuthenticated ? { label: '+ 새 코스형 자료', to: '/content/courses/new' } : undefined}
+        primaryAction={isAuthenticated ? { label: '코스형 자료 등록', to: '/content/courses/new' } : undefined}
         moreLink={{ label: '전체 보기', to: '/content/courses' }}
       />
 
@@ -374,7 +374,7 @@ function SurveysSection({ isAuthenticated }: { isAuthenticated: boolean }) {
       <SectionHeader
         title="설문조사"
         description="구성원 의견을 수집하는 설문"
-        primaryAction={isAuthenticated ? { label: '+ 새 설문', to: '/content/surveys/new' } : undefined}
+        primaryAction={isAuthenticated ? { label: '설문 등록', to: '/content/surveys/new' } : undefined}
         moreLink={{ label: '전체 보기', to: '/content/surveys' }}
       />
 

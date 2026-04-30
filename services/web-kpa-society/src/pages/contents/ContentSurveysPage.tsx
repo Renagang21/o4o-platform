@@ -98,7 +98,7 @@ export function ContentSurveysPage() {
         </div>
         {isAuthenticated && (
           <Link to="/content/surveys/new" style={styles.primaryBtn}>
-            + 새 설문
+            설문 등록
           </Link>
         )}
       </header>

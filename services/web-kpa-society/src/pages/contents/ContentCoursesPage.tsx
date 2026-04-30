@@ -84,7 +84,7 @@ export function ContentCoursesPage() {
         </div>
         {isAuthenticated && (
           <Link to="/content/courses/new" style={styles.primaryBtn}>
-            + 새 코스형 자료
+            코스형 자료 등록
           </Link>
         )}
       </header>
