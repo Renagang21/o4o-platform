@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { lmsInstructorApi } from '../../../api/lms-instructor';
+import { lmsInstructorApi, type ContentKind } from '../../../api/lms-instructor';
 
 const styles: Record<string, React.CSSProperties> = {
   page: { maxWidth: 680, margin: '0 auto', padding: '32px 20px' },
@@ -62,6 +62,13 @@ interface CourseNewPageProps {
   redirectAfterCreate?: (courseId: string) => string;
   /** id 없이 저장 성공 시(이론상 없음) 이동할 fallback. 미지정 시 returnTo, 그것도 없으면 /instructor/courses. */
   redirectAfterCreateFallback?: string;
+  /**
+   * WO-KPA-CONTENT-COURSE-KIND-SEPARATION-V1: 코스 분류.
+   *   - 'lecture'(기본): /instructor/courses/new에서 생성 — 일반 강의로 저장
+   *   - 'content_resource': /content/courses/new에서 생성 — 콘텐츠 허브의 코스형 자료
+   * 미지정 시 백엔드에서 'lecture' 기본 적용.
+   */
+  contentKind?: ContentKind;
 }
 
 export default function CourseNewPage({
@@ -70,6 +77,7 @@ export default function CourseNewPage({
   returnTo,
   redirectAfterCreate,
   redirectAfterCreateFallback,
+  contentKind,
 }: CourseNewPageProps = {}) {
   const navigate = useNavigate();
   const [form, setForm] = useState({ title: '', description: '' });
@@ -98,6 +106,7 @@ export default function CourseNewPage({
         title: form.title.trim(),
         description: form.description.trim(),
         tags: tags.length > 0 ? tags : undefined,
+        contentKind, // 미지정 시 백엔드에서 'lecture' 기본
       });
       // API returns { success, data: Course }
       const courseId = res.data?.data?.id;

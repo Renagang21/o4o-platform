@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
 import { BaseService } from '../../../common/base.service.js';
-import { Course, CourseStatus, CourseLevel } from '@o4o/lms-core';
+import { Course, CourseStatus, CourseLevel, ContentKind } from '@o4o/lms-core';
 import { sanitizeInstructor } from '../utils/sanitize-user.js';
 import logger from '../../../utils/logger.js';
 
@@ -35,6 +35,8 @@ export interface CreateCourseRequest {
   // Paid Course (WO-LMS-PAID-COURSE-V1)
   isPaid?: boolean;
   price?: number;
+  // WO-KPA-CONTENT-COURSE-KIND-SEPARATION-V1: 코스형 자료 vs 일반 강의 분류 (미전달 시 LECTURE)
+  contentKind?: ContentKind;
 }
 
 export interface UpdateCourseRequest extends Partial<CreateCourseRequest> {
@@ -51,6 +53,9 @@ export interface CourseFilters {
   tags?: string[];
   page?: number;
   limit?: number;
+  // WO-KPA-CONTENT-COURSE-KIND-SEPARATION-V1: 미전달 시 'lecture'만 조회 (기본 필터).
+  // 모든 종류를 보고 싶으면 'all'을 명시.
+  contentKind?: ContentKind | 'all';
 }
 
 export class CourseService extends BaseService<Course> {
@@ -97,7 +102,9 @@ export class CourseService extends BaseService<Course> {
       tags: sanitizedTags,
       status: CourseStatus.DRAFT,
       currentEnrollments: 0,
-      isPublished: false
+      isPublished: false,
+      // WO-KPA-CONTENT-COURSE-KIND-SEPARATION-V1: 미전달 시 LECTURE 기본
+      contentKind: data.contentKind ?? ContentKind.LECTURE,
     });
 
     const saved = await this.courseRepository.save(course);
@@ -128,10 +135,18 @@ export class CourseService extends BaseService<Course> {
       search,
       tags,
       page = 1,
-      limit = 20
+      limit = 20,
+      contentKind,
     } = filters;
 
     const query = this.courseRepository.createQueryBuilder('course');
+
+    // WO-KPA-CONTENT-COURSE-KIND-SEPARATION-V1: 미전달 시 LECTURE만, 'all'이면 미적용
+    if (contentKind === undefined) {
+      query.andWhere('course.contentKind = :contentKind', { contentKind: ContentKind.LECTURE });
+    } else if (contentKind !== 'all') {
+      query.andWhere('course.contentKind = :contentKind', { contentKind });
+    }
 
     // Filters
     if (status) {

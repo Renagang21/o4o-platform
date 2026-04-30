@@ -264,7 +264,8 @@ function CoursesSection({ isAuthenticated }: { isAuthenticated: boolean }) {
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    lmsInstructorApi.myCourses(1, 10)
+    // WO-KPA-CONTENT-COURSE-KIND-SEPARATION-V1: 코스형 자료(content_resource)만 조회
+    lmsInstructorApi.myCourses(1, 10, 'content_resource')
       .then((res: any) => {
         if (cancelled) return;
         // axios response shape: res.data = { success, data: Course[] }

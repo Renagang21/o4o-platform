@@ -29,6 +29,18 @@ export enum CourseStatus {
   ARCHIVED = 'archived',
 }
 
+/**
+ * WO-KPA-CONTENT-COURSE-KIND-SEPARATION-V1
+ * 같은 lms_courses 테이블에 들어가는 두 종류의 코스를 구분하는 분류 축.
+ *
+ *   LECTURE          : /instructor/courses/new 에서 만든 LMS 일반 강의 (기본값)
+ *   CONTENT_RESOURCE : /content/courses/new 에서 만든 콘텐츠 허브의 "코스형 자료"
+ */
+export enum ContentKind {
+  LECTURE = 'lecture',
+  CONTENT_RESOURCE = 'content_resource',
+}
+
 @Entity('lms_courses')
 @Index(['organizationId', 'status'])
 @Index(['instructorId'])
@@ -52,6 +64,10 @@ export class Course {
 
   @Column({ type: 'enum', enum: CourseStatus, default: CourseStatus.DRAFT })
   status!: CourseStatus;
+
+  // WO-KPA-CONTENT-COURSE-KIND-SEPARATION-V1: 코스형 자료 vs 일반 강의 분류
+  @Column({ name: 'content_kind', type: 'varchar', length: 30, default: ContentKind.LECTURE })
+  contentKind!: ContentKind;
 
   // Duration in minutes
   @Column({ type: 'integer', default: 0 })

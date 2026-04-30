@@ -8,6 +8,8 @@ import { authClient } from '../contexts/AuthContext';
 export type CourseLevel = 'beginner' | 'intermediate' | 'advanced';
 export type CourseStatus = 'draft' | 'published' | 'archived';
 export type LessonType = 'VIDEO' | 'ARTICLE' | 'QUIZ' | 'ASSIGNMENT' | 'LIVE';
+// WO-KPA-CONTENT-COURSE-KIND-SEPARATION-V1
+export type ContentKind = 'lecture' | 'content_resource';
 
 export interface Course {
   id: string;
@@ -68,6 +70,8 @@ export interface CreateCourseDto {
   level?: CourseLevel;
   tags?: string[];
   thumbnail?: string | null;
+  // WO-KPA-CONTENT-COURSE-KIND-SEPARATION-V1: 미전달 시 백엔드에서 'lecture' 기본
+  contentKind?: ContentKind;
 }
 
 export interface UpdateCourseDto {
@@ -140,11 +144,16 @@ export interface UpsertQuizDto {
 }
 
 export const lmsInstructorApi = {
-  /** 내 강의 목록 */
-  myCourses: (page = 1, limit = 20) =>
-    authClient.api.get<CoursesResponseWrapper>(
-      `/lms/instructor/courses?page=${page}&limit=${limit}`,
-    ),
+  /**
+   * 내 강의 목록
+   * WO-KPA-CONTENT-COURSE-KIND-SEPARATION-V1: contentKind 미지정 시 'lecture'만 반환.
+   * 'content_resource' 또는 'all' 명시 가능.
+   */
+  myCourses: (page = 1, limit = 20, contentKind?: ContentKind | 'all') => {
+    const qs = new URLSearchParams({ page: String(page), limit: String(limit) });
+    if (contentKind) qs.set('contentKind', contentKind);
+    return authClient.api.get<CoursesResponseWrapper>(`/lms/instructor/courses?${qs.toString()}`);
+  },
 
   /** 강의 상세 */
   getCourse: (id: string) =>

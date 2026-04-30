@@ -10,7 +10,7 @@ export {
   Survey, SurveyStatus, SurveyQuestion, QuestionType, SurveyResponse, ResponseStatus,
   ContentBundle, ContentBundleType,
   // Phase 2
-  Course, CourseLevel, CourseStatus,
+  Course, CourseLevel, CourseStatus, ContentKind,
   Lesson, LessonType,
 } from '@o4o/interactive-content-core';
 export type {

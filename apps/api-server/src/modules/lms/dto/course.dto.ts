@@ -10,7 +10,7 @@ import {
   MaxLength,
   Min
 } from 'class-validator';
-import { CourseLevel, CourseStatus } from '@o4o/lms-core';
+import { CourseLevel, CourseStatus, ContentKind } from '@o4o/lms-core';
 
 export class CreateCourseDto {
   @IsString()
@@ -78,6 +78,11 @@ export class CreateCourseDto {
   @IsString({ each: true })
   @IsOptional()
   tags?: string[];
+
+  // WO-KPA-CONTENT-COURSE-KIND-SEPARATION-V1: 코스형 자료 vs 일반 강의 (미전달 시 'lecture')
+  @IsEnum(ContentKind)
+  @IsOptional()
+  contentKind?: ContentKind;
 }
 
 export class UpdateCourseDto {

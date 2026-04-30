@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
 import { AppDataSource } from '../../../database/connection.js';
-import { InstructorApplication, Enrollment, EnrollmentStatus, Course } from '@o4o/lms-core';
+import { InstructorApplication, Enrollment, EnrollmentStatus, Course, ContentKind } from '@o4o/lms-core';
 import { roleAssignmentService } from '../../auth/services/role-assignment.service.js';
 import logger from '../../../utils/logger.js';
 
@@ -198,14 +198,22 @@ export class InstructorController extends BaseController {
   static async myCourses(req: Request, res: Response): Promise<any> {
     try {
       const userId = (req as any).user?.id;
-      const { page = '1', limit = '20' } = req.query;
+      const { page = '1', limit = '20', contentKind } = req.query;
 
       const courseRepo = AppDataSource.getRepository(Course);
       const pageNum = Number(page) || 1;
       const limitNum = Number(limit) || 20;
 
+      // WO-KPA-CONTENT-COURSE-KIND-SEPARATION-V1: 미전달 시 LECTURE만, 'all'이면 미적용
+      const where: any = { instructorId: userId };
+      if (contentKind === undefined) {
+        where.contentKind = ContentKind.LECTURE;
+      } else if (contentKind !== 'all') {
+        where.contentKind = contentKind;
+      }
+
       const [courses, total] = await courseRepo.findAndCount({
-        where: { instructorId: userId },
+        where,
         order: { createdAt: 'DESC' },
         skip: (pageNum - 1) * limitNum,
         take: limitNum,

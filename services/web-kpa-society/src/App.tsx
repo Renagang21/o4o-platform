@@ -653,6 +653,7 @@ function App() {
                 returnTo="/content/courses"
                 redirectAfterCreate={(id) => `/content/courses/${id}`}
                 redirectAfterCreateFallback="/content/courses"
+                contentKind="content_resource"
               />
             </Layout>
           } />

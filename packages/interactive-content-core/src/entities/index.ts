@@ -15,7 +15,7 @@ export { ContentBundle, ContentBundleType } from './ContentBundle.js';
 export type { ContentItem } from './ContentBundle.js';
 
 // Course & Lesson (Phase 2)
-export { Course, CourseLevel, CourseStatus } from './Course.js';
+export { Course, CourseLevel, CourseStatus, ContentKind } from './Course.js';
 export { Lesson, LessonType } from './Lesson.js';
 
 // Templates (WO-O4O-TEMPLATE-SYSTEM-FOUNDATION)
