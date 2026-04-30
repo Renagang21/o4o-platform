@@ -16,29 +16,6 @@ import { contentApi } from '../../api/content';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
 
-// ─── Constants ───────────────────────────────────────────────────────────────
-
-const CONTENT_TYPES = [
-  { value: 'information', label: '정보 콘텐츠' },
-  { value: 'participation', label: '참여 프로그램' },
-] as const;
-
-const SUB_TYPES: Record<string, { value: string; label: string }[]> = {
-  participation: [
-    { value: '설문', label: '설문' },
-    // 퀴즈 제거 (WO-KPA-CONTENT-QUIZ-REMOVE-V1): 퀴즈는 LMS 레슨(QUIZ 타입) 전용
-    { value: '이벤트', label: '이벤트' },
-    { value: '캠페인', label: '캠페인' },
-  ],
-  information: [
-    { value: '건강정보', label: '건강정보' },
-    { value: '약물학정보', label: '약물학정보' },
-    { value: '복약정보', label: '복약정보' },
-    { value: '실무정보', label: '실무정보' },
-    { value: '자유 콘텐츠', label: '자유 콘텐츠' },
-  ],
-};
-
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export function ContentWritePage() {
@@ -50,8 +27,6 @@ export function ContentWritePage() {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [summary, setSummary] = useState('');
-  const [contentType, setContentType] = useState<string>('information');
-  const [subType, setSubType] = useState<string>('');
   const [tags, setTags] = useState('');
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -73,8 +48,6 @@ export function ContentWritePage() {
           setTitle(c.title);
           setBody(c.body || '');
           setSummary(c.summary || '');
-          setContentType(c.content_type || 'information');
-          setSubType(c.sub_type || '');
           setTags((c.tags || []).join(', '));
         }
       })
@@ -105,7 +78,7 @@ export function ContentWritePage() {
         title: title.trim(),
         body: body || undefined,
         summary: summary || undefined,
-        content_type: contentType as 'participation' | 'information',
+        content_type: 'information' as const, // WO-KPA-CONTENT-WRITE-SIMPLIFY-V2: 분류 UI 제거, 기본값 고정
         sub_type: 'content', // WO-KPA-CONTENT-RESOURCE-SUBTYPE-SEPARATION-V1: 콘텐츠 허브 항목 고정
         tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
         status: saveStatus,
@@ -130,8 +103,6 @@ export function ContentWritePage() {
       setSaving(false);
     }
   };
-
-  const availableSubTypes = SUB_TYPES[contentType] || [];
 
   if (loading) {
     return (
@@ -158,35 +129,6 @@ export function ContentWritePage() {
             placeholder="콘텐츠 제목을 입력하세요"
             style={styles.input}
           />
-        </div>
-
-        {/* Content Type + Sub Type */}
-        <div style={styles.row}>
-          <div style={{ ...styles.field, flex: 1 }}>
-            <label style={styles.label}>분류</label>
-            <select
-              value={contentType}
-              onChange={(e) => { setContentType(e.target.value); setSubType(''); }}
-              style={styles.select}
-            >
-              {CONTENT_TYPES.map((ct) => (
-                <option key={ct.value} value={ct.value}>{ct.label}</option>
-              ))}
-            </select>
-          </div>
-          <div style={{ ...styles.field, flex: 1 }}>
-            <label style={styles.label}>유형</label>
-            <select
-              value={subType}
-              onChange={(e) => setSubType(e.target.value)}
-              style={styles.select}
-            >
-              <option value="">선택 안 함</option>
-              {availableSubTypes.map((st) => (
-                <option key={st.value} value={st.value}>{st.label}</option>
-              ))}
-            </select>
-          </div>
         </div>
 
         {/* Body — RichTextEditor */}
@@ -316,21 +258,6 @@ const styles: Record<string, React.CSSProperties> = {
     outline: 'none',
     resize: 'vertical',
     boxSizing: 'border-box',
-  },
-  select: {
-    width: '100%',
-    padding: '10px 14px',
-    fontSize: '0.875rem',
-    border: '1px solid #e2e8f0',
-    borderRadius: 8,
-    outline: 'none',
-    backgroundColor: '#ffffff',
-    boxSizing: 'border-box',
-  },
-  row: {
-    display: 'flex',
-    gap: 12,
-    marginBottom: 20,
   },
   actions: {
     display: 'flex',
