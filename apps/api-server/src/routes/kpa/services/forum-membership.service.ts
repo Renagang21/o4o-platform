@@ -36,19 +36,19 @@ export class ForumMembershipService {
     );
     if (row) return true;
 
-    // Fallback: forum_category."createdBy" (for forums created before membership backfill)
+    // Fallback: forum_category_requests.requester_id (for forums created before membership backfill)
     const [cat] = await this.dataSource.query(
-      `SELECT id FROM forum_category WHERE id = $1 AND "createdBy" = $2 LIMIT 1`,
+      `SELECT id FROM forum_category_requests WHERE id = $1 AND requester_id = $2 LIMIT 1`,
       [categoryId, userId],
     );
     return !!cat;
   }
 
-  /** Get forum category essential fields */
+  /** Get forum essential fields from forum_category_requests */
   private async getForumCategory(categoryId: string): Promise<any | null> {
     const [cat] = await this.dataSource.query(
-      `SELECT id, name, slug, forum_type, "createdBy", "organizationId" AS organization_id
-       FROM forum_category WHERE id = $1 LIMIT 1`,
+      `SELECT id, name, slug, forum_type, requester_id, organization_id
+       FROM forum_category_requests WHERE id = $1 LIMIT 1`,
       [categoryId],
     );
     return cat || null;

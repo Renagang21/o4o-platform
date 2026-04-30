@@ -37,15 +37,16 @@ export class ForumCommentController extends ForumControllerBase {
       }
 
       // WO-KPA-A-CLOSED-FORUM-ACCESS-CONTROL-V1
-      if (parentPost.categoryId) {
+      // WO-O4O-FORUM-CATEGORY-CLEANUP-V1: use forumId (forum_category_requests)
+      if (parentPost.forumId) {
         const { userId: uid, roles } = this.getUserFromReq(req);
-        const access = await this.checkClosedForumAccess(parentPost.categoryId, uid, roles);
+        const access = await this.checkClosedForumAccess(parentPost.forumId, uid, roles);
         if (!access.allowed) {
           res.status(403).json({
             success: false,
             error: 'This post belongs to a closed forum. Membership is required.',
             code: 'CLOSED_FORUM_ACCESS_DENIED',
-            data: { categoryId: parentPost.categoryId },
+            data: { forumId: parentPost.forumId },
           });
           return;
         }
@@ -122,15 +123,16 @@ export class ForumCommentController extends ForumControllerBase {
       }
 
       // WO-KPA-A-CLOSED-FORUM-ACCESS-CONTROL-V1
-      if (post.categoryId) {
+      // WO-O4O-FORUM-CATEGORY-CLEANUP-V1: use forumId (forum_category_requests)
+      if (post.forumId) {
         const { userId: cuid, roles: croles } = this.getUserFromReq(req);
-        const access = await this.checkClosedForumAccess(post.categoryId, cuid, croles);
+        const access = await this.checkClosedForumAccess(post.forumId, cuid, croles);
         if (!access.allowed) {
           res.status(403).json({
             success: false,
             error: 'Membership is required to comment in this closed forum.',
             code: 'CLOSED_FORUM_ACCESS_DENIED',
-            data: { categoryId: post.categoryId },
+            data: { forumId: post.forumId },
           });
           return;
         }

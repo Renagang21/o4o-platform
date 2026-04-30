@@ -221,11 +221,11 @@ export class MarketTrialOperatorController {
           const ds = MarketTrialOperatorController.dataSource;
           const TRIAL_FORUM_CATEGORY_ID = 'f0000000-0a00-4000-f000-0000000000f1';
 
-          // Stage 1: 카테고리 존재 확인
+          // Stage 1: 포럼 존재 확인 (WO-O4O-FORUM-CATEGORY-CLEANUP-V1: forum_category_requests)
           let catExists: Array<{ id: string }>;
           try {
             catExists = await ds.query(
-              `SELECT id FROM forum_category WHERE id = $1`,
+              `SELECT id FROM forum_category_requests WHERE id = $1`,
               [TRIAL_FORUM_CATEGORY_ID],
             );
           } catch (catErr) {
@@ -252,7 +252,7 @@ export class MarketTrialOperatorController {
               const inserted = await ds.query(
                 `INSERT INTO forum_post (
                   "id", "title", "slug", "content", "excerpt",
-                  "type", "status", "categoryId", "author_id",
+                  "type", "status", "forum_id", "author_id",
                   "isPinned", "isLocked", "allowComments",
                   "viewCount", "commentCount", "likeCount",
                   "published_at", "created_at", "updated_at"

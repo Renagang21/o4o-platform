@@ -108,17 +108,18 @@ export class ForumControllerBase {
    * - closed → member / owner / admin / operator only
    */
   protected async checkClosedForumAccess(
-    categoryId: string,
+    forumId: string,
     userId: string | undefined,
     userRoles: string[],
   ): Promise<{ allowed: boolean; forumType?: string }> {
-    const category = await this.categoryRepository.findOne({
-      where: { id: categoryId },
-      select: ['id', 'forumType', 'createdBy'],
-    });
-    if (!category) return { allowed: true }; // 404 handled by caller
-    if (!category.forumType || category.forumType !== 'closed') {
-      return { allowed: true, forumType: category.forumType };
+    // WO-O4O-FORUM-CATEGORY-CLEANUP-V1: query forum_category_requests (not forum_category)
+    const [forum] = await AppDataSource.query(
+      `SELECT id, forum_type, requester_id FROM forum_category_requests WHERE id = $1 LIMIT 1`,
+      [forumId],
+    );
+    if (!forum) return { allowed: true }; // 404 handled by caller
+    if (!forum.forum_type || forum.forum_type !== 'closed') {
+      return { allowed: true, forumType: forum.forum_type };
     }
 
     // Admin / operator bypass
@@ -133,12 +134,12 @@ export class ForumControllerBase {
     const [member] = await AppDataSource.query(
       `SELECT role FROM forum_category_members
        WHERE forum_category_id = $1 AND user_id = $2 LIMIT 1`,
-      [categoryId, userId],
+      [forumId, userId],
     );
     if (member) return { allowed: true, forumType: 'closed' };
 
-    // Fallback: createdBy (before membership backfill)
-    if (category.createdBy === userId) return { allowed: true, forumType: 'closed' };
+    // Fallback: requester_id (forum creator, before membership backfill)
+    if (forum.requester_id === userId) return { allowed: true, forumType: 'closed' };
 
     return { allowed: false, forumType: 'closed' };
   }

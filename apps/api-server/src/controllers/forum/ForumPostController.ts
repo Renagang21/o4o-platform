@@ -40,16 +40,17 @@ export class ForumPostController extends ForumControllerBase {
       }
 
       // Category filter + WO-KPA-A-CLOSED-FORUM-ACCESS-CONTROL-V1
+      // WO-O4O-FORUM-CATEGORY-CLEANUP-V1: use forumId (forum_category_requests)
       const { userId: uid, roles } = this.getUserFromReq(req);
       if (categoryId) {
-        queryBuilder.andWhere('post.categoryId = :categoryId', { categoryId });
+        queryBuilder.andWhere('post.forumId = :forumId', { forumId: categoryId });
         const access = await this.checkClosedForumAccess(categoryId, uid, roles);
         if (!access.allowed) {
           res.status(403).json({
             success: false,
             error: 'This is a closed forum. Membership is required to view posts.',
             code: 'CLOSED_FORUM_ACCESS_DENIED',
-            data: { categoryId },
+            data: { forumId: categoryId },
           });
           return;
         }
@@ -59,15 +60,13 @@ export class ForumPostController extends ForumControllerBase {
         if (!roles.some((r) => BYPASS.includes(r))) {
           if (uid) {
             queryBuilder.andWhere(`(
-              category.forumType IS NULL OR category.forumType != 'closed'
-              OR category.createdBy = :closedUid
-              OR EXISTS (SELECT 1 FROM forum_category_members fcm
-                         WHERE fcm.forum_category_id = post."categoryId"
-                         AND fcm.user_id = :closedUid)
+              NOT EXISTS (SELECT 1 FROM forum_category_requests _fcr WHERE _fcr.id = post.forum_id AND _fcr.forum_type = 'closed')
+              OR EXISTS (SELECT 1 FROM forum_category_requests _fcr2 WHERE _fcr2.id = post.forum_id AND _fcr2.created_by = :closedUid)
+              OR EXISTS (SELECT 1 FROM forum_category_members fcm WHERE fcm.forum_category_id = post.forum_id AND fcm.user_id = :closedUid)
             )`, { closedUid: uid });
           } else {
             queryBuilder.andWhere(
-              `(category.forumType IS NULL OR category.forumType != 'closed')`,
+              `NOT EXISTS (SELECT 1 FROM forum_category_requests _fcr WHERE _fcr.id = post.forum_id AND _fcr.forum_type = 'closed')`,
             );
           }
         }
@@ -173,15 +172,16 @@ export class ForumPostController extends ForumControllerBase {
       }
 
       // WO-KPA-A-CLOSED-FORUM-ACCESS-CONTROL-V1
-      if (post.categoryId) {
+      // WO-O4O-FORUM-CATEGORY-CLEANUP-V1: use forumId (forum_category_requests)
+      if (post.forumId) {
         const { userId: uid, roles } = this.getUserFromReq(req);
-        const access = await this.checkClosedForumAccess(post.categoryId, uid, roles);
+        const access = await this.checkClosedForumAccess(post.forumId, uid, roles);
         if (!access.allowed) {
           res.status(403).json({
             success: false,
             error: 'This post belongs to a closed forum. Membership is required.',
             code: 'CLOSED_FORUM_ACCESS_DENIED',
-            data: { categoryId: post.categoryId },
+            data: { forumId: post.forumId },
           });
           return;
         }
@@ -419,14 +419,7 @@ export class ForumPostController extends ForumControllerBase {
       post.status = PostStatus.ARCHIVED;
       await this.postRepository.save(post);
 
-      // Decrement category postCount
-      if (wasPuslished && post.categoryId) {
-        const category = await this.categoryRepository.findOne({ where: { id: post.categoryId } });
-        if (category) {
-          category.decrementPostCount();
-          await this.categoryRepository.save(category);
-        }
-      }
+      // forum_category_requests has no postCount — no-op after WO-O4O-FORUM-CATEGORY-CLEANUP-V1
 
       res.json({
         success: true,
@@ -464,26 +457,27 @@ export class ForumPostController extends ForumControllerBase {
         return;
       }
 
-      if (!post.categoryId) {
+      // WO-O4O-FORUM-CATEGORY-CLEANUP-V1: use forumId (forum_category_requests)
+      if (!post.forumId) {
         res.status(400).json({ success: false, error: 'Post has no forum', code: 'NO_FORUM' });
         return;
       }
 
-      // Ownership check: createdBy match OR membership role='owner'
-      const category = await this.categoryRepository.findOne({
-        where: { id: post.categoryId },
-        select: ['id', 'createdBy'] as any,
-      });
-      if (!category) {
+      // Ownership check: requester_id match OR membership role='owner'
+      const [forum] = await AppDataSource.query(
+        `SELECT id, requester_id FROM forum_category_requests WHERE id = $1 LIMIT 1`,
+        [post.forumId],
+      );
+      if (!forum) {
         res.status(404).json({ success: false, error: 'Forum not found' });
         return;
       }
 
-      const isOwnerByCreatedBy = category.createdBy === userId;
-      if (!isOwnerByCreatedBy) {
+      const isOwnerByCreester = forum.requester_id === userId;
+      if (!isOwnerByCreester) {
         const [member] = await AppDataSource.query(
           `SELECT role FROM forum_category_members WHERE forum_category_id = $1 AND user_id = $2 LIMIT 1`,
-          [post.categoryId, userId],
+          [post.forumId, userId],
         );
         if (!member || member.role !== 'owner') {
           res.status(403).json({ success: false, error: 'Only the forum owner can pin posts', code: 'NOT_FORUM_OWNER' });
@@ -494,7 +488,7 @@ export class ForumPostController extends ForumControllerBase {
       if (pin) {
         // Auto-unpin any existing pinned post in this forum
         await this.postRepository.update(
-          { categoryId: post.categoryId, isPinned: true },
+          { forumId: post.forumId, isPinned: true },
           { isPinned: false },
         );
         post.isPinned = true;

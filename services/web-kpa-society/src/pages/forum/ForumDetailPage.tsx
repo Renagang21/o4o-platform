@@ -52,10 +52,12 @@ export function ForumDetailPage() {
       setComments(commentsRes.data);
 
       // Check if current user is the forum owner
-      if (postRes.data?.categoryId && user?.id) {
+      // WO-O4O-FORUM-CATEGORY-CLEANUP-V1: use forumId (forum_category_requests)
+      const resolvedForumId = postRes.data?.forumId || postRes.data?.categoryId;
+      if (resolvedForumId && user?.id) {
         try {
-          const catRes = await forumApi.getCategory(postRes.data.categoryId);
-          setIsForumOwner(catRes.data?.createdBy === user.id);
+          const catRes = await forumApi.getCategory(resolvedForumId);
+          setIsForumOwner(catRes.data?.createdBy === user.id || catRes.data?.requester_id === user.id);
         } catch {
           // non-critical — ignore
         }
@@ -65,8 +67,9 @@ export function ForumDetailPage() {
       const code = err?.response?.data?.code || err?.code;
       if (status === 403 && code === 'CLOSED_FORUM_ACCESS_DENIED') {
         setError('비공개 포럼입니다. 가입 신청 후 승인을 받으면 열람할 수 있습니다.');
-        // WO-KPA-A-PRIVATE-FORUM-JOIN-UX-CONNECT-V1: Extract categoryId for join request
-        const catId = err?.data?.categoryId;
+        // WO-KPA-A-PRIVATE-FORUM-JOIN-UX-CONNECT-V1: Extract forumId for join request
+        // WO-O4O-FORUM-CATEGORY-CLEANUP-V1: prefer forumId, fallback to categoryId
+        const catId = err?.data?.forumId || err?.data?.categoryId;
         if (catId) {
           setClosedCategoryId(catId);
           if (user) {

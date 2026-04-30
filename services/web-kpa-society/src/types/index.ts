@@ -60,7 +60,8 @@ export interface ForumPost extends Partial<ForumPostResponse> {
   excerpt?: string;
   authorId: string;
   authorName: string;       // flattened from author.name
-  categoryId: string;
+  forumId?: string;          // WO-O4O-FORUM-CATEGORY-CLEANUP-V1: new SSOT (forum_category_requests.id)
+  categoryId: string;       // @deprecated — use forumId
   categoryName: string;     // flattened from category.name
   viewCount: number;
   views: number;            // alias for viewCount

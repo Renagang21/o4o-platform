@@ -242,13 +242,15 @@ export class ForumRequestService {
         [user.id, reviewComment || null, requestId],
       );
 
-      // 2. ForumCategory 생성 (Extension → Core)
-      const [category] = await queryRunner.query(
-        `INSERT INTO forum_category
-          (id, name, description, slug, icon_emoji, is_active, require_approval, access_level, created_by, organization_id, is_organization_exclusive, created_at, updated_at)
-         VALUES (gen_random_uuid(), $1, $2, $3, $4, true, false, 'all', $5, $6, true, NOW(), NOW())
+      // 2. forum_category_requests에 포럼 생성 (WO-O4O-FORUM-CATEGORY-CLEANUP-V1)
+      const [forum] = await queryRunner.query(
+        `INSERT INTO forum_category_requests
+          (id, name, description, slug, forum_type, service_code, organization_id,
+           requester_id, requester_name, requester_email, status, created_at, updated_at)
+         VALUES (gen_random_uuid(), $1, $2, $3, 'open', 'kpa-society', $4, $5, $6, $7, 'completed', NOW(), NOW())
          RETURNING id, slug`,
-        [payload.name, payload.description, slug, payload.iconEmoji || null, user.id, ar.organization_id],
+        [payload.name, payload.description, slug, ar.organization_id,
+         user.id, user.name || user.email || 'Unknown', user.email || null],
       );
 
       // 2b. Owner를 forum_category_members에 등록
@@ -257,17 +259,17 @@ export class ForumRequestService {
         `INSERT INTO forum_category_members (forum_category_id, user_id, role, joined_at, created_at, updated_at)
          VALUES ($1, $2, 'owner', NOW(), NOW(), NOW())
          ON CONFLICT (forum_category_id, user_id) DO NOTHING`,
-        [category.id, user.id],
+        [forum.id, user.id],
       );
 
       // 3. 결과 기록
       await queryRunner.query(
         `UPDATE kpa_approval_requests SET result_entity_id = $1, result_metadata = $2, updated_at = NOW() WHERE id = $3`,
-        [category.id, JSON.stringify({ slug: category.slug }), requestId],
+        [forum.id, JSON.stringify({ slug: forum.slug }), requestId],
       );
 
       await queryRunner.commitTransaction();
-      return { data: { requestId, status: 'approved', categoryId: category.id, categorySlug: category.slug } };
+      return { data: { requestId, status: 'approved', categoryId: forum.id, categorySlug: forum.slug } };
     } catch (err) {
       await queryRunner.rollbackTransaction();
       throw err;
