@@ -1,83 +1,43 @@
 /**
- * ContentListPage — 콘텐츠 허브 목록
+ * ContentListPage — 콘텐츠 허브 (섹션 기반)
  *
- * WO-KPA-CONTENT-LIST-UX-ALIGNMENT-V1
+ * WO-KPA-CONTENT-HUB-FOUNDATION-V1
  * WO-O4O-CONTENT-HUB-TEMPLATE-TYPE-ALIGNMENT-V1
- * WO-KPA-CONTENT-LIST-TABS-ALIGN-WITH-CREATE-TYPES-V1: 리스트 탭을 생성 타입(문서/설문/코스형 자료)과 일치
+ * WO-KPA-CONTENT-LIST-TABS-ALIGN-WITH-CREATE-TYPES-V1
+ * WO-KPA-CONTENT-SECTION-CREATE-FLOW-ALIGN-V1 (Phase 1: 등록 흐름 정렬)
+ * WO-KPA-CONTENT-HUB-SECTION-UI-V1 (Phase 2: 섹션 허브 UI 전환)
  *
- * ContentHubTemplate 기반 공통 구조.
- * 컬럼: [유형] [제목] [작성자] [작성일] [조회수] [좋아요] [액션]
+ * /content를 3개 섹션의 허브로 표시:
+ *   1. 문서형 콘텐츠 — 메인 섹션 (리스트, 등록/상세/링크/수정/삭제)
+ *   2. 코스형 자료  — 두 번째 섹션 (리스트, 등록 + 더보기)
+ *   3. 설문조사     — 세 번째 섹션 (카드 preview 6개, 등록 + 더보기)
+ *
+ * 데이터 소스:
+ *   - 문서: contentApi.list (content_type='information', sub_type='content')
+ *   - 코스: lmsInstructorApi.myCourses (Phase 3에서 코스형/강의 분리)
+ *   - 설문: participationApi.getParticipationSets
+ *
  * 권한: 작성자만 수정/삭제 노출 (createdBy === currentUserId)
- * rawItemsRef 우회 제거 — ContentHubItem 확장 타입으로 직접 매핑
  */
 
-import { useMemo, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ContentHubTemplate } from '@o4o/shared-space-ui';
-import type { ContentHubConfig, ContentHubItem } from '@o4o/shared-space-ui';
 import { contentApi, type ContentItem } from '../../api/content';
+import { participationApi } from '../../api/participation';
+import { lmsInstructorApi } from '../../api/lms-instructor';
+import type { ParticipationSet } from '../participation/types';
+import type { Course } from '../../api/lms-instructor';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
 
-// ─── Type Mapping ─────────────────────────────────────────────────────────────
-// WO-KPA-CONTENT-LIST-TABS-ALIGN-WITH-CREATE-TYPES-V1
-// 생성 타입(/content/new): 문서 / 설문 / 코스형 자료
-// 리스트 탭: 전체 / 문서 / 설문 / 코스형 자료
-//
-// 데이터 모델:
-//   - content_type='information' + sub_type='content'  → 문서 (ContentWritePage 저장)
-//   - content_type='participation'                     → 설문 (sub_type 무관, legacy 포함)
-//   - sub_type='course'                                → 코스형 자료 (향후 호환)
-//
-// 설문/코스 신규 생성은 별도 도메인 API(participation/lms-instructor)로 가지만,
-// content_type='participation' 또는 sub_type='course'로 contents 테이블에 들어 있는
-// 항목은 본 리스트에서 함께 보여 일관성을 유지한다.
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
-const TYPE_LABELS: Record<string, string> = {
-  information: '문서',
-  participation: '설문',
-};
-
-const TYPE_COLORS: Record<string, { bg: string; text: string }> = {
-  information: { bg: '#eff6ff', text: '#1d4ed8' },
-  participation: { bg: '#f5f3ff', text: '#7c3aed' },
-  course: { bg: '#ecfdf5', text: '#047857' },
-};
-
-function mapContentItem(item: ContentItem): ContentHubItem {
-  // sub_type='course'면 코스형 자료로 우선 분류
-  const isCourse = item.sub_type === 'course';
-  const label = isCourse ? '코스형 자료' : (TYPE_LABELS[item.content_type] ?? '문서');
-  const color = isCourse ? TYPE_COLORS.course : TYPE_COLORS[item.content_type];
-  return {
-    id: item.id,
-    title: item.title,
-    type: label,
-    typeColor: color,
-    date: item.created_at,
-    // WO-O4O-CONTENT-HUB-TEMPLATE-TYPE-ALIGNMENT-V1: 확장 필드
-    authorName: item.author_name ?? null,
-    createdBy: item.created_by ?? null,
-    viewCount: item.view_count ?? 0,
-    likeCount: item.like_count ?? 0,
-  };
-}
-
-// 탭 키 → API query 매핑. 탭별로 content_type / sub_type을 다르게 적용한다.
-// 'all' 탭은 기존 sub_type='content' 고정을 유지해 자료실(sub_type='resource') 분리를 보존
-// (WO-KPA-CONTENT-RESOURCE-SUBTYPE-SEPARATION-V1).
-const FILTER_QUERY: Record<string, { content_type?: string; sub_type?: string }> = {
-  all: { sub_type: 'content' },
-  information: { content_type: 'information', sub_type: 'content' },
-  participation: { content_type: 'participation' },
-  course: { sub_type: 'course' },
-};
-
-function formatDate(d: string) {
+function formatDate(d: string | Date | null | undefined) {
+  if (!d) return '-';
   try { return new Date(d).toLocaleDateString('ko-KR'); } catch { return '-'; }
 }
 
-// ─── Row Action Menu ──────────────────────────────────────────────────────────
+// ─── Row Action Menu (문서 섹션 전용) ─────────────────────────────────────────
 
 function RowActionMenu({
   onView,
@@ -110,23 +70,14 @@ function RowActionMenu({
             onClick={(e) => { e.stopPropagation(); setOpen(false); }}
           />
           <div style={styles.dropdown}>
-            <button
-              style={styles.dropdownItem}
-              onClick={(e) => { e.stopPropagation(); setOpen(false); onView(); }}
-            >
+            <button style={styles.dropdownItem} onClick={(e) => { e.stopPropagation(); setOpen(false); onView(); }}>
               상세보기
             </button>
-            <button
-              style={styles.dropdownItem}
-              onClick={(e) => { e.stopPropagation(); setOpen(false); onCopyLink(); }}
-            >
+            <button style={styles.dropdownItem} onClick={(e) => { e.stopPropagation(); setOpen(false); onCopyLink(); }}>
               링크 복사
             </button>
             {isOwner && (
-              <button
-                style={styles.dropdownItem}
-                onClick={(e) => { e.stopPropagation(); setOpen(false); onEdit(); }}
-              >
+              <button style={styles.dropdownItem} onClick={(e) => { e.stopPropagation(); setOpen(false); onEdit(); }}>
                 수정
               </button>
             )}
@@ -145,122 +96,82 @@ function RowActionMenu({
   );
 }
 
-// ─── Content Table ────────────────────────────────────────────────────────────
+// ─── Section Header (공통) ────────────────────────────────────────────────────
 
-function ContentTable({
-  items,
-  currentUserId,
-  onNavigate,
-  onCopyLink,
-  onEdit,
-  onDelete,
+function SectionHeader({
+  title,
+  description,
+  primaryAction,
+  moreLink,
 }: {
-  items: ContentHubItem[];
-  currentUserId: string | undefined;
-  onNavigate: (id: string) => void;
-  onCopyLink: (id: string) => void;
-  onEdit: (id: string) => void;
-  onDelete: (id: string) => void;
+  title: string;
+  description?: string;
+  primaryAction?: { label: string; to: string };
+  moreLink?: { label: string; to: string };
 }) {
-  if (items.length === 0) return null;
-
   return (
-    <div style={styles.tableWrap}>
-      <table style={styles.table}>
-        <thead>
-          <tr>
-            <th style={{ ...styles.th, width: 64 }}>유형</th>
-            <th style={styles.th}>제목</th>
-            <th style={{ ...styles.th, width: 96 }}>작성자</th>
-            <th style={{ ...styles.th, width: 100 }}>작성일</th>
-            <th style={{ ...styles.th, width: 56, textAlign: 'center' }}>조회</th>
-            <th style={{ ...styles.th, width: 56, textAlign: 'center' }}>좋아요</th>
-            <th style={{ ...styles.th, width: 48 }}></th>
-          </tr>
-        </thead>
-        <tbody>
-          {items.map((item) => {
-            const isOwner = !!(currentUserId && item.createdBy === currentUserId);
-            const badgeColor = item.typeColor ?? { bg: '#f1f5f9', text: '#475569' };
-
-            return (
-              <tr
-                key={item.id}
-                onClick={() => onNavigate(item.id)}
-                style={styles.row}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLTableRowElement).style.backgroundColor = '#f8fafc'; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLTableRowElement).style.backgroundColor = ''; }}
-              >
-                {/* 유형 */}
-                <td style={{ ...styles.td, textAlign: 'center' }}>
-                  {item.type && (
-                    <span style={{
-                      display: 'inline-block', padding: '2px 8px',
-                      fontSize: '0.6875rem', fontWeight: 600, borderRadius: 4,
-                      backgroundColor: badgeColor.bg, color: badgeColor.text,
-                    }}>
-                      {item.type}
-                    </span>
-                  )}
-                </td>
-
-                {/* 제목 */}
-                <td style={styles.td}>
-                  <span style={{ fontWeight: 600, fontSize: '0.875rem', color: '#1e293b' }}>
-                    {item.title}
-                  </span>
-                </td>
-
-                {/* 작성자 */}
-                <td style={{ ...styles.td, color: '#64748b', fontSize: '0.8125rem' }}>
-                  {item.authorName || '-'}
-                </td>
-
-                {/* 작성일 */}
-                <td style={{ ...styles.td, color: '#94a3b8', fontSize: '0.8125rem' }}>
-                  {item.date ? formatDate(item.date) : '-'}
-                </td>
-
-                {/* 조회수 */}
-                <td style={{ ...styles.td, textAlign: 'center', color: '#94a3b8', fontSize: '0.8125rem' }}>
-                  👁 {item.viewCount ?? 0}
-                </td>
-
-                {/* 좋아요 */}
-                <td style={{ ...styles.td, textAlign: 'center', color: '#94a3b8', fontSize: '0.8125rem' }}>
-                  👍 {item.likeCount ?? 0}
-                </td>
-
-                {/* 액션 */}
-                <td
-                  style={{ ...styles.td, textAlign: 'center' }}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <RowActionMenu
-                    isOwner={isOwner}
-                    onView={() => onNavigate(item.id)}
-                    onCopyLink={() => onCopyLink(item.id)}
-                    onEdit={() => onEdit(item.id)}
-                    onDelete={() => onDelete(item.id)}
-                  />
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+    <div style={styles.sectionHeader}>
+      <div>
+        <h2 style={styles.sectionTitle}>{title}</h2>
+        {description && <p style={styles.sectionDesc}>{description}</p>}
+      </div>
+      <div style={styles.sectionActions}>
+        {moreLink && (
+          <Link to={moreLink.to} style={styles.moreLink}>
+            {moreLink.label} →
+          </Link>
+        )}
+        {primaryAction && (
+          <Link to={primaryAction.to} style={styles.primaryBtn}>
+            {primaryAction.label}
+          </Link>
+        )}
+      </div>
     </div>
   );
 }
 
-// ─── Component ───────────────────────────────────────────────────────────────
+// ─── Section 1: 문서형 콘텐츠 ─────────────────────────────────────────────────
 
-export function ContentListPage() {
+function DocumentsSection({
+  currentUserId,
+  isAuthenticated,
+  refreshKey,
+  onChanged,
+}: {
+  currentUserId?: string;
+  isAuthenticated: boolean;
+  refreshKey: number;
+  onChanged: () => void;
+}) {
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuth();
+  const [items, setItems] = useState<ContentItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // 삭제 후 ContentHubTemplate 재마운트로 목록 갱신
-  const [refreshKey, setRefreshKey] = useState(0);
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    contentApi.list({
+      page: 1,
+      limit: 10,
+      sort: 'latest',
+      content_type: 'information',
+      sub_type: 'content',
+    })
+      .then((res) => {
+        if (cancelled) return;
+        setItems(res.data?.items ?? []);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setItems([]);
+      })
+      .finally(() => {
+        if (cancelled) return;
+        setLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [refreshKey]);
 
   const handleCopyLink = useCallback((id: string) => {
     const url = `${window.location.origin}/content/${id}`;
@@ -274,84 +185,350 @@ export function ContentListPage() {
     try {
       await contentApi.remove(id);
       toast.success('삭제되었습니다');
-      setRefreshKey((k) => k + 1);
+      onChanged();
     } catch (e: any) {
       toast.error(e?.message || '삭제에 실패했습니다');
     }
+  }, [onChanged]);
+
+  return (
+    <section style={styles.section}>
+      <SectionHeader
+        title="문서형 콘텐츠"
+        description="리치 텍스트 편집기로 작성한 문서"
+        primaryAction={isAuthenticated ? { label: '+ 새 문서', to: '/content/documents/new' } : undefined}
+      />
+
+      <div style={styles.tableWrap}>
+        {loading ? (
+          <div style={styles.placeholder}>불러오는 중...</div>
+        ) : items.length === 0 ? (
+          <div style={styles.placeholder}>아직 문서가 없습니다</div>
+        ) : (
+          <table style={styles.table}>
+            <thead>
+              <tr>
+                <th style={styles.th}>제목</th>
+                <th style={{ ...styles.th, width: 96 }}>작성자</th>
+                <th style={{ ...styles.th, width: 100 }}>작성일</th>
+                <th style={{ ...styles.th, width: 56, textAlign: 'center' }}>조회</th>
+                <th style={{ ...styles.th, width: 56, textAlign: 'center' }}>좋아요</th>
+                <th style={{ ...styles.th, width: 48 }}></th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.map((item) => {
+                const isOwner = !!(currentUserId && item.created_by === currentUserId);
+                return (
+                  <tr
+                    key={item.id}
+                    onClick={() => navigate(`/content/${item.id}`)}
+                    style={styles.row}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLTableRowElement).style.backgroundColor = '#f8fafc'; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLTableRowElement).style.backgroundColor = ''; }}
+                  >
+                    <td style={styles.td}>
+                      <span style={{ fontWeight: 600, fontSize: '0.875rem', color: '#1e293b' }}>{item.title}</span>
+                    </td>
+                    <td style={{ ...styles.td, color: '#64748b', fontSize: '0.8125rem' }}>{item.author_name || '-'}</td>
+                    <td style={{ ...styles.td, color: '#94a3b8', fontSize: '0.8125rem' }}>{formatDate(item.created_at)}</td>
+                    <td style={{ ...styles.td, textAlign: 'center', color: '#94a3b8', fontSize: '0.8125rem' }}>👁 {item.view_count ?? 0}</td>
+                    <td style={{ ...styles.td, textAlign: 'center', color: '#94a3b8', fontSize: '0.8125rem' }}>👍 {item.like_count ?? 0}</td>
+                    <td style={{ ...styles.td, textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+                      <RowActionMenu
+                        isOwner={isOwner}
+                        onView={() => navigate(`/content/${item.id}`)}
+                        onCopyLink={() => handleCopyLink(item.id)}
+                        onEdit={() => navigate(`/content/${item.id}/edit`)}
+                        onDelete={() => handleDelete(item.id)}
+                      />
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </section>
+  );
+}
+
+// ─── Section 2: 코스형 자료 ──────────────────────────────────────────────────
+
+function CoursesSection({ isAuthenticated }: { isAuthenticated: boolean }) {
+  const navigate = useNavigate();
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    lmsInstructorApi.myCourses(1, 10)
+      .then((res: any) => {
+        if (cancelled) return;
+        // axios response shape: res.data = { success, data: Course[] }
+        const list = res?.data?.data ?? [];
+        setCourses(Array.isArray(list) ? list : []);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setCourses([]);
+      })
+      .finally(() => {
+        if (cancelled) return;
+        setLoading(false);
+      });
+    return () => { cancelled = true; };
   }, []);
 
-  const config: ContentHubConfig = useMemo(() => ({
-    serviceKey: 'kpa-society',
-    heroTitle: '콘텐츠',
-    heroDesc: '콘텐츠를 탐색하고 관리하세요',
-    headerAction: isAuthenticated ? (
-      <Link
-        to="/content/new"
-        style={{
-          display: 'inline-flex', alignItems: 'center', gap: 6,
-          padding: '10px 18px', backgroundColor: '#2563eb', color: '#fff',
-          fontSize: '0.875rem', fontWeight: 600, borderRadius: 8,
-          textDecoration: 'none', whiteSpace: 'nowrap',
-        }}
-      >
-        + 콘텐츠 제작
-      </Link>
-    ) : undefined,
-    searchPlaceholder: '제목으로 검색...',
-    filters: [
-      { key: 'all', label: '전체' },
-      { key: 'information', label: '문서' },
-      { key: 'participation', label: '설문' },
-      { key: 'course', label: '코스형 자료' },
-    ],
-    pageLimit: 20,
-    fetchItems: async ({ filter, search, page, limit }) => {
-      try {
-        const query = FILTER_QUERY[filter] ?? FILTER_QUERY.all;
-        const res = await contentApi.list({
-          page,
-          limit,
-          sort: 'latest',
-          search: search || undefined,
-          content_type: query.content_type,
-          sub_type: query.sub_type,
-        });
-        return {
-          items: (res.data?.items ?? []).map(mapContentItem),
-          total: res.data?.total ?? 0,
-        };
-      } catch {
-        return { items: [], total: 0 };
-      }
-    },
-    renderItems: (items) => (
-      <ContentTable
-        items={items}
-        currentUserId={user?.id}
-        onNavigate={(id) => navigate(`/content/${id}`)}
-        onCopyLink={handleCopyLink}
-        onEdit={(id) => navigate(`/content/${id}/edit`)}
-        onDelete={handleDelete}
+  return (
+    <section style={styles.section}>
+      <SectionHeader
+        title="코스형 자료"
+        description="목록형으로 구성된 분량 많은 콘텐츠"
+        primaryAction={isAuthenticated ? { label: '+ 새 코스형 자료', to: '/content/courses/new' } : undefined}
+        moreLink={{ label: '전체 보기', to: '/content/courses' }}
       />
-    ),
-    emptyMessage: '아직 콘텐츠가 없습니다',
-    emptyFilteredMessage: '검색 결과가 없습니다',
-    showUsageBlock: false,
-    showInfoBlock: false,
-  }), [isAuthenticated, user?.id, navigate, handleCopyLink, handleDelete]);
 
-  return <ContentHubTemplate key={refreshKey} config={config} />;
+      <div style={styles.tableWrap}>
+        {loading ? (
+          <div style={styles.placeholder}>불러오는 중...</div>
+        ) : courses.length === 0 ? (
+          <div style={styles.placeholder}>아직 코스형 자료가 없습니다</div>
+        ) : (
+          <table style={styles.table}>
+            <thead>
+              <tr>
+                <th style={styles.th}>제목</th>
+                <th style={{ ...styles.th, width: 80 }}>레슨</th>
+                <th style={{ ...styles.th, width: 100 }}>작성일</th>
+                <th style={{ ...styles.th, width: 80 }}>상태</th>
+              </tr>
+            </thead>
+            <tbody>
+              {courses.map((c) => (
+                <tr
+                  key={c.id}
+                  onClick={() => navigate(`/instructor/courses/${c.id}`)}
+                  style={styles.row}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLTableRowElement).style.backgroundColor = '#f8fafc'; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLTableRowElement).style.backgroundColor = ''; }}
+                >
+                  <td style={styles.td}>
+                    <span style={{ fontWeight: 600, fontSize: '0.875rem', color: '#1e293b' }}>{c.title}</span>
+                  </td>
+                  <td style={{ ...styles.td, color: '#64748b', fontSize: '0.8125rem' }}>{c.duration > 0 ? `${c.duration}분` : '-'}</td>
+                  <td style={{ ...styles.td, color: '#94a3b8', fontSize: '0.8125rem' }}>{formatDate(c.createdAt)}</td>
+                  <td style={{ ...styles.td }}>
+                    <span style={{
+                      ...styles.statusBadge,
+                      backgroundColor: c.status === 'published' ? '#ecfdf5' : '#f1f5f9',
+                      color: c.status === 'published' ? '#047857' : '#64748b',
+                    }}>
+                      {c.status === 'published' ? '공개' : c.status === 'archived' ? '보관' : '초안'}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </section>
+  );
+}
+
+// ─── Section 3: 설문조사 ──────────────────────────────────────────────────────
+
+function SurveysSection({ isAuthenticated }: { isAuthenticated: boolean }) {
+  const navigate = useNavigate();
+  const [surveys, setSurveys] = useState<ParticipationSet[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    participationApi.getParticipationSets({ page: 1, limit: 6 })
+      .then((res) => {
+        if (cancelled) return;
+        // PaginatedResponse: { items: T[], total, page, limit, totalPages } 또는 axios wrapping
+        const payload = (res as any)?.data ?? res;
+        const list = payload?.items ?? payload?.data?.items ?? [];
+        setSurveys(Array.isArray(list) ? list : []);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setSurveys([]);
+      })
+      .finally(() => {
+        if (cancelled) return;
+        setLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, []);
+
+  return (
+    <section style={styles.section}>
+      <SectionHeader
+        title="설문조사"
+        description="구성원 의견을 수집하는 설문"
+        primaryAction={isAuthenticated ? { label: '+ 새 설문', to: '/content/surveys/new' } : undefined}
+        moreLink={{ label: '전체 보기', to: '/content/surveys' }}
+      />
+
+      {loading ? (
+        <div style={{ ...styles.tableWrap, padding: 0 }}>
+          <div style={styles.placeholder}>불러오는 중...</div>
+        </div>
+      ) : surveys.length === 0 ? (
+        <div style={{ ...styles.tableWrap, padding: 0 }}>
+          <div style={styles.placeholder}>아직 설문이 없습니다</div>
+        </div>
+      ) : (
+        <div style={styles.cardGrid}>
+          {surveys.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => navigate(`/participation/${s.id}/respond`)}
+              style={styles.card}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#94a3b8'; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#e2e8f0'; }}
+            >
+              <div style={styles.cardTitle}>{s.title}</div>
+              {s.description && <div style={styles.cardDesc}>{s.description}</div>}
+              <div style={styles.cardMeta}>
+                <span>질문 {s.questions?.length ?? 0}개</span>
+                <span style={{
+                  ...styles.statusBadge,
+                  backgroundColor: s.status === 'active' ? '#ecfdf5' : s.status === 'closed' ? '#fef2f2' : '#f1f5f9',
+                  color: s.status === 'active' ? '#047857' : s.status === 'closed' ? '#b91c1c' : '#64748b',
+                }}>
+                  {s.status === 'active' ? '진행중' : s.status === 'closed' ? '종료' : '초안'}
+                </span>
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+// ─── Component ───────────────────────────────────────────────────────────────
+
+export function ContentListPage() {
+  const { user, isAuthenticated } = useAuth();
+
+  // 문서 섹션의 삭제 후 재조회 트리거
+  const [refreshKey, setRefreshKey] = useState(0);
+  const handleDocumentsChanged = useCallback(() => {
+    setRefreshKey((k) => k + 1);
+  }, []);
+
+  return (
+    <div style={styles.page}>
+      <header style={styles.heroHeader}>
+        <h1 style={styles.heroTitle}>콘텐츠</h1>
+        <p style={styles.heroDesc}>문서·코스형 자료·설문을 한 곳에서 관리합니다.</p>
+      </header>
+
+      <DocumentsSection
+        currentUserId={user?.id}
+        isAuthenticated={isAuthenticated}
+        refreshKey={refreshKey}
+        onChanged={handleDocumentsChanged}
+      />
+
+      <CoursesSection isAuthenticated={isAuthenticated} />
+
+      <SurveysSection isAuthenticated={isAuthenticated} />
+    </div>
+  );
 }
 
 // ─── Styles ──────────────────────────────────────────────────────────────────
 
 const styles: Record<string, React.CSSProperties> = {
+  page: {
+    maxWidth: 1100,
+    margin: '0 auto',
+    padding: '32px 16px 60px',
+  },
+  heroHeader: {
+    marginBottom: 32,
+  },
+  heroTitle: {
+    fontSize: '1.75rem',
+    fontWeight: 700,
+    color: '#0f172a',
+    margin: '0 0 4px',
+  },
+  heroDesc: {
+    fontSize: '0.9375rem',
+    color: '#64748b',
+    margin: 0,
+  },
+
+  section: {
+    marginBottom: 40,
+  },
+  sectionHeader: {
+    display: 'flex',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+    gap: 12,
+    flexWrap: 'wrap',
+  },
+  sectionTitle: {
+    fontSize: '1.125rem',
+    fontWeight: 700,
+    color: '#0f172a',
+    margin: '0 0 4px',
+  },
+  sectionDesc: {
+    fontSize: '0.8125rem',
+    color: '#64748b',
+    margin: 0,
+  },
+  sectionActions: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12,
+  },
+  moreLink: {
+    fontSize: '0.8125rem',
+    color: '#475569',
+    textDecoration: 'none',
+    whiteSpace: 'nowrap',
+  },
+  primaryBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 6,
+    padding: '8px 16px',
+    backgroundColor: '#2563eb',
+    color: '#fff',
+    fontSize: '0.875rem',
+    fontWeight: 600,
+    borderRadius: 8,
+    textDecoration: 'none',
+    whiteSpace: 'nowrap',
+  },
+
   tableWrap: {
     backgroundColor: '#fff',
     borderRadius: 8,
     border: '1px solid #e2e8f0',
     overflow: 'hidden',
-    marginBottom: 8,
+  },
+  placeholder: {
+    padding: '32px 16px',
+    fontSize: '0.875rem',
+    color: '#94a3b8',
+    textAlign: 'center',
   },
   table: {
     width: '100%',
@@ -380,6 +557,15 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
     transition: 'background-color 0.1s',
   },
+  statusBadge: {
+    display: 'inline-block',
+    padding: '2px 8px',
+    fontSize: '0.6875rem',
+    fontWeight: 600,
+    borderRadius: 4,
+  },
+
+  // RowActionMenu
   menuBtn: {
     padding: '2px 8px',
     fontSize: '0.875rem',
@@ -415,6 +601,59 @@ const styles: Record<string, React.CSSProperties> = {
     border: 'none',
     textAlign: 'left',
     cursor: 'pointer',
+  },
+
+  // Survey cards
+  cardGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+    gap: 12,
+  },
+  card: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    padding: 16,
+    backgroundColor: '#ffffff',
+    border: '1px solid #e2e8f0',
+    borderRadius: 8,
+    cursor: 'pointer',
+    textAlign: 'left',
+    transition: 'border-color 0.15s',
+    minHeight: 100,
+  },
+  cardTitle: {
+    fontSize: '0.9375rem',
+    fontWeight: 600,
+    color: '#0f172a',
+    marginBottom: 6,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    display: '-webkit-box',
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: 'vertical',
+    width: '100%',
+  },
+  cardDesc: {
+    fontSize: '0.8125rem',
+    color: '#64748b',
+    marginBottom: 12,
+    flex: 1,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    display: '-webkit-box',
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: 'vertical',
+    width: '100%',
+  },
+  cardMeta: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    fontSize: '0.75rem',
+    color: '#94a3b8',
+    marginTop: 'auto',
   },
 };
 
