@@ -50,7 +50,8 @@ export interface ForumCategory {
   description?: string;
   postCount: number;
   forumType?: string;
-  createdBy?: string;
+  // 신청자(=포럼 소유자) ID — forum_category_requests.requester_id (entity property: requesterId)
+  requesterId?: string;
 }
 
 export interface ForumPost extends Partial<ForumPostResponse> {

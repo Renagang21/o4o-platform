@@ -57,7 +57,8 @@ export function ForumDetailPage() {
       if (resolvedForumId && user?.id) {
         try {
           const catRes = await forumApi.getCategory(resolvedForumId);
-          setIsForumOwner(catRes.data?.createdBy === user.id || catRes.data?.requester_id === user.id);
+          // forum_category_requests.requester_id (entity property: requesterId) = 포럼 소유자
+          setIsForumOwner(catRes.data?.requesterId === user.id);
         } catch {
           // non-critical — ignore
         }
