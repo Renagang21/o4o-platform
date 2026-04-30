@@ -289,7 +289,7 @@ const iconStyle: React.CSSProperties = {
 
 const heroStyles: Record<string, React.CSSProperties> = {
   wrapper: {
-    backgroundColor: 'color-mix(in srgb, var(--color-primary, #16A34A) 5%, #ffffff)',
+    backgroundColor: '#f0fdf4', /* green-50 — primary/5 equivalent */
     borderBottom: '1px solid var(--color-border-default, #e2e8f0)',
     padding: '40px 0 36px',
   },
