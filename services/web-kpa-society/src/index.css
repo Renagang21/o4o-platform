@@ -190,3 +190,16 @@ html {
   border-color: var(--color-neutral-300);
   box-shadow: var(--shadow-sm);
 }
+
+/* ========================================
+ * Service Identity — data-service 기반 테마 격리
+ * WO-O4O-THEME-FOUNDATION-V1
+ * html[data-service="kpa"]로 서비스 식별자를 선언.
+ * 향후 공유 CSS 파일에서 서비스별 primary 오버라이드에 사용.
+ * ======================================== */
+html[data-service="kpa"] {
+  --color-primary: #2563EB;
+  --color-primary-light: #3B82F6;
+  --color-primary-dark: #1D4ED8;
+  --color-primary-darker: #1E3A8A;
+}

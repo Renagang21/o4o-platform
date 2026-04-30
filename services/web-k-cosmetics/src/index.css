@@ -174,3 +174,16 @@ body {
 html {
   scroll-behavior: smooth;
 }
+
+/* ========================================
+ * Service Identity — data-service 기반 테마 격리
+ * WO-O4O-THEME-FOUNDATION-V1
+ * html[data-service="k-cosmetics"]로 서비스 식별자를 선언.
+ * 향후 공유 CSS 파일에서 서비스별 primary 오버라이드에 사용.
+ * ======================================== */
+html[data-service="k-cosmetics"] {
+  --color-primary: #E11D48;
+  --color-primary-light: #F43F5E;
+  --color-primary-dark: #BE123C;
+  --color-primary-darker: #9F1239;
+}

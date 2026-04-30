@@ -237,3 +237,16 @@ html {
 .animate-marquee:hover {
   animation-play-state: paused;
 }
+
+/* ========================================
+ * Service Identity — data-service 기반 테마 격리
+ * WO-O4O-THEME-FOUNDATION-V1
+ * html[data-service="glycopharm"]로 서비스 식별자를 선언.
+ * 향후 공유 CSS 파일에서 서비스별 primary 오버라이드에 사용.
+ * ======================================== */
+html[data-service="glycopharm"] {
+  --color-primary: #16A34A;
+  --color-primary-light: #22C55E;
+  --color-primary-dark: #15803D;
+  --color-primary-darker: #166534;
+}
