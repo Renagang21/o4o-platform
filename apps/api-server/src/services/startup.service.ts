@@ -1,6 +1,6 @@
 import { AppDataSource } from '../database/connection.js';
 import { DatabaseChecker } from '../utils/database-checker.js';
-import { MaterializedViewScheduler } from './MaterializedViewScheduler.js';
+// MaterializedViewScheduler removed — mv_product_listings view/function never created in DB
 // settlementScheduler removed (Phase 8-3 - legacy commerce)
 import { backupService } from './BackupService.js';
 import { errorAlertService } from './ErrorAlertService.js';
@@ -287,10 +287,7 @@ export class StartupService {
     }
 
     try {
-      // Materialized View Scheduler
-      const refreshInterval = env.isProduction() ? '*/5 * * * *' : '*/10 * * * *';
-      MaterializedViewScheduler.start(refreshInterval);
-      logger.info('✅ Materialized View Scheduler started');
+      // Materialized View Scheduler removed — mv_product_listings does not exist in DB
 
       // Settlement Scheduler removed (Phase 8-3 - legacy commerce)
       logger.info('✅ Settlement Scheduler skipped (legacy commerce removed)');
@@ -385,8 +382,8 @@ export class StartupService {
     logger.info('Shutting down services...');
 
     try {
-      MaterializedViewScheduler.stop();
       // settlementScheduler removed (Phase 8-3 - legacy commerce)
+      // MaterializedViewScheduler removed — mv_product_listings does not exist in DB
       logger.info('✅ Schedulers stopped');
     } catch (error) {
       logger.error('Error during shutdown:', error);
