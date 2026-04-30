@@ -2,14 +2,15 @@
  * ContentListPage — 콘텐츠 허브 목록
  *
  * WO-KPA-CONTENT-LIST-UX-ALIGNMENT-V1
- * (이전) WO-KPA-CONTENT-HUB-TEMPLATE-MIGRATION-V1
+ * WO-O4O-CONTENT-HUB-TEMPLATE-TYPE-ALIGNMENT-V1
  *
  * ContentHubTemplate 기반 공통 구조.
  * 컬럼: [유형] [제목] [작성자] [작성일] [조회수] [좋아요] [액션]
- * 권한: 작성자만 수정/삭제 노출 (created_by === user.id)
+ * 권한: 작성자만 수정/삭제 노출 (createdBy === currentUserId)
+ * rawItemsRef 우회 제거 — ContentHubItem 확장 타입으로 직접 매핑
  */
 
-import { useMemo, useRef, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ContentHubTemplate } from '@o4o/shared-space-ui';
 import type { ContentHubConfig, ContentHubItem } from '@o4o/shared-space-ui';
@@ -17,7 +18,7 @@ import { contentApi, type ContentItem } from '../../api/content';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
 
-// ─── Type Mapping (ContentHubTemplate 요구사항) ───────────────────────────────
+// ─── Type Mapping ─────────────────────────────────────────────────────────────
 
 const TYPE_LABELS: Record<string, string> = {
   information: '문서',
@@ -38,6 +39,11 @@ function mapContentItem(item: ContentItem): ContentHubItem {
     type: subLabel,
     typeColor: TYPE_COLORS[item.content_type],
     date: item.created_at,
+    // WO-O4O-CONTENT-HUB-TEMPLATE-TYPE-ALIGNMENT-V1: 확장 필드
+    authorName: item.author_name ?? null,
+    createdBy: item.created_by ?? null,
+    viewCount: item.view_count ?? 0,
+    likeCount: item.like_count ?? 0,
   };
 }
 
@@ -69,7 +75,6 @@ function RowActionMenu({
       </button>
       {open && (
         <>
-          {/* 닫기 오버레이 */}
           <div
             style={{ position: 'fixed', inset: 0, zIndex: 10 }}
             onClick={(e) => { e.stopPropagation(); setOpen(false); }}
@@ -104,13 +109,13 @@ function RowActionMenu({
 
 function ContentTable({
   items,
-  userId,
+  currentUserId,
   onNavigate,
   onEdit,
   onDelete,
 }: {
-  items: ContentItem[];
-  userId: string | undefined;
+  items: ContentHubItem[];
+  currentUserId: string | undefined;
   onNavigate: (id: string) => void;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
@@ -133,10 +138,8 @@ function ContentTable({
         </thead>
         <tbody>
           {items.map((item) => {
-            const isOwner = !!(userId && item.created_by === userId);
-            const badgeColor = TYPE_COLORS[item.content_type] ?? { bg: '#f1f5f9', text: '#475569' };
-            const typeLabel = item.sub_type === '설문' ? '설문'
-              : TYPE_LABELS[item.content_type] ?? '문서';
+            const isOwner = !!(currentUserId && item.createdBy === currentUserId);
+            const badgeColor = item.typeColor ?? { bg: '#f1f5f9', text: '#475569' };
 
             return (
               <tr
@@ -148,13 +151,15 @@ function ContentTable({
               >
                 {/* 유형 */}
                 <td style={{ ...styles.td, textAlign: 'center' }}>
-                  <span style={{
-                    display: 'inline-block', padding: '2px 8px',
-                    fontSize: '0.6875rem', fontWeight: 600, borderRadius: 4,
-                    backgroundColor: badgeColor.bg, color: badgeColor.text,
-                  }}>
-                    {typeLabel}
-                  </span>
+                  {item.type && (
+                    <span style={{
+                      display: 'inline-block', padding: '2px 8px',
+                      fontSize: '0.6875rem', fontWeight: 600, borderRadius: 4,
+                      backgroundColor: badgeColor.bg, color: badgeColor.text,
+                    }}>
+                      {item.type}
+                    </span>
+                  )}
                 </td>
 
                 {/* 제목 */}
@@ -166,22 +171,22 @@ function ContentTable({
 
                 {/* 작성자 */}
                 <td style={{ ...styles.td, color: '#64748b', fontSize: '0.8125rem' }}>
-                  {item.author_name || '-'}
+                  {item.authorName || '-'}
                 </td>
 
                 {/* 작성일 */}
                 <td style={{ ...styles.td, color: '#94a3b8', fontSize: '0.8125rem' }}>
-                  {formatDate(item.created_at)}
+                  {item.date ? formatDate(item.date) : '-'}
                 </td>
 
                 {/* 조회수 */}
                 <td style={{ ...styles.td, textAlign: 'center', color: '#94a3b8', fontSize: '0.8125rem' }}>
-                  👁 {item.view_count ?? 0}
+                  👁 {item.viewCount ?? 0}
                 </td>
 
                 {/* 좋아요 */}
                 <td style={{ ...styles.td, textAlign: 'center', color: '#94a3b8', fontSize: '0.8125rem' }}>
-                  👍 {item.like_count ?? 0}
+                  👍 {item.likeCount ?? 0}
                 </td>
 
                 {/* 액션 */}
@@ -189,13 +194,13 @@ function ContentTable({
                   style={{ ...styles.td, textAlign: 'center' }}
                   onClick={(e) => e.stopPropagation()}
                 >
-                  {isOwner ? (
+                  {isOwner && (
                     <RowActionMenu
                       onView={() => onNavigate(item.id)}
                       onEdit={() => onEdit(item.id)}
                       onDelete={() => onDelete(item.id)}
                     />
-                  ) : null}
+                  )}
                 </td>
               </tr>
             );
@@ -212,10 +217,7 @@ export function ContentListPage() {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
 
-  // ContentHubTemplate이 ContentHubItem[]만 받으므로, 원본 데이터를 ref로 보존
-  const rawItemsRef = useRef<ContentItem[]>([]);
-
-  // 삭제 후 목록 갱신을 위한 key
+  // 삭제 후 ContentHubTemplate 재마운트로 목록 갱신
   const [refreshKey, setRefreshKey] = useState(0);
 
   const handleDelete = useCallback(async (id: string) => {
@@ -263,20 +265,18 @@ export function ContentListPage() {
           content_type: filter !== 'all' ? filter : undefined,
           sub_type: 'content', // WO-KPA-CONTENT-RESOURCE-SUBTYPE-SEPARATION-V1
         });
-        rawItemsRef.current = res.data?.items ?? [];
         return {
           items: (res.data?.items ?? []).map(mapContentItem),
           total: res.data?.total ?? 0,
         };
       } catch {
-        rawItemsRef.current = [];
         return { items: [], total: 0 };
       }
     },
-    renderItems: (_items) => (
+    renderItems: (items) => (
       <ContentTable
-        items={rawItemsRef.current}
-        userId={user?.id}
+        items={items}
+        currentUserId={user?.id}
         onNavigate={(id) => navigate(`/content/${id}`)}
         onEdit={(id) => navigate(`/content/${id}/edit`)}
         onDelete={handleDelete}

@@ -38,6 +38,15 @@ export interface ContentHubItem {
   date?: string | null;
   isPinned?: boolean;
   isNew?: boolean;
+  // WO-O4O-CONTENT-HUB-TEMPLATE-TYPE-ALIGNMENT-V1: 리스트 표시/권한 판단용 필드
+  /** 작성자 표시명 */
+  authorName?: string | null;
+  /** 작성자 userId — renderItems에서 isOwner 판단에 사용 */
+  createdBy?: string | null;
+  /** 조회수 */
+  viewCount?: number;
+  /** 좋아요 수 */
+  likeCount?: number;
 }
 
 export interface ContentHubFilter {
