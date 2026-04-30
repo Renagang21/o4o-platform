@@ -184,9 +184,20 @@ function AddProductModal({
               <Loader2 className="w-5 h-5 animate-spin mr-2" /> 제품 목록 로딩 중...
             </div>
           ) : available.length === 0 ? (
-            <div className="text-center py-12 text-slate-400">
-              <p className="text-sm">등록 가능한 제품이 없습니다.</p>
-              <p className="text-xs mt-1">모든 제품이 이미 이 채널에 등록되어 있거나, 승인된 제품이 없습니다.</p>
+            <div className="text-center py-10">
+              <Package className="w-8 h-8 mx-auto mb-3 text-slate-300" />
+              <p className="text-sm font-medium text-slate-600">추가할 수 있는 상품이 없습니다</p>
+              <p className="text-xs mt-2 text-slate-400 leading-relaxed">
+                모든 상품이 이미 추가되었거나,<br />
+                HUB에서 신청한 상품의 승인이 아직 완료되지 않았습니다.
+              </p>
+              <Link
+                to="/store-hub/b2b"
+                onClick={onClose}
+                className="inline-flex items-center gap-1 mt-4 text-xs font-medium text-blue-600 hover:underline"
+              >
+                상품 보러가기 →
+              </Link>
             </div>
           ) : (
             <div className="space-y-2">

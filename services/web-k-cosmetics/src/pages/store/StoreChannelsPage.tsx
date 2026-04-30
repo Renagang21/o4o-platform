@@ -31,6 +31,9 @@ import {
   ChevronUp,
   ChevronDown,
   ExternalLink,
+  Link2,
+  AlertCircle,
+  Copy,
 } from 'lucide-react';
 import {
   fetchChannelOverviewWithCode,
@@ -168,9 +171,20 @@ function AddProductModal({
               <Loader2 className="w-5 h-5 animate-spin mr-2" /> 제품 목록 로딩 중...
             </div>
           ) : available.length === 0 ? (
-            <div className="text-center py-12 text-slate-400">
-              <p className="text-sm">등록 가능한 제품이 없습니다.</p>
-              <p className="text-xs mt-1">모든 제품이 이미 이 채널에 등록되어 있거나, 승인된 제품이 없습니다.</p>
+            <div className="text-center py-10">
+              <Package className="w-8 h-8 mx-auto mb-3 text-slate-300" />
+              <p className="text-sm font-medium text-slate-600">추가할 수 있는 상품이 없습니다</p>
+              <p className="text-xs mt-2 text-slate-400 leading-relaxed">
+                모든 상품이 이미 추가되었거나,<br />
+                HUB에서 신청한 상품의 승인이 아직 완료되지 않았습니다.
+              </p>
+              <Link
+                to="/store-hub/b2b"
+                onClick={onClose}
+                className="inline-flex items-center gap-1 mt-4 text-xs font-medium text-pink-600 hover:underline"
+              >
+                상품 보러가기 →
+              </Link>
             </div>
           ) : (
             <div className="space-y-2">
@@ -218,6 +232,106 @@ function AddProductModal({
         </div>
       </div>
     </>
+  );
+}
+
+/* ─── Channel Description Map ───────────────── */
+
+const CHANNEL_DESC: Record<string, string> = {
+  B2C: '고객이 온라인으로 상품을 확인하고 구매합니다',
+  KIOSK: '매장 내 키오스크에서 고객이 직접 상품을 조회합니다',
+  TABLET: '매장 내 태블릿에서 상품 안내 및 상담 요청을 처리합니다',
+  SIGNAGE: '매장 내 디지털 사이니지에 콘텐츠를 표시합니다',
+};
+
+/* ─── ChannelPublicUrlCard ───────────────────── */
+
+function ChannelPublicUrlCard({
+  channelType,
+  orgCode,
+  showToast,
+}: {
+  channelType: ChannelType;
+  orgCode: string | null;
+  showToast: (type: 'success' | 'error', message: string) => void;
+}) {
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+
+  const getChannelUrl = (): { url: string | null; label: string; guidance: string | null; guidanceLink: string | null } => {
+    if (channelType === 'B2C') {
+      if (!orgCode) return { url: null, label: '온라인 스토어', guidance: null, guidanceLink: null };
+      return { url: `${origin}/store/${orgCode}`, label: '온라인 스토어', guidance: null, guidanceLink: null };
+    }
+    if (channelType === 'TABLET') {
+      if (!orgCode) return { url: null, label: '태블릿', guidance: null, guidanceLink: null };
+      return { url: `${origin}/tablet/${orgCode}`, label: '태블릿 상품 안내', guidance: null, guidanceLink: null };
+    }
+    if (channelType === 'KIOSK') {
+      return { url: null, label: '키오스크', guidance: '키오스크는 별도 공개 URL이 없습니다. B2C 스토어 또는 태블릿 채널을 통해 고객이 접근합니다.', guidanceLink: null };
+    }
+    return { url: null, label: '사이니지', guidance: '재생 화면은 사이니지 관리에서 플레이리스트를 선택하여 실행합니다.', guidanceLink: '/store/signage' };
+  };
+
+  const { url, label, guidance, guidanceLink } = getChannelUrl();
+
+  const handleCopy = async () => {
+    if (!url) return;
+    try {
+      await navigator.clipboard.writeText(url);
+      showToast('success', '공개 주소가 클립보드에 복사되었습니다.');
+    } catch {
+      showToast('error', '복사에 실패했습니다. 주소를 직접 복사해 주세요.');
+    }
+  };
+
+  if ((channelType === 'B2C' || channelType === 'TABLET') && !orgCode) {
+    return (
+      <div className="flex items-center gap-3 p-4 mb-6 rounded-lg border border-amber-200 bg-amber-50">
+        <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0" />
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-amber-800">공개 주소가 아직 설정되지 않았습니다</p>
+          <p className="text-xs text-amber-600 mt-0.5">매장 설정에서 매장 코드를 등록하면 공개 URL이 생성됩니다.</p>
+        </div>
+        <Link to="/store/settings" className="flex-shrink-0 px-3 py-1.5 text-xs font-medium text-amber-700 bg-white border border-amber-300 rounded-lg hover:bg-amber-100">
+          설정으로 이동
+        </Link>
+      </div>
+    );
+  }
+
+  if (guidance) {
+    return (
+      <div className="flex items-center gap-3 p-4 mb-6 rounded-lg border border-slate-200 bg-slate-50">
+        <Link2 className="w-5 h-5 text-slate-400 flex-shrink-0" />
+        <div className="flex-1 min-w-0">
+          <p className="text-sm text-slate-600">{guidance}</p>
+        </div>
+        {guidanceLink && (
+          <Link to={guidanceLink} className="flex-shrink-0 inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-pink-700 bg-white border border-pink-200 rounded-lg hover:bg-pink-50">
+            사이니지 관리 <ExternalLink className="w-3 h-3" />
+          </Link>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-3 p-4 mb-6 rounded-lg border border-slate-200 bg-white">
+      <Link2 className="w-5 h-5 text-pink-500 flex-shrink-0" />
+      <div className="flex-1 min-w-0">
+        <div className="text-xs text-slate-500 mb-1">{label} 공개 주소</div>
+        <div className="text-[15px] font-mono font-medium text-slate-900 truncate">{url}</div>
+        <div className="text-xs text-slate-400 mt-1">이 주소로 고객이 매장 화면에 접속합니다</div>
+      </div>
+      <div className="flex items-center gap-1.5 flex-shrink-0">
+        <button onClick={handleCopy} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200" title="주소 복사">
+          <Copy className="w-3.5 h-3.5" /> 복사
+        </button>
+        <a href={url!} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-pink-700 bg-pink-50 border border-pink-200 rounded-lg hover:bg-pink-100" title="새 탭에서 열기">
+          <ExternalLink className="w-3.5 h-3.5" /> 열기
+        </a>
+      </div>
+    </div>
   );
 }
 
@@ -505,6 +619,43 @@ export function StoreChannelsPage() {
           })}
         </div>
       </div>
+
+      {/* ─── 채널 선택 가이드 (WO-O4O-CHANNEL-UX-STEP1-GUIDE-V1) ─── */}
+      <div className="mb-6 p-5 rounded-xl border border-slate-200 bg-slate-50">
+        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">상품을 어디에 보여줄지 선택하세요</p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {([
+            { type: 'B2C', icon: '🌐', label: '온라인 판매', sub: '고객이 온라인으로 구매' },
+            { type: 'TABLET', icon: '📱', label: '매장 태블릿', sub: '매장에서 상품 안내·상담' },
+            { type: 'KIOSK', icon: '🖥️', label: '키오스크', sub: '고객이 직접 탐색' },
+            { type: 'SIGNAGE', icon: '📺', label: '사이니지', sub: '화면(TV)에 콘텐츠 표시' },
+          ] as const).map(item => (
+            <button
+              key={item.type}
+              onClick={() => setActiveTab(item.type)}
+              className={`flex flex-col items-start gap-1 p-3 rounded-lg border text-left transition-colors ${
+                activeTab === item.type
+                  ? 'border-pink-400 bg-pink-50'
+                  : 'border-slate-200 bg-white hover:border-slate-300'
+              }`}
+            >
+              <span className="text-lg">{item.icon}</span>
+              <span className={`text-xs font-semibold ${activeTab === item.type ? 'text-pink-700' : 'text-slate-700'}`}>{item.label}</span>
+              <span className="text-[11px] text-slate-400 leading-tight">{item.sub}</span>
+            </button>
+          ))}
+        </div>
+        {CHANNEL_DESC[activeTab] && (
+          <p className="mt-3 text-xs text-slate-500 border-t border-slate-200 pt-3">
+            <span className="font-medium">현재 선택:</span> {CHANNEL_DESC[activeTab]}
+          </p>
+        )}
+      </div>
+
+      {/* ─── 공개 URL 카드 ─── */}
+      {currentChannel && (
+        <ChannelPublicUrlCard channelType={activeTab} orgCode={orgCode} showToast={showToast} />
+      )}
 
       {/* Toast Feedback */}
       {toast && (
