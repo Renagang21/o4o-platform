@@ -346,6 +346,7 @@ export function StoreChannelsPage() {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   const [channelProducts, setChannelProducts] = useState<ChannelProduct[]>([]);
+  const [availableProducts, setAvailableProducts] = useState<AvailableProduct[]>([]);
   const [productLoading, setProductLoading] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [deactivatingId, setDeactivatingId] = useState<string | null>(null);
@@ -391,10 +392,15 @@ export function StoreChannelsPage() {
   const loadChannelProducts = useCallback(async (channelId: string) => {
     setProductLoading(true);
     try {
-      const products = await fetchChannelProducts(channelId);
+      const [products, available] = await Promise.all([
+        fetchChannelProducts(channelId),
+        fetchAvailableProducts(channelId),
+      ]);
       setChannelProducts(products);
+      setAvailableProducts(available);
     } catch {
       setChannelProducts([]);
+      setAvailableProducts([]);
       showToast('error', '제품 목록을 불러오지 못했습니다.');
     } finally {
       setProductLoading(false);
@@ -406,6 +412,7 @@ export function StoreChannelsPage() {
       loadChannelProducts(currentChannel.id);
     } else {
       setChannelProducts([]);
+      setAvailableProducts([]);
     }
   }, [isProductChannel, currentChannel?.id, loadChannelProducts]);
 
@@ -656,6 +663,54 @@ export function StoreChannelsPage() {
       {currentChannel && (
         <ChannelPublicUrlCard channelType={activeTab} orgCode={orgCode} showToast={showToast} />
       )}
+
+      {/* ─── 상태 기반 행동 유도 (WO-O4O-CHANNEL-UX-STEP2-STATE-DRIVEN-V1) ─── */}
+      {isProductChannel && currentChannel?.status === 'APPROVED' && !productLoading && (() => {
+        if (channelProducts.length > 0) {
+          return (
+            <div className="flex items-start gap-4 p-5 mb-6 rounded-xl border border-green-200 bg-green-50">
+              <span className="text-xl shrink-0">🟢</span>
+              <div>
+                <p className="text-sm font-semibold text-green-800">이 채널에서 상품이 고객에게 노출되고 있습니다</p>
+                <p className="text-xs text-green-700 mt-1">상품 순서를 조정하거나 추가 상품을 등록할 수 있습니다.</p>
+              </div>
+            </div>
+          );
+        }
+        if (availableProducts.length > 0) {
+          return (
+            <div className="flex items-start justify-between gap-4 p-5 mb-6 rounded-xl border border-amber-200 bg-amber-50">
+              <div className="flex items-start gap-4">
+                <span className="text-xl shrink-0">🟡</span>
+                <div>
+                  <p className="text-sm font-semibold text-amber-800">상품은 추가되었지만 아직 진열되지 않았습니다</p>
+                  <p className="text-xs text-amber-700 mt-1">채널에 추가하면 고객에게 보여줄 수 있습니다.</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="shrink-0 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                이 채널에 상품 추가하기
+              </button>
+            </div>
+          );
+        }
+        return (
+          <div className="flex items-start justify-between gap-4 p-5 mb-6 rounded-xl border border-slate-200 bg-slate-50">
+            <div className="flex items-start gap-4">
+              <span className="text-xl shrink-0">⬜</span>
+              <div>
+                <p className="text-sm font-semibold text-slate-700">아직 추가된 상품이 없습니다</p>
+                <p className="text-xs text-slate-500 mt-1">HUB에서 상품을 선택하고 내 매장에서 판매를 시작하세요.</p>
+              </div>
+            </div>
+            <Link to="/store-hub/b2b" className="shrink-0 px-4 py-2 text-sm font-medium text-blue-700 bg-white border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors">
+              상품 보러가기
+            </Link>
+          </div>
+        );
+      })()}
 
       {/* Toast Feedback */}
       {toast && (
