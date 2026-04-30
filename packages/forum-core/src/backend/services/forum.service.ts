@@ -156,21 +156,11 @@ export class ForumService {
 
   // Post Methods
   async createPost(data: Partial<ForumPost>, authorId: string): Promise<ForumPost> {
-    const category = await this.categoryRepository.findOne({
-      // @ts-ignore WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1: dead code, categoryId removed
-      where: { id: data.categoryId }
-    });
-
-    if (!category) {
-      throw new Error('Category not found');
-    }
-
     // Permission check: can user create post in this organization?
-    if (data.organizationId || category.organizationId) {
-      const orgId = data.organizationId || category.organizationId;
-      const hasPermission = await canCreatePost(AppDataSource, authorId, orgId);
+    if (data.organizationId) {
+      const hasPermission = await canCreatePost(AppDataSource, authorId, data.organizationId);
       if (!hasPermission) {
-        throw new Error(`Permission denied: cannot create post in organization ${orgId}`);
+        throw new Error(`Permission denied: cannot create post in organization ${data.organizationId}`);
       }
     }
 
@@ -178,21 +168,11 @@ export class ForumService {
       ...data,
       authorId,
       slug: this.generateSlug(data.title || ''),
-      status: category.requireApproval ? PostStatus.PENDING : PostStatus.PUBLISHED,
-      publishedAt: category.requireApproval ? undefined : new Date()
+      status: PostStatus.PUBLISHED,
+      publishedAt: new Date(),
     });
 
-    const savedPost = await this.postRepository.save(post);
-
-    // 카테고리 통계 업데이트
-    if (savedPost.status === PostStatus.PUBLISHED) {
-      await this.updateCategoryStats(category.id, 'increment_post');
-    }
-
-    // 캐시 무효화
-    await this.invalidatePostCache(category.id);
-
-    return savedPost;
+    return await this.postRepository.save(post);
   }
 
   async updatePost(postId: string, data: Partial<ForumPost>, userId: string, userRole: string): Promise<ForumPost | null> {
@@ -223,10 +203,6 @@ export class ForumService {
       where: { id: postId },
       relations: ['category', 'author', 'comments']
     });
-
-    // 캐시 무효화
-    // @ts-ignore WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1: dead code, categoryId removed
-    await this.invalidatePostCache(post.categoryId);
 
     return updatedPost;
   }
@@ -397,10 +373,7 @@ export class ForumService {
       );
     }
 
-    // Await the lazy-loaded category to check requireApproval
-    // @ts-ignore WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1: dead code, category removed
-    const category = post.category ? await post.category : null;
-    const requireApproval = category?.requireApproval ?? false;
+    const requireApproval = false;
 
     const comment = this.commentRepository.create({
       ...data,
@@ -416,11 +389,6 @@ export class ForumService {
     // 게시글 통계 업데이트
     if (savedComment.status === CommentStatus.PUBLISHED) {
       await this.updatePostStats(post.id, 'increment_comment', authorId);
-      // @ts-ignore WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1: dead code, category/categoryId removed
-      if (post.category) {
-        // @ts-ignore
-        await this.updateCategoryStats(post.categoryId, 'increment_comment');
-      }
     }
 
     // 부모 댓글 통계 업데이트

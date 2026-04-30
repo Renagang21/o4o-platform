@@ -57,7 +57,6 @@ export interface SearchResultPost {
   excerpt?: string;
   type: PostType;
   status: PostStatus;
-  categoryId: string;
   authorId: string;
   organizationId?: string;
   viewCount: number;
@@ -164,7 +163,6 @@ export class ForumSearchService {
       'post.excerpt',
       'post.type',
       'post.status',
-      'post.categoryId',
       'post.authorId',
       'post.organizationId',
       'post.viewCount',
@@ -201,11 +199,6 @@ export class ForumSearchService {
     // Post type filter
     if (postType) {
       qb.andWhere('post.type = :postType', { postType });
-    }
-
-    // Category filter
-    if (categoryId) {
-      qb.andWhere('post.categoryId = :categoryId', { categoryId });
     }
 
     // Organization filter
@@ -262,8 +255,6 @@ export class ForumSearchService {
         excerpt: entity.excerpt,
         type: entity.type,
         status: entity.status,
-        // @ts-ignore WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1: dead code, categoryId removed
-        categoryId: entity.categoryId,
         authorId: entity.authorId,
         organizationId: entity.organizationId,
         viewCount: entity.viewCount,

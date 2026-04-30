@@ -107,7 +107,7 @@ export function ForumWritePage() {
               style={styles.input}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="제목을 입력하세요"
+              placeholder="예: 세무 신고 어떻게 하시나요? / 신제품 입고 후기 공유"
               required
             />
           </div>
@@ -117,7 +117,7 @@ export function ForumWritePage() {
             <RichTextEditor
               value={editorHtml}
               onChange={(content) => setEditorHtml(content.html)}
-              placeholder="내용을 입력하세요"
+              placeholder="질문, 정보 공유, 경험담 등 자유롭게 작성해보세요"
               minHeight="400px"
               editable={!submitting}
             />
