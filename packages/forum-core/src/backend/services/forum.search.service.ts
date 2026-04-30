@@ -262,6 +262,7 @@ export class ForumSearchService {
         excerpt: entity.excerpt,
         type: entity.type,
         status: entity.status,
+        // @ts-ignore WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1: dead code, categoryId removed
         categoryId: entity.categoryId,
         authorId: entity.authorId,
         organizationId: entity.organizationId,

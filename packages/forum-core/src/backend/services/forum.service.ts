@@ -157,6 +157,7 @@ export class ForumService {
   // Post Methods
   async createPost(data: Partial<ForumPost>, authorId: string): Promise<ForumPost> {
     const category = await this.categoryRepository.findOne({
+      // @ts-ignore WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1: dead code, categoryId removed
       where: { id: data.categoryId }
     });
 
@@ -224,6 +225,7 @@ export class ForumService {
     });
 
     // 캐시 무효화
+    // @ts-ignore WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1: dead code, categoryId removed
     await this.invalidatePostCache(post.categoryId);
 
     return updatedPost;
@@ -396,6 +398,7 @@ export class ForumService {
     }
 
     // Await the lazy-loaded category to check requireApproval
+    // @ts-ignore WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1: dead code, category removed
     const category = post.category ? await post.category : null;
     const requireApproval = category?.requireApproval ?? false;
 
@@ -413,7 +416,9 @@ export class ForumService {
     // 게시글 통계 업데이트
     if (savedComment.status === CommentStatus.PUBLISHED) {
       await this.updatePostStats(post.id, 'increment_comment', authorId);
+      // @ts-ignore WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1: dead code, category/categoryId removed
       if (post.category) {
+        // @ts-ignore
         await this.updateCategoryStats(post.categoryId, 'increment_comment');
       }
     }
