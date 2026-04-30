@@ -238,6 +238,8 @@ const PrintContentPage = lazy(() => import('./pages/content/PrintContentPage'));
 const ContentListPage = lazy(() => import('./pages/contents/ContentListPage').then(m => ({ default: m.ContentListPage })));
 const ContentDetailPage = lazy(() => import('./pages/contents/ContentDetailPage').then(m => ({ default: m.ContentDetailPage })));
 const ContentWritePage = lazy(() => import('./pages/contents/ContentWritePage').then(m => ({ default: m.ContentWritePage })));
+// WO-KPA-CONTENT-COURSES-LIST-V1: 코스형 자료 전용 목록
+const ContentCoursesPage = lazy(() => import('./pages/contents/ContentCoursesPage').then(m => ({ default: m.ContentCoursesPage })));
 
 // QR Landing Page — Phase 2 lazy
 const QrLandingPage = lazy(() => import('./pages/qr/QrLandingPage'));
@@ -310,6 +312,13 @@ function RegisterRedirect() {
 /** Legacy /news/:id → / redirect (WO-KPA-CONTENT-HUB-REMOVAL-V1) */
 function NewsIdRedirect() {
   return <Navigate to="/" replace />;
+}
+
+// WO-KPA-CONTENT-COURSES-LIST-V1: /content/courses/:id → /instructor/courses/:id (상세/편집).
+// Phase에서 ContentCourseDetailPage 도입 시 본 wrapper 제거.
+function ContentCourseDetailRedirect() {
+  const { id } = useParams<{ id: string }>();
+  return <Navigate to={id ? `/instructor/courses/${id}` : '/content/courses'} replace />;
 }
 
 // WO-O4O-ROLEBASED-HOME-REMOVAL-AND-ROUTING-NORMALIZATION-V1:
@@ -658,10 +667,13 @@ function App() {
             </Layout>
           } />
 
-          {/* 섹션 목록 — Phase 2까지 임시 redirect로 사용자가 만든 항목을 즉시 확인 */}
+          {/* 섹션 목록
+              - /content/surveys: Phase 4까지 임시 redirect (→ /participation)
+              - /content/courses: WO-KPA-CONTENT-COURSES-LIST-V1 — 전용 목록 페이지
+              - /content/courses/:id: /instructor/courses/:id 상세로 wrapper redirect (Phase에서 전용 페이지 도입 시 변경) */}
           <Route path="/content/surveys" element={<Navigate to="/participation" replace />} />
-          <Route path="/content/courses" element={<Navigate to="/instructor/courses" replace />} />
-          <Route path="/content/courses/:id" element={<Navigate to="/instructor/courses" replace />} />
+          <Route path="/content/courses" element={<Layout serviceName={SERVICE_NAME}><ContentCoursesPage /></Layout>} />
+          <Route path="/content/courses/:id" element={<ContentCourseDetailRedirect />} />
 
           {/* 콘텐츠 상세/수정 (sub_type='content' 문서) */}
           <Route path="/content/:id" element={<Layout serviceName={SERVICE_NAME}><ContentDetailPage /></Layout>} />
