@@ -94,7 +94,8 @@ export class ForumCategoryController extends ForumControllerBase {
     try {
       const { id } = req.params;
 
-      let forum = await this.requestRepo.findOne({ where: { id } });
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+      let forum = isUuid ? await this.requestRepo.findOne({ where: { id } }) : null;
       if (!forum) {
         forum = await this.requestRepo.findOne({ where: { slug: id } });
       }
