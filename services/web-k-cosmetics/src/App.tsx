@@ -14,6 +14,7 @@ import { KCosGlobalHeader } from '@/components/KCosGlobalHeader';
 // Layouts (always needed)
 import MainLayout from '@/components/layouts/MainLayout';
 import PartnerLayout from '@/components/layouts/PartnerLayout';
+import { KCosmeticsHubLayout } from '@/components/layouts/KCosmeticsHubLayout';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import OperatorLayoutWrapper from '@/components/layouts/OperatorLayoutWrapper';
 import { RoleGuard, OperatorRoute } from '@/components/auth/RoleGuard';
@@ -47,7 +48,12 @@ const MySettingsPage = lazy(() => import('@/pages/mypage/MySettingsPage'));
 const PartnerApplyPage = lazy(() => import('@/pages/partners/ApplyPage'));
 
 // Hub (WO-O4O-EXPLORATION-HUB-REMOVAL-V1: StoreHubTemplate 기반)
+// WO-O4O-STOREHUB-STRUCTURE-ALIGNMENT-V1: KCosmeticsHubLayout + nested routes
 const KCosmeticsHubPage = lazy(() => import('@/pages/hub/KCosmeticsHubPage'));
+const HubB2BPage = lazy(() => import('@/pages/hub/HubB2BPage').then(m => ({ default: m.HubB2BPage })));
+const HubContentPage = lazy(() => import('@/pages/hub/HubContentPage').then(m => ({ default: m.HubContentPage })));
+const HubSignagePage = lazy(() => import('@/pages/hub/HubSignagePage').then(m => ({ default: m.HubSignagePage })));
+const HubEventOffersPage = lazy(() => import('@/pages/hub/HubEventOffersPage').then(m => ({ default: m.HubEventOffersPage })));
 
 // Forum Pages
 const ForumHubPage = lazy(() => import('@/pages/forum').then(m => ({ default: m.ForumHubPage })));
@@ -278,10 +284,16 @@ function AppRoutes() {
         {/* B2B Routes */}
         <Route path="b2b/supply" element={<SupplyPage />} />
 
-        {/* Hub (WO-O4O-EXPLORATION-HUB-REMOVAL-V1: StoreHubTemplate 기반) */}
+        {/* Hub (WO-O4O-STOREHUB-STRUCTURE-ALIGNMENT-V1: KCosmeticsHubLayout + nested routes) */}
         {/* WO-O4O-HUB-TO-STORE-HUB-RENAMING-V1: /hub → /store-hub */}
         <Route path="hub" element={<Navigate to="/store-hub" replace />} />
-        <Route path="store-hub" element={<KCosmeticsHubPage />} />
+        <Route path="store-hub" element={<KCosmeticsHubLayout />}>
+          <Route index element={<KCosmeticsHubPage />} />
+          <Route path="b2b" element={<HubB2BPage />} />
+          <Route path="content" element={<HubContentPage />} />
+          <Route path="signage" element={<HubSignagePage />} />
+          <Route path="event-offers" element={<HubEventOffersPage />} />
+        </Route>
 
         {/* Services Routes */}
         <Route path="services/tourists" element={<TouristHubPage />} />

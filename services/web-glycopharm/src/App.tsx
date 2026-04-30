@@ -411,6 +411,7 @@ function AppRoutes() {
           <Route index element={<GlycoStoreHubPage />} />
           <Route path="b2b" element={<HubB2BCatalogPage />} />
           <Route path="content" element={<HubContentListPage />} />
+          <Route path="signage" element={<Navigate to="/store/signage/library" replace />} />
         </Route>
         {/* WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1 */}
         <Route path="library/content" element={<HubContentListPage />} />
