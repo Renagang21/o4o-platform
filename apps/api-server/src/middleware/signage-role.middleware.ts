@@ -636,11 +636,16 @@ export const validateServiceKey = (
     });
   }
 
-  // Add validation for allowed service keys if needed
+  // WO-O4O-SIGNAGE-PLAYBACK-LOG-SECURITY-HARDENING-V1
+  // 미등록 serviceKey 차단 — console.warn 후 통과 금지
   const validServiceKeys = ['pharmacy', 'cosmetics', 'tourism', 'common', 'kpa-society', 'neture', 'glycopharm'];
   if (!validServiceKeys.includes(serviceKey) && serviceKey !== 'test') {
-    // Log warning but don't block - allow for future services
-    console.warn(`[Signage] Unrecognized service key: ${serviceKey}`);
+    return res.status(400).json({
+      success: false,
+      error: 'Bad Request',
+      code: 'INVALID_SERVICE_KEY',
+      message: `Invalid service key: ${serviceKey}`,
+    });
   }
 
   next();

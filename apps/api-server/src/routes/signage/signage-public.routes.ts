@@ -11,6 +11,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import type { DataSource } from 'typeorm';
 import { validateServiceKey } from '../../middleware/signage-role.middleware.js';
+import { playbackLogLimiter } from '../../config/rate-limiters.config.js';
 
 interface PublicQueryParams {
   source?: string;
@@ -293,45 +294,67 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
    * POST /api/signage/:serviceKey/public/playback/log
    *
    * WO-O4O-SIGNAGE-CAMPAIGN-ANALYTICS-DATA-COLLECTION-V1
+   * WO-O4O-SIGNAGE-PLAYBACK-LOG-SECURITY-HARDENING-V1
+   *
    * 재생 시작 로그 — 인증 없이 호출 가능 (device agent / player)
    *
-   * body: { mediaId: string, playlistId?: string }
-   * organization_id: 인증 context 없으므로 null 허용
+   * 보안:
+   * - playbackLogLimiter: 100회/분/IP+serviceKey
+   * - serviceKey: validateServiceKey 미들웨어에서 화이트리스트 차단
+   * - mediaId: UUID 형식 + signage_media 존재 검증
+   * - playlistId: UUID 형식만 검증 (선택값)
+   * - organization_id: null 허용 (미인증 device agent)
    */
-  router.post('/playback/log', async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const serviceKey = req.params.serviceKey;
-      const { mediaId, playlistId } = req.body as { mediaId?: string; playlistId?: string };
+  router.post(
+    '/playback/log',
+    playbackLogLimiter,
+    async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const serviceKey = req.params.serviceKey;
+        const { mediaId, playlistId } = req.body as { mediaId?: string; playlistId?: string };
 
-      if (!mediaId || typeof mediaId !== 'string') {
-        res.status(400).json({ success: false, error: 'mediaId is required' });
-        return;
+        // 1. mediaId 필수 검증
+        if (!mediaId || typeof mediaId !== 'string') {
+          res.status(400).json({ success: false, error: 'mediaId is required', code: 'MEDIA_ID_REQUIRED' });
+          return;
+        }
+
+        // 2. UUID 형식 검증
+        const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (!UUID_RE.test(mediaId)) {
+          res.status(400).json({ success: false, error: 'mediaId must be a valid UUID', code: 'INVALID_MEDIA_ID' });
+          return;
+        }
+
+        if (playlistId && !UUID_RE.test(playlistId)) {
+          res.status(400).json({ success: false, error: 'playlistId must be a valid UUID', code: 'INVALID_PLAYLIST_ID' });
+          return;
+        }
+
+        // 3. media_id 존재 검증 (DB 오염 방지)
+        const media = await dataSource.query(
+          `SELECT id FROM signage_media WHERE id = $1 AND "serviceKey" = $2 LIMIT 1`,
+          [mediaId, serviceKey],
+        );
+        if (!media.length) {
+          res.status(404).json({ success: false, error: 'Media not found', code: 'MEDIA_NOT_FOUND' });
+          return;
+        }
+
+        // 4. 로그 INSERT — organization_id는 null 허용 (미인증)
+        await dataSource.query(
+          `INSERT INTO signage_playback_logs
+             (service_key, media_id, playlist_id, organization_id)
+           VALUES ($1, $2, $3, $4)`,
+          [serviceKey, mediaId, playlistId ?? null, null],
+        );
+
+        res.json({ success: true });
+      } catch (error) {
+        next(error);
       }
-
-      // UUID 형식 검증 (최소 안전 체크)
-      const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      if (!UUID_RE.test(mediaId)) {
-        res.status(400).json({ success: false, error: 'mediaId must be a valid UUID' });
-        return;
-      }
-
-      if (playlistId && !UUID_RE.test(playlistId)) {
-        res.status(400).json({ success: false, error: 'playlistId must be a valid UUID' });
-        return;
-      }
-
-      await dataSource.query(
-        `INSERT INTO signage_playback_logs
-           (service_key, media_id, playlist_id, organization_id)
-         VALUES ($1, $2, $3, $4)`,
-        [serviceKey, mediaId, playlistId ?? null, null],
-      );
-
-      res.json({ success: true });
-    } catch (error) {
-      next(error);
-    }
-  });
+    },
+  );
 
   return router;
 }

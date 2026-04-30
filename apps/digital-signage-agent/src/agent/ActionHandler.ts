@@ -138,7 +138,17 @@ export class ActionHandler extends EventEmitter<ActionHandlerEvents> {
    * Fire-and-forget playback log — 실패해도 재시도 없음
    */
   private logPlaybackStart(mediaId: string, _playlistId: string | null): void {
-    if (!this.httpClient || !this.serviceKey) return;
+    if (!this.httpClient) return;
+    if (!this.serviceKey) {
+      // WO-O4O-SIGNAGE-PLAYBACK-LOG-SECURITY-HARDENING-V1
+      // SERVICE_KEY 환경변수 미설정 시 명시적 경고 (silent skip 방지)
+      this.logger.warn(
+        'Playback log skipped: SERVICE_KEY is not configured. ' +
+        'Set SERVICE_KEY env var on the device agent to enable analytics.',
+        { mediaId },
+      );
+      return;
+    }
 
     const url = `/api/signage/${this.serviceKey}/public/playback/log`;
     this.httpClient.post(url, { mediaId, playlistId: _playlistId }).catch((err: unknown) => {

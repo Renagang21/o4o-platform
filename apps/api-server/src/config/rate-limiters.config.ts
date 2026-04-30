@@ -146,6 +146,30 @@ export const adminReviewLimiter = rateLimit({
   skip: isLocalhost
 });
 
+/**
+ * WO-O4O-SIGNAGE-PLAYBACK-LOG-SECURITY-HARDENING-V1
+ * Rate limiter for signage playback log (public, unauthenticated)
+ * 100 requests per 60 seconds per (IP + serviceKey)
+ * — "100회/분" 은 재생 루프 기준 충분한 여유를 제공하면서 스팸 차단
+ */
+export const playbackLogLimiter = rateLimit({
+  windowMs: 60 * 1000, // 60초
+  max: 100,
+  message: {
+    success: false,
+    error: 'Too many playback log requests',
+    code: 'RATE_LIMIT_EXCEEDED',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req: any) => {
+    const ip = getClientIP(req);
+    const serviceKey = req.params?.serviceKey ?? 'unknown';
+    return `${ip}:${serviceKey}`;
+  },
+  skip: isLocalhost,
+});
+
 // Export all limiters as an object for convenience
 export const rateLimiters = {
   standard: standardLimiter,
@@ -154,5 +178,6 @@ export const rateLimiters = {
   ssoCheck: ssoCheckLimiter,
   userPermissions: userPermissionsLimiter,
   enrollment: enrollmentLimiter,
-  adminReview: adminReviewLimiter
+  adminReview: adminReviewLimiter,
+  playbackLog: playbackLogLimiter,
 };
