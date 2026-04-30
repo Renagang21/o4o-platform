@@ -240,6 +240,8 @@ const ContentDetailPage = lazy(() => import('./pages/contents/ContentDetailPage'
 const ContentWritePage = lazy(() => import('./pages/contents/ContentWritePage').then(m => ({ default: m.ContentWritePage })));
 // WO-KPA-CONTENT-COURSES-LIST-V1: 코스형 자료 전용 목록
 const ContentCoursesPage = lazy(() => import('./pages/contents/ContentCoursesPage').then(m => ({ default: m.ContentCoursesPage })));
+// WO-KPA-CONTENT-SURVEYS-LIST-V1: 설문조사 전용 목록 (콘텐츠 허브 하위)
+const ContentSurveysPage = lazy(() => import('./pages/contents/ContentSurveysPage').then(m => ({ default: m.ContentSurveysPage })));
 
 // QR Landing Page — Phase 2 lazy
 const QrLandingPage = lazy(() => import('./pages/qr/QrLandingPage'));
@@ -668,10 +670,10 @@ function App() {
           } />
 
           {/* 섹션 목록
-              - /content/surveys: Phase 4까지 임시 redirect (→ /participation)
+              - /content/surveys: WO-KPA-CONTENT-SURVEYS-LIST-V1 — 전용 목록 페이지
               - /content/courses: WO-KPA-CONTENT-COURSES-LIST-V1 — 전용 목록 페이지
               - /content/courses/:id: /instructor/courses/:id 상세로 wrapper redirect (Phase에서 전용 페이지 도입 시 변경) */}
-          <Route path="/content/surveys" element={<Navigate to="/participation" replace />} />
+          <Route path="/content/surveys" element={<Layout serviceName={SERVICE_NAME}><ContentSurveysPage /></Layout>} />
           <Route path="/content/courses" element={<Layout serviceName={SERVICE_NAME}><ContentCoursesPage /></Layout>} />
           <Route path="/content/courses/:id" element={<ContentCourseDetailRedirect />} />
 
