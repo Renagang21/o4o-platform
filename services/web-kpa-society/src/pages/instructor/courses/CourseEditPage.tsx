@@ -9,6 +9,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { RichTextEditor } from '@o4o/content-editor';
 import { lmsInstructorApi, Course, Lesson, LessonType } from '../../../api/lms-instructor';
+import QuizBuilder from './QuizBuilder';
 
 const LEVEL_LABEL: Record<string, string> = { beginner: '입문', intermediate: '중급', advanced: '고급' };
 const LESSON_TYPE_LABEL: Record<LessonType, string> = {
@@ -196,6 +197,15 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
             {saving ? '저장 중...' : '저장'}
           </button>
         </div>
+
+        {/* 퀴즈 빌더 — QUIZ 유형 레슨 편집 시만 표시 */}
+        {isEdit && lesson && form.type === 'QUIZ' && (
+          <QuizBuilder
+            lessonId={lesson.id}
+            courseId={courseId}
+            lessonTitle={form.title}
+          />
+        )}
       </div>
     </div>
   );

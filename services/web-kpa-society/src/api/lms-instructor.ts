@@ -98,6 +98,47 @@ export interface UpdateLessonDto {
   isPublished?: boolean;
 }
 
+export type QuizQuestionType = 'single' | 'multi' | 'text';
+
+export interface QuizQuestionDraft {
+  id: string;
+  question: string;
+  type: QuizQuestionType;
+  options: string[];
+  answer: string | string[];
+  points: number;
+  order: number;
+}
+
+export interface InstructorQuiz {
+  id: string;
+  lessonId: string;
+  courseId: string;
+  title: string;
+  description?: string;
+  questions: QuizQuestionDraft[];
+  passingScore: number;
+  timeLimit: number | null;
+  maxAttempts: number | null;
+  showResultsImmediately: boolean;
+  showCorrectAnswers: boolean;
+  isPublished: boolean;
+}
+
+export interface UpsertQuizDto {
+  lessonId: string;
+  courseId: string;
+  title: string;
+  description?: string;
+  questions: Omit<QuizQuestionDraft, 'id'>[];
+  passingScore: number;
+  timeLimit?: number | null;
+  maxAttempts?: number | null;
+  showResultsImmediately?: boolean;
+  showCorrectAnswers?: boolean;
+  isPublished?: boolean;
+}
+
 export const lmsInstructorApi = {
   /** 내 강의 목록 */
   myCourses: (page = 1, limit = 20) =>
@@ -222,6 +263,22 @@ export const lmsInstructorApi = {
       };
     }>(`/lms/instructor/participants/${courseId}?${qs.toString()}`);
   },
+
+  // ── 퀴즈 관리 (WO-KPA-LMS-QUIZ-BUILDER-UI-V1) ──────────────────
+
+  /** 레슨에 연결된 퀴즈 조회 (강사용 — 정답 포함) */
+  getQuizForLesson: (lessonId: string) =>
+    authClient.api.get<{ success: boolean; data: { quiz: InstructorQuiz } }>(
+      `/lms/lessons/${lessonId}/quiz`,
+    ),
+
+  /** 퀴즈 생성 */
+  createQuiz: (dto: UpsertQuizDto) =>
+    authClient.api.post<{ success: boolean; data: InstructorQuiz }>('/lms/quizzes', dto),
+
+  /** 퀴즈 수정 */
+  updateQuiz: (quizId: string, dto: Partial<UpsertQuizDto>) =>
+    authClient.api.patch<{ success: boolean; data: InstructorQuiz }>(`/lms/quizzes/${quizId}`, dto),
 
   /** 보상 운영 요약 통계 (WO-O4O-MARKETING-CONTENT-OPERATIONS-ENHANCEMENT-V2) */
   participantsSummary: (courseId: string) =>
