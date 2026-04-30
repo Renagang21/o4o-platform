@@ -549,6 +549,36 @@ export const adminMenuStatic: MenuItem[] = [
   },
 
   // ============================================
+  // SUPPLIER (WO-O4O-SUPPLIER-CONTENT-SUBMISSION-PHASE1-V1)
+  // ============================================
+  {
+    id: 'supplier',
+    label: '공급자 대시보드',
+    icon: <Briefcase className="w-5 h-5" />,
+    roles: ['supplier', 'admin', 'super_admin'],
+    children: [
+      {
+        id: 'supplier-dashboard',
+        label: '대시보드',
+        icon: <LayoutDashboard className="w-4 h-4" />,
+        path: '/supplierops/dashboard',
+      },
+      {
+        id: 'supplier-marketing-materials',
+        label: '마케팅 자료',
+        icon: <FileText className="w-4 h-4" />,
+        path: '/supplierops/marketing-materials',
+      },
+      {
+        id: 'supplier-products',
+        label: '제품 목록',
+        icon: <Package className="w-4 h-4" />,
+        path: '/supplierops/products',
+      },
+    ],
+  },
+
+  // ============================================
   // INSIGHTS
   // ============================================
   {

@@ -94,6 +94,7 @@ import { createCourseRequestController } from './controllers/course-request.cont
 import { createForumRequestController } from './controllers/forum-request.controller.js';
 import { createForumMembershipController } from './controllers/forum-membership.controller.js';
 import { createContentApprovalController } from './controllers/content-approval.controller.js';
+import { createSupplierContentController } from './controllers/supplier-content.controller.js';
 import { createCommunityHubController } from './controllers/community-hub.controller.js';
 import { createLegalDocumentsController } from './controllers/legal-documents.controller.js';
 import { createEventOfferController } from './controllers/event-offer.controller.js';
@@ -238,6 +239,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Supplier Event Offer proposal routes (WO-EVENT-OFFER-SUPPLIER-PROPOSAL-PATH-V1)
   router.use('/supplier', createSupplierOffersController(dataSource, coreRequireAuth as any));
+
+  // Supplier Marketing Content Submission (WO-O4O-SUPPLIER-CONTENT-SUBMISSION-PHASE1-V1)
+  router.use('/supplier/content-submissions', createSupplierContentController(dataSource, coreRequireAuth as any));
 
   // Join Inquiry Admin routes (WO-KPA-JOIN-CONVERSION-V1)
   router.use('/join-inquiries', createJoinInquiryAdminRoutes(dataSource, coreRequireAuth as any, requireKpaScope));

@@ -357,16 +357,10 @@ export default function ContentApprovalsPage() {
     <div className="p-6">
       <PageHeader
         title="콘텐츠 승인 관리"
-        description="공급자 자료 제출 및 매장 HUB 공유 요청을 검토하고 승인합니다."
-        actions={
-          <button
-            className="flex items-center gap-1 rounded border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50"
-            onClick={() => refetch()}
-          >
-            <RefreshCw size={14} />
-            새로고침
-          </button>
-        }
+        subtitle="공급자 자료 제출 및 매장 HUB 공유 요청을 검토하고 승인합니다."
+        actions={[
+          { id: 'refresh', label: '새로고침', icon: <RefreshCw size={14} />, onClick: () => refetch() },
+        ]}
       />
 
       {/* 탭 — entity_type 필터 */}
@@ -419,7 +413,9 @@ export default function ContentApprovalsPage() {
       </div>
 
       {/* 테이블 */}
-      {isError ? (
+      {isLoading ? (
+        <div className="py-12 text-center text-sm text-gray-400">불러오는 중...</div>
+      ) : isError ? (
         <div className="rounded border border-red-200 bg-red-50 p-6 text-center text-sm text-red-600">
           데이터를 불러오는 중 오류가 발생했습니다.
         </div>
@@ -427,7 +423,6 @@ export default function ContentApprovalsPage() {
         <BaseTable<ApprovalRequest>
           columns={columns}
           data={data?.data ?? []}
-          loading={isLoading}
           emptyMessage={
             statusFilter === 'pending' ? '대기 중인 승인 요청이 없습니다.' : '해당 조건의 요청이 없습니다.'
           }

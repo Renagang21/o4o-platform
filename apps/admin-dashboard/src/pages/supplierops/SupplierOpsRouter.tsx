@@ -17,6 +17,9 @@ const BulkImportPage = lazy(() => import('./pages/BulkImportPage'));
 const Offers = lazy(() => import('./pages/Offers'));
 const Orders = lazy(() => import('./pages/Orders'));
 const Settlement = lazy(() => import('./pages/Settlement'));
+// Marketing Materials (WO-O4O-SUPPLIER-CONTENT-SUBMISSION-PHASE1-V1)
+const MarketingMaterials = lazy(() => import('./pages/MarketingMaterials'));
+const MarketingMaterialsCreate = lazy(() => import('./pages/MarketingMaterialsCreate'));
 
 // Loading component
 const PageLoader: React.FC = () => (
@@ -43,6 +46,9 @@ const SupplierOpsRouter: React.FC = () => {
         <Route path="orders" element={<Orders />} />
         <Route path="orders/:id" element={<Orders />} />
         <Route path="settlement" element={<Settlement />} />
+        {/* Marketing Materials (WO-O4O-SUPPLIER-CONTENT-SUBMISSION-PHASE1-V1) */}
+        <Route path="marketing-materials" element={<MarketingMaterials />} />
+        <Route path="marketing-materials/new" element={<MarketingMaterialsCreate />} />
         <Route path="*" element={<Dashboard />} />
       </Routes>
     </Suspense>
