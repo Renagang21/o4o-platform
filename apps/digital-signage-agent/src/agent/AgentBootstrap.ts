@@ -55,7 +55,13 @@ export class AgentBootstrap extends EventEmitter<AgentBootstrapEvents> {
     this.httpClient = new FallbackHttpClient(this.config, this.logger);
     this.socketClient = new CoreSocketClient(this.config, this.logger);
     this.player = new LocalPlayer(this.logger);
-    this.actionHandler = new ActionHandler(this.logger, this.registrar, this.player);
+    this.actionHandler = new ActionHandler(
+      this.logger,
+      this.registrar,
+      this.player,
+      this.httpClient,
+      this.config.serviceKey,
+    );
     this.heartbeat = new AgentHeartbeat(this.config, this.logger, this.registrar);
 
     // Setup event handlers

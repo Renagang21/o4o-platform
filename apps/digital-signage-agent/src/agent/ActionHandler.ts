@@ -10,6 +10,7 @@ import { AgentLogger } from './AgentLogger';
 import { AgentRegistrar } from './AgentRegistrar';
 import { LocalPlayer, PlayerStatus } from '../player/LocalPlayer';
 import { ActionExecutePayload, ActionStatusPayload } from '../comm/CoreSocketClient';
+import type { FallbackHttpClient } from '../comm/FallbackHttpClient';
 
 export type ActionStatus = 'pending' | 'running' | 'paused' | 'completed' | 'stopped' | 'failed';
 
@@ -32,16 +33,23 @@ export class ActionHandler extends EventEmitter<ActionHandlerEvents> {
   private player: LocalPlayer;
   private activeActions: Map<string, ActionState> = new Map();
   private slotToAction: Map<string, string> = new Map();
+  // WO-O4O-SIGNAGE-CAMPAIGN-ANALYTICS-DATA-COLLECTION-V1
+  private httpClient: FallbackHttpClient | null = null;
+  private serviceKey: string | null = null;
 
   constructor(
     logger: AgentLogger,
     registrar: AgentRegistrar,
-    player: LocalPlayer
+    player: LocalPlayer,
+    httpClient?: FallbackHttpClient,
+    serviceKey?: string,
   ) {
     super();
     this.logger = logger;
     this.registrar = registrar;
     this.player = player;
+    this.httpClient = httpClient ?? null;
+    this.serviceKey = serviceKey ?? null;
 
     // Listen to player events
     this.setupPlayerListeners();
@@ -114,11 +122,31 @@ export class ActionHandler extends EventEmitter<ActionHandlerEvents> {
 
       // Update status to running
       this.updateActionStatus(actionExecutionId, 'running');
+
+      // WO-O4O-SIGNAGE-CAMPAIGN-ANALYTICS-DATA-COLLECTION-V1
+      // 재생 시작 로그 — fire and forget (UX 영향 없음)
+      this.logPlaybackStart(mediaSource.id, payload.scheduleId ?? null);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       this.updateActionStatus(actionExecutionId, 'failed', errorMessage);
       this.registrar.updateSlotStatus(displaySlotId, 'error');
     }
+  }
+
+  /**
+   * WO-O4O-SIGNAGE-CAMPAIGN-ANALYTICS-DATA-COLLECTION-V1
+   * Fire-and-forget playback log — 실패해도 재시도 없음
+   */
+  private logPlaybackStart(mediaId: string, _playlistId: string | null): void {
+    if (!this.httpClient || !this.serviceKey) return;
+
+    const url = `/api/signage/${this.serviceKey}/public/playback/log`;
+    this.httpClient.post(url, { mediaId, playlistId: _playlistId }).catch((err: unknown) => {
+      this.logger.warn('Playback log failed (non-critical)', {
+        mediaId,
+        error: err instanceof Error ? err.message : String(err),
+      });
+    });
   }
 
   /**

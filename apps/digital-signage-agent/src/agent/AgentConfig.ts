@@ -14,6 +14,9 @@ export interface AgentConfig {
   hardwareId: string;
   deviceName?: string;
 
+  // Service identification (WO-O4O-SIGNAGE-CAMPAIGN-ANALYTICS-DATA-COLLECTION-V1)
+  serviceKey?: string;
+
   // Connection settings
   heartbeatIntervalMs: number;
   reconnectIntervalMs: number;
@@ -45,6 +48,7 @@ export function loadConfigFromEnv(): Partial<AgentConfig> {
     coreServerWsUrl: process.env.CORE_SERVER_WS_URL || 'ws://localhost:3001',
     hardwareId: process.env.HARDWARE_ID,
     deviceName: process.env.DEVICE_NAME,
+    serviceKey: process.env.SERVICE_KEY,
     heartbeatIntervalMs: parseInt(process.env.HEARTBEAT_INTERVAL_MS || '5000'),
     reconnectIntervalMs: parseInt(process.env.RECONNECT_INTERVAL_MS || '3000'),
     maxReconnectAttempts: parseInt(process.env.MAX_RECONNECT_ATTEMPTS || '10'),
