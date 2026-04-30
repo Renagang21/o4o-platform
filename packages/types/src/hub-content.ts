@@ -14,13 +14,13 @@
 // =============================================================================
 
 /** HUB 통합 제작 주체 (IR-O4O-PLATFORM-CONTENT-POLICY-FINAL-V1 §3) */
-export type HubProducer = 'operator' | 'supplier' | 'community';
+export type HubProducer = 'operator' | 'supplier' | 'community' | 'store';
 
 /** HUB 가시성 범위 (IR-O4O-PLATFORM-CONTENT-POLICY-FINAL-V1 §4) */
 export type HubVisibility = 'global' | 'service' | 'store';
 
 /** HUB 콘텐츠 원본 도메인 */
-export type HubSourceDomain = 'cms' | 'signage-media' | 'signage-playlist';
+export type HubSourceDomain = 'cms' | 'signage-media' | 'signage-playlist' | 'kpa-store-content';
 
 // =============================================================================
 // API Response DTOs
@@ -75,6 +75,7 @@ export const HUB_PRODUCER_LABELS: Record<HubProducer, string> = {
   operator: '운영자',
   supplier: '공급자',
   community: '커뮤니티',
+  store: '매장',
 };
 
 /** 가시성 범위별 한글 라벨 */
@@ -89,4 +90,5 @@ export const HUB_SOURCE_DOMAIN_LABELS: Record<HubSourceDomain, string> = {
   cms: 'CMS 콘텐츠',
   'signage-media': '사이니지 미디어',
   'signage-playlist': '사이니지 플레이리스트',
+  'kpa-store-content': '매장 활용 사례',
 };

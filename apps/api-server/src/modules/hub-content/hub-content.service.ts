@@ -25,12 +25,14 @@ const PRODUCER_TO_AUTHOR_ROLES: Record<HubProducer, string[]> = {
   operator: ['admin', 'service_admin'],
   supplier: ['supplier'],
   community: ['community'],
+  store: [],  // KpaStoreContent는 별도 조회 — queryCms에서 사용 안 함
 };
 
 const PRODUCER_TO_SIGNAGE_SOURCE: Record<HubProducer, string> = {
   operator: 'hq',
   supplier: 'supplier',
   community: 'community',
+  store: '',  // KpaStoreContent는 별도 조회 — querySignage에서 사용 안 함
 };
 
 const AUTHOR_ROLE_TO_PRODUCER: Record<string, HubProducer> = {
@@ -104,6 +106,8 @@ export class HubContentQueryService {
         return this.querySignageMedia(serviceKey, producer, page, limit);
       case 'signage-playlist':
         return this.querySignagePlaylists(serviceKey, producer, page, limit);
+      case 'kpa-store-content':
+        return this.queryStoreSharedContent(page, limit, producer);
       default:
         return { success: true, data: [], pagination: { page, limit, total: 0, totalPages: 0 } };
     }
@@ -117,16 +121,18 @@ export class HubContentQueryService {
     page: number,
     limit: number,
   ): Promise<HubContentListResponse> {
-    const [cms, media, playlists] = await Promise.allSettled([
+    const [cms, media, playlists, storeContents] = await Promise.allSettled([
       this.queryCms(serviceKey, producer, 1, MAX_FETCH_PER_DOMAIN),
       this.querySignageMedia(serviceKey, producer, 1, MAX_FETCH_PER_DOMAIN),
       this.querySignagePlaylists(serviceKey, producer, 1, MAX_FETCH_PER_DOMAIN),
+      this.queryStoreSharedContent(1, MAX_FETCH_PER_DOMAIN, producer),
     ]);
 
     const items: HubContentItemResponse[] = [];
     if (cms.status === 'fulfilled') items.push(...cms.value.data);
     if (media.status === 'fulfilled') items.push(...media.value.data);
     if (playlists.status === 'fulfilled') items.push(...playlists.value.data);
+    if (storeContents.status === 'fulfilled') items.push(...storeContents.value.data);
 
     // Sort by createdAt DESC
     items.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -149,6 +155,10 @@ export class HubContentQueryService {
     page: number,
     limit: number,
   ): Promise<HubContentListResponse> {
+    // 'store' producer는 KpaStoreContent 전용 — CMS 조회 대상 아님
+    if (producer === 'store') {
+      return { success: true, data: [], pagination: { page, limit, total: 0, totalPages: 0 } };
+    }
     try {
       const repo = this.dataSource.getRepository('CmsContent');
 
@@ -191,6 +201,10 @@ export class HubContentQueryService {
     page: number,
     limit: number,
   ): Promise<HubContentListResponse> {
+    // 'store' producer는 KpaStoreContent 전용 — Signage 조회 대상 아님
+    if (producer === 'store') {
+      return { success: true, data: [], pagination: { page, limit, total: 0, totalPages: 0 } };
+    }
     try {
       const offset = (page - 1) * limit;
       const params: any[] = [serviceKey];
@@ -253,6 +267,10 @@ export class HubContentQueryService {
     page: number,
     limit: number,
   ): Promise<HubContentListResponse> {
+    // 'store' producer는 KpaStoreContent 전용 — Signage 조회 대상 아님
+    if (producer === 'store') {
+      return { success: true, data: [], pagination: { page, limit, total: 0, totalPages: 0 } };
+    }
     try {
       const offset = (page - 1) * limit;
       const params: any[] = [serviceKey];
@@ -297,6 +315,56 @@ export class HubContentQueryService {
       return {
         success: true,
         data: playlists.map((p: any) => this.mapSignagePlaylist(p)),
+        pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      };
+    } catch (error: any) {
+      if (error.message?.includes('does not exist')) {
+        return { success: true, data: [], pagination: { page, limit, total: 0, totalPages: 0 } };
+      }
+      throw error;
+    }
+  }
+
+  // ── KPA Store Shared Content ──────────────────────────────────────────────
+
+  /**
+   * WO-O4O-STORE-CONTENT-HUB-SHARE-BACKEND-PHASE1-V1
+   *
+   * share_status='approved'인 KpaStoreContent를 HUB 통합 응답으로 반환.
+   * kpa_store_contents는 serviceKey 컬럼이 없으므로 KPA 전용 테이블 전체를 조회.
+   * producer 필터가 'store' 이외의 값이면 빈 결과 반환 (기존 조회 영향 없음).
+   * organization_id는 API 응답에 포함하지 않는다 (WO 정책).
+   */
+  private async queryStoreSharedContent(
+    page: number,
+    limit: number,
+    producer: HubProducer | undefined,
+  ): Promise<HubContentListResponse> {
+    // producer가 명시됐는데 'store'가 아니면 빈 결과
+    if (producer && producer !== 'store') {
+      return { success: true, data: [], pagination: { page, limit, total: 0, totalPages: 0 } };
+    }
+
+    try {
+      const offset = (page - 1) * limit;
+
+      const rows = await this.dataSource.query(
+        `SELECT id, title, content_json, updated_at
+         FROM kpa_store_contents
+         WHERE share_status = 'approved'
+         ORDER BY updated_at DESC
+         LIMIT $1 OFFSET $2`,
+        [limit, offset],
+      );
+
+      const [countRow] = await this.dataSource.query(
+        `SELECT COUNT(*) as total FROM kpa_store_contents WHERE share_status = 'approved'`,
+      );
+      const total = parseInt(countRow?.total || '0', 10);
+
+      return {
+        success: true,
+        data: rows.map((r: any) => this.mapStoreContentItem(r)),
         pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
       };
     } catch (error: any) {
@@ -358,6 +426,19 @@ export class HubContentQueryService {
       itemCount: p.itemCount ?? 0,
       totalDuration: p.totalDuration ?? 0,
       creatorName: p.creatorName ?? null,
+    };
+  }
+
+  private mapStoreContentItem(r: any): HubContentItemResponse {
+    // organization_id는 WO 정책에 따라 응답에 포함하지 않음
+    return {
+      id: r.id,
+      sourceDomain: 'kpa-store-content',
+      producer: 'store',
+      title: r.title,
+      description: null,
+      thumbnailUrl: null,
+      createdAt: r.updated_at instanceof Date ? r.updated_at.toISOString() : String(r.updated_at),
     };
   }
 }

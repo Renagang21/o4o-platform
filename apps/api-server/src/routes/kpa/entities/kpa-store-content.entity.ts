@@ -43,4 +43,18 @@ export class KpaStoreContent {
 
   @Column({ type: 'uuid', nullable: true })
   updated_by: string | null;
+
+  // ── WO-O4O-STORE-CONTENT-HUB-SHARE-BACKEND-PHASE1-V1 ─────────────────────
+
+  /** HUB 공유 상태: null=미요청 / pending=검토중 / approved=승인 / rejected=반려 */
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  share_status: 'pending' | 'approved' | 'rejected' | null;
+
+  /** 승인 시각 */
+  @Column({ type: 'timestamptz', nullable: true })
+  shared_at: Date | null;
+
+  /** 연결된 kpa_approval_requests.id */
+  @Column({ type: 'uuid', nullable: true })
+  shared_request_id: string | null;
 }

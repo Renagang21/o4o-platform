@@ -145,7 +145,18 @@ export class ContentApprovalService {
           await this.publishContent(qr, domain, contentId);
         }
       }
-      // store_share_to_hub: 콘텐츠 생성은 WO-O4O-STORE-CONTENT-HUB-SHARE-PHASE1-V1에서 처리
+      // store_share_to_hub: share_status='approved' + shared_at + shared_request_id 업데이트
+      if (ar.entity_type === 'store_share_to_hub') {
+        const { storeContentId } = payload;
+        if (storeContentId && UUID_RE.test(storeContentId)) {
+          await qr.query(
+            `UPDATE kpa_store_contents
+             SET share_status = 'approved', shared_at = NOW(), shared_request_id = $1
+             WHERE id = $2`,
+            [requestId, storeContentId],
+          );
+        }
+      }
 
       await qr.commitTransaction();
       return { data: { requestId, status: 'approved' } };
@@ -164,7 +175,7 @@ export class ContentApprovalService {
     }
 
     const [ar] = await this.dataSource.query(
-      `SELECT id, status FROM kpa_approval_requests
+      `SELECT id, status, entity_type, payload FROM kpa_approval_requests
        WHERE id = $1 AND entity_type = ANY($2) LIMIT 1`,
       [requestId, [...CONTENT_APPROVAL_ENTITY_TYPES]],
     );
@@ -187,6 +198,19 @@ export class ContentApprovalService {
        WHERE id = $3`,
       [user.id, reason || null, requestId],
     );
+
+    // store_share_to_hub: share_status='rejected' 업데이트
+    if (ar.entity_type === 'store_share_to_hub') {
+      const payload: Record<string, any> =
+        typeof ar.payload === 'string' ? JSON.parse(ar.payload) : (ar.payload ?? {});
+      const { storeContentId } = payload;
+      if (storeContentId && UUID_RE.test(storeContentId)) {
+        await this.dataSource.query(
+          `UPDATE kpa_store_contents SET share_status = 'rejected' WHERE id = $1`,
+          [storeContentId],
+        );
+      }
+    }
 
     return { data: { requestId, status: 'rejected' } };
   }
