@@ -2,9 +2,10 @@
  * HubContentsPage — HUB 콘텐츠 목록
  *
  * WO-O4O-STORE-CONTENT-HUB-SHARE-UI-PHASE2-V1
+ * WO-O4O-HUB-PRODUCER-FILTERING-PHASE3-V1
  *
  * 경로: /operator/hub-contents
- * 기능: 탭별 HUB 콘텐츠 조회 [전체] [공급자 자료] [매장 활용 사례]
+ * 기능: [전체][공급자 자료][매장 활용 사례] 탭 + 출처 라벨 통일
  */
 
 import { useState } from 'react';
@@ -13,10 +14,6 @@ import { authClient } from '@o4o/auth-client';
 import { BaseTable } from '@o4o/ui';
 import type { O4OColumn } from '@o4o/ui';
 import { RefreshCw } from 'lucide-react';
-import {
-  HUB_PRODUCER_LABELS,
-  HUB_SOURCE_DOMAIN_LABELS,
-} from '@o4o/types/hub-content';
 import type { HubContentItemResponse, HubProducer } from '@o4o/types/hub-content';
 import PageHeader from '../../components/common/PageHeader';
 
@@ -27,10 +24,31 @@ const API_BASE = '/api/v1/hub/contents';
 
 type TabKey = 'all' | 'supplier' | 'store';
 
-const TABS: { key: TabKey; label: string; producer?: HubProducer }[] = [
-  { key: 'all',      label: '전체' },
-  { key: 'supplier', label: '공급자 자료',    producer: 'supplier' },
-  { key: 'store',    label: '매장 활용 사례', producer: 'store' },
+interface TabDef {
+  key: TabKey;
+  label: string;
+  producer?: HubProducer;
+  description: string;
+}
+
+const TABS: TabDef[] = [
+  {
+    key: 'all',
+    label: '전체',
+    description: '공급자, 운영자, 매장 활용 사례를 통합 조회합니다.',
+  },
+  {
+    key: 'supplier',
+    label: '공급자 자료',
+    producer: 'supplier',
+    description: '공급자가 제공한 공식 마케팅 자료입니다.',
+  },
+  {
+    key: 'store',
+    label: '매장 활용 사례',
+    producer: 'store',
+    description: '다른 매장에서 실제로 활용한 콘텐츠입니다.',
+  },
 ];
 
 const EMPTY_MESSAGES: Record<TabKey, string> = {
@@ -39,11 +57,20 @@ const EMPTY_MESSAGES: Record<TabKey, string> = {
   store:    '승인된 매장 활용 사례가 없습니다.',
 };
 
+// WO 기준 출처 라벨 — 'store'는 "매장 활용"으로 표기 (HUB_PRODUCER_LABELS override)
+const PRODUCER_LABEL: Record<string, string> = {
+  operator:  '운영자',
+  supplier:  '공급자',
+  community: '커뮤니티',
+  store:     '매장 활용',
+};
+
+// 출처별 뱃지 색상
 const PRODUCER_BADGE_CLASS: Record<string, string> = {
-  operator: 'bg-gray-100 text-gray-600',
-  supplier: 'bg-purple-50 text-purple-700',
+  operator:  'bg-gray-100 text-gray-700',
+  supplier:  'bg-purple-50 text-purple-700',
   community: 'bg-blue-50 text-blue-700',
-  store: 'bg-teal-50 text-teal-700',
+  store:     'bg-teal-50 text-teal-700',
 };
 
 // ── API ──────────────────────────────────────────────────────────────────────
@@ -87,37 +114,32 @@ export default function HubContentsPage() {
       key: 'title',
       header: '제목',
       render: (row) => (
-        <span className="text-sm font-medium text-gray-900">{row.title}</span>
+        <div>
+          <p className="text-sm font-medium text-gray-900">{row.title}</p>
+          {row.description && (
+            <p className="mt-0.5 max-w-sm truncate text-xs text-gray-500">{row.description}</p>
+          )}
+        </div>
       ),
     },
     {
       key: 'producer',
-      header: '제작 주체',
-      width: 120,
+      header: '출처',
+      width: 110,
       render: (row) => (
         <span
           className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
             PRODUCER_BADGE_CLASS[row.producer] ?? 'bg-gray-100 text-gray-600'
           }`}
         >
-          {HUB_PRODUCER_LABELS[row.producer] ?? row.producer}
-        </span>
-      ),
-    },
-    {
-      key: 'sourceDomain',
-      header: '출처',
-      width: 150,
-      render: (row) => (
-        <span className="text-xs text-gray-500">
-          {HUB_SOURCE_DOMAIN_LABELS[row.sourceDomain] ?? row.sourceDomain}
+          {PRODUCER_LABEL[row.producer] ?? row.producer}
         </span>
       ),
     },
     {
       key: 'createdAt',
       header: '등록일',
-      width: 120,
+      width: 110,
       render: (row) => (
         <span className="text-sm text-gray-500">
           {new Date(row.createdAt).toLocaleDateString('ko-KR')}
@@ -130,14 +152,14 @@ export default function HubContentsPage() {
     <div className="p-6">
       <PageHeader
         title="HUB 콘텐츠"
-        subtitle="공급자 자료, 운영자 자료, 매장 활용 사례를 통합 조회합니다."
+        subtitle="KPA Society HUB에 등록된 자료를 탭별로 조회합니다."
         actions={[
           { id: 'refresh', label: '새로고침', icon: <RefreshCw size={14} />, onClick: () => refetch() },
         ]}
       />
 
       {/* 탭 */}
-      <div className="mb-4 border-b border-gray-200">
+      <div className="border-b border-gray-200">
         <div className="flex gap-1">
           {TABS.map((t) => (
             <button
@@ -159,6 +181,9 @@ export default function HubContentsPage() {
           ))}
         </div>
       </div>
+
+      {/* 탭 설명 */}
+      <p className="mb-4 mt-2 text-xs text-gray-500">{activeTab.description}</p>
 
       {/* 콘텐츠 테이블 */}
       {isLoading ? (

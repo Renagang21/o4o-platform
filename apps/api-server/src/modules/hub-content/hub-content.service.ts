@@ -134,8 +134,16 @@ export class HubContentQueryService {
     if (playlists.status === 'fulfilled') items.push(...playlists.value.data);
     if (storeContents.status === 'fulfilled') items.push(...storeContents.value.data);
 
-    // Sort by createdAt DESC
-    items.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    // Sort: createdAt DESC 기본, 동일 시각일 때 producer 우선순위 tie-break
+    // operator(0) > supplier(1) > store(2) > community(3)
+    const PRODUCER_PRIORITY: Record<string, number> = {
+      operator: 0, supplier: 1, store: 2, community: 3,
+    };
+    items.sort((a, b) => {
+      const timeDiff = new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      if (timeDiff !== 0) return timeDiff;
+      return (PRODUCER_PRIORITY[a.producer] ?? 9) - (PRODUCER_PRIORITY[b.producer] ?? 9);
+    });
 
     const total = items.length;
     const paged = items.slice((page - 1) * limit, page * limit);
