@@ -73,12 +73,13 @@ export const templatePresets: Record<TemplateKey, TemplatePreset> = {
   kpa: {
     key: 'kpa',
     name: 'KPA Professional',
+    // WO-O4O-KPA-HERO-TONE-FIX-V1: bg-bg-secondary → bg-primary-50, border-primary-100
     description: '전문기관형 — 절제된 색상, border 중심, 그림자 없음',
     category: 'professional',
     tokens: {
       hero: {
-        bg: 'bg-bg-secondary',
-        border: 'border border-border',
+        bg: 'bg-primary-50',
+        border: 'border border-primary-100',
         padding: 'py-16',
       },
       card: {
