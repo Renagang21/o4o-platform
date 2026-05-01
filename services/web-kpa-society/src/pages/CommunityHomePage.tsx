@@ -9,6 +9,7 @@
  * WO-KPA-MAIN-HOME-RESTRUCTURE-V1: 참여 유도형 커뮤니티 허브 전환
  * WO-SHARED-SPACE-COMPONENT-SPLIT-V1: 공통 컴포넌트 적용
  * WO-KPA-HOME-STRUCTURE-REFINEMENT-V1: 홈 구조 정리 (4블록 허브)
+ * WO-KPA-COMMUNITY-ACCESS-GATE-V1: 비로그인 사용자 서비스 카드 클릭 시 로그인 유도
  *
  * 섹션 구조 (3블록):
  * ├─ HeroBannerSection        — 동적 광고 캐러셀 (KPA 고유)
@@ -17,10 +18,13 @@
  * └─ CtaGuidanceSection       — Market Trial CTA (shared)
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { HeroBannerSection } from '../components/community/HeroBannerSection';
 import { homeApi } from '../api/home';
 import type { HomePageData } from '../api/home';
+import { useAuth } from '../contexts/AuthContext';
+import { useAuthModal } from '../contexts/LoginModalContext';
 import { PageHero, PageSection, PageContainer, Card, useTemplate } from '@o4o/ui';
 import {
   NewsNoticesSection,
@@ -79,8 +83,20 @@ const NewspaperIcon = () => (
 
 export function CommunityHomePage() {
   const tpl = useTemplate();
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const { openLoginModal, setOnLoginSuccess } = useAuthModal();
   const [data, setData] = useState<HomePageData | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // WO-KPA-COMMUNITY-ACCESS-GATE-V1: 비로그인 사용자 카드 클릭 시 로그인 유도
+  const handleCardClick = useCallback((href: string, e: React.MouseEvent) => {
+    if (!isAuthenticated) {
+      e.preventDefault();
+      setOnLoginSuccess(() => { navigate(href); });
+      openLoginModal();
+    }
+  }, [isAuthenticated, navigate, openLoginModal, setOnLoginSuccess]);
 
   useEffect(() => {
     homeApi.prefetchAll()
@@ -163,6 +179,7 @@ export function CommunityHomePage() {
         <PageContainer>
           <AppEntrySection
             accentColor="var(--color-primary)"
+            onCardClick={handleCardClick}
             cards={[
               { title: '포럼', description: '동료 약사와 질문·토론으로 전문성을 높이세요', href: '/forum', icon: <span className={`flex items-center justify-center shrink-0 ${tpl?.icon?.wrapper ?? ''} ${tpl?.icon?.icon ?? 'text-primary'}`}><ForumIcon /></span> },
               { title: '강의', description: '보수교육·세미나를 온라인으로 수강하세요', href: '/lms', icon: <span className={`flex items-center justify-center shrink-0 ${tpl?.icon?.wrapper ?? ''} ${tpl?.icon?.icon ?? 'text-primary'}`}><EducationIconSvg /></span> },

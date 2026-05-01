@@ -19,7 +19,6 @@ import type {
 } from './types';
 import {
   QUESTION_TYPE_LABELS,
-  SCOPE_TYPE_LABELS,
   QuestionType,
   ParticipationScopeType,
   AnonymityType,
@@ -396,24 +395,13 @@ export function ParticipationCreatePage({
         <h3 style={styles.sectionTitle}>참여 설정</h3>
 
         <div style={styles.fieldRow}>
+          {/* WO-KPA-COMMUNITY-ACCESS-GATE-AND-CONTENT-VISIBILITY-CLEANUP-V1:
+              /content 허브 참여는 '커뮤니티 회원 공개'로 고정 */}
           <div style={styles.fieldHalf}>
             <label style={styles.label}>참여 범위</label>
-            <select
-              value={scope.scopeType}
-              onChange={e =>
-                setScope({
-                  ...scope,
-                  scopeType: e.target.value as ParticipationScopeType,
-                })
-              }
-              style={styles.select}
-            >
-              {Object.entries(SCOPE_TYPE_LABELS).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
+            <div style={{ ...styles.select, backgroundColor: '#f8fafc', color: '#475569', cursor: 'default' }}>
+              전체 공개
+            </div>
           </div>
 
           <div style={styles.fieldHalf}>

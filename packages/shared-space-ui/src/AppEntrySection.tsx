@@ -9,6 +9,7 @@ export function AppEntrySection({
   subtitle,
   cards,
   accentColor = DEFAULT_ACCENT,
+  onCardClick,
 }: AppEntrySectionProps) {
   useEffect(() => {
     const id = 'shared-appentry-responsive';
@@ -47,6 +48,7 @@ export function AppEntrySection({
             to={card.href}
             style={styles.card}
             className="ss-appentry-card"
+            onClick={onCardClick ? (e) => onCardClick(card.href, e) : undefined}
           >
             {card.icon && <span style={styles.icon}>{card.icon}</span>}
             <div style={styles.content}>

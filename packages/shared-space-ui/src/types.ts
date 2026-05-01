@@ -89,6 +89,8 @@ export interface AppEntrySectionProps {
     icon?: ReactNode;
   }>;
   accentColor?: string;
+  /** WO-KPA-COMMUNITY-ACCESS-GATE-V1: 카드 클릭 인터셉터. e.preventDefault() 호출 시 이동 차단. */
+  onCardClick?: (href: string, e: React.MouseEvent) => void;
 }
 
 export interface CtaGuidanceSectionProps {
