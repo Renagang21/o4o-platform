@@ -336,6 +336,21 @@ export const lmsInstructorApi = {
       '/lms/assignments',
       dto,
     ),
+
+  // ── Live 관리 (WO-O4O-LMS-LIVE-MINIMAL-V1) ─────────────────────────
+
+  /** 레슨에 연결된 라이브 정보 조회 */
+  getLiveForLesson: (lessonId: string) =>
+    authClient.api.get<{ success: boolean; data: { live: LiveDto } }>(
+      `/lms/lessons/${lessonId}/live`,
+    ),
+
+  /** 라이브 설정 생성/수정 */
+  upsertLive: (lessonId: string, dto: UpsertLiveDto) =>
+    authClient.api.post<{ success: boolean; data: { live: LiveDto } }>(
+      `/lms/lessons/${lessonId}/live`,
+      dto,
+    ),
 };
 
 // WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1
@@ -353,4 +368,18 @@ export interface UpsertAssignmentDto {
   lessonId: string;
   instructions?: string | null;
   dueDate?: string | null;
+}
+
+// WO-O4O-LMS-LIVE-MINIMAL-V1
+export interface LiveDto {
+  lessonId: string;
+  liveStartAt: string | null;
+  liveEndAt: string | null;
+  liveUrl: string | null;
+}
+
+export interface UpsertLiveDto {
+  liveStartAt: string;
+  liveEndAt: string;
+  liveUrl: string;
 }

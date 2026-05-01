@@ -97,6 +97,15 @@ export const lmsApi = {
       `/lms/assignments/${assignmentId}/my`,
     ),
 
+  // 라이브 (WO-O4O-LMS-LIVE-MINIMAL-V1)
+  getLiveForLesson: (lessonId: string) =>
+    apiClient.get<ApiResponse<{ live: LiveLesson }>>(`/lms/lessons/${lessonId}/live`),
+
+  joinLive: (lessonId: string) =>
+    apiClient.post<ApiResponse<{ lessonCompleted: boolean }>>(
+      `/lms/lessons/${lessonId}/live/join`,
+    ),
+
   // 수료 (WO-O4O-COMPLETION-V1)
   getMyCompletions: (params?: { page?: number; limit?: number }) =>
     apiClient.get<PaginatedResponse<CourseCompletionItem>>('/lms/completions/me', params),
@@ -134,4 +143,12 @@ export interface AssignmentSubmission {
   content: string | null;
   submittedAt: string;
   status: 'submitted';
+}
+
+// WO-O4O-LMS-LIVE-MINIMAL-V1
+export interface LiveLesson {
+  lessonId: string;
+  liveStartAt: string | null;
+  liveEndAt: string | null;
+  liveUrl: string | null;
 }

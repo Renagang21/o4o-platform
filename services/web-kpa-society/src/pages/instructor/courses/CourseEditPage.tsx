@@ -11,16 +11,15 @@ import { RichTextEditor } from '@o4o/content-editor';
 import { lmsInstructorApi, Course, Lesson, LessonType, type CourseVisibility } from '../../../api/lms-instructor';
 import QuizBuilder from './QuizBuilder';
 import AssignmentEditor from './AssignmentEditor';
+import LiveEditor from './LiveEditor';
 
 const LESSON_TYPE_LABEL: Record<LessonType, string> = {
   VIDEO: '영상', ARTICLE: '문서', QUIZ: '퀴즈', ASSIGNMENT: '과제', LIVE: '라이브',
 };
 
-// WO-O4O-LMS-LESSON-TYPE-HIDE-INCOMPLETE-V1 → WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1
-// ASSIGNMENT 활성화. LIVE는 여전히 차단.
-const SUPPORTED_LESSON_TYPES: LessonType[] = ['VIDEO', 'ARTICLE', 'QUIZ', 'ASSIGNMENT'];
-const isUnsupportedType = (t: LessonType | string): boolean =>
-  t === 'LIVE' || t === 'live';
+// WO-O4O-LMS-LIVE-MINIMAL-V1: LIVE까지 모든 타입 활성화.
+const SUPPORTED_LESSON_TYPES: LessonType[] = ['VIDEO', 'ARTICLE', 'QUIZ', 'ASSIGNMENT', 'LIVE'];
+const isUnsupportedType = (_t: LessonType | string): boolean => false;
 
 /* ──────────────── styles ──────────────── */
 // 함수형 style은 별도 함수로 분리. (Record<string, CSSProperties>에 함수 값을 넣으면
@@ -244,6 +243,11 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
         {/* WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1: 과제 에디터 — ASSIGNMENT 유형 레슨 편집 시만 표시 */}
         {isEdit && lesson && form.type === 'ASSIGNMENT' && (
           <AssignmentEditor lessonId={lesson.id} />
+        )}
+
+        {/* WO-O4O-LMS-LIVE-MINIMAL-V1: 라이브 에디터 — LIVE 유형 레슨 편집 시만 표시 */}
+        {isEdit && lesson && form.type === 'LIVE' && (
+          <LiveEditor lessonId={lesson.id} />
         )}
       </div>
     </div>

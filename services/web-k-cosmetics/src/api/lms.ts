@@ -99,6 +99,14 @@ export interface LmsAssignmentSubmission {
   status: 'submitted';
 }
 
+// WO-O4O-LMS-LIVE-MINIMAL-V1
+export interface LmsLive {
+  lessonId: string;
+  liveStartAt: string | null;
+  liveEndAt: string | null;
+  liveUrl: string | null;
+}
+
 interface PaginatedResponse<T> {
   data: T[];
   pagination?: { page: number; limit: number; total: number; totalPages: number };
@@ -194,6 +202,19 @@ export const lmsApi = {
   getMyAssignmentSubmission: async (assignmentId: string): Promise<ApiResponse<{ submission: LmsAssignmentSubmission | null }>> => {
     const { data } = await api.get<ApiResponse<{ submission: LmsAssignmentSubmission | null }>>(
       `/lms/assignments/${assignmentId}/my`,
+    );
+    return data;
+  },
+
+  // 라이브 (WO-O4O-LMS-LIVE-MINIMAL-V1)
+  getLiveForLesson: async (lessonId: string): Promise<ApiResponse<{ live: LmsLive }>> => {
+    const { data } = await api.get<ApiResponse<{ live: LmsLive }>>(`/lms/lessons/${lessonId}/live`);
+    return data;
+  },
+
+  joinLive: async (lessonId: string): Promise<ApiResponse<{ lessonCompleted: boolean }>> => {
+    const { data } = await api.post<ApiResponse<{ lessonCompleted: boolean }>>(
+      `/lms/lessons/${lessonId}/live/join`,
     );
     return data;
   },

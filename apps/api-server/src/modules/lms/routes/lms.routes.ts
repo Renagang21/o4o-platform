@@ -9,6 +9,8 @@ import { InstructorController } from '../controllers/InstructorController.js';
 import { QuizController } from '../controllers/QuizController.js';
 // WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1
 import { AssignmentController } from '../controllers/AssignmentController.js';
+// WO-O4O-LMS-LIVE-MINIMAL-V1
+import { LiveController } from '../controllers/LiveController.js';
 // WO-O4O-COMPLETION-V1
 import { CompletionController } from '../controllers/CompletionController.js';
 import { requireAuth, optionalAuth } from '../../../common/middleware/auth.middleware.js';
@@ -109,6 +111,19 @@ router.post('/assignments/:assignmentId/submit', requireAuth, asyncHandler(Assig
 
 // GET /api/v1/lms/assignments/:assignmentId/my - Get current user's submission
 router.get('/assignments/:assignmentId/my', requireAuth, asyncHandler(AssignmentController.getMySubmission));
+
+// ========================================
+// LIVE ROUTES (WO-O4O-LMS-LIVE-MINIMAL-V1)
+// ========================================
+
+// GET /api/v1/lms/lessons/:lessonId/live - Get live config for a lesson
+router.get('/lessons/:lessonId/live', requireAuth, asyncHandler(LiveController.getLiveForLesson));
+
+// POST /api/v1/lms/lessons/:lessonId/live - Upsert live config (Instructor)
+router.post('/lessons/:lessonId/live', requireAuth, requireInstructor, asyncHandler(LiveController.upsertLive));
+
+// POST /api/v1/lms/lessons/:lessonId/live/join - Mark as joined (Learner)
+router.post('/lessons/:lessonId/live/join', requireAuth, asyncHandler(LiveController.joinLive));
 
 // ========================================
 // COMPLETION ROUTES (WO-O4O-COMPLETION-V1)

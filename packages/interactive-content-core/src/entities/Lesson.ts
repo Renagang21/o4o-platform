@@ -91,6 +91,17 @@ export class Lesson {
     timeLimit?: number; // in minutes
   };
 
+  // Live Lesson Fields (WO-O4O-LMS-LIVE-MINIMAL-V1)
+  // Used only when type === LessonType.LIVE.
+  @Column({ type: 'timestamp', nullable: true })
+  liveStartAt?: Date;
+
+  @Column({ type: 'timestamp', nullable: true })
+  liveEndAt?: Date;
+
+  @Column({ type: 'text', nullable: true })
+  liveUrl?: string; // YouTube URL only (validated at API layer)
+
   // Settings
   @Column({ type: 'boolean', default: true })
   isPublished!: boolean;
