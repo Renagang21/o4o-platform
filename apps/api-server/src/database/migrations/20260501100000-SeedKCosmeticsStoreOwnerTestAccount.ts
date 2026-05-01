@@ -116,14 +116,8 @@ export class SeedKCosmeticsStoreOwnerTestAccount20260501100000 implements Migrat
     }
     console.log(`[SeedKCosStoreOwner] store_member: owner`);
 
-    // 9. platform_store_slug_history (slug registry, idempotent)
-    await queryRunner.query(
-      `INSERT INTO platform_store_slug_history (id, store_id, service_key, slug, is_current, created_at, updated_at)
-       VALUES (gen_random_uuid(), $1, 'cosmetics', $2, true, NOW(), NOW())
-       ON CONFLICT DO NOTHING`,
-      [storeId, STORE_SLUG],
-    );
-    console.log(`[SeedKCosStoreOwner] slug: ${STORE_SLUG}`);
+    // Note: slug is stored directly on cosmetics_stores.slug (set above).
+    // platform_store_slug_history tracks slug *changes* only — no initial entry needed for seed.
 
     console.log(`[SeedKCosStoreOwner] Done: ${TEST_EMAIL} → cosmetics:store_owner + store "${STORE_NAME}"`);
   }
@@ -138,10 +132,9 @@ export class SeedKCosmeticsStoreOwnerTestAccount20260501100000 implements Migrat
 
     const userId = users[0].id;
 
-    // Delete store member, store, slug, enrollment, org member, org, role, membership, user
+    // Delete store member, store, enrollment, org member, org, role, membership, user
     await queryRunner.query(`DELETE FROM cosmetics.cosmetics_store_members WHERE user_id = $1`, [userId]);
     await queryRunner.query(`DELETE FROM cosmetics.cosmetics_stores WHERE code = $1`, [STORE_CODE]);
-    await queryRunner.query(`DELETE FROM platform_store_slug_history WHERE slug = $1 AND service_key = 'cosmetics'`, [STORE_SLUG]);
     await queryRunner.query(`DELETE FROM organization_service_enrollments WHERE organization_id IN (SELECT id FROM organizations WHERE code = $1)`, [STORE_CODE]);
     await queryRunner.query(`DELETE FROM organization_members WHERE user_id = $1`, [userId]);
     await queryRunner.query(`DELETE FROM organizations WHERE code = $1`, [STORE_CODE]);
