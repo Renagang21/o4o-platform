@@ -24,7 +24,6 @@ import {
   AlertTriangle,
   List,
   AlertOctagon,
-  Play,
   RefreshCw,
   Loader2 as Spinner,
   X,
@@ -85,14 +84,15 @@ interface RequestData {
   updatedAt: string;
 }
 
+// WO-O4O-FORUM-REQUEST-FLOW-SIMPLIFY-V1: 승인=즉시 포럼 생성으로 단순화
 const statusConfig: Record<CategoryRequestStatus, { label: string; color: string; bgColor: string }> = {
   pending: { label: '대기 중', color: 'text-yellow-700', bgColor: 'bg-yellow-100' },
   revision_requested: { label: '보완 요청', color: 'text-orange-700', bgColor: 'bg-orange-100' },
-  approved: { label: '승인됨 (생성 전)', color: 'text-blue-700', bgColor: 'bg-blue-100' },
-  creating: { label: '생성 중', color: 'text-indigo-700', bgColor: 'bg-indigo-100' },
-  completed: { label: '생성 완료', color: 'text-green-700', bgColor: 'bg-green-100' },
+  approved: { label: '승인됨', color: 'text-blue-700', bgColor: 'bg-blue-100' },
+  creating: { label: '처리 중', color: 'text-indigo-700', bgColor: 'bg-indigo-100' },
+  completed: { label: '승인됨', color: 'text-green-700', bgColor: 'bg-green-100' },
   failed: { label: '생성 실패', color: 'text-red-700', bgColor: 'bg-red-100' },
-  rejected: { label: '거절됨', color: 'text-slate-600', bgColor: 'bg-slate-100' },
+  rejected: { label: '거부됨', color: 'text-slate-600', bgColor: 'bg-slate-100' },
 };
 
 function formatDate(dateString: string): string {
@@ -118,23 +118,15 @@ function isReviewable(status: string): boolean {
   return status === 'pending' || status === 'revision_requested';
 }
 
-function canCreateForum(status: string): boolean {
-  return status === 'approved';
-}
-
 function canRecreateForum(status: string): boolean {
   return status === 'failed';
 }
 
 // ─── Action Policies ───
 
+// WO-O4O-FORUM-REQUEST-FLOW-SIMPLIFY-V1: createForum 제거 (승인 시 자동 생성)
 const forumRequestPolicy = defineActionPolicy<RequestData>('kpa:forum:requests', {
   rules: [
-    {
-      key: 'createForum',
-      label: '포럼 생성',
-      visible: (row) => canCreateForum(row.status),
-    },
     {
       key: 'recreateForum',
       label: '재생성',
@@ -149,7 +141,6 @@ const forumRequestPolicy = defineActionPolicy<RequestData>('kpa:forum:requests',
 });
 
 const REQUEST_ACTION_ICONS: Record<string, React.ReactNode> = {
-  createForum: <Play className="w-4 h-4" />,
   recreateForum: <RefreshCw className="w-4 h-4" />,
   review: <Eye className="w-4 h-4" />,
 };
@@ -539,7 +530,7 @@ export default function ForumManagementPage() {
         reviewComment: reviewComment || undefined,
       });
       if (result.success) {
-        toast.success(action === 'approve' ? '승인되었습니다 — 포럼 생성 버튼을 눌러 포럼을 생성하세요' : action === 'reject' ? '거절되었습니다' : '보완 요청되었습니다');
+        toast.success(action === 'approve' ? '승인되었습니다 — 포럼이 즉시 생성됩니다' : action === 'reject' ? '거부되었습니다' : '보완 요청되었습니다');
         setSelectedRequest(null);
         setReviewComment('');
         loadRequests();
@@ -651,13 +642,11 @@ export default function ForumManagementPage() {
       render: (_v, row) => (
         <RowActionMenu
           actions={buildRowActions(forumRequestPolicy, row, {
-            createForum: () => handleCreateForum(row),
             recreateForum: () => handleCreateForum(row, true),
             review: () => { setSelectedRequest(row); setReviewComment(''); },
           }, {
             icons: REQUEST_ACTION_ICONS,
             loading: {
-              createForum: creatingRequestId === row.id,
               recreateForum: creatingRequestId === row.id,
             },
           })}
@@ -816,11 +805,9 @@ export default function ForumManagementPage() {
                 <option value="all">모든 상태</option>
                 <option value="pending">대기 중</option>
                 <option value="revision_requested">보완 요청</option>
-                <option value="approved">승인됨 (생성 전)</option>
-                <option value="creating">생성 중</option>
-                <option value="completed">생성 완료</option>
+                <option value="completed">승인됨</option>
                 <option value="failed">생성 실패</option>
-                <option value="rejected">거절됨</option>
+                <option value="rejected">거부됨</option>
               </select>
               <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
             </div>
@@ -1025,18 +1012,6 @@ export default function ForumManagementPage() {
                         승인
                       </button>
                     </>
-                  )}
-                  {canCreateForum(selectedRequest.status) && (
-                    <button
-                      onClick={() => handleCreateForum(selectedRequest)}
-                      disabled={creatingRequestId === selectedRequest.id}
-                      className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
-                    >
-                      {creatingRequestId === selectedRequest.id
-                        ? <Loader2 className="w-4 h-4 animate-spin" />
-                        : <Play className="w-4 h-4" />}
-                      포럼 생성
-                    </button>
                   )}
                   {canRecreateForum(selectedRequest.status) && (
                     <button

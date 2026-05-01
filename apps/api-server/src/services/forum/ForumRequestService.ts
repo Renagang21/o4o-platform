@@ -9,7 +9,7 @@
  * - forum_category_requests 테이블 사용 (serviceCode 격리)
  * - 신청자 CRUD: create, listMy, getDetail, update
  * - 운영자 심사: review (approve/reject/revision)
- * - 승인 시 forum_category_requests.status → 'completed' 전이 (WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1)
+ * - 승인 시 즉시 포럼 생성 + status → 'completed' (WO-O4O-FORUM-REQUEST-FLOW-SIMPLIFY-V1)
  */
 
 import { AppDataSource } from '../../database/connection.js';
@@ -273,27 +273,61 @@ export class ForumRequestService {
       return { data: saved };
     }
 
-    // action === 'approve' — 승인만 (포럼 생성은 별도 명시적 호출)
-    row.status = 'approved' as any;
+    // action === 'approve' — 승인 즉시 포럼 생성 (WO-O4O-FORUM-REQUEST-FLOW-SIMPLIFY-V1)
     row.reviewerId = reviewer.id;
     row.reviewerName = reviewer.name || reviewer.email || 'Operator';
     row.reviewComment = reviewComment || undefined;
     row.reviewedAt = new Date();
-    // 재심사 시 이전 오류 메시지 초기화
     row.errorMessage = undefined;
 
-    const saved = await this.requestRepo.save(row);
-    return { data: saved };
+    try {
+      if (!row.slug) {
+        row.slug = generateSlug(row.name);
+      }
+
+      // WO-KPA-A-FORUM-OWNER-MEMBERSHIP-AUTO-SYNC-V1
+      await AppDataSource.query(
+        `INSERT INTO forum_category_members (forum_category_id, user_id, role, joined_at, created_at, updated_at)
+         VALUES ($1, $2, 'owner', NOW(), NOW(), NOW())
+         ON CONFLICT (forum_category_id, user_id) DO NOTHING`,
+        [row.id, row.requesterId],
+      );
+
+      row.status = 'completed' as any;
+      const saved = await this.requestRepo.save(row);
+
+      logger.info(`[ForumRequest] Approved & created: ${row.name} (id: ${row.id}, slug: ${row.slug})`);
+
+      return {
+        data: {
+          ...saved,
+          forum: { id: saved.id, name: saved.name, slug: saved.slug },
+        },
+      };
+    } catch (err: any) {
+      row.status = 'failed' as any;
+      row.errorMessage = err?.message || '포럼 생성 중 오류가 발생했습니다';
+      try {
+        await this.requestRepo.save(row);
+      } catch (saveErr) {
+        logger.error('[ForumRequest] Failed to persist failed status:', saveErr);
+      }
+      logger.error('[ForumRequest] Approve + create failed:', err);
+      return {
+        error: {
+          status: 500,
+          code: 'FORUM_CREATE_FAILED',
+          message: err?.message || '포럼 생성에 실패했습니다',
+        },
+      };
+    }
   }
 
   /**
-   * 포럼 생성 실행 (상태 머신: approved/failed → creating → completed/failed)
+   * 포럼 재생성 (failed → completed/failed)
    *
-   * WO-FORUM-CREATION-STATE-MACHINE-AND-ORPHAN-ZERO-V1
-   *
-   * - approved 또는 failed 상태의 신청에 대해서만 실행 가능
-   * - creating 중간 상태로 전이 후 포럼 생성
-   * - 성공 시 completed, 실패 시 failed + errorMessage
+   * WO-O4O-FORUM-REQUEST-FLOW-SIMPLIFY-V1: approve 시 자동 생성으로 전환.
+   * 이 메서드는 생성 실패(failed) 상태에서 재시도 전용.
    */
   async createForumFromRequest(
     requestId: string,
@@ -310,12 +344,13 @@ export class ForumRequestService {
       return { error: { status: 404, code: 'NOT_FOUND', message: 'Request not found' } };
     }
 
-    if (row.status !== 'approved' && (row.status as string) !== 'failed') {
+    // WO-O4O-FORUM-REQUEST-FLOW-SIMPLIFY-V1: failed 상태에서만 재시도 가능
+    if ((row.status as string) !== 'failed') {
       return {
         error: {
           status: 400,
           code: 'INVALID_STATUS',
-          message: `현재 상태(${row.status})에서는 포럼 생성을 실행할 수 없습니다. approved 또는 failed 상태에서만 가능합니다`,
+          message: `현재 상태(${row.status})에서는 재생성할 수 없습니다. failed 상태에서만 가능합니다`,
         },
       };
     }
