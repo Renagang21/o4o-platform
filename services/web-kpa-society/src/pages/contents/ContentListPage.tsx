@@ -7,15 +7,13 @@
  * WO-KPA-CONTENT-SECTION-CREATE-FLOW-ALIGN-V1 (Phase 1: 등록 흐름 정렬)
  * WO-KPA-CONTENT-HUB-SECTION-UI-V1 (Phase 2: 섹션 허브 UI 전환)
  *
- * /content를 3개 섹션의 허브로 표시:
+ * /content를 2개 섹션의 허브로 표시:
  *   1. 문서형 콘텐츠 — 메인 섹션 (리스트, 등록/상세/링크/수정/삭제)
  *   2. 코스형 자료  — 두 번째 섹션 (리스트, 등록 + 더보기)
- *   3. 설문조사     — 세 번째 섹션 (카드 preview 6개, 등록 + 더보기)
  *
  * 데이터 소스:
  *   - 문서: contentApi.list (content_type='information', sub_type='content')
  *   - 코스: lmsInstructorApi.myCourses (Phase 3에서 코스형/강의 분리)
- *   - 설문: participationApi.getParticipationSets
  *
  * 권한: 작성자만 수정/삭제 노출 (createdBy === currentUserId)
  */
@@ -23,9 +21,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { contentApi, type ContentItem } from '../../api/content';
-import { participationApi } from '../../api/participation';
 import { lmsInstructorApi } from '../../api/lms-instructor';
-import type { ParticipationSet } from '../participation/types';
 import type { Course } from '../../api/lms-instructor';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
@@ -340,83 +336,6 @@ function CoursesSection({ isAuthenticated }: { isAuthenticated: boolean }) {
   );
 }
 
-// ─── Section 3: 설문조사 ──────────────────────────────────────────────────────
-
-function SurveysSection({ isAuthenticated }: { isAuthenticated: boolean }) {
-  const navigate = useNavigate();
-  const [surveys, setSurveys] = useState<ParticipationSet[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    participationApi.getParticipationSets({ page: 1, limit: 6 })
-      .then((res) => {
-        if (cancelled) return;
-        // PaginatedResponse: { items: T[], total, page, limit, totalPages } 또는 axios wrapping
-        const payload = (res as any)?.data ?? res;
-        const list = payload?.items ?? payload?.data?.items ?? [];
-        setSurveys(Array.isArray(list) ? list : []);
-      })
-      .catch(() => {
-        if (cancelled) return;
-        setSurveys([]);
-      })
-      .finally(() => {
-        if (cancelled) return;
-        setLoading(false);
-      });
-    return () => { cancelled = true; };
-  }, []);
-
-  return (
-    <section style={styles.section}>
-      <SectionHeader
-        title="설문조사"
-        description="구성원 의견을 수집하는 설문"
-        primaryAction={isAuthenticated ? { label: '설문 등록', to: '/content/surveys/new' } : undefined}
-        moreLink={{ label: '전체 보기', to: '/content/surveys' }}
-      />
-
-      {loading ? (
-        <div style={{ ...styles.tableWrap, padding: 0 }}>
-          <div style={styles.placeholder}>불러오는 중...</div>
-        </div>
-      ) : surveys.length === 0 ? (
-        <div style={{ ...styles.tableWrap, padding: 0 }}>
-          <div style={styles.placeholder}>아직 설문이 없습니다</div>
-        </div>
-      ) : (
-        <div style={styles.cardGrid}>
-          {surveys.map((s) => (
-            <button
-              key={s.id}
-              type="button"
-              onClick={() => navigate(`/participation/${s.id}/respond`)}
-              style={styles.card}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#94a3b8'; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#e2e8f0'; }}
-            >
-              <div style={styles.cardTitle}>{s.title}</div>
-              {s.description && <div style={styles.cardDesc}>{s.description}</div>}
-              <div style={styles.cardMeta}>
-                <span>질문 {s.questions?.length ?? 0}개</span>
-                <span style={{
-                  ...styles.statusBadge,
-                  backgroundColor: s.status === 'active' ? '#ecfdf5' : s.status === 'closed' ? '#fef2f2' : '#f1f5f9',
-                  color: s.status === 'active' ? '#047857' : s.status === 'closed' ? '#b91c1c' : '#64748b',
-                }}>
-                  {s.status === 'active' ? '진행중' : s.status === 'closed' ? '종료' : '초안'}
-                </span>
-              </div>
-            </button>
-          ))}
-        </div>
-      )}
-    </section>
-  );
-}
-
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export function ContentListPage() {
@@ -432,7 +351,7 @@ export function ContentListPage() {
     <div style={styles.page}>
       <header style={styles.heroHeader}>
         <h1 style={styles.heroTitle}>콘텐츠</h1>
-        <p style={styles.heroDesc}>문서·코스형 자료·설문을 한 곳에서 관리합니다.</p>
+        <p style={styles.heroDesc}>문서·코스형 자료를 한 곳에서 관리합니다.</p>
       </header>
 
       <DocumentsSection
@@ -443,8 +362,6 @@ export function ContentListPage() {
       />
 
       <CoursesSection isAuthenticated={isAuthenticated} />
-
-      <SurveysSection isAuthenticated={isAuthenticated} />
     </div>
   );
 }
@@ -604,58 +521,6 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
   },
 
-  // Survey cards
-  cardGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-    gap: 12,
-  },
-  card: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-    padding: 16,
-    backgroundColor: '#ffffff',
-    border: '1px solid #e2e8f0',
-    borderRadius: 8,
-    cursor: 'pointer',
-    textAlign: 'left',
-    transition: 'border-color 0.15s',
-    minHeight: 100,
-  },
-  cardTitle: {
-    fontSize: '0.9375rem',
-    fontWeight: 600,
-    color: '#0f172a',
-    marginBottom: 6,
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    display: '-webkit-box',
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: 'vertical',
-    width: '100%',
-  },
-  cardDesc: {
-    fontSize: '0.8125rem',
-    color: '#64748b',
-    marginBottom: 12,
-    flex: 1,
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    display: '-webkit-box',
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: 'vertical',
-    width: '100%',
-  },
-  cardMeta: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '100%',
-    fontSize: '0.75rem',
-    color: '#94a3b8',
-    marginTop: 'auto',
-  },
 };
 
 export default ContentListPage;
