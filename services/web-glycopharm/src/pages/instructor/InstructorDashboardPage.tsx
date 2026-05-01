@@ -27,12 +27,6 @@ interface InstructorCourseStats {
 
 type InstructorCourse = LmsCourse & InstructorCourseStats;
 
-const LEVEL_LABEL: Record<string, string> = {
-  beginner: '초급',
-  intermediate: '중급',
-  advanced: '고급',
-};
-
 export default function InstructorDashboardPage() {
   const navigate = useNavigate();
   const [courses, setCourses] = useState<InstructorCourse[]>([]);
@@ -164,9 +158,6 @@ export default function InstructorDashboardPage() {
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs text-primary-600 font-medium">
-                        {LEVEL_LABEL[course.level] ?? course.level}
-                      </span>
                       <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                         course.isPublished
                           ? 'bg-green-50 text-green-700'

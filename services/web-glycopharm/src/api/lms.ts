@@ -13,7 +13,6 @@ export interface LmsCourse {
   title: string;
   description: string | null;
   thumbnail: string | null;
-  level: 'beginner' | 'intermediate' | 'advanced';
   status: string;
   duration: number;
   instructorId: string | null;
@@ -92,13 +91,11 @@ export interface LmsCertificate {
 export const lmsApi = {
   getCourses: async (params?: {
     search?: string;
-    level?: string;
     page?: number;
     limit?: number;
   }): Promise<LmsCoursesResult> => {
     const query = new URLSearchParams({ status: 'published' });
     if (params?.search) query.set('search', params.search);
-    if (params?.level && params.level !== 'all') query.set('level', params.level);
     if (params?.page) query.set('page', String(params.page));
     if (params?.limit) query.set('limit', String(params.limit));
     const { data } = await api.get<LmsCoursesResult>(`/lms/courses?${query.toString()}`);

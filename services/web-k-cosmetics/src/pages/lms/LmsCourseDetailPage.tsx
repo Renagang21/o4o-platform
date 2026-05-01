@@ -92,11 +92,6 @@ export default function LmsCourseDetailPage() {
     }
   };
 
-  const getLevelLabel = (level: string) => {
-    const labels: Record<string, string> = { beginner: '입문', intermediate: '중급', advanced: '고급' };
-    return labels[level] || level;
-  };
-
   // ─── Loading / Error ────────────────────────────────────────────────────────
 
   if (loading) {
@@ -151,7 +146,6 @@ export default function LmsCourseDetailPage() {
           {/* 강의 정보 카드 */}
           <div style={S.card}>
             <div style={S.courseHeader}>
-              <span style={S.levelBadge}>{getLevelLabel(course.level || '')}</span>
               {course.category && <span style={S.categoryBadge}>{course.category}</span>}
               {isArchived && <span style={S.archivedBadge}>종료</span>}
             </div>
@@ -267,7 +261,6 @@ const S: Record<string, React.CSSProperties> = {
   sidebar: { position: 'sticky', top: '24px', height: 'fit-content' },
   card: { backgroundColor: C.white, border: `1px solid ${C.neutral200}`, borderRadius: '12px', padding: '28px' },
   courseHeader: { display: 'flex', gap: '8px', marginBottom: '16px' },
-  levelBadge: { padding: '4px 12px', backgroundColor: C.primary, color: C.white, borderRadius: '4px', fontSize: '13px' },
   categoryBadge: { padding: '4px 12px', backgroundColor: C.neutral100, color: C.neutral700, borderRadius: '4px', fontSize: '13px' },
   title: { fontSize: '24px', fontWeight: 700, color: C.neutral900, margin: 0, marginBottom: '16px' },
   meta: { display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: C.neutral500, flexWrap: 'wrap' as const },

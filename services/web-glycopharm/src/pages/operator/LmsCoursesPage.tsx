@@ -26,7 +26,6 @@ import PageHeader from '@/components/common/PageHeader';
 interface CourseRow {
   id: string;
   title: string;
-  level: string;
   status: string;
   isPublished: boolean;
   duration: number;
@@ -41,12 +40,6 @@ interface PaginationMeta {
   totalPages: number;
 }
 
-const LEVEL_LABEL: Record<string, string> = {
-  beginner: '초급',
-  intermediate: '중급',
-  advanced: '고급',
-};
-
 // ─── Columns ─────────────────────────────────────────────────
 
 const columns: Column<CourseRow>[] = [
@@ -58,15 +51,6 @@ const columns: Column<CourseRow>[] = [
         <p className="font-medium text-slate-800 truncate max-w-xs">{row.title}</p>
         <p className="text-xs text-slate-400">{row.id.slice(0, 8)}…</p>
       </div>
-    ),
-  },
-  {
-    key: 'level',
-    header: '수준',
-    render: (row) => (
-      <span className="text-sm text-primary-600 font-medium">
-        {LEVEL_LABEL[row.level] ?? row.level}
-      </span>
     ),
   },
   {

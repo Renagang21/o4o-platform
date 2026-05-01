@@ -11,7 +11,6 @@ import {
   ArrowLeft,
   BookOpen,
   Clock,
-  BarChart2,
   Calendar,
   CheckCircle,
   PlayCircle,
@@ -26,12 +25,6 @@ import {
 import { lmsApi, type LmsCourse, type LmsLesson, type LmsQuiz, type QuizSubmitResult, type LmsCertificate } from '@/api/lms';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLoginModal } from '@/contexts/LoginModalContext';
-
-const LEVEL_LABEL: Record<string, string> = {
-  beginner: '초급',
-  intermediate: '중급',
-  advanced: '고급',
-};
 
 // ── 레슨 콘텐츠 렌더러 ───────────────────────────────────────────────────────
 function LessonContent({ lesson }: { lesson: LmsLesson }) {
@@ -440,16 +433,12 @@ export default function CourseDetailPage() {
           </div>
         )}
         <div className="p-6">
-          <span className="inline-block px-3 py-1 bg-primary-50 text-primary-700 text-xs font-medium rounded-full mb-3">
-            {LEVEL_LABEL[course.level] ?? course.level}
-          </span>
           <h1 className="text-2xl font-bold text-slate-800 mb-3">{course.title}</h1>
 
           <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500 mb-4">
             {course.duration > 0 && (
               <span className="flex items-center gap-1.5"><Clock className="w-4 h-4" />{course.duration}분</span>
             )}
-            <span className="flex items-center gap-1.5"><BarChart2 className="w-4 h-4" />{LEVEL_LABEL[course.level] ?? course.level}</span>
             <span className="flex items-center gap-1.5">
               <Calendar className="w-4 h-4" />
               {new Date(course.createdAt).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}

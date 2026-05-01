@@ -17,7 +17,6 @@ function mapCourse(c: LmsCourse): LmsHubCourse {
     title: c.title,
     description: c.description,
     thumbnail: c.thumbnail,
-    level: c.level,
     status: c.status,
     duration: c.duration,
     createdAt: c.createdAt,

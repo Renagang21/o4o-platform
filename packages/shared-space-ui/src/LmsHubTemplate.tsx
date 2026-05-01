@@ -30,8 +30,6 @@ export interface LmsHubCourse {
   title: string;
   description?: string | null;
   thumbnail?: string | null;
-  /** 수준 (beginner / intermediate / advanced 등) */
-  level?: string;
   /** 상태 (published / draft / archived) */
   status?: string;
   /** 총 재생시간(분) */
@@ -51,7 +49,6 @@ export interface LmsHubCourse {
 
 export interface LmsHubFetchParams {
   search?: string;
-  level?: string;
   page?: number;
   limit?: number;
 }
@@ -216,7 +213,7 @@ export function LmsHubTemplate({ config }: { config: LmsHubConfig }) {
       header: '유형',
       width: '12%',
       render: (_v, row) => {
-        const label = row.category || row.level || '-';
+        const label = row.category || '-';
         return (
           <span style={colStyles.badge}>{label}</span>
         );
