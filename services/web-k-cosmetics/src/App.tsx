@@ -122,6 +122,8 @@ const OperatorApplicationsPage = lazy(() => import('@/pages/operator/Application
 const OperatorProductsPage = lazy(() => import('@/pages/operator/ProductsPage'));
 const OperatorProductDetailPage = lazy(() => import('@/pages/operator/ProductDetailPage'));
 const OperatorOrdersPage = lazy(() => import('@/pages/operator/OrdersPage'));
+// WO-O4O-EVENT-OFFER-KCOS-OPERATOR-APPROVAL-V1
+const OperatorEventOfferApprovalsPage = lazy(() => import('@/pages/operator/EventOfferApprovalsPage'));
 const OperatorUsersPage = lazy(() => import('@/pages/operator/UsersPage'));
 const OperatorUserDetailPage = lazy(() => import('@/pages/operator/UserDetailPage'));
 const OperatorSettingsPage = lazy(() => import('@/pages/operator/SettingsPage'));
@@ -359,6 +361,8 @@ function AppRoutes() {
         <Route path="stores" element={<OperatorStoresPage />} />
         <Route path="stores/:storeId" element={<OperatorStoreDetailPage />} />
         <Route path="orders" element={<OperatorOrdersPage />} />
+        {/* WO-O4O-EVENT-OFFER-KCOS-OPERATOR-APPROVAL-V1: 이벤트 오퍼 승인 */}
+        <Route path="event-offers" element={<OperatorEventOfferApprovalsPage />} />
         {/* WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: Deprecated routes removed (inventory, settlements, analytics, marketing) */}
         <Route path="signage/content" element={<SignageContentHubPage />} />
               <Route path="signage/playlist/:id" element={<SignagePlaylistDetailPage />} />

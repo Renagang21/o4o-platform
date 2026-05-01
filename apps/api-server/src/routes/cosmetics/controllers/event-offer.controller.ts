@@ -11,16 +11,20 @@
  *   진열 row가 생성됨 (WO-O4O-EVENT-OFFER-STORE-PRODUCT-LINK-V1)
  *
  * Routes (mounted at /api/v1/cosmetics/event-offers):
- * - GET  /                  (optionalAuth)              — Public listing
- * - GET  /enriched          (optionalAuth)              — Enriched listing
- * - GET  /stats             (auth + cosmetics:operator) — Operator stats
- * - GET  /my-participations (authenticate)              — My participations
- * - GET  /:id               (optionalAuth)              — Detail (+ availability if logged in)
- * - POST /                  (auth + cosmetics:operator) — Create event offer (operator)
- * - POST /:id/participate   (authenticate)              — Create participation order
+ * - GET  /                          (optionalAuth)              — Public listing
+ * - GET  /enriched                  (optionalAuth)              — Enriched listing
+ * - GET  /stats                     (auth + cosmetics:operator) — Operator stats
+ * - GET  /my-participations         (authenticate)              — My participations
+ * - GET  /pending-listings          (auth + cosmetics:operator) — Approval queue (WO-O4O-EVENT-OFFER-KCOS-OPERATOR-APPROVAL-V1)
+ * - GET  /:id                       (optionalAuth)              — Detail (+ availability if logged in)
+ * - POST /                          (auth + cosmetics:operator) — Create event offer (operator)
+ * - POST /:id/participate           (authenticate)              — Create participation order
+ * - POST /products/:id/approve      (auth + cosmetics:operator) — Approve pending OPL (WO-O4O-EVENT-OFFER-KCOS-OPERATOR-APPROVAL-V1)
+ * - POST /products/:id/reject       (auth + cosmetics:operator) — Reject pending OPL (WO-O4O-EVENT-OFFER-KCOS-OPERATOR-APPROVAL-V1)
  *
- * NOTE: Supplier create endpoint는 미구현 — K-Cos supplier ↔ organization 매핑
- *       메커니즘이 명확하지 않아 IR로 분리 (WO-O4O-EVENT-OFFER-KCOS-CREATE-V1 §2).
+ * NOTE: K-Cos supplier 직접 create는 multi-service proposal에서 처리됨
+ *       (WO-O4O-EVENT-OFFER-MULTI-SERVICE-PROPOSAL-V1).
+ *       이 controller는 K-Cos operator 책임 영역만 담당.
  */
 
 import { Router, Request, Response, RequestHandler } from 'express';
@@ -121,6 +125,110 @@ export function createCosmeticsEventOfferController(
         data,
         pagination: { page: 1, limit: 20, total, totalPages: Math.ceil(total / 20) },
       });
+    }),
+  );
+
+  // ─── WO-O4O-EVENT-OFFER-KCOS-OPERATOR-APPROVAL-V1 ─────────────────────────
+  // Approval Queue: supplier가 multi-service proposal로 제안한 pending OPL을
+  // K-Cos operator가 승인/반려.
+  //
+  // KPA approval과 동일한 EventOfferService 메서드를 사용하되,
+  // SK = K_COSMETICS_EVENT_OFFER로 격리.
+
+  /**
+   * GET /pending-listings — Approval queue (K-Cos operator 전용)
+   *
+   * /:id 캐치를 피하기 위해 /:id 위에 등록.
+   */
+  router.get(
+    '/pending-listings',
+    authenticate,
+    requireCosmeticsScope('cosmetics:operator'),
+    asyncHandler(async (req: Request, res: Response) => {
+      const page = Math.max(1, parseInt(String(req.query.page ?? '1'), 10) || 1);
+      const limit = Math.min(100, Math.max(1, parseInt(String(req.query.limit ?? '50'), 10) || 50));
+
+      const result = await service.listPendingListings(SK, page, limit);
+
+      res.json({
+        success: true,
+        data: result.data,
+        pagination: { page, limit, total: result.total },
+      });
+    }),
+  );
+
+  /**
+   * POST /products/:id/approve — pending OPL 승인 (K-Cos operator 전용)
+   */
+  router.post(
+    '/products/:id/approve',
+    authenticate,
+    requireCosmeticsScope('cosmetics:operator'),
+    asyncHandler(async (req: Request, res: Response) => {
+      const user = (req as any).user;
+      if (!user?.id) {
+        res.status(401).json({ success: false, error: { message: 'Unauthorized' } });
+        return;
+      }
+
+      try {
+        const result = await service.approveListing(req.params.id, user.id);
+        res.json({ success: true, data: result });
+      } catch (err) {
+        if (err instanceof EventOfferCreateError) {
+          const messageMap: Record<string, string> = {
+            NOT_FOUND:      '이벤트를 찾을 수 없습니다.',
+            INVALID_STATE:  '대기중(pending) 상태에서만 승인할 수 있습니다.',
+            INTERNAL_ERROR: '서버 오류가 발생했습니다.',
+          };
+          res.status(err.statusCode).json({
+            success: false,
+            error: { code: err.code, message: messageMap[err.code] ?? err.message },
+          });
+          return;
+        }
+        throw err;
+      }
+    }),
+  );
+
+  /**
+   * POST /products/:id/reject — pending OPL 반려 (K-Cos operator 전용)
+   * body: { reason: string } 필수
+   */
+  router.post(
+    '/products/:id/reject',
+    authenticate,
+    requireCosmeticsScope('cosmetics:operator'),
+    asyncHandler(async (req: Request, res: Response) => {
+      const user = (req as any).user;
+      if (!user?.id) {
+        res.status(401).json({ success: false, error: { message: 'Unauthorized' } });
+        return;
+      }
+
+      const reason = (req.body?.reason ?? '') as string;
+
+      try {
+        const result = await service.rejectListing(req.params.id, user.id, reason);
+        res.json({ success: true, data: result });
+      } catch (err) {
+        if (err instanceof EventOfferCreateError) {
+          const messageMap: Record<string, string> = {
+            NOT_FOUND:       '이벤트를 찾을 수 없습니다.',
+            INVALID_STATE:   '대기중(pending) 상태에서만 반려할 수 있습니다.',
+            INVALID_REASON:  '반려 사유를 입력해 주세요.',
+            INTERNAL_ERROR:  '서버 오류가 발생했습니다.',
+          };
+          res.status(err.statusCode).json({
+            success: false,
+            error: { code: err.code, message: messageMap[err.code] ?? err.message },
+          });
+          return;
+        }
+        throw err;
+      }
     }),
   );
 
