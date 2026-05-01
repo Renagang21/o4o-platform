@@ -83,7 +83,7 @@ export default function MyProfilePage() {
           value={user.name}
           editValue={editData.name}
           isEditing={isEditing}
-          onChange={(v) => setEditData(prev => ({ ...prev, name: v }))}
+          onChange={(v: string) => setEditData(prev => ({ ...prev, name: v }))}
           icon={<User className="w-5 h-5 text-gray-400" />}
         />
         <ProfileInfoField
@@ -91,7 +91,7 @@ export default function MyProfilePage() {
           value={user.nickname || '-'}
           editValue={editData.nickname}
           isEditing={isEditing}
-          onChange={(v) => setEditData(prev => ({ ...prev, nickname: v }))}
+          onChange={(v: string) => setEditData(prev => ({ ...prev, nickname: v }))}
           icon={<User className="w-5 h-5 text-gray-400" />}
         />
         {!isEditing && user.nickname && (
