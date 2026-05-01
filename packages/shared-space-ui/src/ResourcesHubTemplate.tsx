@@ -690,6 +690,30 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
 
   return (
     <div style={st.container}>
+      {/*
+       * WO-KPA-RESOURCES-VIEW-HTML-RENDERING-FIX-V1:
+       *   드로어 본문 CSS와 spinner keyframes 모두 컴포넌트 mount 동안 항상 유지되도록
+       *   loading 분기 안이 아닌 최상단에 배치한다. (이전에는 loading 종료 시 style이
+       *   언마운트되어 .o4o-drawer-body 규칙이 사라졌고, 글로벌 reset CSS와 결합되면
+       *   <p>/<a>/<ul> 시각 차이가 사라져 코드처럼 보이는 증상이 발생했음.)
+       */}
+      <style>{`@keyframes o4o-rhub-spin { to { transform: rotate(360deg); } }
+.o4o-drawer-body { word-break: break-word; }
+.o4o-drawer-body a { color: #2563EB; text-decoration: underline; }
+.o4o-drawer-body a:hover { color: #1D4ED8; }
+.o4o-drawer-body p { margin: 0 0 0.75em; }
+.o4o-drawer-body ul, .o4o-drawer-body ol { padding-left: 1.25em; margin: 0 0 0.75em; }
+.o4o-drawer-body li { margin: 0.15em 0; }
+.o4o-drawer-body h1, .o4o-drawer-body h2, .o4o-drawer-body h3, .o4o-drawer-body h4 { font-weight: 600; margin: 1em 0 0.5em; line-height: 1.3; }
+.o4o-drawer-body h1 { font-size: 1.25em; }
+.o4o-drawer-body h2 { font-size: 1.15em; }
+.o4o-drawer-body h3 { font-size: 1.05em; }
+.o4o-drawer-body h4 { font-size: 1em; }
+.o4o-drawer-body img { max-width: 100%; height: auto; border-radius: 6px; margin: 0.5em 0; }
+.o4o-drawer-body blockquote { margin: 0.5em 0; padding: 0.5em 1em; border-left: 3px solid #E5E7EB; color: #4B5563; background: #F9FAFB; }
+.o4o-drawer-body pre { background: #F3F4F6; padding: 0.75em 1em; border-radius: 6px; overflow-x: auto; font-size: 0.875em; }
+.o4o-drawer-body code { background: #F3F4F6; padding: 0.1em 0.3em; border-radius: 3px; font-family: ui-monospace, monospace; font-size: 0.9em; }
+`}</style>
       {/* Block 1: Hero / Intro */}
       <div style={st.header}>
         <div>
@@ -739,12 +763,6 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
       {loading ? (
         <div style={st.center}>
           <div style={st.spinner} />
-          <style>{`@keyframes o4o-rhub-spin { to { transform: rotate(360deg); } }
-.o4o-drawer-body a { color: #2563EB; text-decoration: underline; }
-.o4o-drawer-body a:hover { color: #1D4ED8; }
-.o4o-drawer-body p { margin: 0 0 0.75em; }
-.o4o-drawer-body ul, .o4o-drawer-body ol { padding-left: 1.25em; margin: 0 0 0.75em; }
-`}</style>
           <p style={{ color: '#6B7280', marginTop: 12 }}>
             {config.loadingMessage ?? '자료를 불러오는 중...'}
           </p>
