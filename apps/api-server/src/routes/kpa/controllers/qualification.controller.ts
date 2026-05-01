@@ -84,7 +84,7 @@ export function createQualificationController(
                 request_data: existing.metadata || requestData,
               });
               await reqRepo.save(recoveryReq);
-              console.log(`[Qualification] recovered missing qualification_request for user=${userId} type=${qualType}`);
+              console.warn(`[Qualification] recovered missing qualification_request for user=${userId} type=${qualType}`);
             }
             res.status(409).json({ success: false, error: '이미 검토 중인 신청이 있습니다.', code: 'ALREADY_PENDING' });
             return;
