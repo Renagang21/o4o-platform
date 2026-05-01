@@ -358,11 +358,21 @@ export class ForumPostController extends ForumControllerBase {
         post.metadata = normalizeMetadata(mergedMetadata);
       }
 
-      const updatedPost = await this.postRepository.save(post);
+      await this.postRepository.save(post);
+
+      // WO-O4O-FORUM-POST-EDIT-SAVE-STABILITY-FIX-V1:
+      // Reload with author relation for flattenPostFields (consistent with getPost)
+      const updatedPost = await this.postRepository
+        .createQueryBuilder('post')
+        .leftJoinAndSelect('post.author', 'author')
+        .where('post.id = :id', { id: post.id })
+        .getOne();
+
+      this.sanitizeUser((updatedPost as any)?.author);
 
       res.json({
         success: true,
-        data: updatedPost,
+        data: updatedPost ? this.flattenPostFields(updatedPost) : post,
       });
     } catch (error: any) {
       logger.error('Error updating forum post:', error);

@@ -434,8 +434,8 @@ export default function RegisterModal() {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">닉네임 <span className="text-red-500">*</span></label>
                       <input type="text" name="nickname" value={formData.nickname} onChange={handleInputChange}
-                        placeholder="포럼 표시명" required className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                      <p className="text-xs text-gray-500 mt-1">포럼에 표시될 이름</p>
+                        placeholder="활동 시 사용할 이름 입력" maxLength={50} required className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                      <p className="text-xs text-gray-500 mt-1">포럼, 댓글 등 공개 화면에 표시되는 이름입니다. (최대 50자)</p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">핸드폰 번호 <span className="text-red-500">*</span></label>

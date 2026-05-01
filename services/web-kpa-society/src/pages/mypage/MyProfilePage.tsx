@@ -49,6 +49,7 @@ export function MyProfilePage() {
   const [basicForm, setBasicForm] = useState({
     lastName: '',
     firstName: '',
+    nickname: '',
     phone: '',
     email: '',
   });
@@ -96,6 +97,7 @@ export function MyProfilePage() {
     setBasicForm({
       lastName: data.lastName || '',
       firstName: data.firstName || '',
+      nickname: data.nickname || '',
       phone: data.phone || '',
       email: data.email || '',
     });
@@ -304,6 +306,13 @@ export function MyProfilePage() {
                 </div>
 
                 <div style={styles.field}>
+                  <label style={styles.label}>닉네임</label>
+                  <input type="text" style={styles.input} value={basicForm.nickname}
+                    onChange={e => setBasicForm({ ...basicForm, nickname: e.target.value })} placeholder="활동 시 사용할 이름 입력" maxLength={50} />
+                  <p style={styles.hint}>실제 이름과 별도로 공개 화면(포럼, 댓글 등)에 표시됩니다.</p>
+                </div>
+
+                <div style={styles.field}>
                   <label style={styles.label}>핸드폰</label>
                   <input type="tel" style={styles.input} value={basicForm.phone}
                     onChange={e => setBasicForm({ ...basicForm, phone: e.target.value })} placeholder="연락처를 입력하세요" />
@@ -325,6 +334,13 @@ export function MyProfilePage() {
                 <div style={styles.infoRow}>
                   <span style={styles.infoLabel}>이름</span>
                   <span style={styles.infoValue}>{profile?.name || '-'}</span>
+                </div>
+                <div style={styles.infoRow}>
+                  <span style={styles.infoLabel}>닉네임</span>
+                  <div style={{ textAlign: 'right' }}>
+                    <span style={styles.infoValue}>{profile?.nickname || '-'}</span>
+                    <p style={styles.hint}>포럼, 댓글 등 공개 화면에 표시됩니다.</p>
+                  </div>
                 </div>
                 <div style={styles.infoRow}>
                   <span style={styles.infoLabel}>핸드폰</span>

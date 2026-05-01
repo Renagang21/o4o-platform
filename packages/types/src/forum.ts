@@ -63,6 +63,7 @@ export type ForumRequestStatus = 'pending' | 'revision_requested' | 'approved' |
 export interface ForumAuthorResponse {
   id: string;
   name?: string;
+  nickname?: string | null;  // WO-FORUM-NICKNAME-UNIFICATION-V1
   username?: string;
   email?: string;
   /** WO-NETURE-EXTERNAL-CONTACT-V1 */

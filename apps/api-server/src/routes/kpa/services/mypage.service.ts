@@ -67,6 +67,7 @@ export class MypageService {
       name: fullUser?.name || '',
       lastName: fullUser?.lastName || '',
       firstName: fullUser?.firstName || '',
+      nickname: fullUser?.nickname || null,
       email: fullUser?.email || '',
       phone: fullUser?.phone || '',
       roles: roles,
@@ -110,7 +111,7 @@ export class MypageService {
    */
   async updateProfile(
     userId: string,
-    data: { name?: string; lastName?: string; firstName?: string; phone?: string; university?: string; workplace?: string },
+    data: { name?: string; lastName?: string; firstName?: string; nickname?: string; phone?: string; university?: string; workplace?: string },
     currentUser: any,
   ): Promise<any> {
     const userRepository = this.dataSource.getRepository('User');
@@ -120,6 +121,7 @@ export class MypageService {
     if (data.name !== undefined) updateData.name = data.name;
     if (data.lastName !== undefined) updateData.lastName = data.lastName;
     if (data.firstName !== undefined) updateData.firstName = data.firstName;
+    if (data.nickname !== undefined) updateData.nickname = data.nickname;
     if (data.phone !== undefined) updateData.phone = data.phone ? data.phone.replace(/\D/g, '') : data.phone;
     if (data.university !== undefined) updateData.university = data.university;
     if (data.workplace !== undefined) updateData.workplace = data.workplace;
@@ -141,6 +143,7 @@ export class MypageService {
       name: updatedUser?.name || '',
       lastName: updatedUser?.lastName || '',
       firstName: updatedUser?.firstName || '',
+      nickname: updatedUser?.nickname || null,
       email: updatedUser?.email || '',
       phone: updatedUser?.phone || '',
     };

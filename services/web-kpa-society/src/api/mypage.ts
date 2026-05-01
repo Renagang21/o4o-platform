@@ -15,6 +15,7 @@ import type {
 export interface ProfileUpdateRequest {
   lastName?: string;
   firstName?: string;
+  nickname?: string;
   phone?: string;
   email?: string;
   university?: string;
@@ -51,6 +52,7 @@ export interface ProfileResponse {
   name: string;
   lastName: string;
   firstName: string;
+  nickname: string | null;
   email: string;
   phone: string;
   roles: string[];

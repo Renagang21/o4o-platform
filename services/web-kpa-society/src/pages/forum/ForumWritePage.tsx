@@ -66,8 +66,18 @@ export function ForumWritePage() {
           navigate(`/forum/post/${res.data.id}`);
         }
       }
-    } catch {
-      toast.error('저장에 실패했습니다.');
+    } catch (err: any) {
+      console.error('[ForumWritePage] save failed:', err);
+      const status = err?.status;
+      if (status === 401) {
+        toast.error('로그인이 만료되었습니다. 다시 로그인해 주세요.');
+      } else if (status === 403) {
+        toast.error('이 글을 수정할 권한이 없습니다.');
+      } else if (status === 404) {
+        toast.error('게시글을 찾을 수 없습니다.');
+      } else {
+        toast.error('저장에 실패했습니다.');
+      }
     } finally {
       setSubmitting(false);
     }
@@ -99,6 +109,12 @@ export function ForumWritePage() {
       />
 
       <Card padding="large">
+        <div style={styles.authorInfo}>
+          <span style={styles.authorLabel}>작성자 표시명:</span>
+          <span style={styles.authorName}>{user.nickname || user.name}</span>
+          <p style={styles.authorHint}>(표시명은 프로필에서 변경할 수 있습니다)</p>
+        </div>
+
         <form onSubmit={handleSubmit}>
           <div style={styles.field}>
             <label style={styles.label}>제목</label>
@@ -150,6 +166,32 @@ const styles: Record<string, React.CSSProperties> = {
     maxWidth: '800px',
     margin: '0 auto',
     padding: '0 20px 40px',
+  },
+  authorInfo: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '12px 16px',
+    backgroundColor: colors.neutral50,
+    borderRadius: '8px',
+    marginBottom: '24px',
+  },
+  authorLabel: {
+    fontSize: '13px',
+    color: colors.neutral500,
+  },
+  authorName: {
+    fontSize: '14px',
+    fontWeight: 600,
+    color: colors.neutral900,
+  },
+  authorHint: {
+    fontSize: '12px',
+    color: colors.neutral400,
+    margin: 0,
+    width: '100%',
+    marginTop: '2px',
   },
   loginPrompt: {
     ...typography.bodyL,

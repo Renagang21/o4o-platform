@@ -65,9 +65,12 @@ export class ForumCommentController extends ForumControllerBase {
       // WO-KPA-A-FORUM-CREATOR-SENSITIVE-FIELDS-EXPOSURE-HOTFIX-V1
       comments.forEach(c => this.sanitizeUser((c as any).author));
 
+      // WO-FORUM-NICKNAME-UNIFICATION-KPA-FIRST-V1: flatten authorName for frontend
+      const flattenedComments = comments.map(c => this.flattenPostFields(c));
+
       res.json({
         success: true,
-        data: comments,
+        data: flattenedComments,
         pagination: {
           page,
           limit,
@@ -162,9 +165,10 @@ export class ForumCommentController extends ForumControllerBase {
       // WO-KPA-A-FORUM-CREATOR-SENSITIVE-FIELDS-EXPOSURE-HOTFIX-V1
       this.sanitizeUser((commentWithAuthor as any)?.author);
 
+      // WO-FORUM-NICKNAME-UNIFICATION-KPA-FIRST-V1: flatten authorName
       res.status(201).json({
         success: true,
-        data: commentWithAuthor,
+        data: commentWithAuthor ? this.flattenPostFields(commentWithAuthor) : commentWithAuthor,
       });
     } catch (error: any) {
       logger.error('Error creating forum comment:', error);
@@ -223,7 +227,8 @@ export class ForumCommentController extends ForumControllerBase {
       // WO-KPA-A-FORUM-CREATOR-SENSITIVE-FIELDS-EXPOSURE-HOTFIX-V1
       this.sanitizeUser((updated as any)?.author);
 
-      res.status(200).json({ success: true, data: updated });
+      // WO-FORUM-NICKNAME-UNIFICATION-KPA-FIRST-V1: flatten authorName
+      res.status(200).json({ success: true, data: updated ? this.flattenPostFields(updated) : updated });
     } catch (error: any) {
       logger.error('Error updating forum comment:', error);
       res.status(500).json({ success: false, error: error.message || 'Failed to update comment' });
