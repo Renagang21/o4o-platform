@@ -20,7 +20,7 @@ import { useNavigate } from 'react-router-dom';
 import { Tag, ChevronLeft, ChevronRight, Package, Plus, X, Loader2 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { netureEventOfferApi, supplierKpaEventOfferApi } from '../../lib/api';
-import type { ProposableOffer } from '../../lib/api';
+import type { ProposableOffer, MyEventOfferProposal } from '../../lib/api';
 
 type StatusTab = 'active' | 'ended' | 'all';
 
@@ -54,6 +54,8 @@ const STATUS_LABEL: Record<string, { label: string; cls: string }> = {
   ended:    { label: '종료',    cls: 'bg-slate-100 text-slate-500' },
   approved: { label: '승인됨',  cls: 'bg-blue-100 text-blue-700' },
   pending:  { label: '검토중',  cls: 'bg-yellow-100 text-yellow-700' },
+  // WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1
+  rejected: { label: '반려',    cls: 'bg-red-100 text-red-700' },
   canceled: { label: '취소',    cls: 'bg-red-100 text-red-500' },
 };
 
@@ -87,6 +89,22 @@ export default function SupplierEventOfferPage() {
   const [proposableOffers, setProposableOffers] = useState<ProposableOffer[]>([]);
   const [proposableLoading, setProposableLoading] = useState(false);
   const [proposingId, setProposingId] = useState<string | null>(null);
+
+  // WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1: 내 제안 현황
+  const [myProposals, setMyProposals] = useState<MyEventOfferProposal[]>([]);
+  const [proposalsLoading, setProposalsLoading] = useState(false);
+
+  const loadMyProposals = useCallback(async () => {
+    setProposalsLoading(true);
+    try {
+      const data = await supplierKpaEventOfferApi.listMyProposals();
+      setMyProposals(data);
+    } catch {
+      setMyProposals([]);
+    } finally {
+      setProposalsLoading(false);
+    }
+  }, []);
 
   const fetchItems = useCallback(async (p: number, status: StatusTab) => {
     setLoading(true);
@@ -138,9 +156,10 @@ export default function SupplierEventOfferPage() {
     try {
       await supplierKpaEventOfferApi.proposeOffer(offerId);
       toast.success(`"${title}" 이(가) 이벤트로 제안되었습니다. 운영자 승인 후 노출됩니다.`);
-      // 제안 성공 → 모달 닫고 현재 탭 새로고침
+      // 제안 성공 → 모달 닫고 현재 탭 + 내 제안 현황 새로고침
       handleClosePropose();
       fetchItems(page, activeTab);
+      loadMyProposals();
     } catch (err: unknown) {
       const code = extractErrorCode(err);
       const msg = code && PROPOSE_ERROR_MESSAGES[code]
@@ -154,11 +173,16 @@ export default function SupplierEventOfferPage() {
     } finally {
       setProposingId(null);
     }
-  }, [page, activeTab, fetchItems, handleClosePropose, loadProposableOffers]);
+  }, [page, activeTab, fetchItems, handleClosePropose, loadProposableOffers, loadMyProposals]);
 
   useEffect(() => {
     fetchItems(1, activeTab);
   }, [activeTab]);
+
+  // WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1: 내 제안 현황 — 페이지 로드 시 1회 조회
+  useEffect(() => {
+    loadMyProposals();
+  }, [loadMyProposals]);
 
   return (
     <div className="max-w-5xl mx-auto p-6">
@@ -188,6 +212,56 @@ export default function SupplierEventOfferPage() {
           </button>
         </div>
       </div>
+
+      {/* WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1: 내 제안 현황 */}
+      {(proposalsLoading || myProposals.length > 0) && (
+        <div className="mb-6 rounded-xl border border-slate-200 bg-white p-5">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <h2 className="text-sm font-semibold text-slate-800">내 제안 현황</h2>
+              <p className="text-xs text-slate-500 mt-0.5">
+                내가 제안한 이벤트의 승인 상태입니다. 반려된 경우 사유를 확인하세요.
+              </p>
+            </div>
+            <span className="text-xs text-slate-500">총 {myProposals.length}건</span>
+          </div>
+          {proposalsLoading && myProposals.length === 0 ? (
+            <div className="py-6 text-center text-sm text-slate-500">불러오는 중...</div>
+          ) : (
+            <ul className="divide-y divide-slate-100">
+              {myProposals.map((p) => {
+                const badge = STATUS_LABEL[p.status] ?? { label: p.status, cls: 'bg-slate-100 text-slate-500' };
+                return (
+                  <li key={p.id} className="py-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-slate-800 truncate">{p.title}</p>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          {p.price != null && (
+                            <span>₩{Number(p.price).toLocaleString()}</span>
+                          )}
+                          <span className="ml-2 text-slate-400">제안: {formatDate(p.proposedAt)}</span>
+                          {p.decidedAt && (
+                            <span className="ml-2 text-slate-400">결정: {formatDate(p.decidedAt)}</span>
+                          )}
+                        </p>
+                      </div>
+                      <span className={`text-xs px-2.5 py-1 rounded-full font-medium inline-block flex-shrink-0 ${badge.cls}`}>
+                        {badge.label}
+                      </span>
+                    </div>
+                    {p.status === 'rejected' && p.rejectedReason && (
+                      <div className="mt-2 ml-0 px-3 py-2 bg-red-50 border-l-2 border-red-300 rounded text-xs text-red-700">
+                        <span className="font-semibold">반려 사유:</span> {p.rejectedReason}
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+      )}
 
       {/* Status Tabs */}
       <div className="flex gap-1 mb-6 border-b border-slate-200">

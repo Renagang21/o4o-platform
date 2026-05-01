@@ -76,6 +76,9 @@ const ERROR_CODES = {
   OFFER_NOT_FOUND: { code: 'OFFER_NOT_FOUND', message: '공급자 상품을 찾을 수 없습니다.' },
   ALREADY_REGISTERED: { code: 'ALREADY_REGISTERED', message: '이미 등록된 이벤트 상품입니다.' },
   ORG_NOT_FOUND: { code: 'ORG_NOT_FOUND', message: '운영자 조직 정보를 찾을 수 없습니다.' },
+  // WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1: Approval Queue 에러
+  INVALID_STATE: { code: 'INVALID_STATE', message: '대기중(pending) 상태에서만 승인/반려할 수 있습니다.' },
+  INVALID_REASON: { code: 'INVALID_REASON', message: '반려 사유를 입력해 주세요.' },
 } as const;
 
 function createErrorResponse(
@@ -328,6 +331,8 @@ export function createEventOfferOperatorController(
           serviceKey: SERVICE_KEYS.KPA_GROUPBUY,
           organizationId,
           roleType: 'operator',
+          // WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1: operator 즉시 승인 → decided_by 기록
+          operatorUserId: userId,
         });
 
         res.json({
@@ -358,11 +363,109 @@ export function createEventOfferOperatorController(
             ALREADY_LISTED: 'ALREADY_REGISTERED',
             OFFER_NOT_OWNED: 'INTERNAL_ERROR', // operator 분기에서는 발생 불가
             INTERNAL_ERROR: 'INTERNAL_ERROR',
+            // WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1
+            NOT_FOUND: 'NOT_FOUND',
+            INVALID_STATE: 'INVALID_STATE',
+            INVALID_REASON: 'INVALID_REASON',
           };
           createErrorResponse(res, error.statusCode, map[error.code] ?? 'INTERNAL_ERROR');
           return;
         }
         console.error('Failed to add event offer product:', error);
+        createErrorResponse(res, 500, 'INTERNAL_ERROR');
+      }
+    }
+  );
+
+  // ─── WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1 ──────────────────────────────
+  // Approval Queue: pending 목록 조회 + 승인/반려 endpoint.
+
+  /**
+   * GET /groupbuy-admin/pending-listings
+   * supplier가 제안한 pending OPL 목록 (승인 대기열).
+   */
+  router.get(
+    '/pending-listings',
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const page = Math.max(1, parseInt(String(req.query.page ?? '1'), 10) || 1);
+        const limit = Math.min(100, Math.max(1, parseInt(String(req.query.limit ?? '50'), 10) || 50));
+
+        const service = new EventOfferService(dataSource);
+        const result = await service.listPendingListings(SERVICE_KEYS.KPA_GROUPBUY, page, limit);
+
+        res.json({
+          success: true,
+          data: result.data,
+          pagination: { page, limit, total: result.total },
+        });
+      } catch (error: any) {
+        console.error('Failed to list pending listings:', error);
+        createErrorResponse(res, 500, 'INTERNAL_ERROR');
+      }
+    }
+  );
+
+  /**
+   * POST /groupbuy-admin/products/:id/approve
+   * pending OPL 승인 → status='approved', is_active=true.
+   */
+  router.post(
+    '/products/:id/approve',
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const { id } = req.params;
+        const userId = (req as any).user?.id;
+
+        const service = new EventOfferService(dataSource);
+        const result = await service.approveListing(id, userId);
+
+        res.json({ success: true, data: result });
+      } catch (error: any) {
+        if (error instanceof EventOfferCreateError) {
+          const map: Record<string, keyof typeof ERROR_CODES> = {
+            NOT_FOUND: 'NOT_FOUND',
+            INVALID_STATE: 'INVALID_STATE',
+            INTERNAL_ERROR: 'INTERNAL_ERROR',
+          };
+          createErrorResponse(res, error.statusCode, map[error.code] ?? 'INTERNAL_ERROR');
+          return;
+        }
+        console.error('Failed to approve event offer:', error);
+        createErrorResponse(res, 500, 'INTERNAL_ERROR');
+      }
+    }
+  );
+
+  /**
+   * POST /groupbuy-admin/products/:id/reject
+   * pending OPL 반려 → status='rejected', is_active=false, rejected_reason.
+   * body: { reason: string }
+   */
+  router.post(
+    '/products/:id/reject',
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const { id } = req.params;
+        const userId = (req as any).user?.id;
+        const { reason } = req.body || {};
+
+        const service = new EventOfferService(dataSource);
+        const result = await service.rejectListing(id, userId, reason ?? '');
+
+        res.json({ success: true, data: result });
+      } catch (error: any) {
+        if (error instanceof EventOfferCreateError) {
+          const map: Record<string, keyof typeof ERROR_CODES> = {
+            NOT_FOUND: 'NOT_FOUND',
+            INVALID_STATE: 'INVALID_STATE',
+            INVALID_REASON: 'INVALID_REASON',
+            INTERNAL_ERROR: 'INTERNAL_ERROR',
+          };
+          createErrorResponse(res, error.statusCode, map[error.code] ?? 'INTERNAL_ERROR');
+          return;
+        }
+        console.error('Failed to reject event offer:', error);
         createErrorResponse(res, 500, 'INTERNAL_ERROR');
       }
     }

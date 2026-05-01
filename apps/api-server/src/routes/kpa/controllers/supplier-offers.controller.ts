@@ -11,7 +11,7 @@
  *
  * API:
  *   GET  /kpa/supplier/my-offers           — 제안 가능한 SPO 목록
- *   GET  /kpa/supplier/event-offers        — 내 제안 OPL 목록
+ *   GET  /kpa/supplier/event-offers        — 내 제안 OPL 목록 (status, rejectedReason 포함 — WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1)
  *   GET  /kpa/supplier/event-offers/stats  — 공급자 Event Offer 성과 집계 (WO-EVENT-OFFER-SUPPLIER-DASHBOARD-STATS-INTEGRATION-V1)
  *   POST /kpa/supplier/event-offers        — SPO → OPL(is_active=false) 제안 생성
  */
@@ -183,13 +183,16 @@ export function createSupplierOffersController(
         }
 
         // WO-O4O-EVENT-OFFER-CORE-REFORM-V1: DB status 필드를 직접 노출
+        // WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1: rejected_reason, decided_at 노출
         const rows = await dataSource.query(`
           SELECT
             opl.id,
-            opl.offer_id   AS "offerId",
-            opl.is_active  AS "isActive",
+            opl.offer_id        AS "offerId",
+            opl.is_active       AS "isActive",
             opl.status,
-            opl.created_at AS "proposedAt",
+            opl.created_at      AS "proposedAt",
+            opl.decided_at      AS "decidedAt",
+            opl.rejected_reason AS "rejectedReason",
             COALESCE(pm.name, '(상품명 없음)')  AS title,
             COALESCE(org.name, '(공급사 없음)') AS "supplierName",
             spo.price_general::numeric          AS price
@@ -210,10 +213,14 @@ export function createSupplierOffersController(
           supplierName: r.supplierName,
           price: r.price,
           isActive: r.isActive,
-          status: r.status,   // DB 값 직접 노출 (pending | approved | canceled)
+          status: r.status,   // DB 값 직접 노출 (pending | approved | rejected | canceled)
           proposedAt: r.proposedAt instanceof Date
             ? r.proposedAt.toISOString()
             : String(r.proposedAt || ''),
+          decidedAt: r.decidedAt
+            ? (r.decidedAt instanceof Date ? r.decidedAt.toISOString() : String(r.decidedAt))
+            : null,
+          rejectedReason: r.rejectedReason,
         }));
 
         res.json({ success: true, data: proposals });

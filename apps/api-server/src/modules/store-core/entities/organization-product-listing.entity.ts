@@ -108,6 +108,27 @@ export class OrganizationProductListing {
   @Column({ name: 'source_id', type: 'uuid', nullable: true })
   source_id: string | null;
 
+  // ─────────────────────────────────────────────────────────────────────
+  // WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1: Approval Queue 메타필드
+  // supplier 제안 → operator 승인/반려 lifecycle. nullable이라 기존 row 호환.
+  // ─────────────────────────────────────────────────────────────────────
+
+  /** proposal 작성자 (supplier user_id). operator 직접 등록 시 NULL 가능. */
+  @Column({ name: 'requested_by', type: 'uuid', nullable: true })
+  requested_by: string | null;
+
+  /** 승인/반려 결정자 (operator user_id). pending 상태에서는 NULL. */
+  @Column({ name: 'decided_by', type: 'uuid', nullable: true })
+  decided_by: string | null;
+
+  /** 결정 시각. pending 상태에서는 NULL. */
+  @Column({ name: 'decided_at', type: 'timestamp', nullable: true })
+  decided_at: Date | null;
+
+  /** 반려 사유. status='rejected'일 때 채워짐. */
+  @Column({ name: 'rejected_reason', type: 'text', nullable: true })
+  rejected_reason: string | null;
+
   @CreateDateColumn()
   created_at: Date;
 

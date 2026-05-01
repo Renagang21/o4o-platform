@@ -21,6 +21,7 @@ import {
   type EventOfferAdminStats,
   type EventOfferApiError,
   type AvailableOffer,
+  type PendingListing,
 } from '../../../api/eventOfferAdmin';
 
 type StatusFilter = 'all' | 'visible' | 'hidden';
@@ -63,6 +64,17 @@ const PAGE_TEXT = {
   toastRemoved: (title: string) => `"${title}" 이(가) 목록에서 제외되었습니다.`,
   toastAdded: (title: string) => `"${title}" 이(가) 이벤트 목록에 추가되었습니다.`,
   toastError: '처리 중 오류가 발생했습니다.',
+  // WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1
+  pendingSectionTitle: '승인 대기',
+  pendingDesc: '공급사가 제안한 이벤트입니다. 검토 후 승인하면 매장에 노출됩니다.',
+  pendingEmpty: '승인 대기중인 이벤트가 없습니다.',
+  actionApprove: '승인',
+  actionReject: '반려',
+  rejectReasonPrompt: '반려 사유를 입력해 주세요.',
+  toastApproved: (title: string) => `"${title}" 이(가) 승인되었습니다.`,
+  toastRejected: (title: string) => `"${title}" 이(가) 반려되었습니다.`,
+  confirmApprove: (title: string) =>
+    `"${title}" 이벤트를 승인하시겠습니까?\n승인 후 즉시 매장에 노출됩니다.`,
   statsCachePrefix: '최근 집계 기준',
   statsRefresh: '새로고침',
   statsRefreshing: '새로고침 중...',
@@ -102,8 +114,13 @@ export function EventOfferManagePage() {
   const [showStats, setShowStats] = useState(false);
   const [statsError, setStatsError] = useState<string | null>(null);
 
+  // WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1: 승인 대기 목록
+  const [pendingListings, setPendingListings] = useState<PendingListing[]>([]);
+  const [pendingLoading, setPendingLoading] = useState(false);
+
   useEffect(() => {
     loadProducts();
+    loadPending();
   }, []);
 
   const isPermissionError = (err: any): boolean => {
@@ -229,6 +246,59 @@ export function EventOfferManagePage() {
     }
   };
 
+  // WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1: 승인 대기 로딩/액션
+  const loadPending = async () => {
+    setPendingLoading(true);
+    try {
+      const res = await eventOfferAdminApi.getPendingListings(1, 50);
+      if (res?.data) setPendingListings(res.data);
+    } catch (err: any) {
+      // permission 에러는 loadProducts에서 처리되므로 여기선 silent
+    } finally {
+      setPendingLoading(false);
+    }
+  };
+
+  const handleApprove = async (item: PendingListing) => {
+    if (actionLoading[item.id]) return;
+    if (!window.confirm(PAGE_TEXT.confirmApprove(item.productName))) return;
+    setRowLoading(item.id, true);
+    try {
+      await eventOfferAdminApi.approveProduct(item.id);
+      setPendingListings(prev => prev.filter(p => p.id !== item.id));
+      toast.success(PAGE_TEXT.toastApproved(item.productName));
+      // 승인된 항목은 products 목록에 새로 나타나야 하므로 재로드
+      await loadProducts();
+    } catch (err: any) {
+      const apiErr = err?.response?.data?.error as EventOfferApiError | undefined;
+      toast.error(apiErr?.message || PAGE_TEXT.toastError);
+    } finally {
+      setRowLoading(item.id, false);
+    }
+  };
+
+  const handleReject = async (item: PendingListing) => {
+    if (actionLoading[item.id]) return;
+    const reason = window.prompt(PAGE_TEXT.rejectReasonPrompt);
+    if (reason === null) return;
+    const trimmed = reason.trim();
+    if (!trimmed) {
+      toast.error(PAGE_TEXT.rejectReasonPrompt);
+      return;
+    }
+    setRowLoading(item.id, true);
+    try {
+      await eventOfferAdminApi.rejectProduct(item.id, trimmed);
+      setPendingListings(prev => prev.filter(p => p.id !== item.id));
+      toast.success(PAGE_TEXT.toastRejected(item.productName));
+    } catch (err: any) {
+      const apiErr = err?.response?.data?.error as EventOfferApiError | undefined;
+      toast.error(apiErr?.message || PAGE_TEXT.toastError);
+    } finally {
+      setRowLoading(item.id, false);
+    }
+  };
+
   const handleRefreshStats = async () => {
     setStatsLoading(true);
     setStatsError(null);
@@ -351,6 +421,77 @@ export function EventOfferManagePage() {
                 )}
                 {createError && <div style={styles.formError}>{createError}</div>}
               </form>
+            </div>
+          )}
+
+          {/* WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1: 승인 대기 목록 */}
+          {(pendingLoading || pendingListings.length > 0) && (
+            <div style={styles.pendingCard}>
+              <div style={styles.pendingHeader}>
+                <h2 style={styles.pendingTitle}>
+                  {PAGE_TEXT.pendingSectionTitle}
+                  {pendingListings.length > 0 && (
+                    <span style={styles.pendingBadge}>{pendingListings.length}</span>
+                  )}
+                </h2>
+                <p style={styles.pendingDesc}>{PAGE_TEXT.pendingDesc}</p>
+              </div>
+              {pendingLoading ? (
+                <div style={styles.loadingText}>불러오는 중...</div>
+              ) : pendingListings.length === 0 ? (
+                <div style={styles.emptyOffersText}>{PAGE_TEXT.pendingEmpty}</div>
+              ) : (
+                <div>
+                  {pendingListings.map(item => {
+                    const isActing = !!actionLoading[item.id];
+                    return (
+                      <div key={item.id} style={styles.pendingRow}>
+                        <div style={{ flex: 3, minWidth: 0 }}>
+                          <div style={styles.productName}>{item.productName}</div>
+                          <div style={styles.productCond}>
+                            단가: {item.price != null ? `${item.price.toLocaleString()}원` : '미정'}
+                          </div>
+                        </div>
+                        <div style={{ flex: 2, minWidth: 0, fontSize: 13, color: colors.neutral600 }}>
+                          {item.supplierName}
+                          {item.requestedByEmail && (
+                            <div style={{ fontSize: 11, color: colors.neutral500, marginTop: 2 }}>
+                              제안: {item.requestedByEmail}
+                            </div>
+                          )}
+                        </div>
+                        <div style={{ width: 90, textAlign: 'center' as const, fontSize: 12, color: colors.neutral500 }}>
+                          {formatDate(item.createdAt)}
+                        </div>
+                        <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end', width: 160 }}>
+                          <button
+                            style={{
+                              ...styles.actionBtn,
+                              ...styles.actionBtnApprove,
+                              opacity: isActing ? 0.5 : 1,
+                            }}
+                            disabled={isActing}
+                            onClick={() => handleApprove(item)}
+                          >
+                            {isActing ? '...' : PAGE_TEXT.actionApprove}
+                          </button>
+                          <button
+                            style={{
+                              ...styles.actionBtn,
+                              ...styles.actionBtnReject,
+                              opacity: isActing ? 0.5 : 1,
+                            }}
+                            disabled={isActing}
+                            onClick={() => handleReject(item)}
+                          >
+                            {PAGE_TEXT.actionReject}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
 
@@ -763,6 +904,48 @@ const styles: Record<string, React.CSSProperties> = {
   actionBtnShow: { backgroundColor: '#D1FAE5', color: '#059669' },
   actionBtnHide: { backgroundColor: '#F3F4F6', color: '#6B7280' },
   actionBtnRemove: { backgroundColor: '#FEE2E2', color: '#DC2626' },
+  // WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1
+  actionBtnApprove: { backgroundColor: colors.primary, color: colors.white },
+  actionBtnReject: { backgroundColor: '#FEE2E2', color: '#DC2626' },
+
+  // Pending listings (승인 대기)
+  pendingCard: {
+    backgroundColor: colors.white,
+    borderRadius: '12px',
+    padding: '20px 24px',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+    marginBottom: '20px',
+    borderLeft: `4px solid #D97706`,
+  },
+  pendingHeader: { marginBottom: '14px' },
+  pendingTitle: {
+    fontSize: '15px',
+    fontWeight: 600,
+    color: colors.neutral900,
+    margin: 0,
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+  },
+  pendingBadge: {
+    display: 'inline-block',
+    minWidth: '22px',
+    padding: '2px 8px',
+    borderRadius: '11px',
+    fontSize: '12px',
+    fontWeight: 600,
+    backgroundColor: '#FEF3C7',
+    color: '#D97706',
+    textAlign: 'center' as const,
+  },
+  pendingDesc: { fontSize: '12px', color: colors.neutral500, marginTop: '4px' },
+  pendingRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    padding: '12px 0',
+    borderTop: `1px solid ${colors.neutral100}`,
+  },
 
   // Stats
   statsCard: {

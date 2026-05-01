@@ -65,6 +65,40 @@ export interface CreateEventOfferProductDto {
   // organizationId는 서버에서 kpa_members로 자동 주입
 }
 
+// WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1
+export interface PendingListing {
+  id: string;
+  offerId: string;
+  masterId: string;
+  organizationId: string;
+  productName: string;
+  supplierName: string;
+  price: number | null;
+  requestedBy: string | null;
+  requestedByEmail: string | null;
+  createdAt: string;
+}
+
+export interface PendingListingsResponse {
+  data: PendingListing[];
+  pagination: { page: number; limit: number; total: number };
+}
+
+export interface ApproveListingResult {
+  id: string;
+  status: 'approved';
+  isActive: true;
+  decidedAt: string;
+}
+
+export interface RejectListingResult {
+  id: string;
+  status: 'rejected';
+  isActive: false;
+  decidedAt: string;
+  rejectedReason: string;
+}
+
 /** 공급자 연계 상태 */
 export type SupplierConnectionStatus = 'connected' | 'disconnected' | 'degraded' | 'mock';
 
@@ -140,4 +174,29 @@ export const eventOfferAdminApi = {
    */
   getSupplierStatus: () =>
     apiClient.get<{ data: SupplierStatusResponse }>('/groupbuy-admin/supplier-status'),
+
+  // ─── WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1 ─────────────────────────────
+  // Approval Queue: supplier 제안 → operator 승인/반려.
+
+  /** pending OPL 목록 조회 (승인 대기열) */
+  getPendingListings: (page = 1, limit = 50) => {
+    const qs = new URLSearchParams({ page: String(page), limit: String(limit) });
+    return apiClient.get<PendingListingsResponse>(
+      `/groupbuy-admin/pending-listings?${qs.toString()}`
+    );
+  },
+
+  /** pending OPL 승인 */
+  approveProduct: (id: string) =>
+    apiClient.post<{ data: ApproveListingResult }>(
+      `/groupbuy-admin/products/${id}/approve`,
+      {}
+    ),
+
+  /** pending OPL 반려 */
+  rejectProduct: (id: string, reason: string) =>
+    apiClient.post<{ data: RejectListingResult }>(
+      `/groupbuy-admin/products/${id}/reject`,
+      { reason }
+    ),
 };

@@ -790,6 +790,12 @@ export class EventOfferService {
     roleType: 'supplier' | 'operator';
     /** roleType='supplier'일 때 offer 소유권 검증용 (해당 offer의 supplier가 이 user에 매핑되는지) */
     ownerUserId?: string;
+    /**
+     * WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1
+     * roleType='operator'일 때 결정자 user_id (decided_by에 기록).
+     * roleType='supplier'일 땐 무시.
+     */
+    operatorUserId?: string;
   }): Promise<{
     id: string;
     offerId: string;
@@ -854,6 +860,13 @@ export class EventOfferService {
       input.roleType === 'operator' ? 'approved' : 'pending';
     const isActive = input.roleType === 'operator';
 
+    // WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1: Approval Queue 메타필드
+    //   supplier 제안: requested_by = ownerUserId, decided_by/decided_at = NULL
+    //   operator 직접 등록: requested_by = NULL, decided_by/decided_at = NOW()
+    const requestedBy = input.roleType === 'supplier' ? input.ownerUserId ?? null : null;
+    const decidedBy = input.roleType === 'operator' ? input.operatorUserId ?? null : null;
+    const decidedAt = input.roleType === 'operator' ? new Date() : null;
+
     // 5. INSERT
     const listingRepo = this.dataSource.getRepository(OrganizationProductListing);
     const listing = listingRepo.create({
@@ -864,6 +877,10 @@ export class EventOfferService {
       is_active: isActive,
       status,
       price: offer.price_general != null ? Number(offer.price_general) : null,
+      requested_by: requestedBy,
+      decided_by: decidedBy,
+      decided_at: decidedAt,
+      rejected_reason: null,
     } as Partial<OrganizationProductListing>);
 
     const saved = await listingRepo.save(listing);
@@ -882,6 +899,196 @@ export class EventOfferService {
       isActive,
       price: offer.price_general != null ? Number(offer.price_general) : null,
       createdAt,
+    };
+  }
+
+  // ─── WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1 ────────────────────────────────
+  // Approval Queue: supplier가 제안한 pending 항목을 operator가 승인/반려.
+  //
+  // 정책:
+  //   approveListing — pending → approved + is_active=true
+  //   rejectListing  — pending → rejected + is_active=false + rejected_reason
+  //
+  // 에러:
+  //   404 NOT_FOUND      — OPL 없음
+  //   400 INVALID_STATE  — pending이 아닌 경우
+  //   400 INVALID_REASON — reject 사유 미입력
+
+  /**
+   * pending OPL을 승인한다.
+   * 변경: status='approved', is_active=true, decided_by, decided_at=NOW()
+   */
+  async approveListing(
+    oplId: string,
+    decidedBy: string,
+  ): Promise<{
+    id: string;
+    status: 'approved';
+    isActive: true;
+    decidedAt: string;
+  }> {
+    const repo = this.dataSource.getRepository(OrganizationProductListing);
+    const listing = await repo.findOne({ where: { id: oplId } });
+    if (!listing) {
+      throw new EventOfferCreateError(404, 'Listing not found', 'NOT_FOUND');
+    }
+    if (listing.status !== 'pending') {
+      throw new EventOfferCreateError(
+        400,
+        `Cannot approve: current status is '${listing.status}'`,
+        'INVALID_STATE',
+      );
+    }
+
+    const now = new Date();
+    listing.status = 'approved';
+    listing.is_active = true;
+    listing.decided_by = decidedBy;
+    listing.decided_at = now;
+    listing.rejected_reason = null;
+
+    const saved = await repo.save(listing);
+
+    return {
+      id: saved.id,
+      status: 'approved',
+      isActive: true,
+      decidedAt: (saved.decided_at instanceof Date
+        ? saved.decided_at
+        : new Date(saved.decided_at as any)
+      ).toISOString(),
+    };
+  }
+
+  /**
+   * pending OPL을 반려한다.
+   * 변경: status='rejected', is_active=false, decided_by, decided_at=NOW(), rejected_reason
+   */
+  async rejectListing(
+    oplId: string,
+    decidedBy: string,
+    reason: string,
+  ): Promise<{
+    id: string;
+    status: 'rejected';
+    isActive: false;
+    decidedAt: string;
+    rejectedReason: string;
+  }> {
+    const trimmed = (reason ?? '').trim();
+    if (!trimmed) {
+      throw new EventOfferCreateError(400, 'Reject reason is required', 'INVALID_REASON');
+    }
+
+    const repo = this.dataSource.getRepository(OrganizationProductListing);
+    const listing = await repo.findOne({ where: { id: oplId } });
+    if (!listing) {
+      throw new EventOfferCreateError(404, 'Listing not found', 'NOT_FOUND');
+    }
+    if (listing.status !== 'pending') {
+      throw new EventOfferCreateError(
+        400,
+        `Cannot reject: current status is '${listing.status}'`,
+        'INVALID_STATE',
+      );
+    }
+
+    const now = new Date();
+    listing.status = 'rejected';
+    listing.is_active = false;
+    listing.decided_by = decidedBy;
+    listing.decided_at = now;
+    listing.rejected_reason = trimmed;
+
+    const saved = await repo.save(listing);
+
+    return {
+      id: saved.id,
+      status: 'rejected',
+      isActive: false,
+      decidedAt: (saved.decided_at instanceof Date
+        ? saved.decided_at
+        : new Date(saved.decided_at as any)
+      ).toISOString(),
+      rejectedReason: trimmed,
+    };
+  }
+
+  /**
+   * GET pending listings — operator approval queue
+   * status='pending' AND service_key 필터.
+   */
+  async listPendingListings(
+    serviceKey: string,
+    page: number = 1,
+    limit: number = 20,
+  ): Promise<{
+    data: Array<{
+      id: string;
+      offerId: string;
+      masterId: string;
+      organizationId: string;
+      productName: string;
+      supplierName: string;
+      price: number | null;
+      requestedBy: string | null;
+      requestedByEmail: string | null;
+      createdAt: string;
+    }>;
+    total: number;
+  }> {
+    const safePage = Math.max(1, page);
+    const safeLimit = Math.min(Math.max(1, limit), 100);
+    const offset = (safePage - 1) * safeLimit;
+
+    const [countRows, rows] = await Promise.all([
+      this.dataSource.query(
+        `SELECT COUNT(*)::int AS total
+         FROM organization_product_listings opl
+         WHERE opl.service_key = $1 AND opl.status = 'pending'`,
+        [serviceKey],
+      ),
+      this.dataSource.query(
+        `SELECT
+           opl.id,
+           opl.offer_id        AS "offerId",
+           opl.master_id       AS "masterId",
+           opl.organization_id AS "organizationId",
+           opl.price::numeric  AS "price",
+           opl.requested_by    AS "requestedBy",
+           opl.created_at      AS "createdAt",
+           u.email             AS "requestedByEmail",
+           COALESCE(pm.name, '(상품명 없음)')  AS "productName",
+           COALESCE(org.name, '(공급사 없음)') AS "supplierName"
+         FROM organization_product_listings opl
+         LEFT JOIN supplier_product_offers spo ON spo.id  = opl.offer_id
+         LEFT JOIN neture_suppliers ns          ON ns.id  = spo.supplier_id
+         LEFT JOIN organizations org            ON org.id = ns.organization_id
+         LEFT JOIN product_masters pm           ON pm.id  = opl.master_id
+         LEFT JOIN users u                      ON u.id   = opl.requested_by
+         WHERE opl.service_key = $1 AND opl.status = 'pending'
+         ORDER BY opl.created_at ASC
+         LIMIT $2 OFFSET $3`,
+        [serviceKey, safeLimit, offset],
+      ),
+    ]);
+
+    return {
+      data: rows.map((r: any) => ({
+        id: r.id,
+        offerId: r.offerId,
+        masterId: r.masterId,
+        organizationId: r.organizationId,
+        productName: r.productName,
+        supplierName: r.supplierName,
+        price: r.price !== null ? Number(r.price) : null,
+        requestedBy: r.requestedBy,
+        requestedByEmail: r.requestedByEmail,
+        createdAt: r.createdAt instanceof Date
+          ? r.createdAt.toISOString()
+          : String(r.createdAt || ''),
+      })),
+      total: countRows[0]?.total ?? 0,
     };
   }
 }
@@ -908,7 +1115,11 @@ export type EventOfferCreateErrorCode =
   | 'OFFER_NOT_FOUND'
   | 'OFFER_NOT_OWNED'
   | 'ALREADY_LISTED'
-  | 'INTERNAL_ERROR';
+  | 'INTERNAL_ERROR'
+  // WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1: approveListing/rejectListing
+  | 'NOT_FOUND'
+  | 'INVALID_STATE'
+  | 'INVALID_REASON';
 
 export class EventOfferCreateError extends Error {
   constructor(

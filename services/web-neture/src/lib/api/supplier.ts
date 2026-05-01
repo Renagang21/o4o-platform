@@ -981,6 +981,20 @@ export interface ProposeOfferResult {
   proposedAt: string;
 }
 
+// WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1
+export interface MyEventOfferProposal {
+  id: string;
+  offerId: string;
+  title: string;
+  supplierName: string;
+  price: number | null;
+  isActive: boolean;
+  status: 'pending' | 'approved' | 'rejected' | 'canceled';
+  proposedAt: string;
+  decidedAt: string | null;
+  rejectedReason: string | null;
+}
+
 /** Backend 응답 에러 코드 (supplier-offers.controller.ts ERROR_CODES와 동일) */
 export type SupplierEventOfferErrorCode =
   | 'INTERNAL_ERROR'
@@ -1023,6 +1037,18 @@ export const supplierKpaEventOfferApi = {
       )
       .then(
         (res: { data: { success: boolean; data: ProposeOfferResult } }) => res.data.data,
+      ),
+
+  // WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1
+  /** 내가 제안한 OPL 목록 (status, rejectedReason 포함) */
+  listMyProposals: (): Promise<MyEventOfferProposal[]> =>
+    api
+      .get<{ success: boolean; data: MyEventOfferProposal[] }>(
+        '/kpa/supplier/event-offers'
+      )
+      .then(
+        (res: { data: { success: boolean; data: MyEventOfferProposal[] } }) =>
+          res.data.data || [],
       ),
 };
 

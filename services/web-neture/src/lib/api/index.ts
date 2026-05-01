@@ -86,6 +86,8 @@ export {
   type ProposableOffer,
   type ProposeOfferResult,
   type SupplierEventOfferErrorCode,
+  // WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1
+  type MyEventOfferProposal,
 } from './supplier.js';
 
 // Seller API
