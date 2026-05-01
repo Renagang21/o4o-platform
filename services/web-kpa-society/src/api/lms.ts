@@ -22,9 +22,9 @@ import type {
 export const lmsApi = {
   // 안내 흐름
   // WO-KPA-CONTENT-COURSES-PUBLIC-VISIBILITY-FIX-V1: contentKind 필터 추가
+  // WO-KPA-LMS-REMOVE-LEVEL-QUERY-PARAM-V1: level 쿼리 파라미터 제거 (BE는 받아도 무시)
   getCourses: (params?: {
     category?: string;
-    level?: string;
     status?: string;
     page?: number;
     limit?: number;

@@ -11,7 +11,6 @@ import { RichTextEditor } from '@o4o/content-editor';
 import { lmsInstructorApi, Course, Lesson, LessonType, type CourseVisibility } from '../../../api/lms-instructor';
 import QuizBuilder from './QuizBuilder';
 
-const LEVEL_LABEL: Record<string, string> = { beginner: '입문', intermediate: '중급', advanced: '고급' };
 const LESSON_TYPE_LABEL: Record<LessonType, string> = {
   VIDEO: '영상', ARTICLE: '문서', QUIZ: '퀴즈', ASSIGNMENT: '과제', LIVE: '라이브',
 };
@@ -104,15 +103,8 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
     videoUrl: lesson?.videoUrl || '',
     duration: lesson?.duration ?? 0,
   });
-  const [content, setContent] = useState<string>(() => {
-    if (!lesson?.content) return '';
-    if (typeof lesson.content === 'string') return lesson.content;
-    // 레거시 JSON 객체 호환: { html: "..." } 또는 { text: "..." }
-    const c = lesson.content as any;
-    if (c.html) return c.html;
-    if (c.text) return `<p>${c.text}</p>`;
-    return '';
-  });
+  // WO-KPA-LMS-REMOVE-LEGACY-CONTENT-FORMAT-V1: content는 HTML string 단일 포맷
+  const [content, setContent] = useState<string>(lesson?.content || '');
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
@@ -183,12 +175,13 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
 
         <div style={s.field}>
           <label style={s.label}>본문</label>
+          {/* WO-KPA-LMS-LESSON-EDITOR-UPGRADE-V1: 강사용 풀 에디터 (이미지/링크/리스트/표 등) */}
           <RichTextEditor
             value={content}
             onChange={(c) => setContent(c.html)}
             placeholder="레슨 본문을 입력하세요"
-            minHeight="200px"
-            preset="compact"
+            minHeight="320px"
+            preset="full"
           />
         </div>
 
@@ -232,7 +225,7 @@ export default function CourseEditPage() {
   const [error, setError] = useState<string | null>(null);
 
   // course form state
-  const [form, setForm] = useState({ title: '', description: '', level: 'beginner' });
+  const [form, setForm] = useState({ title: '', description: '' });
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
   // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1: 공개/회원제. 기본값 회원제.
@@ -262,7 +255,7 @@ export default function CourseEditPage() {
       // GET /lms/courses/:id/lessons → { success, data: Lesson[], pagination }
       const ls: Lesson[] = Array.isArray((lRes as any).data?.data) ? (lRes as any).data?.data : [];
       setCourse(c);
-      setForm({ title: c.title, description: c.description, level: c.level });
+      setForm({ title: c.title, description: c.description });
       setTags(c.tags || []);
       // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1: 응답에 visibility가 없으면 기본 'members'
       setVisibility(c.visibility ?? 'members');
@@ -289,7 +282,6 @@ export default function CourseEditPage() {
       await lmsInstructorApi.updateCourse(id, {
         title: form.title.trim(),
         description: form.description.trim(),
-        level: form.level as any,
         tags: tags.length > 0 ? tags : [],
         visibility, // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1
       });
@@ -422,14 +414,6 @@ export default function CourseEditPage() {
           <div style={s.field}>
             <label style={s.label}>설명</label>
             <textarea style={s.textarea} value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />
-          </div>
-          <div style={{ display: 'flex', gap: 16 }}>
-            <div style={{ ...s.field, flex: 1 }}>
-              <label style={s.label}>난이도</label>
-              <select style={s.select} value={form.level} onChange={(e) => setForm((f) => ({ ...f, level: e.target.value }))}>
-                {Object.entries(LEVEL_LABEL).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-              </select>
-            </div>
           </div>
           {/* WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1: 공개 범위 */}
           <div style={s.field}>

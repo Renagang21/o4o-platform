@@ -10,7 +10,7 @@ import {
   MaxLength,
   Min
 } from 'class-validator';
-import { CourseLevel, CourseStatus, ContentKind, CourseVisibility } from '@o4o/lms-core';
+import { CourseStatus, ContentKind, CourseVisibility } from '@o4o/lms-core';
 
 export class CreateCourseDto {
   @IsString()
@@ -26,10 +26,6 @@ export class CreateCourseDto {
   @IsOptional()
   @MaxLength(500)
   thumbnail?: string;
-
-  @IsEnum(CourseLevel)
-  @IsOptional()
-  level?: CourseLevel;
 
   @IsNumber()
   @Min(0)
@@ -107,10 +103,6 @@ export class UpdateCourseDto {
   @IsOptional()
   thumbnail?: string;
 
-  @IsEnum(CourseLevel)
-  @IsOptional()
-  level?: CourseLevel;
-
   @IsEnum(CourseStatus)
   @IsOptional()
   status?: CourseStatus;
@@ -170,10 +162,6 @@ export class CourseQueryDto {
   @IsEnum(CourseStatus)
   @IsOptional()
   status?: CourseStatus;
-
-  @IsEnum(CourseLevel)
-  @IsOptional()
-  level?: CourseLevel;
 
   @IsUUID()
   @IsOptional()

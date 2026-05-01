@@ -17,19 +17,12 @@ export interface LectureData {
   duration: number; // minutes
   lessonCount: number;
   category: string;
-  level: 'beginner' | 'intermediate' | 'advanced';
   isFree: boolean;
   thumbnail?: string;
   // 로그인 후 상태
   progress?: number; // 0-100
   status?: 'not_started' | 'in_progress' | 'completed';
 }
-
-const levelLabels: Record<string, string> = {
-  beginner: '입문',
-  intermediate: '중급',
-  advanced: '심화',
-};
 
 export function LectureCard({ lecture }: { lecture: LectureData }) {
   const { isAuthenticated } = useAuth();
@@ -58,7 +51,6 @@ export function LectureCard({ lecture }: { lecture: LectureData }) {
           <span style={lecture.isFree ? styles.badgeFree : styles.badgePaid}>
             {lecture.isFree ? '무료' : '유료'}
           </span>
-          <span style={styles.badgeLevel}>{levelLabels[lecture.level]}</span>
           {lecture.status && (
             <span style={
               isCompleted ? styles.badgeCompleted :
@@ -164,14 +156,6 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: borderRadius.sm,
     backgroundColor: '#fef3c7',
     color: '#92400e',
-    fontSize: '0.688rem',
-    fontWeight: 500,
-  },
-  badgeLevel: {
-    padding: '2px 8px',
-    borderRadius: borderRadius.sm,
-    backgroundColor: colors.neutral100,
-    color: colors.neutral600,
     fontSize: '0.688rem',
     fontWeight: 500,
   },

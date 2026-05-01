@@ -22,12 +22,6 @@ import type { Course } from '../../types';
 
 type PriceFilter = 'all' | 'free' | 'paid';
 
-const LEVEL_LABELS: Record<string, string> = {
-  beginner: '입문',
-  intermediate: '중급',
-  advanced: '고급',
-};
-
 export function CourseHubPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { isAuthenticated } = useAuth();
@@ -202,7 +196,6 @@ export function CourseHubPage() {
                   </div>
                   <div style={styles.courseContent}>
                     <div style={styles.courseHeader}>
-                      <span style={styles.levelBadge}>{LEVEL_LABELS[course.level] || course.level}</span>
                       {course.isPaid ? (
                         <span style={styles.paidBadge}>
                           유료{course.price ? ` ₩${course.price.toLocaleString()}` : ''}
@@ -370,14 +363,6 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     gap: '8px',
     marginBottom: '12px',
-  },
-  levelBadge: {
-    padding: '2px 8px',
-    backgroundColor: colors.primary,
-    color: '#ffffff',
-    borderRadius: '4px',
-    fontSize: '12px',
-    fontWeight: 500,
   },
   freeBadge: {
     padding: '2px 8px',

@@ -450,18 +450,12 @@ export function LmsLessonPage() {
               )}
             </div>
 
-            {/* 내용 */}
-            {currentLesson.content && (() => {
-              const raw = currentLesson.content as any;
-              const html = typeof raw === 'string'
-                ? raw
-                : raw?.html || (raw?.text ? `<p>${raw.text}</p>` : '');
-              return html ? (
-                <Card padding="large" style={{ marginTop: '24px' }}>
-                  <ContentRenderer html={html} style={styles.content} />
-                </Card>
-              ) : null;
-            })()}
+            {/* 내용 — WO-KPA-LMS-REMOVE-LEGACY-CONTENT-FORMAT-V1: HTML string 단일 포맷 */}
+            {currentLesson.content && (
+              <Card padding="large" style={{ marginTop: '24px' }}>
+                <ContentRenderer html={currentLesson.content} style={styles.content} />
+              </Card>
+            )}
           </>
         )}
 

@@ -7,12 +7,6 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { lmsInstructorApi, Course } from '../../../api/lms-instructor';
 
-const LEVEL_LABEL: Record<string, string> = {
-  beginner: '입문',
-  intermediate: '중급',
-  advanced: '고급',
-};
-
 const STATUS_LABEL: Record<string, string> = {
   draft: '초안',
   published: '발행됨',
@@ -123,7 +117,6 @@ export default function CourseListPage() {
               <span style={badgeStyle(STATUS_COLOR[course.status] || '#6b7280')}>
                 {STATUS_LABEL[course.status] || course.status}
               </span>
-              <span style={styles.metaText}>{LEVEL_LABEL[course.level] || course.level}</span>
               <span style={styles.metaText}>수강 {course.currentEnrollments}명</span>
               {course.duration > 0 && (
                 <span style={styles.metaText}>{course.duration}분</span>

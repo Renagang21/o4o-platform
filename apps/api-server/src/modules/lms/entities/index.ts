@@ -7,7 +7,6 @@ export {
   Certificate,
   LMSEvent,
   Attendance,
-  CourseLevel,
   CourseStatus,
   LessonType,
   EnrollmentStatus,

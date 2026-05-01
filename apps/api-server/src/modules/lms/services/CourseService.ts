@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
 import { BaseService } from '../../../common/base.service.js';
-import { Course, CourseStatus, CourseLevel, ContentKind, CourseVisibility } from '@o4o/lms-core';
+import { Course, CourseStatus, ContentKind, CourseVisibility } from '@o4o/lms-core';
 import { sanitizeInstructor } from '../utils/sanitize-user.js';
 import logger from '../../../utils/logger.js';
 
@@ -19,7 +19,6 @@ export interface CreateCourseRequest {
   title: string;
   description: string;
   thumbnail?: string;
-  level?: CourseLevel;
   duration?: number;
   instructorId: string;
   organizationId?: string;
@@ -47,7 +46,6 @@ export interface UpdateCourseRequest extends Partial<CreateCourseRequest> {
 
 export interface CourseFilters {
   status?: CourseStatus;
-  level?: CourseLevel;
   organizationId?: string;
   instructorId?: string;
   isRequired?: boolean;
@@ -135,7 +133,6 @@ export class CourseService extends BaseService<Course> {
   async listCourses(filters: CourseFilters = {}): Promise<{ courses: Course[]; total: number }> {
     const {
       status,
-      level,
       organizationId,
       instructorId,
       isRequired,
@@ -164,10 +161,6 @@ export class CourseService extends BaseService<Course> {
     // Filters
     if (status) {
       query.andWhere('course.status = :status', { status });
-    }
-
-    if (level) {
-      query.andWhere('course.level = :level', { level });
     }
 
     if (organizationId) {

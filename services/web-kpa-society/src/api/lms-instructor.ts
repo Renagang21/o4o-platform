@@ -5,7 +5,6 @@
 
 import { authClient } from '../contexts/AuthContext';
 
-export type CourseLevel = 'beginner' | 'intermediate' | 'advanced';
 export type CourseStatus = 'draft' | 'published' | 'archived';
 export type LessonType = 'VIDEO' | 'ARTICLE' | 'QUIZ' | 'ASSIGNMENT' | 'LIVE';
 // WO-KPA-CONTENT-COURSE-KIND-SEPARATION-V1
@@ -18,7 +17,6 @@ export interface Course {
   title: string;
   description: string;
   thumbnail: string | null;
-  level: CourseLevel;
   status: CourseStatus;
   duration: number;
   instructorId: string;
@@ -71,7 +69,6 @@ export interface CoursesResponseWrapper {
 export interface CreateCourseDto {
   title: string;
   description: string;
-  level?: CourseLevel;
   tags?: string[];
   thumbnail?: string | null;
   // WO-KPA-CONTENT-COURSE-KIND-SEPARATION-V1: 미전달 시 백엔드에서 'lecture' 기본
@@ -83,7 +80,6 @@ export interface CreateCourseDto {
 export interface UpdateCourseDto {
   title?: string;
   description?: string;
-  level?: CourseLevel;
   tags?: string[];
   thumbnail?: string | null;
   // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1

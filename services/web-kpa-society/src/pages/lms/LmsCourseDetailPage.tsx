@@ -98,15 +98,6 @@ export function LmsCourseDetailPage() {
     }
   };
 
-  const getLevelLabel = (level: string) => {
-    const labels: Record<string, string> = {
-      beginner: '입문',
-      intermediate: '중급',
-      advanced: '고급',
-    };
-    return labels[level] || level;
-  };
-
   if (loading) {
     return <LoadingSpinner message="안내 흐름을 불러오는 중..." />;
   }
@@ -172,7 +163,6 @@ export function LmsCourseDetailPage() {
         <div style={styles.main}>
           <Card padding="large">
             <div style={styles.courseHeader}>
-              <span style={styles.levelBadge}>{getLevelLabel(course.level)}</span>
               <span style={styles.categoryBadge}>{course.category}</span>
               {isArchived && (
                 <span style={styles.archivedBadge}>종료</span>
@@ -336,13 +326,6 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     gap: '8px',
     marginBottom: '16px',
-  },
-  levelBadge: {
-    padding: '4px 12px',
-    backgroundColor: colors.primary,
-    color: colors.white,
-    borderRadius: '4px',
-    fontSize: '13px',
   },
   categoryBadge: {
     padding: '4px 12px',

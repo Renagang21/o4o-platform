@@ -28,12 +28,6 @@ const LESSON_TYPE_ICONS: Record<string, string> = {
   live: '🔴',
 };
 
-const LEVEL_LABELS: Record<string, string> = {
-  beginner: '입문',
-  intermediate: '중급',
-  advanced: '고급',
-};
-
 export function CourseIntroPage() {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
@@ -200,7 +194,6 @@ export function CourseIntroPage() {
           {/* A. Hero */}
           <Card padding="large">
             <div style={styles.badges}>
-              <span style={styles.levelBadge}>{LEVEL_LABELS[course.level] || course.level}</span>
               {isFree ? (
                 <span style={styles.freeBadge}>무료</span>
               ) : (
@@ -459,14 +452,6 @@ const styles: Record<string, React.CSSProperties> = {
     gap: '8px',
     marginBottom: '16px',
     flexWrap: 'wrap',
-  },
-  levelBadge: {
-    padding: '4px 12px',
-    backgroundColor: colors.primary,
-    color: '#ffffff',
-    borderRadius: '4px',
-    fontSize: '13px',
-    fontWeight: 500,
   },
   freeBadge: {
     padding: '4px 12px',

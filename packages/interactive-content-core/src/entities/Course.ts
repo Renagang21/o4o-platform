@@ -17,12 +17,6 @@ import {
  * Can be organization-scoped for organization-specific training.
  */
 
-export enum CourseLevel {
-  BEGINNER = 'beginner',
-  INTERMEDIATE = 'intermediate',
-  ADVANCED = 'advanced',
-}
-
 export enum CourseStatus {
   DRAFT = 'draft',
   PUBLISHED = 'published',
@@ -70,9 +64,6 @@ export class Course {
 
   @Column({ type: 'varchar', length: 500, nullable: true })
   thumbnail?: string;
-
-  @Column({ type: 'enum', enum: CourseLevel, default: CourseLevel.BEGINNER })
-  level!: CourseLevel;
 
   @Column({ type: 'enum', enum: CourseStatus, default: CourseStatus.DRAFT })
   status!: CourseStatus;

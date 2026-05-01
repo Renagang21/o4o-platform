@@ -25,7 +25,6 @@ interface Course {
   title: string;
   description: string;
   thumbnail: string | null;
-  level: string;
   duration: number;
   instructorId: string;
 }
@@ -61,12 +60,6 @@ const STATUS_COLOR: Record<EnrollmentStatus, string> = {
   completed: '#6366f1',
   cancelled: '#9ca3af',
   expired: '#9ca3af',
-};
-
-const LEVEL_LABEL: Record<string, string> = {
-  beginner: '입문',
-  intermediate: '중급',
-  advanced: '고급',
 };
 
 const FILTER_OPTIONS: { value: string; label: string }[] = [
@@ -142,10 +135,8 @@ function EnrollmentCard({ enrollment, onNavigate }: { enrollment: Enrollment; on
         </div>
 
         <div style={{ display: 'flex', gap: 10, fontSize: 12, color: colors.neutral500, marginBottom: 10 }}>
-          <span>{LEVEL_LABEL[course.level] || course.level}</span>
-          {course.duration > 0 && <span>·</span>}
           {course.duration > 0 && <span>{course.duration}분</span>}
-          {enrolledAt && <span>·</span>}
+          {course.duration > 0 && enrolledAt && <span>·</span>}
           {enrolledAt && <span>신청일: {new Date(enrolledAt).toLocaleDateString('ko-KR')}</span>}
         </div>
 

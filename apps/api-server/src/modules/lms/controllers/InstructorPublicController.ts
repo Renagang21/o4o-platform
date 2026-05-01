@@ -68,7 +68,6 @@ export class InstructorPublicController extends BaseController {
           title: c.title,
           description: c.description,
           thumbnail: c.thumbnail || null,
-          level: c.level,
           duration: c.duration,
           isPaid: c.isPaid,
           price: c.price || null,
