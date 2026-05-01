@@ -12,7 +12,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { ContentRenderer } from '@o4o/content-editor';
 import { lmsApi } from '../../api/lms';
-import type { LmsCourse, LmsLesson, LmsEnrollment, LmsQuiz, LmsQuizResult } from '../../api/lms';
+import type { LmsCourse, LmsLesson, LmsEnrollment, LmsQuiz, LmsQuizResult, LmsAssignment, LmsAssignmentSubmission } from '../../api/lms';
 
 // ─── 색상 (KPA colors/typography 대응) ───────────────────────────────────────
 
@@ -44,6 +44,12 @@ export default function LmsLessonPage() {
   const [quizResult, setQuizResult] = useState<LmsQuizResult | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
+  // Assignment state (WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1)
+  const [assignment, setAssignment] = useState<LmsAssignment | null>(null);
+  const [mySubmission, setMySubmission] = useState<LmsAssignmentSubmission | null>(null);
+  const [assignmentDraft, setAssignmentDraft] = useState('');
+  const [assignmentSubmitting, setAssignmentSubmitting] = useState(false);
+
   // 수료 모달
   const [showCompletionModal, setShowCompletionModal] = useState(false);
 
@@ -56,6 +62,10 @@ export default function LmsLessonPage() {
     setQuiz(null);
     setSelectedAnswers({});
     setQuizResult(null);
+    // WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1
+    setAssignment(null);
+    setMySubmission(null);
+    setAssignmentDraft('');
   }, [lessonId]);
 
   const loadData = async () => {
@@ -85,8 +95,10 @@ export default function LmsLessonPage() {
         // 미시작 상태
       }
 
+      const lessonTypeRaw = (lessonData?.type as string)?.toLowerCase?.() || '';
+
       // Load quiz if lesson type is quiz
-      if (lessonData?.type === 'quiz') {
+      if (lessonTypeRaw === 'quiz') {
         try {
           const quizRes = await lmsApi.getQuizForLesson(lessonId!);
           if ((quizRes as any).data?.quiz) {
@@ -94,6 +106,27 @@ export default function LmsLessonPage() {
           }
         } catch {
           // No quiz available
+        }
+      }
+
+      // WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1: load assignment if lesson type is assignment
+      if (lessonTypeRaw === 'assignment') {
+        try {
+          const aRes = await lmsApi.getAssignmentForLesson(lessonId!);
+          const a = (aRes as any).data?.assignment ?? null;
+          if (a) {
+            setAssignment(a);
+            try {
+              const sRes = await lmsApi.getMyAssignmentSubmission(a.id);
+              const sub = (sRes as any).data?.submission ?? null;
+              setMySubmission(sub);
+              setAssignmentDraft(sub?.content ?? '');
+            } catch {
+              // 미제출 정상
+            }
+          }
+        } catch {
+          // 강사 미등록 정상
         }
       }
     } catch (err) {
@@ -183,6 +216,43 @@ export default function LmsLessonPage() {
     setQuizResult(null);
   };
 
+  // WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1
+  const handleAssignmentSubmit = async () => {
+    if (!assignment) return;
+    if (!assignmentDraft.trim()) {
+      toast.error('제출 내용을 입력해주세요.');
+      return;
+    }
+    setAssignmentSubmitting(true);
+    try {
+      const res = await lmsApi.submitAssignment(assignment.id, assignmentDraft.trim());
+      const sub = (res as any).data?.submission ?? null;
+      const lessonCompleted = (res as any).data?.lessonCompleted ?? false;
+      if (sub) setMySubmission(sub);
+      toast.success('제출되었습니다.');
+
+      try {
+        const enrollmentRes = await lmsApi.getEnrollmentByCourse(courseId!);
+        const enrollmentData = (enrollmentRes as any).data?.enrollment ?? (enrollmentRes as any).data ?? null;
+        setEnrollment(enrollmentData);
+
+        const isLast = lessons.findIndex(l => l.id === lessonId) === lessons.length - 1;
+        const isCourseDone = (enrollmentData as any)?.status === 'completed'
+          || (enrollmentData as any)?.progressPercentage >= 100
+          || (enrollmentData as any)?.progress >= 100;
+        if (isLast && lessonCompleted && isCourseDone) {
+          setShowCompletionModal(true);
+        }
+      } catch {
+        // ignore
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : '제출에 실패했습니다.');
+    } finally {
+      setAssignmentSubmitting(false);
+    }
+  };
+
   // ─── Loading / Error ────────────────────────────────────────────────────────
 
   if (loading) {
@@ -214,10 +284,11 @@ export default function LmsLessonPage() {
   const nextLesson = currentIndex < lessons.length - 1 ? lessons[currentIndex + 1] : null;
   const completedLessonIds: string[] = (enrollment as any)?.metadata?.completedLessonIds || [];
   const isCompleted = completedLessonIds.includes(currentLesson.id);
-  const isQuizLesson = currentLesson.type === 'quiz' && quiz;
-  // WO-O4O-LMS-LESSON-TYPE-HIDE-INCOMPLETE-V1: assignment/live는 미구현 → 안내만 표시
+  // WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1
   const lessonTypeLower = (currentLesson.type as string)?.toLowerCase?.() || '';
-  const isUnsupportedLesson = lessonTypeLower === 'assignment' || lessonTypeLower === 'live';
+  const isQuizLesson = lessonTypeLower === 'quiz' && quiz;
+  const isAssignmentLesson = lessonTypeLower === 'assignment';
+  const isUnsupportedLesson = lessonTypeLower === 'live';
 
   return (
     <div style={S.wrapper}>
@@ -273,16 +344,68 @@ export default function LmsLessonPage() {
           <h1 style={S.title}>{currentLesson.title}</h1>
         </div>
 
-        {/* WO-O4O-LMS-LESSON-TYPE-HIDE-INCOMPLETE-V1: 미지원 타입 안내 */}
+        {/* WO-O4O-LMS-LESSON-TYPE-HIDE-INCOMPLETE-V1: LIVE 미지원 안내 */}
         {isUnsupportedLesson ? (
           <div style={{ marginTop: '24px', padding: '28px', backgroundColor: '#fef3c7', border: '1px solid #fde68a', borderRadius: '12px' }}>
             <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#92400e', marginBottom: '8px' }}>
               현재 지원되지 않는 레슨입니다
             </h3>
             <p style={{ fontSize: '15px', color: '#92400e', lineHeight: 1.6 }}>
-              이 레슨 유형(<strong>{lessonTypeLower === 'live' ? '라이브' : '과제'}</strong>)은 아직 정식 지원되지 않습니다. 운영자에게 문의해 주세요.
+              이 레슨 유형(<strong>라이브</strong>)은 아직 정식 지원되지 않습니다. 운영자에게 문의해 주세요.
             </p>
           </div>
+        ) : isAssignmentLesson ? (
+          /* WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1: 과제 영역 */
+          assignment ? (
+            <>
+              <div style={{ marginTop: '24px', padding: '28px', backgroundColor: C.white, border: `1px solid ${C.neutral200}`, borderRadius: '12px' }}>
+                <h3 style={{ fontSize: '18px', fontWeight: 600, color: C.neutral900, marginBottom: '8px' }}>과제 안내</h3>
+                {assignment.instructions ? (
+                  <p style={{ fontSize: '15px', color: C.neutral700, whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
+                    {assignment.instructions}
+                  </p>
+                ) : (
+                  <p style={{ fontSize: '13px', color: C.neutral500 }}>설명이 등록되지 않았습니다.</p>
+                )}
+                {assignment.dueDate && (
+                  <p style={{ fontSize: '13px', color: '#92400e', marginTop: '8px' }}>
+                    마감일: {new Date(assignment.dueDate).toLocaleString('ko-KR')}
+                  </p>
+                )}
+              </div>
+
+              <div style={{ marginTop: '16px', padding: '28px', backgroundColor: C.white, border: `1px solid ${C.neutral200}`, borderRadius: '12px' }}>
+                <h4 style={{ fontSize: '15px', fontWeight: 600, color: C.neutral900, marginBottom: '12px' }}>
+                  {mySubmission ? '내 제출' : '제출하기'}
+                </h4>
+                <textarea
+                  value={assignmentDraft}
+                  onChange={(e) => setAssignmentDraft(e.target.value)}
+                  placeholder="과제 내용을 입력하세요"
+                  style={{ width: '100%', minHeight: '160px', padding: '12px 16px', border: `1px solid ${C.neutral300}`, borderRadius: '8px', fontSize: '14px', color: C.neutral700, outline: 'none', boxSizing: 'border-box' as const, resize: 'vertical' as const, fontFamily: 'inherit' }}
+                />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '12px' }}>
+                  <button
+                    style={{ ...S.submitButton, opacity: assignmentSubmitting ? 0.6 : 1 }}
+                    onClick={handleAssignmentSubmit}
+                    disabled={assignmentSubmitting}
+                  >
+                    {assignmentSubmitting ? '제출 중...' : mySubmission ? '재제출하기' : '제출하기'}
+                  </button>
+                  {mySubmission && (
+                    <span style={{ fontSize: '13px', color: C.neutral500 }}>
+                      마지막 제출: {new Date(mySubmission.submittedAt).toLocaleString('ko-KR')}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </>
+          ) : (
+            <div style={{ marginTop: '24px', padding: '28px', backgroundColor: '#fef3c7', border: '1px solid #fde68a', borderRadius: '12px' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#92400e', marginBottom: '8px' }}>과제가 아직 준비되지 않았습니다</h3>
+              <p style={{ fontSize: '15px', color: '#92400e' }}>강사가 과제 내용을 등록하면 제출할 수 있습니다.</p>
+            </div>
+          )
         ) : isQuizLesson ? (
           <div>
             {quiz.description && (
@@ -399,7 +522,7 @@ export default function LmsLessonPage() {
             <div />
           )}
 
-          {!isCompleted && enrollment && !isQuizLesson && !isUnsupportedLesson && (
+          {!isCompleted && enrollment && !isQuizLesson && !isAssignmentLesson && !isUnsupportedLesson && (
             <button style={S.completeButton} onClick={handleComplete}>
               ✓ 완료
             </button>

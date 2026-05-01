@@ -7,6 +7,8 @@ import { CertificateController } from '../controllers/CertificateController.js';
 import { InstructorController } from '../controllers/InstructorController.js';
 // WO-O4O-QUIZ-SYSTEM-V1
 import { QuizController } from '../controllers/QuizController.js';
+// WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1
+import { AssignmentController } from '../controllers/AssignmentController.js';
 // WO-O4O-COMPLETION-V1
 import { CompletionController } from '../controllers/CompletionController.js';
 import { requireAuth, optionalAuth } from '../../../common/middleware/auth.middleware.js';
@@ -91,6 +93,22 @@ router.get('/quizzes/:quizId/attempts', requireAuth, asyncHandler(QuizController
 
 // PATCH /api/v1/lms/quizzes/:quizId - Update Quiz (Instructor)
 router.patch('/quizzes/:quizId', requireAuth, requireInstructor, asyncHandler(QuizController.updateQuiz));
+
+// ========================================
+// ASSIGNMENT ROUTES (WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1)
+// ========================================
+
+// GET /api/v1/lms/lessons/:lessonId/assignment - Get assignment for a lesson
+router.get('/lessons/:lessonId/assignment', requireAuth, asyncHandler(AssignmentController.getAssignmentForLesson));
+
+// POST /api/v1/lms/assignments - Upsert assignment (Instructor)
+router.post('/assignments', requireAuth, requireInstructor, asyncHandler(AssignmentController.upsertAssignment));
+
+// POST /api/v1/lms/assignments/:assignmentId/submit - Submit assignment (Learner)
+router.post('/assignments/:assignmentId/submit', requireAuth, asyncHandler(AssignmentController.submitAssignment));
+
+// GET /api/v1/lms/assignments/:assignmentId/my - Get current user's submission
+router.get('/assignments/:assignmentId/my', requireAuth, asyncHandler(AssignmentController.getMySubmission));
 
 // ========================================
 // COMPLETION ROUTES (WO-O4O-COMPLETION-V1)

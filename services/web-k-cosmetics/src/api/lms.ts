@@ -80,6 +80,25 @@ export interface LmsQuizResult {
   creditsEarned: number;
 }
 
+// WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1
+export interface LmsAssignment {
+  id: string;
+  lessonId: string;
+  instructions: string | null;
+  submissionType: 'text';
+  dueDate: string | null;
+}
+
+export interface LmsAssignmentSubmission {
+  id: string;
+  assignmentId: string;
+  userId: string;
+  lessonId: string;
+  content: string | null;
+  submittedAt: string;
+  status: 'submitted';
+}
+
 interface PaginatedResponse<T> {
   data: T[];
   pagination?: { page: number; limit: number; total: number; totalPages: number };
@@ -155,6 +174,27 @@ export const lmsApi = {
   // 퀴즈 제출
   submitQuiz: async (quizId: string, answers: Array<{ questionId: string; answer: string | string[] }>): Promise<ApiResponse<LmsQuizResult>> => {
     const { data } = await api.post<ApiResponse<LmsQuizResult>>(`/lms/quizzes/${quizId}/submit`, { answers });
+    return data;
+  },
+
+  // 과제 (WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1)
+  getAssignmentForLesson: async (lessonId: string): Promise<ApiResponse<{ assignment: LmsAssignment }>> => {
+    const { data } = await api.get<ApiResponse<{ assignment: LmsAssignment }>>(`/lms/lessons/${lessonId}/assignment`);
+    return data;
+  },
+
+  submitAssignment: async (assignmentId: string, content: string): Promise<ApiResponse<{ submission: LmsAssignmentSubmission; lessonCompleted: boolean }>> => {
+    const { data } = await api.post<ApiResponse<{ submission: LmsAssignmentSubmission; lessonCompleted: boolean }>>(
+      `/lms/assignments/${assignmentId}/submit`,
+      { content },
+    );
+    return data;
+  },
+
+  getMyAssignmentSubmission: async (assignmentId: string): Promise<ApiResponse<{ submission: LmsAssignmentSubmission | null }>> => {
+    const { data } = await api.get<ApiResponse<{ submission: LmsAssignmentSubmission | null }>>(
+      `/lms/assignments/${assignmentId}/my`,
+    );
     return data;
   },
 };

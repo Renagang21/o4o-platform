@@ -445,6 +445,9 @@ import {
   ContentBundle,
   Course,
   Lesson,
+  // WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1
+  Assignment,
+  Submission,
   // WO-O4O-TEMPLATE-SYSTEM-FOUNDATION
   Template,
   TemplateVersion,
@@ -876,6 +879,9 @@ export const AppDataSource = new DataSource({
     ContentBundle,
     Course,
     Lesson,
+    // WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1
+    Assignment,
+    Submission,
     // WO-O4O-TEMPLATE-SYSTEM-FOUNDATION
     Template,
     TemplateVersion,

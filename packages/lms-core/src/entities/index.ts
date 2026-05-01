@@ -12,12 +12,16 @@ export {
   // Phase 2
   Course, CourseStatus, ContentKind, CourseVisibility,
   Lesson, LessonType,
+  // WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1
+  Assignment, Submission,
 } from '@o4o/interactive-content-core';
 export type {
   QuizQuestion, QuizAnswer,
   QuestionOption,
   QuestionAnswer,
   ContentItem,
+  AssignmentSubmissionType,
+  SubmissionStatus,
 } from '@o4o/interactive-content-core';
 
 // Education Extension (re-export from @o4o/education-extension for backward compatibility)

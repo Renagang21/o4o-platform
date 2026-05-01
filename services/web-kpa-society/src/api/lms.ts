@@ -82,6 +82,21 @@ export const lmsApi = {
   getQuizAttempts: (quizId: string) =>
     apiClient.get<ApiResponse<{ attempts: any[] }>>(`/lms/quizzes/${quizId}/attempts`),
 
+  // 과제 (WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1)
+  getAssignmentForLesson: (lessonId: string) =>
+    apiClient.get<ApiResponse<{ assignment: AssignmentLearner }>>(`/lms/lessons/${lessonId}/assignment`),
+
+  submitAssignment: (assignmentId: string, content: string) =>
+    apiClient.post<ApiResponse<{ submission: AssignmentSubmission; lessonCompleted: boolean }>>(
+      `/lms/assignments/${assignmentId}/submit`,
+      { content },
+    ),
+
+  getMyAssignmentSubmission: (assignmentId: string) =>
+    apiClient.get<ApiResponse<{ submission: AssignmentSubmission | null }>>(
+      `/lms/assignments/${assignmentId}/my`,
+    ),
+
   // 수료 (WO-O4O-COMPLETION-V1)
   getMyCompletions: (params?: { page?: number; limit?: number }) =>
     apiClient.get<PaginatedResponse<CourseCompletionItem>>('/lms/completions/me', params),
@@ -101,3 +116,22 @@ export const lmsApi = {
   operatorHardDeleteCourse: (id: string) =>
     apiClient.delete<ApiResponse<{ deleted: boolean }>>(`/lms/operator/courses/${id}/hard`),
 };
+
+// WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1
+export interface AssignmentLearner {
+  id: string;
+  lessonId: string;
+  instructions: string | null;
+  submissionType: 'text';
+  dueDate: string | null;
+}
+
+export interface AssignmentSubmission {
+  id: string;
+  assignmentId: string;
+  userId: string;
+  lessonId: string;
+  content: string | null;
+  submittedAt: string;
+  status: 'submitted';
+}

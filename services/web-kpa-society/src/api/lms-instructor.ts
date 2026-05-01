@@ -321,4 +321,36 @@ export const lmsInstructorApi = {
     const base = (import.meta as any).env?.VITE_API_BASE_URL ?? '';
     return `${base}/api/v1/lms/instructor/participants/${courseId}/export?${qs.toString()}`;
   },
+
+  // ── 과제 관리 (WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1) ───────────────────
+
+  /** 레슨에 연결된 과제 조회 */
+  getAssignmentForLesson: (lessonId: string) =>
+    authClient.api.get<{ success: boolean; data: { assignment: AssignmentDto } }>(
+      `/lms/lessons/${lessonId}/assignment`,
+    ),
+
+  /** 과제 생성/수정 (lessonId 기준 upsert) */
+  upsertAssignment: (dto: UpsertAssignmentDto) =>
+    authClient.api.post<{ success: boolean; data: { assignment: AssignmentDto } }>(
+      '/lms/assignments',
+      dto,
+    ),
 };
+
+// WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1
+export interface AssignmentDto {
+  id: string;
+  lessonId: string;
+  instructions: string | null;
+  submissionType: 'text';
+  dueDate: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UpsertAssignmentDto {
+  lessonId: string;
+  instructions?: string | null;
+  dueDate?: string | null;
+}

@@ -7,6 +7,9 @@ export {
   Certificate,
   LMSEvent,
   Attendance,
+  // WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1
+  Assignment,
+  Submission,
   CourseStatus,
   LessonType,
   EnrollmentStatus,
