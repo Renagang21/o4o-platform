@@ -147,6 +147,8 @@ const StoreSignagePage = lazy(() => import('@/pages/store/StoreSignagePage'));
 // WO-O4O-STORE-LOCAL-PRODUCT-UI-V1: 자체 상품 CRUD + 태블릿 진열 관리
 const StoreLocalProductsPage = lazy(() => import('@/pages/store/StoreLocalProductsPage'));
 const StoreTabletDisplaysPage = lazy(() => import('@/pages/store/StoreTabletDisplaysPage'));
+// WO-O4O-KCOS-STORE-PRODUCTS-FOUNDATION-V1: 매장 경영자 주문 제품 (commerce/order product domain)
+const StoreProductsPage = lazy(() => import('@/pages/store/StoreProductsPage'));
 
 // WO-O4O-TABLET-INTEREST-UX-REFACTOR-V1: Tablet 키오스크 + Interest 관리
 const TabletStorePage = lazy(() => import('@/pages/tablet/TabletStorePage'));
@@ -401,7 +403,8 @@ function AppRoutes() {
         }
       >
         <Route index element={<StoreCockpitPage />} />
-        <Route path="products" element={<StorePlaceholderPage title="상품 관리" />} />
+        {/* WO-O4O-KCOS-STORE-PRODUCTS-FOUNDATION-V1: 매장 경영자 주문 제품 (commerce/order product domain) */}
+        <Route path="products" element={<StoreProductsPage />} />
         <Route path="local-products" element={<StoreLocalProductsPage />} />
         <Route path="tablet-displays" element={<StoreTabletDisplaysPage />} />
         {/* channels: 채널 관리 (WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1) */}
