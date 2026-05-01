@@ -374,8 +374,8 @@ export function ForumDetailPage() {
       </div>
 
       <div style={styles.footer}>
-        <Link to="/forum" style={styles.backButton}>
-          다른 글 둘러보기 →
+        <Link to="/forum" style={styles.backToListButton}>
+          ← 목록으로
         </Link>
       </div>
     </div>
@@ -594,13 +594,17 @@ const styles: Record<string, React.CSSProperties> = {
     marginTop: '32px',
     textAlign: 'center',
   },
-  backButton: {
+  backToListButton: {
+    display: 'inline-block',
     padding: '12px 32px',
     backgroundColor: colors.neutral100,
     color: colors.neutral700,
     textDecoration: 'none',
     borderRadius: '6px',
     fontSize: '14px',
+    fontWeight: 500,
+    border: `1px solid ${colors.neutral300}`,
+    transition: 'all 0.2s',
   },
   // WO-KPA-A-PRIVATE-FORUM-JOIN-UX-CONNECT-V1
   accessDenied: {
