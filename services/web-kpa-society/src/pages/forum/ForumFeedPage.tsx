@@ -124,11 +124,13 @@ export function ForumFeedPage() {
     if (!forum) return;
     setPostsLoading(true);
     try {
+      // WO-FORUM-LIKE-SYSTEM-V1: 서버 사이드 정렬
       const res = await forumApi.getPosts({
         forumId: forum.id,
         page: currentPage,
         limit: PAGE_SIZE,
         search: searchQuery || undefined,
+        sortBy: sort === 'popular' ? 'popular' : undefined,
       });
       setPosts(res.data || []);
       setTotalPages(res.totalPages || 1);
@@ -140,19 +142,12 @@ export function ForumFeedPage() {
     } finally {
       setPostsLoading(false);
     }
-  }, [forum, currentPage, searchQuery]);
+  }, [forum, currentPage, searchQuery, sort]);
 
   useEffect(() => { loadPosts(); }, [loadPosts]);
 
-  // Client-side sort (인기)
-  const displayedPosts = useMemo(() => {
-    if (sort === 'popular') {
-      return [...posts].sort((a, b) =>
-        ((b.viewCount || 0) + (b.likeCount || 0) * 2) - ((a.viewCount || 0) + (a.likeCount || 0) * 2),
-      );
-    }
-    return posts;
-  }, [posts, sort]);
+  // WO-FORUM-LIKE-SYSTEM-V1: 서버 사이드 정렬로 전환 (sortBy 파라미터 전달)
+  const displayedPosts = posts;
 
   // URL param helpers
   const updateParam = (key: string, value: string) => {
@@ -243,6 +238,15 @@ export function ForumFeedPage() {
       align: 'center',
       render: (val) => (
         <span className="text-xs text-slate-500">{val ?? 0}</span>
+      ),
+    },
+    {
+      key: 'likeCount',
+      header: '👍',
+      width: '50px',
+      align: 'center',
+      render: (val) => (
+        <span className="text-xs text-slate-500">{(val ?? 0) > 0 ? val : ''}</span>
       ),
     },
     {

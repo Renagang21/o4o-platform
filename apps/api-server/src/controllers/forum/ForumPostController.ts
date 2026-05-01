@@ -90,7 +90,10 @@ export class ForumPostController extends ForumControllerBase {
       // Sorting
       switch (sortBy) {
         case 'popular':
-          queryBuilder.orderBy('post.viewCount', 'DESC');
+          // WO-FORUM-LIKE-SYSTEM-V1: likeCount 우선, viewCount 보조
+          queryBuilder
+            .orderBy('post.likeCount', 'DESC')
+            .addOrderBy('post.viewCount', 'DESC');
           break;
         case 'oldest':
           queryBuilder.orderBy('post.createdAt', 'ASC');
@@ -193,9 +196,21 @@ export class ForumPostController extends ForumControllerBase {
       // WO-KPA-A-FORUM-CREATOR-SENSITIVE-FIELDS-EXPOSURE-HOTFIX-V1
       this.sanitizeUser((post as any).author);
 
+      // WO-FORUM-LIKE-SYSTEM-V1: include isLiked for authenticated user
+      const flattened = this.flattenPostFields(post);
+      const userId = (req as any).user?.id;
+      if (userId) {
+        try {
+          const liked = await this.likeRepository.findOne({ where: { postId: post.id, userId } });
+          (flattened as any).isLiked = !!liked;
+        } catch { /* graceful fallback */ }
+      } else {
+        (flattened as any).isLiked = false;
+      }
+
       res.json({
         success: true,
-        data: this.flattenPostFields(post),
+        data: flattened,
       });
     } catch (error: any) {
       logger.error('Error getting forum post:', error);

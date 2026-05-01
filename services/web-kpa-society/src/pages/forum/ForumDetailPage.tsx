@@ -50,6 +50,8 @@ export function ForumDetailPage() {
 
       setPost(postRes.data);
       setComments(commentsRes.data);
+      // WO-FORUM-LIKE-SYSTEM-V1: initialize isLiked from server response
+      setIsLiked(!!(postRes.data as any)?.isLiked);
 
       // Check if current user is the forum owner
       // WO-O4O-FORUM-CATEGORY-CLEANUP-V1: use forumId (forum_category_requests)
@@ -123,7 +125,7 @@ export function ForumDetailPage() {
       setIsLiking(true);
       const res = await forumApi.likePost(post.id);
       setPost({ ...post, likeCount: res.data.likeCount });
-      setIsLiked((res.data as any).isLiked ?? !isLiked);
+      setIsLiked(res.data.isLiked);
     } catch (err: any) {
       const msg = err?.message || '';
       if (msg.includes('token') || msg.includes('expired') || msg.includes('401')) {

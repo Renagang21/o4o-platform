@@ -46,6 +46,7 @@ export const forumApi = {
     limit?: number;
     search?: string;
     tag?: string;
+    sortBy?: string;
   }) =>
     apiClient.get<PaginatedResponse<ForumPost>>(`${getForumBasePath()}/posts`, params),
 
@@ -68,7 +69,7 @@ export const forumApi = {
     apiClient.delete<ApiResponse<void>>(`${getForumBasePath()}/posts/${id}`),
 
   likePost: (id: string) =>
-    apiClient.post<ApiResponse<{ likeCount: number }>>(`${getForumBasePath()}/posts/${id}/like`),
+    apiClient.post<ApiResponse<{ likeCount: number; isLiked: boolean }>>(`${getForumBasePath()}/posts/${id}/like`),
 
   // WO-KPA-A-FORUM-NOTICE-PIN-BY-OWNER-V1: forum owner pin/unpin
   pinPost: (id: string, pin: boolean) =>
