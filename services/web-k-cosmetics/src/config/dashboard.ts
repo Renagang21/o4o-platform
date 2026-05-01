@@ -34,7 +34,7 @@ export const KCOSMETICS_DASHBOARD_MAP: Record<string, string> = {
   'k-cosmetics:operator': '/operator',
   'k-cosmetics:supplier': '/',
   'k-cosmetics:partner': '/partner',
-  'cosmetics:store_owner': '/',
+  'cosmetics:store_owner': '/store',
   'consumer': '/',           // legacy
   'customer': '/',           // legacy
 };
