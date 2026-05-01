@@ -46,6 +46,9 @@
       "@o4o/appearance-system": [
         "./packages/appearance-system/dist",
         "./packages/appearance-system/src"
+      ],
+      "@o4o/account-ui": [
+        "./packages/account-ui/src"
       ]
     }
   },
