@@ -109,10 +109,10 @@ export default function LmsLessonPage() {
         // 미시작 상태
       }
 
-      const lessonTypeRaw = (lessonData?.type as string)?.toLowerCase?.() || '';
+      // WO-O4O-LMS-LESSON-TYPE-NORMALIZATION-V1: lowercase across the board
+      const lessonType = lessonData?.type as string | undefined;
 
-      // Load quiz if lesson type is quiz
-      if (lessonTypeRaw === 'quiz') {
+      if (lessonType === 'quiz') {
         try {
           const quizRes = await lmsApi.getQuizForLesson(lessonId!);
           if ((quizRes as any).data?.quiz) {
@@ -124,7 +124,7 @@ export default function LmsLessonPage() {
       }
 
       // WO-O4O-LMS-LIVE-MINIMAL-V1
-      if (lessonTypeRaw === 'live') {
+      if (lessonType === 'live') {
         try {
           const lRes = await lmsApi.getLiveForLesson(lessonId!);
           const l = (lRes as any).data?.live ?? null;
@@ -134,8 +134,8 @@ export default function LmsLessonPage() {
         }
       }
 
-      // WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1: load assignment if lesson type is assignment
-      if (lessonTypeRaw === 'assignment') {
+      // WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1
+      if (lessonType === 'assignment') {
         try {
           const aRes = await lmsApi.getAssignmentForLesson(lessonId!);
           const a = (aRes as any).data?.assignment ?? null;
@@ -339,11 +339,10 @@ export default function LmsLessonPage() {
   const nextLesson = currentIndex < lessons.length - 1 ? lessons[currentIndex + 1] : null;
   const completedLessonIds: string[] = (enrollment as any)?.metadata?.completedLessonIds || [];
   const isCompleted = completedLessonIds.includes(currentLesson.id);
-  // WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1 / WO-O4O-LMS-LIVE-MINIMAL-V1
-  const lessonTypeLower = (currentLesson.type as string)?.toLowerCase?.() || '';
-  const isQuizLesson = lessonTypeLower === 'quiz' && quiz;
-  const isAssignmentLesson = lessonTypeLower === 'assignment';
-  const isLiveLesson = lessonTypeLower === 'live';
+  // WO-O4O-LMS-LESSON-TYPE-NORMALIZATION-V1: type is always lowercase
+  const isQuizLesson = currentLesson.type === 'quiz' && quiz;
+  const isAssignmentLesson = currentLesson.type === 'assignment';
+  const isLiveLesson = currentLesson.type === 'live';
 
   const liveStatus: 'unset' | 'scheduled' | 'in_progress' | 'ended' = (() => {
     if (!isLiveLesson) return 'unset';

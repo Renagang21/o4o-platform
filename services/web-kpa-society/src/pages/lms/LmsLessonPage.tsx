@@ -96,9 +96,10 @@ export function LmsLessonPage() {
         // 미시작 상태
       }
 
-      // Load quiz if lesson type is quiz
-      const lessonTypeRaw = (lessonData?.type as string)?.toLowerCase?.() || '';
-      if (lessonTypeRaw === 'quiz') {
+      // WO-O4O-LMS-LESSON-TYPE-NORMALIZATION-V1: lowercase across the board
+      const lessonType = lessonData?.type as string | undefined;
+
+      if (lessonType === 'quiz') {
         try {
           const quizRes = await lmsApi.getQuizForLesson(lessonId!);
           if (quizRes.data?.quiz) {
@@ -109,8 +110,8 @@ export function LmsLessonPage() {
         }
       }
 
-      // WO-O4O-LMS-LIVE-MINIMAL-V1: load live config if lesson type is live
-      if (lessonTypeRaw === 'live') {
+      // WO-O4O-LMS-LIVE-MINIMAL-V1
+      if (lessonType === 'live') {
         try {
           const lRes = await lmsApi.getLiveForLesson(lessonId!);
           const l = (lRes as any).data?.live ?? null;
@@ -120,8 +121,8 @@ export function LmsLessonPage() {
         }
       }
 
-      // WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1: load assignment if lesson type is assignment
-      if (lessonTypeRaw === 'assignment') {
+      // WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1
+      if (lessonType === 'assignment') {
         try {
           const aRes = await lmsApi.getAssignmentForLesson(lessonId!);
           const a = (aRes as any).data?.assignment ?? null;
@@ -342,11 +343,10 @@ export function LmsLessonPage() {
   // Use metadata.completedLessonIds for per-lesson completion tracking
   const completedLessonIds: string[] = (enrollment as any)?.metadata?.completedLessonIds || [];
   const isCompleted = completedLessonIds.includes(currentLesson.id);
-  // WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1 / WO-O4O-LMS-LIVE-MINIMAL-V1
-  const lessonTypeLower = (currentLesson.type as string)?.toLowerCase?.() || '';
-  const isQuizLesson = lessonTypeLower === 'quiz' && quiz;
-  const isAssignmentLesson = lessonTypeLower === 'assignment';
-  const isLiveLesson = lessonTypeLower === 'live';
+  // WO-O4O-LMS-LESSON-TYPE-NORMALIZATION-V1: type is always lowercase
+  const isQuizLesson = currentLesson.type === 'quiz' && quiz;
+  const isAssignmentLesson = currentLesson.type === 'assignment';
+  const isLiveLesson = currentLesson.type === 'live';
 
   // Live status (예정/진행중/종료)
   const liveStatus: 'unset' | 'scheduled' | 'in_progress' | 'ended' = (() => {

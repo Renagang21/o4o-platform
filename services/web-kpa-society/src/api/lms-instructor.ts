@@ -6,7 +6,8 @@
 import { authClient } from '../contexts/AuthContext';
 
 export type CourseStatus = 'draft' | 'published' | 'archived';
-export type LessonType = 'VIDEO' | 'ARTICLE' | 'QUIZ' | 'ASSIGNMENT' | 'LIVE';
+// WO-O4O-LMS-LESSON-TYPE-NORMALIZATION-V1: lowercase across the board
+export type LessonType = 'video' | 'article' | 'quiz' | 'assignment' | 'live';
 // WO-KPA-CONTENT-COURSE-KIND-SEPARATION-V1
 export type ContentKind = 'lecture' | 'content_resource';
 // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1

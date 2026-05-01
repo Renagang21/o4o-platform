@@ -57,6 +57,11 @@ export class LessonService extends BaseService<Lesson> {
 
   // CRUD Operations
   async createLesson(data: CreateLessonRequest): Promise<Lesson> {
+    // WO-O4O-LMS-LESSON-TYPE-NORMALIZATION-V1: enforce lowercase storage
+    if (data.type) {
+      data.type = (data.type as unknown as string).toLowerCase() as LessonType;
+    }
+
     // Get max order for this course
     if (data.order === undefined) {
       const maxOrder = await this.lessonRepository
@@ -130,6 +135,11 @@ export class LessonService extends BaseService<Lesson> {
     const lesson = await this.getLesson(id);
     if (!lesson) {
       throw new Error(`Lesson not found: ${id}`);
+    }
+
+    // WO-O4O-LMS-LESSON-TYPE-NORMALIZATION-V1: enforce lowercase storage
+    if (data.type) {
+      data.type = (data.type as unknown as string).toLowerCase() as LessonType;
     }
 
     // Update fields

@@ -13,13 +13,12 @@ import QuizBuilder from './QuizBuilder';
 import AssignmentEditor from './AssignmentEditor';
 import LiveEditor from './LiveEditor';
 
+// WO-O4O-LMS-LESSON-TYPE-NORMALIZATION-V1: lowercase across UI/API/DB
 const LESSON_TYPE_LABEL: Record<LessonType, string> = {
-  VIDEO: '영상', ARTICLE: '문서', QUIZ: '퀴즈', ASSIGNMENT: '과제', LIVE: '라이브',
+  video: '영상', article: '문서', quiz: '퀴즈', assignment: '과제', live: '라이브',
 };
 
-// WO-O4O-LMS-LIVE-MINIMAL-V1: LIVE까지 모든 타입 활성화.
-const SUPPORTED_LESSON_TYPES: LessonType[] = ['VIDEO', 'ARTICLE', 'QUIZ', 'ASSIGNMENT', 'LIVE'];
-const isUnsupportedType = (_t: LessonType | string): boolean => false;
+const SUPPORTED_LESSON_TYPES: LessonType[] = ['video', 'article', 'quiz', 'assignment', 'live'];
 
 /* ──────────────── styles ──────────────── */
 // 함수형 style은 별도 함수로 분리. (Record<string, CSSProperties>에 함수 값을 넣으면
@@ -72,15 +71,6 @@ const s: Record<string, React.CSSProperties> = {
   tag: { display: 'inline-flex', alignItems: 'center', gap: 4, padding: '2px 8px', background: '#ede9fe', color: '#5b21b6', borderRadius: 999, fontSize: 12, fontWeight: 500 },
   tagRemove: { cursor: 'pointer', fontSize: 13, color: '#7c3aed' },
   tagInput: { border: 'none', outline: 'none', fontSize: 13, flex: 1, minWidth: 60, color: '#111827' },
-  // WO-O4O-LMS-LESSON-TYPE-HIDE-INCOMPLETE-V1
-  unsupportedBanner: {
-    padding: '12px 14px', background: '#fef3c7', border: '1px solid #fde68a',
-    color: '#92400e', borderRadius: 8, fontSize: 13, lineHeight: 1.5, marginBottom: 16,
-  },
-  unsupportedTag: {
-    marginLeft: 6, padding: '1px 6px', background: '#fef3c7', color: '#92400e',
-    borderRadius: 4, fontSize: 11, fontWeight: 600,
-  },
 };
 
 const saveBtnStyle = (disabled: boolean): React.CSSProperties => ({
@@ -113,7 +103,7 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
   const isEdit = lesson !== null;
   const [form, setForm] = useState({
     title: lesson?.title || '',
-    type: (lesson?.type || 'ARTICLE') as LessonType,
+    type: (lesson?.type || 'article') as LessonType,
     description: lesson?.description || '',
     videoUrl: lesson?.videoUrl || '',
     duration: lesson?.duration ?? 0,
@@ -123,11 +113,7 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
-  // WO-O4O-LMS-LESSON-TYPE-HIDE-INCOMPLETE-V1
-  const isUnsupportedExisting = isEdit && lesson ? isUnsupportedType(lesson.type) : false;
-
   const handleSave = async () => {
-    if (isUnsupportedExisting) { setErr('이 레슨 유형은 현재 지원되지 않아 저장할 수 없습니다.'); return; }
     if (!form.title.trim()) { setErr('제목을 입력하세요.'); return; }
     setSaving(true);
     setErr(null);
@@ -164,17 +150,9 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
       <div style={s.modalBox}>
         <div style={s.modalTitle}>{isEdit ? '레슨 수정' : '새 레슨 추가'}</div>
 
-        {/* WO-O4O-LMS-LESSON-TYPE-HIDE-INCOMPLETE-V1: 미지원 타입 안내 */}
-        {isUnsupportedExisting && (
-          <div style={s.unsupportedBanner}>
-            ⚠ 이 레슨 유형(<strong>{LESSON_TYPE_LABEL[form.type] || form.type}</strong>)은 현재 지원되지 않습니다.
-            저장이 차단됩니다. 삭제하거나 지원되는 유형(영상 / 문서 / 퀴즈)으로 새 레슨을 만드세요.
-          </div>
-        )}
-
         <div style={s.field}>
           <label style={s.label}>제목 *</label>
-          <input style={s.input} value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} placeholder="레슨 제목" disabled={isUnsupportedExisting} />
+          <input style={s.input} value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} placeholder="레슨 제목" />
         </div>
 
         {!isEdit && (
@@ -193,7 +171,7 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
           <textarea style={s.textarea} value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} placeholder="레슨 설명 (선택)" />
         </div>
 
-        {(form.type === 'VIDEO' || (isEdit && lesson?.videoUrl !== undefined)) && (
+        {(form.type === 'video' || (isEdit && lesson?.videoUrl !== undefined)) && (
           <div style={s.field}>
             <label style={s.label}>영상 URL</label>
             <input style={s.input} value={form.videoUrl} onChange={(e) => setForm((f) => ({ ...f, videoUrl: e.target.value }))} placeholder="https://..." />
@@ -223,16 +201,16 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
         <div style={s.modalActions}>
           <button style={s.cancelBtn} onClick={onClose}>취소</button>
           <button
-            style={saveBtnStyle(saving || !form.title.trim() || isUnsupportedExisting)}
-            disabled={saving || !form.title.trim() || isUnsupportedExisting}
+            style={saveBtnStyle(saving || !form.title.trim())}
+            disabled={saving || !form.title.trim()}
             onClick={handleSave}
           >
             {saving ? '저장 중...' : '저장'}
           </button>
         </div>
 
-        {/* 퀴즈 빌더 — QUIZ 유형 레슨 편집 시만 표시 */}
-        {isEdit && lesson && form.type === 'QUIZ' && (
+        {/* 퀴즈 빌더 — quiz 유형 레슨 편집 시만 표시 */}
+        {isEdit && lesson && form.type === 'quiz' && (
           <QuizBuilder
             lessonId={lesson.id}
             courseId={courseId}
@@ -240,13 +218,13 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
           />
         )}
 
-        {/* WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1: 과제 에디터 — ASSIGNMENT 유형 레슨 편집 시만 표시 */}
-        {isEdit && lesson && form.type === 'ASSIGNMENT' && (
+        {/* WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1: 과제 에디터 — assignment 유형 레슨 편집 시만 표시 */}
+        {isEdit && lesson && form.type === 'assignment' && (
           <AssignmentEditor lessonId={lesson.id} />
         )}
 
-        {/* WO-O4O-LMS-LIVE-MINIMAL-V1: 라이브 에디터 — LIVE 유형 레슨 편집 시만 표시 */}
-        {isEdit && lesson && form.type === 'LIVE' && (
+        {/* WO-O4O-LMS-LIVE-MINIMAL-V1: 라이브 에디터 — live 유형 레슨 편집 시만 표시 */}
+        {isEdit && lesson && form.type === 'live' && (
           <LiveEditor lessonId={lesson.id} />
         )}
       </div>
@@ -564,8 +542,6 @@ export default function CourseEditPage() {
                   <div style={s.lessonTitle}>{lesson.title}</div>
                   <div style={s.lessonMeta}>
                     {LESSON_TYPE_LABEL[lesson.type] || lesson.type} · {lesson.duration > 0 ? `${lesson.duration}분` : '시간 미설정'}
-                    {/* WO-O4O-LMS-LESSON-TYPE-HIDE-INCOMPLETE-V1: 미지원 타입 표시 */}
-                    {isUnsupportedType(lesson.type) && <span style={s.unsupportedTag}>미지원</span>}
                     {!lesson.isPublished && <span style={{ marginLeft: 6, color: '#f59e0b' }}>미발행</span>}
                   </div>
                 </div>
