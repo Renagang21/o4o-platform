@@ -2,6 +2,7 @@
  * SignageManagerTemplate — Signage Hub 동영상 + 플레이리스트 관리 템플릿
  *
  * WO-O4O-SIGNAGE-HUB-TEMPLATE-FOUNDATION-V1
+ * WO-KPA-SIGNAGE-LIST-UX-REFACTOR-V1: 체크 선택 + ActionBar + 컬럼 제어 opt-in 추가
  *
  * 구조:
  *   Hero    — 타이틀 + 설명 + 탭별 액션 버튼 (동영상 등록 / 플레이리스트 등록)
@@ -18,7 +19,7 @@
  * 금지: 스케줄·HQ운영·강제노출 탭을 이 Template에 추가하지 말 것
  */
 
-import { useState, useRef } from 'react';
+import { useState, useRef, type ReactNode } from 'react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -93,6 +94,23 @@ export interface SignageManagerConfig {
   onEditPlaylist?: (p: SignageHubPlaylist) => void;
   onDeletePlaylist?: (p: SignageHubPlaylist) => void;
   canEditPlaylist?: (p: SignageHubPlaylist) => boolean;
+
+  // ── 플레이리스트 재생 ──────────────────────────────────────────────────────
+  /** ▶ 재생 버튼 (플레이리스트) */
+  onPlayPlaylist?: (p: SignageHubPlaylist) => void;
+
+  // ── 체크 선택 (opt-in) ──────────────────────────────────────────────────────
+  selectable?: boolean;
+  selectedVideoIds?: Set<string>;
+  onVideoSelectionChange?: (ids: Set<string>) => void;
+  selectedPlaylistIds?: Set<string>;
+  onPlaylistSelectionChange?: (ids: Set<string>) => void;
+
+  // ── 컬럼 제어 ────────────────────────────────────────────────────────────────
+  hideVideoLinkColumn?: boolean;
+
+  // ── ActionBar 슬롯 ───────────────────────────────────────────────────────────
+  actionBarSlot?: ReactNode;
 
   // ── 탭 제어 ────────────────────────────────────────────────────────────────
   initialTab?: 'videos' | 'playlists';
@@ -207,6 +225,7 @@ export function SignageManagerTemplate({ config }: { config: SignageManagerConfi
                 />
               </div>
             )}
+            {config.actionBarSlot}
             <VideoTable config={config} />
             <HubPagination
               page={config.videoPage}
@@ -231,6 +250,7 @@ export function SignageManagerTemplate({ config }: { config: SignageManagerConfi
                 />
               </div>
             )}
+            {config.actionBarSlot}
             <PlaylistTable config={config} />
             <HubPagination
               page={config.playlistPage}
@@ -262,26 +282,63 @@ function VideoTable({ config }: { config: SignageManagerConfig }) {
     );
   }
 
+  const selectable = !!config.selectable;
+  const selectedIds = config.selectedVideoIds ?? new Set<string>();
+  const allSelected = config.videos.length > 0 && config.videos.every((v) => selectedIds.has(v.id));
+
+  const toggleAll = () => {
+    if (!config.onVideoSelectionChange) return;
+    if (allSelected) {
+      config.onVideoSelectionChange(new Set());
+    } else {
+      config.onVideoSelectionChange(new Set(config.videos.map((v) => v.id)));
+    }
+  };
+
+  const toggleOne = (id: string) => {
+    if (!config.onVideoSelectionChange) return;
+    const next = new Set(selectedIds);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    config.onVideoSelectionChange(next);
+  };
+
   return (
     <div style={st.tableWrap}>
       <table style={st.table}>
         <thead>
           <tr>
+            {selectable && (
+              <th style={{ ...st.th, width: 40, textAlign: 'center' as const }}>
+                <input type="checkbox" checked={allSelected} onChange={toggleAll} />
+              </th>
+            )}
             <th style={st.th}>제목</th>
-            <th style={{ ...st.th, width: 180 }}>영상 링크</th>
+            {!config.hideVideoLinkColumn && (
+              <th style={{ ...st.th, width: 180 }}>영상 링크</th>
+            )}
             <th style={{ ...st.th, width: 80, textAlign: 'center' as const }}>재생시간</th>
             <th style={{ ...st.th, width: 70, textAlign: 'center' as const }}>상태</th>
             <th style={{ ...st.th, width: 80 }}>등록자</th>
             <th style={{ ...st.th, width: 90 }}>등록일</th>
-            <th style={{ ...st.th, width: 100, textAlign: 'right' as const }}>액션</th>
+            <th style={{ ...st.th, width: selectable ? 50 : 100, textAlign: 'right' as const }}>액션</th>
           </tr>
         </thead>
         <tbody>
           {config.videos.map((v) => {
             const playUrl = v.sourceUrl || v.url || '';
             const canEdit = config.canEditVideo ? config.canEditVideo(v) : false;
+            const rowClickable = selectable && config.onPlayVideo;
             return (
-              <tr key={v.id} style={st.tr}>
+              <tr
+                key={v.id}
+                style={{ ...st.tr, ...(rowClickable ? st.trClickable : {}) }}
+                onClick={rowClickable ? () => config.onPlayVideo!(v) : undefined}
+              >
+                {selectable && (
+                  <td style={{ ...st.td, textAlign: 'center' as const }} onClick={(e) => e.stopPropagation()}>
+                    <input type="checkbox" checked={selectedIds.has(v.id)} onChange={() => toggleOne(v.id)} />
+                  </td>
+                )}
                 <td style={st.td}>
                   <span style={st.cellTitle}>{v.name}</span>
                   {v.description && <span style={st.cellDesc}>{v.description}</span>}
@@ -296,15 +353,17 @@ function VideoTable({ config }: { config: SignageManagerConfig }) {
                     </div>
                   )}
                 </td>
-                <td style={st.td}>
-                  {playUrl ? (
-                    <a href={playUrl} target="_blank" rel="noopener noreferrer" style={st.urlLink}>
-                      {playUrl}
-                    </a>
-                  ) : (
-                    <span style={{ color: N400, fontSize: 13 }}>-</span>
-                  )}
-                </td>
+                {!config.hideVideoLinkColumn && (
+                  <td style={st.td}>
+                    {playUrl ? (
+                      <a href={playUrl} target="_blank" rel="noopener noreferrer" style={st.urlLink}>
+                        {playUrl}
+                      </a>
+                    ) : (
+                      <span style={{ color: N400, fontSize: 13 }}>-</span>
+                    )}
+                  </td>
+                )}
                 <td style={{ ...st.td, textAlign: 'center' as const, color: N500, fontSize: 13 }}>
                   {formatDuration(v.duration)}
                 </td>
@@ -317,7 +376,7 @@ function VideoTable({ config }: { config: SignageManagerConfig }) {
                 <td style={{ ...st.td, fontSize: 13, color: N500 }}>
                   {v.createdAt ? new Date(v.createdAt).toLocaleDateString('ko-KR') : '-'}
                 </td>
-                <td style={st.td}>
+                <td style={st.td} onClick={(e) => e.stopPropagation()}>
                   <div style={st.actionRow}>
                     {playUrl && (
                       <button
@@ -326,10 +385,10 @@ function VideoTable({ config }: { config: SignageManagerConfig }) {
                         title="새창 재생"
                       >▶</button>
                     )}
-                    {canEdit && config.onEditVideo && (
+                    {!selectable && canEdit && config.onEditVideo && (
                       <button onClick={() => config.onEditVideo!(v)} style={st.actionBtn} title="수정">✎</button>
                     )}
-                    {canEdit && config.onDeleteVideo && (
+                    {!selectable && canEdit && config.onDeleteVideo && (
                       <button onClick={() => config.onDeleteVideo!(v)} style={st.deleteBtn} title="삭제">✕</button>
                     )}
                   </div>
@@ -357,29 +416,65 @@ function PlaylistTable({ config }: { config: SignageManagerConfig }) {
     );
   }
 
+  const selectable = !!config.selectable;
+  const selectedIds = config.selectedPlaylistIds ?? new Set<string>();
+  const allSelected = config.playlists.length > 0 && config.playlists.every((p) => selectedIds.has(p.id));
+
+  const toggleAll = () => {
+    if (!config.onPlaylistSelectionChange) return;
+    if (allSelected) {
+      config.onPlaylistSelectionChange(new Set());
+    } else {
+      config.onPlaylistSelectionChange(new Set(config.playlists.map((p) => p.id)));
+    }
+  };
+
+  const toggleOne = (id: string) => {
+    if (!config.onPlaylistSelectionChange) return;
+    const next = new Set(selectedIds);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    config.onPlaylistSelectionChange(next);
+  };
+
+  const hasPlayAction = !!config.onPlayPlaylist || !!config.onPlaylistClick;
+  const actionColWidth = selectable ? (hasPlayAction ? 50 : 0) : 100;
+
   return (
     <div style={st.tableWrap}>
       <table style={st.table}>
         <thead>
           <tr>
+            {selectable && (
+              <th style={{ ...st.th, width: 40, textAlign: 'center' as const }}>
+                <input type="checkbox" checked={allSelected} onChange={toggleAll} />
+              </th>
+            )}
             <th style={st.th}>제목</th>
             <th style={{ ...st.th, width: 80, textAlign: 'center' as const }}>영상 수</th>
             <th style={{ ...st.th, width: 100, textAlign: 'center' as const }}>총 재생시간</th>
             <th style={{ ...st.th, width: 70, textAlign: 'center' as const }}>상태</th>
             <th style={{ ...st.th, width: 80 }}>등록자</th>
             <th style={{ ...st.th, width: 90 }}>수정일</th>
-            <th style={{ ...st.th, width: 100, textAlign: 'right' as const }}>액션</th>
+            {actionColWidth > 0 && (
+              <th style={{ ...st.th, width: actionColWidth, textAlign: 'right' as const }}>액션</th>
+            )}
           </tr>
         </thead>
         <tbody>
           {config.playlists.map((p) => {
             const canEdit = config.canEditPlaylist ? config.canEditPlaylist(p) : false;
+            const rowClickable = config.onPlaylistClick;
             return (
               <tr
                 key={p.id}
-                style={{ ...st.tr, ...(config.onPlaylistClick ? st.trClickable : {}) }}
-                onClick={config.onPlaylistClick ? () => config.onPlaylistClick!(p) : undefined}
+                style={{ ...st.tr, ...(rowClickable ? st.trClickable : {}) }}
+                onClick={rowClickable ? () => config.onPlaylistClick!(p) : undefined}
               >
+                {selectable && (
+                  <td style={{ ...st.td, textAlign: 'center' as const }} onClick={(e) => e.stopPropagation()}>
+                    <input type="checkbox" checked={selectedIds.has(p.id)} onChange={() => toggleOne(p.id)} />
+                  </td>
+                )}
                 <td style={st.td}>
                   <span style={config.onPlaylistClick ? st.cellTitleLink : st.cellTitle}>{p.name}</span>
                   {p.description && <span style={st.cellDesc}>{p.description}</span>}
@@ -411,19 +506,24 @@ function PlaylistTable({ config }: { config: SignageManagerConfig }) {
                     ? new Date(p.updatedAt || p.createdAt!).toLocaleDateString('ko-KR')
                     : '-'}
                 </td>
-                <td
-                  style={st.td}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <div style={st.actionRow}>
-                    {canEdit && config.onEditPlaylist && (
-                      <button onClick={() => config.onEditPlaylist!(p)} style={st.actionBtn} title="편집">✎</button>
-                    )}
-                    {canEdit && config.onDeletePlaylist && (
-                      <button onClick={() => config.onDeletePlaylist!(p)} style={st.deleteBtn} title="삭제">✕</button>
-                    )}
-                  </div>
-                </td>
+                {actionColWidth > 0 && (
+                  <td
+                    style={st.td}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div style={st.actionRow}>
+                      {config.onPlayPlaylist && (
+                        <button onClick={() => config.onPlayPlaylist!(p)} style={st.actionBtn} title="재생">▶</button>
+                      )}
+                      {!selectable && canEdit && config.onEditPlaylist && (
+                        <button onClick={() => config.onEditPlaylist!(p)} style={st.actionBtn} title="편집">✎</button>
+                      )}
+                      {!selectable && canEdit && config.onDeletePlaylist && (
+                        <button onClick={() => config.onDeletePlaylist!(p)} style={st.deleteBtn} title="삭제">✕</button>
+                      )}
+                    </div>
+                  </td>
+                )}
               </tr>
             );
           })}

@@ -5,12 +5,18 @@
  *   SignageManagerTemplate 기반으로 전환.
  *   동영상/플레이리스트 탭 구조 유지.
  *   API 연결 + 모달(등록/수정/삭제) 유지.
+ *
+ * WO-KPA-SIGNAGE-LIST-UX-REFACTOR-V1
+ *   체크박스 선택 + ActionBar 패턴으로 전환.
+ *   영상 링크 컬럼 제거, 행별 액션 최소화 (재생만 유지).
+ *   수정/삭제/전체화면 재생은 ActionBar에서 처리.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { SignageManagerTemplate } from '@o4o/shared-space-ui';
 import type { SignageHubVideo, SignageHubPlaylist } from '@o4o/shared-space-ui';
+import { ActionBar } from '@o4o/ui';
 import { publicContentApi } from '../../lib/api/signageV2';
 import { getAccessToken, useAuth } from '../../contexts/AuthContext';
 import { hasAnyRole, PLATFORM_ROLES } from '../../lib/role-constants';
@@ -85,6 +91,10 @@ export default function ContentHubPage() {
   const [editTags, setEditTags] = useState<string[]>([]);
   const [editTagInput, setEditTagInput] = useState('');
 
+  // Selection state
+  const [selectedVideoIds, setSelectedVideoIds] = useState<Set<string>>(new Set());
+  const [selectedPlaylistIds, setSelectedPlaylistIds] = useState<Set<string>>(new Set());
+
   // ── Auth fetch helper ──
   const apiFetch = useCallback(async (path: string, options?: RequestInit) => {
     const token = getAccessToken();
@@ -147,6 +157,12 @@ export default function ContentHubPage() {
       .catch(() => {})
       .finally(() => setPlaylistsLoading(false));
   }, [activeTab, playlistPage, reloadKey]);
+
+  // ── Clear selection on data reload ──
+  useEffect(() => {
+    setSelectedVideoIds(new Set());
+    setSelectedPlaylistIds(new Set());
+  }, [reloadKey]);
 
   // ── Tags (create) ──
   const addTag = (value: string) => {
@@ -260,6 +276,106 @@ export default function ContentHubPage() {
     }
   };
 
+  // ── ActionBar helpers ──
+  const selectedVideo = useMemo(() => {
+    if (selectedVideoIds.size !== 1) return null;
+    const id = [...selectedVideoIds][0];
+    return videos.find((v) => v.id === id) ?? null;
+  }, [selectedVideoIds, videos]);
+
+  const selectedPlaylist = useMemo(() => {
+    if (selectedPlaylistIds.size !== 1) return null;
+    const id = [...selectedPlaylistIds][0];
+    return playlists.find((p) => p.id === id) ?? null;
+  }, [selectedPlaylistIds, playlists]);
+
+  const canEditSelected = (items: Array<SignageHubVideo | SignageHubPlaylist>, ids: Set<string>) => {
+    if (ids.size === 0) return false;
+    return [...ids].every((id) => {
+      const item = items.find((i) => i.id === id);
+      if (!item) return false;
+      return isOperator || (!!user && item.source === 'community' && item.createdByUserId === user.id);
+    });
+  };
+
+  const handleBulkDeleteVideos = () => {
+    if (selectedVideoIds.size === 0) return;
+    // 단일 선택 → 기존 삭제 모달 재사용
+    if (selectedVideoIds.size === 1 && selectedVideo) {
+      setDeleteConfirm({ id: selectedVideo.id, name: selectedVideo.name, type: 'video', operatorDelete: isOperator });
+      return;
+    }
+    // 다건: 첫 항목으로 삭제 모달 (향후 bulk 확장 가능)
+    const firstId = [...selectedVideoIds][0];
+    const first = videos.find((v) => v.id === firstId);
+    if (first) {
+      setDeleteConfirm({ id: first.id, name: `${first.name} 외 ${selectedVideoIds.size - 1}건`, type: 'video', operatorDelete: isOperator });
+    }
+  };
+
+  const handleBulkDeletePlaylists = () => {
+    if (selectedPlaylistIds.size === 0) return;
+    if (selectedPlaylistIds.size === 1 && selectedPlaylist) {
+      setDeleteConfirm({ id: selectedPlaylist.id, name: selectedPlaylist.name, type: 'playlist', operatorDelete: isOperator });
+      return;
+    }
+    const firstId = [...selectedPlaylistIds][0];
+    const first = playlists.find((p) => p.id === firstId);
+    if (first) {
+      setDeleteConfirm({ id: first.id, name: `${first.name} 외 ${selectedPlaylistIds.size - 1}건`, type: 'playlist', operatorDelete: isOperator });
+    }
+  };
+
+  const videoActions = useMemo(() => [
+    {
+      key: 'edit',
+      label: '수정',
+      onClick: () => { if (selectedVideo) openEditModal(selectedVideo); },
+      visible: selectedVideoIds.size === 1 && !!selectedVideo && canEditSelected(videos, selectedVideoIds),
+    },
+    {
+      key: 'play',
+      label: '전체화면 재생',
+      onClick: () => { if (selectedVideo) navigate(`/signage/play/media/${selectedVideo.id}`); },
+      visible: selectedVideoIds.size === 1,
+    },
+    {
+      key: 'delete',
+      label: `삭제 (${selectedVideoIds.size})`,
+      onClick: handleBulkDeleteVideos,
+      variant: 'danger' as const,
+      visible: canEditSelected(videos, selectedVideoIds),
+      group: 'danger',
+    },
+  ], [selectedVideoIds, selectedVideo, videos, isOperator, user]);
+
+  const playlistActions = useMemo(() => [
+    {
+      key: 'edit',
+      label: '수정',
+      onClick: () => { if (selectedPlaylist) navigate(`/signage/playlist/${selectedPlaylist.id}/edit`); },
+      visible: selectedPlaylistIds.size === 1 && !!selectedPlaylist && canEditSelected(playlists, selectedPlaylistIds),
+    },
+    {
+      key: 'play',
+      label: '전체화면 재생',
+      onClick: () => { if (selectedPlaylist) navigate(`/signage/play/playlist/${selectedPlaylist.id}`); },
+      visible: selectedPlaylistIds.size === 1,
+    },
+    {
+      key: 'delete',
+      label: `삭제 (${selectedPlaylistIds.size})`,
+      onClick: handleBulkDeletePlaylists,
+      variant: 'danger' as const,
+      visible: canEditSelected(playlists, selectedPlaylistIds),
+      group: 'danger',
+    },
+  ], [selectedPlaylistIds, selectedPlaylist, playlists, isOperator, user]);
+
+  const actionBarSlot = activeTab === 'videos'
+    ? <ActionBar selectedCount={selectedVideoIds.size} onClearSelection={() => setSelectedVideoIds(new Set())} actions={videoActions} />
+    : <ActionBar selectedCount={selectedPlaylistIds.size} onClearSelection={() => setSelectedPlaylistIds(new Set())} actions={playlistActions} />;
+
   return (
     <>
       <SignageManagerTemplate config={{
@@ -282,8 +398,6 @@ export default function ContentHubPage() {
           setCreateModal(true);
         } : undefined,
         onPlayVideo: (v) => navigate(`/signage/play/media/${v.id}`),
-        onEditVideo: (v) => openEditModal(v),
-        onDeleteVideo: (v) => setDeleteConfirm({ id: v.id, name: v.name, type: 'video', operatorDelete: isOperator }),
         canEditVideo: (v) => isOperator || (!!user && v.source === 'community' && v.createdByUserId === user.id),
 
         // ── 플레이리스트 탭 ──
@@ -295,14 +409,24 @@ export default function ContentHubPage() {
         onPlaylistPageChange: (p) => setPlaylistPage(p),
         onPlaylistClick: (p) => navigate(`/signage/play/playlist/${p.id}`),
         onAddPlaylist: user ? () => navigate('/signage/playlist/new') : undefined,
-        onEditPlaylist: (p) => navigate(`/signage/playlist/${p.id}/edit`),
-        onDeletePlaylist: (p) => setDeleteConfirm({ id: p.id, name: p.name, type: 'playlist', operatorDelete: isOperator }),
+        onPlayPlaylist: (p) => navigate(`/signage/play/playlist/${p.id}`),
         canEditPlaylist: (p) => isOperator || (!!user && p.source === 'community' && p.createdByUserId === user?.id),
+
+        // ── 체크 선택 + ActionBar ──
+        selectable: true,
+        selectedVideoIds,
+        onVideoSelectionChange: setSelectedVideoIds,
+        selectedPlaylistIds,
+        onPlaylistSelectionChange: setSelectedPlaylistIds,
+        hideVideoLinkColumn: true,
+        actionBarSlot,
 
         // ── 탭 제어 ──
         initialTab,
         onTabChange: (tab) => {
           setActiveTab(tab);
+          setSelectedVideoIds(new Set());
+          setSelectedPlaylistIds(new Set());
           setSearchParams(tab === 'playlists' ? { tab: 'playlists' } : {});
         },
       }} />
