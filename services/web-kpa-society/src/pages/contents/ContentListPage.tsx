@@ -8,16 +8,18 @@
  * WO-KPA-CONTENT-HUB-SECTION-UI-V1 (Phase 2: 섹션 허브 UI 전환)
  * WO-O4O-CONTENT-LIBRARY-CARD-STANDARD-V1: inline style → Tailwind, hex → theme, Card 적용
  * WO-KPA-CONTENT-HUB-SURVEY-SECTION-RESTORE-V1: 설문조사 섹션 추가
+ * WO-KPA-PARTICIPATION-SETS-404-CLEANUP-V1: KPA에 participation 백엔드가 없으므로
+ *   설문 섹션은 정적 안내로 유지 (participation API 호출 제거).
  *
  * /content를 3개 섹션의 허브로 표시:
  *   1. 문서형 콘텐츠 — 메인 섹션 (리스트, 등록/상세/링크/수정/삭제)
  *   2. 코스형 자료  — 두 번째 섹션 (리스트, 등록 + 더보기)
- *   3. 설문조사     — 세 번째 섹션 (카드 미리보기, 등록 + 더보기)
+ *   3. 설문조사     — 세 번째 섹션 (정적 안내 — participation 실행은 Neture canonical)
  *
  * 데이터 소스:
  *   - 문서: contentApi.list (content_type='information', sub_type='content')
  *   - 코스: lmsApi.getCourses (공개 API, contentKind='content_resource', status='published')
- *   - 설문: participationApi.getParticipationSets (최대 6개)
+ *   - 설문: 없음 (API 미호출 — 정적 placeholder)
  *
  * WO-KPA-CONTENT-COURSES-PUBLIC-VISIBILITY-FIX-V1:
  *   코스형 자료 섹션을 강사 전용 API에서 공개 API로 교체.
@@ -30,9 +32,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { contentApi, type ContentItem } from '../../api/content';
 import { lmsApi } from '../../api/lms';
-import { participationApi } from '../../api/participation';
 import type { Course } from '../../types';
-import type { ParticipationSet } from '../participation/types';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
 import { Card } from '@o4o/ui';
@@ -407,94 +407,23 @@ function CoursesSection({ canCreateCourse }: { canCreateCourse: boolean }) {
   );
 }
 
-// ─── Section 3: 설문조사 (WO-KPA-CONTENT-HUB-SURVEY-SECTION-RESTORE-V1) ─────
+// ─── Section 3: 설문조사 (WO-KPA-PARTICIPATION-SETS-404-CLEANUP-V1) ─────────
+// participation 실행 기능은 Neture canonical이며 KPA 백엔드에 엔드포인트가 없다.
+// 따라서 이 섹션은 API를 호출하지 않고 정적 placeholder만 표시한다.
 
-function SurveysSection({ isAuthenticated }: { isAuthenticated: boolean }) {
-  const navigate = useNavigate();
-  const [surveys, setSurveys] = useState<ParticipationSet[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    participationApi.getParticipationSets({ page: 1, limit: 6 })
-      .then((res: any) => {
-        if (cancelled) return;
-        const list = res?.data?.items ?? res?.items ?? [];
-        setSurveys(Array.isArray(list) ? list : []);
-      })
-      .catch(() => {
-        if (cancelled) return;
-        setSurveys([]);
-      })
-      .finally(() => {
-        if (cancelled) return;
-        setLoading(false);
-      });
-    return () => { cancelled = true; };
-  }, []);
-
-  const handleClick = (s: ParticipationSet) => {
-    if (s.status === 'active') {
-      navigate(`/participation/${s.id}/respond`);
-    } else {
-      navigate(`/participation/${s.id}/results`);
-    }
-  };
-
-  const statusBadge = (status: string) => {
-    if (status === 'active') return { cls: 'bg-emerald-50 text-emerald-700', label: '진행 중' };
-    if (status === 'closed') return { cls: 'bg-slate-100 text-slate-500', label: '종료됨' };
-    return { cls: 'bg-amber-50 text-amber-700', label: '초안' };
-  };
-
+function SurveysSection() {
   return (
     <section className="mb-10">
       <SectionHeader
         title="설문조사"
         description="의견을 수집하거나 참여를 받는 설문"
-        primaryAction={isAuthenticated ? { label: '설문 등록', to: '/content/surveys/new' } : undefined}
         moreLink={{ label: '전체 보기', to: '/content/surveys' }}
       />
-
-      {loading ? (
-        <Card className="overflow-hidden">
-          <div className="py-8 px-4 text-sm text-slate-400 text-center">불러오는 중...</div>
-        </Card>
-      ) : surveys.length === 0 ? (
-        <Card className="overflow-hidden">
-          <div className="py-8 px-4 text-sm text-slate-400 text-center">아직 설문조사가 없습니다</div>
-        </Card>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {surveys.map((s) => {
-            const badge = statusBadge(s.status);
-            return (
-              <Card
-                key={s.id}
-                className="p-4 cursor-pointer hover:bg-slate-50 transition-colors"
-                onClick={() => handleClick(s)}
-              >
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-start justify-between gap-2">
-                    <span className="text-sm font-medium text-slate-800 line-clamp-1 flex-1 min-w-0">{s.title}</span>
-                    <span className={`inline-block px-2 py-0.5 text-[11px] font-semibold rounded shrink-0 ${badge.cls}`}>
-                      {badge.label}
-                    </span>
-                  </div>
-                  {s.description && (
-                    <p className="text-xs text-slate-500 line-clamp-2 m-0">{s.description}</p>
-                  )}
-                  <div className="flex items-center gap-3 text-xs text-slate-400">
-                    <span>질문 {s.questions?.length ?? 0}개</span>
-                    <span>{formatDate(s.createdAt)}</span>
-                  </div>
-                </div>
-              </Card>
-            );
-          })}
+      <Card className="overflow-hidden">
+        <div className="py-8 px-4 text-sm text-slate-400 text-center">
+          설문조사 기능은 준비 중입니다
         </div>
-      )}
+      </Card>
     </section>
   );
 }
@@ -531,7 +460,7 @@ export function ContentListPage() {
 
       <CoursesSection canCreateCourse={canCreateCourse} />
 
-      <SurveysSection isAuthenticated={isAuthenticated} />
+      <SurveysSection />
     </div>
   );
 }
