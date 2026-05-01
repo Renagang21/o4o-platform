@@ -102,13 +102,18 @@ export class SeedKCosmeticsStoreOwnerTestAccount20260501100000 implements Migrat
     const storeId = storeResult[0].id;
     console.log(`[SeedKCosStoreOwner] store: ${storeId}`);
 
-    // 8. cosmetics.cosmetics_store_members (idempotent via UNIQUE(store_id, user_id))
-    await queryRunner.query(
-      `INSERT INTO cosmetics.cosmetics_store_members (id, store_id, user_id, role, is_active, created_at, updated_at)
-       VALUES (gen_random_uuid(), $1, $2, 'owner', true, NOW(), NOW())
-       ON CONFLICT ON CONSTRAINT "UQ_cosmetics_store_members_storeId_userId" DO NOTHING`,
+    // 8. cosmetics.cosmetics_store_members (idempotent — check before insert)
+    const existingMember = await queryRunner.query(
+      `SELECT 1 FROM cosmetics.cosmetics_store_members WHERE store_id = $1 AND user_id = $2 LIMIT 1`,
       [storeId, userId],
     );
+    if (existingMember.length === 0) {
+      await queryRunner.query(
+        `INSERT INTO cosmetics.cosmetics_store_members (id, store_id, user_id, role, is_active, created_at, updated_at)
+         VALUES (gen_random_uuid(), $1, $2, 'owner', true, NOW(), NOW())`,
+        [storeId, userId],
+      );
+    }
     console.log(`[SeedKCosStoreOwner] store_member: owner`);
 
     // 9. platform_store_slug_history (slug registry, idempotent)
