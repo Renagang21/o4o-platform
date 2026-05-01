@@ -7,15 +7,10 @@
 import { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
 import { authenticationService } from '../../../services/authentication.service.js';
-import { AppDataSource } from '../../../database/connection.js';
 import type { LoginRequestDto } from '../dto/index.js';
 import logger from '../../../utils/logger.js';
 import { monitoringMetrics } from '../../../common/monitoring/metrics.service.js';
-import {
-  isCrossOriginRequest,
-  derivePharmacistQualification,
-  deriveKpaMembershipContext,
-} from './auth-helpers.js';
+import { isCrossOriginRequest } from './auth-helpers.js';
 
 // Phase 5-B: Auth ↔ Infra Separation
 // Auth 계층은 DB 상태 검사를 수행하지 않음.
@@ -77,27 +72,12 @@ export class AuthLoginController extends BaseController {
       // Uses request origin for multi-domain cookie support
       authenticationService.setAuthCookies(req, res, result.tokens, result.sessionId);
 
-      // Enrich user data with activityType + kpaMembership (same as /auth/me)
-      const loginUser = result.user as Record<string, unknown>;
-      try {
-        const qualification = await derivePharmacistQualification(result.user.id);
-        loginUser.pharmacistRole = qualification.pharmacistRole;
-        loginUser.pharmacistFunction = qualification.pharmacistFunction;
-        loginUser.isStoreOwner = qualification.isStoreOwner;
-      } catch { /* non-critical */ }
-      try {
-        const [profile] = await AppDataSource.query(
-          `SELECT activity_type FROM kpa_pharmacist_profiles WHERE user_id = $1 LIMIT 1`,
-          [result.user.id]
-        );
-        loginUser.activityType = profile?.activity_type || null;
-      } catch { loginUser.activityType = null; }
-      try {
-        const kpaMembership = await deriveKpaMembershipContext(result.user.id);
-        loginUser.kpaMembership = kpaMembership;
-      } catch { /* non-critical */ }
+      // WO-KPA-LOGIN-LATENCY-CLEANUP-V1: KPA enrichment 제거
+      // pharmacistQualification, activityType, kpaMembership는
+      // 프론트엔드에서 GET /api/v1/kpa/me-context로 별도 조회
 
       // WO-O4O-NAME-NORMALIZATION-V1: displayName 추가
+      const loginUser = result.user as Record<string, unknown>;
       loginUser.displayName =
         (result.user.lastName || result.user.firstName)
           ? `${result.user.lastName || ''}${result.user.firstName || ''}`.trim()

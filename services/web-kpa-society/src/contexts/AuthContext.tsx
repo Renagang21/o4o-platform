@@ -212,6 +212,8 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  /** WO-KPA-LOGIN-LATENCY-CLEANUP-V1: KPA context 로딩 완료 여부 */
+  isKpaContextLoaded: boolean;
   login: (email: string, password: string) => Promise<User>;
   loginAsTestAccount: (accountType: TestAccountType) => void;
   logout: () => Promise<void>;
@@ -279,9 +281,53 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  // WO-KPA-LOGIN-LATENCY-CLEANUP-V1: KPA context 비동기 로딩 상태
+  // true = 로딩 불필요 또는 로딩 완료 / false = 아직 로딩 중
+  const [isKpaContextLoaded, setIsKpaContextLoaded] = useState(true);
 
   // Phase 2-b: Service User state (WO-AUTH-SERVICE-IDENTITY-PHASE2B-KPA-PHARMACY)
   const [serviceUser, setServiceUser] = useState<ServiceUser | null>(null);
+
+  /**
+   * WO-KPA-LOGIN-LATENCY-CLEANUP-V1: KPA context를 별도 API로 비동기 조회
+   *
+   * /auth/login, /auth/me 에서 제거된 KPA enrichment를 대체.
+   * functional setUser로 현재 user 상태에 KPA 필드를 merge.
+   * login()/checkAuth()에서 fire-and-forget으로 호출 → 로그인/화면진입을 차단하지 않음.
+   * AuthGate는 isKpaContextLoaded=false 동안 KPA 게이트를 건너뛴다.
+   */
+  const fetchKpaContext = useCallback(async () => {
+    try {
+      const response = await authClient.api.get('/kpa/me-context');
+      const data = response.data as { success: boolean; data: any };
+      if (data.success && data.data) {
+        const ctx = data.data;
+        setUser(prev => {
+          if (!prev) return prev;
+          const updated = { ...prev };
+          updated.activityType = ctx.activityType || undefined;
+          updated.isStoreOwner = !!ctx.isStoreOwner;
+          if (ctx.kpaMembership) {
+            updated.kpaMembership = ctx.kpaMembership;
+            // 하위 호환 필드 populate
+            updated.membershipRole = ctx.kpaMembership.role || undefined;
+            updated.membershipOrgId = ctx.kpaMembership.organizationId || undefined;
+            updated.membershipOrgName = ctx.kpaMembership.organizationName || undefined;
+            updated.membershipOrgType = ctx.kpaMembership.organizationType || undefined;
+            updated.membershipStatus = ctx.kpaMembership.status || undefined;
+            if (ctx.kpaMembership.membershipType === 'student') {
+              updated.membershipType = 'student';
+            }
+          }
+          return updated;
+        });
+      }
+    } catch (error) {
+      console.error('[KPA] me-context fetch failed:', error);
+    } finally {
+      setIsKpaContextLoaded(true);
+    }
+  }, []);
 
   const checkAuth = useCallback(async () => {
     // WO-KPA-A-AUTH-LOOP-GUARD-STABILIZATION-V1:
@@ -290,6 +336,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!token) {
       setUser(null);
       setIsLoading(false);
+      setIsKpaContextLoaded(true);
       return;
     }
 
@@ -300,22 +347,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (data.success && data.data) {
         // WO-O4O-AUTH-CHAIN-UNIFICATION-V1: parseAuthResponse로 user 추출 통일
         const { user: apiUser } = parseAuthResponse(data);
-        if (!apiUser) { setUser(null); setIsLoading(false); return; }
+        if (!apiUser) { setUser(null); setIsLoading(false); setIsKpaContextLoaded(true); return; }
         const userData = createUserFromApiResponse(apiUser);
 
-        // WO-KPA-B-SERVICE-CONTEXT-UNIFICATION-V1: kpaMembership from /auth/me (단일 호출)
-        const km = (apiUser as any).kpaMembership;
-        if (km) {
-          userData.kpaMembership = km;
-          // 하위 호환 필드 populate
-          userData.membershipRole = km.role || undefined;
-          userData.membershipOrgId = km.organizationId || undefined;
-          userData.membershipOrgName = km.organizationName || undefined;
-          userData.membershipOrgType = km.organizationType || undefined;
-          userData.membershipStatus = km.status || undefined;
-        }
-
+        // 즉시 user 설정 → 화면 표시 차단 해제
         setUser(userData);
+        // WO-KPA-LOGIN-LATENCY-CLEANUP-V1: KPA context는 비동기 후속 로딩
+        setIsKpaContextLoaded(false);
+        void fetchKpaContext();
       } else {
         setUser(null);
       }
@@ -325,7 +364,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [fetchKpaContext]);
 
   useEffect(() => {
     checkAuth();
@@ -345,18 +384,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const apiUser = response.user as any;
       const userData = createUserFromApiResponse(apiUser as ApiUser);
 
-      // Parse kpaMembership from login response (same as checkAuth)
-      const km = apiUser.kpaMembership;
-      if (km) {
-        userData.kpaMembership = km;
-        userData.membershipRole = km.role || undefined;
-        userData.membershipOrgId = km.organizationId || undefined;
-        userData.membershipOrgName = km.organizationName || undefined;
-        userData.membershipOrgType = km.organizationType || undefined;
-        userData.membershipStatus = km.status || undefined;
-      }
-
+      // 즉시 user 설정 → 로그인 모달 닫기 + 화면 진입
       setUser(userData);
+      // WO-KPA-LOGIN-LATENCY-CLEANUP-V1: KPA context는 비동기 후속 로딩
+      setIsKpaContextLoaded(false);
+      void fetchKpaContext();
+
       return userData;
     } else {
       throw new Error('로그인 응답 형식이 올바르지 않습니다.');
@@ -398,7 +431,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
    * WO-KPA-A-PHARMACIST-ACTIVITY-TYPE-BUSINESS-INFO-FLOW-V1:
    * activityType + optional businessInfo 저장
    * - API PATCH로 서버 저장 → 서버가 isStoreOwner 재계산
-   * - checkAuth()로 서버 응답 기반 상태 동기화
+   * - fetchKpaContext()로 KPA context 갱신 (await — AuthGate 정합성 보장)
    * - error re-throw: ActivitySetupPage에서 에러 UI 표시 가능
    */
   const setActivityType = async (activityType: string, businessInfo?: Record<string, any>) => {
@@ -406,7 +439,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const payload: Record<string, any> = { activityType };
       if (businessInfo) payload.businessInfo = businessInfo;
       await authClient.api.patch('/auth/me/profile', payload);
-      await checkAuth();
+      // WO-KPA-LOGIN-LATENCY-CLEANUP-V1: KPA context만 갱신 (await로 AuthGate 정합성 보장)
+      setIsKpaContextLoaded(false);
+      await fetchKpaContext();
     }
   };
 
@@ -469,6 +504,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user,
         isAuthenticated: !!user,
         isLoading,
+        isKpaContextLoaded,
         login,
         loginAsTestAccount,
         logout,

@@ -11,10 +11,7 @@ import { AppDataSource } from '../../../database/connection.js';
 import logger from '../../../utils/logger.js';
 import { deriveUserScopes } from '../../../utils/scope-assignment.utils.js';
 import { roleAssignmentService } from '../services/role-assignment.service.js';
-import {
-  derivePharmacistQualification,
-  deriveKpaMembershipContext,
-} from './auth-helpers.js';
+import { derivePharmacistQualification } from './auth-helpers.js';
 
 export class AuthAccountController extends BaseController {
   /**
@@ -59,27 +56,12 @@ export class AuthAccountController extends BaseController {
           ? `${req.user.lastName || ''}${req.user.firstName || ''}`.trim()
           : req.user.name || req.user.email?.split('@')[0] || '사용자';
 
-      // WO-ROLE-NORMALIZATION-PHASE3-B-V1: derive from kpa_pharmacist_profiles + organization_members
-      const qualification = await derivePharmacistQualification(req.user.id);
-      const ud = userData as Record<string, unknown>;
-      ud.pharmacistRole = qualification.pharmacistRole;
-      ud.pharmacistFunction = qualification.pharmacistFunction;
-      ud.isStoreOwner = qualification.isStoreOwner;
-
-      // activityType from kpa_pharmacist_profiles (required for setup-activity gate)
-      try {
-        const [profile] = await AppDataSource.query(
-          `SELECT activity_type FROM kpa_pharmacist_profiles WHERE user_id = $1 LIMIT 1`,
-          [req.user.id]
-        );
-        ud.activityType = profile?.activity_type || null;
-      } catch { ud.activityType = null; }
-
-      // WO-KPA-B-SERVICE-CONTEXT-UNIFICATION-V1: KPA membership context 통합
-      const kpaMembership = await deriveKpaMembershipContext(req.user.id);
-      ud.kpaMembership = kpaMembership;
+      // WO-KPA-LOGIN-LATENCY-CLEANUP-V1: KPA enrichment 제거
+      // pharmacistQualification, activityType, kpaMembership는
+      // 프론트엔드에서 GET /api/v1/kpa/me-context로 별도 조회
 
       // WO-O4O-SERVICE-MEMBERSHIP-GUARD-V1: Include service memberships
+      const ud = userData as Record<string, unknown>;
       try {
         ud.memberships = await AppDataSource.query(
           `SELECT service_key AS "serviceKey", status, role FROM service_memberships WHERE user_id = $1`,
@@ -219,26 +201,12 @@ export class AuthAccountController extends BaseController {
       });
       userData.scopes = scopes;
 
-      // WO-ROLE-NORMALIZATION-PHASE3-B-V1: derive from kpa_pharmacist_profiles + organization_members
-      const qualification = await derivePharmacistQualification(req.user.id);
-      const ud = userData as Record<string, unknown>;
-      ud.pharmacistRole = qualification.pharmacistRole;
-      ud.pharmacistFunction = qualification.pharmacistFunction;
-      ud.isStoreOwner = qualification.isStoreOwner;
-
-      // activityType from kpa_pharmacist_profiles (required for setup-activity gate)
-      try {
-        const [profile] = await AppDataSource.query(
-          `SELECT activity_type FROM kpa_pharmacist_profiles WHERE user_id = $1 LIMIT 1`,
-          [req.user.id]
-        );
-        ud.activityType = profile?.activity_type || null;
-      } catch { ud.activityType = null; }
-
-      // kpaMembership context (required for membershipType on frontend)
-      ud.kpaMembership = await deriveKpaMembershipContext(req.user.id);
+      // WO-KPA-LOGIN-LATENCY-CLEANUP-V1: KPA enrichment 제거
+      // pharmacistQualification, activityType, kpaMembership는
+      // 프론트엔드에서 GET /api/v1/kpa/me-context로 별도 조회
 
       // WO-O4O-SERVICE-MEMBERSHIP-GUARD-V1: Include service memberships
+      const ud = userData as Record<string, unknown>;
       try {
         ud.memberships = await AppDataSource.query(
           `SELECT service_key AS "serviceKey", status, role FROM service_memberships WHERE user_id = $1`,

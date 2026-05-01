@@ -3,12 +3,14 @@
  *
  * WO-KPA-A-AUTH-UX-STATE-UNIFICATION-V1
  * WO-KPA-B-SERVICE-CONTEXT-UNIFICATION-V1: kpaMembership.serviceAccess 기반 확장
+ * WO-KPA-LOGIN-LATENCY-CLEANUP-V1: KPA context 비동기 로딩 지원
  *
  * 로그인된 사용자의 상태에 따라 적절한 화면으로 분기:
- * 1. serviceAccess = 'pending' → PendingApprovalPage
- * 2. serviceAccess = 'blocked' → PendingApprovalPage (정지/탈퇴)
- * 3. active + activityType 미설정 + 면제 아님 → ActivitySetupPage
- * 4. 정상 → children 렌더링
+ * 1. KPA context 아직 로딩 중 → children 통과 (차단하지 않음)
+ * 2. serviceAccess = 'pending' → PendingApprovalPage
+ * 3. serviceAccess = 'blocked' → PendingApprovalPage (정지/탈퇴)
+ * 4. active + activityType 미설정 + 면제 아님 → ActivitySetupPage
+ * 5. 정상 → children 렌더링
  *
  * 비로그인 사용자는 그대로 통과 (공개 페이지 접근 허용)
  */
@@ -22,12 +24,17 @@ interface AuthGateProps {
 }
 
 export function AuthGate({ children }: AuthGateProps) {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, isKpaContextLoaded } = useAuth();
 
   if (isLoading) return null;
 
   // 비로그인 → 통과 (공개 페이지는 Layout이 처리)
   if (!user) return <>{children}</>;
+
+  // WO-KPA-LOGIN-LATENCY-CLEANUP-V1:
+  // KPA context가 아직 로딩 중이면 KPA 게이트를 건너뛰고 통과.
+  // fetchKpaContext 완료 → setUser + setIsKpaContextLoaded(true) → 재렌더 → 게이트 재평가.
+  if (!isKpaContextLoaded) return <>{children}</>;
 
   // kpaMembership.serviceAccess 기반 판정 (우선)
   const sa = user.kpaMembership?.serviceAccess;

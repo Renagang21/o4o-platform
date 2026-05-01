@@ -101,6 +101,7 @@ import { createCommunityHubController } from './controllers/community-hub.contro
 import { createLegalDocumentsController } from './controllers/legal-documents.controller.js';
 import { createEventOfferController } from './controllers/event-offer.controller.js';
 import { createMypageController } from './controllers/mypage.controller.js';
+import { createMeContextController } from './controllers/me-context.controller.js'; // WO-KPA-LOGIN-LATENCY-CLEANUP-V1
 import { createQualificationController } from './controllers/qualification.controller.js'; // WO-O4O-QUALIFICATION-SYSTEM-V1
 import { createInstructorDashboardController } from './controllers/instructor-dashboard.controller.js'; // WO-O4O-INSTRUCTOR-DASHBOARD-V1
 import { createWorkingContentController } from './controllers/working-content.controller.js';
@@ -338,6 +339,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // ============================================================================
   // AUTHENTICATED USER ROUTES — requireAuth only (no admin/operator scope)
   // ============================================================================
+
+  // WO-KPA-LOGIN-LATENCY-CLEANUP-V1: KPA user context (moved from /auth/login + /auth/me)
+  router.use('/me-context', createMeContextController(dataSource, coreRequireAuth as any));
 
   // Store Hub routes (WO-STORE-HUB-UNIFIED-RENDERING-PHASE1-V1)
   router.use('/store-hub', createStoreHubController(dataSource, coreRequireAuth as any));
