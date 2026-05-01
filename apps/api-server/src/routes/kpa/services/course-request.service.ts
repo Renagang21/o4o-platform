@@ -497,7 +497,6 @@ export class CourseRequestService {
         const course = await courseService.createCourse({
           title: payload.proposed_title,
           description: payload.proposed_description,
-          level: payload.proposed_level?.toUpperCase() as any || 'BEGINNER',
           duration: payload.proposed_duration,
           credits: Number(payload.proposed_credits) || 0,
           tags: payload.proposed_tags || [],
@@ -544,7 +543,6 @@ export class CourseRequestService {
       const course = await courseService.createCourse({
         title: cr.proposed_title,
         description: cr.proposed_description,
-        level: cr.proposed_level?.toUpperCase() as any || 'BEGINNER',
         duration: cr.proposed_duration,
         credits: Number(cr.proposed_credits) || 0,
         tags: cr.proposed_tags || [],
