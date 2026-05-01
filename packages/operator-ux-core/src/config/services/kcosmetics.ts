@@ -2,7 +2,9 @@ import type { ServiceConfig } from '../serviceConfig.js';
 
 export const kcosmeticsConfig: ServiceConfig = {
   key: 'k-cosmetics',
-  template: 'kcosmetics',
+  // WO-O4O-REFERENCE-DESIGN-IMPORT-V1: referenceA preset 실험 적용
+  // 원래 값: 'kcosmetics'
+  template: 'referenceA',
 
   terminology: {
     storeLabel: '매장',

@@ -9,6 +9,9 @@ import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { LoginModalProvider } from '@/contexts/LoginModalContext';
 import LoginModal from '@/components/common/LoginModal';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
+import { TemplateProvider } from '@o4o/ui';
+import { templates } from '@o4o/shared-space-ui';
+import { kcosmeticsConfig } from '@o4o/operator-ux-core';
 import { KCosGlobalHeader } from '@/components/KCosGlobalHeader';
 
 // Layouts (always needed)
@@ -428,9 +431,12 @@ export default function App() {
           <LoginModalProvider>
             <O4OToastProvider />
             <LoginModal />
-            <Suspense fallback={<PageLoading />}>
-              <AppRoutes />
-            </Suspense>
+            {/* WO-O4O-REFERENCE-DESIGN-IMPORT-V1: TemplateProvider 추가 */}
+            <TemplateProvider template={templates[kcosmeticsConfig.template]}>
+              <Suspense fallback={<PageLoading />}>
+                <AppRoutes />
+              </Suspense>
+            </TemplateProvider>
           </LoginModalProvider>
         </AuthProvider>
       </BrowserRouter>

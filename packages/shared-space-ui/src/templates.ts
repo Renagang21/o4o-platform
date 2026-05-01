@@ -16,7 +16,7 @@
  *   - 점진적으로 inline style → template className 전환 기반
  */
 
-export type TemplateKey = 'kpa' | 'glycopharm' | 'kcosmetics';
+export type TemplateKey = 'kpa' | 'glycopharm' | 'kcosmetics' | 'referenceA';
 
 export interface TemplateTokens {
   hero: {
@@ -105,6 +105,41 @@ export const templates: Record<TemplateKey, TemplateTokens> = {
     },
     icon: {
       wrapper: 'bg-primary-50 rounded-full w-11 h-11',
+      icon: 'text-primary',
+    },
+  },
+
+  /**
+   * WO-O4O-REFERENCE-DESIGN-IMPORT-V1
+   *
+   * Reference preset: "Premium SaaS Landing"
+   * 원본: Stripe / Linear / Vercel 디자인 패턴 합성 (light-mode)
+   *
+   * 특징:
+   *  - Gradient hero (기존 preset 중 유일)
+   *  - Borderless hero (깔끔한 인상)
+   *  - 2xl 라운딩 + lg 그림자 (premium 카드)
+   *  - 넉넉한 섹션 간격 (mb-24)
+   *  - 대형 원형 아이콘 래퍼
+   */
+  referenceA: {
+    hero: {
+      bg: 'bg-gradient-to-r from-primary-50 to-primary-100',
+      border: '',
+      padding: 'py-24',
+    },
+    card: {
+      radius: 'rounded-2xl',
+      shadow: 'shadow-lg',
+    },
+    section: {
+      spacing: 'mb-24',
+    },
+    button: {
+      radius: 'rounded-full',
+    },
+    icon: {
+      wrapper: 'bg-primary-50 rounded-full w-12 h-12',
       icon: 'text-primary',
     },
   },

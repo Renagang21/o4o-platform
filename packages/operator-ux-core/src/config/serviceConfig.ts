@@ -11,7 +11,7 @@
 export type ServiceKey = 'kpa-society' | 'glycopharm' | 'k-cosmetics';
 
 /** @o4o/shared-space-ui의 TemplateKey와 구조적으로 호환 */
-export type ServiceTemplateKey = 'kpa' | 'glycopharm' | 'kcosmetics';
+export type ServiceTemplateKey = 'kpa' | 'glycopharm' | 'kcosmetics' | 'referenceA';
 
 export interface ServiceConfig {
   key: ServiceKey;
