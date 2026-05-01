@@ -135,6 +135,10 @@ export interface ResourcesHubConfig {
   getCurrentUserId?: () => string | null;
   getOwnerEditHref?: (id: string) => string;
   onOwnerDelete?: (id: string) => Promise<void>;
+
+  // WO-KPA-RESOURCES-TAKE-ACTION-CLARIFY-V1: 가져가기 결과 toast 어댑터
+  // (consumer 페이지가 자신의 toast 라이브러리로 연결)
+  onToast?: (message: string, type?: 'success' | 'error') => void;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -316,55 +320,74 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
     }
   }, [config, drawerItem, loadData]);
 
+  // WO-KPA-RESOURCES-TAKE-ACTION-CLARIFY-V1:
+  //   가져가기 = 작업 재료 복사. 보기는 제목/행 클릭으로만.
+  //   드로어 fallback 모두 제거. 실패는 toast로 안내 (config.onToast).
+  //   - READ : body 텍스트를 클립보드로 복사 (기존: 드로어 → 변경)
+  //   - COPY : body 텍스트를 클립보드로 복사 (기존 동작 유지)
+  //   - LINK : source_url 우선 → body 첫 링크 → 없으면 toast
+  //   - DOWNLOAD : source_url을 클립보드로 복사 (기존: 다운로드 트리거 → 변경)
   const handleTakeAction = useCallback(async (row: ResourcesHubItem, e: React.MouseEvent) => {
     e.stopPropagation();
     const at = getActionType(row);
+    const notify = config.onToast;
+
+    const flashCopied = () => {
+      setCopiedId(row.id);
+      setTimeout(() => setCopiedId(prev => prev === row.id ? null : prev), 1500);
+    };
+
+    // body가 비어 있을 때 detail에서 한 번 더 시도
+    const ensureBody = async (): Promise<string> => {
+      if (row.body) return row.body;
+      if (config.fetchDetail) {
+        try { const d = await config.fetchDetail(row.id); return d.body ?? ''; } catch { /* ignore */ }
+      }
+      return '';
+    };
+
+    const writeClipboard = async (text: string, successMsg: string) => {
+      try {
+        await navigator.clipboard.writeText(text);
+        flashCopied();
+        notify?.(successMsg, 'success');
+      } catch {
+        notify?.('복사에 실패했습니다', 'error');
+      }
+    };
 
     if (at === 'external') {
-      // source_url 우선, 없으면 body에서 첫 번째 링크 추출
-      const url = row.source_url || (row.body ? extractFirstLinkFromHtml(row.body) : null);
+      // LINK: source_url → body 첫 링크 → toast 실패
+      let url = row.source_url ?? null;
+      if (!url) url = row.body ? extractFirstLinkFromHtml(row.body) : null;
+      if (!url) {
+        const body = await ensureBody();
+        url = body ? extractFirstLinkFromHtml(body) : null;
+      }
       if (url) {
         window.open(url, '_blank', 'noopener,noreferrer');
-      } else if (config.fetchDetail) {
-        // body 없으면 detail fetch 후 재시도
-        try {
-          const d = await config.fetchDetail(row.id);
-          const fallback = d.source_url || (d.body ? extractFirstLinkFromHtml(d.body) : null);
-          if (fallback) window.open(fallback, '_blank', 'noopener,noreferrer');
-          else openDrawer(row);
-        } catch { openDrawer(row); }
       } else {
-        openDrawer(row);
+        notify?.('복사/열 수 있는 링크가 없습니다', 'error');
       }
-    } else if (at === 'download' && row.source_url) {
-      const a = document.createElement('a');
-      a.href = row.source_url;
-      if (row.source_file_name) a.download = row.source_file_name;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    } else if (at === 'copy') {
-      // body HTML → 순수 텍스트 추출 (메타정보 제외)
-      let rawBody = row.body ?? '';
-      if (!rawBody && config.fetchDetail) {
-        try { const d = await config.fetchDetail(row.id); rawBody = d.body ?? ''; } catch { /* ignore */ }
+    } else if (at === 'download') {
+      // DOWNLOAD: 다운로드 트리거 → 파일 URL 복사 (AI 전달용)
+      const url = row.source_url ?? null;
+      if (!url) {
+        notify?.('복사할 파일 링크가 없습니다', 'error');
+        return;
       }
-      const text = rawBody ? extractTextFromHtml(rawBody) : '';
-      if (text) {
-        try {
-          await navigator.clipboard.writeText(text);
-          setCopiedId(row.id);
-          setTimeout(() => setCopiedId(prev => prev === row.id ? null : prev), 1500);
-        } catch { /* ignore */ }
-      } else {
-        // 복사할 내용 없음 → 드로어로 보여줌
-        if (config.fetchDetail) openDrawer(row);
-      }
+      await writeClipboard(url, '파일 링크가 복사되었습니다');
     } else {
-      // READ 또는 기타 → 보기(드로어)
-      if (config.fetchDetail) openDrawer(row);
+      // COPY 또는 READ('view'): 본문 텍스트를 클립보드로 복사
+      const body = await ensureBody();
+      const text = body ? extractTextFromHtml(body) : '';
+      if (!text) {
+        notify?.('복사할 본문이 없습니다', 'error');
+        return;
+      }
+      await writeClipboard(text, '복사되었습니다');
     }
-  }, [config, openDrawer]);
+  }, [config]);
 
   // ─── Bulk ─────────────────────────────────────────────────────────────────
 

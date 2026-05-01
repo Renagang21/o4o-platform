@@ -123,6 +123,12 @@ function useKpaResourcesConfig(isOperator: boolean, userId: string | null | unde
       toast.success('자료가 삭제되었습니다');
     },
 
+    // WO-KPA-RESOURCES-TAKE-ACTION-CLARIFY-V1: 가져가기 결과 toast
+    onToast: (message, type) => {
+      if (type === 'error') toast.error(message);
+      else toast.success(message);
+    },
+
     emptyMessage: '등록된 자료가 없습니다.',
     emptyFilteredMessage: '검색 결과가 없습니다.',
   // eslint-disable-next-line react-hooks/exhaustive-deps
