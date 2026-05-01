@@ -9,7 +9,7 @@ import { InstructorController } from '../controllers/InstructorController.js';
 import { QuizController } from '../controllers/QuizController.js';
 // WO-O4O-COMPLETION-V1
 import { CompletionController } from '../controllers/CompletionController.js';
-import { requireAuth } from '../../../common/middleware/auth.middleware.js';
+import { requireAuth, optionalAuth } from '../../../common/middleware/auth.middleware.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import { requireEnrollment } from '../middleware/requireEnrollment.js';
 import { requireInstructor } from '../middleware/requireInstructor.js';
@@ -29,10 +29,12 @@ const router: Router = Router();
 router.post('/courses', requireAuth, requireInstructor, asyncHandler(CourseController.createCourse));
 
 // GET /api/v1/lms/courses - List Courses
-router.get('/courses', requireAuth, asyncHandler(CourseController.listCourses));
+// WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-POLICY-V1: optionalAuth — 비로그인은 visibility='public'만 노출
+router.get('/courses', optionalAuth, asyncHandler(CourseController.listCourses));
 
 // GET /api/v1/lms/courses/:id - Get Course by ID
-router.get('/courses/:id', requireAuth, asyncHandler(CourseController.getCourse));
+// WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-POLICY-V1: optionalAuth — members 강의는 비로그인 시 401(MEMBERS_ONLY)
+router.get('/courses/:id', optionalAuth, asyncHandler(CourseController.getCourse));
 
 // PATCH /api/v1/lms/courses/:id - Update Course
 router.patch('/courses/:id', requireAuth, requireInstructor, asyncHandler(CourseController.updateCourse));

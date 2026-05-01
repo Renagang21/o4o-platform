@@ -24,25 +24,34 @@ export function LmsCourseDetailPage() {
   const [enrollment, setEnrollment] = useState<Enrollment | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-POLICY-V1: 회원제 강의 + 비로그인 → 로그인 유도
+  const [needLogin, setNeedLogin] = useState(false);
   const [enrolling, setEnrolling] = useState(false);
 
   useEffect(() => {
     if (id) loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const loadData = async () => {
     try {
       setLoading(true);
       setError(null);
+      setNeedLogin(false);
 
-      const [courseRes, lessonsRes] = await Promise.all([
-        lmsApi.getCourse(id!),
-        lmsApi.getLessons(id!),
-      ]);
-
+      // 1) 코스 조회 — 회원제 강의 + 비로그인 시 401(MEMBERS_ONLY) 발생
+      const courseRes = await lmsApi.getCourse(id!);
       // WO-O4O-LMS-ROUTING-INTEGRATION-FIX-V1: extract from nested response shapes
       setCourse((courseRes as any).data?.course ?? (courseRes as any).data ?? null);
-      setLessons(Array.isArray((lessonsRes as any).data) ? (lessonsRes as any).data : []);
+
+      // 2) 레슨 조회 — /lessons는 여전히 인증 필요. 비로그인은 빈 목록으로 폴백.
+      //    (별도 try/catch로 코스 표시는 항상 보장)
+      try {
+        const lessonsRes = await lmsApi.getLessons(id!);
+        setLessons(Array.isArray((lessonsRes as any).data) ? (lessonsRes as any).data : []);
+      } catch {
+        setLessons([]);
+      }
 
       // 진행 정보 확인 (로그인 시)
       if (user) {
@@ -53,8 +62,13 @@ export function LmsCourseDetailPage() {
           // 미시작 상태
         }
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '안내 흐름을 불러오는데 실패했습니다.');
+    } catch (err: any) {
+      // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-POLICY-V1
+      if (err?.code === 'MEMBERS_ONLY') {
+        setNeedLogin(true);
+      } else {
+        setError(err instanceof Error ? err.message : '안내 흐름을 불러오는데 실패했습니다.');
+      }
     } finally {
       setLoading(false);
     }
@@ -95,6 +109,23 @@ export function LmsCourseDetailPage() {
 
   if (loading) {
     return <LoadingSpinner message="안내 흐름을 불러오는 중..." />;
+  }
+
+  // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-POLICY-V1: 회원 전용 강의 + 비로그인
+  if (needLogin) {
+    return (
+      <div style={styles.container}>
+        <EmptyState
+          icon="🔒"
+          title="회원 전용 강의입니다"
+          description="이 강의는 로그인한 회원만 볼 수 있습니다. 로그인 후 다시 시도해 주세요."
+          action={{
+            label: '로그인하기',
+            onClick: () => navigate('/login', { state: { from: `/lms/course/${id}` } }),
+          }}
+        />
+      </div>
+    );
   }
 
   if (error || !course) {

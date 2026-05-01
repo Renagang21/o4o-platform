@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { CourseVisibility } from '@o4o/lms-core';
 import { BaseController } from '../../../common/base.controller.js';
 import { CourseService } from '../services/CourseService.js';
 import { roleAssignmentService } from '../../auth/services/role-assignment.service.js';
@@ -62,6 +63,13 @@ export class CourseController extends BaseController {
         return BaseController.notFound(res, 'Course not found');
       }
 
+      // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-POLICY-V1
+      // 비로그인 사용자는 'public' 강의만 조회 가능. 'members'는 401(MEMBERS_ONLY).
+      const isAuthenticated = !!(req as any).user;
+      if (!isAuthenticated && course.visibility !== CourseVisibility.PUBLIC) {
+        return BaseController.unauthorized(res, '회원 전용 강의입니다. 로그인이 필요합니다.', 'MEMBERS_ONLY');
+      }
+
       return BaseController.ok(res, { course });
     } catch (error: any) {
       logger.error('[CourseController.getCourse] Error', { error: error.message });
@@ -71,10 +79,17 @@ export class CourseController extends BaseController {
 
   static async listCourses(req: Request, res: Response): Promise<any> {
     try {
-      const filters = req.query;
+      const filters: any = { ...req.query };
       const service = CourseService.getInstance();
 
-      const { courses, total } = await service.listCourses(filters as any);
+      // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-POLICY-V1
+      // 비로그인은 visibility='public' 강제. 클라이언트가 다른 값을 보내도 덮어씀.
+      const isAuthenticated = !!(req as any).user;
+      if (!isAuthenticated) {
+        filters.visibility = CourseVisibility.PUBLIC;
+      }
+
+      const { courses, total } = await service.listCourses(filters);
 
       return BaseController.okPaginated(res, courses, {
         total,

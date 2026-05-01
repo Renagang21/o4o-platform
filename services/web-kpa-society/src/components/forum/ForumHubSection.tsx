@@ -13,10 +13,12 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { homeApi } from '../../api/home';
 import { useAuth } from '../../contexts/AuthContext';
+import { HubEntityCard, type HubBadge } from '../common';
 import type { ForumHubItem } from '../../types';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
 
 // Responsive 2-col grid (inline styles don't support @media)
+// WO-O4O-SHARED-HUB-CARD-COMPONENT-V1: hover 효과는 HubEntityCard 내부에서 처리.
 const gridStyles = `
   .forum-hub-grid {
     display: grid;
@@ -27,9 +29,6 @@ const gridStyles = `
     .forum-hub-grid {
       grid-template-columns: 1fr 1fr;
     }
-  }
-  .forum-hub-card:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   }
   .forum-hub-sort-tab {
     background: none;
@@ -218,50 +217,45 @@ export function ForumHubSection({ prefetchedForums, loading: parentLoading }: Pr
         </div>
       ) : (
         <div className="forum-hub-grid">
-          {filteredForums.map((forum) => (
-            <Link
-              key={forum.id}
-              to={`/forum/${forum.slug}`}
-              style={{ textDecoration: 'none', color: 'inherit' }}
-            >
-              {/* WO-FORUM-CARD-STRUCTURE-CLEANUP-V1: 포럼 소개 카드 — 게시글 미리보기 제거 */}
-              <div className="forum-hub-card" style={styles.card}>
-                <div style={styles.cardTop}>
-                  <div style={styles.cardTitleRow}>
-                    {forum.iconEmoji && (
-                      <span style={styles.emoji}>{forum.iconEmoji}</span>
-                    )}
-                    <span style={styles.cardName}>{forum.name}</span>
-                  </div>
+          {/* WO-O4O-SHARED-HUB-CARD-COMPONENT-V1: HubEntityCard로 교체. 표시 항목 유지. */}
+          {filteredForums.map((forum) => {
+            const isClosed = forum.forumType === 'closed';
+            const tagsLen = forum.tags?.length ?? 0;
+            const tagChipBadges: HubBadge[] = (forum.tags || []).slice(0, 3).map((t) => ({
+              label: `#${t}`,
+              color: 'blue',
+            }));
+            const overflowBadge: HubBadge[] =
+              tagsLen > 3 ? [{ label: `+${tagsLen - 3}`, color: 'gray' }] : [];
+            const memberBadge: HubBadge[] =
+              isClosed && forum.memberCount > 0
+                ? [{ label: `참여자 ${forum.memberCount}명`, color: 'gray' }]
+                : [];
+
+            const bottomBadges: HubBadge[] = [
+              { label: isClosed ? '가입 필요' : '공개', color: isClosed ? 'orange' : 'green' },
+              { label: '닉네임 표시', color: 'gray' },
+              ...memberBadge,
+              ...tagChipBadges,
+              ...overflowBadge,
+            ];
+
+            return (
+              <HubEntityCard
+                key={forum.id}
+                href={`/forum/${forum.slug}`}
+                title={forum.name}
+                titlePrefix={forum.iconEmoji || undefined}
+                titleAside={
                   <span style={styles.postCountBadge}>{forum.postCount}개 글</span>
-                </div>
-
-                {forum.creatorName && (
-                  <p style={styles.creatorLine}>개설자: {forum.creatorName}</p>
-                )}
-
-                {forum.description && (
-                  <p style={styles.description}>{forum.description}</p>
-                )}
-
-                <div style={styles.tagRow}>
-                  <span style={forum.forumType === 'closed' ? styles.badgeClosed : styles.badgeOpen}>
-                    {forum.forumType === 'closed' ? '가입 필요' : '공개'}
-                  </span>
-                  <span style={styles.badgeNickname}>닉네임 표시</span>
-                  {forum.forumType === 'closed' && forum.memberCount > 0 && (
-                    <span style={styles.badgeNickname}>참여자 {forum.memberCount}명</span>
-                  )}
-                  {forum.tags && forum.tags.length > 0 && forum.tags.slice(0, 3).map((tag) => (
-                    <span key={tag} style={styles.tagChip}>#{tag}</span>
-                  ))}
-                  {forum.tags && forum.tags.length > 3 && (
-                    <span style={styles.tagMore}>+{forum.tags.length - 3}</span>
-                  )}
-                </div>
-              </div>
-            </Link>
-          ))}
+                }
+                subline={forum.creatorName ? `개설자: ${forum.creatorName}` : undefined}
+                description={forum.description || undefined}
+                bottomBadges={bottomBadges}
+                minHeight={160}
+              />
+            );
+          })}
         </div>
       )}
     </section>
@@ -299,44 +293,8 @@ const styles: Record<string, React.CSSProperties> = {
     gap: '6px',
     marginBottom: spacing.md,
   },
-  card: {
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.lg,
-    boxShadow: shadows.sm,
-    border: `1px solid ${colors.neutral100}`,
-    padding: spacing.lg,
-    transition: 'box-shadow 0.15s ease',
-    cursor: 'pointer',
-    // WO-O4O-FORUM-HUB-FULL-REBUILD-V1: 카드 높이 일정 유지
-    display: 'flex',
-    flexDirection: 'column',
-    gap: spacing.sm,
-    minHeight: 160,
-  },
-  cardTop: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  cardTitleRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: spacing.xs,
-    minWidth: 0,
-    flex: 1,
-  },
-  emoji: {
-    fontSize: '1.25rem',
-    flexShrink: 0,
-  },
-  cardName: {
-    ...typography.headingS,
-    color: colors.neutral900,
-    margin: 0,
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-  },
+  // WO-O4O-SHARED-HUB-CARD-COMPONENT-V1: 카드 본문 스타일은 HubEntityCard로 이관.
+  // 여기 남은 postCountBadge는 titleAside 슬롯에 주입되는 커스텀 pill (Forum 전용).
   postCountBadge: {
     fontSize: '0.75rem',
     fontWeight: 500,
@@ -345,73 +303,6 @@ const styles: Record<string, React.CSSProperties> = {
     padding: '2px 8px',
     borderRadius: borderRadius.sm,
     whiteSpace: 'nowrap',
-    flexShrink: 0,
-    marginLeft: spacing.sm,
-  },
-  description: {
-    fontSize: '0.813rem',
-    color: colors.neutral500,
-    margin: 0,
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-  },
-  creatorLine: {
-    fontSize: '0.75rem',
-    color: colors.neutral500,
-    margin: 0,
-  },
-  tagRow: {
-    display: 'flex',
-    flexWrap: 'wrap' as const,
-    gap: '4px',
-    // WO-O4O-FORUM-HUB-FULL-REBUILD-V1: 태그 영역은 카드 하단에 고정
-    marginTop: 'auto',
-  },
-  badgeOpen: {
-    fontSize: '0.688rem',
-    fontWeight: 600,
-    color: '#16A34A',
-    backgroundColor: '#F0FDF4',
-    padding: '2px 7px',
-    borderRadius: '999px',
-    whiteSpace: 'nowrap' as const,
-  },
-  badgeClosed: {
-    fontSize: '0.688rem',
-    fontWeight: 600,
-    color: '#EA580C',
-    backgroundColor: '#FFF7ED',
-    padding: '2px 7px',
-    borderRadius: '999px',
-    whiteSpace: 'nowrap' as const,
-  },
-  badgeNickname: {
-    fontSize: '0.688rem',
-    fontWeight: 500,
-    color: colors.neutral500,
-    backgroundColor: colors.neutral100,
-    padding: '2px 7px',
-    borderRadius: '999px',
-    whiteSpace: 'nowrap' as const,
-  },
-  tagChip: {
-    fontSize: '0.688rem',
-    fontWeight: 500,
-    color: '#3B82F6',
-    backgroundColor: '#EFF6FF',
-    padding: '2px 7px',
-    borderRadius: '999px',
-    whiteSpace: 'nowrap' as const,
-  },
-  tagMore: {
-    fontSize: '0.688rem',
-    fontWeight: 500,
-    color: colors.neutral400,
-    backgroundColor: colors.neutral100,
-    padding: '2px 7px',
-    borderRadius: '999px',
-    whiteSpace: 'nowrap' as const,
   },
   emptyCard: {
     backgroundColor: colors.white,

@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { lmsInstructorApi, type ContentKind } from '../../../api/lms-instructor';
+import { lmsInstructorApi, type ContentKind, type CourseVisibility } from '../../../api/lms-instructor';
 
 const styles: Record<string, React.CSSProperties> = {
   page: { maxWidth: 680, margin: '0 auto', padding: '32px 20px' },
@@ -83,6 +83,8 @@ export default function CourseNewPage({
   const [form, setForm] = useState({ title: '', description: '' });
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
+  // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1: 기본값 회원제
+  const [visibility, setVisibility] = useState<CourseVisibility>('members');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -107,6 +109,7 @@ export default function CourseNewPage({
         description: form.description.trim(),
         tags: tags.length > 0 ? tags : undefined,
         contentKind, // 미지정 시 백엔드에서 'lecture' 기본
+        visibility,  // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1
       });
       // API returns { success, data: Course }
       const courseId = res.data?.data?.id;
@@ -150,6 +153,34 @@ export default function CourseNewPage({
             onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
             placeholder="강의 내용과 목표를 설명해 주세요"
           />
+        </div>
+
+        {/* WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1: 공개 범위 */}
+        <div style={styles.field}>
+          <label style={styles.label}>공개 범위 *</label>
+          <div style={{ display: 'flex', gap: 16 }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#374151', cursor: 'pointer' }}>
+              <input
+                type="radio"
+                name="visibility"
+                value="members"
+                checked={visibility === 'members'}
+                onChange={() => setVisibility('members')}
+              />
+              회원제 강의
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#374151', cursor: 'pointer' }}>
+              <input
+                type="radio"
+                name="visibility"
+                value="public"
+                checked={visibility === 'public'}
+                onChange={() => setVisibility('public')}
+              />
+              공개 강의
+            </label>
+          </div>
+          <span style={styles.hint}>회원제는 로그인 회원만, 공개는 모두에게 노출됩니다.</span>
         </div>
 
         <div style={styles.field}>

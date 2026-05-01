@@ -41,6 +41,18 @@ export enum ContentKind {
   CONTENT_RESOURCE = 'content_resource',
 }
 
+/**
+ * WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1
+ * 강의 공개 범위.
+ *
+ *   PUBLIC  : 공개 강의 (목록/상세 노출. 비로그인 접근 정책은 별도 WO에서 처리)
+ *   MEMBERS : 회원제 강의 (기본값. 로그인 회원만)
+ */
+export enum CourseVisibility {
+  PUBLIC = 'public',
+  MEMBERS = 'members',
+}
+
 @Entity('lms_courses')
 @Index(['organizationId', 'status'])
 @Index(['instructorId'])
@@ -68,6 +80,10 @@ export class Course {
   // WO-KPA-CONTENT-COURSE-KIND-SEPARATION-V1: 코스형 자료 vs 일반 강의 분류
   @Column({ name: 'content_kind', type: 'varchar', length: 30, default: ContentKind.LECTURE })
   contentKind!: ContentKind;
+
+  // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1: 공개 강의 vs 회원제 강의
+  @Column({ name: 'visibility', type: 'varchar', length: 20, default: CourseVisibility.MEMBERS })
+  visibility!: CourseVisibility;
 
   // Duration in minutes
   @Column({ type: 'integer', default: 0 })

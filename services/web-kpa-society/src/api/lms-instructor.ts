@@ -10,6 +10,8 @@ export type CourseStatus = 'draft' | 'published' | 'archived';
 export type LessonType = 'VIDEO' | 'ARTICLE' | 'QUIZ' | 'ASSIGNMENT' | 'LIVE';
 // WO-KPA-CONTENT-COURSE-KIND-SEPARATION-V1
 export type ContentKind = 'lecture' | 'content_resource';
+// WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1
+export type CourseVisibility = 'public' | 'members';
 
 export interface Course {
   id: string;
@@ -29,6 +31,8 @@ export interface Course {
   credits: number;
   isPaid: boolean;
   price: number | null;
+  // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1
+  visibility: CourseVisibility;
   createdAt: string;
   updatedAt: string;
   publishedAt: string | null;
@@ -72,6 +76,8 @@ export interface CreateCourseDto {
   thumbnail?: string | null;
   // WO-KPA-CONTENT-COURSE-KIND-SEPARATION-V1: 미전달 시 백엔드에서 'lecture' 기본
   contentKind?: ContentKind;
+  // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1: 미전달 시 백엔드에서 'members' 기본
+  visibility?: CourseVisibility;
 }
 
 export interface UpdateCourseDto {
@@ -80,6 +86,8 @@ export interface UpdateCourseDto {
   level?: CourseLevel;
   tags?: string[];
   thumbnail?: string | null;
+  // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1
+  visibility?: CourseVisibility;
 }
 
 export interface CreateLessonDto {

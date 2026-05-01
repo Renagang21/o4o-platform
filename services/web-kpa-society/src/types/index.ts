@@ -155,6 +155,8 @@ export interface Course {
   credits?: number;
   tags?: string[];
   instructor?: { id: string; name: string; avatar?: string };
+  // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1
+  visibility?: 'public' | 'members';
 }
 
 // Instructor Public Profile - WO-CONTENT-INSTRUCTOR-PUBLIC-PROFILE-V1

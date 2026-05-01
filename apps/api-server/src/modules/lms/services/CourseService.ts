@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
 import { BaseService } from '../../../common/base.service.js';
-import { Course, CourseStatus, CourseLevel, ContentKind } from '@o4o/lms-core';
+import { Course, CourseStatus, CourseLevel, ContentKind, CourseVisibility } from '@o4o/lms-core';
 import { sanitizeInstructor } from '../utils/sanitize-user.js';
 import logger from '../../../utils/logger.js';
 
@@ -37,6 +37,8 @@ export interface CreateCourseRequest {
   price?: number;
   // WO-KPA-CONTENT-COURSE-KIND-SEPARATION-V1: 코스형 자료 vs 일반 강의 분류 (미전달 시 LECTURE)
   contentKind?: ContentKind;
+  // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1: 공개/회원제 (미전달 시 MEMBERS)
+  visibility?: CourseVisibility;
 }
 
 export interface UpdateCourseRequest extends Partial<CreateCourseRequest> {
@@ -56,6 +58,9 @@ export interface CourseFilters {
   // WO-KPA-CONTENT-COURSE-KIND-SEPARATION-V1: 미전달 시 'lecture'만 조회 (기본 필터).
   // 모든 종류를 보고 싶으면 'all'을 명시.
   contentKind?: ContentKind | 'all';
+  // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-POLICY-V1: 미전달 시 필터 미적용(전체).
+  // 비로그인 컨트롤러에서 PUBLIC을 강제 주입.
+  visibility?: CourseVisibility;
 }
 
 export class CourseService extends BaseService<Course> {
@@ -105,6 +110,8 @@ export class CourseService extends BaseService<Course> {
       isPublished: false,
       // WO-KPA-CONTENT-COURSE-KIND-SEPARATION-V1: 미전달 시 LECTURE 기본
       contentKind: data.contentKind ?? ContentKind.LECTURE,
+      // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1: 미전달 시 MEMBERS 기본
+      visibility: data.visibility ?? CourseVisibility.MEMBERS,
     });
 
     const saved = await this.courseRepository.save(course);
@@ -137,6 +144,7 @@ export class CourseService extends BaseService<Course> {
       page = 1,
       limit = 20,
       contentKind,
+      visibility,
     } = filters;
 
     const query = this.courseRepository.createQueryBuilder('course');
@@ -146,6 +154,11 @@ export class CourseService extends BaseService<Course> {
       query.andWhere('course.contentKind = :contentKind', { contentKind: ContentKind.LECTURE });
     } else if (contentKind !== 'all') {
       query.andWhere('course.contentKind = :contentKind', { contentKind });
+    }
+
+    // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-POLICY-V1: visibility 명시 시 필터 적용
+    if (visibility) {
+      query.andWhere('course.visibility = :visibility', { visibility });
     }
 
     // Filters

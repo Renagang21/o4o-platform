@@ -8,7 +8,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { RichTextEditor } from '@o4o/content-editor';
-import { lmsInstructorApi, Course, Lesson, LessonType } from '../../../api/lms-instructor';
+import { lmsInstructorApi, Course, Lesson, LessonType, type CourseVisibility } from '../../../api/lms-instructor';
 import QuizBuilder from './QuizBuilder';
 
 const LEVEL_LABEL: Record<string, string> = { beginner: '입문', intermediate: '중급', advanced: '고급' };
@@ -235,6 +235,8 @@ export default function CourseEditPage() {
   const [form, setForm] = useState({ title: '', description: '', level: 'beginner' });
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
+  // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1: 공개/회원제. 기본값 회원제.
+  const [visibility, setVisibility] = useState<CourseVisibility>('members');
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState<string | null>(null);
 
@@ -262,6 +264,8 @@ export default function CourseEditPage() {
       setCourse(c);
       setForm({ title: c.title, description: c.description, level: c.level });
       setTags(c.tags || []);
+      // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1: 응답에 visibility가 없으면 기본 'members'
+      setVisibility(c.visibility ?? 'members');
       setLessons(ls.sort((a, b) => a.order - b.order));
     } catch (err: any) {
       if (err?.response?.data?.code === 'INSTRUCTOR_REQUIRED') {
@@ -287,6 +291,7 @@ export default function CourseEditPage() {
         description: form.description.trim(),
         level: form.level as any,
         tags: tags.length > 0 ? tags : [],
+        visibility, // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1
       });
       setSaveMsg('저장되었습니다.');
       setTimeout(() => setSaveMsg(null), 2000);
@@ -424,6 +429,32 @@ export default function CourseEditPage() {
               <select style={s.select} value={form.level} onChange={(e) => setForm((f) => ({ ...f, level: e.target.value }))}>
                 {Object.entries(LEVEL_LABEL).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
               </select>
+            </div>
+          </div>
+          {/* WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1: 공개 범위 */}
+          <div style={s.field}>
+            <label style={s.label}>공개 범위</label>
+            <div style={{ display: 'flex', gap: 16 }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#374151', cursor: 'pointer' }}>
+                <input
+                  type="radio"
+                  name="visibility"
+                  value="members"
+                  checked={visibility === 'members'}
+                  onChange={() => setVisibility('members')}
+                />
+                회원제 강의
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#374151', cursor: 'pointer' }}>
+                <input
+                  type="radio"
+                  name="visibility"
+                  value="public"
+                  checked={visibility === 'public'}
+                  onChange={() => setVisibility('public')}
+                />
+                공개 강의
+              </label>
             </div>
           </div>
           <div style={s.field}>

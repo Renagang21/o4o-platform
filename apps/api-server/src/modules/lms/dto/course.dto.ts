@@ -10,7 +10,7 @@ import {
   MaxLength,
   Min
 } from 'class-validator';
-import { CourseLevel, CourseStatus, ContentKind } from '@o4o/lms-core';
+import { CourseLevel, CourseStatus, ContentKind, CourseVisibility } from '@o4o/lms-core';
 
 export class CreateCourseDto {
   @IsString()
@@ -83,6 +83,11 @@ export class CreateCourseDto {
   @IsEnum(ContentKind)
   @IsOptional()
   contentKind?: ContentKind;
+
+  // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1: 공개/회원제 (미전달 시 'members')
+  @IsEnum(CourseVisibility)
+  @IsOptional()
+  visibility?: CourseVisibility;
 }
 
 export class UpdateCourseDto {
@@ -154,6 +159,11 @@ export class UpdateCourseDto {
   @IsString({ each: true })
   @IsOptional()
   tags?: string[];
+
+  // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1: 공개/회원제 변경
+  @IsEnum(CourseVisibility)
+  @IsOptional()
+  visibility?: CourseVisibility;
 }
 
 export class CourseQueryDto {
