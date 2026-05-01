@@ -51,7 +51,9 @@ export function ResourceWritePage() {
   const [title, setTitle] = useState('');
   const [summary, setSummary] = useState('');
   const [body, setBody] = useState('');
-  const [tags, setTags] = useState('');
+  // WO-KPA-RESOURCES-TAG-ENTER-INPUT-FIX-V1: 칩 기반 입력. tags=확정된 태그, tagInput=현재 입력 중 텍스트
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState('');
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -86,7 +88,8 @@ export function ResourceWritePage() {
           setTitle(item.title);
           setSummary(item.summary || '');
           setBody(item.body || '');
-          setTags((item.tags || []).join(', '));
+          setTags(item.tags || []);
+          setTagInput('');
 
           // Determine mode from source_type
           if (item.source_type === 'external') {
@@ -176,7 +179,13 @@ export function ResourceWritePage() {
 
     setSaving(true);
     try {
-      const tagArr = tags.split(',').map((t) => t.trim()).filter(Boolean);
+      // WO-KPA-RESOURCES-TAG-ENTER-INPUT-FIX-V1:
+      //   확정된 칩 + 미확정 input(쉼표 분할 + trim + dedup)을 합쳐 저장.
+      const pendingFromInput = tagInput
+        .split(',')
+        .map((t) => t.trim())
+        .filter(Boolean);
+      const tagArr = Array.from(new Set([...tags, ...pendingFromInput]));
       const base = {
         title: title.trim(),
         summary: summary || undefined,
@@ -391,16 +400,61 @@ export function ResourceWritePage() {
           </div>
         )}
 
-        {/* Tags */}
+        {/* Tags — WO-KPA-RESOURCES-TAG-ENTER-INPUT-FIX-V1: Enter/쉼표 확정, Backspace 마지막 칩 삭제 */}
         <div style={styles.field}>
-          <label style={styles.label}>태그 <span style={styles.hint}>(선택, 쉼표로 구분)</span></label>
-          <input
-            type="text"
-            value={tags}
-            onChange={(e) => setTags(e.target.value)}
-            placeholder="예: 약국경영, 복약지도, 건강관리"
-            style={styles.input}
-          />
+          <label style={styles.label}>태그 <span style={styles.hint}>(선택, Enter 또는 쉼표로 추가)</span></label>
+          <div style={styles.tagInputWrap}>
+            {tags.map((tag) => (
+              <span key={tag} style={styles.tagChip}>
+                {tag}
+                <button
+                  type="button"
+                  onClick={() => setTags((prev) => prev.filter((t) => t !== tag))}
+                  style={styles.tagChipRemove}
+                  aria-label={`${tag} 삭제`}
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+            <input
+              type="text"
+              value={tagInput}
+              onChange={(e) => {
+                const v = e.target.value;
+                if (v.includes(',')) {
+                  // paste/IME로 쉼표가 들어온 경우: 마지막 조각은 input에 남김
+                  const parts = v.split(',');
+                  const last = parts.pop() || '';
+                  setTags((prev) => {
+                    const next = [...prev];
+                    parts.forEach((p) => {
+                      const t = p.trim();
+                      if (t && !next.includes(t)) next.push(t);
+                    });
+                    return next;
+                  });
+                  setTagInput(last);
+                } else {
+                  setTagInput(v);
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ',') {
+                  e.preventDefault();
+                  const t = tagInput.trim();
+                  if (!t) return;
+                  setTags((prev) => (prev.includes(t) ? prev : [...prev, t]));
+                  setTagInput('');
+                } else if (e.key === 'Backspace' && tagInput === '' && tags.length > 0) {
+                  e.preventDefault();
+                  setTags((prev) => prev.slice(0, -1));
+                }
+              }}
+              placeholder={tags.length === 0 ? '예: 약국경영, 복약지도, 건강관리' : ''}
+              style={styles.tagInput}
+            />
+          </div>
         </div>
 
         {/* Action Buttons */}
@@ -509,6 +563,54 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: 8,
     outline: 'none',
     boxSizing: 'border-box' as const,
+  },
+  // WO-KPA-RESOURCES-TAG-ENTER-INPUT-FIX-V1
+  tagInputWrap: {
+    display: 'flex',
+    flexWrap: 'wrap' as const,
+    alignItems: 'center',
+    gap: 6,
+    width: '100%',
+    minHeight: 42,
+    padding: '6px 10px',
+    border: '1px solid #e2e8f0',
+    borderRadius: 8,
+    background: '#fff',
+    boxSizing: 'border-box' as const,
+  },
+  tagChip: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 4,
+    padding: '4px 8px',
+    fontSize: '0.8125rem',
+    background: '#f1f5f9',
+    color: '#334155',
+    borderRadius: 9999,
+    lineHeight: 1.2,
+  },
+  tagChipRemove: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 16,
+    height: 16,
+    padding: 0,
+    border: 'none',
+    background: 'transparent',
+    color: '#64748b',
+    fontSize: '0.875rem',
+    cursor: 'pointer',
+    lineHeight: 1,
+  },
+  tagInput: {
+    flex: 1,
+    minWidth: 120,
+    padding: '4px 4px',
+    fontSize: '0.875rem',
+    border: 'none',
+    outline: 'none',
+    background: 'transparent',
   },
   textarea: {
     width: '100%',
