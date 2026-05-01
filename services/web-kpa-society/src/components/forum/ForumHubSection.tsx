@@ -224,7 +224,7 @@ export function ForumHubSection({ prefetchedForums, loading: parentLoading }: Pr
               to={`/forum/${forum.slug}`}
               style={{ textDecoration: 'none', color: 'inherit' }}
             >
-              {/* WO-O4O-FORUM-HUB-FULL-REBUILD-V1: name+count → desc → lastPost → tags */}
+              {/* WO-FORUM-CARD-STRUCTURE-CLEANUP-V1: 포럼 소개 카드 — 게시글 미리보기 제거 */}
               <div className="forum-hub-card" style={styles.card}>
                 <div style={styles.cardTop}>
                   <div style={styles.cardTitleRow}>
@@ -236,27 +236,22 @@ export function ForumHubSection({ prefetchedForums, loading: parentLoading }: Pr
                   <span style={styles.postCountBadge}>{forum.postCount}개 글</span>
                 </div>
 
-                {forum.description && (
-                  <p style={styles.description}>{forum.description}</p>
-                )}
-
                 {forum.creatorName && (
                   <p style={styles.creatorLine}>개설자: {forum.creatorName}</p>
                 )}
 
-                <p style={styles.lastPostLine}>
-                  {forum.lastPostTitle ? (
-                    <span style={styles.lastPostTitle}>{forum.lastPostTitle}</span>
-                  ) : (
-                    <span style={styles.lastPostEmpty}>최근 글 없음</span>
-                  )}
-                </p>
+                {forum.description && (
+                  <p style={styles.description}>{forum.description}</p>
+                )}
 
                 <div style={styles.tagRow}>
                   <span style={forum.forumType === 'closed' ? styles.badgeClosed : styles.badgeOpen}>
                     {forum.forumType === 'closed' ? '가입 필요' : '공개'}
                   </span>
                   <span style={styles.badgeNickname}>닉네임 표시</span>
+                  {forum.forumType === 'closed' && forum.memberCount > 0 && (
+                    <span style={styles.badgeNickname}>참여자 {forum.memberCount}명</span>
+                  )}
                   {forum.tags && forum.tags.length > 0 && forum.tags.slice(0, 3).map((tag) => (
                     <span key={tag} style={styles.tagChip}>#{tag}</span>
                   ))}
@@ -365,22 +360,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '0.75rem',
     color: colors.neutral500,
     margin: 0,
-  },
-  lastPostLine: {
-    margin: 0,
-    fontSize: '0.813rem',
-    color: colors.neutral700,
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-    // gap from above element comes from parent flex gap
-  },
-  lastPostTitle: {
-    color: colors.neutral700,
-  },
-  lastPostEmpty: {
-    color: colors.neutral400,
-    fontStyle: 'italic',
   },
   tagRow: {
     display: 'flex',
