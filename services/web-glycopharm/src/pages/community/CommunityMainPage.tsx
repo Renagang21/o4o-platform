@@ -105,21 +105,6 @@ export default function CommunityMainPage() {
   const [noticeItems, setNoticeItems] = useState<NoticeItem[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const id = 'glyco-home-two-col-responsive';
-    if (document.getElementById(id)) return;
-    const style = document.createElement('style');
-    style.id = id;
-    style.textContent = `
-      @media (max-width: 768px) {
-        .glyco-home-two-col { flex-direction: column !important; }
-        .glyco-status-grid { flex-direction: column !important; }
-      }
-    `;
-    document.head.appendChild(style);
-    return () => { document.getElementById(id)?.remove(); };
-  }, []);
-
   const loadNotices = useCallback(async () => {
     setLoading(true);
     try {
@@ -153,7 +138,7 @@ export default function CommunityMainPage() {
               <h1 style={heroStyles.title}>GlycoPharm 관리 현황</h1>
               <p style={heroStyles.subtitle}>약국 운영 · 혈당 케어 · 디지털 사이니지를 한 곳에서</p>
             </div>
-            <div style={heroStyles.statusGrid} className="glyco-status-grid">
+            <div className="flex flex-col md:flex-row gap-3 flex-shrink-0">
               <div style={heroStyles.statusCard}>
                 <span style={heroStyles.statusIcon}><StoreIcon /></span>
                 <div>
@@ -183,9 +168,9 @@ export default function CommunityMainPage() {
       {/* 1. 공지 / 약업신문 뉴스 (2-column) */}
       <PageSection>
         <PageContainer>
-          <div style={twoColStyles.row} className="glyco-home-two-col">
+          <div className="flex flex-col md:flex-row gap-4">
             {/* Left: 공지사항 */}
-            <div style={twoColStyles.col}>
+            <div className="flex-1 min-w-0">
               <NewsNoticesSection
                 title="공지"
                 items={noticeItems}
@@ -196,7 +181,7 @@ export default function CommunityMainPage() {
               />
             </div>
             {/* Right: 약업신문 뉴스 Placeholder */}
-            <div style={twoColStyles.col}>
+            <div className="flex-1 min-w-0">
               <div style={twoColStyles.placeholderHeader}>
                 <h2 style={twoColStyles.placeholderTitle}>약업신문 뉴스</h2>
               </div>
@@ -319,12 +304,6 @@ const heroStyles: Record<string, React.CSSProperties> = {
     margin: 0,
     lineHeight: 1.6,
   },
-  statusGrid: {
-    display: 'flex',
-    gap: 12,
-    flex: '0 0 auto',
-    alignItems: 'stretch',
-  },
   statusCard: {
     display: 'flex',
     alignItems: 'center',
@@ -359,14 +338,6 @@ const heroStyles: Record<string, React.CSSProperties> = {
 // ─── Two-column Styles ───────────────────────────────────────
 
 const twoColStyles: Record<string, React.CSSProperties> = {
-  row: {
-    display: 'flex',
-    gap: 16,
-  },
-  col: {
-    flex: 1,
-    minWidth: 0,
-  },
   placeholderHeader: {
     marginBottom: 12,
   },

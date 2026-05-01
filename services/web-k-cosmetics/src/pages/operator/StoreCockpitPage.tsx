@@ -14,7 +14,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Card } from '@o4o/ui';
+import { Card, useTemplate } from '@o4o/ui';
 import {
   storeApi,
   type StoreInfo,
@@ -76,6 +76,7 @@ function formatDate(dateStr: string): string {
 // ============================================================================
 
 export default function StoreCockpitPage() {
+  const tpl = useTemplate();
   const [stores, setStores] = useState<StoreInfo[]>([]);
   const [selectedStore, setSelectedStore] = useState<StoreInfo | null>(null);
   const [summary, setSummary] = useState<StoreSummary | null>(null);
@@ -316,7 +317,7 @@ export default function StoreCockpitPage() {
       {/* ================================================================== */}
       {/* Block 2: KPI Cards */}
       {/* ================================================================== */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className={`grid ${tpl?.layout?.grid ?? 'grid-cols-2 lg:grid-cols-4'} ${tpl?.layout?.gap ?? 'gap-4'}`}>
         {/* Today Orders */}
         <Card className="p-5">
           <div className="flex items-center gap-3 mb-3">

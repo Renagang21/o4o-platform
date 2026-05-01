@@ -17,7 +17,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Link2, Trash2, Sparkles, Tag } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
-import { BaseTable, ActionBar, RowActionMenu, PageSection, PageContainer, type O4OColumn, type ActionBarAction, type RowActionItem } from '@o4o/ui';
+import { BaseTable, ActionBar, RowActionMenu, PageSection, PageContainer, Card, type O4OColumn, type ActionBarAction, type RowActionItem } from '@o4o/ui';
 import { PageHeader } from '../../components/common';
 import { forumApi } from '../../api';
 import { useAuth } from '../../contexts';
@@ -437,8 +437,8 @@ export function ForumListPage() {
         </div>
       )}
 
-      {/* Table */}
-      <div className="bg-white rounded-lg border border-slate-200 overflow-hidden mb-2">
+      {/* Desktop: Table */}
+      <div className="hidden md:block bg-white rounded-lg border border-slate-200 overflow-hidden mb-2">
         <BaseTable<ForumPost>
           columns={columns}
           data={posts}
@@ -448,6 +448,66 @@ export function ForumListPage() {
           onSelectionChange={setSelectedKeys}
           emptyMessage={emptyMessage}
         />
+      </div>
+
+      {/* Mobile: Card List (WO-O4O-RESPONSIVE-LIST-V1) */}
+      <div className="block md:hidden mb-2">
+        {posts.length === 0 && !loading ? (
+          emptyMessage
+        ) : (
+          <div className="flex flex-col gap-3">
+            {posts.map((post) => (
+              <Link key={post.id} to={`/forum/post/${post.id}`} className="no-underline text-inherit">
+                <Card className="p-4 hover:bg-slate-50 transition-colors">
+                  <div className="flex flex-col gap-2">
+                    {/* Title row */}
+                    <div className="flex items-start gap-1.5">
+                      {post.isPinned && (
+                        <span className="inline-block px-1.5 py-0.5 text-[11px] font-semibold bg-red-50 text-red-600 rounded shrink-0 mt-0.5">공지</span>
+                      )}
+                      <span className="text-sm font-medium text-slate-800 line-clamp-2">
+                        {post.title}
+                        {(post.commentCount ?? 0) > 0 && (
+                          <span className="ml-1 text-xs text-primary font-medium">[{post.commentCount}]</span>
+                        )}
+                      </span>
+                    </div>
+
+                    {/* Tags */}
+                    {Array.isArray((post as any).tags) && (post as any).tags.length > 0 && (
+                      <div className="flex gap-1 flex-wrap">
+                        {((post as any).tags as string[]).slice(0, 3).map((tag) => (
+                          <span
+                            key={tag}
+                            className={`px-2 py-0.5 text-[11px] font-medium rounded-xl border ${
+                              activeTag === tag
+                                ? 'bg-primary border-primary text-white'
+                                : 'bg-slate-50 border-slate-200 text-slate-500'
+                            }`}
+                          >
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Meta row */}
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-slate-500">
+                        {post.authorName || '-'} · {formatDate(post.createdAt)}
+                      </span>
+                      <div className="flex items-center gap-3 text-xs text-slate-400">
+                        {(post.likeCount ?? 0) > 0 && <span>👍 {post.likeCount}</span>}
+                        <span>👁 {post.viewCount ?? 0}</span>
+                        {(post.commentCount ?? 0) > 0 && <span>💬 {post.commentCount}</span>}
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Pagination */}

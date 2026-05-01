@@ -91,21 +91,6 @@ export function HomePage() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Responsive 2-column CSS
-  useEffect(() => {
-    const id = 'kcos-home-two-col-responsive';
-    if (document.getElementById(id)) return;
-    const style = document.createElement('style');
-    style.id = id;
-    style.textContent = `
-      @media (max-width: 768px) {
-        .kcos-home-two-col { flex-direction: column !important; }
-      }
-    `;
-    document.head.appendChild(style);
-    return () => { document.getElementById(id)?.remove(); };
-  }, []);
-
   // ── Notice items ──
   const noticeItems: NoticeItem[] = (data?.notices ?? []).map((n) => ({
     id: n.id,
@@ -124,9 +109,9 @@ export function HomePage() {
       {/* 2. 공지 / K-Beauty 트렌드 (2-column) */}
       <PageSection>
         <PageContainer>
-          <div style={twoColStyles.row} className="kcos-home-two-col">
+          <div className="flex flex-col md:flex-row gap-5">
             {/* Left: 공지사항 */}
-            <div style={twoColStyles.col}>
+            <div className="flex-1 min-w-0">
               <NewsNoticesSection
                 title="공지"
                 items={noticeItems}
@@ -137,7 +122,7 @@ export function HomePage() {
               />
             </div>
             {/* Right: K-Beauty 트렌드 Placeholder */}
-            <div style={twoColStyles.col}>
+            <div className="flex-1 min-w-0">
               <div style={twoColStyles.placeholderHeader}>
                 <h2 style={twoColStyles.placeholderTitle}>K-Beauty 트렌드</h2>
               </div>
@@ -204,14 +189,6 @@ export function HomePage() {
 // ─── Two-column Styles ───────────────────────────────────────
 
 const twoColStyles: Record<string, React.CSSProperties> = {
-  row: {
-    display: 'flex',
-    gap: 20,
-  },
-  col: {
-    flex: 1,
-    minWidth: 0,
-  },
   placeholderHeader: {
     marginBottom: 12,
   },

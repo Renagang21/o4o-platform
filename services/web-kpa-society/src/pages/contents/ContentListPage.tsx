@@ -201,55 +201,86 @@ function DocumentsSection({
         primaryAction={isAuthenticated ? { label: '문서 등록', to: '/content/documents/new' } : undefined}
       />
 
-      <Card className="overflow-hidden">
-        {loading ? (
+      {loading ? (
+        <Card className="overflow-hidden">
           <div className="py-8 px-4 text-sm text-slate-400 text-center">불러오는 중...</div>
-        ) : items.length === 0 ? (
+        </Card>
+      ) : items.length === 0 ? (
+        <Card className="overflow-hidden">
           <div className="py-8 px-4 text-sm text-slate-400 text-center">아직 문서가 없습니다</div>
-        ) : (
-          <table className="w-full border-collapse table-fixed">
-            <thead>
-              <tr>
-                <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left">제목</th>
-                <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left w-24">작성자</th>
-                <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left w-[100px]">작성일</th>
-                <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-center w-14">조회</th>
-                <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-center w-14">좋아요</th>
-                <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left w-12"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((item) => {
-                const isOwner = !!(currentUserId && item.created_by === currentUserId);
-                return (
-                  <tr
-                    key={item.id}
-                    onClick={() => navigate(`/content/${item.id}`)}
-                    className="cursor-pointer transition-colors hover:bg-slate-50"
-                  >
-                    <td className="px-3 py-3 text-sm text-slate-900 border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap">
-                      <span className="font-semibold text-sm text-slate-800">{item.title}</span>
-                    </td>
-                    <td className="px-3 py-3 text-[13px] text-slate-500 border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap">{item.author_name || '-'}</td>
-                    <td className="px-3 py-3 text-[13px] text-slate-400 border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap">{formatDate(item.created_at)}</td>
-                    <td className="px-3 py-3 text-[13px] text-slate-400 border-b border-slate-100 text-center whitespace-nowrap">👁 {item.view_count ?? 0}</td>
-                    <td className="px-3 py-3 text-[13px] text-slate-400 border-b border-slate-100 text-center whitespace-nowrap">👍 {item.like_count ?? 0}</td>
-                    <td className="px-3 py-3 border-b border-slate-100 text-center" onClick={(e) => e.stopPropagation()}>
-                      <RowActionMenu
-                        isOwner={isOwner}
-                        onView={() => navigate(`/content/${item.id}`)}
-                        onCopyLink={() => handleCopyLink(item.id)}
-                        onEdit={() => navigate(`/content/${item.id}/edit`)}
-                        onDelete={() => handleDelete(item.id)}
-                      />
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
-      </Card>
+        </Card>
+      ) : (
+        <>
+          {/* Desktop: Table */}
+          <Card className="overflow-hidden hidden md:block">
+            <table className="w-full border-collapse table-fixed">
+              <thead>
+                <tr>
+                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left">제목</th>
+                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left w-24">작성자</th>
+                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left w-[100px]">작성일</th>
+                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-center w-14">조회</th>
+                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-center w-14">좋아요</th>
+                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left w-12"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((item) => {
+                  const isOwner = !!(currentUserId && item.created_by === currentUserId);
+                  return (
+                    <tr
+                      key={item.id}
+                      onClick={() => navigate(`/content/${item.id}`)}
+                      className="cursor-pointer transition-colors hover:bg-slate-50"
+                    >
+                      <td className="px-3 py-3 text-sm text-slate-900 border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap">
+                        <span className="font-semibold text-sm text-slate-800">{item.title}</span>
+                      </td>
+                      <td className="px-3 py-3 text-[13px] text-slate-500 border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap">{item.author_name || '-'}</td>
+                      <td className="px-3 py-3 text-[13px] text-slate-400 border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap">{formatDate(item.created_at)}</td>
+                      <td className="px-3 py-3 text-[13px] text-slate-400 border-b border-slate-100 text-center whitespace-nowrap">👁 {item.view_count ?? 0}</td>
+                      <td className="px-3 py-3 text-[13px] text-slate-400 border-b border-slate-100 text-center whitespace-nowrap">👍 {item.like_count ?? 0}</td>
+                      <td className="px-3 py-3 border-b border-slate-100 text-center" onClick={(e) => e.stopPropagation()}>
+                        <RowActionMenu
+                          isOwner={isOwner}
+                          onView={() => navigate(`/content/${item.id}`)}
+                          onCopyLink={() => handleCopyLink(item.id)}
+                          onEdit={() => navigate(`/content/${item.id}/edit`)}
+                          onDelete={() => handleDelete(item.id)}
+                        />
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </Card>
+
+          {/* Mobile: Card List (WO-O4O-RESPONSIVE-LIST-EXPAND-V1) */}
+          <div className="block md:hidden flex flex-col gap-3">
+            {items.map((item) => (
+              <Card
+                key={item.id}
+                className="p-4 cursor-pointer hover:bg-slate-50 transition-colors"
+                onClick={() => navigate(`/content/${item.id}`)}
+              >
+                <div className="flex flex-col gap-2">
+                  <span className="text-sm font-medium text-slate-800 line-clamp-2">{item.title}</span>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-slate-500">
+                      {item.author_name || '-'} · {formatDate(item.created_at)}
+                    </span>
+                    <div className="flex items-center gap-3 text-xs text-slate-400">
+                      <span>👁 {item.view_count ?? 0}</span>
+                      {(item.like_count ?? 0) > 0 && <span>👍 {item.like_count}</span>}
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </>
+      )}
     </section>
   );
 }
@@ -293,46 +324,79 @@ function CoursesSection({ canCreateCourse }: { canCreateCourse: boolean }) {
         moreLink={{ label: '전체 보기', to: '/content/courses' }}
       />
 
-      <Card className="overflow-hidden">
-        {loading ? (
+      {loading ? (
+        <Card className="overflow-hidden">
           <div className="py-8 px-4 text-sm text-slate-400 text-center">불러오는 중...</div>
-        ) : courses.length === 0 ? (
+        </Card>
+      ) : courses.length === 0 ? (
+        <Card className="overflow-hidden">
           <div className="py-8 px-4 text-sm text-slate-400 text-center">아직 코스형 자료가 없습니다</div>
-        ) : (
-          <table className="w-full border-collapse table-fixed">
-            <thead>
-              <tr>
-                <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left">제목</th>
-                <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left w-20">레슨</th>
-                <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left w-[100px]">작성일</th>
-                <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left w-20">상태</th>
-              </tr>
-            </thead>
-            <tbody>
-              {courses.map((c) => (
-                <tr
-                  key={c.id}
-                  onClick={() => navigate(`/content/courses/${c.id}`)}
-                  className="cursor-pointer transition-colors hover:bg-slate-50"
-                >
-                  <td className="px-3 py-3 text-sm text-slate-900 border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap">
-                    <span className="font-semibold text-sm text-slate-800">{c.title}</span>
-                  </td>
-                  <td className="px-3 py-3 text-[13px] text-slate-500 border-b border-slate-100">{c.duration > 0 ? `${c.duration}분` : '-'}</td>
-                  <td className="px-3 py-3 text-[13px] text-slate-400 border-b border-slate-100">{formatDate(c.createdAt)}</td>
-                  <td className="px-3 py-3 border-b border-slate-100">
+        </Card>
+      ) : (
+        <>
+          {/* Desktop: Table */}
+          <Card className="overflow-hidden hidden md:block">
+            <table className="w-full border-collapse table-fixed">
+              <thead>
+                <tr>
+                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left">제목</th>
+                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left w-20">레슨</th>
+                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left w-[100px]">작성일</th>
+                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left w-20">상태</th>
+                </tr>
+              </thead>
+              <tbody>
+                {courses.map((c) => (
+                  <tr
+                    key={c.id}
+                    onClick={() => navigate(`/content/courses/${c.id}`)}
+                    className="cursor-pointer transition-colors hover:bg-slate-50"
+                  >
+                    <td className="px-3 py-3 text-sm text-slate-900 border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap">
+                      <span className="font-semibold text-sm text-slate-800">{c.title}</span>
+                    </td>
+                    <td className="px-3 py-3 text-[13px] text-slate-500 border-b border-slate-100">{c.duration > 0 ? `${c.duration}분` : '-'}</td>
+                    <td className="px-3 py-3 text-[13px] text-slate-400 border-b border-slate-100">{formatDate(c.createdAt)}</td>
+                    <td className="px-3 py-3 border-b border-slate-100">
+                      <span className={`inline-block px-2 py-0.5 text-[11px] font-semibold rounded ${
+                        c.status === 'published' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'
+                      }`}>
+                        {c.status === 'published' ? '공개' : c.status === 'archived' ? '보관' : '초안'}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Card>
+
+          {/* Mobile: Card List (WO-O4O-RESPONSIVE-LIST-EXPAND-V1) */}
+          <div className="block md:hidden flex flex-col gap-3">
+            {courses.map((c) => (
+              <Card
+                key={c.id}
+                className="p-4 cursor-pointer hover:bg-slate-50 transition-colors"
+                onClick={() => navigate(`/content/courses/${c.id}`)}
+              >
+                <div className="flex flex-col gap-2">
+                  <span className="text-sm font-medium text-slate-800 line-clamp-2">{c.title}</span>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-slate-500">
+                      {formatDate(c.createdAt)}
+                      {c.duration > 0 && ` · ${c.duration}분`}
+                    </span>
                     <span className={`inline-block px-2 py-0.5 text-[11px] font-semibold rounded ${
                       c.status === 'published' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'
                     }`}>
                       {c.status === 'published' ? '공개' : c.status === 'archived' ? '보관' : '초안'}
                     </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </Card>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </>
+      )}
     </section>
   );
 }

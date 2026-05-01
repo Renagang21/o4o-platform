@@ -39,12 +39,20 @@ export interface IconTemplate {
   icon: string;
 }
 
+/** WO-O4O-TEMPLATE-RESPONSIVE-LAYOUT-V1 */
+export interface LayoutTemplate {
+  container: string;
+  grid: string;
+  gap: string;
+}
+
 export interface TemplateTokens {
   hero: HeroTemplate;
   card: CardTemplate;
   section: SectionTemplate;
   button?: ButtonTemplate;
   icon?: IconTemplate;
+  layout?: LayoutTemplate;
 }
 
 // ─── Context ─────────────────────────────────────────────────────────────────

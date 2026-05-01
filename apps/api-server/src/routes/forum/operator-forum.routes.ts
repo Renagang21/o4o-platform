@@ -683,6 +683,42 @@ router.post('/categories/:id/deactivate', async (req: Request, res: Response): P
   }
 });
 
+/** POST /categories/:id/activate — reactivate archived forum (status → completed) */
+router.post('/categories/:id/activate', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const serviceCode = (req as any)._serviceCode;
+    const userId = (req as AuthRequest).user?.id;
+
+    const forum = await requestRepo().findOne({
+      where: { id: req.params.id, serviceCode },
+    });
+    if (!forum || !['completed', 'archived'].includes(forum.status)) {
+      res.status(404).json({ success: false, error: 'Forum not found for this service' });
+      return;
+    }
+
+    if (forum.status !== 'archived') {
+      res.status(400).json({ success: false, error: '이미 활성 상태인 포럼입니다', code: 'ALREADY_ACTIVE' });
+      return;
+    }
+
+    const meta = forum.metadata || {};
+    forum.status = 'completed';
+    forum.metadata = {
+      ...meta,
+      reactivatedAt: new Date().toISOString(),
+      reactivatedBy: userId,
+    };
+
+    await requestRepo().save(forum);
+    logger.info(`Forum ${forum.id} reactivated by operator ${userId}`);
+    res.json({ success: true, data: { id: forum.id, isActive: true } });
+  } catch (error: any) {
+    logger.error('Error reactivating forum:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 /** GET /categories/:id/delete-check — hard delete pre-flight check */
 router.get('/categories/:id/delete-check', async (req: Request, res: Response): Promise<void> => {
   try {

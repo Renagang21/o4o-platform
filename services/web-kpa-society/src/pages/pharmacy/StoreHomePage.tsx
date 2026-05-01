@@ -30,7 +30,7 @@ import {
   Tablet as TabletIcon,
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Card } from '@o4o/ui';
+import { Card, useTemplate } from '@o4o/ui';
 import { kpaConfig } from '@o4o/operator-ux-core';
 import { getMarketingAnalytics, getRecentScans } from '../../api/storeAnalytics';
 import type { MarketingAnalyticsData, RecentScanItem } from '../../api/storeAnalytics';
@@ -40,6 +40,7 @@ import { getStoreSlug } from '../../api/pharmacyInfo';
 import { GuideEditableSection } from '../../components/guide';
 
 export function StoreHomePage() {
+  const tpl = useTemplate();
   const navigate = useNavigate();
   const [analytics, setAnalytics] = useState<MarketingAnalyticsData | null>(null);
   const [recentScans, setRecentScans] = useState<RecentScanItem[]>([]);
@@ -115,8 +116,8 @@ export function StoreHomePage() {
         </button>
       </div>
 
-      {/* ── 운영 현황 KPI ── */}
-      <div className="grid grid-cols-4 gap-3 mb-6">
+      {/* ── 운영 현황 KPI (WO-O4O-TEMPLATE-RESPONSIVE-LAYOUT-V1) ── */}
+      <div className={`grid ${tpl?.layout?.grid ?? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'} ${tpl?.layout?.gap ?? 'gap-3'} mb-6`}>
         <Card className="p-5 text-center">
           <BookOpen size={20} className="text-emerald-600 mx-auto" />
           <p className="text-2xl font-bold text-primary m-0 mt-2">{libraryCount ?? '–'}</p>

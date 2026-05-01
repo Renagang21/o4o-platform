@@ -105,21 +105,6 @@ export function CommunityHomePage() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Responsive 2-column CSS
-  useEffect(() => {
-    const id = 'kpa-home-two-col-responsive';
-    if (document.getElementById(id)) return;
-    const style = document.createElement('style');
-    style.id = id;
-    style.textContent = `
-      @media (max-width: 768px) {
-        .kpa-home-two-col { flex-direction: column !important; }
-      }
-    `;
-    document.head.appendChild(style);
-    return () => { document.getElementById(id)?.remove(); };
-  }, []);
-
   // ── Notice items ──
   const noticeItems: NoticeItem[] = (data?.notices ?? []).map((n) => ({
     id: n.id,
@@ -139,9 +124,9 @@ export function CommunityHomePage() {
       {/* 2. 공지 / 약사공론 뉴스 (2-column) */}
       <PageSection>
         <PageContainer>
-          <div style={twoColStyles.row} className="kpa-home-two-col">
+          <div className="flex flex-col md:flex-row gap-4">
             {/* Left: 공지사항 */}
-            <div style={twoColStyles.col}>
+            <div className="flex-1 min-w-0">
               <NewsNoticesSection
                 title="공지"
                 items={noticeItems}
@@ -151,7 +136,7 @@ export function CommunityHomePage() {
               />
             </div>
             {/* Right: 약사공론 뉴스 Placeholder */}
-            <div style={twoColStyles.col}>
+            <div className="flex-1 min-w-0">
               <div style={twoColStyles.placeholderHeader}>
                 <h2 style={twoColStyles.placeholderTitle}>약사공론 뉴스</h2>
               </div>
@@ -238,14 +223,6 @@ export function CommunityHomePage() {
 }
 
 const twoColStyles: Record<string, React.CSSProperties> = {
-  row: {
-    display: 'flex',
-    gap: 16,
-  },
-  col: {
-    flex: 1,
-    minWidth: 0,
-  },
   placeholderHeader: {
     marginBottom: 12,
   },

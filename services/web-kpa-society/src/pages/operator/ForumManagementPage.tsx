@@ -152,6 +152,11 @@ const forumCategoryPolicy = defineActionPolicy<CategoryData>('kpa:forum:categori
       label: '태그 수정',
     },
     {
+      key: 'activate',
+      label: '활성화',
+      visible: (row) => !row.isActive,
+    },
+    {
       key: 'deactivate',
       label: '비활성화',
       variant: 'warning',
@@ -168,6 +173,7 @@ const forumCategoryPolicy = defineActionPolicy<CategoryData>('kpa:forum:categori
 
 const CATEGORY_ACTION_ICONS: Record<string, React.ReactNode> = {
   editTags: <Pencil className="w-4 h-4" />,
+  activate: <CheckCircle className="w-4 h-4" />,
   deactivate: <Trash2 className="w-4 h-4" />,
   hardDelete: <AlertOctagon className="w-4 h-4" />,
 };
@@ -283,6 +289,21 @@ export default function ForumManagementPage() {
       toast.error(err?.response?.data?.error || '오류가 발생했습니다');
     } finally {
       setIsDeactivating(false);
+    }
+  };
+
+  const handleActivate = async (cat: CategoryData) => {
+    if (!confirm(`'${cat.name}' 포럼을 활성화하시겠습니까?\n활성화하면 사용자에게 다시 노출됩니다.`)) return;
+    try {
+      const result = await forumOperatorApi.activate(cat.id);
+      if (result.success) {
+        toast.success(`'${cat.name}' 포럼이 활성화되었습니다`);
+        loadCategories();
+      } else {
+        toast.error(result.error || '활성화 실패');
+      }
+    } catch (err: any) {
+      toast.error(err?.response?.data?.error || '오류가 발생했습니다');
     }
   };
 
@@ -402,6 +423,40 @@ export default function ForumManagementPage() {
 
     if (failed === 0) {
       toast.success(`${success}개 포럼 비활성화 완료`);
+    } else {
+      toast.error(`${success}건 성공, ${failed}건 실패${failedNames.length > 0 ? ` (${failedNames.join(', ')})` : ''}`);
+    }
+    setSelectedCatIds(new Set());
+    loadCategories();
+    setIsBulkProcessing(false);
+  };
+
+  // ── Bulk activate (활성화): 선택된 비활성 포럼만 대상 ──
+  const handleBulkActivate = async () => {
+    const targets = filteredCategories.filter((c) => selectedCatIds.has(c.id) && !c.isActive);
+    if (targets.length === 0) {
+      toast.error('활성화할 수 있는 비활성 포럼이 없습니다');
+      return;
+    }
+    if (!confirm(`${targets.length}개 비활성 포럼을 활성화합니다. 진행하시겠습니까?`)) return;
+
+    setIsBulkProcessing(true);
+    let success = 0;
+    let failed = 0;
+    const failedNames: string[] = [];
+
+    for (const cat of targets) {
+      try {
+        const result = await forumOperatorApi.activate(cat.id);
+        if (result.success) success++;
+        else { failed++; failedNames.push(cat.name); }
+      } catch {
+        failed++; failedNames.push(cat.name);
+      }
+    }
+
+    if (failed === 0) {
+      toast.success(`${success}개 포럼 활성화 완료`);
     } else {
       toast.error(`${success}건 성공, ${failed}건 실패${failedNames.length > 0 ? ` (${failedNames.join(', ')})` : ''}`);
     }
@@ -719,6 +774,7 @@ export default function ForumManagementPage() {
         <RowActionMenu
           actions={buildRowActions(forumCategoryPolicy, row, {
             editTags: () => openTagEditModal(row),
+            activate: () => handleActivate(row),
             deactivate: () => { setDeactivateTarget(row); setDeactivateReason(''); },
             hardDelete: () => openHardDeleteModal(row),
           }, {
@@ -1078,6 +1134,16 @@ export default function ForumManagementPage() {
               )}
               {selectedInactiveCount > 0 && (
                 <button
+                  onClick={handleBulkActivate}
+                  disabled={isBulkProcessing}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-green-600 hover:bg-green-700 rounded disabled:opacity-50 transition-colors"
+                >
+                  {isBulkProcessing ? <Spinner className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5" />}
+                  활성화 ({selectedInactiveCount})
+                </button>
+              )}
+              {selectedInactiveCount > 0 && (
+                <button
                   onClick={handleBulkHardDelete}
                   disabled={isBulkProcessing}
                   className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-rose-600 hover:bg-rose-700 rounded disabled:opacity-50 transition-colors"
@@ -1137,6 +1203,12 @@ export default function ForumManagementPage() {
                   <p className="text-sm text-slate-500 mt-0.5">개설자: {deactivateTarget.creatorName}</p>
                 )}
               </div>
+
+              {deactivateTarget.postCount > 0 && (
+                <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
+                  이 포럼에는 <strong>{deactivateTarget.postCount}개</strong>의 게시글이 있습니다.
+                </div>
+              )}
 
               <div className="space-y-1.5 text-sm text-slate-600">
                 <p>• 비활성화 후 일반 사용자에게 노출되지 않습니다.</p>

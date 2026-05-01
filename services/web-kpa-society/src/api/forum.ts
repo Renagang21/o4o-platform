@@ -269,6 +269,11 @@ export const forumOperatorApi = {
     return res.data;
   },
 
+  activate: async (id: string) => {
+    const res = await authClient.api.post(`${OPERATOR_BASE}/categories/${id}/activate?${SVC}`, {});
+    return res.data;
+  },
+
   // WO-KPA-A-OPERATOR-FORUM-HARD-DELETE-SAFE-GUARD-V1
   getDeleteCheck: async (id: string) => {
     const res = await authClient.api.get(`${OPERATOR_BASE}/categories/${id}/delete-check?${SVC}`);

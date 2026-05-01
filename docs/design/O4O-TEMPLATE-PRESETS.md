@@ -187,7 +187,7 @@ console.log(preset.description); // '전문기관형 — ...'
 | 토큰 | 설명 | 현재 |
 |------|------|------|
 | `typography` | heading size/weight, body size | 미지원 |
-| `layout` | grid cols, gap, density | 미지원 |
+| `layout` | container, grid, gap | 구현 완료 (WO-O4O-TEMPLATE-RESPONSIVE-LAYOUT-V1) |
 | `animation` | transition, hover effect | 미지원 |
 | `color` | primary scheme override | CSS var 의존 |
 

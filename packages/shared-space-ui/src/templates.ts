@@ -53,6 +53,12 @@ export interface TemplateTokens {
     wrapper: string;
     icon: string;
   };
+  /** WO-O4O-TEMPLATE-RESPONSIVE-LAYOUT-V1 */
+  layout?: {
+    container: string;
+    grid: string;
+    gap: string;
+  };
 }
 
 // ─── Preset Types ───────────────────────────────────────────
@@ -96,6 +102,11 @@ export const templatePresets: Record<TemplateKey, TemplatePreset> = {
         wrapper: '',
         icon: 'text-primary',
       },
+      layout: {
+        container: 'max-w-5xl',
+        grid: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
+        gap: 'gap-4',
+      },
     },
   },
 
@@ -124,6 +135,11 @@ export const templatePresets: Record<TemplateKey, TemplatePreset> = {
         wrapper: 'bg-primary-50 rounded-lg w-9 h-9',
         icon: 'text-primary',
       },
+      layout: {
+        container: 'max-w-5xl',
+        grid: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
+        gap: 'gap-3',
+      },
     },
   },
 
@@ -151,6 +167,11 @@ export const templatePresets: Record<TemplateKey, TemplatePreset> = {
       icon: {
         wrapper: 'bg-primary-50 rounded-full w-11 h-11',
         icon: 'text-primary',
+      },
+      layout: {
+        container: 'max-w-6xl',
+        grid: 'grid-cols-2 lg:grid-cols-4',
+        gap: 'gap-4',
       },
     },
   },
@@ -183,6 +204,11 @@ export const templatePresets: Record<TemplateKey, TemplatePreset> = {
       icon: {
         wrapper: 'bg-primary-50 rounded-full w-12 h-12',
         icon: 'text-primary',
+      },
+      layout: {
+        container: 'max-w-7xl',
+        grid: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
+        gap: 'gap-6',
       },
     },
   },

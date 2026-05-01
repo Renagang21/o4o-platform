@@ -33,6 +33,7 @@ import {
   BaseDetailDrawer,
   ActionBar,
   RowActionMenu,
+  Card,
 } from '@o4o/ui';
 import { HubPagination } from './HubPagination';
 import type { O4OColumn, ActionBarAction, RowActionItem } from '@o4o/ui';
@@ -652,22 +653,88 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
         </div>
       ) : (
         <>
-          <BaseTable<ResourcesHubItem>
-            columns={columns}
-            data={items}
-            rowKey={(row) => row.id}
-            tableId={config.tableId}
-            onRowClick={config.fetchDetail ? (row) => openDrawer(row) : undefined}
-            selectable
-            selectedKeys={selectedKeys}
-            onSelectionChange={setSelectedKeys}
-            emptyMessage={
-              searchQuery
-                ? (config.emptyFilteredMessage ?? '검색 결과가 없습니다.')
-                : (config.emptyMessage ?? '등록된 자료가 없습니다.')
-            }
-            rowClassName={() => config.fetchDetail ? 'cursor-pointer' : ''}
-          />
+          {/* Desktop: Table */}
+          <div className="hidden md:block">
+            <BaseTable<ResourcesHubItem>
+              columns={columns}
+              data={items}
+              rowKey={(row) => row.id}
+              tableId={config.tableId}
+              onRowClick={config.fetchDetail ? (row) => openDrawer(row) : undefined}
+              selectable
+              selectedKeys={selectedKeys}
+              onSelectionChange={setSelectedKeys}
+              emptyMessage={
+                searchQuery
+                  ? (config.emptyFilteredMessage ?? '검색 결과가 없습니다.')
+                  : (config.emptyMessage ?? '등록된 자료가 없습니다.')
+              }
+              rowClassName={() => config.fetchDetail ? 'cursor-pointer' : ''}
+            />
+          </div>
+
+          {/* Mobile: Card List (WO-O4O-RESPONSIVE-LIST-EXPAND-V1) */}
+          <div className="block md:hidden">
+            {items.length === 0 ? (
+              <div style={{ padding: '40px 16px', textAlign: 'center', color: '#6B7280', fontSize: 14 }}>
+                {searchQuery
+                  ? (config.emptyFilteredMessage ?? '검색 결과가 없습니다.')
+                  : (config.emptyMessage ?? '등록된 자료가 없습니다.')}
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {items.map((row) => {
+                  const ft = getFileType(row);
+                  const badge = FILE_TYPE_BADGE[ft];
+                  const actionType = getActionType(row);
+                  const isCopied = copiedId === row.id;
+                  return (
+                    <Card
+                      key={row.id}
+                      className="p-4 cursor-pointer hover:bg-slate-50 transition-colors"
+                      onClick={() => config.fetchDetail ? openDrawer(row) : undefined}
+                    >
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        {/* Line 1: file type badge + title */}
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 6 }}>
+                          {row.source_url && (
+                            <span style={{
+                              padding: '1px 5px', borderRadius: 4, fontSize: 10, fontWeight: 600,
+                              background: badge.bg, color: badge.color, flexShrink: 0, marginTop: 2,
+                            }}>
+                              {badge.label}
+                            </span>
+                          )}
+                          <span className="text-sm font-medium text-slate-800 line-clamp-2">{row.title}</span>
+                        </div>
+                        {/* Line 2: author · date · views */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span className="text-xs text-slate-500">
+                            {row.author_name || '-'} · {formatDate(row.created_at)}
+                          </span>
+                          <span className="text-xs text-slate-400">👁 {row.view_count ?? 0}</span>
+                        </div>
+                        {/* Line 3: take action button */}
+                        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                          <button
+                            onClick={(e) => handleTakeAction(row, e)}
+                            style={{ ...st.actionBtn, ...(isCopied ? { background: '#D1FAE5', color: '#065F46' } : {}) }}
+                          >
+                            {actionType === 'external' ? <ExternalLink size={12} />
+                              : actionType === 'download' ? <Download size={12} />
+                              : actionType === 'copy' ? <Copy size={12} />
+                              : null}
+                            {isCopied ? '복사됨!' : '가져가기'}
+                          </button>
+                        </div>
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
           <div style={{ marginTop: 20 }}>
             <HubPagination
               currentPage={currentPage}
