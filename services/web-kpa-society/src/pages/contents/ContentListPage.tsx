@@ -32,7 +32,9 @@ import { useEffect, useState, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { contentApi, type ContentItem } from '../../api/content';
 import { lmsApi } from '../../api/lms';
+import { participationApi } from '../../api/participation';
 import type { Course } from '../../types';
+import type { ParticipationSet } from '../participation/types';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
 import { Card } from '@o4o/ui';
@@ -407,23 +409,87 @@ function CoursesSection({ canCreateCourse }: { canCreateCourse: boolean }) {
   );
 }
 
-// ─── Section 3: 설문조사 (WO-KPA-PARTICIPATION-SETS-404-CLEANUP-V1) ─────────
-// participation 실행 기능은 Neture canonical이며 KPA 백엔드에 엔드포인트가 없다.
-// 따라서 이 섹션은 API를 호출하지 않고 정적 placeholder만 표시한다.
+// ─── Section 3: 설문조사 ──────────────────────────────────────────────────
+// WO-O4O-SURVEY-CORE-PHASE1-V1: O4O 공통 Survey API 연결, placeholder 제거.
+// participationApi는 내부에서 /api/v1/surveys?serviceKey=kpa-society를 호출한다.
 
-function SurveysSection() {
+function SurveysSection({ isAuthenticated }: { isAuthenticated: boolean }) {
+  const navigate = useNavigate();
+  const [items, setItems] = useState<ParticipationSet[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    participationApi.getParticipationSets({ page: 1, limit: 6 })
+      .then((res) => {
+        if (cancelled) return;
+        setItems(Array.isArray(res.data) ? res.data : []);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setItems([]);
+      })
+      .finally(() => {
+        if (cancelled) return;
+        setLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, []);
+
+  const targetForSurvey = (set: ParticipationSet) =>
+    set.status === 'active'
+      ? `/participation/${set.id}/respond`
+      : `/participation/${set.id}/results`;
+
   return (
     <section className="mb-10">
       <SectionHeader
         title="설문조사"
         description="의견을 수집하거나 참여를 받는 설문"
+        primaryAction={isAuthenticated ? { label: '설문 등록', to: '/content/surveys/new' } : undefined}
         moreLink={{ label: '전체 보기', to: '/content/surveys' }}
       />
-      <Card className="overflow-hidden">
-        <div className="py-8 px-4 text-sm text-slate-400 text-center">
-          설문조사 기능은 준비 중입니다
+      {loading ? (
+        <Card className="overflow-hidden">
+          <div className="py-8 px-4 text-sm text-slate-400 text-center">불러오는 중...</div>
+        </Card>
+      ) : items.length === 0 ? (
+        <Card className="overflow-hidden">
+          <div className="py-8 px-4 text-sm text-slate-400 text-center">아직 등록된 설문이 없습니다</div>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {items.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => navigate(targetForSurvey(s))}
+              className="flex flex-col items-start p-4 bg-white border border-slate-200 rounded-lg cursor-pointer text-left transition-colors hover:border-slate-400 min-h-[120px]"
+            >
+              <div className="flex items-center justify-between w-full mb-2">
+                <span className={`inline-block px-2 py-0.5 text-[11px] font-semibold rounded ${
+                  s.status === 'active' ? 'bg-emerald-50 text-emerald-700'
+                  : s.status === 'closed' ? 'bg-red-50 text-red-700'
+                  : 'bg-slate-100 text-slate-500'
+                }`}>
+                  {s.status === 'active' ? '진행중' : s.status === 'closed' ? '종료' : '초안'}
+                </span>
+                <span className="text-xs text-slate-400">
+                  {s.createdAt ? new Date(s.createdAt).toLocaleDateString('ko-KR') : '-'}
+                </span>
+              </div>
+              <div className="text-sm font-semibold text-slate-900 mb-1.5 line-clamp-2 w-full">
+                {s.title}
+              </div>
+              {s.description && (
+                <div className="text-[13px] text-slate-500 mb-2 line-clamp-2 w-full">{s.description}</div>
+              )}
+              <div className="text-xs text-slate-400 mt-auto">질문 {s.questions?.length ?? 0}개</div>
+            </button>
+          ))}
         </div>
-      </Card>
+      )}
     </section>
   );
 }
@@ -460,7 +526,7 @@ export function ContentListPage() {
 
       <CoursesSection canCreateCourse={canCreateCourse} />
 
-      <SurveysSection />
+      <SurveysSection isAuthenticated={isAuthenticated} />
     </div>
   );
 }

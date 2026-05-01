@@ -149,3 +149,10 @@ export class ApiClient {
 }
 
 export const apiClient = new ApiClient(API_BASE_URL);
+
+// WO-O4O-SURVEY-CORE-PHASE1-V1: O4O 공통 도메인용 Core API client (no /kpa prefix)
+const CORE_API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+  ? `${import.meta.env.VITE_API_BASE_URL}/api/v1`
+  : '/api/v1';
+
+export const coreApiClient = new ApiClient(CORE_API_BASE_URL);

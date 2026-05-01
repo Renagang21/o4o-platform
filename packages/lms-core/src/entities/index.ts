@@ -7,15 +7,16 @@ export type { EngagementMetadata } from './EngagementLog.js';
 export {
   // Phase 1
   Quiz, QuizAttempt, AttemptStatus,
-  Survey, SurveyStatus, SurveyQuestion, QuestionType, SurveyResponse, ResponseStatus,
+  Survey, SurveyStatus, SurveyOwnerType, SurveyVisibility, SurveyQuestion, QuestionType, SurveyResponse, ResponseStatus,
   ContentBundle, ContentBundleType,
   // Phase 2
-  Course, CourseLevel, CourseStatus, ContentKind,
+  Course, CourseLevel, CourseStatus, ContentKind, CourseVisibility,
   Lesson, LessonType,
 } from '@o4o/interactive-content-core';
 export type {
   QuizQuestion, QuizAnswer,
   QuestionOption,
+  QuestionAnswer,
   ContentItem,
 } from '@o4o/interactive-content-core';
 

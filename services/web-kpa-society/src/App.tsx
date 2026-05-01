@@ -62,6 +62,8 @@ const ParticipationListPage = lazy(() => import('./pages/participation/Participa
 const ParticipationCreatePage = lazy(() => import('./pages/participation/ParticipationCreatePage').then(m => ({ default: m.ParticipationCreatePage })));
 const ParticipationRespondPage = lazy(() => import('./pages/participation/ParticipationRespondPage').then(m => ({ default: m.ParticipationRespondPage })));
 const ParticipationResultPage = lazy(() => import('./pages/participation/ParticipationResultPage').then(m => ({ default: m.ParticipationResultPage })));
+// WO-O4O-SURVEY-CORE-PHASE1-V1: /content/surveys/new에서 allowedQuestionTypes/hideScopeField 사용
+import { QuestionType } from './pages/participation/types';
 
 // Event Offer pages — Phase 2 lazy (barrel unwound)
 const EventOfferListPage = lazy(() => import('./pages/event-offer/EventOfferListPage').then(m => ({ default: m.EventOfferListPage })));
@@ -659,6 +661,8 @@ function App() {
                   { label: '새 설문' },
                 ]}
                 returnTo="/content/surveys"
+                allowedQuestionTypes={[QuestionType.SINGLE_CHOICE, QuestionType.MULTIPLE_CHOICE, QuestionType.FREE_TEXT]}
+                hideScopeField
               />
             </Layout>
           } />

@@ -28,6 +28,7 @@ export enum ResponseStatus {
 @Index(['surveyId', 'createdAt'])
 @Index(['userId', 'surveyId'])
 @Index(['status'])
+@Index(['serviceKey'])
 export class SurveyResponse {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -71,6 +72,17 @@ export class SurveyResponse {
 
   @Column({ type: 'jsonb', default: {} })
   metadata!: Record<string, any>;
+
+  // WO-O4O-SURVEY-CORE-PHASE1-V1: 응답 컨텍스트 + 익명 중복 방지
+  @Column({ name: 'service_key', type: 'varchar', length: 50, default: 'global' })
+  serviceKey!: string;
+
+  @Column({ name: 'organization_id', type: 'uuid', nullable: true })
+  organizationId?: string;
+
+  // 익명 응답 시 중복 방지용 토큰 (sessionId 또는 hash). 기명 응답은 NULL.
+  @Column({ name: 'anonymous_token', type: 'varchar', length: 64, nullable: true })
+  anonymousToken?: string;
 
   @CreateDateColumn()
   createdAt!: Date;

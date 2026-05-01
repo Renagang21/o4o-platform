@@ -27,9 +27,38 @@ export enum SurveyStatus {
   ARCHIVED = 'archived',
 }
 
+/**
+ * WO-O4O-SURVEY-CORE-PHASE1-V1 — owner_type 분류
+ * 설문 작성 주체. Phase 1에서는 service_operator / community_member 2종 활용.
+ */
+export enum SurveyOwnerType {
+  PLATFORM_OPERATOR = 'platform_operator',
+  SERVICE_OPERATOR = 'service_operator',
+  SUPPLIER = 'supplier',
+  STORE_OWNER = 'store_owner',
+  COMMUNITY_MEMBER = 'community_member',
+}
+
+/**
+ * WO-O4O-SURVEY-CORE-PHASE1-V1 — visibility (응답 자격)
+ * Phase 1에서는 public / members_only / organization 3종 활용.
+ */
+export enum SurveyVisibility {
+  PUBLIC = 'public',
+  MEMBERS_ONLY = 'members_only',
+  PHARMACY_ONLY = 'pharmacy_only',
+  STORE_OWNER_ONLY = 'store_owner_only',
+  ORGANIZATION = 'organization',
+  SUPPLIER_TARGET = 'supplier_target',
+  CUSTOM_TARGET = 'custom_target',
+}
+
 @Entity('lms_surveys')
 @Index(['status', 'createdAt'])
 @Index(['bundleId'])
+@Index(['serviceKey'])
+@Index(['ownerType', 'ownerId'])
+@Index(['visibility'])
 export class Survey {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -82,6 +111,25 @@ export class Survey {
 
   @Column({ type: 'jsonb', default: {} })
   metadata!: Record<string, any>;
+
+  // WO-O4O-SURVEY-CORE-PHASE1-V1: O4O 공통 Participation Engine 분류 축
+  @Column({ name: 'service_key', type: 'varchar', length: 50, default: 'global' })
+  serviceKey!: string;
+
+  @Column({ name: 'owner_type', type: 'varchar', length: 30, default: SurveyOwnerType.COMMUNITY_MEMBER })
+  ownerType!: SurveyOwnerType;
+
+  @Column({ name: 'owner_id', type: 'uuid', nullable: true })
+  ownerId?: string;
+
+  @Column({ name: 'organization_id', type: 'uuid', nullable: true })
+  organizationId?: string;
+
+  @Column({ name: 'visibility', type: 'varchar', length: 30, default: SurveyVisibility.MEMBERS_ONLY })
+  visibility!: SurveyVisibility;
+
+  @Column({ name: 'target_filter', type: 'jsonb', default: {} })
+  targetFilter!: Record<string, any>;
 
   @Column({ type: 'uuid', nullable: true })
   createdBy?: string;

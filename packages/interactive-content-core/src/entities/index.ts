@@ -4,18 +4,19 @@ export type { QuizQuestion } from './Quiz.js';
 export { QuizAttempt, AttemptStatus } from './QuizAttempt.js';
 export type { QuizAnswer } from './QuizAttempt.js';
 
-// Survey
-export { Survey, SurveyStatus } from './Survey.js';
+// Survey (WO-O4O-SURVEY-CORE-PHASE1-V1: SurveyOwnerType, SurveyVisibility 추가)
+export { Survey, SurveyStatus, SurveyOwnerType, SurveyVisibility } from './Survey.js';
 export { SurveyQuestion, QuestionType } from './SurveyQuestion.js';
 export type { QuestionOption } from './SurveyQuestion.js';
 export { SurveyResponse, ResponseStatus } from './SurveyResponse.js';
+export type { QuestionAnswer } from './SurveyResponse.js';
 
 // ContentBundle
 export { ContentBundle, ContentBundleType } from './ContentBundle.js';
 export type { ContentItem } from './ContentBundle.js';
 
 // Course & Lesson (Phase 2)
-export { Course, CourseLevel, CourseStatus, ContentKind } from './Course.js';
+export { Course, CourseLevel, CourseStatus, ContentKind, CourseVisibility } from './Course.js';
 export { Lesson, LessonType } from './Lesson.js';
 
 // Templates (WO-O4O-TEMPLATE-SYSTEM-FOUNDATION)
