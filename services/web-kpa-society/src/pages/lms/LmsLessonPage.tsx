@@ -213,6 +213,9 @@ export function LmsLessonPage() {
   const completedLessonIds: string[] = (enrollment as any)?.metadata?.completedLessonIds || [];
   const isCompleted = completedLessonIds.includes(currentLesson.id);
   const isQuizLesson = currentLesson.type === 'quiz' && quiz;
+  // WO-O4O-LMS-LESSON-TYPE-HIDE-INCOMPLETE-V1: assignment/live는 미구현 → 안내만 표시 (대소문자 모두 안전 처리)
+  const lessonTypeLower = (currentLesson.type as string)?.toLowerCase?.() || '';
+  const isUnsupportedLesson = lessonTypeLower === 'assignment' || lessonTypeLower === 'live';
 
   return (
     <div style={styles.wrapper}>
@@ -275,8 +278,17 @@ export function LmsLessonPage() {
           <h1 style={styles.title}>{currentLesson.title}</h1>
         </div>
 
-        {/* 퀴즈 영역 (WO-O4O-QUIZ-SYSTEM-V1) */}
-        {isQuizLesson ? (
+        {/* WO-O4O-LMS-LESSON-TYPE-HIDE-INCOMPLETE-V1: 미지원 타입 안내 */}
+        {isUnsupportedLesson ? (
+          <Card padding="large" style={{ marginTop: '24px', backgroundColor: '#fef3c7', border: '1px solid #fde68a' }}>
+            <h3 style={{ ...typography.headingS, color: '#92400e', marginBottom: '8px' }}>
+              현재 지원되지 않는 레슨입니다
+            </h3>
+            <p style={{ ...typography.bodyM, color: '#92400e' }}>
+              이 레슨 유형(<strong>{lessonTypeLower === 'live' ? '라이브' : '과제'}</strong>)은 아직 정식 지원되지 않습니다. 운영자에게 문의해 주세요.
+            </p>
+          </Card>
+        ) : isQuizLesson ? (
           <div>
             {quiz.description && (
               <Card padding="large" style={{ marginBottom: '16px' }}>
@@ -472,7 +484,7 @@ export function LmsLessonPage() {
             <div />
           )}
 
-          {!isCompleted && enrollment && !isQuizLesson && (
+          {!isCompleted && enrollment && !isQuizLesson && !isUnsupportedLesson && (
             <button style={styles.completeButton} onClick={handleComplete}>
               ✓ 완료
             </button>

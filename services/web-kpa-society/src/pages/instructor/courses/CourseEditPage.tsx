@@ -15,6 +15,12 @@ const LESSON_TYPE_LABEL: Record<LessonType, string> = {
   VIDEO: '영상', ARTICLE: '문서', QUIZ: '퀴즈', ASSIGNMENT: '과제', LIVE: '라이브',
 };
 
+// WO-O4O-LMS-LESSON-TYPE-HIDE-INCOMPLETE-V1: 미구현 타입(ASSIGNMENT, LIVE) 신규 생성 차단.
+// enum/DB/API는 그대로 두고 UI에서만 차단. 기존 데이터는 안내 후 읽기 전용 처리.
+const SUPPORTED_LESSON_TYPES: LessonType[] = ['VIDEO', 'ARTICLE', 'QUIZ'];
+const isUnsupportedType = (t: LessonType | string): boolean =>
+  t === 'ASSIGNMENT' || t === 'LIVE' || t === 'assignment' || t === 'live';
+
 /* ──────────────── styles ──────────────── */
 // 함수형 style은 별도 함수로 분리. (Record<string, CSSProperties>에 함수 값을 넣으면
 // 객체 키가 함수로 잘못 좁혀져 TS2560/TS2349 발생)
@@ -66,6 +72,15 @@ const s: Record<string, React.CSSProperties> = {
   tag: { display: 'inline-flex', alignItems: 'center', gap: 4, padding: '2px 8px', background: '#ede9fe', color: '#5b21b6', borderRadius: 999, fontSize: 12, fontWeight: 500 },
   tagRemove: { cursor: 'pointer', fontSize: 13, color: '#7c3aed' },
   tagInput: { border: 'none', outline: 'none', fontSize: 13, flex: 1, minWidth: 60, color: '#111827' },
+  // WO-O4O-LMS-LESSON-TYPE-HIDE-INCOMPLETE-V1
+  unsupportedBanner: {
+    padding: '12px 14px', background: '#fef3c7', border: '1px solid #fde68a',
+    color: '#92400e', borderRadius: 8, fontSize: 13, lineHeight: 1.5, marginBottom: 16,
+  },
+  unsupportedTag: {
+    marginLeft: 6, padding: '1px 6px', background: '#fef3c7', color: '#92400e',
+    borderRadius: 4, fontSize: 11, fontWeight: 600,
+  },
 };
 
 const saveBtnStyle = (disabled: boolean): React.CSSProperties => ({
@@ -108,7 +123,11 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
+  // WO-O4O-LMS-LESSON-TYPE-HIDE-INCOMPLETE-V1
+  const isUnsupportedExisting = isEdit && lesson ? isUnsupportedType(lesson.type) : false;
+
   const handleSave = async () => {
+    if (isUnsupportedExisting) { setErr('이 레슨 유형은 현재 지원되지 않아 저장할 수 없습니다.'); return; }
     if (!form.title.trim()) { setErr('제목을 입력하세요.'); return; }
     setSaving(true);
     setErr(null);
@@ -145,16 +164,24 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
       <div style={s.modalBox}>
         <div style={s.modalTitle}>{isEdit ? '레슨 수정' : '새 레슨 추가'}</div>
 
+        {/* WO-O4O-LMS-LESSON-TYPE-HIDE-INCOMPLETE-V1: 미지원 타입 안내 */}
+        {isUnsupportedExisting && (
+          <div style={s.unsupportedBanner}>
+            ⚠ 이 레슨 유형(<strong>{LESSON_TYPE_LABEL[form.type] || form.type}</strong>)은 현재 지원되지 않습니다.
+            저장이 차단됩니다. 삭제하거나 지원되는 유형(영상 / 문서 / 퀴즈)으로 새 레슨을 만드세요.
+          </div>
+        )}
+
         <div style={s.field}>
           <label style={s.label}>제목 *</label>
-          <input style={s.input} value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} placeholder="레슨 제목" />
+          <input style={s.input} value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} placeholder="레슨 제목" disabled={isUnsupportedExisting} />
         </div>
 
         {!isEdit && (
           <div style={s.field}>
             <label style={s.label}>유형</label>
             <select style={s.select} value={form.type} onChange={(e) => setForm((f) => ({ ...f, type: e.target.value as LessonType }))}>
-              {(Object.keys(LESSON_TYPE_LABEL) as LessonType[]).map((t) => (
+              {SUPPORTED_LESSON_TYPES.map((t) => (
                 <option key={t} value={t}>{LESSON_TYPE_LABEL[t]}</option>
               ))}
             </select>
@@ -195,7 +222,11 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
 
         <div style={s.modalActions}>
           <button style={s.cancelBtn} onClick={onClose}>취소</button>
-          <button style={saveBtnStyle(saving || !form.title.trim())} disabled={saving || !form.title.trim()} onClick={handleSave}>
+          <button
+            style={saveBtnStyle(saving || !form.title.trim() || isUnsupportedExisting)}
+            disabled={saving || !form.title.trim() || isUnsupportedExisting}
+            onClick={handleSave}
+          >
             {saving ? '저장 중...' : '저장'}
           </button>
         </div>
@@ -522,7 +553,9 @@ export default function CourseEditPage() {
                 <div style={s.lessonBody}>
                   <div style={s.lessonTitle}>{lesson.title}</div>
                   <div style={s.lessonMeta}>
-                    {LESSON_TYPE_LABEL[lesson.type]} · {lesson.duration > 0 ? `${lesson.duration}분` : '시간 미설정'}
+                    {LESSON_TYPE_LABEL[lesson.type] || lesson.type} · {lesson.duration > 0 ? `${lesson.duration}분` : '시간 미설정'}
+                    {/* WO-O4O-LMS-LESSON-TYPE-HIDE-INCOMPLETE-V1: 미지원 타입 표시 */}
+                    {isUnsupportedType(lesson.type) && <span style={s.unsupportedTag}>미지원</span>}
                     {!lesson.isPublished && <span style={{ marginLeft: 6, color: '#f59e0b' }}>미발행</span>}
                   </div>
                 </div>
