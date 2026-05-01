@@ -71,36 +71,61 @@ export function createQualificationController(
             return;
           }
           if (existing.status === 'pending') {
+            // WO-KPA-LMS-QUALIFICATION-REQUEST-BACKFILL-AND-SAFETY-V1:
+            // member_qualifications는 pending이지만 qualification_requests가 누락된 경우 복구
+            const existingReq = await reqRepo.findOne({
+              where: { user_id: userId, qualification_type: qualType, status: 'pending' },
+            });
+            if (!existingReq) {
+              const recoveryReq = reqRepo.create({
+                user_id: userId,
+                qualification_type: qualType,
+                status: 'pending',
+                request_data: existing.metadata || requestData,
+              });
+              await reqRepo.save(recoveryReq);
+              console.log(`[Qualification] recovered missing qualification_request for user=${userId} type=${qualType}`);
+            }
             res.status(409).json({ success: false, error: '이미 검토 중인 신청이 있습니다.', code: 'ALREADY_PENDING' });
             return;
           }
-          // rejected → 재신청 허용: 기존 row 업데이트
-          existing.status = 'pending';
-          existing.requested_at = new Date();
-          existing.approved_at = null;
-          existing.rejected_at = null;
-          existing.metadata = requestData;
-          await qualRepo.save(existing);
-        } else {
-          // 신규 자격 row
-          const qual = qualRepo.create({
-            user_id: userId,
-            qualification_type: qualType as any,
-            status: 'pending',
-            requested_at: new Date(),
-            metadata: requestData,
-          });
-          await qualRepo.save(qual);
         }
 
-        // 신청 이력 기록
-        const qReq = reqRepo.create({
-          user_id: userId,
-          qualification_type: qualType,
-          status: 'pending',
-          request_data: requestData,
+        // WO-KPA-LMS-QUALIFICATION-REQUEST-BACKFILL-AND-SAFETY-V1:
+        // 트랜잭션으로 묶어 member_qualifications + qualification_requests 원자적 생성
+        const savedReq = await dataSource.transaction(async (manager) => {
+          const txQualRepo = manager.getRepository(MemberQualification);
+          const txReqRepo = manager.getRepository(QualificationRequest);
+
+          if (existing) {
+            // rejected → 재신청 허용: 기존 row 업데이트
+            existing.status = 'pending';
+            existing.requested_at = new Date();
+            existing.approved_at = null;
+            existing.rejected_at = null;
+            existing.metadata = requestData;
+            await txQualRepo.save(existing);
+          } else {
+            // 신규 자격 row
+            const qual = txQualRepo.create({
+              user_id: userId,
+              qualification_type: qualType as any,
+              status: 'pending',
+              requested_at: new Date(),
+              metadata: requestData,
+            });
+            await txQualRepo.save(qual);
+          }
+
+          // 신청 이력 기록
+          const qReq = txReqRepo.create({
+            user_id: userId,
+            qualification_type: qualType,
+            status: 'pending',
+            request_data: requestData,
+          });
+          return txReqRepo.save(qReq);
         });
-        const savedReq = await reqRepo.save(qReq);
 
         res.status(201).json({ success: true, data: savedReq });
       } catch (error: any) {
