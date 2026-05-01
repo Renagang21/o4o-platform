@@ -334,12 +334,6 @@ export default function ContentHubPage() {
       visible: selectedVideoIds.size === 1 && !!selectedVideo && canEditSelected(videos, selectedVideoIds),
     },
     {
-      key: 'play',
-      label: '전체화면 재생',
-      onClick: () => { if (selectedVideo) navigate(`/signage/play/media/${selectedVideo.id}`); },
-      visible: selectedVideoIds.size === 1,
-    },
-    {
       key: 'delete',
       label: `삭제 (${selectedVideoIds.size})`,
       onClick: handleBulkDeleteVideos,
@@ -355,12 +349,6 @@ export default function ContentHubPage() {
       label: '수정',
       onClick: () => { if (selectedPlaylist) navigate(`/signage/playlist/${selectedPlaylist.id}/edit`); },
       visible: selectedPlaylistIds.size === 1 && !!selectedPlaylist && canEditSelected(playlists, selectedPlaylistIds),
-    },
-    {
-      key: 'play',
-      label: '전체화면 재생',
-      onClick: () => { if (selectedPlaylist) navigate(`/signage/play/playlist/${selectedPlaylist.id}`); },
-      visible: selectedPlaylistIds.size === 1,
     },
     {
       key: 'delete',
@@ -397,7 +385,7 @@ export default function ContentHubPage() {
           setCreateError(null);
           setCreateModal(true);
         } : undefined,
-        onPlayVideo: (v) => navigate(`/signage/play/media/${v.id}`),
+        onPlayVideo: (v) => window.open(`/signage/play/media/${v.id}`, '_blank'),
         canEditVideo: (v) => isOperator || (!!user && v.source === 'community' && v.createdByUserId === user.id),
 
         // ── 플레이리스트 탭 ──
@@ -407,9 +395,9 @@ export default function ContentHubPage() {
         playlistPage,
         playlistPageLimit: PAGE_LIMIT,
         onPlaylistPageChange: (p) => setPlaylistPage(p),
-        onPlaylistClick: (p) => navigate(`/signage/play/playlist/${p.id}`),
+        onPlaylistClick: (p) => window.open(`/signage/play/playlist/${p.id}`, '_blank'),
         onAddPlaylist: user ? () => navigate('/signage/playlist/new') : undefined,
-        onPlayPlaylist: (p) => navigate(`/signage/play/playlist/${p.id}`),
+        onPlayPlaylist: (p) => window.open(`/signage/play/playlist/${p.id}`, '_blank'),
         canEditPlaylist: (p) => isOperator || (!!user && p.source === 'community' && p.createdByUserId === user?.id),
 
         // ── 체크 선택 + ActionBar ──
