@@ -135,7 +135,7 @@ export function buildKpaOperatorConfig(
   if (forumPendingCount > 0) {
     aiSummary.push({
       id: 'ai-forum-requests',
-      message: `포럼 요청 ${forumPendingCount}건 대기 — 카테고리 검토가 필요합니다.`,
+      message: `포럼 개설 요청 ${forumPendingCount}건 대기 — 검토가 필요합니다.`,
       level: forumPendingCount > 5 ? 'warning' : 'info',
       link: '/operator/forum-management',
     });

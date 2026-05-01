@@ -1,5 +1,5 @@
 /**
- * ForumManagementPage - 포럼 카테고리 요청 관리 + 활성 포럼 목록
+ * ForumManagementPage - 포럼 개설 요청 관리 + 활성 포럼 목록
  *
  * WO-O4O-KPA-A-FORUM-ALIGNMENT-V1
  * WO-KPA-A-OPERATOR-FORUM-DIRECT-SOFT-DELETE-V1
