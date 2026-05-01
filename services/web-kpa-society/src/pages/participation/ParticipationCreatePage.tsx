@@ -40,6 +40,13 @@ interface ParticipationCreatePageProps {
   returnTo?: string;
   /** Limit visible question type buttons */
   allowedQuestionTypes?: QuestionType[];
+  /**
+   * 참여 범위 필드 숨김 (저장 시 PUBLIC 고정).
+   * WO-KPA-CONTENT-SURVEY-SCOPE-FIELD-REMOVE-V1: 콘텐츠 허브 설문(/content/surveys/new)은
+   * 전체 공개로 고정되므로 사용자에게 범위 선택/표시를 노출하지 않는다.
+   * /participation/create 등 일반 참여 흐름은 미지정 → 기존 표시 유지.
+   */
+  hideScopeField?: boolean;
 }
 
 export function ParticipationCreatePage({
@@ -48,6 +55,7 @@ export function ParticipationCreatePage({
   breadcrumb,
   returnTo,
   allowedQuestionTypes,
+  hideScopeField,
 }: ParticipationCreatePageProps = {}) {
   const navigate = useNavigate();
   const [title, setTitle] = useState('');
@@ -394,17 +402,13 @@ export function ParticipationCreatePage({
       <Card padding="large" style={{ marginTop: '24px' }}>
         <h3 style={styles.sectionTitle}>참여 설정</h3>
 
-        <div style={styles.fieldRow}>
-          {/* WO-KPA-COMMUNITY-ACCESS-GATE-AND-CONTENT-VISIBILITY-CLEANUP-V1:
-              /content 허브 참여는 '커뮤니티 회원 공개'로 고정 */}
-          <div style={styles.fieldHalf}>
-            <label style={styles.label}>참여 범위</label>
-            <div style={{ ...styles.select, backgroundColor: '#f8fafc', color: '#475569', cursor: 'default' }}>
-              전체 공개
-            </div>
-          </div>
-
-          <div style={styles.fieldHalf}>
+        {/* WO-KPA-COMMUNITY-ACCESS-GATE-AND-CONTENT-VISIBILITY-CLEANUP-V1:
+            /content 허브 참여는 '커뮤니티 회원 공개'로 고정.
+            WO-KPA-CONTENT-SURVEY-SCOPE-FIELD-REMOVE-V1:
+            hideScopeField=true (콘텐츠 허브 흐름) → 참여 범위 UI 제거,
+            응답 방식만 단독 row로. scope state 기본값(PUBLIC)은 그대로 저장. */}
+        {hideScopeField ? (
+          <div style={styles.field}>
             <label style={styles.label}>응답 방식</label>
             <select
               value={scope.anonymity}
@@ -420,7 +424,33 @@ export function ParticipationCreatePage({
               <option value="identified">기명</option>
             </select>
           </div>
-        </div>
+        ) : (
+          <div style={styles.fieldRow}>
+            <div style={styles.fieldHalf}>
+              <label style={styles.label}>참여 범위</label>
+              <div style={{ ...styles.select, backgroundColor: '#f8fafc', color: '#475569', cursor: 'default' }}>
+                전체 공개
+              </div>
+            </div>
+
+            <div style={styles.fieldHalf}>
+              <label style={styles.label}>응답 방식</label>
+              <select
+                value={scope.anonymity}
+                onChange={e =>
+                  setScope({
+                    ...scope,
+                    anonymity: e.target.value as AnonymityType,
+                  })
+                }
+                style={styles.select}
+              >
+                <option value="anonymous">익명</option>
+                <option value="identified">기명</option>
+              </select>
+            </div>
+          </div>
+        )}
 
         <div style={styles.fieldRow}>
           <div style={styles.fieldHalf}>

@@ -661,6 +661,7 @@ function App() {
                 ]}
                 returnTo="/content/surveys"
                 allowedQuestionTypes={[QuestionType.SINGLE_CHOICE, QuestionType.MULTIPLE_CHOICE, QuestionType.FREE_TEXT]}
+                hideScopeField
               />
             </Layout>
           } />
