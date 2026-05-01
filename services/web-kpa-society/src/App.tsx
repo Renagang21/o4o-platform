@@ -83,6 +83,7 @@ const PlaylistEditorPage = lazy(() => import('./pages/signage/PlaylistEditorPage
 const PlaylistDetailPage = lazy(() => import('./pages/signage/PlaylistDetailPage'));
 const MediaDetailPage = lazy(() => import('./pages/signage/MediaDetailPage'));
 const PublicSignagePage = lazy(() => import('./pages/signage/PublicSignagePage'));
+const SignageFullscreenPlayerPage = lazy(() => import('./pages/signage/SignageFullscreenPlayerPage'));
 
 // Legal pages — Phase 2 lazy (barrel unwound)
 const PolicyPage = lazy(() => import('./pages/legal/PolicyPage').then(m => ({ default: m.PolicyPage })));
@@ -737,6 +738,9 @@ function App() {
           <Route path="/signage/playlist/:id/edit" element={<Layout serviceName={SERVICE_NAME}><PlaylistEditorPage /></Layout>} />
           <Route path="/signage/playlist/:id" element={<Layout serviceName={SERVICE_NAME}><PlaylistDetailPage /></Layout>} />
           <Route path="/signage/media/:id" element={<Layout serviceName={SERVICE_NAME}><MediaDetailPage /></Layout>} />
+          {/* WO-KPA-SIGNAGE-FULLSCREEN-PLAYER-V1: 전체화면 재생 (Layout 없음) */}
+          <Route path="/signage/play/media/:mediaId" element={<SignageFullscreenPlayerPage />} />
+          <Route path="/signage/play/playlist/:playlistId" element={<SignageFullscreenPlayerPage />} />
 
           {/* Events (이벤트) */}
           <Route path="/events" element={<Layout serviceName={SERVICE_NAME}><EventsHomePage /></Layout>} />

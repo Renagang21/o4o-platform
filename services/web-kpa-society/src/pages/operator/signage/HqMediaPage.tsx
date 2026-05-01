@@ -93,6 +93,7 @@ export default function HqMediaPage() {
   const [formSourceType, setFormSourceType] = useState('url');
   const [formSourceUrl, setFormSourceUrl] = useState('');
   const [isCreating, setIsCreating] = useState(false);
+  const [formDuration, setFormDuration] = useState('');
   const [formTags, setFormTags] = useState<string[]>([]);
   const [formTagInput, setFormTagInput] = useState('');
 
@@ -138,10 +139,23 @@ export default function HqMediaPage() {
     setFormTags(prev => prev.filter(t => t !== tag));
   };
 
+  const parseDuration = (input: string): number => {
+    const parts = input.trim().split(':').map(Number);
+    if (parts.some(isNaN)) return 0;
+    if (parts.length === 2) return parts[0] * 60 + parts[1];
+    if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+    return 0;
+  };
+
   const handleCreate = async () => {
     if (!formName.trim() || !formSourceUrl.trim()) return;
     if (formTags.length === 0) {
       setError('태그를 최소 1개 이상 입력해주세요');
+      return;
+    }
+    const durationSec = parseDuration(formDuration);
+    if (!formDuration.trim() || durationSec <= 0) {
+      setError('재생시간을 입력하세요 (예: 10:30)');
       return;
     }
     setIsCreating(true);
@@ -154,11 +168,13 @@ export default function HqMediaPage() {
           sourceType: formSourceType,
           sourceUrl: formSourceUrl.trim(),
           tags: formTags,
+          duration: durationSec,
         }),
       });
       setFormName(''); setFormSourceUrl(''); setShowForm(false);
       setFormTags([]);
       setFormTagInput('');
+      setFormDuration('');
       fetchMedia();
     } catch (err: any) {
       setError(err?.message || '미디어 등록에 실패했습니다');
@@ -349,6 +365,10 @@ export default function HqMediaPage() {
                 <option value="youtube">YouTube</option>
                 <option value="vimeo">Vimeo</option>
               </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-500 mb-1">재생시간 * (mm:ss)</label>
+              <input type="text" value={formDuration} onChange={e => setFormDuration(e.target.value)} placeholder="예: 10:30" className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
             </div>
             <div>
               <label className="block text-xs font-medium text-slate-500 mb-1">미디어 타입</label>

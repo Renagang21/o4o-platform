@@ -6,7 +6,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getAccessToken } from '../../../contexts/AuthContext';
-import { ArrowLeft, Film, ExternalLink, Trash2 } from 'lucide-react';
+import { ArrowLeft, Film, ExternalLink, Trash2, Maximize } from 'lucide-react';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 const SERVICE_KEY = 'kpa-society';
@@ -247,12 +247,55 @@ export default function HqMediaDetailPage() {
           <video src={media.sourceUrl} controls className="max-w-md rounded-lg border border-slate-200" />
         </div>
       )}
-      {media.thumbnailUrl && media.mediaType !== 'image' && media.mediaType !== 'video' && (
+      {/* WO-KPA-SIGNAGE-FULLSCREEN-PLAYER-V1: YouTube/Vimeo embed preview */}
+      {(media.sourceType === 'youtube' || (media.sourceUrl && media.sourceUrl.includes('youtu'))) && (() => {
+        const ytMatch = media.sourceUrl.match(/(?:youtu\.be\/|v=)([\w-]+)/);
+        return ytMatch ? (
+          <div className="bg-white rounded-xl border border-blue-100 p-6">
+            <h2 className="text-lg font-semibold text-slate-800 mb-4">미리보기</h2>
+            <iframe
+              src={`https://www.youtube.com/embed/${ytMatch[1]}?rel=0`}
+              className="w-full max-w-lg aspect-video rounded-lg border border-slate-200"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              title={media.name}
+            />
+          </div>
+        ) : null;
+      })()}
+      {(media.sourceType === 'vimeo' || (media.sourceUrl && media.sourceUrl.includes('vimeo'))) && (() => {
+        const vmMatch = media.sourceUrl.match(/vimeo\.com\/(\d+)/);
+        return vmMatch ? (
+          <div className="bg-white rounded-xl border border-blue-100 p-6">
+            <h2 className="text-lg font-semibold text-slate-800 mb-4">미리보기</h2>
+            <iframe
+              src={`https://player.vimeo.com/video/${vmMatch[1]}?title=0&byline=0&portrait=0`}
+              className="w-full max-w-lg aspect-video rounded-lg border border-slate-200"
+              allow="autoplay; fullscreen; picture-in-picture"
+              allowFullScreen
+              title={media.name}
+            />
+          </div>
+        ) : null;
+      })()}
+      {media.thumbnailUrl && media.mediaType !== 'image' && media.mediaType !== 'video' && !media.sourceUrl?.includes('youtu') && !media.sourceUrl?.includes('vimeo') && (
         <div className="bg-white rounded-xl border border-blue-100 p-6">
           <h2 className="text-lg font-semibold text-slate-800 mb-4">썸네일</h2>
           <img src={media.thumbnailUrl} alt={media.name} className="max-w-md rounded-lg border border-slate-200" />
         </div>
       )}
+
+      {/* WO-KPA-SIGNAGE-FULLSCREEN-PLAYER-V1: 전체화면 재생 링크 */}
+      <div className="bg-white rounded-xl border border-blue-100 p-6">
+        <a
+          href={`/signage/play/media/${media.id}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+        >
+          <Maximize className="w-4 h-4" /> 전체화면 재생 (새 탭)
+        </a>
+      </div>
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (

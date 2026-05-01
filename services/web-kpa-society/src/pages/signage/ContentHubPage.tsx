@@ -169,6 +169,7 @@ export default function ContentHubPage() {
     if (!createForm.name.trim()) { setCreateError('제목을 입력하세요'); return; }
     if (!createForm.sourceUrl.trim()) { setCreateError('URL을 입력하세요'); return; }
     if (formTags.length === 0) { setCreateError('태그를 최소 1개 입력하세요'); return; }
+    if (!createForm.durationInput.trim() || parseDurationInput(createForm.durationInput) <= 0) { setCreateError('재생시간을 입력하세요 (예: 10:30)'); return; }
     setIsCreating(true);
     setCreateError(null);
     try {
@@ -211,6 +212,7 @@ export default function ContentHubPage() {
     if (!editForm.name.trim()) { setEditError('제목을 입력하세요'); return; }
     if (!editForm.sourceUrl.trim()) { setEditError('URL을 입력하세요'); return; }
     if (editTags.length === 0) { setEditError('태그를 최소 1개 입력하세요'); return; }
+    if (!editForm.durationInput.trim() || parseDurationInput(editForm.durationInput) <= 0) { setEditError('재생시간을 입력하세요 (예: 10:30)'); return; }
     setIsEditing(true);
     setEditError(null);
     try {
@@ -279,6 +281,7 @@ export default function ContentHubPage() {
           setCreateError(null);
           setCreateModal(true);
         } : undefined,
+        onPlayVideo: (v) => navigate(`/signage/play/media/${v.id}`),
         onEditVideo: (v) => openEditModal(v),
         onDeleteVideo: (v) => setDeleteConfirm({ id: v.id, name: v.name, type: 'video', operatorDelete: isOperator }),
         canEditVideo: (v) => isOperator || (!!user && v.source === 'community' && v.createdByUserId === user.id),
@@ -290,6 +293,7 @@ export default function ContentHubPage() {
         playlistPage,
         playlistPageLimit: PAGE_LIMIT,
         onPlaylistPageChange: (p) => setPlaylistPage(p),
+        onPlaylistClick: (p) => navigate(`/signage/play/playlist/${p.id}`),
         onAddPlaylist: user ? () => navigate('/signage/playlist/new') : undefined,
         onEditPlaylist: (p) => navigate(`/signage/playlist/${p.id}/edit`),
         onDeletePlaylist: (p) => setDeleteConfirm({ id: p.id, name: p.name, type: 'playlist', operatorDelete: isOperator }),
@@ -321,7 +325,7 @@ export default function ContentHubPage() {
                 <input type="url" value={createForm.sourceUrl} onChange={(e) => setCreateForm(f => ({ ...f, sourceUrl: e.target.value }))} placeholder="https://www.youtube.com/watch?v=..." style={inputStyle} />
               </div>
               <div>
-                <label style={labelStyle}>재생시간 (선택, mm:ss)</label>
+                <label style={labelStyle}>재생시간 * (mm:ss)</label>
                 <input type="text" value={createForm.durationInput} onChange={(e) => setCreateForm(f => ({ ...f, durationInput: e.target.value }))} placeholder="예: 10:30" style={inputStyle} />
               </div>
               <div>
@@ -375,7 +379,7 @@ export default function ContentHubPage() {
                 <input type="url" value={editForm.sourceUrl} onChange={(e) => setEditForm(f => ({ ...f, sourceUrl: e.target.value }))} placeholder="https://www.youtube.com/watch?v=..." style={inputStyle} />
               </div>
               <div>
-                <label style={labelStyle}>재생시간 (선택, mm:ss)</label>
+                <label style={labelStyle}>재생시간 * (mm:ss)</label>
                 <input type="text" value={editForm.durationInput} onChange={(e) => setEditForm(f => ({ ...f, durationInput: e.target.value }))} placeholder="예: 10:30" style={inputStyle} />
               </div>
               <div>

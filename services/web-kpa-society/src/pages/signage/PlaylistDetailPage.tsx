@@ -15,7 +15,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Download, Plus, Play, Clock, List, User, Calendar, RotateCw, Film } from 'lucide-react';
+import { ArrowLeft, Download, Plus, Play, Clock, List, User, Calendar, RotateCw, Film, Maximize } from 'lucide-react';
 import { publicContentApi, type SignagePlaylist } from '../../lib/api/signageV2';
 import { assetSnapshotApi } from '../../api/assetSnapshot';
 import type { SignagePlaylistItemResponse, ContentSource } from '@o4o/types/signage';
@@ -140,14 +140,17 @@ export default function PlaylistDetailPage() {
       return <img src={media.url} alt={media.name} className="w-full rounded-lg object-contain max-h-[480px]" />;
     }
 
-    // Fallback: external link
+    // Fallback: internal fullscreen player
     const playUrl = getMediaPlayUrl(media);
     if (playUrl) {
       return (
         <div className="w-full aspect-video rounded-lg bg-slate-100 flex items-center justify-center">
-          <a href={playUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-blue-600 hover:underline">
-            <Play className="h-5 w-5" /> 새 창에서 열기
-          </a>
+          <button
+            onClick={() => navigate(`/signage/play/playlist/${id}`)}
+            className="flex items-center gap-2 text-blue-600 hover:underline bg-transparent border-none cursor-pointer text-base"
+          >
+            <Play className="h-5 w-5" /> 전체화면 재생
+          </button>
         </div>
       );
     }
@@ -250,14 +253,24 @@ export default function PlaylistDetailPage() {
             </div>
           </div>
 
-          {/* Add to Store button */}
-          <button
-            onClick={handleAddToStore}
-            className="flex-shrink-0 flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
-          >
-            <Plus className="h-4 w-4" />
-            내 매장에 추가
-          </button>
+          <div className="flex-shrink-0 flex flex-col gap-2">
+            {/* WO-KPA-SIGNAGE-FULLSCREEN-PLAYER-V1: 전체화면 재생 */}
+            <button
+              onClick={() => navigate(`/signage/play/playlist/${playlist.id}`)}
+              className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <Maximize className="h-4 w-4" />
+              전체화면 재생
+            </button>
+            {/* Add to Store button */}
+            <button
+              onClick={handleAddToStore}
+              className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
+            >
+              <Plus className="h-4 w-4" />
+              내 매장에 추가
+            </button>
+          </div>
         </div>
       </div>
 
