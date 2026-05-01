@@ -103,6 +103,7 @@ export interface ForumHubItem {
   lastPostTitle: string | null;
   forumType?: string;
   tags?: string[] | null;
+  creatorName?: string;
 }
 
 // 포럼 활동 섹션 (WO-KPA-FORUM-HUB-V2-PHASE3)

@@ -232,15 +232,16 @@ export function ForumHubSection({ prefetchedForums, loading: parentLoading }: Pr
                       <span style={styles.emoji}>{forum.iconEmoji}</span>
                     )}
                     <span style={styles.cardName}>{forum.name}</span>
-                    {forum.forumType === 'closed' && (
-                      <span style={{ fontSize: '0.75rem', flexShrink: 0, marginLeft: '4px' }} title="비공개 포럼">🔒</span>
-                    )}
                   </div>
                   <span style={styles.postCountBadge}>{forum.postCount}개 글</span>
                 </div>
 
                 {forum.description && (
                   <p style={styles.description}>{forum.description}</p>
+                )}
+
+                {forum.creatorName && (
+                  <p style={styles.creatorLine}>개설자: {forum.creatorName}</p>
                 )}
 
                 <p style={styles.lastPostLine}>
@@ -251,16 +252,18 @@ export function ForumHubSection({ prefetchedForums, loading: parentLoading }: Pr
                   )}
                 </p>
 
-                {forum.tags && forum.tags.length > 0 && (
-                  <div style={styles.tagRow}>
-                    {forum.tags.slice(0, 3).map((tag) => (
-                      <span key={tag} style={styles.tagChip}>#{tag}</span>
-                    ))}
-                    {forum.tags.length > 3 && (
-                      <span style={styles.tagMore}>+{forum.tags.length - 3}</span>
-                    )}
-                  </div>
-                )}
+                <div style={styles.tagRow}>
+                  <span style={forum.forumType === 'closed' ? styles.badgeClosed : styles.badgeOpen}>
+                    {forum.forumType === 'closed' ? '가입 필요' : '공개'}
+                  </span>
+                  <span style={styles.badgeNickname}>닉네임 표시</span>
+                  {forum.tags && forum.tags.length > 0 && forum.tags.slice(0, 3).map((tag) => (
+                    <span key={tag} style={styles.tagChip}>#{tag}</span>
+                  ))}
+                  {forum.tags && forum.tags.length > 3 && (
+                    <span style={styles.tagMore}>+{forum.tags.length - 3}</span>
+                  )}
+                </div>
               </div>
             </Link>
           ))}
@@ -358,6 +361,11 @@ const styles: Record<string, React.CSSProperties> = {
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
   },
+  creatorLine: {
+    fontSize: '0.75rem',
+    color: colors.neutral500,
+    margin: 0,
+  },
   lastPostLine: {
     margin: 0,
     fontSize: '0.813rem',
@@ -380,6 +388,33 @@ const styles: Record<string, React.CSSProperties> = {
     gap: '4px',
     // WO-O4O-FORUM-HUB-FULL-REBUILD-V1: 태그 영역은 카드 하단에 고정
     marginTop: 'auto',
+  },
+  badgeOpen: {
+    fontSize: '0.688rem',
+    fontWeight: 600,
+    color: '#16A34A',
+    backgroundColor: '#F0FDF4',
+    padding: '2px 7px',
+    borderRadius: '999px',
+    whiteSpace: 'nowrap' as const,
+  },
+  badgeClosed: {
+    fontSize: '0.688rem',
+    fontWeight: 600,
+    color: '#EA580C',
+    backgroundColor: '#FFF7ED',
+    padding: '2px 7px',
+    borderRadius: '999px',
+    whiteSpace: 'nowrap' as const,
+  },
+  badgeNickname: {
+    fontSize: '0.688rem',
+    fontWeight: 500,
+    color: colors.neutral500,
+    backgroundColor: colors.neutral100,
+    padding: '2px 7px',
+    borderRadius: '999px',
+    whiteSpace: 'nowrap' as const,
   },
   tagChip: {
     fontSize: '0.688rem',

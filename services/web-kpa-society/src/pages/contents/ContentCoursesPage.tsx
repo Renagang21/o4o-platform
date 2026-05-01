@@ -8,16 +8,17 @@
  * 일반 LMS 강의(/instructor/courses, /lms/courses)와는 분리된 노출.
  *
  * API:
- *   - GET /lms/instructor/courses?contentKind=content_resource (lmsInstructorApi.myCourses)
+ *   - GET /api/v1/kpa/lms/courses?contentKind=content_resource&status=published (lmsApi.getCourses)
  *
- * 행 클릭 / 상세 보기:
- *   - /content/courses/${id} → /instructor/courses/${id}로 redirect (App.tsx 라우트)
- *   - 향후 ContentCourseDetailPage 도입 시 변경
+ * WO-KPA-CONTENT-COURSES-PUBLIC-VISIBILITY-FIX-V1:
+ *   강사 전용 API에서 공개 API로 교체.
+ *   모든 이용자가 공개 코스형 자료를 볼 수 있도록 수정.
  */
 
 import { useEffect, useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { lmsInstructorApi, type Course } from '../../api/lms-instructor';
+import { lmsApi } from '../../api/lms';
+import type { Course } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
 
 const PAGE_LIMIT = 20;
@@ -41,7 +42,12 @@ function formatDate(d: string | Date | null | undefined) {
 
 export function ContentCoursesPage() {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { user } = useAuth();
+
+  // WO-KPA-CONTENT-COURSES-PUBLIC-VISIBILITY-FIX-V1:
+  // 등록 버튼은 lms:instructor 또는 kpa:admin만 노출
+  const roles = user?.roles ?? [];
+  const canCreateCourse = roles.includes('lms:instructor') || roles.includes('kpa:admin');
 
   const [courses, setCourses] = useState<Course[]>([]);
   const [total, setTotal] = useState(0);
@@ -52,11 +58,12 @@ export function ContentCoursesPage() {
   const load = useCallback((pageNum: number) => {
     setLoading(true);
     setError(null);
-    // WO-KPA-CONTENT-COURSE-KIND-SEPARATION-V1: content_resource만 명시 조회
-    lmsInstructorApi.myCourses(pageNum, PAGE_LIMIT, 'content_resource')
+    // WO-KPA-CONTENT-COURSES-PUBLIC-VISIBILITY-FIX-V1:
+    // 공개 API — 모든 이용자가 published content_resource를 조회
+    lmsApi.getCourses({ page: pageNum, limit: PAGE_LIMIT, status: 'published', contentKind: 'content_resource' })
       .then((res: any) => {
-        const list = res?.data?.data ?? [];
-        const pagination = res?.data?.pagination;
+        const list = res?.data ?? [];
+        const pagination = res?.pagination;
         setCourses(Array.isArray(list) ? list : []);
         setTotal(pagination?.total ?? 0);
       })
@@ -82,7 +89,7 @@ export function ContentCoursesPage() {
           <h1 style={styles.title}>코스형 자료</h1>
           <p style={styles.desc}>주제가 있는 분량 많은 콘텐츠를 목록형으로 구성한 자료입니다.</p>
         </div>
-        {isAuthenticated && (
+        {canCreateCourse && (
           <Link to="/content/courses/new" style={styles.primaryBtn}>
             코스형 자료 등록
           </Link>
@@ -97,7 +104,7 @@ export function ContentCoursesPage() {
         ) : courses.length === 0 ? (
           <div style={styles.placeholder}>
             <p style={{ margin: 0, marginBottom: 8 }}>아직 등록된 코스형 자료가 없습니다.</p>
-            {isAuthenticated && (
+            {canCreateCourse && (
               <Link to="/content/courses/new" style={styles.emptyCta}>
                 첫 코스형 자료 만들기 →
               </Link>
@@ -145,7 +152,7 @@ export function ContentCoursesPage() {
                       {formatDate(c.createdAt)}
                     </td>
                     <td style={{ ...styles.td, textAlign: 'center', color: '#64748b', fontSize: '0.8125rem' }}>
-                      {c.currentEnrollments ?? 0}
+                      {c.enrollmentCount ?? 0}
                     </td>
                     <td
                       style={{ ...styles.td, textAlign: 'right' }}

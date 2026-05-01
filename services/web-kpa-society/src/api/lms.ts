@@ -21,6 +21,7 @@ import type {
 
 export const lmsApi = {
   // 안내 흐름
+  // WO-KPA-CONTENT-COURSES-PUBLIC-VISIBILITY-FIX-V1: contentKind 필터 추가
   getCourses: (params?: {
     category?: string;
     level?: string;
@@ -28,6 +29,7 @@ export const lmsApi = {
     page?: number;
     limit?: number;
     search?: string;
+    contentKind?: 'lecture' | 'content_resource' | 'all';
   }) =>
     apiClient.get<PaginatedResponse<Course>>('/lms/courses', params),
 

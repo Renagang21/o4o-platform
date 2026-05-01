@@ -14,7 +14,11 @@
  *
  * 데이터 소스:
  *   - 문서: contentApi.list (content_type='information', sub_type='content')
- *   - 코스: lmsInstructorApi.myCourses (Phase 3에서 코스형/강의 분리)
+ *   - 코스: lmsApi.getCourses (공개 API, contentKind='content_resource', status='published')
+ *
+ * WO-KPA-CONTENT-COURSES-PUBLIC-VISIBILITY-FIX-V1:
+ *   코스형 자료 섹션을 강사 전용 API에서 공개 API로 교체.
+ *   모든 이용자가 공개 코스형 자료를 볼 수 있도록 수정.
  *
  * 권한: 작성자만 수정/삭제 노출 (createdBy === currentUserId)
  */
@@ -22,8 +26,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { contentApi, type ContentItem } from '../../api/content';
-import { lmsInstructorApi } from '../../api/lms-instructor';
-import type { Course } from '../../api/lms-instructor';
+import { lmsApi } from '../../api/lms';
+import type { Course } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
 import { Card } from '@o4o/ui';
@@ -252,7 +256,7 @@ function DocumentsSection({
 
 // ─── Section 2: 코스형 자료 ──────────────────────────────────────────────────
 
-function CoursesSection({ isAuthenticated }: { isAuthenticated: boolean }) {
+function CoursesSection({ canCreateCourse }: { canCreateCourse: boolean }) {
   const navigate = useNavigate();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
@@ -260,12 +264,13 @@ function CoursesSection({ isAuthenticated }: { isAuthenticated: boolean }) {
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    // WO-KPA-CONTENT-COURSE-KIND-SEPARATION-V1: 코스형 자료(content_resource)만 조회
-    lmsInstructorApi.myCourses(1, 10, 'content_resource')
+    // WO-KPA-CONTENT-COURSES-PUBLIC-VISIBILITY-FIX-V1:
+    // 공개 API로 교체 — 모든 이용자가 published content_resource를 조회할 수 있음
+    lmsApi.getCourses({ page: 1, limit: 10, status: 'published', contentKind: 'content_resource' })
       .then((res: any) => {
         if (cancelled) return;
-        // axios response shape: res.data = { success, data: Course[] }
-        const list = res?.data?.data ?? [];
+        // apiClient (fetch) response shape: { success, data: Course[], pagination }
+        const list = res?.data ?? [];
         setCourses(Array.isArray(list) ? list : []);
       })
       .catch(() => {
@@ -284,7 +289,7 @@ function CoursesSection({ isAuthenticated }: { isAuthenticated: boolean }) {
       <SectionHeader
         title="코스형 자료"
         description="목록형으로 구성된 분량 많은 콘텐츠"
-        primaryAction={isAuthenticated ? { label: '코스형 자료 등록', to: '/content/courses/new' } : undefined}
+        primaryAction={canCreateCourse ? { label: '코스형 자료 등록', to: '/content/courses/new' } : undefined}
         moreLink={{ label: '전체 보기', to: '/content/courses' }}
       />
 
@@ -307,7 +312,7 @@ function CoursesSection({ isAuthenticated }: { isAuthenticated: boolean }) {
               {courses.map((c) => (
                 <tr
                   key={c.id}
-                  onClick={() => navigate(`/instructor/courses/${c.id}`)}
+                  onClick={() => navigate(`/content/courses/${c.id}`)}
                   className="cursor-pointer transition-colors hover:bg-slate-50"
                 >
                   <td className="px-3 py-3 text-sm text-slate-900 border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap">
@@ -337,6 +342,11 @@ function CoursesSection({ isAuthenticated }: { isAuthenticated: boolean }) {
 export function ContentListPage() {
   const { user, isAuthenticated } = useAuth();
 
+  // WO-KPA-CONTENT-COURSES-PUBLIC-VISIBILITY-FIX-V1:
+  // 코스형 자료 등록은 lms:instructor 또는 kpa:admin 역할 필요
+  const roles = user?.roles ?? [];
+  const canCreateCourse = roles.includes('lms:instructor') || roles.includes('kpa:admin');
+
   // 문서 섹션의 삭제 후 재조회 트리거
   const [refreshKey, setRefreshKey] = useState(0);
   const handleDocumentsChanged = useCallback(() => {
@@ -357,7 +367,7 @@ export function ContentListPage() {
         onChanged={handleDocumentsChanged}
       />
 
-      <CoursesSection isAuthenticated={isAuthenticated} />
+      <CoursesSection canCreateCourse={canCreateCourse} />
     </div>
   );
 }

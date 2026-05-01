@@ -2,6 +2,7 @@
  * StoreCockpitPage - K-Cosmetics 매장 전용 Cockpit 대시보드
  *
  * WO-KCOS-STORES-PHASE3-STORE-COCKPIT-V1
+ * WO-O4O-STORE-DASHBOARD-DESIGN-REFINEMENT-V1: pink → primary, div → Card 적용
  *
  * 5-Block 구조:
  * 1. Store Status Header
@@ -13,6 +14,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { NavLink } from 'react-router-dom';
+import { Card } from '@o4o/ui';
 import {
   storeApi,
   type StoreInfo,
@@ -205,7 +207,7 @@ export default function StoreCockpitPage() {
         <p className="text-slate-500 mb-4">{error}</p>
         <button
           onClick={loadStores}
-          className="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition"
+          className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition"
         >
           다시 시도
         </button>
@@ -230,7 +232,7 @@ export default function StoreCockpitPage() {
         <p className="text-slate-500 mb-6">매장 신청을 통해 K-Cosmetics 네트워크에 참여하세요.</p>
         <NavLink
           to="/operator/applications"
-          className="inline-flex items-center px-5 py-2.5 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition font-medium"
+          className="inline-flex items-center px-5 py-2.5 bg-primary text-white rounded-lg hover:bg-primary-dark transition font-medium"
         >
           매장 신청하기
           <svg className="w-4 h-4 ml-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -252,12 +254,12 @@ export default function StoreCockpitPage() {
       {/* ================================================================== */}
       {/* Block 1: Store Status Header */}
       {/* ================================================================== */}
-      <div className="bg-white rounded-xl p-6 border border-slate-100">
+      <Card className="p-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="flex items-center gap-4">
             {/* Store icon */}
-            <div className="w-12 h-12 rounded-xl bg-pink-100 flex items-center justify-center flex-shrink-0">
-              <svg className="w-6 h-6 text-pink-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <div className="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center flex-shrink-0">
+              <svg className="w-6 h-6 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7" />
                 <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
                 <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4" />
@@ -286,7 +288,7 @@ export default function StoreCockpitPage() {
               <select
                 value={selectedStore?.id || ''}
                 onChange={(e) => handleStoreChange(e.target.value)}
-                className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary"
               >
                 {stores.map(s => (
                   <option key={s.id} value={s.id}>{s.name}</option>
@@ -309,14 +311,14 @@ export default function StoreCockpitPage() {
             </NavLink>
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* ================================================================== */}
       {/* Block 2: KPI Cards */}
       {/* ================================================================== */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Today Orders */}
-        <div className="bg-white rounded-xl p-5 border border-slate-100">
+        <Card className="p-5">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
               <svg className="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -326,14 +328,14 @@ export default function StoreCockpitPage() {
             </div>
             <p className="text-sm text-slate-500">오늘 주문</p>
           </div>
-          <p className="text-2xl font-bold text-slate-800">{stats?.todayOrders ?? 0}<span className="text-sm font-normal text-slate-400 ml-1">건</span></p>
+          <p className="text-2xl font-bold text-primary">{stats?.todayOrders ?? 0}<span className="text-sm font-normal text-slate-400 ml-1">건</span></p>
           {(stats?.todayRevenue ?? 0) > 0 && (
             <p className="text-xs text-slate-400 mt-1">{formatCurrency(stats!.todayRevenue)}</p>
           )}
-        </div>
+        </Card>
 
         {/* Monthly Revenue */}
-        <div className="bg-white rounded-xl p-5 border border-slate-100">
+        <Card className="p-5">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
               <svg className="w-5 h-5 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -342,12 +344,12 @@ export default function StoreCockpitPage() {
             </div>
             <p className="text-sm text-slate-500">이번달 매출</p>
           </div>
-          <p className="text-2xl font-bold text-slate-800">{formatCurrency(stats?.monthlyRevenue ?? 0)}</p>
+          <p className="text-2xl font-bold text-primary">{formatCurrency(stats?.monthlyRevenue ?? 0)}</p>
           <p className="text-xs text-slate-400 mt-1">{stats?.monthlyOrders ?? 0}건</p>
-        </div>
+        </Card>
 
         {/* Channel Breakdown */}
-        <div className="bg-white rounded-xl p-5 border border-slate-100">
+        <Card className="p-5">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
               <svg className="w-5 h-5 text-purple-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -368,13 +370,13 @@ export default function StoreCockpitPage() {
           ) : (
             <p className="text-sm text-slate-400">데이터 없음</p>
           )}
-        </div>
+        </Card>
 
         {/* Registered Products */}
-        <div className="bg-white rounded-xl p-5 border border-slate-100">
+        <Card className="p-5">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-lg bg-pink-50 flex items-center justify-center">
-              <svg className="w-5 h-5 text-pink-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <div className="w-10 h-10 rounded-lg bg-primary-50 flex items-center justify-center">
+              <svg className="w-5 h-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="m7.5 4.27 9 5.15" />
                 <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
                 <path d="m3.3 7 8.7 5 8.7-5" /><path d="M12 22V12" />
@@ -382,22 +384,22 @@ export default function StoreCockpitPage() {
             </div>
             <p className="text-sm text-slate-500">등록 상품</p>
           </div>
-          <p className="text-2xl font-bold text-slate-800">{listingTotal}<span className="text-sm font-normal text-slate-400 ml-1">개</span></p>
+          <p className="text-2xl font-bold text-primary">{listingTotal}<span className="text-sm font-normal text-slate-400 ml-1">개</span></p>
           <p className="text-xs text-slate-400 mt-1">
             노출 {listings.filter(l => l.isVisible).length}개
           </p>
-        </div>
+        </Card>
       </div>
 
       {/* ================================================================== */}
       {/* Block 3: 상품 운영 현황 */}
       {/* ================================================================== */}
-      <div className="bg-white rounded-xl p-6 border border-slate-100">
+      <Card className="p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold text-slate-800">상품 운영 현황</h2>
           <NavLink
             to="/operator/products"
-            className="text-sm text-pink-600 hover:text-pink-700 font-medium"
+            className="text-sm text-primary hover:text-primary-dark font-medium"
           >
             전체 보기 &rarr;
           </NavLink>
@@ -448,14 +450,14 @@ export default function StoreCockpitPage() {
             <p className="text-slate-400 text-xs mt-1">상품을 등록하여 판매를 시작하세요</p>
           </div>
         )}
-      </div>
+      </Card>
 
       {/* Bottom row: 2 columns */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* ================================================================== */}
         {/* Block 4: 콘텐츠/사이니지 (WO-KCOS-STORES-PHASE4) */}
         {/* ================================================================== */}
-        <div className="bg-white rounded-xl p-6 border border-slate-100">
+        <Card className="p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold text-slate-800">콘텐츠 / 사이니지</h2>
             {playlists.length > 0 && (
@@ -481,7 +483,7 @@ export default function StoreCockpitPage() {
                 <button
                   onClick={handleGenerateDefault}
                   disabled={playlistLoading}
-                  className="text-sm text-pink-600 hover:text-pink-700 font-medium disabled:opacity-50"
+                  className="text-sm text-primary hover:text-primary-dark font-medium disabled:opacity-50"
                 >
                   {playlistLoading ? '생성중...' : '자동 편성'}
                 </button>
@@ -505,18 +507,18 @@ export default function StoreCockpitPage() {
               <button
                 onClick={handleGenerateDefault}
                 disabled={playlistLoading}
-                className="inline-flex items-center mt-3 px-4 py-2 bg-pink-600 text-white text-sm rounded-lg hover:bg-pink-700 transition disabled:opacity-50"
+                className="inline-flex items-center mt-3 px-4 py-2 bg-primary text-white text-sm rounded-lg hover:bg-primary-dark transition disabled:opacity-50"
               >
                 {playlistLoading ? '생성중...' : '인기 상품 자동 편성'}
               </button>
             </div>
           )}
-        </div>
+        </Card>
 
         {/* ================================================================== */}
         {/* Block 5: AI 인사이트 (WO-KCOS-STORES-PHASE5) */}
         {/* ================================================================== */}
-        <div className="bg-white rounded-xl p-6 border border-slate-100">
+        <Card className="p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold text-slate-800">AI 인사이트</h2>
             {insights && (
@@ -568,8 +570,8 @@ export default function StoreCockpitPage() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-8 bg-gradient-to-br from-slate-50 to-pink-50 rounded-xl">
-              <svg className="w-12 h-12 text-pink-200 mx-auto mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <div className="text-center py-8 bg-gradient-to-br from-slate-50 to-primary-50 rounded-xl">
+              <svg className="w-12 h-12 text-primary-200 mx-auto mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
               </svg>
               <p className="text-slate-500 text-sm font-medium">충분한 데이터가 없습니다</p>
@@ -578,19 +580,19 @@ export default function StoreCockpitPage() {
               </p>
             </div>
           )}
-        </div>
+        </Card>
       </div>
 
       {/* ================================================================== */}
       {/* Recent Orders (from summary) */}
       {/* ================================================================== */}
       {summary?.recentOrders && summary.recentOrders.length > 0 && (
-        <div className="bg-white rounded-xl p-6 border border-slate-100">
+        <Card className="p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold text-slate-800">최근 주문</h2>
             <NavLink
               to="/operator/orders"
-              className="text-sm text-pink-600 hover:text-pink-700 font-medium"
+              className="text-sm text-primary hover:text-primary-dark font-medium"
             >
               전체 보기 &rarr;
             </NavLink>
@@ -630,7 +632,7 @@ export default function StoreCockpitPage() {
               </tbody>
             </table>
           </div>
-        </div>
+        </Card>
       )}
     </div>
   );

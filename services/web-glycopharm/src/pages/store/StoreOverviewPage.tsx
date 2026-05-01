@@ -7,6 +7,9 @@
  * WO-MENU-REALIGN-V1:
  * - Care 섹션 제거 (Care는 Home으로 분리)
  *
+ * WO-O4O-STORE-DASHBOARD-DESIGN-REFINEMENT-V1:
+ * - inline style → Tailwind, hex → theme, Card 적용
+ *
  * 구조:
  *  1. 매출/매장 카드 + 운영 신호 (pharmacist)
  *  2. 관리자 전용 카드 (glycopharm:admin)
@@ -21,6 +24,7 @@ import { HubLayout } from '@o4o/hub-core';
 import type { HubSectionDefinition } from '@o4o/hub-core';
 import { computeStoreInsights } from '@o4o/store-ui-core';
 import type { StoreInsight } from '@o4o/store-ui-core';
+import { Card } from '@o4o/ui';
 import {
   BrainCircuit,
   TrendingUp,
@@ -119,51 +123,41 @@ const HUB_SECTIONS: HubSectionDefinition[] = [
 
 function AiSummaryCard({ data }: { data: AiSummaryData }) {
   const { insight, meta } = data;
-  const riskColor =
-    insight.riskLevel === 'high' ? '#dc2626' :
-    insight.riskLevel === 'medium' ? '#d97706' : '#059669';
-  const riskBg =
-    insight.riskLevel === 'high' ? '#fef2f2' :
-    insight.riskLevel === 'medium' ? '#fffbeb' : '#ecfdf5';
+
+  const riskClass =
+    insight.riskLevel === 'high' ? 'text-red-600 bg-red-50' :
+    insight.riskLevel === 'medium' ? 'text-amber-600 bg-amber-50' :
+    'text-emerald-600 bg-emerald-50';
   const riskLabel =
     insight.riskLevel === 'high' ? '주의' :
     insight.riskLevel === 'medium' ? '관찰' : '정상';
 
   return (
-    <div style={styles.aiCard}>
-      <div style={styles.aiCardHeader}>
-        <BrainCircuit style={{ width: 20, height: 20, color: '#059669' }} />
-        <span style={{ fontSize: '15px', fontWeight: 600, color: '#1e293b' }}>약국 운영 분석</span>
-        <span style={{
-          fontSize: '11px',
-          fontWeight: 600,
-          color: riskColor,
-          backgroundColor: riskBg,
-          padding: '2px 8px',
-          borderRadius: '10px',
-        }}>
+    <Card className="p-5">
+      <div className="flex items-center gap-2 mb-3">
+        <BrainCircuit className="w-5 h-5 text-emerald-600" />
+        <span className="text-[15px] font-semibold text-slate-800">약국 운영 분석</span>
+        <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-[10px] ${riskClass}`}>
           {riskLabel}
         </span>
-        <span style={{ marginLeft: 'auto', fontSize: '11px', color: '#94a3b8' }}>
+        <span className="ml-auto text-[11px] text-slate-400">
           {meta.provider} · {meta.durationMs}ms
         </span>
       </div>
-      <p style={styles.aiSummaryText}>{insight.summary}</p>
+      <p className="text-sm leading-relaxed text-slate-700 m-0 mb-3">{insight.summary}</p>
       {insight.recommendedActions.length > 0 && (
-        <div style={styles.aiActions}>
+        <div className="flex flex-col gap-1.5">
           {insight.recommendedActions.map((action, i) => (
-            <div key={i} style={styles.aiActionItem}>
-              <span style={styles.aiActionDot} />
-              <span style={{ fontSize: '13px', color: '#475569' }}>{action}</span>
+            <div key={i} className="flex items-center gap-2">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+              <span className="text-[13px] text-slate-600">{action}</span>
             </div>
           ))}
         </div>
       )}
-    </div>
+    </Card>
   );
 }
-
-// ─── Component ───
 
 // ─── Insight Block (WO-STORE-AI-INSIGHT-LAYER-V1) ───
 
@@ -173,29 +167,31 @@ function InsightBlock({ insights, onNavigate }: { insights: StoreInsight[]; onNa
     l === 'critical' ? '🔴' : l === 'warning' ? '🟡' : '🔵';
 
   return (
-    <section style={styles.insightSection}>
-      <h2 style={styles.sectionTitle}>경영 인사이트</h2>
-      <div style={styles.insightCard}>
-        {insights.map((ins) => (
-          <div key={ins.code} style={styles.insightRow}>
-            <span style={styles.insightIcon}>{levelIcon(ins.level)}</span>
-            <div style={{ flex: 1 }}>
-              <span style={styles.insightMsg}>{ins.message}</span>
-              {ins.recommendation && (
-                <span style={styles.insightRec}> — {ins.recommendation}</span>
+    <section className="mb-8">
+      <h2 className="text-lg font-semibold text-slate-800 mb-4 mt-0">경영 인사이트</h2>
+      <Card className="px-5 py-4">
+        <div className="flex flex-col gap-2.5">
+          {insights.map((ins) => (
+            <div key={ins.code} className="flex items-start gap-2.5">
+              <span className="text-base leading-[22px] flex-shrink-0">{levelIcon(ins.level)}</span>
+              <div className="flex-1">
+                <span className="text-sm font-semibold text-slate-800">{ins.message}</span>
+                {ins.recommendation && (
+                  <span className="text-[13px] text-slate-500"> — {ins.recommendation}</span>
+                )}
+              </div>
+              {ins.action && (
+                <button
+                  onClick={() => onNavigate(ins.action!.target)}
+                  className="flex-shrink-0 self-center px-3 py-1 text-xs font-semibold text-primary bg-transparent border border-primary-200 rounded-md cursor-pointer whitespace-nowrap hover:bg-primary-50"
+                >
+                  {ins.action.label} →
+                </button>
               )}
             </div>
-            {ins.action && (
-              <button
-                onClick={() => onNavigate(ins.action!.target)}
-                style={styles.insightActionBtn}
-              >
-                {ins.action.label} →
-              </button>
-            )}
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      </Card>
     </section>
   );
 }
@@ -235,32 +231,36 @@ export default function StoreOverviewPage() {
       beforeSections={
         <>
           {/* 새로고침 버튼 */}
-          <div style={styles.refreshRow}>
-            <button style={styles.refreshButton} onClick={fetchData} disabled={loading}>
-              <RefreshCw style={{ width: 16, height: 16, ...(loading ? { animation: 'spin 1s linear infinite' } : {}) }} />
+          <div className="flex justify-end mb-4 -mt-4">
+            <button
+              className="flex items-center gap-1.5 px-4 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-600 cursor-pointer"
+              onClick={fetchData}
+              disabled={loading}
+            >
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
               새로고침
             </button>
           </div>
 
           {/* AI Summary 카드 */}
-          <section style={styles.summarySection}>
-            <h2 style={styles.sectionTitle}>AI 운영 요약</h2>
+          <section className="mb-8">
+            <h2 className="text-lg font-semibold text-slate-800 mb-4 mt-0">AI 운영 요약</h2>
             {loading ? (
-              <div style={styles.loadingBox}>
-                <Loader2 style={{ width: 24, height: 24, color: '#3b82f6', animation: 'spin 1s linear infinite' }} />
-                <span style={{ color: '#64748b', fontSize: '14px' }}>분석 중...</span>
+              <div className="flex items-center justify-center gap-2.5 py-8">
+                <Loader2 className="w-6 h-6 text-primary animate-spin" />
+                <span className="text-sm text-slate-500">분석 중...</span>
               </div>
             ) : error ? (
-              <div style={styles.errorBox}>
-                <AlertCircle style={{ width: 20, height: 20, color: '#dc2626' }} />
-                <span style={{ color: '#dc2626', fontSize: '14px' }}>{error}</span>
+              <div className="flex items-center gap-2 p-4 bg-red-50 rounded-lg">
+                <AlertCircle className="w-5 h-5 text-red-600" />
+                <span className="text-sm text-red-600">{error}</span>
               </div>
             ) : cockpitData.aiSummary ? (
               <AiSummaryCard data={cockpitData.aiSummary} />
             ) : (
-              <div style={styles.emptyBox}>
-                <span style={{ color: '#94a3b8', fontSize: '14px' }}>AI 요약 데이터가 없습니다.</span>
-              </div>
+              <Card className="p-6 text-center">
+                <span className="text-sm text-slate-400">AI 요약 데이터가 없습니다.</span>
+              </Card>
             )}
           </section>
 
@@ -272,140 +272,3 @@ export default function StoreOverviewPage() {
     />
   );
 }
-
-// ─── Styles ───
-
-const styles: Record<string, React.CSSProperties> = {
-  refreshRow: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    marginBottom: '16px',
-    marginTop: '-16px',
-  },
-  refreshButton: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '8px 16px',
-    backgroundColor: '#ffffff',
-    border: '1px solid #d1d5db',
-    borderRadius: '8px',
-    fontSize: '13px',
-    color: '#4b5563',
-    cursor: 'pointer',
-  },
-  summarySection: {
-    marginBottom: '32px',
-  },
-  sectionTitle: {
-    fontSize: '18px',
-    fontWeight: 600,
-    color: '#1e293b',
-    margin: '0 0 16px 0',
-  },
-  loadingBox: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    padding: '32px',
-    justifyContent: 'center',
-  },
-  errorBox: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    padding: '16px',
-    backgroundColor: '#FEF2F2',
-    borderRadius: '8px',
-  },
-  emptyBox: {
-    padding: '24px',
-    textAlign: 'center' as const,
-    backgroundColor: '#ffffff',
-    borderRadius: '12px',
-    border: '1px solid #e2e8f0',
-  },
-  aiCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: '12px',
-    border: '1px solid #e2e8f0',
-    padding: '20px',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-  },
-  aiCardHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    marginBottom: '12px',
-  },
-  aiSummaryText: {
-    fontSize: '14px',
-    lineHeight: 1.6,
-    color: '#334155',
-    margin: '0 0 12px 0',
-  },
-  aiActions: {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: '6px',
-  },
-  aiActionItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-  },
-  aiActionDot: {
-    display: 'inline-block',
-    width: '6px',
-    height: '6px',
-    borderRadius: '50%',
-    backgroundColor: '#3b82f6',
-    flexShrink: 0,
-  },
-  // WO-STORE-AI-INSIGHT-LAYER-V1
-  insightSection: {
-    marginBottom: '32px',
-  },
-  insightCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: '12px',
-    border: '1px solid #e2e8f0',
-    padding: '16px 20px',
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: '10px',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-  },
-  insightRow: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    gap: '10px',
-  },
-  insightIcon: {
-    fontSize: '16px',
-    lineHeight: '22px',
-    flexShrink: 0,
-  },
-  insightMsg: {
-    fontSize: '14px',
-    fontWeight: 600,
-    color: '#1e293b',
-  },
-  insightRec: {
-    fontSize: '13px',
-    color: '#64748b',
-  },
-  insightActionBtn: {
-    flexShrink: 0,
-    alignSelf: 'center',
-    padding: '4px 12px',
-    fontSize: '12px',
-    fontWeight: 600,
-    color: '#2563eb',
-    backgroundColor: 'transparent',
-    border: '1px solid #93c5fd',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    whiteSpace: 'nowrap' as const,
-  },
-};

@@ -9,6 +9,9 @@
  *
  * WO-O4O-STORE-UX-STRUCTURE-ALIGNMENT-V1:
  *   - "주요 바로가기" → "실행 흐름" 3-step 구조로 재편
+ *
+ * WO-O4O-STORE-DASHBOARD-DESIGN-REFINEMENT-V1:
+ *   - inline style → Tailwind, hex → theme, Card 적용
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -27,7 +30,7 @@ import {
   Tablet as TabletIcon,
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { colors } from '../../styles/theme';
+import { Card } from '@o4o/ui';
 import { kpaConfig } from '@o4o/operator-ux-core';
 import { getMarketingAnalytics, getRecentScans } from '../../api/storeAnalytics';
 import type { MarketingAnalyticsData, RecentScanItem } from '../../api/storeAnalytics';
@@ -82,142 +85,142 @@ export function StoreHomePage() {
 
   if (loading) {
     return (
-      <div style={styles.container}>
-        <div style={styles.loadingState}>
-          <RefreshCw size={24} style={{ color: colors.neutral300 }} />
-          <p style={{ color: colors.neutral500, fontSize: '14px', marginTop: '12px' }}>불러오는 중...</p>
+      <div className="max-w-[960px] p-6">
+        <div className="flex flex-col items-center justify-center py-20">
+          <RefreshCw size={24} className="text-slate-300" />
+          <p className="text-sm text-slate-500 mt-3">불러오는 중...</p>
         </div>
       </div>
     );
   }
 
   const deviceIcon: Record<string, React.ReactNode> = {
-    mobile: <Smartphone size={13} style={{ color: '#2563eb' }} />,
-    tablet: <TabletIcon size={13} style={{ color: '#7c3aed' }} />,
-    desktop: <Monitor size={13} style={{ color: '#059669' }} />,
+    mobile: <Smartphone size={13} className="text-primary" />,
+    tablet: <TabletIcon size={13} className="text-violet-600" />,
+    desktop: <Monitor size={13} className="text-emerald-600" />,
   };
   const deviceLabel: Record<string, string> = { mobile: '모바일', tablet: '태블릿', desktop: '데스크톱' };
 
   return (
-    <div style={styles.container}>
+    <div className="max-w-[960px] p-6">
       {/* Header */}
-      <div style={styles.header}>
+      <div className="flex justify-between items-start mb-6">
         <div>
-          <h1 style={styles.title}>{kpaConfig.uiText.storeHomeTitle}</h1>
-          <p style={styles.subtitle}>{kpaConfig.uiText.storeHomeSubtitle}</p>
+          <h1 className="text-xl font-bold text-slate-800 m-0">{kpaConfig.uiText.storeHomeTitle}</h1>
+          <p className="text-[13px] text-slate-500 mt-1">{kpaConfig.uiText.storeHomeSubtitle}</p>
         </div>
-        <button onClick={fetchData} style={styles.refreshBtn}>
+        <button onClick={fetchData} className="flex items-center gap-1.5 px-3.5 py-2 border border-slate-200 rounded-lg bg-white text-[13px] text-slate-600 cursor-pointer whitespace-nowrap">
           <RefreshCw size={14} />
           새로고침
         </button>
       </div>
 
       {/* ── 운영 현황 KPI ── */}
-      <div style={styles.kpiGrid}>
-        <div style={styles.kpiCard}>
-          <BookOpen size={20} style={{ color: '#059669', marginBottom: '8px' }} />
-          <p style={styles.kpiValue}>{libraryCount ?? '–'}</p>
-          <p style={styles.kpiLabel}>자료실</p>
-        </div>
-        <div style={styles.kpiCard}>
-          <QrCode size={20} style={{ color: colors.primary, marginBottom: '8px' }} />
-          <p style={styles.kpiValue}>{analytics?.activeQrCount ?? '–'}</p>
-          <p style={styles.kpiLabel}>활성 QR</p>
-        </div>
-        <div style={styles.kpiCard}>
-          <Package size={20} style={{ color: '#7c3aed', marginBottom: '8px' }} />
-          <p style={styles.kpiValue}>{productCount ?? '–'}</p>
-          <p style={styles.kpiLabel}>진열 상품</p>
-        </div>
-        <div style={styles.kpiCard}>
-          <BarChart3 size={20} style={{ color: '#2563eb', marginBottom: '8px' }} />
-          <p style={styles.kpiValue}>{analytics?.weeklyScans?.toLocaleString() ?? '–'}</p>
-          <p style={styles.kpiLabel}>이번주 스캔</p>
-        </div>
+      <div className="grid grid-cols-4 gap-3 mb-6">
+        <Card className="p-5 text-center">
+          <BookOpen size={20} className="text-emerald-600 mx-auto" />
+          <p className="text-2xl font-bold text-primary m-0 mt-2">{libraryCount ?? '–'}</p>
+          <p className="text-xs text-slate-500 mt-1 m-0">자료실</p>
+        </Card>
+        <Card className="p-5 text-center">
+          <QrCode size={20} className="text-primary mx-auto" />
+          <p className="text-2xl font-bold text-primary m-0 mt-2">{analytics?.activeQrCount ?? '–'}</p>
+          <p className="text-xs text-slate-500 mt-1 m-0">활성 QR</p>
+        </Card>
+        <Card className="p-5 text-center">
+          <Package size={20} className="text-violet-600 mx-auto" />
+          <p className="text-2xl font-bold text-primary m-0 mt-2">{productCount ?? '–'}</p>
+          <p className="text-xs text-slate-500 mt-1 m-0">진열 상품</p>
+        </Card>
+        <Card className="p-5 text-center">
+          <BarChart3 size={20} className="text-primary mx-auto" />
+          <p className="text-2xl font-bold text-primary m-0 mt-2">{analytics?.weeklyScans?.toLocaleString() ?? '–'}</p>
+          <p className="text-xs text-slate-500 mt-1 m-0">이번주 스캔</p>
+        </Card>
       </div>
 
       {/* ── 실행 흐름 (WO-O4O-STORE-UX-STRUCTURE-ALIGNMENT-V1) ── */}
-      <div style={styles.section}>
-        <h2 style={styles.sectionTitle}>실행 흐름</h2>
-        <div style={styles.stepFlow}>
+      <Card className="p-5 mb-4">
+        <h2 className="text-[15px] font-semibold text-slate-800 m-0 mb-3">실행 흐름</h2>
+        <div className="flex flex-col">
 
           {/* Step 1: 상품 선택 */}
-          <div style={styles.stepGroup}>
-            <div style={styles.stepHeader}>
-              <span style={{ ...styles.stepBadge, backgroundColor: '#2563eb' }}>1</span>
-              <span style={{ ...styles.stepLabel, color: '#2563eb' }}>상품 선택</span>
+          <div className="py-3">
+            <div className="flex items-center gap-2 mb-2.5">
+              <span className="inline-flex items-center justify-center w-[22px] h-[22px] rounded-full bg-primary text-[11px] font-bold text-white flex-shrink-0">1</span>
+              <span className="text-[13px] font-semibold text-primary tracking-wide">상품 선택</span>
             </div>
-            <div style={styles.stepLinks}>
-              <Link to="/store/commerce/products" style={styles.stepLink}>
-                <Package size={16} style={{ color: '#7c3aed' }} />
+            <div className="flex flex-wrap gap-2 pl-[30px]">
+              <Link to="/store/commerce/products" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
+                <Package size={16} className="text-violet-600" />
                 <span>상품 관리</span>
               </Link>
             </div>
           </div>
 
-          <div style={styles.stepDivider} />
+          <div className="h-px bg-slate-100" />
 
           {/* Step 2: 콘텐츠 만들기 */}
-          <div style={styles.stepGroup}>
-            <div style={styles.stepHeader}>
-              <span style={{ ...styles.stepBadge, backgroundColor: '#059669' }}>2</span>
-              <span style={{ ...styles.stepLabel, color: '#059669' }}>콘텐츠 만들기</span>
+          <div className="py-3">
+            <div className="flex items-center gap-2 mb-2.5">
+              <span className="inline-flex items-center justify-center w-[22px] h-[22px] rounded-full bg-emerald-600 text-[11px] font-bold text-white flex-shrink-0">2</span>
+              <span className="text-[13px] font-semibold text-emerald-600 tracking-wide">콘텐츠 만들기</span>
             </div>
-            <div style={styles.stepLinks}>
-              <Link to="/store/content" style={styles.stepLink}>
-                <BookOpen size={16} style={{ color: '#059669' }} />
+            <div className="flex flex-wrap gap-2 pl-[30px]">
+              <Link to="/store/content" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
+                <BookOpen size={16} className="text-emerald-600" />
                 <span>자료실</span>
               </Link>
-              <Link to="/store/marketing/qr" style={styles.stepLink}>
-                <QrCode size={16} style={{ color: colors.primary }} />
+              <Link to="/store/marketing/qr" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
+                <QrCode size={16} className="text-primary" />
                 <span>QR 관리</span>
               </Link>
-              <Link to="/store/marketing/pop" style={styles.stepLink}>
-                <Megaphone size={16} style={{ color: '#f59e0b' }} />
+              <Link to="/store/marketing/pop" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
+                <Megaphone size={16} className="text-amber-500" />
                 <span>POP 자료</span>
               </Link>
-              <Link to="/store/content/blog" style={styles.stepLink}>
-                <Newspaper size={16} style={{ color: '#ec4899' }} />
+              <Link to="/store/content/blog" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
+                <Newspaper size={16} className="text-pink-500" />
                 <span>블로그</span>
               </Link>
             </div>
           </div>
 
-          <div style={styles.stepDivider} />
+          <div className="h-px bg-slate-100" />
 
           {/* Step 3: 매장에 적용하기 */}
-          <div style={styles.stepGroup}>
-            <div style={styles.stepHeader}>
-              <span style={{ ...styles.stepBadge, backgroundColor: '#7c3aed' }}>3</span>
-              <span style={{ ...styles.stepLabel, color: '#7c3aed' }}>매장에 적용하기</span>
+          <div className="py-3">
+            <div className="flex items-center gap-2 mb-2.5">
+              <span className="inline-flex items-center justify-center w-[22px] h-[22px] rounded-full bg-violet-600 text-[11px] font-bold text-white flex-shrink-0">3</span>
+              <span className="text-[13px] font-semibold text-violet-600 tracking-wide">매장에 적용하기</span>
             </div>
-            <div style={styles.stepLinks}>
-              <Link to="/store/marketing/signage" style={styles.stepLink}>
-                <Monitor size={16} style={{ color: '#2563eb' }} />
+            <div className="flex flex-wrap gap-2 pl-[30px]">
+              <Link to="/store/marketing/signage" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
+                <Monitor size={16} className="text-primary" />
                 <span>사이니지</span>
               </Link>
-              <Link to="/store/channels" style={styles.stepLink}>
-                <BarChart3 size={16} style={{ color: '#7c3aed' }} />
+              <Link to="/store/channels" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
+                <BarChart3 size={16} className="text-violet-600" />
                 <span>채널 관리</span>
               </Link>
             </div>
           </div>
 
         </div>
-      </div>
+      </Card>
 
       {/* ── 하단 2열: 홍보 성과 요약 + 최근 활동 ── */}
-      <div style={styles.twoCol}>
+      <div className="grid grid-cols-2 gap-4 mb-4">
         {/* 홍보 성과 요약 */}
-        <div style={styles.section}>
-          <div style={styles.sectionHeader}>
-            <h2 style={styles.sectionTitle}>홍보 성과 요약</h2>
-            <Link to="/store/analytics/marketing" style={styles.seeAllLink}>
+        <Card className="p-5">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-[15px] font-semibold text-slate-800 m-0">홍보 성과 요약</h2>
+            <Link to="/store/analytics/marketing" className="flex items-center gap-1 text-xs text-primary no-underline">
               상세 분석 <ArrowRight size={12} />
             </Link>
           </div>
           {!analytics || analytics.topQrCodes.length === 0 ? (
-            <p style={styles.emptyText}>
+            <p className="text-[13px] text-slate-400 text-center py-5 m-0">
               <GuideEditableSection
                 pageKey="store"
                 sectionKey="empty-marketing"
@@ -225,27 +228,27 @@ export function StoreHomePage() {
               />
             </p>
           ) : (
-            <div style={styles.topList}>
+            <div className="flex flex-col gap-1.5">
               {analytics.topQrCodes.slice(0, 3).map((qr, idx) => (
-                <div key={qr.id} style={styles.topItem}>
-                  <span style={styles.topRank}>{idx + 1}</span>
-                  <div style={styles.topInfo}>
-                    <p style={styles.topTitle}>{qr.title}</p>
-                    <span style={styles.topSlug}>{qr.scanCount}회 스캔</span>
+                <div key={qr.id} className="flex items-center gap-3 px-2.5 py-2 rounded-lg bg-slate-50">
+                  <span className="w-[22px] h-[22px] flex items-center justify-center rounded-full bg-slate-200 text-[11px] font-bold text-slate-600 flex-shrink-0">{idx + 1}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[13px] font-medium text-slate-800 m-0 overflow-hidden text-ellipsis whitespace-nowrap">{qr.title}</p>
+                    <span className="text-[11px] text-slate-400">{qr.scanCount}회 스캔</span>
                   </div>
                 </div>
               ))}
             </div>
           )}
-        </div>
+        </Card>
 
         {/* 최근 활동 */}
-        <div style={styles.section}>
-          <div style={styles.sectionHeader}>
-            <h2 style={styles.sectionTitle}>최근 활동</h2>
+        <Card className="p-5">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-[15px] font-semibold text-slate-800 m-0">최근 활동</h2>
           </div>
           {recentScans.length === 0 ? (
-            <p style={styles.emptyText}>
+            <p className="text-[13px] text-slate-400 text-center py-5 m-0">
               <GuideEditableSection
                 pageKey="store"
                 sectionKey="empty-activity"
@@ -253,18 +256,18 @@ export function StoreHomePage() {
               />
             </p>
           ) : (
-            <div style={styles.recentList}>
+            <div className="flex flex-col gap-1">
               {recentScans.slice(0, 6).map((scan, idx) => (
-                <div key={idx} style={styles.recentItem}>
-                  <div style={styles.recentIcon}>
-                    {deviceIcon[scan.deviceType] || <Smartphone size={13} style={{ color: colors.neutral400 }} />}
+                <div key={idx} className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg bg-slate-50">
+                  <div className="flex items-center justify-center w-7 h-7 rounded-full bg-white border border-slate-200 flex-shrink-0">
+                    {deviceIcon[scan.deviceType] || <Smartphone size={13} className="text-slate-400" />}
                   </div>
-                  <div style={styles.recentInfo}>
-                    <p style={styles.recentTitle}>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[13px] font-medium text-slate-800 m-0 overflow-hidden text-ellipsis whitespace-nowrap">
                       {scan.qrTitle || '(삭제된 QR)'}
                     </p>
-                    <span style={styles.recentMeta}>
-                      <Clock size={10} style={{ marginRight: '3px' }} />
+                    <span className="inline-flex items-center text-[11px] text-slate-400 mt-0.5">
+                      <Clock size={10} className="mr-0.5" />
                       {formatRelativeTime(scan.createdAt)}
                       {' · '}
                       {deviceLabel[scan.deviceType] || scan.deviceType}
@@ -274,7 +277,7 @@ export function StoreHomePage() {
               ))}
             </div>
           )}
-        </div>
+        </Card>
       </div>
     </div>
   );
@@ -293,270 +296,3 @@ function formatRelativeTime(dateStr: string): string {
   if (diffDay < 7) return `${diffDay}일 전`;
   return new Date(dateStr).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
 }
-
-// ── 스타일 ──
-
-const styles: Record<string, React.CSSProperties> = {
-  container: {
-    padding: '24px',
-    maxWidth: '960px',
-  },
-  loadingState: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '80px 20px',
-  },
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: '24px',
-  },
-  title: {
-    fontSize: '20px',
-    fontWeight: 700,
-    color: colors.neutral800,
-    margin: 0,
-  },
-  subtitle: {
-    fontSize: '13px',
-    color: colors.neutral500,
-    marginTop: '4px',
-  },
-  refreshBtn: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '8px 14px',
-    border: `1px solid ${colors.neutral200}`,
-    borderRadius: '8px',
-    backgroundColor: '#fff',
-    fontSize: '13px',
-    color: colors.neutral600,
-    cursor: 'pointer',
-    whiteSpace: 'nowrap',
-  },
-
-  // KPI
-  kpiGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(4, 1fr)',
-    gap: '12px',
-    marginBottom: '24px',
-  },
-  kpiCard: {
-    padding: '20px 16px',
-    border: `1px solid ${colors.neutral200}`,
-    borderRadius: '12px',
-    backgroundColor: '#fff',
-    textAlign: 'center',
-  },
-  kpiValue: {
-    fontSize: '28px',
-    fontWeight: 700,
-    color: colors.neutral800,
-    margin: 0,
-  },
-  kpiLabel: {
-    fontSize: '12px',
-    color: colors.neutral500,
-    margin: '4px 0 0',
-  },
-
-  // Two column
-  twoCol: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gap: '16px',
-    marginBottom: '16px',
-  },
-
-  // Section
-  section: {
-    padding: '20px',
-    border: `1px solid ${colors.neutral200}`,
-    borderRadius: '12px',
-    backgroundColor: '#fff',
-    marginBottom: '16px',
-  },
-  sectionHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '16px',
-  },
-  sectionTitle: {
-    fontSize: '15px',
-    fontWeight: 600,
-    color: colors.neutral800,
-    margin: 0,
-  },
-  seeAllLink: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '4px',
-    fontSize: '12px',
-    color: colors.primary,
-    textDecoration: 'none',
-  },
-  emptyText: {
-    fontSize: '13px',
-    color: colors.neutral400,
-    textAlign: 'center',
-    padding: '20px 0',
-    margin: 0,
-  },
-
-  // Top QR
-  topList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '6px',
-  },
-  topItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    padding: '8px 10px',
-    borderRadius: '8px',
-    backgroundColor: colors.neutral50,
-  },
-  topRank: {
-    width: '22px',
-    height: '22px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: '50%',
-    backgroundColor: colors.neutral200,
-    fontSize: '11px',
-    fontWeight: 700,
-    color: colors.neutral600,
-    flexShrink: 0,
-  },
-  topInfo: {
-    flex: 1,
-    minWidth: 0,
-  },
-  topTitle: {
-    fontSize: '13px',
-    fontWeight: 500,
-    color: colors.neutral800,
-    margin: 0,
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-  },
-  topSlug: {
-    fontSize: '11px',
-    color: colors.neutral400,
-  },
-
-  // Recent Activity
-  recentList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '4px',
-  },
-  recentItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    padding: '8px 10px',
-    borderRadius: '8px',
-    backgroundColor: colors.neutral50,
-  },
-  recentIcon: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '28px',
-    height: '28px',
-    borderRadius: '50%',
-    backgroundColor: '#fff',
-    border: `1px solid ${colors.neutral200}`,
-    flexShrink: 0,
-  },
-  recentInfo: {
-    flex: 1,
-    minWidth: 0,
-  },
-  recentTitle: {
-    fontSize: '13px',
-    fontWeight: 500,
-    color: colors.neutral800,
-    margin: 0,
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-  },
-  recentMeta: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    fontSize: '11px',
-    color: colors.neutral400,
-    marginTop: '2px',
-  },
-
-  // 실행 흐름 — 3-step structure
-  stepFlow: {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: '0',
-  },
-  stepGroup: {
-    paddingTop: '12px',
-    paddingBottom: '12px',
-  },
-  stepHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    marginBottom: '10px',
-  },
-  stepBadge: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '22px',
-    height: '22px',
-    borderRadius: '50%',
-    fontSize: '11px',
-    fontWeight: 700,
-    color: '#fff',
-    flexShrink: 0,
-  },
-  stepLabel: {
-    fontSize: '13px',
-    fontWeight: 600,
-    letterSpacing: '0.02em',
-  },
-  stepLinks: {
-    display: 'flex',
-    flexWrap: 'wrap' as const,
-    gap: '8px',
-    paddingLeft: '30px',
-  },
-  stepLink: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '6px 14px',
-    border: `1px solid ${colors.neutral200}`,
-    borderRadius: '8px',
-    backgroundColor: colors.neutral50,
-    textDecoration: 'none',
-    fontSize: '13px',
-    fontWeight: 500,
-    color: colors.neutral700,
-    cursor: 'pointer',
-    transition: 'border-color 0.15s',
-  },
-  stepDivider: {
-    height: '1px',
-    backgroundColor: colors.neutral100,
-    margin: '0',
-  },
-};

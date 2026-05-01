@@ -111,6 +111,7 @@ export class ForumQueryService {
         false AS "isPinned",
         c.forum_type AS "forumType",
         c.tags,
+        c.requester_name AS "creatorName",
         COUNT(DISTINCT p.author_id)::int AS "memberCount",
         MAX(p.created_at) AS "lastActivityAt",
         (SELECT p2.title FROM forum_post p2
@@ -200,6 +201,7 @@ export class ForumQueryService {
         COUNT(p.id)::int AS "postCount",
         0 AS "sortOrder", false AS "isPinned",
         c.forum_type AS "forumType", c.tags,
+        c.requester_name AS "creatorName",
         COUNT(DISTINCT p.author_id)::int AS "memberCount",
         MAX(p.created_at) AS "lastActivityAt",
         (SELECT p2.title FROM forum_post p2
