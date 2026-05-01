@@ -176,6 +176,16 @@ export function ForumDetailPage() {
     }
   };
 
+  const handleDeleteComment = async (commentId: string) => {
+    if (!post || !confirm('댓글을 삭제하시겠습니까?')) return;
+    try {
+      await forumApi.deleteComment(post.id, commentId);
+      setComments(comments.filter((c) => c.id !== commentId));
+    } catch (err) {
+      toast.error('댓글 삭제에 실패했습니다.');
+    }
+  };
+
   if (loading) {
     return <LoadingSpinner message="게시글을 불러오는 중..." />;
   }
@@ -261,12 +271,22 @@ export function ForumDetailPage() {
         <h1 style={styles.title}>{post.title}</h1>
 
         <div style={styles.meta}>
-          <span style={styles.author}>{post.authorName}</span>
+          <span style={styles.author}>작성자: {post.authorName}</span>
           <span style={styles.separator}>·</span>
-          <span>{new Date(post.createdAt).toLocaleString()}</span>
+          <span>등록일: {new Date(post.createdAt).toLocaleDateString('ko-KR')}</span>
           <span style={styles.separator}>·</span>
           <span>조회 {post.viewCount}</span>
+          <span style={styles.separator}>·</span>
+          <span>댓글 {post.commentCount ?? 0}</span>
         </div>
+
+        {post.tags && post.tags.length > 0 && (
+          <div style={styles.tagRow}>
+            {post.tags.map((tag) => (
+              <span key={tag} style={styles.tagChip}>#{tag}</span>
+            ))}
+          </div>
+        )}
 
         <div style={styles.content}>
           <ContentRenderer
@@ -317,18 +337,6 @@ export function ForumDetailPage() {
         </div>
       </Card>
 
-      {/* 참여 안내 */}
-      <p style={styles.engagementGuide}>
-        {user
-          ? '의견이 있다면 아래 댓글로 나눠주세요.'
-          : ''}
-        {!user && (
-          <>
-            <Link to="/login" style={styles.engagementLink}>로그인</Link>하면 좋아요와 댓글을 남길 수 있습니다.
-          </>
-        )}
-      </p>
-
       {/* 댓글 섹션 */}
       <div style={styles.commentsSection}>
         <h2 style={styles.commentsTitle}>댓글 {comments.length}개</h2>
@@ -358,17 +366,30 @@ export function ForumDetailPage() {
         )}
 
         <div style={styles.commentList}>
-          {comments.map(comment => (
-            <div key={comment.id} style={styles.commentItem}>
-              <div style={styles.commentHeader}>
-                <span style={styles.commentAuthor}>{comment.authorName}</span>
-                <span style={styles.commentDate}>
-                  {new Date(comment.createdAt).toLocaleString()}
-                </span>
+          {comments.map(comment => {
+            const isCommentAuthor = user?.id === comment.authorId || isAdmin;
+            return (
+              <div key={comment.id} style={styles.commentItem}>
+                <div style={styles.commentHeader}>
+                  <div style={styles.commentHeaderLeft}>
+                    <span style={styles.commentAuthor}>{comment.authorName}</span>
+                    <span style={styles.commentDate}>
+                      {new Date(comment.createdAt).toLocaleDateString('ko-KR')}
+                    </span>
+                  </div>
+                  {isCommentAuthor && (
+                    <button
+                      style={styles.commentDeleteButton}
+                      onClick={() => handleDeleteComment(comment.id)}
+                    >
+                      삭제
+                    </button>
+                  )}
+                </div>
+                <p style={styles.commentContent}>{comment.content}</p>
               </div>
-              <p style={styles.commentContent}>{comment.content}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -527,17 +548,20 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '14px',
     cursor: 'pointer',
   },
-  engagementGuide: {
-    textAlign: 'center',
-    fontSize: '13px',
-    color: colors.neutral500,
-    marginTop: '16px',
-    marginBottom: 0,
+  tagRow: {
+    display: 'flex',
+    flexWrap: 'wrap' as const,
+    gap: '6px',
+    marginBottom: '20px',
   },
-  engagementLink: {
-    color: colors.primary,
-    textDecoration: 'none',
+  tagChip: {
+    fontSize: '0.75rem',
     fontWeight: 500,
+    color: '#3B82F6',
+    backgroundColor: '#EFF6FF',
+    padding: '3px 10px',
+    borderRadius: '999px',
+    whiteSpace: 'nowrap' as const,
   },
   loginPrompt: {
     padding: '20px',
@@ -573,7 +597,22 @@ const styles: Record<string, React.CSSProperties> = {
   commentHeader: {
     display: 'flex',
     justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: '8px',
+  },
+  commentHeaderLeft: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+  },
+  commentDeleteButton: {
+    padding: '4px 10px',
+    fontSize: '12px',
+    color: colors.neutral500,
+    backgroundColor: 'transparent',
+    border: `1px solid ${colors.neutral300}`,
+    borderRadius: '4px',
+    cursor: 'pointer',
   },
   commentAuthor: {
     fontWeight: 500,
