@@ -35,6 +35,10 @@ export type { SignageHubItem, SignageHubFilter, SignageHubFetchParams, SignageHu
 export { SignageManagerTemplate } from './SignageManagerTemplate';
 export type { SignageHubVideo, SignageHubPlaylist, SignageManagerConfig } from './SignageManagerTemplate';
 
+/* Home templates — WO-O4O-TEMPLATE-APPLY-HOME-V1 */
+export { templates } from './templates';
+export type { TemplateKey, TemplateTokens } from './templates';
+
 /* Guide pages — WO-O4O-GUIDE-COMMON-AND-GLYCOPHARM-HOME-V1 */
 export * from './guide';
 

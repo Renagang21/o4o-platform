@@ -5,6 +5,7 @@
  * WO-KPA-RESOURCES-UPLOAD-BUTTON-ON-RESOURCES-V1: 자료 등록 버튼 추가
  * WO-KPA-RESOURCES-UPLOAD-ENTRY-AND-FORM-SEPARATION-V1: CTA → /resources/new
  * WO-KPA-RESOURCES-OWNER-ACTIONS-AND-TAKE-V1: 등록자 수정/삭제 + 가져가기 액션
+ * WO-O4O-CONTENT-LIBRARY-CARD-STANDARD-V1: inline style → Tailwind, hex → theme
  *
  * ResourcesHubTemplate + KPA adapter.
  * KPA 전용 API(resourcesApi), operator 조건, 문구는
@@ -21,34 +22,6 @@ import { hasAnyRole, PLATFORM_ROLES } from '../../lib/role-constants';
 
 // ─── Resource Upload Button ──────────────────────────────────────────────────
 
-const uploadBtnStyle: React.CSSProperties = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: 6,
-  padding: '10px 18px',
-  backgroundColor: '#2563eb',
-  color: '#ffffff',
-  fontSize: '0.875rem',
-  fontWeight: 600,
-  borderRadius: 8,
-  border: 'none',
-  cursor: 'pointer',
-  whiteSpace: 'nowrap',
-};
-
-const emptyUploadBtnStyle: React.CSSProperties = {
-  display: 'inline-block',
-  marginTop: 12,
-  padding: '8px 16px',
-  backgroundColor: '#2563eb',
-  color: '#ffffff',
-  fontSize: '0.875rem',
-  fontWeight: 600,
-  borderRadius: 8,
-  border: 'none',
-  cursor: 'pointer',
-};
-
 function ResourceUploadButton({ variant = 'hero' }: { variant?: 'hero' | 'empty' }) {
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
@@ -64,7 +37,13 @@ function ResourceUploadButton({ variant = 'hero' }: { variant?: 'hero' | 'empty'
   };
 
   return (
-    <button onClick={handleClick} style={variant === 'hero' ? uploadBtnStyle : emptyUploadBtnStyle}>
+    <button
+      onClick={handleClick}
+      className={variant === 'hero'
+        ? 'inline-flex items-center gap-1.5 px-[18px] py-2.5 bg-primary text-white text-sm font-semibold rounded-lg border-none cursor-pointer whitespace-nowrap'
+        : 'inline-block mt-3 px-4 py-2 bg-primary text-white text-sm font-semibold rounded-lg border-none cursor-pointer'
+      }
+    >
       {variant === 'hero' ? '+ 자료 등록' : '자료 등록하기'}
     </button>
   );

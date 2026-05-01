@@ -2,6 +2,7 @@ import type { ServiceConfig } from '../serviceConfig.js';
 
 export const kpaConfig: ServiceConfig = {
   key: 'kpa-society',
+  template: 'kpa',
 
   terminology: {
     storeLabel: '약국',

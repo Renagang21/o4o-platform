@@ -53,10 +53,10 @@ export function ForumDetailPage() {
 
       // Check if current user is the forum owner
       // WO-O4O-FORUM-CATEGORY-CLEANUP-V1: use forumId (forum_category_requests)
-      const resolvedForumId = postRes.data?.forumId || postRes.data?.categoryId;
+      const resolvedForumId = postRes.data?.forumId;
       if (resolvedForumId && user?.id) {
         try {
-          const catRes = await forumApi.getCategory(resolvedForumId);
+          const catRes = await forumApi.getForum(resolvedForumId);
           // forum_category_requests.requester_id (entity property: requesterId) = 포럼 소유자
           setIsForumOwner(catRes.data?.requesterId === user.id);
         } catch {
@@ -69,8 +69,7 @@ export function ForumDetailPage() {
       if (status === 403 && code === 'CLOSED_FORUM_ACCESS_DENIED') {
         setError('비공개 포럼입니다. 가입 신청 후 승인을 받으면 열람할 수 있습니다.');
         // WO-KPA-A-PRIVATE-FORUM-JOIN-UX-CONNECT-V1: Extract forumId for join request
-        // WO-O4O-FORUM-CATEGORY-CLEANUP-V1: prefer forumId, fallback to categoryId
-        const catId = err?.data?.forumId || err?.data?.categoryId;
+        const catId = err?.data?.forumId;
         if (catId) {
           setClosedCategoryId(catId);
           if (user) {

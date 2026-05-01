@@ -15,7 +15,7 @@ import { useState, useEffect } from 'react';
 import { HeroBannerSection } from '../components/community/HeroBannerSection';
 import { homeApi } from '../api/home';
 import type { HomePageData } from '../api/home';
-import { PageHero, PageSection, PageContainer } from '@o4o/ui';
+import { PageHero, PageSection, PageContainer, Card, useTemplate } from '@o4o/ui';
 import {
   NewsNoticesSection,
   AppEntrySection,
@@ -77,27 +77,10 @@ const TrendIcon = () => (
   </svg>
 );
 
-// ─── Icon wrapper — brand card style (circular pill bg) ─────
-
-const IconWrap = ({ children }: { children: React.ReactNode }) => (
-  <span style={iconWrapStyle}>{children}</span>
-);
-
-const iconWrapStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  width: 44,
-  height: 44,
-  borderRadius: '50%',
-  backgroundColor: '#fdf2f8', /* pink-50 = primary/10 */
-  color: 'var(--color-primary)',
-  flexShrink: 0,
-};
-
 // ─── Main Component ─────────────────────────────────────────
 
 export function HomePage() {
+  const tpl = useTemplate();
   const [data, setData] = useState<HomePageData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -158,7 +141,7 @@ export function HomePage() {
               <div style={twoColStyles.placeholderHeader}>
                 <h2 style={twoColStyles.placeholderTitle}>K-Beauty 트렌드</h2>
               </div>
-              <div style={twoColStyles.placeholderCard}>
+              <Card style={twoColStyles.placeholderCard}>
                 <TrendIcon />
                 <p style={twoColStyles.placeholderText}>
                   이 영역은 K-Beauty 트렌드 소식이 표시될 예정입니다.
@@ -169,7 +152,7 @@ export function HomePage() {
                 >
                   커뮤니티 바로가기 →
                 </a>
-              </div>
+              </Card>
             </div>
           </div>
         </PageContainer>
@@ -181,12 +164,12 @@ export function HomePage() {
           <AppEntrySection
             accentColor="var(--color-primary)"
             cards={[
-              { title: '포럼', description: 'K-Beauty 전문가와 토론하고 소통하세요', href: '/forum', icon: <IconWrap><ForumIcon /></IconWrap> },
-              { title: '강의', description: 'K-Beauty 교육 콘텐츠를 온라인으로 수강하세요', href: '/lms', icon: <IconWrap><EducationIconSvg /></IconWrap> },
-              { title: '콘텐츠', description: '플랫폼 콘텐츠를 검색하고 활용하세요', href: '/library/content', icon: <IconWrap><ContentIcon /></IconWrap> },
-              { title: '매장 운영 허브', description: 'B2B 상품, 사이니지, 콘텐츠를 탐색하고 매장에 연결하세요', href: '/store-hub', icon: <IconWrap><StoreHubIcon /></IconWrap> },
-              { title: '자료실', description: 'K-Beauty 관련 자료를 검색하고 활용하세요', href: '/resources', icon: <IconWrap><ResourcesIcon /></IconWrap> },
-              { title: '커뮤니티', description: '공지, 광고, 후원 정보를 확인하세요', href: '/community', icon: <IconWrap><CommunityIcon /></IconWrap> },
+              { title: '포럼', description: 'K-Beauty 전문가와 토론하고 소통하세요', href: '/forum', icon: <span className={`flex items-center justify-center shrink-0 ${tpl?.icon?.wrapper ?? ''} ${tpl?.icon?.icon ?? 'text-primary'}`}><ForumIcon /></span> },
+              { title: '강의', description: 'K-Beauty 교육 콘텐츠를 온라인으로 수강하세요', href: '/lms', icon: <span className={`flex items-center justify-center shrink-0 ${tpl?.icon?.wrapper ?? ''} ${tpl?.icon?.icon ?? 'text-primary'}`}><EducationIconSvg /></span> },
+              { title: '콘텐츠', description: '플랫폼 콘텐츠를 검색하고 활용하세요', href: '/library/content', icon: <span className={`flex items-center justify-center shrink-0 ${tpl?.icon?.wrapper ?? ''} ${tpl?.icon?.icon ?? 'text-primary'}`}><ContentIcon /></span> },
+              { title: '매장 운영 허브', description: 'B2B 상품, 사이니지, 콘텐츠를 탐색하고 매장에 연결하세요', href: '/store-hub', icon: <span className={`flex items-center justify-center shrink-0 ${tpl?.icon?.wrapper ?? ''} ${tpl?.icon?.icon ?? 'text-primary'}`}><StoreHubIcon /></span> },
+              { title: '자료실', description: 'K-Beauty 관련 자료를 검색하고 활용하세요', href: '/resources', icon: <span className={`flex items-center justify-center shrink-0 ${tpl?.icon?.wrapper ?? ''} ${tpl?.icon?.icon ?? 'text-primary'}`}><ResourcesIcon /></span> },
+              { title: '커뮤니티', description: '공지, 광고, 후원 정보를 확인하세요', href: '/community', icon: <span className={`flex items-center justify-center shrink-0 ${tpl?.icon?.wrapper ?? ''} ${tpl?.icon?.icon ?? 'text-primary'}`}><CommunityIcon /></span> },
             ]}
           />
         </PageContainer>
@@ -240,7 +223,7 @@ const twoColStyles: Record<string, React.CSSProperties> = {
   },
   placeholderCard: {
     backgroundColor: 'var(--color-bg-primary, #ffffff)',
-    borderRadius: 16,
+    /* borderRadius/shadow → Card 컴포넌트 template 자동 적용 */
     border: '1px solid var(--color-border-default, #e2e8f0)',
     padding: '56px 16px',
     display: 'flex',

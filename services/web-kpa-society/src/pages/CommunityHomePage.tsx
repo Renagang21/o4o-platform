@@ -21,7 +21,7 @@ import { useState, useEffect } from 'react';
 import { HeroBannerSection } from '../components/community/HeroBannerSection';
 import { homeApi } from '../api/home';
 import type { HomePageData } from '../api/home';
-import { PageHero, PageSection, PageContainer } from '@o4o/ui';
+import { PageHero, PageSection, PageContainer, Card, useTemplate } from '@o4o/ui';
 import {
   NewsNoticesSection,
   AppEntrySection,
@@ -78,6 +78,7 @@ const NewspaperIcon = () => (
 // ─── Main Component ─────────────────────────────────────────
 
 export function CommunityHomePage() {
+  const tpl = useTemplate();
   const [data, setData] = useState<HomePageData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -138,7 +139,7 @@ export function CommunityHomePage() {
               <div style={twoColStyles.placeholderHeader}>
                 <h2 style={twoColStyles.placeholderTitle}>약사공론 뉴스</h2>
               </div>
-              <div style={twoColStyles.placeholderCard}>
+              <Card style={twoColStyles.placeholderCard}>
                 <NewspaperIcon />
                 <p style={twoColStyles.placeholderText}>
                   이 영역은 약사공론 뉴스가 표시될 예정입니다.
@@ -151,7 +152,7 @@ export function CommunityHomePage() {
                 >
                   약사공론 바로가기 →
                 </a>
-              </div>
+              </Card>
             </div>
           </div>
         </PageContainer>
@@ -163,11 +164,11 @@ export function CommunityHomePage() {
           <AppEntrySection
             accentColor="var(--color-primary)"
             cards={[
-              { title: '포럼', description: '동료 약사와 질문·토론으로 전문성을 높이세요', href: '/forum', icon: <span style={iconStyle}><ForumIcon /></span> },
-              { title: '강의', description: '보수교육·세미나를 온라인으로 수강하세요', href: '/lms', icon: <span style={iconStyle}><EducationIconSvg /></span> },
-              { title: '콘텐츠', description: '플랫폼 콘텐츠를 검색하고 활용하세요', href: '/content', icon: <span style={iconStyle}><ContentIcon /></span> },
-              { title: '디지털 사이니지', description: '약국 디지털 미디어를 관리하세요', href: '/signage', icon: <span style={iconStyle}><SignageIcon /></span> },
-              { title: '자료실', description: '자료를 저장하고 AI 작업에 활용하세요', href: '/resources', icon: <span style={iconStyle}><ResourceLibraryIcon /></span> },
+              { title: '포럼', description: '동료 약사와 질문·토론으로 전문성을 높이세요', href: '/forum', icon: <span className={`flex items-center justify-center shrink-0 ${tpl?.icon?.wrapper ?? ''} ${tpl?.icon?.icon ?? 'text-primary'}`}><ForumIcon /></span> },
+              { title: '강의', description: '보수교육·세미나를 온라인으로 수강하세요', href: '/lms', icon: <span className={`flex items-center justify-center shrink-0 ${tpl?.icon?.wrapper ?? ''} ${tpl?.icon?.icon ?? 'text-primary'}`}><EducationIconSvg /></span> },
+              { title: '콘텐츠', description: '플랫폼 콘텐츠를 검색하고 활용하세요', href: '/content', icon: <span className={`flex items-center justify-center shrink-0 ${tpl?.icon?.wrapper ?? ''} ${tpl?.icon?.icon ?? 'text-primary'}`}><ContentIcon /></span> },
+              { title: '디지털 사이니지', description: '약국 디지털 미디어를 관리하세요', href: '/signage', icon: <span className={`flex items-center justify-center shrink-0 ${tpl?.icon?.wrapper ?? ''} ${tpl?.icon?.icon ?? 'text-primary'}`}><SignageIcon /></span> },
+              { title: '자료실', description: '자료를 저장하고 AI 작업에 활용하세요', href: '/resources', icon: <span className={`flex items-center justify-center shrink-0 ${tpl?.icon?.wrapper ?? ''} ${tpl?.icon?.icon ?? 'text-primary'}`}><ResourceLibraryIcon /></span> },
             ]}
           />
         </PageContainer>
@@ -219,12 +220,6 @@ export function CommunityHomePage() {
   );
 }
 
-const iconStyle: React.CSSProperties = {
-  color: 'var(--color-primary)',
-  display: 'flex',
-  alignItems: 'center',
-};
-
 const twoColStyles: Record<string, React.CSSProperties> = {
   row: {
     display: 'flex',
@@ -245,7 +240,7 @@ const twoColStyles: Record<string, React.CSSProperties> = {
   },
   placeholderCard: {
     backgroundColor: 'var(--color-bg-primary, #ffffff)',
-    borderRadius: 12,
+    /* borderRadius/shadow → Card 컴포넌트 template 자동 적용 */
     border: '1px solid var(--color-border-default, #e2e8f0)',
     padding: '48px 16px',
     display: 'flex',

@@ -27,6 +27,8 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  /** WO-FORUM-NICKNAME-UNIFICATION-V1: 포럼 공개 표시명 */
+  nickname?: string;
   roles: UserRole[];
   memberships?: { serviceKey: string; status: string }[];
 }

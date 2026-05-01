@@ -171,7 +171,7 @@ export function normalizePostType(type: string): ForumPostType {
  * Get author name from post
  */
 export function getAuthorName(post: ForumPost): string {
-  return post.author?.name || post.author?.username || '익명';
+  return (post as any).authorName || post.author?.nickname || post.author?.name || '익명';
 }
 
 /**

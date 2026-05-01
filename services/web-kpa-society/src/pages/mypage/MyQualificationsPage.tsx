@@ -20,6 +20,11 @@ interface LmsCreatorFormData {
   bio: string;
   experience: string;
   organization: string;
+  plannedCourses: string;
+  lectureSubjects: string;
+  targetAudience: string;
+  lectureFormat: string;
+  referenceLinks: string;
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -43,7 +48,11 @@ export function MyQualificationsPage() {
   const [loading, setLoading] = useState(true);
   const [showApplyForm, setShowApplyForm] = useState(false);
 
-  const [form, setForm] = useState<LmsCreatorFormData>({ bio: '', experience: '', organization: '' });
+  const [form, setForm] = useState<LmsCreatorFormData>({
+    bio: '', experience: '', organization: '',
+    plannedCourses: '', lectureSubjects: '', targetAudience: '',
+    lectureFormat: '', referenceLinks: '',
+  });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -84,12 +93,21 @@ export function MyQualificationsPage() {
           bio: form.bio.trim(),
           experience: form.experience.trim() || undefined,
           organization: form.organization.trim() || undefined,
+          plannedCourses: form.plannedCourses.trim() || undefined,
+          lectureSubjects: form.lectureSubjects.trim() || undefined,
+          targetAudience: form.targetAudience.trim() || undefined,
+          lectureFormat: form.lectureFormat.trim() || undefined,
+          referenceLinks: form.referenceLinks.trim() || undefined,
         },
       });
       if (res.data.success) {
         setSuccess('자격 신청이 완료되었습니다. 검토 후 결과를 알려드립니다.');
         setShowApplyForm(false);
-        setForm({ bio: '', experience: '', organization: '' });
+        setForm({
+          bio: '', experience: '', organization: '',
+          plannedCourses: '', lectureSubjects: '', targetAudience: '',
+          lectureFormat: '', referenceLinks: '',
+        });
         await loadData();
       }
     } catch (err: any) {
@@ -179,6 +197,9 @@ export function MyQualificationsPage() {
           <div style={styles.noticeBox}>
             강사 신청 후 운영자 승인까지 1~2일 소요될 수 있습니다.
           </div>
+          <div style={styles.noticeBox}>
+            입력한 내용은 운영자의 강사 승인 검토에 사용됩니다. 승인 후 강의 등록 메뉴에서 강의를 개설할 수 있습니다.
+          </div>
 
           <LmsCreatorForm form={form} onChange={setForm} />
 
@@ -247,6 +268,26 @@ function LmsCreatorForm({ form, onChange }: { form: LmsCreatorFormData; onChange
       <div style={styles.formGroup}>
         <label style={styles.label}>소속 기관</label>
         <input value={form.organization} onChange={set('organization')} placeholder="소속 기관명 (선택)" style={styles.input} />
+      </div>
+      <div style={styles.formGroup}>
+        <label style={styles.label}>어떤 강의를 개설할 예정인가요?</label>
+        <textarea value={form.plannedCourses} onChange={set('plannedCourses')} placeholder="개설 예정인 강의 내용을 간단히 설명해 주세요 (선택)" style={styles.textarea} rows={3} />
+      </div>
+      <div style={styles.formGroup}>
+        <label style={styles.label}>주요 강의 주제/분야</label>
+        <input value={form.lectureSubjects} onChange={set('lectureSubjects')} placeholder="예: 당뇨 관리, 건기식 상담, 약국 경영 등 (선택)" style={styles.input} />
+      </div>
+      <div style={styles.formGroup}>
+        <label style={styles.label}>예상 강의 대상</label>
+        <input value={form.targetAudience} onChange={set('targetAudience')} placeholder="예: 약사, 약대 학생, 일반인 등 (선택)" style={styles.input} />
+      </div>
+      <div style={styles.formGroup}>
+        <label style={styles.label}>강의 방식</label>
+        <input value={form.lectureFormat} onChange={set('lectureFormat')} placeholder="예: 문서형, 영상형, 퀴즈 포함, 실시간 강의 등 (선택)" style={styles.input} />
+      </div>
+      <div style={styles.formGroup}>
+        <label style={styles.label}>참고 링크</label>
+        <input value={form.referenceLinks} onChange={set('referenceLinks')} placeholder="포트폴리오, 블로그, 유튜브 채널 등 (선택)" style={styles.input} />
       </div>
     </>
   );

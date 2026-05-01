@@ -78,7 +78,7 @@ export interface CreateForumPostDto {
   slug?: string;
   type?: PostType;
   status?: PostStatus;
-  categoryId: string;
+  forumId: string;
   organizationId?: string;
   isOrganizationExclusive?: boolean;
   isPinned?: boolean;
@@ -98,7 +98,7 @@ export interface UpdateForumPostDto {
   slug?: string;
   type?: PostType;
   status?: PostStatus;
-  categoryId?: string;
+  forumId?: string;
   organizationId?: string;
   isOrganizationExclusive?: boolean;
   isPinned?: boolean;
@@ -370,7 +370,7 @@ export function getExtensionMeta<T = unknown>(
 export interface ForumPostQueryParams {
   page?: number;
   limit?: number;
-  categoryId?: string;
+  forumId?: string;
   authorId?: string;
   organizationId?: string;
   status?: PostStatus;

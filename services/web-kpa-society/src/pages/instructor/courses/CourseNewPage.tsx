@@ -112,7 +112,7 @@ export default function CourseNewPage({
       const courseId = res.data?.data?.id;
       if (courseId) {
         const target = redirectAfterCreate ? redirectAfterCreate(courseId) : `/instructor/courses/${courseId}`;
-        navigate(target);
+        navigate(target, { state: { justCreated: true } });
       } else {
         navigate(redirectAfterCreateFallback ?? returnTo ?? '/instructor/courses');
       }

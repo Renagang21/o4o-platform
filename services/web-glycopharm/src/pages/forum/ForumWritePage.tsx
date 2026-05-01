@@ -37,7 +37,7 @@ const POST_TYPES: { value: PostType; label: string }[] = [
 
 export default function ForumWritePage() {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [categories, setCategories] = useState<ForumCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -126,6 +126,14 @@ export default function ForumWritePage() {
     <div style={styles.page}>
       <div style={styles.container}>
         <h1 style={styles.heading}>글쓰기</h1>
+
+        {user && (
+          <div style={styles.authorInfo}>
+            <span style={styles.authorLabel}>작성자 표시명:</span>
+            <span style={styles.authorName}>{user.nickname || user.name}</span>
+            <p style={styles.authorHint}>(표시명은 프로필에서 변경할 수 있습니다)</p>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} style={styles.form}>
           {/* Category */}
@@ -281,6 +289,32 @@ const styles: Record<string, CSSProperties> = {
     backgroundColor: '#059669',
     color: 'white',
     cursor: 'pointer',
+  },
+  authorInfo: {
+    display: 'flex',
+    flexWrap: 'wrap' as const,
+    alignItems: 'center',
+    gap: 8,
+    padding: '12px 16px',
+    backgroundColor: '#f1f5f9',
+    borderRadius: 8,
+    marginBottom: 24,
+  },
+  authorLabel: {
+    fontSize: 13,
+    color: '#64748b',
+  },
+  authorName: {
+    fontSize: 14,
+    fontWeight: 600,
+    color: '#1e293b',
+  },
+  authorHint: {
+    fontSize: 12,
+    color: '#94a3b8',
+    margin: 0,
+    width: '100%',
+    marginTop: 2,
   },
   loginPrompt: {
     textAlign: 'center' as const,

@@ -2,7 +2,7 @@
  * Forum Core App Manifest
  *
  * Core forum engine providing:
- * - Posts, comments, categories, tags
+ * - Posts, comments, tags
  * - Likes, bookmarks, reports
  * - Public templates for rendering
  */
@@ -13,7 +13,7 @@ export const forumManifest = {
   displayName: '포럼 엔진',
   version: '1.0.0',
   appType: 'core' as const,
-  description: '커뮤니티 포럼 코어 엔진 (게시글/댓글/카테고리/태그)',
+  description: '커뮤니티 포럼 코어 엔진 (게시글/댓글/태그)',
 
   // ===== 의존성 =====
   dependencies: {
@@ -24,7 +24,6 @@ export const forumManifest = {
   // ===== 소유 테이블 =====
   ownsTables: [
     'forum_post',
-    'forum_category',
     'forum_comment',
     'forum_like',
     'forum_bookmark',
@@ -41,7 +40,6 @@ export const forumManifest = {
   backend: {
     entities: [
       'ForumPost',
-      'ForumCategory',
       'ForumComment',
       'ForumLike',
       'ForumBookmark',
@@ -49,7 +47,6 @@ export const forumManifest = {
     services: [
       'ForumService',
       'PostService',
-      'CategoryService',
       'CommentService',
     ],
     controllers: [
@@ -67,14 +64,12 @@ export const forumManifest = {
         { path: '/admin/forum/posts/:id', component: 'PostDetail' },
         { path: '/admin/forum/posts/:id/edit', component: 'PostEdit' },
         { path: '/admin/forum/posts/new', component: 'PostNew' },
-        { path: '/admin/forum/categories', component: 'CategoryList' },
         { path: '/admin/forum/reports', component: 'ReportList' },
       ],
     },
     public: {
       pages: [
         { path: '/forum', component: 'ForumHome', template: 'forum-home' },
-        { path: '/forum/category/:slug', component: 'CategoryArchive', template: 'category-archive' },
         { path: '/forum/post/:slug', component: 'PostSingle', template: 'post-single' },
         { path: '/forum/tag/:tag', component: 'PostList', template: 'post-list' },
         { path: '/forum/search', component: 'SearchResults', template: 'post-list' },
@@ -146,12 +141,6 @@ export const forumManifest = {
             icon: 'file-text',
           },
           {
-            id: 'forum-categories',
-            label: '카테고리',
-            path: '/admin/forum/categories',
-            icon: 'folder',
-          },
-          {
             id: 'forum-reports',
             label: '신고 검토',
             path: '/admin/forum/reports',
@@ -164,8 +153,8 @@ export const forumManifest = {
 
   // ===== 외부 노출 =====
   exposes: {
-    services: ['ForumService', 'PostService', 'CategoryService', 'CommentService'],
-    types: ['ForumPost', 'ForumCategory', 'ForumComment'],
+    services: ['ForumService', 'PostService', 'CommentService'],
+    types: ['ForumPost', 'ForumComment'],
     events: ['post.created', 'post.updated', 'post.deleted', 'comment.created', 'comment.deleted'],
   },
 
@@ -176,14 +165,7 @@ export const forumManifest = {
       storage: 'entity' as const,
       primaryKey: 'id',
       label: '포럼 게시글',
-      supports: ['title', 'content', 'author', 'categories', 'tags', 'comments'],
-    },
-    {
-      name: 'forum_category',
-      storage: 'entity' as const,
-      primaryKey: 'id',
-      label: '포럼 카테고리',
-      supports: ['name', 'description', 'hierarchy'],
+      supports: ['title', 'content', 'author', 'tags', 'comments'],
     },
   ],
 
@@ -209,13 +191,6 @@ export const forumManifest = {
       description: '단일 게시글 내용, 댓글 표시',
       component: './templates/PostSingle.js',
       dataLoader: 'postSingleLoader',
-    },
-    {
-      id: 'category-archive',
-      name: '카테고리 아카이브',
-      description: '특정 카테고리의 게시글 목록',
-      component: './templates/CategoryArchive.js',
-      dataLoader: 'categoryArchiveLoader',
     },
   ],
 

@@ -29,7 +29,8 @@ interface RawForumCategory {
 interface RawForumPost {
   id: string;
   title: string;
-  author?: { id: string; name?: string; email?: string } | null;
+  author?: { id: string; name?: string; nickname?: string; email?: string } | null;
+  authorName?: string;
   viewCount: number;
   commentCount: number;
   createdAt: string;
@@ -55,7 +56,7 @@ function mapPost(raw: RawForumPost): ForumHubPost {
   return {
     id: raw.id,
     title: raw.title,
-    authorName: raw.author?.name || raw.author?.email?.split('@')[0] || '익명',
+    authorName: raw.authorName || raw.author?.nickname || raw.author?.name || '익명',
     viewCount: raw.viewCount ?? 0,
     commentCount: raw.commentCount ?? 0,
     createdAt: raw.createdAt,

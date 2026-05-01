@@ -5,8 +5,8 @@
  * Course detail/edit + Lesson management (create/edit/delete)
  */
 
-import React, { useEffect, useState, useCallback } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { RichTextEditor } from '@o4o/content-editor';
 import { lmsInstructorApi, Course, Lesson, LessonType } from '../../../api/lms-instructor';
 import QuizBuilder from './QuizBuilder';
@@ -45,6 +45,15 @@ const s: Record<string, React.CSSProperties> = {
   editSmBtn: { padding: '4px 10px', background: '#ede9fe', color: '#5b21b6', border: 'none', borderRadius: 5, fontSize: 12, cursor: 'pointer' },
   delSmBtn: { padding: '4px 10px', background: '#fee2e2', color: '#dc2626', border: 'none', borderRadius: 5, fontSize: 12, cursor: 'pointer' },
   addLessonBtn: { padding: '9px 18px', background: '#f3f4f6', color: '#374151', border: '1px dashed #d1d5db', borderRadius: 7, fontSize: 13, cursor: 'pointer', width: '100%' },
+  emptyState: { textAlign: 'center' as const, padding: '48px 20px', color: '#6b7280' },
+  emptyIcon: { fontSize: 40, marginBottom: 12 },
+  emptyTitle: { fontSize: 16, fontWeight: 600, color: '#374151', marginBottom: 6 },
+  emptyDesc: { fontSize: 13, color: '#9ca3af', marginBottom: 20 },
+  createdBanner: { display: 'flex', alignItems: 'center', gap: 12, padding: '14px 18px', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 10, marginBottom: 24, fontSize: 14, color: '#15803d' },
+  createdBannerBtn: { marginLeft: 'auto', padding: '6px 14px', background: '#10b981', color: '#fff', border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' as const },
+  publishSmBtn: { padding: '4px 10px', border: 'none', borderRadius: 5, fontSize: 12, cursor: 'pointer' },
+  dragHandle: { cursor: 'grab', color: '#9ca3af', fontSize: 16, userSelect: 'none' as const, paddingRight: 4 },
+  dragOver: { borderColor: '#4f46e5', background: '#f5f3ff' },
   modal: {
     position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex',
     alignItems: 'center', justifyContent: 'center', zIndex: 1000,
@@ -214,6 +223,7 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
 /* ──────────────── CourseEditPage ──────────────── */
 export default function CourseEditPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { id } = useParams<{ id: string }>();
 
   const [course, setCourse] = useState<Course | null>(null);
@@ -230,6 +240,13 @@ export default function CourseEditPage() {
 
   // lesson modal
   const [lessonModal, setLessonModal] = useState<{ open: boolean; lesson: Lesson | null }>({ open: false, lesson: null });
+
+  // WO-KPA-LMS-UX-QUICK-WINS-V1: 생성 안내 배너
+  const [showCreatedBanner, setShowCreatedBanner] = useState(() => !!(location.state as any)?.justCreated);
+
+  // WO-KPA-LMS-UX-QUICK-WINS-V1: 드래그 정렬
+  const dragIndexRef = useRef<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
   const loadData = useCallback(async () => {
     if (!id) return;
@@ -315,6 +332,59 @@ export default function CourseEditPage() {
     }
   };
 
+  // WO-KPA-LMS-UX-QUICK-WINS-V1: 레슨 발행 토글
+  const handleTogglePublish = async (lesson: Lesson) => {
+    try {
+      await lmsInstructorApi.updateLesson(lesson.id, { isPublished: !lesson.isPublished });
+      await loadData();
+    } catch {
+      alert('발행 상태 변경에 실패했습니다.');
+    }
+  };
+
+  // WO-KPA-LMS-UX-QUICK-WINS-V1: 드래그 정렬
+  const handleDragStart = (index: number) => {
+    dragIndexRef.current = index;
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    setDragOverIndex(index);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverIndex(null);
+  };
+
+  const handleDrop = async (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    setDragOverIndex(null);
+    const dragIndex = dragIndexRef.current;
+    if (dragIndex === null || dragIndex === dropIndex || !id) return;
+    dragIndexRef.current = null;
+
+    // 로컬 재정렬 (즉시 UI 반영)
+    const reordered = [...lessons];
+    const [moved] = reordered.splice(dragIndex, 1);
+    reordered.splice(dropIndex, 0, moved);
+    setLessons(reordered);
+
+    // API 호출
+    try {
+      await lmsInstructorApi.reorderLessons(id, reordered.map(l => l.id));
+      await loadData();
+    } catch {
+      // 실패 시 원래 순서로 롤백
+      await loadData();
+      alert('순서 변경에 실패했습니다.');
+    }
+  };
+
+  const handleDragEnd = () => {
+    dragIndexRef.current = null;
+    setDragOverIndex(null);
+  };
+
   const addTag = () => {
     const t = tagInput.trim().replace(/^#/, '');
     if (!t || t.length > 30 || tags.includes(t)) { setTagInput(''); return; }
@@ -392,30 +462,73 @@ export default function CourseEditPage() {
         </div>
       </div>
 
+      {/* WO-KPA-LMS-UX-QUICK-WINS-V1: 생성 안내 배너 */}
+      {showCreatedBanner && (
+        <div style={s.createdBanner}>
+          <span>강의가 생성되었습니다. 이제 레슨을 추가하여 강의를 구성하세요.</span>
+          <button
+            style={s.createdBannerBtn}
+            onClick={() => { setShowCreatedBanner(false); setLessonModal({ open: true, lesson: null }); }}
+          >
+            + 레슨 추가
+          </button>
+        </div>
+      )}
+
       {/* Lessons */}
       <div style={s.section}>
         <div style={s.sectionTitle}>레슨 목록 ({lessons.length})</div>
 
-        {lessons.map((lesson) => (
-          <div key={lesson.id} style={s.lessonCard}>
-            <div style={s.lessonOrder}>{lesson.order}</div>
-            <div style={s.lessonBody}>
-              <div style={s.lessonTitle}>{lesson.title}</div>
-              <div style={s.lessonMeta}>
-                {LESSON_TYPE_LABEL[lesson.type]} · {lesson.duration > 0 ? `${lesson.duration}분` : '시간 미설정'}
-                {!lesson.isPublished && <span style={{ marginLeft: 6, color: '#f59e0b' }}>미발행</span>}
-              </div>
-            </div>
-            <div style={s.lessonActions}>
-              <button style={s.editSmBtn} onClick={() => setLessonModal({ open: true, lesson })}>편집</button>
-              <button style={s.delSmBtn} onClick={() => handleDeleteLesson(lesson.id)}>삭제</button>
-            </div>
+        {lessons.length === 0 ? (
+          /* WO-KPA-LMS-UX-QUICK-WINS-V1: Empty 상태 */
+          <div style={s.emptyState}>
+            <div style={s.emptyIcon}>📝</div>
+            <div style={s.emptyTitle}>아직 강의 내용이 없습니다</div>
+            <div style={s.emptyDesc}>첫 번째 레슨을 추가하여 강의를 구성하세요</div>
+            <button style={s.addLessonBtn} onClick={() => setLessonModal({ open: true, lesson: null })}>
+              + 레슨 추가
+            </button>
           </div>
-        ))}
+        ) : (
+          <>
+            {lessons.map((lesson, index) => (
+              <div
+                key={lesson.id}
+                style={{ ...s.lessonCard, ...(dragOverIndex === index ? s.dragOver : {}) }}
+                draggable
+                onDragStart={() => handleDragStart(index)}
+                onDragOver={(e) => handleDragOver(e, index)}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, index)}
+                onDragEnd={handleDragEnd}
+              >
+                <span style={s.dragHandle} title="드래그하여 순서 변경">⠿</span>
+                <div style={s.lessonOrder}>{index + 1}</div>
+                <div style={s.lessonBody}>
+                  <div style={s.lessonTitle}>{lesson.title}</div>
+                  <div style={s.lessonMeta}>
+                    {LESSON_TYPE_LABEL[lesson.type]} · {lesson.duration > 0 ? `${lesson.duration}분` : '시간 미설정'}
+                    {!lesson.isPublished && <span style={{ marginLeft: 6, color: '#f59e0b' }}>미발행</span>}
+                  </div>
+                </div>
+                <div style={s.lessonActions}>
+                  <button
+                    style={{ ...s.publishSmBtn, background: lesson.isPublished ? '#fef3c7' : '#d1fae5', color: lesson.isPublished ? '#92400e' : '#065f46' }}
+                    onClick={() => handleTogglePublish(lesson)}
+                  >
+                    {lesson.isPublished ? '비공개' : '발행'}
+                  </button>
+                  <button style={s.editSmBtn} onClick={() => setLessonModal({ open: true, lesson })}>편집</button>
+                  <button style={s.delSmBtn} onClick={() => handleDeleteLesson(lesson.id)}>삭제</button>
+                </div>
+              </div>
+            ))}
 
-        <button style={s.addLessonBtn} onClick={() => setLessonModal({ open: true, lesson: null })}>
-          + 새 레슨 추가
-        </button>
+            <button style={s.addLessonBtn} onClick={() => setLessonModal({ open: true, lesson: null })}>
+              + 새 레슨 추가
+            </button>
+          </>
+        )}
       </div>
 
       {lessonModal.open && (

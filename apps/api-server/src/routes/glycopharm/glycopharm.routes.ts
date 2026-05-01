@@ -9,7 +9,7 @@ import { Router, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { createGlycopharmController } from './controllers/glycopharm.controller.js';
 // display.controller removed — WO-O4O-GLYCOPHARM-SIGNAGE-MIGRATION-V1
-import { createForumRequestController } from './controllers/forum-request.controller.js';
+// forum-request.controller removed — WO-O4O-FORUM-CATEGORY-DEAD-CODE-REMOVAL-V1
 import { createApplicationController } from './controllers/application.controller.js';
 import { createAdminController } from './controllers/admin.controller.js';
 import { createStoreApplicationsController } from './controllers/store-applications.controller.js';
@@ -98,13 +98,7 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   );
   router.use('/', glycopharmMemberController);
 
-  // Forum Category Request routes
-  const forumRequestController = createForumRequestController(
-    dataSource,
-    coreRequireAuth as any,
-    requireGlycopharmScope
-  );
-  router.use('/forum-requests', forumRequestController);
+  // Forum Category Request routes removed — WO-O4O-FORUM-CATEGORY-DEAD-CODE-REMOVAL-V1
 
   // Application routes (pharmacy participation/service applications)
   const applicationController = createApplicationController(

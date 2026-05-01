@@ -222,6 +222,10 @@ export function LmsCourseDetailPage() {
                       <div style={{ ...styles.progressFill, width: `${enrollment.progress}%` }} />
                     </div>
                     <p style={styles.progressText}>진도율: {enrollment.progress}%</p>
+                    {/* WO-KPA-LMS-UX-QUICK-WINS-V1 */}
+                    <p style={{ fontSize: '12px', color: '#94a3b8', textAlign: 'center' as const, marginBottom: '8px' }}>
+                      {(enrollment as any).completedLessons ?? 0} / {lessons.length} 레슨 완료
+                    </p>
                     {(enrollment as any).status === 'completed' && (
                       <Link to="/mypage/certificates" style={styles.certButton}>수료증 보기</Link>
                     )}
@@ -252,6 +256,10 @@ export function LmsCourseDetailPage() {
                     />
                   </div>
                   <p style={styles.progressText}>진도율: {enrollment.progress}%</p>
+                  {/* WO-KPA-LMS-UX-QUICK-WINS-V1: 완료 레슨 수 표시 */}
+                  <p style={{ fontSize: '12px', color: '#94a3b8', textAlign: 'center' as const, marginBottom: '16px' }}>
+                    {(enrollment as any).completedLessons ?? 0} / {lessons.length} 레슨 완료
+                  </p>
                   <Link
                     to={`/lms/course/${course.id}/lesson/${lessons[0]?.id || ''}`}
                     style={styles.continueButton}

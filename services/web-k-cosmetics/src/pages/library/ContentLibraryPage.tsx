@@ -2,12 +2,13 @@
  * ContentLibraryPage — K-Cosmetics 콘텐츠 라이브러리
  *
  * WO-O4O-COMMONIZATION-REFINEMENT-V1
+ * WO-O4O-CONTENT-LIBRARY-CARD-STANDARD-V1: inline style → Tailwind, hex → theme, Card 적용
  *
  * ContentHubTemplate + k-cosmetics config-adapter.
  * Route: /library/content
  */
 
-import { useMemo, type CSSProperties } from 'react';
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ContentHubTemplate,
@@ -18,6 +19,7 @@ import {
 import { hubContentApi, type HubContentItemResponse } from '../../lib/api/hubContent';
 import { dashboardCopyApi } from '../../lib/api/dashboardCopy';
 import { useAuth } from '../../contexts/AuthContext';
+import { Card } from '@o4o/ui';
 
 // ─── Adapter ──────────────────────────────────────────────────────────────────
 
@@ -44,103 +46,58 @@ function apiItemToContentHubItem(item: HubContentItemResponse): ContentHubItem {
 
 function CardGrid({ items, ctx }: { items: ContentHubItem[]; ctx: ContentHubItemContext }) {
   return (
-    <div style={gridSt.grid}>
+    <div className="grid grid-cols-2 gap-4">
       {items.map((item) => {
         const isCopied = ctx.copiedIds.has(item.id);
         const isCopying = ctx.copyingId === item.id;
         return (
-          <div
+          <Card
             key={item.id}
             onClick={() => item.href && window.open(item.href, '_blank', 'noopener')}
-            style={{ ...gridSt.card, cursor: item.href ? 'pointer' : 'default' }}
+            className={`overflow-hidden ${item.href ? 'cursor-pointer' : 'cursor-default'}`}
           >
             {item.thumbnail ? (
-              <div style={gridSt.thumb}>
+              <div className="w-full h-[140px] bg-slate-50 overflow-hidden">
                 <img
                   src={item.thumbnail}
                   alt={item.title}
-                  style={gridSt.thumbImg}
+                  className="w-full h-full object-cover"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                 />
               </div>
             ) : (
-              <div style={{ ...gridSt.thumb, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ fontSize: 32, color: '#e2e8f0' }}>📄</span>
+              <div className="w-full h-[140px] bg-slate-50 flex items-center justify-center">
+                <span className="text-[32px] text-slate-200">📄</span>
               </div>
             )}
-            <div style={gridSt.body}>
-              <div style={{ display: 'flex', gap: 4, marginBottom: 6 }}>
-                {item.type && <span style={gridSt.badge}>{item.type}</span>}
-                {item.isPinned && <span style={gridSt.pinnedBadge}>추천</span>}
+            <div className="px-3.5 pt-2.5 pb-3">
+              <div className="flex gap-1 mb-1.5">
+                {item.type && <span className="inline-block px-1.5 py-px text-[10px] font-medium bg-slate-100 text-slate-500 rounded">{item.type}</span>}
+                {item.isPinned && <span className="inline-block px-1.5 py-px text-[10px] font-medium bg-primary-50 text-primary rounded">추천</span>}
               </div>
-              <p style={gridSt.title}>{item.title}</p>
-              {item.summary && <p style={gridSt.desc}>{item.summary}</p>}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
-                <p style={gridSt.date}>{item.date}</p>
+              <p className="text-sm font-semibold text-slate-800 mb-1 mt-0 overflow-hidden text-ellipsis line-clamp-2">{item.title}</p>
+              {item.summary && <p className="text-xs text-slate-400 mb-1.5 mt-0 overflow-hidden text-ellipsis line-clamp-2">{item.summary}</p>}
+              <div className="flex items-center justify-between mt-1">
+                <p className="text-[10px] text-slate-300 m-0">{item.date}</p>
                 <button
                   onClick={(e) => { e.stopPropagation(); ctx.onCopy(item); }}
                   disabled={isCopied || isCopying}
-                  style={{
-                    ...gridSt.copyBtn,
-                    ...(isCopied || isCopying ? gridSt.copyBtnDisabled : {}),
-                  }}
+                  className={`inline-flex items-center gap-0.5 px-2 py-0.5 text-[10px] font-medium rounded border-none cursor-pointer ${
+                    isCopied || isCopying
+                      ? 'bg-slate-50 text-slate-300 cursor-default'
+                      : 'bg-slate-100 text-slate-500'
+                  }`}
                 >
                   {isCopied ? ctx.copiedLabel : isCopying ? ctx.copyingLabel : ctx.copyLabel}
                 </button>
               </div>
             </div>
-          </div>
+          </Card>
         );
       })}
     </div>
   );
 }
-
-const gridSt: Record<string, CSSProperties> = {
-  grid: { display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 },
-  card: {
-    backgroundColor: 'white', borderRadius: 12,
-    border: '1px solid #e2e8f0', overflow: 'hidden',
-  },
-  thumb: {
-    width: '100%', height: 140,
-    backgroundColor: '#f8fafc', overflow: 'hidden',
-  },
-  thumbImg: { width: '100%', height: '100%', objectFit: 'cover' as const },
-  body: { padding: '10px 14px 12px' },
-  badge: {
-    display: 'inline-block', padding: '1px 6px',
-    fontSize: 10, fontWeight: 500,
-    backgroundColor: '#f1f5f9', color: '#64748b', borderRadius: 4,
-  },
-  pinnedBadge: {
-    display: 'inline-block', padding: '1px 6px',
-    fontSize: 10, fontWeight: 500,
-    backgroundColor: '#fdf2f8', color: '#DB2777', borderRadius: 4,
-  },
-  title: {
-    fontSize: 14, fontWeight: 600, color: '#1e293b',
-    margin: '0 0 4px 0', overflow: 'hidden', textOverflow: 'ellipsis',
-    display: '-webkit-box', WebkitLineClamp: 2,
-    WebkitBoxOrient: 'vertical' as any,
-  },
-  desc: {
-    fontSize: 12, color: '#94a3b8',
-    margin: '0 0 6px 0', overflow: 'hidden', textOverflow: 'ellipsis',
-    display: '-webkit-box', WebkitLineClamp: 2,
-    WebkitBoxOrient: 'vertical' as any,
-  },
-  date: { fontSize: 10, color: '#cbd5e1', margin: 0 },
-  copyBtn: {
-    display: 'inline-flex', alignItems: 'center', gap: 2,
-    padding: '3px 8px', fontSize: 10, fontWeight: 500,
-    borderRadius: 4, border: 'none', cursor: 'pointer',
-    backgroundColor: '#f1f5f9', color: '#64748b',
-  },
-  copyBtnDisabled: {
-    backgroundColor: '#f8fafc', color: '#cbd5e1', cursor: 'default',
-  },
-};
 
 // ─── Page Component ───────────────────────────────────────────────────────────
 
@@ -153,7 +110,7 @@ export default function ContentLibraryPage() {
     heroTitle: '콘텐츠 라이브러리',
     heroDesc: 'K-Cosmetics 콘텐츠를 한눈에 확인하세요',
     headerAction: (
-      <Link to="/community" style={{ fontSize: 13, color: '#64748b', textDecoration: 'none' }}>
+      <Link to="/community" className="text-[13px] text-slate-500 no-underline hover:underline">
         ← 커뮤니티
       </Link>
     ),

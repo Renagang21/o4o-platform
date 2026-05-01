@@ -6,6 +6,7 @@
  * WO-KPA-CONTENT-LIST-TABS-ALIGN-WITH-CREATE-TYPES-V1
  * WO-KPA-CONTENT-SECTION-CREATE-FLOW-ALIGN-V1 (Phase 1: 등록 흐름 정렬)
  * WO-KPA-CONTENT-HUB-SECTION-UI-V1 (Phase 2: 섹션 허브 UI 전환)
+ * WO-O4O-CONTENT-LIBRARY-CARD-STANDARD-V1: inline style → Tailwind, hex → theme, Card 적용
  *
  * /content를 2개 섹션의 허브로 표시:
  *   1. 문서형 콘텐츠 — 메인 섹션 (리스트, 등록/상세/링크/수정/삭제)
@@ -25,6 +26,7 @@ import { lmsInstructorApi } from '../../api/lms-instructor';
 import type { Course } from '../../api/lms-instructor';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
+import { Card } from '@o4o/ui';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -51,10 +53,10 @@ function RowActionMenu({
   const [open, setOpen] = useState(false);
 
   return (
-    <div style={{ position: 'relative', display: 'inline-block' }}>
+    <div className="relative inline-block">
       <button
         onClick={(e) => { e.stopPropagation(); setOpen((o) => !o); }}
-        style={styles.menuBtn}
+        className="px-2 py-0.5 text-sm font-bold text-slate-500 bg-transparent border border-slate-200 rounded cursor-pointer tracking-wider"
         title="액션"
       >
         ···
@@ -62,24 +64,24 @@ function RowActionMenu({
       {open && (
         <>
           <div
-            style={{ position: 'fixed', inset: 0, zIndex: 10 }}
+            className="fixed inset-0 z-10"
             onClick={(e) => { e.stopPropagation(); setOpen(false); }}
           />
-          <div style={styles.dropdown}>
-            <button style={styles.dropdownItem} onClick={(e) => { e.stopPropagation(); setOpen(false); onView(); }}>
+          <div className="absolute right-0 top-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-20 min-w-[100px] overflow-hidden">
+            <button className="block w-full px-3.5 py-2 text-[13px] font-medium text-slate-700 bg-transparent border-none text-left cursor-pointer hover:bg-slate-50" onClick={(e) => { e.stopPropagation(); setOpen(false); onView(); }}>
               상세보기
             </button>
-            <button style={styles.dropdownItem} onClick={(e) => { e.stopPropagation(); setOpen(false); onCopyLink(); }}>
+            <button className="block w-full px-3.5 py-2 text-[13px] font-medium text-slate-700 bg-transparent border-none text-left cursor-pointer hover:bg-slate-50" onClick={(e) => { e.stopPropagation(); setOpen(false); onCopyLink(); }}>
               링크 복사
             </button>
             {isOwner && (
-              <button style={styles.dropdownItem} onClick={(e) => { e.stopPropagation(); setOpen(false); onEdit(); }}>
+              <button className="block w-full px-3.5 py-2 text-[13px] font-medium text-slate-700 bg-transparent border-none text-left cursor-pointer hover:bg-slate-50" onClick={(e) => { e.stopPropagation(); setOpen(false); onEdit(); }}>
                 수정
               </button>
             )}
             {isOwner && (
               <button
-                style={{ ...styles.dropdownItem, color: '#ef4444' }}
+                className="block w-full px-3.5 py-2 text-[13px] font-medium text-red-500 bg-transparent border-none text-left cursor-pointer hover:bg-slate-50"
                 onClick={(e) => { e.stopPropagation(); setOpen(false); onDelete(); }}
               >
                 삭제
@@ -106,19 +108,19 @@ function SectionHeader({
   moreLink?: { label: string; to: string };
 }) {
   return (
-    <div style={styles.sectionHeader}>
+    <div className="flex items-end justify-between mb-3 gap-3 flex-wrap">
       <div>
-        <h2 style={styles.sectionTitle}>{title}</h2>
-        {description && <p style={styles.sectionDesc}>{description}</p>}
+        <h2 className="text-lg font-bold text-slate-900 mb-1 mt-0">{title}</h2>
+        {description && <p className="text-[13px] text-slate-500 m-0">{description}</p>}
       </div>
-      <div style={styles.sectionActions}>
+      <div className="flex items-center gap-3">
         {moreLink && (
-          <Link to={moreLink.to} style={styles.moreLink}>
+          <Link to={moreLink.to} className="text-[13px] text-slate-600 no-underline whitespace-nowrap hover:underline">
             {moreLink.label} →
           </Link>
         )}
         {primaryAction && (
-          <Link to={primaryAction.to} style={styles.primaryBtn}>
+          <Link to={primaryAction.to} className="inline-flex items-center gap-1.5 px-4 py-2 bg-primary text-white text-sm font-semibold rounded-lg no-underline whitespace-nowrap">
             {primaryAction.label}
           </Link>
         )}
@@ -188,28 +190,28 @@ function DocumentsSection({
   }, [onChanged]);
 
   return (
-    <section style={styles.section}>
+    <section className="mb-10">
       <SectionHeader
         title="문서형 콘텐츠"
         description="리치 텍스트 편집기로 작성한 문서"
         primaryAction={isAuthenticated ? { label: '문서 등록', to: '/content/documents/new' } : undefined}
       />
 
-      <div style={styles.tableWrap}>
+      <Card className="overflow-hidden">
         {loading ? (
-          <div style={styles.placeholder}>불러오는 중...</div>
+          <div className="py-8 px-4 text-sm text-slate-400 text-center">불러오는 중...</div>
         ) : items.length === 0 ? (
-          <div style={styles.placeholder}>아직 문서가 없습니다</div>
+          <div className="py-8 px-4 text-sm text-slate-400 text-center">아직 문서가 없습니다</div>
         ) : (
-          <table style={styles.table}>
+          <table className="w-full border-collapse table-fixed">
             <thead>
               <tr>
-                <th style={styles.th}>제목</th>
-                <th style={{ ...styles.th, width: 96 }}>작성자</th>
-                <th style={{ ...styles.th, width: 100 }}>작성일</th>
-                <th style={{ ...styles.th, width: 56, textAlign: 'center' }}>조회</th>
-                <th style={{ ...styles.th, width: 56, textAlign: 'center' }}>좋아요</th>
-                <th style={{ ...styles.th, width: 48 }}></th>
+                <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left">제목</th>
+                <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left w-24">작성자</th>
+                <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left w-[100px]">작성일</th>
+                <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-center w-14">조회</th>
+                <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-center w-14">좋아요</th>
+                <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left w-12"></th>
               </tr>
             </thead>
             <tbody>
@@ -219,18 +221,16 @@ function DocumentsSection({
                   <tr
                     key={item.id}
                     onClick={() => navigate(`/content/${item.id}`)}
-                    style={styles.row}
-                    onMouseEnter={(e) => { (e.currentTarget as HTMLTableRowElement).style.backgroundColor = '#f8fafc'; }}
-                    onMouseLeave={(e) => { (e.currentTarget as HTMLTableRowElement).style.backgroundColor = ''; }}
+                    className="cursor-pointer transition-colors hover:bg-slate-50"
                   >
-                    <td style={styles.td}>
-                      <span style={{ fontWeight: 600, fontSize: '0.875rem', color: '#1e293b' }}>{item.title}</span>
+                    <td className="px-3 py-3 text-sm text-slate-900 border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap">
+                      <span className="font-semibold text-sm text-slate-800">{item.title}</span>
                     </td>
-                    <td style={{ ...styles.td, color: '#64748b', fontSize: '0.8125rem' }}>{item.author_name || '-'}</td>
-                    <td style={{ ...styles.td, color: '#94a3b8', fontSize: '0.8125rem' }}>{formatDate(item.created_at)}</td>
-                    <td style={{ ...styles.td, textAlign: 'center', color: '#94a3b8', fontSize: '0.8125rem' }}>👁 {item.view_count ?? 0}</td>
-                    <td style={{ ...styles.td, textAlign: 'center', color: '#94a3b8', fontSize: '0.8125rem' }}>👍 {item.like_count ?? 0}</td>
-                    <td style={{ ...styles.td, textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+                    <td className="px-3 py-3 text-[13px] text-slate-500 border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap">{item.author_name || '-'}</td>
+                    <td className="px-3 py-3 text-[13px] text-slate-400 border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap">{formatDate(item.created_at)}</td>
+                    <td className="px-3 py-3 text-[13px] text-slate-400 border-b border-slate-100 text-center whitespace-nowrap">👁 {item.view_count ?? 0}</td>
+                    <td className="px-3 py-3 text-[13px] text-slate-400 border-b border-slate-100 text-center whitespace-nowrap">👍 {item.like_count ?? 0}</td>
+                    <td className="px-3 py-3 border-b border-slate-100 text-center" onClick={(e) => e.stopPropagation()}>
                       <RowActionMenu
                         isOwner={isOwner}
                         onView={() => navigate(`/content/${item.id}`)}
@@ -245,7 +245,7 @@ function DocumentsSection({
             </tbody>
           </table>
         )}
-      </div>
+      </Card>
     </section>
   );
 }
@@ -280,7 +280,7 @@ function CoursesSection({ isAuthenticated }: { isAuthenticated: boolean }) {
   }, []);
 
   return (
-    <section style={styles.section}>
+    <section className="mb-10">
       <SectionHeader
         title="코스형 자료"
         description="목록형으로 구성된 분량 많은 콘텐츠"
@@ -288,19 +288,19 @@ function CoursesSection({ isAuthenticated }: { isAuthenticated: boolean }) {
         moreLink={{ label: '전체 보기', to: '/content/courses' }}
       />
 
-      <div style={styles.tableWrap}>
+      <Card className="overflow-hidden">
         {loading ? (
-          <div style={styles.placeholder}>불러오는 중...</div>
+          <div className="py-8 px-4 text-sm text-slate-400 text-center">불러오는 중...</div>
         ) : courses.length === 0 ? (
-          <div style={styles.placeholder}>아직 코스형 자료가 없습니다</div>
+          <div className="py-8 px-4 text-sm text-slate-400 text-center">아직 코스형 자료가 없습니다</div>
         ) : (
-          <table style={styles.table}>
+          <table className="w-full border-collapse table-fixed">
             <thead>
               <tr>
-                <th style={styles.th}>제목</th>
-                <th style={{ ...styles.th, width: 80 }}>레슨</th>
-                <th style={{ ...styles.th, width: 100 }}>작성일</th>
-                <th style={{ ...styles.th, width: 80 }}>상태</th>
+                <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left">제목</th>
+                <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left w-20">레슨</th>
+                <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left w-[100px]">작성일</th>
+                <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left w-20">상태</th>
               </tr>
             </thead>
             <tbody>
@@ -308,21 +308,17 @@ function CoursesSection({ isAuthenticated }: { isAuthenticated: boolean }) {
                 <tr
                   key={c.id}
                   onClick={() => navigate(`/instructor/courses/${c.id}`)}
-                  style={styles.row}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLTableRowElement).style.backgroundColor = '#f8fafc'; }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLTableRowElement).style.backgroundColor = ''; }}
+                  className="cursor-pointer transition-colors hover:bg-slate-50"
                 >
-                  <td style={styles.td}>
-                    <span style={{ fontWeight: 600, fontSize: '0.875rem', color: '#1e293b' }}>{c.title}</span>
+                  <td className="px-3 py-3 text-sm text-slate-900 border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap">
+                    <span className="font-semibold text-sm text-slate-800">{c.title}</span>
                   </td>
-                  <td style={{ ...styles.td, color: '#64748b', fontSize: '0.8125rem' }}>{c.duration > 0 ? `${c.duration}분` : '-'}</td>
-                  <td style={{ ...styles.td, color: '#94a3b8', fontSize: '0.8125rem' }}>{formatDate(c.createdAt)}</td>
-                  <td style={{ ...styles.td }}>
-                    <span style={{
-                      ...styles.statusBadge,
-                      backgroundColor: c.status === 'published' ? '#ecfdf5' : '#f1f5f9',
-                      color: c.status === 'published' ? '#047857' : '#64748b',
-                    }}>
+                  <td className="px-3 py-3 text-[13px] text-slate-500 border-b border-slate-100">{c.duration > 0 ? `${c.duration}분` : '-'}</td>
+                  <td className="px-3 py-3 text-[13px] text-slate-400 border-b border-slate-100">{formatDate(c.createdAt)}</td>
+                  <td className="px-3 py-3 border-b border-slate-100">
+                    <span className={`inline-block px-2 py-0.5 text-[11px] font-semibold rounded ${
+                      c.status === 'published' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'
+                    }`}>
                       {c.status === 'published' ? '공개' : c.status === 'archived' ? '보관' : '초안'}
                     </span>
                   </td>
@@ -331,7 +327,7 @@ function CoursesSection({ isAuthenticated }: { isAuthenticated: boolean }) {
             </tbody>
           </table>
         )}
-      </div>
+      </Card>
     </section>
   );
 }
@@ -348,10 +344,10 @@ export function ContentListPage() {
   }, []);
 
   return (
-    <div style={styles.page}>
-      <header style={styles.heroHeader}>
-        <h1 style={styles.heroTitle}>콘텐츠</h1>
-        <p style={styles.heroDesc}>문서·코스형 자료를 한 곳에서 관리합니다.</p>
+    <div className="max-w-[1100px] mx-auto px-4 pt-8 pb-16">
+      <header className="mb-8">
+        <h1 className="text-2xl font-bold text-slate-900 mb-1 mt-0">콘텐츠</h1>
+        <p className="text-[15px] text-slate-500 m-0">문서·코스형 자료를 한 곳에서 관리합니다.</p>
       </header>
 
       <DocumentsSection
@@ -365,162 +361,5 @@ export function ContentListPage() {
     </div>
   );
 }
-
-// ─── Styles ──────────────────────────────────────────────────────────────────
-
-const styles: Record<string, React.CSSProperties> = {
-  page: {
-    maxWidth: 1100,
-    margin: '0 auto',
-    padding: '32px 16px 60px',
-  },
-  heroHeader: {
-    marginBottom: 32,
-  },
-  heroTitle: {
-    fontSize: '1.75rem',
-    fontWeight: 700,
-    color: '#0f172a',
-    margin: '0 0 4px',
-  },
-  heroDesc: {
-    fontSize: '0.9375rem',
-    color: '#64748b',
-    margin: 0,
-  },
-
-  section: {
-    marginBottom: 40,
-  },
-  sectionHeader: {
-    display: 'flex',
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-    gap: 12,
-    flexWrap: 'wrap',
-  },
-  sectionTitle: {
-    fontSize: '1.125rem',
-    fontWeight: 700,
-    color: '#0f172a',
-    margin: '0 0 4px',
-  },
-  sectionDesc: {
-    fontSize: '0.8125rem',
-    color: '#64748b',
-    margin: 0,
-  },
-  sectionActions: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 12,
-  },
-  moreLink: {
-    fontSize: '0.8125rem',
-    color: '#475569',
-    textDecoration: 'none',
-    whiteSpace: 'nowrap',
-  },
-  primaryBtn: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: 6,
-    padding: '8px 16px',
-    backgroundColor: '#2563eb',
-    color: '#fff',
-    fontSize: '0.875rem',
-    fontWeight: 600,
-    borderRadius: 8,
-    textDecoration: 'none',
-    whiteSpace: 'nowrap',
-  },
-
-  tableWrap: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    border: '1px solid #e2e8f0',
-    overflow: 'hidden',
-  },
-  placeholder: {
-    padding: '32px 16px',
-    fontSize: '0.875rem',
-    color: '#94a3b8',
-    textAlign: 'center',
-  },
-  table: {
-    width: '100%',
-    borderCollapse: 'collapse',
-    tableLayout: 'fixed',
-  },
-  th: {
-    padding: '10px 12px',
-    fontSize: '0.75rem',
-    fontWeight: 600,
-    color: '#64748b',
-    backgroundColor: '#f8fafc',
-    borderBottom: '1px solid #e2e8f0',
-    textAlign: 'left',
-  },
-  td: {
-    padding: '12px',
-    fontSize: '0.875rem',
-    color: '#0f172a',
-    borderBottom: '1px solid #f1f5f9',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-  },
-  row: {
-    cursor: 'pointer',
-    transition: 'background-color 0.1s',
-  },
-  statusBadge: {
-    display: 'inline-block',
-    padding: '2px 8px',
-    fontSize: '0.6875rem',
-    fontWeight: 600,
-    borderRadius: 4,
-  },
-
-  // RowActionMenu
-  menuBtn: {
-    padding: '2px 8px',
-    fontSize: '0.875rem',
-    fontWeight: 700,
-    color: '#64748b',
-    backgroundColor: 'transparent',
-    border: '1px solid #e2e8f0',
-    borderRadius: 4,
-    cursor: 'pointer',
-    letterSpacing: 2,
-  },
-  dropdown: {
-    position: 'absolute',
-    right: 0,
-    top: '100%',
-    marginTop: 4,
-    backgroundColor: '#ffffff',
-    border: '1px solid #e2e8f0',
-    borderRadius: 8,
-    boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-    zIndex: 20,
-    minWidth: 100,
-    overflow: 'hidden',
-  },
-  dropdownItem: {
-    display: 'block',
-    width: '100%',
-    padding: '8px 14px',
-    fontSize: '0.8125rem',
-    fontWeight: 500,
-    color: '#334155',
-    backgroundColor: 'transparent',
-    border: 'none',
-    textAlign: 'left',
-    cursor: 'pointer',
-  },
-
-};
 
 export default ContentListPage;

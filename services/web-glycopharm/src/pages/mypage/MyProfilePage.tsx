@@ -55,6 +55,7 @@ export default function MyProfilePage() {
   const [editData, setEditData] = useState({
     lastName: user?.lastName || '',
     firstName: user?.firstName || '',
+    nickname: user?.nickname || '',
     phone: user?.phone || '',
   });
   const [saving, setSaving] = useState(false);
@@ -83,6 +84,7 @@ export default function MyProfilePage() {
         name: fullName,
         lastName: editData.lastName,
         firstName: editData.firstName,
+        nickname: editData.nickname,
         phone: editData.phone,
       });
 
@@ -90,6 +92,7 @@ export default function MyProfilePage() {
         name: fullName,
         lastName: editData.lastName,
         firstName: editData.firstName,
+        nickname: editData.nickname,
         phone: editData.phone,
       });
       setIsEditing(false);
@@ -105,7 +108,7 @@ export default function MyProfilePage() {
 
   const handleCancel = () => {
     setIsEditing(false);
-    setEditData({ lastName: user.lastName || '', firstName: user.firstName || '', phone: user.phone || '' });
+    setEditData({ lastName: user.lastName || '', firstName: user.firstName || '', nickname: user.nickname || '', phone: user.phone || '' });
     setFeedback(null);
   };
 
@@ -139,7 +142,7 @@ export default function MyProfilePage() {
         isEditing={isEditing}
         saving={saving}
         onEdit={() => {
-          setEditData({ lastName: user.lastName || '', firstName: user.firstName || '', phone: user.phone || '' });
+          setEditData({ lastName: user.lastName || '', firstName: user.firstName || '', nickname: user.nickname || '', phone: user.phone || '' });
           setIsEditing(true);
         }}
         onSave={handleSave}
@@ -167,6 +170,17 @@ export default function MyProfilePage() {
           onChange={(v) => setEditData(prev => ({ ...prev, firstName: v }))}
           icon={<User className="w-5 h-5 text-gray-400" />}
         />
+        <ProfileInfoField
+          label="닉네임"
+          value={user.nickname || '-'}
+          editValue={editData.nickname}
+          isEditing={isEditing}
+          onChange={(v) => setEditData(prev => ({ ...prev, nickname: v }))}
+          icon={<User className="w-5 h-5 text-gray-400" />}
+        />
+        {!isEditing && user.nickname && (
+          <p className="text-xs text-gray-400 -mt-2 ml-10 mb-2">포럼, 댓글 등 공개 화면에 표시됩니다.</p>
+        )}
         <ProfileInfoField
           label="연락처"
           value={user.phone || '등록된 연락처가 없습니다'}

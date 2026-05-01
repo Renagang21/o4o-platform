@@ -140,7 +140,7 @@ export default function PostDetailPage() {
               <div key={comment.id} style={styles.comment}>
                 <div style={styles.commentMeta}>
                   <span style={styles.commentAuthor}>
-                    {comment.author?.name || comment.author?.username || '익명'}
+                    {comment.author?.nickname || comment.author?.name || '익명'}
                   </span>
                   <span style={styles.commentDate}>
                     {formatDate(comment.createdAt)}

@@ -10,7 +10,7 @@
 
 import { apiClient } from './client';
 import type {
-  ForumCategory,
+  ForumInfo,
   ForumPost,
   ForumComment,
   CreatePostRequest,
@@ -35,14 +35,13 @@ function getForumBasePath(): string {
 }
 
 export const forumApi = {
-  // 카테고리 — getCategories() 제거 (WO-O4O-FORUM-CATEGORY-REMNANT-CLEANUP-V1: DB 완전 제거됨)
-  // getCategory()는 ForumDetailPage 비공개 포럼 소유자 검증에 필수
-  getCategory: (id: string) =>
-    apiClient.get<ApiResponse<ForumCategory>>(`${getForumBasePath()}/categories/${id}`),
+  // 포럼 정보 — ForumDetailPage 비공개 포럼 소유자 검증에 필수
+  getForum: (id: string) =>
+    apiClient.get<ApiResponse<ForumInfo>>(`${getForumBasePath()}/categories/${id}`),
 
   // 게시글
   getPosts: (params?: {
-    categoryId?: string;
+    forumId?: string;
     page?: number;
     limit?: number;
     search?: string;
@@ -89,13 +88,13 @@ export const forumApi = {
     apiClient.delete<ApiResponse<void>>(`${getForumBasePath()}/posts/${postId}/comments/${commentId}`),
 
   // Owner routes — WO-O4O-FORUM-MY-FORUM-EXPANSION-V1
-  getMyCategories: () =>
-    apiClient.get<ApiResponse<ForumCategory[]>>(`${getForumBasePath()}/categories/mine`),
+  getMyForums: () =>
+    apiClient.get<ApiResponse<ForumInfo[]>>(`${getForumBasePath()}/categories/mine`),
 
-  updateMyCategory: (id: string, data: { name?: string; description?: string; iconEmoji?: string | null; iconUrl?: string | null }) =>
-    apiClient.patch<ApiResponse<ForumCategory>>(`${getForumBasePath()}/categories/${id}/owner`, data),
+  updateMyForum: (id: string, data: { name?: string; description?: string; iconEmoji?: string | null; iconUrl?: string | null }) =>
+    apiClient.patch<ApiResponse<ForumInfo>>(`${getForumBasePath()}/categories/${id}/owner`, data),
 
-  requestDeleteCategory: (id: string, data: { reason?: string }) =>
+  requestDeleteForum: (id: string, data: { reason?: string }) =>
     apiClient.post<ApiResponse<void>>(`${getForumBasePath()}/categories/${id}/delete-request`, data),
 };
 
@@ -124,41 +123,41 @@ export interface ForumMember {
 }
 
 export const forumMembershipApi = {
-  getJoinRequests: (categoryId: string) =>
+  getJoinRequests: (forumId: string) =>
     apiClient.get<ApiResponse<ForumJoinRequest[]>>(
-      `${getForumBasePath()}/categories/${categoryId}/join-requests`,
+      `${getForumBasePath()}/categories/${forumId}/join-requests`,
     ),
 
-  approveJoin: (categoryId: string, requestId: string) =>
+  approveJoin: (forumId: string, requestId: string) =>
     apiClient.post<ApiResponse<{ requestId: string; status: string; userId: string }>>(
-      `${getForumBasePath()}/categories/${categoryId}/members/${requestId}/approve`,
+      `${getForumBasePath()}/categories/${forumId}/members/${requestId}/approve`,
     ),
 
-  rejectJoin: (categoryId: string, requestId: string, reviewComment?: string) =>
+  rejectJoin: (forumId: string, requestId: string, reviewComment?: string) =>
     apiClient.post<ApiResponse<{ requestId: string; status: string }>>(
-      `${getForumBasePath()}/categories/${categoryId}/members/${requestId}/reject`,
+      `${getForumBasePath()}/categories/${forumId}/members/${requestId}/reject`,
       { reviewComment },
     ),
 
-  getMembers: (categoryId: string) =>
+  getMembers: (forumId: string) =>
     apiClient.get<ApiResponse<ForumMember[]>>(
-      `${getForumBasePath()}/categories/${categoryId}/members`,
+      `${getForumBasePath()}/categories/${forumId}/members`,
     ),
 
-  removeMember: (categoryId: string, userId: string) =>
+  removeMember: (forumId: string, userId: string) =>
     apiClient.delete<ApiResponse<{ removed: boolean; userId: string }>>(
-      `${getForumBasePath()}/categories/${categoryId}/members/${userId}`,
+      `${getForumBasePath()}/categories/${forumId}/members/${userId}`,
     ),
 
   // WO-KPA-A-PRIVATE-FORUM-JOIN-UX-CONNECT-V1: 일반 사용자용
-  requestJoin: (categoryId: string) =>
+  requestJoin: (forumId: string) =>
     apiClient.post<ApiResponse<any>>(
-      `${getForumBasePath()}/categories/${categoryId}/join`,
+      `${getForumBasePath()}/categories/${forumId}/join`,
     ),
 
-  getMembershipStatus: (categoryId: string) =>
+  getMembershipStatus: (forumId: string) =>
     apiClient.get<ApiResponse<{ isMember: boolean; role: string | null; pendingRequest: boolean }>>(
-      `${getForumBasePath()}/categories/${categoryId}/membership-status`,
+      `${getForumBasePath()}/categories/${forumId}/membership-status`,
     ),
 };
 

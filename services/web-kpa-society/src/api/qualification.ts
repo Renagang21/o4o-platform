@@ -50,6 +50,7 @@ export interface QualificationRequest {
   user_id: string;
   user_name: string | null;
   user_email: string | null;
+  user_created_at: string | null;
   qualification_type: string;
   status: QualificationStatus;
   request_data: Record<string, any>;

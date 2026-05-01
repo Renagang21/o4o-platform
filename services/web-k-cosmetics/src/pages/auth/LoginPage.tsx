@@ -1,11 +1,13 @@
 /**
  * LoginPage - K-Cosmetics
  * Based on GlycoPharm LoginPage structure
+ * WO-O4O-KCOS-AUTH-DESIGN-POLISH-V1: inline style → Tailwind, hex → theme, Card/Button 적용
  */
 
 import { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth, getKCosmeticsDashboardRoute } from '@/contexts/AuthContext';
+import { Card, Button } from '@o4o/ui';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -38,43 +40,47 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <div style={styles.logo}>💄</div>
-        <h1 style={styles.title}>로그인</h1>
-        <p style={styles.subtitle}>K-Cosmetics에 오신 것을 환영합니다</p>
+    <div className="min-h-[80vh] flex items-center justify-center py-12 px-6">
+      <Card className="w-full max-w-[400px] p-12 text-center">
+        <div className="text-5xl mb-4">💄</div>
+        <h1 className="text-2xl font-bold text-slate-800 mb-2 mt-0">로그인</h1>
+        <p className="text-sm text-slate-500 mb-8 mt-0">K-Cosmetics에 오신 것을 환영합니다</p>
 
-        <form onSubmit={handleSubmit} style={styles.form}>
-          {error && <div style={styles.error}>{error}</div>}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-left">
+          {error && (
+            <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm text-center">
+              {error}
+            </div>
+          )}
 
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>이메일</label>
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-slate-700">이메일</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="이메일을 입력하세요"
-              style={styles.input}
+              className="w-full px-4 py-3 border border-slate-200 rounded-lg text-base outline-none transition-colors focus:border-primary"
               required
             />
           </div>
 
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>비밀번호</label>
-            <div style={styles.passwordWrapper}>
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-slate-700">비밀번호</label>
+            <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
                 autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="비밀번호를 입력하세요"
-                style={styles.passwordInput}
+                className="w-full px-4 py-3 pr-12 border border-slate-200 rounded-lg text-base outline-none transition-colors focus:border-primary"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                style={styles.eyeButton}
+                className="absolute right-3 top-1/2 -translate-y-1/2 bg-transparent border-none p-1 cursor-pointer text-slate-400 flex items-center justify-center"
               >
                 {showPassword ? (
                   <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -91,195 +97,45 @@ export default function LoginPage() {
           </div>
 
           {/* Remember Me & Forgot Password */}
-          <div style={styles.optionsRow}>
-            <label style={styles.checkboxLabel}>
-              <input type="checkbox" style={styles.checkbox} />
+          <div className="flex justify-between items-center">
+            <label className="flex items-center gap-2 text-sm text-slate-500 cursor-pointer">
+              <input type="checkbox" className="w-4 h-4 accent-primary" />
               <span>로그인 상태 유지</span>
             </label>
-            <Link to="/forgot-password" style={styles.forgotLink}>
+            <Link to="/forgot-password" className="text-sm text-primary no-underline hover:underline">
               비밀번호 찾기
             </Link>
           </div>
 
-          <button
+          <Button
             type="submit"
-            style={{
-              ...styles.submitButton,
-              opacity: loading ? 0.7 : 1,
-            }}
+            variant="primary"
+            className="w-full h-12 text-base mt-2"
             disabled={loading}
           >
             {loading ? '로그인 중...' : '로그인'}
-          </button>
+          </Button>
         </form>
 
         {/* 테스트 계정 빠른 로그인 */}
-        <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px dashed #e2e8f0' }}>
-          <p style={{ textAlign: 'center', fontSize: '12px', color: '#94a3b8', marginBottom: '10px' }}>테스트 계정</p>
+        <div className="mt-4 pt-4 border-t border-dashed border-slate-200">
+          <p className="text-center text-xs text-slate-400 mb-2.5 mt-0">테스트 계정</p>
           <button
             type="button"
             disabled={loading}
             onClick={() => { setEmail('store-owner-kcosmetics@o4o.com'); setPassword('O4oTestPass@1'); setError(null); }}
-            style={{
-              width: '100%',
-              padding: '8px',
-              fontSize: '13px',
-              fontWeight: 500,
-              color: '#475569',
-              backgroundColor: '#f8fafc',
-              border: '1px solid #e2e8f0',
-              borderRadius: '8px',
-              cursor: loading ? 'not-allowed' : 'pointer',
-              opacity: loading ? 0.5 : 1,
-            }}
+            className={`w-full py-2 text-xs font-medium text-slate-600 bg-slate-50 border border-slate-200 rounded-lg transition-colors ${
+              loading ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:bg-slate-100'
+            }`}
           >
             매장 경영자 로그인
           </button>
         </div>
 
-        <div style={styles.footer}>
-          <Link to="/" style={styles.link}>홈으로 돌아가기</Link>
+        <div className="mt-6 pt-6 border-t border-slate-200 text-center">
+          <Link to="/" className="text-sm font-medium text-primary no-underline hover:underline">홈으로 돌아가기</Link>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  container: {
-    minHeight: '80vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '48px 24px',
-  },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: '16px',
-    padding: '48px',
-    width: '100%',
-    maxWidth: '400px',
-    boxShadow: '0 4px 24px rgba(0, 0, 0, 0.08)',
-    textAlign: 'center',
-  },
-  logo: {
-    fontSize: '48px',
-    marginBottom: '16px',
-  },
-  title: {
-    fontSize: '24px',
-    fontWeight: 700,
-    color: '#1e293b',
-    margin: '0 0 8px 0',
-  },
-  subtitle: {
-    fontSize: '14px',
-    color: '#64748b',
-    margin: '0 0 32px 0',
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '16px',
-    textAlign: 'left',
-  },
-  error: {
-    backgroundColor: '#fef2f2',
-    color: '#dc2626',
-    padding: '12px',
-    borderRadius: '8px',
-    fontSize: '14px',
-    textAlign: 'center',
-  },
-  inputGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '4px',
-  },
-  label: {
-    fontSize: '14px',
-    fontWeight: 500,
-    color: '#334155',
-  },
-  input: {
-    padding: '12px 16px',
-    border: '1px solid #e2e8f0',
-    borderRadius: '8px',
-    fontSize: '16px',
-    outline: 'none',
-    transition: 'border-color 0.2s',
-  },
-  passwordWrapper: {
-    position: 'relative',
-  },
-  passwordInput: {
-    width: '100%',
-    padding: '12px 48px 12px 16px',
-    border: '1px solid #e2e8f0',
-    borderRadius: '8px',
-    fontSize: '16px',
-    outline: 'none',
-    transition: 'border-color 0.2s',
-    boxSizing: 'border-box',
-  },
-  eyeButton: {
-    position: 'absolute',
-    right: '12px',
-    top: '50%',
-    transform: 'translateY(-50%)',
-    background: 'none',
-    border: 'none',
-    padding: '4px',
-    cursor: 'pointer',
-    color: '#94a3b8',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  optionsRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  checkboxLabel: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    fontSize: '14px',
-    color: '#64748b',
-    cursor: 'pointer',
-  },
-  checkbox: {
-    width: '16px',
-    height: '16px',
-    accentColor: '#e91e63',
-  },
-  forgotLink: {
-    fontSize: '14px',
-    color: '#e91e63',
-    textDecoration: 'none',
-  },
-  submitButton: {
-    padding: '14px',
-    backgroundColor: '#e91e63',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '12px',
-    fontSize: '16px',
-    fontWeight: 600,
-    cursor: 'pointer',
-    marginTop: '8px',
-  },
-  footer: {
-    marginTop: '24px',
-    paddingTop: '24px',
-    borderTop: '1px solid #e2e8f0',
-    textAlign: 'center',
-  },
-  link: {
-    color: '#e91e63',
-    textDecoration: 'none',
-    fontSize: '14px',
-    fontWeight: 500,
-  },
-};

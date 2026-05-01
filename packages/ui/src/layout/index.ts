@@ -46,6 +46,12 @@ export * from './AGSection';
 export * from './Section';
 
 // ═══════════════════════════════════════════════════════════════════════════
+// Template Provider - 서비스 레벨 디자인 토큰 Context
+// WO-O4O-TEMPLATE-PROVIDER-V1
+// ═══════════════════════════════════════════════════════════════════════════
+export * from './TemplateContext';
+
+// ═══════════════════════════════════════════════════════════════════════════
 // Horizontal Spacing / Container Standard
 // WO-O4O-HORIZONTAL-SPACING-AND-CONTAINER-STANDARD-V1
 // ═══════════════════════════════════════════════════════════════════════════

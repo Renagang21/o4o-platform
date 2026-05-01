@@ -1,8 +1,7 @@
 import { MoreThanOrEqual, DataSource } from 'typeorm';
-import { ForumCategory } from '../entities/ForumCategory.js';
 import { ForumPost, PostStatus, PostType } from '../entities/ForumPost.js';
 import { ForumComment, CommentStatus } from '../entities/ForumComment.js';
-import { canCreatePost, canManagePost, canCreateCategory, canManageCategory, canCreateComment, canManageComment } from '../utils/forumPermissions.js';
+import { canCreatePost, canManagePost, canCreateComment, canManageComment } from '../utils/forumPermissions.js';
 
 // DataSource and CacheService are injected at runtime from api-server
 // This avoids direct import of api-server modules
@@ -20,7 +19,7 @@ export function initForumService(dataSource: DataSource, cache: any): void {
 
 export interface ForumSearchOptions {
   query?: string;
-  categoryId?: string;
+  forumId?: string;
   authorId?: string;
   organizationId?: string;
   tags?: string[];
@@ -42,117 +41,14 @@ export interface ForumStatistics {
   todayPosts: number;
   todayComments: number;
   popularTags: Array<{ name: string; count: number }>;
-  activeCategories: Array<{ name: string; postCount: number }>;
+  activeForums: Array<{ name: string; postCount: number }>;
   topContributors: Array<{ userId: string; username: string; postCount: number; commentCount: number }>;
 }
 
 export class ForumService {
-  private get categoryRepository() { return AppDataSource.getRepository(ForumCategory); }
   private get postRepository() { return AppDataSource.getRepository(ForumPost); }
   private get commentRepository() { return AppDataSource.getRepository(ForumComment); }
   // User repository is accessed via raw query since User entity is in api-server
-
-  // Category Methods
-  async createCategory(data: Partial<ForumCategory>, creatorId: string): Promise<ForumCategory> {
-    // Permission check: can user create category in this organization?
-    const hasPermission = await canCreateCategory(
-      AppDataSource,
-      creatorId,
-      data.organizationId
-    );
-    if (!hasPermission) {
-      throw new Error(
-        `Permission denied: cannot create category${data.organizationId ? ` in organization ${data.organizationId}` : ''}`
-      );
-    }
-
-    const category = this.categoryRepository.create({
-      ...data,
-      createdBy: creatorId,
-      slug: this.generateSlug(data.name || '')
-    });
-
-    const savedCategory = await this.categoryRepository.save(category);
-
-    // WO-KPA-A-FORUM-OWNER-MEMBERSHIP-AUTO-SYNC-V1
-    await AppDataSource.query(
-      `INSERT INTO forum_category_members (forum_category_id, user_id, role, joined_at, created_at, updated_at)
-       VALUES ($1, $2, 'owner', NOW(), NOW(), NOW())
-       ON CONFLICT (forum_category_id, user_id) DO NOTHING`,
-      [savedCategory.id, creatorId],
-    );
-
-    // 캐시 무효화
-    await this.invalidateCategoryCache();
-
-    return savedCategory;
-  }
-
-  async updateCategory(categoryId: string, data: Partial<ForumCategory>): Promise<ForumCategory | null> {
-    const category = await this.categoryRepository.findOne({ where: { id: categoryId } });
-    if (!category) return null;
-
-    if (data.name && data.name !== category.name) {
-      data.slug = this.generateSlug(data.name);
-    }
-
-    await this.categoryRepository.update(categoryId, data);
-    const updatedCategory = await this.categoryRepository.findOne({ 
-      where: { id: categoryId },
-      relations: ['parent', 'children', 'creator']
-    });
-
-    // 캐시 무효화
-    await this.invalidateCategoryCache();
-
-    return updatedCategory;
-  }
-
-  async getCategories(
-    includeInactive: boolean = false,
-    organizationId?: string
-  ): Promise<ForumCategory[]> {
-    const cacheKey = `forum_categories_${includeInactive}_${organizationId || 'all'}`;
-    const cached = await cacheService.get(cacheKey) as ForumCategory[] | null;
-
-    if (cached) {
-      return cached;
-    }
-
-    const queryBuilder = this.categoryRepository
-      .createQueryBuilder('category')
-      .leftJoinAndSelect('category.parent', 'parent')
-      .leftJoinAndSelect('category.children', 'children')
-      .leftJoinAndSelect('category.creator', 'creator')
-      .orderBy('category.sortOrder', 'ASC')
-      .addOrderBy('category.name', 'ASC');
-
-    if (!includeInactive) {
-      queryBuilder.where('category.isActive = :isActive', { isActive: true });
-    }
-
-    // Organization filter
-    if (organizationId) {
-      queryBuilder.andWhere(
-        '(category.organizationId = :organizationId OR category.organizationId IS NULL)',
-        { organizationId }
-      );
-    }
-
-    const categories = await queryBuilder.getMany();
-
-    // 캐시에 저장 (10분)
-    await cacheService.set(cacheKey, categories, undefined, { ttl: 600 });
-
-    return categories;
-  }
-
-  async getCategoryBySlug(slug: string): Promise<ForumCategory | null> {
-    return await this.categoryRepository.findOne({
-      where: { slug, isActive: true },
-      relations: ['parent', 'children', 'creator', 'lastPost', 'lastPost.author']
-    });
-  }
 
   // Post Methods
   async createPost(data: Partial<ForumPost>, authorId: string): Promise<ForumPost> {
@@ -178,7 +74,7 @@ export class ForumService {
   async updatePost(postId: string, data: Partial<ForumPost>, userId: string, userRole: string): Promise<ForumPost | null> {
     const post = await this.postRepository.findOne({
       where: { id: postId },
-      relations: ['category', 'author']
+      relations: ['author']
     });
 
     if (!post) return null;
@@ -201,7 +97,7 @@ export class ForumService {
     await this.postRepository.update(postId, data);
     const updatedPost = await this.postRepository.findOne({
       where: { id: postId },
-      relations: ['category', 'author', 'comments']
+      relations: ['author', 'comments']
     });
 
     return updatedPost;
@@ -210,7 +106,7 @@ export class ForumService {
   async getPost(postId: string, userId?: string): Promise<ForumPost | null> {
     const post = await this.postRepository.findOne({
       where: { id: postId },
-      relations: ['category', 'author', 'comments', 'comments.author', 'lastCommenter']
+      relations: ['author', 'comments', 'comments.author', 'lastCommenter']
     });
 
     if (!post) return null;
@@ -228,7 +124,7 @@ export class ForumService {
   async getPostBySlug(slug: string, userId?: string): Promise<ForumPost | null> {
     const post = await this.postRepository.findOne({
       where: { slug, status: PostStatus.PUBLISHED },
-      relations: ['category', 'author', 'comments', 'comments.author', 'lastCommenter']
+      relations: ['author', 'comments', 'comments.author', 'lastCommenter']
     });
 
     if (!post) return null;
@@ -258,18 +154,9 @@ export class ForumService {
 
     let queryBuilder = this.postRepository
       .createQueryBuilder('post')
-      .leftJoinAndSelect('post.category', 'category')
       .leftJoinAndSelect('post.author', 'author')
       .leftJoinAndSelect('post.lastCommenter', 'lastCommenter')
       .where('post.status = :status', { status: PostStatus.PUBLISHED });
-
-    // 접근 권한 필터링
-    queryBuilder.andWhere('category.isActive = :isActive', { isActive: true });
-    
-    // 카테고리 필터
-    if (options.categoryId) {
-      queryBuilder.andWhere('post.categoryId = :categoryId', { categoryId: options.categoryId });
-    }
 
     // 조직 필터
     if (options.organizationId) {
@@ -448,7 +335,7 @@ export class ForumService {
       todayPosts,
       todayComments,
       popularTags,
-      activeCategories,
+      activeForums,
       topContributors
     ] = await Promise.all([
       this.postRepository.count({ where: { status: PostStatus.PUBLISHED } }),
@@ -467,7 +354,7 @@ export class ForumService {
         } 
       }),
       Promise.resolve([]),
-      this.getActiveCategories(10),
+      Promise.resolve([]),
       this.getTopContributors(10)
     ]);
 
@@ -478,7 +365,7 @@ export class ForumService {
       todayPosts,
       todayComments,
       popularTags,
-      activeCategories,
+      activeForums,
       topContributors
     };
 
@@ -497,28 +384,6 @@ export class ForumService {
       .replace(/-+/g, '-')
       .replace(/^-|-$/g, '')
       .substring(0, 200);
-  }
-
-  private async updateCategoryStats(categoryId: string, action: 'increment_post' | 'increment_comment' | 'decrement_post' | 'decrement_comment'): Promise<void> {
-    const category = await this.categoryRepository.findOne({ where: { id: categoryId } });
-    if (!category) return;
-
-    switch (action) {
-      case 'increment_post':
-        category.incrementPostCount();
-        break;
-      case 'increment_comment':
-        category.incrementCommentCount();
-        break;
-      case 'decrement_post':
-        category.decrementPostCount();
-        break;
-      case 'decrement_comment':
-        category.decrementCommentCount();
-        break;
-    }
-
-    await this.categoryRepository.save(category);
   }
 
   private async updatePostStats(postId: string, action: 'increment_comment' | 'decrement_comment', userId?: string): Promise<void> {
@@ -561,19 +426,6 @@ export class ForumService {
     });
   }
 
-  private async getActiveCategories(limit: number): Promise<Array<{ name: string; postCount: number }>> {
-    const categories = await this.categoryRepository.find({
-      where: { isActive: true },
-      order: { postCount: 'DESC' },
-      take: limit
-    });
-
-    return categories.map((cat: any) => ({
-      name: cat.name,
-      postCount: cat.postCount
-    }));
-  }
-
   private async getTopContributors(limit: number): Promise<Array<{ userId: string; username: string; postCount: number; commentCount: number }>> {
     // 복잡한 쿼리는 직접 SQL로 구현
     const result = await AppDataSource.query(`
@@ -603,15 +455,6 @@ export class ForumService {
     return result;
   }
 
-  private async invalidateCategoryCache(): Promise<void> {
-    // 카테고리 관련 캐시 무효화
-    // 실제 구현에서는 패턴 매칭으로 관련 캐시들을 일괄 삭제
-  }
-
-  private async invalidatePostCache(categoryId: string): Promise<void> {
-    // 게시글 관련 캐시 무효화
-    // 실제 구현에서는 패턴 매칭으로 관련 캐시들을 일괄 삭제
-  }
 }
 
 export const forumService = new ForumService();

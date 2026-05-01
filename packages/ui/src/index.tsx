@@ -25,25 +25,32 @@
  */
 
 import React, { HTMLAttributes, forwardRef, ButtonHTMLAttributes } from 'react';
+import { useTemplate } from './layout/TemplateContext';
 
 function cn(...classes: (string | undefined | false)[]) {
   return classes.filter(Boolean).join(' ');
 }
 
 // Card Components
+// WO-O4O-TEMPLATE-CARD-STANDARD-V1: template.card 자동 적용
 const Card = forwardRef<
   HTMLDivElement,
   HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn(
-      "rounded-lg border bg-card text-card-foreground shadow-sm",
-      className
-    )}
-    {...props}
-  />
-))
+>(({ className, ...props }, ref) => {
+  const t = useTemplate();
+  const radius = t?.card?.radius ?? 'rounded-lg';
+  const shadow = t?.card?.shadow ?? 'shadow-sm';
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        `${radius} border bg-card text-card-foreground ${shadow}`,
+        className
+      )}
+      {...props}
+    />
+  );
+})
 Card.displayName = "Card"
 
 const CardHeader = forwardRef<
@@ -106,6 +113,7 @@ const CardFooter = forwardRef<
 CardFooter.displayName = "CardFooter"
 
 // Button Component
+// WO-O4O-TEMPLATE-BUTTON-STANDARD-V1: template.button.radius 자동 적용 + primary 테마 색상
 type ButtonVariant = 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'primary' | 'success';
 type ButtonSize = 'default' | 'sm' | 'lg' | 'icon';
 
@@ -124,7 +132,7 @@ const getVariantClasses = (variant: ButtonVariant = 'default'): string => {
     secondary: "bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 shadow-sm hover:from-gray-200 hover:to-gray-300 focus-visible:ring-gray-500",
     ghost: "text-gray-600 hover:bg-gray-100 hover:text-gray-900 focus-visible:ring-gray-500",
     link: "text-blue-600 underline-offset-4 hover:underline hover:text-blue-800 focus-visible:ring-blue-500",
-    primary: "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md hover:from-blue-700 hover:to-blue-800 hover:shadow-lg transform hover:-translate-y-0.5 focus-visible:ring-blue-500",
+    primary: "bg-primary text-white shadow-md hover:bg-primary-700 hover:shadow-lg transform hover:-translate-y-0.5 focus-visible:ring-primary",
     success: "bg-gradient-to-r from-green-600 to-green-700 text-white shadow-md hover:from-green-700 hover:to-green-800 hover:shadow-lg focus-visible:ring-green-500",
   };
   return variants[variant];
@@ -133,8 +141,8 @@ const getVariantClasses = (variant: ButtonVariant = 'default'): string => {
 const getSizeClasses = (size: ButtonSize = 'default'): string => {
   const sizes: Record<ButtonSize, string> = {
     default: "h-10 px-4 py-2",
-    sm: "h-8 rounded-md px-3 text-xs",
-    lg: "h-12 rounded-md px-8 text-base",
+    sm: "h-8 px-3 text-xs",
+    lg: "h-12 px-8 text-base",
     icon: "h-10 w-10",
   };
   return sizes[size];
@@ -142,10 +150,12 @@ const getSizeClasses = (size: ButtonSize = 'default'): string => {
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'default', size = 'default', ...props }, ref) => {
+    const t = useTemplate();
+    const radius = t?.button?.radius ?? 'rounded-md';
     return (
       <button
         className={cn(
-          "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 transform active:scale-95",
+          `inline-flex items-center justify-center whitespace-nowrap ${radius} text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 transform active:scale-95`,
           getVariantClasses(variant),
           getSizeClasses(size),
           className

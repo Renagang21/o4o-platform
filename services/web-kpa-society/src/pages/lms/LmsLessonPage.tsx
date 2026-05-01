@@ -301,6 +301,7 @@ export function LmsLessonPage() {
                 }}>
                   {quizResult.passed ? '합격' : '불합격'}
                 </h3>
+                {/* WO-KPA-LMS-UX-QUICK-WINS-V1: 퀴즈 결과 상세 보강 */}
                 <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
                   <div>
                     <span style={{ ...typography.bodyS, color: colors.neutral500 }}>점수</span>
@@ -309,9 +310,21 @@ export function LmsLessonPage() {
                     </p>
                   </div>
                   <div>
-                    <span style={{ ...typography.bodyS, color: colors.neutral500 }}>정답</span>
+                    <span style={{ ...typography.bodyS, color: colors.neutral500 }}>총 문항</span>
                     <p style={{ ...typography.headingM, color: colors.neutral900 }}>
-                      {quizResult.correctCount} / {quizResult.total}
+                      {quizResult.total}문제
+                    </p>
+                  </div>
+                  <div>
+                    <span style={{ ...typography.bodyS, color: colors.neutral500 }}>정답</span>
+                    <p style={{ ...typography.headingM, color: '#166534' }}>
+                      {quizResult.correctCount}문제
+                    </p>
+                  </div>
+                  <div>
+                    <span style={{ ...typography.bodyS, color: colors.neutral500 }}>오답</span>
+                    <p style={{ ...typography.headingM, color: '#991b1b' }}>
+                      {quizResult.total - quizResult.correctCount}문제
                     </p>
                   </div>
                   {quizResult.creditsEarned > 0 && (
@@ -499,19 +512,21 @@ export function LmsLessonPage() {
             <div style={{ marginBottom: '16px', padding: '10px 16px', backgroundColor: '#fefce8', border: '1px solid #fde047', borderRadius: '8px', fontSize: '14px', color: '#854d0e', textAlign: 'center' as const }}>
               ⭐ +50 크레딧이 적립되었습니다
             </div>
+            {/* WO-KPA-LMS-UX-QUICK-WINS-V1: 수료 CTA 정리 */}
             <div style={styles.modalActions}>
               <Link
                 to="/mypage/certificates"
                 style={styles.modalCertBtn}
               >
-                수료증 보기
+                인증서 보기
               </Link>
-              <button
-                style={styles.modalCloseBtn}
-                onClick={() => { setShowCompletionModal(false); navigate(`/lms/course/${courseId}`); }}
+              <Link
+                to="/lms/courses"
+                style={{ ...styles.modalCloseBtn, textDecoration: 'none', textAlign: 'center' as const, display: 'block' }}
+                onClick={() => setShowCompletionModal(false)}
               >
-                강의 페이지로
-              </button>
+                다른 강의 보기
+              </Link>
             </div>
           </div>
         </div>

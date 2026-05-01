@@ -43,7 +43,7 @@ import type {
 export type { ForumPostResponse, ForumCommentResponse, ForumCategoryResponse };
 
 // Local view types with KPA-specific flattened fields
-export interface ForumCategory {
+export interface ForumInfo {
   id: string;
   name: string;
   slug: string;
@@ -54,6 +54,9 @@ export interface ForumCategory {
   requesterId?: string;
 }
 
+/** @deprecated Use ForumInfo instead */
+export type ForumCategory = ForumInfo;
+
 export interface ForumPost extends Partial<ForumPostResponse> {
   id: string;
   title: string;
@@ -61,8 +64,7 @@ export interface ForumPost extends Partial<ForumPostResponse> {
   excerpt?: string;
   authorId: string;
   authorName: string;       // flattened from author.name
-  forumId?: string;          // WO-O4O-FORUM-CATEGORY-CLEANUP-V1: new SSOT (forum_category_requests.id)
-  categoryId: string;       // @deprecated — use forumId
+  forumId?: string;          // WO-O4O-FORUM-CATEGORY-CLEANUP-V1: SSOT (forum_category_requests.id)
   categoryName: string;     // flattened from category.name
   viewCount: number;
   views: number;            // alias for viewCount

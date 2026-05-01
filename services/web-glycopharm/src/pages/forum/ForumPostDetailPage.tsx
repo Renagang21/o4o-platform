@@ -102,7 +102,7 @@ export default function ForumPostDetailPage() {
     );
   }
 
-  const authorName = post.author?.name || post.author?.email?.split('@')[0] || '익명';
+  const authorName = (post as any).authorName || post.author?.nickname || post.author?.name || '익명';
   const bodyText = post.content || post.body || '';
 
   return (
@@ -179,7 +179,7 @@ export default function ForumPostDetailPage() {
         ) : (
           <div className="bg-white border border-slate-200 rounded-xl divide-y divide-slate-100">
             {comments.map((comment) => {
-              const cAuthor = comment.author?.name || comment.author?.email?.split('@')[0] || '익명';
+              const cAuthor = comment.author?.nickname || comment.author?.name || '익명';
               const cBody = comment.content || comment.body || '';
               return (
                 <div key={comment.id} className="px-6 py-4">

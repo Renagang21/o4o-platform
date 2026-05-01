@@ -36,6 +36,6 @@ export * from './member-list/index';
 export * from './form/index';
 
 // Service Config (WO-O4O-SERVICE-CONFIG-INTRODUCTION-V1)
-export type { ServiceKey, ServiceConfig } from './config/index.js';
+export type { ServiceKey, ServiceConfig, ServiceTemplateKey } from './config/index.js';
 export { kpaConfig, glycopharmConfig, kcosmeticsConfig, serviceConfigMap } from './config/index.js';
 export { useServiceConfig } from './hooks/useServiceConfig.js';

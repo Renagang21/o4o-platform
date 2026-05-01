@@ -2,6 +2,7 @@ import type { ServiceConfig } from '../serviceConfig.js';
 
 export const glycopharmConfig: ServiceConfig = {
   key: 'glycopharm',
+  template: 'glycopharm',
 
   terminology: {
     storeLabel: '약국',

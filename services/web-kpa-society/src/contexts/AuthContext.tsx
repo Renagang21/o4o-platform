@@ -114,6 +114,8 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  /** WO-FORUM-NICKNAME-UNIFICATION-V1: 포럼 공개 표시명 */
+  nickname?: string;
   role?: string;  // WO-O4O-ROLE-MODEL-UNIFICATION-PHASE2-V1: deprecated, use roles[]
   roles: string[];  // Primary role array
   membershipType?: MembershipType;  // Phase 3: 약사/약대생 구분

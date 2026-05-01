@@ -44,6 +44,7 @@ export default function RegisterPage() {
     passwordConfirm: '',
     lastName: '',
     firstName: '',
+    nickname: '',
     phone: '',
     businessName: '',
     businessNumber: '',
@@ -94,6 +95,7 @@ export default function RegisterPage() {
       const response = await api.post('/auth/register', {
         ...formData,
         name: `${formData.lastName}${formData.firstName}`,
+        nickname: formData.nickname,
         phone: formData.phone.replace(/\D/g, ''),
         role: selectedRole,
         service: 'k-cosmetics',
@@ -135,8 +137,8 @@ export default function RegisterPage() {
   const isPhoneValid = /^\d{10,11}$/.test(formData.phone);
 
   const isFormValid = () => {
-    const base = formData.email && formData.lastName && formData.firstName && formData.phone && isPhoneValid &&
-      formData.agreeTerms && formData.agreePrivacy;
+    const base = formData.email && formData.lastName && formData.firstName && formData.nickname &&
+      formData.phone && isPhoneValid && formData.agreeTerms && formData.agreePrivacy;
     if (existingAccountMode) return base && formData.password.length > 0;
     return base && isPasswordStrong && formData.password === formData.passwordConfirm;
   };
@@ -322,6 +324,22 @@ export default function RegisterPage() {
                   <span style={styles.fieldError}>핸드폰 번호는 10~11자리 숫자여야 합니다</span>
                 )}
               </div>
+            </div>
+
+            {/* Nickname */}
+            <div style={styles.inputGroup}>
+              <label style={styles.label}>닉네임 *</label>
+              <input
+                type="text"
+                name="nickname"
+                value={formData.nickname}
+                onChange={handleInputChange}
+                placeholder="서비스에서 사용할 표시 이름"
+                style={styles.input}
+                maxLength={50}
+                required
+              />
+              <span style={styles.helpText}>포럼, 댓글 등 공개 화면에 표시되는 이름입니다. (최대 50자)</span>
             </div>
 
             {/* Business Info (판매자 전용) */}

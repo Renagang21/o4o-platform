@@ -2,6 +2,7 @@ import type { ServiceConfig } from '../serviceConfig.js';
 
 export const kcosmeticsConfig: ServiceConfig = {
   key: 'k-cosmetics',
+  template: 'kcosmetics',
 
   terminology: {
     storeLabel: '매장',

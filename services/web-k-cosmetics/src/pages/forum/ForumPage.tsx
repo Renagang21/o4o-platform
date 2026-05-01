@@ -2,6 +2,7 @@
  * ForumPage - K-Cosmetics 포럼 게시글 목록 (테이블 + 페이지네이션)
  *
  * Phase 22-F: 테이블 형태 + 20건 단위 페이지 넘김
+ * WO-O4O-FORUM-LIST-DESIGN-REFINEMENT-V1: inline style → Tailwind, hardcoded hex → theme
  *
  * 컬럼: 유형 | 제목 | 작성자 | 작성일 | 좋아요 | 댓글
  * 검색 + 유형 필터 + 정렬
@@ -62,12 +63,12 @@ function formatDate(dateString: string): string {
   return minutes > 0 ? `${minutes}분 전` : '방금 전';
 }
 
-const TYPE_BADGES: Record<PostType, { label: string; bg: string; color: string }> = {
-  announcement: { label: '공지', bg: '#fef2f2', color: '#dc2626' },
-  question: { label: '질문', bg: '#f0fdf4', color: '#16a34a' },
-  guide: { label: '가이드', bg: '#fefce8', color: '#ca8a04' },
-  discussion: { label: '토론', bg: '#eff6ff', color: '#2563eb' },
-  poll: { label: '투표', bg: '#faf5ff', color: '#9333ea' },
+const TYPE_BADGES: Record<PostType, { label: string; className: string }> = {
+  announcement: { label: '공지', className: 'bg-red-50 text-red-600' },
+  question: { label: '질문', className: 'bg-green-50 text-green-600' },
+  guide: { label: '가이드', className: 'bg-yellow-50 text-yellow-600' },
+  discussion: { label: '토론', className: 'bg-blue-50 text-blue-600' },
+  poll: { label: '투표', className: 'bg-purple-50 text-purple-600' },
 };
 
 const TYPE_FILTERS: { value: PostType | ''; label: string }[] = [
@@ -208,73 +209,77 @@ export default function ForumPage() {
     <PageSection last>
       <PageContainer>
       {/* Header */}
-      <header style={s.header}>
-        <div style={s.headerRow}>
+      <header className="mb-6">
+        <div className="flex justify-between items-start gap-5">
           <div>
-            <h1 style={s.title}>K-Cosmetics 커뮤니티</h1>
-            <p style={s.description}>K-Cosmetics에 대한 질문과 의견을 나누는 공간입니다.</p>
+            <h1 className="text-2xl font-bold text-slate-900 mb-2 mt-0">K-Cosmetics 커뮤니티</h1>
+            <p className="text-sm text-slate-500 m-0">K-Cosmetics에 대한 질문과 의견을 나누는 공간입니다.</p>
           </div>
-          <Link to="/forum" style={s.writeButton}>글쓰기</Link>
+          <Link to="/forum" className="inline-flex items-center px-5 py-2.5 text-sm font-semibold text-white bg-primary rounded-lg no-underline whitespace-nowrap shrink-0">글쓰기</Link>
         </div>
       </header>
 
       {/* Search + Filters */}
-      <div style={s.toolbar}>
-        <form style={s.searchForm} onSubmit={handleSearchSubmit}>
+      <div className="mb-4">
+        <form className="flex gap-2 mb-3" onSubmit={handleSearchSubmit}>
           <input
             type="text"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="검색어를 입력하세요"
-            style={s.searchInput}
+            className="flex-1 px-3.5 py-2 text-sm border border-slate-200 rounded-md outline-none bg-white"
           />
-          <button type="submit" style={s.searchBtn}>검색</button>
+          <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-primary border-none rounded-md cursor-pointer whitespace-nowrap">검색</button>
         </form>
-        <div style={s.filterRow}>
-          <div style={s.pills}>
+        <div className="flex justify-between items-center gap-2 flex-wrap mb-2">
+          <div className="flex gap-1 flex-wrap">
             {TYPE_FILTERS.map(({ value, label }) => (
               <button
                 key={value}
                 onClick={() => updateParam('type', value)}
-                style={{ ...s.pill, ...(typeFilter === value ? s.pillActive : {}) }}
+                className={`px-3 py-1 text-xs font-medium rounded-full border cursor-pointer transition-colors ${
+                  typeFilter === value
+                    ? 'bg-primary text-white border-primary'
+                    : 'bg-white text-slate-500 border-slate-200'
+                }`}
               >
                 {label}
               </button>
             ))}
           </div>
-          <select value={sortBy} onChange={(e) => updateParam('sort', e.target.value === 'latest' ? '' : e.target.value)} style={s.select}>
+          <select value={sortBy} onChange={(e) => updateParam('sort', e.target.value === 'latest' ? '' : e.target.value)} className="px-2.5 py-1.5 text-xs border border-slate-200 rounded-md bg-white text-slate-700 outline-none cursor-pointer">
             {SORT_OPTIONS.map(({ value, label }) => <option key={value} value={value}>{label}</option>)}
           </select>
         </div>
         {hasFilters && (
-          <div style={s.activeFilters}>
-            <span style={s.activeLabel}>
+          <div className="flex items-center justify-between px-3 py-1.5 bg-primary-50 rounded-md border border-primary-200">
+            <span className="text-xs text-primary-700">
               {searchQuery && `"${searchQuery}" `}
               {typeFilter && TYPE_FILTERS.find(t => t.value === typeFilter)?.label
                 ? `${TYPE_FILTERS.find(t => t.value === typeFilter)!.label} ` : ''}
               {sortBy !== 'latest' && SORT_OPTIONS.find(o => o.value === sortBy)?.label || ''}
             </span>
-            <button onClick={handleClearAll} style={s.clearBtn}>초기화</button>
+            <button onClick={handleClearAll} className="text-xs text-primary-700 bg-transparent border-none cursor-pointer underline px-1 py-0.5">초기화</button>
           </div>
         )}
       </div>
 
       {/* Loading */}
       {isLoading && (
-        <div style={s.tableWrapper}>
-          <table style={s.table}>
+        <div className="bg-white rounded-lg border border-slate-200 overflow-hidden mb-2">
+          <table className="w-full border-collapse table-fixed">
             <thead><tr>
-              <th style={{ ...s.th, width: '60px' }}>유형</th>
-              <th style={s.th}>제목</th>
-              <th style={{ ...s.th, width: '100px' }}>작성자</th>
-              <th style={{ ...s.th, width: '100px' }}>작성일</th>
-              <th style={{ ...s.th, width: '50px' }}>좋아요</th>
-              <th style={{ ...s.th, width: '50px' }}>댓글</th>
+              <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left" style={{ width: '60px' }}>유형</th>
+              <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left">제목</th>
+              <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left" style={{ width: '100px' }}>작성자</th>
+              <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left" style={{ width: '100px' }}>작성일</th>
+              <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-center" style={{ width: '50px' }}>좋아요</th>
+              <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-center" style={{ width: '50px' }}>댓글</th>
             </tr></thead>
             <tbody>
               {[1,2,3,4,5].map(i => (
-                <tr key={i}><td colSpan={6} style={s.td}>
-                  <div style={{ ...s.skeleton, width: `${50 + i * 8}%` }} />
+                <tr key={i}><td colSpan={6} className="px-3 py-3 border-b border-slate-100">
+                  <div className="h-3.5 bg-slate-200 rounded" style={{ width: `${50 + i * 8}%` }} />
                 </td></tr>
               ))}
             </tbody>
@@ -284,9 +289,9 @@ export default function ForumPage() {
 
       {/* Error */}
       {error && (
-        <div style={s.errorBox}>
-          <p style={s.errorText}>{error}</p>
-          <button onClick={() => window.location.reload()} style={s.retryBtn}>다시 시도</button>
+        <div className="py-10 px-5 text-center bg-red-50 rounded-lg mb-4">
+          <p className="text-red-600 text-sm mb-3 mt-0">{error}</p>
+          <button onClick={() => window.location.reload()} className="px-4 py-2 text-xs font-medium text-red-600 bg-white border border-red-200 rounded-md cursor-pointer">다시 시도</button>
         </div>
       )}
 
@@ -295,25 +300,25 @@ export default function ForumPage() {
         <>
           {/* Pinned rows (page 1 only) */}
           {!hasFilters && pinnedPosts.length > 0 && (
-            <div style={s.tableWrapper}>
-              <table style={s.table}>
+            <div className="bg-white rounded-lg border border-slate-200 overflow-hidden mb-2">
+              <table className="w-full border-collapse table-fixed">
                 <tbody>
                   {pinnedPosts.map(post => {
                     const badge = TYPE_BADGES[post.type];
                     return (
-                      <tr key={post.id} style={s.pinnedRow} onClick={() => handlePostClick(post)}>
-                        <td style={{ ...s.td, width: '60px', textAlign: 'center' }}>
-                          <span style={{ ...s.badge, backgroundColor: badge.bg, color: badge.color }}>{badge.label}</span>
+                      <tr key={post.id} className="cursor-pointer bg-amber-50 hover:bg-amber-100 transition-colors" onClick={() => handlePostClick(post)}>
+                        <td className="px-3 py-3 text-center border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: '60px' }}>
+                          <span className={`inline-block px-2 py-0.5 text-[11px] font-medium rounded ${badge.className}`}>{badge.label}</span>
                         </td>
-                        <td style={s.td}>
-                          <span style={s.pinnedTag}>고정</span>
-                          <span style={s.titleText}>{post.title}</span>
-                          {post.commentCount > 0 && <span style={s.commentBadge}>[{post.commentCount}]</span>}
+                        <td className="px-3 py-3 text-sm text-slate-800 border-b border-slate-100">
+                          <span className="inline-block px-1.5 py-0.5 text-[11px] font-semibold rounded bg-red-50 text-red-600 mr-1.5">고정</span>
+                          <span className="font-medium">{post.title}</span>
+                          {post.commentCount > 0 && <span className="ml-1.5 text-xs text-primary font-medium">[{post.commentCount}]</span>}
                         </td>
-                        <td style={{ ...s.td, width: '100px', color: '#64748b' }}>{post.authorName}</td>
-                        <td style={{ ...s.td, width: '100px', color: '#94a3b8' }}>{formatDate(post.createdAt)}</td>
-                        <td style={{ ...s.td, width: '50px', textAlign: 'center', color: '#64748b' }}>{post.likeCount > 0 ? post.likeCount : ''}</td>
-                        <td style={{ ...s.td, width: '50px', textAlign: 'center', color: '#64748b' }}>{post.commentCount}</td>
+                        <td className="px-3 py-3 text-xs text-slate-500 border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: '100px' }}>{post.authorName}</td>
+                        <td className="px-3 py-3 text-xs text-slate-400 border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: '100px' }}>{formatDate(post.createdAt)}</td>
+                        <td className="px-3 py-3 text-xs text-slate-500 border-b border-slate-100 text-center" style={{ width: '50px' }}>{post.likeCount > 0 ? post.likeCount : ''}</td>
+                        <td className="px-3 py-3 text-xs text-slate-500 border-b border-slate-100 text-center" style={{ width: '50px' }}>{post.commentCount}</td>
                       </tr>
                     );
                   })}
@@ -323,57 +328,57 @@ export default function ForumPage() {
           )}
 
           {/* Info bar */}
-          <div style={s.infoBar}>
-            <span style={s.totalCount}>
+          <div className="flex justify-between items-center py-2 mb-1">
+            <span className="text-xs text-slate-500">
               {hasFilters ? `검색 결과 ${totalCount}건` : `총 ${totalCount}개의 게시글`}
             </span>
             {totalPages > 1 && (
-              <span style={s.pageInfo}>{currentPage} / {totalPages} 페이지</span>
+              <span className="text-xs text-slate-400">{currentPage} / {totalPages} 페이지</span>
             )}
           </div>
 
           {/* Posts table */}
-          <div style={s.tableWrapper}>
-            <table style={s.table}>
+          <div className="bg-white rounded-lg border border-slate-200 overflow-hidden mb-2">
+            <table className="w-full border-collapse table-fixed">
               <thead>
                 <tr>
-                  <th style={{ ...s.th, width: '60px' }}>유형</th>
-                  <th style={s.th}>제목</th>
-                  <th style={{ ...s.th, width: '100px' }}>작성자</th>
-                  <th style={{ ...s.th, width: '100px' }}>작성일</th>
-                  <th style={{ ...s.th, width: '60px' }}>댓글</th>
+                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left" style={{ width: '60px' }}>유형</th>
+                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left">제목</th>
+                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left" style={{ width: '100px' }}>작성자</th>
+                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left" style={{ width: '100px' }}>작성일</th>
+                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-center" style={{ width: '60px' }}>댓글</th>
                 </tr>
               </thead>
               <tbody>
                 {posts.length > 0 ? posts.map(post => {
                   const badge = TYPE_BADGES[post.type];
                   return (
-                    <tr key={post.id} style={s.row} onClick={() => handlePostClick(post)}>
-                      <td style={{ ...s.td, width: '60px', textAlign: 'center' }}>
-                        <span style={{ ...s.badge, backgroundColor: badge.bg, color: badge.color }}>{badge.label}</span>
+                    <tr key={post.id} className="cursor-pointer hover:bg-slate-50 transition-colors" onClick={() => handlePostClick(post)}>
+                      <td className="px-3 py-3 text-center border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: '60px' }}>
+                        <span className={`inline-block px-2 py-0.5 text-[11px] font-medium rounded ${badge.className}`}>{badge.label}</span>
                       </td>
-                      <td style={s.td}>
-                        <span style={s.titleText}>{post.title}</span>
-                        {post.commentCount > 0 && <span style={s.commentBadge}>[{post.commentCount}]</span>}
+                      <td className="px-3 py-3 text-sm text-slate-800 border-b border-slate-100">
+                        <span className="font-medium">{post.title}</span>
+                        {post.commentCount > 0 && <span className="ml-1.5 text-xs text-primary font-medium">[{post.commentCount}]</span>}
                       </td>
-                      <td style={{ ...s.td, width: '100px', color: '#64748b', fontSize: '13px' }}>{post.authorName}</td>
-                      <td style={{ ...s.td, width: '100px', color: '#94a3b8', fontSize: '13px' }}>{formatDate(post.createdAt)}</td>
-                      <td style={{ ...s.td, width: '50px', textAlign: 'center', color: '#64748b', fontSize: '13px' }}>{post.likeCount > 0 ? post.likeCount : ''}</td>
-                      <td style={{ ...s.td, width: '50px', textAlign: 'center', color: '#64748b', fontSize: '13px' }}>{post.commentCount}</td>
+                      <td className="px-3 py-3 text-xs text-slate-500 border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: '100px' }}>{post.authorName}</td>
+                      <td className="px-3 py-3 text-xs text-slate-400 border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: '100px' }}>{formatDate(post.createdAt)}</td>
+                      <td className="px-3 py-3 text-xs text-slate-500 border-b border-slate-100 text-center" style={{ width: '50px' }}>{post.likeCount > 0 ? post.likeCount : ''}</td>
+                      <td className="px-3 py-3 text-xs text-slate-500 border-b border-slate-100 text-center" style={{ width: '50px' }}>{post.commentCount}</td>
                     </tr>
                   );
                 }) : (
                   <tr>
-                    <td colSpan={6} style={s.emptyCell}>
+                    <td colSpan={6} className="py-16 px-5 text-center">
                       {hasFilters ? (
                         <>
-                          <p style={s.emptyTitle}>검색 결과가 없습니다</p>
-                          <button onClick={handleClearAll} style={s.emptyBtn}>전체 목록 보기</button>
+                          <p className="text-sm text-slate-500 mb-3 mt-0">검색 결과가 없습니다</p>
+                          <button onClick={handleClearAll} className="inline-flex items-center px-4 py-2 text-xs font-semibold text-white bg-primary rounded-md border-none cursor-pointer">전체 목록 보기</button>
                         </>
                       ) : (
                         <>
-                          <p style={s.emptyTitle}>아직 등록된 글이 없습니다</p>
-                          <Link to="/forum" style={s.emptyBtn}>글쓰기</Link>
+                          <p className="text-sm text-slate-500 mb-3 mt-0">아직 등록된 글이 없습니다</p>
+                          <Link to="/forum" className="inline-flex items-center px-4 py-2 text-xs font-semibold text-white bg-primary rounded-md no-underline border-none">글쓰기</Link>
                         </>
                       )}
                     </td>
@@ -385,143 +390,39 @@ export default function ForumPage() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div style={s.pagination}>
+            <div className="flex justify-center items-center gap-1 py-6">
               <button onClick={() => goToPage(1)} disabled={currentPage === 1}
-                style={{ ...s.pageBtn, ...(currentPage === 1 ? s.pageBtnDisabled : {}) }}>&laquo;</button>
+                className={`inline-flex items-center justify-center min-w-[36px] h-9 px-2 text-sm font-medium rounded-md border transition-all ${
+                  currentPage === 1 ? 'text-slate-300 cursor-default opacity-50 bg-white border-slate-200' : 'text-slate-600 bg-white border-slate-200 cursor-pointer hover:bg-slate-50'
+                }`}>&laquo;</button>
               <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}
-                style={{ ...s.pageBtn, ...(currentPage === 1 ? s.pageBtnDisabled : {}) }}>&lsaquo;</button>
+                className={`inline-flex items-center justify-center min-w-[36px] h-9 px-2 text-sm font-medium rounded-md border transition-all ${
+                  currentPage === 1 ? 'text-slate-300 cursor-default opacity-50 bg-white border-slate-200' : 'text-slate-600 bg-white border-slate-200 cursor-pointer hover:bg-slate-50'
+                }`}>&lsaquo;</button>
               {pageNumbers.map(p => (
                 <button key={p} onClick={() => goToPage(p)}
-                  style={{ ...s.pageBtn, ...(p === currentPage ? s.pageBtnActive : {}) }}>{p}</button>
+                  className={`inline-flex items-center justify-center min-w-[36px] h-9 px-2 text-sm font-medium rounded-md border transition-all cursor-pointer ${
+                    p === currentPage ? 'bg-primary text-white border-primary' : 'text-slate-600 bg-white border-slate-200 hover:bg-slate-50'
+                  }`}>{p}</button>
               ))}
               <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages}
-                style={{ ...s.pageBtn, ...(currentPage === totalPages ? s.pageBtnDisabled : {}) }}>&rsaquo;</button>
+                className={`inline-flex items-center justify-center min-w-[36px] h-9 px-2 text-sm font-medium rounded-md border transition-all ${
+                  currentPage === totalPages ? 'text-slate-300 cursor-default opacity-50 bg-white border-slate-200' : 'text-slate-600 bg-white border-slate-200 cursor-pointer hover:bg-slate-50'
+                }`}>&rsaquo;</button>
               <button onClick={() => goToPage(totalPages)} disabled={currentPage === totalPages}
-                style={{ ...s.pageBtn, ...(currentPage === totalPages ? s.pageBtnDisabled : {}) }}>&raquo;</button>
+                className={`inline-flex items-center justify-center min-w-[36px] h-9 px-2 text-sm font-medium rounded-md border transition-all ${
+                  currentPage === totalPages ? 'text-slate-300 cursor-default opacity-50 bg-white border-slate-200' : 'text-slate-600 bg-white border-slate-200 cursor-pointer hover:bg-slate-50'
+                }`}>&raquo;</button>
             </div>
           )}
         </>
       )}
 
       {/* Footer */}
-      <div style={s.footer}>
-        <Link to="/" style={s.backLink}>&larr; 홈으로 돌아가기</Link>
+      <div className="mt-6 text-center">
+        <Link to="/" className="text-sm text-slate-500 no-underline hover:text-primary">&larr; 홈으로 돌아가기</Link>
       </div>
       </PageContainer>
     </PageSection>
   );
 }
-
-// ============================================================================
-// Styles
-// ============================================================================
-
-const PRIMARY = '#e91e63';
-
-const s: Record<string, React.CSSProperties> = {
-  container: { maxWidth: '960px', margin: '0 auto', padding: '40px 20px' },
-  header: { marginBottom: '24px' },
-  headerRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '20px' },
-  title: { fontSize: '24px', fontWeight: 700, color: '#0f172a', margin: '0 0 8px 0' },
-  description: { fontSize: '14px', color: '#64748b', margin: 0 },
-  writeButton: {
-    display: 'inline-flex', alignItems: 'center', padding: '10px 20px',
-    fontSize: '14px', fontWeight: 600, color: '#fff', backgroundColor: PRIMARY,
-    textDecoration: 'none', borderRadius: '8px', whiteSpace: 'nowrap', flexShrink: 0,
-  },
-  toolbar: { marginBottom: '16px' },
-  searchForm: { display: 'flex', gap: '8px', marginBottom: '12px' },
-  searchInput: {
-    flex: 1, padding: '8px 14px', fontSize: '14px', border: '1px solid #e2e8f0',
-    borderRadius: '6px', outline: 'none', backgroundColor: '#fff', boxSizing: 'border-box',
-  } as React.CSSProperties,
-  searchBtn: {
-    padding: '8px 18px', fontSize: '14px', fontWeight: 500, color: '#fff',
-    backgroundColor: PRIMARY, border: 'none', borderRadius: '6px', cursor: 'pointer', whiteSpace: 'nowrap',
-  } as React.CSSProperties,
-  filterRow: {
-    display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px',
-    flexWrap: 'wrap', marginBottom: '8px',
-  } as React.CSSProperties,
-  select: {
-    padding: '6px 10px', fontSize: '13px', border: '1px solid #e2e8f0', borderRadius: '6px',
-    backgroundColor: '#fff', color: '#334155', cursor: 'pointer', outline: 'none',
-  } as React.CSSProperties,
-  pills: { display: 'flex', gap: '4px', flexWrap: 'wrap' } as React.CSSProperties,
-  pill: {
-    padding: '4px 12px', fontSize: '12px', fontWeight: 500, border: '1px solid #e2e8f0',
-    borderRadius: '16px', backgroundColor: '#fff', color: '#64748b', cursor: 'pointer',
-  } as React.CSSProperties,
-  pillActive: { backgroundColor: PRIMARY, color: '#fff', borderColor: PRIMARY } as React.CSSProperties,
-  activeFilters: {
-    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-    padding: '6px 12px', backgroundColor: '#fce4ec', borderRadius: '6px', border: '1px solid #f8bbd0',
-  },
-  activeLabel: { fontSize: '13px', color: '#c2185b' },
-  clearBtn: {
-    fontSize: '12px', color: '#c2185b', background: 'none', border: 'none',
-    cursor: 'pointer', textDecoration: 'underline', padding: '2px 4px',
-  } as React.CSSProperties,
-
-  tableWrapper: {
-    backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0',
-    overflow: 'hidden', marginBottom: '8px',
-  },
-  table: { width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' } as React.CSSProperties,
-  th: {
-    padding: '10px 12px', fontSize: '12px', fontWeight: 600, color: '#64748b',
-    backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', textAlign: 'left',
-  } as React.CSSProperties,
-  td: {
-    padding: '12px', fontSize: '14px', color: '#1e293b', borderBottom: '1px solid #f1f5f9',
-    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-  } as React.CSSProperties,
-  row: { cursor: 'pointer', transition: 'background-color 0.1s' },
-  pinnedRow: { cursor: 'pointer', backgroundColor: '#fffbeb', transition: 'background-color 0.1s' },
-  badge: { display: 'inline-block', padding: '2px 8px', fontSize: '11px', fontWeight: 500, borderRadius: '4px' },
-  pinnedTag: {
-    display: 'inline-block', padding: '1px 6px', fontSize: '11px', fontWeight: 600,
-    backgroundColor: '#fef2f2', color: '#dc2626', borderRadius: '3px', marginRight: '6px',
-  },
-  titleText: { fontWeight: 500 },
-  commentBadge: { marginLeft: '6px', fontSize: '13px', color: PRIMARY, fontWeight: 500 },
-
-  infoBar: {
-    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-    padding: '8px 0', marginBottom: '4px',
-  },
-  totalCount: { fontSize: '13px', color: '#64748b' },
-  pageInfo: { fontSize: '13px', color: '#94a3b8' },
-
-  pagination: {
-    display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '4px', padding: '24px 0',
-  },
-  pageBtn: {
-    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-    minWidth: '36px', height: '36px', padding: '0 8px',
-    fontSize: '14px', fontWeight: 500, color: '#475569',
-    backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '6px',
-    cursor: 'pointer', transition: 'all 0.15s',
-  } as React.CSSProperties,
-  pageBtnActive: { backgroundColor: PRIMARY, color: '#fff', borderColor: PRIMARY },
-  pageBtnDisabled: { color: '#cbd5e1', cursor: 'default', opacity: 0.5 },
-
-  emptyCell: { padding: '60px 20px', textAlign: 'center' } as React.CSSProperties,
-  emptyTitle: { fontSize: '15px', color: '#64748b', margin: '0 0 12px 0' },
-  emptyBtn: {
-    display: 'inline-flex', alignItems: 'center', padding: '8px 18px',
-    fontSize: '13px', fontWeight: 600, color: '#fff', backgroundColor: PRIMARY,
-    textDecoration: 'none', borderRadius: '6px', border: 'none', cursor: 'pointer',
-  },
-
-  errorBox: { padding: '40px 20px', textAlign: 'center', backgroundColor: '#fef2f2', borderRadius: '8px', marginBottom: '16px' },
-  errorText: { color: '#dc2626', fontSize: '14px', margin: '0 0 12px 0' },
-  retryBtn: {
-    padding: '8px 18px', fontSize: '13px', fontWeight: 500, color: '#dc2626',
-    backgroundColor: '#fff', border: '1px solid #fecaca', borderRadius: '6px', cursor: 'pointer',
-  },
-  skeleton: { height: '14px', backgroundColor: '#e2e8f0', borderRadius: '4px' },
-
-  footer: { marginTop: '24px', textAlign: 'center' },
-  backLink: { fontSize: '14px', color: '#64748b', textDecoration: 'none' },
-};

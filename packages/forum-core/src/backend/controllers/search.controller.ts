@@ -32,7 +32,7 @@ export class SearchController {
    * - q: Search query string (required)
    * - extensionKey: Extension key filter (e.g., 'neture', 'yaksa')
    * - postType: PostType enum value
-   * - categoryId: Filter by category
+   * - forumId: Filter by forum
    * - organizationId: Filter by organization
    * - sort: 'relevance' | 'latest' | 'popular' | 'oldest' (default: 'relevance')
    * - page: Page number (default: 1)
@@ -44,7 +44,7 @@ export class SearchController {
         q,
         extensionKey,
         postType,
-        categoryId,
+        forumId,
         organizationId,
         authorId,
         sort = 'relevance',
@@ -70,7 +70,7 @@ export class SearchController {
         query: q as string,
         extensionKey: extensionKey as string | undefined,
         postType: postType as PostType | undefined,
-        categoryId: categoryId as string | undefined,
+        forumId: forumId as string | undefined,
         organizationId: organizationId as string | undefined,
         authorId: authorId as string | undefined,
         sort: sort as 'relevance' | 'latest' | 'popular' | 'oldest',

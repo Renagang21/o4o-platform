@@ -24,6 +24,7 @@ export default function MyProfilePage() {
   const [saving, setSaving] = useState(false);
   const [editData, setEditData] = useState({
     name: user?.name || '',
+    nickname: user?.nickname || '',
   });
 
   if (!isAuthenticated || !user) {
@@ -47,8 +48,8 @@ export default function MyProfilePage() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await api.put('/users/profile', { name: editData.name });
-      updateUser({ name: editData.name });
+      await api.put('/users/profile', { name: editData.name, nickname: editData.nickname });
+      updateUser({ name: editData.name, nickname: editData.nickname });
       setIsEditing(false);
       toast.success('프로필이 수정되었습니다.');
     } catch (err: any) {
@@ -60,7 +61,7 @@ export default function MyProfilePage() {
   };
 
   const handleCancel = () => {
-    setEditData({ name: user.name || '' });
+    setEditData({ name: user.name || '', nickname: user.nickname || '' });
     setIsEditing(false);
   };
 
@@ -82,9 +83,20 @@ export default function MyProfilePage() {
           value={user.name}
           editValue={editData.name}
           isEditing={isEditing}
-          onChange={(v) => setEditData({ name: v })}
+          onChange={(v) => setEditData(prev => ({ ...prev, name: v }))}
           icon={<User className="w-5 h-5 text-gray-400" />}
         />
+        <ProfileInfoField
+          label="닉네임"
+          value={user.nickname || '-'}
+          editValue={editData.nickname}
+          isEditing={isEditing}
+          onChange={(v) => setEditData(prev => ({ ...prev, nickname: v }))}
+          icon={<User className="w-5 h-5 text-gray-400" />}
+        />
+        {!isEditing && user.nickname && (
+          <p className="text-xs text-gray-400 -mt-2 ml-10 mb-2">포럼, 댓글 등 공개 화면에 표시됩니다.</p>
+        )}
         <ProfileInfoField
           label="이메일"
           value={user.email}

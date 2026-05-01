@@ -54,7 +54,7 @@ export default function ForumMemberManagementPage() {
     setError(null);
     try {
       const [catRes, reqRes, memRes] = await Promise.all([
-        forumApi.getMyCategories(),
+        forumApi.getMyForums(),
         forumMembershipApi.getJoinRequests(forumId),
         forumMembershipApi.getMembers(forumId),
       ]);

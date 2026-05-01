@@ -192,6 +192,10 @@ export const lmsInstructorApi = {
   deleteLesson: (lessonId: string) =>
     authClient.api.delete<{ success: boolean }>(`/lms/lessons/${lessonId}`),
 
+  /** 레슨 순서 변경 (WO-KPA-LMS-UX-QUICK-WINS-V1) */
+  reorderLessons: (courseId: string, lessonIds: string[]) =>
+    authClient.api.post<{ success: boolean }>(`/lms/courses/${courseId}/lessons/reorder`, { lessonIds }),
+
   /** 강의 발행 */
   publishCourse: (id: string) =>
     authClient.api.post<{ success: boolean; data: Course }>(`/lms/courses/${id}/publish`, {}),

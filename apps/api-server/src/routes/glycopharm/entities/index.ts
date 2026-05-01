@@ -20,8 +20,7 @@ export { GlycopharmFeaturedProduct } from './glycopharm-featured-product.entity.
 
 // Smart Display entities removed — WO-O4O-GLYCOPHARM-SIGNAGE-MIGRATION-V1
 
-// Forum Category Request (GlycoPharm legacy - renamed to avoid collision with forum-core)
-export { GlycopharmForumCategoryRequest, type GlycopharmCategoryRequestStatus } from './forum-category-request.entity.js';
+// GlycopharmForumCategoryRequest removed — WO-O4O-FORUM-CATEGORY-DEAD-CODE-REMOVAL-V1
 
 // Customer Request (Phase 1: Common Request Implementation)
 export {

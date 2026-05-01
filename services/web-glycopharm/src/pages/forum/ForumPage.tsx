@@ -5,6 +5,8 @@
  *
  * 컬럼: 카테고리 | 제목 | 작성자 | 작성일 | 댓글
  * 검색 + 카테고리 필터 + 정렬
+ *
+ * WO-O4O-FORUM-LIST-DESIGN-REFINEMENT-V1: hardcoded blue → primary
  */
 
 import { useState, useEffect, useMemo } from 'react';
@@ -58,7 +60,7 @@ function normalizePost(raw: ForumPostRaw): ForumPost {
   return {
     id: raw.id,
     title: raw.title || '(제목 없음)',
-    author: raw.author?.name || raw.author?.email?.split('@')[0] || '익명',
+    author: (raw as any).authorName || raw.author?.nickname || raw.author?.name || '익명',
     authorRole: '',
     category: raw.category?.name || '일반',
     views: raw.viewCount || 0,
@@ -241,13 +243,13 @@ export default function ForumPage() {
           </select>
         </div>
         {hasFilters && (
-          <div className="flex items-center justify-between px-3 py-1.5 bg-blue-50 rounded-md border border-blue-200">
-            <span className="text-xs text-blue-700">
+          <div className="flex items-center justify-between px-3 py-1.5 bg-primary-50 rounded-md border border-primary-200">
+            <span className="text-xs text-primary-700">
               {searchQuery && `"${searchQuery}" `}
               {categoryFilter !== '전체' && `${categoryFilter} `}
               {sortBy !== 'latest' && SORT_OPTIONS.find(o => o.value === sortBy)?.label}
             </span>
-            <button onClick={handleClearAll} className="text-xs text-blue-700 underline bg-transparent border-none cursor-pointer">초기화</button>
+            <button onClick={handleClearAll} className="text-xs text-primary-700 underline bg-transparent border-none cursor-pointer">초기화</button>
           </div>
         )}
       </div>

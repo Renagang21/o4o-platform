@@ -4,6 +4,9 @@ import { Layout, DemoLayout } from './components';
 import { LoadingSpinner } from './components/common/LoadingSpinner';
 import { AuthProvider, OrganizationProvider } from './contexts';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
+import { TemplateProvider } from '@o4o/ui';
+import { templates } from '@o4o/shared-space-ui';
+import { kpaConfig } from '@o4o/operator-ux-core';
 import { ServiceProvider } from './contexts/ServiceContext';
 import { useAuth } from './contexts/AuthContext';
 import { getPharmacyInfo } from './api/pharmacyInfo';
@@ -396,6 +399,8 @@ function App() {
       <BrowserRouter>
         {/* WO-KPA-CONTEXT-SWITCHER-AND-ORG-RESOLUTION-V1: 라우트 기반 서비스 컨텍스트 */}
         <ServiceProvider>
+        {/* WO-O4O-TEMPLATE-PROVIDER-V1: 서비스 디자인 토큰 자동 주입 */}
+        <TemplateProvider template={templates[kpaConfig.template]}>
         <O4OToastProvider />
         {/* 전역 인증 모달 (WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1, WO-O4O-AUTH-MODAL-REGISTER-STANDARD-V1) */}
         <LoginModal />
@@ -883,6 +888,7 @@ function App() {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
         </Suspense>
+        </TemplateProvider>
         </ServiceProvider>
       </BrowserRouter>
       </OrganizationProvider>

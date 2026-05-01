@@ -82,7 +82,7 @@ export default function MyForumDashboardPage() {
   const loadMyCategories = async () => {
     setCategoriesLoading(true);
     try {
-      const response = await forumApi.getMyCategories();
+      const response = await forumApi.getMyForums();
       const apiRes = response as any;
       setMyCategories((apiRes.data || []) as MyForumCategory[]);
     } catch {
@@ -105,7 +105,7 @@ export default function MyForumDashboardPage() {
     setEditSaving(true);
     setEditError(null);
     try {
-      await forumApi.updateMyCategory(editingCategory.id, {
+      await forumApi.updateMyForum(editingCategory.id, {
         name: trimmedName,
         description: editForm.description.trim() || undefined,
         iconEmoji: editForm.iconEmoji.trim() || null,
@@ -125,7 +125,7 @@ export default function MyForumDashboardPage() {
     setDeleteSaving(true);
     setDeleteError(null);
     try {
-      await forumApi.requestDeleteCategory(deletingCategory.id, { reason: deleteReason.trim() || undefined });
+      await forumApi.requestDeleteForum(deletingCategory.id, { reason: deleteReason.trim() || undefined });
       setDeletingCategory(null);
       setDeleteReason('');
       loadMyCategories();

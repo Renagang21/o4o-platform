@@ -5,14 +5,13 @@
  * Responsibilities:
  * - Create forum tables if they don't exist (adoptExistingTables support)
  * - Seed forum permissions
- * - Initialize default categories (optional)
  */
 
 import type { InstallContext } from '@o4o/types';
 
 export async function install(context: InstallContext): Promise<void> {
   const { dataSource, options = {}, logger } = context;
-  const { adoptExistingTables = true, seedDefaultData = false } = options;
+  const { adoptExistingTables = true } = options;
 
   logger.info('[forum-core] Installing...');
 
@@ -29,11 +28,6 @@ export async function install(context: InstallContext): Promise<void> {
   // 2. Seed forum permissions
   await seedForumPermissions(dataSource, logger);
 
-  // 3. Seed default categories (optional)
-  if (seedDefaultData) {
-    await seedDefaultCategories(dataSource, logger);
-  }
-
   logger.info('[forum-core] Installation completed successfully.');
 }
 
@@ -48,7 +42,6 @@ async function checkForumTablesExist(dataSource: any): Promise<boolean> {
 
     const forumTables = [
       'forum_post',
-      'forum_category',
       'forum_comment',
     ];
 
@@ -111,48 +104,6 @@ async function seedForumPermissions(dataSource: any, logger: any): Promise<void>
       logger.info(`[forum-core] Permission created: ${perm.key}`);
     } else {
       logger.info(`[forum-core] Permission exists: ${perm.key}`);
-    }
-  }
-}
-
-/**
- * Seed default forum categories
- */
-async function seedDefaultCategories(dataSource: any, logger: any): Promise<void> {
-  const categoryRepository = dataSource.getRepository('ForumCategory');
-
-  const defaultCategories = [
-    {
-      name: '공지사항',
-      slug: 'announcements',
-      description: '중요한 공지사항',
-      sortOrder: 1,
-      isActive: true,
-    },
-    {
-      name: '자유게시판',
-      slug: 'general',
-      description: '자유로운 이야기',
-      sortOrder: 2,
-      isActive: true,
-    },
-    {
-      name: '질문답변',
-      slug: 'qna',
-      description: '질문과 답변',
-      sortOrder: 3,
-      isActive: true,
-    },
-  ];
-
-  for (const cat of defaultCategories) {
-    const exists = await categoryRepository.findOne({
-      where: { slug: cat.slug },
-    });
-
-    if (!exists) {
-      await categoryRepository.save(cat);
-      logger.info(`[forum-core] Category created: ${cat.name}`);
     }
   }
 }

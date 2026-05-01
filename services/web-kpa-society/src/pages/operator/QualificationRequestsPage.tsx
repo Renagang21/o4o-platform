@@ -34,6 +34,11 @@ const INSTRUCTOR_FIELD_LABELS: Record<string, string> = {
   lectureTopics: '강의 주제',
   lecturePlanSummary: '강의 계획 요약',
   portfolioUrl: '포트폴리오 URL',
+  plannedCourses: '개설 예정 강의',
+  lectureSubjects: '주요 강의 주제/분야',
+  targetAudience: '예상 강의 대상',
+  lectureFormat: '강의 방식',
+  referenceLinks: '참고 링크',
 };
 
 function TagList({ items }: { items: string[] }) {
@@ -49,7 +54,12 @@ function TagList({ items }: { items: string[] }) {
 }
 
 function InstructorRequestDetail({ data }: { data: Record<string, any> }) {
-  const orderedKeys = ['displayName', 'organization', 'jobTitle', 'expertise', 'bio', 'experience', 'lectureTopics', 'lecturePlanSummary', 'portfolioUrl'];
+  const orderedKeys = [
+    'displayName', 'organization', 'jobTitle', 'expertise',
+    'bio', 'experience',
+    'lectureTopics', 'lecturePlanSummary', 'portfolioUrl',
+    'plannedCourses', 'lectureSubjects', 'targetAudience', 'lectureFormat', 'referenceLinks',
+  ];
   const displayed = new Set<string>();
 
   return (
@@ -375,6 +385,11 @@ export default function QualificationRequestsPage() {
               {selectedRequest.user_email && (
                 <p style={{ fontSize: '13px', color: '#64748b' }}>{selectedRequest.user_email}</p>
               )}
+              {selectedRequest.user_created_at && (
+                <p style={{ fontSize: '12px', color: '#94a3b8', marginTop: '4px' }}>
+                  가입일: {new Date(selectedRequest.user_created_at).toLocaleDateString('ko-KR')}
+                </p>
+              )}
             </div>
 
             <div style={styles.detailRow}>
@@ -393,7 +408,7 @@ export default function QualificationRequestsPage() {
               })()}
             </div>
 
-            {selectedRequest.qualification_type === 'instructor'
+            {(selectedRequest.qualification_type === 'instructor' || selectedRequest.qualification_type === 'lms_creator')
               ? <InstructorRequestDetail data={selectedRequest.request_data as Record<string, any>} />
               : Object.entries(selectedRequest.request_data).map(([k, v]) => (
                   <div key={k} style={styles.detailRow}>

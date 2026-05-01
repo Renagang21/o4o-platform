@@ -19,9 +19,10 @@ import {
   AppEntrySection,
   CtaGuidanceSection,
   O4OHelpSection,
+  templates,
 } from '@o4o/shared-space-ui';
 import type { NoticeItem } from '@o4o/shared-space-ui';
-import { PageSection, PageContainer } from '@o4o/ui';
+import { PageSection, PageContainer, Card, useTemplate } from '@o4o/ui';
 
 // ─── Inline SVG Icons ──────────────────────────────────────
 
@@ -99,6 +100,8 @@ interface ForumPostRaw {
 // ─── Main Component ─────────────────────────────────────────
 
 export default function CommunityMainPage() {
+  const t = templates.glycopharm;
+  const tpl = useTemplate();
   const [noticeItems, setNoticeItems] = useState<NoticeItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -142,7 +145,7 @@ export default function CommunityMainPage() {
   return (
     <div style={styles.page}>
       {/* 0. 상태 요약형 Hero (데이터/관리 느낌) */}
-      <div style={heroStyles.wrapper}>
+      <div style={heroStyles.wrapper} className={`${t.hero.bg} ${t.hero.border} ${t.hero.padding}`}>
         <PageContainer>
           <div style={heroStyles.inner}>
             <div style={heroStyles.titleGroup}>
@@ -197,7 +200,7 @@ export default function CommunityMainPage() {
               <div style={twoColStyles.placeholderHeader}>
                 <h2 style={twoColStyles.placeholderTitle}>약업신문 뉴스</h2>
               </div>
-              <div style={twoColStyles.placeholderCard}>
+              <Card style={twoColStyles.placeholderCard}>
                 <NewspaperIcon />
                 <p style={twoColStyles.placeholderText}>
                   이 영역은 약업신문 뉴스가 표시될 예정입니다.
@@ -210,7 +213,7 @@ export default function CommunityMainPage() {
                 >
                   약업신문 바로가기 →
                 </a>
-              </div>
+              </Card>
             </div>
           </div>
         </PageContainer>
@@ -222,11 +225,11 @@ export default function CommunityMainPage() {
           <AppEntrySection
             accentColor="var(--color-primary)"
             cards={[
-              { title: '포럼', description: '동료 약사와 질문·토론으로 전문성을 높이세요', href: '/forum', icon: <span style={iconStyle}><ForumIcon /></span> },
-              { title: '강의', description: '보수교육·세미나를 온라인으로 수강하세요', href: '/lms', icon: <span style={iconStyle}><EducationIconSvg /></span> },
-              { title: '콘텐츠', description: '플랫폼 콘텐츠를 검색하고 활용하세요', href: '/content', icon: <span style={iconStyle}><ContentIcon /></span> },
-              { title: '디지털 사이니지', description: '약국 디지털 미디어를 관리하세요', href: '/store/signage/library', icon: <span style={iconStyle}><SignageIcon /></span> },
-              { title: '자료실', description: '자료를 저장하고 AI 작업에 활용하세요', href: '/resources', icon: <span style={iconStyle}><ResourceLibraryIcon /></span> },
+              { title: '포럼', description: '동료 약사와 질문·토론으로 전문성을 높이세요', href: '/forum', icon: <span className={`flex items-center justify-center shrink-0 ${tpl?.icon?.wrapper ?? ''} ${tpl?.icon?.icon ?? 'text-primary'}`}><ForumIcon /></span> },
+              { title: '강의', description: '보수교육·세미나를 온라인으로 수강하세요', href: '/lms', icon: <span className={`flex items-center justify-center shrink-0 ${tpl?.icon?.wrapper ?? ''} ${tpl?.icon?.icon ?? 'text-primary'}`}><EducationIconSvg /></span> },
+              { title: '콘텐츠', description: '플랫폼 콘텐츠를 검색하고 활용하세요', href: '/content', icon: <span className={`flex items-center justify-center shrink-0 ${tpl?.icon?.wrapper ?? ''} ${tpl?.icon?.icon ?? 'text-primary'}`}><ContentIcon /></span> },
+              { title: '디지털 사이니지', description: '약국 디지털 미디어를 관리하세요', href: '/store/signage/library', icon: <span className={`flex items-center justify-center shrink-0 ${tpl?.icon?.wrapper ?? ''} ${tpl?.icon?.icon ?? 'text-primary'}`}><SignageIcon /></span> },
+              { title: '자료실', description: '자료를 저장하고 AI 작업에 활용하세요', href: '/resources', icon: <span className={`flex items-center justify-center shrink-0 ${tpl?.icon?.wrapper ?? ''} ${tpl?.icon?.icon ?? 'text-primary'}`}><ResourceLibraryIcon /></span> },
             ]}
           />
         </PageContainer>
@@ -240,7 +243,7 @@ export default function CommunityMainPage() {
             description="디지털 사이니지로 약국을 꾸며보세요"
             href="/store/signage/library"
             linkLabel="사이니지 보기 →"
-            icon={<span style={iconStyle}><SignageIcon /></span>}
+            icon={<span className={`flex items-center justify-center shrink-0 ${tpl?.icon?.icon ?? 'text-primary'}`}><SignageIcon /></span>}
             accentColor="var(--color-primary)"
             accentBg="var(--color-primary-light, #f0fdf4)"
           />
@@ -277,21 +280,11 @@ export default function CommunityMainPage() {
   );
 }
 
-// ─── Icon style ─────────────────────────────────────────────
-
-const iconStyle: React.CSSProperties = {
-  color: 'var(--color-primary)',
-  display: 'flex',
-  alignItems: 'center',
-};
-
 // ─── Hero Styles (상태 요약형 — 옅은 green tint) ────────────
 
 const heroStyles: Record<string, React.CSSProperties> = {
   wrapper: {
-    backgroundColor: '#f0fdf4', /* green-50 — primary/5 equivalent */
-    borderBottom: '1px solid var(--color-border-default, #e2e8f0)',
-    padding: '40px 0 36px',
+    /* bg/border/padding → template className (t.hero.bg/border/padding) */
   },
   inner: {
     display: 'flex',
@@ -385,7 +378,7 @@ const twoColStyles: Record<string, React.CSSProperties> = {
   },
   placeholderCard: {
     backgroundColor: 'var(--color-bg-primary, #ffffff)',
-    borderRadius: 12,
+    /* borderRadius/shadow → Card 컴포넌트 template 자동 적용 */
     border: '1px solid var(--color-border-default, #e2e8f0)',
     padding: '36px 16px',
     display: 'flex',

@@ -31,16 +31,6 @@ export interface ForumPost {
   updatedAt: string;
 }
 
-export interface ForumCategory {
-  id: string;
-  name: string;
-  slug: string;
-  description?: string;
-  postCount: number;
-  order: number;
-  parentId?: string;
-}
-
 export interface ForumModerationItem {
   id: string;
   type: 'post' | 'comment' | 'user';
@@ -79,7 +69,7 @@ class ForumService {
   async createPost(data: {
     title: string;
     content: string;
-    categoryId: string;
+    forumId: string;
     tags?: string[];
   }): Promise<ForumPost> {
     const response = await api.post<ForumPost>(apiEndpoints.forum.posts, data);
@@ -93,30 +83,6 @@ class ForumService {
 
   async deletePost(id: string): Promise<void> {
     await api.delete(`${apiEndpoints.forum.posts}/${id}`);
-  }
-
-  async getCategories(): Promise<ForumCategory[]> {
-    const response = await api.get<ForumCategory[]>(apiEndpoints.forum.categories);
-    return response.data;
-  }
-
-  async createCategory(data: {
-    name: string;
-    slug: string;
-    description?: string;
-    parentId?: string;
-  }): Promise<ForumCategory> {
-    const response = await api.post<ForumCategory>(apiEndpoints.forum.categories, data);
-    return response.data;
-  }
-
-  async updateCategory(id: string, data: Partial<ForumCategory>): Promise<ForumCategory> {
-    const response = await api.put<ForumCategory>(`${apiEndpoints.forum.categories}/${id}`, data);
-    return response.data;
-  }
-
-  async deleteCategory(id: string): Promise<void> {
-    await api.delete(`${apiEndpoints.forum.categories}/${id}`);
   }
 
   async getModerationQueue(params?: {
@@ -142,12 +108,6 @@ class ForumService {
     await api.post(`${apiEndpoints.forum.posts}/bulk/delete`, { ids });
   }
 
-  async bulkMovePostsToCategory(postIds: string[], categoryId: string): Promise<void> {
-    await api.post(`${apiEndpoints.forum.posts}/bulk/move`, {
-      postIds,
-      categoryId,
-    });
-  }
 }
 
 export const forumService = new ForumService();

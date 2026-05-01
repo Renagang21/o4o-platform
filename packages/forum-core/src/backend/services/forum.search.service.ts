@@ -21,7 +21,7 @@ export interface ForumSearchQuery {
   // Filters
   postType?: PostType;
   status?: PostStatus;
-  categoryId?: string;
+  forumId?: string;
   organizationId?: string;
   authorId?: string;
 
@@ -126,7 +126,7 @@ export class ForumSearchService {
       query,
       postType,
       status = PostStatus.PUBLISHED,
-      categoryId,
+      forumId,
       organizationId,
       authorId,
       extensionKey,

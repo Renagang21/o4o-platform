@@ -1,5 +1,6 @@
 import { useEffect, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
+import { useTemplate } from '@o4o/ui';
 import type { CtaGuidanceSectionProps } from './types';
 
 const DEFAULT_ACCENT = '#059669';
@@ -45,6 +46,10 @@ export function CtaGuidanceSection({
     </>
   );
 
+  // WO-O4O-TEMPLATE-BUTTON-STANDARD-V1: template card radius 자동 적용
+  const t = useTemplate();
+  const radiusClass = t?.card?.radius ?? 'rounded-xl';
+
   const cardStyle: CSSProperties = {
     ...styles.card,
     borderLeft: `3px solid ${accentColor}`,
@@ -58,7 +63,7 @@ export function CtaGuidanceSection({
           target="_blank"
           rel="noopener noreferrer"
           style={cardStyle}
-          className="ss-cta-card"
+          className={`ss-cta-card ${radiusClass}`}
         >
           {inner}
         </a>
@@ -68,7 +73,7 @@ export function CtaGuidanceSection({
 
   return (
     <section style={styles.section}>
-      <Link to={href} style={cardStyle} className="ss-cta-card">
+      <Link to={href} style={cardStyle} className={`ss-cta-card ${radiusClass}`}>
         {inner}
       </Link>
     </section>
@@ -85,7 +90,7 @@ const styles: Record<string, CSSProperties> = {
     gap: 16,
     padding: '20px 24px',
     backgroundColor: '#ffffff',
-    borderRadius: 12,
+    /* borderRadius → template className (radiusClass) */
     border: '1px solid #e2e8f0',
     boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
     textDecoration: 'none',

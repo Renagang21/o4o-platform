@@ -7,6 +7,9 @@
  * WO-O4O-FORUM-TAG-UX-AND-SEARCH-V1:
  * 태그 필터 + 인기 태그 바 추가
  *
+ * WO-O4O-FORUM-LIST-DESIGN-REFINEMENT-V1:
+ * inline style → Tailwind, hardcoded hex → theme class
+ *
  * 컬럼: 제목 (태그 포함) | 작성자 | 작성일 | 👍 | 👁 | 💬 | 액션
  */
 
@@ -18,7 +21,6 @@ import { BaseTable, ActionBar, RowActionMenu, PageSection, PageContainer, type O
 import { PageHeader } from '../../components/common';
 import { forumApi } from '../../api';
 import { useAuth } from '../../contexts';
-import { colors } from '../../styles/theme';
 import type { ForumPost } from '../../types';
 import { buildAiClipboardText, stripHtml, blocksToText } from '../../utils/ai-clipboard';
 
@@ -186,28 +188,26 @@ export function ForumListPage() {
       header: '제목',
       render: (_v, row) => (
         <div>
-          <Link to={`/forum/post/${row.id}`} style={s.postLink}>
-            {row.isPinned && <span style={s.pinnedTag}>공지</span>}
-            <span style={{
-              ...s.titleText,
-              backgroundColor: row.isPinned ? '#fffbeb' : undefined,
-            }}>
+          <Link to={`/forum/post/${row.id}`} className="flex items-center gap-1.5 no-underline text-inherit">
+            {row.isPinned && <span className="inline-block px-1.5 py-0.5 text-[11px] font-semibold bg-red-50 text-red-600 rounded shrink-0">공지</span>}
+            <span className={`font-medium overflow-hidden text-ellipsis whitespace-nowrap ${row.isPinned ? 'bg-amber-50' : ''}`}>
               {row.title}
             </span>
             {(row.commentCount ?? 0) > 0 && (
-              <span style={s.commentBadge}>[{row.commentCount}]</span>
+              <span className="ml-1.5 text-xs text-primary font-medium shrink-0">[{row.commentCount}]</span>
             )}
           </Link>
           {Array.isArray((row as any).tags) && (row as any).tags.length > 0 && (
-            <div style={s.tagRow}>
+            <div className="flex gap-1 mt-1 flex-wrap">
               {((row as any).tags as string[]).slice(0, 3).map((tag) => (
                 <button
                   key={tag}
                   onClick={(e) => { e.stopPropagation(); handleTagClick(tag); }}
-                  style={{
-                    ...s.tagChip,
-                    ...(activeTag === tag ? s.tagChipActive : {}),
-                  }}
+                  className={`px-2 py-0.5 text-[11px] font-medium rounded-xl border cursor-pointer transition-all ${
+                    activeTag === tag
+                      ? 'bg-primary border-primary text-white'
+                      : 'bg-slate-50 border-slate-200 text-slate-500'
+                  }`}
                 >
                   #{tag}
                 </button>
@@ -222,7 +222,7 @@ export function ForumListPage() {
       header: '작성자',
       width: '100px',
       render: (val) => (
-        <span style={{ fontSize: '13px', color: colors.neutral500 }}>{val || '-'}</span>
+        <span className="text-xs text-slate-500">{val || '-'}</span>
       ),
     },
     {
@@ -230,7 +230,7 @@ export function ForumListPage() {
       header: '작성일',
       width: '100px',
       render: (val) => (
-        <span style={{ fontSize: '13px', color: colors.neutral400 }}>{formatDate(val)}</span>
+        <span className="text-xs text-slate-400">{formatDate(val)}</span>
       ),
     },
     {
@@ -239,7 +239,7 @@ export function ForumListPage() {
       width: '50px',
       align: 'center',
       render: (val) => (
-        <span style={{ fontSize: '13px', color: colors.neutral500 }}>{(val ?? 0) > 0 ? val : ''}</span>
+        <span className="text-xs text-slate-500">{(val ?? 0) > 0 ? val : ''}</span>
       ),
     },
     {
@@ -248,7 +248,7 @@ export function ForumListPage() {
       width: '50px',
       align: 'center',
       render: (val) => (
-        <span style={{ fontSize: '13px', color: colors.neutral500 }}>{val ?? 0}</span>
+        <span className="text-xs text-slate-500">{val ?? 0}</span>
       ),
     },
     {
@@ -257,7 +257,7 @@ export function ForumListPage() {
       width: '50px',
       align: 'center',
       render: (val) => (
-        <span style={{ fontSize: '13px', color: colors.neutral500 }}>{val ?? 0}</span>
+        <span className="text-xs text-slate-500">{val ?? 0}</span>
       ),
     },
     {
@@ -324,17 +324,17 @@ export function ForumListPage() {
   // ── Empty Message ──
 
   const emptyMessage = (
-    <div style={s.emptyCell}>
+    <div className="py-16 px-5 text-center">
       {hasFilters ? (
         <>
-          <p style={s.emptyTitle}>검색 결과가 없습니다</p>
-          <button onClick={handleClearAll} style={s.emptyBtn}>전체 보기</button>
+          <p className="text-sm text-slate-500 mb-3 mt-0">검색 결과가 없습니다</p>
+          <button onClick={handleClearAll} className="inline-flex items-center px-4 py-2 text-xs font-semibold text-white bg-primary rounded-md border-none cursor-pointer">전체 보기</button>
         </>
       ) : (
         <>
-          <p style={s.emptyTitle}>아직 등록된 글이 없습니다</p>
+          <p className="text-sm text-slate-500 mb-3 mt-0">아직 등록된 글이 없습니다</p>
           {user && (
-            <Link to="/forum/write" style={s.emptyBtn}>글쓰기</Link>
+            <Link to="/forum/write" className="inline-flex items-center px-4 py-2 text-xs font-semibold text-white bg-primary rounded-md no-underline">글쓰기</Link>
           )}
         </>
       )}
@@ -364,20 +364,21 @@ export function ForumListPage() {
 
       {/* Popular Tags Bar */}
       {popularTags.length > 0 && (
-        <div style={s.popularTagsBar}>
-          <span style={s.popularTagsLabel}>
+        <div className="flex items-center gap-2.5 px-3.5 py-2.5 mb-3 bg-slate-50 border border-slate-200 rounded-lg flex-wrap">
+          <span className="inline-flex items-center text-xs font-semibold text-slate-500 whitespace-nowrap shrink-0">
             <Tag size={12} style={{ marginRight: '4px' }} />
             인기 태그
           </span>
-          <div style={s.popularTagsList}>
+          <div className="flex gap-1.5 flex-wrap">
             {popularTags.map(({ tag }) => (
               <button
                 key={tag}
                 onClick={() => handleTagClick(tag)}
-                style={{
-                  ...s.popularTagBtn,
-                  ...(activeTag === tag ? s.popularTagBtnActive : {}),
-                }}
+                className={`px-2.5 py-0.5 text-xs font-medium rounded-xl border cursor-pointer transition-all ${
+                  activeTag === tag
+                    ? 'bg-primary border-primary text-white'
+                    : 'bg-white border-slate-300 text-slate-600'
+                }`}
               >
                 #{tag}
               </button>
@@ -387,30 +388,30 @@ export function ForumListPage() {
       )}
 
       {/* Search + Filters */}
-      <div style={s.toolbar}>
-        <form style={s.searchForm} onSubmit={handleSearchSubmit}>
+      <div className="mb-4">
+        <form className="flex gap-2 mb-3" onSubmit={handleSearchSubmit}>
           <input
             type="text"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="검색어를 입력하세요"
-            style={s.searchInput}
+            className="flex-1 px-3.5 py-2 text-sm border border-slate-200 rounded-md outline-none bg-white"
           />
-          <button type="submit" style={s.searchBtn}>검색</button>
+          <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-primary border-none rounded-md cursor-pointer whitespace-nowrap">검색</button>
         </form>
-        <div style={s.filterRow}>
+        <div className="flex justify-between items-center gap-2 flex-wrap mb-2">
           {user && (
-            <Link to="/forum/write" style={{ ...s.writeButton, marginLeft: 'auto' }}>글쓰기</Link>
+            <Link to="/forum/write" className="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-primary rounded-md no-underline whitespace-nowrap ml-auto">글쓰기</Link>
           )}
         </div>
         {hasFilters && (
-          <div style={s.activeFilters}>
-            <span style={s.activeLabel}>
+          <div className="flex items-center justify-between px-3 py-1.5 bg-primary-50 rounded-md border border-primary-200">
+            <span className="text-xs text-primary-700">
               {searchQuery && `"${searchQuery}"`}
               {searchQuery && activeTag && ' + '}
               {activeTag && `#${activeTag}`}
             </span>
-            <button onClick={handleClearAll} style={s.clearBtn}>전체 보기</button>
+            <button onClick={handleClearAll} className="text-xs text-primary-700 bg-transparent border-none cursor-pointer underline px-1 py-0.5">전체 보기</button>
           </div>
         )}
       </div>
@@ -426,18 +427,18 @@ export function ForumListPage() {
 
       {/* Info bar */}
       {!loading && (
-        <div style={s.infoBar}>
-          <span style={s.totalCount}>
+        <div className="flex justify-between items-center py-2 mb-1">
+          <span className="text-xs text-slate-500">
             {hasFilters ? `검색 결과 ${totalCount}건` : `총 ${totalCount}개의 게시글`}
           </span>
           {totalPages > 1 && (
-            <span style={s.pageInfo}>{currentPage} / {totalPages} 페이지</span>
+            <span className="text-xs text-slate-400">{currentPage} / {totalPages} 페이지</span>
           )}
         </div>
       )}
 
       {/* Table */}
-      <div style={s.tableWrapper}>
+      <div className="bg-white rounded-lg border border-slate-200 overflow-hidden mb-2">
         <BaseTable<ForumPost>
           columns={columns}
           data={posts}
@@ -451,123 +452,32 @@ export function ForumListPage() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div style={s.pagination}>
+        <div className="flex justify-center items-center gap-1 py-6">
           <button onClick={() => goToPage(1)} disabled={currentPage === 1}
-            style={{ ...s.pageBtn, ...(currentPage === 1 ? s.pageBtnDisabled : {}) }}>&laquo;</button>
+            className={`inline-flex items-center justify-center min-w-[36px] h-9 px-2 text-sm font-medium rounded-md border transition-all ${
+              currentPage === 1 ? 'text-slate-300 cursor-default opacity-50 bg-white border-slate-200' : 'text-slate-600 bg-white border-slate-200 cursor-pointer hover:bg-slate-50'
+            }`}>&laquo;</button>
           <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}
-            style={{ ...s.pageBtn, ...(currentPage === 1 ? s.pageBtnDisabled : {}) }}>&lsaquo;</button>
+            className={`inline-flex items-center justify-center min-w-[36px] h-9 px-2 text-sm font-medium rounded-md border transition-all ${
+              currentPage === 1 ? 'text-slate-300 cursor-default opacity-50 bg-white border-slate-200' : 'text-slate-600 bg-white border-slate-200 cursor-pointer hover:bg-slate-50'
+            }`}>&lsaquo;</button>
           {pageNumbers.map(p => (
             <button key={p} onClick={() => goToPage(p)}
-              style={{ ...s.pageBtn, ...(p === currentPage ? s.pageBtnActive : {}) }}>{p}</button>
+              className={`inline-flex items-center justify-center min-w-[36px] h-9 px-2 text-sm font-medium rounded-md border transition-all cursor-pointer ${
+                p === currentPage ? 'bg-primary text-white border-primary' : 'text-slate-600 bg-white border-slate-200 hover:bg-slate-50'
+              }`}>{p}</button>
           ))}
           <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages}
-            style={{ ...s.pageBtn, ...(currentPage === totalPages ? s.pageBtnDisabled : {}) }}>&rsaquo;</button>
+            className={`inline-flex items-center justify-center min-w-[36px] h-9 px-2 text-sm font-medium rounded-md border transition-all ${
+              currentPage === totalPages ? 'text-slate-300 cursor-default opacity-50 bg-white border-slate-200' : 'text-slate-600 bg-white border-slate-200 cursor-pointer hover:bg-slate-50'
+            }`}>&rsaquo;</button>
           <button onClick={() => goToPage(totalPages)} disabled={currentPage === totalPages}
-            style={{ ...s.pageBtn, ...(currentPage === totalPages ? s.pageBtnDisabled : {}) }}>&raquo;</button>
+            className={`inline-flex items-center justify-center min-w-[36px] h-9 px-2 text-sm font-medium rounded-md border transition-all ${
+              currentPage === totalPages ? 'text-slate-300 cursor-default opacity-50 bg-white border-slate-200' : 'text-slate-600 bg-white border-slate-200 cursor-pointer hover:bg-slate-50'
+            }`}>&raquo;</button>
         </div>
       )}
       </PageContainer>
     </PageSection>
   );
 }
-
-// ============================================================================
-// Styles
-// ============================================================================
-
-const s: Record<string, React.CSSProperties> = {
-  container: { maxWidth: '1000px', margin: '0 auto', padding: '0 20px 40px' },
-  popularTagsBar: {
-    display: 'flex', alignItems: 'center', gap: '10px',
-    padding: '10px 14px', marginBottom: '12px',
-    backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px',
-    flexWrap: 'wrap',
-  } as React.CSSProperties,
-  popularTagsLabel: {
-    display: 'inline-flex', alignItems: 'center',
-    fontSize: '12px', fontWeight: 600, color: '#64748b', whiteSpace: 'nowrap', flexShrink: 0,
-  } as React.CSSProperties,
-  popularTagsList: { display: 'flex', gap: '6px', flexWrap: 'wrap' } as React.CSSProperties,
-  popularTagBtn: {
-    padding: '3px 10px', fontSize: '12px', fontWeight: 500,
-    border: '1px solid #cbd5e1', borderRadius: '12px',
-    backgroundColor: '#fff', color: '#475569', cursor: 'pointer',
-    transition: 'all 0.15s',
-  } as React.CSSProperties,
-  popularTagBtnActive: {
-    backgroundColor: colors.primary, borderColor: colors.primary, color: '#fff',
-  },
-  toolbar: { marginBottom: '16px' },
-  searchForm: { display: 'flex', gap: '8px', marginBottom: '12px' },
-  searchInput: {
-    flex: 1, padding: '8px 14px', fontSize: '14px', border: `1px solid ${colors.neutral200}`,
-    borderRadius: '6px', outline: 'none', backgroundColor: colors.white, boxSizing: 'border-box',
-  } as React.CSSProperties,
-  searchBtn: {
-    padding: '8px 18px', fontSize: '14px', fontWeight: 500, color: colors.white,
-    backgroundColor: colors.primary, border: 'none', borderRadius: '6px', cursor: 'pointer', whiteSpace: 'nowrap',
-  } as React.CSSProperties,
-  filterRow: {
-    display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px',
-    flexWrap: 'wrap', marginBottom: '8px',
-  } as React.CSSProperties,
-  writeButton: {
-    padding: '10px 20px', backgroundColor: colors.primary, color: colors.white,
-    textDecoration: 'none', borderRadius: '6px', fontSize: '14px', fontWeight: 500, whiteSpace: 'nowrap',
-  } as React.CSSProperties,
-  activeFilters: {
-    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-    padding: '6px 12px', backgroundColor: '#eff6ff', borderRadius: '6px', border: '1px solid #bfdbfe',
-  },
-  activeLabel: { fontSize: '13px', color: '#1d4ed8' },
-  clearBtn: {
-    fontSize: '12px', color: '#1d4ed8', background: 'none', border: 'none',
-    cursor: 'pointer', textDecoration: 'underline', padding: '2px 4px',
-  } as React.CSSProperties,
-  infoBar: {
-    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-    padding: '8px 0', marginBottom: '4px',
-  },
-  totalCount: { fontSize: '13px', color: colors.neutral500 },
-  pageInfo: { fontSize: '13px', color: colors.neutral400 },
-  tableWrapper: {
-    backgroundColor: colors.white, borderRadius: '8px', border: `1px solid ${colors.neutral200}`,
-    overflow: 'hidden', marginBottom: '8px',
-  },
-  postLink: { display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none', color: 'inherit' },
-  pinnedTag: {
-    display: 'inline-block', padding: '1px 6px', fontSize: '11px', fontWeight: 600,
-    backgroundColor: '#fef2f2', color: colors.accentRed, borderRadius: '3px', flexShrink: 0,
-  },
-  titleText: { fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } as React.CSSProperties,
-  commentBadge: { marginLeft: '6px', fontSize: '13px', color: colors.primary, fontWeight: 500, flexShrink: 0 },
-  tagRow: { display: 'flex', gap: '4px', marginTop: '4px', flexWrap: 'wrap' } as React.CSSProperties,
-  tagChip: {
-    padding: '2px 8px', fontSize: '11px', fontWeight: 500,
-    border: '1px solid #e2e8f0', borderRadius: '10px',
-    backgroundColor: '#f8fafc', color: '#64748b', cursor: 'pointer',
-    transition: 'all 0.15s',
-  } as React.CSSProperties,
-  tagChipActive: {
-    backgroundColor: colors.primary, borderColor: colors.primary, color: '#fff',
-  },
-  pagination: {
-    display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '4px', padding: '24px 0',
-  },
-  pageBtn: {
-    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-    minWidth: '36px', height: '36px', padding: '0 8px',
-    fontSize: '14px', fontWeight: 500, color: colors.neutral600,
-    backgroundColor: colors.white, border: `1px solid ${colors.neutral200}`, borderRadius: '6px',
-    cursor: 'pointer', transition: 'all 0.15s',
-  } as React.CSSProperties,
-  pageBtnActive: { backgroundColor: colors.primary, color: colors.white, borderColor: colors.primary },
-  pageBtnDisabled: { color: colors.neutral300, cursor: 'default', opacity: 0.5 },
-  emptyCell: { padding: '60px 20px', textAlign: 'center' } as React.CSSProperties,
-  emptyTitle: { fontSize: '15px', color: colors.neutral500, margin: '0 0 12px 0' },
-  emptyBtn: {
-    display: 'inline-flex', alignItems: 'center', padding: '8px 18px',
-    fontSize: '13px', fontWeight: 600, color: colors.white, backgroundColor: colors.primary,
-    textDecoration: 'none', borderRadius: '6px', border: 'none', cursor: 'pointer',
-  },
-};

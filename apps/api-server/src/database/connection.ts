@@ -157,7 +157,7 @@ import {
   GlycopharmEvent,
   GlycopharmRequestActionLog,
   GlycopharmBillingInvoice, // Phase 3-D: Invoice Finalization
-  GlycopharmForumCategoryRequest, // Forum Category Request (legacy)
+  // GlycopharmForumCategoryRequest — REMOVED (WO-O4O-FORUM-CATEGORY-DEAD-CODE-REMOVAL-V1)
   // GlycopharmOrder, GlycopharmOrderItem - REMOVED (Phase 4-A: Legacy Order System Deprecation)
   // TabletServiceRequest — REMOVED (WO-O4O-STORE-TABLET-LEGACY-CLEANUP-V1)
   StoreBlogPost, // WO-STORE-BLOG-CHANNEL-V1
@@ -699,7 +699,7 @@ export const AppDataSource = new DataSource({
     GlycopharmEvent,
     GlycopharmRequestActionLog,
     GlycopharmBillingInvoice, // Phase 3-D: Invoice Finalization
-    GlycopharmForumCategoryRequest, // Forum Category Request (legacy)
+    // GlycopharmForumCategoryRequest — REMOVED (WO-O4O-FORUM-CATEGORY-DEAD-CODE-REMOVAL-V1)
     // TabletServiceRequest — REMOVED (WO-O4O-STORE-TABLET-LEGACY-CLEANUP-V1)
     StoreBlogPost, // WO-STORE-BLOG-CHANNEL-V1
     GlycopharmPharmacyExtension, // WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1

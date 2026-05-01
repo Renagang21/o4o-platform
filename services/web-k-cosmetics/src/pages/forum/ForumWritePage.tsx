@@ -36,7 +36,7 @@ function textToBlocks(text: string): Array<{ type: string; content: string }> {
 
 export default function ForumWritePage() {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [categories, setCategories] = useState<PopularForum[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -121,6 +121,14 @@ export default function ForumWritePage() {
     <div style={styles.page}>
       <div style={styles.container}>
         <h1 style={styles.heading}>Write a Post</h1>
+
+        {user && (
+          <div style={styles.authorInfo}>
+            <span style={styles.authorLabel}>Display name:</span>
+            <span style={styles.authorName}>{user.nickname || user.name}</span>
+            <p style={styles.authorHint}>(You can change your display name in your profile settings)</p>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} style={styles.form}>
           {/* Category */}
@@ -287,6 +295,32 @@ const styles: Record<string, CSSProperties> = {
     backgroundColor: '#DB2777',
     color: 'white',
     cursor: 'pointer',
+  },
+  authorInfo: {
+    display: 'flex',
+    flexWrap: 'wrap' as const,
+    alignItems: 'center',
+    gap: 8,
+    padding: '12px 16px',
+    backgroundColor: '#f1f5f9',
+    borderRadius: 8,
+    marginBottom: 24,
+  },
+  authorLabel: {
+    fontSize: 13,
+    color: '#64748b',
+  },
+  authorName: {
+    fontSize: 14,
+    fontWeight: 600,
+    color: '#1e293b',
+  },
+  authorHint: {
+    fontSize: 12,
+    color: '#94a3b8',
+    margin: 0,
+    width: '100%',
+    marginTop: 2,
   },
   loginPrompt: {
     textAlign: 'center' as const,

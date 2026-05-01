@@ -22,7 +22,7 @@ import toast from 'react-hot-toast';
 interface ForumPostFormData {
   title: string;
   content: any; // Block[] or HTML string
-  categoryId: string;
+  forumId: string;
   status: 'published' | 'draft';
   isPinned: boolean;
   isLocked: boolean;
@@ -37,7 +37,7 @@ const ForumPostForm: FC = () => {
   const [formData, setFormData] = useState<ForumPostFormData>({
     title: '',
     content: '',
-    categoryId: '',
+    forumId: '',
     status: 'published',
     isPinned: false,
     isLocked: false
@@ -111,7 +111,7 @@ const ForumPostForm: FC = () => {
       setFormData({
         title: post.title,
         content: post.content,
-        categoryId: post.category.id,
+        forumId: post.forumId || post.category?.id,
         status: post.status,
         isPinned: post.isPinned,
         isLocked: post.isLocked
@@ -132,7 +132,7 @@ const ForumPostForm: FC = () => {
       return;
     }
 
-    if (!formData.categoryId) {
+    if (!formData.forumId) {
       toast.error('카테고리를 선택하세요');
       return;
     }
@@ -201,15 +201,15 @@ const ForumPostForm: FC = () => {
               <div>
                 <Label htmlFor="category">카테고리 *</Label>
                 <Select
-                  value={formData.categoryId}
-                  onValueChange={(value: string) => handleChange('categoryId', value)}
+                  value={formData.forumId}
+                  onValueChange={(value: string) => handleChange('forumId', value)}
                 >
                   <SelectTrigger>
                       <SelectValue 
                         placeholder="카테고리를 선택하세요"
-                      getDisplayValue={(categoryId) => {
-                        const category = categories.find((c: any) => c.id === categoryId);
-                        return category?.name || categoryId;
+                      getDisplayValue={(forumId) => {
+                        const forum = categories.find((c: any) => c.id === forumId);
+                        return forum?.name || forumId;
                       }}
                     />
                   </SelectTrigger>
