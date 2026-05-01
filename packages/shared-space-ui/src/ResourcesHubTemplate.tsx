@@ -42,7 +42,6 @@ import {
   ExternalLink,
   Download,
   File,
-  Link2,
   Trash2,
   Plus,
   Heart,
@@ -193,6 +192,52 @@ function extractFirstLinkFromHtml(html: string): string | null {
   div.innerHTML = DOMPurify.sanitize(html);
   const a = div.querySelector('a[href]');
   return a ? (a as HTMLAnchorElement).href : null;
+}
+
+/**
+ * WO-KPA-RESOURCES-BULK-COPY-AI-FORMAT-V1:
+ *   선택된 자료를 후속 작업용 AI에게 전달하기 좋은 텍스트 블록으로 포맷.
+ *   메타정보(등록자/등록일/조회수/좋아요)는 제외. 제목·유형은 항상 포함.
+ *   링크는 LINK/DOWNLOAD 타입에만 포함.
+ */
+function formatResourceForAI(row: ResourcesHubItem, index: number): string {
+  const at = getActionType(row);
+  const typeLabel =
+    at === 'view' ? 'READ'
+    : at === 'copy' ? 'COPY'
+    : at === 'external' ? 'LINK'
+    : 'DOWNLOAD';
+
+  const contentText = row.body ? extractTextFromHtml(row.body) : '';
+
+  let link = '';
+  if (at === 'external') {
+    link = row.source_url || (row.body ? extractFirstLinkFromHtml(row.body) ?? '' : '');
+  } else if (at === 'download') {
+    link = row.source_url ?? '';
+  }
+
+  const lines: string[] = [];
+  lines.push(`[자료 ${index + 1}]`);
+  lines.push(`제목: ${row.title || '(제목 없음)'}`);
+  lines.push(`유형: ${typeLabel}`);
+
+  if (contentText) {
+    lines.push('내용:');
+    lines.push(contentText);
+  }
+
+  if (link) {
+    if (contentText) lines.push('');
+    lines.push('링크:');
+    lines.push(link);
+  }
+
+  if (!contentText && !link) {
+    lines.push('내용 없음');
+  }
+
+  return lines.join('\n');
 }
 
 const FILE_TYPE_BADGE: Record<string, { label: string; bg: string; color: string }> = {
@@ -391,13 +436,42 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
 
   // ─── Bulk ─────────────────────────────────────────────────────────────────
 
-  const handleBulkCopy = useCallback(() => {
-    const urls = items
-      .filter(item => selectedKeys.has(item.id))
-      .map(item => item.source_url || `${window.location.origin}/resources`)
-      .join('\n');
-    navigator.clipboard.writeText(urls).catch(() => {});
-  }, [items, selectedKeys]);
+  // WO-KPA-RESOURCES-BULK-COPY-AI-FORMAT-V1:
+  //   선택 자료를 AI 입력 친화 포맷([자료 N] 블록)으로 클립보드에 복사.
+  //   body가 비어있는 row는 fetchDetail로 한 번 더 시도 (단건 가져가기와 동일 정책).
+  //   메타정보(등록자/조회수/좋아요)는 제외. 제목·유형은 항상 포함.
+  const handleBulkCopy = useCallback(async () => {
+    const selectedRows = items.filter(item => selectedKeys.has(item.id));
+    if (selectedRows.length === 0) return;
+
+    const notify = config.onToast;
+
+    // body 없는 row는 detail에서 보강
+    const enriched = await Promise.all(
+      selectedRows.map(async (row) => {
+        if (row.body || !config.fetchDetail) return row;
+        try {
+          const detail = await config.fetchDetail(row.id);
+          return {
+            ...row,
+            body: detail.body ?? row.body,
+            source_url: row.source_url ?? detail.source_url,
+          };
+        } catch {
+          return row;
+        }
+      }),
+    );
+
+    const text = enriched.map((row, i) => formatResourceForAI(row, i)).join('\n\n');
+
+    try {
+      await navigator.clipboard.writeText(text);
+      notify?.(`선택한 자료 ${selectedRows.length}건이 복사되었습니다`, 'success');
+    } catch {
+      notify?.('복사에 실패했습니다', 'error');
+    }
+  }, [items, selectedKeys, config]);
 
   const handleBulkDelete = useCallback(async () => {
     if (!config.onDelete && !config.onBulkDelete) return;
@@ -587,9 +661,10 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
   const bulkActions: ActionBarAction[] = useMemo(() => {
     const actions: ActionBarAction[] = [
       {
+        // WO-KPA-RESOURCES-BULK-COPY-AI-FORMAT-V1: AI 친화 포맷으로 복사 (제목/유형/내용/링크)
         key: 'copy',
-        label: '링크 복사',
-        icon: <Link2 size={14} />,
+        label: '선택 자료 복사',
+        icon: <Copy size={14} />,
         onClick: handleBulkCopy,
       },
     ];
