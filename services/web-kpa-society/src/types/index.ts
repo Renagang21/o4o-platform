@@ -147,7 +147,6 @@ export interface Course {
   lessonCount: number;
   enrollmentCount: number;
   category: string;
-  level: 'beginner' | 'intermediate' | 'advanced';
   status: 'draft' | 'published' | 'archived';
   createdAt: string;
   isPaid?: boolean;
@@ -165,7 +164,6 @@ export interface InstructorCourseItem {
   title: string;
   description: string;
   thumbnail: string | null;
-  level: 'beginner' | 'intermediate' | 'advanced';
   duration: number;
   isPaid: boolean;
   price: number | null;
