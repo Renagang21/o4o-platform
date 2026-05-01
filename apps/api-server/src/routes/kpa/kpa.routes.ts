@@ -490,6 +490,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // Comments
   forumRouter.get('/posts/:postId/comments', forumController.listComments.bind(forumController));
   forumRouter.post('/comments', authenticate, forumController.createComment.bind(forumController));
+  // WO-FORUM-COMMENT-ROUTE-STANDARDIZATION-V1: RESTful nested 경로 추가 (프론트 정합)
+  forumRouter.post('/posts/:postId/comments', authenticate, forumController.createComment.bind(forumController));
+  forumRouter.delete('/posts/:postId/comments/:id', authenticate, forumController.deleteComment.bind(forumController));
 
   // Forum Directory (읽기: 공개, 쓰기: admin scope — WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1)
   // (path /categories kept for compat — WO-O4O-FORUM-NAMING-CLEANUP-V1)

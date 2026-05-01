@@ -103,7 +103,10 @@ export class ForumCommentController extends ForumControllerBase {
         return;
       }
 
-      const { postId, content, parentId } = req.body;
+      // WO-FORUM-COMMENT-ROUTE-STANDARDIZATION-V1
+      // Nested route(/posts/:postId/comments)는 URL의 postId 우선, 기존 flat route(/comments)는 body.postId fallback
+      const postId = (req.params.postId as string) || (req.body.postId as string);
+      const { content, parentId } = req.body;
 
       // Validate required fields
       if (!postId) {
