@@ -366,10 +366,13 @@ export interface ReviewApplicationResponse {
 class GlycopharmApiClient {
   private async request<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: { method?: string; body?: unknown } = {}
   ): Promise<T> {
     const method = (options.method || 'GET').toUpperCase();
-    const body = options.body ? JSON.parse(options.body as string) : undefined;
+    // body는 plain object 또는 직렬화된 string. axios는 객체를 직접 받으므로 string은 parse.
+    const body = typeof options.body === 'string'
+      ? JSON.parse(options.body)
+      : options.body;
 
     try {
       const response = method === 'GET'

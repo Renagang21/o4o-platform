@@ -101,7 +101,7 @@ export default function StoreApprovalsPage() {
 
   // Pagination
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
 
   const loadApplications = useCallback(async () => {

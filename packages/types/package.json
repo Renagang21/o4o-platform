@@ -40,7 +40,9 @@
   "sideEffects": false,
   "scripts": {
     "build": "npx tsc --build",
-    "type-check": "tsc --noEmit"
+    "clean": "rimraf dist tsconfig.tsbuildinfo",
+    "type-check": "tsc --noEmit",
+    "prepare": "npm run build"
   },
   "devDependencies": {
     "@types/react": "^19.2.0",

@@ -17,6 +17,7 @@ import { apiClient } from '@/services/api';
 interface ForumPostAuthor {
   id: string;
   name?: string;
+  nickname?: string | null;
   email?: string;
 }
 

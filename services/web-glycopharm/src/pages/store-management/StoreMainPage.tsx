@@ -28,7 +28,6 @@ import {
   Tv,
   Sparkles,
   RefreshCw,
-  TrendingUp,
   Activity,
   BarChart3,
   Zap,

@@ -21,7 +21,7 @@ interface PostDetail {
   title: string;
   content?: string | null;
   body?: string | null;
-  author?: { name?: string; email?: string } | null;
+  author?: { name?: string; nickname?: string | null; email?: string } | null;
   category?: { name?: string } | null;
   viewCount: number;
   commentCount: number;
@@ -35,7 +35,7 @@ interface Comment {
   id: string;
   content?: string | null;
   body?: string | null;
-  author?: { name?: string; email?: string } | null;
+  author?: { name?: string; nickname?: string | null; email?: string } | null;
   createdAt: string;
 }
 

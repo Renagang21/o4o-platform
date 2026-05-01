@@ -25,6 +25,7 @@ import {
   GraduationCap,
   Settings,
   Shield,
+  LayoutDashboard,
 } from 'lucide-react';
 
 import ServiceSwitcher from '../ServiceSwitcher';

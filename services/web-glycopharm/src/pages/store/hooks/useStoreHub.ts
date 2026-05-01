@@ -136,8 +136,6 @@ function buildGlycoSignals(data: CockpitData): Record<string, HubSignal> {
 // ─── QuickAction Executor ───
 
 async function executeAction(key: string, _payload?: Record<string, unknown>): Promise<HubActionResult> {
-  const api = authClient.api;
-
   switch (key) {
     case 'glycopharm.trigger.review_requests': {
       // Navigate action — no API call

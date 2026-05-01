@@ -45,7 +45,7 @@ interface PaginationMeta {
 const columns: Column<CourseRow>[] = [
   {
     key: 'title',
-    header: '강의명',
+    title: '강의명',
     render: (row) => (
       <div>
         <p className="font-medium text-slate-800 truncate max-w-xs">{row.title}</p>
@@ -55,7 +55,7 @@ const columns: Column<CourseRow>[] = [
   },
   {
     key: 'isPublished',
-    header: '공개',
+    title: '공개',
     render: (row) => (
       <span className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full font-medium ${
         row.isPublished
@@ -71,7 +71,7 @@ const columns: Column<CourseRow>[] = [
   },
   {
     key: 'duration',
-    header: '시간',
+    title: '시간',
     render: (row) => (
       <span className="text-sm text-slate-600">
         {row.duration > 0 ? `${row.duration}분` : '-'}
@@ -80,7 +80,7 @@ const columns: Column<CourseRow>[] = [
   },
   {
     key: 'createdAt',
-    header: '생성일',
+    title: '생성일',
     render: (row) => (
       <span className="text-sm text-slate-500">
         {new Date(row.createdAt).toLocaleDateString('ko-KR')}
@@ -134,7 +134,7 @@ export default function LmsCoursesPage() {
     <div className="space-y-6">
       <PageHeader
         title="강의 관리"
-        subtitle={`총 ${meta.total}개 강의`}
+        description={`총 ${meta.total}개 강의`}
         icon={<BookOpen className="w-6 h-6" />}
       />
 
@@ -186,8 +186,9 @@ export default function LmsCoursesPage() {
           </div>
         ) : (
           <DataTable
-            columns={columns}
-            data={courses}
+            columns={columns as Column<Record<string, any>>[]}
+            dataSource={courses}
+            rowKey="id"
             onRowClick={(row) => navigate(`/education/${row.id}`)}
           />
         )}

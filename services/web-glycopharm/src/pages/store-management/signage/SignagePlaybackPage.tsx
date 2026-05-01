@@ -140,7 +140,7 @@ export default function SignagePlaybackPage() {
 
     // 1차: 인증 API (내 플레이리스트)
     api.get(`${SIGNAGE_BASE}/playlists/${playlistId}`)
-      .then((res) => {
+      .then((res: { data: any }) => {
         const data = (res.data as any)?.data ?? res.data;
         if (data?.id) { setPlaylist(data); return; }
         throw new Error('not found');

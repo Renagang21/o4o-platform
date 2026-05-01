@@ -76,7 +76,7 @@ export default function PharmaciesPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedPharmacy, setSelectedPharmacy] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
+  const [isBulkProcessing] = useState(false);
 
   // API data state
   const [pharmacies, setPharmacies] = useState<OperatorPharmacy[]>([]);
@@ -84,7 +84,7 @@ export default function PharmaciesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalItems, setTotalItems] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
+  const [, setTotalPages] = useState(1);
 
   const itemsPerPage = 10;
 

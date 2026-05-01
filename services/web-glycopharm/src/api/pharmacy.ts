@@ -278,12 +278,6 @@ class PharmacyApiClient {
     }
   }
 
-  /** Unwrap standard { success, data } API envelope returned by Care endpoints */
-  private unwrap<T>(res: unknown): T {
-    const obj = res as Record<string, unknown>;
-    return obj && typeof obj === 'object' && 'data' in obj ? (obj.data as T) : (res as T);
-  }
-
   // ============================================================================
   // Dashboard API
   // ============================================================================

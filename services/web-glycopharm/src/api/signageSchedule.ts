@@ -90,7 +90,10 @@ export async function fetchSchedules(
 
   const res = await api.get(url, { headers: orgHeaders(organizationId) });
   const json = res.data as { data?: { items?: SignageScheduleItem[]; total?: number }; items?: SignageScheduleItem[]; total?: number };
-  return json.data ?? { items: json.items ?? [], total: json.total ?? 0 };
+  if (json.data) {
+    return { items: json.data.items ?? [], total: json.data.total ?? 0 };
+  }
+  return { items: json.items ?? [], total: json.total ?? 0 };
 }
 
 export async function createSchedule(

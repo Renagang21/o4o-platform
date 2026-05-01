@@ -81,15 +81,16 @@ export default function PharmacySettings() {
                 `/glycopharm/stores/${encodeURIComponent(slug)}/channels`
               );
               if (channelsRes.data?.success && Array.isArray(channelsRes.data?.data)) {
-                const channels = channelsRes.data.data;
+                type ChannelRow = { type: string; status: string; config: any; approvedAt: string | null; createdAt: string };
+                const channels: ChannelRow[] = channelsRes.data.data;
                 const mapStatus = (status: string): 'none' | 'requested' | 'approved' | 'rejected' => {
                   if (status === 'APPROVED') return 'approved';
                   if (status === 'PENDING') return 'requested';
                   if (status === 'REJECTED') return 'rejected';
                   return 'none';
                 };
-                const kiosk = channels.find(c => c.type === 'KIOSK');
-                const tablet = channels.find(c => c.type === 'TABLET');
+                const kiosk = channels.find((c) => c.type === 'KIOSK');
+                const tablet = channels.find((c) => c.type === 'TABLET');
                 setDeviceSettings(prev => ({
                   ...prev,
                   kioskStatus: kiosk ? mapStatus(kiosk.status) : 'none',

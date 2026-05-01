@@ -19,11 +19,18 @@ export function usePharmacyUnread(intervalMs = 10_000): PharmacyUnread {
   useEffect(() => {
     mountedRef.current = true;
 
+    // 백엔드 미배포 상태일 수 있어 메서드 존재 여부를 런타임에 확인
+    type UnreadApi = {
+      getPharmacyUnreadCount?: () => Promise<{ count: number }>;
+      getPharmacyUnreadByPatient?: () => Promise<Array<{ patientId: string; count: number }>>;
+    };
+    const unreadApi = pharmacyApi as unknown as UnreadApi;
+
     const fetch = async () => {
       try {
         const [countRes, byPatientRes] = await Promise.all([
-          pharmacyApi.getPharmacyUnreadCount().catch(() => null),
-          pharmacyApi.getPharmacyUnreadByPatient().catch(() => null),
+          unreadApi.getPharmacyUnreadCount?.().catch(() => null) ?? null,
+          unreadApi.getPharmacyUnreadByPatient?.().catch(() => null) ?? null,
         ]);
         if (!mountedRef.current) return;
 

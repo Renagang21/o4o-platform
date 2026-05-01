@@ -369,7 +369,7 @@ export default function CourseDetailPage() {
 
   // ── 수강신청 ───────────────────────────────────────────────────────────────
   const handleEnroll = async () => {
-    if (!isAuthenticated) { openLoginModal(`/education/${id}`); return; }
+    if (!isAuthenticated) { openLoginModal(); return; }
     if (!id) return;
     setEnrolling(true);
     setEnrollError(null);

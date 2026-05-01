@@ -12,7 +12,6 @@ import {
   Package,
   Search,
   RefreshCw,
-  Loader2,
   AlertCircle,
   Image,
   Truck,

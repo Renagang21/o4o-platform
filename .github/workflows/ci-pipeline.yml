@@ -27,7 +27,19 @@ jobs:
       uses: ./.github/actions/setup-build-env
       with:
         node-version: ${{ env.NODE_VERSION }}
-    
+
+    # WO-O4O-TYPES-AUTO-BUILD-GUARD-V1
+    # setup-build-env가 이미 pnpm run build:packages를 실행하지만,
+    # types/dist가 stale인 채로 type-check가 도는 회귀를 다시 방지하기 위한 명시 가드.
+    - name: Build shared types (explicit guard)
+      run: pnpm --filter=@o4o/types run build
+
+    - name: Verify types dist freshness
+      run: |
+        test -f packages/types/dist/index.d.ts || (echo "❌ packages/types/dist/index.d.ts missing" && exit 1)
+        test -f packages/types/dist/forum.d.ts || (echo "❌ packages/types/dist/forum.d.ts missing" && exit 1)
+        echo "✅ packages/types/dist freshness verified"
+
     - name: Run TypeScript check (Frontend only)
       run: pnpm run type-check:frontend
 

@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { GLYCOPHARM_ROLES } from '@/lib/role-constants';
 import { LoginModalProvider } from '@/contexts/LoginModalContext';
@@ -280,24 +280,6 @@ function SoftGuard({ feature, allowedRoles, children }: {
     return <Navigate to="/" replace />;
   }
   return <>{children}</>;
-}
-
-/**
- * SoftGuardOutlet — Layout route용 Soft Guard
- * Route의 element로 사용, Outlet을 렌더하거나 FeatureIntroPage를 렌더
- */
-function SoftGuardOutlet({ feature, allowedRoles }: {
-  feature: 'care' | 'store' | 'mypage';
-  allowedRoles?: string[];
-}) {
-  const { isAuthenticated, user, isLoading } = useAuth();
-
-  if (isLoading) return <PageLoading />;
-  if (!isAuthenticated) return <FeatureIntroPage feature={feature} />;
-  if (allowedRoles && user && !user.roles.some(r => allowedRoles.includes(r))) {
-    return <Navigate to="/" replace />;
-  }
-  return <Outlet />;
 }
 
 /** Store Dashboard Layout Wrapper - connects auth context to shared layout */
