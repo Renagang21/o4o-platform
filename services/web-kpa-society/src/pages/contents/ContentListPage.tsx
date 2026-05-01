@@ -160,7 +160,7 @@ function DocumentsSection({
     setLoading(true);
     contentApi.list({
       page: 1,
-      limit: 10,
+      limit: 6,
       sort: 'latest',
       content_type: 'information',
       sub_type: 'content',
@@ -204,6 +204,7 @@ function DocumentsSection({
         title="문서형 콘텐츠"
         description="리치 텍스트 편집기로 작성한 문서"
         primaryAction={isAuthenticated ? { label: '문서 등록', to: '/content/documents/new' } : undefined}
+        moreLink={{ label: '전체 보기', to: '/content/documents' }}
       />
 
       {loading ? (

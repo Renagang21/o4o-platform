@@ -242,6 +242,8 @@ const PrintContentPage = lazy(() => import('./pages/content/PrintContentPage'));
 const ContentListPage = lazy(() => import('./pages/contents/ContentListPage').then(m => ({ default: m.ContentListPage })));
 const ContentDetailPage = lazy(() => import('./pages/contents/ContentDetailPage').then(m => ({ default: m.ContentDetailPage })));
 const ContentWritePage = lazy(() => import('./pages/contents/ContentWritePage').then(m => ({ default: m.ContentWritePage })));
+// WO-KPA-CONTENT-HUB-UNIFIED-SECTION-RULES-V1: 문서형 콘텐츠 전용 목록
+const ContentDocumentsPage = lazy(() => import('./pages/contents/ContentDocumentsPage').then(m => ({ default: m.ContentDocumentsPage })));
 // WO-KPA-CONTENT-COURSES-LIST-V1: 코스형 자료 전용 목록
 const ContentCoursesPage = lazy(() => import('./pages/contents/ContentCoursesPage').then(m => ({ default: m.ContentCoursesPage })));
 // WO-KPA-CONTENT-SURVEYS-LIST-V1: 설문조사 전용 목록 (콘텐츠 허브 하위)
@@ -676,9 +678,11 @@ function App() {
           } />
 
           {/* 섹션 목록
+              - /content/documents: WO-KPA-CONTENT-HUB-UNIFIED-SECTION-RULES-V1 — 문서형 콘텐츠 전용 목록
               - /content/surveys: WO-KPA-CONTENT-SURVEYS-LIST-V1 — 전용 목록 페이지
               - /content/courses: WO-KPA-CONTENT-COURSES-LIST-V1 — 전용 목록 페이지
               - /content/courses/:id: /instructor/courses/:id 상세로 wrapper redirect (Phase에서 전용 페이지 도입 시 변경) */}
+          <Route path="/content/documents" element={<Layout serviceName={SERVICE_NAME}><ContentDocumentsPage /></Layout>} />
           <Route path="/content/surveys" element={<Layout serviceName={SERVICE_NAME}><ContentSurveysPage /></Layout>} />
           <Route path="/content/courses" element={<Layout serviceName={SERVICE_NAME}><ContentCoursesPage /></Layout>} />
           <Route path="/content/courses/:id" element={<ContentCourseDetailRedirect />} />
@@ -688,9 +692,6 @@ function App() {
           <Route path="/content/:id/edit" element={<Layout serviceName={SERVICE_NAME}><ContentWritePage /></Layout>} />
 
           {/* Legacy redirects → 신규 섹션 라우트 */}
-          {/* WO-KPA-CONTENT-ROUTE-CLEANUP-AFTER-SECTIONS-V1: /content/documents 목록 페이지는
-              의도적으로 만들지 않음(메인 허브 1번 섹션이 동일 역할). 직접 접근 시 안전망 redirect. */}
-          <Route path="/content/documents" element={<Navigate to="/content" replace />} />
           <Route path="/content/new" element={<Navigate to="/content/documents/new" replace />} />
           <Route path="/content/write" element={<Navigate to="/content/documents/new" replace />} />
           <Route path="/content/new/survey" element={<Navigate to="/content/surveys/new" replace />} />
