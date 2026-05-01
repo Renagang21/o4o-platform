@@ -17,6 +17,8 @@ import { createStoreAssetControlController } from '../o4o-store/controllers/stor
 import { createStorePlaylistController } from '../o4o-store/controllers/store-playlist.controller.js';
 // WO-O4O-EVENT-OFFER-NETURE-ADOPTION-V1
 import { createNetureEventOfferController } from './controllers/event-offer.controller.js';
+// WO-O4O-EVENT-OFFER-MULTI-SERVICE-PROPOSAL-V1
+import { createSupplierEventOfferProposalsController } from './controllers/supplier-event-offer-proposals.controller.js';
 
 export function createNetureRoutes(dataSource: DataSource): Router {
   const router = Router();
@@ -49,6 +51,15 @@ export function createNetureRoutes(dataSource: DataSource): Router {
   // /api/v1/neture/event-offers/*
   // ============================================================================
   router.use('/event-offers', createNetureEventOfferController(dataSource, requireAuth as any));
+
+  // ============================================================================
+  // Supplier Multi-Service Proposal — WO-O4O-EVENT-OFFER-MULTI-SERVICE-PROPOSAL-V1
+  // /api/v1/neture/supplier/event-offer-proposals
+  // ============================================================================
+  router.use(
+    '/supplier',
+    createSupplierEventOfferProposalsController(dataSource, requireAuth as any),
+  );
 
   return router;
 }

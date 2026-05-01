@@ -21,6 +21,15 @@ import { SERVICE_KEYS } from '../../../constants/service-keys.js';
 import { CheckoutOrder } from '../../../entities/checkout/CheckoutOrder.entity.js';
 import { checkoutService } from '../../../services/checkout.service.js';
 import { resolveStoreAccess } from '../../../utils/store-owner.utils.js';
+// WO-O4O-EVENT-OFFER-MULTI-SERVICE-PROPOSAL-V1
+import {
+  resolveOrganizationForEventOffer,
+} from '../helpers/event-offer-organization.helper.js';
+import {
+  TARGET_TO_EVENT_OFFER_KEY,
+  type TargetServiceKey,
+  isSupportedTargetServiceKey,
+} from '../../../constants/event-offer-service-mapping.js';
 
 // ─── WO-O4O-EVENT-OFFER-STORE-PRODUCT-LINK-V1 ───────────────────────────────
 // Event Offer service_key → Store(매장 진열) service_key 매핑.
@@ -1090,6 +1099,139 @@ export class EventOfferService {
       })),
       total: countRows[0]?.total ?? 0,
     };
+  }
+
+  // ─── WO-O4O-EVENT-OFFER-MULTI-SERVICE-PROPOSAL-V1 ─────────────────────────
+  // 단일 SPO를 여러 서비스(KPA / K-Cos)로 동시 제안.
+  //
+  // 정책:
+  //   - 각 target service를 event offer service key로 변환 후 createListing() 호출
+  //   - 서비스별 organizationId는 resolveOrganizationForEventOffer로 결정
+  //   - 서비스별로 결과를 분리해서 반환 (성공 / 실패 코드)
+  //   - createListing() 자체는 단일 service 단위 — 변경 없음 (단일 책임)
+  //   - 부분 실패 허용: 한 서비스 실패가 다른 서비스 성공을 막지 않는다
+  //
+  // 결과 status 분류:
+  //   created            — INSERT 성공
+  //   already_proposed   — (org, service, offer) 중복
+  //   offer_not_found    — SPO 없음
+  //   offer_not_owned    — supplier 소유권 없음
+  //   org_unavailable    — 해당 service에 매핑 가능한 organization 없음
+  //   unsupported        — TARGET_TO_EVENT_OFFER_KEY 미등록 (예: glycopharm 미지원)
+  //   internal_error     — 기타
+
+  async createMultiServiceProposal(input: {
+    offerId: string;
+    targetServiceKeys: string[];
+    ownerUserId: string;
+  }): Promise<{
+    offerId: string;
+    results: Array<{
+      targetServiceKey: string;
+      eventOfferServiceKey: string | null;
+      status:
+        | 'created'
+        | 'already_proposed'
+        | 'offer_not_found'
+        | 'offer_not_owned'
+        | 'org_unavailable'
+        | 'unsupported'
+        | 'internal_error';
+      listingId: string | null;
+      message?: string;
+    }>;
+  }> {
+    const unique = Array.from(new Set(input.targetServiceKeys.filter(Boolean)));
+    const results: Array<{
+      targetServiceKey: string;
+      eventOfferServiceKey: string | null;
+      status:
+        | 'created'
+        | 'already_proposed'
+        | 'offer_not_found'
+        | 'offer_not_owned'
+        | 'org_unavailable'
+        | 'unsupported'
+        | 'internal_error';
+      listingId: string | null;
+      message?: string;
+    }> = [];
+
+    for (const target of unique) {
+      // 1. 매핑 검증
+      if (!isSupportedTargetServiceKey(target)) {
+        results.push({
+          targetServiceKey: target,
+          eventOfferServiceKey: null,
+          status: 'unsupported',
+          listingId: null,
+          message: '지원되지 않는 대상 서비스입니다.',
+        });
+        continue;
+      }
+      const eventOfferKey = TARGET_TO_EVENT_OFFER_KEY[target as TargetServiceKey];
+
+      // 2. 서비스별 organizationId 결정
+      const organizationId = await resolveOrganizationForEventOffer({
+        dataSource: this.dataSource,
+        userId: input.ownerUserId,
+        roleType: 'supplier',
+        serviceKey: eventOfferKey,
+      });
+      if (!organizationId) {
+        results.push({
+          targetServiceKey: target,
+          eventOfferServiceKey: eventOfferKey,
+          status: 'org_unavailable',
+          listingId: null,
+          message: `${target} 조직 정보를 확인할 수 없습니다.`,
+        });
+        continue;
+      }
+
+      // 3. 단일 createListing 호출 (서비스별 독립)
+      try {
+        const created = await this.createListing({
+          offerId: input.offerId,
+          serviceKey: eventOfferKey,
+          organizationId,
+          roleType: 'supplier',
+          ownerUserId: input.ownerUserId,
+        });
+        results.push({
+          targetServiceKey: target,
+          eventOfferServiceKey: eventOfferKey,
+          status: 'created',
+          listingId: created.id,
+        });
+      } catch (e: any) {
+        if (e instanceof EventOfferCreateError) {
+          const codeMap: Record<string, typeof results[number]['status']> = {
+            ALREADY_LISTED:  'already_proposed',
+            OFFER_NOT_FOUND: 'offer_not_found',
+            OFFER_NOT_OWNED: 'offer_not_owned',
+            INTERNAL_ERROR:  'internal_error',
+          };
+          results.push({
+            targetServiceKey: target,
+            eventOfferServiceKey: eventOfferKey,
+            status: codeMap[e.code] ?? 'internal_error',
+            listingId: null,
+            message: e.message,
+          });
+        } else {
+          results.push({
+            targetServiceKey: target,
+            eventOfferServiceKey: eventOfferKey,
+            status: 'internal_error',
+            listingId: null,
+            message: e?.message ?? 'unknown error',
+          });
+        }
+      }
+    }
+
+    return { offerId: input.offerId, results };
   }
 }
 

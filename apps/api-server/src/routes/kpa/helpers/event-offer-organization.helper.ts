@@ -75,8 +75,21 @@ export async function resolveOrganizationForEventOffer(
       );
       return rows[0]?.organization_id ?? null;
     }
-    // supplier 분기는 K-Cos supplier 매핑 메커니즘이 명확해질 때까지 미구현
-    // (별도 IR에서 결정 — WO-O4O-EVENT-OFFER-KCOS-CREATE-V1 §2)
+    if (roleType === 'supplier') {
+      // WO-O4O-EVENT-OFFER-MULTI-SERVICE-PROPOSAL-V1
+      // K-Cos supplier 제안: K-Cos에 enroll된 첫 active 조직 = "K-Cos 공통 운영 조직"
+      // (KPA가 kpa_members.role='operator' fallback을 사용하는 것과 동일한 패턴)
+      const rows = await dataSource.query(
+        `SELECT ose.organization_id
+         FROM organization_service_enrollments ose
+         WHERE ose.service_code = $1
+           AND ose.status = 'active'
+         ORDER BY ose.created_at ASC NULLS LAST
+         LIMIT 1`,
+        [SERVICE_KEYS.K_COSMETICS],
+      );
+      return rows[0]?.organization_id ?? null;
+    }
     return null;
   }
 

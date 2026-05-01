@@ -982,9 +982,12 @@ export interface ProposeOfferResult {
 }
 
 // WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1
+// WO-O4O-EVENT-OFFER-MULTI-SERVICE-PROPOSAL-V1: serviceKey 필드 추가 (KPA + K-Cos 통합)
 export interface MyEventOfferProposal {
   id: string;
   offerId: string;
+  /** OPL service_key (kpa-groupbuy / k-cosmetics-event-offer) */
+  serviceKey: string;
   title: string;
   supplierName: string;
   price: number | null;
@@ -993,6 +996,29 @@ export interface MyEventOfferProposal {
   proposedAt: string;
   decidedAt: string | null;
   rejectedReason: string | null;
+}
+
+// WO-O4O-EVENT-OFFER-MULTI-SERVICE-PROPOSAL-V1
+export type ProposalStatus =
+  | 'created'
+  | 'already_proposed'
+  | 'offer_not_found'
+  | 'offer_not_owned'
+  | 'org_unavailable'
+  | 'unsupported'
+  | 'internal_error';
+
+export interface PerServiceProposalResult {
+  targetServiceKey: string;
+  eventOfferServiceKey: string | null;
+  status: ProposalStatus;
+  listingId: string | null;
+  message?: string;
+}
+
+export interface MultiServiceProposalResult {
+  offerId: string;
+  results: PerServiceProposalResult[];
 }
 
 /** Backend 응답 에러 코드 (supplier-offers.controller.ts ERROR_CODES와 동일) */
@@ -1039,16 +1065,35 @@ export const supplierKpaEventOfferApi = {
         (res: { data: { success: boolean; data: ProposeOfferResult } }) => res.data.data,
       ),
 
-  // WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1
-  /** 내가 제안한 OPL 목록 (status, rejectedReason 포함) */
+  // WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1 + WO-O4O-EVENT-OFFER-MULTI-SERVICE-PROPOSAL-V1
+  /** 내가 제안한 OPL 목록 — KPA + K-Cos 통합 (serviceKey로 구분) */
   listMyProposals: (): Promise<MyEventOfferProposal[]> =>
     api
       .get<{ success: boolean; data: MyEventOfferProposal[] }>(
-        '/kpa/supplier/event-offers'
+        '/neture/supplier/event-offer-proposals'
       )
       .then(
         (res: { data: { success: boolean; data: MyEventOfferProposal[] } }) =>
           res.data.data || [],
+      ),
+
+  // WO-O4O-EVENT-OFFER-MULTI-SERVICE-PROPOSAL-V1
+  /**
+   * 단일 SPO를 여러 대상 서비스(KPA / K-Cos)로 동시 제안.
+   * 부분 실패 허용 — results 배열에서 서비스별 status 확인.
+   */
+  proposeEventOfferToServices: (
+    offerId: string,
+    serviceKeys: string[],
+  ): Promise<MultiServiceProposalResult> =>
+    api
+      .post<{ success: boolean; data: MultiServiceProposalResult }>(
+        '/neture/supplier/event-offer-proposals',
+        { offerId, serviceKeys },
+      )
+      .then(
+        (res: { data: { success: boolean; data: MultiServiceProposalResult } }) =>
+          res.data.data,
       ),
 };
 

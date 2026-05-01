@@ -88,6 +88,10 @@ export {
   type SupplierEventOfferErrorCode,
   // WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1
   type MyEventOfferProposal,
+  // WO-O4O-EVENT-OFFER-MULTI-SERVICE-PROPOSAL-V1
+  type ProposalStatus,
+  type PerServiceProposalResult,
+  type MultiServiceProposalResult,
 } from './supplier.js';
 
 // Seller API

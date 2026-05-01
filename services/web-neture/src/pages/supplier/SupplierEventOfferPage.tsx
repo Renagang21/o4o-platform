@@ -20,7 +20,48 @@ import { useNavigate } from 'react-router-dom';
 import { Tag, ChevronLeft, ChevronRight, Package, Plus, X, Loader2 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { netureEventOfferApi, supplierKpaEventOfferApi } from '../../lib/api';
-import type { ProposableOffer, MyEventOfferProposal } from '../../lib/api';
+import type { ProposableOffer, MyEventOfferProposal, PerServiceProposalResult } from '../../lib/api';
+
+// WO-O4O-EVENT-OFFER-MULTI-SERVICE-PROPOSAL-V1
+// 대상 서비스 선택 옵션. backend의 TARGET_TO_EVENT_OFFER_KEY와 정합.
+// GlycoPharm은 backend event offer 컨텍스트 미정의 → disabled.
+type ProposeTarget = {
+  key: string;
+  label: string;
+  enabled: boolean;
+  hint?: string;
+};
+const PROPOSE_TARGETS: ProposeTarget[] = [
+  { key: 'kpa-society', label: 'KPA Society', enabled: true },
+  { key: 'k-cosmetics', label: 'K-Cosmetics', enabled: true },
+  { key: 'glycopharm',  label: 'GlycoPharm',  enabled: false, hint: '준비 중' },
+];
+
+const TARGET_LABEL: Record<string, string> = {
+  'kpa-society': 'KPA Society',
+  'k-cosmetics': 'K-Cosmetics',
+  'glycopharm':  'GlycoPharm',
+  // event-offer service keys (status display용 fallback)
+  'kpa-groupbuy':            'KPA Society',
+  'k-cosmetics-event-offer': 'K-Cosmetics',
+};
+
+// WO-O4O-EVENT-OFFER-MULTI-SERVICE-PROPOSAL-V1
+// 응답 service_key (kpa-groupbuy 등) → UI 라벨로 매핑.
+const EVENT_KEY_TO_LABEL: Record<string, string> = {
+  'kpa-groupbuy':            'KPA Society',
+  'k-cosmetics-event-offer': 'K-Cosmetics',
+};
+
+const PROPOSAL_STATUS_MESSAGE: Record<string, string> = {
+  created:           '제안되었습니다.',
+  already_proposed:  '이미 제안된 상품입니다.',
+  offer_not_found:   '공급자 상품을 찾을 수 없습니다.',
+  offer_not_owned:   '권한이 없습니다.',
+  org_unavailable:   '대상 서비스의 조직 정보를 확인할 수 없습니다.',
+  unsupported:       '지원되지 않는 서비스입니다.',
+  internal_error:    '처리 중 오류가 발생했습니다.',
+};
 
 type StatusTab = 'active' | 'ended' | 'all';
 
@@ -90,6 +131,16 @@ export default function SupplierEventOfferPage() {
   const [proposableLoading, setProposableLoading] = useState(false);
   const [proposingId, setProposingId] = useState<string | null>(null);
 
+  // WO-O4O-EVENT-OFFER-MULTI-SERVICE-PROPOSAL-V1
+  // 대상 서비스 다중 선택 상태. 모달 열릴 때 KPA Society 기본 선택.
+  const [selectedTargets, setSelectedTargets] = useState<string[]>(['kpa-society']);
+
+  const toggleTarget = useCallback((key: string) => {
+    setSelectedTargets(prev =>
+      prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key],
+    );
+  }, []);
+
   // WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1: 내 제안 현황
   const [myProposals, setMyProposals] = useState<MyEventOfferProposal[]>([]);
   const [proposalsLoading, setProposalsLoading] = useState(false);
@@ -142,6 +193,8 @@ export default function SupplierEventOfferPage() {
 
   const handleOpenPropose = useCallback(() => {
     setProposeOpen(true);
+    // 모달 열 때마다 기본값(KPA Society)으로 초기화
+    setSelectedTargets(['kpa-society']);
     loadProposableOffers();
   }, [loadProposableOffers]);
 
@@ -151,29 +204,60 @@ export default function SupplierEventOfferPage() {
     setProposingId(null);
   }, []);
 
+  // WO-O4O-EVENT-OFFER-MULTI-SERVICE-PROPOSAL-V1
+  // 단일 SPO를 선택된 대상 서비스(KPA / K-Cos)로 동시 제안.
+  // 부분 실패 허용 — 서비스별 결과를 각각 toast로 표시.
   const handlePropose = useCallback(async (offerId: string, title: string) => {
+    if (selectedTargets.length === 0) {
+      toast.error('대상 서비스를 1개 이상 선택해 주세요.');
+      return;
+    }
     setProposingId(offerId);
     try {
-      await supplierKpaEventOfferApi.proposeOffer(offerId);
-      toast.success(`"${title}" 이(가) 이벤트로 제안되었습니다. 운영자 승인 후 노출됩니다.`);
-      // 제안 성공 → 모달 닫고 현재 탭 + 내 제안 현황 새로고침
-      handleClosePropose();
-      fetchItems(page, activeTab);
-      loadMyProposals();
+      const result = await supplierKpaEventOfferApi.proposeEventOfferToServices(
+        offerId,
+        selectedTargets,
+      );
+
+      // 서비스별 결과 표시
+      let createdCount = 0;
+      result.results.forEach((r: PerServiceProposalResult) => {
+        const label = TARGET_LABEL[r.targetServiceKey] ?? r.targetServiceKey;
+        const msg = PROPOSAL_STATUS_MESSAGE[r.status] ?? r.message ?? '처리되었습니다.';
+        if (r.status === 'created') {
+          createdCount += 1;
+          toast.success(`${label}: ${msg}`);
+        } else {
+          toast.error(`${label}: ${msg}`);
+        }
+      });
+
+      if (createdCount > 0) {
+        // 1건이라도 성공 → 모달 닫고 목록 새로고침
+        handleClosePropose();
+        fetchItems(page, activeTab);
+        loadMyProposals();
+      } else {
+        // 전부 실패 → 모달 유지, 목록 재로드(이미 제안된 항목 제거)
+        loadProposableOffers();
+      }
+      // 추가 안내: 모든 서비스에 성공한 경우
+      if (createdCount === result.results.length && createdCount > 1) {
+        toast.success(`"${title}" 이(가) ${createdCount}개 서비스에 제안되었습니다.`);
+      }
     } catch (err: unknown) {
       const code = extractErrorCode(err);
       const msg = code && PROPOSE_ERROR_MESSAGES[code]
         ? PROPOSE_ERROR_MESSAGES[code]
         : '제안에 실패했습니다.';
       toast.error(msg);
-      // ALREADY_PROPOSED는 목록에서 자동 제거되어야 함 → 다시 로드
-      if (code === 'ALREADY_PROPOSED') {
-        loadProposableOffers();
-      }
     } finally {
       setProposingId(null);
     }
-  }, [page, activeTab, fetchItems, handleClosePropose, loadProposableOffers, loadMyProposals]);
+  }, [
+    page, activeTab, selectedTargets,
+    fetchItems, handleClosePropose, loadProposableOffers, loadMyProposals,
+  ]);
 
   useEffect(() => {
     fetchItems(1, activeTab);
@@ -235,8 +319,14 @@ export default function SupplierEventOfferPage() {
                   <li key={p.id} className="py-3">
                     <div className="flex items-center justify-between gap-3">
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-slate-800 truncate">{p.title}</p>
-                        <p className="text-xs text-slate-500 mt-0.5">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          {/* WO-O4O-EVENT-OFFER-MULTI-SERVICE-PROPOSAL-V1: 서비스 라벨 */}
+                          <span className="inline-block px-2 py-0.5 bg-slate-100 text-slate-700 rounded text-[10px] font-semibold">
+                            {EVENT_KEY_TO_LABEL[p.serviceKey] ?? p.serviceKey}
+                          </span>
+                          <p className="text-sm font-medium text-slate-800 truncate">{p.title}</p>
+                        </div>
+                        <p className="text-xs text-slate-500">
                           {p.price != null && (
                             <span>₩{Number(p.price).toLocaleString()}</span>
                           )}
@@ -402,7 +492,7 @@ export default function SupplierEventOfferPage() {
               <div>
                 <h2 className="text-lg font-semibold text-slate-800">이벤트 제안</h2>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  공급 중인 상품을 KPA 이벤트로 제안합니다. 운영자 승인 후 노출됩니다.
+                  공급 중인 상품을 선택한 서비스의 이벤트로 동시에 제안합니다. 각 서비스 운영자 승인 후 노출됩니다.
                 </p>
               </div>
               <button
@@ -411,6 +501,43 @@ export default function SupplierEventOfferPage() {
               >
                 <X size={20} />
               </button>
+            </div>
+
+            {/* WO-O4O-EVENT-OFFER-MULTI-SERVICE-PROPOSAL-V1: 대상 서비스 선택 */}
+            <div className="px-6 py-3 border-b border-slate-100 bg-slate-50/60">
+              <div className="text-xs font-semibold text-slate-700 mb-2">대상 서비스 (복수 선택)</div>
+              <div className="flex flex-wrap gap-2">
+                {PROPOSE_TARGETS.map(t => {
+                  const checked = selectedTargets.includes(t.key);
+                  return (
+                    <label
+                      key={t.key}
+                      className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-sm cursor-pointer transition-colors ${
+                        !t.enabled
+                          ? 'border-slate-200 bg-slate-100 text-slate-400 cursor-not-allowed'
+                          : checked
+                            ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
+                            : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        disabled={!t.enabled || proposingId !== null}
+                        onChange={() => toggleTarget(t.key)}
+                        className="w-3.5 h-3.5"
+                      />
+                      <span>{t.label}</span>
+                      {t.hint && (
+                        <span className="text-[10px] text-slate-400 ml-1">({t.hint})</span>
+                      )}
+                    </label>
+                  );
+                })}
+              </div>
+              {selectedTargets.length === 0 && (
+                <p className="mt-2 text-xs text-red-600">대상 서비스를 1개 이상 선택해 주세요.</p>
+              )}
             </div>
 
             {/* Modal Body */}
@@ -449,7 +576,7 @@ export default function SupplierEventOfferPage() {
                       </div>
                       <button
                         onClick={() => handlePropose(offer.id, offer.title)}
-                        disabled={proposingId !== null}
+                        disabled={proposingId !== null || selectedTargets.length === 0}
                         className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
                       >
                         {proposingId === offer.id ? (
