@@ -21,7 +21,12 @@ export class ForumPostController extends ForumControllerBase {
       const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
       const skip = (page - 1) * limit;
 
-      const categoryId = req.query.categoryId as string || req.query.category as string;
+      // WO-FORUM-POST-LIST-FORUMID-PARAM-FIX-V1
+      // forumId 우선, categoryId / category 는 하위 호환
+      const forumId =
+        (req.query.forumId as string) ||
+        (req.query.categoryId as string) ||
+        (req.query.category as string);
       const query = req.query.search as string || req.query.query as string;
       const tag = req.query.tag as string;
       const status = req.query.status as PostStatus;
@@ -38,18 +43,18 @@ export class ForumPostController extends ForumControllerBase {
         queryBuilder.where('post.status = :status', { status: PostStatus.PUBLISHED });
       }
 
-      // Category filter + WO-KPA-A-CLOSED-FORUM-ACCESS-CONTROL-V1
+      // Forum filter + WO-KPA-A-CLOSED-FORUM-ACCESS-CONTROL-V1
       // WO-O4O-FORUM-CATEGORY-CLEANUP-V1: use forumId (forum_category_requests)
       const { userId: uid, roles } = this.getUserFromReq(req);
-      if (categoryId) {
-        queryBuilder.andWhere('post.forumId = :forumId', { forumId: categoryId });
-        const access = await this.checkClosedForumAccess(categoryId, uid, roles);
+      if (forumId) {
+        queryBuilder.andWhere('post.forumId = :forumId', { forumId });
+        const access = await this.checkClosedForumAccess(forumId, uid, roles);
         if (!access.allowed) {
           res.status(403).json({
             success: false,
             error: 'This is a closed forum. Membership is required to view posts.',
             code: 'CLOSED_FORUM_ACCESS_DENIED',
-            data: { forumId: categoryId },
+            data: { forumId },
           });
           return;
         }
