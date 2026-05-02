@@ -134,6 +134,12 @@ export const lmsApi = {
     return data;
   },
 
+  // 강사 본인 강의 목록 (WO-KCOS-LMS-INSTRUCTOR-BOOTSTRAP-V1)
+  getInstructorCourses: async (): Promise<ApiResponse<LmsCourse[]>> => {
+    const { data } = await api.get<ApiResponse<LmsCourse[]>>('/lms/instructor/courses');
+    return data;
+  },
+
   // 강의 상세
   getCourse: async (id: string): Promise<ApiResponse<LmsCourse>> => {
     const { data } = await api.get<ApiResponse<LmsCourse>>(`/lms/courses/${id}`);

@@ -72,6 +72,10 @@ const EducationPage = lazy(() => import('@/pages/lms/EducationPage'));
 const LmsCourseDetailPage = lazy(() => import('@/pages/lms/LmsCourseDetailPage'));
 const LmsLessonPage = lazy(() => import('@/pages/lms/LmsLessonPage'));
 
+// LMS Instructor (WO-KCOS-LMS-INSTRUCTOR-BOOTSTRAP-V1)
+const InstructorDashboardPage = lazy(() => import('@/pages/instructor/InstructorDashboardPage'));
+const InstructorCoursesPage = lazy(() => import('@/pages/instructor/InstructorCoursesPage'));
+
 // Resources Hub (WO-KCOS-RESOURCES-HUB-IMPLEMENTATION-V1)
 const ResourcesPage = lazy(() => import('@/pages/resources/ResourcesPage').then(m => ({ default: m.ResourcesPage })));
 
@@ -253,6 +257,26 @@ function AppRoutes() {
         <Route path="lms" element={<EducationPage />} />
         <Route path="lms/course/:id" element={<LmsCourseDetailPage />} />
         <Route path="lms/course/:courseId/lesson/:lessonId" element={<LmsLessonPage />} />
+
+        {/* LMS Instructor (WO-KCOS-LMS-INSTRUCTOR-BOOTSTRAP-V1)
+            진입은 lms:instructor / k-cosmetics:admin / platform:super_admin.
+            백엔드 requireInstructor 가 실제 권한을 검증하므로 가드는 정책상 일관성을 위한 1차 차단. */}
+        <Route
+          path="instructor"
+          element={
+            <ProtectedRoute allowedRoles={['lms:instructor', 'k-cosmetics:admin', 'platform:super_admin']}>
+              <InstructorDashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="instructor/courses"
+          element={
+            <ProtectedRoute allowedRoles={['lms:instructor', 'k-cosmetics:admin', 'platform:super_admin']}>
+              <InstructorCoursesPage />
+            </ProtectedRoute>
+          }
+        />
 
         {/* MyPage 3-split (WO-O4O-KCOSMETICS-MYPAGE-SPLIT-V1) */}
         <Route

@@ -12,7 +12,7 @@
  */
 
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, UserCircle, Settings } from 'lucide-react';
+import { LayoutDashboard, UserCircle, Settings, GraduationCap } from 'lucide-react';
 import { GlobalHeader, GlobalHeaderMenuItem } from '@o4o/ui';
 import { useAuth, getKCosmeticsDashboardRoute } from '@/contexts/AuthContext';
 import { useLoginModal } from '@/contexts/LoginModalContext';
@@ -53,6 +53,11 @@ export function KCosGlobalHeader() {
   const isPartner = isAuthenticated && user?.roles?.some(
     (r: string) => r === 'k-cosmetics:partner',
   );
+  // WO-KCOS-LMS-INSTRUCTOR-BOOTSTRAP-V1: lms:instructor 또는 admin 진입 허용
+  const isInstructor = isAuthenticated && user?.roles?.some(
+    (r: string) => r === 'lms:instructor',
+  );
+  const showInstructor = isInstructor || isAdmin;
 
   const contextualNav = filterContextualNav(KCOS_CONTEXTUAL_NAV, {
     isAdmin: !!isAdmin,
@@ -89,6 +94,12 @@ export function KCosGlobalHeader() {
       utilitySlot={<ServiceSwitcher currentServiceKey="k-cosmetics" />}
       userMenuItems={
         <>
+          {/* 강의 대시보드 — 최상단 (WO-KCOS-LMS-INSTRUCTOR-BOOTSTRAP-V1) */}
+          {showInstructor && (
+            <GlobalHeaderMenuItem to="/instructor" icon={<GraduationCap className="w-4 h-4" />}>
+              강의 대시보드
+            </GlobalHeaderMenuItem>
+          )}
           <GlobalHeaderMenuItem to={dashboardPath} icon={<LayoutDashboard className="w-4 h-4" />}>
             대시보드
           </GlobalHeaderMenuItem>
