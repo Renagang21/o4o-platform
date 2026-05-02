@@ -3540,6 +3540,9 @@ importers:
       '@o4o/operator-ux-core':
         specifier: workspace:*
         version: link:../../packages/operator-ux-core
+      '@o4o/shared-space-ui':
+        specifier: workspace:*
+        version: link:../../packages/shared-space-ui
       '@o4o/types':
         specifier: workspace:*
         version: link:../../packages/types
