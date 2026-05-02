@@ -8,6 +8,7 @@
 import { AppDataSource } from '../database/connection.js';
 import { Notification, NotificationType, NotificationChannel } from '../entities/Notification.js';
 import { Repository } from 'typeorm';
+import { notificationEventHub } from './forum/NotificationEventHub.js';
 
 interface CreateNotificationDTO {
   userId: string;
@@ -16,6 +17,11 @@ interface CreateNotificationDTO {
   message?: string;
   metadata?: Record<string, any>;
   channel?: NotificationChannel;
+  // WO-O4O-NOTIFICATION-CORE-BASELINE-V1: O4O Boundary Policy fields
+  serviceKey?: string;
+  organizationId?: string;
+  actorId?: string;
+  priority?: string;
 }
 
 interface ListNotificationsOptions {
@@ -25,6 +31,8 @@ interface ListNotificationsOptions {
   isRead?: boolean;
   type?: NotificationType;
   channel?: NotificationChannel;
+  serviceKey?: string;
+  organizationId?: string;
 }
 
 interface ListNotificationsResult {
@@ -44,21 +52,51 @@ export class NotificationService {
   }
 
   /**
-   * Create a new notification
+   * Create a new notification.
+   *
+   * WO-O4O-NOTIFICATION-CORE-BASELINE-V1: persists O4O Boundary fields and
+   * emits an SSE event via NotificationEventHub when channel is in_app.
+   * SSE emission is best-effort — failures are logged but never thrown.
    */
   async createNotification(data: CreateNotificationDTO): Promise<Notification> {
+    const channel: NotificationChannel = data.channel || 'in_app';
+
     const notification = this.repository.create({
       userId: data.userId,
       type: data.type,
       title: data.title,
       message: data.message,
       metadata: data.metadata,
-      channel: data.channel || 'in_app',
+      channel,
+      serviceKey: data.serviceKey,
+      organizationId: data.organizationId,
+      actorId: data.actorId,
+      priority: data.priority,
       isRead: false,
-      createdAt: new Date(),
     });
 
-    return await this.repository.save(notification);
+    const saved = await this.repository.save(notification);
+
+    if (channel === 'in_app') {
+      try {
+        notificationEventHub.emitNotification({
+          id: saved.id,
+          userId: saved.userId,
+          type: saved.type,
+          title: saved.title,
+          message: saved.message ?? saved.title,
+          serviceKey: saved.serviceKey,
+          organizationId: saved.organizationId,
+          actorId: saved.actorId,
+          metadata: saved.metadata,
+          createdAt: saved.createdAt,
+        });
+      } catch (error) {
+        console.error('[Notification] Failed to emit SSE event:', error);
+      }
+    }
+
+    return saved;
   }
 
   /**
@@ -109,6 +147,8 @@ export class NotificationService {
       isRead,
       type,
       channel,
+      serviceKey,
+      organizationId,
     } = options;
 
     const queryBuilder = this.repository
@@ -127,6 +167,14 @@ export class NotificationService {
 
     if (channel) {
       queryBuilder.andWhere('notification.channel = :channel', { channel });
+    }
+
+    if (serviceKey) {
+      queryBuilder.andWhere('notification.serviceKey = :serviceKey', { serviceKey });
+    }
+
+    if (organizationId) {
+      queryBuilder.andWhere('notification.organizationId = :organizationId', { organizationId });
     }
 
     // Get total count
@@ -154,17 +202,54 @@ export class NotificationService {
   /**
    * Get unread notification count for a user
    */
-  async getUnreadCount(userId: string, channel?: NotificationChannel): Promise<number> {
+  async getUnreadCount(
+    userId: string,
+    options?: { channel?: NotificationChannel; serviceKey?: string; organizationId?: string }
+  ): Promise<number> {
     const queryBuilder = this.repository
       .createQueryBuilder('notification')
       .where('notification.userId = :userId', { userId })
       .andWhere('notification.isRead = :isRead', { isRead: false });
 
-    if (channel) {
-      queryBuilder.andWhere('notification.channel = :channel', { channel });
+    if (options?.channel) {
+      queryBuilder.andWhere('notification.channel = :channel', { channel: options.channel });
+    }
+
+    if (options?.serviceKey) {
+      queryBuilder.andWhere('notification.serviceKey = :serviceKey', { serviceKey: options.serviceKey });
+    }
+
+    if (options?.organizationId) {
+      queryBuilder.andWhere('notification.organizationId = :organizationId', {
+        organizationId: options.organizationId,
+      });
     }
 
     return await queryBuilder.getCount();
+  }
+
+  /**
+   * Mark multiple notifications as read in one call.
+   * Returns the number of rows affected (only those owned by userId).
+   */
+  async markManyAsRead(notificationIds: string[], userId: string): Promise<number> {
+    if (!notificationIds || notificationIds.length === 0) {
+      return 0;
+    }
+
+    const result = await this.repository
+      .createQueryBuilder()
+      .update(Notification)
+      .set({
+        isRead: true,
+        readAt: new Date(),
+      })
+      .where('id IN (:...ids)', { ids: notificationIds })
+      .andWhere('userId = :userId', { userId })
+      .andWhere('isRead = :isRead', { isRead: false })
+      .execute();
+
+    return result.affected || 0;
   }
 
   /**

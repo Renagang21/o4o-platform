@@ -93,9 +93,26 @@ class ForumNotificationService {
     const savedNotification = await repo.save(notification);
 
     // Phase 15-B: Emit SSE event for realtime delivery
-    // This is non-blocking - if user is not connected, event is simply dropped
+    // This is non-blocking - if user is not connected, event is simply dropped.
+    // WO-O4O-NOTIFICATION-CORE-BASELINE-V1: Hub now takes a plain payload —
+    // adapt ForumNotification → NotificationEmitPayload here (forum-specific
+    // fields like postId / commentId / targetType travel via metadata).
     try {
-      notificationEventHub.emitNotification(savedNotification);
+      notificationEventHub.emitNotification({
+        id: savedNotification.id,
+        userId: savedNotification.userId,
+        type: savedNotification.type,
+        message: savedNotification.getMessage(),
+        organizationId: savedNotification.organizationId,
+        actorId: savedNotification.actorId,
+        metadata: {
+          ...(savedNotification.metadata ?? {}),
+          postId: savedNotification.postId,
+          commentId: savedNotification.commentId,
+          targetType: savedNotification.targetType,
+        },
+        createdAt: savedNotification.createdAt,
+      });
     } catch (error) {
       // Log but don't fail - SSE is enhancement, not critical path
       console.error('[SSE] Failed to emit notification event:', error);

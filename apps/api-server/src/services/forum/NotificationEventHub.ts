@@ -1,6 +1,7 @@
 /**
  * NotificationEventHub
  * Phase 15-B: Forum Notification Realtime Layer
+ * WO-O4O-NOTIFICATION-CORE-BASELINE-V1: generalized for platform-wide use
  *
  * Memory-based EventEmitter for SSE notification delivery.
  * Manages user subscriptions and event distribution.
@@ -8,22 +9,40 @@
  * Design:
  * - Uses Node.js EventEmitter for in-process event handling
  * - Interface designed for future Redis Pub/Sub replacement
- * - Supports multi-tenant (organizationId) filtering
+ * - Supports multi-tenant filtering by serviceKey + organizationId
+ * - Hub takes a plain payload object — NO entity coupling.
+ *   Callers (forum / core / future domains) adapt their entity into
+ *   NotificationEmitPayload before emit.
  */
 
 import { EventEmitter } from 'events';
 import type { Response } from 'express';
-import type { ForumNotification } from '../../entities/ForumNotification.js';
 import logger from '../../utils/logger.js';
 
 // SSE Client connection info
 export interface SSEClient {
   id: string;
   userId: string;
+  serviceKey?: string;
   organizationId?: string;
   res: Response;
   connectedAt: Date;
   lastHeartbeat: Date;
+}
+
+// Plain emit payload — entity-agnostic.
+// Forum and Core notifications both reduce to this shape before being emitted.
+export interface NotificationEmitPayload {
+  id: string;
+  userId: string;
+  type: string;
+  title?: string;
+  message: string;
+  serviceKey?: string;
+  organizationId?: string;
+  actorId?: string;
+  metadata?: Record<string, any>;
+  createdAt: Date;
 }
 
 // Notification event payload for SSE
@@ -32,9 +51,9 @@ export interface NotificationEvent {
   data: {
     id: string;
     notificationType: string;
+    title?: string;
     message: string;
-    postId?: string;
-    commentId?: string;
+    serviceKey?: string;
     organizationId?: string;
     actorId?: string;
     metadata?: Record<string, any>;
@@ -70,17 +89,27 @@ class NotificationEventHub extends EventEmitter {
 
   /**
    * Subscribe a client to notifications
+   *
+   * Backwards-compatible signature: positional `organizationId` is preserved for
+   * existing callers (forum.notifications.routes.ts). New callers should pass
+   * the options object form to also include `serviceKey`.
    */
   subscribe(
     clientId: string,
     userId: string,
     res: Response,
-    organizationId?: string
+    organizationIdOrOptions?: string | { serviceKey?: string; organizationId?: string }
   ): void {
+    const opts =
+      typeof organizationIdOrOptions === 'string' || organizationIdOrOptions === undefined
+        ? { organizationId: organizationIdOrOptions as string | undefined }
+        : organizationIdOrOptions;
+
     const client: SSEClient = {
       id: clientId,
       userId,
-      organizationId,
+      serviceKey: opts.serviceKey,
+      organizationId: opts.organizationId,
       res,
       connectedAt: new Date(),
       lastHeartbeat: new Date(),
@@ -142,26 +171,29 @@ class NotificationEventHub extends EventEmitter {
   }
 
   /**
-   * Emit a notification event to a specific user
+   * Emit a notification event to a specific user.
+   *
+   * Accepts a plain payload — entity-agnostic. Forum and Core call sites
+   * adapt their own entity into NotificationEmitPayload before invoking.
    */
-  emitNotification(notification: ForumNotification): void {
+  emitNotification(payload: NotificationEmitPayload): void {
     const event: NotificationEvent = {
       type: 'notification',
       data: {
-        id: notification.id,
-        notificationType: notification.type,
-        message: notification.getMessage(),
-        postId: notification.postId,
-        commentId: notification.commentId,
-        organizationId: notification.organizationId,
-        actorId: notification.actorId,
-        metadata: notification.metadata,
-        createdAt: notification.createdAt.toISOString(),
+        id: payload.id,
+        notificationType: payload.type,
+        title: payload.title,
+        message: payload.message,
+        serviceKey: payload.serviceKey,
+        organizationId: payload.organizationId,
+        actorId: payload.actorId,
+        metadata: payload.metadata,
+        createdAt: payload.createdAt.toISOString(),
       },
     };
 
     // Get all clients for this user
-    const clientIds = this.userClients.get(notification.userId);
+    const clientIds = this.userClients.get(payload.userId);
     if (!clientIds || clientIds.size === 0) {
       return; // User not connected
     }
@@ -171,11 +203,21 @@ class NotificationEventHub extends EventEmitter {
       const client = this.clients.get(clientId);
       if (!client) continue;
 
-      // Organization filter: only send yaksa notifications to matching org
+      // serviceKey filter: only deliver to clients subscribed to the same service
+      // (or to clients that did not narrow by serviceKey — they receive everything)
       if (
-        notification.organizationId &&
+        payload.serviceKey &&
+        client.serviceKey &&
+        payload.serviceKey !== client.serviceKey
+      ) {
+        continue;
+      }
+
+      // Organization filter: only send tenant-scoped notifications to matching org
+      if (
+        payload.organizationId &&
         client.organizationId &&
-        notification.organizationId !== client.organizationId
+        payload.organizationId !== client.organizationId
       ) {
         continue;
       }
