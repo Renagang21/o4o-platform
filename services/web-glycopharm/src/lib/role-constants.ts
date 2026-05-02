@@ -14,6 +14,8 @@ export const GLYCOPHARM_ROLES = {
   SUPPLIER: 'supplier',
   CONSUMER: 'customer',
   PLATFORM_SUPER_ADMIN: 'platform:super_admin',
+  // WO-O4O-INSTRUCTOR-DASHBOARD-ENTRY-V1
+  LMS_INSTRUCTOR: 'lms:instructor',
 } as const;
 
 /** 약사 역할 확인 헬퍼 — glycopharm:pharmacist 단일 기준 */

@@ -9,7 +9,7 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { isPharmacistRole } from '@/lib/role-constants';
+import { GLYCOPHARM_ROLES, isPharmacistRole } from '@/lib/role-constants';
 import { glycopharmConfig } from '@o4o/operator-ux-core';
 import { useLoginModal } from '@/contexts/LoginModalContext';
 import {
@@ -61,6 +61,9 @@ export default function Header() {
   const isPharmacy = isAuthenticated && user?.roles?.some(r => isPharmacistRole(r));
   const isAdmin = isAuthenticated && user?.roles?.some(r => r === 'glycopharm:admin' || r === 'platform:super_admin');
   const isOperator = isAuthenticated && user?.roles?.some(r => r === 'glycopharm:operator' || r === 'glycopharm:admin' || r === 'platform:super_admin');
+  // WO-O4O-INSTRUCTOR-DASHBOARD-ENTRY-V1: lms:instructor 또는 admin/platform:super_admin 진입 허용
+  const isInstructor = isAuthenticated && user?.roles?.some(r => r === GLYCOPHARM_ROLES.LMS_INSTRUCTOR);
+  const showInstructor = isInstructor || isAdmin;
 
   // KPA canonical: Shield 단일 진입 (admin > operator 우선)
   const showDashboard = isAdmin || isOperator;
@@ -167,6 +170,18 @@ export default function Header() {
                         </p>
                         <p className="text-xs text-slate-500">{user?.email}</p>
                       </div>
+                      {/* 강의 대시보드 — 최상단 (WO-O4O-INSTRUCTOR-DASHBOARD-ENTRY-V1)
+                       * lms:instructor 또는 glycopharm:admin/platform:super_admin 만 노출 */}
+                      {showInstructor && (
+                        <NavLink
+                          to="/instructor"
+                          className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                          onClick={() => setUserMenuOpen(false)}
+                        >
+                          <GraduationCap className="w-4 h-4" />
+                          강의 대시보드
+                        </NavLink>
+                      )}
                       {showDashboard && (
                         <NavLink
                           to={dashboardPath}
@@ -280,6 +295,17 @@ export default function Header() {
             <div className="mt-4 pt-4 border-t">
               {isAuthenticated ? (
                 <div className="flex flex-col gap-1">
+                  {/* 강의 대시보드 — 최상단 (WO-O4O-INSTRUCTOR-DASHBOARD-ENTRY-V1) */}
+                  {showInstructor && (
+                    <NavLink
+                      to="/instructor"
+                      className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-600"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <GraduationCap className="w-5 h-5" />
+                      강의 대시보드
+                    </NavLink>
+                  )}
                   {showDashboard && (
                     <NavLink
                       to={dashboardPath}
