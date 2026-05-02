@@ -19,6 +19,9 @@ export const ROLES = {
   // WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1
   KPA_STORE_OWNER: 'kpa:store_owner',
 
+  // WO-O4O-INSTRUCTOR-DASHBOARD-ENTRY-V1
+  LMS_INSTRUCTOR: 'lms:instructor',
+
   // 플랫폼 Super
   PLATFORM_ADMIN: 'platform:admin',
   PLATFORM_OPERATOR: 'platform:operator',

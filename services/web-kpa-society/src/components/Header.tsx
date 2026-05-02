@@ -11,12 +11,12 @@
 
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { User, LayoutDashboard, Settings, LogOut, Shield } from 'lucide-react';
+import { User, LayoutDashboard, Settings, LogOut, Shield, GraduationCap } from 'lucide-react';
 import { useAuth, type User as UserType } from '../contexts';
 import { useAuthModal } from '../contexts/LoginModalContext';
 import { colors } from '../styles/theme';
 import { DashboardSwitcher, useAccessibleDashboards } from './common/DashboardSwitcher';
-import { SUPER_OPERATOR_ROLES, hasAnyRole } from '../lib/role-constants';
+import { ROLES, SUPER_OPERATOR_ROLES, hasAnyRole } from '../lib/role-constants';
 import { kpaConfig } from '@o4o/operator-ux-core';
 import ServiceSwitcher from './ServiceSwitcher';
 
@@ -102,6 +102,7 @@ export function Header({ serviceName }: { serviceName: string }) {
   // 나머지 → 전체 공개
   const isAdmin = user ? user.roles.includes('kpa:admin') : false;
   const isOperator = user ? user.roles.includes('kpa:operator') : false;
+  const isInstructor = user ? user.roles.includes(ROLES.LMS_INSTRUCTOR) : false;
   const isStoreOwner = user?.isStoreOwner === true;
   const isPharmacyRelated = isStoreOwner || (user as any)?.activityType === 'pharmacy_owner';
   const displayMenuItems = menuItems
@@ -259,7 +260,19 @@ export function Header({ serviceName }: { serviceName: string }) {
                          * WO-KPA-SOCIETY-DASHBOARD-TO-MYPAGE-CONSOLIDATION-V1
                          */
                         <>
-                          {/* 운영/관리 진입점 — 최상단 (WO-KPA-OPERATOR-USER-MENU-CLEANUP-V1) */}
+                          {/* 강의 대시보드 — 최상단 (WO-O4O-INSTRUCTOR-DASHBOARD-ENTRY-V1)
+                           * lms:instructor 또는 kpa:admin 만 노출. kpa:operator 는 /operator/lms 사용. */}
+                          {(isInstructor || isAdmin) && (
+                            <Link
+                              to="/instructor"
+                              style={styles.userDropdownItem}
+                              onClick={() => setShowUserDropdown(false)}
+                            >
+                              <GraduationCap style={{ width: 16, height: 16, color: colors.gray500 }} />
+                              강의 대시보드
+                            </Link>
+                          )}
+                          {/* 운영/관리 진입점 (WO-KPA-OPERATOR-USER-MENU-CLEANUP-V1) */}
                           {(isAdmin || isOperator) && (
                             <Link
                               to={isAdmin ? '/admin' : '/operator'}
