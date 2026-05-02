@@ -20,8 +20,12 @@ import authRoutes from '../modules/auth/routes/auth.routes.js';
 import serviceAuthRoutes from '../modules/auth/routes/service-auth.routes.js';
 import guestAuthRoutes from '../modules/auth/routes/guest-auth.routes.js';
 import lmsRoutes from '../modules/lms/routes/lms.routes.js';
+// WO-O4O-LMS-AI-MINIMAL-V1
+import aiRoutes from '../modules/ai/routes/ai.routes.js';
 // WO-O4O-CREDIT-SYSTEM-V1
 import creditRoutes from '../modules/credit/routes/credit.routes.js';
+// WO-O4O-POINT-CORE-EXTENSION-V1
+import pointRoutes from '../modules/point/routes/point.routes.js';
 import { kpaLmsScopeGuard } from '../middleware/kpa-lms-scope-guard.js';
 import usersRoutes from '../routes/users.routes.js';
 import cptRoutes from '../routes/cpt.js';
@@ -130,8 +134,12 @@ export async function registerCoreRoutes(app: Application): Promise<void> {
   // LMS routes (WO-KPA-B-LMS-GUARD-BYPASS-AUDIT-AND-IMPLEMENTATION-V1: KPA org scope guard BEFORE lmsRoutes)
   app.use('/api/v1/lms', kpaLmsScopeGuard);
   app.use('/api/v1/lms', lmsRoutes);
+  // WO-O4O-LMS-AI-MINIMAL-V1
+  app.use('/api/v1/ai', aiRoutes);
   // WO-O4O-CREDIT-SYSTEM-V1: Credit balance & transactions
   app.use('/api/v1/credits', creditRoutes);
+  // WO-O4O-POINT-CORE-EXTENSION-V1: Point admin grant/spend
+  app.use('/api/v1/points', pointRoutes);
   app.use('/api/v1/users', usersRoutes);
   app.use('/api/v1/cpt', cptRoutes);
   app.use('/api/health', healthRoutes);

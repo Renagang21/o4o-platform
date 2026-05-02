@@ -1,41 +1,59 @@
 /**
- * PointService — O4O Platform 공통 보상 진입점 (facade)
+ * PointService — O4O Platform 공통 보상 진입점 (facade + spend)
  *
- * WO-O4O-POINT-CORE-SEPARATION-V1
+ * WO-O4O-POINT-CORE-SEPARATION-V1: facade 도입 (grantPoint)
+ * WO-O4O-POINT-CORE-EXTENSION-V1: spend 도입 + 운영자 지급/차감 지원
  *
- * 목적:
- *   기존 LMS 전용 CreditService를 플랫폼 공통 인터페이스로 승격하기 위한 1차 단계.
- *   본 클래스는 호출 의미 변경 없이 CreditService에 위임만 한다.
+ * 본 모듈은 LMS Quiz 적립과 운영자 수동 지급/차감 모두의 단일 진입점을 제공한다.
+ * 내부적으로 credit_balances / credit_transactions 테이블을 사용하지만,
+ * 호출자는 PointService만 알면 된다.
  *
- *   QuizService 등 feature 모듈은 이 facade만 호출하고, CreditService 직접 의존을
- *   제거한다. 향후 spend / wallet / supplier-cost 확장은 본 facade의 인터페이스를
- *   통해 점진적으로 도입된다.
- *
- * 설계 결정:
- *   - referenceKey, description은 required로 유지 — IR-O4O-MARKETING-CONTENT-REWARD-POLICY-V1
- *     의 dedup/감사 정책을 약화시키지 않기 위함. WO 샘플의 optional 시그니처를 그대로
- *     채택하면 dedup 보장이 무너짐.
- *   - sourceType은 CreditSourceType enum을 그대로 노출. 향후 PointSourceType으로
- *     리네이밍 시 enum 값(문자열)은 보존되므로 별도 마이그레이션 불필요.
- *   - 반환 타입은 CreditTransaction | null — 호출자가 dedup 결과를 그대로 검사할 수 있음.
- *
- * 이번 WO에서 하지 않는 것 (예고):
- *   - spend / refund / adjust
+ * 이번 단계에서 하지 않는 것:
+ *   - DB 명명 리네이밍 (credit_* → point_*)
  *   - wallet 다중 분리 (서비스별 잔액)
- *   - supplier 비용 부담 추적
- *   - 운영자 수동 지급 API
- *   - DB 명명 리네이밍 (credit_balances → point_wallets 등)
+ *   - supplier 비용 부담 추적 (sponsorOrgId 등)
+ *   - reward 정책 DB화
  */
 
-import type { CreditSourceType, CreditTransaction } from '../../credit/entities/CreditTransaction.js';
+import { AppDataSource } from '../../../database/connection.js';
+import { CreditBalance } from '../../credit/entities/CreditBalance.js';
+import {
+  CreditTransaction,
+  CreditSourceType,
+  TransactionType,
+} from '../../credit/entities/CreditTransaction.js';
 import { CreditService } from '../../credit/services/CreditService.js';
+import logger from '../../../utils/logger.js';
+
+/**
+ * sourceType 타입.
+ *   - 자동 적립(LMS Quiz): CreditSourceType enum 값 (lesson_complete / quiz_pass / course_complete)
+ *   - 운영자 조작: 'admin_grant' / 'admin_spend' / 'admin_adjust'
+ *
+ * 향후 PointSourceType 전용 enum으로 승격 예정. 현재는 union으로 호환 유지.
+ */
+export type PointSourceType =
+  | CreditSourceType
+  | 'admin_grant'
+  | 'admin_spend'
+  | 'admin_adjust';
 
 export interface GrantPointParams {
   userId: string;
   amount: number;
-  sourceType: CreditSourceType;
+  sourceType: PointSourceType;
   sourceId?: string;
-  /** 중복 지급 방지 키. 동일 userId + 보상 이벤트에 결정성 있게 생성해야 함. */
+  /** 중복 지급 방지 키. 동일 보상 이벤트에 결정성 있게 생성. */
+  referenceKey: string;
+  description: string;
+}
+
+export interface SpendPointParams {
+  userId: string;
+  amount: number;
+  sourceType: PointSourceType;
+  sourceId?: string;
+  /** 중복 차감 방지 키. */
   referenceKey: string;
   description: string;
 }
@@ -52,17 +70,96 @@ export class PointService {
 
   /**
    * 사용자에게 포인트 지급. 동일 referenceKey가 이미 존재하면 null 반환(dedup).
-   *
-   * 현재 구현: CreditService.earnCredit()로 위임 — 동작·DB·로그 모두 기존과 동일.
+   * CreditService.earnCredit()로 위임 — 동작·DB·로그 모두 기존과 동일.
    */
   async grantPoint(params: GrantPointParams): Promise<CreditTransaction | null> {
     return CreditService.getInstance().earnCredit(
       params.userId,
       params.amount,
-      params.sourceType,
+      params.sourceType as CreditSourceType,
       params.sourceId,
       params.referenceKey,
       params.description,
     );
+  }
+
+  /**
+   * 사용자 포인트 차감.
+   *
+   * 정책:
+   *   - amount는 양수만 허용. 음수 차감(=지급)은 grantPoint를 사용해야 함.
+   *   - balance < amount 인 경우 INSUFFICIENT_BALANCE 에러.
+   *   - referenceKey 중복 시 dedup (이미 차감 처리된 요청은 멱등).
+   *   - DB 트랜잭션 + pessimistic lock으로 동시성 안전 보장.
+   *
+   * 본 메서드는 CreditService를 거치지 않고 entity repo를 직접 사용한다.
+   * 사유: CreditService는 earn 전용 설계이므로 spend 로직을 추가하면
+   *      "Earn-only" 계약이 깨짐. 분리 유지를 위해 PointService에서 직접 처리.
+   *
+   * @returns 차감 후 잔액 + 트랜잭션 ID
+   * @throws INVALID_AMOUNT — amount <= 0
+   * @throws INSUFFICIENT_BALANCE — 잔액 부족
+   */
+  async spendPoint(
+    params: SpendPointParams,
+  ): Promise<{ balance: number; transactionId: string }> {
+    if (params.amount <= 0) {
+      throw new Error('INVALID_AMOUNT');
+    }
+
+    return AppDataSource.transaction(async (manager) => {
+      const balanceRepo = manager.getRepository(CreditBalance);
+      const txRepo = manager.getRepository(CreditTransaction);
+
+      // referenceKey 중복 차감 방지 (멱등성)
+      const existing = await txRepo.findOne({
+        where: { referenceKey: params.referenceKey },
+      });
+      if (existing) {
+        const cur = await balanceRepo.findOne({
+          where: { userId: params.userId },
+        });
+        logger.debug(`[Point] spend dedup hit: ${params.referenceKey}`);
+        return {
+          balance: cur?.balance ?? 0,
+          transactionId: existing.id,
+        };
+      }
+
+      // pessimistic write lock으로 동시성 보호
+      const balance = await balanceRepo
+        .createQueryBuilder('b')
+        .setLock('pessimistic_write')
+        .where('b.userId = :userId', { userId: params.userId })
+        .getOne();
+
+      if (!balance || balance.balance < params.amount) {
+        throw new Error('INSUFFICIENT_BALANCE');
+      }
+
+      balance.balance -= params.amount;
+      await balanceRepo.save(balance);
+
+      const tx = txRepo.create({
+        userId: params.userId,
+        amount: -params.amount, // 음수로 기록 (ledger 방향성)
+        transactionType: TransactionType.SPEND,
+        sourceType: params.sourceType as CreditSourceType,
+        sourceId: params.sourceId,
+        referenceKey: params.referenceKey,
+        description: params.description,
+      });
+      await txRepo.save(tx);
+
+      logger.info('[Point] Spent', {
+        userId: params.userId,
+        amount: params.amount,
+        sourceType: params.sourceType,
+        referenceKey: params.referenceKey,
+        newBalance: balance.balance,
+      });
+
+      return { balance: balance.balance, transactionId: tx.id };
+    });
   }
 }
