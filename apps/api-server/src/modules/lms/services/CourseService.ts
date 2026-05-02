@@ -3,6 +3,7 @@ import { AppDataSource } from '../../../database/connection.js';
 import { BaseService } from '../../../common/base.service.js';
 import { Course, CourseStatus, ContentKind, CourseVisibility } from '@o4o/lms-core';
 import { sanitizeInstructor } from '../utils/sanitize-user.js';
+import { notificationService } from '../../../services/NotificationService.js';
 import logger from '../../../utils/logger.js';
 
 /** O4O Tag Policy V1 — sanitize (trim / #strip / 30char / dedup) */
@@ -344,6 +345,19 @@ export class CourseService extends BaseService<Course> {
       title: updated.title,
     });
 
+    // WO-O4O-LMS-NOTIFICATION-INTEGRATION-V1
+    await notificationService.createNotification({
+      userId: updated.instructorId,
+      organizationId: updated.organizationId,
+      type: 'lms.course_submitted',
+      title: '강의 검토 요청',
+      message: '강의가 검토 요청 상태로 변경되었습니다.',
+      metadata: {
+        courseId: updated.id,
+        courseTitle: updated.title,
+      },
+    });
+
     return updated;
   }
 
@@ -369,6 +383,19 @@ export class CourseService extends BaseService<Course> {
     logger.info(`[LMS] Course approved & published`, {
       id: updated.id,
       title: updated.title,
+    });
+
+    // WO-O4O-LMS-NOTIFICATION-INTEGRATION-V1
+    await notificationService.createNotification({
+      userId: updated.instructorId,
+      organizationId: updated.organizationId,
+      type: 'lms.course_approved',
+      title: '강의 승인 완료',
+      message: '강의가 승인되었습니다.',
+      metadata: {
+        courseId: updated.id,
+        courseTitle: updated.title,
+      },
     });
 
     return updated;
@@ -402,6 +429,20 @@ export class CourseService extends BaseService<Course> {
       id: updated.id,
       title: updated.title,
       reason: trimmed,
+    });
+
+    // WO-O4O-LMS-NOTIFICATION-INTEGRATION-V1
+    await notificationService.createNotification({
+      userId: updated.instructorId,
+      organizationId: updated.organizationId,
+      type: 'lms.course_rejected',
+      title: '강의 반려',
+      message: '강의가 반려되었습니다.',
+      metadata: {
+        courseId: updated.id,
+        courseTitle: updated.title,
+        rejectionReason: trimmed,
+      },
     });
 
     return updated;

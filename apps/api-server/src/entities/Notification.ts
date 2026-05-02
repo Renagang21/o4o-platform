@@ -38,6 +38,10 @@ export type NotificationType =
   | 'member.fee_overdue'
   | 'member.report_rejected'
   | 'member.education_deadline'
+  // WO-O4O-LMS-NOTIFICATION-INTEGRATION-V1: LMS course lifecycle events
+  | 'lms.course_submitted'
+  | 'lms.course_approved'
+  | 'lms.course_rejected'
   | 'custom';
 
 // Legacy interface for backward compatibility
