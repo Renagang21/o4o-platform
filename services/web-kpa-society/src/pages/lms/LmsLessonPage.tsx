@@ -14,6 +14,22 @@ import { colors, typography } from '../../styles/theme';
 import type { Course, Lesson, Enrollment, Quiz, QuizResult } from '../../types';
 import { ContentRenderer } from '@o4o/content-editor';
 
+// WO-O4O-LMS-UX-REFINEMENT-V1: lesson type 라벨/아이콘 단일 출처
+const LESSON_TYPE_LABEL: Record<string, string> = {
+  article: '문서',
+  video: '동영상',
+  quiz: '퀴즈',
+  assignment: '과제',
+  live: '라이브',
+};
+const LESSON_TYPE_ICON: Record<string, string> = {
+  article: '📄',
+  video: '🎬',
+  quiz: '❓',
+  assignment: '📝',
+  live: '🔴',
+};
+
 export function LmsLessonPage() {
   const { courseId, lessonId } = useParams<{ courseId: string; lessonId: string }>();
   const navigate = useNavigate();
@@ -388,10 +404,10 @@ export function LmsLessonPage() {
                 <span style={styles.lessonNumber}>
                   {isLessonCompleted ? '✓' : index + 1}
                 </span>
-                <span style={styles.lessonTitle}>{lesson.title}</span>
-                <span style={styles.lessonDuration}>
-                  {lesson.type === 'quiz' ? '퀴즈' : `${lesson.duration}분`}
+                <span style={styles.lessonTypeIcon} aria-hidden>
+                  {LESSON_TYPE_ICON[lesson.type ?? ''] || '📄'}
                 </span>
+                <span style={styles.lessonTitle}>{lesson.title}</span>
               </Link>
             );
           })}
@@ -407,7 +423,9 @@ export function LmsLessonPage() {
                 }}
               />
             </div>
-            <span style={styles.progressText}>진도율: {enrollment.progress}%</span>
+            <span style={styles.progressText}>
+              진도율: {enrollment.progress}% ({completedLessonIds.length} / {lessons.length})
+            </span>
           </div>
         )}
       </aside>
@@ -415,9 +433,21 @@ export function LmsLessonPage() {
       {/* 메인 콘텐츠 */}
       <main style={styles.main}>
         <div style={styles.lessonHeader}>
-          <span style={styles.lessonOrder}>
-            {currentIndex + 1} / {lessons.length}
-          </span>
+          <div style={styles.headerMeta}>
+            <span style={styles.lessonOrder}>
+              {currentIndex + 1} / {lessons.length}
+            </span>
+            <span style={styles.typeBadge}>
+              {LESSON_TYPE_ICON[currentLesson.type ?? ''] || '📄'} {LESSON_TYPE_LABEL[currentLesson.type ?? ''] || currentLesson.type || '레슨'}
+            </span>
+            {isCompleted && <span style={styles.statusBadgeCompleted}>✓ 완료</span>}
+            {isLiveLesson && liveStatus === 'scheduled' && (
+              <span style={styles.statusBadgeScheduled}>⏰ 예정</span>
+            )}
+            {isLiveLesson && liveStatus === 'in_progress' && (
+              <span style={styles.statusBadgeLive}>🔴 진행 중</span>
+            )}
+          </div>
           <h1 style={styles.title}>{currentLesson.title}</h1>
         </div>
 
@@ -830,6 +860,12 @@ const styles: Record<string, React.CSSProperties> = {
   lessonItemActive: {
     backgroundColor: colors.primary,
     color: colors.white,
+    borderLeft: `3px solid ${colors.accentGreen}`,
+    paddingLeft: '9px',
+  },
+  lessonTypeIcon: {
+    fontSize: '14px',
+    flexShrink: 0,
   },
   lessonNumber: {
     width: '24px',
@@ -882,9 +918,48 @@ const styles: Record<string, React.CSSProperties> = {
   lessonHeader: {
     marginBottom: '24px',
   },
+  headerMeta: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    flexWrap: 'wrap' as const,
+    marginBottom: '8px',
+  },
   lessonOrder: {
     ...typography.bodyS,
     color: colors.neutral500,
+  },
+  typeBadge: {
+    padding: '3px 10px',
+    borderRadius: '999px',
+    fontSize: '12px',
+    fontWeight: 600,
+    backgroundColor: colors.neutral100,
+    color: colors.neutral700,
+  },
+  statusBadgeCompleted: {
+    padding: '3px 10px',
+    borderRadius: '999px',
+    fontSize: '12px',
+    fontWeight: 600,
+    backgroundColor: '#d1fae5',
+    color: '#065f46',
+  },
+  statusBadgeScheduled: {
+    padding: '3px 10px',
+    borderRadius: '999px',
+    fontSize: '12px',
+    fontWeight: 600,
+    backgroundColor: '#dbeafe',
+    color: '#1e40af',
+  },
+  statusBadgeLive: {
+    padding: '3px 10px',
+    borderRadius: '999px',
+    fontSize: '12px',
+    fontWeight: 700,
+    backgroundColor: '#fee2e2',
+    color: '#991b1b',
   },
   title: {
     ...typography.headingL,

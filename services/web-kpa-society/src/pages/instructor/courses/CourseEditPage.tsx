@@ -13,9 +13,9 @@ import QuizBuilder from './QuizBuilder';
 import AssignmentEditor from './AssignmentEditor';
 import LiveEditor from './LiveEditor';
 
-// WO-O4O-LMS-LESSON-TYPE-NORMALIZATION-V1: lowercase across UI/API/DB
+// WO-O4O-LMS-UX-REFINEMENT-V1: instructor 라벨 통일 ("동영상")
 const LESSON_TYPE_LABEL: Record<LessonType, string> = {
-  video: '영상', article: '문서', quiz: '퀴즈', assignment: '과제', live: '라이브',
+  video: '동영상', article: '문서', quiz: '퀴즈', assignment: '과제', live: '라이브',
 };
 
 const SUPPORTED_LESSON_TYPES: LessonType[] = ['video', 'article', 'quiz', 'assignment', 'live'];

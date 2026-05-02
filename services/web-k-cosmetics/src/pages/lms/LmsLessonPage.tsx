@@ -26,6 +26,22 @@ const C = {
   accentGreen: '#22c55e',
 };
 
+// WO-O4O-LMS-UX-REFINEMENT-V1
+const LESSON_TYPE_LABEL: Record<string, string> = {
+  article: '문서',
+  video: '동영상',
+  quiz: '퀴즈',
+  assignment: '과제',
+  live: '라이브',
+};
+const LESSON_TYPE_ICON: Record<string, string> = {
+  article: '📄',
+  video: '🎬',
+  quiz: '❓',
+  assignment: '📝',
+  live: '🔴',
+};
+
 // ─── Page Component ──────────────────────────────────────────────────────────
 
 export default function LmsLessonPage() {
@@ -383,10 +399,10 @@ export default function LmsLessonPage() {
                 <span style={S.lessonNumber}>
                   {isLessonCompleted ? '✓' : index + 1}
                 </span>
-                <span style={S.lessonTitle}>{lesson.title}</span>
-                <span style={S.lessonDuration}>
-                  {lesson.type === 'quiz' ? '퀴즈' : `${lesson.duration}분`}
+                <span style={S.lessonTypeIcon} aria-hidden>
+                  {LESSON_TYPE_ICON[lesson.type as string] || '📄'}
                 </span>
+                <span style={S.lessonTitle}>{lesson.title}</span>
               </Link>
             );
           })}
@@ -397,7 +413,9 @@ export default function LmsLessonPage() {
             <div style={S.progressBar}>
               <div style={{ ...S.progressFill, width: `${enrollment.progress}%` }} />
             </div>
-            <span style={S.progressText}>진도율: {enrollment.progress}%</span>
+            <span style={S.progressText}>
+              진도율: {enrollment.progress}% ({completedLessonIds.length} / {lessons.length})
+            </span>
           </div>
         )}
       </aside>
@@ -405,7 +423,19 @@ export default function LmsLessonPage() {
       {/* 메인 콘텐츠 */}
       <main style={S.main}>
         <div style={S.lessonHeader}>
-          <span style={S.lessonOrder}>{currentIndex + 1} / {lessons.length}</span>
+          <div style={S.headerMeta}>
+            <span style={S.lessonOrder}>{currentIndex + 1} / {lessons.length}</span>
+            <span style={S.typeBadge}>
+              {LESSON_TYPE_ICON[currentLesson.type as string] || '📄'} {LESSON_TYPE_LABEL[currentLesson.type as string] || currentLesson.type}
+            </span>
+            {isCompleted && <span style={S.statusBadgeCompleted}>✓ 완료</span>}
+            {isLiveLesson && liveStatus === 'scheduled' && (
+              <span style={S.statusBadgeScheduled}>⏰ 예정</span>
+            )}
+            {isLiveLesson && liveStatus === 'in_progress' && (
+              <span style={S.statusBadgeLive}>🔴 진행 중</span>
+            )}
+          </div>
           <h1 style={S.title}>{currentLesson.title}</h1>
         </div>
 
@@ -692,7 +722,11 @@ const S: Record<string, React.CSSProperties> = {
     display: 'flex', alignItems: 'center', gap: '12px', padding: '12px',
     borderRadius: '8px', textDecoration: 'none', color: C.neutral400, fontSize: '14px',
   },
-  lessonItemActive: { backgroundColor: C.primary, color: C.white },
+  lessonItemActive: {
+    backgroundColor: C.primary, color: C.white,
+    borderLeft: `3px solid ${C.accentGreen}`, paddingLeft: '9px',
+  },
+  lessonTypeIcon: { fontSize: '14px', flexShrink: 0 },
   lessonNumber: {
     width: '24px', height: '24px', borderRadius: '50%',
     backgroundColor: 'rgba(255,255,255,0.1)',
@@ -713,7 +747,27 @@ const S: Record<string, React.CSSProperties> = {
   progressText: { fontSize: '13px', color: C.neutral400 },
   main: { flex: 1, marginLeft: '320px', padding: '32px', maxWidth: '900px' },
   lessonHeader: { marginBottom: '24px' },
+  headerMeta: {
+    display: 'flex', alignItems: 'center', gap: '8px',
+    flexWrap: 'wrap' as const, marginBottom: '8px',
+  },
   lessonOrder: { fontSize: '13px', color: C.neutral500 },
+  typeBadge: {
+    padding: '3px 10px', borderRadius: '999px', fontSize: '12px',
+    fontWeight: 600, backgroundColor: C.neutral100, color: C.neutral700,
+  },
+  statusBadgeCompleted: {
+    padding: '3px 10px', borderRadius: '999px', fontSize: '12px',
+    fontWeight: 600, backgroundColor: '#d1fae5', color: '#065f46',
+  },
+  statusBadgeScheduled: {
+    padding: '3px 10px', borderRadius: '999px', fontSize: '12px',
+    fontWeight: 600, backgroundColor: '#dbeafe', color: '#1e40af',
+  },
+  statusBadgeLive: {
+    padding: '3px 10px', borderRadius: '999px', fontSize: '12px',
+    fontWeight: 700, backgroundColor: '#fee2e2', color: '#991b1b',
+  },
   title: { fontSize: '24px', fontWeight: 700, color: C.neutral900, marginTop: '8px' },
   videoContainer: {
     aspectRatio: '16/9', backgroundColor: C.neutral900,
