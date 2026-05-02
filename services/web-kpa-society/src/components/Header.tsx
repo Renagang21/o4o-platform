@@ -97,7 +97,8 @@ export function Header({ serviceName }: { serviceName: string }) {
   // ── 메뉴 필터링 (WO-KPA-A-ROLE-BASED-NAVIGATION-AND-ENTRY-REFINEMENT-V1) ──
   // kpa:admin  → "관리자 콘솔" /admin
   // kpa:operator → "운영 대시보드" /operator
-  // /store → 승인된 약국 (isStoreOwner)
+  // /store-hub → 약국 관련 사용자(pharmacy_owner/isStoreOwner) + operator/admin
+  // /store → 승인된 약국(isStoreOwner) + operator/admin
   // 나머지 → 전체 공개
   const isAdmin = user ? user.roles.includes('kpa:admin') : false;
   const isOperator = user ? user.roles.includes('kpa:operator') : false;
@@ -114,8 +115,8 @@ export function Header({ serviceName }: { serviceName: string }) {
     .filter(item => {
       if (item.href === '/operator') return isOperator;
       if (item.href === '/admin') return isAdmin;
-      if (item.href === '/store-hub') return isPharmacyRelated;
-      if (item.href === '/store') return isStoreOwner;
+      if (item.href === '/store-hub') return isPharmacyRelated || isOperator || isAdmin;
+      if (item.href === '/store') return isStoreOwner || isOperator || isAdmin;
       return true;
     });
 
