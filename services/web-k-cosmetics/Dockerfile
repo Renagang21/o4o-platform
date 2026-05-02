@@ -37,7 +37,10 @@ COPY packages/content-editor/package.json ./packages/content-editor/
 COPY services/web-k-cosmetics/package.json ./services/web-k-cosmetics/
 
 # Install dependencies
-RUN pnpm install --filter @o4o/web-k-cosmetics...
+# WO-O4O-DOCKER-PNPM-IGNORE-SCRIPTS-FIX-V1: --ignore-scripts로 prepare 자동 빌드 skip.
+# packages/types prepare가 tsconfig.json 미복사 시점에 tsc --build 실행해 실패하는 문제 회피.
+# 명시적 build는 source copy 후 아래 RUN 단계에서 수행됨.
+RUN pnpm install --filter @o4o/web-k-cosmetics... --ignore-scripts
 
 # Copy workspace package source
 COPY packages/auth-client/ ./packages/auth-client/

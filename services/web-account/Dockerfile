@@ -24,7 +24,10 @@ COPY packages/ ./packages/
 COPY services/web-account/ ./services/web-account/
 
 # Install dependencies
-RUN pnpm install --filter account-web...
+# WO-O4O-DOCKER-PNPM-IGNORE-SCRIPTS-FIX-V1: --ignore-scripts로 prepare 자동 빌드 skip.
+# packages/types prepare가 tsconfig.json 미복사 시점에 tsc --build 실행해 실패하는 문제 회피.
+# 명시적 build는 source copy 후 아래 RUN 단계에서 수행됨.
+RUN pnpm install --filter account-web... --ignore-scripts
 
 # Build-time environment variable for Vite
 ARG VITE_API_BASE_URL=https://api.neture.co.kr
