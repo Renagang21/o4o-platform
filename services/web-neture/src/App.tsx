@@ -749,10 +749,7 @@ function App() {
               {/* 파트너 개요 */}
               <Route path="/partner/overview-info" element={<PartnerOverviewInfoPage />} />
 
-              {/* 테스트 센터 포럼 */}
-              <Route path="/forum" element={<ForumPage title="테스트 센터" description="모든 서비스의 테스트 피드백과 의견을 나누는 공간입니다." noticeText="서비스 테스트 후 발견한 문제점, 개선 의견, 질문을 남겨주세요." />} />
-              <Route path="/forum/write" element={<ForumWritePage />} />
-              <Route path="/forum/post/:slug" element={<ForumPostPage />} />
+              {/* /forum, /forum/write, /forum/post/:slug — NetureLayout canonical (WO-NETURE-COMMUNITY-HUB-TEMPLATE-ADOPTION-V1) */}
               <Route path="/forum/service-update" element={<ForumPage boardSlug="service-update" />} />
               <Route path="/forum/service-update/new" element={<ForumWritePage />} />
               <Route path="/forum/service-update/:slug" element={<ForumPostPage />} />
