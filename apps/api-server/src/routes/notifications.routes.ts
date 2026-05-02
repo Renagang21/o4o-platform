@@ -19,12 +19,18 @@
 import { Router, Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { authenticate } from '../middleware/auth.middleware.js';
+import { apiLimiter } from '../middleware/rateLimiter.js';
 import { notificationService } from '../services/NotificationService.js';
 import { notificationEventHub } from '../services/forum/NotificationEventHub.js';
 import logger from '../utils/logger.js';
 
 const router: Router = Router();
 
+// Rate limit before auth so we shed bad traffic cheaply.
+// apiLimiter keys per (ip, userId) at 60 req/min — SSE connection counts as
+// a single request and then streams indefinitely, so the long-poll style is
+// not throttled after the initial subscribe.
+router.use(apiLimiter);
 router.use(authenticate);
 
 // ============================================================================
