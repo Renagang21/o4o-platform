@@ -284,6 +284,7 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | APP-CONTENT | Frozen |
 | APP-SIGNAGE | Frozen |
 | APP-FORUM | Frozen |
+| APP-LMS | Baseline Defined (Phase 1) — 백엔드 공통, frontend 공통화는 후속. 상세: `docs/architecture/APP-LMS-BASELINE.md` |
 
 서비스 코드는 QueryService 호출 + 설정만. Raw SQL/중복 로직/서비스별 UI 분기 금지.
 
@@ -355,9 +356,11 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | **Event Offer Neture 역할 구분** | `docs/baseline/EVENT-OFFER-NETURE-ROLE-CLARIFICATION-V1.md` |
 | **O4O Table Standard (Aspirational)** | `docs/baseline/O4O-TABLE-STANDARD-BASELINE-V1.md` |
 | **O4O Form Standard (Aspirational)** | `docs/baseline/O4O-FORM-STANDARD-BASELINE-V1.md` |
+| **APP-LMS Baseline** | `docs/architecture/APP-LMS-BASELINE.md` |
+| **LMS Scope Guard 설계** | `docs/architecture/LMS-SCOPE-GUARD.md` |
 
 ---
 
-*Updated: 2026-04-28*
-*Version: 7.4*
+*Updated: 2026-05-02*
+*Version: 7.5*
 *Status: Active Constitution*
