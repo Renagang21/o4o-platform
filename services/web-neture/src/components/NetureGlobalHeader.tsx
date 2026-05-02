@@ -14,6 +14,8 @@
 import { useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Settings } from 'lucide-react';
 import { GlobalHeader, GlobalHeaderMenuItem } from '@o4o/ui';
+import { NotificationBell, useNotifications } from '@o4o/account-ui';
+import { notificationsApi, NOTIFICATION_SERVICE_KEY } from '../lib/api/notifications';
 import { useAuth } from '../contexts/AuthContext';
 import { useLoginModal } from '../contexts/LoginModalContext';
 import {
@@ -44,6 +46,12 @@ export function NetureGlobalHeader() {
   const { user, isAuthenticated, logout } = useAuth();
   const { openLoginModal, openRegisterModal } = useLoginModal();
   const navigate = useNavigate();
+
+  // WO-O4O-NOTIFICATION-UI-CORE-V1
+  const notif = useNotifications(notificationsApi, {
+    enabled: isAuthenticated && !!user,
+    serviceKey: NOTIFICATION_SERVICE_KEY,
+  });
 
   const isAdmin = isAuthenticated && user?.roles?.some(
     (r: string) => r === 'neture:admin' || r === 'platform:super_admin',
@@ -95,7 +103,21 @@ export function NetureGlobalHeader() {
       onLogin={openLoginModal}
       onRegister={openRegisterModal}
       onLogout={handleLogout}
-      utilitySlot={<ServiceSwitcher currentServiceKey="neture" />}
+      utilitySlot={
+        <>
+          {isAuthenticated && user && (
+            <NotificationBell
+              unreadCount={notif.unreadCount}
+              notifications={notif.notifications}
+              loading={notif.loading}
+              onOpen={notif.refetchList}
+              onMarkAsRead={notif.markAsRead}
+              onMarkAllAsRead={notif.markAllAsRead}
+            />
+          )}
+          <ServiceSwitcher currentServiceKey="neture" />
+        </>
+      }
       userMenuItems={
         <>
           {hasDashboardRole && (

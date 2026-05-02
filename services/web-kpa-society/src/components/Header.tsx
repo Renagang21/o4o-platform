@@ -15,9 +15,12 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Shield, GraduationCap } from 'lucide-react';
 import {
   GlobalUserProfileDropdown,
+  NotificationBell,
   getUserDisplayName,
+  useNotifications,
   type GlobalUserProfileMenuItem,
 } from '@o4o/account-ui';
+import { notificationsApi, NOTIFICATION_SERVICE_KEY } from '../api/notifications';
 import { useAuth, type User as UserType } from '../contexts';
 import { useAuthModal } from '../contexts/LoginModalContext';
 import { colors } from '../styles/theme';
@@ -69,6 +72,12 @@ export function Header({ serviceName }: { serviceName: string }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const accessibleDashboards = useAccessibleDashboards();
+
+  // WO-O4O-NOTIFICATION-UI-CORE-V1: shared notification bell (logged-in only)
+  const notif = useNotifications(notificationsApi, {
+    enabled: !!user,
+    serviceKey: NOTIFICATION_SERVICE_KEY,
+  });
 
   // ── 메뉴 필터링 (WO-KPA-A-ROLE-BASED-NAVIGATION-AND-ENTRY-REFINEMENT-V1) ──
   // kpa:admin  → "관리자 콘솔" /admin
@@ -251,6 +260,16 @@ export function Header({ serviceName }: { serviceName: string }) {
           {/* Auth Buttons */}
           <div style={styles.authArea}>
             {user && <ServiceSwitcher currentServiceKey="kpa-society" />}
+            {user && (
+              <NotificationBell
+                unreadCount={notif.unreadCount}
+                notifications={notif.notifications}
+                loading={notif.loading}
+                onOpen={notif.refetchList}
+                onMarkAsRead={notif.markAsRead}
+                onMarkAllAsRead={notif.markAllAsRead}
+              />
+            )}
             {user ? (
               <GlobalUserProfileDropdown
                 user={{
