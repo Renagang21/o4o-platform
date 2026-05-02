@@ -5,7 +5,8 @@ import { Progress, ProgressStatus, Enrollment, EnrollmentStatus } from '@o4o/lms
 import type { QuizQuestion, QuizAnswer } from '@o4o/lms-core';
 import logger from '../../../utils/logger.js';
 // WO-O4O-CREDIT-SYSTEM-V1
-import { CreditService } from '../../credit/services/CreditService.js';
+// WO-O4O-POINT-CORE-SEPARATION-V1: CreditService 직접 호출 제거, PointService facade 경유.
+import { PointService } from '../../point/services/PointService.js';
 import { CreditSourceType } from '../../credit/entities/CreditTransaction.js';
 import { CREDIT_REWARDS, CREDIT_DESCRIPTIONS } from '../../credit/credit-constants.js';
 // WO-O4O-COMPLETION-V1
@@ -160,22 +161,21 @@ export class QuizService {
       lessonCompleted = await this.completeLessonProgress(quizAny.lessonId, quiz.courseId, userId, score);
     }
 
-    // WO-O4O-CREDIT-SYSTEM-V1: Award credits for quiz pass
+    // WO-O4O-CREDIT-SYSTEM-V1 / WO-O4O-POINT-CORE-SEPARATION-V1: 포인트 지급 (PointService facade)
     let creditsEarned = 0;
     if (passed) {
       try {
-        const creditService = CreditService.getInstance();
-        const quizCredit = await creditService.earnCredit(
+        const quizCredit = await PointService.getInstance().grantPoint({
           userId,
-          CREDIT_REWARDS.QUIZ_PASS,
-          CreditSourceType.QUIZ_PASS,
-          quizId,
-          `quiz_pass:${userId}:${quizId}`,
-          CREDIT_DESCRIPTIONS.QUIZ_PASS,
-        );
+          amount: CREDIT_REWARDS.QUIZ_PASS,
+          sourceType: CreditSourceType.QUIZ_PASS,
+          sourceId: quizId,
+          referenceKey: `quiz_pass:${userId}:${quizId}`,
+          description: CREDIT_DESCRIPTIONS.QUIZ_PASS,
+        });
         if (quizCredit) creditsEarned += CREDIT_REWARDS.QUIZ_PASS;
       } catch (creditError) {
-        logger.warn('[Quiz] Credit award failed (quiz_pass)', { quizId, userId, error: (creditError as Error).message });
+        logger.warn('[Quiz] Point grant failed (quiz_pass)', { quizId, userId, error: (creditError as Error).message });
       }
     }
 
@@ -282,19 +282,18 @@ export class QuizService {
     progress.attempts = (progress.attempts || 0) + 1;
     await this.progressRepository.save(progress);
 
-    // WO-O4O-CREDIT-SYSTEM-V1: Award credits for lesson complete
+    // WO-O4O-CREDIT-SYSTEM-V1 / WO-O4O-POINT-CORE-SEPARATION-V1: 포인트 지급 (PointService facade)
     try {
-      const creditService = CreditService.getInstance();
-      await creditService.earnCredit(
+      await PointService.getInstance().grantPoint({
         userId,
-        CREDIT_REWARDS.LESSON_COMPLETE,
-        CreditSourceType.LESSON_COMPLETE,
-        lessonId,
-        `lesson_complete:${userId}:${lessonId}`,
-        CREDIT_DESCRIPTIONS.LESSON_COMPLETE,
-      );
+        amount: CREDIT_REWARDS.LESSON_COMPLETE,
+        sourceType: CreditSourceType.LESSON_COMPLETE,
+        sourceId: lessonId,
+        referenceKey: `lesson_complete:${userId}:${lessonId}`,
+        description: CREDIT_DESCRIPTIONS.LESSON_COMPLETE,
+      });
     } catch (creditError) {
-      logger.warn('[Quiz] Credit award failed (lesson_complete)', { lessonId, userId, error: (creditError as Error).message });
+      logger.warn('[Quiz] Point grant failed (lesson_complete)', { lessonId, userId, error: (creditError as Error).message });
     }
 
     // Update enrollment progress
@@ -333,23 +332,22 @@ export class QuizService {
       //   course_complete 보상은 동일 userId + courseId 기준 1회만 지급한다.
       //   referenceKey = `course_complete:{userId}:{courseId}` UNIQUE 제약으로 DB 레벨에서 중복 방지.
       //   재참여 또는 재완료가 발생하더라도 보상은 재지급하지 않는다.
-      //   (CreditService.earnCredit 내부에서 dedup 처리 — null 반환)
+      //   (PointService.grantPoint → CreditService.earnCredit 내부에서 dedup 처리 — null 반환)
       // 수동 보상 정책:
       //   운영자 수동 보상 기능은 현재 단계에서 지원하지 않는다.
       //   승인/감사 정책 확정 전까지 수동 지급 관련 로직/엔드포인트 추가 금지.
       // ────────────────────────────────────────────────────────────────────────────────
       try {
-        const creditService = CreditService.getInstance();
-        await creditService.earnCredit(
+        await PointService.getInstance().grantPoint({
           userId,
-          CREDIT_REWARDS.COURSE_COMPLETE,
-          CreditSourceType.COURSE_COMPLETE,
-          courseId,
-          `course_complete:${userId}:${courseId}`,
-          CREDIT_DESCRIPTIONS.COURSE_COMPLETE,
-        );
+          amount: CREDIT_REWARDS.COURSE_COMPLETE,
+          sourceType: CreditSourceType.COURSE_COMPLETE,
+          sourceId: courseId,
+          referenceKey: `course_complete:${userId}:${courseId}`,
+          description: CREDIT_DESCRIPTIONS.COURSE_COMPLETE,
+        });
       } catch (creditError) {
-        logger.warn('[Quiz] Credit award failed (course_complete)', { courseId, userId, error: (creditError as Error).message });
+        logger.warn('[Quiz] Point grant failed (course_complete)', { courseId, userId, error: (creditError as Error).message });
       }
 
       // WO-O4O-COMPLETION-V1: Auto-create completion record + certificate
