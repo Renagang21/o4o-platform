@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { LoadingSpinner, EmptyState, Card } from '../../components/common';
-import { lmsApi } from '../../api';
+import { lmsApi, aiApi, type AiAnalyzeResult } from '../../api';
 import type { AssignmentLearner, AssignmentSubmission, LiveLesson } from '../../api/lms';
 import { colors, typography } from '../../styles/theme';
 import type { Course, Lesson, Enrollment, Quiz, QuizResult } from '../../types';
@@ -57,6 +57,11 @@ export function LmsLessonPage() {
   const [liveJoining, setLiveJoining] = useState(false);
   const [now, setNow] = useState(() => new Date());
 
+  // AI state (WO-O4O-LMS-AI-MINIMAL-V1)
+  const [aiResult, setAiResult] = useState<AiAnalyzeResult | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+
   // WO-LMS-COMPLETION-AND-CERTIFICATE-UX-REFINEMENT-V1
   const [showCompletionModal, setShowCompletionModal] = useState(false);
 
@@ -75,6 +80,9 @@ export function LmsLessonPage() {
     setAssignmentDraft('');
     // WO-O4O-LMS-LIVE-MINIMAL-V1
     setLive(null);
+    // WO-O4O-LMS-AI-MINIMAL-V1
+    setAiResult(null);
+    setAiError(null);
   }, [lessonId]);
 
   // WO-O4O-LMS-LIVE-MINIMAL-V1: tick clock for live status (예정/진행중/종료) — 30s cadence
@@ -261,6 +269,72 @@ export function LmsLessonPage() {
   const handleRetry = () => {
     setSelectedAnswers({});
     setQuizResult(null);
+    setAiResult(null);
+    setAiError(null);
+  };
+
+  // WO-O4O-LMS-AI-MINIMAL-V1: 3개 트리거 핸들러
+  const callAi = async (
+    fn: () => Promise<{ data: { data: AiAnalyzeResult } }>,
+  ) => {
+    setAiLoading(true);
+    setAiError(null);
+    try {
+      const res = await fn();
+      const data = (res as any).data?.data ?? null;
+      if (data) setAiResult(data);
+      else setAiError('AI 응답을 해석하지 못했습니다.');
+    } catch (err) {
+      setAiError(err instanceof Error ? err.message : 'AI 호출에 실패했습니다.');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const handleAiQuiz = () => {
+    if (!quiz || !quizResult) return;
+    callAi(() =>
+      aiApi.analyzeQuiz({
+        lessonId: currentLesson?.id,
+        questions: quiz.questions.map((q) => ({
+          id: q.id,
+          question: q.question,
+          type: q.type,
+          options: q.options,
+        })),
+        userAnswers: quizResult.answers.map((a) => ({
+          questionId: a.questionId,
+          // submitted answer lives in local state (response strips it when showCorrectAnswers=false)
+          answer: (selectedAnswers[a.questionId] ?? '') as any,
+          isCorrect: a.isCorrect,
+        })),
+        score: quizResult.score,
+        passingScore: quiz.passingScore,
+      }) as any,
+    );
+  };
+
+  const handleAiLive = () => {
+    if (!live || !currentLesson) return;
+    callAi(() =>
+      aiApi.summarizeLive({
+        lessonId: currentLesson.id,
+        title: currentLesson.title,
+        description: currentLesson.description ?? undefined,
+        notes: typeof currentLesson.content === 'string' ? currentLesson.content : undefined,
+      }) as any,
+    );
+  };
+
+  const handleAiAssignment = () => {
+    if (!mySubmission || !mySubmission.content) return;
+    callAi(() =>
+      aiApi.feedbackAssignment({
+        lessonId: currentLesson?.id,
+        instructions: assignment?.instructions ?? undefined,
+        submissionContent: mySubmission.content || '',
+      }) as any,
+    );
   };
 
   // WO-O4O-LMS-LIVE-MINIMAL-V1
@@ -363,6 +437,53 @@ export function LmsLessonPage() {
   const isQuizLesson = currentLesson.type === 'quiz' && quiz;
   const isAssignmentLesson = currentLesson.type === 'assignment';
   const isLiveLesson = currentLesson.type === 'live';
+
+  // WO-O4O-LMS-AI-MINIMAL-V1: 결과 패널 (3개 트리거가 같은 슬롯 공유)
+  const renderAiPanel = () => {
+    if (!aiLoading && !aiResult && !aiError) return null;
+    return (
+      <Card padding="large" style={{ marginTop: '16px', backgroundColor: '#f5f3ff', border: '1px solid #ddd6fe' }}>
+        <h4 style={{ ...typography.bodyL, fontWeight: 600, color: '#5b21b6', marginBottom: '12px' }}>
+          ✨ AI 분석
+        </h4>
+        {aiLoading && (
+          <p style={{ ...typography.bodyM, color: colors.neutral500 }}>분석 중입니다…</p>
+        )}
+        {aiError && !aiLoading && (
+          <p style={{ ...typography.bodyM, color: '#991b1b' }}>{aiError}</p>
+        )}
+        {aiResult && !aiLoading && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            {aiResult.summary && (
+              <p style={{ ...typography.bodyM, color: colors.neutral800, whiteSpace: 'pre-wrap' }}>
+                {aiResult.summary}
+              </p>
+            )}
+            {aiResult.insights.length > 0 && (
+              <div>
+                <div style={{ ...typography.bodyS, fontWeight: 600, color: colors.neutral700, marginBottom: '6px' }}>인사이트</div>
+                <ul style={{ margin: 0, paddingLeft: '20px', color: colors.neutral700 }}>
+                  {aiResult.insights.map((s, i) => (
+                    <li key={i} style={{ marginBottom: '4px' }}>{s}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {aiResult.recommendations.length > 0 && (
+              <div>
+                <div style={{ ...typography.bodyS, fontWeight: 600, color: colors.neutral700, marginBottom: '6px' }}>추천</div>
+                <ul style={{ margin: 0, paddingLeft: '20px', color: colors.neutral700 }}>
+                  {aiResult.recommendations.map((s, i) => (
+                    <li key={i} style={{ marginBottom: '4px' }}>{s}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
+      </Card>
+    );
+  };
 
   // Live status (예정/진행중/종료)
   const liveStatus: 'unset' | 'scheduled' | 'in_progress' | 'ended' = (() => {
@@ -485,7 +606,7 @@ export function LmsLessonPage() {
               )}
 
               {liveStatus === 'ended' && (
-                <div style={{ marginTop: '16px' }}>
+                <div style={{ marginTop: '16px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                   <a
                     href={live.liveUrl}
                     target="_blank"
@@ -494,8 +615,14 @@ export function LmsLessonPage() {
                   >
                     ▶ 다시보기
                   </a>
+                  {/* WO-O4O-LMS-AI-MINIMAL-V1 */}
+                  <button style={styles.aiButton} onClick={handleAiLive} disabled={aiLoading}>
+                    ✨ {aiLoading ? '요약 중…' : 'AI 요약 보기'}
+                  </button>
                 </div>
               )}
+              {/* WO-O4O-LMS-AI-MINIMAL-V1: live panel */}
+              {liveStatus === 'ended' && renderAiPanel()}
             </Card>
           ) : (
             <Card padding="large" style={{ marginTop: '24px', backgroundColor: '#fef3c7', border: '1px solid #fde68a' }}>
@@ -535,7 +662,7 @@ export function LmsLessonPage() {
                   placeholder="과제 내용을 입력하세요"
                   style={styles.assignmentTextarea}
                 />
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '12px', flexWrap: 'wrap' }}>
                   <button
                     style={{ ...styles.submitButton, opacity: assignmentSubmitting ? 0.6 : 1 }}
                     onClick={handleAssignmentSubmit}
@@ -543,6 +670,12 @@ export function LmsLessonPage() {
                   >
                     {assignmentSubmitting ? '제출 중...' : mySubmission ? '재제출하기' : '제출하기'}
                   </button>
+                  {/* WO-O4O-LMS-AI-MINIMAL-V1 */}
+                  {mySubmission && (
+                    <button style={styles.aiButton} onClick={handleAiAssignment} disabled={aiLoading}>
+                      ✨ {aiLoading ? '분석 중…' : 'AI 피드백 받기'}
+                    </button>
+                  )}
                   {mySubmission && (
                     <span style={{ ...typography.bodyS, color: colors.neutral500 }}>
                       마지막 제출: {new Date(mySubmission.submittedAt).toLocaleString('ko-KR')}
@@ -550,6 +683,8 @@ export function LmsLessonPage() {
                   )}
                 </div>
               </Card>
+              {/* WO-O4O-LMS-AI-MINIMAL-V1: assignment panel */}
+              {mySubmission && renderAiPanel()}
             </>
           ) : (
             <Card padding="large" style={{ marginTop: '24px', backgroundColor: '#fef3c7', border: '1px solid #fde68a' }}>
@@ -619,13 +754,22 @@ export function LmsLessonPage() {
                     </div>
                   )}
                 </div>
-                {!quizResult.passed && (
-                  <button style={styles.retryButton} onClick={handleRetry}>
-                    다시 시도
+                <div style={{ display: 'flex', gap: '8px', marginTop: '16px', flexWrap: 'wrap' }}>
+                  {!quizResult.passed && (
+                    <button style={styles.retryButton} onClick={handleRetry}>
+                      다시 시도
+                    </button>
+                  )}
+                  {/* WO-O4O-LMS-AI-MINIMAL-V1 */}
+                  <button style={styles.aiButton} onClick={handleAiQuiz} disabled={aiLoading}>
+                    ✨ {aiLoading ? '분석 중…' : 'AI 분석 보기'}
                   </button>
-                )}
+                </div>
               </Card>
             )}
+
+            {/* WO-O4O-LMS-AI-MINIMAL-V1: quiz panel */}
+            {quizResult && renderAiPanel()}
 
             {/* 문제 목록 */}
             {!quizResult && quiz.questions.map((question, qIndex) => (
@@ -1060,13 +1204,23 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
   },
   retryButton: {
-    marginTop: '16px',
     padding: '10px 24px',
     backgroundColor: colors.neutral100,
     color: colors.neutral700,
     border: `1px solid ${colors.neutral300}`,
     borderRadius: '6px',
     fontSize: '14px',
+    cursor: 'pointer',
+  },
+  // WO-O4O-LMS-AI-MINIMAL-V1
+  aiButton: {
+    padding: '10px 20px',
+    backgroundColor: '#ede9fe',
+    color: '#5b21b6',
+    border: '1px solid #ddd6fe',
+    borderRadius: '6px',
+    fontSize: '14px',
+    fontWeight: 600,
     cursor: 'pointer',
   },
   textAnswerInput: {
