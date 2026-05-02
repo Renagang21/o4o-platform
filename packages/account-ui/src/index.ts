@@ -17,3 +17,18 @@ export type {
 } from './components/GlobalUserProfileDropdown.js';
 export { getUserDisplayName } from './utils/getUserDisplayName.js';
 export type { DisplayNameUser } from './utils/getUserDisplayName.js';
+
+// WO-O4O-NOTIFICATION-UI-CORE-V1
+export { NotificationBell } from './components/NotificationBell.js';
+export type { NotificationBellProps } from './components/NotificationBell.js';
+export { useNotifications } from './notifications/useNotifications.js';
+export type {
+  UseNotificationsOptions,
+  UseNotificationsResult,
+} from './notifications/useNotifications.js';
+export type {
+  NotificationItem,
+  NotificationListResult,
+  NotificationListParams,
+  NotificationApiClient,
+} from './notifications/types.js';

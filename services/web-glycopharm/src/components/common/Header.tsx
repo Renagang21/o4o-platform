@@ -16,9 +16,12 @@ import { glycopharmConfig } from '@o4o/operator-ux-core';
 import { useLoginModal } from '@/contexts/LoginModalContext';
 import {
   GlobalUserProfileDropdown,
+  NotificationBell,
   getUserDisplayName,
+  useNotifications,
   type GlobalUserProfileMenuItem,
 } from '@o4o/account-ui';
+import { notificationsApi, NOTIFICATION_SERVICE_KEY } from '@/lib/api/notifications';
 import {
   Menu,
   X,
@@ -82,6 +85,12 @@ export default function Header() {
   };
 
   const displayName = getUserDisplayName(user as any);
+
+  // WO-O4O-NOTIFICATION-UI-CORE-V1
+  const notif = useNotifications(notificationsApi, {
+    enabled: isAuthenticated && !!user,
+    serviceKey: NOTIFICATION_SERVICE_KEY,
+  });
 
   const menuItems: GlobalUserProfileMenuItem[] = useMemo(() => {
     const items: GlobalUserProfileMenuItem[] = [];
@@ -182,6 +191,16 @@ export default function Header() {
           {/* Desktop User Actions */}
           <div className="hidden md:flex items-center gap-3">
             {isAuthenticated && <ServiceSwitcher currentServiceKey="glycopharm" />}
+            {isAuthenticated && user && (
+              <NotificationBell
+                unreadCount={notif.unreadCount}
+                notifications={notif.notifications}
+                loading={notif.loading}
+                onOpen={notif.refetchList}
+                onMarkAsRead={notif.markAsRead}
+                onMarkAllAsRead={notif.markAllAsRead}
+              />
+            )}
             {isAuthenticated && user ? (
               <GlobalUserProfileDropdown
                 user={{ displayName, email: user.email }}
