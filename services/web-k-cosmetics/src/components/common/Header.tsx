@@ -2,11 +2,17 @@
  * Header - K-Cosmetics
  * Based on GlycoPharm Header structure
  * WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1: 중앙화된 LoginModal 사용
+ * WO-O4O-GLOBAL-USER-PROFILE-DROPDOWN-EXTRACTION-V1: 사용자 드롭다운을 공통 컴포넌트로 교체
  */
 
-import { useState, useEffect, useRef } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User } from 'lucide-react';
+import { LayoutDashboard } from 'lucide-react';
+import {
+  GlobalUserProfileDropdown,
+  getUserDisplayName,
+  type GlobalUserProfileMenuItem,
+} from '@o4o/account-ui';
 import { useAuth, ROLE_LABELS, getKCosmeticsDashboardRoute } from '@/contexts/AuthContext';
 import { useLoginModal } from '@/contexts/LoginModalContext';
 import ServiceSwitcher from '../ServiceSwitcher';
@@ -16,43 +22,33 @@ export default function Header() {
   const { openLoginModal } = useLoginModal();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  // Close dropdown on ESC key
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setUserMenuOpen(false);
-    };
-    if (userMenuOpen) {
-      document.addEventListener('keydown', handleKeyDown);
-      return () => document.removeEventListener('keydown', handleKeyDown);
-    }
-  }, [userMenuOpen]);
-
-  // Close dropdown on click outside
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setUserMenuOpen(false);
-      }
-    };
-    if (userMenuOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }
-  }, [userMenuOpen]);
 
   const handleLogout = () => {
     logout();
     navigate('/');
-    setUserMenuOpen(false);
     setMobileMenuOpen(false);
   };
 
   const dashboardPath = user?.roles[0] ? getKCosmeticsDashboardRoute(user.roles) : '/';
   const roleLabel = user?.roles[0] ? ROLE_LABELS[user.roles[0]] : '';
   const isStoreOwner = user?.roles.includes('cosmetics:store_owner') ?? false;
+
+  const displayName = getUserDisplayName(user as any);
+
+  const menuItems: GlobalUserProfileMenuItem[] = useMemo(() => [
+    {
+      key: 'dashboard',
+      icon: <LayoutDashboard className="w-4 h-4 text-gray-500" />,
+      label: '대시보드',
+      href: dashboardPath,
+    },
+    {
+      key: 'mypage',
+      icon: <LayoutDashboard className="w-4 h-4 text-gray-500" />,
+      label: '마이페이지',
+      href: '/mypage',
+    },
+  ], [dashboardPath]);
 
   return (
     <header style={styles.header}>
@@ -85,56 +81,12 @@ export default function Header() {
           {/* Desktop User Actions */}
           <div style={styles.actions}>
             {isAuthenticated && <ServiceSwitcher currentServiceKey="k-cosmetics" />}
-            {isAuthenticated ? (
-              <div style={styles.userMenu} ref={dropdownRef}>
-                <button
-                  onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  style={styles.userButton}
-                  aria-label="사용자 메뉴"
-                >
-                  <div style={styles.avatar}>
-                    <User style={{ width: 20, height: 20, color: '#fff' }} />
-                  </div>
-                </button>
-
-                {userMenuOpen && (
-                  <div style={styles.dropdown}>
-                    <div style={styles.dropdownHeader}>
-                      <p style={styles.dropdownName}>
-                        {/* WO-O4O-NAME-NORMALIZATION-V1 */}
-                        {(user as any)?.displayName
-                          || (((user as any)?.lastName || (user as any)?.firstName) ? `${(user as any).lastName || ''}${(user as any).firstName || ''}`.trim() : '')
-                          || (user?.name && user.name !== user.email ? user.name : '')
-                          || user?.email?.split('@')[0]
-                          || '사용자'}님
-                      </p>
-                      <p style={styles.dropdownEmail}>{user?.email}</p>
-                      <p style={styles.dropdownRole}>{roleLabel}</p>
-                    </div>
-                    <Link
-                      to={dashboardPath}
-                      style={styles.dropdownItem}
-                      onClick={() => setUserMenuOpen(false)}
-                    >
-                      대시보드
-                    </Link>
-                    <Link
-                      to="/mypage"
-                      style={styles.dropdownItem}
-                      onClick={() => setUserMenuOpen(false)}
-                    >
-                      마이페이지
-                    </Link>
-                    {/* Account Center — 임시 숨김: account.neture.co.kr 서비스 미배포/SSL 미구성 (WO-O4O-ACCOUNT-CENTER-LINK-VISIBILITY-POLICY-ALIGNMENT-V1) */}
-                    <button
-                      onClick={handleLogout}
-                      style={styles.dropdownLogout}
-                    >
-                      로그아웃
-                    </button>
-                  </div>
-                )}
-              </div>
+            {isAuthenticated && user ? (
+              <GlobalUserProfileDropdown
+                user={{ displayName, email: user.email, roleLabel }}
+                menuItems={menuItems}
+                onLogout={handleLogout}
+              />
             ) : (
               <>
                 <button onClick={openLoginModal} style={styles.loginLink}>로그인</button>
@@ -270,90 +222,6 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     alignItems: 'center',
     gap: '12px',
-  },
-  userMenu: {
-    position: 'relative',
-  },
-  userButton: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '4px',
-    borderRadius: '50%',
-    border: 'none',
-    background: 'transparent',
-    cursor: 'pointer',
-    transition: 'background-color 0.2s',
-  },
-  avatar: {
-    width: '36px',
-    height: '36px',
-    borderRadius: '50%',
-    background: 'linear-gradient(135deg, #f48fb1, #e91e63)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: '#fff',
-    fontSize: '15px',
-    fontWeight: 600,
-    boxShadow: '0 2px 8px rgba(233, 30, 99, 0.3)',
-  },
-  dropdown: {
-    position: 'absolute',
-    right: 0,
-    top: '100%',
-    marginTop: '8px',
-    width: '192px',
-    backgroundColor: '#fff',
-    borderRadius: '12px',
-    boxShadow: '0 10px 40px rgba(0,0,0,0.15)',
-    border: '1px solid #e2e8f0',
-    padding: '8px 0',
-    zIndex: 50,
-  },
-  dropdownHeader: {
-    padding: '12px 16px',
-    borderBottom: '1px solid #e2e8f0',
-  },
-  dropdownName: {
-    fontSize: '14px',
-    fontWeight: 600,
-    color: '#1e293b',
-    margin: '0 0 4px 0',
-  },
-  dropdownEmail: {
-    fontSize: '13px',
-    fontWeight: 500,
-    color: '#1e293b',
-    margin: 0,
-  },
-  dropdownRole: {
-    fontSize: '11px',
-    color: '#e91e63',
-    margin: '2px 0 0 0',
-    fontWeight: 500,
-  },
-  dropdownItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    padding: '10px 16px',
-    fontSize: '14px',
-    color: '#334155',
-    textDecoration: 'none',
-  },
-  dropdownLogout: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    width: '100%',
-    padding: '10px 16px',
-    fontSize: '14px',
-    color: '#dc2626',
-    background: 'transparent',
-    border: 'none',
-    cursor: 'pointer',
-    textAlign: 'left',
   },
   loginLink: {
     padding: '8px 16px',
