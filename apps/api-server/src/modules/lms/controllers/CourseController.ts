@@ -172,7 +172,51 @@ export class CourseController extends BaseController {
     }
   }
 
+  /**
+   * WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1
+   * 직접 publish는 kpa:admin 전용 (관리자 override 경로).
+   * 일반 강사는 submit-review를 사용해야 함 → 403.
+   */
   static async publishCourse(req: Request, res: Response): Promise<any> {
+    try {
+      const { id } = req.params;
+      const userRoles: string[] = (req as any).user?.roles || [];
+      const service = CourseService.getInstance();
+
+      const course = await service.getCourse(id);
+      if (!course) {
+        return BaseController.notFound(res, 'Course not found');
+      }
+
+      // 강사는 직접 publish 금지 — submit-review 사용
+      if (!userRoles.includes('kpa:admin')) {
+        return BaseController.forbidden(
+          res,
+          '강의 공개는 운영자 승인을 거쳐야 합니다. 승인 요청을 사용해주세요.',
+          'PUBLISH_REQUIRES_APPROVAL',
+        );
+      }
+
+      const updated = await service.publishCourse(id);
+
+      return BaseController.ok(res, { course: updated, message: 'Course published successfully' });
+    } catch (error: any) {
+      logger.error('[CourseController.publishCourse] Error', { error: error.message });
+
+      if (error.message && error.message.includes('not found')) {
+        return BaseController.notFound(res, error.message);
+      }
+
+      return BaseController.error(res, error);
+    }
+  }
+
+  /**
+   * WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1
+   * 강사 승인 요청 — DRAFT 또는 REJECTED → PENDING_REVIEW.
+   * 본인 강의 또는 kpa:admin만 호출 가능.
+   */
+  static async submitForReview(req: Request, res: Response): Promise<any> {
     try {
       const { id } = req.params;
       const userId = (req as any).user?.id;
@@ -184,16 +228,26 @@ export class CourseController extends BaseController {
         return BaseController.notFound(res, 'Course not found');
       }
       if (!CourseController.isOwnerOrAdmin(userId, course.instructorId, userRoles)) {
-        return BaseController.forbidden(res, 'You can only publish your own courses');
+        return BaseController.forbidden(res, 'You can only submit your own courses for review');
       }
 
-      const updated = await service.publishCourse(id);
+      const updated = await service.submitForReview(id);
 
-      return BaseController.ok(res, { course: updated, message: 'Course published successfully' });
+      return BaseController.ok(res, {
+        course: updated,
+        message: '승인 요청이 접수되었습니다',
+      });
     } catch (error: any) {
-      logger.error('[CourseController.publishCourse] Error', { error: error.message });
+      logger.error('[CourseController.submitForReview] Error', { error: error.message });
 
-      if (error.message && error.message.includes('not found')) {
+      if (error.message?.startsWith('INVALID_STATUS_TRANSITION')) {
+        return BaseController.badRequest(
+          res,
+          '현재 상태에서는 승인 요청할 수 없습니다',
+          'INVALID_STATUS_TRANSITION',
+        );
+      }
+      if (error.message?.includes('not found')) {
         return BaseController.notFound(res, error.message);
       }
 

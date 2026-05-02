@@ -46,8 +46,13 @@ router.patch('/courses/:id', requireAuth, requireInstructor, asyncHandler(Course
 // DELETE /api/v1/lms/courses/:id - Archive Course
 router.delete('/courses/:id', requireAuth, requireInstructor, asyncHandler(CourseController.deleteCourse));
 
-// POST /api/v1/lms/courses/:id/publish - Publish Course
+// POST /api/v1/lms/courses/:id/publish - Publish Course (kpa:admin override만)
+// WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1: 강사 직접 publish 금지, controller에서 403 반환
 router.post('/courses/:id/publish', requireAuth, requireInstructor, asyncHandler(CourseController.publishCourse));
+
+// POST /api/v1/lms/courses/:id/submit-review - 강사 승인 요청
+// WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1: DRAFT 또는 REJECTED → PENDING_REVIEW
+router.post('/courses/:id/submit-review', requireAuth, requireInstructor, asyncHandler(CourseController.submitForReview));
 
 // POST /api/v1/lms/courses/:id/unpublish - Unpublish Course
 router.post('/courses/:id/unpublish', requireAuth, requireInstructor, asyncHandler(CourseController.unpublishCourse));

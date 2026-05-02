@@ -551,6 +551,48 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     res.json({ success: true, data: { course: updated } });
   }));
 
+  // WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1: Operator 강의 승인
+  // PENDING_REVIEW → PUBLISHED. PENDING_REVIEW 상태가 아닌 강의는 400 반환.
+  lmsRouter.post('/operator/courses/:id/approve', authenticate, requireKpaScope('kpa:operator'), asyncHandler(async (req: Request, res: Response) => {
+    const service = CourseService.getInstance();
+    const course = await service.getCourse(req.params.id);
+    if (!course) { res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); return; }
+    try {
+      const updated = await service.approveCourse(req.params.id);
+      res.json({ success: true, data: { course: updated } });
+    } catch (err: any) {
+      if (err.message?.startsWith('INVALID_STATUS_TRANSITION')) {
+        res.status(400).json({ success: false, error: '검토 대기(PENDING_REVIEW) 상태의 강의만 승인할 수 있습니다.', code: 'INVALID_STATUS_TRANSITION' });
+        return;
+      }
+      throw err;
+    }
+  }));
+
+  // WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1: Operator 강의 반려
+  // PENDING_REVIEW → REJECTED + rejectionReason 저장.
+  // Body: { reason: string }
+  lmsRouter.post('/operator/courses/:id/reject', authenticate, requireKpaScope('kpa:operator'), asyncHandler(async (req: Request, res: Response) => {
+    const service = CourseService.getInstance();
+    const course = await service.getCourse(req.params.id);
+    if (!course) { res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); return; }
+    const reason = typeof req.body?.reason === 'string' ? req.body.reason : '';
+    try {
+      const updated = await service.rejectCourse(req.params.id, reason);
+      res.json({ success: true, data: { course: updated } });
+    } catch (err: any) {
+      if (err.message === 'REJECTION_REASON_REQUIRED') {
+        res.status(400).json({ success: false, error: '반려 사유를 입력해주세요.', code: 'REJECTION_REASON_REQUIRED' });
+        return;
+      }
+      if (err.message?.startsWith('INVALID_STATUS_TRANSITION')) {
+        res.status(400).json({ success: false, error: '검토 대기(PENDING_REVIEW) 상태의 강의만 반려할 수 있습니다.', code: 'INVALID_STATUS_TRANSITION' });
+        return;
+      }
+      throw err;
+    }
+  }));
+
   lmsRouter.post('/operator/courses/:id/archive', authenticate, requireKpaScope('kpa:operator'), asyncHandler(async (req: Request, res: Response) => {
     const service = CourseService.getInstance();
     const course = await service.getCourse(req.params.id);

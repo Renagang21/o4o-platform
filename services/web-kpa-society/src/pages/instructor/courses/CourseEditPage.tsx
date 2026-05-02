@@ -86,9 +86,23 @@ const publishBtnStyle = (pub: boolean): React.CSSProperties => ({
 const statusBadgeStyle = (status: string): React.CSSProperties => ({
   display: 'inline-block', padding: '3px 10px', borderRadius: 999, fontSize: 11, fontWeight: 600,
   color: '#fff',
-  background: status === 'published' ? '#10b981' : status === 'archived' ? '#f59e0b' : '#6b7280',
+  background:
+    status === 'published' ? '#10b981'
+    : status === 'pending_review' ? '#3b82f6'
+    : status === 'rejected' ? '#ef4444'
+    : status === 'archived' ? '#f59e0b'
+    : '#6b7280',
   marginLeft: 10,
 });
+
+// WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1
+const STATUS_LABEL: Record<string, string> = {
+  draft: '초안',
+  pending_review: '검토 중',
+  published: '공개 중',
+  rejected: '반려됨',
+  archived: '종료됨',
+};
 
 /* ──────────────── LessonModal ──────────────── */
 interface LessonModalProps {
@@ -313,17 +327,16 @@ export default function CourseEditPage() {
     }
   };
 
-  const handlePublish = async () => {
+  // WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1
+  // 강사는 직접 publish 불가. submitForReview로 운영자 승인 요청.
+  // PUBLISHED 상태에서 비공개 전환은 운영자 권한이므로 강사 측 버튼에서 제거됨.
+  const handleSubmitForReview = async () => {
     if (!id || !course) return;
     try {
-      if (course.status === 'published') {
-        await lmsInstructorApi.unpublishCourse(id);
-      } else {
-        await lmsInstructorApi.publishCourse(id);
-      }
+      await lmsInstructorApi.submitForReview(id);
       await loadData();
     } catch (e: any) {
-      alert(e?.response?.data?.error || '처리 실패');
+      alert(e?.response?.data?.error || '승인 요청 실패');
     }
   };
 
@@ -422,9 +435,30 @@ export default function CourseEditPage() {
         <div style={s.sectionTitle}>
           강의 정보
           <span style={statusBadgeStyle(course.status)}>
-            {course.status === 'published' ? '공개 중' : course.status === 'archived' ? '종료됨' : '초안'}
+            {STATUS_LABEL[course.status] ?? course.status}
           </span>
         </div>
+        {/* WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1: 반려 사유 표시 */}
+        {course.status === 'rejected' && course.rejectionReason && (
+          <div style={{
+            padding: '12px 14px', background: '#fef2f2', border: '1px solid #fecaca',
+            color: '#991b1b', borderRadius: 8, fontSize: 13, lineHeight: 1.5, marginBottom: 12,
+          }}>
+            <strong>반려 사유:</strong> {course.rejectionReason}
+            <div style={{ fontSize: 12, color: '#7f1d1d', marginTop: 6 }}>
+              내용을 수정한 뒤 "수정 후 재요청"을 눌러주세요.
+            </div>
+          </div>
+        )}
+        {/* WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1: 검토 중 안내 */}
+        {course.status === 'pending_review' && (
+          <div style={{
+            padding: '12px 14px', background: '#eff6ff', border: '1px solid #bfdbfe',
+            color: '#1e40af', borderRadius: 8, fontSize: 13, marginBottom: 12,
+          }}>
+            운영자 검토 중입니다. 검토가 완료되면 알림이 표시됩니다.
+          </div>
+        )}
         <div style={s.card}>
           <div style={s.field}>
             <label style={s.label}>제목</label>
@@ -481,9 +515,18 @@ export default function CourseEditPage() {
             <button style={saveBtnStyle(saving || !form.title.trim())} disabled={saving || !form.title.trim()} onClick={handleSaveCourse}>
               {saving ? '저장 중...' : '저장'}
             </button>
-            {course.status !== 'archived' && (
-              <button style={publishBtnStyle(course.status === 'published')} onClick={handlePublish}>
-                {course.status === 'published' ? '비공개 전환' : '발행하기'}
+            {/* WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1: 상태별 액션 버튼 */}
+            {(course.status === 'draft' || course.status === 'rejected') && (
+              <button style={publishBtnStyle(false)} onClick={handleSubmitForReview}>
+                {course.status === 'rejected' ? '수정 후 재요청' : '승인 요청'}
+              </button>
+            )}
+            {course.status === 'pending_review' && (
+              <button
+                style={{ ...publishBtnStyle(true), opacity: 0.6, cursor: 'not-allowed' }}
+                disabled
+              >
+                검토 중
               </button>
             )}
             {course.status !== 'archived' && (

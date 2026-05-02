@@ -17,7 +17,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, RefreshCw, AlertCircle, Search, Loader2, Archive, EyeOff, Trash2 } from 'lucide-react';
+import { BookOpen, RefreshCw, AlertCircle, Search, Loader2, Archive, EyeOff, Trash2, Check, X } from 'lucide-react';
 import { ActionBar, BulkResultModal, RowActionMenu } from '@o4o/ui';
 import { DataTable, Pagination, defineActionPolicy, buildRowActions, useBatchAction } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
@@ -30,8 +30,19 @@ import type { Course } from '../../types';
 const STATUS_CONFIG: Record<string, { text: string; cls: string }> = {
   published: { text: '공개', cls: 'bg-green-50 text-green-700' },
   draft: { text: '준비중', cls: 'bg-amber-50 text-amber-600' },
+  pending_review: { text: '검토 대기', cls: 'bg-blue-50 text-blue-700' },
+  rejected: { text: '반려됨', cls: 'bg-red-50 text-red-700' },
   archived: { text: '종료', cls: 'bg-slate-100 text-slate-500' },
 };
+
+const STATUS_FILTER_OPTIONS = [
+  { value: '', label: '전체' },
+  { value: 'pending_review', label: '검토 대기' },
+  { value: 'draft', label: '준비중' },
+  { value: 'published', label: '공개' },
+  { value: 'rejected', label: '반려됨' },
+  { value: 'archived', label: '종료' },
+];
 
 // ─── Action Policy ───
 
@@ -40,6 +51,23 @@ const courseActionPolicy = defineActionPolicy<Course>('kpa:lms:courses', {
     {
       key: 'view',
       label: '상세 보기',
+    },
+    // WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1
+    {
+      key: 'approve',
+      label: '승인 (공개)',
+      visible: (row) => row.status === 'pending_review',
+      confirm: (row) => ({
+        title: '강의 승인',
+        message: `"${row.title}" 강의를 승인하여 공개 처리합니다.`,
+        confirmText: '승인',
+      }),
+    },
+    {
+      key: 'reject',
+      label: '반려',
+      variant: 'danger',
+      visible: (row) => row.status === 'pending_review',
     },
     {
       key: 'unpublish',
@@ -76,6 +104,8 @@ const courseActionPolicy = defineActionPolicy<Course>('kpa:lms:courses', {
 
 const COURSE_ACTION_ICONS: Record<string, React.ReactNode> = {
   view: <BookOpen className="w-4 h-4" />,
+  approve: <Check className="w-4 h-4" />,
+  reject: <X className="w-4 h-4" />,
   unpublish: <EyeOff className="w-4 h-4" />,
   archive: <Archive className="w-4 h-4" />,
   'hard-delete': <Trash2 className="w-4 h-4" />,
@@ -100,6 +130,11 @@ export default function OperatorLmsCoursesPage() {
   const [searchInput, setSearchInput] = useState('');
   const [page, setPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  // WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1: 상태 필터 + 반려 사유 modal
+  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [rejectModal, setRejectModal] = useState<{ open: boolean; course: Course | null; reason: string; submitting: boolean }>(
+    { open: false, course: null, reason: '', submitting: false },
+  );
   const batch = useBatchAction();
   const PAGE_SIZE = 20;
 
@@ -107,9 +142,10 @@ export default function OperatorLmsCoursesPage() {
     setLoading(true);
     setError(null);
     try {
-      // No status filter → returns all statuses (draft/published/archived)
+      // WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1: status 필터 적용 가능 (전체 / 검토대기 / 공개 등)
       const res = await lmsApi.getCourses({
         search: search || undefined,
+        status: statusFilter || undefined,
         page,
         limit: PAGE_SIZE,
       });
@@ -121,7 +157,7 @@ export default function OperatorLmsCoursesPage() {
       setError('강의 목록을 불러오지 못했습니다.');
     }
     setLoading(false);
-  }, [search, page]);
+  }, [search, statusFilter, page]);
 
   useEffect(() => {
     fetchCourses();
@@ -167,6 +203,42 @@ export default function OperatorLmsCoursesPage() {
     } catch (err: any) {
       const reason = (err as any)?.data?.error || err?.message || '완전 삭제에 실패했습니다';
       toast.error(reason);
+    }
+  };
+
+  // WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1: 승인 / 반려
+  const handleApprove = async (course: Course) => {
+    try {
+      await lmsApi.operatorApproveCourse(course.id);
+      toast.success(`"${course.title}" 승인되어 공개되었습니다`);
+      fetchCourses();
+    } catch (err: any) {
+      const reason = (err as any)?.data?.error || err?.message || '승인에 실패했습니다';
+      toast.error(reason);
+    }
+  };
+
+  const openRejectModal = (course: Course) => {
+    setRejectModal({ open: true, course, reason: '', submitting: false });
+  };
+
+  const handleRejectSubmit = async () => {
+    if (!rejectModal.course) return;
+    const reason = rejectModal.reason.trim();
+    if (!reason) {
+      toast.error('반려 사유를 입력해주세요');
+      return;
+    }
+    setRejectModal((s) => ({ ...s, submitting: true }));
+    try {
+      await lmsApi.operatorRejectCourse(rejectModal.course.id, reason);
+      toast.success(`"${rejectModal.course.title}" 반려되었습니다`);
+      setRejectModal({ open: false, course: null, reason: '', submitting: false });
+      fetchCourses();
+    } catch (err: any) {
+      const msg = (err as any)?.data?.error || err?.message || '반려 처리에 실패했습니다';
+      toast.error(msg);
+      setRejectModal((s) => ({ ...s, submitting: false }));
     }
   };
 
@@ -385,6 +457,8 @@ export default function OperatorLmsCoursesPage() {
         <RowActionMenu
           actions={buildRowActions(courseActionPolicy, row, {
             view: () => navigate(`/lms/course/${row.id}`),
+            approve: () => handleApprove(row),
+            reject: () => openRejectModal(row),
             unpublish: () => handleUnpublish(row),
             archive: () => handleArchive(row),
             'hard-delete': () => handleHardDelete(row),
@@ -438,9 +512,9 @@ export default function OperatorLmsCoursesPage() {
         강의 데이터와 수강 기록 보존을 위해 <strong>종료(보관)</strong> 처리합니다. 종료된 강의는 <strong>완전 삭제</strong>할 수 있습니다.
       </div>
 
-      {/* Search */}
-      <form onSubmit={handleSearch} style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-        <div style={{ position: 'relative', flex: 1 }}>
+      {/* Search + Status Filter — WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1 */}
+      <form onSubmit={handleSearch} style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
+        <div style={{ position: 'relative', flex: 1, minWidth: 240 }}>
           <Search size={15} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
           <input
             type="text"
@@ -450,9 +524,18 @@ export default function OperatorLmsCoursesPage() {
             style={{ width: '100%', padding: '8px 10px 8px 32px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' as const, outline: 'none' }}
           />
         </div>
+        <select
+          value={statusFilter}
+          onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
+          style={{ padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 14, background: '#fff', minWidth: 130, cursor: 'pointer' }}
+        >
+          {STATUS_FILTER_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
         <button type="submit" style={searchBtnStyle}>검색</button>
-        {search && (
-          <button type="button" onClick={() => { setSearch(''); setSearchInput(''); setPage(1); }} style={clearBtnStyle}>
+        {(search || statusFilter) && (
+          <button type="button" onClick={() => { setSearch(''); setSearchInput(''); setStatusFilter(''); setPage(1); }} style={clearBtnStyle}>
             초기화
           </button>
         )}
@@ -503,6 +586,56 @@ export default function OperatorLmsCoursesPage() {
         result={batch.result}
         onRetry={() => batch.retryFailed()}
       />
+
+      {/* WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1: 반려 사유 입력 modal */}
+      {rejectModal.open && rejectModal.course && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 1000,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}
+          onClick={(e) => { if (e.target === e.currentTarget && !rejectModal.submitting) setRejectModal({ open: false, course: null, reason: '', submitting: false }); }}
+        >
+          <div style={{ background: '#fff', borderRadius: 12, padding: '24px 28px', width: '100%', maxWidth: 480 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1e293b', margin: 0, marginBottom: 8 }}>강의 반려</h3>
+            <p style={{ fontSize: 13, color: '#64748b', margin: 0, marginBottom: 16 }}>
+              "<strong>{rejectModal.course.title}</strong>" 반려 사유를 입력해주세요. 강사에게 표시되며 수정 후 재요청 시 참고합니다.
+            </p>
+            <textarea
+              value={rejectModal.reason}
+              onChange={(e) => setRejectModal((s) => ({ ...s, reason: e.target.value }))}
+              placeholder="예: 강의 본문이 비어있습니다. 레슨을 추가한 뒤 다시 요청해주세요."
+              rows={5}
+              style={{
+                width: '100%', padding: '10px 12px', border: '1px solid #e2e8f0', borderRadius: 8,
+                fontSize: 14, color: '#1e293b', boxSizing: 'border-box', outline: 'none', resize: 'vertical',
+              }}
+              autoFocus
+              disabled={rejectModal.submitting}
+            />
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 16 }}>
+              <button
+                onClick={() => setRejectModal({ open: false, course: null, reason: '', submitting: false })}
+                disabled={rejectModal.submitting}
+                style={{ padding: '8px 16px', background: '#f1f5f9', color: '#475569', border: 'none', borderRadius: 8, fontSize: 13, cursor: 'pointer' }}
+              >
+                취소
+              </button>
+              <button
+                onClick={handleRejectSubmit}
+                disabled={rejectModal.submitting || !rejectModal.reason.trim()}
+                style={{
+                  padding: '8px 16px', background: rejectModal.submitting || !rejectModal.reason.trim() ? '#fca5a5' : '#dc2626',
+                  color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600,
+                  cursor: rejectModal.submitting || !rejectModal.reason.trim() ? 'not-allowed' : 'pointer',
+                }}
+              >
+                {rejectModal.submitting ? '처리 중...' : '반려'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

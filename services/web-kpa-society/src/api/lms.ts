@@ -124,6 +124,13 @@ export const lmsApi = {
   // WO-LMS-COURSE-HARD-DELETE-V1: 운영자 강의 완전 삭제
   operatorHardDeleteCourse: (id: string) =>
     apiClient.delete<ApiResponse<{ deleted: boolean }>>(`/lms/operator/courses/${id}/hard`),
+
+  // WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1: 운영자 강의 승인/반려
+  operatorApproveCourse: (id: string) =>
+    apiClient.post<ApiResponse<{ course: Course }>>(`/lms/operator/courses/${id}/approve`),
+
+  operatorRejectCourse: (id: string, reason: string) =>
+    apiClient.post<ApiResponse<{ course: Course }>>(`/lms/operator/courses/${id}/reject`, { reason }),
 };
 
 // WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1

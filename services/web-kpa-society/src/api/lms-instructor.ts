@@ -5,7 +5,13 @@
 
 import { authClient } from '../contexts/AuthContext';
 
-export type CourseStatus = 'draft' | 'published' | 'archived';
+// WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1: pending_review/rejected 추가
+export type CourseStatus =
+  | 'draft'
+  | 'pending_review'
+  | 'published'
+  | 'rejected'
+  | 'archived';
 // WO-O4O-LMS-LESSON-TYPE-NORMALIZATION-V1: lowercase across the board
 export type LessonType = 'video' | 'article' | 'quiz' | 'assignment' | 'live';
 // WO-KPA-CONTENT-COURSE-KIND-SEPARATION-V1
@@ -32,6 +38,8 @@ export interface Course {
   price: number | null;
   // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1
   visibility: CourseVisibility;
+  // WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1
+  rejectionReason?: string | null;
   createdAt: string;
   updatedAt: string;
   publishedAt: string | null;
@@ -201,9 +209,13 @@ export const lmsInstructorApi = {
   reorderLessons: (courseId: string, lessonIds: string[]) =>
     authClient.api.post<{ success: boolean }>(`/lms/courses/${courseId}/lessons/reorder`, { lessonIds }),
 
-  /** 강의 발행 */
+  /** 강의 발행 (kpa:admin 전용) — 일반 강사는 submitForReview를 사용해야 함 */
   publishCourse: (id: string) =>
     authClient.api.post<{ success: boolean; data: Course }>(`/lms/courses/${id}/publish`, {}),
+
+  /** 강사 승인 요청 — DRAFT 또는 REJECTED → PENDING_REVIEW (WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1) */
+  submitForReview: (id: string) =>
+    authClient.api.post<{ success: boolean; data: Course }>(`/lms/courses/${id}/submit-review`, {}),
 
   /** 강의 발행 취소 */
   unpublishCourse: (id: string) =>

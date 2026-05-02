@@ -17,9 +17,19 @@ import {
  * Can be organization-scoped for organization-specific training.
  */
 
+/**
+ * WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1
+ *   DRAFT          : 강사 작성 중 (기본값, 노출 X)
+ *   PENDING_REVIEW : 강사가 승인 요청 (운영자 검토 대기, 노출 X)
+ *   PUBLISHED      : 운영자 승인 완료 (사용자 노출 O)
+ *   REJECTED       : 운영자 반려 (rejectionReason 동반, 강사가 수정 후 재요청 가능)
+ *   ARCHIVED       : 종료(보관, 노출 X)
+ */
 export enum CourseStatus {
   DRAFT = 'draft',
+  PENDING_REVIEW = 'pending_review',
   PUBLISHED = 'published',
+  REJECTED = 'rejected',
   ARCHIVED = 'archived',
 }
 
@@ -67,6 +77,10 @@ export class Course {
 
   @Column({ type: 'enum', enum: CourseStatus, default: CourseStatus.DRAFT })
   status!: CourseStatus;
+
+  // WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1: 반려 사유 (REJECTED 상태에서만 의미 있음)
+  @Column({ name: 'rejectionReason', type: 'text', nullable: true })
+  rejectionReason?: string | null;
 
   // WO-KPA-CONTENT-COURSE-KIND-SEPARATION-V1: 코스형 자료 vs 일반 강의 분류
   @Column({ name: 'content_kind', type: 'varchar', length: 30, default: ContentKind.LECTURE })
@@ -193,12 +207,14 @@ export class Course {
   }
 
   /**
-   * Publish course
+   * Publish course (운영자 승인 시 호출).
+   * WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1: rejectionReason 클리어.
    */
   publish(): void {
     this.status = CourseStatus.PUBLISHED;
     this.isPublished = true;
     this.publishedAt = new Date();
+    this.rejectionReason = null;
   }
 
   /**
@@ -207,5 +223,24 @@ export class Course {
   archive(): void {
     this.status = CourseStatus.ARCHIVED;
     this.isPublished = false;
+  }
+
+  /**
+   * WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1
+   * 강사가 승인 요청 (DRAFT 또는 REJECTED → PENDING_REVIEW).
+   * 재요청 시 이전 반려 사유 클리어.
+   */
+  submitForReview(): void {
+    this.status = CourseStatus.PENDING_REVIEW;
+    this.rejectionReason = null;
+  }
+
+  /**
+   * WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1
+   * 운영자 반려 (PENDING_REVIEW → REJECTED).
+   */
+  reject(reason: string): void {
+    this.status = CourseStatus.REJECTED;
+    this.rejectionReason = reason;
   }
 }

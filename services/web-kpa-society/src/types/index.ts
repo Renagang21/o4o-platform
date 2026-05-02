@@ -147,7 +147,9 @@ export interface Course {
   lessonCount: number;
   enrollmentCount: number;
   category: string;
-  status: 'draft' | 'published' | 'archived';
+  // WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1
+  status: 'draft' | 'pending_review' | 'published' | 'rejected' | 'archived';
+  rejectionReason?: string | null;
   createdAt: string;
   isPaid?: boolean;
   price?: number;

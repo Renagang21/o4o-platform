@@ -278,6 +278,97 @@ export class CourseService extends BaseService<Course> {
     return updated;
   }
 
+  /**
+   * WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1
+   * 강사 승인 요청 — DRAFT 또는 REJECTED → PENDING_REVIEW.
+   * PUBLISHED / PENDING_REVIEW 상태에서는 거부.
+   */
+  async submitForReview(id: string): Promise<Course> {
+    const course = await this.getCourse(id);
+    if (!course) {
+      throw new Error(`Course not found: ${id}`);
+    }
+
+    if (
+      course.status !== CourseStatus.DRAFT &&
+      course.status !== CourseStatus.REJECTED
+    ) {
+      throw new Error(
+        `INVALID_STATUS_TRANSITION: status='${course.status}' is not eligible for submit-review`,
+      );
+    }
+
+    course.submitForReview();
+    const updated = await this.courseRepository.save(course);
+
+    logger.info(`[LMS] Course submitted for review`, {
+      id: updated.id,
+      title: updated.title,
+    });
+
+    return updated;
+  }
+
+  /**
+   * WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1
+   * 운영자 승인 — PENDING_REVIEW → PUBLISHED.
+   */
+  async approveCourse(id: string): Promise<Course> {
+    const course = await this.getCourse(id);
+    if (!course) {
+      throw new Error(`Course not found: ${id}`);
+    }
+
+    if (course.status !== CourseStatus.PENDING_REVIEW) {
+      throw new Error(
+        `INVALID_STATUS_TRANSITION: only PENDING_REVIEW can be approved (current: '${course.status}')`,
+      );
+    }
+
+    course.publish();
+    const updated = await this.courseRepository.save(course);
+
+    logger.info(`[LMS] Course approved & published`, {
+      id: updated.id,
+      title: updated.title,
+    });
+
+    return updated;
+  }
+
+  /**
+   * WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1
+   * 운영자 반려 — PENDING_REVIEW → REJECTED + 사유 저장.
+   */
+  async rejectCourse(id: string, reason: string): Promise<Course> {
+    const course = await this.getCourse(id);
+    if (!course) {
+      throw new Error(`Course not found: ${id}`);
+    }
+
+    if (course.status !== CourseStatus.PENDING_REVIEW) {
+      throw new Error(
+        `INVALID_STATUS_TRANSITION: only PENDING_REVIEW can be rejected (current: '${course.status}')`,
+      );
+    }
+
+    const trimmed = (reason || '').trim();
+    if (!trimmed) {
+      throw new Error('REJECTION_REASON_REQUIRED');
+    }
+
+    course.reject(trimmed);
+    const updated = await this.courseRepository.save(course);
+
+    logger.info(`[LMS] Course rejected`, {
+      id: updated.id,
+      title: updated.title,
+      reason: trimmed,
+    });
+
+    return updated;
+  }
+
   async unpublishCourse(id: string): Promise<Course> {
     const course = await this.getCourse(id);
     if (!course) {
