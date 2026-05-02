@@ -94,7 +94,7 @@ KPA-Society를 reference implementation으로 한다.
 |---|---|---|---|
 | **KPA-Society** | Full (6+ 페이지) | Full (5+ 페이지) | reference implementation |
 | **GlycoPharm** | Partial (`/education` 위주) | Partial — Dashboard 1페이지만 | 강사 풀세트는 후속 |
-| **K-Cosmetics** | Partial (3페이지) | **None** | §11 보류 결정 참조 |
+| **K-Cosmetics** | Partial (3페이지) | **Target — 미구현** | 공통화 대상. Phase에 따라 bootstrap 예정 (§11) |
 | **Neture** | None | None | LMS 미사용 |
 
 > 매트릭스 표기는 `APP-STANDARD-LIST-AND-MATRIX.md` 의 O/W/X/P와는 별도로, 본 문서에서 Learner/Instructor를 분리해 더 정확히 기록한다. 두 문서가 충돌할 경우 본 문서가 우선한다.
@@ -155,9 +155,11 @@ KPA-Society를 reference implementation으로 한다.
 | Phase | 내용 | 산출물 |
 |---|---|---|
 | **Phase 1** | APP-LMS 기준 확정 | **본 문서** (완료) |
+| Phase 1-A | K-Cosmetics Instructor bootstrap | `WO-KCOS-LMS-INSTRUCTOR-BOOTSTRAP-V1` — 최소 라우트/페이지/메뉴 진입점 |
+| Phase 1-B | 전 서비스 Instructor 구조 통일 | KPA reference 기준으로 GlycoPharm/K-Cosmetics 풀세트화 (CourseList/Edit/Participants 등) |
 | Phase 2 | Frontend 공통 client / types 추출 | `@o4o/lms-client`, `@o4o/lms-types` + 3개 서비스 마이그레이션 |
 | Phase 3 | LmsHubTemplate 도입 | `@o4o/shared-space-ui` 확장 + Learner UI 통일 |
-| Phase 4 (선택) | Instructor UI 공통화 | InstructorDashboardTemplate / CourseEditorTemplate |
+| Phase 4 | Instructor UI 공통화 | InstructorDashboardTemplate / CourseEditorTemplate |
 | Phase 5 (필요 시) | serviceKey 기반 격리 정비 | 가드 service-neutral 전환 + 자격 시스템 일반화 |
 
 각 Phase는 독립 WO로 분리되며, 이전 Phase 완료 후 발행한다.
@@ -168,10 +170,10 @@ KPA-Society를 reference implementation으로 한다.
 
 | 항목 | 결정 | 사유 |
 |---|---|---|
-| K-Cosmetics Instructor | **보류** | 비즈니스 판단 필요 (B2C 화장품 도메인에서 강사·강의 등록 양면 시장이 의미 있는지) |
+| K-Cosmetics Instructor | **Phase 대상 (구현 예정)** | LMS 공통 APP 원칙상 모든 도입 서비스가 동일 구조를 가진다. Phase 1-A에서 bootstrap, Phase 1-B에서 풀세트화 |
 | Neture LMS | **미사용** | 도입 계획 없음. 본 문서 적용 대상 아님 |
 
-K-Cos Instructor 도입 여부는 `WO-KCOS-LMS-INSTRUCTOR-DECISION-V1` 같은 별도 의사결정 WO로 처리한다. 본 문서는 결정을 강제하지 않는다.
+K-Cos Instructor는 구조 공통화 차원에서 도입한다 — 비즈니스적 활용 범위는 도입 후 단계적으로 확장한다.
 
 ---
 
