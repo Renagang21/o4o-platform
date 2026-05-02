@@ -8,6 +8,8 @@ import {
 } from '@o4o/lms-core';
 import logger from '../../../utils/logger.js';
 import { CompletionService } from './CompletionService.js';
+// WO-O4O-LMS-COURSE-REAPPROVAL-FLOW-V1
+import { CourseService } from './CourseService.js';
 
 /**
  * LiveService
@@ -98,6 +100,12 @@ export class LiveService {
 
     const saved = await this.lessonRepository.save(lesson);
     logger.info('[Live] Upserted', { lessonId, start, end });
+
+    // WO-O4O-LMS-COURSE-REAPPROVAL-FLOW-V1
+    if (saved.courseId) {
+      await CourseService.getInstance().maybeRevertToPendingReview(saved.courseId);
+    }
+
     return saved;
   }
 

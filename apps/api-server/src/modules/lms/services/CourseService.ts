@@ -240,14 +240,52 @@ export class CourseService extends BaseService<Course> {
       data.tags = sanitizedTags;
     }
 
+    // WO-O4O-LMS-COURSE-REAPPROVAL-FLOW-V1
+    // PUBLISHED 강의가 수정되면 자동으로 PENDING_REVIEW 전환 (운영자 재승인 필요).
+    // data.status가 명시적으로 지정된 경우(예: 운영자/admin이 archive 등 다른 전이 수행)는 그대로 존중.
+    const wasPublished = course.status === CourseStatus.PUBLISHED;
+
     // Update fields
     Object.assign(course, data);
+
+    if (wasPublished && !data.status) {
+      course.status = CourseStatus.PENDING_REVIEW;
+      course.rejectionReason = null;
+      logger.info('[LMS] Course auto-reverted to PENDING_REVIEW (content edited)', {
+        id: course.id,
+        title: course.title,
+      });
+    }
 
     const updated = await this.courseRepository.save(course);
 
     logger.info(`[LMS] Course updated: ${updated.title}`, { id: updated.id });
 
     return updated;
+  }
+
+  /**
+   * WO-O4O-LMS-COURSE-REAPPROVAL-FLOW-V1
+   * 콘텐츠(레슨/퀴즈/과제/라이브) 변경 시 호출되는 상태 전환 헬퍼.
+   *
+   *   PUBLISHED  → PENDING_REVIEW (재검토 트리거, rejectionReason 클리어)
+   *   기타 상태  → no-op
+   *
+   * 호출 측: LessonService / QuizService / AssignmentService / LiveService 의 mutation 메서드.
+   * 콘텐츠 변경이 발생하면 운영자 재승인 없이는 사용자 노출 안 되도록 보장.
+   */
+  async maybeRevertToPendingReview(courseId: string): Promise<void> {
+    if (!courseId) return;
+    const course = await this.courseRepository.findOne({ where: { id: courseId } });
+    if (course && course.status === CourseStatus.PUBLISHED) {
+      course.status = CourseStatus.PENDING_REVIEW;
+      course.rejectionReason = null;
+      await this.courseRepository.save(course);
+      logger.info('[LMS] Course auto-reverted to PENDING_REVIEW (related content changed)', {
+        id: courseId,
+        title: course.title,
+      });
+    }
   }
 
   async deleteCourse(id: string): Promise<void> {

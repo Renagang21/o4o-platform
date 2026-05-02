@@ -11,6 +11,8 @@ import { CreditSourceType } from '../../credit/entities/CreditTransaction.js';
 import { CREDIT_REWARDS, CREDIT_DESCRIPTIONS } from '../../credit/credit-constants.js';
 // WO-O4O-COMPLETION-V1
 import { CompletionService } from './CompletionService.js';
+// WO-O4O-LMS-COURSE-REAPPROVAL-FLOW-V1
+import { CourseService } from './CourseService.js';
 
 export interface SubmitQuizRequest {
   answers: Array<{ questionId: string; answer: string | string[] }>;
@@ -420,6 +422,11 @@ export class QuizService {
       questionCount: data.questions.length,
     });
 
+    // WO-O4O-LMS-COURSE-REAPPROVAL-FLOW-V1: 콘텐츠 변경 → 재검토 트리거
+    if (data.courseId) {
+      await CourseService.getInstance().maybeRevertToPendingReview(data.courseId);
+    }
+
     return saved;
   }
 
@@ -446,6 +453,13 @@ export class QuizService {
       quiz.publishedAt = new Date();
     }
 
-    return this.quizRepository.save(quiz);
+    const saved = await this.quizRepository.save(quiz);
+
+    // WO-O4O-LMS-COURSE-REAPPROVAL-FLOW-V1
+    if (saved.courseId) {
+      await CourseService.getInstance().maybeRevertToPendingReview(saved.courseId);
+    }
+
+    return saved;
   }
 }

@@ -2,6 +2,7 @@ import { Repository } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
 import { BaseService } from '../../../common/base.service.js';
 import { Lesson, LessonType } from '@o4o/lms-core';
+import { CourseService } from './CourseService.js';
 import logger from '../../../utils/logger.js';
 
 export interface CreateLessonRequest {
@@ -84,6 +85,9 @@ export class LessonService extends BaseService<Lesson> {
 
     logger.info(`[LMS] Lesson created: ${saved.title}`, { id: saved.id, courseId: data.courseId });
 
+    // WO-O4O-LMS-COURSE-REAPPROVAL-FLOW-V1
+    await CourseService.getInstance().maybeRevertToPendingReview(data.courseId);
+
     return saved;
   }
 
@@ -149,6 +153,9 @@ export class LessonService extends BaseService<Lesson> {
 
     logger.info(`[LMS] Lesson updated: ${updated.title}`, { id: updated.id });
 
+    // WO-O4O-LMS-COURSE-REAPPROVAL-FLOW-V1
+    await CourseService.getInstance().maybeRevertToPendingReview(updated.courseId);
+
     return updated;
   }
 
@@ -158,9 +165,13 @@ export class LessonService extends BaseService<Lesson> {
       throw new Error(`Lesson not found: ${id}`);
     }
 
+    const courseId = lesson.courseId; // remove 후엔 access 불가, 미리 캡처
     await this.lessonRepository.remove(lesson);
 
     logger.info(`[LMS] Lesson deleted: ${lesson.title}`, { id });
+
+    // WO-O4O-LMS-COURSE-REAPPROVAL-FLOW-V1
+    await CourseService.getInstance().maybeRevertToPendingReview(courseId);
   }
 
   async reorderLessons(courseId: string, lessonIds: string[]): Promise<void> {
@@ -172,5 +183,8 @@ export class LessonService extends BaseService<Lesson> {
     }
 
     logger.info(`[LMS] Lessons reordered for course ${courseId}`);
+
+    // WO-O4O-LMS-COURSE-REAPPROVAL-FLOW-V1
+    await CourseService.getInstance().maybeRevertToPendingReview(courseId);
   }
 }

@@ -459,6 +459,17 @@ export default function CourseEditPage() {
             운영자 검토 중입니다. 검토가 완료되면 알림이 표시됩니다.
           </div>
         )}
+        {/* WO-O4O-LMS-COURSE-REAPPROVAL-FLOW-V1: PUBLISHED 상태에서 수정 시 재검토 안내 */}
+        {course.status === 'published' && (
+          <div style={{
+            padding: '12px 14px', background: '#fffbeb', border: '1px solid #fde68a',
+            color: '#92400e', borderRadius: 8, fontSize: 13, marginBottom: 12, lineHeight: 1.5,
+          }}>
+            <strong>공개 중인 강의입니다.</strong> 강의 정보, 레슨, 퀴즈/과제/라이브 등을 수정하면
+            자동으로 <strong>재검토 대기 상태</strong>로 전환되어 사용자 노출이 일시 중단됩니다.
+            운영자 재승인 후 다시 공개됩니다.
+          </div>
+        )}
         <div style={s.card}>
           <div style={s.field}>
             <label style={s.label}>제목</label>

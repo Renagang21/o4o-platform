@@ -10,6 +10,8 @@ import {
 } from '@o4o/lms-core';
 import logger from '../../../utils/logger.js';
 import { CompletionService } from './CompletionService.js';
+// WO-O4O-LMS-COURSE-REAPPROVAL-FLOW-V1
+import { CourseService } from './CourseService.js';
 
 /**
  * AssignmentService
@@ -63,26 +65,39 @@ export class AssignmentService {
   async upsertAssignment(data: UpsertAssignmentRequest): Promise<Assignment> {
     const dueDate = data.dueDate ? new Date(data.dueDate) : undefined;
 
+    // WO-O4O-LMS-COURSE-REAPPROVAL-FLOW-V1: lesson → course 역추적해 재검토 트리거 후보 확보
+    const lessonRepo = AppDataSource.getRepository(Lesson);
+    const lesson = await lessonRepo.findOne({
+      where: { id: data.lessonId },
+      select: ['id', 'courseId'],
+    });
+
     const existing = await this.assignmentRepository.findOne({
       where: { lessonId: data.lessonId },
     });
 
+    let saved: Assignment;
     if (existing) {
       existing.instructions = data.instructions;
       existing.dueDate = dueDate;
-      const saved = await this.assignmentRepository.save(existing);
+      saved = await this.assignmentRepository.save(existing);
       logger.info('[Assignment] Updated', { id: saved.id, lessonId: data.lessonId });
-      return saved;
+    } else {
+      const assignment = this.assignmentRepository.create({
+        lessonId: data.lessonId,
+        instructions: data.instructions,
+        submissionType: 'text',
+        dueDate,
+      });
+      saved = await this.assignmentRepository.save(assignment);
+      logger.info('[Assignment] Created', { id: saved.id, lessonId: data.lessonId });
     }
 
-    const assignment = this.assignmentRepository.create({
-      lessonId: data.lessonId,
-      instructions: data.instructions,
-      submissionType: 'text',
-      dueDate,
-    });
-    const saved = await this.assignmentRepository.save(assignment);
-    logger.info('[Assignment] Created', { id: saved.id, lessonId: data.lessonId });
+    // WO-O4O-LMS-COURSE-REAPPROVAL-FLOW-V1
+    if (lesson?.courseId) {
+      await CourseService.getInstance().maybeRevertToPendingReview(lesson.courseId);
+    }
+
     return saved;
   }
 
