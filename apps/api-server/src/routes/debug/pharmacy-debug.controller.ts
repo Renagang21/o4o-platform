@@ -31,6 +31,7 @@ export function createPharmacyDebugRouter(dataSource: DataSource): Router {
   const router = Router();
 
   // GET / — 약국 목록
+  // WO-O4O-GLUCOSEVIEW-POST-DROP-CLEANUP-V1: glucoseview_customers JOIN(환자수) 제거
   router.get('/', async (_req, res) => {
     try {
       const rows = await dataSource.query(`
@@ -39,19 +40,13 @@ export function createPharmacyDebugRouter(dataSource: DataSource): Router {
           o.name AS org_name,
           gp.name AS gp_name,
           o."isActive",
-          o."createdAt",
-          COALESCE(pc.cnt, 0)::int AS patient_count
+          o."createdAt"
         FROM organizations o
         JOIN organization_service_enrollments e
           ON e.organization_id = o.id
           AND e.service_code = 'glycopharm'
           AND e.status = 'active'
         LEFT JOIN glycopharm_pharmacies gp ON gp.id = o.id
-        LEFT JOIN (
-          SELECT organization_id, COUNT(*)::int AS cnt
-          FROM glucoseview_customers
-          GROUP BY organization_id
-        ) pc ON pc.organization_id = o.id
         ORDER BY o."createdAt"
       `);
 
@@ -60,7 +55,6 @@ export function createPharmacyDebugRouter(dataSource: DataSource): Router {
         <td>${esc(r.org_name)}</td>
         <td>${esc(r.gp_name)}</td>
         <td>${r.isActive ? 'YES' : '<span class="warn">NO</span>'}</td>
-        <td>${r.patient_count}</td>
         <td>${esc(r.created_at)}</td>
         <td>${r.isActive ? `<a href="/__debug__/pharmacy/deactivate?id=${esc(r.id)}">비활성화</a>` : '-'}</td>
       </tr>`).join('\n');
@@ -69,7 +63,7 @@ export function createPharmacyDebugRouter(dataSource: DataSource): Router {
         <h1>GlycoPharm 약국 목록</h1>
         <p>총 ${rows.length}개</p>
         <table>
-          <tr><th>ID</th><th>Org Name</th><th>GP Name</th><th>Active</th><th>Patients</th><th>Created</th><th>Action</th></tr>
+          <tr><th>ID</th><th>Org Name</th><th>GP Name</th><th>Active</th><th>Created</th><th>Action</th></tr>
           ${tableRows}
         </table>
         <p><a href="/__debug__/pharmacy">새로고침</a></p>
@@ -288,108 +282,9 @@ export function createPharmacyDebugRouter(dataSource: DataSource): Router {
     }
   });
 
-  // GET /care-data — 환자별 health_readings + glucoseview_customers 진단
-  router.get('/care-data', async (req, res) => {
-    const email = req.query.email as string;
-    const gcId = req.query.gcId as string;
-    if (!email && !gcId) {
-      res.send(page('Care Data Debug', `
-        <h1>Care 데이터 진단</h1>
-        <form method="GET">
-          <p>환자 이메일: <input name="email" placeholder="patient1@o4o.com" style="width:300px;padding:4px" /></p>
-          <p>또는 glucoseview_customers.id: <input name="gcId" placeholder="c57abb40-..." style="width:300px;padding:4px" /></p>
-          <button type="submit" style="padding:6px 16px;background:#0066cc;color:white;border:none;cursor:pointer">조회</button>
-        </form>
-      `));
-      return;
-    }
-
-    try {
-      // 1. users 조회
-      let userRows: any[] = [];
-      if (email) {
-        userRows = await dataSource.query(`SELECT id, email, name, status FROM users WHERE email = $1`, [email]);
-      }
-
-      // 2. glucoseview_customers 조회
-      let gcRows: any[] = [];
-      if (gcId) {
-        gcRows = await dataSource.query(`SELECT id, user_id, organization_id, name, email FROM glucoseview_customers WHERE id = $1`, [gcId]);
-        if (gcRows.length > 0 && gcRows[0].user_id) {
-          userRows = await dataSource.query(`SELECT id, email, name, status FROM users WHERE id = $1`, [gcRows[0].user_id]);
-        }
-      } else if (userRows.length > 0) {
-        gcRows = await dataSource.query(`SELECT id, user_id, organization_id, name, email FROM glucoseview_customers WHERE user_id = $1 OR email = $2`, [userRows[0].id, email]);
-      }
-
-      const userId = userRows[0]?.id || null;
-      const gcCustomerId = gcRows[0]?.id || null;
-      const orgId = gcRows[0]?.organization_id || null;
-
-      // 3. health_readings 조회
-      let readings: any[] = [];
-      if (userId) {
-        readings = await dataSource.query(
-          `SELECT id, patient_id, pharmacy_id, metric_type, value_numeric, source_type, measured_at, metadata
-           FROM health_readings WHERE patient_id = $1 ORDER BY measured_at DESC LIMIT 20`, [userId]);
-      }
-      // patient_id = glucoseview_customers.id 로 저장된 건도 조회
-      let readingsByGcId: any[] = [];
-      if (gcCustomerId && gcCustomerId !== userId) {
-        readingsByGcId = await dataSource.query(
-          `SELECT id, patient_id, pharmacy_id, metric_type, value_numeric, source_type, measured_at, metadata
-           FROM health_readings WHERE patient_id = $1 ORDER BY measured_at DESC LIMIT 20`, [gcCustomerId]);
-      }
-
-      const body = `
-        <h1>Care 데이터 진단</h1>
-        <h2>1. users</h2>
-        <pre>${esc(JSON.stringify(userRows, null, 2))}</pre>
-        <p><strong>users.id:</strong> ${esc(userId)}</p>
-
-        <h2>2. glucoseview_customers</h2>
-        <pre>${esc(JSON.stringify(gcRows, null, 2))}</pre>
-        <p><strong>gc.id:</strong> ${esc(gcCustomerId)}</p>
-        <p><strong>gc.user_id:</strong> ${esc(gcRows[0]?.user_id)}</p>
-        <p><strong>gc.organization_id:</strong> ${esc(orgId)}</p>
-        <p style="color:${gcRows[0]?.user_id === userId ? 'green' : 'red'}">
-          user_id == users.id: <strong>${gcRows[0]?.user_id === userId ? 'MATCH' : 'MISMATCH'}</strong>
-        </p>
-
-        <h2>3. health_readings (patient_id = users.id: ${esc(userId)})</h2>
-        <p>${readings.length}건</p>
-        <pre>${esc(JSON.stringify(readings.map(r => ({
-          id: r.id,
-          patient_id: r.patient_id,
-          pharmacy_id: r.pharmacy_id,
-          metric: r.metric_type,
-          value: r.value_numeric,
-          source: r.source_type,
-          measured_at: r.measured_at,
-        })), null, 2))}</pre>
-
-        ${readingsByGcId.length > 0 ? `
-        <h2 style="color:red">4. health_readings (patient_id = gc.id: ${esc(gcCustomerId)}) — 잘못된 ID!</h2>
-        <p style="color:red">${readingsByGcId.length}건 — 이 데이터는 patient_id가 glucoseview_customers.id로 저장됨</p>
-        <pre>${esc(JSON.stringify(readingsByGcId.map(r => ({
-          id: r.id,
-          patient_id: r.patient_id,
-          pharmacy_id: r.pharmacy_id,
-          metric: r.metric_type,
-          value: r.value_numeric,
-          source: r.source_type,
-          measured_at: r.measured_at,
-        })), null, 2))}</pre>
-        ` : '<h2>4. gc.id로 저장된 잘못된 데이터: 없음 ✅</h2>'}
-
-        <p><a href="/__debug__/pharmacy/care-data">← 다시 조회</a></p>
-      `;
-
-      res.send(page('Care Data Debug', body));
-    } catch (err) {
-      res.status(500).send(page('Error', `<pre>${esc(err)}</pre>`));
-    }
-  });
+  // WO-O4O-GLUCOSEVIEW-POST-DROP-CLEANUP-V1
+  // GET /care-data 제거 — 100% glucoseview_customers 진단용 endpoint.
+  // glucoseview_customers 테이블 삭제(20260600000000)로 더 이상 동작하지 않음.
 
   // GET /appointment-trace?patient=전화수&pharmacy=테스트약국
   // IR-O4O-GLYCOPHARM-APPOINTMENT-REQUEST-MISSING-IN-PHARMACY-V1
@@ -422,7 +317,6 @@ export function createPharmacyDebugRouter(dataSource: DataSource): Router {
         [`%${patient}%`],
       );
       const patientIds: string[] = result.patients.map((p: any) => p.id);
-      const patientEmails: string[] = result.patients.map((p: any) => p.email);
 
       // 2. 약국 조회
       result.pharmacies = pharmacy
@@ -451,16 +345,8 @@ export function createPharmacyDebugRouter(dataSource: DataSource): Router {
         [patientIds.length > 0 ? patientIds : null, pharmacyIds.length > 0 ? pharmacyIds : null],
       ).catch((e: any) => ({ error: String(e?.message || e) }));
 
-      // 4. glucoseview_customers (연결 승인 결과)
-      result.glucoseview_customers = await dataSource.query(
-        `SELECT id, user_id, organization_id, pharmacist_id, name, email, phone, created_at
-         FROM glucoseview_customers
-         WHERE ($1::text[] IS NULL OR email = ANY($1::text[]))
-            OR ($2::uuid[] IS NULL OR organization_id = ANY($2::uuid[]))
-         ORDER BY created_at DESC
-         LIMIT 30`,
-        [patientEmails.length > 0 ? patientEmails : null, pharmacyIds.length > 0 ? pharmacyIds : null],
-      ).catch((e: any) => ({ error: String(e?.message || e) }));
+      // WO-O4O-GLUCOSEVIEW-POST-DROP-CLEANUP-V1: glucoseview_customers 진단 블록 제거
+      // (테이블 삭제 — 약국-환자 연결은 향후 Care Core 기반으로 재진단 예정)
 
       // 5. care_appointments (상담 예약)
       result.appointments = await dataSource.query(
@@ -506,13 +392,7 @@ export function createPharmacyDebugRouter(dataSource: DataSource): Router {
         }
       }
 
-      if (Array.isArray(result.glucoseview_customers)) {
-        if (result.glucoseview_customers.length === 0) {
-          findings.push('❌ glucoseview_customers 없음 → 약국과 연결되지 않은 상태 → 상담 예약 생성 불가 (NOT_LINKED)');
-        } else {
-          findings.push(`✅ glucoseview_customers ${result.glucoseview_customers.length}건 — 환자가 약국과 연결됨`);
-        }
-      }
+      // WO-O4O-GLUCOSEVIEW-POST-DROP-CLEANUP-V1: glucoseview_customers 진단 항목 제거
 
       if (Array.isArray(result.appointments)) {
         if (result.appointments.length === 0) {
@@ -539,9 +419,6 @@ export function createPharmacyDebugRouter(dataSource: DataSource): Router {
 
         <h2>3. care_pharmacy_link_requests</h2>
         <pre>${esc(JSON.stringify(result.link_requests, null, 2))}</pre>
-
-        <h2>4. glucoseview_customers (연결 승인 결과)</h2>
-        <pre>${esc(JSON.stringify(result.glucoseview_customers, null, 2))}</pre>
 
         <h2>5. care_appointments (상담 예약)</h2>
         <pre>${esc(JSON.stringify(result.appointments, null, 2))}</pre>
