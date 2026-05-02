@@ -10,6 +10,7 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
+  UpdateDateColumn,
   Index,
   ManyToOne,
   JoinColumn,
@@ -50,6 +51,8 @@ export interface NotificationData {
 
 @Entity('notifications')
 @Index(['userId', 'isRead', 'createdAt'])
+@Index(['serviceKey', 'userId', 'createdAt'])
+@Index(['organizationId', 'createdAt'])
 @Index(['type', 'createdAt'])
 export class Notification {
   @PrimaryGeneratedColumn('uuid')
@@ -62,6 +65,19 @@ export class Notification {
   @ManyToOne('User', { nullable: false })
   @JoinColumn({ name: 'userId' })
   user!: User;
+
+  // O4O Boundary Policy fields (WO-O4O-NOTIFICATION-CORE-BASELINE-V1)
+  // serviceKey: which O4O service this notification belongs to (kpa, glycopharm, neture, k-cosmetics, ...)
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  serviceKey?: string;
+
+  // organizationId: multi-tenant boundary (e.g. yaksa branch, store organization)
+  @Column({ type: 'uuid', nullable: true })
+  organizationId?: string;
+
+  // actorId: user who triggered the notification (nullable for system events)
+  @Column({ type: 'uuid', nullable: true })
+  actorId?: string;
 
   // Notification channel (in_app by default, email is optional)
   @Column({ type: 'varchar', length: 50, default: 'in_app' })
@@ -82,12 +98,19 @@ export class Notification {
   @Column({ type: 'jsonb', nullable: true })
   metadata?: Record<string, any>;
 
+  // Optional priority hint (low | normal | high | critical)
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  priority?: string;
+
   // Read status
   @Column({ type: 'boolean', default: false })
   isRead: boolean;
 
   @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt: Date;
+
+  @UpdateDateColumn({ type: 'timestamp with time zone' })
+  updatedAt: Date;
 
   @Column({ type: 'timestamp with time zone', nullable: true })
   readAt?: Date;

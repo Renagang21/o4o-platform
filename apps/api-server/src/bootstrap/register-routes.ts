@@ -31,6 +31,8 @@ import usersRoutes from '../routes/users.routes.js';
 import cptRoutes from '../routes/cpt.js';
 import healthRoutes from '../routes/health.js';
 import forumRoutes from '../routes/forum/forum.routes.js';
+// WO-O4O-NOTIFICATION-CORE-BASELINE-V1: platform-wide notification core
+import notificationsRoutes from '../routes/notifications.routes.js';
 // WO-O4O-SURVEY-CORE-PHASE1-V1: O4O 공통 Survey (Participation Engine)
 import surveyRoutes from '../modules/survey/routes/survey.routes.js';
 import settingsRoutes from '../routes/settingsRoutes.js';
@@ -155,6 +157,9 @@ export async function registerCoreRoutes(app: Application): Promise<void> {
   }
 
   app.use('/api/v1/forum', forumRoutes);
+  // WO-O4O-NOTIFICATION-CORE-BASELINE-V1: platform-wide notifications
+  // (forum-specific notifications stay under /api/v1/forum/notifications/*)
+  app.use('/api/v1/notifications', notificationsRoutes);
   // WO-O4O-SURVEY-CORE-PHASE1-V1: 공통 설문 도메인
   app.use('/api/v1/surveys', surveyRoutes);
   app.use('/api/v1/settings', settingsRoutes);
