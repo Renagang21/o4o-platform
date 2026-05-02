@@ -55,6 +55,10 @@ export async function resolveOrganizationForEventOffer(
 
   // ── K-Cosmetics Event Offer (k-cosmetics-event-offer) ────────────────────
   // WO-O4O-EVENT-OFFER-KCOS-CREATE-V1
+  // WO-O4O-EVENT-OFFER-KCOS-E2E-SMOKE-V1: organization_service_enrollments.service_code는
+  //   생성 시점부터 'cosmetics'(product-level)로 적재됨 — seed migration / organization-ops
+  //   동일. SERVICE_KEYS.K_COSMETICS('k-cosmetics', platform-level)과 다른 키이므로
+  //   resolver는 반드시 SERVICE_KEYS.COSMETICS를 질의 키로 사용해야 한다.
   if (serviceKey === SERVICE_KEYS.K_COSMETICS_EVENT_OFFER) {
     if (roleType === 'operator') {
       // 사용자가 멤버인 organization 중 K-Cos에 enroll된 active 조직을 매핑.
@@ -71,7 +75,7 @@ export async function resolveOrganizationForEventOffer(
            AND om.role IN ('owner','admin','manager')
            AND om.left_at IS NULL
          LIMIT 1`,
-        [userId, SERVICE_KEYS.K_COSMETICS],
+        [userId, SERVICE_KEYS.COSMETICS],
       );
       return rows[0]?.organization_id ?? null;
     }
@@ -86,7 +90,7 @@ export async function resolveOrganizationForEventOffer(
            AND ose.status = 'active'
          ORDER BY ose.created_at ASC NULLS LAST
          LIMIT 1`,
-        [SERVICE_KEYS.K_COSMETICS],
+        [SERVICE_KEYS.COSMETICS],
       );
       return rows[0]?.organization_id ?? null;
     }
