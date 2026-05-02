@@ -5,13 +5,19 @@
  * WO-KPA-SOCIETY-SERVICE-STRUCTURE-BASELINE-V1: 3개 서비스 구조 기준
  * WO-KPA-SUPER-OPERATOR-BASELINE-REFINE-V1: Super Operator 공통 메뉴 지원
  * WO-KPA-A-ROLE-BASED-NAVIGATION-AND-ENTRY-REFINEMENT-V1: 공개/역할 메뉴 분리 + dropdown 진입점
+ * WO-O4O-GLOBAL-USER-PROFILE-DROPDOWN-EXTRACTION-V1: 사용자 드롭다운을 @o4o/account-ui 공통 컴포넌트로 교체 (hover 트리거 + Super Operator 배지/색상 보존)
  *
  * 원칙: 상단 메뉴는 서비스 진입점만 노출 (기능 나열 금지)
  */
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { User, LayoutDashboard, Settings, LogOut, Shield, GraduationCap } from 'lucide-react';
+import { LayoutDashboard, Shield, GraduationCap } from 'lucide-react';
+import {
+  GlobalUserProfileDropdown,
+  getUserDisplayName,
+  type GlobalUserProfileMenuItem,
+} from '@o4o/account-ui';
 import { useAuth, type User as UserType } from '../contexts';
 import { useAuthModal } from '../contexts/LoginModalContext';
 import { colors } from '../styles/theme';
@@ -28,35 +34,6 @@ function isSuperOperator(user: UserType | null): boolean {
   if (!user) return false;
   if ((user as any).isSuperOperator) return true;
   return hasAnyRole(user.roles, SUPER_OPERATOR_ROLES);
-}
-
-/**
- * WO-O4O-NAME-NORMALIZATION-V1: 사용자 표시 이름 헬퍼
- * 우선순위: displayName > lastName+firstName > name > email prefix > '사용자'
- */
-function getUserDisplayName(user: UserType | null): string {
-  if (!user) return '사용자';
-
-  const extendedUser = user as any;
-
-  // 1. API computed displayName
-  if (extendedUser.displayName) return extendedUser.displayName;
-
-  // 2. lastName + firstName 조합
-  if (extendedUser.lastName || extendedUser.firstName) {
-    const fullName = `${extendedUser.lastName || ''}${extendedUser.firstName || ''}`.trim();
-    if (fullName) return fullName;
-  }
-
-  // 3. name 필드 (이메일과 다른 경우에만)
-  if (user.name && user.name !== user.email) {
-    return user.name;
-  }
-
-  // 4. email prefix
-  if (user.email) return user.email.split('@')[0];
-
-  return '사용자';
 }
 
 interface MenuItem {
@@ -90,7 +67,6 @@ export function Header({ serviceName }: { serviceName: string }) {
   const navigate = useNavigate();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [showUserDropdown, setShowUserDropdown] = useState(false);
 
   const accessibleDashboards = useAccessibleDashboards();
 
@@ -105,6 +81,8 @@ export function Header({ serviceName }: { serviceName: string }) {
   const isInstructor = user ? user.roles.includes(ROLES.LMS_INSTRUCTOR) : false;
   const isStoreOwner = user?.isStoreOwner === true;
   const isPharmacyRelated = isStoreOwner || (user as any)?.activityType === 'pharmacy_owner';
+  const isSuperOp = isSuperOperator(user);
+
   const displayMenuItems = menuItems
     .map(item => {
       // admin이면 "운영 대시보드" → "관리자 콘솔" + /admin
@@ -130,6 +108,79 @@ export function Header({ serviceName }: { serviceName: string }) {
     await logout();
     navigate('/');
   };
+
+  const displayName = getUserDisplayName(user as any);
+
+  // 사용자 드롭다운 메뉴 항목 (기존 분기 로직 보존)
+  const dropdownMenuItems: GlobalUserProfileMenuItem[] = useMemo(() => {
+    if (!user) return [];
+
+    // Super Operator: 간소화된 메뉴
+    if (isSuperOp) {
+      return [
+        {
+          key: 'dashboard',
+          icon: <Shield className="w-4 h-4 text-amber-600" />,
+          label: isAdmin ? '관리자 콘솔' : '운영 대시보드',
+          href: isAdmin ? '/admin' : '/operator',
+        },
+        {
+          key: 'mypage',
+          icon: <LayoutDashboard className="w-4 h-4 text-gray-500" />,
+          label: '마이페이지',
+          href: '/mypage',
+        },
+      ];
+    }
+
+    // 일반 사용자: 전체 메뉴
+    const items: GlobalUserProfileMenuItem[] = [];
+
+    // 강의 대시보드 (WO-O4O-INSTRUCTOR-DASHBOARD-ENTRY-V1)
+    if (isInstructor || isAdmin) {
+      items.push({
+        key: 'instructor',
+        icon: <GraduationCap className="w-4 h-4 text-gray-500" />,
+        label: '강의 대시보드',
+        href: '/instructor',
+      });
+    }
+
+    // 운영/관리 진입점 (WO-KPA-OPERATOR-USER-MENU-CLEANUP-V1)
+    if (isAdmin || isOperator) {
+      items.push({
+        key: 'admin-console',
+        icon: <Shield className="w-4 h-4 text-gray-500" />,
+        label: isAdmin ? '관리자 콘솔' : '운영 대시보드',
+        href: isAdmin ? '/admin' : '/operator',
+      });
+    }
+
+    // 다중 대시보드 접근 가능 시 DashboardSwitcher, 아니면 단순 마이페이지 링크
+    // WO-KPA-SOCIETY-DASHBOARD-TO-MYPAGE-CONSOLIDATION-V1
+    if (accessibleDashboards.length >= 2) {
+      items.push({
+        key: 'dashboard-switcher',
+        node: (close) => <DashboardSwitcher onNavigate={close} />,
+      });
+    } else {
+      items.push({
+        key: 'mypage',
+        icon: <LayoutDashboard className="w-4 h-4 text-gray-500" />,
+        label: '마이페이지',
+        href: '/mypage',
+      });
+    }
+
+    items.push({
+      key: 'settings',
+      icon: <LayoutDashboard className="w-4 h-4 text-gray-500" />,
+      label: '설정',
+      href: '/mypage/settings',
+    });
+
+    return items;
+  }, [user, isSuperOp, isAdmin, isOperator, isInstructor, accessibleDashboards.length]);
 
   return (
     <>
@@ -201,129 +252,26 @@ export function Header({ serviceName }: { serviceName: string }) {
           <div style={styles.authArea}>
             {user && <ServiceSwitcher currentServiceKey="kpa-society" />}
             {user ? (
-              <div
-                style={styles.userIconWrapper}
-                onMouseEnter={() => setShowUserDropdown(true)}
-                onMouseLeave={() => setShowUserDropdown(false)}
-              >
-                {/* Super Operator는 다른 아이콘/색상 */}
-                <button
-                  style={{
-                    ...styles.userIconButton,
-                    ...(isSuperOperator(user) ? styles.operatorIconButton : {}),
-                  }}
-                  aria-label="사용자 메뉴"
-                >
-                  <User style={{ width: 20, height: 20, color: isSuperOperator(user) ? '#d97706' : colors.gray600 }} />
-                </button>
-                {showUserDropdown && (
-                  <div style={styles.userDropdown}>
-                    <div style={styles.userDropdownInner}>
-                      <div style={{
-                        ...styles.userDropdownHeader,
-                        ...(isSuperOperator(user) ? styles.operatorDropdownHeader : {}),
-                      }}>
-                        <span style={styles.userDropdownName}>{getUserDisplayName(user)}님</span>
-                        <span style={styles.userDropdownEmail}>{user.email}</span>
-                        {isSuperOperator(user) && (
-                          <span style={styles.operatorBadge}>🛡️ Super Operator</span>
-                        )}
-                      </div>
-                      <div style={styles.userDropdownDivider} />
-
-                      {/* Super Operator: 간소화된 메뉴 */}
-                      {isSuperOperator(user) ? (
-                        <>
-                          <Link
-                            to={isAdmin ? '/admin' : '/operator'}
-                            style={styles.userDropdownItem}
-                            onClick={() => setShowUserDropdown(false)}
-                          >
-                            <Shield style={{ width: 16, height: 16, color: '#d97706' }} />
-                            {isAdmin ? '관리자 콘솔' : '운영 대시보드'}
-                          </Link>
-                          <Link
-                            to="/mypage"
-                            style={styles.userDropdownItem}
-                            onClick={() => setShowUserDropdown(false)}
-                          >
-                            <LayoutDashboard style={{ width: 16, height: 16, color: colors.gray500 }} />
-                            마이페이지
-                          </Link>
-                        </>
-                      ) : (
-                        /* 일반 사용자: 전체 메뉴
-                         * DashboardSwitcher: 2개 이상 대시보드 접근 가능 시 표시 (KPA 전용)
-                         * - "마이페이지" (/mypage): 모든 인증 사용자
-                         * - "약국경영" (/pharmacy): pharmacy context + non-admin/operator
-                         * 1개만 접근 가능하면 단순 마이페이지 링크 표시
-                         * WO-KPA-SOCIETY-DASHBOARD-TO-MYPAGE-CONSOLIDATION-V1
-                         */
-                        <>
-                          {/* 강의 대시보드 — 최상단 (WO-O4O-INSTRUCTOR-DASHBOARD-ENTRY-V1)
-                           * lms:instructor 또는 kpa:admin 만 노출. kpa:operator 는 /operator/lms 사용. */}
-                          {(isInstructor || isAdmin) && (
-                            <Link
-                              to="/instructor"
-                              style={styles.userDropdownItem}
-                              onClick={() => setShowUserDropdown(false)}
-                            >
-                              <GraduationCap style={{ width: 16, height: 16, color: colors.gray500 }} />
-                              강의 대시보드
-                            </Link>
-                          )}
-                          {/* 운영/관리 진입점 (WO-KPA-OPERATOR-USER-MENU-CLEANUP-V1) */}
-                          {(isAdmin || isOperator) && (
-                            <Link
-                              to={isAdmin ? '/admin' : '/operator'}
-                              style={styles.userDropdownItem}
-                              onClick={() => setShowUserDropdown(false)}
-                            >
-                              <Shield style={{ width: 16, height: 16, color: colors.gray500 }} />
-                              {isAdmin ? '관리자 콘솔' : '운영 대시보드'}
-                            </Link>
-                          )}
-                          {accessibleDashboards.length >= 2 ? (
-                            <>
-                              <DashboardSwitcher onNavigate={() => setShowUserDropdown(false)} />
-                            </>
-                          ) : (
-                            <Link
-                              to="/mypage"
-                              style={styles.userDropdownItem}
-                              onClick={() => setShowUserDropdown(false)}
-                            >
-                              <LayoutDashboard style={{ width: 16, height: 16, color: colors.gray500 }} />
-                              마이페이지
-                            </Link>
-                          )}
-                          <Link
-                            to="/mypage/settings"
-                            style={styles.userDropdownItem}
-                            onClick={() => setShowUserDropdown(false)}
-                          >
-                            <Settings style={{ width: 16, height: 16, color: colors.gray500 }} />
-                            설정
-                          </Link>
-                        </>
-                      )}
-
-                      {/* Account Center — 임시 숨김: account.neture.co.kr 서비스 미배포/SSL 미구성 (WO-KPA-SOCIETY-HIDE-BROKEN-ACCOUNT-CENTER-LINK-V1) */}
-                      <div style={styles.userDropdownDivider} />
-                      <button
-                        style={styles.userDropdownLogout}
-                        onClick={() => {
-                          setShowUserDropdown(false);
-                          handleLogout();
-                        }}
-                      >
-                        <LogOut style={{ width: 16, height: 16, color: colors.error || '#dc2626' }} />
-                        로그아웃
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
+              <GlobalUserProfileDropdown
+                user={{
+                  displayName,
+                  email: user.email,
+                  badge: isSuperOp ? (
+                    <span className="text-xs font-semibold text-amber-700">🛡️ Super Operator</span>
+                  ) : undefined,
+                }}
+                menuItems={dropdownMenuItems}
+                onLogout={handleLogout}
+                trigger="hover"
+                triggerClassName={
+                  isSuperOp
+                    ? 'flex items-center justify-center w-10 h-10 rounded-full bg-amber-100 border border-amber-500 hover:bg-amber-200 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500'
+                    : 'flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 border border-gray-300 hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500'
+                }
+                triggerIconClassName={isSuperOp ? 'text-amber-600' : 'text-gray-600'}
+                headerClassName={isSuperOp ? 'bg-amber-50' : undefined}
+                widthClassName="w-[220px]"
+              />
             ) : (
               <>
                 <button
@@ -501,101 +449,6 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     alignItems: 'center',
     gap: '10px',
-  },
-  userIconWrapper: {
-    position: 'relative',
-  },
-  userIconButton: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '40px',
-    height: '40px',
-    borderRadius: '50%',
-    backgroundColor: colors.gray100,
-    border: `1px solid ${colors.gray300}`,
-    cursor: 'pointer',
-    transition: 'background-color 0.2s, border-color 0.2s',
-  },
-  userIcon: {
-    fontSize: '20px',
-  },
-  userDropdown: {
-    position: 'absolute',
-    top: '100%',
-    right: 0,
-    paddingTop: '8px',  // Use paddingTop instead of marginTop to keep hover area connected
-    backgroundColor: 'transparent',
-    zIndex: 100,
-  },
-  userDropdownInner: {
-    backgroundColor: colors.white,
-    borderRadius: '12px',
-    boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-    minWidth: '220px',
-    padding: '8px 0',
-  },
-  userDropdownHeader: {
-    padding: '12px 16px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '4px',
-  },
-  userDropdownName: {
-    fontSize: '15px',
-    fontWeight: 600,
-    color: colors.gray900,
-  },
-  userDropdownEmail: {
-    fontSize: '12px',
-    color: colors.gray500,
-    wordBreak: 'break-all',
-  },
-  userDropdownDivider: {
-    height: '1px',
-    backgroundColor: colors.gray200,
-    margin: '4px 0',
-  },
-  userDropdownItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    padding: '10px 16px',
-    color: colors.gray700,
-    textDecoration: 'none',
-    fontSize: '14px',
-    transition: 'background-color 0.2s',
-  },
-  userDropdownItemIcon: {
-    fontSize: '16px',
-  },
-  userDropdownLogout: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    width: '100%',
-    padding: '10px 16px',
-    color: colors.error || '#dc2626',
-    backgroundColor: 'transparent',
-    border: 'none',
-    fontSize: '14px',
-    cursor: 'pointer',
-    textAlign: 'left',
-    transition: 'background-color 0.2s',
-  },
-  // WO-KPA-SUPER-OPERATOR-BASELINE-REFINE-V1: Super Operator 스타일
-  operatorIconButton: {
-    backgroundColor: '#fef3c7',
-    borderColor: '#f59e0b',
-  },
-  operatorDropdownHeader: {
-    backgroundColor: '#fffbeb',
-  },
-  operatorBadge: {
-    marginTop: '4px',
-    fontSize: '11px',
-    fontWeight: 600,
-    color: '#d97706',
   },
   authButton: {
     padding: '10px 20px',

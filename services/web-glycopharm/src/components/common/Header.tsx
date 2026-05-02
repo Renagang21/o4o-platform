@@ -4,20 +4,26 @@
  *   KPA-Society 기준 역할 기반 메뉴 구조
  *   비로그인/일반: 홈 | 포럼 | 강의
  *   약사 로그인: 홈 | 포럼 | 강의 | ─ | 약국 HUB | 내 약국
+ * WO-O4O-GLOBAL-USER-PROFILE-DROPDOWN-EXTRACTION-V1:
+ *   사용자 드롭다운을 @o4o/account-ui 공통 컴포넌트로 교체
  */
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { GLYCOPHARM_ROLES, isPharmacistRole } from '@/lib/role-constants';
 import { glycopharmConfig } from '@o4o/operator-ux-core';
 import { useLoginModal } from '@/contexts/LoginModalContext';
 import {
+  GlobalUserProfileDropdown,
+  getUserDisplayName,
+  type GlobalUserProfileMenuItem,
+} from '@o4o/account-ui';
+import {
   Menu,
   X,
   User,
   LogOut,
-  ChevronDown,
   Activity,
   Home,
   MessageSquare,
@@ -55,7 +61,6 @@ export default function Header() {
   const { openLoginModal } = useLoginModal();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   // WO-GLYCOPHARM-ROLE-PREFIX-MIGRATION-V1: glycopharm:pharmacist OR legacy pharmacy
   const isPharmacy = isAuthenticated && user?.roles?.some(r => isPharmacistRole(r));
@@ -73,9 +78,46 @@ export default function Header() {
   const handleLogout = () => {
     logout();
     navigate('/');
-    setUserMenuOpen(false);
     setMobileMenuOpen(false);
   };
+
+  const displayName = getUserDisplayName(user as any);
+
+  const menuItems: GlobalUserProfileMenuItem[] = useMemo(() => {
+    const items: GlobalUserProfileMenuItem[] = [];
+    if (showInstructor) {
+      items.push({
+        key: 'instructor',
+        icon: <GraduationCap className="w-4 h-4 text-gray-500" />,
+        label: '강의 대시보드',
+        href: '/instructor',
+      });
+    }
+    if (showDashboard) {
+      items.push({
+        key: 'dashboard',
+        icon: <Shield className="w-4 h-4" />,
+        label: dashboardLabel,
+        href: dashboardPath,
+        variant: 'highlighted',
+      });
+    }
+    items.push(
+      {
+        key: 'mypage',
+        icon: <User className="w-4 h-4 text-gray-500" />,
+        label: '마이페이지',
+        href: '/mypage',
+      },
+      {
+        key: 'settings',
+        icon: <Settings className="w-4 h-4 text-gray-500" />,
+        label: '설정',
+        href: '/mypage/settings',
+      },
+    );
+    return items;
+  }, [showInstructor, showDashboard, dashboardLabel, dashboardPath]);
 
   /** NavLink 활성 스타일 (desktop) */
   const desktopNavClass = (isActive: boolean) =>
@@ -140,86 +182,12 @@ export default function Header() {
           {/* Desktop User Actions */}
           <div className="hidden md:flex items-center gap-3">
             {isAuthenticated && <ServiceSwitcher currentServiceKey="glycopharm" />}
-            {isAuthenticated ? (
-              <div className="relative">
-                <button
-                  onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="flex items-center gap-1 px-2 py-2 rounded-xl hover:bg-slate-100 transition-colors"
-                >
-                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center">
-                    <User className="w-5 h-5 text-white" />
-                  </div>
-                  <ChevronDown className="w-4 h-4 text-slate-400" />
-                </button>
-
-                {userMenuOpen && (
-                  <>
-                    <div
-                      className="fixed inset-0 z-40"
-                      onClick={() => setUserMenuOpen(false)}
-                    />
-                    <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border py-2 z-50 animate-slide-in-right">
-                      <div className="px-4 py-2 border-b">
-                        <p className="text-sm font-medium text-slate-800">
-                          {/* WO-O4O-NAME-NORMALIZATION-V1 */}
-                          {(user as any)?.displayName
-                            || (((user as any)?.lastName || (user as any)?.firstName) ? `${(user as any).lastName || ''}${(user as any).firstName || ''}`.trim() : '')
-                            || (user?.name && user.name !== user.email ? user.name : '')
-                            || user?.email?.split('@')[0]
-                            || '사용자'}
-                        </p>
-                        <p className="text-xs text-slate-500">{user?.email}</p>
-                      </div>
-                      {/* 강의 대시보드 — 최상단 (WO-O4O-INSTRUCTOR-DASHBOARD-ENTRY-V1)
-                       * lms:instructor 또는 glycopharm:admin/platform:super_admin 만 노출 */}
-                      {showInstructor && (
-                        <NavLink
-                          to="/instructor"
-                          className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
-                          onClick={() => setUserMenuOpen(false)}
-                        >
-                          <GraduationCap className="w-4 h-4" />
-                          강의 대시보드
-                        </NavLink>
-                      )}
-                      {showDashboard && (
-                        <NavLink
-                          to={dashboardPath}
-                          className="flex items-center gap-2 px-4 py-2 text-sm text-blue-700 hover:bg-blue-50"
-                          onClick={() => setUserMenuOpen(false)}
-                        >
-                          <Shield className="w-4 h-4" />
-                          {dashboardLabel}
-                        </NavLink>
-                      )}
-                      <NavLink
-                        to="/mypage"
-                        className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
-                        onClick={() => setUserMenuOpen(false)}
-                      >
-                        <User className="w-4 h-4" />
-                        마이페이지
-                      </NavLink>
-                      <NavLink
-                        to="/mypage/settings"
-                        className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
-                        onClick={() => setUserMenuOpen(false)}
-                      >
-                        <Settings className="w-4 h-4" />
-                        설정
-                      </NavLink>
-                      {/* Account Center — 임시 숨김: account.neture.co.kr 서비스 미배포/SSL 미구성 (WO-O4O-ACCOUNT-CENTER-LINK-VISIBILITY-POLICY-ALIGNMENT-V1) */}
-                      <button
-                        onClick={handleLogout}
-                        className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        로그아웃
-                      </button>
-                    </div>
-                  </>
-                )}
-              </div>
+            {isAuthenticated && user ? (
+              <GlobalUserProfileDropdown
+                user={{ displayName, email: user.email }}
+                menuItems={menuItems}
+                onLogout={handleLogout}
+              />
             ) : (
               <>
                 <button

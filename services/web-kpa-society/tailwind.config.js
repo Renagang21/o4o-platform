@@ -6,6 +6,7 @@ export default {
     "../../packages/operator-core/src/**/*.{ts,tsx}",
     "../../packages/store-ui-core/src/**/*.{ts,tsx}",
     "../../packages/ui/src/**/*.{ts,tsx}",
+    "../../packages/account-ui/src/**/*.{ts,tsx}",
     "../../packages/shared-space-ui/src/**/*.{ts,tsx}",
   ],
   theme: {
