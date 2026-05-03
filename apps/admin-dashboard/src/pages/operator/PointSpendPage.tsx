@@ -1,11 +1,14 @@
 /**
- * PointSpendPage
+ * PointSpendPage (operator point operation page)
  *
  * WO-O4O-POINT-OPERATOR-UI-V1
  * WO-O4O-POINT-PAYOUT-TYPE-BACKEND-V1 — payoutType을 API body에 포함
  * WO-O4O-POINT-TRANSACTION-VIEW-ADMIN-V1 — 사용자 거래 이력 조회 영역 추가
+ * WO-O4O-POINT-OPERATOR-UI-CONFIRM-AND-GRANT-V1
+ *   - 차감 확인 모달 추가 (typo/오조작 방어)
+ *   - 수동 지급(grant) 폼 추가 (차감 실수 보상 채널 확보)
+ *   - grant/spend 성공 시 동일 userId 이력 자동 재조회
  *
- * 운영자 포인트 차감(보상 지급 완료 처리) UI + 거래 이력 조회.
  * 정책: docs/point/O4O-POINT-REWARD-OPERATION-POLICY.md
  *   - 차감 = 보상 지급 완료 처리
  *   - description 필수
@@ -14,10 +17,10 @@
  */
 
 import { useState, FormEvent } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
 import { toast } from 'react-hot-toast';
-import { Coins, AlertTriangle, Search } from 'lucide-react';
+import { Coins, AlertTriangle, Search, Plus } from 'lucide-react';
 import PageHeader from '@/components/common/PageHeader';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -27,6 +30,15 @@ interface SpendResponse {
   data: {
     balance: number;
     transactionId: string;
+  };
+}
+
+interface GrantResponse {
+  success: boolean;
+  data: {
+    granted: number;
+    transactionId: string | null;
+    deduped: boolean;
   };
 }
 
@@ -116,14 +128,36 @@ async function fetchTransactions(
   return res.data.data;
 }
 
+async function grantPoint(params: {
+  userId: string;
+  amount: number;
+  description: string;
+}): Promise<GrantResponse['data']> {
+  const res = await authClient.api.post<GrantResponse>('/api/v1/points/admin/grant', params);
+  return res.data.data;
+}
+
 // ── Component ────────────────────────────────────────────────────────────────
 
 export default function PointSpendPage() {
+  const queryClient = useQueryClient();
+
+  // ── Spend form state ──
   const [userId, setUserId] = useState('');
   const [amount, setAmount] = useState('');
   const [payoutType, setPayoutType] = useState<PayoutType | ''>('');
   const [description, setDescription] = useState('');
   const [lastResult, setLastResult] = useState<SpendResponse['data'] | null>(null);
+
+  // ── Spend confirmation modal state ──
+  // 차감 실행 직전에 사용자가 다시 한 번 확인할 수 있도록 캡처해 둔다.
+  type PendingSpend = {
+    userId: string;
+    amount: number;
+    payoutType: PayoutType;
+    description: string;
+  };
+  const [pendingSpend, setPendingSpend] = useState<PendingSpend | null>(null);
 
   const trimmedDescription = description.trim();
   const numericAmount = Number(amount);
@@ -142,12 +176,20 @@ export default function PointSpendPage() {
     }
   };
 
-  const mutation = useMutation({
+  // grant/spend 성공 시 이력 쿼리 무효화.
+  // 이력 쿼리가 disabled(아직 조회 안 함)이면 invalidate는 stale 마킹만 — refetch 없음.
+  // enabled & 같은 페이지면 자동 refetch → WO 요구 "동일 userId면 재조회" 충족.
+  const refreshHistory = () => {
+    queryClient.invalidateQueries({ queryKey: ['point-admin-transactions'] });
+  };
+
+  const spendMutation = useMutation({
     mutationFn: spendPoint,
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
       setLastResult(data);
       toast.success(`차감 완료. 잔액: ${data.balance.toLocaleString()}P`);
       setAmount('');
+      refreshHistory();
     },
     onError: (err: any) => {
       const body: SpendErrorBody | undefined = err?.response?.data;
@@ -168,15 +210,71 @@ export default function PointSpendPage() {
     },
   });
 
-  const handleSubmit = (e: FormEvent) => {
+  // Spend submit: 즉시 API 호출 대신 확인 모달을 띄운다.
+  const handleSpendSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!canSubmit) return;
     // canSubmit narrows payoutType to PointPayoutType (alias narrowing)
-    mutation.mutate({
+    setPendingSpend({
       userId: userId.trim(),
       amount: numericAmount,
       payoutType: payoutType as PayoutType,
       description: trimmedDescription,
+    });
+  };
+
+  const handleConfirmSpend = () => {
+    if (!pendingSpend) return;
+    spendMutation.mutate(pendingSpend);
+    setPendingSpend(null);
+  };
+
+  // ── Grant form state (운영자 수동 지급) ──
+  const [grantUserId, setGrantUserId] = useState('');
+  const [grantAmount, setGrantAmount] = useState('');
+  const [grantDescription, setGrantDescription] = useState('');
+  const [lastGrantResult, setLastGrantResult] = useState<GrantResponse['data'] | null>(null);
+
+  const grantTrimmedDescription = grantDescription.trim();
+  const grantNumericAmount = Number(grantAmount);
+  const isValidGrantAmount = Number.isInteger(grantNumericAmount) && grantNumericAmount > 0;
+  const canGrantSubmit =
+    grantUserId.trim().length > 0 &&
+    isValidGrantAmount &&
+    grantTrimmedDescription.length > 0;
+
+  const grantMutation = useMutation({
+    mutationFn: grantPoint,
+    onSuccess: (data, variables) => {
+      setLastGrantResult(data);
+      if (data.deduped) {
+        toast(`이미 처리된 요청입니다. (referenceKey 중복 — 추가 적립 없음)`);
+      } else {
+        toast.success(`지급 완료. ${data.granted.toLocaleString()}P 적립`);
+      }
+      setGrantAmount('');
+      refreshHistory();
+    },
+    onError: (err: any) => {
+      const body: SpendErrorBody | undefined = err?.response?.data;
+      const code = body?.code;
+      if (code === 'INVALID_AMOUNT') {
+        toast.error('지급 금액은 1 이상의 정수여야 합니다.');
+      } else if (code === 'INVALID_USER_ID') {
+        toast.error('대상 사용자 ID를 확인해 주세요.');
+      } else {
+        toast.error(body?.error || '지급 처리 중 오류가 발생했습니다.');
+      }
+    },
+  });
+
+  const handleGrantSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    if (!canGrantSubmit) return;
+    grantMutation.mutate({
+      userId: grantUserId.trim(),
+      amount: grantNumericAmount,
+      description: grantTrimmedDescription,
     });
   };
 
@@ -219,122 +317,221 @@ export default function PointSpendPage() {
   return (
     <div className="p-6">
       <PageHeader
-        title="포인트 보상 정산 (차감)"
-        subtitle="보상 지급 완료 후 사용자 포인트를 차감합니다. 차감 사유(description)는 필수입니다."
+        title="포인트 운영"
+        subtitle="포인트 적립(grant)·차감(spend)과 사용자 거래 이력 조회를 수행합니다."
       />
 
-      <div className="mt-2 mb-6 flex items-start gap-2 rounded border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
-        <AlertTriangle size={16} className="mt-0.5 flex-shrink-0" />
-        <div>
-          <p className="font-medium">정책 안내</p>
-          <p className="mt-0.5">
-            포인트 차감은 <strong>보상 지급 완료 처리</strong>를 의미합니다. 실제 보상(현금/상품권 등)
-            지급 후 본 화면에서 차감을 수행하세요. 모든 차감 내역은 영구 기록됩니다.
-          </p>
-        </div>
-      </div>
+      {/* ── 지급(grant) 섹션 ── */}
+      <section className="mt-2 mb-10 border-b border-gray-200 pb-8">
+        <h2 className="mb-1 text-lg font-semibold text-gray-900">포인트 지급</h2>
+        <p className="mb-4 text-sm text-gray-500">
+          운영자가 사용자에게 수동으로 포인트를 적립합니다. 차감 실수 보상, 이벤트 보상 등에 사용합니다.
+        </p>
 
-      <form onSubmit={handleSubmit} className="max-w-xl space-y-4">
-        {/* userId */}
-        <div>
-          <label htmlFor="userId" className="mb-1 block text-sm font-medium text-gray-700">
-            사용자 ID <span className="text-red-500">*</span>
-          </label>
-          <input
-            id="userId"
-            type="text"
-            value={userId}
-            onChange={(e) => setUserId(e.target.value)}
-            placeholder="UUID (예: a0000000-0a00-4000-a000-000000000001)"
-            className="w-full rounded border border-gray-300 px-3 py-2 text-sm font-mono focus:border-blue-500 focus:outline-none"
-            disabled={mutation.isPending}
-          />
-        </div>
+        <form onSubmit={handleGrantSubmit} className="max-w-xl space-y-4">
+          <div>
+            <label htmlFor="grantUserId" className="mb-1 block text-sm font-medium text-gray-700">
+              사용자 ID <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="grantUserId"
+              type="text"
+              value={grantUserId}
+              onChange={(e) => setGrantUserId(e.target.value)}
+              placeholder="UUID"
+              className="w-full rounded border border-gray-300 px-3 py-2 text-sm font-mono focus:border-blue-500 focus:outline-none"
+              disabled={grantMutation.isPending}
+            />
+          </div>
 
-        {/* amount */}
-        <div>
-          <label htmlFor="amount" className="mb-1 block text-sm font-medium text-gray-700">
-            차감 포인트 <span className="text-red-500">*</span>
-          </label>
-          <input
-            id="amount"
-            type="number"
-            min={1}
-            step={1}
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            placeholder="예: 100"
-            className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-            disabled={mutation.isPending}
-          />
-          {amount !== '' && !isValidAmount && (
-            <p className="mt-1 text-xs text-red-600">1 이상의 정수만 입력 가능합니다.</p>
-          )}
-        </div>
+          <div>
+            <label htmlFor="grantAmount" className="mb-1 block text-sm font-medium text-gray-700">
+              지급 포인트 <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="grantAmount"
+              type="number"
+              min={1}
+              step={1}
+              value={grantAmount}
+              onChange={(e) => setGrantAmount(e.target.value)}
+              placeholder="예: 100"
+              className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              disabled={grantMutation.isPending}
+            />
+            {grantAmount !== '' && !isValidGrantAmount && (
+              <p className="mt-1 text-xs text-red-600">1 이상의 정수만 입력 가능합니다.</p>
+            )}
+          </div>
 
-        {/* payoutType */}
-        <div>
-          <label htmlFor="payoutType" className="mb-1 block text-sm font-medium text-gray-700">
-            보상 유형 <span className="text-red-500">*</span>
-          </label>
-          <select
-            id="payoutType"
-            value={payoutType}
-            onChange={(e) => handlePayoutTypeChange(e.target.value as PayoutType | '')}
-            className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-            disabled={mutation.isPending}
-          >
-            <option value="">보상 유형을 선택하세요</option>
-            {PAYOUT_TYPES.map((p) => (
-              <option key={p.value} value={p.value}>
-                {p.label}
-              </option>
-            ))}
-          </select>
-          <p className="mt-1 text-xs text-gray-500">
-            선택 시 아래 사유가 자동으로 입력됩니다. 필요 시 직접 수정할 수 있습니다.
-          </p>
-        </div>
+          <div>
+            <label
+              htmlFor="grantDescription"
+              className="mb-1 block text-sm font-medium text-gray-700"
+            >
+              지급 사유 (description) <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              id="grantDescription"
+              value={grantDescription}
+              onChange={(e) => setGrantDescription(e.target.value)}
+              rows={2}
+              placeholder="예: 운영자 수동 지급 (이벤트 보상)"
+              className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              disabled={grantMutation.isPending}
+            />
+            {grantDescription !== '' && grantTrimmedDescription === '' && (
+              <p className="mt-1 text-xs text-red-600">공백만 입력할 수 없습니다.</p>
+            )}
+          </div>
 
-        {/* description */}
-        <div>
-          <label htmlFor="description" className="mb-1 block text-sm font-medium text-gray-700">
-            차감 사유 (description) <span className="text-red-500">*</span>
-          </label>
-          <textarea
-            id="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={2}
-            placeholder="예: 설문 참여 보상 정산 완료"
-            className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-            disabled={mutation.isPending}
-          />
-          {description !== '' && trimmedDescription === '' && (
-            <p className="mt-1 text-xs text-red-600">공백만 입력할 수 없습니다.</p>
-          )}
-        </div>
-
-        {/* submit */}
-        <div className="flex items-center gap-3 pt-2">
-          <button
-            type="submit"
-            disabled={!canSubmit || mutation.isPending}
-            className="inline-flex items-center gap-2 rounded bg-admin-blue px-4 py-2 text-sm font-medium text-white hover:bg-admin-blue-dark disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <Coins size={14} />
-            {mutation.isPending ? '처리 중...' : '차감 실행'}
-          </button>
-          {lastResult && (
-            <span className="text-sm text-gray-600">
-              마지막 처리: 잔액 <strong>{lastResult.balance.toLocaleString()}P</strong>
-              <span className="ml-2 font-mono text-xs text-gray-400">
-                tx: {lastResult.transactionId.slice(0, 8)}…
+          <div className="flex items-center gap-3 pt-2">
+            <button
+              type="submit"
+              disabled={!canGrantSubmit || grantMutation.isPending}
+              className="inline-flex items-center gap-2 rounded border border-green-600 bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Plus size={14} />
+              {grantMutation.isPending ? '처리 중...' : '지급 실행'}
+            </button>
+            {lastGrantResult && (
+              <span className="text-sm text-gray-600">
+                마지막 지급: <strong>+{lastGrantResult.granted.toLocaleString()}P</strong>
+                {lastGrantResult.transactionId && (
+                  <span className="ml-2 font-mono text-xs text-gray-400">
+                    tx: {lastGrantResult.transactionId.slice(0, 8)}…
+                  </span>
+                )}
+                {lastGrantResult.deduped && (
+                  <span className="ml-2 text-xs text-amber-600">(중복 dedup)</span>
+                )}
               </span>
-            </span>
-          )}
+            )}
+          </div>
+        </form>
+      </section>
+
+      {/* ── 차감(spend) 섹션 ── */}
+      <section className="mb-10 border-b border-gray-200 pb-8">
+        <h2 className="mb-1 text-lg font-semibold text-gray-900">포인트 차감 (보상 정산)</h2>
+        <p className="mb-4 text-sm text-gray-500">
+          보상 지급 완료 후 사용자 포인트를 차감합니다. 차감 사유(description)는 필수이며 모든 내역은
+          영구 기록됩니다.
+        </p>
+
+        <div className="mb-6 flex max-w-xl items-start gap-2 rounded border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+          <AlertTriangle size={16} className="mt-0.5 flex-shrink-0" />
+          <div>
+            <p className="font-medium">정책 안내</p>
+            <p className="mt-0.5">
+              포인트 차감은 <strong>보상 지급 완료 처리</strong>를 의미합니다. 실제 보상(현금/상품권 등)
+              지급 후 본 화면에서 차감을 수행하세요.
+            </p>
+          </div>
         </div>
-      </form>
+
+        <form onSubmit={handleSpendSubmit} className="max-w-xl space-y-4">
+          {/* userId */}
+          <div>
+            <label htmlFor="userId" className="mb-1 block text-sm font-medium text-gray-700">
+              사용자 ID <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="userId"
+              type="text"
+              value={userId}
+              onChange={(e) => setUserId(e.target.value)}
+              placeholder="UUID (예: a0000000-0a00-4000-a000-000000000001)"
+              className="w-full rounded border border-gray-300 px-3 py-2 text-sm font-mono focus:border-blue-500 focus:outline-none"
+              disabled={spendMutation.isPending}
+            />
+          </div>
+
+          {/* amount */}
+          <div>
+            <label htmlFor="amount" className="mb-1 block text-sm font-medium text-gray-700">
+              차감 포인트 <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="amount"
+              type="number"
+              min={1}
+              step={1}
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              placeholder="예: 100"
+              className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              disabled={spendMutation.isPending}
+            />
+            {amount !== '' && !isValidAmount && (
+              <p className="mt-1 text-xs text-red-600">1 이상의 정수만 입력 가능합니다.</p>
+            )}
+          </div>
+
+          {/* payoutType */}
+          <div>
+            <label htmlFor="payoutType" className="mb-1 block text-sm font-medium text-gray-700">
+              보상 유형 <span className="text-red-500">*</span>
+            </label>
+            <select
+              id="payoutType"
+              value={payoutType}
+              onChange={(e) => handlePayoutTypeChange(e.target.value as PayoutType | '')}
+              className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              disabled={spendMutation.isPending}
+            >
+              <option value="">보상 유형을 선택하세요</option>
+              {PAYOUT_TYPES.map((p) => (
+                <option key={p.value} value={p.value}>
+                  {p.label}
+                </option>
+              ))}
+            </select>
+            <p className="mt-1 text-xs text-gray-500">
+              선택 시 아래 사유가 자동으로 입력됩니다. 필요 시 직접 수정할 수 있습니다.
+            </p>
+          </div>
+
+          {/* description */}
+          <div>
+            <label htmlFor="description" className="mb-1 block text-sm font-medium text-gray-700">
+              차감 사유 (description) <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={2}
+              placeholder="예: 설문 참여 보상 정산 완료"
+              className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              disabled={spendMutation.isPending}
+            />
+            {description !== '' && trimmedDescription === '' && (
+              <p className="mt-1 text-xs text-red-600">공백만 입력할 수 없습니다.</p>
+            )}
+          </div>
+
+          {/* submit (확인 모달 트리거) */}
+          <div className="flex items-center gap-3 pt-2">
+            <button
+              type="submit"
+              disabled={!canSubmit || spendMutation.isPending}
+              className="inline-flex items-center gap-2 rounded bg-admin-blue px-4 py-2 text-sm font-medium text-white hover:bg-admin-blue-dark disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Coins size={14} />
+              {spendMutation.isPending ? '처리 중...' : '포인트 차감'}
+            </button>
+            {lastResult && (
+              <span className="text-sm text-gray-600">
+                마지막 처리: 잔액 <strong>{lastResult.balance.toLocaleString()}P</strong>
+                <span className="ml-2 font-mono text-xs text-gray-400">
+                  tx: {lastResult.transactionId.slice(0, 8)}…
+                </span>
+              </span>
+            )}
+          </div>
+        </form>
+      </section>
 
       {/* ── 거래 이력 조회 (WO-O4O-POINT-TRANSACTION-VIEW-ADMIN-V1) ── */}
       <div className="mt-10 border-t border-gray-200 pt-8">
@@ -464,6 +661,71 @@ export default function PointSpendPage() {
           </div>
         )}
       </div>
+
+      {/* ── 차감 확인 모달 (WO-O4O-POINT-OPERATOR-UI-CONFIRM-AND-GRANT-V1) ── */}
+      {pendingSpend && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setPendingSpend(null)}
+        >
+          <div
+            className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="mb-3 text-lg font-semibold text-gray-900">포인트 차감 확인</h3>
+
+            <dl className="mb-4 space-y-2 rounded border border-gray-200 bg-gray-50 p-3 text-sm">
+              <div className="flex">
+                <dt className="w-24 flex-shrink-0 text-gray-500">사용자</dt>
+                <dd className="break-all font-mono text-gray-800">{pendingSpend.userId}</dd>
+              </div>
+              <div className="flex">
+                <dt className="w-24 flex-shrink-0 text-gray-500">차감 포인트</dt>
+                <dd className="font-semibold text-red-600">
+                  {pendingSpend.amount.toLocaleString()}P
+                </dd>
+              </div>
+              <div className="flex">
+                <dt className="w-24 flex-shrink-0 text-gray-500">보상 유형</dt>
+                <dd className="text-gray-800">
+                  {PAYOUT_TYPES.find((p) => p.value === pendingSpend.payoutType)?.label
+                    ?? pendingSpend.payoutType}
+                </dd>
+              </div>
+              <div className="flex">
+                <dt className="w-24 flex-shrink-0 text-gray-500">사유</dt>
+                <dd className="text-gray-800">{pendingSpend.description}</dd>
+              </div>
+            </dl>
+
+            <p className="mb-5 text-sm text-amber-700">
+              이 차감은 <strong>“보상 지급 완료 처리”</strong>로 기록됩니다. 진행하시겠습니까?
+            </p>
+
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setPendingSpend(null)}
+                disabled={spendMutation.isPending}
+                className="rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmSpend}
+                disabled={spendMutation.isPending}
+                className="inline-flex items-center gap-2 rounded bg-admin-blue px-4 py-2 text-sm font-medium text-white hover:bg-admin-blue-dark disabled:opacity-50"
+              >
+                <Coins size={14} />
+                차감 실행
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
