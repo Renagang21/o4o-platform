@@ -4,7 +4,11 @@ import { BaseService } from '../../../common/base.service.js';
 import { Course, CourseStatus, ContentKind, CourseVisibility } from '@o4o/lms-core';
 import { sanitizeInstructor } from '../utils/sanitize-user.js';
 import { notificationService } from '../../../services/NotificationService.js';
+import { logEvent } from '../../../common/event-log.service.js';
 import logger from '../../../utils/logger.js';
+
+/** WO-O4O-GLOBAL-EVENT-LOG-MINIMAL-V1: actor passed from controller for audit trail */
+type EventActor = { id: string; role: string | null };
 
 /** O4O Tag Policy V1 — sanitize (trim / #strip / 30char / dedup) */
 function sanitizeCourseTags(tags: unknown): string[] {
@@ -322,11 +326,13 @@ export class CourseService extends BaseService<Course> {
    * 강사 승인 요청 — DRAFT 또는 REJECTED → PENDING_REVIEW.
    * PUBLISHED / PENDING_REVIEW 상태에서는 거부.
    */
-  async submitForReview(id: string): Promise<Course> {
+  async submitForReview(id: string, actor?: EventActor): Promise<Course> {
     const course = await this.getCourse(id);
     if (!course) {
       throw new Error(`Course not found: ${id}`);
     }
+
+    const before = course.status;
 
     if (
       course.status !== CourseStatus.DRAFT &&
@@ -343,6 +349,17 @@ export class CourseService extends BaseService<Course> {
     logger.info(`[LMS] Course submitted for review`, {
       id: updated.id,
       title: updated.title,
+    });
+
+    // WO-O4O-GLOBAL-EVENT-LOG-MINIMAL-V1
+    await logEvent({
+      serviceKey: 'kpa-society',
+      entityType: 'course',
+      entityId: updated.id,
+      action: 'course.submitted',
+      actorId: actor?.id,
+      actorRole: actor?.role ?? null,
+      metadata: { before, after: updated.status },
     });
 
     // WO-O4O-LMS-NOTIFICATION-INTEGRATION-V1
@@ -365,11 +382,13 @@ export class CourseService extends BaseService<Course> {
    * WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1
    * 운영자 승인 — PENDING_REVIEW → PUBLISHED.
    */
-  async approveCourse(id: string): Promise<Course> {
+  async approveCourse(id: string, actor?: EventActor): Promise<Course> {
     const course = await this.getCourse(id);
     if (!course) {
       throw new Error(`Course not found: ${id}`);
     }
+
+    const before = course.status;
 
     if (course.status !== CourseStatus.PENDING_REVIEW) {
       throw new Error(
@@ -383,6 +402,17 @@ export class CourseService extends BaseService<Course> {
     logger.info(`[LMS] Course approved & published`, {
       id: updated.id,
       title: updated.title,
+    });
+
+    // WO-O4O-GLOBAL-EVENT-LOG-MINIMAL-V1
+    await logEvent({
+      serviceKey: 'kpa-society',
+      entityType: 'course',
+      entityId: updated.id,
+      action: 'course.approved',
+      actorId: actor?.id,
+      actorRole: actor?.role ?? null,
+      metadata: { before, after: updated.status },
     });
 
     // WO-O4O-LMS-NOTIFICATION-INTEGRATION-V1
@@ -405,11 +435,13 @@ export class CourseService extends BaseService<Course> {
    * WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1
    * 운영자 반려 — PENDING_REVIEW → REJECTED + 사유 저장.
    */
-  async rejectCourse(id: string, reason: string): Promise<Course> {
+  async rejectCourse(id: string, reason: string, actor?: EventActor): Promise<Course> {
     const course = await this.getCourse(id);
     if (!course) {
       throw new Error(`Course not found: ${id}`);
     }
+
+    const before = course.status;
 
     if (course.status !== CourseStatus.PENDING_REVIEW) {
       throw new Error(
@@ -429,6 +461,17 @@ export class CourseService extends BaseService<Course> {
       id: updated.id,
       title: updated.title,
       reason: trimmed,
+    });
+
+    // WO-O4O-GLOBAL-EVENT-LOG-MINIMAL-V1
+    await logEvent({
+      serviceKey: 'kpa-society',
+      entityType: 'course',
+      entityId: updated.id,
+      action: 'course.rejected',
+      actorId: actor?.id,
+      actorRole: actor?.role ?? null,
+      metadata: { before, after: updated.status, reason: trimmed },
     });
 
     // WO-O4O-LMS-NOTIFICATION-INTEGRATION-V1

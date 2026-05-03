@@ -558,7 +558,11 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     const course = await service.getCourse(req.params.id);
     if (!course) { res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); return; }
     try {
-      const updated = await service.approveCourse(req.params.id);
+      const userRoles: string[] = (req as any).user?.roles || [];
+      const updated = await service.approveCourse(req.params.id, {
+        id: (req as any).user?.id,
+        role: userRoles[0] ?? null,
+      });
       res.json({ success: true, data: { course: updated } });
     } catch (err: any) {
       if (err.message?.startsWith('INVALID_STATUS_TRANSITION')) {
@@ -578,7 +582,11 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     if (!course) { res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); return; }
     const reason = typeof req.body?.reason === 'string' ? req.body.reason : '';
     try {
-      const updated = await service.rejectCourse(req.params.id, reason);
+      const userRoles: string[] = (req as any).user?.roles || [];
+      const updated = await service.rejectCourse(req.params.id, reason, {
+        id: (req as any).user?.id,
+        role: userRoles[0] ?? null,
+      });
       res.json({ success: true, data: { course: updated } });
     } catch (err: any) {
       if (err.message === 'REJECTION_REASON_REQUIRED') {

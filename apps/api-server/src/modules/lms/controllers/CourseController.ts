@@ -231,7 +231,10 @@ export class CourseController extends BaseController {
         return BaseController.forbidden(res, 'You can only submit your own courses for review');
       }
 
-      const updated = await service.submitForReview(id);
+      const updated = await service.submitForReview(id, {
+        id: userId,
+        role: userRoles[0] ?? null,
+      });
 
       return BaseController.ok(res, {
         course: updated,
