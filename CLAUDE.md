@@ -359,6 +359,7 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | **APP-LMS Baseline** | `docs/architecture/APP-LMS-BASELINE.md` |
 | **LMS Scope Guard 설계** | `docs/architecture/LMS-SCOPE-GUARD.md` |
 | **LMS Client Convention V1** | `docs/architecture/LMS-CLIENT-CONVENTION-V1.md` |
+| **LMS Client Extraction V2 Impact** | `docs/architecture/LMS-CLIENT-EXTRACTION-V2-IMPACT.md` |
 
 ---
 
