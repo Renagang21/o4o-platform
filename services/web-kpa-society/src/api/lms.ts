@@ -5,8 +5,11 @@
  * API 명칭은 기존 호환성을 위해 유지하되, UI에서는 중립적 용어를 사용합니다.
  *
  * WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP2: 학습자 write API 3개(enrollCourse,
- *   updateProgress, submitQuiz) 만 @o4o/lms-client factory 로 위임. read 메서드와
- *   operator/instructor 메서드는 현 구현 유지(reference 보존).
+ *   updateProgress, submitQuiz) factory 위임.
+ * WO-O4O-LMS-V2-COMMONIZATION-CLEANUP-V1: 학습자 read 메서드 6개도 factory 위임 전환
+ *   (getCourses, getCourse, getLessons, getMyEnrollments, getEnrollmentByCourse, getQuizForLesson).
+ *   getLesson 은 GlycoPharm backend 미구현(Phase 5)으로 local 유지.
+ *   operator/instructor/certificate/completion 메서드는 KPA 전용으로 local 유지.
  */
 
 import { apiClient } from './client';
@@ -42,6 +45,7 @@ export const lmsApi = {
   // 안내 흐름
   // WO-KPA-CONTENT-COURSES-PUBLIC-VISIBILITY-FIX-V1: contentKind 필터 추가
   // WO-KPA-LMS-REMOVE-LEVEL-QUERY-PARAM-V1: level 쿼리 파라미터 제거 (BE는 받아도 무시)
+  // WO-O4O-LMS-V2-COMMONIZATION-CLEANUP-V1: factory 위임 전환.
   getCourses: (params?: {
     category?: string;
     status?: string;
@@ -49,27 +53,35 @@ export const lmsApi = {
     limit?: number;
     search?: string;
     contentKind?: 'lecture' | 'content_resource' | 'all';
-  }) =>
-    apiClient.get<PaginatedResponse<Course>>('/lms/courses', params),
+  }) => learnerClient.getCourses<Course>(params as Record<string, unknown> | undefined) as unknown as Promise<PaginatedResponse<Course>>,
 
-  getCourse: (id: string) =>
-    apiClient.get<ApiResponse<Course>>(`/lms/courses/${id}`),
+  // WO-O4O-LMS-V2-COMMONIZATION-CLEANUP-V1: factory 위임 전환. 실제 backend 응답은
+  // `{success, data: {course: Course}}` 인데 기존 KPA 타입(`ApiResponse<Course>`) 은
+  // `{success, data: Course}` 로 잘못 명시되어 있다. 페이지는 defensive cast 로 양쪽 모두 처리 중.
+  // 타입 정정은 별도 cleanup WO 로 분리.
+  getCourse: (id: string) => learnerClient.getCourse<Course>(id) as unknown as Promise<ApiResponse<Course>>,
 
   // 단계
+  // WO-O4O-LMS-V2-COMMONIZATION-CLEANUP-V1: factory 위임 전환.
   getLessons: (courseId: string) =>
-    apiClient.get<ApiResponse<Lesson[]>>(`/lms/courses/${courseId}/lessons`),
+    learnerClient.getLessons<Lesson>(courseId) as Promise<ApiResponse<Lesson[]>>,
 
   // WO-O4O-LMS-ROUTING-INTEGRATION-FIX-V1: use /lms/lessons/:id (not course sub-path)
+  // factory 미포함(GlycoPharm backend 미구현으로 Phase 5 보류). KPA 단독으로 local 유지.
   getLesson: (_courseId: string, lessonId: string) =>
     apiClient.get<ApiResponse<{ lesson: Lesson }>>(`/lms/lessons/${lessonId}`),
 
   // 진행
+  // WO-O4O-LMS-V2-COMMONIZATION-CLEANUP-V1: factory `getMyEnrollments` 사용 — endpoint 정정 (/lms/enrollments → /lms/enrollments/me).
+  // 기존 KPA lmsApi 호출처는 0건이라 회귀 위험 없음(grep 결과). 페이지(MyEnrollmentsPage)는 기존에 /me 직접 호출 중이었으므로 본 메서드로 전환.
+  // 반환 shape: factory 는 `{success, data: T[], pagination?}`, KPA 의 PaginatedResponse 는 `{data, total, page, ...}` flat — 페이지가 `res.data?.data` 패턴으로 이미 envelope 처리 중이므로 unknown cast 로 기존 타입 보존.
   getMyEnrollments: (params?: { status?: string; page?: number; limit?: number }) =>
-    apiClient.get<PaginatedResponse<Enrollment>>('/lms/enrollments', params),
+    learnerClient.getMyEnrollments<Enrollment>(params as Record<string, unknown> | undefined) as unknown as Promise<PaginatedResponse<Enrollment>>,
 
   // WO-O4O-LMS-ROUTING-INTEGRATION-FIX-V1: lookup by courseId for current user
+  // WO-O4O-LMS-V2-COMMONIZATION-CLEANUP-V1: factory 위임 전환.
   getEnrollmentByCourse: (courseId: string) =>
-    apiClient.get<ApiResponse<{ enrollment: Enrollment }>>(`/lms/enrollments/me/course/${courseId}`),
+    learnerClient.getEnrollmentByCourse<Enrollment>(courseId) as Promise<ApiResponse<{ enrollment: Enrollment }>>,
 
   // WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP2: 공통 factory 사용. 반환 형태 동일.
   enrollCourse: (courseId: string) =>
@@ -91,8 +103,9 @@ export const lmsApi = {
     apiClient.get<Blob>(`/lms/certificates/${id}/download`),
 
   // 퀴즈 (WO-O4O-QUIZ-SYSTEM-V1)
+  // WO-O4O-LMS-V2-COMMONIZATION-CLEANUP-V1: factory 위임 전환.
   getQuizForLesson: (lessonId: string) =>
-    apiClient.get<ApiResponse<{ quiz: Quiz }>>(`/lms/lessons/${lessonId}/quiz`),
+    learnerClient.getQuizForLesson<Quiz>(lessonId) as Promise<ApiResponse<{ quiz: Quiz }>>,
 
   // WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP2: 공통 factory 사용. 반환 형태 동일.
   submitQuiz: (quizId: string, answers: Array<{ questionId: string; answer: string | string[] }>) =>

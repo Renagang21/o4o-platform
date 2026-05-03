@@ -54,12 +54,14 @@ V2 작업은 IMPACT 분석에서 도출된 **2단계 안전 분할 전략(Option
 
 | 항목 | 상태 |
 |---|---|
-| Read API factory 적용 | ✅ Step 2 시점에 함께 채택 |
+| Read API factory 적용 | ✅ **Cleanup-V1 시점에 채택** (V2 Step 1/2 본문에서는 KPA read 미적용 — V2 발표 직후 구조 검증 IR(`IR-O4O-LMS-COMMONIZATION-VERIFY-V1`)에서 PARTIAL 판정 후 Cleanup WO 로 정렬) |
 | Write API factory 적용 | ✅ Step 2 |
 | baseURL | `/api/v1/kpa` 유지 |
-| 기존 구조 | reference 보존 — pages 0 수정 |
+| 페이지 코드 수정 | Cleanup-V1 에서 1건(`MyEnrollmentsPage` direct call 제거). Step 1/2 본문에서는 0 |
 | operator 메서드 (`operator*` 6개) | local 유지 (KPA 전용) |
 | `lms-instructor.ts` (27개 강사용 메서드) | local 유지 (KPA 전용) |
+| `getLesson` | local 유지 — GlycoPharm backend 미구현(Phase 5) |
+| `getMyEnrollments` | Cleanup-V1 에서 endpoint 정정 + factory 채택 (`/lms/enrollments` → `/lms/enrollments/me`) |
 
 ### 3.2 GlycoPharm
 
@@ -70,6 +72,7 @@ V2 작업은 IMPACT 분석에서 도출된 **2단계 안전 분할 전략(Option
 | unwrap 패턴 (`data.data.X`, try/catch null) | 보존 |
 | Enrollment endpoint | `/lms/enrollments/:courseId` 유지 (factory 와 다름) |
 | Phase 2 deprecated alias (`getCourseById` 등) | 보존 |
+| `InstructorDashboardPage` 페이지 직접 호출 | Cleanup-V1 에서 `lmsApi.getInstructorCourses()` 로 정렬 |
 
 ### 3.3 K-Cosmetics
 
@@ -215,6 +218,8 @@ V2 작업은 IMPACT 분석에서 도출된 **2단계 안전 분할 전략(Option
 - `e03c1b38c` — WO-O4O-LMS-CLIENT-EXTRACTION-V2-IMPACT-DOC-V1
 - `72ba3ff05` — WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP1
 - `b7057c3bd` — WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP2
+- `fc220cd48` — WO-O4O-LMS-CLIENT-V2-COMPLETE-DOC-V1 (V2 closure declaration — KPA Read API 표기 오류는 Cleanup-V1 에서 정정됨)
+- (Cleanup) WO-O4O-LMS-V2-COMMONIZATION-CLEANUP-V1 — page direct call 2건 제거 + KPA read 6 메서드 factory 채택 + 본 문서 정정
 - (선행) `0318a02e1` — WO-O4O-LMS-CLIENT-EXTRACTION-V1-SCOPED
 - (선행) `000f975e3` — WO-O4O-LMS-GLYCOPHARM-METHOD-ALIGNMENT-V1
 - (선행) `30dbac357` — WO-O4O-LMS-SCOPE-GUARD-DOC-V1

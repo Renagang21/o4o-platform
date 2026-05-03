@@ -163,6 +163,19 @@ export function createLmsLearnerClient(http: LmsHttpClient) {
       return http.get<LmsApiResponse<{ enrollment: T }>>(`/lms/enrollments/me/course/${courseId}`);
     },
 
+    /**
+     * 본인의 전체 수강 목록 (`GET /lms/enrollments/me`).
+     * WO-O4O-LMS-V2-COMMONIZATION-CLEANUP-V1: KPA 페이지의 직접 호출 제거를 위해 추가.
+     * 반환: `{ success, data: T[], pagination? }` — backend 응답 envelope.
+     */
+    getMyEnrollments<T extends LmsEnrollmentBase = LmsEnrollmentBase>(
+      params?: Record<string, unknown>,
+    ): Promise<LmsApiResponse<T[]> & { pagination?: { page: number; limit: number; total: number; totalPages: number } }> {
+      return http.get<
+        LmsApiResponse<T[]> & { pagination?: { page: number; limit: number; total: number; totalPages: number } }
+      >('/lms/enrollments/me', params);
+    },
+
     /** 레슨에 연결된 퀴즈 조회. 반환: `{ success, data: { quiz: T } }` */
     getQuizForLesson<T = unknown>(
       lessonId: string,

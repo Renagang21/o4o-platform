@@ -17,8 +17,7 @@ import {
   ChevronRight,
   BarChart2,
 } from 'lucide-react';
-import { api } from '@/lib/apiClient';
-import type { LmsCourse } from '@/api/lms';
+import { lmsApi, type LmsCourse } from '@/api/lms';
 
 interface InstructorCourseStats {
   enrolledCount?: number;
@@ -40,11 +39,10 @@ export default function InstructorDashboardPage() {
       setLoading(true);
       setError(null);
       try {
-        const { data } = await api.get<{ success: boolean; data: InstructorCourse[] }>(
-          '/lms/instructor/courses',
-        );
+        // WO-O4O-LMS-V2-COMMONIZATION-CLEANUP-V1: lmsApi factory 위임으로 전환 (이전: api.get 직접 호출).
+        const res = await lmsApi.getInstructorCourses();
         if (!cancelled) {
-          setCourses(data.data ?? []);
+          setCourses((res.data ?? []) as InstructorCourse[]);
         }
       } catch {
         if (!cancelled) {

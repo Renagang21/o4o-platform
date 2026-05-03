@@ -11,8 +11,8 @@ import { useNavigate } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState } from '../../components/common';
 import { MyPageNavigation } from '@o4o/account-ui';
 import { KPA_MYPAGE_NAV_ITEMS } from './navItems';
-import { authClient } from '../../contexts/AuthContext';
 import { useAuth } from '../../contexts';
+import { lmsApi } from '../../api/lms';
 import { colors } from '../../styles/theme';
 
 /* ── 타입 ──────────────────────────────── */
@@ -174,9 +174,11 @@ export function MyEnrollmentsPage() {
     setLoading(true);
     setError(null);
     try {
-      const res: any = await authClient.api.get('/lms/enrollments/me');
-      // API: { success, data: Enrollment[], pagination }
-      const data = res.data?.data;
+      // WO-O4O-LMS-V2-COMMONIZATION-CLEANUP-V1: lmsApi.getMyEnrollments factory 경유로 전환.
+      // 기존: authClient.api.get('/lms/enrollments/me') 직접. lmsApi 가 동일 endpoint 사용.
+      const res: any = await lmsApi.getMyEnrollments();
+      // API envelope: { success, data: Enrollment[], pagination }
+      const data = res?.data;
       setEnrollments(Array.isArray(data) ? data : []);
     } catch (err: any) {
       setError('수강 목록을 불러오지 못했습니다.');
