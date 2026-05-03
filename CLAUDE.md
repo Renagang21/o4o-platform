@@ -364,6 +364,7 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | **Operator Integration State V1** | `docs/architecture/OPERATOR-INTEGRATION-STATE-V1.md` |
 | **Operator DataTable Policy V1** | `docs/architecture/OPERATOR-DATATABLE-POLICY-V1.md` |
 | **Operator Core Design V1** | `docs/architecture/OPERATOR-CORE-DESIGN-V1.md` |
+| **Operator Core Extraction Verify Checklist V1** | `docs/architecture/OPERATOR-CORE-EXTRACTION-VERIFY-CHECKLIST-V1.md` |
 
 ---
 
