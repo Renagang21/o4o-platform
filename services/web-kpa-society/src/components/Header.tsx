@@ -6,6 +6,7 @@
  * WO-KPA-SUPER-OPERATOR-BASELINE-REFINE-V1: Super Operator 공통 메뉴 지원
  * WO-KPA-A-ROLE-BASED-NAVIGATION-AND-ENTRY-REFINEMENT-V1: 공개/역할 메뉴 분리 + dropdown 진입점
  * WO-O4O-GLOBAL-USER-PROFILE-DROPDOWN-EXTRACTION-V1: 사용자 드롭다운을 @o4o/account-ui 공통 컴포넌트로 교체 (hover 트리거 + Super Operator 배지/색상 보존)
+ * WO-O4O-INSTRUCTOR-ENTRY-FIX-V1: Super Operator 분기 + 모바일 메뉴에서도 강의 대시보드 진입점 노출
  *
  * 원칙: 상단 메뉴는 서비스 진입점만 노출 (기능 나열 금지)
  */
@@ -124,22 +125,30 @@ export function Header({ serviceName }: { serviceName: string }) {
   const dropdownMenuItems: GlobalUserProfileMenuItem[] = useMemo(() => {
     if (!user) return [];
 
-    // Super Operator: 간소화된 메뉴
+    // Super Operator: 간소화된 메뉴 (강의 대시보드는 강사/admin 겸임 시 노출)
     if (isSuperOp) {
-      return [
-        {
-          key: 'dashboard',
-          icon: <Shield className="w-4 h-4 text-amber-600" />,
-          label: isAdmin ? '관리자 콘솔' : '운영 대시보드',
-          href: isAdmin ? '/admin' : '/operator',
-        },
-        {
-          key: 'mypage',
-          icon: <LayoutDashboard className="w-4 h-4 text-gray-500" />,
-          label: '마이페이지',
-          href: '/mypage',
-        },
-      ];
+      const superItems: GlobalUserProfileMenuItem[] = [];
+      if (isInstructor || isAdmin) {
+        superItems.push({
+          key: 'instructor',
+          icon: <GraduationCap className="w-4 h-4 text-gray-500" />,
+          label: '강의 대시보드',
+          href: '/instructor',
+        });
+      }
+      superItems.push({
+        key: 'dashboard',
+        icon: <Shield className="w-4 h-4 text-amber-600" />,
+        label: isAdmin ? '관리자 콘솔' : '운영 대시보드',
+        href: isAdmin ? '/admin' : '/operator',
+      });
+      superItems.push({
+        key: 'mypage',
+        icon: <LayoutDashboard className="w-4 h-4 text-gray-500" />,
+        label: '마이페이지',
+        href: '/mypage',
+      });
+      return superItems;
     }
 
     // 일반 사용자: 전체 메뉴
@@ -370,6 +379,15 @@ export function Header({ serviceName }: { serviceName: string }) {
                 </Link>
               </div>
             ))}
+            {(isInstructor || isAdmin) && (
+              <Link
+                to="/instructor"
+                style={styles.mobileMenuItem}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                강의 대시보드
+              </Link>
+            )}
           </div>
         )}
       </header>
