@@ -2,12 +2,14 @@
 
 > **상위 문서**: `CLAUDE.md` · `docs/architecture/APP-LMS-BASELINE.md` · `docs/architecture/LMS-CLIENT-CONVENTION-V1.md`
 > **선행 IR/문서**: `docs/architecture/LMS-CLIENT-EXTRACTION-V2-IMPACT.md`
-> **버전**: V1 — Final
-> **작성일**: 2026-05-03
-> **상태**: **V2 COMPLETE**
-> **WO**: WO-O4O-LMS-CLIENT-V2-COMPLETE-DOC-V1
+> **버전**: V1 (Final) → V1.1 (Verified — IR-V2 결과 반영)
+> **작성일**: 2026-05-03 (V1 발행) / 2026-05-03 (V1.1 재확정)
+> **상태**: **V2 COMPLETE — VERIFIED ✅**
+> **WO**: WO-O4O-LMS-CLIENT-V2-COMPLETE-DOC-V1 (선언) · WO-O4O-LMS-V2-VERIFIED-DOC-FINALIZE-V1 (재확정 반영)
 >
 > 본 문서는 `WO-O4O-LMS-CLIENT-EXTRACTION-V2` 가 구조적으로 완료되었음을 확정한다. 이후 LMS frontend client 관련 작업은 본 문서에 정의된 적용 상태와 예외 사항을 기준으로 판정한다.
+>
+> **재확정 경로**: V1 발행 직후 `IR-O4O-LMS-COMMONIZATION-VERIFY-V1` 에서 PARTIAL 판정(KPA read 6개 direct 잔존 + 페이지 직접 호출 2건) → `WO-O4O-LMS-V2-COMMONIZATION-CLEANUP-V1` 로 잔재 제거 → `IR-O4O-LMS-COMMONIZATION-VERIFY-V2` 에서 **COMPLETE 재판정**. 본 문서 V1.1 은 그 결과를 반영한 최종 상태이다.
 
 ---
 
@@ -125,7 +127,30 @@ V2 작업은 IMPACT 분석에서 도출된 **2단계 안전 분할 전략(Option
 | 실제 enroll → DB INSERT 흐름 | 미수행 (CLAUDE.md §0 정책: 데이터 변경은 사용자 승인 필요. published 강의 0개로 자연 트래픽도 부재) |
 | Idempotency, progress 누적, quiz 채점 | 미수행 (위와 동일) |
 
-→ 정적 + 로그 + 계약 검증으로 회귀 위험 차단. 실제 write 흐름 검증은 향후 자연 트래픽 또는 사용자 직접 1회 시도로 보완.
+→ 정적 + 로그 + 계약 검증으로 회귀 위험 차단. 실제 write 흐름 검증은 별도 후속 단계(`WO-O4O-LMS-REAL-DATA-SEED-V1`)로 분리되어 있으며 V2 종료 판정 자체와는 독립적이다.
+
+### 5.4 구조 재검증 (IR-V2 결과 반영)
+
+V1 발행 직후 사용자 framework("모든 LMS 호출 factory 경유") 기준의 정밀 재검증을 수행했다.
+
+| 단계 | 결과 |
+|---|---|
+| `IR-O4O-LMS-COMMONIZATION-VERIFY-V1` (V1 발행 직후) | **PARTIAL** — KPA read 6 메서드 direct 잔존 + 페이지 직접 호출 2건 (GlycoPharm InstructorDashboardPage, KPA MyEnrollmentsPage) 발견 |
+| `WO-O4O-LMS-V2-COMMONIZATION-CLEANUP-V1` (커밋 `814f4b53a`) | KPA 6 read 메서드 factory 위임 + 페이지 직접 호출 2건 제거 + factory 에 `getMyEnrollments` 추가 + 본 문서 §3.1/§3.2 정정 |
+| `IR-O4O-LMS-COMMONIZATION-VERIFY-V2` (cleanup 후) | **COMPLETE ✅** |
+
+**IR-V2 정밀 점검 결과**:
+
+| 점검 | 결과 |
+|---|---|
+| 3 서비스 `@o4o/lms-client` import | ✅ 통일 |
+| V2 surface 메서드 factory 미사용 잔재 | ✅ **0건** |
+| 페이지 레벨 LMS direct call (`api.X('/lms/`, `apiClient.X('/lms/`, `authClient.api.X('/lms/`, `fetch('/api/v1/lms/`) | ✅ **0건** |
+| Hardcoded full URL (`'/api/v1/lms/'` 등) — 페이지 코드 | ✅ **0건** |
+| Fallback 우회 패턴 (`try { factory } catch { fetch }`) | ✅ **0건** |
+| 의도적 예외 모두 Phase 5 / 서비스 전용으로 카테고리화 | ✅ |
+
+남은 local 사용은 모두 §6 의도적 예외 카탈로그 4 카테고리 안에 들어간다. V2 surface 외 잔재 0.
 
 ---
 
@@ -170,10 +195,11 @@ V2 작업은 IMPACT 분석에서 도출된 **2단계 안전 분할 전략(Option
 | 영역 | 상태 |
 |---|---|
 | Backend (`/api/v1/lms/*` 모듈) | ✅ 공통 (이전부터) |
-| Frontend Client | ✅ **V2 완료 (본 문서)** |
+| Frontend Client | ✅ **V2 완료 — IR-V2 verified COMPLETE (본 문서)** |
 | Frontend UI Template (`LmsHubTemplate` 등) | ❌ 미공통 — APP-LMS Phase 3 |
 | Frontend 페이지 구조 (`/lms`, `/instructor`) | △ 부분 공통 — 라우트는 표준화, 페이지 컴포넌트는 서비스별 |
 | Data 격리 정책 | △ KPA 중심 (`organizationId` + `kpa_members`) — Phase 5 검토 |
+| 실제 운영 데이터로의 write 흐름 검증 (enroll → progress → submit) | ⏸ **후속 보류** — `WO-O4O-LMS-REAL-DATA-SEED-V1` 별도 단계. V2 종료 판정과 독립적. |
 
 ---
 
@@ -194,21 +220,29 @@ V2 작업은 IMPACT 분석에서 도출된 **2단계 안전 분할 전략(Option
 
 ## 9. 결론
 
-> **`WO-O4O-LMS-CLIENT-EXTRACTION-V2` — V2 COMPLETE**
+> **`WO-O4O-LMS-CLIENT-EXTRACTION-V2` — V2 COMPLETE (VERIFIED ✅)**
 
 - 구조 공통화: ✅ 완료
 - 서비스 간 API 호출 통일: ✅ 완료 (3개 서비스 × 9개 메서드)
 - 회귀: ✅ 정적·로그·계약 검증에서 0
 - 페이지 변경: 0 — public API 보존
 - Endpoint 변경: 0 — 기존 동작 보존
+- **재검증 (IR-V2)**: ✅ V2 surface factory 미사용 잔재 0건, 페이지 직접 LMS 호출 0건 — 의도적 예외(Phase 5 / 서비스 전용)만 남음
 
 ```
-상태:  V2 COMPLETE
-일자:  2026-05-03
-커밋:  72ba3ff05 (Step 1) → b7057c3bd (Step 2)
+상태:        V2 COMPLETE — VERIFIED
+선언 일자:    2026-05-03 (V1)
+재확정 일자:  2026-05-03 (V1.1, IR-V2 결과 반영)
+커밋 흐름:    72ba3ff05 (Step 1)
+              → b7057c3bd (Step 2)
+              → fc220cd48 (V1 선언, KPA Read 표기 오류 포함)
+              → 814f4b53a (Cleanup-V1 — 잔재 제거 + 표기 정정)
+              → IR-V2 COMPLETE 재판정
 ```
 
-본 문서가 LMS frontend client 공통화의 종료 마커이다. 이후 LMS UI Template 공통화(APP-LMS Phase 3) 또는 §8 Phase 5 작업으로 자연스럽게 이어질 수 있다.
+본 문서가 LMS frontend client 공통화의 **재검증된 종료 마커**이다. 이후 LMS UI Template 공통화(APP-LMS Phase 3) 또는 §8 Phase 5 작업으로 자연스럽게 이어질 수 있다.
+
+실제 운영 데이터로의 write 흐름 검증(`WO-O4O-LMS-REAL-DATA-SEED-V1`)은 V2 종료 판정과 독립적인 후속 보류 단계로, 본 문서 §7 상태 표에 명시되어 있다.
 
 ---
 
@@ -218,8 +252,11 @@ V2 작업은 IMPACT 분석에서 도출된 **2단계 안전 분할 전략(Option
 - `e03c1b38c` — WO-O4O-LMS-CLIENT-EXTRACTION-V2-IMPACT-DOC-V1
 - `72ba3ff05` — WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP1
 - `b7057c3bd` — WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP2
-- `fc220cd48` — WO-O4O-LMS-CLIENT-V2-COMPLETE-DOC-V1 (V2 closure declaration — KPA Read API 표기 오류는 Cleanup-V1 에서 정정됨)
-- (Cleanup) WO-O4O-LMS-V2-COMMONIZATION-CLEANUP-V1 — page direct call 2건 제거 + KPA read 6 메서드 factory 채택 + 본 문서 정정
+- `fc220cd48` — WO-O4O-LMS-CLIENT-V2-COMPLETE-DOC-V1 (V1 closure declaration — KPA Read API 표기 오류는 Cleanup-V1 에서 정정됨)
+- `814f4b53a` — WO-O4O-LMS-V2-COMMONIZATION-CLEANUP-V1 (page direct call 2건 제거 + KPA read 6 메서드 factory 채택 + V1 표기 정정)
+- (재검증) IR-O4O-LMS-COMMONIZATION-VERIFY-V1 → PARTIAL (Cleanup 트리거)
+- (재검증) IR-O4O-LMS-COMMONIZATION-VERIFY-V2 → **COMPLETE 재판정**
+- (V1.1) WO-O4O-LMS-V2-VERIFIED-DOC-FINALIZE-V1 — IR-V2 결과 반영 (본 commit)
 - (선행) `0318a02e1` — WO-O4O-LMS-CLIENT-EXTRACTION-V1-SCOPED
 - (선행) `000f975e3` — WO-O4O-LMS-GLYCOPHARM-METHOD-ALIGNMENT-V1
 - (선행) `30dbac357` — WO-O4O-LMS-SCOPE-GUARD-DOC-V1
