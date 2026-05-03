@@ -4,6 +4,10 @@ import { AppDataSource } from '../../../database/connection.js';
 import { InstructorApplication, Enrollment, EnrollmentStatus, Course, ContentKind } from '@o4o/lms-core';
 import { roleAssignmentService } from '../../auth/services/role-assignment.service.js';
 import logger from '../../../utils/logger.js';
+// WO-O4O-LMS-ASSIGNMENT-GRADING-V1
+import { AssignmentService } from '../services/AssignmentService.js';
+import { LessonService } from '../services/LessonService.js';
+import { CourseService } from '../services/CourseService.js';
 
 /**
  * InstructorController
@@ -879,6 +883,128 @@ export class InstructorController extends BaseController {
       return BaseController.ok(res, { enrollment: updated, message: '수강이 거절되었습니다' });
     } catch (error: any) {
       logger.error('[InstructorController.rejectEnrollment] Error', { error: error.message });
+      return BaseController.error(res, error);
+    }
+  }
+
+  // ========================================
+  // WO-O4O-LMS-ASSIGNMENT-GRADING-V1: 과제 채점
+  // ========================================
+
+  /**
+   * 강사 강의 ownership 체크 (kpa:admin 우회 허용).
+   */
+  private static async checkLessonOwnership(
+    lessonId: string,
+    userId: string,
+  ): Promise<{ allowed: boolean; notFound: boolean; courseId?: string }> {
+    const lesson = await LessonService.getInstance().getLesson(lessonId);
+    if (!lesson) return { allowed: false, notFound: true };
+
+    const isKpaAdmin = await roleAssignmentService.hasAnyRole(userId, ['kpa:admin']);
+    if (isKpaAdmin) return { allowed: true, notFound: false, courseId: lesson.courseId };
+
+    const course = await CourseService.getInstance().getCourse(lesson.courseId);
+    if (!course) return { allowed: false, notFound: true };
+
+    return {
+      allowed: course.instructorId === userId,
+      notFound: false,
+      courseId: lesson.courseId,
+    };
+  }
+
+  /**
+   * GET /api/v1/lms/instructor/lessons/:lessonId/submissions
+   * 특정 lesson의 모든 submission 조회 (강사 ownership 체크).
+   */
+  static async listLessonSubmissions(req: Request, res: Response): Promise<any> {
+    try {
+      const { lessonId } = req.params;
+      const userId = (req as any).user?.id;
+      if (!userId) return BaseController.unauthorized(res, 'User not authenticated');
+
+      const own = await InstructorController.checkLessonOwnership(lessonId, userId);
+      if (own.notFound) return BaseController.notFound(res, 'Lesson not found');
+      if (!own.allowed) {
+        return BaseController.forbidden(res, '본인 강의의 제출물만 조회할 수 있습니다.');
+      }
+
+      const rows = await AssignmentService.getInstance().listSubmissionsForLesson(lessonId);
+      const items = rows.map(({ submission, userName }) => ({
+        id: submission.id,
+        userId: submission.userId,
+        userName: userName ?? '(이름 없음)',
+        content: submission.content ?? null,
+        submittedAt: submission.submittedAt,
+        status: submission.status,
+        gradingStatus: submission.gradingStatus,
+        score: submission.score ?? null,
+        feedback: submission.feedback ?? null,
+        gradedAt: submission.gradedAt ?? null,
+        gradedBy: submission.gradedBy ?? null,
+      }));
+
+      return BaseController.ok(res, {
+        lessonId,
+        courseId: own.courseId,
+        items,
+      });
+    } catch (error: any) {
+      logger.error('[InstructorController.listLessonSubmissions] Error', { error: error.message });
+      return BaseController.error(res, error);
+    }
+  }
+
+  /**
+   * POST /api/v1/lms/instructor/submissions/:submissionId/grade
+   * 강사 채점.
+   * Body: { gradingStatus: 'graded' | 'returned', score?, feedback? }
+   *
+   * 정책 (WO-O4O-LMS-ASSIGNMENT-GRADING-V1):
+   *   - 본인 강의의 submission만 채점 가능 (kpa:admin 우회 허용)
+   *   - 기존 lesson 진도/Credit/수료/인증서 흐름은 변경하지 않음
+   */
+  static async gradeSubmission(req: Request, res: Response): Promise<any> {
+    try {
+      const { submissionId } = req.params;
+      const userId = (req as any).user?.id;
+      if (!userId) return BaseController.unauthorized(res, 'User not authenticated');
+
+      const { gradingStatus, score, feedback } = req.body || {};
+
+      // Submission → lesson → course ownership 체크
+      const submissionRepo = AppDataSource.getRepository('Submission');
+      const submission: any = await submissionRepo.findOne({ where: { id: submissionId } });
+      if (!submission) return BaseController.notFound(res, 'Submission not found');
+
+      const own = await InstructorController.checkLessonOwnership(submission.lessonId, userId);
+      if (own.notFound) return BaseController.notFound(res, 'Lesson not found');
+      if (!own.allowed) {
+        return BaseController.forbidden(res, '본인 강의의 제출물만 채점할 수 있습니다.');
+      }
+
+      try {
+        const updated = await AssignmentService.getInstance().gradeSubmission(submissionId, userId, {
+          gradingStatus,
+          score: typeof score === 'number' ? score : null,
+          feedback: typeof feedback === 'string' ? feedback : null,
+        });
+        return BaseController.ok(res, { submission: updated });
+      } catch (err: any) {
+        if (err?.code === 'INVALID_SCORE') {
+          return BaseController.error(res, err.message, 400, 'INVALID_SCORE');
+        }
+        if (err?.code === 'FEEDBACK_REQUIRED') {
+          return BaseController.error(res, err.message, 400, 'FEEDBACK_REQUIRED');
+        }
+        if (err?.code === 'INVALID_GRADING_STATUS') {
+          return BaseController.error(res, err.message, 400, 'INVALID_GRADING_STATUS');
+        }
+        throw err;
+      }
+    } catch (error: any) {
+      logger.error('[InstructorController.gradeSubmission] Error', { error: error.message });
       return BaseController.error(res, error);
     }
   }

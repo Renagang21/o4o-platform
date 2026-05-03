@@ -22,6 +22,8 @@ export type {
   ContentItem,
   AssignmentSubmissionType,
   SubmissionStatus,
+  // WO-O4O-LMS-ASSIGNMENT-GRADING-V1
+  GradingStatus,
 } from '@o4o/interactive-content-core';
 
 // Education Extension (re-export from @o4o/education-extension for backward compatibility)

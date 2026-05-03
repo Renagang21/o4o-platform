@@ -195,6 +195,11 @@ export interface AssignmentSubmission {
   content: string | null;
   submittedAt: string;
   status: 'submitted';
+  // WO-O4O-LMS-ASSIGNMENT-GRADING-V1
+  gradingStatus?: 'ungraded' | 'graded' | 'returned';
+  score?: number | null;
+  feedback?: string | null;
+  gradedAt?: string | null;
 }
 
 // WO-O4O-LMS-LIVE-MINIMAL-V1

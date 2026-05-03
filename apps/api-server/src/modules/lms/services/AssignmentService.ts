@@ -174,6 +174,92 @@ export class AssignmentService {
     });
   }
 
+  // ── WO-O4O-LMS-ASSIGNMENT-GRADING-V1 ─────────────────────────────────
+
+  /**
+   * 강사용 — 특정 lesson의 모든 submission을 사용자 정보와 함께 조회.
+   * Ownership 체크는 호출자가 수행 (Controller).
+   */
+  async listSubmissionsForLesson(lessonId: string): Promise<Array<{
+    submission: Submission;
+    userName: string | null;
+  }>> {
+    const rows = await this.submissionRepository
+      .createQueryBuilder('s')
+      .leftJoin('users', 'u', 'u.id = s."userId"')
+      .addSelect('u.name', 's_userName')
+      .where('s."lessonId" = :lessonId', { lessonId })
+      .orderBy('s."submittedAt"', 'DESC')
+      .getRawAndEntities();
+
+    return rows.entities.map((submission, idx) => ({
+      submission,
+      userName: rows.raw[idx]?.s_userName ?? null,
+    }));
+  }
+
+  /**
+   * 강사 채점 처리.
+   * - gradingStatus='graded': score (0~100) 필수
+   * - gradingStatus='returned': feedback 필수 (재제출 요청 의미)
+   * - gradedAt/gradedBy 자동 기록
+   * - 기존 submission.status, lesson 완료, Credit 지급은 변경하지 않음
+   */
+  async gradeSubmission(
+    submissionId: string,
+    instructorId: string,
+    data: {
+      gradingStatus: 'graded' | 'returned';
+      score?: number | null;
+      feedback?: string | null;
+    },
+  ): Promise<Submission> {
+    const submission = await this.submissionRepository.findOne({
+      where: { id: submissionId },
+    });
+    if (!submission) throw new Error('Submission not found');
+
+    if (data.gradingStatus === 'graded') {
+      if (
+        typeof data.score !== 'number' ||
+        !Number.isInteger(data.score) ||
+        data.score < 0 ||
+        data.score > 100
+      ) {
+        const err: any = new Error('score는 0~100 정수여야 합니다.');
+        err.code = 'INVALID_SCORE';
+        throw err;
+      }
+    } else if (data.gradingStatus === 'returned') {
+      if (!data.feedback || !data.feedback.trim()) {
+        const err: any = new Error('returned 처리 시 feedback이 필요합니다.');
+        err.code = 'FEEDBACK_REQUIRED';
+        throw err;
+      }
+    } else {
+      const err: any = new Error('gradingStatus는 graded | returned 만 허용됩니다.');
+      err.code = 'INVALID_GRADING_STATUS';
+      throw err;
+    }
+
+    submission.gradingStatus = data.gradingStatus;
+    submission.score = data.gradingStatus === 'graded' ? data.score! : null;
+    submission.feedback = data.feedback?.trim() || null;
+    submission.gradedAt = new Date();
+    submission.gradedBy = instructorId;
+
+    const saved = await this.submissionRepository.save(submission);
+
+    logger.info('[Assignment] Graded', {
+      submissionId: saved.id,
+      gradingStatus: saved.gradingStatus,
+      score: saved.score,
+      gradedBy: instructorId,
+    });
+
+    return saved;
+  }
+
   /**
    * Mark lesson as completed in user's enrollment progress.
    * Mirrors QuizService.completeLessonProgress() — minus quiz scoring/credits.

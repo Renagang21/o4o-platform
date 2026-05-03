@@ -364,7 +364,50 @@ export const lmsInstructorApi = {
       `/lms/lessons/${lessonId}/live`,
       dto,
     ),
+
+  // ── 과제 채점 (WO-O4O-LMS-ASSIGNMENT-GRADING-V1) ──────────────────
+
+  /** 특정 lesson의 모든 submission 조회 (강사 ownership 체크 백엔드 수행) */
+  listLessonSubmissions: (lessonId: string) =>
+    authClient.api.get<{
+      success: boolean;
+      data: {
+        lessonId: string;
+        courseId: string;
+        items: InstructorSubmission[];
+      };
+    }>(`/lms/instructor/lessons/${lessonId}/submissions`),
+
+  /** 강사 채점 처리 — graded(score 0~100) 또는 returned(feedback 필수) */
+  gradeSubmission: (submissionId: string, dto: GradeSubmissionDto) =>
+    authClient.api.post<{ success: boolean; data: { submission: InstructorSubmission } }>(
+      `/lms/instructor/submissions/${submissionId}/grade`,
+      dto,
+    ),
 };
+
+// WO-O4O-LMS-ASSIGNMENT-GRADING-V1
+export type GradingStatus = 'ungraded' | 'graded' | 'returned';
+
+export interface InstructorSubmission {
+  id: string;
+  userId: string;
+  userName: string;
+  content: string | null;
+  submittedAt: string;
+  status: 'submitted';
+  gradingStatus: GradingStatus;
+  score: number | null;
+  feedback: string | null;
+  gradedAt: string | null;
+  gradedBy: string | null;
+}
+
+export interface GradeSubmissionDto {
+  gradingStatus: 'graded' | 'returned';
+  score?: number | null;
+  feedback?: string | null;
+}
 
 // WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1
 export interface AssignmentDto {

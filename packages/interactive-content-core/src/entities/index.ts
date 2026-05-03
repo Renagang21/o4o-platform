@@ -20,10 +20,11 @@ export { Course, CourseStatus, ContentKind, CourseVisibility } from './Course.js
 export { Lesson, LessonType } from './Lesson.js';
 
 // Assignment (WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1)
+// WO-O4O-LMS-ASSIGNMENT-GRADING-V1: GradingStatus 추가
 export { Assignment } from './Assignment.js';
 export type { AssignmentSubmissionType } from './Assignment.js';
 export { Submission } from './Submission.js';
-export type { SubmissionStatus } from './Submission.js';
+export type { SubmissionStatus, GradingStatus } from './Submission.js';
 
 // Templates (WO-O4O-TEMPLATE-SYSTEM-FOUNDATION)
 export {

@@ -53,6 +53,8 @@ const CourseNewPage = lazy(() => import('./pages/instructor/courses/CourseNewPag
 const CourseEditPage = lazy(() => import('./pages/instructor/courses/CourseEditPage'));
 const InstructorCourseDashboardPage = lazy(() => import('./pages/instructor/InstructorCourseDashboardPage'));
 const ContentParticipantsPage = lazy(() => import('./pages/instructor/ContentParticipantsPage'));
+// WO-O4O-LMS-ASSIGNMENT-GRADING-V1
+const LessonSubmissionsPage = lazy(() => import('./pages/instructor/courses/LessonSubmissionsPage'));
 // WO-KPA-INSTRUCTOR-DASHBOARD-SIDEBAR-LAYOUT-V1: 강사 영역 사이드바 레이아웃
 import { InstructorLayout } from './components/instructor/InstructorLayout';
 
@@ -730,6 +732,8 @@ function App() {
           <Route path="/instructor/dashboard" element={<InstructorLayout><InstructorCourseDashboardPage /></InstructorLayout>} />
           {/* WO-O4O-MARKETING-CONTENT-OPERATIONS-MVP-V1 */}
           <Route path="/instructor/contents/:courseId/participants" element={<InstructorLayout><ContentParticipantsPage /></InstructorLayout>} />
+          {/* WO-O4O-LMS-ASSIGNMENT-GRADING-V1: 과제 채점 */}
+          <Route path="/instructor/courses/:courseId/lessons/:lessonId/submissions" element={<InstructorLayout><LessonSubmissionsPage /></InstructorLayout>} />
 
           {/* LMS (교육/강의) */}
           <Route path="/lms" element={<Layout serviceName={SERVICE_NAME}><EducationPage /></Layout>} />

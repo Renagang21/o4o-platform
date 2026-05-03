@@ -251,6 +251,14 @@ router.post('/instructor/enrollments/:id/approve', requireAuth, requireInstructo
 // POST /api/v1/lms/instructor/enrollments/:id/reject - Reject Enrollment (Instructor)
 router.post('/instructor/enrollments/:id/reject', requireAuth, requireInstructor, asyncHandler(InstructorController.rejectEnrollment));
 
+// WO-O4O-LMS-ASSIGNMENT-GRADING-V1: 과제 채점
+
+// GET /api/v1/lms/instructor/lessons/:lessonId/submissions - List submissions (Instructor)
+router.get('/instructor/lessons/:lessonId/submissions', requireAuth, requireInstructor, asyncHandler(InstructorController.listLessonSubmissions));
+
+// POST /api/v1/lms/instructor/submissions/:submissionId/grade - Grade submission (Instructor)
+router.post('/instructor/submissions/:submissionId/grade', requireAuth, requireInstructor, asyncHandler(InstructorController.gradeSubmission));
+
 // ========================================
 // TEMPLATE ROUTES (WO-O4O-TEMPLATE-SYSTEM-FOUNDATION)
 // ========================================

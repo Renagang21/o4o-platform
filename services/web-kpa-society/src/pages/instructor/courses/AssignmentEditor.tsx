@@ -8,6 +8,7 @@
  */
 
 import React, { useEffect, useState, useCallback } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { lmsInstructorApi, type AssignmentDto } from '../../../api/lms-instructor';
 
 interface Props {
@@ -36,6 +37,9 @@ function toLocalInput(iso: string | null | undefined): string {
 }
 
 export default function AssignmentEditor({ lessonId }: Props) {
+  // WO-O4O-LMS-ASSIGNMENT-GRADING-V1: courseId from URL for submission grading entry
+  const { id: courseId } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [assignment, setAssignment] = useState<AssignmentDto | null>(null);
   const [instructions, setInstructions] = useState('');
   const [dueLocal, setDueLocal] = useState('');
@@ -120,8 +124,32 @@ export default function AssignmentEditor({ lessonId }: Props) {
       </div>
 
       <div style={{ ...s.hint, marginTop: 10 }}>
-        제출 방식은 텍스트 입력만 지원합니다. 파일 업로드/채점은 후속 단계에서 추가됩니다.
+        제출 방식은 텍스트 입력만 지원합니다. 파일 업로드는 후속 단계에서 추가됩니다.
       </div>
+
+      {/* WO-O4O-LMS-ASSIGNMENT-GRADING-V1: 채점 페이지 진입점 */}
+      {assignment && courseId && (
+        <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid #e5e7eb' }}>
+          <button
+            style={{
+              padding: '7px 14px',
+              fontSize: 13,
+              fontWeight: 500,
+              color: '#4f46e5',
+              backgroundColor: 'transparent',
+              border: '1px solid #4f46e5',
+              borderRadius: 7,
+              cursor: 'pointer',
+            }}
+            onClick={() => navigate(`/instructor/courses/${courseId}/lessons/${lessonId}/submissions`)}
+          >
+            📝 제출물 채점
+          </button>
+          <span style={{ ...s.hint, marginLeft: 10 }}>
+            학생 제출물 확인 / 점수 입력 / 피드백 / 재제출 요청
+          </span>
+        </div>
+      )}
     </div>
   );
 }

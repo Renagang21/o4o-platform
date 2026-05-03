@@ -733,6 +733,33 @@ export function LmsLessonPage() {
                   )}
                 </div>
               </Card>
+              {/* WO-O4O-LMS-ASSIGNMENT-GRADING-V1: 강사 채점 결과 표시 */}
+              {mySubmission && mySubmission.gradingStatus && mySubmission.gradingStatus !== 'ungraded' && (
+                <Card padding="large" style={{
+                  marginTop: '16px',
+                  backgroundColor: mySubmission.gradingStatus === 'returned' ? '#fef3c7' : '#ecfdf5',
+                  border: mySubmission.gradingStatus === 'returned' ? '1px solid #fde68a' : '1px solid #a7f3d0',
+                }}>
+                  <h4 style={{ ...typography.bodyL, fontWeight: 600, color: colors.neutral900, marginBottom: '12px' }}>
+                    {mySubmission.gradingStatus === 'returned' ? '🔁 재제출 요청' : '📝 강사 채점'}
+                  </h4>
+                  {mySubmission.gradingStatus === 'graded' && mySubmission.score !== null && mySubmission.score !== undefined && (
+                    <p style={{ ...typography.bodyM, color: colors.neutral800, marginBottom: '8px' }}>
+                      점수: <strong>{mySubmission.score}점 / 100점</strong>
+                    </p>
+                  )}
+                  {mySubmission.feedback && (
+                    <p style={{ ...typography.bodyM, color: colors.neutral700, whiteSpace: 'pre-wrap', marginBottom: '8px' }}>
+                      {mySubmission.feedback}
+                    </p>
+                  )}
+                  {mySubmission.gradedAt && (
+                    <p style={{ ...typography.bodyS, color: colors.neutral500 }}>
+                      채점일: {new Date(mySubmission.gradedAt).toLocaleString('ko-KR')}
+                    </p>
+                  )}
+                </Card>
+              )}
               {/* WO-O4O-LMS-AI-MINIMAL-V1: assignment panel */}
               {mySubmission && renderAiPanel()}
             </>
