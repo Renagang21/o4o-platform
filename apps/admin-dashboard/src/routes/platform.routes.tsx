@@ -25,6 +25,9 @@ const AuthAnalyticsPage = lazy(() => import('@/pages/operator/AuthAnalyticsPage'
 // Content Approvals (WO-O4O-OPERATOR-CONTENT-APPROVAL-PHASE1-V1)
 const ContentApprovalsPage = lazy(() => import('@/pages/operator/ContentApprovalsPage'));
 
+// Point Spend (WO-O4O-POINT-OPERATOR-UI-V1)
+const PointSpendPage = lazy(() => import('@/pages/operator/PointSpendPage'));
+
 // KPA HUB & Store Content (WO-O4O-STORE-CONTENT-HUB-SHARE-UI-PHASE2-V1)
 const HubContentsPage = lazy(() => import('@/pages/kpa/HubContentsPage'));
 const MyStoreContentsPage = lazy(() => import('@/pages/kpa/MyStoreContentsPage'));
@@ -133,6 +136,16 @@ export function PlatformRoutes() {
       <AdminProtectedRoute requiredRoles={['admin', 'super_admin', 'operator']}>
         <Suspense fallback={<PageLoader />}>
           <ContentApprovalsPage />
+        </Suspense>
+      </AdminProtectedRoute>
+    } />,
+
+    // Point Spend (WO-O4O-POINT-OPERATOR-UI-V1)
+    // 백엔드 /api/v1/points/admin/spend 가 requireAdmin 가드이므로 admin/super_admin만 허용
+    <Route key="/operator/points" path="/operator/points" element={
+      <AdminProtectedRoute requiredRoles={['admin', 'super_admin']}>
+        <Suspense fallback={<PageLoader />}>
+          <PointSpendPage />
         </Suspense>
       </AdminProtectedRoute>
     } />,
