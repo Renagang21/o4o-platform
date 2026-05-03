@@ -56,6 +56,7 @@ type PayoutType = typeof PAYOUT_TYPES[number]['value'];
 async function spendPoint(params: {
   userId: string;
   amount: number;
+  payoutType: PayoutType;
   description: string;
 }): Promise<SpendResponse['data']> {
   const res = await authClient.api.post<SpendResponse>('/api/v1/points/admin/spend', params);
@@ -106,6 +107,8 @@ export default function PointSpendPage() {
         toast.error('차감 금액은 1 이상의 정수여야 합니다.');
       } else if (code === 'INVALID_USER_ID') {
         toast.error('대상 사용자 ID를 확인해 주세요.');
+      } else if (code === 'INVALID_PAYOUT_TYPE') {
+        toast.error('보상 유형(payoutType) 값이 올바르지 않습니다.');
       } else {
         toast.error(body?.error || '차감 처리 중 오류가 발생했습니다.');
       }
@@ -115,9 +118,11 @@ export default function PointSpendPage() {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!canSubmit) return;
+    // canSubmit narrows payoutType to PointPayoutType (alias narrowing)
     mutation.mutate({
       userId: userId.trim(),
       amount: numericAmount,
+      payoutType: payoutType as PayoutType,
       description: trimmedDescription,
     });
   };

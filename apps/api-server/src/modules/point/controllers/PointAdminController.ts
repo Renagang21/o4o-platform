@@ -9,8 +9,14 @@
 
 import { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
-import { PointService } from '../services/PointService.js';
+import {
+  PointService,
+  POINT_PAYOUT_TYPES,
+  type PointPayoutType,
+} from '../services/PointService.js';
 import logger from '../../../utils/logger.js';
+
+const PAYOUT_TYPE_SET = new Set<string>(POINT_PAYOUT_TYPES);
 
 export class PointAdminController extends BaseController {
   /**
@@ -61,14 +67,18 @@ export class PointAdminController extends BaseController {
 
   /**
    * POST /api/v1/points/admin/spend
-   * Body: { userId: string; amount: number; description: string }
+   * Body: { userId: string; amount: number; payoutType: PointPayoutType; description: string }
    *
    * 정책: 차감은 "보상 지급 완료 처리"이므로 description은 필수.
    *      (docs/point/O4O-POINT-REWARD-OPERATION-POLICY.md §6)
+   *
+   * WO-O4O-POINT-PAYOUT-TYPE-BACKEND-V1: payoutType을 sourceType으로 저장하여
+   *   credit_transactions에서 보상 유형별 집계가 가능하도록 한다.
+   *   transactionType은 항상 'spend' (PointService.spendPoint 내부에서 보장).
    */
   static async spend(req: Request, res: Response): Promise<any> {
     try {
-      const { userId, amount, description } = req.body ?? {};
+      const { userId, amount, payoutType, description } = req.body ?? {};
 
       if (!userId || typeof userId !== 'string') {
         return BaseController.badRequest(res, 'userId is required', 'INVALID_USER_ID');
@@ -76,10 +86,18 @@ export class PointAdminController extends BaseController {
       if (!Number.isInteger(amount) || amount <= 0) {
         return BaseController.badRequest(res, 'amount must be positive integer', 'INVALID_AMOUNT');
       }
+      if (typeof payoutType !== 'string' || !PAYOUT_TYPE_SET.has(payoutType)) {
+        return BaseController.badRequest(
+          res,
+          'payoutType must be one of: ' + POINT_PAYOUT_TYPES.join(', '),
+          'INVALID_PAYOUT_TYPE',
+        );
+      }
       if (typeof description !== 'string' || !description.trim()) {
         return BaseController.badRequest(res, 'description is required', 'INVALID_DESCRIPTION');
       }
       const desc = description.trim();
+      const sourceType = payoutType as PointPayoutType;
 
       const operatorId = (req as any).user?.id;
       const referenceKey = `admin_spend:${userId}:${Date.now()}`;
@@ -87,12 +105,18 @@ export class PointAdminController extends BaseController {
       const result = await PointService.getInstance().spendPoint({
         userId,
         amount,
-        sourceType: 'admin_spend',
+        sourceType,
         referenceKey,
         description: desc,
       });
 
-      logger.info('[PointAdmin] spend', { operatorId, userId, amount, referenceKey });
+      logger.info('[PointAdmin] spend', {
+        operatorId,
+        userId,
+        amount,
+        payoutType: sourceType,
+        referenceKey,
+      });
 
       return BaseController.ok(res, result);
     } catch (error: any) {

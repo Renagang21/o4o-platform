@@ -28,15 +28,34 @@ import logger from '../../../utils/logger.js';
 /**
  * sourceType 타입.
  *   - 자동 적립(LMS Quiz): CreditSourceType enum 값 (lesson_complete / quiz_pass / course_complete)
- *   - 운영자 조작: 'admin_grant' / 'admin_spend' / 'admin_adjust'
+ *   - 운영자 일반 조작: 'admin_grant' / 'admin_spend' / 'admin_adjust'
+ *   - 운영자 보상 정산(차감): 'reward_payout_*' — 실제 보상 지급 완료 유형
+ *     (WO-O4O-POINT-PAYOUT-TYPE-BACKEND-V1)
  *
  * 향후 PointSourceType 전용 enum으로 승격 예정. 현재는 union으로 호환 유지.
+ * DB 컬럼은 varchar(50)이라 마이그레이션 없이 새 값 저장 가능.
  */
+export type PointPayoutType =
+  | 'reward_payout_offline'
+  | 'reward_payout_voucher'
+  | 'reward_payout_survey'
+  | 'reward_payout_course'
+  | 'reward_payout_other';
+
+export const POINT_PAYOUT_TYPES: readonly PointPayoutType[] = [
+  'reward_payout_offline',
+  'reward_payout_voucher',
+  'reward_payout_survey',
+  'reward_payout_course',
+  'reward_payout_other',
+] as const;
+
 export type PointSourceType =
   | CreditSourceType
   | 'admin_grant'
   | 'admin_spend'
-  | 'admin_adjust';
+  | 'admin_adjust'
+  | PointPayoutType;
 
 export interface GrantPointParams {
   userId: string;
