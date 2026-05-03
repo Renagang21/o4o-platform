@@ -229,6 +229,12 @@ export class EnrollmentController extends BaseController {
         // - quiz/assignment/live: 전용 제출/참여 API에서만 완료 처리 (직접 호출 거부)
         // - video: watchedSeconds 또는 progressRatio 기반, 70% 임계
         // - article: scrolledRatio 0.8 또는 dwellTimeSeconds 30초, 둘 다 미충족 시 거부
+        //
+        // WO-O4O-LMS-COMPLETION-RULES-BACKWARD-COMPAT-V1: legacy 클라이언트 호환성 보강
+        // - video/article에서 메트릭이 전혀 전달되지 않은 호출은 legacy fallback으로 완료 허용
+        // - 일부라도 전달되면 strict 정책 그대로 적용
+        // - quiz/assignment/live는 fallback 없이 strict 유지 (전용 API 사용 강제)
+        // - fallback은 GlycoPharm/K-Cosmetics 프론트가 메트릭 전송 적용되면 제거 가능
         const lessonRepo = AppDataSource.getRepository('Lesson');
         const lesson: any = await lessonRepo.findOne({ where: { id: lessonId } });
         if (!lesson) return BaseController.notFound(res, 'Lesson not found');
@@ -243,53 +249,71 @@ export class EnrollmentController extends BaseController {
         }
 
         if (lesson.type === 'video') {
-          const VIDEO_THRESHOLD = 0.7;
-          let satisfied = false;
-          let code: 'VIDEO_METRICS_REQUIRED' | 'VIDEO_DURATION_UNKNOWN' | 'VIDEO_THRESHOLD_NOT_MET' = 'VIDEO_METRICS_REQUIRED';
+          const hasAnyVideoMetric =
+            typeof watchedSeconds === 'number' || typeof progressRatio === 'number';
+          if (!hasAnyVideoMetric) {
+            // WO-O4O-LMS-COMPLETION-RULES-BACKWARD-COMPAT-V1: legacy fallback
+            logger.warn('[LMS] legacy LMS completion fallback used (video) — deprecated, transition to metrics-aware client', {
+              userId, courseId, lessonId, lessonType: 'video',
+            });
+          } else {
+            const VIDEO_THRESHOLD = 0.7;
+            let satisfied = false;
+            let code: 'VIDEO_DURATION_UNKNOWN' | 'VIDEO_THRESHOLD_NOT_MET' = 'VIDEO_THRESHOLD_NOT_MET';
 
-          if (typeof progressRatio === 'number' && progressRatio >= VIDEO_THRESHOLD) {
-            satisfied = true;
-          } else if (typeof watchedSeconds === 'number' && watchedSeconds > 0) {
-            // videoDuration(초) 우선, fallback duration(분 → 초)
-            const baseSeconds =
-              lesson.videoDuration && lesson.videoDuration > 0
-                ? lesson.videoDuration
-                : lesson.duration && lesson.duration > 0
-                  ? lesson.duration * 60
-                  : null;
-            if (baseSeconds === null) {
-              code = 'VIDEO_DURATION_UNKNOWN';
-            } else if (watchedSeconds >= baseSeconds * VIDEO_THRESHOLD) {
+            if (typeof progressRatio === 'number' && progressRatio >= VIDEO_THRESHOLD) {
               satisfied = true;
-            } else {
-              code = 'VIDEO_THRESHOLD_NOT_MET';
+            } else if (typeof watchedSeconds === 'number' && watchedSeconds > 0) {
+              // videoDuration(초) 우선, fallback duration(분 → 초)
+              const baseSeconds =
+                lesson.videoDuration && lesson.videoDuration > 0
+                  ? lesson.videoDuration
+                  : lesson.duration && lesson.duration > 0
+                    ? lesson.duration * 60
+                    : null;
+              if (baseSeconds === null) {
+                code = 'VIDEO_DURATION_UNKNOWN';
+              } else if (watchedSeconds >= baseSeconds * VIDEO_THRESHOLD) {
+                satisfied = true;
+              } else {
+                code = 'VIDEO_THRESHOLD_NOT_MET';
+              }
             }
-          }
 
-          if (!satisfied) {
-            return BaseController.error(
-              res,
-              '비디오 시청 기준(70% 이상)을 충족하지 않았습니다.',
-              400,
-              code,
-            );
+            if (!satisfied) {
+              return BaseController.error(
+                res,
+                '비디오 시청 기준(70% 이상)을 충족하지 않았습니다.',
+                400,
+                code,
+              );
+            }
           }
         }
 
         if (lesson.type === 'article') {
-          const ARTICLE_SCROLL_THRESHOLD = 0.8;
-          const ARTICLE_DWELL_SECONDS = 30;
-          const scrollOk =
-            typeof scrolledRatio === 'number' && scrolledRatio >= ARTICLE_SCROLL_THRESHOLD;
-          const dwellOk =
-            typeof dwellTimeSeconds === 'number' && dwellTimeSeconds >= ARTICLE_DWELL_SECONDS;
-          if (!scrollOk && !dwellOk) {
-            return BaseController.error(
-              res,
-              '학습 시간(30초 이상) 또는 스크롤(80% 이상) 기준 중 하나를 충족해야 합니다.',
-              400,
-              'ARTICLE_THRESHOLD_NOT_MET',
-            );
+          const hasAnyArticleMetric =
+            typeof scrolledRatio === 'number' || typeof dwellTimeSeconds === 'number';
+          if (!hasAnyArticleMetric) {
+            // WO-O4O-LMS-COMPLETION-RULES-BACKWARD-COMPAT-V1: legacy fallback
+            logger.warn('[LMS] legacy LMS completion fallback used (article) — deprecated, transition to metrics-aware client', {
+              userId, courseId, lessonId, lessonType: 'article',
+            });
+          } else {
+            const ARTICLE_SCROLL_THRESHOLD = 0.8;
+            const ARTICLE_DWELL_SECONDS = 30;
+            const scrollOk =
+              typeof scrolledRatio === 'number' && scrolledRatio >= ARTICLE_SCROLL_THRESHOLD;
+            const dwellOk =
+              typeof dwellTimeSeconds === 'number' && dwellTimeSeconds >= ARTICLE_DWELL_SECONDS;
+            if (!scrollOk && !dwellOk) {
+              return BaseController.error(
+                res,
+                '학습 시간(30초 이상) 또는 스크롤(80% 이상) 기준 중 하나를 충족해야 합니다.',
+                400,
+                'ARTICLE_THRESHOLD_NOT_MET',
+              );
+            }
           }
         }
 
