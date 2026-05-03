@@ -4,7 +4,7 @@
  * WO-O4O-QUIZ-SYSTEM-V1: 퀴즈 타입 레슨 지원 추가
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { LoadingSpinner, EmptyState, Card } from '../../components/common';
@@ -65,6 +65,12 @@ export function LmsLessonPage() {
   // WO-LMS-COMPLETION-AND-CERTIFICATE-UX-REFINEMENT-V1
   const [showCompletionModal, setShowCompletionModal] = useState(false);
 
+  // WO-O4O-LMS-LESSON-TYPE-COMPLETION-RULES-V1: video/article 완료 메트릭 추적
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const watchedSecondsRef = useRef(0);
+  const scrolledRatioRef = useRef(0);
+  const lessonStartAtRef = useRef<number>(Date.now());
+
   useEffect(() => {
     if (courseId && lessonId) loadData();
   }, [courseId, lessonId]);
@@ -83,7 +89,27 @@ export function LmsLessonPage() {
     // WO-O4O-LMS-AI-MINIMAL-V1
     setAiResult(null);
     setAiError(null);
+    // WO-O4O-LMS-LESSON-TYPE-COMPLETION-RULES-V1: 메트릭 리셋
+    watchedSecondsRef.current = 0;
+    scrolledRatioRef.current = 0;
+    lessonStartAtRef.current = Date.now();
   }, [lessonId]);
+
+  // WO-O4O-LMS-LESSON-TYPE-COMPLETION-RULES-V1: article lesson — 윈도우 스크롤 비율 추적
+  useEffect(() => {
+    if (currentLesson?.type !== 'article') return;
+    const handleScroll = () => {
+      const doc = document.documentElement;
+      const denom = Math.max(doc.scrollHeight - doc.clientHeight, 1);
+      const ratio = window.scrollY / denom;
+      if (ratio > scrolledRatioRef.current) {
+        scrolledRatioRef.current = Math.min(ratio, 1);
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [currentLesson?.type, lessonId]);
 
   // WO-O4O-LMS-LIVE-MINIMAL-V1: tick clock for live status (예정/진행중/종료) — 30s cadence
   useEffect(() => {
@@ -173,10 +199,31 @@ export function LmsLessonPage() {
   };
 
   const handleComplete = async () => {
-    if (!courseId || !lessonId) return;
+    if (!courseId || !lessonId || !currentLesson) return;
+
+    // WO-O4O-LMS-LESSON-TYPE-COMPLETION-RULES-V1: lesson type별 완료 메트릭 수집
+    // 백엔드 정책 임계값: video 70%, article scroll 80% 또는 dwell 30초
+    const metrics: {
+      watchedSeconds?: number;
+      progressRatio?: number;
+      scrolledRatio?: number;
+      dwellTimeSeconds?: number;
+    } = {};
+    if (currentLesson.type === 'video') {
+      const v = videoRef.current;
+      if (watchedSecondsRef.current > 0) {
+        metrics.watchedSeconds = Math.floor(watchedSecondsRef.current);
+      }
+      if (v && v.duration > 0 && Number.isFinite(v.duration) && v.currentTime > 0) {
+        metrics.progressRatio = Math.min(v.currentTime / v.duration, 1);
+      }
+    } else if (currentLesson.type === 'article') {
+      metrics.scrolledRatio = scrolledRatioRef.current;
+      metrics.dwellTimeSeconds = Math.floor((Date.now() - lessonStartAtRef.current) / 1000);
+    }
 
     try {
-      const res = await lmsApi.updateProgress(courseId, lessonId, true);
+      const res = await lmsApi.updateProgress(courseId, lessonId, true, metrics);
       // WO-O4O-LMS-ROUTING-INTEGRATION-FIX-V1: extract enrollment from nested response
       const updatedEnrollment = (res as any).data?.enrollment ?? (res as any).data ?? null;
       setEnrollment(updatedEnrollment);
@@ -197,8 +244,11 @@ export function LmsLessonPage() {
           toast.success('모든 단계를 완료했습니다!');
         }
       }
-    } catch (err) {
-      toast.error('진도 업데이트에 실패했습니다.');
+    } catch (err: any) {
+      // WO-O4O-LMS-LESSON-TYPE-COMPLETION-RULES-V1: 백엔드 정책 거부 메시지 노출
+      const beMsg = err?.response?.data?.error
+        || (err instanceof Error ? err.message : null);
+      toast.error(beMsg || '진도 업데이트에 실패했습니다.');
     }
   };
 
@@ -864,10 +914,18 @@ export function LmsLessonPage() {
             <div style={styles.videoContainer}>
               {currentLesson.videoUrl ? (
                 <video
+                  ref={videoRef}
                   style={styles.video}
                   src={currentLesson.videoUrl}
                   controls
                   autoPlay
+                  // WO-O4O-LMS-LESSON-TYPE-COMPLETION-RULES-V1: 시청 시간 추적
+                  onTimeUpdate={(e) => {
+                    const t = e.currentTarget.currentTime;
+                    if (t > watchedSecondsRef.current) {
+                      watchedSecondsRef.current = t;
+                    }
+                  }}
                 />
               ) : (
                 <div style={styles.videoPlaceholder}>

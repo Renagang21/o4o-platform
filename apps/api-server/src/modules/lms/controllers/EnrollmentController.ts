@@ -202,11 +202,20 @@ export class EnrollmentController extends BaseController {
   }
 
   // WO-O4O-LMS-ROUTING-INTEGRATION-FIX-V1
+  // WO-O4O-LMS-LESSON-TYPE-COMPLETION-RULES-V1: lesson type별 완료 정책 분기
   static async updateLessonProgress(req: Request, res: Response): Promise<any> {
     try {
       const { courseId } = req.params;
       const userId = (req as any).user?.id;
-      const { lessonId, completed } = req.body;
+      const {
+        lessonId,
+        completed,
+        // WO-O4O-LMS-LESSON-TYPE-COMPLETION-RULES-V1: type별 완료 메트릭
+        watchedSeconds,
+        progressRatio,
+        scrolledRatio,
+        dwellTimeSeconds,
+      } = req.body;
 
       if (!userId) return BaseController.unauthorized(res, 'User not authenticated');
 
@@ -216,6 +225,75 @@ export class EnrollmentController extends BaseController {
       if (!enrollment) return BaseController.notFound(res, 'Enrollment not found');
 
       if (completed && lessonId) {
+        // WO-O4O-LMS-LESSON-TYPE-COMPLETION-RULES-V1: lesson.type별 완료 정책 강제
+        // - quiz/assignment/live: 전용 제출/참여 API에서만 완료 처리 (직접 호출 거부)
+        // - video: watchedSeconds 또는 progressRatio 기반, 70% 임계
+        // - article: scrolledRatio 0.8 또는 dwellTimeSeconds 30초, 둘 다 미충족 시 거부
+        const lessonRepo = AppDataSource.getRepository('Lesson');
+        const lesson: any = await lessonRepo.findOne({ where: { id: lessonId } });
+        if (!lesson) return BaseController.notFound(res, 'Lesson not found');
+
+        if (lesson.type === 'quiz' || lesson.type === 'assignment' || lesson.type === 'live') {
+          return BaseController.error(
+            res,
+            `${lesson.type} 레슨은 전용 제출/참여 API를 통해서만 완료 처리됩니다.`,
+            400,
+            'LESSON_TYPE_REQUIRES_DEDICATED_API',
+          );
+        }
+
+        if (lesson.type === 'video') {
+          const VIDEO_THRESHOLD = 0.7;
+          let satisfied = false;
+          let code: 'VIDEO_METRICS_REQUIRED' | 'VIDEO_DURATION_UNKNOWN' | 'VIDEO_THRESHOLD_NOT_MET' = 'VIDEO_METRICS_REQUIRED';
+
+          if (typeof progressRatio === 'number' && progressRatio >= VIDEO_THRESHOLD) {
+            satisfied = true;
+          } else if (typeof watchedSeconds === 'number' && watchedSeconds > 0) {
+            // videoDuration(초) 우선, fallback duration(분 → 초)
+            const baseSeconds =
+              lesson.videoDuration && lesson.videoDuration > 0
+                ? lesson.videoDuration
+                : lesson.duration && lesson.duration > 0
+                  ? lesson.duration * 60
+                  : null;
+            if (baseSeconds === null) {
+              code = 'VIDEO_DURATION_UNKNOWN';
+            } else if (watchedSeconds >= baseSeconds * VIDEO_THRESHOLD) {
+              satisfied = true;
+            } else {
+              code = 'VIDEO_THRESHOLD_NOT_MET';
+            }
+          }
+
+          if (!satisfied) {
+            return BaseController.error(
+              res,
+              '비디오 시청 기준(70% 이상)을 충족하지 않았습니다.',
+              400,
+              code,
+            );
+          }
+        }
+
+        if (lesson.type === 'article') {
+          const ARTICLE_SCROLL_THRESHOLD = 0.8;
+          const ARTICLE_DWELL_SECONDS = 30;
+          const scrollOk =
+            typeof scrolledRatio === 'number' && scrolledRatio >= ARTICLE_SCROLL_THRESHOLD;
+          const dwellOk =
+            typeof dwellTimeSeconds === 'number' && dwellTimeSeconds >= ARTICLE_DWELL_SECONDS;
+          if (!scrollOk && !dwellOk) {
+            return BaseController.error(
+              res,
+              '학습 시간(30초 이상) 또는 스크롤(80% 이상) 기준 중 하나를 충족해야 합니다.',
+              400,
+              'ARTICLE_THRESHOLD_NOT_MET',
+            );
+          }
+        }
+
+        // ── 정책 통과 → 기존 완료 처리 흐름 (변경 없음) ──
         // Track completed lesson IDs in metadata
         const completedIds: string[] = enrollment.metadata?.completedLessonIds || [];
         if (!completedIds.includes(lessonId)) {

@@ -199,17 +199,29 @@ export function createLmsLearnerClient(http: LmsHttpClient) {
 
     /**
      * 진도 업데이트.
-     * `POST /lms/enrollments/:courseId/progress` body: `{ lessonId, completed }`
+     * `POST /lms/enrollments/:courseId/progress` body: `{ lessonId, completed, ...metrics? }`
      * 반환: `{ success, data: { enrollment: T } }` — GlycoPharm 은 페이지에서 무시(void 반환).
+     *
+     * WO-O4O-LMS-LESSON-TYPE-COMPLETION-RULES-V1: lesson type별 완료 메트릭(선택).
+     *   - video: `watchedSeconds` 또는 `progressRatio` (백엔드 70% 임계)
+     *   - article: `scrolledRatio` 또는 `dwellTimeSeconds` (백엔드 80% / 30초 임계)
+     *   - quiz/assignment/live: 본 API로 완료 불가 — 전용 제출/참여 API 사용
+     *   - 메트릭 미전달 시 video/article은 백엔드에서 거부됨 (`VIDEO_METRICS_REQUIRED` 등)
      */
     updateProgress<T extends LmsEnrollmentBase = LmsEnrollmentBase>(
       courseId: string,
       lessonId: string,
       completed: boolean,
+      metrics?: {
+        watchedSeconds?: number;
+        progressRatio?: number;
+        scrolledRatio?: number;
+        dwellTimeSeconds?: number;
+      },
     ): Promise<LmsApiResponse<{ enrollment: T }>> {
       return http.post<LmsApiResponse<{ enrollment: T }>>(
         `/lms/enrollments/${courseId}/progress`,
-        { lessonId, completed },
+        { lessonId, completed, ...(metrics ?? {}) },
       );
     },
 

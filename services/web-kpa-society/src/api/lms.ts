@@ -89,8 +89,21 @@ export const lmsApi = {
 
   // WO-O4O-LMS-ROUTING-INTEGRATION-FIX-V1: progress endpoint now exists in backend
   // WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP2: 공통 factory 사용. 반환 형태 동일.
-  updateProgress: (courseId: string, lessonId: string, completed: boolean) =>
-    learnerClient.updateProgress<Enrollment>(courseId, lessonId, completed) as Promise<ApiResponse<{ enrollment: Enrollment }>>,
+  // WO-O4O-LMS-LESSON-TYPE-COMPLETION-RULES-V1: lesson type별 완료 메트릭(선택) 추가.
+  // video: watchedSeconds/progressRatio, article: scrolledRatio/dwellTimeSeconds.
+  // 메트릭 미전달 시 video/article은 백엔드에서 거부됨.
+  updateProgress: (
+    courseId: string,
+    lessonId: string,
+    completed: boolean,
+    metrics?: {
+      watchedSeconds?: number;
+      progressRatio?: number;
+      scrolledRatio?: number;
+      dwellTimeSeconds?: number;
+    },
+  ) =>
+    learnerClient.updateProgress<Enrollment>(courseId, lessonId, completed, metrics) as Promise<ApiResponse<{ enrollment: Enrollment }>>,
 
   // 완료 기록
   getMyCertificates: (params?: { page?: number; limit?: number }) =>
