@@ -62,6 +62,9 @@ export class PointAdminController extends BaseController {
   /**
    * POST /api/v1/points/admin/spend
    * Body: { userId: string; amount: number; description: string }
+   *
+   * 정책: 차감은 "보상 지급 완료 처리"이므로 description은 필수.
+   *      (docs/point/O4O-POINT-REWARD-OPERATION-POLICY.md §6)
    */
   static async spend(req: Request, res: Response): Promise<any> {
     try {
@@ -73,9 +76,10 @@ export class PointAdminController extends BaseController {
       if (!Number.isInteger(amount) || amount <= 0) {
         return BaseController.badRequest(res, 'amount must be positive integer', 'INVALID_AMOUNT');
       }
-      const desc = typeof description === 'string' && description.trim()
-        ? description.trim()
-        : 'Admin spend';
+      if (typeof description !== 'string' || !description.trim()) {
+        return BaseController.badRequest(res, 'description is required', 'INVALID_DESCRIPTION');
+      }
+      const desc = description.trim();
 
       const operatorId = (req as any).user?.id;
       const referenceKey = `admin_spend:${userId}:${Date.now()}`;
