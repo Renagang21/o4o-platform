@@ -12,7 +12,7 @@
  */
 
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Settings } from 'lucide-react';
+import { GraduationCap, LayoutDashboard, Settings } from 'lucide-react';
 import { GlobalHeader, GlobalHeaderMenuItem } from '@o4o/ui';
 import { useAuth } from '@/contexts/AuthContext';
 import { isPharmacistRole } from '@/lib/role-constants';
@@ -56,6 +56,10 @@ export function GlycoGlobalHeader() {
   const isOperator = isAuthenticated && user?.roles?.some(
     (r: string) => r === 'glycopharm:operator' || r === 'glycopharm:admin' || r === 'platform:super_admin',
   );
+  // WO-O4O-INSTRUCTOR-ENTRY-FIX-V3
+  const isInstructor = isAuthenticated && user?.roles?.some(
+    (r: string) => r === 'lms:instructor',
+  );
   const isPharmacy = isAuthenticated && user?.roles?.some((r: string) => isPharmacistRole(r));
 
   // contextualNav 필터링
@@ -96,6 +100,11 @@ export function GlycoGlobalHeader() {
       utilitySlot={<ServiceSwitcher currentServiceKey="glycopharm" />}
       userMenuItems={
         <>
+          {(isInstructor || isAdmin) && (
+            <GlobalHeaderMenuItem to="/instructor" icon={<GraduationCap className="w-4 h-4" />}>
+              강의 대시보드
+            </GlobalHeaderMenuItem>
+          )}
           <GlobalHeaderMenuItem to="/mypage" icon={<LayoutDashboard className="w-4 h-4" />}>
             마이페이지
           </GlobalHeaderMenuItem>
