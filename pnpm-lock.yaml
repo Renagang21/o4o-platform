@@ -3452,6 +3452,9 @@ importers:
       '@o4o/forum-core':
         specifier: workspace:*
         version: link:../../packages/forum-core
+      '@o4o/lms-client':
+        specifier: workspace:*
+        version: link:../../packages/lms-client
       '@o4o/operator-core':
         specifier: workspace:*
         version: link:../../packages/operator-core

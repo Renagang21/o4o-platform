@@ -178,11 +178,11 @@ export const lmsApi = {
     }
   },
 
+  // 강의 신청 — WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP2.
+  // 공통 factory 호출 + Glyco 의 기존 unwrap 패턴 보존.
   enrollCourse: async (courseId: string): Promise<LmsEnrollment> => {
-    const { data } = await api.post<{ success: boolean; data: { enrollment: LmsEnrollment } }>(
-      `/lms/courses/${courseId}/enroll`,
-    );
-    return data.data.enrollment;
+    const res = await learnerClient.enrollCourse<LmsEnrollment>(courseId);
+    return res.data.enrollment;
   },
 
   getLessons: async (courseId: string): Promise<LmsLesson[]> => {
@@ -199,24 +199,21 @@ export const lmsApi = {
     }
   },
 
+  // 퀴즈 제출 — WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP2.
+  // 공통 factory 호출 + Glyco 의 기존 unwrap 패턴 보존.
   submitQuiz: async (
     quizId: string,
     answers: Array<{ questionId: string; answer: string | string[] }>,
   ): Promise<QuizSubmitResult> => {
-    const { data } = await api.post<{ success: boolean; data: QuizSubmitResult }>(
-      `/lms/quizzes/${quizId}/submit`,
-      { answers },
-    );
-    return data.data;
+    const res = await learnerClient.submitQuiz<QuizSubmitResult>(quizId, answers);
+    return res.data;
   },
 
-  // updateProgress: KPA/K-Cos 시그니처와 통일. completed 미지정 시 기존 GlycoPharm
-  // 동작(true 고정) 보존을 위해 default = true.
+  // updateProgress — WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP2.
+  // KPA/K-Cos 시그니처와 통일. completed 미지정 시 기존 GlycoPharm 동작(true 고정) 보존.
+  // Glyco 페이지가 결과를 사용하지 않으므로 void 반환은 유지.
   updateProgress: async (courseId: string, lessonId: string, completed: boolean = true): Promise<void> => {
-    await api.post(`/lms/enrollments/${courseId}/progress`, {
-      lessonId,
-      completed,
-    });
+    await learnerClient.updateProgress<LmsEnrollment>(courseId, lessonId, completed);
   },
 
   // ─── deprecated alias (LMS-CLIENT-CONVENTION-V1 §4) ───────────────────────

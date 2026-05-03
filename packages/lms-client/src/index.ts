@@ -117,10 +117,10 @@ export interface LmsHttpClient {
   delete<T>(path: string): Promise<T>;
 }
 
-// ─── Learner Client Factory (WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP1) ─────────
+// ─── Learner Client Factory (WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP1 + STEP2) ──
 
 /**
- * 학습자 측 read-only client. 현 단계(Step 1)에서 5개 메서드만 추출.
+ * 학습자 측 client. Step 1 에서 read-only 5개, Step 2 에서 write 3개 추출.
  *
  * 반환 형태: 백엔드 envelope(`{ success, data: ... }`) 그대로 노출 — LMS-CLIENT-CONVENTION-V1 §5.
  * 서비스별 lms.ts 가 thin wrapper 로 자체 반환 형태(envelope 유지 / unwrap 등)를 결정한다.
@@ -129,10 +129,14 @@ export interface LmsHttpClient {
  *
  * 제외 항목 (의도적):
  *   - getLesson — GlycoPharm backend 미구현. Phase 5 에서 추가.
- *   - write API (enrollCourse, updateProgress, submitQuiz) — Step 2.
+ *   - 강사용 write API (createCourse, publishCourse 등) — KPA `lms-instructor.ts` 전용.
+ *   - 운영자용 API (`operator*`) — KPA 전용.
+ *   - 과제/라이브 (assignment, live) — Phase 5+ 에서 검토.
  */
 export function createLmsLearnerClient(http: LmsHttpClient) {
   return {
+    // ── Read-only (Step 1) ────────────────────────────────────────────────
+
     /** 강의 단건 조회. 반환: `{ success, data: { course: T } }` */
     getCourse<T extends LmsCourseBase = LmsCourseBase>(id: string): Promise<LmsApiResponse<{ course: T }>> {
       return http.get<LmsApiResponse<{ course: T }>>(`/lms/courses/${id}`);
@@ -164,6 +168,51 @@ export function createLmsLearnerClient(http: LmsHttpClient) {
       lessonId: string,
     ): Promise<LmsApiResponse<{ quiz: T }>> {
       return http.get<LmsApiResponse<{ quiz: T }>>(`/lms/lessons/${lessonId}/quiz`);
+    },
+
+    // ── Write (Step 2 — WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP2) ────────────
+    // 3개 서비스 모두 동일 endpoint + body 형태 사용 확인됨. 변경 불가능한 contract.
+
+    /**
+     * 강의 신청.
+     * `POST /lms/courses/:courseId/enroll`
+     * 반환: `{ success, data: { enrollment: T } }`
+     */
+    enrollCourse<T extends LmsEnrollmentBase = LmsEnrollmentBase>(
+      courseId: string,
+    ): Promise<LmsApiResponse<{ enrollment: T }>> {
+      return http.post<LmsApiResponse<{ enrollment: T }>>(`/lms/courses/${courseId}/enroll`);
+    },
+
+    /**
+     * 진도 업데이트.
+     * `POST /lms/enrollments/:courseId/progress` body: `{ lessonId, completed }`
+     * 반환: `{ success, data: { enrollment: T } }` — GlycoPharm 은 페이지에서 무시(void 반환).
+     */
+    updateProgress<T extends LmsEnrollmentBase = LmsEnrollmentBase>(
+      courseId: string,
+      lessonId: string,
+      completed: boolean,
+    ): Promise<LmsApiResponse<{ enrollment: T }>> {
+      return http.post<LmsApiResponse<{ enrollment: T }>>(
+        `/lms/enrollments/${courseId}/progress`,
+        { lessonId, completed },
+      );
+    },
+
+    /**
+     * 퀴즈 제출.
+     * `POST /lms/quizzes/:quizId/submit` body: `{ answers }`
+     * 반환: `{ success, data: TResult }` — 결과 형태(score/passed/correctCount 등)는 서비스별 type 으로 지정.
+     */
+    submitQuiz<TResult = unknown>(
+      quizId: string,
+      answers: Array<{ questionId: string; answer: string | string[] }>,
+    ): Promise<LmsApiResponse<TResult>> {
+      return http.post<LmsApiResponse<TResult>>(
+        `/lms/quizzes/${quizId}/submit`,
+        { answers },
+      );
     },
   };
 }

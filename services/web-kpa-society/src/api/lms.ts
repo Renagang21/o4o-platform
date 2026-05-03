@@ -3,9 +3,14 @@
  *
  * NOTE: Learning App은 교육/평가 도구가 아닌 순차 전달 도구입니다.
  * API 명칭은 기존 호환성을 위해 유지하되, UI에서는 중립적 용어를 사용합니다.
+ *
+ * WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP2: 학습자 write API 3개(enrollCourse,
+ *   updateProgress, submitQuiz) 만 @o4o/lms-client factory 로 위임. read 메서드와
+ *   operator/instructor 메서드는 현 구현 유지(reference 보존).
  */
 
 import { apiClient } from './client';
+import { createLmsLearnerClient, type LmsHttpClient } from '@o4o/lms-client';
 import type {
   Course,
   Lesson,
@@ -18,6 +23,20 @@ import type {
   PaginatedResponse,
   ApiResponse,
 } from '../types';
+
+// ─── 공통 LMS client adapter (WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP2) ─────────
+// KPA `apiClient` 는 envelope 을 직접 반환하므로(`Promise<T>`) thin pass-through 만 필요.
+// baseURL `/api/v1/kpa` 는 apiClient 가 보유 — factory 의 path-only 호출과 자동 결합된다.
+
+const lmsHttp: LmsHttpClient = {
+  get: <T,>(path: string, params?: Record<string, unknown>): Promise<T> =>
+    apiClient.get<T>(path, params as Record<string, string | number | boolean | undefined> | undefined),
+  post: <T,>(path: string, body?: unknown): Promise<T> => apiClient.post<T>(path, body),
+  patch: <T,>(path: string, body?: unknown): Promise<T> => apiClient.patch<T>(path, body),
+  delete: <T,>(path: string): Promise<T> => apiClient.delete<T>(path),
+};
+
+const learnerClient = createLmsLearnerClient(lmsHttp);
 
 export const lmsApi = {
   // 안내 흐름
@@ -52,15 +71,14 @@ export const lmsApi = {
   getEnrollmentByCourse: (courseId: string) =>
     apiClient.get<ApiResponse<{ enrollment: Enrollment }>>(`/lms/enrollments/me/course/${courseId}`),
 
+  // WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP2: 공통 factory 사용. 반환 형태 동일.
   enrollCourse: (courseId: string) =>
-    apiClient.post<ApiResponse<{ enrollment: Enrollment }>>(`/lms/courses/${courseId}/enroll`),
+    learnerClient.enrollCourse<Enrollment>(courseId) as Promise<ApiResponse<{ enrollment: Enrollment }>>,
 
   // WO-O4O-LMS-ROUTING-INTEGRATION-FIX-V1: progress endpoint now exists in backend
+  // WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP2: 공통 factory 사용. 반환 형태 동일.
   updateProgress: (courseId: string, lessonId: string, completed: boolean) =>
-    apiClient.post<ApiResponse<{ enrollment: Enrollment }>>(`/lms/enrollments/${courseId}/progress`, {
-      lessonId,
-      completed,
-    }),
+    learnerClient.updateProgress<Enrollment>(courseId, lessonId, completed) as Promise<ApiResponse<{ enrollment: Enrollment }>>,
 
   // 완료 기록
   getMyCertificates: (params?: { page?: number; limit?: number }) =>
@@ -76,8 +94,9 @@ export const lmsApi = {
   getQuizForLesson: (lessonId: string) =>
     apiClient.get<ApiResponse<{ quiz: Quiz }>>(`/lms/lessons/${lessonId}/quiz`),
 
+  // WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP2: 공통 factory 사용. 반환 형태 동일.
   submitQuiz: (quizId: string, answers: Array<{ questionId: string; answer: string | string[] }>) =>
-    apiClient.post<ApiResponse<QuizResult>>(`/lms/quizzes/${quizId}/submit`, { answers }),
+    learnerClient.submitQuiz<QuizResult>(quizId, answers) as Promise<ApiResponse<QuizResult>>,
 
   getQuizAttempts: (quizId: string) =>
     apiClient.get<ApiResponse<{ attempts: any[] }>>(`/lms/quizzes/${quizId}/attempts`),

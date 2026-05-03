@@ -191,29 +191,19 @@ export const lmsApi = {
   getEnrollmentByCourse: (courseId: string) =>
     learnerClient.getEnrollmentByCourse<LmsEnrollment>(courseId),
 
-  // 수강 신청
-  enrollCourse: async (courseId: string): Promise<ApiResponse<{ enrollment: LmsEnrollment }>> => {
-    const { data } = await api.post<ApiResponse<{ enrollment: LmsEnrollment }>>(`/lms/courses/${courseId}/enroll`);
-    return data;
-  },
+  // 수강 신청 — WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP2.
+  enrollCourse: (courseId: string) => learnerClient.enrollCourse<LmsEnrollment>(courseId),
 
-  // 진행률 업데이트
-  updateProgress: async (courseId: string, lessonId: string, completed: boolean): Promise<ApiResponse<{ enrollment: LmsEnrollment }>> => {
-    const { data } = await api.post<ApiResponse<{ enrollment: LmsEnrollment }>>(`/lms/enrollments/${courseId}/progress`, {
-      lessonId,
-      completed,
-    });
-    return data;
-  },
+  // 진행률 업데이트 — WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP2.
+  updateProgress: (courseId: string, lessonId: string, completed: boolean) =>
+    learnerClient.updateProgress<LmsEnrollment>(courseId, lessonId, completed),
 
   // 퀴즈 조회 — WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP1.
   getQuizForLesson: (lessonId: string) => learnerClient.getQuizForLesson<LmsQuiz>(lessonId),
 
-  // 퀴즈 제출
-  submitQuiz: async (quizId: string, answers: Array<{ questionId: string; answer: string | string[] }>): Promise<ApiResponse<LmsQuizResult>> => {
-    const { data } = await api.post<ApiResponse<LmsQuizResult>>(`/lms/quizzes/${quizId}/submit`, { answers });
-    return data;
-  },
+  // 퀴즈 제출 — WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP2.
+  submitQuiz: (quizId: string, answers: Array<{ questionId: string; answer: string | string[] }>) =>
+    learnerClient.submitQuiz<LmsQuizResult>(quizId, answers),
 
   // 과제 (WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1)
   getAssignmentForLesson: async (lessonId: string): Promise<ApiResponse<{ assignment: LmsAssignment }>> => {

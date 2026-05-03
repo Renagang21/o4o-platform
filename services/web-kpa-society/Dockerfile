@@ -41,6 +41,7 @@ COPY packages/content-core/package.json ./packages/content-core/
 COPY packages/shortcodes/package.json ./packages/shortcodes/
 COPY packages/utils/package.json ./packages/utils/
 COPY packages/account-ui/package.json ./packages/account-ui/
+COPY packages/lms-client/package.json ./packages/lms-client/
 
 # Copy service package.json
 COPY services/web-kpa-society/package.json ./services/web-kpa-society/
@@ -74,6 +75,7 @@ COPY packages/content-core/ ./packages/content-core/
 COPY packages/shortcodes/ ./packages/shortcodes/
 COPY packages/utils/ ./packages/utils/
 COPY packages/account-ui/ ./packages/account-ui/
+COPY packages/lms-client/ ./packages/lms-client/
 
 # Copy service source
 COPY services/web-kpa-society/ ./services/web-kpa-society/
@@ -88,6 +90,7 @@ RUN pnpm --filter @o4o/forum-core build
 RUN pnpm --filter @o4o/content-editor build
 RUN pnpm --filter @o4o/block-renderer build
 RUN pnpm --filter @o4o/account-ui build
+RUN pnpm --filter @o4o/lms-client build
 
 # Build-time environment variable for Vite
 ARG VITE_API_BASE_URL=https://api.neture.co.kr

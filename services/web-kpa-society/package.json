@@ -18,6 +18,7 @@
     "@o4o/auth-utils": "workspace:*",
     "@o4o/content-editor": "workspace:*",
     "@o4o/forum-core": "workspace:*",
+    "@o4o/lms-client": "workspace:*",
     "@o4o/operator-core": "workspace:*",
     "@o4o/store-asset-policy-core": "workspace:*",
     "@o4o/store-ui-core": "workspace:*",
