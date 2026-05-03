@@ -365,6 +365,36 @@ export const lmsInstructorApi = {
       dto,
     ),
 
+  // ── 승인 대기 수강신청 (WO-O4O-LMS-INSTRUCTOR-DASHBOARD-CONNECT-V1) ───────────
+
+  /** 본인 강의의 PENDING 수강신청 목록 */
+  pendingEnrollments: (params?: { courseId?: string; page?: number; limit?: number }) => {
+    const qs = new URLSearchParams();
+    if (params?.courseId) qs.set('courseId', params.courseId);
+    if (params?.page) qs.set('page', String(params.page));
+    if (params?.limit) qs.set('limit', String(params.limit));
+    const suffix = qs.toString() ? `?${qs.toString()}` : '';
+    return authClient.api.get<{
+      success: boolean;
+      data: PendingEnrollmentItem[];
+      pagination?: { total: number; page: number; limit: number; totalPages: number };
+    }>(`/lms/instructor/enrollments${suffix}`);
+  },
+
+  /** 수강 승인 (PENDING → APPROVED) */
+  approveEnrollment: (id: string) =>
+    authClient.api.post<{ success: boolean; data: { enrollment: unknown; message: string } }>(
+      `/lms/instructor/enrollments/${id}/approve`,
+      {},
+    ),
+
+  /** 수강 거절 (PENDING → REJECTED) */
+  rejectEnrollment: (id: string) =>
+    authClient.api.post<{ success: boolean; data: { enrollment: unknown; message: string } }>(
+      `/lms/instructor/enrollments/${id}/reject`,
+      {},
+    ),
+
   // ── 과제 채점 (WO-O4O-LMS-ASSIGNMENT-GRADING-V1) ──────────────────
 
   /** 특정 lesson의 모든 submission 조회 (강사 ownership 체크 백엔드 수행) */
@@ -407,6 +437,18 @@ export interface GradeSubmissionDto {
   gradingStatus: 'graded' | 'returned';
   score?: number | null;
   feedback?: string | null;
+}
+
+// WO-O4O-LMS-INSTRUCTOR-DASHBOARD-CONNECT-V1
+export interface PendingEnrollmentItem {
+  id: string;
+  userId: string;
+  courseId: string;
+  status: string;
+  enrolledAt: string | null;
+  createdAt: string;
+  course: { id: string; title: string };
+  user: { id: string; name: string | null; email?: string | null };
 }
 
 // WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1
