@@ -20,6 +20,7 @@
     "@o4o/forum-core": "workspace:*",
     "@o4o/lms-client": "workspace:*",
     "@o4o/operator-core": "workspace:*",
+    "@o4o/operator-core-ui": "workspace:*",
     "@o4o/store-asset-policy-core": "workspace:*",
     "@o4o/store-ui-core": "workspace:*",
     "@o4o/admin-ux-core": "workspace:*",
