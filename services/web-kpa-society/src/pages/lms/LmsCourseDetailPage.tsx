@@ -192,7 +192,9 @@ export function LmsCourseDetailPage() {
             <h2 style={styles.sectionTitle}>순서 목록</h2>
             <div style={styles.lessonList}>
               {lessons.map((lesson, index) => {
-                const isCompleted = enrollment?.completedLessons?.includes(lesson.id);
+                // completedLessons is a count (number), not array — IDs are in metadata
+                const completedLessonIds: string[] = (enrollment as any)?.metadata?.completedLessonIds || [];
+                const isCompleted = completedLessonIds.includes(lesson.id);
                 const canAccess = enrollment || lesson.isPreview;
 
                 return (
