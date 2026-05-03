@@ -433,12 +433,15 @@ export default function InstructorDashboardPage() {
 }
 
 // ── 스타일 ─────────────────────────────────────────────────────
+// WO-KPA-INSTRUCTOR-DASHBOARD-SIDEBAR-LAYOUT-V1:
+//   InstructorLayout(사이드바)이 외곽 폭을 잡으므로 페이지는 maxWidth 미설정.
+//   카드 그리드는 가용 폭에 따라 1열/2열로 자동 적응.
 const styles: Record<string, React.CSSProperties> = {
-  container: { padding: '24px 32px', maxWidth: '900px', margin: '0 auto' },
+  container: { padding: '0' },
   loading: { padding: '60px', textAlign: 'center', color: colors.neutral400 },
   header: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' },
   title: { fontSize: '24px', fontWeight: 700, color: colors.neutral900 },
-  grid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' },
+  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '16px' },
   errorBanner: { padding: '12px 16px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', color: '#dc2626', marginBottom: '16px', fontSize: '14px' },
   successBanner: { padding: '12px 16px', backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', color: '#16a34a', marginBottom: '16px', fontSize: '14px' },
   editBtn: { padding: '6px 14px', fontSize: '13px', color: colors.primary, backgroundColor: 'transparent', border: `1px solid ${colors.primary}`, borderRadius: '6px', cursor: 'pointer' },

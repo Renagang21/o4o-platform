@@ -53,6 +53,8 @@ const CourseNewPage = lazy(() => import('./pages/instructor/courses/CourseNewPag
 const CourseEditPage = lazy(() => import('./pages/instructor/courses/CourseEditPage'));
 const InstructorCourseDashboardPage = lazy(() => import('./pages/instructor/InstructorCourseDashboardPage'));
 const ContentParticipantsPage = lazy(() => import('./pages/instructor/ContentParticipantsPage'));
+// WO-KPA-INSTRUCTOR-DASHBOARD-SIDEBAR-LAYOUT-V1: 강사 영역 사이드바 레이아웃
+import { InstructorLayout } from './components/instructor/InstructorLayout';
 
 // Events pages — Phase 2 lazy
 const EventsHomePage = lazy(() => import('./pages/events/EventsHomePage').then(m => ({ default: m.EventsHomePage })));
@@ -719,14 +721,15 @@ function App() {
           {/* Instructor Public Profile - WO-CONTENT-INSTRUCTOR-PUBLIC-PROFILE-V1 */}
           <Route path="/instructors/:userId" element={<Layout serviceName={SERVICE_NAME}><InstructorProfilePage /></Layout>} />
 
-          {/* Instructor Dashboard - WO-O4O-INSTRUCTOR-DASHBOARD-V1 */}
-          <Route path="/instructor" element={<Layout serviceName={SERVICE_NAME}><InstructorDashboardPage /></Layout>} />
-          <Route path="/instructor/courses" element={<Layout serviceName={SERVICE_NAME}><CourseListPage /></Layout>} />
-          <Route path="/instructor/courses/new" element={<Layout serviceName={SERVICE_NAME}><CourseNewPage /></Layout>} />
-          <Route path="/instructor/courses/:id" element={<Layout serviceName={SERVICE_NAME}><CourseEditPage /></Layout>} />
-          <Route path="/instructor/dashboard" element={<Layout serviceName={SERVICE_NAME}><InstructorCourseDashboardPage /></Layout>} />
+          {/* Instructor Dashboard - WO-O4O-INSTRUCTOR-DASHBOARD-V1
+              WO-KPA-INSTRUCTOR-DASHBOARD-SIDEBAR-LAYOUT-V1: Layout → InstructorLayout(사이드바+본문) */}
+          <Route path="/instructor" element={<InstructorLayout><InstructorDashboardPage /></InstructorLayout>} />
+          <Route path="/instructor/courses" element={<InstructorLayout><CourseListPage /></InstructorLayout>} />
+          <Route path="/instructor/courses/new" element={<InstructorLayout><CourseNewPage /></InstructorLayout>} />
+          <Route path="/instructor/courses/:id" element={<InstructorLayout><CourseEditPage /></InstructorLayout>} />
+          <Route path="/instructor/dashboard" element={<InstructorLayout><InstructorCourseDashboardPage /></InstructorLayout>} />
           {/* WO-O4O-MARKETING-CONTENT-OPERATIONS-MVP-V1 */}
-          <Route path="/instructor/contents/:courseId/participants" element={<Layout serviceName={SERVICE_NAME}><ContentParticipantsPage /></Layout>} />
+          <Route path="/instructor/contents/:courseId/participants" element={<InstructorLayout><ContentParticipantsPage /></InstructorLayout>} />
 
           {/* LMS (교육/강의) */}
           <Route path="/lms" element={<Layout serviceName={SERVICE_NAME}><EducationPage /></Layout>} />
