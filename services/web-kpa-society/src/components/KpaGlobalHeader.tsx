@@ -13,7 +13,7 @@
 
 import { useNavigate, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { LayoutDashboard, Settings, Shield } from 'lucide-react';
+import { GraduationCap, LayoutDashboard, Settings, Shield } from 'lucide-react';
 import { GlobalHeader, GlobalHeaderMenuItem } from '@o4o/ui';
 import { useAuth, type User as UserType } from '../contexts';
 import { useAuthModal } from '../contexts/LoginModalContext';
@@ -65,6 +65,7 @@ export function KpaGlobalHeader() {
   // 역할 판정
   const isAdmin = user ? user.roles.includes('kpa:admin') : false;
   const isOperator = user ? user.roles.includes('kpa:operator') : false;
+  const isInstructor = user ? user.roles.includes('lms:instructor') : false;
   const isStoreOwner = user?.isStoreOwner === true;
   const isPharmacyRelated = isStoreOwner || (user as any)?.activityType === 'pharmacy_owner';
 
@@ -125,6 +126,11 @@ export function KpaGlobalHeader() {
       }
       userMenuItems={
         <>
+          {(isInstructor || isAdmin) && (
+            <GlobalHeaderMenuItem to="/instructor" icon={<GraduationCap className="w-4 h-4" />}>
+              강의 대시보드
+            </GlobalHeaderMenuItem>
+          )}
           {(isOperator || isAdmin) && (
             <GlobalHeaderMenuItem to="/operator" icon={<Shield className="w-4 h-4" />}>
               운영 대시보드
