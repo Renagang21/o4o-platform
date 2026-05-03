@@ -14,9 +14,12 @@ import {
   POINT_PAYOUT_TYPES,
   type PointPayoutType,
 } from '../services/PointService.js';
+import { CreditService } from '../../credit/services/CreditService.js';
 import logger from '../../../utils/logger.js';
 
 const PAYOUT_TYPE_SET = new Set<string>(POINT_PAYOUT_TYPES);
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export class PointAdminController extends BaseController {
   /**
@@ -127,6 +130,55 @@ export class PointAdminController extends BaseController {
         return BaseController.badRequest(res, 'amount must be positive', 'INVALID_AMOUNT');
       }
       logger.error('[PointAdminController.spend] Error', { error: error.message });
+      return BaseController.error(res, error);
+    }
+  }
+
+  /**
+   * GET /api/v1/points/admin/transactions?userId=<uuid>&page=1&limit=20
+   *
+   * WO-O4O-POINT-TRANSACTION-VIEW-ADMIN-V1
+   *
+   * 운영자가 특정 사용자의 포인트 거래 이력을 조회.
+   *   - userId 필수 (UUID)
+   *   - limit max 100
+   *   - 정렬: createdAt DESC (CreditService.getTransactions 기본 동작)
+   *
+   * 본 단계 범위: userId 필터만. transactionType / sourceType / 날짜 범위 필터는 별도 WO.
+   */
+  static async listTransactions(req: Request, res: Response): Promise<any> {
+    try {
+      const userIdRaw = req.query.userId;
+      const userId = typeof userIdRaw === 'string' ? userIdRaw.trim() : '';
+      if (!userId) {
+        return BaseController.badRequest(res, 'userId is required', 'INVALID_USER_ID');
+      }
+      if (!UUID_RE.test(userId)) {
+        return BaseController.badRequest(res, 'userId must be a UUID', 'INVALID_USER_ID');
+      }
+
+      const pageRaw = parseInt(String(req.query.page ?? '1'), 10);
+      const limitRaw = parseInt(String(req.query.limit ?? '20'), 10);
+      const page = Number.isFinite(pageRaw) && pageRaw > 0 ? pageRaw : 1;
+      const limit = Math.min(Math.max(1, Number.isFinite(limitRaw) ? limitRaw : 20), 100);
+
+      const { transactions, total } = await CreditService.getInstance().getTransactions(
+        userId,
+        page,
+        limit,
+      );
+
+      return BaseController.ok(res, {
+        transactions,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      });
+    } catch (error: any) {
+      logger.error('[PointAdminController.listTransactions] Error', { error: error.message });
       return BaseController.error(res, error);
     }
   }

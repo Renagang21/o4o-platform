@@ -2,25 +2,22 @@
  * PointSpendPage
  *
  * WO-O4O-POINT-OPERATOR-UI-V1
+ * WO-O4O-POINT-PAYOUT-TYPE-BACKEND-V1 — payoutType을 API body에 포함
+ * WO-O4O-POINT-TRANSACTION-VIEW-ADMIN-V1 — 사용자 거래 이력 조회 영역 추가
  *
- * 운영자 포인트 차감(보상 지급 완료 처리) UI.
+ * 운영자 포인트 차감(보상 지급 완료 처리) UI + 거래 이력 조회.
  * 정책: docs/point/O4O-POINT-REWARD-OPERATION-POLICY.md
  *   - 차감 = 보상 지급 완료 처리
  *   - description 필수
  *
  * Route: /operator/points
- *
- * 본 단계 범위:
- *   - 차감 폼만 (이력 조회는 admin API 부재로 별도 WO)
- *   - payoutType은 UI 전용 dropdown (description 자동 채움)
- *   - API에는 userId, amount, description만 전송 (sourceType 백엔드 미변경)
  */
 
 import { useState, FormEvent } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
 import { toast } from 'react-hot-toast';
-import { Coins, AlertTriangle } from 'lucide-react';
+import { Coins, AlertTriangle, Search } from 'lucide-react';
 import PageHeader from '@/components/common/PageHeader';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -39,6 +36,34 @@ interface SpendErrorBody {
   code?: string;
 }
 
+// ── Transaction History Types ───────────────────────────────────────────────
+
+type TransactionType = 'earn' | 'spend' | 'adjust';
+
+interface PointTransaction {
+  id: string;
+  userId: string;
+  amount: number;
+  transactionType: TransactionType;
+  sourceType: string;
+  sourceId: string | null;
+  description: string | null;
+  createdAt: string;
+}
+
+interface TransactionsResponse {
+  success: boolean;
+  data: {
+    transactions: PointTransaction[];
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
+  };
+}
+
 // ── Constants ────────────────────────────────────────────────────────────────
 
 const PAYOUT_TYPES = [
@@ -51,6 +76,23 @@ const PAYOUT_TYPES = [
 
 type PayoutType = typeof PAYOUT_TYPES[number]['value'];
 
+// 사람이 읽기 쉬운 sourceType 라벨 (없는 키는 raw 표시)
+const SOURCE_TYPE_LABELS: Record<string, string> = {
+  lesson_complete: '레슨 완료',
+  quiz_pass: '퀴즈 통과',
+  course_complete: '코스 완료',
+  admin_grant: '관리자 지급',
+  admin_spend: '관리자 차감(legacy)',
+  admin_adjust: '관리자 조정',
+  reward_payout_offline: '오프라인 보상',
+  reward_payout_voucher: '상품권',
+  reward_payout_survey: '설문 참여',
+  reward_payout_course: '강의 참여',
+  reward_payout_other: '기타',
+};
+
+const HISTORY_PAGE_SIZE = 20;
+
 // ── API ──────────────────────────────────────────────────────────────────────
 
 async function spendPoint(params: {
@@ -60,6 +102,17 @@ async function spendPoint(params: {
   description: string;
 }): Promise<SpendResponse['data']> {
   const res = await authClient.api.post<SpendResponse>('/api/v1/points/admin/spend', params);
+  return res.data.data;
+}
+
+async function fetchTransactions(
+  userId: string,
+  page: number,
+): Promise<TransactionsResponse['data']> {
+  const res = await authClient.api.get<TransactionsResponse>(
+    '/api/v1/points/admin/transactions',
+    { params: { userId, page: String(page), limit: String(HISTORY_PAGE_SIZE) } },
+  );
   return res.data.data;
 }
 
@@ -125,6 +178,42 @@ export default function PointSpendPage() {
       payoutType: payoutType as PayoutType,
       description: trimmedDescription,
     });
+  };
+
+  // ── Transaction History (WO-O4O-POINT-TRANSACTION-VIEW-ADMIN-V1) ────────────
+  const [lookupUserIdInput, setLookupUserIdInput] = useState('');
+  const [submittedLookupUserId, setSubmittedLookupUserId] = useState('');
+  const [historyPage, setHistoryPage] = useState(1);
+
+  const historyQuery = useQuery({
+    queryKey: ['point-admin-transactions', submittedLookupUserId, historyPage],
+    queryFn: () => fetchTransactions(submittedLookupUserId, historyPage),
+    enabled: submittedLookupUserId.length > 0,
+  });
+
+  const handleLookup = (e: FormEvent) => {
+    e.preventDefault();
+    const trimmed = lookupUserIdInput.trim();
+    if (!trimmed) return;
+    setHistoryPage(1);
+    setSubmittedLookupUserId(trimmed);
+  };
+
+  const formatDate = (iso: string) => {
+    const d = new Date(iso);
+    return d.toLocaleString('ko-KR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  const txTypeBadge = (t: TransactionType) => {
+    if (t === 'earn') return { label: '적립', className: 'bg-green-100 text-green-800' };
+    if (t === 'spend') return { label: '차감', className: 'bg-red-100 text-red-800' };
+    return { label: '조정', className: 'bg-gray-100 text-gray-700' };
   };
 
   return (
@@ -246,6 +335,135 @@ export default function PointSpendPage() {
           )}
         </div>
       </form>
+
+      {/* ── 거래 이력 조회 (WO-O4O-POINT-TRANSACTION-VIEW-ADMIN-V1) ── */}
+      <div className="mt-10 border-t border-gray-200 pt-8">
+        <h2 className="mb-1 text-lg font-semibold text-gray-900">거래 이력 조회</h2>
+        <p className="mb-4 text-sm text-gray-500">
+          특정 사용자의 포인트 적립·차감 이력을 최신순으로 조회합니다.
+        </p>
+
+        <form onSubmit={handleLookup} className="mb-6 flex max-w-xl items-end gap-2">
+          <div className="flex-1">
+            <label htmlFor="lookupUserId" className="mb-1 block text-sm font-medium text-gray-700">
+              사용자 ID
+            </label>
+            <input
+              id="lookupUserId"
+              type="text"
+              value={lookupUserIdInput}
+              onChange={(e) => setLookupUserIdInput(e.target.value)}
+              placeholder="UUID"
+              className="w-full rounded border border-gray-300 px-3 py-2 text-sm font-mono focus:border-blue-500 focus:outline-none"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={!lookupUserIdInput.trim() || historyQuery.isFetching}
+            className="inline-flex items-center gap-2 rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <Search size={14} />
+            {historyQuery.isFetching ? '조회 중...' : '조회'}
+          </button>
+        </form>
+
+        {submittedLookupUserId === '' ? (
+          <p className="text-sm text-gray-400">사용자 ID를 입력하고 조회 버튼을 눌러주세요.</p>
+        ) : historyQuery.isError ? (
+          <div className="rounded border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            {(historyQuery.error as any)?.response?.data?.error
+              || '거래 이력을 불러오지 못했습니다. (UUID 형식이 올바른지 확인해 주세요.)'}
+          </div>
+        ) : historyQuery.isLoading ? (
+          <p className="text-sm text-gray-500">불러오는 중...</p>
+        ) : (
+          <div>
+            <div className="overflow-x-auto rounded border border-gray-200">
+              <table className="min-w-full divide-y divide-gray-200 text-sm">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-3 py-2 text-left font-medium text-gray-600">날짜</th>
+                    <th className="px-3 py-2 text-left font-medium text-gray-600">구분</th>
+                    <th className="px-3 py-2 text-right font-medium text-gray-600">금액</th>
+                    <th className="px-3 py-2 text-left font-medium text-gray-600">유형 (sourceType)</th>
+                    <th className="px-3 py-2 text-left font-medium text-gray-600">사유</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 bg-white">
+                  {(historyQuery.data?.transactions ?? []).map((tx) => {
+                    const badge = txTypeBadge(tx.transactionType);
+                    const sourceLabel = SOURCE_TYPE_LABELS[tx.sourceType] ?? tx.sourceType;
+                    const isNegative = tx.amount < 0;
+                    return (
+                      <tr key={tx.id}>
+                        <td className="whitespace-nowrap px-3 py-2 text-gray-600">
+                          {formatDate(tx.createdAt)}
+                        </td>
+                        <td className="px-3 py-2">
+                          <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${badge.className}`}>
+                            {badge.label}
+                          </span>
+                        </td>
+                        <td className={`whitespace-nowrap px-3 py-2 text-right font-medium ${isNegative ? 'text-red-600' : 'text-green-700'}`}>
+                          {isNegative ? '' : '+'}{tx.amount.toLocaleString()}P
+                        </td>
+                        <td className="px-3 py-2">
+                          <div className="text-gray-800">{sourceLabel}</div>
+                          {sourceLabel !== tx.sourceType && (
+                            <div className="font-mono text-xs text-gray-400">{tx.sourceType}</div>
+                          )}
+                        </td>
+                        <td className="px-3 py-2 text-gray-700">
+                          {tx.description ?? <span className="text-gray-300">-</span>}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {historyQuery.data?.transactions.length === 0 && (
+                    <tr>
+                      <td colSpan={5} className="px-3 py-8 text-center text-sm text-gray-400">
+                        해당 사용자의 거래 이력이 없습니다.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {historyQuery.data && historyQuery.data.pagination.totalPages > 1 && (
+              <div className="mt-3 flex items-center justify-center gap-2">
+                <button
+                  className="rounded border px-3 py-1 text-sm disabled:opacity-40"
+                  onClick={() => setHistoryPage((p) => Math.max(1, p - 1))}
+                  disabled={historyPage <= 1 || historyQuery.isFetching}
+                >
+                  이전
+                </button>
+                <span className="px-3 py-1 text-sm text-gray-600">
+                  {historyQuery.data.pagination.page} / {historyQuery.data.pagination.totalPages}
+                  <span className="ml-2 text-xs text-gray-400">
+                    (총 {historyQuery.data.pagination.total.toLocaleString()}건)
+                  </span>
+                </span>
+                <button
+                  className="rounded border px-3 py-1 text-sm disabled:opacity-40"
+                  onClick={() =>
+                    setHistoryPage((p) =>
+                      Math.min(historyQuery.data!.pagination.totalPages, p + 1),
+                    )
+                  }
+                  disabled={
+                    historyPage >= (historyQuery.data?.pagination.totalPages ?? 1) ||
+                    historyQuery.isFetching
+                  }
+                >
+                  다음
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
