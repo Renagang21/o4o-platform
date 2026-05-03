@@ -11,6 +11,7 @@
 import { api } from '@/lib/apiClient';
 import {
   createLmsInstructorClient,
+  createLmsLearnerClient,
   type LmsHttpClient,
   type LmsApiResponse,
 } from '@o4o/lms-client';
@@ -112,9 +113,22 @@ const lmsHttp: LmsHttpClient = {
     const { data } = await api.get<T>(path, { params });
     return data;
   },
+  post: async <T>(path: string, body?: unknown): Promise<T> => {
+    const { data } = await api.post<T>(path, body);
+    return data;
+  },
+  patch: async <T>(path: string, body?: unknown): Promise<T> => {
+    const { data } = await api.patch<T>(path, body);
+    return data;
+  },
+  delete: async <T>(path: string): Promise<T> => {
+    const { data } = await api.delete<T>(path);
+    return data;
+  },
 };
 
 const instructorClient = createLmsInstructorClient(lmsHttp);
+const learnerClient = createLmsLearnerClient(lmsHttp);
 
 export const lmsApi = {
   // 강사 본인 강의 목록. 페이지(InstructorDashboardPage)는 현재 api.get 직접 호출 중이며,
@@ -122,30 +136,37 @@ export const lmsApi = {
   getInstructorCourses: (): Promise<LmsApiResponse<LmsCourse[]>> =>
     instructorClient.getCourses<LmsCourse>(),
 
+  // ─── 학습자 메서드 (WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP1) ─────────────────
+  // 공통 factory 가 envelope 을 그대로 반환하므로, GlycoPharm thin wrapper 가
+  // 기존 unwrap 패턴(`data.data.X`, try/catch null) 을 보존하여 페이지 호환 유지.
+  // unwrap 제거는 Phase 5 별도 WO 에서 진행.
+
   getCourses: async (params?: {
     search?: string;
     page?: number;
     limit?: number;
   }): Promise<LmsCoursesResult> => {
-    const query = new URLSearchParams({ status: 'published' });
-    if (params?.search) query.set('search', params.search);
-    if (params?.page) query.set('page', String(params.page));
-    if (params?.limit) query.set('limit', String(params.limit));
-    const { data } = await api.get<LmsCoursesResult>(`/lms/courses?${query.toString()}`);
-    return data;
+    const res = await learnerClient.getCourses<LmsCourse>({
+      status: 'published',
+      ...(params?.search ? { search: params.search } : {}),
+      ...(params?.page ? { page: params.page } : {}),
+      ...(params?.limit ? { limit: params.limit } : {}),
+    });
+    // factory 반환은 LmsPaginatedResponse — Glyco 의 LmsCoursesResult 와 구조 호환.
+    return res as unknown as LmsCoursesResult;
   },
 
-  // ─── 표준 이름 (WO-O4O-LMS-GLYCOPHARM-METHOD-ALIGNMENT-V1) ─────────────────
-  // LMS-CLIENT-CONVENTION-V1 §4 기준. 내부 unwrap 정책은 Phase 2 범위 외이므로
-  // GlycoPharm 의 기존 unwrap 패턴(`data.data.X`, try/catch null 반환)을 그대로 유지.
+  // ─── 표준 이름 (WO-O4O-LMS-GLYCOPHARM-METHOD-ALIGNMENT-V1 + V2-STEP1) ──────
+  // LMS-CLIENT-CONVENTION-V1 §4 기준 표준 이름. 내부 구현은 공통 factory 호출 + 기존 unwrap 보존.
 
   getCourse: async (id: string): Promise<LmsCourse> => {
-    const { data } = await api.get<{ success: boolean; data: { course: LmsCourse } }>(
-      `/lms/courses/${id}`,
-    );
-    return data.data.course;
+    const res = await learnerClient.getCourse<LmsCourse>(id);
+    return res.data.course;
   },
 
+  // 주의: Glyco 의 endpoint(`/lms/enrollments/:courseId`) 는 factory 의
+  // `/lms/enrollments/me/course/:courseId` 와 다르므로 V2 Step 1 에서 factory 로 전환하지 않는다.
+  // endpoint 정렬은 별도 WO 에서 진행 (현 동작 보존이 우선).
   getEnrollmentByCourse: async (courseId: string): Promise<LmsEnrollment | null> => {
     try {
       const { data } = await api.get<{ success: boolean; data: { enrollment: LmsEnrollment } }>(
@@ -165,18 +186,14 @@ export const lmsApi = {
   },
 
   getLessons: async (courseId: string): Promise<LmsLesson[]> => {
-    const { data } = await api.get<{ success: boolean; data: LmsLesson[] }>(
-      `/lms/courses/${courseId}/lessons`,
-    );
-    return data.data ?? [];
+    const res = await learnerClient.getLessons<LmsLesson>(courseId);
+    return res.data ?? [];
   },
 
   getQuizForLesson: async (lessonId: string): Promise<LmsQuiz | null> => {
     try {
-      const { data } = await api.get<{ success: boolean; data: { quiz: LmsQuiz } }>(
-        `/lms/lessons/${lessonId}/quiz`,
-      );
-      return data.data.quiz;
+      const res = await learnerClient.getQuizForLesson<LmsQuiz>(lessonId);
+      return res.data.quiz;
     } catch {
       return null;
     }

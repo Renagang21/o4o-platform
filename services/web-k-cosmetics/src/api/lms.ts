@@ -13,6 +13,7 @@
 import { api } from '../lib/apiClient';
 import {
   createLmsInstructorClient,
+  createLmsLearnerClient,
   type LmsHttpClient,
   type LmsApiResponse,
 } from '@o4o/lms-client';
@@ -124,11 +125,8 @@ export interface LmsLive {
   liveUrl: string | null;
 }
 
-interface PaginatedResponse<T> {
-  data: T[];
-  pagination?: { page: number; limit: number; total: number; totalPages: number };
-  totalPages?: number;
-}
+// PaginatedResponse — V2 Step 1 이후 @o4o/lms-client 의 LmsPaginatedResponse 사용으로 대체됨.
+// (학습자 메서드들이 factory 호출로 이동하여 본 인터페이스 직접 사용처가 사라짐.)
 
 // 백엔드 envelope — @o4o/lms-client 의 LmsApiResponse 와 호환. 기존 export 이름은 유지.
 type ApiResponse<T> = LmsApiResponse<T>;
@@ -140,54 +138,58 @@ const lmsHttp: LmsHttpClient = {
     const { data } = await api.get<T>(path, { params });
     return data;
   },
+  post: async <T>(path: string, body?: unknown): Promise<T> => {
+    const { data } = await api.post<T>(path, body);
+    return data;
+  },
+  patch: async <T>(path: string, body?: unknown): Promise<T> => {
+    const { data } = await api.patch<T>(path, body);
+    return data;
+  },
+  delete: async <T>(path: string): Promise<T> => {
+    const { data } = await api.delete<T>(path);
+    return data;
+  },
 };
 
 const instructorClient = createLmsInstructorClient(lmsHttp);
+const learnerClient = createLmsLearnerClient(lmsHttp);
 
 // ─── API ─────────────────────────────────────────────────────────────────────
 
 export const lmsApi = {
-  // 강의 목록
-  getCourses: async (params?: {
+  // 강의 목록 — WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP1: 공통 factory 사용. 반환 형태 동일.
+  getCourses: (params?: {
     category?: string;
     level?: string;
     status?: string;
     page?: number;
     limit?: number;
     search?: string;
-  }): Promise<PaginatedResponse<LmsCourse>> => {
-    const { data } = await api.get<PaginatedResponse<LmsCourse>>('/lms/courses', { params });
-    return data;
-  },
+  }) => learnerClient.getCourses<LmsCourse>(params as Record<string, unknown> | undefined),
 
   // 강사 본인 강의 목록 (WO-KCOS-LMS-INSTRUCTOR-BOOTSTRAP-V1)
   // WO-O4O-LMS-CLIENT-EXTRACTION-V1-SCOPED: 공통 factory 사용. 반환 형태는 기존과 동일.
   getInstructorCourses: (): Promise<ApiResponse<LmsCourse[]>> =>
     instructorClient.getCourses<LmsCourse>(),
 
-  // 강의 상세
-  getCourse: async (id: string): Promise<ApiResponse<LmsCourse>> => {
-    const { data } = await api.get<ApiResponse<LmsCourse>>(`/lms/courses/${id}`);
-    return data;
-  },
+  // 강의 상세 — WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP1.
+  // 반환 형태는 백엔드 envelope 그대로(`{ success, data: { course } }`). 페이지의
+  // defensive cast 패턴(`(res as any).data?.course ?? (res as any).data ?? null`)은 그대로 동작.
+  getCourse: (id: string) => learnerClient.getCourse<LmsCourse>(id),
 
-  // 레슨 목록
-  getLessons: async (courseId: string): Promise<ApiResponse<LmsLesson[]>> => {
-    const { data } = await api.get<ApiResponse<LmsLesson[]>>(`/lms/courses/${courseId}/lessons`);
-    return data;
-  },
+  // 레슨 목록 — WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP1.
+  getLessons: (courseId: string) => learnerClient.getLessons<LmsLesson>(courseId),
 
-  // 레슨 상세
+  // 레슨 상세 — getLesson 은 V2 Step 1 범위 외(GlycoPharm 미구현). 기존 구현 유지.
   getLesson: async (_courseId: string, lessonId: string): Promise<ApiResponse<{ lesson: LmsLesson }>> => {
     const { data } = await api.get<ApiResponse<{ lesson: LmsLesson }>>(`/lms/lessons/${lessonId}`);
     return data;
   },
 
-  // 수강 상태 조회
-  getEnrollmentByCourse: async (courseId: string): Promise<ApiResponse<{ enrollment: LmsEnrollment }>> => {
-    const { data } = await api.get<ApiResponse<{ enrollment: LmsEnrollment }>>(`/lms/enrollments/me/course/${courseId}`);
-    return data;
-  },
+  // 수강 상태 조회 — WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP1.
+  getEnrollmentByCourse: (courseId: string) =>
+    learnerClient.getEnrollmentByCourse<LmsEnrollment>(courseId),
 
   // 수강 신청
   enrollCourse: async (courseId: string): Promise<ApiResponse<{ enrollment: LmsEnrollment }>> => {
@@ -204,11 +206,8 @@ export const lmsApi = {
     return data;
   },
 
-  // 퀴즈 조회
-  getQuizForLesson: async (lessonId: string): Promise<ApiResponse<{ quiz: LmsQuiz }>> => {
-    const { data } = await api.get<ApiResponse<{ quiz: LmsQuiz }>>(`/lms/lessons/${lessonId}/quiz`);
-    return data;
-  },
+  // 퀴즈 조회 — WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP1.
+  getQuizForLesson: (lessonId: string) => learnerClient.getQuizForLesson<LmsQuiz>(lessonId),
 
   // 퀴즈 제출
   submitQuiz: async (quizId: string, answers: Array<{ questionId: string; answer: string | string[] }>): Promise<ApiResponse<LmsQuizResult>> => {

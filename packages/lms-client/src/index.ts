@@ -85,15 +85,87 @@ export interface LmsCertificateBase {
  */
 export interface LmsInstructorCourseBase extends LmsCourseBase {}
 
+// ─── Paginated Response (학습자 목록 조회용) ────────────────────────────────
+
+/**
+ * 백엔드 `/lms/courses` 페이지네이션 응답.
+ * KPA `PaginatedResponse<T>`, GlycoPharm `LmsCoursesResult`, K-Cos `PaginatedResponse<T>` 와 호환.
+ */
+export interface LmsPaginatedResponse<T> {
+  data: T[];
+  pagination?: { page: number; limit: number; total: number; totalPages: number };
+  /** 일부 서비스(GlycoPharm)는 `meta` 키를 사용. 타입은 호환만 보장. */
+  meta?: { page: number; limit: number; total: number; totalPages: number };
+  /** 일부 호출은 `totalPages` 만 노출 — backward compat */
+  totalPages?: number;
+}
+
 // ─── HTTP Adapter ───────────────────────────────────────────────────────────
 
 /**
  * 서비스별 http 클라이언트(fetch 래퍼 / axios 등)를 흡수하는 최소 인터페이스.
  * 각 메서드는 envelope 까지 포함한 결과(`Promise<T>`)를 반환해야 한다 — adapter 가
  * axios 의 `{ data }` 단계만 unwrap 한다.
+ *
+ * WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP1: post/patch/delete 추가.
+ *   write API 는 Step 2 에서 활용. 인터페이스만 미리 정의해 adapter 호환성을 잡아둔다.
  */
 export interface LmsHttpClient {
   get<T>(path: string, params?: Record<string, unknown>): Promise<T>;
+  post<T>(path: string, body?: unknown): Promise<T>;
+  patch<T>(path: string, body?: unknown): Promise<T>;
+  delete<T>(path: string): Promise<T>;
+}
+
+// ─── Learner Client Factory (WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP1) ─────────
+
+/**
+ * 학습자 측 read-only client. 현 단계(Step 1)에서 5개 메서드만 추출.
+ *
+ * 반환 형태: 백엔드 envelope(`{ success, data: ... }`) 그대로 노출 — LMS-CLIENT-CONVENTION-V1 §5.
+ * 서비스별 lms.ts 가 thin wrapper 로 자체 반환 형태(envelope 유지 / unwrap 등)를 결정한다.
+ *
+ * 본 factory 는 axios/fetch 를 직접 사용하지 않으며, LmsHttpClient 인터페이스로 추상화한다.
+ *
+ * 제외 항목 (의도적):
+ *   - getLesson — GlycoPharm backend 미구현. Phase 5 에서 추가.
+ *   - write API (enrollCourse, updateProgress, submitQuiz) — Step 2.
+ */
+export function createLmsLearnerClient(http: LmsHttpClient) {
+  return {
+    /** 강의 단건 조회. 반환: `{ success, data: { course: T } }` */
+    getCourse<T extends LmsCourseBase = LmsCourseBase>(id: string): Promise<LmsApiResponse<{ course: T }>> {
+      return http.get<LmsApiResponse<{ course: T }>>(`/lms/courses/${id}`);
+    },
+
+    /** 강의 목록 조회. 반환: `LmsPaginatedResponse<T>` (data 배열 + pagination/meta 옵션). */
+    getCourses<T extends LmsCourseBase = LmsCourseBase>(
+      params?: Record<string, unknown>,
+    ): Promise<LmsPaginatedResponse<T>> {
+      return http.get<LmsPaginatedResponse<T>>('/lms/courses', params);
+    },
+
+    /** 코스 레슨 목록. 반환: `{ success, data: T[] }` */
+    getLessons<T extends LmsLessonBase = LmsLessonBase>(
+      courseId: string,
+    ): Promise<LmsApiResponse<T[]>> {
+      return http.get<LmsApiResponse<T[]>>(`/lms/courses/${courseId}/lessons`);
+    },
+
+    /** 본인의 특정 강의 수강 정보. 반환: `{ success, data: { enrollment: T } }` */
+    getEnrollmentByCourse<T extends LmsEnrollmentBase = LmsEnrollmentBase>(
+      courseId: string,
+    ): Promise<LmsApiResponse<{ enrollment: T }>> {
+      return http.get<LmsApiResponse<{ enrollment: T }>>(`/lms/enrollments/me/course/${courseId}`);
+    },
+
+    /** 레슨에 연결된 퀴즈 조회. 반환: `{ success, data: { quiz: T } }` */
+    getQuizForLesson<T = unknown>(
+      lessonId: string,
+    ): Promise<LmsApiResponse<{ quiz: T }>> {
+      return http.get<LmsApiResponse<{ quiz: T }>>(`/lms/lessons/${lessonId}/quiz`);
+    },
+  };
 }
 
 // ─── Instructor Client Factory ──────────────────────────────────────────────
