@@ -11,6 +11,7 @@ import { AppDataSource } from '../../../database/connection.js';
 import logger from '../../../utils/logger.js';
 import { deriveUserScopes } from '../../../utils/scope-assignment.utils.js';
 import { roleAssignmentService } from '../services/role-assignment.service.js';
+import { getCachedRoles, setCachedRoles } from '../utils/role-cache.js';
 import { derivePharmacistQualification } from './auth-helpers.js';
 
 export class AuthAccountController extends BaseController {
@@ -24,8 +25,23 @@ export class AuthAccountController extends BaseController {
     }
 
     try {
-      // Phase3-E: roles from JWT payload (set at login from role_assignments)
-      const roles = req.user.roles || [];
+      // WO-O4O-AUTH-ROLE-FRESHEN-V1:
+      //   roles는 role_assignments(SSOT) 기준으로 fresh 조회하되 60s in-memory 캐시.
+      //   캐시 무효화는 assignRole/removeRole 시점에 즉시 수행.
+      //   DB 실패 시 JWT payload로 fallback (/auth/me는 500을 내면 안 되는 hot path).
+      let roles = getCachedRoles(req.user.id);
+      if (!roles) {
+        try {
+          roles = await roleAssignmentService.getRoleNames(req.user.id);
+          setCachedRoles(req.user.id, roles);
+        } catch (cacheError: any) {
+          logger.warn('[AuthAccountController.me] Role fresh query failed, falling back to JWT payload', {
+            error: cacheError?.message,
+            userId: req.user.id,
+          });
+          roles = req.user.roles || [];
+        }
+      }
 
       // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1: scopes 계산
       const scopes = deriveUserScopes({

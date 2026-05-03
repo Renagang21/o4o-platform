@@ -18,6 +18,7 @@ import { AppDataSource } from '../../../database/connection.js';
 import { RoleAssignment } from '../entities/RoleAssignment.js';
 import { UserRole } from '../../../types/auth.js';
 import logger from '../../../utils/logger.js';
+import { invalidateRoles } from '../utils/role-cache.js';
 
 export interface AssignRoleInput {
   userId: string;
@@ -154,7 +155,9 @@ export class RoleAssignmentService {
       );
     }
 
-    return await this.repository.save(assignment);
+    const saved = await this.repository.save(assignment);
+    invalidateRoles(userId); // WO-O4O-AUTH-ROLE-FRESHEN-V1
+    return saved;
   }
 
   /**
@@ -199,6 +202,7 @@ export class RoleAssignmentService {
 
     assignment.deactivate();
     await this.repository.save(assignment);
+    invalidateRoles(userId); // WO-O4O-AUTH-ROLE-FRESHEN-V1
 
     logger.info(
       `[RoleAssignmentService] Removed role ${role} from user ${userId}`
@@ -219,6 +223,7 @@ export class RoleAssignmentService {
     }
 
     await this.repository.save(assignments);
+    invalidateRoles(userId); // WO-O4O-AUTH-ROLE-FRESHEN-V1
 
     logger.info(
       `[RoleAssignmentService] Removed ${assignments.length} roles from user ${userId}`
