@@ -135,14 +135,18 @@ export const lmsApi = {
     return data;
   },
 
-  getCourseById: async (id: string): Promise<LmsCourse> => {
+  // ─── 표준 이름 (WO-O4O-LMS-GLYCOPHARM-METHOD-ALIGNMENT-V1) ─────────────────
+  // LMS-CLIENT-CONVENTION-V1 §4 기준. 내부 unwrap 정책은 Phase 2 범위 외이므로
+  // GlycoPharm 의 기존 unwrap 패턴(`data.data.X`, try/catch null 반환)을 그대로 유지.
+
+  getCourse: async (id: string): Promise<LmsCourse> => {
     const { data } = await api.get<{ success: boolean; data: { course: LmsCourse } }>(
       `/lms/courses/${id}`,
     );
     return data.data.course;
   },
 
-  getMyEnrollment: async (courseId: string): Promise<LmsEnrollment | null> => {
+  getEnrollmentByCourse: async (courseId: string): Promise<LmsEnrollment | null> => {
     try {
       const { data } = await api.get<{ success: boolean; data: { enrollment: LmsEnrollment } }>(
         `/lms/enrollments/${courseId}`,
@@ -160,14 +164,14 @@ export const lmsApi = {
     return data.data.enrollment;
   },
 
-  getLessonsByCourse: async (courseId: string): Promise<LmsLesson[]> => {
+  getLessons: async (courseId: string): Promise<LmsLesson[]> => {
     const { data } = await api.get<{ success: boolean; data: LmsLesson[] }>(
       `/lms/courses/${courseId}/lessons`,
     );
     return data.data ?? [];
   },
 
-  getLessonQuiz: async (lessonId: string): Promise<LmsQuiz | null> => {
+  getQuizForLesson: async (lessonId: string): Promise<LmsQuiz | null> => {
     try {
       const { data } = await api.get<{ success: boolean; data: { quiz: LmsQuiz } }>(
         `/lms/lessons/${lessonId}/quiz`,
@@ -189,11 +193,37 @@ export const lmsApi = {
     return data.data;
   },
 
-  updateProgress: async (courseId: string, lessonId: string): Promise<void> => {
+  // updateProgress: KPA/K-Cos 시그니처와 통일. completed 미지정 시 기존 GlycoPharm
+  // 동작(true 고정) 보존을 위해 default = true.
+  updateProgress: async (courseId: string, lessonId: string, completed: boolean = true): Promise<void> => {
     await api.post(`/lms/enrollments/${courseId}/progress`, {
       lessonId,
-      completed: true,
+      completed,
     });
+  },
+
+  // ─── deprecated alias (LMS-CLIENT-CONVENTION-V1 §4) ───────────────────────
+  // 기존 페이지 호환을 위해 유지. 신규 코드는 위의 표준 이름 사용.
+  // Phase 4 (V2 extraction) 후 페이지 마이그레이션이 끝나면 제거 예정.
+
+  /** @deprecated LMS-CLIENT-CONVENTION-V1: use `getCourse` instead. */
+  getCourseById(id: string): Promise<LmsCourse> {
+    return this.getCourse(id);
+  },
+
+  /** @deprecated LMS-CLIENT-CONVENTION-V1: use `getLessons` instead. */
+  getLessonsByCourse(courseId: string): Promise<LmsLesson[]> {
+    return this.getLessons(courseId);
+  },
+
+  /** @deprecated LMS-CLIENT-CONVENTION-V1: use `getEnrollmentByCourse` instead. */
+  getMyEnrollment(courseId: string): Promise<LmsEnrollment | null> {
+    return this.getEnrollmentByCourse(courseId);
+  },
+
+  /** @deprecated LMS-CLIENT-CONVENTION-V1: use `getQuizForLesson` instead. */
+  getLessonQuiz(lessonId: string): Promise<LmsQuiz | null> {
+    return this.getQuizForLesson(lessonId);
   },
 
   getMyCertificate: async (courseId: string): Promise<LmsCertificate | null> => {
