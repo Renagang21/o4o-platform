@@ -16,6 +16,7 @@
     "@o4o/ai-components": "workspace:*",
     "@o4o/auth-client": "workspace:*",
     "@o4o/auth-utils": "workspace:*",
+    "@o4o/lms-client": "workspace:*",
     "@o4o/operator-core": "workspace:*",
     "@o4o/store-asset-policy-core": "workspace:*",
     "@o4o/store-ui-core": "workspace:*",

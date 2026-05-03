@@ -1,0 +1,21 @@
+{
+  "name": "@o4o/lms-client",
+  "version": "1.0.0",
+  "description": "Shared LMS base types and partial client for O4O Platform — WO-O4O-LMS-CLIENT-EXTRACTION-V1-SCOPED. Step A+B only: base types + getInstructorCourses factory. Learner client extraction deferred until services align.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "npx tsc --build",
+    "type-check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "5.4.5"
+  }
+}

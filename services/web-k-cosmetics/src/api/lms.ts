@@ -2,6 +2,8 @@
  * LMS API Client — K-Cosmetics
  *
  * WO-KCOS-KPA-LMS-STEP1-ENABLE-V1 / WO-KCOS-KPA-LMS-STEP3-LESSON-PLAYER-V1
+ * WO-O4O-LMS-CLIENT-EXTRACTION-V1-SCOPED: getInstructorCourses 만 @o4o/lms-client factory 사용.
+ *   학습자 메서드는 향후 정렬 IR 후 추출 예정.
  *
  * KPA-Society lmsApi 구조 기준.
  * K-Cosmetics api(Axios) 래퍼를 사용하되, 호출 시그니처와 반환 타입은 KPA와 동일하게 유지한다.
@@ -9,6 +11,21 @@
  */
 
 import { api } from '../lib/apiClient';
+import {
+  createLmsInstructorClient,
+  type LmsHttpClient,
+  type LmsApiResponse,
+} from '@o4o/lms-client';
+
+// 공통 base 타입 re-export — 페이지가 @o4o/lms-client 를 직접 import 하지 않아도 되도록.
+export type {
+  LmsCourseBase,
+  LmsLessonBase,
+  LmsEnrollmentBase,
+  LmsCertificateBase,
+  LmsInstructorCourseBase,
+  LmsCourseStatus,
+} from '@o4o/lms-client';
 
 // ─── Types (KPA types 기준) ─────────────────────────────────────────────────
 
@@ -113,10 +130,19 @@ interface PaginatedResponse<T> {
   totalPages?: number;
 }
 
-interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-}
+// 백엔드 envelope — @o4o/lms-client 의 LmsApiResponse 와 호환. 기존 export 이름은 유지.
+type ApiResponse<T> = LmsApiResponse<T>;
+
+// ─── 공통 instructor client (WO-O4O-LMS-CLIENT-EXTRACTION-V1-SCOPED) ────────
+
+const lmsHttp: LmsHttpClient = {
+  get: async <T>(path: string, params?: Record<string, unknown>): Promise<T> => {
+    const { data } = await api.get<T>(path, { params });
+    return data;
+  },
+};
+
+const instructorClient = createLmsInstructorClient(lmsHttp);
 
 // ─── API ─────────────────────────────────────────────────────────────────────
 
@@ -135,10 +161,9 @@ export const lmsApi = {
   },
 
   // 강사 본인 강의 목록 (WO-KCOS-LMS-INSTRUCTOR-BOOTSTRAP-V1)
-  getInstructorCourses: async (): Promise<ApiResponse<LmsCourse[]>> => {
-    const { data } = await api.get<ApiResponse<LmsCourse[]>>('/lms/instructor/courses');
-    return data;
-  },
+  // WO-O4O-LMS-CLIENT-EXTRACTION-V1-SCOPED: 공통 factory 사용. 반환 형태는 기존과 동일.
+  getInstructorCourses: (): Promise<ApiResponse<LmsCourse[]>> =>
+    instructorClient.getCourses<LmsCourse>(),
 
   // 강의 상세
   getCourse: async (id: string): Promise<ApiResponse<LmsCourse>> => {

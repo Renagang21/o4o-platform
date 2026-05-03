@@ -2285,6 +2285,12 @@ importers:
         specifier: ^5.3.0
         version: 5.9.3
 
+  packages/lms-client:
+    devDependencies:
+      typescript:
+        specifier: 5.4.5
+        version: 5.4.5
+
   packages/lms-core:
     dependencies:
       '@o4o/education-extension':
@@ -3240,6 +3246,9 @@ importers:
       '@o4o/hub-core':
         specifier: workspace:*
         version: link:../../packages/hub-core
+      '@o4o/lms-client':
+        specifier: workspace:*
+        version: link:../../packages/lms-client
       '@o4o/operator-core':
         specifier: workspace:*
         version: link:../../packages/operator-core
@@ -3349,6 +3358,9 @@ importers:
       '@o4o/error-handling':
         specifier: workspace:*
         version: link:../../packages/error-handling
+      '@o4o/lms-client':
+        specifier: workspace:*
+        version: link:../../packages/lms-client
       '@o4o/operator-core':
         specifier: workspace:*
         version: link:../../packages/operator-core

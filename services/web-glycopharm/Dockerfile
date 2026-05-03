@@ -35,6 +35,7 @@ COPY packages/o4o-ai-components/package.json ./packages/o4o-ai-components/
 COPY packages/error-handling/package.json ./packages/error-handling/
 COPY packages/content-editor/package.json ./packages/content-editor/
 COPY packages/account-ui/package.json ./packages/account-ui/
+COPY packages/lms-client/package.json ./packages/lms-client/
 
 # Copy service package.json
 COPY services/web-glycopharm/package.json ./services/web-glycopharm/
@@ -62,6 +63,7 @@ COPY packages/o4o-ai-components/ ./packages/o4o-ai-components/
 COPY packages/error-handling/ ./packages/error-handling/
 COPY packages/content-editor/ ./packages/content-editor/
 COPY packages/account-ui/ ./packages/account-ui/
+COPY packages/lms-client/ ./packages/lms-client/
 
 # Copy service source
 COPY services/web-glycopharm/ ./services/web-glycopharm/
@@ -74,6 +76,7 @@ RUN pnpm --filter @o4o/ui build
 RUN pnpm --filter @o4o/account-ui build
 RUN pnpm --filter @o4o/content-editor build
 RUN pnpm --filter @o4o/utils build
+RUN pnpm --filter @o4o/lms-client build
 
 # Build-time environment variable for Vite
 ARG VITE_API_BASE_URL=https://api.neture.co.kr

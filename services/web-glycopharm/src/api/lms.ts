@@ -2,11 +2,28 @@
  * LMS API Client — GlycoPharm
  * WO-GLYCOPHARM-LMS-ROUTING-INTEGRATION-V1 / WO-GLYCOPHARM-COURSE-DETAIL-ENROLL-V1
  * WO-GLYCOPHARM-LESSON-QUIZ-LEARNING-V1
+ * WO-O4O-LMS-CLIENT-EXTRACTION-V1-SCOPED: getInstructorCourses 만 @o4o/lms-client factory 사용.
+ *   기존 학습자 메서드(unwrap 패턴 포함)는 그대로 유지.
  *
  * 전역 LMS 엔드포인트 /api/v1/lms/* 사용
  * kpaLmsScopeGuard는 GET 요청을 통과시킴 — 백엔드 변경 불필요
  */
 import { api } from '@/lib/apiClient';
+import {
+  createLmsInstructorClient,
+  type LmsHttpClient,
+  type LmsApiResponse,
+} from '@o4o/lms-client';
+
+// 공통 base 타입 re-export
+export type {
+  LmsCourseBase,
+  LmsLessonBase,
+  LmsEnrollmentBase,
+  LmsCertificateBase,
+  LmsInstructorCourseBase,
+  LmsCourseStatus,
+} from '@o4o/lms-client';
 
 export interface LmsCourse {
   id: string;
@@ -88,7 +105,23 @@ export interface LmsCertificate {
   userName?: string;
 }
 
+// ─── 공통 instructor client (WO-O4O-LMS-CLIENT-EXTRACTION-V1-SCOPED) ────────
+
+const lmsHttp: LmsHttpClient = {
+  get: async <T>(path: string, params?: Record<string, unknown>): Promise<T> => {
+    const { data } = await api.get<T>(path, { params });
+    return data;
+  },
+};
+
+const instructorClient = createLmsInstructorClient(lmsHttp);
+
 export const lmsApi = {
+  // 강사 본인 강의 목록. 페이지(InstructorDashboardPage)는 현재 api.get 직접 호출 중이며,
+  // 향후 정렬 작업에서 본 메서드로 마이그레이션한다 (이번 WO 범위 외).
+  getInstructorCourses: (): Promise<LmsApiResponse<LmsCourse[]>> =>
+    instructorClient.getCourses<LmsCourse>(),
+
   getCourses: async (params?: {
     search?: string;
     page?: number;
