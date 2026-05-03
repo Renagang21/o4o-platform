@@ -136,7 +136,7 @@
 | `Pagination` (operator-ux-core) | ✅ | 0 | 0 | KPA 전용 사용 |
 | `RoleGuard` / `OperatorRoute` | ✅ | ✅ | ✅ | 서비스 자체 구현 |
 
-### 4.2 문제점 #1 — **DataTable 이원화** (해결 필요)
+### 4.2 문제점 #1 — **DataTable 계층 분리 + 정책 확정 필요** (해소됨 — `OPERATOR-DATATABLE-POLICY-V1` 으로 정책 확정)
 
 | 항목 | `@o4o/operator-ux-core` `DataTable` | `@o4o/ui` `DataTable` |
 |---|---|---|
@@ -144,10 +144,11 @@
 | `system` / `onCellClick` 속성 | ✅ 있음 | ❌ 없음 |
 | `useBatchAction` 연동 | ✅ | ❌ |
 | 사용 서비스 | KPA 중심 | Glyco / K-Cos 중심 |
+| 패키지 관계 | **`@o4o/ui` BaseTable 을 wrap 한 상위 레이어** | 범용 UI 컴포넌트 (전 플랫폼) |
 
-→ 같은 이름의 컴포넌트가 패키지마다 다른 API. 신규 작업자가 어느 쪽 import 인지 매번 확인해야 함. 코드 컨텍스트 파편화.
+→ 두 DataTable 은 **경쟁 관계가 아니라 의도된 계층 분리**임이 IR-V1 에서 확정됨. operator-ux-core 가 ui 의 BaseTable 을 wrap 하여 Operator 도메인 전용 기능(batch action / action policy / system 컬럼)을 더한 상위 레이어.
 
-**정책**: 본 문서 발행 이후 신규 페이지는 **단일 표준 채택 후 작성**한다. 어느 쪽을 표준으로 할지 결정은 별도 IR(`IR-O4O-OPERATOR-DATATABLE-UNIFICATION-V1`) 진행. 즉흥적 한쪽 폐기 금지.
+**정책 (확정)**: Operator 페이지 표준 = `@o4o/operator-ux-core` `DataTable`. 비-Operator 페이지 = `@o4o/ui` `DataTable` 또는 `BaseTable`. 한 페이지에 두 DataTable 동시 import 금지. 상세는 [`OPERATOR-DATATABLE-POLICY-V1.md`](OPERATOR-DATATABLE-POLICY-V1.md) 참조.
 
 ### 4.3 문제점 #2 — **라우팅 구조 불일치**
 
@@ -177,8 +178,8 @@
 ### 6.1 이미 공통화된 영역
 `OperatorDashboardLayout` 5-Block, Forum Delete Requests / Analytics / Community Management, Signage HQ Console — 추가 작업 불필요. 신규 서비스 도입 시 그대로 사용.
 
-### 6.2 DataTable 이원화 (P0 문제)
-`@o4o/operator-ux-core` ↔ `@o4o/ui` 두 `DataTable` 병존. KPA 중심 vs Glyco/K-Cos 중심 사용. **본 문서 §4.2 정책에 따라 별도 통합 IR 필요**.
+### 6.2 DataTable 계층 분리 — 정책 확정 (P0 해소)
+`@o4o/operator-ux-core` 가 `@o4o/ui` BaseTable 을 wrap 한 의도된 계층 분리임이 `IR-O4O-OPERATOR-DATATABLE-UNIFICATION-V1` 에서 확정됨. 정책은 `OPERATOR-DATATABLE-POLICY-V1` 로 정전. Operator 페이지는 `@o4o/operator-ux-core` `DataTable` 표준, 그 외는 `@o4o/ui`.
 
 ### 6.3 라우팅 구조 불일치 (P1 문제)
 KPA만 `OperatorRoutes.tsx` 별도. Glyco/K-Cos는 App.tsx 인라인. 정리 가능하나 우선순위 낮음.
@@ -238,16 +239,10 @@ KPA만 `OperatorRoutes.tsx` 별도. Glyco/K-Cos는 App.tsx 인라인. 정리 가
 - Service Logic 주입 패턴 (Core UI + Service Logic 카테고리 처리법)
 - 패키지 의존도 / Dockerfile 영향 분석 (LMS V2 IMPACT 분석과 동일 깊이)
 
-### 8.2 병렬 — DataTable 통합 IR
-**`IR-O4O-OPERATOR-DATATABLE-UNIFICATION-V1`** 발행 권장.
+### 8.2 ✅ 완료 — DataTable 정책 확정
+`IR-O4O-OPERATOR-DATATABLE-UNIFICATION-V1` → `WO-O4O-OPERATOR-DATATABLE-POLICY-DOC-V1` 진행. 결과: `OPERATOR-DATATABLE-POLICY-V1` 정책 문서로 확정. 두 DataTable 은 통합 대상이 아닌 의도된 계층 분리 — Operator 페이지는 `@o4o/operator-ux-core` 표준, 비-Operator 는 `@o4o/ui` 표준.
 
-조사 항목:
-- `@o4o/operator-ux-core` `DataTable` 의 KPA 전용 기능 (`useBatchAction`, `defineActionPolicy`, `Pagination`) 의 다른 서비스 전이 가능성
-- `@o4o/ui` `DataTable` 가 위 기능을 흡수할 수 있는지
-- 통합 방향: 한쪽으로 흡수 vs 두 패키지 역할 분리 명확화
-- Operator Core 설계 IR 와 동시 진행 시 충돌 가능성
-
-→ 두 IR 결과가 모이면 본격 추출 WO 시작 가능.
+→ DataTable 표준이 결정되었으므로 §8.1 의 `IR-O4O-OPERATOR-CORE-DESIGN-V1` 진입 가능.
 
 ---
 

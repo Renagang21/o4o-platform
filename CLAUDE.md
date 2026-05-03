@@ -362,6 +362,7 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | **LMS Client Extraction V2 Impact** | `docs/architecture/LMS-CLIENT-EXTRACTION-V2-IMPACT.md` |
 | **LMS Client V2 Complete** | `docs/architecture/LMS-CLIENT-EXTRACTION-V2-COMPLETE.md` |
 | **Operator Integration State V1** | `docs/architecture/OPERATOR-INTEGRATION-STATE-V1.md` |
+| **Operator DataTable Policy V1** | `docs/architecture/OPERATOR-DATATABLE-POLICY-V1.md` |
 
 ---
 
