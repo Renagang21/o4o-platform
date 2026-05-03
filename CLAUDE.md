@@ -358,6 +358,7 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | **O4O Form Standard (Aspirational)** | `docs/baseline/O4O-FORM-STANDARD-BASELINE-V1.md` |
 | **APP-LMS Baseline** | `docs/architecture/APP-LMS-BASELINE.md` |
 | **LMS Scope Guard 설계** | `docs/architecture/LMS-SCOPE-GUARD.md` |
+| **LMS Client Convention V1** | `docs/architecture/LMS-CLIENT-CONVENTION-V1.md` |
 
 ---
 
