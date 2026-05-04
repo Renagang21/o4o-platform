@@ -10,7 +10,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
-import { lmsApi } from '../../api/lms';
+import { lmsApi, normalizeEnrollment } from '../../api/lms';
 import { useAuth } from '../../contexts/AuthContext';
 import type { LmsCourse, LmsLesson, LmsEnrollment } from '../../api/lms';
 
@@ -59,7 +59,9 @@ export default function LmsCourseDetailPage() {
       if (user) {
         try {
           const enrollmentRes = await lmsApi.getEnrollmentByCourse(id!);
-          setEnrollment((enrollmentRes as any).data?.enrollment ?? (enrollmentRes as any).data ?? null);
+          setEnrollment(normalizeEnrollment(
+            (enrollmentRes as any).data?.enrollment ?? (enrollmentRes as any).data
+          ));
         } catch {
           // 미시작 상태
         }
@@ -83,7 +85,9 @@ export default function LmsCourseDetailPage() {
     try {
       setEnrolling(true);
       const res = await lmsApi.enrollCourse(id!);
-      setEnrollment((res as any).data?.enrollment ?? (res as any).data ?? null);
+      setEnrollment(normalizeEnrollment(
+        (res as any).data?.enrollment ?? (res as any).data
+      ));
       toast.success('수강 등록이 완료되었습니다.');
     } catch {
       toast.error('수강 등록에 실패했습니다.');
@@ -173,7 +177,7 @@ export default function LmsCourseDetailPage() {
             <h2 style={S.sectionTitle}>레슨 목록</h2>
             <div style={{ display: 'flex', flexDirection: 'column' as const }}>
               {lessons.map((lesson, index) => {
-                const isCompleted = enrollment?.completedLessons?.includes(lesson.id);
+                const isCompleted = enrollment?.metadata?.completedLessonIds?.includes(lesson.id);
                 const canAccess = enrollment || lesson.isPreview;
 
                 return (

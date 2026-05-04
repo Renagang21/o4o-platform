@@ -66,11 +66,30 @@ export interface LmsEnrollment {
   userId: string;
   courseId: string;
   progress: number;
-  completedLessons: string[];
+  completedLessons: number; // count of completed lessons (DB INTEGER, not an array)
   startedAt: string;
   completedAt?: string;
   status?: string;
-  metadata?: { completedLessonIds: string[] };
+  metadata?: {
+    completedLessonIds?: string[]; // per-lesson completion tracking — use this for .includes() checks
+  };
+}
+
+// WO-O4O-LMS-CROSS-SERVICE-DATA-NORMALIZATION-V1
+// enrollment 응답 정규화 — DB의 completedLessons는 INTEGER(count),
+// per-lesson ID 배열은 metadata.completedLessonIds에 있음.
+export function normalizeEnrollment(raw: any): LmsEnrollment | null {
+  if (!raw) return null;
+  return {
+    ...raw,
+    completedLessons: typeof raw.completedLessons === 'number' ? raw.completedLessons : 0,
+    metadata: {
+      ...raw.metadata,
+      completedLessonIds: Array.isArray(raw?.metadata?.completedLessonIds)
+        ? raw.metadata.completedLessonIds
+        : [],
+    },
+  };
 }
 
 export interface LmsQuizQuestion {

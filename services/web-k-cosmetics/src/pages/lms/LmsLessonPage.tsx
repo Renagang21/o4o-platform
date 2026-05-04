@@ -11,7 +11,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { ContentRenderer } from '@o4o/content-editor';
-import { lmsApi } from '../../api/lms';
+import { lmsApi, normalizeEnrollment } from '../../api/lms';
 import type { LmsCourse, LmsLesson, LmsEnrollment, LmsQuiz, LmsQuizResult, LmsAssignment, LmsAssignmentSubmission, LmsLive } from '../../api/lms';
 import { aiApi, type AiAnalyzeResult } from '../../api/ai';
 
@@ -128,8 +128,9 @@ export default function LmsLessonPage() {
 
       try {
         const enrollmentRes = await lmsApi.getEnrollmentByCourse(courseId!);
-        const enrollmentData = (enrollmentRes as any).data?.enrollment ?? (enrollmentRes as any).data ?? null;
-        setEnrollment(enrollmentData);
+        setEnrollment(normalizeEnrollment(
+          (enrollmentRes as any).data?.enrollment ?? (enrollmentRes as any).data
+        ));
       } catch {
         // 미시작 상태
       }
@@ -191,7 +192,9 @@ export default function LmsLessonPage() {
 
     try {
       const res = await lmsApi.updateProgress(courseId, lessonId, true);
-      const updatedEnrollment = (res as any).data?.enrollment ?? (res as any).data ?? null;
+      const updatedEnrollment = normalizeEnrollment(
+        (res as any).data?.enrollment ?? (res as any).data
+      );
       setEnrollment(updatedEnrollment);
 
       // 다음 레슨으로 이동
@@ -201,9 +204,9 @@ export default function LmsLessonPage() {
         navigate(`/lms/course/${courseId}/lesson/${nextLesson.id}`);
       } else {
         // 마지막 레슨 완료 → 수료 모달
-        const isCourseDone = (updatedEnrollment as any)?.status === 'completed'
+        const isCourseDone = updatedEnrollment?.status === 'completed'
           || (updatedEnrollment as any)?.progressPercentage >= 100
-          || (updatedEnrollment as any)?.progress >= 100;
+          || (updatedEnrollment?.progress ?? 0) >= 100;
         if (isCourseDone) {
           setShowCompletionModal(true);
         } else {
@@ -246,8 +249,9 @@ export default function LmsLessonPage() {
           : '퀴즈를 통과했습니다!');
         try {
           const enrollmentRes = await lmsApi.getEnrollmentByCourse(courseId!);
-          const enrollmentData = (enrollmentRes as any).data?.enrollment ?? (enrollmentRes as any).data ?? null;
-          setEnrollment(enrollmentData);
+          setEnrollment(normalizeEnrollment(
+            (enrollmentRes as any).data?.enrollment ?? (enrollmentRes as any).data
+          ));
         } catch {
           // ignore
         }
@@ -340,13 +344,15 @@ export default function LmsLessonPage() {
       const lessonCompleted = (res as any).data?.lessonCompleted ?? false;
       try {
         const enrollmentRes = await lmsApi.getEnrollmentByCourse(courseId!);
-        const enrollmentData = (enrollmentRes as any).data?.enrollment ?? (enrollmentRes as any).data ?? null;
+        const enrollmentData = normalizeEnrollment(
+          (enrollmentRes as any).data?.enrollment ?? (enrollmentRes as any).data
+        );
         setEnrollment(enrollmentData);
 
         const isLast = lessons.findIndex(l => l.id === lessonId) === lessons.length - 1;
-        const isCourseDone = (enrollmentData as any)?.status === 'completed'
+        const isCourseDone = enrollmentData?.status === 'completed'
           || (enrollmentData as any)?.progressPercentage >= 100
-          || (enrollmentData as any)?.progress >= 100;
+          || (enrollmentData?.progress ?? 0) >= 100;
         if (isLast && lessonCompleted && isCourseDone) {
           setShowCompletionModal(true);
         }
@@ -377,13 +383,15 @@ export default function LmsLessonPage() {
 
       try {
         const enrollmentRes = await lmsApi.getEnrollmentByCourse(courseId!);
-        const enrollmentData = (enrollmentRes as any).data?.enrollment ?? (enrollmentRes as any).data ?? null;
+        const enrollmentData = normalizeEnrollment(
+          (enrollmentRes as any).data?.enrollment ?? (enrollmentRes as any).data
+        );
         setEnrollment(enrollmentData);
 
         const isLast = lessons.findIndex(l => l.id === lessonId) === lessons.length - 1;
-        const isCourseDone = (enrollmentData as any)?.status === 'completed'
+        const isCourseDone = enrollmentData?.status === 'completed'
           || (enrollmentData as any)?.progressPercentage >= 100
-          || (enrollmentData as any)?.progress >= 100;
+          || (enrollmentData?.progress ?? 0) >= 100;
         if (isLast && lessonCompleted && isCourseDone) {
           setShowCompletionModal(true);
         }
@@ -426,7 +434,7 @@ export default function LmsLessonPage() {
   const currentIndex = lessons.findIndex(l => l.id === lessonId);
   const prevLesson = currentIndex > 0 ? lessons[currentIndex - 1] : null;
   const nextLesson = currentIndex < lessons.length - 1 ? lessons[currentIndex + 1] : null;
-  const completedLessonIds: string[] = (enrollment as any)?.metadata?.completedLessonIds || [];
+  const completedLessonIds = enrollment?.metadata?.completedLessonIds ?? [];
   const isCompleted = completedLessonIds.includes(currentLesson.id);
   // WO-O4O-LMS-LESSON-TYPE-NORMALIZATION-V1: type is always lowercase
   const isQuizLesson = currentLesson.type === 'quiz' && quiz;
@@ -446,7 +454,7 @@ export default function LmsLessonPage() {
             {aiResult.summary && (
               <p style={{ fontSize: '14px', color: C.neutral800, whiteSpace: 'pre-wrap' as const }}>{aiResult.summary}</p>
             )}
-            {aiResult.insights.length > 0 && (
+            {(aiResult.insights ?? []).length > 0 && (
               <div>
                 <div style={{ fontSize: '13px', fontWeight: 600, color: C.neutral700, marginBottom: '6px' }}>인사이트</div>
                 <ul style={{ margin: 0, paddingLeft: '20px', color: C.neutral700 }}>
@@ -454,7 +462,7 @@ export default function LmsLessonPage() {
                 </ul>
               </div>
             )}
-            {aiResult.recommendations.length > 0 && (
+            {(aiResult.recommendations ?? []).length > 0 && (
               <div>
                 <div style={{ fontSize: '13px', fontWeight: 600, color: C.neutral700, marginBottom: '6px' }}>추천</div>
                 <ul style={{ margin: 0, paddingLeft: '20px', color: C.neutral700 }}>

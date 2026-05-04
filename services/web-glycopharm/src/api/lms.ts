@@ -44,6 +44,29 @@ export interface LmsEnrollment {
   userId: string;
   status: string;
   enrolledAt: string;
+  // Extended fields (returned by some endpoints)
+  progress?: number;
+  completedLessons?: number; // count (DB INTEGER) — never treat as array
+  metadata?: {
+    completedLessonIds?: string[]; // per-lesson IDs — use this for .includes() checks
+  };
+}
+
+// WO-O4O-LMS-CROSS-SERVICE-DATA-NORMALIZATION-V1
+// enrollment 응답 정규화 유틸. GlycoPharm은 현재 completedLessons를 직접 사용하지 않으나,
+// 향후 확장 및 API 변경에 대비해 동일 패턴 유지.
+export function normalizeEnrollment(raw: any): LmsEnrollment | null {
+  if (!raw) return null;
+  return {
+    ...raw,
+    completedLessons: typeof raw.completedLessons === 'number' ? raw.completedLessons : 0,
+    metadata: {
+      ...raw.metadata,
+      completedLessonIds: Array.isArray(raw?.metadata?.completedLessonIds)
+        ? raw.metadata.completedLessonIds
+        : [],
+    },
+  };
 }
 
 export interface LmsCoursesResult {
