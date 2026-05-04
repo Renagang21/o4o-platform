@@ -84,6 +84,9 @@ export function StoreUseModal({ open, onClose, editor }: StoreUseModalProps) {
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
   const [resultView, setResultView] = useState<'preview' | 'text'>('preview');
+  const [saving, setSaving] = useState(false);
+  const [savedAssetId, setSavedAssetId] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState('');
 
   if (!open) return null;
 
@@ -155,10 +158,51 @@ export function StoreUseModal({ open, onClose, editor }: StoreUseModalProps) {
     }
   }
 
+  async function handleSaveAsAsset() {
+    if (!result) return;
+    setSaving(true);
+    setSaveError('');
+    setSavedAssetId(null);
+
+    const title = result.title || `AI 생성 ${USE_CASE_CONFIG.find((c) => c.key === useCase)?.label ?? ''}`;
+    const description = result.summary || result.plainText.slice(0, 200);
+
+    try {
+      const resp = await fetch(`${API_BASE_URL}/api/v1/kpa/store/assets`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          title,
+          description,
+          assetType: 'content',
+          htmlContent: result.html,
+          usageType: useCase,
+          sourceType: 'generated',
+        }),
+      });
+
+      const data = await resp.json();
+
+      if (!resp.ok || !data.success) {
+        setSaveError(data.error || '저장 중 오류가 발생했습니다.');
+        return;
+      }
+
+      setSavedAssetId(data.data?.id ?? data.id ?? '');
+    } catch {
+      setSaveError('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+    } finally {
+      setSaving(false);
+    }
+  }
+
   function handleClose() {
     setResult(null);
     setError('');
     setCopied(false);
+    setSavedAssetId(null);
+    setSaveError('');
     onClose();
   }
 
@@ -361,24 +405,81 @@ export function StoreUseModal({ open, onClose, editor }: StoreUseModalProps) {
               </div>
             )}
 
-            {/* 복사 버튼 */}
-            <button
-              onClick={handleCopy}
-              style={{
-                marginTop: '12px',
-                width: '100%',
-                padding: '10px',
-                background: copied ? '#16a34a' : '#f3f4f6',
-                color: copied ? 'white' : '#374151',
-                border: '1px solid #e5e7eb',
+            {/* 복사 + 저장 버튼 */}
+            <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+              <button
+                onClick={handleCopy}
+                style={{
+                  flex: 1,
+                  padding: '10px',
+                  background: copied ? '#16a34a' : '#f3f4f6',
+                  color: copied ? 'white' : '#374151',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                {copied ? '✅ 복사됨!' : '📋 복사'}
+              </button>
+              <button
+                onClick={handleSaveAsAsset}
+                disabled={saving || !!savedAssetId}
+                style={{
+                  flex: 1,
+                  padding: '10px',
+                  background: savedAssetId ? '#16a34a' : saving ? '#d1fae5' : '#ecfdf5',
+                  color: savedAssetId ? 'white' : saving ? '#059669' : '#059669',
+                  border: `1px solid ${savedAssetId ? '#16a34a' : '#6ee7b7'}`,
+                  borderRadius: '8px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: saving || !!savedAssetId ? 'not-allowed' : 'pointer',
+                }}
+              >
+                {savedAssetId ? '✅ 저장됨!' : saving ? '저장 중...' : '💾 실행 자산으로 저장'}
+              </button>
+            </div>
+
+            {/* 저장 에러 */}
+            {saveError && (
+              <div style={{
+                marginTop: '8px',
+                padding: '10px 12px',
+                background: '#fef2f2',
+                border: '1px solid #fecaca',
                 borderRadius: '8px',
-                fontSize: '13px',
-                fontWeight: 600,
-                cursor: 'pointer',
-              }}
-            >
-              {copied ? '✅ 복사됨!' : '📋 복사'}
-            </button>
+                color: '#dc2626',
+                fontSize: '12px',
+              }}>
+                {saveError}
+              </div>
+            )}
+
+            {/* 저장 성공 안내 */}
+            {savedAssetId && (
+              <div style={{
+                marginTop: '8px',
+                padding: '10px 12px',
+                background: '#f0fdf4',
+                border: '1px solid #bbf7d0',
+                borderRadius: '8px',
+                fontSize: '12px',
+                color: '#166534',
+              }}>
+                <div style={{ fontWeight: 600, marginBottom: '4px' }}>실행 자산으로 저장됐습니다.</div>
+                <div style={{ color: '#4b7c61', fontFamily: 'monospace', fontSize: '11px', marginBottom: '6px' }}>
+                  ID: {savedAssetId}
+                </div>
+                <div style={{ color: '#4b7c61' }}>
+                  {useCase === 'qr' && 'QR 코드 생성 시 이 자산을 libraryItemId로 연결할 수 있습니다.'}
+                  {useCase === 'pop' && 'POP 생성 시 libraryItemIds에 이 자산 ID를 포함해 사용할 수 있습니다.'}
+                  {useCase === 'sns' && 'SNS 게시용 자산이 저장됐습니다. 매장 자산 관리에서 확인할 수 있습니다.'}
+                  {useCase === 'blog' && '매장 설명문 자산이 저장됐습니다. 매장 자산 관리에서 확인할 수 있습니다.'}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
