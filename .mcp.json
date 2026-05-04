@@ -1,13 +1,8 @@
 {
   "mcpServers": {
     "playwright": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@playwright/mcp@0.0.30",
-        "--headless",
-        "--isolated"
-      ]
+      "command": "C:\\nvm4w\\nodejs\\node.exe",
+      "args": ["C:\\Users\\home\\AppData\\Roaming\\npm\\node_modules\\@playwright\\mcp\\cli.js"]
     }
   }
 }
