@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 import { YaksaCommunity, CommunityType } from '../entities/YaksaCommunity.js';
 import { YaksaCommunityMember, CommunityMemberRole } from '../entities/YaksaCommunityMember.js';
-import type { ForumPost } from '@o4o/forum-core';
+import { type ForumPost, PostStatus, PostType } from '@o4o/forum-core';
 import { normalizeContent } from '@o4o/forum-core';
 
 /**
@@ -361,38 +361,38 @@ export class YaksaCommunityService {
     }
 
     // Determine post status based on requireApproval setting
-    const status = community.requireApproval ? 'pending' : 'publish';
+    const status: PostStatus = community.requireApproval ? PostStatus.PENDING : PostStatus.PUBLISHED;
     const publishedAt = community.requireApproval ? null : new Date();
 
     // Create the forum post with Yaksa metadata
     // Normalize content to Block[] format
     const normalizedContent = normalizeContent(data.content);
 
-    // WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1 이후 ForumPost.categoryId 컬럼 제거됨.
-    // yaksa community 의 categoryId 의미는 forum-yaksa 의 stale 영역으로 별도 cleanup WO 필요.
-    // type-check 만 통과시키기 위해 as any 사용 — 런타임 동작 변경 없음.
+    // WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1: ForumPost.categoryId column 이 Core 에서 제거됨.
+    // yaksa community post 의 categoryId 는 metadata.extensions.yaksa.categoryId 로 이전 —
+    // extension 영역의 도메인 식별자는 metadata 에 저장하는 표준 패턴 따름.
     const post = this.forumPostRepository.create({
       title: data.title,
       content: normalizedContent,
       authorId: data.userId,
-      categoryId: data.categoryId,
-      type: data.type as any || 'discussion',
+      type: (data.type as PostType) || PostType.DISCUSSION,
       tags: data.tags,
-      status: status as any,
+      status,
       slug: this.generateSlug(data.title),
       metadata: {
         extensions: {
           yaksa: {
             communityId: data.communityId,
+            categoryId: data.categoryId,
             isAnnouncement: data.isAnnouncement || false,
           },
         },
       },
-      publishedAt: publishedAt as any,
-    } as any);
+      publishedAt: publishedAt ?? undefined,
+    });
 
     const savedPost = await this.forumPostRepository.save(post);
-    return savedPost as any;
+    return savedPost;
   }
 
   /**
