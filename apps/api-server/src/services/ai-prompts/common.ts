@@ -51,6 +51,16 @@ export function buildToneInstruction(
       professional: '신뢰감 있고 전문적인 느낌의 제목을 추천하세요.',
       concise: '짧고 임팩트 있는 제목을 추천하세요.',
     },
+    store_qr: {
+      easy: '고객이 쉽게 이해할 수 있도록 쉬운 말로 안내하세요.',
+      professional: '신뢰감 있고 정확한 어조로 안내하세요.',
+      promotion: '매장 방문을 유도하는 홍보형 어조로 안내하세요.',
+    },
+    store_sns: {
+      easy: '누구나 공감할 수 있는 쉽고 친근한 말투로 작성하세요.',
+      professional: '정보 전달이 명확한 전문적인 어조로 작성하세요.',
+      promotion: '공유와 참여를 유도하는 홍보형 어조로 작성하세요.',
+    },
   };
 
   return map[outputType]?.[tone] ?? '';

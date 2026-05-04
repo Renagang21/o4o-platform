@@ -28,9 +28,11 @@ import {
   Minus,
   Highlighter,
   Sparkles,
+  ShoppingBag,
 } from 'lucide-react';
 import type { EditorPreset } from '../types';
 import { AiContentModal } from './AiContentModal';
+import { StoreUseModal } from './StoreUseModal';
 
 interface ExistingImage {
   id: string;
@@ -51,6 +53,7 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
   const [showVideoInput, setShowVideoInput] = useState(false);
   const [showImageInput, setShowImageInput] = useState(false);
   const [showAiModal, setShowAiModal] = useState(false);
+  const [showStoreModal, setShowStoreModal] = useState(false);
   const [linkUrl, setLinkUrl] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
   const [imageUrl, setImageUrl] = useState('');
@@ -561,7 +564,7 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
         </div>
       )}
 
-      {/* AI 정리 버튼 (full only) — WO-AI-CONTENT-TRANSFORM-IMPLEMENTATION-V1 */}
+      {/* AI 정리 + 매장 활용 버튼 (full only) — WO-AI-CONTENT-TRANSFORM-IMPLEMENTATION-V1, WO-O4O-STORE-USE-CONTENT-TRANSFORM-V1 */}
       {preset === 'full' && (
         <>
           <Divider />
@@ -586,6 +589,28 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
           >
             <Sparkles size={14} />
             AI 정리
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowStoreModal(true)}
+            title="매장에서 활용 (QR 안내문 / POP / SNS / 블로그)"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              padding: '4px 10px',
+              border: '1px solid #bbf7d0',
+              borderRadius: '6px',
+              background: '#f0fdf4',
+              color: '#16a34a',
+              fontSize: '12px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <ShoppingBag size={14} />
+            매장 활용
           </button>
         </>
       )}
@@ -669,6 +694,12 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
     <AiContentModal
       open={showAiModal}
       onClose={() => setShowAiModal(false)}
+      editor={editor}
+    />
+    {/* 매장 활용 변환 모달 */}
+    <StoreUseModal
+      open={showStoreModal}
+      onClose={() => setShowStoreModal(false)}
       editor={editor}
     />
     </>

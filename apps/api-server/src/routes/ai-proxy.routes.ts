@@ -566,4 +566,142 @@ router.post('/url-to-blocks', authenticate, async (req, res: Response) => {
   }
 });
 
+// ===========================================
+// POST /api/ai/content-to-store-use — 콘텐츠 → 매장 활용 변환
+// WO-O4O-STORE-USE-CONTENT-TRANSFORM-V1
+//
+// sourceHtml의 텍스트를 추출하여 useCase에 맞는 매장 활용 문구로 변환한다.
+// useCase: 'qr' | 'pop' | 'sns' | 'blog'
+// audience: 'customer' | 'staff' | 'store_owner'
+// tone: 'easy' | 'professional' | 'promotion'
+// length: 'short' | 'medium'
+// ===========================================
+
+/** HTML에서 순수 텍스트 추출 (간단 strip) */
+function htmlToPlainText(html: string): string {
+  return html
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n')
+    .replace(/<\/li>/gi, '\n')
+    .replace(/<[^>]*>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+/** useCase → OutputType 매핑 */
+type StoreUseCase = 'qr' | 'pop' | 'sns' | 'blog';
+
+function useCaseToOutputType(useCase: StoreUseCase): string {
+  switch (useCase) {
+    case 'qr': return 'store_qr';
+    case 'pop': return 'pop';
+    case 'sns': return 'store_sns';
+    case 'blog': return 'blog';
+  }
+}
+
+/** audience 매핑 (WO API → 내부 프롬프트 옵션) */
+function mapAudience(audience: string): string {
+  switch (audience) {
+    case 'customer': return 'pharmacy';
+    case 'staff': return 'operator';
+    case 'store_owner': return 'operator';
+    default: return 'general';
+  }
+}
+
+router.post('/content-to-store-use', authenticate, async (req, res: Response) => {
+  const authReq = req as AuthRequest;
+  const userId = authReq.user?.id;
+
+  if (!userId) {
+    return res.status(401).json({ success: false, error: '로그인이 필요합니다.' });
+  }
+
+  const {
+    sourceHtml,
+    useCase,
+    audience = 'customer',
+    tone = 'easy',
+    length = 'short',
+  } = req.body;
+
+  if (!sourceHtml || typeof sourceHtml !== 'string' || sourceHtml.trim().length === 0) {
+    return res.status(400).json({ success: false, error: 'sourceHtml이 필요합니다.' });
+  }
+
+  const validUseCases: StoreUseCase[] = ['qr', 'pop', 'sns', 'blog'];
+  if (!validUseCases.includes(useCase)) {
+    return res.status(400).json({ success: false, error: `useCase는 ${validUseCases.join(', ')} 중 하나여야 합니다.` });
+  }
+
+  const plainText = htmlToPlainText(sourceHtml);
+  if (plainText.length < 10) {
+    return res.status(400).json({ success: false, error: '콘텐츠 내용이 너무 짧습니다. 본문을 먼저 작성해 주세요.' });
+  }
+
+  const outputType = useCaseToOutputType(useCase as StoreUseCase);
+
+  if (!isSupportedOutputType(outputType)) {
+    return res.status(400).json({ success: false, error: `지원하지 않는 useCase: ${useCase}` });
+  }
+
+  const internalAudience = mapAudience(audience);
+  const options = { tone, length, audience: internalAudience };
+  const systemPrompt = buildSystemPrompt(outputType, options);
+  const userPrompt = buildUserPrompt(outputType, plainText);
+  const requestId = crypto.randomUUID();
+
+  try {
+    const rawResponse = await aiProxyService.generateRawContent(
+      {
+        provider: 'gemini',
+        model: 'gemini-2.5-flash',
+        systemPrompt,
+        userPrompt,
+        temperature: 0.5,
+        maxTokens: 2048,
+      },
+      userId,
+      requestId,
+    );
+
+    const normalized = parseResponse(outputType, rawResponse.parsed, rawResponse.rawText);
+    const resultPlainText = normalized.html
+      ? htmlToPlainText(normalized.html)
+      : normalized.longText || normalized.shortText || normalized.summary || '';
+
+    logger.info('AI content-to-store-use generated', { requestId, userId, useCase, outputType, model: rawResponse.model });
+
+    return res.json({
+      success: true,
+      html: normalized.html,
+      plainText: resultPlainText,
+      title: normalized.title,
+      summary: normalized.summary,
+      shortText: normalized.shortText,
+      longText: normalized.longText,
+      bullets: normalized.bullets,
+      requestId,
+    });
+  } catch (error: any) {
+    const status = error.type === 'RATE_LIMIT_ERROR' ? 429
+                 : error.type === 'AUTH_ERROR' ? 401
+                 : error.type === 'VALIDATION_ERROR' ? 400
+                 : error.type === 'TIMEOUT_ERROR' ? 504
+                 : 500;
+    logger.error('AI content-to-store-use error', { requestId, error: error.message, type: error.type });
+    return res.status(status).json({
+      success: false,
+      error: error.message || 'AI 매장 활용 변환 중 오류가 발생했습니다.',
+      requestId,
+    });
+  }
+});
+
 export default router;

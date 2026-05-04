@@ -40,13 +40,25 @@ export {
   parseTitleSuggestResponse,
 } from './titleSuggest.js';
 
+export {
+  buildStoreQrSystemPrompt,
+  buildStoreQrUserPrompt,
+  parseStoreQrResponse,
+} from './storeQr.js';
+
+export {
+  buildStoreSnsSystemPrompt,
+  buildStoreSnsUserPrompt,
+  parseStoreSnsResponse,
+} from './storeSns.js';
+
 // ---------------------------------------------------------------------------
 // 지원 outputType 목록 및 builder 디스패처
 // ---------------------------------------------------------------------------
 
-export type OutputType = 'product_detail' | 'blog' | 'pop' | 'summary' | 'title_suggest';
+export type OutputType = 'product_detail' | 'blog' | 'pop' | 'summary' | 'title_suggest' | 'store_qr' | 'store_sns';
 
-export const SUPPORTED_OUTPUT_TYPES: OutputType[] = ['product_detail', 'blog', 'pop', 'summary', 'title_suggest'];
+export const SUPPORTED_OUTPUT_TYPES: OutputType[] = ['product_detail', 'blog', 'pop', 'summary', 'title_suggest', 'store_qr', 'store_sns'];
 
 export function isSupportedOutputType(value: string): value is OutputType {
   return SUPPORTED_OUTPUT_TYPES.includes(value as OutputType);
@@ -61,6 +73,8 @@ import { buildBlogSystemPrompt, buildBlogUserPrompt, parseBlogResponse } from '.
 import { buildPopSystemPrompt, buildPopUserPrompt, parsePopResponse } from './pop.js';
 import { buildSummarySystemPrompt, buildSummaryUserPrompt, parseSummaryResponse } from './summary.js';
 import { buildTitleSuggestSystemPrompt, buildTitleSuggestUserPrompt, parseTitleSuggestResponse } from './titleSuggest.js';
+import { buildStoreQrSystemPrompt, buildStoreQrUserPrompt, parseStoreQrResponse } from './storeQr.js';
+import { buildStoreSnsSystemPrompt, buildStoreSnsUserPrompt, parseStoreSnsResponse } from './storeSns.js';
 import type { NormalizedAiContentResponse } from './common.js';
 
 interface PromptOptions {
@@ -84,6 +98,10 @@ export function buildSystemPrompt(outputType: OutputType, options: PromptOptions
       return buildSummarySystemPrompt(options);
     case 'title_suggest':
       return buildTitleSuggestSystemPrompt(options);
+    case 'store_qr':
+      return buildStoreQrSystemPrompt(options);
+    case 'store_sns':
+      return buildStoreSnsSystemPrompt(options);
   }
 }
 
@@ -102,6 +120,10 @@ export function buildUserPrompt(outputType: OutputType, input: string): string {
       return buildSummaryUserPrompt(input);
     case 'title_suggest':
       return buildTitleSuggestUserPrompt(input);
+    case 'store_qr':
+      return buildStoreQrUserPrompt(input);
+    case 'store_sns':
+      return buildStoreSnsUserPrompt(input);
   }
 }
 
@@ -130,6 +152,12 @@ export function parseResponse(
       break;
     case 'title_suggest':
       partial = parseTitleSuggestResponse(parsed, rawText);
+      break;
+    case 'store_qr':
+      partial = parseStoreQrResponse(parsed, rawText);
+      break;
+    case 'store_sns':
+      partial = parseStoreSnsResponse(parsed, rawText);
       break;
   }
 
