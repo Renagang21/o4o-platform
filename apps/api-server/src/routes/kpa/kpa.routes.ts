@@ -144,6 +144,7 @@ import { CourseService } from '../../modules/lms/services/CourseService.js';
 import { CreditController } from '../../modules/credit/controllers/CreditController.js';
 // WO-O4O-COMPLETION-V1
 import { CompletionController } from '../../modules/lms/controllers/CompletionController.js';
+import { requireEnrollment } from '../../modules/lms/middleware/requireEnrollment.js';
 
 /**
  * KPA Scope Guard — powered by @o4o/security-core
@@ -526,10 +527,14 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   lmsRouter.get('/courses/:id', optionalAuth, asyncHandler(CourseController.getCourse));
   lmsRouter.get('/courses/:courseId/lessons', optionalAuth, asyncHandler(LessonController.listLessonsByCourse));
 
+  // Lesson detail (authenticated + enrollment check)
+  lmsRouter.get('/lessons/:id', authenticate, requireEnrollment({ checkLesson: true }), asyncHandler(LessonController.getLesson));
+
   // Enrollments (authenticated)
   lmsRouter.get('/enrollments', authenticate, asyncHandler(EnrollmentController.getMyEnrollments));
   lmsRouter.get('/enrollments/:courseId', authenticate, asyncHandler(EnrollmentController.getEnrollment));
   lmsRouter.post('/courses/:courseId/enroll', authenticate, asyncHandler(EnrollmentController.enrollCourse));
+  lmsRouter.post('/enrollments/:courseId/progress', authenticate, asyncHandler(EnrollmentController.updateLessonProgress));
 
   // Certificates
   lmsRouter.get('/certificates', authenticate, asyncHandler(CertificateController.getMyCertificates));
