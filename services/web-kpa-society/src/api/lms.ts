@@ -178,6 +178,24 @@ export const lmsApi = {
     apiClient.post<ApiResponse<{ course: Course }>>(`/lms/operator/courses/${id}/reject`, { reason }),
 };
 
+// WO-O4O-LMS-FRONT-DATA-NORMALIZATION-V1
+// enrollment 응답 정규화 — DB의 completedLessons는 INTEGER(count),
+// per-lesson ID 배열은 metadata.completedLessonIds에 있음.
+// 양쪽 필드를 항상 올바른 타입으로 보정한다.
+export function normalizeEnrollment(raw: any): Enrollment | null {
+  if (!raw) return null;
+  return {
+    ...raw,
+    completedLessons: typeof raw.completedLessons === 'number' ? raw.completedLessons : 0,
+    metadata: {
+      ...raw.metadata,
+      completedLessonIds: Array.isArray(raw?.metadata?.completedLessonIds)
+        ? raw.metadata.completedLessonIds
+        : [],
+    },
+  };
+}
+
 // WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1
 export interface AssignmentLearner {
   id: string;

@@ -9,6 +9,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { lmsApi, aiApi, type AiAnalyzeResult } from '../../api';
+import { normalizeEnrollment } from '../../api/lms';
 import type { AssignmentLearner, AssignmentSubmission, LiveLesson } from '../../api/lms';
 import { colors, typography } from '../../styles/theme';
 import type { Course, Lesson, Enrollment, Quiz, QuizResult } from '../../types';
@@ -140,8 +141,9 @@ export function LmsLessonPage() {
 
       try {
         const enrollmentRes = await lmsApi.getEnrollmentByCourse(courseId!);
-        const enrollmentData = (enrollmentRes as any).data?.enrollment ?? (enrollmentRes as any).data ?? null;
-        setEnrollment(enrollmentData);
+        setEnrollment(normalizeEnrollment(
+          (enrollmentRes as any).data?.enrollment ?? (enrollmentRes as any).data
+        ));
       } catch {
         // 미시작 상태
       }
@@ -225,7 +227,9 @@ export function LmsLessonPage() {
     try {
       const res = await lmsApi.updateProgress(courseId, lessonId, true, metrics);
       // WO-O4O-LMS-ROUTING-INTEGRATION-FIX-V1: extract enrollment from nested response
-      const updatedEnrollment = (res as any).data?.enrollment ?? (res as any).data ?? null;
+      const updatedEnrollment = normalizeEnrollment(
+        (res as any).data?.enrollment ?? (res as any).data
+      );
       setEnrollment(updatedEnrollment);
 
       // 다음 레슨으로 이동
@@ -235,9 +239,9 @@ export function LmsLessonPage() {
         navigate(`/lms/course/${courseId}/lesson/${nextLesson.id}`);
       } else {
         // WO-LMS-COMPLETION-AND-CERTIFICATE-UX-REFINEMENT-V1: 마지막 레슨 완료 → 수료 모달
-        const isCourseDone = (updatedEnrollment as any)?.status === 'completed'
+        const isCourseDone = updatedEnrollment?.status === 'completed'
           || (updatedEnrollment as any)?.progressPercentage >= 100
-          || (updatedEnrollment as any)?.progress >= 100;
+          || (updatedEnrollment?.progress ?? 0) >= 100;
         if (isCourseDone) {
           setShowCompletionModal(true);
         } else {
@@ -301,8 +305,9 @@ export function LmsLessonPage() {
         // Reload enrollment to reflect progress
         try {
           const enrollmentRes = await lmsApi.getEnrollmentByCourse(courseId!);
-          const enrollmentData = (enrollmentRes as any).data?.enrollment ?? (enrollmentRes as any).data ?? null;
-          setEnrollment(enrollmentData);
+          setEnrollment(normalizeEnrollment(
+            (enrollmentRes as any).data?.enrollment ?? (enrollmentRes as any).data
+          ));
         } catch {
           // ignore
         }
@@ -352,7 +357,7 @@ export function LmsLessonPage() {
           type: q.type,
           options: q.options,
         })),
-        userAnswers: quizResult.answers.map((a) => ({
+        userAnswers: (quizResult.answers ?? []).map((a) => ({
           questionId: a.questionId,
           // submitted answer lives in local state (response strips it when showCorrectAnswers=false)
           answer: (selectedAnswers[a.questionId] ?? '') as any,
@@ -400,13 +405,15 @@ export function LmsLessonPage() {
       // 3) enrollment refresh
       try {
         const enrollmentRes = await lmsApi.getEnrollmentByCourse(courseId!);
-        const enrollmentData = (enrollmentRes as any).data?.enrollment ?? (enrollmentRes as any).data ?? null;
+        const enrollmentData = normalizeEnrollment(
+          (enrollmentRes as any).data?.enrollment ?? (enrollmentRes as any).data
+        );
         setEnrollment(enrollmentData);
 
         const isLast = lessons.findIndex(l => l.id === lessonId) === lessons.length - 1;
-        const isCourseDone = (enrollmentData as any)?.status === 'completed'
+        const isCourseDone = enrollmentData?.status === 'completed'
           || (enrollmentData as any)?.progressPercentage >= 100
-          || (enrollmentData as any)?.progress >= 100;
+          || (enrollmentData?.progress ?? 0) >= 100;
         if (isLast && lessonCompleted && isCourseDone) {
           setShowCompletionModal(true);
         }
@@ -438,14 +445,16 @@ export function LmsLessonPage() {
       // refresh enrollment so progress bar / completed marks update
       try {
         const enrollmentRes = await lmsApi.getEnrollmentByCourse(courseId!);
-        const enrollmentData = (enrollmentRes as any).data?.enrollment ?? (enrollmentRes as any).data ?? null;
+        const enrollmentData = normalizeEnrollment(
+          (enrollmentRes as any).data?.enrollment ?? (enrollmentRes as any).data
+        );
         setEnrollment(enrollmentData);
 
         // last lesson + course done → completion modal
         const isLast = lessons.findIndex(l => l.id === lessonId) === lessons.length - 1;
-        const isCourseDone = (enrollmentData as any)?.status === 'completed'
+        const isCourseDone = enrollmentData?.status === 'completed'
           || (enrollmentData as any)?.progressPercentage >= 100
-          || (enrollmentData as any)?.progress >= 100;
+          || (enrollmentData?.progress ?? 0) >= 100;
         if (isLast && lessonCompleted && isCourseDone) {
           setShowCompletionModal(true);
         }
@@ -479,9 +488,7 @@ export function LmsLessonPage() {
   const currentIndex = lessons.findIndex(l => l.id === lessonId);
   const prevLesson = currentIndex > 0 ? lessons[currentIndex - 1] : null;
   const nextLesson = currentIndex < lessons.length - 1 ? lessons[currentIndex + 1] : null;
-  // WO-O4O-LMS-ROUTING-INTEGRATION-FIX-V1: completedLessons is a count (number), not array
-  // Use metadata.completedLessonIds for per-lesson completion tracking
-  const completedLessonIds: string[] = (enrollment as any)?.metadata?.completedLessonIds || [];
+  const completedLessonIds = enrollment?.metadata?.completedLessonIds ?? [];
   const isCompleted = completedLessonIds.includes(currentLesson.id);
   // WO-O4O-LMS-LESSON-TYPE-NORMALIZATION-V1: type is always lowercase
   const isQuizLesson = currentLesson.type === 'quiz' && quiz;

@@ -10,7 +10,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
-import { lmsApi } from '../../api';
+import { lmsApi, normalizeEnrollment } from '../../api/lms';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 import type { Course, Lesson, Enrollment } from '../../types';
@@ -57,7 +57,9 @@ export function LmsCourseDetailPage() {
       if (user) {
         try {
           const enrollmentRes = await lmsApi.getEnrollmentByCourse(id!);
-          setEnrollment((enrollmentRes as any).data?.enrollment ?? (enrollmentRes as any).data ?? null);
+          setEnrollment(normalizeEnrollment(
+            (enrollmentRes as any).data?.enrollment ?? (enrollmentRes as any).data
+          ));
         } catch {
           // 미시작 상태
         }
@@ -89,7 +91,9 @@ export function LmsCourseDetailPage() {
     try {
       setEnrolling(true);
       const res = await lmsApi.enrollCourse(id!);
-      setEnrollment((res as any).data?.enrollment ?? (res as any).data ?? null);
+      setEnrollment(normalizeEnrollment(
+        (res as any).data?.enrollment ?? (res as any).data
+      ));
       toast.success('시작 등록이 완료되었습니다.');
     } catch (err) {
       toast.error('시작 등록에 실패했습니다.');
@@ -192,8 +196,7 @@ export function LmsCourseDetailPage() {
             <h2 style={styles.sectionTitle}>순서 목록</h2>
             <div style={styles.lessonList}>
               {lessons.map((lesson, index) => {
-                // completedLessons is a count (number), not array — IDs are in metadata
-                const completedLessonIds: string[] = (enrollment as any)?.metadata?.completedLessonIds || [];
+                const completedLessonIds = enrollment?.metadata?.completedLessonIds ?? [];
                 const isCompleted = completedLessonIds.includes(lesson.id);
                 const canAccess = enrollment || lesson.isPreview;
 
@@ -247,9 +250,9 @@ export function LmsCourseDetailPage() {
                     <p style={styles.progressText}>진도율: {enrollment.progress}%</p>
                     {/* WO-KPA-LMS-UX-QUICK-WINS-V1 */}
                     <p style={{ fontSize: '12px', color: '#94a3b8', textAlign: 'center' as const, marginBottom: '8px' }}>
-                      {(enrollment as any).completedLessons ?? 0} / {lessons.length} 레슨 완료
+                      {enrollment.completedLessons} / {lessons.length} 레슨 완료
                     </p>
-                    {(enrollment as any).status === 'completed' && (
+                    {enrollment.status === 'completed' && (
                       <Link to="/mypage/certificates" style={styles.certButton}>수료증 보기</Link>
                     )}
                   </>
@@ -257,7 +260,7 @@ export function LmsCourseDetailPage() {
               </div>
             ) : enrollment ? (
               // WO-LMS-COMPLETION-AND-CERTIFICATE-UX-REFINEMENT-V1
-              (enrollment as any).status === 'completed' ? (
+              enrollment.status === 'completed' ? (
                 <div style={styles.enrolledInfo}>
                   <div style={styles.completedBadge}>수료 완료</div>
                   <p style={styles.progressText}>진도율: 100%</p>
@@ -281,7 +284,7 @@ export function LmsCourseDetailPage() {
                   <p style={styles.progressText}>진도율: {enrollment.progress}%</p>
                   {/* WO-KPA-LMS-UX-QUICK-WINS-V1: 완료 레슨 수 표시 */}
                   <p style={{ fontSize: '12px', color: '#94a3b8', textAlign: 'center' as const, marginBottom: '16px' }}>
-                    {(enrollment as any).completedLessons ?? 0} / {lessons.length} 레슨 완료
+                    {enrollment.completedLessons} / {lessons.length} 레슨 완료
                   </p>
                   <Link
                     to={`/lms/course/${course.id}/lesson/${lessons[0]?.id || ''}`}

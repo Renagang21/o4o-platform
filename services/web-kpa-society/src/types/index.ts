@@ -212,10 +212,13 @@ export interface Enrollment {
   courseId: string;
   course: Course;
   progress: number; // 0-100
-  completedLessons: string[];
+  completedLessons: number; // count of completed lessons (DB INTEGER, not an array)
   startedAt: string;
   completedAt?: string;
   status?: 'pending' | 'approved' | 'rejected' | 'in_progress' | 'completed' | 'cancelled' | 'expired';
+  metadata?: {
+    completedLessonIds?: string[]; // per-lesson completion tracking (use this for .includes() checks)
+  };
 }
 
 export interface Certificate {
