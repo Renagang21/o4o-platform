@@ -525,16 +525,18 @@ router.post('/url-to-blocks', authenticate, async (req, res: Response) => {
       return noiseKeywords.some(kw => text.includes(kw));
     };
 
-    const filteredBlocks = normalizedBlocks.filter(b => !isNoiseBlock(b));
-
-    // 6-B. YouTube 특수 처리: embed + 텍스트 4개 이내
-    let finalBlocks: typeof filteredBlocks;
+    // 6-B. YouTube 특수 처리: 노이즈 필터 없이 embed + 텍스트 4개 이내로만 제한
+    //       (YouTube 텍스트는 AI가 이미 요약 처리하므로 필터 불필요)
+    let finalBlocks: typeof normalizedBlocks;
     if (isYouTube) {
-      const ytBlocks = filteredBlocks.filter(b => b.type === 'o4o/youtube');
-      const textBlocks = filteredBlocks.filter(b => b.type !== 'o4o/youtube').slice(0, 4);
+      const ytBlocks = normalizedBlocks.filter(b => b.type === 'o4o/youtube');
+      const textBlocks = normalizedBlocks
+        .filter(b => b.type !== 'o4o/youtube')
+        .slice(0, 4);
       finalBlocks = [...ytBlocks, ...textBlocks];
     } else {
-      finalBlocks = filteredBlocks;
+      // 일반 페이지: 노이즈 필터 적용
+      finalBlocks = normalizedBlocks.filter(b => !isNoiseBlock(b));
     }
 
     // 6-C. 최대 블록 수 강제 제한
@@ -545,7 +547,6 @@ router.post('/url-to-blocks', authenticate, async (req, res: Response) => {
       requestId,
       userId,
       rawBlocks: normalizedBlocks.length,
-      afterFilter: filteredBlocks.length,
       final: limitedBlocks.length,
       isYouTube,
     });
