@@ -12,6 +12,8 @@ import { lmsInstructorApi, Course, Lesson, LessonType, type CourseVisibility } f
 import QuizBuilder from './QuizBuilder';
 import AssignmentEditor from './AssignmentEditor';
 import LiveEditor from './LiveEditor';
+// WO-O4O-LMS-COURSE-STRUCTURE-AI-V2
+import CourseStructureAiModal, { type GeneratedLesson } from './CourseStructureAiModal';
 
 // WO-O4O-LMS-UX-REFINEMENT-V1: instructor 라벨 통일 ("동영상")
 const LESSON_TYPE_LABEL: Record<LessonType, string> = {
@@ -401,6 +403,9 @@ export default function CourseEditPage() {
   // lesson modal
   const [lessonModal, setLessonModal] = useState<{ open: boolean; lesson: Lesson | null }>({ open: false, lesson: null });
 
+  // WO-O4O-LMS-COURSE-STRUCTURE-AI-V2: 강의 구조 AI 모달
+  const [structureModalOpen, setStructureModalOpen] = useState(false);
+
   // WO-KPA-LMS-UX-QUICK-WINS-V1: 생성 안내 배너
   const [showCreatedBanner, setShowCreatedBanner] = useState(() => !!(location.state as any)?.justCreated);
 
@@ -491,6 +496,28 @@ export default function CourseEditPage() {
     } catch {
       alert('레슨 삭제에 실패했습니다.');
     }
+  };
+
+  // WO-O4O-LMS-COURSE-STRUCTURE-AI-V2: 선택된 AI 생성 레슨을 일괄 생성
+  // - 자동 생성된 레슨은 article 타입으로 추가 (사용자가 이후 type 변경/본문 보강 가능)
+  // - description = AI summary
+  // - order 는 기존 마지막 + 1 부터 순차적으로
+  const handleAddCourseStructureLessons = async (selected: GeneratedLesson[]) => {
+    if (!id) throw new Error('courseId 가 없습니다.');
+    let baseOrder = lessons.length > 0 ? Math.max(...lessons.map((l) => l.order)) + 1 : 1;
+    for (const item of selected) {
+      await lmsInstructorApi.createLesson(id, {
+        title: item.title,
+        type: 'article',
+        description: item.summary || null,
+        content: null,
+        videoUrl: null,
+        order: baseOrder,
+        duration: 0,
+      });
+      baseOrder += 1;
+    }
+    await loadData();
   };
 
   // WO-KPA-LMS-UX-QUICK-WINS-V1: 레슨 발행 토글
@@ -697,7 +724,28 @@ export default function CourseEditPage() {
 
       {/* Lessons */}
       <div style={s.section}>
-        <div style={s.sectionTitle}>레슨 목록 ({lessons.length})</div>
+        <div style={{ ...s.sectionTitle, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span>레슨 목록 ({lessons.length})</span>
+          {/* WO-O4O-LMS-COURSE-STRUCTURE-AI-V2: 강의 구조 AI 생성 진입 */}
+          <button
+            type="button"
+            onClick={() => setStructureModalOpen(true)}
+            style={{
+              padding: '6px 14px',
+              background: '#eef2ff',
+              color: '#4338ca',
+              border: '1px solid #c7d2fe',
+              borderRadius: 7,
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+            }}
+            title="유튜브 / 블로그 URL 또는 주제로 강의 레슨 구조를 자동 생성"
+          >
+            🧱 AI로 강의 구조 만들기
+          </button>
+        </div>
 
         {lessons.length === 0 ? (
           /* WO-KPA-LMS-UX-QUICK-WINS-V1: Empty 상태 */
@@ -760,6 +808,13 @@ export default function CourseEditPage() {
           onSaved={(keepOpen) => { if (!keepOpen) setLessonModal({ open: false, lesson: null }); loadData(); }}
         />
       )}
+
+      {/* WO-O4O-LMS-COURSE-STRUCTURE-AI-V2: 강의 구조 AI 모달 */}
+      <CourseStructureAiModal
+        open={structureModalOpen}
+        onClose={() => setStructureModalOpen(false)}
+        onConfirm={handleAddCourseStructureLessons}
+      />
     </div>
   );
 }

@@ -704,4 +704,166 @@ router.post('/content-to-store-use', authenticate, async (req, res: Response) =>
   }
 });
 
+// ===========================================
+// POST /api/ai/course-structure — 주제/URL → 레슨 목록 (5~8개)
+// WO-O4O-LMS-COURSE-STRUCTURE-AI-V2
+// ===========================================
+//
+// 정책:
+// - 입력: { input: string, type: 'url' | 'topic' }
+// - 출력: { success, lessons: [{ title, summary }], requestId }
+// - 자동 생성된 레슨은 절대 자동 저장하지 않음 (사용자 선택 후 호출자가 createLesson 으로 저장)
+// - 5~8개의 논리 순서 레슨, 각 제목은 짧고 명확, summary 1~2문장
+
+function buildCourseStructureSystemPrompt(): string {
+  return `당신은 O4O LMS 강의 설계 전문가입니다.
+주어진 주제 또는 URL 콘텐츠로부터 강의의 레슨 구조(목차)를 설계하세요.
+
+## 출력 규칙
+- 반드시 JSON 배열만 반환 (\`\`\`json ... \`\`\` 코드블록 형식)
+- 각 항목 구조: { "title": "레슨 제목", "summary": "1~2문장 요약" }
+- 5개 이상 8개 이하
+
+## 레슨 구성 규칙
+- 논리적인 순서로 배치 (입문 → 핵심 → 응용)
+- 각 레슨은 독립적으로 학습 가능한 단일 주제
+- 제목은 짧고 명확하게 (한 줄, 30자 이내 권장)
+- summary 는 1~2문장으로 학습자가 무엇을 얻는지 명시
+
+## 금지
+- 본문 / 영상 / 퀴즈 / 과제 생성 금지
+- 8개 초과 또는 5개 미만 금지
+- JSON 외 다른 텍스트 포함 금지
+
+JSON 만 반환하세요.`;
+}
+
+router.post('/course-structure', authenticate, async (req, res: Response) => {
+  const authReq = req as AuthRequest;
+  const userId = authReq.user?.id;
+
+  if (!userId) {
+    return res.status(401).json({ success: false, error: '로그인이 필요합니다.' });
+  }
+
+  const { input, type } = req.body as { input?: string; type?: 'url' | 'topic' };
+
+  if (!input || typeof input !== 'string' || input.trim().length === 0) {
+    return res.status(400).json({ success: false, error: 'input이 필요합니다.' });
+  }
+  if (type !== 'url' && type !== 'topic') {
+    return res.status(400).json({ success: false, error: "type 은 'url' 또는 'topic' 이어야 합니다." });
+  }
+
+  const requestId = crypto.randomUUID();
+
+  try {
+    // 1. type 별 user prompt 빌드
+    let userPrompt: string;
+    if (type === 'url') {
+      // URL 검증
+      let parsedUrl: URL;
+      try {
+        parsedUrl = new URL(input.trim());
+        if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+          throw new Error('http/https URL 만 허용됩니다.');
+        }
+      } catch {
+        return res.status(400).json({ success: false, error: '올바른 URL 형식이 아닙니다. (http/https 만 허용)' });
+      }
+
+      // URL 텍스트 추출 (재사용)
+      let urlText: string;
+      try {
+        urlText = await fetchUrlText(parsedUrl.toString());
+      } catch (fetchError: any) {
+        logger.warn('[course-structure] URL fetch 실패', { requestId, error: fetchError.message });
+        return res.status(422).json({ success: false, error: `URL 콘텐츠를 가져올 수 없습니다: ${fetchError.message}` });
+      }
+      if (urlText.trim().length < 50) {
+        return res.status(422).json({ success: false, error: 'URL 에서 충분한 텍스트를 추출할 수 없습니다.' });
+      }
+      userPrompt = [
+        `다음 URL(${parsedUrl.hostname})의 콘텐츠로부터 강의의 레슨 구조(목차)를 5~8개로 설계하세요:`,
+        '',
+        '=== 추출된 텍스트 ===',
+        urlText,
+      ].join('\n');
+    } else {
+      // topic 모드 — 그대로 주제로 사용
+      userPrompt = [
+        '다음 주제로 강의의 레슨 구조(목차)를 5~8개로 설계하세요:',
+        '',
+        `주제: ${input.trim()}`,
+      ].join('\n');
+    }
+
+    // 2. AI 호출
+    logger.info('[course-structure] 시작', { requestId, userId, type });
+    const aiResponse = await aiProxyService.generateRawContent(
+      {
+        provider: 'gemini',
+        model: 'gemini-2.5-flash',
+        systemPrompt: buildCourseStructureSystemPrompt(),
+        userPrompt,
+        temperature: 0.6,
+        maxTokens: 4096,
+      },
+      userId,
+      requestId,
+    );
+
+    // 3. JSON 배열 파싱 (url-to-blocks 와 동일 패턴)
+    const rawText: string = aiResponse.rawText || '';
+    const jsonMatch =
+      rawText.match(/```json\s*([\s\S]*?)```/) ||
+      rawText.match(/```\s*([\s\S]*?)```/) ||
+      rawText.match(/(\[[\s\S]*\])/);
+
+    if (!jsonMatch) {
+      logger.error('[course-structure] JSON 파싱 실패', { requestId, rawText: rawText.slice(0, 200) });
+      return res.status(500).json({ success: false, error: 'AI 응답에서 레슨 구조를 파싱할 수 없습니다.' });
+    }
+
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(jsonMatch[1] || jsonMatch[0]);
+    } catch (parseError: any) {
+      logger.error('[course-structure] JSON parse error', { requestId, error: parseError.message });
+      return res.status(500).json({ success: false, error: 'JSON 파싱 실패: ' + parseError.message });
+    }
+    if (!Array.isArray(parsed)) {
+      return res.status(500).json({ success: false, error: 'AI 응답이 배열 형식이 아닙니다.' });
+    }
+
+    // 4. 정규화 + 5~8개 강제
+    const lessons = parsed
+      .map((item: any) => ({
+        title: typeof item?.title === 'string' ? item.title.trim() : '',
+        summary: typeof item?.summary === 'string' ? item.summary.trim() : '',
+      }))
+      .filter((l) => l.title.length > 0)
+      .slice(0, 8);
+
+    if (lessons.length < 3) {
+      // 5개 미만이면 사실상 사용 불가 — 에러
+      logger.warn('[course-structure] 부족한 레슨 수', { requestId, count: lessons.length });
+      return res.status(500).json({
+        success: false,
+        error: `생성된 레슨이 너무 적습니다 (${lessons.length}개). 다시 시도해 주세요.`,
+      });
+    }
+
+    logger.info('[course-structure] 완료', { requestId, userId, count: lessons.length });
+    return res.json({ success: true, lessons, requestId });
+  } catch (error: any) {
+    logger.error('[course-structure] 오류', { requestId, error: error.message });
+    return res.status(500).json({
+      success: false,
+      error: error.message || '강의 구조 생성 중 오류가 발생했습니다.',
+      requestId,
+    });
+  }
+});
+
 export default router;
