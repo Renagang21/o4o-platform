@@ -13,6 +13,10 @@ export { ContentHighlightSection } from './ContentHighlightSection';
 export { HubPagination } from './HubPagination';
 export type { HubPaginationProps } from './HubPagination';
 
+/* WO-O4O-GUIDE-UI-COMPONENT-V1: 화면 안 상황 안내 카드 (전 서비스 공통) */
+export { GuideBlock } from './GuideBlock';
+export type { GuideBlockProps, GuideBlockVariant } from './GuideBlock';
+
 /* HUB page templates */
 export { LmsHubTemplate } from './LmsHubTemplate';
 export type { LmsHubCourse, LmsHubFetchParams, LmsHubConfig } from './LmsHubTemplate';

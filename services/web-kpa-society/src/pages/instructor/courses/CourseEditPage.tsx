@@ -8,6 +8,8 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { RichTextEditor, AiContentModal } from '@o4o/content-editor';
+// WO-O4O-GUIDE-UI-COMPONENT-V1
+import { GuideBlock } from '@o4o/shared-space-ui';
 import { lmsInstructorApi, Course, Lesson, LessonType, type CourseVisibility } from '../../../api/lms-instructor';
 import QuizBuilder from './QuizBuilder';
 import AssignmentEditor from './AssignmentEditor';
@@ -21,6 +23,35 @@ const LESSON_TYPE_LABEL: Record<LessonType, string> = {
 };
 
 const SUPPORTED_LESSON_TYPES: LessonType[] = ['video', 'article', 'quiz', 'assignment', 'live'];
+
+// WO-O4O-GUIDE-UI-COMPONENT-V1: 레슨 유형별 화면 안 안내
+const LESSON_TYPE_GUIDE: Record<LessonType, { title: string; description: string; steps: string[] }> = {
+  article: {
+    title: '문서 레슨입니다.',
+    description: '이 화면에서 학습 내용을 직접 작성합니다.',
+    steps: ['저장한 내용이 수강자에게 레슨 본문으로 표시됩니다.'],
+  },
+  video: {
+    title: '동영상 레슨입니다.',
+    description: '이 화면에서는 영상에 대한 설명을 작성합니다.',
+    steps: ['영상 URL과 재생 정보는 동영상 레슨 설정에 사용됩니다.'],
+  },
+  quiz: {
+    title: '퀴즈 레슨입니다.',
+    description: '이 화면에서는 퀴즈에 대한 설명을 작성합니다.',
+    steps: ['저장 후 문제와 정답을 설정할 수 있습니다.'],
+  },
+  assignment: {
+    title: '과제 레슨입니다.',
+    description: '이 화면에서는 과제에 대한 안내를 작성합니다.',
+    steps: ['저장 후 제출 조건과 과제 설정을 이어서 입력할 수 있습니다.'],
+  },
+  live: {
+    title: '라이브 레슨입니다.',
+    description: '이 화면에서는 라이브 수업에 대한 설명을 작성합니다.',
+    steps: ['저장 후 일정과 접속 정보를 설정할 수 있습니다.'],
+  },
+};
 
 /* ──────────────── styles ──────────────── */
 // 함수형 style은 별도 함수로 분리. (Record<string, CSSProperties>에 함수 값을 넣으면
@@ -308,6 +339,16 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
                 <input style={s.input} value={form.videoUrl} onChange={(e) => setForm((f) => ({ ...f, videoUrl: e.target.value }))} placeholder="https://..." />
               </div>
             )}
+
+            {/* WO-O4O-GUIDE-UI-COMPONENT-V1: 레슨 유형별 화면 안 안내 — 본문 입력 직전 */}
+            <div style={{ marginBottom: 16 }}>
+              <GuideBlock
+                variant="info"
+                title={LESSON_TYPE_GUIDE[form.type].title}
+                description={LESSON_TYPE_GUIDE[form.type].description}
+                steps={LESSON_TYPE_GUIDE[form.type].steps}
+              />
+            </div>
 
             <div style={s.field}>
               <label style={s.label}>본문</label>
