@@ -13,7 +13,7 @@ import {
   X, Eye, EyeOff, FileText, FileSearch, Tag, Trash2,
   CheckCircle, XCircle,
 } from 'lucide-react';
-import { toast } from '@o4o/error-handling';
+import { toast, parseApiError } from '@o4o/error-handling';
 import { ContentRenderer } from '@o4o/content-editor';
 import { ActionBar, ConfirmActionDialog, RowActionMenu } from '@o4o/ui';
 import { DataTable, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
@@ -27,7 +27,7 @@ import {
 import { productCleanupApi } from '../../lib/api/operatorProductCleanup';
 import {
   DISTRIBUTION_TYPE_LABELS,
-  APPROVAL_STATUS_BADGE,
+  getApprovalStatusBadge,
   REGULATORY_TYPE_LABELS,
   REGULATORY_TYPE_BADGE,
   getSupplyPolicyBadges,
@@ -392,9 +392,8 @@ export default function AllRegisteredProductsPage() {
       }
       setSelectedOfferIds(new Set());
       await fetchOffers(page);
-    } catch (err: any) {
-      const e = err?.response?.data?.error;
-      toast.error(typeof e === 'string' ? e : e?.message || e?.code || '승인 중 오류가 발생했습니다');
+    } catch (err) {
+      toast.error(parseApiError(err).userMessage);
     } finally {
       setActionLoading(false);
     }
@@ -416,9 +415,8 @@ export default function AllRegisteredProductsPage() {
       }
       setSelectedOfferIds(new Set());
       await fetchOffers(page);
-    } catch (err: any) {
-      const e = err?.response?.data?.error;
-      toast.error(typeof e === 'string' ? e : e?.message || e?.code || '반려 중 오류가 발생했습니다');
+    } catch (err) {
+      toast.error(parseApiError(err).userMessage);
     } finally {
       setActionLoading(false);
     }
@@ -616,7 +614,7 @@ export default function AllRegisteredProductsPage() {
       sortable: true,
       sortAccessor: (row) => row.approvalStatus || '',
       render: (_v, row) => {
-        const apprBadge = APPROVAL_STATUS_BADGE[row.approvalStatus?.toLowerCase()] || { label: row.approvalStatus || '-', bg: 'bg-slate-100', text: 'text-slate-600' };
+        const apprBadge = getApprovalStatusBadge(row.approvalStatus);
         return (
           <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${apprBadge.bg} ${apprBadge.text}`}>
             {apprBadge.label}
@@ -1086,7 +1084,7 @@ export default function AllRegisteredProductsPage() {
                 <DetailCard label="유통 타입" value={DISTRIBUTION_TYPE_LABELS[detailOffer.distributionType] || detailOffer.distributionType || '-'} />
                 <DetailCard label="공급가" value={detailOffer.priceGeneral ? `₩${detailOffer.priceGeneral.toLocaleString()}` : '-'} />
                 <DetailCard label="소비자가" value={detailOffer.consumerReferencePrice ? `₩${detailOffer.consumerReferencePrice.toLocaleString()}` : '-'} />
-                <DetailCard label="승인 상태" value={APPROVAL_STATUS_BADGE[detailOffer.approvalStatus?.toLowerCase()]?.label || detailOffer.approvalStatus || '-'} />
+                <DetailCard label="승인 상태" value={getApprovalStatusBadge(detailOffer.approvalStatus).label} />
                 <DetailCard label="카테고리" value={detailOffer.categoryName || '-'} />
                 <DetailCard label="규제 유형" value={detailOffer.regulatoryType ? (REGULATORY_TYPE_LABELS[detailOffer.regulatoryType] || detailOffer.regulatoryType) : '-'} />
                 {detailOffer.brandName && <DetailCard label="브랜드" value={detailOffer.brandName} />}

@@ -30,6 +30,19 @@ export const APPROVAL_STATUS_BADGE: Record<string, { label: string; bg: string; 
   none: { label: '미요청', bg: 'bg-slate-100', text: 'text-slate-500' },
 };
 
+/**
+ * API는 'PENDING'(대문자) enum을 반환하지만 badge 상수 키는 소문자.
+ * 이 함수를 통해 대소문자 불일치 없이 badge를 조회한다.
+ */
+export function getApprovalStatusBadge(
+  status: string | undefined | null,
+): { label: string; bg: string; text: string } {
+  return (
+    APPROVAL_STATUS_BADGE[status?.toLowerCase() ?? ''] ??
+    { label: status || '-', bg: 'bg-slate-100', text: 'text-slate-600' }
+  );
+}
+
 // ─── Regulatory Type ───
 
 export const REGULATORY_TYPE_LABELS: Record<string, string> = {
