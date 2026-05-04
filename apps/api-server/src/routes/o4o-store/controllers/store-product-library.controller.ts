@@ -11,6 +11,7 @@
  * GET  /master/:masterId/offers         — Master의 공급자 Offer 목록
  * GET  /master/:masterId/images         — 상품 이미지 목록
  * POST /master/:masterId/images/from-url — URL→GCS 이미지 임포트
+ * PATCH /images/reorder                 — 이미지 정렬 순서 일괄 저장
  * PATCH /images/:imageId/primary        — 대표 이미지 지정
  * DELETE /images/:imageId               — 이미지 삭제
  * POST /list                            — Store Listing 생성
@@ -220,6 +221,7 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
                 pm.regulatory_name AS "regulatoryName", pm.manufacturer_name AS "manufacturerName",
                 (SELECT pi.image_url FROM product_images pi
                  WHERE pi.master_id = pm.id AND pi.is_primary = true LIMIT 1) AS "primaryImage",
+                (SELECT COUNT(*)::int FROM product_images pi WHERE pi.master_id = pm.id) AS "imageCount",
                 spo.price_general AS "offerPrice", spo.distribution_type AS "distributionType",
                 s.id AS "supplierId", o.name AS "supplierName"
          FROM organization_product_listings opl
@@ -399,6 +401,38 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
 
     logger.info(`[StoreProductImage] Image imported: master=${masterId}, type=${imageType}, gcs=${gcsPath}`);
     res.status(201).json({ success: true, data: inserted[0] });
+  }));
+
+  // ─── PATCH /images/reorder — 이미지 정렬 순서 일괄 저장 ───────────────
+  // body: { items: [{ id: string, sortOrder: number }] }
+  // WO-O4O-STORE-PRODUCT-IMAGE-REGISTRATION-PHASE3-V1
+  router.patch('/images/reorder', requireAuth, requireStoreOwner as RequestHandler, asyncHandler(async (req: Request, res: Response) => {
+    const { items } = req.body;
+
+    if (!Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ success: false, error: { code: 'INVALID_INPUT', message: 'items array is required' } });
+    }
+
+    // Validate each item
+    for (const item of items) {
+      if (typeof item.id !== 'string' || typeof item.sortOrder !== 'number') {
+        return res.status(400).json({ success: false, error: { code: 'INVALID_INPUT', message: 'Each item must have id (string) and sortOrder (number)' } });
+      }
+    }
+
+    // Bulk UPDATE: unnest arrays for efficiency
+    const ids = items.map((i: { id: string; sortOrder: number }) => i.id);
+    const sortOrders = items.map((i: { id: string; sortOrder: number }) => i.sortOrder);
+
+    await dataSource.query(
+      `UPDATE product_images SET sort_order = t.sort_order::int, updated_at = NOW()
+       FROM (SELECT unnest($1::uuid[]) AS id, unnest($2::int[]) AS sort_order) t
+       WHERE product_images.id = t.id`,
+      [ids, sortOrders],
+    );
+
+    logger.info(`[StoreProductImage] Reordered ${items.length} images`);
+    res.json({ success: true });
   }));
 
   // ─── PATCH /images/:imageId/primary — 대표 이미지 지정 ──────────────

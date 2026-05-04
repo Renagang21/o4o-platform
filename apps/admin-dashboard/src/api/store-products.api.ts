@@ -57,6 +57,7 @@ export interface StoreListingItem {
   regulatoryName: string;
   manufacturerName: string;
   primaryImage: string | null;
+  imageCount: number;                      // 등록된 이미지 수 (0 = 이미지 없음)
   offerPrice: number;                      // 공급자 기본가
   distributionType: string;
   supplierId: string;
@@ -182,6 +183,19 @@ export async function importImageFromUrl(
     data?: ProductImageItem;
     error?: { code: string; message: string };
   }>(`${BASE}/master/${masterId}/images/from-url`, { url, type });
+  return res.data;
+}
+
+/**
+ * 이미지 정렬 순서 일괄 저장
+ */
+export async function reorderImages(
+  items: { id: string; sortOrder: number }[],
+): Promise<{ success: boolean }> {
+  const res = await authClient.api.patch<{ success: boolean }>(
+    `${BASE}/images/reorder`,
+    { items },
+  );
   return res.data;
 }
 

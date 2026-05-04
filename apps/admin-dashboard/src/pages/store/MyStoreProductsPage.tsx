@@ -14,9 +14,10 @@ import type { O4OColumn } from '@o4o/ui';
 import { toast } from 'react-hot-toast';
 import {
   Plus, Search, RefreshCw, Package, ChevronRight,
-  ToggleLeft, ToggleRight, Pencil, X, Tv2, ShoppingCart,
+  ToggleLeft, ToggleRight, Pencil, X, Tv2, ShoppingCart, Image,
 } from 'lucide-react';
 import PageHeader from '../../components/common/PageHeader';
+import ImageManagerModal from './ImageManagerModal';
 import {
   searchStoreProducts,
   getMasterOffers,
@@ -506,7 +507,7 @@ function ChannelToggleModal({
 
 // ── 메인 페이지 ────────────────────────────────────────────────────────────────
 
-type ActiveModal = null | 'register' | 'price' | 'desc' | 'channel';
+type ActiveModal = null | 'register' | 'price' | 'desc' | 'channel' | 'image';
 
 export default function MyStoreProductsPage() {
   const [activeModal, setActiveModal] = useState<ActiveModal>(null);
@@ -560,12 +561,24 @@ export default function MyStoreProductsPage() {
     {
       key: 'primaryImage',
       header: '',
-      width: 52,
-      render: (row) => row.primaryImage ? (
-        <img src={row.primaryImage} alt={row.name} className="h-10 w-10 rounded object-cover" />
-      ) : (
-        <div className="h-10 w-10 rounded bg-gray-100 flex items-center justify-center">
-          <Package size={16} className="text-gray-300" />
+      width: 60,
+      render: (row) => (
+        <div className="relative inline-block">
+          {row.primaryImage ? (
+            <img src={row.primaryImage} alt={row.name} className="h-10 w-10 rounded object-cover" />
+          ) : (
+            <div className="h-10 w-10 rounded bg-gray-100 flex items-center justify-center">
+              <Package size={16} className="text-gray-300" />
+            </div>
+          )}
+          {row.imageCount === 0 && (
+            <span
+              className="absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-0.5 text-[9px] font-bold text-white leading-none"
+              title="이미지 없음"
+            >
+              !
+            </span>
+          )}
         </div>
       ),
     },
@@ -623,10 +636,18 @@ export default function MyStoreProductsPage() {
     },
     {
       key: 'id',
-      header: '채널/설명',
-      width: 110,
+      header: '관리',
+      width: 140,
       render: (row) => (
-        <div className="flex gap-1">
+        <div className="flex gap-1 flex-wrap">
+          <button
+            onClick={() => openModal('image', row)}
+            className="flex items-center gap-1 rounded border border-gray-200 px-2 py-1 text-xs text-gray-500 hover:border-violet-300 hover:text-violet-600"
+            title="이미지 관리"
+          >
+            <Image size={11} />
+            이미지
+          </button>
           <button
             onClick={() => openModal('channel', row)}
             className="flex items-center gap-1 rounded border border-gray-200 px-2 py-1 text-xs text-gray-500 hover:border-blue-300 hover:text-blue-600"
@@ -775,6 +796,13 @@ export default function MyStoreProductsPage() {
           channels={channels}
           onClose={closeModal}
           onSuccess={handleMutationSuccess}
+        />
+      )}
+      {activeModal === 'image' && selectedListing && (
+        <ImageManagerModal
+          masterId={selectedListing.masterId}
+          productName={selectedListing.name}
+          onClose={closeModal}
         />
       )}
     </div>
