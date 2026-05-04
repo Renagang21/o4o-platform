@@ -582,6 +582,12 @@ export const adminMenuStatic: MenuItem[] = [
         path: '/kpa/my-store-contents',
       },
       {
+        id: 'my-store-products',
+        label: '내 매장 상품',
+        icon: <Package className="w-4 h-4" />,
+        path: '/store/my-products',
+      },
+      {
         id: 'supplier-signage-reports',
         label: '사이니지 리포트',
         icon: <BarChart2 className="w-4 h-4" />,

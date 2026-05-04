@@ -32,6 +32,9 @@ const PointSpendPage = lazy(() => import('@/pages/operator/PointSpendPage'));
 const HubContentsPage = lazy(() => import('@/pages/kpa/HubContentsPage'));
 const MyStoreContentsPage = lazy(() => import('@/pages/kpa/MyStoreContentsPage'));
 
+// 내 매장 상품 관리 (WO-O4O-STORE-PRODUCT-REGISTRATION-PHASE1-V1)
+const MyStoreProductsPage = lazy(() => import('@/pages/store/MyStoreProductsPage'));
+
 // KPA HUB Notice (WO-O4O-HUB-NOTICE-SYSTEM-V1)
 const HubNoticeListPage = lazy(() => import('@/pages/kpa/HubNoticeListPage'));
 
@@ -173,6 +176,15 @@ export function PlatformRoutes() {
       <AdminProtectedRoute requiredRoles={['admin', 'super_admin', 'operator']}>
         <Suspense fallback={<PageLoader />}>
           <HubNoticeListPage />
+        </Suspense>
+      </AdminProtectedRoute>
+    } />,
+
+    // 내 매장 상품 관리 (WO-O4O-STORE-PRODUCT-REGISTRATION-PHASE1-V1)
+    <Route key="/store/my-products" path="/store/my-products" element={
+      <AdminProtectedRoute requiredRoles={['admin', 'super_admin', 'operator', 'supplier']}>
+        <Suspense fallback={<PageLoader />}>
+          <MyStoreProductsPage />
         </Suspense>
       </AdminProtectedRoute>
     } />,

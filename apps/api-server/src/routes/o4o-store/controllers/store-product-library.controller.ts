@@ -2,16 +2,22 @@
  * Store Product Library Controller
  *
  * WO-O4O-STORE-PRODUCT-LIBRARY-INTEGRATION-V1
+ * WO-O4O-STORE-PRODUCT-IMAGE-REGISTRATION-PHASE2-V1
  *
  * 매장(Store Owner)이 Product Library를 검색하고,
  * Offer를 선택하여 Store Listing을 직접 생성·관리하는 API.
  *
- * GET  /search                  — 제품 검색
- * GET  /master/:masterId/offers — Master의 공급자 Offer 목록
- * POST /list                    — Store Listing 생성
- * GET  /                        — 내 매장 진열 목록
- * PATCH /:id                    — Listing 수정 (isActive, price)
- * PATCH /:id/description        — 매장 상품 설명 override (WO-STORE-PRODUCT-DESCRIPTION-OVERRIDE-V1)
+ * GET  /search                          — 제품 검색
+ * GET  /master/:masterId/offers         — Master의 공급자 Offer 목록
+ * GET  /master/:masterId/images         — 상품 이미지 목록
+ * POST /master/:masterId/images/from-url — URL→GCS 이미지 임포트
+ * PATCH /images/:imageId/primary        — 대표 이미지 지정
+ * DELETE /images/:imageId               — 이미지 삭제
+ * POST /list                            — Store Listing 생성
+ * GET  /                                — 내 매장 진열 목록
+ * GET  /my-channels                     — 내 매장 채널 목록
+ * PATCH /:id                            — Listing 수정 (isActive, price)
+ * PATCH /:id/description                — 매장 상품 설명 override
  *
  * 인증: requireAuth + requireStoreOwner (organization_members 기반)
  */
@@ -23,11 +29,32 @@ import { asyncHandler } from '../../../middleware/error-handler.js';
 import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { createRequireStoreOwner } from '../../../utils/store-owner.utils.js';
 import { NetureService } from '../../../modules/neture/neture.service.js';
+import { ImageStorageService } from '../../../modules/neture/services/image-storage.service.js';
 import logger from '../../../utils/logger.js';
+
+// ── 허용 MIME 타입 (URL 임포트) ───────────────────────────────────────────────
+const ALLOWED_IMAGE_MIMES = new Set([
+  'image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif',
+]);
+
+// ── URL에서 MIME 타입 추론 (Content-Type 헤더 또는 확장자 기반) ─────────────────
+function inferMime(contentType: string | null, url: string): string {
+  if (contentType) {
+    const base = contentType.split(';')[0].trim().toLowerCase();
+    if (ALLOWED_IMAGE_MIMES.has(base)) return base;
+  }
+  const ext = url.split('?')[0].split('.').pop()?.toLowerCase();
+  const extMap: Record<string, string> = {
+    jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png',
+    webp: 'image/webp', gif: 'image/gif',
+  };
+  return extMap[ext ?? ''] ?? 'image/jpeg';
+}
 
 export function createStoreProductLibraryController(dataSource: DataSource): Router {
   const router = Router();
   const listingRepo = dataSource.getRepository(OrganizationProductListing);
+  const imageStorageService = new ImageStorageService();
   const requireStoreOwner = createRequireStoreOwner(dataSource);
   const netureService = new NetureService();
 
@@ -187,7 +214,7 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
 
     const [listings, countResult] = await Promise.all([
       dataSource.query(
-        `SELECT opl.id, opl.is_active AS "isActive", opl.price, opl.created_at AS "createdAt",
+        `SELECT opl.id, opl.offer_id AS "offerId", opl.is_active AS "isActive", opl.price, opl.created_at AS "createdAt",
                 opl.updated_at AS "updatedAt",
                 pm.id AS "masterId", pm.barcode, pm.name,
                 pm.regulatory_name AS "regulatoryName", pm.manufacturer_name AS "manufacturerName",
@@ -246,6 +273,211 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
 
     logger.info(`[StoreProductLibrary] Listing updated: id=${id}, org=${organizationId}`);
     res.json({ success: true, data: updated });
+  }));
+
+  // ─── GET /master/:masterId/images — 상품 이미지 목록 ────────────────
+  router.get('/master/:masterId/images', requireAuth, requireStoreOwner as RequestHandler, asyncHandler(async (req: Request, res: Response) => {
+    const { masterId } = req.params;
+
+    const images = await dataSource.query(
+      `SELECT id, image_url AS "imageUrl", gcs_path AS "gcsPath",
+              type, is_primary AS "isPrimary", sort_order AS "sortOrder",
+              created_at AS "createdAt"
+       FROM product_images
+       WHERE master_id = $1
+       ORDER BY sort_order ASC, created_at ASC`,
+      [masterId],
+    );
+
+    res.json({ success: true, data: images });
+  }));
+
+  // ─── POST /master/:masterId/images/from-url — URL→GCS 이미지 임포트 ─
+  // URL에서 이미지를 fetch하여 GCS에 저장 후 ProductImage로 등록.
+  // 외부 URL은 저장하지 않는다 (GCS 경로만 참조).
+  // WO-O4O-STORE-PRODUCT-IMAGE-REGISTRATION-PHASE2-V1
+  router.post('/master/:masterId/images/from-url', requireAuth, requireStoreOwner as RequestHandler, asyncHandler(async (req: Request, res: Response) => {
+    const { masterId } = req.params;
+    const { url: imageUrl, type = 'detail' } = req.body;
+
+    if (!imageUrl || typeof imageUrl !== 'string') {
+      return res.status(400).json({ success: false, error: { code: 'INVALID_INPUT', message: 'url is required' } });
+    }
+
+    const imageType = ['thumbnail', 'detail', 'content'].includes(type)
+      ? (type as 'thumbnail' | 'detail' | 'content')
+      : 'detail';
+
+    // 1. ProductMaster 존재 확인
+    const masters = await dataSource.query(
+      `SELECT id FROM product_masters WHERE id = $1`,
+      [masterId],
+    );
+    if (masters.length === 0) {
+      return res.status(404).json({ success: false, error: { code: 'MASTER_NOT_FOUND', message: 'Product master not found' } });
+    }
+
+    // 2. URL fetch → Buffer
+    let imageBuffer: Buffer;
+    let mimeType: string;
+    try {
+      const { default: fetch } = await import('node-fetch');
+      const response = await fetch(imageUrl, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; O4OImageImport/1.0)' },
+        size: 10 * 1024 * 1024, // 10MB limit
+      });
+
+      if (!response.ok) {
+        return res.status(400).json({
+          success: false,
+          error: { code: 'FETCH_FAILED', message: `Failed to fetch image: HTTP ${response.status}` },
+        });
+      }
+
+      mimeType = inferMime(response.headers.get('content-type'), imageUrl);
+      if (!ALLOWED_IMAGE_MIMES.has(mimeType)) {
+        return res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_IMAGE_TYPE', message: 'Unsupported image type. Allowed: jpeg, png, webp, gif' },
+        });
+      }
+
+      imageBuffer = Buffer.from(await response.arrayBuffer());
+    } catch (err: any) {
+      logger.warn(`[StoreProductImage] URL fetch failed: ${imageUrl}`, err);
+      return res.status(400).json({
+        success: false,
+        error: { code: 'FETCH_FAILED', message: 'Could not download image from the provided URL' },
+      });
+    }
+
+    // 3. GCS 업로드
+    const originalName = imageUrl.split('/').pop()?.split('?')[0] ?? 'image.jpg';
+    const { url: gcsUrl, gcsPath } = await imageStorageService.uploadImage(
+      masterId,
+      imageBuffer,
+      mimeType,
+      originalName,
+      imageType,
+    );
+
+    // 4. DB 저장 (CatalogService 로직과 동일하게 직접 처리)
+    // thumbnail: 기존 교체, detail/content: 다중 허용
+    if (imageType === 'thumbnail') {
+      const existing = await dataSource.query(
+        `SELECT id, gcs_path FROM product_images WHERE master_id = $1 AND type = 'thumbnail'`,
+        [masterId],
+      );
+      if (existing.length > 0) {
+        await dataSource.query(`DELETE FROM product_images WHERE id = $1`, [existing[0].id]);
+        if (existing[0].gcs_path) {
+          imageStorageService.deleteImage(existing[0].gcs_path).catch(() => {});
+        }
+        // 기존 primary 해제
+        await dataSource.query(
+          `UPDATE product_images SET is_primary = false WHERE master_id = $1 AND is_primary = true`,
+          [masterId],
+        );
+      }
+    }
+
+    const countResult = await dataSource.query(
+      `SELECT COUNT(*)::int AS cnt FROM product_images WHERE master_id = $1`,
+      [masterId],
+    );
+    const existingCount: number = countResult[0]?.cnt ?? 0;
+    const isPrimary = imageType === 'thumbnail' ? true : existingCount === 0;
+
+    const inserted = await dataSource.query(
+      `INSERT INTO product_images
+         (id, master_id, image_url, gcs_path, type, is_primary, sort_order, created_at, updated_at)
+       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, NOW(), NOW())
+       RETURNING id, image_url AS "imageUrl", gcs_path AS "gcsPath",
+                 type, is_primary AS "isPrimary", sort_order AS "sortOrder", created_at AS "createdAt"`,
+      [masterId, gcsUrl, gcsPath, imageType, isPrimary, existingCount],
+    );
+
+    logger.info(`[StoreProductImage] Image imported: master=${masterId}, type=${imageType}, gcs=${gcsPath}`);
+    res.status(201).json({ success: true, data: inserted[0] });
+  }));
+
+  // ─── PATCH /images/:imageId/primary — 대표 이미지 지정 ──────────────
+  router.patch('/images/:imageId/primary', requireAuth, requireStoreOwner as RequestHandler, asyncHandler(async (req: Request, res: Response) => {
+    const { imageId } = req.params;
+
+    // 어느 master 소속인지 확인
+    const rows = await dataSource.query(
+      `SELECT id, master_id FROM product_images WHERE id = $1`,
+      [imageId],
+    );
+    if (rows.length === 0) {
+      return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Image not found' } });
+    }
+    const masterId = rows[0].master_id;
+
+    // 기존 primary 해제 → 선택 이미지 primary 설정
+    await dataSource.query(
+      `UPDATE product_images SET is_primary = false WHERE master_id = $1`,
+      [masterId],
+    );
+    await dataSource.query(
+      `UPDATE product_images SET is_primary = true WHERE id = $1`,
+      [imageId],
+    );
+
+    logger.info(`[StoreProductImage] Primary set: imageId=${imageId}, master=${masterId}`);
+    res.json({ success: true });
+  }));
+
+  // ─── DELETE /images/:imageId — 이미지 삭제 ─────────────────────────
+  router.delete('/images/:imageId', requireAuth, requireStoreOwner as RequestHandler, asyncHandler(async (req: Request, res: Response) => {
+    const { imageId } = req.params;
+
+    const rows = await dataSource.query(
+      `SELECT id, master_id, gcs_path, is_primary FROM product_images WHERE id = $1`,
+      [imageId],
+    );
+    if (rows.length === 0) {
+      return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Image not found' } });
+    }
+
+    const { master_id: masterId, gcs_path: gcsPath, is_primary: wasPrimary } = rows[0];
+
+    await dataSource.query(`DELETE FROM product_images WHERE id = $1`, [imageId]);
+
+    // GCS 파일 삭제 (실패해도 무시)
+    if (gcsPath) {
+      imageStorageService.deleteImage(gcsPath).catch(() => {});
+    }
+
+    // 대표 이미지였으면 다음 이미지를 대표로 승격
+    if (wasPrimary) {
+      await dataSource.query(
+        `UPDATE product_images SET is_primary = true
+         WHERE id = (SELECT id FROM product_images WHERE master_id = $1 ORDER BY sort_order ASC, created_at ASC LIMIT 1)`,
+        [masterId],
+      );
+    }
+
+    logger.info(`[StoreProductImage] Image deleted: imageId=${imageId}, master=${masterId}`);
+    res.json({ success: true });
+  }));
+
+  // ─── GET /my-channels — 내 매장 채널 목록 (B2C/KIOSK) ──────────────
+  // 채널 노출 토글 UI에서 사용. organization_channels에서 직접 조회.
+  router.get('/my-channels', requireAuth, requireStoreOwner as RequestHandler, asyncHandler(async (req: Request, res: Response) => {
+    const organizationId = (req as any).organizationId;
+
+    const channels = await dataSource.query(
+      `SELECT id, channel_type AS "channelType", status, approved_at AS "approvedAt", created_at AS "createdAt"
+       FROM organization_channels
+       WHERE organization_id = $1
+         AND channel_type IN ('B2C', 'KIOSK')
+       ORDER BY created_at ASC`,
+      [organizationId],
+    );
+
+    res.json({ success: true, data: channels });
   }));
 
   // ─── PATCH /:id/description — 매장 상품 설명 override ──────────────

@@ -660,6 +660,18 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Store Product Library routes:', storeProductLibError);
     }
 
+    // 31-f. Register Store Channel Products routes (WO-O4O-STORE-PRODUCT-REGISTRATION-PHASE1-5-V1)
+    try {
+      const { createStoreChannelProductsController } = await import(
+        '../routes/o4o-store/controllers/store-channel-products.controller.js'
+      );
+      const { requireAuth: channelProductsAuth } = await import('../middleware/auth.middleware.js');
+      app.use('/api/v1/store/channel-products', createStoreChannelProductsController(dataSource, channelProductsAuth));
+      logger.info('✅ Store Channel Products routes registered at /api/v1/store/channel-products');
+    } catch (storeChannelProductsError) {
+      logger.error('Failed to register Store Channel Products routes:', storeChannelProductsError);
+    }
+
     // 31-g. Register Guide Contents routes (WO-O4O-GUIDE-INLINE-EDIT-V1)
     try {
       const guideContentsRoutes = createGuideContentsRouter(dataSource);
