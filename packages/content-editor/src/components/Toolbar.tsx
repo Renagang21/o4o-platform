@@ -28,11 +28,11 @@ import {
   Minus,
   Highlighter,
   Sparkles,
-  ShoppingBag,
+  // WO-O4O-AI-CONTENT-AUTOMATION-SCOPE-CLEANUP-V1: ShoppingBag(매장 활용 아이콘)은 후속 WO 재사용을 위해 import 제거.
+  // StoreUseModal 컴포넌트는 packages/content-editor/src/components/StoreUseModal.tsx 에 유지됨.
 } from 'lucide-react';
 import type { EditorPreset } from '../types';
 import { AiContentModal } from './AiContentModal';
-import { StoreUseModal } from './StoreUseModal';
 
 interface ExistingImage {
   id: string;
@@ -53,7 +53,7 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
   const [showVideoInput, setShowVideoInput] = useState(false);
   const [showImageInput, setShowImageInput] = useState(false);
   const [showAiModal, setShowAiModal] = useState(false);
-  const [showStoreModal, setShowStoreModal] = useState(false);
+  // WO-O4O-AI-CONTENT-AUTOMATION-SCOPE-CLEANUP-V1: showStoreModal 상태는 후속 WO에서 복원 예정.
   const [linkUrl, setLinkUrl] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
   const [imageUrl, setImageUrl] = useState('');
@@ -564,7 +564,9 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
         </div>
       )}
 
-      {/* AI 정리 + 매장 활용 버튼 (full only) — WO-AI-CONTENT-TRANSFORM-IMPLEMENTATION-V1, WO-O4O-STORE-USE-CONTENT-TRANSFORM-V1 */}
+      {/* AI 정리 버튼 (full only) — WO-AI-CONTENT-TRANSFORM-IMPLEMENTATION-V1
+          WO-O4O-AI-CONTENT-AUTOMATION-SCOPE-CLEANUP-V1:
+          "매장 활용" 버튼은 콘텐츠 제작 자동화 흐름과 분리하여 후속 WO에서 복원. StoreUseModal 컴포넌트와 백엔드 API는 유지. */}
       {preset === 'full' && (
         <>
           <Divider />
@@ -589,28 +591,6 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
           >
             <Sparkles size={14} />
             AI 정리
-          </button>
-          <button
-            type="button"
-            onClick={() => setShowStoreModal(true)}
-            title="매장에서 활용 (QR 안내문 / POP / SNS / 블로그)"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '4px',
-              padding: '4px 10px',
-              border: '1px solid #bbf7d0',
-              borderRadius: '6px',
-              background: '#f0fdf4',
-              color: '#16a34a',
-              fontSize: '12px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            <ShoppingBag size={14} />
-            매장 활용
           </button>
         </>
       )}
@@ -696,12 +676,8 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
       onClose={() => setShowAiModal(false)}
       editor={editor}
     />
-    {/* 매장 활용 변환 모달 */}
-    <StoreUseModal
-      open={showStoreModal}
-      onClose={() => setShowStoreModal(false)}
-      editor={editor}
-    />
+    {/* WO-O4O-AI-CONTENT-AUTOMATION-SCOPE-CLEANUP-V1:
+        StoreUseModal 마운트 제거. 후속 WO에서 매장 활용 흐름을 복원할 때 다시 연결. */}
     </>
   );
 }
