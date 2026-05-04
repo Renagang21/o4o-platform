@@ -188,6 +188,9 @@ const SignagePlaybackPage = lazy(() => import('./pages/pharmacy/SignagePlaybackP
 const SignagePlayerSelectPage = lazy(() => import('./pages/pharmacy/SignagePlayerSelectPage').then(m => ({ default: m.SignagePlayerSelectPage })));
 const PharmacyInfoPage = lazy(() => import('./pages/pharmacy/PharmacyInfoPage').then(m => ({ default: m.PharmacyInfoPage })));
 const StoreHubPage = lazy(() => import('./pages/pharmacy/StoreHubPage').then(m => ({ default: m.StoreHubPage })));
+
+// WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: 매장 경영자용 매장 상품 관리 (공통 패키지)
+import { StoreProductsManagerPage } from '@o4o/store-products-ui';
 // PharmacyHubLayout는 정적 유지 (Layout)
 import { PharmacyHubLayout } from './components/pharmacy/PharmacyHubLayout';
 
@@ -828,6 +831,8 @@ function App() {
             <Route path="commerce/orderable" element={<Navigate to="/store-hub/b2b" replace />} />
             <Route path="commerce/products" element={<PharmacyB2BPage />} />
             <Route path="commerce/products/b2c" element={<PharmacySellPage />} />
+            {/* WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: 내 매장 상품 (ProductMaster + Listing) */}
+            <Route path="my-products" element={<PharmacyOwnerOnlyGuard><StoreProductsManagerPage /></PharmacyOwnerOnlyGuard>} />
             <Route path="commerce/products/suppliers" element={<SupplierListPage />} />
             <Route path="commerce/products/suppliers/:supplierId" element={<SupplierDetailPage />} />
             <Route path="commerce/products/:productId/marketing" element={<ProductMarketingPage />} />

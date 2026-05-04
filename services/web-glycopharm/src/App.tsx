@@ -18,6 +18,9 @@ import KioskLayout from '@/components/layouts/KioskLayout';
 import TabletLayout from '@/components/layouts/TabletLayout';
 import { RoleGuard, OperatorRoute } from '@/components/auth/RoleGuard';
 
+// WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: 매장 경영자용 매장 상품 관리 (공통 패키지)
+import { StoreProductsManagerPage } from '@o4o/store-products-ui';
+
 // Public Pages (always loaded - first paint)
 import LoginPage from '@/pages/auth/LoginPage';
 import HandoffPage from '@/pages/HandoffPage';
@@ -580,6 +583,13 @@ function AppRoutes() {
         <Route path="hub" element={<StoreOverviewPage />} />
         <Route path="identity" element={<StoreMainPage />} />
         <Route path="products" element={<PharmacyProducts />} />
+        {/* WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: 내 매장 상품 (ProductMaster + Listing).
+            상위 ProtectedRoute 가 PHARMACIST 게이트 — 추가로 store_owner/admin 만 통과시킨다. */}
+        <Route path="my-products" element={
+          <RoleGuard allowedRoles={['glycopharm:store_owner', GLYCOPHARM_ROLES.ADMIN, GLYCOPHARM_ROLES.PLATFORM_SUPER_ADMIN]}>
+            <StoreProductsManagerPage />
+          </RoleGuard>
+        } />
         <Route path="local-products" element={<StoreLocalProductsPage />} />
         <Route path="tablet-displays" element={<StoreTabletDisplaysPage />} />
         {/* channels: 채널 관리 (WO-O4O-GLYCOPHARM-STORE-HUB-ADOPTION-V1) */}

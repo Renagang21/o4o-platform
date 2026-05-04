@@ -82,7 +82,9 @@ export const COSMETICS_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'channels', label: '채널 관리', subPath: '/channels' },
     ]},
     { label: '상품', items: [
-      { key: 'local-products', label: '자체 상품', subPath: '/local-products' },
+      // WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: ProductMaster 기반 매장 진열
+      { key: 'my-products',    label: '내 매장 상품', subPath: '/my-products' },
+      { key: 'local-products', label: '자체 상품',    subPath: '/local-products' },
     ]},
     { label: '디지털 사이니지', items: [
       { key: 'signage', label: '사이니지', subPath: '/signage' },
@@ -118,6 +120,8 @@ export const GLYCOPHARM_STORE_CONFIG: StoreDashboardConfig = {
       label: '운영',
       items: [
         { key: 'products',        label: '상품 관리',    subPath: '/products' },
+        // WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: ProductMaster 기반 매장 진열
+        { key: 'my-products',     label: '내 매장 상품', subPath: '/my-products' },
         { key: 'local-products',  label: '자체 상품',    subPath: '/local-products' },
         { key: 'b2b-order',       label: 'B2B 주문',     subPath: '/b2b-order' },
         { key: 'orders',          label: '주문 내역',    subPath: '/orders' },
@@ -185,9 +189,12 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'home', label: '홈', subPath: '' },
     ]},
     { label: '상품', items: [
-      { key: 'products',       label: '공급 상품',    subPath: '/commerce/products' },
-      { key: 'local-products', label: '내 매장 상품', subPath: '/commerce/local-products' },
-      { key: 'orders',         label: '주문 내역',    subPath: '/commerce/orders' },
+      { key: 'products',       label: '공급 상품',           subPath: '/commerce/products' },
+      // WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: ProductMaster 기반 매장 진열 (공통 패키지).
+      // 기존 local-products(자체 상품)와 의미가 다름 — 라벨에 (통합) 접미로 명시.
+      { key: 'my-products',    label: '내 매장 상품(통합)', subPath: '/my-products' },
+      { key: 'local-products', label: '내 매장 상품',        subPath: '/commerce/local-products' },
+      { key: 'orders',         label: '주문 내역',           subPath: '/commerce/orders' },
     ]},
     { label: '디지털 사이니지', items: [
       { key: 'signage-playlist',  label: '플레이리스트', subPath: '/marketing/signage/playlist' },

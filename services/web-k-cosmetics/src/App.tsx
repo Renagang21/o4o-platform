@@ -22,6 +22,9 @@ import DashboardLayout from '@/components/layouts/DashboardLayout';
 import OperatorLayoutWrapper from '@/components/layouts/OperatorLayoutWrapper';
 import { RoleGuard, OperatorRoute } from '@/components/auth/RoleGuard';
 
+// WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: 매장 경영자용 매장 상품 관리 (공통 패키지)
+import { StoreProductsManagerPage } from '@o4o/store-products-ui';
+
 // Public Pages (always loaded - first paint)
 import { HomePage, NotFoundPage } from '@/pages';
 import LoginPage from '@/pages/auth/LoginPage';
@@ -429,6 +432,9 @@ function AppRoutes() {
         <Route index element={<StoreCockpitPage />} />
         {/* WO-O4O-KCOS-STORE-PRODUCTS-FOUNDATION-V1: 매장 경영자 주문 제품 (commerce/order product domain) */}
         <Route path="products" element={<StoreProductsPage />} />
+        {/* WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: 내 매장 상품 (ProductMaster + Listing).
+            상위 ProtectedRoute 가 cosmetics:store_owner 포함 게이트. */}
+        <Route path="my-products" element={<StoreProductsManagerPage />} />
         <Route path="local-products" element={<StoreLocalProductsPage />} />
         <Route path="tablet-displays" element={<StoreTabletDisplaysPage />} />
         {/* channels: 채널 관리 (WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1) */}
