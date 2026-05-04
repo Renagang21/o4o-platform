@@ -41,6 +41,8 @@ import TemplatesPage from '../pages/operator/signage/TemplatesPage';
 import TemplateDetailPage from '../pages/operator/signage/TemplateDetailPage';
 import ForcedContentPage from '../pages/operator/signage/ForcedContentPage';
 import OperatorAnalyticsPage from '../pages/operator/AnalyticsPage';
+// WO-O4O-GUIDE-CONTENT-EDITOR-UI-V1
+import OperatorGuideContentsPage from '../pages/operator/OperatorGuideContentsPage';
 import { RoleGuard } from '../components/auth/RoleGuard';
 import { PLATFORM_ROLES, ROLES } from '../lib/role-constants';
 // WO-O4O-OPERATOR-UI-STANDARDIZATION-V1: shared OperatorShell wrapper
@@ -128,6 +130,9 @@ export function OperatorRoutes() {
           {/* LMS 강의 관리 (WO-KPA-OPERATOR-LMS-ROUTE-CANONICAL-FIX-V1: /operator/lms를 canonical route로 변경) */}
           <Route path="lms" element={<OperatorLmsCoursesPage />} />
           <Route path="lms/courses" element={<Navigate to="/operator/lms" replace />} />
+
+          {/* 안내 문구 관리 (WO-O4O-GUIDE-CONTENT-EDITOR-UI-V1) */}
+          <Route path="guide-contents" element={<OperatorGuideContentsPage />} />
 
           {/* 매장 관리 (WO-O4O-STORE-HUB-OPERATOR-INTEGRATION-V1) */}
           <Route path="stores" element={<OperatorStoresPage />} />

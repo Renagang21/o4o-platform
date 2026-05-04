@@ -47,9 +47,11 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '자료실 관리', path: '/operator/resources' },
   ],
   // WO-KPA-LMS-INSTRUCTOR-APPROVAL-RELOCATE-V1: 강의 독립 그룹 (강의 관리 + 강사 승인)
+  // WO-O4O-GUIDE-CONTENT-EDITOR-UI-V1: 안내 문구 관리 추가 (LMS 레슨 작성 화면)
   lms: [
     { label: '강의 관리', path: '/operator/lms' },
     { label: '강사 승인', path: '/operator/qualification-requests' },
+    { label: '안내 문구 관리', path: '/operator/guide-contents' },
   ],
   signage: [
 
