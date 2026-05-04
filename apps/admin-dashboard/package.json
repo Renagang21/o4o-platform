@@ -47,6 +47,7 @@
     "@o4o/slide-app": "file:../../packages/slide-app",
     "@o4o/pharmacy-ai-insight": "file:../../packages/pharmacy-ai-insight",
     "@o4o/cgm-pharmacist-app": "workspace:*",
+    "@o4o/store-products-ui": "workspace:*",
     "@o4o/types": "file:../../packages/types",
     "@o4o/ui": "workspace:*",
     "@o4o/utils": "file:../../packages/utils",

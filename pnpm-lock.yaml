@@ -314,6 +314,9 @@ importers:
       '@o4o/slide-app':
         specifier: file:../../packages/slide-app
         version: link:../../packages/slide-app
+      '@o4o/store-products-ui':
+        specifier: workspace:*
+        version: link:../../packages/store-products-ui
       '@o4o/types':
         specifier: file:../../packages/types
         version: link:../../packages/types
@@ -2942,6 +2945,34 @@ importers:
 
   packages/store-core: {}
 
+  packages/store-products-ui:
+    dependencies:
+      '@o4o/auth-client':
+        specifier: workspace:*
+        version: link:../auth-client
+      '@o4o/ui':
+        specifier: workspace:*
+        version: link:../ui
+      '@tanstack/react-query':
+        specifier: '>=5.0.0'
+        version: 5.90.11(react@19.2.0)
+      lucide-react:
+        specifier: '>=0.300.0'
+        version: 0.523.0(react@19.2.0)
+      react:
+        specifier: 19.2.0
+        version: 19.2.0
+      react-dom:
+        specifier: 19.2.0
+        version: 19.2.0(react@19.2.0)
+      react-hot-toast:
+        specifier: '>=2.0.0'
+        version: 2.6.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+    devDependencies:
+      typescript:
+        specifier: 5.4.5
+        version: 5.4.5
+
   packages/store-ui-core:
     dependencies:
       lucide-react:
@@ -3289,6 +3320,9 @@ importers:
       '@o4o/store-asset-policy-core':
         specifier: workspace:*
         version: link:../../packages/store-asset-policy-core
+      '@o4o/store-products-ui':
+        specifier: workspace:*
+        version: link:../../packages/store-products-ui
       '@o4o/store-ui-core':
         specifier: workspace:*
         version: link:../../packages/store-ui-core
@@ -3401,6 +3435,9 @@ importers:
       '@o4o/store-asset-policy-core':
         specifier: workspace:*
         version: link:../../packages/store-asset-policy-core
+      '@o4o/store-products-ui':
+        specifier: workspace:*
+        version: link:../../packages/store-products-ui
       '@o4o/store-ui-core':
         specifier: workspace:*
         version: link:../../packages/store-ui-core
@@ -3498,6 +3535,9 @@ importers:
       '@o4o/store-asset-policy-core':
         specifier: workspace:*
         version: link:../../packages/store-asset-policy-core
+      '@o4o/store-products-ui':
+        specifier: workspace:*
+        version: link:../../packages/store-products-ui
       '@o4o/store-ui-core':
         specifier: workspace:*
         version: link:../../packages/store-ui-core
@@ -3589,6 +3629,9 @@ importers:
       '@o4o/shared-space-ui':
         specifier: workspace:*
         version: link:../../packages/shared-space-ui
+      '@o4o/store-products-ui':
+        specifier: workspace:*
+        version: link:../../packages/store-products-ui
       '@o4o/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -18443,7 +18486,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.15
       tinyrainbow: 2.0.0
-      vitest: 3.2.4(@types/node@24.10.1)(@vitest/ui@3.2.4)(jsdom@26.1.0)(msw@2.12.3(@types/node@24.10.1)(typescript@5.4.5))(terser@5.43.1)
+      vitest: 3.2.4(@types/node@22.17.2)(@vitest/ui@3.2.4)(jsdom@26.1.0)(msw@2.12.3(@types/node@22.17.2)(typescript@5.4.5))(terser@5.44.1)
 
   '@vitest/utils@3.2.4':
     dependencies:

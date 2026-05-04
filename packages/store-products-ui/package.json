@@ -1,0 +1,26 @@
+{
+  "name": "@o4o/store-products-ui",
+  "version": "0.1.0",
+  "description": "Store Products UI - 매장 경영자용 상품 관리 페이지(검색/등록/가격/설명/채널/이미지). Phase A 공통화 산출물.",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@o4o/auth-client": "workspace:*",
+    "@o4o/ui": "workspace:*"
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": ">=5.0.0",
+    "lucide-react": ">=0.300.0",
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0",
+    "react-hot-toast": ">=2.0.0"
+  },
+  "devDependencies": {
+    "typescript": "5.4.5"
+  }
+}

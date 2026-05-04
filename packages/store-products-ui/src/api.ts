@@ -1,76 +1,30 @@
 /**
- * Store Product Library API Client
+ * Store Products UI — API Client
  *
- * WO-O4O-STORE-PRODUCT-REGISTRATION-PHASE1-V1
+ * WO-O4O-STORE-PRODUCTS-UI-CORE-EXTRACTION-V1
  *
  * 매장 경영자가 ProductMaster를 검색하고,
  * OrganizationProductListing을 생성·관리하는 API 클라이언트.
  *
  * Base: /api/v1/store/products
+ *
+ * Backend gate: requireAuth + requireStoreOwner (role_assignments 기반)
  */
 
 import { authClient } from '@o4o/auth-client';
+import type {
+  StoreProductSearchResult,
+  StoreProductOffer,
+  StoreListingItem,
+  PaginatedResponse,
+  ProductImageItem,
+  StoreChannel,
+  ChannelProductItem,
+} from './types.js';
 
 const BASE = '/api/v1/store/products';
 
-// ── Types ─────────────────────────────────────────────────────────────────────
-
-export interface StoreProductSearchResult {
-  id: string;                              // masterId
-  barcode: string;
-  name: string;
-  regulatoryName: string;
-  manufacturerName: string;
-  specification: string | null;
-  category: { id: string; name: string } | null;
-  brand: { id: string; name: string } | null;
-  primaryImageUrl: string | null;
-  offerCount: number;
-}
-
-export interface StoreProductOffer {
-  id: string;                              // offerId (SupplierProductOffer.id)
-  supplierId: string;
-  supplierName: string;
-  priceGeneral: number;
-  priceGold: number;
-  pricePlatinum: number;
-  distributionType: string;
-  consumerShortDescription: string | null;
-  businessShortDescription: string | null;
-  effectiveShortDescription: string;
-  effectiveDetailDescription: string;
-  brandName: string | null;
-  manufacturerName: string | null;
-}
-
-export interface StoreListingItem {
-  id: string;                              // OrganizationProductListing.id
-  offerId: string;                         // SupplierProductOffer.id (for description override)
-  isActive: boolean;
-  price: number | null;                    // 매장 override 가격 (null = offer 기본가 사용)
-  createdAt: string;
-  updatedAt: string;
-  masterId: string;
-  barcode: string;
-  name: string;
-  regulatoryName: string;
-  manufacturerName: string;
-  primaryImage: string | null;
-  imageCount: number;                      // 등록된 이미지 수 (0 = 이미지 없음)
-  offerPrice: number;                      // 공급자 기본가
-  distributionType: string;
-  supplierId: string;
-  supplierName: string;
-}
-
-export interface PaginatedResponse<T> {
-  success: boolean;
-  data: T[];
-  meta: { page: number; limit: number; total: number; totalPages: number };
-}
-
-// ── API Functions ─────────────────────────────────────────────────────────────
+// ── 검색/조회/등록 ──────────────────────────────────────────────────────────
 
 /**
  * ProductMaster 검색 (바코드/상품명/제조사)
@@ -148,17 +102,7 @@ export async function updateStoreListing(
   return res.data;
 }
 
-// ── 이미지 관련 ──────────────────────────────────────────────────────────────
-
-export interface ProductImageItem {
-  id: string;
-  imageUrl: string;
-  gcsPath: string;
-  type: 'thumbnail' | 'detail' | 'content';
-  isPrimary: boolean;
-  sortOrder: number;
-  createdAt: string;
-}
+// ── 이미지 ──────────────────────────────────────────────────────────────────
 
 /**
  * 상품 이미지 목록 조회
@@ -219,27 +163,7 @@ export async function deleteImage(imageId: string): Promise<{ success: boolean }
   return res.data;
 }
 
-// ── 채널 관련 ─────────────────────────────────────────────────────────────────
-
-export interface StoreChannel {
-  id: string;
-  channelType: 'B2C' | 'KIOSK';
-  status: string;
-  approvedAt: string | null;
-  createdAt: string;
-}
-
-export interface ChannelProductItem {
-  id: string;                              // OrganizationProductChannel.id
-  isActive: boolean;
-  displayOrder: number;
-  createdAt: string;
-  productListingId: string;
-  productName: string;
-  retailPrice: number;
-  serviceKey: string;
-  listingActive: boolean;
-}
+// ── 채널 ────────────────────────────────────────────────────────────────────
 
 /**
  * 내 매장 채널 목록 (B2C/KIOSK)
@@ -304,3 +228,23 @@ export async function updateListingDescription(
   }>(`${BASE}/${offerId}/description`, body);
   return res.data;
 }
+
+// ── Bundled API object (선택적 — 단순 import용) ──────────────────────────────
+
+export const storeProductsApi = {
+  searchStoreProducts,
+  getMasterOffers,
+  createStoreListing,
+  getMyStoreListings,
+  updateStoreListing,
+  updateListingDescription,
+  getMasterImages,
+  importImageFromUrl,
+  reorderImages,
+  setImagePrimary,
+  deleteImage,
+  getMyChannels,
+  getChannelProducts,
+  addProductToChannel,
+  toggleChannelProduct,
+} as const;
