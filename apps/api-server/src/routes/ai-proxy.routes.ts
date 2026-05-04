@@ -505,9 +505,52 @@ router.post('/url-to-blocks', authenticate, async (req, res: Response) => {
       ...(block.innerBlocks ? { innerBlocks: block.innerBlocks } : {}),
     }));
 
-    logger.info('[url-to-blocks] 완료', { requestId, userId, blockCount: normalizedBlocks.length });
+    // 6. 후처리 파이프라인 (WO-O4O-AI-URL-CONTENT-QUALITY-V3)
+    const isYouTube =
+      parsedUrl.hostname.includes('youtube.com') ||
+      parsedUrl.hostname.includes('youtu.be');
 
-    return res.json({ success: true, blocks: normalizedBlocks, requestId });
+    // 6-A. 노이즈 블록 제거
+    const noiseKeywords = [
+      '로그인', '회원가입', '아이디', '비밀번호', '이용약관', '개인정보',
+      '저작권', '문의하기', '문의', '크리에이터', '광고', '개발자',
+      '보도자료', '약관', '정책 및 안전', 'youtube 작동',
+      'contact', 'login', 'sign up', 'register', 'copyright',
+      'privacy policy', 'terms of service', 'quick menu',
+      '회원', '구독', '좋아요', '댓글', '공유',
+    ];
+
+    const isNoiseBlock = (block: any): boolean => {
+      const text = ((block.content || '') + JSON.stringify(block.attributes || {})).toLowerCase();
+      return noiseKeywords.some(kw => text.includes(kw));
+    };
+
+    const filteredBlocks = normalizedBlocks.filter(b => !isNoiseBlock(b));
+
+    // 6-B. YouTube 특수 처리: embed + 텍스트 4개 이내
+    let finalBlocks: typeof filteredBlocks;
+    if (isYouTube) {
+      const ytBlocks = filteredBlocks.filter(b => b.type === 'o4o/youtube');
+      const textBlocks = filteredBlocks.filter(b => b.type !== 'o4o/youtube').slice(0, 4);
+      finalBlocks = [...ytBlocks, ...textBlocks];
+    } else {
+      finalBlocks = filteredBlocks;
+    }
+
+    // 6-C. 최대 블록 수 강제 제한
+    const MAX_BLOCKS = 10;
+    const limitedBlocks = finalBlocks.slice(0, MAX_BLOCKS);
+
+    logger.info('[url-to-blocks] 완료', {
+      requestId,
+      userId,
+      rawBlocks: normalizedBlocks.length,
+      afterFilter: filteredBlocks.length,
+      final: limitedBlocks.length,
+      isYouTube,
+    });
+
+    return res.json({ success: true, blocks: limitedBlocks, requestId });
   } catch (error: any) {
     logger.error('[url-to-blocks] 오류', { requestId, error: error.message });
     return res.status(500).json({
