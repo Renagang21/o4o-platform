@@ -48,10 +48,16 @@ export interface CourseStructureAiModalProps {
   onConfirm: (selected: GeneratedLessonWithBody[]) => Promise<void>;
 }
 
-/** WO-O4O-LMS-LESSON-BODY-AI-GENERATION-V3: 본문 생성 실패 시 사용되는 최소 fallback HTML */
+/** WO-O4O-LMS-LESSON-BODY-AI-GENERATION-V3: 본문 생성 실패 시 사용되는 최소 fallback HTML
+ *  WO-O4O-AI-CONTENT-AUTOMATION-DOC-AND-VERIFY-V1: HTML 엔티티 escape 보강 (& · < · >) */
 function buildFallbackBodyHtml(title: string, summary: string): string {
-  const safeTitle = (title || '').replace(/</g, '&lt;');
-  const safeSummary = (summary || '').replace(/</g, '&lt;');
+  const escape = (t: string) =>
+    (t || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  const safeTitle = escape(title);
+  const safeSummary = escape(summary);
   if (!safeSummary.trim()) {
     return `<h2>${safeTitle}</h2>\n<p>본문을 작성해 주세요.</p>`;
   }
