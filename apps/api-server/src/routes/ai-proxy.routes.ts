@@ -283,16 +283,23 @@ async function fetchUrlText(url: string): Promise<string> {
 
 /**
  * HTML에서 의미있는 텍스트 추출
+ * WO-O4O-AI-URL-CONTENT-QUALITY-V2: 노이즈 제거 강화
  */
 function stripHtml(html: string): string {
-  return html
+  // UI 노이즈 태그 전체 블록 제거 (nav/header/footer/aside/form/button/input/select)
+  const noiseTagsRe = /<(nav|header|footer|aside|form|button|input|select|textarea|label|fieldset|dialog|menu|menuitem)[\s\S]*?<\/\1>/gi;
+
+  const cleaned = html
     // script/style 블록 제거
     .replace(/<script[\s\S]*?<\/script>/gi, ' ')
     .replace(/<style[\s\S]*?<\/style>/gi, ' ')
-    // nav/header/footer/aside 제거
-    .replace(/<(nav|header|footer|aside)[\s\S]*?<\/\1>/gi, ' ')
+    // UI 노이즈 태그 제거 (2회 반복: 중첩 대응)
+    .replace(noiseTagsRe, ' ')
+    .replace(noiseTagsRe, ' ')
+    // 자기완결형 input/br/hr 제거
+    .replace(/<(input|br|hr|img)[^>]*\/?>/gi, ' ')
     // 블록 태그를 줄바꿈으로
-    .replace(/<\/(p|div|h[1-6]|li|br|tr|td|th)>/gi, '\n')
+    .replace(/<\/(p|div|h[1-6]|li|br|tr|td|th|section|article)>/gi, '\n')
     // 나머지 태그 제거
     .replace(/<[^>]+>/g, ' ')
     // HTML 엔티티 기본 변환
@@ -302,19 +309,47 @@ function stripHtml(html: string): string {
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
     .replace(/&nbsp;/g, ' ')
-    // 연속 공백/줄바꿈 정리
-    .replace(/[ \t]+/g, ' ')
+    .replace(/&copy;/g, '')
+    // 연속 공백 정리
+    .replace(/[ \t]+/g, ' ');
+
+  // 라인별 UI 노이즈 필터링 (WO-O4O-AI-URL-CONTENT-QUALITY-V2)
+  const noisePatterns = [
+    /^(로그인|회원가입|아이디\s*찾기|비밀번호\s*찾기|회원\s*등록|이용약관|개인정보|저작권|문의|고객센터)$/,
+    /^(login|sign\s*up|register|contact|menu|quick\s*menu|subscribe|newsletter)$/i,
+    /^(정보|보도자료|저작권|광고|개발자|약관|크리에이터|채널|구독|좋아요|댓글|공유)$/,
+    /^(home|about|services|products|blog|news|events|careers|faq|sitemap)$/i,
+    /^[\s\|·•\-–—]+$/,  // 구분자만 있는 라인
+  ];
+
+  const filteredLines = cleaned
+    .split('\n')
+    .map(l => l.trim())
+    .filter(l => {
+      if (l.length === 0) return false;
+      if (l.length < 3) return false;
+      // 노이즈 패턴 매칭
+      if (noisePatterns.some(re => re.test(l))) return false;
+      // 메뉴처럼 짧은 단어들이 연속된 라인 (예: "정보 보도자료 저작권 광고")
+      const words = l.split(/\s+/);
+      if (words.length >= 4 && words.every(w => w.length <= 8)) return false;
+      return true;
+    });
+
+  return filteredLines
+    .join('\n')
     .replace(/\n{3,}/g, '\n\n')
     .trim()
-    // 최대 4000자 (토큰 초과 방지)
-    .slice(0, 4000);
+    // 최대 3500자 (토큰 초과 방지, V2: 4000→3500 압축)
+    .slice(0, 3500);
 }
 
 /**
  * Block 생성용 시스템 프롬프트
+ * WO-O4O-AI-URL-CONTENT-QUALITY-V2: 블록 수 압축 + 구조 안정화
  */
 function buildUrlBlockSystemPrompt(contentType: string, tone: string): string {
-  const contentTypeLabel = contentType === 'explanatory' ? '설명형' : '문서형';
+  const contentTypeLabel = contentType === 'explain' || contentType === 'explanatory' ? '설명형' : '문서형';
   const toneLabel = tone === 'professional' ? '전문적' : tone === 'store' ? '매장 친화적' : '일반적';
 
   return `당신은 O4O 플랫폼의 콘텐츠 블록 생성 전문가입니다.
@@ -328,25 +363,33 @@ function buildUrlBlockSystemPrompt(contentType: string, tone: string): string {
 - 각 블록 구조: { "id": "block-N", "type": "o4o/...", "content": "...", "attributes": {...} }
 - id는 "block-1", "block-2" ... 순서대로
 
+## 블록 수 및 길이 제한 (필수)
+- **최대 8~10개 블록**으로 구성할 것
+- 핵심 내용만 요약하여 포함할 것
+- 각 paragraph는 3문장 이내로 간결하게 작성
+- 전체 내용을 나열하지 말고 독자에게 가장 유용한 정보만 선별
+
+## 콘텐츠 필터링 (필수)
+- 메뉴, 네비게이션, 로그인, 회원가입, footer, 저작권 등 UI 요소는 절대 포함하지 말 것
+- 광고, 구독 유도, 관련 링크 목록은 제외
+- YouTube 페이지의 경우: 영상 제목, 설명, 핵심 정보만 포함. 채널 메뉴, 추천 영상, UI 항목 제외
+- 실제 읽을 수 있는 본문 내용만 포함
+
 ## 사용 가능한 블록 타입
-- o4o/heading: 제목 → { "id": "block-1", "type": "o4o/heading", "content": "제목 텍스트", "attributes": { "level": 2 } }
-- o4o/paragraph: 문단 → { "id": "block-2", "type": "o4o/paragraph", "content": "본문 텍스트" }
-- o4o/list: 항목 목록 → { "id": "block-3", "type": "o4o/list", "content": "<li>항목1</li><li>항목2</li>", "attributes": { "type": "unordered" } }
-- o4o/quote: 인용문 → { "id": "block-4", "type": "o4o/quote", "content": "인용 내용", "attributes": { "citation": "출처" } }
-- o4o/image: 이미지(URL 있을 때만) → { "id": "block-5", "type": "o4o/image", "attributes": { "url": "https://...", "alt": "설명" } }
+- o4o/heading: 제목 → { "id": "block-1", "type": "o4o/heading", "content": "제목", "attributes": { "level": 2 } }
+- o4o/paragraph: 문단 → { "id": "block-2", "type": "o4o/paragraph", "content": "본문" }
+- o4o/list: 핵심 포인트 목록 → { "id": "block-3", "type": "o4o/list", "content": "<li>항목1</li><li>항목2</li>", "attributes": { "type": "unordered" } }
+- o4o/quote: 중요 인용문만 → { "id": "block-4", "type": "o4o/quote", "content": "인용", "attributes": { "citation": "출처" } }
+- o4o/image: 이미지 URL 있을 때만 → { "id": "block-5", "type": "o4o/image", "attributes": { "url": "https://...", "alt": "설명" } }
 - o4o/youtube: YouTube URL 있을 때만 → { "id": "block-6", "type": "o4o/youtube", "attributes": { "url": "https://youtube.com/..." } }
 
-## 변환 규칙
-1. 핵심 제목 → o4o/heading (level 2)
-2. 소제목 → o4o/heading (level 3)
-3. 일반 문단 → o4o/paragraph
-4. 열거형 내용 → o4o/list
-5. 중요 인용/강조 → o4o/quote
-6. 이미지 URL → o4o/image (attributes에 url 포함)
-7. YouTube URL → o4o/youtube
-8. layout/widget 블록은 사용하지 말 것
+## 구조 규칙
+1. heading(level 2) → paragraph 흐름 중심으로 구성
+2. list는 핵심 포인트에만 사용 (3~5개 항목)
+3. layout/widget/columns 블록 사용 금지
+4. 읽기 쉬운 문서 형태로 구성
 
-블록 수는 5~15개가 적당합니다. JSON만 반환하고 다른 텍스트는 포함하지 마세요.`;
+JSON만 반환하고 다른 텍스트는 포함하지 마세요.`;
 }
 
 router.post('/url-to-blocks', authenticate, async (req, res: Response) => {
