@@ -10,6 +10,8 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { RichTextEditor, AiContentModal } from '@o4o/content-editor';
 // WO-O4O-GUIDE-UI-COMPONENT-V1
 import { GuideBlock } from '@o4o/shared-space-ui';
+// WO-O4O-GUIDE-CONTENT-MANAGEMENT-V1-SCOPED
+import { fetchGuidePageContent } from '../../../api/guideContent';
 import { lmsInstructorApi, Course, Lesson, LessonType, type CourseVisibility } from '../../../api/lms-instructor';
 import QuizBuilder from './QuizBuilder';
 import AssignmentEditor from './AssignmentEditor';
@@ -24,7 +26,35 @@ const LESSON_TYPE_LABEL: Record<LessonType, string> = {
 
 const SUPPORTED_LESSON_TYPES: LessonType[] = ['video', 'article', 'quiz', 'assignment', 'live'];
 
-// WO-O4O-GUIDE-UI-COMPONENT-V1: 레슨 유형별 화면 안 안내
+// WO-O4O-GUIDE-CONTENT-MANAGEMENT-V1-SCOPED:
+//   guide_contents 에 sectionKey={lessonType} / pageKey='lms.lesson.editor' 로 저장된
+//   JSON 문자열을 우선 사용하고, 없거나 parse 실패 시 LESSON_TYPE_GUIDE fallback.
+const GUIDE_PAGE_KEY = 'lms.lesson.editor';
+const GUIDE_SERVICE_KEY = 'kpa-society';
+
+interface LessonGuideOverride {
+  title?: string;
+  description?: string;
+  steps?: string[];
+}
+
+function parseLessonGuideContent(raw: string): LessonGuideOverride | null {
+  try {
+    const obj = JSON.parse(raw);
+    if (!obj || typeof obj !== 'object') return null;
+    const out: LessonGuideOverride = {};
+    if (typeof (obj as any).title === 'string') out.title = (obj as any).title;
+    if (typeof (obj as any).description === 'string') out.description = (obj as any).description;
+    if (Array.isArray((obj as any).steps)) {
+      out.steps = (obj as any).steps.filter((s: unknown): s is string => typeof s === 'string');
+    }
+    return out;
+  } catch {
+    return null;
+  }
+}
+
+// WO-O4O-GUIDE-UI-COMPONENT-V1: 레슨 유형별 화면 안 안내 (운영자 override 부재 시 fallback)
 const LESSON_TYPE_GUIDE: Record<LessonType, { title: string; description: string; steps: string[] }> = {
   article: {
     title: '문서 레슨입니다.',
@@ -171,6 +201,24 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
   const activeLesson = lesson ?? savedLesson;
   // editor를 표시할 조건 — isEdit 또는 신규 생성 완료(savedLesson 존재)
   const showEditor = isEdit || savedLesson !== null;
+
+  // WO-O4O-GUIDE-CONTENT-MANAGEMENT-V1-SCOPED: 운영자 override fetch (실패 시 fallback)
+  const [guideOverrides, setGuideOverrides] = useState<Partial<Record<LessonType, LessonGuideOverride>>>({});
+  useEffect(() => {
+    let cancelled = false;
+    fetchGuidePageContent(GUIDE_SERVICE_KEY, GUIDE_PAGE_KEY).then((sections) => {
+      if (cancelled) return;
+      const next: Partial<Record<LessonType, LessonGuideOverride>> = {};
+      for (const t of SUPPORTED_LESSON_TYPES) {
+        const raw = sections[t];
+        if (!raw) continue;
+        const parsed = parseLessonGuideContent(raw);
+        if (parsed) next[t] = parsed;
+      }
+      setGuideOverrides(next);
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   // quiz/assignment/live 타입은 전용 editor 마운트가 필요하므로 저장 후 modal을 닫지 않는다
   const EDITOR_TYPES: LessonType[] = ['quiz', 'assignment', 'live'];
@@ -341,13 +389,20 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
             )}
 
             {/* WO-O4O-GUIDE-UI-COMPONENT-V1: 레슨 유형별 화면 안 안내 — 본문 입력 직전 */}
+            {/* WO-O4O-GUIDE-CONTENT-MANAGEMENT-V1-SCOPED: 운영자 override 우선, 없으면 fallback */}
             <div style={{ marginBottom: 16 }}>
-              <GuideBlock
-                variant="info"
-                title={LESSON_TYPE_GUIDE[form.type].title}
-                description={LESSON_TYPE_GUIDE[form.type].description}
-                steps={LESSON_TYPE_GUIDE[form.type].steps}
-              />
+              {(() => {
+                const fb = LESSON_TYPE_GUIDE[form.type];
+                const ov = guideOverrides[form.type];
+                return (
+                  <GuideBlock
+                    variant="info"
+                    title={ov?.title ?? fb.title}
+                    description={ov?.description ?? fb.description}
+                    steps={ov?.steps ?? fb.steps}
+                  />
+                );
+              })()}
             </div>
 
             <div style={s.field}>
