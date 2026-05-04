@@ -12,9 +12,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Sparkles, AlertCircle } from 'lucide-react';
+import { Loader2, Sparkles, AlertCircle, Link2, FileText } from 'lucide-react';
 import { simpleAIGenerator, AI_MODELS, type AIModel, type Block, type GenerateResult } from '@/services/ai/SimpleAIGenerator';
 import { AppSystemKeyService } from '@/services/app-system-keys.service';
+import { authClient } from '@o4o/auth-client';
 
 interface SimpleAIModalProps {
   isOpen: boolean;
@@ -46,6 +47,12 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
   const [elapsedTime, setElapsedTime] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [isAppInstalled, setIsAppInstalled] = useState(false);
+
+  // WO-O4O-AI-BLOCK-GENERATION-V1: URL 모드 상태
+  const [sourceMode, setSourceMode] = useState<'prompt' | 'url'>('prompt');
+  const [urlInput, setUrlInput] = useState('');
+  const [urlContentType, setUrlContentType] = useState<'document' | 'explanatory'>('document');
+  const [urlTone, setUrlTone] = useState<'normal' | 'professional' | 'store'>('normal');
 
   // 모달이 열릴 때 저장된 API 키 자동 로드 (App System에서)
   useEffect(() => {
@@ -81,6 +88,66 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
 
   // Gemini 모델만 필터링
   const geminiModels = Object.entries(AI_MODELS).filter(([key]) => key.startsWith('gemini-'));
+
+  // WO-O4O-AI-BLOCK-GENERATION-V1: URL → Block[] 생성
+  const handleGenerateFromUrl = async () => {
+    if (!urlInput.trim()) {
+      setError('URL을 입력해주세요.');
+      return;
+    }
+    try {
+      new URL(urlInput.trim());
+    } catch {
+      setError('올바른 URL 형식이 아닙니다. (예: https://example.com)');
+      return;
+    }
+
+    setIsGenerating(true);
+    setError(null);
+    setProgress(10);
+    setProgressMessage('URL 콘텐츠 분석 중...');
+    setElapsedTime(0);
+
+    const startTime = Date.now();
+    const intervalId = setInterval(() => {
+      setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
+    }, 1000);
+
+    try {
+      setProgress(30);
+      setProgressMessage('AI 블록 생성 중...');
+
+      const response = await authClient.api.post('/ai/url-to-blocks', {
+        url: urlInput.trim(),
+        contentType: urlContentType,
+        tone: urlTone,
+      });
+
+      clearInterval(intervalId);
+
+      const data = response.data as { success: boolean; blocks?: Block[]; error?: string };
+
+      if (!data.success || !data.blocks || data.blocks.length === 0) {
+        throw new Error(data.error || '블록 생성 결과가 없습니다.');
+      }
+
+      setProgress(100);
+      setProgressMessage('완료!');
+
+      onGenerate({ blocks: data.blocks });
+      onClose();
+      setUrlInput('');
+      setProgress(0);
+      setProgressMessage('');
+      setElapsedTime(0);
+    } catch (err: any) {
+      clearInterval(intervalId);
+      const message = err?.response?.data?.error || err.message || 'URL 블록 생성 중 오류가 발생했습니다.';
+      setError(message);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
@@ -233,11 +300,87 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
             className="space-y-4 py-4"
             onSubmit={(e) => {
               e.preventDefault();
-              handleGenerate();
+              if (sourceMode === 'url') handleGenerateFromUrl();
+              else handleGenerate();
             }}
           >
-            {/* 신규 모드에서만 템플릿 선택 표시 */}
+            {/* WO-O4O-AI-BLOCK-GENERATION-V1: 소스 모드 탭 (신규 모드에서만) */}
             {mode === 'new' && (
+              <div className="flex rounded-lg border border-gray-200 overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => { setSourceMode('prompt'); setError(null); }}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium transition-colors ${
+                    sourceMode === 'prompt'
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-white text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <FileText className="w-4 h-4" />
+                  직접 입력
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setSourceMode('url'); setError(null); }}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium transition-colors ${
+                    sourceMode === 'url'
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-white text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <Link2 className="w-4 h-4" />
+                  URL에서 생성
+                </button>
+              </div>
+            )}
+
+            {/* URL 모드 폼 */}
+            {sourceMode === 'url' && mode === 'new' && (
+              <div className="space-y-3">
+                <div className="space-y-1">
+                  <Label>URL</Label>
+                  <input
+                    type="url"
+                    className="flex h-10 w-full rounded-md border border-gray-300 bg-background px-3 py-2 text-sm"
+                    placeholder="https://example.com/article"
+                    value={urlInput}
+                    onChange={(e) => setUrlInput(e.target.value)}
+                  />
+                  <p className="text-xs text-gray-500">공개 접근 가능한 URL을 입력하세요</p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <Label>콘텐츠 유형</Label>
+                    <Select value={urlContentType} onValueChange={(v: any) => setUrlContentType(v)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="document">문서형</SelectItem>
+                        <SelectItem value="explanatory">설명형</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1">
+                    <Label>톤</Label>
+                    <Select value={urlTone} onValueChange={(v: any) => setUrlTone(v)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="normal">일반</SelectItem>
+                        <SelectItem value="professional">전문</SelectItem>
+                        <SelectItem value="store">매장용</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 신규 모드에서만 템플릿 선택 표시 */}
+            {sourceMode === 'prompt' && mode === 'new' && (
               <div className="space-y-2">
                 <Label>템플릿</Label>
                 <Select value={template} onValueChange={(v: any) => setTemplate(v)}>
@@ -258,92 +401,97 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
               </div>
             )}
 
-            {/* AI 서비스 정보 */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-              <div className="flex items-center gap-2 text-sm">
-                <Sparkles className="w-4 h-4 text-blue-600" />
-                <span className="font-medium text-blue-900">Google Gemini AI 사용</span>
-              </div>
-              {!isAppInstalled && (
-                <p className="text-xs text-blue-700 mt-1">
-                  💡 <a href="/admin/settings/app-services" target="_blank" className="underline hover:no-underline">
-                    AI Services 설정
-                  </a>에서 Gemini 앱을 먼저 설치하세요.
-                </p>
-              )}
-            </div>
+            {/* 직접 입력 모드: AI 서비스 정보 + 모델 + API 키 + 프롬프트 */}
+            {sourceMode === 'prompt' && (
+              <>
+                {/* AI 서비스 정보 */}
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <div className="flex items-center gap-2 text-sm">
+                    <Sparkles className="w-4 h-4 text-blue-600" />
+                    <span className="font-medium text-blue-900">Google Gemini AI 사용</span>
+                  </div>
+                  {!isAppInstalled && (
+                    <p className="text-xs text-blue-700 mt-1">
+                      💡 <a href="/admin/settings/app-services" target="_blank" className="underline hover:no-underline">
+                        AI Services 설정
+                      </a>에서 Gemini 앱을 먼저 설치하세요.
+                    </p>
+                  )}
+                </div>
 
-            {/* 모델 선택 */}
-            <div className="space-y-2">
-              <Label>Gemini 모델</Label>
-              <Select value={model} onValueChange={(v) => setModel(v as AIModel)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {geminiModels.map(([key, name]) => (
-                    <SelectItem key={key} value={key}>
-                      <div className="text-sm">
-                        <div className="font-medium">{key}</div>
-                        <div className="text-xs text-gray-500">{name}</div>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+                {/* 모델 선택 */}
+                <div className="space-y-2">
+                  <Label>Gemini 모델</Label>
+                  <Select value={model} onValueChange={(v) => setModel(v as AIModel)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {geminiModels.map(([key, name]) => (
+                        <SelectItem key={key} value={key}>
+                          <div className="text-sm">
+                            <div className="font-medium">{key}</div>
+                            <div className="text-xs text-gray-500">{name}</div>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-            {/* API 키 */}
-            <div className="space-y-2">
-              <Label>Google Gemini API 키</Label>
-              <input
-                type="password"
-                autoComplete="off"
-                className="flex h-10 w-full rounded-md border border-gray-300 bg-background px-3 py-2 text-sm"
-                placeholder="AIza..."
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-              />
-              <div className="text-xs text-gray-500 space-y-1">
-                <p>Google AI Studio에서 발급받은 API 키를 입력하세요</p>
-                {!apiKey && (
-                  <p className="text-blue-600">
-                    💡 <a href="/admin/settings/app-services" target="_blank" className="underline hover:no-underline">
-                      AI Services 설정
-                    </a>에서 API 키를 미리 저장하면 자동으로 입력됩니다.
+                {/* API 키 */}
+                <div className="space-y-2">
+                  <Label>Google Gemini API 키</Label>
+                  <input
+                    type="password"
+                    autoComplete="off"
+                    className="flex h-10 w-full rounded-md border border-gray-300 bg-background px-3 py-2 text-sm"
+                    placeholder="AIza..."
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                  />
+                  <div className="text-xs text-gray-500 space-y-1">
+                    <p>Google AI Studio에서 발급받은 API 키를 입력하세요</p>
+                    {!apiKey && (
+                      <p className="text-blue-600">
+                        💡 <a href="/admin/settings/app-services" target="_blank" className="underline hover:no-underline">
+                          AI Services 설정
+                        </a>에서 API 키를 미리 저장하면 자동으로 입력됩니다.
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* 프롬프트 입력 */}
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <Label>{mode === 'new' ? '페이지 내용 설명' : '편집 요청 사항'}</Label>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setPrompt(mode === 'new' ? examplePrompts[template] : editExamplePrompt)}
+                    >
+                      예시 사용
+                    </Button>
+                  </div>
+                  <Textarea
+                    placeholder={mode === 'new'
+                      ? '어떤 페이지를 만들까요? 자세히 설명해주세요...'
+                      : '어떻게 편집할까요? 구체적으로 설명해주세요...'}
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    rows={4}
+                    className="resize-none"
+                  />
+                  <p className="text-xs text-gray-500">
+                    {mode === 'new'
+                      ? '페이지의 목적, 타겟 고객, 주요 내용 등을 자세히 설명하면 더 좋은 결과를 얻을 수 있습니다.'
+                      : '편집 방향을 구체적으로 설명하면 더 정확한 결과를 얻을 수 있습니다.'}
                   </p>
-                )}
-              </div>
-            </div>
-
-            {/* 프롬프트 입력 */}
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <Label>{mode === 'new' ? '페이지 내용 설명' : '편집 요청 사항'}</Label>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setPrompt(mode === 'new' ? examplePrompts[template] : editExamplePrompt)}
-                >
-                  예시 사용
-                </Button>
-              </div>
-              <Textarea
-                placeholder={mode === 'new'
-                  ? '어떤 페이지를 만들까요? 자세히 설명해주세요...'
-                  : '어떻게 편집할까요? 구체적으로 설명해주세요...'}
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                rows={4}
-                className="resize-none"
-              />
-              <p className="text-xs text-gray-500">
-                {mode === 'new'
-                  ? '페이지의 목적, 타겟 고객, 주요 내용 등을 자세히 설명하면 더 좋은 결과를 얻을 수 있습니다.'
-                  : '편집 방향을 구체적으로 설명하면 더 정확한 결과를 얻을 수 있습니다.'}
-              </p>
-            </div>
+                </div>
+              </>
+            )}
 
             {/* 에러 메시지 */}
             {error && (
@@ -368,10 +516,17 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
             <Button type="button" variant="outline" onClick={onClose}>
               취소
             </Button>
-            <Button type="button" onClick={handleGenerate} disabled={!prompt.trim() || !apiKey.trim()}>
-              <Sparkles className="mr-2 h-4 w-4" />
-              {mode === 'new' ? '페이지 생성' : '편집 적용'}
-            </Button>
+            {sourceMode === 'url' && mode === 'new' ? (
+              <Button type="button" onClick={handleGenerateFromUrl} disabled={!urlInput.trim()}>
+                <Link2 className="mr-2 h-4 w-4" />
+                URL로 생성
+              </Button>
+            ) : (
+              <Button type="button" onClick={handleGenerate} disabled={!prompt.trim() || !apiKey.trim()}>
+                <Sparkles className="mr-2 h-4 w-4" />
+                {mode === 'new' ? '페이지 생성' : '편집 적용'}
+              </Button>
+            )}
           </DialogFooter>
         )}
       </DialogContent>
