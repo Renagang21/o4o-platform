@@ -505,38 +505,42 @@ router.post('/url-to-blocks', authenticate, async (req, res: Response) => {
       ...(block.innerBlocks ? { innerBlocks: block.innerBlocks } : {}),
     }));
 
-    // 6. 후처리 파이프라인 (WO-O4O-AI-URL-CONTENT-QUALITY-V3)
+    // 6. 후처리 파이프라인 (WO-O4O-AI-URL-CONTENT-QUALITY-V4)
+    // 전략: 키워드 기반 제거 → 문장/구조 기반 품질 필터로 전환
     const isYouTube =
       parsedUrl.hostname.includes('youtube.com') ||
       parsedUrl.hostname.includes('youtu.be');
 
-    // 6-A. 노이즈 블록 제거
-    const noiseKeywords = [
-      '로그인', '회원가입', '아이디', '비밀번호', '이용약관', '개인정보',
-      '저작권', '문의하기', '문의', '크리에이터', '광고', '개발자',
-      '보도자료', '약관', '정책 및 안전', 'youtube 작동',
-      'contact', 'login', 'sign up', 'register', 'copyright',
-      'privacy policy', 'terms of service', 'quick menu',
-      '회원', '구독', '좋아요', '댓글', '공유',
-    ];
+    // 6-A. 품질 기반 필터 함수
+    /** 20자 미만 — 메뉴/버튼/레이블 대부분 해당 */
+    const isTooShort = (text: string): boolean => text.trim().length < 20;
 
-    const isNoiseBlock = (block: any): boolean => {
-      const text = ((block.content || '') + JSON.stringify(block.attributes || {})).toLowerCase();
-      return noiseKeywords.some(kw => text.includes(kw));
+    /** 짧은 단어 4개 이상 연속 — 네비게이션/메뉴 구조 특징 */
+    const isMenuLike = (text: string): boolean => {
+      const tokens = text.split(/[\s|,·\-–—\/]/).filter(Boolean);
+      return tokens.length >= 4 && tokens.every(t => t.length <= 6);
     };
 
-    // 6-B. YouTube 특수 처리: 노이즈 필터 없이 embed + 텍스트 4개 이내로만 제한
-    //       (YouTube 텍스트는 AI가 이미 요약 처리하므로 필터 불필요)
+    /** 블록 텍스트가 실질적인 콘텐츠인지 판단 */
+    const isValidContent = (text: string): boolean => {
+      if (!text || isTooShort(text)) return false;
+      if (isMenuLike(text)) return false;
+      return true;
+    };
+
+    // 6-B. 블록별 품질 필터 적용
     let finalBlocks: typeof normalizedBlocks;
     if (isYouTube) {
+      // YouTube: embed 유지 + 유효 텍스트 블록 최대 3개
       const ytBlocks = normalizedBlocks.filter(b => b.type === 'o4o/youtube');
       const textBlocks = normalizedBlocks
         .filter(b => b.type !== 'o4o/youtube')
-        .slice(0, 4);
+        .filter(b => isValidContent(b.content || ''))
+        .slice(0, 3);
       finalBlocks = [...ytBlocks, ...textBlocks];
     } else {
-      // 일반 페이지: 노이즈 필터 적용
-      finalBlocks = normalizedBlocks.filter(b => !isNoiseBlock(b));
+      // 일반 페이지: 품질 필터 적용
+      finalBlocks = normalizedBlocks.filter(b => isValidContent(b.content || ''));
     }
 
     // 6-C. 최대 블록 수 강제 제한
@@ -547,6 +551,7 @@ router.post('/url-to-blocks', authenticate, async (req, res: Response) => {
       requestId,
       userId,
       rawBlocks: normalizedBlocks.length,
+      afterFilter: finalBlocks.length,
       final: limitedBlocks.length,
       isYouTube,
     });
