@@ -50,7 +50,7 @@ interface NoticeFormData {
   title: string;
   summary: string;
   body: string;
-  status: 'draft' | 'published';
+  status: 'draft' | 'published' | 'archived';
   isPinned: boolean;
   publishedAt: string;
   expiresAt: string;

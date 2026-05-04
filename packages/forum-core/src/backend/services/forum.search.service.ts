@@ -22,6 +22,7 @@ export interface ForumSearchQuery {
   postType?: PostType;
   status?: PostStatus;
   forumId?: string;
+  categoryId?: string;
   organizationId?: string;
   authorId?: string;
 

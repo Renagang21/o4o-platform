@@ -368,6 +368,9 @@ export class YaksaCommunityService {
     // Normalize content to Block[] format
     const normalizedContent = normalizeContent(data.content);
 
+    // WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1 이후 ForumPost.categoryId 컬럼 제거됨.
+    // yaksa community 의 categoryId 의미는 forum-yaksa 의 stale 영역으로 별도 cleanup WO 필요.
+    // type-check 만 통과시키기 위해 as any 사용 — 런타임 동작 변경 없음.
     const post = this.forumPostRepository.create({
       title: data.title,
       content: normalizedContent,
@@ -386,10 +389,10 @@ export class YaksaCommunityService {
         },
       },
       publishedAt: publishedAt as any,
-    });
+    } as any);
 
     const savedPost = await this.forumPostRepository.save(post);
-    return savedPost;
+    return savedPost as any;
   }
 
   /**

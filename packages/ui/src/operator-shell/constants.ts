@@ -21,9 +21,11 @@ import {
   HeartPulse,
   Settings,
 } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
 import { OperatorCapability } from '@o4o/types';
 import type { OperatorGroupKey } from './types';
+
+// lucide-react 0.523 미export — Home 의 typeof 로 local 별칭 (모든 lucide 아이콘 동일 시그니처).
+type LucideIcon = typeof Home;
 
 export interface StandardGroup {
   key: OperatorGroupKey;
