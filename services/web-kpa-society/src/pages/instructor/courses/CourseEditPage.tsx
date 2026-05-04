@@ -7,7 +7,7 @@
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { RichTextEditor } from '@o4o/content-editor';
+import { RichTextEditor, AiContentModal } from '@o4o/content-editor';
 import { lmsInstructorApi, Course, Lesson, LessonType, type CourseVisibility } from '../../../api/lms-instructor';
 import QuizBuilder from './QuizBuilder';
 import AssignmentEditor from './AssignmentEditor';
@@ -127,6 +127,8 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
   const [content, setContent] = useState<string>(lesson?.content || '');
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  // WO-O4O-LMS-LESSON-AI-ASSIST-V1: AI로 레슨 초안 만들기
+  const [aiOpen, setAiOpen] = useState(false);
   // WO-KPA-LMS-LESSON-EDITOR-UX-FLOW-V1:
   // 신규 생성 후 quiz/assignment/live editor를 즉시 표시하기 위해
   // createLesson API가 반환한 lesson을 보관한다.
@@ -139,6 +141,55 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
 
   // quiz/assignment/live 타입은 전용 editor 마운트가 필요하므로 저장 후 modal을 닫지 않는다
   const EDITOR_TYPES: LessonType[] = ['quiz', 'assignment', 'live'];
+
+  // ── WO-O4O-LMS-LESSON-AI-ASSIST-V1: AI 레슨 초안 핸들러 ──────────────────
+  const isYouTubeUrl = (url: string) => /^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\//i.test(url);
+
+  const toYouTubeEmbedUrl = (url: string): string | null => {
+    // youtu.be/<id>
+    const shortMatch = url.match(/youtu\.be\/([^?&#]+)/i);
+    if (shortMatch) return `https://www.youtube.com/embed/${shortMatch[1]}`;
+    // youtube.com/watch?v=<id>
+    const longMatch = url.match(/[?&]v=([^&#]+)/);
+    if (longMatch) return `https://www.youtube.com/embed/${longMatch[1]}`;
+    return null;
+  };
+
+  /** HTML 첫 번째 heading 텍스트 추출 (h1~h3) */
+  const extractTitleFromHtml = (html: string): string => {
+    const match = html.match(/<h[1-3][^>]*>([\s\S]*?)<\/h[1-3]>/i);
+    if (!match) return '';
+    // 태그 제거 후 텍스트만
+    return match[1].replace(/<[^>]+>/g, '').trim();
+  };
+
+  const handleAiInsert = ({ html, title, sourceUrl }: { html: string; title: string; sourceUrl?: string }) => {
+    // 1. 제목 자동 채움 — AI title 우선, fallback 첫 heading. 사용자가 이미 입력한 제목은 보호.
+    const finalTitle = (title || '').trim() || extractTitleFromHtml(html);
+    if (finalTitle && !form.title.trim()) {
+      setForm((f) => ({ ...f, title: finalTitle }));
+    }
+
+    // 2. YouTube source URL 처리 — 영상 블록 자동 추가 + videoUrl 세팅
+    let finalContent = html;
+    if (sourceUrl && isYouTubeUrl(sourceUrl)) {
+      // videoUrl 자동 채움 (사용자가 입력하지 않았을 때만)
+      if (!form.videoUrl.trim()) {
+        setForm((f) => ({ ...f, videoUrl: sourceUrl }));
+      }
+      // HTML 에 iframe 이 없으면 본문 상단에 embed 추가
+      if (!/<iframe[\s>]/i.test(html)) {
+        const embed = toYouTubeEmbedUrl(sourceUrl);
+        if (embed) {
+          finalContent = `<iframe src="${embed}" frameborder="0" allowfullscreen style="width:100%;aspect-ratio:16/9;"></iframe>\n${html}`;
+        }
+      }
+    }
+
+    // 3. 본문 — RichTextEditor 가 value prop 변경을 useEffect 로 sync. 사용자가 추가 수정 가능.
+    setContent(finalContent);
+  };
+  // ── END WO-O4O-LMS-LESSON-AI-ASSIST-V1 ────────────────────────────────
 
   const handleSave = async () => {
     if (!form.title.trim()) { setErr('제목을 입력하세요.'); return; }
@@ -201,6 +252,33 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
         {/* 기본 필드: 신규 생성 중(savedLesson 없음)이거나 기존 편집일 때만 표시 */}
         {!savedLesson && (
           <>
+            {/* WO-O4O-LMS-LESSON-AI-ASSIST-V1: AI로 레슨 초안 만들기 — 제목/본문/유튜브 자동 채움 */}
+            <div style={{ marginBottom: 16, padding: '12px 14px', background: '#eef2ff', border: '1px solid #c7d2fe', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#4338ca', marginBottom: 2 }}>✨ AI 보조</div>
+                <div style={{ fontSize: 12, color: '#6366f1' }}>
+                  유튜브 URL 또는 콘텐츠 URL로 제목 / 본문 / 영상 블록을 한 번에 생성합니다.
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAiOpen(true)}
+                style={{
+                  padding: '8px 16px',
+                  background: '#4f46e5',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 7,
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                AI로 레슨 초안 만들기
+              </button>
+            </div>
+
             <div style={s.field}>
               <label style={s.label}>제목 *</label>
               <input style={s.input} value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} placeholder="레슨 제목" />
@@ -288,6 +366,14 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
           </div>
         )}
       </div>
+
+      {/* WO-O4O-LMS-LESSON-AI-ASSIST-V1: AI 레슨 초안 모달 — editor=null + onInsert 로 form state 직접 갱신 */}
+      <AiContentModal
+        open={aiOpen}
+        onClose={() => setAiOpen(false)}
+        editor={null}
+        onInsert={handleAiInsert}
+      />
     </div>
   );
 }

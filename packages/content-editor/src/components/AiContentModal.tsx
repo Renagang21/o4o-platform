@@ -32,6 +32,13 @@ interface AiContentModalProps {
   open: boolean;
   onClose: () => void;
   editor: Editor | null;
+  /**
+   * WO-O4O-LMS-LESSON-AI-ASSIST-V1: 삽입 시점에 결과(html / title / sourceUrl)를 추가로 활용.
+   * - 호출 시점: editor.commands.setContent(html) 직후, handleClose() 직전
+   * - editor 가 null 이어도 onInsert 가 있으면 결과 전달 (LessonModal 처럼 외부 form state 로 받는 케이스)
+   * - 기존 사용처(Toolbar)는 onInsert 미전달 — 영향 없음
+   */
+  onInsert?: (data: { html: string; title: string; sourceUrl?: string }) => void;
 }
 
 type AiMode = 'customer_rewrite' | 'summary' | 'pop' | 'title_suggest';
@@ -124,7 +131,7 @@ function blocksToHtml(blocks: UrlBlock[]): string {
     .join('\n');
 }
 
-export function AiContentModal({ open, onClose, editor }: AiContentModalProps) {
+export function AiContentModal({ open, onClose, editor, onInsert }: AiContentModalProps) {
   // 기존 text 모드 상태
   const [input, setInput] = useState('');
   const [mode, setMode] = useState<AiMode>('customer_rewrite');
@@ -266,8 +273,19 @@ export function AiContentModal({ open, onClose, editor }: AiContentModalProps) {
   };
 
   const handleInsert = () => {
-    if (!editor || !result) return;
-    editor.commands.setContent(result.html);
+    if (!result) return;
+    // editor 가 있을 때는 기존처럼 setContent
+    if (editor) {
+      editor.commands.setContent(result.html);
+    }
+    // WO-O4O-LMS-LESSON-AI-ASSIST-V1: onInsert 가 있으면 외부 form state 로 결과 전달
+    if (onInsert) {
+      onInsert({
+        html: result.html,
+        title: result.title,
+        sourceUrl: sourceTab === 'url' ? urlInput.trim() : undefined,
+      });
+    }
     handleClose();
   };
 
