@@ -1,59 +1,32 @@
 /**
- * Operator Stores Page — Store Console
- * WO-O4O-STORE-CONSOLE-V1
+ * Operator Stores Page — Store Console (GlycoPharm)
  *
- * /api/v1/operator/stores API (Extension Layer)
- * Bearer token auth (GlycoPharm)
+ * WO-O4O-OPERATOR-STORES-STEP3-GLYCO-V1: @o4o/operator-core-ui 의 OperatorStoresList thin wrapper.
+ *   기존 ~300 라인 → ~110 라인. KPA Step 1 패턴 답습.
+ *
+ * 보존:
+ *   - 검색 / pagination / row click 동작
+ *   - subtitle "O4O 플랫폼 매장 카탈로그"
+ *   - colorScheme primary (Glyco 톤)
+ *   - slug 컬럼 (Glyco 만 표시) — columns override
+ *
+ * 비고:
+ *   - StatusBadge (활성/비활성) 색상 토큰이 core 기본값과 동일하여 inline 렌더 사용
+ *   - PageHeader 의 Store 아이콘은 core 표준 헤더에 슬롯이 없어 생략 (KPA Step 1 동일)
  */
 
-import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Store,
-  RefreshCw,
-  Search,
-  AlertTriangle,
-} from 'lucide-react';
-import { DataTable } from '@o4o/ui';
-import type { Column } from '@o4o/ui';
+import { OperatorStoresList } from '@o4o/operator-core-ui';
+import type {
+  StoresApi,
+  StoresConfig,
+  StoresListResponse,
+  OperatorStoreBase,
+} from '@o4o/operator-core-ui';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { api } from '../../lib/apiClient';
-import StatusBadge from '../../components/common/StatusBadge';
-import PageHeader from '../../components/common/PageHeader';
 
-// ─── Types ───────────────────────────────────────────────────
-
-interface StoreData {
-  id: string;
-  name: string;
-  code: string;
-  type: string;
-  isActive: boolean;
-  address: string | null;
-  phone: string | null;
-  businessNumber: string | null;
-  ownerEmail: string | null;
-  ownerName: string | null;
-  slug: string | null;
-  channelCount: number;
-  productCount: number;
-  createdAt: string;
-}
-
-interface StatsData {
-  totalStores: number;
-  activeStores: number;
-  withChannel: number;
-  withProducts: number;
-}
-
-interface PaginationData {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-}
-
-// ─── API Helper ──────────────────────────────────────────────
+// ─── Glyco HTTP adapter (axios 래퍼 — baseURL /api/v1) ──────
 
 async function apiFetch<T>(path: string): Promise<T> {
   const url = path.replace(/^\/api\/v1/, '') || '/';
@@ -61,239 +34,155 @@ async function apiFetch<T>(path: string): Promise<T> {
   return response.data;
 }
 
-// ─── Component ───────────────────────────────────────────────
+const glycoStoresApi: StoresApi = {
+  listStores: (params) => {
+    const qs = new URLSearchParams();
+    if (params.page) qs.set('page', String(params.page));
+    if (params.limit) qs.set('limit', String(params.limit));
+    if (params.sortBy) qs.set('sortBy', params.sortBy);
+    if (params.sortOrder) qs.set('sortOrder', params.sortOrder);
+    if (params.search) qs.set('search', params.search);
+    return apiFetch<StoresListResponse>(`/api/v1/operator/stores?${qs.toString()}`);
+  },
+  getStore: (id) => apiFetch(`/api/v1/operator/stores/${id}`),
+};
 
-export default function StoresPage() {
-  const navigate = useNavigate();
-  const [stores, setStores] = useState<StoreData[]>([]);
-  const [stats, setStats] = useState<StatsData>({ totalStores: 0, activeStores: 0, withChannel: 0, withProducts: 0 });
-  const [pagination, setPagination] = useState<PaginationData>({ page: 1, limit: 20, total: 0, totalPages: 1 });
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [searchInput, setSearchInput] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
+// ─── Glyco config (terminology / typeLabels / colorScheme) ───
 
-  const fetchStores = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const params = new URLSearchParams({
-        page: String(currentPage),
-        limit: '20',
-        sortBy: 'createdAt',
-        sortOrder: 'DESC',
-      });
-      if (searchTerm) params.set('search', searchTerm);
-
-      const data = await apiFetch<{
-        success: boolean;
-        stores: StoreData[];
-        stats: StatsData;
-        pagination: PaginationData;
-      }>(`/api/v1/operator/stores?${params}`);
-
-      if (data.success) {
-        setStores(data.stores);
-        setStats(data.stats);
-        setPagination(data.pagination);
-      }
-    } catch (err: any) {
-      console.error('Failed to fetch stores:', err);
-      setError(err?.message || '매장 데이터를 불러올 수 없습니다');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [currentPage, searchTerm]);
-
-  useEffect(() => {
-    fetchStores();
-  }, [fetchStores]);
-
-  const handleSearch = () => {
-    setSearchTerm(searchInput);
-    setCurrentPage(1);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') handleSearch();
-  };
-
-  const formatDate = (dateStr: string) => {
-    try {
-      return new Date(dateStr).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
-    } catch {
-      return '-';
-    }
-  };
-
-  const typeLabel: Record<string, string> = {
+const glycoStoresConfig: StoresConfig = {
+  serviceKey: 'glycopharm',
+  terminology: { storeLabel: '매장' },
+  colorScheme: 'primary',
+  typeLabels: {
     pharmacy: '약국',
     store: '매장',
     branch: '지점',
-  };
+  },
+};
 
+// ─── Glyco columns (slug 컬럼 보존을 위해 override) ─────────
+
+function formatDate(dateStr: string): string {
+  try {
+    return new Date(dateStr).toLocaleDateString('ko-KR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+  } catch {
+    return '-';
+  }
+}
+
+const glycoColumns: ListColumnDef<OperatorStoreBase>[] = [
+  {
+    key: 'name',
+    header: '매장명',
+    sortable: true,
+    render: (_v, row) => (
+      <div>
+        <p className="font-medium text-slate-800 text-sm">{row.name}</p>
+        {row.type && (
+          <p className="text-xs text-slate-400 mt-0.5">
+            {glycoStoresConfig.typeLabels?.[row.type] ?? row.type}
+          </p>
+        )}
+      </div>
+    ),
+  },
+  {
+    key: 'code',
+    header: '코드',
+    width: '100px',
+    render: (v) => (
+      <span className="font-mono text-xs text-slate-600 bg-slate-50 px-2 py-1 rounded">
+        {v || '-'}
+      </span>
+    ),
+  },
+  {
+    key: 'slug',
+    header: 'Slug',
+    width: '130px',
+    render: (v) => v
+      ? <span className="font-mono text-xs text-primary-600">{v}</span>
+      : <span className="text-slate-300">-</span>,
+  },
+  {
+    key: 'ownerName',
+    header: '운영자',
+    render: (_v, row) => row.ownerName ? (
+      <div>
+        <p className="text-sm text-slate-700">{row.ownerName}</p>
+        {row.ownerEmail && <p className="text-xs text-slate-400">{row.ownerEmail}</p>}
+      </div>
+    ) : (
+      <span className="text-sm text-slate-300">-</span>
+    ),
+  },
+  {
+    key: 'channelCount',
+    header: '채널',
+    align: 'center',
+    width: '60px',
+    sortable: true,
+    render: (v) => (
+      <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-medium ${
+        v > 0 ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-400'
+      }`}>
+        {v}
+      </span>
+    ),
+  },
+  {
+    key: 'productCount',
+    header: '상품',
+    align: 'center',
+    width: '60px',
+    sortable: true,
+    render: (v) => (
+      <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-medium ${
+        v > 0 ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-400'
+      }`}>
+        {v}
+      </span>
+    ),
+  },
+  {
+    key: 'isActive',
+    header: '상태',
+    align: 'center',
+    width: '80px',
+    render: (v) => (
+      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+        v ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500'
+      }`}>
+        {v ? '활성' : '비활성'}
+      </span>
+    ),
+  },
+  {
+    key: 'createdAt',
+    header: '생성일',
+    width: '110px',
+    sortable: true,
+    sortAccessor: (row) => new Date(row.createdAt).getTime(),
+    render: (v) => <span className="text-sm text-slate-500">{formatDate(v)}</span>,
+  },
+];
+
+// ─── Page (thin wrapper) ─────────────────────────────────────
+
+export default function StoresPage() {
+  const navigate = useNavigate();
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="매장 관리"
-        description="O4O 플랫폼 매장 카탈로그"
-        icon={<Store className="w-6 h-6 text-primary-600" />}
-        actions={
-          <button
-            onClick={fetchStores}
-            disabled={isLoading}
-            className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors text-sm disabled:opacity-50"
-          >
-            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-            새로고침
-          </button>
-        }
-      />
-
-      {/* Error */}
-      {error && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-center gap-3">
-          <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" />
-          <p className="text-sm text-amber-800">{error}</p>
-        </div>
-      )}
-
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
-          <p className="text-2xl font-bold text-slate-800">{stats.totalStores}</p>
-          <p className="text-xs text-slate-500">전체 매장</p>
-        </div>
-        <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
-          <p className="text-2xl font-bold text-green-600">{stats.activeStores}</p>
-          <p className="text-xs text-slate-500">활성 매장</p>
-        </div>
-        <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
-          <p className="text-2xl font-bold text-blue-600">{stats.withChannel}</p>
-          <p className="text-xs text-slate-500">채널 보유</p>
-        </div>
-        <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
-          <p className="text-2xl font-bold text-purple-600">{stats.withProducts}</p>
-          <p className="text-xs text-slate-500">상품 보유</p>
-        </div>
-      </div>
-
-      {/* Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-100">
-        {/* Search */}
-        <div className="p-4 border-b border-slate-100">
-          <div className="flex items-center gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input
-                type="text"
-                placeholder="매장명, 코드, 운영자 검색..."
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
-              />
-            </div>
-            <button
-              onClick={handleSearch}
-              className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium"
-            >
-              검색
-            </button>
-          </div>
-        </div>
-
-        {/* Table */}
-        {(() => {
-          const columns: Column<StoreData>[] = [
-            {
-              key: 'name',
-              title: '매장명',
-              render: (_v, s) => (
-                <div>
-                  <p className="font-medium text-slate-800 text-sm">{s.name}</p>
-                  <p className="text-xs text-slate-400 mt-0.5">{typeLabel[s.type] || s.type}</p>
-                </div>
-              ),
-            },
-            {
-              key: 'code',
-              title: '코드',
-              width: '100px',
-              render: (_v, s) => (
-                <span className="font-mono text-xs text-slate-600 bg-slate-50 px-2 py-1 rounded">{s.code || '-'}</span>
-              ),
-            },
-            {
-              key: 'slug',
-              title: 'Slug',
-              width: '130px',
-              render: (_v, s) => s.slug
-                ? <span className="font-mono text-xs text-primary-600">{s.slug}</span>
-                : <span className="text-slate-300">-</span>,
-            },
-            {
-              key: 'ownerName',
-              title: '운영자',
-              render: (_v, s) => s.ownerName
-                ? <div><p className="text-sm text-slate-700">{s.ownerName}</p><p className="text-xs text-slate-400">{s.ownerEmail}</p></div>
-                : <span className="text-sm text-slate-300">-</span>,
-            },
-            {
-              key: 'channelCount',
-              title: '채널',
-              width: '60px',
-              align: 'right',
-              render: (_v, s) => (
-                <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-medium ${s.channelCount > 0 ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-400'}`}>
-                  {s.channelCount}
-                </span>
-              ),
-            },
-            {
-              key: 'productCount',
-              title: '상품',
-              width: '60px',
-              align: 'right',
-              render: (_v, s) => (
-                <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-medium ${s.productCount > 0 ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-400'}`}>
-                  {s.productCount}
-                </span>
-              ),
-            },
-            {
-              key: 'isActive',
-              title: '상태',
-              width: '70px',
-              render: (_v, s) => <StatusBadge status={s.isActive ? 'active' : 'inactive'} />,
-            },
-            {
-              key: 'createdAt',
-              title: '생성일',
-              width: '100px',
-              render: (_v, s) => <span className="text-sm text-slate-500">{formatDate(s.createdAt)}</span>,
-            },
-          ];
-
-          return (
-            <DataTable<StoreData>
-              columns={columns}
-              dataSource={stores}
-              rowKey="id"
-              loading={isLoading}
-              emptyText="매장 데이터가 없습니다"
-              onRowClick={(s) => navigate(`/operator/stores/${s.id}`)}
-              pagination={{
-                current: currentPage,
-                pageSize: pagination.limit,
-                total: pagination.total,
-                onChange: (p) => setCurrentPage(p),
-              }}
-            />
-          );
-        })()}
-      </div>
-    </div>
+    <OperatorStoresList
+      api={glycoStoresApi}
+      config={glycoStoresConfig}
+      columns={glycoColumns}
+      onRowClick={(row) => navigate(`/operator/stores/${row.id}`)}
+      subtitle="O4O 플랫폼 매장 카탈로그"
+      tableId="glycopharm-stores"
+    />
   );
 }
