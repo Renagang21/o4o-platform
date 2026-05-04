@@ -255,14 +255,20 @@ export class NetureCatalogService {
         { q: `%${params.q}%` },
       );
       // 점수 기반 정렬: name 정확 일치 → alias 일치 → 부분 일치
-      qb.orderBy(
+      // WO-O4O-FIX-PRODUCT-SEARCH-ORDERBY-ALIAS-V1:
+      //   multi-line CASE 식을 orderBy 첫 인자에 직접 넣으면 TypeORM 이 alias 로 파싱하여
+      //   '"CASE\n WHEN LOWER(m" alias was not found' 오류가 난다 (getManyAndCount 페이지네이션 wrap).
+      //   addSelect 로 명시적 alias 'search_rank' 부여 후 alias 로 정렬.
+      //   forum.search.service.ts 의 ts_rank_cd 패턴과 동일.
+      qb.addSelect(
         `CASE
            WHEN LOWER(m.name) = LOWER(:exactQ) THEN 0
            WHEN EXISTS (SELECT 1 FROM product_aliases pa WHERE pa.product_master_id = m.id AND LOWER(pa.alias) = LOWER(:exactQ)) THEN 1
            ELSE 2
          END`,
-        'ASC',
-      ).addOrderBy('m.name', 'ASC');
+        'search_rank',
+      );
+      qb.orderBy('search_rank', 'ASC').addOrderBy('m.name', 'ASC');
       qb.setParameter('exactQ', params.q);
     } else {
       qb.orderBy('m.name', 'ASC');
