@@ -532,7 +532,12 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Enrollments (authenticated)
   lmsRouter.get('/enrollments', authenticate, asyncHandler(EnrollmentController.getMyEnrollments));
-  lmsRouter.get('/enrollments/:courseId', authenticate, asyncHandler(EnrollmentController.getEnrollment));
+  // HOTFIX-O4O-KPA-LMS-ENROLLMENT-ROUTE-ALIAS-V1:
+  // factory(learnerClient) 호출 경로 /enrollments/me/course/:courseId 와 기존 /enrollments/:courseId 모두 지원.
+  // 둘 다 getMyEnrollmentForCourse(userId+courseId 복합 조회)를 사용해야 함.
+  // 기존 라우트는 getEnrollment(id 단독 조회) → 잘못된 핸들러였으므로 함께 수정.
+  lmsRouter.get('/enrollments/me/course/:courseId', authenticate, asyncHandler(EnrollmentController.getMyEnrollmentForCourse));
+  lmsRouter.get('/enrollments/:courseId', authenticate, asyncHandler(EnrollmentController.getMyEnrollmentForCourse));
   lmsRouter.post('/courses/:courseId/enroll', authenticate, asyncHandler(EnrollmentController.enrollCourse));
   lmsRouter.post('/enrollments/:courseId/progress', authenticate, asyncHandler(EnrollmentController.updateLessonProgress));
 
