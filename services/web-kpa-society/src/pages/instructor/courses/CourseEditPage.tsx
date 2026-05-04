@@ -15,7 +15,7 @@ import QuizBuilder from './QuizBuilder';
 import AssignmentEditor from './AssignmentEditor';
 import LiveEditor from './LiveEditor';
 // WO-O4O-LMS-COURSE-STRUCTURE-AI-V2
-import CourseStructureAiModal, { type GeneratedLesson } from './CourseStructureAiModal';
+import CourseStructureAiModal, { type GeneratedLessonWithBody } from './CourseStructureAiModal';
 
 // WO-O4O-LMS-UX-REFINEMENT-V1: instructor 라벨 통일 ("동영상")
 const LESSON_TYPE_LABEL: Record<LessonType, string> = {
@@ -543,7 +543,10 @@ export default function CourseEditPage() {
   // - 자동 생성된 레슨은 article 타입으로 추가 (사용자가 이후 type 변경/본문 보강 가능)
   // - description = AI summary
   // - order 는 기존 마지막 + 1 부터 순차적으로
-  const handleAddCourseStructureLessons = async (selected: GeneratedLesson[]) => {
+  // WO-O4O-LMS-LESSON-BODY-AI-GENERATION-V3:
+  // - 모달이 본문 HTML 초안 생성까지 마친 상태로 전달 → content 에 저장
+  // - 본문 생성 실패 항목은 모달이 fallback HTML 로 채워서 전달 (bodyFallback=true)
+  const handleAddCourseStructureLessons = async (selected: GeneratedLessonWithBody[]) => {
     if (!id) throw new Error('courseId 가 없습니다.');
     let baseOrder = lessons.length > 0 ? Math.max(...lessons.map((l) => l.order)) + 1 : 1;
     for (const item of selected) {
@@ -551,7 +554,7 @@ export default function CourseEditPage() {
         title: item.title,
         type: 'article',
         description: item.summary || null,
-        content: null,
+        content: item.html || null,
         videoUrl: null,
         order: baseOrder,
         duration: 0,
@@ -850,10 +853,12 @@ export default function CourseEditPage() {
         />
       )}
 
-      {/* WO-O4O-LMS-COURSE-STRUCTURE-AI-V2: 강의 구조 AI 모달 */}
+      {/* WO-O4O-LMS-COURSE-STRUCTURE-AI-V2 + WO-O4O-LMS-LESSON-BODY-AI-GENERATION-V3:
+          강의 구조(레슨 후보) AI 생성 + 본문 HTML 초안 생성 */}
       <CourseStructureAiModal
         open={structureModalOpen}
         onClose={() => setStructureModalOpen(false)}
+        courseTitle={form.title || course.title}
         onConfirm={handleAddCourseStructureLessons}
       />
     </div>

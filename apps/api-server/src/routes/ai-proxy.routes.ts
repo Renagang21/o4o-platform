@@ -866,4 +866,139 @@ router.post('/course-structure', authenticate, async (req, res: Response) => {
   }
 });
 
+// ===========================================
+// POST /api/ai/lesson-body — 레슨 본문 HTML 초안 생성
+// WO-O4O-LMS-LESSON-BODY-AI-GENERATION-V3
+// ===========================================
+//
+// 정책:
+// - 입력: { courseTitle, lessonTitle, lessonSummary, tone?, audience? }
+// - 출력: { success, html, requestId }
+// - 한국어 / 약사·전문가 강의 톤 / h2·p·ul·li 중심 / 700~1200자
+// - 과장 홍보 / 의료·법률 확정 표현 금지
+// - 자동 저장 안 함 (호출자가 createLesson 으로 저장 시점 결정)
+
+function buildLessonBodySystemPrompt(tone: string, audience: string): string {
+  const toneLabel = tone === 'casual' ? '편안한' : tone === 'concise' ? '간결한' : '전문적이고 차분한';
+  const audienceLabel = audience === 'student' ? '약대생/일반 학습자' : '약사 및 보건·전문가 커뮤니티';
+  return `당신은 O4O LMS 강의 작가입니다. 한국어로 강의 본문 초안 HTML 을 작성하세요.
+
+## 톤 / 대상
+- 톤: ${toneLabel}
+- 대상: ${audienceLabel}
+- 학습자가 바로 읽을 수 있는 본문이어야 합니다.
+
+## 분량 / 형식
+- 700~1200자 분량의 HTML 만 반환 (코드블록 / 마크다운 금지)
+- 사용 가능한 태그: <h2> <h3> <p> <ul> <li> <ol> <strong> <em>
+- 첫 줄은 <h2>...</h2> 로 시작
+- 단락마다 빈 줄로 구분되도록 <p> 또는 <h2>·<h3> 단위 분리
+- 적절한 곳에 <h3>실무 적용 포인트</h3> + <ul><li>… 섹션을 1회 추가 (필요할 때만)
+
+## 금지
+- iframe / img / script / style / class 속성 / 인라인 스타일 금지
+- "최고", "유일한", "완벽한" 등 과장 표현 금지
+- 의료 / 법률 / 효능 효과를 단정하는 표현 금지 (예: "치료된다", "보장된다")
+- 출처 미상의 통계 / 수치 인용 금지
+- 본문 외 메타 설명("이 글은…", "다음 강의는…") 금지
+
+## 형식 예시 (참고용 — 실제 출력은 주제에 맞게)
+<h2>레슨 제목</h2>
+<p>도입 단락…</p>
+<h3>핵심 개념</h3>
+<ul><li>…</li><li>…</li></ul>
+<p>설명 단락…</p>
+<h3>실무 적용 포인트</h3>
+<ul><li>…</li><li>…</li></ul>
+
+HTML 만 반환하세요. 다른 텍스트나 코드블록 표시는 포함하지 마세요.`;
+}
+
+router.post('/lesson-body', authenticate, async (req, res: Response) => {
+  const authReq = req as AuthRequest;
+  const userId = authReq.user?.id;
+
+  if (!userId) {
+    return res.status(401).json({ success: false, error: '로그인이 필요합니다.' });
+  }
+
+  const {
+    courseTitle = '',
+    lessonTitle,
+    lessonSummary = '',
+    tone = 'professional',
+    audience = 'instructor',
+  } = req.body as {
+    courseTitle?: string;
+    lessonTitle?: string;
+    lessonSummary?: string;
+    tone?: string;
+    audience?: string;
+  };
+
+  if (!lessonTitle || typeof lessonTitle !== 'string' || lessonTitle.trim().length === 0) {
+    return res.status(400).json({ success: false, error: 'lessonTitle 이 필요합니다.' });
+  }
+
+  const requestId = crypto.randomUUID();
+
+  try {
+    const userPrompt = [
+      `다음 레슨의 본문 HTML 초안을 작성하세요.`,
+      '',
+      courseTitle ? `강의명: ${courseTitle.trim()}` : '',
+      `레슨 제목: ${lessonTitle.trim()}`,
+      lessonSummary ? `레슨 요약: ${lessonSummary.trim()}` : '',
+    ].filter(Boolean).join('\n');
+
+    logger.info('[lesson-body] 시작', { requestId, userId, lessonTitle: lessonTitle.slice(0, 60) });
+
+    const aiResponse = await aiProxyService.generateRawContent(
+      {
+        provider: 'gemini',
+        model: 'gemini-2.5-flash',
+        systemPrompt: buildLessonBodySystemPrompt(tone, audience),
+        userPrompt,
+        temperature: 0.6,
+        maxTokens: 4096,
+      },
+      userId,
+      requestId,
+    );
+
+    let rawText: string = (aiResponse.rawText || '').trim();
+    // 혹시 codeblock 으로 감싸면 제거
+    const codeblockMatch = rawText.match(/^```(?:html)?\s*([\s\S]*?)```$/);
+    if (codeblockMatch) rawText = codeblockMatch[1].trim();
+
+    // 최소 검증 — 빈 응답 또는 너무 짧음
+    if (rawText.length < 80) {
+      logger.warn('[lesson-body] 응답이 너무 짧음', { requestId, length: rawText.length });
+      return res.status(500).json({
+        success: false,
+        error: 'AI 응답이 너무 짧습니다. 다시 시도해 주세요.',
+        requestId,
+      });
+    }
+
+    // HTML 외 위험 태그 / 속성 제거 (간단 sanitize — script/style/iframe/on*/class)
+    const safeHtml = rawText
+      .replace(/<script[\s\S]*?<\/script>/gi, '')
+      .replace(/<style[\s\S]*?<\/style>/gi, '')
+      .replace(/<iframe[\s\S]*?<\/iframe>/gi, '')
+      .replace(/<(\w+)([^>]*?)\son\w+="[^"]*"([^>]*?)>/gi, '<$1$2$3>')
+      .replace(/<(\w+)([^>]*?)\sclass="[^"]*"([^>]*?)>/gi, '<$1$2$3>');
+
+    logger.info('[lesson-body] 완료', { requestId, userId, length: safeHtml.length });
+    return res.json({ success: true, html: safeHtml, requestId });
+  } catch (error: any) {
+    logger.error('[lesson-body] 오류', { requestId, error: error.message });
+    return res.status(500).json({
+      success: false,
+      error: error.message || '레슨 본문 생성 중 오류가 발생했습니다.',
+      requestId,
+    });
+  }
+});
+
 export default router;

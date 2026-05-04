@@ -1,13 +1,18 @@
 /**
  * CourseStructureAiModal — 강의 구조(레슨 목록) AI 생성 모달
  *
- * WO-O4O-LMS-COURSE-STRUCTURE-AI-V2
+ * WO-O4O-LMS-COURSE-STRUCTURE-AI-V2 (initial: title + summary 후보)
+ * WO-O4O-LMS-LESSON-BODY-AI-GENERATION-V3:
+ *   선택한 후보를 추가하기 직전, 각 후보에 대해 /api/ai/lesson-body 로
+ *   본문 HTML 초안을 생성하여 onConfirm 에 전달한다.
+ *   실패한 항목은 summary 기반 fallback HTML 로 대체 (전체 중단 없음).
  *
  * 정책:
  *  - 자동 저장 금지. 사용자가 체크 → "선택한 레슨 추가" 클릭 시에만 createLesson 호출
  *  - 입력: URL 또는 주제 텍스트 (탭 전환)
- *  - 출력: 5~8개 레슨 (제목 + 요약)
- *  - 본문 / 영상 / 퀴즈 / 과제 자동 생성하지 않음
+ *  - 출력 (구조): 5~8개 레슨 (제목 + 요약)
+ *  - 추가 시: 본문 HTML 초안까지 생성 후 호출자에게 전달
+ *  - 영상 / 퀴즈 / 과제는 자동 생성하지 않음
  */
 
 import React, { useState } from 'react';
@@ -21,16 +26,66 @@ export interface GeneratedLesson {
   summary: string;
 }
 
+/** WO-O4O-LMS-LESSON-BODY-AI-GENERATION-V3: onConfirm 으로 전달되는 최종 페이로드 */
+export interface GeneratedLessonWithBody {
+  title: string;
+  summary: string;
+  /** AI 생성 또는 fallback HTML */
+  html: string;
+  /** 본문 생성이 fallback 으로 처리되었는지 (호출자가 알림용으로 활용 가능) */
+  bodyFallback: boolean;
+}
+
 export interface CourseStructureAiModalProps {
   open: boolean;
   onClose: () => void;
-  /** 사용자가 선택 후 "추가" 클릭 시 호출. 호출자가 createLesson 일괄 호출. */
-  onConfirm: (selected: GeneratedLesson[]) => Promise<void>;
+  /** WO-O4O-LMS-LESSON-BODY-AI-GENERATION-V3: lesson-body 프롬프트 컨텍스트 */
+  courseTitle?: string;
+  /**
+   * 사용자가 선택 후 "추가" 클릭 시 호출.
+   * 본문 HTML 초안 생성까지 완료한 상태로 전달됨 — 호출자는 createLesson 만 일괄 호출.
+   */
+  onConfirm: (selected: GeneratedLessonWithBody[]) => Promise<void>;
+}
+
+/** WO-O4O-LMS-LESSON-BODY-AI-GENERATION-V3: 본문 생성 실패 시 사용되는 최소 fallback HTML */
+function buildFallbackBodyHtml(title: string, summary: string): string {
+  const safeTitle = (title || '').replace(/</g, '&lt;');
+  const safeSummary = (summary || '').replace(/</g, '&lt;');
+  if (!safeSummary.trim()) {
+    return `<h2>${safeTitle}</h2>\n<p>본문을 작성해 주세요.</p>`;
+  }
+  return `<h2>${safeTitle}</h2>\n<p>${safeSummary}</p>`;
+}
+
+/** WO-O4O-LMS-LESSON-BODY-AI-GENERATION-V3: lesson-body API 호출 (실패 시 throw) */
+async function fetchLessonBodyHtml(params: {
+  courseTitle: string;
+  lessonTitle: string;
+  lessonSummary: string;
+}): Promise<string> {
+  const res = await fetch(`${API_BASE_URL}/api/ai/lesson-body`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({
+      courseTitle: params.courseTitle,
+      lessonTitle: params.lessonTitle,
+      lessonSummary: params.lessonSummary,
+      tone: 'professional',
+      audience: 'instructor',
+    }),
+  });
+  const data = await res.json();
+  if (!res.ok || !data.success || typeof data.html !== 'string' || data.html.trim().length === 0) {
+    throw new Error(data?.error || '본문 생성 실패');
+  }
+  return data.html;
 }
 
 type SourceTab = 'topic' | 'url';
 
-export default function CourseStructureAiModal({ open, onClose, onConfirm }: CourseStructureAiModalProps) {
+export default function CourseStructureAiModal({ open, onClose, courseTitle = '', onConfirm }: CourseStructureAiModalProps) {
   const [tab, setTab] = useState<SourceTab>('topic');
   const [topic, setTopic] = useState('');
   const [url, setUrl] = useState('');
@@ -39,6 +94,8 @@ export default function CourseStructureAiModal({ open, onClose, onConfirm }: Cou
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [adding, setAdding] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  // WO-O4O-LMS-LESSON-BODY-AI-GENERATION-V3: 본문 생성 / 추가 단계 상태 표시
+  const [progressMessage, setProgressMessage] = useState<string | null>(null);
 
   if (!open) return null;
 
@@ -51,6 +108,7 @@ export default function CourseStructureAiModal({ open, onClose, onConfirm }: Cou
     setErr(null);
     setGenerating(false);
     setAdding(false);
+    setProgressMessage(null);
     onClose();
   };
 
@@ -103,6 +161,10 @@ export default function CourseStructureAiModal({ open, onClose, onConfirm }: Cou
     });
   };
 
+  // WO-O4O-LMS-LESSON-BODY-AI-GENERATION-V3:
+  //   1. 선택한 후보들에 대해 lesson-body 를 순차 호출 (병렬 호출 시 rate limit / UX 혼란 우려)
+  //   2. 실패 항목은 fallback HTML 로 대체 (전체 중단 안 함)
+  //   3. 완료 후 onConfirm 으로 전달 → 호출자가 createLesson 일괄 실행
   const handleAdd = async () => {
     if (selected.size === 0) {
       setErr('추가할 레슨을 1개 이상 선택해 주세요.');
@@ -110,17 +172,46 @@ export default function CourseStructureAiModal({ open, onClose, onConfirm }: Cou
     }
     setErr(null);
     setAdding(true);
+    setProgressMessage(null);
+
     try {
-      const picked = Array.from(selected)
+      const picked: GeneratedLesson[] = Array.from(selected)
         .sort((a, b) => a - b) // 원본 순서 유지
         .map((i) => lessons[i])
         .filter(Boolean);
-      await onConfirm(picked);
+
+      // 1단계: 본문 HTML 초안 생성 (순차)
+      const withBody: GeneratedLessonWithBody[] = [];
+      for (let i = 0; i < picked.length; i++) {
+        const item = picked[i];
+        setProgressMessage(`레슨 본문 초안 생성 중 (${i + 1} / ${picked.length})…  "${item.title}"`);
+        try {
+          const html = await fetchLessonBodyHtml({
+            courseTitle,
+            lessonTitle: item.title,
+            lessonSummary: item.summary,
+          });
+          withBody.push({ title: item.title, summary: item.summary, html, bodyFallback: false });
+        } catch {
+          // 일부 실패는 무시 — fallback 으로 대체하고 계속 진행
+          withBody.push({
+            title: item.title,
+            summary: item.summary,
+            html: buildFallbackBodyHtml(item.title, item.summary),
+            bodyFallback: true,
+          });
+        }
+      }
+
+      // 2단계: 호출자에게 일괄 전달 (createLesson 단계)
+      setProgressMessage(`선택한 레슨을 추가하고 있습니다… (${withBody.length}개)`);
+      await onConfirm(withBody);
       handleClose();
     } catch (e: any) {
       setErr(e?.response?.data?.error || e?.message || '레슨 추가에 실패했습니다.');
     } finally {
       setAdding(false);
+      setProgressMessage(null);
     }
   };
 
@@ -242,10 +333,18 @@ export default function CourseStructureAiModal({ open, onClose, onConfirm }: Cou
             </>
           )}
 
+          {/* WO-O4O-LMS-LESSON-BODY-AI-GENERATION-V3: 본문 생성 / 추가 진행 상태 */}
+          {adding && progressMessage && (
+            <div style={s.progress}>
+              <span style={{ fontSize: 16 }}>⏳</span>
+              <span>{progressMessage}</span>
+            </div>
+          )}
+
           {err && <div style={s.error}>{err}</div>}
 
           <p style={s.disclaimer}>
-            AI가 생성한 구조는 참고용입니다. 추가 후 각 레슨의 본문/영상은 따로 편집할 수 있습니다.
+            AI가 생성한 구조와 본문은 참고용입니다. 추가 후 각 레슨에서 본문/영상을 편집할 수 있습니다.
           </p>
         </div>
 
@@ -303,6 +402,8 @@ const s: Record<string, React.CSSProperties> = {
   selectActions: { display: 'flex', gap: 12, alignItems: 'center', fontSize: 12 },
   linkBtn: { padding: '4px 8px', fontSize: 12, color: '#4f46e5', background: 'transparent', border: 'none', cursor: 'pointer', textDecoration: 'underline' },
   error: { padding: '10px 14px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 6, fontSize: 13, color: '#dc2626' },
+  // WO-O4O-LMS-LESSON-BODY-AI-GENERATION-V3
+  progress: { padding: '10px 14px', background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 6, fontSize: 13, color: '#1d4ed8', display: 'flex', alignItems: 'center', gap: 10 },
   disclaimer: { fontSize: 11, color: '#9ca3af', margin: 0, textAlign: 'center' as const },
   footer: { display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '12px 20px', borderTop: '1px solid #e5e7eb', background: '#f9fafb', flexShrink: 0 },
   cancelBtn: { padding: '8px 16px', border: '1px solid #d1d5db', borderRadius: 6, background: 'white', fontSize: 14, cursor: 'pointer', color: '#374151' },
