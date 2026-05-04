@@ -110,7 +110,8 @@ interface LessonModalProps {
   lesson: Lesson | null; // null = new
   nextOrder: number;
   onClose: () => void;
-  onSaved: () => void;
+  /** keepOpen=true: 리스트 reload만 하고 modal은 닫지 않음 (quiz/assignment/live 신규 생성 후 editor 유지) */
+  onSaved: (keepOpen?: boolean) => void;
 }
 
 function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonModalProps) {
@@ -126,6 +127,18 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
   const [content, setContent] = useState<string>(lesson?.content || '');
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  // WO-KPA-LMS-LESSON-EDITOR-UX-FLOW-V1:
+  // 신규 생성 후 quiz/assignment/live editor를 즉시 표시하기 위해
+  // createLesson API가 반환한 lesson을 보관한다.
+  const [savedLesson, setSavedLesson] = useState<Lesson | null>(null);
+
+  // 현재 편집 대상 lesson — 기존 편집이면 lesson, 신규 생성 직후면 savedLesson
+  const activeLesson = lesson ?? savedLesson;
+  // editor를 표시할 조건 — isEdit 또는 신규 생성 완료(savedLesson 존재)
+  const showEditor = isEdit || savedLesson !== null;
+
+  // quiz/assignment/live 타입은 전용 editor 마운트가 필요하므로 저장 후 modal을 닫지 않는다
+  const EDITOR_TYPES: LessonType[] = ['quiz', 'assignment', 'live'];
 
   const handleSave = async () => {
     if (!form.title.trim()) { setErr('제목을 입력하세요.'); return; }
@@ -141,8 +154,9 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
           videoUrl: form.videoUrl || null,
           duration: form.duration,
         });
+        onSaved();
       } else {
-        await lmsInstructorApi.createLesson(courseId, {
+        const res = await lmsInstructorApi.createLesson(courseId, {
           title: form.title.trim(),
           type: form.type,
           description: form.description || null,
@@ -151,8 +165,17 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
           order: nextOrder,
           duration: form.duration,
         });
+        // 백엔드 응답: { success, data: { lesson } }
+        const created: Lesson = (res as any).data?.data?.lesson ?? (res as any).data?.lesson ?? (res as any).data;
+        const needsEditor = EDITOR_TYPES.includes(form.type) && !!created?.id;
+        if (needsEditor) {
+          // quiz/assignment/live: modal을 유지하고 전용 editor를 즉시 표시
+          setSavedLesson(created);
+          onSaved(true); // 리스트 reload만, modal은 닫지 않음
+        } else {
+          onSaved(); // article/video: modal 닫기 + 리스트 reload (기존 흐름 유지)
+        }
       }
-      onSaved();
     } catch (e: any) {
       setErr(e?.response?.data?.error || '저장에 실패했습니다.');
       setSaving(false);
@@ -162,84 +185,107 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
   return (
     <div style={s.modal} onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div style={s.modalBox}>
-        <div style={s.modalTitle}>{isEdit ? '레슨 수정' : '새 레슨 추가'}</div>
+        <div style={s.modalTitle}>{isEdit ? '레슨 수정' : savedLesson ? '레슨 생성 완료 — 세부 설정' : '새 레슨 추가'}</div>
 
-        <div style={s.field}>
-          <label style={s.label}>제목 *</label>
-          <input style={s.input} value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} placeholder="레슨 제목" />
-        </div>
-
-        {!isEdit && (
-          <div style={s.field}>
-            <label style={s.label}>유형</label>
-            <select style={s.select} value={form.type} onChange={(e) => setForm((f) => ({ ...f, type: e.target.value as LessonType }))}>
-              {SUPPORTED_LESSON_TYPES.map((t) => (
-                <option key={t} value={t}>{LESSON_TYPE_LABEL[t]}</option>
-              ))}
-            </select>
+        {/* WO-KPA-LMS-LESSON-EDITOR-UX-FLOW-V1: 신규 생성 직후 전용 editor 안내 배너 */}
+        {savedLesson && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, marginBottom: 16, fontSize: 13, color: '#15803d' }}>
+            <span>✅</span>
+            <span>
+              레슨이 생성되었습니다. 이어서{' '}
+              <strong>{LESSON_TYPE_LABEL[form.type]}</strong> 설정을 입력하세요.
+            </span>
           </div>
         )}
 
-        <div style={s.field}>
-          <label style={s.label}>설명</label>
-          <textarea style={s.textarea} value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} placeholder="레슨 설명 (선택)" />
-        </div>
+        {/* 기본 필드: 신규 생성 중(savedLesson 없음)이거나 기존 편집일 때만 표시 */}
+        {!savedLesson && (
+          <>
+            <div style={s.field}>
+              <label style={s.label}>제목 *</label>
+              <input style={s.input} value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} placeholder="레슨 제목" />
+            </div>
 
-        {(form.type === 'video' || (isEdit && lesson?.videoUrl !== undefined)) && (
-          <div style={s.field}>
-            <label style={s.label}>영상 URL</label>
-            <input style={s.input} value={form.videoUrl} onChange={(e) => setForm((f) => ({ ...f, videoUrl: e.target.value }))} placeholder="https://..." />
-          </div>
+            {!isEdit && (
+              <div style={s.field}>
+                <label style={s.label}>유형</label>
+                <select style={s.select} value={form.type} onChange={(e) => setForm((f) => ({ ...f, type: e.target.value as LessonType }))}>
+                  {SUPPORTED_LESSON_TYPES.map((t) => (
+                    <option key={t} value={t}>{LESSON_TYPE_LABEL[t]}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <div style={s.field}>
+              <label style={s.label}>설명</label>
+              <textarea style={s.textarea} value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} placeholder="레슨 설명 (선택)" />
+            </div>
+
+            {form.type === 'video' && (
+              <div style={s.field}>
+                <label style={s.label}>영상 URL</label>
+                <input style={s.input} value={form.videoUrl} onChange={(e) => setForm((f) => ({ ...f, videoUrl: e.target.value }))} placeholder="https://..." />
+              </div>
+            )}
+
+            <div style={s.field}>
+              <label style={s.label}>본문</label>
+              {/* WO-KPA-LMS-LESSON-EDITOR-UPGRADE-V1: 강사용 풀 에디터 (이미지/링크/리스트/표 등) */}
+              <RichTextEditor
+                value={content}
+                onChange={(c) => setContent(c.html)}
+                placeholder="레슨 본문을 입력하세요"
+                minHeight="320px"
+                preset="full"
+              />
+            </div>
+
+            <div style={s.field}>
+              <label style={s.label}>예상 학습 시간 (분)</label>
+              <input style={{ ...s.input, width: 100 }} type="number" min={0} value={form.duration}
+                onChange={(e) => setForm((f) => ({ ...f, duration: Number(e.target.value) }))} />
+            </div>
+
+            {err && <p style={s.error}>{err}</p>}
+
+            <div style={s.modalActions}>
+              <button style={s.cancelBtn} onClick={onClose}>취소</button>
+              <button
+                style={saveBtnStyle(saving || !form.title.trim())}
+                disabled={saving || !form.title.trim()}
+                onClick={handleSave}
+              >
+                {saving ? '저장 중...' : '저장'}
+              </button>
+            </div>
+          </>
         )}
 
-        <div style={s.field}>
-          <label style={s.label}>본문</label>
-          {/* WO-KPA-LMS-LESSON-EDITOR-UPGRADE-V1: 강사용 풀 에디터 (이미지/링크/리스트/표 등) */}
-          <RichTextEditor
-            value={content}
-            onChange={(c) => setContent(c.html)}
-            placeholder="레슨 본문을 입력하세요"
-            minHeight="320px"
-            preset="full"
-          />
-        </div>
-
-        <div style={s.field}>
-          <label style={s.label}>예상 학습 시간 (분)</label>
-          <input style={{ ...s.input, width: 100 }} type="number" min={0} value={form.duration}
-            onChange={(e) => setForm((f) => ({ ...f, duration: Number(e.target.value) }))} />
-        </div>
-
-        {err && <p style={s.error}>{err}</p>}
-
-        <div style={s.modalActions}>
-          <button style={s.cancelBtn} onClick={onClose}>취소</button>
-          <button
-            style={saveBtnStyle(saving || !form.title.trim())}
-            disabled={saving || !form.title.trim()}
-            onClick={handleSave}
-          >
-            {saving ? '저장 중...' : '저장'}
-          </button>
-        </div>
-
-        {/* 퀴즈 빌더 — quiz 유형 레슨 편집 시만 표시 */}
-        {isEdit && lesson && form.type === 'quiz' && (
+        {/* 퀴즈 빌더 — quiz 유형 레슨 편집 시 또는 신규 생성 직후 표시 */}
+        {showEditor && activeLesson && form.type === 'quiz' && (
           <QuizBuilder
-            lessonId={lesson.id}
+            lessonId={activeLesson.id}
             courseId={courseId}
-            lessonTitle={form.title}
+            lessonTitle={form.title || activeLesson.title}
           />
         )}
 
-        {/* WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1: 과제 에디터 — assignment 유형 레슨 편집 시만 표시 */}
-        {isEdit && lesson && form.type === 'assignment' && (
-          <AssignmentEditor lessonId={lesson.id} />
+        {/* WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1: 과제 에디터 */}
+        {showEditor && activeLesson && form.type === 'assignment' && (
+          <AssignmentEditor lessonId={activeLesson.id} />
         )}
 
-        {/* WO-O4O-LMS-LIVE-MINIMAL-V1: 라이브 에디터 — live 유형 레슨 편집 시만 표시 */}
-        {isEdit && lesson && form.type === 'live' && (
-          <LiveEditor lessonId={lesson.id} />
+        {/* WO-O4O-LMS-LIVE-MINIMAL-V1: 라이브 에디터 */}
+        {showEditor && activeLesson && form.type === 'live' && (
+          <LiveEditor lessonId={activeLesson.id} />
+        )}
+
+        {/* 신규 생성 후 editor 표시 중일 때 닫기 버튼 */}
+        {savedLesson && (
+          <div style={{ ...s.modalActions, marginTop: 24 }}>
+            <button style={s.cancelBtn} onClick={onClose}>닫기</button>
+          </div>
         )}
       </div>
     </div>
@@ -625,7 +671,7 @@ export default function CourseEditPage() {
           lesson={lessonModal.lesson}
           nextOrder={nextOrder}
           onClose={() => setLessonModal({ open: false, lesson: null })}
-          onSaved={() => { setLessonModal({ open: false, lesson: null }); loadData(); }}
+          onSaved={(keepOpen) => { if (!keepOpen) setLessonModal({ open: false, lesson: null }); loadData(); }}
         />
       )}
     </div>
