@@ -72,6 +72,18 @@ export class EnrollmentService extends BaseService<Enrollment> {
     });
 
     if (existing) {
+      // HOTFIX-O4O-LMS-ENROLLMENT-APPROVED-START-V1:
+      // APPROVED 상태 = 강사 승인 완료 → 학습자가 "시작하기"를 누르면 IN_PROGRESS로 전이.
+      // 진행 중/완료 상태는 그대로 유지하고 재신청은 불필요하므로 기존 enrollment 반환.
+      if (existing.status === EnrollmentStatus.APPROVED) {
+        existing.status = EnrollmentStatus.IN_PROGRESS;
+        if (!existing.startedAt) existing.startedAt = new Date();
+        const started = await this.enrollmentRepository.save(existing);
+        logger.info(`[LMS] Enrollment APPROVED → IN_PROGRESS`, { enrollmentId: started.id, userId: data.userId, courseId: data.courseId });
+        return started;
+      }
+
+      // IN_PROGRESS / COMPLETED / PENDING: 이미 수강 중이거나 대기 중 — 재신청 불필요
       const terminalStatuses: EnrollmentStatus[] = [
         EnrollmentStatus.CANCELLED,
         EnrollmentStatus.REJECTED,
