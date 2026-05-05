@@ -12,7 +12,7 @@
  */
 
 import { useNavigate } from 'react-router-dom';
-import { GraduationCap, LayoutDashboard, Settings } from 'lucide-react';
+import { GraduationCap, LayoutDashboard, Settings, Shield } from 'lucide-react';
 import { GlobalHeader, GlobalHeaderMenuItem } from '@o4o/ui';
 import { useAuth } from '@/contexts/AuthContext';
 import { isPharmacistRole } from '@/lib/role-constants';
@@ -103,6 +103,11 @@ export function GlycoGlobalHeader() {
           {(isInstructor || isAdmin) && (
             <GlobalHeaderMenuItem to="/instructor" icon={<GraduationCap className="w-4 h-4" />}>
               강의 대시보드
+            </GlobalHeaderMenuItem>
+          )}
+          {isOperator && (
+            <GlobalHeaderMenuItem to="/operator" icon={<Shield className="w-4 h-4" />}>
+              운영 대시보드
             </GlobalHeaderMenuItem>
           )}
           <GlobalHeaderMenuItem to="/mypage" icon={<LayoutDashboard className="w-4 h-4" />}>
