@@ -15,6 +15,7 @@
     "react-router-dom": "^6.0.0 || ^7.0.0"
   },
   "dependencies": {
+    "@o4o/content-editor": "workspace:*",
     "@o4o/ui": "workspace:*",
     "dompurify": "^3.0.6",
     "lucide-react": ">=0.300.0"

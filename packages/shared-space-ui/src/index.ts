@@ -17,6 +17,9 @@ export type { HubPaginationProps } from './HubPagination';
 export { GuideBlock } from './GuideBlock';
 export type { GuideBlockProps, GuideBlockVariant } from './GuideBlock';
 
+/* WO-O4O-GUIDE-CLIENT-EXTRACTION-V1: guide_contents API client + GuideEditableSection (Base) */
+export * from './guide-client';
+
 /* HUB page templates */
 export { LmsHubTemplate } from './LmsHubTemplate';
 export type { LmsHubCourse, LmsHubFetchParams, LmsHubConfig } from './LmsHubTemplate';

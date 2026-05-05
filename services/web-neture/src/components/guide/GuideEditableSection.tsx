@@ -1,8 +1,7 @@
 /**
  * WO-O4O-GUIDE-CLIENT-EXTRACTION-V1: thin wrapper.
  *
- * 실제 UI 는 @o4o/shared-space-ui 의 GuideEditableSection 이 담당.
- * KPA 측에서는 (1) serviceKey, (2) client, (3) canEdit 을 주입한다.
+ * Neture 최초 도입. 다른 3 서비스 패턴과 동일.
  */
 
 import {
@@ -12,7 +11,7 @@ import {
 import { useAuth } from '../../contexts/AuthContext';
 import { guideClient } from '../../api/guideContent';
 
-const SERVICE_KEY = 'kpa-society';
+const SERVICE_KEY = 'neture';
 
 interface Props {
   pageKey: string;

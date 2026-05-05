@@ -14,6 +14,8 @@ import { EditableTextCell, RowActionMenu, ConfirmActionDialog } from '@o4o/ui';
 import { DataTable } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { operatorBrandApi, type BrandItem } from '../../lib/api/operatorBrand';
+// WO-O4O-GUIDE-CLIENT-EXTRACTION-V1: Neture 최초 도입 — 페이지 상단 안내 inline 편집
+import { GuideEditableSection } from '../../components/guide';
 
 export default function BrandManagementPage() {
   const [brands, setBrands] = useState<BrandItem[]>([]);
@@ -150,7 +152,14 @@ export default function BrandManagementPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-slate-800">브랜드 관리</h1>
-        <p className="text-sm text-slate-500 mt-1">중복 브랜드를 검색하고 병합하여 데이터 품질을 관리합니다</p>
+        <p className="text-sm text-slate-500 mt-1">
+          {/* WO-O4O-GUIDE-CLIENT-EXTRACTION-V1: 운영자 inline 편집 가능 안내 */}
+          <GuideEditableSection
+            pageKey="operator.brand.management"
+            sectionKey="page-help"
+            defaultContent="중복 브랜드를 검색하고 병합하여 데이터 품질을 관리합니다"
+          />
+        </p>
       </div>
 
       {/* Search */}
