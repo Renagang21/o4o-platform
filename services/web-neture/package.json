@@ -20,6 +20,7 @@
     "@o4o/forum-core": "workspace:*",
     "@o4o/hub-core": "workspace:*",
     "@o4o/operator-core": "workspace:*",
+    "@o4o/operator-core-ui": "workspace:*",
     "@o4o/operator-ux-core": "workspace:*",
     "@o4o/shared-space-ui": "workspace:*",
     "@o4o/store-products-ui": "workspace:*",

@@ -62,6 +62,7 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   ],
   content: [
     { label: '홈페이지 CMS', path: '/operator/homepage-cms' },
+    { label: '안내 문구 관리', path: '/operator/guide-contents' },
     { label: '커뮤니티 광고', path: '/operator/community-admin', adminOnly: true },
   ],
   signage: [

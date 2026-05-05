@@ -125,6 +125,8 @@ const OperatorAnalyticsPage = lazy(() => import('@/pages/operator/AnalyticsPage'
 
 // Operator Guideline Management (WO-GLYCOPHARM-GUIDELINE-CMS-MIGRATION-V1)
 const GuidelineManagementPage = lazy(() => import('@/pages/operator/GuidelineManagementPage'));
+// Operator Guide Contents (WO-O4O-OPERATOR-GUIDE-CONTENTS-CORE-EXTRACTION-V1)
+const OperatorGuideContentsPage = lazy(() => import('@/pages/operator/OperatorGuideContentsPage'));
 
 // Operator Semi-Franchise Pages
 const PharmaciesPage = lazy(() => import('@/pages/operator/PharmaciesPage'));
@@ -538,6 +540,8 @@ function AppRoutes() {
             역할 관리는 /admin/roles 에서만 접근. /operator/roles 라우트 제거. */}
         {/* Guideline Management (WO-GLYCOPHARM-GUIDELINE-CMS-MIGRATION-V1) */}
         <Route path="guidelines" element={<GuidelineManagementPage />} />
+        {/* Guide Contents (WO-O4O-OPERATOR-GUIDE-CONTENTS-CORE-EXTRACTION-V1) */}
+        <Route path="guide-contents" element={<OperatorGuideContentsPage />} />
         {/* LMS Management (WO-GLYCOPHARM-INSTRUCTOR-OPERATOR-V1) */}
         <Route path="lms/courses" element={<LmsCoursesPage />} />
         {/* Settings */}

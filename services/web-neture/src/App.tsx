@@ -447,6 +447,8 @@ const SignageTemplateDetailPage = lazy(() => import('./pages/operator/signage/Te
 
 // Homepage CMS (WO-O4O-NETURE-HOMEPAGE-CMS-V1)
 const HomepageCmsPage = lazy(() => import('./pages/operator/HomepageCmsPage'));
+// Operator Guide Contents (WO-O4O-OPERATOR-GUIDE-CONTENTS-CORE-EXTRACTION-V1)
+const OperatorGuideContentsPage = lazy(() => import('./pages/operator/OperatorGuideContentsPage'));
 
 // Content Library (WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1)
 const ContentLibraryPage = lazy(() => import('./pages/library/ContentLibraryPage'));
@@ -915,6 +917,8 @@ function App() {
               <Route path="/operator/signage/templates" element={<SignageTemplatesPage />} />
               <Route path="/operator/signage/templates/:templateId" element={<SignageTemplateDetailPage />} />
               <Route path="/operator/homepage-cms" element={<HomepageCmsPage />} />
+              {/* Guide Contents (WO-O4O-OPERATOR-GUIDE-CONTENTS-CORE-EXTRACTION-V1) */}
+              <Route path="/operator/guide-contents" element={<OperatorGuideContentsPage />} />
               <Route path="/operator/analytics" element={<OperatorAnalyticsPage />} />
               <Route path="/operator/supplier-quality" element={<SupplierQualityPage />} />
               <Route path="/operator/category-mapping-rules" element={<CategoryMappingRulesPage />} />

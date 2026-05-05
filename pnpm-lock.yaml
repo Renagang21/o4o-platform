@@ -2477,6 +2477,9 @@ importers:
       '@o4o/operator-ux-core':
         specifier: workspace:*
         version: link:../operator-ux-core
+      '@o4o/shared-space-ui':
+        specifier: workspace:*
+        version: link:../shared-space-ui
       '@o4o/ui':
         specifier: workspace:*
         version: link:../ui
@@ -3426,6 +3429,9 @@ importers:
       '@o4o/operator-core':
         specifier: workspace:*
         version: link:../../packages/operator-core
+      '@o4o/operator-core-ui':
+        specifier: workspace:*
+        version: link:../../packages/operator-core-ui
       '@o4o/operator-ux-core':
         specifier: workspace:*
         version: link:../../packages/operator-ux-core
@@ -3623,6 +3629,9 @@ importers:
       '@o4o/operator-core':
         specifier: workspace:*
         version: link:../../packages/operator-core
+      '@o4o/operator-core-ui':
+        specifier: workspace:*
+        version: link:../../packages/operator-core-ui
       '@o4o/operator-ux-core':
         specifier: workspace:*
         version: link:../../packages/operator-ux-core

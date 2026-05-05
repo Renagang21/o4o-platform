@@ -8,10 +8,12 @@
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./modules/stores": "./src/modules/stores/index.ts"
+    "./modules/stores": "./src/modules/stores/index.ts",
+    "./modules/guide-contents": "./src/modules/guide-contents/index.ts"
   },
   "dependencies": {
     "@o4o/operator-ux-core": "workspace:*",
+    "@o4o/shared-space-ui": "workspace:*",
     "@o4o/ui": "workspace:*"
   },
   "peerDependencies": {

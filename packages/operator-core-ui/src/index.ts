@@ -29,3 +29,12 @@ export type {
   UseStoresQueryArgs,
   UseStoresQueryResult,
 } from './modules/stores';
+
+// Guide Contents Module
+export { GuideContentsManager } from './modules/guide-contents';
+export type {
+  GuideSection,
+  GuideContentsConfig,
+  GuideContentsClient,
+  GuideContentsManagerProps,
+} from './modules/guide-contents';

@@ -1,12 +1,12 @@
 /**
- * OperatorGuideContentsPage — /operator/guide-contents (KPA-Society)
+ * OperatorGuideContentsPage — /operator/guide-contents (GlycoPharm)
  *
  * WO-O4O-OPERATOR-GUIDE-CONTENTS-CORE-EXTRACTION-V1
- * 공통 모듈로 추출됨: @o4o/operator-core-ui/modules/guide-contents
+ * 공통 모듈: @o4o/operator-core-ui/modules/guide-contents
  */
 
 import { GuideContentsManager, type GuideContentsConfig } from '@o4o/operator-core-ui/modules/guide-contents';
-import { guideClient } from '../../api/guideContent';
+import { guideClient } from '@/api/guideContent';
 
 const config: GuideContentsConfig = {
   pageKey: 'lms.lesson.editor',
@@ -20,5 +20,5 @@ const config: GuideContentsConfig = {
 };
 
 export default function OperatorGuideContentsPage() {
-  return <GuideContentsManager serviceKey="kpa-society" config={config} client={guideClient} />;
+  return <GuideContentsManager serviceKey="glycopharm" config={config} client={guideClient} />;
 }

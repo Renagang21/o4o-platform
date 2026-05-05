@@ -137,6 +137,8 @@ const OperatorSettingsPage = lazy(() => import('@/pages/operator/SettingsPage'))
 const OperatorRoleManagementPage = lazy(() => import('@/pages/operator/RoleManagementPage'));
 const OperatorAiReportPage = lazy(() => import('@/pages/operator/AiReportPage'));
 const StoreCockpitPage = lazy(() => import('@/pages/operator/StoreCockpitPage'));
+// Operator Guide Contents (WO-O4O-OPERATOR-GUIDE-CONTENTS-CORE-EXTRACTION-V1)
+const OperatorGuideContentsPage = lazy(() => import('@/pages/operator/OperatorGuideContentsPage'));
 
 // Community Management (WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1)
 const CommunityManagementPage = lazy(() => import('@/pages/operator/CommunityManagementPage'));
@@ -418,6 +420,8 @@ function AppRoutes() {
         <Route path="forum-delete-requests" element={<ForumDeleteRequestsPage />} />
         {/* WO-O4O-FORUM-ANALYTICS-UNIFICATION-V1 */}
         <Route path="forum-analytics" element={<ForumAnalyticsPage />} />
+        {/* Guide Contents (WO-O4O-OPERATOR-GUIDE-CONTENTS-CORE-EXTRACTION-V1) */}
+        <Route path="guide-contents" element={<OperatorGuideContentsPage />} />
       </Route>
 
       {/* Store Owner Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1) */}
