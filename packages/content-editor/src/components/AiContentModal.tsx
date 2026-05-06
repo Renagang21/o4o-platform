@@ -26,6 +26,14 @@ interface AiContentResult {
   html: string;
   title: string;
   summary: string;
+  /**
+   * WO-O4O-AI-CONTENT-EDITOR-YOUTUBE-COMMAND-INSERT-V1:
+   *   o4o/youtube 블록의 URL 목록.
+   *   setContent 경로는 TipTap parseHTML 매칭 한계로 youtube embed 를 drop 하므로,
+   *   handleInsert 에서 별도로 editor.commands.setYoutubeVideo({src}) 로 삽입한다.
+   *   미리보기(blocksToHtml)에는 youtube wrapper 가 그대로 포함되므로 시각적 일관성 유지.
+   */
+  youtubeUrls?: string[];
 }
 
 interface AiContentModalProps {
@@ -254,7 +262,20 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
         throw new Error('HTML 변환 결과가 비어있습니다.');
       }
 
-      setResult({ html, title: '', summary: `${data.blocks.length}개 블록 → HTML 변환 완료` });
+      // WO-O4O-AI-CONTENT-EDITOR-YOUTUBE-COMMAND-INSERT-V1:
+      //   o4o/youtube URL 목록을 별도로 보존 — handleInsert 에서
+      //   editor.commands.setYoutubeVideo({src}) 로 삽입한다.
+      const youtubeUrls = (data.blocks as UrlBlock[])
+        .filter((b) => b.type === 'o4o/youtube')
+        .map((b) => b.attributes?.url || b.attributes?.src || '')
+        .filter((u): u is string => Boolean(u));
+
+      setResult({
+        html,
+        title: '',
+        summary: `${data.blocks.length}개 블록 → HTML 변환 완료`,
+        youtubeUrls,
+      });
       setResultTab('preview');
     } catch (err: any) {
       setError(err.message || 'URL 콘텐츠 생성 중 오류가 발생했습니다.');
@@ -287,6 +308,25 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
     // editor 가 있을 때는 setContent(html, true) — emitUpdate=true 로 onUpdate → onChange 트리거
     if (editor) {
       editor.commands.setContent(result.html, true);
+      // WO-O4O-AI-CONTENT-EDITOR-YOUTUBE-COMMAND-INSERT-V1:
+      //   setContent 경로는 <div data-youtube-video><iframe>...</iframe></div> wrapper 도
+      //   ProseMirror DOMParser 단계에서 drop 됨 (실측 확인). TipTap Youtube extension 의
+      //   공식 명령(setYoutubeVideo)으로 별도 삽입한다. extension 미등록 시 명령이 부재하므로
+      //   존재 여부를 확인한 뒤 호출.
+      if (result.youtubeUrls && result.youtubeUrls.length > 0) {
+        const ytCommand = (editor.commands as unknown as {
+          setYoutubeVideo?: (options: { src: string }) => boolean;
+        }).setYoutubeVideo;
+        if (typeof ytCommand === 'function') {
+          for (const src of result.youtubeUrls) {
+            try {
+              ytCommand({ src });
+            } catch {
+              /* invalid url 등은 silently skip */
+            }
+          }
+        }
+      }
     }
     // WO-O4O-LMS-LESSON-AI-ASSIST-V1: onInsert 가 있으면 외부 form state 로 결과 전달
     if (onInsert) {
