@@ -18,7 +18,7 @@ import { StoreExecutionAsset } from '../../platform/entities/store-execution-ass
 import { StoreQrCode } from '../../platform/entities/store-qr-code.entity.js';
 import { NetureSupplierLibraryItem } from '../../../modules/neture/entities/NetureSupplierLibraryItem.entity.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
-import { createRequireStoreOwner } from '../../../utils/store-owner.utils.js';
+import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
 import { generatePopPdf } from '../../../services/pop-generator.service.js';
 import type { PopGenerateInput } from '../../../services/pop-generator.service.js';
 
@@ -35,12 +35,16 @@ const IMAGE_MIME_TYPES = new Set([
 export function createStorePopController(
   dataSource: DataSource,
   requireAuth: AuthMiddleware,
+  // WO-O4O-STORE-GUARD-PHASE2B-LIBRARY-MARKETING-POP-V1:
+  //   serviceKey 지정 시 해당 서비스의 store_owner role 만 통과 (cross-service leakage 차단).
+  //   미지정 시 기존 동작 유지 (back-compat).
+  serviceKey?: StoreOwnerServiceKey,
 ): Router {
   const router = Router();
   const libraryRepo = dataSource.getRepository(StoreExecutionAsset);
   const qrRepo = dataSource.getRepository(StoreQrCode);
   const supplierLibraryRepo = dataSource.getRepository(NetureSupplierLibraryItem);
-  const requirePharmacyOwner = createRequireStoreOwner(dataSource);
+  const requirePharmacyOwner = createRequireStoreOwner(dataSource, serviceKey);
 
   // ─── GET /pharmacy/pop/source/supplier-items — 공급자 공개 자료 목록 ──
   router.get(

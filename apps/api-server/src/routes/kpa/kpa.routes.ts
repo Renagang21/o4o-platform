@@ -385,13 +385,15 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   router.use('/', createStoreQrLandingController(dataSource, coreRequireAuth as any, 'kpa'));
 
   // Store POP routes (WO-O4O-QR-POP-AUTO-GENERATOR-V1) — internal: /pharmacy/pop/*
-  router.use('/', createStorePopController(dataSource, coreRequireAuth as any));
+  // WO-O4O-STORE-GUARD-PHASE2B-LIBRARY-MARKETING-POP-V1: serviceKey='kpa' 전달.
+  router.use('/', createStorePopController(dataSource, coreRequireAuth as any, 'kpa'));
 
   // Store Analytics routes (WO-O4O-MARKETING-ANALYTICS-V1) — internal: /pharmacy/analytics/*
   router.use('/', createStoreAnalyticsController(dataSource, coreRequireAuth as any));
 
   // Product Marketing Graph (WO-O4O-PRODUCT-MARKETING-GRAPH-V1) — internal: /pharmacy/products/*/marketing
-  router.use('/', createProductMarketingController(dataSource, coreRequireAuth as any));
+  // WO-O4O-STORE-GUARD-PHASE2B-LIBRARY-MARKETING-POP-V1: serviceKey='kpa' 전달.
+  router.use('/', createProductMarketingController(dataSource, coreRequireAuth as any, 'kpa'));
 
   // ============================================================================
   // Store Channel Routes — WO-KPA-STORE-CHANNEL-INTEGRATION-V1

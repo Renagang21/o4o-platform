@@ -28,7 +28,7 @@ import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { StoreLibraryItem } from '../../platform/entities/store-library-item.entity.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
-import { createRequireStoreOwner } from '../../../utils/store-owner.utils.js';
+import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
 
 const VALID_ASSET_TYPES = ['file', 'content', 'external-link'] as const;
 
@@ -37,11 +37,15 @@ type AuthMiddleware = RequestHandler;
 export function createStoreLibraryController(
   dataSource: DataSource,
   requireAuth: AuthMiddleware,
+  // WO-O4O-STORE-GUARD-PHASE2B-LIBRARY-MARKETING-POP-V1:
+  //   serviceKey 지정 시 해당 서비스의 store_owner role 만 통과 (cross-service leakage 차단).
+  //   미지정 시 기존 동작 유지 (back-compat).
+  serviceKey?: StoreOwnerServiceKey,
 ): Router {
   const router = Router();
   const libraryRepo = dataSource.getRepository(StoreLibraryItem);
 
-  const requirePharmacyOwner = createRequireStoreOwner(dataSource);
+  const requirePharmacyOwner = createRequireStoreOwner(dataSource, serviceKey);
 
   // ─── GET /pharmacy/library — 자료 목록 (페이지네이션) ──────────
   router.get(

@@ -363,20 +363,23 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   router.use('/store-playlists', createStorePlaylistController(dataSource, coreRequireAuth as any));
 
   // Store Library (internal: /pharmacy/library/*)
-  router.use('/', createStoreLibraryController(dataSource, coreRequireAuth as any));
+  // WO-O4O-STORE-GUARD-PHASE2B-LIBRARY-MARKETING-POP-V1: serviceKey='glycopharm' 전달.
+  router.use('/', createStoreLibraryController(dataSource, coreRequireAuth as any, 'glycopharm'));
 
   // Store QR Landing (internal: /qr/public/*, /pharmacy/qr/*)
   // WO-O4O-STORE-GUARD-PHASE2A-CHANNEL-AND-QR-V1: serviceKey='glycopharm' 전달 (public route 는 무관).
   router.use('/', createStoreQrLandingController(dataSource, coreRequireAuth as any, 'glycopharm'));
 
   // Store POP (internal: /pharmacy/pop/*)
-  router.use('/', createStorePopController(dataSource, coreRequireAuth as any));
+  // WO-O4O-STORE-GUARD-PHASE2B-LIBRARY-MARKETING-POP-V1: serviceKey='glycopharm' 전달.
+  router.use('/', createStorePopController(dataSource, coreRequireAuth as any, 'glycopharm'));
 
   // Store Analytics (internal: /pharmacy/analytics/*)
   router.use('/', createStoreAnalyticsController(dataSource, coreRequireAuth as any));
 
   // Product Marketing Graph (internal: /pharmacy/products/*/marketing)
-  router.use('/', createProductMarketingController(dataSource, coreRequireAuth as any));
+  // WO-O4O-STORE-GUARD-PHASE2B-LIBRARY-MARKETING-POP-V1: serviceKey='glycopharm' 전달.
+  router.use('/', createProductMarketingController(dataSource, coreRequireAuth as any, 'glycopharm'));
 
   // Published Assets
   router.use('/published-assets', createPublishedAssetsController(dataSource));
