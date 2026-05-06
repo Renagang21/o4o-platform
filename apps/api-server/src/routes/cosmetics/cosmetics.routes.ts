@@ -102,7 +102,8 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
   router.use('/store-hub/channel-products', createStoreChannelProductsController(dataSource, coreRequireAuth as any));
 
   // B2B Supply Catalog — 공급자 상품 카탈로그 + 신청 (WO-O4O-HUB-TO-STORE-UX-BRIDGE-V1)
-  router.use('/pharmacy/products', createPharmacyProductsController(dataSource, coreRequireAuth as any));
+  // WO-GLYCOPHARM-STORE-GUARD-SERVICE-AWARE-FIX-V1: serviceKey='cosmetics' 전달 → cosmetics:store_owner 만 통과.
+  router.use('/pharmacy/products', createPharmacyProductsController(dataSource, coreRequireAuth as any, 'cosmetics'));
 
   // Asset Snapshot
   router.use('/assets', createAssetSnapshotController(dataSource, coreRequireAuth as any));

@@ -357,7 +357,8 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   router.use('/pharmacy', createPharmacyInfoController(dataSource, coreRequireAuth as any));
 
   // Pharmacy Products routes (WO-PHARMACY-PRODUCT-LISTING-APPROVAL-PHASE1-V1)
-  router.use('/pharmacy/products', createPharmacyProductsController(dataSource, coreRequireAuth as any));
+  // WO-GLYCOPHARM-STORE-GUARD-SERVICE-AWARE-FIX-V1: serviceKey='kpa' 전달 → kpa:store_owner 만 통과.
+  router.use('/pharmacy/products', createPharmacyProductsController(dataSource, coreRequireAuth as any, 'kpa'));
 
   // Asset Snapshot routes (WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1)
   router.use('/assets', createAssetSnapshotController(dataSource, coreRequireAuth as any));

@@ -345,7 +345,9 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   router.use('/pharmacy/store', createPharmacyStoreConfigController(dataSource, coreRequireAuth as any));
 
   // Pharmacy Products — 상품 채택/관리
-  router.use('/pharmacy/products', createPharmacyProductsController(dataSource, coreRequireAuth as any));
+  // WO-GLYCOPHARM-STORE-GUARD-SERVICE-AWARE-FIX-V1: serviceKey='glycopharm' 전달 →
+  //   glycopharm:store_owner 또는 glycopharm:pharmacist 만 통과 (cross-service leakage 차단).
+  router.use('/pharmacy/products', createPharmacyProductsController(dataSource, coreRequireAuth as any, 'glycopharm'));
 
   // Asset Snapshot
   router.use('/assets', createAssetSnapshotController(dataSource, coreRequireAuth as any));

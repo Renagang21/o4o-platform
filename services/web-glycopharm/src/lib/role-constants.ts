@@ -7,10 +7,17 @@
 
 // GlycoPharm role constants — DB에 실제 저장되는 값과 일치
 // WO-GLYCOPHARM-PHARMACY-ROLE-FINAL-CLEANUP-V1: PHARMACY 제거, PHARMACIST 단일 기준
+//
+// WO-GLYCOPHARM-STORE-GUARD-SERVICE-AWARE-FIX-V1:
+//   GlycoPharm 도메인에서 매장 경영자 = 약사(PHARMACIST). backend store_owner 가드도
+//   glycopharm 서비스에서는 PHARMACIST 와 STORE_OWNER 둘 다 인정한다 (store-owner.utils.ts 참조).
+//   STORE_OWNER alias 는 향후 명시적 store_owner role 운영 시 사용. 현 시점 alias 만 추가.
 export const GLYCOPHARM_ROLES = {
   ADMIN: 'glycopharm:admin',
   OPERATOR: 'glycopharm:operator',
   PHARMACIST: 'glycopharm:pharmacist',
+  /** Backend STORE_OWNER_ROLES_BY_SERVICE['glycopharm'] 와 정합 — alias for forward compat */
+  STORE_OWNER: 'glycopharm:store_owner',
   SUPPLIER: 'supplier',
   CONSUMER: 'customer',
   PLATFORM_SUPER_ADMIN: 'platform:super_admin',

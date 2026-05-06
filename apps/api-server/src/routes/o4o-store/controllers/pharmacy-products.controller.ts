@@ -23,7 +23,7 @@ import { KpaAuditLog } from '../../kpa/entities/kpa-audit-log.entity.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import { SERVICE_KEYS } from '../../../constants/service-keys.js';
 import { ApiError } from '../../../utils/api-error.js';
-import { createRequireStoreOwner } from '../../../utils/store-owner.utils.js';
+import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
 
 type AuthMiddleware = RequestHandler;
 
@@ -45,14 +45,19 @@ function resolveServiceKeyFromBody(body: any): string {
 
 export function createPharmacyProductsController(
   dataSource: DataSource,
-  requireAuth: AuthMiddleware
+  requireAuth: AuthMiddleware,
+  // WO-GLYCOPHARM-STORE-GUARD-SERVICE-AWARE-FIX-V1:
+  //   serviceKey 지정 시 해당 서비스의 store_owner role 만 통과 (cross-service leakage 차단).
+  //   미지정 시 기존 동작 유지 (back-compat — 모든 서비스 store_owner role 허용).
+  serviceKey?: StoreOwnerServiceKey,
 ): Router {
   const router = Router();
   const listingRepo = dataSource.getRepository(OrganizationProductListing);
   const auditRepo = dataSource.getRepository(KpaAuditLog);
 
   // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반 middleware
-  const requirePharmacyOwner = createRequireStoreOwner(dataSource);
+  // WO-GLYCOPHARM-STORE-GUARD-SERVICE-AWARE-FIX-V1: serviceKey 전파.
+  const requirePharmacyOwner = createRequireStoreOwner(dataSource, serviceKey);
 
   // ─── GET /catalog — 플랫폼 B2B 상품 카탈로그 ─────────────────────
   // WO-O4O-API-PHARMACY-B2B-CATALOG-V1
