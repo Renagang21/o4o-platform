@@ -31,11 +31,11 @@ export async function resolveAiApiKey(
   try {
     if (dataSource.isInitialized) {
       const rows = await dataSource.query(
-        `SELECT apikey FROM ai_settings WHERE provider = $1 AND isactive = true LIMIT 1`,
+        `SELECT "apiKey" FROM ai_settings WHERE provider = $1 AND "isActive" = true LIMIT 1`,
         [provider],
       );
-      if (rows[0]?.apikey) {
-        return rows[0].apikey as string;
+      if (rows[0]?.apiKey) {
+        return rows[0].apiKey as string;
       }
     }
   } catch {
