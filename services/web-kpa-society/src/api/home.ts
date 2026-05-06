@@ -43,13 +43,6 @@ interface HomeFeatured {
 type HomeMedia = SignageHomeMedia;
 type HomePlaylist = SignageHomePlaylist;
 
-export interface HomeForumCategory {
-  id: string;
-  name: string;
-  slug: string;
-  postCount: number;
-  iconEmoji?: string;
-}
 
 interface NoticesResponse {
   success: boolean;
