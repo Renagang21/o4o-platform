@@ -115,7 +115,11 @@ function blocksToHtml(blocks: UrlBlock[]): string {
           const embedUrl = url.includes('watch?v=')
             ? url.replace('watch?v=', 'embed/')
             : url;
-          return `<iframe src="${embedUrl}" frameborder="0" allowfullscreen style="width:100%;aspect-ratio:16/9;"></iframe>`;
+          // WO-O4O-AI-CONTENT-EDITOR-YOUTUBE-RENDER-V1:
+          //   TipTap @tiptap/extension-youtube 의 parseHTML 규칙은
+          //     { tag: 'div[data-youtube-video] iframe' }
+          //   raw <iframe> 단독은 setContent 시 drop 되므로 wrapper 필수.
+          return `<div data-youtube-video><iframe src="${embedUrl}" frameborder="0" allowfullscreen></iframe></div>`;
         }
         case 'o4o/image': {
           const src = block.attributes?.url || block.attributes?.src || '';
