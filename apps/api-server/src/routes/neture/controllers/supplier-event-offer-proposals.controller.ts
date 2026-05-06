@@ -63,10 +63,18 @@ export function createSupplierEventOfferProposalsController(
         return;
       }
 
-      const { offerId, serviceKeys } = (req.body ?? {}) as {
+      const body = (req.body ?? {}) as {
         offerId?: string;
         serviceKeys?: unknown;
+        // WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1
+        eventPrice?: unknown;
+        startAt?: unknown;
+        endAt?: unknown;
+        totalQuantity?: unknown;
+        perOrderLimit?: unknown;
+        perStoreLimit?: unknown;
       };
+      const { offerId, serviceKeys } = body;
 
       if (!offerId || typeof offerId !== 'string') {
         res.status(400).json({
@@ -94,6 +102,77 @@ export function createSupplierEventOfferProposalsController(
         return;
       }
 
+      // WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1
+      // 이벤트 조건 검증 — 정책: eventPrice/startAt/endAt 필수, 기간 미입력 금지.
+      const eventPriceNum =
+        typeof body.eventPrice === 'number'
+          ? body.eventPrice
+          : typeof body.eventPrice === 'string' && body.eventPrice.trim() !== ''
+            ? Number(body.eventPrice)
+            : NaN;
+      if (!Number.isFinite(eventPriceNum) || eventPriceNum <= 0) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_PARAMS', message: 'eventPrice 는 0 보다 큰 숫자여야 합니다.' },
+        });
+        return;
+      }
+
+      const startAt =
+        typeof body.startAt === 'string' && body.startAt.trim() !== ''
+          ? new Date(body.startAt)
+          : null;
+      const endAt =
+        typeof body.endAt === 'string' && body.endAt.trim() !== ''
+          ? new Date(body.endAt)
+          : null;
+      if (!startAt || Number.isNaN(startAt.getTime())) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_PARAMS', message: '시작 일시(startAt)가 필요합니다.' },
+        });
+        return;
+      }
+      if (!endAt || Number.isNaN(endAt.getTime())) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_PARAMS', message: '종료 일시(endAt)가 필요합니다.' },
+        });
+        return;
+      }
+      if (startAt.getTime() >= endAt.getTime()) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_PARAMS', message: '시작 일시는 종료 일시보다 이전이어야 합니다.' },
+        });
+        return;
+      }
+
+      const parseOptionalInt = (v: unknown, name: string): number | null | { error: string } => {
+        if (v == null || v === '') return null;
+        const n = typeof v === 'number' ? v : Number(v);
+        if (!Number.isFinite(n) || !Number.isInteger(n) || n < 0) {
+          return { error: `${name} 는 0 이상의 정수여야 합니다.` };
+        }
+        return n;
+      };
+
+      const totalQuantity = parseOptionalInt(body.totalQuantity, 'totalQuantity');
+      if (totalQuantity && typeof totalQuantity === 'object' && 'error' in totalQuantity) {
+        res.status(400).json({ success: false, error: { code: 'INVALID_PARAMS', message: totalQuantity.error } });
+        return;
+      }
+      const perOrderLimit = parseOptionalInt(body.perOrderLimit, 'perOrderLimit');
+      if (perOrderLimit && typeof perOrderLimit === 'object' && 'error' in perOrderLimit) {
+        res.status(400).json({ success: false, error: { code: 'INVALID_PARAMS', message: perOrderLimit.error } });
+        return;
+      }
+      const perStoreLimit = parseOptionalInt(body.perStoreLimit, 'perStoreLimit');
+      if (perStoreLimit && typeof perStoreLimit === 'object' && 'error' in perStoreLimit) {
+        res.status(400).json({ success: false, error: { code: 'INVALID_PARAMS', message: perStoreLimit.error } });
+        return;
+      }
+
       // 공급자 계정 연결 확인 (UI fast-fail)
       const supplierId = await resolveSupplierIdByUser(dataSource, userId);
       if (!supplierId) {
@@ -112,6 +191,14 @@ export function createSupplierEventOfferProposalsController(
         offerId,
         targetServiceKeys: cleanKeys,
         ownerUserId: userId,
+        eventConditions: {
+          eventPrice: eventPriceNum,
+          startAt,
+          endAt,
+          totalQuantity: totalQuantity as number | null,
+          perOrderLimit: perOrderLimit as number | null,
+          perStoreLimit: perStoreLimit as number | null,
+        },
       });
 
       res.status(201).json({
@@ -164,6 +251,12 @@ export function createSupplierEventOfferProposalsController(
            opl.created_at      AS "proposedAt",
            opl.decided_at      AS "decidedAt",
            opl.rejected_reason AS "rejectedReason",
+           opl.event_price::numeric AS "eventPrice",
+           opl.start_at        AS "startAt",
+           opl.end_at          AS "endAt",
+           opl.total_quantity  AS "totalQuantity",
+           opl.per_order_limit AS "perOrderLimit",
+           opl.per_store_limit AS "perStoreLimit",
            COALESCE(pm.name, '(상품명 없음)')  AS title,
            COALESCE(org.name, '(공급사 없음)') AS "supplierName",
            spo.price_general::numeric          AS price
@@ -185,6 +278,13 @@ export function createSupplierEventOfferProposalsController(
         title: r.title,
         supplierName: r.supplierName,
         price: r.price !== null ? Number(r.price) : null,
+        // WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1
+        eventPrice: r.eventPrice !== null ? Number(r.eventPrice) : null,
+        startAt: r.startAt ? new Date(r.startAt).toISOString() : null,
+        endAt: r.endAt ? new Date(r.endAt).toISOString() : null,
+        totalQuantity: r.totalQuantity !== null ? Number(r.totalQuantity) : null,
+        perOrderLimit: r.perOrderLimit !== null ? Number(r.perOrderLimit) : null,
+        perStoreLimit: r.perStoreLimit !== null ? Number(r.perStoreLimit) : null,
         isActive: r.isActive,
         status: r.status,
         proposedAt: r.proposedAt instanceof Date

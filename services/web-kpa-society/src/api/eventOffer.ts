@@ -35,10 +35,11 @@ export const eventOfferApi = {
 
   // 이벤트 상품 목록 (enriched, WO-EVENT-OFFER-HUB-TABLE-AND-DIRECT-ORDER-REFINE-V1)
   // WO-EVENT-OFFER-HUB-TIME-WINDOW-FILTER-HOTFIX-V1: status 필터 추가
+  // WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1: 'upcoming' 추가
   getEnrichedOffers: (params?: {
     page?: number;
     limit?: number;
-    status?: 'active' | 'ended' | 'all';
+    status?: 'upcoming' | 'active' | 'ended' | 'all';
   }) =>
     apiClient.get<{
       success: boolean;

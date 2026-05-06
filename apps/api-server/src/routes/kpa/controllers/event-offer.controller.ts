@@ -87,8 +87,9 @@ export function createEventOfferController(
   router.get('/enriched', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
     const page = parseInt(req.query.page as string) || 1;
     const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
-    const status = (['active', 'ended', 'all'].includes(req.query.status as string)
-      ? req.query.status as 'active' | 'ended' | 'all'
+    // WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1: 'upcoming' (시작 전) 허용
+    const status = (['upcoming', 'active', 'ended', 'all'].includes(req.query.status as string)
+      ? req.query.status as 'upcoming' | 'active' | 'ended' | 'all'
       : 'active');
 
     const { data, total } = await service.listGroupbuysEnriched(page, limit, status);

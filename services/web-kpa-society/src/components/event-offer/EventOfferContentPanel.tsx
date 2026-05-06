@@ -35,9 +35,11 @@ interface OrderResult {
   error?: string;
 }
 
+// WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1: 'upcoming' 추가
 type StatusTab = { key: EventOfferStatus; label: string };
 const STATUS_TABS: StatusTab[] = [
-  { key: 'active', label: '진행중' },
+  { key: 'upcoming', label: '진행 예정' },
+  { key: 'active', label: '진행 중' },
   { key: 'ended', label: '종료' },
   { key: 'all', label: '전체' },
 ];
@@ -119,13 +121,14 @@ export function EventOfferContentPanel({ compact = false }: EventOfferContentPan
     return result;
   }, [items, supplierFilter, searchQuery]);
 
+  // WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1: 진행 중(active) 만 주문 가능
   const selectableItems = useMemo(
-    () => filteredItems.filter(i => i.isActive),
+    () => filteredItems.filter(i => i.status === 'active'),
     [filteredItems],
   );
 
   const groupedSelection = useMemo(() => {
-    const selected = items.filter(i => selectedIds.has(i.id) && i.isActive);
+    const selected = items.filter(i => selectedIds.has(i.id) && i.status === 'active');
     const groups: Record<string, EventOfferItem[]> = {};
     for (const item of selected) {
       if (!groups[item.supplierName]) groups[item.supplierName] = [];
@@ -201,7 +204,7 @@ export function EventOfferContentPanel({ compact = false }: EventOfferContentPan
   };
 
   const handleOrderAll = async () => {
-    const allItems = items.filter(i => selectedIds.has(i.id) && i.isActive);
+    const allItems = items.filter(i => selectedIds.has(i.id) && i.status === 'active');
     await handleBatchOrder(allItems);
   };
 
@@ -216,15 +219,23 @@ export function EventOfferContentPanel({ compact = false }: EventOfferContentPan
   const formatPeriod = (item: EventOfferItem) => {
     const start = item.startAt ? formatDate(item.startAt) : formatDate(item.createdAt);
     const end = item.endAt ? formatDate(item.endAt) : null;
-    if (item.status === 'active' || (item.status === 'approved' && !item.startAt)) return `${start} ~`;
+    if (item.status === 'active' && !item.startAt) return `${start} ~`;
     if (end) return `${start} ~ ${end}`;
     return `${start} ~`;
   };
 
+  // WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1
   const getStatusBadge = (item: EventOfferItem): { style: React.CSSProperties; label: string } => {
-    if (item.status === 'approved') return { style: badgeSoon, label: '곧 시작' };
-    if (item.status === 'active' || item.isActive) return { style: badgeActive, label: '진행중' };
-    return { style: badgeEnded, label: '종료' };
+    switch (item.status) {
+      case 'upcoming':  return { style: badgeSoon, label: '곧 시작' };
+      case 'active':    return { style: badgeActive, label: '진행중' };
+      case 'sold_out':  return { style: badgeEnded, label: '매진' };
+      case 'pending':   return { style: badgeEnded, label: '대기' };
+      case 'rejected':  return { style: badgeEnded, label: '반려' };
+      case 'canceled':  return { style: badgeEnded, label: '취소' };
+      case 'ended':
+      default:          return { style: badgeEnded, label: '종료' };
+    }
   };
 
   const getGroupSubtotal = (groupItems: EventOfferItem[]) =>
@@ -323,17 +334,21 @@ export function EventOfferContentPanel({ compact = false }: EventOfferContentPan
               <span style={{ ...colCenter, width: 100 }}>액션</span>
             </div>
 
-            {filteredItems.map(item => (
+            {/* WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1
+                upcoming(시작 전) 노출 + 주문 비활성, active 만 주문 가능, sold_out/ended 분리 표시 */}
+            {filteredItems.map(item => {
+              const isOrderable = item.status === 'active';
+              return (
               <div
                 key={item.id}
                 style={{
                   ...listRow,
-                  ...(!item.isActive ? { opacity: 0.6, backgroundColor: colors.neutral50 } : {}),
+                  ...(!isOrderable ? { opacity: 0.7, backgroundColor: colors.neutral50 } : {}),
                 }}
               >
                 {hasStore && statusFilter !== 'ended' && (
                   <span style={{ ...colCenter, width: 48 }}>
-                    {item.isActive ? (
+                    {isOrderable ? (
                       <input
                         type="checkbox"
                         checked={selectedIds.has(item.id)}
@@ -368,19 +383,24 @@ export function EventOfferContentPanel({ compact = false }: EventOfferContentPan
                 <span style={{ ...colCenter, width: 80 }}>
                   {(() => { const b = getStatusBadge(item); return <span style={b.style}>{b.label}</span>; })()}
                 </span>
-                <span style={{ ...colCenter, width: 100 }}>
-                  {item.isActive && hasStore ? (
+                <span style={{ ...colCenter, width: 110 }}>
+                  {item.status === 'upcoming' ? (
+                    <span style={disabledText}>곧 시작</span>
+                  ) : item.status === 'sold_out' ? (
+                    <span style={disabledText}>매진</span>
+                  ) : isOrderable && hasStore ? (
                     <button style={orderBtn} onClick={() => handleDirectOrder(item)}>
                       내 매장에 추가
                     </button>
-                  ) : item.isActive && !hasStore ? (
+                  ) : isOrderable && !hasStore ? (
                     <span style={disabledText}>매장 필요</span>
                   ) : (
                     <span style={disabledText}>종료됨</span>
                   )}
                 </span>
               </div>
-            ))}
+              );
+            })}
 
             {filteredItems.length === 0 && (
               <div style={emptyRow}>검색 결과가 없습니다.</div>

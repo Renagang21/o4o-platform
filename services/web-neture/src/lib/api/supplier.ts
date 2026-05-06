@@ -983,6 +983,7 @@ export interface ProposeOfferResult {
 
 // WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1
 // WO-O4O-EVENT-OFFER-MULTI-SERVICE-PROPOSAL-V1: serviceKey 필드 추가 (KPA + K-Cos 통합)
+// WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1: 이벤트 조건 필드 추가
 export interface MyEventOfferProposal {
   id: string;
   offerId: string;
@@ -990,12 +991,31 @@ export interface MyEventOfferProposal {
   serviceKey: string;
   title: string;
   supplierName: string;
+  /** 일반 공급가 (price_general) */
   price: number | null;
+  /** WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1: 이벤트 전용 가격/기간/수량 */
+  eventPrice: number | null;
+  startAt: string | null;
+  endAt: string | null;
+  totalQuantity: number | null;
+  perOrderLimit: number | null;
+  perStoreLimit: number | null;
   isActive: boolean;
   status: 'pending' | 'approved' | 'rejected' | 'canceled';
   proposedAt: string;
   decidedAt: string | null;
   rejectedReason: string | null;
+}
+
+// WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1: supplier 가 제안 시 입력하는 이벤트 조건
+export interface ProposeEventConditions {
+  eventPrice: number;
+  /** ISO date string (YYYY-MM-DD or full ISO) */
+  startAt: string;
+  endAt: string;
+  totalQuantity?: number | null;
+  perOrderLimit?: number | null;
+  perStoreLimit?: number | null;
 }
 
 // WO-O4O-EVENT-OFFER-MULTI-SERVICE-PROPOSAL-V1
@@ -1078,18 +1098,33 @@ export const supplierKpaEventOfferApi = {
       ),
 
   // WO-O4O-EVENT-OFFER-MULTI-SERVICE-PROPOSAL-V1
+  // WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1: eventConditions 파라미터 추가
   /**
    * 단일 SPO를 여러 대상 서비스(KPA / K-Cos)로 동시 제안.
    * 부분 실패 허용 — results 배열에서 서비스별 status 확인.
+   *
+   * eventConditions: 이벤트 가격/기간/수량 — 각 서비스 row 에 동일 적용.
+   *   - 일반 공급가/소비자가는 절대 변경되지 않는다 (정책).
+   *   - eventPrice <= 일반 공급가, startAt < endAt — 백엔드 추가 검증.
    */
   proposeEventOfferToServices: (
     offerId: string,
     serviceKeys: string[],
+    eventConditions: ProposeEventConditions,
   ): Promise<MultiServiceProposalResult> =>
     api
       .post<{ success: boolean; data: MultiServiceProposalResult }>(
         '/neture/supplier/event-offer-proposals',
-        { offerId, serviceKeys },
+        {
+          offerId,
+          serviceKeys,
+          eventPrice: eventConditions.eventPrice,
+          startAt: eventConditions.startAt,
+          endAt: eventConditions.endAt,
+          totalQuantity: eventConditions.totalQuantity ?? null,
+          perOrderLimit: eventConditions.perOrderLimit ?? null,
+          perStoreLimit: eventConditions.perStoreLimit ?? null,
+        },
       )
       .then(
         (res: { data: { success: boolean; data: MultiServiceProposalResult } }) =>

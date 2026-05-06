@@ -15,12 +15,17 @@
  * - 신규: 자기 SPO 중에서 KPA 이벤트로 제안 (POST /kpa/supplier/event-offers)
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tag, ChevronLeft, ChevronRight, Package, Plus, X, Loader2 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { netureEventOfferApi, supplierKpaEventOfferApi } from '../../lib/api';
-import type { ProposableOffer, MyEventOfferProposal, PerServiceProposalResult } from '../../lib/api';
+import type {
+  ProposableOffer,
+  MyEventOfferProposal,
+  PerServiceProposalResult,
+  ProposeEventConditions,
+} from '../../lib/api';
 import { GuideBlock } from '@o4o/shared-space-ui';
 import { fetchGuidePageContent } from '../../api/guideContent';
 
@@ -168,6 +173,67 @@ export default function SupplierEventOfferPage() {
     );
   }, []);
 
+  // WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1: 이벤트 조건 입력 상태
+  // - eventPrice: 필수, 0보다 커야 함, 일반 공급가 이하
+  // - startAt / endAt: 필수, startAt < endAt
+  // - totalQuantity / perOrderLimit / perStoreLimit: optional
+  const [selectedOfferId, setSelectedOfferId] = useState<string | null>(null);
+  const [eventPrice, setEventPrice] = useState<string>('');
+  const [startAt, setStartAt] = useState<string>(''); // datetime-local
+  const [endAt, setEndAt] = useState<string>('');
+  const [totalQuantity, setTotalQuantity] = useState<string>('');
+  const [perOrderLimit, setPerOrderLimit] = useState<string>('');
+  const [perStoreLimit, setPerStoreLimit] = useState<string>('');
+
+  const selectedOffer = useMemo(
+    () => proposableOffers.find(o => o.id === selectedOfferId) ?? null,
+    [proposableOffers, selectedOfferId],
+  );
+
+  const resetEventConditionInputs = useCallback(() => {
+    setSelectedOfferId(null);
+    setEventPrice('');
+    setStartAt('');
+    setEndAt('');
+    setTotalQuantity('');
+    setPerOrderLimit('');
+    setPerStoreLimit('');
+  }, []);
+
+  /** 입력값 검증 결과를 반환. error 없으면 null. */
+  const validateEventConditions = useCallback((): string | null => {
+    if (!selectedOffer) return '제안할 상품을 먼저 선택하세요.';
+    const epNum = Number(eventPrice);
+    if (!eventPrice || !Number.isFinite(epNum) || epNum <= 0) {
+      return '이벤트 가격을 0보다 큰 숫자로 입력하세요.';
+    }
+    if (selectedOffer.price != null && epNum > Number(selectedOffer.price)) {
+      return `이벤트 가격은 일반 공급가(₩${Number(selectedOffer.price).toLocaleString()}) 이하여야 합니다.`;
+    }
+    if (!startAt) return '시작 일시를 입력하세요.';
+    if (!endAt) return '종료 일시를 입력하세요.';
+    const startMs = new Date(startAt).getTime();
+    const endMs = new Date(endAt).getTime();
+    if (!Number.isFinite(startMs)) return '시작 일시 형식이 올바르지 않습니다.';
+    if (!Number.isFinite(endMs)) return '종료 일시 형식이 올바르지 않습니다.';
+    if (startMs >= endMs) return '시작 일시는 종료 일시보다 이전이어야 합니다.';
+    const checkOptionalInt = (v: string, label: string): string | null => {
+      if (!v) return null;
+      const n = Number(v);
+      if (!Number.isFinite(n) || !Number.isInteger(n) || n < 0) {
+        return `${label}는 0 이상의 정수여야 합니다.`;
+      }
+      return null;
+    };
+    return (
+      checkOptionalInt(totalQuantity, '총 수량') ||
+      checkOptionalInt(perOrderLimit, '1회 주문 제한') ||
+      checkOptionalInt(perStoreLimit, '매장별 제한')
+    );
+  }, [selectedOffer, eventPrice, startAt, endAt, totalQuantity, perOrderLimit, perStoreLimit]);
+
+  const validationError = validateEventConditions();
+
   // WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1: 내 제안 현황
   const [myProposals, setMyProposals] = useState<MyEventOfferProposal[]>([]);
   const [proposalsLoading, setProposalsLoading] = useState(false);
@@ -222,28 +288,51 @@ export default function SupplierEventOfferPage() {
     setProposeOpen(true);
     // 모달 열 때마다 기본값(KPA Society)으로 초기화
     setSelectedTargets(['kpa-society']);
+    resetEventConditionInputs();
     loadProposableOffers();
-  }, [loadProposableOffers]);
+  }, [loadProposableOffers, resetEventConditionInputs]);
 
   const handleClosePropose = useCallback(() => {
     setProposeOpen(false);
     setProposableOffers([]);
     setProposingId(null);
-  }, []);
+    resetEventConditionInputs();
+  }, [resetEventConditionInputs]);
 
   // WO-O4O-EVENT-OFFER-MULTI-SERVICE-PROPOSAL-V1
+  // WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1: 이벤트 조건 입력 → API 전달
   // 단일 SPO를 선택된 대상 서비스(KPA / K-Cos)로 동시 제안.
   // 부분 실패 허용 — 서비스별 결과를 각각 toast로 표시.
-  const handlePropose = useCallback(async (offerId: string, title: string) => {
+  const handlePropose = useCallback(async () => {
+    if (!selectedOffer) {
+      toast.error('제안할 상품을 선택하세요.');
+      return;
+    }
     if (selectedTargets.length === 0) {
       toast.error('대상 서비스를 1개 이상 선택해 주세요.');
       return;
     }
-    setProposingId(offerId);
+    const errMsg = validateEventConditions();
+    if (errMsg) {
+      toast.error(errMsg);
+      return;
+    }
+
+    const conditions: ProposeEventConditions = {
+      eventPrice: Number(eventPrice),
+      startAt: new Date(startAt).toISOString(),
+      endAt: new Date(endAt).toISOString(),
+      totalQuantity: totalQuantity ? Number(totalQuantity) : null,
+      perOrderLimit: perOrderLimit ? Number(perOrderLimit) : null,
+      perStoreLimit: perStoreLimit ? Number(perStoreLimit) : null,
+    };
+
+    setProposingId(selectedOffer.id);
     try {
       const result = await supplierKpaEventOfferApi.proposeEventOfferToServices(
-        offerId,
+        selectedOffer.id,
         selectedTargets,
+        conditions,
       );
 
       // 서비스별 결과 표시
@@ -270,7 +359,7 @@ export default function SupplierEventOfferPage() {
       }
       // 추가 안내: 모든 서비스에 성공한 경우
       if (createdCount === result.results.length && createdCount > 1) {
-        toast.success(`"${title}" 이(가) ${createdCount}개 서비스에 제안되었습니다.`);
+        toast.success(`"${selectedOffer.title}" 이(가) ${createdCount}개 서비스에 제안되었습니다.`);
       }
     } catch (err: unknown) {
       const code = extractErrorCode(err);
@@ -284,6 +373,8 @@ export default function SupplierEventOfferPage() {
   }, [
     page, activeTab, selectedTargets,
     fetchItems, handleClosePropose, loadProposableOffers, loadMyProposals,
+    selectedOffer, eventPrice, startAt, endAt,
+    totalQuantity, perOrderLimit, perStoreLimit, validateEventConditions,
   ]);
 
   useEffect(() => {
@@ -582,7 +673,9 @@ export default function SupplierEventOfferPage() {
             </div>
 
             {/* Modal Body */}
-            <div className="flex-1 overflow-y-auto px-6 py-4">
+            {/* WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1
+                Step 1: 상품 선택 (radio) — Step 2: 이벤트 조건 입력 — 하단 "제안하기" 버튼 */}
+            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-5">
               {proposableLoading ? (
                 <div className="flex justify-center py-12">
                   <Loader2 size={24} className="animate-spin text-indigo-600" />
@@ -596,53 +689,190 @@ export default function SupplierEventOfferPage() {
                   </p>
                 </div>
               ) : (
-                <ul className="divide-y divide-slate-100">
-                  {proposableOffers.map((offer) => (
-                    <li
-                      key={offer.id}
-                      className="flex items-center justify-between gap-4 py-3"
-                    >
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-slate-800 truncate">
-                          {offer.title}
-                        </p>
-                        <p className="text-xs text-slate-500 truncate mt-0.5">
-                          {offer.supplierName}
-                          {offer.price != null && (
-                            <span className="ml-2 text-slate-700">
-                              · ₩{Number(offer.price).toLocaleString()}
-                            </span>
-                          )}
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => handlePropose(offer.id, offer.title)}
-                        disabled={proposingId !== null || selectedTargets.length === 0}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
-                      >
-                        {proposingId === offer.id ? (
-                          <>
-                            <Loader2 size={12} className="animate-spin" />
-                            제안 중...
-                          </>
-                        ) : (
-                          '제안'
+                <>
+                  {/* Step 1: 상품 선택 */}
+                  <div>
+                    <div className="text-xs font-semibold text-slate-700 mb-2">
+                      1. 제안할 상품 선택
+                    </div>
+                    <ul className="divide-y divide-slate-100 border border-slate-200 rounded-lg overflow-hidden">
+                      {proposableOffers.map((offer) => {
+                        const checked = selectedOfferId === offer.id;
+                        return (
+                          <li key={offer.id}>
+                            <label
+                              className={`flex items-center gap-3 px-3 py-2.5 cursor-pointer text-sm ${
+                                checked ? 'bg-indigo-50' : 'hover:bg-slate-50'
+                              }`}
+                            >
+                              <input
+                                type="radio"
+                                name="proposable-offer"
+                                checked={checked}
+                                onChange={() => setSelectedOfferId(offer.id)}
+                                disabled={proposingId !== null}
+                                className="w-3.5 h-3.5 accent-indigo-600"
+                              />
+                              <div className="min-w-0 flex-1">
+                                <p className="font-medium text-slate-800 truncate">
+                                  {offer.title}
+                                </p>
+                                <p className="text-xs text-slate-500 truncate mt-0.5">
+                                  {offer.supplierName}
+                                  {offer.price != null && (
+                                    <span className="ml-2 text-slate-700">
+                                      · 일반 공급가 ₩{Number(offer.price).toLocaleString()}
+                                    </span>
+                                  )}
+                                </p>
+                              </div>
+                            </label>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+
+                  {/* Step 2: 이벤트 조건 입력 */}
+                  <div className="space-y-3">
+                    <div className="text-xs font-semibold text-slate-700">
+                      2. 이벤트 조건 입력
+                    </div>
+
+                    {/* 이벤트 가격 */}
+                    <div>
+                      <label className="block text-xs text-slate-600 mb-1">
+                        이벤트 공급가 <span className="text-red-500">*</span>
+                        {selectedOffer?.price != null && (
+                          <span className="ml-1 text-slate-400">
+                            (일반 공급가 ₩{Number(selectedOffer.price).toLocaleString()} 이하)
+                          </span>
                         )}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
+                      </label>
+                      <input
+                        type="number"
+                        min={0}
+                        step={1}
+                        value={eventPrice}
+                        onChange={e => setEventPrice(e.target.value)}
+                        disabled={proposingId !== null}
+                        placeholder="예: 18000"
+                        className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+
+                    {/* 시작/종료 일시 */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs text-slate-600 mb-1">
+                          시작 일시 <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="datetime-local"
+                          value={startAt}
+                          onChange={e => setStartAt(e.target.value)}
+                          disabled={proposingId !== null}
+                          className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-slate-600 mb-1">
+                          종료 일시 <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="datetime-local"
+                          value={endAt}
+                          onChange={e => setEndAt(e.target.value)}
+                          disabled={proposingId !== null}
+                          className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                      </div>
+                    </div>
+
+                    {/* 수량 제한 (optional) */}
+                    <div className="grid grid-cols-3 gap-3">
+                      <div>
+                        <label className="block text-xs text-slate-600 mb-1">
+                          총 수량 <span className="text-slate-400">(선택)</span>
+                        </label>
+                        <input
+                          type="number"
+                          min={0}
+                          step={1}
+                          value={totalQuantity}
+                          onChange={e => setTotalQuantity(e.target.value)}
+                          disabled={proposingId !== null}
+                          placeholder="무제한"
+                          className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-slate-600 mb-1">
+                          1회 주문 제한 <span className="text-slate-400">(선택)</span>
+                        </label>
+                        <input
+                          type="number"
+                          min={1}
+                          step={1}
+                          value={perOrderLimit}
+                          onChange={e => setPerOrderLimit(e.target.value)}
+                          disabled={proposingId !== null}
+                          placeholder="무제한"
+                          className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-slate-600 mb-1">
+                          매장별 제한 <span className="text-slate-400">(선택)</span>
+                        </label>
+                        <input
+                          type="number"
+                          min={1}
+                          step={1}
+                          value={perStoreLimit}
+                          onChange={e => setPerStoreLimit(e.target.value)}
+                          disabled={proposingId !== null}
+                          placeholder="무제한"
+                          className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                      </div>
+                    </div>
+
+                    {validationError && (
+                      <p className="text-xs text-red-600">{validationError}</p>
+                    )}
+                  </div>
+                </>
               )}
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end px-6 py-3 border-t border-slate-200">
+            <div className="flex items-center justify-end gap-2 px-6 py-3 border-t border-slate-200">
               <button
                 onClick={handleClosePropose}
                 disabled={proposingId !== null}
                 className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg disabled:opacity-40"
               >
                 닫기
+              </button>
+              <button
+                onClick={handlePropose}
+                disabled={
+                  proposingId !== null ||
+                  proposableOffers.length === 0 ||
+                  selectedTargets.length === 0 ||
+                  validationError !== null
+                }
+                className="inline-flex items-center gap-1 px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {proposingId !== null ? (
+                  <>
+                    <Loader2 size={14} className="animate-spin" />
+                    제안 중...
+                  </>
+                ) : (
+                  '제안하기'
+                )}
               </button>
             </div>
           </div>

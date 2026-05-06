@@ -315,13 +315,27 @@ export interface EventOfferProduct {
 // 이벤트 상품 (Enriched, WO-EVENT-OFFER-HUB-TABLE-AND-DIRECT-ORDER-REFINE-V1)
 // WO-O4O-EVENT-OFFER-CORE-REFORM-V1: status / startAt / endAt 추가
 // WO-O4O-EVENT-OFFER-QUANTITY-LIMITS-V2: 수량 필드 추가
+// WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1: eventPrice / generalPrice / 신규 status
 export interface EventOfferItem {
   id: string;
   offerId: string;
   price: number | null;
+  /** 이벤트 전용 공급가 (null = 레거시 listing) */
+  eventPrice: number | null;
+  /** 일반 공급가 (price_general 스냅샷). 비교 표시용. */
+  generalPrice: number | null;
   isActive: boolean;
-  /** 런타임 계산 상태: pending | approved(곧 시작) | active(진행중) | ended(종료) | canceled */
-  status: 'pending' | 'approved' | 'active' | 'ended' | 'canceled';
+  /**
+   * 런타임 계산 상태:
+   * - pending: 운영자 승인 대기
+   * - rejected: 반려
+   * - canceled: 취소
+   * - upcoming: 승인됨, 시작 전
+   * - active: 진행 중
+   * - sold_out: 매진
+   * - ended: 종료
+   */
+  status: 'pending' | 'rejected' | 'canceled' | 'upcoming' | 'active' | 'sold_out' | 'ended';
   startAt: string | null;
   endAt: string | null;
   createdAt: string;
@@ -336,8 +350,10 @@ export interface EventOfferItem {
   perStoreLimit: number | null;
 }
 
-// 이벤트 상태 (WO-EVENT-OFFER-HUB-TIME-WINDOW-FILTER-HOTFIX-V1)
-export type EventOfferStatus = 'active' | 'ended' | 'all';
+// 이벤트 상태 — KPA 매장 경영자 탭 키
+// WO-EVENT-OFFER-HUB-TIME-WINDOW-FILTER-HOTFIX-V1
+// WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1: 'upcoming' 추가
+export type EventOfferStatus = 'upcoming' | 'active' | 'ended' | 'all';
 
 // 이벤트 오퍼 (캠페인 모델 - legacy)
 export interface LegacyEventOffer {

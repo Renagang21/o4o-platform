@@ -44,37 +44,49 @@ const STORE_SERVICE_KEY_MAP: Record<string, string> = {
 
 // ─── 상태 계산 ───────────────────────────────────────────────────────────────
 
-export type EventStatusKey = 'pending' | 'approved' | 'active' | 'ended' | 'canceled';
-
 /**
- * DB 저장 status + start_at/end_at 기반 런타임 상태 계산.
- * DB 저장값: pending | approved | canceled
- * 런타임 계산값: approved(곧 시작) | active(진행중) | ended(종료)
+ * WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1: 'upcoming' / 'sold_out' / 'rejected' 추가.
+ * - DB 저장값: pending | approved | rejected | canceled
+ * - 런타임 계산값(approved 분기): upcoming(시작 전) | active(진행중) | sold_out(매진) | ended(종료)
  */
+export type EventStatusKey =
+  | 'pending'
+  | 'rejected'
+  | 'canceled'
+  | 'upcoming'
+  | 'active'
+  | 'sold_out'
+  | 'ended';
+
 export function resolveEventStatus(opl: {
   status: string;
   start_at: Date | string | null;
   end_at: Date | string | null;
+  total_quantity?: number | null;
 }): EventStatusKey {
   if (opl.status === 'canceled') return 'canceled';
+  if (opl.status === 'rejected') return 'rejected';
   if (opl.status === 'pending') return 'pending';
 
-  // start_at / end_at 없으면 DB 값 그대로 반환 (approved = 항상 진행)
-  if (!opl.start_at || !opl.end_at) return 'active';
-
+  // status === 'approved' 이후
   const now = new Date();
-  const startAt = opl.start_at instanceof Date ? opl.start_at : new Date(opl.start_at);
-  const endAt = opl.end_at instanceof Date ? opl.end_at : new Date(opl.end_at);
 
-  if (now < startAt) return 'approved';         // 곧 시작
-  if (now >= startAt && now <= endAt) return 'active'; // 진행중
-  return 'ended';                               // 종료
+  if (opl.start_at) {
+    const startAt = opl.start_at instanceof Date ? opl.start_at : new Date(opl.start_at);
+    if (now < startAt) return 'upcoming';
+  }
+  if (opl.end_at) {
+    const endAt = opl.end_at instanceof Date ? opl.end_at : new Date(opl.end_at);
+    if (now > endAt) return 'ended';
+  }
+  if (opl.total_quantity != null && Number(opl.total_quantity) <= 0) return 'sold_out';
+  return 'active';
 }
 
 // ─── Active 조건 SQL 절 ───────────────────────────────────────────────────────
 
 /**
- * 매장 경영자에게 노출할 이벤트 필터 조건 (테이블 alias: opl)
+ * 매장 경영자에게 노출할 "주문 가능(active)" 이벤트 필터 (테이블 alias: opl)
  * status='approved' + 날짜 조건 + 수량 조건
  */
 const ACTIVE_OFFER_CLAUSE = `
@@ -82,6 +94,18 @@ const ACTIVE_OFFER_CLAUSE = `
   AND (opl.start_at IS NULL OR NOW() >= opl.start_at)
   AND (opl.end_at   IS NULL OR NOW() <= opl.end_at)
   AND (opl.total_quantity IS NULL OR opl.total_quantity > 0)
+`.trim();
+
+/**
+ * WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1
+ * "곧 시작(upcoming)" 노출 조건: approved + start_at 미도래 + (end_at 미경과)
+ * — 시작 전이지만 매장 경영자에게 미리 보여주기 위한 조건. 주문은 불가.
+ */
+const UPCOMING_OFFER_CLAUSE = `
+  opl.status = 'approved'
+  AND opl.start_at IS NOT NULL
+  AND NOW() < opl.start_at
+  AND (opl.end_at IS NULL OR NOW() <= opl.end_at)
 `.trim();
 
 // ─── Service ─────────────────────────────────────────────────────────────────
@@ -138,13 +162,17 @@ export class EventOfferService {
   async listGroupbuysEnriched(
     page: number,
     limit: number,
-    status?: 'active' | 'ended' | 'all',
+    status?: 'upcoming' | 'active' | 'ended' | 'all',
     serviceKey: string = SERVICE_KEYS.KPA_GROUPBUY,
   ): Promise<{
     data: Array<{
       id: string;
       offerId: string;
       price: number | null;
+      /** WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1: 이벤트 전용 가격 */
+      eventPrice: number | null;
+      /** 일반 공급가 (supplier_product_offers.price_general 스냅샷) */
+      generalPrice: number | null;
       isActive: boolean;
       status: EventStatusKey;
       startAt: string | null;
@@ -152,6 +180,7 @@ export class EventOfferService {
       createdAt: string;
       updatedAt: string;
       supplierId: string;
+      /** 주문 시 적용 단가 = event_price ?? price_general */
       unitPrice: number | null;
       productName: string;
       supplierName: string;
@@ -171,11 +200,15 @@ export class EventOfferService {
     let filterClause: string;
     if (effectiveStatus === 'active') {
       filterClause = ACTIVE_OFFER_CLAUSE;
+    } else if (effectiveStatus === 'upcoming') {
+      // WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1: 시작 전 노출
+      filterClause = UPCOMING_OFFER_CLAUSE;
     } else if (effectiveStatus === 'ended') {
-      // 취소되었거나 날짜 만료된 항목
+      // 취소되었거나 날짜 만료된 항목 + sold_out (수량 0)
       filterClause = `(
         opl.status = 'canceled'
         OR (opl.status = 'approved' AND opl.end_at IS NOT NULL AND NOW() > opl.end_at)
+        OR (opl.status = 'approved' AND opl.total_quantity IS NOT NULL AND opl.total_quantity <= 0)
       )`;
     } else {
       // 'all' — 필터 없음
@@ -195,6 +228,7 @@ export class EventOfferService {
          opl.id,
          opl.offer_id        AS "offerId",
          opl.price::numeric,
+         opl.event_price::numeric AS "eventPrice",
          opl.is_active       AS "isActive",
          opl.status          AS "dbStatus",
          opl.start_at        AS "startAt",
@@ -205,7 +239,8 @@ export class EventOfferService {
          opl.per_order_limit AS "perOrderLimit",
          opl.per_store_limit AS "perStoreLimit",
          spo.supplier_id     AS "supplierId",
-         COALESCE(spo.price_general, opl.price)::numeric AS "unitPrice",
+         spo.price_general::numeric AS "generalPrice",
+         COALESCE(opl.event_price, spo.price_general, opl.price)::numeric AS "unitPrice",
          COALESCE(pm.name, '(상품명 없음)')  AS "productName",
          COALESCE(org.name, '(공급사 없음)') AS "supplierName"
        FROM organization_product_listings opl
@@ -224,8 +259,15 @@ export class EventOfferService {
         id: r.id,
         offerId: r.offerId,
         price: r.price !== null ? Number(r.price) : null,
+        eventPrice: r.eventPrice !== null ? Number(r.eventPrice) : null,
+        generalPrice: r.generalPrice !== null ? Number(r.generalPrice) : null,
         isActive: r.isActive,
-        status: resolveEventStatus({ status: r.dbStatus, start_at: r.startAt, end_at: r.endAt }),
+        status: resolveEventStatus({
+          status: r.dbStatus,
+          start_at: r.startAt,
+          end_at: r.endAt,
+          total_quantity: r.totalQuantity,
+        }),
         startAt: r.startAt ? new Date(r.startAt).toISOString() : null,
         endAt: r.endAt ? new Date(r.endAt).toISOString() : null,
         createdAt: r.createdAt instanceof Date ? r.createdAt.toISOString() : String(r.createdAt || ''),
@@ -455,9 +497,10 @@ export class EventOfferService {
     // listing은 lock 이후 재조회하므로 여기서는 supplier 정보만 가져옴
     // (supplier 정보는 별도 row라 lock 범위 밖에서 조회해도 안전)
     // → listing 먼저 찾아서 offer_id 확보
+    // WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1: event_price 도 동시 로드
     const preLockRows = await this.dataSource.query(
       `SELECT opl.id, opl.offer_id, opl.master_id, opl.organization_id, opl.service_key,
-              opl.status, opl.start_at, opl.end_at
+              opl.status, opl.start_at, opl.end_at, opl.event_price
        FROM organization_product_listings opl
        WHERE opl.id = $1
          AND opl.service_key = $2
@@ -488,7 +531,11 @@ export class EventOfferService {
     if (product.approval_status !== 'APPROVED') throw new EventOfferError(400, 'Product is not approved', 'PRODUCT_NOT_APPROVED');
     if (product.supplier_status !== 'ACTIVE') throw new EventOfferError(400, 'Supplier is not active', 'SUPPLIER_INACTIVE');
 
-    const unitPrice = Number(product.price_general ?? 0);
+    // WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1
+    // 진행 중(active) 이벤트 주문 단가 = event_price (있으면) ?? price_general (레거시 fallback)
+    // 일반 공급가는 절대 변경되지 않는다 — 단가는 checkout_orders.items[].unitPrice 스냅샷에만 반영.
+    const eventPrice = preListing.event_price != null ? Number(preListing.event_price) : null;
+    const unitPrice = eventPrice ?? Number(product.price_general ?? 0);
     if (unitPrice <= 0) throw new EventOfferError(400, 'Invalid product price', 'INVALID_PRICE');
 
     // ── Step 3: 수량 제한 검증 + total_quantity 원자적 차감 ──────────────
@@ -805,6 +852,19 @@ export class EventOfferService {
      * roleType='supplier'일 땐 무시.
      */
     operatorUserId?: string;
+    /**
+     * WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1
+     * 이벤트 조건. supplier 가 일반 공급가/소비자가와 별도로 지정한다.
+     * 일반 공급가는 절대 변경하지 않는다.
+     */
+    eventConditions?: {
+      eventPrice: number;
+      startAt: Date;
+      endAt: Date;
+      totalQuantity?: number | null;
+      perOrderLimit?: number | null;
+      perStoreLimit?: number | null;
+    };
   }): Promise<{
     id: string;
     offerId: string;
@@ -814,6 +874,13 @@ export class EventOfferService {
     status: 'pending' | 'approved';
     isActive: boolean;
     price: number | null;
+    /** WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1 */
+    eventPrice: number | null;
+    startAt: string | null;
+    endAt: string | null;
+    totalQuantity: number | null;
+    perOrderLimit: number | null;
+    perStoreLimit: number | null;
     createdAt: string;
   }> {
     // 1. Offer 조회 (master_id, supplier_id, price, name, supplier org_name)
@@ -876,6 +943,40 @@ export class EventOfferService {
     const decidedBy = input.roleType === 'operator' ? input.operatorUserId ?? null : null;
     const decidedAt = input.roleType === 'operator' ? new Date() : null;
 
+    // WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1
+    // 이벤트 조건 입력 검증 — 정책: eventPrice <= price_general, startAt < endAt
+    const ec = input.eventConditions;
+    if (ec) {
+      if (!Number.isFinite(ec.eventPrice) || ec.eventPrice <= 0) {
+        throw new EventOfferCreateError(400, 'eventPrice 는 0 보다 큰 숫자여야 합니다.', 'INTERNAL_ERROR');
+      }
+      const generalPrice = offer.price_general != null ? Number(offer.price_general) : null;
+      if (generalPrice != null && ec.eventPrice > generalPrice) {
+        throw new EventOfferCreateError(
+          400,
+          `이벤트 가격(${ec.eventPrice})은 일반 공급가(${generalPrice}) 이하여야 합니다.`,
+          'INTERNAL_ERROR',
+        );
+      }
+      const startMs = ec.startAt.getTime();
+      const endMs = ec.endAt.getTime();
+      if (!Number.isFinite(startMs) || !Number.isFinite(endMs)) {
+        throw new EventOfferCreateError(400, '시작/종료 일시 형식이 올바르지 않습니다.', 'INTERNAL_ERROR');
+      }
+      if (startMs >= endMs) {
+        throw new EventOfferCreateError(400, '시작 일시는 종료 일시보다 이전이어야 합니다.', 'INTERNAL_ERROR');
+      }
+      if (ec.totalQuantity != null && (!Number.isFinite(ec.totalQuantity) || ec.totalQuantity < 0)) {
+        throw new EventOfferCreateError(400, 'totalQuantity 는 0 이상이어야 합니다.', 'INTERNAL_ERROR');
+      }
+      if (ec.perOrderLimit != null && (!Number.isFinite(ec.perOrderLimit) || ec.perOrderLimit < 1)) {
+        throw new EventOfferCreateError(400, 'perOrderLimit 은 1 이상이어야 합니다.', 'INTERNAL_ERROR');
+      }
+      if (ec.perStoreLimit != null && (!Number.isFinite(ec.perStoreLimit) || ec.perStoreLimit < 1)) {
+        throw new EventOfferCreateError(400, 'perStoreLimit 은 1 이상이어야 합니다.', 'INTERNAL_ERROR');
+      }
+    }
+
     // 5. INSERT
     const listingRepo = this.dataSource.getRepository(OrganizationProductListing);
     const listing = listingRepo.create({
@@ -885,7 +986,15 @@ export class EventOfferService {
       service_key: input.serviceKey,
       is_active: isActive,
       status,
+      // 일반 공급가 스냅샷 (기존 로직 유지)
       price: offer.price_general != null ? Number(offer.price_general) : null,
+      // WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1: 이벤트 전용 가격/기간/수량
+      event_price: ec ? ec.eventPrice : null,
+      start_at: ec ? ec.startAt : null,
+      end_at: ec ? ec.endAt : null,
+      total_quantity: ec?.totalQuantity ?? null,
+      per_order_limit: ec?.perOrderLimit ?? null,
+      per_store_limit: ec?.perStoreLimit ?? null,
       requested_by: requestedBy,
       decided_by: decidedBy,
       decided_at: decidedAt,
@@ -907,6 +1016,12 @@ export class EventOfferService {
       status,
       isActive,
       price: offer.price_general != null ? Number(offer.price_general) : null,
+      eventPrice: saved.event_price != null ? Number(saved.event_price) : null,
+      startAt: saved.start_at ? (saved.start_at instanceof Date ? saved.start_at.toISOString() : new Date(saved.start_at).toISOString()) : null,
+      endAt: saved.end_at ? (saved.end_at instanceof Date ? saved.end_at.toISOString() : new Date(saved.end_at).toISOString()) : null,
+      totalQuantity: saved.total_quantity != null ? Number(saved.total_quantity) : null,
+      perOrderLimit: saved.per_order_limit != null ? Number(saved.per_order_limit) : null,
+      perStoreLimit: saved.per_store_limit != null ? Number(saved.per_store_limit) : null,
       createdAt,
     };
   }
@@ -1040,6 +1155,14 @@ export class EventOfferService {
       productName: string;
       supplierName: string;
       price: number | null;
+      /** WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1: 운영자 승인 화면 가시성 */
+      eventPrice: number | null;
+      generalPrice: number | null;
+      startAt: string | null;
+      endAt: string | null;
+      totalQuantity: number | null;
+      perOrderLimit: number | null;
+      perStoreLimit: number | null;
       requestedBy: string | null;
       requestedByEmail: string | null;
       createdAt: string;
@@ -1064,9 +1187,16 @@ export class EventOfferService {
            opl.master_id       AS "masterId",
            opl.organization_id AS "organizationId",
            opl.price::numeric  AS "price",
+           opl.event_price::numeric AS "eventPrice",
+           opl.start_at        AS "startAt",
+           opl.end_at          AS "endAt",
+           opl.total_quantity  AS "totalQuantity",
+           opl.per_order_limit AS "perOrderLimit",
+           opl.per_store_limit AS "perStoreLimit",
            opl.requested_by    AS "requestedBy",
            opl.created_at      AS "createdAt",
            u.email             AS "requestedByEmail",
+           spo.price_general::numeric AS "generalPrice",
            COALESCE(pm.name, '(상품명 없음)')  AS "productName",
            COALESCE(org.name, '(공급사 없음)') AS "supplierName"
          FROM organization_product_listings opl
@@ -1091,6 +1221,13 @@ export class EventOfferService {
         productName: r.productName,
         supplierName: r.supplierName,
         price: r.price !== null ? Number(r.price) : null,
+        eventPrice: r.eventPrice !== null ? Number(r.eventPrice) : null,
+        generalPrice: r.generalPrice !== null ? Number(r.generalPrice) : null,
+        startAt: r.startAt ? new Date(r.startAt).toISOString() : null,
+        endAt: r.endAt ? new Date(r.endAt).toISOString() : null,
+        totalQuantity: r.totalQuantity !== null ? Number(r.totalQuantity) : null,
+        perOrderLimit: r.perOrderLimit !== null ? Number(r.perOrderLimit) : null,
+        perStoreLimit: r.perStoreLimit !== null ? Number(r.perStoreLimit) : null,
         requestedBy: r.requestedBy,
         requestedByEmail: r.requestedByEmail,
         createdAt: r.createdAt instanceof Date
@@ -1124,6 +1261,18 @@ export class EventOfferService {
     offerId: string;
     targetServiceKeys: string[];
     ownerUserId: string;
+    /**
+     * WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1
+     * supplier 가 지정한 이벤트 조건 — 모든 대상 서비스 row 에 동일하게 적용.
+     */
+    eventConditions?: {
+      eventPrice: number;
+      startAt: Date;
+      endAt: Date;
+      totalQuantity?: number | null;
+      perOrderLimit?: number | null;
+      perStoreLimit?: number | null;
+    };
   }): Promise<{
     offerId: string;
     results: Array<{
@@ -1197,6 +1346,8 @@ export class EventOfferService {
           organizationId,
           roleType: 'supplier',
           ownerUserId: input.ownerUserId,
+          // WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1
+          eventConditions: input.eventConditions,
         });
         results.push({
           targetServiceKey: target,

@@ -29,9 +29,11 @@ interface OrderResult {
   error?: string;
 }
 
+// WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1: 4-탭 (진행 예정/진행 중/종료/전체)
 type StatusTab = { key: EventOfferStatus; label: string };
 const STATUS_TABS: StatusTab[] = [
-  { key: 'active', label: '진행중' },
+  { key: 'upcoming', label: '진행 예정' },
+  { key: 'active', label: '진행 중' },
   { key: 'ended', label: '종료' },
   { key: 'all', label: '전체' },
 ];
@@ -126,14 +128,15 @@ export function KpaEventOfferPage() {
     return result;
   }, [items, supplierFilter, searchQuery]);
 
-  // 진행중 항목만 선택 가능
+  // WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1
+  // 진행 중(active) 항목만 주문 선택 가능. upcoming/sold_out/ended/canceled 제외.
   const selectableItems = useMemo(
-    () => filteredItems.filter(i => i.isActive),
+    () => filteredItems.filter(i => i.status === 'active'),
     [filteredItems],
   );
 
   const groupedSelection = useMemo(() => {
-    const selected = items.filter(i => selectedIds.has(i.id) && i.isActive);
+    const selected = items.filter(i => selectedIds.has(i.id) && i.status === 'active');
     const groups: Record<string, EventOfferItem[]> = {};
     for (const item of selected) {
       if (!groups[item.supplierName]) groups[item.supplierName] = [];
@@ -230,16 +233,34 @@ export function KpaEventOfferPage() {
   const formatPeriod = (item: EventOfferItem) => {
     const start = item.startAt ? formatDate(item.startAt) : formatDate(item.createdAt);
     const end = item.endAt ? formatDate(item.endAt) : null;
-    if (item.status === 'active' || (item.status === 'approved' && !item.startAt)) return `${start} ~`;
+    if (item.status === 'active' && !item.startAt) return `${start} ~`;
     if (end) return `${start} ~ ${end}`;
     return `${start} ~`;
   };
 
-  // WO-O4O-EVENT-OFFER-CORE-REFORM-V1: 런타임 상태 기반 배지
+  // WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1: 4-상태 + sold_out/rejected/canceled 배지
   const getStatusBadge = (item: EventOfferItem): { style: React.CSSProperties; label: string } => {
-    if (item.status === 'approved') return { style: styles.badgeSoon, label: '곧 시작' };
-    if (item.status === 'active' || item.isActive) return { style: styles.badgeActive, label: '진행중' };
-    return { style: styles.badgeEnded, label: '종료' };
+    switch (item.status) {
+      case 'upcoming':  return { style: styles.badgeSoon, label: '곧 시작' };
+      case 'active':    return { style: styles.badgeActive, label: '진행중' };
+      case 'sold_out':  return { style: styles.badgeEnded, label: '매진' };
+      case 'pending':   return { style: styles.badgeEnded, label: '대기' };
+      case 'rejected':  return { style: styles.badgeEnded, label: '반려' };
+      case 'canceled':  return { style: styles.badgeEnded, label: '취소' };
+      case 'ended':
+      default:          return { style: styles.badgeEnded, label: '종료' };
+    }
+  };
+
+  // WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1: 할인 정보
+  const getDiscount = (item: EventOfferItem): { amount: number; rate: number } | null => {
+    if (item.eventPrice == null || item.generalPrice == null) return null;
+    const ep = Number(item.eventPrice);
+    const gp = Number(item.generalPrice);
+    if (!Number.isFinite(ep) || !Number.isFinite(gp) || gp <= 0 || ep >= gp) return null;
+    const amount = gp - ep;
+    const rate = Math.round((amount / gp) * 100);
+    return { amount, rate };
   };
 
   const getGroupSubtotal = (groupItems: EventOfferItem[]) =>
@@ -388,18 +409,28 @@ export function KpaEventOfferPage() {
               <span style={{ ...styles.colCenter, width: 100 }}>액션</span>
             </div>
 
-            {/* Rows */}
-            {filteredItems.map(item => (
+            {/* Rows
+                WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1
+                - 가격 컬럼: 이벤트 가격 + 기존 가격 strikethrough + 할인율
+                - 주문 버튼:
+                    upcoming  → "내일부터 시작" disabled
+                    active    → "주문" enabled (매장 있을 때)
+                    ended/sold_out/canceled → 종료/매진/취소 표시 disabled
+            */}
+            {filteredItems.map(item => {
+              const isOrderable = item.status === 'active';
+              const discount = getDiscount(item);
+              return (
               <div
                 key={item.id}
                 style={{
                   ...styles.listRow,
-                  ...(!item.isActive ? { opacity: 0.6, backgroundColor: colors.neutral50 } : {}),
+                  ...(!isOrderable ? { opacity: 0.7, backgroundColor: colors.neutral50 } : {}),
                 }}
               >
                 {hasStore && statusFilter !== 'ended' && (
                   <span style={{ ...styles.colCenter, width: 48 }}>
-                    {item.isActive ? (
+                    {isOrderable ? (
                       <input
                         type="checkbox"
                         checked={selectedIds.has(item.id)}
@@ -419,31 +450,53 @@ export function KpaEventOfferPage() {
                 <span style={{ ...styles.col, flex: 2, color: colors.neutral600, fontSize: 13 }}>
                   {item.supplierName}
                 </span>
-                <span style={{ ...styles.colRight, width: 120, fontWeight: 600 }}>
-                  {formatPrice(item.unitPrice)}
-                </span>
+                <div style={{ ...styles.colRight, width: 140 }}>
+                  <div style={{ fontWeight: 700, fontSize: 14, color: discount ? '#DC2626' : colors.neutral900 }}>
+                    {formatPrice(item.unitPrice)}
+                  </div>
+                  {discount && item.generalPrice != null && (
+                    <>
+                      <div style={{ fontSize: 11, color: colors.neutral400, textDecoration: 'line-through' }}>
+                        {formatPrice(item.generalPrice)}
+                      </div>
+                      <div style={{ fontSize: 11, fontWeight: 600, color: '#DC2626' }}>
+                        -{discount.rate}%
+                      </div>
+                    </>
+                  )}
+                  {item.totalQuantity != null && (
+                    <div style={{ fontSize: 11, color: item.totalQuantity <= 10 ? '#D97706' : colors.neutral500, marginTop: 2 }}>
+                      잔여 {item.totalQuantity.toLocaleString()}개
+                    </div>
+                  )}
+                </div>
                 <span style={{ ...styles.colCenter, width: 140, fontSize: 12, color: colors.neutral500 }}>
                   {formatPeriod(item)}
                 </span>
                 <span style={{ ...styles.colCenter, width: 80 }}>
                   {(() => { const b = getStatusBadge(item); return <span style={b.style}>{b.label}</span>; })()}
                 </span>
-                <span style={{ ...styles.colCenter, width: 100 }}>
-                  {item.isActive && hasStore ? (
+                <span style={{ ...styles.colCenter, width: 110 }}>
+                  {item.status === 'upcoming' ? (
+                    <span style={styles.disabledText}>곧 시작</span>
+                  ) : item.status === 'sold_out' ? (
+                    <span style={styles.disabledText}>매진</span>
+                  ) : isOrderable && hasStore ? (
                     <button
                       style={styles.orderBtn}
                       onClick={() => handleDirectOrder(item)}
                     >
                       주문
                     </button>
-                  ) : item.isActive && !hasStore ? (
+                  ) : isOrderable && !hasStore ? (
                     <span style={styles.disabledText}>매장 필요</span>
                   ) : (
                     <span style={styles.disabledText}>종료됨</span>
                   )}
                 </span>
               </div>
-            ))}
+              );
+            })}
 
             {filteredItems.length === 0 && (
               <div style={styles.emptyRow}>

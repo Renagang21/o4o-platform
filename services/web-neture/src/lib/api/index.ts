@@ -92,6 +92,8 @@ export {
   type ProposalStatus,
   type PerServiceProposalResult,
   type MultiServiceProposalResult,
+  // WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1
+  type ProposeEventConditions,
 } from './supplier.js';
 
 // Seller API

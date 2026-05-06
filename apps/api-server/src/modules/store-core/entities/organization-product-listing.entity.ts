@@ -95,6 +95,15 @@ export class OrganizationProductListing {
   price: number | null;
 
   /**
+   * WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1
+   * 이벤트 전용 공급가. supplier 가 일반 공급가와 별도로 지정.
+   * NULL 이면 이벤트 전용 가격이 설정되지 않은 (레거시) listing.
+   * 일반 공급가/소비자가는 절대 수정하지 않는다.
+   */
+  @Column({ name: 'event_price', type: 'numeric', precision: 12, scale: 2, nullable: true })
+  event_price: number | null;
+
+  /**
    * Origin type of this listing — 'market_trial' when created via Trial listing flow.
    * WO-MARKET-TRIAL-LISTING-AUTOLINK-V1
    */
