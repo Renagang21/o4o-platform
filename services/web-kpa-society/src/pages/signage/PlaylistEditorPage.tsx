@@ -90,7 +90,7 @@ export default function PlaylistEditorPage() {
     let cancelled = false;
     fetchGuidePageContent(SERVICE_KEY, 'signage.playlist.manager').then((sections) => {
       if (cancelled) return;
-      const raw = sections['page-help'];
+      const raw = sections['guideblock-page-help'];
       if (!raw) return;
       try {
         const obj = JSON.parse(raw);

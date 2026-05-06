@@ -66,7 +66,7 @@ export default function PharmacyProducts() {
     fetchGuidePageContent(SERVICE_KEY, GUIDE_PAGE_KEY)
       .then(sections => {
         if (cancelled) return;
-        const raw = sections['page-help'];
+        const raw = sections['guideblock-page-help'];
         if (!raw) return;
         try {
           const parsed = JSON.parse(raw);

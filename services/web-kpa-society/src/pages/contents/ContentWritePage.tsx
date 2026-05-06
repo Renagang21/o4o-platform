@@ -47,7 +47,7 @@ export function ContentWritePage() {
     let cancelled = false;
     fetchGuidePageContent('kpa-society', 'content.document.editor').then((sections) => {
       if (cancelled) return;
-      const raw = sections['page-help'];
+      const raw = sections['guideblock-page-help'];
       if (!raw) return;
       try {
         const obj = JSON.parse(raw);

@@ -17,10 +17,36 @@ import { operatorBrandApi, type BrandItem } from '../../lib/api/operatorBrand';
 // WO-O4O-GUIDE-CLIENT-EXTRACTION-V1: Neture 최초 도입 — 페이지 상단 안내 inline 편집
 import { GuideEditableSection } from '../../components/guide';
 import { GuideBlock } from '@o4o/shared-space-ui';
+import { fetchGuidePageContent } from '../../api/guideContent';
+
+const GUIDE_PAGE_KEY = 'operator.brand.management';
+const SERVICE_KEY = 'neture';
 
 export default function BrandManagementPage() {
   const [brands, setBrands] = useState<BrandItem[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // WO-O4O-GUIDE-SECTIONKEY-MIGRATION-V1: guideblock-page-help로 전환 — GuideEditableSection(page-help)과 분리
+  const [guideTitle, setGuideTitle] = useState<string | null>(null);
+  const [guideDesc, setGuideDesc] = useState<string | null>(null);
+  const [guideSteps, setGuideSteps] = useState<string[] | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    fetchGuidePageContent(SERVICE_KEY, GUIDE_PAGE_KEY)
+      .then(sections => {
+        if (cancelled) return;
+        const raw = sections['guideblock-page-help'];
+        if (!raw) return;
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed.title) setGuideTitle(parsed.title);
+          if (parsed.description) setGuideDesc(parsed.description);
+          if (Array.isArray(parsed.steps)) setGuideSteps(parsed.steps);
+        } catch { /* use fallback */ }
+      })
+      .catch(() => { /* use fallback */ });
+    return () => { cancelled = true; };
+  }, []);
   const [search, setSearch] = useState('');
   const searchTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
@@ -163,12 +189,12 @@ export default function BrandManagementPage() {
         </p>
       </div>
 
-      {/* GuideBlock — static fallback only (GuideEditableSection이 page-help sectionKey 공유 중) */}
+      {/* GuideBlock — guideblock-page-help DB override (GuideEditableSection은 page-help 유지) */}
       <GuideBlock
         variant="info"
-        title="브랜드 데이터를 관리합니다."
-        description="중복 브랜드를 검색하고 병합하여 플랫폼 상품 데이터 품질을 유지합니다."
-        steps={[
+        title={guideTitle ?? '브랜드 데이터를 관리합니다.'}
+        description={guideDesc ?? '중복 브랜드를 검색하고 병합하여 플랫폼 상품 데이터 품질을 유지합니다.'}
+        steps={guideSteps ?? [
           '브랜드명으로 검색하여 중복 항목을 찾습니다',
           '브랜드명을 직접 수정하거나 병합 대상을 선택합니다',
           '병합 시 소스 브랜드의 상품이 대상 브랜드로 이관됩니다',

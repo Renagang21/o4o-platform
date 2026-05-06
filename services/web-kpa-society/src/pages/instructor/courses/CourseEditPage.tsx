@@ -495,7 +495,7 @@ export default function CourseEditPage() {
     let cancelled = false;
     fetchGuidePageContent(GUIDE_SERVICE_KEY, COURSE_GUIDE_PAGE_KEY).then((sections) => {
       if (cancelled) return;
-      const raw = sections['page-help'];
+      const raw = sections['guideblock-page-help'];
       if (raw) {
         const parsed = parseLessonGuideContent(raw);
         if (parsed) setCourseGuide(parsed);
