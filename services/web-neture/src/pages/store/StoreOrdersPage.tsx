@@ -17,6 +17,12 @@ import { ClipboardList, Search, RefreshCw, ChevronLeft, ChevronRight, Package } 
 import { storeApi, sellerApi } from '../../lib/api';
 import type { StoreOrder, StoreOrderItem } from '../../lib/api';
 import { addToCart } from '../../lib/cart';
+import { GuideBlock } from '@o4o/shared-space-ui';
+import { fetchGuidePageContent } from '../../api/guideContent';
+
+const GUIDE_PAGE_KEY = 'store.order.list';
+const GUIDEBLOCK_SECTION_KEY = 'guideblock-page-help';
+const SERVICE_KEY = 'neture';
 
 // ============================================================================
 // Status Mapping
@@ -98,6 +104,27 @@ export default function StoreOrdersPage() {
   // State
   const [orders, setOrders] = useState<StoreOrder[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const [guideTitle, setGuideTitle] = useState<string | null>(null);
+  const [guideDesc, setGuideDesc] = useState<string | null>(null);
+  const [guideSteps, setGuideSteps] = useState<string[] | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    fetchGuidePageContent(SERVICE_KEY, GUIDE_PAGE_KEY)
+      .then(sections => {
+        if (cancelled) return;
+        const raw = sections[GUIDEBLOCK_SECTION_KEY];
+        if (!raw) return;
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed.title) setGuideTitle(parsed.title);
+          if (parsed.description) setGuideDesc(parsed.description);
+          if (Array.isArray(parsed.steps)) setGuideSteps(parsed.steps);
+        } catch { /* use fallback */ }
+      })
+      .catch(() => { /* use fallback */ });
+    return () => { cancelled = true; };
+  }, []);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [total, setTotal] = useState(0);
@@ -191,6 +218,18 @@ export default function StoreOrdersPage() {
           {total > 0 && <span style={styles.totalCount}>{total}건</span>}
         </h1>
       </div>
+
+      <GuideBlock
+        variant="info"
+        title={guideTitle ?? '주문 내역 이용 안내'}
+        description={guideDesc ?? 'B2B 주문 현황을 확인하고 재주문을 신청합니다.'}
+        steps={guideSteps ?? [
+          '주문번호 검색 또는 상태 필터로 원하는 주문을 찾습니다.',
+          '주문 번호를 클릭하면 상세 내역을 확인할 수 있습니다.',
+          '재주문 버튼으로 동일한 상품을 장바구니에 추가합니다.',
+        ]}
+        compact
+      />
 
       {/* Message */}
       {message && (

@@ -12,6 +12,12 @@ import { useNavigate } from 'react-router-dom';
 import { Plus, FolderOpen, AlertCircle } from 'lucide-react';
 import { supplierApi, type SupplierLibraryItem } from '../../lib/api';
 import { DataTable, type Column } from '@o4o/ui';
+import { GuideBlock } from '@o4o/shared-space-ui';
+import { fetchGuidePageContent } from '../../api/guideContent';
+
+const GUIDE_PAGE_KEY = 'supplier.library.list';
+const GUIDEBLOCK_SECTION_KEY = 'guideblock-page-help';
+const SERVICE_KEY = 'neture';
 
 const columns: Column<Record<string, any>>[] = [
   { key: 'title', title: '제목', dataIndex: 'title', width: '30%' },
@@ -43,6 +49,27 @@ export default function SupplierLibraryPage() {
   const [loading, setLoading] = useState(true);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [visibilityFilter, setVisibilityFilter] = useState<VisibilityFilter>('all');
+
+  const [guideTitle, setGuideTitle] = useState<string | null>(null);
+  const [guideDesc, setGuideDesc] = useState<string | null>(null);
+  const [guideSteps, setGuideSteps] = useState<string[] | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    fetchGuidePageContent(SERVICE_KEY, GUIDE_PAGE_KEY)
+      .then(sections => {
+        if (cancelled) return;
+        const raw = sections[GUIDEBLOCK_SECTION_KEY];
+        if (!raw) return;
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed.title) setGuideTitle(parsed.title);
+          if (parsed.description) setGuideDesc(parsed.description);
+          if (Array.isArray(parsed.steps)) setGuideSteps(parsed.steps);
+        } catch { /* use fallback */ }
+      })
+      .catch(() => { /* use fallback */ });
+    return () => { cancelled = true; };
+  }, []);
 
   const fetchItems = useCallback(async () => {
     setLoading(true);
@@ -198,6 +225,18 @@ export default function SupplierLibraryPage() {
           자료 등록
         </button>
       </div>
+
+      <GuideBlock
+        variant="info"
+        title={guideTitle ?? '자료실 이용 안내'}
+        description={guideDesc ?? '파일과 문서 자료를 등록하고 공개 범위를 설정합니다.'}
+        steps={guideSteps ?? [
+          '자료 등록 버튼으로 파일 또는 문서를 추가합니다.',
+          '공개 범위를 \'서비스 공개\'로 설정하면 매장 운영자에게 노출됩니다.',
+          '수정·삭제는 목록에서 직접 수행합니다.',
+        ]}
+        compact
+      />
 
       {/* Visibility Filter Bar (WO-CONTENT-META-UI-VALIDATION-V1) */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>

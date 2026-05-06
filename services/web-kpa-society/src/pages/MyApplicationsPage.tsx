@@ -2,6 +2,12 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { kpaApi, RoleApplication } from '../api/kpa';
 import { useAuth } from '../contexts';
+import { GuideBlock } from '@o4o/shared-space-ui';
+import { fetchGuidePageContent } from '../api/guideContent';
+
+const GUIDE_PAGE_KEY = 'user.application.status';
+const GUIDEBLOCK_SECTION_KEY = 'guideblock-page-help';
+const SERVICE_KEY = 'kpa-society';
 
 /**
  * My Applications Page
@@ -15,6 +21,27 @@ export function MyApplicationsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
+
+  const [guideTitle, setGuideTitle] = useState<string | null>(null);
+  const [guideDesc, setGuideDesc] = useState<string | null>(null);
+  const [guideSteps, setGuideSteps] = useState<string[] | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    fetchGuidePageContent(SERVICE_KEY, GUIDE_PAGE_KEY)
+      .then(sections => {
+        if (cancelled) return;
+        const raw = sections[GUIDEBLOCK_SECTION_KEY];
+        if (!raw) return;
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed.title) setGuideTitle(parsed.title);
+          if (parsed.description) setGuideDesc(parsed.description);
+          if (Array.isArray(parsed.steps)) setGuideSteps(parsed.steps);
+        } catch { /* use fallback */ }
+      })
+      .catch(() => { /* use fallback */ });
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -120,6 +147,18 @@ export function MyApplicationsPage() {
         <h1 style={styles.title}>내 신청 목록</h1>
         <p style={styles.subtitle}>제출한 신청서의 상태를 확인하세요.</p>
       </div>
+
+      <GuideBlock
+        variant="info"
+        title={guideTitle ?? '신청 상태 확인 안내'}
+        description={guideDesc ?? '제출한 신청서의 처리 현황을 확인합니다.'}
+        steps={guideSteps ?? [
+          '상단 필터에서 원하는 상태(전체/심사 중/승인됨/반려됨)를 선택합니다.',
+          '심사 중인 신청은 처리 완료까지 며칠이 소요될 수 있습니다.',
+          '반려된 경우 사유를 확인 후 재신청하실 수 있습니다.',
+        ]}
+        compact
+      />
 
       {/* Filter */}
       <div style={styles.filterContainer}>

@@ -21,6 +21,12 @@ import {
   type SettlementStatus,
 } from '../../api/trial';
 import { useAuth } from '../../contexts/AuthContext';
+import { GuideBlock } from '@o4o/shared-space-ui';
+import { fetchGuidePageContent } from '../../api/guideContent';
+
+const GUIDE_PAGE_KEY = 'market-trial.participation.status';
+const GUIDEBLOCK_SECTION_KEY = 'guideblock-page-help';
+const SERVICE_KEY = 'neture';
 
 const SETTLEMENT_STATUS_LABEL: Record<SettlementStatus, string> = {
   pending: '정산 대기',
@@ -343,6 +349,27 @@ export function MyParticipationsPage() {
   const [selectedTrialId, setSelectedTrialId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const [guideTitle, setGuideTitle] = useState<string | null>(null);
+  const [guideDesc, setGuideDesc] = useState<string | null>(null);
+  const [guideSteps, setGuideSteps] = useState<string[] | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    fetchGuidePageContent(SERVICE_KEY, GUIDE_PAGE_KEY)
+      .then(sections => {
+        if (cancelled) return;
+        const raw = sections[GUIDEBLOCK_SECTION_KEY];
+        if (!raw) return;
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed.title) setGuideTitle(parsed.title);
+          if (parsed.description) setGuideDesc(parsed.description);
+          if (Array.isArray(parsed.steps)) setGuideSteps(parsed.steps);
+        } catch { /* use fallback */ }
+      })
+      .catch(() => { /* use fallback */ });
+    return () => { cancelled = true; };
+  }, []);
+
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
@@ -395,6 +422,18 @@ export function MyParticipationsPage() {
           참여 내역, 예상 정산 정보, 선택 현황을 확인합니다.
         </p>
       </div>
+
+      <GuideBlock
+        variant="info"
+        title={guideTitle ?? '참여 내역 확인 안내'}
+        description={guideDesc ?? '유통 참여형 펀딩의 정산 현황과 선택 가능한 옵션을 확인합니다.'}
+        steps={guideSteps ?? [
+          '상단 KPI에서 전체 참여 수와 처리 대기 건수를 확인합니다.',
+          '\'선택 대기\' 상태인 항목은 제품 수령 또는 금액 환급을 선택해 주세요.',
+          '정산 완료 건은 이미 처리가 끝난 상태입니다.',
+        ]}
+        compact
+      />
 
       <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '28px' }}>
         <KpiCard label="전체 참여" value={kpiTotal} />
