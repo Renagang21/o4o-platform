@@ -64,6 +64,32 @@ describe('KPA Scope Guard', () => {
     });
   });
 
+  // WO-KPA-SCOPE-HIERARCHY-FIX-V1: kpa:admin ⊃ kpa:operator
+  describe('scope hierarchy (admin ⊃ operator)', () => {
+    it('kpa:admin role → passes kpa:operator scope', async () => {
+      const guard = requireKpaScope('kpa:operator');
+      const user = createMockUser({ roles: ['kpa:admin'] });
+      const result = await executeGuard(guard, user);
+      expect(result.allowed).toBe(true);
+    });
+
+    it('kpa:operator role → denied for kpa:admin scope (403)', async () => {
+      const guard = requireKpaScope('kpa:admin');
+      const user = createMockUser({ roles: ['kpa:operator'] });
+      const result = await executeGuard(guard, user);
+      expect(result.allowed).toBe(false);
+      expect(result.statusCode).toBe(403);
+    });
+
+    it('kpa:district_admin role → denied for kpa:admin scope (403)', async () => {
+      const guard = requireKpaScope('kpa:admin');
+      const user = createMockUser({ roles: ['kpa:district_admin'] });
+      const result = await executeGuard(guard, user);
+      expect(result.allowed).toBe(false);
+      expect(result.statusCode).toBe(403);
+    });
+  });
+
   describe('platform bypass DISABLED', () => {
     it('platform:admin → denied (403)', async () => {
       const guard = requireKpaScope('kpa:admin');

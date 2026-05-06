@@ -26,6 +26,11 @@ export const KPA_SCOPE_CONFIG: ServiceScopeGuardConfig = {
   platformBypass: false,
   legacyRoles: [],
   blockedServicePrefixes: ['platform', 'neture', 'glycopharm', 'cosmetics'],
+  // WO-KPA-SCOPE-HIERARCHY-FIX-V1: kpa:admin ⊃ kpa:operator (admin covers operator, not vice versa)
+  scopeRoleMapping: {
+    'kpa:admin': ['kpa:admin'],
+    'kpa:operator': ['kpa:operator', 'kpa:admin', 'kpa:district_admin'],
+  },
 };
 
 /**
