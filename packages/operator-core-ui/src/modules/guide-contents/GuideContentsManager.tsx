@@ -25,6 +25,7 @@ import type {
   GuideContentsManagerProps,
   GuideSection,
 } from './types';
+import { validateGuideContent } from './validateGuideContent';
 
 interface GuideForm {
   title: string;
@@ -141,15 +142,24 @@ export function GuideContentsManager({ serviceKey, config, client }: GuideConten
   );
 
   const handleSave = async () => {
-    setSaving(true);
     setErr(null);
+
+    const payload = {
+      title: current.title.trim(),
+      description: current.description.trim(),
+      steps: stepsArray,
+      variant: current.variant,
+    };
+
+    // Schema validation — invalid payload 저장 차단
+    const validation = validateGuideContent(payload);
+    if (!validation.valid) {
+      setErr(validation.error ?? '입력값을 확인해 주세요.');
+      return;
+    }
+
+    setSaving(true);
     try {
-      const payload = {
-        title: current.title.trim(),
-        description: current.description.trim(),
-        steps: stepsArray,
-        variant: current.variant,
-      };
       await client.saveGuideContent(serviceKey, pageKey, activeKey, JSON.stringify(payload));
       setSavedAt(new Date().toLocaleTimeString('ko-KR'));
     } catch (e) {

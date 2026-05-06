@@ -368,9 +368,10 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | **GuideBlock 1차 적용 보고서** | `docs/architecture/O4O-GUIDE-BLOCK-1ST-WAVE-REPORT-V1.md` |
 | **GuideBlock 서비스 전체 적용 보고서** | `docs/architecture/O4O-GUIDE-BLOCK-SERVICE-WIDE-REPORT-V1.md` |
 | **Guide sectionKey 충돌 정책** | `docs/architecture/O4O-GUIDE-SECTIONKEY-CONFLICT-POLICY-V1.md` |
+| **Guide Schema Validation** | `docs/architecture/O4O-GUIDE-SCHEMA-VALIDATION-V1.md` |
 
 ---
 
 *Updated: 2026-05-06*
-*Version: 7.8*
+*Version: 7.9*
 *Status: Active Constitution*

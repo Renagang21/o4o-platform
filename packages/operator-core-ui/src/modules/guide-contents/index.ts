@@ -11,4 +11,6 @@ export type {
   GuideContentsManagerProps,
 } from './types';
 
+export type { GuideContentPayload, GuideValidationResult } from './validateGuideContent';
+export { validateGuideContent } from './validateGuideContent';
 export { GuideContentsManager } from './GuideContentsManager';
