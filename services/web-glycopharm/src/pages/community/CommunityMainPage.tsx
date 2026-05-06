@@ -15,47 +15,20 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { apiClient } from '@/services/api';
-import { StandardHomeTemplate, templates } from '@o4o/shared-space-ui';
+import {
+  StandardHomeTemplate,
+  templates,
+  ForumIcon,
+  EducationIcon,
+  ContentIcon,
+  SignageIcon,
+  ResourcesIcon,
+} from '@o4o/shared-space-ui';
 import type { NoticeItem } from '@o4o/shared-space-ui';
 import { PageContainer, Card, useTemplate } from '@o4o/ui';
 
-// ─── Inline SVG Icons ──────────────────────────────────────
-
-const ForumIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-  </svg>
-);
-
-const EducationIconSvg = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-  </svg>
-);
-
-const ContentIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-    <polyline points="14 2 14 8 20 8" />
-    <line x1="16" y1="13" x2="8" y2="13" />
-    <line x1="16" y1="17" x2="8" y2="17" />
-  </svg>
-);
-
-const SignageIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-    <line x1="8" y1="21" x2="16" y2="21" />
-    <line x1="12" y1="17" x2="12" y2="21" />
-  </svg>
-);
-
-const ResourceLibraryIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-  </svg>
-);
+// ─── 서비스 전용 아이콘 ─────────────────────────────────────
+// ForumIcon, EducationIcon, ContentIcon, SignageIcon, ResourcesIcon → @o4o/shared-space-ui
 
 const NewspaperIcon = () => (
   <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -187,17 +160,17 @@ export default function CommunityMainPage() {
       }
       appEntryCards={[
         { title: '포럼', description: '동료 약사와 질문·토론으로 전문성을 높이세요', href: '/forum', icon: <span className={iconCls}><ForumIcon /></span> },
-        { title: '강의', description: '보수교육·세미나를 온라인으로 수강하세요', href: '/lms', icon: <span className={iconCls}><EducationIconSvg /></span> },
+        { title: '강의', description: '보수교육·세미나를 온라인으로 수강하세요', href: '/lms', icon: <span className={iconCls}><EducationIcon /></span> },
         { title: '콘텐츠', description: '플랫폼 콘텐츠를 검색하고 활용하세요', href: '/content', icon: <span className={iconCls}><ContentIcon /></span> },
-        { title: '디지털 사이니지', description: '약국 디지털 미디어를 관리하세요', href: '/store/signage/library', icon: <span className={iconCls}><SignageIcon /></span> },
-        { title: '자료실', description: '자료를 저장하고 AI 작업에 활용하세요', href: '/resources', icon: <span className={iconCls}><ResourceLibraryIcon /></span> },
+        { title: '디지털 사이니지', description: '약국 디지털 미디어를 관리하세요', href: '/store/signage/library', icon: <span className={iconCls}><SignageIcon size={24} /></span> },
+        { title: '자료실', description: '자료를 저장하고 AI 작업에 활용하세요', href: '/resources', icon: <span className={iconCls}><ResourcesIcon /></span> },
       ]}
       cta={{
         title: '매장 운영에 도움이 필요하세요?',
         description: '디지털 사이니지로 약국을 꾸며보세요',
         href: '/store/signage/library',
         linkLabel: '사이니지 보기 →',
-        icon: <span className={`flex items-center justify-center shrink-0 ${tpl?.icon?.icon ?? 'text-primary'}`}><SignageIcon /></span>,
+        icon: <span className={`flex items-center justify-center shrink-0 ${tpl?.icon?.icon ?? 'text-primary'}`}><SignageIcon size={24} /></span>,
         accentColor: 'var(--color-primary)',
         accentBg: 'var(--color-primary-light, #f0fdf4)',
       }}
