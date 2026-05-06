@@ -4,6 +4,7 @@ import { DatabaseChecker } from '../utils/database-checker.js';
 // settlementScheduler removed (Phase 8-3 - legacy commerce)
 import { backupService } from './BackupService.js';
 import { errorAlertService } from './ErrorAlertService.js';
+import { marketTrialLifecycleJob } from '../jobs/market-trial-lifecycle.job.js';
 import { env } from '../utils/env-validator.js';
 import logger from '../utils/logger.js';
 
@@ -291,6 +292,11 @@ export class StartupService {
 
       // Settlement Scheduler removed (Phase 8-3 - legacy commerce)
       logger.info('✅ Settlement Scheduler skipped (legacy commerce removed)');
+
+      // WO-NETURE-MARKET-TRIAL-LIFECYCLE-AUTO-TRANSITION-V1
+      // Auto-advance RECRUITING trials whose fundingEndAt has elapsed.
+      marketTrialLifecycleJob.start();
+      logger.info('✅ Market Trial Lifecycle Job started');
     } catch (schedulerError) {
       logger.warn('Scheduler initialization failed (non-critical):', schedulerError);
     }
@@ -384,6 +390,7 @@ export class StartupService {
     try {
       // settlementScheduler removed (Phase 8-3 - legacy commerce)
       // MaterializedViewScheduler removed — mv_product_listings does not exist in DB
+      marketTrialLifecycleJob.stop();
       logger.info('✅ Schedulers stopped');
     } catch (error) {
       logger.error('Error during shutdown:', error);

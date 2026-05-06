@@ -68,6 +68,100 @@ export function calculateSettlement(
   return { totalAmount, productQty, remainder };
 }
 
+/**
+ * KPI helpers (WO-NETURE-MARKET-TRIAL-ANALYTICS-AND-KPI-V1)
+ *
+ * Single source of truth for the (currentAmount / targetAmount) and
+ * (currentParticipants / maxParticipants) ratio calculations so backend
+ * and frontend stay aligned. All helpers return null when the input is
+ * missing or the denominator is non-positive — never NaN/Infinity.
+ */
+
+/** Round to one decimal place, preserving null for missing inputs. */
+function round1(value: number): number {
+  return Math.round(value * 10) / 10;
+}
+
+/**
+ * (currentAmount / targetAmount) * 100, rounded to 1 decimal.
+ * targetAmount <= 0 or non-finite inputs → null.
+ * Not clamped at 100 — overfunded trials display their true rate.
+ */
+export function calculateAchievementRate(
+  currentAmount: number | string | null | undefined,
+  targetAmount: number | string | null | undefined,
+): number | null {
+  const cur = Number(currentAmount);
+  const tgt = Number(targetAmount);
+  if (!Number.isFinite(cur) || !Number.isFinite(tgt) || tgt <= 0) return null;
+  return round1((cur / tgt) * 100);
+}
+
+/**
+ * (currentParticipants / maxParticipants) * 100, rounded to 1 decimal.
+ * maxParticipants null/0 → null (unlimited capacity).
+ */
+export function calculateParticipationRate(
+  currentParticipants: number | null | undefined,
+  maxParticipants: number | null | undefined,
+): number | null {
+  const cur = Number(currentParticipants);
+  const max = Number(maxParticipants);
+  if (!Number.isFinite(cur) || !Number.isFinite(max) || max <= 0) return null;
+  return round1((cur / max) * 100);
+}
+
+/**
+ * paid count / total participant count * 100. Returns null when there are
+ * no participants to avoid a misleading 0%.
+ */
+export function calculatePaymentCompletionRate(
+  paidCount: number | null | undefined,
+  totalCount: number | null | undefined,
+): number | null {
+  const paid = Number(paidCount);
+  const total = Number(totalCount);
+  if (!Number.isFinite(paid) || !Number.isFinite(total) || total <= 0) return null;
+  return round1((paid / total) * 100);
+}
+
+/**
+ * Whole days remaining until fundingEndAt, floored at 0.
+ * Past fundingEndAt → 0. Missing input → null.
+ */
+export function calculateRecruitingRemainingDays(
+  fundingEndAt: Date | string | null | undefined,
+  now: Date = new Date(),
+): number | null {
+  if (!fundingEndAt) return null;
+  const end = fundingEndAt instanceof Date ? fundingEndAt : new Date(fundingEndAt);
+  if (isNaN(end.getTime())) return null;
+  const diffMs = end.getTime() - now.getTime();
+  if (diffMs <= 0) return 0;
+  return Math.ceil(diffMs / (24 * 60 * 60 * 1000));
+}
+
+/**
+ * Elapsed share of the funding window, 0..100 rounded to 1 decimal.
+ * Before fundingStartAt → 0. After fundingEndAt → 100. Invalid window → null.
+ */
+export function calculateRecruitingProgressPercent(
+  fundingStartAt: Date | string | null | undefined,
+  fundingEndAt: Date | string | null | undefined,
+  now: Date = new Date(),
+): number | null {
+  if (!fundingStartAt || !fundingEndAt) return null;
+  const start = fundingStartAt instanceof Date ? fundingStartAt : new Date(fundingStartAt);
+  const end = fundingEndAt instanceof Date ? fundingEndAt : new Date(fundingEndAt);
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) return null;
+  const total = end.getTime() - start.getTime();
+  if (total <= 0) return null;
+  const elapsed = now.getTime() - start.getTime();
+  if (elapsed <= 0) return 0;
+  if (elapsed >= total) return 100;
+  return round1((elapsed / total) * 100);
+}
+
 /** WO-MARKET-TRIAL-EDIT-FLOW-V1 */
 export interface UpdateTrialDto {
   title?: string;
@@ -250,59 +344,65 @@ export class MarketTrialService {
   }
 
   /**
-   * Participate in a Market Trial
+   * Participate in a Market Trial.
+   *
+   * WO-NETURE-MARKET-TRIAL-LIFECYCLE-AUTO-TRANSITION-V1:
+   *   - Wraps participant insert + currentAmount/currentParticipants increment
+   *     in a single transaction.
+   *   - Uses atomic SQL increment (column = column + ?) instead of read-modify-write
+   *     so concurrent participations don't lose contributions.
+   *   - The active API path (`MarketTrialController.joinTrial`) does its own atomic
+   *     increment of currentParticipants directly; this service-level path stays
+   *     consistent for any caller that wires it.
    */
   async participate(trialId: string, dto: ParticipateDto): Promise<MarketTrialParticipant> {
-    // Get the trial
-    const trial = await this.trialRepo.findOne({ where: { id: trialId } });
-
-    if (!trial) {
-      throw new Error('Market Trial not found');
-    }
-
-    // Check if trial is open for participation
-    if (trial.status !== TrialStatus.RECRUITING) {
-      throw new Error('Market Trial is not open for participation');
-    }
-
-    // Check funding period
-    const now = new Date();
-    if (now < new Date(trial.fundingStartAt)) {
-      throw new Error('Funding period has not started yet');
-    }
-    if (now > new Date(trial.fundingEndAt)) {
-      throw new Error('Funding period has ended');
-    }
-
-    // Validate contribution amount
+    // Validate contribution amount (cheap, do before opening a transaction)
     if (dto.contributionAmount <= 0) {
       throw new Error('Contribution amount must be positive');
     }
 
-    // Create participant record
-    const participant = this.participantRepo.create({
-      marketTrialId: trialId,
-      participantId: dto.participantId,
-      participantType: dto.participantType,
-      contributionAmount: dto.contributionAmount,
-    });
+    return this.dataSource.transaction(async (manager) => {
+      const trialRepo = manager.getRepository(MarketTrial);
+      const participantRepo = manager.getRepository(MarketTrialParticipant);
 
-    const savedParticipant = await this.participantRepo.save(participant);
+      const trial = await trialRepo.findOne({ where: { id: trialId } });
+      if (!trial) {
+        throw new Error('Market Trial not found');
+      }
 
-    // Update trial's current amount
-    const newAmount = Number(trial.currentAmount) + Number(dto.contributionAmount);
-    await this.trialRepo.update(trialId, {
-      currentAmount: newAmount,
-    });
+      if (trial.status !== TrialStatus.RECRUITING) {
+        throw new Error('Market Trial is not open for participation');
+      }
 
-    // Check if funding target is reached
-    if (newAmount >= Number(trial.targetAmount)) {
-      await this.trialRepo.update(trialId, {
-        status: TrialStatus.DEVELOPMENT,
+      const now = new Date();
+      if (now < new Date(trial.fundingStartAt)) {
+        throw new Error('Funding period has not started yet');
+      }
+      if (now > new Date(trial.fundingEndAt)) {
+        throw new Error('Funding period has ended');
+      }
+
+      const participant = participantRepo.create({
+        marketTrialId: trialId,
+        participantId: dto.participantId,
+        participantType: dto.participantType,
+        contributionAmount: dto.contributionAmount,
       });
-    }
+      const savedParticipant = await participantRepo.save(participant);
 
-    return savedParticipant;
+      // Atomic SQL increment — avoids read-modify-write race with concurrent participations.
+      await trialRepo
+        .createQueryBuilder()
+        .update(MarketTrial)
+        .set({
+          currentAmount: () => `"currentAmount" + ${Number(dto.contributionAmount)}`,
+          currentParticipants: () => `"currentParticipants" + 1`,
+        })
+        .where('id = :id', { id: trialId })
+        .execute();
+
+      return savedParticipant;
+    });
   }
 
   /**
@@ -316,37 +416,141 @@ export class MarketTrialService {
   }
 
   /**
-   * Evaluate and update trial status if needed
-   * Called on read operations to ensure status is current
+   * Evaluate and update trial status if needed.
+   * Called on read operations to ensure status is current even if the
+   * lifecycle cron has not yet fired since fundingEndAt elapsed.
+   *
+   * WO-NETURE-MARKET-TRIAL-LIFECYCLE-AUTO-TRANSITION-V1:
+   *   Now delegates to transitionStatusIfRecruitingExpired() so read paths and
+   *   the lifecycle cron share the same idempotent atomic-update logic.
    */
   async evaluateStatusIfNeeded(trial: MarketTrial): Promise<MarketTrial> {
-    // Only evaluate RECRUITING trials
     if (trial.status !== TrialStatus.RECRUITING) {
       return trial;
     }
-
     const now = new Date();
-    const fundingEndAt = new Date(trial.fundingEndAt);
-
-    // Check if funding period has ended
-    if (now >= fundingEndAt) {
-      const currentAmount = Number(trial.currentAmount);
-      const targetAmount = Number(trial.targetAmount);
-
-      if (currentAmount >= targetAmount) {
-        // Funding successful - move to development
-        trial.status = TrialStatus.DEVELOPMENT;
-      } else {
-        // Funding failed - close the trial
-        trial.status = TrialStatus.CLOSED;
-      }
-
-      // Update in database
-      await this.trialRepo.update(trial.id, {
-        status: trial.status,
-      });
+    if (now < new Date(trial.fundingEndAt)) {
+      return trial;
     }
 
+    const result = await this.transitionStatusIfRecruitingExpired(trial.id);
+    if (result) {
+      trial.status = result.toStatus;
+      trial.lastTransitionAt = result.transitionedAt;
+      trial.autoClosedAt = result.transitionedAt;
+      trial.closeReason = result.reason;
+    }
     return trial;
+  }
+
+  /**
+   * Atomically advance a single RECRUITING trial whose fundingEndAt has elapsed.
+   *
+   * WO-NETURE-MARKET-TRIAL-LIFECYCLE-AUTO-TRANSITION-V1
+   *
+   * Idempotent — uses an UPDATE with `status='recruiting'` precondition so a
+   * concurrent caller (other cron instance, or read-path evaluation) will see
+   * `affected=0` and skip. Returns null when the row was already transitioned
+   * by another caller, or when the funding period has not yet expired.
+   *
+   * Allowed auto transitions (only these, never to a new FAILED state):
+   *   currentAmount >= targetAmount  →  DEVELOPMENT  (auto_target_reached)
+   *   currentAmount <  targetAmount  →  CLOSED       (auto_target_missed)
+   */
+  async transitionStatusIfRecruitingExpired(
+    trialId: string,
+  ): Promise<{
+    fromStatus: TrialStatus;
+    toStatus: TrialStatus;
+    reason: 'auto_target_reached' | 'auto_target_missed';
+    transitionedAt: Date;
+  } | null> {
+    const trial = await this.trialRepo.findOne({ where: { id: trialId } });
+    if (!trial) return null;
+    if (trial.status !== TrialStatus.RECRUITING) return null;
+
+    const now = new Date();
+    if (now < new Date(trial.fundingEndAt)) return null;
+
+    const currentAmount = Number(trial.currentAmount);
+    const targetAmount = Number(trial.targetAmount);
+    const targetReached = targetAmount > 0 ? currentAmount >= targetAmount : false;
+    const toStatus = targetReached ? TrialStatus.DEVELOPMENT : TrialStatus.CLOSED;
+    const reason = targetReached ? 'auto_target_reached' : 'auto_target_missed';
+
+    const transitionedAt = new Date();
+    const historyEntry = {
+      from: TrialStatus.RECRUITING,
+      to: toStatus,
+      at: transitionedAt.toISOString(),
+      reason,
+      auto: true,
+    };
+
+    // Atomic UPDATE with status precondition — prevents double-transition
+    // when multiple cron instances (or read-path evaluators) race.
+    const result = await this.trialRepo
+      .createQueryBuilder()
+      .update(MarketTrial)
+      .set({
+        status: toStatus,
+        lastTransitionAt: transitionedAt,
+        autoClosedAt: transitionedAt,
+        closeReason: reason,
+        statusHistory: () =>
+          `COALESCE("statusHistory", '[]'::jsonb) || '${JSON.stringify([historyEntry]).replace(/'/g, "''")}'::jsonb`,
+      })
+      .where('id = :id AND status = :currentStatus', {
+        id: trialId,
+        currentStatus: TrialStatus.RECRUITING,
+      })
+      .execute();
+
+    if (!result.affected || result.affected === 0) {
+      return null;
+    }
+
+    return { fromStatus: TrialStatus.RECRUITING, toStatus, reason, transitionedAt };
+  }
+
+  /**
+   * Find every RECRUITING trial whose fundingEndAt has elapsed, then attempt
+   * an atomic transition for each. Designed to be called from the lifecycle cron.
+   *
+   * WO-NETURE-MARKET-TRIAL-LIFECYCLE-AUTO-TRANSITION-V1
+   */
+  async processExpiredRecruitingTrials(now: Date = new Date()): Promise<{
+    scanned: number;
+    transitioned: Array<{
+      trialId: string;
+      fromStatus: TrialStatus;
+      toStatus: TrialStatus;
+      reason: 'auto_target_reached' | 'auto_target_missed';
+      transitionedAt: Date;
+    }>;
+  }> {
+    const candidates = await this.trialRepo
+      .createQueryBuilder('trial')
+      .select(['trial.id'])
+      .where('trial.status = :status', { status: TrialStatus.RECRUITING })
+      .andWhere('trial.fundingEndAt <= :now', { now })
+      .getMany();
+
+    const transitioned: Array<{
+      trialId: string;
+      fromStatus: TrialStatus;
+      toStatus: TrialStatus;
+      reason: 'auto_target_reached' | 'auto_target_missed';
+      transitionedAt: Date;
+    }> = [];
+
+    for (const c of candidates) {
+      const r = await this.transitionStatusIfRecruitingExpired(c.id);
+      if (r) {
+        transitioned.push({ trialId: c.id, ...r });
+      }
+    }
+
+    return { scanned: candidates.length, transitioned };
   }
 }

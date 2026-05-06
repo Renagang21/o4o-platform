@@ -81,6 +81,19 @@ export type CustomerConversionStatus = 'none' | 'interested' | 'considering' | '
 export type SettlementStatus =
   | 'pending' | 'choice_pending' | 'choice_completed' | 'offline_review' | 'offline_settled';
 
+// WO-NETURE-MARKET-TRIAL-PAYMENT-READINESS-V1
+export type PaymentStatus =
+  | 'unpaid' | 'pending' | 'paid' | 'failed' | 'canceled' | 'refunded';
+
+export const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
+  unpaid: '미결제',
+  pending: '결제 대기',
+  paid: '결제 완료',
+  failed: '결제 실패',
+  canceled: '결제 취소',
+  refunded: '환불 완료',
+};
+
 export interface TrialParticipant {
   id: string;
   name: string;
@@ -107,6 +120,15 @@ export interface TrialParticipant {
   settlementProductQty: number | null;
   settlementRemainder: number | null;
   settlementNote: string | null;
+  // WO-NETURE-MARKET-TRIAL-PAYMENT-READINESS-V1
+  paymentStatus: PaymentStatus;
+  paymentMethod: string | null;
+  paymentProvider: string | null;
+  paymentReference: string | null;
+  paidAmount: number | null;
+  paidAt: string | null;
+  confirmedAt: string | null;
+  paymentNote: string | null;
   updatedAt: string;
 }
 
@@ -542,6 +564,52 @@ export async function updateParticipantSettlementStatus(
   const { data } = await api.patch(
     `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/participants/${participantId}/settlement-status`,
     { settlementStatus, ...(settlementNote !== undefined && { settlementNote }) },
+  );
+  return data.data || data;
+}
+
+/**
+ * WO-NETURE-MARKET-TRIAL-PAYMENT-READINESS-V1:
+ * 운영자 participant 결제 상태 갱신. PG 연동 전 단계의 수기 송금 확인 + 향후 PG webhook의
+ * 백엔드 entry point 역할. payment 변경은 trial.status에 영향을 주지 않는다.
+ *
+ * Body 필드는 모두 선택. paymentStatus만 필수.
+ *   - paymentMethod 권장값: 'manual_transfer'
+ *   - paymentProvider 권장값: 'internal' (수기) / 'toss' / 'kakao' 등 (향후)
+ *   - confirmedAt 미지정 + paymentStatus='paid' → 백엔드가 자동 stamp
+ */
+export interface UpdateParticipantPaymentInput {
+  paymentStatus: PaymentStatus;
+  paymentMethod?: string | null;
+  paymentProvider?: string | null;
+  paymentReference?: string | null;
+  paidAmount?: number | null;
+  paidAt?: string | null;       // ISO datetime
+  confirmedAt?: string | null;  // ISO datetime
+  paymentNote?: string | null;
+}
+
+export interface UpdateParticipantPaymentResult {
+  id: string;
+  paymentStatus: PaymentStatus;
+  paymentMethod: string | null;
+  paymentProvider: string | null;
+  paymentReference: string | null;
+  paidAmount: number | null;
+  paidAt: string | null;
+  confirmedAt: string | null;
+  paymentNote: string | null;
+  updatedAt: string | null;
+}
+
+export async function updateParticipantPaymentStatus(
+  trialId: string,
+  participantId: string,
+  input: UpdateParticipantPaymentInput,
+): Promise<UpdateParticipantPaymentResult> {
+  const { data } = await api.patch(
+    `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/participants/${participantId}/payment-status`,
+    input,
   );
   return data.data || data;
 }

@@ -159,6 +159,58 @@ export class MarketTrialParticipant {
   @Column({ type: 'text', nullable: true })
   settlementNote?: string | null;
 
+  // ── Payment lifecycle (WO-NETURE-MARKET-TRIAL-PAYMENT-READINESS-V1) ──
+  // Distinct from settlement* — these track money-in (PG or manual transfer).
+
+  /**
+   * Payment lifecycle state.
+   * Values from PaymentStatus enum: 'unpaid' | 'pending' | 'paid' | 'failed' | 'canceled' | 'refunded'.
+   */
+  @Column({ type: 'varchar', length: 20, default: 'unpaid' })
+  paymentStatus!: string;
+
+  /**
+   * Recommended values: 'manual_transfer' (수기 송금), or future PG-driven values
+   * such as 'card' / 'bank_transfer'. Stored free-form so a new method does not
+   * require a migration.
+   */
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  paymentMethod?: string | null;
+
+  /**
+   * Recommended values: 'internal' (operator-confirmed), or future PG identifiers
+   * ('toss' | 'kakao' | 'naver' | 'kg_inicis'). Stored free-form.
+   */
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  paymentProvider?: string | null;
+
+  /**
+   * PG transaction id, bank receipt number, or operator-supplied memo key.
+   */
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  paymentReference?: string | null;
+
+  @Column({ type: 'decimal', precision: 12, scale: 2, nullable: true })
+  paidAmount?: number | null;
+
+  /**
+   * Timestamp the payment was made (PG approval time, or transfer date for manual_transfer).
+   */
+  @Column({ type: 'timestamp', nullable: true })
+  paidAt?: Date | null;
+
+  /**
+   * Timestamp the operator/system confirmed the payment as valid (e.g. matched a transfer).
+   */
+  @Column({ type: 'timestamp', nullable: true })
+  confirmedAt?: Date | null;
+
+  /**
+   * Operator note for the payment (manual transfer details, refund reason, etc.).
+   */
+  @Column({ type: 'text', nullable: true })
+  paymentNote?: string | null;
+
   @CreateDateColumn()
   createdAt!: Date;
 

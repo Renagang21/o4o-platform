@@ -217,6 +217,44 @@ export class MarketTrial {
   @Column({ type: 'timestamp', nullable: true })
   notificationSentAt?: Date;
 
+  // ── Lifecycle tracking (WO-NETURE-MARKET-TRIAL-LIFECYCLE-AUTO-TRANSITION-V1) ──
+
+  /**
+   * Timestamp of the latest status transition (manual or automatic).
+   */
+  @Column({ type: 'timestamp', nullable: true })
+  lastTransitionAt?: Date | null;
+
+  /**
+   * Timestamp at which the lifecycle cron auto-advanced this trial out of RECRUITING.
+   * NULL = transition was operator-initiated (or never transitioned).
+   */
+  @Column({ type: 'timestamp', nullable: true })
+  autoClosedAt?: Date | null;
+
+  /**
+   * Machine-readable reason for the latest auto/manual transition.
+   *   'auto_target_reached' — RECRUITING → DEVELOPMENT (target met after fundingEndAt)
+   *   'auto_target_missed' — RECRUITING → CLOSED      (target not met after fundingEndAt)
+   *   'manual'             — operator-initiated transition
+   *   NULL                 — never transitioned
+   */
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  closeReason?: string | null;
+
+  /**
+   * Append-only audit trail of status transitions.
+   * Each entry: { from, to, at, reason, auto }
+   */
+  @Column({ type: 'jsonb', default: () => "'[]'::jsonb" })
+  statusHistory!: Array<{
+    from: string;
+    to: string;
+    at: string;
+    reason: string;
+    auto: boolean;
+  }>;
+
   @CreateDateColumn()
   createdAt!: Date;
 
