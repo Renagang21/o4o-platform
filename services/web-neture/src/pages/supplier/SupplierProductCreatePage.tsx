@@ -27,6 +27,11 @@ import { useContentTemplates } from '../../hooks/useContentTemplates';
 import { useAuth } from '../../contexts';
 import MediaPickerModal from '../../components/common/MediaPickerModal';
 import { loadAndClearDraft } from '../../lib/product-import/storage';
+import { GuideBlock } from '@o4o/shared-space-ui';
+import { fetchGuidePageContent } from '../../api/guideContent';
+
+const GUIDE_PAGE_KEY = 'supplier.product.editor';
+const SERVICE_KEY = 'neture';
 
 const STEPS = ['기본 정보', '가격 / 유통', '이미지 / 설명'];
 
@@ -97,6 +102,28 @@ export default function SupplierProductCreatePage() {
     // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
     isFeatured: false,
   });
+
+  const [guideTitle, setGuideTitle] = useState<string | null>(null);
+  const [guideDesc, setGuideDesc] = useState<string | null>(null);
+  const [guideSteps, setGuideSteps] = useState<string[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchGuidePageContent(SERVICE_KEY, GUIDE_PAGE_KEY)
+      .then(sections => {
+        if (cancelled) return;
+        const raw = sections['page-help'];
+        if (!raw) return;
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed.title) setGuideTitle(parsed.title);
+          if (parsed.description) setGuideDesc(parsed.description);
+          if (Array.isArray(parsed.steps)) setGuideSteps(parsed.steps);
+        } catch { /* use fallback */ }
+      })
+      .catch(() => { /* use fallback */ });
+    return () => { cancelled = true; };
+  }, []);
 
   // Barcode search state
   const [searching, setSearching] = useState(false);
@@ -381,6 +408,19 @@ export default function SupplierProductCreatePage() {
         <h1 className="text-2xl font-bold text-slate-800">상품 등록</h1>
         <p className="text-slate-500 mt-1">상품 정보를 입력하여 새 상품을 등록합니다</p>
       </div>
+
+      {/* GuideBlock */}
+      <GuideBlock
+        variant="info"
+        title={guideTitle ?? '상품 등록 절차를 안내합니다.'}
+        description={guideDesc ?? '3단계 마법사로 상품 기본 정보, 가격/유통 설정, 이미지/설명을 순서대로 입력합니다.'}
+        steps={guideSteps ?? [
+          'Step 1: 상품명, 카테고리, 브랜드, 규제 정보를 입력합니다',
+          'Step 2: 공급가, 유통 정책, 서비스 노출을 설정합니다',
+          'Step 3: 대표 이미지와 상세 설명을 작성하고 등록합니다',
+        ]}
+        compact
+      />
 
       {/* WO-O4O-PRODUCT-IMPORT-ASSISTANT-V1: Import Assistant 초안 알림 */}
       {importDraft && (

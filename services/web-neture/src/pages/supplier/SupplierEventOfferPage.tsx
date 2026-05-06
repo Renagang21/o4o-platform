@@ -21,6 +21,11 @@ import { Tag, ChevronLeft, ChevronRight, Package, Plus, X, Loader2 } from 'lucid
 import { toast } from '@o4o/error-handling';
 import { netureEventOfferApi, supplierKpaEventOfferApi } from '../../lib/api';
 import type { ProposableOffer, MyEventOfferProposal, PerServiceProposalResult } from '../../lib/api';
+import { GuideBlock } from '@o4o/shared-space-ui';
+import { fetchGuidePageContent } from '../../api/guideContent';
+
+const GUIDE_PAGE_KEY = 'supplier.event-offer.editor';
+const SERVICE_KEY = 'neture';
 
 // WO-O4O-EVENT-OFFER-MULTI-SERVICE-PROPOSAL-V1
 // 대상 서비스 선택 옵션. backend의 TARGET_TO_EVENT_OFFER_KEY와 정합.
@@ -117,6 +122,28 @@ function extractErrorCode(err: unknown): string | null {
 
 export default function SupplierEventOfferPage() {
   const navigate = useNavigate();
+
+  const [guideTitle, setGuideTitle] = useState<string | null>(null);
+  const [guideDesc, setGuideDesc] = useState<string | null>(null);
+  const [guideSteps, setGuideSteps] = useState<string[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchGuidePageContent(SERVICE_KEY, GUIDE_PAGE_KEY)
+      .then(sections => {
+        if (cancelled) return;
+        const raw = sections['page-help'];
+        if (!raw) return;
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed.title) setGuideTitle(parsed.title);
+          if (parsed.description) setGuideDesc(parsed.description);
+          if (Array.isArray(parsed.steps)) setGuideSteps(parsed.steps);
+        } catch { /* use fallback */ }
+      })
+      .catch(() => { /* use fallback */ });
+    return () => { cancelled = true; };
+  }, []);
 
   const [activeTab, setActiveTab] = useState<StatusTab>('active');
   const [items, setItems] = useState<OfferItem[]>([]);
@@ -296,6 +323,20 @@ export default function SupplierEventOfferPage() {
           </button>
         </div>
       </div>
+
+      {/* GuideBlock */}
+      <GuideBlock
+        variant="info"
+        title={guideTitle ?? '이벤트 오퍼를 제안하고 현황을 확인합니다.'}
+        description={guideDesc ?? '공급자 상품을 KPA Society / K-Cosmetics에 이벤트로 제안하고 승인 상태를 관리합니다.'}
+        steps={guideSteps ?? [
+          '"이벤트 제안" 버튼으로 제안할 상품과 대상 서비스를 선택합니다',
+          '내 제안 현황에서 승인 진행 상태를 확인합니다',
+          '반려된 경우 사유를 확인하고 재제안을 검토합니다',
+          '승인된 오퍼는 해당 서비스 매장에 노출됩니다',
+        ]}
+        compact
+      />
 
       {/* WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1: 내 제안 현황 */}
       {(proposalsLoading || myProposals.length > 0) && (

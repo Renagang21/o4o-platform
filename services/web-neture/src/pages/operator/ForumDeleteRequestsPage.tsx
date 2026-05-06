@@ -22,6 +22,11 @@ import { ActionBar, BulkResultModal } from '@o4o/ui';
 import { DataTable, useBatchAction } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { forumOperatorApi } from '../../services/forumApi';
+import { GuideBlock } from '@o4o/shared-space-ui';
+import { fetchGuidePageContent } from '../../api/guideContent';
+
+const GUIDE_PAGE_KEY = 'forum.request.management';
+const SERVICE_KEY = 'neture';
 
 type DeleteRequestStatus = 'pending' | 'approved' | 'rejected';
 
@@ -64,6 +69,28 @@ export default function ForumDeleteRequestsPage() {
   const [selectedRequest, setSelectedRequest] = useState<DeleteRequestData | null>(null);
   const [reviewComment, setReviewComment] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+
+  const [guideTitle, setGuideTitle] = useState<string | null>(null);
+  const [guideDesc, setGuideDesc] = useState<string | null>(null);
+  const [guideSteps, setGuideSteps] = useState<string[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchGuidePageContent(SERVICE_KEY, GUIDE_PAGE_KEY)
+      .then(sections => {
+        if (cancelled) return;
+        const raw = sections['page-help'];
+        if (!raw) return;
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed.title) setGuideTitle(parsed.title);
+          if (parsed.description) setGuideDesc(parsed.description);
+          if (Array.isArray(parsed.steps)) setGuideSteps(parsed.steps);
+        } catch { /* use fallback */ }
+      })
+      .catch(() => { /* use fallback */ });
+    return () => { cancelled = true; };
+  }, []);
 
   // Selection & V3 batch
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -248,6 +275,20 @@ export default function ForumDeleteRequestsPage() {
           </div>
         )}
       </div>
+
+      {/* GuideBlock */}
+      <GuideBlock
+        variant="info"
+        title={guideTitle ?? '포럼 삭제 요청을 검토합니다.'}
+        description={guideDesc ?? '포럼 소유자의 삭제 요청을 승인하거나 반려합니다. 검토 의견을 함께 작성할 수 있습니다.'}
+        steps={guideSteps ?? [
+          '대기 중인 삭제 요청 목록을 확인합니다',
+          '요청 상세 내용과 삭제 사유를 검토합니다',
+          '승인 또는 반려를 선택하고 의견을 작성합니다',
+          '처리 결과는 포럼 소유자에게 즉시 반영됩니다',
+        ]}
+        compact
+      />
 
       {/* Status Filter */}
       <div className="flex gap-2">

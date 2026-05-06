@@ -18,6 +18,11 @@ import { operatorProductApi } from '../../lib/api/operatorProductApi';
 import { productCleanupApi } from '../../lib/api/operatorProductCleanup';
 import type { SupplierProduct } from '../../lib/api';
 import ProductDetailDrawer from '../supplier/ProductDetailDrawer';
+import { GuideBlock } from '@o4o/shared-space-ui';
+import { fetchGuidePageContent } from '../../api/guideContent';
+
+const GUIDE_PAGE_KEY = 'operator.event-offer.management';
+const SERVICE_KEY = 'neture';
 
 // ─── Constants ───
 
@@ -130,6 +135,28 @@ export default function OperatorProductApprovalPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  const [guideTitle, setGuideTitle] = useState<string | null>(null);
+  const [guideDesc, setGuideDesc] = useState<string | null>(null);
+  const [guideSteps, setGuideSteps] = useState<string[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchGuidePageContent(SERVICE_KEY, GUIDE_PAGE_KEY)
+      .then(sections => {
+        if (cancelled) return;
+        const raw = sections['page-help'];
+        if (!raw) return;
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed.title) setGuideTitle(parsed.title);
+          if (parsed.description) setGuideDesc(parsed.description);
+          if (Array.isArray(parsed.steps)) setGuideSteps(parsed.steps);
+        } catch { /* use fallback */ }
+      })
+      .catch(() => { /* use fallback */ });
+    return () => { cancelled = true; };
+  }, []);
 
   // V3: Batch action hook
   const batch = useBatchAction();
@@ -367,6 +394,20 @@ export default function OperatorProductApprovalPage() {
           공급자가 등록한 상품을 검토하고 승인 / 반려합니다.
         </p>
       </div>
+
+      {/* GuideBlock */}
+      <GuideBlock
+        variant="info"
+        title={guideTitle ?? '공급자 상품 승인 절차를 안내합니다.'}
+        description={guideDesc ?? '공급자가 등록한 상품을 검토하고 플랫폼 노출 여부를 결정합니다.'}
+        steps={guideSteps ?? [
+          '승인대기 탭에서 검토할 상품 목록을 확인합니다',
+          '상품명 클릭으로 이미지·설명·가격 등 상세 정보를 검토합니다',
+          '승인 시 서비스 노출 정책에 따라 즉시 배포됩니다',
+          '반려 시 사유를 입력하면 공급자에게 전달됩니다',
+        ]}
+        compact
+      />
 
       {/* Stats Cards */}
       <div className="grid grid-cols-4 gap-4 mb-6">
