@@ -99,7 +99,8 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
   router.use('/store-hub', createStoreHubController(dataSource, coreRequireAuth as any));
 
   // Channel Product Management — 채널별 상품 진열 관리
-  router.use('/store-hub/channel-products', createStoreChannelProductsController(dataSource, coreRequireAuth as any));
+  // WO-O4O-STORE-GUARD-PHASE2A-CHANNEL-AND-QR-V1: serviceKey='cosmetics' 전달.
+  router.use('/store-hub/channel-products', createStoreChannelProductsController(dataSource, coreRequireAuth as any, 'cosmetics'));
 
   // B2B Supply Catalog — 공급자 상품 카탈로그 + 신청 (WO-O4O-HUB-TO-STORE-UX-BRIDGE-V1)
   // WO-GLYCOPHARM-STORE-GUARD-SERVICE-AWARE-FIX-V1: serviceKey='cosmetics' 전달 → cosmetics:store_owner 만 통과.
@@ -121,7 +122,8 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
   router.use('/', createStoreLibraryController(dataSource, coreRequireAuth as any));
 
   // Store QR Landing (internal: /qr/public/*, /pharmacy/qr/*)
-  router.use('/', createStoreQrLandingController(dataSource, coreRequireAuth as any));
+  // WO-O4O-STORE-GUARD-PHASE2A-CHANNEL-AND-QR-V1: serviceKey='cosmetics' 전달 (public route 는 무관).
+  router.use('/', createStoreQrLandingController(dataSource, coreRequireAuth as any, 'cosmetics'));
 
   // Store POP (internal: /pharmacy/pop/*)
   router.use('/', createStorePopController(dataSource, coreRequireAuth as any));

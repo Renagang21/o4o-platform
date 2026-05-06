@@ -339,7 +339,8 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   router.use('/store-hub', createStoreHubController(dataSource, coreRequireAuth as any));
 
   // Channel Product Management — 채널별 상품 진열 관리
-  router.use('/store-hub/channel-products', createStoreChannelProductsController(dataSource, coreRequireAuth as any));
+  // WO-O4O-STORE-GUARD-PHASE2A-CHANNEL-AND-QR-V1: serviceKey='glycopharm' 전달.
+  router.use('/store-hub/channel-products', createStoreChannelProductsController(dataSource, coreRequireAuth as any, 'glycopharm'));
 
   // Pharmacy Store Config — 스토어프론트 설정
   router.use('/pharmacy/store', createPharmacyStoreConfigController(dataSource, coreRequireAuth as any));
@@ -365,7 +366,8 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   router.use('/', createStoreLibraryController(dataSource, coreRequireAuth as any));
 
   // Store QR Landing (internal: /qr/public/*, /pharmacy/qr/*)
-  router.use('/', createStoreQrLandingController(dataSource, coreRequireAuth as any));
+  // WO-O4O-STORE-GUARD-PHASE2A-CHANNEL-AND-QR-V1: serviceKey='glycopharm' 전달 (public route 는 무관).
+  router.use('/', createStoreQrLandingController(dataSource, coreRequireAuth as any, 'glycopharm'));
 
   // Store POP (internal: /pharmacy/pop/*)
   router.use('/', createStorePopController(dataSource, coreRequireAuth as any));

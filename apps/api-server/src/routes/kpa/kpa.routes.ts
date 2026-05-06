@@ -348,7 +348,8 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   router.use('/store-hub', createStoreHubController(dataSource, coreRequireAuth as any));
 
   // Channel Product Management (WO-CHANNEL-EXECUTION-CONSOLE-V1)
-  router.use('/store-hub/channel-products', createStoreChannelProductsController(dataSource, coreRequireAuth as any));
+  // WO-O4O-STORE-GUARD-PHASE2A-CHANNEL-AND-QR-V1: serviceKey='kpa' 전달.
+  router.use('/store-hub/channel-products', createStoreChannelProductsController(dataSource, coreRequireAuth as any, 'kpa'));
 
   // Pharmacy Store Config routes (WO-PHARMACY-HUB-REALIGN-PHASEH2-V1)
   router.use('/pharmacy/store', createPharmacyStoreConfigController(dataSource, coreRequireAuth as any));
@@ -380,7 +381,8 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   router.use('/', createStoreExecutionAssetsController(dataSource, coreRequireAuth as any));
 
   // Store QR Landing routes (WO-O4O-QR-LANDING-PAGE-V1) — internal: /qr/public/*, /pharmacy/qr/*
-  router.use('/', createStoreQrLandingController(dataSource, coreRequireAuth as any));
+  // WO-O4O-STORE-GUARD-PHASE2A-CHANNEL-AND-QR-V1: serviceKey='kpa' 전달 (public route /qr/public/:slug 는 무관).
+  router.use('/', createStoreQrLandingController(dataSource, coreRequireAuth as any, 'kpa'));
 
   // Store POP routes (WO-O4O-QR-POP-AUTO-GENERATOR-V1) — internal: /pharmacy/pop/*
   router.use('/', createStorePopController(dataSource, coreRequireAuth as any));

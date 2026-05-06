@@ -27,7 +27,7 @@ import { DataSource } from 'typeorm';
 import { createHash } from 'crypto';
 import { StoreQrCode } from '../../platform/entities/store-qr-code.entity.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
-import { createRequireStoreOwner } from '../../../utils/store-owner.utils.js';
+import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
 import { generateQrPng, generateQrSvg, generateQrPrintPdf } from '../../../services/qr-print.service.js';
 import type { QrPrintItem } from '../../../services/qr-print.service.js';
 import { generateProductFlyer } from '../../../services/qr-flyer.service.js';
@@ -53,10 +53,14 @@ function hashIp(ip: string | undefined): string | null {
 export function createStoreQrLandingController(
   dataSource: DataSource,
   requireAuth: AuthMiddleware,
+  // WO-O4O-STORE-GUARD-PHASE2A-CHANNEL-AND-QR-V1:
+  //   serviceKey 지정 시 해당 서비스의 store_owner role 만 통과 (cross-service leakage 차단).
+  //   미지정 시 기존 동작 유지 (back-compat).
+  serviceKey?: StoreOwnerServiceKey,
 ): Router {
   const router = Router();
   const qrRepo = dataSource.getRepository(StoreQrCode);
-  const requirePharmacyOwner = createRequireStoreOwner(dataSource);
+  const requirePharmacyOwner = createRequireStoreOwner(dataSource, serviceKey);
 
   // ─── PUBLIC: GET /qr/public/:slug ──────────────────────────────
   router.get(

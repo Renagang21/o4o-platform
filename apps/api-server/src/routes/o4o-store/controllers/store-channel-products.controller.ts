@@ -19,7 +19,7 @@
 
 import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
-import { createRequireStoreOwner } from '../../../utils/store-owner.utils.js';
+import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
 import { OrganizationProductChannel } from '../../../modules/store-core/entities/organization-product-channel.entity.js';
 
 type AuthMiddleware = import('express').RequestHandler;
@@ -33,10 +33,14 @@ const PRODUCT_CHANNELS = ['B2C', 'KIOSK'] as const;
 
 export function createStoreChannelProductsController(
   dataSource: DataSource,
-  requireAuth: AuthMiddleware
+  requireAuth: AuthMiddleware,
+  // WO-O4O-STORE-GUARD-PHASE2A-CHANNEL-AND-QR-V1:
+  //   serviceKey 지정 시 해당 서비스의 store_owner role 만 통과 (cross-service leakage 차단).
+  //   미지정 시 기존 동작 유지 (back-compat — /api/v1/store/channel-products 공용 mount 용).
+  serviceKey?: StoreOwnerServiceKey,
 ): Router {
   const router = Router();
-  const requirePharmacyOwner = createRequireStoreOwner(dataSource);
+  const requirePharmacyOwner = createRequireStoreOwner(dataSource, serviceKey);
 
   /**
    * Validate channel belongs to org and is a product-manageable type.
