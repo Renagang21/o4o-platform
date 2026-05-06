@@ -48,9 +48,11 @@ class AIProxyService {
   private static instance: AIProxyService;
 
   // Timeout and retry configuration
-  private readonly DEFAULT_TIMEOUT = 120000; // 120 seconds (increased from 60s)
-  private readonly MAX_RETRIES = 2; // 2 retries (decreased from 3 for faster failure)
-  private readonly BASE_DELAY = 1000; // 1 second
+  // WO-O4O-AI-GEMINI-RESILIENCE-FIX-V1: MAX_RETRIES 2→4, BASE_DELAY 1→2s
+  // to absorb transient Gemini upstream 503 bursts (3–10s recovery window).
+  private readonly DEFAULT_TIMEOUT = 120000; // 120 seconds
+  private readonly MAX_RETRIES = 4; // 4 retries (5 total attempts)
+  private readonly BASE_DELAY = 2000; // 2 seconds
   private readonly MAX_DELAY = 20000; // 20 seconds
   private readonly RETRY_FACTOR = 2;
 
@@ -179,9 +181,11 @@ class AIProxyService {
    * Returns validated model name or default for provider
    */
   private resolveModel(provider: AIProvider, requestedModel?: string): string {
+    // WO-O4O-AI-GEMINI-RESILIENCE-FIX-V1: gemini default → whitelist-included gemini-2.5-flash
+    // Previously 'gemini-3.0-flash' which is not in MODEL_WHITELIST (validateRequest would throw).
     const defaults = {
       openai: 'gpt-5-mini',
-      gemini: 'gemini-3.0-flash',
+      gemini: 'gemini-2.5-flash',
       claude: 'claude-sonnet-4.5',
     };
 
@@ -298,9 +302,13 @@ class AIProxyService {
 
         logger.warn('AI proxy retry', {
           requestId,
+          provider: request.provider,
+          model: request.model,
           attempt: attempt + 1,
-          maxRetries: this.MAX_RETRIES,
+          totalAttempts: this.MAX_RETRIES + 1,
           backoffMs: backoff,
+          retryAfter: error.retryAfter ?? null,
+          errorType: error.type,
           error: error.message,
         });
 
@@ -493,7 +501,23 @@ class AIProxyService {
         throw this.createError('RATE_LIMIT_ERROR', 'Gemini rate limit exceeded', true, retryAfter);
       }
       if (response.status === 503) {
-        throw this.createError('PROVIDER_ERROR', 'Gemini service unavailable', true);
+        // WO-O4O-AI-GEMINI-RESILIENCE-FIX-V1: preserve upstream 503 details (truncated, no secrets)
+        const retryAfter = this.parseRetryAfter(response.headers.get('Retry-After'));
+        let upstreamMessage = '';
+        try {
+          const text = await response.text();
+          upstreamMessage = text.slice(0, 200);
+        } catch {
+          // body may already be consumed or unreadable; ignore
+        }
+        logger.warn('Gemini upstream 503', {
+          requestId,
+          model,
+          status: 503,
+          retryAfter: retryAfter ?? null,
+          upstreamMessage: upstreamMessage || null,
+        });
+        throw this.createError('PROVIDER_ERROR', 'Gemini service unavailable', true, retryAfter);
       }
       if (!response.ok) {
         const error = await response.json();
@@ -657,9 +681,13 @@ class AIProxyService {
         const backoff = this.calculateBackoff(attempt, error.retryAfter);
         logger.warn('AI raw content retry', {
           requestId,
+          provider: request.provider,
+          model: request.model,
           attempt: attempt + 1,
-          maxRetries: this.MAX_RETRIES,
+          totalAttempts: this.MAX_RETRIES + 1,
           backoffMs: backoff,
+          retryAfter: error.retryAfter ?? null,
+          errorType: error.type,
           error: error.message,
         });
         await this.sleep(backoff);
