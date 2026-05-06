@@ -20,7 +20,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { HeroBannerSection } from '../components/community/HeroBannerSection';
+import { HeroBannerSection } from '@o4o/shared-space-ui';
 import { homeApi } from '../api/home';
 import type { HomePageData } from '../api/home';
 import { useAuth } from '../contexts/AuthContext';
@@ -118,7 +118,14 @@ export function CommunityHomePage() {
     <div style={styles.page}>
       {/* 1. Hero 배너 (동적 광고 캐러셀 — KPA 고유) */}
       <PageHero>
-        <HeroBannerSection ads={data?.heroAds ?? []} />
+        <HeroBannerSection
+            ads={data?.heroAds ?? []}
+            fallback={{
+              badge: '약사/약국 서비스',
+              title: '약사 커뮤니티와 약국 경영 서비스',
+              subtitle: '약사 커뮤니티와 약국 경영 서비스를 한 곳에서',
+            }}
+          />
       </PageHero>
 
       {/* 2. 공지 / 약사공론 뉴스 (2-column) */}

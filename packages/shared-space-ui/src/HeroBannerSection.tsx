@@ -1,19 +1,52 @@
 /**
- * HeroBannerSection — Community Hub Hero Banner Carousel
+ * HeroBannerSection — 공통 Hero 광고 캐러셀
  *
- * WO-KPA-A-COMMUNITY-HUB-IMPLEMENTATION-V1
- * - Auto-rotate every 5s, arrow navigation, dot indicator
- * - Falls back to static hero when no ads
+ * WO-O4O-HERO-BANNER-COMMONIZE-V1
+ *
+ * 공통화 대상:
+ *   - carousel engine (autoplay 5s, arrow/dot navigation)
+ *   - responsive layout / overlay 구조
+ *   - fallback 정적 hero (콘텐츠만 서비스별)
+ *
+ * 서비스별 유지:
+ *   - fallbackContent (badge/title/subtitle/colors)
+ *   - 광고 데이터 source (각 서비스 API)
  */
 
 import { useState, useEffect, useCallback, CSSProperties } from 'react';
-import type { CommunityAd } from '../../api/community';
 
-interface Props {
-  ads: CommunityAd[];
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+/** 광고 슬라이드 데이터. CommunityAd (KPA/K-Cosmetics) 와 동일 구조. */
+export interface HeroBannerAd {
+  id: string;
+  title: string;
+  imageUrl: string;
+  linkUrl: string | null;
+  displayOrder?: number;
 }
 
-export function HeroBannerSection({ ads }: Props) {
+/** 광고 없을 때 표시할 서비스별 정적 hero 콘텐츠 */
+export interface HeroBannerFallback {
+  badge: string;
+  title: string;
+  subtitle: string;
+  /** 배지 + 타이틀 강조 색. 기본값 var(--color-primary, #2563EB) */
+  primaryColor?: string;
+  /** fallback hero 배경색. 기본값 var(--color-bg-secondary, #f8fafc) */
+  bgColor?: string;
+  /** fallback hero 테두리 색. 기본값 var(--color-border-default, #e2e8f0) */
+  borderColor?: string;
+}
+
+export interface HeroBannerSectionProps {
+  ads: HeroBannerAd[];
+  fallback: HeroBannerFallback;
+}
+
+// ─── Component ───────────────────────────────────────────────────────────────
+
+export function HeroBannerSection({ ads, fallback }: HeroBannerSectionProps) {
   const [current, setCurrent] = useState(0);
 
   const next = useCallback(() => {
@@ -30,14 +63,23 @@ export function HeroBannerSection({ ads }: Props) {
     return () => clearInterval(timer);
   }, [next, ads.length]);
 
-  // No ads: show default hero
+  // No ads: show service-specific static hero
   if (ads.length === 0) {
+    const primary = fallback.primaryColor ?? 'var(--color-primary, #2563EB)';
     return (
-      <section style={styles.defaultHero}>
+      <section
+        style={{
+          ...styles.defaultHero,
+          background: fallback.bgColor ?? 'var(--color-bg-secondary, #f8fafc)',
+          border: `1px solid ${fallback.borderColor ?? 'var(--color-border-default, #e2e8f0)'}`,
+        }}
+      >
         <div style={styles.defaultContent}>
-          <span style={styles.badge}>약사/약국 서비스</span>
-          <h1 style={styles.title}>약사 커뮤니티와 약국 경영 서비스</h1>
-          <p style={styles.subtitle}>약사 커뮤니티와 약국 경영 서비스를 한 곳에서</p>
+          <span style={{ ...styles.badge, background: primary }}>
+            {fallback.badge}
+          </span>
+          <h1 style={{ ...styles.title, color: primary }}>{fallback.title}</h1>
+          <p style={styles.subtitle}>{fallback.subtitle}</p>
         </div>
       </section>
     );
@@ -62,10 +104,14 @@ export function HeroBannerSection({ ads }: Props) {
       {ads.length > 1 && (
         <>
           <button onClick={prev} style={{ ...styles.arrow, left: 12 }} aria-label="Previous">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><polyline points="15 18 9 12 15 6" /></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
           </button>
           <button onClick={next} style={{ ...styles.arrow, right: 12 }} aria-label="Next">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><polyline points="9 6 15 12 9 18" /></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <polyline points="9 6 15 12 9 18" />
+            </svg>
           </button>
           <div style={styles.dots}>
             {ads.map((_, i) => (
@@ -85,6 +131,8 @@ export function HeroBannerSection({ ads }: Props) {
     </section>
   );
 }
+
+// ─── Styles ──────────────────────────────────────────────────────────────────
 
 const styles: Record<string, CSSProperties> = {
   container: {
@@ -153,9 +201,7 @@ const styles: Record<string, CSSProperties> = {
     padding: 0,
   },
   defaultHero: {
-    background: 'var(--color-bg-secondary, #f8fafc)',
     borderRadius: 16,
-    border: '1px solid var(--color-border-default, #e2e8f0)',
     padding: '64px 32px',
     textAlign: 'center' as const,
     marginBottom: 0,
@@ -166,7 +212,6 @@ const styles: Record<string, CSSProperties> = {
   },
   badge: {
     display: 'inline-block',
-    background: 'var(--color-primary, #2563EB)',
     color: 'white',
     fontSize: 12,
     fontWeight: 600,
@@ -175,7 +220,6 @@ const styles: Record<string, CSSProperties> = {
     marginBottom: 16,
   },
   title: {
-    color: 'var(--color-primary, #2563EB)',
     fontSize: 28,
     fontWeight: 700,
     margin: '0 0 12px',

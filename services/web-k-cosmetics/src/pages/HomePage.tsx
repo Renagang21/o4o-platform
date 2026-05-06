@@ -12,7 +12,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { HeroBannerSection } from '../components/community/HeroBannerSection';
+import { HeroBannerSection } from '@o4o/shared-space-ui';
 import { homeApi } from '../api/home';
 import type { HomePageData } from '../api/home';
 import { PageHero, PageSection, PageContainer, Card, useTemplate } from '@o4o/ui';
@@ -97,7 +97,17 @@ export function HomePage() {
     <div style={styles.page}>
       {/* 1. Hero 배너 (동적 광고 캐러셀 / 브랜드 Hero) */}
       <PageHero>
-        <HeroBannerSection ads={data?.heroAds ?? []} />
+        <HeroBannerSection
+            ads={data?.heroAds ?? []}
+            fallback={{
+              badge: 'K-Cosmetics Community',
+              title: 'K-Beauty Community Hub',
+              subtitle: 'Forum, Video, Resources all in one place',
+              primaryColor: 'var(--color-primary, #DB2777)',
+              bgColor: '#fdf2f8',
+              borderColor: '#fce7f3',
+            }}
+          />
       </PageHero>
 
       {/* 2. 공지 / K-Beauty 트렌드 (2-column) */}

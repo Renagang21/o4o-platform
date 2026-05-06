@@ -1,5 +1,9 @@
 /* @o4o/shared-space-ui — Shared presentation components for community home pages and HUB templates */
 
+/* WO-O4O-HERO-BANNER-COMMONIZE-V1: 공통 Hero 광고 캐러셀 */
+export { HeroBannerSection } from './HeroBannerSection';
+export type { HeroBannerAd, HeroBannerFallback, HeroBannerSectionProps } from './HeroBannerSection';
+
 export { HeroSummarySection } from './HeroSummarySection';
 export { NewsNoticesSection } from './NewsNoticesSection';
 export { ActivitySection } from './ActivitySection';
