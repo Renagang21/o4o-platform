@@ -23,6 +23,8 @@ import {
   buildUserPrompt,
   parseResponse,
 } from '../services/ai-prompts/index.js';
+// WO-O4O-AI-URL-TO-BLOCKS-YOUTUBE-SUPPORT-V1
+import { isYouTubeUrl, fetchYouTubeContent } from './ai-proxy/youtube-fetcher.js';
 
 const router: Router = Router();
 
@@ -250,8 +252,21 @@ router.post('/content', authenticate, async (req, res: Response) => {
 
 /**
  * URL에서 텍스트 추출 (서버사이드 fetch + HTML 스트리핑)
+ *
+ * WO-O4O-AI-URL-TO-BLOCKS-YOUTUBE-SUPPORT-V1:
+ *   YouTube URL 은 SPA 라 단순 fetch 로 콘텐츠 추출 불가 →
+ *   별도 oEmbed + transcript 경로(fetchYouTubeContent) 우선 사용,
+ *   결과가 부실하면(50자 미만) 일반 fetch 로 폴백.
  */
 async function fetchUrlText(url: string): Promise<string> {
+  if (isYouTubeUrl(url)) {
+    const ytText = await fetchYouTubeContent(url).catch(() => '');
+    if (ytText && ytText.trim().length >= 50) {
+      return ytText.slice(0, 3500);
+    }
+    // 폴백: 일반 fetch 도 거의 의미 없지만 시도는 해 둔다
+  }
+
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 15000);
 
@@ -533,6 +548,17 @@ router.post('/url-to-blocks', authenticate, async (req, res: Response) => {
     if (isYouTube) {
       // YouTube: embed 유지 + 유효 텍스트 블록 최대 3개
       const ytBlocks = normalizedBlocks.filter(b => b.type === 'o4o/youtube');
+      // WO-O4O-AI-URL-TO-BLOCKS-YOUTUBE-SUPPORT-V1:
+      //   Gemini 가 o4o/youtube 블록을 만들지 않은 경우에도 원본 URL 기반으로
+      //   embed 블록 1개를 보장한다. (block schema 변경 없음 — 기존 타입 그대로)
+      if (ytBlocks.length === 0) {
+        ytBlocks.push({
+          id: `block-yt-${Date.now()}`,
+          type: 'o4o/youtube',
+          content: '',
+          attributes: { url: parsedUrl.toString() },
+        } as typeof normalizedBlocks[number]);
+      }
       const textBlocks = normalizedBlocks
         .filter(b => b.type !== 'o4o/youtube')
         .filter(b => isValidContent(b.content || ''))
