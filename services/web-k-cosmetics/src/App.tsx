@@ -82,8 +82,6 @@ const InstructorCoursesPage = lazy(() => import('@/pages/instructor/InstructorCo
 // Resources Hub (WO-KCOS-RESOURCES-HUB-IMPLEMENTATION-V1)
 const ResourcesPage = lazy(() => import('@/pages/resources/ResourcesPage').then(m => ({ default: m.ResourcesPage })));
 
-// Community Hub (WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1)
-const CommunityHubPage = lazy(() => import('@/pages/community/CommunityHubPage'));
 
 // Content Library (WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1)
 const ContentLibraryPage = lazy(() => import('@/pages/library/ContentLibraryPage'));
@@ -140,8 +138,6 @@ const StoreCockpitPage = lazy(() => import('@/pages/operator/StoreCockpitPage'))
 // Operator Guide Contents (WO-O4O-OPERATOR-GUIDE-CONTENTS-CORE-EXTRACTION-V1)
 const OperatorGuideContentsPage = lazy(() => import('@/pages/operator/OperatorGuideContentsPage'));
 
-// Community Management (WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1)
-const CommunityManagementPage = lazy(() => import('@/pages/operator/CommunityManagementPage'));
 // WO-O4O-FORUM-OPERATOR-UNIFICATION-V1
 const ForumRequestsPage = lazy(() => import('@/pages/operator/ForumRequestsPage'));
 const ForumDeleteRequestsPage = lazy(() => import('@/pages/operator/ForumDeleteRequestsPage'));
@@ -223,8 +219,6 @@ function AppRoutes() {
         {/* Resources Hub (WO-KCOS-RESOURCES-HUB-IMPLEMENTATION-V1) */}
         <Route path="resources" element={<ResourcesPage />} />
 
-        {/* Community Hub (WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1) */}
-        <Route path="community" element={<CommunityHubPage />} />
         {/* WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1 */}
         <Route path="library/content" element={<ContentLibraryPage />} />
 
@@ -413,8 +407,6 @@ function AppRoutes() {
         <Route path="ai-report" element={<OperatorAiReportPage />} />
         {/* Store Cockpit (WO-KCOS-STORES-PHASE3-STORE-COCKPIT-V1) */}
         <Route path="store-cockpit" element={<StoreCockpitPage />} />
-        {/* Community Management (WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1) */}
-        <Route path="community" element={<CommunityManagementPage />} />
         {/* WO-O4O-FORUM-OPERATOR-UNIFICATION-V1 */}
         <Route path="forum-requests" element={<ForumRequestsPage />} />
         <Route path="forum-delete-requests" element={<ForumDeleteRequestsPage />} />
