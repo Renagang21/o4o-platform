@@ -24,6 +24,11 @@ import {
 import { pharmacyApi, type PharmacyProduct, type ProductAiTagData, type ProductSearchResultData } from '@/api/pharmacy';
 import { toast } from '@o4o/error-handling';
 import { DataTable, type Column } from '@o4o/ui';
+import { GuideBlock } from '@o4o/shared-space-ui';
+import { fetchGuidePageContent } from '@/api/guideContent';
+
+const GUIDE_PAGE_KEY = 'store.product.management';
+const SERVICE_KEY = 'glycopharm';
 
 export default function PharmacyProducts() {
   const [products, setProducts] = useState<PharmacyProduct[]>([]);
@@ -51,6 +56,28 @@ export default function PharmacyProducts() {
   const [tagsLoading, setTagsLoading] = useState(false);
   const [tagGenerating, setTagGenerating] = useState(false);
   const [newManualTag, setNewManualTag] = useState('');
+
+  const [guideTitle, setGuideTitle] = useState<string | null>(null);
+  const [guideDesc, setGuideDesc] = useState<string | null>(null);
+  const [guideSteps, setGuideSteps] = useState<string[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchGuidePageContent(SERVICE_KEY, GUIDE_PAGE_KEY)
+      .then(sections => {
+        if (cancelled) return;
+        const raw = sections['page-help'];
+        if (!raw) return;
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed.title) setGuideTitle(parsed.title);
+          if (parsed.description) setGuideDesc(parsed.description);
+          if (Array.isArray(parsed.steps)) setGuideSteps(parsed.steps);
+        } catch { /* use fallback */ }
+      })
+      .catch(() => { /* use fallback */ });
+    return () => { cancelled = true; };
+  }, []);
 
   // 검색어 디바운스
   useEffect(() => {
@@ -372,6 +399,20 @@ export default function PharmacyProducts() {
           </button>
         </div>
       </div>
+
+      {/* GuideBlock */}
+      <GuideBlock
+        variant="info"
+        title={guideTitle ?? '약국 상품을 관리합니다.'}
+        description={guideDesc ?? '약국에서 판매하는 상품을 등록하고 재고·가격·카테고리를 관리합니다.'}
+        steps={guideSteps ?? [
+          '상품 등록 버튼으로 새 상품을 추가합니다',
+          '카테고리와 검색어로 상품 목록을 필터링합니다',
+          'AI 태그 검색으로 유사 상품을 빠르게 찾을 수 있습니다',
+          '각 상품의 가격·재고·상태를 편집합니다',
+        ]}
+        compact
+      />
 
       {/* Filters */}
       <div className="bg-white rounded-2xl shadow-sm p-4">

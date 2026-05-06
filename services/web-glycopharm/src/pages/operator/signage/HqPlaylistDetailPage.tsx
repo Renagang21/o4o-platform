@@ -7,6 +7,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api, API_BASE_URL } from '../../../lib/apiClient';
 import { ArrowLeft, ListMusic, Play } from 'lucide-react';
+import { GuideBlock } from '@o4o/shared-space-ui';
+import { fetchGuidePageContent } from '../../../api/guideContent';
+
+const GUIDE_PAGE_KEY = 'signage.playlist.manager';
 
 const SERVICE_KEY = 'glycopharm';
 
@@ -72,6 +76,28 @@ export default function HqPlaylistDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
+
+  const [guideTitle, setGuideTitle] = useState<string | null>(null);
+  const [guideDesc, setGuideDesc] = useState<string | null>(null);
+  const [guideSteps, setGuideSteps] = useState<string[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchGuidePageContent(SERVICE_KEY, GUIDE_PAGE_KEY)
+      .then(sections => {
+        if (cancelled) return;
+        const raw = sections['page-help'];
+        if (!raw) return;
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed.title) setGuideTitle(parsed.title);
+          if (parsed.description) setGuideDesc(parsed.description);
+          if (Array.isArray(parsed.steps)) setGuideSteps(parsed.steps);
+        } catch { /* use fallback */ }
+      })
+      .catch(() => { /* use fallback */ });
+    return () => { cancelled = true; };
+  }, []);
 
   const apiFetch = useCallback(async (path: string, options?: RequestInit) => {
     const url = path.startsWith('/api/v1') ? path.replace(/^\/api\/v1/, '') : `${API_BASE_URL}${path}`;
@@ -165,6 +191,20 @@ export default function HqPlaylistDetailPage() {
         <h1 className="text-2xl font-bold text-slate-800">{playlist.name}</h1>
         <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${sc.cls}`}>{sc.text}</span>
       </div>
+
+      {/* GuideBlock */}
+      <GuideBlock
+        variant="info"
+        title={guideTitle ?? '플레이리스트를 편집합니다.'}
+        description={guideDesc ?? 'HQ 사이니지 플레이리스트의 상태를 관리하고 미디어 항목을 추가·순서 변경합니다.'}
+        steps={guideSteps ?? [
+          '상태를 초안→대기→활성으로 변경하여 사이니지에 배포합니다',
+          '플레이리스트 항목에서 미디어를 추가하거나 제거합니다',
+          '각 항목의 재생 시간을 설정합니다',
+          '활성 상태에서만 사이니지 화면에 실제로 표시됩니다',
+        ]}
+        compact
+      />
 
       {/* Status Control */}
       <div className="bg-white rounded-xl border border-slate-100 p-6">
