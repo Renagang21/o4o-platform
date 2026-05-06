@@ -10,6 +10,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { lmsInstructorApi, type AssignmentDto } from '../../../api/lms-instructor';
+// WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1
+import { GuideBlock } from '@o4o/shared-space-ui';
 
 interface Props {
   lessonId: string;
@@ -92,6 +94,18 @@ export default function AssignmentEditor({ lessonId }: Props) {
   return (
     <div style={s.wrap}>
       <div style={s.title}>과제 설정</div>
+      {/* WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1: lms.assignment.editor */}
+      <GuideBlock
+        variant="info"
+        title="과제를 설정합니다."
+        description="수강자가 제출할 과제의 안내와 마감일을 입력하세요."
+        steps={[
+          '과제 안내문을 작성합니다',
+          '마감일을 설정합니다 (선택)',
+          '저장하면 수강자가 텍스트로 과제를 제출할 수 있습니다',
+        ]}
+        compact
+      />
 
       <div style={s.field}>
         <label style={s.label}>과제 설명</label>

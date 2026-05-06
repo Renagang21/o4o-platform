@@ -11,6 +11,9 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { publicContentApi } from '../../lib/api/signageV2';
 import { getAccessToken, useAuth } from '../../contexts/AuthContext';
+// WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1
+import { GuideBlock } from '@o4o/shared-space-ui';
+import { fetchGuidePageContent } from '../../api/guideContent';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 const SERVICE_KEY = 'kpa-society';
@@ -73,6 +76,31 @@ export default function PlaylistEditorPage() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1: signage.playlist.manager guide
+  const [guideTitle, setGuideTitle] = useState('플레이리스트를 구성합니다.');
+  const [guideDesc, setGuideDesc] = useState('제목을 입력하고 영상 항목을 추가한 뒤 저장하세요.');
+  const [guideSteps, setGuideSteps] = useState([
+    '플레이리스트 제목을 입력합니다',
+    '항목 추가 버튼으로 영상 URL과 재생 시간을 입력합니다',
+    '항목 순서를 드래그로 조정할 수 있습니다',
+    '저장하면 사이니지 화면에 플레이리스트가 반영됩니다',
+  ]);
+  useEffect(() => {
+    let cancelled = false;
+    fetchGuidePageContent(SERVICE_KEY, 'signage.playlist.manager').then((sections) => {
+      if (cancelled) return;
+      const raw = sections['page-help'];
+      if (!raw) return;
+      try {
+        const obj = JSON.parse(raw);
+        if (obj?.title) setGuideTitle(obj.title);
+        if (obj?.description) setGuideDesc(obj.description);
+        if (Array.isArray(obj?.steps)) setGuideSteps(obj.steps);
+      } catch { /* keep fallback */ }
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
 
   // Auth fetch helper
   const apiFetch = useCallback(async (path: string, options?: RequestInit) => {
@@ -211,6 +239,14 @@ export default function PlaylistEditorPage() {
           <button onClick={() => navigate('/signage?tab=playlists')} style={styles.backBtn}>← 뒤로</button>
           <h1 style={styles.title}>{isEdit ? '플레이리스트 수정' : '플레이리스트 생성'}</h1>
         </div>
+
+        {/* WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1: signage.playlist.manager */}
+        <GuideBlock
+          variant="info"
+          title={guideTitle}
+          description={guideDesc}
+          steps={guideSteps}
+        />
 
         {/* Form */}
         <div style={styles.card}>

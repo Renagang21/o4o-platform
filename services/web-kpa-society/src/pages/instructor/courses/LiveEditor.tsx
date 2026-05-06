@@ -9,6 +9,8 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { lmsInstructorApi, type LiveDto } from '../../../api/lms-instructor';
+// WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1
+import { GuideBlock } from '@o4o/shared-space-ui';
 
 interface Props {
   lessonId: string;
@@ -111,6 +113,18 @@ export default function LiveEditor({ lessonId }: Props) {
   return (
     <div style={s.wrap}>
       <div style={s.title}>라이브 설정</div>
+      {/* WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1: lms.live.editor */}
+      <GuideBlock
+        variant="info"
+        title="라이브 수업 일정을 설정합니다."
+        description="시작·종료 일시와 YouTube 라이브 URL을 입력하세요."
+        steps={[
+          '시작 일시와 종료 일시를 입력합니다',
+          'YouTube 라이브 URL을 입력합니다 (youtube.com 또는 youtu.be)',
+          '저장하면 수강자가 해당 시간에 라이브 수업에 접속할 수 있습니다',
+        ]}
+        compact
+      />
 
       <div style={s.row}>
         <div style={s.rowField}>

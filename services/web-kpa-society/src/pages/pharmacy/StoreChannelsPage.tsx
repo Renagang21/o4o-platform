@@ -68,6 +68,9 @@ import {
 } from '../../api/channelProducts';
 import { fetchChannelOverview } from '../../api/storeHub';
 import { GuideEditableSection } from '../../components/guide';
+// WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1
+import { GuideBlock } from '@o4o/shared-space-ui';
+import { fetchGuidePageContent } from '../../api/guideContent';
 import { kpaConfig } from '@o4o/operator-ux-core';
 
 /* ─── Constants ──────────────────────────────── */
@@ -380,6 +383,31 @@ export function StoreChannelsPage() {
   const [assets, setAssets] = useState<StoreAssetItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  // WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1: store.channel.editor guide
+  const [guideTitle, setGuideTitle] = useState('채널별 제품과 콘텐츠를 관리합니다.');
+  const [guideDesc, setGuideDesc] = useState('탭에서 채널을 선택하고 노출 제품과 콘텐츠를 설정하세요.');
+  const [guideSteps, setGuideSteps] = useState([
+    '채널 탭(B2C/키오스크/태블릿/사이니지)을 선택합니다',
+    '채널을 활성화하고 노출 제품을 추가합니다',
+    '콘텐츠를 연결하면 해당 채널에 표시됩니다',
+    '변경사항은 즉시 반영됩니다',
+  ]);
+  useEffect(() => {
+    let cancelled = false;
+    fetchGuidePageContent('kpa-society', 'store.channel.editor').then((sections) => {
+      if (cancelled) return;
+      const raw = sections['page-help'];
+      if (!raw) return;
+      try {
+        const obj = JSON.parse(raw);
+        if (obj?.title) setGuideTitle(obj.title);
+        if (obj?.description) setGuideDesc(obj.description);
+        if (Array.isArray(obj?.steps)) setGuideSteps(obj.steps);
+      } catch { /* keep fallback */ }
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
 
   // Product management state (WO-CHANNEL-EXECUTION-CONSOLE-V1)
   const [channelProducts, setChannelProducts] = useState<ChannelProduct[]>([]);
@@ -734,6 +762,14 @@ export function StoreChannelsPage() {
           </button>
         </div>
       </div>
+
+      {/* WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1: store.channel.editor */}
+      <GuideBlock
+        variant="info"
+        title={guideTitle}
+        description={guideDesc}
+        steps={guideSteps}
+      />
 
       {/* ─── [A] Channel Tabs ────────────────────── */}
       <div className="border-b border-slate-200 mb-6">

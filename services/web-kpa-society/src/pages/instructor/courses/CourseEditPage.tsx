@@ -30,6 +30,8 @@ const SUPPORTED_LESSON_TYPES: LessonType[] = ['video', 'article', 'quiz', 'assig
 //   guide_contents 에 sectionKey={lessonType} / pageKey='lms.lesson.editor' 로 저장된
 //   JSON 문자열을 우선 사용하고, 없거나 parse 실패 시 LESSON_TYPE_GUIDE fallback.
 const GUIDE_PAGE_KEY = 'lms.lesson.editor';
+// WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1: course editor guide
+const COURSE_GUIDE_PAGE_KEY = 'lms.course.editor';
 const GUIDE_SERVICE_KEY = 'kpa-society';
 
 interface LessonGuideOverride {
@@ -487,6 +489,21 @@ export default function CourseEditPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1: lms.course.editor guide override
+  const [courseGuide, setCourseGuide] = useState<LessonGuideOverride>({});
+  useEffect(() => {
+    let cancelled = false;
+    fetchGuidePageContent(GUIDE_SERVICE_KEY, COURSE_GUIDE_PAGE_KEY).then((sections) => {
+      if (cancelled) return;
+      const raw = sections['page-help'];
+      if (raw) {
+        const parsed = parseLessonGuideContent(raw);
+        if (parsed) setCourseGuide(parsed);
+      }
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+
   // course form state
   const [form, setForm] = useState({ title: '', description: '' });
   const [tags, setTags] = useState<string[]>([]);
@@ -729,6 +746,19 @@ export default function CourseEditPage() {
           </div>
         )}
         <div style={s.card}>
+          {/* WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1: lms.course.editor */}
+          <GuideBlock
+            variant="info"
+            title={courseGuide.title ?? '강의 기본 정보를 입력합니다.'}
+            description={courseGuide.description ?? '제목, 설명, 공개 범위, 태그를 설정한 뒤 저장하세요.'}
+            steps={courseGuide.steps ?? [
+              '강의 제목을 입력합니다',
+              '강의 설명을 작성합니다 (선택)',
+              '공개 범위를 선택합니다 (회원제/공개)',
+              '태그를 1개 이상 입력한 후 저장합니다',
+            ]}
+            compact
+          />
           <div style={s.field}>
             <label style={s.label}>제목</label>
             <input style={s.input} value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} />

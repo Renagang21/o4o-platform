@@ -15,6 +15,9 @@ import { RichTextEditor } from '@o4o/content-editor';
 import { contentApi } from '../../api/content';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
+// WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1
+import { GuideBlock } from '@o4o/shared-space-ui';
+import { fetchGuidePageContent } from '../../api/guideContent';
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
@@ -30,6 +33,31 @@ export function ContentWritePage() {
   const [tags, setTags] = useState('');
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1: content.document.editor guide
+  const [guideTitle, setGuideTitle] = useState('콘텐츠를 작성합니다.');
+  const [guideDesc, setGuideDesc] = useState('제목과 본문을 입력한 뒤 초안 저장 또는 공개 저장을 선택하세요.');
+  const [guideSteps, setGuideSteps] = useState([
+    '콘텐츠 제목을 입력합니다',
+    '본문을 작성합니다 (리치 텍스트 편집)',
+    '요약과 태그를 입력합니다 (선택)',
+    '초안으로 저장하거나 바로 공개할 수 있습니다',
+  ]);
+  useEffect(() => {
+    let cancelled = false;
+    fetchGuidePageContent('kpa-society', 'content.document.editor').then((sections) => {
+      if (cancelled) return;
+      const raw = sections['page-help'];
+      if (!raw) return;
+      try {
+        const obj = JSON.parse(raw);
+        if (obj?.title) setGuideTitle(obj.title);
+        if (obj?.description) setGuideDesc(obj.description);
+        if (Array.isArray(obj?.steps)) setGuideSteps(obj.steps);
+      } catch { /* keep fallback */ }
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
 
   // Load existing content for edit mode
   useEffect(() => {
@@ -117,6 +145,14 @@ export function ContentWritePage() {
       <h1 style={styles.pageTitle}>
         {isEditMode ? '콘텐츠 수정' : '콘텐츠 작성'}
       </h1>
+
+      {/* WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1: content.document.editor */}
+      <GuideBlock
+        variant="info"
+        title={guideTitle}
+        description={guideDesc}
+        steps={guideSteps}
+      />
 
       <div style={styles.card}>
         {/* Title */}

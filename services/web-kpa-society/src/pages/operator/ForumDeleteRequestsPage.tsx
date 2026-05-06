@@ -22,6 +22,9 @@ import { ActionBar, BulkResultModal } from '@o4o/ui';
 import { DataTable, useBatchAction } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { forumOperatorApi } from '../../api/forum';
+// WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1
+import { GuideBlock } from '@o4o/shared-space-ui';
+import { fetchGuidePageContent } from '../../api/guideContent';
 
 type DeleteRequestStatus = 'pending' | 'approved' | 'rejected';
 
@@ -68,6 +71,31 @@ export default function ForumDeleteRequestsPage() {
   // Selection & V3 batch
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const batch = useBatchAction();
+
+  // WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1: forum.request.management guide
+  const [guideTitle, setGuideTitle] = useState('포럼 삭제 요청을 검토합니다.');
+  const [guideDesc, setGuideDesc] = useState('포럼 소유자의 삭제 요청을 승인하거나 반려하세요.');
+  const [guideSteps, setGuideSteps] = useState([
+    '대기 중인 요청을 확인합니다',
+    '요청 상세를 열어 사유를 검토합니다',
+    '승인하면 포럼이 삭제되고, 반려하면 요청이 종료됩니다',
+    '일괄 처리로 여러 요청을 한 번에 승인할 수 있습니다',
+  ]);
+  useEffect(() => {
+    let cancelled = false;
+    fetchGuidePageContent('kpa-society', 'forum.request.management').then((sections) => {
+      if (cancelled) return;
+      const raw = sections['page-help'];
+      if (!raw) return;
+      try {
+        const obj = JSON.parse(raw);
+        if (obj?.title) setGuideTitle(obj.title);
+        if (obj?.description) setGuideDesc(obj.description);
+        if (Array.isArray(obj?.steps)) setGuideSteps(obj.steps);
+      } catch { /* keep fallback */ }
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     loadRequests();
@@ -248,6 +276,14 @@ export default function ForumDeleteRequestsPage() {
           </div>
         )}
       </div>
+
+      {/* WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1: forum.request.management */}
+      <GuideBlock
+        variant="info"
+        title={guideTitle}
+        description={guideDesc}
+        steps={guideSteps}
+      />
 
       {/* Status Filter */}
       <div className="flex gap-2">

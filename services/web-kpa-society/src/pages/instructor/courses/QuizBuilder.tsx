@@ -12,6 +12,8 @@ import {
   type QuizQuestionDraft,
   type QuizQuestionType,
 } from '../../../api/lms-instructor';
+// WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1
+import { GuideBlock } from '@o4o/shared-space-ui';
 
 /* ── styles ── */
 const q: Record<string, React.CSSProperties> = {
@@ -187,6 +189,19 @@ export default function QuizBuilder({ lessonId, courseId, lessonTitle }: Props) 
   return (
     <div style={q.wrap}>
       <div style={q.sectionTitle}>퀴즈 설정 {quiz ? '(수정)' : '(신규)'}</div>
+      {/* WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1: lms.quiz.editor */}
+      <GuideBlock
+        variant="info"
+        title="퀴즈를 구성합니다."
+        description="통과 점수, 제한 시간을 설정한 뒤 문항을 추가하세요."
+        steps={[
+          '통과 점수와 제한 시간을 입력합니다',
+          '문항 추가 버튼으로 문제를 작성합니다',
+          '각 문항의 유형(단일/다중 선택)과 배점을 설정합니다',
+          '저장하면 수강자에게 퀴즈가 활성화됩니다',
+        ]}
+        compact
+      />
 
       {/* 기본 설정 */}
       <div style={q.settings}>

@@ -18,6 +18,9 @@ import { resourcesApi } from '../../api/resources';
 import { mediaApi } from '../../api/media';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
+// WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1
+import { GuideBlock } from '@o4o/shared-space-ui';
+import { fetchGuidePageContent } from '../../api/guideContent';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -60,6 +63,31 @@ export function ResourceWritePage() {
   const [uploadedFile, setUploadedFile] = useState<UploadedFile | null>(null);
   // WO-O4O-KPA-RESOURCES-USAGE-TYPE-V1: usage_type + 자동동기화 플래그
   const [usageType, setUsageType] = useState<UsageType>('DOWNLOAD'); // file 모드 기본
+
+  // WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1: content.resource.editor guide
+  const [guideTitle, setGuideTitle] = useState('자료를 등록합니다.');
+  const [guideDesc, setGuideDesc] = useState('활용 방식을 선택하고 필요한 항목을 입력한 뒤 저장하세요.');
+  const [guideSteps, setGuideSteps] = useState([
+    '자료 활용 방식을 선택합니다 (읽기/링크/다운로드/복사)',
+    '자료 제목과 설명을 입력합니다',
+    '방식에 따라 파일, URL, 또는 본문을 입력합니다',
+    '저장합니다',
+  ]);
+  useEffect(() => {
+    let cancelled = false;
+    fetchGuidePageContent('kpa-society', 'content.resource.editor').then((sections) => {
+      if (cancelled) return;
+      const raw = sections['page-help'];
+      if (!raw) return;
+      try {
+        const obj = JSON.parse(raw);
+        if (obj?.title) setGuideTitle(obj.title);
+        if (obj?.description) setGuideDesc(obj.description);
+        if (Array.isArray(obj?.steps)) setGuideSteps(obj.steps);
+      } catch { /* keep fallback */ }
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
   const [_autoSyncUsageType, setAutoSyncUsageType] = useState(true);
   // WO-O4O-KPA-RESOURCES-DATA-GUARD-AND-RETEST-V1: LINK 타입 외부 URL
   const [externalUrl, setExternalUrl] = useState('');
@@ -253,6 +281,14 @@ export function ResourceWritePage() {
       <h1 style={styles.pageTitle}>
         {isEditMode ? '자료 수정' : '자료 등록'}
       </h1>
+
+      {/* WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1: content.resource.editor */}
+      <GuideBlock
+        variant="info"
+        title={guideTitle}
+        description={guideDesc}
+        steps={guideSteps}
+      />
 
       <div style={styles.card}>
         {/* Mode tabs 제거: usage_type 선택이 입력 방식을 결정함 (WO-O4O-KPA-RESOURCES-DATA-GUARD-AND-RETEST-V1) */}
