@@ -34,6 +34,7 @@ COPY packages/error-handling/package.json ./packages/error-handling/
 COPY packages/account-ui/package.json ./packages/account-ui/
 COPY packages/content-editor/package.json ./packages/content-editor/
 COPY packages/lms-client/package.json ./packages/lms-client/
+COPY packages/store-products-ui/package.json ./packages/store-products-ui/
 
 # Copy service package.json
 COPY services/web-k-cosmetics/package.json ./services/web-k-cosmetics/
@@ -60,6 +61,7 @@ COPY packages/error-handling/ ./packages/error-handling/
 COPY packages/account-ui/ ./packages/account-ui/
 COPY packages/content-editor/ ./packages/content-editor/
 COPY packages/lms-client/ ./packages/lms-client/
+COPY packages/store-products-ui/ ./packages/store-products-ui/
 
 # Copy service source
 COPY services/web-k-cosmetics/ ./services/web-k-cosmetics/

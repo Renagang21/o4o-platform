@@ -43,6 +43,7 @@ COPY packages/shortcodes/package.json ./packages/shortcodes/
 COPY packages/utils/package.json ./packages/utils/
 COPY packages/account-ui/package.json ./packages/account-ui/
 COPY packages/lms-client/package.json ./packages/lms-client/
+COPY packages/store-products-ui/package.json ./packages/store-products-ui/
 
 # Copy service package.json
 COPY services/web-kpa-society/package.json ./services/web-kpa-society/
@@ -78,6 +79,7 @@ COPY packages/shortcodes/ ./packages/shortcodes/
 COPY packages/utils/ ./packages/utils/
 COPY packages/account-ui/ ./packages/account-ui/
 COPY packages/lms-client/ ./packages/lms-client/
+COPY packages/store-products-ui/ ./packages/store-products-ui/
 
 # Copy service source
 COPY services/web-kpa-society/ ./services/web-kpa-society/
