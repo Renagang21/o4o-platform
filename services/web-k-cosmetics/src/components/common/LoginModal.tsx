@@ -223,7 +223,7 @@ export default function LoginModal() {
             <button
               type="button"
               disabled={isSubmitting}
-              onClick={() => handleQuickLogin('store-owner-k-cosmetics@o4o.com', 'O4oTestPass')}
+              onClick={() => handleQuickLogin('store-owner-kcosmetics@o4o.com', 'O4oTestPass@1')}
               style={styles.quickLoginBtn}
             >
               🏪 매장 경영자
