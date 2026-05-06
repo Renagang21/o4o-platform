@@ -24,6 +24,10 @@ export type { GuideBlockProps, GuideBlockVariant } from './GuideBlock';
 /* WO-O4O-GUIDE-CLIENT-EXTRACTION-V1: guide_contents API client + GuideEditableSection (Base) */
 export * from './guide-client';
 
+/* WO-O4O-STANDARD-HOME-TEMPLATE-V1: 공통 Home 레이아웃 (KPA/GlycoPharm/K-Cosmetics) */
+export { StandardHomeTemplate } from './StandardHomeTemplate';
+export type { StandardHomeTemplateProps } from './StandardHomeTemplate';
+
 /* HUB page templates */
 export { LmsHubTemplate } from './LmsHubTemplate';
 export type { LmsHubCourse, LmsHubFetchParams, LmsHubConfig } from './LmsHubTemplate';

@@ -10,6 +10,7 @@
  * WO-SHARED-SPACE-COMPONENT-SPLIT-V1: 공통 컴포넌트 적용
  * WO-KPA-HOME-STRUCTURE-REFINEMENT-V1: 홈 구조 정리 (4블록 허브)
  * WO-KPA-COMMUNITY-ACCESS-GATE-V1: 비로그인 사용자 서비스 카드 클릭 시 로그인 유도
+ * WO-O4O-STANDARD-HOME-TEMPLATE-V1: StandardHomeTemplate 적용
  *
  * 섹션 구조 (3블록):
  * ├─ HeroBannerSection        — 동적 광고 캐러셀 (KPA 고유)
@@ -20,19 +21,16 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { HeroBannerSection } from '@o4o/shared-space-ui';
+import { PageHero, Card, useTemplate } from '@o4o/ui';
+import {
+  HeroBannerSection,
+  StandardHomeTemplate,
+} from '@o4o/shared-space-ui';
+import type { NoticeItem } from '@o4o/shared-space-ui';
 import { homeApi } from '../api/home';
 import type { HomePageData } from '../api/home';
 import { useAuth } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/LoginModalContext';
-import { PageHero, PageSection, PageContainer, Card, useTemplate } from '@o4o/ui';
-import {
-  NewsNoticesSection,
-  AppEntrySection,
-  CtaGuidanceSection,
-  O4OHelpSection,
-} from '@o4o/shared-space-ui';
-import type { NoticeItem } from '@o4o/shared-space-ui';
 
 // ─── Inline SVG Icons ──────────────────────────────────────
 
@@ -105,7 +103,6 @@ export function CommunityHomePage() {
       .finally(() => setLoading(false));
   }, []);
 
-  // ── Notice items ──
   const noticeItems: NoticeItem[] = (data?.notices ?? []).map((n) => ({
     id: n.id,
     title: n.title,
@@ -114,11 +111,13 @@ export function CommunityHomePage() {
     href: `/content/${n.id}`,
   }));
 
+  const iconCls = `flex items-center justify-center shrink-0 ${tpl?.icon?.wrapper ?? ''} ${tpl?.icon?.icon ?? 'text-primary'}`;
+
   return (
-    <div style={styles.page}>
-      {/* 1. Hero 배너 (동적 광고 캐러셀 — KPA 고유) */}
-      <PageHero>
-        <HeroBannerSection
+    <StandardHomeTemplate
+      heroSlot={
+        <PageHero>
+          <HeroBannerSection
             ads={data?.heroAds ?? []}
             fallback={{
               badge: '약사/약국 서비스',
@@ -126,122 +125,73 @@ export function CommunityHomePage() {
               subtitle: '약사 커뮤니티와 약국 경영 서비스를 한 곳에서',
             }}
           />
-      </PageHero>
-
-      {/* 2. 공지 / 약사공론 뉴스 (2-column) */}
-      <PageSection>
-        <PageContainer>
-          <div className="flex flex-col md:flex-row gap-4">
-            {/* Left: 공지사항 */}
-            <div className="flex-1 min-w-0">
-              <NewsNoticesSection
-                title="공지"
-                items={noticeItems}
-                loading={loading}
-                accentColor="var(--color-primary)"
-                accentBg="var(--color-primary-light, #eff6ff)"
-              />
-            </div>
-            {/* Right: 약사공론 뉴스 Placeholder */}
-            <div className="flex-1 min-w-0">
-              <div style={twoColStyles.placeholderHeader}>
-                <h2 style={twoColStyles.placeholderTitle}>약사공론 뉴스</h2>
-              </div>
-              <Card style={twoColStyles.placeholderCard}>
-                <NewspaperIcon />
-                <p style={twoColStyles.placeholderText}>
-                  이 영역은 약사공론 뉴스가 표시될 예정입니다.
-                </p>
-                <a
-                  href="https://www.kpanews.co.kr"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={twoColStyles.placeholderLink}
-                >
-                  약사공론 바로가기 →
-                </a>
-              </Card>
-            </div>
+        </PageHero>
+      }
+      notices={noticeItems}
+      noticesLoading={loading}
+      noticesAccentBg="var(--color-primary-light, #eff6ff)"
+      noticesRightSlot={
+        <>
+          <div style={placeholderStyles.header}>
+            <h2 style={placeholderStyles.title}>약사공론 뉴스</h2>
           </div>
-        </PageContainer>
-      </PageSection>
-
-      {/* 4. 서비스 바로가기 (shared) */}
-      <PageSection>
-        <PageContainer>
-          <AppEntrySection
-            accentColor="var(--color-primary)"
-            onCardClick={handleCardClick}
-            cards={[
-              { title: '포럼', description: '동료 약사와 질문·토론으로 전문성을 높이세요', href: '/forum', icon: <span className={`flex items-center justify-center shrink-0 ${tpl?.icon?.wrapper ?? ''} ${tpl?.icon?.icon ?? 'text-primary'}`}><ForumIcon /></span> },
-              { title: '강의', description: '보수교육·세미나를 온라인으로 수강하세요', href: '/lms', icon: <span className={`flex items-center justify-center shrink-0 ${tpl?.icon?.wrapper ?? ''} ${tpl?.icon?.icon ?? 'text-primary'}`}><EducationIconSvg /></span> },
-              { title: '콘텐츠', description: '플랫폼 콘텐츠를 검색하고 활용하세요', href: '/content', icon: <span className={`flex items-center justify-center shrink-0 ${tpl?.icon?.wrapper ?? ''} ${tpl?.icon?.icon ?? 'text-primary'}`}><ContentIcon /></span> },
-              { title: '디지털 사이니지', description: '약국 디지털 미디어를 관리하세요', href: '/signage', icon: <span className={`flex items-center justify-center shrink-0 ${tpl?.icon?.wrapper ?? ''} ${tpl?.icon?.icon ?? 'text-primary'}`}><SignageIcon /></span> },
-              { title: '자료실', description: '자료를 저장하고 AI 작업에 활용하세요', href: '/resources', icon: <span className={`flex items-center justify-center shrink-0 ${tpl?.icon?.wrapper ?? ''} ${tpl?.icon?.icon ?? 'text-primary'}`}><ResourceLibraryIcon /></span> },
-            ]}
-          />
-        </PageContainer>
-      </PageSection>
-
-      {/* 5. Market Trial CTA (shared) */}
-      <PageSection>
-        <PageContainer>
-          <CtaGuidanceSection
-            title="유통 참여형 펀딩 (Market Trial)"
-            description="서비스 참여자와 함께 제품을 다듬고, 좋은 조건의 유통 환경을 만들어가는 참여형 프로그램"
-            href="https://neture.co.kr"
-            linkLabel="Neture에서 보기 →"
-            icon={<span>🧪</span>}
-            accentColor="var(--color-primary)"
-            accentBg="var(--color-primary-light, #eff6ff)"
-            external
-          />
-        </PageContainer>
-      </PageSection>
-
-      {/* 6. O4O 도움 + 다른 서비스 (shared) */}
-      <PageSection last>
-        <PageContainer>
-          <O4OHelpSection
-            currentServiceKey="kpa-society"
-            usageTitle="KPA-Society 이용 가이드"
-            usageItems={[
-              {
-                title: 'O4O 개요',
-                description: 'O4O 서비스 구조와 KPA-Society의 역할',
-                href: '/guide/intro',
-              },
-              {
-                title: '서비스 활용 방법',
-                description: '상품, 콘텐츠, 고객 응대 기반 매장 운영 방식',
-                href: '/guide/usage',
-              },
-              {
-                title: '기능별 이용 방법',
-                description: '포럼, 강의, 자료실, 매장 기능 구성',
-                href: '/guide/features',
-              },
-            ]}
-          />
-        </PageContainer>
-      </PageSection>
-    </div>
+          <Card style={placeholderStyles.card}>
+            <NewspaperIcon />
+            <p style={placeholderStyles.text}>이 영역은 약사공론 뉴스가 표시될 예정입니다.</p>
+            <a
+              href="https://www.kpanews.co.kr"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={placeholderStyles.link}
+            >
+              약사공론 바로가기 →
+            </a>
+          </Card>
+        </>
+      }
+      appEntryCards={[
+        { title: '포럼', description: '동료 약사와 질문·토론으로 전문성을 높이세요', href: '/forum', icon: <span className={iconCls}><ForumIcon /></span> },
+        { title: '강의', description: '보수교육·세미나를 온라인으로 수강하세요', href: '/lms', icon: <span className={iconCls}><EducationIconSvg /></span> },
+        { title: '콘텐츠', description: '플랫폼 콘텐츠를 검색하고 활용하세요', href: '/content', icon: <span className={iconCls}><ContentIcon /></span> },
+        { title: '디지털 사이니지', description: '약국 디지털 미디어를 관리하세요', href: '/signage', icon: <span className={iconCls}><SignageIcon /></span> },
+        { title: '자료실', description: '자료를 저장하고 AI 작업에 활용하세요', href: '/resources', icon: <span className={iconCls}><ResourceLibraryIcon /></span> },
+      ]}
+      appEntryOnCardClick={handleCardClick}
+      cta={{
+        title: '유통 참여형 펀딩 (Market Trial)',
+        description: '서비스 참여자와 함께 제품을 다듬고, 좋은 조건의 유통 환경을 만들어가는 참여형 프로그램',
+        href: 'https://neture.co.kr',
+        linkLabel: 'Neture에서 보기 →',
+        icon: <span>🧪</span>,
+        accentColor: 'var(--color-primary)',
+        accentBg: 'var(--color-primary-light, #eff6ff)',
+        external: true,
+      }}
+      help={{
+        currentServiceKey: 'kpa-society',
+        usageTitle: 'KPA-Society 이용 가이드',
+        usageItems: [
+          { title: 'O4O 개요', description: 'O4O 서비스 구조와 KPA-Society의 역할', href: '/guide/intro' },
+          { title: '서비스 활용 방법', description: '상품, 콘텐츠, 고객 응대 기반 매장 운영 방식', href: '/guide/usage' },
+          { title: '기능별 이용 방법', description: '포럼, 강의, 자료실, 매장 기능 구성', href: '/guide/features' },
+        ],
+      }}
+    />
   );
 }
 
-const twoColStyles: Record<string, React.CSSProperties> = {
-  placeholderHeader: {
-    marginBottom: 12,
-  },
-  placeholderTitle: {
+// ─── Notices Right Placeholder Styles ───────────────────────
+
+const placeholderStyles: Record<string, React.CSSProperties> = {
+  header: { marginBottom: 12 },
+  title: {
     fontSize: 18,
     fontWeight: 700,
     color: 'var(--color-text-primary, #1e293b)',
     margin: 0,
   },
-  placeholderCard: {
+  card: {
     backgroundColor: 'var(--color-bg-primary, #ffffff)',
-    /* borderRadius/shadow → Card 컴포넌트 template 자동 적용 */
     border: '1px solid var(--color-border-default, #e2e8f0)',
     padding: '48px 16px',
     display: 'flex',
@@ -250,25 +200,18 @@ const twoColStyles: Record<string, React.CSSProperties> = {
     justifyContent: 'center',
     minHeight: 200,
   },
-  placeholderText: {
+  text: {
     fontSize: '0.9375rem',
     fontWeight: 500,
     color: 'var(--color-text-secondary, #475569)',
     margin: '12px 0',
     textAlign: 'center',
   },
-  placeholderLink: {
+  link: {
     fontSize: '0.875rem',
     fontWeight: 600,
     color: 'var(--color-primary, #2563EB)',
     textDecoration: 'none',
-  },
-};
-
-const styles: Record<string, React.CSSProperties> = {
-  page: {
-    minHeight: '100vh',
-    backgroundColor: 'var(--color-bg-secondary, #f8fafc)',
   },
 };
 
