@@ -30,35 +30,28 @@ export interface NetureContextualNavItem extends GlobalHeaderNavItem {
   visibleWhen: 'supplier' | 'partner' | 'operator' | 'admin';
 }
 
-export const NETURE_CONTEXTUAL_NAV: NetureContextualNavItem[] = [
-  // 운영자/관리자 진입은 상단 공용 nav가 아닌 유저 드롭다운으로만 제공
-  // WO-O4O-OPERATOR-CONTEXTUAL-NAV-SEPARATION-V1
-];
+export const NETURE_CONTEXTUAL_NAV: NetureContextualNavItem[] = [];
 
 // ─── Filter Helper ───────────────────────────────────────────────────────────
 
 export interface NetureNavVisibility {
-  isAdmin: boolean;
-  isOperator: boolean;
+  isAdminOrOperator: boolean;
   isSupplier: boolean;
   isPartner: boolean;
 }
 
+// WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1
+// operator/admin은 모든 contextual nav를 본다.
 export function filterContextualNav(
   items: NetureContextualNavItem[],
   vis: NetureNavVisibility,
 ): GlobalHeaderNavItem[] {
+  if (vis.isAdminOrOperator) {
+    return items.map(({ label, href }) => ({ label, href }));
+  }
   return items
-    .map((item) => {
-      if (item.visibleWhen === 'operator' && vis.isAdmin) {
-        return { label: '관리자 콘솔', href: '/admin', visibleWhen: 'admin' as const };
-      }
-      return item;
-    })
     .filter((item) => {
       const cond = item.visibleWhen;
-      if (cond === 'admin') return vis.isAdmin;
-      if (cond === 'operator') return vis.isOperator;
       if (cond === 'supplier') return vis.isSupplier;
       if (cond === 'partner') return vis.isPartner;
       return false;

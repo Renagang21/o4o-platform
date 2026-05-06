@@ -12,7 +12,7 @@
  */
 
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Settings } from 'lucide-react';
+import { LayoutDashboard, Settings, Shield } from 'lucide-react';
 import { GlobalHeader, GlobalHeaderMenuItem } from '@o4o/ui';
 import { NotificationBell, useNotifications } from '@o4o/account-ui';
 import { notificationsApi, NOTIFICATION_SERVICE_KEY } from '../lib/api/notifications';
@@ -73,9 +73,9 @@ export function NetureGlobalHeader() {
   // 우선순위 기반 라벨 — roles[0]만 보면 Operator에게도 '사용자'가 표시될 수 있음
   const roleLabel = getNetureRoleLabel(user?.roles);
 
+  // WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1: operator/admin은 모든 메뉴를 본다
   const contextualNav = filterContextualNav(NETURE_CONTEXTUAL_NAV, {
-    isAdmin: !!isAdmin,
-    isOperator: !!isOperator,
+    isAdminOrOperator: !!(isAdmin || isOperator),
     isSupplier: !!isSupplier,
     isPartner: !!isPartner,
   });
@@ -120,7 +120,13 @@ export function NetureGlobalHeader() {
       }
       userMenuItems={
         <>
-          {hasDashboardRole && (
+          {/* WO-O4O-OPERATOR-MENU-COMMONIZATION-V1: 운영자·관리자는 전용 라벨, 그 외는 동적 라벨 */}
+          {isOperator && (
+            <GlobalHeaderMenuItem to={dashboardPath} icon={<Shield className="w-4 h-4" />}>
+              운영 대시보드
+            </GlobalHeaderMenuItem>
+          )}
+          {!isOperator && (isSupplier || isPartner) && (
             <GlobalHeaderMenuItem to={dashboardPath} icon={<LayoutDashboard className="w-4 h-4" />}>
               {roleLabel} 대시보드
             </GlobalHeaderMenuItem>

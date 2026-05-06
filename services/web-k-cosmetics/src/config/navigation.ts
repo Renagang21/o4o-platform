@@ -30,34 +30,28 @@ export interface KCosContextualNavItem extends GlobalHeaderNavItem {
 export const KCOS_CONTEXTUAL_NAV: KCosContextualNavItem[] = [
   { label: kcosmeticsConfig.terminology.myStoreLabel, href: '/store', visibleWhen: 'storeManager' },
   { label: '파트너', href: '/partner', visibleWhen: 'partner' },
-  // 운영자/관리자 진입은 상단 공용 nav가 아닌 유저 드롭다운으로만 제공
-  // WO-O4O-OPERATOR-CONTEXTUAL-NAV-SEPARATION-V1
 ];
 
 // ─── Filter Helper ───────────────────────────────────────────────────────────
 
 export interface KCosNavVisibility {
-  isAdmin: boolean;
-  isOperator: boolean;
+  isAdminOrOperator: boolean;
   isStoreManager: boolean;
   isPartner: boolean;
 }
 
+// WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1
+// operator/admin은 모든 contextual nav를 본다.
 export function filterContextualNav(
   items: KCosContextualNavItem[],
   vis: KCosNavVisibility,
 ): GlobalHeaderNavItem[] {
+  if (vis.isAdminOrOperator) {
+    return items.map(({ label, href }) => ({ label, href }));
+  }
   return items
-    .map((item) => {
-      if (item.visibleWhen === 'operator' && vis.isAdmin) {
-        return { label: '관리자 콘솔', href: '/admin', visibleWhen: 'admin' as const };
-      }
-      return item;
-    })
     .filter((item) => {
       const cond = item.visibleWhen;
-      if (cond === 'admin') return vis.isAdmin;
-      if (cond === 'operator') return vis.isOperator;
       if (cond === 'storeManager') return vis.isStoreManager;
       if (cond === 'partner') return vis.isPartner;
       return false;

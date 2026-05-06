@@ -31,38 +31,28 @@ export interface GlycoContextualNavItem extends GlobalHeaderNavItem {
 export const GLYCO_CONTEXTUAL_NAV: GlycoContextualNavItem[] = [
   { label: glycopharmConfig.terminology.storeHubLabel, href: '/store-hub', visibleWhen: 'pharmacyRelated' },
   { label: glycopharmConfig.terminology.myStoreLabel, href: '/store', visibleWhen: 'storeOwner' },
-  // 운영자/관리자 진입은 상단 공용 nav가 아닌 유저 드롭다운으로만 제공
-  // WO-O4O-OPERATOR-CONTEXTUAL-NAV-SEPARATION-V1
 ];
 
 // ─── Filter Helper ───────────────────────────────────────────────────────────
 
 export interface GlycoNavVisibility {
-  isAdmin: boolean;
-  isOperator: boolean;
+  isAdminOrOperator: boolean;
   isStoreOwner: boolean;
   isPharmacyRelated: boolean;
 }
 
-/**
- * 역할 조건에 따라 contextualNav를 필터링한다.
- * admin인 경우 "운영 대시보드"를 "관리자 콘솔" + /admin으로 교체.
- */
+// WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1
+// operator/admin은 모든 contextual nav를 본다.
 export function filterContextualNav(
   items: GlycoContextualNavItem[],
   vis: GlycoNavVisibility,
 ): GlobalHeaderNavItem[] {
+  if (vis.isAdminOrOperator) {
+    return items.map(({ label, href }) => ({ label, href }));
+  }
   return items
-    .map((item) => {
-      if (item.visibleWhen === 'operator' && vis.isAdmin) {
-        return { label: '관리자 콘솔', href: '/admin', visibleWhen: 'admin' as const };
-      }
-      return item;
-    })
     .filter((item) => {
       const cond = item.visibleWhen;
-      if (cond === 'admin') return vis.isAdmin;
-      if (cond === 'operator') return vis.isOperator;
       if (cond === 'storeOwner') return vis.isStoreOwner;
       if (cond === 'pharmacyRelated') return vis.isPharmacyRelated;
       return false;

@@ -39,3 +39,6 @@ export * from './form/index';
 export type { ServiceKey, ServiceConfig, ServiceTemplateKey } from './config/index.js';
 export { kpaConfig, glycopharmConfig, kcosmeticsConfig, serviceConfigMap } from './config/index.js';
 export { useServiceConfig } from './hooks/useServiceConfig.js';
+
+// Nav helpers (WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1)
+export { isAdminOrOperator } from './nav/index.js';

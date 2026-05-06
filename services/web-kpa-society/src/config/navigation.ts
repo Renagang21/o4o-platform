@@ -31,42 +31,31 @@ export interface KpaContextualNavItem extends GlobalHeaderNavItem {
 export const KPA_CONTEXTUAL_NAV: KpaContextualNavItem[] = [
   { label: kpaConfig.terminology.storeHubLabel, href: '/store-hub', visibleWhen: 'pharmacyRelated' },
   { label: kpaConfig.terminology.myStoreLabel, href: '/store', visibleWhen: 'storeOwner' },
-  // 운영자/관리자 진입은 상단 공용 nav가 아닌 유저 드롭다운(방패 아이콘)으로만 제공
-  // WO-KPA-OPERATOR-HEADER-HOME-LINK-ALIGNMENT-V1
 ];
 
 // ─── Filter Helper ───────────────────────────────────────────────────────────
 
 export interface KpaNavVisibility {
-  isAdmin: boolean;
-  isOperator: boolean;
+  isAdminOrOperator: boolean;
   isStoreOwner: boolean;
   isPharmacyRelated: boolean;
 }
 
-/**
- * 역할 조건에 따라 contextualNav를 필터링한다.
- * admin인 경우 "운영 대시보드"를 "관리자 콘솔" + /admin으로 교체.
- */
+// WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1
+// operator/admin은 모든 contextual nav를 본다.
 export function filterContextualNav(
   items: KpaContextualNavItem[],
   vis: KpaNavVisibility,
 ): GlobalHeaderNavItem[] {
+  if (vis.isAdminOrOperator) {
+    return items.map(({ label, href }) => ({ label, href }));
+  }
   return items
-    .map((item) => {
-      // admin이면 operator 메뉴를 admin 메뉴로 교체
-      if (item.visibleWhen === 'operator' && vis.isAdmin) {
-        return { label: '관리자 콘솔', href: '/admin', visibleWhen: 'admin' as const };
-      }
-      return item;
-    })
     .filter((item) => {
       const cond = item.visibleWhen;
-      if (cond === 'admin') return vis.isAdmin;
-      if (cond === 'operator') return vis.isOperator;
       if (cond === 'storeOwner') return vis.isStoreOwner;
       if (cond === 'pharmacyRelated') return vis.isPharmacyRelated;
       return false;
     })
-    .map(({ label, href }) => ({ label, href })); // strip visibleWhen
+    .map(({ label, href }) => ({ label, href }));
 }

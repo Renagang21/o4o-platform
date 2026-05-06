@@ -12,7 +12,7 @@
  */
 
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, UserCircle, Settings, GraduationCap } from 'lucide-react';
+import { LayoutDashboard, UserCircle, Settings, GraduationCap, Shield } from 'lucide-react';
 import { GlobalHeader, GlobalHeaderMenuItem } from '@o4o/ui';
 import { useAuth, getKCosmeticsDashboardRoute } from '@/contexts/AuthContext';
 import { useLoginModal } from '@/contexts/LoginModalContext';
@@ -59,9 +59,9 @@ export function KCosGlobalHeader() {
   );
   const showInstructor = isInstructor || isAdmin;
 
+  // WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1: operator/admin은 모든 메뉴를 본다
   const contextualNav = filterContextualNav(KCOS_CONTEXTUAL_NAV, {
-    isAdmin: !!isAdmin,
-    isOperator: !!isOperator,
+    isAdminOrOperator: !!(isAdmin || isOperator),
     isStoreManager: !!isAuthenticated,
     isPartner: !!isPartner,
   });
@@ -100,9 +100,16 @@ export function KCosGlobalHeader() {
               강의 대시보드
             </GlobalHeaderMenuItem>
           )}
-          <GlobalHeaderMenuItem to={dashboardPath} icon={<LayoutDashboard className="w-4 h-4" />}>
-            대시보드
-          </GlobalHeaderMenuItem>
+          {/* WO-O4O-OPERATOR-MENU-COMMONIZATION-V1: 운영자 이상은 전용 라벨 표시 */}
+          {isOperator ? (
+            <GlobalHeaderMenuItem to={dashboardPath} icon={<Shield className="w-4 h-4" />}>
+              운영 대시보드
+            </GlobalHeaderMenuItem>
+          ) : (
+            <GlobalHeaderMenuItem to={dashboardPath} icon={<LayoutDashboard className="w-4 h-4" />}>
+              대시보드
+            </GlobalHeaderMenuItem>
+          )}
           <GlobalHeaderMenuItem to="/mypage" icon={<UserCircle className="w-4 h-4" />}>
             마이페이지
           </GlobalHeaderMenuItem>

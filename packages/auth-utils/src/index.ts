@@ -5,7 +5,7 @@ export { AUTH_ERROR_MESSAGES, resolveAuthError } from './errorMessages.js';
 export { ROLE_PRIORITY } from './rolePriority.js';
 export { ROLE_DASHBOARD_MAP } from './roleDashboardMap.js';
 export { getPrimaryDashboardRoute } from './getPrimaryDashboardRoute.js';
-export { hasRole, hasAnyRole } from './hasRole.js';
+export { hasRole, hasAnyRole, isOperatorOrAbove, isAdminOrAbove } from './hasRole.js';
 export { extractRoles } from './extractRoles.js';
 export type { ProfileConfig } from './profile-utils.js';
 export { PROFILE_MAP } from './profile-utils.js';

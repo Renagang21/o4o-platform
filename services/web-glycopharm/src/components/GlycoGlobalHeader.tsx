@@ -63,9 +63,9 @@ export function GlycoGlobalHeader() {
   const isPharmacy = isAuthenticated && user?.roles?.some((r: string) => isPharmacistRole(r));
 
   // contextualNav 필터링
+  // WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1: operator/admin은 모든 메뉴를 본다
   const contextualNav = filterContextualNav(GLYCO_CONTEXTUAL_NAV, {
-    isAdmin: !!isAdmin,
-    isOperator: !!isOperator,
+    isAdminOrOperator: !!(isAdmin || isOperator),
     isStoreOwner: !!isPharmacy,
     isPharmacyRelated: !!isPharmacy,
   });

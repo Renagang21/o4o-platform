@@ -15,6 +15,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { GraduationCap, LayoutDashboard, Settings, Shield } from 'lucide-react';
 import { GlobalHeader, GlobalHeaderMenuItem } from '@o4o/ui';
+import { isOperatorOrAbove, isAdminOrAbove } from '@o4o/auth-utils';
 import { useAuth, type User as UserType } from '../contexts';
 import { useAuthModal } from '../contexts/LoginModalContext';
 import {
@@ -62,17 +63,17 @@ export function KpaGlobalHeader() {
       .catch(() => { /* 실패 시 뱃지 숨김 */ });
   }, [user]);
 
-  // 역할 판정
-  const isAdmin = user ? user.roles.includes('kpa:admin') : false;
-  const isOperator = user ? user.roles.includes('kpa:operator') : false;
+  // 역할 판정 — WO-O4O-OPERATOR-MENU-COMMONIZATION-V1: platform:super_admin 포함
+  const isAdmin = user ? isAdminOrAbove(user.roles, 'kpa') : false;
+  const isOperator = user ? isOperatorOrAbove(user.roles, 'kpa') : false;
   const isInstructor = user ? user.roles.includes('lms:instructor') : false;
   const isStoreOwner = user?.isStoreOwner === true;
   const isPharmacyRelated = isStoreOwner || (user as any)?.activityType === 'pharmacy_owner';
 
   // contextualNav 필터링
+  // WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1: operator/admin은 모든 메뉴를 본다
   const contextualNav = filterContextualNav(KPA_CONTEXTUAL_NAV, {
-    isAdmin,
-    isOperator,
+    isAdminOrOperator: isAdmin || isOperator,
     isStoreOwner,
     isPharmacyRelated,
   });
