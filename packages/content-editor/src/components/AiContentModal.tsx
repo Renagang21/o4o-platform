@@ -280,9 +280,9 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
 
   const handleInsert = () => {
     if (!result) return;
-    // editor 가 있을 때는 기존처럼 setContent
+    // editor 가 있을 때는 setContent(html, true) — emitUpdate=true 로 onUpdate → onChange 트리거
     if (editor) {
-      editor.commands.setContent(result.html);
+      editor.commands.setContent(result.html, true);
     }
     // WO-O4O-LMS-LESSON-AI-ASSIST-V1: onInsert 가 있으면 외부 form state 로 결과 전달
     if (onInsert) {
