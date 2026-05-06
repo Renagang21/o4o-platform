@@ -372,9 +372,10 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | **Guide sectionKey Migration** | `docs/architecture/O4O-GUIDE-SECTIONKEY-MIGRATION-V1.md` |
 | **Guide Content Reseed** | `docs/architecture/O4O-GUIDE-CONTENT-RESEED-GUIDEBLOCK-V1.md` |
 | **GuideBlock 2차 적용 보고서** | `docs/architecture/O4O-GUIDE-BLOCK-SECOND-WAVE-REPORT-V1.md` |
+| **O4O 공통 Guide 시스템 v1 최종 보고서** | `docs/architecture/O4O-GUIDE-SYSTEM-FINAL-REPORT-V1.md` |
 
 ---
 
 *Updated: 2026-05-06*
-*Version: 8.2*
+*Version: 8.3*
 *Status: Active Constitution*
