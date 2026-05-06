@@ -10,7 +10,7 @@
  * 또는 URL을 입력하면 AI가 해당 페이지 콘텐츠를 HTML로 변환.
  * 결과를 에디터에 직접 삽입.
  *
- * - 인증: credentials: 'include' (쿠키 기반, 별도 토큰 prop 불필요)
+ * - 인증: credentials: 'include' (쿠키 기반 fallback) + aiRequestHeaders prop (Bearer 토큰 등 명시 주입)
  * - 삽입: editor.commands.setContent(html) → TipTap onUpdate → onChange 자동 트리거
  * - 모드: 고객용 문장 정리 / 짧게 요약 / POP용 정리 / 제목 추천
  */
@@ -39,6 +39,12 @@ interface AiContentModalProps {
    * - 기존 사용처(Toolbar)는 onInsert 미전달 — 영향 없음
    */
   onInsert?: (data: { html: string; title: string; sourceUrl?: string }) => void;
+  /**
+   * WO-O4O-CONTENT-EDITOR-AI-AUTH-HEADERS-V1: AI API 요청 추가 헤더.
+   * - Content-Type: application/json에 병합됨 (Authorization: Bearer 등)
+   * - 미제공 시 credentials: 'include' fallback만 사용
+   */
+  aiRequestHeaders?: Record<string, string>;
 }
 
 type AiMode = 'customer_rewrite' | 'summary' | 'pop' | 'title_suggest';
@@ -131,7 +137,7 @@ function blocksToHtml(blocks: UrlBlock[]): string {
     .join('\n');
 }
 
-export function AiContentModal({ open, onClose, editor, onInsert }: AiContentModalProps) {
+export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeaders }: AiContentModalProps) {
   // 기존 text 모드 상태
   const [input, setInput] = useState('');
   const [mode, setMode] = useState<AiMode>('customer_rewrite');
@@ -175,7 +181,7 @@ export function AiContentModal({ open, onClose, editor, onInsert }: AiContentMod
     try {
       const response = await fetch(`${API_BASE_URL}/api/ai/content`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...aiRequestHeaders },
         credentials: 'include',
         body: JSON.stringify({
           input: input.trim(),
@@ -219,7 +225,7 @@ export function AiContentModal({ open, onClose, editor, onInsert }: AiContentMod
     try {
       const response = await fetch(`${API_BASE_URL}/api/ai/url-to-blocks`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...aiRequestHeaders },
         credentials: 'include',
         body: JSON.stringify({
           url: urlInput.trim(),

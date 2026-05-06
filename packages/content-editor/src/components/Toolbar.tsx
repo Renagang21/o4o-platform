@@ -46,9 +46,11 @@ interface ToolbarProps {
   existingImages?: ExistingImage[];
   preset?: EditorPreset;
   onMediaLibraryPick?: (insertImage: (url: string) => void) => void;
+  /** WO-O4O-CONTENT-EDITOR-AI-AUTH-HEADERS-V1: AiContentModal로 전달할 AI API 추가 헤더 */
+  aiRequestHeaders?: Record<string, string>;
 }
 
-export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full', onMediaLibraryPick }: ToolbarProps) {
+export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full', onMediaLibraryPick, aiRequestHeaders }: ToolbarProps) {
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [showVideoInput, setShowVideoInput] = useState(false);
   const [showImageInput, setShowImageInput] = useState(false);
@@ -675,6 +677,7 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
       open={showAiModal}
       onClose={() => setShowAiModal(false)}
       editor={editor}
+      aiRequestHeaders={aiRequestHeaders}
     />
     {/* WO-O4O-AI-CONTENT-AUTOMATION-SCOPE-CLEANUP-V1:
         StoreUseModal 마운트 제거. 후속 WO에서 매장 활용 흐름을 복원할 때 다시 연결. */}

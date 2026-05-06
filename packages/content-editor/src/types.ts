@@ -58,6 +58,12 @@ export interface ContentEditorProps {
    *  공용 미디어 라이브러리 선택 콜백.
    *  호출 시 insertImage 함수를 받아 부모가 picker를 열고, 선택 완료 시 insertImage(url)로 에디터에 삽입. */
   onMediaLibraryPick?: (insertImage: (url: string) => void) => void;
+  /**
+   * WO-O4O-CONTENT-EDITOR-AI-AUTH-HEADERS-V1: AI API 요청 추가 헤더.
+   * - AI fetch 호출 시 headers에 병합됨 (Authorization: Bearer 등)
+   * - 미제공 시 credentials: 'include' fallback 유지
+   */
+  aiRequestHeaders?: Record<string, string>;
 }
 
 export interface ToolbarProps {
