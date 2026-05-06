@@ -13,7 +13,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { RichTextEditor } from '@o4o/content-editor';
 import { contentApi } from '../../api/content';
-import { useAuth, getServiceAccessToken } from '../../contexts/AuthContext';
+import { useAuth, getAccessToken } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
 // WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1
 import { GuideBlock } from '@o4o/shared-space-ui';
@@ -176,7 +176,7 @@ export function ContentWritePage() {
             placeholder="내용을 입력하세요"
             minHeight="300px"
             aiRequestHeaders={(() => {
-              const token = getServiceAccessToken();
+              const token = getAccessToken();
               return token ? { Authorization: `Bearer ${token}` } : undefined;
             })()}
           />
