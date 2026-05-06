@@ -370,9 +370,10 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | **Guide sectionKey 충돌 정책** | `docs/architecture/O4O-GUIDE-SECTIONKEY-CONFLICT-POLICY-V1.md` |
 | **Guide Schema Validation** | `docs/architecture/O4O-GUIDE-SCHEMA-VALIDATION-V1.md` |
 | **Guide sectionKey Migration** | `docs/architecture/O4O-GUIDE-SECTIONKEY-MIGRATION-V1.md` |
+| **Guide Content Reseed** | `docs/architecture/O4O-GUIDE-CONTENT-RESEED-GUIDEBLOCK-V1.md` |
 
 ---
 
 *Updated: 2026-05-06*
-*Version: 8.0*
+*Version: 8.1*
 *Status: Active Constitution*
