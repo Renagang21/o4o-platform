@@ -367,9 +367,10 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | **Operator Core Extraction Verify Checklist V1** | `docs/architecture/OPERATOR-CORE-EXTRACTION-VERIFY-CHECKLIST-V1.md` |
 | **GuideBlock 1차 적용 보고서** | `docs/architecture/O4O-GUIDE-BLOCK-1ST-WAVE-REPORT-V1.md` |
 | **GuideBlock 서비스 전체 적용 보고서** | `docs/architecture/O4O-GUIDE-BLOCK-SERVICE-WIDE-REPORT-V1.md` |
+| **Guide sectionKey 충돌 정책** | `docs/architecture/O4O-GUIDE-SECTIONKEY-CONFLICT-POLICY-V1.md` |
 
 ---
 
 *Updated: 2026-05-06*
-*Version: 7.7*
+*Version: 7.8*
 *Status: Active Constitution*
