@@ -164,7 +164,27 @@ export function HomePage() {
       {/* 5. O4O 도움 + 다른 서비스 (shared) */}
       <PageSection last>
         <PageContainer>
-          <O4OHelpSection currentServiceKey="k-cosmetics" />
+          <O4OHelpSection
+            currentServiceKey="k-cosmetics"
+            usageTitle="K-Cosmetics 이용 가이드"
+            usageItems={[
+              {
+                title: 'O4O 개요',
+                description: 'O4O 서비스 구조와 K-Cosmetics의 역할',
+                href: '/guide/intro',
+              },
+              {
+                title: '서비스 활용 방법',
+                description: '상품, 콘텐츠, 고객 응대 기반 매장 운영 방식',
+                href: '/guide/usage',
+              },
+              {
+                title: '기능별 이용 방법',
+                description: '포럼, 강의, 자료실, 매장 기능 구성',
+                href: '/guide/features',
+              },
+            ]}
+          />
         </PageContainer>
       </PageSection>
     </div>
