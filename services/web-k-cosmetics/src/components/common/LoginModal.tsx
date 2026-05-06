@@ -88,6 +88,28 @@ export default function LoginModal() {
     }
   };
 
+  const handleQuickLogin = async (email: string, pwd: string) => {
+    setError('');
+    setIsSubmitting(true);
+    try {
+      const result = await login(email, pwd);
+      if (!result.success) {
+        setError(result.error || '빠른 로그인에 실패했습니다.');
+        return;
+      }
+      closeLoginModal();
+      if (location.pathname === '/' || location.pathname === '/login') {
+        const dashboardPath = result.role ? getKCosmeticsDashboardRoute([result.role]) : '/';
+        if (dashboardPath !== '/') navigate(dashboardPath);
+      }
+      onLoginSuccess?.();
+    } catch (err: any) {
+      setError(err.message || '빠른 로그인에 실패했습니다.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleClose = () => {
     setEmail('');
     setPassword('');
@@ -193,6 +215,29 @@ export default function LoginModal() {
             )}
           </button>
         </form>
+
+        {/* 빠른 로그인 */}
+        <div style={styles.quickLoginSection}>
+          <p style={styles.quickLoginLabel}>테스트 계정으로 빠른 로그인</p>
+          <div style={styles.quickLoginGrid}>
+            <button
+              type="button"
+              disabled={isSubmitting}
+              onClick={() => handleQuickLogin('store-owner-k-cosmetics@o4o.com', 'O4oTestPass')}
+              style={styles.quickLoginBtn}
+            >
+              🏪 매장 경영자
+            </button>
+            <button
+              type="button"
+              disabled={isSubmitting}
+              onClick={() => handleQuickLogin('admin-k-cosmetics@o4o.com', 'O4oTestPass')}
+              style={styles.quickLoginBtn}
+            >
+              🛡️ 운영자
+            </button>
+          </div>
+        </div>
 
         {/* Footer Links */}
         <div style={styles.footer}>
@@ -383,6 +428,37 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '14px',
     color: '#64748b',
     cursor: 'pointer',
+  },
+  quickLoginSection: {
+    marginTop: '16px',
+    padding: '14px',
+    backgroundColor: '#f8fafc',
+    borderRadius: '12px',
+    border: '1px solid #e2e8f0',
+  },
+  quickLoginLabel: {
+    fontSize: '12px',
+    color: '#94a3b8',
+    fontWeight: 500,
+    marginBottom: '8px',
+    textAlign: 'center' as const,
+  },
+  quickLoginGrid: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: '8px',
+  },
+  quickLoginBtn: {
+    padding: '8px 12px',
+    backgroundColor: '#fff',
+    border: '1px solid #e2e8f0',
+    borderRadius: '8px',
+    fontSize: '13px',
+    fontWeight: 500,
+    color: '#475569',
+    cursor: 'pointer',
+    transition: 'border-color 0.2s, background-color 0.2s',
+    textAlign: 'center' as const,
   },
   footer: {
     marginTop: '24px',
