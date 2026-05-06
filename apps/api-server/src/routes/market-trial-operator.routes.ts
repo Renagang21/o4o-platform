@@ -27,6 +27,8 @@ export function createNetureOperatorTrialRoutes(): Router {
   router.use(requireNetureScope('neture:operator') as any);
 
   router.get('/', MarketTrialOperatorController.listAll);
+  // WO-NETURE-MARKET-TRIAL-ANALYTICS-AND-KPI-V1: aggregate KPI (literal path — must precede /:id)
+  router.get('/kpi', MarketTrialOperatorController.getKpi);
   // WO-MONITOR-1: 포럼 연계 실패 조회/resolve (리터럴 경로 — /:id 보다 앞에 위치)
   router.get('/forum-sync-failures', MarketTrialOperatorController.listForumSyncFailures);
   router.patch('/forum-sync-failures/:failureId/resolve', MarketTrialOperatorController.resolveForumSyncFailure);
@@ -103,6 +105,8 @@ export function createNetureOperatorTrialRoutes(): Router {
     }
   });
   router.get('/:id', MarketTrialOperatorController.getDetail);
+  // WO-NETURE-MARKET-TRIAL-ANALYTICS-AND-KPI-V1: per-trial KPI
+  router.get('/:id/kpi', MarketTrialOperatorController.getTrialKpi);
   // WO-MARKET-TRIAL-OPERATIONS-CONSOLIDATION-V1
   router.get('/:id/funnel', MarketTrialOperatorController.getFunnel);
   router.get('/:id/participants', MarketTrialOperatorController.listParticipants);
@@ -113,6 +117,8 @@ export function createNetureOperatorTrialRoutes(): Router {
   router.patch('/:id/participants/:participantId/conversion', MarketTrialOperatorController.updateParticipantConversionStatus);
   // WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1
   router.patch('/:id/participants/:participantId/settlement-status', MarketTrialOperatorController.updateParticipantSettlementStatus);
+  // WO-NETURE-MARKET-TRIAL-PAYMENT-READINESS-V1
+  router.patch('/:id/participants/:participantId/payment-status', MarketTrialOperatorController.updateParticipantPaymentStatus);
   // WO-MARKET-TRIAL-LISTING-AUTOLINK-V1
   router.post('/:id/participants/:participantId/listing', MarketTrialOperatorController.createListingFromParticipant);
   router.patch('/:id/status', MarketTrialOperatorController.updateTrialStatus);

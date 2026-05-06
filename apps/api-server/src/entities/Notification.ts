@@ -42,6 +42,15 @@ export type NotificationType =
   | 'lms.course_submitted'
   | 'lms.course_approved'
   | 'lms.course_rejected'
+  // WO-NETURE-MARKET-TRIAL-NOTIFICATION-INTEGRATION-V1: Market Trial lifecycle events
+  | 'market_trial.submitted'
+  | 'market_trial.approved'
+  | 'market_trial.rejected'
+  | 'market_trial.joined'
+  | 'market_trial.recruiting_success'
+  | 'market_trial.recruiting_failed'
+  | 'market_trial.outcome_confirming'
+  | 'market_trial.fulfilled'
   | 'custom';
 
 // Legacy interface for backward compatibility

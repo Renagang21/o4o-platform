@@ -21,12 +21,22 @@ import {
   MarketTrial,
   TrialStatus,
   MarketTrialForum,
+  PaymentStatus,
+  VALID_PAYMENT_STATUSES,
+  isPaymentStatus,
+  calculateAchievementRate,
+  calculateParticipationRate,
+  calculatePaymentCompletionRate,
+  calculateRecruitingRemainingDays,
+  calculateRecruitingProgressPercent,
 } from '@o4o/market-trial';
 import {
   MarketTrialForumSyncFailure,
   type ForumSyncStage,
   type ForumSyncSeverity,
 } from '../../extensions/trial-forum-monitor/entities/MarketTrialForumSyncFailure.entity.js';
+import { marketTrialNotification } from '../../services/marketTrial.notification.js';
+import logger from '../../utils/logger.js';
 
 // Allowed trial status transitions (operator-initiated)
 const ALLOWED_TRIAL_TRANSITIONS: Partial<Record<TrialStatus, TrialStatus[]>> = {
@@ -138,6 +148,62 @@ export class MarketTrialOperatorController {
     } catch (error) {
       console.error('Operator list trials error:', error);
       res.status(500).json({ success: false, message: 'Failed to list trials' });
+    }
+  }
+
+  /**
+   * GET /api/v1/neture/operator/market-trial/kpi
+   * WO-NETURE-MARKET-TRIAL-ANALYTICS-AND-KPI-V1:
+   *   Lightweight aggregate snapshot for the operator dashboard.
+   *
+   * Status semantics (per WO §6):
+   *   successfulTrials = closeReason='auto_target_reached'
+   *                      OR status IN (development, outcome_confirming, fulfilled)
+   *   failedTrials     = closeReason='auto_target_missed'
+   *   closedTrials     = status='closed' (post-recruit, regardless of outcome)
+   *   successRate      = successfulTrials / (successfulTrials + failedTrials)
+   *
+   * Payment analytics (per WO §7) — payment lifecycle only, settlement excluded.
+   *
+   * All counts are SQL aggregates (single round-trip, no N+1).
+   * No new index is required — existing (status), (status, fundingEndAt),
+   * and (marketTrialId, paymentStatus) indexes cover the queries.
+   */
+  static async getKpi(req: AuthRequest, res: Response) {
+    try {
+      const ds = MarketTrialOperatorController.dataSource;
+      if (!ds) {
+        return res.status(500).json({ success: false, message: 'DataSource not initialized' });
+      }
+      const data = await computeKpiSnapshot(ds, { supplierId: null });
+      res.json({ success: true, data });
+    } catch (error) {
+      console.error('Operator KPI error:', error);
+      res.status(500).json({ success: false, message: 'Failed to compute KPI' });
+    }
+  }
+
+  /**
+   * GET /api/v1/neture/operator/market-trial/:id/kpi
+   * Per-trial operational KPI for the operator detail screen.
+   * Returned separately from /:id (detail) so the detail call stays light.
+   */
+  static async getTrialKpi(req: AuthRequest, res: Response) {
+    try {
+      const { id } = req.params;
+      const ds = MarketTrialOperatorController.dataSource;
+      if (!ds) {
+        return res.status(500).json({ success: false, message: 'DataSource not initialized' });
+      }
+      const trial = await MarketTrialOperatorController.trialRepo.findOne({ where: { id } });
+      if (!trial) {
+        return res.status(404).json({ success: false, message: 'Trial not found' });
+      }
+      const data = await computeTrialKpi(ds, trial);
+      res.json({ success: true, data });
+    } catch (error) {
+      console.error('Operator trial KPI error:', error);
+      res.status(500).json({ success: false, message: 'Failed to compute trial KPI' });
     }
   }
 
@@ -301,6 +367,10 @@ export class MarketTrialOperatorController {
         }
       }
 
+      // WO-NETURE-MARKET-TRIAL-NOTIFICATION-INTEGRATION-V1: notify supplier of approval.
+      // Idempotent at the call site — status precondition above blocks repeats.
+      void marketTrialNotification.onApproved(trial, (req as any).user?.id);
+
       res.json({
         success: true,
         data: toOperatorTrialDTO(trial),
@@ -334,6 +404,9 @@ export class MarketTrialOperatorController {
 
       trial.status = TrialStatus.CLOSED;
       await MarketTrialOperatorController.trialRepo.save(trial);
+
+      // WO-NETURE-MARKET-TRIAL-NOTIFICATION-INTEGRATION-V1: notify supplier of rejection.
+      void marketTrialNotification.onRejected(trial, reason, (req as any).user?.id);
 
       res.json({
         success: true,
@@ -469,6 +542,13 @@ export class MarketTrialOperatorController {
         conditions.push(`p."settlementStatus" = $${params.length}`);
       }
 
+      // WO-NETURE-MARKET-TRIAL-PAYMENT-READINESS-V1: payment filter support
+      if (req.query.paymentStatus && typeof req.query.paymentStatus === 'string'
+        && isPaymentStatus(req.query.paymentStatus)) {
+        params.push(req.query.paymentStatus);
+        conditions.push(`COALESCE(p."paymentStatus", 'unpaid') = $${params.length}`);
+      }
+
       const rows: Array<{
         id: string;
         participantName: string;
@@ -489,6 +569,15 @@ export class MarketTrialOperatorController {
         settlementProductQty: number | null;
         settlementRemainder: string | null;
         settlementNote: string | null;
+        // WO-NETURE-MARKET-TRIAL-PAYMENT-READINESS-V1
+        paymentStatus: string;
+        paymentMethod: string | null;
+        paymentProvider: string | null;
+        paymentReference: string | null;
+        paidAmount: string | null;
+        paidAt: Date | null;
+        confirmedAt: Date | null;
+        paymentNote: string | null;
         updatedAt: Date;
       }> = await ds.query(
         `SELECT
@@ -514,6 +603,14 @@ export class MarketTrialOperatorController {
            p."settlementProductQty",
            p."settlementRemainder",
            p."settlementNote",
+           COALESCE(p."paymentStatus", 'unpaid') AS "paymentStatus",
+           p."paymentMethod",
+           p."paymentProvider",
+           p."paymentReference",
+           p."paidAmount",
+           p."paidAt",
+           p."confirmedAt",
+           p."paymentNote",
            p."updatedAt"
          FROM market_trial_participants p
          LEFT JOIN users u ON u.id = p."participantId"
@@ -598,6 +695,15 @@ export class MarketTrialOperatorController {
               settlementProductQty: r.settlementProductQty ?? null,
               settlementRemainder: r.settlementRemainder != null ? Number(r.settlementRemainder) : null,
               settlementNote: r.settlementNote || null,
+              // WO-NETURE-MARKET-TRIAL-PAYMENT-READINESS-V1
+              paymentStatus: r.paymentStatus,
+              paymentMethod: r.paymentMethod || null,
+              paymentProvider: r.paymentProvider || null,
+              paymentReference: r.paymentReference || null,
+              paidAmount: r.paidAmount != null ? Number(r.paidAmount) : null,
+              paidAt: r.paidAt ? new Date(r.paidAt).toISOString() : null,
+              confirmedAt: r.confirmedAt ? new Date(r.confirmedAt).toISOString() : null,
+              paymentNote: r.paymentNote || null,
               updatedAt: new Date(r.updatedAt).toISOString(),
             };
           }),
@@ -748,6 +854,146 @@ export class MarketTrialOperatorController {
     } catch (error) {
       console.error('Update participant settlement status error:', error);
       res.status(500).json({ success: false, message: 'Failed to update settlement status' });
+    }
+  }
+
+  /**
+   * PATCH /api/v1/neture/operator/market-trial/:id/participants/:participantId/payment-status
+   * WO-NETURE-MARKET-TRIAL-PAYMENT-READINESS-V1:
+   *   Operator updates a participant's payment lifecycle state. PG integration is
+   *   out of scope for this WO — the endpoint is the manual reconciliation entry
+   *   point and the future PG webhook target.
+   *
+   *   Body (all optional except paymentStatus):
+   *     paymentStatus     : 'unpaid' | 'pending' | 'paid' | 'failed' | 'canceled' | 'refunded'
+   *     paymentMethod     : free-form (recommended: 'manual_transfer')
+   *     paymentProvider   : free-form (recommended: 'internal' for manual)
+   *     paymentReference  : PG tx id or transfer memo
+   *     paidAmount        : decimal
+   *     paidAt            : ISO datetime
+   *     confirmedAt       : ISO datetime (omit to auto-stamp on PAID)
+   *     paymentNote       : operator memo
+   *
+   *   Lifecycle policy:
+   *     - No transition matrix is enforced — operator may correct mistakes by
+   *       moving back to UNPAID, etc. WO §5: payment changes never auto-mutate
+   *       trial.status.
+   *     - When transitioning to PAID and confirmedAt is not supplied,
+   *       confirmedAt is auto-stamped to NOW() so the audit trail is preserved.
+   *
+   *   Future notification event point (NOT fired in this WO):
+   *     - PAID    → market_trial.payment_confirmed (supplier + participant)
+   *     - FAILED  → market_trial.payment_failed    (participant)
+   *     - REFUNDED → market_trial.refunded         (supplier + participant)
+   */
+  static async updateParticipantPaymentStatus(req: AuthRequest, res: Response) {
+    try {
+      const { id, participantId } = req.params;
+      const {
+        paymentStatus: newStatus,
+        paymentMethod,
+        paymentProvider,
+        paymentReference,
+        paidAmount,
+        paidAt,
+        confirmedAt,
+        paymentNote,
+      } = req.body ?? {};
+      const ds = MarketTrialOperatorController.dataSource;
+      if (!ds) {
+        return res.status(500).json({ success: false, message: 'DataSource not initialized' });
+      }
+
+      if (!isPaymentStatus(newStatus)) {
+        return res.status(400).json({
+          success: false,
+          message: `Invalid paymentStatus. Allowed: ${VALID_PAYMENT_STATUSES.join(', ')}`,
+        });
+      }
+
+      const trial = await MarketTrialOperatorController.trialRepo.findOne({ where: { id } });
+      if (!trial) {
+        return res.status(404).json({ success: false, message: 'Trial not found' });
+      }
+
+      const exists: Array<{ id: string }> = await ds.query(
+        `SELECT id FROM market_trial_participants WHERE id = $1 AND "marketTrialId" = $2`,
+        [participantId, id],
+      );
+      if (!exists || exists.length === 0) {
+        return res.status(404).json({ success: false, message: 'Participant not found for this trial' });
+      }
+
+      // Build the SET list dynamically so callers can omit fields they don't want
+      // to overwrite (e.g. update paymentStatus only without clearing paidAt).
+      const sets: string[] = [`"paymentStatus" = $1`];
+      const sqlParams: unknown[] = [newStatus];
+
+      const pushSet = (column: string, value: unknown, transform?: (v: any) => unknown) => {
+        if (value === undefined) return;
+        const idx = sqlParams.length + 1;
+        sets.push(`"${column}" = $${idx}`);
+        sqlParams.push(value === null ? null : transform ? transform(value) : value);
+      };
+
+      pushSet('paymentMethod', paymentMethod);
+      pushSet('paymentProvider', paymentProvider);
+      pushSet('paymentReference', paymentReference);
+      pushSet('paidAmount', paidAmount, (v) => Number(v));
+      pushSet('paidAt', paidAt, (v) => new Date(v));
+      pushSet('paymentNote', paymentNote);
+
+      // Auto-stamp confirmedAt on PAID transition unless caller supplies an explicit value.
+      if (confirmedAt !== undefined) {
+        pushSet('confirmedAt', confirmedAt, (v) => (v === null ? null : new Date(v)));
+      } else if (newStatus === PaymentStatus.PAID) {
+        const idx = sqlParams.length + 1;
+        sets.push(`"confirmedAt" = COALESCE("confirmedAt", $${idx})`);
+        sqlParams.push(new Date());
+      }
+
+      sets.push(`"updatedAt" = now()`);
+
+      const idIdx = sqlParams.length + 1;
+      const trialIdx = sqlParams.length + 2;
+      sqlParams.push(participantId, id);
+
+      const sql = `UPDATE market_trial_participants
+                   SET ${sets.join(', ')}
+                   WHERE id = $${idIdx} AND "marketTrialId" = $${trialIdx}
+                   RETURNING id, "paymentStatus", "paymentMethod", "paymentProvider",
+                             "paymentReference", "paidAmount", "paidAt", "confirmedAt",
+                             "paymentNote", "updatedAt"`;
+
+      const result = await ds.query(sql, sqlParams);
+      if (!result || result.length === 0) {
+        return res.status(404).json({ success: false, message: 'Participant not found' });
+      }
+
+      const row = result[0];
+      logger.info(
+        `[MarketTrialPayment] trial=${id} participant=${participantId} → paymentStatus=${row.paymentStatus} actor=${(req as any).user?.id ?? 'unknown'}`,
+      );
+
+      res.json({
+        success: true,
+        data: {
+          id: row.id,
+          paymentStatus: row.paymentStatus,
+          paymentMethod: row.paymentMethod || null,
+          paymentProvider: row.paymentProvider || null,
+          paymentReference: row.paymentReference || null,
+          paidAmount: row.paidAmount != null ? Number(row.paidAmount) : null,
+          paidAt: row.paidAt ? new Date(row.paidAt).toISOString() : null,
+          confirmedAt: row.confirmedAt ? new Date(row.confirmedAt).toISOString() : null,
+          paymentNote: row.paymentNote || null,
+          updatedAt: row.updatedAt ? new Date(row.updatedAt).toISOString() : null,
+        },
+        message: `결제 상태가 "${newStatus}"로 변경되었습니다.`,
+      });
+    } catch (error) {
+      console.error('Update participant payment status error:', error);
+      res.status(500).json({ success: false, message: 'Failed to update payment status' });
     }
   }
 
@@ -973,6 +1219,7 @@ export class MarketTrialOperatorController {
         });
       }
 
+      const previousStatus = trial.status;
       trial.status = newStatus as TrialStatus;
       await MarketTrialOperatorController.trialRepo.save(trial);
 
@@ -991,6 +1238,19 @@ export class MarketTrialOperatorController {
           );
           cascadeCount = result?.rowCount ?? result?.length ?? 0;
         }
+      }
+
+      // WO-NETURE-MARKET-TRIAL-NOTIFICATION-INTEGRATION-V1: lifecycle notifications on operator transition.
+      // Idempotent at the call site — ALLOWED_TRIAL_TRANSITIONS check above blocks repeats.
+      // Note: cron handles the typical RECRUITING → DEVELOPMENT/CLOSED path; this branch covers
+      //       a rare operator-initiated early DEVELOPMENT (success-only — there's no manual recruiting_failed path).
+      const actorId = (req as any).user?.id;
+      if (previousStatus === TrialStatus.RECRUITING && newStatus === TrialStatus.DEVELOPMENT) {
+        void marketTrialNotification.onRecruitingResult(trial.id, true, actorId);
+      } else if (newStatus === TrialStatus.OUTCOME_CONFIRMING) {
+        void marketTrialNotification.onOutcomeConfirming(trial.id, actorId);
+      } else if (newStatus === TrialStatus.FULFILLED) {
+        void marketTrialNotification.onFulfilled(trial.id, actorId);
       }
 
       res.json({
@@ -1405,4 +1665,209 @@ function toOperatorTrialDTO(trial: MarketTrial) {
     updatedAt: new Date(trial.updatedAt).toISOString(),
   };
 }
+
+// ============================================================================
+// WO-NETURE-MARKET-TRIAL-ANALYTICS-AND-KPI-V1: KPI aggregation helpers
+// ============================================================================
+
+export interface MarketTrialKpiSnapshot {
+  totalTrials: number;
+  recruitingTrials: number;
+  developmentTrials: number;
+  outcomeConfirmingTrials: number;
+  fulfilledTrials: number;
+  closedTrials: number;
+  successfulTrials: number;
+  failedTrials: number;
+  successRate: number | null;
+  totalParticipants: number;
+  totalRecruitingAmount: number;
+  totalPaidAmount: number;
+  paidParticipantCount: number;
+  refundCount: number;
+  paymentCompletionRate: number | null;
+  averageAchievementRate: number | null;
+}
+
+/**
+ * Compute the operator/supplier KPI snapshot in two SQL aggregates.
+ * Pass supplierId=null for the operator-wide view, or a uuid to scope the
+ * counts to one supplier (used by the supplier dashboard).
+ */
+async function computeKpiSnapshot(
+  ds: DataSource,
+  opts: { supplierId: string | null },
+): Promise<MarketTrialKpiSnapshot> {
+  const where = opts.supplierId ? `WHERE "supplierId" = $1` : '';
+  const params = opts.supplierId ? [opts.supplierId] : [];
+
+  // Trial-level aggregate — single round-trip, indexed scan on (status), (supplierId).
+  const trialAgg: Array<{
+    total: number;
+    recruiting: number;
+    development: number;
+    outcome_confirming: number;
+    fulfilled: number;
+    closed: number;
+    successful: number;
+    failed: number;
+    total_participants: number;
+    total_recruiting_amount: string;
+    avg_achievement_rate: string | null;
+  }> = await ds.query(
+    `SELECT
+       COUNT(*)::int AS total,
+       COUNT(*) FILTER (WHERE status = 'recruiting')::int AS recruiting,
+       COUNT(*) FILTER (WHERE status = 'development')::int AS development,
+       COUNT(*) FILTER (WHERE status = 'outcome_confirming')::int AS outcome_confirming,
+       COUNT(*) FILTER (WHERE status = 'fulfilled')::int AS fulfilled,
+       COUNT(*) FILTER (WHERE status = 'closed')::int AS closed,
+       COUNT(*) FILTER (
+         WHERE status IN ('development', 'outcome_confirming', 'fulfilled')
+            OR "closeReason" = 'auto_target_reached'
+       )::int AS successful,
+       COUNT(*) FILTER (WHERE "closeReason" = 'auto_target_missed')::int AS failed,
+       COALESCE(SUM("currentParticipants"), 0)::int AS total_participants,
+       COALESCE(SUM("currentAmount"), 0)::numeric AS total_recruiting_amount,
+       AVG(
+         CASE WHEN "targetAmount" > 0
+              THEN ("currentAmount" / "targetAmount") * 100
+              ELSE NULL
+         END
+       )::numeric AS avg_achievement_rate
+     FROM market_trials
+     ${where}`,
+    params,
+  );
+
+  // Participant-level aggregate — joined to market_trials only when scoping by supplier.
+  const participantAgg: Array<{
+    total_paid_amount: string;
+    paid_count: number;
+    refund_count: number;
+    participant_total: number;
+  }> = opts.supplierId
+    ? await ds.query(
+        `SELECT
+           COALESCE(SUM(p."paidAmount"), 0)::numeric AS total_paid_amount,
+           COUNT(*) FILTER (WHERE p."paymentStatus" = 'paid')::int AS paid_count,
+           COUNT(*) FILTER (WHERE p."paymentStatus" = 'refunded')::int AS refund_count,
+           COUNT(*)::int AS participant_total
+         FROM market_trial_participants p
+         INNER JOIN market_trials t ON t.id = p."marketTrialId"
+         WHERE t."supplierId" = $1`,
+        [opts.supplierId],
+      )
+    : await ds.query(
+        `SELECT
+           COALESCE(SUM("paidAmount"), 0)::numeric AS total_paid_amount,
+           COUNT(*) FILTER (WHERE "paymentStatus" = 'paid')::int AS paid_count,
+           COUNT(*) FILTER (WHERE "paymentStatus" = 'refunded')::int AS refund_count,
+           COUNT(*)::int AS participant_total
+         FROM market_trial_participants`,
+      );
+
+  const t = trialAgg[0];
+  const p = participantAgg[0];
+
+  const successful = Number(t?.successful ?? 0);
+  const failed = Number(t?.failed ?? 0);
+  const successDenom = successful + failed;
+  const successRate = successDenom > 0
+    ? Math.round((successful / successDenom) * 1000) / 10
+    : null;
+
+  const avgRaw = t?.avg_achievement_rate;
+  const avgAch = avgRaw == null ? null : Math.round(Number(avgRaw) * 10) / 10;
+
+  const paidCount = Number(p?.paid_count ?? 0);
+  const participantTotal = Number(p?.participant_total ?? 0);
+  const paymentCompletionRate = calculatePaymentCompletionRate(paidCount, participantTotal);
+
+  return {
+    totalTrials: Number(t?.total ?? 0),
+    recruitingTrials: Number(t?.recruiting ?? 0),
+    developmentTrials: Number(t?.development ?? 0),
+    outcomeConfirmingTrials: Number(t?.outcome_confirming ?? 0),
+    fulfilledTrials: Number(t?.fulfilled ?? 0),
+    closedTrials: Number(t?.closed ?? 0),
+    successfulTrials: successful,
+    failedTrials: failed,
+    successRate,
+    totalParticipants: Number(t?.total_participants ?? 0),
+    totalRecruitingAmount: Number(t?.total_recruiting_amount ?? 0),
+    totalPaidAmount: Number(p?.total_paid_amount ?? 0),
+    paidParticipantCount: paidCount,
+    refundCount: Number(p?.refund_count ?? 0),
+    paymentCompletionRate,
+    averageAchievementRate: avgAch,
+  };
+}
+
+export interface MarketTrialDetailKpi {
+  trialId: string;
+  status: string;
+  achievementRate: number | null;
+  participationRate: number | null;
+  participantCount: number;
+  paidParticipantCount: number;
+  unpaidParticipantCount: number;
+  failedPaymentCount: number;
+  refundCount: number;
+  paymentCompletionRate: number | null;
+  totalPaidAmount: number;
+  recruitingRemainingDays: number | null;
+  recruitingProgressPercent: number | null;
+  closeReason: string | null;
+}
+
+/**
+ * Per-trial KPI: combines the trial's denormalized counters with one
+ * participant-level aggregate. Used by /:id/kpi.
+ */
+async function computeTrialKpi(
+  ds: DataSource,
+  trial: MarketTrial,
+): Promise<MarketTrialDetailKpi> {
+  const rows: Array<{
+    total: number;
+    paid: number;
+    unpaid: number;
+    failed: number;
+    refunded: number;
+    paid_amount: string;
+  }> = await ds.query(
+    `SELECT
+       COUNT(*)::int AS total,
+       COUNT(*) FILTER (WHERE "paymentStatus" = 'paid')::int AS paid,
+       COUNT(*) FILTER (WHERE "paymentStatus" = 'unpaid')::int AS unpaid,
+       COUNT(*) FILTER (WHERE "paymentStatus" = 'failed')::int AS failed,
+       COUNT(*) FILTER (WHERE "paymentStatus" = 'refunded')::int AS refunded,
+       COALESCE(SUM("paidAmount"), 0)::numeric AS paid_amount
+     FROM market_trial_participants
+     WHERE "marketTrialId" = $1`,
+    [trial.id],
+  );
+  const r = rows[0] ?? { total: 0, paid: 0, unpaid: 0, failed: 0, refunded: 0, paid_amount: '0' };
+
+  return {
+    trialId: trial.id,
+    status: trial.status,
+    achievementRate: calculateAchievementRate(trial.currentAmount, trial.targetAmount),
+    participationRate: calculateParticipationRate(trial.currentParticipants, trial.maxParticipants ?? null),
+    participantCount: Number(r.total),
+    paidParticipantCount: Number(r.paid),
+    unpaidParticipantCount: Number(r.unpaid),
+    failedPaymentCount: Number(r.failed),
+    refundCount: Number(r.refunded),
+    paymentCompletionRate: calculatePaymentCompletionRate(Number(r.paid), Number(r.total)),
+    totalPaidAmount: Number(r.paid_amount),
+    recruitingRemainingDays: calculateRecruitingRemainingDays(trial.fundingEndAt),
+    recruitingProgressPercent: calculateRecruitingProgressPercent(trial.fundingStartAt, trial.fundingEndAt),
+    closeReason: trial.closeReason ?? null,
+  };
+}
+
+/** Re-exported for the supplier-side controller in marketTrialController.ts. */
+export { computeKpiSnapshot, computeTrialKpi };
 

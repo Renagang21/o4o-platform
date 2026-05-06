@@ -30,6 +30,8 @@ import {
   TrialStatus,
 } from '@o4o/market-trial';
 import { MarketTrialService } from '@o4o/market-trial';
+import { marketTrialNotification } from '../../services/marketTrial.notification.js';
+import { computeKpiSnapshot } from './marketTrialOperatorController.js';
 
 /** Trial 참여 가능 상태 목록 */
 const JOINABLE_STATUSES: TrialStatus[] = [
@@ -615,6 +617,10 @@ export class MarketTrialController {
       await MarketTrialController.trialRepo.update(id, {
         currentParticipants: () => '"currentParticipants" + 1',
       });
+
+      // WO-NETURE-MARKET-TRIAL-NOTIFICATION-INTEGRATION-V1: notify participant of join.
+      // Idempotent at the call site — duplicate-participation check above (line ~588) blocks repeats.
+      void marketTrialNotification.onJoined(trial, userId);
 
       res.status(201).json({
         success: true,

@@ -20,6 +20,7 @@ import {
   updateParticipantRewardStatus,
   updateParticipantConversionStatus,
   updateParticipantSettlementStatus,
+  updateParticipantPaymentStatus,
   createListingFromTrialParticipant,
   updateTrialStatus,
   convertTrialToProduct,
@@ -34,7 +35,9 @@ import type {
   ProductSearchItem,
   CustomerConversionStatus,
   SettlementStatus,
+  PaymentStatus,
 } from '../../api/trial';
+import { PAYMENT_STATUS_LABELS } from '../../api/trial';
 import { BaseTable } from '@o4o/ui';
 import type { O4OColumn } from '@o4o/ui';
 
@@ -79,6 +82,8 @@ export default function MarketTrialApprovalDetailPage() {
   const [creatingListingId, setCreatingListingId] = useState<string | null>(null);
   // WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1
   const [updatingSettlementId, setUpdatingSettlementId] = useState<string | null>(null);
+  // WO-NETURE-MARKET-TRIAL-PAYMENT-READINESS-V1
+  const [updatingPaymentId, setUpdatingPaymentId] = useState<string | null>(null);
   const [showStatusModal, setShowStatusModal] = useState(false);
   // WO-MARKET-TRIAL-PRODUCT-LINK-SEARCH-UI-V1
   const [showConvertModal, setShowConvertModal] = useState(false);
@@ -232,6 +237,35 @@ export default function MarketTrialApprovalDetailPage() {
       setError(err.response?.data?.message || err.message || '정산 상태 변경에 실패했습니다.');
     } finally {
       setUpdatingSettlementId(null);
+    }
+  };
+
+  // WO-NETURE-MARKET-TRIAL-PAYMENT-READINESS-V1: 운영자 결제 상태 갱신 (수기 송금 확인 / 환불 등).
+  // 추가 필드(reference/amount/note 등)는 caller가 input으로 넘김. 이 함수는 비즈니스 로직 없이 패스스루.
+  const handlePaymentStatusChange = async (
+    participant: TrialParticipant,
+    newStatus: PaymentStatus,
+    extra?: {
+      paymentMethod?: string | null;
+      paymentProvider?: string | null;
+      paymentReference?: string | null;
+      paidAmount?: number | null;
+      paidAt?: string | null;
+      paymentNote?: string | null;
+    },
+  ) => {
+    if (!id) return;
+    setUpdatingPaymentId(participant.id);
+    try {
+      await updateParticipantPaymentStatus(id, participant.id, {
+        paymentStatus: newStatus,
+        ...extra,
+      });
+      await loadParticipants(id, filter);
+    } catch (err: any) {
+      setError(err.response?.data?.message || err.message || '결제 상태 변경에 실패했습니다.');
+    } finally {
+      setUpdatingPaymentId(null);
     }
   };
 
@@ -427,6 +461,8 @@ export default function MarketTrialApprovalDetailPage() {
         trialConverted={!!trial.convertedProductId}
         onSettlementStatusChange={handleSettlementStatusChange}
         updatingSettlementId={updatingSettlementId}
+        onPaymentStatusChange={handlePaymentStatusChange}
+        updatingPaymentId={updatingPaymentId}
         trialStatus={trial.status}
       />
 
@@ -786,6 +822,19 @@ const OPERATOR_SETTLEMENT_NEXT: Partial<Record<SettlementStatus, { to: Settlemen
 // Trial 상태 기준 정산 섹션 표시 여부
 const SETTLEMENT_VISIBLE_STATUSES: TrialStatus[] = ['development', 'outcome_confirming', 'fulfilled', 'closed'];
 
+// WO-NETURE-MARKET-TRIAL-PAYMENT-READINESS-V1
+// 결제는 모집 시작 이후 어떤 단계에서도 수기 송금이 들어올 수 있어 정산보다 넓은 범위에서 노출.
+const PAYMENT_VISIBLE_STATUSES: TrialStatus[] = ['recruiting', 'development', 'outcome_confirming', 'fulfilled', 'closed'];
+
+const PAYMENT_STATUS_COLORS: Record<PaymentStatus, string> = {
+  unpaid:   'bg-gray-100 text-gray-600',
+  pending:  'bg-amber-100 text-amber-700',
+  paid:     'bg-green-100 text-green-700',
+  failed:   'bg-red-100 text-red-700',
+  canceled: 'bg-gray-200 text-gray-700',
+  refunded: 'bg-purple-100 text-purple-700',
+};
+
 function ParticipantSection({
   participants,
   totalCount,
@@ -802,6 +851,8 @@ function ParticipantSection({
   trialConverted,
   onSettlementStatusChange,
   updatingSettlementId,
+  onPaymentStatusChange,
+  updatingPaymentId,
   trialStatus,
 }: {
   participants: TrialParticipant[];
@@ -820,6 +871,20 @@ function ParticipantSection({
   // WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1
   onSettlementStatusChange: (p: TrialParticipant, s: SettlementStatus, note?: string) => void;
   updatingSettlementId: string | null;
+  // WO-NETURE-MARKET-TRIAL-PAYMENT-READINESS-V1
+  onPaymentStatusChange: (
+    p: TrialParticipant,
+    s: PaymentStatus,
+    extra?: {
+      paymentMethod?: string | null;
+      paymentProvider?: string | null;
+      paymentReference?: string | null;
+      paidAmount?: number | null;
+      paidAt?: string | null;
+      paymentNote?: string | null;
+    },
+  ) => void;
+  updatingPaymentId: string | null;
   trialStatus: TrialStatus;
 }) {
   const typeLabel = (t: string) => (t === 'seller' ? '판매자' : t === 'partner' ? '파트너' : t);
@@ -982,6 +1047,109 @@ function ParticipantSection({
               })}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* WO-NETURE-MARKET-TRIAL-PAYMENT-READINESS-V1: 결제(수기 송금/PG-ready) 상태 관리 섹션 */}
+      {PAYMENT_VISIBLE_STATUSES.includes(trialStatus) && totalCount > 0 && (
+        <div className="mt-4 border-t border-gray-100 pt-4">
+          <div className="flex items-center gap-2 mb-3">
+            <h3 className="text-sm font-semibold text-gray-700">결제 상태 관리</h3>
+            <span className="text-xs text-gray-500">PG 미연동 — 수기 송금 확인 위주</span>
+          </div>
+          <div className="overflow-x-auto -mx-4 sm:-mx-5">
+            <table className="w-full text-sm min-w-[820px]">
+              <thead>
+                <tr className="border-b border-gray-100">
+                  <th className="text-left py-2 px-4 text-xs font-medium text-gray-500">이름</th>
+                  <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">결제 상태</th>
+                  <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">방법</th>
+                  <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">금액</th>
+                  <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">결제일</th>
+                  <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">확인일</th>
+                  <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">메모</th>
+                  <th className="text-right py-2 px-4 text-xs font-medium text-gray-500">액션</th>
+                </tr>
+              </thead>
+              <tbody>
+                {participants.map((p) => {
+                  const ps = (p.paymentStatus ?? 'unpaid') as PaymentStatus;
+                  const isUpdating = updatingPaymentId === p.id;
+                  const fmtDate = (iso: string | null) =>
+                    iso ? new Date(iso).toLocaleDateString('ko-KR') : '-';
+                  return (
+                    <tr key={p.id} className="border-b border-gray-50 hover:bg-gray-50">
+                      <td className="py-2.5 px-4 text-gray-900 font-medium">{p.name}</td>
+                      <td className="py-2.5 px-2">
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${PAYMENT_STATUS_COLORS[ps]}`}>
+                          {PAYMENT_STATUS_LABELS[ps]}
+                        </span>
+                      </td>
+                      <td className="py-2.5 px-2 text-gray-700 text-xs">
+                        {p.paymentMethod === 'manual_transfer' ? '수기 송금' : (p.paymentMethod || '-')}
+                      </td>
+                      <td className="py-2.5 px-2 text-gray-700 text-xs">
+                        {p.paidAmount != null ? `${p.paidAmount.toLocaleString()}원` : '-'}
+                      </td>
+                      <td className="py-2.5 px-2 text-gray-700 text-xs">{fmtDate(p.paidAt)}</td>
+                      <td className="py-2.5 px-2 text-gray-700 text-xs">{fmtDate(p.confirmedAt)}</td>
+                      <td className="py-2.5 px-2 text-gray-600 text-xs max-w-[180px] truncate" title={p.paymentNote || ''}>
+                        {p.paymentNote || '-'}
+                      </td>
+                      <td className="py-2.5 px-4 text-right space-x-1">
+                        {ps === 'unpaid' || ps === 'pending' || ps === 'failed' ? (
+                          <button
+                            onClick={() => {
+                              const ref = window.prompt('송금 메모/참조 (선택, 예: 은행 입금번호)', p.paymentReference || '') ?? undefined;
+                              const amtStr = window.prompt('결제 금액 (원, 선택)', p.paidAmount != null ? String(p.paidAmount) : '');
+                              const amt = amtStr && amtStr.trim() !== '' ? Number(amtStr) : undefined;
+                              const note = window.prompt('운영자 메모 (선택)', p.paymentNote || '') ?? undefined;
+                              const nowIso = new Date().toISOString();
+                              onPaymentStatusChange(p, 'paid', {
+                                paymentMethod: 'manual_transfer',
+                                paymentProvider: 'internal',
+                                paymentReference: ref,
+                                paidAmount: Number.isFinite(amt) ? amt : undefined,
+                                paidAt: nowIso,
+                                paymentNote: note,
+                              });
+                            }}
+                            disabled={isUpdating}
+                            className="px-2.5 py-1 text-xs text-white bg-emerald-600 rounded hover:bg-emerald-700 disabled:opacity-50"
+                          >
+                            {isUpdating ? '...' : '수기 송금 확인'}
+                          </button>
+                        ) : ps === 'paid' ? (
+                          <>
+                            <button
+                              onClick={() => {
+                                const note = window.prompt('환불 사유 (선택)', '') ?? undefined;
+                                onPaymentStatusChange(p, 'refunded', { paymentNote: note });
+                              }}
+                              disabled={isUpdating}
+                              className="px-2.5 py-1 text-xs text-purple-700 border border-purple-200 rounded hover:bg-purple-50 disabled:opacity-50"
+                            >
+                              {isUpdating ? '...' : '환불'}
+                            </button>
+                            <button
+                              onClick={() => onPaymentStatusChange(p, 'unpaid')}
+                              disabled={isUpdating}
+                              className="px-2.5 py-1 text-xs text-gray-600 border border-gray-200 rounded hover:bg-gray-50 disabled:opacity-50"
+                              title="확인 취소 (운영자 실수 정정용)"
+                            >
+                              미결제로 되돌리기
+                            </button>
+                          </>
+                        ) : (
+                          <span className="text-xs text-gray-300">{PAYMENT_STATUS_LABELS[ps]}</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
