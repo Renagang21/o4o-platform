@@ -24,6 +24,7 @@ COPY packages/auth-utils/package.json ./packages/auth-utils/
 COPY packages/types/package.json ./packages/types/
 COPY packages/ui/package.json ./packages/ui/
 COPY packages/operator-core/package.json ./packages/operator-core/
+COPY packages/operator-core-ui/package.json ./packages/operator-core-ui/
 COPY packages/operator-ux-core/package.json ./packages/operator-ux-core/
 COPY packages/shared-space-ui/package.json ./packages/shared-space-ui/
 COPY packages/store-asset-policy-core/package.json ./packages/store-asset-policy-core/
@@ -49,6 +50,7 @@ COPY packages/auth-utils/ ./packages/auth-utils/
 COPY packages/types/ ./packages/types/
 COPY packages/ui/ ./packages/ui/
 COPY packages/operator-core/ ./packages/operator-core/
+COPY packages/operator-core-ui/ ./packages/operator-core-ui/
 COPY packages/operator-ux-core/ ./packages/operator-ux-core/
 COPY packages/shared-space-ui/ ./packages/shared-space-ui/
 COPY packages/store-asset-policy-core/ ./packages/store-asset-policy-core/
