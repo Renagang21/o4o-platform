@@ -365,9 +365,10 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | **Operator DataTable Policy V1** | `docs/architecture/OPERATOR-DATATABLE-POLICY-V1.md` |
 | **Operator Core Design V1** | `docs/architecture/OPERATOR-CORE-DESIGN-V1.md` |
 | **Operator Core Extraction Verify Checklist V1** | `docs/architecture/OPERATOR-CORE-EXTRACTION-VERIFY-CHECKLIST-V1.md` |
+| **GuideBlock 1차 적용 보고서** | `docs/architecture/O4O-GUIDE-BLOCK-1ST-WAVE-REPORT-V1.md` |
 
 ---
 
-*Updated: 2026-05-02*
-*Version: 7.5*
+*Updated: 2026-05-06*
+*Version: 7.6*
 *Status: Active Constitution*
