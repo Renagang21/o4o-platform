@@ -18,7 +18,6 @@ export const KCOS_PUBLIC_NAV: GlobalHeaderNavItem[] = [
   { label: '포럼', href: '/forum' },
   { label: '강의', href: '/lms' },
   { label: '자료실', href: '/resources' },
-  { label: kcosmeticsConfig.terminology.storeHubLabel, href: '/store-hub' },
 ];
 
 // ─── Contextual Nav ──────────────────────────────────────────────────────────
@@ -28,6 +27,7 @@ export interface KCosContextualNavItem extends GlobalHeaderNavItem {
 }
 
 export const KCOS_CONTEXTUAL_NAV: KCosContextualNavItem[] = [
+  { label: kcosmeticsConfig.terminology.storeHubLabel, href: '/store-hub', visibleWhen: 'storeManager' },
   { label: kcosmeticsConfig.terminology.myStoreLabel, href: '/store', visibleWhen: 'storeManager' },
   { label: '파트너', href: '/partner', visibleWhen: 'partner' },
 ];

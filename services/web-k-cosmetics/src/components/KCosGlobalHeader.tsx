@@ -59,10 +59,21 @@ export function KCosGlobalHeader() {
   );
   const showInstructor = isInstructor || isAdmin;
 
+  const isStoreManager = isAuthenticated && user?.roles?.some(
+    (r: string) =>
+      r === 'cosmetics:store_owner' ||
+      r === 'cosmetics:operator' ||
+      r === 'cosmetics:admin' ||
+      r === 'k-cosmetics:admin' ||
+      r === 'platform:admin' ||
+      r === 'platform:super_admin',
+  );
+
   // WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1: operator/admin은 모든 메뉴를 본다
+  // WO-KCOS-HEADER-ROLE-NAV-FIX-V1: storeManager는 역할 기반 판정 (cosmetics:store_owner 이상)
   const contextualNav = filterContextualNav(KCOS_CONTEXTUAL_NAV, {
     isAdminOrOperator: !!(isAdmin || isOperator),
-    isStoreManager: !!isAuthenticated,
+    isStoreManager: !!isStoreManager,
     isPartner: !!isPartner,
   });
 
