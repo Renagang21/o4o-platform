@@ -13,20 +13,18 @@
 import { useMemo, useCallback } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { OperatorShell } from '@o4o/ui';
+import { isAdminOrAbove } from '@o4o/auth-utils';
 import { useAuth } from '../../contexts/AuthContext';
 import { ENABLED_CAPABILITIES } from '../../config/operatorCapabilities';
 import { UNIFIED_MENU, filterMenuByRole } from '../../config/operatorMenuGroups';
-import { ROLES } from '../../lib/role-constants';
 import { KpaGlobalHeader } from '../KpaGlobalHeader';
 
 export default function KpaOperatorLayoutWrapper() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  // WO-KPA-OPERATOR-AUTH-QUICK-FIX-PHASE1-V1: kpa-society:admin → ROLES.KPA_ADMIN 상수 사용
-  const isAdmin = user?.roles?.some(
-    (r: string) => r === ROLES.KPA_ADMIN || r === ROLES.PLATFORM_SUPER_ADMIN,
-  ) ?? false;
+  // WO-O4O-OPERATOR-ROUTE-GUARD-COMMONIZATION-V1: 공통 helper 사용
+  const isAdmin = user ? isAdminOrAbove(user.roles, 'kpa') : false;
 
   const menuItems = useMemo(
     () => filterMenuByRole(UNIFIED_MENU, isAdmin),

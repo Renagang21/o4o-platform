@@ -6,8 +6,8 @@
  */
 
 import { Navigate, useLocation } from 'react-router-dom';
+import { isAdminOrAbove } from '@o4o/auth-utils';
 import { useAuth } from '../../contexts/AuthContext';
-import { GLYCOPHARM_ROLES } from '../../contexts/AuthContext';
 
 interface RoleGuardProps {
   children: React.ReactNode;
@@ -66,11 +66,8 @@ export function OperatorRoute({ children, fallback = '/login' }: Omit<RoleGuardP
 
   if (!user) return <Navigate to="/" replace />;
 
-  // WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed role checks
-  const isAdmin = user.roles.some(r =>
-    r === GLYCOPHARM_ROLES.ADMIN ||
-    r === GLYCOPHARM_ROLES.PLATFORM_SUPER_ADMIN
-  );
+  // WO-O4O-OPERATOR-ROUTE-GUARD-COMMONIZATION-V1: 공통 helper 사용
+  const isAdmin = isAdminOrAbove(user.roles, 'glycopharm');
   const hasOperatorMembership = user.memberships?.some(
     m => m.serviceKey === SERVICE_KEY && m.status === 'active'
   );

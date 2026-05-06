@@ -31,10 +31,14 @@ export const ROLES = {
 
 // ─── 그룹 ──────────────────────────────────────
 
-/** 플랫폼 관리/운영 (kpa:admin + kpa:operator) */
+/** 플랫폼 관리/운영 (kpa:admin + kpa:operator + platform:super_admin)
+ * WO-O4O-OPERATOR-ROUTE-GUARD-COMMONIZATION-V1: platform:super_admin 추가
+ * — OperatorRoutes RoleGuard가 super_admin을 차단하는 버그 수정
+ */
 export const PLATFORM_ROLES = [
   ROLES.KPA_ADMIN,
   ROLES.KPA_OPERATOR,
+  ROLES.PLATFORM_SUPER_ADMIN,
 ] as const;
 
 /** 인트라넷 접근 = 플랫폼 역할 (분회 역할은 membershipRole로 체크) */

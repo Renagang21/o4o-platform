@@ -13,6 +13,7 @@
 import { useMemo } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { OperatorShell } from '@o4o/ui';
+import { isAdminOrAbove } from '@o4o/auth-utils';
 import { useAuth } from '../../contexts/AuthContext';
 import { ENABLED_CAPABILITIES } from '../../config/operatorCapabilities';
 import { UNIFIED_MENU, filterMenuByRole } from '../../config/operatorMenuGroups';
@@ -22,9 +23,8 @@ export default function OperatorLayoutWrapper() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const isAdmin = user?.roles?.some(
-    (r: string) => r === 'k-cosmetics:admin' || r === 'platform:super_admin',
-  ) ?? false;
+  // WO-O4O-OPERATOR-ROUTE-GUARD-COMMONIZATION-V1: 공통 helper 사용
+  const isAdmin = user ? isAdminOrAbove(user.roles, 'k-cosmetics') : false;
 
   const menuItems = useMemo(
     () => filterMenuByRole(UNIFIED_MENU, isAdmin),
