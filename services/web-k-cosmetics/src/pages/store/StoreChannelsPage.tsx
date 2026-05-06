@@ -58,7 +58,11 @@ import {
   type ChannelProduct,
   type AvailableProduct,
 } from '@/api/channelProducts';
-import { GuideEditableSection } from '@/components/guide';
+import { GuideEditableSection, GuideBlock } from '@o4o/shared-space-ui';
+import { fetchGuidePageContent } from '@/api/guideContent';
+
+const GUIDE_PAGE_KEY = 'store.channel.editor';
+const SERVICE_KEY_GUIDE = 'k-cosmetics';
 
 /* ─── Constants ──────────────────────────────── */
 
@@ -357,6 +361,28 @@ export function StoreChannelsPage() {
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [lastFetched, setLastFetched] = useState<Date | null>(null);
 
+  const [guideTitle, setGuideTitle] = useState<string | null>(null);
+  const [guideDesc, setGuideDesc] = useState<string | null>(null);
+  const [guideSteps, setGuideSteps] = useState<string[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchGuidePageContent(SERVICE_KEY_GUIDE, GUIDE_PAGE_KEY)
+      .then(sections => {
+        if (cancelled) return;
+        const raw = sections['page-help'];
+        if (!raw) return;
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed.title) setGuideTitle(parsed.title);
+          if (parsed.description) setGuideDesc(parsed.description);
+          if (Array.isArray(parsed.steps)) setGuideSteps(parsed.steps);
+        } catch { /* use fallback */ }
+      })
+      .catch(() => { /* use fallback */ });
+    return () => { cancelled = true; };
+  }, []);
+
   const showToast = useCallback((type: 'success' | 'error', message: string) => {
     setToast({ type, message });
     setTimeout(() => setToast(null), 4000);
@@ -593,6 +619,20 @@ export function StoreChannelsPage() {
           </button>
         </div>
       </div>
+
+      {/* GuideBlock */}
+      <GuideBlock
+        variant="info"
+        title={guideTitle ?? '채널별 진열을 설정합니다.'}
+        description={guideDesc ?? '온라인 스토어, 키오스크, 태블릿, 사이니지 채널별로 제품 진열과 콘텐츠 노출을 관리합니다.'}
+        steps={guideSteps ?? [
+          '채널 탭을 선택하여 해당 채널의 진열 상태를 확인합니다',
+          '제품 추가 버튼으로 채널에 상품을 등록합니다',
+          '순서 변경으로 진열 우선순위를 조정합니다',
+          '노출 자산 목록에서 채널별 콘텐츠 공개 상태를 관리합니다',
+        ]}
+        compact
+      />
 
       {/* [A] Channel Tabs */}
       <div className="border-b border-slate-200 mb-6">

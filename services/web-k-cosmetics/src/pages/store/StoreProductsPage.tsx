@@ -18,6 +18,11 @@ import {
   cosmeticsEventOfferApi,
   type EnrichedEventOffer,
 } from '@/api/eventOffer';
+import { GuideBlock } from '@o4o/shared-space-ui';
+import { fetchGuidePageContent } from '@/api/guideContent';
+
+const GUIDE_PAGE_KEY = 'store.product.management';
+const SERVICE_KEY = 'k-cosmetics';
 
 type TabKey = 'event-offers' | 'my-products';
 
@@ -55,6 +60,28 @@ export default function StoreProductsPage() {
   const [offers, setOffers] = useState<EnrichedEventOffer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [guideTitle, setGuideTitle] = useState<string | null>(null);
+  const [guideDesc, setGuideDesc] = useState<string | null>(null);
+  const [guideSteps, setGuideSteps] = useState<string[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchGuidePageContent(SERVICE_KEY, GUIDE_PAGE_KEY)
+      .then(sections => {
+        if (cancelled) return;
+        const raw = sections['page-help'];
+        if (!raw) return;
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed.title) setGuideTitle(parsed.title);
+          if (parsed.description) setGuideDesc(parsed.description);
+          if (Array.isArray(parsed.steps)) setGuideSteps(parsed.steps);
+        } catch { /* use fallback */ }
+      })
+      .catch(() => { /* use fallback */ });
+    return () => { cancelled = true; };
+  }, []);
 
   const loadOffers = useCallback(async () => {
     setLoading(true);
@@ -97,6 +124,19 @@ export default function StoreProductsPage() {
           승인된 이벤트 오퍼를 확인하고 매장에 추가 가능한 상품을 관리합니다.
         </p>
       </div>
+
+      {/* GuideBlock */}
+      <GuideBlock
+        variant="info"
+        title={guideTitle ?? '이벤트 오퍼와 주문 제품을 관리합니다.'}
+        description={guideDesc ?? '승인된 이벤트 오퍼를 확인하고 매장에 추가할 상품을 선택합니다.'}
+        steps={guideSteps ?? [
+          '이벤트 오퍼 탭에서 공급자가 제안한 상품을 확인합니다',
+          '승인·진행 중인 오퍼를 선택하여 매장에 추가합니다',
+          '내 주문 제품 탭에서 추가된 상품 목록을 관리합니다',
+        ]}
+        compact
+      />
 
       {/* Tabs */}
       <div className="flex gap-1 border-b border-slate-200">

@@ -17,6 +17,11 @@ import {
   type PendingListing,
   type EventOfferApiError,
 } from '../../api/eventOfferAdmin';
+import { GuideBlock } from '@o4o/shared-space-ui';
+import { fetchGuidePageContent } from '../../api/guideContent';
+
+const GUIDE_PAGE_KEY = 'event.offer.management';
+const SERVICE_KEY = 'k-cosmetics';
 
 const STATUS_MESSAGE = {
   toastApproved: (title: string) => `"${title}" 이(가) 승인되었습니다.`,
@@ -52,6 +57,28 @@ export default function EventOfferApprovalsPage() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<Record<string, boolean>>({});
   const [error, setError] = useState<string | null>(null);
+
+  const [guideTitle, setGuideTitle] = useState<string | null>(null);
+  const [guideDesc, setGuideDesc] = useState<string | null>(null);
+  const [guideSteps, setGuideSteps] = useState<string[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchGuidePageContent(SERVICE_KEY, GUIDE_PAGE_KEY)
+      .then(sections => {
+        if (cancelled) return;
+        const raw = sections['page-help'];
+        if (!raw) return;
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed.title) setGuideTitle(parsed.title);
+          if (parsed.description) setGuideDesc(parsed.description);
+          if (Array.isArray(parsed.steps)) setGuideSteps(parsed.steps);
+        } catch { /* use fallback */ }
+      })
+      .catch(() => { /* use fallback */ });
+    return () => { cancelled = true; };
+  }, []);
 
   const setRowLoading = (id: string, value: boolean) =>
     setActionLoading(prev => ({ ...prev, [id]: value }));
@@ -138,6 +165,20 @@ export default function EventOfferApprovalsPage() {
           새로고침
         </button>
       </div>
+
+      {/* GuideBlock */}
+      <GuideBlock
+        variant="info"
+        title={guideTitle ?? '이벤트 오퍼 승인 절차를 안내합니다.'}
+        description={guideDesc ?? '공급자가 제안한 이벤트 오퍼를 검토하고 K-Cosmetics 노출 여부를 결정합니다.'}
+        steps={guideSteps ?? [
+          '대기 중인 이벤트 오퍼 목록을 확인합니다',
+          '제품 정보·가격·기간 등 제안 내용을 검토합니다',
+          '승인 시 즉시 K-Cosmetics에 노출됩니다',
+          '반려 시 사유를 입력하면 공급자에게 전달됩니다',
+        ]}
+        compact
+      />
 
       {/* Error */}
       {error && (
