@@ -206,6 +206,8 @@ import { PlatformStoreSlugHistory } from '@o4o/platform-core/store-identity';
 // ============================================================================
 import { CatalogProduct } from '../modules/catalog/entities/catalog-product.entity.js';
 import { StoreProduct } from '../modules/store/entities/store-product.entity.js';
+// STORE LIBRARY ENTITY (WO-O4O-STORE-LIBRARY-FOUNDATION-V1)
+import { StoreLibraryItem } from '../routes/platform/entities/store-library-item.entity.js';
 
 // ============================================================================
 // NETURE ENTITIES (Phase P1: Read-Only Information Platform)
@@ -975,8 +977,9 @@ export const AppDataSource = new DataSource({
     MarketTrialFulfillment,
     MarketTrialForumSyncFailure,
     // ============================================================================
-    // STORE LIBRARY (WO-O4O-STORE-LIBRARY-FOUNDATION-V1) — merged into existing entry above
+    // STORE LIBRARY (WO-O4O-STORE-LIBRARY-FOUNDATION-V1)
     // ============================================================================
+    StoreLibraryItem,
     // ============================================================================
     // STORE AI ENTITIES (WO-O4O-STORE-HUB-AI-SUMMARY-V1)
     // ============================================================================
