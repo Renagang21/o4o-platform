@@ -345,14 +345,16 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   router.use('/me-context', createMeContextController(dataSource, coreRequireAuth as any));
 
   // Store Hub routes (WO-STORE-HUB-UNIFIED-RENDERING-PHASE1-V1)
-  router.use('/store-hub', createStoreHubController(dataSource, coreRequireAuth as any));
+  // WO-O4O-STORE-GUARD-PHASE2C-CONFIG-AND-HUB-V1: serviceKey='kpa' 전달.
+  router.use('/store-hub', createStoreHubController(dataSource, coreRequireAuth as any, 'kpa'));
 
   // Channel Product Management (WO-CHANNEL-EXECUTION-CONSOLE-V1)
   // WO-O4O-STORE-GUARD-PHASE2A-CHANNEL-AND-QR-V1: serviceKey='kpa' 전달.
   router.use('/store-hub/channel-products', createStoreChannelProductsController(dataSource, coreRequireAuth as any, 'kpa'));
 
   // Pharmacy Store Config routes (WO-PHARMACY-HUB-REALIGN-PHASEH2-V1)
-  router.use('/pharmacy/store', createPharmacyStoreConfigController(dataSource, coreRequireAuth as any));
+  // WO-O4O-STORE-GUARD-PHASE2C-CONFIG-AND-HUB-V1: serviceKey='kpa' 전달.
+  router.use('/pharmacy/store', createPharmacyStoreConfigController(dataSource, coreRequireAuth as any, 'kpa'));
 
   // Pharmacy Info routes (WO-KPA-PHARMACY-INFO-EDIT-FLOW-V1)
   router.use('/pharmacy', createPharmacyInfoController(dataSource, coreRequireAuth as any));

@@ -336,14 +336,16 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   // ============================================================================
 
   // Store Hub — Dashboard overview, channels, KPI, live signals
-  router.use('/store-hub', createStoreHubController(dataSource, coreRequireAuth as any));
+  // WO-O4O-STORE-GUARD-PHASE2C-CONFIG-AND-HUB-V1: serviceKey='glycopharm' 전달.
+  router.use('/store-hub', createStoreHubController(dataSource, coreRequireAuth as any, 'glycopharm'));
 
   // Channel Product Management — 채널별 상품 진열 관리
   // WO-O4O-STORE-GUARD-PHASE2A-CHANNEL-AND-QR-V1: serviceKey='glycopharm' 전달.
   router.use('/store-hub/channel-products', createStoreChannelProductsController(dataSource, coreRequireAuth as any, 'glycopharm'));
 
   // Pharmacy Store Config — 스토어프론트 설정
-  router.use('/pharmacy/store', createPharmacyStoreConfigController(dataSource, coreRequireAuth as any));
+  // WO-O4O-STORE-GUARD-PHASE2C-CONFIG-AND-HUB-V1: serviceKey='glycopharm' 전달.
+  router.use('/pharmacy/store', createPharmacyStoreConfigController(dataSource, coreRequireAuth as any, 'glycopharm'));
 
   // Pharmacy Products — 상품 채택/관리
   // WO-GLYCOPHARM-STORE-GUARD-SERVICE-AWARE-FIX-V1: serviceKey='glycopharm' 전달 →

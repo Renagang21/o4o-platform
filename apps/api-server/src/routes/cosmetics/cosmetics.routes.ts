@@ -96,7 +96,8 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
   // ============================================================================
 
   // Store Hub — Dashboard overview, channels, KPI, live signals
-  router.use('/store-hub', createStoreHubController(dataSource, coreRequireAuth as any));
+  // WO-O4O-STORE-GUARD-PHASE2C-CONFIG-AND-HUB-V1: serviceKey='cosmetics' 전달.
+  router.use('/store-hub', createStoreHubController(dataSource, coreRequireAuth as any, 'cosmetics'));
 
   // Channel Product Management — 채널별 상품 진열 관리
   // WO-O4O-STORE-GUARD-PHASE2A-CHANNEL-AND-QR-V1: serviceKey='cosmetics' 전달.

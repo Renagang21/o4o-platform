@@ -16,20 +16,25 @@ import { DataSource } from 'typeorm';
 import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 import { KpaAuditLog } from '../../kpa/entities/kpa-audit-log.entity.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
-import { createRequireStoreOwner } from '../../../utils/store-owner.utils.js';
+import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
 
 type AuthMiddleware = RequestHandler;
 
 export function createPharmacyStoreConfigController(
   dataSource: DataSource,
-  requireAuth: AuthMiddleware
+  requireAuth: AuthMiddleware,
+  // WO-O4O-STORE-GUARD-PHASE2C-CONFIG-AND-HUB-V1:
+  //   serviceKey 지정 시 해당 서비스의 store_owner role 만 통과 (cross-service leakage 차단).
+  //   미지정 시 기존 동작 유지 (back-compat).
+  serviceKey?: StoreOwnerServiceKey,
 ): Router {
   const router = Router();
   const orgRepo = dataSource.getRepository(OrganizationStore);
   const auditRepo = dataSource.getRepository(KpaAuditLog);
 
   // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반 middleware
-  const requireStoreOwner = createRequireStoreOwner(dataSource);
+  // WO-O4O-STORE-GUARD-PHASE2C-CONFIG-AND-HUB-V1: serviceKey 전파.
+  const requireStoreOwner = createRequireStoreOwner(dataSource, serviceKey);
 
   // GET /config — 매장 설정 조회
   router.get('/config', requireAuth, requireStoreOwner, asyncHandler(async (req: Request, res: Response) => {
