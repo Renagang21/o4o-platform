@@ -61,7 +61,9 @@ export function createStoreHubController(
 ): Router {
   const router = Router();
   const requirePharmacyOwner = createRequireStoreOwner(dataSource, serviceKey);
-  const optionalAuth = optionalStoreAuth(dataSource);
+  // WO-O4O-STORE-HUB-OPTIONAL-AUTH-MIGRATION-V1: serviceKey 전파 →
+  //   read-only GET endpoint 도 cross-service routing 차단 (req.organizationId 미설정).
+  const optionalAuth = optionalStoreAuth(dataSource, serviceKey);
 
   /**
    * GET /store-hub/overview
