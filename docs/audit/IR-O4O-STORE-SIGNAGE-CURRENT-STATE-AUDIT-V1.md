@@ -805,8 +805,8 @@ Step 4: Schedule/Forced Content 정책 문서화
 | 문서 | 역할 |
 |------|------|
 | `docs/kpa/IR-KPA-SIGNAGE-CURRENT-STATE-AUDIT-V1.md` | KPA 한정 현황 감사 (2026-04-16) |
-| `docs/kpa/WO-KPA-SIGNAGE-DEAD-CODE-RETIREMENT-PLAN-V1.md` | Dead code 제거 계획 |
-| `docs/kpa/WO-KPA-SIGNAGE-IA-RESTRUCTURE-DRAFT-V1.md` | KPA IA 재설계 초안 |
+| `docs/work-orders/WO-KPA-SIGNAGE-DEAD-CODE-RETIREMENT-PLAN-V1.md` | Dead code 제거 계획 |
+| `docs/work-orders/WO-KPA-SIGNAGE-IA-RESTRUCTURE-DRAFT-V1.md` | KPA IA 재설계 초안 |
 | `docs/architecture/O4O-BOUNDARY-POLICY-V1.md` | Boundary Policy (F6) |
 | `docs/architecture/SIGNAGE-APPROVAL-ARCHITECTURE-V1.md` | 승인 워크플로 설계 |
 
