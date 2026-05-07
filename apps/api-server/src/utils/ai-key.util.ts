@@ -25,9 +25,10 @@ const PROVIDER_ENV_KEYS: Record<string, string> = {
  * Returns empty string if no key is found. Caller decides how to handle.
  *
  * WO-O4O-AI-GEMINI-RESILIENCE-FIX-V1:
- *  - Column "isActive" must be quoted to match migration `1706000000000-CreateAISettings.ts`
- *    which created the column as camelCase ("isActive"). Unquoted `isactive` triggers
- *    `column "isactive" does not exist` (PG case-folds unquoted identifiers to lowercase).
+ *  - "apiKey" column: created with double-quotes in migration → must remain quoted.
+ *  - isactive column: created unquoted (lowercase) → must NOT be quoted.
+ *    Confirmed via production logs: `column "isActive" does not exist` when quoted.
+ *    store-ai.controller.ts uses `isactive` (unquoted) successfully as reference.
  *  - Surface DB lookup failures via logger.warn instead of swallowing silently.
  */
 export async function resolveAiApiKey(
@@ -38,7 +39,7 @@ export async function resolveAiApiKey(
   try {
     if (dataSource.isInitialized) {
       const rows = await dataSource.query(
-        `SELECT "apiKey" FROM ai_settings WHERE provider = $1 AND "isActive" = true LIMIT 1`,
+        `SELECT "apiKey" FROM ai_settings WHERE provider = $1 AND isactive = true LIMIT 1`,
         [provider],
       );
       if (rows[0]?.apiKey) {
