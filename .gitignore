@@ -124,5 +124,8 @@ bin/cloud_sql_proxy
 # Playwright MCP screenshots
 .playwright-mcp/
 
+# Per-machine MCP server config (paths/commands differ by host)
+.mcp.json
+
 # Local test accounts (browser verification — never commit)
 docs/local/*.local.md
