@@ -1055,6 +1055,8 @@ export class EventOfferService {
       decided_by: decidedBy,
       decided_at: decidedAt,
       rejected_reason: null,
+      // WO-O4O-GROUPBUY-LISTING-VIEWMODEL-PHASE1-V1: Store Listing source 식별자
+      source_type: 'event-offer',
     } as Partial<OrganizationProductListing>);
 
     const saved = await listingRepo.save(listing);
