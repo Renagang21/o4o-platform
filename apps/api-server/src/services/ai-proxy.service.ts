@@ -51,14 +51,18 @@ class AIProxyService {
   // WO-O4O-AI-GEMINI-RESILIENCE-FIX-V1: MAX_RETRIES 2→4, BASE_DELAY 1→2s
   // to absorb transient Gemini upstream 503 bursts (3–10s recovery window).
   // WO-O4O-AI-RETRY-COOLDOWN-FIX-V1: MAX_DELAY 20s→90s
-  // Gemini 429 recovery window is 60s+; 20s cap caused all retries to fail,
-  // wasting quota instead of waiting for the rate limit window to reset.
-  // Retry-After header path bypasses MAX_DELAY (calculateBackoff returns directly).
+  // WO-O4O-AI-429-QUOTA-WINDOW-RETRY-V1: RATE_LIMIT_MIN_DELAY 65s
+  // With MAX_RETRIES=4 the exponential sequence peaks at ~16s — never reaching
+  // Gemini's 60s+ quota recovery window. All 5 attempts hit the same rate-limit
+  // window and fail. Fix: enforce a 65s minimum cooldown for RATE_LIMIT_ERROR (429)
+  // so the next retry fires after the quota window has reset.
+  // Retry-After header takes precedence over both constants.
   private readonly DEFAULT_TIMEOUT = 120000; // 120 seconds
   private readonly MAX_RETRIES = 4; // 4 retries (5 total attempts)
   private readonly BASE_DELAY = 2000; // 2 seconds
-  private readonly MAX_DELAY = 90000; // 90 seconds — covers Gemini 60s+ recovery window
+  private readonly MAX_DELAY = 90000; // 90 seconds cap (for non-rate-limit errors)
   private readonly RETRY_FACTOR = 2;
+  private readonly RATE_LIMIT_MIN_DELAY = 65000; // 65s — clears Gemini 60s quota window
 
   private constructor() {
     // API keys are now loaded from database per-request
@@ -301,8 +305,8 @@ class AIProxyService {
           break;
         }
 
-        // Calculate backoff with jitter
-        const backoff = this.calculateBackoff(attempt, error.retryAfter);
+        // Calculate backoff with jitter — pass errorType for 429 special handling
+        const backoff = this.calculateBackoff(attempt, error.retryAfter, error.type);
 
         logger.warn('AI proxy retry', {
           requestId,
@@ -313,6 +317,7 @@ class AIProxyService {
           backoffMs: backoff,
           retryAfter: error.retryAfter ?? null,
           errorType: error.type,
+          rateLimitCooldown: error.type === 'RATE_LIMIT_ERROR' ? true : undefined,
           error: error.message,
         });
 
@@ -682,7 +687,7 @@ class AIProxyService {
         lastError = error;
         if (error.retryable === false) break;
         if (attempt === this.MAX_RETRIES) break;
-        const backoff = this.calculateBackoff(attempt, error.retryAfter);
+        const backoff = this.calculateBackoff(attempt, error.retryAfter, error.type);
         logger.warn('AI raw content retry', {
           requestId,
           provider: request.provider,
@@ -692,6 +697,7 @@ class AIProxyService {
           backoffMs: backoff,
           retryAfter: error.retryAfter ?? null,
           errorType: error.type,
+          rateLimitCooldown: error.type === 'RATE_LIMIT_ERROR' ? true : undefined,
           error: error.message,
         });
         await this.sleep(backoff);
@@ -842,22 +848,34 @@ class AIProxyService {
   }
 
   /**
-   * Calculate exponential backoff with jitter
+   * Calculate exponential backoff with jitter.
+   *
+   * WO-O4O-AI-429-QUOTA-WINDOW-RETRY-V1:
+   *   errorType='RATE_LIMIT_ERROR' → enforce RATE_LIMIT_MIN_DELAY (65s) minimum.
+   *   Rationale: exponential sequence with MAX_RETRIES=4 peaks at ~16s, which is
+   *   well below Gemini's 60s+ quota recovery window. Without a floor, all retries
+   *   land inside the same rate-limit window and fail. Retry-After header wins if
+   *   it specifies a longer delay.
+   *
+   *   Non-rate-limit errors continue to use the standard exponential + MAX_DELAY cap.
    */
-  private calculateBackoff(attempt: number, retryAfter?: number): number {
-    // If Retry-After is provided, use it
+  private calculateBackoff(attempt: number, retryAfter?: number, errorType?: string): number {
+    // Retry-After header takes highest precedence
     if (retryAfter) {
-      return retryAfter * 1000; // Convert to milliseconds
+      return retryAfter * 1000; // Convert seconds → milliseconds
     }
 
-    // Exponential backoff: baseDelay * (factor ^ attempt)
+    // Exponential backoff: baseDelay * (factor ^ attempt) with ±20% jitter
     const exponential = this.BASE_DELAY * Math.pow(this.RETRY_FACTOR, attempt);
-
-    // Add jitter (±20%)
     const jitter = exponential * (0.8 + Math.random() * 0.4);
+    const capped = Math.min(jitter, this.MAX_DELAY);
 
-    // Cap at max delay
-    return Math.min(jitter, this.MAX_DELAY);
+    // 429 rate-limit: enforce minimum cooldown to clear Gemini quota window
+    if (errorType === 'RATE_LIMIT_ERROR') {
+      return Math.max(capped, this.RATE_LIMIT_MIN_DELAY);
+    }
+
+    return capped;
   }
 
   /**
