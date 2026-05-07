@@ -616,7 +616,7 @@ export interface SignageHubConfig {
 |------|------|------|
 | `docs/platform/hub/HUB-UX-GUIDELINES-V1.md` | Operator Hub 화면 구조/카드/Signal 규칙 | 운영 허브 (이 문서와 별개) |
 | `docs/platform/hub/HUB-EXPLORATION-FREEZE-V1.md` | HubExplorationLayout 구조 동결 | 탐색(Market) 허브 동결 |
-| `docs/platform/hub/HUB-TABLE-STANDARD-ROLLOUT-COMPLETION-V1.md` | BaseTable + Selection 표준화 완료 보고 | HUB 테이블 구조 |
+| `docs/reports/HUB-TABLE-STANDARD-ROLLOUT-COMPLETION-V1.md` | BaseTable + Selection 표준화 완료 보고 | HUB 테이블 구조 |
 | `docs/o4o-common-structure.md` | Forum/LMS/Signage 공통 구조 원칙 | 상위 원칙 |
 | `CLAUDE.md` § 13 | O4O 공통 구조 원칙 | 상위 규칙 |
 | `CLAUDE.md` § 13-A | APP 표준화 (Baseline Lock) | APP Freeze 상태 |
