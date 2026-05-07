@@ -333,8 +333,8 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | Neture Partner Contract | `docs/baseline/NETURE-PARTNER-CONTRACT-FREEZE-V1.md` |
 | Design Core | `docs/rules/DESIGN-CORE-GOVERNANCE.md` |
 | Production Migration | `docs/baseline/operations/PRODUCTION-MIGRATION-STANDARD.md` |
-| Channel Execution Console | `docs/baseline/CHANNEL-EXECUTION-CONSOLE-V1.md` |
-| Channel Creation Flow | `docs/baseline/CHANNEL-CREATION-FLOW-SIMPLIFICATION-V1.md` |
+| Channel Execution Console | `docs/work-orders/WO-CHANNEL-EXECUTION-CONSOLE-V1.md` |
+| Channel Creation Flow | `docs/work-orders/WO-CHANNEL-CREATION-FLOW-SIMPLIFICATION-V1.md` |
 | Neture Distribution Engine | `docs/baseline/NETURE-DISTRIBUTION-ENGINE-FREEZE-V1.md` |
 | **Neture Domain Architecture** | `docs/baseline/NETURE-DOMAIN-ARCHITECTURE-FREEZE-V1.md` |
 | RBAC Freeze Declaration | `docs/rbac/RBAC-FREEZE-DECLARATION-V1.md` |
