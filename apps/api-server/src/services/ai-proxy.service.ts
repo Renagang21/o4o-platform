@@ -50,10 +50,14 @@ class AIProxyService {
   // Timeout and retry configuration
   // WO-O4O-AI-GEMINI-RESILIENCE-FIX-V1: MAX_RETRIES 2→4, BASE_DELAY 1→2s
   // to absorb transient Gemini upstream 503 bursts (3–10s recovery window).
+  // WO-O4O-AI-RETRY-COOLDOWN-FIX-V1: MAX_DELAY 20s→90s
+  // Gemini 429 recovery window is 60s+; 20s cap caused all retries to fail,
+  // wasting quota instead of waiting for the rate limit window to reset.
+  // Retry-After header path bypasses MAX_DELAY (calculateBackoff returns directly).
   private readonly DEFAULT_TIMEOUT = 120000; // 120 seconds
   private readonly MAX_RETRIES = 4; // 4 retries (5 total attempts)
   private readonly BASE_DELAY = 2000; // 2 seconds
-  private readonly MAX_DELAY = 20000; // 20 seconds
+  private readonly MAX_DELAY = 90000; // 90 seconds — covers Gemini 60s+ recovery window
   private readonly RETRY_FACTOR = 2;
 
   private constructor() {
