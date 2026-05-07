@@ -400,7 +400,7 @@ const baseColumns: ListColumnDef<SupplierProduct>[] = [
     resizable: true,
     render: (v: string[] | undefined | null) => {
       const display = getServiceDisplay(v);
-      if (!display) return <span className="text-[10px] text-slate-300">-</span>;
+      if (!display) return <span className="text-[10px] bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded font-medium" title="승인요청 전 상품 편집에서 서비스를 선택하세요">서비스 미설정</span>;
       return <span className="text-[10px] bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded font-medium">{display}</span>;
     },
   },
@@ -1155,7 +1155,8 @@ export default function SupplierProductsPage() {
                   if (noEligible > 0) parts.push(`${noEligible}건은 공급 정책(서비스 키)이 설정되지 않았습니다`);
                   if (alreadyDone > 0) parts.push(`${alreadyDone}건은 이미 승인 요청이 진행 중이거나 완료되었습니다`);
                   const reason = parts.length > 0 ? parts.join('. ') : '변경사항이 없습니다';
-                  showToast(`승인 요청된 상품이 없습니다. ${reason}.`);
+                  const guide = noEligible > 0 ? ' 상품 편집에서 서비스별 공급을 선택한 뒤 다시 승인요청해 주세요.' : '';
+                  showToast(`승인 요청된 상품이 없습니다. ${reason}.${guide}`);
                 } else if (d.submitted > 0) {
                   const tail: string[] = [];
                   if (skippedCount > 0) tail.push(`${skippedCount}건 건너뜀`);

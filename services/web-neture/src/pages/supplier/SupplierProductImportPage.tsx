@@ -692,6 +692,11 @@ export default function SupplierProductImportPage() {
                 </label>
               ))}
             </div>
+            {!o4oIsPublic && o4oServiceKeys.length === 0 && (
+              <p className="mt-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                서비스별 공급이 설정되지 않아 승인요청 대상이 아닙니다. 저장 후 상품 편집에서 추가할 수 있습니다.
+              </p>
+            )}
           </div>
 
           {/* 설정 요약 */}
