@@ -2,18 +2,13 @@ import { Repository } from 'typeorm';
 import { AppDataSource } from '../../database/connection.js';
 import { User } from '../../entities/User.js';
 import { LinkedAccount } from '../../entities/LinkedAccount.js';
-import { UserRole, UserStatus } from '../../types/auth.js';
 import type { AuthProvider } from '../../types/account-linking.js';
-import { hashPassword, comparePassword } from '../../utils/auth.utils.js';
 import { emailService } from '../email.service.js';
-import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
-import logger from '../../utils/logger.js';
 
 /**
  * AuthAccountInquiryService
  *
- * Account existence checks, provider queries, test accounts,
- * and find-id email.
+ * Account existence checks, provider queries, and find-id email.
  *
  * Extracted from AuthenticationService (WO-O4O-AUTHENTICATION-SERVICE-SPLIT-V1).
  */
@@ -73,86 +68,6 @@ export class AuthAccountInquiryService {
   }
 
   /**
-   * Get test accounts for development/staging
-   * Returns one user per role: admin, seller, supplier, partner, customer
-   * Auto-creates test accounts if they don't exist
-   */
-  async getTestAccounts(): Promise<Array<{ role: string; email: string; password: string }>> {
-    // Define roles we want to show in test panel
-    const targetRoles: UserRole[] = [
-      UserRole.ADMIN,
-      UserRole.SELLER,
-      UserRole.SUPPLIER,
-      UserRole.PARTNER,
-      UserRole.USER,
-    ];
-    const testAccounts: Array<{ role: string; email: string; password: string }> = [];
-
-    // All test accounts use the same password for convenience
-    const testPassword = 'test123!@#';
-
-    // Find or create one user for each role
-    for (const role of targetRoles) {
-      // role column removed - find test user by email pattern only
-      let user = await this.userRepository
-        .createQueryBuilder('user')
-        .andWhere('(user.email LIKE :pattern1 OR user.email LIKE :pattern2)', {
-          pattern1: '%@test.com',
-          pattern2: '%test%',
-        })
-        .andWhere('user.email LIKE :rolePattern', { rolePattern: `%${role}%` })
-        .select(['user.id', 'user.email', 'user.password', 'user.status', 'user.isEmailVerified'])
-        .limit(1)
-        .getOne();
-
-      // If user doesn't exist, create one
-      if (!user) {
-        const testEmail = `${role}@test.com`;
-        user = this.userRepository.create({
-          email: testEmail,
-          name: `Test ${this.getRoleLabel(role)}`,
-          password: await hashPassword(testPassword),
-          status: UserStatus.ACTIVE,
-          isEmailVerified: true,
-          permissions: [],
-        });
-        await this.userRepository.save(user);
-        await roleAssignmentService.assignRole({ userId: user.id, role });
-        logger.info(`Created test account: ${testEmail} (${role})`);
-      } else {
-        // Update password and status if needed
-        let needsUpdate = false;
-        const isCorrectPassword = await comparePassword(testPassword, user.password || '');
-        if (!isCorrectPassword) {
-          user.password = await hashPassword(testPassword);
-          needsUpdate = true;
-        }
-        if (user.status !== UserStatus.ACTIVE) {
-          user.status = UserStatus.ACTIVE;
-          needsUpdate = true;
-        }
-        if (!user.isEmailVerified) {
-          user.isEmailVerified = true;
-          needsUpdate = true;
-        }
-        if (needsUpdate) {
-          await this.userRepository.save(user);
-          logger.info(`Updated test account: ${user.email} (status: ACTIVE, verified: true)`);
-        }
-      }
-
-      // WO-O4O-USER-ROLES-RUNTIME-FIELD-CLEANUP-V1: user.roles is runtime-only (not from DB), use loop role directly
-      testAccounts.push({
-        role: this.getRoleLabel(role),
-        email: user.email,
-        password: testPassword,
-      });
-    }
-
-    return testAccounts;
-  }
-
-  /**
    * Send find ID email
    */
   async sendFindIdEmail(email: string): Promise<void> {
@@ -193,24 +108,5 @@ export class AuthAccountInquiryService {
     }
     const masked = local.substring(0, 3) + '***';
     return `${masked}@${domain}`;
-  }
-
-  /**
-   * Helper: Get role label in Korean
-   */
-  private getRoleLabel(role: string): string {
-    const labels: Record<string, string> = {
-      user: '사용자',
-      member: '멤버',
-      contributor: '기여자',
-      seller: '판매자',
-      vendor: '벤더',
-      partner: '파트너',
-      operator: '운영자',
-      admin: '관리자',
-      customer: '고객',
-      supplier: '공급자',
-    };
-    return labels[role] || role;
   }
 }

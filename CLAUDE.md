@@ -375,15 +375,17 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 
 ## 15. Browser Verification Test Accounts
 
-브라우저 검증(Playwright / MCP / Claude Code / 수동 smoke test) 시:
-
-> 📄 **`docs/local/TEST-ACCOUNTS.local.md`** 문서를 우선 참고한다.
+> 📄 **테스트시 사용하는 아이디/비밀번호 — `docs/local/TEST-ACCOUNTS.local.md`**
+>
+> 이 문서가 모든 검증·테스트용 자격증명의 **단일 출처(SSOT)**이다.
+> 브라우저 검증(Playwright / MCP / Claude Code / 수동 smoke test) 전 반드시 이 문서를 참조한다.
 
 **원칙:**
 - 로컬/검증 환경 전용 — 실제 운영 계정 사용 금지
 - Git commit 금지 (`.gitignore`로 추적 제외)
 - 서비스별·역할별 테스트 계정 중앙 관리
 - 계정 변경(비밀번호/역할/조직) 시 로컬 문서만 업데이트
+- **자격증명 하드코딩 금지** — 시드 스크립트·테스트 코드·CI 어디에도 이 문서의 비밀번호를 박지 말 것. 발견 시 즉시 제거.
 
 ---
 

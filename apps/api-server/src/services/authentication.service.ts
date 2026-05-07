@@ -126,10 +126,6 @@ export class AuthenticationService {
     return this.accountInquiryService.getAvailableProviders(email);
   }
 
-  async getTestAccounts(): Promise<Array<{ role: string; email: string; password: string }>> {
-    return this.accountInquiryService.getTestAccounts();
-  }
-
   async sendFindIdEmail(email: string): Promise<void> {
     return this.accountInquiryService.sendFindIdEmail(email);
   }
