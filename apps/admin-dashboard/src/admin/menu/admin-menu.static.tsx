@@ -182,18 +182,6 @@ export const adminMenuStatic: MenuItem[] = [
         icon: <LayoutDashboard className="w-4 h-4" />,
         path: '/admin/participation',
       },
-      {
-        id: 'participation-surveys',
-        label: '설문 목록',
-        icon: <ClipboardList className="w-4 h-4" />,
-        path: '/admin/participation/surveys',
-      },
-      {
-        id: 'participation-responses',
-        label: '응답 현황',
-        icon: <BarChart2 className="w-4 h-4" />,
-        path: '/admin/participation/responses',
-      },
     ],
   },
 
@@ -209,18 +197,6 @@ export const adminMenuStatic: MenuItem[] = [
         label: 'Overview',
         icon: <LayoutDashboard className="w-4 h-4" />,
         path: '/admin/learning',
-      },
-      {
-        id: 'learning-flows',
-        label: 'Flow 목록',
-        icon: <Layers className="w-4 h-4" />,
-        path: '/admin/learning/flows',
-      },
-      {
-        id: 'learning-progress',
-        label: '진행 현황',
-        icon: <TrendingUp className="w-4 h-4" />,
-        path: '/admin/learning/progress',
       },
     ],
   },
@@ -356,12 +332,6 @@ export const adminMenuStatic: MenuItem[] = [
         label: 'Service Dashboard',
         icon: <LayoutDashboard className="w-4 h-4" />,
         path: '/admin/yaksa-hub',
-      },
-      {
-        id: 'yaksa-forum',
-        label: 'Forum',
-        icon: <MessageSquare className="w-4 h-4" />,
-        path: '/forum',
       },
       {
         id: 'yaksa-ai-insight',

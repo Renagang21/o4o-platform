@@ -85,10 +85,6 @@ export const menuPermissions: MenuPermission[] = [
     roles: ['admin', 'super_admin', 'pharmacist'],
   },
   {
-    menuId: 'yaksa-forum',
-    // No restriction - accessible to all authenticated users
-  },
-  {
     menuId: 'pharmacy-ai-insight',
     roles: ['admin', 'super_admin', 'pharmacist'],
     permissions: ['pharmacy-ai-insight.read'],
