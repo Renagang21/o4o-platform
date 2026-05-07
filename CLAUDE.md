@@ -48,8 +48,12 @@
 
 ### 브랜치 전략
 
-`main`(프로덕션) / `develop`(통합) / `feature/*`(모든 기능 개발 필수)
-- develop 직접 개발 금지. 모든 작업은 `feature/*`에서 시작
+현재 운영 단계에서는 **main 직접 작업**이 기본이다.
+
+- 작업 전 `git pull origin main` (sync first) 필수
+- 작업 완료 후 main에 직접 commit → push
+- feature 브랜치는 명시적 요청 또는 특수 작업(대규모 리팩토링·실험적 변경)에서만 사용
+- 작업 범위 외 수정 금지 / smoke test 후 결과 보고
 
 ### App 계층 (절대 규칙)
 
@@ -112,7 +116,7 @@ import type { RelatedEntity } from './related.entity.js';
 ## 5. O4O Store & Order
 
 - 모든 매장은 O4O Store Template 사용
-- 모든 주문은 `checkoutService.createOrder()`
+- 주문 생성 규칙: §4 E-commerce Core 참조 (`checkoutService.createOrder()`)
 - 독립 주문 테이블 생성 금지
 - 3중 방어: 런타임 Guard + OrderType 계약 + 스키마 검사
 
@@ -184,14 +188,6 @@ import type { RelatedEntity } from './related.entity.js';
 
 `/__debug__/auth-bootstrap` / `/health/detailed` / `/health/database` / `/api/v1/auth/status`
 
-### 디버그 SSR 테스트 페이지
-
-디버그용 데이터 조회/액션 테스트 페이지 생성 시 반드시 참조:
-
-> 📄 **`docs/platform/debug/DEBUG-SSR-TEST-PAGE-GUIDE-V1.md`**
-
-핵심: **SSR ONLY** (클라이언트 JS 금지) / Factory Router 패턴 / `esc()` XSS 방지 / Raw JSON 덤프 포함
-
 ### JSON 응답 표준
 
 `{ success: true, data: T }` 또는 `{ success: false, error: "msg", code: "ERROR_CODE" }`
@@ -253,7 +249,7 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | LMS Core | `docs/platform/lms/LMS-CORE-EXTENSION-PRINCIPLES.md` |
 | Navigation | `docs/platform/navigation/OPERATOR-DASHBOARD-NAVIGATION.md` |
 | Extension | `docs/platform/extensions/EXTENSION-GENERAL-GUIDE.md` |
-| **Operator Dashboard** | `docs/platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md` |
+| Operator Dashboard | §11 참조 |
 | **HUB Template Standard** | `docs/platform/hub/O4O-HUB-TEMPLATE-STANDARD-V1.md` |
 
 핵심: Content 단일 출처 / Core 불변 / 데이터 소유권 분리 / 이벤트 기반 통신
@@ -346,7 +342,7 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | RBAC Runbook | `docs/rbac/RBAC-RUNBOOK-V1.md` |
 | RBAC Role Catalog | `docs/rbac/RBAC-ROLE-CATALOG-V1.md` |
 | **O4O Core Freeze** | `docs/architecture/O4O-CORE-FREEZE-V1.md` |
-| **Operator Dashboard 표준** | `docs/platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md` |
+| Operator Dashboard 표준 | §11 참조 |
 | **디버그 SSR 테스트 페이지** | `docs/platform/debug/DEBUG-SSR-TEST-PAGE-GUIDE-V1.md` |
 | **User/Operator Freeze** | `docs/architecture/USER-OPERATOR-FREEZE-V1.md` |
 | **O4O 공통 구조 원칙** | `docs/o4o-common-structure.md` |
@@ -391,5 +387,5 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 ---
 
 *Updated: 2026-05-07*
-*Version: 8.4*
+*Version: 8.5*
 *Status: Active Constitution*
