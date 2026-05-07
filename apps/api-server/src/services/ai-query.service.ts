@@ -131,7 +131,7 @@ class AiQueryService {
         freeDailyLimit: 10,
         paidDailyLimit: 100,
         aiEnabled: true,
-        defaultModel: 'gemini-3.0-flash',
+        defaultModel: 'gemini-2.5-flash',
         systemPrompt: `당신은 O4O 플랫폼의 AI 어시스턴트입니다.
 사용자의 질문에 친절하고 정확하게 답변해주세요.
 제공된 맥락 정보(상품, 카테고리, 서비스 정보)를 적극 활용하여 답변하세요.

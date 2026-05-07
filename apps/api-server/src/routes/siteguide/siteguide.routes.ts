@@ -254,7 +254,7 @@ export function createSiteGuideRoutes(dataSource: DataSource): Router {
         systemPrompt,
         userPrompt: userQuestion,
         responseMode: 'text',
-        config: { apiKey: GEMINI_API_KEY, model: 'gemini-3.0-flash', temperature: 0.7, maxTokens: 500 },
+        config: { apiKey: GEMINI_API_KEY, model: 'gemini-2.5-flash', temperature: 0.7, maxTokens: 500 },
         meta: { service: 'siteguide', callerName: 'SiteGuideQuery' },
       });
 

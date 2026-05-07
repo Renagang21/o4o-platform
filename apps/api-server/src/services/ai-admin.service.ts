@@ -104,10 +104,12 @@ class AiAdminService {
       const count = await this.engineRepo.count();
       if (count > 0) return;
 
+      // WO-O4O-AI-MODEL-SETTINGS-CLEANUP-V1: legacy 'gemini-3.0-flash' (non-existent in Google API)
+      // replaced with canonical valid identifiers.
       const defaultEngines: Partial<AiEngine>[] = [
         {
-          slug: 'gemini-3.0-flash',
-          name: 'Gemini 3.0 Flash',
+          slug: 'gemini-2.5-flash',
+          name: 'Gemini 2.5 Flash',
           description: '빠른 응답 속도와 비용 효율적인 모델. 일반적인 질의에 적합합니다.',
           provider: 'google',
           isActive: true,
@@ -115,9 +117,9 @@ class AiAdminService {
           sortOrder: 1,
         },
         {
-          slug: 'gemini-3.0-flash',
-          name: 'Gemini 3.0 Flash',
-          description: '최신 Gemini 모델. 향상된 추론 능력과 응답 품질을 제공합니다.',
+          slug: 'gemini-2.5-pro',
+          name: 'Gemini 2.5 Pro',
+          description: '향상된 추론 능력과 응답 품질을 제공하는 상위 모델.',
           provider: 'google',
           isActive: false,
           isAvailable: true,
@@ -244,7 +246,7 @@ class AiAdminService {
         globalDailyLimit: 1000,
         warningThreshold: 80,
         aiEnabled: true,
-        defaultModel: 'gemini-3.0-flash',
+        defaultModel: 'gemini-2.5-flash',
       });
       await this.policyRepo.save(policy);
     }

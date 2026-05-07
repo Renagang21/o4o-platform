@@ -239,8 +239,9 @@ export class StartupService {
               apiKey: { type: 'string', required: true, description: 'Google AI API Key', secret: true },
               model: {
                 type: 'select',
-                options: ['gemini-3.0-flash', 'gemini-3.0-pro', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro'],
-                default: 'gemini-3.0-flash',
+                // WO-O4O-AI-MODEL-SETTINGS-CLEANUP-V1: gemini-3.0-* removed (non-existent in Google API).
+                options: ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro'],
+                default: 'gemini-2.5-flash',
                 description: 'Gemini model to use',
               },
               temperature: { type: 'number', default: 0.7, min: 0, max: 2, description: 'Sampling temperature' },

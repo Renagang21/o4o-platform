@@ -7,6 +7,9 @@
 export type AIProvider = 'openai' | 'gemini' | 'claude';
 
 // Model Whitelist (2025 models)
+// WO-O4O-AI-MODEL-SETTINGS-CLEANUP-V1: gemini-3.0-flash / gemini-3.0-pro removed —
+// Google API does not recognise these identifiers (per migration 20260323600000-FixGeminiModelName).
+// Canonical Gemini model: gemini-2.5-flash.
 export const MODEL_WHITELIST = {
   openai: [
     'gpt-5',
@@ -16,8 +19,6 @@ export const MODEL_WHITELIST = {
     'gpt-4o',
   ],
   gemini: [
-    'gemini-3.0-flash',
-    'gemini-3.0-pro',
     'gemini-2.5-flash',
     'gemini-2.5-pro',
     'gemini-2.0-flash',

@@ -27,8 +27,8 @@ export class AiQueryPolicy {
   @Column({ name: 'ai_enabled', type: 'boolean', default: true })
   aiEnabled!: boolean;
 
-  /** 사용할 AI 모델 (기본: gemini-3.0-flash) */
-  @Column({ name: 'default_model', type: 'varchar', length: 100, default: 'gemini-3.0-flash' })
+  /** 사용할 AI 모델 (기본: gemini-2.5-flash) — WO-O4O-AI-MODEL-SETTINGS-CLEANUP-V1 */
+  @Column({ name: 'default_model', type: 'varchar', length: 100, default: 'gemini-2.5-flash' })
   defaultModel!: string;
 
   /** 시스템 프롬프트 - 서비스 맥락 유도 */

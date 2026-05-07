@@ -12,11 +12,11 @@ export class AiEngine {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  /** 엔진 식별자 (예: gemini-3.0-flash) */
+  /** 엔진 식별자 (예: gemini-2.5-flash) */
   @Column({ type: 'varchar', length: 100, unique: true })
   slug!: string;
 
-  /** 엔진 표시 이름 (예: Gemini 3.0 Flash) */
+  /** 엔진 표시 이름 (예: Gemini 2.5 Flash) */
   @Column({ type: 'varchar', length: 100 })
   name!: string;
 

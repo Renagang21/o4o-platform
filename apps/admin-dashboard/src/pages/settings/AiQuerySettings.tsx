@@ -36,7 +36,7 @@ const AiQuerySettings: React.FC = () => {
     freeDailyLimit: 10,
     paidDailyLimit: 100,
     aiEnabled: true,
-    defaultModel: 'gemini-3.0-flash',
+    defaultModel: 'gemini-2.5-flash',
     systemPrompt: '',
   });
 
@@ -202,8 +202,8 @@ const AiQuerySettings: React.FC = () => {
             onChange={(e) => handleChange('defaultModel', e.target.value)}
             className="w-full max-w-md px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="gemini-3.0-flash">Gemini 3.0 Flash (최신, 권장)</option>
-            <option value="gemini-3.0-pro">Gemini 3.0 Pro (정확도 높음)</option>
+            <option value="gemini-2.5-flash">Gemini 2.5 Flash (권장, 빠름)</option>
+            <option value="gemini-2.5-pro">Gemini 2.5 Pro (정확도 높음)</option>
             <option value="gemini-2.0-flash">Gemini 2.0 Flash (안정)</option>
             <option value="gemini-1.5-flash">Gemini 1.5 Flash (레거시)</option>
             <option value="gemini-1.5-pro">Gemini 1.5 Pro (레거시)</option>

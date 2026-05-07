@@ -7,7 +7,7 @@
  * 해결 우선순위:
  *   1. 인메모리 캐시 (60초 TTL)
  *   2. ai_llm_policies 테이블 (scope = ?)
- *   3. 하드코딩 기본값 fallback (gemini-3.0-flash, 0.3, 2048)
+ *   3. 하드코딩 기본값 fallback (gemini-2.5-flash, 0.3, 2048)
  *
  * API key 해결:
  *   1. ai_settings 테이블 (provider = ?, isactive = true)
@@ -239,10 +239,11 @@ export class AiPolicyExecutorService {
     }
 
     // 3. Hardcoded fallback
+    // WO-O4O-AI-MODEL-SETTINGS-CLEANUP-V1: 'gemini-3.0-flash' (non-existent) → 'gemini-2.5-flash' (canonical).
     const fallback = Object.assign(new AiLlmPolicy(), {
       scope,
       provider: 'gemini',
-      model: 'gemini-3.0-flash',
+      model: 'gemini-2.5-flash',
       temperature: 0.3,
       maxTokens: 2048,
       topP: null,

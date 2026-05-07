@@ -24,7 +24,8 @@ export class AiLlmPolicy {
   @Column({ type: 'varchar', length: 20, default: 'gemini' })
   provider!: string;
 
-  @Column({ type: 'varchar', length: 100, default: 'gemini-3.0-flash' })
+  // WO-O4O-AI-MODEL-SETTINGS-CLEANUP-V1: default 'gemini-3.0-flash' (non-existent) → 'gemini-2.5-flash'.
+  @Column({ type: 'varchar', length: 100, default: 'gemini-2.5-flash' })
   model!: string;
 
   @Column({ type: 'numeric', precision: 3, scale: 2, default: 0.3 })

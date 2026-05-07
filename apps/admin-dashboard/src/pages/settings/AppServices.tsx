@@ -201,7 +201,7 @@ const AppServices: React.FC = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 bg-gray-50 rounded-lg">
                   <p className="text-sm text-gray-500 mb-1">모델 버전</p>
-                  <p className="font-medium text-gray-900">gemini-3.0-flash</p>
+                  <p className="font-medium text-gray-900">gemini-2.5-flash</p>
                 </div>
                 <div className="p-4 bg-gray-50 rounded-lg">
                   <p className="text-sm text-gray-500 mb-1">최대 토큰</p>
