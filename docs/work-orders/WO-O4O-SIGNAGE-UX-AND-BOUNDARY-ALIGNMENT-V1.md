@@ -352,7 +352,7 @@ Phase 2 (HUB/Store 경계)  ←── Phase 1 완료 후 KPA 구조가 안정되
 | `docs/kpa/WO-KPA-SIGNAGE-IA-RESTRUCTURE-DRAFT-V1.md` | KPA IA 재설계 초안 |
 | `docs/architecture/COSMETICS-DOMAIN-RULES.md` | K-Cosmetics 격리 규칙 (통합 금지 근거) |
 | `docs/architecture/O4O-BOUNDARY-POLICY-V1.md` | Boundary Policy (Broadcast=serviceKey) |
-| `docs/rules/design-core-governance.md` | Design Core 거버넌스 |
+| `docs/rules/DESIGN-CORE-GOVERNANCE.md` | Design Core 거버넌스 |
 
 ---
 

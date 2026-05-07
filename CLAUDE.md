@@ -201,7 +201,7 @@ import type { RelatedEntity } from './related.entity.js';
 | **Cosmetics** | 독립 스키마 (`cosmetics_` prefix), E-commerce Core 통해 주문 | `docs/architecture/COSMETICS-DOMAIN-RULES.md` |
 | **Business Service** | OpenAPI 계약 우선, 서비스 간 직접 호출/DB 접근 금지 | `docs/architecture/BUSINESS-SERVICE-RULES.md` |
 | **Retail Stable** | Visibility Gate 4중 정의, Payment atomic transition | `docs/platform/architecture/O4O-RETAIL-STABLE-V1.md` |
-| **Design Core** | 모든 신규 화면은 Design Core v1.0, 독자적 디자인 시스템 금지 | `docs/rules/design-core-governance.md` |
+| **Design Core** | 모든 신규 화면은 Design Core v1.0, 독자적 디자인 시스템 금지 | `docs/rules/DESIGN-CORE-GOVERNANCE.md` |
 
 ---
 
@@ -292,7 +292,7 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | # | 대상 | Freeze 일자 | 상세 문서 |
 |---|------|-----------|----------|
 | F1 | **Operator OS** — security-core, hub-core, ai-core, action-log-core, asset-copy-core, operator-ux-core, admin-ux-core | 2026-02-16 | `docs/baseline/BASELINE-OPERATOR-OS-V1.md` |
-| F2 | **KPA UX** — 3개 서비스 영역 5-Block/4-Block 통합 UX | 2026-02-17 | `docs/baseline/KPA_UX_BASELINE_V1.md` |
+| F2 | **KPA UX** — 3개 서비스 영역 5-Block/4-Block 통합 UX | 2026-02-17 | `docs/baseline/KPA-UX-BASELINE-V1.md` |
 | F3 | **Store Layer** — store-ui-core, store-asset-policy-core, store-core, asset-copy-core, hub-core 의존 방향 | 2026-02-22 | `docs/architecture/STORE-LAYER-ARCHITECTURE.md` |
 | F4 | **Platform Content Policy** — HUB 3축 모델 (Producer/Visibility/ServiceScope) | 2026-02-23 | `docs/baseline/PLATFORM-CONTENT-POLICY-V1.md` |
 | F5 | **Content Stable** — HUB 콘텐츠 타입·매핑·병합 로직·API 계약 | 2026-02-23 | `docs/baseline/CONTENT-STABLE-DECLARATION-V1.md` |
@@ -325,13 +325,13 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | Retail Stable v1.0 | `docs/platform/architecture/O4O-RETAIL-STABLE-V1.md` |
 | Operator OS Baseline | `docs/baseline/BASELINE-OPERATOR-OS-V1.md` |
 | UX Core Freeze | `docs/baseline/UX-CORE-FREEZE-V1.md` |
-| KPA UX Baseline | `docs/baseline/KPA_UX_BASELINE_V1.md` |
+| KPA UX Baseline | `docs/baseline/KPA-UX-BASELINE-V1.md` |
 | Store Layer Architecture | `docs/architecture/STORE-LAYER-ARCHITECTURE.md` |
 | Platform Content Policy | `docs/baseline/PLATFORM-CONTENT-POLICY-V1.md` |
 | Content Stable | `docs/baseline/CONTENT-STABLE-DECLARATION-V1.md` |
 | Boundary Policy | `docs/architecture/O4O-BOUNDARY-POLICY-V1.md` |
 | Neture Partner Contract | `docs/baseline/NETURE-PARTNER-CONTRACT-FREEZE-V1.md` |
-| Design Core | `docs/rules/design-core-governance.md` |
+| Design Core | `docs/rules/DESIGN-CORE-GOVERNANCE.md` |
 | Production Migration | `docs/baseline/operations/PRODUCTION-MIGRATION-STANDARD.md` |
 | Channel Execution Console | `docs/baseline/CHANNEL-EXECUTION-CONSOLE-V1.md` |
 | Channel Creation Flow | `docs/baseline/CHANNEL-CREATION-FLOW-SIMPLIFICATION-V1.md` |

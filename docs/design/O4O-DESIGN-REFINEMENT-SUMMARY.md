@@ -208,7 +208,7 @@ interface TemplateTokens {
 |------|------|
 | Design System Baseline | `docs/design/O4O-DESIGN-SYSTEM-BASELINE.md` |
 | Template Presets | `docs/design/O4O-TEMPLATE-PRESETS.md` |
-| Design Core Governance | `docs/rules/design-core-governance.md` |
+| Design Core Governance | `docs/rules/DESIGN-CORE-GOVERNANCE.md` |
 
 ---
 

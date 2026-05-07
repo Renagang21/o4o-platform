@@ -272,7 +272,7 @@ GET /api/signage/kpa-society/playlists
 
 ### P5. Design Core / BaseTable 미적용
 - 11개 signage 화면 모두 custom `<table>` 사용. Design Core 컴포넌트 계약 없음.
-- `docs/rules/design-core-governance.md` 의 "모든 신규 화면은 Design Core v1.0" 규칙과 어긋남.
+- `docs/rules/DESIGN-CORE-GOVERNANCE.md` 의 "모든 신규 화면은 Design Core v1.0" 규칙과 어긋남.
 - 장기적으로 UX 일관성/접근성/검증 비용 증가.
 
 ---

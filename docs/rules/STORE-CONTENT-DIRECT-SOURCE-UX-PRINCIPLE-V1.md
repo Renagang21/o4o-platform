@@ -95,7 +95,7 @@
 ## 참조 문서
 
 - `docs/architecture/O4O-BOUNDARY-POLICY-V1.md` — 도메인 경계 및 자료 소유권 기준
-- `docs/rules/design-core-governance.md` — 공통 UI/UX 거버넌스
+- `docs/rules/DESIGN-CORE-GOVERNANCE.md` — 공통 UI/UX 거버넌스
 - `docs/platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md` — Operator 화면 표준
 - `docs/platform/digital-signage/` — 디지털사이니지 API 표준
 

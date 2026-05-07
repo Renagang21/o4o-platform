@@ -8,7 +8,7 @@
 |------|------|------|
 | `BASELINE-OPERATOR-OS-V1.md` | Frozen | Core 패키지 동결, Hub/Trigger/Security 기준선 |
 | `UX-CORE-FREEZE-V1.md` | Frozen | Operator 5-Block + Admin 4-Block 표준 |
-| `KPA_UX_BASELINE_V1.md` | Frozen | KPA 3개 서비스 UX 적용 현황 |
+| `KPA-UX-BASELINE-V1.md` | Frozen | KPA 3개 서비스 UX 적용 현황 |
 | `KPA-ROLE-MATRIX-V1.md` | Frozen | KPA 권한/역할 매트릭스 |
 | `KPA-SOCIETY-SERVICE-STRUCTURE.md` | Active | KPA 3-Service 구조 정의 |
 | `E-COMMERCE-ORDER-CONTRACT.md` | Active | 주문 생성 유일 경로 정의 |
