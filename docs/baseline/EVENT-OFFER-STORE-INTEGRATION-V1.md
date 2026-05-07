@@ -3,8 +3,9 @@
 > Event Offer → Store 통합 설계 기준
 >
 > Status: Active
-> Version: 1.0
+> Version: 1.1
 > Created: 2026-04-28
+> Updated: 2026-05-07 — §13 canonical route 확정 추가
 > 선행 문서: `docs/baseline/EVENT-OFFER-COMMON-DOMAIN-V1.md`
 
 ---
@@ -198,6 +199,57 @@ Tabs: [전체] [공급 상품] [Event Offer]
 
 ### Phase 3
 - 공급자 Products 탭과 연결
+
+---
+
+## 13. Canonical Route 확정 (2026-05-07)
+
+WO-O4O-STORE-PRODUCTS-UI-CANONICAL-ALIGNMENT-V2 완료 후 실제 구현된 canonical 구조.
+
+### 13.1 전체 Pipeline
+
+```
+[공급자 상품 등록]
+  ↓
+Supplier Product (neture 서비스)
+  ↓  (Event Offer 생성)
+Event Offer [pending]
+  ↓  (운영자 승인)
+Event Offer [approved → active]
+  ↓
+/store-hub/event-offers  ← Discovery canonical route
+  ↓  (매장 경영자 participate())       ← Phase 2 구현 예정
+OPL (Order Product Listing)
+  ↓
+Store Product (내 매장 상품)
+  ↓
+/store/my-products  ← Management canonical route
+  ↓
+Channel / POP / QR 노출
+```
+
+### 13.2 서비스별 canonical route
+
+| Route | 역할 | 상태 |
+|-------|------|------|
+| `/store-hub/event-offers` | Event Offer 탐색·조회 | KPA, K-Cosmetics ✓ / GlycoPharm 구현 예정 |
+| `/store/my-products` | 매장 상품 관리 | KPA, GlycoPharm, K-Cosmetics ✓ |
+| `/store/products` | → `/store/my-products` redirect | backward compat 유지 |
+
+### 13.3 기존 §4.2 "변경 구조"와의 관계
+
+§4.2에서 목표했던 "Store 상품 관리 내 Event Offer 탭" 구조는
+두 개의 독립 canonical route로 분리 확정됐다:
+
+- Event Offer **탐색** → `/store-hub/event-offers` (허브 진입)
+- 내 매장 **상품 관리** → `/store/my-products` (상품 관리 진입)
+
+이 구조가 더 명확한 이유:
+- 허브(HUB)는 공급 계층, 스토어는 실행 계층 (Store Layer 설계 원칙)
+- "이벤트 참여 탐색"과 "상품 목록 관리"는 다른 UX 맥락
+- K-Cosmetics `/store/products`의 Event Offer 탭 중복 문제 해소
+
+> 📄 route 구조 상세: `docs/architecture/STORE-PRODUCTS-CANONICAL-V1.md`
 
 ---
 

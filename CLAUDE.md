@@ -367,6 +367,8 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | **Global Header Standard** | `docs/architecture/ui/GLOBAL-HEADER-STANDARD-V1.md` |
 | **KPA Signage Structure Baseline** | `docs/baseline/KPA-SIGNAGE-STRUCTURE-V1.md` |
 | **O4O AI Usage Flow Baseline** | `docs/baseline/O4O-AI-USAGE-FLOW-BASELINE-V1.md` |
+| **Store Products Canonical** | `docs/architecture/STORE-PRODUCTS-CANONICAL-V1.md` |
+| **RBAC Canonical State** | `docs/rbac/RBAC-CANONICAL-STATE-V1.md` |
 
 ---
 
