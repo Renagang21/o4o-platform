@@ -25,9 +25,9 @@ export class ActionLog {
   @Index()
   service_key!: string;
 
-  @Column({ name: 'user_id', type: 'uuid' })
+  @Column({ name: 'user_id', type: 'uuid', nullable: true })
   @Index()
-  user_id!: string;
+  user_id!: string | null;
 
   @Column({ name: 'organization_id', type: 'uuid', nullable: true })
   organization_id!: string | null;

@@ -15,7 +15,7 @@ export type ActionStatus = 'success' | 'failed';
 /** 로그 기록 입력 */
 export interface ActionLogEntry {
   serviceKey: string;
-  userId: string;
+  userId: string | null;
   organizationId?: string;
   actionKey: string;
   source: ActionSource;

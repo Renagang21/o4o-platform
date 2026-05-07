@@ -40,7 +40,7 @@ export class ActionLogService {
    */
   async logSuccess(
     serviceKey: string,
-    userId: string,
+    userId: string | null,
     actionKey: string,
     opts?: { organizationId?: string; source?: ActionLogEntry['source']; durationMs?: number; meta?: Record<string, any> },
   ): Promise<void> {
@@ -61,7 +61,7 @@ export class ActionLogService {
    */
   async logFailure(
     serviceKey: string,
-    userId: string,
+    userId: string | null,
     actionKey: string,
     errorMessage: string,
     opts?: { organizationId?: string; source?: ActionLogEntry['source']; durationMs?: number; meta?: Record<string, any> },

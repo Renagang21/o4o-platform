@@ -526,9 +526,9 @@ export class AuthLoginService {
       };
 
       if (success) {
-        this.actionLogService.logSuccess('platform', userId || 'anonymous', actionKey, { meta }).catch(() => {});
+        this.actionLogService.logSuccess('platform', userId || null, actionKey, { meta }).catch(() => {});
       } else {
-        this.actionLogService.logFailure('platform', userId || 'anonymous', actionKey, failureReason || 'unknown', { meta }).catch(() => {});
+        this.actionLogService.logFailure('platform', userId || null, actionKey, failureReason || 'unknown', { meta }).catch(() => {});
       }
     } catch {
       // fire-and-forget
