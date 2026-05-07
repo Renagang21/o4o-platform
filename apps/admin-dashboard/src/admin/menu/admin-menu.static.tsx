@@ -40,8 +40,6 @@ import {
   Shield,
   Briefcase,
   Store,
-  Printer,
-  Tablet,
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -546,18 +544,6 @@ export const adminMenuStatic: MenuItem[] = [
         path: '/supplierops/products',
       },
       {
-        id: 'kpa-my-store-contents',
-        label: '내 매장 콘텐츠',
-        icon: <Store className="w-4 h-4" />,
-        path: '/kpa/my-store-contents',
-      },
-      {
-        id: 'kpa-content-workspace',
-        label: '콘텐츠 작업 공간',
-        icon: <Layers className="w-4 h-4" />,
-        path: '/kpa/content-workspace',
-      },
-      {
         id: 'supplier-signage-reports',
         label: '사이니지 리포트',
         icon: <BarChart2 className="w-4 h-4" />,
@@ -632,41 +618,6 @@ export const adminMenuStatic: MenuItem[] = [
     ],
   },
 
-  {
-    id: 'store-pop',
-    label: 'POP 제작',
-    icon: <Printer className="w-5 h-5" />,
-    roles: ['admin', 'super_admin'],
-    children: [
-      {
-        id: 'store-pop-list',
-        label: 'POP 목록',
-        icon: <Printer className="w-4 h-4" />,
-        path: '/store/pop',
-      },
-      {
-        id: 'store-pop-create',
-        label: '새 POP 만들기',
-        icon: <Printer className="w-4 h-4" />,
-        path: '/store/pop/create',
-      },
-    ],
-  },
-
-  {
-    id: 'store-tablet',
-    label: '타블렛 채널',
-    icon: <Tablet className="w-5 h-5" />,
-    roles: ['admin', 'super_admin'],
-    children: [
-      {
-        id: 'store-tablet-settings',
-        label: '노출 상품 설정',
-        icon: <Tablet className="w-4 h-4" />,
-        path: '/store/tablet/settings',
-      },
-    ],
-  },
 
   {
     id: 'physical-stores',
