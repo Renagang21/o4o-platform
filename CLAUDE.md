@@ -212,7 +212,6 @@ import type { RelatedEntity } from './related.entity.js';
 3개 서비스 공존: **커뮤니티**(유지) / **분회 서비스**(유지) / **데모**(제거 예정)
 
 - 라우트 위치 ≠ 서비스 소속 (Forum은 커뮤니티 서비스의 기능)
-- Account와 Service Membership 분리 원칙
 
 ---
 
@@ -380,5 +379,5 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 ---
 
 *Updated: 2026-05-07*
-*Version: 8.7*
+*Version: 8.8*
 *Status: Active Constitution*
