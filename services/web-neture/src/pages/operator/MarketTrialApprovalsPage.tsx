@@ -13,8 +13,8 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getOperatorTrials, getForumSyncFailures, resolveForumSyncFailure } from '../../api/trial';
-import type { OperatorTrial, ForumSyncFailure } from '../../api/trial';
+import { getOperatorTrials, getForumSyncFailures, resolveForumSyncFailure, getOperatorMarketTrialKpi } from '../../api/trial';
+import type { OperatorTrial, ForumSyncFailure, MarketTrialKpiSnapshot } from '../../api/trial';
 
 // ============================================================================
 // 상수
@@ -100,10 +100,24 @@ function TrialsPanel() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [filter, setFilter] = useState('');
+  const [kpi, setKpi] = useState<MarketTrialKpiSnapshot | null>(null);
+
+  useEffect(() => {
+    loadKpi();
+  }, []);
 
   useEffect(() => {
     loadTrials();
   }, [filter]);
+
+  const loadKpi = async () => {
+    try {
+      const data = await getOperatorMarketTrialKpi();
+      setKpi(data);
+    } catch {
+      // best-effort: KPI bar is non-blocking
+    }
+  };
 
   const loadTrials = async () => {
     setLoading(true);
@@ -120,6 +134,9 @@ function TrialsPanel() {
 
   return (
     <>
+      {/* KPI 요약 바 (백엔드 집계) */}
+      {kpi && <KpiBar kpi={kpi} />}
+
       {/* 상태 필터 탭 */}
       <div className="flex gap-2 mb-6 flex-wrap">
         {FILTER_TABS.map((tab) => (
@@ -144,8 +161,6 @@ function TrialsPanel() {
         </div>
       )}
 
-      {!loading && trials.length > 0 && <SummaryBar trials={trials} />}
-
       {loading ? (
         <div className="text-center py-12 text-gray-500">불러오는 중...</div>
       ) : trials.length === 0 ? (
@@ -169,26 +184,44 @@ function TrialsPanel() {
   );
 }
 
-// ── Summary Metrics Bar ──
+// ── KPI Bar (backend aggregate) ──
 
-function SummaryBar({ trials }: { trials: OperatorTrial[] }) {
-  const recruiting = trials.filter((t) => t.status === 'recruiting').length;
-  const submitted = trials.filter((t) => t.status === 'submitted').length;
-  const totalParticipants = trials.reduce((sum, t) => sum + t.currentParticipants, 0);
+function KpiBar({ kpi }: { kpi: MarketTrialKpiSnapshot }) {
+  const fmt = (n: number) => n.toLocaleString('ko-KR');
+  const fmtRate = (r: number | null) => (r == null ? '-' : `${r}%`);
 
   return (
-    <div className="grid grid-cols-3 gap-3 mb-5">
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
       <div className="bg-white border border-gray-200 rounded-lg p-3 text-center">
-        <p className="text-lg font-bold text-yellow-600">{submitted}</p>
-        <p className="text-xs text-gray-500 mt-0.5">심사 대기</p>
+        <p className="text-lg font-bold text-gray-900">{fmt(kpi.totalTrials)}</p>
+        <p className="text-xs text-gray-500 mt-0.5">전체 Trial</p>
+        <p className="text-xs text-gray-400 mt-0.5">
+          모집 중 <span className="font-medium text-green-600">{kpi.recruitingTrials}</span>
+          {' · '}심사 <span className="font-medium text-yellow-600">
+            {kpi.totalTrials - kpi.recruitingTrials - kpi.developmentTrials - kpi.outcomeConfirmingTrials - kpi.fulfilledTrials - kpi.closedTrials}
+          </span>
+        </p>
       </div>
       <div className="bg-white border border-gray-200 rounded-lg p-3 text-center">
-        <p className="text-lg font-bold text-green-600">{recruiting}</p>
-        <p className="text-xs text-gray-500 mt-0.5">모집 중</p>
+        <p className="text-lg font-bold text-blue-700">{fmt(kpi.totalParticipants)}</p>
+        <p className="text-xs text-gray-500 mt-0.5">누적 참여자</p>
+        <p className="text-xs text-gray-400 mt-0.5">
+          결제 완료 <span className="font-medium text-blue-600">{fmt(kpi.paidParticipantCount)}</span>
+        </p>
       </div>
       <div className="bg-white border border-gray-200 rounded-lg p-3 text-center">
-        <p className="text-lg font-bold text-blue-600">{totalParticipants}</p>
-        <p className="text-xs text-gray-500 mt-0.5">전체 참여자</p>
+        <p className="text-lg font-bold text-emerald-700">{fmtRate(kpi.successRate)}</p>
+        <p className="text-xs text-gray-500 mt-0.5">모집 성공률</p>
+        <p className="text-xs text-gray-400 mt-0.5">
+          성공 {kpi.successfulTrials} · 실패 {kpi.failedTrials}
+        </p>
+      </div>
+      <div className="bg-white border border-gray-200 rounded-lg p-3 text-center">
+        <p className="text-lg font-bold text-purple-700">{fmtRate(kpi.paymentCompletionRate)}</p>
+        <p className="text-xs text-gray-500 mt-0.5">결제 완료율</p>
+        <p className="text-xs text-gray-400 mt-0.5">
+          환불 <span className="font-medium text-red-500">{kpi.refundCount}</span>건
+        </p>
       </div>
     </div>
   );

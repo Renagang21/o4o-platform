@@ -750,3 +750,57 @@ export async function getFulfillment(participationId: string): Promise<Fulfillme
     throw err;
   }
 }
+
+// ============================================================================
+// Analytics / KPI (WO-NETURE-MARKET-TRIAL-ANALYTICS-AND-KPI-V1)
+// ============================================================================
+
+export interface MarketTrialKpiSnapshot {
+  totalTrials: number;
+  recruitingTrials: number;
+  developmentTrials: number;
+  outcomeConfirmingTrials: number;
+  fulfilledTrials: number;
+  closedTrials: number;
+  successfulTrials: number;
+  failedTrials: number;
+  successRate: number | null;
+  totalParticipants: number;
+  totalRecruitingAmount: number;
+  totalPaidAmount: number;
+  paidParticipantCount: number;
+  refundCount: number;
+  paymentCompletionRate: number | null;
+  averageAchievementRate: number | null;
+}
+
+export interface MarketTrialDetailKpi {
+  trialId: string;
+  status: string;
+  achievementRate: number | null;
+  participationRate: number | null;
+  participantCount: number;
+  paidParticipantCount: number;
+  unpaidParticipantCount: number;
+  failedPaymentCount: number;
+  refundCount: number;
+  paymentCompletionRate: number | null;
+  totalPaidAmount: number;
+  recruitingRemainingDays: number | null;
+  recruitingProgressPercent: number | null;
+  closeReason: string | null;
+}
+
+export async function getOperatorMarketTrialKpi(): Promise<MarketTrialKpiSnapshot> {
+  const { data } = await api.get(
+    `${API_BASE_URL}/api/v1/neture/operator/market-trial/kpi`,
+  );
+  return data.data || data;
+}
+
+export async function getOperatorTrialKpi(trialId: string): Promise<MarketTrialDetailKpi> {
+  const { data } = await api.get(
+    `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/kpi`,
+  );
+  return data.data || data;
+}

@@ -25,6 +25,7 @@ import {
   updateTrialStatus,
   convertTrialToProduct,
   searchProductsForConversion,
+  getOperatorTrialKpi,
 } from '../../api/trial';
 import type {
   OperatorTrial,
@@ -36,6 +37,7 @@ import type {
   CustomerConversionStatus,
   SettlementStatus,
   PaymentStatus,
+  MarketTrialDetailKpi,
 } from '../../api/trial';
 import { PAYMENT_STATUS_LABELS } from '../../api/trial';
 import { BaseTable } from '@o4o/ui';
@@ -94,6 +96,8 @@ export default function MarketTrialApprovalDetailPage() {
   const [productSearchLoading, setProductSearchLoading] = useState(false);
   const [selectedProductKey, setSelectedProductKey] = useState<Set<string>>(new Set());
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // WO-NETURE-MARKET-TRIAL-ANALYTICS-AND-KPI-V1
+  const [trialKpi, setTrialKpi] = useState<MarketTrialDetailKpi | null>(null);
 
   const loadParticipants = useCallback(async (trialId: string, f: ParticipantFilter) => {
     const filters: {
@@ -123,6 +127,8 @@ export default function MarketTrialApprovalDetailPage() {
       ]);
       setTrial(trialData);
       setFunnel(funnelData);
+      // KPI is best-effort — never blocks the page
+      getOperatorTrialKpi(id).then(setTrialKpi).catch(() => null);
       await loadParticipants(id, filter);
     } catch (err: any) {
       setError(err.message || 'Trial을 불러오는데 실패했습니다.');
@@ -385,6 +391,9 @@ export default function MarketTrialApprovalDetailPage() {
 
       {/* Summary Metrics Card */}
       <SummaryMetrics trial={trial} recruitRate={recruitRate} summary={summary} />
+
+      {/* KPI Bar — WO-NETURE-MARKET-TRIAL-ANALYTICS-AND-KPI-V1 */}
+      {trialKpi && <TrialKpiBar kpi={trialKpi} />}
 
       {/* Fulfillment Summary Card */}
       {summary && summary.totalCount > 0 && (
@@ -1471,6 +1480,55 @@ function FunnelSection({ funnel }: { funnel: TrialFunnel }) {
             <span className="text-[10px] text-gray-500 mt-1 text-center leading-tight">매장 진열</span>
             <span className="text-[10px] text-gray-400">{pct(funnel.listingCount)}%</span>
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Trial KPI Bar (WO-NETURE-MARKET-TRIAL-ANALYTICS-AND-KPI-V1) ──
+
+function TrialKpiBar({ kpi }: { kpi: MarketTrialDetailKpi }) {
+  const fmtRate = (r: number | null) => (r == null ? '-' : `${r}%`);
+  const fmtDays = (d: number | null) => (d == null ? '-' : d <= 0 ? '마감' : `${d}일`);
+
+  return (
+    <div className="mb-5 bg-white border border-gray-200 rounded-lg p-4">
+      <p className="text-xs font-medium text-gray-500 mb-3">운영 지표 (KPI)</p>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="text-center">
+          <p className="text-base font-bold text-blue-700">{fmtRate(kpi.achievementRate)}</p>
+          <p className="text-xs text-gray-500 mt-0.5">목표 달성률</p>
+        </div>
+        <div className="text-center">
+          <p className="text-base font-bold text-green-700">{fmtRate(kpi.participationRate)}</p>
+          <p className="text-xs text-gray-500 mt-0.5">참여율</p>
+          <p className="text-xs text-gray-400 mt-0.5">{kpi.participantCount}명 참여</p>
+        </div>
+        <div className="text-center">
+          <p className="text-base font-bold text-purple-700">{fmtRate(kpi.paymentCompletionRate)}</p>
+          <p className="text-xs text-gray-500 mt-0.5">결제 완료율</p>
+          <p className="text-xs text-gray-400 mt-0.5">
+            완료 {kpi.paidParticipantCount} · 환불 {kpi.refundCount}
+          </p>
+        </div>
+        <div className="text-center">
+          <p className={`text-base font-bold ${
+            kpi.recruitingRemainingDays != null && kpi.recruitingRemainingDays <= 3
+              ? 'text-red-600'
+              : 'text-gray-700'
+          }`}>
+            {fmtDays(kpi.recruitingRemainingDays)}
+          </p>
+          <p className="text-xs text-gray-500 mt-0.5">모집 잔여</p>
+          {kpi.recruitingProgressPercent != null && (
+            <div className="mt-1 h-1 bg-gray-100 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-blue-400 rounded-full"
+                style={{ width: `${Math.min(100, kpi.recruitingProgressPercent)}%` }}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>
