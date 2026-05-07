@@ -17,8 +17,9 @@ async function verifyBranchAdmin(
   userId: string,
   userRoles: string[],
 ): Promise<boolean> {
-  // kpa:admin / kpa:district_admin → bypass
-  if (userRoles.some(r => r === 'kpa:admin' || r === 'kpa:district_admin')) return true;
+  // WO-O4O-KPA-BRANCH-DISTRICT-LEGACY-CLEANUP-V1: kpa:district_admin 제거 (지부/분회 모델 제거됨)
+  // kpa:admin → bypass
+  if (userRoles.some(r => r === 'kpa:admin')) return true;
   // KPA 활성 admin 확인
   const [member] = await ds.query(
     `SELECT id FROM kpa_members WHERE user_id = $1 AND status = 'active' AND role = 'admin' LIMIT 1`,

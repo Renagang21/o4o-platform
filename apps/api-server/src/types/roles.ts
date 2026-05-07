@@ -35,13 +35,15 @@ export type PlatformRole =
 
 /**
  * KPA-Society service roles
+ *
+ * WO-O4O-KPA-BRANCH-DISTRICT-LEGACY-CLEANUP-V1:
+ *   kpa:district_admin / kpa:branch_admin / kpa:branch_operator 제거.
+ *   KPA에는 kpa-society 운영자(kpa:operator) 만 존재한다.
+ *   조직 단위 역할은 kpa_members.role(=user.membershipRole)로 관리.
  */
 export type KpaRole =
   | 'kpa:admin'            // KPA service admin
   | 'kpa:operator'         // KPA service operator
-  | 'kpa:district_admin'   // District-level admin
-  | 'kpa:branch_admin'     // Branch-level admin
-  | 'kpa:branch_operator'  // Branch-level operator
   | 'kpa:store_owner'      // KPA pharmacy store owner (WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1)
   | 'kpa:pharmacist'       // General pharmacist/member
   | 'kpa:student';         // Student member
@@ -264,30 +266,8 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
     category: 'service',
     deprecated: false
   },
-  'kpa:district_admin': {
-    role: 'kpa:district_admin',
-    label: 'District Admin',
-    description: 'District-level administrator',
-    service: 'kpa',
-    category: 'service',
-    deprecated: false
-  },
-  'kpa:branch_admin': {
-    role: 'kpa:branch_admin',
-    label: 'Branch Admin',
-    description: 'Branch-level administrator',
-    service: 'kpa',
-    category: 'service',
-    deprecated: false
-  },
-  'kpa:branch_operator': {
-    role: 'kpa:branch_operator',
-    label: 'Branch Operator',
-    description: 'Branch-level operator',
-    service: 'kpa',
-    category: 'service',
-    deprecated: false
-  },
+  // WO-O4O-KPA-BRANCH-DISTRICT-LEGACY-CLEANUP-V1:
+  //   kpa:district_admin / kpa:branch_admin / kpa:branch_operator entries removed.
   'kpa:store_owner': {
     role: 'kpa:store_owner',
     label: 'KPA Store Owner',
@@ -513,7 +493,7 @@ export function getRoleMetadata(role: string): RoleMetadata | undefined {
  *
  * @example
  * getRolesByService('kpa')
- * // Returns: ['kpa:admin', 'kpa:operator', 'kpa:district_admin', ...]
+ * // Returns: ['kpa:admin', 'kpa:operator', 'kpa:store_owner', 'kpa:pharmacist', 'kpa:student']
  */
 export function getRolesByService(serviceKey: ServiceKey): PrefixedRole[] {
   return Object.values(ROLE_REGISTRY)

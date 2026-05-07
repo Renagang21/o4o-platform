@@ -2,12 +2,12 @@
  * KPA Organization Role Guard Middleware
  *
  * WO-KPA-C-ROLE-SYNC-NORMALIZATION-V1
+ * WO-O4O-KPA-BRANCH-DISTRICT-LEGACY-CLEANUP-V1: kpa:district_admin 제거 (지부/분회 모델 제거됨)
  *
  * KpaMember.role 기반 조직 역할 검증.
- * User.roles[]의 kpa-c:* 의존 제거 — KpaMember.role이 SSOT.
  *
  * 역할 계층: admin > operator > member
- * kpa:admin bypass: User.roles[]에 kpa:admin이 있으면 모든 분회 접근 허용.
+ * kpa:admin bypass: User.roles[]에 kpa:admin이 있으면 모든 조직 접근 허용.
  *
  * 사용법:
  *   router.use(requireOrgRole(dataSource, 'admin'));
@@ -26,7 +26,7 @@ const ROLE_HIERARCHY: Record<string, number> = {
 };
 
 /** kpa:admin bypass 역할 */
-const BYPASS_ROLES = ['kpa:admin', 'kpa:district_admin'];
+const BYPASS_ROLES = ['kpa:admin'];
 
 export type KpaOrgRole = 'member' | 'operator' | 'admin';
 
@@ -55,7 +55,7 @@ export function requireOrgRole(
       return;
     }
 
-    // kpa:admin / kpa:district_admin bypass — 모든 분회 접근 허용
+    // kpa:admin bypass — 모든 조직 접근 허용
     const userRoles: string[] = user.roles || [];
     if (userRoles.some((r: string) => BYPASS_ROLES.includes(r))) {
       next();
