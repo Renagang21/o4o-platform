@@ -123,3 +123,6 @@ bin/cloud_sql_proxy
 
 # Playwright MCP screenshots
 .playwright-mcp/
+
+# Local test accounts (browser verification — never commit)
+docs/local/*.local.md

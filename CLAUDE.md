@@ -376,6 +376,20 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 
 ---
 
-*Updated: 2026-05-06*
-*Version: 8.3*
+## 15. Browser Verification Test Accounts
+
+브라우저 검증(Playwright / MCP / Claude Code / 수동 smoke test) 시:
+
+> 📄 **`docs/local/TEST-ACCOUNTS.local.md`** 문서를 우선 참고한다.
+
+**원칙:**
+- 로컬/검증 환경 전용 — 실제 운영 계정 사용 금지
+- Git commit 금지 (`.gitignore`로 추적 제외)
+- 서비스별·역할별 테스트 계정 중앙 관리
+- 계정 변경(비밀번호/역할/조직) 시 로컬 문서만 업데이트
+
+---
+
+*Updated: 2026-05-07*
+*Version: 8.4*
 *Status: Active Constitution*
