@@ -50,23 +50,14 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v6
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
+    # WO-O4O-CI-DEPLOY-API-SETUP-BUILD-ENV-ALIGN-V1:
+    # 4-step pnpm/node/install/build:packages 흐름을 다른 workflow와 동일한
+    # composite action으로 통일. unpinned pnpm + frozen-lockfile 단독 사용으로
+    # CI를 차단하던 ERR_PNPM_LOCKFILE_CONFIG_MISMATCH 회피.
+    - name: Setup build environment
+      uses: ./.github/actions/setup-build-env
       with:
         node-version: '22.18.0'
-
-    - name: Install pnpm
-      run: npm install -g pnpm
-
-    - name: Install dependencies
-      run: pnpm install --frozen-lockfile
-
-    - name: Build shared packages (unified with CI)
-      run: |
-        echo "🔨 Phase 1: Building shared packages (same as CI pipeline)..."
-        echo "============================================================"
-        pnpm run build:packages
-        echo "✅ Shared packages built (unified with CI)"
 
     - name: Build API-specific packages
       run: |
