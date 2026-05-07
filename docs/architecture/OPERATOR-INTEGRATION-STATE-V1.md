@@ -270,7 +270,7 @@ KPA만 `OperatorRoutes.tsx` 별도. Glyco/K-Cos는 App.tsx 인라인. 정리 가
 
 - IR: IR-O4O-OPERATOR-INTEGRATION-STATE-V1 (이번 conversation)
 - 5-Block 표준: [docs/platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md](../platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md)
-- LMS 공통화 선행 사례: [LMS-CLIENT-EXTRACTION-V2-COMPLETE.md](LMS-CLIENT-EXTRACTION-V2-COMPLETE.md)
+- LMS 공통화 선행 사례: [LMS-CLIENT-EXTRACTION-V2-COMPLETE.md](../reports/LMS-CLIENT-EXTRACTION-V2-COMPLETE.md)
 - 공통화 정의 표준: [O4O-COMMONIZATION-STANDARD.md](O4O-COMMONIZATION-STANDARD.md)
 - 기존 패키지: [packages/operator-ux-core/](../../packages/operator-ux-core/), [packages/admin-ux-core/](../../packages/admin-ux-core/)
 - 서비스별 operator 페이지:
