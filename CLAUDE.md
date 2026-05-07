@@ -361,6 +361,12 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | **Guide Schema Validation** | `docs/architecture/O4O-GUIDE-SCHEMA-VALIDATION-V1.md` |
 | **Guide sectionKey Migration** | `docs/architecture/O4O-GUIDE-SECTIONKEY-MIGRATION-V1.md` |
 | **Guide Content Reseed** | `docs/architecture/O4O-GUIDE-CONTENT-RESEED-GUIDEBLOCK-V1.md` |
+| **Store Local Product 경계 정책** | `docs/baseline/STORE-LOCAL-PRODUCT-BOUNDARY-POLICY-V1.md` |
+| **User Domain SSOT** | `docs/baseline/USER-DOMAIN-SSOT-V1.md` |
+| **Role Policy & Guard Baseline** | `docs/baseline/ROLE-POLICY-AND-GUARD-V1.md` |
+| **Global Header Standard** | `docs/architecture/ui/GLOBAL-HEADER-STANDARD-V1.md` |
+| **KPA Signage Structure Baseline** | `docs/baseline/KPA-SIGNAGE-STRUCTURE-V1.md` |
+| **O4O AI Usage Flow Baseline** | `docs/baseline/O4O-AI-USAGE-FLOW-BASELINE-V1.md` |
 
 ---
 
@@ -379,5 +385,5 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 ---
 
 *Updated: 2026-05-07*
-*Version: 8.8*
+*Version: 8.9*
 *Status: Active Constitution*
