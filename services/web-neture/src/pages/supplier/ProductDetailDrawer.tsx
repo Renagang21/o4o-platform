@@ -330,6 +330,8 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
         // WO-NETURE-PRODUCT-DRAWER-B2C-EDIT-RESTORE-V1: B2C 설명 저장 복구
         consumerShortDescription: editConsumerShort.trim() || null,
         consumerDetailDescription: editConsumerDetail.trim() || null,
+        // 서비스별 공급 설정
+        serviceKeys: form.serviceKeys,
       };
       console.log('[ProductDetailDrawer] save payload:', payload);
 
