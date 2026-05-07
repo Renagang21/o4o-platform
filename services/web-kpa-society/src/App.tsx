@@ -70,7 +70,9 @@ const ParticipationResultPage = lazy(() => import('./pages/participation/Partici
 import { QuestionType } from './pages/participation/types';
 
 // Event Offer pages — Phase 2 lazy (barrel unwound)
-const EventOfferListPage = lazy(() => import('./pages/event-offer/EventOfferListPage').then(m => ({ default: m.EventOfferListPage })));
+// WO-O4O-KPA-EVENT-OFFER-LIST-LEGACY-RETIRE-V1: legacy EventOfferListPage 제거.
+//   canonical = KpaEventOfferPage (enriched ViewModel) — /store-hub/event-offers
+//   /demo/event-offers 라우트는 canonical 로 redirect.
 const EventOfferDetailPage = lazy(() => import('./pages/event-offer/EventOfferDetailPage').then(m => ({ default: m.EventOfferDetailPage })));
 const EventOfferHistoryPage = lazy(() => import('./pages/event-offer/EventOfferHistoryPage').then(m => ({ default: m.EventOfferHistoryPage })));
 const KpaEventOfferPage = lazy(() => import('./pages/event-offer/KpaEventOfferPage').then(m => ({ default: m.KpaEventOfferPage })));
@@ -970,7 +972,9 @@ function DemoLayoutRoutes() {
         <Route path="/participation/:id/results" element={<ParticipationResultPage />} />
 
         {/* Event Offers (이벤트) */}
-        <Route path="/event-offers" element={<PharmacyOwnerOnlyGuard><EventOfferListPage /></PharmacyOwnerOnlyGuard>} />
+        {/* WO-O4O-KPA-EVENT-OFFER-LIST-LEGACY-RETIRE-V1:
+            legacy EventOfferListPage 제거 — /demo/event-offers 는 canonical 로 redirect. */}
+        <Route path="/event-offers" element={<Navigate to="/store-hub/event-offers" replace />} />
         <Route path="/event-offers/history" element={<PharmacyOwnerOnlyGuard><EventOfferHistoryPage /></PharmacyOwnerOnlyGuard>} />
         <Route path="/event-offers/:id" element={<PharmacyOwnerOnlyGuard><EventOfferDetailPage /></PharmacyOwnerOnlyGuard>} />
 
