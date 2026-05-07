@@ -24,6 +24,8 @@ import KpaOperatorDashboard from '../pages/operator/KpaOperatorDashboard';
 import OperatorStoresPage from '../pages/operator/OperatorStoresPage';
 import OperatorStoreDetailPage from '../pages/operator/OperatorStoreDetailPage';
 import OperatorStoreChannelsPage from '../pages/operator/OperatorStoreChannelsPage';
+// WO-O4O-EVENT-OFFER-OPERATOR-APPROVAL-KPA-V1: operator event offer approval
+import { EventOfferManagePage } from '../pages/intranet/event-offer';
 // WO-KPA-A-BRANCH-CHAPTER-REMOVAL-PHASE4: admin-branch/NewsPage 제거 → operator/news 리다이렉트
 // WO-KPA-A-PLACEHOLDER-PAGES-IMPLEMENTATION: KPA-a operator 전용 페이지로 교체
 import OperatorForumPage from '../pages/operator/OperatorForumPage';
@@ -123,6 +125,9 @@ export function OperatorRoutes() {
 
           {/* 상품 판매 신청 관리 (WO-O4O-PRODUCT-APPROVAL-WORKFLOW-V1) */}
           <Route path="product-applications" element={<ProductApplicationManagementPage />} />
+
+          {/* 이벤트 오퍼 승인 관리 (WO-O4O-EVENT-OFFER-OPERATOR-APPROVAL-KPA-V1) */}
+          <Route path="event-offers" element={<EventOfferManagePage />} />
 
           {/* 자격 신청 관리 (WO-O4O-QUALIFICATION-SYSTEM-V1) */}
           <Route path="qualification-requests" element={<QualificationRequestsPage />} />
