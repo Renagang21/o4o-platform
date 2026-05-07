@@ -139,8 +139,8 @@ export function EventOfferDetailPage() {
                     setParticipating(true);
                     try {
                       await eventOfferApi.participate(id!, 1);
-                      toast.success('이벤트 참여가 완료되었습니다. 참여 내역에서 확인하세요.');
-                      navigate('/event-offers/history');
+                      toast.success('이벤트 참여가 완료되었습니다.');
+                      navigate('/store-hub/event-offers');
                     } catch (err) {
                       toast.error(err instanceof Error ? err.message : '이벤트 참여에 실패했습니다.');
                     } finally {
