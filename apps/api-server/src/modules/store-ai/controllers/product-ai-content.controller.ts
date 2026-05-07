@@ -10,6 +10,7 @@ import { authenticate } from '../../../middleware/auth.middleware.js';
  *
  * POST /:productId/ai-contents/generate          — 전체 content_type AI 콘텐츠 일괄 생성
  * POST /:productId/ai-contents/generate/:type     — 특정 content_type AI 콘텐츠 생성
+ * PUT  /:productId/ai-contents/:type              — AI 콘텐츠 수동 저장 (upsert) — WO-O4O-AI-CONTENT-AUTO-CHANNEL-SAVE-V1
  * GET  /:productId/ai-contents                    — 상품 AI 콘텐츠 전체 조회
  * GET  /:productId/ai-contents/:type              — 특정 content_type 조회
  * DELETE /:productId/ai-contents/:contentId       — AI 콘텐츠 삭제
@@ -74,6 +75,33 @@ export function createProductAiContentRouter(dataSource: DataSource): Router {
     } catch (error) {
       console.error('[ProductAiContent] generate type error:', error);
       res.status(500).json({ success: false, error: 'Failed to start content generation' });
+    }
+  });
+
+  // PUT /:productId/ai-contents/:type — 수동 저장 (upsert) — WO-O4O-AI-CONTENT-AUTO-CHANNEL-SAVE-V1
+  router.put('/:productId/ai-contents/:type', authenticate, async (req, res) => {
+    try {
+      const { productId, type } = req.params;
+
+      if (!VALID_CONTENT_TYPES.includes(type as ProductAiContentType)) {
+        res.status(400).json({
+          success: false,
+          error: `Invalid content type. Valid types: ${VALID_CONTENT_TYPES.join(', ')}`,
+        });
+        return;
+      }
+
+      const { content, model } = req.body as { content?: string; model?: string };
+      if (!content || typeof content !== 'string') {
+        res.status(400).json({ success: false, error: 'content is required' });
+        return;
+      }
+
+      const saved = await contentService.saveContent(productId, type as ProductAiContentType, content, model);
+      res.json({ success: true, data: saved });
+    } catch (error) {
+      console.error('[ProductAiContent] save error:', error);
+      res.status(500).json({ success: false, error: 'Failed to save AI content' });
     }
   });
 

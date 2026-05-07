@@ -132,6 +132,28 @@ export class ProductAiContentService {
   }
 
   /**
+   * AI 콘텐츠 수동 저장 (upsert) — WO-O4O-AI-CONTENT-AUTO-CHANNEL-SAVE-V1
+   *
+   * AiContentModal 등 외부에서 생성한 콘텐츠를 product_ai_contents에 저장.
+   */
+  async saveContent(
+    productId: string,
+    contentType: ProductAiContentType,
+    content: string,
+    model?: string,
+  ): Promise<ProductAiContent> {
+    const existing = await this.contentRepo.findOne({ where: { productId, contentType } });
+    if (existing) {
+      existing.content = content;
+      if (model) existing.model = model;
+      return await this.contentRepo.save(existing);
+    }
+    return await this.contentRepo.save(
+      this.contentRepo.create({ productId, contentType, content, model: model ?? null }),
+    );
+  }
+
+  /**
    * AI 콘텐츠 삭제.
    */
   async deleteContent(id: string, productId: string): Promise<void> {

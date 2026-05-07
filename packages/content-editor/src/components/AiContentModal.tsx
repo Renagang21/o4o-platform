@@ -53,6 +53,19 @@ interface AiContentModalProps {
    * - 미제공 시 credentials: 'include' fallback만 사용
    */
   aiRequestHeaders?: Record<string, string>;
+  /**
+   * WO-O4O-AI-CONTENT-AUTO-CHANNEL-SAVE-V1: AI 결과를 채널(product_ai_contents 등)에 저장.
+   * - 호출 시점: "채널에 저장" 버튼 클릭 시
+   * - 미제공 시 버튼 미표시 (선택적 기능)
+   * - 반환값: { success, fieldLabel?, error? } — fieldLabel은 저장 성공 메시지에 표시
+   */
+  onChannelSave?: (data: {
+    outputType: string;
+    html: string;
+    title: string;
+    summary: string;
+    mode: AiMode;
+  }) => Promise<{ success: boolean; fieldLabel?: string; error?: string }>;
 }
 
 type AiMode = 'customer_rewrite' | 'summary' | 'pop' | 'title_suggest';
@@ -149,7 +162,7 @@ function blocksToHtml(blocks: UrlBlock[]): string {
     .join('\n');
 }
 
-export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeaders }: AiContentModalProps) {
+export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeaders, onChannelSave }: AiContentModalProps) {
   // 기존 text 모드 상태
   const [input, setInput] = useState('');
   const [mode, setMode] = useState<AiMode>('customer_rewrite');
@@ -160,6 +173,9 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
   const [error, setError] = useState('');
   const [resultTab, setResultTab] = useState<ResultTab>('preview');
   const [copied, setCopied] = useState(false);
+  // WO-O4O-AI-CONTENT-AUTO-CHANNEL-SAVE-V1
+  const [channelSaving, setChannelSaving] = useState(false);
+  const [channelSaveStatus, setChannelSaveStatus] = useState<{ ok: boolean; label?: string; error?: string } | null>(null);
 
   // URL 모드 상태 (WO-O4O-RICHTEXT-AI-URL-IMPORT-V1)
   const [sourceTab, setSourceTab] = useState<SourceTab>('text');
@@ -339,12 +355,34 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
     handleClose();
   };
 
+  const handleChannelSave = async () => {
+    if (!result || !onChannelSave) return;
+    setChannelSaving(true);
+    setChannelSaveStatus(null);
+    try {
+      const res = await onChannelSave({
+        outputType: currentConfig.outputType,
+        html: result.html,
+        title: result.title,
+        summary: result.summary,
+        mode,
+      });
+      setChannelSaveStatus({ ok: res.success, label: res.fieldLabel, error: res.error });
+    } catch (err: any) {
+      setChannelSaveStatus({ ok: false, error: err?.message || '저장 중 오류가 발생했습니다.' });
+    } finally {
+      setChannelSaving(false);
+    }
+  };
+
   const handleClose = () => {
     setInput('');
     setResult(null);
     setError('');
     setLoading(false);
     setCopied(false);
+    setChannelSaveStatus(null);
+    setChannelSaving(false);
     setUrlInput('');
     onClose();
   };
@@ -861,67 +899,105 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
         </div>
 
         {/* Footer */}
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'flex-end',
-            gap: '8px',
-            padding: '12px 20px',
-            borderTop: '1px solid #e5e7eb',
-            background: '#f9fafb',
-            flexShrink: 0,
-          }}
-        >
-          <button
-            type="button"
-            onClick={handleClose}
+        <div style={{ flexShrink: 0 }}>
+          {/* WO-O4O-AI-CONTENT-AUTO-CHANNEL-SAVE-V1: 채널 저장 상태 메시지 */}
+          {channelSaveStatus && (
+            <div
+              style={{
+                padding: '6px 20px',
+                fontSize: '12px',
+                color: channelSaveStatus.ok ? '#16a34a' : '#dc2626',
+                background: channelSaveStatus.ok ? '#f0fdf4' : '#fef2f2',
+                borderTop: '1px solid #e5e7eb',
+                textAlign: 'right',
+              }}
+            >
+              {channelSaveStatus.ok
+                ? `저장 완료${channelSaveStatus.label ? ` — ${channelSaveStatus.label}` : ''} ✓`
+                : `저장 실패: ${channelSaveStatus.error}`}
+            </div>
+          )}
+          <div
             style={{
-              padding: '8px 16px',
-              border: '1px solid #d1d5db',
-              borderRadius: '6px',
-              background: 'white',
-              fontSize: '14px',
-              cursor: 'pointer',
-              color: '#374151',
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: '8px',
+              padding: '12px 20px',
+              borderTop: '1px solid #e5e7eb',
+              background: '#f9fafb',
             }}
           >
-            취소
-          </button>
-          {result && (
             <button
               type="button"
-              onClick={handleCopy}
+              onClick={handleClose}
               style={{
                 padding: '8px 16px',
                 border: '1px solid #d1d5db',
                 borderRadius: '6px',
-                background: copied ? '#f0fdf4' : 'white',
+                background: 'white',
                 fontSize: '14px',
                 cursor: 'pointer',
-                color: copied ? '#16a34a' : '#374151',
-                fontWeight: copied ? 600 : 400,
+                color: '#374151',
               }}
             >
-              {copied ? '복사됨 ✓' : '복사'}
+              취소
             </button>
-          )}
-          <button
-            type="button"
-            onClick={handleInsert}
-            disabled={!result}
-            style={{
-              padding: '8px 20px',
-              border: 'none',
-              borderRadius: '6px',
-              background: result ? '#4f46e5' : '#d1d5db',
-              color: 'white',
-              fontSize: '14px',
-              fontWeight: 600,
-              cursor: result ? 'pointer' : 'not-allowed',
-            }}
-          >
-            에디터에 삽입
-          </button>
+            {result && (
+              <button
+                type="button"
+                onClick={handleCopy}
+                style={{
+                  padding: '8px 16px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '6px',
+                  background: copied ? '#f0fdf4' : 'white',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  color: copied ? '#16a34a' : '#374151',
+                  fontWeight: copied ? 600 : 400,
+                }}
+              >
+                {copied ? '복사됨 ✓' : '복사'}
+              </button>
+            )}
+            {/* WO-O4O-AI-CONTENT-AUTO-CHANNEL-SAVE-V1: onChannelSave가 있을 때만 표시 */}
+            {onChannelSave && result && (
+              <button
+                type="button"
+                onClick={handleChannelSave}
+                disabled={channelSaving}
+                style={{
+                  padding: '8px 16px',
+                  border: '1px solid #059669',
+                  borderRadius: '6px',
+                  background: channelSaving ? '#d1fae5' : channelSaveStatus?.ok ? '#d1fae5' : '#ecfdf5',
+                  fontSize: '14px',
+                  cursor: channelSaving ? 'not-allowed' : 'pointer',
+                  color: '#059669',
+                  fontWeight: 600,
+                }}
+              >
+                {channelSaving ? '저장 중...' : channelSaveStatus?.ok ? '저장됨 ✓' : '채널에 저장'}
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={handleInsert}
+              disabled={!result}
+              style={{
+                padding: '8px 20px',
+                border: 'none',
+                borderRadius: '6px',
+                background: result ? '#4f46e5' : '#d1d5db',
+                color: 'white',
+                fontSize: '14px',
+                fontWeight: 600,
+                cursor: result ? 'pointer' : 'not-allowed',
+              }}
+            >
+              에디터에 삽입
+            </button>
+          </div>
         </div>
       </div>
     </>
