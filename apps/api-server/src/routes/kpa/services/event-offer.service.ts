@@ -463,15 +463,63 @@ export class EventOfferService {
     serviceKey: string = SERVICE_KEYS.KPA_GROUPBUY,
   ): Promise<Record<string, any> | null> {
     const rows = await this.dataSource.query(
-      `SELECT opl.*
+      `SELECT
+         opl.id,
+         opl.offer_id        AS "offerId",
+         opl.price::numeric,
+         opl.event_price::numeric AS "eventPrice",
+         opl.is_active       AS "isActive",
+         opl.status          AS "dbStatus",
+         opl.start_at        AS "startAt",
+         opl.end_at          AS "endAt",
+         opl.created_at      AS "createdAt",
+         opl.updated_at      AS "updatedAt",
+         opl.total_quantity  AS "totalQuantity",
+         opl.per_order_limit AS "perOrderLimit",
+         opl.per_store_limit AS "perStoreLimit",
+         spo.supplier_id     AS "supplierId",
+         spo.price_general::numeric AS "generalPrice",
+         COALESCE(opl.event_price, spo.price_general, opl.price)::numeric AS "unitPrice",
+         COALESCE(pm.name, '(상품명 없음)')  AS "productName",
+         COALESCE(org.name, '(공급사 없음)') AS "supplierName"
        FROM organization_product_listings opl
+       LEFT JOIN supplier_product_offers spo ON spo.id = opl.offer_id
+       LEFT JOIN neture_suppliers ns          ON ns.id  = spo.supplier_id
+       LEFT JOIN organizations org            ON org.id = ns.organization_id
+       LEFT JOIN product_masters pm           ON pm.id  = opl.master_id
        WHERE opl.id = $1
          AND opl.service_key = $2
          AND ${ACTIVE_OFFER_CLAUSE}
        LIMIT 1`,
       [id, serviceKey],
     );
-    return rows[0] ?? null;
+    if (!rows[0]) return null;
+    const r = rows[0];
+    return {
+      id: r.id,
+      offerId: r.offerId,
+      price: r.price !== null ? Number(r.price) : null,
+      eventPrice: r.eventPrice !== null ? Number(r.eventPrice) : null,
+      generalPrice: r.generalPrice !== null ? Number(r.generalPrice) : null,
+      isActive: r.isActive,
+      status: resolveEventStatus({
+        status: r.dbStatus,
+        start_at: r.startAt,
+        end_at: r.endAt,
+        total_quantity: r.totalQuantity,
+      }),
+      startAt: r.startAt ? new Date(r.startAt).toISOString() : null,
+      endAt: r.endAt ? new Date(r.endAt).toISOString() : null,
+      createdAt: r.createdAt instanceof Date ? r.createdAt.toISOString() : String(r.createdAt || ''),
+      updatedAt: r.updatedAt instanceof Date ? r.updatedAt.toISOString() : String(r.updatedAt || ''),
+      supplierId: r.supplierId,
+      unitPrice: r.unitPrice !== null ? Number(r.unitPrice) : null,
+      productName: r.productName,
+      supplierName: r.supplierName,
+      totalQuantity: r.totalQuantity !== null ? Number(r.totalQuantity) : null,
+      perOrderLimit: r.perOrderLimit !== null ? Number(r.perOrderLimit) : null,
+      perStoreLimit: r.perStoreLimit !== null ? Number(r.perStoreLimit) : null,
+    };
   }
 
   /**

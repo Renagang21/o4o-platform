@@ -25,9 +25,9 @@ export const eventOfferApi = {
       pagination: { page: number; limit: number; total: number; totalPages: number };
     }>('/groupbuy', params),
 
-  // 이벤트 상품 상세 (WO-KPA-GROUPBUY-PAGE-V1)
+  // 이벤트 상품 상세 — enriched (productName/unitPrice 포함)
   getEventOfferProduct: (id: string) =>
-    apiClient.get<{ success: boolean; data: EventOfferProduct }>(`/groupbuy/${id}`),
+    apiClient.get<{ success: boolean; data: EventOfferItem }>(`/groupbuy/${id}`),
 
   // 이벤트 운영 통계 (WO-KPA-GROUPBUY-STATS-V1)
   getEventOfferStats: () =>

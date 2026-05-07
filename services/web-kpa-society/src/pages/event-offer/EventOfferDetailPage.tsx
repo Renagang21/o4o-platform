@@ -12,13 +12,13 @@ import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/c
 import { eventOfferApi } from '../../api';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
-import type { EventOfferProduct } from '../../types';
+import type { EventOfferItem } from '../../types';
 
 export function EventOfferDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [product, setProduct] = useState<EventOfferProduct | null>(null);
+  const [product, setProduct] = useState<EventOfferItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [participating, setParticipating] = useState(false);
@@ -75,7 +75,7 @@ export function EventOfferDetailPage() {
         breadcrumb={[
           { label: '홈', href: '/' },
           { label: '이벤트', href: '/event-offers' },
-          { label: product.product_name },
+          { label: product.productName },
         ]}
       />
 
@@ -91,8 +91,8 @@ export function EventOfferDetailPage() {
             <h2 style={styles.sectionTitle}>상품 정보</h2>
             <div style={styles.infoGrid}>
               <div style={styles.infoRow}>
-                <span style={styles.infoLabel}>상품 ID</span>
-                <span style={styles.infoValue}>{product.external_product_id}</span>
+                <span style={styles.infoLabel}>공급업체</span>
+                <span style={styles.infoValue}>{product.supplierName}</span>
               </div>
               <div style={styles.infoRow}>
                 <span style={styles.infoLabel}>서비스</span>
@@ -100,16 +100,18 @@ export function EventOfferDetailPage() {
               </div>
               <div style={styles.infoRow}>
                 <span style={styles.infoLabel}>등록일</span>
-                <span style={styles.infoValue}>{formatDate(product.created_at)}</span>
+                <span style={styles.infoValue}>{formatDate(product.createdAt)}</span>
               </div>
-              {product.product_metadata && Object.keys(product.product_metadata).length > 0 && (
+              {product.startAt && (
                 <div style={styles.infoRow}>
-                  <span style={styles.infoLabel}>추가 정보</span>
-                  <span style={styles.infoValue}>
-                    {Object.entries(product.product_metadata)
-                      .map(([k, v]) => `${k}: ${v}`)
-                      .join(', ')}
-                  </span>
+                  <span style={styles.infoLabel}>시작일</span>
+                  <span style={styles.infoValue}>{formatDate(product.startAt)}</span>
+                </div>
+              )}
+              {product.endAt && (
+                <div style={styles.infoRow}>
+                  <span style={styles.infoLabel}>종료일</span>
+                  <span style={styles.infoValue}>{formatDate(product.endAt)}</span>
                 </div>
               )}
             </div>
@@ -120,11 +122,11 @@ export function EventOfferDetailPage() {
         <div style={styles.sidebar}>
           <Card padding="large">
             <span style={styles.badge}>이벤트</span>
-            <h1 style={styles.title}>{product.product_name}</h1>
+            <h1 style={styles.title}>{product.productName}</h1>
 
             <div style={styles.priceSection}>
               <span style={styles.priceLabel}>판매 가격</span>
-              <span style={styles.price}>{formatPrice(product.retail_price)}</span>
+              <span style={styles.price}>{formatPrice(product.unitPrice)}</span>
             </div>
 
             <div style={styles.actionSection}>
