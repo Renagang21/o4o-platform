@@ -20,11 +20,12 @@ import { DataTable, defineActionPolicy, buildRowActions } from '@o4o/operator-ux
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import {
   operatorAllOffersApi,
-  adminProductApi,
   type AllRegisteredOffer,
   type AllOffersKpi,
 } from '../../lib/api';
 import { productCleanupApi } from '../../lib/api/operatorProductCleanup';
+// WO-O4O-NETURE-OPERATOR-PRODUCT-API-SCOPE-FIX-V1: adminProductApi → operatorProductApi
+import { operatorProductApi } from '../../lib/api/operatorProductApi';
 import {
   DISTRIBUTION_TYPE_LABELS,
   getApprovalStatusBadge,
@@ -168,7 +169,7 @@ function TagsPreviewModal({
 
 // WO-NETURE-OPERATOR-PRODUCT-APPROVAL-ACTION-V1: 행별 승인/반려 액션 정책
 // - 대상: offer-level approvalStatus (PENDING/APPROVED/REJECTED). 화면 badge와 일치
-// - 행별/Bulk 모두 offer-level adminProductApi 사용으로 일치 (post-review 보정)
+// - 행별/Bulk 모두 offer-level operatorProductApi 사용 (WO-O4O-NETURE-OPERATOR-PRODUCT-API-SCOPE-FIX-V1)
 const productApprovalActionPolicy = defineActionPolicy<AllRegisteredOffer>('neture:all-products-approval', {
   inlineMax: 2,
   rules: [
@@ -371,7 +372,7 @@ export default function AllRegisteredProductsPage() {
   };
 
   // WO-NETURE-OPERATOR-PRODUCT-APPROVAL-ACTION-V1 (보정):
-  // Bulk도 offer-level adminProductApi로 일치. service-level 호출 제거.
+  // WO-O4O-NETURE-OPERATOR-PRODUCT-API-SCOPE-FIX-V1: operatorProductApi로 교체
   // 응답 형태: { success, data: { results: [{ id, status: success|skipped|failed }] } }
   const handleBulkApprove = async () => {
     const ids = collectPendingOfferIds();
@@ -381,7 +382,7 @@ export default function AllRegisteredProductsPage() {
     }
     setActionLoading(true);
     try {
-      const result = await adminProductApi.batchApprove(ids);
+      const result = await operatorProductApi.batchApprove(ids);
       const results: Array<{ status: string }> = result?.data?.results ?? [];
       const successCount = results.filter((r) => r.status === 'success').length;
       const failedCount = results.filter((r) => r.status === 'failed').length;
@@ -404,7 +405,7 @@ export default function AllRegisteredProductsPage() {
     if (ids.length === 0) return;
     setActionLoading(true);
     try {
-      const result = await adminProductApi.batchReject(ids, reason || undefined);
+      const result = await operatorProductApi.batchReject(ids, reason || undefined);
       const results: Array<{ status: string }> = result?.data?.results ?? [];
       const successCount = results.filter((r) => r.status === 'success').length;
       const failedCount = results.filter((r) => r.status === 'failed').length;
@@ -426,7 +427,7 @@ export default function AllRegisteredProductsPage() {
   const handleRowApprove = async (offer: AllRegisteredOffer) => {
     setActionLoading(true);
     try {
-      const ok = await adminProductApi.approveProduct(offer.id);
+      const ok = await operatorProductApi.approveProduct(offer.id);
       if (ok) {
         toast.success(`"${offer.name || '상품'}" 승인되었습니다`);
         await fetchOffers(page);
@@ -441,7 +442,7 @@ export default function AllRegisteredProductsPage() {
   const handleRowReject = async (offer: AllRegisteredOffer, reason?: string) => {
     setActionLoading(true);
     try {
-      const ok = await adminProductApi.rejectProduct(offer.id, reason);
+      const ok = await operatorProductApi.rejectProduct(offer.id, reason);
       if (ok) {
         toast.success(`"${offer.name || '상품'}" 반려되었습니다`);
         await fetchOffers(page);
