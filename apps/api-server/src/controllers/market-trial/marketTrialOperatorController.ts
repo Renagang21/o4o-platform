@@ -940,7 +940,16 @@ export class MarketTrialOperatorController {
       pushSet('paymentProvider', paymentProvider);
       pushSet('paymentReference', paymentReference);
       pushSet('paidAmount', paidAmount, (v) => Number(v));
-      pushSet('paidAt', paidAt, (v) => new Date(v));
+
+      // Auto-stamp paidAt on PAID transition unless caller supplies an explicit value.
+      if (paidAt !== undefined) {
+        pushSet('paidAt', paidAt, (v) => new Date(v));
+      } else if (newStatus === PaymentStatus.PAID) {
+        const idx = sqlParams.length + 1;
+        sets.push(`"paidAt" = COALESCE("paidAt", $${idx})`);
+        sqlParams.push(new Date());
+      }
+
       pushSet('paymentNote', paymentNote);
 
       // Auto-stamp confirmedAt on PAID transition unless caller supplies an explicit value.
