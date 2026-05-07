@@ -2,18 +2,23 @@
  * Neture Product Approval Queue Page
  *
  * WO-O4O-ADMIN-PRODUCT-APPROVAL-UI-V1
- * WO-O4O-TABLE-STANDARD-ALIGNMENT-V1 — BaseTable + O4OColumn + RowActionMenu + FilterBar (레퍼런스)
+ * WO-O4O-TABLE-STANDARD-ALIGNMENT-V1 — BaseTable + O4OColumn + RowActionMenu + FilterBar
+ * WO-O4O-PRODUCT-APPROVAL-CANONICAL-COMPLETION-V1 — V3 Canonical alignment:
+ *   BaseTable selectable + Set<string> + ActionBar + useBatchAction + BulkResultModal
  *
  * Supplier가 등록한 상품(SupplierProductOffer)의 PENDING 상태를
  * Admin이 승인/거절할 수 있는 전용 승인 큐 UI.
+ *
+ * Canonical Reference: docs/architecture/O4O-OPERATOR-TABLE-CANONICAL-V1.md
  */
 
 import { useState, useEffect, useMemo } from 'react';
-import { CheckCircle, XCircle, Clock, AlertCircle, RefreshCw, Edit2 } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, AlertCircle, RefreshCw } from 'lucide-react';
 import { authClient } from '@o4o/auth-client';
 import { toast } from 'react-hot-toast';
-import { BaseTable, RowActionMenu, FilterBar } from '@o4o/ui';
+import { BaseTable, RowActionMenu, FilterBar, ActionBar, BulkResultModal } from '@o4o/ui';
 import type { O4OColumn } from '@o4o/ui';
+import { useBatchAction } from '@o4o/operator-ux-core';
 import PageHeader from '../../components/common/PageHeader';
 
 interface ProductOffer {
@@ -60,6 +65,13 @@ export default function ProductApprovalQueuePage() {
   const [filterStatus, setFilterStatus] = useState('');
   const [search, setSearch] = useState('');
 
+  // ── V3 Canonical: Set<string> selection state ─────────────────────────────
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  // ── V3 Canonical: useBatchAction hook ─────────────────────────────────────
+  const approveBatch = useBatchAction();
+  const rejectBatch = useBatchAction();
+
   useEffect(() => { fetchProducts(); }, []);
 
   const fetchProducts = async () => {
@@ -74,8 +86,9 @@ export default function ProductApprovalQueuePage() {
     }
   };
 
+  // ── 단건 액션 (RowActionMenu confirm prop 사용) ────────────────────────────
+
   const handleApprove = async (id: string) => {
-    if (!confirm('이 상품을 승인하시겠습니까?')) return;
     try {
       await authClient.api.post(`/api/v1/neture/admin/products/${id}/approve`);
       toast.success('상품이 승인되었습니다');
@@ -86,16 +99,16 @@ export default function ProductApprovalQueuePage() {
   };
 
   const handleReject = async (id: string, reason?: string) => {
-    const r = reason || prompt('거절 사유를 입력해주세요:');
-    if (!r) return;
     try {
-      await authClient.api.post(`/api/v1/neture/admin/products/${id}/reject`, { reason: r });
+      await authClient.api.post(`/api/v1/neture/admin/products/${id}/reject`, { reason });
       toast.success('상품이 거절되었습니다');
       fetchProducts();
     } catch {
       toast.error('거절 처리에 실패했습니다');
     }
   };
+
+  // ── V3 Canonical: Bulk 액션 ───────────────────────────────────────────────
 
   const filteredProducts = useMemo(() => products.filter((p) => {
     if (filterStatus && p.approvalStatus !== filterStatus) return false;
@@ -106,8 +119,70 @@ export default function ProductApprovalQueuePage() {
     return true;
   }), [products, filterStatus, search]);
 
-  // ── O4O 표준 컬럼 정의 ─────────────────────────────
+  // 선택된 항목 중 PENDING인 수 (bulk approve/reject 대상)
+  const selectedPendingCount = useMemo(
+    () => [...selectedIds].filter(id => filteredProducts.find(p => p.id === id)?.approvalStatus === 'PENDING').length,
+    [selectedIds, filteredProducts],
+  );
+
+  const handleBulkApprove = async () => {
+    const pendingIds = [...selectedIds].filter(
+      id => filteredProducts.find(p => p.id === id)?.approvalStatus === 'PENDING',
+    );
+    if (pendingIds.length === 0) return;
+
+    const result = await approveBatch.executeBatch(
+      (batchIds) => authClient.api.post('/api/v1/neture/admin/products/batch-approve', { ids: batchIds }),
+      pendingIds,
+    );
+    if (result.successCount > 0) {
+      setSelectedIds(new Set());
+      fetchProducts();
+    }
+  };
+
+  const handleBulkReject = async (reason?: string) => {
+    const pendingIds = [...selectedIds].filter(
+      id => filteredProducts.find(p => p.id === id)?.approvalStatus === 'PENDING',
+    );
+    if (pendingIds.length === 0) return;
+
+    const result = await rejectBatch.executeBatch(
+      (batchIds) => authClient.api.post('/api/v1/neture/admin/products/batch-reject', { ids: batchIds, reason }),
+      pendingIds,
+    );
+    if (result.successCount > 0) {
+      setSelectedIds(new Set());
+      fetchProducts();
+    }
+  };
+
+  // ── V3 Canonical: O4O 표준 컬럼 정의 ─────────────────────────────────────
   const columns: O4OColumn<ProductOffer>[] = [
+    // 1. Select column (system: true → 맨 앞, reorder/visibility 제외)
+    {
+      key: '_select',
+      system: true,
+      header: '',
+      width: 40,
+      align: 'center',
+      render: (_, row) => (
+        <input
+          type="checkbox"
+          checked={selectedIds.has(row.id)}
+          onChange={(e) => {
+            const next = new Set(selectedIds);
+            e.target.checked ? next.add(row.id) : next.delete(row.id);
+            setSelectedIds(next);
+          }}
+          onClick={(e) => e.stopPropagation()}
+          className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+        />
+      ),
+      onCellClick: () => {},
+    },
+
+    // 2. 상태
     {
       key: 'approvalStatus',
       header: '상태',
@@ -125,6 +200,8 @@ export default function ProductApprovalQueuePage() {
         );
       },
     },
+
+    // 3. 상품명
     {
       key: 'masterName',
       header: '상품명',
@@ -134,6 +211,8 @@ export default function ProductApprovalQueuePage() {
         <span className="text-sm font-medium text-gray-900">{row.masterName || '-'}</span>
       ),
     },
+
+    // 4. 공급사
     {
       key: 'supplierName',
       header: '공급사',
@@ -143,6 +222,8 @@ export default function ProductApprovalQueuePage() {
         <span className="text-sm text-gray-600">{row.supplierName || '-'}</span>
       ),
     },
+
+    // 5. 유통
     {
       key: 'distributionType',
       header: '유통',
@@ -156,6 +237,8 @@ export default function ProductApprovalQueuePage() {
         </span>
       ),
     },
+
+    // 6. 가격
     {
       key: 'priceGeneral',
       header: '가격',
@@ -169,6 +252,8 @@ export default function ProductApprovalQueuePage() {
         </span>
       ),
     },
+
+    // 7. 등록일
     {
       key: 'createdAt',
       header: '등록일',
@@ -181,14 +266,17 @@ export default function ProductApprovalQueuePage() {
         </span>
       ),
     },
+
+    // 8. Actions column (system: 'last' → 맨 뒤 고정)
     {
       key: '_actions',
       header: '',
       width: 56,
-      system: true,
+      system: 'last',
       align: 'center',
       render: (_, row) => (
         <RowActionMenu
+          inlineMax={0}
           actions={[
             {
               key: 'approve',
@@ -196,6 +284,7 @@ export default function ProductApprovalQueuePage() {
               icon: <CheckCircle size={14} />,
               variant: 'primary',
               hidden: row.approvalStatus !== 'PENDING',
+              confirm: { title: '승인 확인', message: '이 상품을 승인하시겠습니까?', confirmText: '승인' },
               onClick: () => handleApprove(row.id),
             },
             {
@@ -204,25 +293,35 @@ export default function ProductApprovalQueuePage() {
               icon: <XCircle size={14} />,
               variant: 'danger',
               hidden: row.approvalStatus !== 'PENDING',
-              confirm: { title: '거절 확인', message: '이 상품을 거절하시겠습니까?', variant: 'danger', showReason: true, reasonPlaceholder: '거절 사유를 입력해주세요' },
+              confirm: {
+                title: '거절 확인',
+                message: '이 상품을 거절하시겠습니까?',
+                variant: 'danger',
+                confirmText: '거절',
+                showReason: true,
+                reasonPlaceholder: '거절 사유를 입력해주세요 (선택)',
+              },
               onClick: (reason) => handleReject(row.id, reason),
             },
             {
               key: 'view',
               label: '상세 보기',
-              icon: <Edit2 size={14} />,
+              icon: <AlertCircle size={14} />,
               onClick: () => {},
               hidden: row.approvalStatus === 'PENDING',
             },
           ]}
         />
       ),
+      onCellClick: () => {},
     },
   ];
 
   const pending = products.filter((p) => p.approvalStatus === 'PENDING').length;
   const approved = products.filter((p) => p.approvalStatus === 'APPROVED').length;
   const rejected = products.filter((p) => p.approvalStatus === 'REJECTED').length;
+
+  const isBatchLoading = approveBatch.loading || rejectBatch.loading;
 
   return (
     <div className="p-6">
@@ -252,12 +351,12 @@ export default function ProductApprovalQueuePage() {
         ))}
       </div>
 
-      {/* FilterBar (표준 컴포넌트) */}
+      {/* FilterBar */}
       <div className="bg-white rounded-lg shadow p-4 mb-4">
         <FilterBar
           searchPlaceholder="상품명, 공급사 검색..."
           searchValue={search}
-          onSearchChange={setSearch}
+          onSearchChange={(v) => { setSearch(v); setSelectedIds(new Set()); }}
           filters={[
             {
               key: 'status',
@@ -270,23 +369,94 @@ export default function ProductApprovalQueuePage() {
             },
           ]}
           filterValues={{ status: filterStatus }}
-          onFilterChange={(_, value) => setFilterStatus(value)}
+          onFilterChange={(_, value) => { setFilterStatus(value); setSelectedIds(new Set()); }}
         />
       </div>
 
-      {/* BaseTable (표준 컴포넌트) */}
+      {/* V3 Canonical: ActionBar (선택 시에만 표시) */}
+      <div className="mb-3">
+        <ActionBar
+          selectedCount={selectedIds.size}
+          onClearSelection={() => setSelectedIds(new Set())}
+          statusInfo={selectedPendingCount > 0
+            ? `선택된 ${selectedIds.size}개 중 ${selectedPendingCount}개가 승인 대기 상태입니다`
+            : selectedIds.size > 0 ? '선택된 항목 중 대기 중인 상품이 없습니다' : undefined}
+          actions={[
+            {
+              key: 'approve',
+              label: `일괄 승인 (${selectedPendingCount})`,
+              icon: <CheckCircle size={14} />,
+              variant: 'primary',
+              loading: approveBatch.loading,
+              disabled: selectedPendingCount === 0 || isBatchLoading,
+              visible: selectedPendingCount > 0,
+              group: 'actions',
+              tooltip: '선택된 대기 중 상품을 일괄 승인합니다',
+              confirm: {
+                title: '일괄 승인 확인',
+                message: `${selectedPendingCount}개 상품을 승인하시겠습니까?`,
+                confirmText: '승인',
+              },
+              onClick: handleBulkApprove,
+            },
+            {
+              key: 'reject',
+              label: `일괄 거절 (${selectedPendingCount})`,
+              icon: <XCircle size={14} />,
+              variant: 'danger',
+              loading: rejectBatch.loading,
+              disabled: selectedPendingCount === 0 || isBatchLoading,
+              visible: selectedPendingCount > 0,
+              group: 'danger',
+              tooltip: '선택된 대기 중 상품을 일괄 거절합니다',
+              confirm: {
+                title: '일괄 거절 확인',
+                message: `${selectedPendingCount}개 상품을 거절하시겠습니까?`,
+                variant: 'danger',
+                confirmText: '거절',
+                showReason: true,
+                reasonPlaceholder: '거절 사유를 입력해주세요 (선택)',
+              },
+              onClick: handleBulkReject,
+            },
+          ]}
+        />
+      </div>
+
+      {/* V3 Canonical: BaseTable with selectable */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <BaseTable<ProductOffer>
           columns={columns}
           data={filteredProducts}
           rowKey={(row) => row.id}
-          emptyMessage="조건에 맞는 상품이 없습니다."
+          emptyMessage={loading ? '로딩 중...' : '조건에 맞는 상품이 없습니다.'}
+          selectable
+          selectedKeys={selectedIds}
+          onSelectionChange={setSelectedIds}
           columnVisibility
           tableId="neture-product-approval"
           reorderable
           persistState
         />
       </div>
+
+      {/* V3 Canonical: BulkResultModal — 승인 결과 */}
+      <BulkResultModal
+        open={approveBatch.showResult}
+        onClose={() => { approveBatch.clearResult(); fetchProducts(); }}
+        result={approveBatch.result}
+        onRetry={() => approveBatch.retryFailed()}
+        title="일괄 승인 결과"
+      />
+
+      {/* V3 Canonical: BulkResultModal — 거절 결과 */}
+      <BulkResultModal
+        open={rejectBatch.showResult}
+        onClose={() => { rejectBatch.clearResult(); fetchProducts(); }}
+        result={rejectBatch.result}
+        onRetry={() => rejectBatch.retryFailed()}
+        title="일괄 거절 결과"
+      />
     </div>
   );
 }

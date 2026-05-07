@@ -356,6 +356,7 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | **LMS Client Convention V1** | `docs/architecture/LMS-CLIENT-CONVENTION-V1.md` |
 | **Operator Integration State V1** | `docs/architecture/OPERATOR-INTEGRATION-STATE-V1.md` |
 | **Operator DataTable Policy V1** | `docs/architecture/OPERATOR-DATATABLE-POLICY-V1.md` |
+| **Operator Table Canonical V1** | `docs/architecture/O4O-OPERATOR-TABLE-CANONICAL-V1.md` |
 | **Operator Core Design V1** | `docs/architecture/OPERATOR-CORE-DESIGN-V1.md` |
 | **Guide sectionKey 충돌 정책** | `docs/architecture/O4O-GUIDE-SECTIONKEY-CONFLICT-POLICY-V1.md` |
 | **Guide Schema Validation** | `docs/architecture/O4O-GUIDE-SCHEMA-VALIDATION-V1.md` |
@@ -387,5 +388,5 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 ---
 
 *Updated: 2026-05-07*
-*Version: 8.9*
+*Version: 8.10*
 *Status: Active Constitution*
