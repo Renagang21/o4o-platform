@@ -19,10 +19,12 @@ export const MENU_CAPABILITY_MAP: Record<string, string> = {
   products: 'B2C_COMMERCE',
   orders: 'B2C_COMMERCE',
   signage: 'SIGNAGE',
-  // Section mode (KPA) — shared keys above + below
-  library: 'LIBRARY',
-  qr: 'QR_MARKETING',
-  pop: 'POP_PRINT',
+  // WO-O4O-KPA-STORE-SIDEBAR-MENU-RESTRUCTURE-V1:
+  // qr / pop / library 매핑 임시 제거 — 기존 매장의 store_capabilities row 누락으로 인한
+  // UX 불일치(홈 카드 vs 사이드바) 해결. 후속: row backfill 또는 default fallback 도입.
+  // library: 'LIBRARY',
+  // qr: 'QR_MARKETING',
+  // pop: 'POP_PRINT',
 };
 
 /**

@@ -196,18 +196,29 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'local-products', label: '내 매장 상품',        subPath: '/commerce/local-products' },
       { key: 'orders',         label: '주문 내역',           subPath: '/commerce/orders' },
     ]},
+    // WO-O4O-KPA-STORE-SIDEBAR-MENU-RESTRUCTURE-V1: 새 "내 자료함" 그룹 — 디지털 사이니지 상단.
+    // 매장이 커뮤니티(/content, /lms, /resources)에서 가져와 보유한 자료의 보관함.
+    // 페이지는 placeholder, 콘텐츠 기획 확정 후 후속 WO에서 본 페이지 연결.
+    { label: '내 자료함', items: [
+      { key: 'library-contents',  label: '콘텐츠', subPath: '/library/contents' },
+      { key: 'library-courses',   label: '강좌',   subPath: '/library/courses' },
+      { key: 'library-resources', label: '자료',   subPath: '/library/resources' },
+    ]},
     { label: '디지털 사이니지', items: [
       { key: 'signage-playlist',  label: '플레이리스트', subPath: '/marketing/signage/playlist' },
       { key: 'signage-videos',    label: '동영상',       subPath: '/marketing/signage/videos' },
       { key: 'signage-schedules', label: '스케줄',       subPath: '/marketing/signage/schedules' },
       { key: 'signage-player',    label: '재생',         subPath: '/marketing/signage/player' },
     ]},
+    // WO-O4O-KPA-STORE-SIDEBAR-MENU-RESTRUCTURE-V1: 블로그 아래 QR 코드 / POP 자료 / 자료실 노출.
+    // (capability 게이트 임시 우회 — menuCapabilityMap.ts 매핑 제거)
     { label: '매장 실행', items: [
       { key: 'channels',        label: '채널 관리', subPath: '/channels' },
       { key: 'tablet-displays', label: '태블릿 진열', subPath: '/commerce/tablet-displays' },
+      { key: 'blog',            label: '블로그',    subPath: '/content/blog' },
       { key: 'qr',              label: 'QR 코드',   subPath: '/marketing/qr' },
       { key: 'pop',             label: 'POP 자료',  subPath: '/marketing/pop' },
-      { key: 'blog',            label: '블로그',    subPath: '/content/blog' },
+      { key: 'library',         label: '자료실',    subPath: '/content' },
       { key: 'requests',        label: '상담 요청', subPath: '/requests' },
     ]},
     { label: '분석', items: [
