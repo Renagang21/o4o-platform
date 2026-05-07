@@ -316,6 +316,7 @@ export interface EventOfferProduct {
 // WO-O4O-EVENT-OFFER-CORE-REFORM-V1: status / startAt / endAt 추가
 // WO-O4O-EVENT-OFFER-QUANTITY-LIMITS-V2: 수량 필드 추가
 // WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1: eventPrice / generalPrice / 신규 status
+// WO-O4O-GROUPBUY-LISTING-VIEWMODEL-PHASE1-V1: sourceType 추가 (Store Listing 정렬)
 export interface EventOfferItem {
   id: string;
   offerId: string;
@@ -348,7 +349,14 @@ export interface EventOfferItem {
   totalQuantity: number | null;
   perOrderLimit: number | null;
   perStoreLimit: number | null;
+  /** OPL.source_type — Store Listing 진입 경로 식별자 (예: 'event-offer', null=레거시) */
+  sourceType: string | null;
 }
+
+// WO-O4O-GROUPBUY-LISTING-VIEWMODEL-PHASE1-V1: Generic Store Listing alias
+// EventOfferItem은 실제로 Store Listing ViewModel 역할을 수행한다.
+// 향후 sourceType 분기(trial/campaign 등) 도입 시 이 alias에서 분리한다.
+export type StoreListing = EventOfferItem;
 
 // 이벤트 상태 — KPA 매장 경영자 탭 키
 // WO-EVENT-OFFER-HUB-TIME-WINDOW-FILTER-HOTFIX-V1

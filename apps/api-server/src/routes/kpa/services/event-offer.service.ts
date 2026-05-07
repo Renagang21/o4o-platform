@@ -188,6 +188,8 @@ export class EventOfferService {
       totalQuantity: number | null;
       perOrderLimit: number | null;
       perStoreLimit: number | null;
+      // WO-O4O-GROUPBUY-LISTING-VIEWMODEL-PHASE1-V1: Store Listing source 식별자
+      sourceType: string | null;
     }>;
     total: number;
   }> {
@@ -242,7 +244,8 @@ export class EventOfferService {
          spo.price_general::numeric AS "generalPrice",
          COALESCE(opl.event_price, spo.price_general, opl.price)::numeric AS "unitPrice",
          COALESCE(pm.name, '(상품명 없음)')  AS "productName",
-         COALESCE(org.name, '(공급사 없음)') AS "supplierName"
+         COALESCE(org.name, '(공급사 없음)') AS "supplierName",
+         opl.source_type AS "sourceType"
        FROM organization_product_listings opl
        LEFT JOIN supplier_product_offers spo ON spo.id = opl.offer_id
        LEFT JOIN neture_suppliers ns          ON ns.id  = spo.supplier_id
@@ -280,6 +283,8 @@ export class EventOfferService {
         totalQuantity: r.totalQuantity !== null ? Number(r.totalQuantity) : null,
         perOrderLimit: r.perOrderLimit !== null ? Number(r.perOrderLimit) : null,
         perStoreLimit: r.perStoreLimit !== null ? Number(r.perStoreLimit) : null,
+        // WO-O4O-GROUPBUY-LISTING-VIEWMODEL-PHASE1-V1
+        sourceType: r.sourceType ?? null,
       })),
       total,
     };
@@ -481,7 +486,8 @@ export class EventOfferService {
          spo.price_general::numeric AS "generalPrice",
          COALESCE(opl.event_price, spo.price_general, opl.price)::numeric AS "unitPrice",
          COALESCE(pm.name, '(상품명 없음)')  AS "productName",
-         COALESCE(org.name, '(공급사 없음)') AS "supplierName"
+         COALESCE(org.name, '(공급사 없음)') AS "supplierName",
+         opl.source_type AS "sourceType"
        FROM organization_product_listings opl
        LEFT JOIN supplier_product_offers spo ON spo.id = opl.offer_id
        LEFT JOIN neture_suppliers ns          ON ns.id  = spo.supplier_id
@@ -519,6 +525,8 @@ export class EventOfferService {
       totalQuantity: r.totalQuantity !== null ? Number(r.totalQuantity) : null,
       perOrderLimit: r.perOrderLimit !== null ? Number(r.perOrderLimit) : null,
       perStoreLimit: r.perStoreLimit !== null ? Number(r.perStoreLimit) : null,
+      // WO-O4O-GROUPBUY-LISTING-VIEWMODEL-PHASE1-V1
+      sourceType: r.sourceType ?? null,
     };
   }
 
