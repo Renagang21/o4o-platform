@@ -355,20 +355,13 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | **APP-LMS Baseline** | `docs/architecture/APP-LMS-BASELINE.md` |
 | **LMS Scope Guard 설계** | `docs/architecture/LMS-SCOPE-GUARD.md` |
 | **LMS Client Convention V1** | `docs/architecture/LMS-CLIENT-CONVENTION-V1.md` |
-| **LMS Client Extraction V2 Impact** | `docs/architecture/LMS-CLIENT-EXTRACTION-V2-IMPACT.md` |
-| **LMS Client V2 Complete** | `docs/architecture/LMS-CLIENT-EXTRACTION-V2-COMPLETE.md` |
 | **Operator Integration State V1** | `docs/architecture/OPERATOR-INTEGRATION-STATE-V1.md` |
 | **Operator DataTable Policy V1** | `docs/architecture/OPERATOR-DATATABLE-POLICY-V1.md` |
 | **Operator Core Design V1** | `docs/architecture/OPERATOR-CORE-DESIGN-V1.md` |
-| **Operator Core Extraction Verify Checklist V1** | `docs/architecture/OPERATOR-CORE-EXTRACTION-VERIFY-CHECKLIST-V1.md` |
-| **GuideBlock 1차 적용 보고서** | `docs/architecture/O4O-GUIDE-BLOCK-1ST-WAVE-REPORT-V1.md` |
-| **GuideBlock 서비스 전체 적용 보고서** | `docs/architecture/O4O-GUIDE-BLOCK-SERVICE-WIDE-REPORT-V1.md` |
 | **Guide sectionKey 충돌 정책** | `docs/architecture/O4O-GUIDE-SECTIONKEY-CONFLICT-POLICY-V1.md` |
 | **Guide Schema Validation** | `docs/architecture/O4O-GUIDE-SCHEMA-VALIDATION-V1.md` |
 | **Guide sectionKey Migration** | `docs/architecture/O4O-GUIDE-SECTIONKEY-MIGRATION-V1.md` |
 | **Guide Content Reseed** | `docs/architecture/O4O-GUIDE-CONTENT-RESEED-GUIDEBLOCK-V1.md` |
-| **GuideBlock 2차 적용 보고서** | `docs/architecture/O4O-GUIDE-BLOCK-SECOND-WAVE-REPORT-V1.md` |
-| **O4O 공통 Guide 시스템 v1 최종 보고서** | `docs/architecture/O4O-GUIDE-SYSTEM-FINAL-REPORT-V1.md` |
 
 ---
 
@@ -387,5 +380,5 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 ---
 
 *Updated: 2026-05-07*
-*Version: 8.5*
+*Version: 8.6*
 *Status: Active Constitution*
