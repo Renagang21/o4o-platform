@@ -21,7 +21,6 @@ import {
   FileDown,
 } from 'lucide-react';
 import { colors } from '../../styles/theme';
-import { getAccessToken } from '../../contexts/AuthContext';
 import {
   getProductMarketing,
   unlinkProductMarketingAsset,
@@ -32,29 +31,29 @@ import type {
   ProductLibraryAsset,
 } from '../../api/productMarketing';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
-
 export function ProductMarketingPage() {
   const { productId } = useParams<{ productId: string }>();
   const navigate = useNavigate();
   const [data, setData] = useState<ProductMarketingData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const handlePopDownload = async (layout: 'A4' | 'A5' = 'A4') => {
+  // WO-O4O-AI-AUTO-POP-BUILDER-V1: POP 편집 페이지로 이동 — 첫 활성 자료실 항목을 context로 전달
+  const handleCreatePop = () => {
     if (!productId) return;
-    const token = getAccessToken();
-    const url = `${API_BASE}/api/v1/products/${productId}/pop/${layout}`;
-    try {
-      const resp = await fetch(url, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
+    const targetAsset = data?.libraryAssets.find((a: ProductLibraryAsset) => a.isActive);
+    if (targetAsset) {
+      navigate(`/store/commerce/products/${productId}/pop`, {
+        state: {
+          productName: targetAsset.title,
+          selectedLibraryItem: {
+            id: targetAsset.id,
+            title: targetAsset.title,
+            description: targetAsset.description,
+          },
+        },
       });
-      if (!resp.ok) throw new Error('POP 생성 실패');
-      const blob = await resp.blob();
-      const blobUrl = URL.createObjectURL(blob);
-      window.open(blobUrl, '_blank');
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
-    } catch {
-      // silent
+    } else {
+      navigate(`/store/commerce/products/${productId}/pop`);
     }
   };
 
@@ -152,9 +151,9 @@ export function ProductMarketingPage() {
             <QrCode size={14} />
             QR 만들기
           </button>
-          <button onClick={() => handlePopDownload('A4')} style={styles.actionBtn}>
+          <button onClick={handleCreatePop} style={styles.actionBtn}>
             <FileDown size={14} />
-            POP 출력
+            POP 만들기
           </button>
           <button onClick={() => navigate(-1)} style={styles.backBtn}>
             <ArrowLeft size={14} />

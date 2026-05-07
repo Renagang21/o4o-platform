@@ -179,6 +179,7 @@ const StorePopPage = lazy(() => import('./pages/pharmacy/StorePopPage').then(m =
 const MarketingAnalyticsPage = lazy(() => import('./pages/pharmacy/MarketingAnalyticsPage').then(m => ({ default: m.MarketingAnalyticsPage })));
 const StoreHomePage = lazy(() => import('./pages/pharmacy/StoreHomePage').then(m => ({ default: m.StoreHomePage })));
 const ProductMarketingPage = lazy(() => import('./pages/pharmacy/ProductMarketingPage').then(m => ({ default: m.ProductMarketingPage })));
+const ProductPopBuilderPage = lazy(() => import('./pages/pharmacy/ProductPopBuilderPage').then(m => ({ default: m.ProductPopBuilderPage })));
 // default-as-named (wrapper 불필요)
 const StoreAssetsPage = lazy(() => import('./pages/pharmacy/StoreAssetsPage'));
 const StoreContentEditPage = lazy(() => import('./pages/pharmacy/StoreContentEditPage'));
@@ -838,6 +839,8 @@ function App() {
             <Route path="commerce/products/suppliers" element={<SupplierListPage />} />
             <Route path="commerce/products/suppliers/:supplierId" element={<SupplierDetailPage />} />
             <Route path="commerce/products/:productId/marketing" element={<ProductMarketingPage />} />
+            {/* WO-O4O-AI-AUTO-POP-BUILDER-V1: 상품 POP 만들기 (AI prefill + 편집 + PDF) */}
+            <Route path="commerce/products/:productId/pop" element={<ProductPopBuilderPage />} />
             <Route path="commerce/local-products" element={<StoreLocalProductsPage />} />
             <Route path="commerce/tablet-displays" element={<StoreTabletDisplaysPage />} />
             <Route path="commerce/order-worktable" element={<StoreOrderWorktablePage />} />
