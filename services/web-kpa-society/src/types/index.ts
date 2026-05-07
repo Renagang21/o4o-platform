@@ -492,3 +492,20 @@ export interface Event {
   status: 'upcoming' | 'ongoing' | 'ended';
   createdAt: string;
 }
+
+
+// ─────────────────────────────────────────────────────
+// Store Listing Card — Canonical ViewModel
+// WO-O4O-KPA-STORE-LISTING-VIEWMODEL-CANONICAL-V1
+// ─────────────────────────────────────────────────────
+
+export type {
+  StoreListingSourceType,
+  StoreListingBadge,
+  StoreListingPeriod,
+  StoreListingInventory,
+  StoreListingPrimaryAction,
+  StoreListingCardViewModel,
+} from './storeListing';
+
+export { fromEventOfferItem } from './storeListing';
