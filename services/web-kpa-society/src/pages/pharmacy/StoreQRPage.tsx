@@ -16,6 +16,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { QrCode, Plus, Trash2, ExternalLink, Copy, Check, RefreshCw, BarChart3, X, Smartphone, Monitor, Tablet, Download, Printer, ArrowRight } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
+import { GuideBlock } from '@o4o/shared-space-ui';
 import { colors } from '../../styles/theme';
 import { StoreQRCreateEntryModal } from '../../components/store/StoreQRCreateEntryModal';
 import { StoreAssetSelectorModal } from '../../components/store/StoreAssetSelectorModal';
@@ -331,6 +332,15 @@ export function StoreQRPage() {
 
   return (
     <div style={styles.container}>
+      {/* WO-O4O-STORE-WORKSPACE-QR-PREFILL-V2: QR canonical 안내 */}
+      <div style={{ marginBottom: '16px' }}>
+        <GuideBlock
+          variant="warning"
+          title="QR 코드는 '연결 대상'을 저장합니다"
+          description="QR 코드는 내용을 저장하는 것이 아니라 연결 대상을 저장합니다. 사용자가 QR을 스캔하면 선택한 상품/콘텐츠/페이지/URL로 이동합니다. 내용 자체는 자료실/상품/콘텐츠 페이지에서 관리하세요."
+        />
+      </div>
+
       {/* Header */}
       <div style={styles.header}>
         <div>
@@ -430,6 +440,18 @@ export function StoreQRPage() {
               ))}
             </select>
           </div>
+
+          {/* WO-O4O-STORE-WORKSPACE-QR-PREFILL-V2: link 타입 추가 경고 */}
+          {formLandingType === 'link' && (
+            <div style={{ marginBottom: '12px' }}>
+              <GuideBlock
+                variant="warning"
+                title="URL 연결형 QR"
+                description="URL 연결형 QR입니다. QR 자체에 콘텐츠가 저장되지 않으며, 입력한 URL로 바로 이동합니다. 대상 URL이 사라지면 QR도 작동하지 않습니다."
+                compact
+              />
+            </div>
+          )}
 
           {/* WO-O4O-STORE-QR-TO-INTEREST-FLOW-V1: tablet 타입은 landingTargetId 불필요 (storeSlug 자동 사용) */}
           {formLandingType !== 'tablet' && (

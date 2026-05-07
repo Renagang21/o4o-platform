@@ -77,6 +77,29 @@ export function ProductMarketingPage() {
     fetchData();
   }, [fetchData]);
 
+  // WO-O4O-STORE-WORKSPACE-QR-PREFILL-V2: 상품에 연결된 첫 활성 자료실 항목을
+  // selectedLibraryItem state로 전달 → StoreQRPage에서 자동 prefill
+  const handleCreateQr = () => {
+    const targetAsset = data?.libraryAssets.find((a: ProductLibraryAsset) => a.isActive);
+    if (targetAsset) {
+      navigate('/store/marketing/qr', {
+        state: {
+          selectedLibraryItem: {
+            id: targetAsset.id,
+            title: targetAsset.title,
+            category: targetAsset.category,
+            fileUrl: targetAsset.fileUrl,
+            assetType: 'file',
+            url: null,
+            htmlContent: null,
+          },
+        },
+      });
+    } else {
+      navigate('/store/marketing/qr');
+    }
+  };
+
   const handleUnlink = async (linkId: string) => {
     if (!productId) return;
     try {
@@ -125,7 +148,7 @@ export function ProductMarketingPage() {
           <p style={styles.subtitle}>이 상품에 연결된 QR 코드, 자료실 항목 등을 확인합니다</p>
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
-          <button onClick={() => navigate('/store/marketing/qr')} style={styles.actionBtn}>
+          <button onClick={handleCreateQr} style={styles.actionBtn}>
             <QrCode size={14} />
             QR 만들기
           </button>
