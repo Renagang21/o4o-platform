@@ -57,7 +57,7 @@ describe('Cross-Service Access Blocking', () => {
     const blockedRoles = [
       'kpa:admin',
       'kpa:operator',
-      'kpa:branch_admin',
+      'kpa:store_owner',
       'glycopharm:admin',
       'glycopharm:operator',
       'cosmetics:admin',

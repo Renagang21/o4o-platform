@@ -14,14 +14,17 @@ import type { ServiceScopeGuardConfig } from './types.js';
  *
  * Organizational isolation: platform:super_admin does NOT bypass.
  * KPA organizations are fully isolated from platform-level access.
+ *
+ * WO-O4O-KPA-BRANCH-DISTRICT-LEGACY-CLEANUP-V1:
+ *   kpa:district_admin / kpa:branch_admin / kpa:branch_operator 모두 제거.
+ *   KPA에는 kpa-society 운영자(kpa:operator) / 관리자(kpa:admin) 만 존재.
+ *   조직 단위 역할은 kpa_members.role(=user.membershipRole)로 관리.
  */
 export const KPA_SCOPE_CONFIG: ServiceScopeGuardConfig = {
   serviceKey: 'kpa',
   allowedRoles: [
     'kpa:admin',
     'kpa:operator',
-    'kpa:district_admin',
-    // kpa:branch_admin, kpa:branch_operator removed — WO-KPA-A-BRANCH-CHAPTER-REMOVAL-PHASE3-DATA-AND-ROLE-CLEANUP-V1
   ],
   platformBypass: false,
   legacyRoles: [],
@@ -29,7 +32,7 @@ export const KPA_SCOPE_CONFIG: ServiceScopeGuardConfig = {
   // WO-KPA-SCOPE-HIERARCHY-FIX-V1: kpa:admin ⊃ kpa:operator (admin covers operator, not vice versa)
   scopeRoleMapping: {
     'kpa:admin': ['kpa:admin'],
-    'kpa:operator': ['kpa:operator', 'kpa:admin', 'kpa:district_admin'],
+    'kpa:operator': ['kpa:operator', 'kpa:admin'],
   },
 };
 

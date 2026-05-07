@@ -25,7 +25,7 @@ type AuthMiddleware = RequestHandler;
  *   dataSource,
  *   requireAuth,
  *   {
- *     allowedRoles: ['kpa:admin', 'kpa:operator', 'kpa:branch_admin', 'kpa:branch_operator'],
+ *     allowedRoles: ['kpa:admin', 'kpa:operator'],
  *     sourceService: 'kpa',
  *     resolver: new KpaAssetResolver(dataSource),
  *     resolveOrgId: async (ds, userId) => { ... },

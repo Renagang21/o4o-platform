@@ -31,7 +31,7 @@ export interface ServiceScopeGuardConfig {
   /**
    * All service-prefixed roles that may grant access.
    * The guard checks if the requested scope is in this list.
-   * e.g., ['kpa:admin', 'kpa:operator', 'kpa:district_admin']
+   * e.g., ['kpa:admin', 'kpa:operator']
    */
   allowedRoles: string[];
 

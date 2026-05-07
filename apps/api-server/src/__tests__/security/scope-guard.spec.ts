@@ -34,10 +34,11 @@ describe('KPA Scope Guard', () => {
   describe('allowed roles', () => {
     // WO-KPA-A-BRANCH-CHAPTER-REMOVAL-PHASE4-DEAD-CODE-AND-DROP-V1:
     // kpa:branch_admin and kpa:branch_operator removed from KPA_SCOPE_CONFIG
+    // WO-O4O-KPA-BRANCH-DISTRICT-LEGACY-CLEANUP-V1:
+    // kpa:district_admin 도 제거. KPA에는 kpa-society 운영자/관리자만 존재.
     const allowedRoles = [
       'kpa:admin',
       'kpa:operator',
-      'kpa:district_admin',
     ];
 
     it.each(allowedRoles)('role %s → allowed for kpa:operator scope', async (role) => {
@@ -81,7 +82,9 @@ describe('KPA Scope Guard', () => {
       expect(result.statusCode).toBe(403);
     });
 
-    it('kpa:district_admin role → denied for kpa:admin scope (403)', async () => {
+    // WO-O4O-KPA-BRANCH-DISTRICT-LEGACY-CLEANUP-V1
+    // kpa:district_admin 제거 — legacy role은 admin/operator scope 모두에서 거부되어야 한다.
+    it('kpa:district_admin role (legacy) → denied for kpa:admin scope (403)', async () => {
       const guard = requireKpaScope('kpa:admin');
       const user = createMockUser({ roles: ['kpa:district_admin'] });
       const result = await executeGuard(guard, user);

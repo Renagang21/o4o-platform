@@ -11,6 +11,10 @@
  * isBranchOperator (KPA-c) tests removed — branch controllers deleted.
  * kpa:branch_admin and kpa:branch_operator removed from allowed roles.
  *
+ * WO-O4O-KPA-BRANCH-DISTRICT-LEGACY-CLEANUP-V1:
+ * kpa:district_admin 도 제거. KPA에는 kpa-society 운영자(kpa:operator) /
+ * 관리자(kpa:admin) 만 존재.
+ *
  * These tests detect guard logic changes at CI time.
  */
 
@@ -48,7 +52,7 @@ describe('hasAnyServiceRole (core utility)', () => {
 // 2. requireKpaScope — KPA-a guard role matrix
 //
 // Frozen role list from KPA_SCOPE_CONFIG (security-core):
-//   ALLOWED: kpa:admin, kpa:operator, kpa:district_admin
+//   ALLOWED: kpa:admin, kpa:operator
 //   DENIED:  platform:*, legacy unprefixed, other services
 // ─────────────────────────────────────────────────────
 
@@ -57,7 +61,6 @@ describe('requireKpaScope role matrix (KPA-a)', () => {
   const KPA_SCOPE_ALLOWED_ROLES = [
     'kpa:admin',
     'kpa:operator',
-    'kpa:district_admin',
   ];
 
   describe('ALLOWED roles', () => {
@@ -74,11 +77,14 @@ describe('requireKpaScope role matrix (KPA-a)', () => {
       'glycopharm:admin',
       'cosmetics:admin',
       'glucoseview:admin',
-      'admin',            // legacy
-      'super_admin',      // legacy
-      'operator',         // legacy
-      'branch_admin',     // legacy
-      'kpa:pharmacist',   // member, not operator
+      'admin',                 // legacy
+      'super_admin',           // legacy
+      'operator',              // legacy
+      'branch_admin',          // legacy (지부/분회 모델 제거됨)
+      'kpa:district_admin',    // legacy (지부/분회 모델 제거됨)
+      'kpa:branch_admin',      // legacy (지부/분회 모델 제거됨)
+      'kpa:branch_operator',   // legacy (지부/분회 모델 제거됨)
+      'kpa:pharmacist',        // member, not operator
     ];
 
     it.each(deniedRoles)('%s → denied', (role) => {

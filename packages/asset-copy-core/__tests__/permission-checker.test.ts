@@ -88,7 +88,7 @@ describe('DefaultPermissionChecker', () => {
     it('Neture role → KPA allowedRoles → FORBIDDEN', () => {
       const result = checker.hasAnyRole(
         ['neture:admin'],
-        ['kpa:admin', 'kpa:operator', 'kpa:branch_admin'],
+        ['kpa:admin', 'kpa:operator', 'kpa:store_owner'],
       );
       expect(result).toBe(false);
     });
