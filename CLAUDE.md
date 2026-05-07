@@ -219,23 +219,23 @@ import type { RelatedEntity } from './related.entity.js';
 ## 11. Operator Dashboard 표준
 
 > 📄 상세: `docs/platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md`
+> 📄 DataTable 정책: `docs/architecture/OPERATOR-DATATABLE-POLICY-V1.md`
 
 ### Admin / Operator 역할 구분
 
-| 역할 | 범위 | 핵심 기능 |
-|------|------|----------|
-| **Admin** | 구조 + 정책 + 거버넌스 + 금융 | 승인 관리, 사용자 CRUD, 정산/커미션, 시스템 설정 |
-| **Operator** | 운영 + 콘텐츠 + 모니터링 | Dashboard, 콘텐츠 CRUD, 사이니지, 포럼, AI 리포트 |
+| 역할 | 범위 |
+|------|------|
+| **Admin** | 구조 + 정책 + 거버넌스 + 금융 |
+| **Operator** | 운영 + 콘텐츠 + 모니터링 |
 
-### 필수 규칙
+### 핵심 규칙
 
-1. **Guard**: `requireAuth` → `require{Service}Scope('{service}:{role}')` — 인라인 역할 체크, 레거시 `requireAdmin` 서비스 레벨 사용 금지
-2. **Layout**: Admin / Operator 독립 레이아웃 — 좌측 사이드바 + Capability Group (접이식)
-3. **Dashboard**: 5-Block (`KPI` + `AI Summary` + `Action Queue` + `Activity Log` + `Quick Actions`) — `OperatorDashboardLayout` 컴포넌트 사용
-4. **KPI**: Capability 분류(Network/Commerce/Care/Content/Signage/Community/Analytics) 기반 4~8개 — Backend 집계 필수, serviceKey 격리, KPI→Action Queue 연결
-5. **AI Summary**: Backend `CopilotEngineService.generateInsights()` 사용 — Frontend client-side 생성 금지
-6. **Sidebar**: 11-Capability Group 순서 준수 — Dashboard → Users → Approvals → Products → Stores → Orders → Content → Signage → Forum → Analytics → System
-7. **Route**: Backend `/api/v1/{service}/operator/*`, `/api/v1/{service}/admin/*` — Frontend `/operator/*`, `/admin/*`
+1. **Guard**: `requireAuth` → `require{Service}Scope('{service}:{role}')` — 레거시 `requireAdmin` 서비스 레벨 사용 금지
+2. **Dashboard**: 5-Block 구조 (`KPI` + `AI Summary` + `Action Queue` + `Activity Log` + `Quick Actions`) — `OperatorDashboardLayout` 컴포넌트 사용
+3. **AI Summary**: Backend `CopilotEngineService.generateInsights()` 사용 — Frontend client-side 생성 금지
+4. **Route**: Backend `/api/v1/{service}/operator/*` · `/api/v1/{service}/admin/*` — Frontend `/operator/*` · `/admin/*`
+
+레이아웃·Sidebar 순서·KPI 분류·DataTable 정책 등 상세 규칙은 canonical 문서 참조.
 
 ---
 
@@ -380,5 +380,5 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 ---
 
 *Updated: 2026-05-07*
-*Version: 8.6*
+*Version: 8.7*
 *Status: Active Constitution*
