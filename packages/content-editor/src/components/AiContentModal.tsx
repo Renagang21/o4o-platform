@@ -309,20 +309,20 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
     if (editor) {
       editor.commands.setContent(result.html, true);
       // WO-O4O-AI-CONTENT-EDITOR-YOUTUBE-COMMAND-INSERT-V1:
-      //   setContent 경로는 <div data-youtube-video><iframe>...</iframe></div> wrapper 도
-      //   ProseMirror DOMParser 단계에서 drop 됨 (실측 확인). TipTap Youtube extension 의
-      //   공식 명령(setYoutubeVideo)으로 별도 삽입한다. extension 미등록 시 명령이 부재하므로
-      //   존재 여부를 확인한 뒤 호출.
+      //   setContent 후 에디터 HTML에 YouTube URL이 없을 때만 setYoutubeVideo 호출.
+      //   TipTap DOMParser 가 <div data-youtube-video><iframe> wrapper 를 파싱하면
+      //   이미 삽입됐으므로 중복 삽입 방지.
       if (result.youtubeUrls && result.youtubeUrls.length > 0) {
+        const currentHtml = editor.getHTML();
         const ytCommand = (editor.commands as unknown as {
           setYoutubeVideo?: (options: { src: string }) => boolean;
         }).setYoutubeVideo;
         if (typeof ytCommand === 'function') {
           for (const src of result.youtubeUrls) {
-            try {
-              ytCommand({ src });
-            } catch {
-              /* invalid url 등은 silently skip */
+            const embedUrl = src.includes('watch?v=') ? src.replace('watch?v=', 'embed/') : src;
+            const alreadyInserted = currentHtml.includes(embedUrl) || currentHtml.includes(src);
+            if (!alreadyInserted) {
+              try { ytCommand({ src }); } catch { /* invalid url — skip */ }
             }
           }
         }
