@@ -1,5 +1,9 @@
 # NETURE-DOMAIN-ARCHITECTURE-FREEZE-V3
 
+> **Current Canonical**: This document (V3, 2026-03-01) supersedes
+> [`NETURE-DOMAIN-ARCHITECTURE-FREEZE-V1.md`](./NETURE-DOMAIN-ARCHITECTURE-FREEZE-V1.md).
+> Use this document as the authoritative Neture domain architecture reference.
+
 ## 1. 선언 목적
 
 본 문서는 Neture 도메인의 핵심 실행 흐름이

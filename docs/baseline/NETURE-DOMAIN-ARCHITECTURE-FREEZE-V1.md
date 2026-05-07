@@ -2,6 +2,12 @@
 
 **Neture Price & Distribution Architecture Freeze Declaration**
 
+> **⚠️ Version Note**: This document (V1, 2026-02-28, Beta 3 stage) has been superseded by
+> [`NETURE-DOMAIN-ARCHITECTURE-FREEZE-V3.md`](./NETURE-DOMAIN-ARCHITECTURE-FREEZE-V3.md)
+> as the current canonical architecture freeze.
+> V1 is retained for historical reference — the price rules and Campaign structure defined here
+> remain valid context, but V3 is the authoritative source for Neture domain architecture.
+
 ---
 
 ## 1. 목적
