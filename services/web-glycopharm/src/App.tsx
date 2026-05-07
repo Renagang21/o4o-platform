@@ -48,7 +48,6 @@ const RoleSelectPage = lazy(() => import('@/pages/auth/RoleSelectPage'));
 // Store Management pages (WO-O4O-GLYCOPHARM-NAVIGATION-AND-STORE-STRUCTURE-REFINE-V1:
 //   pages/pharmacy/ → pages/store-management/ 이동, /store/* 라우트 담당)
 const StoreMainPage = lazy(() => import('@/pages/store-management/StoreMainPage'));
-const PharmacyProducts = lazy(() => import('@/pages/store-management/PharmacyProducts'));
 const PharmacyOrders = lazy(() => import('@/pages/store-management/PharmacyOrders'));
 const PharmacyPatients = lazy(() => import('@/pages/store-management/PharmacyPatients'));
 const PharmacySettings = lazy(() => import('@/pages/store-management/PharmacySettings'));
@@ -586,7 +585,8 @@ function AppRoutes() {
       >
         <Route path="hub" element={<StoreOverviewPage />} />
         <Route path="identity" element={<StoreMainPage />} />
-        <Route path="products" element={<PharmacyProducts />} />
+        {/* WO-O4O-STORE-PRODUCTS-UI-CANONICAL-ALIGNMENT-V2: /store/my-products 로 통일 */}
+        <Route path="products" element={<Navigate to="/store/my-products" replace />} />
         {/* WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: 내 매장 상품 (ProductMaster + Listing).
             상위 ProtectedRoute 가 PHARMACIST 게이트 — 추가로 store_owner/admin 만 통과시킨다. */}
         <Route path="my-products" element={
