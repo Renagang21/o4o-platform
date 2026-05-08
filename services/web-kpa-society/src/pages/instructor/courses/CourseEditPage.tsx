@@ -473,6 +473,7 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
         onClose={() => setAiOpen(false)}
         editor={null}
         onInsert={handleAiInsert}
+        showCommunitySave={true}
       />
     </div>
   );

@@ -64,6 +64,11 @@ export interface ContentEditorProps {
    * - 미제공 시 credentials: 'include' fallback 유지
    */
   aiRequestHeaders?: Record<string, string>;
+  /**
+   * WO-O4O-AI-CONTENT-COMMUNITY-SAVE-INTEGRATION-V1: AI 결과를 커뮤니티(포럼)에 저장 버튼 표시.
+   * - true 시 AiContentModal에 "커뮤니티 저장" 버튼 활성화
+   */
+  showCommunitySave?: boolean;
 }
 
 export interface ToolbarProps {

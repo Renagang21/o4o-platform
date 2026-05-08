@@ -66,6 +66,12 @@ interface AiContentModalProps {
     summary: string;
     mode: AiMode;
   }) => Promise<{ success: boolean; fieldLabel?: string; error?: string }>;
+  /**
+   * WO-O4O-AI-CONTENT-COMMUNITY-SAVE-INTEGRATION-V1: AI 결과를 커뮤니티(포럼)에 저장.
+   * - true 시 "커뮤니티 저장" 버튼 표시 + 인라인 저장 패널 활성화
+   * - 미제공(undefined/false) 시 버튼 미표시
+   */
+  showCommunitySave?: boolean;
 }
 
 type AiMode = 'customer_rewrite' | 'summary' | 'pop' | 'title_suggest';
@@ -162,7 +168,7 @@ function blocksToHtml(blocks: UrlBlock[]): string {
     .join('\n');
 }
 
-export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeaders, onChannelSave }: AiContentModalProps) {
+export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeaders, onChannelSave, showCommunitySave }: AiContentModalProps) {
   // 기존 text 모드 상태
   const [input, setInput] = useState('');
   const [mode, setMode] = useState<AiMode>('customer_rewrite');
@@ -176,6 +182,15 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
   // WO-O4O-AI-CONTENT-AUTO-CHANNEL-SAVE-V1
   const [channelSaving, setChannelSaving] = useState(false);
   const [channelSaveStatus, setChannelSaveStatus] = useState<{ ok: boolean; label?: string; error?: string } | null>(null);
+
+  // WO-O4O-AI-CONTENT-COMMUNITY-SAVE-INTEGRATION-V1
+  const [showCommunitySavePanel, setShowCommunitySavePanel] = useState(false);
+  const [communityTitle, setCommunityTitle] = useState('');
+  const [communityForumId, setCommunityForumId] = useState('');
+  const [communityForums, setCommunityForums] = useState<{ id: string; name: string }[]>([]);
+  const [communityForumsLoading, setCommunityForumsLoading] = useState(false);
+  const [communitySaving, setCommunitySaving] = useState(false);
+  const [communitySaveStatus, setCommunitySaveStatus] = useState<{ ok: boolean; error?: string; postId?: string } | null>(null);
 
   // URL 모드 상태 (WO-O4O-RICHTEXT-AI-URL-IMPORT-V1)
   const [sourceTab, setSourceTab] = useState<SourceTab>('text');
@@ -375,6 +390,61 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
     }
   };
 
+  // WO-O4O-AI-CONTENT-COMMUNITY-SAVE-INTEGRATION-V1
+  const handleOpenCommunitySavePanel = async () => {
+    if (!result) return;
+    setCommunityTitle(result.title || '');
+    setCommunityForumId('');
+    setCommunitySaveStatus(null);
+    setShowCommunitySavePanel(true);
+    if (communityForums.length === 0) {
+      setCommunityForumsLoading(true);
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/v1/forum/categories`, {
+          headers: { ...aiRequestHeaders },
+          credentials: 'include',
+        });
+        const data = await res.json();
+        if (data.success && Array.isArray(data.data)) {
+          setCommunityForums(data.data.map((f: any) => ({ id: f.id, name: f.name })));
+        }
+      } catch {
+        // 포럼 목록 로딩 실패 — 사용자는 포럼 없이 저장 가능
+      } finally {
+        setCommunityForumsLoading(false);
+      }
+    }
+  };
+
+  const handleCommunitySave = async () => {
+    if (!result) return;
+    setCommunitySaving(true);
+    setCommunitySaveStatus(null);
+    try {
+      const body: Record<string, any> = {
+        title: communityTitle.trim() || 'AI 생성 콘텐츠',
+        content: result.html,
+        type: 'discussion',
+      };
+      if (communityForumId) body.forumId = communityForumId;
+      const res = await fetch(`${API_BASE_URL}/api/v1/forum/posts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...aiRequestHeaders },
+        credentials: 'include',
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || '커뮤니티 저장에 실패했습니다.');
+      }
+      setCommunitySaveStatus({ ok: true, postId: data.data?.id });
+    } catch (err: any) {
+      setCommunitySaveStatus({ ok: false, error: err?.message || '저장 중 오류가 발생했습니다.' });
+    } finally {
+      setCommunitySaving(false);
+    }
+  };
+
   const handleClose = () => {
     setInput('');
     setResult(null);
@@ -384,6 +454,11 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
     setChannelSaveStatus(null);
     setChannelSaving(false);
     setUrlInput('');
+    setShowCommunitySavePanel(false);
+    setCommunityTitle('');
+    setCommunityForumId('');
+    setCommunitySaveStatus(null);
+    setCommunitySaving(false);
     onClose();
   };
 
@@ -892,6 +967,123 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
             </div>
           )}
 
+          {/* WO-O4O-AI-CONTENT-COMMUNITY-SAVE-INTEGRATION-V1: 커뮤니티 저장 패널 */}
+          {showCommunitySave && result && showCommunitySavePanel && (
+            <div
+              style={{
+                border: '1px solid #bae6fd',
+                borderRadius: '8px',
+                padding: '14px',
+                background: '#f0f9ff',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+              }}
+            >
+              <div style={{ fontSize: '13px', fontWeight: 600, color: '#0369a1' }}>커뮤니티 게시글로 저장</div>
+
+              {/* 제목 입력 */}
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', color: '#374151', marginBottom: '4px' }}>제목</label>
+                <input
+                  type="text"
+                  value={communityTitle}
+                  onChange={(e) => setCommunityTitle(e.target.value)}
+                  placeholder="게시글 제목을 입력하세요"
+                  style={{
+                    width: '100%',
+                    padding: '8px 10px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '6px',
+                    fontSize: '13px',
+                    fontFamily: 'inherit',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+
+              {/* 게시판 선택 */}
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', color: '#374151', marginBottom: '4px' }}>게시판 선택</label>
+                <select
+                  value={communityForumId}
+                  onChange={(e) => setCommunityForumId(e.target.value)}
+                  disabled={communityForumsLoading}
+                  style={{
+                    width: '100%',
+                    padding: '8px 10px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '6px',
+                    fontSize: '13px',
+                    fontFamily: 'inherit',
+                    background: 'white',
+                    boxSizing: 'border-box',
+                  }}
+                >
+                  <option value="">
+                    {communityForumsLoading ? '게시판 목록 로딩 중...' : '게시판 선택 (선택사항)'}
+                  </option>
+                  {communityForums.map((f) => (
+                    <option key={f.id} value={f.id}>{f.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 저장 결과 */}
+              {communitySaveStatus && (
+                <div
+                  style={{
+                    padding: '8px 12px',
+                    borderRadius: '6px',
+                    fontSize: '12px',
+                    color: communitySaveStatus.ok ? '#15803d' : '#dc2626',
+                    background: communitySaveStatus.ok ? '#f0fdf4' : '#fef2f2',
+                  }}
+                >
+                  {communitySaveStatus.ok
+                    ? `게시글이 저장되었습니다 ✓`
+                    : `저장 실패: ${communitySaveStatus.error}`}
+                </div>
+              )}
+
+              {/* 버튼 */}
+              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                <button
+                  type="button"
+                  onClick={() => { setShowCommunitySavePanel(false); setCommunitySaveStatus(null); }}
+                  style={{
+                    padding: '7px 14px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '6px',
+                    background: 'white',
+                    fontSize: '13px',
+                    cursor: 'pointer',
+                    color: '#374151',
+                  }}
+                >
+                  취소
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCommunitySave}
+                  disabled={communitySaving || Boolean(communitySaveStatus?.ok)}
+                  style={{
+                    padding: '7px 14px',
+                    border: 'none',
+                    borderRadius: '6px',
+                    background: communitySaveStatus?.ok ? '#d1fae5' : communitySaving ? '#bfdbfe' : '#0284c7',
+                    color: communitySaveStatus?.ok ? '#15803d' : 'white',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    cursor: communitySaving || communitySaveStatus?.ok ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  {communitySaving ? '저장 중...' : communitySaveStatus?.ok ? '저장됨 ✓' : '게시글 저장'}
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Disclaimer */}
           <p style={{ fontSize: '11px', color: '#9ca3af', margin: 0, textAlign: 'center' }}>
             AI가 생성한 내용은 참고용입니다. 반드시 검토 후 사용하세요.
@@ -958,6 +1150,25 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
                 }}
               >
                 {copied ? '복사됨 ✓' : '복사'}
+              </button>
+            )}
+            {/* WO-O4O-AI-CONTENT-COMMUNITY-SAVE-INTEGRATION-V1: 커뮤니티 저장 버튼 */}
+            {showCommunitySave && result && (
+              <button
+                type="button"
+                onClick={showCommunitySavePanel ? () => { setShowCommunitySavePanel(false); setCommunitySaveStatus(null); } : handleOpenCommunitySavePanel}
+                style={{
+                  padding: '8px 16px',
+                  border: `1px solid ${showCommunitySavePanel ? '#0369a1' : '#0284c7'}`,
+                  borderRadius: '6px',
+                  background: showCommunitySavePanel ? '#e0f2fe' : '#f0f9ff',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  color: '#0369a1',
+                  fontWeight: 600,
+                }}
+              >
+                {communitySaveStatus?.ok ? '저장됨 ✓' : showCommunitySavePanel ? '커뮤니티 저장 ▲' : '커뮤니티 저장'}
               </button>
             )}
             {/* WO-O4O-AI-CONTENT-AUTO-CHANNEL-SAVE-V1: onChannelSave가 있을 때만 표시 */}

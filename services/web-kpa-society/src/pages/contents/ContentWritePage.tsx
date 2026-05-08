@@ -179,6 +179,7 @@ export function ContentWritePage() {
               const token = getAccessToken();
               return token ? { Authorization: `Bearer ${token}` } : undefined;
             })()}
+            showCommunitySave={true}
           />
         </div>
 
