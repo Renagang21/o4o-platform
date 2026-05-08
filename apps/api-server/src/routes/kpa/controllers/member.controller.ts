@@ -284,7 +284,7 @@ export function createMemberController(
     requireScope('kpa:operator'),
     async (req: AuthRequest, res: Response): Promise<void> => {
       try {
-        const { organization_id, status, role, page = '1', limit = '20' } = req.query;
+        const { organization_id, status, role, search, page = '1', limit = '20' } = req.query;
 
         const qb = memberRepo.createQueryBuilder('m')
           .leftJoinAndSelect('m.user', 'u')
@@ -300,6 +300,13 @@ export function createMemberController(
 
         if (role) {
           qb.andWhere('m.role = :role', { role });
+        }
+
+        if (search) {
+          qb.andWhere(
+            '(u.name ILIKE :search OR u.email ILIKE :search)',
+            { search: `%${search}%` }
+          );
         }
 
         const pageNum = parseInt(page as string) || 1;
@@ -844,14 +851,27 @@ export function createMemberController(
         } catch (e) { console.error('[KPA AuditLog] Failed:', e); }
 
         // 순서: 프로필 → memberships/roles → member_services(CASCADE) → member → user
-        await dataSource.query(`DELETE FROM kpa_pharmacist_profiles WHERE user_id = $1`, [member.user_id]).catch(() => {});
-        await dataSource.query(`DELETE FROM kpa_student_profiles WHERE user_id = $1`, [member.user_id]).catch(() => {});
-        await dataSource.query(`DELETE FROM kpa_external_expert_profiles WHERE user_id = $1`, [member.user_id]).catch(() => {});
-        await dataSource.query(`DELETE FROM kpa_supplier_staff_profiles WHERE user_id = $1`, [member.user_id]).catch(() => {});
-        await dataSource.query(`DELETE FROM service_memberships WHERE user_id = $1`, [member.user_id]).catch(() => {});
-        await dataSource.query(`DELETE FROM role_assignments WHERE user_id = $1`, [member.user_id]).catch(() => {});
-        await memberRepo.remove(member); // CASCADE: kpa_member_services 자동 삭제
-        await dataSource.query(`DELETE FROM users WHERE id = $1`, [member.user_id]).catch(() => {});
+        const queryRunner = dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        try {
+          await queryRunner.query(`DELETE FROM kpa_pharmacist_profiles WHERE user_id = $1`, [member.user_id]);
+          await queryRunner.query(`DELETE FROM kpa_student_profiles WHERE user_id = $1`, [member.user_id]);
+          await queryRunner.query(`DELETE FROM kpa_external_expert_profiles WHERE user_id = $1`, [member.user_id]);
+          await queryRunner.query(`DELETE FROM kpa_supplier_staff_profiles WHERE user_id = $1`, [member.user_id]);
+          await queryRunner.query(`DELETE FROM service_memberships WHERE user_id = $1`, [member.user_id]);
+          await queryRunner.query(`DELETE FROM role_assignments WHERE user_id = $1`, [member.user_id]);
+          await memberRepo.remove(member); // CASCADE: kpa_member_services 자동 삭제
+          await queryRunner.query(`DELETE FROM users WHERE id = $1`, [member.user_id]);
+          await queryRunner.commitTransaction();
+        } catch (txError: any) {
+          await queryRunner.rollbackTransaction();
+          console.error('Hard delete transaction failed:', txError);
+          res.status(500).json({ error: { code: 'DELETE_FAILED', message: txError.message } });
+          return;
+        } finally {
+          await queryRunner.release();
+        }
 
         res.json({ success: true, data: { mode: 'hard', deleted: true } });
       } catch (error: any) {
