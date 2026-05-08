@@ -7,9 +7,9 @@
 
 import { useState, useEffect } from 'react';
 import {
-  Users, CheckCircle, XCircle, Eye, Filter, RefreshCw, X, AlertCircle,
+  Users, CheckCircle, XCircle, Filter, RefreshCw, AlertCircle,
 } from 'lucide-react';
-import { DataTable } from '@o4o/ui';
+import { DataTable, BaseDetailDrawer } from '@o4o/ui';
 import type { Column } from '@o4o/ui';
 import { glycopharmApi } from '@/api/glycopharm';
 import type { GlycopharmMemberRecord, GlycopharmMemberStatus } from '@/api/glycopharm';
@@ -23,14 +23,6 @@ const SUBROLE_LABEL: Record<string, string> = {
   staff_pharmacist: '근무약사',
 };
 
-function DetailRow({ label, value }: { label: string; value: React.ReactNode }) {
-  return (
-    <div className="flex justify-between items-start text-sm py-1 border-b border-slate-50 last:border-0">
-      <span className="text-slate-500 shrink-0 w-28">{label}</span>
-      <span className="text-slate-800 text-right">{value}</span>
-    </div>
-  );
-}
 
 export default function GlycopharmMembersPage() {
   const [members, setMembers] = useState<GlycopharmMemberRecord[]>([]);
@@ -189,20 +181,13 @@ export default function GlycopharmMembersPage() {
     {
       key: 'actions',
       title: '관리',
-      width: '110px',
+      width: '80px',
       align: 'right',
       render: (_v, record) => (
         <div
           className="flex items-center justify-end gap-1"
           onClick={(e) => e.stopPropagation()}
         >
-          <button
-            onClick={() => setSelected(record)}
-            title="상세"
-            className="p-1.5 text-slate-500 hover:bg-slate-50 rounded-lg transition-colors"
-          >
-            <Eye className="w-4 h-4" />
-          </button>
           {record.status === 'pending' && (
             <>
               <button
@@ -341,66 +326,43 @@ export default function GlycopharmMembersPage() {
         />
       </div>
 
-      {/* ── 상세 모달 ── */}
-      {selected && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-              <h2 className="text-lg font-bold text-slate-800">회원 신청 상세</h2>
-              <button
-                onClick={() => setSelected(null)}
-                className="p-1 text-slate-400 hover:text-slate-600 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="px-6 py-5 space-y-1">
-              <DetailRow label="사용자 ID" value={<span className="text-xs font-mono">{selected.userId}</span>} />
-              <DetailRow label="회원 유형" value="약사" />
-              <DetailRow
-                label="세부직역"
-                value={selected.subRole ? (SUBROLE_LABEL[selected.subRole] ?? selected.subRole) : '-'}
-              />
-              <DetailRow label="면허번호" value={selected.metadata?.licenseNumber || '-'} />
-              <DetailRow label="약국명" value={selected.metadata?.pharmacyName || '-'} />
-              <DetailRow label="약국 주소" value={selected.metadata?.pharmacyAddress || '-'} />
-              <DetailRow label="상태" value={<StatusBadge status={selected.status} />} />
-              {selected.rejectionReason && (
-                <DetailRow
-                  label="거절 사유"
-                  value={<span className="text-red-600">{selected.rejectionReason}</span>}
-                />
-              )}
-              <DetailRow
-                label="신청일"
-                value={new Date(selected.createdAt).toLocaleDateString('ko-KR')}
-              />
-              {selected.approvedAt && (
-                <DetailRow
-                  label="승인일"
-                  value={new Date(selected.approvedAt).toLocaleDateString('ko-KR')}
-                />
-              )}
-            </div>
-            {selected.status === 'pending' && (
-              <div className="flex gap-3 px-6 pb-6">
-                <button
-                  onClick={() => openApproveModal(selected)}
-                  className="flex-1 py-2.5 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors"
-                >
-                  승인
-                </button>
-                <button
-                  onClick={() => openRejectModal(selected)}
-                  className="flex-1 py-2.5 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-colors"
-                >
-                  거절
-                </button>
+      {/* ── 상세 Drawer ── */}
+      <BaseDetailDrawer
+        open={!!selected}
+        onClose={() => setSelected(null)}
+        title={selected?.metadata?.pharmacyName || '회원 신청 상세'}
+        width={520}
+        actions={
+          selected?.status === 'pending'
+            ? [
+                { label: '거절', onClick: () => openRejectModal(selected), variant: 'danger' },
+                { label: '승인', onClick: () => openApproveModal(selected), variant: 'primary' },
+              ]
+            : []
+        }
+      >
+        {selected && (
+          <div style={{ fontSize: 14, color: '#374151' }}>
+            {[
+              { label: '사용자 ID', value: <span style={{ fontFamily: 'monospace', fontSize: 12 }}>{selected.userId}</span> },
+              { label: '회원 유형', value: '약사' },
+              { label: '세부직역', value: selected.subRole ? (SUBROLE_LABEL[selected.subRole] ?? selected.subRole) : '-' },
+              { label: '면허번호', value: selected.metadata?.licenseNumber || '-' },
+              { label: '약국명', value: selected.metadata?.pharmacyName || '-' },
+              { label: '약국 주소', value: selected.metadata?.pharmacyAddress || '-' },
+              { label: '상태', value: <StatusBadge status={selected.status} /> },
+              ...(selected.rejectionReason ? [{ label: '거절 사유', value: <span style={{ color: '#dc2626' }}>{selected.rejectionReason}</span> }] : []),
+              { label: '신청일', value: new Date(selected.createdAt).toLocaleDateString('ko-KR') },
+              ...(selected.approvedAt ? [{ label: '승인일', value: new Date(selected.approvedAt).toLocaleDateString('ko-KR') }] : []),
+            ].map((item) => (
+              <div key={item.label} style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
+                <span style={{ fontWeight: 600, color: '#64748b', minWidth: 80, flexShrink: 0 }}>{item.label}</span>
+                <span style={{ color: '#1e293b' }}>{item.value}</span>
               </div>
-            )}
+            ))}
           </div>
-        </div>
-      )}
+        )}
+      </BaseDetailDrawer>
 
       {/* ── 승인 확인 모달 ── */}
       {approveTarget && (

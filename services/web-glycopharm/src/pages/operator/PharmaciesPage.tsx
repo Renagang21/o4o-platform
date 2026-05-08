@@ -24,8 +24,9 @@ import {
   BarChart3,
   Loader2,
 } from 'lucide-react';
-import { DataTable, ActionBar } from '@o4o/ui';
-import type { Column } from '@o4o/ui';
+import { ActionBar } from '@o4o/ui';
+import { DataTable } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import {
   glycopharmApi,
   type OperatorPharmacy,
@@ -75,7 +76,7 @@ export default function PharmaciesPage() {
   const [tierFilter, setTierFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedPharmacy, setSelectedPharmacy] = useState<string | null>(null);
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isBulkProcessing] = useState(false);
 
   // API data state
@@ -143,7 +144,7 @@ export default function PharmaciesPage() {
 
   // Reset selection on filter changes
   useEffect(() => {
-    setSelectedIds([]);
+    setSelectedIds(new Set());
   }, [activeTab, regionFilter, tierFilter, searchTerm]);
 
   // Calculate tab counts from stats
@@ -339,19 +340,19 @@ export default function PharmaciesPage() {
 
         {/* Bulk Actions */}
         {(() => {
-          const selectedActiveCount = selectedIds.filter(id => {
+          const selectedActiveCount = [...selectedIds].filter(id => {
             const p = pharmacies.find(ph => ph.id === id);
             return p?.status === 'active';
           }).length;
-          const selectedInactiveCount = selectedIds.filter(id => {
+          const selectedInactiveCount = [...selectedIds].filter(id => {
             const p = pharmacies.find(ph => ph.id === id);
             return p?.status !== 'active';
           }).length;
           return (
             <div className="px-4 pt-3">
               <ActionBar
-                selectedCount={selectedIds.length}
-                onClearSelection={() => setSelectedIds([])}
+                selectedCount={selectedIds.size}
+                onClearSelection={() => setSelectedIds(new Set())}
                 actions={[
                   ...(selectedActiveCount > 0 ? [{
                     key: 'suspend',
@@ -377,10 +378,10 @@ export default function PharmaciesPage() {
 
         {/* Table */}
         {(() => {
-          const columns: Column<OperatorPharmacy>[] = [
+          const columns: ListColumnDef<OperatorPharmacy>[] = [
             {
               key: 'name',
-              title: '약국 정보',
+              header: '약국 정보',
               render: (_v, p) => (
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center">
@@ -395,7 +396,7 @@ export default function PharmaciesPage() {
             },
             {
               key: 'region',
-              title: '지역',
+              header: '지역',
               width: '100px',
               render: (_v, p) => (
                 <div className="flex items-center gap-1 text-sm text-slate-600">
@@ -405,19 +406,19 @@ export default function PharmaciesPage() {
             },
             {
               key: 'tier',
-              title: '등급',
+              header: '등급',
               width: '100px',
               render: (_v, p) => <TierBadge tier={p.tier} />,
             },
             {
               key: 'status',
-              title: '상태',
+              header: '상태',
               width: '110px',
               render: (_v, p) => <StatusBadge status={p.status} />,
             },
             {
               key: 'monthlyOrders',
-              title: '월 주문',
+              header: '월 주문',
               width: '90px',
               align: 'right',
               render: (_v, p) => (
@@ -426,7 +427,7 @@ export default function PharmaciesPage() {
             },
             {
               key: 'monthlyRevenue',
-              title: '월 매출',
+              header: '월 매출',
               width: '100px',
               align: 'right',
               render: (_v, p) => (
@@ -435,7 +436,7 @@ export default function PharmaciesPage() {
             },
             {
               key: 'growthRate',
-              title: '성장률',
+              header: '성장률',
               width: '80px',
               align: 'right',
               render: (_v, p) => (
@@ -447,9 +448,10 @@ export default function PharmaciesPage() {
             },
             {
               key: 'actions',
-              title: '액션',
+              header: '액션',
               width: '60px',
               align: 'right',
+              onCellClick: () => {},
               render: (_v, p) => (
                 <div className="relative flex justify-end">
                   <button onClick={() => setSelectedPharmacy(selectedPharmacy === p.id ? null : p.id)} className="p-2 rounded-lg hover:bg-slate-100 transition-colors">
@@ -459,7 +461,6 @@ export default function PharmaciesPage() {
                     <>
                       <div className="fixed inset-0 z-10" onClick={() => setSelectedPharmacy(null)} />
                       <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border py-2 z-20">
-                        <button className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50">상세 보기</button>
                         <button className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50">주문 내역</button>
                         <button className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50">성과 분석</button>
                         <hr className="my-1" />
@@ -476,24 +477,45 @@ export default function PharmaciesPage() {
             },
           ];
 
+          const totalPages = Math.ceil(totalItems / itemsPerPage);
+
           return (
-            <DataTable<OperatorPharmacy>
-              columns={columns}
-              dataSource={pharmacies}
-              rowKey="id"
-              loading={isLoading}
-              emptyText="자료가 없습니다"
-              rowSelection={{
-                selectedRowKeys: selectedIds,
-                onChange: setSelectedIds,
-              }}
-              pagination={{
-                current: currentPage,
-                pageSize: itemsPerPage,
-                total: totalItems,
-                onChange: (p) => setCurrentPage(p),
-              }}
-            />
+            <>
+              <DataTable<OperatorPharmacy>
+                columns={columns}
+                data={pharmacies}
+                rowKey="id"
+                loading={isLoading}
+                emptyMessage="자료가 없습니다"
+                selectable
+                selectedKeys={selectedIds}
+                onSelectionChange={setSelectedIds}
+              />
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between px-4 py-3 border-t border-slate-200">
+                  <span className="text-xs text-slate-500">
+                    {(currentPage - 1) * itemsPerPage + 1}–{Math.min(currentPage * itemsPerPage, totalItems)} / {totalItems}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      disabled={currentPage <= 1}
+                      className="px-3 py-1.5 text-sm border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-40"
+                    >
+                      이전
+                    </button>
+                    <span className="text-sm text-slate-600">{currentPage} / {totalPages}</span>
+                    <button
+                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                      disabled={currentPage >= totalPages}
+                      className="px-3 py-1.5 text-sm border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-40"
+                    >
+                      다음
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
           );
         })()}
       </div>

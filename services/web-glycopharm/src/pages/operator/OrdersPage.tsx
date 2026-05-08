@@ -19,7 +19,6 @@ import {
   CheckCircle,
   Clock,
   XCircle,
-  Eye,
   FileText,
   RefreshCw,
   Download,
@@ -28,8 +27,9 @@ import {
   AlertCircle,
   Loader2,
 } from 'lucide-react';
-import { DataTable, ActionBar } from '@o4o/ui';
-import type { Column } from '@o4o/ui';
+import { ActionBar } from '@o4o/ui';
+import { DataTable } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { glycopharmApi, type OperatorOrder, type OperatorOrderStats, type OrderStatus } from '@/api/glycopharm';
 import StatusBadge from '../../components/common/StatusBadge';
 import PageHeader from '../../components/common/PageHeader';
@@ -71,7 +71,7 @@ export default function OrdersPage() {
   const [, setTotalPages] = useState(1);
   const [totalOrders, setTotalOrders] = useState(0);
   const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isBulkProcessing] = useState(false);
 
   const itemsPerPage = 10;
@@ -130,7 +130,7 @@ export default function OrdersPage() {
 
   // Reset selection on tab/filter/search change
   useEffect(() => {
-    setSelectedIds([]);
+    setSelectedIds(new Set());
   }, [activeTab, dateFilter, searchTerm]);
 
   // Tab counts (based on stats)
@@ -335,19 +335,19 @@ export default function OrdersPage() {
 
         {/* Bulk Actions */}
         {(() => {
-          const selectedPendingCount = selectedIds.filter(id => {
+          const selectedPendingCount = [...selectedIds].filter(id => {
             const o = orders.find(ord => ord.id === id);
             return o?.status === 'pending';
           }).length;
-          const selectedProcessingCount = selectedIds.filter(id => {
+          const selectedProcessingCount = [...selectedIds].filter(id => {
             const o = orders.find(ord => ord.id === id);
             return o?.status === 'processing';
           }).length;
           return (
             <div className="px-4 pt-3">
               <ActionBar
-                selectedCount={selectedIds.length}
-                onClearSelection={() => setSelectedIds([])}
+                selectedCount={selectedIds.size}
+                onClearSelection={() => setSelectedIds(new Set())}
                 actions={[
                   ...(selectedPendingCount > 0 ? [{
                     key: 'confirm',
@@ -381,10 +381,10 @@ export default function OrdersPage() {
 
         {/* Table */}
         {(() => {
-          const columns: Column<OperatorOrder>[] = [
+          const columns: ListColumnDef<OperatorOrder>[] = [
             {
               key: 'orderNumber',
-              title: '주문 정보',
+              header: '주문 정보',
               render: (_v, o) => (
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
@@ -399,7 +399,7 @@ export default function OrdersPage() {
             },
             {
               key: 'pharmacyName',
-              title: '약국',
+              header: '약국',
               render: (_v, o) => (
                 <div className="flex items-center gap-2">
                   <Store className="w-4 h-4 text-slate-400" />
@@ -412,7 +412,7 @@ export default function OrdersPage() {
             },
             {
               key: 'items',
-              title: '수량',
+              header: '수량',
               width: '70px',
               align: 'right',
               render: (_v, o) => (
@@ -421,7 +421,7 @@ export default function OrdersPage() {
             },
             {
               key: 'totalAmount',
-              title: '금액',
+              header: '금액',
               width: '110px',
               align: 'right',
               render: (_v, o) => (
@@ -430,19 +430,19 @@ export default function OrdersPage() {
             },
             {
               key: 'paymentStatus',
-              title: '결제',
+              header: '결제',
               width: '80px',
               render: (_v, o) => <PaymentBadge status={o.paymentStatus} />,
             },
             {
               key: 'status',
-              title: '상태',
+              header: '상태',
               width: '110px',
               render: (_v, o) => <StatusBadge status={o.status} />,
             },
             {
               key: 'createdAt',
-              title: '주문일시',
+              header: '주문일시',
               width: '130px',
               render: (_v, o) => (
                 <div className="flex items-center gap-1 text-sm text-slate-600">
@@ -452,9 +452,10 @@ export default function OrdersPage() {
             },
             {
               key: 'actions',
-              title: '액션',
+              header: '액션',
               width: '60px',
               align: 'right',
+              onCellClick: () => {},
               render: (_v, o) => (
                 <div className="relative flex justify-end">
                   <button onClick={() => setSelectedOrder(selectedOrder === o.id ? null : o.id)} className="p-2 rounded-lg hover:bg-slate-100 transition-colors">
@@ -464,7 +465,6 @@ export default function OrdersPage() {
                     <>
                       <div className="fixed inset-0 z-10" onClick={() => setSelectedOrder(null)} />
                       <div className="absolute right-0 mt-2 w-44 bg-white rounded-lg shadow-lg border py-2 z-20">
-                        <button className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"><Eye className="w-4 h-4" />상세 보기</button>
                         {o.status === 'pending' && <button className="w-full px-4 py-2 text-left text-sm text-blue-600 hover:bg-blue-50 flex items-center gap-2"><CheckCircle className="w-4 h-4" />주문 확인</button>}
                         {o.status === 'processing' && <button className="w-full px-4 py-2 text-left text-sm text-indigo-600 hover:bg-indigo-50 flex items-center gap-2"><Truck className="w-4 h-4" />배송 시작</button>}
                         <button className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"><FileText className="w-4 h-4" />송장 출력</button>
@@ -477,24 +477,45 @@ export default function OrdersPage() {
             },
           ];
 
+          const totalPages = Math.ceil(totalOrders / itemsPerPage);
+
           return (
-            <DataTable<OperatorOrder>
-              columns={columns}
-              dataSource={orders}
-              rowKey="id"
-              loading={isLoading}
-              emptyText="자료가 없습니다"
-              rowSelection={{
-                selectedRowKeys: selectedIds,
-                onChange: setSelectedIds,
-              }}
-              pagination={{
-                current: currentPage,
-                pageSize: itemsPerPage,
-                total: totalOrders,
-                onChange: (p) => setCurrentPage(p),
-              }}
-            />
+            <>
+              <DataTable<OperatorOrder>
+                columns={columns}
+                data={orders}
+                rowKey="id"
+                loading={isLoading}
+                emptyMessage="자료가 없습니다"
+                selectable
+                selectedKeys={selectedIds}
+                onSelectionChange={setSelectedIds}
+              />
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between px-4 py-3 border-t border-slate-200">
+                  <span className="text-xs text-slate-500">
+                    {(currentPage - 1) * itemsPerPage + 1}–{Math.min(currentPage * itemsPerPage, totalOrders)} / {totalOrders}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      disabled={currentPage <= 1}
+                      className="px-3 py-1.5 text-sm border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-40"
+                    >
+                      이전
+                    </button>
+                    <span className="text-sm text-slate-600">{currentPage} / {totalPages}</span>
+                    <button
+                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                      disabled={currentPage >= totalPages}
+                      className="px-3 py-1.5 text-sm border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-40"
+                    >
+                      다음
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
           );
         })()}
       </div>
