@@ -1,5 +1,11 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
+// WO-O4O-STORE-PRODUCTS-QUERYCLIENT-PROVIDER-ALIGN-V1
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1 } },
+});
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { GLYCOPHARM_ROLES } from '@/lib/role-constants';
 import { LoginModalProvider } from '@/contexts/LoginModalContext';
@@ -637,6 +643,7 @@ function AppRoutes() {
 
 export default function App() {
   return (
+    <QueryClientProvider client={queryClient}>
     <O4OErrorBoundary>
       <BrowserRouter>
         <AuthProvider>
@@ -653,5 +660,6 @@ export default function App() {
         </AuthProvider>
       </BrowserRouter>
     </O4OErrorBoundary>
+    </QueryClientProvider>
   );
 }

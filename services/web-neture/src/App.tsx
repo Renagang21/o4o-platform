@@ -16,6 +16,12 @@
 
 import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom';
+// WO-O4O-STORE-PRODUCTS-QUERYCLIENT-PROVIDER-ALIGN-V1
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1 } },
+});
 import { AuthProvider, LoginModalProvider, useLoginModal } from './contexts';
 import LoginModal from './components/LoginModal';
 import RegisterModal from './components/RegisterModal';
@@ -533,6 +539,7 @@ const ProtectedRoute = RoleGuard;
 
 function App() {
   return (
+    <QueryClientProvider client={queryClient}>
     <O4OErrorBoundary>
     <AuthProvider>
       <LoginModalProvider>
@@ -983,6 +990,7 @@ function App() {
       </LoginModalProvider>
     </AuthProvider>
     </O4OErrorBoundary>
+    </QueryClientProvider>
   );
 }
 

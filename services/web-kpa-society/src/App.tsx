@@ -1,5 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { useEffect, useState, lazy, Suspense } from 'react';
+// WO-O4O-STORE-PRODUCTS-QUERYCLIENT-PROVIDER-ALIGN-V1
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1 } },
+});
 import { Layout, DemoLayout } from './components';
 import { LoadingSpinner } from './components/common/LoadingSpinner';
 import { AuthProvider, OrganizationProvider } from './contexts';
@@ -407,6 +413,7 @@ function PageLoader() {
 
 function App() {
   return (
+    <QueryClientProvider client={queryClient}>
     <O4OErrorBoundary>
     <AuthProvider>
       <LoginModalProvider>
@@ -922,6 +929,7 @@ function App() {
       </LoginModalProvider>
     </AuthProvider>
     </O4OErrorBoundary>
+    </QueryClientProvider>
   );
 }
 
