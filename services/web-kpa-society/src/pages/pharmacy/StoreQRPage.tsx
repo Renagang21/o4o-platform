@@ -13,13 +13,12 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { QrCode, Trash2, ExternalLink, Copy, Check, RefreshCw, BarChart3, X, Smartphone, Monitor, Tablet, Download, Printer, ArrowRight } from 'lucide-react';
+import { QrCode, Trash2, ExternalLink, Copy, Check, RefreshCw, BarChart3, X, Smartphone, Monitor, Tablet, Download, Printer, ArrowRight, FolderOpen } from 'lucide-react';
 import { getStoreLibraryItem } from '../../api/storeLibrary';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { GuideBlock } from '@o4o/shared-space-ui';
 import { colors } from '../../styles/theme';
-import { StoreQRCreateEntryModal } from '../../components/store/StoreQRCreateEntryModal';
 import { StoreAssetSelectorModal } from '../../components/store/StoreAssetSelectorModal';
 import type { AssetSelectorResult as LibrarySelectorResult } from '../../components/store/StoreAssetSelectorModal';
 import { QrPrintTemplateModal } from './QrPrintTemplateModal';
@@ -37,10 +36,8 @@ import { getAccessToken } from '../../contexts/AuthContext';
 
 const LANDING_TYPE_OPTIONS: { value: string; label: string }[] = [
   { value: 'product', label: '제품' },
-  { value: 'promotion', label: '행사' },
   { value: 'page', label: '콘텐츠' },
   { value: 'link', label: '외부 링크' },
-  { value: 'tablet', label: '상담 요청' },
 ];
 
 function toSlug(text: string): string {
@@ -65,12 +62,10 @@ function autoLandingType(assetType: string): string {
 }
 
 export function StoreQRPage() {
-  const navigate = useNavigate();
   const location = useLocation();
 
   const [items, setItems] = useState<StoreQrCode[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showEntryModal, setShowEntryModal] = useState(false);
   const [showSelector, setShowSelector] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
@@ -199,7 +194,6 @@ export function StoreQRPage() {
     setFormLandingTargetId(item.assetType === 'external-link' && item.url ? item.url : '');
     setFormError(null);
     setShowSelector(false);
-    setShowEntryModal(false);
     setCreating(true);
   };
 
@@ -387,8 +381,8 @@ export function StoreQRPage() {
             <span style={{ color: colors.neutral300 }}>/</span>
             <span style={{ color: colors.neutral600, fontSize: '13px' }}>QR 코드</span>
           </div>
-          <h1 style={styles.title}>QR 코드 관리</h1>
-          <p style={styles.subtitle}>Library 자료를 QR 코드로 연결하여 오프라인에서 온라인으로 유도합니다</p>
+          <h1 style={styles.title}>QR 코드</h1>
+          <p style={styles.subtitle}>매장에 부착·재사용할 QR 코드를 모아 출력합니다</p>
         </div>
         {/* WO-O4O-KPA-STORE-PRODUCTION-ENTRY-CANONICAL-CORRECTION-V1:
             "QR 코드 생성" 신규 진입 버튼 제거 — 제작 시작은 "내 자료함"에서만. */}
@@ -422,7 +416,7 @@ export function StoreQRPage() {
       {/* Create Form */}
       {creating && selectedLibrary && (
         <div style={styles.createForm}>
-          <h3 style={styles.formTitle}>새 QR 코드 설정</h3>
+          <h3 style={styles.formTitle}>새 QR 만들기</h3>
 
           {/* 선택된 자료 정보 */}
           <div style={styles.selectedLibraryCard}>
@@ -440,7 +434,7 @@ export function StoreQRPage() {
               </p>
             </div>
             <button
-              onClick={() => { setCreating(false); setSelectedLibrary(null); setShowEntryModal(true); }}
+              onClick={() => { setCreating(false); setSelectedLibrary(null); setShowSelector(true); }}
               style={styles.changeLibraryBtn}
             >
               자료 변경
@@ -449,7 +443,7 @@ export function StoreQRPage() {
           </div>
 
           <div style={styles.formRow}>
-            <label style={styles.formLabel}>슬러그 (URL 경로)</label>
+            <label style={styles.formLabel}>QR 주소 (URL 경로)</label>
             <div style={styles.slugPreview}>
               <span style={styles.slugBase}>{qrBaseUrl}</span>
               <input
@@ -463,7 +457,7 @@ export function StoreQRPage() {
           </div>
 
           <div style={styles.formRow}>
-            <label style={styles.formLabel}>랜딩 유형</label>
+            <label style={styles.formLabel}>연결 유형</label>
             <select
               value={formLandingType}
               onChange={(e) => setFormLandingType(e.target.value)}
@@ -487,35 +481,32 @@ export function StoreQRPage() {
             </div>
           )}
 
-          {/* WO-O4O-STORE-QR-TO-INTEREST-FLOW-V1: tablet 타입은 landingTargetId 불필요 (storeSlug 자동 사용) */}
-          {formLandingType !== 'tablet' && (
-            <div style={styles.formRow}>
-              <label style={styles.formLabel}>
-                {formLandingType === 'product' ? '연결 상품 (선택)' : formLandingType === 'link' ? '랜딩 대상 (URL)' : '랜딩 대상 ID (선택)'}
-              </label>
-              {formLandingType === 'product' ? (
-                <select
-                  value={formLandingTargetId}
-                  onChange={(e) => setFormLandingTargetId(e.target.value)}
-                  style={styles.select}
-                  disabled={loadingProducts}
-                >
-                  <option value="">{loadingProducts ? '상품 목록 로딩 중...' : '상품 선택 (선택사항)'}</option>
-                  {productOptions.map((p) => (
-                    <option key={p.id} value={p.id}>{p.name}</option>
-                  ))}
-                </select>
-              ) : (
-                <input
-                  type="text"
-                  value={formLandingTargetId}
-                  onChange={(e) => setFormLandingTargetId(e.target.value)}
-                  style={styles.input}
-                  placeholder={formLandingType === 'link' ? 'https://example.com' : '대상 ID (비워두면 자료 페이지로 이동)'}
-                />
-              )}
-            </div>
-          )}
+          <div style={styles.formRow}>
+            <label style={styles.formLabel}>
+              {formLandingType === 'product' ? '연결 상품 (선택)' : formLandingType === 'link' ? '연결 URL' : '연결 대상 (선택)'}
+            </label>
+            {formLandingType === 'product' ? (
+              <select
+                value={formLandingTargetId}
+                onChange={(e) => setFormLandingTargetId(e.target.value)}
+                style={styles.select}
+                disabled={loadingProducts}
+              >
+                <option value="">{loadingProducts ? '상품 목록 로딩 중...' : '상품 선택 (선택사항)'}</option>
+                {productOptions.map((p) => (
+                  <option key={p.id} value={p.id}>{p.name}</option>
+                ))}
+              </select>
+            ) : (
+              <input
+                type="text"
+                value={formLandingTargetId}
+                onChange={(e) => setFormLandingTargetId(e.target.value)}
+                style={styles.input}
+                placeholder={formLandingType === 'link' ? 'https://example.com' : '비워두면 자료 페이지로 이동합니다'}
+              />
+            )}
+          </div>
 
           {formError && <p style={styles.formError}>{formError}</p>}
 
@@ -531,7 +522,7 @@ export function StoreQRPage() {
               disabled={saving}
               style={{ ...styles.saveBtn, opacity: saving ? 0.7 : 1 }}
             >
-              {saving ? '저장 중...' : 'QR 코드 생성'}
+              {saving ? '저장 중...' : 'QR 만들기'}
             </button>
           </div>
         </div>
@@ -550,9 +541,13 @@ export function StoreQRPage() {
             <p style={{ color: colors.neutral500, fontSize: '14px', margin: 0 }}>
               등록된 QR 코드가 없습니다
             </p>
-            <p style={{ color: colors.neutral400, fontSize: '13px', marginTop: '4px' }}>
-              "QR 코드 생성" 버튼을 눌러 Library에서 자료를 선택하세요
+            <p style={{ color: colors.neutral400, fontSize: '13px', marginTop: '4px', textAlign: 'center' }}>
+              내 자료함에서 자료를 선택해 QR 코드를 제작할 수 있습니다.
             </p>
+            <Link to="/store/library/resources" style={styles.emptyStateBtn}>
+              <FolderOpen size={14} />
+              내 자료함 열기
+            </Link>
           </div>
         ) : (
           <div style={styles.list}>
@@ -584,10 +579,11 @@ export function StoreQRPage() {
                     <div style={{ position: 'relative' }}>
                       <button
                         onClick={() => setDownloadMenuId(downloadMenuId === item.id ? null : item.id)}
-                        style={styles.iconBtn}
+                        style={styles.downloadBtn}
                         title="QR 다운로드"
                       >
-                        <Download size={16} />
+                        <Download size={14} />
+                        출력
                       </button>
                       {downloadMenuId === item.id && (
                         <div style={styles.downloadMenu}>
@@ -682,21 +678,6 @@ export function StoreQRPage() {
           </div>
         )}
       </div>
-
-      {/* Entry Modal — 2-choice (기존 자료 선택 / 새 자산 만들기) */}
-      <StoreQRCreateEntryModal
-        open={showEntryModal}
-        title="QR 생성 방식 선택"
-        onSelectExisting={() => {
-          setShowEntryModal(false);
-          setShowSelector(true);
-        }}
-        onCreateNew={() => {
-          setShowEntryModal(false);
-          navigate('/store/content');
-        }}
-        onClose={() => setShowEntryModal(false)}
-      />
 
       {/* Asset Selector Modal */}
       <StoreAssetSelectorModal
@@ -839,6 +820,35 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
     borderRadius: '6px',
     textDecoration: 'none',
+  },
+  downloadBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '4px',
+    padding: '6px 10px',
+    border: `1px solid ${colors.primary}`,
+    backgroundColor: '#fff',
+    color: colors.primary,
+    cursor: 'pointer',
+    borderRadius: '6px',
+    fontSize: '12px',
+    fontWeight: 600,
+    whiteSpace: 'nowrap',
+  },
+  emptyStateBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    marginTop: '16px',
+    padding: '8px 14px',
+    border: `1px solid ${colors.primary}`,
+    backgroundColor: '#fff',
+    color: colors.primary,
+    borderRadius: '8px',
+    fontSize: '13px',
+    fontWeight: 500,
+    textDecoration: 'none',
+    cursor: 'pointer',
   },
 
   // Selected library card
