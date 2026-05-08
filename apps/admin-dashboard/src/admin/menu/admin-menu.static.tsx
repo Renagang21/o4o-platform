@@ -22,19 +22,15 @@ import {
   UserCheck,
   BarChart2,
   ClipboardList,
-  Link2,
   Activity,
   Monitor,
   Image,
   Calendar,
-  PlayCircle,
-  LayoutGrid,
   TrendingUp,
   MessageSquare,
   Layers,
   Shield,
   Briefcase,
-  Store,
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -54,12 +50,10 @@ export interface MenuItem {
  * +-- Overview (Dashboard)
  * +-- Core (Users, Operators, Membership, Settings)
  * +-- Content
- * +-- Participation
- * +-- Learning (Flow)
  * +-- CMS
  * +-- AppStore
  * +-- Forum
- * +-- Services (Yaksa, K-Cosmetics, Neture, Signage)
+ * +-- Services (Yaksa, Digital Signage)
  * +-- Insights (Ops Metrics, Content Manager, Reports)
  */
 export const adminMenuStatic: MenuItem[] = [
@@ -162,37 +156,6 @@ export const adminMenuStatic: MenuItem[] = [
     ],
   },
 
-  // Participation
-  {
-    id: 'participation',
-    label: 'Participation',
-    icon: <ClipboardList className="w-5 h-5" />,
-    roles: ['admin', 'super_admin'],
-    children: [
-      {
-        id: 'participation-overview',
-        label: 'Overview',
-        icon: <LayoutDashboard className="w-4 h-4" />,
-        path: '/admin/participation',
-      },
-    ],
-  },
-
-  // Learning (Flow)
-  {
-    id: 'learning',
-    label: 'Learning (Flow)',
-    icon: <PlayCircle className="w-5 h-5" />,
-    roles: ['admin', 'super_admin'],
-    children: [
-      {
-        id: 'learning-overview',
-        label: 'Overview',
-        icon: <LayoutDashboard className="w-4 h-4" />,
-        path: '/admin/learning',
-      },
-    ],
-  },
 
   // CMS
   {
@@ -264,12 +227,6 @@ export const adminMenuStatic: MenuItem[] = [
         label: 'Browse Apps',
         icon: <Package className="w-4 h-4" />,
         path: '/apps/store',
-      },
-      {
-        id: 'appstore-installed',
-        label: 'Installed Apps',
-        icon: <Package className="w-4 h-4" />,
-        path: '/admin/appstore/installed',
       },
     ],
   },
@@ -385,43 +342,6 @@ export const adminMenuStatic: MenuItem[] = [
     roles: ['admin', 'super_admin'],
   },
 
-  {
-    id: 'store-network',
-    label: 'Store Network',
-    icon: <Store className="w-5 h-5" />,
-    path: '/admin/store-network',
-    roles: ['admin', 'super_admin'],
-  },
-
-  {
-    id: 'store-content',
-    label: 'Store Content',
-    icon: <FileText className="w-5 h-5" />,
-    roles: ['admin', 'super_admin'],
-    children: [
-      {
-        id: 'store-content-list',
-        label: '콘텐츠 관리',
-        icon: <FileText className="w-4 h-4" />,
-        path: '/store-content',
-      },
-      {
-        id: 'store-content-templates',
-        label: '템플릿 라이브러리',
-        icon: <LayoutGrid className="w-4 h-4" />,
-        path: '/store-content/templates',
-      },
-    ],
-  },
-
-
-  {
-    id: 'physical-stores',
-    label: 'Physical Stores',
-    icon: <Link2 className="w-5 h-5" />,
-    path: '/admin/physical-stores',
-    roles: ['admin', 'super_admin'],
-  },
 
   {
     id: 'service-content-manager',
