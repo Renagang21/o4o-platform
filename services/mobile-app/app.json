@@ -1,0 +1,24 @@
+{
+  "expo": {
+    "name": "O4O 운영앱",
+    "slug": "o4o-mobile-app",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "platforms": ["android"],
+    "scheme": "o4o",
+    "newArchEnabled": true,
+    "android": {
+      "package": "com.o4o.mobileapp",
+      "adaptiveIcon": {
+        "backgroundColor": "#1976d2"
+      }
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
