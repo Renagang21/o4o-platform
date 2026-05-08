@@ -7,7 +7,7 @@
  *
  * 동작:
  * - defaultContent 표시 (DB 오버라이드가 있으면 DB 값 우선)
- * - canEdit 일 때 ✏ 아이콘 hover 표시
+ * - canEdit 일 때 "수정" 버튼 항상 표시 (WO-O4O-GUIDE-CONTENT-VISIBLE-EDIT-BUTTON-V1)
  * - 클릭 시 RichTextEditor 모달 open
  * - 저장 시 client.saveGuideContent 호출 → 즉시 반영
  *
@@ -41,8 +41,6 @@ export function GuideEditableSection({
   client,
 }: GuideEditableSectionProps) {
   const [dbContent, setDbContent] = useState<string | null>(null);
-  const [mouseOver, setMouseOver] = useState(false);
-  const hovered = canEdit && mouseOver;
   const [modalOpen, setModalOpen] = useState(false);
   const [editorValue, setEditorValue] = useState('');
   const [saving, setSaving] = useState(false);
@@ -88,18 +86,14 @@ export function GuideEditableSection({
   return (
     <>
       {/* 텍스트 표시 영역 */}
-      <span
-        style={{ position: 'relative', display: 'inline' }}
-        onMouseEnter={() => setMouseOver(true)}
-        onMouseLeave={() => setMouseOver(false)}
-      >
+      <span style={{ display: 'inline' }}>
         {dbContent !== null ? (
           String(dbContent).trim() ? (
             <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(String(dbContent)) }} />
           ) : (
             canEdit ? (
               <span style={{ color: '#aaa', fontStyle: 'italic' }}>
-                (내용을 작성하려면 편집 버튼을 누르세요)
+                (내용을 작성하려면 수정 버튼을 누르세요)
               </span>
             ) : null
           )
@@ -107,14 +101,14 @@ export function GuideEditableSection({
           defaultContent
         )}
 
-        {/* 운영자 편집 버튼 */}
-        {canEdit && hovered && (
+        {/* 운영자 수정 버튼 — canEdit 시 항상 표시 */}
+        {canEdit && (
           <button
             onClick={openEditor}
-            title="본문 편집"
+            title="본문 수정"
             style={{
               marginLeft: 6,
-              padding: '2px 6px',
+              padding: '2px 8px',
               fontSize: 11,
               lineHeight: 1,
               background: '#f0f0f0',
@@ -125,7 +119,7 @@ export function GuideEditableSection({
               color: '#555',
             }}
           >
-            ✏
+            ✏ 수정
           </button>
         )}
       </span>
