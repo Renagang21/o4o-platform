@@ -120,6 +120,44 @@ const URL_CONTENT_TYPE_LABELS: Record<UrlContentType, string> = {
   explain: '설명형',
 };
 
+/**
+ * HTML → Forum Block[] 변환 (프론트엔드 전용, DOMParser 사용)
+ * WO-O4O-AI-CONTENT-COMMUNITY-SAVE-INTEGRATION-V1:
+ *   forum post API는 Block[] JSON을 기대하지만 백엔드 normalizeContent가
+ *   Node.js에서 DOMParser를 호출하므로 실패함 → 프론트에서 미리 변환해서 전달
+ */
+function htmlToForumBlocks(html: string): object[] {
+  if (!html || !html.trim()) return [];
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+  const blocks: object[] = [];
+  doc.body.childNodes.forEach((node, index) => {
+    if (node.nodeType !== Node.ELEMENT_NODE) return;
+    const el = node as Element;
+    const tag = el.tagName.toLowerCase();
+    if (tag === 'h1' || tag === 'h2' || tag === 'h3' || tag === 'h4' || tag === 'h5' || tag === 'h6') {
+      blocks.push({ id: `b${index}`, type: 'heading', content: el.textContent || '', attributes: { level: parseInt(tag[1]) } });
+    } else if (tag === 'p') {
+      const text = el.textContent?.trim();
+      if (text) blocks.push({ id: `b${index}`, type: 'paragraph', content: el.innerHTML });
+    } else if (tag === 'ul' || tag === 'ol') {
+      const items = Array.from(el.querySelectorAll('li')).map((li) => li.textContent?.trim() || '').filter(Boolean);
+      if (items.length) blocks.push({ id: `b${index}`, type: 'list', content: { items }, attributes: { ordered: tag === 'ol' } });
+    } else if (tag === 'blockquote') {
+      const text = el.textContent?.trim();
+      if (text) blocks.push({ id: `b${index}`, type: 'quote', content: text });
+    } else if (tag === 'div' && el.getAttribute('data-youtube-video')) {
+      const iframe = el.querySelector('iframe');
+      const src = iframe?.getAttribute('src') || '';
+      if (src) blocks.push({ id: `b${index}`, type: 'paragraph', content: `[YouTube: ${src}]` });
+    } else {
+      const text = el.textContent?.trim();
+      if (text) blocks.push({ id: `b${index}`, type: 'paragraph', content: el.innerHTML });
+    }
+  });
+  return blocks;
+}
+
 /** Block[] → HTML 변환 (RichTextEditor TipTap 기반) */
 function blocksToHtml(blocks: UrlBlock[]): string {
   return blocks
@@ -421,9 +459,13 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
     setCommunitySaving(true);
     setCommunitySaveStatus(null);
     try {
+      // WO-O4O-AI-CONTENT-COMMUNITY-SAVE-INTEGRATION-V1:
+      //   백엔드 normalizeContent가 Node.js에서 DOMParser를 사용해 실패하므로
+      //   프론트에서 HTML → Block[] 변환 후 전달 (백엔드는 Array인 경우 그대로 저장)
+      const contentBlocks = htmlToForumBlocks(result.html);
       const body: Record<string, any> = {
         title: communityTitle.trim() || 'AI 생성 콘텐츠',
-        content: result.html,
+        content: contentBlocks.length > 0 ? contentBlocks : result.html,
         type: 'discussion',
       };
       if (communityForumId) body.forumId = communityForumId;
