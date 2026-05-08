@@ -180,6 +180,7 @@ export function ContentWritePage() {
               return token ? { Authorization: `Bearer ${token}` } : undefined;
             })()}
             showCommunitySave={true}
+            showStoreSave={true}
           />
         </div>
 

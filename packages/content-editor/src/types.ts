@@ -69,6 +69,12 @@ export interface ContentEditorProps {
    * - true 시 AiContentModal에 "커뮤니티 저장" 버튼 활성화
    */
   showCommunitySave?: boolean;
+  /**
+   * WO-O4O-AI-STORE-CONTENT-DIRECT-SAVE-V1: AI 결과를 내 매장 콘텐츠로 저장 버튼 표시.
+   * - true 시 AiContentModal에 "내 매장 저장" 버튼 활성화 (store owner 전용)
+   * - API 403 시 오류 메시지 표시 (store owner가 아닌 경우)
+   */
+  showStoreSave?: boolean;
 }
 
 export interface ToolbarProps {

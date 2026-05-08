@@ -3,15 +3,17 @@
  *
  * WO-KPA-A-CONTENT-OVERRIDE-EXTENSION-V1
  * WO-O4O-STORE-CONTENT-HUB-SHARE-UI-PHASE2-V1
+ * WO-O4O-AI-STORE-CONTENT-DIRECT-SAVE-V1
  *
  * Core(o4o_asset_snapshots) immutable. 매장이 복제된 콘텐츠를
  * kpa_store_contents 테이블에서 독립 편집.
  *
  * Endpoints:
- *   GET /store-contents               — 내 매장 콘텐츠 목록 (share_status 포함)
- *   GET /store-contents/:snapshotId   — 편집용 콘텐츠 조회 (store 우선, fallback snapshot)
- *   PUT /store-contents/:snapshotId   — 편집 저장 (upsert)
- *   POST /store-contents/:id/share-to-hub — HUB 공유 요청 생성
+ *   GET /store-contents                    — 내 매장 콘텐츠 목록 (share_status 포함)
+ *   POST /store-contents                   — direct 콘텐츠 신규 생성 (source_type='direct')
+ *   GET /store-contents/:snapshotId        — 편집용 콘텐츠 조회 (store 우선, fallback snapshot)
+ *   PUT /store-contents/:snapshotId        — 편집 저장 (upsert, snapshot_edit 전용)
+ *   POST /store-contents/:id/share-to-hub  — HUB 공유 요청 생성
  */
 
 import { Router, Request, Response } from 'express';
@@ -73,6 +75,7 @@ export function createStoreContentController(
           success: true,
           data: contents.map((c) => ({
             id: c.id,
+            sourceType: c.source_type,
             snapshotId: c.snapshot_id,
             title: c.title,
             updatedAt: c.updated_at,
@@ -83,6 +86,79 @@ export function createStoreContentController(
         });
       } catch (error: any) {
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
+      }
+    },
+  );
+
+  /**
+   * POST /store-contents
+   *
+   * WO-O4O-AI-STORE-CONTENT-DIRECT-SAVE-V1
+   * Direct 콘텐츠 신규 생성 (source_type='direct', snapshot_id=null).
+   * AI 생성 결과, 직접 작성, 붙여넣기 등 모든 비-스냅샷 경로에서 사용.
+   * 매장 내부 전용 — published-assets 공개 렌더링 대상 아님.
+   *
+   * Body: { title: string, contentJson: unknown }
+   */
+  router.post(
+    '/',
+    requireAuth,
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const authReq = req as AuthRequest;
+        const userId = authReq.user?.id;
+        if (!userId) {
+          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+          return;
+        }
+
+        const organizationId = await resolveOrgId(dataSource, userId);
+        if (!organizationId) {
+          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: '매장 소속이 없습니다. 매장 경영자만 사용할 수 있습니다.' } });
+          return;
+        }
+
+        const { title, contentJson } = req.body as {
+          title?: string;
+          contentJson?: unknown;
+        };
+
+        if (!title || !title.trim()) {
+          res.status(400).json({
+            success: false,
+            error: { code: 'VALIDATION_ERROR', message: 'title은 필수입니다.' },
+          });
+          return;
+        }
+
+        const repo = dataSource.getRepository(KpaStoreContent);
+        const content = repo.create({
+          snapshot_id: null,
+          source_type: 'direct',
+          organization_id: organizationId,
+          title: title.trim(),
+          content_json: (contentJson ?? {}) as Record<string, unknown>,
+          updated_by: userId,
+        });
+        const saved = await repo.save(content);
+
+        res.status(201).json({
+          success: true,
+          data: {
+            id: saved.id,
+            sourceType: saved.source_type,
+            organizationId: saved.organization_id,
+            title: saved.title,
+            contentJson: saved.content_json,
+            updatedAt: saved.updated_at,
+            updatedBy: saved.updated_by,
+          },
+        });
+      } catch (error: any) {
+        res.status(500).json({
+          success: false,
+          error: { code: 'INTERNAL_ERROR', message: error.message },
+        });
       }
     },
   );

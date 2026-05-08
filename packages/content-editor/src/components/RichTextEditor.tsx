@@ -45,6 +45,7 @@ export function RichTextEditor({
   onMediaLibraryPick,
   aiRequestHeaders,
   showCommunitySave,
+  showStoreSave,
 }: ContentEditorProps) {
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
   const [saveModalOpen, setSaveModalOpen] = useState(false);
@@ -187,7 +188,7 @@ export function RichTextEditor({
           이미지 업로드 중…
         </div>
       )}
-      {editable && <Toolbar editor={editor} preset={preset} onImageUpload={onImageUpload} existingImages={existingImages} onMediaLibraryPick={onMediaLibraryPick} aiRequestHeaders={aiRequestHeaders} showCommunitySave={showCommunitySave} />}
+      {editable && <Toolbar editor={editor} preset={preset} onImageUpload={onImageUpload} existingImages={existingImages} onMediaLibraryPick={onMediaLibraryPick} aiRequestHeaders={aiRequestHeaders} showCommunitySave={showCommunitySave} showStoreSave={showStoreSave} />}
       <div style={{ overflow: 'hidden', borderRadius: showTemplateActions ? '0' : '0 0 8px 8px' }}>
         <EditorContent
           editor={editor}

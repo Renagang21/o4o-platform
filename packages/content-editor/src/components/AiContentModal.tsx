@@ -72,6 +72,13 @@ interface AiContentModalProps {
    * - 미제공(undefined/false) 시 버튼 미표시
    */
   showCommunitySave?: boolean;
+  /**
+   * WO-O4O-AI-STORE-CONTENT-DIRECT-SAVE-V1: AI 결과를 내 매장 콘텐츠로 저장.
+   * - true 시 "내 매장 저장" 버튼 표시 + 인라인 저장 패널 활성화
+   * - API 403 → store owner 아닌 경우 오류 메시지 표시
+   * - 미제공(undefined/false) 시 버튼 미표시
+   */
+  showStoreSave?: boolean;
 }
 
 type AiMode = 'customer_rewrite' | 'summary' | 'pop' | 'title_suggest';
@@ -206,7 +213,7 @@ function blocksToHtml(blocks: UrlBlock[]): string {
     .join('\n');
 }
 
-export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeaders, onChannelSave, showCommunitySave }: AiContentModalProps) {
+export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeaders, onChannelSave, showCommunitySave, showStoreSave }: AiContentModalProps) {
   // 기존 text 모드 상태
   const [input, setInput] = useState('');
   const [mode, setMode] = useState<AiMode>('customer_rewrite');
@@ -229,6 +236,12 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
   const [communityForumsLoading, setCommunityForumsLoading] = useState(false);
   const [communitySaving, setCommunitySaving] = useState(false);
   const [communitySaveStatus, setCommunitySaveStatus] = useState<{ ok: boolean; error?: string; postId?: string } | null>(null);
+
+  // WO-O4O-AI-STORE-CONTENT-DIRECT-SAVE-V1
+  const [showStoreSavePanel, setShowStoreSavePanel] = useState(false);
+  const [storeTitle, setStoreTitle] = useState('');
+  const [storeSaving, setStoreSaving] = useState(false);
+  const [storeSaveStatus, setStoreSaveStatus] = useState<{ ok: boolean; error?: string; contentId?: string } | null>(null);
 
   // URL 모드 상태 (WO-O4O-RICHTEXT-AI-URL-IMPORT-V1)
   const [sourceTab, setSourceTab] = useState<SourceTab>('text');
@@ -487,6 +500,44 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
     }
   };
 
+  // WO-O4O-AI-STORE-CONTENT-DIRECT-SAVE-V1
+  const handleOpenStoreSavePanel = () => {
+    if (!result) return;
+    setStoreTitle(result.title || '');
+    setStoreSaveStatus(null);
+    setShowStoreSavePanel(true);
+  };
+
+  const handleStoreSave = async () => {
+    if (!result) return;
+    setStoreSaving(true);
+    setStoreSaveStatus(null);
+    try {
+      const contentBlocks = htmlToForumBlocks(result.html);
+      const res = await fetch(`${API_BASE_URL}/api/v1/kpa/store-contents`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...aiRequestHeaders },
+        credentials: 'include',
+        body: JSON.stringify({
+          title: storeTitle.trim() || 'AI 생성 콘텐츠',
+          contentJson: contentBlocks.length > 0 ? contentBlocks : { html: result.html },
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        const msg = res.status === 403
+          ? '매장 소속이 없습니다. 매장 경영자만 내 매장에 저장할 수 있습니다.'
+          : (data.error?.message || data.error || '내 매장 저장에 실패했습니다.');
+        throw new Error(msg);
+      }
+      setStoreSaveStatus({ ok: true, contentId: data.data?.id });
+    } catch (err: any) {
+      setStoreSaveStatus({ ok: false, error: err?.message || '저장 중 오류가 발생했습니다.' });
+    } finally {
+      setStoreSaving(false);
+    }
+  };
+
   const handleClose = () => {
     setInput('');
     setResult(null);
@@ -501,6 +552,10 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
     setCommunityForumId('');
     setCommunitySaveStatus(null);
     setCommunitySaving(false);
+    setShowStoreSavePanel(false);
+    setStoreTitle('');
+    setStoreSaveStatus(null);
+    setStoreSaving(false);
     onClose();
   };
 
@@ -1126,6 +1181,96 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
             </div>
           )}
 
+          {/* WO-O4O-AI-STORE-CONTENT-DIRECT-SAVE-V1: 내 매장 저장 패널 */}
+          {showStoreSave && result && showStoreSavePanel && (
+            <div
+              style={{
+                border: '1px solid #bbf7d0',
+                borderRadius: '8px',
+                padding: '14px',
+                background: '#f0fdf4',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+              }}
+            >
+              <div style={{ fontSize: '13px', fontWeight: 600, color: '#15803d' }}>내 매장 콘텐츠로 저장</div>
+
+              {/* 제목 입력 */}
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', color: '#374151', marginBottom: '4px' }}>제목</label>
+                <input
+                  type="text"
+                  value={storeTitle}
+                  onChange={(e) => setStoreTitle(e.target.value)}
+                  placeholder="저장할 콘텐츠 제목을 입력하세요"
+                  style={{
+                    width: '100%',
+                    padding: '8px 10px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '6px',
+                    fontSize: '13px',
+                    fontFamily: 'inherit',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+
+              {/* 저장 결과 */}
+              {storeSaveStatus && (
+                <div
+                  style={{
+                    padding: '8px 12px',
+                    borderRadius: '6px',
+                    fontSize: '12px',
+                    color: storeSaveStatus.ok ? '#15803d' : '#dc2626',
+                    background: storeSaveStatus.ok ? '#dcfce7' : '#fef2f2',
+                  }}
+                >
+                  {storeSaveStatus.ok
+                    ? `내 매장 콘텐츠에 저장되었습니다 ✓`
+                    : `저장 실패: ${storeSaveStatus.error}`}
+                </div>
+              )}
+
+              {/* 버튼 */}
+              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                <button
+                  type="button"
+                  onClick={() => { setShowStoreSavePanel(false); setStoreSaveStatus(null); }}
+                  style={{
+                    padding: '7px 14px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '6px',
+                    background: 'white',
+                    fontSize: '13px',
+                    cursor: 'pointer',
+                    color: '#374151',
+                  }}
+                >
+                  취소
+                </button>
+                <button
+                  type="button"
+                  onClick={handleStoreSave}
+                  disabled={storeSaving || Boolean(storeSaveStatus?.ok)}
+                  style={{
+                    padding: '7px 14px',
+                    border: 'none',
+                    borderRadius: '6px',
+                    background: storeSaveStatus?.ok ? '#dcfce7' : storeSaving ? '#bbf7d0' : '#16a34a',
+                    color: storeSaveStatus?.ok ? '#15803d' : 'white',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    cursor: storeSaving || storeSaveStatus?.ok ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  {storeSaving ? '저장 중...' : storeSaveStatus?.ok ? '저장됨 ✓' : '매장에 저장'}
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Disclaimer */}
           <p style={{ fontSize: '11px', color: '#9ca3af', margin: 0, textAlign: 'center' }}>
             AI가 생성한 내용은 참고용입니다. 반드시 검토 후 사용하세요.
@@ -1211,6 +1356,25 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
                 }}
               >
                 {communitySaveStatus?.ok ? '저장됨 ✓' : showCommunitySavePanel ? '커뮤니티 저장 ▲' : '커뮤니티 저장'}
+              </button>
+            )}
+            {/* WO-O4O-AI-STORE-CONTENT-DIRECT-SAVE-V1: 내 매장 저장 버튼 */}
+            {showStoreSave && result && (
+              <button
+                type="button"
+                onClick={showStoreSavePanel ? () => { setShowStoreSavePanel(false); setStoreSaveStatus(null); } : handleOpenStoreSavePanel}
+                style={{
+                  padding: '8px 16px',
+                  border: `1px solid ${showStoreSavePanel ? '#15803d' : '#16a34a'}`,
+                  borderRadius: '6px',
+                  background: showStoreSavePanel ? '#dcfce7' : '#f0fdf4',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  color: '#15803d',
+                  fontWeight: 600,
+                }}
+              >
+                {storeSaveStatus?.ok ? '저장됨 ✓' : showStoreSavePanel ? '내 매장 저장 ▲' : '내 매장 저장'}
               </button>
             )}
             {/* WO-O4O-AI-CONTENT-AUTO-CHANNEL-SAVE-V1: onChannelSave가 있을 때만 표시 */}
