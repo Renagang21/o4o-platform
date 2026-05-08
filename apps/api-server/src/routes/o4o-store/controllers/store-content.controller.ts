@@ -4,13 +4,18 @@
  * WO-KPA-A-CONTENT-OVERRIDE-EXTENSION-V1
  * WO-O4O-STORE-CONTENT-HUB-SHARE-UI-PHASE2-V1
  * WO-O4O-AI-STORE-CONTENT-DIRECT-SAVE-V1
+ * WO-O4O-KPA-STORE-CONTENT-STORE-OWNER-GUARD-FIX-V1
  *
  * Core(o4o_asset_snapshots) immutable. 매장이 복제된 콘텐츠를
  * kpa_store_contents 테이블에서 독립 편집.
  *
+ * 권한 정책:
+ *   POST / (direct 생성) — role_assignments.kpa:store_owner REQUIRED (RBAC SSOT)
+ *   기타 — org membership (resolveOrgId, kpa_members 기반)
+ *
  * Endpoints:
  *   GET /store-contents                    — 내 매장 콘텐츠 목록 (share_status 포함)
- *   POST /store-contents                   — direct 콘텐츠 신규 생성 (source_type='direct')
+ *   POST /store-contents                   — direct 콘텐츠 신규 생성 (source_type='direct', store owner only)
  *   GET /store-contents/:snapshotId        — 편집용 콘텐츠 조회 (store 우선, fallback snapshot)
  *   PUT /store-contents/:snapshotId        — 편집 저장 (upsert, snapshot_edit 전용)
  *   POST /store-contents/:id/share-to-hub  — HUB 공유 요청 생성
@@ -21,6 +26,7 @@ import { DataSource } from 'typeorm';
 import { KpaMember } from '../../kpa/entities/kpa-member.entity.js';
 import { KpaStoreContent } from '../../kpa/entities/kpa-store-content.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
+import { isStoreOwner } from '../../../utils/store-owner.utils.js';
 
 type AuthMiddleware = import('express').RequestHandler;
 
@@ -94,9 +100,15 @@ export function createStoreContentController(
    * POST /store-contents
    *
    * WO-O4O-AI-STORE-CONTENT-DIRECT-SAVE-V1
+   * WO-O4O-KPA-STORE-CONTENT-STORE-OWNER-GUARD-FIX-V1
+   *
    * Direct 콘텐츠 신규 생성 (source_type='direct', snapshot_id=null).
    * AI 생성 결과, 직접 작성, 붙여넣기 등 모든 비-스냅샷 경로에서 사용.
    * 매장 내부 전용 — published-assets 공개 렌더링 대상 아님.
+   *
+   * 권한: role_assignments.kpa:store_owner REQUIRED (RBAC SSOT)
+   *   1차: isStoreOwner('kpa') → role_assignments 확인
+   *   2차: organizationId → organization_members 우선, kpa_members fallback
    *
    * Body: { title: string, contentJson: unknown }
    */
@@ -112,9 +124,35 @@ export function createStoreContentController(
           return;
         }
 
-        const organizationId = await resolveOrgId(dataSource, userId);
+        // WO-O4O-KPA-STORE-CONTENT-STORE-OWNER-GUARD-FIX-V1:
+        // role_assignments에 kpa:store_owner 있는지 확인 (RBAC SSOT)
+        const { isOwner, organizationId: orgFromRa } = await isStoreOwner(dataSource, userId, 'kpa');
+        if (!isOwner) {
+          res.status(403).json({
+            success: false,
+            error: {
+              code: 'STORE_OWNER_REQUIRED',
+              message: '매장 경영자(kpa:store_owner)만 내 매장 콘텐츠를 저장할 수 있습니다.',
+            },
+          });
+          return;
+        }
+
+        // organizationId: organization_members 우선, kpa_members fallback
+        let organizationId: string | null = orgFromRa;
         if (!organizationId) {
-          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: '매장 소속이 없습니다. 매장 경영자만 사용할 수 있습니다.' } });
+          const member = await dataSource.getRepository(KpaMember).findOne({ where: { user_id: userId } });
+          organizationId = member?.organization_id || null;
+        }
+
+        if (!organizationId) {
+          res.status(403).json({
+            success: false,
+            error: {
+              code: 'NO_ORG',
+              message: '매장 조직 정보를 찾을 수 없습니다. 매장 등록 후 다시 시도해 주세요.',
+            },
+          });
           return;
         }
 
