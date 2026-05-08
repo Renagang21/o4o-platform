@@ -43,10 +43,15 @@ export function StoreBlogPostPage() {
   }, [slug, postSlug]);
 
   // SEO meta — 게시글 + 매장 정보 결합
+  // WO-O4O-KPA-STORE-BLOG-CONTENT-RICHTEXT-V1: HTML 콘텐츠 도입에 따라 description 에서 태그 strip
   const seoTitle = post && storeInfo
     ? `${post.title} | ${storeInfo.name}`
     : post?.title || null;
-  const seoDescription = post?.excerpt || (post?.content ? post.content.slice(0, 160) : null) || storeInfo?.description || null;
+  const stripTags = (s: string | null | undefined): string =>
+    (s || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+  const rawDesc = post?.excerpt || post?.content || storeInfo?.description || '';
+  const cleanDesc = stripTags(rawDesc).slice(0, 160);
+  const seoDescription = cleanDesc || null;
   const seoUrl = typeof window !== 'undefined' && slug && postSlug
     ? `${window.location.origin}/store/${slug}/blog/${postSlug}`
     : null;

@@ -20,6 +20,10 @@ import {
 } from '../../api/blogStaff';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getStoreSlug } from '../../api/pharmacyInfo';
+// WO-O4O-KPA-STORE-BLOG-CONTENT-RICHTEXT-V1: canonical RichTextEditor 사용
+import { RichTextEditor } from '@o4o/content-editor';
+import { mediaApi } from '../../api/media';
+import { getAccessToken } from '../../contexts/AuthContext';
 
 type ViewMode = 'list' | 'editor';
 type StatusFilter = 'all' | 'draft' | 'published' | 'archived';
@@ -219,6 +223,13 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
+  // WO-O4O-KPA-STORE-BLOG-CONTENT-RICHTEXT-V1: editor 이미지 업로드 핸들러
+  const handleImageUpload = async (file: File): Promise<string> => {
+    const res = await mediaApi.upload(file, true, 'kpa-society', 'blog');
+    if (res.success && res.data) return res.data.url;
+    throw new Error(res.error || '이미지 업로드에 실패했습니다.');
+  };
+
   // Editor view
   if (mode === 'editor') {
     return (
@@ -265,12 +276,19 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
           </div>
           <div>
             <label style={labelStyle}>본문</label>
-            <textarea
+            {/* WO-O4O-KPA-STORE-BLOG-CONTENT-RICHTEXT-V1: textarea → canonical RichTextEditor (preset=full).
+                기존 plain-text 게시글은 RichTextEditor 가 setContent 시 자동으로 paragraph 로 감싸서 호환. */}
+            <RichTextEditor
               value={editorContent}
-              onChange={(e) => setEditorContent(e.target.value)}
-              placeholder="게시글 내용을 작성하세요"
-              rows={16}
-              style={{ ...inputStyle, resize: 'vertical', fontFamily: 'inherit', lineHeight: 1.7 }}
+              onChange={(c) => setEditorContent(c.html)}
+              onImageUpload={handleImageUpload}
+              placeholder="전문 칼럼을 작성하세요"
+              minHeight="360px"
+              preset="full"
+              aiRequestHeaders={(() => {
+                const token = getAccessToken();
+                return token ? { Authorization: `Bearer ${token}` } : undefined;
+              })()}
             />
           </div>
 
