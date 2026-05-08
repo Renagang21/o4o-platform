@@ -10,7 +10,10 @@
  */
 
 import { useEffect, useState, useCallback } from 'react';
-import { Tag, Loader2, CheckCircle2, XCircle } from 'lucide-react';
+import { Tag } from 'lucide-react';
+import { BaseDetailDrawer } from '@o4o/ui';
+import { DataTable } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { toast } from '@o4o/error-handling';
 import {
   cosmeticsEventOfferAdminApi,
@@ -22,15 +25,6 @@ import { fetchGuidePageContent } from '../../api/guideContent';
 
 const GUIDE_PAGE_KEY = 'event.offer.management';
 const SERVICE_KEY = 'k-cosmetics';
-
-const STATUS_MESSAGE = {
-  toastApproved: (title: string) => `"${title}" 이(가) 승인되었습니다.`,
-  toastRejected: (title: string) => `"${title}" 이(가) 반려되었습니다.`,
-  toastError: '처리 중 오류가 발생했습니다.',
-  rejectReasonPrompt: '반려 사유를 입력해 주세요.',
-  confirmApprove: (title: string) =>
-    `"${title}" 이벤트를 승인하시겠습니까?\n승인 후 즉시 K-Cosmetics에 노출됩니다.`,
-};
 
 function formatDate(iso: string): string {
   if (!iso) return '-';
@@ -55,8 +49,10 @@ function formatPrice(value: number | null): string {
 export default function EventOfferApprovalsPage() {
   const [items, setItems] = useState<PendingListing[]>([]);
   const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState<Record<string, boolean>>({});
   const [error, setError] = useState<string | null>(null);
+  const [selectedItem, setSelectedItem] = useState<PendingListing | null>(null);
+  const [rejectReason, setRejectReason] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const [guideTitle, setGuideTitle] = useState<string | null>(null);
   const [guideDesc, setGuideDesc] = useState<string | null>(null);
@@ -79,9 +75,6 @@ export default function EventOfferApprovalsPage() {
       .catch(() => { /* use fallback */ });
     return () => { cancelled = true; };
   }, []);
-
-  const setRowLoading = (id: string, value: boolean) =>
-    setActionLoading(prev => ({ ...prev, [id]: value }));
 
   const loadPending = useCallback(async () => {
     setLoading(true);
@@ -106,43 +99,84 @@ export default function EventOfferApprovalsPage() {
     loadPending();
   }, [loadPending]);
 
-  const handleApprove = async (item: PendingListing) => {
-    if (actionLoading[item.id]) return;
-    if (!window.confirm(STATUS_MESSAGE.confirmApprove(item.productName))) return;
-    setRowLoading(item.id, true);
+  const handleApprove = async () => {
+    if (!selectedItem || isProcessing) return;
+    setIsProcessing(true);
     try {
-      await cosmeticsEventOfferAdminApi.approveEventOffer(item.id);
-      setItems(prev => prev.filter(p => p.id !== item.id));
-      toast.success(STATUS_MESSAGE.toastApproved(item.productName));
+      await cosmeticsEventOfferAdminApi.approveEventOffer(selectedItem.id);
+      setItems(prev => prev.filter(p => p.id !== selectedItem.id));
+      setSelectedItem(null);
+      setRejectReason('');
+      toast.success(`"${selectedItem.productName}" 이(가) 승인되었습니다.`);
     } catch (err: any) {
       const apiErr = err?.response?.data?.error as EventOfferApiError | undefined;
-      toast.error(apiErr?.message || STATUS_MESSAGE.toastError);
+      toast.error(apiErr?.message || '처리 중 오류가 발생했습니다.');
     } finally {
-      setRowLoading(item.id, false);
+      setIsProcessing(false);
     }
   };
 
-  const handleReject = async (item: PendingListing) => {
-    if (actionLoading[item.id]) return;
-    const reason = window.prompt(STATUS_MESSAGE.rejectReasonPrompt);
-    if (reason === null) return;
-    const trimmed = reason.trim();
+  const handleReject = async () => {
+    if (!selectedItem || isProcessing) return;
+    const trimmed = rejectReason.trim();
     if (!trimmed) {
-      toast.error(STATUS_MESSAGE.rejectReasonPrompt);
+      toast.error('반려 사유를 입력해 주세요.');
       return;
     }
-    setRowLoading(item.id, true);
+    setIsProcessing(true);
     try {
-      await cosmeticsEventOfferAdminApi.rejectEventOffer(item.id, trimmed);
-      setItems(prev => prev.filter(p => p.id !== item.id));
-      toast.success(STATUS_MESSAGE.toastRejected(item.productName));
+      await cosmeticsEventOfferAdminApi.rejectEventOffer(selectedItem.id, trimmed);
+      setItems(prev => prev.filter(p => p.id !== selectedItem.id));
+      setSelectedItem(null);
+      setRejectReason('');
+      toast.success(`"${selectedItem.productName}" 이(가) 반려되었습니다.`);
     } catch (err: any) {
       const apiErr = err?.response?.data?.error as EventOfferApiError | undefined;
-      toast.error(apiErr?.message || STATUS_MESSAGE.toastError);
+      toast.error(apiErr?.message || '처리 중 오류가 발생했습니다.');
     } finally {
-      setRowLoading(item.id, false);
+      setIsProcessing(false);
     }
   };
+
+  const columns: ListColumnDef<PendingListing>[] = [
+    {
+      key: 'productName',
+      header: '상품명',
+      render: (_v, item) => (
+        <span className="text-sm font-medium text-slate-800">{item.productName}</span>
+      ),
+    },
+    {
+      key: 'supplierName',
+      header: '공급사 / 제안자',
+      render: (_v, item) => (
+        <div>
+          <p className="text-sm text-slate-700">{item.supplierName}</p>
+          {item.requestedByEmail && (
+            <p className="text-xs text-slate-400 mt-0.5">{item.requestedByEmail}</p>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'price',
+      header: '가격',
+      width: '120px',
+      render: (_v, item) => (
+        <span className="text-sm font-semibold text-slate-700">{formatPrice(item.price)}</span>
+      ),
+    },
+    {
+      key: 'createdAt',
+      header: '제안일',
+      width: '160px',
+      sortable: true,
+      sortAccessor: (item) => new Date(item.createdAt).getTime(),
+      render: (_v, item) => (
+        <span className="text-xs text-slate-500">{formatDate(item.createdAt)}</span>
+      ),
+    },
+  ];
 
   return (
     <div className="space-y-6">
@@ -187,82 +221,55 @@ export default function EventOfferApprovalsPage() {
         </div>
       )}
 
-      {/* List */}
-      <div className="bg-white rounded-xl border border-slate-100 overflow-hidden">
-        {loading ? (
-          <div className="flex justify-center items-center py-16">
-            <Loader2 size={28} className="animate-spin text-pink-600" />
-          </div>
-        ) : items.length === 0 ? (
-          <div className="text-center py-16 text-slate-500">
-            <Tag size={36} className="mx-auto mb-3 text-slate-300" />
-            <p className="font-medium text-sm">승인 대기중인 이벤트가 없습니다.</p>
-          </div>
-        ) : (
-          <div>
-            {/* Table Header */}
-            <div className="grid grid-cols-[2fr_1.5fr_1fr_1fr_180px] gap-4 px-5 py-3 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-              <span>상품명</span>
-              <span>공급사 / 제안자</span>
-              <span>가격</span>
-              <span>제안일</span>
-              <span className="text-right">작업</span>
-            </div>
+      <DataTable<PendingListing>
+        columns={columns}
+        data={items}
+        rowKey="id"
+        loading={loading}
+        onRowClick={(item) => { setSelectedItem(item); setRejectReason(''); }}
+        emptyMessage="승인 대기중인 이벤트가 없습니다"
+        tableId="kcos-event-offer-approvals"
+      />
 
-            {items.map(item => {
-              const isActing = !!actionLoading[item.id];
-              return (
-                <div
-                  key={item.id}
-                  className="grid grid-cols-[2fr_1.5fr_1fr_1fr_180px] gap-4 px-5 py-4 border-b border-slate-100 last:border-0 items-center hover:bg-slate-50/60 transition-colors"
-                >
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-slate-800 truncate">
-                      {item.productName}
-                    </p>
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm text-slate-700 truncate">{item.supplierName}</p>
-                    {item.requestedByEmail && (
-                      <p className="text-xs text-slate-400 truncate mt-0.5">
-                        {item.requestedByEmail}
-                      </p>
-                    )}
-                  </div>
-                  <span className="text-sm font-semibold text-slate-700">
-                    {formatPrice(item.price)}
-                  </span>
-                  <span className="text-xs text-slate-500">
-                    {formatDate(item.createdAt)}
-                  </span>
-                  <div className="flex justify-end gap-2">
-                    <button
-                      onClick={() => handleApprove(item)}
-                      disabled={isActing}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-pink-600 hover:bg-pink-700 rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                    >
-                      {isActing ? (
-                        <Loader2 size={12} className="animate-spin" />
-                      ) : (
-                        <CheckCircle2 size={12} />
-                      )}
-                      승인
-                    </button>
-                    <button
-                      onClick={() => handleReject(item)}
-                      disabled={isActing}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                    >
-                      <XCircle size={12} />
-                      반려
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
+      <BaseDetailDrawer
+        open={!!selectedItem}
+        onClose={() => { setSelectedItem(null); setRejectReason(''); }}
+        title={selectedItem?.productName ?? ''}
+        width={520}
+        actions={[
+          { label: '반려', onClick: handleReject, variant: 'danger' as const, loading: isProcessing, disabled: isProcessing },
+          { label: '승인', onClick: handleApprove, variant: 'primary' as const, loading: isProcessing, disabled: isProcessing },
+        ]}
+      >
+        {selectedItem && (
+          <div className="space-y-4">
+            {[
+              { label: '공급사', value: selectedItem.supplierName },
+              { label: '제안자', value: selectedItem.requestedByEmail || '-' },
+              { label: '가격', value: formatPrice(selectedItem.price) },
+              { label: '제안일', value: formatDate(selectedItem.createdAt) },
+            ].map((item) => (
+              <div key={item.label} style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
+                <span style={{ fontWeight: 600, color: '#64748b', minWidth: 70, flexShrink: 0 }}>{item.label}</span>
+                <span style={{ color: '#1e293b' }}>{item.value}</span>
+              </div>
+            ))}
+
+            <div className="pt-4 border-t border-slate-200">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                반려 사유 <span className="text-slate-400 font-normal">(반려 시 필수)</span>
+              </label>
+              <textarea
+                value={rejectReason}
+                onChange={(e) => setRejectReason(e.target.value)}
+                placeholder="반려 사유를 입력해 주세요"
+                rows={3}
+                className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent resize-none"
+              />
+            </div>
           </div>
         )}
-      </div>
+      </BaseDetailDrawer>
     </div>
   );
 }

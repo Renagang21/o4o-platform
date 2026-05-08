@@ -6,9 +6,21 @@
  */
 
 import { useState } from 'react';
-import { DataTable, type Column } from '@o4o/ui';
+import { BaseDetailDrawer } from '@o4o/ui';
+import { DataTable } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 
-const applications = [
+interface Application {
+  id: number;
+  storeName: string;
+  owner: string;
+  phone: string;
+  type: string;
+  status: string;
+  appliedDate: string;
+}
+
+const applications: Application[] = [
   { id: 1, storeName: '뷰티마트 잠실점', owner: '김미영', phone: '010-1234-5678', type: '신규입점', status: '검토중', appliedDate: '2024-01-15' },
   { id: 2, storeName: '코스메 선릉점', owner: '이정은', phone: '010-2345-6789', type: '신규입점', status: '승인대기', appliedDate: '2024-01-14' },
   { id: 3, storeName: '스킨랩 역삼점', owner: '박수진', phone: '010-3456-7890', type: '브랜드추가', status: '승인완료', appliedDate: '2024-01-13' },
@@ -31,6 +43,7 @@ const typeColors: Record<string, string> = {
 
 export default function ApplicationsPage() {
   const [statusFilter, setStatusFilter] = useState('all');
+  const [selectedApp, setSelectedApp] = useState<Application | null>(null);
 
   const statuses = ['all', '검토중', '승인대기', '승인완료', '반려'];
 
@@ -38,46 +51,47 @@ export default function ApplicationsPage() {
     statusFilter === 'all' || app.status === statusFilter
   );
 
-  // DataTable 컬럼 정의 (4개 - 축약형 + 액션)
-  const columns: Column<Record<string, any>>[] = [
-    { key: 'store', title: '매장 정보', dataIndex: 'store', width: '30%' },
-    { key: 'application', title: '신청 내용', dataIndex: 'application', width: '25%' },
-    { key: 'contact', title: '연락처', dataIndex: 'contact', width: '15%' },
-    { key: 'status', title: '상태', dataIndex: 'status', width: '15%', align: 'center' },
-    { key: 'actions', title: '', dataIndex: 'actions', width: '15%' },
-  ];
-
-  // DataTable 행 데이터 변환
-  const tableRows = filteredApplications.map((app) => ({
-    id: app.id.toString(),
-    store: (
-      <div>
-        <p className="font-medium text-slate-800">{app.storeName}</p>
-        <p className="text-sm text-slate-600 mt-1">{app.owner}</p>
-      </div>
-    ),
-    application: (
-      <div>
-        <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${typeColors[app.type]}`}>
-          {app.type}
+  const columns: ListColumnDef<Application>[] = [
+    {
+      key: 'storeName',
+      header: '매장 정보',
+      render: (_v, app) => (
+        <div>
+          <p className="font-medium text-slate-800">{app.storeName}</p>
+          <p className="text-sm text-slate-600 mt-1">{app.owner}</p>
+        </div>
+      ),
+    },
+    {
+      key: 'type',
+      header: '신청 내용',
+      render: (_v, app) => (
+        <div>
+          <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${typeColors[app.type] ?? 'bg-slate-100 text-slate-600'}`}>
+            {app.type}
+          </span>
+          <p className="text-sm text-slate-500 mt-1">{app.appliedDate}</p>
+        </div>
+      ),
+    },
+    {
+      key: 'phone',
+      header: '연락처',
+      width: '150px',
+      render: (_v, app) => <p className="text-sm text-slate-600">{app.phone}</p>,
+    },
+    {
+      key: 'status',
+      header: '상태',
+      width: '120px',
+      align: 'center',
+      render: (_v, app) => (
+        <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${statusColors[app.status] ?? 'bg-slate-100 text-slate-600'}`}>
+          {app.status}
         </span>
-        <p className="text-sm text-slate-500 mt-1">{app.appliedDate}</p>
-      </div>
-    ),
-    contact: (
-      <p className="text-sm text-slate-600">{app.phone}</p>
-    ),
-    status: (
-      <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${statusColors[app.status]}`}>
-        {app.status}
-      </span>
-    ),
-    actions: (
-      <button className="text-pink-600 hover:text-pink-700 font-medium text-sm">
-        상세보기
-      </button>
-    ),
-  }));
+      ),
+    },
+  ];
 
   return (
     <div className="space-y-6">
@@ -128,15 +142,39 @@ export default function ApplicationsPage() {
         </div>
       </div>
 
-      {/* Applications Table - Condensed (Spike) */}
-      <div className="bg-white rounded-xl border border-slate-100 overflow-hidden">
-        <DataTable
-          columns={columns}
-          dataSource={tableRows}
-          rowKey="id"
-          emptyText="신청이 없습니다"
-        />
-      </div>
+      <DataTable<Application>
+        columns={columns}
+        data={filteredApplications}
+        rowKey={(row) => String(row.id)}
+        emptyMessage="신청이 없습니다"
+        onRowClick={(app) => setSelectedApp(app)}
+        tableId="kcos-applications"
+      />
+
+      <BaseDetailDrawer
+        open={!!selectedApp}
+        onClose={() => setSelectedApp(null)}
+        title={selectedApp?.storeName ?? ''}
+        width={480}
+        actions={[]}
+      >
+        {selectedApp && (
+          <div className="space-y-1">
+            {[
+              { label: '신청자', value: selectedApp.owner },
+              { label: '신청 유형', value: selectedApp.type },
+              { label: '상태', value: selectedApp.status },
+              { label: '연락처', value: selectedApp.phone },
+              { label: '신청일', value: selectedApp.appliedDate },
+            ].map((item) => (
+              <div key={item.label} style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
+                <span style={{ fontWeight: 600, color: '#64748b', minWidth: 80, flexShrink: 0 }}>{item.label}</span>
+                <span style={{ color: '#1e293b' }}>{item.value}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </BaseDetailDrawer>
     </div>
   );
 }
