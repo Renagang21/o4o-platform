@@ -41,7 +41,8 @@ export function GuideEditableSection({
   client,
 }: GuideEditableSectionProps) {
   const [dbContent, setDbContent] = useState<string | null>(null);
-  const [hovered, setHovered] = useState(false);
+  const [mouseOver, setMouseOver] = useState(false);
+  const hovered = canEdit && mouseOver;
   const [modalOpen, setModalOpen] = useState(false);
   const [editorValue, setEditorValue] = useState('');
   const [saving, setSaving] = useState(false);
@@ -89,8 +90,8 @@ export function GuideEditableSection({
       {/* 텍스트 표시 영역 */}
       <span
         style={{ position: 'relative', display: 'inline' }}
-        onMouseEnter={() => canEdit && setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
+        onMouseEnter={() => setMouseOver(true)}
+        onMouseLeave={() => setMouseOver(false)}
       >
         {dbContent !== null ? (
           String(dbContent).trim() ? (
