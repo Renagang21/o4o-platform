@@ -31,12 +31,23 @@ type Layout = 'A4' | 'A5' | 'A6';
 type ShortSource = 'pop_short' | 'product_description' | 'asset' | 'fallback';
 type LongSource = 'pop_long' | 'product_description' | 'asset' | 'fallback';
 
+// WO-O4O-KPA-STORE-QR-PRODUCT-CONTEXT-CANONICAL-MERGE-V1:
+//   ProductMarketingPage가 production canonical(source.items[]) + productContext로 보내는
+//   상품 컨텍스트 진입 state. 단건 prefill은 source.items[0]에서 추출.
+interface BuilderProductionItem {
+  id: string;
+  title: string;
+  description?: string | null;
+  origin: 'snapshot' | 'direct' | 'library';
+}
 interface BuilderLocationState {
-  productName?: string;
-  selectedLibraryItem?: {
-    id: string;
-    title?: string;
-    description?: string | null;
+  production?: {
+    source?: { items?: BuilderProductionItem[] };
+    target?: string;
+  };
+  productContext?: {
+    productId?: string;
+    productName?: string;
   };
 }
 
@@ -46,10 +57,13 @@ export function ProductPopBuilderPage() {
   const location = useLocation();
   const incoming = (location.state as BuilderLocationState | null) ?? {};
 
+  const incomingProductName = incoming.productContext?.productName ?? '';
+  const incomingFirstItem = incoming.production?.source?.items?.[0];
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [generating, setGenerating] = useState(false);
-  const [title, setTitle] = useState<string>(incoming.productName ?? '');
+  const [title, setTitle] = useState<string>(incomingProductName);
   const [shortText, setShortText] = useState('');
   const [longText, setLongText] = useState('');
   const [layout, setLayout] = useState<Layout>('A4');
@@ -73,8 +87,8 @@ export function ProductPopBuilderPage() {
         const popShort = map.get('pop_short')?.trim() || '';
         const popLong = map.get('pop_long')?.trim() || '';
         const productDesc = map.get('product_description')?.trim() || '';
-        const assetDesc = (incoming.selectedLibraryItem?.description ?? '').trim();
-        const fallbackName = (incoming.productName ?? '').trim();
+        const assetDesc = (incomingFirstItem?.description ?? '').trim();
+        const fallbackName = incomingProductName.trim();
 
         // pop_short prefill (priority: pop_short → product_description short → asset → fallback)
         if (popShort) {
@@ -104,10 +118,6 @@ export function ProductPopBuilderPage() {
         } else if (fallbackName) {
           setLongText(fallbackName);
           setLongSource('fallback');
-        }
-
-        if (!incoming.productName && fallbackName === '') {
-          // no productName from state — leave title blank for user to fill
         }
       } catch {
         // graceful — empty form

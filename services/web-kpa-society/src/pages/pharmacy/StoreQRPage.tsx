@@ -133,34 +133,19 @@ export function StoreQRPage() {
     });
   }, [formLandingType, creating]);
 
-  // Router state 기반 자동 선택 — 두 경로 지원:
-  //  1) 레거시: state.selectedLibraryItem
-  //  2) WO-O4O-KPA-STORE-PRODUCTION-ENTRY-CANONICAL-CORRECTION-V1:
-  //     state.production.source.items[0] (내 자료함에서 제작 시작 → QR)
+  // Router state 기반 자동 선택 — canonical production.source.items[] 단일 시그니처:
+  //  - 내 자료함 → 제작 시작 → QR (다건 가능, 첫 library 항목 사용)
+  //  - 상품 마케팅 → QR 만들기 (단건 자동 prefill, productContext 동반)
+  // WO-O4O-KPA-STORE-PRODUCTION-ENTRY-CANONICAL-CORRECTION-V1
+  // WO-O4O-KPA-STORE-QR-PRODUCT-CONTEXT-CANONICAL-MERGE-V1
   useEffect(() => {
     const state = location.state as
       | {
-          selectedLibraryItem?: Record<string, unknown>;
           production?: {
             source?: { items?: Array<{ id: string; title: string; description?: string | null; origin?: string }> };
           };
         }
       | null;
-
-    const single = state?.selectedLibraryItem;
-    if (single && typeof single.id === 'string') {
-      handleLibrarySelect({
-        id: single.id as string,
-        title: (single.title as string) || '',
-        category: (single.category as string) || null,
-        fileUrl: (single.fileUrl as string) || null,
-        assetType: (single.assetType as string) || 'file',
-        url: (single.url as string) || null,
-        htmlContent: (single.htmlContent as string) || null,
-      });
-      window.history.replaceState({}, document.title);
-      return;
-    }
 
     const incoming = state?.production?.source?.items?.find((it) => it.origin === 'library');
     if (incoming) {

@@ -37,23 +37,36 @@ export function ProductMarketingPage() {
   const [data, setData] = useState<ProductMarketingData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // WO-O4O-AI-AUTO-POP-BUILDER-V1: POP 편집 페이지로 이동 — 첫 활성 자료실 항목을 context로 전달
+  // WO-O4O-AI-AUTO-POP-BUILDER-V1: POP 편집 페이지로 이동
+  // WO-O4O-KPA-STORE-QR-PRODUCT-CONTEXT-CANONICAL-MERGE-V1:
+  //   production canonical(source.items[]) + productContext 분리 시그니처로 통일.
   const handleCreatePop = () => {
     if (!productId) return;
     const targetAsset = data?.libraryAssets.find((a: ProductLibraryAsset) => a.isActive);
     if (targetAsset) {
       navigate(`/store/commerce/products/${productId}/pop`, {
         state: {
-          productName: targetAsset.title,
-          selectedLibraryItem: {
-            id: targetAsset.id,
-            title: targetAsset.title,
-            description: targetAsset.description,
+          production: {
+            source: {
+              fromLibrary: 'resources' as const,
+              items: [
+                {
+                  id: targetAsset.id,
+                  title: targetAsset.title,
+                  description: targetAsset.description ?? null,
+                  origin: 'library' as const,
+                },
+              ],
+            },
+            target: 'pop' as const,
           },
+          productContext: { productId, productName: targetAsset.title },
         },
       });
     } else {
-      navigate(`/store/commerce/products/${productId}/pop`);
+      navigate(`/store/commerce/products/${productId}/pop`, {
+        state: { productContext: { productId } },
+      });
     }
   };
 
@@ -76,22 +89,31 @@ export function ProductMarketingPage() {
     fetchData();
   }, [fetchData]);
 
-  // WO-O4O-STORE-WORKSPACE-QR-PREFILL-V2: 상품에 연결된 첫 활성 자료실 항목을
-  // selectedLibraryItem state로 전달 → StoreQRPage에서 자동 prefill
+  // WO-O4O-STORE-WORKSPACE-QR-PREFILL-V2: 상품에 연결된 첫 활성 자료실 항목을 prefill
+  // WO-O4O-KPA-STORE-QR-PRODUCT-CONTEXT-CANONICAL-MERGE-V1:
+  //   production canonical(source.items[]) + productContext 분리 시그니처로 통일.
+  //   StoreQRPage 진입 시 production.source.items[0] 기반으로 fetch + prefill.
   const handleCreateQr = () => {
+    if (!productId) return;
     const targetAsset = data?.libraryAssets.find((a: ProductLibraryAsset) => a.isActive);
     if (targetAsset) {
       navigate('/store/marketing/qr', {
         state: {
-          selectedLibraryItem: {
-            id: targetAsset.id,
-            title: targetAsset.title,
-            category: targetAsset.category,
-            fileUrl: targetAsset.fileUrl,
-            assetType: 'file',
-            url: null,
-            htmlContent: null,
+          production: {
+            source: {
+              fromLibrary: 'resources' as const,
+              items: [
+                {
+                  id: targetAsset.id,
+                  title: targetAsset.title,
+                  description: targetAsset.description ?? null,
+                  origin: 'library' as const,
+                },
+              ],
+            },
+            target: 'qr' as const,
           },
+          productContext: { productId, productName: targetAsset.title },
         },
       });
     } else {
