@@ -84,16 +84,6 @@ export const menuPermissions: MenuPermission[] = [
     menuId: 'yaksa-tools',
     roles: ['admin', 'super_admin', 'pharmacist'],
   },
-  {
-    menuId: 'pharmacy-ai-insight',
-    roles: ['admin', 'super_admin', 'pharmacist'],
-    permissions: ['pharmacy-ai-insight.read'],
-  },
-  {
-    menuId: 'cgm-pharmacist',
-    roles: ['admin', 'super_admin', 'pharmacist'],
-    permissions: ['cgm-pharmacist.patients.read'],
-  },
 
   // CMS - No restriction (allow all)
   // Posts, Pages, Media - All users can view
