@@ -192,6 +192,33 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
     }
   };
 
+  // WO-O4O-KPA-STORE-BLOG-PUBLIC-HEADER-V1: 공개 URL 복사 / 미리보기
+  const buildPublicUrl = (postSlug: string): string | null => {
+    if (!slug || typeof window === 'undefined') return null;
+    return `${window.location.origin}/store/${slug}/blog/${postSlug}`;
+  };
+
+  const handleCopyUrl = async (postSlug: string) => {
+    const url = buildPublicUrl(postSlug);
+    if (!url) return;
+    try {
+      await navigator.clipboard.writeText(url);
+      setError(null);
+      // 가벼운 피드백 — 기존 toast 인프라 없음. error state 재활용 회피 위해 alert 대신 짧은 confirm.
+      // 정책상 alert 도 회피하려면 추후 toast 추가. 현재는 setError 채널 미오염을 위해 console + 시각 피드백 생략.
+      // 사용자에게 직접 안내가 필요 — alert 사용.
+      alert('공개 URL이 클립보드에 복사되었습니다.');
+    } catch {
+      alert(`복사에 실패했습니다. 직접 복사해 주세요:\n${url}`);
+    }
+  };
+
+  const handlePreview = (postSlug: string) => {
+    const url = buildPublicUrl(postSlug);
+    if (!url) return;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
   // Editor view
   if (mode === 'editor') {
     return (
@@ -346,6 +373,25 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
                 </div>
 
                 <div style={{ display: 'flex', gap: '6px', flexShrink: 0, marginLeft: '12px' }}>
+                  {/* WO-O4O-KPA-STORE-BLOG-PUBLIC-HEADER-V1: 공개 URL 복사 / 미리보기 (발행 글만) */}
+                  {post.status === 'published' && (
+                    <>
+                      <button
+                        onClick={() => handleCopyUrl(post.slug)}
+                        style={{ ...smallBtn, color: '#0f172a' }}
+                        title="공개 URL을 클립보드에 복사"
+                      >
+                        URL 복사
+                      </button>
+                      <button
+                        onClick={() => handlePreview(post.slug)}
+                        style={{ ...smallBtn, color: '#0f172a' }}
+                        title="공개 페이지를 새 탭에서 열기"
+                      >
+                        미리보기
+                      </button>
+                    </>
+                  )}
                   <button onClick={() => openEditor(post)} style={{ ...smallBtn, color: '#3b82f6' }}>수정</button>
                   {post.status === 'draft' && (
                     <button onClick={() => handlePublish(post.id)} style={{ ...smallBtn, color: '#16a34a' }}>발행</button>

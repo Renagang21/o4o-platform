@@ -56,3 +56,28 @@ export async function fetchBlogPost(
   if (!json.success) throw new Error(json.error?.message || 'Blog post not found');
   return json.data;
 }
+
+// WO-O4O-KPA-STORE-BLOG-PUBLIC-HEADER-V1: 공개 헤더용 매장 정보
+// /api/v1/stores/:slug 를 그대로 활용 (신규 endpoint 없음)
+
+export interface PublicStoreInfo {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  address: string | null;
+  addressDetail: string | null;
+  phone: string | null;
+  logo: string | null;
+  hero_image: string | null;
+  status: string;
+  productCount: number;
+}
+
+export async function fetchPublicStoreInfo(slug: string): Promise<PublicStoreInfo> {
+  const url = `${getApiBase()}/${encodeURIComponent(slug)}`;
+  const res = await fetch(url);
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error?.message || 'Store not found');
+  return json.data;
+}
