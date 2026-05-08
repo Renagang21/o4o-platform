@@ -13,7 +13,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { QrCode, Plus, Trash2, ExternalLink, Copy, Check, RefreshCw, BarChart3, X, Smartphone, Monitor, Tablet, Download, Printer, ArrowRight } from 'lucide-react';
+import { QrCode, Trash2, ExternalLink, Copy, Check, RefreshCw, BarChart3, X, Smartphone, Monitor, Tablet, Download, Printer, ArrowRight } from 'lucide-react';
+import { getStoreLibraryItem } from '../../api/storeLibrary';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { GuideBlock } from '@o4o/shared-space-ui';
@@ -137,22 +138,57 @@ export function StoreQRPage() {
     });
   }, [formLandingType, creating]);
 
-  // Router state 기반 자동 선택 (StoreLibraryNewPage에서 복귀 시)
+  // Router state 기반 자동 선택 — 두 경로 지원:
+  //  1) 레거시: state.selectedLibraryItem
+  //  2) WO-O4O-KPA-STORE-PRODUCTION-ENTRY-CANONICAL-CORRECTION-V1:
+  //     state.production.source.items[0] (내 자료함에서 제작 시작 → QR)
   useEffect(() => {
-    const state = location.state as { selectedLibraryItem?: Record<string, unknown> } | null;
-    const item = state?.selectedLibraryItem;
-    if (item && typeof item.id === 'string') {
+    const state = location.state as
+      | {
+          selectedLibraryItem?: Record<string, unknown>;
+          production?: {
+            source?: { items?: Array<{ id: string; title: string; description?: string | null; origin?: string }> };
+          };
+        }
+      | null;
+
+    const single = state?.selectedLibraryItem;
+    if (single && typeof single.id === 'string') {
       handleLibrarySelect({
-        id: item.id as string,
-        title: (item.title as string) || '',
-        category: (item.category as string) || null,
-        fileUrl: (item.fileUrl as string) || null,
-        assetType: (item.assetType as string) || 'file',
-        url: (item.url as string) || null,
-        htmlContent: (item.htmlContent as string) || null,
+        id: single.id as string,
+        title: (single.title as string) || '',
+        category: (single.category as string) || null,
+        fileUrl: (single.fileUrl as string) || null,
+        assetType: (single.assetType as string) || 'file',
+        url: (single.url as string) || null,
+        htmlContent: (single.htmlContent as string) || null,
       });
-      // 뒤로가기 시 재트리거 방지
       window.history.replaceState({}, document.title);
+      return;
+    }
+
+    const incoming = state?.production?.source?.items?.find((it) => it.origin === 'library');
+    if (incoming) {
+      // 자료실 항목 fetch 후 creation mode 진입
+      (async () => {
+        try {
+          const res = await getStoreLibraryItem(incoming.id);
+          const lib = res.data;
+          handleLibrarySelect({
+            id: lib.id,
+            title: lib.title,
+            category: lib.category,
+            fileUrl: lib.fileUrl,
+            assetType: lib.assetType,
+            url: lib.url,
+            htmlContent: lib.htmlContent,
+          });
+        } catch {
+          // skip
+        } finally {
+          window.history.replaceState({}, document.title);
+        }
+      })();
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -354,10 +390,8 @@ export function StoreQRPage() {
           <h1 style={styles.title}>QR 코드 관리</h1>
           <p style={styles.subtitle}>Library 자료를 QR 코드로 연결하여 오프라인에서 온라인으로 유도합니다</p>
         </div>
-        <button onClick={() => setShowEntryModal(true)} style={styles.addBtn}>
-          <Plus size={16} />
-          QR 코드 생성
-        </button>
+        {/* WO-O4O-KPA-STORE-PRODUCTION-ENTRY-CANONICAL-CORRECTION-V1:
+            "QR 코드 생성" 신규 진입 버튼 제거 — 제작 시작은 "내 자료함"에서만. */}
       </div>
 
       {/* Batch Print Toolbar */}

@@ -1,23 +1,21 @@
 /**
- * StorePopPage — 매장 POP 자료 관리
+ * StorePopPage — 매장 POP 자료 관리 (결과물 관리 전용)
  *
  * WO-O4O-POP-LIBRARY-INTEGRATION-V1
  * WO-O4O-QR-POP-AUTO-GENERATOR-V1
  * WO-STORE-POP-ASSET-INTEGRATION-V1
- *
- * 2-choice 진입: "기존 자료 선택" | "새 자산 만들기"
- * Library에서 자료를 선택 → QR 코드 연결(선택) → A4/A5 레이아웃 → POP PDF 자동 생성.
- * 새 자산 생성 시 StoreLibraryNewPage에서 저장 후 자동 복귀.
+ * WO-O4O-KPA-STORE-PRODUCTION-ENTRY-CANONICAL-CORRECTION-V1:
+ *   "신규 제작 시작" 버튼 제거 — 제작 시작은 "내 자료함"에서만 진입.
+ *   본 페이지는 선택된 자료 기반 PDF 출력 + 항목 제거 역할 유지.
+ *   진입 시 location.state.production.source.items 또는 selectedLibraryItem 으로 자료 수신.
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Megaphone, Plus, Trash2, ExternalLink, FileDown, QrCode } from 'lucide-react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Megaphone, Trash2, ExternalLink, FileDown, QrCode } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { colors } from '../../styles/theme';
-import { StoreAssetSelectorModal } from '../../components/store/StoreAssetSelectorModal';
-import type { AssetSelectorResult as LibrarySelectorResult } from '../../components/store/StoreAssetSelectorModal';
-import { StoreQRCreateEntryModal } from '../../components/store/StoreQRCreateEntryModal';
+import { getStoreLibraryItem } from '../../api/storeLibrary';
 import { getStoreQrCodes } from '../../api/storeQr';
 import type { StoreQrCode } from '../../api/storeQr';
 
@@ -37,11 +35,8 @@ const ASSET_TYPE_LABELS: Record<string, string> = {
 };
 
 export function StorePopPage() {
-  const navigate = useNavigate();
   const location = useLocation();
   const [popItems, setPopItems] = useState<PopItem[]>([]);
-  const [showSelector, setShowSelector] = useState(false);
-  const [showEntryModal, setShowEntryModal] = useState(false);
 
   // QR selection
   const [qrCodes, setQrCodes] = useState<StoreQrCode[]>([]);
@@ -66,39 +61,68 @@ export function StorePopPage() {
     fetchQrCodes();
   }, [fetchQrCodes]);
 
-  // 새 자산 생성 후 자동 복귀 (location.state에서 자료 수신)
+  // 자료 수신 — 다음 두 경로 지원:
+  //  1) 레거시: location.state.selectedLibraryItem (단건)
+  //  2) WO-O4O-KPA-STORE-PRODUCTION-ENTRY-CANONICAL-CORRECTION-V1:
+  //     location.state.production.source.items (다건, 내 자료함에서 제작 시작)
   useEffect(() => {
-    const state = location.state as { selectedLibraryItem?: Record<string, unknown> } | null;
-    const item = state?.selectedLibraryItem;
-    if (item && typeof item.id === 'string') {
+    const state = location.state as
+      | {
+          selectedLibraryItem?: Record<string, unknown>;
+          production?: {
+            source?: { fromLibrary?: string; items?: Array<{ id: string; title: string; description?: string | null; origin?: string }> };
+          };
+        }
+      | null;
+
+    // 1) 레거시 단건
+    const single = state?.selectedLibraryItem;
+    if (single && typeof single.id === 'string') {
       const newItem: PopItem = {
-        id: item.id as string,
-        title: (item.title as string) || '',
-        category: (item.category as string) || null,
-        fileUrl: (item.fileUrl as string) || null,
-        assetType: (item.assetType as string) || 'file',
-        url: (item.url as string) || null,
+        id: single.id as string,
+        title: (single.title as string) || '',
+        category: (single.category as string) || null,
+        fileUrl: (single.fileUrl as string) || null,
+        assetType: (single.assetType as string) || 'file',
+        url: (single.url as string) || null,
       };
       setPopItems((prev) => prev.some((p) => p.id === newItem.id) ? prev : [...prev, newItem]);
-      window.history.replaceState({}, document.title);
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleSelect = (item: LibrarySelectorResult) => {
-    if (popItems.some((p) => p.id === item.id)) {
-      setShowSelector(false);
-      return;
+    // 2) 신규 제작 흐름 — 자료(library) 항목들을 fetch하여 추가
+    const incoming = state?.production?.source?.items;
+    if (incoming?.length) {
+      (async () => {
+        const libraryItems = incoming.filter((it) => it.origin === 'library');
+        const fetched: PopItem[] = [];
+        for (const it of libraryItems) {
+          try {
+            const res = await getStoreLibraryItem(it.id);
+            const lib = res.data;
+            fetched.push({
+              id: lib.id,
+              title: lib.title,
+              category: lib.category,
+              fileUrl: lib.fileUrl,
+              assetType: lib.assetType,
+              url: lib.url,
+            });
+          } catch {
+            // skip — 가져오지 못한 자료는 무시
+          }
+        }
+        if (fetched.length) {
+          setPopItems((prev) => {
+            const ids = new Set(prev.map((p) => p.id));
+            return [...prev, ...fetched.filter((f) => !ids.has(f.id))];
+          });
+          toast.success(`${fetched.length}개 자료가 추가되었습니다`);
+        }
+      })();
     }
-    setPopItems((prev) => [...prev, {
-      id: item.id,
-      title: item.title,
-      category: item.category,
-      fileUrl: item.fileUrl,
-      assetType: (item as any).assetType || 'file',
-      url: (item as any).url || null,
-    }]);
-    setShowSelector(false);
-  };
+
+    if (state) window.history.replaceState({}, document.title);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleRemove = (id: string) => {
     setPopItems((prev) => prev.filter((p) => p.id !== id));
@@ -147,12 +171,8 @@ export function StorePopPage() {
             <span style={{ color: colors.neutral600, fontSize: '13px' }}>POP 자료</span>
           </div>
           <h1 style={styles.title}>POP 자료 관리</h1>
-          <p style={styles.subtitle}>Library 자료를 선택하고 QR 코드를 연결하여 POP 광고를 PDF로 출력합니다</p>
+          <p style={styles.subtitle}>선택된 자료에 QR 코드를 연결하여 POP 광고를 PDF로 출력합니다</p>
         </div>
-        <button onClick={() => setShowEntryModal(true)} style={styles.addBtn}>
-          <Plus size={16} />
-          자료 추가
-        </button>
       </div>
 
       {/* POP Item List */}
@@ -161,10 +181,10 @@ export function StorePopPage() {
           <div style={styles.emptyState}>
             <Megaphone size={48} style={{ color: colors.neutral300, marginBottom: '12px' }} />
             <p style={{ color: colors.neutral500, fontSize: '14px', margin: 0 }}>
-              POP 디스플레이에 사용할 자료가 없습니다
+              선택된 자료가 없습니다
             </p>
             <p style={{ color: colors.neutral400, fontSize: '13px', marginTop: '4px' }}>
-              "자료 추가" 버튼을 눌러 Library에서 자료를 추가하세요
+              "내 자료함 → 자료" 또는 "내 자료함 → 콘텐츠"에서 자료를 선택해 "제작 시작 → POP"으로 진입하세요.
             </p>
           </div>
         ) : (
@@ -278,22 +298,6 @@ export function StorePopPage() {
         )}
       </div>
 
-      {/* Entry Modal — 2-choice 진입 */}
-      <StoreQRCreateEntryModal
-        open={showEntryModal}
-        title="POP 자료 추가 방식"
-        onSelectExisting={() => { setShowEntryModal(false); setShowSelector(true); }}
-        onCreateNew={() => { setShowEntryModal(false); navigate('/store/content'); }}
-        onClose={() => setShowEntryModal(false)}
-      />
-
-      {/* Asset Selector Modal */}
-      <StoreAssetSelectorModal
-        open={showSelector}
-        onSelect={handleSelect}
-        onClose={() => setShowSelector(false)}
-        usageType="pop"
-      />
     </div>
   );
 }

@@ -178,6 +178,13 @@ export const GLYCOPHARM_STORE_CONFIG: StoreDashboardConfig = {
  *   - "자료실" 제거 (route 미연결 상태)
  *   - 채널 관리/상담 요청 → 매장 실행 그룹으로 이동
  *   - 태블릿 진열/블로그 → 매장 실행 그룹으로 통합
+ * WO-O4O-KPA-STORE-MATERIALS-AND-PRODUCTIONS-CANONICAL-ALIGN-V1:
+ *   - "내 자료함" 그룹 정리: 강좌 제거 → 콘텐츠/자료 2개 (canonical)
+ *   - 상품 상세설명 신규 라우트 (/store/marketing/product-descriptions) 연결
+ * WO-O4O-KPA-STORE-PRODUCTION-ENTRY-CANONICAL-CORRECTION-V1:
+ *   - "내 제작물" 그룹 제거 (제작 시작 진입점은 "내 자료함"으로 통일)
+ *   - POP / QR 코드 / 블로그 / 상품 상세설명 메뉴는 결과물 관리 전용으로
+ *     매장 실행 그룹 내 개별 메뉴로 유지
  */
 export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
   serviceKey: 'kpa-society',
@@ -196,12 +203,11 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'local-products', label: '내 매장 상품',        subPath: '/commerce/local-products' },
       { key: 'orders',         label: '주문 내역',           subPath: '/commerce/orders' },
     ]},
-    // WO-O4O-KPA-STORE-SIDEBAR-MENU-RESTRUCTURE-V1: 새 "내 자료함" 그룹 — 디지털 사이니지 상단.
-    // 매장이 커뮤니티(/content, /lms, /resources)에서 가져와 보유한 자료의 보관함.
-    // 페이지는 placeholder, 콘텐츠 기획 확정 후 후속 WO에서 본 페이지 연결.
+    // 내 자료함 — 매장이 커뮤니티/공급자에서 가져와 보유한 source/reference 보관함.
+    // 제작 시작(POP/QR/블로그/상품 상세설명)은 본 그룹에서만 진입.
+    // (강좌/레슨형 콘텐츠는 콘텐츠 항목 내부에서 type 표시만, 별도 그룹 금지)
     { label: '내 자료함', items: [
       { key: 'library-contents',  label: '콘텐츠', subPath: '/library/contents' },
-      { key: 'library-courses',   label: '강좌',   subPath: '/library/courses' },
       { key: 'library-resources', label: '자료',   subPath: '/library/resources' },
     ]},
     { label: '디지털 사이니지', items: [
@@ -210,16 +216,16 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'signage-schedules', label: '스케줄',       subPath: '/marketing/signage/schedules' },
       { key: 'signage-player',    label: '재생',         subPath: '/marketing/signage/player' },
     ]},
-    // WO-O4O-KPA-STORE-SIDEBAR-MENU-RESTRUCTURE-V1: 블로그 아래 QR 코드 / POP 자료 / 자료실 노출.
-    // (capability 게이트 임시 우회 — menuCapabilityMap.ts 매핑 제거)
+    // 매장 실행 — 결과물 관리(POP/QR/블로그/상품 상세설명) + 운영 기능.
+    // 신규 제작 진입은 본 그룹이 아닌 "내 자료함"에서 시작.
     { label: '매장 실행', items: [
-      { key: 'channels',        label: '채널 관리', subPath: '/channels' },
-      { key: 'tablet-displays', label: '태블릿 진열', subPath: '/commerce/tablet-displays' },
-      { key: 'blog',            label: '블로그',    subPath: '/content/blog' },
-      { key: 'qr',              label: 'QR 코드',   subPath: '/marketing/qr' },
-      { key: 'pop',             label: 'POP 자료',  subPath: '/marketing/pop' },
-      { key: 'library',         label: '자료실',    subPath: '/content' },
-      { key: 'requests',        label: '상담 요청', subPath: '/requests' },
+      { key: 'channels',             label: '채널 관리',     subPath: '/channels' },
+      { key: 'tablet-displays',      label: '태블릿 진열',   subPath: '/commerce/tablet-displays' },
+      { key: 'pop',                  label: 'POP',          subPath: '/marketing/pop' },
+      { key: 'qr',                   label: 'QR 코드',      subPath: '/marketing/qr' },
+      { key: 'blog',                 label: '블로그',        subPath: '/content/blog' },
+      { key: 'product-descriptions', label: '상품 상세설명', subPath: '/marketing/product-descriptions' },
+      { key: 'requests',             label: '상담 요청',     subPath: '/requests' },
     ]},
     { label: '분석', items: [
       { key: 'analytics-marketing', label: '마케팅 분석', subPath: '/analytics/marketing' },

@@ -186,7 +186,10 @@ const MarketingAnalyticsPage = lazy(() => import('./pages/pharmacy/MarketingAnal
 const StoreHomePage = lazy(() => import('./pages/pharmacy/StoreHomePage').then(m => ({ default: m.StoreHomePage })));
 const ProductMarketingPage = lazy(() => import('./pages/pharmacy/ProductMarketingPage').then(m => ({ default: m.ProductMarketingPage })));
 const ProductPopBuilderPage = lazy(() => import('./pages/pharmacy/ProductPopBuilderPage').then(m => ({ default: m.ProductPopBuilderPage })));
-const StoreLibraryPlaceholderPage = lazy(() => import('./pages/pharmacy/StoreLibraryPlaceholderPage').then(m => ({ default: m.StoreLibraryPlaceholderPage })));
+// WO-O4O-KPA-STORE-MATERIALS-AND-PRODUCTIONS-CANONICAL-ALIGN-V1: 내 자료함 / 내 제작물 canonical 페이지
+const StoreLibraryContentsPage = lazy(() => import('./pages/pharmacy/StoreLibraryContentsPage'));
+const StoreLibraryResourcesPage = lazy(() => import('./pages/pharmacy/StoreLibraryResourcesPage'));
+const StoreProductDescriptionsPage = lazy(() => import('./pages/pharmacy/StoreProductDescriptionsPage'));
 // default-as-named (wrapper 불필요)
 const StoreAssetsPage = lazy(() => import('./pages/pharmacy/StoreAssetsPage'));
 const StoreContentEditPage = lazy(() => import('./pages/pharmacy/StoreContentEditPage'));
@@ -850,8 +853,11 @@ function App() {
             <Route path="commerce/products/:productId/marketing" element={<ProductMarketingPage />} />
             {/* WO-O4O-AI-AUTO-POP-BUILDER-V1: 상품 POP 만들기 (AI prefill + 편집 + PDF) */}
             <Route path="commerce/products/:productId/pop" element={<ProductPopBuilderPage />} />
-            {/* WO-O4O-KPA-STORE-SIDEBAR-MENU-RESTRUCTURE-V1: 내 자료함 placeholder (콘텐츠 기획 확정 후 본 페이지 연결) */}
-            <Route path="library/:kind" element={<StoreLibraryPlaceholderPage />} />
+            {/* WO-O4O-KPA-STORE-MATERIALS-AND-PRODUCTIONS-CANONICAL-ALIGN-V1: 내 자료함 실 페이지 (콘텐츠 / 자료) */}
+            <Route path="library/contents" element={<StoreLibraryContentsPage />} />
+            <Route path="library/resources" element={<StoreLibraryResourcesPage />} />
+            {/* WO-O4O-KPA-STORE-MATERIALS-AND-PRODUCTIONS-CANONICAL-ALIGN-V1: 내 제작물 / 상품 상세설명 */}
+            <Route path="marketing/product-descriptions" element={<StoreProductDescriptionsPage />} />
             <Route path="commerce/local-products" element={<StoreLocalProductsPage />} />
             <Route path="commerce/tablet-displays" element={<StoreTabletDisplaysPage />} />
             <Route path="commerce/order-worktable" element={<StoreOrderWorktablePage />} />

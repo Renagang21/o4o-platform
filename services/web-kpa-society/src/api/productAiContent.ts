@@ -45,3 +45,14 @@ export async function saveProductAiContent(
     ...(model && { model }),
   });
 }
+
+/**
+ * 특정 타입 AI 콘텐츠 생성 트리거 (fire-and-forget).
+ * 백엔드가 비동기로 생성 → 잠시 후 getProductAiContents()로 polling/refresh.
+ */
+export async function generateProductAiContent(
+  productId: string,
+  type: ProductAiContentType,
+): Promise<{ success: boolean; message?: string }> {
+  return coreApiClient.post(`/products/${productId}/ai-contents/generate/${type}`, {});
+}

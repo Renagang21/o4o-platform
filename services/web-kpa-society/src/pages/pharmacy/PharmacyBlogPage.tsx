@@ -18,7 +18,7 @@ import {
   deleteBlogPost,
   type StaffBlogPost,
 } from '../../api/blogStaff';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { getStoreSlug } from '../../api/pharmacyInfo';
 
 type ViewMode = 'list' | 'editor';
@@ -37,6 +37,7 @@ function formatDate(dateStr: string): string {
 
 export function PharmacyBlogPage({ service }: { service?: string }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [slug, setSlug] = useState<string | null>(null);
   const [posts, setPosts] = useState<StaffBlogPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -92,6 +93,29 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
   useEffect(() => {
     loadPosts();
   }, [loadPosts]);
+
+  // WO-O4O-KPA-STORE-PRODUCTION-ENTRY-CANONICAL-CORRECTION-V1:
+  //   "내 자료함 → 제작 시작 → 블로그" 진입 시 source 항목 기반 신규 에디터 자동 오픈.
+  useEffect(() => {
+    const state = location.state as
+      | {
+          production?: {
+            source?: { items?: Array<{ id: string; title: string; description?: string | null; origin?: string }> };
+          };
+        }
+      | null;
+    const items = state?.production?.source?.items;
+    if (items && items.length > 0) {
+      const first = items[0];
+      setEditingPost(null);
+      setEditorTitle(first.title || '');
+      setEditorContent(first.description || '');
+      setEditorExcerpt(first.description?.slice(0, 120) || '');
+      setEditorSlug('');
+      setMode('editor');
+      window.history.replaceState({}, document.title);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const openEditor = (post?: StaffBlogPost) => {
     if (post) {
@@ -244,12 +268,11 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
         <div>
           <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#1e293b' }}>블로그 관리</h1>
           <p style={{ fontSize: '14px', color: '#64748b', marginTop: '4px' }}>
-            매장 블로그 게시글을 작성하고 관리합니다.
+            매장 블로그 게시글을 관리합니다. 신규 작성은 "내 자료함 → 제작 시작 → 블로그"에서 진입하세요.
           </p>
         </div>
-        <button onClick={() => openEditor()} style={{ ...btnStyle, backgroundColor: '#3b82f6', color: '#fff' }}>
-          새 글 작성
-        </button>
+        {/* WO-O4O-KPA-STORE-PRODUCTION-ENTRY-CANONICAL-CORRECTION-V1:
+            "새 글 작성" 신규 진입 버튼 제거 — 제작 시작은 "내 자료함"에서만. */}
       </div>
 
       {/* Status filter */}
@@ -287,7 +310,7 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
       ) : posts.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '48px 0' }}>
           <p style={{ color: '#94a3b8', fontSize: '15px' }}>
-            게시글이 없습니다. 새 글을 작성해보세요.
+            게시글이 없습니다. "내 자료함 → 제작 시작 → 블로그"에서 새 글을 시작하세요.
           </p>
         </div>
       ) : (
