@@ -78,8 +78,18 @@ function parseBlocks(contentJson: Record<string, unknown>): ContentBlock[] {
   return [{ type: 'text', value: JSON.stringify(contentJson, null, 2) }];
 }
 
-function blocksToContentJson(blocks: ContentBlock[], original: Record<string, unknown>): Record<string, unknown> {
-  return { ...original, blocks };
+function blocksToContentJson(blocks: ContentBlock[], original: unknown): Record<string, unknown> {
+  // 원래 형식이 배열이면 {blocks:[...]} 래퍼로 변환 (배열 spread 방지)
+  if (Array.isArray(original)) {
+    return { blocks: blocks.map(b => {
+      if (b.type === 'list') return { type: 'list', items: b.items || [] };
+      if (b.type === 'image') return { type: 'image', url: b.value };
+      if (b.type === 'link') return { type: 'link', url: b.value, label: b.label };
+      return { type: 'text', content: b.value };
+    }) };
+  }
+  const orig = (original || {}) as Record<string, unknown>;
+  return { ...orig, blocks };
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
