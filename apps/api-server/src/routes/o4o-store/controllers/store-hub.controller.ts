@@ -19,6 +19,8 @@ import { cacheAside, hashCacheKey, READ_CACHE_TTL } from '../../../cache/read-ca
 import { OrganizationChannel } from '../../../modules/store-core/entities/organization-channel.entity.js';
 import { StoreCapabilityService } from '../../../modules/store-core/services/store-capability.service.js';
 import { getCapabilityMeta } from '@o4o/capabilities';
+// WO-O4O-STORE-SLUG-EDITABLE-V1: slug change endpoint reuses existing core service.
+import { StoreSlugService, type StoreSlugServiceKey } from '@o4o/platform-core/store-identity';
 
 type AuthMiddleware = import('express').RequestHandler;
 
@@ -383,6 +385,190 @@ export function createStoreHubController(
           res.status(409).json({
             success: false,
             error: { code: 'ALREADY_EXISTS', message: 'This channel type already exists for your organization' },
+          });
+          return;
+        }
+        res.status(500).json({
+          success: false,
+          error: { code: 'INTERNAL_ERROR', message: error.message },
+        });
+      }
+    }
+  );
+
+  /**
+   * GET /store-hub/slug
+   *
+   * WO-O4O-STORE-SLUG-EDITABLE-V1
+   *
+   * 현재 매장의 slug + canChange 플래그 반환.
+   * 응답에 service-slug serviceKey 미포함 (controller serviceKey context 에서 결정).
+   */
+  router.get(
+    '/slug',
+    requireAuth,
+    requirePharmacyOwner,
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const organizationId = req.organizationId!;
+        if (!serviceKey) {
+          res.status(400).json({
+            success: false,
+            error: { code: 'SERVICE_KEY_REQUIRED', message: 'Slug 변경은 서비스 컨텍스트가 필요합니다.' },
+          });
+          return;
+        }
+
+        const slugService = new StoreSlugService(dataSource);
+        const slugSvcKey = serviceKey as StoreSlugServiceKey;
+        const record = await slugService.findByStoreId(organizationId, slugSvcKey);
+        const canChange = await slugService.canChangeSlug(organizationId);
+
+        res.json({
+          success: true,
+          data: {
+            slug: record?.slug ?? null,
+            isActive: record?.isActive ?? false,
+            canChange,
+          },
+        });
+      } catch (error: any) {
+        res.status(500).json({
+          success: false,
+          error: { code: 'INTERNAL_ERROR', message: error.message },
+        });
+      }
+    }
+  );
+
+  /**
+   * PATCH /store-hub/slug
+   *
+   * WO-O4O-STORE-SLUG-EDITABLE-V1
+   *
+   * 매장 slug 를 변경한다. StoreSlugService.changeSlug() 가 처리:
+   *   - validateSlug (length / format / RESERVED 차단)
+   *   - duplicate 검사 (platform_store_slugs unique)
+   *   - history 저장 (platform_store_slug_history.old_slug → new_slug)
+   *   - active 레코드 업데이트
+   * 1-time change policy 가 platform-core 에 적용되어 있으므로 추가 변경은 거부됨.
+   *
+   * Body: { newSlug: string }
+   * 권한: requireAuth + requirePharmacyOwner (serviceKey context)
+   */
+  router.patch(
+    '/slug',
+    requireAuth,
+    requirePharmacyOwner,
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const organizationId = req.organizationId!;
+        const userId = req.user!.id;
+        if (!serviceKey) {
+          res.status(400).json({
+            success: false,
+            error: { code: 'SERVICE_KEY_REQUIRED', message: 'Slug 변경은 서비스 컨텍스트가 필요합니다.' },
+          });
+          return;
+        }
+
+        const newSlugInput = req.body?.newSlug;
+        if (typeof newSlugInput !== 'string' || newSlugInput.trim().length === 0) {
+          res.status(400).json({
+            success: false,
+            error: { code: 'INVALID_INPUT', message: '새 주소(slug)를 입력해주세요.' },
+          });
+          return;
+        }
+        const newSlug = newSlugInput.trim();
+
+        const slugService = new StoreSlugService(dataSource);
+        const slugSvcKey = serviceKey as StoreSlugServiceKey;
+
+        // 자기 자신의 현재 slug 와 동일하면 no-op (의도적 허용 — 이미 사용 중)
+        const current = await slugService.findByStoreId(organizationId, slugSvcKey);
+        if (current && current.slug === newSlug.toLowerCase()) {
+          res.json({
+            success: true,
+            data: { slug: current.slug, unchanged: true },
+          });
+          return;
+        }
+
+        // availability 사전 검증 — 명확한 error code 매핑
+        const availability = await slugService.checkAvailability(newSlug);
+        if (!availability.available) {
+          if (availability.reason === 'reserved') {
+            res.status(400).json({
+              success: false,
+              error: { code: 'SLUG_RESERVED', message: '사용할 수 없는 주소입니다.' },
+            });
+            return;
+          }
+          if (availability.reason === 'duplicate') {
+            res.status(409).json({
+              success: false,
+              error: { code: 'SLUG_DUPLICATE', message: '이미 사용 중인 주소입니다.' },
+            });
+            return;
+          }
+          // 'invalid' (TOO_SHORT / TOO_LONG / INVALID_CHARACTERS / hyphen 등)
+          res.status(400).json({
+            success: false,
+            error: {
+              code: 'SLUG_INVALID',
+              message: '잘못된 주소 형식입니다.',
+              detail: availability.validationError ?? null,
+            },
+          });
+          return;
+        }
+
+        // canChangeSlug — 1-time policy 확인
+        const canChange = await slugService.canChangeSlug(organizationId);
+        if (!canChange) {
+          res.status(409).json({
+            success: false,
+            error: {
+              code: 'SLUG_ALREADY_CHANGED',
+              message: '이 매장은 이미 주소가 변경되었습니다. 추가 변경은 운영팀에 문의하세요.',
+            },
+          });
+          return;
+        }
+
+        // changeSlug — history 저장 + active 업데이트
+        const updated = await slugService.changeSlug({
+          storeId: organizationId,
+          serviceKey: slugSvcKey,
+          newSlug,
+          changedBy: userId,
+        });
+
+        res.json({
+          success: true,
+          data: {
+            slug: updated.slug,
+            unchanged: false,
+          },
+        });
+      } catch (error: any) {
+        // changeSlug 가 throw 하는 메시지를 식별 — 이미 위에서 사전 검증하지만 race-condition 대비
+        const msg = String(error?.message || '');
+        if (/already changed/i.test(msg)) {
+          res.status(409).json({
+            success: false,
+            error: {
+              code: 'SLUG_ALREADY_CHANGED',
+              message: '이 매장은 이미 주소가 변경되었습니다. 추가 변경은 운영팀에 문의하세요.',
+            },
+          });
+          return;
+        }
+        if (/not available/i.test(msg)) {
+          res.status(409).json({
+            success: false,
+            error: { code: 'SLUG_DUPLICATE', message: '이미 사용 중인 주소입니다.' },
           });
           return;
         }

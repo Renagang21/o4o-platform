@@ -164,3 +164,49 @@ export async function fetchStoreCapabilities(): Promise<StoreCapabilityOverview[
   );
   return response.data ?? [];
 }
+
+// ─────────────────────────────────────────────────────
+// Store Slug (WO-O4O-STORE-SLUG-EDITABLE-V1)
+// ─────────────────────────────────────────────────────
+
+export interface StoreSlugStatus {
+  slug: string | null;
+  isActive: boolean;
+  canChange: boolean;
+}
+
+export interface StoreSlugChangeResult {
+  slug: string;
+  unchanged: boolean;
+}
+
+/**
+ * Backend slug error codes — apiClient 가 4xx 응답을 throw 할 때
+ * `(err as Error & { code?: string }).code` 로 식별 가능.
+ */
+export type StoreSlugErrorCode =
+  | 'SLUG_RESERVED'
+  | 'SLUG_DUPLICATE'
+  | 'SLUG_INVALID'
+  | 'SLUG_ALREADY_CHANGED'
+  | 'INVALID_INPUT'
+  | 'SERVICE_KEY_REQUIRED'
+  | 'INTERNAL_ERROR';
+
+export async function fetchStoreSlugStatus(): Promise<StoreSlugStatus> {
+  const response = await apiClient.get<{ success: boolean; data: StoreSlugStatus }>(
+    '/store-hub/slug'
+  );
+  return response.data ?? { slug: null, isActive: false, canChange: false };
+}
+
+/**
+ * 매장 slug 변경. apiClient 가 4xx/5xx 응답을 throw — 호출처는 try/catch 로 (err as any).code 분기.
+ */
+export async function updateStoreSlug(newSlug: string): Promise<StoreSlugChangeResult> {
+  const response = await apiClient.patch<{ success: boolean; data: StoreSlugChangeResult }>(
+    '/store-hub/slug',
+    { newSlug },
+  );
+  return response.data;
+}

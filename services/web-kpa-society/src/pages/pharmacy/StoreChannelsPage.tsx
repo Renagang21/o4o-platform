@@ -49,6 +49,9 @@ import {
   fetchChannelOverviewWithCode,
   createChannel,
   fetchLiveSignals,
+  // WO-O4O-STORE-SLUG-EDITABLE-V1
+  fetchStoreSlugStatus,
+  updateStoreSlug,
   type ChannelOverview,
   type ChannelType,
   type ChannelStatus,
@@ -272,12 +275,63 @@ function ChannelPublicUrlCard({
   channelType,
   orgCode,
   showToast,
+  // WO-O4O-STORE-SLUG-EDITABLE-V1
+  canChangeSlug,
+  onSlugChanged,
 }: {
   channelType: ChannelType;
   orgCode: string | null;
   showToast: (type: 'success' | 'error', message: string) => void;
+  canChangeSlug: boolean;
+  onSlugChanged: (newSlug: string) => void;
 }) {
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
+  // WO-O4O-STORE-SLUG-EDITABLE-V1: edit mode state
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  const startEdit = () => {
+    if (!orgCode || !canChangeSlug) return;
+    setDraft(orgCode);
+    setEditing(true);
+  };
+
+  const cancelEdit = () => {
+    setEditing(false);
+    setDraft('');
+  };
+
+  const submitEdit = async () => {
+    const next = draft.trim();
+    if (!next) {
+      showToast('error', '주소를 입력해주세요.');
+      return;
+    }
+    if (orgCode && next === orgCode) {
+      cancelEdit();
+      return;
+    }
+    setSaving(true);
+    try {
+      const result = await updateStoreSlug(next);
+      onSlugChanged(result.slug);
+      showToast('success', '주소가 변경되었습니다. 기존 주소는 자동으로 새 주소로 이동합니다.');
+      setEditing(false);
+      setDraft('');
+    } catch (err: any) {
+      const code = err?.code as string | undefined;
+      const msg =
+        code === 'SLUG_RESERVED' ? '사용할 수 없는 주소입니다.'
+        : code === 'SLUG_DUPLICATE' ? '이미 사용 중인 주소입니다.'
+        : code === 'SLUG_INVALID' ? '잘못된 주소 형식입니다. (3~120자, 소문자·숫자·한글·하이픈만 허용)'
+        : code === 'SLUG_ALREADY_CHANGED' ? '이 매장은 이미 주소가 변경되었습니다. 추가 변경은 운영팀에 문의하세요.'
+        : err?.message || '주소 변경에 실패했습니다.';
+      showToast('error', msg);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   // Determine URL and guidance per channel type
   const getChannelUrl = (): { url: string | null; label: string; guidance: string | null; guidanceLink: string | null } => {
@@ -349,47 +403,99 @@ function ChannelPublicUrlCard({
     );
   }
 
-  // B2C / TABLET with valid URL
+  // B2C / TABLET with valid URL — WO-O4O-STORE-SLUG-EDITABLE-V1: editable mode
   return (
     <div className="flex items-center gap-3 p-4 mb-6 rounded-lg border border-slate-200 bg-white">
       <Link2 className="w-5 h-5 text-blue-500 flex-shrink-0" />
       <div className="flex-1 min-w-0">
         <div className="text-xs text-slate-500 mb-1 flex items-center gap-2">
           <span>{label} 공개 주소</span>
-          {/* WO-O4O-STORE-CHANNEL-MANAGEMENT-CLEANUP-V1: slug editable UI prep
-              현재는 readonly. 향후 PATCH endpoint 노출 시 활성화 (WO-O4O-STORE-SLUG-EDITABLE-V1) */}
-          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-500">
-            <Lock className="w-2.5 h-2.5" /> readonly
-          </span>
+          {!canChangeSlug && (
+            <span
+              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-500"
+              title="이 매장은 이미 주소가 변경된 적이 있어 추가 변경이 제한됩니다."
+            >
+              <Lock className="w-2.5 h-2.5" /> 변경 제한
+            </span>
+          )}
         </div>
-        <div className="text-[15px] font-mono font-medium text-slate-900 truncate">{url}</div>
-        <div className="text-xs text-slate-400 mt-1">이 주소로 고객이 매장 화면에 접속합니다</div>
+        {editing ? (
+          <div className="flex items-center gap-1.5">
+            <span className="text-[14px] font-mono text-slate-500 truncate">{origin}/store/</span>
+            <input
+              type="text"
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              disabled={saving}
+              autoFocus
+              spellCheck={false}
+              className="flex-1 min-w-0 px-2 py-1 text-[14px] font-mono font-medium text-slate-900 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+              placeholder="새 주소 (영문 소문자/숫자/한글/하이픈)"
+            />
+          </div>
+        ) : (
+          <div className="text-[15px] font-mono font-medium text-slate-900 truncate">{url}</div>
+        )}
+        <div className="text-xs text-slate-400 mt-1">
+          {editing
+            ? '저장 후 기존 주소는 자동으로 새 주소로 이동합니다 (1회 변경 가능)'
+            : '이 주소로 고객이 매장 화면에 접속합니다'}
+        </div>
       </div>
       <div className="flex items-center gap-1.5 flex-shrink-0">
-        <button
-          type="button"
-          disabled
-          title="주소(slug) 변경은 곧 제공될 예정입니다 (WO-O4O-STORE-SLUG-EDITABLE-V1)"
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-400 bg-slate-50 border border-slate-200 rounded-lg cursor-not-allowed"
-        >
-          <Pencil className="w-3.5 h-3.5" /> 주소 변경
-        </button>
-        <button
-          onClick={handleCopy}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200"
-          title="주소 복사"
-        >
-          <Copy className="w-3.5 h-3.5" /> 복사
-        </button>
-        <a
-          href={url!}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100"
-          title="새 탭에서 열기"
-        >
-          <ExternalLink className="w-3.5 h-3.5" /> 열기
-        </a>
+        {editing ? (
+          <>
+            <button
+              type="button"
+              onClick={cancelEdit}
+              disabled={saving}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200 disabled:opacity-50"
+            >
+              취소
+            </button>
+            <button
+              type="button"
+              onClick={submitEdit}
+              disabled={saving || draft.trim().length === 0}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-emerald-600 border border-emerald-600 rounded-lg hover:bg-emerald-700 disabled:opacity-50"
+            >
+              {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+              저장
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              type="button"
+              onClick={startEdit}
+              disabled={!canChangeSlug}
+              title={canChangeSlug ? '주소(slug) 변경 — 기존 주소는 자동으로 새 주소로 redirect 됩니다.' : '이 매장은 이미 주소가 변경되어 추가 변경이 제한됩니다.'}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border ${
+                canChangeSlug
+                  ? 'text-slate-700 bg-white border-slate-300 hover:bg-slate-50'
+                  : 'text-slate-400 bg-slate-50 border-slate-200 cursor-not-allowed'
+              }`}
+            >
+              <Pencil className="w-3.5 h-3.5" /> 주소 변경
+            </button>
+            <button
+              onClick={handleCopy}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200"
+              title="주소 복사"
+            >
+              <Copy className="w-3.5 h-3.5" /> 복사
+            </button>
+            <a
+              href={url!}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100"
+              title="새 탭에서 열기"
+            >
+              <ExternalLink className="w-3.5 h-3.5" /> 열기
+            </a>
+          </>
+        )}
       </div>
     </div>
   );
@@ -878,6 +984,9 @@ export function StoreChannelsPage() {
   // WO-O4O-STORE-CHANNEL-ACTION-ENHANCEMENT-V1: 대기 관심 요청 카운트
   const [pendingInterestCount, setPendingInterestCount] = useState(0);
 
+  // WO-O4O-STORE-SLUG-EDITABLE-V1: slug change capability flag
+  const [canChangeSlug, setCanChangeSlug] = useState(false);
+
   // WO-STORE-CHANNEL-BETA-READINESS-V1: user feedback + operational visibility
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [lastFetched, setLastFetched] = useState<Date | null>(null);
@@ -892,6 +1001,8 @@ export function StoreChannelsPage() {
     const results = await Promise.allSettled([
       fetchChannelOverviewWithCode().catch(() => ({ channels: [] as ChannelOverview[], organizationCode: null })),
       storeAssetControlApi.list({ limit: 200 }).then(r => r.data.items).catch(() => [] as StoreAssetItem[]),
+      // WO-O4O-STORE-SLUG-EDITABLE-V1: slug status (graceful degradation)
+      fetchStoreSlugStatus().catch(() => ({ slug: null, isActive: false, canChange: false })),
     ]);
     const chResult = results[0].status === 'fulfilled'
       ? results[0].value as { channels: ChannelOverview[]; organizationCode: string | null }
@@ -899,6 +1010,9 @@ export function StoreChannelsPage() {
     setChannels(chResult.channels);
     setOrgCode(chResult.organizationCode);
     setAssets(results[1].status === 'fulfilled' ? results[1].value as StoreAssetItem[] : []);
+    if (results[2].status === 'fulfilled') {
+      setCanChangeSlug(results[2].value.canChange);
+    }
     setLastFetched(new Date());
     setLoading(false);
 
@@ -1320,11 +1434,17 @@ export function StoreChannelsPage() {
       )}
 
       {/* ─── Public URL Card (WO-O4O-STORE-CHANNEL-PUBLIC-URL-GUIDE-V1) ─── */}
+      {/* WO-O4O-STORE-SLUG-EDITABLE-V1: editable mode props */}
       {currentChannel && (
         <ChannelPublicUrlCard
           channelType={activeTab}
           orgCode={orgCode}
           showToast={showToast}
+          canChangeSlug={canChangeSlug}
+          onSlugChanged={(newSlug) => {
+            setOrgCode(newSlug);
+            setCanChangeSlug(false);
+          }}
         />
       )}
 
