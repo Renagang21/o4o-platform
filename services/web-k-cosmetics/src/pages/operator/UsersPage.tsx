@@ -2,8 +2,9 @@
  * Operator Users Page — 회원 관리
  * WO-O4O-MEMBERSHIP-CONSOLE-V1
  * WO-O4O-MEMBER-LIST-STANDARDIZATION-V1
+ * WO-O4O-KCOS-USERS-TABLE-STANDARDIZE-V1
  *
- * MemberListLayout + @o4o/ui DataTable 기반 표준 회원 리스트.
+ * MemberListLayout + @o4o/operator-ux-core DataTable 기반 표준 회원 리스트.
  * 탭: 전체 | 판매자 | 소비자 | 가입 신청
  * 기능: 검색, 정렬, 승인/거부, 비밀번호 변경, 편집, 삭제
  */
@@ -26,10 +27,17 @@ import {
   Eye,
   EyeOff,
 } from 'lucide-react';
-import { DataTable, RowActionMenu } from '@o4o/ui';
-import type { Column } from '@o4o/ui';
-import { MemberListLayout, StatusBadge, RoleBadge, ServiceBadge, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
-import type { MemberTab } from '@o4o/operator-ux-core';
+import { RowActionMenu } from '@o4o/ui';
+import {
+  DataTable,
+  MemberListLayout,
+  StatusBadge,
+  RoleBadge,
+  ServiceBadge,
+  defineActionPolicy,
+  buildRowActions,
+} from '@o4o/operator-ux-core';
+import type { ListColumnDef, MemberTab } from '@o4o/operator-ux-core';
 import { api } from '../../lib/apiClient';
 import { toast } from '@o4o/error-handling';
 import EditUserModal from './EditUserModal';
@@ -380,12 +388,13 @@ export default function UsersPage() {
 
   // ─── DataTable Columns ────────────────────────────
 
-  const columns: Column<UserData>[] = [
+  const columns: ListColumnDef<UserData>[] = [
     {
       key: 'name',
-      title: '이름',
-      sortable: true,
+      header: '이름',
       width: '180px',
+      sortable: true,
+      sortAccessor: (user) => getUserName(user),
       render: (_v, user) => (
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center text-sm font-medium text-slate-600 shrink-0">
@@ -394,24 +403,24 @@ export default function UsersPage() {
           <span className="font-medium text-slate-800 text-sm truncate">{getUserName(user)}</span>
         </div>
       ),
-      sorter: (a, b) => getUserName(a).localeCompare(getUserName(b)),
     },
     {
       key: 'email',
-      title: '이메일',
-      dataIndex: 'email',
-      sortable: true,
+      header: '이메일',
       width: '220px',
+      sortable: true,
+      sortAccessor: (user) => user.email,
+      render: (_v, user) => <span className="text-sm text-slate-700">{user.email}</span>,
     },
     {
       key: 'role',
-      title: '역할',
+      header: '역할',
       width: '120px',
       render: (_v, user) => <RoleBadge role={getPrimaryRole(user)} />,
     },
     {
       key: 'services',
-      title: '서비스',
+      header: '서비스',
       width: '150px',
       render: (_v, user) => (
         <div className="flex flex-wrap gap-1">
@@ -425,24 +434,28 @@ export default function UsersPage() {
     },
     {
       key: 'createdAt',
-      title: '가입일',
-      dataIndex: 'createdAt',
-      sortable: true,
+      header: '가입일',
       width: '100px',
-      render: (v) => <span className="text-sm text-slate-600">{new Date(v).toLocaleDateString('ko-KR')}</span>,
+      sortable: true,
+      sortAccessor: (user) => new Date(user.createdAt).getTime(),
+      render: (_v, user) => (
+        <span className="text-sm text-slate-600">
+          {new Date(user.createdAt).toLocaleDateString('ko-KR')}
+        </span>
+      ),
     },
     {
       key: 'status',
-      title: '상태',
-      dataIndex: 'status',
+      header: '상태',
       width: '80px',
-      render: (v) => <StatusBadge status={v} />,
+      render: (_v, user) => <StatusBadge status={user.status} />,
     },
     {
       key: '_actions',
-      title: '액션',
+      header: '액션',
       width: '60px',
       align: 'center',
+      onCellClick: () => {},
       render: (_v, user) => (
         <RowActionMenu
           actions={buildRowActions(userActionPolicy, user, {
@@ -464,6 +477,13 @@ export default function UsersPage() {
       ),
     },
   ];
+
+  // ─── Pagination ────────────────────────────────────
+
+  const paginationTotal = (activeTab === 'all' || activeTab === 'pending')
+    ? pagination.total
+    : filteredUsers.length;
+  const totalPages = Math.ceil(paginationTotal / pagination.limit) || 1;
 
   return (
     <div className="p-6">
@@ -518,18 +538,59 @@ export default function UsersPage() {
         {/* DataTable */}
         <DataTable<UserData>
           columns={columns}
-          dataSource={filteredUsers}
+          data={filteredUsers}
           rowKey="id"
           loading={loading}
-          emptyText={activeTab === 'pending' ? '가입 신청이 없습니다.' : '등록된 사용자가 없습니다.'}
+          emptyMessage={activeTab === 'pending' ? '가입 신청이 없습니다.' : '등록된 사용자가 없습니다.'}
           onRowClick={(user) => navigate(`/operator/users/${user.id}`)}
-          pagination={{
-            current: pagination.page,
-            pageSize: pagination.limit,
-            total: activeTab === 'all' || activeTab === 'pending' ? pagination.total : filteredUsers.length,
-            onChange: (page) => fetchUsers(page),
-          }}
+          tableId="kcos-users"
         />
+
+        {/* Pagination */}
+        {!loading && totalPages > 1 && (
+          <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100 mt-2">
+            <p className="text-sm text-slate-500">
+              총 {paginationTotal}명 중 {(pagination.page - 1) * pagination.limit + 1}-
+              {Math.min(pagination.page * pagination.limit, paginationTotal)}명 표시
+            </p>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => fetchUsers(Math.max(1, pagination.page - 1))}
+                disabled={pagination.page === 1}
+                className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed text-slate-600"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                const start = Math.max(1, Math.min(pagination.page - 2, totalPages - 4));
+                return start + i;
+              }).filter(p => p <= totalPages).map((pg) => (
+                <button
+                  key={pg}
+                  onClick={() => fetchUsers(pg)}
+                  className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
+                    pagination.page === pg
+                      ? 'bg-primary-600 text-white'
+                      : 'hover:bg-slate-100 text-slate-600'
+                  }`}
+                >
+                  {pg}
+                </button>
+              ))}
+              <button
+                onClick={() => fetchUsers(Math.min(totalPages, pagination.page + 1))}
+                disabled={pagination.page === totalPages}
+                className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed text-slate-600"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        )}
       </MemberListLayout>
 
       {/* Password Modal */}
