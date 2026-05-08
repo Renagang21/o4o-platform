@@ -8,7 +8,9 @@
  */
 
 export type { NormalizedAiContentResponse } from './common.js';
-export { normalizeAiResponse } from './common.js';
+export { normalizeAiResponse, buildCustomPromptInstruction } from './common.js';
+
+import { buildCustomPromptInstruction } from './common.js';
 
 export {
   buildProductDetailSystemPrompt,
@@ -81,28 +83,52 @@ interface PromptOptions {
   tone?: string;
   length?: string;
   audience?: string;
+  /**
+   * WO-O4O-AI-CONTENT-CUSTOM-PROMPT-AND-CORE-EXTENSION-AUDIT-V1:
+   *   사용자가 모달 등에서 자유 텍스트로 입력한 추가 요청.
+   *   각 outputType 시스템 프롬프트 뒤에 별도 [사용자 추가 요청] 블록으로 주입된다.
+   *   미입력 시 기존 동작과 동일.
+   */
+  customPrompt?: string;
 }
 
 /**
  * outputType에 따라 시스템 프롬프트를 반환한다.
+ *
+ * 최종 구조:
+ *   [base + outputType + tone/length/audience + output schema] + [사용자 추가 요청(optional)]
  */
 export function buildSystemPrompt(outputType: OutputType, options: PromptOptions): string {
+  // customPrompt 는 outputType별 builder 가 아닌 dispatcher 단계에서 통합 주입한다 →
+  // 7개 builder 시그니처 변경 없이 모든 outputType 에 균일 적용.
+  const { customPrompt, ...rest } = options;
+
+  let base: string;
   switch (outputType) {
     case 'product_detail':
-      return buildProductDetailSystemPrompt(options);
+      base = buildProductDetailSystemPrompt(rest);
+      break;
     case 'blog':
-      return buildBlogSystemPrompt(options);
+      base = buildBlogSystemPrompt(rest);
+      break;
     case 'pop':
-      return buildPopSystemPrompt(options);
+      base = buildPopSystemPrompt(rest);
+      break;
     case 'summary':
-      return buildSummarySystemPrompt(options);
+      base = buildSummarySystemPrompt(rest);
+      break;
     case 'title_suggest':
-      return buildTitleSuggestSystemPrompt(options);
+      base = buildTitleSuggestSystemPrompt(rest);
+      break;
     case 'store_qr':
-      return buildStoreQrSystemPrompt(options);
+      base = buildStoreQrSystemPrompt(rest);
+      break;
     case 'store_sns':
-      return buildStoreSnsSystemPrompt(options);
+      base = buildStoreSnsSystemPrompt(rest);
+      break;
   }
+
+  return base + buildCustomPromptInstruction(customPrompt);
 }
 
 /**

@@ -131,6 +131,23 @@ export function buildOptionInstructions(
   return `\n[작성 옵션]\n${parts.map((p) => `- ${p}`).join('\n')}`;
 }
 
+/**
+ * 사용자 추가 요청(custom prompt) 지시문 생성
+ *
+ * WO-O4O-AI-CONTENT-CUSTOM-PROMPT-AND-CORE-EXTENSION-AUDIT-V1
+ *
+ * - 시스템 프롬프트의 마지막 단계에 주입되어 [공통 원칙]·[출력 형식]을 침범하지 않도록 가드한다.
+ * - 빈 문자열/공백/미입력 시에는 빈 문자열 반환 → 기존 동작 보존.
+ * - 길이는 최대 500자로 trim — 토큰 폭증 / 프롬프트 인젝션 위험 완화.
+ */
+export function buildCustomPromptInstruction(customPrompt: string | undefined): string {
+  if (!customPrompt || typeof customPrompt !== 'string') return '';
+  const trimmed = customPrompt.trim();
+  if (trimmed.length === 0) return '';
+  const safe = trimmed.slice(0, 500);
+  return `\n[사용자 추가 요청]\n${safe}\n위 추가 요청을 우선 반영하되, [공통 원칙]과 [출력 형식]은 그대로 유지하세요.`;
+}
+
 /** AI 응답(파싱 실패 포함)을 공통 구조로 정규화 */
 export interface NormalizedAiContentResponse {
   html: string;

@@ -256,6 +256,12 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
   const [urlTone, setUrlTone] = useState<UrlTone>('normal');
   const [urlContentType, setUrlContentType] = useState<UrlContentType>('document');
 
+  // WO-O4O-AI-CONTENT-CUSTOM-PROMPT-AND-CORE-EXTENSION-AUDIT-V1:
+  //   사용자 자유 입력 — text 모드는 customPrompt, URL 모드는 customInstruction 으로 매핑.
+  //   미입력 시 기존 동작 유지. 500자 제한은 백엔드에서도 다시 trim.
+  const [customPrompt, setCustomPrompt] = useState('');
+  const CUSTOM_PROMPT_MAX = 500;
+
   if (!open) return null;
 
   const currentConfig = MODE_CONFIG.find((m) => m.key === mode)!;
@@ -288,6 +294,8 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
           input: input.trim(),
           outputType: currentConfig.outputType,
           options: showToneLength ? { tone, length } : {},
+          // WO-O4O-AI-CONTENT-CUSTOM-PROMPT-AND-CORE-EXTENSION-AUDIT-V1
+          customPrompt: customPrompt.trim().slice(0, CUSTOM_PROMPT_MAX),
         }),
       });
 
@@ -332,7 +340,9 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
           url: urlInput.trim(),
           contentType: urlContentType,
           tone: urlTone,
-          customInstruction: '',
+          // WO-O4O-AI-CONTENT-CUSTOM-PROMPT-AND-CORE-EXTENSION-AUDIT-V1:
+          //   동일한 customPrompt 입력란을 URL 모드의 customInstruction 으로도 매핑한다.
+          customInstruction: customPrompt.trim().slice(0, CUSTOM_PROMPT_MAX),
         }),
       });
 
@@ -563,6 +573,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
     setStoreTitle('');
     setStoreSaveStatus(null);
     setStoreSaving(false);
+    setCustomPrompt('');
     onClose();
   };
 
@@ -667,6 +678,41 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
                 {tab === 'text' ? '기존 입력' : 'URL에서 가져오기'}
               </button>
             ))}
+          </div>
+
+          {/* WO-O4O-AI-CONTENT-CUSTOM-PROMPT-AND-CORE-EXTENSION-AUDIT-V1:
+              추가 요청사항 — text/url 모드 공통 적용. 미입력 시 기존 동작 유지. */}
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+              <label style={{ fontSize: '13px', fontWeight: 500, color: '#374151' }}>
+                추가 요청사항 <span style={{ color: '#9ca3af', fontWeight: 400 }}>(선택)</span>
+              </label>
+              <span style={{ fontSize: '11px', color: '#9ca3af' }}>
+                {customPrompt.length}/{CUSTOM_PROMPT_MAX}
+              </span>
+            </div>
+            <textarea
+              value={customPrompt}
+              onChange={(e) => setCustomPrompt(e.target.value.slice(0, CUSTOM_PROMPT_MAX))}
+              placeholder={
+                '예) 약국 고객이 이해하기 쉽게 작성\n블로그 스타일로 길게 정리\nPOP에 맞게 짧고 강조형으로 작성\n전문가 칼럼 스타일로 작성\n소제목 중심으로 정리'
+              }
+              rows={3}
+              style={{
+                width: '100%',
+                padding: '10px 12px',
+                border: '1px solid #d1d5db',
+                borderRadius: '6px',
+                fontSize: '13px',
+                resize: 'vertical',
+                fontFamily: 'inherit',
+                boxSizing: 'border-box',
+                background: '#fafafa',
+              }}
+            />
+            <p style={{ fontSize: '11px', color: '#9ca3af', margin: '4px 0 0' }}>
+              모든 모드(텍스트/URL)에 공통 적용됩니다. 공통 원칙·출력 형식은 그대로 유지됩니다.
+            </p>
           </div>
 
           {/* TEXT MODE */}

@@ -198,7 +198,7 @@ router.post('/content', authenticate, async (req, res: Response) => {
     return res.status(401).json({ success: false, error: '로그인이 필요합니다.' });
   }
 
-  const { input, outputType = 'product_detail', options = {} } = req.body;
+  const { input, outputType = 'product_detail', options = {}, customPrompt } = req.body;
 
   if (!input || typeof input !== 'string' || input.trim().length === 0) {
     return res.status(400).json({ success: false, error: 'input 텍스트가 필요합니다.' });
@@ -208,7 +208,18 @@ router.post('/content', authenticate, async (req, res: Response) => {
     return res.status(400).json({ success: false, error: `지원하지 않는 outputType: ${outputType}` });
   }
 
-  const systemPrompt = buildSystemPrompt(outputType, options);
+  // WO-O4O-AI-CONTENT-CUSTOM-PROMPT-AND-CORE-EXTENSION-AUDIT-V1:
+  //   customPrompt 는 options 외부에서도 받을 수 있도록 허용하되, options.customPrompt 로 통합한다.
+  //   미전달/빈 문자열 시 기존 동작 그대로.
+  const mergedOptions = {
+    ...options,
+    customPrompt:
+      typeof customPrompt === 'string'
+        ? customPrompt
+        : (typeof options?.customPrompt === 'string' ? options.customPrompt : ''),
+  };
+
+  const systemPrompt = buildSystemPrompt(outputType, mergedOptions);
   const userPrompt = buildUserPrompt(outputType, input);
   const requestId = crypto.randomUUID();
 
