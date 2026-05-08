@@ -12,7 +12,7 @@ import { RichTextEditor } from '@o4o/content-editor';
 import { htmlToBlocks, blocksToHtml } from '@o4o/forum-core/utils';
 import { PageHeader, LoadingSpinner, Card } from '../../components/common';
 import { forumApi } from '../../api';
-import { useAuth } from '../../contexts';
+import { useAuth, getAccessToken } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 
 export function ForumWritePage() {
@@ -136,6 +136,12 @@ export function ForumWritePage() {
               placeholder="질문, 정보 공유, 경험담 등 자유롭게 작성해보세요"
               minHeight="400px"
               editable={!submitting}
+              aiRequestHeaders={(() => {
+                const token = getAccessToken();
+                return token ? { Authorization: `Bearer ${token}` } : undefined;
+              })()}
+              showCommunitySave={true}
+              showStoreSave={user?.roles?.includes('kpa:store_owner') ?? false}
             />
           </div>
 
