@@ -113,7 +113,8 @@ export const GLYCOPHARM_STORE_CONFIG: StoreDashboardConfig = {
     {
       label: '',
       items: [
-        { key: 'dashboard', label: '대시보드', subPath: '/hub' },
+        // WO-O4O-GLYCO-STORE-CANONICAL-ENTRY-ALIGN-V1: /store 인덱스 = 운영 홈 (canonical 정렬)
+        { key: 'dashboard', label: '대시보드', subPath: '' },
       ],
     },
     {

@@ -179,7 +179,8 @@ import { StoreDashboardLayout, GLYCOPHARM_STORE_CONFIG, resolveStoreMenu } from 
 import { GlycoGlobalHeader } from './components/GlycoGlobalHeader';
 import { useStoreCapabilities } from './hooks/useStoreCapabilities';
 const StoreOverviewPage = lazy(() => import('@/pages/store/StoreOverviewPage'));
-const StoreEntryPage = lazy(() => import('@/pages/store/StoreEntryPage'));
+// WO-O4O-GLYCO-STORE-CANONICAL-ENTRY-ALIGN-V1: StoreEntryPage 라우트 제거됨.
+// 페이지 파일은 보존(별도 cleanup WO에서 판단). 라우트 사용 제거에 따른 import만 정리.
 const StoreAssetsPage = lazy(() => import('@/pages/store/StoreAssetsPage'));
 const StoreChannelsPage = lazy(() => import('@/pages/store/StoreChannelsPage'));
 
@@ -342,9 +343,9 @@ function AppRoutes() {
       <Route path="register" element={<RegisterPage />} />
       <Route path="forgot-password" element={<AccountRecoveryPage />} />
       <Route path="reset-password" element={<ResetPasswordPage />} />
-      {/* WO-O4O-GLYCOPHARM-ENTRYPOINT-AND-NAV-REALIGN-V1:
-          /pharmacy → /store/hub */}
-      <Route path="pharmacy" element={<Navigate to="/store/hub" replace />} />
+      {/* WO-O4O-GLYCOPHARM-ENTRYPOINT-AND-NAV-REALIGN-V1 + WO-O4O-GLYCO-STORE-CANONICAL-ENTRY-ALIGN-V1:
+          /pharmacy → /store (canonical 정렬) */}
+      <Route path="pharmacy" element={<Navigate to="/store" replace />} />
 
       {/* Public Routes with MainLayout */}
       <Route element={<MainLayout />}>
@@ -427,12 +428,8 @@ function AppRoutes() {
           </SoftGuard>
         } />
 
-        {/* Store Entry Portal (WO-STORE-MAIN-ENTRY-LAYOUT-V1) */}
-        <Route path="store" element={
-          <SoftGuard feature="store" allowedRoles={[GLYCOPHARM_ROLES.PHARMACIST]}>
-            <StoreEntryPage />
-          </SoftGuard>
-        } />
+        {/* WO-O4O-GLYCO-STORE-CANONICAL-ENTRY-ALIGN-V1:
+            /store 인덱스는 StoreLayoutWrapper 라우트(아래)로 단일화. MainLayout 경유 진입 라우트 제거. */}
       </Route>
 
       {/* Service User Routes (Phase 2: WO-AUTH-SERVICE-IDENTITY-PHASE2-GLYCOPHARM) */}
@@ -452,9 +449,10 @@ function AppRoutes() {
         <Route path="dashboard" element={<ServiceDashboardPage />} />
       </Route>
 
-      {/* Backward compat: /pharmacist → /store/hub (레거시 북마크 대응) */}
-      <Route path="pharmacist" element={<Navigate to="/store/hub" replace />} />
-      <Route path="pharmacist/*" element={<Navigate to="/store/hub" replace />} />
+      {/* Backward compat: /pharmacist → /store (레거시 북마크 대응)
+          WO-O4O-GLYCO-STORE-CANONICAL-ENTRY-ALIGN-V1: /store/hub → /store 로 정렬 */}
+      <Route path="pharmacist" element={<Navigate to="/store" replace />} />
+      <Route path="pharmacist/*" element={<Navigate to="/store" replace />} />
 
       {/* Supplier Dashboard - Neture에서 관리 */}
       <Route
@@ -589,7 +587,10 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       >
-        <Route path="hub" element={<StoreOverviewPage />} />
+        {/* WO-O4O-GLYCO-STORE-CANONICAL-ENTRY-ALIGN-V1:
+            /store 인덱스 = 운영 홈 (canonical). /store/hub 는 backward compat redirect. */}
+        <Route index element={<StoreOverviewPage />} />
+        <Route path="hub" element={<Navigate to="/store" replace />} />
         <Route path="identity" element={<StoreMainPage />} />
         {/* WO-O4O-STORE-PRODUCTS-UI-CANONICAL-ALIGNMENT-V2: /store/my-products 로 통일 */}
         <Route path="products" element={<Navigate to="/store/my-products" replace />} />
