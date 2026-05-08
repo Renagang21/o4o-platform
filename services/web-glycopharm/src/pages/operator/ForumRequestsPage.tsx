@@ -5,14 +5,14 @@ import {
   Clock,
   CheckCircle,
   XCircle,
-  Eye,
   ChevronDown,
   Loader2,
   AlertCircle,
   RotateCcw,
 } from 'lucide-react';
-import { DataTable } from '@o4o/ui';
-import type { Column } from '@o4o/ui';
+import { BaseDetailDrawer } from '@o4o/ui';
+import { DataTable } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import type { CategoryRequestStatus } from '@/types';
 import { forumRequestApi } from '@/services/api';
 import { toast } from '@o4o/error-handling';
@@ -49,7 +49,6 @@ function formatDate(dateString: string): string {
   });
 }
 
-/** 심사 가능 상태인지 확인 */
 function isReviewable(status: CategoryRequestStatus): boolean {
   return status === 'pending' || status === 'revision_requested';
 }
@@ -115,7 +114,6 @@ export default function ForumRequestsPage() {
       if (response.error) {
         toast.error(response.error.message);
       } else {
-        // Reload list to get fresh data
         await loadRequests();
         setSelectedRequest(null);
         setReviewComment('');
@@ -131,6 +129,43 @@ export default function ForumRequestsPage() {
       setIsProcessing(false);
     }
   };
+
+  const columns: ListColumnDef<RequestData>[] = [
+    {
+      key: 'name',
+      header: '포럼명',
+      render: (_v, req) => (
+        <div>
+          <div className="font-medium text-slate-800">{req.name}</div>
+          <div className="text-sm text-slate-500 line-clamp-1">{req.description}</div>
+        </div>
+      ),
+    },
+    {
+      key: 'requesterName',
+      header: '신청자',
+      render: (_v, req) => (
+        <div>
+          <div className="text-slate-800">{req.requesterName}</div>
+          {req.requesterEmail && <div className="text-sm text-slate-500">{req.requesterEmail}</div>}
+        </div>
+      ),
+    },
+    {
+      key: 'createdAt',
+      header: '신청일',
+      width: '160px',
+      sortable: true,
+      sortAccessor: (req) => new Date(req.createdAt).getTime(),
+      render: (_v, req) => <span className="text-sm text-slate-600">{formatDate(req.createdAt)}</span>,
+    },
+    {
+      key: 'status',
+      header: '상태',
+      width: '100px',
+      render: (_v, req) => <StatusBadge status={req.status} />,
+    },
+  ];
 
   if (isLoading) {
     return (
@@ -200,208 +235,97 @@ export default function ForumRequestsPage() {
         </div>
       </div>
 
-      {/* Table */}
-      {(() => {
-        const columns: Column<RequestData>[] = [
-          {
-            key: 'name',
-            title: '포럼명',
-            render: (_v, req) => (
+      {/* DataTable */}
+      <DataTable<RequestData>
+        columns={columns}
+        data={filteredRequests}
+        rowKey="id"
+        loading={isLoading}
+        onRowClick={(req) => { setSelectedRequest(req); setReviewComment(''); }}
+        emptyMessage="검색 조건에 맞는 신청이 없습니다"
+        tableId="glycopharm-forum-requests"
+      />
+
+      {/* Detail Drawer */}
+      <BaseDetailDrawer
+        open={!!selectedRequest}
+        onClose={() => { setSelectedRequest(null); setReviewComment(''); }}
+        title={selectedRequest?.name ?? ''}
+        width={560}
+        actions={
+          selectedRequest && isReviewable(selectedRequest.status)
+            ? [
+                { label: '보완', onClick: () => handleReview('revision'), variant: 'default' as const, loading: isProcessing, disabled: isProcessing },
+                { label: '거절', onClick: () => handleReview('reject'), variant: 'danger' as const, loading: isProcessing, disabled: isProcessing },
+                { label: '승인', onClick: () => handleReview('approve'), variant: 'primary' as const, loading: isProcessing, disabled: isProcessing },
+              ]
+            : []
+        }
+      >
+        {selectedRequest && (
+          <div className="space-y-4">
+            <div>
+              <p className="text-sm font-medium text-slate-500 mb-1">포럼 설명</p>
+              <p className="text-slate-800">{selectedRequest.description}</p>
+            </div>
+
+            {selectedRequest.reason && (
               <div>
-                <div className="font-medium text-slate-800">{req.name}</div>
-                <div className="text-sm text-slate-500 line-clamp-1">{req.description}</div>
+                <p className="text-sm font-medium text-slate-500 mb-1">신청 사유</p>
+                <p className="text-slate-800">{selectedRequest.reason}</p>
               </div>
-            ),
-          },
-          {
-            key: 'requesterName',
-            title: '신청자',
-            render: (_v, req) => (
+            )}
+
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <div className="text-slate-800">{req.requesterName}</div>
-                {req.requesterEmail && <div className="text-sm text-slate-500">{req.requesterEmail}</div>}
+                <p className="text-sm font-medium text-slate-500 mb-1">신청자</p>
+                <p className="text-slate-800">{selectedRequest.requesterName}</p>
               </div>
-            ),
-          },
-          {
-            key: 'createdAt',
-            title: '신청일',
-            width: '160px',
-            render: (_v, req) => <span className="text-sm text-slate-600">{formatDate(req.createdAt)}</span>,
-          },
-          {
-            key: 'status',
-            title: '상태',
-            width: '100px',
-            render: (_v, req) => <StatusBadge status={req.status} />,
-          },
-          {
-            key: 'actions',
-            title: '작업',
-            width: '100px',
-            align: 'right',
-            render: (_v, req) => (
-              <div className="flex justify-end gap-2">
-                <button onClick={() => setSelectedRequest(req)} className="p-2 rounded-lg hover:bg-slate-100 text-slate-600" title="상세보기">
-                  <Eye className="w-4 h-4" />
-                </button>
-                {isReviewable(req.status) && (
-                  <>
-                    <button onClick={() => { setSelectedRequest(req); setReviewComment(''); }} className="p-2 rounded-lg hover:bg-green-100 text-green-600" title="승인">
-                      <CheckCircle className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => { setSelectedRequest(req); setReviewComment(''); }} className="p-2 rounded-lg hover:bg-red-100 text-red-600" title="거절">
-                      <XCircle className="w-4 h-4" />
-                    </button>
-                  </>
-                )}
-              </div>
-            ),
-          },
-        ];
-
-        return (
-          <DataTable<RequestData>
-            columns={columns}
-            dataSource={filteredRequests}
-            rowKey="id"
-            emptyText="검색 조건에 맞는 신청이 없습니다"
-          />
-        );
-      })()}
-
-      {/* Review Modal */}
-      {selectedRequest && (
-        <>
-          <div
-            className="fixed inset-0 bg-black/50 z-40"
-            onClick={() => setSelectedRequest(null)}
-          />
-          <div className="fixed inset-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-lg bg-white rounded-xl shadow-xl z-50 overflow-hidden flex flex-col max-h-[90vh]">
-            {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-slate-200">
-              <h2 className="text-lg font-semibold text-slate-800">
-                포럼 신청 상세
-              </h2>
-            </div>
-
-            {/* Modal Content */}
-            <div className="p-6 overflow-y-auto flex-1">
-              <div className="space-y-4">
-                {/* Basic Info */}
-                <div>
-                  <h4 className="text-sm font-medium text-slate-500 mb-1">포럼 이름</h4>
-                  <p className="text-slate-800 font-medium">{selectedRequest.name}</p>
-                </div>
-
-                <div>
-                  <h4 className="text-sm font-medium text-slate-500 mb-1">포럼 설명</h4>
-                  <p className="text-slate-800">{selectedRequest.description}</p>
-                </div>
-
-                {selectedRequest.reason && (
-                  <div>
-                    <h4 className="text-sm font-medium text-slate-500 mb-1">신청 사유</h4>
-                    <p className="text-slate-800">{selectedRequest.reason}</p>
-                  </div>
-                )}
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <h4 className="text-sm font-medium text-slate-500 mb-1">신청자</h4>
-                    <p className="text-slate-800">{selectedRequest.requesterName}</p>
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-medium text-slate-500 mb-1">신청일</h4>
-                    <p className="text-slate-800">{formatDate(selectedRequest.createdAt)}</p>
-                  </div>
-                </div>
-
-                {/* Review section for reviewable requests */}
-                {isReviewable(selectedRequest.status) && (
-                  <div className="pt-4 border-t border-slate-200">
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      검토 의견
-                    </label>
-                    <textarea
-                      value={reviewComment}
-                      onChange={(e) => setReviewComment(e.target.value)}
-                      placeholder="승인/거절/보완 사유를 입력하세요 (보완 요청 시 필수)"
-                      rows={3}
-                      className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
-                    />
-                  </div>
-                )}
-
-                {/* Already reviewed */}
-                {!isReviewable(selectedRequest.status) && selectedRequest.reviewComment && (
-                  <div className={`p-4 rounded-lg ${
-                    selectedRequest.status === 'approved' ? 'bg-green-50' : 'bg-red-50'
-                  }`}>
-                    <h4 className={`text-sm font-medium mb-1 ${
-                      selectedRequest.status === 'approved' ? 'text-green-700' : 'text-red-700'
-                    }`}>
-                      검토 의견
-                    </h4>
-                    <p className={
-                      selectedRequest.status === 'approved' ? 'text-green-600' : 'text-red-600'
-                    }>
-                      {selectedRequest.reviewComment}
-                    </p>
-                    {selectedRequest.reviewedAt && (
-                      <p className="text-xs text-slate-500 mt-2">
-                        {selectedRequest.reviewerName} | {formatDate(selectedRequest.reviewedAt)}
-                      </p>
-                    )}
-                  </div>
-                )}
+              <div>
+                <p className="text-sm font-medium text-slate-500 mb-1">신청일</p>
+                <p className="text-slate-800">{formatDate(selectedRequest.createdAt)}</p>
               </div>
             </div>
 
-            {/* Modal Footer */}
-            <div className="px-6 py-4 border-t border-slate-200 flex gap-3">
-              <button
-                onClick={() => setSelectedRequest(null)}
-                className="flex-1 px-4 py-2 text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
-              >
-                닫기
-              </button>
-              {isReviewable(selectedRequest.status) && (
-                <>
-                  <button
-                    onClick={() => handleReview('revision')}
-                    disabled={isProcessing}
-                    className="px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-                  >
-                    <RotateCcw className="w-4 h-4" />
-                    보완
-                  </button>
-                  <button
-                    onClick={() => handleReview('reject')}
-                    disabled={isProcessing}
-                    className="flex-1 px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-                  >
-                    <XCircle className="w-4 h-4" />
-                    거절
-                  </button>
-                  <button
-                    onClick={() => handleReview('approve')}
-                    disabled={isProcessing}
-                    className="flex-1 px-4 py-2 text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-                  >
-                    {isProcessing ? (
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    ) : (
-                      <CheckCircle className="w-4 h-4" />
-                    )}
-                    승인
-                  </button>
-                </>
-              )}
-            </div>
+            {isReviewable(selectedRequest.status) && (
+              <div className="pt-4 border-t border-slate-200">
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  검토 의견
+                </label>
+                <textarea
+                  value={reviewComment}
+                  onChange={(e) => setReviewComment(e.target.value)}
+                  placeholder="승인/거절/보완 사유를 입력하세요 (보완 요청 시 필수)"
+                  rows={3}
+                  className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+                />
+              </div>
+            )}
+
+            {!isReviewable(selectedRequest.status) && selectedRequest.reviewComment && (
+              <div className={`p-4 rounded-lg ${
+                selectedRequest.status === 'approved' ? 'bg-green-50' : 'bg-red-50'
+              }`}>
+                <h4 className={`text-sm font-medium mb-1 ${
+                  selectedRequest.status === 'approved' ? 'text-green-700' : 'text-red-700'
+                }`}>
+                  검토 의견
+                </h4>
+                <p className={
+                  selectedRequest.status === 'approved' ? 'text-green-600' : 'text-red-600'
+                }>
+                  {selectedRequest.reviewComment}
+                </p>
+                {selectedRequest.reviewedAt && (
+                  <p className="text-xs text-slate-500 mt-2">
+                    {selectedRequest.reviewerName} | {formatDate(selectedRequest.reviewedAt)}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
-        </>
-      )}
+        )}
+      </BaseDetailDrawer>
     </div>
   );
 }

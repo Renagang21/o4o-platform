@@ -6,17 +6,12 @@
  */
 
 import { useState, useEffect } from 'react';
-import {
-  Trash2,
-  CheckCircle,
-  XCircle,
-  Loader2,
-  AlertCircle,
-  Inbox,
-  MessageSquare,
-  X,
-} from 'lucide-react';
+import { Trash2 } from 'lucide-react';
+import { BaseDetailDrawer } from '@o4o/ui';
+import { DataTable } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { forumDeleteRequestApi } from '@/services/api';
+import { toast } from '@o4o/error-handling';
 import StatusBadge from '../../components/common/StatusBadge';
 import PageHeader from '../../components/common/PageHeader';
 import { GuideBlock } from '@o4o/shared-space-ui';
@@ -64,11 +59,9 @@ export default function ForumDeleteRequestsPage() {
   const [requests, setRequests] = useState<DeleteRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('pending');
-  const [reviewingId, setReviewingId] = useState<string | null>(null);
-  const [reviewAction, setReviewAction] = useState<'approve' | 'reject' | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<DeleteRequest | null>(null);
   const [reviewComment, setReviewComment] = useState('');
-  const [reviewSaving, setReviewSaving] = useState(false);
-  const [reviewError, setReviewError] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const [guideTitle, setGuideTitle] = useState<string | null>(null);
   const [guideDesc, setGuideDesc] = useState<string | null>(null);
@@ -109,47 +102,82 @@ export default function ForumDeleteRequestsPage() {
     }
   };
 
-  const openReview = (id: string, action: 'approve' | 'reject') => {
-    setReviewingId(id);
-    setReviewAction(action);
-    setReviewComment('');
-    setReviewError(null);
-  };
-
-  const handleReview = async () => {
-    if (!reviewingId || !reviewAction) return;
-    setReviewSaving(true);
-    setReviewError(null);
+  const handleReview = async (action: 'approve' | 'reject') => {
+    if (!selectedRequest) return;
+    setIsProcessing(true);
     try {
-      const fn = reviewAction === 'approve'
+      const fn = action === 'approve'
         ? forumDeleteRequestApi.approve
         : forumDeleteRequestApi.reject;
-      const res = await fn(reviewingId, { reviewComment: reviewComment.trim() || undefined });
+      const res = await fn(selectedRequest.id, { reviewComment: reviewComment.trim() || undefined });
       if (res.error) {
-        setReviewError(res.error.message);
+        toast.error(res.error.message);
       } else {
-        setReviewingId(null);
-        setReviewAction(null);
-        loadRequests();
+        await loadRequests();
+        setSelectedRequest(null);
+        setReviewComment('');
+        toast.success(action === 'approve' ? '삭제 승인 완료' : '반려 완료');
       }
     } catch {
-      setReviewError('처리 중 오류가 발생했습니다.');
+      toast.error('처리 중 오류가 발생했습니다.');
     } finally {
-      setReviewSaving(false);
+      setIsProcessing(false);
     }
   };
 
-  const reviewTarget = requests.find(r => r.id === reviewingId);
+  const columns: ListColumnDef<DeleteRequest>[] = [
+    {
+      key: 'name',
+      header: '포럼명',
+      render: (_v, req) => (
+        <div>
+          <div className="font-medium text-slate-800">{req.name}</div>
+          {req.description && (
+            <div className="text-sm text-slate-500 line-clamp-1">{req.description}</div>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'creatorName',
+      header: '생성자',
+      width: '120px',
+      render: (_v, req) => (
+        <span className="text-slate-800">{req.creatorName || req.createdBy.slice(0, 8)}</span>
+      ),
+    },
+    {
+      key: 'postCount',
+      header: '게시글',
+      width: '80px',
+      render: (_v, req) => <span className="text-slate-600">{req.postCount}</span>,
+    },
+    {
+      key: 'deleteRequestedAt',
+      header: '요청일',
+      width: '160px',
+      sortable: true,
+      sortAccessor: (req) => new Date(req.deleteRequestedAt).getTime(),
+      render: (_v, req) => (
+        <span className="text-sm text-slate-600">{formatDate(req.deleteRequestedAt)}</span>
+      ),
+    },
+    {
+      key: 'deleteRequestStatus',
+      header: '상태',
+      width: '100px',
+      render: (_v, req) => <StatusBadge status={req.deleteRequestStatus} />,
+    },
+  ];
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="space-y-6">
       <PageHeader
         title="포럼 삭제 요청 관리"
         description="포럼 소유자의 삭제 요청을 검토하고 승인/반려합니다"
         icon={<Trash2 className="w-6 h-6 text-red-500" />}
       />
 
-      {/* GuideBlock */}
       <GuideBlock
         variant="info"
         title={guideTitle ?? '포럼 삭제 요청을 검토합니다.'}
@@ -164,7 +192,7 @@ export default function ForumDeleteRequestsPage() {
       />
 
       {/* Status Tabs */}
-      <div className="flex gap-1 mb-6 bg-slate-100 rounded-lg p-1">
+      <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
         {STATUS_TABS.map((tab) => (
           <button
             key={tab.value}
@@ -180,172 +208,104 @@ export default function ForumDeleteRequestsPage() {
         ))}
       </div>
 
-      {/* Loading */}
-      {isLoading && (
-        <div className="flex items-center justify-center py-12 bg-white rounded-xl border border-slate-200">
-          <Loader2 className="w-6 h-6 text-slate-400 animate-spin" />
-          <span className="ml-2 text-slate-500">불러오는 중...</span>
-        </div>
-      )}
+      <DataTable<DeleteRequest>
+        columns={columns}
+        data={requests}
+        rowKey="id"
+        loading={isLoading}
+        onRowClick={(req) => { setSelectedRequest(req); setReviewComment(''); }}
+        emptyMessage="해당 상태의 삭제 요청이 없습니다"
+        tableId="glycopharm-forum-delete-requests"
+      />
 
-      {/* Empty */}
-      {!isLoading && requests.length === 0 && (
-        <div className="bg-white rounded-xl border border-slate-200 p-8 text-center">
-          <Inbox className="w-12 h-12 text-slate-300 mx-auto" />
-          <h3 className="mt-3 text-lg font-medium text-slate-700">
-            {statusFilter === 'pending' ? '대기 중인 삭제 요청이 없습니다' : '해당 상태의 요청이 없습니다'}
-          </h3>
-        </div>
-      )}
-
-      {/* Request List */}
-      {!isLoading && requests.length > 0 && (
-        <div className="space-y-3">
-          {requests.map((req) => (
-            <div
-              key={req.id}
-              className="bg-white rounded-xl border border-slate-200 p-5"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-start gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center shrink-0 mt-0.5">
-                    <MessageSquare className="w-5 h-5 text-red-500" />
-                  </div>
-                  <div className="min-w-0">
-                    <h3 className="font-semibold text-slate-800">{req.name}</h3>
-                    {req.description && (
-                      <p className="text-sm text-slate-500 mt-0.5 line-clamp-2">{req.description}</p>
-                    )}
-                    <div className="flex items-center gap-3 mt-2 text-xs text-slate-400">
-                      <span>생성자: {req.creatorName || req.createdBy.slice(0, 8)}</span>
-                      <span>게시글: {req.postCount}</span>
-                      <span>요청일: {formatDate(req.deleteRequestedAt)}</span>
-                    </div>
-                    {req.deleteRequestReason && (
-                      <div className="mt-2 p-2 bg-slate-50 rounded-lg">
-                        <span className="text-xs font-medium text-slate-500">삭제 사유: </span>
-                        <span className="text-sm text-slate-700">{req.deleteRequestReason}</span>
-                      </div>
-                    )}
-                    {req.deleteReviewComment && req.deleteRequestStatus !== 'pending' && (
-                      <div className={`mt-2 p-2 rounded-lg ${
-                        req.deleteRequestStatus === 'approved' ? 'bg-green-50' : 'bg-red-50'
-                      }`}>
-                        <span className={`text-xs font-medium ${
-                          req.deleteRequestStatus === 'approved' ? 'text-green-700' : 'text-red-700'
-                        }`}>검토 의견: </span>
-                        <span className={`text-sm ${
-                          req.deleteRequestStatus === 'approved' ? 'text-green-600' : 'text-red-600'
-                        }`}>{req.deleteReviewComment}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <StatusBadge status={req.deleteRequestStatus} />
-                  {req.deleteRequestStatus === 'pending' && (
-                    <>
-                      <button
-                        onClick={() => openReview(req.id, 'approve')}
-                        className="px-3 py-1.5 text-xs font-medium bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                      >
-                        승인
-                      </button>
-                      <button
-                        onClick={() => openReview(req.id, 'reject')}
-                        className="px-3 py-1.5 text-xs font-medium bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
-                      >
-                        반려
-                      </button>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Review Modal */}
-      {reviewingId && reviewAction && reviewTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="fixed inset-0 bg-black/50" onClick={() => !reviewSaving && setReviewingId(null)} />
-          <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-5">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-slate-800">
-                {reviewAction === 'approve' ? '삭제 요청 승인' : '삭제 요청 반려'}
-              </h3>
-              <button
-                onClick={() => !reviewSaving && setReviewingId(null)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className={`p-3 rounded-lg ${
-              reviewAction === 'approve' ? 'bg-green-50' : 'bg-red-50'
-            }`}>
-              <p className={`text-sm font-medium ${
-                reviewAction === 'approve' ? 'text-green-800' : 'text-red-800'
-              }`}>
-                "{reviewTarget.name}" 포럼의 삭제 요청을 {reviewAction === 'approve' ? '승인' : '반려'}합니다.
-              </p>
-              {reviewAction === 'approve' && (
-                <p className="text-xs text-green-600 mt-1">승인 시 포럼이 비활성화 처리됩니다.</p>
-              )}
-            </div>
-
-            {reviewError && (
-              <div className="p-3 bg-red-50 rounded-lg flex items-center gap-2 text-sm text-red-700">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                {reviewError}
+      <BaseDetailDrawer
+        open={!!selectedRequest}
+        onClose={() => { setSelectedRequest(null); setReviewComment(''); }}
+        title={selectedRequest?.name ?? ''}
+        width={560}
+        actions={
+          selectedRequest?.deleteRequestStatus === 'pending'
+            ? [
+                { label: '반려', onClick: () => handleReview('reject'), variant: 'danger' as const, loading: isProcessing, disabled: isProcessing },
+                { label: '삭제 승인', onClick: () => handleReview('approve'), variant: 'primary' as const, loading: isProcessing, disabled: isProcessing },
+              ]
+            : []
+        }
+      >
+        {selectedRequest && (
+          <div className="space-y-4">
+            {selectedRequest.description && (
+              <div>
+                <p className="text-sm font-medium text-slate-500 mb-1">포럼 설명</p>
+                <p className="text-slate-800">{selectedRequest.description}</p>
               </div>
             )}
 
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                검토 의견 <span className="text-slate-400 font-normal">(선택)</span>
-              </label>
-              <textarea
-                value={reviewComment}
-                onChange={(e) => setReviewComment(e.target.value)}
-                placeholder="검토 의견을 입력해주세요"
-                rows={3}
-                className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm resize-none"
-              />
+            {selectedRequest.deleteRequestReason && (
+              <div>
+                <p className="text-sm font-medium text-slate-500 mb-1">삭제 사유</p>
+                <p className="text-slate-800">{selectedRequest.deleteRequestReason}</p>
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm font-medium text-slate-500 mb-1">생성자</p>
+                <p className="text-slate-800">
+                  {selectedRequest.creatorName || selectedRequest.createdBy.slice(0, 8)}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-slate-500 mb-1">게시글 수</p>
+                <p className="text-slate-800">{selectedRequest.postCount}</p>
+              </div>
             </div>
 
-            <div className="flex gap-3 pt-2">
-              <button
-                onClick={() => setReviewingId(null)}
-                disabled={reviewSaving}
-                className="flex-1 px-4 py-2.5 text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors text-sm font-medium disabled:opacity-50"
-              >
-                취소
-              </button>
-              <button
-                onClick={handleReview}
-                disabled={reviewSaving}
-                className={`flex-1 px-4 py-2.5 text-white rounded-lg transition-colors text-sm font-medium disabled:opacity-50 flex items-center justify-center gap-2 ${
-                  reviewAction === 'approve'
-                    ? 'bg-green-600 hover:bg-green-700'
-                    : 'bg-red-600 hover:bg-red-700'
-                }`}
-              >
-                {reviewSaving ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : reviewAction === 'approve' ? (
-                  <CheckCircle className="w-4 h-4" />
-                ) : (
-                  <XCircle className="w-4 h-4" />
+            {selectedRequest.postCount > 0 && (
+              <div className="p-4 rounded-lg bg-amber-50 border border-amber-200">
+                <p className="text-amber-700 text-sm">
+                  이 포럼에는 {selectedRequest.postCount}개의 게시글이 있습니다. 삭제 승인 시 포럼이 비활성화됩니다.
+                </p>
+              </div>
+            )}
+
+            {selectedRequest.deleteRequestStatus === 'pending' && (
+              <div className="pt-4 border-t border-slate-200">
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  검토 의견 <span className="text-slate-400 font-normal">(선택)</span>
+                </label>
+                <textarea
+                  value={reviewComment}
+                  onChange={(e) => setReviewComment(e.target.value)}
+                  placeholder="검토 의견을 입력해주세요"
+                  rows={3}
+                  className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+                />
+              </div>
+            )}
+
+            {selectedRequest.deleteRequestStatus !== 'pending' && selectedRequest.deleteReviewComment && (
+              <div className={`p-4 rounded-lg ${
+                selectedRequest.deleteRequestStatus === 'approved' ? 'bg-green-50' : 'bg-red-50'
+              }`}>
+                <h4 className={`text-sm font-medium mb-1 ${
+                  selectedRequest.deleteRequestStatus === 'approved' ? 'text-green-700' : 'text-red-700'
+                }`}>
+                  검토 의견
+                </h4>
+                <p className={
+                  selectedRequest.deleteRequestStatus === 'approved' ? 'text-green-600' : 'text-red-600'
+                }>
+                  {selectedRequest.deleteReviewComment}
+                </p>
+                {selectedRequest.deleteReviewedAt && (
+                  <p className="text-xs text-slate-500 mt-2">{formatDate(selectedRequest.deleteReviewedAt)}</p>
                 )}
-                {reviewSaving ? '처리 중...' : reviewAction === 'approve' ? '승인' : '반려'}
-              </button>
-            </div>
+              </div>
+            )}
           </div>
-        </div>
-      )}
+        )}
+      </BaseDetailDrawer>
     </div>
   );
 }

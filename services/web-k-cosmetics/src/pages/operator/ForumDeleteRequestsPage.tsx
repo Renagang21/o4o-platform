@@ -7,14 +7,10 @@
  */
 
 import { useState, useEffect } from 'react';
-import {
-  Trash2,
-  Clock,
-  CheckCircle,
-  XCircle,
-  Eye,
-  Loader2,
-} from 'lucide-react';
+import { Trash2, Clock } from 'lucide-react';
+import { BaseDetailDrawer } from '@o4o/ui';
+import { DataTable } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { toast } from '@o4o/error-handling';
 import { forumOperatorApi } from '@/services/forumApi';
 import { GuideBlock } from '@o4o/shared-space-ui';
@@ -128,17 +124,56 @@ export default function ForumDeleteRequestsPage() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="w-8 h-8 text-pink-600 animate-spin" />
-        <span className="ml-2 text-slate-600">로딩 중...</span>
-      </div>
-    );
-  }
+  const columns: ListColumnDef<DeleteRequestData>[] = [
+    {
+      key: 'name',
+      header: '포럼명',
+      render: (_v, req) => (
+        <div>
+          <div className="font-medium text-slate-800">{req.name}</div>
+          <div className="text-sm text-slate-500 line-clamp-1">{req.description}</div>
+        </div>
+      ),
+    },
+    {
+      key: 'creatorName',
+      header: '생성자',
+      width: '120px',
+      render: (_v, req) => <span className="text-slate-800">{req.creatorName || '-'}</span>,
+    },
+    {
+      key: 'postCount',
+      header: '게시글',
+      width: '80px',
+      render: (_v, req) => <span className="text-slate-600">{req.postCount}</span>,
+    },
+    {
+      key: 'deleteRequestedAt',
+      header: '요청일',
+      width: '160px',
+      sortable: true,
+      sortAccessor: (req) => new Date(req.deleteRequestedAt).getTime(),
+      render: (_v, req) => (
+        <span className="text-sm text-slate-600">{formatDate(req.deleteRequestedAt)}</span>
+      ),
+    },
+    {
+      key: 'deleteRequestStatus',
+      header: '상태',
+      width: '100px',
+      render: (_v, req) => {
+        const s = statusConfig[req.deleteRequestStatus] || statusConfig.pending;
+        return (
+          <span className={`px-3 py-1 text-xs font-medium rounded-full ${s.bgColor} ${s.color}`}>
+            {s.label}
+          </span>
+        );
+      },
+    },
+  ];
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
@@ -189,177 +224,98 @@ export default function ForumDeleteRequestsPage() {
         ))}
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-slate-50 border-b border-slate-200">
-            <tr>
-              <th className="px-6 py-3 text-left text-sm font-medium text-slate-600">포럼명</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-slate-600">생성자</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-slate-600">게시글 수</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-slate-600">요청일</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-slate-600">상태</th>
-              <th className="px-6 py-3 text-right text-sm font-medium text-slate-600">작업</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {requests.map((request) => {
-              const status = statusConfig[request.deleteRequestStatus] || statusConfig.pending;
-              return (
-                <tr key={request.id} className="hover:bg-slate-50">
-                  <td className="px-6 py-4">
-                    <div className="font-medium text-slate-800">{request.name}</div>
-                    <div className="text-sm text-slate-500 line-clamp-1">{request.description}</div>
-                  </td>
-                  <td className="px-6 py-4 text-slate-800">
-                    {request.creatorName || '-'}
-                  </td>
-                  <td className="px-6 py-4 text-slate-600">
-                    {request.postCount}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-slate-600">
-                    {formatDate(request.deleteRequestedAt)}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-3 py-1 text-xs font-medium rounded-full ${status.bgColor} ${status.color}`}>
-                      {status.label}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex justify-end">
-                      <button
-                        onClick={() => { setSelectedRequest(request); setReviewComment(''); }}
-                        className="p-2 rounded-lg hover:bg-slate-100 text-slate-600"
-                        title="상세보기"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+      <DataTable<DeleteRequestData>
+        columns={columns}
+        data={requests}
+        rowKey="id"
+        loading={isLoading}
+        onRowClick={(req) => { setSelectedRequest(req); setReviewComment(''); }}
+        emptyMessage="삭제 요청이 없습니다"
+        tableId="kcos-forum-delete-requests"
+      />
 
-        {requests.length === 0 && (
-          <div className="text-center py-12">
-            <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto">
-              <Trash2 className="w-8 h-8 text-slate-400" />
+      <BaseDetailDrawer
+        open={!!selectedRequest}
+        onClose={() => { setSelectedRequest(null); setReviewComment(''); }}
+        title={selectedRequest?.name ?? ''}
+        width={560}
+        actions={
+          selectedRequest?.deleteRequestStatus === 'pending'
+            ? [
+                { label: '반려', onClick: () => handleReview('reject'), variant: 'danger' as const, loading: isProcessing, disabled: isProcessing },
+                { label: '삭제 승인', onClick: () => handleReview('approve'), variant: 'primary' as const, loading: isProcessing, disabled: isProcessing },
+              ]
+            : []
+        }
+      >
+        {selectedRequest && (
+          <div className="space-y-4">
+            <div>
+              <p className="text-sm font-medium text-slate-500 mb-1">포럼 설명</p>
+              <p className="text-slate-800">{selectedRequest.description}</p>
             </div>
-            <h3 className="mt-4 text-lg font-medium text-slate-800">삭제 요청이 없습니다</h3>
-            <p className="mt-2 text-slate-500">포럼 삭제 요청이 들어오면 여기에 표시됩니다</p>
+
+            {selectedRequest.deleteRequestReason && (
+              <div>
+                <p className="text-sm font-medium text-slate-500 mb-1">삭제 사유</p>
+                <p className="text-slate-800">{selectedRequest.deleteRequestReason}</p>
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm font-medium text-slate-500 mb-1">생성자</p>
+                <p className="text-slate-800">{selectedRequest.creatorName || '-'}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-slate-500 mb-1">게시글 수</p>
+                <p className="text-slate-800">{selectedRequest.postCount}</p>
+              </div>
+            </div>
+
+            {selectedRequest.postCount > 0 && (
+              <div className="p-4 rounded-lg bg-amber-50 border border-amber-200">
+                <p className="text-amber-700 text-sm">
+                  이 포럼에는 {selectedRequest.postCount}개의 게시글이 있습니다. 삭제 승인 시 포럼이 비활성화됩니다.
+                </p>
+              </div>
+            )}
+
+            {selectedRequest.deleteRequestStatus === 'pending' && (
+              <div className="pt-4 border-t border-slate-200">
+                <label className="block text-sm font-medium text-slate-700 mb-2">검토 의견</label>
+                <textarea
+                  value={reviewComment}
+                  onChange={(e) => setReviewComment(e.target.value)}
+                  placeholder="승인 또는 반려 사유를 입력하세요 (선택)"
+                  rows={3}
+                  className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 resize-none"
+                />
+              </div>
+            )}
+
+            {selectedRequest.deleteRequestStatus !== 'pending' && selectedRequest.deleteReviewComment && (
+              <div className={`p-4 rounded-lg ${
+                selectedRequest.deleteRequestStatus === 'approved' ? 'bg-green-50' : 'bg-red-50'
+              }`}>
+                <h4 className={`text-sm font-medium mb-1 ${
+                  selectedRequest.deleteRequestStatus === 'approved' ? 'text-green-700' : 'text-red-700'
+                }`}>
+                  검토 의견
+                </h4>
+                <p className={
+                  selectedRequest.deleteRequestStatus === 'approved' ? 'text-green-600' : 'text-red-600'
+                }>
+                  {selectedRequest.deleteReviewComment}
+                </p>
+                {selectedRequest.deleteReviewedAt && (
+                  <p className="text-xs text-slate-500 mt-2">{formatDate(selectedRequest.deleteReviewedAt)}</p>
+                )}
+              </div>
+            )}
           </div>
         )}
-      </div>
-
-      {/* Review Modal */}
-      {selectedRequest && (
-        <>
-          <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setSelectedRequest(null)} />
-          <div className="fixed inset-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-lg bg-white rounded-xl shadow-xl z-50 overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="px-6 py-4 border-b border-slate-200">
-              <h2 className="text-lg font-semibold text-slate-800">삭제 요청 상세</h2>
-            </div>
-            <div className="p-6 overflow-y-auto flex-1 space-y-4">
-              <div>
-                <h4 className="text-sm font-medium text-slate-500 mb-1">포럼 이름</h4>
-                <p className="text-slate-800 font-medium">{selectedRequest.name}</p>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium text-slate-500 mb-1">포럼 설명</h4>
-                <p className="text-slate-800">{selectedRequest.description}</p>
-              </div>
-              {selectedRequest.deleteRequestReason && (
-                <div>
-                  <h4 className="text-sm font-medium text-slate-500 mb-1">삭제 사유</h4>
-                  <p className="text-slate-800">{selectedRequest.deleteRequestReason}</p>
-                </div>
-              )}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <h4 className="text-sm font-medium text-slate-500 mb-1">생성자</h4>
-                  <p className="text-slate-800">{selectedRequest.creatorName || '-'}</p>
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium text-slate-500 mb-1">게시글 수</h4>
-                  <p className="text-slate-800">{selectedRequest.postCount}</p>
-                </div>
-              </div>
-
-              {selectedRequest.postCount > 0 && (
-                <div className="p-4 rounded-lg bg-amber-50 border border-amber-200">
-                  <p className="text-amber-700 text-sm">
-                    이 포럼에는 {selectedRequest.postCount}개의 게시글이 있습니다. 삭제 승인 시 포럼이 비활성화됩니다.
-                  </p>
-                </div>
-              )}
-
-              {selectedRequest.deleteRequestStatus === 'pending' && (
-                <div className="pt-4 border-t border-slate-200">
-                  <label className="block text-sm font-medium text-slate-700 mb-2">검토 의견</label>
-                  <textarea
-                    value={reviewComment}
-                    onChange={(e) => setReviewComment(e.target.value)}
-                    placeholder="승인 또는 반려 사유를 입력하세요 (선택)"
-                    rows={3}
-                    className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 resize-none"
-                  />
-                </div>
-              )}
-
-              {selectedRequest.deleteRequestStatus !== 'pending' && selectedRequest.deleteReviewComment && (
-                <div className={`p-4 rounded-lg ${selectedRequest.deleteRequestStatus === 'approved' ? 'bg-green-50' : 'bg-red-50'}`}>
-                  <h4 className={`text-sm font-medium mb-1 ${selectedRequest.deleteRequestStatus === 'approved' ? 'text-green-700' : 'text-red-700'}`}>
-                    검토 의견
-                  </h4>
-                  <p className={selectedRequest.deleteRequestStatus === 'approved' ? 'text-green-600' : 'text-red-600'}>
-                    {selectedRequest.deleteReviewComment}
-                  </p>
-                  {selectedRequest.deleteReviewedAt && (
-                    <p className="text-xs text-slate-500 mt-2">
-                      {formatDate(selectedRequest.deleteReviewedAt)}
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
-
-            <div className="px-6 py-4 border-t border-slate-200 flex gap-3">
-              <button
-                onClick={() => setSelectedRequest(null)}
-                className="flex-1 px-4 py-2 text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
-              >
-                닫기
-              </button>
-              {selectedRequest.deleteRequestStatus === 'pending' && (
-                <>
-                  <button
-                    onClick={() => handleReview('reject')}
-                    disabled={isProcessing}
-                    className="flex-1 px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 flex items-center justify-center gap-2"
-                  >
-                    <XCircle className="w-4 h-4" />
-                    반려
-                  </button>
-                  <button
-                    onClick={() => handleReview('approve')}
-                    disabled={isProcessing}
-                    className="flex-1 px-4 py-2 text-white bg-green-600 rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center justify-center gap-2"
-                  >
-                    {isProcessing ? (
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    ) : (
-                      <CheckCircle className="w-4 h-4" />
-                    )}
-                    삭제 승인
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-        </>
-      )}
+      </BaseDetailDrawer>
     </div>
   );
 }
