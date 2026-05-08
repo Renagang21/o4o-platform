@@ -13,10 +13,10 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { RichTextEditor } from '@o4o/content-editor';
+import { RichTextEditor, AiContentModal } from '@o4o/content-editor';
 import { resourcesApi } from '../../api/resources';
 import { mediaApi } from '../../api/media';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth, getAccessToken } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
 // WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1
 import { GuideBlock } from '@o4o/shared-space-ui';
@@ -38,6 +38,13 @@ interface UploadedFile {
   url: string;
   fileName: string;
   fileSize: number;
+}
+
+// WO-O4O-CONTENT-AI-ENTRY-V1: HTML 첫 heading 추출 (AI title fallback)
+function extractTitleFromHtml(html: string): string {
+  const match = html.match(/<h[1-3][^>]*>([\s\S]*?)<\/h[1-3]>/i);
+  if (!match) return '';
+  return match[1].replace(/<[^>]+>/g, '').trim();
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -91,6 +98,17 @@ export function ResourceWritePage() {
   const [_autoSyncUsageType, setAutoSyncUsageType] = useState(true);
   // WO-O4O-KPA-RESOURCES-DATA-GUARD-AND-RETEST-V1: LINK 타입 외부 URL
   const [externalUrl, setExternalUrl] = useState('');
+  // WO-O4O-CONTENT-AI-ENTRY-V1: AI로 만들기 모달
+  const [aiOpen, setAiOpen] = useState(false);
+
+  // WO-O4O-CONTENT-AI-ENTRY-V1: AI 결과를 form state 로 주입 (READ/COPY 본문 자동 채움)
+  const handleAiInsert = ({ html, title: aiTitle }: { html: string; title: string; sourceUrl?: string }) => {
+    const finalTitle = (aiTitle || '').trim() || extractTitleFromHtml(html);
+    if (finalTitle && !title.trim()) {
+      setTitle(finalTitle);
+    }
+    setBody(html);
+  };
 
   // ── Auth guard ──
   useEffect(() => {
@@ -422,18 +440,37 @@ export function ResourceWritePage() {
 
         {/* READ / COPY: 본문 편집기 */}
         {(usageType === 'READ' || usageType === 'COPY') && (
-          <div style={styles.field}>
-            <label style={styles.label}>
-              본문 {usageType === 'COPY' && <span style={styles.required}>*</span>}
-            </label>
-            <RichTextEditor
-              value={body}
-              onChange={(content) => setBody(content.html)}
-              onImageUpload={handleImageUpload}
-              placeholder={usageType === 'COPY' ? '복사해서 활용할 내용을 입력하세요' : '내용을 입력하세요'}
-              minHeight="300px"
-            />
-          </div>
+          <>
+            {/* WO-O4O-CONTENT-AI-ENTRY-V1: AI 보조 배너 — 본문 입력 직전 */}
+            <div style={styles.aiBanner}>
+              <div style={styles.aiBannerText}>
+                <div style={styles.aiBannerTitle}>✨ AI 보조</div>
+                <div style={styles.aiBannerDesc}>
+                  유튜브 URL 또는 콘텐츠 URL로 제목과 본문을 한 번에 생성합니다.
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAiOpen(true)}
+                style={styles.aiBannerBtn}
+              >
+                AI로 만들기
+              </button>
+            </div>
+
+            <div style={styles.field}>
+              <label style={styles.label}>
+                본문 {usageType === 'COPY' && <span style={styles.required}>*</span>}
+              </label>
+              <RichTextEditor
+                value={body}
+                onChange={(content) => setBody(content.html)}
+                onImageUpload={handleImageUpload}
+                placeholder={usageType === 'COPY' ? '복사해서 활용할 내용을 입력하세요' : '내용을 입력하세요'}
+                minHeight="300px"
+              />
+            </div>
+          </>
         )}
 
         {/* Tags — WO-KPA-RESOURCES-TAG-ENTER-INPUT-FIX-V1: Enter/쉼표 확정, Backspace 마지막 칩 삭제 */}
@@ -518,6 +555,21 @@ export function ResourceWritePage() {
           </button>
         </div>
       </div>
+
+      {/* WO-O4O-CONTENT-AI-ENTRY-V1: AI 콘텐츠 생성 모달
+          - editor=null + onInsert 패턴 (LessonModal / ContentWritePage 와 동일)
+          - 결과 HTML 은 setBody → RichTextEditor value prop sync
+          - usage_type READ/COPY 에서만 진입 (본문이 의미 있는 경우) */}
+      <AiContentModal
+        open={aiOpen}
+        onClose={() => setAiOpen(false)}
+        editor={null}
+        onInsert={handleAiInsert}
+        aiRequestHeaders={(() => {
+          const token = getAccessToken();
+          return token ? { Authorization: `Bearer ${token}` } : undefined;
+        })()}
+      />
     </div>
   );
 }
@@ -762,6 +814,43 @@ const styles: Record<string, React.CSSProperties> = {
     border: '1px solid #2563eb',
     borderRadius: 8,
     cursor: 'pointer',
+  },
+  // WO-O4O-CONTENT-AI-ENTRY-V1
+  aiBanner: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+    padding: '12px 14px',
+    marginBottom: 16,
+    background: '#eef2ff',
+    border: '1px solid #c7d2fe',
+    borderRadius: 8,
+  },
+  aiBannerText: {
+    flex: 1,
+    minWidth: 0,
+  },
+  aiBannerTitle: {
+    fontSize: 13,
+    fontWeight: 600,
+    color: '#4338ca',
+    marginBottom: 2,
+  },
+  aiBannerDesc: {
+    fontSize: 12,
+    color: '#6366f1',
+  },
+  aiBannerBtn: {
+    padding: '8px 16px',
+    background: '#4f46e5',
+    color: '#fff',
+    border: 'none',
+    borderRadius: 7,
+    fontSize: 13,
+    fontWeight: 600,
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
   },
 };
 

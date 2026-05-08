@@ -11,13 +11,20 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { RichTextEditor } from '@o4o/content-editor';
+import { RichTextEditor, AiContentModal } from '@o4o/content-editor';
 import { contentApi } from '../../api/content';
 import { useAuth, getAccessToken } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
 // WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1
 import { GuideBlock } from '@o4o/shared-space-ui';
 import { fetchGuidePageContent } from '../../api/guideContent';
+
+// WO-O4O-CONTENT-AI-ENTRY-V1: HTML 첫 heading 추출 (AI title fallback)
+function extractTitleFromHtml(html: string): string {
+  const match = html.match(/<h[1-3][^>]*>([\s\S]*?)<\/h[1-3]>/i);
+  if (!match) return '';
+  return match[1].replace(/<[^>]+>/g, '').trim();
+}
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
@@ -33,6 +40,8 @@ export function ContentWritePage() {
   const [tags, setTags] = useState('');
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
+  // WO-O4O-CONTENT-AI-ENTRY-V1: AI로 만들기 모달
+  const [aiOpen, setAiOpen] = useState(false);
 
   // WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1: content.document.editor guide
   const [guideTitle, setGuideTitle] = useState('콘텐츠를 작성합니다.');
@@ -93,6 +102,17 @@ export function ContentWritePage() {
       navigate('/content', { replace: true });
     }
   }, [isAuthenticated, navigate]);
+
+  // WO-O4O-CONTENT-AI-ENTRY-V1: AI 결과를 form state 로 주입
+  // - LessonModal 의 onInsert 패턴 재사용 (사용자가 비워둔 필드만 자동 채움)
+  // - 본문은 항상 덮어씀 — 사용자가 이후 RichTextEditor 에서 편집 가능
+  const handleAiInsert = ({ html, title: aiTitle }: { html: string; title: string; sourceUrl?: string }) => {
+    const finalTitle = (aiTitle || '').trim() || extractTitleFromHtml(html);
+    if (finalTitle && !title.trim()) {
+      setTitle(finalTitle);
+    }
+    setBody(html);
+  };
 
   const handleSave = async (saveStatus: 'draft' | 'published') => {
     if (!title.trim()) {
@@ -167,6 +187,23 @@ export function ContentWritePage() {
           />
         </div>
 
+        {/* WO-O4O-CONTENT-AI-ENTRY-V1: AI 보조 배너 — 페이지 상단 진입 */}
+        <div style={styles.aiBanner}>
+          <div style={styles.aiBannerText}>
+            <div style={styles.aiBannerTitle}>✨ AI 보조</div>
+            <div style={styles.aiBannerDesc}>
+              유튜브 URL 또는 콘텐츠 URL로 제목과 본문을 한 번에 생성합니다.
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setAiOpen(true)}
+            style={styles.aiBannerBtn}
+          >
+            AI로 만들기
+          </button>
+        </div>
+
         {/* Body — RichTextEditor */}
         <div style={styles.field}>
           <label style={styles.label}>본문</label>
@@ -233,6 +270,21 @@ export function ContentWritePage() {
           </button>
         </div>
       </div>
+
+      {/* WO-O4O-CONTENT-AI-ENTRY-V1: AI 콘텐츠 생성 모달
+          - editor=null + onInsert 패턴 (LessonModal 과 동일)
+          - 결과 HTML 은 setBody → RichTextEditor value prop sync
+          - showCommunitySave / showStoreSave 는 페이지 진입 시 비활성 (RichTextEditor 툴바에 이미 존재) */}
+      <AiContentModal
+        open={aiOpen}
+        onClose={() => setAiOpen(false)}
+        editor={null}
+        onInsert={handleAiInsert}
+        aiRequestHeaders={(() => {
+          const token = getAccessToken();
+          return token ? { Authorization: `Bearer ${token}` } : undefined;
+        })()}
+      />
     </div>
   );
 }
@@ -337,6 +389,43 @@ const styles: Record<string, React.CSSProperties> = {
     border: '1px solid #2563eb',
     borderRadius: 8,
     cursor: 'pointer',
+  },
+  // WO-O4O-CONTENT-AI-ENTRY-V1
+  aiBanner: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+    padding: '12px 14px',
+    marginBottom: 20,
+    background: '#eef2ff',
+    border: '1px solid #c7d2fe',
+    borderRadius: 8,
+  },
+  aiBannerText: {
+    flex: 1,
+    minWidth: 0,
+  },
+  aiBannerTitle: {
+    fontSize: 13,
+    fontWeight: 600,
+    color: '#4338ca',
+    marginBottom: 2,
+  },
+  aiBannerDesc: {
+    fontSize: 12,
+    color: '#6366f1',
+  },
+  aiBannerBtn: {
+    padding: '8px 16px',
+    background: '#4f46e5',
+    color: '#fff',
+    border: 'none',
+    borderRadius: 7,
+    fontSize: 13,
+    fontWeight: 600,
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
   },
 };
 
