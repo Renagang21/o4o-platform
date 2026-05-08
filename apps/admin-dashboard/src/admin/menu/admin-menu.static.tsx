@@ -346,33 +346,6 @@ export const adminMenuStatic: MenuItem[] = [
     ],
   },
 
-  // Glycopharm
-  {
-    id: 'glycopharm',
-    label: 'Glycopharm',
-    icon: <Activity className="w-5 h-5" />,
-    roles: ['admin', 'super_admin'],
-    children: [
-      {
-        id: 'glycopharm-pharmacies',
-        label: 'Pharmacies',
-        icon: <Heart className="w-4 h-4" />,
-        path: '/glycopharm/pharmacies',
-      },
-      {
-        id: 'glycopharm-products',
-        label: 'Products',
-        icon: <Package className="w-4 h-4" />,
-        path: '/glycopharm/products',
-      },
-      {
-        id: 'glycopharm-applications',
-        label: 'Applications',
-        icon: <ClipboardList className="w-4 h-4" />,
-        path: '/admin/service-applications/glycopharm',
-      },
-    ],
-  },
 
 
   // K-Cosmetics
