@@ -79,6 +79,13 @@ interface AiContentModalProps {
    * - 미제공(undefined/false) 시 버튼 미표시
    */
   showStoreSave?: boolean;
+  /**
+   * WO-O4O-AI-LESSON-FLOW-FIX-V1: 헤더/입력 라벨 LMS 문맥 오버라이드.
+   * - 미제공 시 기존 기본값("AI 콘텐츠 정리", "https://example.com/article") 유지
+   * - LMS 레슨 초안 진입처에서 "AI 레슨 초안 만들기" 등으로 명시
+   */
+  headerLabel?: string;
+  urlPlaceholder?: string;
 }
 
 type AiMode = 'customer_rewrite' | 'summary' | 'pop' | 'title_suggest';
@@ -213,7 +220,7 @@ function blocksToHtml(blocks: UrlBlock[]): string {
     .join('\n');
 }
 
-export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeaders, onChannelSave, showCommunitySave, showStoreSave }: AiContentModalProps) {
+export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeaders, onChannelSave, showCommunitySave, showStoreSave, headerLabel, urlPlaceholder }: AiContentModalProps) {
   // 기존 text 모드 상태
   const [input, setInput] = useState('');
   const [mode, setMode] = useState<AiMode>('customer_rewrite');
@@ -610,7 +617,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ fontSize: '18px' }}>✨</span>
-            <span style={{ fontWeight: 600, fontSize: '15px', color: '#111827' }}>AI 콘텐츠 정리</span>
+            <span style={{ fontWeight: 600, fontSize: '15px', color: '#111827' }}>{headerLabel ?? 'AI 콘텐츠 정리'}</span>
           </div>
           <button
             type="button"
@@ -840,7 +847,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
                   type="url"
                   value={urlInput}
                   onChange={(e) => setUrlInput(e.target.value)}
-                  placeholder="https://example.com/article"
+                  placeholder={urlPlaceholder ?? 'https://example.com/article'}
                   style={{
                     width: '100%',
                     padding: '10px 12px',

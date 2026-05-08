@@ -13,6 +13,8 @@ import { GuideBlock } from '@o4o/shared-space-ui';
 // WO-O4O-GUIDE-CONTENT-MANAGEMENT-V1-SCOPED
 import { fetchGuidePageContent } from '../../../api/guideContent';
 import { lmsInstructorApi, Course, Lesson, LessonType, type CourseVisibility } from '../../../api/lms-instructor';
+// WO-O4O-AI-LESSON-FLOW-FIX-V1: AI panel에 instructor Bearer 토큰 명시 주입
+import { getAccessToken } from '../../../contexts/AuthContext';
 import QuizBuilder from './QuizBuilder';
 import AssignmentEditor from './AssignmentEditor';
 import LiveEditor from './LiveEditor';
@@ -468,12 +470,21 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
       </div>
 
       {/* WO-O4O-LMS-LESSON-AI-ASSIST-V1: AI 레슨 초안 모달 — editor=null + onInsert 로 form state 직접 갱신 */}
+      {/* WO-O4O-AI-LESSON-FLOW-FIX-V1:
+          - aiRequestHeaders: instructor Bearer 토큰 명시 주입 → /api/ai/url-to-blocks 401 해결
+          - headerLabel/urlPlaceholder: LMS 문맥 라벨 (다른 진입처는 기본값 유지) */}
       <AiContentModal
         open={aiOpen}
         onClose={() => setAiOpen(false)}
         editor={null}
         onInsert={handleAiInsert}
         showCommunitySave={true}
+        aiRequestHeaders={(() => {
+          const token = getAccessToken();
+          return token ? { Authorization: `Bearer ${token}` } : undefined;
+        })()}
+        headerLabel="AI 레슨 초안 만들기"
+        urlPlaceholder="https://www.youtube.com/watch?v=..."
       />
     </div>
   );
