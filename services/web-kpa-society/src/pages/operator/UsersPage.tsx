@@ -10,7 +10,6 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Users,
   Search,
@@ -30,7 +29,7 @@ import {
   EyeOff,
   Sparkles,
 } from 'lucide-react';
-import { ActionBar, BulkResultModal, RowActionMenu } from '@o4o/ui';
+import { ActionBar, BulkResultModal, RowActionMenu, BaseDetailDrawer } from '@o4o/ui';
 import { DataTable, useBatchAction, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { authClient } from '../../contexts/AuthContext';
@@ -276,7 +275,6 @@ function PasswordModal({ user, onClose, onSuccess }: { user: UserData; onClose: 
 // ─── Main Component ──────────────────────────────────────────
 
 export default function UsersPage() {
-  const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>('all');
   const [users, setUsers] = useState<UserData[]>([]);
   const [pagination, setPagination] = useState<PaginationData>({ page: 1, limit: 20, total: 0, totalPages: 0 });
@@ -288,6 +286,7 @@ export default function UsersPage() {
   const [passwordUser, setPasswordUser] = useState<UserData | null>(null);
   const [editUser, setEditUser] = useState<UserData | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
   const batch = useBatchAction();
 
   // V3: AI summary state
@@ -797,7 +796,7 @@ export default function UsersPage() {
             ? '가입 신청이 없습니다.'
             : '등록된 사용자가 없습니다.'
         }
-        onRowClick={(row) => navigate(`/operator/users/${row.id}`)}
+        onRowClick={(row) => setSelectedUser(row)}
         tableId="kpa-users"
         selectable
         selectedKeys={selectedIds}
@@ -842,6 +841,111 @@ export default function UsersPage() {
           onSuccess={() => { fetchUsers(pagination.page); }}
         />
       )}
+
+      {/* 회원 상세 Drawer */}
+      <BaseDetailDrawer
+        open={!!selectedUser}
+        onClose={() => setSelectedUser(null)}
+        title={selectedUser ? getUserName(selectedUser) : ''}
+        width={520}
+        actions={selectedUser ? [
+          ...(selectedUser.status === 'pending' || selectedUser.status === 'rejected' ? [{
+            label: '승인',
+            onClick: () => { handleStatusChange(selectedUser.id, 'approved').then(() => setSelectedUser(null)); },
+            variant: 'primary' as const,
+            loading: actionLoading === selectedUser.id,
+            disabled: actionLoading === selectedUser.id,
+          }] : []),
+          ...(selectedUser.status === 'pending' ? [{
+            label: '거부',
+            onClick: () => { handleStatusChange(selectedUser.id, 'rejected').then(() => setSelectedUser(null)); },
+            variant: 'danger' as const,
+            loading: actionLoading === selectedUser.id,
+            disabled: actionLoading === selectedUser.id,
+          }] : []),
+          ...(selectedUser.status === 'active' || selectedUser.status === 'approved' ? [{
+            label: '정지',
+            onClick: () => { handleStatusChange(selectedUser.id, 'suspended').then(() => setSelectedUser(null)); },
+            variant: 'danger' as const,
+            loading: actionLoading === selectedUser.id,
+            disabled: actionLoading === selectedUser.id,
+          }] : []),
+          ...(selectedUser.status === 'suspended' ? [{
+            label: '활성화',
+            onClick: () => { handleStatusChange(selectedUser.id, 'approved').then(() => setSelectedUser(null)); },
+            variant: 'primary' as const,
+            loading: actionLoading === selectedUser.id,
+            disabled: actionLoading === selectedUser.id,
+          }] : []),
+        ] : []}
+      >
+        {selectedUser && (
+          <div style={{ fontSize: 14, color: '#374151' }}>
+            {/* 기본 정보 */}
+            <div style={{ padding: '12px 16px', backgroundColor: '#f8fafc', borderRadius: '8px', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+                <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: 16, color: '#475569', flexShrink: 0 }}>
+                  {getUserName(selectedUser).charAt(0)}
+                </div>
+                <div>
+                  <p style={{ fontWeight: 600, fontSize: 15, color: '#1e293b', marginBottom: 2 }}>{getUserName(selectedUser)}</p>
+                  <p style={{ fontSize: 13, color: '#64748b' }}>{selectedUser.email}</p>
+                </div>
+                <div style={{ marginLeft: 'auto' }}>
+                  <StatusBadge status={selectedUser.status} />
+                </div>
+              </div>
+            </div>
+
+            {/* 상세 필드 */}
+            {[
+              { label: '역할', value: getRoleLabel(selectedUser) },
+              selectedUser.phone ? { label: '연락처', value: selectedUser.phone } : null,
+              selectedUser.company ? { label: '소속', value: selectedUser.company } : null,
+              { label: '가입일', value: new Date(selectedUser.createdAt).toLocaleDateString('ko-KR') },
+            ].filter(Boolean).map((item: any) => (
+              <div key={item.label} style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
+                <span style={{ fontWeight: 600, color: '#64748b', minWidth: 60 }}>{item.label}</span>
+                <span style={{ color: '#1e293b' }}>{item.value}</span>
+              </div>
+            ))}
+
+            {/* 서비스 멤버십 */}
+            {selectedUser.memberships && selectedUser.memberships.length > 0 && (
+              <div style={{ marginTop: 12 }}>
+                <p style={{ fontWeight: 600, color: '#64748b', marginBottom: 6 }}>서비스 멤버십</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                  {selectedUser.memberships.map((m) => (
+                    <span
+                      key={m.id}
+                      style={{
+                        padding: '3px 10px',
+                        borderRadius: 12,
+                        fontSize: 12,
+                        fontWeight: 500,
+                        background: m.status === 'active' ? '#eff6ff' : m.status === 'pending' ? '#fffbeb' : '#f1f5f9',
+                        color: m.status === 'active' ? '#1d4ed8' : m.status === 'pending' ? '#92400e' : '#64748b',
+                      }}
+                    >
+                      {SERVICE_LABELS[m.serviceKey] || m.serviceKey} · {m.status}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 상세 페이지 링크 */}
+            <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid #f1f5f9' }}>
+              <a
+                href={`/operator/users/${selectedUser.id}`}
+                style={{ fontSize: 13, color: '#2563eb', textDecoration: 'none' }}
+              >
+                전체 상세 페이지 →
+              </a>
+            </div>
+          </div>
+        )}
+      </BaseDetailDrawer>
     </div>
   );
 }

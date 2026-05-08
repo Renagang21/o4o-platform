@@ -25,7 +25,7 @@ import {
   AlertTriangle,
   ShieldAlert,
 } from 'lucide-react';
-import { DataTable, RowActionMenu, ConfirmActionDialog } from '@o4o/ui';
+import { DataTable, RowActionMenu, ConfirmActionDialog, BaseDetailDrawer } from '@o4o/ui';
 import type { Column } from '@o4o/ui';
 import { MemberListLayout, StatusBadge, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
 import type { MemberTab } from '@o4o/operator-ux-core';
@@ -420,6 +420,7 @@ export default function MemberManagementPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [editTarget, setEditTarget] = useState<KpaMember | null>(null);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+  const [selectedMember, setSelectedMember] = useState<KpaMember | null>(null);
 
   // Stats fetch (application stats only — member counts are fetched in fetchMembers)
   useEffect(() => {
@@ -661,6 +662,7 @@ export default function MemberManagementPage() {
               rowKey="id"
               loading={memberLoading}
               emptyText="회원이 없습니다."
+              onRowClick={(m) => setSelectedMember(m)}
               pagination={{
                 current: memberPage,
                 pageSize: 20,
@@ -689,6 +691,96 @@ export default function MemberManagementPage() {
           onDeleted={() => fetchMembers(memberPage)}
         />
       )}
+
+      {/* 회원 상세 Drawer */}
+      <BaseDetailDrawer
+        open={!!selectedMember}
+        onClose={() => setSelectedMember(null)}
+        title={selectedMember ? (selectedMember.user?.name || '-') : ''}
+        width={520}
+        actions={selectedMember ? [
+          ...(selectedMember.status === 'pending' ? [
+            {
+              label: '승인',
+              onClick: () => { handleStatusChange(selectedMember.id, 'active').then(() => setSelectedMember(null)); },
+              variant: 'primary' as const,
+              loading: actionLoading === selectedMember.id,
+              disabled: actionLoading === selectedMember.id,
+            },
+            {
+              label: '반려',
+              onClick: () => { handleStatusChange(selectedMember.id, 'rejected').then(() => setSelectedMember(null)); },
+              variant: 'danger' as const,
+              loading: actionLoading === selectedMember.id,
+              disabled: actionLoading === selectedMember.id,
+            },
+          ] : []),
+          ...(selectedMember.status === 'active' ? [{
+            label: '정지',
+            onClick: () => { handleStatusChange(selectedMember.id, 'suspended').then(() => setSelectedMember(null)); },
+            variant: 'danger' as const,
+            loading: actionLoading === selectedMember.id,
+            disabled: actionLoading === selectedMember.id,
+          }] : []),
+          ...(selectedMember.status === 'suspended' ? [{
+            label: '복원',
+            onClick: () => { handleStatusChange(selectedMember.id, 'active').then(() => setSelectedMember(null)); },
+            variant: 'primary' as const,
+            loading: actionLoading === selectedMember.id,
+            disabled: actionLoading === selectedMember.id,
+          }] : []),
+        ] : []}
+      >
+        {selectedMember && (
+          <div style={{ fontSize: 14, color: '#374151' }}>
+            {/* 기본 정보 */}
+            <div style={{ padding: '12px 16px', backgroundColor: '#f8fafc', borderRadius: '8px', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
+                <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: 16, color: '#475569', flexShrink: 0 }}>
+                  {(selectedMember.user?.name || '-').charAt(0)}
+                </div>
+                <div>
+                  <p style={{ fontWeight: 600, fontSize: 15, color: '#1e293b', marginBottom: 2 }}>{selectedMember.user?.name || '-'}</p>
+                  <p style={{ fontSize: 13, color: '#64748b' }}>{selectedMember.user?.email || '-'}</p>
+                </div>
+                <div style={{ marginLeft: 'auto' }}>
+                  <StatusBadge status={selectedMember.status} />
+                </div>
+              </div>
+            </div>
+
+            {/* 상세 필드 */}
+            {([
+              { label: '유형', value: selectedMember.membership_type === 'pharmacist' ? '약사' : '약대생' },
+              { label: '역할', value: roleLabels[selectedMember.role] },
+              selectedMember.license_number ? { label: '면허번호', value: selectedMember.license_number } : null,
+              selectedMember.pharmacy_name ? { label: '약국명', value: selectedMember.pharmacy_name } : null,
+              { label: '가입일', value: formatDate(selectedMember.joined_at || selectedMember.created_at) },
+            ] as ({ label: string; value: string } | null)[]).filter(Boolean).map((item) => (
+              <div key={item!.label} style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
+                <span style={{ fontWeight: 600, color: '#64748b', minWidth: 70 }}>{item!.label}</span>
+                <span style={{ color: '#1e293b' }}>{item!.value}</span>
+              </div>
+            ))}
+
+            {/* 수정/삭제 링크 */}
+            <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid #f1f5f9', display: 'flex', gap: 12 }}>
+              <button
+                onClick={() => { setEditTarget(selectedMember); setSelectedMember(null); }}
+                style={{ fontSize: 13, color: '#2563eb', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+              >
+                정보 수정
+              </button>
+              <button
+                onClick={() => { setDeleteTargetId(selectedMember.id); setSelectedMember(null); }}
+                style={{ fontSize: 13, color: '#dc2626', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+              >
+                삭제
+              </button>
+            </div>
+          </div>
+        )}
+      </BaseDetailDrawer>
     </div>
   );
 }

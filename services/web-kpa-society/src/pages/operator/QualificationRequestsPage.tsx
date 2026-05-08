@@ -6,7 +6,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { FileCheck, Trash2 } from 'lucide-react';
-import { RowActionMenu, ActionBar } from '@o4o/ui';
+import { RowActionMenu, ActionBar, BaseDetailDrawer } from '@o4o/ui';
 import { DataTable, defineActionPolicy, buildRowActions, useBatchAction } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import {
@@ -353,6 +353,7 @@ export default function QualificationRequestsPage() {
         selectable
         selectedKeys={selectedIds}
         onSelectionChange={setSelectedIds}
+        onRowClick={(row) => { setSelectedRequest(row); setReviewNote(''); setSuccess(null); }}
       />
 
       {/* 페이지네이션 */}
@@ -368,14 +369,31 @@ export default function QualificationRequestsPage() {
         </div>
       )}
 
-      {/* 검토 모달 */}
-      {selectedRequest && (
-        <div style={styles.modalOverlay} onClick={() => setSelectedRequest(null)}>
-          <div style={styles.modal} onClick={e => e.stopPropagation()}>
-            <h2 style={styles.modalTitle}>
-              {selectedRequest.status === 'pending' ? '자격 신청 검토' : '자격 신청 상세'}
-            </h2>
-
+      {/* 검토 Drawer */}
+      <BaseDetailDrawer
+        open={!!selectedRequest}
+        onClose={() => { setSelectedRequest(null); setReviewNote(''); }}
+        title={selectedRequest ? (selectedRequest.status === 'pending' ? '자격 신청 검토' : '자격 신청 상세') : ''}
+        width={560}
+        actions={selectedRequest?.status === 'pending' ? [
+          {
+            label: '반려',
+            onClick: () => handleReview('rejected'),
+            variant: 'danger' as const,
+            loading: reviewing,
+            disabled: reviewing,
+          },
+          {
+            label: '승인',
+            onClick: () => handleReview('approved'),
+            variant: 'primary' as const,
+            loading: reviewing,
+            disabled: reviewing,
+          },
+        ] : []}
+      >
+        {selectedRequest && (
+          <div>
             {/* 신청자 정보 */}
             <div style={{ padding: '12px 16px', backgroundColor: '#f8fafc', borderRadius: '8px', marginBottom: '16px' }}>
               <p style={{ fontSize: '12px', fontWeight: 600, color: '#64748b', marginBottom: '6px', textTransform: 'uppercase' as const, letterSpacing: '0.05em' }}>신청자</p>
@@ -418,62 +436,38 @@ export default function QualificationRequestsPage() {
                 ))
             }
 
-            {selectedRequest.status !== 'pending' ? (
-              <>
-                <div style={{ ...styles.formGroup, borderTop: `1px solid ${colors.neutral200}`, paddingTop: '16px', marginTop: '8px' }}>
-                  <div style={styles.detailRow}>
-                    <span style={styles.detailLabel}>검토일</span>
-                    <span style={styles.detailValue}>
-                      {selectedRequest.reviewed_at
-                        ? new Date(selectedRequest.reviewed_at).toLocaleDateString('ko-KR')
-                        : '-'}
-                    </span>
-                  </div>
-                  <div style={styles.detailRow}>
-                    <span style={styles.detailLabel}>검토 의견</span>
-                    <span style={styles.detailValue}>{selectedRequest.review_note || '-'}</span>
-                  </div>
+            {selectedRequest.status !== 'pending' && (
+              <div style={{ ...styles.formGroup, borderTop: `1px solid ${colors.neutral200}`, paddingTop: '16px', marginTop: '8px' }}>
+                <div style={styles.detailRow}>
+                  <span style={styles.detailLabel}>검토일</span>
+                  <span style={styles.detailValue}>
+                    {selectedRequest.reviewed_at
+                      ? new Date(selectedRequest.reviewed_at).toLocaleDateString('ko-KR')
+                      : '-'}
+                  </span>
                 </div>
-                <div style={styles.modalActions}>
-                  <button style={styles.cancelBtn} onClick={() => setSelectedRequest(null)}>닫기</button>
+                <div style={styles.detailRow}>
+                  <span style={styles.detailLabel}>검토 의견</span>
+                  <span style={styles.detailValue}>{selectedRequest.review_note || '-'}</span>
                 </div>
-              </>
-            ) : (
-              <>
-                <div style={styles.formGroup}>
-                  <label style={styles.label}>검토 의견 (선택)</label>
-                  <textarea
-                    value={reviewNote}
-                    onChange={e => setReviewNote(e.target.value)}
-                    placeholder="승인/반려 사유를 입력해 주세요"
-                    style={styles.textarea}
-                    rows={3}
-                  />
-                </div>
-                <div style={styles.modalActions}>
-                  <button style={styles.cancelBtn} onClick={() => setSelectedRequest(null)}>
-                    취소
-                  </button>
-                  <button
-                    style={{ ...styles.rejectBtn, ...(reviewing ? styles.disabledBtn : {}) }}
-                    onClick={() => handleReview('rejected')}
-                    disabled={reviewing}
-                  >
-                    반려
-                  </button>
-                  <button
-                    style={{ ...styles.approveBtn, ...(reviewing ? styles.disabledBtn : {}) }}
-                    onClick={() => handleReview('approved')}
-                    disabled={reviewing}
-                  >
-                    {reviewing ? '처리 중...' : '승인'}
-                  </button>
-                </div>
-              </>
+              </div>
+            )}
+
+            {selectedRequest.status === 'pending' && (
+              <div style={styles.formGroup}>
+                <label style={styles.label}>검토 의견 (선택)</label>
+                <textarea
+                  value={reviewNote}
+                  onChange={e => setReviewNote(e.target.value)}
+                  placeholder="승인/반려 사유를 입력해 주세요"
+                  style={styles.textarea}
+                  rows={3}
+                />
+              </div>
             )}
           </div>
-        </div>
-      )}
+        )}
+      </BaseDetailDrawer>
     </div>
   );
 }
@@ -489,18 +483,10 @@ const styles: Record<string, React.CSSProperties> = {
   pagination: { display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '16px', marginTop: '20px' },
   pageBtn: { padding: '8px 16px', fontSize: '14px', border: `1px solid ${colors.neutral300}`, borderRadius: '6px', cursor: 'pointer', backgroundColor: colors.white },
   pageInfo: { fontSize: '14px', color: colors.neutral600 },
-  modalOverlay: { position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 },
-  modal: { backgroundColor: colors.white, borderRadius: '12px', padding: '28px', width: '480px', maxWidth: '90vw', maxHeight: '80vh', overflowY: 'auto' as const },
-  modalTitle: { fontSize: '18px', fontWeight: 700, color: colors.neutral900, marginBottom: '20px' },
   detailRow: { display: 'flex', gap: '12px', marginBottom: '12px', fontSize: '14px' },
   detailLabel: { fontWeight: 600, color: colors.neutral600, minWidth: '80px' },
   detailValue: { color: colors.neutral700, flex: 1, whiteSpace: 'pre-wrap' as const },
   formGroup: { marginTop: '16px' },
   label: { display: 'block', fontSize: '14px', fontWeight: 500, color: colors.neutral700, marginBottom: '6px' },
   textarea: { width: '100%', padding: '10px 12px', fontSize: '14px', border: `1px solid ${colors.neutral300}`, borderRadius: '6px', resize: 'vertical' as const, boxSizing: 'border-box' as const },
-  modalActions: { display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px' },
-  cancelBtn: { padding: '9px 18px', fontSize: '14px', color: colors.neutral600, backgroundColor: colors.neutral100, border: 'none', borderRadius: '6px', cursor: 'pointer' },
-  rejectBtn: { padding: '9px 18px', fontSize: '14px', fontWeight: 500, color: colors.white, backgroundColor: '#ef4444', border: 'none', borderRadius: '6px', cursor: 'pointer' },
-  approveBtn: { padding: '9px 18px', fontSize: '14px', fontWeight: 500, color: colors.white, backgroundColor: '#10b981', border: 'none', borderRadius: '6px', cursor: 'pointer' },
-  disabledBtn: { opacity: 0.6, cursor: 'not-allowed' },
 };
