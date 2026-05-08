@@ -53,10 +53,15 @@ function parseBlocks(contentJson: Record<string, unknown>): ContentBlock[] {
         return { type: 'image' as const, value: b.attributes?.url || b.url || '' };
       }
       if (b.type === 'o4o/list' || b.type === 'list') {
-        return { type: 'list' as const, value: '', items: b.items || [] };
+        // items는 b.items 또는 b.content.items (htmlToForumBlocks 저장 형식)
+        const items = Array.isArray(b.items) ? b.items
+          : (b.content && Array.isArray(b.content.items) ? b.content.items : []);
+        return { type: 'list' as const, value: '', items };
       }
       // o4o/paragraph, o4o/heading, text 등 텍스트 계열
-      return { type: 'text' as const, value: b.content || b.text || b.value || '' };
+      // content가 객체인 경우(content.items 등) 무시하고 빈 문자열
+      const textVal = typeof b.content === 'string' ? b.content : (b.text || b.value || '');
+      return { type: 'text' as const, value: textVal };
     });
   }
   if (Array.isArray(contentJson.blocks)) {
