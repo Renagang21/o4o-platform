@@ -375,40 +375,6 @@ export const adminMenuStatic: MenuItem[] = [
     ],
   },
 
-  // Neture
-  {
-    id: 'neture',
-    label: 'Neture',
-    icon: <Package className="w-5 h-5" />,
-    roles: ['admin', 'super_admin'],
-    children: [
-      {
-        id: 'neture-products',
-        label: 'Products',
-        icon: <Package className="w-4 h-4" />,
-        path: '/neture/products',
-      },
-      {
-        id: 'neture-approvals',
-        label: 'Product Approvals',
-        icon: <ClipboardList className="w-4 h-4" />,
-        path: '/neture/approvals',
-      },
-      {
-        id: 'neture-suppliers',
-        label: 'Suppliers',
-        icon: <Package className="w-4 h-4" />,
-        path: '/neture/suppliers',
-      },
-      {
-        id: 'neture-partners',
-        label: 'Partners',
-        icon: <Users className="w-4 h-4" />,
-        path: '/neture/partners',
-      },
-    ],
-  },
-
   // Digital Signage
   {
     id: 'digital-signage',
