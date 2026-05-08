@@ -64,7 +64,7 @@ export interface MenuItem {
  * +-- CMS
  * +-- AppStore
  * +-- Forum
- * +-- Services (Yaksa, Glycopharm, GlucoseView, K-Cosmetics, Neture, Signage)
+ * +-- Services (Yaksa, K-Cosmetics, Neture, Signage)
  * +-- Insights (Ops Metrics, Content Manager, Reports)
  */
 export const adminMenuStatic: MenuItem[] = [
