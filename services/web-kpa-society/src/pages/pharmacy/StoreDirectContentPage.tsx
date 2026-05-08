@@ -42,6 +42,23 @@ type ContentBlock = {
 };
 
 function parseBlocks(contentJson: Record<string, unknown>): ContentBlock[] {
+  // contentJson이 배열인 경우 (o4o/youtube, o4o/paragraph 등 직접 블록 배열)
+  if (Array.isArray(contentJson)) {
+    return (contentJson as any[]).map((b) => {
+      if (b.type === 'o4o/youtube' || b.type === 'o4o/video') {
+        const url = b.attributes?.url || b.url || '';
+        return { type: 'link' as const, value: url, label: '▶ YouTube 영상 보기' };
+      }
+      if (b.type === 'o4o/image' || b.type === 'image') {
+        return { type: 'image' as const, value: b.attributes?.url || b.url || '' };
+      }
+      if (b.type === 'o4o/list' || b.type === 'list') {
+        return { type: 'list' as const, value: '', items: b.items || [] };
+      }
+      // o4o/paragraph, o4o/heading, text 등 텍스트 계열
+      return { type: 'text' as const, value: b.content || b.text || b.value || '' };
+    });
+  }
   if (Array.isArray(contentJson.blocks)) {
     return (contentJson.blocks as any[]).map((b) => {
       if ('content' in b && !('value' in b)) return { type: b.type === 'text' ? 'text' : b.type, value: b.content || '' } as ContentBlock;
