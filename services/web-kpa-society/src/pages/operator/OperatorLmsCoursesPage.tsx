@@ -18,7 +18,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, RefreshCw, AlertCircle, Search, Loader2, Archive, EyeOff, Trash2, Check, X } from 'lucide-react';
-import { ActionBar, BulkResultModal, RowActionMenu } from '@o4o/ui';
+import { ActionBar, BulkResultModal, RowActionMenu, BaseDetailDrawer } from '@o4o/ui';
 import { DataTable, Pagination, defineActionPolicy, buildRowActions, useBatchAction } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { lmsApi } from '../../api';
@@ -136,6 +136,7 @@ export default function OperatorLmsCoursesPage() {
     { open: false, course: null, reason: '', submitting: false },
   );
   const batch = useBatchAction();
+  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const PAGE_SIZE = 20;
 
   const fetchCourses = useCallback(async () => {
@@ -568,6 +569,7 @@ export default function OperatorLmsCoursesPage() {
             selectable
             selectedKeys={selectedIds}
             onSelectionChange={setSelectedIds}
+            onRowClick={(row) => setSelectedCourse(row)}
           />
           {total > PAGE_SIZE && (
             <Pagination
@@ -586,6 +588,40 @@ export default function OperatorLmsCoursesPage() {
         result={batch.result}
         onRetry={() => batch.retryFailed()}
       />
+
+      {/* 강의 상세 Drawer */}
+      <BaseDetailDrawer
+        open={!!selectedCourse}
+        onClose={() => setSelectedCourse(null)}
+        title={selectedCourse?.title ?? ''}
+        width={520}
+      >
+        {selectedCourse && (
+          <div style={{ fontSize: 14, color: '#374151' }}>
+            {[
+              { label: '강사', value: (selectedCourse as any).instructor?.name || selectedCourse.instructorName || '-' },
+              { label: '유형', value: selectedCourse.category || '-' },
+              { label: '레슨 수', value: `${selectedCourse.lessonCount ?? 0}개` },
+              { label: '상태', value: STATUS_CONFIG[selectedCourse.status]?.text || selectedCourse.status },
+              { label: '등록일', value: formatDate(selectedCourse.createdAt) },
+              { label: '수정일', value: formatDate((selectedCourse as any).updatedAt || '') },
+            ].map((item) => (
+              <div key={item.label} style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
+                <span style={{ fontWeight: 600, color: '#64748b', minWidth: 70, flexShrink: 0 }}>{item.label}</span>
+                <span style={{ color: '#1e293b' }}>{item.value}</span>
+              </div>
+            ))}
+            <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid #e2e8f0' }}>
+              <a
+                href={`/lms/course/${selectedCourse.id}`}
+                style={{ fontSize: 13, color: '#2563eb', textDecoration: 'none' }}
+              >
+                편집 페이지 이동 →
+              </a>
+            </div>
+          </div>
+        )}
+      </BaseDetailDrawer>
 
       {/* WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1: 반려 사유 입력 modal */}
       {rejectModal.open && rejectModal.course && (

@@ -29,7 +29,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 // WO-KPA-OPERATOR-RESOURCES-TABLE-STANDARD-COMPLIANCE-V1: ActionBar 추가
-import { RowActionMenu, ActionBar } from '@o4o/ui';
+import { RowActionMenu, ActionBar, BaseDetailDrawer } from '@o4o/ui';
 import {
   DataTable,
   Pagination,
@@ -134,6 +134,7 @@ export default function OperatorResourcesPage() {
   // WO-KPA-OPERATOR-RESOURCES-TABLE-STANDARD-COMPLIANCE-V1: 선택 상태
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<ResourceItem | null>(null);
 
   const fetchItems = useCallback(async () => {
     setLoading(true);
@@ -597,6 +598,7 @@ export default function OperatorResourcesPage() {
             selectable
             selectedKeys={selectedIds}
             onSelectionChange={setSelectedIds}
+            onRowClick={(row) => setSelectedItem(row)}
           />
           {total > PAGE_SIZE && (
             <Pagination
@@ -608,6 +610,42 @@ export default function OperatorResourcesPage() {
           )}
         </>
       )}
+      {/* 자료 상세 Drawer */}
+      <BaseDetailDrawer
+        open={!!selectedItem}
+        onClose={() => setSelectedItem(null)}
+        title={selectedItem?.title ?? ''}
+        width={520}
+      >
+        {selectedItem && (
+          <div style={{ fontSize: 14, color: '#374151' }}>
+            {selectedItem.summary && (
+              <p style={{ fontSize: 13, color: '#64748b', marginBottom: 16 }}>{selectedItem.summary}</p>
+            )}
+            {[
+              { label: '유형', value: SOURCE_CONFIG[selectedItem.source_type]?.text || selectedItem.source_type },
+              { label: '활용방식', value: USAGE_CONFIG[selectedItem.usage_type as string]?.text || (selectedItem.usage_type as string) || '-' },
+              { label: '상태', value: STATUS_CONFIG[selectedItem.status]?.text || selectedItem.status },
+              { label: '작성자', value: selectedItem.author_name || '-' },
+              { label: '조회수', value: String(selectedItem.view_count ?? 0) },
+              { label: '등록일', value: formatDate(selectedItem.created_at) },
+            ].map((item) => (
+              <div key={item.label} style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
+                <span style={{ fontWeight: 600, color: '#64748b', minWidth: 70, flexShrink: 0 }}>{item.label}</span>
+                <span style={{ color: '#1e293b' }}>{item.value}</span>
+              </div>
+            ))}
+            <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid #e2e8f0' }}>
+              <a
+                href={`/resources/${selectedItem.id}`}
+                style={{ fontSize: 13, color: '#2563eb', textDecoration: 'none' }}
+              >
+                상세 페이지 이동 →
+              </a>
+            </div>
+          </div>
+        )}
+      </BaseDetailDrawer>
     </div>
   );
 }

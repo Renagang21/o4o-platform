@@ -30,7 +30,7 @@ import {
   Search,
   Archive,
 } from 'lucide-react';
-import { ActionBar, BulkResultModal, RowActionMenu } from '@o4o/ui';
+import { ActionBar, BulkResultModal, RowActionMenu, BaseDetailDrawer } from '@o4o/ui';
 import { DataTable, useBatchAction, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { getAccessToken } from '../../contexts/AuthContext';
@@ -308,6 +308,7 @@ function ContentList({
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const batch = useBatchAction();
+  const [selectedContent, setSelectedContent] = useState<CmsContent | null>(null);
   const limit = 20;
 
   const fetchItems = useCallback(async () => {
@@ -691,6 +692,7 @@ function ContentList({
         selectable
         selectedKeys={selectedIds}
         onSelectionChange={setSelectedIds}
+        onRowClick={(row) => setSelectedContent(row)}
       />
 
       {/* Pagination */}
@@ -713,6 +715,40 @@ function ContentList({
           </button>
         </div>
       )}
+
+      {/* 콘텐츠 상세 Drawer */}
+      <BaseDetailDrawer
+        open={!!selectedContent}
+        onClose={() => setSelectedContent(null)}
+        title={selectedContent?.title ?? ''}
+        width={520}
+        actions={selectedContent && selectedContent.status !== 'archived' ? [
+          {
+            label: '수정',
+            onClick: () => { onEdit(selectedContent!); setSelectedContent(null); },
+            variant: 'primary' as const,
+          },
+        ] : []}
+      >
+        {selectedContent && (
+          <div style={{ fontSize: 14, color: '#374151' }}>
+            {selectedContent.summary && (
+              <p style={{ fontSize: 13, color: '#64748b', marginBottom: 16 }}>{selectedContent.summary}</p>
+            )}
+            {[
+              { label: '유형', value: typeConfig[selectedContent.type].label },
+              { label: '상태', value: statusConfig[selectedContent.status].label },
+              { label: '작성일', value: formatDate(selectedContent.createdAt) },
+              { label: '게시일', value: formatDate(selectedContent.publishedAt) },
+            ].map((item) => (
+              <div key={item.label} style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
+                <span style={{ fontWeight: 600, color: '#64748b', minWidth: 70, flexShrink: 0 }}>{item.label}</span>
+                <span style={{ color: '#1e293b' }}>{item.value}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </BaseDetailDrawer>
     </div>
   );
 }
