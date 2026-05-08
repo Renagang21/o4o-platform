@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { toast, parseApiError } from '@o4o/error-handling';
 import { ContentRenderer } from '@o4o/content-editor';
-import { ActionBar, ConfirmActionDialog, RowActionMenu } from '@o4o/ui';
+import { ActionBar, BaseDetailDrawer, RowActionMenu } from '@o4o/ui';
 import { DataTable, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import {
@@ -170,6 +170,7 @@ function TagsPreviewModal({
 // WO-NETURE-OPERATOR-PRODUCT-APPROVAL-ACTION-V1: 행별 승인/반려 액션 정책
 // - 대상: offer-level approvalStatus (PENDING/APPROVED/REJECTED). 화면 badge와 일치
 // - 행별/Bulk 모두 offer-level operatorProductApi 사용 (WO-O4O-NETURE-OPERATOR-PRODUCT-API-SCOPE-FIX-V1)
+// WO-O4O-NETURE-OPERATOR-CANONICAL-INTERACTION-V1: delete 추가 → RowActionMenu
 const productApprovalActionPolicy = defineActionPolicy<AllRegisteredOffer>('neture:all-products-approval', {
   inlineMax: 2,
   rules: [
@@ -198,12 +199,25 @@ const productApprovalActionPolicy = defineActionPolicy<AllRegisteredOffer>('netu
         reasonPlaceholder: '반려 사유를 입력하세요 (선택)',
       }),
     },
+    {
+      key: 'delete',
+      label: '삭제',
+      variant: 'danger',
+      visible: () => true,
+      confirm: (row) => ({
+        title: '상품 삭제 확인',
+        message: `"${row.name || '상품'}"을 삭제합니다. (휴지통으로 이동)`,
+        variant: 'danger',
+        confirmText: '삭제',
+      }),
+    },
   ],
 });
 
 const PRODUCT_APPROVAL_ACTION_ICONS: Record<string, React.ReactNode> = {
   approve: <CheckCircle className="w-4 h-4" />,
   reject: <XCircle className="w-4 h-4" />,
+  delete: <Trash2 className="w-4 h-4" />,
 };
 
 export default function AllRegisteredProductsPage() {
@@ -218,7 +232,6 @@ export default function AllRegisteredProductsPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [total, setTotal] = useState(0);
-  const [detailOffer, setDetailOffer] = useState<AllRegisteredOffer | null>(null);
   // WO-NETURE-OPERATOR-PRODUCT-LIST-DESCRIPTION-COLUMNS-APPLY-V1
   const [shortPreviewOffer, setShortPreviewOffer] = useState<AllRegisteredOffer | null>(null);
   const [detailPreviewOffer, setDetailPreviewOffer] = useState<AllRegisteredOffer | null>(null);
@@ -232,8 +245,8 @@ export default function AllRegisteredProductsPage() {
   // WO-NETURE-OPERATOR-APPROVAL-LIST-SELECTION-ACTION-BAR-V1: Selection state
   const [selectedOfferIds, setSelectedOfferIds] = useState<Set<string>>(new Set());
   const [actionLoading, setActionLoading] = useState(false);
-  const [deleteLoading, setDeleteLoading] = useState(false);
-  const [showDetailDeleteConfirm, setShowDetailDeleteConfirm] = useState(false);
+  // WO-O4O-NETURE-OPERATOR-CANONICAL-INTERACTION-V1: canonical drawer
+  const [detailOffer, setDetailOffer] = useState<AllRegisteredOffer | null>(null);
 
   const PAGE_SIZE = 50;
 
@@ -304,35 +317,7 @@ export default function AllRegisteredProductsPage() {
   const displayOffers = filteredOffers;
 
   // WO-NETURE-OPERATOR-APPROVAL-LIST-SELECTION-ACTION-BAR-V1
-  // 선택 가능한 offer = 모든 offer (승인/거절은 내부에서 pending 필터, 삭제는 전체 대상)
-  // WO-NETURE-OPERATOR-PRODUCT-APPROVAL-ACTION-V1 (보정): pending 판정을 offer-level로 통일
-  const isSelectable = (_o: AllRegisteredOffer) => true;
   const hasPendingApproval = (o: AllRegisteredOffer) => o.approvalStatus === 'PENDING';
-
-  const selectableIds = useMemo(
-    () => displayOffers.filter(isSelectable).map((o) => o.id),
-    [displayOffers],
-  );
-
-  const allSelected = selectableIds.length > 0 && selectableIds.every((id) => selectedOfferIds.has(id));
-  const someSelected = selectableIds.some((id) => selectedOfferIds.has(id));
-
-  const toggleSelectAll = () => {
-    if (allSelected) {
-      setSelectedOfferIds(new Set());
-    } else {
-      setSelectedOfferIds(new Set(selectableIds));
-    }
-  };
-
-  const toggleSelectOne = (id: string) => {
-    setSelectedOfferIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
 
   // Reset selection on filter/page change
   useEffect(() => {
@@ -348,6 +333,23 @@ export default function AllRegisteredProductsPage() {
       if (o.approvalStatus === 'PENDING') ids.push(o.id);
     }
     return ids;
+  };
+
+  // WO-O4O-NETURE-OPERATOR-CANONICAL-INTERACTION-V1: row-level delete → RowActionMenu
+  const handleRowDelete = async (offer: AllRegisteredOffer) => {
+    setActionLoading(true);
+    try {
+      const result = await productCleanupApi.softDelete(offer.id);
+      if (result.success) {
+        toast.success(`"${offer.name || '상품'}" 삭제되었습니다 (휴지통)`);
+        setDetailOffer(null);
+        await fetchOffers(page);
+      } else {
+        toast.error(`삭제 실패: ${result.error || '알 수 없는 오류'}`);
+      }
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   const handleBulkDelete = async () => {
@@ -476,42 +478,10 @@ export default function AllRegisteredProductsPage() {
     }
   };
 
-  // ─── Column definitions (WO-O4O-NETURE-OPERATOR-PRODUCTS-LIST-MIGRATE-TO-BASETABLE-V1) ───
-  // selectedOfferIds / allSelected / someSelected 변경 시 헤더 체크박스가 함께 갱신되도록 deps에 포함.
+  // ─── Column definitions (WO-O4O-NETURE-OPERATOR-CANONICAL-INTERACTION-V1) ───
+  // WO-O4O-NETURE-OPERATOR-PRODUCTS-LIST-MIGRATE-TO-BASETABLE-V1
+  // DataTable selectable prop handles checkbox — no manual _select column needed
   const columns = useMemo<ListColumnDef<AllRegisteredOffer>[]>(() => [
-    {
-      key: '_select',
-      header: (
-        <input
-          type="checkbox"
-          checked={allSelected}
-          ref={(el) => { if (el) el.indeterminate = !allSelected && someSelected; }}
-          onChange={toggleSelectAll}
-          disabled={selectableIds.length === 0}
-          className="w-4 h-4 accent-blue-600 cursor-pointer disabled:opacity-30"
-          onClick={(e) => e.stopPropagation()}
-        />
-      ),
-      width: '40px',
-      align: 'center',
-      system: true,
-      sticky: true,
-      onCellClick: () => { /* swallow row click */ },
-      render: (_v, row) => {
-        const canSelect = isSelectable(row);
-        return (
-          <input
-            type="checkbox"
-            checked={selectedOfferIds.has(row.id)}
-            onChange={(e) => { e.stopPropagation(); toggleSelectOne(row.id); }}
-            onClick={(e) => e.stopPropagation()}
-            disabled={!canSelect}
-            className="w-4 h-4 accent-blue-600 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
-            title={canSelect ? '' : '승인 대기 항목만 선택 가능'}
-          />
-        );
-      },
-    },
     {
       key: '_image',
       header: '',
@@ -697,7 +667,8 @@ export default function AllRegisteredProductsPage() {
         );
       },
     },
-    // WO-NETURE-OPERATOR-PRODUCT-APPROVAL-ACTION-V1: 행별 승인/반려 메뉴
+    // WO-NETURE-OPERATOR-PRODUCT-APPROVAL-ACTION-V1: 행별 승인/반려/삭제 메뉴
+    // WO-O4O-NETURE-OPERATOR-CANONICAL-INTERACTION-V1: delete added as destructive action
     {
       key: '_actions',
       header: '',
@@ -713,13 +684,14 @@ export default function AllRegisteredProductsPage() {
             {
               approve: () => handleRowApprove(row),
               reject: (reason?: string) => handleRowReject(row, reason),
+              delete: () => handleRowDelete(row),
             },
             { icons: PRODUCT_APPROVAL_ACTION_ICONS },
           )}
         />
       ),
     },
-  ], [selectedOfferIds, allSelected, someSelected, selectableIds.length]);
+  ], []);
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
@@ -1004,6 +976,9 @@ export default function AllRegisteredProductsPage() {
           reorderable
           persistState
           columnVisibility
+          selectable
+          selectedKeys={selectedOfferIds}
+          onSelectionChange={setSelectedOfferIds}
         />
 
         {/* Pagination */}
@@ -1055,111 +1030,61 @@ export default function AllRegisteredProductsPage() {
         />
       )}
 
-      {/* Detail Panel (right slide) */}
-      {detailOffer && (
-        <div className="fixed inset-0 z-50 flex justify-end">
-          <div className="absolute inset-0 bg-black/30" onClick={() => setDetailOffer(null)} />
-          <div className="relative w-full max-w-md bg-white shadow-xl overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-slate-900">상품 상세</h2>
-              <button onClick={() => setDetailOffer(null)} className="p-1 rounded hover:bg-slate-100"><X className="w-5 h-5" /></button>
-            </div>
-            <div className="px-6 py-4 space-y-4">
-              {/* Image */}
-              {detailOffer.primaryImageUrl ? (
-                <img src={detailOffer.primaryImageUrl} alt="" className="w-full h-48 rounded-lg object-cover bg-slate-100" />
-              ) : (
-                <div className="w-full h-48 rounded-lg bg-slate-100 flex items-center justify-center">
-                  <Package className="w-12 h-12 text-slate-300" />
-                </div>
-              )}
-              {/* Info */}
-              <div>
-                <h3 className="text-lg font-bold text-slate-900">{detailOffer.name}</h3>
-                <p className="text-sm text-slate-500 mt-1">{detailOffer.barcode || detailOffer.id}</p>
-              </div>
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <DetailCard label="공급자" value={detailOffer.supplierName || '-'} />
-                <DetailCard label="공급자 상태" value={detailOffer.supplierStatus || '-'} />
-                <DetailCard label="활성 상태" value={detailOffer.isActive ? '활성' : '비활성'} />
-                <DetailCard label="유통 타입" value={DISTRIBUTION_TYPE_LABELS[detailOffer.distributionType] || detailOffer.distributionType || '-'} />
-                <DetailCard label="공급가" value={detailOffer.priceGeneral ? `₩${detailOffer.priceGeneral.toLocaleString()}` : '-'} />
-                <DetailCard label="소비자가" value={detailOffer.consumerReferencePrice ? `₩${detailOffer.consumerReferencePrice.toLocaleString()}` : '-'} />
-                <DetailCard label="승인 상태" value={getApprovalStatusBadge(detailOffer.approvalStatus).label} />
-                <DetailCard label="카테고리" value={detailOffer.categoryName || '-'} />
-                <DetailCard label="규제 유형" value={detailOffer.regulatoryType ? (REGULATORY_TYPE_LABELS[detailOffer.regulatoryType] || detailOffer.regulatoryType) : '-'} />
-                {detailOffer.brandName && <DetailCard label="브랜드" value={detailOffer.brandName} />}
-                {detailOffer.specification && <DetailCard label="규격" value={detailOffer.specification} />}
-              </div>
-              {/* Service Approvals */}
-              {detailOffer.serviceApprovals && detailOffer.serviceApprovals.length > 0 && (
-                <div className="bg-slate-50 rounded-lg p-3">
-                  <p className="text-xs text-slate-500 mb-2">서비스 승인 현황</p>
-                  <div className="space-y-1.5">
-                    {detailOffer.serviceApprovals.map((sa, i) => (
-                      <div key={i} className="flex items-center justify-between text-sm">
-                        <span className="text-slate-700">{sa.serviceKey}</span>
-                        <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                          sa.status === 'approved' ? 'bg-green-50 text-green-700' :
-                          sa.status === 'rejected' ? 'bg-red-50 text-red-600' :
-                          'bg-amber-50 text-amber-700'
-                        }`}>
-                          {sa.status === 'approved' ? '승인' : sa.status === 'rejected' ? '반려' : '대기'}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {/* Created At */}
-              <div className="bg-slate-50 rounded-lg p-3">
-                <p className="text-xs text-slate-500">등록일</p>
-                <p className="text-sm text-slate-800 mt-0.5">{new Date(detailOffer.createdAt).toLocaleDateString('ko-KR')}</p>
-              </div>
-              {/* Delete */}
-              <div className="pt-2 border-t border-slate-100">
-                <button
-                  disabled={deleteLoading}
-                  onClick={() => setShowDetailDeleteConfirm(true)}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Trash2 className="w-4 h-4" />
-                  상품 삭제 (휴지통)
-                </button>
-              </div>
-
-              {/* Detail Delete Confirm (V4-EXPANSION) */}
-              <ConfirmActionDialog
-                open={showDetailDeleteConfirm}
-                onClose={() => setShowDetailDeleteConfirm(false)}
-                onConfirm={async () => {
-                  setDeleteLoading(true);
-                  try {
-                    const result = await productCleanupApi.softDelete(detailOffer.id);
-                    if (result.success) {
-                      toast.success('상품이 삭제되었습니다 (휴지통으로 이동)');
-                      setShowDetailDeleteConfirm(false);
-                      setDetailOffer(null);
-                      await fetchOffers(page);
-                    } else {
-                      toast.error(`삭제 실패: ${result.error || '알 수 없는 오류'}`);
-                    }
-                  } catch {
-                    toast.error('삭제 중 오류가 발생했습니다');
-                  } finally {
-                    setDeleteLoading(false);
-                  }
-                }}
-                title="상품 삭제 확인"
-                message={`"${detailOffer.name}" 상품을 삭제합니다.\n(휴지통으로 이동)`}
-                confirmText="삭제"
-                variant="danger"
-                loading={deleteLoading}
+      {/* WO-O4O-NETURE-OPERATOR-CANONICAL-INTERACTION-V1: canonical BaseDetailDrawer */}
+      <BaseDetailDrawer
+        open={!!detailOffer}
+        onClose={() => setDetailOffer(null)}
+        title={detailOffer?.name ?? ''}
+        width={520}
+      >
+        {detailOffer && (
+          <div style={{ fontSize: 14, color: '#374151' }}>
+            {/* Image */}
+            {detailOffer.primaryImageUrl ? (
+              <img
+                src={detailOffer.primaryImageUrl}
+                alt=""
+                style={{ width: '100%', height: 160, objectFit: 'cover', borderRadius: 8, marginBottom: 16 }}
               />
-            </div>
+            ) : (
+              <div style={{ width: '100%', height: 120, background: '#f1f5f9', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+                <Package style={{ width: 40, height: 40, color: '#cbd5e1' }} />
+              </div>
+            )}
+            {/* Metadata */}
+            {[
+              { label: '공급사', value: detailOffer.supplierName || '-' },
+              { label: '카테고리', value: detailOffer.categoryName || '-' },
+              { label: '공급가', value: detailOffer.priceGeneral ? `₩${Number(detailOffer.priceGeneral).toLocaleString()}` : '-' },
+              { label: '소비자가', value: detailOffer.consumerReferencePrice ? `₩${Number(detailOffer.consumerReferencePrice).toLocaleString()}` : '-' },
+              { label: '승인 상태', value: getApprovalStatusBadge(detailOffer.approvalStatus).label },
+              { label: '활성', value: detailOffer.isActive ? '활성' : '비활성' },
+              { label: '유통 방식', value: DISTRIBUTION_TYPE_LABELS[detailOffer.distributionType] || detailOffer.distributionType || '-' },
+              { label: '규제 유형', value: detailOffer.regulatoryType ? (REGULATORY_TYPE_LABELS[detailOffer.regulatoryType] || detailOffer.regulatoryType) : '-' },
+              { label: '등록일', value: new Date(detailOffer.createdAt).toLocaleDateString('ko-KR') },
+            ].map((item) => (
+              <div key={item.label} style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
+                <span style={{ fontWeight: 600, color: '#64748b', minWidth: 80, flexShrink: 0 }}>{item.label}</span>
+                <span style={{ color: '#1e293b' }}>{item.value}</span>
+              </div>
+            ))}
+            {/* Service exposure */}
+            {detailOffer.serviceApprovals && detailOffer.serviceApprovals.length > 0 && (
+              <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid #e2e8f0' }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: '#64748b', marginBottom: 8 }}>서비스 노출 현황</div>
+                {detailOffer.serviceApprovals.map((sa, i) => (
+                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 4 }}>
+                    <span style={{ color: '#374151' }}>{sa.serviceKey}</span>
+                    <span style={{ color: sa.status === 'approved' ? '#15803d' : sa.status === 'rejected' ? '#dc2626' : '#d97706', fontWeight: 500 }}>
+                      {sa.status === 'approved' ? '승인' : sa.status === 'rejected' ? '반려' : '대기'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        </div>
-      )}
+        )}
+      </BaseDetailDrawer>
     </div>
   );
 }
@@ -1178,15 +1103,6 @@ function KpiCard({ label, value, cls, active, onClick }: {
       <p className="text-xs text-slate-500 truncate">{label}</p>
       <p className={`text-lg font-bold ${cls}`}>{value}</p>
     </button>
-  );
-}
-
-function DetailCard({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="bg-slate-50 rounded-lg p-3">
-      <p className="text-xs text-slate-500">{label}</p>
-      <p className="font-medium text-slate-800 mt-0.5">{value}</p>
-    </div>
   );
 }
 
