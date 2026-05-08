@@ -65,7 +65,8 @@ export function createStoreContentController(
           return;
         }
 
-        const organizationId = await resolveOrgId(dataSource, userId);
+        // organization_members 우선, kpa_members fallback (POST와 동일)
+        const organizationId = await resolveDualOrgId(userId);
         if (!organizationId) {
           res.status(403).json({ success: false, error: { code: 'NO_ORG', message: 'No organization membership' } });
           return;
@@ -207,10 +208,22 @@ export function createStoreContentController(
   // ─────────────────────────────────────────────────────────────────────────
 
   /**
+   * POST에서 사용하는 것과 동일한 이중 org 해석:
+   * organization_members (isStoreOwner) 우선, kpa_members fallback.
+   * direct 콘텐츠는 이 경로로 저장되므로 조회도 동일 소스를 사용해야 한다.
+   */
+  async function resolveDualOrgId(userId: string): Promise<string | null> {
+    const { organizationId: orgFromRa } = await isStoreOwner(dataSource, userId, 'kpa');
+    if (orgFromRa) return orgFromRa;
+    const member = await dataSource.getRepository(KpaMember).findOne({ where: { user_id: userId } });
+    return member?.organization_id || null;
+  }
+
+  /**
    * GET /store-contents/direct/:id
    *
    * source_type='direct' 콘텐츠 상세 조회.
-   * organization ownership 확인 (isStoreOwner 또는 resolveOrgId 모두 허용).
+   * organization ownership 확인: organization_members 우선, kpa_members fallback.
    */
   router.get(
     '/direct/:id',
@@ -229,7 +242,7 @@ export function createStoreContentController(
           return;
         }
 
-        const organizationId = await resolveOrgId(dataSource, userId);
+        const organizationId = await resolveDualOrgId(userId);
         if (!organizationId) {
           res.status(403).json({ success: false, error: { code: 'NO_ORG', message: 'No organization membership' } });
           return;
