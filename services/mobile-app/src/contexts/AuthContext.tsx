@@ -64,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(accessToken);
     setUser(userData);
 
-    router.replace('/(app)/');
+    router.replace('/(app)');
   }
 
   function logout() {
