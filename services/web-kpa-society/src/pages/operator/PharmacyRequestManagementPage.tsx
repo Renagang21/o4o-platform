@@ -10,7 +10,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Check, X } from 'lucide-react';
-import { OperatorConfirmModal, RowActionMenu, useOperatorAction } from '@o4o/ui';
+import { OperatorConfirmModal, RowActionMenu, useOperatorAction, BaseDetailDrawer } from '@o4o/ui';
 import { OperatorActionType } from '@o4o/types';
 import { DataTable, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
@@ -43,6 +43,7 @@ export default function PharmacyRequestManagementPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [actionTargetId, setActionTargetId] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [selectedRequest, setSelectedRequest] = useState<RequestItem | null>(null);
   const { pendingAction, loading: actionHookLoading, requestAction, cancelAction, executeAction } = useOperatorAction();
 
   const loadRequests = useCallback(async () => {
@@ -87,6 +88,7 @@ export default function PharmacyRequestManagementPage() {
     });
     setActionLoading(null);
     setActionTargetId(null);
+    setSelectedRequest(null);
   };
 
   const formatBizNo = (num: string) => {
@@ -233,6 +235,7 @@ export default function PharmacyRequestManagementPage() {
         selectable
         selectedKeys={selectedIds}
         onSelectionChange={setSelectedIds}
+        onRowClick={(row) => setSelectedRequest(row)}
       />
 
       {/* Pagination */}
@@ -273,6 +276,57 @@ export default function PharmacyRequestManagementPage() {
           }
         />
       )}
+
+      {/* 약국 신청 상세 Drawer */}
+      <BaseDetailDrawer
+        open={!!selectedRequest}
+        onClose={() => setSelectedRequest(null)}
+        title={selectedRequest?.pharmacy_name ?? ''}
+        width={560}
+        actions={[
+          {
+            label: '반려',
+            onClick: () => { openRejectModal(selectedRequest!.id); },
+            variant: 'danger' as const,
+            loading: actionLoading === selectedRequest?.id,
+            disabled: actionLoading === selectedRequest?.id,
+          },
+          {
+            label: '승인',
+            onClick: () => { openApproveModal(selectedRequest!.id); },
+            variant: 'primary' as const,
+            loading: actionLoading === selectedRequest?.id,
+            disabled: actionLoading === selectedRequest?.id,
+          },
+        ]}
+      >
+        {selectedRequest && (
+          <div style={{ fontSize: 14, color: '#374151' }}>
+            {/* 신청자 정보 */}
+            <div style={{ padding: '12px 16px', backgroundColor: '#f8fafc', borderRadius: 8, marginBottom: 16 }}>
+              <p style={{ fontSize: 12, fontWeight: 600, color: '#64748b', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>신청자</p>
+              <p style={{ fontSize: 15, fontWeight: 600, color: '#1e293b', marginBottom: 2 }}>
+                {(selectedRequest as any).user?.name || '(이름 없음)'}
+              </p>
+              <p style={{ fontSize: 13, color: '#64748b' }}>{(selectedRequest as any).user?.email || '-'}</p>
+            </div>
+
+            {/* 약국 정보 */}
+            {[
+              { label: '약국명', value: selectedRequest.pharmacy_name },
+              { label: '사업자번호', value: formatBizNo(selectedRequest.business_number) },
+              { label: '약국 전화', value: formatPhone(selectedRequest.pharmacy_phone) },
+              { label: '개설자 핸드폰', value: formatPhone(selectedRequest.owner_phone) },
+              { label: '신청일', value: formatDate(selectedRequest.created_at) },
+            ].map((item) => (
+              <div key={item.label} style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
+                <span style={{ fontWeight: 600, color: '#64748b', minWidth: 90, flexShrink: 0 }}>{item.label}</span>
+                <span style={{ color: '#1e293b' }}>{item.value}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </BaseDetailDrawer>
     </div>
   );
 }

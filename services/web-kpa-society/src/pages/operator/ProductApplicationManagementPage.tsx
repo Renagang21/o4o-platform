@@ -20,7 +20,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { CheckCircle, XCircle, Sparkles, Trash2 } from 'lucide-react';
-import { OperatorConfirmModal, useOperatorAction, ActionBar, BulkResultModal, RowActionMenu } from '@o4o/ui';
+import { OperatorConfirmModal, useOperatorAction, ActionBar, BulkResultModal, RowActionMenu, BaseDetailDrawer } from '@o4o/ui';
 import type { RowActionItem } from '@o4o/ui';
 import { OperatorActionType } from '@o4o/types';
 import { DataTable, Pagination, useBatchAction } from '@o4o/operator-ux-core';
@@ -110,6 +110,7 @@ export default function ProductApplicationManagementPage() {
   const batch = useBatchAction();
 
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [selectedApp, setSelectedApp] = useState<ProductApplication | null>(null);
 
   // V3: AI summary state
   const [aiLoading, setAiLoading] = useState(false);
@@ -193,6 +194,7 @@ export default function ProductApplicationManagementPage() {
     });
     setActionLoading(null);
     setActionTargetId(null);
+    setSelectedApp(null);
     setTimeout(() => setToastMsg(null), 4000);
   };
 
@@ -375,15 +377,33 @@ export default function ProductApplicationManagementPage() {
       header: '액션',
       system: true,
       align: 'center',
-      width: '150px',
+      width: '80px',
       onCellClick: () => {},
       render: (_v, row) => {
+        const isTarget = actionLoading === row.id;
         const rowActions: RowActionItem[] = [
+          ...(row.status === 'pending' ? [
+            {
+              key: 'approve',
+              label: '승인',
+              variant: 'primary' as const,
+              loading: isTarget,
+              onClick: () => openApproveModal(row.id),
+            },
+            {
+              key: 'reject',
+              label: '거절',
+              variant: 'danger' as const,
+              loading: isTarget,
+              onClick: () => openRejectModal(row.id),
+            },
+          ] : []),
           {
             key: 'delete',
             label: '삭제',
-            variant: 'danger',
+            variant: 'danger' as const,
             loading: deleteLoading,
+            divider: row.status === 'pending',
             onClick: () => handleDeleteItem(row.id),
             confirm: {
               title: '신청 이력 삭제',
@@ -393,34 +413,13 @@ export default function ProductApplicationManagementPage() {
           },
         ];
 
-        if (row.status !== 'pending') {
-          const reviewedDate = row.status === 'approved' && row.reviewed_at
-            ? <span className="text-xs text-slate-400">{new Date(row.reviewed_at).toLocaleDateString('ko-KR')}</span>
-            : null;
-          return (
-            <div className="flex items-center gap-1.5 justify-center">
-              {reviewedDate}
-              <RowActionMenu actions={rowActions} />
-            </div>
-          );
-        }
-        const isTarget = actionLoading === row.id;
+        const reviewedDate = row.status === 'approved' && row.reviewed_at
+          ? <span className="text-xs text-slate-400 mr-1">{new Date(row.reviewed_at).toLocaleDateString('ko-KR')}</span>
+          : null;
+
         return (
-          <div className="flex gap-1.5 justify-center items-center">
-            <button
-              onClick={() => openApproveModal(row.id)}
-              disabled={isTarget}
-              className="px-3 py-1 rounded-md text-xs font-semibold bg-blue-700 text-white hover:bg-blue-800 disabled:opacity-60"
-            >
-              {isTarget ? '처리중...' : '승인'}
-            </button>
-            <button
-              onClick={() => openRejectModal(row.id)}
-              disabled={isTarget}
-              className="px-3 py-1 rounded-md text-xs font-semibold border border-red-200 text-red-600 hover:bg-red-50 disabled:opacity-60"
-            >
-              거절
-            </button>
+          <div className="flex items-center gap-1 justify-center">
+            {reviewedDate}
             <RowActionMenu actions={rowActions} />
           </div>
         );
@@ -587,6 +586,7 @@ export default function ProductApplicationManagementPage() {
           selectable
           selectedKeys={selectedIds}
           onSelectionChange={setSelectedIds}
+          onRowClick={(row) => setSelectedApp(row)}
         />
       )}
 
@@ -616,6 +616,88 @@ export default function ProductApplicationManagementPage() {
           }
         />
       )}
+
+      {/* 상품 신청 상세 Drawer */}
+      <BaseDetailDrawer
+        open={!!selectedApp}
+        onClose={() => setSelectedApp(null)}
+        title={selectedApp?.product_name ?? ''}
+        width={560}
+        actions={selectedApp?.status === 'pending' ? [
+          {
+            label: '거절',
+            onClick: () => { openRejectModal(selectedApp!.id); },
+            variant: 'danger' as const,
+            loading: actionLoading === selectedApp?.id,
+            disabled: actionLoading === selectedApp?.id,
+          },
+          {
+            label: '승인',
+            onClick: () => { openApproveModal(selectedApp!.id); },
+            variant: 'primary' as const,
+            loading: actionLoading === selectedApp?.id,
+            disabled: actionLoading === selectedApp?.id,
+          },
+        ] : []}
+      >
+        {selectedApp && (
+          <div style={{ fontSize: 14, color: '#374151' }}>
+            {/* 상태 badge */}
+            <div style={{ marginBottom: 16 }}>
+              {(() => {
+                const info = STATUS_LABELS[selectedApp.status] || STATUS_LABELS.pending;
+                return (
+                  <span
+                    style={{
+                      display: 'inline-block',
+                      padding: '4px 12px',
+                      borderRadius: 20,
+                      fontSize: 12,
+                      fontWeight: 600,
+                      backgroundColor: info.bg,
+                      color: info.color,
+                    }}
+                  >
+                    {info.label}
+                  </span>
+                );
+              })()}
+            </div>
+
+            {/* 기본 정보 */}
+            {[
+              { label: '약국', value: selectedApp.organizationName || selectedApp.organization_id.slice(0, 8) },
+              { label: '공급사', value: selectedApp.supplierName || '-' },
+              { label: '공급가', value: formatKpaPrice(selectedApp) + (getPriceLabel(selectedApp) ? ` (${getPriceLabel(selectedApp)})` : '') },
+              { label: '카테고리', value: (selectedApp.product_metadata?.category as string) || '-' },
+              { label: '신청일', value: new Date(selectedApp.requested_at).toLocaleDateString('ko-KR') },
+            ].map((item) => (
+              <div key={item.label} style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
+                <span style={{ fontWeight: 600, color: '#64748b', minWidth: 70, flexShrink: 0 }}>{item.label}</span>
+                <span style={{ color: '#1e293b' }}>{item.value}</span>
+              </div>
+            ))}
+
+            {/* 처리 결과 (pending 아닌 경우) */}
+            {selectedApp.status !== 'pending' && (
+              <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid #f1f5f9' }}>
+                {selectedApp.reviewed_at && (
+                  <div style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
+                    <span style={{ fontWeight: 600, color: '#64748b', minWidth: 70 }}>처리일</span>
+                    <span style={{ color: '#1e293b' }}>{new Date(selectedApp.reviewed_at).toLocaleDateString('ko-KR')}</span>
+                  </div>
+                )}
+                {selectedApp.reject_reason && (
+                  <div style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
+                    <span style={{ fontWeight: 600, color: '#64748b', minWidth: 70 }}>거절 사유</span>
+                    <span style={{ color: '#dc2626' }}>{selectedApp.reject_reason}</span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </BaseDetailDrawer>
     </div>
   );
 }
