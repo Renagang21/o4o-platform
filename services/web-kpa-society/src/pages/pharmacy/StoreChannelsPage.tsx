@@ -4,13 +4,19 @@
  * WO-O4O-STORE-CHANNEL-CENTRIC-V1
  * WO-CHANNEL-EXECUTION-CONSOLE-V1 Phase 1 + Phase 2
  * WO-CHANNEL-CREATION-FLOW-SIMPLIFICATION-V1
+ * WO-O4O-STORE-CHANNEL-MANAGEMENT-CLEANUP-V1: 판매 채널 중심 정비
+ *  - SIGNAGE 탭 제거(독립 메뉴는 유지)
+ *  - 블로그 카드 섹션 제거(독립 페이지 유지)
+ *  - KIOSK 보류 안내
+ *  - TABLET 다중 디바이스 패널 (store_tablets / store_tablet_displays 재사용)
+ *  - slug readonly UI prep
  *
  * 구조:
- *  [A] 채널 탭 (B2C / KIOSK / TABLET / SIGNAGE)
+ *  [A] 채널 탭 (B2C / KIOSK / TABLET)
  *  [B] 채널 KPI (상태, 노출 상품, 노출 콘텐츠, 강제노출)
- *  [C] Quick Actions + 채널 미리보기
- *  [D] 채널 제품 목록 (B2C/KIOSK만) + 제품 추가 모달 + 순서 변경
- *  [E] 노출 자산 리스트
+ *  [C] Quick Actions
+ *  [D] 채널 제품 목록 (B2C/KIOSK) + 제품 추가 모달 + 순서 변경
+ *  [E] TABLET 다중 디바이스 패널 / 또는 자산 리스트
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
@@ -23,7 +29,6 @@ import {
   ShieldAlert,
   Lock,
   Monitor,
-  Smartphone,
   Tablet,
   Globe,
   Plus,
@@ -37,9 +42,8 @@ import {
   Copy,
   Link2,
   AlertCircle,
-  BookOpen,
-  PenLine,
-  Settings2,
+  Pencil,
+  Save,
 } from 'lucide-react';
 import {
   fetchChannelOverviewWithCode,
@@ -67,6 +71,16 @@ import {
   type AvailableProduct,
 } from '../../api/channelProducts';
 import { fetchChannelOverview } from '../../api/storeHub';
+// WO-O4O-STORE-CHANNEL-MANAGEMENT-CLEANUP-V1: 태블릿 다중 디바이스 패널
+import {
+  fetchTablets,
+  fetchTabletDisplays,
+  fetchProductPool,
+  saveTabletDisplays,
+  type Tablet as TabletDevice,
+  type ProductPool,
+  type DisplayItem,
+} from '../../api/tabletDisplays';
 import { GuideEditableSection } from '../../components/guide';
 // WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1
 import { GuideBlock } from '@o4o/shared-space-ui';
@@ -75,11 +89,11 @@ import { kpaConfig } from '@o4o/operator-ux-core';
 
 /* ─── Constants ──────────────────────────────── */
 
+// WO-O4O-STORE-CHANNEL-MANAGEMENT-CLEANUP-V1: SIGNAGE 탭 제거 (독립 "디지털 사이니지" 메뉴는 유지)
 const CHANNEL_TABS: { type: ChannelType; label: string; Icon: typeof Globe; assetKey: string | null }[] = [
   { type: 'B2C', label: '온라인 스토어', Icon: Globe, assetKey: 'home' },
   { type: 'KIOSK', label: '키오스크', Icon: Monitor, assetKey: null },
   { type: 'TABLET', label: '태블릿', Icon: Tablet, assetKey: null },
-  { type: 'SIGNAGE', label: '사이니지', Icon: Smartphone, assetKey: 'signage' },
 ];
 
 /** Channels that support product management */
@@ -275,20 +289,12 @@ function ChannelPublicUrlCard({
       if (!orgCode) return { url: null, label: '태블릿', guidance: null, guidanceLink: null };
       return { url: `${origin}/tablet/${orgCode}`, label: '태블릿 상품 안내', guidance: null, guidanceLink: null };
     }
-    if (channelType === 'KIOSK') {
-      return {
-        url: null,
-        label: '키오스크',
-        guidance: '키오스크는 별도 공개 URL이 없습니다. B2C 스토어 또는 태블릿 채널을 통해 고객이 접근합니다.',
-        guidanceLink: null,
-      };
-    }
-    // SIGNAGE
+    // KIOSK (보류) — WO-O4O-STORE-CHANNEL-MANAGEMENT-CLEANUP-V1
     return {
       url: null,
-      label: '사이니지',
-      guidance: '재생 화면은 사이니지 관리에서 플레이리스트를 선택하여 실행합니다.',
-      guidanceLink: '/store/marketing/signage/player',
+      label: '키오스크',
+      guidance: '키오스크는 업체 협의 후 제공 예정입니다. 현재는 채널 등록·상태 확인만 가능합니다.',
+      guidanceLink: null,
     };
   };
 
@@ -323,7 +329,7 @@ function ChannelPublicUrlCard({
     );
   }
 
-  // KIOSK / SIGNAGE guidance
+  // KIOSK guidance (보류 안내)
   if (guidance) {
     return (
       <div className="flex items-center gap-3 p-4 mb-6 rounded-lg border border-slate-200 bg-slate-50">
@@ -336,7 +342,7 @@ function ChannelPublicUrlCard({
             to={guidanceLink}
             className="flex-shrink-0 inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-700 bg-white border border-blue-200 rounded-lg hover:bg-blue-50"
           >
-            사이니지 재생 <ExternalLink className="w-3 h-3" />
+            이동 <ExternalLink className="w-3 h-3" />
           </Link>
         )}
       </div>
@@ -348,11 +354,26 @@ function ChannelPublicUrlCard({
     <div className="flex items-center gap-3 p-4 mb-6 rounded-lg border border-slate-200 bg-white">
       <Link2 className="w-5 h-5 text-blue-500 flex-shrink-0" />
       <div className="flex-1 min-w-0">
-        <div className="text-xs text-slate-500 mb-1">{label} 공개 주소</div>
+        <div className="text-xs text-slate-500 mb-1 flex items-center gap-2">
+          <span>{label} 공개 주소</span>
+          {/* WO-O4O-STORE-CHANNEL-MANAGEMENT-CLEANUP-V1: slug editable UI prep
+              현재는 readonly. 향후 PATCH endpoint 노출 시 활성화 (WO-O4O-STORE-SLUG-EDITABLE-V1) */}
+          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-500">
+            <Lock className="w-2.5 h-2.5" /> readonly
+          </span>
+        </div>
         <div className="text-[15px] font-mono font-medium text-slate-900 truncate">{url}</div>
         <div className="text-xs text-slate-400 mt-1">이 주소로 고객이 매장 화면에 접속합니다</div>
       </div>
       <div className="flex items-center gap-1.5 flex-shrink-0">
+        <button
+          type="button"
+          disabled
+          title="주소(slug) 변경은 곧 제공될 예정입니다 (WO-O4O-STORE-SLUG-EDITABLE-V1)"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-400 bg-slate-50 border border-slate-200 rounded-lg cursor-not-allowed"
+        >
+          <Pencil className="w-3.5 h-3.5" /> 주소 변경
+        </button>
         <button
           onClick={handleCopy}
           className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200"
@@ -374,6 +395,430 @@ function ChannelPublicUrlCard({
   );
 }
 
+/* ─── TabletDisplaysPanel (WO-O4O-STORE-CHANNEL-MANAGEMENT-CLEANUP-V1) ─────────
+ * 태블릿 다중 디바이스 패널 — store_tablets / store_tablet_displays 재사용.
+ * - 태블릿 chip 선택
+ * - 선택 태블릿의 노출 상품 리스트 (이름/순서/표시)
+ * - "제품 추가" 모달 (supplier + local pool)
+ * - 변경사항 일괄 저장
+ * StoreTabletDisplaysPage 와 동일 API 사용. 진열 세부 편집(가격/이미지)은 단독 페이지로 안내.
+ */
+
+interface TabletDisplayEntry {
+  productType: 'supplier' | 'local';
+  productId: string;
+  productName: string;
+  sortOrder: number;
+  isVisible: boolean;
+}
+
+function TabletDisplaysPanel({
+  orgCode,
+  showToast,
+}: {
+  orgCode: string | null;
+  showToast: (type: 'success' | 'error', message: string) => void;
+}) {
+  const navigate = useNavigate();
+  const [tablets, setTablets] = useState<TabletDevice[]>([]);
+  const [selectedTabletId, setSelectedTabletId] = useState<string | null>(null);
+  const [pool, setPool] = useState<ProductPool | null>(null);
+  const [displays, setDisplays] = useState<TabletDisplayEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadingTablet, setLoadingTablet] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
+  const [showPoolModal, setShowPoolModal] = useState(false);
+  const [poolTab, setPoolTab] = useState<'supplier' | 'local'>('supplier');
+  const [selectedPoolIds, setSelectedPoolIds] = useState<Set<string>>(new Set());
+
+  // 태블릿 목록 로드
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    fetchTablets()
+      .then((data) => {
+        if (cancelled) return;
+        const active = data.filter((t) => t.is_active);
+        setTablets(active);
+        if (active.length > 0 && !selectedTabletId) {
+          setSelectedTabletId(active[0].id);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) showToast('error', '태블릿 목록을 불러오지 못했습니다.');
+      })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, [showToast, selectedTabletId]);
+
+  // 선택 태블릿의 pool + displays 로드
+  const loadTabletData = useCallback(async (tabletId: string) => {
+    setLoadingTablet(true);
+    try {
+      const [poolData, displayData] = await Promise.all([
+        fetchProductPool(tabletId),
+        fetchTabletDisplays(tabletId),
+      ]);
+      setPool(poolData);
+      const entries: TabletDisplayEntry[] = displayData.map((d: DisplayItem) => {
+        let productName = '(알 수 없음)';
+        if (d.product_type === 'supplier') {
+          const sp = poolData.supplierProducts.find((p) => p.id === d.product_id);
+          productName = sp?.product_name || '(삭제된 공급 상품)';
+        } else {
+          const lp = poolData.localProducts.find((p) => p.id === d.product_id);
+          productName = lp?.name || '(삭제된 자체 상품)';
+        }
+        return {
+          productType: d.product_type,
+          productId: d.product_id,
+          productName,
+          sortOrder: d.sort_order,
+          isVisible: d.is_visible,
+        };
+      });
+      setDisplays(entries);
+      setHasChanges(false);
+      setSelectedPoolIds(new Set());
+    } catch {
+      showToast('error', '태블릿 데이터를 불러오지 못했습니다.');
+    } finally {
+      setLoadingTablet(false);
+    }
+  }, [showToast]);
+
+  useEffect(() => {
+    if (selectedTabletId) loadTabletData(selectedTabletId);
+  }, [selectedTabletId, loadTabletData]);
+
+  const isInDisplay = (productType: 'supplier' | 'local', productId: string) =>
+    displays.some((d) => d.productType === productType && d.productId === productId);
+
+  const poolItems = poolTab === 'supplier'
+    ? (pool?.supplierProducts || [])
+        .filter((p) => !isInDisplay('supplier', p.id))
+        .map((p) => ({ id: p.id, name: p.product_name, type: 'supplier' as const }))
+    : (pool?.localProducts || [])
+        .filter((p) => !isInDisplay('local', p.id))
+        .map((p) => ({ id: p.id, name: p.name, type: 'local' as const }));
+
+  const handleAddSelected = () => {
+    const newEntries: TabletDisplayEntry[] = [];
+    for (const item of poolItems) {
+      if (selectedPoolIds.has(item.id)) {
+        newEntries.push({
+          productType: item.type,
+          productId: item.id,
+          productName: item.name,
+          sortOrder: displays.length + newEntries.length,
+          isVisible: true,
+        });
+      }
+    }
+    if (newEntries.length > 0) {
+      setDisplays((prev) => [...prev, ...newEntries]);
+      setSelectedPoolIds(new Set());
+      setHasChanges(true);
+      setShowPoolModal(false);
+      showToast('success', `${newEntries.length}개 제품이 추가되었습니다. 저장 버튼을 눌러 반영하세요.`);
+    }
+  };
+
+  const moveItem = (index: number, direction: 'up' | 'down') => {
+    const target = direction === 'up' ? index - 1 : index + 1;
+    if (target < 0 || target >= displays.length) return;
+    const next = [...displays];
+    [next[index], next[target]] = [next[target], next[index]];
+    setDisplays(next.map((d, i) => ({ ...d, sortOrder: i })));
+    setHasChanges(true);
+  };
+
+  const removeItem = (index: number) => {
+    setDisplays((prev) => prev.filter((_, i) => i !== index).map((d, i) => ({ ...d, sortOrder: i })));
+    setHasChanges(true);
+  };
+
+  const handleSave = async () => {
+    if (!selectedTabletId) return;
+    setSaving(true);
+    try {
+      await saveTabletDisplays(
+        selectedTabletId,
+        displays.map((d, i) => ({
+          productType: d.productType,
+          productId: d.productId,
+          sortOrder: i,
+          isVisible: d.isVisible,
+        })),
+      );
+      setHasChanges(false);
+      showToast('success', '태블릿 진열이 저장되었습니다.');
+    } catch {
+      showToast('error', '저장에 실패했습니다.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-lg border border-slate-200 p-6">
+        <div className="flex items-center justify-center py-8 text-slate-400">
+          <Loader2 className="w-4 h-4 animate-spin mr-2" /> 태블릿 목록 로딩 중...
+        </div>
+      </div>
+    );
+  }
+
+  if (tablets.length === 0) {
+    return (
+      <div className="bg-white rounded-lg border border-slate-200 p-6 text-center">
+        <Tablet className="w-8 h-8 mx-auto mb-2 text-slate-300" />
+        <p className="text-sm text-slate-500">등록된 태블릿 디바이스가 없습니다.</p>
+        <p className="text-xs text-slate-400 mt-1">태블릿 디바이스 등록은 운영자/관리자가 진행합니다.</p>
+      </div>
+    );
+  }
+
+  const tabletCommonUrl = orgCode
+    ? `${typeof window !== 'undefined' ? window.location.origin : ''}/tablet/${orgCode}`
+    : null;
+
+  return (
+    <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
+      {/* Tablet selector chips */}
+      <div className="flex items-center gap-2 p-4 border-b border-slate-200 flex-wrap">
+        <span className="text-xs font-semibold text-slate-500 mr-1">디바이스</span>
+        {tablets.map((t) => {
+          const active = t.id === selectedTabletId;
+          return (
+            <button
+              key={t.id}
+              onClick={() => setSelectedTabletId(t.id)}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full border transition-colors ${
+                active
+                  ? 'bg-indigo-600 text-white border-indigo-600'
+                  : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
+              }`}
+              title={t.location || ''}
+            >
+              <Tablet className="w-3.5 h-3.5" />
+              {t.name}
+              {!t.is_active && <span className="ml-1 text-[10px] opacity-70">(비활성)</span>}
+            </button>
+          );
+        })}
+        <span className="ml-auto text-[11px] text-slate-400">
+          공통 공개 URL — 모든 디바이스가 같은 주소를 사용합니다
+        </span>
+      </div>
+
+      {/* Common public URL */}
+      {tabletCommonUrl && (
+        <div className="flex items-center gap-3 px-4 py-3 bg-slate-50 border-b border-slate-200">
+          <Link2 className="w-4 h-4 text-slate-400 flex-shrink-0" />
+          <div className="flex-1 min-w-0 text-[13px] font-mono text-slate-700 truncate">
+            {tabletCommonUrl}
+          </div>
+          <button
+            onClick={() => navigate('/store/commerce/tablet-displays')}
+            className="text-xs font-medium text-indigo-700 hover:underline whitespace-nowrap"
+          >
+            진열 페이지 열기 →
+          </button>
+        </div>
+      )}
+
+      {/* Selected tablet displays */}
+      {!selectedTabletId ? (
+        <div className="p-6 text-center text-slate-400 text-sm">디바이스를 선택하세요.</div>
+      ) : loadingTablet ? (
+        <div className="flex items-center justify-center py-8 text-slate-400">
+          <Loader2 className="w-4 h-4 animate-spin mr-2" /> 진열 정보 로딩 중...
+        </div>
+      ) : (
+        <>
+          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200">
+            <h3 className="text-sm font-semibold text-slate-700">
+              진열 제품 ({displays.length})
+            </h3>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowPoolModal(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+              >
+                <Plus className="w-3.5 h-3.5" /> 제품 추가
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={saving || !hasChanges}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:bg-slate-300"
+              >
+                {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                저장
+              </button>
+            </div>
+          </div>
+
+          {displays.length === 0 ? (
+            <div className="text-center py-8 text-slate-400">
+              <Package className="w-8 h-8 mx-auto mb-2 text-slate-300" />
+              <p className="text-sm">이 디바이스에 진열된 제품이 없습니다.</p>
+              <p className="text-xs mt-1">"제품 추가" 버튼으로 시작하세요.</p>
+            </div>
+          ) : (
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-slate-50 text-left text-xs text-slate-500 uppercase">
+                  <th className="px-4 py-3 font-medium w-12">#</th>
+                  <th className="px-4 py-3 font-medium">상품명</th>
+                  <th className="px-4 py-3 font-medium w-20">유형</th>
+                  <th className="px-4 py-3 font-medium w-24">순서</th>
+                  <th className="px-4 py-3 font-medium w-16">제거</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {displays.map((d, idx) => (
+                  <tr key={`${d.productType}:${d.productId}`} className="hover:bg-slate-50">
+                    <td className="px-4 py-3 text-slate-400">{idx + 1}</td>
+                    <td className="px-4 py-3">
+                      <div className="font-medium text-slate-900 truncate max-w-sm">{d.productName}</div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`px-1.5 py-0.5 rounded text-xs ${
+                        d.productType === 'supplier' ? 'bg-blue-50 text-blue-700' : 'bg-purple-50 text-purple-700'
+                      }`}>
+                        {d.productType === 'supplier' ? '공급' : '자체'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-0.5">
+                        <button
+                          onClick={() => moveItem(idx, 'up')}
+                          disabled={idx === 0}
+                          className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-600 disabled:opacity-30"
+                          title="위로 이동"
+                        >
+                          <ChevronUp className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => moveItem(idx, 'down')}
+                          disabled={idx === displays.length - 1}
+                          className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-600 disabled:opacity-30"
+                          title="아래로 이동"
+                        >
+                          <ChevronDown className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={() => removeItem(idx)}
+                        className="p-1 rounded hover:bg-red-50 text-slate-400 hover:text-red-600"
+                        title="진열에서 제거"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </>
+      )}
+
+      {/* Pool 모달 — 제품 추가 */}
+      {showPoolModal && pool && (
+        <>
+          <div className="fixed inset-0 bg-black/50 z-[1000]" onClick={() => setShowPoolModal(false)} />
+          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-2xl z-[1001] w-full max-w-lg max-h-[80vh] flex flex-col">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+              <div className="flex items-center gap-2">
+                <Package className="w-5 h-5 text-blue-600" />
+                <h2 className="text-lg font-semibold text-slate-900">진열할 제품 선택</h2>
+              </div>
+              <button onClick={() => setShowPoolModal(false)} className="p-1 rounded-lg hover:bg-slate-100">
+                <X className="w-5 h-5 text-slate-400" />
+              </button>
+            </div>
+
+            <div className="flex border-b border-slate-200">
+              {(['supplier', 'local'] as const).map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => { setPoolTab(tab); setSelectedPoolIds(new Set()); }}
+                  className={`flex-1 px-4 py-2.5 text-xs font-medium border-b-2 transition-colors ${
+                    poolTab === tab
+                      ? 'border-blue-600 text-blue-600'
+                      : 'border-transparent text-slate-500 hover:text-slate-700'
+                  }`}
+                >
+                  {tab === 'supplier' ? '공급 상품' : '자체 상품'} ({(tab === 'supplier' ? pool.supplierProducts : pool.localProducts).length})
+                </button>
+              ))}
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-4 py-2">
+              {poolItems.length === 0 ? (
+                <div className="text-center py-8 text-slate-400 text-sm">추가할 수 있는 상품이 없습니다.</div>
+              ) : (
+                <div className="space-y-1">
+                  {poolItems.map((p) => {
+                    const checked = selectedPoolIds.has(p.id);
+                    return (
+                      <label
+                        key={p.id}
+                        className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer hover:bg-slate-50 ${
+                          checked ? 'bg-blue-50' : ''
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => {
+                            setSelectedPoolIds((prev) => {
+                              const next = new Set(prev);
+                              if (next.has(p.id)) next.delete(p.id); else next.add(p.id);
+                              return next;
+                            });
+                          }}
+                          className="rounded border-slate-300"
+                        />
+                        <span className="text-sm text-slate-800 truncate">{p.name}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            <div className="px-6 py-3 border-t border-slate-200 flex justify-between items-center">
+              <span className="text-xs text-slate-500">{selectedPoolIds.size}개 선택됨</span>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowPoolModal(false)}
+                  className="px-3 py-1.5 text-sm text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200"
+                >
+                  취소
+                </button>
+                <button
+                  onClick={handleAddSelected}
+                  disabled={selectedPoolIds.size === 0}
+                  className="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                >
+                  진열에 추가
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 /* ─── Main Component ─────────────────────────── */
 
 export function StoreChannelsPage() {
@@ -385,12 +830,13 @@ export function StoreChannelsPage() {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   // WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1: store.channel.editor guide
-  const [guideTitle, setGuideTitle] = useState('채널별 제품과 콘텐츠를 관리합니다.');
-  const [guideDesc, setGuideDesc] = useState('탭에서 채널을 선택하고 노출 제품과 콘텐츠를 설정하세요.');
+  // WO-O4O-STORE-CHANNEL-MANAGEMENT-CLEANUP-V1: 사이니지 step 제거 (독립 메뉴)
+  const [guideTitle, setGuideTitle] = useState('판매 채널을 관리합니다.');
+  const [guideDesc, setGuideDesc] = useState('온라인 스토어와 태블릿 디바이스별로 노출 상품을 설정하세요.');
   const [guideSteps, setGuideSteps] = useState([
-    '채널 탭(B2C/키오스크/태블릿/사이니지)을 선택합니다',
+    '채널 탭(온라인 스토어 / 키오스크 / 태블릿)을 선택합니다',
     '채널을 활성화하고 노출 제품을 추가합니다',
-    '콘텐츠를 연결하면 해당 채널에 표시됩니다',
+    '태블릿은 디바이스별로 상품을 다르게 진열할 수 있습니다',
     '변경사항은 즉시 반영됩니다',
   ]);
   useEffect(() => {
@@ -844,9 +1290,8 @@ export function StoreChannelsPage() {
           </div>
           <p className="text-sm text-slate-500 mt-0.5">
             {activeTab === 'B2C' && '고객이 온라인으로 상품을 확인하고 구매할 수 있는 스토어프론트'}
-            {activeTab === 'KIOSK' && '매장 내 키오스크에서 고객이 직접 상품을 조회합니다'}
-            {activeTab === 'TABLET' && '매장 내 태블릿에서 상품 안내 및 관심 요청을 처리합니다'}
-            {activeTab === 'SIGNAGE' && '매장 내 디지털 사이니지에 콘텐츠를 표시합니다'}
+            {activeTab === 'KIOSK' && '매장 내 키오스크 (업체 협의 후 제공 예정 — 보류 상태)'}
+            {activeTab === 'TABLET' && '매장 내 태블릿 디바이스별 상품 진열 및 관심 요청 처리'}
           </p>
         </div>
         {!currentChannel && (
@@ -861,6 +1306,19 @@ export function StoreChannelsPage() {
         )}
       </div>
 
+      {/* WO-O4O-STORE-CHANNEL-MANAGEMENT-CLEANUP-V1: KIOSK 보류 안내 배너 */}
+      {activeTab === 'KIOSK' && (
+        <div className="flex items-start gap-3 p-4 mb-6 rounded-lg border border-amber-200 bg-amber-50">
+          <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-amber-800">키오스크 채널은 현재 보류 상태입니다</p>
+            <p className="text-xs text-amber-700 mt-1 leading-relaxed">
+              키오스크 디바이스 연동은 업체 협의 후 제공 예정입니다. 채널 등록·상태 확인은 가능하나 실제 출력·고객 접근 경로는 아직 연결되지 않았습니다.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* ─── Public URL Card (WO-O4O-STORE-CHANNEL-PUBLIC-URL-GUIDE-V1) ─── */}
       {currentChannel && (
         <ChannelPublicUrlCard
@@ -871,7 +1329,8 @@ export function StoreChannelsPage() {
       )}
 
       {/* ─── 상태 기반 행동 유도 (WO-O4O-CHANNEL-UX-STEP2-STATE-DRIVEN-V1) ─── */}
-      {isProductChannel && currentChannel?.status === 'APPROVED' && !productLoading && (() => {
+      {/* WO-O4O-STORE-CHANNEL-MANAGEMENT-CLEANUP-V1: KIOSK 보류 시 행동 유도 숨김 */}
+      {isProductChannel && activeTab !== 'KIOSK' && currentChannel?.status === 'APPROVED' && !productLoading && (() => {
         if (channelProducts.length > 0) {
           return (
             <div className="flex items-start gap-4 p-5 mb-6 rounded-xl border border-green-200 bg-green-50">
@@ -970,22 +1429,6 @@ export function StoreChannelsPage() {
               <ExternalLink className="w-3.5 h-3.5" /> 스토어 보기
             </a>
           )}
-          {activeTab === 'SIGNAGE' && (
-            <>
-              <button
-                onClick={() => navigate('/store/signage')}
-                className="px-3 py-1.5 text-xs font-medium text-purple-700 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100"
-              >
-                사이니지 콘텐츠
-              </button>
-              <button
-                onClick={() => navigate('/store/marketing/signage/player')}
-                className="px-3 py-1.5 text-xs font-medium text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100"
-              >
-                재생 실행
-              </button>
-            </>
-          )}
           {activeTab === 'TABLET' && (
             <>
               <button
@@ -1027,13 +1470,17 @@ export function StoreChannelsPage() {
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold text-slate-700">진열 제품</h2>
-            {currentChannel && currentChannel.status === 'APPROVED' && (
+            {/* WO-O4O-STORE-CHANNEL-MANAGEMENT-CLEANUP-V1: KIOSK 보류 — 제품 추가 버튼 비활성화 */}
+            {currentChannel && currentChannel.status === 'APPROVED' && activeTab !== 'KIOSK' && (
               <button
                 onClick={() => setShowAddModal(true)}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
               >
                 <Plus className="w-3.5 h-3.5" /> 제품 추가
               </button>
+            )}
+            {currentChannel && activeTab === 'KIOSK' && (
+              <span className="text-xs text-slate-400">제품 진열은 키오스크 출시 후 활성화됩니다</span>
             )}
           </div>
 
@@ -1367,139 +1814,14 @@ export function StoreChannelsPage() {
           </div>
         )
       ) : (
+        // WO-O4O-STORE-CHANNEL-MANAGEMENT-CLEANUP-V1: TABLET 다중 디바이스 패널
         activeTab === 'TABLET' ? (
-          <div className="bg-white rounded-lg border border-slate-200 p-6">
-            <p className="text-sm font-medium text-slate-700 mb-4">태블릿 채널 관리</p>
-            <div className="grid grid-cols-2 gap-4">
-              <button
-                onClick={() => navigate('/store/commerce/tablet-displays')}
-                className="flex flex-col items-start gap-1 p-4 rounded-lg border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-left"
-              >
-                <span className="text-sm font-semibold text-indigo-700">태블릿 진열</span>
-                <span className="text-xs text-indigo-500">태블릿에 어떤 상품을 표시할지 디바이스별로 구성합니다</span>
-              </button>
-              <button
-                onClick={() => navigate('/store/requests')}
-                className="flex flex-col items-start gap-1 p-4 rounded-lg border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-left"
-              >
-                <span className="text-sm font-semibold text-emerald-700">상담 요청</span>
-                <span className="text-xs text-emerald-500">매장에서 접수된 상담 요청을 확인하고 처리합니다</span>
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="text-center py-16 text-slate-400 bg-white rounded-lg border border-slate-200">
-            <p className="text-sm">이 채널의 콘텐츠 배치 기능은 준비 중입니다.</p>
-            <p className="text-xs mt-1">상품 노출은 위 KPI에서 확인할 수 있습니다.</p>
-          </div>
-        )
+          <TabletDisplaysPanel orgCode={orgCode} showToast={showToast} />
+        ) : null
       )}
 
-      {/* ─── [F] Blog 유사 채널 (WO-O4O-STORE-BLOG-CHANNEL-CLARITY-V1) ─── */}
-      <div className="mt-10 pt-8 border-t border-slate-200">
-        <div className="flex items-center gap-4 mb-4 p-5 bg-white rounded-xl border border-slate-200">
-          <div
-            className="flex items-center justify-center w-12 h-12 rounded-xl"
-            style={{ backgroundColor: '#eff6ff' }}
-          >
-            <BookOpen className="w-6 h-6" style={{ color: '#2563eb' }} />
-          </div>
-          <div className="flex-1">
-            <div className="flex items-center gap-2.5">
-              <h2 className="text-lg font-bold text-slate-900">블로그</h2>
-              <span
-                className="px-2.5 py-1 rounded-full text-xs font-semibold"
-                style={{ background: '#dcfce7', color: '#166534' }}
-              >
-                사용 가능
-              </span>
-            </div>
-            <p className="text-sm text-slate-500 mt-0.5">
-              블로그는 상품과 함께 매장 정보를 전달하는 콘텐츠 채널입니다
-            </p>
-          </div>
-        </div>
-
-        {/* Blog URL */}
-        {orgCode ? (
-          <div className="flex items-center gap-3 p-4 mb-4 rounded-lg border border-slate-200 bg-white">
-            <Link2 className="w-5 h-5 text-blue-500 flex-shrink-0" />
-            <div className="flex-1 min-w-0">
-              <div className="text-xs text-slate-500 mb-1">블로그 공개 주소</div>
-              <div className="text-[15px] font-mono font-medium text-slate-900 truncate">
-                {typeof window !== 'undefined' ? window.location.origin : ''}/store/{orgCode}/blog
-              </div>
-              <div className="text-xs text-slate-400 mt-1">이 주소로 고객이 매장 블로그에 접속합니다</div>
-            </div>
-            <div className="flex items-center gap-1.5 flex-shrink-0">
-              <button
-                onClick={async () => {
-                  const blogUrl = `${window.location.origin}/store/${orgCode}/blog`;
-                  try {
-                    await navigator.clipboard.writeText(blogUrl);
-                    showToast('success', '블로그 주소가 클립보드에 복사되었습니다.');
-                  } catch {
-                    showToast('error', '복사에 실패했습니다. 주소를 직접 복사해 주세요.');
-                  }
-                }}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200"
-                title="주소 복사"
-              >
-                <Copy className="w-3.5 h-3.5" /> 복사
-              </button>
-              <a
-                href={`/store/${orgCode}/blog`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100"
-                title="새 탭에서 열기"
-              >
-                <ExternalLink className="w-3.5 h-3.5" /> 열기
-              </a>
-            </div>
-          </div>
-        ) : (
-          <div className="flex items-center gap-3 p-4 mb-4 rounded-lg border border-amber-200 bg-amber-50">
-            <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0" />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-amber-800">블로그 주소가 아직 설정되지 않았습니다</p>
-              <p className="text-xs text-amber-600 mt-0.5">매장 설정에서 약국 코드를 등록하면 블로그 URL이 생성됩니다.</p>
-            </div>
-            <Link
-              to="/store/settings"
-              className="flex-shrink-0 px-3 py-1.5 text-xs font-medium text-amber-700 bg-white border border-amber-300 rounded-lg hover:bg-amber-100"
-            >
-              설정으로 이동
-            </Link>
-          </div>
-        )}
-
-        {/* Blog Quick Actions */}
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => navigate('/store/content/blog')}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100"
-          >
-            <PenLine className="w-3.5 h-3.5" /> 글 작성
-          </button>
-          <button
-            onClick={() => navigate('/store/content/blog')}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-50 border border-slate-200 rounded-lg hover:bg-slate-100"
-          >
-            <Settings2 className="w-3.5 h-3.5" /> 블로그 관리
-          </button>
-          {orgCode && (
-            <a
-              href={`/store/${orgCode}/blog`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-50 border border-slate-200 rounded-lg hover:bg-slate-100"
-            >
-              <ExternalLink className="w-3.5 h-3.5" /> 미리보기
-            </a>
-          )}
-        </div>
-      </div>
+      {/* WO-O4O-STORE-CHANNEL-MANAGEMENT-CLEANUP-V1:
+          블로그 카드 섹션 제거. 블로그는 콘텐츠 채널로 별도 메뉴(/store/content/blog)에서 관리. */}
 
       {/* ─── Add Product Modal ───────────────────── */}
       {currentChannel && (
