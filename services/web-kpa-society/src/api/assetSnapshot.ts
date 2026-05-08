@@ -237,3 +237,41 @@ export const storeContentApi = {
       body,
     ),
 };
+
+// ─── Direct Content API (WO-O4O-STORE-CONTENT-DIRECT-DETAIL-EDIT-UX-V1) ──────
+
+export interface DirectContentItem {
+  id: string;
+  sourceType: 'direct';
+  title: string;
+  contentJson: Record<string, unknown>;
+  updatedAt: string;
+  updatedBy: string | null;
+}
+
+export const directContentApi = {
+  /** 내 매장 direct 콘텐츠 목록 (GET /store-contents 에서 source_type='direct' 필터) */
+  list: () =>
+    apiClient.get<{ success: boolean; data: Array<{ id: string; sourceType: string; snapshotId: string | null; title: string; updatedAt: string; shareStatus: string | null; sharedAt: string | null; sharedRequestId: string | null }> }>(
+      '/store-contents',
+    ),
+
+  /** direct 콘텐츠 상세 */
+  get: (id: string) =>
+    apiClient.get<{ success: boolean; data: DirectContentItem }>(
+      `/store-contents/direct/${id}`,
+    ),
+
+  /** direct 콘텐츠 수정 */
+  update: (id: string, body: { title?: string; contentJson?: Record<string, unknown> }) =>
+    apiClient.put<{ success: boolean; data: DirectContentItem }>(
+      `/store-contents/direct/${id}`,
+      body,
+    ),
+
+  /** direct 콘텐츠 삭제 */
+  remove: (id: string) =>
+    apiClient.delete<{ success: boolean; data: { deleted: boolean; id: string } }>(
+      `/store-contents/direct/${id}`,
+    ),
+};

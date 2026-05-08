@@ -201,6 +201,199 @@ export function createStoreContentController(
     },
   );
 
+  // ─────────────────────────────────────────────────────────────────────────
+  // direct 콘텐츠 전용 CRUD (WO-O4O-STORE-CONTENT-DIRECT-DETAIL-EDIT-UX-V1)
+  // NOTE: /direct/:id 라우트는 /:snapshotId 보다 먼저 등록해야 한다.
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /**
+   * GET /store-contents/direct/:id
+   *
+   * source_type='direct' 콘텐츠 상세 조회.
+   * organization ownership 확인 (isStoreOwner 또는 resolveOrgId 모두 허용).
+   */
+  router.get(
+    '/direct/:id',
+    requireAuth,
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const authReq = req as AuthRequest;
+        const userId = authReq.user?.id;
+        if (!userId) {
+          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+          return;
+        }
+        const { id } = req.params;
+        if (!UUID_RE.test(id)) {
+          res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid content ID' } });
+          return;
+        }
+
+        const organizationId = await resolveOrgId(dataSource, userId);
+        if (!organizationId) {
+          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: 'No organization membership' } });
+          return;
+        }
+
+        const repo = dataSource.getRepository(KpaStoreContent);
+        const content = await repo.findOne({
+          where: { id, organization_id: organizationId, source_type: 'direct' },
+        });
+
+        if (!content) {
+          res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Direct content not found' } });
+          return;
+        }
+
+        res.json({
+          success: true,
+          data: {
+            id: content.id,
+            sourceType: content.source_type,
+            title: content.title,
+            contentJson: content.content_json,
+            updatedAt: content.updated_at,
+            updatedBy: content.updated_by,
+          },
+        });
+      } catch (error: any) {
+        res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
+      }
+    },
+  );
+
+  /**
+   * PUT /store-contents/direct/:id
+   *
+   * direct 콘텐츠 수정. store owner 권한 필수.
+   * Body: { title?: string, contentJson?: object }
+   */
+  router.put(
+    '/direct/:id',
+    requireAuth,
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const authReq = req as AuthRequest;
+        const userId = authReq.user?.id;
+        if (!userId) {
+          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+          return;
+        }
+        const { id } = req.params;
+        if (!UUID_RE.test(id)) {
+          res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid content ID' } });
+          return;
+        }
+
+        // store owner 권한 확인 (RBAC SSOT)
+        const { isOwner, organizationId: orgFromRa } = await isStoreOwner(dataSource, userId, 'kpa');
+        if (!isOwner) {
+          res.status(403).json({ success: false, error: { code: 'STORE_OWNER_REQUIRED', message: '매장 경영자(kpa:store_owner)만 수정할 수 있습니다.' } });
+          return;
+        }
+
+        let organizationId: string | null = orgFromRa;
+        if (!organizationId) {
+          const member = await dataSource.getRepository(KpaMember).findOne({ where: { user_id: userId } });
+          organizationId = member?.organization_id || null;
+        }
+        if (!organizationId) {
+          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: '매장 조직 정보를 찾을 수 없습니다.' } });
+          return;
+        }
+
+        const { title, contentJson } = req.body as { title?: string; contentJson?: Record<string, unknown> };
+
+        const repo = dataSource.getRepository(KpaStoreContent);
+        const content = await repo.findOne({
+          where: { id, organization_id: organizationId, source_type: 'direct' },
+        });
+
+        if (!content) {
+          res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Direct content not found' } });
+          return;
+        }
+
+        if (title !== undefined) content.title = title.trim() || content.title;
+        if (contentJson !== undefined) content.content_json = contentJson as Record<string, unknown>;
+        content.updated_by = userId;
+
+        const saved = await repo.save(content);
+
+        res.json({
+          success: true,
+          data: {
+            id: saved.id,
+            sourceType: saved.source_type,
+            title: saved.title,
+            contentJson: saved.content_json,
+            updatedAt: saved.updated_at,
+            updatedBy: saved.updated_by,
+          },
+        });
+      } catch (error: any) {
+        res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
+      }
+    },
+  );
+
+  /**
+   * DELETE /store-contents/direct/:id
+   *
+   * direct 콘텐츠 삭제. store owner 권한 필수.
+   */
+  router.delete(
+    '/direct/:id',
+    requireAuth,
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const authReq = req as AuthRequest;
+        const userId = authReq.user?.id;
+        if (!userId) {
+          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+          return;
+        }
+        const { id } = req.params;
+        if (!UUID_RE.test(id)) {
+          res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid content ID' } });
+          return;
+        }
+
+        const { isOwner, organizationId: orgFromRa } = await isStoreOwner(dataSource, userId, 'kpa');
+        if (!isOwner) {
+          res.status(403).json({ success: false, error: { code: 'STORE_OWNER_REQUIRED', message: '매장 경영자(kpa:store_owner)만 삭제할 수 있습니다.' } });
+          return;
+        }
+
+        let organizationId: string | null = orgFromRa;
+        if (!organizationId) {
+          const member = await dataSource.getRepository(KpaMember).findOne({ where: { user_id: userId } });
+          organizationId = member?.organization_id || null;
+        }
+        if (!organizationId) {
+          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: '매장 조직 정보를 찾을 수 없습니다.' } });
+          return;
+        }
+
+        const repo = dataSource.getRepository(KpaStoreContent);
+        const content = await repo.findOne({
+          where: { id, organization_id: organizationId, source_type: 'direct' },
+        });
+
+        if (!content) {
+          res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Direct content not found' } });
+          return;
+        }
+
+        await repo.remove(content);
+
+        res.json({ success: true, data: { deleted: true, id } });
+      } catch (error: any) {
+        res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
+      }
+    },
+  );
+
   /**
    * POST /store-contents/:id/share-to-hub
    *

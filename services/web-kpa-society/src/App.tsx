@@ -190,6 +190,7 @@ const StoreLibraryPlaceholderPage = lazy(() => import('./pages/pharmacy/StoreLib
 // default-as-named (wrapper 불필요)
 const StoreAssetsPage = lazy(() => import('./pages/pharmacy/StoreAssetsPage'));
 const StoreContentEditPage = lazy(() => import('./pages/pharmacy/StoreContentEditPage'));
+const StoreDirectContentPage = lazy(() => import('./pages/pharmacy/StoreDirectContentPage'));
 const StoreLocalProductsPage = lazy(() => import('./pages/pharmacy/StoreLocalProductsPage'));
 const StoreTabletDisplaysPage = lazy(() => import('./pages/pharmacy/StoreTabletDisplaysPage'));
 // Pharmacy specific (not in barrel)
@@ -877,6 +878,7 @@ function App() {
             <Route path="channels/tablet" element={<Navigate to="/store/requests" replace />} />
             <Route path="content" element={<StoreAssetsPage />} />
             <Route path="content/blog" element={<PharmacyBlogPage />} />
+            <Route path="content/direct/:id" element={<StoreDirectContentPage />} />
             <Route path="content/:snapshotId/edit" element={<StoreContentEditPage />} />
             <Route path="billing" element={<StoreBillingPage />} />
             <Route path="settings" element={<PharmacyStorePage />} />
