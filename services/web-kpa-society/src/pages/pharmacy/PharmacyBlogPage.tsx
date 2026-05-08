@@ -21,9 +21,26 @@ import {
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getStoreSlug } from '../../api/pharmacyInfo';
 // WO-O4O-KPA-STORE-BLOG-CONTENT-RICHTEXT-V1: canonical RichTextEditor 사용
-import { RichTextEditor } from '@o4o/content-editor';
+// WO-O4O-KPA-STORE-BLOG-AI-WIRING-V1: AI 콘텐츠 보조 (canonical AiContentModal 재사용)
+import { RichTextEditor, AiContentModal } from '@o4o/content-editor';
 import { mediaApi } from '../../api/media';
 import { getAccessToken } from '../../contexts/AuthContext';
+
+// WO-O4O-KPA-STORE-BLOG-AI-WIRING-V1: HTML 첫 heading 추출 (AI title fallback)
+function extractTitleFromHtml(html: string): string {
+  const match = html.match(/<h[1-3][^>]*>([\s\S]*?)<\/h[1-3]>/i);
+  if (!match) return '';
+  return match[1].replace(/<[^>]+>/g, '').trim();
+}
+
+// WO-O4O-KPA-STORE-BLOG-AI-WIRING-V1: HTML → plain (excerpt fallback 용)
+function htmlToPlain(html: string): string {
+  return html
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
 
 type ViewMode = 'list' | 'editor';
 type StatusFilter = 'all' | 'draft' | 'published' | 'archived';
@@ -56,6 +73,8 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
   const [editorExcerpt, setEditorExcerpt] = useState('');
   const [editorSlug, setEditorSlug] = useState('');
   const [saving, setSaving] = useState(false);
+  // WO-O4O-KPA-STORE-BLOG-AI-WIRING-V1: AI 콘텐츠 보조 모달
+  const [aiOpen, setAiOpen] = useState(false);
 
   // Resolve slug from KPA pharmacy info
   useEffect(() => {
@@ -230,6 +249,22 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
     throw new Error(res.error || '이미지 업로드에 실패했습니다.');
   };
 
+  // WO-O4O-KPA-STORE-BLOG-AI-WIRING-V1: AI 결과를 form state 로 주입 (보조 패턴)
+  // - 사용자가 비워둔 title/excerpt 만 자동 채움 (이미 입력된 값 보호)
+  // - body 는 항상 덮어씀 — 사용자가 RichTextEditor 에서 추가 편집/검토 후 저장 책임
+  // - 자동 게시 / 자동 발행 안 함
+  const handleAiInsert = ({ html, title: aiTitle }: { html: string; title: string; sourceUrl?: string }) => {
+    const finalTitle = (aiTitle || '').trim() || extractTitleFromHtml(html);
+    if (finalTitle && !editorTitle.trim()) {
+      setEditorTitle(finalTitle);
+    }
+    if (!editorExcerpt.trim()) {
+      const plain = htmlToPlain(html);
+      if (plain) setEditorExcerpt(plain.slice(0, 120));
+    }
+    setEditorContent(html);
+  };
+
   // Editor view
   if (mode === 'editor') {
     return (
@@ -274,6 +309,25 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
               style={inputStyle}
             />
           </div>
+          {/* WO-O4O-KPA-STORE-BLOG-AI-WIRING-V1: AI 콘텐츠 보조 배너
+              - 자동 생성기 아님. 전문인 칼럼 작성을 보조하는 도구.
+              - 진입 wording 은 "정리 / 다듬기 / 요약" 톤. "자동 블로그 생성" 표현 회피. */}
+          <div style={aiBanner}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={aiBannerTitle}>✨ AI 콘텐츠 보조</div>
+              <div style={aiBannerDesc}>
+                URL이나 자료를 정리해 칼럼 초안을 다듬습니다. 최종 글은 직접 작성·검토하세요.
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setAiOpen(true)}
+              style={aiBannerBtn}
+            >
+              AI로 정리하기
+            </button>
+          </div>
+
           <div>
             <label style={labelStyle}>본문</label>
             {/* WO-O4O-KPA-STORE-BLOG-CONTENT-RICHTEXT-V1: textarea → canonical RichTextEditor (preset=full).
@@ -302,6 +356,25 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
             </button>
           </div>
         </div>
+
+        {/* WO-O4O-KPA-STORE-BLOG-AI-WIRING-V1: AI 콘텐츠 보조 모달
+            - editor=null + onInsert 패턴 (ContentWritePage / ResourceWritePage / LessonModal 동일)
+            - mode 4종 모두 활용 가능: customer_rewrite (소비자용 정리) / summary (요약) /
+              pop (POP·SNS용 짧은 문구) / title_suggest (제목 추천)
+            - URL 탭: /api/ai/url-to-blocks → blocksToHtml → RichTextEditor 주입
+            - 자동 발행 / 자동 게시 안 함 — 사용자가 검토 후 임시저장 / 발행 */}
+        <AiContentModal
+          open={aiOpen}
+          onClose={() => setAiOpen(false)}
+          editor={null}
+          onInsert={handleAiInsert}
+          aiRequestHeaders={(() => {
+            const token = getAccessToken();
+            return token ? { Authorization: `Bearer ${token}` } : undefined;
+          })()}
+          headerLabel="AI 칼럼 보조"
+          urlPlaceholder="https://example.com/article 또는 https://www.youtube.com/watch?v=..."
+        />
       </div>
     );
   }
@@ -464,6 +537,44 @@ const inputStyle: React.CSSProperties = {
   color: '#1e293b',
   outline: 'none',
   boxSizing: 'border-box',
+};
+
+// WO-O4O-KPA-STORE-BLOG-AI-WIRING-V1
+const aiBanner: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: 12,
+  padding: '12px 14px',
+  marginBottom: 16,
+  background: '#eef2ff',
+  border: '1px solid #c7d2fe',
+  borderRadius: 8,
+};
+
+const aiBannerTitle: React.CSSProperties = {
+  fontSize: 13,
+  fontWeight: 600,
+  color: '#4338ca',
+  marginBottom: 2,
+};
+
+const aiBannerDesc: React.CSSProperties = {
+  fontSize: 12,
+  color: '#6366f1',
+  lineHeight: 1.5,
+};
+
+const aiBannerBtn: React.CSSProperties = {
+  padding: '8px 16px',
+  background: '#4f46e5',
+  color: '#fff',
+  border: 'none',
+  borderRadius: 7,
+  fontSize: 13,
+  fontWeight: 600,
+  cursor: 'pointer',
+  whiteSpace: 'nowrap',
 };
 
 export default PharmacyBlogPage;
