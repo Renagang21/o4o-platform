@@ -16,10 +16,8 @@ import {
   Clock,
   CheckCircle,
   XCircle,
-  RotateCcw,
   Eye,
   ChevronDown,
-  Loader2,
   Trash2,
   AlertTriangle,
   List,
@@ -31,7 +29,7 @@ import {
 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 // WO-KPA-OPERATOR-FORUM-REQUESTS-TABLE-COMPLIANCE-V1: ActionBar 추가
-import { RowActionMenu, ActionBar } from '@o4o/ui';
+import { RowActionMenu, ActionBar, BaseDetailDrawer } from '@o4o/ui';
 import { DataTable, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { forumOperatorApi } from '../../api/forum';
@@ -211,6 +209,9 @@ export default function ForumManagementPage() {
   // WO-KPA-OPERATOR-FORUM-REQUESTS-TABLE-COMPLIANCE-V1: 신청 관리 탭 selection
   const [selectedRequestIds, setSelectedRequestIds] = useState<Set<string>>(new Set());
   const [isBulkRequestProcessing, setIsBulkRequestProcessing] = useState(false);
+
+  // ── Category detail drawer ──
+  const [selectedCategory, setSelectedCategory] = useState<CategoryData | null>(null);
 
   // ── Hard delete 모달 (WO-KPA-A-OPERATOR-FORUM-HARD-DELETE-SAFE-GUARD-V1) ──
   interface DeleteCheckData {
@@ -924,167 +925,110 @@ export default function ForumManagementPage() {
             selectable
             selectedKeys={selectedRequestIds}
             onSelectionChange={setSelectedRequestIds}
+            onRowClick={(row) => { setSelectedRequest(row); setReviewComment(''); }}
           />
 
-          {/* Review Modal */}
-          {selectedRequest && (
-            <>
-              <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setSelectedRequest(null)} />
-              <div className="fixed inset-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-lg bg-white rounded-xl shadow-xl z-50 overflow-hidden flex flex-col max-h-[90vh]">
-                <div className="px-6 py-4 border-b border-slate-200">
-                  <h2 className="text-lg font-semibold text-slate-800">포럼 신청 상세</h2>
+          {/* 포럼 신청 상세 Drawer */}
+          <BaseDetailDrawer
+            open={!!selectedRequest}
+            onClose={() => { setSelectedRequest(null); setReviewComment(''); }}
+            title={selectedRequest?.name ?? ''}
+            width={560}
+            actions={selectedRequest ? [
+              ...(isReviewable(selectedRequest.status) ? [
+                { label: '거절', onClick: () => handleReview('reject'), variant: 'danger' as const, loading: isProcessing, disabled: isProcessing },
+                { label: '보완 요청', onClick: () => handleReview('revision'), variant: 'default' as const, loading: isProcessing, disabled: isProcessing },
+                { label: '승인', onClick: () => handleReview('approve'), variant: 'primary' as const, loading: isProcessing, disabled: isProcessing },
+              ] : []),
+              ...(canRecreateForum(selectedRequest.status) ? [
+                { label: '재생성', onClick: () => handleCreateForum(selectedRequest, true), variant: 'default' as const, loading: creatingRequestId === selectedRequest.id, disabled: creatingRequestId === selectedRequest.id },
+              ] : []),
+            ] : []}
+          >
+            {selectedRequest && (
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm font-medium text-slate-500 mb-1">포럼 유형</p>
+                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-sm font-medium rounded-lg ${selectedRequest.forumType === 'closed' ? 'bg-slate-100 text-slate-700' : 'bg-blue-50 text-blue-700'}`}>
+                    {selectedRequest.forumType === 'closed' ? '비공개 포럼' : '공개 포럼'}
+                  </span>
                 </div>
-                <div className="p-6 overflow-y-auto flex-1 space-y-4">
+                <div>
+                  <p className="text-sm font-medium text-slate-500 mb-1">포럼 설명</p>
+                  <p className="text-slate-800">{selectedRequest.description}</p>
+                </div>
+                {selectedRequest.tags && selectedRequest.tags.length > 0 && (
                   <div>
-                    <h4 className="text-sm font-medium text-slate-500 mb-1">포럼 이름</h4>
-                    <p className="text-slate-800 font-medium">{selectedRequest.name}</p>
+                    <p className="text-sm font-medium text-slate-500 mb-2">태그</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {selectedRequest.tags.map((tag) => (
+                        <span key={tag} className="px-2.5 py-1 text-xs font-medium rounded-full bg-blue-50 text-blue-700">{tag}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {selectedRequest.reason && (
+                  <div>
+                    <p className="text-sm font-medium text-slate-500 mb-1">신청 사유</p>
+                    <p className="text-slate-800">{selectedRequest.reason}</p>
+                  </div>
+                )}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm font-medium text-slate-500 mb-1">신청자</p>
+                    <p className="text-slate-800">{selectedRequest.requesterName}</p>
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-slate-500 mb-1">포럼 유형</h4>
-                    <p className="text-slate-800">
-                      {selectedRequest.forumType === 'closed' ? (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-sm font-medium rounded-lg bg-slate-100 text-slate-700">비공개 포럼</span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-sm font-medium rounded-lg bg-blue-50 text-blue-700">공개 포럼</span>
-                      )}
+                    <p className="text-sm font-medium text-slate-500 mb-1">신청일</p>
+                    <p className="text-slate-800">{formatDate(selectedRequest.createdAt)}</p>
+                  </div>
+                </div>
+
+                {isReviewable(selectedRequest.status) && (
+                  <div className="pt-4 border-t border-slate-200">
+                    <label className="block text-sm font-medium text-slate-700 mb-2">검토 의견</label>
+                    <textarea
+                      value={reviewComment}
+                      onChange={(e) => setReviewComment(e.target.value)}
+                      placeholder="승인/거절/보완 요청 사유를 입력하세요 (선택)"
+                      rows={3}
+                      className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                    />
+                  </div>
+                )}
+
+                {!isReviewable(selectedRequest.status) && selectedRequest.reviewComment && (
+                  <div className={`p-4 rounded-lg ${['approved', 'creating', 'completed'].includes(selectedRequest.status) ? 'bg-green-50' : 'bg-red-50'}`}>
+                    <p className={`text-sm font-medium mb-1 ${['approved', 'creating', 'completed'].includes(selectedRequest.status) ? 'text-green-700' : 'text-red-700'}`}>
+                      검토 의견
                     </p>
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-medium text-slate-500 mb-1">포럼 설명</h4>
-                    <p className="text-slate-800">{selectedRequest.description}</p>
-                  </div>
-                  {selectedRequest.tags && selectedRequest.tags.length > 0 && (
-                    <div>
-                      <h4 className="text-sm font-medium text-slate-500 mb-2">태그</h4>
-                      <div className="flex flex-wrap gap-1.5">
-                        {selectedRequest.tags.map((tag) => (
-                          <span key={tag} className="px-2.5 py-1 text-xs font-medium rounded-full bg-blue-50 text-blue-700">
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {selectedRequest.reason && (
-                    <div>
-                      <h4 className="text-sm font-medium text-slate-500 mb-1">신청 사유</h4>
-                      <p className="text-slate-800">{selectedRequest.reason}</p>
-                    </div>
-                  )}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <h4 className="text-sm font-medium text-slate-500 mb-1">신청자</h4>
-                      <p className="text-slate-800">{selectedRequest.requesterName}</p>
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-medium text-slate-500 mb-1">신청일</h4>
-                      <p className="text-slate-800">{formatDate(selectedRequest.createdAt)}</p>
-                    </div>
-                  </div>
-
-                  {isReviewable(selectedRequest.status) && (
-                    <div className="pt-4 border-t border-slate-200">
-                      <label className="block text-sm font-medium text-slate-700 mb-2">검토 의견</label>
-                      <textarea
-                        value={reviewComment}
-                        onChange={(e) => setReviewComment(e.target.value)}
-                        placeholder="승인/거절/보완 요청 사유를 입력하세요 (선택)"
-                        rows={3}
-                        className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                      />
-                    </div>
-                  )}
-
-                  {!isReviewable(selectedRequest.status) && selectedRequest.reviewComment && (
-                    <div className={`p-4 rounded-lg ${
-                      ['approved', 'creating', 'completed'].includes(selectedRequest.status) ? 'bg-green-50' : 'bg-red-50'
-                    }`}>
-                      <h4 className={`text-sm font-medium mb-1 ${
-                        ['approved', 'creating', 'completed'].includes(selectedRequest.status) ? 'text-green-700' : 'text-red-700'
-                      }`}>
-                        검토 의견
-                      </h4>
-                      <p className={['approved', 'creating', 'completed'].includes(selectedRequest.status) ? 'text-green-600' : 'text-red-600'}>
-                        {selectedRequest.reviewComment}
+                    <p className={['approved', 'creating', 'completed'].includes(selectedRequest.status) ? 'text-green-600' : 'text-red-600'}>
+                      {selectedRequest.reviewComment}
+                    </p>
+                    {selectedRequest.reviewedAt && (
+                      <p className="text-xs text-slate-500 mt-2">
+                        {selectedRequest.reviewerName} | {formatDate(selectedRequest.reviewedAt)}
                       </p>
-                      {selectedRequest.reviewedAt && (
-                        <p className="text-xs text-slate-500 mt-2">
-                          {selectedRequest.reviewerName} | {formatDate(selectedRequest.reviewedAt)}
-                        </p>
-                      )}
-                    </div>
-                  )}
+                    )}
+                  </div>
+                )}
 
-                  {selectedRequest.status === 'failed' && selectedRequest.errorMessage && (
-                    <div className="p-4 rounded-lg bg-red-50 border border-red-200">
-                      <h4 className="text-sm font-medium text-red-700 mb-1">생성 오류</h4>
-                      <p className="text-sm text-red-600 font-mono break-all">{selectedRequest.errorMessage}</p>
-                    </div>
-                  )}
+                {selectedRequest.status === 'failed' && selectedRequest.errorMessage && (
+                  <div className="p-4 rounded-lg bg-red-50 border border-red-200">
+                    <p className="text-sm font-medium text-red-700 mb-1">생성 오류</p>
+                    <p className="text-sm text-red-600 font-mono break-all">{selectedRequest.errorMessage}</p>
+                  </div>
+                )}
 
-                  {selectedRequest.status === 'completed' && selectedRequest.createdCategorySlug && (
-                    <div className="p-4 rounded-lg bg-green-50 border border-green-200">
-                      <h4 className="text-sm font-medium text-green-700 mb-1">생성된 포럼</h4>
-                      <p className="text-sm text-green-600">슬러그: <span className="font-mono">{selectedRequest.createdCategorySlug}</span></p>
-                    </div>
-                  )}
-                </div>
-
-                <div className="px-6 py-4 border-t border-slate-200 flex gap-3">
-                  <button
-                    onClick={() => setSelectedRequest(null)}
-                    className="flex-1 px-4 py-2 text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
-                  >
-                    닫기
-                  </button>
-                  {isReviewable(selectedRequest.status) && (
-                    <>
-                      <button
-                        onClick={() => handleReview('reject')}
-                        disabled={isProcessing}
-                        className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 flex items-center gap-2"
-                      >
-                        <XCircle className="w-4 h-4" />
-                        거절
-                      </button>
-                      <button
-                        onClick={() => handleReview('revision')}
-                        disabled={isProcessing}
-                        className="px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-600 disabled:opacity-50 flex items-center gap-2"
-                      >
-                        <RotateCcw className="w-4 h-4" />
-                        보완
-                      </button>
-                      <button
-                        onClick={() => handleReview('approve')}
-                        disabled={isProcessing}
-                        className="px-4 py-2 text-white bg-green-600 rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center gap-2"
-                      >
-                        {isProcessing ? (
-                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        ) : (
-                          <CheckCircle className="w-4 h-4" />
-                        )}
-                        승인
-                      </button>
-                    </>
-                  )}
-                  {canRecreateForum(selectedRequest.status) && (
-                    <button
-                      onClick={() => handleCreateForum(selectedRequest, true)}
-                      disabled={creatingRequestId === selectedRequest.id}
-                      className="px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-600 disabled:opacity-50 flex items-center gap-2"
-                    >
-                      {creatingRequestId === selectedRequest.id
-                        ? <Loader2 className="w-4 h-4 animate-spin" />
-                        : <RefreshCw className="w-4 h-4" />}
-                      재생성
-                    </button>
-                  )}
-                </div>
+                {selectedRequest.status === 'completed' && selectedRequest.createdCategorySlug && (
+                  <div className="p-4 rounded-lg bg-green-50 border border-green-200">
+                    <p className="text-sm font-medium text-green-700 mb-1">생성된 포럼</p>
+                    <p className="text-sm text-green-600">슬러그: <span className="font-mono">{selectedRequest.createdCategorySlug}</span></p>
+                  </div>
+                )}
               </div>
-            </>
-          )}
+            )}
+          </BaseDetailDrawer>
         </>
       )}
 
@@ -1172,6 +1116,7 @@ export default function ForumManagementPage() {
             selectable
             selectedKeys={selectedCatIds}
             onSelectionChange={setSelectedCatIds}
+            onRowClick={(row) => setSelectedCategory(row)}
           />
 
           {/* 목록 하단 요약 */}
@@ -1184,6 +1129,57 @@ export default function ForumManagementPage() {
           </div>
         </>
       )}
+
+      {/* 포럼 카테고리 상세 Drawer */}
+      <BaseDetailDrawer
+        open={!!selectedCategory}
+        onClose={() => setSelectedCategory(null)}
+        title={selectedCategory?.name ?? ''}
+        width={480}
+      >
+        {selectedCategory && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              {selectedCategory.isActive
+                ? <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700">활성</span>
+                : <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-slate-100 text-slate-500">비활성</span>}
+              {selectedCategory.forumType === 'closed'
+                ? <span className="px-1.5 py-0.5 text-xs font-medium rounded bg-slate-100 text-slate-600">비공개</span>
+                : <span className="px-1.5 py-0.5 text-xs font-medium rounded bg-blue-50 text-blue-600">공개</span>}
+            </div>
+            {selectedCategory.description && (
+              <div>
+                <p className="text-sm font-medium text-slate-500 mb-1">설명</p>
+                <p className="text-sm text-slate-800">{selectedCategory.description}</p>
+              </div>
+            )}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm font-medium text-slate-500 mb-1">개설자</p>
+                <p className="text-slate-800">{selectedCategory.creatorName || '-'}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-slate-500 mb-1">게시글</p>
+                <p className="text-slate-800">{selectedCategory.postCount}개</p>
+              </div>
+            </div>
+            {selectedCategory.tags && selectedCategory.tags.length > 0 && (
+              <div>
+                <p className="text-sm font-medium text-slate-500 mb-2">태그</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {selectedCategory.tags.map((tag) => (
+                    <span key={tag} className="px-2.5 py-1 text-xs font-medium rounded-full bg-slate-100 text-slate-600">{tag}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            <div>
+              <p className="text-sm font-medium text-slate-500 mb-1">생성일</p>
+              <p className="text-sm text-slate-800">{formatDate(selectedCategory.createdAt)}</p>
+            </div>
+          </div>
+        )}
+      </BaseDetailDrawer>
 
       {/* ── 비활성화 확인 모달 (WO-KPA-A-OPERATOR-FORUM-DIRECT-SOFT-DELETE-V1) ── */}
       {deactivateTarget && (
