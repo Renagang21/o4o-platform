@@ -1,13 +1,22 @@
 /**
- * StorePopPage — 매장 POP 자료 관리 (결과물 관리 전용)
+ * StorePopPage — POP 편집/출력 화면
  *
  * WO-O4O-POP-LIBRARY-INTEGRATION-V1
  * WO-O4O-QR-POP-AUTO-GENERATOR-V1
  * WO-STORE-POP-ASSET-INTEGRATION-V1
  * WO-O4O-KPA-STORE-PRODUCTION-ENTRY-CANONICAL-CORRECTION-V1:
  *   "신규 제작 시작" 버튼 제거 — 제작 시작은 "내 자료함"에서만 진입.
- *   본 페이지는 선택된 자료 기반 PDF 출력 + 항목 제거 역할 유지.
- *   진입 시 location.state.production.source.items 또는 selectedLibraryItem 으로 자료 수신.
+ * WO-O4O-KPA-POP-PRODUCTION-FLOW-CANONICAL-CORRECTION-V1:
+ *   - 라벨/breadcrumb/empty state canonical 통일 (POP)
+ *   - dead path 제거: state.selectedLibraryItem, addBtn style
+ *   - origin 정렬: library / snapshot / direct 모두 수용 (silent fail 제거)
+ *   - PDF 출력은 library origin 한정 (백엔드 제약) — 비대상 항목은 사용자 메시지로 처리
+ *
+ * 본 페이지 역할:
+ *   - 선택된 자료 표시
+ *   - QR 연결 (선택)
+ *   - layout 선택
+ *   - PDF 출력
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -19,19 +28,29 @@ import { getStoreLibraryItem } from '../../api/storeLibrary';
 import { getStoreQrCodes } from '../../api/storeQr';
 import type { StoreQrCode } from '../../api/storeQr';
 
+type PopItemOrigin = 'library' | 'snapshot' | 'direct';
+
 interface PopItem {
   id: string;
   title: string;
+  description: string | null;
   category: string | null;
   fileUrl: string | null;
   assetType: string;
   url: string | null;
+  origin: PopItemOrigin;
 }
 
 const ASSET_TYPE_LABELS: Record<string, string> = {
   file: '파일',
   content: '콘텐츠',
   'external-link': '외부 링크',
+};
+
+const ORIGIN_BADGE: Record<PopItemOrigin, { label: string; bg: string; color: string }> = {
+  library:  { label: '자료',          bg: '#EFF6FF', color: '#2563EB' },
+  snapshot: { label: '커뮤니티 콘텐츠', bg: '#F1F5F9', color: '#475569' },
+  direct:   { label: '직접 작성 콘텐츠', bg: '#F0FDF4', color: '#16A34A' },
 };
 
 export function StorePopPage() {
@@ -61,67 +80,87 @@ export function StorePopPage() {
     fetchQrCodes();
   }, [fetchQrCodes]);
 
-  // 자료 수신 — 다음 두 경로 지원:
-  //  1) 레거시: location.state.selectedLibraryItem (단건)
-  //  2) WO-O4O-KPA-STORE-PRODUCTION-ENTRY-CANONICAL-CORRECTION-V1:
-  //     location.state.production.source.items (다건, 내 자료함에서 제작 시작)
+  // 자료 수신 — "내 자료함 → 제작 시작 → POP" 진입의 production state.
+  // 3개 origin 모두 수용:
+  //   library  → StoreExecutionAsset 단건 fetch (이미지/파일 메타 포함)
+  //   snapshot → state에 포함된 title/description 그대로 사용 (콘텐츠 기반)
+  //   direct   → state에 포함된 title/description 그대로 사용 (직접 작성 콘텐츠)
+  // 미지원 origin은 silent fail 대신 사용자 메시지 + console.warn.
   useEffect(() => {
     const state = location.state as
       | {
-          selectedLibraryItem?: Record<string, unknown>;
           production?: {
-            source?: { fromLibrary?: string; items?: Array<{ id: string; title: string; description?: string | null; origin?: string }> };
+            source?: {
+              fromLibrary?: string;
+              items?: Array<{ id: string; title: string; description?: string | null; origin?: string }>;
+            };
           };
         }
       | null;
 
-    // 1) 레거시 단건
-    const single = state?.selectedLibraryItem;
-    if (single && typeof single.id === 'string') {
-      const newItem: PopItem = {
-        id: single.id as string,
-        title: (single.title as string) || '',
-        category: (single.category as string) || null,
-        fileUrl: (single.fileUrl as string) || null,
-        assetType: (single.assetType as string) || 'file',
-        url: (single.url as string) || null,
-      };
-      setPopItems((prev) => prev.some((p) => p.id === newItem.id) ? prev : [...prev, newItem]);
-    }
-
-    // 2) 신규 제작 흐름 — 자료(library) 항목들을 fetch하여 추가
     const incoming = state?.production?.source?.items;
-    if (incoming?.length) {
-      (async () => {
-        const libraryItems = incoming.filter((it) => it.origin === 'library');
-        const fetched: PopItem[] = [];
-        for (const it of libraryItems) {
+    if (!incoming?.length) return;
+
+    let cancelled = false;
+    (async () => {
+      const fetched: PopItem[] = [];
+      const unsupported: string[] = [];
+
+      for (const it of incoming) {
+        const origin = (it.origin as PopItemOrigin | undefined) ?? null;
+        if (origin === 'library') {
           try {
             const res = await getStoreLibraryItem(it.id);
             const lib = res.data;
             fetched.push({
               id: lib.id,
               title: lib.title,
+              description: lib.description ?? null,
               category: lib.category,
               fileUrl: lib.fileUrl,
               assetType: lib.assetType,
               url: lib.url,
+              origin: 'library',
             });
           } catch {
-            // skip — 가져오지 못한 자료는 무시
+            // 단건 fetch 실패 — 항목 제외 (목록에서 누락된 자료는 의미 없음)
           }
-        }
-        if (fetched.length) {
-          setPopItems((prev) => {
-            const ids = new Set(prev.map((p) => p.id));
-            return [...prev, ...fetched.filter((f) => !ids.has(f.id))];
+        } else if (origin === 'snapshot' || origin === 'direct') {
+          fetched.push({
+            id: it.id,
+            title: it.title,
+            description: it.description ?? null,
+            category: null,
+            fileUrl: null,
+            assetType: 'content',
+            url: null,
+            origin,
           });
-          toast.success(`${fetched.length}개 자료가 추가되었습니다`);
+        } else {
+          unsupported.push(it.id);
         }
-      })();
-    }
+      }
 
-    if (state) window.history.replaceState({}, document.title);
+      if (cancelled) return;
+
+      if (fetched.length) {
+        setPopItems((prev) => {
+          const ids = new Set(prev.map((p) => p.id));
+          return [...prev, ...fetched.filter((f) => !ids.has(f.id))];
+        });
+      }
+
+      if (unsupported.length) {
+        // eslint-disable-next-line no-console
+        console.warn('[StorePopPage] 지원하지 않는 origin', unsupported);
+        toast.error(`${unsupported.length}개 항목은 POP에 사용할 수 없습니다`);
+      }
+    })();
+
+    window.history.replaceState({}, document.title);
+    return () => {
+      cancelled = true;
+    };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleRemove = (id: string) => {
@@ -133,7 +172,17 @@ export function StorePopPage() {
     : '/api/v1/kpa';
 
   const handleGenerate = async () => {
-    if (popItems.length === 0) return;
+    const libraryItems = popItems.filter((p) => p.origin === 'library');
+    const otherCount = popItems.length - libraryItems.length;
+
+    if (libraryItems.length === 0) {
+      toast.error('PDF 출력은 "내 자료함 → 자료" 항목만 지원합니다');
+      return;
+    }
+    if (otherCount > 0) {
+      toast(`콘텐츠 항목 ${otherCount}개는 PDF 출력에서 제외됩니다`);
+    }
+
     setGenerating(true);
     try {
       const resp = await fetch(`${apiBase}/pharmacy/pop/generate`, {
@@ -141,7 +190,7 @@ export function StorePopPage() {
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
-          libraryItemIds: popItems.map((p) => p.id),
+          libraryItemIds: libraryItems.map((p) => p.id),
           qrId: selectedQrId || undefined,
           layout,
         }),
@@ -165,12 +214,12 @@ export function StorePopPage() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
             <Link to="/store" style={{ color: colors.neutral400, fontSize: '13px', textDecoration: 'none' }}>
-              매장 관리
+              매장 실행
             </Link>
             <span style={{ color: colors.neutral300 }}>/</span>
-            <span style={{ color: colors.neutral600, fontSize: '13px' }}>POP 자료</span>
+            <span style={{ color: colors.neutral600, fontSize: '13px' }}>POP</span>
           </div>
-          <h1 style={styles.title}>POP 자료 관리</h1>
+          <h1 style={styles.title}>POP</h1>
           <p style={styles.subtitle}>선택된 자료에 QR 코드를 연결하여 POP 광고를 PDF로 출력합니다</p>
         </div>
       </div>
@@ -181,55 +230,65 @@ export function StorePopPage() {
           <div style={styles.emptyState}>
             <Megaphone size={48} style={{ color: colors.neutral300, marginBottom: '12px' }} />
             <p style={{ color: colors.neutral500, fontSize: '14px', margin: 0 }}>
-              선택된 자료가 없습니다
+              POP 자료가 없습니다.
             </p>
             <p style={{ color: colors.neutral400, fontSize: '13px', marginTop: '4px' }}>
-              "내 자료함 → 자료" 또는 "내 자료함 → 콘텐츠"에서 자료를 선택해 "제작 시작 → POP"으로 진입하세요.
+              내 자료함의 콘텐츠나 자료를 선택해 POP를 제작할 수 있습니다.
             </p>
           </div>
         ) : (
           <>
             <div style={styles.list}>
-              {popItems.map((item) => (
-                <div key={item.id} style={styles.card}>
-                  <div style={styles.cardIcon}>
-                    <Megaphone size={24} style={{ color: '#f59e0b' }} />
-                  </div>
-                  <div style={styles.cardInfo}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <p style={styles.cardTitle}>{item.title}</p>
-                      <span style={styles.assetTypeBadge}>
-                        {ASSET_TYPE_LABELS[item.assetType] || item.assetType}
-                      </span>
+              {popItems.map((item) => {
+                const originMeta = ORIGIN_BADGE[item.origin];
+                return (
+                  <div key={item.id} style={styles.card}>
+                    <div style={styles.cardIcon}>
+                      <Megaphone size={24} style={{ color: '#f59e0b' }} />
                     </div>
-                    {item.category && (
-                      <span style={styles.cardCategory}>{item.category}</span>
-                    )}
-                    {item.assetType === 'external-link' && item.url ? (
-                      <a
-                        href={item.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={styles.cardLink}
-                      >
-                        <ExternalLink size={12} /> {item.url}
-                      </a>
-                    ) : item.fileUrl ? (
-                      <a
-                        href={item.fileUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={styles.cardLink}
-                      >
-                        <ExternalLink size={12} /> URL 열기
-                      </a>
-                    ) : null}
+                    <div style={styles.cardInfo}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                        <p style={styles.cardTitle}>{item.title}</p>
+                        <span style={{ ...styles.originBadge, background: originMeta.bg, color: originMeta.color }}>
+                          {originMeta.label}
+                        </span>
+                        {item.origin === 'library' && (
+                          <span style={styles.assetTypeBadge}>
+                            {ASSET_TYPE_LABELS[item.assetType] || item.assetType}
+                          </span>
+                        )}
+                      </div>
+                      {item.category && (
+                        <span style={styles.cardCategory}>{item.category}</span>
+                      )}
+                      {item.assetType === 'external-link' && item.url ? (
+                        <a
+                          href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={styles.cardLink}
+                        >
+                          <ExternalLink size={12} /> {item.url}
+                        </a>
+                      ) : item.fileUrl ? (
+                        <a
+                          href={item.fileUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={styles.cardLink}
+                        >
+                          <ExternalLink size={12} /> URL 열기
+                        </a>
+                      ) : item.description ? (
+                        <p style={styles.cardDescription}>{item.description}</p>
+                      ) : null}
+                    </div>
+                    <button onClick={() => handleRemove(item.id)} style={styles.removeBtn}>
+                      <Trash2 size={16} />
+                    </button>
                   </div>
-                  <button onClick={() => handleRemove(item.id)} style={styles.removeBtn}>
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Generate Settings */}
@@ -326,20 +385,6 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.neutral500,
     marginTop: '4px',
   },
-  addBtn: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '8px 16px',
-    backgroundColor: colors.primary,
-    color: '#fff',
-    border: 'none',
-    borderRadius: '8px',
-    fontSize: '14px',
-    fontWeight: 500,
-    cursor: 'pointer',
-    whiteSpace: 'nowrap',
-  },
   body: {
     minHeight: '300px',
   },
@@ -388,6 +433,15 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.neutral800,
     margin: 0,
   },
+  originBadge: {
+    display: 'inline-block',
+    padding: '2px 8px',
+    borderRadius: '10px',
+    fontSize: '11px',
+    fontWeight: 500,
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
+  },
   assetTypeBadge: {
     display: 'inline-block',
     padding: '2px 8px',
@@ -416,6 +470,16 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '12px',
     color: colors.primary,
     textDecoration: 'none',
+  },
+  cardDescription: {
+    fontSize: '12px',
+    color: colors.neutral500,
+    margin: '6px 0 0',
+    lineHeight: 1.5,
+    overflow: 'hidden',
+    display: '-webkit-box',
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: 'vertical',
   },
   removeBtn: {
     display: 'flex',
