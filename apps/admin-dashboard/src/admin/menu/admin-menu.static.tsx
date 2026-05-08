@@ -374,39 +374,6 @@ export const adminMenuStatic: MenuItem[] = [
     ],
   },
 
-  // GlucoseView
-  {
-    id: 'glucoseview',
-    label: 'GlucoseView',
-    icon: <Activity className="w-5 h-5" />,
-    roles: ['admin', 'super_admin'],
-    children: [
-      {
-        id: 'glucoseview-vendors',
-        label: 'CGM Vendors',
-        icon: <Monitor className="w-4 h-4" />,
-        path: '/glucoseview/vendors',
-      },
-      {
-        id: 'glucoseview-profiles',
-        label: 'View Profiles',
-        icon: <LayoutGrid className="w-4 h-4" />,
-        path: '/glucoseview/view-profiles',
-      },
-      {
-        id: 'glucoseview-connections',
-        label: 'Connections',
-        icon: <Link2 className="w-4 h-4" />,
-        path: '/glucoseview/connections',
-      },
-      {
-        id: 'glucoseview-applications',
-        label: 'Applications',
-        icon: <ClipboardList className="w-4 h-4" />,
-        path: '/admin/service-applications/glucoseview',
-      },
-    ],
-  },
 
   // K-Cosmetics
   {
