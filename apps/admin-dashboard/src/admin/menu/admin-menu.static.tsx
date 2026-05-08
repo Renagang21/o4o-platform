@@ -22,11 +22,7 @@ import {
   UserCheck,
   BarChart2,
   ClipboardList,
-  Heart,
   Link2,
-  DollarSign,
-  Sparkles,
-  Percent,
   Activity,
   Monitor,
   Image,
@@ -334,46 +330,6 @@ export const adminMenuStatic: MenuItem[] = [
   },
 
 
-
-  // K-Cosmetics
-  {
-    id: 'k-cosmetics',
-    label: 'K-Cosmetics',
-    icon: <Heart className="w-5 h-5" />,
-    roles: ['admin', 'super_admin', 'partner'],
-    children: [
-      {
-        id: 'cosmetics-dashboard',
-        label: 'Dashboard',
-        icon: <BarChart2 className="w-4 h-4" />,
-        path: '/cosmetics-partner/dashboard',
-      },
-      {
-        id: 'cosmetics-links',
-        label: 'Partner Links',
-        icon: <Link2 className="w-4 h-4" />,
-        path: '/cosmetics-partner/links',
-      },
-      {
-        id: 'cosmetics-routines',
-        label: 'Routines',
-        icon: <Sparkles className="w-4 h-4" />,
-        path: '/cosmetics-partner/routines',
-      },
-      {
-        id: 'cosmetics-earnings',
-        label: 'Earnings',
-        icon: <DollarSign className="w-4 h-4" />,
-        path: '/cosmetics-partner/earnings',
-      },
-      {
-        id: 'cosmetics-commissions',
-        label: 'Commission Policies',
-        icon: <Percent className="w-4 h-4" />,
-        path: '/cosmetics-partner/commission-policies',
-      },
-    ],
-  },
 
   // Digital Signage
   {
