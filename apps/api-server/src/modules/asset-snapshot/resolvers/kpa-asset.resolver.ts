@@ -5,6 +5,7 @@
  * WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1: lesson type 추가 (Reference Metadata 방식)
  * WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1: content type 추가
  *   (kpa_contents 콘텐츠 허브 → 자료함 Full Copy 경로)
+ * WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1: resolveContent 에 reusable_policy 검증 추가
  *
  * Resolves KPA community CMS, Signage, LMS Course, KPA Content assets
  * into the standard ResolvedContent format.
@@ -118,18 +119,24 @@ export class KpaAssetResolver implements ContentResolver {
 
   /**
    * WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1
+   * WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1: reusable_policy 검증 추가
    *
    * KPA 콘텐츠 허브(`kpa_contents`)의 문서형/코스형 콘텐츠를 매장 자료함으로 Full Copy.
    * 콘텐츠 본문(body / blocks)이 자료함에서 직접 사용되어 POP/QR/블로그 제작에 활용된다.
    *
-   * Gate: is_deleted = false 인 콘텐츠만 가져갈 수 있다. status 게이트는 운영자가
-   * 작성한 콘텐츠도 매장이 가져갈 수 있어야 하므로 본 단계에서는 적용하지 않는다.
+   * Gates:
+   *   1. is_deleted = false  (삭제된 콘텐츠 차단)
+   *   2. reusable_policy ≠ 'restricted'  (제작자 명시적 차단)
+   * 위 조건 미충족 시 null 반환 → AssetCopyService 가 SOURCE_NOT_FOUND 로 처리.
+   *
+   * status 게이트는 운영자가 작성한 콘텐츠도 매장이 가져갈 수 있어야 하므로 본 단계에서는
+   * 적용하지 않는다.
    */
   private async resolveContent(id: string): Promise<ResolvedContent | null> {
     const rows = await this.dataSource.query(
       `SELECT id, title, summary, body, blocks, tags, category, status,
               content_type, sub_type, source_type, source_url, source_file_name,
-              thumbnail_url, author_name
+              thumbnail_url, author_name, reusable_policy
        FROM kpa_contents
        WHERE id = $1 AND is_deleted = false
        LIMIT 1`,
@@ -137,6 +144,9 @@ export class KpaAssetResolver implements ContentResolver {
     );
     if (!rows || rows.length === 0) return null;
     const c = rows[0];
+
+    // Gate 2 — reusable_policy 검증 (restricted 는 가져가기 차단)
+    if (c.reusable_policy === 'restricted') return null;
 
     return {
       title: c.title,

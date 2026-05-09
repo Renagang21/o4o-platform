@@ -3,10 +3,25 @@
  * KPA Society 콘텐츠 정리 허브
  *
  * WO-O4O-KPA-CONTENT-HUB-FOUNDATION-V1
+ * WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1: reusable_policy 추가
  *
  * 기존 kpa_branch_docs (파일 저장소 구조)를 대체하는
  * Block 기반 콘텐츠 구조.
  */
+
+/**
+ * 콘텐츠 재사용 허용 정책 — 매장 운영자가 자신의 "내 자료함"으로 가져올 수 있는지 결정.
+ * LMS 의 CourseReusablePolicy 와 동일 enum 체계.
+ *
+ *   RESTRICTED : 가져가기 차단 (제작자 명시적 차단)
+ *   PLATFORM   : 모든 매장 가져갈 수 있음 (default)
+ *
+ * (ORGANIZATION 값은 향후 확장용 — varchar(20) 스키마는 호환)
+ */
+export enum ContentReusablePolicy {
+  RESTRICTED = 'restricted',
+  PLATFORM = 'platform',
+}
 
 import {
   Entity,
@@ -86,6 +101,13 @@ export class KpaContent {
 
   @Column({ type: 'uuid', nullable: true })
   created_by: string | null;
+
+  /**
+   * WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1
+   * 매장 자료함 가져가기 허용 정책. default 'platform'.
+   */
+  @Column({ name: 'reusable_policy', type: 'varchar', length: 20, default: ContentReusablePolicy.PLATFORM })
+  reusable_policy: ContentReusablePolicy;
 
   @Column({ type: 'boolean', default: false })
   is_deleted: boolean;

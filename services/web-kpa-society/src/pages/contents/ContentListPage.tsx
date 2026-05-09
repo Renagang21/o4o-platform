@@ -222,12 +222,15 @@ function DocumentsSection({
       system: 'last',
       render: (_v, row) => {
         const isOwner = !!(currentUserId && row.created_by === currentUserId);
+        // WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1: restricted 콘텐츠는 가져가기 차단
+        const isRestricted = (row as any).reusable_policy === 'restricted';
         const actions: RowActionItem[] = [
           {
             key: 'copy-to-store',
-            label: '내 자료함 가져가기',
+            label: isRestricted ? '내 자료함 가져가기 (불가)' : '내 자료함 가져가기',
             onClick: () => handleCopyToStore(row.id),
             loading: copying === row.id,
+            disabled: isRestricted,
           },
         ];
         if (isOwner) {
@@ -254,12 +257,15 @@ function DocumentsSection({
   ];
 
   const drawerIsOwner = !!(currentUserId && drawerItem && drawerItem.created_by === currentUserId);
+  // WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1: drawer 에서도 restricted 차단
+  const drawerIsRestricted = (drawerItem as any)?.reusable_policy === 'restricted';
   const drawerActions = drawerItem ? [
     {
-      label: '내 자료함 가져가기',
+      label: drawerIsRestricted ? '내 자료함 가져가기 (불가)' : '내 자료함 가져가기',
       variant: 'primary' as const,
       onClick: () => handleCopyToStore(drawerItem.id),
       loading: copying === drawerItem.id,
+      disabled: drawerIsRestricted,
     },
     ...(drawerIsOwner ? [
       {

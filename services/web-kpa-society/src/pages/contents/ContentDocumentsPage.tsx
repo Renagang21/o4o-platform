@@ -138,7 +138,15 @@ export function ContentDocumentsPage() {
   const handleBulkCopy = useCallback(async () => {
     setBulkBusy(true);
     try {
-      const ids = Array.from(selectedKeys);
+      // WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1:
+      //   restricted 항목은 사전 제외 (backend resolver 도 차단하나 client 에서 미리 거른다)
+      const allIds = Array.from(selectedKeys);
+      const restrictedSet = new Set(
+        items.filter((it) => it.reusable_policy === 'restricted').map((it) => it.id),
+      );
+      const ids = allIds.filter((id) => !restrictedSet.has(id));
+      const skipped = allIds.length - ids.length;
+
       const results = await Promise.allSettled(
         ids.map((id) =>
           assetSnapshotApi.copy({
@@ -163,10 +171,11 @@ export function ContentDocumentsPage() {
         toast.success(`${acquired}개를 자료함에 가져왔습니다${dupNote}`);
       }
       if (failed > 0) toast.error(`${failed}개 가져오기 실패`);
+      if (skipped > 0) toast(`가져가기 불가 ${skipped}개는 제외됨`);
     } finally {
       setBulkBusy(false);
     }
-  }, [selectedKeys]);
+  }, [selectedKeys, items]);
 
   const handleBulkDelete = useCallback(async () => {
     if (!currentUserId) return;
@@ -232,12 +241,15 @@ export function ContentDocumentsPage() {
       system: 'last',
       render: (_v, row) => {
         const isOwner = !!(currentUserId && row.created_by === currentUserId);
+        // WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1: restricted 콘텐츠는 가져가기 차단
+        const isRestricted = row.reusable_policy === 'restricted';
         const actions: RowActionItem[] = [
           {
             key: 'copy-to-store',
-            label: '내 자료함 가져가기',
+            label: isRestricted ? '내 자료함 가져가기 (불가)' : '내 자료함 가져가기',
             onClick: () => handleCopyToStore(row.id),
             loading: copyingId === row.id,
+            disabled: isRestricted,
           },
         ];
         if (isOwner) {
@@ -285,12 +297,15 @@ export function ContentDocumentsPage() {
   ];
 
   const drawerIsOwner = !!(currentUserId && drawerItem && drawerItem.created_by === currentUserId);
+  // WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1: drawer 에서도 restricted 차단
+  const drawerIsRestricted = drawerItem?.reusable_policy === 'restricted';
   const drawerActions = drawerItem ? [
     {
-      label: '내 자료함 가져가기',
+      label: drawerIsRestricted ? '내 자료함 가져가기 (불가)' : '내 자료함 가져가기',
       variant: 'primary' as const,
       onClick: () => handleCopyToStore(drawerItem.id),
       loading: copyingId === drawerItem.id,
+      disabled: drawerIsRestricted,
     },
     ...(drawerIsOwner ? [
       {

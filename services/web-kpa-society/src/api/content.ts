@@ -28,6 +28,8 @@ export interface ContentItem {
   created_at: string;
   updated_at: string;
   isRecommendedByMe?: boolean;
+  // WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1: 매장 가져가기 허용 정책
+  reusable_policy?: 'platform' | 'restricted';
 }
 
 export interface ContentListResponse {
@@ -80,6 +82,8 @@ export interface ContentCreatePayload {
   source_type?: string;
   source_url?: string;
   thumbnail_url?: string;
+  // WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1
+  reusable_policy?: 'platform' | 'restricted';
 }
 
 export const contentApi = {

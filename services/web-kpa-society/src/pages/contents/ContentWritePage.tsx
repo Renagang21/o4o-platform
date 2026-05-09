@@ -40,6 +40,9 @@ export function ContentWritePage() {
   const [tags, setTags] = useState('');
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
+  // WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1:
+  //   매장이 자기 자료함에 가져갈 수 있는지 제작자가 결정. default 'platform' (가져가기 허용).
+  const [reusablePolicy, setReusablePolicy] = useState<'platform' | 'restricted'>('platform');
   // WO-O4O-CONTENT-AI-ENTRY-V1: AI로 만들기 모달
   const [aiOpen, setAiOpen] = useState(false);
 
@@ -86,6 +89,10 @@ export function ContentWritePage() {
           setBody(c.body || '');
           setSummary(c.summary || '');
           setTags((c.tags || []).join(', '));
+          // WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1
+          if (c.reusable_policy === 'restricted' || c.reusable_policy === 'platform') {
+            setReusablePolicy(c.reusable_policy);
+          }
         }
       })
       .catch((e) => {
@@ -139,6 +146,8 @@ export function ContentWritePage() {
         sub_type: 'content', // WO-KPA-CONTENT-RESOURCE-SUBTYPE-SEPARATION-V1: 콘텐츠 허브 항목 고정
         tags: tagArr,
         status: saveStatus,
+        // WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1
+        reusable_policy: reusablePolicy,
       };
 
       if (isEditMode && id) {
@@ -252,6 +261,36 @@ export function ContentWritePage() {
             placeholder="예: 약국경영, 복약지도, 건강관리"
             style={styles.input}
           />
+        </div>
+
+        {/* Reusable Policy (WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1) */}
+        <div style={styles.field}>
+          <label style={styles.label}>매장 가져가기 허용</label>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '14px' }}>
+              <input
+                type="radio"
+                name="reusable_policy"
+                value="platform"
+                checked={reusablePolicy === 'platform'}
+                onChange={() => setReusablePolicy('platform')}
+              />
+              매장에서 내 자료함으로 가져가기 허용
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '14px' }}>
+              <input
+                type="radio"
+                name="reusable_policy"
+                value="restricted"
+                checked={reusablePolicy === 'restricted'}
+                onChange={() => setReusablePolicy('restricted')}
+              />
+              가져가기 불가
+            </label>
+          </div>
+          <span style={{ ...styles.hint, marginTop: '4px', display: 'block' }}>
+            가져가기 불가로 설정해도 커뮤니티에서 일반 열람은 그대로 가능합니다.
+          </span>
         </div>
 
         {/* Action Buttons */}

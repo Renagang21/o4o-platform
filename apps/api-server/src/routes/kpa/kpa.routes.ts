@@ -1266,7 +1266,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     contentRouter.post('/', authenticate, asyncHandler(async (req: Request, res: Response) => {
       const user = (req as any).user;
       const userId = user?.id;
-      const { title, summary, blocks, tags, category, thumbnail_url, source_type, source_url, source_file_name, status: reqStatus, body, content_type, sub_type, usage_type: reqUsageType } = req.body;
+      const { title, summary, blocks, tags, category, thumbnail_url, source_type, source_url, source_file_name, status: reqStatus, body, content_type, sub_type, usage_type: reqUsageType, reusable_policy: reqReusablePolicy } = req.body;
 
       if (!title?.trim()) {
         res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'title은 필수입니다' } });
@@ -1311,9 +1311,15 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         }
       }
 
+      // WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1: reusable_policy 처리
+      const VALID_REUSABLE_POLICIES = ['restricted', 'platform'];
+      const reusablePolicy = VALID_REUSABLE_POLICIES.includes(reqReusablePolicy)
+        ? reqReusablePolicy
+        : 'platform';
+
       const [saved] = await dataSource.query(
-        `INSERT INTO kpa_contents (title, summary, blocks, tags, category, thumbnail_url, source_type, source_url, source_file_name, status, created_by, body, content_type, sub_type, author_name, usage_type)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
+        `INSERT INTO kpa_contents (title, summary, blocks, tags, category, thumbnail_url, source_type, source_url, source_file_name, status, created_by, body, content_type, sub_type, author_name, usage_type, reusable_policy)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)
          RETURNING *`,
         [
           title.trim(),
@@ -1332,6 +1338,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
           sub_type || null,
           user?.name || null,
           derivedUsageType,
+          reusablePolicy,
         ]
       );
       await writeAuditLog(user, 'CONTENT_CREATED', 'kpa_content', saved.id, { title: saved.title });
@@ -1398,7 +1405,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         return;
       }
 
-      const { title, summary, blocks, tags, category, thumbnail_url, source_type, source_url, source_file_name, status: reqStatus, body, content_type, sub_type, usage_type: reqUsageType } = req.body;
+      const { title, summary, blocks, tags, category, thumbnail_url, source_type, source_url, source_file_name, status: reqStatus, body, content_type, sub_type, usage_type: reqUsageType, reusable_policy: reqReusablePolicy } = req.body;
 
       // WO-O4O-KPA-RESOURCES-USAGE-TYPE-V1: COPY 보정 — 수정 시에도 blocks/body 필수
       if (reqUsageType === 'COPY') {
@@ -1455,6 +1462,12 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         const VALID_USAGE_TYPES = ['READ', 'LINK', 'DOWNLOAD', 'COPY'];
         sets.push(`usage_type = $${idx++}`);
         params.push(VALID_USAGE_TYPES.includes(reqUsageType) ? reqUsageType : existing.usage_type);
+      }
+      // WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1: reusable_policy 변경 처리
+      if (reqReusablePolicy !== undefined) {
+        const VALID_REUSABLE_POLICIES = ['restricted', 'platform'];
+        sets.push(`reusable_policy = $${idx++}`);
+        params.push(VALID_REUSABLE_POLICIES.includes(reqReusablePolicy) ? reqReusablePolicy : existing.reusable_policy);
       }
 
       params.push(existing.id);
