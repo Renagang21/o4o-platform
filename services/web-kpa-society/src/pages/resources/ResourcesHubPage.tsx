@@ -6,6 +6,7 @@
  * WO-KPA-RESOURCES-UPLOAD-ENTRY-AND-FORM-SEPARATION-V1: CTA → /resources/new
  * WO-KPA-RESOURCES-OWNER-ACTIONS-AND-TAKE-V1: 등록자 수정/삭제 + 가져가기 액션
  * WO-O4O-CONTENT-LIBRARY-CARD-STANDARD-V1: inline style → Tailwind, hex → theme
+ * WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: 매장 경영자 → 내 자료함 가져가기 (Community → Store copy)
  *
  * ResourcesHubTemplate + KPA adapter.
  * KPA 전용 API(resourcesApi), operator 조건, 문구는
@@ -17,6 +18,7 @@ import { useNavigate } from 'react-router-dom';
 import { ResourcesHubTemplate, type ResourcesHubConfig, type ResourcesHubItem } from '@o4o/shared-space-ui';
 import { toast } from '@o4o/error-handling';
 import { resourcesApi } from '../../api';
+import { assetSnapshotApi } from '../../api/assetSnapshot';
 import { useAuth } from '../../contexts/AuthContext';
 import { hasAnyRole, PLATFORM_ROLES } from '../../lib/role-constants';
 
@@ -51,7 +53,11 @@ function ResourceUploadButton({ variant = 'hero' }: { variant?: 'hero' | 'empty'
 
 // ─── KPA Config ───────────────────────────────────────────────────────────────
 
-function useKpaResourcesConfig(isOperator: boolean, userId: string | null | undefined): ResourcesHubConfig {
+function useKpaResourcesConfig(
+  isOperator: boolean,
+  userId: string | null | undefined,
+  isStoreOwner: boolean,
+): ResourcesHubConfig {
   return useMemo(() => ({
     serviceKey: 'kpa-society',
     tableId: 'kpa-resources',
@@ -129,10 +135,30 @@ function useKpaResourcesConfig(isOperator: boolean, userId: string | null | unde
       else toast.success(message);
     },
 
+    // WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: 매장 경영자에게만 "내 자료함 가져가기" 노출.
+    //   resolver 가 sub_type='resource' + reusable_policy≠restricted + is_deleted=false 통과시킨다.
+    //   DUPLICATE_SNAPSHOT 은 이미 자료함에 있는 경우 — 사용자 관점에서는 성공으로 안내.
+    onCopyToStore: isStoreOwner
+      ? async (id) => {
+          try {
+            await assetSnapshotApi.copy({ sourceService: 'kpa', sourceAssetId: id, assetType: 'resource' });
+            toast.success('내 자료함에 가져왔습니다');
+          } catch (e: any) {
+            if (e?.code === 'DUPLICATE_SNAPSHOT') {
+              toast.success('이미 자료함에 있습니다');
+            } else if (e?.code === 'SOURCE_NOT_FOUND' || e?.code === 'POLICY_VIOLATION') {
+              toast.error('가져가기 불가 자료입니다');
+            } else {
+              toast.error(e?.message || '가져오기에 실패했습니다');
+            }
+          }
+        }
+      : undefined,
+
     emptyMessage: '등록된 자료가 없습니다.',
     emptyFilteredMessage: '검색 결과가 없습니다.',
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }), [isOperator, userId]);
+  }), [isOperator, userId, isStoreOwner]);
 }
 
 // ─── Page Component ───────────────────────────────────────────────────────────
@@ -140,7 +166,9 @@ function useKpaResourcesConfig(isOperator: boolean, userId: string | null | unde
 export function ResourcesHubPage() {
   const { user } = useAuth();
   const isOperator = hasAnyRole(user?.roles ?? [], PLATFORM_ROLES);
-  const config = useKpaResourcesConfig(isOperator, user?.id);
+  // WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: store_owner 만 자료함 가져가기 노출 (LmsCoursesPage 패턴)
+  const isStoreOwner = !!user?.isStoreOwner && !!user?.kpaMembership?.organizationId;
+  const config = useKpaResourcesConfig(isOperator, user?.id, isStoreOwner);
   return <ResourcesHubTemplate config={config} />;
 }
 

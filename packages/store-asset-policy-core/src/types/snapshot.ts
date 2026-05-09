@@ -23,7 +23,9 @@ export interface StoreAssetItem {
   sourceAssetId: string;
   // WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1: 'lesson' 추가 (LMS 강의 Reference Metadata)
   // WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1: 'content' 추가 (KPA 콘텐츠 허브 Full Copy)
-  assetType: 'cms' | 'signage' | 'lesson' | 'content';
+  // WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: 'resource' 추가 (KPA 자료실 sub_type='resource' Full Copy)
+  //   StoreAssetsPanel 은 별도 탭을 갖지 않음 — 자료 표시는 StoreLibraryResourcesPage 가 담당.
+  assetType: 'cms' | 'signage' | 'lesson' | 'content' | 'resource';
   title: string;
   // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1: lesson 항목 메타(thumbnail/instructor/lessonCount/publicUrl) 표시용
   contentJson?: Record<string, unknown>;

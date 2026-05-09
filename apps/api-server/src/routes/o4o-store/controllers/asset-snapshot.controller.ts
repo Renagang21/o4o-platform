@@ -9,12 +9,13 @@
  *   매장(약국) 운영자는 자료함의 canonical principal — 콘텐츠 가져가기/POP/QR/블로그 제작의
  *   주된 사용자임. 기존 화이트리스트가 HQ role(admin/operator)과 일반 약사(pharmacist)만 포함했던
  *   것은 store_owner role 도입(types/roles.ts) 이전 구성으로, 정책과 불일치하여 본 WO에서 정렬.
+ * WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: assetType 'resource' 추가 (kpa_contents sub_type='resource')
  *
  * Uses Core Controller Factory with KPA-specific config:
  * - Roles: kpa:admin, kpa:operator, kpa:pharmacist, kpa:store_owner
  * - Org: KpaMember.organization_id
- * - Resolver: KpaAssetResolver (CmsContent + signage_media + lms_courses + kpa_contents)
- * - Asset types: cms, signage, lesson, content
+ * - Resolver: KpaAssetResolver (CmsContent + signage_media + lms_courses + kpa_contents content/resource)
+ * - Asset types: cms, signage, lesson, content, resource
  */
 
 import type { RequestHandler } from 'express';
@@ -47,7 +48,7 @@ export function createAssetSnapshotController(
   return createAssetCopyController(dataSource, requireAuth, {
     // WO-O4O-ASSET-SNAPSHOT-COPY-STORE-OWNER-ALIGN-V1: kpa:store_owner 추가.
     // 매장 단위 자료함은 store_owner가 canonical principal. 동일 controller가 cms/signage/lesson/
-    // content 4종 assetType 전체에 적용되므로, store_owner는 모든 자료 가져가기에 자동 허용된다.
+    // content/resource 5종 assetType 전체에 적용되므로, store_owner는 모든 자료 가져가기에 자동 허용된다.
     allowedRoles: ['kpa:admin', 'kpa:operator', 'kpa:pharmacist', 'kpa:store_owner'],
     sourceService: 'kpa',
     resolver: new KpaAssetResolver(dataSource),
@@ -58,6 +59,8 @@ export function createAssetSnapshotController(
     //   Resolver가 published + reusable_policy != restricted 만 통과시킨다.
     // WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1: KPA 콘텐츠 허브(content) 가져가기 허용.
     //   Resolver가 is_deleted=false 만 통과시킨다.
-    allowedAssetTypes: ['cms', 'signage', 'lesson', 'content'],
+    // WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: KPA 자료실(resource) 가져가기 허용.
+    //   Resolver가 sub_type='resource' + is_deleted=false + reusable_policy≠restricted 통과시킨다.
+    allowedAssetTypes: ['cms', 'signage', 'lesson', 'content', 'resource'],
   });
 }

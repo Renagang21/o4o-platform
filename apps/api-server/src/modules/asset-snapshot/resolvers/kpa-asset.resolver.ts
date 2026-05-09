@@ -6,8 +6,10 @@
  * WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1: content type 추가
  *   (kpa_contents 콘텐츠 허브 → 자료함 Full Copy 경로)
  * WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1: resolveContent 에 reusable_policy 검증 추가
+ * WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: resource type 추가
+ *   (kpa_contents sub_type='resource' 자료실 → 자료함 Full Copy 경로)
  *
- * Resolves KPA community CMS, Signage, LMS Course, KPA Content assets
+ * Resolves KPA community CMS, Signage, LMS Course, KPA Content, KPA Resource assets
  * into the standard ResolvedContent format.
  */
 
@@ -31,6 +33,9 @@ export class KpaAssetResolver implements ContentResolver {
     }
     if (assetType === 'content') {
       return this.resolveContent(sourceAssetId);
+    }
+    if (assetType === 'resource') {
+      return this.resolveResource(sourceAssetId);
     }
     return null;
   }
@@ -166,6 +171,58 @@ export class KpaAssetResolver implements ContentResolver {
         sourceFileName: c.source_file_name,
         thumbnailUrl: c.thumbnail_url,
         authorName: c.author_name,
+        capturedAt: new Date().toISOString(),
+      },
+    };
+  }
+
+  /**
+   * WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1
+   *
+   * KPA 자료실(`kpa_contents` WHERE sub_type='resource')의 파일/외부링크/문서 자료를
+   * 매장 자료함으로 Full Copy. 자료실은 콘텐츠 허브와 동일 테이블을 공유하지만 sub_type
+   * 으로 분리되며, 자료함 자료 탭(StoreLibraryResourcesPage)에서 제작 시작 진입점이 된다.
+   *
+   * Gates:
+   *   1. is_deleted = false  (삭제된 자료 차단)
+   *   2. sub_type = 'resource'  (콘텐츠 허브 항목이 resource 로 잘못 가져가지지 않도록 강제)
+   *   3. reusable_policy ≠ 'restricted'  (제작자 명시적 차단)
+   * 위 조건 미충족 시 null 반환 → AssetCopyService 가 SOURCE_NOT_FOUND 로 처리.
+   */
+  private async resolveResource(id: string): Promise<ResolvedContent | null> {
+    const rows = await this.dataSource.query(
+      `SELECT id, title, summary, body, blocks, tags, category, status,
+              content_type, sub_type, source_type, source_url, source_file_name,
+              usage_type, thumbnail_url, author_name, reusable_policy
+       FROM kpa_contents
+       WHERE id = $1 AND is_deleted = false AND sub_type = 'resource'
+       LIMIT 1`,
+      [id],
+    );
+    if (!rows || rows.length === 0) return null;
+    const r = rows[0];
+
+    if (r.reusable_policy === 'restricted') return null;
+
+    return {
+      title: r.title,
+      type: 'resource',
+      sourceService: 'kpa',
+      contentJson: {
+        title: r.title,
+        summary: r.summary,
+        body: r.body,
+        blocks: r.blocks,
+        tags: r.tags,
+        category: r.category,
+        contentType: r.content_type,
+        subType: r.sub_type,
+        sourceType: r.source_type,
+        sourceUrl: r.source_url,
+        sourceFileName: r.source_file_name,
+        usageType: r.usage_type,
+        thumbnailUrl: r.thumbnail_url,
+        authorName: r.author_name,
         capturedAt: new Date().toISOString(),
       },
     };

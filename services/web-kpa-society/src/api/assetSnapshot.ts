@@ -4,6 +4,7 @@
  * WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1
  * WO-KPA-A-ASSET-COPY-STABILIZATION-V1 (pagination)
  * WO-O4O-SNAPSHOT-POLICY-MIGRATION-V1: snapshot_type, lifecycle_status types
+ * WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: assetType 'resource' 추가
  */
 
 import { apiClient } from './client';
@@ -14,12 +15,14 @@ import type { LessonSnapshotContent } from '@o4o/shared-space-ui';
 // 기존 KPA 호출처는 본 모듈에서 import 하던 패턴이므로, 호환성을 위해 re-export 한다.
 export type { LessonSnapshotContent };
 
+export type SnapshotAssetType = 'cms' | 'signage' | 'lesson' | 'content' | 'resource';
+
 export interface AssetSnapshotItem {
   id: string;
   organizationId: string;
   sourceService: string;
   sourceAssetId: string;
-  assetType: 'cms' | 'signage' | 'lesson' | 'content';
+  assetType: SnapshotAssetType;
   title: string;
   contentJson: Record<string, unknown>;
   createdBy: string;
@@ -32,7 +35,7 @@ export interface AssetSnapshotItem {
 interface CopyAssetRequest {
   sourceService: string;
   sourceAssetId: string;
-  assetType: 'cms' | 'signage' | 'lesson' | 'content';
+  assetType: SnapshotAssetType;
 }
 
 interface CopyAssetResponse {
@@ -62,7 +65,7 @@ export const assetSnapshotApi = {
   /**
    * List asset snapshots for the user's store (paginated)
    */
-  list: (params?: { type?: 'cms' | 'signage' | 'lesson' | 'content'; page?: number; limit?: number }) => {
+  list: (params?: { type?: SnapshotAssetType; page?: number; limit?: number }) => {
     const query: Record<string, string> = {};
     if (params?.type) query.type = params.type;
     if (params?.page) query.page = String(params.page);
@@ -91,7 +94,7 @@ export interface StoreAssetItem {
   organizationId: string;
   sourceService: string;
   sourceAssetId: string;
-  assetType: 'cms' | 'signage' | 'lesson' | 'content';
+  assetType: SnapshotAssetType;
   title: string;
   // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1: lesson 항목 thumbnail/lessonCount/publicUrl 표시용 (cms는 미사용)
   contentJson?: Record<string, unknown>;
@@ -123,7 +126,7 @@ export const storeAssetControlApi = {
   /**
    * List store assets with publish status (joined with control table)
    */
-  list: (params?: { type?: 'cms' | 'signage' | 'lesson' | 'content'; page?: number; limit?: number }) => {
+  list: (params?: { type?: SnapshotAssetType; page?: number; limit?: number }) => {
     const query: Record<string, string> = {};
     if (params?.type) query.type = params.type;
     if (params?.page) query.page = String(params.page);
@@ -163,7 +166,7 @@ export interface PublishedAssetItem {
   organizationId: string;
   sourceService: string;
   sourceAssetId: string;
-  assetType: 'cms' | 'signage' | 'lesson' | 'content';
+  assetType: SnapshotAssetType;
   title: string;
   contentJson: Record<string, unknown>;
   createdAt: string;
@@ -189,7 +192,7 @@ export const publishedAssetsApi = {
    */
   list: (
     organizationId: string,
-    params?: { channel?: string; type?: 'cms' | 'signage' | 'lesson' | 'content'; page?: number; limit?: number },
+    params?: { channel?: string; type?: SnapshotAssetType; page?: number; limit?: number },
   ) => {
     const query: Record<string, string> = {};
     if (params?.channel) query.channel = params.channel;

@@ -3,16 +3,22 @@
  *
  * WO-O4O-KPA-STORE-MATERIALS-AND-PRODUCTIONS-CANONICAL-ALIGN-V1
  * WO-O4O-KPA-STORE-PRODUCTION-ENTRY-CANONICAL-CORRECTION-V1: checkbox + 제작 시작 진입
+ * WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: 커뮤니티 자료실에서 가져온 snapshot 도 함께 표시
  *
- * 매장이 보유한 자료실 아이템 (file / external-link / content) 목록.
- * Backend: GET /pharmacy/library — store_library_items 기존 active API 재사용.
+ * 매장이 보유한 자료(직접 업로드 + 커뮤니티 자료실 가져옴) 통합 목록.
+ *   - 직접 업로드: store_library_items (GET /pharmacy/library)
+ *   - 커뮤니티 가져옴: o4o_asset_snapshots WHERE asset_type='resource' (GET /assets?type=resource)
  *
  * 본 페이지는 제작 시작 단일 진입점:
  *   자료 선택 → "제작 시작" → modal → 편집기 route 이동
+ *
+ * 삭제 정책:
+ *   - 직접 업로드 항목: 삭제 가능 (DELETE /pharmacy/library/:id)
+ *   - 가져온 snapshot 항목: 본 WO 범위 외 (snapshot 삭제 endpoint 미존재 — 후속 WO 후보)
  */
 
 import { useEffect, useState, useCallback, useMemo, type CSSProperties } from 'react';
-import { Library, ExternalLink, Trash2, RefreshCw, FileDown, Link as LinkIcon, FileText, Sparkles } from 'lucide-react';
+import { Library, ExternalLink, Trash2, RefreshCw, FileDown, Link as LinkIcon, FileText, Sparkles, Download } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import {
   getStoreLibraryItems,
@@ -20,6 +26,7 @@ import {
   type StoreLibraryItem,
   type AssetType,
 } from '../../api/storeLibrary';
+import { assetSnapshotApi, type AssetSnapshotItem } from '../../api/assetSnapshot';
 import { colors } from '../../styles/theme';
 import { StartProductionModal, type ProductionSource } from './StartProductionModal';
 
@@ -31,8 +38,72 @@ const ASSET_TYPE_LABEL: Record<AssetType, { label: string; bg: string; color: st
   'external-link': { label: '외부 링크', bg: '#FEF3C7', color: '#D97706', Icon: LinkIcon },
 };
 
+// WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: 두 source(library / snapshot) 통합 표시용
+type SourceKind = 'library' | 'snapshot';
+
+interface UnifiedResourceRow {
+  id: string;                          // library: 'lib:<id>', snapshot: 'snap:<id>'
+  rawId: string;                       // 원본 id (삭제/제작 시 사용)
+  kind: SourceKind;
+  title: string;
+  description: string | null;
+  assetType: AssetType;                // 표시용 (snapshot 도 file/content/external-link 로 매핑)
+  category: string | null;
+  updatedAt: string;
+  href: string | null;
+  sourceFileName: string | null;
+  // 제작 modal 진입 시 origin 분기용
+  modalOrigin: 'library' | 'snapshot';
+}
+
+function libraryToUnified(it: StoreLibraryItem): UnifiedResourceRow {
+  return {
+    id: `lib:${it.id}`,
+    rawId: it.id,
+    kind: 'library',
+    title: it.title,
+    description: it.description,
+    assetType: it.assetType,
+    category: it.category,
+    updatedAt: it.updatedAt,
+    href: it.assetType === 'file' ? it.fileUrl : it.assetType === 'external-link' ? it.url : null,
+    sourceFileName: it.fileName,
+    modalOrigin: 'library',
+  };
+}
+
+function snapshotToUnified(snap: AssetSnapshotItem): UnifiedResourceRow {
+  // contentJson 은 KpaAssetResolver.resolveResource() 가 채운 형태
+  const cj = snap.contentJson as Record<string, unknown> | undefined;
+  const sourceUrl = (cj?.sourceUrl as string | null | undefined) ?? null;
+  const sourceFileName = (cj?.sourceFileName as string | null | undefined) ?? null;
+  const summary = (cj?.summary as string | null | undefined) ?? null;
+  const category = (cj?.category as string | null | undefined) ?? null;
+  const sourceType = (cj?.sourceType as string | null | undefined) ?? null;
+
+  // resource 의 source_type(upload/external/manual) → assetType(file/external-link/content) 매핑
+  const assetType: AssetType =
+    sourceType === 'external' ? 'external-link'
+    : sourceType === 'upload' ? 'file'
+    : 'content';
+
+  return {
+    id: `snap:${snap.id}`,
+    rawId: snap.id,
+    kind: 'snapshot',
+    title: snap.title,
+    description: summary,
+    assetType,
+    category,
+    updatedAt: snap.createdAt,
+    href: sourceUrl,
+    sourceFileName,
+    modalOrigin: 'snapshot',
+  };
+}
+
 export default function StoreLibraryResourcesPage() {
-  const [items, setItems] = useState<StoreLibraryItem[]>([]);
+  const [items, setItems] = useState<UnifiedResourceRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -42,11 +113,29 @@ export default function StoreLibraryResourcesPage() {
   const fetchItems = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getStoreLibraryItems({ page: 1, limit: PAGE_LIMIT });
-      setItems(res.data?.items || []);
+      // 두 source 병렬 조회. 한쪽 실패해도 가능한 항목은 표시 (graceful degradation).
+      const [libRes, snapRes] = await Promise.allSettled([
+        getStoreLibraryItems({ page: 1, limit: PAGE_LIMIT }),
+        assetSnapshotApi.list({ type: 'resource', page: 1, limit: PAGE_LIMIT }),
+      ]);
+
+      const libraryRows = libRes.status === 'fulfilled'
+        ? (libRes.value.data?.items ?? []).map(libraryToUnified)
+        : [];
+      const snapshotRows = snapRes.status === 'fulfilled'
+        ? (snapRes.value.data?.items ?? []).map(snapshotToUnified)
+        : [];
+
+      // updatedAt 기준 내림차순 merge
+      const merged = [...libraryRows, ...snapshotRows].sort((a, b) =>
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+      );
+      setItems(merged);
       setSelected(new Set());
-    } catch (e: any) {
-      toast.error(e?.message || '불러오는 데 실패했습니다');
+
+      if (libRes.status === 'rejected' && snapRes.status === 'rejected') {
+        toast.error('불러오는 데 실패했습니다');
+      }
     } finally {
       setLoading(false);
     }
@@ -56,15 +145,17 @@ export default function StoreLibraryResourcesPage() {
     fetchItems();
   }, [fetchItems]);
 
-  const handleDelete = async (id: string) => {
+  // 직접 업로드(library) 항목만 삭제 가능. snapshot 삭제는 후속 WO 후보.
+  const handleDelete = async (row: UnifiedResourceRow) => {
+    if (row.kind !== 'library') return;
     if (!confirm('이 자료를 삭제하시겠습니까?')) return;
-    setDeletingId(id);
+    setDeletingId(row.id);
     try {
-      await deleteStoreLibraryItem(id);
-      setItems((prev) => prev.filter((it) => it.id !== id));
+      await deleteStoreLibraryItem(row.rawId);
+      setItems((prev) => prev.filter((it) => it.id !== row.id));
       setSelected((prev) => {
         const next = new Set(prev);
-        next.delete(id);
+        next.delete(row.id);
         return next;
       });
       toast.success('삭제되었습니다');
@@ -96,33 +187,41 @@ export default function StoreLibraryResourcesPage() {
     const sourceItems: ProductionSource['items'] = items
       .filter((it) => selected.has(it.id))
       .map((it) => ({
-        id: it.id,
+        id: it.rawId,
         title: it.title,
         description: it.description,
-        origin: 'library',
+        origin: it.modalOrigin,
       }));
     setModalSource({ fromLibrary: 'resources', items: sourceItems });
     setModalOpen(true);
   };
 
+  // 직접 업로드(library) 항목만 batch 삭제. snapshot 항목은 자동 제외.
   const handleBulkDelete = async () => {
     if (selected.size === 0) return;
-    if (!confirm(`선택한 ${selected.size}개 자료를 삭제하시겠습니까?`)) return;
-    const ids = Array.from(selected);
+    const libraryRows = items.filter((it) => selected.has(it.id) && it.kind === 'library');
+    const skippedCount = selected.size - libraryRows.length;
+    if (libraryRows.length === 0) {
+      toast.error('가져온 자료는 일괄 삭제할 수 없습니다');
+      return;
+    }
+    const confirmMsg = skippedCount > 0
+      ? `직접 업로드 ${libraryRows.length}개를 삭제합니다 (가져온 자료 ${skippedCount}개 제외)`
+      : `선택한 ${libraryRows.length}개 자료를 삭제하시겠습니까?`;
+    if (!confirm(confirmMsg)) return;
     try {
-      await Promise.all(ids.map((id) => deleteStoreLibraryItem(id)));
-      setItems((prev) => prev.filter((it) => !selected.has(it.id)));
-      setSelected(new Set());
-      toast.success(`${ids.length}개 삭제되었습니다`);
+      await Promise.all(libraryRows.map((it) => deleteStoreLibraryItem(it.rawId)));
+      const removedIds = new Set(libraryRows.map((it) => it.id));
+      setItems((prev) => prev.filter((it) => !removedIds.has(it.id)));
+      setSelected((prev) => {
+        const next = new Set(prev);
+        for (const id of removedIds) next.delete(id);
+        return next;
+      });
+      toast.success(`${libraryRows.length}개 삭제되었습니다`);
     } catch (e: any) {
       toast.error(e?.message || '일괄 삭제에 실패했습니다');
     }
-  };
-
-  const openHref = (item: StoreLibraryItem): string | null => {
-    if (item.assetType === 'file' && item.fileUrl) return item.fileUrl;
-    if (item.assetType === 'external-link' && item.url) return item.url;
-    return null;
   };
 
   const visibleItems = useMemo(() => items, [items]);
@@ -200,7 +299,7 @@ export default function StoreLibraryResourcesPage() {
         <ul style={styles.list}>
           {visibleItems.map((item) => {
             const meta = ASSET_TYPE_LABEL[item.assetType] ?? ASSET_TYPE_LABEL.file;
-            const href = openHref(item);
+            const isSnapshot = item.kind === 'snapshot';
             return (
               <li key={item.id} style={styles.listItem}>
                 <input
@@ -219,6 +318,18 @@ export default function StoreLibraryResourcesPage() {
                     )}
                   </div>
                   <span style={{ ...styles.badge, background: meta.bg, color: meta.color }}>{meta.label}</span>
+                  {/* WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: source 구분 badge */}
+                  <span
+                    style={{
+                      ...styles.badge,
+                      background: isSnapshot ? '#EEF2FF' : '#F5F3FF',
+                      color: isSnapshot ? '#4338CA' : '#6D28D9',
+                    }}
+                    title={isSnapshot ? '커뮤니티 자료실에서 가져온 자료' : '직접 업로드한 자료'}
+                  >
+                    {isSnapshot ? <Download size={11} style={{ marginRight: 3 }} /> : null}
+                    {isSnapshot ? '커뮤니티 가져옴' : '직접 추가'}
+                  </span>
                   {item.category && (
                     <span style={{ ...styles.badge, background: colors.neutral100, color: colors.neutral600 }}>
                       {item.category}
@@ -229,9 +340,9 @@ export default function StoreLibraryResourcesPage() {
                   <span style={styles.metaText}>
                     {item.updatedAt ? new Date(item.updatedAt).toLocaleDateString('ko-KR') : ''}
                   </span>
-                  {href && (
+                  {item.href && (
                     <a
-                      href={href}
+                      href={item.href}
                       target="_blank"
                       rel="noreferrer"
                       style={styles.openLink}
@@ -240,14 +351,19 @@ export default function StoreLibraryResourcesPage() {
                       <ExternalLink size={14} />
                     </a>
                   )}
-                  <button
-                    onClick={() => handleDelete(item.id)}
-                    disabled={deletingId === item.id}
-                    style={styles.deleteBtn}
-                    title="삭제"
-                  >
-                    <Trash2 size={14} />
-                  </button>
+                  {/* 직접 업로드만 삭제 가능. 가져온 snapshot 삭제는 후속 WO 후보. */}
+                  {item.kind === 'library' ? (
+                    <button
+                      onClick={() => handleDelete(item)}
+                      disabled={deletingId === item.id}
+                      style={styles.deleteBtn}
+                      title="삭제"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  ) : (
+                    <span style={{ width: 28, height: 28, display: 'inline-block' }} />
+                  )}
                 </div>
               </li>
             );

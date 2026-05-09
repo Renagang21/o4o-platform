@@ -71,6 +71,8 @@ export interface ResourcesHubItem {
   // WO-KPA-RESOURCES-MINOR-REFINEMENT-V1: 좋아요
   like_count?: number;
   isRecommendedByMe?: boolean;
+  // WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: 매장 가져가기 정책. 'restricted' 면 자료함 가져가기 차단.
+  reusable_policy?: 'platform' | 'restricted';
 }
 
 export interface ResourcesHubFetchParams {
@@ -138,6 +140,12 @@ export interface ResourcesHubConfig {
   // WO-KPA-RESOURCES-TAKE-ACTION-CLARIFY-V1: 가져가기 결과 toast 어댑터
   // (consumer 페이지가 자신의 toast 라이브러리로 연결)
   onToast?: (message: string, type?: 'success' | 'error') => void;
+
+  // WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: 매장 자료함 가져가기 액션
+  //   - 매장 경영자(store_owner)에게만 노출되도록 consumer 가 조건부로 전달
+  //   - reusable_policy='restricted' 항목은 row action 에서 자동 비활성
+  //   - 성공/실패/중복 처리는 consumer 가 자체 toast 로 안내 (resolve 시 성공으로 간주)
+  onCopyToStore?: (id: string) => Promise<void>;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -601,6 +609,18 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
 
           // ⋯ 메뉴 구성
           const rowActions: RowActionItem[] = [];
+
+          // WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: 내 자료함 가져가기 (store_owner only)
+          if (config.onCopyToStore) {
+            const isRestricted = row.reusable_policy === 'restricted';
+            rowActions.push({
+              key: 'copy-to-store',
+              label: isRestricted ? '내 자료함 가져가기 (불가)' : '내 자료함 가져가기',
+              disabled: isRestricted,
+              onClick: () => { config.onCopyToStore!(row.id).catch(() => { /* consumer toast 처리 */ }); },
+            });
+          }
+
           // 수정: operator 우선, 없으면 본인
           if (config.getEditHref) {
             rowActions.push({ key: 'edit', label: '수정', onClick: () => navigate(config.getEditHref!(row.id)) });

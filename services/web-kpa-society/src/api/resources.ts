@@ -32,6 +32,8 @@ export interface ResourceItem {
   created_at: string;
   updated_at: string;
   isRecommendedByMe?: boolean;
+  // WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: 매장 가져가기 정책. 'restricted' 면 가져가기 차단.
+  reusable_policy?: 'platform' | 'restricted';
 }
 
 export interface ResourceListResponse {
