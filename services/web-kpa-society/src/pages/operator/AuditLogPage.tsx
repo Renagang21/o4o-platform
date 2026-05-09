@@ -1,6 +1,7 @@
 /**
  * AuditLogPage - KPA-a 운영자 감사 로그 조회
  * WO-KPA-A-OPERATOR-AUDIT-LOG-PHASE1-V1
+ * WO-O4O-KPA-AUDIT-LOG-CANONICAL-ALIGN-V1: raw <table> → @o4o/operator-ux-core DataTable
  *
  * API:
  *   GET /api/v1/kpa/operator/audit-logs
@@ -11,13 +12,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   Shield,
-  Loader2,
   AlertCircle,
   RefreshCw,
   ChevronLeft,
   ChevronRight,
   Filter,
 } from 'lucide-react';
+import { DataTable } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { getAccessToken } from '../../contexts/AuthContext';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
@@ -143,6 +145,66 @@ export default function AuditLogPage() {
     return parts.join(' / ') || JSON.stringify(m);
   };
 
+  // WO-O4O-KPA-AUDIT-LOG-CANONICAL-ALIGN-V1:
+  //   raw <table> 컬럼 정의를 ListColumnDef 로 정렬.
+  //   created_at 만 sortable (sortAccessor = epoch). 그 외 컬럼은 audit 데이터 특성상 정렬 의미 약해 미적용.
+  const auditColumns: ListColumnDef<AuditLog>[] = [
+    {
+      key: 'created_at',
+      header: '일시',
+      width: '180px',
+      sortable: true,
+      render: (_v, log) => (
+        <span className="text-sm text-slate-600 whitespace-nowrap">{formatDate(log.created_at)}</span>
+      ),
+      sortAccessor: (log) => new Date(log.created_at).getTime(),
+    },
+    {
+      key: 'action_type',
+      header: '액션',
+      width: '160px',
+      render: (_v, log) => (
+        <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${ACTION_COLORS[log.action_type] || 'bg-gray-100 text-gray-800'}`}>
+          {ACTION_LABELS[log.action_type] || log.action_type}
+        </span>
+      ),
+    },
+    {
+      key: 'target_type',
+      header: '대상',
+      width: '90px',
+      render: (_v, log) => (
+        <span className="text-sm text-slate-700">{TARGET_LABELS[log.target_type] || log.target_type}</span>
+      ),
+    },
+    {
+      key: 'metadata',
+      header: '상세',
+      // 긴 metadata 본문 노출 회피: formatMetadata 가 요약, 컬럼은 max-width + truncate
+      render: (_v, log) => (
+        <span className="block max-w-xs truncate text-sm text-slate-600" title={formatMetadata(log)}>
+          {formatMetadata(log)}
+        </span>
+      ),
+    },
+    {
+      key: 'operator_role',
+      header: '운영자 역할',
+      width: '120px',
+      render: (_v, log) => <span className="text-sm text-slate-600">{log.operator_role}</span>,
+    },
+    {
+      key: 'operator_id',
+      header: '운영자 ID',
+      width: '110px',
+      render: (_v, log) => (
+        <span className="text-xs text-slate-400 font-mono" title={log.operator_id}>
+          {log.operator_id.slice(0, 8)}...
+        </span>
+      ),
+    },
+  ];
+
   return (
     <div className="p-6 max-w-7xl mx-auto">
       {/* Header */}
@@ -195,57 +257,18 @@ export default function AuditLogPage() {
         </div>
       )}
 
-      {/* Table */}
-      {loading ? (
-        <div className="flex justify-center py-20">
-          <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
-        </div>
-      ) : logs.length === 0 ? (
-        <div className="text-center py-20 text-gray-500">
-          감사 로그가 없습니다.
-        </div>
-      ) : (
-        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b">
-              <tr>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">일시</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">액션</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">대상</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">상세</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">운영자 역할</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">운영자 ID</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {logs.map((log) => (
-                <tr key={log.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
-                    {formatDate(log.created_at)}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${ACTION_COLORS[log.action_type] || 'bg-gray-100 text-gray-800'}`}>
-                      {ACTION_LABELS[log.action_type] || log.action_type}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-gray-700">
-                    {TARGET_LABELS[log.target_type] || log.target_type}
-                  </td>
-                  <td className="px-4 py-3 text-gray-600 max-w-xs truncate">
-                    {formatMetadata(log)}
-                  </td>
-                  <td className="px-4 py-3 text-gray-600">
-                    {log.operator_role}
-                  </td>
-                  <td className="px-4 py-3 text-gray-400 font-mono text-xs">
-                    {log.operator_id.slice(0, 8)}...
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      {/* WO-O4O-KPA-AUDIT-LOG-CANONICAL-ALIGN-V1:
+          raw <table> + 자체 spinner + 자체 empty state 를 canonical DataTable 로 통합.
+          loading/empty 처리는 DataTable 내장 — 별도 분기 제거.
+          row click 미정의 (audit log 는 read-only, drawer 도입은 본 WO scope 외). */}
+      <DataTable<AuditLog>
+        columns={auditColumns}
+        data={logs}
+        rowKey="id"
+        loading={loading}
+        emptyMessage="감사 로그가 없습니다."
+        tableId="kpa-operator-audit-logs"
+      />
 
       {/* Pagination */}
       {totalPages > 1 && (
