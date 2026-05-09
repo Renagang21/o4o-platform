@@ -2,6 +2,7 @@
  * IdlePlaylistEditor — Lightweight editor for tablet idle playlist
  *
  * WO-O4O-TABLET-IDLE-PLAYLIST-EDITOR-V1
+ * WO-O4O-TABLET-IDLE-PREVIEW-V1 — 내부 Preview sub-component 추가
  *
  * 매장 운영자가 tablet idle 화면에 재생할 항목(image/video URL + duration)을
  * 편집하는 controlled component.
@@ -12,6 +13,8 @@
  * - 순서: up/down 버튼 (drag-drop 미사용)
  * - validation 은 add 시점에 inline 표시
  * - duration 은 image 항목 전용 (video 는 onEnded 자동 진행)
+ * - Preview 는 편집 보조 — 실제 kiosk fullscreen runtime 과 100% 동일하지 않음
+ *   (URL/순서/타입 확인 목적). IdleOverlay runtime 미터치.
  *
  * 외부 의존성: react 만 (lucide-react 등 추가 의존성 없음 — inline SVG 사용)
  *
@@ -19,9 +22,16 @@
  *   <IdlePlaylistEditor items={items} onChange={setItems} />
  *
  * 저장은 부모 컴포넌트가 별도 버튼/API 로 수행.
+ *
+ * Preview 동작:
+ * - 빈 배열: "재생 항목이 없습니다" 안내
+ * - image: <img> 노출 (durationMs 기준 자동 진행 미사용 — 수동 이전/다음 버튼만)
+ * - video: <video controls muted playsInline> (운영자 수동 재생/일시정지)
+ * - 로딩 실패: onError 안내 메시지
+ * - items 가 변경되어 previewIndex 가 범위를 벗어나면 0 으로 보정
  */
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { IdlePlaylistItem } from './types';
 
 export interface IdlePlaylistEditorProps {
@@ -152,6 +162,9 @@ export function IdlePlaylistEditor({ items, onChange, disabled = false }: IdlePl
 
       {error && <div style={styles.error}>{error}</div>}
 
+      {/* List + Preview (responsive: wrap to stack on narrow screens) */}
+      <div style={styles.splitRow}>
+      <div style={styles.listCol}>
       {/* List */}
       {items.length === 0 ? (
         <div style={styles.empty}>
@@ -208,6 +221,131 @@ export function IdlePlaylistEditor({ items, onChange, disabled = false }: IdlePl
           ))}
         </ul>
       )}
+      </div>
+      <div style={styles.previewCol}>
+        <IdlePlaylistPreview items={items} />
+      </div>
+      </div>
+    </div>
+  );
+}
+
+// ── IdlePlaylistPreview (internal — WO-O4O-TABLET-IDLE-PREVIEW-V1) ────────────
+// 편집 보조 preview. 실제 kiosk fullscreen runtime 과 동일하지 않음 (URL/순서/타입
+// 확인 목적). IdleOverlay (TabletKioskPage 내부) 는 별개 — 본 컴포넌트는 그것을
+// 침범하지 않는다.
+//
+// 동작:
+// - 빈 배열: "재생 항목이 없습니다" 안내
+// - 수동 이전/다음 (autoplay 미사용 — 운영자가 직접 확인)
+// - image: <img onError> 로 로딩 실패 안내
+// - video: <video controls muted playsInline> + onError 안내
+
+interface IdlePlaylistPreviewProps {
+  items: IdlePlaylistItem[];
+}
+
+function IdlePlaylistPreview({ items }: IdlePlaylistPreviewProps) {
+  const [previewIndex, setPreviewIndex] = useState(0);
+  const [loadError, setLoadError] = useState(false);
+
+  // items 변경 시 index 가 범위 벗어나면 0 으로 보정
+  useEffect(() => {
+    if (previewIndex >= items.length) {
+      setPreviewIndex(0);
+    }
+  }, [items.length, previewIndex]);
+
+  // 항목/index 변경 시 에러 상태 리셋
+  const currentKey = useMemo(() => {
+    const it = items[previewIndex];
+    return it ? `${it.type}-${it.url}` : 'empty';
+  }, [items, previewIndex]);
+  useEffect(() => {
+    setLoadError(false);
+  }, [currentKey]);
+
+  if (items.length === 0) {
+    return (
+      <div style={styles.previewBox}>
+        <div style={styles.previewHeader}>
+          <span style={styles.previewLabel}>미리보기</span>
+        </div>
+        <div style={styles.previewStage}>
+          <span style={styles.previewEmpty}>재생 항목이 없습니다</span>
+        </div>
+      </div>
+    );
+  }
+
+  const safeIndex = Math.min(previewIndex, items.length - 1);
+  const current = items[safeIndex];
+
+  const goPrev = () => setPreviewIndex((i) => (i - 1 + items.length) % items.length);
+  const goNext = () => setPreviewIndex((i) => (i + 1) % items.length);
+
+  return (
+    <div style={styles.previewBox}>
+      <div style={styles.previewHeader}>
+        <span style={styles.previewLabel}>미리보기</span>
+        <span style={styles.previewIdx}>
+          {safeIndex + 1} / {items.length}
+        </span>
+      </div>
+      <div style={styles.previewStage}>
+        {loadError ? (
+          <div style={styles.previewEmpty}>
+            {current.type === 'video' ? '영상' : '이미지'} 로드 실패
+            <div style={styles.previewHint}>{current.url}</div>
+          </div>
+        ) : current.type === 'image' ? (
+          <img
+            src={current.url}
+            alt=""
+            style={styles.previewMedia}
+            onError={() => setLoadError(true)}
+            draggable={false}
+          />
+        ) : (
+          <video
+            key={current.url}
+            src={current.url}
+            controls
+            muted
+            playsInline
+            style={styles.previewMedia}
+            onError={() => setLoadError(true)}
+          />
+        )}
+      </div>
+      <div style={styles.previewControls}>
+        <button
+          type="button"
+          onClick={goPrev}
+          disabled={items.length <= 1}
+          style={styles.previewBtn}
+          aria-label="이전 항목"
+          title="이전"
+        >
+          ‹ 이전
+        </button>
+        <span style={styles.previewMeta}>
+          <span style={current.type === 'video' ? styles.badgeVideo : styles.badgeImage}>
+            {current.type === 'video' ? '영상' : '이미지'}
+          </span>
+          <span style={styles.previewUrl} title={current.url}>{current.url}</span>
+        </span>
+        <button
+          type="button"
+          onClick={goNext}
+          disabled={items.length <= 1}
+          style={styles.previewBtn}
+          aria-label="다음 항목"
+          title="다음"
+        >
+          다음 ›
+        </button>
+      </div>
     </div>
   );
 }
@@ -354,6 +492,113 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '14px',
     cursor: 'pointer',
     marginLeft: '4px',
+  },
+  // Split layout (List + Preview, responsive via flexWrap)
+  splitRow: {
+    display: 'flex',
+    gap: '12px',
+    flexWrap: 'wrap',
+    alignItems: 'flex-start',
+  },
+  listCol: {
+    flex: '1 1 320px',
+    minWidth: '0',
+  },
+  previewCol: {
+    flex: '1 1 320px',
+    minWidth: '0',
+  },
+  // Preview sub-component
+  previewBox: {
+    border: '1px solid #e2e8f0',
+    borderRadius: '8px',
+    overflow: 'hidden',
+    backgroundColor: '#fff',
+    display: 'flex',
+    flexDirection: 'column' as const,
+  },
+  previewHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '8px 12px',
+    backgroundColor: '#f8fafc',
+    borderBottom: '1px solid #e2e8f0',
+  },
+  previewLabel: {
+    fontSize: '12px',
+    fontWeight: 600,
+    color: '#475569',
+  },
+  previewIdx: {
+    fontSize: '11px',
+    color: '#64748b',
+    fontVariantNumeric: 'tabular-nums',
+  },
+  previewStage: {
+    position: 'relative' as const,
+    aspectRatio: '16 / 9',
+    width: '100%',
+    backgroundColor: '#0f172a',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  previewMedia: {
+    maxWidth: '100%',
+    maxHeight: '100%',
+    objectFit: 'contain' as const,
+    display: 'block',
+  },
+  previewEmpty: {
+    color: '#94a3b8',
+    fontSize: '13px',
+    textAlign: 'center' as const,
+    padding: '12px',
+  },
+  previewHint: {
+    marginTop: '6px',
+    fontSize: '11px',
+    color: '#64748b',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap' as const,
+    maxWidth: '260px',
+  },
+  previewControls: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '8px 12px',
+    borderTop: '1px solid #f1f5f9',
+  },
+  previewBtn: {
+    padding: '6px 10px',
+    borderRadius: '6px',
+    border: '1px solid #e2e8f0',
+    backgroundColor: '#fff',
+    color: '#475569',
+    fontSize: '12px',
+    fontWeight: 600,
+    cursor: 'pointer',
+    flexShrink: 0,
+  },
+  previewMeta: {
+    flex: 1,
+    minWidth: 0,
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+  },
+  previewUrl: {
+    flex: 1,
+    fontSize: '11px',
+    color: '#64748b',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap' as const,
+    minWidth: 0,
   },
 };
 
