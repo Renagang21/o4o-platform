@@ -12,17 +12,19 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
+// WO-O4O-BLOG-UI-PARTIAL-EXTRACT-V1: Blog public layer 는 @o4o/shared-space-ui 로 이전됨
 import {
   fetchBlogPosts,
   fetchPublicStoreInfo,
   fetchPublicBlogSettings,
+  BlogPublicHeader,
+  BlogList,
+  pickBlogTemplate,
+  useBlogSeo,
   type BlogPost,
   type PublicStoreInfo,
   type PublicBlogSettings,
-} from '../../api/blog';
-import { BlogPublicHeader } from './blog/BlogPublicHeader';
-import { BlogList, pickBlogTemplate } from './blog/blogTemplates';
-import { useBlogSeo } from './blog/useBlogSeo';
+} from '@o4o/shared-space-ui';
 
 export default function StoreBlogListPage() {
   const { storeSlug } = useParams<{ storeSlug: string }>();

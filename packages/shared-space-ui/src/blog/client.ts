@@ -1,15 +1,17 @@
 /**
  * Blog API Client — Public (no auth)
  *
- * WO-STORE-BLOG-CHANNEL-V1
- * WO-STORE-SLUG-UNIFICATION-V1: unified /api/v1/stores namespace
+ * WO-O4O-BLOG-UI-PARTIAL-EXTRACT-V1
+ * Extracted from: services/web-kpa-society/src/api/blog.ts
  *
- * Calls /api/v1/stores/:slug/blog/* endpoints directly.
- * No authentication required for public blog pages.
+ * Service-agnostic. Calls unified /api/v1/stores/:slug/blog/* endpoints directly.
+ * Backend `unified-store-public.routes.ts` resolves slug → storeId + serviceKey.
+ *
+ * Usage: VITE_API_BASE_URL 가 설정된 모든 서비스(KPA / Neture / Glycopharm / ...)에서 동일하게 작동.
  */
 
 function getApiBase(): string {
-  const base = import.meta.env.VITE_API_BASE_URL || '';
+  const base = (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_BASE_URL) || '';
   return `${base}/api/v1/stores`;
 }
 
@@ -57,9 +59,7 @@ export async function fetchBlogPost(
   return json.data;
 }
 
-// WO-O4O-KPA-STORE-BLOG-PUBLIC-HEADER-V1: 공개 헤더용 매장 정보
-// /api/v1/stores/:slug 를 그대로 활용 (신규 endpoint 없음)
-
+// 공개 헤더용 매장 정보 — /api/v1/stores/:slug 그대로 활용
 export interface PublicStoreInfo {
   id: string;
   name: string;
@@ -82,8 +82,7 @@ export async function fetchPublicStoreInfo(slug: string): Promise<PublicStoreInf
   return json.data;
 }
 
-// WO-O4O-KPA-STORE-BLOG-META-V1: 공개 Blog identity (이름·소개·heroImage·defaultTemplate)
-
+// 공개 Blog identity (이름·소개·heroImage·defaultTemplate)
 export interface PublicBlogSettings {
   id: string;
   storeId: string;

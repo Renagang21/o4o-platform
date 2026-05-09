@@ -2,6 +2,7 @@
  * BlogPublicHeader — 공개 Blog 페이지 상단 매장 identity 헤더
  *
  * WO-O4O-KPA-STORE-BLOG-PUBLIC-HEADER-V1
+ * WO-O4O-BLOG-UI-PARTIAL-EXTRACT-V1: shared-space-ui 로 이전
  *
  * 목표:
  *  - 사용자가 "어떤 전문 매장이 운영하는 Blog 인가" 즉시 인지
@@ -12,7 +13,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import type { PublicStoreInfo, PublicBlogSettings } from '../../../api/blog';
+import type { PublicStoreInfo, PublicBlogSettings } from './client';
 
 interface BlogPublicHeaderProps {
   storeSlug: string;

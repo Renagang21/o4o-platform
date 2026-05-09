@@ -2,6 +2,7 @@
  * blogTemplates — 공개 Blog 템플릿 2종 (Professional / Modern)
  *
  * WO-O4O-KPA-STORE-BLOG-PUBLIC-HEADER-V1
+ * WO-O4O-BLOG-UI-PARTIAL-EXTRACT-V1: shared-space-ui 로 이전. CSS class 'kpa-blog-body' → 'o4o-blog-body'
  *
  * 설계 원칙:
  *  - 콘텐츠/읽기 중심. 쇼핑몰·마케팅 톤 회피
@@ -17,7 +18,7 @@
 import type { ReactElement } from 'react';
 import { Link } from 'react-router-dom';
 import { ContentRenderer } from '@o4o/content-editor';
-import type { BlogPost } from '../../../api/blog';
+import type { BlogPost } from './client';
 
 // ─── Plain ↔ HTML detection (WO-O4O-KPA-STORE-BLOG-CONTENT-RICHTEXT-V1) ─────
 // 기존 plain-text 게시글이 RichText 전환 후에도 깨지지 않도록 호환 처리.
@@ -75,7 +76,7 @@ function BlogContentBody({ content, fontSize, lineHeight, color }: BlogContentBo
         <BlogProseStyle />
         <ContentRenderer
           html={content}
-          className="kpa-blog-body"
+          className="o4o-blog-body"
           style={baseStyle}
         />
       </>
@@ -96,23 +97,23 @@ function BlogProseStyle() {
   blogProseStyleInjected = true;
   return (
     <style>{`
-      .kpa-blog-body p { margin: 0 0 1.1em; }
-      .kpa-blog-body h2 { font-size: 1.25em; font-weight: 700; line-height: 1.4; margin: 2em 0 0.6em; letter-spacing: -0.01em; color: #0f172a; }
-      .kpa-blog-body h3 { font-size: 1.12em; font-weight: 700; line-height: 1.4; margin: 1.6em 0 0.5em; letter-spacing: -0.01em; color: #0f172a; }
-      .kpa-blog-body ul, .kpa-blog-body ol { margin: 0 0 1.1em; padding-left: 1.6em; }
-      .kpa-blog-body li { margin: 0.25em 0; }
-      .kpa-blog-body blockquote { margin: 1.4em 0; padding: 0.4em 1em; border-left: 3px solid #cbd5e1; color: #475569; font-style: italic; }
-      .kpa-blog-body a { color: #2563eb; text-decoration: underline; text-underline-offset: 2px; }
-      .kpa-blog-body img { max-width: 100%; height: auto; display: block; margin: 1.4em auto; border-radius: 8px; }
-      .kpa-blog-body iframe { max-width: 100%; aspect-ratio: 16 / 9; width: 100%; height: auto; display: block; margin: 1.4em 0; border: 0; border-radius: 8px; }
-      .kpa-blog-body hr { border: 0; border-top: 1px solid #e2e8f0; margin: 2em 0; }
-      .kpa-blog-body code { background: #f1f5f9; padding: 0.1em 0.35em; border-radius: 4px; font-size: 0.9em; }
-      .kpa-blog-body pre { background: #0f172a; color: #e2e8f0; padding: 1em; border-radius: 8px; overflow-x: auto; margin: 1.4em 0; }
-      .kpa-blog-body pre code { background: none; padding: 0; color: inherit; }
+      .o4o-blog-body p { margin: 0 0 1.1em; }
+      .o4o-blog-body h2 { font-size: 1.25em; font-weight: 700; line-height: 1.4; margin: 2em 0 0.6em; letter-spacing: -0.01em; color: #0f172a; }
+      .o4o-blog-body h3 { font-size: 1.12em; font-weight: 700; line-height: 1.4; margin: 1.6em 0 0.5em; letter-spacing: -0.01em; color: #0f172a; }
+      .o4o-blog-body ul, .o4o-blog-body ol { margin: 0 0 1.1em; padding-left: 1.6em; }
+      .o4o-blog-body li { margin: 0.25em 0; }
+      .o4o-blog-body blockquote { margin: 1.4em 0; padding: 0.4em 1em; border-left: 3px solid #cbd5e1; color: #475569; font-style: italic; }
+      .o4o-blog-body a { color: #2563eb; text-decoration: underline; text-underline-offset: 2px; }
+      .o4o-blog-body img { max-width: 100%; height: auto; display: block; margin: 1.4em auto; border-radius: 8px; }
+      .o4o-blog-body iframe { max-width: 100%; aspect-ratio: 16 / 9; width: 100%; height: auto; display: block; margin: 1.4em 0; border: 0; border-radius: 8px; }
+      .o4o-blog-body hr { border: 0; border-top: 1px solid #e2e8f0; margin: 2em 0; }
+      .o4o-blog-body code { background: #f1f5f9; padding: 0.1em 0.35em; border-radius: 4px; font-size: 0.9em; }
+      .o4o-blog-body pre { background: #0f172a; color: #e2e8f0; padding: 1em; border-radius: 8px; overflow-x: auto; margin: 1.4em 0; }
+      .o4o-blog-body pre code { background: none; padding: 0; color: inherit; }
       @media (max-width: 480px) {
-        .kpa-blog-body { font-size: 16px !important; line-height: 1.78 !important; }
-        .kpa-blog-body h2 { font-size: 1.18em; }
-        .kpa-blog-body h3 { font-size: 1.06em; }
+        .o4o-blog-body { font-size: 16px !important; line-height: 1.78 !important; }
+        .o4o-blog-body h2 { font-size: 1.18em; }
+        .o4o-blog-body h3 { font-size: 1.06em; }
       }
     `}</style>
   );

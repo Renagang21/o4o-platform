@@ -60,6 +60,11 @@ export type { TemplateKey, TemplateTokens, TemplatePreset, PresetCategory } from
 /* Guide pages — WO-O4O-GUIDE-COMMON-AND-GLYCOPHARM-HOME-V1 */
 export * from './guide';
 
+/* Public Blog UI — WO-O4O-BLOG-UI-PARTIAL-EXTRACT-V1
+ * 검증된 pure layer 만 추출: BlogPublicHeader / blogTemplates / useBlogSeo / public API client.
+ * Staff editor / AI wiring / settings UI / backend extraction 은 비포함 — premature abstraction 회피. */
+export * from './blog';
+
 export type {
   /* Data types */
   NoticeItem,
