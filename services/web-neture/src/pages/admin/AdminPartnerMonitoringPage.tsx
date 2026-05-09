@@ -2,6 +2,7 @@
  * AdminPartnerMonitoringPage — 파트너 모니터링 대시보드
  *
  * WO-O4O-ADMIN-PARTNER-MONITORING-V1
+ * WO-O4O-NETURE-ADMIN-PARTNER-MONITORING-DATATABLE-ALIGN-V1 — raw table → canonical DataTable
  *
  * 파트너별 종합 통계: 주문 수, 총 커미션, 지급 대기, 지급 완료
  */
@@ -9,6 +10,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Users, TrendingUp, Clock, CheckCircle, Search, ChevronLeft, ChevronRight, Eye } from 'lucide-react';
+import { DataTable } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import {
   adminPartnerMonitoringApi,
   type PartnerMonitoringItem,
@@ -56,6 +59,81 @@ export default function AdminPartnerMonitoringPage() {
     { label: '지급 완료', value: `${fmt(kpi.total_paid)}원`, icon: CheckCircle, color: '#7c3aed', bg: '#f5f3ff' },
   ];
 
+  const columns: ListColumnDef<PartnerMonitoringItem>[] = [
+    {
+      key: 'name',
+      header: '파트너',
+      sortable: true,
+      sortAccessor: (row) => row.name || '',
+      render: (_v, row) => <span className="text-slate-900">{row.name || '—'}</span>,
+    },
+    {
+      key: 'email',
+      header: '이메일',
+      sortable: true,
+      sortAccessor: (row) => row.email,
+      render: (_v, row) => (
+        <span className="text-slate-500" title={row.email}>{row.email}</span>
+      ),
+    },
+    {
+      key: 'orders',
+      header: '주문 수',
+      align: 'right',
+      sortable: true,
+      sortAccessor: (row) => row.orders,
+      render: (_v, row) => <span className="text-slate-900">{fmt(row.orders)}</span>,
+    },
+    {
+      key: 'commission',
+      header: '총 커미션',
+      align: 'right',
+      sortable: true,
+      sortAccessor: (row) => row.commission,
+      render: (_v, row) => (
+        <span className="text-slate-900 font-semibold">{fmt(row.commission)}원</span>
+      ),
+    },
+    {
+      key: 'payable',
+      header: '지급 대기',
+      align: 'right',
+      sortable: true,
+      sortAccessor: (row) => row.payable,
+      render: (_v, row) => (
+        <span style={{ color: '#d97706' }}>{fmt(row.payable)}원</span>
+      ),
+    },
+    {
+      key: 'paid',
+      header: '지급 완료',
+      align: 'right',
+      sortable: true,
+      sortAccessor: (row) => row.paid,
+      render: (_v, row) => (
+        <span style={{ color: '#059669' }}>{fmt(row.paid)}원</span>
+      ),
+    },
+    {
+      key: '_actions',
+      header: '상세',
+      system: true,
+      align: 'center',
+      width: '60px',
+      onCellClick: () => {},
+      render: (_v, row) => (
+        <button
+          type="button"
+          onClick={() => navigate(`/operator/partners/${row.partner_id}`)}
+          aria-label="파트너 상세 보기"
+          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
+        >
+          <Eye size={16} color="#2563eb" />
+        </button>
+      ),
+    },
+  ];
+
   return (
     <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
       <h1 style={{ fontSize: '22px', fontWeight: 700, color: '#0f172a', marginBottom: '20px' }}>파트너 모니터링</h1>
@@ -101,48 +179,15 @@ export default function AdminPartnerMonitoringPage() {
         </button>
       </div>
 
-      {/* Table */}
-      <div style={{ backgroundColor: '#fff', borderRadius: '10px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
-          <thead>
-            <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
-              <th style={thStyle}>파트너</th>
-              <th style={thStyle}>이메일</th>
-              <th style={{ ...thStyle, textAlign: 'right' }}>주문 수</th>
-              <th style={{ ...thStyle, textAlign: 'right' }}>총 커미션</th>
-              <th style={{ ...thStyle, textAlign: 'right' }}>지급 대기</th>
-              <th style={{ ...thStyle, textAlign: 'right' }}>지급 완료</th>
-              <th style={{ ...thStyle, textAlign: 'center' }}>상세</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr><td colSpan={7} style={{ padding: '40px', textAlign: 'center', color: '#94a3b8' }}>로딩 중...</td></tr>
-            ) : partners.length === 0 ? (
-              <tr><td colSpan={7} style={{ padding: '40px', textAlign: 'center', color: '#94a3b8' }}>파트너가 없습니다</td></tr>
-            ) : (
-              partners.map((p) => (
-                <tr key={p.partner_id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                  <td style={tdStyle}>{p.name || '—'}</td>
-                  <td style={{ ...tdStyle, color: '#64748b' }}>{p.email}</td>
-                  <td style={{ ...tdStyle, textAlign: 'right' }}>{fmt(p.orders)}</td>
-                  <td style={{ ...tdStyle, textAlign: 'right', fontWeight: 600 }}>{fmt(p.commission)}원</td>
-                  <td style={{ ...tdStyle, textAlign: 'right', color: '#d97706' }}>{fmt(p.payable)}원</td>
-                  <td style={{ ...tdStyle, textAlign: 'right', color: '#059669' }}>{fmt(p.paid)}원</td>
-                  <td style={{ ...tdStyle, textAlign: 'center' }}>
-                    <button
-                      onClick={() => navigate(`/operator/partners/${p.partner_id}`)}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
-                    >
-                      <Eye size={16} color="#2563eb" />
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+      {/* DataTable */}
+      <DataTable<PartnerMonitoringItem>
+        columns={columns}
+        data={partners}
+        rowKey="partner_id"
+        loading={loading}
+        emptyMessage="파트너가 없습니다"
+        tableId="neture-admin-partner-monitoring"
+      />
 
       {/* Pagination */}
       {meta.totalPages > 1 && (
@@ -169,14 +214,6 @@ export default function AdminPartnerMonitoringPage() {
     </div>
   );
 }
-
-const thStyle: React.CSSProperties = {
-  padding: '12px 16px', textAlign: 'left', fontSize: '13px', fontWeight: 600, color: '#475569',
-};
-
-const tdStyle: React.CSSProperties = {
-  padding: '12px 16px', color: '#0f172a',
-};
 
 function paginationBtnStyle(disabled: boolean): React.CSSProperties {
   return {
