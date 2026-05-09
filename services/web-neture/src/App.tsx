@@ -232,8 +232,8 @@ const SupplierSettlementsPage = lazy(() => import('./pages/account/SupplierSettl
 const StoreCartPage = lazy(() => import('./pages/store/StoreCartPage'));
 const StoreOrdersPage = lazy(() => import('./pages/store/StoreOrdersPage'));
 const StoreOrderDetailPage = lazy(() => import('./pages/store/StoreOrderDetailPage'));
-const StoreBlogListPage = lazy(() => import('./pages/store/StoreBlogListPage'));
-const StoreBlogPage = lazy(() => import('./pages/store/StoreBlogPage'));
+// WO-O4O-NETURE-BLOG-RETIRE-V1: Neture Blog 운영 대상 아님 — public Blog page/route 제거.
+// Neture canonical 콘텐츠 채널은 Forum + Content + AI editor 로 유지.
 // Store Owner Manage (WO-O4O-STORE-PRODUCT-LIBRARY-INTEGRATION-V1)
 const StoreListingsPage = lazy(() => import('./pages/store/StoreListingsPage'));
 const StoreProductLibraryPage = lazy(() => import('./pages/store/StoreProductLibraryPage'));
@@ -725,8 +725,7 @@ function App() {
             <Route element={<MainLayout />}>
               <Route path="/store/product/:offerId" element={<StoreProductPage />} />
               <Route path="/store/:storeSlug/product/:productSlug" element={<StoreProductPage />} />
-              <Route path="/store/:storeSlug/blog" element={<StoreBlogListPage />} />
-              <Route path="/store/:storeSlug/blog/:postSlug" element={<StoreBlogPage />} />
+              {/* WO-O4O-NETURE-BLOG-RETIRE-V1: Neture Blog public route 제거 (canonical = Forum + Content + AI editor) */}
               <Route path="/store/cart" element={<StoreCartPage />} />
               <Route path="/store/orders" element={<StoreOrdersPage />} />
               <Route path="/store/orders/:id" element={<StoreOrderDetailPage />} />

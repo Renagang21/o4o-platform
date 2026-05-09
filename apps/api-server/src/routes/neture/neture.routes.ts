@@ -19,8 +19,9 @@ import { createStorePlaylistController } from '../o4o-store/controllers/store-pl
 import { createNetureEventOfferController } from './controllers/event-offer.controller.js';
 // WO-O4O-EVENT-OFFER-MULTI-SERVICE-PROPOSAL-V1
 import { createSupplierEventOfferProposalsController } from './controllers/supplier-event-offer-proposals.controller.js';
-// WO-O4O-NETURE-BLOG-CANONICAL-ALIGN-V1: Blog 라우트 등록 (서비스 스코프 staff/settings 엔드포인트 활성)
-import { createBlogController } from '../o4o-store/controllers/blog.controller.js';
+// WO-O4O-NETURE-BLOG-RETIRE-V1: createBlogController('neture') 등록 제거.
+// Neture 는 Blog 를 운영 대상으로 두지 않으며 canonical 콘텐츠 채널은 Forum + Content + AI editor.
+// store_blog_posts / store_blog_settings entity 와 KPA Blog 흐름 자체는 영향 없음.
 
 export function createNetureRoutes(dataSource: DataSource): Router {
   const router = Router();
@@ -63,13 +64,9 @@ export function createNetureRoutes(dataSource: DataSource): Router {
     createSupplierEventOfferProposalsController(dataSource, requireAuth as any),
   );
 
-  // ============================================================================
-  // Blog Routes — WO-O4O-NETURE-BLOG-CANONICAL-ALIGN-V1
-  // /api/v1/neture/stores/:slug/blog/* (public + staff)
-  // - public 읽기는 unified-store-public 으로도 접근 가능 (slug 기반)
-  // - staff/settings 엔드포인트는 서비스 스코프(`/api/v1/neture/...`)에서 노출됨
-  // ============================================================================
-  router.use('/stores', createBlogController(dataSource, requireAuth as any, 'neture'));
+  // WO-O4O-NETURE-BLOG-RETIRE-V1: Blog 라우트 미등록.
+  // Neture 는 Blog 를 운영 대상으로 두지 않음. /api/v1/neture/stores/:slug/blog/* endpoint 미노출.
+  // KPA blog.controller / store_blog_posts / store_blog_settings entity 는 그대로 활성 (KPA 영향 없음).
 
   return router;
 }
