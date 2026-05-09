@@ -21,7 +21,8 @@ import {
   Loader2, Tablet, ChevronUp, ChevronDown, X, Plus,
   ArrowLeft, Save, Package, ShoppingBag, AlertTriangle, Tv,
 } from 'lucide-react';
-import { IdlePlaylistEditor, type IdlePlaylistItem } from '@o4o/tablet-kiosk-core';
+import { IdlePlaylistEditor, type IdlePlaylistItem, type LibraryAsset } from '@o4o/tablet-kiosk-core';
+import { getStoreLibraryItems } from '../../api/storeLibrary';
 import {
   fetchTablets,
   fetchTabletDisplays,
@@ -233,6 +234,32 @@ export default function StoreTabletDisplaysPage() {
   // Idle changes detection (shallow JSON compare)
   const idleHasChanges = JSON.stringify(idleItems) !== JSON.stringify(idleInitial);
 
+  // WO-O4O-TABLET-IDLE-MEDIA-LIBRARY-V1
+  // 매장 자료함의 image/video 자산만 가져와 LibraryAsset 으로 변환.
+  // store_library_items 의 mime_type 기반 필터링. runtime 은 url 만 사용 — assetId lookup 없음.
+  const fetchIdleLibraryAssets = useCallback(async (): Promise<LibraryAsset[]> => {
+    const res = await getStoreLibraryItems({ limit: 100 });
+    if (!res.success) return [];
+    const items = res.data?.items ?? [];
+    return items
+      .map((item) => {
+        const mime = item.mimeType ?? '';
+        const isVideo = mime.startsWith('video/');
+        const isImage = mime.startsWith('image/');
+        if (!isVideo && !isImage) return null;
+        const url = item.fileUrl ?? item.url ?? '';
+        if (!url) return null;
+        return {
+          id: item.id,
+          title: item.title,
+          type: isVideo ? ('video' as const) : ('image' as const),
+          url,
+          thumbnail: item.fileUrl ?? undefined,
+        };
+      })
+      .filter((a): a is LibraryAsset => a !== null);
+  }, []);
+
   // Save idle playlist (WO-O4O-TABLET-IDLE-PLAYLIST-EDITOR-V1)
   const handleSaveIdle = async () => {
     if (!selectedTabletId) return;
@@ -364,7 +391,12 @@ export default function StoreTabletDisplaysPage() {
                   매장이 일정 시간 사용되지 않을 때 태블릿이 자동으로 보여줄 이미지/영상 목록입니다.
                   고객이 화면을 터치하면 즉시 상품 안내 화면으로 돌아갑니다.
                 </p>
-                <IdlePlaylistEditor items={idleItems} onChange={setIdleItems} disabled={savingIdle} />
+                <IdlePlaylistEditor
+                  items={idleItems}
+                  onChange={setIdleItems}
+                  disabled={savingIdle}
+                  fetchLibraryAssets={fetchIdleLibraryAssets}
+                />
               </div>
             </div>
           )}

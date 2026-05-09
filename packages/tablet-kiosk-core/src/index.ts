@@ -20,4 +20,5 @@ export type {
   TabletInterestSubmitBody,
   TabletKioskApi,
   IdlePlaylistItem,
+  LibraryAsset,
 } from './types';

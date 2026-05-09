@@ -3,6 +3,7 @@
  *
  * WO-O4O-TABLET-IDLE-PLAYLIST-EDITOR-V1
  * WO-O4O-TABLET-IDLE-PREVIEW-V1 — 내부 Preview sub-component 추가
+ * WO-O4O-TABLET-IDLE-MEDIA-LIBRARY-V1 — 자료함에서 선택 (callback prop 주입)
  *
  * 매장 운영자가 tablet idle 화면에 재생할 항목(image/video URL + duration)을
  * 편집하는 controlled component.
@@ -32,13 +33,20 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import type { IdlePlaylistItem } from './types';
+import type { IdlePlaylistItem, LibraryAsset } from './types';
 
 export interface IdlePlaylistEditorProps {
   items: IdlePlaylistItem[];
   onChange: (next: IdlePlaylistItem[]) => void;
   /** read-only 모드 (저장 중일 때 등) */
   disabled?: boolean;
+  /**
+   * WO-O4O-TABLET-IDLE-MEDIA-LIBRARY-V1
+   * 매장 자료함의 image/video 자산을 가져오는 함수. 주입 시 "자료함에서 추가" 버튼이 노출되어
+   * picker 모달이 열린다. 미제공 시 URL 직접 입력만 가능.
+   * tablet-kiosk-core 자체는 자료함 API 를 알지 못함 — wrapper 가 책임진다.
+   */
+  fetchLibraryAssets?: () => Promise<LibraryAsset[]>;
 }
 
 const DEFAULT_IMAGE_DURATION_MS = 5000;
@@ -59,12 +67,38 @@ function isLikelyValidUrl(url: string): boolean {
   return /^https?:\/\//i.test(url) || url.startsWith('/');
 }
 
-export function IdlePlaylistEditor({ items, onChange, disabled = false }: IdlePlaylistEditorProps) {
+export function IdlePlaylistEditor({
+  items,
+  onChange,
+  disabled = false,
+  fetchLibraryAssets,
+}: IdlePlaylistEditorProps) {
   const [newUrl, setNewUrl] = useState('');
   const [newType, setNewType] = useState<'image' | 'video'>('image');
   const [newDuration, setNewDuration] = useState<string>(String(DEFAULT_IMAGE_DURATION_MS));
   const [autoType, setAutoType] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // WO-O4O-TABLET-IDLE-MEDIA-LIBRARY-V1
+  const [pickerOpen, setPickerOpen] = useState(false);
+
+  const handlePickFromLibrary = (asset: LibraryAsset) => {
+    setError(null);
+    const next: IdlePlaylistItem[] = [
+      ...items,
+      asset.type === 'image'
+        ? {
+            type: 'image' as const,
+            url: asset.url,
+            durationMs: asset.durationMs ?? DEFAULT_IMAGE_DURATION_MS,
+          }
+        : {
+            type: 'video' as const,
+            url: asset.url,
+          },
+    ];
+    onChange(next);
+    setPickerOpen(false);
+  };
 
   const handleAdd = () => {
     setError(null);
@@ -156,11 +190,36 @@ export function IdlePlaylistEditor({ items, onChange, disabled = false }: IdlePl
             cursor: disabled || newUrl.trim().length === 0 ? 'not-allowed' : 'pointer',
           }}
         >
-          + 추가
+          + URL 추가
         </button>
+        {/* WO-O4O-TABLET-IDLE-MEDIA-LIBRARY-V1: fetchLibraryAssets 주입 시 노출 */}
+        {fetchLibraryAssets && (
+          <button
+            type="button"
+            onClick={() => setPickerOpen(true)}
+            disabled={disabled}
+            style={{
+              ...styles.libraryBtn,
+              opacity: disabled ? 0.5 : 1,
+              cursor: disabled ? 'not-allowed' : 'pointer',
+            }}
+          >
+            + 자료함에서 추가
+          </button>
+        )}
       </div>
 
       {error && <div style={styles.error}>{error}</div>}
+
+      {/* WO-O4O-TABLET-IDLE-MEDIA-LIBRARY-V1: Library picker modal */}
+      {fetchLibraryAssets && (
+        <LibraryAssetPicker
+          open={pickerOpen}
+          onClose={() => setPickerOpen(false)}
+          onSelect={handlePickFromLibrary}
+          fetchAssets={fetchLibraryAssets}
+        />
+      )}
 
       {/* List + Preview (responsive: wrap to stack on narrow screens) */}
       <div style={styles.splitRow}>
@@ -229,6 +288,258 @@ export function IdlePlaylistEditor({ items, onChange, disabled = false }: IdlePl
     </div>
   );
 }
+
+// ── LibraryAssetPicker (internal — WO-O4O-TABLET-IDLE-MEDIA-LIBRARY-V1) ──────
+// 자료함의 image/video 자산을 선택하는 minimal modal.
+//
+// 데이터 fetch 는 wrapper 가 책임 (fetchAssets prop). tablet-kiosk-core 는 자료함 API 를
+// 알지 못한다. 선택된 항목은 onSelect 로 부모(IdlePlaylistEditor)에 전달되어 IdlePlaylistItem
+// 으로 변환된다 (asset.url 만 runtime 저장 — assetId 기반 lookup 미도입).
+
+interface LibraryAssetPickerProps {
+  open: boolean;
+  onClose: () => void;
+  onSelect: (asset: LibraryAsset) => void;
+  fetchAssets: () => Promise<LibraryAsset[]>;
+}
+
+function LibraryAssetPicker({ open, onClose, onSelect, fetchAssets }: LibraryAssetPickerProps) {
+  const [assets, setAssets] = useState<LibraryAsset[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [filter, setFilter] = useState<'all' | 'image' | 'video'>('all');
+
+  useEffect(() => {
+    if (!open) return;
+    setLoading(true);
+    setLoadError(null);
+    fetchAssets()
+      .then((list) => setAssets(Array.isArray(list) ? list : []))
+      .catch((e) => setLoadError(e?.message || '자료함을 불러오는데 실패했습니다.'))
+      .finally(() => setLoading(false));
+  }, [open, fetchAssets]);
+
+  if (!open) return null;
+
+  const filtered = filter === 'all' ? assets : assets.filter((a) => a.type === filter);
+
+  return (
+    <div style={pickerStyles.backdrop} onClick={onClose} role="presentation">
+      <div style={pickerStyles.modal} onClick={(e) => e.stopPropagation()}>
+        <div style={pickerStyles.header}>
+          <span style={pickerStyles.title}>자료함에서 선택</span>
+          <button type="button" onClick={onClose} style={pickerStyles.closeBtn} aria-label="닫기">×</button>
+        </div>
+
+        <div style={pickerStyles.filterRow}>
+          {(['all', 'image', 'video'] as const).map((f) => (
+            <button
+              key={f}
+              type="button"
+              onClick={() => setFilter(f)}
+              style={{
+                ...pickerStyles.filterBtn,
+                ...(filter === f ? pickerStyles.filterBtnActive : null),
+              }}
+            >
+              {f === 'all' ? '전체' : f === 'image' ? '이미지' : '영상'}
+              {filter === f && assets.length > 0 ? ` · ${
+                f === 'all' ? assets.length : assets.filter((a) => a.type === f).length
+              }` : ''}
+            </button>
+          ))}
+        </div>
+
+        <div style={pickerStyles.body}>
+          {loading ? (
+            <div style={pickerStyles.empty}>불러오는 중…</div>
+          ) : loadError ? (
+            <div style={{ ...pickerStyles.empty, color: '#dc2626' }}>{loadError}</div>
+          ) : filtered.length === 0 ? (
+            <div style={pickerStyles.empty}>
+              자료함에 image/video 자산이 없습니다.
+              <div style={pickerStyles.emptyHint}>매장 자료실에서 image/video 자료를 가져온 뒤 다시 열어주세요.</div>
+            </div>
+          ) : (
+            <div style={pickerStyles.grid}>
+              {filtered.map((asset) => (
+                <button
+                  key={asset.id}
+                  type="button"
+                  onClick={() => onSelect(asset)}
+                  style={pickerStyles.card}
+                  title={asset.title}
+                >
+                  <div style={pickerStyles.cardThumb}>
+                    {asset.type === 'image' ? (
+                      <img
+                        src={asset.thumbnail || asset.url}
+                        alt=""
+                        style={pickerStyles.thumbMedia}
+                        draggable={false}
+                      />
+                    ) : (
+                      <div style={pickerStyles.videoThumb}>
+                        {asset.thumbnail ? (
+                          <img src={asset.thumbnail} alt="" style={pickerStyles.thumbMedia} draggable={false} />
+                        ) : (
+                          <span style={{ color: '#94a3b8', fontSize: '11px' }}>VIDEO</span>
+                        )}
+                      </div>
+                    )}
+                    <span style={pickerStyles.typeBadge}>{asset.type === 'image' ? '이미지' : '영상'}</span>
+                  </div>
+                  <span style={pickerStyles.cardTitle}>{asset.title || '(제목 없음)'}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const pickerStyles: Record<string, React.CSSProperties> = {
+  backdrop: {
+    position: 'fixed',
+    inset: 0,
+    backgroundColor: 'rgba(15, 23, 42, 0.5)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1000,
+  },
+  modal: {
+    backgroundColor: '#fff',
+    borderRadius: '12px',
+    width: 'min(720px, 92vw)',
+    maxHeight: '80vh',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    overflow: 'hidden',
+    boxShadow: '0 20px 50px rgba(0,0,0,0.25)',
+  },
+  header: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '12px 16px',
+    borderBottom: '1px solid #e2e8f0',
+  },
+  title: {
+    fontSize: '14px',
+    fontWeight: 600,
+    color: '#0f172a',
+  },
+  closeBtn: {
+    width: '28px',
+    height: '28px',
+    borderRadius: '6px',
+    border: '1px solid #e2e8f0',
+    backgroundColor: '#fff',
+    color: '#475569',
+    fontSize: '16px',
+    cursor: 'pointer',
+  },
+  filterRow: {
+    display: 'flex',
+    gap: '6px',
+    padding: '10px 16px',
+    borderBottom: '1px solid #f1f5f9',
+  },
+  filterBtn: {
+    padding: '6px 12px',
+    borderRadius: '999px',
+    border: '1px solid #e2e8f0',
+    backgroundColor: '#fff',
+    color: '#475569',
+    fontSize: '12px',
+    cursor: 'pointer',
+  },
+  filterBtnActive: {
+    backgroundColor: '#0d9488',
+    color: '#fff',
+    borderColor: '#0d9488',
+  },
+  body: {
+    flex: 1,
+    overflowY: 'auto',
+    padding: '12px',
+  },
+  empty: {
+    padding: '40px 16px',
+    textAlign: 'center' as const,
+    color: '#94a3b8',
+    fontSize: '13px',
+  },
+  emptyHint: {
+    marginTop: '6px',
+    fontSize: '11px',
+    color: '#cbd5e1',
+  },
+  grid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
+    gap: '10px',
+  },
+  card: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    alignItems: 'stretch',
+    gap: '6px',
+    padding: '6px',
+    border: '1px solid #e2e8f0',
+    borderRadius: '8px',
+    backgroundColor: '#fff',
+    textAlign: 'left' as const,
+    cursor: 'pointer',
+  },
+  cardThumb: {
+    position: 'relative' as const,
+    aspectRatio: '16 / 10',
+    backgroundColor: '#0f172a',
+    borderRadius: '6px',
+    overflow: 'hidden',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  videoThumb: {
+    width: '100%',
+    height: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#1e293b',
+  },
+  thumbMedia: {
+    maxWidth: '100%',
+    maxHeight: '100%',
+    objectFit: 'cover' as const,
+    width: '100%',
+    height: '100%',
+  },
+  typeBadge: {
+    position: 'absolute' as const,
+    top: '6px',
+    left: '6px',
+    fontSize: '10px',
+    fontWeight: 600,
+    padding: '2px 6px',
+    borderRadius: '4px',
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    color: '#fff',
+  },
+  cardTitle: {
+    fontSize: '12px',
+    color: '#334155',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap' as const,
+    padding: '0 4px 4px',
+  },
+};
 
 // ── IdlePlaylistPreview (internal — WO-O4O-TABLET-IDLE-PREVIEW-V1) ────────────
 // 편집 보조 preview. 실제 kiosk fullscreen runtime 과 동일하지 않음 (URL/순서/타입
@@ -392,6 +703,16 @@ const styles: Record<string, React.CSSProperties> = {
     border: 'none',
     backgroundColor: '#0d9488',
     color: '#fff',
+    fontSize: '13px',
+    fontWeight: 600,
+  },
+  // WO-O4O-TABLET-IDLE-MEDIA-LIBRARY-V1
+  libraryBtn: {
+    padding: '8px 14px',
+    borderRadius: '8px',
+    border: '1px solid #0d9488',
+    backgroundColor: '#fff',
+    color: '#0d9488',
     fontSize: '13px',
     fontWeight: 600,
   },
