@@ -2,6 +2,16 @@
  * TabletStorePage — In-Store Tablet Kiosk View (K-Cosmetics)
  *
  * WO-O4O-TABLET-INTEREST-UX-REFACTOR-V1
+ * WO-O4O-TABLET-INTERACTIVE-UX-ALIGN-V1
+ *
+ * 성격: 매장 내 interactive device.
+ *   ─ "쇼핑몰"이 아니라 "매장 안내 디바이스"이다.
+ *   ─ 결제/장바구니/주문 흐름 없음. 핵심은 "관심 → 직원 안내" 연결.
+ *   ─ 향후 확장 가능 영역(별도 WO):
+ *       · idle playback layer (signage playlist embed)
+ *       · AI 설명 / 추천 영역
+ *       · consultation / waiting / promotion 템플릿
+ *       · QR / 블로그 / 콘텐츠 연결
  *
  * 구조:
  * ├─ 상품 그리드 (TABLET 채널 상품 — Supplier + Local 혼합)
@@ -13,6 +23,9 @@
  * - 인증 불필요
  * - 제출 후 3초 polling으로 상태 추적
  * - 2분 idle 후 자동 리셋
+ *
+ * State 구조 메모: viewMode + 9개 useState 분산. 향후 idle/AI/consultation 모드
+ *   추가 시 useReducer 전환 검토 필요(별도 WO). 현재 단일 흐름에서는 안정적.
  */
 
 import { useEffect, useState, useRef } from 'react';
@@ -202,7 +215,7 @@ export default function TabletStorePage() {
             </div>
           )}
           {isDone && (
-            <button onClick={resetToDefault} style={styles.primaryBtn}>새 요청</button>
+            <button onClick={resetToDefault} style={styles.primaryBtn}>처음으로</button>
           )}
         </div>
       </div>
@@ -238,7 +251,7 @@ export default function TabletStorePage() {
             {!isLocal && (
               <div style={{ margin: '16px 0' }}>
                 <input type="text" value={customerName} onChange={(e) => setCustomerName(e.target.value)} placeholder="이름 (선택사항)" style={styles.input} maxLength={100} />
-                <input type="text" value={customerNote} onChange={(e) => setCustomerNote(e.target.value)} placeholder="메모 (선택사항)" style={{ ...styles.input, marginTop: '8px' }} maxLength={200} />
+                <input type="text" value={customerNote} onChange={(e) => setCustomerNote(e.target.value)} placeholder="요청 사항 (선택사항)" style={{ ...styles.input, marginTop: '8px' }} maxLength={200} />
               </div>
             )}
             {isLocal && (
@@ -252,7 +265,7 @@ export default function TabletStorePage() {
           <button onClick={() => { setViewMode('browse'); setSelectedProduct(null); setCustomerName(''); setCustomerNote(''); }} style={styles.backBtn}>돌아가기</button>
           {!isLocal && (
             <button onClick={handleSubmitInterest} disabled={submitting} style={{ ...styles.interestBtn, opacity: submitting ? 0.6 : 1 }}>
-              {submitting ? '요청 중...' : '관심 있어요'}
+              {submitting ? '요청 중...' : '직원에게 안내 요청'}
             </button>
           )}
         </div>
@@ -264,7 +277,7 @@ export default function TabletStorePage() {
     <div style={styles.fullscreen}>
       <div style={styles.header}>
         <h1 style={{ fontSize: '20px', fontWeight: 700 }}>상품 안내</h1>
-        <span style={{ fontSize: '14px', color: '#64748b' }}>관심 있는 상품을 터치해주세요</span>
+        <span style={{ fontSize: '14px', color: '#64748b' }}>관심 있는 상품을 터치하면 자세히 안내해드립니다</span>
       </div>
       <div style={styles.body}>
         {loading ? (
