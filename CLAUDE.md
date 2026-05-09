@@ -122,6 +122,15 @@ import type { RelatedEntity } from './related.entity.js';
 
 > 📄 상세: `docs/architecture/O4O-STORE-RULES.md`
 
+### Store Production Material (Canonical)
+
+- **Store Production Material 관련 작업 전 `docs/architecture/O4O-STORE-PRODUCTION-MATERIAL-CANONICAL-V1.md` 를 우선 참조한다.**
+- `kpa_store_contents` 는 현재 **legacy physical table name** 으로 간주한다 (KPA / GlycoPharm / Cosmetics 3 서비스 공통 사용 중).
+- logical canonical 개념은 service-neutral **Store Production Material** 이다.
+- 단순 prefix 제거 또는 성급한 table rename 제안 금지. rename 판단은 canonical 문서 기준으로 수행한다.
+
+> 📄 상세: `docs/architecture/O4O-STORE-PRODUCTION-MATERIAL-CANONICAL-V1.md`
+
 ---
 
 ## 6. 인프라 (GCP Cloud Run)
@@ -312,6 +321,7 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | Cosmetics 도메인 | `docs/architecture/COSMETICS-DOMAIN-RULES.md` |
 | Business 서비스 | `docs/architecture/BUSINESS-SERVICE-RULES.md` |
 | O4O Store/Order | `docs/architecture/O4O-STORE-RULES.md` |
+| **Store Production Material Canonical** | `docs/architecture/O4O-STORE-PRODUCTION-MATERIAL-CANONICAL-V1.md` |
 | E-commerce 계약 | `docs/baseline/E-COMMERCE-ORDER-CONTRACT.md` |
 | GlycoPharm Legacy | `docs/baseline/legacy/GLYCOPHARM-LEGACY-POSTMORTEM.md` |
 | ESM Entity 규칙 | `docs/reference/ESM-CIRCULAR-DEPENDENCY-ANALYSIS-V01.md` |
