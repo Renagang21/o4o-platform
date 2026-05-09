@@ -49,7 +49,7 @@ export function ContentWritePage() {
   const [guideSteps, setGuideSteps] = useState([
     '콘텐츠 제목을 입력합니다',
     '본문을 작성합니다 (리치 텍스트 편집)',
-    '요약과 태그를 입력합니다 (선택)',
+    '요약(선택)과 태그(필수, 최소 1개)를 입력합니다',
     '초안으로 저장하거나 바로 공개할 수 있습니다',
   ]);
   useEffect(() => {
@@ -120,6 +120,15 @@ export function ContentWritePage() {
       return;
     }
 
+    // WO-O4O-CONTENT-FORM-TAG-LABEL-VALIDATION-ALIGN-V1:
+    //   백엔드 O4O Tag Policy V1 (kpa.routes.ts: 최소 1개 필수)을 라벨/검증 양쪽에서 반영.
+    //   서버 round-trip 전에 사용자에게 즉시 피드백.
+    const tagArr = tags.split(',').map((t) => t.trim()).filter(Boolean);
+    if (tagArr.length === 0) {
+      toast.error('태그를 1개 이상 입력해주세요');
+      return;
+    }
+
     setSaving(true);
     try {
       const payload = {
@@ -128,7 +137,7 @@ export function ContentWritePage() {
         summary: summary || undefined,
         content_type: 'information' as const, // WO-KPA-CONTENT-WRITE-SIMPLIFY-V2: 분류 UI 제거, 기본값 고정
         sub_type: 'content', // WO-KPA-CONTENT-RESOURCE-SUBTYPE-SEPARATION-V1: 콘텐츠 허브 항목 고정
-        tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
+        tags: tagArr,
         status: saveStatus,
       };
 
@@ -235,7 +244,7 @@ export function ContentWritePage() {
 
         {/* Tags */}
         <div style={styles.field}>
-          <label style={styles.label}>태그 <span style={styles.hint}>(선택, 쉼표로 구분)</span></label>
+          <label style={styles.label}>태그 <span style={styles.required}>*</span> <span style={styles.hint}>(쉼표로 구분, 최소 1개)</span></label>
           <input
             type="text"
             value={tags}

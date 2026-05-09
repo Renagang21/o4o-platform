@@ -223,19 +223,25 @@ export function ResourceWritePage() {
       }
     }
 
+    // WO-O4O-CONTENT-FORM-TAG-LABEL-VALIDATION-ALIGN-V1:
+    //   백엔드 O4O Tag Policy V1 (kpa.routes.ts: 최소 1개 필수)을 라벨/검증 양쪽에서 반영.
+    //   확정 칩 + 미확정 input 텍스트를 합쳐 검증.
+    const pendingFromInput = tagInput
+      .split(',')
+      .map((t) => t.trim())
+      .filter(Boolean);
+    const tagArr = Array.from(new Set([...tags, ...pendingFromInput]));
+    if (tagArr.length === 0) {
+      toast.error('태그를 1개 이상 입력해주세요');
+      return;
+    }
+
     setSaving(true);
     try {
-      // WO-KPA-RESOURCES-TAG-ENTER-INPUT-FIX-V1:
-      //   확정된 칩 + 미확정 input(쉼표 분할 + trim + dedup)을 합쳐 저장.
-      const pendingFromInput = tagInput
-        .split(',')
-        .map((t) => t.trim())
-        .filter(Boolean);
-      const tagArr = Array.from(new Set([...tags, ...pendingFromInput]));
       const base = {
         title: title.trim(),
         summary: summary || undefined,
-        tags: tagArr.length > 0 ? tagArr : undefined,
+        tags: tagArr,
         status: saveStatus,
         usage_type: usageType,
         sub_type: 'resource', // WO-KPA-CONTENT-RESOURCE-SUBTYPE-SEPARATION-V1: 자료실 항목 고정
@@ -475,7 +481,7 @@ export function ResourceWritePage() {
 
         {/* Tags — WO-KPA-RESOURCES-TAG-ENTER-INPUT-FIX-V1: Enter/쉼표 확정, Backspace 마지막 칩 삭제 */}
         <div style={styles.field}>
-          <label style={styles.label}>태그 <span style={styles.hint}>(선택, Enter 또는 쉼표로 추가)</span></label>
+          <label style={styles.label}>태그 <span style={styles.required}>*</span> <span style={styles.hint}>(Enter 또는 쉼표로 추가, 최소 1개)</span></label>
           <div style={styles.tagInputWrap}>
             {tags.map((tag) => (
               <span key={tag} style={styles.tagChip}>
