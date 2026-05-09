@@ -707,6 +707,9 @@ function App() {
               - /content/courses: WO-KPA-CONTENT-COURSES-LIST-V1 — 전용 목록 페이지
               - /content/courses/:id: /instructor/courses/:id 상세로 wrapper redirect (Phase에서 전용 페이지 도입 시 변경) */}
           <Route path="/content/documents" element={<Layout serviceName={SERVICE_NAME}><ContentDocumentsPage /></Layout>} />
+          {/* WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1:
+              자료실 — 동일 컴포넌트, sub_type='resource' 필터. 가져가기 흐름 동일. */}
+          <Route path="/content/resources" element={<Layout serviceName={SERVICE_NAME}><ContentDocumentsPage subType="resource" /></Layout>} />
           <Route path="/content/surveys" element={<Layout serviceName={SERVICE_NAME}><ContentSurveysPage /></Layout>} />
           <Route path="/content/courses" element={<Layout serviceName={SERVICE_NAME}><ContentCoursesPage /></Layout>} />
           <Route path="/content/courses/:id" element={<ContentCourseDetailRedirect />} />

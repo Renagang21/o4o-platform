@@ -601,9 +601,18 @@ export function ContentListPage() {
 
   return (
     <div className="max-w-[1100px] mx-auto px-4 pt-8 pb-16">
-      <header className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-900 mb-1 mt-0">콘텐츠</h1>
-        <p className="text-[15px] text-slate-500 m-0">문서·코스형 자료·설문조사를 한 곳에서 관리합니다.</p>
+      <header className="mb-8 flex items-end justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 mb-1 mt-0">콘텐츠</h1>
+          <p className="text-[15px] text-slate-500 m-0">문서·코스형 자료·설문조사를 한 곳에서 관리합니다.</p>
+        </div>
+        {/* WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: 자료실 진입 링크 */}
+        <Link
+          to="/content/resources"
+          className="text-sm font-medium text-primary no-underline whitespace-nowrap hover:underline"
+        >
+          자료실 →
+        </Link>
       </header>
 
       <DocumentsSection

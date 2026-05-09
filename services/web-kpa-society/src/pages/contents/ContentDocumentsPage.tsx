@@ -1,5 +1,5 @@
 /**
- * ContentDocumentsPage — /content/documents
+ * ContentDocumentsPage — /content/documents 및 /content/resources
  *
  * WO-KPA-CONTENT-HUB-UNIFIED-SECTION-RULES-V1
  * WO-O4O-CONTENT-HUB-TABLE-CANONICAL-ALIGN-V1:
@@ -7,12 +7,19 @@
  *   - "링크 복사" → "내 자료함 가져가기" (contentApi.copyToStore)
  *   - "상세보기" 메뉴 제거 — row 클릭 시 Drawer 오픈
  *   - bulk select + bulk 가져가기/삭제(소유자만 필터) 추가
+ * WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1: restricted 콘텐츠 가져가기 차단
+ * WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1:
+ *   subType prop 추가 — 동일 페이지 코드로 '문서형 콘텐츠' (sub_type='content') 와
+ *   '자료실' (sub_type='resource') 두 라우트를 처리. asset_type='content' 재사용
+ *   (resolver 가 sub_type 을 content_json 에 자동 보존하므로 backend 변경 불필요).
  *
- * 문서형 콘텐츠 전체 목록.
- * /content 허브의 문서 섹션 미리보기 → "전체 보기" 클릭 시 이 페이지로 이동.
+ * 문서형 콘텐츠 / 자료실 전체 목록.
+ * /content 허브의 섹션 미리보기 → "전체 보기" 클릭 시 이 페이지로 이동.
  *
- * API: contentApi.list (content_type='information', sub_type='content')
- * 권한: 작성자만 수정/삭제 노출 (created_by === currentUserId)
+ * API: contentApi.list (content_type='information', sub_type=props.subType)
+ * 권한: 작성자만 수정/삭제 노출 (created_by === currentUserId).
+ *       자료실(sub_type='resource') 은 일반 사용자가 직접 등록하는 메뉴를 제공하지 않는다
+ *       (운영자 등록 → 사용자 가져가기). 단 작성자 수정/삭제 권한은 기존과 동일하게 동작.
  */
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
@@ -39,10 +46,29 @@ function formatDate(d: string | Date | null | undefined) {
   try { return new Date(d).toLocaleDateString('ko-KR'); } catch { return '-'; }
 }
 
-export function ContentDocumentsPage() {
+export interface ContentDocumentsPageProps {
+  /**
+   * WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1
+   * 'content' (default) — 문서형 콘텐츠 / 'resource' — 자료실
+   */
+  subType?: 'content' | 'resource';
+}
+
+export function ContentDocumentsPage({ subType = 'content' }: ContentDocumentsPageProps = {}) {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
   const currentUserId = user?.id;
+
+  // WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: subType 별 라벨/링크
+  const isResource = subType === 'resource';
+  const pageTitle = isResource ? '자료실' : '문서형 콘텐츠';
+  const pageDescription = isResource
+    ? '커뮤니티 자료를 매장 내 자료함으로 가져갈 수 있습니다.'
+    : '리치 텍스트 편집기로 작성한 문서 전체 목록';
+  const newItemHref = '/content/documents/new';
+  const newItemLabel = isResource ? '자료 등록' : '문서 등록';
+  const emptyText = isResource ? '아직 등록된 자료가 없습니다.' : '아직 등록된 문서가 없습니다.';
+  const emptyCtaText = isResource ? '첫 자료 작성하기 →' : '첫 문서 작성하기 →';
 
   const [items, setItems] = useState<ContentItem[]>([]);
   const [total, setTotal] = useState(0);
@@ -66,7 +92,7 @@ export function ContentDocumentsPage() {
       limit: PAGE_LIMIT,
       sort: 'latest',
       content_type: 'information',
-      sub_type: 'content',
+      sub_type: subType,
     })
       .then((res) => {
         setItems(res.data?.items ?? []);
@@ -77,7 +103,7 @@ export function ContentDocumentsPage() {
         setTotal(0);
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [subType]);
 
   useEffect(() => {
     load(page);
@@ -321,10 +347,11 @@ export function ContentDocumentsPage() {
 
   const emptyMessage = (
     <div className="py-12 px-4 text-sm text-slate-400 text-center">
-      <p className="m-0 mb-2">아직 등록된 문서가 없습니다.</p>
-      {isAuthenticated && (
-        <Link to="/content/documents/new" className="text-sm font-semibold text-primary no-underline">
-          첫 문서 작성하기 →
+      <p className="m-0 mb-2">{emptyText}</p>
+      {/* WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: 자료실(resource) 은 사용자 직접 등록 진입점 미제공 */}
+      {isAuthenticated && !isResource && (
+        <Link to={newItemHref} className="text-sm font-semibold text-primary no-underline">
+          {emptyCtaText}
         </Link>
       )}
     </div>
@@ -335,12 +362,13 @@ export function ContentDocumentsPage() {
       <header className="flex items-end justify-between mb-6 gap-3 flex-wrap">
         <div>
           <Link to="/content" className="text-[13px] text-slate-500 no-underline mb-2 inline-block">← 콘텐츠 허브</Link>
-          <h1 className="text-2xl font-bold text-slate-900 mb-1 mt-1">문서형 콘텐츠</h1>
-          <p className="text-sm text-slate-500 m-0">리치 텍스트 편집기로 작성한 문서 전체 목록</p>
+          <h1 className="text-2xl font-bold text-slate-900 mb-1 mt-1">{pageTitle}</h1>
+          <p className="text-sm text-slate-500 m-0">{pageDescription}</p>
         </div>
-        {isAuthenticated && (
-          <Link to="/content/documents/new" className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-primary text-white text-sm font-semibold rounded-lg no-underline whitespace-nowrap">
-            문서 등록
+        {/* WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: 자료실은 등록 버튼 미노출 */}
+        {isAuthenticated && !isResource && (
+          <Link to={newItemHref} className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-primary text-white text-sm font-semibold rounded-lg no-underline whitespace-nowrap">
+            {newItemLabel}
           </Link>
         )}
       </header>
