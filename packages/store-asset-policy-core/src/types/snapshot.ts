@@ -21,8 +21,11 @@ export interface StoreAssetItem {
   organizationId: string;
   sourceService: string;
   sourceAssetId: string;
-  assetType: 'cms' | 'signage';
+  // WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1: 'lesson' 추가 (LMS 강의 Reference Metadata)
+  assetType: 'cms' | 'signage' | 'lesson';
   title: string;
+  // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1: lesson 항목 메타(thumbnail/instructor/lessonCount/publicUrl) 표시용
+  contentJson?: Record<string, unknown>;
   createdBy: string;
   createdAt: string;
   publishStatus: AssetPublishStatus;
@@ -38,7 +41,8 @@ export interface StoreAssetItem {
   lifecycleStatus: LifecycleStatus;
 }
 
-export type TabKey = 'all' | 'cms' | 'signage';
+// WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1: 'lesson' 추가
+export type TabKey = 'all' | 'cms' | 'signage' | 'lesson';
 export type StatusFilter = 'all' | 'published' | 'draft' | 'hidden';
 export type PolicyFilter = 'all' | 'user_copy' | 'hq_forced' | 'campaign_push' | 'expiring_soon' | 'expired';
 export type ChannelFilter = 'all' | 'home' | 'signage' | 'promotion';

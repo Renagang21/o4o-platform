@@ -158,6 +158,8 @@ export interface Course {
   instructor?: { id: string; name: string; avatar?: string };
   // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1
   visibility?: 'public' | 'members';
+  // WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1: 매장 자료함 가져가기 허용 정책 (visibility와 독립 축)
+  reusablePolicy?: 'restricted' | 'organization' | 'platform';
 }
 
 // Instructor Public Profile - WO-CONTENT-INSTRUCTOR-PUBLIC-PROFILE-V1

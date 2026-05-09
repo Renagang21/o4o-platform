@@ -4,6 +4,7 @@
  * WO-KPA-A-ASSET-CONTROL-EXTENSION-V1: publish status
  * WO-KPA-A-ASSET-CONTROL-EXTENSION-V2: channel_map, forced restrictions
  * WO-O4O-SNAPSHOT-POLICY-MIGRATION-V1: snapshot_type, lifecycle_status
+ * WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1: type=lesson 필터 허용
  *
  * Extension layer for asset operational control.
  * Core(o4o_asset_snapshots) is FROZEN — this controller manages
@@ -79,9 +80,11 @@ export function createStoreAssetControlController(
         const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 20));
         const offset = (page - 1) * limit;
 
+        // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1: 'lesson' 추가 — KpaAssetResolver가 published + reusable_policy != restricted 검증
+        const VALID_TYPES = ['cms', 'signage', 'lesson'];
         let typeFilter = '';
         const params: any[] = [organizationId, limit, offset];
-        if (assetType && ['cms', 'signage'].includes(assetType)) {
+        if (assetType && VALID_TYPES.includes(assetType)) {
           typeFilter = `AND s.asset_type = $4`;
           params.push(assetType);
         }
@@ -90,12 +93,15 @@ export function createStoreAssetControlController(
           SELECT COUNT(*)::int as total
           FROM o4o_asset_snapshots s
           WHERE s.organization_id = $1
-          ${assetType && ['cms', 'signage'].includes(assetType) ? `AND s.asset_type = $2` : ''}
+          ${assetType && VALID_TYPES.includes(assetType) ? `AND s.asset_type = $2` : ''}
         `;
-        const countParams = assetType && ['cms', 'signage'].includes(assetType)
+        const countParams = assetType && VALID_TYPES.includes(assetType)
           ? [organizationId, assetType]
           : [organizationId];
 
+        // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1: lesson 항목은 content_json의 reference metadata
+        // (thumbnail, instructorName, lessonCount, publicUrl 등)를 화면에서 활용한다.
+        // 기존 cms 흐름에는 contentJson이 추가되더라도 영향 없음.
         const dataQuery = `
           SELECT
             s.id,
@@ -104,6 +110,7 @@ export function createStoreAssetControlController(
             s.source_asset_id AS "sourceAssetId",
             s.asset_type AS "assetType",
             s.title,
+            s.content_json AS "contentJson",
             s.created_by AS "createdBy",
             s.created_at AS "createdAt",
             COALESCE(c.publish_status, 'draft') AS "publishStatus",

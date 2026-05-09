@@ -6,8 +6,9 @@
  * - 표시 항목/CTA 분기는 그대로 유지
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type MouseEvent } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { PageSection, PageContainer } from '@o4o/ui';
 import {
   PageHeader,
@@ -17,6 +18,7 @@ import {
   HubEntityCard,
 } from '../../components/common';
 import { lmsApi } from '../../api';
+import { assetSnapshotApi } from '../../api/assetSnapshot';
 import { useAuth } from '../../contexts';
 import type { Course } from '../../types';
 
@@ -52,14 +54,43 @@ export function LmsCoursesPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
+  // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1
+  // 매장 경영자가 이미 자료함에 가져간 강의의 sourceAssetId 집합. 중복 추가 방지 + 버튼 상태 표시.
+  const [addedCourseIds, setAddedCourseIds] = useState<Set<string>>(new Set());
+  const [addingCourseId, setAddingCourseId] = useState<string | null>(null);
 
   const currentPage = parseInt(searchParams.get('page') || '1');
   const currentCategory = searchParams.get('category') || '';
+
+  // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1: 매장 보유자만 자료함 액션 노출
+  const isStoreOwner = !!user?.isStoreOwner && !!user?.kpaMembership?.organizationId;
 
   useEffect(() => {
     loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, currentCategory]);
+
+  // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1: 매장 경영자가 페이지 진입 시 이미 가져간 강의 set을 미리 로드
+  useEffect(() => {
+    if (!isStoreOwner) return;
+    let cancelled = false;
+    assetSnapshotApi
+      .list({ type: 'lesson', limit: 100 })
+      .then((res) => {
+        if (cancelled) return;
+        const ids = new Set<string>();
+        for (const item of res.data?.items ?? []) {
+          ids.add(item.sourceAssetId);
+        }
+        setAddedCourseIds(ids);
+      })
+      .catch(() => {
+        // 권한/엔드포인트 미가용 시 silent — 버튼은 그대로 노출되며, 실제 추가 시 실패 처리.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isStoreOwner]);
 
   const loadData = async () => {
     try {
@@ -81,6 +112,38 @@ export function LmsCoursesPage() {
       setTotalPages(1);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1
+  // 매장 자료함에 강의 추가. assetType='lesson', sourceAssetId=courseId.
+  // 중복 / SOURCE_NOT_FOUND(원본 비공개·정책 차단·삭제 등) / 기타 오류를 사용자 친화적으로 처리.
+  const handleAddToLibrary = async (course: Course, e: MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isStoreOwner) return;
+    if (addedCourseIds.has(course.id)) return;
+    setAddingCourseId(course.id);
+    try {
+      await assetSnapshotApi.copy({
+        sourceService: 'kpa',
+        sourceAssetId: course.id,
+        assetType: 'lesson',
+      });
+      setAddedCourseIds((prev) => new Set(prev).add(course.id));
+      toast.success('내 자료함에 추가되었습니다');
+    } catch (err: any) {
+      const code = err?.response?.data?.error?.code ?? err?.code;
+      if (code === 'DUPLICATE_SNAPSHOT') {
+        setAddedCourseIds((prev) => new Set(prev).add(course.id));
+        toast.success('이미 내 자료함에 있는 강의입니다');
+      } else if (code === 'SOURCE_NOT_FOUND') {
+        toast.error('현재 자료함에 추가할 수 없는 강의입니다');
+      } else {
+        toast.error(err?.response?.data?.error?.message || err?.message || '자료함 추가에 실패했습니다');
+      }
+    } finally {
+      setAddingCourseId(null);
     }
   };
 
@@ -119,6 +182,17 @@ export function LmsCoursesPage() {
                 const instructorName =
                   (course as any).instructor?.name || course.instructorName || '-';
 
+                // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1
+                // 매장 보유자 + published + reusablePolicy != 'restricted' 만 추가 버튼 노출.
+                // 정책 미허용 강의(restricted)는 버튼 자체를 숨겨 사용자에게 혼란을 주지 않는다.
+                const canAddToLibrary =
+                  isStoreOwner &&
+                  course.status === 'published' &&
+                  !!course.reusablePolicy &&
+                  course.reusablePolicy !== 'restricted';
+                const isAlreadyAdded = addedCourseIds.has(course.id);
+                const isAdding = addingCourseId === course.id;
+
                 return (
                   <HubEntityCard
                     key={course.id}
@@ -138,7 +212,25 @@ export function LmsCoursesPage() {
                       { icon: '👥', label: `${course.enrollmentCount ?? 0}명 진행중` },
                     ]}
                     cta={{ label: cta.label }}
-                  />
+                  >
+                    {canAddToLibrary && (
+                      <button
+                        type="button"
+                        onClick={(e) =>
+                          isAlreadyAdded ? e.preventDefault() : handleAddToLibrary(course, e)
+                        }
+                        disabled={isAlreadyAdded || isAdding}
+                        style={addLibraryBtnStyle(isAlreadyAdded, isAdding)}
+                        aria-label="내 자료함에 추가"
+                      >
+                        {isAlreadyAdded
+                          ? '✓ 자료함에 있음'
+                          : isAdding
+                          ? '추가 중...'
+                          : '＋ 내 자료함에 추가'}
+                      </button>
+                    )}
+                  </HubEntityCard>
                 );
               })}
             </div>
@@ -163,3 +255,23 @@ const styles: Record<string, React.CSSProperties> = {
     gap: '20px',
   },
 };
+
+// WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1
+// "내 자료함에 추가" 보조 버튼 — HubEntityCard children 슬롯 내부, CTA보다 약한 톤.
+function addLibraryBtnStyle(isAdded: boolean, isAdding: boolean): React.CSSProperties {
+  return {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '4px',
+    padding: '6px 12px',
+    backgroundColor: isAdded ? '#F3F4F6' : '#FFFFFF',
+    color: isAdded ? '#6B7280' : '#5B21B6',
+    border: `1px solid ${isAdded ? '#E5E7EB' : '#DDD6FE'}`,
+    borderRadius: '6px',
+    fontSize: '12px',
+    fontWeight: 500,
+    cursor: isAdded || isAdding ? 'default' : 'pointer',
+    alignSelf: 'flex-start',
+  };
+}

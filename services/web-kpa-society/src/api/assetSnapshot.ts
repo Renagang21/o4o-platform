@@ -13,17 +13,36 @@ export interface AssetSnapshotItem {
   organizationId: string;
   sourceService: string;
   sourceAssetId: string;
-  assetType: 'cms' | 'signage';
+  assetType: 'cms' | 'signage' | 'lesson';
   title: string;
   contentJson: Record<string, unknown>;
   createdBy: string;
   createdAt: string;
 }
 
+/**
+ * WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1
+ * Lesson 항목의 contentJson 형태 (Reference Metadata).
+ * 강의 본문/lesson body/video URL은 포함되지 않는다.
+ */
+export interface LessonSnapshotContent {
+  courseId: string;
+  title: string;
+  thumbnail: string | null;
+  summary: string;
+  lessonCount: number;
+  instructorName: string | null;
+  contentKind: 'lecture' | 'content_resource';
+  visibility: 'public' | 'members';
+  publicUrl: string;
+  sourceService: string;
+  capturedAt: string;
+}
+
 interface CopyAssetRequest {
   sourceService: string;
   sourceAssetId: string;
-  assetType: 'cms' | 'signage';
+  assetType: 'cms' | 'signage' | 'lesson';
 }
 
 interface CopyAssetResponse {
@@ -53,7 +72,7 @@ export const assetSnapshotApi = {
   /**
    * List asset snapshots for the user's store (paginated)
    */
-  list: (params?: { type?: 'cms' | 'signage'; page?: number; limit?: number }) => {
+  list: (params?: { type?: 'cms' | 'signage' | 'lesson'; page?: number; limit?: number }) => {
     const query: Record<string, string> = {};
     if (params?.type) query.type = params.type;
     if (params?.page) query.page = String(params.page);
@@ -82,8 +101,10 @@ export interface StoreAssetItem {
   organizationId: string;
   sourceService: string;
   sourceAssetId: string;
-  assetType: 'cms' | 'signage';
+  assetType: 'cms' | 'signage' | 'lesson';
   title: string;
+  // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1: lesson 항목 thumbnail/lessonCount/publicUrl 표시용 (cms는 미사용)
+  contentJson?: Record<string, unknown>;
   createdBy: string;
   createdAt: string;
   publishStatus: AssetPublishStatus;
@@ -112,7 +133,7 @@ export const storeAssetControlApi = {
   /**
    * List store assets with publish status (joined with control table)
    */
-  list: (params?: { type?: 'cms' | 'signage'; page?: number; limit?: number }) => {
+  list: (params?: { type?: 'cms' | 'signage' | 'lesson'; page?: number; limit?: number }) => {
     const query: Record<string, string> = {};
     if (params?.type) query.type = params.type;
     if (params?.page) query.page = String(params.page);
@@ -152,7 +173,7 @@ export interface PublishedAssetItem {
   organizationId: string;
   sourceService: string;
   sourceAssetId: string;
-  assetType: 'cms' | 'signage';
+  assetType: 'cms' | 'signage' | 'lesson';
   title: string;
   contentJson: Record<string, unknown>;
   createdAt: string;
@@ -178,7 +199,7 @@ export const publishedAssetsApi = {
    */
   list: (
     organizationId: string,
-    params?: { channel?: string; type?: 'cms' | 'signage'; page?: number; limit?: number },
+    params?: { channel?: string; type?: 'cms' | 'signage' | 'lesson'; page?: number; limit?: number },
   ) => {
     const query: Record<string, string> = {};
     if (params?.channel) query.channel = params.channel;
