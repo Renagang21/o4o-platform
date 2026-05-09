@@ -2,8 +2,14 @@
  * MemberManagementPage - KPA-a 회원 관리 & 가입 신청 관리
  * WO-KPA-A-MEMBER-APPROVAL-UI-PHASE1-V1
  * WO-O4O-MEMBER-LIST-STANDARDIZATION-V1
+ * WO-O4O-KPA-MEMBER-MANAGEMENT-CANONICAL-ALIGN-V1: DataTable canonical 정렬
+ *   - DataTable / 컬럼 타입을 @o4o/operator-ux-core 로 통일 (다른 11개 canonical 화면과 일치)
+ *   - Column<T> → ListColumnDef<T> (title→header, sorter→sortAccessor)
+ *   - DataTable props 정렬 (dataSource→data, emptyText→emptyMessage, tableId 추가)
+ *   - 내장 pagination prop → 외부 JSX 페이지네이션 (canonical 패턴)
+ *   - 기존 컬럼/행/액션/Drawer/EditModal/DeleteRiskModal 동작 모두 유지
  *
- * MemberListLayout + @o4o/ui DataTable 기반 표준화.
+ * MemberListLayout + @o4o/operator-ux-core DataTable 기반 표준화.
  * 탭: 전체 | 약사 | 약대생 | 가입 신청
  */
 
@@ -25,10 +31,15 @@ import {
   AlertTriangle,
   ShieldAlert,
 } from 'lucide-react';
-import { DataTable, RowActionMenu, ConfirmActionDialog, BaseDetailDrawer } from '@o4o/ui';
-import type { Column } from '@o4o/ui';
-import { MemberListLayout, StatusBadge, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
-import type { MemberTab } from '@o4o/operator-ux-core';
+import { RowActionMenu, ConfirmActionDialog, BaseDetailDrawer } from '@o4o/ui';
+import {
+  DataTable,
+  MemberListLayout,
+  StatusBadge,
+  defineActionPolicy,
+  buildRowActions,
+} from '@o4o/operator-ux-core';
+import type { ListColumnDef, MemberTab } from '@o4o/operator-ux-core';
 import { apiClient } from '../../api/client';
 
 // ─── Types ───────────────────────────────────────────────────
@@ -415,6 +426,9 @@ export default function MemberManagementPage() {
   const [memberLoading, setMemberLoading] = useState(true);
   const [memberError, setMemberError] = useState<string | null>(null);
   const [memberPage, setMemberPage] = useState(1);
+  // WO-O4O-KPA-MEMBER-MANAGEMENT-CANONICAL-ALIGN-V1:
+  //   외부 pagination JSX 사용 — API 가 반환하는 totalPages 를 보관
+  const [memberTotalPages, setMemberTotalPages] = useState(1);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -444,6 +458,7 @@ export default function MemberManagementPage() {
       );
       setMembers(res.data);
       setMemberTotal(res.total);
+      setMemberTotalPages(Math.max(1, res.totalPages || 1));
 
       // Count by membership_type + status (한 번만 조회)
       const allRes = await apiClient.get<{ data: KpaMember[]; total: number }>('/members', { limit: 1000 });
@@ -499,11 +514,13 @@ export default function MemberManagementPage() {
     { key: 'applications', label: '가입 신청', count: stats?.submitted ?? 0 },
   ];
 
-  // DataTable columns for members
-  const memberColumns: Column<KpaMember>[] = [
+  // DataTable columns for members — WO-O4O-KPA-MEMBER-MANAGEMENT-CANONICAL-ALIGN-V1:
+  //   ListColumnDef (operator-ux-core) 로 변경 — title→header, sorter→sortAccessor.
+  //   sortAccessor 는 정렬 키 값만 반환 (BaseTable 이 비교는 자동 처리).
+  const memberColumns: ListColumnDef<KpaMember>[] = [
     {
       key: 'name',
-      title: '이름',
+      header: '이름',
       sortable: true,
       width: '150px',
       render: (_v, m) => (
@@ -514,19 +531,19 @@ export default function MemberManagementPage() {
           <span className="font-medium text-slate-800 text-sm">{m.user?.name || '-'}</span>
         </div>
       ),
-      sorter: (a, b) => (a.user?.name || '').localeCompare(b.user?.name || ''),
+      sortAccessor: (m) => m.user?.name || '',
     },
     {
       key: 'email',
-      title: '이메일',
+      header: '이메일',
       sortable: true,
       width: '200px',
       render: (_v, m) => <span className="text-sm text-slate-600">{m.user?.email || '-'}</span>,
-      sorter: (a, b) => (a.user?.email || '').localeCompare(b.user?.email || ''),
+      sortAccessor: (m) => m.user?.email || '',
     },
     {
       key: 'membership_type',
-      title: '유형',
+      header: '유형',
       width: '80px',
       render: (_v, m) => (
         <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full border ${
@@ -540,29 +557,30 @@ export default function MemberManagementPage() {
     },
     {
       key: 'role',
-      title: '역할',
+      header: '역할',
       width: '80px',
       render: (_v, m) => <span className="text-sm text-slate-600">{roleLabels[m.role]}</span>,
     },
     {
       key: 'status',
-      title: '상태',
+      header: '상태',
       width: '80px',
       render: (_v, m) => <StatusBadge status={m.status} />,
     },
     {
       key: 'joined_at',
-      title: '가입일',
+      header: '가입일',
       sortable: true,
       width: '100px',
       render: (_v, m) => <span className="text-sm text-slate-500">{formatDate(m.joined_at || m.created_at)}</span>,
-      sorter: (a, b) => new Date(a.joined_at || a.created_at).getTime() - new Date(b.joined_at || b.created_at).getTime(),
+      sortAccessor: (m) => new Date(m.joined_at || m.created_at).getTime(),
     },
     {
       key: '_actions',
-      title: '액션',
+      header: '액션',
       width: '60px',
       align: 'center',
+      system: true,
       render: (_v, m) => (
         <RowActionMenu
           actions={buildRowActions(memberActionPolicy, m, {
@@ -658,18 +676,40 @@ export default function MemberManagementPage() {
             )}
             <DataTable<KpaMember>
               columns={memberColumns}
-              dataSource={filteredMembers}
+              data={filteredMembers}
               rowKey="id"
               loading={memberLoading}
-              emptyText="회원이 없습니다."
+              emptyMessage="회원이 없습니다."
+              tableId="kpa-operator-members"
               onRowClick={(m) => setSelectedMember(m)}
-              pagination={{
-                current: memberPage,
-                pageSize: 20,
-                total: activeTab === 'all' ? memberTotal : filteredMembers.length,
-                onChange: (page) => { setMemberPage(page); fetchMembers(page); },
-              }}
             />
+
+            {/* WO-O4O-KPA-MEMBER-MANAGEMENT-CANONICAL-ALIGN-V1:
+                operator-ux-core DataTable 은 내장 pagination 미지원 — 외부 JSX 로 분리.
+                서버사이드 페이지(activeTab='all' 또는 status-* 탭) 일 때만 노출.
+                client-side 필터(약사/약대생 탭) 일 때는 페이지네이션 의미 없으므로 숨김. */}
+            {memberTotalPages > 1 && activeTab !== 'applications'
+              && (activeTab === 'all' || activeTab.startsWith('status-')) && (
+              <div className="flex items-center justify-center gap-3 mt-4">
+                <button
+                  type="button"
+                  className="px-3 py-1.5 text-sm border border-slate-200 rounded-md hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={() => { const next = Math.max(1, memberPage - 1); setMemberPage(next); fetchMembers(next); }}
+                  disabled={memberPage <= 1 || memberLoading}
+                >
+                  이전
+                </button>
+                <span className="text-sm text-slate-600">{memberPage} / {memberTotalPages}</span>
+                <button
+                  type="button"
+                  className="px-3 py-1.5 text-sm border border-slate-200 rounded-md hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={() => { const next = Math.min(memberTotalPages, memberPage + 1); setMemberPage(next); fetchMembers(next); }}
+                  disabled={memberPage >= memberTotalPages || memberLoading}
+                >
+                  다음
+                </button>
+              </div>
+            )}
           </>
         )}
       </MemberListLayout>
