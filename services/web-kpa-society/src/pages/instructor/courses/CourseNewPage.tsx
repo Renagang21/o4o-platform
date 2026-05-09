@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { lmsInstructorApi, type ContentKind, type CourseVisibility } from '../../../api/lms-instructor';
+import { lmsInstructorApi, type ContentKind, type CourseVisibility, type CourseReusablePolicy } from '../../../api/lms-instructor';
 
 const styles: Record<string, React.CSSProperties> = {
   page: { maxWidth: 680, margin: '0 auto', padding: '32px 20px' },
@@ -85,6 +85,8 @@ export default function CourseNewPage({
   const [tagInput, setTagInput] = useState('');
   // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1: 기본값 회원제
   const [visibility, setVisibility] = useState<CourseVisibility>('members');
+  // WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1: 매장 자료함 가져가기 허용 여부 (기본값 차단)
+  const [reusablePolicy, setReusablePolicy] = useState<CourseReusablePolicy>('restricted');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -110,6 +112,7 @@ export default function CourseNewPage({
         tags: tags.length > 0 ? tags : undefined,
         contentKind, // 미지정 시 백엔드에서 'lecture' 기본
         visibility,  // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1
+        reusablePolicy, // WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1
       });
       // API returns { success, data: Course }
       const courseId = res.data?.data?.id;
@@ -181,6 +184,34 @@ export default function CourseNewPage({
             </label>
           </div>
           <span style={styles.hint}>회원제는 로그인 회원만, 공개는 모두에게 노출됩니다.</span>
+        </div>
+
+        {/* WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1: 매장 자료함 가져가기 허용 — visibility와 독립 축 */}
+        <div style={styles.field}>
+          <label style={styles.label}>매장 자료함 활용 허용</label>
+          <div style={{ display: 'flex', gap: 16 }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#374151', cursor: 'pointer' }}>
+              <input
+                type="radio"
+                name="reusablePolicy"
+                value="restricted"
+                checked={reusablePolicy === 'restricted'}
+                onChange={() => setReusablePolicy('restricted')}
+              />
+              차단(기본)
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#374151', cursor: 'pointer' }}>
+              <input
+                type="radio"
+                name="reusablePolicy"
+                value="platform"
+                checked={reusablePolicy === 'platform'}
+                onChange={() => setReusablePolicy('platform')}
+              />
+              모든 매장 허용
+            </label>
+          </div>
+          <span style={styles.hint}>허용 시 매장 운영자가 이 강의를 자료함에 추가하여 매장 콘텐츠로 활용할 수 있습니다(공개 메타데이터만 노출, 강의 본문/영상은 복사되지 않음).</span>
         </div>
 
         <div style={styles.field}>

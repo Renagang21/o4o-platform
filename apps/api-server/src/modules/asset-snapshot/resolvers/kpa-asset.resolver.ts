@@ -2,13 +2,15 @@
  * KPA Asset Resolver
  *
  * WO-O4O-ASSET-COPY-CORE-EXTRACTION-V1
+ * WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1: lesson type 추가 (Reference Metadata 방식)
  *
- * Resolves KPA community CMS and Signage assets
+ * Resolves KPA community CMS, Signage, and LMS Course assets
  * into the standard ResolvedContent format.
  */
 
 import { DataSource } from 'typeorm';
 import { CmsContent } from '@o4o-apps/cms-core/entities';
+import { Course, CourseStatus, CourseReusablePolicy } from '@o4o/lms-core';
 import type { ContentResolver, ResolvedContent } from '@o4o/asset-copy-core';
 
 export class KpaAssetResolver implements ContentResolver {
@@ -20,6 +22,9 @@ export class KpaAssetResolver implements ContentResolver {
     }
     if (assetType === 'signage') {
       return this.resolveSignage(sourceAssetId);
+    }
+    if (assetType === 'lesson') {
+      return this.resolveLesson(sourceAssetId);
     }
     return null;
   }
@@ -42,6 +47,66 @@ export class KpaAssetResolver implements ContentResolver {
         linkUrl: content.linkUrl,
         linkText: content.linkText,
         metadata: content.metadata,
+      },
+    };
+  }
+
+  /**
+   * WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1
+   *
+   * Reference Metadata 방식 — 강의 본문/lesson body/video URL은 복사하지 않는다.
+   * 매장이 자료함에 가져갈 수 있는 강의는 다음 조건을 모두 만족해야 한다:
+   *   1. status === 'published'  (DRAFT/PENDING_REVIEW/REJECTED/ARCHIVED는 차단)
+   *   2. reusable_policy !== 'restricted'  (강사가 명시적 허용)
+   *
+   * 위 조건 미충족 시 null 반환 → AssetCopyService가 NotFound 또는 Forbidden으로 처리.
+   * lesson_count 는 lms_lessons 테이블에서 별도 집계 (lightweight count, body 미포함).
+   */
+  private async resolveLesson(id: string): Promise<ResolvedContent | null> {
+    const repo = this.dataSource.getRepository(Course);
+    const course = await repo.findOne({
+      where: { id },
+      relations: ['instructor'],
+    });
+    if (!course) return null;
+
+    // Gate 1 — published 강의만 자료함 노출 가능
+    if (course.status !== CourseStatus.PUBLISHED) return null;
+
+    // Gate 2 — reusable_policy 검증 (restricted는 가져가기 차단)
+    if (course.reusablePolicy === CourseReusablePolicy.RESTRICTED) return null;
+
+    // Lightweight lesson count (body 조회 없이 row count만)
+    const [{ count }] = await this.dataSource.query(
+      `SELECT COUNT(*)::int AS count FROM "lms_lessons" WHERE "courseId" = $1`,
+      [id],
+    );
+
+    const description = course.description ?? '';
+    const summary = description.length > 200 ? `${description.slice(0, 200)}…` : description;
+    const instructorName =
+      (course as any).instructor?.name ??
+      (course as any).instructor?.fullName ??
+      (course as any).instructor?.email ??
+      null;
+
+    return {
+      title: course.title,
+      type: 'lesson',
+      sourceService: 'kpa',
+      contentJson: {
+        // Reference Metadata만 — lesson body / quiz / video content 미포함
+        courseId: course.id,
+        title: course.title,
+        thumbnail: course.thumbnail ?? null,
+        summary,
+        lessonCount: count ?? 0,
+        instructorName,
+        contentKind: course.contentKind,
+        visibility: course.visibility,
+        publicUrl: `/lms/course/${course.id}`,
+        sourceService: 'kpa',
+        capturedAt: new Date().toISOString(),
       },
     };
   }

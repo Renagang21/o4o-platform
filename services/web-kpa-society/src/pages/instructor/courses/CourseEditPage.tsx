@@ -12,7 +12,7 @@ import { RichTextEditor, AiContentModal } from '@o4o/content-editor';
 import { GuideBlock } from '@o4o/shared-space-ui';
 // WO-O4O-GUIDE-CONTENT-MANAGEMENT-V1-SCOPED
 import { fetchGuidePageContent } from '../../../api/guideContent';
-import { lmsInstructorApi, Course, Lesson, LessonType, type CourseVisibility } from '../../../api/lms-instructor';
+import { lmsInstructorApi, Course, Lesson, LessonType, type CourseVisibility, type CourseReusablePolicy } from '../../../api/lms-instructor';
 // WO-O4O-AI-LESSON-FLOW-FIX-V1: AI panel에 instructor Bearer 토큰 명시 주입
 import { getAccessToken } from '../../../contexts/AuthContext';
 import QuizBuilder from './QuizBuilder';
@@ -522,6 +522,8 @@ export default function CourseEditPage() {
   const [tagInput, setTagInput] = useState('');
   // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1: 공개/회원제. 기본값 회원제.
   const [visibility, setVisibility] = useState<CourseVisibility>('members');
+  // WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1: 매장 자료함 가져가기 허용. 기본값 차단.
+  const [reusablePolicy, setReusablePolicy] = useState<CourseReusablePolicy>('restricted');
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState<string | null>(null);
 
@@ -554,6 +556,8 @@ export default function CourseEditPage() {
       setTags(c.tags || []);
       // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1: 응답에 visibility가 없으면 기본 'members'
       setVisibility(c.visibility ?? 'members');
+      // WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1: 응답에 reusablePolicy가 없으면 기본 'restricted'
+      setReusablePolicy(c.reusablePolicy ?? 'restricted');
       setLessons(ls.sort((a, b) => a.order - b.order));
     } catch (err: any) {
       if (err?.response?.data?.code === 'INSTRUCTOR_REQUIRED') {
@@ -579,6 +583,7 @@ export default function CourseEditPage() {
         description: form.description.trim(),
         tags: tags.length > 0 ? tags : [],
         visibility, // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1
+        reusablePolicy, // WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1
       });
       setSaveMsg('저장되었습니다.');
       setTimeout(() => setSaveMsg(null), 2000);
@@ -804,6 +809,35 @@ export default function CourseEditPage() {
                 공개 강의
               </label>
             </div>
+          </div>
+          {/* WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1: 매장 자료함 가져가기 허용 — visibility와 독립 축 */}
+          <div style={s.field}>
+            <label style={s.label}>매장 자료함 활용 허용</label>
+            <div style={{ display: 'flex', gap: 16 }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#374151', cursor: 'pointer' }}>
+                <input
+                  type="radio"
+                  name="reusablePolicy"
+                  value="restricted"
+                  checked={reusablePolicy === 'restricted'}
+                  onChange={() => setReusablePolicy('restricted')}
+                />
+                차단(기본)
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#374151', cursor: 'pointer' }}>
+                <input
+                  type="radio"
+                  name="reusablePolicy"
+                  value="platform"
+                  checked={reusablePolicy === 'platform'}
+                  onChange={() => setReusablePolicy('platform')}
+                />
+                모든 매장 허용
+              </label>
+            </div>
+            <span style={{ fontSize: 11, color: '#9ca3af' }}>
+              허용 시 매장 운영자가 이 강의를 자료함에 추가하여 매장 콘텐츠로 활용할 수 있습니다(공개 메타데이터만 노출, 강의 본문/영상은 복사되지 않음).
+            </span>
           </div>
           <div style={s.field}>
             <label style={s.label}>태그</label>

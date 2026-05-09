@@ -16,7 +16,8 @@ export { ContentBundle, ContentBundleType } from './ContentBundle.js';
 export type { ContentItem } from './ContentBundle.js';
 
 // Course & Lesson (Phase 2)
-export { Course, CourseStatus, ContentKind, CourseVisibility } from './Course.js';
+// WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1: CourseReusablePolicy 추가
+export { Course, CourseStatus, ContentKind, CourseVisibility, CourseReusablePolicy } from './Course.js';
 export { Lesson, LessonType } from './Lesson.js';
 
 // Assignment (WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1)

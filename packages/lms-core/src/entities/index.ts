@@ -10,7 +10,8 @@ export {
   Survey, SurveyStatus, SurveyOwnerType, SurveyVisibility, SurveyQuestion, QuestionType, SurveyResponse, ResponseStatus,
   ContentBundle, ContentBundleType,
   // Phase 2
-  Course, CourseStatus, ContentKind, CourseVisibility,
+  // WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1: CourseReusablePolicy 추가
+  Course, CourseStatus, ContentKind, CourseVisibility, CourseReusablePolicy,
   Lesson, LessonType,
   // WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1
   Assignment, Submission,

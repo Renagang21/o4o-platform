@@ -46,7 +46,10 @@ export function createAssetCopyController(
     resolveOrgId,
     noOrgErrorCode = 'NO_ORGANIZATION',
     noOrgMessage = 'User has no organization membership',
+    // WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1: 기본은 cms/signage, 서비스가 lesson 등을 추가 가능.
+    allowedAssetTypes = ['cms', 'signage'],
   } = config;
+  const allowedAssetTypesMessage = allowedAssetTypes.join(' or ');
 
   /**
    * POST /copy
@@ -81,10 +84,10 @@ export function createAssetCopyController(
         return;
       }
 
-      if (!['cms', 'signage'].includes(assetType)) {
+      if (!allowedAssetTypes.includes(assetType)) {
         res.status(400).json({
           success: false,
-          error: { code: 'INVALID_ASSET_TYPE', message: 'assetType must be cms or signage' },
+          error: { code: 'INVALID_ASSET_TYPE', message: `assetType must be ${allowedAssetTypesMessage}` },
         });
         return;
       }
@@ -166,10 +169,10 @@ export function createAssetCopyController(
       }
 
       const assetType = req.query.type as string | undefined;
-      if (assetType && !['cms', 'signage'].includes(assetType)) {
+      if (assetType && !allowedAssetTypes.includes(assetType)) {
         res.status(400).json({
           success: false,
-          error: { code: 'INVALID_ASSET_TYPE', message: 'type must be cms or signage' },
+          error: { code: 'INVALID_ASSET_TYPE', message: `type must be ${allowedAssetTypesMessage}` },
         });
         return;
       }

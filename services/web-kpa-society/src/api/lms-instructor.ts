@@ -18,6 +18,8 @@ export type LessonType = 'video' | 'article' | 'quiz' | 'assignment' | 'live';
 export type ContentKind = 'lecture' | 'content_resource';
 // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1
 export type CourseVisibility = 'public' | 'members';
+// WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1: 매장 자료함 가져가기 허용 정책 (visibility와 독립 축)
+export type CourseReusablePolicy = 'restricted' | 'organization' | 'platform';
 
 export interface Course {
   id: string;
@@ -38,6 +40,8 @@ export interface Course {
   price: number | null;
   // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1
   visibility: CourseVisibility;
+  // WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1
+  reusablePolicy?: CourseReusablePolicy;
   // WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1
   rejectionReason?: string | null;
   createdAt: string;
@@ -84,6 +88,8 @@ export interface CreateCourseDto {
   contentKind?: ContentKind;
   // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1: 미전달 시 백엔드에서 'members' 기본
   visibility?: CourseVisibility;
+  // WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1: 미전달 시 백엔드에서 'restricted' 기본
+  reusablePolicy?: CourseReusablePolicy;
 }
 
 export interface UpdateCourseDto {
@@ -93,6 +99,8 @@ export interface UpdateCourseDto {
   thumbnail?: string | null;
   // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1
   visibility?: CourseVisibility;
+  // WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1
+  reusablePolicy?: CourseReusablePolicy;
 }
 
 export interface CreateLessonDto {

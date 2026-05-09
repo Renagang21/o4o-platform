@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
 import { BaseService } from '../../../common/base.service.js';
-import { Course, CourseStatus, ContentKind, CourseVisibility } from '@o4o/lms-core';
+import { Course, CourseStatus, ContentKind, CourseVisibility, CourseReusablePolicy } from '@o4o/lms-core';
 import { sanitizeInstructor } from '../utils/sanitize-user.js';
 import { notificationService } from '../../../services/NotificationService.js';
 import { logEvent } from '../../../common/event-log.service.js';
@@ -43,6 +43,9 @@ export interface CreateCourseRequest {
   contentKind?: ContentKind;
   // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1: 공개/회원제 (미전달 시 MEMBERS)
   visibility?: CourseVisibility;
+  // WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1: 매장 자료함 가져가기 허용 정책 (미전달 시 RESTRICTED)
+  // visibility(수강 접근성)와 독립된 별개 축. 두 축을 혼동하지 말 것.
+  reusablePolicy?: CourseReusablePolicy;
 }
 
 export interface UpdateCourseRequest extends Partial<CreateCourseRequest> {
@@ -115,6 +118,8 @@ export class CourseService extends BaseService<Course> {
       contentKind: data.contentKind ?? ContentKind.LECTURE,
       // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1: 미전달 시 MEMBERS 기본
       visibility: data.visibility ?? CourseVisibility.MEMBERS,
+      // WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1: 미전달 시 RESTRICTED 기본 (자료함 가져가기 차단)
+      reusablePolicy: data.reusablePolicy ?? CourseReusablePolicy.RESTRICTED,
     });
 
     const saved = await this.courseRepository.save(course);

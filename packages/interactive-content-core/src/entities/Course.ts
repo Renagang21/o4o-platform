@@ -57,6 +57,21 @@ export enum CourseVisibility {
   MEMBERS = 'members',
 }
 
+/**
+ * WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1
+ * 강의 재사용 허용 정책 — 매장 운영자가 자신의 "내 자료함"으로 가져올 수 있는지 결정한다.
+ * `visibility`(수강 접근성)와는 독립된 별개 축이다.
+ *
+ *   RESTRICTED   : 본인/소속 강의자만 (기본값. 가져가기 차단)
+ *   ORGANIZATION : 동일 organizationId 매장만 가져갈 수 있음 (Phase 2)
+ *   PLATFORM     : 모든 매장 가져갈 수 있음
+ */
+export enum CourseReusablePolicy {
+  RESTRICTED = 'restricted',
+  ORGANIZATION = 'organization',
+  PLATFORM = 'platform',
+}
+
 @Entity('lms_courses')
 @Index(['organizationId', 'status'])
 @Index(['instructorId'])
@@ -89,6 +104,10 @@ export class Course {
   // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1: 공개 강의 vs 회원제 강의
   @Column({ name: 'visibility', type: 'varchar', length: 20, default: CourseVisibility.MEMBERS })
   visibility!: CourseVisibility;
+
+  // WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1: 매장 자료함 가져가기 허용 정책 (visibility와 독립 축)
+  @Column({ name: 'reusable_policy', type: 'varchar', length: 20, default: CourseReusablePolicy.RESTRICTED })
+  reusablePolicy!: CourseReusablePolicy;
 
   // Duration in minutes
   @Column({ type: 'integer', default: 0 })

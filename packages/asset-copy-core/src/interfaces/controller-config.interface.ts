@@ -44,4 +44,15 @@ export interface AssetCopyControllerConfig {
    * Services with hierarchical roles can inject custom implementations.
    */
   permissionChecker?: PermissionChecker;
+
+  /**
+   * WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1
+   *
+   * Asset types this controller accepts (POST /copy and GET / type filter).
+   * Default: ['cms', 'signage'] — backward compatible with existing services.
+   *
+   * Services that want to expose additional types (e.g. 'lesson' for KPA LMS)
+   * should override this list. The resolver must handle each listed type.
+   */
+  allowedAssetTypes?: string[];
 }
