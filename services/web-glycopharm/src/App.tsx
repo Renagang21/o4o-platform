@@ -60,6 +60,10 @@ const PharmacySettings = lazy(() => import('@/pages/store-management/PharmacySet
 const PharmacyManagement = lazy(() => import('@/pages/store-management/PharmacyManagement'));
 const PharmacyB2BProducts = lazy(() => import('@/pages/store-management/PharmacyB2BProducts'));
 const CustomerRequestsPage = lazy(() => import('@/pages/store-management/CustomerRequestsPage')); // Phase 1: Common Request
+// WO-O4O-GLYCO-BLOG-INTRODUCE-V1: Blog 도입 (KPA canonical 정렬)
+const PharmacyBlogPage = lazy(() => import('@/pages/store-management/PharmacyBlogPage'));
+const StoreBlogPage = lazy(() => import('@/pages/store/StoreBlogPage'));
+const StoreBlogPostPage = lazy(() => import('@/pages/store/StoreBlogPostPage'));
 
 // Store Signage — WO-O4O-GLYCOPHARM-SIGNAGE-PHASE1-V1 (StoreSignagePage → StoreSignageMainPage로 교체됨)
 
@@ -578,6 +582,12 @@ function AppRoutes() {
       {/* QR Landing (Phase 2-B: standalone public page, no layout) */}
       <Route path="qr/:pharmacyId" element={<QrLandingPage />} />
 
+      {/* Public Blog (WO-O4O-GLYCO-BLOG-INTRODUCE-V1)
+          unified-store-public 경로(/api/v1/stores/:slug/blog/*) 사용. 인증 불필요.
+          consumer storefront route(/store/:pharmacyId)와 path 충돌 없음 — `/blog` 세그먼트로 더 specific 매칭 */}
+      <Route path="store/:slug/blog" element={<StoreBlogPage />} />
+      <Route path="store/:slug/blog/:postSlug" element={<StoreBlogPostPage />} />
+
       {/* Store Owner Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1) */}
       <Route
         path="store"
@@ -607,6 +617,8 @@ function AppRoutes() {
         <Route path="channels" element={<StoreChannelsPage />} />
         <Route path="orders" element={<PharmacyOrders />} />
         <Route path="content" element={<StoreAssetsPage />} />
+        {/* Blog (WO-O4O-GLYCO-BLOG-INTRODUCE-V1) — staff 작성/관리 */}
+        <Route path="content/blog" element={<PharmacyBlogPage />} />
         <Route path="services" element={<PharmacyPatients />} />
         <Route path="settings" element={<PharmacySettings />} />
         <Route path="apply" element={<StoreApplyPage />} />
