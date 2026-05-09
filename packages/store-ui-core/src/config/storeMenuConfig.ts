@@ -145,6 +145,8 @@ export const GLYCOPHARM_STORE_CONFIG: StoreDashboardConfig = {
         { key: 'market-trial', label: '유통 참여형 펀딩', subPath: '/market-trial' },
         { key: 'funnel',       label: '전환 퍼널',      subPath: '/funnel' },
         { key: 'content',      label: '콘텐츠 가져오기', subPath: '/content' },
+        // WO-O4O-GLYCO-BLOG-INTRODUCE-V1: 전문 매장 운영자의 공개 콘텐츠 채널
+        { key: 'content-blog', label: '블로그',         subPath: '/content/blog' },
         { key: 'channels',     label: '채널 관리',      subPath: '/channels' },
       ],
     },
