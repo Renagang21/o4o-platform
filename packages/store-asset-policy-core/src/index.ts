@@ -57,3 +57,13 @@ export { LifecycleStatusPill } from './components/LifecycleStatusPill';
 
 export { PolicyFilterBar } from './components/PolicyFilterBar';
 export type { PolicyFilterBarProps } from './components/PolicyFilterBar';
+
+// Media Extraction (WO-O4O-TABLET-IDLE-LIBRARY-SNAPSHOT-SUPPORT-V1)
+export {
+  extractSnapshotMedia,
+  extractSnapshotMediaList,
+} from './media/snapshotMedia';
+export type {
+  SnapshotMediaItem,
+  SnapshotForMedia,
+} from './media/snapshotMedia';

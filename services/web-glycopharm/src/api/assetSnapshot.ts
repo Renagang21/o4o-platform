@@ -33,10 +33,39 @@ interface CopyAssetResponse {
   };
 }
 
+// WO-O4O-TABLET-IDLE-LIBRARY-SNAPSHOT-SUPPORT-V1: 자료함 snapshot 목록 조회
+export interface AssetSnapshotItem {
+  id: string;
+  organizationId: string;
+  sourceService: string;
+  sourceAssetId: string;
+  assetType: string;
+  title: string;
+  contentJson: Record<string, unknown>;
+  createdBy: string;
+  createdAt: string;
+}
+
+interface PaginatedAssetSnapshots {
+  items: AssetSnapshotItem[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
 export const assetSnapshotApi = {
   copy: async (body: CopyAssetRequest) => {
     const res = await api.post('/glycopharm/assets/copy', body);
     return res.data as CopyAssetResponse;
+  },
+
+  list: async (params?: { type?: string; page?: number; limit?: number }) => {
+    const qp = new URLSearchParams();
+    if (params?.type) qp.set('type', params.type);
+    if (params?.page) qp.set('page', String(params.page));
+    qp.set('limit', String(params?.limit ?? 100));
+    const res = await api.get(`/glycopharm/assets?${qp.toString()}`);
+    return res.data as { success: boolean; data: PaginatedAssetSnapshots };
   },
 };
 

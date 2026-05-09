@@ -22,7 +22,9 @@ import {
   ArrowLeft, Save, Package, ShoppingBag, AlertTriangle, Tv,
 } from 'lucide-react';
 import { IdlePlaylistEditor, type IdlePlaylistItem, type LibraryAsset } from '@o4o/tablet-kiosk-core';
+import { extractSnapshotMediaList, type SnapshotForMedia } from '@o4o/store-asset-policy-core';
 import { getStoreLibraryItems } from '../../api/storeLibrary';
+import { assetSnapshotApi } from '../../api/assetSnapshot';
 import {
   fetchTablets,
   fetchTabletDisplays,
@@ -235,29 +237,62 @@ export default function StoreTabletDisplaysPage() {
   const idleHasChanges = JSON.stringify(idleItems) !== JSON.stringify(idleInitial);
 
   // WO-O4O-TABLET-IDLE-MEDIA-LIBRARY-V1
-  // 매장 자료함의 image/video 자산만 가져와 LibraryAsset 으로 변환.
-  // store_library_items 의 mime_type 기반 필터링. runtime 은 url 만 사용 — assetId lookup 없음.
+  // WO-O4O-TABLET-IDLE-LIBRARY-SNAPSHOT-SUPPORT-V1: o4o_asset_snapshots 미디어 병합
+  // 매장 자료함의 두 source 를 병합해 image/video LibraryAsset 으로 변환:
+  //   1) store_library_items (직접 업로드)
+  //   2) o4o_asset_snapshots (Community → Store snapshot copy)
+  // runtime 은 url 만 사용 — assetId lookup 없음. 동일 url 은 dedupe 처리.
   const fetchIdleLibraryAssets = useCallback(async (): Promise<LibraryAsset[]> => {
-    const res = await getStoreLibraryItems({ limit: 100 });
-    if (!res.success) return [];
-    const items = res.data?.items ?? [];
-    return items
-      .map((item) => {
+    // (1) store_library_items
+    const directAssetsP = getStoreLibraryItems({ limit: 100 }).then((res) => {
+      if (!res.success) return [] as LibraryAsset[];
+      const items = res.data?.items ?? [];
+      const out: LibraryAsset[] = [];
+      for (const item of items) {
         const mime = item.mimeType ?? '';
         const isVideo = mime.startsWith('video/');
         const isImage = mime.startsWith('image/');
-        if (!isVideo && !isImage) return null;
+        if (!isVideo && !isImage) continue;
         const url = item.fileUrl ?? item.url ?? '';
-        if (!url) return null;
-        return {
+        if (!url) continue;
+        const asset: LibraryAsset = {
           id: item.id,
           title: item.title,
-          type: isVideo ? ('video' as const) : ('image' as const),
+          type: isVideo ? 'video' : 'image',
           url,
-          thumbnail: item.fileUrl ?? undefined,
         };
+        if (item.fileUrl) asset.thumbnail = item.fileUrl;
+        out.push(asset);
+      }
+      return out;
+    });
+
+    // (2) o4o_asset_snapshots → 미디어 추출
+    const snapshotAssetsP = assetSnapshotApi
+      .list({ limit: 100 })
+      .then((res) => {
+        const items = res?.data?.items ?? [];
+        const snapshots: SnapshotForMedia[] = items.map((s) => ({
+          id: s.id,
+          assetType: s.assetType,
+          title: s.title,
+          contentJson: s.contentJson,
+        }));
+        return extractSnapshotMediaList(snapshots) as LibraryAsset[];
       })
-      .filter((a): a is LibraryAsset => a !== null);
+      .catch(() => [] as LibraryAsset[]);
+
+    const [direct, fromSnapshots] = await Promise.all([directAssetsP, snapshotAssetsP]);
+
+    // dedupe by url (직접 업로드 우선)
+    const seen = new Set<string>();
+    const merged: LibraryAsset[] = [];
+    for (const a of [...direct, ...fromSnapshots]) {
+      if (seen.has(a.url)) continue;
+      seen.add(a.url);
+      merged.push(a);
+    }
+    return merged;
   }, []);
 
   // Save idle playlist (WO-O4O-TABLET-IDLE-PLAYLIST-EDITOR-V1)
