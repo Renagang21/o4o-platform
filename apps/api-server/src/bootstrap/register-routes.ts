@@ -807,14 +807,9 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register RBAC DB Audit routes:', rbacAuditError);
     }
 
-    // TEMP: GlycoPharm Test Account Audit (IR-GLYCOPHARM-TEST-ACCOUNT-EXTRACT-V2) — remove after use
-    try {
-      const { createGlycopharmTestAccountsRouter } = await import('../routes/debug/glycopharm-test-accounts.controller.js');
-      app.use('/__debug__/glycopharm-test-accounts', createGlycopharmTestAccountsRouter(dataSource));
-      logger.info('✅ GlycoPharm Test Accounts endpoint registered at /__debug__/glycopharm-test-accounts');
-    } catch (glycoTestError) {
-      logger.error('Failed to register GlycoPharm Test Accounts:', glycoTestError);
-    }
+    // WO-O4O-GLYCO-CARE-BACKEND-CLEANUP-V1: GlycoPharm Test Account Audit endpoint 제거.
+    //   드롭된 테이블(glucoseview_customers / health_readings / care_kpi_snapshots)을 SELECT 하던
+    //   임시 진단 controller. 운영 시 모든 쿼리가 "relation does not exist" 로 실패하던 dead code.
 
     // 37-f. Service Users Audit endpoint
     try {

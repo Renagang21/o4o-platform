@@ -334,30 +334,10 @@ export function createPharmacyDebugRouter(dataSource: DataSource): Router {
         : [];
       const pharmacyIds: string[] = result.pharmacies.map((p: any) => p.id);
 
-      // 3. care_pharmacy_link_requests
-      result.link_requests = await dataSource.query(
-        `SELECT id, patient_id, patient_name, patient_email, pharmacy_id, pharmacy_name, status, message, reject_reason, handled_by, handled_at, created_at
-         FROM care_pharmacy_link_requests
-         WHERE ($1::uuid[] IS NULL OR patient_id = ANY($1::uuid[]))
-            OR ($2::uuid[] IS NULL OR pharmacy_id = ANY($2::uuid[]))
-         ORDER BY created_at DESC
-         LIMIT 30`,
-        [patientIds.length > 0 ? patientIds : null, pharmacyIds.length > 0 ? pharmacyIds : null],
-      ).catch((e: any) => ({ error: String(e?.message || e) }));
-
-      // WO-O4O-GLUCOSEVIEW-POST-DROP-CLEANUP-V1: glucoseview_customers 진단 블록 제거
-      // (테이블 삭제 — 약국-환자 연결은 향후 Care Core 기반으로 재진단 예정)
-
-      // 5. care_appointments (상담 예약)
-      result.appointments = await dataSource.query(
-        `SELECT id, patient_id, patient_name, patient_email, pharmacy_id, pharmacy_name, pharmacist_id, status, scheduled_at, notes, reject_reason, created_at
-         FROM care_appointments
-         WHERE ($1::uuid[] IS NULL OR patient_id = ANY($1::uuid[]))
-            OR ($2::uuid[] IS NULL OR pharmacy_id = ANY($2::uuid[]))
-         ORDER BY created_at DESC
-         LIMIT 30`,
-        [patientIds.length > 0 ? patientIds : null, pharmacyIds.length > 0 ? pharmacyIds : null],
-      ).catch((e: any) => ({ error: String(e?.message || e) }));
+      // WO-O4O-GLYCO-CARE-BACKEND-CLEANUP-V1: care_pharmacy_link_requests / care_appointments
+      //   진단 블록 제거. 두 테이블 모두 20260601000000-DropCareTables 마이그레이션에서 DROP 됨.
+      //   patientIds 는 약국 owner/member 확인 블록에서 계속 사용되므로 유지.
+      void patientIds;
 
       // 6. 약국 owner / member 확인
       if (pharmacyIds.length > 0) {

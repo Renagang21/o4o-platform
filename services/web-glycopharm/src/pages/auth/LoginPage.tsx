@@ -25,7 +25,9 @@ export default function LoginPage() {
   // WO-GLYCOPHARM-ROLE-PREFIX-MIGRATION-V1:
   //   query param `?type=pharmacist` / `?type=pharmacy` 모두 약사 로그인으로 normalize.
   //   내부 표준은 'pharmacy' (loginType용), 실제 role은 glycopharm:pharmacist.
-  const rawType = searchParams.get('type'); // 'patient' | 'pharmacy' | 'pharmacist' (legacy) | 'operator' | null
+  // WO-O4O-GLYCO-CARE-BACKEND-CLEANUP-V1: 'patient' 쿼리 type 미사용 (RegisterPage 에서 patient 옵션 제거).
+  // back-compat 호환을 위해 query param 자체 처리는 유지 — 외부 링크가 ?type=patient 로 진입해도 정상 동작.
+  const rawType = searchParams.get('type'); // 'pharmacy' | 'pharmacist' (legacy) | 'operator' | null  (※ 'patient' 는 deprecated)
   const loginType = (rawType === 'pharmacist' ? 'pharmacy' : rawType)
     || (location.pathname.startsWith('/admin') ? 'operator' : null);
 

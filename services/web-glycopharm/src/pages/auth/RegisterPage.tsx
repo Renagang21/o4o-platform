@@ -1,11 +1,13 @@
 /**
  * RegisterPage — GlycoPharm 회원가입
  * WO-O4O-GLYCOPHARM-SIGNUP-REFORM-V1
+ * WO-O4O-GLYCO-CARE-BACKEND-CLEANUP-V1: '당뇨인'(patient) 회원 유형 제거.
+ *   Care/Glucoseview 백엔드 인프라가 모두 DROP 되어 patient 가입 시 functional surface 0.
+ *   GlycoPharm canonical 구조 = 전문 매장 운영 (약국 회원 only).
  *
- * - 당뇨인/약국 유형 선택
- * - 약국: 사업자 정보 필수 (약국명, 사업자번호, 세금계산서 이메일)
+ * - 약국 회원 가입 only
+ * - 사업자 정보 필수 (약국명, 사업자번호, 세금계산서 이메일)
  * - 닉네임: 필수 입력
- * - 면허번호: 제거
  */
 
 import { useState } from 'react';
@@ -34,7 +36,8 @@ const SERVICE_LABELS: Record<string, string> = {
 
 export default function RegisterPage() {
   const navigate = useNavigate();
-  const [memberType, setMemberType] = useState<'patient' | 'pharmacy'>('patient');
+  // WO-O4O-GLYCO-CARE-BACKEND-CLEANUP-V1: 약국 회원 only — patient 옵션 제거
+  const memberType = 'pharmacy' as const;
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -141,12 +144,11 @@ export default function RegisterPage() {
         marketingAccepted: formData.agreeMarketing,
       });
 
-      // 약국: 승인 대기 메시지 표시, 당뇨인: 로그인 이동
-      if (memberType === 'pharmacy') {
-        setRegistrationComplete(true);
-      } else {
-        navigate('/login?type=patient');
-      }
+      // WO-O4O-GLYCO-CARE-BACKEND-CLEANUP-V1: 약국 회원 only — 가입 후 승인 대기 화면 표시
+      setRegistrationComplete(true);
+      // navigate 는 약국 가입 흐름에서 미사용 — 승인 화면이 본 페이지에서 직접 표시됨.
+      // 향후 redirect 흐름 추가 가능. (현재 unused 경고 회피)
+      void navigate;
     } catch (err: any) {
       if (err.response?.data) {
         const data = err.response.data;
@@ -247,36 +249,11 @@ export default function RegisterPage() {
               </div>
             )}
 
-            {/* 회원 유형 선택 */}
-            <div>
-              <h3 className="text-sm font-semibold text-slate-800 mb-3">회원 유형</h3>
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setMemberType('patient')}
-                  className={`flex-1 py-3 rounded-xl font-medium text-sm border-2 transition-colors ${
-                    memberType === 'patient'
-                      ? 'border-blue-600 bg-blue-50 text-blue-700'
-                      : 'border-slate-200 text-slate-500 hover:border-slate-300'
-                  }`}
-                >
-                  당뇨인
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setMemberType('pharmacy')}
-                  className={`flex-1 py-3 rounded-xl font-medium text-sm border-2 transition-colors ${
-                    memberType === 'pharmacy'
-                      ? 'border-blue-600 bg-blue-50 text-blue-700'
-                      : 'border-slate-200 text-slate-500 hover:border-slate-300'
-                  }`}
-                >
-                  약국
-                </button>
-              </div>
-              {memberType === 'pharmacy' && (
-                <p className="text-xs text-slate-400 mt-2">약국 가입은 운영자 승인 후 이용 가능합니다.</p>
-              )}
+            {/* WO-O4O-GLYCO-CARE-BACKEND-CLEANUP-V1: 회원 유형 선택 제거 — 약국 회원 only.
+                기존 '당뇨인' 옵션은 Care/Glucoseview 인프라 DROP 으로 인해 functional surface 0이 되어 제거됨. */}
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-3">
+              <p className="text-sm font-semibold text-blue-800">약국 회원 가입</p>
+              <p className="text-xs text-blue-600 mt-1">약국 가입은 운영자 승인 후 이용 가능합니다.</p>
             </div>
 
             {/* 기본 정보 */}
@@ -683,7 +660,7 @@ export default function RegisterPage() {
                     <h3 className="font-bold text-base">제3조 (약관의 효력 및 변경)</h3>
                     <p>본 약관은 서비스 화면에 게시하거나 기타의 방법으로 회원에게 공지함으로써 효력이 발생합니다.</p>
                     <h3 className="font-bold text-base">제4조 (회원가입 및 서비스 이용)</h3>
-                    <p>1. 회원가입은 당뇨인 또는 약국 회원으로 가능합니다.</p>
+                    <p>1. 회원가입은 약국 회원으로 가능합니다.</p>
                     <p>2. 약국 회원은 사업자 정보 확인 후 운영자 승인을 거쳐 이용이 가능합니다.</p>
                     <p>3. 회원은 가입 시 정확한 정보를 제공해야 하며, 허위 정보 제공 시 서비스 이용이 제한될 수 있습니다.</p>
                     <p className="text-xs text-slate-400 pt-4 border-t">시행일: 2026년 3월 17일</p>

@@ -146,25 +146,9 @@ async function getGlycopharmSummary(ds: DataSource): Promise<Record<string, any>
       JOIN organization_service_enrollments ose ON ose.organization_id = o.id AND ose.service_code = 'glycopharm'
     `);
 
-    // Care KPI (most recent snapshot per pharmacy)
-    let highRiskCount = 0;
-    let moderateRiskCount = 0;
-    let lowRiskCount = 0;
-    try {
-      const careRows = await ds.query(`
-        SELECT DISTINCT ON (pharmacy_id) pharmacy_id, "riskLevel"
-        FROM care_kpi_snapshots
-        ORDER BY pharmacy_id, "snapshotDate" DESC
-      `);
-      for (const row of careRows) {
-        if (row.riskLevel === 'high') highRiskCount++;
-        else if (row.riskLevel === 'moderate') moderateRiskCount++;
-        else lowRiskCount++;
-      }
-    } catch {
-      // Care table may not exist yet
-    }
-
+    // WO-O4O-GLYCO-CARE-BACKEND-CLEANUP-V1: Care KPI 블록 제거.
+    //   care_kpi_snapshots 테이블이 20260601000000-DropCareTables 마이그레이션에서 DROP 됨.
+    //   GlycoPharm canonical 구조에서는 환자 risk 추적 미사용.
     const totalPharmacies = parseInt(pharmacyStats?.totalPharmacies || '0');
     const activePharmacies = parseInt(pharmacyStats?.activePharmacies || '0');
 
@@ -175,13 +159,7 @@ async function getGlycopharmSummary(ds: DataSource): Promise<Record<string, any>
         total: totalPharmacies,
         active: activePharmacies,
       },
-      care: {
-        highRisk: highRiskCount,
-        moderate: moderateRiskCount,
-        low: lowRiskCount,
-      },
-      riskLevel: highRiskCount > 0 ? 'critical'
-        : moderateRiskCount > 3 ? 'warning' : 'healthy',
+      riskLevel: 'healthy',
     };
   } catch (error) {
     logger.warn('[Platform Hub] GlycoPharm summary failed:', error);
