@@ -70,6 +70,9 @@ export const ALL_STORE_MENUS: StoreMenuItemDef[] = [
  * K-Cosmetics Store Config
  * WO-KCOS-KPA-CANONICAL-MENU-ALIGN-V1: flat → section mode 전환
  *   KPA canonical 기준 5섹션 구조
+ * WO-O4O-TABLET-MENU-STRUCTURE-ALIGN-V1:
+ *   - "콘텐츠/태블릿" 그룹 → "매장 실행" (콘텐츠 항목 부재로 정합성 회복)
+ *   - "태블릿 진열" → "태블릿" (매장 내 device 단위 통합 표현)
  */
 export const COSMETICS_STORE_CONFIG: StoreDashboardConfig = {
   serviceKey: 'cosmetics',
@@ -89,8 +92,8 @@ export const COSMETICS_STORE_CONFIG: StoreDashboardConfig = {
     { label: '디지털 사이니지', items: [
       { key: 'signage', label: '사이니지', subPath: '/signage' },
     ]},
-    { label: '콘텐츠/태블릿', items: [
-      { key: 'tablet-displays', label: '태블릿 진열', subPath: '/tablet-displays' },
+    { label: '매장 실행', items: [
+      { key: 'tablet-displays', label: '태블릿', subPath: '/tablet-displays' },
     ]},
     { label: '설정', items: [
       { key: 'settings', label: '매장 설정', subPath: '/settings' },
@@ -103,6 +106,9 @@ export const COSMETICS_STORE_CONFIG: StoreDashboardConfig = {
  * WO-O4O-GLYCOPHARM-NAVIGATION-AND-STORE-STRUCTURE-REFINE-V1:
  *   flat enabledMenus → 섹션형 menuSections (4개 그룹)
  *   개요 / 운영 / 마케팅·콘텐츠 / 경영 / 설정
+ * WO-O4O-TABLET-MENU-STRUCTURE-ALIGN-V1:
+ *   - "태블릿 진열" → "태블릿" (매장 내 device 단위 통합 표현)
+ *   - 사이니지 "재생" → "TV 재생" (TV fullscreen playback 의미 명확화)
  */
 export const GLYCOPHARM_STORE_CONFIG: StoreDashboardConfig = {
   serviceKey: 'glycopharm',
@@ -126,7 +132,7 @@ export const GLYCOPHARM_STORE_CONFIG: StoreDashboardConfig = {
         { key: 'local-products',  label: '자체 상품',    subPath: '/local-products' },
         { key: 'b2b-order',       label: 'B2B 주문',     subPath: '/b2b-order' },
         { key: 'orders',          label: '주문 내역',    subPath: '/orders' },
-        { key: 'tablet-displays', label: '태블릿 진열',  subPath: '/tablet-displays' },
+        { key: 'tablet-displays', label: '태블릿',        subPath: '/tablet-displays' },
         { key: 'requests',        label: '고객 요청',    subPath: '/requests' },
       ],
     },
@@ -136,7 +142,7 @@ export const GLYCOPHARM_STORE_CONFIG: StoreDashboardConfig = {
         { key: 'signage-playlist',  label: '플레이리스트', subPath: '/signage/playlist' },
         { key: 'signage-videos',    label: '동영상',       subPath: '/signage/videos' },
         { key: 'signage-schedules', label: '스케줄',       subPath: '/signage/schedules' },
-        { key: 'signage-player',    label: '재생',         subPath: '/signage/player' },
+        { key: 'signage-player',    label: 'TV 재생',      subPath: '/signage/player' },
       ],
     },
     {
@@ -188,6 +194,11 @@ export const GLYCOPHARM_STORE_CONFIG: StoreDashboardConfig = {
  *   - "내 제작물" 그룹 제거 (제작 시작 진입점은 "내 자료함"으로 통일)
  *   - POP / QR 코드 / 블로그 / 상품 상세설명 메뉴는 결과물 관리 전용으로
  *     매장 실행 그룹 내 개별 메뉴로 유지
+ * WO-O4O-TABLET-MENU-STRUCTURE-ALIGN-V1:
+ *   - "태블릿 진열" → "태블릿" (매장 내 device 단위 통합 표현, 매장당 복수 tablet 전제)
+ *   - 사이니지 "재생" → "TV 재생" (TV fullscreen playback 의미 명확화)
+ *   - Tablet은 매장 내 interactive device, Signage는 TV 전용 재생.
+ *     Playlist는 두 도메인이 공통으로 사용 가능한 자산 (현재 signage 하위 유지).
  */
 export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
   serviceKey: 'kpa-society',
@@ -222,13 +233,15 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'signage-playlist',  label: '플레이리스트', subPath: '/marketing/signage/playlist' },
       { key: 'signage-videos',    label: '동영상',       subPath: '/marketing/signage/videos' },
       { key: 'signage-schedules', label: '스케줄',       subPath: '/marketing/signage/schedules' },
-      { key: 'signage-player',    label: '재생',         subPath: '/marketing/signage/player' },
+      { key: 'signage-player',    label: 'TV 재생',      subPath: '/marketing/signage/player' },
     ]},
     // 매장 실행 — 결과물 관리(POP/QR/블로그/상품 상세설명) + 운영 기능.
     // 신규 제작 진입은 본 그룹이 아닌 "내 자료함"에서 시작.
+    // 태블릿: 매장 내 interactive device. 매장당 복수 tablet 전제.
+    //         (idle playlist 연결은 후속 WO에서 도입)
     { label: '매장 실행', items: [
       { key: 'channels',             label: '채널 관리',     subPath: '/channels' },
-      { key: 'tablet-displays',      label: '태블릿 진열',   subPath: '/commerce/tablet-displays' },
+      { key: 'tablet-displays',      label: '태블릿',        subPath: '/commerce/tablet-displays' },
       { key: 'pop',                  label: 'POP',          subPath: '/marketing/pop' },
       { key: 'qr',                   label: 'QR 코드',      subPath: '/marketing/qr' },
       { key: 'blog',                 label: '블로그',        subPath: '/content/blog' },
