@@ -154,20 +154,8 @@ export interface PharmacyOrderItem {
   totalPrice: number;
 }
 
-// 약국 고객
-export interface PharmacyCustomer {
-  id: string;
-  userId?: string; // WO-O4O-CARE-IDENTITY-UNIFICATION-USERS-ID-V1
-  name: string;
-  phone: string;
-  email?: string;
-  diabetesType?: 'type1' | 'type2' | 'gestational' | 'prediabetes';
-  lastOrderAt?: string;
-  totalOrders: number;
-  totalSpent: number;
-  status: 'active' | 'inactive';
-  createdAt: string;
-}
+// WO-O4O-GLYCO-CARE-CLEANUP-V1: PharmacyCustomer 타입 제거 (환자/Care 잔재 — PharmacyPatients
+// 페이지 단독 사용처였음. canonical 구조에서는 환자 직접 관리 시스템 미포함).
 
 // Store AI Summary 응답 (WO-O4O-STORE-HUB-AI-SUMMARY-V1)
 export interface StoreAiSummaryData {
@@ -493,69 +481,11 @@ class PharmacyApiClient {
   }
 
   // ============================================================================
-  // Customers API
+  // WO-O4O-GLYCO-CARE-CLEANUP-V1: Customers API 전체 제거 (getCustomers / createCustomer /
+  //   getCustomerDetail / getCustomerOrders). PharmacyPatients 페이지 단독 사용처였으며
+  //   페이지 자체가 canonical 구조 외. backend `/glycopharm/pharmacy/customers/*` endpoint 는
+  //   별도 cleanup 후보 (본 WO 범위 외 — 운영 데이터 영향 검증 필요).
   // ============================================================================
-
-  /**
-   * 내 약국 고객 목록
-   */
-  async getCustomers(params?: {
-    search?: string;
-    status?: string;
-    page?: number;
-    pageSize?: number;
-  }): Promise<StoreApiResponse<StorePaginatedResponse<PharmacyCustomer>>> {
-    const searchParams = new URLSearchParams();
-    if (params?.search) searchParams.set('search', params.search);
-    if (params?.status) searchParams.set('status', params.status);
-    if (params?.page) searchParams.set('page', params.page.toString());
-    if (params?.pageSize) searchParams.set('pageSize', params.pageSize.toString());
-
-    const queryString = searchParams.toString();
-    return this.request(`/glycopharm/pharmacy/customers${queryString ? `?${queryString}` : ''}`);
-  }
-
-  /**
-   * 당뇨인 등록
-   * WO-GLYCOPHARM-PHARMACY-PATIENT-REGISTER-FORM-COMPLETE-V1
-   */
-  async createCustomer(data: {
-    name: string;
-    phone?: string;
-    email?: string;
-    gender?: 'male' | 'female';
-    birthYear?: number;
-    notes?: string;
-  }): Promise<StoreApiResponse<{ id: string; user_id?: string; name: string; phone: string; email: string; gender: string | null; birth_year: number | null; created_at: string }>> {
-    return this.request('/glycopharm/pharmacy/customers', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  }
-
-  /**
-   * 고객 상세 조회
-   */
-  async getCustomerDetail(customerId: string): Promise<StoreApiResponse<PharmacyCustomer>> {
-    return this.request(`/glycopharm/pharmacy/customers/${customerId}`);
-  }
-
-  /**
-   * 고객 주문 내역
-   */
-  async getCustomerOrders(
-    customerId: string,
-    params?: { page?: number; pageSize?: number }
-  ): Promise<StoreApiResponse<StorePaginatedResponse<PharmacyOrder>>> {
-    const searchParams = new URLSearchParams();
-    if (params?.page) searchParams.set('page', params.page.toString());
-    if (params?.pageSize) searchParams.set('pageSize', params.pageSize.toString());
-
-    const queryString = searchParams.toString();
-    return this.request(
-      `/glycopharm/pharmacy/customers/${customerId}/orders${queryString ? `?${queryString}` : ''}`
-    );
-  }
 
   // ============================================================================
   // Store Settings API

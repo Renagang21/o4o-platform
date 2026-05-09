@@ -55,7 +55,8 @@ const RoleSelectPage = lazy(() => import('@/pages/auth/RoleSelectPage'));
 //   pages/pharmacy/ → pages/store-management/ 이동, /store/* 라우트 담당)
 const StoreMainPage = lazy(() => import('@/pages/store-management/StoreMainPage'));
 const PharmacyOrders = lazy(() => import('@/pages/store-management/PharmacyOrders'));
-const PharmacyPatients = lazy(() => import('@/pages/store-management/PharmacyPatients'));
+// WO-O4O-GLYCO-CARE-CLEANUP-V1: PharmacyPatients (환자/Care 잔재) 제거.
+// 현재 GlycoPharm canonical = 전문 매장 운영 + Blog + Content + Store. /store/services 라우트도 함께 제거됨.
 const PharmacySettings = lazy(() => import('@/pages/store-management/PharmacySettings'));
 const PharmacyManagement = lazy(() => import('@/pages/store-management/PharmacyManagement'));
 const PharmacyB2BProducts = lazy(() => import('@/pages/store-management/PharmacyB2BProducts'));
@@ -619,7 +620,8 @@ function AppRoutes() {
         <Route path="content" element={<StoreAssetsPage />} />
         {/* Blog (WO-O4O-GLYCO-BLOG-INTRODUCE-V1) — staff 작성/관리 */}
         <Route path="content/blog" element={<PharmacyBlogPage />} />
-        <Route path="services" element={<PharmacyPatients />} />
+        {/* WO-O4O-GLYCO-CARE-CLEANUP-V1: /store/services (PharmacyPatients) 라우트 제거.
+            환자/Care 직접 관리 시스템은 현재 canonical 구조에 포함되지 않음. */}
         <Route path="settings" element={<PharmacySettings />} />
         <Route path="apply" element={<StoreApplyPage />} />
         {/* billing: 정산/인보이스 (WO-STORE-BILLING-FOUNDATION-V1) */}
