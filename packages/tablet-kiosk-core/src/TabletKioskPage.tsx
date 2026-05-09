@@ -4,12 +4,13 @@
  * WO-O4O-TABLET-INTEREST-UX-REFACTOR-V1
  * WO-O4O-TABLET-INTERACTIVE-UX-ALIGN-V1
  * WO-O4O-TABLET-KIOSK-PAGE-DEDUP-V1
+ * WO-O4O-TABLET-RUNTIME-REDUCER-V1 — useState 9개 분산 → useReducer 단일 runtime state
  *
  * 성격: 매장 내 interactive device.
  *   ─ "쇼핑몰"이 아니라 "매장 안내 디바이스"이다.
  *   ─ 결제/장바구니/주문 흐름 없음. 핵심은 "관심 → 직원 안내" 연결.
  *   ─ 향후 확장 가능 영역(별도 WO):
- *       · idle playback layer (signage playlist embed)
+ *       · idle playback layer (signage playlist embed) — 'idle' mode 추가 예정
  *       · AI 설명 / 추천 영역
  *       · consultation / waiting / promotion 템플릿
  *       · QR / 블로그 / 콘텐츠 연결
@@ -29,11 +30,16 @@
  * - api: HTTP 호출 함수 3종 (KPA = fetch, Cosmetics = axios 등 wrapper 가 흡수)
  * - showQrBadge: KPA QR 접속 진입 시 배지 표시 (서비스별 진입 패턴 차이)
  *
- * State 구조 메모: viewMode + 9개 useState 분산. 향후 idle/AI/consultation 모드
- *   추가 시 useReducer 전환 검토 필요(별도 WO). 현재 단일 흐름에서는 안정적.
+ * Runtime state 구조 (WO-O4O-TABLET-RUNTIME-REDUCER-V1):
+ *   - 단일 RuntimeState + useReducer (이전: useState 9개 분산)
+ *   - reducer 는 순수 함수, side-effect (polling/idle reset/네트워크 호출) 는 useEffect 에서 수행
+ *   - 향후 idle / consultation / waiting 모드는 Mode 타입 + Action 만 추가하면 됨 (별도 WO)
+ *   - 타이밍(3초 polling / 2분 auto-reset) 그대로 유지
+ *
+ * 외부 export 정책: 본 컴포넌트와 props 만. RuntimeState/Action 은 내부 전용.
  */
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useReducer, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import type {
   TabletProduct,
@@ -41,7 +47,13 @@ import type {
   TabletKioskApi,
 } from './types';
 
-type ViewMode = 'browse' | 'detail' | 'submitted' | 'error';
+// ── Display & view types (internal) ──
+
+/**
+ * Tablet runtime mode.
+ * 향후 idle layer 도입 시 'idle' 추가 예정 (별도 WO-O4O-TABLET-IDLE-LAYER-V1).
+ */
+type Mode = 'browse' | 'detail' | 'submitted' | 'error';
 
 interface DisplayProduct {
   id: string;
@@ -55,6 +67,120 @@ interface DisplayProduct {
   category?: string;
   imageUrl?: string;
 }
+
+// ── Reducer (internal) ──
+
+interface RuntimeState {
+  mode: Mode;
+  products: DisplayProduct[];
+  loading: boolean;
+  /** 가장 최근 에러 메시지. truthy 면 (mode !== 'submitted' 일 때) error view 가 표시됨. */
+  errorMessage: string | null;
+  submitting: boolean;
+  selectedProduct: DisplayProduct | null;
+  customerName: string;
+  customerNote: string;
+  interestId: string | null;
+  interestStatus: InterestStatusDetail | null;
+}
+
+type Action =
+  | { type: 'LOAD_START' }
+  | { type: 'LOAD_SUCCESS'; products: DisplayProduct[] }
+  | { type: 'LOAD_ERROR'; message: string }
+  | { type: 'SELECT_PRODUCT'; product: DisplayProduct }
+  | { type: 'UPDATE_CUSTOMER_NAME'; value: string }
+  | { type: 'UPDATE_CUSTOMER_NOTE'; value: string }
+  /** detail → browse (selectedProduct + customer 입력 클리어, interest 상태는 손대지 않음) */
+  | { type: 'BACK_TO_BROWSE' }
+  | { type: 'SUBMIT_START' }
+  | { type: 'SUBMIT_SUCCESS'; requestId: string }
+  | { type: 'SUBMIT_ERROR'; message: string }
+  | { type: 'STATUS_UPDATE'; status: InterestStatusDetail }
+  /** submitted/auto-reset → browse (모든 transient state 초기화) */
+  | { type: 'RESET_TO_BROWSE' }
+  /** error view 의 "다시 시도": errorMessage 만 클리어 + browse 모드로 복귀.
+   *  selectedProduct/interestId 등은 보존 (기존 동작 유지) */
+  | { type: 'CLEAR_ERROR' };
+
+const initialState: RuntimeState = {
+  mode: 'browse',
+  products: [],
+  loading: true,
+  errorMessage: null,
+  submitting: false,
+  selectedProduct: null,
+  customerName: '',
+  customerNote: '',
+  interestId: null,
+  interestStatus: null,
+};
+
+function reducer(state: RuntimeState, action: Action): RuntimeState {
+  switch (action.type) {
+    case 'LOAD_START':
+      return { ...state, loading: true };
+    case 'LOAD_SUCCESS':
+      return { ...state, loading: false, products: action.products };
+    case 'LOAD_ERROR':
+      // 기존 동작: setError(...) + setLoading(false) 만. mode 전환 없음.
+      // render 단계에서 (errorMessage && mode !== 'submitted') 가 error view 진입 조건.
+      return { ...state, loading: false, errorMessage: action.message };
+    case 'SELECT_PRODUCT':
+      return { ...state, mode: 'detail', selectedProduct: action.product };
+    case 'UPDATE_CUSTOMER_NAME':
+      return { ...state, customerName: action.value };
+    case 'UPDATE_CUSTOMER_NOTE':
+      return { ...state, customerNote: action.value };
+    case 'BACK_TO_BROWSE':
+      return {
+        ...state,
+        mode: 'browse',
+        selectedProduct: null,
+        customerName: '',
+        customerNote: '',
+      };
+    case 'SUBMIT_START':
+      return { ...state, submitting: true };
+    case 'SUBMIT_SUCCESS':
+      return {
+        ...state,
+        mode: 'submitted',
+        submitting: false,
+        interestId: action.requestId,
+        customerName: '',
+        customerNote: '',
+      };
+    case 'SUBMIT_ERROR':
+      return {
+        ...state,
+        mode: 'error',
+        submitting: false,
+        errorMessage: action.message,
+      };
+    case 'STATUS_UPDATE':
+      return { ...state, interestStatus: action.status };
+    case 'RESET_TO_BROWSE':
+      return {
+        ...state,
+        mode: 'browse',
+        selectedProduct: null,
+        customerName: '',
+        customerNote: '',
+        interestId: null,
+        interestStatus: null,
+        errorMessage: null,
+      };
+    case 'CLEAR_ERROR':
+      // 기존 error view "다시 시도" 동작 그대로: errorMessage 만 클리어 + mode=browse.
+      // selectedProduct/interestId 등 transient 는 보존.
+      return { ...state, mode: 'browse', errorMessage: null };
+    default:
+      return state;
+  }
+}
+
+// ── Pure helpers ──
 
 function formatPrice(price: number): string {
   return price.toLocaleString('ko-KR') + '원';
@@ -87,6 +213,8 @@ function mapLocalProduct(p: any): DisplayProduct {
   };
 }
 
+// ── Component ──
+
 export interface TabletKioskPageProps {
   /** HTTP 호출 함수 3종 (서비스 wrapper 가 주입) */
   api: TabletKioskApi;
@@ -96,35 +224,35 @@ export interface TabletKioskPageProps {
 
 export function TabletKioskPage({ api, showQrBadge = false }: TabletKioskPageProps) {
   const { slug } = useParams<{ slug: string }>();
-  const [viewMode, setViewMode] = useState<ViewMode>('browse');
-  const [displayProducts, setDisplayProducts] = useState<DisplayProduct[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const {
+    mode,
+    products,
+    loading,
+    errorMessage,
+    submitting,
+    selectedProduct,
+    customerName,
+    customerNote,
+    interestId,
+    interestStatus,
+  } = state;
 
-  // Detail view
-  const [selectedProduct, setSelectedProduct] = useState<DisplayProduct | null>(null);
-  const [customerName, setCustomerName] = useState('');
-  const [customerNote, setCustomerNote] = useState('');
-
-  // Submitted state
-  const [interestId, setInterestId] = useState<string | null>(null);
-  const [interestStatus, setInterestStatus] = useState<InterestStatusDetail | null>(null);
+  // Side-effect refs (reducer 외부에서 관리 — polling interval, auto-reset timeout)
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const idleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Load products (supplier + local merged)
   useEffect(() => {
     if (!slug) return;
-    setLoading(true);
+    dispatch({ type: 'LOAD_START' });
     api.fetchProducts(slug, { limit: 50 })
       .then((res) => {
         const suppliers = res.data.map(mapSupplierProduct);
         const locals = ((res.localProducts as any[] | undefined) || []).map(mapLocalProduct);
-        setDisplayProducts([...suppliers, ...locals]);
+        dispatch({ type: 'LOAD_SUCCESS', products: [...suppliers, ...locals] });
       })
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
+      .catch((e) => dispatch({ type: 'LOAD_ERROR', message: e.message }));
   }, [slug, api]);
 
   // Submit interest request
@@ -132,32 +260,29 @@ export function TabletKioskPage({ api, showQrBadge = false }: TabletKioskPagePro
     if (!slug || !selectedProduct) return;
     if (selectedProduct.type === 'local') return; // Local products cannot create interest
 
-    setSubmitting(true);
+    dispatch({ type: 'SUBMIT_START' });
     try {
       const result = await api.submitInterest(slug, {
         masterId: selectedProduct.masterId || selectedProduct.id,
         customerName: customerName.trim() || undefined,
         customerNote: customerNote.trim() || undefined,
       });
-      setInterestId(result.requestId);
-      setViewMode('submitted');
-      setCustomerName('');
-      setCustomerNote('');
+      dispatch({ type: 'SUBMIT_SUCCESS', requestId: result.requestId });
     } catch (e: any) {
-      setError(e.message || '관심 요청 생성에 실패했습니다.');
-      setViewMode('error');
-    } finally {
-      setSubmitting(false);
+      dispatch({
+        type: 'SUBMIT_ERROR',
+        message: e.message || '관심 요청 생성에 실패했습니다.',
+      });
     }
   };
 
-  // Poll for status after submit
+  // Poll for status after submit (3s interval, 기존 타이밍 유지)
   useEffect(() => {
-    if (viewMode !== 'submitted' || !slug || !interestId) return;
+    if (mode !== 'submitted' || !slug || !interestId) return;
 
     const poll = () => {
       api.checkStatus(slug, interestId)
-        .then(setInterestStatus)
+        .then((status) => dispatch({ type: 'STATUS_UPDATE', status }))
         .catch(() => {});
     };
     poll();
@@ -166,14 +291,15 @@ export function TabletKioskPage({ api, showQrBadge = false }: TabletKioskPagePro
     return () => {
       if (pollRef.current) clearInterval(pollRef.current);
     };
-  }, [viewMode, slug, interestId, api]);
+  }, [mode, slug, interestId, api]);
 
-  // Auto-reset after COMPLETED/CANCELLED (2 min)
+  // Auto-reset after COMPLETED/CANCELLED (2 min, 기존 타이밍 유지)
   useEffect(() => {
     if (!interestStatus) return;
     if (interestStatus.status === 'COMPLETED' || interestStatus.status === 'CANCELLED') {
       idleRef.current = setTimeout(() => {
-        resetToDefault();
+        dispatch({ type: 'RESET_TO_BROWSE' });
+        if (pollRef.current) clearInterval(pollRef.current);
       }, 120_000);
     }
     return () => {
@@ -182,14 +308,9 @@ export function TabletKioskPage({ api, showQrBadge = false }: TabletKioskPagePro
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [interestStatus?.status]);
 
-  const resetToDefault = () => {
-    setViewMode('browse');
-    setSelectedProduct(null);
-    setInterestId(null);
-    setInterestStatus(null);
-    setError(null);
-    setCustomerName('');
-    setCustomerNote('');
+  // 사용자 트리거 reset (submitted "처음으로" 버튼)
+  const handleResetToBrowse = () => {
+    dispatch({ type: 'RESET_TO_BROWSE' });
     if (pollRef.current) clearInterval(pollRef.current);
   };
 
@@ -201,14 +322,14 @@ export function TabletKioskPage({ api, showQrBadge = false }: TabletKioskPagePro
   };
 
   // ── Error view ──
-  if (viewMode === 'error' || (error && viewMode !== 'submitted')) {
+  if (mode === 'error' || (errorMessage && mode !== 'submitted')) {
     return (
       <div style={styles.fullscreen}>
         <div style={styles.centerMessage}>
           <div style={{ fontSize: '48px', marginBottom: '16px' }}>!</div>
           <h2 style={{ fontSize: '24px', marginBottom: '8px' }}>오류 발생</h2>
-          <p style={{ color: '#64748b', marginBottom: '24px' }}>{error}</p>
-          <button onClick={() => { setError(null); setViewMode('browse'); }} style={styles.primaryBtn}>
+          <p style={{ color: '#64748b', marginBottom: '24px' }}>{errorMessage}</p>
+          <button onClick={() => dispatch({ type: 'CLEAR_ERROR' })} style={styles.primaryBtn}>
             다시 시도
           </button>
         </div>
@@ -217,7 +338,7 @@ export function TabletKioskPage({ api, showQrBadge = false }: TabletKioskPagePro
   }
 
   // ── Submitted view ──
-  if (viewMode === 'submitted') {
+  if (mode === 'submitted') {
     const st = interestStatus ? statusLabels[interestStatus.status] : statusLabels.REQUESTED;
     const isDone = interestStatus?.status === 'COMPLETED' || interestStatus?.status === 'CANCELLED';
     return (
@@ -238,7 +359,7 @@ export function TabletKioskPage({ api, showQrBadge = false }: TabletKioskPagePro
             </div>
           )}
           {isDone && (
-            <button onClick={resetToDefault} style={styles.primaryBtn}>
+            <button onClick={handleResetToBrowse} style={styles.primaryBtn}>
               처음으로
             </button>
           )}
@@ -248,7 +369,7 @@ export function TabletKioskPage({ api, showQrBadge = false }: TabletKioskPagePro
   }
 
   // ── Detail view ──
-  if (viewMode === 'detail' && selectedProduct) {
+  if (mode === 'detail' && selectedProduct) {
     const isLocal = selectedProduct.type === 'local';
     return (
       <div style={styles.fullscreen}>
@@ -284,7 +405,7 @@ export function TabletKioskPage({ api, showQrBadge = false }: TabletKioskPagePro
                 <input
                   type="text"
                   value={customerName}
-                  onChange={(e) => setCustomerName(e.target.value)}
+                  onChange={(e) => dispatch({ type: 'UPDATE_CUSTOMER_NAME', value: e.target.value })}
                   placeholder="이름 (선택사항)"
                   style={styles.input}
                   maxLength={100}
@@ -292,7 +413,7 @@ export function TabletKioskPage({ api, showQrBadge = false }: TabletKioskPagePro
                 <input
                   type="text"
                   value={customerNote}
-                  onChange={(e) => setCustomerNote(e.target.value)}
+                  onChange={(e) => dispatch({ type: 'UPDATE_CUSTOMER_NOTE', value: e.target.value })}
                   placeholder="요청 사항 (선택사항)"
                   style={{ ...styles.input, marginTop: '8px' }}
                   maxLength={200}
@@ -312,7 +433,7 @@ export function TabletKioskPage({ api, showQrBadge = false }: TabletKioskPagePro
         {/* Bottom Action Bar */}
         <div style={styles.actionBar}>
           <button
-            onClick={() => { setViewMode('browse'); setSelectedProduct(null); setCustomerName(''); setCustomerNote(''); }}
+            onClick={() => dispatch({ type: 'BACK_TO_BROWSE' })}
             style={styles.backBtn}
           >
             돌아가기
@@ -352,16 +473,16 @@ export function TabletKioskPage({ api, showQrBadge = false }: TabletKioskPagePro
           <div style={styles.centerMessage}>
             <p style={{ color: '#94a3b8' }}>상품을 불러오는 중...</p>
           </div>
-        ) : displayProducts.length === 0 ? (
+        ) : products.length === 0 ? (
           <div style={styles.centerMessage}>
             <p style={{ color: '#94a3b8' }}>표시할 상품이 없습니다.</p>
           </div>
         ) : (
           <div style={styles.grid}>
-            {displayProducts.map((p) => (
+            {products.map((p) => (
               <div
                 key={`${p.type}-${p.id}`}
-                onClick={() => { setSelectedProduct(p); setViewMode('detail'); }}
+                onClick={() => dispatch({ type: 'SELECT_PRODUCT', product: p })}
                 style={styles.productCard}
               >
                 <div style={styles.productImgArea}>
