@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Building2, Truck, Monitor, ChevronRight, Filter } from 'lucide-react';
-import { DataTable } from '@o4o/ui';
-import type { Column } from '@o4o/ui';
+import { Building2, Truck, Monitor, ChevronRight, ChevronLeft, Filter } from 'lucide-react';
+import { DataTable } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { glycopharmApi } from '@/api/glycopharm';
 import type { AdminApplication, ApplicationStatus, ServiceType, OrganizationType } from '@/api/glycopharm';
 import StatusBadge from '../../components/common/StatusBadge';
@@ -11,6 +11,11 @@ import PageHeader from '../../components/common/PageHeader';
 /**
  * Operator Applications Page
  * 운영자용 신청 목록 화면
+ *
+ * WO-O4O-OPERATOR-DATATABLE-SOURCE-ALIGN-V1: DataTable @o4o/ui → @o4o/operator-ux-core
+ *   - Column → ListColumnDef
+ *   - dataSource → data, emptyText → emptyMessage
+ *   - 내장 pagination → 외부 JSX pagination
  */
 
 const SERVICE_LABELS: Record<ServiceType, { label: string; icon: typeof Building2 }> = {
@@ -31,7 +36,7 @@ export default function ApplicationsPage() {
 
   // Pagination
   const [page, setPage] = useState(1);
-  const [, setTotalPages] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
 
   useEffect(() => {
@@ -178,10 +183,10 @@ export default function ApplicationsPage() {
 
       {/* Applications Table */}
       {!error && (() => {
-        const columns: Column<AdminApplication>[] = [
+        const columns: ListColumnDef<AdminApplication>[] = [
           {
             key: 'organizationName',
-            title: '약국명',
+            header: '약국명',
             render: (_v, app) => (
               <div>
                 <p className="font-medium text-slate-800">{app.organizationName}</p>
@@ -193,7 +198,7 @@ export default function ApplicationsPage() {
           },
           {
             key: 'userName',
-            title: '신청자',
+            header: '신청자',
             render: (_v, app) => (
               <div>
                 <p className="text-sm text-slate-700">{app.userName || '-'}</p>
@@ -203,7 +208,7 @@ export default function ApplicationsPage() {
           },
           {
             key: 'serviceTypes',
-            title: '서비스',
+            header: '서비스',
             render: (_v, app) => (
               <div className="flex flex-wrap gap-1">
                 {app.serviceTypes.map((serviceType) => (
@@ -216,21 +221,22 @@ export default function ApplicationsPage() {
           },
           {
             key: 'status',
-            title: '상태',
+            header: '상태',
             width: '120px',
             render: (_v, app) => <StatusBadge status={app.status} />,
           },
           {
             key: 'submittedAt',
-            title: '신청일',
+            header: '신청일',
             width: '100px',
             render: (_v, app) => (
               <span className="text-sm text-slate-600">{new Date(app.submittedAt).toLocaleDateString('ko-KR')}</span>
             ),
           },
           {
-            key: 'actions',
-            title: '',
+            key: '_actions',
+            header: '',
+            system: true,
             width: '60px',
             align: 'right',
             render: (_v, app) => (
@@ -242,19 +248,39 @@ export default function ApplicationsPage() {
         ];
 
         return (
-          <DataTable<AdminApplication>
-            columns={columns}
-            dataSource={applications}
-            rowKey="id"
-            loading={loading}
-            emptyText={hasFilters ? '조건에 맞는 신청이 없습니다.' : '신청 내역이 없습니다.'}
-            pagination={{
-              current: page,
-              pageSize: 20,
-              total,
-              onChange: (p) => setPage(p),
-            }}
-          />
+          <>
+            <DataTable<AdminApplication>
+              columns={columns}
+              data={applications}
+              rowKey="id"
+              loading={loading}
+              emptyMessage={hasFilters ? '조건에 맞는 신청이 없습니다.' : '신청 내역이 없습니다.'}
+              tableId="glycopharm-operator-applications"
+            />
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-3 mt-4">
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page <= 1}
+                  className="flex items-center gap-1 px-3 py-2 border rounded-lg disabled:opacity-50 hover:bg-slate-50"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  이전
+                </button>
+                <span className="text-sm text-slate-600">
+                  {page} / {totalPages}
+                </span>
+                <button
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page >= totalPages}
+                  className="flex items-center gap-1 px-3 py-2 border rounded-lg disabled:opacity-50 hover:bg-slate-50"
+                >
+                  다음
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+          </>
         );
       })()}
     </div>

@@ -4,6 +4,8 @@
  * Phase 2: 운영자 승인 UI
  * - 신청 목록 조회 (상태별 필터링)
  * - 신청 상세 페이지 링크
+ *
+ * WO-O4O-OPERATOR-DATATABLE-SOURCE-ALIGN-V1: DataTable @o4o/ui → @o4o/operator-ux-core
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -16,13 +18,14 @@ import {
   AlertTriangle,
   FileEdit,
   ChevronRight,
+  ChevronLeft,
   Filter,
   RefreshCw,
   AlertCircle,
   Building2,
 } from 'lucide-react';
-import { DataTable } from '@o4o/ui';
-import type { Column } from '@o4o/ui';
+import { DataTable } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { storeApi } from '@/api/store';
 import type { StoreApplication, StoreApplicationStatus } from '@/types/store';
 
@@ -101,7 +104,7 @@ export default function StoreApprovalsPage() {
 
   // Pagination
   const [page, setPage] = useState(1);
-  const [, setTotalPages] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
 
   const loadApplications = useCallback(async () => {
@@ -279,10 +282,10 @@ export default function StoreApprovalsPage() {
 
       {/* Applications Table */}
       {!error && (() => {
-        const columns: Column<StoreApplication>[] = [
+        const columns: ListColumnDef<StoreApplication>[] = [
           {
             key: 'pharmacyName',
-            title: '약국명',
+            header: '약국명',
             render: (_v, app) => (
               <div>
                 <p className="font-medium text-slate-800">{app.form.pharmacyName}</p>
@@ -292,7 +295,7 @@ export default function StoreApprovalsPage() {
           },
           {
             key: 'businessName',
-            title: '사업자 정보',
+            header: '사업자 정보',
             render: (_v, app) => (
               <div>
                 <p className="text-sm text-slate-700">{app.form.businessName}</p>
@@ -302,7 +305,7 @@ export default function StoreApprovalsPage() {
           },
           {
             key: 'pharmacistName',
-            title: '관리약사',
+            header: '관리약사',
             render: (_v, app) => (
               <div>
                 <p className="text-sm text-slate-700">{app.form.pharmacistName}</p>
@@ -312,7 +315,7 @@ export default function StoreApprovalsPage() {
           },
           {
             key: 'status',
-            title: '상태',
+            header: '상태',
             width: '120px',
             render: (_v, app) => {
               const cfg = STATUS_CONFIG[app.status];
@@ -327,7 +330,7 @@ export default function StoreApprovalsPage() {
           },
           {
             key: 'submittedAt',
-            title: '신청일',
+            header: '신청일',
             width: '100px',
             render: (_v, app) => (
               <span className="text-sm text-slate-600">
@@ -336,8 +339,9 @@ export default function StoreApprovalsPage() {
             ),
           },
           {
-            key: 'actions',
-            title: '',
+            key: '_actions',
+            header: '',
+            system: true,
             width: '60px',
             align: 'right',
             render: (_v, app) => (
@@ -349,19 +353,39 @@ export default function StoreApprovalsPage() {
         ];
 
         return (
-          <DataTable<StoreApplication>
-            columns={columns}
-            dataSource={applications}
-            rowKey="id"
-            loading={loading}
-            emptyText={hasFilters ? '조건에 맞는 신청이 없습니다.' : '아직 스토어 판매 참여 신청이 없습니다.'}
-            pagination={{
-              current: page,
-              pageSize: 20,
-              total,
-              onChange: (p) => setPage(p),
-            }}
-          />
+          <>
+            <DataTable<StoreApplication>
+              columns={columns}
+              data={applications}
+              rowKey="id"
+              loading={loading}
+              emptyMessage={hasFilters ? '조건에 맞는 신청이 없습니다.' : '아직 스토어 판매 참여 신청이 없습니다.'}
+              tableId="glycopharm-operator-store-approvals"
+            />
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-3 mt-4">
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page <= 1}
+                  className="flex items-center gap-1 px-3 py-2 border rounded-lg disabled:opacity-50 hover:bg-slate-50"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  이전
+                </button>
+                <span className="text-sm text-slate-600">
+                  {page} / {totalPages}
+                </span>
+                <button
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page >= totalPages}
+                  className="flex items-center gap-1 px-3 py-2 border rounded-lg disabled:opacity-50 hover:bg-slate-50"
+                >
+                  다음
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+          </>
         );
       })()}
     </div>

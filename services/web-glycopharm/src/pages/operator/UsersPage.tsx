@@ -2,8 +2,9 @@
  * Operator Users Page — 회원 관리
  * WO-O4O-MEMBERSHIP-CONSOLE-V1
  * WO-O4O-MEMBER-LIST-STANDARDIZATION-V1
+ * WO-O4O-OPERATOR-DATATABLE-SOURCE-ALIGN-V1: DataTable @o4o/ui → @o4o/operator-ux-core
  *
- * MemberListLayout + @o4o/ui DataTable 기반 표준 회원 리스트.
+ * MemberListLayout + @o4o/operator-ux-core DataTable 기반 표준 회원 리스트.
  * 탭: 전체 | 약국 | 당뇨인 | 가입 신청
  * 기능: 검색, 정렬, 승인/거부, 비밀번호 변경, 편집, 삭제
  */
@@ -26,11 +27,12 @@ import {
   X,
   Eye,
   EyeOff,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
-import { DataTable, ActionBar, BulkResultModal, RowActionMenu, ConfirmActionDialog } from '@o4o/ui';
-import type { Column } from '@o4o/ui';
-import { MemberListLayout, StatusBadge, RoleBadge, ServiceBadge, useBatchAction, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
-import type { MemberTab } from '@o4o/operator-ux-core';
+import { ActionBar, BulkResultModal, RowActionMenu, ConfirmActionDialog } from '@o4o/ui';
+import { DataTable, MemberListLayout, StatusBadge, RoleBadge, ServiceBadge, useBatchAction, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
+import type { ListColumnDef, MemberTab } from '@o4o/operator-ux-core';
 import { api } from '../../lib/apiClient';
 import { toast } from '@o4o/error-handling';
 import EditUserModal from './EditUserModal';
@@ -383,7 +385,7 @@ export default function UsersPage() {
   const [passwordUser, setPasswordUser] = useState<UserData | null>(null);
   const [editUser, setEditUser] = useState<UserData | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<UserData | null>(null);
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   // V3: Batch action hook
   const batch = useBatchAction();
@@ -449,7 +451,7 @@ export default function UsersPage() {
 
   // Reset selection on tab/search change
   useEffect(() => {
-    setSelectedIds([]);
+    setSelectedIds(new Set());
   }, [activeTab, searchQuery]);
 
   const handleStatusChange = async (userId: string, status: string) => {
@@ -475,7 +477,7 @@ export default function UsersPage() {
   // ─── V3: Batch Actions (single API call) ───
 
   const handleBulkApprove = async () => {
-    const ids = selectedIds.filter(id => {
+    const ids = Array.from(selectedIds).filter(id => {
       const u = filteredUsers.find(user => user.id === id);
       return u?.status === 'pending' || u?.status === 'rejected';
     });
@@ -488,14 +490,14 @@ export default function UsersPage() {
       ids,
     );
     if (result.successCount > 0) {
-      setSelectedIds([]);
+      setSelectedIds(new Set());
       fetchUsers(pagination.page);
       fetchStats();
     }
   };
 
   const handleBulkReject = async () => {
-    const ids = selectedIds.filter(id => {
+    const ids = Array.from(selectedIds).filter(id => {
       const u = filteredUsers.find(user => user.id === id);
       return u?.status === 'pending';
     });
@@ -508,7 +510,7 @@ export default function UsersPage() {
       ids,
     );
     if (result.successCount > 0) {
-      setSelectedIds([]);
+      setSelectedIds(new Set());
       fetchUsers(pagination.page);
       fetchStats();
     }
@@ -537,12 +539,13 @@ export default function UsersPage() {
 
   // ─── DataTable Columns ────────────────────────────
 
-  const columns: Column<UserData>[] = [
+  const columns: ListColumnDef<UserData>[] = [
     {
       key: 'name',
-      title: '이름',
+      header: '이름',
       sortable: true,
       width: '180px',
+      sortAccessor: (u) => getUserName(u),
       render: (_v, user) => (
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center text-sm font-medium text-slate-600 shrink-0">
@@ -551,24 +554,22 @@ export default function UsersPage() {
           <span className="font-medium text-slate-800 text-sm truncate">{getUserName(user)}</span>
         </div>
       ),
-      sorter: (a, b) => getUserName(a).localeCompare(getUserName(b)),
     },
     {
       key: 'email',
-      title: '이메일',
-      dataIndex: 'email',
+      header: '이메일',
       sortable: true,
       width: '220px',
     },
     {
       key: 'role',
-      title: '역할',
+      header: '역할',
       width: '120px',
       render: (_v, user) => <RoleBadge role={getPrimaryRole(user)} />,
     },
     {
       key: 'services',
-      title: '서비스',
+      header: '서비스',
       width: '150px',
       render: (_v, user) => (
         <div className="flex flex-wrap gap-1">
@@ -582,22 +583,22 @@ export default function UsersPage() {
     },
     {
       key: 'createdAt',
-      title: '가입일',
-      dataIndex: 'createdAt',
+      header: '가입일',
       sortable: true,
+      sortAccessor: (u) => new Date(u.createdAt).getTime(),
       width: '100px',
       render: (v) => <span className="text-sm text-slate-600">{new Date(v).toLocaleDateString('ko-KR')}</span>,
     },
     {
       key: 'status',
-      title: '상태',
-      dataIndex: 'status',
+      header: '상태',
       width: '80px',
       render: (v) => <StatusBadge status={v} />,
     },
     {
       key: '_actions',
-      title: '액션',
+      header: '액션',
+      system: true,
       width: '60px',
       align: 'center',
       render: (_v, user) => (
@@ -674,19 +675,19 @@ export default function UsersPage() {
 
         {/* V3: Bulk Actions with batch API */}
         {(() => {
-          const selectedPendingCount = selectedIds.filter(id => {
+          const selectedPendingCount = Array.from(selectedIds).filter(id => {
             const u = filteredUsers.find(user => user.id === id);
             return u?.status === 'pending';
           }).length;
-          const selectedApprovableCount = selectedIds.filter(id => {
+          const selectedApprovableCount = Array.from(selectedIds).filter(id => {
             const u = filteredUsers.find(user => user.id === id);
             return u?.status === 'pending' || u?.status === 'rejected';
           }).length;
           return (
             <div className="mb-3">
               <ActionBar
-                selectedCount={selectedIds.length}
-                onClearSelection={() => setSelectedIds([])}
+                selectedCount={selectedIds.size}
+                onClearSelection={() => setSelectedIds(new Set())}
                 actions={[
                   {
                     key: 'approve',
@@ -725,22 +726,41 @@ export default function UsersPage() {
         {/* DataTable */}
         <DataTable<UserData>
           columns={columns}
-          dataSource={filteredUsers}
+          data={filteredUsers}
           rowKey="id"
           loading={loading}
-          emptyText={activeTab === 'pending' ? '가입 신청이 없습니다.' : '등록된 사용자가 없습니다.'}
+          emptyMessage={activeTab === 'pending' ? '가입 신청이 없습니다.' : '등록된 사용자가 없습니다.'}
           onRowClick={(user) => navigate(`/operator/users/${user.id}`)}
-          rowSelection={{
-            selectedRowKeys: selectedIds,
-            onChange: setSelectedIds,
-          }}
-          pagination={{
-            current: pagination.page,
-            pageSize: pagination.limit,
-            total: activeTab === 'all' || activeTab === 'pending' ? pagination.total : filteredUsers.length,
-            onChange: (page) => fetchUsers(page),
-          }}
+          selectable
+          selectedKeys={selectedIds}
+          onSelectionChange={setSelectedIds}
+          tableId="glycopharm-operator-users"
         />
+
+        {/* Pagination — external JSX (operator-ux-core DataTable 미내장) */}
+        {(activeTab === 'all' || activeTab === 'pending') && pagination.totalPages > 1 && (
+          <div className="flex items-center justify-center gap-3 mt-4">
+            <button
+              onClick={() => fetchUsers(Math.max(1, pagination.page - 1))}
+              disabled={pagination.page <= 1}
+              className="flex items-center gap-1 px-3 py-2 border rounded-lg disabled:opacity-50 hover:bg-slate-50"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              이전
+            </button>
+            <span className="text-sm text-slate-600">
+              {pagination.page} / {pagination.totalPages}
+            </span>
+            <button
+              onClick={() => fetchUsers(Math.min(pagination.totalPages, pagination.page + 1))}
+              disabled={pagination.page >= pagination.totalPages}
+              className="flex items-center gap-1 px-3 py-2 border rounded-lg disabled:opacity-50 hover:bg-slate-50"
+            >
+              다음
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
       </MemberListLayout>
 
       {/* Password Modal */}

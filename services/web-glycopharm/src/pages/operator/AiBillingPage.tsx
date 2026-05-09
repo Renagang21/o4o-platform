@@ -2,6 +2,7 @@
  * AiBillingPage — WO-O4O-AI-BILLING-DATA-SYSTEM-V1
  * WO-O4O-TABLE-STANDARD-V2 — DataTable 표준 전환
  * WO-O4O-TABLE-STANDARD-V4-CLEANUP — ActionPolicy + confirm/alert 제거
+ * WO-O4O-OPERATOR-DATATABLE-SOURCE-ALIGN-V1 — DataTable @o4o/ui → @o4o/operator-ux-core
  *
  * AI 정산 데이터 관리: 생성 / 확정 / 결제 완료 / 조정 / CSV 내보내기
  */
@@ -16,9 +17,9 @@ import {
   Plus,
   Edit3,
 } from 'lucide-react';
-import { DataTable, RowActionMenu } from '@o4o/ui';
-import type { Column } from '@o4o/ui';
-import { defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
+import { RowActionMenu } from '@o4o/ui';
+import { DataTable, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { toast } from '@o4o/error-handling';
 import { api, API_BASE_URL } from '@/lib/apiClient';
 
@@ -189,15 +190,15 @@ export default function AiBillingPage() {
 
   // ─── Column Definitions ───
 
-  const columns: Column<BillingSummary>[] = [
+  const columns: ListColumnDef<BillingSummary>[] = [
     {
       key: 'period',
-      title: '기간',
+      header: '기간',
       render: (_v, b) => <span className="font-medium text-gray-900">{b.period}</span>,
     },
     {
       key: 'serviceKey',
-      title: '서비스',
+      header: '서비스',
       render: (_v, b) => (
         <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded ${
           b.serviceKey === 'care' ? 'bg-purple-100 text-purple-700' :
@@ -208,25 +209,25 @@ export default function AiBillingPage() {
     },
     {
       key: 'totalRequests',
-      title: '요청수',
+      header: '요청수',
       align: 'right',
       render: (_v, b) => b.totalRequests.toLocaleString(),
     },
     {
       key: 'totalTokens',
-      title: '토큰',
+      header: '토큰',
       align: 'right',
       render: (_v, b) => <span className="text-gray-500">{formatTokens(b.totalTokens)}</span>,
     },
     {
       key: 'totalCost',
-      title: '비용',
+      header: '비용',
       align: 'right',
       render: (_v, b) => <span className="text-gray-500">${b.totalCost.toFixed(4)}</span>,
     },
     {
       key: 'adjustmentAmount',
-      title: '조정',
+      header: '조정',
       align: 'right',
       render: (_v, b) => {
         if (b.adjustmentAmount !== 0) {
@@ -241,19 +242,20 @@ export default function AiBillingPage() {
     },
     {
       key: 'finalCost',
-      title: '최종 비용',
+      header: '최종 비용',
       align: 'right',
       render: (_v, b) => <span className="font-medium text-gray-900">${b.finalCost.toFixed(4)}</span>,
     },
     {
       key: 'status',
-      title: '상태',
+      header: '상태',
       align: 'center',
       render: (_v, b) => statusBadge(b.status),
     },
     {
       key: '_actions',
-      title: '액션',
+      header: '액션',
+      system: true,
       align: 'center',
       width: '80px',
       render: (_v, b) => (
@@ -312,10 +314,11 @@ export default function AiBillingPage() {
         </div>
         <DataTable<BillingSummary>
           columns={columns}
-          dataSource={billings}
+          data={billings}
           rowKey="id"
           loading={loading}
-          emptyText="정산 데이터 없음"
+          emptyMessage="정산 데이터 없음"
+          tableId="glycopharm-operator-ai-billing"
         />
       </div>
 

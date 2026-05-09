@@ -2,15 +2,19 @@
  * GlycopharmMembersPage
  *
  * WO-GLYCOPHARM-OPERATOR-MEMBER-MANAGEMENT-V1
+ * WO-O4O-OPERATOR-DATATABLE-SOURCE-ALIGN-V1: DataTable @o4o/ui → @o4o/operator-ux-core
+ *
  * 운영자용 약사 회원 신청 목록 / 상세 / 승인 / 거절 화면
  */
 
 import { useState, useEffect } from 'react';
 import {
   Users, CheckCircle, XCircle, Filter, RefreshCw, AlertCircle,
+  ChevronLeft, ChevronRight,
 } from 'lucide-react';
-import { DataTable, BaseDetailDrawer } from '@o4o/ui';
-import type { Column } from '@o4o/ui';
+import { BaseDetailDrawer } from '@o4o/ui';
+import { DataTable } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { glycopharmApi } from '@/api/glycopharm';
 import type { GlycopharmMemberRecord, GlycopharmMemberStatus } from '@/api/glycopharm';
 import StatusBadge from '../../components/common/StatusBadge';
@@ -30,6 +34,7 @@ export default function GlycopharmMembersPage() {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+  const totalPages = total > 0 ? Math.ceil(total / 20) : 0;
 
   // Filters
   const [statusFilter, setStatusFilter] = useState<GlycopharmMemberStatus | ''>('');
@@ -137,50 +142,48 @@ export default function GlycopharmMembersPage() {
 
   const hasFilters = statusFilter || subRoleFilter;
 
-  const columns: Column<GlycopharmMemberRecord>[] = [
+  const columns: ListColumnDef<GlycopharmMemberRecord>[] = [
     {
       key: 'membershipType',
-      title: '유형',
-      dataIndex: 'membershipType',
+      header: '유형',
       width: '80px',
       render: () => '약사',
     },
     {
       key: 'subRole',
-      title: '세부직역',
-      dataIndex: 'subRole',
+      header: '세부직역',
       width: '130px',
-      render: (v) => (v ? (SUBROLE_LABEL[v] ?? v) : '-'),
+      render: (v) => (v ? (SUBROLE_LABEL[v as string] ?? v) : '-'),
     },
     {
       key: 'licenseNumber',
-      title: '면허번호',
+      header: '면허번호',
       width: '130px',
       render: (_v, r) => r.metadata?.licenseNumber || '-',
     },
     {
       key: 'pharmacyName',
-      title: '약국명',
+      header: '약국명',
       render: (_v, r) => r.metadata?.pharmacyName || '-',
     },
     {
       key: 'status',
-      title: '상태',
-      dataIndex: 'status',
+      header: '상태',
       width: '100px',
       render: (v) => <StatusBadge status={v} />,
     },
     {
       key: 'createdAt',
-      title: '신청일',
-      dataIndex: 'createdAt',
+      header: '신청일',
       width: '110px',
       sortable: true,
+      sortAccessor: (r) => new Date(r.createdAt).getTime(),
       render: (v) => new Date(v).toLocaleDateString('ko-KR'),
     },
     {
-      key: 'actions',
-      title: '관리',
+      key: '_actions',
+      header: '관리',
+      system: true,
       width: '80px',
       align: 'right',
       render: (_v, record) => (
@@ -312,18 +315,36 @@ export default function GlycopharmMembersPage() {
       <div className="bg-white rounded-xl shadow-sm">
         <DataTable<GlycopharmMemberRecord>
           columns={columns}
-          dataSource={filtered}
+          data={filtered}
           rowKey="id"
           loading={loading}
-          pagination={{
-            current: page,
-            pageSize: 20,
-            total,
-            onChange: (p) => setPage(p),
-          }}
           onRowClick={(r) => setSelected(r)}
-          emptyText="등록된 약사 회원 신청이 없습니다"
+          emptyMessage="등록된 약사 회원 신청이 없습니다"
+          tableId="glycopharm-operator-members"
         />
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-3 py-4 border-t border-slate-100">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page <= 1}
+              className="flex items-center gap-1 px-3 py-2 border rounded-lg disabled:opacity-50 hover:bg-slate-50"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              이전
+            </button>
+            <span className="text-sm text-slate-600">
+              {page} / {totalPages}
+            </span>
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page >= totalPages}
+              className="flex items-center gap-1 px-3 py-2 border rounded-lg disabled:opacity-50 hover:bg-slate-50"
+            >
+              다음
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* ── 상세 Drawer ── */}

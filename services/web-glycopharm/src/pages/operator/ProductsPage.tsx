@@ -1,6 +1,7 @@
 /**
  * Operator Products Page — Product Master Console
  * WO-O4O-PRODUCT-MASTER-CONSOLE-V1
+ * WO-O4O-OPERATOR-DATATABLE-SOURCE-ALIGN-V1: DataTable @o4o/ui → @o4o/operator-ux-core
  *
  * /api/v1/operator/products API (Extension Layer)
  * product_masters 테이블 기반 플랫폼 상품 관리
@@ -16,9 +17,11 @@ import {
   Image,
   Truck,
   Copy,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
-import { DataTable } from '@o4o/ui';
-import type { Column } from '@o4o/ui';
+import { DataTable } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { api } from '../../lib/apiClient';
 import PageHeader from '../../components/common/PageHeader';
 
@@ -228,10 +231,10 @@ export default function ProductsPage() {
 
         {/* Table */}
         {(() => {
-          const columns: Column<ProductData>[] = [
+          const columns: ListColumnDef<ProductData>[] = [
             {
               key: 'primaryImage',
-              title: '이미지',
+              header: '이미지',
               width: '70px',
               render: (_v, p) => p.primaryImage
                 ? <img src={p.primaryImage} alt={p.marketingName} className="w-10 h-10 rounded-lg object-cover border border-slate-200" />
@@ -239,7 +242,7 @@ export default function ProductsPage() {
             },
             {
               key: 'marketingName',
-              title: '상품명',
+              header: '상품명',
               render: (_v, p) => (
                 <div>
                   <p className="font-medium text-slate-800 text-sm">{p.marketingName}</p>
@@ -251,25 +254,25 @@ export default function ProductsPage() {
             },
             {
               key: 'barcode',
-              title: '바코드',
+              header: '바코드',
               width: '130px',
               render: (_v, p) => <span className="font-mono text-xs text-slate-600 bg-slate-50 px-2 py-1 rounded">{p.barcode}</span>,
             },
             {
               key: 'brandName',
-              title: '브랜드',
+              header: '브랜드',
               width: '120px',
               render: (_v, p) => p.brandName ? <span className="text-sm text-slate-600">{p.brandName}</span> : <span className="text-slate-300">-</span>,
             },
             {
               key: 'categoryName',
-              title: '카테고리',
+              header: '카테고리',
               width: '120px',
               render: (_v, p) => p.categoryName ? <span className="text-sm text-slate-600">{p.categoryName}</span> : <span className="text-slate-300">-</span>,
             },
             {
               key: 'supplierCount',
-              title: '공급자',
+              header: '공급자',
               width: '70px',
               align: 'right',
               render: (_v, p) => (
@@ -280,27 +283,47 @@ export default function ProductsPage() {
             },
             {
               key: 'createdAt',
-              title: '생성일',
+              header: '생성일',
               width: '100px',
               render: (_v, p) => <span className="text-sm text-slate-500">{formatDate(p.createdAt)}</span>,
             },
           ];
 
           return (
-            <DataTable<ProductData>
-              columns={columns}
-              dataSource={products}
-              rowKey="id"
-              loading={isLoading}
-              emptyText="상품 데이터가 없습니다"
-              onRowClick={(p) => navigate(`/operator/products/${p.id}`)}
-              pagination={{
-                current: currentPage,
-                pageSize: pagination.limit,
-                total: pagination.total,
-                onChange: (p) => setCurrentPage(p),
-              }}
-            />
+            <>
+              <DataTable<ProductData>
+                columns={columns}
+                data={products}
+                rowKey="id"
+                loading={isLoading}
+                emptyMessage="상품 데이터가 없습니다"
+                onRowClick={(p) => navigate(`/operator/products/${p.id}`)}
+                tableId="glycopharm-operator-products"
+              />
+              {pagination.totalPages > 1 && (
+                <div className="flex items-center justify-center gap-3 py-4 border-t border-slate-100">
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage <= 1}
+                    className="flex items-center gap-1 px-3 py-2 border rounded-lg disabled:opacity-50 hover:bg-slate-50"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    이전
+                  </button>
+                  <span className="text-sm text-slate-600">
+                    {currentPage} / {pagination.totalPages}
+                  </span>
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.min(pagination.totalPages, p + 1))}
+                    disabled={currentPage >= pagination.totalPages}
+                    className="flex items-center gap-1 px-3 py-2 border rounded-lg disabled:opacity-50 hover:bg-slate-50"
+                  >
+                    다음
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+            </>
           );
         })()}
       </div>

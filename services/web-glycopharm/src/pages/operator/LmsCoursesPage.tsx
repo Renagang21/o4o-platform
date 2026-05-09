@@ -1,6 +1,7 @@
 /**
  * Operator LMS Courses Page — GlycoPharm
  * WO-GLYCOPHARM-INSTRUCTOR-OPERATOR-V1
+ * WO-O4O-OPERATOR-DATATABLE-SOURCE-ALIGN-V1: DataTable @o4o/ui → @o4o/operator-ux-core
  *
  * GET /lms/courses (no status filter — admin view of all courses)
  */
@@ -11,13 +12,12 @@ import {
   BookOpen,
   Search,
   RefreshCw,
-  Loader2,
   AlertCircle,
   Eye,
   EyeOff,
 } from 'lucide-react';
-import { DataTable } from '@o4o/ui';
-import type { Column } from '@o4o/ui';
+import { DataTable } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { api } from '@/lib/apiClient';
 import PageHeader from '@/components/common/PageHeader';
 
@@ -41,12 +41,15 @@ interface PaginationMeta {
 }
 
 // ─── Columns ─────────────────────────────────────────────────
+// WO-O4O-OPERATOR-DATATABLE-SOURCE-ALIGN-V1:
+//   ListColumnDef render 시그니처는 (value, row, index). 기존 (row) 단일 인자 호출은
+//   2번째 positional(row)로 정렬한다.
 
-const columns: Column<CourseRow>[] = [
+const columns: ListColumnDef<CourseRow>[] = [
   {
     key: 'title',
-    title: '강의명',
-    render: (row) => (
+    header: '강의명',
+    render: (_v, row) => (
       <div>
         <p className="font-medium text-slate-800 truncate max-w-xs">{row.title}</p>
         <p className="text-xs text-slate-400">{row.id.slice(0, 8)}…</p>
@@ -55,8 +58,8 @@ const columns: Column<CourseRow>[] = [
   },
   {
     key: 'isPublished',
-    title: '공개',
-    render: (row) => (
+    header: '공개',
+    render: (_v, row) => (
       <span className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full font-medium ${
         row.isPublished
           ? 'bg-green-50 text-green-700'
@@ -71,8 +74,8 @@ const columns: Column<CourseRow>[] = [
   },
   {
     key: 'duration',
-    title: '시간',
-    render: (row) => (
+    header: '시간',
+    render: (_v, row) => (
       <span className="text-sm text-slate-600">
         {row.duration > 0 ? `${row.duration}분` : '-'}
       </span>
@@ -80,8 +83,8 @@ const columns: Column<CourseRow>[] = [
   },
   {
     key: 'createdAt',
-    title: '생성일',
-    render: (row) => (
+    header: '생성일',
+    render: (_v, row) => (
       <span className="text-sm text-slate-500">
         {new Date(row.createdAt).toLocaleDateString('ko-KR')}
       </span>
@@ -170,26 +173,25 @@ export default function LmsCoursesPage() {
 
       {/* Table */}
       <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-        {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
-          </div>
-        ) : error ? (
+        {error ? (
           <div className="py-16 text-center">
             <AlertCircle className="w-10 h-10 text-red-400 mx-auto mb-3" />
             <p className="text-slate-600">{error}</p>
           </div>
-        ) : courses.length === 0 ? (
-          <div className="py-16 text-center">
-            <BookOpen className="w-10 h-10 text-slate-200 mx-auto mb-3" />
-            <p className="text-slate-500">등록된 강의가 없습니다.</p>
-          </div>
         ) : (
-          <DataTable
-            columns={columns as Column<Record<string, any>>[]}
-            dataSource={courses}
+          <DataTable<CourseRow>
+            columns={columns}
+            data={courses}
             rowKey="id"
+            loading={loading}
+            emptyMessage={
+              <div className="py-16 text-center">
+                <BookOpen className="w-10 h-10 text-slate-200 mx-auto mb-3" />
+                <p className="text-slate-500">등록된 강의가 없습니다.</p>
+              </div>
+            }
             onRowClick={(row) => navigate(`/education/${row.id}`)}
+            tableId="glycopharm-operator-lms-courses"
           />
         )}
       </div>

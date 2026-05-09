@@ -6,6 +6,8 @@
  * - 상태 매핑 수정: active → APPROVED
  * - 운영자 메모 기능
  * - 거절 시 신청자 알림 안내
+ *
+ * WO-O4O-OPERATOR-DATATABLE-SOURCE-ALIGN-V1: DataTable @o4o/ui → @o4o/operator-ux-core
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -20,7 +22,9 @@ import {
   X,
   MessageSquare,
 } from 'lucide-react';
-import { DataTable, type Column, OperatorConfirmModal } from '@o4o/ui';
+import { OperatorConfirmModal } from '@o4o/ui';
+import { DataTable } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { OperatorActionType } from '@o4o/types';
 import { operatorRegistrationApi } from '../../../lib/api';
 
@@ -221,13 +225,13 @@ export default function RegistrationRequestsPage() {
   const approvedCount = requests.filter((r) => r.status === 'APPROVED').length;
   const rejectedCount = requests.filter((r) => r.status === 'REJECTED').length;
 
-  // DataTable columns
-  const columns: Column<Record<string, any>>[] = [
-    { key: 'applicant', title: '신청자', dataIndex: 'applicant', width: '30%' },
-    { key: 'company', title: '회사 / 면허', dataIndex: 'company', width: '20%' },
-    { key: 'date', title: '신청일', dataIndex: 'date', width: '15%' },
-    { key: 'status', title: '상태', dataIndex: 'status', width: '15%', align: 'center' },
-    { key: 'actions', title: '', dataIndex: 'actions', width: '20%' },
+  // DataTable columns — pre-rendered ReactNode 셀 (key === field name 으로 row[key] 자동 매핑)
+  const columns: ListColumnDef<Record<string, any>>[] = [
+    { key: 'applicant', header: '신청자', width: '30%' },
+    { key: 'company', header: '회사 / 면허', width: '20%' },
+    { key: 'date', header: '신청일', width: '15%' },
+    { key: 'status', header: '상태', width: '15%', align: 'center' },
+    { key: 'actions', header: '', width: '20%' },
   ];
 
   // DataTable rows
@@ -440,14 +444,15 @@ export default function RegistrationRequestsPage() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100">
           <DataTable
             columns={columns}
-            dataSource={tableRows}
+            data={tableRows}
             rowKey="id"
             loading={loading}
-            emptyText={
+            emptyMessage={
               statusFilter === 'PENDING'
                 ? '대기 중인 가입 신청이 없습니다'
                 : '조건에 맞는 가입 신청이 없습니다'
             }
+            tableId="neture-operator-registration-requests"
           />
         </div>
 
