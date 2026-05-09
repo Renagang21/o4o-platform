@@ -21,6 +21,10 @@ export type { HubPaginationProps } from './HubPagination';
 export { GuideBlock } from './GuideBlock';
 export type { GuideBlockProps, GuideBlockVariant } from './GuideBlock';
 
+/* WO-O4O-LESSON-CARD-PREVIEW-COMPONENT-V1: LMS 강의 Reference Metadata preview (자료함/POP/QR/블로그 공용) */
+export { LessonCardPreview } from './LessonCardPreview';
+export type { LessonCardPreviewProps, LessonCardPreviewVariant } from './LessonCardPreview';
+
 /* WO-O4O-GUIDE-CLIENT-EXTRACTION-V1: guide_contents API client + GuideEditableSection (Base) */
 export * from './guide-client';
 
@@ -73,6 +77,8 @@ export type {
   SignageMediaItem,
   SignagePlaylistItem,
   ContentHighlightItem,
+  /* WO-O4O-LESSON-CARD-PREVIEW-COMPONENT-V1: LMS 강의 Reference Metadata 공용 타입 */
+  LessonSnapshotContent,
   /* Component props */
   HeroSummarySectionProps,
   NewsNoticesSectionProps,

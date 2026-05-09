@@ -4,9 +4,12 @@
  * WO-O4O-KPA-STORE-MATERIALS-AND-PRODUCTIONS-CANONICAL-ALIGN-V1
  * WO-O4O-KPA-STORE-PRODUCTION-ENTRY-CANONICAL-CORRECTION-V1: checkbox + 제작 시작 진입
  * WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1: lesson 항목(LMS 강의 reference metadata) 표시 + type filter
+ * WO-O4O-LESSON-CARD-PREVIEW-COMPONENT-V1: lesson 인라인 표시를 LessonCardPreview 공용 컴포넌트로 교체
+ * WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1: KPA 콘텐츠 허브 가져온 항목(asset_type='content') 표시.
+ *   "콘텐츠" 필터에서 'cms'(레거시 CmsContent)와 'content'(kpa_contents)를 통합 표시.
  *
  * 매장이 보유한 콘텐츠 source/reference 저장소.
- * - 커뮤니티에서 가져온 snapshot-based 콘텐츠 (asset_type='cms')
+ * - 커뮤니티에서 가져온 snapshot-based 콘텐츠 (asset_type='cms' / 'content')
  * - LMS 강의 메타데이터 (asset_type='lesson') — Reference Metadata, lesson body 미포함
  * - 매장이 직접 작성한 direct 콘텐츠
  *
@@ -16,21 +19,22 @@
 
 import { useEffect, useState, useCallback, useMemo, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, ExternalLink, Trash2, RefreshCw, FileText, Sparkles, GraduationCap } from 'lucide-react';
+import { BookOpen, ExternalLink, Trash2, RefreshCw, FileText, Sparkles } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
+import { LessonCardPreview, type LessonSnapshotContent } from '@o4o/shared-space-ui';
 import {
   storeAssetControlApi,
   directContentApi,
   type StoreAssetItem,
-  type LessonSnapshotContent,
 } from '../../api/assetSnapshot';
 import { colors } from '../../styles/theme';
 import { StartProductionModal, type ProductionSource } from './StartProductionModal';
 
-// WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1
+// WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1 / WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1
 // type filter — 매장 운영자가 "전체 / 콘텐츠 / 강의"로 보기 좁히기. 강좌형 콘텐츠는 별도 메뉴 신설하지 않고
 // 본 페이지 안에서 type 분류만으로 노출한다([storeMenuConfig.ts:212] design intent).
-type SnapshotTypeFilter = 'all' | 'cms' | 'lesson';
+// "콘텐츠" 필터는 'cms'(레거시 platform CMS) + 'content'(KPA 콘텐츠 허브 가져옴) 통합 표시.
+type SnapshotTypeFilter = 'all' | 'content' | 'lesson';
 
 interface DirectItem {
   id: string;
@@ -65,17 +69,22 @@ export default function StoreLibraryContentsPage() {
   const fetchAll = useCallback(async () => {
     setLoading(true);
     try {
-      // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1: cms와 lesson 두 type 병렬 fetch.
+      // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1 / WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1
+      // cms / content / lesson 세 type 병렬 fetch.
+      //   - cms     : 레거시 platform CmsContent 기반
+      //   - content : KPA 콘텐츠 허브(kpa_contents) 가져옴 — 신규 표준
+      //   - lesson  : LMS 강의 reference metadata
       // signage는 본 페이지(콘텐츠) 범위 외이므로 미요청.
-      const [cmsRes, lessonRes, directRes] = await Promise.all([
-        storeAssetControlApi.list({ type: 'cms', limit: 200 }),
-        storeAssetControlApi.list({ type: 'lesson', limit: 200 }).catch(() => ({
-          data: { items: [] as StoreAssetItem[], total: 0, page: 1, limit: 200 },
-        })),
+      const emptyPage = { items: [] as StoreAssetItem[], total: 0, page: 1, limit: 200 };
+      const [cmsRes, contentRes, lessonRes, directRes] = await Promise.all([
+        storeAssetControlApi.list({ type: 'cms', limit: 200 }).catch(() => ({ data: emptyPage })),
+        storeAssetControlApi.list({ type: 'content', limit: 200 }).catch(() => ({ data: emptyPage })),
+        storeAssetControlApi.list({ type: 'lesson', limit: 200 }).catch(() => ({ data: emptyPage })),
         directContentApi.list().catch(() => ({ data: [] as DirectItem[] })),
       ]);
       const merged = [
         ...(cmsRes.data?.items ?? []),
+        ...(contentRes.data?.items ?? []),
         ...(lessonRes.data?.items ?? []),
       ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       setSnapshots(merged);
@@ -121,9 +130,14 @@ export default function StoreLibraryContentsPage() {
     });
   };
 
-  // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1: filter 적용된 snapshot 목록 + direct는 typeFilter='lesson' 시 제외
+  // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1 / WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1
+  // filter 적용된 snapshot 목록 + direct는 typeFilter='lesson' 시 제외.
+  // "콘텐츠" 필터는 cms(레거시) + content(KPA 콘텐츠 허브) 통합 표시.
   const filteredSnapshots = useMemo<StoreAssetItem[]>(() => {
     if (typeFilter === 'all') return snapshots;
+    if (typeFilter === 'content') {
+      return snapshots.filter((s) => s.assetType === 'cms' || s.assetType === 'content');
+    }
     return snapshots.filter((s) => s.assetType === typeFilter);
   }, [snapshots, typeFilter]);
 
@@ -212,10 +226,11 @@ export default function StoreLibraryContentsPage() {
         </button>
       </div>
 
-      {/* WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1: type filter — 전체 / 콘텐츠 / 강의 */}
+      {/* WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1 / WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1
+          type filter — 전체 / 콘텐츠 / 강의. "콘텐츠"는 cms+content 통합. */}
       <div style={styles.filterBar}>
-        {(['all', 'cms', 'lesson'] as const).map((type) => {
-          const label = type === 'all' ? '전체' : type === 'cms' ? '콘텐츠' : '강의';
+        {(['all', 'content', 'lesson'] as const).map((type) => {
+          const label = type === 'all' ? '전체' : type === 'content' ? '콘텐츠' : '강의';
           const isActive = typeFilter === type;
           return (
             <button
@@ -336,19 +351,36 @@ export default function StoreLibraryContentsPage() {
                 {filteredSnapshots.map((item) => {
                   const k = keyOf('snapshot', item.id);
                   // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1: lesson은 Reference Metadata.
-                  const isLesson = item.assetType === 'lesson';
-                  const lessonMeta = isLesson
-                    ? (item.contentJson as Partial<LessonSnapshotContent> | undefined)
-                    : undefined;
-                  // 원본 열기: lesson은 publicUrl(/lms/course/:id), 그 외는 기존 viewer(/view/{id}).
-                  const openHref = isLesson && lessonMeta?.publicUrl
-                    ? lessonMeta.publicUrl
-                    : `/view/${item.id}`;
-                  const lessonInlineMeta: string[] = [];
-                  if (lessonMeta?.instructorName) lessonInlineMeta.push(`강사 ${lessonMeta.instructorName}`);
-                  if (typeof lessonMeta?.lessonCount === 'number') {
-                    lessonInlineMeta.push(`레슨 ${lessonMeta.lessonCount}개`);
+                  // WO-O4O-LESSON-CARD-PREVIEW-COMPONENT-V1: lesson 항목은 공용 LessonCardPreview를 사용.
+                  if (item.assetType === 'lesson') {
+                    const lessonSnap = item.contentJson as LessonSnapshotContent | undefined;
+                    if (!lessonSnap || typeof lessonSnap !== 'object') return null;
+                    return (
+                      <li key={item.id} style={styles.lessonListItem}>
+                        <input
+                          type="checkbox"
+                          checked={selected.has(k)}
+                          onChange={() => toggleOne(k)}
+                          style={styles.checkbox}
+                          aria-label={`${item.title} 선택`}
+                        />
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <LessonCardPreview
+                            snapshot={lessonSnap}
+                            variant="compact"
+                            rightSlot={
+                              item.lifecycleStatus === 'archived' ? (
+                                <span style={{ ...styles.badge, background: '#FEF3C7', color: '#D97706' }}>보관</span>
+                              ) : item.lifecycleStatus === 'expired' ? (
+                                <span style={{ ...styles.badge, background: '#FEE2E2', color: '#DC2626' }}>만료</span>
+                              ) : null
+                            }
+                          />
+                        </div>
+                      </li>
+                    );
                   }
+                  // 기존 cms snapshot — 인라인 1줄 표시 (변경 없음)
                   return (
                     <li key={item.id} style={styles.listItem}>
                       <input
@@ -359,27 +391,15 @@ export default function StoreLibraryContentsPage() {
                         aria-label={`${item.title} 선택`}
                       />
                       <div style={styles.itemMain}>
-                        {isLesson ? (
-                          <GraduationCap size={16} style={{ color: '#7C3AED', flexShrink: 0 }} />
-                        ) : (
-                          <BookOpen size={16} style={{ color: colors.primary, flexShrink: 0 }} />
-                        )}
-                        <Link to={openHref} target={isLesson ? '_blank' : undefined} rel={isLesson ? 'noreferrer' : undefined} style={styles.itemTitle}>
+                        <BookOpen size={16} style={{ color: colors.primary, flexShrink: 0 }} />
+                        <Link to={`/view/${item.id}`} style={styles.itemTitle}>
                           {item.title}
                         </Link>
-                        {/* WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1: lesson 항목에 강의 배지 */}
-                        {isLesson && (
-                          <span style={{ ...styles.badge, background: '#EDE9FE', color: '#5B21B6' }}>강의</span>
-                        )}
                         {item.lifecycleStatus === 'archived' && (
                           <span style={{ ...styles.badge, background: '#FEF3C7', color: '#D97706' }}>보관</span>
                         )}
                         {item.lifecycleStatus === 'expired' && (
                           <span style={{ ...styles.badge, background: '#FEE2E2', color: '#DC2626' }}>만료</span>
-                        )}
-                        {/* lesson 인라인 메타: 강사명·레슨 수 */}
-                        {isLesson && lessonInlineMeta.length > 0 && (
-                          <span style={styles.lessonInlineMeta}>{lessonInlineMeta.join(' · ')}</span>
                         )}
                       </div>
                       <div style={styles.itemMeta}>
@@ -387,11 +407,11 @@ export default function StoreLibraryContentsPage() {
                           {item.createdAt ? new Date(item.createdAt).toLocaleDateString('ko-KR') : ''}
                         </span>
                         <Link
-                          to={openHref}
+                          to={`/view/${item.id}`}
                           target="_blank"
                           rel="noreferrer"
                           style={styles.openLink}
-                          title={isLesson ? '원본 강의 열기' : '원본 열기'}
+                          title="원본 열기"
                         >
                           <ExternalLink size={14} />
                         </Link>
@@ -493,11 +513,7 @@ const styles: Record<string, CSSProperties> = {
     color: '#5B21B6',
     fontWeight: 600,
   },
-  lessonInlineMeta: {
-    fontSize: '12px',
-    color: colors.neutral500,
-    whiteSpace: 'nowrap',
-  },
+  // (lesson inline meta는 LessonCardPreview가 처리하므로 페이지 로컬 스타일 제거)
   selectAllLabel: {
     display: 'inline-flex',
     alignItems: 'center',
@@ -574,6 +590,13 @@ const styles: Record<string, CSSProperties> = {
     background: colors.white,
     border: `1px solid ${colors.neutral200}`,
     borderRadius: '8px',
+  },
+  // WO-O4O-LESSON-CARD-PREVIEW-COMPONENT-V1
+  // lesson 항목은 LessonCardPreview(자체 border/padding 보유)를 임베드 — 외곽 컨테이너는 체크박스 정렬만 담당.
+  lessonListItem: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
   },
   itemMain: {
     display: 'flex',

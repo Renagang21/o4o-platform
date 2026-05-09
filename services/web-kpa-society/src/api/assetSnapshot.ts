@@ -7,42 +7,32 @@
  */
 
 import { apiClient } from './client';
+import type { LessonSnapshotContent } from '@o4o/shared-space-ui';
+
+// WO-O4O-LESSON-CARD-PREVIEW-COMPONENT-V1
+// LessonSnapshotContent의 정식 위치는 @o4o/shared-space-ui 이다 (LessonCardPreview와 같은 위치).
+// 기존 KPA 호출처는 본 모듈에서 import 하던 패턴이므로, 호환성을 위해 re-export 한다.
+export type { LessonSnapshotContent };
 
 export interface AssetSnapshotItem {
   id: string;
   organizationId: string;
   sourceService: string;
   sourceAssetId: string;
-  assetType: 'cms' | 'signage' | 'lesson';
+  assetType: 'cms' | 'signage' | 'lesson' | 'content';
   title: string;
   contentJson: Record<string, unknown>;
   createdBy: string;
   createdAt: string;
 }
 
-/**
- * WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1
- * Lesson 항목의 contentJson 형태 (Reference Metadata).
- * 강의 본문/lesson body/video URL은 포함되지 않는다.
- */
-export interface LessonSnapshotContent {
-  courseId: string;
-  title: string;
-  thumbnail: string | null;
-  summary: string;
-  lessonCount: number;
-  instructorName: string | null;
-  contentKind: 'lecture' | 'content_resource';
-  visibility: 'public' | 'members';
-  publicUrl: string;
-  sourceService: string;
-  capturedAt: string;
-}
+// WO-O4O-LESSON-CARD-PREVIEW-COMPONENT-V1: LessonSnapshotContent 는 @o4o/shared-space-ui로 승격됨.
+// 본 모듈은 type re-export(상단)만 유지한다 — POP/QR/블로그에서도 동일 타입 재사용.
 
 interface CopyAssetRequest {
   sourceService: string;
   sourceAssetId: string;
-  assetType: 'cms' | 'signage' | 'lesson';
+  assetType: 'cms' | 'signage' | 'lesson' | 'content';
 }
 
 interface CopyAssetResponse {
@@ -72,7 +62,7 @@ export const assetSnapshotApi = {
   /**
    * List asset snapshots for the user's store (paginated)
    */
-  list: (params?: { type?: 'cms' | 'signage' | 'lesson'; page?: number; limit?: number }) => {
+  list: (params?: { type?: 'cms' | 'signage' | 'lesson' | 'content'; page?: number; limit?: number }) => {
     const query: Record<string, string> = {};
     if (params?.type) query.type = params.type;
     if (params?.page) query.page = String(params.page);
@@ -101,7 +91,7 @@ export interface StoreAssetItem {
   organizationId: string;
   sourceService: string;
   sourceAssetId: string;
-  assetType: 'cms' | 'signage' | 'lesson';
+  assetType: 'cms' | 'signage' | 'lesson' | 'content';
   title: string;
   // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1: lesson 항목 thumbnail/lessonCount/publicUrl 표시용 (cms는 미사용)
   contentJson?: Record<string, unknown>;
@@ -133,7 +123,7 @@ export const storeAssetControlApi = {
   /**
    * List store assets with publish status (joined with control table)
    */
-  list: (params?: { type?: 'cms' | 'signage' | 'lesson'; page?: number; limit?: number }) => {
+  list: (params?: { type?: 'cms' | 'signage' | 'lesson' | 'content'; page?: number; limit?: number }) => {
     const query: Record<string, string> = {};
     if (params?.type) query.type = params.type;
     if (params?.page) query.page = String(params.page);
@@ -173,7 +163,7 @@ export interface PublishedAssetItem {
   organizationId: string;
   sourceService: string;
   sourceAssetId: string;
-  assetType: 'cms' | 'signage' | 'lesson';
+  assetType: 'cms' | 'signage' | 'lesson' | 'content';
   title: string;
   contentJson: Record<string, unknown>;
   createdAt: string;
@@ -199,7 +189,7 @@ export const publishedAssetsApi = {
    */
   list: (
     organizationId: string,
-    params?: { channel?: string; type?: 'cms' | 'signage' | 'lesson'; page?: number; limit?: number },
+    params?: { channel?: string; type?: 'cms' | 'signage' | 'lesson' | 'content'; page?: number; limit?: number },
   ) => {
     const query: Record<string, string> = {};
     if (params?.channel) query.channel = params.channel;

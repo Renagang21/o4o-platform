@@ -197,3 +197,27 @@ export interface SignagePreviewSectionProps {
   viewAllLabel?: string;
   accentColor?: string;
 }
+
+/* ------------------------------------------------------------------ */
+/*  LessonSnapshotContent                                             */
+/*                                                                    */
+/*  WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1                            */
+/*  WO-O4O-LESSON-CARD-PREVIEW-COMPONENT-V1: shared 위치로 승격        */
+/*                                                                    */
+/*  매장 자료함에 가져온 LMS 강의 항목의 contentJson 구조.             */
+/*  Reference Metadata 원칙 — lesson body / videoUrl / quiz는 포함되지 */
+/*  않으며, 컴포넌트는 받지도 표시하지도 않는다.                        */
+/* ------------------------------------------------------------------ */
+export interface LessonSnapshotContent {
+  courseId: string;
+  title: string;
+  thumbnail: string | null;
+  summary: string;
+  lessonCount: number;
+  instructorName: string | null;
+  contentKind: 'lecture' | 'content_resource';
+  visibility: 'public' | 'members';
+  publicUrl: string;
+  sourceService: string;
+  capturedAt: string;
+}
