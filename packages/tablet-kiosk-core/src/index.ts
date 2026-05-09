@@ -15,4 +15,5 @@ export type {
   InterestStatusDetail,
   TabletInterestSubmitBody,
   TabletKioskApi,
+  IdlePlaylistItem,
 } from './types';

@@ -5,12 +5,14 @@
  * WO-O4O-TABLET-INTERACTIVE-UX-ALIGN-V1
  * WO-O4O-TABLET-KIOSK-PAGE-DEDUP-V1
  * WO-O4O-TABLET-RUNTIME-REDUCER-V1 — useState 9개 분산 → useReducer 단일 runtime state
+ * WO-O4O-TABLET-IDLE-LAYER-V1 — 'idle' 모드 + inactivity detection + idle overlay 추가
  *
  * 성격: 매장 내 interactive device.
  *   ─ "쇼핑몰"이 아니라 "매장 안내 디바이스"이다.
  *   ─ 결제/장바구니/주문 흐름 없음. 핵심은 "관심 → 직원 안내" 연결.
+ *   ─ idle 은 보조 상태(매장 대기 화면)다. signage 처럼 항상 재생되는 구조 아님.
+ *     사용자 터치 시 즉시 interactive 우선.
  *   ─ 향후 확장 가능 영역(별도 WO):
- *       · idle playback layer (signage playlist embed) — 'idle' mode 추가 예정
  *       · AI 설명 / 추천 영역
  *       · consultation / waiting / promotion 템플릿
  *       · QR / 블로그 / 콘텐츠 연결
@@ -19,41 +21,52 @@
  * ├─ 상품 그리드 (TABLET 채널 상품 — Supplier + Local 혼합)
  * ├─ 상품 상세 오버레이
  * ├─ 관심 표시 (Interest Request, 결제 없음)
- * └─ 요청 상태 추적 화면
+ * ├─ 요청 상태 추적 화면
+ * └─ Idle overlay (fullscreen, 자체 minimal player — signage runtime 미사용)
  *
  * - Layout/Header 없음 (전체화면 kiosk mode)
  * - 인증 불필요
  * - 제출 후 3초 polling으로 상태 추적
- * - 2분 idle 후 자동 리셋
+ * - 2분 idle 후 자동 리셋 (submitted COMPLETED/CANCELLED → browse)
+ * - 미조작 N초 후 idle 진입 (browse/detail 한정 — submitted/error 제외)
  *
  * 주입 영역 (서비스 wrapper 책임):
  * - api: HTTP 호출 함수 3종 (KPA = fetch, Cosmetics = axios 등 wrapper 가 흡수)
  * - showQrBadge: KPA QR 접속 진입 시 배지 표시 (서비스별 진입 패턴 차이)
+ * - idlePlaylist + idleTimeoutMs: idle 활성화 (opt-in, undefined 면 idle 비활성화)
  *
  * Runtime state 구조 (WO-O4O-TABLET-RUNTIME-REDUCER-V1):
  *   - 단일 RuntimeState + useReducer (이전: useState 9개 분산)
- *   - reducer 는 순수 함수, side-effect (polling/idle reset/네트워크 호출) 는 useEffect 에서 수행
- *   - 향후 idle / consultation / waiting 모드는 Mode 타입 + Action 만 추가하면 됨 (별도 WO)
+ *   - reducer 는 순수 함수, side-effect (polling/idle reset/inactivity timer)는 useEffect 에서 수행
+ *   - 향후 consultation / waiting 모드는 Mode 타입 + Action 만 추가하면 됨 (별도 WO)
  *   - 타이밍(3초 polling / 2분 auto-reset) 그대로 유지
  *
  * 외부 export 정책: 본 컴포넌트와 props 만. RuntimeState/Action 은 내부 전용.
  */
 
-import { useEffect, useReducer, useRef } from 'react';
+import { useEffect, useReducer, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import type {
   TabletProduct,
   InterestStatusDetail,
   TabletKioskApi,
+  IdlePlaylistItem,
 } from './types';
 
 // ── Display & view types (internal) ──
 
 /**
  * Tablet runtime mode.
- * 향후 idle layer 도입 시 'idle' 추가 예정 (별도 WO-O4O-TABLET-IDLE-LAYER-V1).
+ * 'idle' 은 보조 상태(매장 대기 화면). signage 처럼 항상 재생되는 구조가 아니라
+ *  inactivity timer 만료 시 진입, 사용자 터치 시 즉시 'browse' 로 복귀.
  */
-type Mode = 'browse' | 'detail' | 'submitted' | 'error';
+type Mode = 'browse' | 'detail' | 'submitted' | 'error' | 'idle';
+
+/** idle 진입이 허용된 mode (polling/error 중 진입 금지) */
+const IDLE_ENTERABLE_MODES: ReadonlyArray<Mode> = ['browse', 'detail'];
+
+/** image 항목 default 노출 시간 */
+const DEFAULT_IDLE_IMAGE_DURATION_MS = 5000;
 
 interface DisplayProduct {
   id: string;
@@ -101,7 +114,12 @@ type Action =
   | { type: 'RESET_TO_BROWSE' }
   /** error view 의 "다시 시도": errorMessage 만 클리어 + browse 모드로 복귀.
    *  selectedProduct/interestId 등은 보존 (기존 동작 유지) */
-  | { type: 'CLEAR_ERROR' };
+  | { type: 'CLEAR_ERROR' }
+  /** Inactivity timer 만료 → idle. browse/detail 에서만 진입 허용. */
+  | { type: 'IDLE_ENTER' }
+  /** 사용자 터치/keyboard interaction → idle 종료. 항상 browse 로 복귀하며
+   *  selectedProduct + customer 입력 클리어 (이전 detail 컨텍스트 폐기). */
+  | { type: 'IDLE_EXIT' };
 
 const initialState: RuntimeState = {
   mode: 'browse',
@@ -175,6 +193,19 @@ function reducer(state: RuntimeState, action: Action): RuntimeState {
       // 기존 error view "다시 시도" 동작 그대로: errorMessage 만 클리어 + mode=browse.
       // selectedProduct/interestId 등 transient 는 보존.
       return { ...state, mode: 'browse', errorMessage: null };
+    case 'IDLE_ENTER':
+      // submitted polling 중 / error / 이미 idle 인 경우 진입 차단 (no-op)
+      if (!IDLE_ENTERABLE_MODES.includes(state.mode)) return state;
+      return { ...state, mode: 'idle' };
+    case 'IDLE_EXIT':
+      // 사용자 터치 → 새 고객 사용 시작 가정. 이전 detail 컨텍스트 폐기.
+      return {
+        ...state,
+        mode: 'browse',
+        selectedProduct: null,
+        customerName: '',
+        customerNote: '',
+      };
     default:
       return state;
   }
@@ -220,9 +251,26 @@ export interface TabletKioskPageProps {
   api: TabletKioskApi;
   /** QR 코드로 진입했는지 표시 (KPA 한정 — Cosmetics 는 false) */
   showQrBadge?: boolean;
+  /**
+   * Idle mode 활성화 여부.
+   * undefined(또는 0) → idle 비활성화 (기존 동작 유지, inactivity timer 등록 안 함).
+   * 양수 → 미조작 N ms 후 idle 진입. browse/detail 에서만 진입 허용.
+   * 권장 30000~90000.
+   */
+  idleTimeoutMs?: number;
+  /**
+   * Idle 화면에서 재생할 playlist. 빈 배열도 허용 (기본 안내 placeholder 표시).
+   * 본 패키지는 자체 minimal player 만 제공 (signage runtime 미사용).
+   */
+  idlePlaylist?: IdlePlaylistItem[];
 }
 
-export function TabletKioskPage({ api, showQrBadge = false }: TabletKioskPageProps) {
+export function TabletKioskPage({
+  api,
+  showQrBadge = false,
+  idleTimeoutMs,
+  idlePlaylist,
+}: TabletKioskPageProps) {
   const { slug } = useParams<{ slug: string }>();
   const [state, dispatch] = useReducer(reducer, initialState);
   const {
@@ -313,6 +361,49 @@ export function TabletKioskPage({ api, showQrBadge = false }: TabletKioskPagePro
     dispatch({ type: 'RESET_TO_BROWSE' });
     if (pollRef.current) clearInterval(pollRef.current);
   };
+
+  // ── Inactivity detection → IDLE_ENTER (WO-O4O-TABLET-IDLE-LAYER-V1) ──
+  // idleTimeoutMs 가 양수일 때만 활성화. browse/detail 에서만 timer 등록.
+  // 사용자 interaction(pointerdown/keydown) 시:
+  //   - mode === 'idle': 즉시 IDLE_EXIT (overlay 의 onPointerDown 과 별개로 안전망)
+  //   - 그 외: timer 재설정
+  // submitted/error 에서는 timer 등록 안 함 → polling 중 idle 진입 불가능 (WO 명시).
+  useEffect(() => {
+    if (!idleTimeoutMs || idleTimeoutMs <= 0) return;
+
+    const isIdleEnterable = IDLE_ENTERABLE_MODES.includes(mode);
+    let timer: ReturnType<typeof setTimeout> | null = null;
+
+    const armTimer = () => {
+      if (timer) clearTimeout(timer);
+      if (isIdleEnterable) {
+        timer = setTimeout(() => {
+          dispatch({ type: 'IDLE_ENTER' });
+        }, idleTimeoutMs);
+      }
+    };
+
+    const handleInteraction = () => {
+      if (mode === 'idle') {
+        dispatch({ type: 'IDLE_EXIT' });
+        // exit 후 mode='browse' → 다음 effect cycle 에서 timer 재등록됨
+        return;
+      }
+      if (isIdleEnterable) {
+        armTimer();
+      }
+    };
+
+    armTimer();
+    window.addEventListener('pointerdown', handleInteraction);
+    window.addEventListener('keydown', handleInteraction);
+
+    return () => {
+      if (timer) clearTimeout(timer);
+      window.removeEventListener('pointerdown', handleInteraction);
+      window.removeEventListener('keydown', handleInteraction);
+    };
+  }, [idleTimeoutMs, mode]);
 
   const statusLabels: Record<string, { label: string; color: string; message: string }> = {
     REQUESTED: { label: '요청 접수됨', color: '#eab308', message: '직원이 곧 확인합니다. 잠시 기다려주세요.' },
@@ -452,6 +543,19 @@ export function TabletKioskPage({ api, showQrBadge = false }: TabletKioskPagePro
     );
   }
 
+  // ── Idle overlay (mode === 'idle' 인 경우만 마운트, 다른 view 위에 z-index 로 덮음) ──
+  // 별도 view 렌더링 분기로 두지 않고 마지막 browse render 와 함께 처리하면
+  // browse → idle 전환 시 unmount/remount 비용 없이 자연스러움. 다만 본 컴포넌트는
+  // 각 mode 별 early-return 구조이므로 idle 도 별도 분기로 처리.
+  if (mode === 'idle') {
+    return (
+      <IdleOverlay
+        items={idlePlaylist ?? []}
+        onUserInteraction={() => dispatch({ type: 'IDLE_EXIT' })}
+      />
+    );
+  }
+
   // ── Browse view ──
   return (
     <div style={styles.fullscreen}>
@@ -506,6 +610,64 @@ export function TabletKioskPage({ api, showQrBadge = false }: TabletKioskPagePro
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+// ── Idle Overlay (internal, minimal player) ───────────────────────────────────
+// 자체 minimal player. signage runtime 을 import 하지 않음.
+//   - image: durationMs (default 5000) 후 다음 항목
+//   - video: onEnded 시 다음 항목
+//   - 빈 playlist: "화면을 터치해주세요" placeholder
+//   - 컨테이너 onPointerDown → IDLE_EXIT (window-level handler 와 이중 안전망)
+
+interface IdleOverlayProps {
+  items: IdlePlaylistItem[];
+  onUserInteraction: () => void;
+}
+
+function IdleOverlay({ items, onUserInteraction }: IdleOverlayProps) {
+  const [index, setIndex] = useState(0);
+  const safeIndex = items.length > 0 ? index % items.length : 0;
+  const current = items.length > 0 ? items[safeIndex] : null;
+
+  // image 항목 자동 진행 (video 는 onEnded 로 진행)
+  useEffect(() => {
+    if (!current || current.type !== 'image' || items.length <= 1) return;
+    const t = setTimeout(() => {
+      setIndex((i) => (i + 1) % items.length);
+    }, current.durationMs ?? DEFAULT_IDLE_IMAGE_DURATION_MS);
+    return () => clearTimeout(t);
+  }, [current, items.length]);
+
+  return (
+    <div
+      style={styles.idleOverlay}
+      onPointerDown={onUserInteraction}
+      role="presentation"
+    >
+      {!current && (
+        <div style={styles.idleEmpty}>
+          <span style={{ fontSize: '20px', color: '#cbd5e1' }}>
+            화면을 터치해주세요
+          </span>
+        </div>
+      )}
+      {current?.type === 'image' && (
+        <img src={current.url} alt="" style={styles.idleMedia} draggable={false} />
+      )}
+      {current?.type === 'video' && (
+        <video
+          src={current.url}
+          autoPlay
+          muted
+          playsInline
+          onEnded={() => {
+            if (items.length > 0) setIndex((i) => (i + 1) % items.length);
+          }}
+          style={styles.idleMedia}
+        />
+      )}
     </div>
   );
 }
@@ -667,6 +829,31 @@ const styles: Record<string, React.CSSProperties> = {
     flex: 1,
     textAlign: 'center' as const,
     padding: '48px',
+  },
+  // Idle overlay (WO-O4O-TABLET-IDLE-LAYER-V1)
+  idleOverlay: {
+    position: 'fixed',
+    inset: 0,
+    backgroundColor: '#000',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+    zIndex: 999,
+    cursor: 'pointer',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  },
+  idleMedia: {
+    maxWidth: '100%',
+    maxHeight: '100%',
+    objectFit: 'contain' as const,
+  },
+  idleEmpty: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    height: '100%',
   },
 };
 
