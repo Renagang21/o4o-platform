@@ -241,7 +241,7 @@ export function ProductMarketingPage() {
                     <Link
                       to={`/store/marketing/qr`}
                       style={styles.assetAction}
-                      title="QR 관리"
+                      title="QR 코드"
                     >
                       <ExternalLink size={13} />
                     </Link>

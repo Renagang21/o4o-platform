@@ -58,14 +58,11 @@ export { StoreSignagePage } from './StoreSignagePage';
 // WO-O4O-STORE-QR-LIBRARY-INTEGRATION-V1: QR 자료 관리
 export { StoreQRPage } from './StoreQRPage';
 
-// WO-O4O-POP-LIBRARY-INTEGRATION-V1: POP 자료 관리
+// WO-O4O-POP-LIBRARY-INTEGRATION-V1: POP 결과물 관리
 export { StorePopPage } from './StorePopPage';
 
 // WO-O4O-MARKETING-ANALYTICS-V1: 마케팅 분석
 export { MarketingAnalyticsPage } from './MarketingAnalyticsPage';
-
-// WO-O4O-STORE-MARKETING-DASHBOARD-V1: 마케팅 대시보드
-export { StoreMarketingDashboardPage } from './StoreMarketingDashboardPage';
 
 // WO-KPA-A-STORE-HOME-AND-SIDEBAR-RESTRUCTURE-V1: 종합 홈
 export { StoreHomePage } from './StoreHomePage';

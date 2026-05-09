@@ -174,11 +174,11 @@ export function StoreHomePage() {
               </Link>
               <Link to="/store/marketing/qr" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
                 <QrCode size={16} className="text-primary" />
-                <span>QR 관리</span>
+                <span>QR 코드</span>
               </Link>
               <Link to="/store/marketing/pop" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
                 <Megaphone size={16} className="text-amber-500" />
-                <span>POP 자료</span>
+                <span>POP</span>
               </Link>
               <Link to="/store/content/blog" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
                 <Newspaper size={16} className="text-pink-500" />

@@ -67,7 +67,7 @@ export function MarketingAnalyticsPage() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
             <Link to="/store" style={{ color: colors.neutral400, fontSize: '13px', textDecoration: 'none' }}>
-              매장 관리
+              매장 실행
             </Link>
             <span style={{ color: colors.neutral300 }}>/</span>
             <span style={{ color: colors.neutral600, fontSize: '13px' }}>마케팅 분석</span>
