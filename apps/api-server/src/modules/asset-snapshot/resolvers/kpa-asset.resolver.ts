@@ -3,8 +3,10 @@
  *
  * WO-O4O-ASSET-COPY-CORE-EXTRACTION-V1
  * WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1: lesson type 추가 (Reference Metadata 방식)
+ * WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1: content type 추가
+ *   (kpa_contents 콘텐츠 허브 → 자료함 Full Copy 경로)
  *
- * Resolves KPA community CMS, Signage, and LMS Course assets
+ * Resolves KPA community CMS, Signage, LMS Course, KPA Content assets
  * into the standard ResolvedContent format.
  */
 
@@ -25,6 +27,9 @@ export class KpaAssetResolver implements ContentResolver {
     }
     if (assetType === 'lesson') {
       return this.resolveLesson(sourceAssetId);
+    }
+    if (assetType === 'content') {
+      return this.resolveContent(sourceAssetId);
     }
     return null;
   }
@@ -106,6 +111,51 @@ export class KpaAssetResolver implements ContentResolver {
         visibility: course.visibility,
         publicUrl: `/lms/course/${course.id}`,
         sourceService: 'kpa',
+        capturedAt: new Date().toISOString(),
+      },
+    };
+  }
+
+  /**
+   * WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1
+   *
+   * KPA 콘텐츠 허브(`kpa_contents`)의 문서형/코스형 콘텐츠를 매장 자료함으로 Full Copy.
+   * 콘텐츠 본문(body / blocks)이 자료함에서 직접 사용되어 POP/QR/블로그 제작에 활용된다.
+   *
+   * Gate: is_deleted = false 인 콘텐츠만 가져갈 수 있다. status 게이트는 운영자가
+   * 작성한 콘텐츠도 매장이 가져갈 수 있어야 하므로 본 단계에서는 적용하지 않는다.
+   */
+  private async resolveContent(id: string): Promise<ResolvedContent | null> {
+    const rows = await this.dataSource.query(
+      `SELECT id, title, summary, body, blocks, tags, category, status,
+              content_type, sub_type, source_type, source_url, source_file_name,
+              thumbnail_url, author_name
+       FROM kpa_contents
+       WHERE id = $1 AND is_deleted = false
+       LIMIT 1`,
+      [id],
+    );
+    if (!rows || rows.length === 0) return null;
+    const c = rows[0];
+
+    return {
+      title: c.title,
+      type: 'content',
+      sourceService: 'kpa',
+      contentJson: {
+        title: c.title,
+        summary: c.summary,
+        body: c.body,
+        blocks: c.blocks,
+        tags: c.tags,
+        category: c.category,
+        contentType: c.content_type,
+        subType: c.sub_type,
+        sourceType: c.source_type,
+        sourceUrl: c.source_url,
+        sourceFileName: c.source_file_name,
+        thumbnailUrl: c.thumbnail_url,
+        authorName: c.author_name,
         capturedAt: new Date().toISOString(),
       },
     };

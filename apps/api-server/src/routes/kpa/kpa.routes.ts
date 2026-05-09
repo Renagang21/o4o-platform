@@ -1652,6 +1652,15 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     }));
 
     // ── Copy to Store ──────────────────────────────────────────────────────
+    //
+    // @deprecated WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1
+    //   사용자 경로의 "내 자료함 가져가기"는 표준 자료함(o4o_asset_snapshots) 시스템으로 이전됨.
+    //   콘텐츠 허브의 ContentListPage / ContentDocumentsPage 는 이제
+    //   `POST /assets/copy { sourceAssetId, assetType: 'content' }` 를 호출한다.
+    //
+    //   본 엔드포인트(kpa_working_contents 저장 경로)는 운영자(operator)의 working copy
+    //   편집/발행 흐름(WorkingContentListPage, WorkingContentEditPage)에서 여전히 사용되므로
+    //   당장 제거하지 않는다. 후속 WO에서 운영자 경로 통합 후 deprecate 종료.
 
     // POST /contents/:id/copy-to-store
     contentRouter.post('/:id/copy-to-store', authenticate, asyncHandler(async (req: Request, res: Response) => {

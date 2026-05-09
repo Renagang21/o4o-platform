@@ -25,6 +25,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { contentApi, type ContentItem } from '../../api/content';
+import { assetSnapshotApi } from '../../api/assetSnapshot';
 import { lmsApi } from '../../api/lms';
 import { participationApi } from '../../api/participation';
 import type { Course } from '../../types';
@@ -145,13 +146,24 @@ function DocumentsSection({
     setDrawerDetail(null);
   }, []);
 
+  // WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1
+  // assetSnapshotApi.copy() — o4o_asset_snapshots 표준 자료함에 저장 (assetType='content').
+  // 가져온 콘텐츠는 /library/contents 페이지에서 보이며 POP/QR/블로그 제작에서 선택 가능.
   const handleCopyToStore = useCallback(async (id: string) => {
     setCopying(id);
     try {
-      await contentApi.copyToStore(id);
+      await assetSnapshotApi.copy({
+        sourceService: 'kpa',
+        sourceAssetId: id,
+        assetType: 'content',
+      });
       toast.success('내 자료함에 가져왔습니다');
     } catch (e: any) {
-      toast.error(e?.message || '가져오기에 실패했습니다');
+      if (e?.code === 'DUPLICATE_SNAPSHOT') {
+        toast.success('이미 자료함에 있습니다');
+      } else {
+        toast.error(e?.message || '가져오기에 실패했습니다');
+      }
     } finally {
       setCopying(null);
     }

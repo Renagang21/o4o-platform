@@ -22,7 +22,8 @@ export interface StoreAssetItem {
   sourceService: string;
   sourceAssetId: string;
   // WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1: 'lesson' 추가 (LMS 강의 Reference Metadata)
-  assetType: 'cms' | 'signage' | 'lesson';
+  // WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1: 'content' 추가 (KPA 콘텐츠 허브 Full Copy)
+  assetType: 'cms' | 'signage' | 'lesson' | 'content';
   title: string;
   // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1: lesson 항목 메타(thumbnail/instructor/lessonCount/publicUrl) 표시용
   contentJson?: Record<string, unknown>;
@@ -42,7 +43,8 @@ export interface StoreAssetItem {
 }
 
 // WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1: 'lesson' 추가
-export type TabKey = 'all' | 'cms' | 'signage' | 'lesson';
+// WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1: 'content' 추가
+export type TabKey = 'all' | 'cms' | 'signage' | 'lesson' | 'content';
 export type StatusFilter = 'all' | 'published' | 'draft' | 'hidden';
 export type PolicyFilter = 'all' | 'user_copy' | 'hq_forced' | 'campaign_push' | 'expiring_soon' | 'expired';
 export type ChannelFilter = 'all' | 'home' | 'signage' | 'promotion';

@@ -104,6 +104,11 @@ export const contentApi = {
   trackView: (id: string) =>
     apiClient.post<{ success: boolean }>(`/contents/${id}/view`),
 
+  /**
+   * @deprecated WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1
+   * 사용자 경로 가져가기는 `assetSnapshotApi.copy({ assetType: 'content' })` 로 교체됨.
+   * 본 메서드는 운영자(operator) working copy 편집/발행 흐름에서만 유지된다.
+   */
   copyToStore: (id: string) =>
     apiClient.post<{ success: boolean }>(`/contents/${id}/copy-to-store`),
 };
