@@ -196,7 +196,8 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
     { label: '', items: [
       { key: 'home', label: '홈', subPath: '' },
     ]},
-    { label: '상품', items: [
+    // WO-O4O-STORE-SIDEBAR-MENU-UX-IMPROVEMENT-V1: 섹션 라벨을 기능 중심 명칭으로 정렬
+    { label: '상품 관리', items: [
       { key: 'products',       label: '공급 상품',           subPath: '/commerce/products' },
       // WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: ProductMaster 기반 매장 진열 (공통 패키지).
       // 기존 local-products(자체 상품)와 의미가 다름 — 라벨에 (통합) 접미로 명시.
@@ -204,12 +205,16 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'local-products', label: '내 매장 상품',        subPath: '/commerce/local-products' },
       { key: 'orders',         label: '주문 내역',           subPath: '/commerce/orders' },
     ]},
-    // 내 자료함 — 매장이 커뮤니티/공급자에서 가져와 보유한 source/reference 보관함.
+    // WO-O4O-STORE-SIDEBAR-MENU-UX-IMPROVEMENT-V1:
+    //   "내 자료함" → "마케팅 자료함" (제작 시작 진입 의미 명확화)
+    //   "자료" → "디지털 자료" (PDF/이미지/문서/복사 자료 등 저장 성격 명시)
+    //   "콘텐츠" 라벨은 유지 (이미 사용자에 익숙, AI 콘텐츠 흐름과 연결)
+    // 매장이 커뮤니티/공급자에서 가져와 보유한 source/reference 보관함.
     // 제작 시작(POP/QR/블로그/상품 상세설명)은 본 그룹에서만 진입.
     // (강좌/레슨형 콘텐츠는 콘텐츠 항목 내부에서 type 표시만, 별도 그룹 금지)
-    { label: '내 자료함', items: [
-      { key: 'library-contents',  label: '콘텐츠', subPath: '/library/contents' },
-      { key: 'library-resources', label: '자료',   subPath: '/library/resources' },
+    { label: '마케팅 자료함', items: [
+      { key: 'library-contents',  label: '콘텐츠',     subPath: '/library/contents' },
+      { key: 'library-resources', label: '디지털 자료', subPath: '/library/resources' },
     ]},
     { label: '디지털 사이니지', items: [
       { key: 'signage-playlist',  label: '플레이리스트', subPath: '/marketing/signage/playlist' },

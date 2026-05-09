@@ -7,7 +7,8 @@
  * 서비스 컨텍스트 표시는 TopBar에서만 처리 (사이드바에서는 제거)
  */
 
-import { NavLink } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   Store,
@@ -42,6 +43,8 @@ import {
   ListVideo,
   Calendar,
   Play,
+  ChevronDown,
+  ChevronRight,
 } from 'lucide-react';
 import type { StoreDashboardConfig, StoreMenuKey } from '../config/storeMenuConfig';
 import { ALL_STORE_MENUS } from '../config/storeMenuConfig';
@@ -120,6 +123,61 @@ export function StoreSidebar({
     config.enabledMenus.includes(item.key),
   );
 
+  // WO-O4O-STORE-SIDEBAR-MENU-UX-IMPROVEMENT-V1:
+  //   섹션 라벨이 있는 그룹은 accordion(expand/collapse) 적용.
+  //   라벨이 빈 문자열인 그룹(예: "홈" 단독)은 항상 평면 노출 — 기존 동작 유지.
+  //   현재 active route 가 속한 섹션은 자동 펼침. 사용자는 chevron 클릭으로 토글 가능.
+  const location = useLocation();
+  const sections = config.menuSections;
+
+  const isItemActive = (itemSubPath: string): boolean => {
+    const full = `${config.basePath}${itemSubPath}`;
+    if (itemSubPath === '') {
+      // 인덱스(/store) 는 정확 일치만 active 로 간주 — 하위 경로가 인덱스를 끌어가지 않도록.
+      return location.pathname === full || location.pathname === `${full}/`;
+    }
+    return (
+      location.pathname === full ||
+      location.pathname.startsWith(`${full}/`)
+    );
+  };
+
+  // section index → active 여부
+  const activeSectionIdx = useMemo(() => {
+    if (!sections) return -1;
+    return sections.findIndex(
+      (s) => s.label && s.items.some((item) => isItemActive(item.subPath)),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sections, location.pathname, config.basePath]);
+
+  // expanded section index 집합. 초기값에 active 섹션 포함.
+  const [expanded, setExpanded] = useState<Set<number>>(() => {
+    const init = new Set<number>();
+    if (activeSectionIdx >= 0) init.add(activeSectionIdx);
+    return init;
+  });
+
+  // active 섹션이 바뀌면 자동으로 펼침에 포함 (사용자가 수동으로 접은 것은 유지).
+  useEffect(() => {
+    if (activeSectionIdx < 0) return;
+    setExpanded((prev) => {
+      if (prev.has(activeSectionIdx)) return prev;
+      const next = new Set(prev);
+      next.add(activeSectionIdx);
+      return next;
+    });
+  }, [activeSectionIdx]);
+
+  const toggleSection = (idx: number) => {
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(idx)) next.delete(idx);
+      else next.add(idx);
+      return next;
+    });
+  };
+
   return (
     <div className="flex flex-col h-full">
       {/* Sidebar Header */}
@@ -142,43 +200,66 @@ export function StoreSidebar({
 
       {/* Navigation */}
       <nav className="flex-1 p-4 overflow-y-auto">
-        {config.menuSections ? (
-          /* Section-based rendering */
-          <div className="space-y-4">
-            {config.menuSections.map((section, sIdx) => (
-              <div key={sIdx}>
-                {section.label && (
-                  <div className="px-4 py-1 text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                    {section.label}
-                  </div>
-                )}
-                <div className="space-y-1">
-                  {section.items.map((item) => {
-                    const Icon = SECTION_ICONS[item.key] || FileText;
-                    const fullPath = `${config.basePath}${item.subPath}`;
+        {sections ? (
+          /* Section-based rendering with accordion (WO-O4O-STORE-SIDEBAR-MENU-UX-IMPROVEMENT-V1) */
+          <div className="space-y-2">
+            {sections.map((section, sIdx) => {
+              const hasLabel = Boolean(section.label);
+              const isExpanded = !hasLabel || expanded.has(sIdx);
+              const sectionContainsActive =
+                hasLabel && section.items.some((item) => isItemActive(item.subPath));
 
-                    return (
-                      <NavLink
-                        key={item.key}
-                        to={fullPath}
-                        end={item.key === 'dashboard' || item.key === 'home'}
-                        onClick={onItemClick}
-                        className={({ isActive }) =>
-                          `flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                            isActive
-                              ? 'bg-teal-100 text-teal-700'
-                              : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                          }`
-                        }
-                      >
-                        <Icon className="w-4 h-4" />
-                        {item.label}
-                      </NavLink>
-                    );
-                  })}
+              return (
+                <div key={sIdx}>
+                  {hasLabel && (
+                    <button
+                      type="button"
+                      onClick={() => toggleSection(sIdx)}
+                      aria-expanded={isExpanded}
+                      className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                        sectionContainsActive
+                          ? 'text-teal-700 bg-teal-50/60 hover:bg-teal-50'
+                          : 'text-slate-700 hover:bg-slate-50'
+                      }`}
+                    >
+                      <span className="tracking-wide">{section.label}</span>
+                      {isExpanded ? (
+                        <ChevronDown className="w-4 h-4 shrink-0" />
+                      ) : (
+                        <ChevronRight className="w-4 h-4 shrink-0" />
+                      )}
+                    </button>
+                  )}
+                  {isExpanded && (
+                    <div className={`space-y-1 ${hasLabel ? 'mt-1 ml-2 pl-2 border-l border-slate-100' : ''}`}>
+                      {section.items.map((item) => {
+                        const Icon = SECTION_ICONS[item.key] || FileText;
+                        const fullPath = `${config.basePath}${item.subPath}`;
+
+                        return (
+                          <NavLink
+                            key={item.key}
+                            to={fullPath}
+                            end={item.key === 'dashboard' || item.key === 'home'}
+                            onClick={onItemClick}
+                            className={({ isActive }) =>
+                              `flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                                isActive
+                                  ? 'bg-teal-100 text-teal-700'
+                                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                              }`
+                            }
+                          >
+                            <Icon className="w-4 h-4" />
+                            {item.label}
+                          </NavLink>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           /* Flat rendering (backward-compat) */
