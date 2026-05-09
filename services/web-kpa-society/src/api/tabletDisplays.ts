@@ -123,3 +123,35 @@ export async function fetchProductPool(
   );
   return res.data;
 }
+
+// ==================== Idle Playlist (WO-O4O-TABLET-IDLE-PLAYLIST-EDITOR-V1) ====================
+
+import type { IdlePlaylistItem } from '@o4o/tablet-kiosk-core';
+
+/**
+ * Tablet idle playlist 조회 (admin).
+ * 값이 없거나 에러 시 빈 배열 반환은 호출자가 처리.
+ */
+export async function fetchTabletIdlePlaylist(
+  tabletId: string,
+): Promise<IdlePlaylistItem[]> {
+  const res = await request<{ success: boolean; data: { items: IdlePlaylistItem[] } }>(
+    `${BASE}/tablets/${tabletId}/idle-playlist`,
+  );
+  return Array.isArray(res.data?.items) ? res.data.items : [];
+}
+
+/**
+ * Tablet idle playlist 저장 (전체 교체).
+ * 빈 배열 허용 — kiosk 는 placeholder 표시.
+ */
+export async function saveTabletIdlePlaylist(
+  tabletId: string,
+  items: IdlePlaylistItem[],
+): Promise<IdlePlaylistItem[]> {
+  const res = await request<{ success: boolean; data: { items: IdlePlaylistItem[] } }>(
+    `${BASE}/tablets/${tabletId}/idle-playlist`,
+    { method: 'PUT', body: JSON.stringify({ items }) },
+  );
+  return Array.isArray(res.data?.items) ? res.data.items : [];
+}

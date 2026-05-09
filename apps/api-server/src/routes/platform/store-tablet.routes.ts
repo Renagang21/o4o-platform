@@ -3,6 +3,7 @@
  *
  * WO-STORE-LOCAL-PRODUCT-DISPLAY-V1
  * WO-O4O-TABLET-MODULE-V1
+ * WO-O4O-TABLET-IDLE-PLAYLIST-EDITOR-V1: idle playlist 편집 API 추가
  *
  * Tablet은 상품을 "소유"하지 않는다. 상품을 "선택하여 진열"한다.
  * 상품 풀: supplier (organization_product_listings) + local (store_local_products)
@@ -18,6 +19,8 @@
  * │  GET    /tablets/:id/displays        — 진열 구성 조회    │
  * │  PUT    /tablets/:id/displays        — 진열 구성 저장    │
  * │  GET    /tablets/:id/product-pool    — 상품 풀 조회      │
+ * │  GET    /tablets/:id/idle-playlist   — idle playlist 조회 │
+ * │  PUT    /tablets/:id/idle-playlist   — idle playlist 저장 │
  * │                                                          │
  * │  POST   /products/register-by-barcode — 바코드 등록      │
  * │                                                          │
@@ -399,6 +402,146 @@ export function createStoreTabletRoutes(
       res.status(500).json({
         success: false,
         error: 'Failed to save displays',
+        code: 'INTERNAL_ERROR',
+      });
+    }
+  }));
+
+  // ─── Idle Playlist (WO-O4O-TABLET-IDLE-PLAYLIST-EDITOR-V1) ─────────────────
+  //
+  // 정책:
+  // - 매장당 N 개 tablet 등록 가능하나 device pairing 부재로 kiosk URL 에서 식별 불가
+  // - 따라서 매장 단위 설정으로 운영. 단 storage 자체는 tablet row 컬럼 (idle_playlist_items)
+  //   에 저장 → device pairing 도입 시 tablet 별 설정으로 자연스럽게 진화 가능
+  // - GET /tablets/:id/idle-playlist 는 admin 전용 (편집 화면에서 사용)
+  // - 공개 kiosk fetch 는 별도 GET /:slug/tablet/idle 사용 (매장의 첫 active tablet row)
+
+  /**
+   * Validate idle playlist items.
+   * 형식: [{ type: 'image'|'video', url: string, durationMs?: number }, ...]
+   */
+  function validateIdlePlaylistItems(items: unknown): { items: any[] } | string {
+    if (!Array.isArray(items)) {
+      return 'items must be an array';
+    }
+    const out: any[] = [];
+    for (let i = 0; i < items.length; i++) {
+      const it = items[i] as any;
+      if (!it || typeof it !== 'object') {
+        return `items[${i}] must be an object`;
+      }
+      if (it.type !== 'image' && it.type !== 'video') {
+        return `items[${i}].type must be 'image' or 'video'`;
+      }
+      if (typeof it.url !== 'string' || it.url.trim().length === 0) {
+        return `items[${i}].url must be a non-empty string`;
+      }
+      const url = it.url.trim();
+      // 보수적 검증: http(s) 또는 / 시작 (relative)
+      if (!/^https?:\/\//i.test(url) && !url.startsWith('/')) {
+        return `items[${i}].url must start with http(s):// or /`;
+      }
+      let durationMs: number | undefined;
+      if (it.durationMs !== undefined && it.durationMs !== null) {
+        const n = Number(it.durationMs);
+        if (!Number.isFinite(n) || n < 1000) {
+          return `items[${i}].durationMs must be >= 1000`;
+        }
+        durationMs = Math.floor(n);
+      }
+      const record: any = { type: it.type, url };
+      if (durationMs !== undefined) record.durationMs = durationMs;
+      out.push(record);
+    }
+    return { items: out };
+  }
+
+  /**
+   * GET /tablets/:id/idle-playlist
+   * Tablet idle playlist 조회 (admin)
+   */
+  router.get('/tablets/:id/idle-playlist', withStoreAuth(async (req, res, organizationId) => {
+    try {
+      const tabletId = req.params.id;
+
+      const rows = await dataSource.query(
+        `SELECT idle_playlist_items
+         FROM store_tablets
+         WHERE id = $1 AND organization_id = $2`,
+        [tabletId, organizationId],
+      );
+
+      if (!rows.length) {
+        res.status(404).json({
+          success: false,
+          error: 'Tablet not found',
+          code: 'NOT_FOUND',
+        });
+        return;
+      }
+
+      const items = Array.isArray(rows[0].idle_playlist_items)
+        ? rows[0].idle_playlist_items
+        : [];
+
+      res.json({ success: true, data: { items } });
+    } catch (error: any) {
+      console.error('[StoreTablet] GET /tablets/:id/idle-playlist error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch idle playlist',
+        code: 'INTERNAL_ERROR',
+      });
+    }
+  }));
+
+  /**
+   * PUT /tablets/:id/idle-playlist
+   * Tablet idle playlist 저장 (전체 교체)
+   *
+   * Body: { items: IdlePlaylistItem[] }
+   * 빈 배열 허용 (idle 화면에서 placeholder 표시).
+   */
+  router.put('/tablets/:id/idle-playlist', withStoreAuth(async (req, res, organizationId) => {
+    try {
+      const tabletId = req.params.id;
+
+      const validation = validateIdlePlaylistItems(req.body?.items);
+      if (typeof validation === 'string') {
+        res.status(400).json({
+          success: false,
+          error: validation,
+          code: 'VALIDATION_ERROR',
+        });
+        return;
+      }
+
+      const updateResult = await dataSource.query(
+        `UPDATE store_tablets
+         SET idle_playlist_items = $1::jsonb
+         WHERE id = $2 AND organization_id = $3
+         RETURNING idle_playlist_items`,
+        [JSON.stringify(validation.items), tabletId, organizationId],
+      );
+
+      if (!updateResult?.[0]) {
+        res.status(404).json({
+          success: false,
+          error: 'Tablet not found',
+          code: 'NOT_FOUND',
+        });
+        return;
+      }
+
+      res.json({
+        success: true,
+        data: { items: updateResult[0].idle_playlist_items ?? [] },
+      });
+    } catch (error: any) {
+      console.error('[StoreTablet] PUT /tablets/:id/idle-playlist error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to save idle playlist',
         code: 'INTERNAL_ERROR',
       });
     }

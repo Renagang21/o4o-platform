@@ -2,22 +2,33 @@
  * Store Tablet Displays Management Page
  *
  * WO-O4O-STORE-LOCAL-PRODUCT-UI-V1
+ * WO-O4O-TABLET-IDLE-PLAYLIST-EDITOR-V1: Idle 재생 목록 편집 섹션 추가
  *
  * Tablet display configuration: mix supplier + local products.
  * Uses store_tablet_displays with product_type discriminator.
+ *
+ * 페이지 구성:
+ *   1. 진열 상품 (Pool / Display grid + 자체 저장)
+ *   2. Idle 재생 목록 (IdlePlaylistEditor + 자체 저장)
+ *      - 매장 단위 설정 (device pairing 부재로 매장당 N tablet 동일 idle 사용)
+ *      - 데이터는 store_tablets.idle_playlist_items JSONB 에 저장
+ *      - kiosk runtime 은 매장의 첫 active tablet row 의 값을 사용 (public API)
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Loader2, Tablet, ChevronUp, ChevronDown, X, Plus,
-  ArrowLeft, Save, Package, ShoppingBag, AlertTriangle,
+  ArrowLeft, Save, Package, ShoppingBag, AlertTriangle, Tv,
 } from 'lucide-react';
+import { IdlePlaylistEditor, type IdlePlaylistItem } from '@o4o/tablet-kiosk-core';
 import {
   fetchTablets,
   fetchTabletDisplays,
   fetchProductPool,
   saveTabletDisplays,
+  fetchTabletIdlePlaylist,
+  saveTabletIdlePlaylist,
 } from '../../api/tabletDisplays';
 import type { Tablet as TabletType, ProductPool } from '../../api/tabletDisplays';
 
@@ -52,6 +63,11 @@ export default function StoreTabletDisplaysPage() {
   const [poolTab, setPoolTab] = useState<'supplier' | 'local'>('supplier');
   const [selectedPoolIds, setSelectedPoolIds] = useState<Set<string>>(new Set());
 
+  // Idle playlist state (WO-O4O-TABLET-IDLE-PLAYLIST-EDITOR-V1)
+  const [idleItems, setIdleItems] = useState<IdlePlaylistItem[]>([]);
+  const [idleInitial, setIdleInitial] = useState<IdlePlaylistItem[]>([]);
+  const [savingIdle, setSavingIdle] = useState(false);
+
   // Toast
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -83,17 +99,20 @@ export default function StoreTabletDisplaysPage() {
     })();
   }, []);
 
-  // Load pool + displays when tablet changes
+  // Load pool + displays + idle playlist when tablet changes
   const loadTabletData = useCallback(async () => {
     if (!selectedTabletId) return;
     setLoadingPool(true);
     setError(null);
     try {
-      const [poolData, displayData] = await Promise.all([
+      const [poolData, displayData, idleData] = await Promise.all([
         fetchProductPool(selectedTabletId),
         fetchTabletDisplays(selectedTabletId),
+        fetchTabletIdlePlaylist(selectedTabletId).catch(() => [] as IdlePlaylistItem[]),
       ]);
       setPool(poolData);
+      setIdleItems(idleData);
+      setIdleInitial(idleData);
 
       // Map display items to entries with product names
       const entries: DisplayEntry[] = displayData.map((d) => {
@@ -211,6 +230,25 @@ export default function StoreTabletDisplaysPage() {
     }
   };
 
+  // Idle changes detection (shallow JSON compare)
+  const idleHasChanges = JSON.stringify(idleItems) !== JSON.stringify(idleInitial);
+
+  // Save idle playlist (WO-O4O-TABLET-IDLE-PLAYLIST-EDITOR-V1)
+  const handleSaveIdle = async () => {
+    if (!selectedTabletId) return;
+    setSavingIdle(true);
+    try {
+      const saved = await saveTabletIdlePlaylist(selectedTabletId, idleItems);
+      setIdleItems(saved);
+      setIdleInitial(saved);
+      setToast({ type: 'success', message: 'Idle 재생 목록이 저장되었습니다.' });
+    } catch (err: any) {
+      setToast({ type: 'error', message: err.message || 'Idle 저장에 실패했습니다.' });
+    } finally {
+      setSavingIdle(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -296,6 +334,38 @@ export default function StoreTabletDisplaysPage() {
             <div className="flex items-center justify-center py-12">
               <Loader2 className="w-6 h-6 text-teal-600 animate-spin" />
               <span className="ml-3 text-slate-400">데이터 로딩 중...</span>
+            </div>
+          )}
+
+          {/* Idle Playlist Editor (WO-O4O-TABLET-IDLE-PLAYLIST-EDITOR-V1) */}
+          {!loadingPool && (
+            <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+              <div className="px-4 py-3 border-b bg-slate-50 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Tv className="w-4 h-4 text-slate-600" />
+                  <h3 className="text-sm font-bold text-slate-700">Idle 재생 목록</h3>
+                  {idleHasChanges && (
+                    <span className="text-xs text-amber-600 font-medium bg-amber-50 px-2 py-0.5 rounded">
+                      변경사항 있음
+                    </span>
+                  )}
+                </div>
+                <button
+                  onClick={handleSaveIdle}
+                  disabled={!idleHasChanges || savingIdle}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-teal-600 text-white text-xs font-medium rounded-lg hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {savingIdle ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                  Idle 저장
+                </button>
+              </div>
+              <div className="p-4">
+                <p className="text-xs text-slate-500 mb-3">
+                  매장이 일정 시간 사용되지 않을 때 태블릿이 자동으로 보여줄 이미지/영상 목록입니다.
+                  고객이 화면을 터치하면 즉시 상품 안내 화면으로 돌아갑니다.
+                </p>
+                <IdlePlaylistEditor items={idleItems} onChange={setIdleItems} disabled={savingIdle} />
+              </div>
             </div>
           )}
 

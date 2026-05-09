@@ -7,6 +7,10 @@
 export { TabletKioskPage } from './TabletKioskPage';
 export type { TabletKioskPageProps } from './TabletKioskPage';
 
+// WO-O4O-TABLET-IDLE-PLAYLIST-EDITOR-V1
+export { IdlePlaylistEditor } from './IdlePlaylistEditor';
+export type { IdlePlaylistEditorProps } from './IdlePlaylistEditor';
+
 export type {
   TabletProduct,
   TabletProductsResponse,

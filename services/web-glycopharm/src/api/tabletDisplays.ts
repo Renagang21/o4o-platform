@@ -78,3 +78,22 @@ export async function fetchProductPool(
   const res = await api.get(`/store/tablets/${tabletId}/product-pool`);
   return res.data?.data;
 }
+
+// ==================== Idle Playlist (WO-O4O-TABLET-IDLE-PLAYLIST-EDITOR-V1) ====================
+
+import type { IdlePlaylistItem } from '@o4o/tablet-kiosk-core';
+
+export async function fetchTabletIdlePlaylist(
+  tabletId: string,
+): Promise<IdlePlaylistItem[]> {
+  const res = await api.get(`/store/tablets/${tabletId}/idle-playlist`);
+  return Array.isArray(res.data?.data?.items) ? res.data.data.items : [];
+}
+
+export async function saveTabletIdlePlaylist(
+  tabletId: string,
+  items: IdlePlaylistItem[],
+): Promise<IdlePlaylistItem[]> {
+  const res = await api.put(`/store/tablets/${tabletId}/idle-playlist`, { items });
+  return Array.isArray(res.data?.data?.items) ? res.data.data.items : [];
+}
