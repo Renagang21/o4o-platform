@@ -318,6 +318,28 @@ export function createMemberController(
 
         const [members, total] = await qb.getManyAndCount();
 
+        // WO-O4O-KPA-MEMBER-PROFILE-CAPABILITY-COLUMN-ADD-V1:
+        //   role_assignments 의 active role 을 user_id 별 batch 로 조회 후 attach.
+        //   leftJoinAndSelect 로 직접 join 하면 row duplication 발생하므로 별도 aggregate.
+        //   activity_type 은 KpaMember entity 컬럼이라 getManyAndCount() 가 자동 반환.
+        const userIds = members.map((m) => m.user_id).filter((id): id is string => Boolean(id));
+        const capabilityMap = new Map<string, string[]>();
+        if (userIds.length > 0) {
+          const rows = await dataSource.query(
+            `SELECT user_id, role FROM role_assignments WHERE user_id = ANY($1::uuid[]) AND is_active = true`,
+            [userIds],
+          );
+          for (const row of rows as Array<{ user_id: string; role: string }>) {
+            if (!row.user_id || !row.role) continue;
+            const list = capabilityMap.get(row.user_id) ?? [];
+            list.push(row.role);
+            capabilityMap.set(row.user_id, list);
+          }
+        }
+        for (const m of members) {
+          (m as any).capabilities = capabilityMap.get(m.user_id) ?? [];
+        }
+
         res.json({
           data: members,
           total,

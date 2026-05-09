@@ -40,6 +40,7 @@ import {
   buildRowActions,
 } from '@o4o/operator-ux-core';
 import type { ListColumnDef, MemberTab } from '@o4o/operator-ux-core';
+import { ACTIVITY_TYPE_LABELS } from '../../contexts/AuthContext';
 import { apiClient } from '../../api/client';
 
 // ─── Types ───────────────────────────────────────────────────
@@ -58,6 +59,9 @@ interface KpaMember {
   membership_type: 'pharmacist' | 'student';
   license_number: string | null;
   pharmacy_name: string | null;
+  // WO-O4O-KPA-MEMBER-PROFILE-CAPABILITY-COLUMN-ADD-V1: profile + capability
+  activity_type?: string | null;       // kpa_members.activity_type (profile metadata)
+  capabilities?: string[];             // role_assignments active roles (capability SSOT)
   joined_at: string | null;
   created_at: string;
   updated_at: string;
@@ -96,6 +100,41 @@ const roleLabels: Record<MemberRole, string> = {
   operator: '운영자',
   admin: '관리자',
 };
+
+// WO-O4O-KPA-MEMBER-PROFILE-CAPABILITY-COLUMN-ADD-V1:
+//   role_assignments role 키 → 사용자 표시 라벨.
+//   알려진 키만 매핑하고, 미매핑 키는 raw 값으로 안전하게 표시.
+const CAPABILITY_LABELS: Record<string, string> = {
+  'kpa:store_owner': '매장 운영',
+  'kpa:operator': '운영자',
+  'kpa:admin': '관리자',
+  'kpa:pharmacist': '약사',
+  'lms:instructor': '강사',
+  'platform:super_admin': '플랫폼 관리자',
+};
+
+/** capability chip 정렬: store_owner → operator → admin → 그 외 */
+const CAPABILITY_PRIORITY: Record<string, number> = {
+  'platform:super_admin': 0,
+  'kpa:admin': 1,
+  'kpa:operator': 2,
+  'kpa:store_owner': 3,
+  'lms:instructor': 4,
+  'kpa:pharmacist': 5,
+};
+
+function sortCapabilities(caps: string[]): string[] {
+  return [...caps].sort((a, b) => {
+    const pa = CAPABILITY_PRIORITY[a] ?? 99;
+    const pb = CAPABILITY_PRIORITY[b] ?? 99;
+    if (pa !== pb) return pa - pb;
+    return a.localeCompare(b);
+  });
+}
+
+function formatCapabilityLabel(role: string): string {
+  return CAPABILITY_LABELS[role] ?? role;
+}
 
 const appStatusConfig: Record<ApplicationStatus, { label: string; color: string; bg: string }> = {
   submitted: { label: '대기', color: 'text-amber-700', bg: 'bg-amber-50' },
@@ -555,11 +594,51 @@ export default function MemberManagementPage() {
         </span>
       ),
     },
+    // WO-O4O-KPA-MEMBER-PROFILE-CAPABILITY-COLUMN-ADD-V1:
+    //   activity_type = profile metadata (자기소개) — 자유 변경 가능
     {
+      key: 'activity_type',
+      header: '활동 유형',
+      width: '120px',
+      render: (_v, m) => (
+        <span className="text-sm text-slate-600">
+          {m.activity_type ? (ACTIVITY_TYPE_LABELS[m.activity_type] ?? m.activity_type) : '-'}
+        </span>
+      ),
+    },
+    {
+      // 라벨 변경: '역할' → '조직 역할' (capability 컬럼과 혼동 방지)
+      // kpa_members.role 은 회원/운영자/관리자 (조직 내 역할). RBAC capability 와 다름.
       key: 'role',
-      header: '역할',
-      width: '80px',
+      header: '조직 역할',
+      width: '90px',
       render: (_v, m) => <span className="text-sm text-slate-600">{roleLabels[m.role]}</span>,
+    },
+    // WO-O4O-KPA-MEMBER-PROFILE-CAPABILITY-COLUMN-ADD-V1:
+    //   capabilities = role_assignments active roles (RBAC SSOT) — 승인 절차로만 부여/회수
+    {
+      key: 'capabilities',
+      header: '권한',
+      width: '180px',
+      render: (_v, m) => {
+        const caps = sortCapabilities(m.capabilities ?? []);
+        if (caps.length === 0) {
+          return <span className="text-xs text-slate-400">일반 회원</span>;
+        }
+        return (
+          <div className="flex flex-wrap gap-1">
+            {caps.map((cap) => (
+              <span
+                key={cap}
+                title={cap}
+                className="inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700"
+              >
+                {formatCapabilityLabel(cap)}
+              </span>
+            ))}
+          </div>
+        );
+      },
     },
     {
       key: 'status',
@@ -789,10 +868,15 @@ export default function MemberManagementPage() {
               </div>
             </div>
 
-            {/* 상세 필드 */}
+            {/* 상세 필드 — WO-O4O-KPA-MEMBER-PROFILE-CAPABILITY-COLUMN-ADD-V1:
+                활동 유형(profile metadata) + 조직 역할(kpa_members.role) 분리.
+                권한(capabilities) 은 chip 으로 별도 렌더 (아래). */}
             {([
               { label: '유형', value: selectedMember.membership_type === 'pharmacist' ? '약사' : '약대생' },
-              { label: '역할', value: roleLabels[selectedMember.role] },
+              selectedMember.activity_type
+                ? { label: '활동 유형', value: ACTIVITY_TYPE_LABELS[selectedMember.activity_type] ?? selectedMember.activity_type }
+                : null,
+              { label: '조직 역할', value: roleLabels[selectedMember.role] },
               selectedMember.license_number ? { label: '면허번호', value: selectedMember.license_number } : null,
               selectedMember.pharmacy_name ? { label: '약국명', value: selectedMember.pharmacy_name } : null,
               { label: '가입일', value: formatDate(selectedMember.joined_at || selectedMember.created_at) },
@@ -802,6 +886,31 @@ export default function MemberManagementPage() {
                 <span style={{ color: '#1e293b' }}>{item!.value}</span>
               </div>
             ))}
+
+            {/* 권한 (capability chips) */}
+            <div style={{ display: 'flex', gap: 12, marginBottom: 10, alignItems: 'flex-start' }}>
+              <span style={{ fontWeight: 600, color: '#64748b', minWidth: 70 }}>권한</span>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {(() => {
+                  const caps = sortCapabilities(selectedMember.capabilities ?? []);
+                  if (caps.length === 0) return <span style={{ color: '#94a3b8', fontSize: 13 }}>일반 회원</span>;
+                  return caps.map((cap) => (
+                    <span
+                      key={cap}
+                      title={cap}
+                      style={{
+                        display: 'inline-flex', alignItems: 'center',
+                        padding: '2px 8px', fontSize: 11, fontWeight: 500,
+                        borderRadius: 9999,
+                        backgroundColor: '#eef2ff', border: '1px solid #c7d2fe', color: '#4338ca',
+                      }}
+                    >
+                      {formatCapabilityLabel(cap)}
+                    </span>
+                  ));
+                })()}
+              </div>
+            </div>
 
             {/* 수정/삭제 링크 */}
             <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid #f1f5f9', display: 'flex', gap: 12 }}>
