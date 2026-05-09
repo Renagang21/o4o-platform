@@ -38,6 +38,7 @@ COPY packages/content-editor/package.json ./packages/content-editor/
 COPY packages/account-ui/package.json ./packages/account-ui/
 COPY packages/lms-client/package.json ./packages/lms-client/
 COPY packages/store-products-ui/package.json ./packages/store-products-ui/
+COPY packages/tablet-kiosk-core/package.json ./packages/tablet-kiosk-core/
 
 # Copy service package.json
 COPY services/web-glycopharm/package.json ./services/web-glycopharm/
@@ -68,6 +69,7 @@ COPY packages/content-editor/ ./packages/content-editor/
 COPY packages/account-ui/ ./packages/account-ui/
 COPY packages/lms-client/ ./packages/lms-client/
 COPY packages/store-products-ui/ ./packages/store-products-ui/
+COPY packages/tablet-kiosk-core/ ./packages/tablet-kiosk-core/
 
 # Copy service source
 COPY services/web-glycopharm/ ./services/web-glycopharm/
