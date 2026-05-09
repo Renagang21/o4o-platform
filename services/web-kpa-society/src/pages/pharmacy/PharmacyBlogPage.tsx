@@ -16,7 +16,11 @@ import {
   publishBlogPost,
   archiveBlogPost,
   deleteBlogPost,
+  // WO-O4O-KPA-STORE-BLOG-META-V1
+  fetchBlogSettings,
+  updateBlogSettings,
   type StaffBlogPost,
+  type StaffBlogSettings,
 } from '../../api/blogStaff';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getStoreSlug } from '../../api/pharmacyInfo';
@@ -42,7 +46,7 @@ function htmlToPlain(html: string): string {
     .trim();
 }
 
-type ViewMode = 'list' | 'editor';
+type ViewMode = 'list' | 'editor' | 'settings';
 type StatusFilter = 'all' | 'draft' | 'published' | 'archived';
 
 const STATUS_LABELS: Record<string, { label: string; color: string; bg: string }> = {
@@ -75,6 +79,18 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
   const [saving, setSaving] = useState(false);
   // WO-O4O-KPA-STORE-BLOG-AI-WIRING-V1: AI 콘텐츠 보조 모달
   const [aiOpen, setAiOpen] = useState(false);
+
+  // WO-O4O-KPA-STORE-BLOG-META-V1: Blog identity 설정
+  const [settings, setSettings] = useState<StaffBlogSettings | null>(null);
+  const [settingsLoading, setSettingsLoading] = useState(false);
+  const [settingsSaving, setSettingsSaving] = useState(false);
+  const [settingsForm, setSettingsForm] = useState({
+    blogName: '',
+    description: '',
+    heroImage: '',
+    defaultTemplate: 'professional',
+  });
+  const [settingsMessage, setSettingsMessage] = useState<{ kind: 'success' | 'error'; text: string } | null>(null);
 
   // Resolve slug from KPA pharmacy info
   useEffect(() => {
@@ -249,6 +265,65 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
     throw new Error(res.error || '이미지 업로드에 실패했습니다.');
   };
 
+  // WO-O4O-KPA-STORE-BLOG-META-V1: settings 화면 진입 핸들러
+  const openSettings = useCallback(async () => {
+    if (!slug) return;
+    setSettingsMessage(null);
+    setSettingsLoading(true);
+    setMode('settings');
+    try {
+      const data = await fetchBlogSettings(slug, service);
+      setSettings(data);
+      setSettingsForm({
+        blogName: data?.blogName ?? '',
+        description: data?.description ?? '',
+        heroImage: data?.heroImage ?? '',
+        defaultTemplate: data?.defaultTemplate ?? 'professional',
+      });
+    } catch (e: any) {
+      setSettingsMessage({ kind: 'error', text: e?.message || '설정을 불러오지 못했습니다.' });
+    } finally {
+      setSettingsLoading(false);
+    }
+  }, [slug, service]);
+
+  const handleSaveSettings = async () => {
+    if (!slug) return;
+    setSettingsSaving(true);
+    setSettingsMessage(null);
+    try {
+      const saved = await updateBlogSettings(slug, {
+        blogName: settingsForm.blogName.trim() || null,
+        description: settingsForm.description.trim() || null,
+        heroImage: settingsForm.heroImage.trim() || null,
+        defaultTemplate: settingsForm.defaultTemplate || 'professional',
+      }, service);
+      setSettings(saved);
+      setSettingsForm({
+        blogName: saved.blogName ?? '',
+        description: saved.description ?? '',
+        heroImage: saved.heroImage ?? '',
+        defaultTemplate: saved.defaultTemplate ?? 'professional',
+      });
+      setSettingsMessage({ kind: 'success', text: '설정이 저장되었습니다.' });
+    } catch (e: any) {
+      setSettingsMessage({ kind: 'error', text: e?.message || '저장에 실패했습니다.' });
+    } finally {
+      setSettingsSaving(false);
+    }
+  };
+
+  // WO-O4O-KPA-STORE-BLOG-META-V1: hero image 업로드 (재사용 — handleImageUpload 동일)
+  const handleHeroUpload = async (file: File) => {
+    setSettingsMessage(null);
+    try {
+      const url = await handleImageUpload(file);
+      setSettingsForm((f) => ({ ...f, heroImage: url }));
+    } catch (e: any) {
+      setSettingsMessage({ kind: 'error', text: e?.message || '대표 이미지 업로드에 실패했습니다.' });
+    }
+  };
+
   // WO-O4O-KPA-STORE-BLOG-AI-WIRING-V1: AI 결과를 form state 로 주입 (보조 패턴)
   // - 사용자가 비워둔 title/excerpt 만 자동 채움 (이미 입력된 값 보호)
   // - body 는 항상 덮어씀 — 사용자가 RichTextEditor 에서 추가 편집/검토 후 저장 책임
@@ -379,6 +454,156 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
     );
   }
 
+  // Settings view (WO-O4O-KPA-STORE-BLOG-META-V1)
+  if (mode === 'settings') {
+    return (
+      <div style={{ maxWidth: '720px', margin: '0 auto' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+          <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#1e293b' }}>블로그 설정</h1>
+          <button onClick={() => setMode('list')} style={{ ...btnStyle, backgroundColor: '#f1f5f9', color: '#475569' }}>
+            돌아가기
+          </button>
+        </div>
+
+        <p style={{ fontSize: 13, color: '#64748b', marginBottom: 24, lineHeight: 1.6 }}>
+          블로그 자체의 identity (이름·소개·대표 이미지·기본 템플릿) 를 설정합니다. 미입력 항목은 매장 정보로 대체됩니다.
+        </p>
+
+        {settingsLoading ? (
+          <div style={{ textAlign: 'center', padding: '48px 0', color: '#94a3b8' }}>
+            불러오는 중...
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div>
+              <label style={labelStyle}>블로그 이름</label>
+              <input
+                type="text"
+                value={settingsForm.blogName}
+                onChange={(e) => setSettingsForm((f) => ({ ...f, blogName: e.target.value }))}
+                placeholder="예: 우리약국 칼럼 (미입력 시 매장명 표시)"
+                style={inputStyle}
+              />
+            </div>
+            <div>
+              <label style={labelStyle}>소개</label>
+              <textarea
+                value={settingsForm.description}
+                onChange={(e) => setSettingsForm((f) => ({ ...f, description: e.target.value }))}
+                placeholder="블로그 채널의 짧은 소개 (전문 분야, 주요 주제 등)"
+                rows={3}
+                style={{ ...inputStyle, resize: 'vertical', fontFamily: 'inherit' }}
+              />
+            </div>
+            <div>
+              <label style={labelStyle}>대표 이미지</label>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                <input
+                  type="text"
+                  value={settingsForm.heroImage}
+                  onChange={(e) => setSettingsForm((f) => ({ ...f, heroImage: e.target.value }))}
+                  placeholder="https:// 이미지 URL 또는 아래 [업로드] 사용"
+                  style={{ ...inputStyle, flex: 1 }}
+                />
+                <label style={{ ...btnStyle, backgroundColor: '#f1f5f9', color: '#475569', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  업로드
+                  <input
+                    type="file"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleHeroUpload(file);
+                      e.target.value = '';
+                    }}
+                  />
+                </label>
+              </div>
+              {settingsForm.heroImage && (
+                <div style={{ marginTop: 8 }}>
+                  <img
+                    src={settingsForm.heroImage}
+                    alt="대표 이미지 미리보기"
+                    style={{ maxWidth: '100%', maxHeight: 200, borderRadius: 8, border: '1px solid #e2e8f0' }}
+                  />
+                </div>
+              )}
+              <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 6 }}>
+                공개 블로그 목록 페이지 상단에 column masthead 로 표시됩니다.
+              </p>
+            </div>
+            <div>
+              <label style={labelStyle}>기본 템플릿</label>
+              <div style={{ display: 'flex', gap: 8 }}>
+                {(['professional', 'modern'] as const).map((t) => (
+                  <label
+                    key={t}
+                    style={{
+                      flex: 1,
+                      padding: '10px 12px',
+                      border: `1px solid ${settingsForm.defaultTemplate === t ? '#3b82f6' : '#e2e8f0'}`,
+                      backgroundColor: settingsForm.defaultTemplate === t ? '#eff6ff' : '#fff',
+                      borderRadius: 8,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="defaultTemplate"
+                      value={t}
+                      checked={settingsForm.defaultTemplate === t}
+                      onChange={() => setSettingsForm((f) => ({ ...f, defaultTemplate: t }))}
+                    />
+                    <span style={{ fontSize: 14, fontWeight: 600, color: '#1e293b' }}>
+                      {t === 'professional' ? 'Professional' : 'Modern'}
+                    </span>
+                  </label>
+                ))}
+              </div>
+              <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 6 }}>
+                URL ?template=modern 으로 임시 미리보기 가능. 향후 유료 템플릿 추가 예정.
+              </p>
+            </div>
+
+            {settingsMessage && (
+              <div
+                style={{
+                  padding: '10px 14px',
+                  borderRadius: 8,
+                  fontSize: 13,
+                  color: settingsMessage.kind === 'success' ? '#15803d' : '#dc2626',
+                  background: settingsMessage.kind === 'success' ? '#f0fdf4' : '#fef2f2',
+                  border: `1px solid ${settingsMessage.kind === 'success' ? '#86efac' : '#fecaca'}`,
+                }}
+              >
+                {settingsMessage.text}
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 8 }}>
+              <button
+                onClick={handleSaveSettings}
+                disabled={settingsSaving}
+                style={{ ...btnStyle, backgroundColor: '#3b82f6', color: '#fff', opacity: settingsSaving ? 0.6 : 1 }}
+              >
+                {settingsSaving ? '저장 중...' : '저장'}
+              </button>
+            </div>
+
+            {settings && (
+              <p style={{ fontSize: 11, color: '#94a3b8', textAlign: 'right' }}>
+                마지막 수정: {new Date(settings.updatedAt).toLocaleString('ko-KR')}
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  }
+
   // List view
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
@@ -391,6 +616,13 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
         </div>
         {/* WO-O4O-KPA-STORE-PRODUCTION-ENTRY-CANONICAL-CORRECTION-V1:
             "새 글 작성" 신규 진입 버튼 제거 — 제작 시작은 "내 자료함"에서만. */}
+        {/* WO-O4O-KPA-STORE-BLOG-META-V1: 블로그 설정 진입 */}
+        <button
+          onClick={openSettings}
+          style={{ ...btnStyle, backgroundColor: '#f1f5f9', color: '#475569', whiteSpace: 'nowrap' }}
+        >
+          블로그 설정
+        </button>
       </div>
 
       {/* Status filter */}

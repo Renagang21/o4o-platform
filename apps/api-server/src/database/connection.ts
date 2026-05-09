@@ -161,6 +161,7 @@ import {
   // GlycopharmOrder, GlycopharmOrderItem - REMOVED (Phase 4-A: Legacy Order System Deprecation)
   // TabletServiceRequest — REMOVED (WO-O4O-STORE-TABLET-LEGACY-CLEANUP-V1)
   StoreBlogPost, // WO-STORE-BLOG-CHANNEL-V1
+  StoreBlogSettings, // WO-O4O-KPA-STORE-BLOG-META-V1
   GlycopharmPharmacyExtension, // WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1
   GlycopharmMember, // WO-GLYCOPHARM-MEMBER-TABLE-CREATION-V1
 } from '../routes/glycopharm/entities/index.js';
@@ -707,6 +708,7 @@ export const AppDataSource = new DataSource({
     // GlycopharmForumCategoryRequest — REMOVED (WO-O4O-FORUM-CATEGORY-DEAD-CODE-REMOVAL-V1)
     // TabletServiceRequest — REMOVED (WO-O4O-STORE-TABLET-LEGACY-CLEANUP-V1)
     StoreBlogPost, // WO-STORE-BLOG-CHANNEL-V1
+    StoreBlogSettings, // WO-O4O-KPA-STORE-BLOG-META-V1
     GlycopharmPharmacyExtension, // WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1
     GlycopharmMember, // WO-GLYCOPHARM-MEMBER-TABLE-CREATION-V1
     // ============================================================================

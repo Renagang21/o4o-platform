@@ -4,6 +4,7 @@
  * WO-STORE-BLOG-CHANNEL-V1
  * WO-STORE-SLUG-UNIFICATION-V1: unified URL
  * WO-O4O-KPA-STORE-BLOG-PUBLIC-HEADER-V1: 매장 identity 헤더 + 템플릿 2종 + SEO meta
+ * WO-O4O-KPA-STORE-BLOG-META-V1: Blog settings (이름·소개·heroImage·defaultTemplate) 연결
  *
  * 경로: /store/:slug/blog/:postSlug
  * 공개 페이지 — 인증 불필요
@@ -11,20 +12,31 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
-import { fetchBlogPost, fetchPublicStoreInfo, type BlogPost, type PublicStoreInfo } from '../../api/blog';
+import {
+  fetchBlogPost,
+  fetchPublicStoreInfo,
+  fetchPublicBlogSettings,
+  type BlogPost,
+  type PublicStoreInfo,
+  type PublicBlogSettings,
+} from '../../api/blog';
 import { BlogPublicHeader } from './blog/BlogPublicHeader';
-import { BlogPost as BlogPostTemplate, resolveBlogTemplateKey } from './blog/blogTemplates';
+import { BlogPost as BlogPostTemplate, pickBlogTemplate } from './blog/blogTemplates';
 import { useBlogSeo } from './blog/useBlogSeo';
 
 export function StoreBlogPostPage() {
   const { slug, postSlug } = useParams<{ slug: string; postSlug: string }>();
   const [searchParams] = useSearchParams();
-  const templateKey = resolveBlogTemplateKey(searchParams.get('template'));
 
   const [post, setPost] = useState<BlogPost | null>(null);
   const [storeInfo, setStoreInfo] = useState<PublicStoreInfo | null>(null);
+  // WO-O4O-KPA-STORE-BLOG-META-V1
+  const [blogSettings, setBlogSettings] = useState<PublicBlogSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // 우선순위: query > settings.defaultTemplate > 'professional'
+  const templateKey = pickBlogTemplate(searchParams.get('template'), blogSettings?.defaultTemplate);
 
   useEffect(() => {
     if (!slug || !postSlug) return;
@@ -32,24 +44,26 @@ export function StoreBlogPostPage() {
     Promise.all([
       fetchBlogPost(slug, postSlug),
       fetchPublicStoreInfo(slug).catch(() => null),
+      fetchPublicBlogSettings(slug).catch(() => null),
     ])
-      .then(([data, info]) => {
+      .then(([data, info, settings]) => {
         setPost(data);
         setStoreInfo(info);
+        setBlogSettings(settings);
         setError(null);
       })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [slug, postSlug]);
 
-  // SEO meta — 게시글 + 매장 정보 결합
-  // WO-O4O-KPA-STORE-BLOG-CONTENT-RICHTEXT-V1: HTML 콘텐츠 도입에 따라 description 에서 태그 strip
-  const seoTitle = post && storeInfo
-    ? `${post.title} | ${storeInfo.name}`
+  // SEO meta — settings → store info fallback
+  const blogName = blogSettings?.blogName?.trim() || storeInfo?.name?.trim() || null;
+  const seoTitle = post && blogName
+    ? `${post.title} | ${blogName}`
     : post?.title || null;
   const stripTags = (s: string | null | undefined): string =>
     (s || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
-  const rawDesc = post?.excerpt || post?.content || storeInfo?.description || '';
+  const rawDesc = post?.excerpt || post?.content || blogSettings?.description || storeInfo?.description || '';
   const cleanDesc = stripTags(rawDesc).slice(0, 160);
   const seoDescription = cleanDesc || null;
   const seoUrl = typeof window !== 'undefined' && slug && postSlug
@@ -58,14 +72,14 @@ export function StoreBlogPostPage() {
   useBlogSeo({
     title: seoTitle,
     description: seoDescription,
-    ogImage: storeInfo?.hero_image || storeInfo?.logo || null,
+    ogImage: blogSettings?.heroImage || storeInfo?.hero_image || storeInfo?.logo || null,
     url: seoUrl,
   });
 
   if (loading) {
     return (
       <div style={{ minHeight: '100vh', background: '#fafbfc' }}>
-        <BlogPublicHeader storeSlug={slug || ''} storeInfo={storeInfo} compact />
+        <BlogPublicHeader storeSlug={slug || ''} storeInfo={storeInfo} blogSettings={blogSettings} compact />
         <div style={{ textAlign: 'center', padding: '48px 0', color: '#94a3b8' }}>
           불러오는 중...
         </div>
@@ -76,7 +90,7 @@ export function StoreBlogPostPage() {
   if (error || !post) {
     return (
       <div style={{ minHeight: '100vh', background: '#fafbfc' }}>
-        <BlogPublicHeader storeSlug={slug || ''} storeInfo={storeInfo} compact />
+        <BlogPublicHeader storeSlug={slug || ''} storeInfo={storeInfo} blogSettings={blogSettings} compact />
         <div style={{ maxWidth: 600, margin: '0 auto', padding: '48px 16px', textAlign: 'center' }}>
           <h2 style={{ fontSize: 20, color: '#1e293b', marginBottom: 8 }}>
             게시글을 찾을 수 없습니다
@@ -95,7 +109,7 @@ export function StoreBlogPostPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#fafbfc' }}>
-      <BlogPublicHeader storeSlug={slug || ''} storeInfo={storeInfo} compact />
+      <BlogPublicHeader storeSlug={slug || ''} storeInfo={storeInfo} blogSettings={blogSettings} compact />
 
       <main style={{ maxWidth: '720px', margin: '0 auto', padding: '0 16px 64px' }}>
         {/* Back link */}

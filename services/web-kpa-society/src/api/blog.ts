@@ -81,3 +81,30 @@ export async function fetchPublicStoreInfo(slug: string): Promise<PublicStoreInf
   if (!json.success) throw new Error(json.error?.message || 'Store not found');
   return json.data;
 }
+
+// WO-O4O-KPA-STORE-BLOG-META-V1: 공개 Blog identity (이름·소개·heroImage·defaultTemplate)
+
+export interface PublicBlogSettings {
+  id: string;
+  storeId: string;
+  serviceKey: string;
+  blogName: string | null;
+  description: string | null;
+  heroImage: string | null;
+  defaultTemplate: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * 공개 Blog 설정 조회. 미존재 시 null 반환 — 호출처에서 store info 로 fallback.
+ * 인증 불필요.
+ */
+export async function fetchPublicBlogSettings(slug: string): Promise<PublicBlogSettings | null> {
+  const url = `${getApiBase()}/${encodeURIComponent(slug)}/blog/settings`;
+  const res = await fetch(url);
+  if (!res.ok) return null;
+  const json = await res.json();
+  if (!json.success) return null;
+  return (json.data as PublicBlogSettings | null) ?? null;
+}

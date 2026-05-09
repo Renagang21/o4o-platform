@@ -11,22 +11,33 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { fetchBlogPosts, fetchPublicStoreInfo, type BlogPost, type PublicStoreInfo } from '../../api/blog';
+import {
+  fetchBlogPosts,
+  fetchPublicStoreInfo,
+  fetchPublicBlogSettings,
+  type BlogPost,
+  type PublicStoreInfo,
+  type PublicBlogSettings,
+} from '../../api/blog';
 import { BlogPublicHeader } from './blog/BlogPublicHeader';
-import { BlogList, resolveBlogTemplateKey } from './blog/blogTemplates';
+import { BlogList, pickBlogTemplate } from './blog/blogTemplates';
 import { useBlogSeo } from './blog/useBlogSeo';
 
 export function StoreBlogPage() {
   const { slug } = useParams<{ slug: string }>();
   const [searchParams] = useSearchParams();
-  const templateKey = resolveBlogTemplateKey(searchParams.get('template'));
 
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [storeInfo, setStoreInfo] = useState<PublicStoreInfo | null>(null);
+  // WO-O4O-KPA-STORE-BLOG-META-V1
+  const [blogSettings, setBlogSettings] = useState<PublicBlogSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+
+  // 우선순위: query > settings.defaultTemplate > 'professional'
+  const templateKey = pickBlogTemplate(searchParams.get('template'), blogSettings?.defaultTemplate);
 
   useEffect(() => {
     if (!slug) return;
@@ -34,31 +45,34 @@ export function StoreBlogPage() {
     Promise.all([
       fetchBlogPosts(slug, { page, limit: 10 }),
       fetchPublicStoreInfo(slug).catch(() => null),
+      fetchPublicBlogSettings(slug).catch(() => null),
     ])
-      .then(([list, info]) => {
+      .then(([list, info, settings]) => {
         setPosts(list.data);
         setTotalPages(list.meta.totalPages);
         setStoreInfo(info);
+        setBlogSettings(settings);
         setError(null);
       })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [slug, page]);
 
-  // SEO meta — 매장 정보 로드 후 동기화
-  const seoTitle = storeInfo ? `${storeInfo.name} 칼럼` : '블로그';
-  const seoDescription = storeInfo?.description || '전문가가 직접 작성하는 매장 콘텐츠 채널입니다.';
+  // SEO meta — settings → store info fallback
+  const seoBlogName = blogSettings?.blogName?.trim() || storeInfo?.name?.trim() || null;
+  const seoTitle = seoBlogName ? `${seoBlogName} 칼럼` : '블로그';
+  const seoDescription = blogSettings?.description?.trim() || storeInfo?.description?.trim() || '전문가가 직접 작성하는 매장 콘텐츠 채널입니다.';
   const seoUrl = typeof window !== 'undefined' && slug ? `${window.location.origin}/store/${slug}/blog` : null;
   useBlogSeo({
     title: seoTitle,
     description: seoDescription,
-    ogImage: storeInfo?.hero_image || storeInfo?.logo || null,
+    ogImage: blogSettings?.heroImage || storeInfo?.hero_image || storeInfo?.logo || null,
     url: seoUrl,
   });
 
   return (
     <div style={{ minHeight: '100vh', background: '#fafbfc' }}>
-      <BlogPublicHeader storeSlug={slug || ''} storeInfo={storeInfo} />
+      <BlogPublicHeader storeSlug={slug || ''} storeInfo={storeInfo} blogSettings={blogSettings} />
 
       <main style={{ maxWidth: '760px', margin: '0 auto', padding: '0 16px 64px' }}>
         {error && (

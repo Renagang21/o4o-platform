@@ -68,6 +68,9 @@ export {
   type StoreBlogPostStatus,
 } from './store-blog-post.entity.js';
 
+// Store Blog Settings (WO-O4O-KPA-STORE-BLOG-META-V1)
+export { StoreBlogSettings } from './store-blog-settings.entity.js';
+
 // WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1 Phase B-1a
 export { GlycopharmPharmacyExtension } from './glycopharm-pharmacy-extension.entity.js';
 

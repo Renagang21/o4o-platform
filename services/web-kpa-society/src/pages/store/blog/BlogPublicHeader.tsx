@@ -12,18 +12,22 @@
  */
 
 import { Link } from 'react-router-dom';
-import type { PublicStoreInfo } from '../../../api/blog';
+import type { PublicStoreInfo, PublicBlogSettings } from '../../../api/blog';
 
 interface BlogPublicHeaderProps {
   storeSlug: string;
   storeInfo: PublicStoreInfo | null;
+  /** WO-O4O-KPA-STORE-BLOG-META-V1: Blog identity 메타. 없으면 storeInfo fallback. */
+  blogSettings?: PublicBlogSettings | null;
   /** 상세 페이지에서 호출 시 true — 헤더를 더 컴팩트하게 표시 */
   compact?: boolean;
 }
 
-export function BlogPublicHeader({ storeSlug, storeInfo, compact = false }: BlogPublicHeaderProps) {
-  const name = storeInfo?.name?.trim() || '매장';
-  const description = storeInfo?.description?.trim() || null;
+export function BlogPublicHeader({ storeSlug, storeInfo, blogSettings, compact = false }: BlogPublicHeaderProps) {
+  // 우선순위: blog settings → store info → fallback
+  const name = (blogSettings?.blogName?.trim() || storeInfo?.name?.trim() || '매장');
+  const description = (blogSettings?.description?.trim() || storeInfo?.description?.trim() || null);
+  const heroImage = blogSettings?.heroImage || null;
   const logo = storeInfo?.logo || null;
 
   return (
@@ -31,11 +35,37 @@ export function BlogPublicHeader({ storeSlug, storeInfo, compact = false }: Blog
       style={{
         borderBottom: '1px solid #e2e8f0',
         background: '#fff',
-        padding: compact ? '20px 0 16px' : '32px 0 24px',
+        padding: compact ? '20px 0 16px' : '0 0 24px',
         marginBottom: compact ? '24px' : '32px',
       }}
     >
-      <div style={{ maxWidth: '760px', margin: '0 auto', padding: '0 16px' }}>
+      {/* WO-O4O-KPA-STORE-BLOG-META-V1: hero image — full mode only, 절제된 column masthead.
+          쇼핑몰 배너 톤 회피 위해 max-height 280px, 폭 100%, fade 없음. */}
+      {!compact && heroImage && (
+        <div
+          style={{
+            width: '100%',
+            maxHeight: 280,
+            overflow: 'hidden',
+            background: '#0f172a',
+            marginBottom: 24,
+          }}
+        >
+          <img
+            src={heroImage}
+            alt={`${name} 대표 이미지`}
+            style={{
+              width: '100%',
+              maxHeight: 280,
+              objectFit: 'cover',
+              display: 'block',
+            }}
+            loading="lazy"
+          />
+        </div>
+      )}
+
+      <div style={{ maxWidth: '760px', margin: '0 auto', padding: '0 16px', paddingTop: !compact && !heroImage ? 32 : 0 }}>
         {/* 매장 사이트 진입 — 작고 절제된 링크 */}
         <Link
           to={`/store/${storeSlug}`}

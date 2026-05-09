@@ -94,3 +94,48 @@ export async function deleteBlogPost(slug: string, postId: string, service?: str
   const url = `${getApiBase(service)}/stores/${encodeURIComponent(slug)}/blog/staff/${postId}`;
   await authFetch(url, { method: 'DELETE' });
 }
+
+// ─────────────────────────────────────────────────────
+// Blog Settings (WO-O4O-KPA-STORE-BLOG-META-V1)
+// ─────────────────────────────────────────────────────
+
+export interface StaffBlogSettings {
+  id: string;
+  storeId: string;
+  serviceKey: string;
+  blogName: string | null;
+  description: string | null;
+  heroImage: string | null;
+  defaultTemplate: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BlogSettingsInput {
+  blogName?: string | null;
+  description?: string | null;
+  heroImage?: string | null;
+  defaultTemplate?: string;
+}
+
+export async function fetchBlogSettings(
+  slug: string,
+  service?: string,
+): Promise<StaffBlogSettings | null> {
+  const url = `${getApiBase(service)}/stores/${encodeURIComponent(slug)}/blog/staff/settings`;
+  const json = await authFetch(url, { method: 'GET' });
+  return (json.data as StaffBlogSettings | null) ?? null;
+}
+
+export async function updateBlogSettings(
+  slug: string,
+  input: BlogSettingsInput,
+  service?: string,
+): Promise<StaffBlogSettings> {
+  const url = `${getApiBase(service)}/stores/${encodeURIComponent(slug)}/blog/staff/settings`;
+  const json = await authFetch(url, {
+    method: 'PUT',
+    body: JSON.stringify(input),
+  });
+  return json.data as StaffBlogSettings;
+}

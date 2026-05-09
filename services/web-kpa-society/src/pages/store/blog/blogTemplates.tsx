@@ -135,12 +135,32 @@ export function getTemplateLabel(key: BlogTemplateKey): string {
 
 /**
  * URL query string `?template=` 파싱. 알 수 없는 값은 'professional' fallback.
- * 향후 storefront_config.theme 통합 시 호출처에서 우선순위 결정.
  */
 export function resolveBlogTemplateKey(searchParam: string | null | undefined): BlogTemplateKey {
   if (!searchParam) return 'professional';
   const norm = searchParam.toLowerCase();
   if (norm === 'professional' || norm === 'modern') return norm;
+  return 'professional';
+}
+
+/**
+ * WO-O4O-KPA-STORE-BLOG-META-V1: 우선순위 기반 template 결정.
+ *  1) URL ?template= override (preview / 임시 진입)
+ *  2) Blog settings.defaultTemplate (운영자 저장값)
+ *  3) 'professional' fallback
+ */
+export function pickBlogTemplate(
+  queryParam: string | null | undefined,
+  settingsDefault: string | null | undefined,
+): BlogTemplateKey {
+  if (queryParam) {
+    const q = queryParam.toLowerCase();
+    if (q === 'professional' || q === 'modern') return q;
+  }
+  if (settingsDefault) {
+    const s = settingsDefault.toLowerCase();
+    if (s === 'professional' || s === 'modern') return s;
+  }
   return 'professional';
 }
 

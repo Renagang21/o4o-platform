@@ -22,6 +22,8 @@ import { DataSource, LessThanOrEqual } from 'typeorm';
 import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 import { StoreBlogPost } from '../../glycopharm/entities/store-blog-post.entity.js';
 import type { StoreBlogPostStatus } from '../../glycopharm/entities/store-blog-post.entity.js';
+// WO-O4O-KPA-STORE-BLOG-META-V1
+import { StoreBlogSettings } from '../../glycopharm/entities/store-blog-settings.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import { StoreSlugService } from '@o4o/platform-core/store-identity';
 
@@ -54,7 +56,19 @@ export function createBlogController(
   const router = Router();
   const orgRepo = dataSource.getRepository(OrganizationStore);
   const blogRepo = dataSource.getRepository(StoreBlogPost);
+  // WO-O4O-KPA-STORE-BLOG-META-V1
+  const settingsRepo = dataSource.getRepository(StoreBlogSettings);
   const slugService = new StoreSlugService(dataSource);
+
+  // WO-O4O-KPA-STORE-BLOG-META-V1: 허용 template key 화이트리스트
+  // 향후 유료 템플릿 추가 시 여기에 등록 (예: 'magazine', 'minimalist').
+  const ALLOWED_TEMPLATES = new Set<string>(['professional', 'modern']);
+  const DEFAULT_TEMPLATE = 'professional';
+
+  function pickTemplate(input: unknown): string {
+    if (typeof input !== 'string') return DEFAULT_TEMPLATE;
+    return ALLOWED_TEMPLATES.has(input) ? input : DEFAULT_TEMPLATE;
+  }
 
   // Helper: resolve organization by slug (active stores only)
   async function resolvePharmacy(slug: string): Promise<OrganizationStore | null> {
@@ -336,6 +350,94 @@ export function createBlogController(
   // STAFF — 삭제
   // DELETE /stores/:slug/blog/staff/:id
   // ============================================================================
+  // ============================================================================
+  // STAFF — Blog Settings 조회 (WO-O4O-KPA-STORE-BLOG-META-V1)
+  // GET /stores/:slug/blog/staff/settings
+  // 매장 settings row 가 없으면 null data 반환 (UI 가 default 폼으로 렌더).
+  // ============================================================================
+  router.get('/:slug/blog/staff/settings', requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { slug } = req.params;
+      const authReq = req as unknown as AuthRequest;
+      const userId = authReq.user?.id || authReq.authUser?.id;
+
+      const pharmacy = await resolvePharmacy(slug);
+      if (!pharmacy) {
+        res.status(404).json({ success: false, error: { code: 'STORE_NOT_FOUND', message: 'Store not found' } });
+        return;
+      }
+      if (!userId || !verifyOwner(pharmacy, userId)) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Not the store owner' } });
+        return;
+      }
+
+      const settings = await settingsRepo.findOne({ where: { storeId: pharmacy.id, serviceKey } });
+      res.json({ success: true, data: settings ?? null });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: err.message } });
+    }
+  });
+
+  // ============================================================================
+  // STAFF — Blog Settings 저장 (upsert) (WO-O4O-KPA-STORE-BLOG-META-V1)
+  // PUT /stores/:slug/blog/staff/settings
+  // Body: { blogName?, description?, heroImage?, defaultTemplate? }
+  // 미입력 컬럼은 null 또는 default 로 저장.
+  // ============================================================================
+  router.put('/:slug/blog/staff/settings', requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { slug } = req.params;
+      const authReq = req as unknown as AuthRequest;
+      const userId = authReq.user?.id || authReq.authUser?.id;
+      const { blogName, description, heroImage, defaultTemplate } = req.body ?? {};
+
+      const pharmacy = await resolvePharmacy(slug);
+      if (!pharmacy) {
+        res.status(404).json({ success: false, error: { code: 'STORE_NOT_FOUND', message: 'Store not found' } });
+        return;
+      }
+      if (!userId || !verifyOwner(pharmacy, userId)) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Not the store owner' } });
+        return;
+      }
+
+      const trim = (v: unknown): string | null => {
+        if (typeof v !== 'string') return null;
+        const t = v.trim();
+        return t.length === 0 ? null : t;
+      };
+
+      const payload: Partial<StoreBlogSettings> = {
+        storeId: pharmacy.id,
+        serviceKey,
+        blogName: trim(blogName),
+        description: trim(description),
+        heroImage: trim(heroImage),
+        defaultTemplate: pickTemplate(defaultTemplate),
+      };
+
+      const existing = await settingsRepo.findOne({ where: { storeId: pharmacy.id, serviceKey } });
+      let saved: StoreBlogSettings;
+      if (existing) {
+        existing.blogName = payload.blogName!;
+        existing.description = payload.description!;
+        existing.heroImage = payload.heroImage!;
+        existing.defaultTemplate = payload.defaultTemplate!;
+        saved = await settingsRepo.save(existing);
+      } else {
+        saved = await settingsRepo.save(settingsRepo.create(payload));
+      }
+      res.json({ success: true, data: saved });
+    } catch (err: any) {
+      // unique 충돌(동일 storeId 동시 insert) — 409 매핑
+      if (String(err?.code) === '23505') {
+        res.status(409).json({ success: false, error: { code: 'CONFLICT', message: 'Settings already exist' } });
+        return;
+      }
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: err.message } });
+    }
+  });
+
   router.delete('/:slug/blog/staff/:id', requireAuth, async (req: Request, res: Response) => {
     try {
       const { slug, id } = req.params;
@@ -361,6 +463,28 @@ export function createBlogController(
 
       await blogRepo.remove(post);
       res.json({ success: true, data: { id, deleted: true } });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: err.message } });
+    }
+  });
+
+  // ============================================================================
+  // PUBLIC — Blog Settings 조회 (WO-O4O-KPA-STORE-BLOG-META-V1)
+  // GET /stores/:slug/blog/settings
+  // - 인증 불필요 — 공개 페이지가 blog identity (이름/소개/heroImage/template) 표시
+  // - settings 미존재 시 null data 반환 (frontend 가 store info fallback)
+  // - 라우트 순서: /:postSlug catch-all 보다 위에 등록 (`settings` literal 우선 매칭)
+  // ============================================================================
+  router.get('/:slug/blog/settings', async (req: Request, res: Response) => {
+    try {
+      const { slug } = req.params;
+      const pharmacy = await resolvePharmacy(slug);
+      if (!pharmacy) {
+        res.status(404).json({ success: false, error: { code: 'STORE_NOT_FOUND', message: 'Store not found' } });
+        return;
+      }
+      const settings = await settingsRepo.findOne({ where: { storeId: pharmacy.id, serviceKey } });
+      res.json({ success: true, data: settings ?? null });
     } catch (err: any) {
       res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: err.message } });
     }
