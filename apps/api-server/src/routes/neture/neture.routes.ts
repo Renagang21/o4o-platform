@@ -19,6 +19,8 @@ import { createStorePlaylistController } from '../o4o-store/controllers/store-pl
 import { createNetureEventOfferController } from './controllers/event-offer.controller.js';
 // WO-O4O-EVENT-OFFER-MULTI-SERVICE-PROPOSAL-V1
 import { createSupplierEventOfferProposalsController } from './controllers/supplier-event-offer-proposals.controller.js';
+// WO-O4O-NETURE-BLOG-CANONICAL-ALIGN-V1: Blog 라우트 등록 (서비스 스코프 staff/settings 엔드포인트 활성)
+import { createBlogController } from '../o4o-store/controllers/blog.controller.js';
 
 export function createNetureRoutes(dataSource: DataSource): Router {
   const router = Router();
@@ -60,6 +62,14 @@ export function createNetureRoutes(dataSource: DataSource): Router {
     '/supplier',
     createSupplierEventOfferProposalsController(dataSource, requireAuth as any),
   );
+
+  // ============================================================================
+  // Blog Routes — WO-O4O-NETURE-BLOG-CANONICAL-ALIGN-V1
+  // /api/v1/neture/stores/:slug/blog/* (public + staff)
+  // - public 읽기는 unified-store-public 으로도 접근 가능 (slug 기반)
+  // - staff/settings 엔드포인트는 서비스 스코프(`/api/v1/neture/...`)에서 노출됨
+  // ============================================================================
+  router.use('/stores', createBlogController(dataSource, requireAuth as any, 'neture'));
 
   return router;
 }

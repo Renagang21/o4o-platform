@@ -1,217 +1,157 @@
 /**
- * StoreBlogListPage - 매장 블로그 목록
+ * StoreBlogListPage — Public Blog List (Neture canonical align)
  *
- * Work Order: WO-O4O-STORE-BLOG-SYSTEM-V1
+ * WO-O4O-STORE-BLOG-SYSTEM-V1
+ * WO-O4O-NETURE-BLOG-CANONICAL-ALIGN-V1: KPA canonical 패턴 정렬
+ *   - BlogPublicHeader / blogTemplates(Professional+Modern) / useBlogSeo 적용
+ *   - Neture override: route param 이름이 `storeSlug` (KPA는 `slug`)
  *
- * Route: /store/:storeSlug/blog
- *
- * 매장별 블로그 게시글 목록. 기존 store_blog_posts 테이블 + unified-store-public API 사용.
- * API: GET /api/v1/stores/:slug/blog?page=N&limit=N
+ * 경로: /store/:storeSlug/blog
+ * 공개 페이지 — 인증 불필요 (unified-store-public 경유)
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
 import {
-  ArrowLeft,
-  FileText,
-  Calendar,
-  ChevronLeft,
-  ChevronRight,
-  Store,
-} from 'lucide-react';
-import { api } from '../../lib/api/index.js';
-
-// ── Types ──
-
-interface BlogPost {
-  id: string;
-  title: string;
-  slug: string;
-  excerpt: string | null;
-  status: string;
-  publishedAt: string;
-  createdAt: string;
-}
-
-interface BlogMeta {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-}
-
-// ── Helpers ──
-
-function formatDate(dateStr: string): string {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-}
-
-// ── Component ──
+  fetchBlogPosts,
+  fetchPublicStoreInfo,
+  fetchPublicBlogSettings,
+  type BlogPost,
+  type PublicStoreInfo,
+  type PublicBlogSettings,
+} from '../../api/blog';
+import { BlogPublicHeader } from './blog/BlogPublicHeader';
+import { BlogList, pickBlogTemplate } from './blog/blogTemplates';
+import { useBlogSeo } from './blog/useBlogSeo';
 
 export default function StoreBlogListPage() {
   const { storeSlug } = useParams<{ storeSlug: string }>();
+  const [searchParams] = useSearchParams();
 
   const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [meta, setMeta] = useState<BlogMeta | null>(null);
-  const [page, setPage] = useState(1);
+  const [storeInfo, setStoreInfo] = useState<PublicStoreInfo | null>(null);
+  const [blogSettings, setBlogSettings] = useState<PublicBlogSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const LIMIT = 10;
-
-  const fetchPosts = useCallback(async (p: number) => {
-    if (!storeSlug) return;
-    setLoading(true);
-    setError(null);
-
-    try {
-      const res = await api.get(
-        `/stores/${encodeURIComponent(storeSlug)}/blog?page=${p}&limit=${LIMIT}`,
-      );
-      const result = res.data;
-      if (result.success) {
-        setPosts(result.data || []);
-        setMeta(result.meta || null);
-      } else {
-        setError(result.error?.message || '블로그 글을 불러올 수 없습니다.');
-      }
-    } catch {
-      setError('네트워크 오류가 발생했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  }, [storeSlug]);
+  const templateKey = pickBlogTemplate(searchParams.get('template'), blogSettings?.defaultTemplate);
 
   useEffect(() => {
-    fetchPosts(page);
-  }, [page, fetchPosts]);
+    if (!storeSlug) return;
+    setLoading(true);
+    Promise.all([
+      fetchBlogPosts(storeSlug, { page, limit: 10 }),
+      fetchPublicStoreInfo(storeSlug).catch(() => null),
+      fetchPublicBlogSettings(storeSlug).catch(() => null),
+    ])
+      .then(([list, info, settings]) => {
+        setPosts(list.data);
+        setTotalPages(list.meta.totalPages);
+        setStoreInfo(info);
+        setBlogSettings(settings);
+        setError(null);
+      })
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false));
+  }, [storeSlug, page]);
 
-  // ── Loading ──
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-3xl mx-auto px-4 py-8">
-          {/* Header skeleton */}
-          <div className="h-8 w-48 bg-gray-200 rounded animate-pulse mb-8" />
-          {/* Post skeletons */}
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-white rounded-xl p-6 mb-4 shadow-sm">
-              <div className="h-5 w-3/4 bg-gray-200 rounded animate-pulse mb-3" />
-              <div className="h-4 w-full bg-gray-100 rounded animate-pulse mb-2" />
-              <div className="h-4 w-2/3 bg-gray-100 rounded animate-pulse mb-3" />
-              <div className="h-3 w-32 bg-gray-100 rounded animate-pulse" />
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  // ── Error ──
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <div className="text-center max-w-sm">
-          <div className="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <FileText size={32} className="text-red-500" />
-          </div>
-          <h1 className="text-lg font-bold text-gray-900 mb-2">블로그 오류</h1>
-          <p className="text-sm text-gray-600 mb-6">{error}</p>
-          <button
-            onClick={() => fetchPosts(page)}
-            className="px-5 py-2.5 bg-primary-600 text-white text-sm font-medium rounded-xl hover:bg-primary-700 transition-colors"
-          >
-            다시 시도
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const seoBlogName = blogSettings?.blogName?.trim() || storeInfo?.name?.trim() || null;
+  const seoTitle = seoBlogName ? `${seoBlogName} 칼럼` : '블로그';
+  const seoDescription =
+    blogSettings?.description?.trim() || storeInfo?.description?.trim() ||
+    '전문가가 직접 작성하는 매장 콘텐츠 채널입니다.';
+  const seoUrl = typeof window !== 'undefined' && storeSlug ? `${window.location.origin}/store/${storeSlug}/blog` : null;
+  useBlogSeo({
+    title: seoTitle,
+    description: seoDescription,
+    ogImage: blogSettings?.heroImage || storeInfo?.hero_image || storeInfo?.logo || null,
+    url: seoUrl,
+  });
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        {/* ── Header ── */}
-        <div className="flex items-center gap-3 mb-8">
-          <Link
-            to={storeSlug ? `/store/${storeSlug}` : '/'}
-            className="p-2 rounded-xl bg-white shadow-sm hover:bg-gray-50 transition-colors"
-          >
-            <ArrowLeft size={20} className="text-gray-600" />
-          </Link>
-          <div>
-            <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-              <Store size={22} className="text-primary-600" />
-              블로그
-            </h1>
-            {meta && (
-              <p className="text-sm text-gray-500 mt-0.5">
-                총 {meta.total}개의 글
-              </p>
-            )}
-          </div>
-        </div>
+    <div style={{ minHeight: '100vh', background: '#fafbfc' }}>
+      <BlogPublicHeader storeSlug={storeSlug || ''} storeInfo={storeInfo} blogSettings={blogSettings} />
 
-        {/* ── Empty State ── */}
-        {posts.length === 0 && (
-          <div className="bg-white rounded-2xl p-12 text-center shadow-sm">
-            <FileText size={48} className="text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500 font-medium">아직 블로그 글이 없습니다.</p>
+      <main style={{ maxWidth: '760px', margin: '0 auto', padding: '0 16px 64px' }}>
+        {error && (
+          <div
+            style={{
+              padding: '12px 16px',
+              backgroundColor: '#fef2f2',
+              border: '1px solid #fecaca',
+              borderRadius: 8,
+              color: '#dc2626',
+              fontSize: 14,
+              marginBottom: 16,
+            }}
+          >
+            {error}
           </div>
         )}
 
-        {/* ── Post List ── */}
-        <div className="space-y-4">
-          {posts.map((post) => (
-            <Link
-              key={post.id}
-              to={`/store/${storeSlug}/blog/${post.slug}`}
-              className="block bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow group"
-            >
-              <h2 className="text-base font-semibold text-gray-900 group-hover:text-primary-600 transition-colors mb-2 line-clamp-2">
-                {post.title}
-              </h2>
-              {post.excerpt && (
-                <p className="text-sm text-gray-600 line-clamp-2 mb-3">
-                  {post.excerpt}
-                </p>
-              )}
-              <div className="flex items-center gap-1.5 text-xs text-gray-400">
-                <Calendar size={13} />
-                <span>{formatDate(post.publishedAt)}</span>
-              </div>
-            </Link>
-          ))}
-        </div>
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '48px 0', color: '#94a3b8' }}>
+            불러오는 중...
+          </div>
+        ) : posts.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '48px 0' }}>
+            <p style={{ color: '#94a3b8', fontSize: 15 }}>아직 게시된 글이 없습니다.</p>
+          </div>
+        ) : (
+          <BlogList template={templateKey} storeSlug={storeSlug || ''} posts={posts} />
+        )}
 
-        {/* ── Pagination ── */}
-        {meta && meta.totalPages > 1 && (
-          <div className="flex items-center justify-center gap-2 mt-8">
+        {totalPages > 1 && (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              gap: 8,
+              marginTop: 40,
+              paddingTop: 24,
+              borderTop: '1px solid #e2e8f0',
+            }}
+          >
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page <= 1}
-              className="p-2 rounded-lg bg-white shadow-sm hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              disabled={page === 1}
+              style={{ ...paginationBtn, opacity: page === 1 ? 0.4 : 1 }}
             >
-              <ChevronLeft size={18} className="text-gray-600" />
+              이전
             </button>
-            <span className="text-sm text-gray-600 px-3">
-              {page} / {meta.totalPages}
+            <span
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                fontSize: 14,
+                color: '#64748b',
+                padding: '0 12px',
+              }}
+            >
+              {page} / {totalPages}
             </span>
             <button
-              onClick={() => setPage((p) => Math.min(meta.totalPages, p + 1))}
-              disabled={page >= meta.totalPages}
-              className="p-2 rounded-lg bg-white shadow-sm hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              style={{ ...paginationBtn, opacity: page === totalPages ? 0.4 : 1 }}
             >
-              <ChevronRight size={18} className="text-gray-600" />
+              다음
             </button>
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 }
+
+const paginationBtn: React.CSSProperties = {
+  padding: '8px 16px',
+  borderRadius: 8,
+  border: '1px solid #e2e8f0',
+  backgroundColor: '#fff',
+  fontSize: 14,
+  cursor: 'pointer',
+  color: '#334155',
+};

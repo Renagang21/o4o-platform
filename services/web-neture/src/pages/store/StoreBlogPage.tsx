@@ -1,138 +1,101 @@
 /**
- * StoreBlogPage - 매장 블로그 글 상세
+ * StoreBlogPage — Public Blog Post Detail (Neture canonical align)
  *
- * Work Order: WO-O4O-STORE-BLOG-SYSTEM-V1
+ * WO-O4O-STORE-BLOG-SYSTEM-V1
+ * WO-O4O-NETURE-BLOG-CANONICAL-ALIGN-V1: KPA canonical 패턴 정렬
+ *   - BlogPublicHeader (compact) / blogTemplates(Pro+Modern) / useBlogSeo / BlogContentBody 적용
+ *   - Neture override: route param 이름이 `storeSlug` (KPA는 `slug`)
  *
- * Route: /store/:storeSlug/blog/:postSlug
- *
- * 매장별 블로그 게시글 상세 페이지.
- * API: GET /api/v1/stores/:slug/blog/:postSlug
+ * 경로: /store/:storeSlug/blog/:postSlug
+ * 공개 페이지 — 인증 불필요
  */
 
-import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useParams, useSearchParams, Link } from 'react-router-dom';
 import {
-  ArrowLeft,
-  FileText,
-  Calendar,
-  List,
-  Share2,
-} from 'lucide-react';
-import { toast } from '@o4o/error-handling';
-import { api } from '../../lib/api/index.js';
-import { ContentRenderer } from '@o4o/content-editor';
-
-// ── Types ──
-
-interface BlogPostDetail {
-  id: string;
-  title: string;
-  slug: string;
-  excerpt: string | null;
-  content: string;
-  status: string;
-  publishedAt: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-// ── Helpers ──
-
-function formatDate(dateStr: string): string {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-}
-
-// ── Component ──
+  fetchBlogPost,
+  fetchPublicStoreInfo,
+  fetchPublicBlogSettings,
+  type BlogPost,
+  type PublicStoreInfo,
+  type PublicBlogSettings,
+} from '../../api/blog';
+import { BlogPublicHeader } from './blog/BlogPublicHeader';
+import { BlogPost as BlogPostTemplate, pickBlogTemplate } from './blog/blogTemplates';
+import { useBlogSeo } from './blog/useBlogSeo';
 
 export default function StoreBlogPage() {
   const { storeSlug, postSlug } = useParams<{ storeSlug: string; postSlug: string }>();
+  const [searchParams] = useSearchParams();
 
-  const [post, setPost] = useState<BlogPostDetail | null>(null);
+  const [post, setPost] = useState<BlogPost | null>(null);
+  const [storeInfo, setStoreInfo] = useState<PublicStoreInfo | null>(null);
+  const [blogSettings, setBlogSettings] = useState<PublicBlogSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!storeSlug || !postSlug) {
-      setError('잘못된 주소입니다.');
-      setLoading(false);
-      return;
-    }
+  const templateKey = pickBlogTemplate(searchParams.get('template'), blogSettings?.defaultTemplate);
 
-    (async () => {
-      try {
-        const res = await api.get(
-          `/stores/${encodeURIComponent(storeSlug)}/blog/${encodeURIComponent(postSlug)}`,
-        );
-        const result = res.data;
-        if (result.success && result.data) {
-          setPost(result.data);
-        } else {
-          setError('블로그 글을 찾을 수 없습니다.');
-        }
-      } catch {
-        setError('네트워크 오류가 발생했습니다.');
-      } finally {
-        setLoading(false);
-      }
-    })();
+  useEffect(() => {
+    if (!storeSlug || !postSlug) return;
+    setLoading(true);
+    Promise.all([
+      fetchBlogPost(storeSlug, postSlug),
+      fetchPublicStoreInfo(storeSlug).catch(() => null),
+      fetchPublicBlogSettings(storeSlug).catch(() => null),
+    ])
+      .then(([data, info, settings]) => {
+        setPost(data);
+        setStoreInfo(info);
+        setBlogSettings(settings);
+        setError(null);
+      })
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false));
   }, [storeSlug, postSlug]);
 
-  const handleShare = async () => {
-    const url = window.location.href;
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: post?.title || '블로그', url });
-      } catch {
-        // User cancelled
-      }
-    } else {
-      await navigator.clipboard.writeText(url);
-      toast.success('링크가 복사되었습니다.');
-    }
-  };
+  const blogName = blogSettings?.blogName?.trim() || storeInfo?.name?.trim() || null;
+  const seoTitle = post && blogName ? `${post.title} | ${blogName}` : post?.title || null;
+  const stripTags = (s: string | null | undefined): string =>
+    (s || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+  const rawDesc = post?.excerpt || post?.content || blogSettings?.description || storeInfo?.description || '';
+  const cleanDesc = stripTags(rawDesc).slice(0, 160);
+  const seoDescription = cleanDesc || null;
+  const seoUrl = typeof window !== 'undefined' && storeSlug && postSlug
+    ? `${window.location.origin}/store/${storeSlug}/blog/${postSlug}`
+    : null;
+  useBlogSeo({
+    title: seoTitle,
+    description: seoDescription,
+    ogImage: blogSettings?.heroImage || storeInfo?.hero_image || storeInfo?.logo || null,
+    url: seoUrl,
+  });
 
-  // ── Loading ──
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-3xl mx-auto px-4 py-8">
-          <div className="h-6 w-32 bg-gray-200 rounded animate-pulse mb-6" />
-          <div className="bg-white rounded-2xl p-8 shadow-sm">
-            <div className="h-8 w-3/4 bg-gray-200 rounded animate-pulse mb-4" />
-            <div className="h-4 w-40 bg-gray-100 rounded animate-pulse mb-8" />
-            <div className="space-y-3">
-              <div className="h-4 w-full bg-gray-100 rounded animate-pulse" />
-              <div className="h-4 w-full bg-gray-100 rounded animate-pulse" />
-              <div className="h-4 w-5/6 bg-gray-100 rounded animate-pulse" />
-              <div className="h-4 w-full bg-gray-100 rounded animate-pulse" />
-              <div className="h-4 w-2/3 bg-gray-100 rounded animate-pulse" />
-            </div>
-          </div>
+      <div style={{ minHeight: '100vh', background: '#fafbfc' }}>
+        <BlogPublicHeader storeSlug={storeSlug || ''} storeInfo={storeInfo} blogSettings={blogSettings} compact />
+        <div style={{ textAlign: 'center', padding: '48px 0', color: '#94a3b8' }}>
+          불러오는 중...
         </div>
       </div>
     );
   }
 
-  // ── Error ──
   if (error || !post) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <div className="text-center max-w-sm">
-          <div className="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <FileText size={32} className="text-red-500" />
-          </div>
-          <h1 className="text-lg font-bold text-gray-900 mb-2">블로그 오류</h1>
-          <p className="text-sm text-gray-600 mb-6">{error || '글을 찾을 수 없습니다.'}</p>
+      <div style={{ minHeight: '100vh', background: '#fafbfc' }}>
+        <BlogPublicHeader storeSlug={storeSlug || ''} storeInfo={storeInfo} blogSettings={blogSettings} compact />
+        <div style={{ maxWidth: 600, margin: '0 auto', padding: '48px 16px', textAlign: 'center' }}>
+          <h2 style={{ fontSize: 20, color: '#1e293b', marginBottom: 8 }}>
+            게시글을 찾을 수 없습니다
+          </h2>
+          <p style={{ color: '#64748b', marginBottom: 24 }}>{error || '존재하지 않는 게시글입니다.'}</p>
           <Link
-            to={storeSlug ? `/store/${storeSlug}/blog` : '/'}
-            className="inline-block px-5 py-2.5 bg-primary-600 text-white text-sm font-medium rounded-xl hover:bg-primary-700 transition-colors"
+            to={`/store/${storeSlug}/blog`}
+            style={{ color: '#3b82f6', textDecoration: 'none', fontSize: 14 }}
           >
-            블로그 목록으로
+            블로그 목록으로 돌아가기
           </Link>
         </div>
       </div>
@@ -140,62 +103,26 @@ export default function StoreBlogPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        {/* ── Navigation ── */}
-        <div className="flex items-center justify-between mb-6">
-          <Link
-            to={`/store/${storeSlug}/blog`}
-            className="flex items-center gap-2 text-sm text-gray-500 hover:text-primary-600 transition-colors"
-          >
-            <ArrowLeft size={16} />
-            <span>블로그 목록</span>
-          </Link>
-          <button
-            onClick={handleShare}
-            className="p-2 rounded-lg bg-white shadow-sm hover:bg-gray-50 transition-colors"
-            title="공유"
-          >
-            <Share2 size={18} className="text-gray-500" />
-          </button>
-        </div>
+    <div style={{ minHeight: '100vh', background: '#fafbfc' }}>
+      <BlogPublicHeader storeSlug={storeSlug || ''} storeInfo={storeInfo} blogSettings={blogSettings} compact />
 
-        {/* ── Article ── */}
-        <article className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          {/* Header */}
-          <div className="px-8 pt-8 pb-6 border-b border-gray-100">
-            <h1 className="text-2xl font-bold text-gray-900 mb-3 leading-snug">
-              {post.title}
-            </h1>
-            <div className="flex items-center gap-4 text-sm text-gray-400">
-              <span className="flex items-center gap-1.5">
-                <Calendar size={14} />
-                {formatDate(post.publishedAt)}
-              </span>
-            </div>
-          </div>
+      <main style={{ maxWidth: '720px', margin: '0 auto', padding: '0 16px 64px' }}>
+        <Link
+          to={`/store/${storeSlug}/blog`}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            color: '#64748b',
+            textDecoration: 'none',
+            fontSize: 13,
+            marginBottom: 24,
+          }}
+        >
+          ← 블로그 목록
+        </Link>
 
-          {/* Content */}
-          <ContentRenderer
-            html={post.content}
-            className="px-8 py-8 prose prose-sm max-w-none text-gray-700 leading-relaxed
-              prose-headings:text-gray-900 prose-headings:font-bold
-              prose-a:text-primary-600 prose-a:no-underline hover:prose-a:underline
-              prose-img:rounded-xl prose-img:shadow-sm"
-          />
-        </article>
-
-        {/* ── Bottom Navigation ── */}
-        <div className="mt-6 flex justify-center">
-          <Link
-            to={`/store/${storeSlug}/blog`}
-            className="flex items-center gap-2 px-5 py-2.5 bg-white text-sm font-medium text-gray-600 rounded-xl shadow-sm hover:bg-gray-50 transition-colors"
-          >
-            <List size={16} />
-            목록으로
-          </Link>
-        </div>
-      </div>
+        <BlogPostTemplate template={templateKey} post={post} />
+      </main>
     </div>
   );
 }
