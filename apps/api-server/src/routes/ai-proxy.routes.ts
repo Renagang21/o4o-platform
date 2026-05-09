@@ -24,7 +24,7 @@ import {
   parseResponse,
 } from '../services/ai-prompts/index.js';
 // WO-O4O-AI-URL-TO-BLOCKS-YOUTUBE-SUPPORT-V1
-import { isYouTubeUrl, fetchYouTubeContent } from './ai-proxy/youtube-fetcher.js';
+import { isYouTubeUrl, fetchYouTubeContent, fetchYouTubeOEmbed } from './ai-proxy/youtube-fetcher.js';
 
 const router: Router = Router();
 
@@ -309,6 +309,149 @@ async function fetchUrlText(url: string): Promise<string> {
 }
 
 /**
+ * WO-O4O-AI-URL-BLOCKS-TITLE-AUTO-FILL-V1
+ *
+ * url-to-blocks 전용: 본문 + 추출된 제목을 함께 반환.
+ * fetchUrlText 와 거의 동일한 fetch 경로지만 추가로 페이지 제목을 함께 추출한다.
+ *
+ * - YouTube URL: oEmbed.title 사용 (fetchYouTubeContent 와 병렬)
+ * - HTML 페이지: <title> → og:title → twitter:title 우선순위로 추출
+ * - course-structure 등 LMS 라우트는 기존 fetchUrlText 를 계속 사용 (영향 없음)
+ */
+interface UrlContent { text: string; title?: string }
+
+async function fetchUrlContent(url: string): Promise<UrlContent> {
+  if (isYouTubeUrl(url)) {
+    // oEmbed 와 본문(자막+metadata)을 병렬 호출 — 추가 latency 없음
+    const [oembed, ytText] = await Promise.all([
+      fetchYouTubeOEmbed(url).catch(() => null),
+      fetchYouTubeContent(url).catch(() => ''),
+    ]);
+    if (ytText && ytText.trim().length >= 50) {
+      return {
+        text: ytText.slice(0, 3500),
+        title: oembed?.title?.trim() || undefined,
+      };
+    }
+    // 폴백: 일반 fetch — 보통 SPA 라 본문도 부족하지만 흐름 유지
+  }
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+  try {
+    const response = await fetch(url, {
+      signal: controller.signal,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; O4O-AI-Bot/1.0)',
+        'Accept': 'text/html,application/xhtml+xml,text/plain',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`URL fetch 실패: ${response.status} ${response.statusText}`);
+    }
+
+    const contentType = response.headers.get('content-type') || '';
+    const rawText = await response.text();
+
+    if (contentType.includes('text/html')) {
+      return {
+        text: stripHtml(rawText),
+        title: extractHtmlTitle(rawText),
+      };
+    }
+    return { text: rawText };
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+/** HTML 엔티티 기본 디코딩 (제목 추출용 짧은 텍스트 한정) */
+function decodeBasicHtmlEntities(s: string): string {
+  return s
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, ' ');
+}
+
+/**
+ * 페이지 제목 추출.
+ *
+ * 우선순위 (WO-O4O-AI-URL-BLOCKS-TITLE-AUTO-FILL-V1):
+ *   1. <title>
+ *   2. og:title
+ *   3. twitter:title
+ *
+ * meta 태그는 attribute 순서가 다양하므로 (name 먼저 / content 먼저) 양방향 패턴을 모두 시도.
+ * 실패 시 undefined — 호출 측에서 blocks 기반 fallback 으로 넘긴다.
+ */
+function extractHtmlTitle(html: string): string | undefined {
+  // 1. <title>...</title>
+  const titleTagMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+  if (titleTagMatch) {
+    const cleaned = decodeBasicHtmlEntities(
+      titleTagMatch[1].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim(),
+    );
+    if (cleaned) return cleaned.slice(0, 200);
+  }
+
+  // 2. og:title (property=og:title content="...")
+  const og =
+    html.match(/<meta\s+[^>]*?property\s*=\s*["']og:title["'][^>]*?content\s*=\s*["']([^"']+)["']/i) ||
+    html.match(/<meta\s+[^>]*?content\s*=\s*["']([^"']+)["'][^>]*?property\s*=\s*["']og:title["']/i);
+  if (og) {
+    const cleaned = decodeBasicHtmlEntities(og[1].trim());
+    if (cleaned) return cleaned.slice(0, 200);
+  }
+
+  // 3. twitter:title (name=twitter:title content="...")
+  const tw =
+    html.match(/<meta\s+[^>]*?name\s*=\s*["']twitter:title["'][^>]*?content\s*=\s*["']([^"']+)["']/i) ||
+    html.match(/<meta\s+[^>]*?content\s*=\s*["']([^"']+)["'][^>]*?name\s*=\s*["']twitter:title["']/i);
+  if (tw) {
+    const cleaned = decodeBasicHtmlEntities(tw[1].trim());
+    if (cleaned) return cleaned.slice(0, 200);
+  }
+
+  return undefined;
+}
+
+/**
+ * AI 가 생성한 blocks 에서 fallback 제목 도출.
+ *
+ * 우선순위 (WO-O4O-AI-URL-BLOCKS-TITLE-AUTO-FILL-V1):
+ *   5. 첫 o4o/heading content
+ *   6. 첫 o4o/paragraph 의 첫 문장 (또는 앞 40자)
+ */
+function deriveTitleFromBlocks(blocks: Array<{ type?: string; content?: string }>): string | undefined {
+  const stripTags = (s: string) => s.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+
+  const firstHeading = blocks.find((b) => b.type === 'o4o/heading');
+  if (firstHeading?.content) {
+    const cleaned = stripTags(String(firstHeading.content));
+    if (cleaned) return cleaned.slice(0, 80);
+  }
+
+  const firstPara = blocks.find((b) => b.type === 'o4o/paragraph');
+  if (firstPara?.content) {
+    const cleaned = stripTags(String(firstPara.content));
+    if (cleaned) {
+      const firstSentence = cleaned.split(/(?<=[.!?。！？])\s+/)[0]?.trim();
+      if (firstSentence && firstSentence.length > 0 && firstSentence.length <= 80) {
+        return firstSentence;
+      }
+      return cleaned.slice(0, 40) + (cleaned.length > 40 ? '…' : '');
+    }
+  }
+
+  return undefined;
+}
+
+/**
  * HTML에서 의미있는 텍스트 추출
  * WO-O4O-AI-URL-CONTENT-QUALITY-V2: 노이즈 제거 강화
  */
@@ -460,9 +603,13 @@ router.post('/url-to-blocks', authenticate, async (req, res: Response) => {
     logger.info('[url-to-blocks] 시작', { requestId, userId, url: parsedUrl.hostname });
 
     // 1. URL 콘텐츠 가져오기
+    // WO-O4O-AI-URL-BLOCKS-TITLE-AUTO-FILL-V1: fetchUrlContent 로 본문 + 추출 제목 함께 수신
     let urlText: string;
+    let extractedTitle: string | undefined;
     try {
-      urlText = await fetchUrlText(parsedUrl.toString());
+      const fetched = await fetchUrlContent(parsedUrl.toString());
+      urlText = fetched.text;
+      extractedTitle = fetched.title;
     } catch (fetchError: any) {
       logger.warn('[url-to-blocks] URL fetch 실패', { requestId, error: fetchError.message });
       return res.status(422).json({
@@ -585,6 +732,12 @@ router.post('/url-to-blocks', authenticate, async (req, res: Response) => {
     const MAX_BLOCKS = 10;
     const limitedBlocks = finalBlocks.slice(0, MAX_BLOCKS);
 
+    // WO-O4O-AI-URL-BLOCKS-TITLE-AUTO-FILL-V1:
+    //   추출 제목(youtube oEmbed / HTML <title>·og·twitter) 우선, 없으면 blocks 기반 fallback.
+    //   둘 다 실패하면 title 미포함 — 클라이언트는 빈 string 으로 다루고 사용자가 직접 입력.
+    const blocksTitleFallback = extractedTitle ? undefined : deriveTitleFromBlocks(limitedBlocks);
+    const finalTitle = (extractedTitle || blocksTitleFallback || '').trim();
+
     logger.info('[url-to-blocks] 완료', {
       requestId,
       userId,
@@ -592,9 +745,10 @@ router.post('/url-to-blocks', authenticate, async (req, res: Response) => {
       afterFilter: finalBlocks.length,
       final: limitedBlocks.length,
       isYouTube,
+      titleSource: extractedTitle ? 'extracted' : (blocksTitleFallback ? 'blocks' : 'none'),
     });
 
-    return res.json({ success: true, blocks: limitedBlocks, requestId });
+    return res.json({ success: true, blocks: limitedBlocks, title: finalTitle, requestId });
   } catch (error: any) {
     logger.error('[url-to-blocks] 오류', { requestId, error: error.message });
     return res.status(500).json({

@@ -369,9 +369,12 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
         .map((b) => b.attributes?.url || b.attributes?.src || '')
         .filter((u): u is string => Boolean(u));
 
+      // WO-O4O-AI-URL-BLOCKS-TITLE-AUTO-FILL-V1:
+      //   백엔드가 추출한 제목(YouTube oEmbed / HTML <title>·og·twitter / blocks fallback)을 사용.
+      //   미추출 시 빈 문자열 — 호출 측(ContentWritePage / ResourceWritePage)이 자체 fallback 적용.
       setResult({
         html,
-        title: '',
+        title: typeof data.title === 'string' ? data.title : '',
         summary: `${data.blocks.length}개 블록 → HTML 변환 완료`,
         youtubeUrls,
       });
