@@ -1,10 +1,25 @@
 /**
  * OrdersPage - K-Cosmetics 주문 관리
+ *
+ * WO-O4O-KCOS-ORDERS-DATATABLE-CANONICAL-ALIGN-V1:
+ *   raw <table> → @o4o/operator-ux-core DataTable canonical 정렬.
+ *   mock data, status filter, stats cards, 도메인 워크플로 변경 없음.
  */
 
 import { useState } from 'react';
+import { DataTable } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 
-const orders = [
+interface OrderRow {
+  id: string;
+  store: string;
+  items: number;
+  total: string;
+  status: string;
+  date: string;
+}
+
+const orders: OrderRow[] = [
   { id: 'ORD-2024-001', store: '뷰티랩 강남점', items: 5, total: '₩1,250,000', status: '배송중', date: '2024-01-15 14:30' },
   { id: 'ORD-2024-002', store: '코스메틱 홍대점', items: 3, total: '₩890,000', status: '준비중', date: '2024-01-15 13:45' },
   { id: 'ORD-2024-003', store: '스킨케어 명동점', items: 8, total: '₩2,100,000', status: '완료', date: '2024-01-15 11:20' },
@@ -28,6 +43,51 @@ export default function OrdersPage() {
   const filteredOrders = orders.filter(order =>
     statusFilter === 'all' || order.status === statusFilter
   );
+
+  const columns: ListColumnDef<OrderRow>[] = [
+    {
+      key: 'id',
+      header: '주문번호',
+      sortable: true,
+      render: (_v, o) => <span className="font-medium text-pink-600">{o.id}</span>,
+    },
+    {
+      key: 'store',
+      header: '매장',
+      sortable: true,
+      render: (_v, o) => <span className="text-slate-800">{o.store}</span>,
+    },
+    {
+      key: 'items',
+      header: '상품수',
+      align: 'right',
+      sortable: true,
+      sortAccessor: (o) => o.items,
+      render: (_v, o) => <span className="text-slate-600">{o.items}개</span>,
+    },
+    {
+      key: 'total',
+      header: '금액',
+      align: 'right',
+      render: (_v, o) => <span className="font-medium text-slate-800">{o.total}</span>,
+    },
+    {
+      key: 'status',
+      header: '상태',
+      render: (_v, o) => (
+        <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[o.status] || 'bg-gray-100 text-gray-700'}`}>
+          {o.status}
+        </span>
+      ),
+    },
+    {
+      key: 'date',
+      header: '주문일시',
+      sortable: true,
+      sortAccessor: (o) => new Date(o.date.replace(' ', 'T')).getTime(),
+      render: (_v, o) => <span className="text-sm text-slate-500">{o.date}</span>,
+    },
+  ];
 
   return (
     <div className="space-y-6">
@@ -84,36 +144,13 @@ export default function OrdersPage() {
 
       {/* Orders Table */}
       <div className="bg-white rounded-xl border border-slate-100 overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-slate-50 border-b border-slate-100">
-            <tr>
-              <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">주문번호</th>
-              <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">매장</th>
-              <th className="text-right px-6 py-4 text-sm font-medium text-slate-500">상품수</th>
-              <th className="text-right px-6 py-4 text-sm font-medium text-slate-500">금액</th>
-              <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">상태</th>
-              <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">주문일시</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {filteredOrders.map((order) => (
-              <tr key={order.id} className="hover:bg-slate-50 transition-colors cursor-pointer">
-                <td className="px-6 py-4">
-                  <p className="font-medium text-pink-600">{order.id}</p>
-                </td>
-                <td className="px-6 py-4 text-slate-800">{order.store}</td>
-                <td className="px-6 py-4 text-right text-slate-600">{order.items}개</td>
-                <td className="px-6 py-4 text-right font-medium text-slate-800">{order.total}</td>
-                <td className="px-6 py-4">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[order.status]}`}>
-                    {order.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm text-slate-500">{order.date}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <DataTable<OrderRow>
+          columns={columns}
+          data={filteredOrders}
+          rowKey="id"
+          emptyMessage={statusFilter === 'all' ? '주문이 없습니다.' : '조건에 맞는 주문이 없습니다.'}
+          tableId="kcosmetics-operator-orders"
+        />
       </div>
     </div>
   );
