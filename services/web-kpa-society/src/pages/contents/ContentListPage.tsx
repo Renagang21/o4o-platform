@@ -4,26 +4,20 @@
  * WO-KPA-CONTENT-HUB-FOUNDATION-V1
  * WO-O4O-CONTENT-HUB-TEMPLATE-TYPE-ALIGNMENT-V1
  * WO-KPA-CONTENT-LIST-TABS-ALIGN-WITH-CREATE-TYPES-V1
- * WO-KPA-CONTENT-SECTION-CREATE-FLOW-ALIGN-V1 (Phase 1: 등록 흐름 정렬)
- * WO-KPA-CONTENT-HUB-SECTION-UI-V1 (Phase 2: 섹션 허브 UI 전환)
- * WO-O4O-CONTENT-LIBRARY-CARD-STANDARD-V1: inline style → Tailwind, hex → theme, Card 적용
- * WO-KPA-CONTENT-HUB-SURVEY-SECTION-RESTORE-V1: 설문조사 섹션 추가
- * WO-KPA-PARTICIPATION-SETS-404-CLEANUP-V1: KPA에 participation 백엔드가 없으므로
- *   설문 섹션은 정적 안내로 유지 (participation API 호출 제거).
+ * WO-KPA-CONTENT-SECTION-CREATE-FLOW-ALIGN-V1
+ * WO-KPA-CONTENT-HUB-SECTION-UI-V1
+ * WO-O4O-CONTENT-LIBRARY-CARD-STANDARD-V1
+ * WO-KPA-CONTENT-HUB-SURVEY-SECTION-RESTORE-V1
+ * WO-KPA-PARTICIPATION-SETS-404-CLEANUP-V1
+ * WO-O4O-CONTENT-HUB-TABLE-CANONICAL-ALIGN-V1:
+ *   - DocumentsSection을 BaseTable + BaseDetailDrawer + RowActionMenu canonical로 정렬
+ *   - "링크 복사" → "내 자료함 가져가기" (contentApi.copyToStore)
+ *   - "상세보기" 액션 제거 → 제목/row 클릭 시 Drawer 오픈
  *
  * /content를 3개 섹션의 허브로 표시:
- *   1. 문서형 콘텐츠 — 메인 섹션 (리스트, 등록/상세/링크/수정/삭제)
+ *   1. 문서형 콘텐츠 — 메인 섹션 (리스트, BaseTable + Drawer)
  *   2. 코스형 자료  — 두 번째 섹션 (리스트, 등록 + 더보기)
- *   3. 설문조사     — 세 번째 섹션 (정적 안내 — participation 실행은 Neture canonical)
- *
- * 데이터 소스:
- *   - 문서: contentApi.list (content_type='information', sub_type='content')
- *   - 코스: lmsApi.getCourses (공개 API, contentKind='content_resource', status='published')
- *   - 설문: 없음 (API 미호출 — 정적 placeholder)
- *
- * WO-KPA-CONTENT-COURSES-PUBLIC-VISIBILITY-FIX-V1:
- *   코스형 자료 섹션을 강사 전용 API에서 공개 API로 교체.
- *   모든 이용자가 공개 코스형 자료를 볼 수 있도록 수정.
+ *   3. 설문조사     — 세 번째 섹션
  *
  * 권한: 작성자만 수정/삭제 노출 (createdBy === currentUserId)
  */
@@ -37,72 +31,20 @@ import type { Course } from '../../types';
 import type { ParticipationSet } from '../participation/types';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
-import { Card } from '@o4o/ui';
+import {
+  Card,
+  BaseTable,
+  BaseDetailDrawer,
+  RowActionMenu,
+  type O4OColumn,
+  type RowActionItem,
+} from '@o4o/ui';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function formatDate(d: string | Date | null | undefined) {
   if (!d) return '-';
   try { return new Date(d).toLocaleDateString('ko-KR'); } catch { return '-'; }
-}
-
-// ─── Row Action Menu (문서 섹션 전용) ─────────────────────────────────────────
-
-function RowActionMenu({
-  onView,
-  onCopyLink,
-  onEdit,
-  onDelete,
-  isOwner,
-}: {
-  onView: () => void;
-  onCopyLink: () => void;
-  onEdit: () => void;
-  onDelete: () => void;
-  isOwner: boolean;
-}) {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <div className="relative inline-block">
-      <button
-        onClick={(e) => { e.stopPropagation(); setOpen((o) => !o); }}
-        className="px-2 py-0.5 text-sm font-bold text-slate-500 bg-transparent border border-slate-200 rounded cursor-pointer tracking-wider"
-        title="액션"
-      >
-        ···
-      </button>
-      {open && (
-        <>
-          <div
-            className="fixed inset-0 z-10"
-            onClick={(e) => { e.stopPropagation(); setOpen(false); }}
-          />
-          <div className="absolute right-0 top-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-20 min-w-[100px] overflow-hidden">
-            <button className="block w-full px-3.5 py-2 text-[13px] font-medium text-slate-700 bg-transparent border-none text-left cursor-pointer hover:bg-slate-50" onClick={(e) => { e.stopPropagation(); setOpen(false); onView(); }}>
-              상세보기
-            </button>
-            <button className="block w-full px-3.5 py-2 text-[13px] font-medium text-slate-700 bg-transparent border-none text-left cursor-pointer hover:bg-slate-50" onClick={(e) => { e.stopPropagation(); setOpen(false); onCopyLink(); }}>
-              링크 복사
-            </button>
-            {isOwner && (
-              <button className="block w-full px-3.5 py-2 text-[13px] font-medium text-slate-700 bg-transparent border-none text-left cursor-pointer hover:bg-slate-50" onClick={(e) => { e.stopPropagation(); setOpen(false); onEdit(); }}>
-                수정
-              </button>
-            )}
-            {isOwner && (
-              <button
-                className="block w-full px-3.5 py-2 text-[13px] font-medium text-red-500 bg-transparent border-none text-left cursor-pointer hover:bg-slate-50"
-                onClick={(e) => { e.stopPropagation(); setOpen(false); onDelete(); }}
-              >
-                삭제
-              </button>
-            )}
-          </div>
-        </>
-      )}
-    </div>
-  );
 }
 
 // ─── Section Header (공통) ────────────────────────────────────────────────────
@@ -157,6 +99,12 @@ function DocumentsSection({
   const [items, setItems] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Drawer + 가져가기 상태 (WO-O4O-CONTENT-HUB-TABLE-CANONICAL-ALIGN-V1)
+  const [drawerItem, setDrawerItem] = useState<ContentItem | null>(null);
+  const [drawerDetail, setDrawerDetail] = useState<ContentItem | null>(null);
+  const [drawerLoading, setDrawerLoading] = useState(false);
+  const [copying, setCopying] = useState<string | null>(null);
+
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
@@ -182,23 +130,136 @@ function DocumentsSection({
     return () => { cancelled = true; };
   }, [refreshKey]);
 
-  const handleCopyLink = useCallback((id: string) => {
-    const url = `${window.location.origin}/content/${id}`;
-    navigator.clipboard.writeText(url)
-      .then(() => toast.success('링크가 복사되었습니다'))
-      .catch(() => toast.error('링크 복사에 실패했습니다'));
+  const openDrawer = useCallback((item: ContentItem) => {
+    setDrawerItem(item);
+    setDrawerDetail(null);
+    setDrawerLoading(true);
+    contentApi.detail(item.id)
+      .then((res) => { if (res.success) setDrawerDetail(res.data); })
+      .catch(() => {})
+      .finally(() => setDrawerLoading(false));
+  }, []);
+
+  const closeDrawer = useCallback(() => {
+    setDrawerItem(null);
+    setDrawerDetail(null);
+  }, []);
+
+  const handleCopyToStore = useCallback(async (id: string) => {
+    setCopying(id);
+    try {
+      await contentApi.copyToStore(id);
+      toast.success('내 자료함에 가져왔습니다');
+    } catch (e: any) {
+      toast.error(e?.message || '가져오기에 실패했습니다');
+    } finally {
+      setCopying(null);
+    }
   }, []);
 
   const handleDelete = useCallback(async (id: string) => {
-    if (!window.confirm('이 콘텐츠를 삭제하시겠습니까?')) return;
     try {
       await contentApi.remove(id);
       toast.success('삭제되었습니다');
+      if (drawerItem?.id === id) closeDrawer();
       onChanged();
     } catch (e: any) {
       toast.error(e?.message || '삭제에 실패했습니다');
     }
-  }, [onChanged]);
+  }, [onChanged, drawerItem, closeDrawer]);
+
+  const columns: O4OColumn<ContentItem>[] = [
+    {
+      key: 'title',
+      header: '제목',
+      render: (_v, row) => (
+        <span className="font-semibold text-sm text-slate-800 overflow-hidden text-ellipsis whitespace-nowrap">{row.title}</span>
+      ),
+    },
+    {
+      key: 'author_name',
+      header: '작성자',
+      width: '100px',
+      render: (val) => <span className="text-[13px] text-slate-500">{val || '-'}</span>,
+    },
+    {
+      key: 'created_at',
+      header: '작성일',
+      width: '100px',
+      render: (val) => <span className="text-[13px] text-slate-400">{formatDate(val)}</span>,
+    },
+    {
+      key: 'view_count',
+      header: '조회',
+      width: '60px',
+      align: 'center',
+      render: (val) => <span className="text-[13px] text-slate-400">{val ?? 0}</span>,
+    },
+    {
+      key: 'like_count',
+      header: '좋아요',
+      width: '60px',
+      align: 'center',
+      render: (val) => <span className="text-[13px] text-slate-400">{val ?? 0}</span>,
+    },
+    {
+      key: '_actions',
+      header: '',
+      width: '52px',
+      align: 'center',
+      system: 'last',
+      render: (_v, row) => {
+        const isOwner = !!(currentUserId && row.created_by === currentUserId);
+        const actions: RowActionItem[] = [
+          {
+            key: 'copy-to-store',
+            label: '내 자료함 가져가기',
+            onClick: () => handleCopyToStore(row.id),
+            loading: copying === row.id,
+          },
+        ];
+        if (isOwner) {
+          actions.push({
+            key: 'edit',
+            label: '수정',
+            onClick: () => navigate(`/content/${row.id}/edit`),
+          });
+          actions.push({
+            key: 'delete',
+            label: '삭제',
+            variant: 'danger',
+            onClick: () => handleDelete(row.id),
+            confirm: {
+              title: '콘텐츠 삭제',
+              message: '이 콘텐츠를 삭제하시겠습니까?',
+              variant: 'danger',
+            },
+          });
+        }
+        return <RowActionMenu actions={actions} />;
+      },
+    },
+  ];
+
+  const drawerIsOwner = !!(currentUserId && drawerItem && drawerItem.created_by === currentUserId);
+  const drawerActions = drawerItem ? [
+    {
+      label: '내 자료함 가져가기',
+      variant: 'primary' as const,
+      onClick: () => handleCopyToStore(drawerItem.id),
+      loading: copying === drawerItem.id,
+    },
+    ...(drawerIsOwner ? [
+      {
+        label: '수정',
+        onClick: () => navigate(`/content/${drawerItem.id}/edit`),
+      },
+    ] : []),
+    {
+      label: '전체 페이지',
+      onClick: () => navigate(`/content/${drawerItem.id}`),
+    },
+  ] : undefined;
 
   return (
     <section className="mb-10">
@@ -213,82 +274,92 @@ function DocumentsSection({
         <Card className="overflow-hidden">
           <div className="py-8 px-4 text-sm text-slate-400 text-center">불러오는 중...</div>
         </Card>
-      ) : items.length === 0 ? (
-        <Card className="overflow-hidden">
-          <div className="py-8 px-4 text-sm text-slate-400 text-center">아직 문서가 없습니다</div>
-        </Card>
       ) : (
         <>
-          {/* Desktop: Table */}
-          <Card className="overflow-hidden hidden md:block">
-            <table className="w-full border-collapse table-fixed">
-              <thead>
-                <tr>
-                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left">제목</th>
-                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left w-24">작성자</th>
-                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left w-[100px]">작성일</th>
-                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-center w-14">조회</th>
-                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-center w-14">좋아요</th>
-                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left w-12"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((item) => {
-                  const isOwner = !!(currentUserId && item.created_by === currentUserId);
-                  return (
-                    <tr
-                      key={item.id}
-                      onClick={() => navigate(`/content/${item.id}`)}
-                      className="cursor-pointer transition-colors hover:bg-slate-50"
-                    >
-                      <td className="px-3 py-3 text-sm text-slate-900 border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap">
-                        <span className="font-semibold text-sm text-slate-800">{item.title}</span>
-                      </td>
-                      <td className="px-3 py-3 text-[13px] text-slate-500 border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap">{item.author_name || '-'}</td>
-                      <td className="px-3 py-3 text-[13px] text-slate-400 border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap">{formatDate(item.created_at)}</td>
-                      <td className="px-3 py-3 text-[13px] text-slate-400 border-b border-slate-100 text-center whitespace-nowrap">👁 {item.view_count ?? 0}</td>
-                      <td className="px-3 py-3 text-[13px] text-slate-400 border-b border-slate-100 text-center whitespace-nowrap">👍 {item.like_count ?? 0}</td>
-                      <td className="px-3 py-3 border-b border-slate-100 text-center" onClick={(e) => e.stopPropagation()}>
-                        <RowActionMenu
-                          isOwner={isOwner}
-                          onView={() => navigate(`/content/${item.id}`)}
-                          onCopyLink={() => handleCopyLink(item.id)}
-                          onEdit={() => navigate(`/content/${item.id}/edit`)}
-                          onDelete={() => handleDelete(item.id)}
-                        />
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </Card>
+          {/* Desktop: BaseTable */}
+          <div className="hidden md:block bg-white rounded-lg border border-slate-200 overflow-hidden">
+            <BaseTable<ContentItem>
+              columns={columns}
+              data={items}
+              rowKey={(row) => row.id}
+              onRowClick={(row) => openDrawer(row)}
+              emptyMessage={
+                <div className="py-8 px-4 text-sm text-slate-400 text-center">아직 문서가 없습니다</div>
+              }
+            />
+          </div>
 
-          {/* Mobile: Card List (WO-O4O-RESPONSIVE-LIST-EXPAND-V1) */}
-          <div className="block md:hidden flex flex-col gap-3">
-            {items.map((item) => (
-              <Card
-                key={item.id}
-                className="p-4 cursor-pointer hover:bg-slate-50 transition-colors"
-                onClick={() => navigate(`/content/${item.id}`)}
-              >
-                <div className="flex flex-col gap-2">
-                  <span className="text-sm font-medium text-slate-800 line-clamp-2">{item.title}</span>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-slate-500">
-                      {item.author_name || '-'} · {formatDate(item.created_at)}
-                    </span>
-                    <div className="flex items-center gap-3 text-xs text-slate-400">
-                      <span>👁 {item.view_count ?? 0}</span>
-                      {(item.like_count ?? 0) > 0 && <span>👍 {item.like_count}</span>}
-                    </div>
-                  </div>
-                </div>
+          {/* Mobile: Card List */}
+          <div className="block md:hidden">
+            {items.length === 0 ? (
+              <Card className="overflow-hidden">
+                <div className="py-8 px-4 text-sm text-slate-400 text-center">아직 문서가 없습니다</div>
               </Card>
-            ))}
+            ) : (
+              <div className="flex flex-col gap-3">
+                {items.map((item) => (
+                  <Card
+                    key={item.id}
+                    className="p-4 cursor-pointer hover:bg-slate-50 transition-colors"
+                    onClick={() => openDrawer(item)}
+                  >
+                    <div className="flex flex-col gap-2">
+                      <span className="text-sm font-medium text-slate-800 line-clamp-2">{item.title}</span>
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-slate-500">
+                          {item.author_name || '-'} · {formatDate(item.created_at)}
+                        </span>
+                        <div className="flex items-center gap-3 text-xs text-slate-400">
+                          <span>👁 {item.view_count ?? 0}</span>
+                          {(item.like_count ?? 0) > 0 && <span>👍 {item.like_count}</span>}
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
           </div>
         </>
       )}
+
+      {/* Detail Drawer */}
+      <BaseDetailDrawer
+        open={!!drawerItem}
+        onClose={closeDrawer}
+        title={drawerItem?.title ?? ''}
+        loading={drawerLoading}
+        actions={drawerActions}
+      >
+        {drawerDetail && (
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
+              <span>{drawerDetail.author_name || '익명'}</span>
+              <span>·</span>
+              <span>{formatDate(drawerDetail.created_at)}</span>
+              <span>·</span>
+              <span>조회 {drawerDetail.view_count ?? 0}</span>
+              <span>·</span>
+              <span>좋아요 {drawerDetail.like_count ?? 0}</span>
+            </div>
+            {drawerDetail.summary && (
+              <p className="text-sm text-slate-600 bg-slate-50 rounded-md px-3 py-2 m-0">{drawerDetail.summary}</p>
+            )}
+            {Array.isArray(drawerDetail.tags) && drawerDetail.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {drawerDetail.tags.map((tag) => (
+                  <span key={tag} className="px-2 py-0.5 text-[11px] font-medium text-slate-500 bg-slate-100 rounded">#{tag}</span>
+                ))}
+              </div>
+            )}
+            {drawerDetail.body ? (
+              <div className="text-sm text-slate-800 leading-relaxed" dangerouslySetInnerHTML={{ __html: drawerDetail.body }} />
+            ) : (
+              <p className="text-sm text-slate-400 m-0">본문이 없습니다.</p>
+            )}
+          </div>
+        )}
+      </BaseDetailDrawer>
     </section>
   );
 }

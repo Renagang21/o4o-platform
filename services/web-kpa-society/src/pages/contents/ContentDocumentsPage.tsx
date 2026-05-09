@@ -2,6 +2,11 @@
  * ContentDocumentsPage — /content/documents
  *
  * WO-KPA-CONTENT-HUB-UNIFIED-SECTION-RULES-V1
+ * WO-O4O-CONTENT-HUB-TABLE-CANONICAL-ALIGN-V1:
+ *   - O4O canonical table 패턴(BaseTable + RowActionMenu + ActionBar + BaseDetailDrawer) 적용
+ *   - "링크 복사" → "내 자료함 가져가기" (contentApi.copyToStore)
+ *   - "상세보기" 메뉴 제거 — row 클릭 시 Drawer 오픈
+ *   - bulk select + bulk 가져가기/삭제(소유자만 필터) 추가
  *
  * 문서형 콘텐츠 전체 목록.
  * /content 허브의 문서 섹션 미리보기 → "전체 보기" 클릭 시 이 페이지로 이동.
@@ -10,12 +15,21 @@
  * 권한: 작성자만 수정/삭제 노출 (created_by === currentUserId)
  */
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { contentApi, type ContentItem } from '../../api/content';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
-import { Card } from '@o4o/ui';
+import {
+  Card,
+  BaseTable,
+  BaseDetailDrawer,
+  RowActionMenu,
+  ActionBar,
+  type O4OColumn,
+  type RowActionItem,
+  type ActionBarAction,
+} from '@o4o/ui';
 
 const PAGE_LIMIT = 20;
 
@@ -23,67 +37,6 @@ function formatDate(d: string | Date | null | undefined) {
   if (!d) return '-';
   try { return new Date(d).toLocaleDateString('ko-KR'); } catch { return '-'; }
 }
-
-// ─── Row Action Menu ──────────────────────────────────────────────────────────
-
-function RowActionMenu({
-  onView,
-  onCopyLink,
-  onEdit,
-  onDelete,
-  isOwner,
-}: {
-  onView: () => void;
-  onCopyLink: () => void;
-  onEdit: () => void;
-  onDelete: () => void;
-  isOwner: boolean;
-}) {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <div className="relative inline-block">
-      <button
-        onClick={(e) => { e.stopPropagation(); setOpen((o) => !o); }}
-        className="px-2 py-0.5 text-sm font-bold text-slate-500 bg-transparent border border-slate-200 rounded cursor-pointer tracking-wider"
-        title="액션"
-      >
-        ···
-      </button>
-      {open && (
-        <>
-          <div
-            className="fixed inset-0 z-10"
-            onClick={(e) => { e.stopPropagation(); setOpen(false); }}
-          />
-          <div className="absolute right-0 top-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-20 min-w-[100px] overflow-hidden">
-            <button className="block w-full px-3.5 py-2 text-[13px] font-medium text-slate-700 bg-transparent border-none text-left cursor-pointer hover:bg-slate-50" onClick={(e) => { e.stopPropagation(); setOpen(false); onView(); }}>
-              상세보기
-            </button>
-            <button className="block w-full px-3.5 py-2 text-[13px] font-medium text-slate-700 bg-transparent border-none text-left cursor-pointer hover:bg-slate-50" onClick={(e) => { e.stopPropagation(); setOpen(false); onCopyLink(); }}>
-              링크 복사
-            </button>
-            {isOwner && (
-              <button className="block w-full px-3.5 py-2 text-[13px] font-medium text-slate-700 bg-transparent border-none text-left cursor-pointer hover:bg-slate-50" onClick={(e) => { e.stopPropagation(); setOpen(false); onEdit(); }}>
-                수정
-              </button>
-            )}
-            {isOwner && (
-              <button
-                className="block w-full px-3.5 py-2 text-[13px] font-medium text-red-500 bg-transparent border-none text-left cursor-pointer hover:bg-slate-50"
-                onClick={(e) => { e.stopPropagation(); setOpen(false); onDelete(); }}
-              >
-                삭제
-              </button>
-            )}
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
-
-// ─── Component ────────────────────────────────────────────────────────────────
 
 export function ContentDocumentsPage() {
   const navigate = useNavigate();
@@ -94,6 +47,16 @@ export function ContentDocumentsPage() {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+
+  // Drawer state
+  const [drawerItem, setDrawerItem] = useState<ContentItem | null>(null);
+  const [drawerDetail, setDrawerDetail] = useState<ContentItem | null>(null);
+  const [drawerLoading, setDrawerLoading] = useState(false);
+
+  // 가져가기 진행 표시
+  const [copyingId, setCopyingId] = useState<string | null>(null);
+  const [bulkBusy, setBulkBusy] = useState(false);
 
   const load = useCallback((pageNum: number) => {
     setLoading(true);
@@ -117,27 +80,210 @@ export function ContentDocumentsPage() {
 
   useEffect(() => {
     load(page);
+    setSelectedKeys(new Set());
   }, [load, page]);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
 
-  const handleCopyLink = useCallback((id: string) => {
-    const url = `${window.location.origin}/content/${id}`;
-    navigator.clipboard.writeText(url)
-      .then(() => toast.success('링크가 복사되었습니다'))
-      .catch(() => toast.error('링크 복사에 실패했습니다'));
+  const openDrawer = useCallback((item: ContentItem) => {
+    setDrawerItem(item);
+    setDrawerDetail(null);
+    setDrawerLoading(true);
+    contentApi.detail(item.id)
+      .then((res) => { if (res.success) setDrawerDetail(res.data); })
+      .catch(() => {})
+      .finally(() => setDrawerLoading(false));
+  }, []);
+
+  const closeDrawer = useCallback(() => {
+    setDrawerItem(null);
+    setDrawerDetail(null);
+  }, []);
+
+  const handleCopyToStore = useCallback(async (id: string) => {
+    setCopyingId(id);
+    try {
+      await contentApi.copyToStore(id);
+      toast.success('내 자료함에 가져왔습니다');
+    } catch (e: any) {
+      toast.error(e?.message || '가져오기에 실패했습니다');
+    } finally {
+      setCopyingId(null);
+    }
   }, []);
 
   const handleDelete = useCallback(async (id: string) => {
-    if (!window.confirm('이 콘텐츠를 삭제하시겠습니까?')) return;
     try {
       await contentApi.remove(id);
       toast.success('삭제되었습니다');
+      if (drawerItem?.id === id) closeDrawer();
+      setSelectedKeys((prev) => { const next = new Set(prev); next.delete(id); return next; });
       load(page);
     } catch (e: any) {
       toast.error(e?.message || '삭제에 실패했습니다');
     }
-  }, [load, page]);
+  }, [load, page, drawerItem, closeDrawer]);
+
+  const handleBulkCopy = useCallback(async () => {
+    setBulkBusy(true);
+    try {
+      const ids = Array.from(selectedKeys);
+      const results = await Promise.allSettled(ids.map((id) => contentApi.copyToStore(id)));
+      const ok = results.filter((r) => r.status === 'fulfilled').length;
+      const failed = results.length - ok;
+      if (ok > 0) toast.success(`${ok}개를 자료함에 가져왔습니다`);
+      if (failed > 0) toast.error(`${failed}개 가져오기 실패`);
+    } finally {
+      setBulkBusy(false);
+    }
+  }, [selectedKeys]);
+
+  const handleBulkDelete = useCallback(async () => {
+    if (!currentUserId) return;
+    setBulkBusy(true);
+    try {
+      // 소유자 필터: 본인 콘텐츠만 삭제 시도
+      const ownIds = items
+        .filter((it) => selectedKeys.has(it.id) && it.created_by === currentUserId)
+        .map((it) => it.id);
+      if (ownIds.length === 0) {
+        toast.error('삭제 가능한 항목(본인 작성)이 없습니다');
+        return;
+      }
+      const results = await Promise.allSettled(ownIds.map((id) => contentApi.remove(id)));
+      const ok = results.filter((r) => r.status === 'fulfilled').length;
+      if (ok > 0) toast.success(`${ok}개 삭제되었습니다`);
+      setSelectedKeys(new Set());
+      load(page);
+    } finally {
+      setBulkBusy(false);
+    }
+  }, [selectedKeys, items, currentUserId, load, page]);
+
+  const columns = useMemo((): O4OColumn<ContentItem>[] => [
+    {
+      key: 'title',
+      header: '제목',
+      render: (_v, row) => (
+        <span className="font-semibold text-sm text-slate-800 overflow-hidden text-ellipsis whitespace-nowrap">{row.title}</span>
+      ),
+    },
+    {
+      key: 'author_name',
+      header: '작성자',
+      width: '100px',
+      render: (val) => <span className="text-[13px] text-slate-500">{val || '-'}</span>,
+    },
+    {
+      key: 'created_at',
+      header: '작성일',
+      width: '100px',
+      render: (val) => <span className="text-[13px] text-slate-400">{formatDate(val)}</span>,
+    },
+    {
+      key: 'view_count',
+      header: '조회',
+      width: '60px',
+      align: 'center',
+      render: (val) => <span className="text-[13px] text-slate-400">{val ?? 0}</span>,
+    },
+    {
+      key: 'like_count',
+      header: '좋아요',
+      width: '60px',
+      align: 'center',
+      render: (val) => <span className="text-[13px] text-slate-400">{val ?? 0}</span>,
+    },
+    {
+      key: '_actions',
+      header: '',
+      width: '52px',
+      align: 'center',
+      system: 'last',
+      render: (_v, row) => {
+        const isOwner = !!(currentUserId && row.created_by === currentUserId);
+        const actions: RowActionItem[] = [
+          {
+            key: 'copy-to-store',
+            label: '내 자료함 가져가기',
+            onClick: () => handleCopyToStore(row.id),
+            loading: copyingId === row.id,
+          },
+        ];
+        if (isOwner) {
+          actions.push({
+            key: 'edit',
+            label: '수정',
+            onClick: () => navigate(`/content/${row.id}/edit`),
+          });
+          actions.push({
+            key: 'delete',
+            label: '삭제',
+            variant: 'danger',
+            onClick: () => handleDelete(row.id),
+            confirm: {
+              title: '콘텐츠 삭제',
+              message: '이 콘텐츠를 삭제하시겠습니까?',
+              variant: 'danger',
+            },
+          });
+        }
+        return <RowActionMenu actions={actions} />;
+      },
+    },
+  ], [currentUserId, copyingId, navigate, handleCopyToStore, handleDelete]);
+
+  const bulkActions: ActionBarAction[] = [
+    {
+      key: 'copy',
+      label: '내 자료함 가져가기',
+      onClick: handleBulkCopy,
+      loading: bulkBusy,
+    },
+    {
+      key: 'delete',
+      label: '삭제',
+      variant: 'danger',
+      onClick: handleBulkDelete,
+      loading: bulkBusy,
+      confirm: {
+        title: '선택 항목 삭제',
+        message: `선택한 항목 중 본인 작성 콘텐츠를 삭제합니다.`,
+        variant: 'danger',
+      },
+    },
+  ];
+
+  const drawerIsOwner = !!(currentUserId && drawerItem && drawerItem.created_by === currentUserId);
+  const drawerActions = drawerItem ? [
+    {
+      label: '내 자료함 가져가기',
+      variant: 'primary' as const,
+      onClick: () => handleCopyToStore(drawerItem.id),
+      loading: copyingId === drawerItem.id,
+    },
+    ...(drawerIsOwner ? [
+      {
+        label: '수정',
+        onClick: () => navigate(`/content/${drawerItem.id}/edit`),
+      },
+    ] : []),
+    {
+      label: '전체 페이지',
+      onClick: () => navigate(`/content/${drawerItem.id}`),
+    },
+  ] : undefined;
+
+  const emptyMessage = (
+    <div className="py-12 px-4 text-sm text-slate-400 text-center">
+      <p className="m-0 mb-2">아직 등록된 문서가 없습니다.</p>
+      {isAuthenticated && (
+        <Link to="/content/documents/new" className="text-sm font-semibold text-primary no-underline">
+          첫 문서 작성하기 →
+        </Link>
+      )}
+    </div>
+  );
 
   return (
     <div className="max-w-[1100px] mx-auto px-4 pt-8 pb-16">
@@ -154,90 +300,71 @@ export function ContentDocumentsPage() {
         )}
       </header>
 
+      {/* Bulk ActionBar */}
+      {selectedKeys.size > 0 && (
+        <ActionBar
+          selectedCount={selectedKeys.size}
+          actions={bulkActions}
+          onClearSelection={() => setSelectedKeys(new Set())}
+        />
+      )}
+
+      {/* Info bar */}
+      {!loading && (
+        <div className="flex justify-between items-center py-2 mb-1">
+          <span className="text-xs text-slate-500">총 {total}개</span>
+          {totalPages > 1 && (
+            <span className="text-xs text-slate-400">{page} / {totalPages} 페이지</span>
+          )}
+        </div>
+      )}
+
       {loading ? (
         <Card className="overflow-hidden">
           <div className="py-12 px-4 text-sm text-slate-400 text-center">불러오는 중...</div>
         </Card>
-      ) : items.length === 0 ? (
-        <Card className="overflow-hidden">
-          <div className="py-12 px-4 text-sm text-slate-400 text-center">
-            <p className="m-0 mb-2">아직 등록된 문서가 없습니다.</p>
-            {isAuthenticated && (
-              <Link to="/content/documents/new" className="text-sm font-semibold text-primary no-underline">
-                첫 문서 작성하기 →
-              </Link>
-            )}
-          </div>
-        </Card>
       ) : (
         <>
-          {/* Desktop: Table */}
-          <Card className="overflow-hidden hidden md:block">
-            <table className="w-full border-collapse table-fixed">
-              <thead>
-                <tr>
-                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left">제목</th>
-                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left w-24">작성자</th>
-                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left w-[100px]">작성일</th>
-                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-center w-14">조회</th>
-                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-center w-14">좋아요</th>
-                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left w-12"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((item) => {
-                  const isOwner = !!(currentUserId && item.created_by === currentUserId);
-                  return (
-                    <tr
-                      key={item.id}
-                      onClick={() => navigate(`/content/${item.id}`)}
-                      className="cursor-pointer transition-colors hover:bg-slate-50"
-                    >
-                      <td className="px-3 py-3 text-sm text-slate-900 border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap">
-                        <span className="font-semibold text-sm text-slate-800">{item.title}</span>
-                      </td>
-                      <td className="px-3 py-3 text-[13px] text-slate-500 border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap">{item.author_name || '-'}</td>
-                      <td className="px-3 py-3 text-[13px] text-slate-400 border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap">{formatDate(item.created_at)}</td>
-                      <td className="px-3 py-3 text-[13px] text-slate-400 border-b border-slate-100 text-center whitespace-nowrap">👁 {item.view_count ?? 0}</td>
-                      <td className="px-3 py-3 text-[13px] text-slate-400 border-b border-slate-100 text-center whitespace-nowrap">👍 {item.like_count ?? 0}</td>
-                      <td className="px-3 py-3 border-b border-slate-100 text-center" onClick={(e) => e.stopPropagation()}>
-                        <RowActionMenu
-                          isOwner={isOwner}
-                          onView={() => navigate(`/content/${item.id}`)}
-                          onCopyLink={() => handleCopyLink(item.id)}
-                          onEdit={() => navigate(`/content/${item.id}/edit`)}
-                          onDelete={() => handleDelete(item.id)}
-                        />
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </Card>
+          {/* Desktop: BaseTable */}
+          <div className="hidden md:block bg-white rounded-lg border border-slate-200 overflow-hidden mb-2">
+            <BaseTable<ContentItem>
+              columns={columns}
+              data={items}
+              rowKey={(row) => row.id}
+              selectable
+              selectedKeys={selectedKeys}
+              onSelectionChange={setSelectedKeys}
+              onRowClick={(row) => openDrawer(row)}
+              emptyMessage={emptyMessage}
+            />
+          </div>
 
-          {/* Mobile: Card List */}
-          <div className="block md:hidden flex flex-col gap-3">
-            {items.map((item) => (
-              <Card
-                key={item.id}
-                className="p-4 cursor-pointer hover:bg-slate-50 transition-colors"
-                onClick={() => navigate(`/content/${item.id}`)}
-              >
-                <div className="flex flex-col gap-2">
-                  <span className="text-sm font-medium text-slate-800 line-clamp-2">{item.title}</span>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-slate-500">
-                      {item.author_name || '-'} · {formatDate(item.created_at)}
-                    </span>
-                    <div className="flex items-center gap-3 text-xs text-slate-400">
-                      <span>👁 {item.view_count ?? 0}</span>
-                      {(item.like_count ?? 0) > 0 && <span>👍 {item.like_count}</span>}
+          {/* Mobile: Card list */}
+          <div className="block md:hidden mb-2">
+            {items.length === 0 ? emptyMessage : (
+              <div className="flex flex-col gap-3">
+                {items.map((item) => (
+                  <Card
+                    key={item.id}
+                    className="p-4 cursor-pointer hover:bg-slate-50 transition-colors"
+                    onClick={() => openDrawer(item)}
+                  >
+                    <div className="flex flex-col gap-2">
+                      <span className="text-sm font-medium text-slate-800 line-clamp-2">{item.title}</span>
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-slate-500">
+                          {item.author_name || '-'} · {formatDate(item.created_at)}
+                        </span>
+                        <div className="flex items-center gap-3 text-xs text-slate-400">
+                          <span>👁 {item.view_count ?? 0}</span>
+                          {(item.like_count ?? 0) > 0 && <span>👍 {item.like_count}</span>}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </Card>
-            ))}
+                  </Card>
+                ))}
+              </div>
+            )}
           </div>
         </>
       )}
@@ -262,6 +389,44 @@ export function ContentDocumentsPage() {
           </button>
         </div>
       )}
+
+      {/* Detail Drawer */}
+      <BaseDetailDrawer
+        open={!!drawerItem}
+        onClose={closeDrawer}
+        title={drawerItem?.title ?? ''}
+        loading={drawerLoading}
+        actions={drawerActions}
+      >
+        {drawerDetail && (
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
+              <span>{drawerDetail.author_name || '익명'}</span>
+              <span>·</span>
+              <span>{formatDate(drawerDetail.created_at)}</span>
+              <span>·</span>
+              <span>조회 {drawerDetail.view_count ?? 0}</span>
+              <span>·</span>
+              <span>좋아요 {drawerDetail.like_count ?? 0}</span>
+            </div>
+            {drawerDetail.summary && (
+              <p className="text-sm text-slate-600 bg-slate-50 rounded-md px-3 py-2 m-0">{drawerDetail.summary}</p>
+            )}
+            {Array.isArray(drawerDetail.tags) && drawerDetail.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {drawerDetail.tags.map((tag) => (
+                  <span key={tag} className="px-2 py-0.5 text-[11px] font-medium text-slate-500 bg-slate-100 rounded">#{tag}</span>
+                ))}
+              </div>
+            )}
+            {drawerDetail.body ? (
+              <div className="text-sm text-slate-800 leading-relaxed" dangerouslySetInnerHTML={{ __html: drawerDetail.body }} />
+            ) : (
+              <p className="text-sm text-slate-400 m-0">본문이 없습니다.</p>
+            )}
+          </div>
+        )}
+      </BaseDetailDrawer>
     </div>
   );
 }
