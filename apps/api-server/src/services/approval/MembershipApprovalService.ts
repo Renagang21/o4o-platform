@@ -166,6 +166,24 @@ export class MembershipApprovalService {
         [userId, memberRole, approvedBy]
       );
 
+      // STEP4: WO-O4O-KPA-MEMBERSHIP-STATUS-SYNC-V1 — kpa_members projection sync
+      //   service_memberships 가 KPA 가입 상태 SSOT. kpa_members.status 는 projection/cache.
+      //   기존엔 PATCH /kpa/members/:id/status 또는 AdminUserController 만 sync 했고,
+      //   본 서비스를 직접 호출하는 경로(operator membership routes 등)에서는 누락.
+      //   service_key='kpa-society' 일 때만 sync — 다른 서비스 사용자의 kpa_members 영향 없음.
+      //   status='pending' 인 row 만 update — 이미 active/suspended 인 경우 덮어쓰지 않음.
+      if (membership.service_key === 'kpa-society') {
+        logger.info('[APPROVAL][STEP4] kpa_members projection sync', { userId });
+        await queryRunner.query(
+          `UPDATE kpa_members
+           SET status = 'active',
+               joined_at = COALESCE(joined_at, CURRENT_DATE),
+               updated_at = NOW()
+           WHERE user_id = $1 AND status = 'pending'`,
+          [userId]
+        );
+      }
+
       await queryRunner.commitTransaction();
 
       // 커밋 후 결과에 status 반영
@@ -226,6 +244,27 @@ export class MembershipApprovalService {
       }
 
       const membership = result[0] as ApproveResult;
+
+      // WO-O4O-KPA-MEMBERSHIP-STATUS-SYNC-V1 — kpa_members projection sync (best-effort)
+      //   기존 rejectMembership 은 단일 statement (transaction 미사용) 패턴이므로 동일 스타일 유지.
+      //   sync 실패 시 reject 자체는 성공으로 간주하고 warning 로그만 남김
+      //   (kpa_members 가 pending 으로 남아도 서비스 접근에 영향 없음 — service_memberships 가 SSOT).
+      if (membership.service_key === 'kpa-society' && membership.user_id) {
+        try {
+          await AppDataSource.query(
+            `UPDATE kpa_members
+             SET status = 'rejected', updated_at = NOW()
+             WHERE user_id = $1 AND status IN ('pending', 'active')`,
+            [membership.user_id]
+          );
+        } catch (syncError) {
+          logger.warn('[ApprovalService] REJECTION_KPA_SYNC_FAILED', {
+            membershipId,
+            userId: membership.user_id,
+            error: syncError instanceof Error ? syncError.message : String(syncError),
+          });
+        }
+      }
 
       logger.info('[ApprovalService] REJECTION_SUCCESS', {
         membershipId,
@@ -317,6 +356,21 @@ export class MembershipApprovalService {
           );
           deactivatedRoles.push(membership.role);
         }
+      }
+
+      // STEP3: WO-O4O-KPA-MEMBERSHIP-STATUS-SYNC-V1 — kpa_members projection sync
+      //   service_key='kpa-society' 인 membership 이 포함된 경우에만 kpa_members.status='suspended'.
+      //   status='active' 인 row 만 update (이미 다른 상태이면 덮어쓰지 않음).
+      //   identity_status 컬럼은 별도 의미(KpaIdentityStatus)이므로 손대지 않음.
+      const hasKpaSocietyMembership = selectResult.some((m: any) => m.service_key === 'kpa-society');
+      if (hasKpaSocietyMembership) {
+        logger.info('[SUSPEND][STEP3] kpa_members projection sync', { userId });
+        await queryRunner.query(
+          `UPDATE kpa_members
+           SET status = 'suspended', updated_at = NOW()
+           WHERE user_id = $1 AND status = 'active'`,
+          [userId]
+        );
       }
 
       // NOTE: users.status is NOT changed — service-level suspension only
@@ -428,6 +482,20 @@ export class MembershipApprovalService {
           [userId, memberRole, reactivatedBy]
         );
         reactivatedRoles.push(memberRole);
+      }
+
+      // STEP4: WO-O4O-KPA-MEMBERSHIP-STATUS-SYNC-V1 — kpa_members projection sync
+      //   service_key='kpa-society' 인 membership 이 포함된 경우에만 kpa_members.status='active'.
+      //   status='suspended' 인 row 만 update (다른 상태는 덮어쓰지 않음).
+      const hasKpaSocietyMembership = selectResult.some((m: any) => m.service_key === 'kpa-society');
+      if (hasKpaSocietyMembership) {
+        logger.info('[REACTIVATE][STEP4] kpa_members projection sync', { userId });
+        await queryRunner.query(
+          `UPDATE kpa_members
+           SET status = 'active', updated_at = NOW()
+           WHERE user_id = $1 AND status = 'suspended'`,
+          [userId]
+        );
       }
 
       await queryRunner.commitTransaction();

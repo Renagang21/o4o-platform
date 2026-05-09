@@ -3,11 +3,13 @@
  *
  * WO-O4O-UNIFIED-STORE-PUBLIC-ROUTES-SPLIT-V1
  * WO-O4O-STORE-TABLET-LEGACY-CLEANUP-V1: Removed legacy service request endpoints
+ * WO-O4O-TABLET-IDLE-PLAYLIST-CONFIG-V1: GET /:slug/tablet/idle 추가
  *
  * Endpoints:
  *   GET  /:slug/tablet/products      — Tablet channel products (supplier + local)
  *   POST /:slug/tablet/interest      — Interest request creation (rate-limited)
  *   GET  /:slug/tablet/interest/:id  — Interest request status (kiosk polling)
+ *   GET  /:slug/tablet/idle          — Idle playlist items (store 단위 설정)
  */
 
 import { Router, Request, Response } from 'express';
@@ -180,6 +182,48 @@ export function createStorePublicTabletRoutes(deps: {
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: '요청 조회에 실패했습니다.' },
+      });
+    }
+  });
+
+  // GET /:slug/tablet/idle — Idle mode playlist items (store-level setting)
+  // WO-O4O-TABLET-IDLE-PLAYLIST-CONFIG-V1
+  //
+  // 정책:
+  // - 현재 device pairing 부재 → kiosk URL 에서 tablet 식별 불가 → 매장 단위 설정
+  // - 매장의 첫 active tablet row 의 idle_playlist_items 를 사용
+  // - 값이 없으면 빈 배열 반환 (kiosk wrapper 는 placeholder 표시)
+  // - 추후 device pairing 도입 시 tablet 별 설정으로 자연스럽게 진화 가능
+  //
+  // 응답: { success: true, data: { items: IdlePlaylistItem[] } }
+  router.get('/:slug/tablet/idle', async (req: Request, res: Response): Promise<void> => {
+    try {
+      const resolved = await resolvePublicStore(dataSource, req.params.slug, req, res);
+      if (!resolved) return;
+
+      // 매장의 첫 active tablet row → idle_playlist_items
+      const rows = await dataSource.query(
+        `SELECT idle_playlist_items
+         FROM store_tablets
+         WHERE organization_id = $1 AND is_active = true
+         ORDER BY created_at ASC
+         LIMIT 1`,
+        [resolved.storeId],
+      );
+
+      const items = Array.isArray(rows?.[0]?.idle_playlist_items)
+        ? rows[0].idle_playlist_items
+        : [];
+
+      res.json({
+        success: true,
+        data: { items },
+      });
+    } catch (error: any) {
+      console.error('[UnifiedStore] GET /:slug/tablet/idle error:', error);
+      res.status(500).json({
+        success: false,
+        error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch idle playlist' },
       });
     }
   });

@@ -3,6 +3,7 @@
  *
  * WO-O4O-TABLET-INTEREST-UX-REFACTOR-V1
  * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient 기반 자동 갱신
+ * WO-O4O-TABLET-IDLE-PLAYLIST-CONFIG-V1: fetchTabletIdle 추가
  *
  * Calls /stores/:slug/tablet/* endpoints directly.
  * No authentication required for tablet kiosk mode.
@@ -10,6 +11,7 @@
  */
 
 import { api } from '../lib/apiClient';
+import type { IdlePlaylistItem } from '@o4o/tablet-kiosk-core';
 
 export interface TabletProduct {
   id: string;
@@ -81,4 +83,18 @@ export async function checkTabletInterestStatus(
   const json = res.data;
   if (!json.success) throw new Error(json.error?.message || '요청 조회에 실패했습니다.');
   return json.data;
+}
+
+// ==================== Idle Playlist API (WO-O4O-TABLET-IDLE-PLAYLIST-CONFIG-V1) ====================
+
+/**
+ * 매장 idle playlist 조회 (store-level 설정).
+ * 값이 없거나 에러 발생 시 빈 배열 반환 — kiosk 는 placeholder 표시.
+ */
+export async function fetchTabletIdle(slug: string): Promise<IdlePlaylistItem[]> {
+  const url = `/stores/${encodeURIComponent(slug)}/tablet/idle`;
+  const res = await api.get(url);
+  const json = res.data;
+  if (!json.success) throw new Error(json.error?.message || 'Failed to fetch idle playlist');
+  return Array.isArray(json.data?.items) ? json.data.items : [];
 }
