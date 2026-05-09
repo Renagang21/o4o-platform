@@ -80,10 +80,14 @@ export class MypageService {
       },
 
       // Pharmacist info (약사 정보) - Super Operator가 아닌 경우에만
+      // FIX-O4O-MYPAGE-PROFILE-COLUMN-ROUTING-V1:
+      //   university 는 kpa_members.university_name 컬럼이 SSOT (User 에는 컬럼 없음)
+      //   workplace 는 User.businessInfo.metadata.workplace JSONB 슬롯에 저장
+      //   기존 코드가 fullUser.university / fullUser.workplace 를 읽어 항상 null 반환하던 버그 수정
       pharmacist: !isSuperOperator ? {
         licenseNumber: kpaMember?.license_number || null,
-        university: fullUser?.university || null,
-        workplace: fullUser?.workplace || null,
+        university: kpaMember?.university_name || null,
+        workplace: fullUser?.businessInfo?.metadata?.workplace || null,
       } : null,
 
       // Pharmacy info (약국 정보) - 약국개설자인 경우에만
@@ -108,6 +112,13 @@ export class MypageService {
 
   /**
    * PUT /profile — Update user profile fields
+   *
+   * FIX-O4O-MYPAGE-PROFILE-COLUMN-ROUTING-V1:
+   *   university / workplace 는 User entity 컬럼이 아니므로 직접 update 하면
+   *   TypeORM EntityPropertyNotFoundError → 500. 각 필드의 SSOT 위치로 라우팅한다.
+   *   - name/lastName/firstName/nickname/phone → users 테이블
+   *   - university                              → kpa_members.university_name (KpaMember 존재 시)
+   *   - workplace                               → users.businessInfo.metadata.workplace (JSONB merge)
    */
   async updateProfile(
     userId: string,
@@ -116,24 +127,49 @@ export class MypageService {
   ): Promise<any> {
     const userRepository = this.dataSource.getRepository('User');
 
-    // Build update object with only provided fields
+    // 1) users 테이블 컬럼만 updateData 에 모은다 (university/workplace 는 별도 처리).
     const updateData: Record<string, any> = {};
     if (data.name !== undefined) updateData.name = data.name;
     if (data.lastName !== undefined) updateData.lastName = data.lastName;
     if (data.firstName !== undefined) updateData.firstName = data.firstName;
     if (data.nickname !== undefined) updateData.nickname = data.nickname;
     if (data.phone !== undefined) updateData.phone = data.phone ? data.phone.replace(/\D/g, '') : data.phone;
-    if (data.university !== undefined) updateData.university = data.university;
-    if (data.workplace !== undefined) updateData.workplace = data.workplace;
 
-    // If lastName and firstName provided, auto-generate name
+    // workplace → businessInfo.metadata.workplace (JSONB). 기존 businessInfo 와 병합.
+    if (data.workplace !== undefined) {
+      const existing = await userRepository.findOne({ where: { id: userId } }) as any;
+      const bi = (existing?.businessInfo as any) || {};
+      const meta = (bi.metadata as Record<string, any> | undefined) || {};
+      updateData.businessInfo = {
+        ...bi,
+        metadata: { ...meta, workplace: data.workplace || null },
+      };
+    }
+
+    // lastName/firstName 둘 중 하나만 와도 name 자동 생성
     if (data.lastName !== undefined || data.firstName !== undefined) {
       const newLastName = data.lastName ?? currentUser.lastName ?? '';
       const newFirstName = data.firstName ?? currentUser.firstName ?? '';
       updateData.name = `${newLastName}${newFirstName}`.trim() || updateData.name;
     }
 
-    await userRepository.update(userId, updateData);
+    if (Object.keys(updateData).length > 0) {
+      await userRepository.update(userId, updateData);
+    }
+
+    // 2) university → kpa_members.university_name (KpaMember 존재 시에만)
+    //    학생/약사 회원이 아닌 사용자는 university 저장 위치가 없으므로 silently no-op.
+    if (data.university !== undefined) {
+      try {
+        const kpaMemberRepository = this.dataSource.getRepository('KpaMember');
+        const member = await kpaMemberRepository.findOne({ where: { user_id: userId } }) as any;
+        if (member) {
+          await kpaMemberRepository.update(member.id, { university_name: data.university || null });
+        }
+      } catch {
+        // KpaMember 미가입 또는 update 실패 시에도 users 업데이트 결과는 그대로 반환
+      }
+    }
 
     // Fetch updated user
     const updatedUser = await userRepository.findOne({ where: { id: userId } }) as any;
