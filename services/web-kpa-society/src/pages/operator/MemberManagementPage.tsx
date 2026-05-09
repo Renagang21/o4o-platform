@@ -31,13 +31,14 @@ import {
   AlertTriangle,
   ShieldAlert,
 } from 'lucide-react';
-import { RowActionMenu, ConfirmActionDialog, BaseDetailDrawer } from '@o4o/ui';
+import { ActionBar, BulkResultModal, RowActionMenu, ConfirmActionDialog, BaseDetailDrawer } from '@o4o/ui';
 import {
   DataTable,
   MemberListLayout,
   StatusBadge,
   defineActionPolicy,
   buildRowActions,
+  useBatchAction,
 } from '@o4o/operator-ux-core';
 import type { ListColumnDef, MemberTab } from '@o4o/operator-ux-core';
 import { ACTIVITY_TYPE_LABELS } from '../../contexts/AuthContext';
@@ -475,6 +476,13 @@ export default function MemberManagementPage() {
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [selectedMember, setSelectedMember] = useState<KpaMember | null>(null);
 
+  // WO-O4O-KPA-MEMBER-BULK-ACTION-ALIGN-V1: bulk selection + batch hook
+  //   - selectedIds: 현재 페이지 기준 회원 ID 집합 (canonical Set<string>)
+  //   - batch: useBatchAction hook (loading/result/showResult + executeBatch + clearResult + retryFailed)
+  //   - 탭 변경 / fetch 후 / batch 완료 시 selection clear (아래 effect 와 핸들러)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const batch = useBatchAction();
+
   // Stats fetch (application stats only — member counts are fetched in fetchMembers)
   useEffect(() => {
     apiClient.get<{ data: ApplicationStats }>('/applications/admin/stats')
@@ -533,6 +541,64 @@ export default function MemberManagementPage() {
     }
   }
 
+  // WO-O4O-KPA-MEMBER-BULK-ACTION-ALIGN-V1:
+  //   sequential batch wrapper — 별도 backend bulk endpoint 없이 기존 PATCH /members/:id/status 를 N회 병렬 호출.
+  //   useBatchAction 이 기대하는 응답 형태({ data: { results } })로 반환 → BulkResultModal 호환.
+  //   per-id 실패는 results[].status='failed' 로 기록되어 retry 가능.
+  const batchUpdateMemberStatus = useCallback(
+    async (
+      ids: string[],
+      options?: Record<string, unknown>,
+    ): Promise<{ data: { results: Array<{ id: string; status: 'success' | 'failed'; error?: string }> } }> => {
+      const targetStatus = (options?.status as MemberStatus | undefined);
+      if (!targetStatus) {
+        return { data: { results: ids.map((id) => ({ id, status: 'failed' as const, error: 'status missing' })) } };
+      }
+      const settled = await Promise.allSettled(
+        ids.map((id) => apiClient.patch(`/members/${id}/status`, { status: targetStatus })),
+      );
+      const results = settled.map((r, i) => {
+        const id = ids[i];
+        if (r.status === 'fulfilled') return { id, status: 'success' as const };
+        const err = r.reason as { message?: string } | null;
+        return { id, status: 'failed' as const, error: err?.message || 'Network error' };
+      });
+      return { data: { results } };
+    },
+    [],
+  );
+
+  // Selection 기반 bulk action 후보 ID 추출 — 현재 status 가 액션 정책에 부합하는 것만 (서버 거절 사전 차단)
+  const selectedPendingIds = useMemo(
+    () => members.filter((m) => selectedIds.has(m.id) && m.status === 'pending').map((m) => m.id),
+    [members, selectedIds],
+  );
+  const selectedActiveIds = useMemo(
+    () => members.filter((m) => selectedIds.has(m.id) && m.status === 'active').map((m) => m.id),
+    [members, selectedIds],
+  );
+  const selectedSuspendedIds = useMemo(
+    () => members.filter((m) => selectedIds.has(m.id) && m.status === 'suspended').map((m) => m.id),
+    [members, selectedIds],
+  );
+
+  const runBulk = useCallback(
+    async (ids: string[], status: MemberStatus) => {
+      if (ids.length === 0) return;
+      const result = await batch.executeBatch(batchUpdateMemberStatus, ids, { status });
+      if (result.successCount > 0) {
+        setSelectedIds(new Set());
+        await fetchMembers(memberPage);
+      }
+    },
+    [batch, batchUpdateMemberStatus, fetchMembers, memberPage],
+  );
+
+  const handleBulkApprove = useCallback(() => runBulk(selectedPendingIds, 'active'), [runBulk, selectedPendingIds]);
+  const handleBulkReject = useCallback(() => runBulk(selectedPendingIds, 'rejected'), [runBulk, selectedPendingIds]);
+  const handleBulkSuspend = useCallback(() => runBulk(selectedActiveIds, 'suspended'), [runBulk, selectedActiveIds]);
+  const handleBulkRestore = useCallback(() => runBulk(selectedSuspendedIds, 'active'), [runBulk, selectedSuspendedIds]);
+
   // Client-side tab filtering (status tabs는 서버사이드이므로 여기선 membership_type만)
   const filteredMembers = useMemo(() => {
     if (activeTab === 'all' || activeTab === 'applications' || activeTab.startsWith('status-')) return members;
@@ -540,6 +606,28 @@ export default function MemberManagementPage() {
     if (!allowed || allowed.length === 0) return members;
     return members.filter(m => allowed.includes(m.membership_type));
   }, [members, activeTab]);
+
+  // WO-O4O-KPA-MEMBER-BULK-ACTION-ALIGN-V1:
+  //   탭 변경 / fetch 결과 변경 시 *invalid* selection 만 정리 (현재 페이지에 없는 ID 제거).
+  //   탭이 'applications' 로 바뀌면 회원 selection 자체가 의미 없으므로 전체 clear.
+  useEffect(() => {
+    if (activeTab === 'applications') {
+      if (selectedIds.size > 0) setSelectedIds(new Set());
+      return;
+    }
+    setSelectedIds((prev) => {
+      if (prev.size === 0) return prev;
+      const validIds = new Set(members.map((m) => m.id));
+      let changed = false;
+      const next = new Set<string>();
+      prev.forEach((id) => {
+        if (validIds.has(id)) next.add(id);
+        else changed = true;
+      });
+      return changed ? next : prev;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, members]);
 
   // Tabs — 유형 + 상태 기반 (WO-KPA-A-MEMBER-STATUS-SEMANTICS-SEPARATION-V1)
   const tabs: MemberTab[] = [
@@ -753,6 +841,87 @@ export default function MemberManagementPage() {
                 <AlertCircle className="w-4 h-4 shrink-0" />{memberError}
               </div>
             )}
+
+            {/* WO-O4O-KPA-MEMBER-BULK-ACTION-ALIGN-V1: bulk action toolbar
+                operator scope 의 status-only 작업만 노출 (approve/reject/suspend/restore).
+                bulk delete / bulk role 변경은 본 WO scope 외. */}
+            <div className="mb-3">
+              <ActionBar
+                selectedCount={selectedIds.size}
+                onClearSelection={() => setSelectedIds(new Set())}
+                actions={[
+                  {
+                    key: 'approve',
+                    label: `승인 (${selectedPendingIds.length})`,
+                    onClick: handleBulkApprove,
+                    variant: 'primary' as const,
+                    icon: <UserCheck size={14} />,
+                    loading: batch.loading,
+                    group: 'actions',
+                    tooltip: '선택된 가입 대기 회원을 일괄 승인합니다',
+                    visible: selectedPendingIds.length > 0,
+                    confirm: {
+                      title: '회원 일괄 승인',
+                      message: `선택한 회원 ${selectedPendingIds.length}명을 승인하시겠습니까?`,
+                      variant: 'warning' as const,
+                      confirmText: '승인',
+                    },
+                  },
+                  {
+                    key: 'reject',
+                    label: `반려 (${selectedPendingIds.length})`,
+                    onClick: handleBulkReject,
+                    variant: 'danger' as const,
+                    icon: <XCircle size={14} />,
+                    loading: batch.loading,
+                    group: 'danger',
+                    tooltip: '선택된 가입 대기 회원을 일괄 반려합니다',
+                    visible: selectedPendingIds.length > 0,
+                    confirm: {
+                      title: '회원 일괄 반려',
+                      message: `선택한 회원 ${selectedPendingIds.length}명의 가입 신청을 반려하시겠습니까?`,
+                      variant: 'danger' as const,
+                      confirmText: '반려',
+                    },
+                  },
+                  {
+                    key: 'suspend',
+                    label: `정지 (${selectedActiveIds.length})`,
+                    onClick: handleBulkSuspend,
+                    variant: 'warning' as const,
+                    icon: <UserX size={14} />,
+                    loading: batch.loading,
+                    group: 'danger',
+                    tooltip: '선택된 활성 회원을 일괄 정지합니다',
+                    visible: selectedActiveIds.length > 0,
+                    confirm: {
+                      title: '회원 일괄 정지',
+                      message: `선택한 회원 ${selectedActiveIds.length}명을 정지하시겠습니까?`,
+                      variant: 'danger' as const,
+                      confirmText: '정지',
+                    },
+                  },
+                  {
+                    key: 'restore',
+                    label: `복원 (${selectedSuspendedIds.length})`,
+                    onClick: handleBulkRestore,
+                    variant: 'primary' as const,
+                    icon: <CheckCircle size={14} />,
+                    loading: batch.loading,
+                    group: 'actions',
+                    tooltip: '선택된 정지 회원을 일괄 복원합니다',
+                    visible: selectedSuspendedIds.length > 0,
+                    confirm: {
+                      title: '회원 일괄 복원',
+                      message: `선택한 회원 ${selectedSuspendedIds.length}명을 복원하시겠습니까?`,
+                      variant: 'warning' as const,
+                      confirmText: '복원',
+                    },
+                  },
+                ]}
+              />
+            </div>
+
             <DataTable<KpaMember>
               columns={memberColumns}
               data={filteredMembers}
@@ -760,6 +929,9 @@ export default function MemberManagementPage() {
               loading={memberLoading}
               emptyMessage="회원이 없습니다."
               tableId="kpa-operator-members"
+              selectable
+              selectedKeys={selectedIds}
+              onSelectionChange={setSelectedIds}
               onRowClick={(m) => setSelectedMember(m)}
             />
 
@@ -792,6 +964,14 @@ export default function MemberManagementPage() {
           </>
         )}
       </MemberListLayout>
+
+      {/* WO-O4O-KPA-MEMBER-BULK-ACTION-ALIGN-V1: bulk 결과 모달 */}
+      <BulkResultModal
+        open={batch.showResult}
+        onClose={() => { batch.clearResult(); fetchMembers(memberPage); }}
+        result={batch.result}
+        onRetry={() => { batch.retryFailed(); }}
+      />
 
       {/* WO-KPA-A-MEMBER-EDIT-AND-DELETE-FLOW-V1: 수정 모달 */}
       {editTarget && (
