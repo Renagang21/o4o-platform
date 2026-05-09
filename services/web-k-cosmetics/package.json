@@ -22,6 +22,7 @@
     "@o4o/store-asset-policy-core": "workspace:*",
     "@o4o/store-products-ui": "workspace:*",
     "@o4o/store-ui-core": "workspace:*",
+    "@o4o/tablet-kiosk-core": "workspace:*",
     "@o4o/operator-ux-core": "workspace:*",
     "@o4o/shared-space-ui": "workspace:*",
     "@o4o/types": "workspace:*",

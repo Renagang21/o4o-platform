@@ -3020,6 +3020,22 @@ importers:
         specifier: ^5.0.0
         version: 5.9.3
 
+  packages/tablet-kiosk-core:
+    dependencies:
+      react:
+        specifier: 19.2.0
+        version: 19.2.0
+      react-dom:
+        specifier: 19.2.0
+        version: 19.2.0(react@19.2.0)
+      react-router-dom:
+        specifier: ^6.0.0 || ^7.0.0
+        version: 7.9.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+    devDependencies:
+      typescript:
+        specifier: 5.4.5
+        version: 5.4.5
+
   packages/types:
     dependencies:
       react:
@@ -3505,6 +3521,9 @@ importers:
       '@o4o/store-ui-core':
         specifier: workspace:*
         version: link:../../packages/store-ui-core
+      '@o4o/tablet-kiosk-core':
+        specifier: workspace:*
+        version: link:../../packages/tablet-kiosk-core
       '@o4o/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -3608,6 +3627,9 @@ importers:
       '@o4o/store-ui-core':
         specifier: workspace:*
         version: link:../../packages/store-ui-core
+      '@o4o/tablet-kiosk-core':
+        specifier: workspace:*
+        version: link:../../packages/tablet-kiosk-core
       '@o4o/types':
         specifier: workspace:*
         version: link:../../packages/types
