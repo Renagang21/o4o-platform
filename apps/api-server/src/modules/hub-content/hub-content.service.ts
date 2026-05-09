@@ -106,8 +106,8 @@ export class HubContentQueryService {
         return this.querySignageMedia(serviceKey, producer, page, limit);
       case 'signage-playlist':
         return this.querySignagePlaylists(serviceKey, producer, page, limit);
-      case 'kpa-store-content':
-        return this.queryStoreSharedContent(page, limit, producer);
+      // (제거됨) case 'kpa-store-content' — WO-O4O-REMOVE-STORE-TO-COMMUNITY-SHARE-FLOW-V1.
+      // Store → Community 공유 흐름 폐기로 store-shared 콘텐츠는 HUB 에 노출되지 않는다.
       default:
         return { success: true, data: [], pagination: { page, limit, total: 0, totalPages: 0 } };
     }
@@ -121,18 +121,18 @@ export class HubContentQueryService {
     page: number,
     limit: number,
   ): Promise<HubContentListResponse> {
-    const [cms, media, playlists, storeContents] = await Promise.allSettled([
+    // WO-O4O-REMOVE-STORE-TO-COMMUNITY-SHARE-FLOW-V1:
+    //   queryStoreSharedContent 호출 제거. Store → Community 공유 흐름 폐기.
+    const [cms, media, playlists] = await Promise.allSettled([
       this.queryCms(serviceKey, producer, 1, MAX_FETCH_PER_DOMAIN),
       this.querySignageMedia(serviceKey, producer, 1, MAX_FETCH_PER_DOMAIN),
       this.querySignagePlaylists(serviceKey, producer, 1, MAX_FETCH_PER_DOMAIN),
-      this.queryStoreSharedContent(1, MAX_FETCH_PER_DOMAIN, producer),
     ]);
 
     const items: HubContentItemResponse[] = [];
     if (cms.status === 'fulfilled') items.push(...cms.value.data);
     if (media.status === 'fulfilled') items.push(...media.value.data);
     if (playlists.status === 'fulfilled') items.push(...playlists.value.data);
-    if (storeContents.status === 'fulfilled') items.push(...storeContents.value.data);
 
     // Sort: createdAt DESC 기본, 동일 시각일 때 producer 우선순위 tie-break
     // operator(0) > supplier(1) > store(2) > community(3)
@@ -333,55 +333,10 @@ export class HubContentQueryService {
     }
   }
 
-  // ── KPA Store Shared Content ──────────────────────────────────────────────
-
-  /**
-   * WO-O4O-STORE-CONTENT-HUB-SHARE-BACKEND-PHASE1-V1
-   *
-   * share_status='approved'인 KpaStoreContent를 HUB 통합 응답으로 반환.
-   * kpa_store_contents는 serviceKey 컬럼이 없으므로 KPA 전용 테이블 전체를 조회.
-   * producer 필터가 'store' 이외의 값이면 빈 결과 반환 (기존 조회 영향 없음).
-   * organization_id는 API 응답에 포함하지 않는다 (WO 정책).
-   */
-  private async queryStoreSharedContent(
-    page: number,
-    limit: number,
-    producer: HubProducer | undefined,
-  ): Promise<HubContentListResponse> {
-    // producer가 명시됐는데 'store'가 아니면 빈 결과
-    if (producer && producer !== 'store') {
-      return { success: true, data: [], pagination: { page, limit, total: 0, totalPages: 0 } };
-    }
-
-    try {
-      const offset = (page - 1) * limit;
-
-      const rows = await this.dataSource.query(
-        `SELECT id, title, content_json, updated_at
-         FROM kpa_store_contents
-         WHERE share_status = 'approved'
-         ORDER BY updated_at DESC
-         LIMIT $1 OFFSET $2`,
-        [limit, offset],
-      );
-
-      const [countRow] = await this.dataSource.query(
-        `SELECT COUNT(*) as total FROM kpa_store_contents WHERE share_status = 'approved'`,
-      );
-      const total = parseInt(countRow?.total || '0', 10);
-
-      return {
-        success: true,
-        data: rows.map((r: any) => this.mapStoreContentItem(r)),
-        pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
-      };
-    } catch (error: any) {
-      if (error.message?.includes('does not exist')) {
-        return { success: true, data: [], pagination: { page, limit, total: 0, totalPages: 0 } };
-      }
-      throw error;
-    }
-  }
+  // (제거됨) queryStoreSharedContent 메서드
+  // WO-O4O-REMOVE-STORE-TO-COMMUNITY-SHARE-FLOW-V1
+  // Store → Community 공유 흐름 폐기. share_status='approved' KpaStoreContent 를
+  // HUB 통합 응답에 포함하던 로직 제거. 매장 콘텐츠는 매장 전용으로 유지된다.
 
   // ── Mappers ──
 
@@ -437,16 +392,6 @@ export class HubContentQueryService {
     };
   }
 
-  private mapStoreContentItem(r: any): HubContentItemResponse {
-    // organization_id는 WO 정책에 따라 응답에 포함하지 않음
-    return {
-      id: r.id,
-      sourceDomain: 'kpa-store-content',
-      producer: 'store',
-      title: r.title,
-      description: null,
-      thumbnailUrl: null,
-      createdAt: r.updated_at instanceof Date ? r.updated_at.toISOString() : String(r.updated_at),
-    };
-  }
+  // (제거됨) mapStoreContentItem — WO-O4O-REMOVE-STORE-TO-COMMUNITY-SHARE-FLOW-V1.
+  // queryStoreSharedContent 와 함께 폐기.
 }

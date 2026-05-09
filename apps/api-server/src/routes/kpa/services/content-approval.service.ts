@@ -3,21 +3,19 @@
  *
  * WO-O4O-OPERATOR-CONTENT-APPROVAL-PHASE1-V1
  * WO-O4O-SIGNAGE-SUPPLIER-CAMPAIGN-REQUEST-V1
+ * WO-O4O-REMOVE-STORE-TO-COMMUNITY-SHARE-FLOW-V1
+ *   — 'store_share_to_hub' entity_type 제거 (Store → Community publish 흐름 폐기)
  *
- * hub_content_submission / store_share_to_hub / signage_campaign_request entity_type 승인 처리.
+ * hub_content_submission / signage_campaign_request entity_type 승인 처리.
  * KpaApprovalRequest 재사용 — 신규 테이블 없음.
  *
  * entity_type 매핑:
  *   hub_content_submission    — 공급자가 HUB 노출 요청한 CMS/Signage 콘텐츠
- *   store_share_to_hub        — 매장 경영자가 편집 후 HUB 공유 요청한 콘텐츠
  *   signage_campaign_request  — 공급자가 강제 삽입 캠페인 집행 요청
+ *   (제거됨) store_share_to_hub — Store → Community 공유. canonical 정책 위배로 폐기.
  *
  * payload 구조 (hub_content_submission):
  *   { domain: 'cms'|'signage-media'|'kpa-content', contentId: uuid, title: string }
- *
- * payload 구조 (store_share_to_hub):
- *   { sourceContentId: uuid, title: string, editedContentJson?: object }
- *   → 승인 시 콘텐츠 신규 생성은 WO-O4O-STORE-CONTENT-HUB-SHARE-PHASE1-V1에서 처리
  *
  * payload 구조 (signage_campaign_request):
  *   { mediaId: uuid, mediaSourceUrl: string, mediaSourceType: string, mediaEmbedId: string|null,
@@ -30,9 +28,11 @@ import type { DataSource, QueryRunner } from 'typeorm';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+// WO-O4O-REMOVE-STORE-TO-COMMUNITY-SHARE-FLOW-V1:
+// 'store_share_to_hub' 제거 — Store → Community publish/share 흐름 폐기.
+// 매장에서 만든 콘텐츠는 매장 전용으로 유지된다.
 export const CONTENT_APPROVAL_ENTITY_TYPES = [
   'hub_content_submission',
-  'store_share_to_hub',
   'signage_campaign_request',
 ] as const;
 
@@ -154,18 +154,10 @@ export class ContentApprovalService {
           await this.publishContent(qr, domain, contentId);
         }
       }
-      // store_share_to_hub: share_status='approved' + shared_at + shared_request_id 업데이트
-      if (ar.entity_type === 'store_share_to_hub') {
-        const { storeContentId } = payload;
-        if (storeContentId && UUID_RE.test(storeContentId)) {
-          await qr.query(
-            `UPDATE kpa_store_contents
-             SET share_status = 'approved', shared_at = NOW(), shared_request_id = $1
-             WHERE id = $2`,
-            [requestId, storeContentId],
-          );
-        }
-      }
+
+      // (제거됨) store_share_to_hub 분기 — WO-O4O-REMOVE-STORE-TO-COMMUNITY-SHARE-FLOW-V1.
+      // 신규 생성 경로(POST /share-to-hub) 가 차단되었으므로 본 분기에 도달할 수 없다.
+      // 과거 데이터의 share_status 컬럼은 cleanup 별도 WO 에서 처리.
 
       // signage_campaign_request: targetServices별 signage_forced_content row 생성
       if (ar.entity_type === 'signage_campaign_request') {
@@ -213,18 +205,8 @@ export class ContentApprovalService {
       [user.id, reason || null, requestId],
     );
 
-    // store_share_to_hub: share_status='rejected' 업데이트
-    if (ar.entity_type === 'store_share_to_hub') {
-      const payload: Record<string, any> =
-        typeof ar.payload === 'string' ? JSON.parse(ar.payload) : (ar.payload ?? {});
-      const { storeContentId } = payload;
-      if (storeContentId && UUID_RE.test(storeContentId)) {
-        await this.dataSource.query(
-          `UPDATE kpa_store_contents SET share_status = 'rejected' WHERE id = $1`,
-          [storeContentId],
-        );
-      }
-    }
+    // (제거됨) store_share_to_hub reject 분기 — WO-O4O-REMOVE-STORE-TO-COMMUNITY-SHARE-FLOW-V1.
+    // 신규 생성 차단으로 본 분기에 도달할 수 없다.
 
     return { data: { requestId, status: 'rejected' } };
   }

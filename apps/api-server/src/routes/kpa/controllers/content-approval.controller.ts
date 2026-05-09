@@ -2,10 +2,12 @@
  * Content Approval Controller
  *
  * WO-O4O-OPERATOR-CONTENT-APPROVAL-PHASE1-V1
+ * WO-O4O-REMOVE-STORE-TO-COMMUNITY-SHARE-FLOW-V1
+ *   — store_share_to_hub 처리 제거 (Store → Community publish 흐름 폐기)
  *
  * 운영자용 콘텐츠 승인 API.
  * 공급자 자료 제출(hub_content_submission) 및
- * 매장 HUB 공유 요청(store_share_to_hub) 통합 처리.
+ * 사이니지 캠페인 요청(signage_campaign_request) 통합 처리.
  *
  * Routes (mounted at /operator/approvals):
  *   GET    /             — 승인 대기 목록

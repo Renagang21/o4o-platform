@@ -232,7 +232,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // WO-O4O-ACTION-SCOPE-GUARD-V1: execute endpoint admin-only scope guard
   router.use('/operator', coreRequireAuth as any, createActionQueueRouter(dataSource, kpaActionConfig, requireKpaScope('kpa:admin')));
 
-  // Content Approval — hub_content_submission / store_share_to_hub (WO-O4O-OPERATOR-CONTENT-APPROVAL-PHASE1-V1)
+  // Content Approval — hub_content_submission / signage_campaign_request
+  // (WO-O4O-OPERATOR-CONTENT-APPROVAL-PHASE1-V1
+  //  WO-O4O-REMOVE-STORE-TO-COMMUNITY-SHARE-FLOW-V1: store_share_to_hub 제거)
   router.use('/operator/approvals', createContentApprovalController(dataSource, coreRequireAuth as any, requireKpaScope));
 
   // Product Application Management (WO-O4O-PRODUCT-APPROVAL-WORKFLOW-V1)

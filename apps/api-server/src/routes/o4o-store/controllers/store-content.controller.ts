@@ -2,23 +2,33 @@
  * Store Content Controller — 매장 전용 콘텐츠 편집
  *
  * WO-KPA-A-CONTENT-OVERRIDE-EXTENSION-V1
- * WO-O4O-STORE-CONTENT-HUB-SHARE-UI-PHASE2-V1
+ * WO-O4O-STORE-CONTENT-HUB-SHARE-UI-PHASE2-V1 (DEPRECATED — 본 흐름은 V1 으로 제거됨)
  * WO-O4O-AI-STORE-CONTENT-DIRECT-SAVE-V1
  * WO-O4O-KPA-STORE-CONTENT-STORE-OWNER-GUARD-FIX-V1
+ * WO-O4O-REMOVE-STORE-TO-COMMUNITY-SHARE-FLOW-V1 — Store → Community 공유 흐름 제거
  *
  * Core(o4o_asset_snapshots) immutable. 매장이 복제된 콘텐츠를
  * kpa_store_contents 테이블에서 독립 편집.
+ *
+ * Canonical 정책 (WO-O4O-REMOVE-STORE-TO-COMMUNITY-SHARE-FLOW-V1):
+ *   - Community → Store = copy only (POST /assets/copy 통해서만)
+ *   - Store → Community = publish/share 없음
+ *   - 매장에서 만든 콘텐츠는 매장 전용. 커뮤니티에 노출하고 싶으면
+ *     처음부터 커뮤니티 영역에서 작성한다.
  *
  * 권한 정책:
  *   POST / (direct 생성) — role_assignments.kpa:store_owner REQUIRED (RBAC SSOT)
  *   기타 — org membership (resolveOrgId, kpa_members 기반)
  *
  * Endpoints:
- *   GET /store-contents                    — 내 매장 콘텐츠 목록 (share_status 포함)
+ *   GET /store-contents                    — 내 매장 콘텐츠 목록
  *   POST /store-contents                   — direct 콘텐츠 신규 생성 (source_type='direct', store owner only)
  *   GET /store-contents/:snapshotId        — 편집용 콘텐츠 조회 (store 우선, fallback snapshot)
  *   PUT /store-contents/:snapshotId        — 편집 저장 (upsert, snapshot_edit 전용)
- *   POST /store-contents/:id/share-to-hub  — HUB 공유 요청 생성
+ *
+ *   (제거됨) POST /store-contents/:id/share-to-hub — Store → Community 공유 요청.
+ *           정책 변경에 따라 V1 으로 제거. DB 컬럼 share_status / shared_at /
+ *           shared_request_id 는 호환성 유지를 위해 잔존 (별도 cleanup WO).
  */
 
 import { Router, Request, Response } from 'express';
@@ -50,8 +60,9 @@ export function createStoreContentController(
   /**
    * GET /store-contents
    *
-   * 내 매장 전체 콘텐츠 목록 (share_status 포함).
-   * WO-O4O-STORE-CONTENT-HUB-SHARE-UI-PHASE2-V1
+   * 내 매장 전체 콘텐츠 목록.
+   * WO-O4O-REMOVE-STORE-TO-COMMUNITY-SHARE-FLOW-V1: shareStatus / sharedAt /
+   *   sharedRequestId 응답 필드 제거 (Store → Community 공유 흐름 폐기).
    */
   router.get(
     '/',
@@ -86,9 +97,6 @@ export function createStoreContentController(
             snapshotId: c.snapshot_id,
             title: c.title,
             updatedAt: c.updated_at,
-            shareStatus: c.share_status,
-            sharedAt: c.shared_at,
-            sharedRequestId: c.shared_request_id,
           })),
         });
       } catch (error: any) {
@@ -407,114 +415,15 @@ export function createStoreContentController(
     },
   );
 
-  /**
-   * POST /store-contents/:id/share-to-hub
-   *
-   * HUB 공유 요청 생성.
-   * - share_status null or rejected 인 경우만 요청 가능
-   * - kpa_approval_requests(entity_type='store_share_to_hub') + share_status='pending' 원자 처리
-   * WO-O4O-STORE-CONTENT-HUB-SHARE-UI-PHASE2-V1
-   */
-  router.post(
-    '/:id/share-to-hub',
-    requireAuth,
-    async (req: Request, res: Response): Promise<void> => {
-      try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
-
-        const { id } = req.params;
-        if (!UUID_RE.test(id)) {
-          res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid content ID' } });
-          return;
-        }
-
-        const organizationId = await resolveOrgId(dataSource, userId);
-        if (!organizationId) {
-          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: 'No organization membership' } });
-          return;
-        }
-
-        const repo = dataSource.getRepository(KpaStoreContent);
-        const content = await repo.findOne({
-          where: { id, organization_id: organizationId },
-        });
-
-        if (!content) {
-          res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Content not found' } });
-          return;
-        }
-
-        // 중복 방지
-        if (content.share_status === 'pending') {
-          res.status(409).json({ success: false, error: { code: 'ALREADY_PENDING', message: '이미 승인 요청 중입니다.' } });
-          return;
-        }
-        if (content.share_status === 'approved') {
-          res.status(409).json({ success: false, error: { code: 'ALREADY_APPROVED', message: '이미 HUB에 공유 중입니다.' } });
-          return;
-        }
-
-        const requesterName: string = authReq.user?.name || authReq.user?.email || '매장 경영자';
-        const requesterEmail: string | null = authReq.user?.email || null;
-
-        // 트랜잭션: kpa_approval_requests 생성 + share_status='pending'
-        const qr = dataSource.createQueryRunner();
-        await qr.connect();
-        await qr.startTransaction();
-
-        try {
-          const [{ ar_id }] = await qr.query(
-            `INSERT INTO kpa_approval_requests
-               (entity_type, organization_id, payload, status,
-                requester_id, requester_name, requester_email,
-                submitted_at, created_at, updated_at)
-             VALUES
-               ('store_share_to_hub', $1, $2, 'pending',
-                $3, $4, $5,
-                NOW(), NOW(), NOW())
-             RETURNING id AS ar_id`,
-            [
-              organizationId,
-              JSON.stringify({ storeContentId: id, title: content.title }),
-              userId,
-              requesterName,
-              requesterEmail,
-            ],
-          );
-
-          await qr.query(
-            `UPDATE kpa_store_contents
-             SET share_status = 'pending', shared_request_id = $1
-             WHERE id = $2`,
-            [ar_id, id],
-          );
-
-          await qr.commitTransaction();
-
-          res.status(201).json({
-            success: true,
-            data: {
-              approvalRequestId: ar_id,
-              storeContentId: id,
-              shareStatus: 'pending',
-            },
-          });
-        } catch (err) {
-          await qr.rollbackTransaction();
-          throw err;
-        } finally {
-          await qr.release();
-        }
-      } catch (error: any) {
-        res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
-      }
-    },
-  );
+  // (제거됨) POST /store-contents/:id/share-to-hub
+  // WO-O4O-REMOVE-STORE-TO-COMMUNITY-SHARE-FLOW-V1
+  //
+  // Canonical 정책: Community → Store = copy only / Store → Community = publish/share 없음.
+  // 매장에서 만든 콘텐츠는 매장 전용으로 유지된다. 커뮤니티 노출이 필요하면
+  // 처음부터 커뮤니티 영역에서 작성해야 한다.
+  //
+  // 기존 DB 컬럼 (share_status, shared_at, shared_request_id) 은 호환성 유지를 위해
+  // 잔존하나 신규 생성 경로는 모두 차단되었다. 컬럼 삭제는 별도 cleanup WO.
 
   /**
    * GET /store-contents/:snapshotId

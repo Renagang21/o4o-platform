@@ -2,10 +2,12 @@
  * ContentApprovalsPage
  *
  * WO-O4O-OPERATOR-CONTENT-APPROVAL-PHASE1-V1
+ * WO-O4O-REMOVE-STORE-TO-COMMUNITY-SHARE-FLOW-V1
+ *   — store_share_to_hub 탭 제거 (Store → Community 공유 흐름 폐기)
  *
  * 운영자용 콘텐츠 승인 관리 페이지.
  * 공급자 자료 제출(hub_content_submission) +
- * 매장 HUB 공유 요청(store_share_to_hub) 통합 처리.
+ * 사이니지 캠페인 요청(signage_campaign_request) 처리.
  *
  * Route: /operator/approvals
  */
@@ -16,13 +18,15 @@ import { authClient } from '@o4o/auth-client';
 import { BaseTable, RowActionMenu } from '@o4o/ui';
 import type { O4OColumn } from '@o4o/ui';
 import { toast } from 'react-hot-toast';
-import { CheckCircle, XCircle, Clock, RefreshCw, FileText, Store, Monitor } from 'lucide-react';
+// WO-O4O-REMOVE-STORE-TO-COMMUNITY-SHARE-FLOW-V1: Store 아이콘 제거 (매장 공유 탭 폐기)
+import { CheckCircle, XCircle, Clock, RefreshCw, FileText, Monitor } from 'lucide-react';
 import PageHeader from '@/components/common/PageHeader';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
 type ApprovalStatus = 'pending' | 'approved' | 'rejected';
-type EntityType = 'hub_content_submission' | 'store_share_to_hub' | 'signage_campaign_request';
+// WO-O4O-REMOVE-STORE-TO-COMMUNITY-SHARE-FLOW-V1: 'store_share_to_hub' 제거
+type EntityType = 'hub_content_submission' | 'signage_campaign_request';
 
 interface ApprovalRequest {
   id: string;
@@ -52,10 +56,10 @@ interface ListResponse {
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
+// WO-O4O-REMOVE-STORE-TO-COMMUNITY-SHARE-FLOW-V1: '매장 공유' 탭 제거
 const ENTITY_TYPE_TABS = [
   { value: 'all', label: '전체' },
   { value: 'hub_content_submission', label: '공급자 자료' },
-  { value: 'store_share_to_hub', label: '매장 공유' },
   { value: 'signage_campaign_request', label: '사이니지 캠페인' },
 ] as const;
 
@@ -68,7 +72,6 @@ const STATUS_FILTERS = [
 
 const ENTITY_TYPE_LABEL: Record<EntityType, string> = {
   hub_content_submission: '공급자 자료',
-  store_share_to_hub: '매장 공유',
   signage_campaign_request: '사이니지 캠페인',
 };
 
@@ -255,15 +258,13 @@ export default function ContentApprovalsPage() {
       width: 130,
       render: (row) => {
         const isCampaign = row.entity_type === 'signage_campaign_request';
-        const isSupplier = row.entity_type === 'hub_content_submission';
+        // WO-O4O-REMOVE-STORE-TO-COMMUNITY-SHARE-FLOW-V1: store_share_to_hub 제거
         return (
           <span className="flex items-center gap-1 text-sm">
             {isCampaign ? (
               <Monitor size={14} className="text-teal-500" />
-            ) : isSupplier ? (
-              <FileText size={14} className="text-blue-500" />
             ) : (
-              <Store size={14} className="text-purple-500" />
+              <FileText size={14} className="text-blue-500" />
             )}
             {ENTITY_TYPE_LABEL[row.entity_type]}
           </span>

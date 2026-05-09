@@ -19,8 +19,12 @@ export type HubProducer = 'operator' | 'supplier' | 'community' | 'store';
 /** HUB 가시성 범위 (IR-O4O-PLATFORM-CONTENT-POLICY-FINAL-V1 §4) */
 export type HubVisibility = 'global' | 'service' | 'store';
 
-/** HUB 콘텐츠 원본 도메인 */
-export type HubSourceDomain = 'cms' | 'signage-media' | 'signage-playlist' | 'kpa-store-content';
+/**
+ * HUB 콘텐츠 원본 도메인.
+ * WO-O4O-REMOVE-STORE-TO-COMMUNITY-SHARE-FLOW-V1:
+ *   'kpa-store-content' 제거 — Store → Community 공유 흐름 폐기.
+ */
+export type HubSourceDomain = 'cms' | 'signage-media' | 'signage-playlist';
 
 // =============================================================================
 // API Response DTOs
@@ -90,5 +94,4 @@ export const HUB_SOURCE_DOMAIN_LABELS: Record<HubSourceDomain, string> = {
   cms: 'CMS 콘텐츠',
   'signage-media': '사이니지 미디어',
   'signage-playlist': '사이니지 플레이리스트',
-  'kpa-store-content': '매장 활용 사례',
 };
