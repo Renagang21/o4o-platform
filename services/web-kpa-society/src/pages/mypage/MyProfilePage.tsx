@@ -15,8 +15,37 @@ import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/c
 import { MyPageNavigation } from '@o4o/account-ui';
 import { KPA_MYPAGE_NAV_ITEMS } from './navItems';
 import { mypageApi, type ProfileResponse } from '../../api';
+import { pharmacyRequestApi, type PharmacyRequest } from '../../api/pharmacyRequestApi';
 import { useAuth, ACTIVITY_TYPE_LABELS } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
+
+// WO-O4O-KPA-PROFILE-AND-STOREOWNER-UX-ALIGN-V1:
+//   직역(profile metadata) 과 매장 운영 권한(kpa:store_owner capability) 의 사용자 인식 정렬용 상태.
+//   - unknown: 로딩 / API 실패 (UI 미표시)
+//   - unsubmitted: 한 번도 신청한 적 없음
+//   - pending: 가장 최근 신청이 검토 중
+//   - approved: 가장 최근 신청이 승인 완료
+//   - rejected: 가장 최근 신청이 반려 (재신청 가능)
+type StoreOwnerCapStatus = 'unknown' | 'unsubmitted' | 'pending' | 'approved' | 'rejected';
+
+const STORE_OWNER_STATUS_LABELS: Record<Exclude<StoreOwnerCapStatus, 'unknown'>, string> = {
+  unsubmitted: '미신청',
+  pending: '승인 대기',
+  approved: '승인 완료',
+  rejected: '반려',
+};
+
+/** 가장 최근(updated_at 기준) 신청의 status 로 capability 상태 도출 */
+function deriveStoreOwnerStatus(items: PharmacyRequest[], hasStoreOwnerRole: boolean): StoreOwnerCapStatus {
+  // role 이 이미 부여돼 있으면 신청 여부와 무관하게 '승인 완료' (캐시/조회 실패 안전망)
+  if (hasStoreOwnerRole) return 'approved';
+  if (!items || items.length === 0) return 'unsubmitted';
+  const latest = [...items].sort((a, b) => (b.updated_at || '').localeCompare(a.updated_at || ''))[0];
+  if (latest.status === 'approved') return 'approved';
+  if (latest.status === 'pending') return 'pending';
+  if (latest.status === 'rejected') return 'rejected';
+  return 'unsubmitted';
+}
 
 const EDITABLE_ACTIVITY_TYPES = [
   'pharmacy_owner', 'pharmacy_employee', 'hospital',
@@ -73,8 +102,38 @@ export function MyProfilePage() {
     newPasswordConfirm: '',
   });
 
+  // WO-O4O-KPA-PROFILE-AND-STOREOWNER-UX-ALIGN-V1: 매장 운영 권한 capability 상태
+  const [storeOwnerStatus, setStoreOwnerStatus] = useState<StoreOwnerCapStatus>('unknown');
+  const [storeOwnerStatusLoading, setStoreOwnerStatusLoading] = useState(false);
+
   useEffect(() => {
     if (user) loadData();
+  }, [user]);
+
+  // WO-O4O-KPA-PROFILE-AND-STOREOWNER-UX-ALIGN-V1:
+  //   매장 운영 권한 상태 fetch — pharmacist info 가 있는 사용자(직역 탭이 노출되는 사용자)에 한해.
+  //   /pharmacy-requests/my 엔드포인트는 인증된 모든 사용자에게 본인 신청을 반환.
+  useEffect(() => {
+    if (!user) return;
+    const hasStoreOwnerRole = Array.isArray((user as any)?.roles)
+      && (user as any).roles.includes('kpa:store_owner');
+    let cancelled = false;
+    setStoreOwnerStatusLoading(true);
+    pharmacyRequestApi.getMyRequests()
+      .then((res) => {
+        if (cancelled) return;
+        const items = res?.data?.items || [];
+        setStoreOwnerStatus(deriveStoreOwnerStatus(items, hasStoreOwnerRole));
+      })
+      .catch(() => {
+        if (cancelled) return;
+        // 조회 실패 시 role 기반으로만 판단 (네트워크/권한 문제 graceful)
+        setStoreOwnerStatus(hasStoreOwnerRole ? 'approved' : 'unknown');
+      })
+      .finally(() => {
+        if (!cancelled) setStoreOwnerStatusLoading(false);
+      });
+    return () => { cancelled = true; };
   }, [user]);
 
   const loadData = async () => {
@@ -495,7 +554,14 @@ export function MyProfilePage() {
 
               <div style={styles.infoRow}>
                 <span style={styles.infoLabel}>직역</span>
-                <span style={styles.infoValue}>{activityType ? ACTIVITY_TYPE_LABELS[activityType] : '-'}</span>
+                <div style={{ textAlign: 'right' }}>
+                  <span style={styles.infoValue}>{activityType ? ACTIVITY_TYPE_LABELS[activityType] : '-'}</span>
+                  {/* WO-O4O-KPA-PROFILE-AND-STOREOWNER-UX-ALIGN-V1:
+                      pharmacy_owner 직역은 capability 가 아니라 자기소개. 분리 안내. */}
+                  {isPharmacyOwner && (
+                    <p style={styles.hint}>회원 본인 소개 정보입니다. 매장 운영 권한은 아래 별도 항목에서 확인하세요.</p>
+                  )}
+                </div>
               </div>
 
               <div style={styles.infoRow}>
@@ -547,6 +613,48 @@ export function MyProfilePage() {
                   </div>
                 </>
               )}
+
+              {/* WO-O4O-KPA-PROFILE-AND-STOREOWNER-UX-ALIGN-V1:
+                  매장 운영 권한 (kpa:store_owner capability) — 직역(profile) 과 분리된 별도 영역.
+                  직역 정보는 자유 변경이지만 매장 운영 권한은 별도 신청·승인 절차 필요. */}
+              <div style={styles.bizDivider} />
+              <div style={styles.capabilitySection}>
+                <div style={styles.capabilityHeader}>
+                  <h4 style={styles.capabilityTitle}>매장 운영 권한</h4>
+                  {storeOwnerStatus !== 'unknown' && (
+                    <span
+                      style={{
+                        ...styles.capabilityBadge,
+                        ...(storeOwnerStatus === 'approved' ? styles.capabilityBadgeApproved
+                          : storeOwnerStatus === 'pending' ? styles.capabilityBadgePending
+                          : storeOwnerStatus === 'rejected' ? styles.capabilityBadgeRejected
+                          : styles.capabilityBadgeUnsubmitted),
+                      }}
+                    >
+                      {STORE_OWNER_STATUS_LABELS[storeOwnerStatus]}
+                    </span>
+                  )}
+                  {storeOwnerStatusLoading && storeOwnerStatus === 'unknown' && (
+                    <span style={styles.capabilityBadgeLoading}>확인 중...</span>
+                  )}
+                </div>
+                <p style={styles.capabilityDesc}>
+                  내 매장 / Store HUB 이용은 별도의 매장 운영 승인 절차가 필요합니다.
+                  위 직역(활동 유형)은 회원 본인 소개 정보이며, 매장 운영 권한과는 다릅니다.
+                </p>
+                {storeOwnerStatus === 'unsubmitted' && (
+                  <Link to="/pharmacy" style={styles.capabilityCtaPrimary}>매장 운영 권한 신청 →</Link>
+                )}
+                {storeOwnerStatus === 'pending' && (
+                  <Link to="/pharmacy" style={styles.capabilityCtaSecondary}>내 신청 보기</Link>
+                )}
+                {storeOwnerStatus === 'approved' && (
+                  <Link to="/store" style={styles.capabilityCtaPrimary}>내 매장으로 이동 →</Link>
+                )}
+                {storeOwnerStatus === 'rejected' && (
+                  <Link to="/pharmacy" style={styles.capabilityCtaPrimary}>다시 신청하기 →</Link>
+                )}
+              </div>
 
               {/* 소속 조직 */}
               {hasOrganizations && (
@@ -804,5 +912,85 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#DC2626',
     fontSize: '14px',
     margin: 0,
+  },
+  // WO-O4O-KPA-PROFILE-AND-STOREOWNER-UX-ALIGN-V1:
+  //   매장 운영 권한 카드 — 직역(profile) 과 시각적으로 분리되도록 background + border 강조.
+  capabilitySection: {
+    marginTop: '16px',
+    padding: '16px',
+    backgroundColor: colors.neutral50,
+    borderRadius: '10px',
+    border: `1px solid ${colors.neutral200}`,
+  },
+  capabilityHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '12px',
+    marginBottom: '8px',
+  },
+  capabilityTitle: {
+    fontSize: '15px',
+    fontWeight: 600,
+    color: colors.neutral800,
+    margin: 0,
+  },
+  capabilityBadge: {
+    fontSize: '12px',
+    fontWeight: 600,
+    padding: '4px 10px',
+    borderRadius: '999px',
+    whiteSpace: 'nowrap' as const,
+  },
+  capabilityBadgeUnsubmitted: {
+    backgroundColor: colors.neutral100,
+    color: colors.neutral600,
+  },
+  capabilityBadgePending: {
+    backgroundColor: '#FFFBEB',
+    color: '#B45309',
+    border: '1px solid #FCD34D',
+  },
+  capabilityBadgeApproved: {
+    backgroundColor: '#ECFDF5',
+    color: '#047857',
+    border: '1px solid #6EE7B7',
+  },
+  capabilityBadgeRejected: {
+    backgroundColor: '#FEF2F2',
+    color: '#B91C1C',
+    border: '1px solid #FCA5A5',
+  },
+  capabilityBadgeLoading: {
+    fontSize: '12px',
+    color: colors.neutral400,
+    fontStyle: 'italic',
+  },
+  capabilityDesc: {
+    fontSize: '13px',
+    lineHeight: 1.6,
+    color: colors.neutral600,
+    margin: '0 0 12px 0',
+  },
+  capabilityCtaPrimary: {
+    display: 'inline-block',
+    padding: '8px 16px',
+    backgroundColor: colors.primary,
+    color: colors.white,
+    borderRadius: '6px',
+    fontSize: '14px',
+    fontWeight: 500,
+    textDecoration: 'none',
+  },
+  capabilityCtaSecondary: {
+    display: 'inline-block',
+    padding: '8px 16px',
+    backgroundColor: colors.white,
+    color: colors.primary,
+    border: `1px solid ${colors.primary}`,
+    borderRadius: '6px',
+    fontSize: '14px',
+    fontWeight: 500,
+    textDecoration: 'none',
   },
 };
