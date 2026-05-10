@@ -16,7 +16,7 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
-import { RichTextEditor, sanitizeHtml } from '@o4o/content-editor';
+import { RichTextEditor, sanitizeRichHtml } from '@o4o/content-editor';
 import type { GuideClient } from './createGuideClient';
 
 export interface GuideEditableSectionProps {
@@ -85,11 +85,15 @@ export function GuideEditableSection({
 
   return (
     <>
-      {/* 텍스트 표시 영역 */}
-      <span style={{ display: 'inline' }}>
+      {/* 콘텐츠 표시 영역 — 리치 콘텐츠(이미지·동영상) 지원을 위해 block 컨테이너 사용 */}
+      <div style={{ position: 'relative' }}>
         {dbContent !== null ? (
           String(dbContent).trim() ? (
-            <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(String(dbContent)) }} />
+            <div
+              className="guide-rich-content"
+              dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(String(dbContent)) }}
+              style={{ lineHeight: 1.7 }}
+            />
           ) : (
             canEdit ? (
               <span style={{ color: '#aaa', fontStyle: 'italic' }}>
@@ -98,7 +102,7 @@ export function GuideEditableSection({
             ) : null
           )
         ) : (
-          defaultContent
+          <span>{defaultContent}</span>
         )}
 
         {/* 운영자 수정 버튼 — canEdit 시 항상 표시 */}
@@ -107,7 +111,9 @@ export function GuideEditableSection({
             onClick={openEditor}
             title="본문 수정"
             style={{
-              marginLeft: 6,
+              marginTop: 6,
+              display: 'inline-flex',
+              alignItems: 'center',
               padding: '2px 8px',
               fontSize: 11,
               lineHeight: 1,
@@ -115,14 +121,25 @@ export function GuideEditableSection({
               border: '1px solid #ccc',
               borderRadius: 3,
               cursor: 'pointer',
-              verticalAlign: 'middle',
               color: '#555',
             }}
           >
             ✏ 수정
           </button>
         )}
-      </span>
+      </div>
+
+      {/* 리치 콘텐츠 렌더링 CSS */}
+      <style>{`
+        .guide-rich-content img { max-width: 100%; height: auto; border-radius: 6px; margin: 8px 0; display: block; }
+        .guide-rich-content iframe { width: 100%; max-width: 640px; aspect-ratio: 16/9; border: none; border-radius: 6px; margin: 8px 0; display: block; }
+        .guide-rich-content h2 { font-size: 1.25em; font-weight: 700; margin: 1em 0 0.4em; }
+        .guide-rich-content h3 { font-size: 1.1em; font-weight: 600; margin: 0.8em 0 0.3em; }
+        .guide-rich-content ul, .guide-rich-content ol { padding-left: 1.5em; margin: 0.4em 0; }
+        .guide-rich-content li { margin: 0.2em 0; }
+        .guide-rich-content a { color: #2563eb; text-decoration: underline; }
+        .guide-rich-content p { margin: 0 0 0.5em; }
+      `}</style>
 
       {/* 에디터 모달 */}
       {modalOpen && (
@@ -168,7 +185,7 @@ export function GuideEditableSection({
               <RichTextEditor
                 value={editorValue}
                 onChange={(content) => setEditorValue(content.html)}
-                preset="compact"
+                preset="guide"
                 minHeight="200px"
               />
             </div>

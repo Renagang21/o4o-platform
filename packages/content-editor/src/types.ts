@@ -12,8 +12,9 @@ export interface EditorContent {
  * Toolbar preset — 용도별 버튼 구성
  * - full: CMS/상품 상세 등 풀 기능 (기본값)
  * - compact: 포럼/댓글 등 경량 입력
+ * - guide: 가이드/온보딩 편집기 (텍스트 포맷 + 이미지 + 동영상, AI 제외)
  */
-export type EditorPreset = 'full' | 'compact';
+export type EditorPreset = 'full' | 'compact' | 'guide';
 
 export interface ContentEditorProps {
   /** 초기 HTML 콘텐츠 */
