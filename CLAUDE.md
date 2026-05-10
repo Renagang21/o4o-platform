@@ -369,10 +369,12 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | **Operator Table Canonical V1** | `docs/architecture/O4O-OPERATOR-TABLE-CANONICAL-V1.md` |
 | **Operator Canonical Workflow V1** | `docs/architecture/O4O-OPERATOR-CANONICAL-WORKFLOW-V1.md` |
 | **Operator Core Design V1** | `docs/architecture/OPERATOR-CORE-DESIGN-V1.md` |
+| **Operator Core Extraction Verify Checklist V1** | `docs/architecture/OPERATOR-CORE-EXTRACTION-VERIFY-CHECKLIST-V1.md` |
 | **Guide sectionKey 충돌 정책** | `docs/architecture/O4O-GUIDE-SECTIONKEY-CONFLICT-POLICY-V1.md` |
 | **Guide Schema Validation** | `docs/architecture/O4O-GUIDE-SCHEMA-VALIDATION-V1.md` |
 | **Guide sectionKey Migration** | `docs/architecture/O4O-GUIDE-SECTIONKEY-MIGRATION-V1.md` |
 | **Guide Content Reseed** | `docs/architecture/O4O-GUIDE-CONTENT-RESEED-GUIDEBLOCK-V1.md` |
+| **Guide pageKey Catalog V1** | `docs/architecture/O4O-GUIDE-PAGE-KEY-CATALOG-V1.md` |
 | **Store Local Product 경계 정책** | `docs/baseline/STORE-LOCAL-PRODUCT-BOUNDARY-POLICY-V1.md` |
 | **User Domain SSOT** | `docs/baseline/USER-DOMAIN-SSOT-V1.md` |
 | **Role Policy & Guard Baseline** | `docs/baseline/ROLE-POLICY-AND-GUARD-V1.md` |
