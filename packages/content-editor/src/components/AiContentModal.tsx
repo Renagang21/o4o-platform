@@ -668,6 +668,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
               border: '1px solid #e5e7eb',
               borderRadius: '8px',
               overflow: 'hidden',
+              flexShrink: 0,
             }}
           >
             {(['text', 'url'] as SourceTab[]).map((tab) => (
@@ -677,8 +678,10 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
                 onClick={() => handleSourceTabChange(tab)}
                 style={{
                   flex: 1,
-                  padding: '8px 12px',
-                  fontSize: '13px',
+                  minHeight: '40px',
+                  padding: '10px 16px',
+                  fontSize: '14px',
+                  lineHeight: 1.4,
                   fontWeight: sourceTab === tab ? 600 : 400,
                   background: sourceTab === tab ? '#4f46e5' : '#f9fafb',
                   color: sourceTab === tab ? 'white' : '#6b7280',
