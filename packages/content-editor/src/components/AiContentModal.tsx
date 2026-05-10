@@ -585,6 +585,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
     setStoreSaveStatus(null);
     setStoreSaving(false);
     setCustomPrompt('');
+    setSourceTab(initialSourceTab ?? 'text');
     onClose();
   };
 
