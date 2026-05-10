@@ -86,6 +86,13 @@ interface AiContentModalProps {
    */
   headerLabel?: string;
   urlPlaceholder?: string;
+  /**
+   * WO-O4O-AI-LESSON-INITIAL-URL-TAB-UX-FIX-V1: 모달 첫 진입 시 활성 탭.
+   * - 미제공 시 기존 동작 유지 ('text' 모드로 시작)
+   * - LMS 레슨 초안처럼 URL/유튜브 진입이 기본인 경우 'url' 지정
+   * - 사용자가 탭을 전환하면 그 이후로는 사용자 선택을 유지 (re-mount 시점에만 적용)
+   */
+  initialSourceTab?: 'text' | 'url';
 }
 
 type AiMode = 'customer_rewrite' | 'summary' | 'pop' | 'title_suggest';
@@ -220,7 +227,7 @@ function blocksToHtml(blocks: UrlBlock[]): string {
     .join('\n');
 }
 
-export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeaders, onChannelSave, showCommunitySave, showStoreSave, headerLabel, urlPlaceholder }: AiContentModalProps) {
+export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeaders, onChannelSave, showCommunitySave, showStoreSave, headerLabel, urlPlaceholder, initialSourceTab }: AiContentModalProps) {
   // 기존 text 모드 상태
   const [input, setInput] = useState('');
   const [mode, setMode] = useState<AiMode>('customer_rewrite');
@@ -251,7 +258,8 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
   const [storeSaveStatus, setStoreSaveStatus] = useState<{ ok: boolean; error?: string; contentId?: string } | null>(null);
 
   // URL 모드 상태 (WO-O4O-RICHTEXT-AI-URL-IMPORT-V1)
-  const [sourceTab, setSourceTab] = useState<SourceTab>('text');
+  // WO-O4O-AI-LESSON-INITIAL-URL-TAB-UX-FIX-V1: caller가 initialSourceTab='url' 지정 시 URL 모드로 시작
+  const [sourceTab, setSourceTab] = useState<SourceTab>(initialSourceTab ?? 'text');
   const [urlInput, setUrlInput] = useState('');
   const [urlTone, setUrlTone] = useState<UrlTone>('normal');
   const [urlContentType, setUrlContentType] = useState<UrlContentType>('document');

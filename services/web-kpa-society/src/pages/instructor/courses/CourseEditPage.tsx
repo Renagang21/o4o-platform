@@ -473,6 +473,8 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
       {/* WO-O4O-AI-LESSON-FLOW-FIX-V1:
           - aiRequestHeaders: instructor Bearer 토큰 명시 주입 → /api/ai/url-to-blocks 401 해결
           - headerLabel/urlPlaceholder: LMS 문맥 라벨 (다른 진입처는 기본값 유지) */}
+      {/* WO-O4O-AI-LESSON-INITIAL-URL-TAB-UX-FIX-V1:
+          - initialSourceTab='url': LMS는 유튜브/콘텐츠 URL 기반 레슨 초안이 기본 흐름이므로 URL 탭으로 시작 */}
       <AiContentModal
         open={aiOpen}
         onClose={() => setAiOpen(false)}
@@ -485,6 +487,7 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
         })()}
         headerLabel="AI 레슨 초안 만들기"
         urlPlaceholder="https://www.youtube.com/watch?v=..."
+        initialSourceTab="url"
       />
     </div>
   );
