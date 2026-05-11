@@ -44,6 +44,8 @@ export interface ListOptions {
   assetType?: string;
   page: number;
   limit: number;
+  // WO-O4O-STORE-LIBRARY-SERVER-PAGINATION-V1: title 기준 server-side 검색
+  search?: string;
 }
 
 export interface PaginatedResult {
@@ -51,6 +53,8 @@ export interface PaginatedResult {
   total: number;
   page: number;
   limit: number;
+  // WO-O4O-STORE-LIBRARY-SERVER-PAGINATION-V1: 프론트 Pagination 컴포넌트가 직접 사용
+  totalPages: number;
 }
 
 export class AssetCopyService {
@@ -146,23 +150,30 @@ export class AssetCopyService {
   }
 
   /**
-   * List snapshots for an organization with pagination
+   * List snapshots for an organization with pagination.
+   * WO-O4O-STORE-LIBRARY-SERVER-PAGINATION-V1: 제목 ILIKE search 지원, totalPages 반환.
    */
   async listByOrganization(
     organizationId: string,
     options: ListOptions,
   ): Promise<PaginatedResult> {
-    const { assetType, page, limit } = options;
-    const where: any = { organizationId };
+    const { assetType, page, limit, search } = options;
+    const qb = this.snapshotRepo
+      .createQueryBuilder('s')
+      .where('s.organizationId = :organizationId', { organizationId });
     if (assetType) {
-      where.assetType = assetType;
+      qb.andWhere('s.assetType = :assetType', { assetType });
     }
-    const [items, total] = await this.snapshotRepo.findAndCount({
-      where,
-      order: { createdAt: 'DESC' },
-      skip: (page - 1) * limit,
-      take: limit,
-    });
-    return { items, total, page, limit };
+    const term = search?.trim();
+    if (term) {
+      qb.andWhere('s.title ILIKE :term', { term: `%${term}%` });
+    }
+    qb.orderBy('s.createdAt', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit);
+
+    const [items, total] = await qb.getManyAndCount();
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+    return { items, total, page, limit, totalPages };
   }
 }

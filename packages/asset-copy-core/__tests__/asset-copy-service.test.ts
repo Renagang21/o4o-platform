@@ -12,12 +12,31 @@ import type { ContentResolver, ResolvedContent } from '../src/interfaces/content
 
 // ── Mock Setup ──────────────────────────────────────────
 
+// WO-O4O-STORE-LIBRARY-SERVER-PAGINATION-V1: listByOrganization 가 createQueryBuilder + getManyAndCount 사용.
+// fluent builder mock — getManyAndCount 결과만 미리 세팅하면 충분.
 function createMockRepo() {
+  const qbState: { result: [any[], number]; calls: any[] } = {
+    result: [[], 0],
+    calls: [],
+  };
+  const qb: any = {};
+  ['where', 'andWhere', 'orderBy', 'skip', 'take'].forEach((m) => {
+    qb[m] = jest.fn((...args: any[]) => {
+      qbState.calls.push({ method: m, args });
+      return qb;
+    });
+  });
+  qb.getManyAndCount = jest.fn(() => Promise.resolve(qbState.result));
+
   return {
     findOne: jest.fn(),
     findAndCount: jest.fn(),
     create: jest.fn((data: any) => ({ ...data, id: 'snap-uuid-1', createdAt: new Date() })),
     save: jest.fn((entity: any) => Promise.resolve(entity)),
+    createQueryBuilder: jest.fn(() => qb),
+    // 테스트 helpers
+    __qb: qb,
+    __qbState: qbState,
   };
 }
 
@@ -261,9 +280,9 @@ describe('AssetCopyService', () => {
   // ── Pagination (listByOrganization) ───────────────────
 
   describe('listByOrganization', () => {
-    it('returns paginated results', async () => {
+    it('returns paginated results with totalPages', async () => {
       const items = [{ id: 'snap-1' }, { id: 'snap-2' }];
-      repo.findAndCount.mockResolvedValue([items, 10]);
+      (repo as any).__qbState.result = [items, 10];
 
       const result = await service.listByOrganization('org-1', {
         page: 1,
@@ -274,10 +293,35 @@ describe('AssetCopyService', () => {
       expect(result.total).toBe(10);
       expect(result.page).toBe(1);
       expect(result.limit).toBe(20);
+      // ceil(10/20) = 1
+      expect(result.totalPages).toBe(1);
+    });
+
+    it('computes totalPages = ceil(total / limit)', async () => {
+      (repo as any).__qbState.result = [[], 47];
+
+      const result = await service.listByOrganization('org-1', {
+        page: 1,
+        limit: 20,
+      });
+
+      // ceil(47/20) = 3
+      expect(result.totalPages).toBe(3);
+    });
+
+    it('returns totalPages = 1 even when total = 0', async () => {
+      (repo as any).__qbState.result = [[], 0];
+
+      const result = await service.listByOrganization('org-1', {
+        page: 1,
+        limit: 20,
+      });
+
+      expect(result.totalPages).toBe(1);
     });
 
     it('filters by assetType when provided', async () => {
-      repo.findAndCount.mockResolvedValue([[], 0]);
+      (repo as any).__qbState.result = [[], 0];
 
       await service.listByOrganization('org-1', {
         assetType: 'signage',
@@ -285,28 +329,55 @@ describe('AssetCopyService', () => {
         limit: 10,
       });
 
-      expect(repo.findAndCount).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: { organizationId: 'org-1', assetType: 'signage' },
-        }),
-      );
+      const calls = (repo as any).__qbState.calls;
+      expect(calls).toContainEqual({
+        method: 'andWhere',
+        args: ['s.assetType = :assetType', { assetType: 'signage' }],
+      });
     });
 
-    it('omits assetType from query when not provided', async () => {
-      repo.findAndCount.mockResolvedValue([[], 0]);
+    it('omits assetType filter when not provided', async () => {
+      (repo as any).__qbState.result = [[], 0];
 
       await service.listByOrganization('org-1', {
         page: 2,
         limit: 5,
       });
 
-      expect(repo.findAndCount).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: { organizationId: 'org-1' },
-          skip: 5,
-          take: 5,
-        }),
-      );
+      const calls = (repo as any).__qbState.calls;
+      expect(calls.some((c: any) => c.method === 'andWhere' && c.args[0] === 's.assetType = :assetType')).toBe(false);
+      // page 2, limit 5 → skip 5, take 5
+      expect(calls).toContainEqual({ method: 'skip', args: [5] });
+      expect(calls).toContainEqual({ method: 'take', args: [5] });
+    });
+
+    it('applies ILIKE search filter when search term provided', async () => {
+      (repo as any).__qbState.result = [[], 0];
+
+      await service.listByOrganization('org-1', {
+        page: 1,
+        limit: 20,
+        search: '혈당',
+      });
+
+      const calls = (repo as any).__qbState.calls;
+      expect(calls).toContainEqual({
+        method: 'andWhere',
+        args: ['s.title ILIKE :term', { term: '%혈당%' }],
+      });
+    });
+
+    it('omits search filter when search is empty/whitespace', async () => {
+      (repo as any).__qbState.result = [[], 0];
+
+      await service.listByOrganization('org-1', {
+        page: 1,
+        limit: 20,
+        search: '   ',
+      });
+
+      const calls = (repo as any).__qbState.calls;
+      expect(calls.some((c: any) => c.method === 'andWhere' && c.args[0] === 's.title ILIKE :term')).toBe(false);
     });
   });
 

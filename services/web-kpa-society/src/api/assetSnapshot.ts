@@ -127,17 +127,29 @@ export interface PaginatedStoreAssets {
   total: number;
   page: number;
   limit: number;
+  // WO-O4O-STORE-LIBRARY-SERVER-PAGINATION-V1: 서버 계산 totalPages 직접 사용
+  totalPages: number;
 }
+
+// WO-O4O-STORE-LIBRARY-SERVER-PAGINATION-V1: 가상 'document' 타입 = cms + content 통합 (백엔드 정의)
+export type StoreAssetListType = SnapshotAssetType | 'document';
 
 export const storeAssetControlApi = {
   /**
-   * List store assets with publish status (joined with control table)
+   * List store assets with publish status (joined with control table).
+   * WO-O4O-STORE-LIBRARY-SERVER-PAGINATION-V1: server-side search + pagination 지원.
    */
-  list: (params?: { type?: SnapshotAssetType; page?: number; limit?: number }) => {
+  list: (params?: {
+    type?: StoreAssetListType;
+    page?: number;
+    limit?: number;
+    search?: string;
+  }) => {
     const query: Record<string, string> = {};
     if (params?.type) query.type = params.type;
     if (params?.page) query.page = String(params.page);
     if (params?.limit) query.limit = String(params.limit);
+    if (params?.search) query.search = params.search;
     return apiClient.get<{ success: boolean; data: PaginatedStoreAssets }>(
       '/store-assets',
       Object.keys(query).length > 0 ? query : undefined,

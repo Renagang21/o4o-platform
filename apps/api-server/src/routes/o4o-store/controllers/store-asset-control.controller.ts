@@ -70,34 +70,63 @@ export function createStoreAssetControlController(
         if (!organizationId) {
           res.json({
             success: true,
-            data: { items: [], total: 0, page: 1, limit: 20 },
+            data: { items: [], total: 0, page: 1, limit: 20, totalPages: 1 },
           });
           return;
         }
 
         const assetType = req.query.type as string | undefined;
+        // WO-O4O-STORE-LIBRARY-SERVER-PAGINATION-V1
+        //   - default limit=20, max limit=50
+        //   - search: title ILIKE partial match
+        //   - VALID_TYPES 에 content/resource 추가, 가상 'document' 타입 = cms+content 통합
         const page = Math.max(1, parseInt(req.query.page as string) || 1);
-        const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 20));
+        const limit = Math.min(50, Math.max(1, parseInt(req.query.limit as string) || 20));
         const offset = (page - 1) * limit;
+        const rawSearch = typeof req.query.search === 'string' ? req.query.search.trim() : '';
+        const search = rawSearch.length > 0 ? rawSearch.slice(0, 200) : undefined;
 
-        // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1: 'lesson' 추가 — KpaAssetResolver가 published + reusable_policy != restricted 검증
-        const VALID_TYPES = ['cms', 'signage', 'lesson'];
+        const SINGLE_TYPES = ['cms', 'signage', 'lesson', 'content', 'resource'];
+        // 'document' 는 가상 타입 — 프론트의 "문서형 콘텐츠" 섹션이 cms+content 를 합쳐서 조회한다.
+        const isDocumentVirtualType = assetType === 'document';
+        const isSingleType = !!assetType && SINGLE_TYPES.includes(assetType);
+
+        // Bind 순서 고정: $1=org, $2=limit, $3=offset, [$4=assetType], [$next=search]
         let typeFilter = '';
-        const params: any[] = [organizationId, limit, offset];
-        if (assetType && VALID_TYPES.includes(assetType)) {
-          typeFilter = `AND s.asset_type = $4`;
-          params.push(assetType);
+        const dataParams: any[] = [organizationId, limit, offset];
+        if (isSingleType) {
+          typeFilter = `AND s.asset_type = $${dataParams.length + 1}`;
+          dataParams.push(assetType);
+        } else if (isDocumentVirtualType) {
+          typeFilter = `AND s.asset_type IN ('cms', 'content')`;
+        }
+        let searchFilter = '';
+        if (search) {
+          searchFilter = `AND s.title ILIKE $${dataParams.length + 1}`;
+          dataParams.push(`%${search}%`);
+        }
+
+        const countParams: any[] = [organizationId];
+        let countTypeFilter = '';
+        if (isSingleType) {
+          countTypeFilter = `AND s.asset_type = $${countParams.length + 1}`;
+          countParams.push(assetType);
+        } else if (isDocumentVirtualType) {
+          countTypeFilter = `AND s.asset_type IN ('cms', 'content')`;
+        }
+        let countSearchFilter = '';
+        if (search) {
+          countSearchFilter = `AND s.title ILIKE $${countParams.length + 1}`;
+          countParams.push(`%${search}%`);
         }
 
         const countQuery = `
           SELECT COUNT(*)::int as total
           FROM o4o_asset_snapshots s
           WHERE s.organization_id = $1
-          ${assetType && VALID_TYPES.includes(assetType) ? `AND s.asset_type = $2` : ''}
+          ${countTypeFilter}
+          ${countSearchFilter}
         `;
-        const countParams = assetType && VALID_TYPES.includes(assetType)
-          ? [organizationId, assetType]
-          : [organizationId];
 
         // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1: lesson 항목은 content_json의 reference metadata
         // (thumbnail, instructorName, lessonCount, publicUrl 등)를 화면에서 활용한다.
@@ -129,6 +158,7 @@ export function createStoreAssetControlController(
             ON c.snapshot_id = s.id AND c.organization_id = s.organization_id
           WHERE s.organization_id = $1
           ${typeFilter}
+          ${searchFilter}
           ORDER BY
             COALESCE(c.is_forced, false) DESC,
             s.created_at DESC
@@ -137,14 +167,15 @@ export function createStoreAssetControlController(
 
         const [countResult, items] = await Promise.all([
           dataSource.query(countQuery, countParams),
-          dataSource.query(dataQuery, params),
+          dataSource.query(dataQuery, dataParams),
         ]);
 
         const total = countResult[0]?.total || 0;
+        const totalPages = Math.max(1, Math.ceil(total / limit));
 
         res.json({
           success: true,
-          data: { items, total, page, limit },
+          data: { items, total, page, limit, totalPages },
         });
       } catch (error: any) {
         res.status(500).json({

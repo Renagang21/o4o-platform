@@ -2,23 +2,24 @@
  * StoreLibraryContentsPage — 내 자료함 / 콘텐츠
  *
  * WO-O4O-STORE-LIBRARY-CONTENTS-CANONICAL-TABLE-SPLIT-V1
- *   - 문서형 콘텐츠 / 코스형 콘텐츠를 독립 섹션 + 독립 DataTable 로 분리
- *   - 카드형 snapshot UI / 혼합 리스트 / 임시 badge 기반 type filter 제거
- *   - operator-ux-core DataTable + Pagination canonical 적용
- *   - 선택 / bulk 제작 시작 / 선택 제거 — 섹션별 독립 selection
- *   - row key = libraryItemId 기반 (snapshot.id 또는 direct.id, origin prefix 로 충돌 회피)
- *   - duplicate 허용 정책 유지 (WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1)
+ *   - 문서형 콘텐츠 / 코스형 콘텐츠 두 독립 DataTable 섹션
+ * WO-O4O-STORE-LIBRARY-SERVER-PAGINATION-V1
+ *   - server-side pagination + search 로 전환 (limit=20 default, max 50)
+ *   - client filter / pre-fetch 제거
+ *   - 검색은 debounce(300ms) → 새 fetch
+ *   - selection 은 페이지 단위 유지 (page transition 시 자동 cleanup)
  *
  * 이전 WO 흐름 보존:
- *   WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1: cms + content snapshot 통합 표시
+ *   WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1: 가상 type='document' = cms+content 통합
  *   WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1:       lesson Reference Metadata 노출
  *   WO-O4O-KPA-STORE-LIBRARY-CONTENTS-REMOVE-FLOW-FIX-V1:
  *     "선택 제거" = snapshot hidden 처리. direct 콘텐츠 삭제는 매장 제작 자료 화면 전담.
+ *   WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1: duplicate 허용 유지
  *
  * 제작 시작 flow: 자료 선택 → "제작 시작" → StartProductionModal → 편집기 route 이동
  */
 
-import { useEffect, useState, useCallback, useMemo, type CSSProperties } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef, type CSSProperties } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { BookOpen, Sparkles, Trash2, RefreshCw, Search, FileText } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
@@ -32,10 +33,8 @@ import {
 import { colors } from '../../styles/theme';
 import { StartProductionModal, type ProductionSource, type ProductionSourceItem } from './StartProductionModal';
 
-const PAGE_SIZE = 10;
-// 백엔드 GET /assets limit 상한 (asset-copy-core controller 기준 100).
-// 단일 매장 자료함 보유량은 일반적으로 이 한도 내 — 한도 초과 시 server pagination 도입은 후속 WO.
-const FETCH_LIMIT = 100;
+const PAGE_LIMIT = 20;
+const SEARCH_DEBOUNCE_MS = 300;
 
 // ─── Row Types ───────────────────────────────────────────────────────────────
 
@@ -99,26 +98,23 @@ function formatDate(iso?: string | null): string {
   return Number.isNaN(d.getTime()) ? '-' : d.toLocaleDateString('ko-KR');
 }
 
-function buildDocumentRows(
-  cmsSnaps: StoreAssetItem[],
-  contentSnaps: StoreAssetItem[],
-  directs: DirectItem[],
-): DocumentRow[] {
-  const snapshotRows: DocumentRow[] = [...cmsSnaps, ...contentSnaps].map((s) => {
-    const sourceType: DocSourceType = s.assetType === 'content' ? 'content' : 'cms';
-    return {
-      id: s.id,
-      origin: 'snapshot',
-      selectionKey: keyOf('snapshot', s.id),
-      title: s.title || '(제목 없음)',
-      authorName: readString(s.contentJson, 'authorName') || '-',
-      sourceType,
-      createdAt: s.createdAt,
-      lifecycleStatus: s.lifecycleStatus ?? null,
-      href: `/view/${s.id}`,
-    };
-  });
-  const directRows: DocumentRow[] = directs.map((d) => ({
+function toDocumentRowFromSnapshot(s: StoreAssetItem): DocumentRow {
+  const sourceType: DocSourceType = s.assetType === 'content' ? 'content' : 'cms';
+  return {
+    id: s.id,
+    origin: 'snapshot',
+    selectionKey: keyOf('snapshot', s.id),
+    title: s.title || '(제목 없음)',
+    authorName: readString(s.contentJson, 'authorName') || '-',
+    sourceType,
+    createdAt: s.createdAt,
+    lifecycleStatus: s.lifecycleStatus ?? null,
+    href: `/view/${s.id}`,
+  };
+}
+
+function toDocumentRowFromDirect(d: DirectItem): DocumentRow {
+  return {
     id: d.id,
     origin: 'direct',
     selectionKey: keyOf('direct', d.id),
@@ -128,93 +124,47 @@ function buildDocumentRows(
     createdAt: d.updatedAt,
     lifecycleStatus: null,
     href: `/store/content/direct/${d.id}`,
-  }));
-  return [...snapshotRows, ...directRows].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-  );
+  };
 }
 
-function buildCourseRows(lessonSnaps: StoreAssetItem[]): CourseRow[] {
-  return lessonSnaps
-    .map((s) => {
-      const publicUrl = readString(s.contentJson, 'publicUrl');
-      return {
-        id: s.id,
-        selectionKey: keyOf('snapshot', s.id),
-        title: s.title || readString(s.contentJson, 'title') || '(제목 없음)',
-        instructorName: readString(s.contentJson, 'instructorName') || '-',
-        lessonCount: readNumber(s.contentJson, 'lessonCount'),
-        createdAt: s.createdAt,
-        lifecycleStatus: s.lifecycleStatus ?? null,
-        href: publicUrl || `/lms/course/${readString(s.contentJson, 'courseId') || s.id}`,
-      };
-    })
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+function toCourseRow(s: StoreAssetItem): CourseRow {
+  const publicUrl = readString(s.contentJson, 'publicUrl');
+  return {
+    id: s.id,
+    selectionKey: keyOf('snapshot', s.id),
+    title: s.title || readString(s.contentJson, 'title') || '(제목 없음)',
+    instructorName: readString(s.contentJson, 'instructorName') || '-',
+    lessonCount: readNumber(s.contentJson, 'lessonCount'),
+    createdAt: s.createdAt,
+    lifecycleStatus: s.lifecycleStatus ?? null,
+    href: publicUrl || `/lms/course/${readString(s.contentJson, 'courseId') || s.id}`,
+  };
 }
 
 // ─── Page Component ──────────────────────────────────────────────────────────
 
 export default function StoreLibraryContentsPage() {
   const navigate = useNavigate();
-  const [cmsSnaps, setCmsSnaps] = useState<StoreAssetItem[]>([]);
-  const [contentSnaps, setContentSnaps] = useState<StoreAssetItem[]>([]);
-  const [lessonSnaps, setLessonSnaps] = useState<StoreAssetItem[]>([]);
-  const [directs, setDirects] = useState<DirectItem[]>([]);
-  const [loading, setLoading] = useState(true);
+
+  // 페이지 단위 reload trigger — 섹션이 후속 fetch 를 재실행하게 함
+  const [reloadKey, setReloadKey] = useState(0);
+  const reload = useCallback(() => setReloadKey((k) => k + 1), []);
 
   // Production modal
   const [modalOpen, setModalOpen] = useState(false);
   const [modalSource, setModalSource] = useState<ProductionSource | null>(null);
 
-  const fetchAll = useCallback(async () => {
-    setLoading(true);
-    try {
-      const emptyPage = { items: [] as StoreAssetItem[], total: 0, page: 1, limit: FETCH_LIMIT };
-      const [cmsRes, contentRes, lessonRes, directRes] = await Promise.all([
-        storeAssetControlApi.list({ type: 'cms', limit: FETCH_LIMIT }).catch(() => ({ data: emptyPage })),
-        storeAssetControlApi.list({ type: 'content', limit: FETCH_LIMIT }).catch(() => ({ data: emptyPage })),
-        storeAssetControlApi.list({ type: 'lesson', limit: FETCH_LIMIT }).catch(() => ({ data: emptyPage })),
-        directContentApi.list().catch(() => ({ data: [] as DirectItem[] })),
-      ]);
-      setCmsSnaps(cmsRes.data?.items ?? []);
-      setContentSnaps(contentRes.data?.items ?? []);
-      setLessonSnaps(lessonRes.data?.items ?? []);
-      setDirects(((directRes.data as DirectItem[] | undefined) ?? []).filter((it) => it.sourceType === 'direct'));
-    } catch (e: any) {
-      toast.error(e?.message || '불러오는 데 실패했습니다');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchAll();
-  }, [fetchAll]);
-
-  const documentRows = useMemo(
-    () => buildDocumentRows(cmsSnaps, contentSnaps, directs),
-    [cmsSnaps, contentSnaps, directs],
-  );
-  const courseRows = useMemo(() => buildCourseRows(lessonSnaps), [lessonSnaps]);
-
-  // ── 제작 시작 (공통) ─────────────────────────────────────────────────
   const openProduction = useCallback((items: ProductionSourceItem[]) => {
     if (items.length === 0) return;
     setModalSource({ fromLibrary: 'contents', items });
     setModalOpen(true);
   }, []);
 
-  // ── 선택 제거 (snapshot 만 hidden 처리) ─────────────────────────────
   const removeSnapshots = useCallback(async (snapshotIds: string[]): Promise<number> => {
     if (snapshotIds.length === 0) return 0;
     await Promise.all(snapshotIds.map((id) => storeAssetControlApi.updatePublishStatus(id, 'hidden')));
     return snapshotIds.length;
   }, []);
-
-  // 부모가 fetchAll 을 다시 호출하므로 섹션은 상태를 직접 비우지 않음
-  const handleAfterRemove = useCallback(() => {
-    fetchAll();
-  }, [fetchAll]);
 
   return (
     <div style={styles.container}>
@@ -233,43 +183,25 @@ export default function StoreLibraryContentsPage() {
             문서형/코스형 콘텐츠를 분리해 보여드립니다. 선택 후 "제작 시작" 으로 POP / QR / 블로그 / 상품 상세설명을 만들 수 있습니다.
           </p>
         </div>
-        <button onClick={fetchAll} style={styles.refreshBtn} disabled={loading}>
+        <button onClick={reload} style={styles.refreshBtn}>
           <RefreshCw size={14} />
           새로고침
         </button>
       </div>
 
       <DocumentsSection
-        rows={documentRows}
-        loading={loading}
+        reloadKey={reloadKey}
         onStartProduction={openProduction}
-        onBulkRemove={async (ids) => {
-          const n = await removeSnapshots(ids).catch((e: any) => {
-            toast.error(e?.message || '제거에 실패했습니다');
-            return 0;
-          });
-          if (n > 0) {
-            toast.success(`${n}개 콘텐츠를 내 자료함에서 제거했습니다`);
-            handleAfterRemove();
-          }
-        }}
+        onAfterRemove={reload}
+        onRemoveSnapshots={removeSnapshots}
         navigate={navigate}
       />
 
       <CoursesSection
-        rows={courseRows}
-        loading={loading}
+        reloadKey={reloadKey}
         onStartProduction={openProduction}
-        onBulkRemove={async (ids) => {
-          const n = await removeSnapshots(ids).catch((e: any) => {
-            toast.error(e?.message || '제거에 실패했습니다');
-            return 0;
-          });
-          if (n > 0) {
-            toast.success(`${n}개 강의를 내 자료함에서 제거했습니다`);
-            handleAfterRemove();
-          }
-        }}
+        onAfterRemove={reload}
+        onRemoveSnapshots={removeSnapshots}
       />
 
       <StartProductionModal
@@ -281,54 +213,97 @@ export default function StoreLibraryContentsPage() {
   );
 }
 
-// ─── DocumentsSection ────────────────────────────────────────────────────────
+// ─── DocumentsSection — server-side paginated ─────────────────────────────────
 
 function DocumentsSection({
-  rows,
-  loading,
+  reloadKey,
   onStartProduction,
-  onBulkRemove,
+  onAfterRemove,
+  onRemoveSnapshots,
   navigate,
 }: {
-  rows: DocumentRow[];
-  loading: boolean;
+  reloadKey: number;
   onStartProduction: (items: ProductionSourceItem[]) => void;
-  onBulkRemove: (snapshotIds: string[]) => void | Promise<void>;
+  onAfterRemove: () => void;
+  onRemoveSnapshots: (snapshotIds: string[]) => Promise<number>;
   navigate: ReturnType<typeof useNavigate>;
 }) {
-  const [search, setSearch] = useState('');
+  // search input vs. committed query (debounced)
+  const [searchInput, setSearchInput] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
+  const [rows, setRows] = useState<DocumentRow[]>([]);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
-  const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    if (!q) return rows;
-    return rows.filter((r) => r.title.toLowerCase().includes(q) || r.authorName.toLowerCase().includes(q));
-  }, [rows, search]);
-
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const safePage = Math.min(page, totalPages);
-  const pageRows = useMemo(
-    () => filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE),
-    [filtered, safePage],
-  );
-
-  // 검색 변경 시 page reset, 또한 보이지 않는 항목 selection 정리
+  // search debounce
   useEffect(() => {
-    setPage(1);
-  }, [search]);
+    const handle = setTimeout(() => {
+      setSearchQuery(searchInput.trim());
+      setPage(1);
+    }, SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(handle);
+  }, [searchInput]);
 
+  // fetch on page/search/reload
+  const reqIdRef = useRef(0);
   useEffect(() => {
-    // 데이터가 갱신되어 더 이상 존재하지 않는 selection 정리
+    const myReq = ++reqIdRef.current;
+    let cancelled = false;
+    setLoading(true);
+    (async () => {
+      const snapshotPromise = storeAssetControlApi
+        .list({ type: 'document', page, limit: PAGE_LIMIT, search: searchQuery || undefined })
+        .catch(() => null);
+      // 직접 작성 콘텐츠는 별도 도메인이므로 페이지 단위로 합쳐서 표시
+      // (현재 directContentApi 는 서버 페이지네이션 미지원 — 첫 페이지에서만 노출하고 검색어가 있을 때는 클라이언트 필터)
+      const directPromise = page === 1
+        ? directContentApi.list().catch(() => null)
+        : Promise.resolve(null);
+      const [snapRes, directRes] = await Promise.all([snapshotPromise, directPromise]);
+      if (cancelled || myReq !== reqIdRef.current) return;
+
+      const snapshots: StoreAssetItem[] = snapRes?.data?.items ?? [];
+      const serverTotal = snapRes?.data?.total ?? 0;
+      const serverTotalPages = snapRes?.data?.totalPages ?? 1;
+
+      let mergedRows: DocumentRow[] = snapshots.map(toDocumentRowFromSnapshot);
+
+      if (page === 1) {
+        const directsAll = ((directRes?.data as DirectItem[] | undefined) ?? []).filter(
+          (it) => it.sourceType === 'direct',
+        );
+        const q = searchQuery.toLowerCase();
+        const directs = q
+          ? directsAll.filter((d) => (d.title || '').toLowerCase().includes(q))
+          : directsAll;
+        const directRows = directs.map(toDocumentRowFromDirect);
+        mergedRows = [...directRows, ...mergedRows].sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        );
+      }
+
+      setRows(mergedRows);
+      setTotal(serverTotal);
+      setTotalPages(Math.max(1, serverTotalPages));
+      setLoading(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [page, searchQuery, reloadKey]);
+
+  // 페이지 / 데이터 변경 시 사라진 selection 정리
+  useEffect(() => {
     setSelected((prev) => {
       const validKeys = new Set(rows.map((r) => r.selectionKey));
-      let changed = false;
       const next = new Set<string>();
       for (const k of prev) {
         if (validKeys.has(k)) next.add(k);
-        else changed = true;
       }
-      return changed ? next : prev;
+      return next.size === prev.size ? prev : next;
     });
   }, [rows]);
 
@@ -349,10 +324,25 @@ function DocumentsSection({
       toast.error('제거 가능한 항목이 없습니다 (직접 작성 콘텐츠는 매장 제작 자료에서 제거)');
       return;
     }
-    if (!confirm(`선택한 ${snapshotIds.length}개 콘텐츠를 내 자료함에서 제거하시겠습니까?${directCount > 0 ? `\n(직접 작성 ${directCount}개는 매장 제작 자료에서 제거)` : ''}`)) return;
-    await onBulkRemove(snapshotIds);
-    setSelected(new Set());
-  }, [selected, rows, onBulkRemove]);
+    if (
+      !confirm(
+        `선택한 ${snapshotIds.length}개 콘텐츠를 내 자료함에서 제거하시겠습니까?${
+          directCount > 0 ? `\n(직접 작성 ${directCount}개는 매장 제작 자료에서 제거)` : ''
+        }`,
+      )
+    )
+      return;
+    try {
+      const n = await onRemoveSnapshots(snapshotIds);
+      if (n > 0) {
+        toast.success(`${n}개 콘텐츠를 내 자료함에서 제거했습니다`);
+        setSelected(new Set());
+        onAfterRemove();
+      }
+    } catch (e: any) {
+      toast.error(e?.message || '제거에 실패했습니다');
+    }
+  }, [selected, rows, onRemoveSnapshots, onAfterRemove]);
 
   const columns: ListColumnDef<DocumentRow>[] = useMemo(
     () => [
@@ -432,15 +422,15 @@ function DocumentsSection({
         <h2 style={styles.sectionTitle}>
           <FileText size={16} style={{ color: colors.primary }} />
           문서형 콘텐츠
-          <span style={styles.countBadge}>{filtered.length}건</span>
+          <span style={styles.countBadge}>{total + (page === 1 ? rows.filter((r) => r.origin === 'direct').length : 0)}건</span>
         </h2>
         <div style={styles.searchWrap}>
           <Search size={14} style={styles.searchIcon} />
           <input
             type="search"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="제목·작성자 검색"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            placeholder="제목 검색"
             style={styles.searchInput}
           />
         </div>
@@ -466,10 +456,10 @@ function DocumentsSection({
 
       <DataTable<DocumentRow>
         columns={columns}
-        data={pageRows}
+        data={rows}
         rowKey="selectionKey"
         loading={loading}
-        emptyMessage="가져온 문서형 콘텐츠가 없습니다"
+        emptyMessage={searchQuery ? '검색 결과가 없습니다' : '가져온 문서형 콘텐츠가 없습니다'}
         tableId="kpa-store-library-documents"
         selectable
         selectedKeys={selected}
@@ -477,61 +467,74 @@ function DocumentsSection({
       />
 
       <Pagination
-        page={safePage}
+        page={page}
         totalPages={totalPages}
         onPageChange={setPage}
-        total={filtered.length}
+        total={total}
       />
     </section>
   );
 }
 
-// ─── CoursesSection ──────────────────────────────────────────────────────────
+// ─── CoursesSection — server-side paginated ───────────────────────────────────
 
 function CoursesSection({
-  rows,
-  loading,
+  reloadKey,
   onStartProduction,
-  onBulkRemove,
+  onAfterRemove,
+  onRemoveSnapshots,
 }: {
-  rows: CourseRow[];
-  loading: boolean;
+  reloadKey: number;
   onStartProduction: (items: ProductionSourceItem[]) => void;
-  onBulkRemove: (snapshotIds: string[]) => void | Promise<void>;
+  onAfterRemove: () => void;
+  onRemoveSnapshots: (snapshotIds: string[]) => Promise<number>;
 }) {
-  const [search, setSearch] = useState('');
+  const [searchInput, setSearchInput] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
+  const [rows, setRows] = useState<CourseRow[]>([]);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
-  const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    if (!q) return rows;
-    return rows.filter(
-      (r) => r.title.toLowerCase().includes(q) || r.instructorName.toLowerCase().includes(q),
-    );
-  }, [rows, search]);
-
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const safePage = Math.min(page, totalPages);
-  const pageRows = useMemo(
-    () => filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE),
-    [filtered, safePage],
-  );
-
   useEffect(() => {
-    setPage(1);
-  }, [search]);
+    const handle = setTimeout(() => {
+      setSearchQuery(searchInput.trim());
+      setPage(1);
+    }, SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(handle);
+  }, [searchInput]);
+
+  const reqIdRef = useRef(0);
+  useEffect(() => {
+    const myReq = ++reqIdRef.current;
+    let cancelled = false;
+    setLoading(true);
+    (async () => {
+      const res = await storeAssetControlApi
+        .list({ type: 'lesson', page, limit: PAGE_LIMIT, search: searchQuery || undefined })
+        .catch(() => null);
+      if (cancelled || myReq !== reqIdRef.current) return;
+      const snapshots: StoreAssetItem[] = res?.data?.items ?? [];
+      setRows(snapshots.map(toCourseRow));
+      setTotal(res?.data?.total ?? 0);
+      setTotalPages(Math.max(1, res?.data?.totalPages ?? 1));
+      setLoading(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [page, searchQuery, reloadKey]);
 
   useEffect(() => {
     setSelected((prev) => {
       const validKeys = new Set(rows.map((r) => r.selectionKey));
-      let changed = false;
       const next = new Set<string>();
       for (const k of prev) {
         if (validKeys.has(k)) next.add(k);
-        else changed = true;
       }
-      return changed ? next : prev;
+      return next.size === prev.size ? prev : next;
     });
   }, [rows]);
 
@@ -547,9 +550,17 @@ function CoursesSection({
     const ids = rows.filter((r) => selected.has(r.selectionKey)).map((r) => r.id);
     if (ids.length === 0) return;
     if (!confirm(`선택한 ${ids.length}개 강의를 내 자료함에서 제거하시겠습니까?`)) return;
-    await onBulkRemove(ids);
-    setSelected(new Set());
-  }, [selected, rows, onBulkRemove]);
+    try {
+      const n = await onRemoveSnapshots(ids);
+      if (n > 0) {
+        toast.success(`${n}개 강의를 내 자료함에서 제거했습니다`);
+        setSelected(new Set());
+        onAfterRemove();
+      }
+    } catch (e: any) {
+      toast.error(e?.message || '제거에 실패했습니다');
+    }
+  }, [selected, rows, onRemoveSnapshots, onAfterRemove]);
 
   const columns: ListColumnDef<CourseRow>[] = useMemo(
     () => [
@@ -629,15 +640,15 @@ function CoursesSection({
         <h2 style={styles.sectionTitle}>
           <BookOpen size={16} style={{ color: colors.primary }} />
           코스형 콘텐츠
-          <span style={styles.countBadge}>{filtered.length}건</span>
+          <span style={styles.countBadge}>{total}건</span>
         </h2>
         <div style={styles.searchWrap}>
           <Search size={14} style={styles.searchIcon} />
           <input
             type="search"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="강의명·강사 검색"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            placeholder="강의명 검색"
             style={styles.searchInput}
           />
         </div>
@@ -663,10 +674,10 @@ function CoursesSection({
 
       <DataTable<CourseRow>
         columns={columns}
-        data={pageRows}
+        data={rows}
         rowKey="selectionKey"
         loading={loading}
-        emptyMessage="가져온 코스형 콘텐츠가 없습니다"
+        emptyMessage={searchQuery ? '검색 결과가 없습니다' : '가져온 코스형 콘텐츠가 없습니다'}
         tableId="kpa-store-library-courses"
         selectable
         selectedKeys={selected}
@@ -674,10 +685,10 @@ function CoursesSection({
       />
 
       <Pagination
-        page={safePage}
+        page={page}
         totalPages={totalPages}
         onPageChange={setPage}
-        total={filtered.length}
+        total={total}
       />
     </section>
   );

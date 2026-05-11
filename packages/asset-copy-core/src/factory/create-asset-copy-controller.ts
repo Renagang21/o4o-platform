@@ -177,11 +177,14 @@ export function createAssetCopyController(
         return;
       }
 
-      // Pagination
+      // Pagination + search (WO-O4O-STORE-LIBRARY-SERVER-PAGINATION-V1)
+      // default limit = 20, max limit = 50, search = title 기준 partial match
       const page = Math.max(1, parseInt(req.query.page as string, 10) || 1);
-      const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string, 10) || 20));
+      const limit = Math.min(50, Math.max(1, parseInt(req.query.limit as string, 10) || 20));
+      const rawSearch = typeof req.query.search === 'string' ? req.query.search.trim() : '';
+      const search = rawSearch.length > 0 ? rawSearch.slice(0, 200) : undefined;
 
-      const result = await service.listByOrganization(orgId, { assetType, page, limit });
+      const result = await service.listByOrganization(orgId, { assetType, page, limit, search });
       res.json({ success: true, data: result });
     } catch {
       res.status(500).json({

@@ -16,11 +16,19 @@ import type { PermissionChecker } from '../src/interfaces/permission-checker.int
 // ── Mock Setup ──────────────────────────────────────────
 
 function createMockRepo() {
+  // WO-O4O-STORE-LIBRARY-SERVER-PAGINATION-V1: listByOrganization 가 createQueryBuilder 기반.
+  const qb: any = {};
+  ['where', 'andWhere', 'orderBy', 'skip', 'take'].forEach((m) => {
+    qb[m] = jest.fn(() => qb);
+  });
+  qb.getManyAndCount = jest.fn().mockResolvedValue([[], 0]);
   return {
     findOne: jest.fn().mockResolvedValue(null),
     findAndCount: jest.fn().mockResolvedValue([[], 0]),
     create: jest.fn((data: any) => ({ ...data, id: 'snap-uuid-1', createdAt: new Date() })),
     save: jest.fn((entity: any) => Promise.resolve(entity)),
+    createQueryBuilder: jest.fn(() => qb),
+    __qb: qb,
   };
 }
 
@@ -216,7 +224,7 @@ describe('Controller Factory', () => {
       expect(res.body.data).toHaveProperty('sourceService', 'kpa');
     });
 
-    it('GET / success returns { success: true, data: { items, total, page, limit } }', async () => {
+    it('GET / success returns { success: true, data: { items, total, page, limit, totalPages } }', async () => {
       const { app } = buildApp({
         user: { id: 'u1', roles: ['kpa:admin'] },
       });
@@ -229,6 +237,8 @@ describe('Controller Factory', () => {
       expect(res.body.data).toHaveProperty('total');
       expect(res.body.data).toHaveProperty('page');
       expect(res.body.data).toHaveProperty('limit');
+      // WO-O4O-STORE-LIBRARY-SERVER-PAGINATION-V1
+      expect(res.body.data).toHaveProperty('totalPages');
     });
 
     it('error response has { success: false, error: { code, message } }', async () => {
