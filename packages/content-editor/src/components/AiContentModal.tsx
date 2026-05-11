@@ -8,6 +8,12 @@
  * WO-O4O-AI-MODAL-OUTPUT-TYPE-EXPOSE-V1:
  *   백엔드 7개 outputType 중 기존 4개에 더해 `blog`, `store_qr` 노출.
  *   백엔드 변경 없음 (이미 builder/parser 보유). 저장 destination 추가도 본 WO 범위 외.
+ * WO-O4O-AI-MODAL-PRODUCTION-MATERIAL-SAVE-V1:
+ *   `showProductionMaterialSave` prop 추가 — POST /api/v1/kpa/store/assets 로
+ *   매장 제작 자료(store_execution_assets)에 직접 저장.
+ *   assetType=content, sourceType=generated 고정.
+ *   category=outputType 그대로, usageType 은 pop/store_qr 만 enum 매핑.
+ *   기존 showStoreSave / showCommunitySave / onChannelSave 와 독립 동작.
  *
  * 사용자가 텍스트를 붙여넣으면 AI가 HTML 형식으로 변환/요약/정리.
  * 또는 URL을 입력하면 AI가 해당 페이지 콘텐츠를 HTML로 변환.
@@ -82,6 +88,17 @@ interface AiContentModalProps {
    * - 미제공(undefined/false) 시 버튼 미표시
    */
   showStoreSave?: boolean;
+  /**
+   * WO-O4O-AI-MODAL-PRODUCTION-MATERIAL-SAVE-V1: AI 결과를 매장 제작 자료로 저장.
+   * - true 시 "매장 제작 자료 저장" 버튼 표시 + 인라인 저장 패널 활성화
+   * - 저장 destination: POST /api/v1/kpa/store/assets
+   *   (assetType=content, category=outputType, usageType=enum 매핑, sourceType=generated)
+   * - usageType enum: pop → 'pop', store_qr → 'qr', 그 외 → null
+   * - API 403 → store owner 아닌 경우 오류 메시지 표시
+   * - 미제공(undefined/false) 시 버튼 미표시
+   * - showStoreSave / showCommunitySave 와 독립적으로 노출 가능 (서로 영향 없음)
+   */
+  showProductionMaterialSave?: boolean;
   /**
    * WO-O4O-AI-LESSON-FLOW-FIX-V1: 헤더/입력 라벨 LMS 문맥 오버라이드.
    * - 미제공 시 기존 기본값("AI 콘텐츠 정리", "https://example.com/article") 유지
@@ -238,7 +255,7 @@ function blocksToHtml(blocks: UrlBlock[]): string {
     .join('\n');
 }
 
-export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeaders, onChannelSave, showCommunitySave, showStoreSave, headerLabel, urlPlaceholder, initialSourceTab }: AiContentModalProps) {
+export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeaders, onChannelSave, showCommunitySave, showStoreSave, showProductionMaterialSave, headerLabel, urlPlaceholder, initialSourceTab }: AiContentModalProps) {
   // 기존 text 모드 상태
   const [input, setInput] = useState('');
   const [mode, setMode] = useState<AiMode>('customer_rewrite');
@@ -267,6 +284,12 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
   const [storeTitle, setStoreTitle] = useState('');
   const [storeSaving, setStoreSaving] = useState(false);
   const [storeSaveStatus, setStoreSaveStatus] = useState<{ ok: boolean; error?: string; contentId?: string } | null>(null);
+
+  // WO-O4O-AI-MODAL-PRODUCTION-MATERIAL-SAVE-V1
+  const [showProductionMaterialSavePanel, setShowProductionMaterialSavePanel] = useState(false);
+  const [productionMaterialTitle, setProductionMaterialTitle] = useState('');
+  const [productionMaterialSaving, setProductionMaterialSaving] = useState(false);
+  const [productionMaterialSaveStatus, setProductionMaterialSaveStatus] = useState<{ ok: boolean; error?: string; assetId?: string } | null>(null);
 
   // URL 모드 상태 (WO-O4O-RICHTEXT-AI-URL-IMPORT-V1)
   // WO-O4O-AI-LESSON-INITIAL-URL-TAB-UX-FIX-V1: caller가 initialSourceTab='url' 지정 시 URL 모드로 시작
@@ -577,6 +600,61 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
     }
   };
 
+  // WO-O4O-AI-MODAL-PRODUCTION-MATERIAL-SAVE-V1
+  //   매장 제작 자료(store_execution_assets)로 AI 결과 저장.
+  //   - assetType=content / sourceType=generated 고정.
+  //   - category 는 outputType 그대로 (free-form) — 통합 리스트에서 유형 분류 키.
+  //   - usageType 은 enum 매핑 가능한 경우만 지정 (pop, qr). 그 외 null.
+  //     · pop outputType → 'pop'
+  //     · store_qr outputType → 'qr'
+  //     · blog / product_detail / summary / title_suggest / store_sns → null (category 만 사용)
+  //   - showStoreSave / showCommunitySave 와 독립.
+  const handleOpenProductionMaterialSavePanel = () => {
+    if (!result) return;
+    setProductionMaterialTitle(result.title || '');
+    setProductionMaterialSaveStatus(null);
+    setShowProductionMaterialSavePanel(true);
+  };
+
+  const handleProductionMaterialSave = async () => {
+    if (!result) return;
+    setProductionMaterialSaving(true);
+    setProductionMaterialSaveStatus(null);
+    try {
+      const outputType = MODE_CONFIG.find((c) => c.key === mode)?.outputType ?? mode;
+      const usageType =
+        outputType === 'pop' ? 'pop'
+        : outputType === 'store_qr' ? 'qr'
+        : null;
+      const res = await fetch(`${API_BASE_URL}/api/v1/kpa/store/assets`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...aiRequestHeaders },
+        credentials: 'include',
+        body: JSON.stringify({
+          title: productionMaterialTitle.trim() || 'AI 생성 매장 제작 자료',
+          description: result.summary || null,
+          assetType: 'content',
+          htmlContent: result.html,
+          category: outputType,
+          usageType,
+          sourceType: 'generated',
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        const msg = res.status === 403
+          ? '매장 소속이 없습니다. 매장 경영자만 매장 제작 자료를 저장할 수 있습니다.'
+          : (data.error?.message || data.error || '매장 제작 자료 저장에 실패했습니다.');
+        throw new Error(msg);
+      }
+      setProductionMaterialSaveStatus({ ok: true, assetId: data.data?.id });
+    } catch (err: any) {
+      setProductionMaterialSaveStatus({ ok: false, error: err?.message || '저장 중 오류가 발생했습니다.' });
+    } finally {
+      setProductionMaterialSaving(false);
+    }
+  };
+
   const handleClose = () => {
     setInput('');
     setResult(null);
@@ -595,6 +673,11 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
     setStoreTitle('');
     setStoreSaveStatus(null);
     setStoreSaving(false);
+    // WO-O4O-AI-MODAL-PRODUCTION-MATERIAL-SAVE-V1
+    setShowProductionMaterialSavePanel(false);
+    setProductionMaterialTitle('');
+    setProductionMaterialSaveStatus(null);
+    setProductionMaterialSaving(false);
     setCustomPrompt('');
     setSourceTab(initialSourceTab ?? 'text');
     onClose();
@@ -1350,6 +1433,110 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
             </div>
           )}
 
+          {/* WO-O4O-AI-MODAL-PRODUCTION-MATERIAL-SAVE-V1: 매장 제작 자료 저장 패널 */}
+          {showProductionMaterialSave && result && showProductionMaterialSavePanel && (
+            <div
+              style={{
+                border: '1px solid #c7d2fe',
+                borderRadius: '8px',
+                padding: '14px',
+                background: '#eef2ff',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+              }}
+            >
+              <div style={{ fontSize: '13px', fontWeight: 600, color: '#4338ca' }}>
+                매장 제작 자료로 저장
+              </div>
+
+              {/* 제목 입력 */}
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', color: '#374151', marginBottom: '4px' }}>제목</label>
+                <input
+                  type="text"
+                  value={productionMaterialTitle}
+                  onChange={(e) => setProductionMaterialTitle(e.target.value)}
+                  placeholder="저장할 매장 제작 자료 제목을 입력하세요"
+                  style={{
+                    width: '100%',
+                    padding: '8px 10px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '6px',
+                    fontSize: '13px',
+                    fontFamily: 'inherit',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+
+              {/* 분류 안내 (read-only) */}
+              <div style={{ fontSize: '11px', color: '#6366f1' }}>
+                분류:&nbsp;
+                <strong>{MODE_CONFIG.find((c) => c.key === mode)?.label ?? mode}</strong>
+                {' '}({MODE_CONFIG.find((c) => c.key === mode)?.outputType ?? mode}
+                {(() => {
+                  const ot = MODE_CONFIG.find((c) => c.key === mode)?.outputType ?? mode;
+                  const ut = ot === 'pop' ? 'pop' : ot === 'store_qr' ? 'qr' : null;
+                  return ut ? ` · usageType=${ut}` : '';
+                })()})
+              </div>
+
+              {/* 저장 결과 */}
+              {productionMaterialSaveStatus && (
+                <div
+                  style={{
+                    padding: '8px 12px',
+                    borderRadius: '6px',
+                    fontSize: '12px',
+                    color: productionMaterialSaveStatus.ok ? '#4338ca' : '#dc2626',
+                    background: productionMaterialSaveStatus.ok ? '#e0e7ff' : '#fef2f2',
+                  }}
+                >
+                  {productionMaterialSaveStatus.ok
+                    ? `매장 제작 자료에 저장되었습니다 ✓`
+                    : `저장 실패: ${productionMaterialSaveStatus.error}`}
+                </div>
+              )}
+
+              {/* 버튼 */}
+              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                <button
+                  type="button"
+                  onClick={() => { setShowProductionMaterialSavePanel(false); setProductionMaterialSaveStatus(null); }}
+                  style={{
+                    padding: '7px 14px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '6px',
+                    background: 'white',
+                    fontSize: '13px',
+                    cursor: 'pointer',
+                    color: '#374151',
+                  }}
+                >
+                  취소
+                </button>
+                <button
+                  type="button"
+                  onClick={handleProductionMaterialSave}
+                  disabled={productionMaterialSaving || Boolean(productionMaterialSaveStatus?.ok)}
+                  style={{
+                    padding: '7px 14px',
+                    border: 'none',
+                    borderRadius: '6px',
+                    background: productionMaterialSaveStatus?.ok ? '#e0e7ff' : productionMaterialSaving ? '#c7d2fe' : '#4f46e5',
+                    color: productionMaterialSaveStatus?.ok ? '#4338ca' : 'white',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    cursor: productionMaterialSaving || productionMaterialSaveStatus?.ok ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  {productionMaterialSaving ? '저장 중...' : productionMaterialSaveStatus?.ok ? '저장됨 ✓' : '제작 자료로 저장'}
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Disclaimer */}
           <p style={{ fontSize: '11px', color: '#9ca3af', margin: 0, textAlign: 'center' }}>
             AI가 생성한 내용은 참고용입니다. 반드시 검토 후 사용하세요.
@@ -1454,6 +1641,25 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
                 }}
               >
                 {storeSaveStatus?.ok ? '저장됨 ✓' : showStoreSavePanel ? '내 매장 저장 ▲' : '내 매장 저장'}
+              </button>
+            )}
+            {/* WO-O4O-AI-MODAL-PRODUCTION-MATERIAL-SAVE-V1: 매장 제작 자료 저장 버튼 */}
+            {showProductionMaterialSave && result && (
+              <button
+                type="button"
+                onClick={showProductionMaterialSavePanel ? () => { setShowProductionMaterialSavePanel(false); setProductionMaterialSaveStatus(null); } : handleOpenProductionMaterialSavePanel}
+                style={{
+                  padding: '8px 16px',
+                  border: `1px solid ${showProductionMaterialSavePanel ? '#4338ca' : '#4f46e5'}`,
+                  borderRadius: '6px',
+                  background: showProductionMaterialSavePanel ? '#e0e7ff' : '#eef2ff',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  color: '#4338ca',
+                  fontWeight: 600,
+                }}
+              >
+                {productionMaterialSaveStatus?.ok ? '저장됨 ✓' : showProductionMaterialSavePanel ? '제작 자료로 저장 ▲' : '제작 자료로 저장'}
               </button>
             )}
             {/* WO-O4O-AI-CONTENT-AUTO-CHANNEL-SAVE-V1: onChannelSave가 있을 때만 표시 */}
