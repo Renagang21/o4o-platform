@@ -4,6 +4,10 @@
  * WO-O4O-SHARED-HUB-CARD-COMPONENT-V1:
  * - 카드 렌더링을 HubEntityCard로 교체
  * - 표시 항목/CTA 분기는 그대로 유지
+ *
+ * WO-O4O-KPA-ME-CONTEXT-HYDRATION-UX-FIX-V1:
+ * - isKpaContextLoaded 사용하여 unknown ≠ false 구분
+ * - kpa:store_owner JWT 역할 보유자에 한해 hydration 중 skeleton 표시
  */
 
 import { useState, useEffect, type MouseEvent } from 'react';
@@ -50,7 +54,7 @@ const resolveCta = (course: Course, loggedIn: boolean): CtaSpec => {
 
 export function LmsCoursesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { user } = useAuth();
+  const { user, isKpaContextLoaded } = useAuth();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
@@ -64,6 +68,12 @@ export function LmsCoursesPage() {
 
   // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1: 매장 보유자만 자료함 액션 노출
   const isStoreOwner = !!user?.isStoreOwner && !!user?.kpaMembership?.organizationId;
+
+  // WO-O4O-KPA-ME-CONTEXT-HYDRATION-UX-FIX-V1:
+  // JWT roles에 kpa:store_owner가 있는 경우, me-context 로딩 완료 전까지
+  // skeleton을 표시하여 "권한 없음"처럼 보이는 순간을 제거한다.
+  // me-context 미완료 상태(unknown)와 확정 false 상태를 구분한다.
+  const mightBeStoreOwner = !!user && !!(user.roles ?? []).includes('kpa:store_owner');
 
   useEffect(() => {
     loadData();
@@ -213,7 +223,11 @@ export function LmsCoursesPage() {
                     ]}
                     cta={{ label: cta.label }}
                   >
-                    {canAddToLibrary && (
+                    {/* WO-O4O-KPA-ME-CONTEXT-HYDRATION-UX-FIX-V1
+                        unknown(hydrating) → skeleton / confirmed true → button / confirmed false → null */}
+                    {mightBeStoreOwner && !isKpaContextLoaded ? (
+                      <div style={actionSkeletonStyle} aria-hidden="true" />
+                    ) : canAddToLibrary ? (
                       <button
                         type="button"
                         onClick={(e) =>
@@ -229,7 +243,7 @@ export function LmsCoursesPage() {
                           ? '추가 중...'
                           : '＋ 내 자료함에 추가'}
                       </button>
-                    )}
+                    ) : null}
                   </HubEntityCard>
                 );
               })}
@@ -254,6 +268,16 @@ const styles: Record<string, React.CSSProperties> = {
     gridTemplateColumns: 'repeat(auto-fill, minmax(420px, 1fr))',
     gap: '20px',
   },
+};
+
+// WO-O4O-KPA-ME-CONTEXT-HYDRATION-UX-FIX-V1
+// kpa:store_owner 역할 보유자의 hydration 중 skeleton — 버튼과 동일한 크기로 자리 유지.
+const actionSkeletonStyle: React.CSSProperties = {
+  height: '30px',
+  width: '128px',
+  borderRadius: '6px',
+  backgroundColor: '#F3F4F6',
+  alignSelf: 'flex-start',
 };
 
 // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1
