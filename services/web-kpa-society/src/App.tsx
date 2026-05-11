@@ -189,6 +189,8 @@ const ProductPopBuilderPage = lazy(() => import('./pages/pharmacy/ProductPopBuil
 // WO-O4O-KPA-STORE-MATERIALS-AND-PRODUCTIONS-CANONICAL-ALIGN-V1: 내 자료함 / 내 제작물 canonical 페이지
 const StoreLibraryContentsPage = lazy(() => import('./pages/pharmacy/StoreLibraryContentsPage'));
 const StoreLibraryResourcesPage = lazy(() => import('./pages/pharmacy/StoreLibraryResourcesPage'));
+// WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-LIBRARY-TAB-V1: 매장 제작 자료
+const StoreProductionMaterialsPage = lazy(() => import('./pages/pharmacy/StoreProductionMaterialsPage'));
 const StoreProductDescriptionsPage = lazy(() => import('./pages/pharmacy/StoreProductDescriptionsPage'));
 // default-as-named (wrapper 불필요)
 const StoreAssetsPage = lazy(() => import('./pages/pharmacy/StoreAssetsPage'));
@@ -859,6 +861,8 @@ function App() {
             {/* WO-O4O-KPA-STORE-MATERIALS-AND-PRODUCTIONS-CANONICAL-ALIGN-V1: 내 자료함 실 페이지 (콘텐츠 / 자료) */}
             <Route path="library/contents" element={<StoreLibraryContentsPage />} />
             <Route path="library/resources" element={<StoreLibraryResourcesPage />} />
+            {/* WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-LIBRARY-TAB-V1: 매장 제작 자료 */}
+            <Route path="library/production-materials" element={<StoreProductionMaterialsPage />} />
             {/* WO-O4O-KPA-STORE-MATERIALS-AND-PRODUCTIONS-CANONICAL-ALIGN-V1: 내 제작물 / 상품 상세설명 */}
             <Route path="marketing/product-descriptions" element={<StoreProductDescriptionsPage />} />
             <Route path="commerce/local-products" element={<StoreLocalProductsPage />} />

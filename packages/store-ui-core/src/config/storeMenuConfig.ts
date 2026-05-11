@@ -226,9 +226,11 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
     // 제작 시작(POP/QR/블로그/상품 상세설명)은 본 그룹에서만 진입.
     // (강좌/레슨형 콘텐츠는 콘텐츠 항목 내부에서 type 표시만, 별도 그룹 금지)
     // WO-O4O-KPA-STORE-LIBRARY-MENU-LABEL-RESTORE-V1: 그룹명 "마케팅 자료함" → "내 자료함", 항목명 "디지털 자료" → "자료"
+    // WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-LIBRARY-TAB-V1: "매장 제작 자료" 항목 추가
     { label: '내 자료함', items: [
-      { key: 'library-contents',  label: '콘텐츠', subPath: '/library/contents' },
-      { key: 'library-resources', label: '자료',   subPath: '/library/resources' },
+      { key: 'library-contents',              label: '콘텐츠',       subPath: '/library/contents' },
+      { key: 'library-resources',             label: '자료',         subPath: '/library/resources' },
+      { key: 'library-production-materials',  label: '매장 제작 자료', subPath: '/library/production-materials' },
     ]},
     { label: '디지털 사이니지', items: [
       { key: 'signage-playlist',  label: '플레이리스트', subPath: '/marketing/signage/playlist' },
