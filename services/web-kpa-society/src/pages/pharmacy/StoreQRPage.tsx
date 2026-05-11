@@ -14,7 +14,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { QrCode, Trash2, ExternalLink, Copy, Check, RefreshCw, BarChart3, X, Smartphone, Monitor, Tablet, Download, Printer, ArrowRight, FolderOpen } from 'lucide-react';
-import { getStoreLibraryItem } from '../../api/storeLibrary';
+import { getStoreExecutionAsset } from '../../api/storeExecutionAssets';
 import { Link, useLocation } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { GuideBlock } from '@o4o/shared-space-ui';
@@ -152,7 +152,7 @@ export function StoreQRPage() {
       // 자료실 항목 fetch 후 creation mode 진입
       (async () => {
         try {
-          const res = await getStoreLibraryItem(incoming.id);
+          const res = await getStoreExecutionAsset(incoming.id);
           const lib = res.data;
           handleLibrarySelect({
             id: lib.id,

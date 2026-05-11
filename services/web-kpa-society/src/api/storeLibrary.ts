@@ -8,6 +8,11 @@
  *
  * Neture Public 엔드포인트: /api/v1/neture/library/public/:id
  * Store Library CRUD: /api/v1/kpa/pharmacy/library
+ *
+ * @deprecated KPA 서비스에서는 storeExecutionAssets.ts (/store/assets) 를 사용한다.
+ * /pharmacy/library 는 KPA 백엔드에 미등록 (cosmetics/glycopharm 전용).
+ * WO-O4O-STORE-LIBRARY-TABLE-MERGE-V1: KPA frontend 3개 파일에서 교체 완료.
+ * 이 파일은 cosmetics/glycopharm web-service 가 사용하므로 보존.
  */
 
 import { ApiClient } from './client';

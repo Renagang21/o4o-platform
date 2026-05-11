@@ -7,14 +7,14 @@
  * WO-O4O-RESOURCES-LIBRARY-SNAPSHOT-DELETE-V1: snapshot 항목 삭제 지원 (DELETE /assets/:id)
  *
  * 매장이 보유한 자료(직접 업로드 + 커뮤니티 자료실 가져옴) 통합 목록.
- *   - 직접 업로드: store_library_items (GET /pharmacy/library)
+ *   - 직접 업로드: store_execution_assets (GET /store/assets) ← WO-O4O-STORE-LIBRARY-TABLE-MERGE-V1
  *   - 커뮤니티 가져옴: o4o_asset_snapshots WHERE asset_type='resource' (GET /assets?type=resource)
  *
  * 본 페이지는 제작 시작 단일 진입점:
  *   자료 선택 → "제작 시작" → modal → 편집기 route 이동
  *
  * 삭제 정책:
- *   - 직접 업로드 항목: hard delete (DELETE /pharmacy/library/:id)
+ *   - 직접 업로드 항목: hard delete (DELETE /store/assets/:id)
  *   - 가져온 snapshot 항목: hard delete (DELETE /assets/:id) — 원본 자료 영향 없음
  */
 
@@ -22,11 +22,11 @@ import { useEffect, useState, useCallback, useMemo, type CSSProperties } from 'r
 import { Library, ExternalLink, Trash2, RefreshCw, FileDown, Link as LinkIcon, FileText, Sparkles, Download } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import {
-  getStoreLibraryItems,
-  deleteStoreLibraryItem,
-  type StoreLibraryItem,
+  getStoreExecutionAssets,
+  deleteStoreExecutionAsset,
+  type StoreExecutionAsset,
   type AssetType,
-} from '../../api/storeLibrary';
+} from '../../api/storeExecutionAssets';
 import { assetSnapshotApi, type AssetSnapshotItem } from '../../api/assetSnapshot';
 import { colors } from '../../styles/theme';
 import { StartProductionModal, type ProductionSource } from './StartProductionModal';
@@ -57,7 +57,7 @@ interface UnifiedResourceRow {
   modalOrigin: 'library' | 'snapshot';
 }
 
-function libraryToUnified(it: StoreLibraryItem): UnifiedResourceRow {
+function libraryToUnified(it: StoreExecutionAsset): UnifiedResourceRow {
   return {
     id: `lib:${it.id}`,
     rawId: it.id,
@@ -116,7 +116,7 @@ export default function StoreLibraryResourcesPage() {
     try {
       // 두 source 병렬 조회. 한쪽 실패해도 가능한 항목은 표시 (graceful degradation).
       const [libRes, snapRes] = await Promise.allSettled([
-        getStoreLibraryItems({ page: 1, limit: PAGE_LIMIT }),
+        getStoreExecutionAssets({ page: 1, limit: PAGE_LIMIT }),
         assetSnapshotApi.list({ type: 'resource', page: 1, limit: PAGE_LIMIT }),
       ]);
 
@@ -157,7 +157,7 @@ export default function StoreLibraryResourcesPage() {
       if (row.kind === 'snapshot') {
         await assetSnapshotApi.remove(row.rawId);
       } else {
-        await deleteStoreLibraryItem(row.rawId);
+        await deleteStoreExecutionAsset(row.rawId);
       }
       setItems((prev) => prev.filter((it) => it.id !== row.id));
       setSelected((prev) => {
@@ -221,7 +221,7 @@ export default function StoreLibraryResourcesPage() {
       await Promise.all(selectedRows.map((it) =>
         it.kind === 'snapshot'
           ? assetSnapshotApi.remove(it.rawId)
-          : deleteStoreLibraryItem(it.rawId),
+          : deleteStoreExecutionAsset(it.rawId),
       ));
       const removedIds = new Set(selectedRows.map((it) => it.id));
       setItems((prev) => prev.filter((it) => !removedIds.has(it.id)));

@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 import { IdlePlaylistEditor, type IdlePlaylistItem, type LibraryAsset } from '@o4o/tablet-kiosk-core';
 import { extractSnapshotMediaList, type SnapshotForMedia } from '@o4o/store-asset-policy-core';
-import { getStoreLibraryItems } from '../../api/storeLibrary';
+import { getStoreExecutionAssets } from '../../api/storeExecutionAssets';
 import { assetSnapshotApi } from '../../api/assetSnapshot';
 import {
   fetchTablets,
@@ -252,8 +252,8 @@ export default function StoreTabletDisplaysPage() {
   //   2) o4o_asset_snapshots (Community → Store snapshot copy)
   // runtime 은 url 만 사용 — assetId lookup 없음. 동일 url 은 dedupe 처리.
   const fetchIdleLibraryAssets = useCallback(async (): Promise<LibraryAsset[]> => {
-    // (1) store_library_items
-    const directAssetsP = getStoreLibraryItems({ limit: 100 }).then((res) => {
+    // (1) store_execution_assets
+    const directAssetsP = getStoreExecutionAssets({ limit: 100 }).then((res) => {
       if (!res.success) return [] as LibraryAsset[];
       const items = res.data?.items ?? [];
       const out: LibraryAsset[] = [];

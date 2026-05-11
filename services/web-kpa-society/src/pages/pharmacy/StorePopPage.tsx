@@ -24,7 +24,7 @@ import { Megaphone, Trash2, ExternalLink, FileDown, QrCode, FolderOpen } from 'l
 import { Link, useLocation } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { colors } from '../../styles/theme';
-import { getStoreLibraryItem } from '../../api/storeLibrary';
+import { getStoreExecutionAsset } from '../../api/storeExecutionAssets';
 import { getStoreQrCodes } from '../../api/storeQr';
 import type { StoreQrCode } from '../../api/storeQr';
 
@@ -110,7 +110,7 @@ export function StorePopPage() {
         const origin = (it.origin as PopItemOrigin | undefined) ?? null;
         if (origin === 'library') {
           try {
-            const res = await getStoreLibraryItem(it.id);
+            const res = await getStoreExecutionAsset(it.id);
             const lib = res.data;
             fetched.push({
               id: lib.id,
