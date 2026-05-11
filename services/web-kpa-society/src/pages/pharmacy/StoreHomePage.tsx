@@ -28,6 +28,7 @@ import {
   Clock,
   Smartphone,
   Tablet as TabletIcon,
+  AlertCircle,
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Card, useTemplate } from '@o4o/ui';
@@ -37,6 +38,8 @@ import type { MarketingAnalyticsData, RecentScanItem } from '../../api/storeAnal
 import { getStoreExecutionAssets } from '../../api/storeExecutionAssets';
 import { getListings } from '../../api/pharmacyProducts';
 import { getStoreSlug } from '../../api/pharmacyInfo';
+import { fetchLiveSignals } from '../../api/storeHub';
+import type { LiveSignals } from '../../api/storeHub';
 import { GuideEditableSection } from '../../components/guide';
 
 export function StoreHomePage() {
@@ -46,6 +49,7 @@ export function StoreHomePage() {
   const [recentScans, setRecentScans] = useState<RecentScanItem[]>([]);
   const [libraryCount, setLibraryCount] = useState<number | null>(null);
   const [productCount, setProductCount] = useState<number | null>(null);
+  const [liveSignals, setLiveSignals] = useState<LiveSignals | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
@@ -55,11 +59,12 @@ export function StoreHomePage() {
       const storeSlug = await getStoreSlug();
       if (!storeSlug) { navigate('/pharmacy', { replace: true }); return; }
 
-      const [analyticsRes, scansRes, libraryRes, listingsRes] = await Promise.all([
+      const [analyticsRes, scansRes, libraryRes, listingsRes, signalsRes] = await Promise.all([
         getMarketingAnalytics().catch(() => null),
         getRecentScans().catch(() => null),
         getStoreExecutionAssets({ page: 1, limit: 1 }).catch(() => null),
         getListings().catch(() => null),
+        fetchLiveSignals().catch(() => null),
       ]);
       if (analyticsRes?.success && analyticsRes.data) {
         setAnalytics(analyticsRes.data);
@@ -72,6 +77,9 @@ export function StoreHomePage() {
       }
       if (listingsRes?.success && listingsRes.data) {
         setProductCount(listingsRes.data.filter((p) => p.is_active).length);
+      }
+      if (signalsRes) {
+        setLiveSignals(signalsRes);
       }
     } catch {
       // silent
@@ -116,13 +124,43 @@ export function StoreHomePage() {
         </button>
       </div>
 
+      {/* ── Live Signals — 미처리 운영 신호 (WO-O4O-KPA-STORE-HOME-LIVE-SIGNALS-V1) ── */}
+      {liveSignals && (liveSignals.newOrders > 0 || liveSignals.pendingTabletRequests > 0 || liveSignals.pendingSalesRequests > 0) && (
+        <div className="mb-4 flex flex-col gap-2">
+          {liveSignals.newOrders > 0 && (
+            <Link to="/store/commerce/orders" className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2.5 text-[13px] font-medium text-amber-800 no-underline hover:bg-amber-100">
+              <AlertCircle size={15} className="flex-shrink-0 text-amber-500" />
+              신규 주문 {liveSignals.newOrders}건 대기
+              <ArrowRight size={13} className="ml-auto" />
+            </Link>
+          )}
+          {liveSignals.pendingTabletRequests > 0 && (
+            <Link to="/store/requests" className="flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-4 py-2.5 text-[13px] font-medium text-blue-800 no-underline hover:bg-blue-100">
+              <AlertCircle size={15} className="flex-shrink-0 text-blue-500" />
+              상담 요청 {liveSignals.pendingTabletRequests}건 대기
+              <ArrowRight size={13} className="ml-auto" />
+            </Link>
+          )}
+          {liveSignals.pendingSalesRequests > 0 && (
+            <Link to="/store/commerce/products" className="flex items-center gap-2 rounded-lg border border-violet-200 bg-violet-50 px-4 py-2.5 text-[13px] font-medium text-violet-800 no-underline hover:bg-violet-100">
+              <AlertCircle size={15} className="flex-shrink-0 text-violet-500" />
+              판매 요청 {liveSignals.pendingSalesRequests}건 대기
+              <ArrowRight size={13} className="ml-auto" />
+            </Link>
+          )}
+        </div>
+      )}
+
       {/* ── 운영 현황 KPI (WO-O4O-TEMPLATE-RESPONSIVE-LAYOUT-V1) ── */}
       <div className={`grid ${tpl?.layout?.grid ?? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'} ${tpl?.layout?.gap ?? 'gap-3'} mb-6`}>
-        <Card className="p-5 text-center">
-          <BookOpen size={20} className="text-emerald-600 mx-auto" />
-          <p className="text-2xl font-bold text-primary m-0 mt-2">{libraryCount ?? '–'}</p>
-          <p className="text-xs text-slate-500 mt-1 m-0">매장 자산 관리</p>
-        </Card>
+        {/* WO-O4O-KPA-STORE-HOME-KPI-LABEL-FIX-V1: 레이블 "매장 자산 관리" → "자료실 파일", 클릭 링크 추가 */}
+        <Link to="/store/library/contents" className="no-underline">
+          <Card className="p-5 text-center hover:border-emerald-300 transition-colors cursor-pointer">
+            <BookOpen size={20} className="text-emerald-600 mx-auto" />
+            <p className="text-2xl font-bold text-primary m-0 mt-2">{libraryCount ?? '–'}</p>
+            <p className="text-xs text-slate-500 mt-1 m-0">자료실 파일</p>
+          </Card>
+        </Link>
         <Card className="p-5 text-center">
           <QrCode size={20} className="text-primary mx-auto" />
           <p className="text-2xl font-bold text-primary m-0 mt-2">{analytics?.activeQrCount ?? '–'}</p>
