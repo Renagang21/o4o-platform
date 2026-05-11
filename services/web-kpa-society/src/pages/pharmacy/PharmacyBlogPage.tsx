@@ -611,18 +611,25 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
         <div>
           <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#1e293b' }}>블로그 관리</h1>
           <p style={{ fontSize: '14px', color: '#64748b', marginTop: '4px' }}>
-            매장 블로그 게시글을 관리합니다. 신규 작성은 "내 자료함 → 제작 시작 → 블로그"에서 진입하세요.
+            매장 블로그 게시글을 관리합니다.
           </p>
         </div>
-        {/* WO-O4O-KPA-STORE-PRODUCTION-ENTRY-CANONICAL-CORRECTION-V1:
-            "새 글 작성" 신규 진입 버튼 제거 — 제작 시작은 "내 자료함"에서만. */}
         {/* WO-O4O-KPA-STORE-BLOG-META-V1: 블로그 설정 진입 */}
-        <button
-          onClick={openSettings}
-          style={{ ...btnStyle, backgroundColor: '#f1f5f9', color: '#475569', whiteSpace: 'nowrap' }}
-        >
-          블로그 설정
-        </button>
+        {/* WO-O4O-STORE-CREATION-CTA-EMPTY-STATE-FIX-V1: "블로그 글 만들기" CTA 복원 */}
+        <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
+          <button
+            onClick={() => openEditor()}
+            style={{ ...btnStyle, backgroundColor: '#3b82f6', color: '#fff', whiteSpace: 'nowrap' }}
+          >
+            블로그 글 만들기
+          </button>
+          <button
+            onClick={openSettings}
+            style={{ ...btnStyle, backgroundColor: '#f1f5f9', color: '#475569', whiteSpace: 'nowrap' }}
+          >
+            블로그 설정
+          </button>
+        </div>
       </div>
 
       {/* Status filter */}
@@ -660,8 +667,14 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
       ) : posts.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '48px 0' }}>
           <p style={{ color: '#94a3b8', fontSize: '15px' }}>
-            게시글이 없습니다. "내 자료함 → 제작 시작 → 블로그"에서 새 글을 시작하세요.
+            게시글이 없습니다.
           </p>
+          <button
+            onClick={() => openEditor()}
+            style={{ ...btnStyle, marginTop: '12px', backgroundColor: '#3b82f6', color: '#fff' }}
+          >
+            블로그 글 만들기
+          </button>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>

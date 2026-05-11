@@ -20,7 +20,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Megaphone, Trash2, ExternalLink, FileDown, QrCode } from 'lucide-react';
+import { Megaphone, Trash2, ExternalLink, FileDown, QrCode, FolderOpen } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { colors } from '../../styles/theme';
@@ -233,8 +233,12 @@ export function StorePopPage() {
               POP 자료가 없습니다.
             </p>
             <p style={{ color: colors.neutral400, fontSize: '13px', marginTop: '4px' }}>
-              내 자료함의 콘텐츠나 자료를 선택해 POP를 제작할 수 있습니다.
+              내 자료함에서 자료를 선택해 POP를 제작할 수 있습니다.
             </p>
+            <Link to="/store/library/contents" style={styles.emptyStateBtn}>
+              <FolderOpen size={14} />
+              내 자료함 열기
+            </Link>
           </div>
         ) : (
           <>
@@ -561,6 +565,21 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: '8px',
     fontSize: '14px',
     fontWeight: 600,
+    cursor: 'pointer',
+  },
+  emptyStateBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    marginTop: '16px',
+    padding: '8px 14px',
+    border: `1px solid ${colors.primary}`,
+    backgroundColor: '#fff',
+    color: colors.primary,
+    borderRadius: '8px',
+    fontSize: '13px',
+    fontWeight: 500,
+    textDecoration: 'none',
     cursor: 'pointer',
   },
 };

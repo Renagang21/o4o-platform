@@ -13,8 +13,8 @@
  */
 
 import { useEffect, useState, useCallback, type CSSProperties } from 'react';
-import { useLocation } from 'react-router-dom';
-import { Sparkles, Save, RefreshCw, FileText, Package } from 'lucide-react';
+import { useLocation, Link } from 'react-router-dom';
+import { Sparkles, Save, RefreshCw, FileText, Package, FolderOpen } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import {
   fetchLocalProducts,
@@ -177,7 +177,13 @@ export default function StoreProductDescriptionsPage() {
           {loading ? (
             <p style={styles.sidebarEmpty}>불러오는 중...</p>
           ) : products.length === 0 ? (
-            <p style={styles.sidebarEmpty}>등록된 자체 상품이 없습니다.</p>
+            <div style={{ padding: '12px 4px' }}>
+              <p style={styles.sidebarEmpty}>등록된 자체 상품이 없습니다.</p>
+              <Link to="/store/commerce/local-products" style={styles.sidebarLink}>
+                <Package size={13} />
+                상품 등록하기
+              </Link>
+            </div>
           ) : (
             <ul style={styles.productList}>
               {products.map((p) => {
@@ -205,7 +211,13 @@ export default function StoreProductDescriptionsPage() {
         {/* 편집 패널 */}
         <section style={styles.editor}>
           {!selectedProduct ? (
-            <div style={styles.editorEmpty}>왼쪽에서 상품을 선택하세요.</div>
+            <div style={{ ...styles.editorEmpty, flexDirection: 'column', gap: '12px' }}>
+              <span>왼쪽에서 상품을 선택하세요.</span>
+              <Link to="/store/library/contents" style={styles.libraryLink}>
+                <FolderOpen size={14} />
+                내 자료함에서 상세설명 만들기
+              </Link>
+            </div>
           ) : (
             <>
               <div style={styles.editorHeader}>
@@ -522,5 +534,32 @@ const styles: Record<string, CSSProperties> = {
     color: colors.white,
     fontWeight: 500,
     cursor: 'pointer',
+  },
+  sidebarLink: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '5px',
+    padding: '6px 10px',
+    background: '#EFF6FF',
+    border: '1px solid #BFDBFE',
+    borderRadius: '6px',
+    fontSize: '12px',
+    color: colors.primary,
+    fontWeight: 500,
+    textDecoration: 'none',
+    marginTop: '4px',
+  },
+  libraryLink: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '8px 14px',
+    border: `1px solid ${colors.primary}`,
+    backgroundColor: '#fff',
+    color: colors.primary,
+    borderRadius: '8px',
+    fontSize: '13px',
+    fontWeight: 500,
+    textDecoration: 'none',
   },
 };
