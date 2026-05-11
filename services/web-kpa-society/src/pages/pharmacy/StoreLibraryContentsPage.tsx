@@ -7,11 +7,14 @@
  * WO-O4O-LESSON-CARD-PREVIEW-COMPONENT-V1: lesson 인라인 표시를 LessonCardPreview 공용 컴포넌트로 교체
  * WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1: KPA 콘텐츠 허브 가져온 항목(asset_type='content') 표시.
  *   "콘텐츠" 필터에서 'cms'(레거시 CmsContent)와 'content'(kpa_contents)를 통합 표시.
+ * WO-O4O-KPA-STORE-LIBRARY-CONTENTS-REMOVE-FLOW-FIX-V1:
+ *   콘텐츠 메뉴는 snapshot/reference 중심. batch action을 "제거(hide)" 기준으로 정렬.
+ *   direct 삭제 로직 제거 — direct 삭제는 내 자료함 > 매장 제작 자료에서만 처리.
  *
  * 매장이 보유한 콘텐츠 source/reference 저장소.
  * - 커뮤니티에서 가져온 snapshot-based 콘텐츠 (asset_type='cms' / 'content')
  * - LMS 강의 메타데이터 (asset_type='lesson') — Reference Metadata, lesson body 미포함
- * - 매장이 직접 작성한 direct 콘텐츠
+ * - 매장이 직접 작성한 direct 콘텐츠 (삭제는 매장 제작 자료 화면에서)
  *
  * 본 페이지는 제작 시작 단일 진입점:
  *   자료 선택 → "제작 시작" → modal (POP/QR/블로그/상품 상세설명) → 편집기 route 이동
@@ -52,7 +55,6 @@ export default function StoreLibraryContentsPage() {
   const [snapshots, setSnapshots] = useState<StoreAssetItem[]>([]);
   const [directs, setDirects] = useState<DirectItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [selected, setSelected] = useState<Set<SelectionKey>>(new Set());
   const [modalOpen, setModalOpen] = useState(false);
   const [modalSource, setModalSource] = useState<ProductionSource | null>(null);
@@ -101,25 +103,6 @@ export default function StoreLibraryContentsPage() {
   useEffect(() => {
     fetchAll();
   }, [fetchAll]);
-
-  const handleDeleteDirect = async (id: string) => {
-    if (!confirm('이 콘텐츠를 삭제하시겠습니까?')) return;
-    setDeletingId(id);
-    try {
-      await directContentApi.remove(id);
-      setDirects((prev) => prev.filter((it) => it.id !== id));
-      setSelected((prev) => {
-        const next = new Set(prev);
-        next.delete(keyOf('direct', id));
-        return next;
-      });
-      toast.success('삭제되었습니다');
-    } catch (e: any) {
-      toast.error(e?.message || '삭제에 실패했습니다');
-    } finally {
-      setDeletingId(null);
-    }
-  };
 
   const toggleOne = (key: SelectionKey) => {
     setSelected((prev) => {
@@ -179,25 +162,27 @@ export default function StoreLibraryContentsPage() {
     setModalOpen(true);
   };
 
-  const handleBulkDelete = async () => {
-    const directIds: string[] = [];
+  // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-REMOVE-FLOW-FIX-V1
+  // 콘텐츠 메뉴의 "제거" = snapshot을 hidden 처리하여 내 자료함에서 숨김.
+  // 원본 커뮤니티 콘텐츠 삭제 금지. direct 콘텐츠는 제거 대상에서 제외(매장 제작 자료 화면 전담).
+  const handleBulkRemove = async () => {
+    const snapshotIds: string[] = [];
     for (const key of selected) {
       const [origin, id] = key.split(':') as ['snapshot' | 'direct', string];
-      if (origin === 'direct') directIds.push(id);
-      // snapshot 삭제는 본 단계에서는 미지원 (snapshot lifecycle 별도)
+      if (origin === 'snapshot') snapshotIds.push(id);
     }
-    if (directIds.length === 0) {
-      toast.error('선택 항목 중 삭제 가능한 직접 작성 콘텐츠가 없습니다');
+    if (snapshotIds.length === 0) {
+      toast.error('제거할 콘텐츠가 없습니다');
       return;
     }
-    if (!confirm(`선택한 ${directIds.length}개 콘텐츠를 삭제하시겠습니까?`)) return;
+    if (!confirm(`선택한 ${snapshotIds.length}개 콘텐츠를 내 자료함에서 제거하시겠습니까?`)) return;
     try {
-      await Promise.all(directIds.map((id) => directContentApi.remove(id)));
-      setDirects((prev) => prev.filter((it) => !directIds.includes(it.id)));
+      await Promise.all(snapshotIds.map((id) => storeAssetControlApi.updatePublishStatus(id, 'hidden')));
+      setSnapshots((prev) => prev.filter((it) => !snapshotIds.includes(it.id)));
       setSelected(new Set());
-      toast.success(`${directIds.length}개 삭제되었습니다`);
+      toast.success(`${snapshotIds.length}개 콘텐츠를 내 자료함에서 제거했습니다`);
     } catch (e: any) {
-      toast.error(e?.message || '일괄 삭제에 실패했습니다');
+      toast.error(e?.message || '내 자료함 제거에 실패했습니다');
     }
   };
 
@@ -272,12 +257,12 @@ export default function StoreLibraryContentsPage() {
           </button>
           <button
             type="button"
-            onClick={handleBulkDelete}
+            onClick={handleBulkRemove}
             disabled={selected.size === 0}
             style={{ ...styles.bulkDeleteBtn, opacity: selected.size === 0 ? 0.5 : 1 }}
           >
             <Trash2 size={14} />
-            선택 삭제
+            선택 제거
           </button>
         </div>
       )}
@@ -324,14 +309,9 @@ export default function StoreLibraryContentsPage() {
                         <span style={styles.metaText}>
                           {item.updatedAt ? new Date(item.updatedAt).toLocaleDateString('ko-KR') : ''}
                         </span>
-                        <button
-                          onClick={() => handleDeleteDirect(item.id)}
-                          disabled={deletingId === item.id}
-                          style={styles.deleteBtn}
-                          title="삭제"
-                        >
-                          <Trash2 size={14} />
-                        </button>
+                        <span style={{ ...styles.badge, background: '#F1F5F9', color: '#64748B', fontSize: 11 }}>
+                          매장 제작 자료에서 삭제
+                        </span>
                       </div>
                     </li>
                   );
