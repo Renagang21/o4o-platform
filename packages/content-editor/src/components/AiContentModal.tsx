@@ -28,7 +28,7 @@
  * - 모드: 고객용 문장 정리 / 짧게 요약 / POP용 정리 / 제목 추천 / 블로그 글 / QR 안내문
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { Editor } from '@tiptap/react';
 
 const API_BASE_URL =
@@ -278,8 +278,17 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
   // 기존 text 모드 상태
   const [input, setInput] = useState('');
   // WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-AI-FLOW-V1:
-  //   initialMode prop 으로 첫 진입 모드 override 가능. 모달 re-mount(open=false→true) 시점에만 반영.
+  //   initialMode prop 으로 첫 진입 모드 override.
+  //   모달이 `if (!open) return null` 패턴이지만 React 는 컴포넌트 instance 를 유지하므로
+  //   useState 초기값은 첫 mount 시점에만 평가됨. 따라서 open 또는 initialMode 가 바뀔 때
+  //   useEffect 로 mode 를 재설정한다 (사용자가 모달 안에서 다른 mode 로 전환한 뒤 닫고 다시
+  //   열면 다시 initialMode 로 돌아옴 — 진입 컨텍스트 우선).
   const [mode, setMode] = useState<AiMode>(initialMode ?? 'customer_rewrite');
+  useEffect(() => {
+    if (open) {
+      setMode(initialMode ?? 'customer_rewrite');
+    }
+  }, [open, initialMode]);
   const [tone, setTone] = useState<ToneOption>('professional');
   const [length, setLength] = useState<LengthOption>('medium');
   const [loading, setLoading] = useState(false);
