@@ -16,11 +16,12 @@
  */
 
 import { useEffect, useState, useCallback, type CSSProperties } from 'react';
-import { Layers, Trash2, RefreshCw, Sparkles, FileEdit } from 'lucide-react';
+import { Layers, Trash2, RefreshCw, Sparkles, FileEdit, Plus } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { directContentApi } from '../../api/assetSnapshot';
 import { colors } from '../../styles/theme';
 import { StartProductionModal, type ProductionSource } from './StartProductionModal';
+import { ProductionTypeSelectorModal } from './ProductionTypeSelectorModal';
 
 // ─── 타입 ─────────────────────────────────────────────────────────────────────
 
@@ -79,6 +80,7 @@ export default function StoreProductionMaterialsPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [modalOpen, setModalOpen]   = useState(false);
   const [modalSource, setModalSource] = useState<ProductionSource | null>(null);
+  const [typeSelectorOpen, setTypeSelectorOpen] = useState(false);
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
@@ -189,10 +191,20 @@ export default function StoreProductionMaterialsPage() {
             POP·QR 코드·블로그·상품 상세설명 제작 과정에서 저장한 원본/편집 자료를 관리합니다.
           </p>
         </div>
-        <button onClick={fetchAll} style={styles.refreshBtn} disabled={loading}>
-          <RefreshCw size={14} />
-          새로고침
-        </button>
+        <div style={styles.headerActions}>
+          <button
+            type="button"
+            onClick={() => setTypeSelectorOpen(true)}
+            style={styles.createBtn}
+          >
+            <Plus size={14} />
+            매장 제작 자료 만들기
+          </button>
+          <button onClick={fetchAll} style={styles.refreshBtn} disabled={loading}>
+            <RefreshCw size={14} />
+            새로고침
+          </button>
+        </div>
       </div>
 
       {/* Batch toolbar */}
@@ -245,9 +257,17 @@ export default function StoreProductionMaterialsPage() {
           <p style={{ margin: 0, color: colors.neutral600, fontSize: 15, fontWeight: 500 }}>
             매장 제작 자료가 없습니다.
           </p>
-          <p style={{ margin: '8px 0 0', color: colors.neutral400, fontSize: 13, lineHeight: 1.6 }}>
+          <p style={{ margin: '8px 0 0 0', color: colors.neutral400, fontSize: 13, lineHeight: 1.6 }}>
             POP, QR 코드, 블로그, 상품 상세설명 제작 과정에서 저장한 자료가 이곳에 표시됩니다.
           </p>
+          <button
+            type="button"
+            onClick={() => setTypeSelectorOpen(true)}
+            style={{ ...styles.createBtn, marginTop: 16 }}
+          >
+            <Plus size={14} />
+            매장 제작 자료 만들기
+          </button>
         </div>
       ) : (
         <div style={styles.tableWrap}>
@@ -324,6 +344,11 @@ export default function StoreProductionMaterialsPage() {
         source={modalSource}
         onClose={() => setModalOpen(false)}
       />
+
+      <ProductionTypeSelectorModal
+        open={typeSelectorOpen}
+        onClose={() => setTypeSelectorOpen(false)}
+      />
     </div>
   );
 }
@@ -364,6 +389,25 @@ const styles: Record<string, CSSProperties> = {
     fontSize: '13px',
     color: colors.neutral500,
     margin: '6px 0 0',
+  },
+  headerActions: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '8px',
+    flexShrink: 0,
+  },
+  createBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '8px 14px',
+    background: colors.primary,
+    border: 'none',
+    borderRadius: '6px',
+    fontSize: '13px',
+    color: colors.white,
+    fontWeight: 500,
+    cursor: 'pointer',
   },
   refreshBtn: {
     display: 'inline-flex',
