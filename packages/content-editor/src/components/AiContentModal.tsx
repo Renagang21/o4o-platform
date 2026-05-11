@@ -5,6 +5,9 @@
  * WO-AI-CONTENT-EDITOR-POLISH-V1
  * WO-STORE-AI-CONTENT-ASSIST-V1
  * WO-O4O-RICHTEXT-AI-URL-IMPORT-V1
+ * WO-O4O-AI-MODAL-OUTPUT-TYPE-EXPOSE-V1:
+ *   백엔드 7개 outputType 중 기존 4개에 더해 `blog`, `store_qr` 노출.
+ *   백엔드 변경 없음 (이미 builder/parser 보유). 저장 destination 추가도 본 WO 범위 외.
  *
  * 사용자가 텍스트를 붙여넣으면 AI가 HTML 형식으로 변환/요약/정리.
  * 또는 URL을 입력하면 AI가 해당 페이지 콘텐츠를 HTML로 변환.
@@ -12,7 +15,7 @@
  *
  * - 인증: credentials: 'include' (쿠키 기반 fallback) + aiRequestHeaders prop (Bearer 토큰 등 명시 주입)
  * - 삽입: editor.commands.setContent(html) → TipTap onUpdate → onChange 자동 트리거
- * - 모드: 고객용 문장 정리 / 짧게 요약 / POP용 정리 / 제목 추천
+ * - 모드: 고객용 문장 정리 / 짧게 요약 / POP용 정리 / 제목 추천 / 블로그 글 / QR 안내문
  */
 
 import { useState } from 'react';
@@ -95,7 +98,7 @@ interface AiContentModalProps {
   initialSourceTab?: 'text' | 'url';
 }
 
-type AiMode = 'customer_rewrite' | 'summary' | 'pop' | 'title_suggest';
+type AiMode = 'customer_rewrite' | 'summary' | 'pop' | 'title_suggest' | 'blog' | 'store_qr';
 type ToneOption = 'friendly' | 'professional' | 'concise';
 type LengthOption = 'short' | 'medium' | 'long';
 type ResultTab = 'preview' | 'html';
@@ -111,11 +114,19 @@ interface UrlBlock {
   innerBlocks?: UrlBlock[];
 }
 
+// WO-O4O-AI-MODAL-OUTPUT-TYPE-EXPOSE-V1:
+//   백엔드 ai-prompts 카탈로그가 7개 outputType 을 이미 지원하지만
+//   모달에는 4개만 노출되어 있던 격차를 해소.
+//   `blog`, `store_qr` 추가 (백엔드 builder/parser 변경 없음).
+//   `store_sns` 는 본 WO 범위 외 — 후속 결정.
+//   디지털 사이니지 outputType 은 카탈로그 자체에 부재 (격리 유지).
 const MODE_CONFIG: { key: AiMode; label: string; outputType: string; desc: string }[] = [
   { key: 'customer_rewrite', label: '고객용 정리', outputType: 'product_detail', desc: '고객이 읽기 쉬운 상품 설명으로 정리' },
-  { key: 'summary', label: '짧게 요약', outputType: 'summary', desc: '핵심만 남겨 3-5줄로 요약' },
-  { key: 'pop', label: 'POP용 정리', outputType: 'pop', desc: 'POP 템플릿용 짧은 문구 세트' },
-  { key: 'title_suggest', label: '제목 추천', outputType: 'title_suggest', desc: '콘텐츠/POP/QR 제목 후보 추천' },
+  { key: 'summary',          label: '짧게 요약',  outputType: 'summary',        desc: '핵심만 남겨 3-5줄로 요약' },
+  { key: 'pop',              label: 'POP용 정리', outputType: 'pop',            desc: 'POP 템플릿용 짧은 문구 세트' },
+  { key: 'title_suggest',    label: '제목 추천',  outputType: 'title_suggest',  desc: '콘텐츠/POP/QR 제목 후보 추천' },
+  { key: 'blog',             label: '블로그 글',  outputType: 'blog',           desc: '블로그 게시용 본문으로 재구성' },
+  { key: 'store_qr',         label: 'QR 안내문',  outputType: 'store_qr',       desc: 'QR 스캔 후 보여줄 짧은 안내문 생성' },
 ];
 
 const TONE_LABELS: Record<ToneOption, string> = {
