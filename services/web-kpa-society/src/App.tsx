@@ -38,7 +38,6 @@ const ForumFeedPage = lazy(() => import('./pages/forum/ForumFeedPage').then(m =>
 import { MarketTrialNetureRedirect } from './components/MarketTrialNetureRedirect';
 
 // LMS pages — WO-KPA-SOCIETY-APP-ROUTE-CODE-SPLITTING-V1: lazy (barrel unwound)
-// WO-O4O-LMS-CANONICAL-ROUTE-ALIGN-V1: EducationPage 제거, /lms → LmsCoursesPage
 const LmsCoursesPage = lazy(() => import('./pages/lms/LmsCoursesPage').then(m => ({ default: m.LmsCoursesPage })));
 const LmsCourseDetailPage = lazy(() => import('./pages/lms/LmsCourseDetailPage').then(m => ({ default: m.LmsCourseDetailPage })));
 const LmsLessonPage = lazy(() => import('./pages/lms/LmsLessonPage').then(m => ({ default: m.LmsLessonPage })));
