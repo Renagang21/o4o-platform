@@ -29,7 +29,6 @@ import { RowActionMenu } from '@o4o/ui';
 
 interface BulkResult {
   succeeded: string[];
-  duplicated: string[];
   failed: Array<{ courseId: string; message: string }>;
 }
 
@@ -79,8 +78,8 @@ export function ContentCoursesPage() {
   const [loading, setLoading] = useState(true);
 
   // Selection + library
+  // WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1: 중복 허용 — addedCourseIds 제거
   const [selectedCourseIds, setSelectedCourseIds] = useState<Set<string>>(new Set());
-  const [addedCourseIds, setAddedCourseIds] = useState<Set<string>>(new Set());
   const [copyingId, setCopyingId] = useState<string | null>(null);
   const [bulkResult, setBulkResult] = useState<BulkResult | null>(null);
   const [isBulkAdding, setIsBulkAdding] = useState(false);
@@ -119,22 +118,6 @@ export function ContentCoursesPage() {
     setSelectedCourseIds(new Set());
   }, [loadData]);
 
-  // Load already-added course IDs
-  useEffect(() => {
-    if (!isAuthenticated) return;
-    let cancelled = false;
-    assetSnapshotApi
-      .list({ type: 'lesson', limit: 200 })
-      .then((res) => {
-        if (cancelled) return;
-        const ids = new Set<string>();
-        for (const item of res.data?.items ?? []) ids.add(item.sourceAssetId);
-        setAddedCourseIds(ids);
-      })
-      .catch(() => {});
-    return () => { cancelled = true; };
-  }, [isAuthenticated]);
-
   // ─── Handlers ──────────────────────────────────────────────────────────────
 
   const handleSearch = (e: React.FormEvent) => {
@@ -147,32 +130,25 @@ export function ContentCoursesPage() {
     });
   };
 
+  // WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1: 중복 허용 — 매번 새 library item
   const handleCopyToStore = useCallback(async (course: Course) => {
-    if (addedCourseIds.has(course.id)) return;
     const isRestricted = course.reusablePolicy === 'restricted';
     if (isRestricted) { toast.error('가져가기가 제한된 자료입니다'); return; }
     setCopyingId(course.id);
     try {
       await assetSnapshotApi.copy({ sourceService: 'kpa', sourceAssetId: course.id, assetType: 'lesson' });
-      setAddedCourseIds((prev) => new Set(prev).add(course.id));
       toast.success('내 자료함에 추가되었습니다');
     } catch (err: any) {
-      const code = err?.response?.data?.error?.code ?? err?.code;
-      if (code === 'DUPLICATE_SNAPSHOT') {
-        setAddedCourseIds((prev) => new Set(prev).add(course.id));
-        toast.success('이미 내 자료함에 있습니다');
-      } else {
-        toast.error(err?.message || '가져오기에 실패했습니다');
-      }
+      toast.error(err?.message || '가져오기에 실패했습니다');
     } finally {
       setCopyingId(null);
     }
-  }, [addedCourseIds]);
+  }, []);
 
   const handleBulkAdd = useCallback(async () => {
     if (selectedCourseIds.size === 0 || isBulkAdding) return;
     setIsBulkAdding(true);
-    const result: BulkResult = { succeeded: [], duplicated: [], failed: [] };
+    const result: BulkResult = { succeeded: [], failed: [] };
     const targets = courses.filter(
       (c) => selectedCourseIds.has(c.id) && c.reusablePolicy !== 'restricted',
     );
@@ -182,17 +158,10 @@ export function ContentCoursesPage() {
           await assetSnapshotApi.copy({ sourceService: 'kpa', sourceAssetId: c.id, assetType: 'lesson' });
           result.succeeded.push(c.id);
         } catch (err: any) {
-          const code = err?.response?.data?.error?.code ?? err?.code;
-          if (code === 'DUPLICATE_SNAPSHOT') result.duplicated.push(c.id);
-          else result.failed.push({ courseId: c.id, message: err?.message || '추가 실패' });
+          result.failed.push({ courseId: c.id, message: err?.message || '추가 실패' });
         }
       }),
     );
-    setAddedCourseIds((prev) => {
-      const next = new Set(prev);
-      [...result.succeeded, ...result.duplicated].forEach((id) => next.add(id));
-      return next;
-    });
     setSelectedCourseIds(new Set());
     setIsBulkAdding(false);
     setBulkResult(result);
@@ -207,10 +176,10 @@ export function ContentCoursesPage() {
     });
   };
 
-  // Selectable = not restricted, not already added
+  // Selectable = not restricted (중복 허용 — 이미 추가됨 필터 제거)
   const selectableIds = new Set(
     courses
-      .filter((c) => c.reusablePolicy !== 'restricted' && !addedCourseIds.has(c.id))
+      .filter((c) => c.reusablePolicy !== 'restricted')
       .map((c) => c.id),
   );
   const allSelected = selectableIds.size > 0 && [...selectableIds].every((id) => selectedCourseIds.has(id));
@@ -313,7 +282,6 @@ export function ContentCoursesPage() {
             </thead>
             <tbody>
               {courses.map((c, idx) => {
-                const isAlreadyAdded = addedCourseIds.has(c.id);
                 const isAdding = copyingId === c.id;
                 const isRestricted = c.reusablePolicy === 'restricted';
                 const isSelectable = selectableIds.has(c.id);
@@ -338,8 +306,6 @@ export function ContentCoursesPage() {
                             style={{ cursor: 'pointer' }}
                             aria-label={`${c.title} 선택`}
                           />
-                        ) : isAlreadyAdded ? (
-                          <span style={{ color: '#9ca3af', fontSize: 14 }}>✓</span>
                         ) : null}
                       </td>
                     )}
@@ -391,10 +357,10 @@ export function ContentCoursesPage() {
                           <button
                             type="button"
                             onClick={() => handleCopyToStore(c)}
-                            disabled={isAlreadyAdded || isAdding}
-                            style={libraryBtnStyle(isAlreadyAdded, isAdding)}
+                            disabled={isAdding}
+                            style={libraryBtnStyle(false, isAdding)}
                           >
-                            {isAlreadyAdded ? '✓ 자료함' : isAdding ? '추가 중...' : '자료함 추가'}
+                            {isAdding ? '추가 중...' : '자료함 추가'}
                           </button>
                         )}
                         {isAuthenticated && isRestricted && (
@@ -460,9 +426,6 @@ export function ContentCoursesPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {bulkResult.succeeded.length > 0 && (
                 <div style={resultRowStyle('#dcfce7', '#15803d')}>✓ 성공: {bulkResult.succeeded.length}개</div>
-              )}
-              {bulkResult.duplicated.length > 0 && (
-                <div style={resultRowStyle('#fef9c3', '#854d0e')}>↩ 이미 추가됨: {bulkResult.duplicated.length}개</div>
               )}
               {bulkResult.failed.length > 0 && (
                 <div style={resultRowStyle('#fee2e2', '#991b1b')}>

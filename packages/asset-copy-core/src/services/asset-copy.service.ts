@@ -107,13 +107,10 @@ export class AssetCopyService {
   async copyResolved(input: CopyResolvedInput): Promise<CopyResult> {
     const { sourceService, sourceAssetId, assetType, targetOrganizationId, createdBy, title, contentJson } = input;
 
-    // Check duplicate: same org + source + type
-    const existing = await this.snapshotRepo.findOne({
-      where: { organizationId: targetOrganizationId, sourceAssetId, assetType },
-    });
-    if (existing) {
-      throw new Error('DUPLICATE_SNAPSHOT');
-    }
+    // WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1
+    // Community → My Library 흐름은 완전 복사 기반 — 동일 원본을 여러 번 복사 가능.
+    // 각 호출은 새 snapshot 을 생성하며, sourceAssetId 연결은 통계/출처 메타데이터로만 유지된다.
+    // (DB 의 UQ_asset_snapshot_org_source_type 도 동일 WO 의 follow-up migration 으로 제거됨.)
 
     // Validate content_json is a proper object
     if (!contentJson || typeof contentJson !== 'object' || Array.isArray(contentJson)) {
@@ -130,16 +127,8 @@ export class AssetCopyService {
       createdBy,
     });
 
-    try {
-      const saved = await this.snapshotRepo.save(snapshot);
-      return { snapshot: saved };
-    } catch (err: any) {
-      // DB unique constraint violation → treat as duplicate
-      if (err.code === '23505') {
-        throw new Error('DUPLICATE_SNAPSHOT');
-      }
-      throw err;
-    }
+    const saved = await this.snapshotRepo.save(snapshot);
+    return { snapshot: saved };
   }
 
   /**

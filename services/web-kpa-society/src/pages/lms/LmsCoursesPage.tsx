@@ -34,7 +34,6 @@ import type { Course } from '../../types';
 
 interface BulkResult {
   succeeded: string[];
-  duplicated: string[];
   failed: Array<{ courseId: string; message: string }>;
 }
 
@@ -85,7 +84,7 @@ export function LmsCoursesPage() {
   const [searchInput, setSearchInput] = useState(searchParams.get('search') || '');
 
   // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1
-  const [addedCourseIds, setAddedCourseIds] = useState<Set<string>>(new Set());
+  // WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1: 같은 원본 중복 추가 허용 — dedupe state 제거
   const [addingCourseId, setAddingCourseId] = useState<string | null>(null);
 
   // WO-O4O-LMS-LIST-BULK-LIBRARY-ACTION-V1
@@ -116,22 +115,6 @@ export function LmsCoursesPage() {
   useEffect(() => {
     setSelectedCourseIds(new Set());
   }, [currentPage, currentSearch]);
-
-  // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1: 이미 가져간 강의 set 로드
-  useEffect(() => {
-    if (!isStoreOwner) return;
-    let cancelled = false;
-    assetSnapshotApi
-      .list({ type: 'lesson', limit: 200 })
-      .then((res) => {
-        if (cancelled) return;
-        const ids = new Set<string>();
-        for (const item of res.data?.items ?? []) ids.add(item.sourceAssetId);
-        setAddedCourseIds(ids);
-      })
-      .catch(() => {});
-    return () => { cancelled = true; };
-  }, [isStoreOwner]);
 
   // WO-O4O-LMS-CANONICAL-ROUTE-ALIGN-V1: 강사 신청 자격 조회
   useEffect(() => {
@@ -179,21 +162,18 @@ export function LmsCoursesPage() {
   };
 
   // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1: 개별 추가
+  // WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1: 중복 허용 — 매번 새 library item 생성
   const handleAddToLibrary = async (course: Course, e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!isStoreOwner || addedCourseIds.has(course.id)) return;
+    if (!isStoreOwner) return;
     setAddingCourseId(course.id);
     try {
       await assetSnapshotApi.copy({ sourceService: 'kpa', sourceAssetId: course.id, assetType: 'lesson' });
-      setAddedCourseIds(prev => new Set(prev).add(course.id));
       toast.success('내 자료함에 추가되었습니다');
     } catch (err: any) {
       const code = err?.response?.data?.error?.code ?? err?.code;
-      if (code === 'DUPLICATE_SNAPSHOT') {
-        setAddedCourseIds(prev => new Set(prev).add(course.id));
-        toast.success('이미 내 자료함에 있는 강의입니다');
-      } else if (code === 'SOURCE_NOT_FOUND') {
+      if (code === 'SOURCE_NOT_FOUND') {
         toast.error('현재 자료함에 추가할 수 없는 강의입니다');
       } else {
         toast.error(err?.response?.data?.error?.message || err?.message || '자료함 추가에 실패했습니다');
@@ -213,10 +193,11 @@ export function LmsCoursesPage() {
   };
 
   // WO-O4O-LMS-LIST-BULK-LIBRARY-ACTION-V1: bulk 추가
+  // WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1: 중복 허용 — 각 선택은 새 library item 생성
   const handleBulkAddToLibrary = async () => {
     if (!isStoreOwner || selectedCourseIds.size === 0 || isBulkAdding) return;
     setIsBulkAdding(true);
-    const result: BulkResult = { succeeded: [], duplicated: [], failed: [] };
+    const result: BulkResult = { succeeded: [], failed: [] };
 
     await Promise.all(
       [...selectedCourseIds].map(async (courseId) => {
@@ -224,18 +205,11 @@ export function LmsCoursesPage() {
           await assetSnapshotApi.copy({ sourceService: 'kpa', sourceAssetId: courseId, assetType: 'lesson' });
           result.succeeded.push(courseId);
         } catch (err: any) {
-          const code = err?.response?.data?.error?.code ?? err?.code;
-          if (code === 'DUPLICATE_SNAPSHOT') result.duplicated.push(courseId);
-          else result.failed.push({ courseId, message: err?.response?.data?.error?.message || err?.message || '추가 실패' });
+          result.failed.push({ courseId, message: err?.response?.data?.error?.message || err?.message || '추가 실패' });
         }
       }),
     );
 
-    setAddedCourseIds(prev => {
-      const next = new Set(prev);
-      [...result.succeeded, ...result.duplicated].forEach(id => next.add(id));
-      return next;
-    });
     setSelectedCourseIds(new Set());
     setIsBulkAdding(false);
     setBulkResult(result);
@@ -252,7 +226,7 @@ export function LmsCoursesPage() {
   // Selectable = can add to library and not already added
   const selectableIds = new Set(
     courses
-      .filter(c => isStoreOwner && c.status === 'published' && !!c.reusablePolicy && c.reusablePolicy !== 'restricted' && !addedCourseIds.has(c.id))
+      .filter(c => isStoreOwner && c.status === 'published' && !!c.reusablePolicy && c.reusablePolicy !== 'restricted')
       .map(c => c.id),
   );
   const allSelectableSelected = selectableIds.size > 0 && [...selectableIds].every(id => selectedCourseIds.has(id));
@@ -350,7 +324,6 @@ export function LmsCoursesPage() {
                       course.status === 'published' &&
                       !!course.reusablePolicy &&
                       course.reusablePolicy !== 'restricted';
-                    const isAlreadyAdded = addedCourseIds.has(course.id);
                     const isAdding = addingCourseId === course.id;
                     const isSelectable = selectableIds.has(course.id);
                     const isSelected = selectedCourseIds.has(course.id);
@@ -384,8 +357,6 @@ export function LmsCoursesPage() {
                                 style={{ cursor: 'pointer' }}
                                 aria-label={`${course.title} 선택`}
                               />
-                            ) : isAlreadyAdded ? (
-                              <span style={{ color: '#9ca3af', fontSize: 14 }}>✓</span>
                             ) : null}
                           </td>
                         )}
@@ -439,17 +410,18 @@ export function LmsCoursesPage() {
                               {ctaLabel}
                             </Link>
 
-                            {/* 자료함 추가 — hydration unknown: skeleton, hydrated: button/badge */}
+                            {/* 자료함 추가 — hydration unknown: skeleton, hydrated: button */}
+                            {/* WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1: 중복 허용 — 항상 활성 */}
                             {mightBeStoreOwner && !isKpaContextLoaded ? (
                               <div style={skeletonActionStyle} />
                             ) : canAddToLibrary ? (
                               <button
                                 type="button"
-                                onClick={(e) => isAlreadyAdded ? e.preventDefault() : handleAddToLibrary(course, e)}
-                                disabled={isAlreadyAdded || isAdding}
-                                style={libraryBtnStyle(isAlreadyAdded, isAdding)}
+                                onClick={(e) => handleAddToLibrary(course, e)}
+                                disabled={isAdding}
+                                style={libraryBtnStyle(false, isAdding)}
                               >
-                                {isAlreadyAdded ? '✓ 자료함' : isAdding ? '추가 중...' : '자료함 추가'}
+                                {isAdding ? '추가 중...' : '자료함 추가'}
                               </button>
                             ) : null}
 
@@ -517,9 +489,6 @@ export function LmsCoursesPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {bulkResult.succeeded.length > 0 && (
                 <div style={resultRowStyle('#dcfce7', '#15803d')}>✓ 성공: {bulkResult.succeeded.length}개</div>
-              )}
-              {bulkResult.duplicated.length > 0 && (
-                <div style={resultRowStyle('#fef9c3', '#854d0e')}>↩ 이미 추가됨: {bulkResult.duplicated.length}개</div>
               )}
               {bulkResult.failed.length > 0 && (
                 <div style={resultRowStyle('#fee2e2', '#991b1b')}>

@@ -128,6 +128,7 @@ export function ContentDocumentsPage({ subType = 'content' }: ContentDocumentsPa
   }, []);
 
   // WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1
+  // WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1: 중복 허용 — 매번 새 library item 생성
   // assetSnapshotApi.copy() — o4o_asset_snapshots 표준 자료함에 저장 (assetType='content').
   const handleCopyToStore = useCallback(async (id: string) => {
     setCopyingId(id);
@@ -139,11 +140,7 @@ export function ContentDocumentsPage({ subType = 'content' }: ContentDocumentsPa
       });
       toast.success('내 자료함에 가져왔습니다');
     } catch (e: any) {
-      if (e?.code === 'DUPLICATE_SNAPSHOT') {
-        toast.success('이미 자료함에 있습니다');
-      } else {
-        toast.error(e?.message || '가져오기에 실패했습니다');
-      }
+      toast.error(e?.message || '가져오기에 실패했습니다');
     } finally {
       setCopyingId(null);
     }
@@ -182,20 +179,14 @@ export function ContentDocumentsPage({ subType = 'content' }: ContentDocumentsPa
           }),
         ),
       );
-      // 이미 자료함에 있는 항목(DUPLICATE_SNAPSHOT)은 성공으로 합산
+      // WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1: 중복 허용 — 각 호출이 새 item 을 생성
       let ok = 0;
-      let dup = 0;
       let failed = 0;
       for (const r of results) {
         if (r.status === 'fulfilled') ok += 1;
-        else if ((r.reason as any)?.code === 'DUPLICATE_SNAPSHOT') dup += 1;
         else failed += 1;
       }
-      const acquired = ok + dup;
-      if (acquired > 0) {
-        const dupNote = dup > 0 ? ` (이미 보유 ${dup}개 포함)` : '';
-        toast.success(`${acquired}개를 자료함에 가져왔습니다${dupNote}`);
-      }
+      if (ok > 0) toast.success(`${ok}개를 자료함에 가져왔습니다`);
       if (failed > 0) toast.error(`${failed}개 가져오기 실패`);
       if (skipped > 0) toast(`가져가기 불가 ${skipped}개는 제외됨`);
     } finally {

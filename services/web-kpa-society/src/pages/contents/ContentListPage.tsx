@@ -147,6 +147,7 @@ function DocumentsSection({
   }, []);
 
   // WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1
+  // WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1: 중복 허용 — 매번 새 library item 생성
   // assetSnapshotApi.copy() — o4o_asset_snapshots 표준 자료함에 저장 (assetType='content').
   // 가져온 콘텐츠는 /library/contents 페이지에서 보이며 POP/QR/블로그 제작에서 선택 가능.
   const handleCopyToStore = useCallback(async (id: string) => {
@@ -159,11 +160,7 @@ function DocumentsSection({
       });
       toast.success('내 자료함에 가져왔습니다');
     } catch (e: any) {
-      if (e?.code === 'DUPLICATE_SNAPSHOT') {
-        toast.success('이미 자료함에 있습니다');
-      } else {
-        toast.error(e?.message || '가져오기에 실패했습니다');
-      }
+      toast.error(e?.message || '가져오기에 실패했습니다');
     } finally {
       setCopying(null);
     }
@@ -393,7 +390,7 @@ function CoursesSection({ canCreateCourse }: { canCreateCourse: boolean }) {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [copying, setCopying] = useState<string | null>(null);
-  const [addedCourseIds, setAddedCourseIds] = useState<Set<string>>(new Set());
+  // WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1: 중복 허용 — addedCourseIds 제거
 
   useEffect(() => {
     let cancelled = false;
@@ -418,16 +415,7 @@ function CoursesSection({ canCreateCourse }: { canCreateCourse: boolean }) {
     return () => { cancelled = true; };
   }, []);
 
-  useEffect(() => {
-    assetSnapshotApi.list({ type: 'lesson', limit: 200 })
-      .then((res) => {
-        const ids = new Set<string>();
-        for (const item of res.data?.items ?? []) ids.add(item.sourceAssetId);
-        setAddedCourseIds(ids);
-      })
-      .catch(() => {});
-  }, []);
-
+  // WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1: 중복 허용 — 매번 새 library item 생성
   const handleCopyToStore = useCallback(async (course: Course) => {
     setCopying(course.id);
     try {
@@ -436,15 +424,9 @@ function CoursesSection({ canCreateCourse }: { canCreateCourse: boolean }) {
         sourceAssetId: course.id,
         assetType: 'lesson',
       });
-      setAddedCourseIds((prev) => new Set(prev).add(course.id));
       toast.success('내 자료함에 가져왔습니다');
     } catch (e: any) {
-      if (e?.code === 'DUPLICATE_SNAPSHOT') {
-        setAddedCourseIds((prev) => new Set(prev).add(course.id));
-        toast.success('이미 자료함에 있습니다');
-      } else {
-        toast.error(e?.message || '가져오기에 실패했습니다');
-      }
+      toast.error(e?.message || '가져오기에 실패했습니다');
     } finally {
       setCopying(null);
     }
@@ -497,14 +479,13 @@ function CoursesSection({ canCreateCourse }: { canCreateCourse: boolean }) {
       system: 'last',
       render: (_v, row) => {
         const isRestricted = row.reusablePolicy === 'restricted';
-        const isAlreadyAdded = addedCourseIds.has(row.id);
         const actions: RowActionItem[] = [
           {
             key: 'copy-to-store',
-            label: isRestricted ? '내 자료함 가져가기 (불가)' : isAlreadyAdded ? '이미 추가됨' : '내 자료함 가져가기',
+            label: isRestricted ? '내 자료함 가져가기 (불가)' : '내 자료함 가져가기',
             onClick: () => handleCopyToStore(row),
             loading: copying === row.id,
-            disabled: isRestricted || isAlreadyAdded,
+            disabled: isRestricted,
           },
           {
             key: 'view',

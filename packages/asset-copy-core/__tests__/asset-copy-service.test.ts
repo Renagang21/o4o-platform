@@ -158,44 +158,32 @@ describe('AssetCopyService', () => {
     });
   });
 
-  // ── Duplicate detection ───────────────────────────────
+  // ── Independent copy semantics ────────────────────────
+  // WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1: 동일 원본 중복 복사 허용.
+  // 더 이상 DUPLICATE_SNAPSHOT 을 throw 하지 않으며, 매번 새 snapshot 이 생성된다.
 
-  describe('Duplicate detection', () => {
-    it('throws DUPLICATE_SNAPSHOT when app-level duplicate found', async () => {
+  describe('Independent copy semantics', () => {
+    it('creates a new snapshot even when an existing snapshot has the same source', async () => {
+      // 기존에 동일 (org, sourceAssetId, assetType) 이 있어도 호출은 성공해야 한다.
       repo.findOne.mockResolvedValue({ id: 'existing-snap' });
+      repo.create.mockReturnValue({ id: 'new-snap', sourceAssetId: 'asset-1' });
+      repo.save.mockResolvedValue({ id: 'new-snap', sourceAssetId: 'asset-1' });
 
-      await expect(
-        service.copyResolved({
-          sourceService: 'kpa',
-          sourceAssetId: 'asset-1',
-          assetType: 'cms',
-          targetOrganizationId: 'org-1',
-          createdBy: 'user-1',
-          title: 'Test',
-          contentJson: { body: 'content' },
-        }),
-      ).rejects.toThrow('DUPLICATE_SNAPSHOT');
+      const result = await service.copyResolved({
+        sourceService: 'kpa',
+        sourceAssetId: 'asset-1',
+        assetType: 'cms',
+        targetOrganizationId: 'org-1',
+        createdBy: 'user-1',
+        title: 'Test',
+        contentJson: { body: 'content' },
+      });
+
+      expect(result.snapshot).toEqual({ id: 'new-snap', sourceAssetId: 'asset-1' });
+      expect(repo.save).toHaveBeenCalledTimes(1);
     });
 
-    it('throws DUPLICATE_SNAPSHOT on DB unique constraint (23505)', async () => {
-      repo.findOne.mockResolvedValue(null);
-      repo.save.mockRejectedValue({ code: '23505' });
-
-      await expect(
-        service.copyResolved({
-          sourceService: 'kpa',
-          sourceAssetId: 'asset-1',
-          assetType: 'cms',
-          targetOrganizationId: 'org-1',
-          createdBy: 'user-1',
-          title: 'Test',
-          contentJson: { body: 'content' },
-        }),
-      ).rejects.toThrow('DUPLICATE_SNAPSHOT');
-    });
-
-    it('rethrows non-23505 DB errors', async () => {
-      repo.findOne.mockResolvedValue(null);
+    it('rethrows DB errors', async () => {
       repo.save.mockRejectedValue(new Error('CONNECTION_LOST'));
 
       await expect(

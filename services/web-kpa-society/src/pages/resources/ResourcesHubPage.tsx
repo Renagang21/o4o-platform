@@ -137,16 +137,14 @@ function useKpaResourcesConfig(
 
     // WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: 매장 경영자에게만 "내 자료함 가져가기" 노출.
     //   resolver 가 sub_type='resource' + reusable_policy≠restricted + is_deleted=false 통과시킨다.
-    //   DUPLICATE_SNAPSHOT 은 이미 자료함에 있는 경우 — 사용자 관점에서는 성공으로 안내.
+    // WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1: 중복 허용 — 매번 새 library item 생성
     onCopyToStore: isStoreOwner
       ? async (id) => {
           try {
             await assetSnapshotApi.copy({ sourceService: 'kpa', sourceAssetId: id, assetType: 'resource' });
             toast.success('내 자료함에 가져왔습니다');
           } catch (e: any) {
-            if (e?.code === 'DUPLICATE_SNAPSHOT') {
-              toast.success('이미 자료함에 있습니다');
-            } else if (e?.code === 'SOURCE_NOT_FOUND' || e?.code === 'POLICY_VIOLATION') {
+            if (e?.code === 'SOURCE_NOT_FOUND' || e?.code === 'POLICY_VIOLATION') {
               toast.error('가져가기 불가 자료입니다');
             } else {
               toast.error(e?.message || '가져오기에 실패했습니다');

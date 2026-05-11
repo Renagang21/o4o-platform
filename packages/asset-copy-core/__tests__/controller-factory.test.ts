@@ -385,9 +385,15 @@ describe('Controller Factory', () => {
       expect(res.body.error.code).toBe('INTERNAL_ERROR');
     });
 
-    it('DUPLICATE_SNAPSHOT → 409', async () => {
+    // WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1: 동일 원본 중복 복사 허용.
+    // controller 의 DUPLICATE_SNAPSHOT → 409 catch 분기는 dead code 로 남아있으나,
+    // service 가 더 이상 throw 하지 않으므로 reachable 검증 대상에서 제외한다.
+    it('same source can be copied multiple times — each call creates a new snapshot', async () => {
       const repo = createMockRepo();
-      repo.findOne.mockResolvedValue({ id: 'existing' }); // duplicate
+      // 기존 snapshot 이 이미 존재해도 새 호출은 새 row 를 생성한다.
+      repo.findOne.mockResolvedValue({ id: 'existing' });
+      repo.create.mockReturnValue({ id: 'new-snap' });
+      repo.save.mockResolvedValue({ id: 'new-snap' });
       const ds = createMockDataSource(repo);
 
       const config: AssetCopyControllerConfig = {
@@ -409,8 +415,9 @@ describe('Controller Factory', () => {
         .post('/assets/copy')
         .send({ sourceAssetId: 'asset-1', assetType: 'cms' });
 
-      expect(res.status).toBe(409);
-      expect(res.body.error.code).toBe('DUPLICATE_SNAPSHOT');
+      expect(res.status).toBe(201);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data).toEqual({ id: 'new-snap' });
     });
   });
 });
