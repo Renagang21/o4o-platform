@@ -12,8 +12,8 @@ import type { CSSProperties } from 'react';
 // ─── Hero ─────────────────────────────────────────────────────────────────
 
 export const heroStyles: Record<string, CSSProperties> = {
-  hero: { backgroundColor: '#1e293b', padding: '48px 0 40px' },
-  heroLg: { backgroundColor: '#1e293b', padding: '56px 0 48px' },
+  hero: { backgroundColor: '#1e293b', padding: '56px 0 56px' },
+  heroLg: { backgroundColor: '#1e293b', padding: '64px 0 64px' },
   heroInner: { maxWidth: 720, margin: '0 auto', padding: '0 24px' },
   eyebrow: {
     fontSize: '0.8125rem',
@@ -103,8 +103,8 @@ export const heroStyles: Record<string, CSSProperties> = {
 // ─── Section ──────────────────────────────────────────────────────────────
 
 export const sectionStyles: Record<string, CSSProperties> = {
-  wrap: { paddingTop: 4, paddingBottom: 4 },
-  wrapLg: { paddingTop: 8, paddingBottom: 8 },
+  wrap: { paddingTop: 20, paddingBottom: 8 },
+  wrapLg: { paddingTop: 32, paddingBottom: 12 },
   titleSm: {
     fontSize: '0.8125rem',
     fontWeight: 700,
