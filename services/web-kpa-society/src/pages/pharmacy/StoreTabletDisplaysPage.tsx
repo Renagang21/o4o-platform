@@ -27,6 +27,8 @@ import { getStoreLibraryItems } from '../../api/storeLibrary';
 import { assetSnapshotApi } from '../../api/assetSnapshot';
 import {
   fetchTablets,
+  createTablet,
+  deleteTablet,
   fetchTabletDisplays,
   fetchProductPool,
   saveTabletDisplays,
@@ -70,6 +72,13 @@ export default function StoreTabletDisplaysPage() {
   const [idleItems, setIdleItems] = useState<IdlePlaylistItem[]>([]);
   const [idleInitial, setIdleInitial] = useState<IdlePlaylistItem[]>([]);
   const [savingIdle, setSavingIdle] = useState(false);
+
+  // Tablet registration form (WO-O4O-STORE-TABLET-REGISTER-UI-V1)
+  const [showRegisterForm, setShowRegisterForm] = useState(false);
+  const [registerName, setRegisterName] = useState('');
+  const [registerLocation, setRegisterLocation] = useState('');
+  const [registering, setRegistering] = useState(false);
+  const [deletingTabletId, setDeletingTabletId] = useState<string | null>(null);
 
   // Toast
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -311,6 +320,44 @@ export default function StoreTabletDisplaysPage() {
     }
   };
 
+  // WO-O4O-STORE-TABLET-REGISTER-UI-V1 — 태블릿 등록
+  const handleRegister = async () => {
+    if (!registerName.trim()) return;
+    setRegistering(true);
+    try {
+      const created = await createTablet(registerName.trim(), registerLocation.trim() || undefined);
+      setTablets((prev) => [...prev, created]);
+      setSelectedTabletId(created.id);
+      setRegisterName('');
+      setRegisterLocation('');
+      setShowRegisterForm(false);
+      setToast({ type: 'success', message: `태블릿 "${created.name}"이 등록되었습니다.` });
+    } catch (err: any) {
+      setToast({ type: 'error', message: err.message || '태블릿 등록에 실패했습니다.' });
+    } finally {
+      setRegistering(false);
+    }
+  };
+
+  // WO-O4O-STORE-TABLET-REGISTER-UI-V1 — 태블릿 삭제(비활성화)
+  const handleDeleteTablet = async (id: string, name: string) => {
+    if (!confirm(`"${name}" 태블릿을 삭제하시겠습니까?\n삭제 후에는 진열 구성도 함께 사라집니다.`)) return;
+    setDeletingTabletId(id);
+    try {
+      await deleteTablet(id);
+      const remaining = tablets.filter((t) => t.id !== id);
+      setTablets(remaining);
+      if (selectedTabletId === id) {
+        setSelectedTabletId(remaining.length > 0 ? remaining[0].id : null);
+      }
+      setToast({ type: 'success', message: `태블릿 "${name}"이 삭제되었습니다.` });
+    } catch (err: any) {
+      setToast({ type: 'error', message: err.message || '삭제에 실패했습니다.' });
+    } finally {
+      setDeletingTabletId(null);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -332,14 +379,24 @@ export default function StoreTabletDisplaysPage() {
             </p>
           </div>
         </div>
-        <button
-          onClick={handleSave}
-          disabled={!hasChanges || saving}
-          className="flex items-center gap-2 px-4 py-2.5 bg-teal-600 text-white text-sm font-medium rounded-xl hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg shadow-teal-600/25"
-        >
-          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-          저장
-        </button>
+        <div className="flex items-center gap-2">
+          {/* WO-O4O-STORE-TABLET-REGISTER-UI-V1: 목록 있을 때도 추가 버튼 */}
+          <button
+            onClick={() => setShowRegisterForm((v) => !v)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 text-sm font-medium rounded-xl hover:bg-slate-50 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            태블릿 추가
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={!hasChanges || saving}
+            className="flex items-center gap-2 px-4 py-2.5 bg-teal-600 text-white text-sm font-medium rounded-xl hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg shadow-teal-600/25"
+          >
+            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+            저장
+          </button>
+        </div>
       </div>
 
       {/* Loading */}
@@ -350,12 +407,79 @@ export default function StoreTabletDisplaysPage() {
         </div>
       )}
 
+      {/* WO-O4O-STORE-TABLET-REGISTER-UI-V1: 인라인 등록 폼 — empty/non-empty 공용 */}
+      {!loadingTablets && showRegisterForm && (
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-teal-100">
+          <div className="px-4 py-3 bg-teal-50 border-b border-teal-100 flex items-center gap-2">
+            <Plus className="w-4 h-4 text-teal-600" />
+            <h3 className="text-sm font-bold text-teal-700">새 태블릿 추가</h3>
+          </div>
+          <div className="p-4 flex flex-col gap-3">
+            <div className="flex gap-3 flex-wrap">
+              <div className="flex-1 min-w-[160px]">
+                <label className="block text-xs font-medium text-slate-600 mb-1">
+                  태블릿 이름 <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={registerName}
+                  onChange={(e) => setRegisterName(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleRegister()}
+                  placeholder="예: 카운터 태블릿"
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  disabled={registering}
+                  autoFocus
+                />
+              </div>
+              <div className="flex-1 min-w-[140px]">
+                <label className="block text-xs font-medium text-slate-600 mb-1">
+                  위치 <span className="text-slate-400">(선택)</span>
+                </label>
+                <input
+                  type="text"
+                  value={registerLocation}
+                  onChange={(e) => setRegisterLocation(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleRegister()}
+                  placeholder="예: 1층 카운터"
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  disabled={registering}
+                />
+              </div>
+            </div>
+            <div className="flex items-center gap-2 justify-end">
+              <button
+                onClick={() => { setShowRegisterForm(false); setRegisterName(''); setRegisterLocation(''); }}
+                className="px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
+                disabled={registering}
+              >
+                취소
+              </button>
+              <button
+                onClick={handleRegister}
+                disabled={registering || !registerName.trim()}
+                className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-medium text-white bg-teal-600 rounded-lg hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {registering ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
+                {registering ? '등록 중...' : '태블릿 추가'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* No tablets */}
-      {!loadingTablets && tablets.length === 0 && (
+      {!loadingTablets && tablets.length === 0 && !showRegisterForm && (
         <div className="text-center py-16 bg-white rounded-2xl shadow-sm">
           <Tablet className="w-16 h-16 text-slate-200 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-slate-800 mb-2">등록된 태블릿이 없습니다</h3>
-          <p className="text-slate-500">매장에 태블릿을 먼저 등록해 주세요.</p>
+          <p className="text-slate-500 mb-4">태블릿을 추가하면 진열 구성을 시작할 수 있습니다.</p>
+          <button
+            onClick={() => setShowRegisterForm(true)}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 text-white text-sm font-medium rounded-xl hover:bg-teal-700 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            새 태블릿 추가
+          </button>
         </div>
       )}
 
@@ -370,8 +494,8 @@ export default function StoreTabletDisplaysPage() {
       {/* Tablet selector + editor */}
       {!loadingTablets && tablets.length > 0 && (
         <>
-          {/* Tablet selector */}
-          <div className="flex items-center gap-3">
+          {/* Tablet selector + delete */}
+          <div className="flex items-center gap-3 flex-wrap">
             <label className="text-sm font-medium text-slate-700">태블릿:</label>
             <select
               value={selectedTabletId || ''}
@@ -384,6 +508,23 @@ export default function StoreTabletDisplaysPage() {
                 </option>
               ))}
             </select>
+            {/* WO-O4O-STORE-TABLET-REGISTER-UI-V1: 선택된 태블릿 삭제 */}
+            {selectedTabletId && (
+              <button
+                onClick={() => {
+                  const t = tablets.find((tb) => tb.id === selectedTabletId);
+                  if (t) handleDeleteTablet(t.id, t.name);
+                }}
+                disabled={deletingTabletId === selectedTabletId}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 disabled:opacity-50 transition-colors"
+                title="현재 태블릿 삭제"
+              >
+                {deletingTabletId === selectedTabletId
+                  ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  : <X className="w-3.5 h-3.5" />}
+                태블릿 삭제
+              </button>
+            )}
             {hasChanges && (
               <span className="text-xs text-amber-600 font-medium bg-amber-50 px-2 py-1 rounded">
                 변경사항 있음

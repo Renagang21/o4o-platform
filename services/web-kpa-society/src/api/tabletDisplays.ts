@@ -90,6 +90,24 @@ export async function fetchTablets(): Promise<Tablet[]> {
   return res.data;
 }
 
+export async function createTablet(name: string, location?: string): Promise<Tablet> {
+  const res = await request<{ success: boolean; data: Tablet }>(
+    `${BASE}/tablets`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ name: name.trim(), location: location?.trim() || undefined }),
+    },
+  );
+  return res.data;
+}
+
+export async function deleteTablet(id: string): Promise<void> {
+  await request<{ success: boolean; data: unknown }>(
+    `${BASE}/tablets/${id}`,
+    { method: 'DELETE' },
+  );
+}
+
 export async function fetchTabletDisplays(
   tabletId: string,
 ): Promise<DisplayItem[]> {
