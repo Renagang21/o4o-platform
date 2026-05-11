@@ -211,14 +211,12 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
     ]},
     // WO-O4O-STORE-SIDEBAR-MENU-UX-IMPROVEMENT-V1: 섹션 라벨을 기능 중심 명칭으로 정렬
     // WO-O4O-KPA-STORE-PRODUCT-MENU-LABEL-RENAME-V1: canonical naming 정렬
-    //   공급 상품 → 공급자 상품 (B2B 카탈로그+주문 역할 명확화)
-    //   내 매장 상품(통합) → 내 매장 상품 (OPL 기반 진열, "(통합)" 접미 제거)
-    //   내 매장 상품 → 직접 등록 상품 (store_local_products 기반 자체 등록 의미 명확화)
+    // WO-O4O-KPA-STORE-PRODUCT-MENU-SIMPLIFICATION-V1: 상품 관리 메뉴 2개로 단순화
+    //   직접 등록 상품(local-products) 메뉴 제거 — route(/commerce/local-products)는 유지
     { label: '상품 관리', items: [
-      { key: 'products',       label: '공급자 상품',   subPath: '/commerce/products' },
-      { key: 'my-products',    label: '내 매장 상품',  subPath: '/my-products' },
-      { key: 'local-products', label: '직접 등록 상품', subPath: '/commerce/local-products' },
-      { key: 'orders',         label: '주문 내역',     subPath: '/commerce/orders' },
+      { key: 'products',    label: '공급자 상품', subPath: '/commerce/products' },
+      { key: 'my-products', label: '내 매장 상품', subPath: '/my-products' },
+      { key: 'orders',      label: '주문 내역',   subPath: '/commerce/orders' },
     ]},
     // WO-O4O-STORE-SIDEBAR-MENU-UX-IMPROVEMENT-V1:
     //   "내 자료함" → "마케팅 자료함" (제작 시작 진입 의미 명확화)

@@ -755,7 +755,7 @@ export default function StoreProductsManagerPage({
           title="내 매장 상품"
           subtitle="진열 상품을 관리하고 채널별 노출을 제어하세요."
           actions={[
-            { id: 'register', label: '상품 등록', icon: <Plus size={14} />, onClick: handleRegister, variant: 'primary' },
+            { id: 'register', label: '내 매장 상품 등록', icon: <Plus size={14} />, onClick: handleRegister, variant: 'primary' },
             { id: 'refresh', label: '새로고침', icon: <RefreshCw size={14} />, onClick: handleRefresh },
           ]}
         />
