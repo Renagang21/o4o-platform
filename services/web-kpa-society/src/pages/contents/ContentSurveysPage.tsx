@@ -3,23 +3,28 @@
  *
  * WO-KPA-CONTENT-SURVEYS-LIST-V1
  * WO-O4O-SURVEY-CORE-PHASE1-V1: O4O 공통 Survey API 연결, 실제 목록 활성화
+ * WO-O4O-CONTENT-LIST-CANONICAL-TABLE-ALIGN-V1:
+ *   - 카드 그리드 → 테이블 형식으로 전환
+ *   - 설문조사는 "참여형 기능" — 내 자료함 가져가기 제외 (checkbox/ActionBar 없음)
+ *   - 검색 + 페이지네이션 유지
  *
  * 콘텐츠 허브의 "설문조사" 전용 목록.
  * 데이터: participationApi.getParticipationSets (내부적으로 /api/v1/surveys?serviceKey=kpa-society 호출)
  *
- * 카드 클릭 분기 (ParticipationListPage 패턴 준수):
+ * 행 클릭 분기 (ParticipationListPage 패턴 준수):
  *   - ACTIVE → /participation/${id}/respond
  *   - DRAFT/CLOSED → /participation/${id}/results
  */
 
 import { useEffect, useState, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { participationApi } from '../../api/participation';
 import type { ParticipationSet } from '../participation/types';
 import { ParticipationStatus } from '../participation/types';
 import { useAuth } from '../../contexts/AuthContext';
+import { BaseTable, type O4OColumn } from '@o4o/ui';
 
-const PAGE_LIMIT = 12;
+const PAGE_LIMIT = 20;
 
 const STATUS_LABEL: Record<string, string> = {
   [ParticipationStatus.ACTIVE]: '진행중',
@@ -27,11 +32,11 @@ const STATUS_LABEL: Record<string, string> = {
   [ParticipationStatus.CLOSED]: '종료',
 };
 
-const STATUS_COLOR: Record<string, { bg: string; text: string }> = {
-  [ParticipationStatus.ACTIVE]: { bg: '#ecfdf5', text: '#047857' },
-  [ParticipationStatus.DRAFT]: { bg: '#f1f5f9', text: '#64748b' },
-  [ParticipationStatus.CLOSED]: { bg: '#fef2f2', text: '#b91c1c' },
-};
+function statusBadgeClass(status: string) {
+  if (status === ParticipationStatus.ACTIVE) return 'inline-block px-2 py-0.5 text-[11px] font-semibold rounded bg-emerald-50 text-emerald-700';
+  if (status === ParticipationStatus.CLOSED) return 'inline-block px-2 py-0.5 text-[11px] font-semibold rounded bg-red-50 text-red-700';
+  return 'inline-block px-2 py-0.5 text-[11px] font-semibold rounded bg-slate-100 text-slate-500';
+}
 
 function formatDate(d: string | Date | null | undefined) {
   if (!d) return '-';
@@ -47,17 +52,21 @@ function targetForSurvey(set: ParticipationSet): string {
 export function ContentSurveysPage() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const currentPage = parseInt(searchParams.get('page') || '1', 10);
+  const currentSearch = searchParams.get('search') || '';
 
   const [surveys, setSurveys] = useState<ParticipationSet[]>([]);
   const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchInput, setSearchInput] = useState(currentSearch);
 
-  const load = useCallback((pageNum: number) => {
+  const load = useCallback((pageNum: number, search: string) => {
     setLoading(true);
     setError(null);
-    participationApi.getParticipationSets({ page: pageNum, limit: PAGE_LIMIT })
+    participationApi.getParticipationSets({ page: pageNum, limit: PAGE_LIMIT, search: search || undefined })
       .then((res) => {
         setSurveys(Array.isArray(res.data) ? res.data : []);
         setTotal(typeof res.total === 'number' ? res.total : 0);
@@ -71,87 +80,166 @@ export function ContentSurveysPage() {
   }, []);
 
   useEffect(() => {
-    load(page);
-  }, [load, page]);
+    load(currentPage, currentSearch);
+  }, [load, currentPage, currentSearch]);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
 
+  function handleSearch(e: React.FormEvent) {
+    e.preventDefault();
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (searchInput) next.set('search', searchInput); else next.delete('search');
+      next.delete('page');
+      return next;
+    });
+  }
+
+  function goPage(p: number) {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set('page', String(p));
+      return next;
+    });
+  }
+
+  const columns: O4OColumn<ParticipationSet>[] = [
+    {
+      key: 'title',
+      header: '제목',
+      render: (_v, row) => (
+        <span className="font-semibold text-sm text-slate-800">{row.title}</span>
+      ),
+    },
+    {
+      key: 'status',
+      header: '상태',
+      width: '80px',
+      render: (val) => (
+        <span className={statusBadgeClass(val)}>
+          {STATUS_LABEL[val] ?? val}
+        </span>
+      ),
+    },
+    {
+      key: 'questions',
+      header: '질문수',
+      width: '70px',
+      align: 'center',
+      render: (_v, row) => (
+        <span className="text-[13px] text-slate-400">{row.questions?.length ?? 0}</span>
+      ),
+    },
+    {
+      key: 'createdAt',
+      header: '등록일',
+      width: '100px',
+      render: (val) => <span className="text-[13px] text-slate-400">{formatDate(val)}</span>,
+    },
+  ];
+
   return (
-    <div style={styles.page}>
-      <header style={styles.header}>
+    <div className="max-w-[1100px] mx-auto px-4 pt-8 pb-16">
+      {/* Header */}
+      <header className="flex items-end justify-between mb-6 gap-3 flex-wrap">
         <div>
-          <Link to="/content" style={styles.backLink}>← 콘텐츠 허브</Link>
-          <h1 style={styles.title}>설문조사</h1>
-          <p style={styles.desc}>구성원 의견을 수집하는 설문 목록입니다.</p>
+          <Link to="/content" className="text-[13px] text-slate-500 no-underline mb-2 inline-block hover:underline">
+            ← 콘텐츠 허브
+          </Link>
+          <h1 className="text-2xl font-bold text-slate-900 mb-1 mt-0">설문조사</h1>
+          <p className="text-[15px] text-slate-500 m-0">구성원 의견을 수집하는 설문 목록입니다.</p>
         </div>
         {isAuthenticated && (
-          <Link to="/content/surveys/new" style={styles.primaryBtn}>
+          <Link
+            to="/content/surveys/new"
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-primary text-white text-sm font-semibold rounded-lg no-underline whitespace-nowrap"
+          >
             설문 등록
           </Link>
         )}
       </header>
 
-      {error && <div style={styles.errorBox}>{error}</div>}
+      {/* Search */}
+      <form onSubmit={handleSearch} className="flex gap-2 mb-4">
+        <input
+          type="text"
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          placeholder="설문 제목 검색..."
+          className="flex-1 px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30"
+        />
+        <button
+          type="submit"
+          className="px-4 py-2 text-sm font-semibold text-white bg-primary rounded-lg whitespace-nowrap"
+        >
+          검색
+        </button>
+        {currentSearch && (
+          <button
+            type="button"
+            onClick={() => {
+              setSearchInput('');
+              setSearchParams((prev) => {
+                const next = new URLSearchParams(prev);
+                next.delete('search');
+                next.delete('page');
+                return next;
+              });
+            }}
+            className="px-3 py-2 text-sm text-slate-500 border border-slate-200 rounded-lg"
+          >
+            초기화
+          </button>
+        )}
+      </form>
 
-      {loading ? (
-        <div style={styles.placeholder}>불러오는 중...</div>
-      ) : surveys.length === 0 ? (
-        <div style={styles.placeholder}>
-          <p style={{ margin: 0, marginBottom: 8 }}>아직 등록된 설문이 없습니다.</p>
-          {isAuthenticated && (
-            <Link to="/content/surveys/new" style={styles.emptyCta}>
-              첫 설문 만들기 →
-            </Link>
-          )}
-        </div>
-      ) : (
-        <div style={styles.cardGrid}>
-          {surveys.map((s) => {
-            const statusColor = STATUS_COLOR[s.status] ?? STATUS_COLOR[ParticipationStatus.DRAFT];
-            return (
-              <button
-                key={s.id}
-                type="button"
-                onClick={() => navigate(targetForSurvey(s))}
-                style={styles.card}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#94a3b8'; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#e2e8f0'; }}
-              >
-                <div style={styles.cardHeader}>
-                  <span style={{
-                    ...styles.statusBadge,
-                    backgroundColor: statusColor.bg,
-                    color: statusColor.text,
-                  }}>
-                    {STATUS_LABEL[s.status] ?? s.status}
-                  </span>
-                  <span style={styles.cardDate}>{formatDate(s.createdAt)}</span>
-                </div>
-                <div style={styles.cardTitle}>{s.title}</div>
-                {s.description && <div style={styles.cardDesc}>{s.description}</div>}
-                <div style={styles.cardMeta}>
-                  <span>질문 {s.questions?.length ?? 0}개</span>
-                </div>
-              </button>
-            );
-          })}
+      {error && (
+        <div className="px-3 py-2.5 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg mb-4">
+          {error}
         </div>
       )}
 
+      {/* Table */}
+      <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
+        {loading ? (
+          <div className="py-12 text-sm text-slate-400 text-center">불러오는 중...</div>
+        ) : (
+          <BaseTable<ParticipationSet>
+            columns={columns}
+            data={surveys}
+            rowKey={(row) => row.id}
+            onRowClick={(row) => navigate(targetForSurvey(row))}
+            emptyMessage={
+              <div className="py-12 text-sm text-slate-400 text-center">
+                {currentSearch ? `"${currentSearch}"에 해당하는 설문이 없습니다.` : '아직 등록된 설문이 없습니다.'}
+                {!currentSearch && isAuthenticated && (
+                  <div className="mt-2">
+                    <Link to="/content/surveys/new" className="text-primary font-semibold no-underline hover:underline">
+                      첫 설문 만들기 →
+                    </Link>
+                  </div>
+                )}
+              </div>
+            }
+          />
+        )}
+      </div>
+
+      {/* Pagination */}
       {totalPages > 1 && (
-        <div style={styles.pagination}>
+        <div className="flex justify-center items-center gap-4 mt-5">
           <button
-            onClick={() => setPage(Math.max(1, page - 1))}
-            disabled={page <= 1}
-            style={{ ...styles.pageBtn, opacity: page <= 1 ? 0.4 : 1, cursor: page <= 1 ? 'not-allowed' : 'pointer' }}
+            onClick={() => goPage(Math.max(1, currentPage - 1))}
+            disabled={currentPage <= 1}
+            className="px-3.5 py-1.5 text-[13px] font-medium text-slate-600 bg-white border border-slate-200 rounded-md disabled:opacity-40 disabled:cursor-not-allowed"
           >
             « 이전
           </button>
-          <span style={styles.pageInfo}>{page} / {totalPages}</span>
+          <span className="text-[13px] text-slate-500">{currentPage} / {totalPages}</span>
           <button
-            onClick={() => setPage(Math.min(totalPages, page + 1))}
-            disabled={page >= totalPages}
-            style={{ ...styles.pageBtn, opacity: page >= totalPages ? 0.4 : 1, cursor: page >= totalPages ? 'not-allowed' : 'pointer' }}
+            onClick={() => goPage(Math.min(totalPages, currentPage + 1))}
+            disabled={currentPage >= totalPages}
+            className="px-3.5 py-1.5 text-[13px] font-medium text-slate-600 bg-white border border-slate-200 rounded-md disabled:opacity-40 disabled:cursor-not-allowed"
           >
             다음 »
           </button>
@@ -160,45 +248,5 @@ export function ContentSurveysPage() {
     </div>
   );
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  page: { maxWidth: 1100, margin: '0 auto', padding: '32px 16px 60px' },
-  header: { display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 24, gap: 12, flexWrap: 'wrap' },
-  backLink: { fontSize: '0.8125rem', color: '#64748b', textDecoration: 'none', marginBottom: 8, display: 'inline-block' },
-  title: { fontSize: '1.5rem', fontWeight: 700, color: '#0f172a', margin: '4px 0 4px' },
-  desc: { fontSize: '0.875rem', color: '#64748b', margin: 0 },
-  primaryBtn: {
-    display: 'inline-flex', alignItems: 'center', gap: 6,
-    padding: '10px 18px', backgroundColor: '#2563eb', color: '#fff',
-    fontSize: '0.875rem', fontWeight: 600, borderRadius: 8,
-    textDecoration: 'none', whiteSpace: 'nowrap',
-  },
-  errorBox: { padding: '10px 14px', fontSize: '0.875rem', color: '#b91c1c', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, marginBottom: 16 },
-  placeholder: { padding: '40px 16px', fontSize: '0.875rem', color: '#94a3b8', textAlign: 'center', backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: 8 },
-  emptyCta: { fontSize: '0.875rem', fontWeight: 600, color: '#2563eb', textDecoration: 'none' },
-  cardGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 },
-  card: {
-    display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: 16,
-    backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 8,
-    cursor: 'pointer', textAlign: 'left', transition: 'border-color 0.15s', minHeight: 140,
-  },
-  cardHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: 10 },
-  statusBadge: { display: 'inline-block', padding: '2px 8px', fontSize: '0.6875rem', fontWeight: 600, borderRadius: 4 },
-  cardDate: { fontSize: '0.75rem', color: '#94a3b8' },
-  cardTitle: {
-    fontSize: '0.9375rem', fontWeight: 600, color: '#0f172a', marginBottom: 6,
-    overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box',
-    WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', width: '100%', lineHeight: 1.4,
-  },
-  cardDesc: {
-    fontSize: '0.8125rem', color: '#64748b', marginBottom: 12, flex: 1,
-    overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box',
-    WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', width: '100%', lineHeight: 1.5,
-  },
-  cardMeta: { width: '100%', fontSize: '0.75rem', color: '#94a3b8', marginTop: 'auto' },
-  pagination: { display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 16, marginTop: 20 },
-  pageBtn: { padding: '6px 14px', fontSize: '0.8125rem', fontWeight: 500, color: '#475569', backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: 6 },
-  pageInfo: { fontSize: '0.8125rem', color: '#64748b' },
-};
 
 export default ContentSurveysPage;

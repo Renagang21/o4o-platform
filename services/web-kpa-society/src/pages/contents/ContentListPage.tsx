@@ -383,11 +383,17 @@ function DocumentsSection({
 }
 
 // ─── Section 2: 코스형 자료 ──────────────────────────────────────────────────
+// WO-O4O-CONTENT-LIST-CANONICAL-TABLE-ALIGN-V1:
+//   - raw <table> → BaseTable + RowActionMenu
+//   - "내 자료함 가져가기" 액션 추가 (assetType='lesson')
+//   - reusablePolicy='restricted' 차단
 
 function CoursesSection({ canCreateCourse }: { canCreateCourse: boolean }) {
   const navigate = useNavigate();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
+  const [copying, setCopying] = useState<string | null>(null);
+  const [addedCourseIds, setAddedCourseIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     let cancelled = false;
@@ -412,6 +418,105 @@ function CoursesSection({ canCreateCourse }: { canCreateCourse: boolean }) {
     return () => { cancelled = true; };
   }, []);
 
+  useEffect(() => {
+    assetSnapshotApi.list({ type: 'lesson', limit: 200 })
+      .then((res) => {
+        const ids = new Set<string>();
+        for (const item of res.data?.items ?? []) ids.add(item.sourceAssetId);
+        setAddedCourseIds(ids);
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleCopyToStore = useCallback(async (course: Course) => {
+    setCopying(course.id);
+    try {
+      await assetSnapshotApi.copy({
+        sourceService: 'kpa',
+        sourceAssetId: course.id,
+        assetType: 'lesson',
+      });
+      setAddedCourseIds((prev) => new Set(prev).add(course.id));
+      toast.success('내 자료함에 가져왔습니다');
+    } catch (e: any) {
+      if (e?.code === 'DUPLICATE_SNAPSHOT') {
+        setAddedCourseIds((prev) => new Set(prev).add(course.id));
+        toast.success('이미 자료함에 있습니다');
+      } else {
+        toast.error(e?.message || '가져오기에 실패했습니다');
+      }
+    } finally {
+      setCopying(null);
+    }
+  }, []);
+
+  const columns: O4OColumn<Course>[] = [
+    {
+      key: 'title',
+      header: '제목',
+      render: (_v, row) => (
+        <span className="font-semibold text-sm text-slate-800 overflow-hidden text-ellipsis whitespace-nowrap">{row.title}</span>
+      ),
+    },
+    {
+      key: 'instructorName',
+      header: '강사',
+      width: '100px',
+      render: (val) => <span className="text-[13px] text-slate-500">{val || '-'}</span>,
+    },
+    {
+      key: 'lessonCount',
+      header: '레슨',
+      width: '60px',
+      align: 'center',
+      render: (val) => <span className="text-[13px] text-slate-400">{val ?? 0}</span>,
+    },
+    {
+      key: 'createdAt',
+      header: '작성일',
+      width: '100px',
+      render: (val) => <span className="text-[13px] text-slate-400">{formatDate(val)}</span>,
+    },
+    {
+      key: 'status',
+      header: '상태',
+      width: '70px',
+      render: (val) => (
+        <span className={`inline-block px-2 py-0.5 text-[11px] font-semibold rounded ${
+          val === 'published' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'
+        }`}>
+          {val === 'published' ? '공개' : val === 'archived' ? '보관' : '초안'}
+        </span>
+      ),
+    },
+    {
+      key: '_actions',
+      header: '',
+      width: '52px',
+      align: 'center',
+      system: 'last',
+      render: (_v, row) => {
+        const isRestricted = row.reusablePolicy === 'restricted';
+        const isAlreadyAdded = addedCourseIds.has(row.id);
+        const actions: RowActionItem[] = [
+          {
+            key: 'copy-to-store',
+            label: isRestricted ? '내 자료함 가져가기 (불가)' : isAlreadyAdded ? '이미 추가됨' : '내 자료함 가져가기',
+            onClick: () => handleCopyToStore(row),
+            loading: copying === row.id,
+            disabled: isRestricted || isAlreadyAdded,
+          },
+          {
+            key: 'view',
+            label: '자세히 보기',
+            onClick: () => navigate(`/content/courses/${row.id}`),
+          },
+        ];
+        return <RowActionMenu actions={actions} />;
+      },
+    },
+  ];
+
   return (
     <section className="mb-10">
       <SectionHeader
@@ -425,72 +530,51 @@ function CoursesSection({ canCreateCourse }: { canCreateCourse: boolean }) {
         <Card className="overflow-hidden">
           <div className="py-8 px-4 text-sm text-slate-400 text-center">불러오는 중...</div>
         </Card>
-      ) : courses.length === 0 ? (
-        <Card className="overflow-hidden">
-          <div className="py-8 px-4 text-sm text-slate-400 text-center">아직 코스형 자료가 없습니다</div>
-        </Card>
       ) : (
         <>
-          {/* Desktop: Table */}
-          <Card className="overflow-hidden hidden md:block">
-            <table className="w-full border-collapse table-fixed">
-              <thead>
-                <tr>
-                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left">제목</th>
-                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left w-20">레슨</th>
-                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left w-[100px]">작성일</th>
-                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left w-20">상태</th>
-                </tr>
-              </thead>
-              <tbody>
-                {courses.map((c) => (
-                  <tr
-                    key={c.id}
-                    onClick={() => navigate(`/content/courses/${c.id}`)}
-                    className="cursor-pointer transition-colors hover:bg-slate-50"
-                  >
-                    <td className="px-3 py-3 text-sm text-slate-900 border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap">
-                      <span className="font-semibold text-sm text-slate-800">{c.title}</span>
-                    </td>
-                    <td className="px-3 py-3 text-[13px] text-slate-500 border-b border-slate-100">{c.duration > 0 ? `${c.duration}분` : '-'}</td>
-                    <td className="px-3 py-3 text-[13px] text-slate-400 border-b border-slate-100">{formatDate(c.createdAt)}</td>
-                    <td className="px-3 py-3 border-b border-slate-100">
+          {/* Desktop: BaseTable */}
+          <div className="hidden md:block bg-white rounded-lg border border-slate-200 overflow-hidden">
+            <BaseTable<Course>
+              columns={columns}
+              data={courses}
+              rowKey={(row) => row.id}
+              onRowClick={(row) => navigate(`/content/courses/${row.id}`)}
+              emptyMessage={
+                <div className="py-8 px-4 text-sm text-slate-400 text-center">아직 코스형 자료가 없습니다</div>
+              }
+            />
+          </div>
+
+          {/* Mobile: Card List */}
+          <div className="block md:hidden flex flex-col gap-3">
+            {courses.length === 0 ? (
+              <Card className="overflow-hidden">
+                <div className="py-8 px-4 text-sm text-slate-400 text-center">아직 코스형 자료가 없습니다</div>
+              </Card>
+            ) : (
+              courses.map((c) => (
+                <Card
+                  key={c.id}
+                  className="p-4 cursor-pointer hover:bg-slate-50 transition-colors"
+                  onClick={() => navigate(`/content/courses/${c.id}`)}
+                >
+                  <div className="flex flex-col gap-2">
+                    <span className="text-sm font-medium text-slate-800 line-clamp-2">{c.title}</span>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-slate-500">
+                        {formatDate(c.createdAt)}
+                        {c.lessonCount > 0 && ` · 레슨 ${c.lessonCount}개`}
+                      </span>
                       <span className={`inline-block px-2 py-0.5 text-[11px] font-semibold rounded ${
                         c.status === 'published' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'
                       }`}>
                         {c.status === 'published' ? '공개' : c.status === 'archived' ? '보관' : '초안'}
                       </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </Card>
-
-          {/* Mobile: Card List (WO-O4O-RESPONSIVE-LIST-EXPAND-V1) */}
-          <div className="block md:hidden flex flex-col gap-3">
-            {courses.map((c) => (
-              <Card
-                key={c.id}
-                className="p-4 cursor-pointer hover:bg-slate-50 transition-colors"
-                onClick={() => navigate(`/content/courses/${c.id}`)}
-              >
-                <div className="flex flex-col gap-2">
-                  <span className="text-sm font-medium text-slate-800 line-clamp-2">{c.title}</span>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-slate-500">
-                      {formatDate(c.createdAt)}
-                      {c.duration > 0 && ` · ${c.duration}분`}
-                    </span>
-                    <span className={`inline-block px-2 py-0.5 text-[11px] font-semibold rounded ${
-                      c.status === 'published' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'
-                    }`}>
-                      {c.status === 'published' ? '공개' : c.status === 'archived' ? '보관' : '초안'}
-                    </span>
+                    </div>
                   </div>
-                </div>
-              </Card>
-            ))}
+                </Card>
+              ))
+            )}
           </div>
         </>
       )}
