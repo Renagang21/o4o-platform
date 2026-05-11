@@ -168,9 +168,9 @@ export function StoreHomePage() {
               <span className="text-[13px] font-semibold text-emerald-600 tracking-wide">콘텐츠 만들기</span>
             </div>
             <div className="flex flex-wrap gap-2 pl-[30px]">
-              <Link to="/store/content" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
+              <Link to="/store/library/contents" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
                 <BookOpen size={16} className="text-emerald-600" />
-                <span>매장 자산 관리</span>
+                <span>내 자료함</span>
               </Link>
               <Link to="/store/marketing/qr" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
                 <QrCode size={16} className="text-primary" />
