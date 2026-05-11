@@ -3,7 +3,7 @@
  *
  * WO-KPA-A-STORE-HOME-AND-SIDEBAR-RESTRUCTURE-V1
  * WO-KPA-A-STORE-HOME-KPI-AND-CONTENT-BALANCE-REFINE-V1:
- *   - KPI 4칸: QR-only → 운영 혼합형 (자료실, 활성 QR, 진열 상품, 이번주 스캔)
+ *   - KPI 4칸: QR-only → 운영 혼합형 (매장 자산 관리, 활성 QR, 진열 상품, 이번주 스캔)
  *   - 하단 콘텐츠 균형 조정 (마케팅 성과 → 홍보 성과 요약, 비중 축소)
  *   - 문구/섹션 제목 종합 홈 성격으로 보정
  *
@@ -121,7 +121,7 @@ export function StoreHomePage() {
         <Card className="p-5 text-center">
           <BookOpen size={20} className="text-emerald-600 mx-auto" />
           <p className="text-2xl font-bold text-primary m-0 mt-2">{libraryCount ?? '–'}</p>
-          <p className="text-xs text-slate-500 mt-1 m-0">자료실</p>
+          <p className="text-xs text-slate-500 mt-1 m-0">매장 자산 관리</p>
         </Card>
         <Card className="p-5 text-center">
           <QrCode size={20} className="text-primary mx-auto" />
@@ -170,7 +170,7 @@ export function StoreHomePage() {
             <div className="flex flex-wrap gap-2 pl-[30px]">
               <Link to="/store/content" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
                 <BookOpen size={16} className="text-emerald-600" />
-                <span>자료실</span>
+                <span>매장 자산 관리</span>
               </Link>
               <Link to="/store/marketing/qr" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
                 <QrCode size={16} className="text-primary" />
