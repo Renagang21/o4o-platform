@@ -13,9 +13,9 @@
  *   - 결과물 lifecycle / entity
  */
 
-import { useState, type CSSProperties } from 'react';
+import { useState, useMemo, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Megaphone, QrCode, BookOpen, FileText, X, ArrowRight } from 'lucide-react';
+import { Megaphone, QrCode, BookOpen, FileText, X, ArrowRight, Info } from 'lucide-react';
 import { colors } from '../../styles/theme';
 
 export type ProductionTarget = 'pop' | 'qr' | 'blog' | 'product-description';
@@ -40,6 +40,18 @@ const TARGETS: Array<{ key: ProductionTarget; label: string; Icon: typeof Megaph
   { key: 'product-description', label: '상품 상세설명', Icon: FileText,  color: '#2563EB', route: '/store/marketing/product-descriptions' },
 ];
 
+// direct origin 한정 안내
+const DIRECT_NOTES: Partial<Record<ProductionTarget, { disabled: boolean; note: string }>> = {
+  qr: {
+    disabled: true,
+    note: 'QR 코드는 파일·링크 자료에서만 생성할 수 있습니다. 내 자료함 > 자료에서 파일 또는 외부 링크를 선택하세요.',
+  },
+  pop: {
+    disabled: false,
+    note: '제작 자료는 텍스트 정보만 전달됩니다. 파일이 없는 POP 레이아웃이 표시됩니다.',
+  },
+};
+
 interface Props {
   open: boolean;
   source: ProductionSource | null;
@@ -49,6 +61,12 @@ interface Props {
 export function StartProductionModal({ open, source, onClose }: Props) {
   const navigate = useNavigate();
   const [selectedTarget, setSelectedTarget] = useState<ProductionTarget | null>(null);
+
+  // direct origin 항목만 선택된 경우 일부 제작 대상에 제한/안내 적용
+  const allDirect = useMemo(
+    () => !!source && source.items.length > 0 && source.items.every((it) => it.origin === 'direct'),
+    [source],
+  );
 
   if (!open || !source) return null;
 
@@ -94,19 +112,30 @@ export function StartProductionModal({ open, source, onClose }: Props) {
             <div style={styles.targetGrid}>
               {TARGETS.map((t) => {
                 const active = selectedTarget === t.key;
+                const directInfo = allDirect ? DIRECT_NOTES[t.key] : undefined;
+                const isDisabled = directInfo?.disabled === true;
                 return (
-                  <button
-                    key={t.key}
-                    type="button"
-                    onClick={() => setSelectedTarget(t.key)}
-                    style={{
-                      ...styles.targetCard,
-                      ...(active ? styles.targetCardActive : {}),
-                    }}
-                  >
-                    <t.Icon size={20} style={{ color: t.color }} />
-                    <span style={styles.targetLabel}>{t.label}</span>
-                  </button>
+                  <div key={t.key} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <button
+                      type="button"
+                      onClick={() => { if (!isDisabled) setSelectedTarget(t.key); }}
+                      disabled={isDisabled}
+                      style={{
+                        ...styles.targetCard,
+                        ...(active && !isDisabled ? styles.targetCardActive : {}),
+                        ...(isDisabled ? styles.targetCardDisabled : {}),
+                      }}
+                    >
+                      <t.Icon size={20} style={{ color: isDisabled ? colors.neutral300 : t.color }} />
+                      <span style={styles.targetLabel}>{t.label}</span>
+                    </button>
+                    {directInfo && (
+                      <div style={styles.directNote}>
+                        <Info size={11} style={{ flexShrink: 0, marginTop: 1 }} />
+                        <span>{directInfo.note}</span>
+                      </div>
+                    )}
+                  </div>
                 );
               })}
             </div>
@@ -119,7 +148,7 @@ export function StartProductionModal({ open, source, onClose }: Props) {
           </button>
           <button
             onClick={handleConfirm}
-            disabled={!selectedTarget}
+            disabled={!selectedTarget || (allDirect && !!selectedTarget && DIRECT_NOTES[selectedTarget]?.disabled)}
             style={{ ...styles.confirmBtn, opacity: selectedTarget ? 1 : 0.5 }}
           >
             편집기로 이동
@@ -217,8 +246,24 @@ const styles: Record<string, CSSProperties> = {
     color: colors.primary,
     fontWeight: 500,
   },
+  targetCardDisabled: {
+    background: colors.neutral50,
+    borderColor: colors.neutral200,
+    color: colors.neutral400,
+    cursor: 'not-allowed',
+    opacity: 0.7,
+  },
   targetLabel: {
     fontSize: '14px',
+  },
+  directNote: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: 4,
+    fontSize: '11px',
+    color: colors.neutral500,
+    lineHeight: 1.5,
+    padding: '0 4px',
   },
   footer: {
     display: 'flex',
