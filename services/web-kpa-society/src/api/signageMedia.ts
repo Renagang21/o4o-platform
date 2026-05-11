@@ -37,7 +37,9 @@ export interface CreateSignageMediaPayload {
   mediaType: 'video';
   sourceType: 'youtube' | 'vimeo';
   sourceUrl: string;
+  description?: string;
   tags?: string[];
+  status?: 'draft' | 'active';
 }
 
 /* ─── Helpers ───────────────────────────────── */

@@ -20,6 +20,8 @@ export interface StorePlaylist {
   publishStatus: PlaylistPublishStatus;
   isActive: boolean;
   sourcePlaylistId: string | null;
+  description?: string | null;
+  tags?: string[];
   createdAt: string;
   updatedAt: string;
   itemCount: number;
@@ -52,12 +54,11 @@ export async function fetchStorePlaylists(): Promise<StorePlaylist[]> {
 }
 
 export async function createStorePlaylist(
-  name: string,
-  playlistType: PlaylistType = 'LIST',
+  payload: { name: string; playlistType?: PlaylistType; description?: string; tags?: string[] },
 ): Promise<StorePlaylist> {
   const response = await apiClient.post<{ success: boolean; data: StorePlaylist }>(
     '/store-playlists',
-    { name, playlistType },
+    { playlistType: 'LIST', ...payload },
   );
   return response.data;
 }
