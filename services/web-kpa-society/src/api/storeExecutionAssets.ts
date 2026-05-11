@@ -49,9 +49,6 @@ export interface StoreExecutionAsset {
   updatedAt: string;
 }
 
-/** @deprecated Use StoreExecutionAsset */
-export type StoreLibraryItem = StoreExecutionAsset;
-
 export interface CreateStoreAssetParams {
   title: string;
   description?: string;
@@ -66,9 +63,6 @@ export interface CreateStoreAssetParams {
   htmlContent?: string;
   sourceType?: string;
 }
-
-/** @deprecated Use CreateStoreAssetParams */
-export type CreateStoreLibraryParams = CreateStoreAssetParams;
 
 /**
  * Neture 공개 자료 단건 조회 (published 상태만)
@@ -90,9 +84,6 @@ export interface StoreAssetPaginatedResponse {
   total: number;
 }
 
-/** @deprecated Use StoreAssetPaginatedResponse */
-export type StoreLibraryPaginatedResponse = StoreAssetPaginatedResponse;
-
 /**
  * Store 실행 자산 목록 조회 (페이지네이션)
  */
@@ -113,16 +104,6 @@ export async function getStoreExecutionAssets(opts?: {
   return apiClient.get(`/store/assets${qs ? `?${qs}` : ''}`);
 }
 
-/** @deprecated Use getStoreExecutionAssets */
-export async function getStoreLibraryItems(opts?: {
-  page?: number;
-  limit?: number;
-  search?: string;
-  category?: string;
-}): Promise<{ success: boolean; data: StoreAssetPaginatedResponse }> {
-  return getStoreExecutionAssets(opts);
-}
-
 /**
  * Store 실행 자산 단건 조회
  */
@@ -132,13 +113,6 @@ export async function getStoreExecutionAsset(
   return apiClient.get(`/store/assets/${id}`);
 }
 
-/** @deprecated Use getStoreExecutionAsset */
-export async function getStoreLibraryItem(
-  id: string,
-): Promise<{ success: boolean; data: StoreExecutionAsset }> {
-  return getStoreExecutionAsset(id);
-}
-
 /**
  * Store 실행 자산 생성
  */
@@ -146,13 +120,6 @@ export async function createStoreExecutionAsset(
   params: CreateStoreAssetParams,
 ): Promise<{ success: boolean; data: StoreExecutionAsset }> {
   return apiClient.post('/store/assets', params);
-}
-
-/** @deprecated Use createStoreExecutionAsset */
-export async function createStoreLibraryItem(
-  params: CreateStoreAssetParams,
-): Promise<{ success: boolean; data: StoreExecutionAsset }> {
-  return createStoreExecutionAsset(params);
 }
 
 export interface UpdateStoreAssetParams {
@@ -168,9 +135,6 @@ export interface UpdateStoreAssetParams {
   htmlContent?: string;
 }
 
-/** @deprecated Use UpdateStoreAssetParams */
-export type UpdateStoreLibraryParams = UpdateStoreAssetParams;
-
 /**
  * Store 실행 자산 수정
  */
@@ -179,14 +143,6 @@ export async function updateStoreExecutionAsset(
   params: UpdateStoreAssetParams,
 ): Promise<{ success: boolean; data: StoreExecutionAsset }> {
   return apiClient.put(`/store/assets/${id}`, params);
-}
-
-/** @deprecated Use updateStoreExecutionAsset */
-export async function updateStoreLibraryItem(
-  id: string,
-  params: UpdateStoreAssetParams,
-): Promise<{ success: boolean; data: StoreExecutionAsset }> {
-  return updateStoreExecutionAsset(id, params);
 }
 
 /**
@@ -198,9 +154,3 @@ export async function deleteStoreExecutionAsset(
   return apiClient.delete(`/store/assets/${id}`);
 }
 
-/** @deprecated Use deleteStoreExecutionAsset */
-export async function deleteStoreLibraryItem(
-  id: string,
-): Promise<{ success: boolean; message: string }> {
-  return deleteStoreExecutionAsset(id);
-}

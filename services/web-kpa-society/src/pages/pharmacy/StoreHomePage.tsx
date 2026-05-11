@@ -34,7 +34,7 @@ import { Card, useTemplate } from '@o4o/ui';
 import { kpaConfig } from '@o4o/operator-ux-core';
 import { getMarketingAnalytics, getRecentScans } from '../../api/storeAnalytics';
 import type { MarketingAnalyticsData, RecentScanItem } from '../../api/storeAnalytics';
-import { getStoreLibraryItems } from '../../api/storeExecutionAssets';
+import { getStoreExecutionAssets } from '../../api/storeExecutionAssets';
 import { getListings } from '../../api/pharmacyProducts';
 import { getStoreSlug } from '../../api/pharmacyInfo';
 import { GuideEditableSection } from '../../components/guide';
@@ -58,7 +58,7 @@ export function StoreHomePage() {
       const [analyticsRes, scansRes, libraryRes, listingsRes] = await Promise.all([
         getMarketingAnalytics().catch(() => null),
         getRecentScans().catch(() => null),
-        getStoreLibraryItems({ page: 1, limit: 1 }).catch(() => null),
+        getStoreExecutionAssets({ page: 1, limit: 1 }).catch(() => null),
         getListings().catch(() => null),
       ]);
       if (analyticsRes?.success && analyticsRes.data) {
