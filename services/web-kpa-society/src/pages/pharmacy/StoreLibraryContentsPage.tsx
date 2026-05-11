@@ -1,43 +1,43 @@
 /**
  * StoreLibraryContentsPage — 내 자료함 / 콘텐츠
  *
- * WO-O4O-KPA-STORE-MATERIALS-AND-PRODUCTIONS-CANONICAL-ALIGN-V1
- * WO-O4O-KPA-STORE-PRODUCTION-ENTRY-CANONICAL-CORRECTION-V1: checkbox + 제작 시작 진입
- * WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1: lesson 항목(LMS 강의 reference metadata) 표시 + type filter
- * WO-O4O-LESSON-CARD-PREVIEW-COMPONENT-V1: lesson 인라인 표시를 LessonCardPreview 공용 컴포넌트로 교체
- * WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1: KPA 콘텐츠 허브 가져온 항목(asset_type='content') 표시.
- *   "콘텐츠" 필터에서 'cms'(레거시 CmsContent)와 'content'(kpa_contents)를 통합 표시.
- * WO-O4O-KPA-STORE-LIBRARY-CONTENTS-REMOVE-FLOW-FIX-V1:
- *   콘텐츠 메뉴는 snapshot/reference 중심. batch action을 "제거(hide)" 기준으로 정렬.
- *   direct 삭제 로직 제거 — direct 삭제는 내 자료함 > 매장 제작 자료에서만 처리.
+ * WO-O4O-STORE-LIBRARY-CONTENTS-CANONICAL-TABLE-SPLIT-V1
+ *   - 문서형 콘텐츠 / 코스형 콘텐츠를 독립 섹션 + 독립 DataTable 로 분리
+ *   - 카드형 snapshot UI / 혼합 리스트 / 임시 badge 기반 type filter 제거
+ *   - operator-ux-core DataTable + Pagination canonical 적용
+ *   - 선택 / bulk 제작 시작 / 선택 제거 — 섹션별 독립 selection
+ *   - row key = libraryItemId 기반 (snapshot.id 또는 direct.id, origin prefix 로 충돌 회피)
+ *   - duplicate 허용 정책 유지 (WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1)
  *
- * 매장이 보유한 콘텐츠 source/reference 저장소.
- * - 커뮤니티에서 가져온 snapshot-based 콘텐츠 (asset_type='cms' / 'content')
- * - LMS 강의 메타데이터 (asset_type='lesson') — Reference Metadata, lesson body 미포함
- * - 매장이 직접 작성한 direct 콘텐츠 (삭제는 매장 제작 자료 화면에서)
+ * 이전 WO 흐름 보존:
+ *   WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1: cms + content snapshot 통합 표시
+ *   WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1:       lesson Reference Metadata 노출
+ *   WO-O4O-KPA-STORE-LIBRARY-CONTENTS-REMOVE-FLOW-FIX-V1:
+ *     "선택 제거" = snapshot hidden 처리. direct 콘텐츠 삭제는 매장 제작 자료 화면 전담.
  *
- * 본 페이지는 제작 시작 단일 진입점:
- *   자료 선택 → "제작 시작" → modal (POP/QR/블로그/상품 상세설명) → 편집기 route 이동
+ * 제작 시작 flow: 자료 선택 → "제작 시작" → StartProductionModal → 편집기 route 이동
  */
 
 import { useEffect, useState, useCallback, useMemo, type CSSProperties } from 'react';
-import { Link } from 'react-router-dom';
-import { BookOpen, ExternalLink, Trash2, RefreshCw, FileText, Sparkles } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { BookOpen, Sparkles, Trash2, RefreshCw, Search, FileText } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
-import { LessonCardPreview, type LessonSnapshotContent } from '@o4o/shared-space-ui';
+import { DataTable, Pagination } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import {
   storeAssetControlApi,
   directContentApi,
   type StoreAssetItem,
 } from '../../api/assetSnapshot';
 import { colors } from '../../styles/theme';
-import { StartProductionModal, type ProductionSource } from './StartProductionModal';
+import { StartProductionModal, type ProductionSource, type ProductionSourceItem } from './StartProductionModal';
 
-// WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1 / WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1
-// type filter — 매장 운영자가 "전체 / 콘텐츠 / 강의"로 보기 좁히기. 강좌형 콘텐츠는 별도 메뉴 신설하지 않고
-// 본 페이지 안에서 type 분류만으로 노출한다([storeMenuConfig.ts:212] design intent).
-// "콘텐츠" 필터는 'cms'(레거시 platform CMS) + 'content'(KPA 콘텐츠 허브 가져옴) 통합 표시.
-type SnapshotTypeFilter = 'all' | 'content' | 'lesson';
+const PAGE_SIZE = 10;
+// 백엔드 GET /assets limit 상한 (asset-copy-core controller 기준 100).
+// 단일 매장 자료함 보유량은 일반적으로 이 한도 내 — 한도 초과 시 server pagination 도입은 후속 WO.
+const FETCH_LIMIT = 100;
+
+// ─── Row Types ───────────────────────────────────────────────────────────────
 
 interface DirectItem {
   id: string;
@@ -47,52 +47,139 @@ interface DirectItem {
   updatedAt: string;
 }
 
-type SelectionKey = string; // `${origin}:${id}`
+type RowOrigin = 'snapshot' | 'direct';
+type DocSourceType = 'cms' | 'content' | 'direct';
 
-const keyOf = (origin: 'snapshot' | 'direct', id: string): SelectionKey => `${origin}:${id}`;
+interface DocumentRow {
+  id: string;
+  origin: RowOrigin;
+  selectionKey: string;
+  title: string;
+  authorName: string;
+  sourceType: DocSourceType;
+  createdAt: string;
+  lifecycleStatus: string | null;
+  href: string;
+}
+
+interface CourseRow {
+  id: string;
+  selectionKey: string;
+  title: string;
+  instructorName: string;
+  lessonCount: number | null;
+  createdAt: string;
+  lifecycleStatus: string | null;
+  href: string;
+}
+
+const keyOf = (origin: RowOrigin, id: string) => `${origin}:${id}`;
+
+const SOURCE_TYPE_LABEL: Record<DocSourceType, string> = {
+  cms: '커뮤니티 (CMS)',
+  content: '커뮤니티 (콘텐츠 허브)',
+  direct: '매장 직접 작성',
+};
+
+function readString(json: unknown, key: string): string {
+  if (!json || typeof json !== 'object') return '';
+  const v = (json as Record<string, unknown>)[key];
+  return typeof v === 'string' ? v : '';
+}
+
+function readNumber(json: unknown, key: string): number | null {
+  if (!json || typeof json !== 'object') return null;
+  const v = (json as Record<string, unknown>)[key];
+  return typeof v === 'number' ? v : null;
+}
+
+function formatDate(iso?: string | null): string {
+  if (!iso) return '-';
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? '-' : d.toLocaleDateString('ko-KR');
+}
+
+function buildDocumentRows(
+  cmsSnaps: StoreAssetItem[],
+  contentSnaps: StoreAssetItem[],
+  directs: DirectItem[],
+): DocumentRow[] {
+  const snapshotRows: DocumentRow[] = [...cmsSnaps, ...contentSnaps].map((s) => {
+    const sourceType: DocSourceType = s.assetType === 'content' ? 'content' : 'cms';
+    return {
+      id: s.id,
+      origin: 'snapshot',
+      selectionKey: keyOf('snapshot', s.id),
+      title: s.title || '(제목 없음)',
+      authorName: readString(s.contentJson, 'authorName') || '-',
+      sourceType,
+      createdAt: s.createdAt,
+      lifecycleStatus: s.lifecycleStatus ?? null,
+      href: `/view/${s.id}`,
+    };
+  });
+  const directRows: DocumentRow[] = directs.map((d) => ({
+    id: d.id,
+    origin: 'direct',
+    selectionKey: keyOf('direct', d.id),
+    title: d.title || '(제목 없음)',
+    authorName: '내 매장',
+    sourceType: 'direct',
+    createdAt: d.updatedAt,
+    lifecycleStatus: null,
+    href: `/store/content/direct/${d.id}`,
+  }));
+  return [...snapshotRows, ...directRows].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  );
+}
+
+function buildCourseRows(lessonSnaps: StoreAssetItem[]): CourseRow[] {
+  return lessonSnaps
+    .map((s) => {
+      const publicUrl = readString(s.contentJson, 'publicUrl');
+      return {
+        id: s.id,
+        selectionKey: keyOf('snapshot', s.id),
+        title: s.title || readString(s.contentJson, 'title') || '(제목 없음)',
+        instructorName: readString(s.contentJson, 'instructorName') || '-',
+        lessonCount: readNumber(s.contentJson, 'lessonCount'),
+        createdAt: s.createdAt,
+        lifecycleStatus: s.lifecycleStatus ?? null,
+        href: publicUrl || `/lms/course/${readString(s.contentJson, 'courseId') || s.id}`,
+      };
+    })
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+}
+
+// ─── Page Component ──────────────────────────────────────────────────────────
 
 export default function StoreLibraryContentsPage() {
-  const [snapshots, setSnapshots] = useState<StoreAssetItem[]>([]);
+  const navigate = useNavigate();
+  const [cmsSnaps, setCmsSnaps] = useState<StoreAssetItem[]>([]);
+  const [contentSnaps, setContentSnaps] = useState<StoreAssetItem[]>([]);
+  const [lessonSnaps, setLessonSnaps] = useState<StoreAssetItem[]>([]);
   const [directs, setDirects] = useState<DirectItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selected, setSelected] = useState<Set<SelectionKey>>(new Set());
+
+  // Production modal
   const [modalOpen, setModalOpen] = useState(false);
   const [modalSource, setModalSource] = useState<ProductionSource | null>(null);
-  // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1: snapshot type filter (전체/콘텐츠/강의)
-  const [typeFilter, setTypeFilter] = useState<SnapshotTypeFilter>('all');
-
-  const changeTypeFilter = (next: SnapshotTypeFilter) => {
-    if (next === typeFilter) return;
-    setTypeFilter(next);
-    // 필터 전환 시 이전 선택 초기화 — 보이지 않는 항목이 selected에 남아있는 것 방지
-    setSelected(new Set());
-  };
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
     try {
-      // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1 / WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1
-      // cms / content / lesson 세 type 병렬 fetch.
-      //   - cms     : 레거시 platform CmsContent 기반
-      //   - content : KPA 콘텐츠 허브(kpa_contents) 가져옴 — 신규 표준
-      //   - lesson  : LMS 강의 reference metadata
-      // signage는 본 페이지(콘텐츠) 범위 외이므로 미요청.
-      const emptyPage = { items: [] as StoreAssetItem[], total: 0, page: 1, limit: 200 };
+      const emptyPage = { items: [] as StoreAssetItem[], total: 0, page: 1, limit: FETCH_LIMIT };
       const [cmsRes, contentRes, lessonRes, directRes] = await Promise.all([
-        storeAssetControlApi.list({ type: 'cms', limit: 200 }).catch(() => ({ data: emptyPage })),
-        storeAssetControlApi.list({ type: 'content', limit: 200 }).catch(() => ({ data: emptyPage })),
-        storeAssetControlApi.list({ type: 'lesson', limit: 200 }).catch(() => ({ data: emptyPage })),
+        storeAssetControlApi.list({ type: 'cms', limit: FETCH_LIMIT }).catch(() => ({ data: emptyPage })),
+        storeAssetControlApi.list({ type: 'content', limit: FETCH_LIMIT }).catch(() => ({ data: emptyPage })),
+        storeAssetControlApi.list({ type: 'lesson', limit: FETCH_LIMIT }).catch(() => ({ data: emptyPage })),
         directContentApi.list().catch(() => ({ data: [] as DirectItem[] })),
       ]);
-      const merged = [
-        ...(cmsRes.data?.items ?? []),
-        ...(contentRes.data?.items ?? []),
-        ...(lessonRes.data?.items ?? []),
-      ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-      setSnapshots(merged);
-      const directItems = (directRes.data || []).filter((it: DirectItem) => it.sourceType === 'direct');
-      setDirects(directItems);
-      setSelected(new Set());
+      setCmsSnaps(cmsRes.data?.items ?? []);
+      setContentSnaps(contentRes.data?.items ?? []);
+      setLessonSnaps(lessonRes.data?.items ?? []);
+      setDirects(((directRes.data as DirectItem[] | undefined) ?? []).filter((it) => it.sourceType === 'direct'));
     } catch (e: any) {
       toast.error(e?.message || '불러오는 데 실패했습니다');
     } finally {
@@ -104,89 +191,30 @@ export default function StoreLibraryContentsPage() {
     fetchAll();
   }, [fetchAll]);
 
-  const toggleOne = (key: SelectionKey) => {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
-    });
-  };
-
-  // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1 / WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1
-  // filter 적용된 snapshot 목록 + direct는 typeFilter='lesson' 시 제외.
-  // "콘텐츠" 필터는 cms(레거시) + content(KPA 콘텐츠 허브) 통합 표시.
-  const filteredSnapshots = useMemo<StoreAssetItem[]>(() => {
-    if (typeFilter === 'all') return snapshots;
-    if (typeFilter === 'content') {
-      return snapshots.filter((s) => s.assetType === 'cms' || s.assetType === 'content');
-    }
-    return snapshots.filter((s) => s.assetType === typeFilter);
-  }, [snapshots, typeFilter]);
-
-  const filteredDirects = useMemo<DirectItem[]>(() => {
-    // direct 콘텐츠는 cms 분류로 본다 — '강의' 필터에서는 직접 작성 콘텐츠를 제외.
-    if (typeFilter === 'lesson') return [];
-    return directs;
-  }, [directs, typeFilter]);
-
-  const allKeys = useMemo<SelectionKey[]>(
-    () => [
-      ...filteredDirects.map((it) => keyOf('direct', it.id)),
-      ...filteredSnapshots.map((it) => keyOf('snapshot', it.id)),
-    ],
-    [filteredDirects, filteredSnapshots],
+  const documentRows = useMemo(
+    () => buildDocumentRows(cmsSnaps, contentSnaps, directs),
+    [cmsSnaps, contentSnaps, directs],
   );
+  const courseRows = useMemo(() => buildCourseRows(lessonSnaps), [lessonSnaps]);
 
-  const allSelected = allKeys.length > 0 && allKeys.every((k) => selected.has(k));
-
-  const toggleAll = () => {
-    if (allSelected) setSelected(new Set());
-    else setSelected(new Set(allKeys));
-  };
-
-  const handleStartProduction = () => {
-    if (selected.size === 0) return;
-    const items: ProductionSource['items'] = [];
-    for (const key of selected) {
-      const [origin, id] = key.split(':') as ['snapshot' | 'direct', string];
-      if (origin === 'direct') {
-        const it = directs.find((d) => d.id === id);
-        if (it) items.push({ id: it.id, title: it.title, origin: 'direct' });
-      } else {
-        const it = snapshots.find((s) => s.id === id);
-        if (it) items.push({ id: it.id, title: it.title, origin: 'snapshot' });
-      }
-    }
+  // ── 제작 시작 (공통) ─────────────────────────────────────────────────
+  const openProduction = useCallback((items: ProductionSourceItem[]) => {
+    if (items.length === 0) return;
     setModalSource({ fromLibrary: 'contents', items });
     setModalOpen(true);
-  };
+  }, []);
 
-  // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-REMOVE-FLOW-FIX-V1
-  // 콘텐츠 메뉴의 "제거" = snapshot을 hidden 처리하여 내 자료함에서 숨김.
-  // 원본 커뮤니티 콘텐츠 삭제 금지. direct 콘텐츠는 제거 대상에서 제외(매장 제작 자료 화면 전담).
-  const handleBulkRemove = async () => {
-    const snapshotIds: string[] = [];
-    for (const key of selected) {
-      const [origin, id] = key.split(':') as ['snapshot' | 'direct', string];
-      if (origin === 'snapshot') snapshotIds.push(id);
-    }
-    if (snapshotIds.length === 0) {
-      toast.error('제거할 콘텐츠가 없습니다');
-      return;
-    }
-    if (!confirm(`선택한 ${snapshotIds.length}개 콘텐츠를 내 자료함에서 제거하시겠습니까?`)) return;
-    try {
-      await Promise.all(snapshotIds.map((id) => storeAssetControlApi.updatePublishStatus(id, 'hidden')));
-      setSnapshots((prev) => prev.filter((it) => !snapshotIds.includes(it.id)));
-      setSelected(new Set());
-      toast.success(`${snapshotIds.length}개 콘텐츠를 내 자료함에서 제거했습니다`);
-    } catch (e: any) {
-      toast.error(e?.message || '내 자료함 제거에 실패했습니다');
-    }
-  };
+  // ── 선택 제거 (snapshot 만 hidden 처리) ─────────────────────────────
+  const removeSnapshots = useCallback(async (snapshotIds: string[]): Promise<number> => {
+    if (snapshotIds.length === 0) return 0;
+    await Promise.all(snapshotIds.map((id) => storeAssetControlApi.updatePublishStatus(id, 'hidden')));
+    return snapshotIds.length;
+  }, []);
 
-  const totalCount = filteredSnapshots.length + filteredDirects.length;
+  // 부모가 fetchAll 을 다시 호출하므로 섹션은 상태를 직접 비우지 않음
+  const handleAfterRemove = useCallback(() => {
+    fetchAll();
+  }, [fetchAll]);
 
   return (
     <div style={styles.container}>
@@ -202,7 +230,7 @@ export default function StoreLibraryContentsPage() {
             콘텐츠
           </h1>
           <p style={styles.subtitle}>
-            보유한 콘텐츠를 선택하여 POP / QR / 블로그 / 상품 상세설명 제작을 시작합니다.
+            문서형/코스형 콘텐츠를 분리해 보여드립니다. 선택 후 "제작 시작" 으로 POP / QR / 블로그 / 상품 상세설명을 만들 수 있습니다.
           </p>
         </div>
         <button onClick={fetchAll} style={styles.refreshBtn} disabled={loading}>
@@ -211,199 +239,38 @@ export default function StoreLibraryContentsPage() {
         </button>
       </div>
 
-      {/* WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1 / WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1
-          type filter — 전체 / 콘텐츠 / 강의. "콘텐츠"는 cms+content 통합. */}
-      <div style={styles.filterBar}>
-        {(['all', 'content', 'lesson'] as const).map((type) => {
-          const label = type === 'all' ? '전체' : type === 'content' ? '콘텐츠' : '강의';
-          const isActive = typeFilter === type;
-          return (
-            <button
-              key={type}
-              type="button"
-              onClick={() => changeTypeFilter(type)}
-              style={{
-                ...styles.filterChip,
-                ...(isActive ? styles.filterChipActive : null),
-              }}
-            >
-              {label}
-            </button>
-          );
-        })}
-      </div>
+      <DocumentsSection
+        rows={documentRows}
+        loading={loading}
+        onStartProduction={openProduction}
+        onBulkRemove={async (ids) => {
+          const n = await removeSnapshots(ids).catch((e: any) => {
+            toast.error(e?.message || '제거에 실패했습니다');
+            return 0;
+          });
+          if (n > 0) {
+            toast.success(`${n}개 콘텐츠를 내 자료함에서 제거했습니다`);
+            handleAfterRemove();
+          }
+        }}
+        navigate={navigate}
+      />
 
-      {/* Batch toolbar */}
-      {totalCount > 0 && (
-        <div style={styles.toolbar}>
-          <label style={styles.selectAllLabel}>
-            <input
-              type="checkbox"
-              checked={allSelected}
-              onChange={toggleAll}
-              style={styles.checkbox}
-            />
-            전체 선택 ({selected.size}/{totalCount})
-          </label>
-          <div style={{ flex: 1 }} />
-          <button
-            type="button"
-            onClick={handleStartProduction}
-            disabled={selected.size === 0}
-            style={{ ...styles.startBtn, opacity: selected.size === 0 ? 0.5 : 1 }}
-          >
-            <Sparkles size={14} />
-            제작 시작
-          </button>
-          <button
-            type="button"
-            onClick={handleBulkRemove}
-            disabled={selected.size === 0}
-            style={{ ...styles.bulkDeleteBtn, opacity: selected.size === 0 ? 0.5 : 1 }}
-          >
-            <Trash2 size={14} />
-            선택 제거
-          </button>
-        </div>
-      )}
-
-      {loading ? (
-        <div style={styles.empty}>불러오는 중...</div>
-      ) : totalCount === 0 ? (
-        <div style={styles.empty}>
-          <BookOpen size={32} style={{ color: colors.neutral300, marginBottom: 12 }} />
-          <p style={{ margin: 0, color: colors.neutral500, fontSize: 14 }}>
-            보관된 콘텐츠가 없습니다.
-          </p>
-          <p style={{ margin: '6px 0 0', color: colors.neutral400, fontSize: 12 }}>
-            커뮤니티 콘텐츠 페이지에서 "내 매장으로 가져오기"를 눌러 추가할 수 있습니다.
-          </p>
-        </div>
-      ) : (
-        <>
-          {filteredDirects.length > 0 && (
-            <section style={styles.section}>
-              <h2 style={styles.sectionTitle}>
-                내 매장 작성 ({filteredDirects.length})
-                <span style={{ ...styles.badge, background: '#DCFCE7', color: '#16A34A' }}>직접 작성</span>
-              </h2>
-              <ul style={styles.list}>
-                {filteredDirects.map((item) => {
-                  const k = keyOf('direct', item.id);
-                  return (
-                    <li key={item.id} style={styles.listItem}>
-                      <input
-                        type="checkbox"
-                        checked={selected.has(k)}
-                        onChange={() => toggleOne(k)}
-                        style={styles.checkbox}
-                        aria-label={`${item.title} 선택`}
-                      />
-                      <div style={styles.itemMain}>
-                        <FileText size={16} style={{ color: colors.accentGreen, flexShrink: 0 }} />
-                        <Link to={`/store/content/direct/${item.id}`} style={styles.itemTitle}>
-                          {item.title}
-                        </Link>
-                      </div>
-                      <div style={styles.itemMeta}>
-                        <span style={styles.metaText}>
-                          {item.updatedAt ? new Date(item.updatedAt).toLocaleDateString('ko-KR') : ''}
-                        </span>
-                        <span style={{ ...styles.badge, background: '#F1F5F9', color: '#64748B', fontSize: 11 }}>
-                          매장 제작 자료에서 삭제
-                        </span>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            </section>
-          )}
-
-          {filteredSnapshots.length > 0 && (
-            <section style={styles.section}>
-              <h2 style={styles.sectionTitle}>
-                {/* WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1: 섹션 라벨을 lesson 포함으로 일반화 */}
-                가져온 콘텐츠 / 강의 ({filteredSnapshots.length})
-                <span style={{ ...styles.badge, background: '#EFF6FF', color: '#2563EB' }}>snapshot</span>
-              </h2>
-              <ul style={styles.list}>
-                {filteredSnapshots.map((item) => {
-                  const k = keyOf('snapshot', item.id);
-                  // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1: lesson은 Reference Metadata.
-                  // WO-O4O-LESSON-CARD-PREVIEW-COMPONENT-V1: lesson 항목은 공용 LessonCardPreview를 사용.
-                  if (item.assetType === 'lesson') {
-                    const lessonSnap = item.contentJson as LessonSnapshotContent | undefined;
-                    if (!lessonSnap || typeof lessonSnap !== 'object') return null;
-                    return (
-                      <li key={item.id} style={styles.lessonListItem}>
-                        <input
-                          type="checkbox"
-                          checked={selected.has(k)}
-                          onChange={() => toggleOne(k)}
-                          style={styles.checkbox}
-                          aria-label={`${item.title} 선택`}
-                        />
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <LessonCardPreview
-                            snapshot={lessonSnap}
-                            variant="compact"
-                            rightSlot={
-                              item.lifecycleStatus === 'archived' ? (
-                                <span style={{ ...styles.badge, background: '#FEF3C7', color: '#D97706' }}>보관</span>
-                              ) : item.lifecycleStatus === 'expired' ? (
-                                <span style={{ ...styles.badge, background: '#FEE2E2', color: '#DC2626' }}>만료</span>
-                              ) : null
-                            }
-                          />
-                        </div>
-                      </li>
-                    );
-                  }
-                  // 기존 cms snapshot — 인라인 1줄 표시 (변경 없음)
-                  return (
-                    <li key={item.id} style={styles.listItem}>
-                      <input
-                        type="checkbox"
-                        checked={selected.has(k)}
-                        onChange={() => toggleOne(k)}
-                        style={styles.checkbox}
-                        aria-label={`${item.title} 선택`}
-                      />
-                      <div style={styles.itemMain}>
-                        <BookOpen size={16} style={{ color: colors.primary, flexShrink: 0 }} />
-                        <Link to={`/view/${item.id}`} style={styles.itemTitle}>
-                          {item.title}
-                        </Link>
-                        {item.lifecycleStatus === 'archived' && (
-                          <span style={{ ...styles.badge, background: '#FEF3C7', color: '#D97706' }}>보관</span>
-                        )}
-                        {item.lifecycleStatus === 'expired' && (
-                          <span style={{ ...styles.badge, background: '#FEE2E2', color: '#DC2626' }}>만료</span>
-                        )}
-                      </div>
-                      <div style={styles.itemMeta}>
-                        <span style={styles.metaText}>
-                          {item.createdAt ? new Date(item.createdAt).toLocaleDateString('ko-KR') : ''}
-                        </span>
-                        <Link
-                          to={`/view/${item.id}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          style={styles.openLink}
-                          title="원본 열기"
-                        >
-                          <ExternalLink size={14} />
-                        </Link>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            </section>
-          )}
-        </>
-      )}
+      <CoursesSection
+        rows={courseRows}
+        loading={loading}
+        onStartProduction={openProduction}
+        onBulkRemove={async (ids) => {
+          const n = await removeSnapshots(ids).catch((e: any) => {
+            toast.error(e?.message || '제거에 실패했습니다');
+            return 0;
+          });
+          if (n > 0) {
+            toast.success(`${n}개 강의를 내 자료함에서 제거했습니다`);
+            handleAfterRemove();
+          }
+        }}
+      />
 
       <StartProductionModal
         open={modalOpen}
@@ -414,10 +281,414 @@ export default function StoreLibraryContentsPage() {
   );
 }
 
+// ─── DocumentsSection ────────────────────────────────────────────────────────
+
+function DocumentsSection({
+  rows,
+  loading,
+  onStartProduction,
+  onBulkRemove,
+  navigate,
+}: {
+  rows: DocumentRow[];
+  loading: boolean;
+  onStartProduction: (items: ProductionSourceItem[]) => void;
+  onBulkRemove: (snapshotIds: string[]) => void | Promise<void>;
+  navigate: ReturnType<typeof useNavigate>;
+}) {
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return rows;
+    return rows.filter((r) => r.title.toLowerCase().includes(q) || r.authorName.toLowerCase().includes(q));
+  }, [rows, search]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const pageRows = useMemo(
+    () => filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE),
+    [filtered, safePage],
+  );
+
+  // 검색 변경 시 page reset, 또한 보이지 않는 항목 selection 정리
+  useEffect(() => {
+    setPage(1);
+  }, [search]);
+
+  useEffect(() => {
+    // 데이터가 갱신되어 더 이상 존재하지 않는 selection 정리
+    setSelected((prev) => {
+      const validKeys = new Set(rows.map((r) => r.selectionKey));
+      let changed = false;
+      const next = new Set<string>();
+      for (const k of prev) {
+        if (validKeys.has(k)) next.add(k);
+        else changed = true;
+      }
+      return changed ? next : prev;
+    });
+  }, [rows]);
+
+  const handleStart = useCallback(() => {
+    if (selected.size === 0) return;
+    const items: ProductionSourceItem[] = rows
+      .filter((r) => selected.has(r.selectionKey))
+      .map((r) => ({ id: r.id, title: r.title, origin: r.origin }));
+    onStartProduction(items);
+  }, [selected, rows, onStartProduction]);
+
+  const handleRemove = useCallback(async () => {
+    const snapshotIds = rows
+      .filter((r) => selected.has(r.selectionKey) && r.origin === 'snapshot')
+      .map((r) => r.id);
+    const directCount = selected.size - snapshotIds.length;
+    if (snapshotIds.length === 0) {
+      toast.error('제거 가능한 항목이 없습니다 (직접 작성 콘텐츠는 매장 제작 자료에서 제거)');
+      return;
+    }
+    if (!confirm(`선택한 ${snapshotIds.length}개 콘텐츠를 내 자료함에서 제거하시겠습니까?${directCount > 0 ? `\n(직접 작성 ${directCount}개는 매장 제작 자료에서 제거)` : ''}`)) return;
+    await onBulkRemove(snapshotIds);
+    setSelected(new Set());
+  }, [selected, rows, onBulkRemove]);
+
+  const columns: ListColumnDef<DocumentRow>[] = useMemo(
+    () => [
+      {
+        key: 'title',
+        header: '제목',
+        sortable: true,
+        sortAccessor: (row) => row.title,
+        render: (_v, row) => (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+            {row.origin === 'direct' ? (
+              <FileText size={14} style={{ color: colors.accentGreen, flexShrink: 0 }} />
+            ) : (
+              <BookOpen size={14} style={{ color: colors.primary, flexShrink: 0 }} />
+            )}
+            <Link to={row.href} style={styles.titleLink} title={row.title}>
+              {row.title}
+            </Link>
+            {row.lifecycleStatus === 'archived' && (
+              <span style={{ ...styles.badge, background: '#FEF3C7', color: '#D97706' }}>보관</span>
+            )}
+            {row.lifecycleStatus === 'expired' && (
+              <span style={{ ...styles.badge, background: '#FEE2E2', color: '#DC2626' }}>만료</span>
+            )}
+          </div>
+        ),
+      },
+      {
+        key: 'authorName',
+        header: '작성자',
+        width: '140px',
+        sortable: true,
+        sortAccessor: (row) => row.authorName,
+        render: (_v, row) => <span style={styles.metaText}>{row.authorName}</span>,
+      },
+      {
+        key: 'sourceType',
+        header: '원본 유형',
+        width: '180px',
+        sortable: true,
+        sortAccessor: (row) => SOURCE_TYPE_LABEL[row.sourceType],
+        render: (_v, row) => <span style={styles.metaText}>{SOURCE_TYPE_LABEL[row.sourceType]}</span>,
+      },
+      {
+        key: 'createdAt',
+        header: '가져온 날짜',
+        width: '120px',
+        sortable: true,
+        sortAccessor: (row) => row.createdAt,
+        render: (_v, row) => <span style={styles.metaText}>{formatDate(row.createdAt)}</span>,
+      },
+      {
+        key: '_actions',
+        header: '액션',
+        system: true,
+        align: 'center',
+        width: '80px',
+        onCellClick: () => {},
+        render: (_v, row) => (
+          <button
+            type="button"
+            onClick={() => navigate(row.href)}
+            style={styles.viewBtn}
+            aria-label="자료 보기"
+          >
+            보기
+          </button>
+        ),
+      },
+    ],
+    [navigate],
+  );
+
+  return (
+    <section style={styles.section}>
+      <div style={styles.sectionHeader}>
+        <h2 style={styles.sectionTitle}>
+          <FileText size={16} style={{ color: colors.primary }} />
+          문서형 콘텐츠
+          <span style={styles.countBadge}>{filtered.length}건</span>
+        </h2>
+        <div style={styles.searchWrap}>
+          <Search size={14} style={styles.searchIcon} />
+          <input
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="제목·작성자 검색"
+            style={styles.searchInput}
+          />
+        </div>
+      </div>
+
+      {selected.size > 0 && (
+        <div style={styles.toolbar}>
+          <span style={{ fontSize: 13, color: colors.neutral700 }}>{selected.size}개 선택됨</span>
+          <div style={{ flex: 1 }} />
+          <button type="button" onClick={handleStart} style={styles.startBtn}>
+            <Sparkles size={14} />
+            제작 시작
+          </button>
+          <button type="button" onClick={handleRemove} style={styles.bulkDeleteBtn}>
+            <Trash2 size={14} />
+            선택 제거
+          </button>
+          <button type="button" onClick={() => setSelected(new Set())} style={styles.clearBtn}>
+            선택 해제
+          </button>
+        </div>
+      )}
+
+      <DataTable<DocumentRow>
+        columns={columns}
+        data={pageRows}
+        rowKey="selectionKey"
+        loading={loading}
+        emptyMessage="가져온 문서형 콘텐츠가 없습니다"
+        tableId="kpa-store-library-documents"
+        selectable
+        selectedKeys={selected}
+        onSelectionChange={setSelected}
+      />
+
+      <Pagination
+        page={safePage}
+        totalPages={totalPages}
+        onPageChange={setPage}
+        total={filtered.length}
+      />
+    </section>
+  );
+}
+
+// ─── CoursesSection ──────────────────────────────────────────────────────────
+
+function CoursesSection({
+  rows,
+  loading,
+  onStartProduction,
+  onBulkRemove,
+}: {
+  rows: CourseRow[];
+  loading: boolean;
+  onStartProduction: (items: ProductionSourceItem[]) => void;
+  onBulkRemove: (snapshotIds: string[]) => void | Promise<void>;
+}) {
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return rows;
+    return rows.filter(
+      (r) => r.title.toLowerCase().includes(q) || r.instructorName.toLowerCase().includes(q),
+    );
+  }, [rows, search]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const pageRows = useMemo(
+    () => filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE),
+    [filtered, safePage],
+  );
+
+  useEffect(() => {
+    setPage(1);
+  }, [search]);
+
+  useEffect(() => {
+    setSelected((prev) => {
+      const validKeys = new Set(rows.map((r) => r.selectionKey));
+      let changed = false;
+      const next = new Set<string>();
+      for (const k of prev) {
+        if (validKeys.has(k)) next.add(k);
+        else changed = true;
+      }
+      return changed ? next : prev;
+    });
+  }, [rows]);
+
+  const handleStart = useCallback(() => {
+    if (selected.size === 0) return;
+    const items: ProductionSourceItem[] = rows
+      .filter((r) => selected.has(r.selectionKey))
+      .map((r) => ({ id: r.id, title: r.title, origin: 'snapshot' }));
+    onStartProduction(items);
+  }, [selected, rows, onStartProduction]);
+
+  const handleRemove = useCallback(async () => {
+    const ids = rows.filter((r) => selected.has(r.selectionKey)).map((r) => r.id);
+    if (ids.length === 0) return;
+    if (!confirm(`선택한 ${ids.length}개 강의를 내 자료함에서 제거하시겠습니까?`)) return;
+    await onBulkRemove(ids);
+    setSelected(new Set());
+  }, [selected, rows, onBulkRemove]);
+
+  const columns: ListColumnDef<CourseRow>[] = useMemo(
+    () => [
+      {
+        key: 'title',
+        header: '강의명',
+        sortable: true,
+        sortAccessor: (row) => row.title,
+        render: (_v, row) => (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+            <BookOpen size={14} style={{ color: colors.primary, flexShrink: 0 }} />
+            <a href={row.href} target="_blank" rel="noreferrer" style={styles.titleLink} title={row.title}>
+              {row.title}
+            </a>
+            {row.lifecycleStatus === 'archived' && (
+              <span style={{ ...styles.badge, background: '#FEF3C7', color: '#D97706' }}>보관</span>
+            )}
+            {row.lifecycleStatus === 'expired' && (
+              <span style={{ ...styles.badge, background: '#FEE2E2', color: '#DC2626' }}>만료</span>
+            )}
+          </div>
+        ),
+      },
+      {
+        key: 'instructorName',
+        header: '강사',
+        width: '140px',
+        sortable: true,
+        sortAccessor: (row) => row.instructorName,
+        render: (_v, row) => <span style={styles.metaText}>{row.instructorName}</span>,
+      },
+      {
+        key: 'lessonCount',
+        header: '레슨 수',
+        width: '90px',
+        align: 'center',
+        sortable: true,
+        sortAccessor: (row) => row.lessonCount ?? -1,
+        render: (_v, row) => (
+          <span style={styles.metaText}>{row.lessonCount == null ? '-' : `${row.lessonCount}개`}</span>
+        ),
+      },
+      {
+        key: 'createdAt',
+        header: '가져온 날짜',
+        width: '120px',
+        sortable: true,
+        sortAccessor: (row) => row.createdAt,
+        render: (_v, row) => <span style={styles.metaText}>{formatDate(row.createdAt)}</span>,
+      },
+      {
+        key: '_actions',
+        header: '액션',
+        system: true,
+        align: 'center',
+        width: '80px',
+        onCellClick: () => {},
+        render: (_v, row) => (
+          <a
+            href={row.href}
+            target="_blank"
+            rel="noreferrer"
+            style={styles.viewBtn}
+            aria-label="강의 보기"
+          >
+            보기
+          </a>
+        ),
+      },
+    ],
+    [],
+  );
+
+  return (
+    <section style={styles.section}>
+      <div style={styles.sectionHeader}>
+        <h2 style={styles.sectionTitle}>
+          <BookOpen size={16} style={{ color: colors.primary }} />
+          코스형 콘텐츠
+          <span style={styles.countBadge}>{filtered.length}건</span>
+        </h2>
+        <div style={styles.searchWrap}>
+          <Search size={14} style={styles.searchIcon} />
+          <input
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="강의명·강사 검색"
+            style={styles.searchInput}
+          />
+        </div>
+      </div>
+
+      {selected.size > 0 && (
+        <div style={styles.toolbar}>
+          <span style={{ fontSize: 13, color: colors.neutral700 }}>{selected.size}개 선택됨</span>
+          <div style={{ flex: 1 }} />
+          <button type="button" onClick={handleStart} style={styles.startBtn}>
+            <Sparkles size={14} />
+            제작 시작
+          </button>
+          <button type="button" onClick={handleRemove} style={styles.bulkDeleteBtn}>
+            <Trash2 size={14} />
+            선택 제거
+          </button>
+          <button type="button" onClick={() => setSelected(new Set())} style={styles.clearBtn}>
+            선택 해제
+          </button>
+        </div>
+      )}
+
+      <DataTable<CourseRow>
+        columns={columns}
+        data={pageRows}
+        rowKey="selectionKey"
+        loading={loading}
+        emptyMessage="가져온 코스형 콘텐츠가 없습니다"
+        tableId="kpa-store-library-courses"
+        selectable
+        selectedKeys={selected}
+        onSelectionChange={setSelected}
+      />
+
+      <Pagination
+        page={safePage}
+        totalPages={totalPages}
+        onPageChange={setPage}
+        total={filtered.length}
+      />
+    </section>
+  );
+}
+
+// ─── Styles ──────────────────────────────────────────────────────────────────
+
 const styles: Record<string, CSSProperties> = {
   container: {
     padding: '24px',
-    maxWidth: '900px',
+    maxWidth: '1100px',
     margin: '0 auto',
   },
   header: {
@@ -426,6 +697,7 @@ const styles: Record<string, CSSProperties> = {
     alignItems: 'flex-start',
     gap: '16px',
     marginBottom: '24px',
+    flexWrap: 'wrap',
   },
   breadcrumb: {
     display: 'flex',
@@ -461,52 +733,68 @@ const styles: Record<string, CSSProperties> = {
     color: colors.neutral700,
     cursor: 'pointer',
   },
+  section: {
+    marginBottom: '32px',
+  },
+  sectionHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '12px',
+    marginBottom: '12px',
+    flexWrap: 'wrap',
+  },
+  sectionTitle: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '8px',
+    fontSize: '15px',
+    fontWeight: 600,
+    color: colors.neutral800,
+    margin: 0,
+  },
+  countBadge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    padding: '2px 8px',
+    fontSize: '12px',
+    fontWeight: 500,
+    color: colors.neutral600,
+    background: colors.neutral100,
+    borderRadius: '999px',
+  },
+  searchWrap: {
+    position: 'relative',
+    minWidth: '220px',
+  },
+  searchIcon: {
+    position: 'absolute',
+    left: 10,
+    top: '50%',
+    transform: 'translateY(-50%)',
+    color: colors.neutral400,
+    pointerEvents: 'none',
+  },
+  searchInput: {
+    width: '100%',
+    padding: '8px 12px 8px 30px',
+    border: `1px solid ${colors.neutral300}`,
+    borderRadius: '6px',
+    fontSize: '13px',
+    outline: 'none',
+    background: colors.white,
+    boxSizing: 'border-box',
+  },
   toolbar: {
     display: 'flex',
     alignItems: 'center',
-    gap: '12px',
+    gap: '10px',
     padding: '10px 12px',
     background: colors.white,
     border: `1px solid ${colors.neutral200}`,
     borderRadius: '8px',
-    marginBottom: '12px',
-  },
-  // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1
-  filterBar: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    marginBottom: '12px',
-  },
-  filterChip: {
-    padding: '6px 14px',
-    background: colors.white,
-    border: `1px solid ${colors.neutral300}`,
-    borderRadius: '999px',
-    fontSize: '13px',
-    color: colors.neutral700,
-    cursor: 'pointer',
-  },
-  filterChipActive: {
-    background: '#EDE9FE',
-    border: `1px solid #C4B5FD`,
-    color: '#5B21B6',
-    fontWeight: 600,
-  },
-  // (lesson inline meta는 LessonCardPreview가 처리하므로 페이지 로컬 스타일 제거)
-  selectAllLabel: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '8px',
-    fontSize: '13px',
-    color: colors.neutral700,
-    cursor: 'pointer',
-  },
-  checkbox: {
-    width: '16px',
-    height: '16px',
-    cursor: 'pointer',
-    flexShrink: 0,
+    marginBottom: '10px',
+    flexWrap: 'wrap',
   },
   startBtn: {
     display: 'inline-flex',
@@ -533,17 +821,27 @@ const styles: Record<string, CSSProperties> = {
     color: colors.neutral700,
     cursor: 'pointer',
   },
-  section: {
-    marginBottom: '24px',
+  clearBtn: {
+    padding: '8px 10px',
+    background: 'transparent',
+    border: 'none',
+    fontSize: '13px',
+    color: colors.neutral500,
+    cursor: 'pointer',
   },
-  sectionTitle: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
+  titleLink: {
     fontSize: '14px',
-    fontWeight: 600,
-    color: colors.neutral700,
-    marginBottom: '10px',
+    fontWeight: 500,
+    color: colors.neutral800,
+    textDecoration: 'none',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    minWidth: 0,
+  },
+  metaText: {
+    fontSize: '13px',
+    color: colors.neutral500,
   },
   badge: {
     display: 'inline-flex',
@@ -552,89 +850,19 @@ const styles: Record<string, CSSProperties> = {
     fontSize: '11px',
     fontWeight: 500,
     borderRadius: '4px',
-  },
-  list: {
-    listStyle: 'none',
-    padding: 0,
-    margin: 0,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '6px',
-  },
-  listItem: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: '10px',
-    padding: '12px 14px',
-    background: colors.white,
-    border: `1px solid ${colors.neutral200}`,
-    borderRadius: '8px',
-  },
-  // WO-O4O-LESSON-CARD-PREVIEW-COMPONENT-V1
-  // lesson 항목은 LessonCardPreview(자체 border/padding 보유)를 임베드 — 외곽 컨테이너는 체크박스 정렬만 담당.
-  lessonListItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-  },
-  itemMain: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    flex: 1,
-    minWidth: 0,
-  },
-  itemTitle: {
-    fontSize: '14px',
-    fontWeight: 500,
-    color: colors.neutral800,
-    textDecoration: 'none',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-  },
-  itemMeta: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
     flexShrink: 0,
   },
-  metaText: {
-    fontSize: '12px',
-    color: colors.neutral400,
-  },
-  openLink: {
+  viewBtn: {
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    width: '28px',
-    height: '28px',
-    color: colors.neutral500,
-    borderRadius: '4px',
-    textDecoration: 'none',
-  },
-  deleteBtn: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '28px',
-    height: '28px',
-    background: 'transparent',
-    border: 'none',
-    color: colors.neutral400,
-    cursor: 'pointer',
-    borderRadius: '4px',
-  },
-  empty: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '64px 24px',
+    padding: '4px 10px',
     background: colors.white,
-    border: `1px solid ${colors.neutral200}`,
-    borderRadius: '8px',
-    textAlign: 'center',
+    border: `1px solid ${colors.neutral300}`,
+    borderRadius: '6px',
+    fontSize: '12px',
+    color: colors.neutral700,
+    cursor: 'pointer',
+    textDecoration: 'none',
   },
 };
