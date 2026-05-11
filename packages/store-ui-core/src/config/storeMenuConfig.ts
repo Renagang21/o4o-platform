@@ -199,6 +199,13 @@ export const GLYCOPHARM_STORE_CONFIG: StoreDashboardConfig = {
  *   - 사이니지 "재생" → "TV 재생" (TV fullscreen playback 의미 명확화)
  *   - Tablet은 매장 내 interactive device, Signage는 TV 전용 재생.
  *     Playlist는 두 도메인이 공통으로 사용 가능한 자산 (현재 signage 하위 유지).
+ * WO-O4O-KPA-STORE-SIDEBAR-PRODUCTION-MENU-REMOVE-V1:
+ *   - "매장 실행" 그룹 → "채널" 으로 재명명 (운영 기능 중심으로 축소)
+ *   - 채널 그룹은 채널 관리 / 태블릿 / 상담 요청 3개 항목만 유지
+ *   - 다음 메뉴 항목 제거 (라우트 및 페이지 컴포넌트는 유지 — deep-link 호환):
+ *       상품 정보 제작, POP, QR 코드, 블로그, 상품 상세설명
+ *   - 제작 진입은 후속 WO에서 "내 자료함 > 매장 제작 자료" 통합 모달로 일원화 예정
+ *   - IR: docs/investigations/IR-O4O-STORE-PRODUCTION-ASSET-RESTRUCTURE-V1.md
  */
 export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
   serviceKey: 'kpa-society',
@@ -238,20 +245,17 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'signage-schedules', label: '스케줄',       subPath: '/marketing/signage/schedules' },
       { key: 'signage-player',    label: 'TV 재생',      subPath: '/marketing/signage/player' },
     ]},
-    // 매장 실행 — 결과물 관리(POP/QR/블로그/상품 상세설명) + 운영 기능.
-    // 신규 제작 진입은 본 그룹이 아닌 "내 자료함"에서 시작.
+    // 채널 — 매장 운영 기능 (채널 관리 / 태블릿 / 상담 요청).
     // 태블릿: 매장 내 interactive device. 매장당 복수 tablet 전제.
     //         (idle playlist 연결은 후속 WO에서 도입)
-    // WO-O4O-KPA-STORE-PRODUCT-INFO-CREATOR-MENU-V1: 상품 정보 제작 메뉴 추가
-    { label: '매장 실행', items: [
-      { key: 'channels',              label: '채널 관리',     subPath: '/channels' },
-      { key: 'product-info-creator',  label: '상품 정보 제작', subPath: '/execution/product-info' },
-      { key: 'tablet-displays',       label: '태블릿',        subPath: '/commerce/tablet-displays' },
-      { key: 'pop',                  label: 'POP',          subPath: '/marketing/pop' },
-      { key: 'qr',                   label: 'QR 코드',      subPath: '/marketing/qr' },
-      { key: 'blog',                 label: '블로그',        subPath: '/content/blog' },
-      { key: 'product-descriptions', label: '상품 상세설명', subPath: '/marketing/product-descriptions' },
-      { key: 'requests',             label: '상담 요청',     subPath: '/requests' },
+    // WO-O4O-KPA-STORE-SIDEBAR-PRODUCTION-MENU-REMOVE-V1:
+    //   POP / QR 코드 / 블로그 / 상품 상세설명 / 상품 정보 제작 메뉴 제거.
+    //   제작 진입은 후속 WO에서 "내 자료함 > 매장 제작 자료" 모달로 통합 예정.
+    //   라우트는 유지 (App.tsx 변경 없음, deep-link 호환).
+    { label: '채널', items: [
+      { key: 'channels',         label: '채널 관리', subPath: '/channels' },
+      { key: 'tablet-displays',  label: '태블릿',    subPath: '/commerce/tablet-displays' },
+      { key: 'requests',         label: '상담 요청', subPath: '/requests' },
     ]},
     { label: '분석', items: [
       { key: 'analytics-marketing', label: '마케팅 분석', subPath: '/analytics/marketing' },
