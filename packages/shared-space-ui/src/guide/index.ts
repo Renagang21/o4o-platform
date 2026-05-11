@@ -68,3 +68,22 @@ export {
   glycopharmGuideFeatureContentProps,
   glycopharmGuideFeatureSignageProps,
 } from './copy/glycopharm.js';
+
+// WO-O4O-NETURE-GUIDE-IA-AND-WRAPPER-PAGES-V1
+export {
+  netureGuideIntroProps,
+  netureGuideIntroStructureProps,
+  netureGuideIntroNetureProps,
+  netureGuideIntroOperationProps,
+  netureGuideIntroConceptProps,
+  netureGuideUsageProps,
+  netureGuideFeaturesProps,
+  netureGuideFeatureSupplierOnboardingProps,
+  netureGuideFeatureProductRegistrationProps,
+  netureGuideFeatureB2BContentProps,
+  netureGuideFeatureEventOfferProps,
+  netureGuideFeatureMarketTrialProps,
+  netureGuideFeaturePartnerProgramProps,
+  netureGuideFeatureForumResourcesProps,
+  netureGuideFeatureCopilotDashboardProps,
+} from './copy/neture.js';

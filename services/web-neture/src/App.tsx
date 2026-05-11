@@ -461,6 +461,24 @@ const ContentLibraryPage = lazy(() => import('./pages/library/ContentLibraryPage
 // Resources (O4O 공통 구조 — /resources)
 const NetureResourcesPage = lazy(() => import('./pages/resources/NetureResourcesPage'));
 
+// Guide Pages (WO-O4O-NETURE-GUIDE-IA-AND-WRAPPER-PAGES-V1) — 16 wrappers, public
+const GuideHomePage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideHomePage })));
+const GuideIntroPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideIntroPage })));
+const GuideIntroStructurePage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideIntroStructurePage })));
+const GuideIntroNeturePage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideIntroNeturePage })));
+const GuideIntroOperationPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideIntroOperationPage })));
+const GuideIntroConceptPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideIntroConceptPage })));
+const GuideUsagePage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideUsagePage })));
+const GuideFeaturesPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideFeaturesPage })));
+const GuideFeatureSupplierOnboardingPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideFeatureSupplierOnboardingPage })));
+const GuideFeatureProductRegistrationPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideFeatureProductRegistrationPage })));
+const GuideFeatureB2BContentPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideFeatureB2BContentPage })));
+const GuideFeatureEventOfferPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideFeatureEventOfferPage })));
+const GuideFeatureMarketTrialPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideFeatureMarketTrialPage })));
+const GuideFeaturePartnerProgramPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideFeaturePartnerProgramPage })));
+const GuideFeatureForumResourcesPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideFeatureForumResourcesPage })));
+const GuideFeatureCopilotDashboardPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideFeatureCopilotDashboardPage })));
+
 // Loading fallback
 function PageLoading() {
   return (
@@ -596,6 +614,24 @@ function App() {
               <Route path="/market-trial" element={<MarketTrialHubPage />} />
               <Route path="/market-trial/my" element={<MyParticipationsPage />} />
               <Route path="/market-trial/:id" element={<MarketTrialDetailPage />} />
+
+              {/* Guide — Neture 공개 이용 가이드 (WO-O4O-NETURE-GUIDE-IA-AND-WRAPPER-PAGES-V1) */}
+              <Route path="/guide" element={<GuideHomePage />} />
+              <Route path="/guide/intro" element={<GuideIntroPage />} />
+              <Route path="/guide/intro/structure" element={<GuideIntroStructurePage />} />
+              <Route path="/guide/intro/neture" element={<GuideIntroNeturePage />} />
+              <Route path="/guide/intro/operation" element={<GuideIntroOperationPage />} />
+              <Route path="/guide/intro/concept" element={<GuideIntroConceptPage />} />
+              <Route path="/guide/usage" element={<GuideUsagePage />} />
+              <Route path="/guide/features" element={<GuideFeaturesPage />} />
+              <Route path="/guide/features/supplier-onboarding" element={<GuideFeatureSupplierOnboardingPage />} />
+              <Route path="/guide/features/product-registration" element={<GuideFeatureProductRegistrationPage />} />
+              <Route path="/guide/features/b2b-content" element={<GuideFeatureB2BContentPage />} />
+              <Route path="/guide/features/event-offer" element={<GuideFeatureEventOfferPage />} />
+              <Route path="/guide/features/market-trial" element={<GuideFeatureMarketTrialPage />} />
+              <Route path="/guide/features/partner-program" element={<GuideFeaturePartnerProgramPage />} />
+              <Route path="/guide/features/forum-resources" element={<GuideFeatureForumResourcesPage />} />
+              <Route path="/guide/features/copilot-dashboard" element={<GuideFeatureCopilotDashboardPage />} />
 
               {/* ── O4O 소개 영역 — WO-O4O-ABOUT-URL-SEMANTIC-ALIGNMENT-V1 ──
                   NetureLayout 통일: About 이동 후 레이아웃 이탈 방지

@@ -14,6 +14,7 @@ import type { GlobalHeaderNavItem } from '@o4o/ui';
 // 모든 사용자에게 노출
 
 // WO-O4O-GLOBAL-MENU-UPDATE-V1: About → O4O 플랫폼 소개 (위치 유지, /about → /o4o)
+// WO-O4O-NETURE-GUIDE-IA-AND-WRAPPER-PAGES-V1: 이용 가이드 진입 추가
 export const NETURE_PUBLIC_NAV: GlobalHeaderNavItem[] = [
   { label: 'Home', href: '/' },
   { label: '유통 참여형 펀딩', href: '/market-trial' },
@@ -21,6 +22,7 @@ export const NETURE_PUBLIC_NAV: GlobalHeaderNavItem[] = [
   { label: 'Partner', href: '/partner' },
   { label: 'Contact Us', href: '/contact' },
   { label: 'O4O 플랫폼 소개', href: '/o4o' },
+  { label: '이용 가이드', href: '/guide' },
 ];
 
 // ─── Contextual Nav ──────────────────────────────────────���───────────────────
