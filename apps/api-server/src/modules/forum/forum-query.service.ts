@@ -30,10 +30,10 @@ export class ForumQueryService {
       return this.dataSource.query(`
         SELECT p.id, p.title, COALESCE(u.nickname, u.name) as "authorName", p.created_at as "createdAt", f.name as "categoryName"
         FROM forum_post p
-        LEFT JOIN forum_category_requests f ON p.forum_id = f.id AND f.status = 'completed'
+        INNER JOIN forum_category_requests f ON p.forum_id = f.id AND f.status = 'completed'
         LEFT JOIN users u ON p.author_id = u.id
         WHERE p.status = 'publish' AND p.organization_id IS NULL
-          AND (f.forum_type IS NULL OR f.forum_type != 'closed')
+          AND f.forum_type != 'closed'
         ORDER BY p.created_at DESC
         LIMIT $1
       `, [limit]);
@@ -43,10 +43,10 @@ export class ForumQueryService {
     return this.dataSource.query(`
       SELECT p.id, p.title, COALESCE(u.nickname, u.name) as "authorName", p.created_at as "createdAt", f.name as "categoryName"
       FROM forum_post p
-      LEFT JOIN forum_category_requests f ON p.forum_id = f.id AND f.status = 'completed'
+      INNER JOIN forum_category_requests f ON p.forum_id = f.id AND f.status = 'completed'
       LEFT JOIN users u ON p.author_id = u.id
       WHERE p.status = 'publish' AND p.organization_id = $1
-        AND (f.forum_type IS NULL OR f.forum_type != 'closed')
+        AND f.forum_type != 'closed'
       ORDER BY p.created_at DESC
       LIMIT $2
     `, [this.config.organizationId, limit]);
@@ -453,10 +453,10 @@ export class ForumQueryService {
       return this.dataSource.query(`
         SELECT p.id, p.title, COALESCE(u.nickname, u.name) as "authorName", p.created_at as "createdAt", f.name as "categoryName"
         FROM forum_post p
-        LEFT JOIN forum_category_requests f ON p.forum_id = f.id AND f.status = 'completed'
+        INNER JOIN forum_category_requests f ON p.forum_id = f.id AND f.status = 'completed'
         LEFT JOIN users u ON p.author_id = u.id
         WHERE p.status = 'publish' AND p."isPinned" = true AND p.organization_id IS NULL
-          AND (f.forum_type IS NULL OR f.forum_type != 'closed')
+          AND f.forum_type != 'closed'
         ORDER BY p.created_at DESC
         LIMIT $1
       `, [limit]);
@@ -466,10 +466,10 @@ export class ForumQueryService {
     return this.dataSource.query(`
       SELECT p.id, p.title, COALESCE(u.nickname, u.name) as "authorName", p.created_at as "createdAt", f.name as "categoryName"
       FROM forum_post p
-      LEFT JOIN forum_category_requests f ON p.forum_id = f.id AND f.status = 'completed'
+      INNER JOIN forum_category_requests f ON p.forum_id = f.id AND f.status = 'completed'
       LEFT JOIN users u ON p.author_id = u.id
       WHERE p.status = 'publish' AND p."isPinned" = true AND p.organization_id = $1
-        AND (f.forum_type IS NULL OR f.forum_type != 'closed')
+        AND f.forum_type != 'closed'
       ORDER BY p.created_at DESC
       LIMIT $2
     `, [this.config.organizationId, limit]);
