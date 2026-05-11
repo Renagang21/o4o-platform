@@ -226,6 +226,38 @@ export function ContentDocumentsPage({ subType = 'content' }: ContentDocumentsPa
   }, [selectedKeys, items, currentUserId, load, page]);
 
   const columns = useMemo((): O4OColumn<ContentItem>[] => [
+    // ─── 선택 컬럼 (BaseTable selectable 계약: _select key + system:true)
+    // 헤더 체크박스는 BaseTable이 auto-wire, body 체크박스는 여기서 직접 렌더.
+    // restricted 콘텐츠는 체크박스 미표시 (선택 불가).
+    {
+      key: '_select',
+      header: '',
+      width: '44px',
+      align: 'center',
+      system: true,
+      render: (_v, row) => {
+        const isRestricted = row.reusable_policy === 'restricted';
+        if (isRestricted) return null;
+        const isChecked = selectedKeys.has(row.id);
+        return (
+          <input
+            type="checkbox"
+            checked={isChecked}
+            onChange={() => {
+              setSelectedKeys((prev) => {
+                const next = new Set(prev);
+                if (next.has(row.id)) next.delete(row.id);
+                else next.add(row.id);
+                return next;
+              });
+            }}
+            onClick={(e) => e.stopPropagation()}
+            className="w-4 h-4 accent-blue-600 cursor-pointer"
+            aria-label={`${row.title} 선택`}
+          />
+        );
+      },
+    },
     {
       key: 'title',
       header: '제목',
@@ -299,7 +331,7 @@ export function ContentDocumentsPage({ subType = 'content' }: ContentDocumentsPa
         return <RowActionMenu actions={actions} />;
       },
     },
-  ], [currentUserId, copyingId, navigate, handleCopyToStore, handleDelete]);
+  ], [currentUserId, copyingId, selectedKeys, navigate, handleCopyToStore, handleDelete]);
 
   const bulkActions: ActionBarAction[] = [
     {
