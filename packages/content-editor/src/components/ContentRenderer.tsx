@@ -11,7 +11,7 @@
  *   max-width 720px, 가운데 정렬, 이미지 반응형(width:100%, height:auto, display:block)
  */
 
-import { sanitizeHtml } from '../sanitize';
+import { sanitizeHtml, sanitizeRichHtml } from '../sanitize';
 
 interface ContentRendererProps {
   /** 렌더링할 HTML 콘텐츠 */
@@ -21,10 +21,11 @@ interface ContentRendererProps {
   /** 인라인 스타일 */
   style?: React.CSSProperties;
   /**
-   * 렌더링 변형. 'product-detail' 지정 시 상품 상세설명 전용 폭/이미지 규칙 적용.
-   * 다른 편집기 확장 시 variant를 추가하여 재사용 가능.
+   * 렌더링 변형.
+   * - 'product-detail': 상품 상세설명 전용 폭/이미지 규칙 적용
+   * - 'guide': 가이드/온보딩 콘텐츠 렌더링 (YouTube iframe + 이미지 + 리치 블록)
    */
-  variant?: 'product-detail';
+  variant?: 'product-detail' | 'guide';
 }
 
 /** 상품 상세설명 전용 스타일 — 이미지 반응형 + 컨텐츠 폭 제한 */
@@ -54,6 +55,29 @@ function injectProductDetailCss() {
   productDetailCssInjected = true;
 }
 
+/** 가이드/온보딩 콘텐츠 렌더링 CSS — YouTube iframe + 이미지 + 리치 블록 */
+const guideCss = `
+.guide-rich-content img { max-width: 100%; height: auto; border-radius: 6px; margin: 8px 0; display: block; }
+.guide-rich-content iframe { width: 100%; max-width: 640px; aspect-ratio: 16/9; border: none; border-radius: 6px; margin: 8px 0; display: block; }
+.guide-rich-content h2 { font-size: 1.25em; font-weight: 700; margin: 1em 0 0.4em; }
+.guide-rich-content h3 { font-size: 1.1em; font-weight: 600; margin: 0.8em 0 0.3em; }
+.guide-rich-content ul, .guide-rich-content ol { padding-left: 1.5em; margin: 0.4em 0; }
+.guide-rich-content li { margin: 0.2em 0; }
+.guide-rich-content a { color: #2563eb; text-decoration: underline; }
+.guide-rich-content p { margin: 0 0 0.5em; }
+`;
+
+let guideCssInjected = false;
+
+function injectGuideCss() {
+  if (guideCssInjected) return;
+  if (typeof document === 'undefined') return;
+  const style = document.createElement('style');
+  style.textContent = guideCss;
+  document.head.appendChild(style);
+  guideCssInjected = true;
+}
+
 export function ContentRenderer({ html = '', className, style, variant }: ContentRendererProps) {
   if (variant === 'product-detail') {
     injectProductDetailCss();
@@ -62,6 +86,17 @@ export function ContentRenderer({ html = '', className, style, variant }: Conten
         className={`product-detail-content ${className || ''}`}
         style={{ ...productDetailStyle, ...style }}
         dangerouslySetInnerHTML={{ __html: sanitizeHtml(html) }}
+      />
+    );
+  }
+
+  if (variant === 'guide') {
+    injectGuideCss();
+    return (
+      <div
+        className={`guide-rich-content ${className || ''}`}
+        style={{ lineHeight: 1.7, ...style }}
+        dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(html) }}
       />
     );
   }

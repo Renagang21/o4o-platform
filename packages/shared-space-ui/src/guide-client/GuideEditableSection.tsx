@@ -16,7 +16,7 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
-import { RichTextEditor, sanitizeRichHtml } from '@o4o/content-editor';
+import { RichTextEditor, ContentRenderer } from '@o4o/content-editor';
 import type { GuideClient } from './createGuideClient';
 
 export interface GuideEditableSectionProps {
@@ -85,15 +85,11 @@ export function GuideEditableSection({
 
   return (
     <>
-      {/* 콘텐츠 표시 영역 — 리치 콘텐츠(이미지·동영상) 지원을 위해 block 컨테이너 사용 */}
-      <div style={{ position: 'relative' }}>
+      {/* 콘텐츠 표시 영역 — ContentRenderer(canonical) 기반 */}
+      <div>
         {dbContent !== null ? (
           String(dbContent).trim() ? (
-            <div
-              className="guide-rich-content"
-              dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(String(dbContent)) }}
-              style={{ lineHeight: 1.7 }}
-            />
+            <ContentRenderer variant="guide" html={String(dbContent)} />
           ) : (
             canEdit ? (
               <span style={{ color: '#aaa', fontStyle: 'italic' }}>
@@ -128,18 +124,6 @@ export function GuideEditableSection({
           </button>
         )}
       </div>
-
-      {/* 리치 콘텐츠 렌더링 CSS */}
-      <style>{`
-        .guide-rich-content img { max-width: 100%; height: auto; border-radius: 6px; margin: 8px 0; display: block; }
-        .guide-rich-content iframe { width: 100%; max-width: 640px; aspect-ratio: 16/9; border: none; border-radius: 6px; margin: 8px 0; display: block; }
-        .guide-rich-content h2 { font-size: 1.25em; font-weight: 700; margin: 1em 0 0.4em; }
-        .guide-rich-content h3 { font-size: 1.1em; font-weight: 600; margin: 0.8em 0 0.3em; }
-        .guide-rich-content ul, .guide-rich-content ol { padding-left: 1.5em; margin: 0.4em 0; }
-        .guide-rich-content li { margin: 0.2em 0; }
-        .guide-rich-content a { color: #2563eb; text-decoration: underline; }
-        .guide-rich-content p { margin: 0 0 0.5em; }
-      `}</style>
 
       {/* 에디터 모달 */}
       {modalOpen && (
