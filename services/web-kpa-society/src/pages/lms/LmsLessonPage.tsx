@@ -1034,7 +1034,7 @@ export function LmsLessonPage() {
                 인증서 보기
               </Link>
               <Link
-                to="/lms/courses"
+                to="/lms"
                 style={{ ...styles.modalCloseBtn, textDecoration: 'none', textAlign: 'center' as const, display: 'block' }}
                 onClick={() => setShowCompletionModal(false)}
               >

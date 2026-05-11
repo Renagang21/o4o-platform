@@ -127,7 +127,7 @@ export function MyCreditsPage() {
           icon="📋"
           title="적립 내역이 없습니다"
           description="학습 활동을 완료하면 크레딧이 적립됩니다."
-          action={{ label: '학습 시작', onClick: () => window.location.href = '/lms/courses' }}
+          action={{ label: '학습 시작', onClick: () => window.location.href = '/lms' }}
         />
       ) : (
         <>

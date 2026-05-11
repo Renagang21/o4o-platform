@@ -150,7 +150,7 @@ export function WorkLearningPage() {
                 <h3 style={styles.recommendTitle}>{course.title}</h3>
                 <span style={styles.recommendDuration}>{course.duration}</span>
               </div>
-              <Link to="/lms/courses" style={styles.viewButton}>
+              <Link to="/lms" style={styles.viewButton}>
                 보기
               </Link>
             </div>

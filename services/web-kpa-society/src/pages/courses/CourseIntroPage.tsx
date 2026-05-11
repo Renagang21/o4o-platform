@@ -143,7 +143,7 @@ export function CourseIntroPage() {
             <button style={styles.loginButton} onClick={openLoginModal}>
               로그인
             </button>
-            <Link to="/lms/courses" style={styles.backLink}>
+            <Link to="/lms" style={styles.backLink}>
               목록으로 돌아가기
             </Link>
           </div>
@@ -163,7 +163,7 @@ export function CourseIntroPage() {
           icon="⚠️"
           title="강좌를 찾을 수 없습니다"
           description={error || '삭제되었거나 존재하지 않는 강좌입니다.'}
-          action={{ label: '목록으로', onClick: () => navigate('/lms/courses') }}
+          action={{ label: '목록으로', onClick: () => navigate('/lms') }}
         />
       </div>
     );
@@ -183,7 +183,7 @@ export function CourseIntroPage() {
         title=""
         breadcrumb={[
           { label: '홈', href: '/' },
-          { label: '교육', href: '/lms/courses' },
+          { label: '교육', href: '/lms' },
           { label: course.title },
         ]}
       />

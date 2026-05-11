@@ -126,7 +126,7 @@ export function MyCertificatesPage() {
           icon="📋"
           title="완료 기록이 없습니다"
           description="안내 흐름을 완료하면 기록이 생성됩니다."
-          action={{ label: '안내 흐름 보기', onClick: () => window.location.href = `/lms/courses` }}
+          action={{ label: '안내 흐름 보기', onClick: () => window.location.href = '/lms' }}
         />
       ) : (
         <>

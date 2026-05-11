@@ -87,7 +87,7 @@ export function MyCompletionsPage() {
           icon="📋"
           title="수료 내역이 없습니다"
           description="코스를 완료하면 수료 기록이 자동으로 생성됩니다."
-          action={{ label: '코스 보기', onClick: () => window.location.href = '/lms/courses' }}
+          action={{ label: '코스 보기', onClick: () => window.location.href = '/lms' }}
         />
       ) : (
         <>

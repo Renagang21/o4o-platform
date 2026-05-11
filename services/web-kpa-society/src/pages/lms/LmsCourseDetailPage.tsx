@@ -130,7 +130,7 @@ export function LmsCourseDetailPage() {
           icon="⚠️"
           title="안내 흐름을 찾을 수 없습니다"
           description={error || '삭제되었거나 존재하지 않는 안내 흐름입니다.'}
-          action={{ label: '목록으로', onClick: () => navigate('/lms/courses') }}
+          action={{ label: '목록으로', onClick: () => navigate('/lms') }}
         />
       </div>
     );
@@ -145,7 +145,7 @@ export function LmsCourseDetailPage() {
         title=""
         breadcrumb={[
           { label: '홈', href: '/' },
-          { label: '안내', href: '/lms/courses' },
+          { label: '안내', href: '/lms' },
           { label: course.title },
         ]}
       />

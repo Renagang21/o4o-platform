@@ -101,7 +101,7 @@ export function LmsCertificatesPage() {
         description="완료한 안내 흐름의 기록을 확인하세요"
         breadcrumb={[
           { label: '홈', href: '/' },
-          { label: '안내', href: '/lms/courses' },
+          { label: '안내', href: '/lms' },
           { label: '완료 기록' },
         ]}
       />
@@ -111,7 +111,7 @@ export function LmsCertificatesPage() {
           icon="📋"
           title="완료 기록이 없습니다"
           description="안내 흐름을 완료하면 기록이 생성됩니다."
-          action={{ label: '안내 흐름 보기', onClick: () => window.location.href = '/lms/courses' }}
+          action={{ label: '안내 흐름 보기', onClick: () => window.location.href = '/lms' }}
         />
       ) : (
         <>
