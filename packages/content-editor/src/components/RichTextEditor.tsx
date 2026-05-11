@@ -5,6 +5,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
+import { ContentRenderer } from './ContentRenderer';
+import { sanitizeRichHtml } from '../sanitize';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import Link from '@tiptap/extension-link';
@@ -50,6 +52,8 @@ export function RichTextEditor({
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
   const [saveModalOpen, setSaveModalOpen] = useState(false);
   const [pasteUploading, setPasteUploading] = useState(false);
+  const [activeTab, setActiveTab] = useState<'edit' | 'html' | 'preview'>('edit');
+  const [htmlSource, setHtmlSource] = useState('');
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -142,6 +146,18 @@ export function RichTextEditor({
     return () => clearInterval(interval);
   }, [autoSaveInterval, onSave, editor]);
 
+  // 탭 전환 — HTML 탭→편집 탭 시 sanitize 후 editor에 반영
+  function switchTab(tab: 'edit' | 'html' | 'preview') {
+    if (activeTab === 'html' && tab === 'edit') {
+      const clean = sanitizeRichHtml(htmlSource);
+      editor?.commands.setContent(clean);
+      // onUpdate가 onChange를 호출하므로 별도 호출 불필요
+    } else if (tab !== 'edit') {
+      setHtmlSource(editor?.getHTML() || '');
+    }
+    setActiveTab(tab);
+  }
+
   // 키보드 단축키로 저장
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -188,8 +204,40 @@ export function RichTextEditor({
           이미지 업로드 중…
         </div>
       )}
-      {editable && <Toolbar editor={editor} preset={preset} onImageUpload={onImageUpload} existingImages={existingImages} onMediaLibraryPick={onMediaLibraryPick} aiRequestHeaders={aiRequestHeaders} showCommunitySave={showCommunitySave} showStoreSave={showStoreSave} />}
-      <div style={{ overflow: 'hidden', borderRadius: showTemplateActions ? '0' : '0 0 8px 8px' }}>
+
+      {/* 탭 바 — full preset + 편집 가능 모드에서만 표시 */}
+      {editable && preset !== 'compact' && (
+        <div style={{ display: 'flex', borderBottom: '1px solid #e5e7eb', background: '#f9fafb' }}>
+          {(['edit', 'html', 'preview'] as const).map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              onClick={() => switchTab(tab)}
+              style={{
+                padding: '7px 16px',
+                fontSize: 13,
+                fontWeight: activeTab === tab ? 600 : 400,
+                color: activeTab === tab ? '#4f46e5' : '#6b7280',
+                background: 'none',
+                border: 'none',
+                borderBottom: activeTab === tab ? '2px solid #4f46e5' : '2px solid transparent',
+                cursor: 'pointer',
+                lineHeight: 1,
+              }}
+            >
+              {tab === 'edit' ? '편집' : tab === 'html' ? 'HTML' : '미리보기'}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* 툴바 — 편집 탭에서만 표시 */}
+      {editable && activeTab === 'edit' && (
+        <Toolbar editor={editor} preset={preset} onImageUpload={onImageUpload} existingImages={existingImages} onMediaLibraryPick={onMediaLibraryPick} aiRequestHeaders={aiRequestHeaders} showCommunitySave={showCommunitySave} showStoreSave={showStoreSave} />
+      )}
+
+      {/* 편집 탭 — 항상 마운트, 다른 탭에서는 숨김 (에디터 상태 유지) */}
+      <div style={{ display: activeTab === 'edit' ? undefined : 'none', overflow: 'hidden', borderRadius: showTemplateActions ? '0' : '0 0 8px 8px' }}>
         <EditorContent
           editor={editor}
           style={{
@@ -198,6 +246,47 @@ export function RichTextEditor({
           }}
         />
       </div>
+
+      {/* HTML 탭 */}
+      {activeTab === 'html' && (
+        <div style={{ padding: '12px' }}>
+          <textarea
+            value={htmlSource}
+            onChange={(e) => setHtmlSource(e.target.value)}
+            style={{
+              width: '100%',
+              minHeight,
+              fontFamily: "'Fira Code', Consolas, monospace",
+              fontSize: 12,
+              border: '1px solid #e5e7eb',
+              borderRadius: 4,
+              padding: '12px',
+              resize: 'vertical',
+              lineHeight: 1.5,
+              boxSizing: 'border-box',
+              outline: 'none',
+              color: '#1e293b',
+              background: '#f8fafc',
+            }}
+            placeholder="HTML 코드를 직접 입력하거나 외부 HTML을 붙여넣으세요..."
+            spellCheck={false}
+          />
+          <p style={{ marginTop: 6, fontSize: 11, color: '#9ca3af', margin: '4px 0 0' }}>
+            편집 탭으로 전환하면 HTML이 자동 적용됩니다 · script, 위험 태그는 자동 제거됩니다
+          </p>
+        </div>
+      )}
+
+      {/* 미리보기 탭 */}
+      {activeTab === 'preview' && (
+        <div style={{ padding: '16px', minHeight }}>
+          {htmlSource ? (
+            <ContentRenderer variant="guide" html={htmlSource} />
+          ) : (
+            <p style={{ color: '#9ca3af', fontSize: 13 }}>미리볼 내용이 없습니다.</p>
+          )}
+        </div>
+      )}
       {showTemplateActions && (
         <div
           style={{

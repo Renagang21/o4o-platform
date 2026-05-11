@@ -247,27 +247,6 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
         <ListOrdered size={18} />
       </ToolButton>
 
-      {/* guide preset: Heading H2/H3 */}
-      {preset === 'guide' && (
-        <>
-          <Divider />
-          <ToolButton
-            onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-            isActive={editor.isActive('heading', { level: 2 })}
-            title="제목 2"
-          >
-            <Heading2 size={18} />
-          </ToolButton>
-          <ToolButton
-            onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-            isActive={editor.isActive('heading', { level: 3 })}
-            title="제목 3"
-          >
-            <Heading3 size={18} />
-          </ToolButton>
-        </>
-      )}
-
       {preset === 'full' && (
         <>
           <Divider />
@@ -410,8 +389,8 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
         )}
       </div>
 
-      {/* Image (full + guide) */}
-      {(preset === 'full' || preset === 'guide') && (
+      {/* Image (full only) */}
+      {preset === 'full' && (
         <div style={{ position: 'relative' }}>
           <ToolButton
             onClick={() => {
@@ -586,76 +565,6 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
                   </div>
                 </>
               )}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Video (full + guide) */}
-      {preset === 'guide' && (
-        <div style={{ position: 'relative' }}>
-          <ToolButton
-            onClick={() => {
-              const next = !showVideoInput;
-              if (next) {
-                window.dispatchEvent(new CustomEvent('content-editor-popup-open', { detail: toolbarId.current }));
-                setShowLinkInput(false);
-                setShowImageInput(false);
-              }
-              setShowVideoInput(next);
-            }}
-            title="동영상 (YouTube/Vimeo)"
-          >
-            <Youtube size={18} />
-          </ToolButton>
-          {showVideoInput && (
-            <div style={{
-              position: 'absolute',
-              top: '100%',
-              right: 0,
-              zIndex: 10,
-              background: 'white',
-              border: '1px solid #e5e7eb',
-              borderRadius: '8px',
-              padding: '12px',
-              boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-              minWidth: '300px',
-            }}>
-              <div style={{ marginBottom: '8px', fontSize: '13px', color: '#6b7280' }}>
-                YouTube 또는 Vimeo URL 입력
-              </div>
-              <div style={{ display: 'flex', gap: '4px' }}>
-                <input
-                  type="url"
-                  value={videoUrl}
-                  onChange={(e) => setVideoUrl(e.target.value)}
-                  placeholder="https://www.youtube.com/watch?v=..."
-                  style={{
-                    flex: 1,
-                    padding: '6px 10px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '4px',
-                    fontSize: '14px',
-                  }}
-                  onKeyDown={(e) => e.key === 'Enter' && handleAddVideo()}
-                />
-                <button
-                  onClick={handleAddVideo}
-                  style={{
-                    padding: '6px 12px',
-                    background: '#4f46e5',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                  }}
-                >
-                  삽입
-                </button>
-              </div>
-              <div style={{ marginTop: '8px', fontSize: '11px', color: '#9ca3af' }}>
-                지원: YouTube, Vimeo
-              </div>
             </div>
           )}
         </div>

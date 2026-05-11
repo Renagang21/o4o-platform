@@ -169,7 +169,6 @@ export function GuideEditableSection({
               <RichTextEditor
                 value={editorValue}
                 onChange={(content) => setEditorValue(content.html)}
-                preset="guide"
                 minHeight="200px"
               />
             </div>
