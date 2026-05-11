@@ -15,9 +15,10 @@
  */
 
 import { useState, useEffect, type MouseEvent } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { PageSection, PageContainer } from '@o4o/ui';
+import { RowActionMenu } from '@o4o/ui';
 import {
   PageHeader,
   LoadingSpinner,
@@ -26,6 +27,8 @@ import {
   HubEntityCard,
 } from '../../components/common';
 import { lmsApi } from '../../api';
+import { lmsInstructorApi } from '../../api/lms-instructor';
+import { qualificationApi, type MemberQualification } from '../../api/qualification';
 import { assetSnapshotApi } from '../../api/assetSnapshot';
 import { useAuth } from '../../contexts';
 import type { Course } from '../../types';
@@ -63,7 +66,43 @@ const resolveCta = (course: Course, loggedIn: boolean): CtaSpec => {
   return { label: '로그인 후 수강', to: '/login', state: { from: detailPath } };
 };
 
+// WO-O4O-LMS-CANONICAL-ROUTE-ALIGN-V1
+// EducationPage에서 이관된 강사 CTA 컴포넌트.
+// 강사 여부(isInstructor)와 자격 심사 상태(qualStatus)에 따라 분기.
+function InstructorHeaderAction({ isInstructor, qualStatus, navigate }: {
+  isInstructor: boolean;
+  qualStatus: 'idle' | 'pending' | 'approved' | 'rejected';
+  navigate: ReturnType<typeof useNavigate>;
+}) {
+  if (isInstructor) {
+    return (
+      <button style={instructorCtaStyles.primaryBtn} onClick={() => navigate('/instructor/courses/new')}>
+        + 강의 등록
+      </button>
+    );
+  }
+  if (qualStatus === 'pending') {
+    return (
+      <div style={instructorCtaStyles.pendingWrap}>
+        <span style={instructorCtaStyles.pendingBadge}>강사 신청 심사 중</span>
+        <button style={instructorCtaStyles.linkBtn} onClick={() => navigate('/mypage/qualifications')}>
+          상태 확인 →
+        </button>
+      </div>
+    );
+  }
+  return (
+    <div style={instructorCtaStyles.applyWrap}>
+      <button style={instructorCtaStyles.secondaryBtn} onClick={() => navigate('/mypage/qualifications')}>
+        강사 신청
+      </button>
+      <p style={instructorCtaStyles.hint}>승인까지 1~2일 소요될 수 있습니다.</p>
+    </div>
+  );
+}
+
 export function LmsCoursesPage() {
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { user, isKpaContextLoaded } = useAuth();
   const [courses, setCourses] = useState<Course[]>([]);
@@ -76,9 +115,28 @@ export function LmsCoursesPage() {
   const [selectedCourseIds, setSelectedCourseIds] = useState<Set<string>>(new Set());
   const [bulkResult, setBulkResult] = useState<BulkResult | null>(null);
   const [isBulkAdding, setIsBulkAdding] = useState(false);
+  // WO-O4O-LMS-CANONICAL-ROUTE-ALIGN-V1: 강사 자격 심사 상태
+  const [qualStatus, setQualStatus] = useState<'idle' | 'pending' | 'approved' | 'rejected'>('idle');
 
   const currentPage = parseInt(searchParams.get('page') || '1');
   const currentCategory = searchParams.get('category') || '';
+  const isAuthenticated = !!user;
+  // WO-O4O-LMS-CANONICAL-ROUTE-ALIGN-V1: 강사 여부
+  const isInstructor = user?.roles?.includes('lms:instructor') ?? false;
+
+  // WO-O4O-LMS-CANONICAL-ROUTE-ALIGN-V1: 강사 신청 자격 조회 (비강사 로그인 상태에서만)
+  useEffect(() => {
+    if (!isAuthenticated || isInstructor) return;
+    (async () => {
+      try {
+        const res = await qualificationApi.getMyQualifications();
+        const lmsQual = res.data.data?.find((q: MemberQualification) => q.qualification_type === 'lms_creator');
+        if (lmsQual) setQualStatus(lmsQual.status);
+      } catch {
+        // 조회 실패 시 idle 유지
+      }
+    })();
+  }, [isAuthenticated, isInstructor]);
 
   // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1: 매장 보유자만 자료함 액션 노출
   const isStoreOwner = !!user?.isStoreOwner && !!user?.kpaMembership?.organizationId;
@@ -240,6 +298,13 @@ export function LmsCoursesPage() {
           breadcrumb={[{ label: '홈', href: '/' }, { label: '강의' }]}
         />
 
+        {/* WO-O4O-LMS-CANONICAL-ROUTE-ALIGN-V1: 강사 CTA (로그인 상태에서만) */}
+        {isAuthenticated && (
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
+            <InstructorHeaderAction isInstructor={isInstructor} qualStatus={qualStatus} navigate={navigate} />
+          </div>
+        )}
+
         {courses.length === 0 ? (
           <EmptyState
             icon="📋"
@@ -321,6 +386,10 @@ export function LmsCoursesPage() {
                             : '＋ 내 자료함에 추가'}
                         </button>
                       ) : null}
+                      {/* WO-O4O-LMS-CANONICAL-ROUTE-ALIGN-V1: 강사 본인 강의 수정/종료 */}
+                      {isInstructor && user?.id && (course as any).instructor?.id === user.id && (
+                        <RowActionMenu actions={buildCourseOwnerActions(course, navigate, loadData)} />
+                      )}
                     </HubEntityCard>
                   </div>
                 );
@@ -553,3 +622,64 @@ const modalCloseBtnStyle: React.CSSProperties = {
   fontWeight: 600,
   cursor: 'pointer',
 };
+
+// WO-O4O-LMS-CANONICAL-ROUTE-ALIGN-V1: 강사 CTA 스타일 (EducationPage에서 이관)
+const instructorCtaStyles: Record<string, React.CSSProperties> = {
+  primaryBtn: {
+    padding: '8px 18px', fontSize: '14px', fontWeight: 600,
+    color: '#ffffff', backgroundColor: '#2563eb',
+    border: 'none', borderRadius: '8px', cursor: 'pointer', whiteSpace: 'nowrap',
+  },
+  secondaryBtn: {
+    padding: '8px 18px', fontSize: '14px', fontWeight: 600,
+    color: '#2563eb', backgroundColor: '#eff6ff',
+    border: '1px solid #bfdbfe', borderRadius: '8px', cursor: 'pointer', whiteSpace: 'nowrap',
+  },
+  pendingWrap: { display: 'flex', alignItems: 'center', gap: '10px' },
+  pendingBadge: {
+    padding: '6px 14px', fontSize: '13px', fontWeight: 500,
+    color: '#92400e', backgroundColor: '#fef3c7',
+    border: '1px solid #fde68a', borderRadius: '20px',
+  },
+  linkBtn: {
+    padding: '0', fontSize: '13px', fontWeight: 500,
+    color: '#2563eb', background: 'transparent', border: 'none',
+    cursor: 'pointer', textDecoration: 'underline',
+  },
+  applyWrap: { display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' },
+  hint: { margin: 0, fontSize: '11px', color: '#94a3b8' },
+};
+
+// WO-O4O-LMS-CANONICAL-ROUTE-ALIGN-V1: 강사 본인 강의 수정/종료 액션 (EducationPage renderRowActions 이관)
+function buildCourseOwnerActions(
+  course: Course,
+  navigate: ReturnType<typeof useNavigate>,
+  reload: () => void,
+) {
+  return [
+    {
+      key: 'edit',
+      label: '수정',
+      onClick: () => navigate(`/instructor/courses/${course.id}/edit`),
+    },
+    {
+      key: 'delete',
+      label: '강의 종료',
+      variant: 'danger' as const,
+      onClick: async () => {
+        try {
+          await lmsInstructorApi.deleteCourse(course.id);
+          toast.success('강의가 종료 처리되었습니다');
+          reload();
+        } catch {
+          toast.error('처리에 실패했습니다');
+        }
+      },
+      confirm: {
+        title: '강의 종료',
+        message: '이 강의를 종료(보관) 처리하시겠습니까?',
+        variant: 'danger' as const,
+      },
+    },
+  ];
+}

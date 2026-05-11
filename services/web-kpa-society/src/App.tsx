@@ -38,7 +38,7 @@ const ForumFeedPage = lazy(() => import('./pages/forum/ForumFeedPage').then(m =>
 import { MarketTrialNetureRedirect } from './components/MarketTrialNetureRedirect';
 
 // LMS pages — WO-KPA-SOCIETY-APP-ROUTE-CODE-SPLITTING-V1: lazy (barrel unwound)
-const EducationPage = lazy(() => import('./pages/lms/EducationPage').then(m => ({ default: m.EducationPage })));
+// WO-O4O-LMS-CANONICAL-ROUTE-ALIGN-V1: EducationPage 제거, /lms → LmsCoursesPage
 const LmsCoursesPage = lazy(() => import('./pages/lms/LmsCoursesPage').then(m => ({ default: m.LmsCoursesPage })));
 const LmsCourseDetailPage = lazy(() => import('./pages/lms/LmsCourseDetailPage').then(m => ({ default: m.LmsCourseDetailPage })));
 const LmsLessonPage = lazy(() => import('./pages/lms/LmsLessonPage').then(m => ({ default: m.LmsLessonPage })));
@@ -756,9 +756,9 @@ function App() {
           {/* WO-O4O-LMS-ASSIGNMENT-GRADING-V1: 과제 채점 */}
           <Route path="/instructor/courses/:courseId/lessons/:lessonId/submissions" element={<InstructorLayout><LessonSubmissionsPage /></InstructorLayout>} />
 
-          {/* LMS (교육/강의) */}
-          <Route path="/lms" element={<Layout serviceName={SERVICE_NAME}><EducationPage /></Layout>} />
-          <Route path="/lms/courses" element={<Layout serviceName={SERVICE_NAME}><LmsCoursesPage /></Layout>} />
+          {/* LMS (교육/강의) — WO-O4O-LMS-CANONICAL-ROUTE-ALIGN-V1: /lms canonical → LmsCoursesPage */}
+          <Route path="/lms" element={<Layout serviceName={SERVICE_NAME}><LmsCoursesPage /></Layout>} />
+          <Route path="/lms/courses" element={<Navigate to="/lms" replace />} />
           <Route path="/lms/course/:id" element={<Layout serviceName={SERVICE_NAME}><LmsCourseDetailPage /></Layout>} />
           <Route path="/lms/course/:courseId/lesson/:lessonId" element={<Layout serviceName={SERVICE_NAME}><LmsLessonPage /></Layout>} />
           <Route path="/lms/certificate" element={<Layout serviceName={SERVICE_NAME}><LmsCertificatesPage /></Layout>} />
@@ -983,9 +983,9 @@ function DemoLayoutRoutes() {
         {/* WO-O4O-FORUM-MULTI-STRUCTURE-RECONSTRUCTION-V1: 포럼 피드 */}
         <Route path="/forum/:slug" element={<ForumFeedPage />} />
 
-        {/* LMS (교육) - WO-KPA-COMMUNITY-HOME-V1 */}
-        <Route path="/lms" element={<EducationPage />} />
-        <Route path="/lms/courses" element={<LmsCoursesPage />} />
+        {/* LMS (교육) - WO-O4O-LMS-CANONICAL-ROUTE-ALIGN-V1 */}
+        <Route path="/lms" element={<LmsCoursesPage />} />
+        <Route path="/lms/courses" element={<Navigate to="/lms" replace />} />
         <Route path="/lms/course/:id" element={<LmsCourseDetailPage />} />
         <Route path="/lms/course/:courseId/lesson/:lessonId" element={<LmsLessonPage />} />
         <Route path="/lms/certificate" element={<LmsCertificatesPage />} />
