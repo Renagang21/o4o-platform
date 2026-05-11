@@ -201,6 +201,18 @@ export interface ProductSnapshotData {
   conversionRate: number;
 }
 
+// AI 추천 상품 (WO-O4O-STORE-COPILOT-DASHBOARD-V1)
+// WO-O4O-WEB-GLYCOPHARM-TYPECHECK-DEBT-V1: StoreMainPage 가 사용 중인 type/method drift 정합화
+export interface RecommendedProductData {
+  id: string;
+  marketingName: string;
+  score: number;
+  categoryName?: string | null;
+  brandName?: string | null;
+  reason: string;
+  tags: string[];
+}
+
 
 class PharmacyApiClient {
   private async request<T>(
@@ -336,6 +348,15 @@ class PharmacyApiClient {
    */
   async getProductSnapshots(): Promise<StoreApiResponse<ProductSnapshotData[]>> {
     return this.request('/store-hub/ai/products/snapshots');
+  }
+
+  /**
+   * AI 추천 상품 조회 (WO-O4O-STORE-COPILOT-DASHBOARD-V1)
+   * WO-O4O-WEB-GLYCOPHARM-TYPECHECK-DEBT-V1: client drift 정합화. 미존재 endpoint 응답은
+   * consumer 의 .catch 로 graceful empty 처리 — 기존 runtime 동작 유지.
+   */
+  async getStoreProductRecommendations(): Promise<StoreApiResponse<{ products: RecommendedProductData[] }>> {
+    return this.request('/store-hub/ai/products/recommendations');
   }
 
   /**

@@ -3,12 +3,9 @@ import {
   FileCheck,
   Search,
   Clock,
-  CheckCircle,
-  XCircle,
   ChevronDown,
   Loader2,
   AlertCircle,
-  RotateCcw,
 } from 'lucide-react';
 import { BaseDetailDrawer } from '@o4o/ui';
 import { DataTable } from '@o4o/operator-ux-core';

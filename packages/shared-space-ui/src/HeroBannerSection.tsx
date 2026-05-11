@@ -13,7 +13,7 @@
  *   - 광고 데이터 source (각 서비스 API)
  */
 
-import { useState, useEffect, useCallback, CSSProperties } from 'react';
+import { useState, useEffect, useCallback, type CSSProperties } from 'react';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
