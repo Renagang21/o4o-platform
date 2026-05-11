@@ -21,7 +21,7 @@
 
 import { useEffect, useState, useCallback, useMemo, useRef, type CSSProperties } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { BookOpen, Sparkles, Trash2, RefreshCw, Search, FileText } from 'lucide-react';
+import { BookOpen, Sparkles, Trash2, RefreshCw, Search, FileText, PenSquare } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { DataTable, Pagination } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
@@ -33,6 +33,7 @@ import {
 } from '../../api/assetSnapshot';
 import { colors } from '../../styles/theme';
 import { StartProductionModal, type ProductionSource, type ProductionSourceItem } from './StartProductionModal';
+import { CreateContentFromResourcesModal } from './CreateContentFromResourcesModal';
 
 const PAGE_LIMIT = 20;
 const SEARCH_DEBOUNCE_MS = 300;
@@ -138,6 +139,10 @@ export default function StoreLibraryContentsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalSource, setModalSource] = useState<ProductionSource | null>(null);
 
+  // WO-O4O-STORE-CONTENT-CREATION-FROM-LIBRARY-RESOURCES-V1
+  // "콘텐츠 제작" 진입 — 자료 선택 → AI 정리 → direct content 저장
+  const [createFromResourcesOpen, setCreateFromResourcesOpen] = useState(false);
+
   const openProduction = useCallback((items: ProductionSourceItem[]) => {
     if (items.length === 0) return;
     setModalSource({ fromLibrary: 'contents', items });
@@ -167,10 +172,21 @@ export default function StoreLibraryContentsPage() {
             문서형/코스형 콘텐츠를 분리해 보여드립니다. 선택 후 "제작 시작" 으로 POP / QR / 블로그 / 상품 상세설명을 만들 수 있습니다.
           </p>
         </div>
-        <button onClick={reload} style={styles.refreshBtn}>
-          <RefreshCw size={14} />
-          새로고침
-        </button>
+        <div style={styles.headerActions}>
+          {/* WO-O4O-STORE-CONTENT-CREATION-FROM-LIBRARY-RESOURCES-V1 */}
+          <button
+            type="button"
+            onClick={() => setCreateFromResourcesOpen(true)}
+            style={styles.createBtn}
+          >
+            <PenSquare size={14} />
+            콘텐츠 제작
+          </button>
+          <button onClick={reload} style={styles.refreshBtn}>
+            <RefreshCw size={14} />
+            새로고침
+          </button>
+        </div>
       </div>
 
       <DocumentsSection
@@ -192,6 +208,16 @@ export default function StoreLibraryContentsPage() {
         open={modalOpen}
         source={modalSource}
         onClose={() => setModalOpen(false)}
+      />
+
+      {/* WO-O4O-STORE-CONTENT-CREATION-FROM-LIBRARY-RESOURCES-V1 */}
+      <CreateContentFromResourcesModal
+        open={createFromResourcesOpen}
+        onClose={() => setCreateFromResourcesOpen(false)}
+        onCreated={() => {
+          // direct content 가 새로 생성되면 콘텐츠 목록 갱신
+          reload();
+        }}
       />
     </div>
   );
@@ -696,6 +722,25 @@ const styles: Record<string, CSSProperties> = {
     fontSize: '13px',
     color: colors.neutral500,
     margin: '6px 0 0',
+  },
+  headerActions: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    flexWrap: 'wrap',
+  },
+  createBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '6px 14px',
+    background: colors.primary,
+    border: 'none',
+    borderRadius: '6px',
+    fontSize: '13px',
+    fontWeight: 500,
+    color: colors.white,
+    cursor: 'pointer',
   },
   refreshBtn: {
     display: 'inline-flex',
