@@ -7,6 +7,12 @@
  *   - dead flag 제거: aiPrefillRequested (수신측에서 누구도 사용 안 함)
  *   - 제작 흐름: 자료 선택 → 본 modal에서 제작 대상 선택 → 편집기 route 이동
  *
+ * WO-O4O-KPA-STORE-PRODUCTION-ENTRY-UNIFY-V1:
+ *   - target 카탈로그를 productionTargets 로 추출. 라우트/라벨/아이콘 SSOT 단일화.
+ *   - 타입(ProductionTarget/ProductionSource/ProductionSourceItem)도 동 파일로 이동.
+ *     본 모듈은 호환성 위해 re-export 유지.
+ *   - navigate payload 는 buildProductionState() 헬퍼로 표준화.
+ *
  * 본 단계 범위 외 (후속 WO):
  *   - multi-template 시스템
  *   - AI 변환 wizard 단계
@@ -15,30 +21,22 @@
 
 import { useState, useMemo, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Megaphone, QrCode, BookOpen, FileText, X, ArrowRight, Info } from 'lucide-react';
+import { X, ArrowRight, Info } from 'lucide-react';
 import { colors } from '../../styles/theme';
+import {
+  PRODUCTION_TARGET_CATALOG,
+  buildProductionState,
+  findProductionTarget,
+  type ProductionTarget,
+  type ProductionSource,
+} from './productionTargets';
 
-export type ProductionTarget = 'pop' | 'qr' | 'blog' | 'product-description';
-
-export interface ProductionSourceItem {
-  id: string;
-  title: string;
-  description?: string | null;
-  /** 원본 종류: snapshot(asset_snapshots) | direct(kpa_store_contents) | library(store_execution_assets) */
-  origin: 'snapshot' | 'direct' | 'library';
-}
-
-export interface ProductionSource {
-  fromLibrary: 'contents' | 'resources';
-  items: ProductionSourceItem[];
-}
-
-const TARGETS: Array<{ key: ProductionTarget; label: string; Icon: typeof Megaphone; color: string; route: string }> = [
-  { key: 'pop',                 label: 'POP',          Icon: Megaphone, color: '#f59e0b', route: '/store/marketing/pop' },
-  { key: 'qr',                  label: 'QR 코드',      Icon: QrCode,    color: '#0ea5e9', route: '/store/marketing/qr' },
-  { key: 'blog',                label: '블로그',        Icon: BookOpen,  color: '#16a34a', route: '/store/content/blog' },
-  { key: 'product-description', label: '상품 상세설명', Icon: FileText,  color: '#2563EB', route: '/store/marketing/product-descriptions' },
-];
+// 외부 사용처 호환을 위한 type re-export (StoreLibraryContents/Resources/ProductionMaterials, ProductionTypeSelectorModal)
+export type {
+  ProductionTarget,
+  ProductionSource,
+  ProductionSourceItem,
+} from './productionTargets';
 
 // direct origin 한정 안내
 const DIRECT_NOTES: Partial<Record<ProductionTarget, { disabled: boolean; note: string }>> = {
@@ -71,18 +69,11 @@ export function StartProductionModal({ open, source, onClose }: Props) {
   if (!open || !source) return null;
 
   const itemsCount = source.items.length;
-  const targetMeta = selectedTarget ? TARGETS.find((t) => t.key === selectedTarget)! : null;
+  const targetMeta = selectedTarget ? findProductionTarget(selectedTarget) : undefined;
 
   const handleConfirm = () => {
     if (!selectedTarget || !targetMeta) return;
-    navigate(targetMeta.route, {
-      state: {
-        production: {
-          source,
-          target: selectedTarget,
-        },
-      },
-    });
+    navigate(targetMeta.route, { state: buildProductionState({ target: selectedTarget, source }) });
     handleClose();
   };
 
@@ -110,7 +101,7 @@ export function StartProductionModal({ open, source, onClose }: Props) {
           <section style={styles.section}>
             <h3 style={styles.sectionTitle}>제작 대상</h3>
             <div style={styles.targetGrid}>
-              {TARGETS.map((t) => {
+              {PRODUCTION_TARGET_CATALOG.map((t) => {
                 const active = selectedTarget === t.key;
                 const directInfo = allDirect ? DIRECT_NOTES[t.key] : undefined;
                 const isDisabled = directInfo?.disabled === true;
@@ -126,7 +117,7 @@ export function StartProductionModal({ open, source, onClose }: Props) {
                         ...(isDisabled ? styles.targetCardDisabled : {}),
                       }}
                     >
-                      <t.Icon size={20} style={{ color: isDisabled ? colors.neutral300 : t.color }} />
+                      <t.Icon size={20} style={{ color: isDisabled ? colors.neutral300 : t.iconColor }} />
                       <span style={styles.targetLabel}>{t.label}</span>
                     </button>
                     {directInfo && (

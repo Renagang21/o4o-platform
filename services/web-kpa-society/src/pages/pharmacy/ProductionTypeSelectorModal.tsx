@@ -2,6 +2,9 @@
  * ProductionTypeSelectorModal — 매장 제작 자료 만들기 (유형 선택)
  *
  * WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-CREATE-FLOW-V1
+ * WO-O4O-KPA-STORE-PRODUCTION-ENTRY-UNIFY-V1:
+ *   - target/route/icon 카탈로그를 productionTargets 로 추출 (StartProductionModal 과 공유).
+ *   - navigate payload 를 buildProductionState() 헬퍼로 표준화.
  *
  * "매장 제작 자료" 화면의 [매장 제작 자료 만들기] 버튼 진입용 모달.
  * 사용자가 원본 자료를 선택하지 않고 곧장 제작 유형을 고르는 흐름.
@@ -10,67 +13,25 @@
  *   - StartProductionModal: 자료 선택 후 진입 (source.items 필수)
  *   - ProductionTypeSelectorModal: 자료 없이 빈 source 로 진입 (메뉴 직접 진입과 동등)
  *
- * 카드 4종 화이트리스트 고정:
+ * 카드 4종 화이트리스트 고정 (productionTargets.PRODUCTION_TARGET_CATALOG):
  *   POP / QR 코드 / 블로그 / 상품 상세설명
  *
  * 디지털 사이니지는 의도적으로 제외 (KPA Signage 구조 freeze 보호).
  * 상품 정보 제작(product-info-creator)도 본 모달 범위 외.
  *
- * router state payload 는 StartProductionModal 과 동일 형태:
- *   { production: { source: { fromLibrary: 'contents', items: [] }, target } }
- * 수신측(StorePopPage / StoreQRPage 등)은 items.length === 0 일 때
- * early return 으로 메뉴 직접 진입과 동일하게 동작한다.
+ * 수신측(StorePopPage / StoreQRPage / StoreProductDescriptionsPage / PharmacyBlogPage)은
+ * source.items.length === 0 일 때 early return 으로 메뉴 직접 진입과 동일하게 동작한다.
  */
 
 import { type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Megaphone, QrCode, BookOpen, FileText, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { colors } from '../../styles/theme';
-import type { ProductionTarget, ProductionSource } from './StartProductionModal';
-
-interface TypeCard {
-  key: ProductionTarget;
-  label: string;
-  description: string;
-  Icon: typeof Megaphone;
-  iconColor: string;
-  route: string;
-}
-
-const TYPE_CARDS: TypeCard[] = [
-  {
-    key: 'pop',
-    label: 'POP',
-    description: '매장 내 게시용 인쇄물 (PDF)',
-    Icon: Megaphone,
-    iconColor: '#f59e0b',
-    route: '/store/marketing/pop',
-  },
-  {
-    key: 'qr',
-    label: 'QR 코드',
-    description: '매장 입구·제품 옆 부착용 QR',
-    Icon: QrCode,
-    iconColor: '#0ea5e9',
-    route: '/store/marketing/qr',
-  },
-  {
-    key: 'blog',
-    label: '블로그',
-    description: '공개 콘텐츠 게시물',
-    Icon: BookOpen,
-    iconColor: '#16a34a',
-    route: '/store/content/blog',
-  },
-  {
-    key: 'product-description',
-    label: '상품 상세설명',
-    description: '상품 카드/상세 페이지용 본문',
-    Icon: FileText,
-    iconColor: '#2563EB',
-    route: '/store/marketing/product-descriptions',
-  },
-];
+import {
+  PRODUCTION_TARGET_CATALOG,
+  buildProductionState,
+  type ProductionTargetMeta,
+} from './productionTargets';
 
 interface Props {
   open: boolean;
@@ -82,9 +43,8 @@ export function ProductionTypeSelectorModal({ open, onClose }: Props) {
 
   if (!open) return null;
 
-  const handleSelect = (card: TypeCard) => {
-    const source: ProductionSource = { fromLibrary: 'contents', items: [] };
-    navigate(card.route, { state: { production: { source, target: card.key } } });
+  const handleSelect = (card: ProductionTargetMeta) => {
+    navigate(card.route, { state: buildProductionState({ target: card.key }) });
     onClose();
   };
 
@@ -103,7 +63,7 @@ export function ProductionTypeSelectorModal({ open, onClose }: Props) {
 
         <div style={styles.body}>
           <div style={styles.grid}>
-            {TYPE_CARDS.map((card) => (
+            {PRODUCTION_TARGET_CATALOG.map((card) => (
               <button
                 key={card.key}
                 type="button"
