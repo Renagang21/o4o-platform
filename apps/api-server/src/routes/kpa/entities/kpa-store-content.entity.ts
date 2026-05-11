@@ -18,6 +18,7 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
+  CreateDateColumn,
   UpdateDateColumn,
   Index,
 } from 'typeorm';
@@ -45,6 +46,11 @@ export class KpaStoreContent {
 
   @Column({ type: 'jsonb', default: '{}' })
   content_json: Record<string, unknown>;
+
+  // WO-O4O-DIRECT-CONTENT-CREATED-AT-COLUMN-V1: 생성 시점 보존 (수정과 분리).
+  // 기존 row 는 migration 으로 updated_at 값 backfill.
+  @CreateDateColumn({ type: 'timestamp' })
+  created_at: Date;
 
   @UpdateDateColumn()
   updated_at: Date;

@@ -5,8 +5,12 @@
  *
  * 매장 자료함의 "콘텐츠" 영역에서 snapshot 기반 자료(o4o_asset_snapshots) 와
  * direct 작성 자료(kpa_store_contents source_type='direct') 를 단일 paginated feed
- * 로 제공한다. 두 소스는 UNION ALL 후 sort_at(snapshot.created_at 또는
- * direct.updated_at) 기준 정렬되어 페이지 일관성과 검색 일관성을 보장한다.
+ * 로 제공한다. 두 소스는 UNION ALL 후 sort_at(snapshot.created_at, direct.created_at)
+ * 기준 정렬되어 페이지 일관성과 검색 일관성을 보장한다.
+ *
+ * WO-O4O-DIRECT-CONTENT-CREATED-AT-COLUMN-V1:
+ *   direct 의 sort_at 을 updated_at → created_at 으로 변경. 수정해도 feed 순서가
+ *   바뀌지 않도록 "생성 시점" 기준 정렬을 보장.
  *
  * 이 컨트롤러는 기존 `store-library.controller.ts` (store_library_items CRUD, 자료
  * Display Domain) 와 별개이며 mount 경로도 분리된다 — 자료함 "콘텐츠" 통합 view 전용.
@@ -34,7 +38,7 @@
  *   - libraryItem 독립성 유지 (id = snapshot.id 또는 store_content.id)
  *   - sourceAssetId 기반 dedupe 금지 — 동일 원본 다중 복사 유지
  *   - publishStatus / control 필드는 snapshot 항목에만 의미가 있음. direct 는 null
- *   - direct 콘텐츠 정렬 기준은 updated_at (created_at 컬럼 부재)
+ *   - direct 콘텐츠 정렬 기준은 created_at (WO-O4O-DIRECT-CONTENT-CREATED-AT-COLUMN-V1)
  */
 
 import { Router, Request, Response } from 'express';
@@ -99,7 +103,8 @@ export function createStoreLibraryFeedController(
         }
 
         // UNION ALL — snapshot(cms+content) + direct(source_type='direct')
-        // sort_at = snapshot.created_at OR direct.updated_at, ORDER BY DESC
+        // sort_at = snapshot.created_at OR direct.created_at, ORDER BY DESC
+        // (WO-O4O-DIRECT-CONTENT-CREATED-AT-COLUMN-V1: direct 도 created_at 사용)
         const useSearch = !!search;
         const searchPattern = useSearch ? `%${search}%` : null;
 
@@ -137,7 +142,7 @@ export function createStoreLibraryFeedController(
                 NULL::varchar AS asset_type,
                 d.title AS title,
                 d.content_json AS content_json,
-                d.updated_at AS sort_at,
+                d.created_at AS sort_at,
                 NULL::varchar AS lifecycle_status
               FROM kpa_store_contents d
               WHERE d.organization_id = $1
