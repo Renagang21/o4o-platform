@@ -34,7 +34,7 @@ import { authenticate } from '../../middleware/auth.middleware.js';
 import { forumRequestService } from '../../services/forum/ForumRequestService.js';
 import { isServiceOperator } from '../../utils/role.utils.js';
 import { AppDataSource } from '../../database/connection.js';
-import { ForumPost, ForumCategoryMember } from '@o4o/forum-core/entities';
+import { ForumPost, ForumCategoryMember, PostStatus } from '@o4o/forum-core/entities';
 import { ForumCategoryRequest } from '@o4o/forum-core/entities';
 import type { AuthRequest } from '../../types/auth.js';
 import type { ServiceKey } from '../../types/roles.js';
@@ -675,7 +675,13 @@ router.post('/categories/:id/deactivate', async (req: Request, res: Response): P
     };
 
     await requestRepo().save(forum);
-    logger.info(`Forum ${forum.id} deactivated by operator ${userId} (reason: ${reason.trim()})`);
+
+    // Fix B: cascade — archive all publish posts so they no longer appear in recent lists
+    const updateResult = await postRepo().update(
+      { forumId: req.params.id, status: PostStatus.PUBLISHED },
+      { status: PostStatus.ARCHIVED },
+    );
+    logger.info(`Forum ${forum.id} deactivated by operator ${userId} (reason: ${reason.trim()}, posts archived: ${updateResult.affected ?? 0})`);
     res.json({ success: true, data: { id: forum.id, isActive: false } });
   } catch (error: any) {
     logger.error('Error deactivating forum:', error);
@@ -873,6 +879,7 @@ router.get('/analytics/summary', async (req: Request, res: Response): Promise<vo
         .createQueryBuilder('post')
         .select('COUNT(*)::int', 'total')
         .where('post.forumId IN (:...forumIds)', { forumIds })
+        .andWhere('post.status = :status', { status: PostStatus.PUBLISHED })
         .getRawOne();
       totalPosts = postStats?.total || 0;
     }
