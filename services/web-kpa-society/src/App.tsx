@@ -197,6 +197,7 @@ const StoreContentEditPage = lazy(() => import('./pages/pharmacy/StoreContentEdi
 const StoreDirectContentPage = lazy(() => import('./pages/pharmacy/StoreDirectContentPage'));
 const StoreLocalProductsPage = lazy(() => import('./pages/pharmacy/StoreLocalProductsPage'));
 const StoreTabletDisplaysPage = lazy(() => import('./pages/pharmacy/StoreTabletDisplaysPage'));
+const StoreProductInfoCreatorPage = lazy(() => import('./pages/pharmacy/StoreProductInfoCreatorPage'));
 // Pharmacy specific (not in barrel)
 const StoreOrderWorktablePage = lazy(() => import('./pages/pharmacy/StoreOrderWorktablePage').then(m => ({ default: m.StoreOrderWorktablePage })));
 const SignagePlaybackPage = lazy(() => import('./pages/pharmacy/SignagePlaybackPage').then(m => ({ default: m.SignagePlaybackPage })));
@@ -865,6 +866,8 @@ function App() {
             {/* WO-O4O-KPA-STORE-MATERIALS-AND-PRODUCTIONS-CANONICAL-ALIGN-V1: 내 제작물 / 상품 상세설명 */}
             <Route path="marketing/product-descriptions" element={<StoreProductDescriptionsPage />} />
             <Route path="commerce/local-products" element={<StoreLocalProductsPage />} />
+            {/* WO-O4O-KPA-STORE-PRODUCT-INFO-CREATOR-MENU-V1: 상품 정보 제작 (placeholder) */}
+            <Route path="execution/product-info" element={<StoreProductInfoCreatorPage />} />
             <Route path="commerce/tablet-displays" element={<StoreTabletDisplaysPage />} />
             <Route path="commerce/order-worktable" element={<StoreOrderWorktablePage />} />
             <Route path="commerce/orders" element={<StoreOrdersPage />} />

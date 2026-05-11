@@ -242,9 +242,11 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
     // 신규 제작 진입은 본 그룹이 아닌 "내 자료함"에서 시작.
     // 태블릿: 매장 내 interactive device. 매장당 복수 tablet 전제.
     //         (idle playlist 연결은 후속 WO에서 도입)
+    // WO-O4O-KPA-STORE-PRODUCT-INFO-CREATOR-MENU-V1: 상품 정보 제작 메뉴 추가
     { label: '매장 실행', items: [
-      { key: 'channels',             label: '채널 관리',     subPath: '/channels' },
-      { key: 'tablet-displays',      label: '태블릿',        subPath: '/commerce/tablet-displays' },
+      { key: 'channels',              label: '채널 관리',     subPath: '/channels' },
+      { key: 'product-info-creator',  label: '상품 정보 제작', subPath: '/execution/product-info' },
+      { key: 'tablet-displays',       label: '태블릿',        subPath: '/commerce/tablet-displays' },
       { key: 'pop',                  label: 'POP',          subPath: '/marketing/pop' },
       { key: 'qr',                   label: 'QR 코드',      subPath: '/marketing/qr' },
       { key: 'blog',                 label: '블로그',        subPath: '/content/blog' },
