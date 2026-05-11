@@ -71,9 +71,8 @@ export function KpaGlobalHeader() {
   const isPharmacyRelated = isStoreOwner || (user as any)?.activityType === 'pharmacy_owner';
 
   // contextualNav 필터링
-  // WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1: operator/admin은 모든 메뉴를 본다
+  // WO-O4O-KPA-MY-PHARMACY-HEADER-ROUTE-FIX-V1: visibleWhen 조건 일관 적용
   const contextualNav = filterContextualNav(KPA_CONTEXTUAL_NAV, {
-    isAdminOrOperator: isAdmin || isOperator,
     isStoreOwner,
     isPharmacyRelated,
   });

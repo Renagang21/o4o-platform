@@ -36,20 +36,17 @@ export const KPA_CONTEXTUAL_NAV: KpaContextualNavItem[] = [
 // ─── Filter Helper ───────────────────────────────────────────────────────────
 
 export interface KpaNavVisibility {
-  isAdminOrOperator: boolean;
   isStoreOwner: boolean;
   isPharmacyRelated: boolean;
 }
 
-// WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1
-// operator/admin은 모든 contextual nav를 본다.
+// WO-O4O-KPA-MY-PHARMACY-HEADER-ROUTE-FIX-V1
+// visibleWhen 조건은 operator/admin에게도 동일하게 적용한다.
+// "내 약국"은 storeOwner 자격이 있을 때만 노출된다.
 export function filterContextualNav(
   items: KpaContextualNavItem[],
   vis: KpaNavVisibility,
 ): GlobalHeaderNavItem[] {
-  if (vis.isAdminOrOperator) {
-    return items.map(({ label, href }) => ({ label, href }));
-  }
   return items
     .filter((item) => {
       const cond = item.visibleWhen;

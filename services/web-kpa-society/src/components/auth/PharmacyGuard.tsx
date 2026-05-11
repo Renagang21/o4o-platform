@@ -22,7 +22,9 @@ export function PharmacyGuard({ children }: PharmacyGuardProps) {
   const [apiCheck, setApiCheck] = useState<'idle' | 'loading' | 'approved' | 'denied'>('idle');
 
   const hasStoreRole = !!user && hasAnyRole(user.roles, STORE_OWNER_ROLES);
-  const needsApiCheck = !!user && !hasAnyRole(user.roles, PLATFORM_ROLES) && !hasStoreRole;
+  // PLATFORM_ROLES 보유자라도 storeOwner가 아니면 API 확인 불필요
+  const isPlatformOnlyUser = !!user && !hasStoreRole && hasAnyRole(user.roles, PLATFORM_ROLES);
+  const needsApiCheck = !!user && !hasStoreRole && !isPlatformOnlyUser;
 
   useEffect(() => {
     if (!needsApiCheck) return;
@@ -62,12 +64,20 @@ export function PharmacyGuard({ children }: PharmacyGuardProps) {
     return <Navigate to="/login" state={{ from: location.pathname + location.search }} replace />;
   }
 
-  if (hasAnyRole(user.roles, PLATFORM_ROLES)) {
-    return <Navigate to="/operator" replace />;
-  }
-
+  // WO-O4O-KPA-MY-PHARMACY-HEADER-ROUTE-FIX-V1
+  // storeOwner가 아닌 운영자/admin은 /store 접근 불가 — /operator로 redirect 금지
   if (hasStoreRole) {
     return <>{children}</>;
+  }
+
+  if (isPlatformOnlyUser) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', minHeight: '400px', gap: 12 }}>
+        <p style={{ color: '#1e40af', fontSize: 16, fontWeight: 600 }}>약국 경영지원 전용 영역</p>
+        <p style={{ color: '#64748B', fontSize: 14 }}>운영자 계정으로는 이 페이지에 접근할 수 없습니다.</p>
+        <p style={{ color: '#94a3b8', fontSize: 13 }}>운영 대시보드는 상단 메뉴에서 진입하세요.</p>
+      </div>
+    );
   }
 
   if (apiCheck === 'loading' || apiCheck === 'idle') {
