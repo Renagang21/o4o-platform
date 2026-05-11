@@ -72,6 +72,13 @@ export const assetSnapshotApi = {
     if (params?.limit) query.limit = String(params.limit);
     return apiClient.get<ListAssetsResponse>('/assets', Object.keys(query).length > 0 ? query : undefined);
   },
+
+  /**
+   * Delete a snapshot from the store's library.
+   * Only removes the store's copy — original community asset is untouched.
+   */
+  remove: (id: string) =>
+    apiClient.delete<{ success: boolean; data: { deleted: boolean; id: string } }>(`/assets/${id}`),
 };
 
 // ─────────────────────────────────────────────────────

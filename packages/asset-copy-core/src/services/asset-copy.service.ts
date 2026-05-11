@@ -143,6 +143,20 @@ export class AssetCopyService {
   }
 
   /**
+   * Delete a snapshot owned by the given organization.
+   * Throws 'NOT_FOUND' if the snapshot does not exist or does not belong to the org.
+   */
+  async deleteById(id: string, organizationId: string): Promise<void> {
+    const snapshot = await this.snapshotRepo.findOne({
+      where: { id, organizationId },
+    });
+    if (!snapshot) {
+      throw new Error('NOT_FOUND');
+    }
+    await this.snapshotRepo.delete({ id });
+  }
+
+  /**
    * List snapshots for an organization with pagination
    */
   async listByOrganization(

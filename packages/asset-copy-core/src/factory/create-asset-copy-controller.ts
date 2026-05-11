@@ -191,5 +191,42 @@ export function createAssetCopyController(
     }
   });
 
+  /**
+   * DELETE /:id
+   * Deletes the snapshot owned by the authenticated user's organization.
+   * 404 if not found or not owned by this org.
+   */
+  router.delete('/:id', requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = (req as any).user;
+      if (!user?.id) {
+        res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+        return;
+      }
+
+      const userRoles = user.roles || [];
+      if (!service.checkPermission(userRoles, allowedRoles)) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Insufficient role' } });
+        return;
+      }
+
+      const orgId = await resolveOrgId(dataSource, user.id);
+      if (!orgId) {
+        res.status(403).json({ success: false, error: { code: noOrgErrorCode, message: noOrgMessage } });
+        return;
+      }
+
+      const { id } = req.params;
+      await service.deleteById(id, orgId);
+      res.json({ success: true, data: { deleted: true, id } });
+    } catch (err: any) {
+      if (err.message === 'NOT_FOUND') {
+        res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Snapshot not found' } });
+        return;
+      }
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to delete snapshot' } });
+    }
+  });
+
   return router;
 }

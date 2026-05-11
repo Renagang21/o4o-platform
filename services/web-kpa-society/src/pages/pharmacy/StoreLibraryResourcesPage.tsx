@@ -4,6 +4,7 @@
  * WO-O4O-KPA-STORE-MATERIALS-AND-PRODUCTIONS-CANONICAL-ALIGN-V1
  * WO-O4O-KPA-STORE-PRODUCTION-ENTRY-CANONICAL-CORRECTION-V1: checkbox + 제작 시작 진입
  * WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: 커뮤니티 자료실에서 가져온 snapshot 도 함께 표시
+ * WO-O4O-RESOURCES-LIBRARY-SNAPSHOT-DELETE-V1: snapshot 항목 삭제 지원 (DELETE /assets/:id)
  *
  * 매장이 보유한 자료(직접 업로드 + 커뮤니티 자료실 가져옴) 통합 목록.
  *   - 직접 업로드: store_library_items (GET /pharmacy/library)
@@ -13,8 +14,8 @@
  *   자료 선택 → "제작 시작" → modal → 편집기 route 이동
  *
  * 삭제 정책:
- *   - 직접 업로드 항목: 삭제 가능 (DELETE /pharmacy/library/:id)
- *   - 가져온 snapshot 항목: 본 WO 범위 외 (snapshot 삭제 endpoint 미존재 — 후속 WO 후보)
+ *   - 직접 업로드 항목: hard delete (DELETE /pharmacy/library/:id)
+ *   - 가져온 snapshot 항목: hard delete (DELETE /assets/:id) — 원본 자료 영향 없음
  */
 
 import { useEffect, useState, useCallback, useMemo, type CSSProperties } from 'react';
@@ -147,11 +148,17 @@ export default function StoreLibraryResourcesPage() {
 
   // 직접 업로드(library) 항목만 삭제 가능. snapshot 삭제는 후속 WO 후보.
   const handleDelete = async (row: UnifiedResourceRow) => {
-    if (row.kind !== 'library') return;
-    if (!confirm('이 자료를 삭제하시겠습니까?')) return;
+    const confirmMsg = row.kind === 'snapshot'
+      ? `"${row.title}" 자료를 내 자료함에서 제거하시겠습니까?\n원본 커뮤니티 자료는 삭제되지 않습니다.`
+      : `"${row.title}" 자료를 삭제하시겠습니까?`;
+    if (!confirm(confirmMsg)) return;
     setDeletingId(row.id);
     try {
-      await deleteStoreLibraryItem(row.rawId);
+      if (row.kind === 'snapshot') {
+        await assetSnapshotApi.remove(row.rawId);
+      } else {
+        await deleteStoreLibraryItem(row.rawId);
+      }
       setItems((prev) => prev.filter((it) => it.id !== row.id));
       setSelected((prev) => {
         const next = new Set(prev);
@@ -196,29 +203,34 @@ export default function StoreLibraryResourcesPage() {
     setModalOpen(true);
   };
 
-  // 직접 업로드(library) 항목만 batch 삭제. snapshot 항목은 자동 제외.
+  // library + snapshot 항목 모두 일괄 삭제 가능.
   const handleBulkDelete = async () => {
     if (selected.size === 0) return;
-    const libraryRows = items.filter((it) => selected.has(it.id) && it.kind === 'library');
-    const skippedCount = selected.size - libraryRows.length;
-    if (libraryRows.length === 0) {
-      toast.error('가져온 자료는 일괄 삭제할 수 없습니다');
-      return;
-    }
-    const confirmMsg = skippedCount > 0
-      ? `직접 업로드 ${libraryRows.length}개를 삭제합니다 (가져온 자료 ${skippedCount}개 제외)`
-      : `선택한 ${libraryRows.length}개 자료를 삭제하시겠습니까?`;
+    const selectedRows = items.filter((it) => selected.has(it.id));
+    if (selectedRows.length === 0) return;
+    const libraryCount = selectedRows.filter((it) => it.kind === 'library').length;
+    const snapshotCount = selectedRows.filter((it) => it.kind === 'snapshot').length;
+    const parts: string[] = [];
+    if (libraryCount > 0) parts.push(`직접 업로드 ${libraryCount}개`);
+    if (snapshotCount > 0) parts.push(`가져온 자료 ${snapshotCount}개`);
+    const confirmMsg = snapshotCount > 0
+      ? `${parts.join(', ')}를 삭제합니다.\n가져온 자료는 내 자료함에서만 제거되며 원본은 유지됩니다.`
+      : `선택한 ${libraryCount}개 자료를 삭제하시겠습니까?`;
     if (!confirm(confirmMsg)) return;
     try {
-      await Promise.all(libraryRows.map((it) => deleteStoreLibraryItem(it.rawId)));
-      const removedIds = new Set(libraryRows.map((it) => it.id));
+      await Promise.all(selectedRows.map((it) =>
+        it.kind === 'snapshot'
+          ? assetSnapshotApi.remove(it.rawId)
+          : deleteStoreLibraryItem(it.rawId),
+      ));
+      const removedIds = new Set(selectedRows.map((it) => it.id));
       setItems((prev) => prev.filter((it) => !removedIds.has(it.id)));
       setSelected((prev) => {
         const next = new Set(prev);
         for (const id of removedIds) next.delete(id);
         return next;
       });
-      toast.success(`${libraryRows.length}개 삭제되었습니다`);
+      toast.success(`${selectedRows.length}개 삭제되었습니다`);
     } catch (e: any) {
       toast.error(e?.message || '일괄 삭제에 실패했습니다');
     }
@@ -351,19 +363,14 @@ export default function StoreLibraryResourcesPage() {
                       <ExternalLink size={14} />
                     </a>
                   )}
-                  {/* 직접 업로드만 삭제 가능. 가져온 snapshot 삭제는 후속 WO 후보. */}
-                  {item.kind === 'library' ? (
-                    <button
-                      onClick={() => handleDelete(item)}
-                      disabled={deletingId === item.id}
-                      style={styles.deleteBtn}
-                      title="삭제"
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  ) : (
-                    <span style={{ width: 28, height: 28, display: 'inline-block' }} />
-                  )}
+                  <button
+                    onClick={() => handleDelete(item)}
+                    disabled={deletingId === item.id}
+                    style={styles.deleteBtn}
+                    title={item.kind === 'snapshot' ? '내 자료함에서 제거' : '삭제'}
+                  >
+                    <Trash2 size={14} />
+                  </button>
                 </div>
               </li>
             );
