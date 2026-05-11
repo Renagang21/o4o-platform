@@ -308,3 +308,55 @@ export const directContentApi = {
       `/store-contents/direct/${id}`,
     ),
 };
+
+// ─────────────────────────────────────────────────────
+// Store Library Unified Feed — WO-O4O-STORE-LIBRARY-DIRECT-CONTENT-UNIFIED-V1
+// snapshot(cms+content) + direct contents 통합 paginated feed
+// ─────────────────────────────────────────────────────
+
+export type LibraryContentOrigin = 'snapshot' | 'direct';
+
+export interface LibraryContentItem {
+  id: string;
+  origin: LibraryContentOrigin;
+  selectionKey: string;
+  /** snapshot 인 경우 'cms'|'content', direct 인 경우 null */
+  assetType: string | null;
+  title: string;
+  contentJson: Record<string, unknown>;
+  /** snapshot.created_at 또는 direct.updated_at — 통합 정렬 기준 */
+  createdAt: string;
+  /** snapshot 의 lifecycle 상태. direct 는 null */
+  lifecycleStatus: string | null;
+}
+
+export interface PaginatedLibraryContents {
+  items: LibraryContentItem[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export const storeLibraryApi = {
+  /**
+   * 내 자료함 콘텐츠 통합 feed (snapshot + direct UNION paginated).
+   * 서버에서 sort_at DESC 기준 단일 페이지네이션 — 클라이언트 merge 불필요.
+   */
+  listContents: (params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    type?: 'document';
+  }) => {
+    const query: Record<string, string> = {};
+    if (params?.page) query.page = String(params.page);
+    if (params?.limit) query.limit = String(params.limit);
+    if (params?.search) query.search = params.search;
+    if (params?.type) query.type = params.type;
+    return apiClient.get<{ success: boolean; data: PaginatedLibraryContents }>(
+      '/store-library/contents',
+      Object.keys(query).length > 0 ? query : undefined,
+    );
+  },
+};

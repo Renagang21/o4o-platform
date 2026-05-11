@@ -27,8 +27,9 @@ import { DataTable, Pagination } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import {
   storeAssetControlApi,
-  directContentApi,
+  storeLibraryApi,
   type StoreAssetItem,
+  type LibraryContentItem,
 } from '../../api/assetSnapshot';
 import { colors } from '../../styles/theme';
 import { StartProductionModal, type ProductionSource, type ProductionSourceItem } from './StartProductionModal';
@@ -37,14 +38,6 @@ const PAGE_LIMIT = 20;
 const SEARCH_DEBOUNCE_MS = 300;
 
 // ─── Row Types ───────────────────────────────────────────────────────────────
-
-interface DirectItem {
-  id: string;
-  sourceType: string;
-  snapshotId: string | null;
-  title: string;
-  updatedAt: string;
-}
 
 type RowOrigin = 'snapshot' | 'direct';
 type DocSourceType = 'cms' | 'content' | 'direct';
@@ -98,32 +91,23 @@ function formatDate(iso?: string | null): string {
   return Number.isNaN(d.getTime()) ? '-' : d.toLocaleDateString('ko-KR');
 }
 
-function toDocumentRowFromSnapshot(s: StoreAssetItem): DocumentRow {
-  const sourceType: DocSourceType = s.assetType === 'content' ? 'content' : 'cms';
+// WO-O4O-STORE-LIBRARY-DIRECT-CONTENT-UNIFIED-V1: 서버 unified feed item → row.
+// snapshot/direct 분기는 origin + assetType 으로 식별.
+function toDocumentRow(it: LibraryContentItem): DocumentRow {
+  const sourceType: DocSourceType =
+    it.origin === 'direct' ? 'direct' : it.assetType === 'content' ? 'content' : 'cms';
+  const href = it.origin === 'direct' ? `/store/content/direct/${it.id}` : `/view/${it.id}`;
+  const authorName = it.origin === 'direct' ? '내 매장' : readString(it.contentJson, 'authorName') || '-';
   return {
-    id: s.id,
-    origin: 'snapshot',
-    selectionKey: keyOf('snapshot', s.id),
-    title: s.title || '(제목 없음)',
-    authorName: readString(s.contentJson, 'authorName') || '-',
+    id: it.id,
+    origin: it.origin,
+    selectionKey: it.selectionKey || keyOf(it.origin, it.id),
+    title: it.title || '(제목 없음)',
+    authorName,
     sourceType,
-    createdAt: s.createdAt,
-    lifecycleStatus: s.lifecycleStatus ?? null,
-    href: `/view/${s.id}`,
-  };
-}
-
-function toDocumentRowFromDirect(d: DirectItem): DocumentRow {
-  return {
-    id: d.id,
-    origin: 'direct',
-    selectionKey: keyOf('direct', d.id),
-    title: d.title || '(제목 없음)',
-    authorName: '내 매장',
-    sourceType: 'direct',
-    createdAt: d.updatedAt,
-    lifecycleStatus: null,
-    href: `/store/content/direct/${d.id}`,
+    createdAt: it.createdAt,
+    lifecycleStatus: it.lifecycleStatus,
+    href,
   };
 }
 
@@ -247,47 +231,28 @@ function DocumentsSection({
     return () => clearTimeout(handle);
   }, [searchInput]);
 
-  // fetch on page/search/reload
+  // fetch on page/search/reload — WO-O4O-STORE-LIBRARY-DIRECT-CONTENT-UNIFIED-V1:
+  // 서버 unified endpoint 단일 호출. snapshot + direct 모두 동일 페이지/정렬/검색 적용.
   const reqIdRef = useRef(0);
   useEffect(() => {
     const myReq = ++reqIdRef.current;
     let cancelled = false;
     setLoading(true);
     (async () => {
-      const snapshotPromise = storeAssetControlApi
-        .list({ type: 'document', page, limit: PAGE_LIMIT, search: searchQuery || undefined })
+      const res = await storeLibraryApi
+        .listContents({
+          type: 'document',
+          page,
+          limit: PAGE_LIMIT,
+          search: searchQuery || undefined,
+        })
         .catch(() => null);
-      // 직접 작성 콘텐츠는 별도 도메인이므로 페이지 단위로 합쳐서 표시
-      // (현재 directContentApi 는 서버 페이지네이션 미지원 — 첫 페이지에서만 노출하고 검색어가 있을 때는 클라이언트 필터)
-      const directPromise = page === 1
-        ? directContentApi.list().catch(() => null)
-        : Promise.resolve(null);
-      const [snapRes, directRes] = await Promise.all([snapshotPromise, directPromise]);
       if (cancelled || myReq !== reqIdRef.current) return;
 
-      const snapshots: StoreAssetItem[] = snapRes?.data?.items ?? [];
-      const serverTotal = snapRes?.data?.total ?? 0;
-      const serverTotalPages = snapRes?.data?.totalPages ?? 1;
-
-      let mergedRows: DocumentRow[] = snapshots.map(toDocumentRowFromSnapshot);
-
-      if (page === 1) {
-        const directsAll = ((directRes?.data as DirectItem[] | undefined) ?? []).filter(
-          (it) => it.sourceType === 'direct',
-        );
-        const q = searchQuery.toLowerCase();
-        const directs = q
-          ? directsAll.filter((d) => (d.title || '').toLowerCase().includes(q))
-          : directsAll;
-        const directRows = directs.map(toDocumentRowFromDirect);
-        mergedRows = [...directRows, ...mergedRows].sort(
-          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-        );
-      }
-
-      setRows(mergedRows);
-      setTotal(serverTotal);
-      setTotalPages(Math.max(1, serverTotalPages));
+      const items = res?.data?.items ?? [];
+      setRows(items.map(toDocumentRow));
+      setTotal(res?.data?.total ?? 0);
+      setTotalPages(Math.max(1, res?.data?.totalPages ?? 1));
       setLoading(false);
     })();
     return () => {
@@ -422,7 +387,7 @@ function DocumentsSection({
         <h2 style={styles.sectionTitle}>
           <FileText size={16} style={{ color: colors.primary }} />
           문서형 콘텐츠
-          <span style={styles.countBadge}>{total + (page === 1 ? rows.filter((r) => r.origin === 'direct').length : 0)}건</span>
+          <span style={styles.countBadge}>{total}건</span>
         </h2>
         <div style={styles.searchWrap}>
           <Search size={14} style={styles.searchIcon} />

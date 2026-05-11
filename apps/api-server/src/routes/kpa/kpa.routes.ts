@@ -75,6 +75,7 @@ import { createStoreAssetControlController } from '../o4o-store/controllers/stor
 import { createAdminForceAssetController } from './controllers/admin-force-asset.controller.js';
 import { createPublishedAssetsController } from '../o4o-store/controllers/published-assets.controller.js';
 import { createStoreContentController } from '../o4o-store/controllers/store-content.controller.js';
+import { createStoreLibraryFeedController } from '../o4o-store/controllers/store-library-feed.controller.js';
 import { createStoreExecutionAssetsController } from '../o4o-store/controllers/store-execution-assets.controller.js';
 import { createStoreQrLandingController } from '../o4o-store/controllers/store-qr-landing.controller.js';
 import { createStorePopController } from '../o4o-store/controllers/store-pop.controller.js';
@@ -373,6 +374,10 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Store Content routes (WO-KPA-A-CONTENT-OVERRIDE-EXTENSION-V1)
   router.use('/store-contents', createStoreContentController(dataSource, coreRequireAuth as any));
+
+  // Store Library 통합 feed (WO-O4O-STORE-LIBRARY-DIRECT-CONTENT-UNIFIED-V1)
+  // snapshot(cms+content) + direct contents UNION paginated feed
+  router.use('/store-library', createStoreLibraryFeedController(dataSource, coreRequireAuth as any));
 
   // Store Playlist routes (WO-O4O-SIGNAGE-STORE-PLAYLIST-ENGINE-V1)
   router.use('/store-playlists', createStorePlaylistController(dataSource, coreRequireAuth as any, 'kpa-society'));
