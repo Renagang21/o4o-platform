@@ -2,6 +2,11 @@
  * StoreProductionMaterialsPage — 내 자료함 / 매장 제작 자료
  *
  * WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-LIBRARY-TAB-V1
+ * WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-AI-FLOW-V1:
+ *   ProductionTypeSelectorModal 선택 → AiContentModal 진입 흐름 연결.
+ *   유형 선택 후 navigate 대신 in-page AiContentModal 을 띄워 AI 생성/편집 + 저장까지
+ *   본 페이지 안에서 마무리할 수 있게 한다. 저장 destination 은
+ *   showProductionMaterialSave 로 store_execution_assets (POST /api/v1/kpa/store/assets).
  *
  * 매장에서 POP·QR·블로그·상품 상세설명 등 결과물을 만들기 위해
  * 편집하거나 AI로 정리한 원본/중간 제작 자료를 관리하는 페이지.
@@ -12,16 +17,29 @@
  *   list API에서 contentJson이 반환되지 않으므로 현재 단계에서는 default 값 표시.
  *   각 도구(POP/QR/블로그/상품 상세설명)가 contentJson에 metadata를 저장하면 자동 반영.
  *
+ * 데이터 소스 한계 (후속 WO 후보):
+ *   현재 list 는 kpa_store_contents 만 노출하지만 AI 흐름의 저장 대상은
+ *   store_execution_assets 임. AI 로 저장한 자료는 본 페이지 list 에 즉시 노출되지
+ *   않을 수 있다 (양쪽 source 통합 머지는 별도 WO).
+ *
  * DB/migration 금지: 기존 API 재사용만으로 구현.
  */
 
 import { useEffect, useState, useCallback, type CSSProperties } from 'react';
 import { Layers, Trash2, RefreshCw, Sparkles, FileEdit, Plus } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
+import { AiContentModal } from '@o4o/content-editor';
 import { directContentApi } from '../../api/assetSnapshot';
+import { getAccessToken } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
 import { StartProductionModal, type ProductionSource } from './StartProductionModal';
 import { ProductionTypeSelectorModal } from './ProductionTypeSelectorModal';
+import {
+  PRODUCTION_TARGET_TO_AI_MODE,
+  type AiModeForProduction,
+  type ProductionTarget,
+  type ProductionTargetMeta,
+} from './productionTargets';
 
 // ─── 타입 ─────────────────────────────────────────────────────────────────────
 
@@ -81,6 +99,10 @@ export default function StoreProductionMaterialsPage() {
   const [modalOpen, setModalOpen]   = useState(false);
   const [modalSource, setModalSource] = useState<ProductionSource | null>(null);
   const [typeSelectorOpen, setTypeSelectorOpen] = useState(false);
+  // WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-AI-FLOW-V1
+  const [aiOpen, setAiOpen] = useState(false);
+  const [aiInitialMode, setAiInitialMode] = useState<AiModeForProduction>('customer_rewrite');
+  const [aiSelectedTarget, setAiSelectedTarget] = useState<ProductionTarget | null>(null);
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
@@ -158,6 +180,19 @@ export default function StoreProductionMaterialsPage() {
     } catch (e: any) {
       toast.error(e?.message || '일괄 삭제에 실패했습니다');
     }
+  };
+
+  // ─── AI 흐름 진입 (WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-AI-FLOW-V1) ────────
+
+  /**
+   * 유형 선택 모달의 카드 클릭 결과를 받아 AiContentModal 을 띄운다.
+   * navigate 하지 않음 — page 안에서 AI 생성 → 저장까지 마무리하는 흐름.
+   * productless 진입만 처리 (productId 기반 트랙은 본 흐름에 미통합).
+   */
+  const handleTypeSelectedToAi = (card: ProductionTargetMeta) => {
+    setAiSelectedTarget(card.key);
+    setAiInitialMode(PRODUCTION_TARGET_TO_AI_MODE[card.key]);
+    setAiOpen(true);
   };
 
   // ─── 제작 시작 ────────────────────────────────────────────────────────────
@@ -348,6 +383,36 @@ export default function StoreProductionMaterialsPage() {
       <ProductionTypeSelectorModal
         open={typeSelectorOpen}
         onClose={() => setTypeSelectorOpen(false)}
+        onSelect={handleTypeSelectedToAi}
+      />
+
+      {/* WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-AI-FLOW-V1:
+            AI 생성/편집 모달. showProductionMaterialSave=true 로 결과를
+            store_execution_assets 에 직접 저장. 저장 성공 후 fetchAll() 로 list refresh
+            (단, 현재 list 는 kpa_store_contents 만 노출하므로 새 항목은 즉시 보이지 않을 수 있음).
+            initialMode 는 유형 선택 결과로 override.
+            productAiContent (productId 기반 비동기) 트랙은 본 흐름에 미통합. */}
+      <AiContentModal
+        open={aiOpen}
+        onClose={() => { setAiOpen(false); setAiSelectedTarget(null); }}
+        editor={null}
+        initialMode={aiInitialMode}
+        showProductionMaterialSave
+        aiRequestHeaders={(() => {
+          const token = getAccessToken();
+          return token ? { Authorization: `Bearer ${token}` } : undefined;
+        })()}
+        headerLabel={`매장 제작 자료 만들기 — ${
+          aiSelectedTarget
+            ? ({
+                pop: 'POP',
+                qr: 'QR 코드',
+                blog: '블로그',
+                'product-description': '상품 상세설명',
+              } as Record<ProductionTarget, string>)[aiSelectedTarget]
+            : 'AI 생성'
+        }`}
+        onProductionMaterialSaved={fetchAll}
       />
     </div>
   );

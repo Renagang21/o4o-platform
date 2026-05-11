@@ -17,6 +17,10 @@
  *
  * 수신측(StorePopPage / StoreQRPage / StoreProductDescriptionsPage / PharmacyBlogPage)은
  * source.items.length === 0 일 때 메뉴 직접 진입과 동일하게 동작 (early return 처리됨).
+ *
+ * WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-AI-FLOW-V1:
+ *   AiContentModal 진입용 default AiMode 매핑(productionTargetToAiMode) 추가.
+ *   AiContentModal 의 MODE_CONFIG 와 동기 — 추가 시 양쪽 갱신 필요.
  */
 
 import { Megaphone, QrCode, BookOpen, FileText, type LucideIcon } from 'lucide-react';
@@ -114,3 +118,32 @@ export function buildProductionState(opts: {
     },
   };
 }
+
+// ─── AiContentModal 진입용 매핑 ─────────────────────────────────────────────
+
+/**
+ * AiContentModal 의 MODE_CONFIG 와 1:1 대응되는 AiMode 키.
+ * AiContentModal 내부 type AiMode 와 동일 (모달이 내부 type 만 export 하지 않으므로 string literal 로 정의).
+ *
+ * MODE_CONFIG 변경 시 동기 갱신 필요:
+ *   packages/content-editor/src/components/AiContentModal.tsx:MODE_CONFIG
+ */
+export type AiModeForProduction =
+  | 'customer_rewrite'
+  | 'pop'
+  | 'blog'
+  | 'store_qr';
+
+/**
+ * 4유형 카드 → AiContentModal 초기 모드 매핑.
+ *  pop                 → 'pop'           (outputType=pop)
+ *  qr                  → 'store_qr'      (outputType=store_qr)
+ *  blog                → 'blog'          (outputType=blog)
+ *  product-description → 'customer_rewrite' (outputType=product_detail)
+ */
+export const PRODUCTION_TARGET_TO_AI_MODE: Record<ProductionTarget, AiModeForProduction> = {
+  pop: 'pop',
+  qr: 'store_qr',
+  blog: 'blog',
+  'product-description': 'customer_rewrite',
+};

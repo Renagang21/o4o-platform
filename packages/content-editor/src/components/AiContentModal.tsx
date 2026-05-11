@@ -14,6 +14,10 @@
  *   assetType=content, sourceType=generated 고정.
  *   category=outputType 그대로, usageType 은 pop/store_qr 만 enum 매핑.
  *   기존 showStoreSave / showCommunitySave / onChannelSave 와 독립 동작.
+ * WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-AI-FLOW-V1:
+ *   `initialMode` prop 추가 — 모달 첫 진입 모드 override.
+ *   매장 제작 자료 흐름에서 유형(POP/QR/블로그/상품 상세설명) 선택 후
+ *   해당 mode 로 모달을 곧장 열기 위한 진입점.
  *
  * 사용자가 텍스트를 붙여넣으면 AI가 HTML 형식으로 변환/요약/정리.
  * 또는 URL을 입력하면 AI가 해당 페이지 콘텐츠를 HTML로 변환.
@@ -99,6 +103,21 @@ interface AiContentModalProps {
    * - showStoreSave / showCommunitySave 와 독립적으로 노출 가능 (서로 영향 없음)
    */
   showProductionMaterialSave?: boolean;
+  /**
+   * WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-AI-FLOW-V1: 매장 제작 자료 저장 성공 시 콜백.
+   * - 호출 시점: handleProductionMaterialSave 가 201 응답 받은 직후
+   * - 호출 측은 보통 list refresh 에 사용. 모달은 자동으로 닫지 않음
+   *   (사용자가 결과를 추가 검토하거나 "에디터에 삽입" 등 다른 액션을 이어갈 수 있도록).
+   * - 미제공 시 noop.
+   */
+  onProductionMaterialSaved?: (assetId: string | undefined) => void;
+  /**
+   * WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-AI-FLOW-V1: 모달 첫 진입 mode 오버라이드.
+   * - 미제공 시 기존 동작 유지 ('customer_rewrite' 로 시작)
+   * - 매장 제작 자료 흐름처럼 유형(POP/QR/블로그/상품 상세설명)을 미리 선택하고 진입할 때 사용
+   * - 사용자가 모달 안에서 다른 mode 로 전환 시 그 선택을 유지 (re-mount 시점에만 적용)
+   */
+  initialMode?: 'customer_rewrite' | 'summary' | 'pop' | 'title_suggest' | 'blog' | 'store_qr';
   /**
    * WO-O4O-AI-LESSON-FLOW-FIX-V1: 헤더/입력 라벨 LMS 문맥 오버라이드.
    * - 미제공 시 기존 기본값("AI 콘텐츠 정리", "https://example.com/article") 유지
@@ -255,10 +274,12 @@ function blocksToHtml(blocks: UrlBlock[]): string {
     .join('\n');
 }
 
-export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeaders, onChannelSave, showCommunitySave, showStoreSave, showProductionMaterialSave, headerLabel, urlPlaceholder, initialSourceTab }: AiContentModalProps) {
+export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeaders, onChannelSave, showCommunitySave, showStoreSave, showProductionMaterialSave, onProductionMaterialSaved, initialMode, headerLabel, urlPlaceholder, initialSourceTab }: AiContentModalProps) {
   // 기존 text 모드 상태
   const [input, setInput] = useState('');
-  const [mode, setMode] = useState<AiMode>('customer_rewrite');
+  // WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-AI-FLOW-V1:
+  //   initialMode prop 으로 첫 진입 모드 override 가능. 모달 re-mount(open=false→true) 시점에만 반영.
+  const [mode, setMode] = useState<AiMode>(initialMode ?? 'customer_rewrite');
   const [tone, setTone] = useState<ToneOption>('professional');
   const [length, setLength] = useState<LengthOption>('medium');
   const [loading, setLoading] = useState(false);
@@ -647,7 +668,9 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
           : (data.error?.message || data.error || '매장 제작 자료 저장에 실패했습니다.');
         throw new Error(msg);
       }
-      setProductionMaterialSaveStatus({ ok: true, assetId: data.data?.id });
+      const assetId: string | undefined = data.data?.id;
+      setProductionMaterialSaveStatus({ ok: true, assetId });
+      onProductionMaterialSaved?.(assetId);
     } catch (err: any) {
       setProductionMaterialSaveStatus({ ok: false, error: err?.message || '저장 중 오류가 발생했습니다.' });
     } finally {
@@ -680,6 +703,8 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
     setProductionMaterialSaving(false);
     setCustomPrompt('');
     setSourceTab(initialSourceTab ?? 'text');
+    // WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-AI-FLOW-V1
+    setMode(initialMode ?? 'customer_rewrite');
     onClose();
   };
 

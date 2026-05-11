@@ -5,6 +5,10 @@
  * WO-O4O-KPA-STORE-PRODUCTION-ENTRY-UNIFY-V1:
  *   - target/route/icon 카탈로그를 productionTargets 로 추출 (StartProductionModal 과 공유).
  *   - navigate payload 를 buildProductionState() 헬퍼로 표준화.
+ * WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-AI-FLOW-V1:
+ *   - onSelect 콜백 prop 추가. 호출 측에서 AiContentModal 등 in-page 후속 흐름을
+ *     직접 dispatch 할 수 있도록 한다. onSelect 미제공 시 기존 navigate fallback 유지
+ *     (deep-link 호환).
  *
  * "매장 제작 자료" 화면의 [매장 제작 자료 만들기] 버튼 진입용 모달.
  * 사용자가 원본 자료를 선택하지 않고 곧장 제작 유형을 고르는 흐름.
@@ -36,15 +40,25 @@ import {
 interface Props {
   open: boolean;
   onClose: () => void;
+  /**
+   * 카드 선택 콜백.
+   * - 제공 시: navigate 하지 않고 호출 측에 control 위임 (in-page AiContentModal 등).
+   * - 미제공 시: 기존 navigate fallback (deep-link 호환).
+   */
+  onSelect?: (card: ProductionTargetMeta) => void;
 }
 
-export function ProductionTypeSelectorModal({ open, onClose }: Props) {
+export function ProductionTypeSelectorModal({ open, onClose, onSelect }: Props) {
   const navigate = useNavigate();
 
   if (!open) return null;
 
   const handleSelect = (card: ProductionTargetMeta) => {
-    navigate(card.route, { state: buildProductionState({ target: card.key }) });
+    if (onSelect) {
+      onSelect(card);
+    } else {
+      navigate(card.route, { state: buildProductionState({ target: card.key }) });
+    }
     onClose();
   };
 
