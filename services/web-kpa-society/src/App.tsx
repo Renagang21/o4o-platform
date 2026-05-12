@@ -156,6 +156,9 @@ const GuideFeatureLmsPage = lazy(() => import('./pages/guide/GuideFeatureLmsPage
 // Community Home (WO-KPA-COMMUNITY-HOME-V1)
 import { CommunityHomePage } from './pages/CommunityHomePage';
 
+// About Page (WO-O4O-KPA-ABOUT-PAGE-IMPLEMENTATION-V1)
+const AboutPage = lazy(() => import('./pages/about/AboutPage'));
+
 // Community Hub — /community는 Home으로 리다이렉트 (WO-KPA-A-PUBLIC-HOME-INTEGRATION-AND-MENU-SIMPLIFICATION-V1)
 
 // Service Detail Pages — Phase 2 lazy (barrel unwound)
@@ -1052,17 +1055,6 @@ function DemoLayoutRoutes() {
 }
 
 // ─── Info Pages (stub) — WO-O4O-KPA-WEB-MENU-STRUCTURE-PHASE1-V1 ─────────────
-
-function AboutPage() {
-  return (
-    <div style={{ maxWidth: 720, margin: '0 auto', padding: '64px 24px' }}>
-      <h1 style={{ fontSize: '1.875rem', fontWeight: 700, color: '#0f172a', marginBottom: 16 }}>KPA-Society 소개</h1>
-      <p style={{ fontSize: '1rem', color: '#475569', lineHeight: 1.7 }}>
-        KPA-Society는 약사 전문 플랫폼으로, 커뮤니티·교육·매장 경영을 하나의 공간에서 지원합니다.
-      </p>
-    </div>
-  );
-}
 
 function ContactPage() {
   return (
