@@ -2,6 +2,7 @@
  * useBlogSeo — Public Blog SEO meta hook
  *
  * WO-O4O-KPA-STORE-BLOG-PUBLIC-HEADER-V1
+ * WO-O4O-KPA-NETURE-SEO-REGISTRY-USEPAGESEO-V1: setMeta 공통 유틸로 교체.
  *
  * - document.title 설정
  * - <meta name="description">, og:title, og:description, og:image, og:url 동기화
@@ -10,28 +11,13 @@
  */
 
 import { useEffect } from 'react';
+import { setMeta } from '../seo/metaUtils';
 
 interface BlogSeoOptions {
   title: string | null;
   description?: string | null;
   ogImage?: string | null;
   url?: string | null;
-}
-
-function setMeta(selector: string, attr: 'name' | 'property', key: string, value: string | null) {
-  if (typeof document === 'undefined') return;
-  let el = document.head.querySelector<HTMLMetaElement>(selector);
-  if (!el) {
-    if (!value) return;
-    el = document.createElement('meta');
-    el.setAttribute(attr, key);
-    document.head.appendChild(el);
-  }
-  if (value === null || value === '') {
-    el.remove();
-    return;
-  }
-  el.setAttribute('content', value);
 }
 
 export function useBlogSeo({ title, description, ogImage, url }: BlogSeoOptions): void {

@@ -11,8 +11,9 @@ import { LoadingSpinner } from './components/common/LoadingSpinner';
 import { AuthProvider, OrganizationProvider } from './contexts';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
 import { TemplateProvider } from '@o4o/ui';
-import { templates } from '@o4o/shared-space-ui';
+import { templates, usePageSeo } from '@o4o/shared-space-ui';
 import { kpaConfig } from '@o4o/operator-ux-core';
+import { kpaSeoRegistry, KPA_SEO_DEFAULTS } from './config/seoRegistry';
 import { ServiceProvider } from './contexts/ServiceContext';
 import { useAuth } from './contexts/AuthContext';
 import { getPharmacyInfo } from './api/pharmacyInfo';
@@ -423,6 +424,13 @@ function PageLoader() {
   );
 }
 
+// WO-O4O-KPA-NETURE-SEO-REGISTRY-USEPAGESEO-V1: 페이지별 메타 동적 적용 (브라우저/SNS 보조용)
+function SeoWatcher() {
+  const { pathname } = useLocation();
+  usePageSeo({ registry: kpaSeoRegistry, pathname, defaults: KPA_SEO_DEFAULTS });
+  return null;
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -431,6 +439,7 @@ function App() {
       <LoginModalProvider>
       <OrganizationProvider>
       <BrowserRouter>
+        <SeoWatcher />
         {/* WO-KPA-CONTEXT-SWITCHER-AND-ORG-RESOLUTION-V1: 라우트 기반 서비스 컨텍스트 */}
         <ServiceProvider>
         {/* WO-O4O-TEMPLATE-PROVIDER-V1: 서비스 디자인 토큰 자동 주입 */}

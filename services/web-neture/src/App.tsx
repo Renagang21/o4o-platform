@@ -26,6 +26,8 @@ import { AuthProvider, LoginModalProvider, useLoginModal } from './contexts';
 import LoginModal from './components/LoginModal';
 import RegisterModal from './components/RegisterModal';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
+import { usePageSeo } from '@o4o/shared-space-ui';
+import { netureSeoRegistry, NETURE_SEO_DEFAULTS } from './config/seoRegistry';
 
 // Layouts
 import NetureLayout from './components/layouts/NetureLayout';
@@ -555,6 +557,13 @@ function WorkspaceOperatorRedirect() {
 
 const ProtectedRoute = RoleGuard;
 
+// WO-O4O-KPA-NETURE-SEO-REGISTRY-USEPAGESEO-V1: 페이지별 메타 동적 적용 (브라우저/SNS 보조용)
+function SeoWatcher() {
+  const { pathname } = useLocation();
+  usePageSeo({ registry: netureSeoRegistry, pathname, defaults: NETURE_SEO_DEFAULTS });
+  return null;
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -562,6 +571,7 @@ function App() {
     <AuthProvider>
       <LoginModalProvider>
         <BrowserRouter>
+          <SeoWatcher />
           <O4OToastProvider />
           <ModalRenderer />
           <Suspense fallback={<PageLoading />}>
