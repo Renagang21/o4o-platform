@@ -78,7 +78,6 @@ export function ContactPage() {
                 <li style={s.cardListItem}>온라인 강의 개설</li>
                 <li style={s.cardListItem}>보수교육 협력</li>
                 <li style={s.cardListItem}>세미나 / 워크숍 운영</li>
-                <li style={s.cardListItem}>교육 콘텐츠 제작 협업</li>
               </ul>
               <a href="mailto:edu@kpa-society.kr" style={s.cardLink}>
                 edu@kpa-society.kr
