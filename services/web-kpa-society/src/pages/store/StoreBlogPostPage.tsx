@@ -71,11 +71,15 @@ export function StoreBlogPostPage() {
   const seoUrl = typeof window !== 'undefined' && slug && postSlug
     ? `${window.location.origin}/store/${slug}/blog/${postSlug}`
     : null;
+  // WO-O4O-BLOG-SEO-JSONLD-CANONICAL-V1: author / publishedAt / modifiedAt 추가
   useBlogSeo({
     title: seoTitle,
     description: seoDescription,
     ogImage: blogSettings?.heroImage || storeInfo?.hero_image || storeInfo?.logo || null,
     url: seoUrl,
+    author: blogSettings?.blogName?.trim() || storeInfo?.name?.trim() || null,
+    publishedAt: post?.publishedAt || post?.createdAt || null,
+    modifiedAt: post?.updatedAt || null,
   });
 
   if (loading) {

@@ -69,11 +69,13 @@ export * from './guide';
  * Staff editor / AI wiring / settings UI / backend extraction 은 비포함 — premature abstraction 회피. */
 export * from './blog';
 
-/* SEO registry hook — WO-O4O-KPA-NETURE-SEO-REGISTRY-USEPAGESEO-V1
+/* SEO registry hook + 공통 유틸 — WO-O4O-KPA-NETURE-SEO-REGISTRY-USEPAGESEO-V1 / WO-O4O-BLOG-SEO-JSONLD-CANONICAL-V1
  * usePageSeo: registry 기반 페이지별 메타 설정 (브라우저/SNS 보조용).
- * setMeta: DOM meta 태그 조작 공통 유틸 (useBlogSeo 공유). */
+ * getMeta/setMeta/removeMeta: DOM meta 태그 조작 유틸.
+ * setCanonical/removeCanonical: canonical 링크 관리.
+ * insertJsonLd/removeJsonLd/buildArticleJsonLd: JSON-LD 구조화 데이터 관리. */
 export type { PageSeoConfig, SeoRegistry } from './seo/types';
-export { usePageSeo, setMeta } from './seo';
+export { usePageSeo, getMeta, setMeta, removeMeta, setCanonical, removeCanonical, insertJsonLd, removeJsonLd, buildArticleJsonLd } from './seo';
 
 export type {
   /* Data types */
