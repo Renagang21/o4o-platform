@@ -14,6 +14,27 @@ import logger from '../../../utils/logger.js';
 
 const IMAGE_MIMES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
+/**
+ * 한글 파일명 보정 (WO-O4O-KPA-RESOURCES-CREATE-MODAL-UX-V1)
+ *
+ * multer/busboy 가 multipart filename 을 latin1 로 파싱하면
+ * UTF-8 한글 바이트열이 깨진 문자열로 저장된다.
+ * - 이미 올바른 유니코드(한글 포함) → 그대로 반환
+ * - 비ASCII 고바이트 문자 포함 → latin1 → utf8 재해석 후
+ *   결과에 한글이 있으면 보정 값 사용
+ * - ASCII만 포함된 파일명 → 그대로 반환
+ */
+function decodeOriginalName(name: string): string {
+  // 이미 유니코드 한글(AC00-D7AF, 1100-11FF, 3130-318F)이 포함돼 있으면 올바른 상태
+  if (/[\u1100-\u11FF\u3130-\u318F\uAC00-\uD7AF]/.test(name)) return name;
+  // 비ASCII 바이트가 있을 때만 재해석 시도
+  if (/[^\x00-\x7F]/.test(name)) {
+    const decoded = Buffer.from(name, 'latin1').toString('utf8');
+    if (/[\u1100-\u11FF\u3130-\u318F\uAC00-\uD7AF]/.test(decoded)) return decoded;
+  }
+  return name;
+}
+
 export class MediaLibraryService {
   private storage: Storage;
   private bucketName: string;
@@ -81,7 +102,7 @@ export class MediaLibraryService {
       url,
       gcsPath,
       fileName,
-      originalName: file.originalname,
+      originalName: decodeOriginalName(file.originalname),
       mimeType,
       fileSize: buffer.length,
       assetType: isImage ? 'image' : this.classifyAssetType(file.mimetype),
