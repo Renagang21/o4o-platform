@@ -3,6 +3,7 @@
  * WO-O4O-SIGNAGE-CONSOLE-V1
  * WO-KPA-SIGNAGE-UI-RESTRUCTURE-V1: 검색바 추가 + DataTable 전환
  * WO-O4O-SIGNAGE-TABLE-STANDARD-V1: O4O 표준 테이블 (체크 선택 + bulk delete + RowActionMenu)
+ * WO-O4O-KPA-SIGNAGE-VIDEO-PLAYLIST-MODAL-V1: 인라인 등록 폼 → 모달
  *
  * Operator creates & manages HQ signage media.
  * API: /api/signage/kpa-society/hq/*
@@ -96,6 +97,28 @@ export default function HqMediaPage() {
   const [formDuration, setFormDuration] = useState('');
   const [formTags, setFormTags] = useState<string[]>([]);
   const [formTagInput, setFormTagInput] = useState('');
+  const [formError, setFormError] = useState<string | null>(null);
+
+  const resetForm = () => {
+    setFormName('');
+    setFormSourceUrl('');
+    setFormMediaType('video');
+    setFormSourceType('url');
+    setFormDuration('');
+    setFormTags([]);
+    setFormTagInput('');
+    setFormError(null);
+  };
+
+  // ESC to close modal
+  useEffect(() => {
+    if (!showForm) return;
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !isCreating) { setShowForm(false); resetForm(); }
+    };
+    document.addEventListener('keydown', handleEsc);
+    return () => document.removeEventListener('keydown', handleEsc);
+  }, [showForm, isCreating]);
 
   const apiFetch = useCallback(async (path: string, options?: RequestInit) => {
     const token = getAccessToken();
@@ -150,15 +173,16 @@ export default function HqMediaPage() {
   const handleCreate = async () => {
     if (!formName.trim() || !formSourceUrl.trim()) return;
     if (formTags.length === 0) {
-      setError('태그를 최소 1개 이상 입력해주세요');
+      setFormError('태그를 최소 1개 이상 입력해주세요');
       return;
     }
     const durationSec = parseDuration(formDuration);
     if (!formDuration.trim() || durationSec <= 0) {
-      setError('재생시간을 입력하세요 (예: 10:30)');
+      setFormError('재생시간을 입력하세요 (예: 10:30)');
       return;
     }
     setIsCreating(true);
+    setFormError(null);
     try {
       await apiFetch(`/api/signage/${SERVICE_KEY}/hq/media`, {
         method: 'POST',
@@ -171,13 +195,11 @@ export default function HqMediaPage() {
           duration: durationSec,
         }),
       });
-      setFormName(''); setFormSourceUrl(''); setShowForm(false);
-      setFormTags([]);
-      setFormTagInput('');
-      setFormDuration('');
+      setShowForm(false);
+      resetForm();
       fetchMedia();
     } catch (err: any) {
-      setError(err?.message || '미디어 등록에 실패했습니다');
+      setFormError(err?.message || '미디어 등록에 실패했습니다');
     } finally {
       setIsCreating(false);
     }
@@ -306,164 +328,202 @@ export default function HqMediaPage() {
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
-            <Film className="w-6 h-6 text-blue-600" /> HQ 미디어 관리
-          </h1>
-          <p className="text-slate-500 text-sm mt-1">운영자 제공 사이니지 미디어 콘텐츠</p>
-          <p className="text-xs text-slate-400 mt-0.5">활성 상태의 미디어만 매장 HUB에 노출됩니다</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
-            <Plus className="w-4 h-4" /> 새 미디어
-          </button>
-          <button onClick={fetchMedia} disabled={isLoading} className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors text-sm disabled:opacity-50">
-            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} /> 새로고침
-          </button>
-        </div>
-      </div>
-
-      {error && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-800">{error}</div>
-      )}
-
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { label: '전체', value: stats.total, color: 'text-slate-800' },
-          { label: '활성', value: stats.active, color: 'text-green-600' },
-          { label: '대기', value: stats.pending, color: 'text-amber-600' },
-          { label: '아카이브', value: stats.archived, color: 'text-slate-500' },
-        ].map(s => (
-          <div key={s.label} className="bg-white rounded-xl p-4 border border-blue-100">
-            <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
-            <p className="text-xs text-slate-500">{s.label}</p>
+    <>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
+              <Film className="w-6 h-6 text-blue-600" /> HQ 미디어 관리
+            </h1>
+            <p className="text-slate-500 text-sm mt-1">운영자 제공 사이니지 미디어 콘텐츠</p>
+            <p className="text-xs text-slate-400 mt-0.5">활성 상태의 미디어만 매장 HUB에 노출됩니다</p>
           </div>
-        ))}
-      </div>
-
-      {/* Create Form */}
-      {showForm && (
-        <div className="bg-white rounded-xl border border-blue-100 p-6">
-          <h2 className="text-lg font-semibold text-slate-800 mb-4">새 미디어 등록</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">제목 *</label>
-              <input type="text" value={formName} onChange={e => setFormName(e.target.value)} placeholder="동영상 제목을 입력하세요" className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">동영상 URL *</label>
-              <input type="text" value={formSourceUrl} onChange={e => setFormSourceUrl(e.target.value)} placeholder="YouTube 또는 Vimeo URL" className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">소스 타입</label>
-              <select value={formSourceType} onChange={e => setFormSourceType(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="url">URL</option>
-                <option value="youtube">YouTube</option>
-                <option value="vimeo">Vimeo</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">재생시간 * (mm:ss)</label>
-              <input type="text" value={formDuration} onChange={e => setFormDuration(e.target.value)} placeholder="예: 10:30" className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">미디어 타입</label>
-              <select value={formMediaType} onChange={e => setFormMediaType(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="video">동영상</option>
-                <option value="image">이미지</option>
-                <option value="html">HTML</option>
-                <option value="text">텍스트</option>
-              </select>
-            </div>
-            <div className="md:col-span-2">
-              <label className="block text-xs font-medium text-slate-500 mb-1">태그 * (최소 1개)</label>
-              <div className="flex flex-wrap gap-1 mb-2 min-h-[28px]">
-                {formTags.map(tag => (
-                  <span key={tag} className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">
-                    #{tag}
-                    <button type="button" onClick={() => removeTag(tag)} className="ml-0.5 hover:text-blue-900">×</button>
-                  </span>
-                ))}
-              </div>
-              <input
-                type="text"
-                value={formTagInput}
-                onChange={(e) => setFormTagInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ',') {
-                    e.preventDefault();
-                    addTag(formTagInput);
-                    setFormTagInput('');
-                  }
-                }}
-                placeholder="태그 입력 후 Enter 또는 쉼표"
-                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <div className="flex flex-wrap gap-1 mt-2">
-                {DEFAULT_TAG_SUGGESTIONS.filter(t => !formTags.includes(t)).map(t => (
-                  <button
-                    key={t}
-                    type="button"
-                    onClick={() => addTag(t)}
-                    className="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded-full hover:bg-blue-100 hover:text-blue-700 transition-colors"
-                  >
-                    #{t}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-          <div className="flex justify-end gap-2 mt-4">
-            <button onClick={() => setShowForm(false)} className="px-4 py-2 border border-slate-200 rounded-lg text-sm hover:bg-slate-50">취소</button>
-            <button onClick={handleCreate} disabled={isCreating || !formName.trim() || !formSourceUrl.trim() || formTags.length === 0} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50">{isCreating ? '등록 중...' : '등록'}</button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => { resetForm(); setShowForm(true); }}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+            >
+              <Plus className="w-4 h-4" /> 새 미디어
+            </button>
+            <button onClick={fetchMedia} disabled={isLoading} className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors text-sm disabled:opacity-50">
+              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} /> 새로고침
+            </button>
           </div>
         </div>
-      )}
 
-      {/* Search */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-        <input
-          type="text"
-          value={searchKeyword}
-          onChange={e => setSearchKeyword(e.target.value)}
-          placeholder="미디어 이름 또는 타입으로 검색..."
-          className="w-full pl-9 pr-4 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        {error && (
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-800">{error}</div>
+        )}
+
+        {/* Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            { label: '전체', value: stats.total, color: 'text-slate-800' },
+            { label: '활성', value: stats.active, color: 'text-green-600' },
+            { label: '대기', value: stats.pending, color: 'text-amber-600' },
+            { label: '아카이브', value: stats.archived, color: 'text-slate-500' },
+          ].map(s => (
+            <div key={s.label} className="bg-white rounded-xl p-4 border border-blue-100">
+              <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
+              <p className="text-xs text-slate-500">{s.label}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Search */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <input
+            type="text"
+            value={searchKeyword}
+            onChange={e => setSearchKeyword(e.target.value)}
+            placeholder="미디어 이름 또는 타입으로 검색..."
+            className="w-full pl-9 pr-4 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        {/* Bulk Action Bar */}
+        <ActionBar
+          selectedCount={selectedIds.size}
+          onClearSelection={() => setSelectedIds(new Set())}
+          actions={bulkActions}
+        />
+
+        <BulkResultModal
+          open={batch.showResult}
+          onClose={() => { batch.clearResult(); fetchMedia(); }}
+          result={batch.result}
+          onRetry={() => { batch.retryFailed(); }}
+        />
+
+        {/* Table */}
+        <DataTable<MediaItem>
+          columns={columns}
+          data={filteredMedia}
+          rowKey="id"
+          loading={isLoading}
+          onRowClick={record => navigate(`/operator/signage/hq-media/${record.id}`)}
+          emptyMessage="HQ 미디어가 없습니다"
+          tableId="kpa-hq-media"
+          selectable
+          selectedKeys={selectedIds}
+          onSelectionChange={setSelectedIds}
         />
       </div>
 
-      {/* Bulk Action Bar */}
-      <ActionBar
-        selectedCount={selectedIds.size}
-        onClearSelection={() => setSelectedIds(new Set())}
-        actions={bulkActions}
-      />
+      {/* ── 동영상 등록 모달 ── */}
+      {showForm && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          onClick={(e) => { if (e.target === e.currentTarget && !isCreating) { setShowForm(false); resetForm(); } }}
+        >
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            {/* 모달 헤더 */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+              <h2 className="text-lg font-semibold text-slate-800">동영상 등록</h2>
+              <button
+                onClick={() => { setShowForm(false); resetForm(); }}
+                disabled={isCreating}
+                className="text-slate-400 hover:text-slate-600 p-1 disabled:opacity-50"
+              >
+                ✕
+              </button>
+            </div>
 
-      <BulkResultModal
-        open={batch.showResult}
-        onClose={() => { batch.clearResult(); fetchMedia(); }}
-        result={batch.result}
-        onRetry={() => { batch.retryFailed(); }}
-      />
+            {/* 모달 본문 */}
+            <div className="px-6 py-5 space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-slate-500 mb-1">제목 *</label>
+                <input type="text" value={formName} onChange={e => setFormName(e.target.value)} placeholder="동영상 제목을 입력하세요" className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-500 mb-1">동영상 URL *</label>
+                <input type="text" value={formSourceUrl} onChange={e => setFormSourceUrl(e.target.value)} placeholder="YouTube 또는 Vimeo URL" className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-slate-500 mb-1">소스 타입</label>
+                  <select value={formSourceType} onChange={e => setFormSourceType(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="url">URL</option>
+                    <option value="youtube">YouTube</option>
+                    <option value="vimeo">Vimeo</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-500 mb-1">재생시간 * (mm:ss)</label>
+                  <input type="text" value={formDuration} onChange={e => setFormDuration(e.target.value)} placeholder="예: 10:30" className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-500 mb-1">미디어 타입</label>
+                <select value={formMediaType} onChange={e => setFormMediaType(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option value="video">동영상</option>
+                  <option value="image">이미지</option>
+                  <option value="html">HTML</option>
+                  <option value="text">텍스트</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-500 mb-1">태그 * (최소 1개)</label>
+                <div className="flex flex-wrap gap-1 mb-2 min-h-[28px]">
+                  {formTags.map(tag => (
+                    <span key={tag} className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">
+                      #{tag}
+                      <button type="button" onClick={() => removeTag(tag)} className="ml-0.5 hover:text-blue-900">×</button>
+                    </span>
+                  ))}
+                </div>
+                <input
+                  type="text"
+                  value={formTagInput}
+                  onChange={(e) => setFormTagInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ',') {
+                      e.preventDefault();
+                      addTag(formTagInput);
+                      setFormTagInput('');
+                    }
+                  }}
+                  placeholder="태그 입력 후 Enter 또는 쉼표"
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {DEFAULT_TAG_SUGGESTIONS.filter(t => !formTags.includes(t)).map(t => (
+                    <button
+                      key={t}
+                      type="button"
+                      onClick={() => addTag(t)}
+                      className="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded-full hover:bg-blue-100 hover:text-blue-700 transition-colors"
+                    >
+                      #{t}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {formError && <p className="text-sm text-red-600">{formError}</p>}
+            </div>
 
-      {/* Table */}
-      <DataTable<MediaItem>
-        columns={columns}
-        data={filteredMedia}
-        rowKey="id"
-        loading={isLoading}
-        onRowClick={record => navigate(`/operator/signage/hq-media/${record.id}`)}
-        emptyMessage="HQ 미디어가 없습니다"
-        tableId="kpa-hq-media"
-        selectable
-        selectedKeys={selectedIds}
-        onSelectionChange={setSelectedIds}
-      />
-
-    </div>
+            {/* 모달 푸터 */}
+            <div className="flex justify-end gap-2 px-6 pb-5">
+              <button
+                onClick={() => { setShowForm(false); resetForm(); }}
+                disabled={isCreating}
+                className="px-4 py-2 border border-slate-200 rounded-lg text-sm hover:bg-slate-50 disabled:opacity-50"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleCreate}
+                disabled={isCreating || !formName.trim() || !formSourceUrl.trim() || formTags.length === 0}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+              >
+                {isCreating ? '등록 중...' : '등록'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
