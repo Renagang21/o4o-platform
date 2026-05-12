@@ -6,6 +6,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Pagination, Card } from '../../components/common';
 import { MyPageNavigation } from '@o4o/account-ui';
 import { KPA_MYPAGE_NAV_ITEMS } from './navItems';
@@ -15,6 +16,7 @@ import { colors, typography } from '../../styles/theme';
 import type { CourseCompletionItem } from '../../types';
 
 export function MyCompletionsPage() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [completions, setCompletions] = useState<CourseCompletionItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -87,7 +89,7 @@ export function MyCompletionsPage() {
           icon="📋"
           title="수료 내역이 없습니다"
           description="코스를 완료하면 수료 기록이 자동으로 생성됩니다."
-          action={{ label: '코스 보기', onClick: () => window.location.href = '/lms' }}
+          action={{ label: '코스 보기', onClick: () => navigate('/lms') }}
         />
       ) : (
         <>
@@ -111,7 +113,7 @@ export function MyCompletionsPage() {
                   </div>
                   <button
                     style={styles.certButton}
-                    onClick={() => window.location.href = '/mypage/certificates'}
+                    onClick={() => navigate('/mypage/certificates')}
                   >
                     수료증 보기
                   </button>

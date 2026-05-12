@@ -121,7 +121,7 @@ export function MobileBottomNav() {
 // display/visibility는 Tailwind만 제어 — inline style로 display 지정 금지
 // (inline style은 md:hidden보다 우선순위가 높아 재정의됨)
 const NAV_CLASS =
-  'flex md:hidden fixed bottom-0 left-0 right-0 z-50 items-stretch bg-white border-t border-slate-200';
+  'flex md:hidden fixed bottom-0 left-0 right-0 z-40 items-stretch bg-white border-t border-slate-200';
 
 // safe-area-inset만 inline style로 — Tailwind 미지원 CSS custom property
 const navSafeArea: React.CSSProperties = {

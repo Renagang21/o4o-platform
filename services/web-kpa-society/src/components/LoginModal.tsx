@@ -19,6 +19,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { X, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/AuthModalContext';
@@ -26,6 +27,7 @@ import { useAuthModal } from '../contexts/AuthModalContext';
 const REMEMBER_EMAIL_KEY = 'kpasociety_remember_email';
 
 export default function LoginModal() {
+  const navigate = useNavigate();
   const { login } = useAuth();
   const { activeModal, closeModal, openRegisterModal, onLoginSuccess } = useAuthModal();
   const [email, setEmail] = useState('');
@@ -142,7 +144,7 @@ export default function LoginModal() {
     // TODO: ForgotPasswordModal로 전환
     // 현재는 페이지 이동 유지 (추후 모달로 전환)
     closeModal();
-    window.location.href = '/forgot-password';
+    navigate('/forgot-password');
   };
 
   const handleRegister = (e: React.MouseEvent) => {

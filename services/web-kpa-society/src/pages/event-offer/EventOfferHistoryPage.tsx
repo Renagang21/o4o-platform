@@ -3,7 +3,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Pagination, Card } from '../../components/common';
 import { eventOfferApi } from '../../api';
 import { useAuth } from '../../contexts';
@@ -11,6 +11,7 @@ import { colors, typography } from '../../styles/theme';
 import type { EventOfferParticipation } from '../../types';
 
 export function EventOfferHistoryPage() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [participations, setParticipations] = useState<EventOfferParticipation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -100,7 +101,7 @@ export function EventOfferHistoryPage() {
           icon="🛒"
           title="참여 내역이 없습니다"
           description="이벤트에 참여해보세요!"
-          action={{ label: '이벤트 보기', onClick: () => window.location.href = '/event-offers' }}
+          action={{ label: '이벤트 보기', onClick: () => navigate('/event-offers') }}
         />
       ) : (
         <>
