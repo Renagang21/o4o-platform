@@ -132,6 +132,9 @@ const IntranetRoutes = lazy(() => import('./routes/IntranetRoutes').then(m => ({
 // Auth/Register — Phase 2 lazy
 const RegisterPendingPage = lazy(() => import('./pages/auth/RegisterPendingPage'));
 
+// Mobile Pages — WO-O4O-KPA-MOBILE-MENU-STRUCTURE-PHASE2-V1
+const MobilePharmacyPage = lazy(() => import('./pages/mobile/MobilePharmacyPage').then(m => ({ default: m.MobilePharmacyPage })));
+
 // Manual Pages (WO-KPA-A-MANUAL-MAIN-PAGE-V1)
 
 // Guide Pages — Phase 2 lazy (14 pages)
@@ -812,6 +815,9 @@ function App() {
 
           {/* Function Gate → /setup-activity 리다이렉트 (WO-KPA-A-AUTH-UX-STATE-UNIFICATION-V1) */}
           <Route path="/select-function" element={<Navigate to="/setup-activity" replace />} />
+
+          {/* Mobile Hub — WO-O4O-KPA-MOBILE-MENU-STRUCTURE-PHASE2-V1 */}
+          <Route path="/mobile/pharmacy" element={<Layout serviceName={SERVICE_NAME}><MobilePharmacyPage /></Layout>} />
 
           {/* Info Pages — WO-O4O-KPA-WEB-MENU-STRUCTURE-PHASE1-V1 (stub) */}
           <Route path="/about" element={<Layout serviceName={SERVICE_NAME}><AboutPage /></Layout>} />

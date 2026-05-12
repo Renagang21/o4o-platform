@@ -177,7 +177,7 @@ export const cardStyles: Record<string, CSSProperties> = {
     borderRadius: 8,
     padding: '18px 20px',
   },
-  overviewLabel: { fontSize: '1rem', fontWeight: 700, color: '#0f172a', margin: '0 0 6px 0' },
+  overviewLabel: { fontSize: '1rem', fontWeight: 700, color: '#0f172a', margin: '0 0 6px 0', wordBreak: 'keep-all' },
   overviewSummary: { fontSize: '0.875rem', color: '#475569', lineHeight: 1.6, margin: 0 },
   // /guide/intro 형 (smaller label, longer detail)
   basic: {
@@ -191,6 +191,7 @@ export const cardStyles: Record<string, CSSProperties> = {
     fontWeight: 600,
     color: '#1e293b',
     margin: '0 0 6px 0',
+    wordBreak: 'keep-all',
   },
   basicDetail: { fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.6, margin: 0 },
   // /guide/features의 클릭 가능 카드
@@ -209,6 +210,7 @@ export const cardStyles: Record<string, CSSProperties> = {
     fontWeight: 600,
     color: '#1e293b',
     margin: '0 0 6px 0',
+    wordBreak: 'keep-all',
   },
   linkRoute: {
     fontSize: '0.75rem',

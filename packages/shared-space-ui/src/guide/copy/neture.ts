@@ -26,7 +26,7 @@ export const netureGuideIntroProps: GuideIntroPageProps = {
     eyebrow: '이용 가이드',
     title: 'Neture 개요',
     description:
-      'Neture는 공급자가 상품과 콘텐츠를 등록하고, 매장에서 실제 고객에게 전달되는 흐름을 지원하는 공급자 실행 플랫폼입니다. 단순한 상품 노출 채널이 아니라, 콘텐츠 · 계약 · 이벤트 · 오프라인 실행까지 연결합니다.',
+      'Neture는 공급자 실행 플랫폼입니다. 상품 등록부터 콘텐츠 운영 · 계약 · 이벤트까지 — 제품이 실제 매장에서 움직이도록 지원합니다.',
     nextLink: { label: '다음: 서비스 활용 방법 →', to: '/guide/usage' },
   },
   sections: [
@@ -36,9 +36,9 @@ export const netureGuideIntroProps: GuideIntroPageProps = {
       description:
         'O4O는 공급자 · 운영자 · 매장이 하나의 플랫폼 위에서 역할을 나누는 구조입니다. 공급자가 상품과 전략을 결정하고, 매장이 실행하며, 운영자가 품질과 정책을 관리합니다.',
       items: [
-        { label: '공급자', detail: '상품과 콘텐츠를 등록하고 유통 범위와 가격 전략을 직접 결정합니다.' },
-        { label: '운영자', detail: '플랫폼 정책 · 상품 품질 · 서비스 노출 승인을 담당합니다.' },
-        { label: '매장', detail: '공급자의 상품과 콘텐츠를 받아 고객에게 직접 전달합니다.' },
+        { label: '공급자', detail: '상품 · 콘텐츠 등록과 유통 전략을 직접 결정합니다.' },
+        { label: '운영자', detail: '상품 품질 · 서비스 노출 승인과 정책을 담당합니다.' },
+        { label: '매장', detail: '공급자의 상품과 콘텐츠를 받아 고객에게 전달합니다.' },
       ],
     },
     {
@@ -47,9 +47,9 @@ export const netureGuideIntroProps: GuideIntroPageProps = {
       description:
         'Neture는 공급자와 매장 실행 서비스(KPA Society · K-Cosmetics 등)를 연결하는 허브입니다. 콘텐츠 · 계약 · 이벤트 · 유통 참여 펀딩의 공통 기반을 제공합니다.',
       items: [
-        { label: '공급자 주도 플랫폼', detail: '공급자가 상품 · 콘텐츠 · 유통 범위 · 이벤트 전략을 직접 구성합니다.' },
-        { label: '콘텐츠 기반 유통', detail: '매장 대상 B2B 콘텐츠, 포럼, 자료실이 유통의 핵심 채널입니다.' },
-        { label: '오프라인 실행 연결', detail: 'Event Offer · Market Trial로 실제 매장 실행과 직접 연결됩니다.' },
+        { label: '공급자 주도 플랫폼', detail: '유통 범위 · 이벤트 · 가격 전략을 공급자가 직접 구성합니다.' },
+        { label: '콘텐츠 기반 유통', detail: 'B2B 콘텐츠 · 포럼 · 자료실이 유통의 핵심 채널입니다.' },
+        { label: '오프라인 실행 연결', detail: 'Event Offer · Market Trial로 매장 실행과 연결됩니다.' },
       ],
     },
     {
@@ -58,9 +58,9 @@ export const netureGuideIntroProps: GuideIntroPageProps = {
       description:
         '운영자가 정책과 승인을 담당하고, 공급자가 콘텐츠와 유통을 주도합니다. 매장과 커뮤니티는 그 결과를 받아 확산합니다.',
       items: [
-        { label: '운영자 정책 관리', detail: '가입 승인, 상품 품질 검수, 서비스별 노출 승인을 운영자가 담당합니다.' },
-        { label: '공급자 주도 유통', detail: '유통 범위 선택, Event Offer, Market Trial 제안권이 공급자에게 있습니다.' },
-        { label: '매장 · 커뮤니티 확산', detail: '매장 실행과 포럼 · 자료실 공유로 콘텐츠가 확장됩니다.' },
+        { label: '운영자 정책 관리', detail: '가입 · 상품 품질 · 서비스 노출 승인을 담당합니다.' },
+        { label: '공급자 주도 유통', detail: 'Event Offer · Trial 제안과 유통 범위 선택권이 공급자에게 있습니다.' },
+        { label: '매장 · 커뮤니티 확산', detail: '포럼 · 자료실로 콘텐츠가 매장 현장까지 확장됩니다.' },
       ],
     },
     {
@@ -166,7 +166,7 @@ export const netureGuideIntroNetureProps: GuideIntroKpaPageProps = {
     eyebrow: 'Neture 개요',
     title: 'Neture 의 위치',
     description:
-      'Neture는 "좋은 제품을 등록하는 플랫폼"이 아닙니다. 제품이 실제 매장에서 움직이도록 — 진열되고, 고객에게 설명되고, 이벤트로 연결되도록 — 지원하는 공급자 실행 플랫폼입니다.',
+      'Neture는 "좋은 제품을 등록하는 플랫폼"이 아닙니다. 제품이 실제 매장에서 진열되고, 고객에게 설명되고, 이벤트로 연결되도록 지원하는 공급자 실행 플랫폼입니다.',
     context: [
       { label: '플랫폼 성격', value: '공급자 중심 · 콘텐츠 기반 · 오프라인 실행 연결' },
       { label: '연결 대상', value: '매장 실행 서비스 (KPA Society · K-Cosmetics 등)' },
@@ -185,15 +185,15 @@ export const netureGuideIntroNetureProps: GuideIntroKpaPageProps = {
     cards: [
       {
         label: '콘텐츠 기반 유통',
-        summary: '공급자가 작성한 B2B · B2C 콘텐츠와 자료실이 매장에서 고객 상담의 근거가 됩니다.',
+        summary: '공급자 콘텐츠 · 포럼 · 자료실이 매장 고객 상담의 실질적 근거가 됩니다.',
       },
       {
         label: '계약 기반 협력',
-        summary: '공급자 · 파트너 · 매장 사이의 협력을 명시적 계약으로 관리해 신뢰를 확보합니다.',
+        summary: '공급자 · 파트너 · 매장 사이의 협력을 명시적 계약으로 관리합니다.',
       },
       {
         label: '오프라인 실행 연결',
-        summary: 'Event Offer와 Market Trial로 온라인 등록이 실제 매장 진열과 프로모션으로 이어집니다.',
+        summary: 'Event Offer · Market Trial로 온라인 등록이 실제 매장 실행과 연결됩니다.',
       },
     ],
   },
@@ -475,7 +475,7 @@ export const netureGuideUsageProps: GuideUsagePageProps = {
         },
         {
           label: 'Market Trial',
-          detail: '진열 안내 · 고객 멘트 · 할인 조건 · 기대 효과를 포함한 오프라인 실행 시나리오를 제안합니다.',
+          detail: '진열 · 고객 안내 · 할인 · 기대 효과를 담은 오프라인 실행 시나리오를 제안합니다.',
         },
       ],
     },
