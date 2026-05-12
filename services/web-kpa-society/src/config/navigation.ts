@@ -12,16 +12,19 @@ import type { GlobalHeaderNavItem } from '@o4o/ui';
 import { kpaConfig } from '@o4o/operator-ux-core';
 
 // ─── Public Nav ──────────────────────────────────────────────────────────────
-// 모든 사용자에게 노출
+// 로그인 상태와 무관하게 항상 노출. About은 마지막에 위치.
+// KpaGlobalHeader가 역할 조건 아이템을 삽입 후 이 배열을 조합한다.
 
-export const KPA_PUBLIC_NAV: GlobalHeaderNavItem[] = [
-  { label: '홈', href: '/' },
-  { label: '포럼', href: '/forum' },
-  { label: '강의', href: '/lms' },
+export const KPA_BASE_NAV: GlobalHeaderNavItem[] = [
+  { label: '커뮤니티', href: '/' },
 ];
+
+export const KPA_ABOUT_NAV_ITEM: GlobalHeaderNavItem = { label: 'About', href: '/about' };
+export const KPA_CONTACT_NAV_ITEM: GlobalHeaderNavItem = { label: 'Contact', href: '/contact' };
 
 // ─── Contextual Nav ──────────────────────────────────────────────────────────
 // 역할 조건에 따라 노출 (서비스에서 필터링 후 전달)
+// 순서: 내 매장/내 약국 → 매장 HUB/약국 HUB (WO-O4O-KPA-WEB-MENU-STRUCTURE-PHASE1-V1)
 
 export interface KpaContextualNavItem extends GlobalHeaderNavItem {
   /** 노출 조건 키 */
@@ -29,8 +32,8 @@ export interface KpaContextualNavItem extends GlobalHeaderNavItem {
 }
 
 export const KPA_CONTEXTUAL_NAV: KpaContextualNavItem[] = [
-  { label: kpaConfig.terminology.storeHubLabel, href: '/store-hub', visibleWhen: 'pharmacyRelated' },
   { label: kpaConfig.terminology.myStoreLabel, href: '/store', visibleWhen: 'storeOwner' },
+  { label: kpaConfig.terminology.storeHubLabel, href: '/store-hub', visibleWhen: 'pharmacyRelated' },
 ];
 
 // ─── Filter Helper ───────────────────────────────────────────────────────────

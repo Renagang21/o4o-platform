@@ -813,6 +813,10 @@ function App() {
           {/* Function Gate → /setup-activity 리다이렉트 (WO-KPA-A-AUTH-UX-STATE-UNIFICATION-V1) */}
           <Route path="/select-function" element={<Navigate to="/setup-activity" replace />} />
 
+          {/* Info Pages — WO-O4O-KPA-WEB-MENU-STRUCTURE-PHASE1-V1 (stub) */}
+          <Route path="/about" element={<Layout serviceName={SERVICE_NAME}><AboutPage /></Layout>} />
+          <Route path="/contact" element={<Layout serviceName={SERVICE_NAME}><ContactPage /></Layout>} />
+
           {/* Legal (이용약관/개인정보처리방침) - WO-KPA-LEGAL-PAGES-V1 */}
           <Route path="/policy" element={<Layout serviceName={SERVICE_NAME}><PolicyPage /></Layout>} />
           <Route path="/privacy" element={<Layout serviceName={SERVICE_NAME}><PrivacyPage /></Layout>} />
@@ -1038,6 +1042,30 @@ function DemoLayoutRoutes() {
         <Route path="*" element={<DemoNotFoundPage />} />
       </Routes>
     </DemoLayout>
+  );
+}
+
+// ─── Info Pages (stub) — WO-O4O-KPA-WEB-MENU-STRUCTURE-PHASE1-V1 ─────────────
+
+function AboutPage() {
+  return (
+    <div style={{ maxWidth: 720, margin: '0 auto', padding: '64px 24px' }}>
+      <h1 style={{ fontSize: '1.875rem', fontWeight: 700, color: '#0f172a', marginBottom: 16 }}>KPA-Society 소개</h1>
+      <p style={{ fontSize: '1rem', color: '#475569', lineHeight: 1.7 }}>
+        KPA-Society는 약사 전문 플랫폼으로, 커뮤니티·교육·매장 경영을 하나의 공간에서 지원합니다.
+      </p>
+    </div>
+  );
+}
+
+function ContactPage() {
+  return (
+    <div style={{ maxWidth: 720, margin: '0 auto', padding: '64px 24px' }}>
+      <h1 style={{ fontSize: '1.875rem', fontWeight: 700, color: '#0f172a', marginBottom: 16 }}>문의하기</h1>
+      <p style={{ fontSize: '1rem', color: '#475569', lineHeight: 1.7 }}>
+        서비스 문의는 운영팀 이메일로 연락해 주세요.
+      </p>
+    </div>
   );
 }
 

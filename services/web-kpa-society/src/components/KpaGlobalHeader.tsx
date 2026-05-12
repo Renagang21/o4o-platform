@@ -19,7 +19,9 @@ import { isOperatorOrAbove, isAdminOrAbove } from '@o4o/auth-utils';
 import { useAuth, type User as UserType } from '../contexts';
 import { useAuthModal } from '../contexts/LoginModalContext';
 import {
-  KPA_PUBLIC_NAV,
+  KPA_BASE_NAV,
+  KPA_ABOUT_NAV_ITEM,
+  KPA_CONTACT_NAV_ITEM,
   KPA_CONTEXTUAL_NAV,
   filterContextualNav,
 } from '../config/navigation';
@@ -70,12 +72,16 @@ export function KpaGlobalHeader() {
   const isStoreOwner = user?.isStoreOwner === true;
   const isPharmacyRelated = isStoreOwner || (user as any)?.activityType === 'pharmacy_owner';
 
-  // contextualNav 필터링
-  // WO-O4O-KPA-MY-PHARMACY-HEADER-ROUTE-FIX-V1: visibleWhen 조건 일관 적용
-  const contextualNav = filterContextualNav(KPA_CONTEXTUAL_NAV, {
-    isStoreOwner,
-    isPharmacyRelated,
-  });
+  // WO-O4O-KPA-WEB-MENU-STRUCTURE-PHASE1-V1: 상태별 통합 nav 조합
+  // 비로그인: 커뮤니티 / About / Contact
+  // 로그인:   커뮤니티 / [내 매장] / [약국 HUB] / About
+  const roleItems = filterContextualNav(KPA_CONTEXTUAL_NAV, { isStoreOwner, isPharmacyRelated });
+  const computedNav = [
+    ...KPA_BASE_NAV,
+    ...roleItems,
+    KPA_ABOUT_NAV_ITEM,
+    ...(user ? [] : [KPA_CONTACT_NAV_ITEM]),
+  ];
 
   // User 정보 변환
   const headerUser = user
@@ -98,8 +104,7 @@ export function KpaGlobalHeader() {
         subtitle: '약사 전문 플랫폼',
         primaryColor: '#2563eb',
       }}
-      publicNav={KPA_PUBLIC_NAV}
-      contextualNav={contextualNav}
+      publicNav={computedNav}
       user={headerUser}
       onLogin={openLoginModal}
       onRegister={openRegisterModal}
