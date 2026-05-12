@@ -20,7 +20,7 @@ import {
 } from 'typeorm';
 
 export type ContactRequestType = 'partner' | 'education';
-export type ContactRequestStatus = 'pending' | 'reviewed' | 'closed';
+export type ContactRequestStatus = 'pending' | 'reviewing' | 'done';
 
 @Entity('contact_requests')
 @Index(['service_key', 'status'])

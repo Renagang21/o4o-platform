@@ -45,6 +45,8 @@ import ForcedContentPage from '../pages/operator/signage/ForcedContentPage';
 import OperatorAnalyticsPage from '../pages/operator/AnalyticsPage';
 // WO-O4O-GUIDE-CONTENT-EDITOR-UI-V1
 import OperatorGuideContentsPage from '../pages/operator/OperatorGuideContentsPage';
+// WO-O4O-KPA-OPERATOR-COLLABORATION-INBOX-V1
+import CollaborationRequestsPage from '../pages/operator/CollaborationRequestsPage';
 import { RoleGuard } from '../components/auth/RoleGuard';
 import { PLATFORM_ROLES, ROLES } from '../lib/role-constants';
 // WO-O4O-OPERATOR-UI-STANDARDIZATION-V1: shared OperatorShell wrapper
@@ -149,6 +151,9 @@ export function OperatorRoutes() {
           {/* WO-KPA-A-OPERATOR-DASHBOARD-FIRST-STABILIZATION-V1: /operator/members를 canonical route로 통일 */}
           <Route path="users" element={<Navigate to="/operator/members" replace />} />
           <Route path="users/:id" element={<UserDetailPage />} />
+
+          {/* 협업 문의 관리 (WO-O4O-KPA-OPERATOR-COLLABORATION-INBOX-V1) */}
+          <Route path="collaboration-requests" element={<CollaborationRequestsPage />} />
 
           {/* 운영 분석 (WO-O4O-AUDIT-ANALYTICS-LAYER-V1) */}
           <Route path="analytics" element={<OperatorAnalyticsPage />} />

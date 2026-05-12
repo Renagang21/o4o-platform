@@ -102,6 +102,36 @@ export function createContactRequestHandler(dataSource: DataSource): RequestHand
   });
 }
 
+/** PATCH /api/v1/kpa/operator/contact-requests/:id/status — kpa:operator+ */
+export function updateContactRequestStatusHandler(dataSource: DataSource): RequestHandler {
+  const repo = () => dataSource.getRepository(ContactRequest);
+
+  return asyncHandler(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { status } = req.body as { status?: string };
+
+    if (!status || !['pending', 'reviewing', 'done'].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        error: '유효하지 않은 상태값입니다. (pending | reviewing | done)',
+        code: 'VALIDATION_ERROR',
+      });
+    }
+
+    const entity = await repo().findOne({
+      where: { id, service_key: 'kpa-society' },
+    });
+    if (!entity) {
+      return res.status(404).json({ success: false, error: '문의를 찾을 수 없습니다.', code: 'NOT_FOUND' });
+    }
+
+    entity.status = status as ContactRequest['status'];
+    const saved = await repo().save(entity);
+
+    return res.json({ success: true, data: { id: saved.id, status: saved.status } });
+  });
+}
+
 /** GET /api/v1/kpa/operator/contact-requests — kpa:operator+ */
 export function listContactRequestsHandler(dataSource: DataSource): RequestHandler {
   const repo = () => dataSource.getRepository(ContactRequest);

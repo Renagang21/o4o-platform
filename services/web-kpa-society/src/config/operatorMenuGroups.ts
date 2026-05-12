@@ -34,6 +34,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '상품 신청 관리', path: '/operator/product-applications' },
     // WO-O4O-EVENT-OFFER-OPERATOR-APPROVAL-KPA-V1: 이벤트 오퍼 승인 관리
     { label: '이벤트 오퍼 승인', path: '/operator/event-offers' },
+    // WO-O4O-KPA-OPERATOR-COLLABORATION-INBOX-V1
+    { label: '협업 문의', path: '/operator/collaboration-requests' },
   ],
   // WO-KPA-OPERATOR-STORES-MENU-HIDE-V1: stores 메뉴 노출 제거
   // stores: [ ... ] — 라우트/페이지/API/DB는 유지
@@ -112,6 +114,8 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: '상품 신청 관리', path: '/operator/product-applications' },
     // WO-O4O-EVENT-OFFER-OPERATOR-APPROVAL-KPA-V1
     { label: '이벤트 오퍼 승인', path: '/operator/event-offers' },
+    // WO-O4O-KPA-OPERATOR-COLLABORATION-INBOX-V1
+    { label: '협업 문의', path: '/operator/collaboration-requests' },
   ],
   // WO-KPA-OPERATOR-STORES-MENU-HIDE-V1: stores 메뉴 노출 제거
   // WO-KPA-LMS-INSTRUCTOR-APPROVAL-RELOCATE-V1: 자료실/강의 독립 그룹 분리

@@ -63,7 +63,7 @@ import { createEventOfferOperatorController } from './controllers/event-offer-op
 import { createSupplierOffersController } from './controllers/supplier-offers.controller.js';
 import { createJoinInquiryAdminRoutes, createJoinInquiryPublicRoutes } from './controllers/join-inquiry.controller.js';
 // WO-O4O-KPA-CONTACT-FORM-WORKFLOW-V1
-import { createContactRequestHandler, listContactRequestsHandler } from './controllers/contact-request.controller.js';
+import { createContactRequestHandler, listContactRequestsHandler, updateContactRequestStatusHandler } from './controllers/contact-request.controller.js';
 import { createOrganizationJoinRequestRoutes } from './controllers/organization-join-request.controller.js';
 import { createPharmacyRequestRoutes } from './controllers/pharmacy-request.controller.js';
 import { createStewardController } from './controllers/steward.controller.js';
@@ -265,6 +265,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // Contact Request — WO-O4O-KPA-CONTACT-FORM-WORKFLOW-V1
   router.post('/contact-requests', createContactRequestHandler(dataSource));
   router.get('/operator/contact-requests', coreRequireAuth as any, requireKpaScope('kpa:operator'), listContactRequestsHandler(dataSource));
+  router.patch('/operator/contact-requests/:id/status', coreRequireAuth as any, requireKpaScope('kpa:operator'), updateContactRequestStatusHandler(dataSource));
 
   // Organization Join Request routes (WO-CONTEXT-JOIN-REQUEST-MVP-V1)
   router.use('/organization-join-requests', createOrganizationJoinRequestRoutes(dataSource, coreRequireAuth as any, requireKpaScope, kpaActionLogService));
