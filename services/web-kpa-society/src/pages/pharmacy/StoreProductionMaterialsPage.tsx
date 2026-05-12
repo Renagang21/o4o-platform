@@ -7,20 +7,21 @@
  *   유형 선택 후 navigate 대신 in-page AiContentModal 을 띄워 AI 생성/편집 + 저장까지
  *   본 페이지 안에서 마무리할 수 있게 한다. 저장 destination 은
  *   showProductionMaterialSave 로 store_execution_assets (POST /api/v1/kpa/store/assets).
+ * WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-LIST-SOURCE-ALIGN-V1:
+ *   리스트 소스를 AI 저장 위치(store_execution_assets)와 정렬.
+ *   fetchAll() 을 병렬 페치로 교체:
+ *     - directContentApi.list() → sourceType='direct' 필터 (kpa_store_contents)
+ *     - getStoreExecutionAssets(limit=100) → sourceType='generated' 필터 (store_execution_assets)
+ *   두 결과를 updatedAt DESC 로 merge. 백엔드 통합 엔드포인트 없음 (클라이언트 머지).
+ *   삭제 API: sourceKind에 따라 directContentApi.remove / deleteStoreExecutionAsset 분기.
  *
  * 매장에서 POP·QR·블로그·상품 상세설명 등 결과물을 만들기 위해
  * 편집하거나 AI로 정리한 원본/중간 제작 자료를 관리하는 페이지.
  *
- * 데이터 소스:
- *   directContentApi.list() — kpa_store_contents (physical) / Store Production Material (logical)
- *   contentJson 안의 purpose / stage / createdFrom 필드가 있는 항목을 우선 표시.
- *   list API에서 contentJson이 반환되지 않으므로 현재 단계에서는 default 값 표시.
- *   각 도구(POP/QR/블로그/상품 상세설명)가 contentJson에 metadata를 저장하면 자동 반영.
- *
- * 데이터 소스 한계 (후속 WO 후보):
- *   현재 list 는 kpa_store_contents 만 노출하지만 AI 흐름의 저장 대상은
- *   store_execution_assets 임. AI 로 저장한 자료는 본 페이지 list 에 즉시 노출되지
- *   않을 수 있다 (양쪽 source 통합 머지는 별도 WO).
+ * 데이터 소스 (통합):
+ *   directContentApi.list() — kpa_store_contents (sourceType='direct')
+ *   getStoreExecutionAssets() — store_execution_assets (sourceType='generated')
+ *   AiContentModal 저장 규칙: assetType=content, sourceType=generated, category=outputType
  *
  * DB/migration 금지: 기존 API 재사용만으로 구현.
  */
@@ -30,6 +31,10 @@ import { Layers, Trash2, RefreshCw, Sparkles, FileEdit, Plus } from 'lucide-reac
 import { toast } from '@o4o/error-handling';
 import { AiContentModal } from '@o4o/content-editor';
 import { directContentApi } from '../../api/assetSnapshot';
+import {
+  getStoreExecutionAssets,
+  deleteStoreExecutionAsset,
+} from '../../api/storeExecutionAssets';
 import { getAccessToken } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
 import { StartProductionModal, type ProductionSource } from './StartProductionModal';
@@ -47,19 +52,26 @@ interface ProductionMaterialItem {
   id: string;
   title: string;
   updatedAt: string;
-  /** contentJson에서 추출 — list API 미지원으로 현재 단계에서는 undefined */
   purpose?: string;
   stage?: string;
   createdFrom?: string;
+  /** 삭제 API 분기용: kpa_store_contents | store_execution_assets */
+  sourceKind: 'direct-content' | 'execution-asset';
 }
 
 // ─── 메타 레이블 헬퍼 ────────────────────────────────────────────────────────
 
 const PURPOSE_LABELS: Record<string, string> = {
+  // direct-content purpose 값
   pop: 'POP',
   qr: 'QR 코드',
   blog: '블로그',
   product_description: '상품 상세설명',
+  // execution-asset category = AiContentModal outputType 값
+  store_qr: 'QR 코드',
+  product_detail: '상품 상세설명',
+  summary: '요약',
+  title_suggest: '제목 추천',
 };
 
 const STAGE_LABELS: Record<string, { label: string; bg: string; fg: string }> = {
@@ -108,21 +120,44 @@ export default function StoreProductionMaterialsPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await directContentApi.list();
-      // source_type='direct' 항목만 사용.
-      // 향후 purpose/stage/createdFrom 이 list에 노출되면 여기서 추출.
-      const raw = (res.data || []).filter((it: any) => it.sourceType === 'direct');
-      setItems(
-        raw.map((it: any): ProductionMaterialItem => ({
+      // WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-LIST-SOURCE-ALIGN-V1
+      // 두 소스 병렬 페치. 한쪽 실패해도 다른 쪽은 표시.
+      const [directRes, assetsRes] = await Promise.all([
+        directContentApi.list().catch(() => null),
+        getStoreExecutionAssets({ limit: 100 }).catch(() => null),
+      ]);
+
+      const directItems: ProductionMaterialItem[] = ((directRes?.data ?? []) as any[])
+        .filter((it: any) => it.sourceType === 'direct')
+        .map((it: any): ProductionMaterialItem => ({
           id: it.id,
           title: it.title,
           updatedAt: it.updatedAt,
-          // contentJson은 list API 미지원 — get(id) 호출 없이 현재 단계에서는 미노출.
           purpose: it.purpose ?? it.contentJson?.purpose,
           stage: it.stage ?? it.contentJson?.stage,
           createdFrom: it.createdFrom ?? it.contentJson?.createdFrom,
-        })),
+          sourceKind: 'direct-content',
+        }));
+
+      // AiContentModal 저장 규칙: sourceType='generated', category=outputType
+      const executionItems: ProductionMaterialItem[] = ((assetsRes?.data?.items ?? []) as any[])
+        .filter((it: any) => it.sourceType === 'generated')
+        .map((it: any): ProductionMaterialItem => ({
+          id: it.id,
+          title: it.title,
+          updatedAt: it.updatedAt,
+          purpose: it.category ?? undefined,
+          stage: 'finalized',
+          createdFrom: 'ai',
+          sourceKind: 'execution-asset',
+        }));
+
+      // updatedAt DESC 병합
+      const merged = [...directItems, ...executionItems].sort(
+        (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
       );
+
+      setItems(merged);
       setSelected(new Set());
     } catch (e: any) {
       setError(e?.message || '불러오는 데 실패했습니다');
@@ -153,11 +188,15 @@ export default function StoreProductionMaterialsPage() {
 
   // ─── 삭제 ─────────────────────────────────────────────────────────────────
 
-  const handleDeleteOne = async (id: string) => {
+  const handleDeleteOne = async (id: string, sourceKind: ProductionMaterialItem['sourceKind']) => {
     if (!confirm('이 제작 자료를 삭제하시겠습니까?')) return;
     setDeletingId(id);
     try {
-      await directContentApi.remove(id);
+      if (sourceKind === 'direct-content') {
+        await directContentApi.remove(id);
+      } else {
+        await deleteStoreExecutionAsset(id);
+      }
       setItems((prev) => prev.filter((it) => it.id !== id));
       setSelected((prev) => { const n = new Set(prev); n.delete(id); return n; });
       toast.success('삭제되었습니다');
@@ -171,12 +210,19 @@ export default function StoreProductionMaterialsPage() {
   const handleBulkDelete = async () => {
     if (selected.size === 0) return;
     if (!confirm(`선택한 ${selected.size}개 제작 자료를 삭제하시겠습니까?`)) return;
-    const ids = [...selected];
+    const selectedItems = items.filter((it) => selected.has(it.id));
     try {
-      await Promise.all(ids.map((id) => directContentApi.remove(id)));
+      await Promise.all(
+        selectedItems.map((it) =>
+          it.sourceKind === 'direct-content'
+            ? directContentApi.remove(it.id)
+            : deleteStoreExecutionAsset(it.id),
+        ),
+      );
+      const ids = selectedItems.map((it) => it.id);
       setItems((prev) => prev.filter((it) => !ids.includes(it.id)));
       setSelected(new Set());
-      toast.success(`${ids.length}개 삭제되었습니다`);
+      toast.success(`${selectedItems.length}개 삭제되었습니다`);
     } catch (e: any) {
       toast.error(e?.message || '일괄 삭제에 실패했습니다');
     }
@@ -201,7 +247,11 @@ export default function StoreProductionMaterialsPage() {
     if (selected.size === 0) return;
     const sourceItems: ProductionSource['items'] = items
       .filter((it) => selected.has(it.id))
-      .map((it) => ({ id: it.id, title: it.title, origin: 'direct' as const }));
+      .map((it) => ({
+        id: it.id,
+        title: it.title,
+        origin: it.sourceKind === 'direct-content' ? 'direct' as const : 'library' as const,
+      }));
     setModalSource({ fromLibrary: 'contents', items: sourceItems });
     setModalOpen(true);
   };
@@ -360,7 +410,7 @@ export default function StoreProductionMaterialsPage() {
                 </div>
                 <div style={{ ...styles.col, width: 44 }}>
                   <button
-                    onClick={() => handleDeleteOne(item.id)}
+                    onClick={() => handleDeleteOne(item.id, item.sourceKind)}
                     disabled={deletingId === item.id}
                     style={styles.deleteBtn}
                     title="삭제"
