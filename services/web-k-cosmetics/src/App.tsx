@@ -42,6 +42,9 @@ import ResetPasswordPage from '@/pages/auth/ResetPasswordPage';
 // Lazy loaded pages (heavy / rarely accessed)
 // ============================================================================
 
+// WO-O4O-KCOS-MENU-CANONICAL-ALIGN-V1: 모바일 매장 경영 허브
+const MobileStorePage = lazy(() => import('@/pages/mobile/MobileStorePage'));
+
 // Public pages
 const ContactPage = lazy(() => import('@/pages').then(m => ({ default: m.ContactPage })));
 const RoleNotAvailablePage = lazy(() => import('@/pages').then(m => ({ default: m.RoleNotAvailablePage })));
@@ -217,6 +220,8 @@ function AppRoutes() {
         <Route path="forgot-password" element={<AccountRecoveryPage />} />
         <Route path="reset-password" element={<ResetPasswordPage />} />
         <Route path="contact" element={<ContactPage />} />
+        {/* WO-O4O-KCOS-MENU-CANONICAL-ALIGN-V1: 모바일 매장 경영 허브 */}
+        <Route path="mobile/store" element={<MobileStorePage />} />
         <Route path="partners" element={<PartnerInfoPage />} />
         <Route path="partners/apply" element={<PartnerApplyPage />} />
 

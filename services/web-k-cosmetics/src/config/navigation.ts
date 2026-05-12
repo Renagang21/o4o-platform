@@ -25,9 +25,10 @@ export interface KCosContextualNavItem extends GlobalHeaderNavItem {
   visibleWhen: 'storeManager' | 'partner' | 'operator' | 'admin';
 }
 
+// WO-O4O-KCOS-MENU-CANONICAL-ALIGN-V1: 내 매장 → 매장 HUB (Canonical 순서), 파트너 유지
 export const KCOS_CONTEXTUAL_NAV: KCosContextualNavItem[] = [
-  { label: kcosmeticsConfig.terminology.storeHubLabel, href: '/store-hub', visibleWhen: 'storeManager' },
   { label: kcosmeticsConfig.terminology.myStoreLabel, href: '/store', visibleWhen: 'storeManager' },
+  { label: kcosmeticsConfig.terminology.storeHubLabel, href: '/store-hub', visibleWhen: 'storeManager' },
   { label: '파트너', href: '/partner', visibleWhen: 'partner' },
 ];
 

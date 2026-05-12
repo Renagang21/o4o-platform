@@ -77,6 +77,11 @@ export function KCosGlobalHeader() {
     isPartner: !!isPartner,
   });
 
+  // WO-O4O-KCOS-MENU-CANONICAL-ALIGN-V1: 비로그인 시 Contact 헤더 노출
+  const publicNav = isAuthenticated
+    ? KCOS_PUBLIC_NAV
+    : [...KCOS_PUBLIC_NAV, { label: 'Contact', href: '/contact' }];
+
   const headerUser = user
     ? { displayName: getUserDisplayName(user), email: user.email }
     : null;
@@ -96,7 +101,7 @@ export function KCosGlobalHeader() {
         subtitle: 'K-Beauty 전문 플랫폼',
         primaryColor: '#db2777',
       }}
-      publicNav={KCOS_PUBLIC_NAV}
+      publicNav={publicNav}
       contextualNav={contextualNav}
       user={headerUser}
       onLogin={openLoginModal}
