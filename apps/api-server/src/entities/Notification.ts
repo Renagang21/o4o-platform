@@ -51,6 +51,8 @@ export type NotificationType =
   | 'market_trial.recruiting_failed'
   | 'market_trial.outcome_confirming'
   | 'market_trial.fulfilled'
+  // WO-O4O-KPA-CONTACT-FORM-WORKFLOW-V1: Contact 문의 등록 알림
+  | 'contact.new'
   | 'custom';
 
 // Legacy interface for backward compatibility

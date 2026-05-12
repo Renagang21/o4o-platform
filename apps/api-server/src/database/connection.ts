@@ -370,6 +370,11 @@ import { ContentTemplate } from '../entities/ContentTemplate.js';
 import { PlatformInquiry } from '../entities/PlatformInquiry.js';
 
 // ============================================================================
+// CONTACT REQUEST ENTITY (WO-O4O-KPA-CONTACT-FORM-WORKFLOW-V1)
+// ============================================================================
+import { ContactRequest } from '../entities/ContactRequest.js';
+
+// ============================================================================
 // PLATFORM SERVICE CATALOG (WO-PLATFORM-SERVICE-CATALOG-AND-MY-V1)
 // ============================================================================
 import { PlatformService } from '../entities/PlatformService.js';
@@ -837,6 +842,8 @@ export const AppDataSource = new DataSource({
     // PLATFORM INQUIRY ENTITY (Platform-level Contact Form)
     // ============================================================================
     PlatformInquiry,
+    // WO-O4O-KPA-CONTACT-FORM-WORKFLOW-V1
+    ContactRequest,
     // ============================================================================
     // PLATFORM SERVICE CATALOG (WO-PLATFORM-SERVICE-CATALOG-AND-MY-V1)
     // ============================================================================

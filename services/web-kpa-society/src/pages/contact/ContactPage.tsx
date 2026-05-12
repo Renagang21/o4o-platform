@@ -2,19 +2,22 @@
  * ContactPage — KPA-Society 협업 및 연결 창구
  *
  * WO-O4O-KPA-CONTACT-PAGE-IMPLEMENTATION-V1
+ * WO-O4O-KPA-CONTACT-FORM-WORKFLOW-V1: 이메일 직접 노출 → 내부 폼 전환
  *
  * 구조:
  * 1. Hero (다크, 텍스트 중심)
- * 2. 운영자 / 단체 협력
- * 3. 강의 개설 / 협업
+ * 2. 운영자 / 단체 협력 카드 + 문의 버튼
+ * 3. 강의 개설 / 협업 카드 + 문의 버튼
  * 4. CTA (About / 포럼 / 가이드)
- *
- * 고객센터/기술지원/CS 구조 배제 — 협업과 연결 창구
  */
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import type { ContactRequestType } from '../../api/contactRequest';
+import { ContactModal } from './ContactModal';
 
 export function ContactPage() {
+  const [modalType, setModalType] = useState<ContactRequestType | null>(null);
+
   useEffect(() => {
     const prev = document.title;
     document.title = 'KPA-Society Contact';
@@ -61,9 +64,9 @@ export function ContactPage() {
                 <li style={s.cardListItem}>협동조합 / 공동 구매</li>
                 <li style={s.cardListItem}>공급·유통 파트너</li>
               </ul>
-              <a href="mailto:partner@kpa-society.kr" style={s.cardLink}>
-                partner@kpa-society.kr
-              </a>
+              <button style={s.cardBtn} onClick={() => setModalType('partner')}>
+                협력 문의 보내기
+              </button>
             </div>
 
             {/* 카드 2: 강의 개설 / 협업 */}
@@ -79,9 +82,9 @@ export function ContactPage() {
                 <li style={s.cardListItem}>보수교육 협력</li>
                 <li style={s.cardListItem}>세미나 / 워크숍 운영</li>
               </ul>
-              <a href="mailto:edu@kpa-society.kr" style={s.cardLink}>
-                edu@kpa-society.kr
-              </a>
+              <button style={s.cardBtn} onClick={() => setModalType('education')}>
+                강의 개설 문의
+              </button>
             </div>
 
           </div>
@@ -97,6 +100,11 @@ export function ContactPage() {
         </section>
 
       </div>
+
+      {/* ── Modal ── */}
+      {modalType && (
+        <ContactModal type={modalType} onClose={() => setModalType(null)} />
+      )}
     </div>
   );
 }
@@ -167,6 +175,8 @@ const s: Record<string, React.CSSProperties> = {
     border: '1px solid var(--color-border-default, #e2e8f0)',
     borderRadius: 14,
     padding: '28px 24px',
+    display: 'flex',
+    flexDirection: 'column' as const,
   },
   cardIcon: {
     fontSize: '2rem',
@@ -187,17 +197,23 @@ const s: Record<string, React.CSSProperties> = {
   cardList: {
     margin: '0 0 20px',
     paddingLeft: 18,
+    flex: 1,
   },
   cardListItem: {
     fontSize: '0.875rem',
     color: 'var(--color-text-secondary, #64748b)',
     lineHeight: 1.8,
   },
-  cardLink: {
-    fontSize: '0.875rem',
+  cardBtn: {
+    padding: '10px 20px',
+    backgroundColor: 'var(--color-primary, #2563eb)',
+    color: '#fff',
+    border: 'none',
+    borderRadius: 8,
+    fontSize: '0.9375rem',
     fontWeight: 600,
-    color: 'var(--color-primary, #2563eb)',
-    textDecoration: 'none',
+    cursor: 'pointer',
+    alignSelf: 'flex-start' as const,
   },
 
   // CTA
