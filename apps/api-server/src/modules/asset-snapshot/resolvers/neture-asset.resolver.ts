@@ -25,7 +25,7 @@ export class NetureAssetResolver implements ContentResolver {
   private async resolveSignage(id: string): Promise<ResolvedContent | null> {
     const rows = await this.dataSource.query(
       `SELECT "id", "name", "description", "mediaType", "sourceType", "sourceUrl",
-              "thumbnailUrl", "duration", "resolution", "content", "tags", "category", "metadata"
+              "thumbnailUrl", "duration", "resolution", "content", "tags", "metadata"
        FROM "signage_media"
        WHERE "id" = $1 AND "deletedAt" IS NULL
        LIMIT 1`,
@@ -48,7 +48,6 @@ export class NetureAssetResolver implements ContentResolver {
         resolution: media.resolution,
         content: media.content,
         tags: media.tags,
-        category: media.category,
         description: media.description,
         metadata: media.metadata,
       },

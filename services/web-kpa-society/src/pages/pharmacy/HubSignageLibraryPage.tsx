@@ -176,10 +176,12 @@ export function HubSignageLibraryPage() {
       setToast({ type: 'success', message: `"${name}" 이(가) 내 매장에 추가되었습니다.` });
     } catch (e: any) {
       const msg = e?.message || '';
-      if (msg.includes('DUPLICATE') || msg.includes('already')) {
+      if (msg.includes('DUPLICATE') || msg.includes('already') || e?.code === 'DUPLICATE_SNAPSHOT') {
         setToast({ type: 'error', message: '이미 매장에 추가된 항목입니다.' });
+      } else if (e?.status === 403) {
+        setToast({ type: 'error', message: '추가 권한이 없습니다. 매장 계정으로 로그인되어 있는지 확인하세요.' });
       } else {
-        setToast({ type: 'error', message: '매장 추가에 실패했습니다.' });
+        setToast({ type: 'error', message: `매장 추가에 실패했습니다. (${msg || '서버 오류'})` });
       }
     } finally {
       setCopyingId(null);
