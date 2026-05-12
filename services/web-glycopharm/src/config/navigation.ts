@@ -14,10 +14,9 @@ import { glycopharmConfig } from '@o4o/operator-ux-core';
 // ─── Public Nav ──────────────────────────────────────────────────────────────
 // 모든 사용자에게 노출
 
+// WO-O4O-GLYCOPHARM-MENU-CANONICAL-ALIGN-V1: 커뮤니티 단일 진입점
 export const GLYCO_PUBLIC_NAV: GlobalHeaderNavItem[] = [
-  { label: '홈', href: '/' },
-  { label: '포럼', href: '/forum' },
-  { label: '강의', href: '/lms' },
+  { label: '커뮤니티', href: '/' },
 ];
 
 // ─── Contextual Nav ──────────────────────────────────────────────────────────
@@ -28,10 +27,10 @@ export interface GlycoContextualNavItem extends GlobalHeaderNavItem {
   visibleWhen: 'pharmacyRelated' | 'storeOwner' | 'operator' | 'admin';
 }
 
-// WO-O4O-GLYCOPHARM-MENU-CANONICAL-ALIGN-V1: 내 매장 → 약국 HUB (Canonical 순서)
+// HUB 우선 — 비KPA 서비스는 매장 HUB가 먼저 노출
 export const GLYCO_CONTEXTUAL_NAV: GlycoContextualNavItem[] = [
-  { label: glycopharmConfig.terminology.myStoreLabel, href: '/store', visibleWhen: 'storeOwner' },
   { label: glycopharmConfig.terminology.storeHubLabel, href: '/store-hub', visibleWhen: 'pharmacyRelated' },
+  { label: glycopharmConfig.terminology.myStoreLabel, href: '/store', visibleWhen: 'storeOwner' },
 ];
 
 // ─── Filter Helper ───────────────────────────────────────────────────────────

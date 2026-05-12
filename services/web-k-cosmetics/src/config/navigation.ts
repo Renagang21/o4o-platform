@@ -13,10 +13,9 @@ import { kcosmeticsConfig } from '@o4o/operator-ux-core';
 
 // ─── Public Nav ──────────────────────────────────────────────────────────────
 
+// WO-O4O-KCOS-MENU-CANONICAL-ALIGN-V1: 커뮤니티 단일 진입점
 export const KCOS_PUBLIC_NAV: GlobalHeaderNavItem[] = [
-  { label: '홈', href: '/' },
-  { label: '포럼', href: '/forum' },
-  { label: '강의', href: '/lms' },
+  { label: '커뮤니티', href: '/' },
 ];
 
 // ─── Contextual Nav ──────────────────────────────────────────────────────────
@@ -25,10 +24,10 @@ export interface KCosContextualNavItem extends GlobalHeaderNavItem {
   visibleWhen: 'storeManager' | 'partner' | 'operator' | 'admin';
 }
 
-// WO-O4O-KCOS-MENU-CANONICAL-ALIGN-V1: 내 매장 → 매장 HUB (Canonical 순서), 파트너 유지
+// HUB 우선 — 비KPA 서비스는 매장 HUB가 먼저 노출, 파트너 유지
 export const KCOS_CONTEXTUAL_NAV: KCosContextualNavItem[] = [
-  { label: kcosmeticsConfig.terminology.myStoreLabel, href: '/store', visibleWhen: 'storeManager' },
   { label: kcosmeticsConfig.terminology.storeHubLabel, href: '/store-hub', visibleWhen: 'storeManager' },
+  { label: kcosmeticsConfig.terminology.myStoreLabel, href: '/store', visibleWhen: 'storeManager' },
   { label: '파트너', href: '/partner', visibleWhen: 'partner' },
 ];
 

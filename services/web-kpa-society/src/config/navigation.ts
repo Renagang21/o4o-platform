@@ -24,7 +24,7 @@ export const KPA_CONTACT_NAV_ITEM: GlobalHeaderNavItem = { label: 'Contact', hre
 
 // ─── Contextual Nav ──────────────────────────────────────────────────────────
 // 역할 조건에 따라 노출 (서비스에서 필터링 후 전달)
-// 순서: 약국 운영 허브 → 내 약국 (사용자 요청 2026-05-12)
+// KPA: 내 약국 우선 — 매장 경영자에게 내 매장이 먼저 보임
 
 export interface KpaContextualNavItem extends GlobalHeaderNavItem {
   /** 노출 조건 키 */
@@ -32,8 +32,8 @@ export interface KpaContextualNavItem extends GlobalHeaderNavItem {
 }
 
 export const KPA_CONTEXTUAL_NAV: KpaContextualNavItem[] = [
-  { label: kpaConfig.terminology.storeHubLabel, href: '/store-hub', visibleWhen: 'pharmacyRelated' },
   { label: kpaConfig.terminology.myStoreLabel, href: '/store', visibleWhen: 'storeOwner' },
+  { label: kpaConfig.terminology.storeHubLabel, href: '/store-hub', visibleWhen: 'pharmacyRelated' },
 ];
 
 // ─── Filter Helper ───────────────────────────────────────────────────────────

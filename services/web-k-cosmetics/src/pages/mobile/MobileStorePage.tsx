@@ -25,15 +25,8 @@ interface TabDef {
   actionLabel: string;
 }
 
+// 탭 순서: 내 매장 | 매장 HUB (매장 경영자에게 내 매장 먼저)
 const TABS: TabDef[] = [
-  {
-    key: 'hub',
-    label: '매장 HUB',
-    route: '/store-hub',
-    icon: <Building2 size={32} strokeWidth={1.5} />,
-    description: '공급사 B2B 카탈로그, 콘텐츠 라이브러리, K-Beauty 운영 자료를 한곳에서 확인하세요.',
-    actionLabel: '매장 HUB 입장',
-  },
   {
     key: 'my-store',
     label: '내 매장',
@@ -42,10 +35,17 @@ const TABS: TabDef[] = [
     description: '내 매장 대시보드, 상품 관리, 사이니지, 주문 현황을 관리하세요.',
     actionLabel: '내 매장 입장',
   },
+  {
+    key: 'hub',
+    label: '매장 HUB',
+    route: '/store-hub',
+    icon: <Building2 size={32} strokeWidth={1.5} />,
+    description: '공급사 B2B 카탈로그, 콘텐츠 라이브러리, K-Beauty 운영 자료를 한곳에서 확인하세요.',
+    actionLabel: '매장 HUB 입장',
+  },
 ];
 
-// K-Cosmetics canonical: 매장 HUB가 기본 활성 탭
-const DEFAULT_TAB: Tab = 'hub';
+const DEFAULT_TAB: Tab = 'my-store';
 
 export default function MobileStorePage() {
   const [activeTab, setActiveTab] = useState<Tab>(DEFAULT_TAB);

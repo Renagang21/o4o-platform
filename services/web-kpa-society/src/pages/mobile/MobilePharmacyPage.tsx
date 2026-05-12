@@ -24,15 +24,8 @@ interface TabDef {
   desc: string;
 }
 
+// 탭 순서: 내 약국 → 약국 HUB (매장 경영자에게 내 매장 먼저)
 const TABS: TabDef[] = [
-  {
-    key: 'hub',
-    label: '약국 HUB',
-    route: '/store-hub',
-    icon: <Building2 size={18} />,
-    title: '약국 HUB',
-    desc: '공동 콘텐츠·상품·이벤트 오퍼를 확인하고 내 매장에 적용하세요.',
-  },
   {
     key: 'my-store',
     label: '내 약국',
@@ -40,6 +33,14 @@ const TABS: TabDef[] = [
     icon: <Store size={18} />,
     title: '내 약국 관리',
     desc: '약국 운영 현황, 마케팅, 채널 설정을 한 곳에서 관리하세요.',
+  },
+  {
+    key: 'hub',
+    label: '약국 HUB',
+    route: '/store-hub',
+    icon: <Building2 size={18} />,
+    title: '약국 HUB',
+    desc: '공동 콘텐츠·상품·이벤트 오퍼를 확인하고 내 매장에 적용하세요.',
   },
 ];
 
