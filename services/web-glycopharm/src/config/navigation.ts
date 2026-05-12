@@ -28,9 +28,10 @@ export interface GlycoContextualNavItem extends GlobalHeaderNavItem {
   visibleWhen: 'pharmacyRelated' | 'storeOwner' | 'operator' | 'admin';
 }
 
+// WO-O4O-GLYCOPHARM-MENU-CANONICAL-ALIGN-V1: 내 매장 → 약국 HUB (Canonical 순서)
 export const GLYCO_CONTEXTUAL_NAV: GlycoContextualNavItem[] = [
-  { label: glycopharmConfig.terminology.storeHubLabel, href: '/store-hub', visibleWhen: 'pharmacyRelated' },
   { label: glycopharmConfig.terminology.myStoreLabel, href: '/store', visibleWhen: 'storeOwner' },
+  { label: glycopharmConfig.terminology.storeHubLabel, href: '/store-hub', visibleWhen: 'pharmacyRelated' },
 ];
 
 // ─── Filter Helper ───────────────────────────────────────────────────────────

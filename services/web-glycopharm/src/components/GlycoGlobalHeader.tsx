@@ -70,6 +70,11 @@ export function GlycoGlobalHeader() {
     isPharmacyRelated: !!isPharmacy,
   });
 
+  // WO-O4O-GLYCOPHARM-MENU-CANONICAL-ALIGN-V1: 비로그인 시 Contact 헤더 노출
+  const publicNav = isAuthenticated
+    ? GLYCO_PUBLIC_NAV
+    : [...GLYCO_PUBLIC_NAV, { label: 'Contact', href: '/contact' }];
+
   // User 정보 변환
   const headerUser = user
     ? {
@@ -91,7 +96,7 @@ export function GlycoGlobalHeader() {
         subtitle: '혈당관리 전문 플랫폼',
         primaryColor: '#059669',
       }}
-      publicNav={GLYCO_PUBLIC_NAV}
+      publicNav={publicNav}
       contextualNav={contextualNav}
       user={headerUser}
       onLogin={openLoginModal}

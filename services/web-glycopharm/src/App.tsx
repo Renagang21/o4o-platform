@@ -205,6 +205,9 @@ const StoreProducts = lazy(() => import('@/pages/store/StoreProducts'));
 const StoreProductDetail = lazy(() => import('@/pages/store/StoreProductDetail'));
 const StoreCart = lazy(() => import('@/pages/store/StoreCart'));
 
+// WO-O4O-GLYCOPHARM-MENU-CANONICAL-ALIGN-V1: 모바일 약국 경영 허브
+const MobilePharmacyPage = lazy(() => import('@/pages/mobile/MobilePharmacyPage'));
+
 // WO-GLYCOPHARM-COMMUNITY-MAIN-PAGE-V1: Community main page
 const CommunityMainPage = lazy(() => import('@/pages/community/CommunityMainPage'));
 const CommunityManagementPage = lazy(() => import('@/pages/operator/CommunityManagementPage'));
@@ -383,6 +386,8 @@ function AppRoutes() {
           </RoleGuard>
         } />
         <Route path="contact" element={<ContactPage />} />
+        {/* WO-O4O-GLYCOPHARM-MENU-CANONICAL-ALIGN-V1: 모바일 약국 경영 허브 */}
+        <Route path="mobile/pharmacy" element={<MobilePharmacyPage />} />
 
         {/* Guide pages — WO-O4O-GUIDE-COMMON-AND-GLYCOPHARM-HOME-V1 */}
         <Route path="guide/intro" element={<GuideIntroPage {...glycopharmGuideIntroProps} />} />
