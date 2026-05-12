@@ -882,60 +882,69 @@ export function StoreSignagePage() {
             </button>
           </div>
 
-          {/* Create form */}
+          {/* Create form — modal */}
           {showCreateForm && (
-            <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <h3 className="text-sm font-semibold text-slate-700 mb-3">새 플레이리스트</h3>
-              <div className="mb-3">
-                <label className="block text-xs font-medium text-slate-600 mb-1">플레이리스트 이름 <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  value={newPlaylistName}
-                  onChange={e => setNewPlaylistName(e.target.value)}
-                  placeholder="플레이리스트 이름을 입력하세요"
-                  className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  autoFocus
-                />
-              </div>
-              <div className="mb-3">
-                <label className="block text-xs font-medium text-slate-600 mb-1">설명 / 사용 목적</label>
-                <textarea
-                  value={newPlaylistDescription}
-                  onChange={e => setNewPlaylistDescription(e.target.value)}
-                  placeholder="이 플레이리스트의 사용 목적이나 적용 위치를 간략히 기록하세요"
-                  rows={2}
-                  className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-xs font-medium text-slate-600 mb-1">태그 <span className="text-slate-400 font-normal">(쉼표로 구분)</span></label>
-                <input
-                  type="text"
-                  value={newPlaylistTags}
-                  onChange={e => setNewPlaylistTags(e.target.value)}
-                  placeholder="예: 대기실, 약국, 홍보"
-                  className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                />
-              </div>
-              <div className="flex justify-end gap-2">
-                <button
-                  onClick={() => {
-                    setShowCreateForm(false);
-                    setNewPlaylistName('');
-                    setNewPlaylistDescription('');
-                    setNewPlaylistTags('');
-                  }}
-                  className="px-4 py-2 text-sm text-slate-600 border border-slate-300 rounded-md hover:bg-slate-50"
-                >
-                  취소
-                </button>
-                <button
-                  onClick={handleCreatePlaylist}
-                  disabled={!newPlaylistName.trim()}
-                  className="px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  생성
-                </button>
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+              onClick={e => { if (e.target === e.currentTarget) { setShowCreateForm(false); setNewPlaylistName(''); setNewPlaylistDescription(''); setNewPlaylistTags(''); } }}
+              onKeyDown={e => { if (e.key === 'Escape') { setShowCreateForm(false); setNewPlaylistName(''); setNewPlaylistDescription(''); setNewPlaylistTags(''); } }}
+              role="dialog"
+              aria-modal="true"
+              tabIndex={-1}
+            >
+              <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+                <h3 className="text-base font-semibold text-slate-800 mb-4">새 플레이리스트</h3>
+                <div className="mb-3">
+                  <label className="block text-xs font-medium text-slate-600 mb-1">플레이리스트 이름 <span className="text-red-500">*</span></label>
+                  <input
+                    type="text"
+                    value={newPlaylistName}
+                    onChange={e => setNewPlaylistName(e.target.value)}
+                    placeholder="플레이리스트 이름을 입력하세요"
+                    className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    autoFocus
+                  />
+                </div>
+                <div className="mb-3">
+                  <label className="block text-xs font-medium text-slate-600 mb-1">설명 / 사용 목적</label>
+                  <textarea
+                    value={newPlaylistDescription}
+                    onChange={e => setNewPlaylistDescription(e.target.value)}
+                    placeholder="이 플레이리스트의 사용 목적이나 적용 위치를 간략히 기록하세요"
+                    rows={2}
+                    className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+                  />
+                </div>
+                <div className="mb-5">
+                  <label className="block text-xs font-medium text-slate-600 mb-1">태그 <span className="text-slate-400 font-normal">(쉼표로 구분)</span></label>
+                  <input
+                    type="text"
+                    value={newPlaylistTags}
+                    onChange={e => setNewPlaylistTags(e.target.value)}
+                    placeholder="예: 대기실, 약국, 홍보"
+                    className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+                <div className="flex justify-end gap-2">
+                  <button
+                    onClick={() => {
+                      setShowCreateForm(false);
+                      setNewPlaylistName('');
+                      setNewPlaylistDescription('');
+                      setNewPlaylistTags('');
+                    }}
+                    className="px-4 py-2 text-sm text-slate-600 border border-slate-300 rounded-md hover:bg-slate-50"
+                  >
+                    취소
+                  </button>
+                  <button
+                    onClick={handleCreatePlaylist}
+                    disabled={!newPlaylistName.trim()}
+                    className="px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    생성
+                  </button>
+                </div>
               </div>
             </div>
           )}
@@ -1510,15 +1519,22 @@ export function StoreSignagePage() {
         &lsquo;활용 위치&rsquo;는 콘텐츠를 어디에 활용할지 표시하는 용도입니다. TV 재생과 스케줄은 플레이리스트/스케줄 설정에서 관리됩니다.
       </p>
 
-      {/* Video registration form */}
+      {/* Video registration form — modal */}
       {showVideoRegForm && (
-        <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <h3 className="text-sm font-semibold text-slate-700 mb-3">동영상 등록</h3>
-          {regVideoError && (
-            <p className="text-xs text-red-600 mb-3 px-2 py-1.5 bg-red-50 border border-red-200 rounded">{regVideoError}</p>
-          )}
-          <div className="grid grid-cols-2 gap-3 mb-3">
-            <div>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          onClick={e => { if (e.target === e.currentTarget) { setShowVideoRegForm(false); setRegVideoTitle(''); setRegVideoUrl(''); setRegVideoDescription(''); setRegVideoTags(''); setRegVideoStatus('active'); setRegVideoError(''); } }}
+          onKeyDown={e => { if (e.key === 'Escape') { setShowVideoRegForm(false); setRegVideoTitle(''); setRegVideoUrl(''); setRegVideoDescription(''); setRegVideoTags(''); setRegVideoStatus('active'); setRegVideoError(''); } }}
+          role="dialog"
+          aria-modal="true"
+          tabIndex={-1}
+        >
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg p-6">
+            <h3 className="text-base font-semibold text-slate-800 mb-4">동영상 등록</h3>
+            {regVideoError && (
+              <p className="text-xs text-red-600 mb-3 px-2 py-1.5 bg-red-50 border border-red-200 rounded">{regVideoError}</p>
+            )}
+            <div className="mb-3">
               <label className="block text-xs font-medium text-slate-600 mb-1">제목 <span className="text-red-500">*</span></label>
               <input
                 type="text"
@@ -1529,7 +1545,7 @@ export function StoreSignagePage() {
                 autoFocus
               />
             </div>
-            <div>
+            <div className="mb-3">
               <label className="block text-xs font-medium text-slate-600 mb-1">YouTube / Vimeo URL <span className="text-red-500">*</span></label>
               <input
                 type="url"
@@ -1539,63 +1555,63 @@ export function StoreSignagePage() {
                 className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
-          </div>
-          <div className="mb-3">
-            <label className="block text-xs font-medium text-slate-600 mb-1">설명 / 용도 메모</label>
-            <textarea
-              value={regVideoDescription}
-              onChange={e => setRegVideoDescription(e.target.value)}
-              placeholder="이 동영상의 활용 위치나 용도를 간략히 기록하세요"
-              rows={2}
-              className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-3 mb-4">
-            <div>
-              <label className="block text-xs font-medium text-slate-600 mb-1">태그 <span className="text-slate-400 font-normal">(쉼표로 구분)</span></label>
-              <input
-                type="text"
-                value={regVideoTags}
-                onChange={e => setRegVideoTags(e.target.value)}
-                placeholder="예: 약국, 건강, 홍보"
-                className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+            <div className="mb-3">
+              <label className="block text-xs font-medium text-slate-600 mb-1">설명 / 용도 메모</label>
+              <textarea
+                value={regVideoDescription}
+                onChange={e => setRegVideoDescription(e.target.value)}
+                placeholder="이 동영상의 활용 위치나 용도를 간략히 기록하세요"
+                rows={2}
+                className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
               />
             </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-600 mb-1">공개 상태</label>
-              <select
-                value={regVideoStatus}
-                onChange={e => setRegVideoStatus(e.target.value as 'draft' | 'active')}
-                className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
-              >
-                <option value="active">공개</option>
-                <option value="draft">초안 (숨김)</option>
-              </select>
+            <div className="grid grid-cols-2 gap-3 mb-5">
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1">태그 <span className="text-slate-400 font-normal">(쉼표로 구분)</span></label>
+                <input
+                  type="text"
+                  value={regVideoTags}
+                  onChange={e => setRegVideoTags(e.target.value)}
+                  placeholder="예: 약국, 건강, 홍보"
+                  className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1">공개 상태</label>
+                <select
+                  value={regVideoStatus}
+                  onChange={e => setRegVideoStatus(e.target.value as 'draft' | 'active')}
+                  className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+                >
+                  <option value="active">공개</option>
+                  <option value="draft">초안 (숨김)</option>
+                </select>
+              </div>
             </div>
-          </div>
-          <div className="flex justify-end gap-2">
-            <button
-              onClick={() => {
-                setShowVideoRegForm(false);
-                setRegVideoTitle('');
-                setRegVideoUrl('');
-                setRegVideoDescription('');
-                setRegVideoTags('');
-                setRegVideoStatus('active');
-                setRegVideoError('');
-              }}
-              className="px-4 py-2 text-sm text-slate-600 border border-slate-300 rounded-md hover:bg-slate-50"
-            >
-              취소
-            </button>
-            <button
-              onClick={handleRegisterVideo}
-              disabled={regVideoSaving || !regVideoTitle.trim() || !regVideoUrl.trim()}
-              className="flex items-center gap-1.5 px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {regVideoSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-              {regVideoSaving ? '등록 중...' : '등록'}
-            </button>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => {
+                  setShowVideoRegForm(false);
+                  setRegVideoTitle('');
+                  setRegVideoUrl('');
+                  setRegVideoDescription('');
+                  setRegVideoTags('');
+                  setRegVideoStatus('active');
+                  setRegVideoError('');
+                }}
+                className="px-4 py-2 text-sm text-slate-600 border border-slate-300 rounded-md hover:bg-slate-50"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleRegisterVideo}
+                disabled={regVideoSaving || !regVideoTitle.trim() || !regVideoUrl.trim()}
+                className="flex items-center gap-1.5 px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {regVideoSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                {regVideoSaving ? '등록 중...' : '등록'}
+              </button>
+            </div>
           </div>
         </div>
       )}
