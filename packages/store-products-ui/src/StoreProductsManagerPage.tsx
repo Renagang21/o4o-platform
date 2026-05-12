@@ -574,11 +574,18 @@ export interface StoreProductsManagerPageProps {
 
   /** 외곽 padding 커스터마이징(서비스별 layout과 정합 맞출 때) */
   containerClassName?: string;
+
+  /**
+   * Empty State에 표시되는 "공급자 상품 보러가기" 링크 경로.
+   * 미지정 시 기본값 '/store/commerce/products/suppliers' 사용.
+   */
+  supplierProductsHref?: string;
 }
 
 export default function StoreProductsManagerPage({
   headerSlot,
   containerClassName = 'p-6',
+  supplierProductsHref = '/store/commerce/products/suppliers',
 }: StoreProductsManagerPageProps = {}) {
   const [activeModal, setActiveModal] = useState<ActiveModal>(null);
   const [selectedListing, setSelectedListing] = useState<StoreListingItem | null>(null);
@@ -586,10 +593,16 @@ export default function StoreProductsManagerPage({
   const [page, setPage] = useState(1);
   const queryClient = useQueryClient();
 
-  const { data, isLoading, isError, refetch } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['my-store-listings', page],
     queryFn: () => getMyStoreListings(page, PAGE_SIZE),
   });
+
+  // WO-O4O-KPA-STORE-MY-PRODUCTS-EMPTY-STATE-FIX-V1:
+  // 404 응답 = "데이터 없음"으로 처리. 실제 서버/네트워크 오류(5xx 등)만 에러 표시.
+  const httpStatus = (error as any)?.response?.status ?? (error as any)?.status ?? null;
+  const isNotFoundError = isError && httpStatus === 404;
+  const isRealError = isError && !isNotFoundError;
 
   const { data: channelsData } = useQuery({
     queryKey: ['my-store-channels'],
@@ -771,24 +784,46 @@ export default function StoreProductsManagerPage({
 
       {isLoading ? (
         <div className="py-12 text-center text-sm text-gray-400">불러오는 중...</div>
-      ) : isError ? (
-        <div className="rounded border border-red-200 bg-red-50 p-6 text-center text-sm text-red-600">
-          데이터를 불러오는 중 오류가 발생했습니다.
-        </div>
-      ) : listings.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 bg-gray-50 py-16 gap-4">
-          <Package size={36} className="text-gray-300" />
-          <div className="text-center">
-            <p className="text-sm font-medium text-gray-600">등록된 매장 상품이 없습니다.</p>
-            <p className="text-xs text-gray-400 mt-1">'상품 등록' 버튼으로 공통 상품을 검색하여 추가하세요.</p>
-          </div>
+      ) : isRealError ? (
+        /* 실제 서버/네트워크 오류 — HTTP 5xx, 401, 403, 네트워크 단절 등 */
+        <div className="rounded border border-red-200 bg-red-50 p-6 text-center">
+          <p className="text-sm font-semibold text-red-700 mb-1">오류가 발생했습니다</p>
+          <p className="text-xs text-red-500 mb-4">
+            {httpStatus ? `서버 오류 (${httpStatus})` : '네트워크 연결을 확인해 주세요.'}
+          </p>
           <button
-            onClick={() => openModal('register')}
-            className="flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            onClick={() => refetch()}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-red-300 bg-white px-4 py-2 text-xs font-medium text-red-600 hover:bg-red-50"
           >
-            <Plus size={14} />
-            첫 상품 등록하기
+            <RefreshCw size={12} />
+            다시 시도
           </button>
+        </div>
+      ) : (isNotFoundError || listings.length === 0) ? (
+        /* 데이터 없음 — Empty State (WO-O4O-KPA-STORE-MY-PRODUCTS-EMPTY-STATE-FIX-V1) */
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 bg-gray-50 py-16 gap-4">
+          <Package size={40} className="text-gray-300" />
+          <div className="text-center">
+            <p className="text-sm font-semibold text-gray-700">등록된 내 매장 상품이 없습니다</p>
+            <p className="text-xs text-gray-400 mt-1.5 max-w-xs">
+              공급자 상품에서 상품을 선택해 내 매장 상품으로 등록해 주세요.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <a
+              href={supplierProductsHref}
+              className="flex items-center gap-2 rounded-lg border border-blue-500 bg-white px-5 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50"
+            >
+              공급자 상품 보러가기
+            </a>
+            <button
+              onClick={() => openModal('register')}
+              className="flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            >
+              <Plus size={14} />
+              상품 등록
+            </button>
+          </div>
         </div>
       ) : (
         <>
