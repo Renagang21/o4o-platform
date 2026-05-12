@@ -7,13 +7,14 @@
  * WO-KPA-RESOURCES-OWNER-ACTIONS-AND-TAKE-V1: 등록자 수정/삭제 + 가져가기 액션
  * WO-O4O-CONTENT-LIBRARY-CARD-STANDARD-V1: inline style → Tailwind, hex → theme
  * WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: 매장 경영자 → 내 자료함 가져가기 (Community → Store copy)
+ * WO-O4O-KPA-RESOURCES-CREATE-MODAL-UX-V1: 일반 사용자 등록 → 모달 전환
  *
  * ResourcesHubTemplate + KPA adapter.
  * KPA 전용 API(resourcesApi), operator 조건, 문구는
  * kpaResourcesConfig에만 위치한다.
  */
 
-import { useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ResourcesHubTemplate, type ResourcesHubConfig, type ResourcesHubItem } from '@o4o/shared-space-ui';
 import { toast } from '@o4o/error-handling';
@@ -21,20 +22,27 @@ import { resourcesApi } from '../../api';
 import { assetSnapshotApi } from '../../api/assetSnapshot';
 import { useAuth } from '../../contexts/AuthContext';
 import { hasAnyRole, PLATFORM_ROLES } from '../../lib/role-constants';
+import { ResourceWriteModal } from './ResourceWriteModal';
 
 // ─── Resource Upload Button ──────────────────────────────────────────────────
 
-function ResourceUploadButton({ variant = 'hero' }: { variant?: 'hero' | 'empty' }) {
+interface UploadButtonProps {
+  variant?: 'hero' | 'empty';
+  onOpenModal: () => void;
+}
+
+function ResourceUploadButton({ variant = 'hero', onOpenModal }: UploadButtonProps) {
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const isOperator = hasAnyRole(user?.roles ?? [], PLATFORM_ROLES);
-  const targetPath = isOperator ? '/operator/resources/new' : '/resources/new';
 
   const handleClick = () => {
     if (!isAuthenticated) {
-      navigate('/login', { state: { from: targetPath } });
+      navigate('/login', { state: { from: '/resources/new' } });
+    } else if (isOperator) {
+      navigate('/operator/resources/new');
     } else {
-      navigate(targetPath);
+      onOpenModal();
     }
   };
 
@@ -57,6 +65,7 @@ function useKpaResourcesConfig(
   isOperator: boolean,
   userId: string | null | undefined,
   isStoreOwner: boolean,
+  onOpenModal: () => void,
 ): ResourcesHubConfig {
   return useMemo(() => ({
     serviceKey: 'kpa-society',
@@ -99,8 +108,9 @@ function useKpaResourcesConfig(
     },
 
     // WO-KPA-RESOURCES-UPLOAD-BUTTON-ON-RESOURCES-V1: 모든 사용자에게 등록 버튼 노출
-    headerAction: <ResourceUploadButton variant="hero" />,
-    renderEmptyAction: () => <ResourceUploadButton variant="empty" />,
+    // WO-O4O-KPA-RESOURCES-CREATE-MODAL-UX-V1: 일반 사용자 클릭 → 모달
+    headerAction: <ResourceUploadButton variant="hero" onOpenModal={onOpenModal} />,
+    renderEmptyAction: () => <ResourceUploadButton variant="empty" onOpenModal={onOpenModal} />,
 
     // Operator-only: row edit/delete
     getEditHref: isOperator
@@ -156,7 +166,7 @@ function useKpaResourcesConfig(
     emptyMessage: '등록된 자료가 없습니다.',
     emptyFilteredMessage: '검색 결과가 없습니다.',
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }), [isOperator, userId, isStoreOwner]);
+  }), [isOperator, userId, isStoreOwner, onOpenModal]);
 }
 
 // ─── Page Component ───────────────────────────────────────────────────────────
@@ -166,8 +176,24 @@ export function ResourcesHubPage() {
   const isOperator = hasAnyRole(user?.roles ?? [], PLATFORM_ROLES);
   // WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: store_owner 만 자료함 가져가기 노출 (LmsCoursesPage 패턴)
   const isStoreOwner = !!user?.isStoreOwner && !!user?.kpaMembership?.organizationId;
-  const config = useKpaResourcesConfig(isOperator, user?.id, isStoreOwner);
-  return <ResourcesHubTemplate config={config} />;
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const openModal = useCallback(() => setModalOpen(true), []);
+
+  const config = useKpaResourcesConfig(isOperator, user?.id, isStoreOwner, openModal);
+
+  return (
+    <>
+      <ResourcesHubTemplate key={refreshKey} config={config} />
+      <ResourceWriteModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSuccess={() => setRefreshKey((k) => k + 1)}
+      />
+    </>
+  );
 }
 
 export default ResourcesHubPage;
