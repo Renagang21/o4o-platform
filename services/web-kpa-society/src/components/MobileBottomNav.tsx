@@ -50,8 +50,8 @@ export function MobileBottomNav() {
   if (!user) {
     return (
       <nav
-        className="md:hidden"
-        style={navStyle}
+        className={NAV_CLASS}
+        style={navSafeArea}
         aria-label="모바일 하단 메뉴"
       >
         <Link to="/" style={isCommunity ? { ...tabStyle, ...activeStyle } : tabStyle} aria-label="커뮤니티">
@@ -73,8 +73,8 @@ export function MobileBottomNav() {
   // 로그인: 커뮤니티 / 약국 경영 / 알림 / 내정보
   return (
     <nav
-      className="md:hidden"
-      style={navStyle}
+      className={NAV_CLASS}
+      style={navSafeArea}
       aria-label="모바일 하단 메뉴"
     >
       <Link
@@ -118,16 +118,13 @@ export function MobileBottomNav() {
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
-const navStyle: React.CSSProperties = {
-  position: 'fixed',
-  bottom: 0,
-  left: 0,
-  right: 0,
-  zIndex: 50,
-  display: 'flex',
-  alignItems: 'stretch',
-  backgroundColor: '#ffffff',
-  borderTop: '1px solid #e2e8f0',
+// display/visibility는 Tailwind만 제어 — inline style로 display 지정 금지
+// (inline style은 md:hidden보다 우선순위가 높아 재정의됨)
+const NAV_CLASS =
+  'flex md:hidden fixed bottom-0 left-0 right-0 z-50 items-stretch bg-white border-t border-slate-200';
+
+// safe-area-inset만 inline style로 — Tailwind 미지원 CSS custom property
+const navSafeArea: React.CSSProperties = {
   paddingBottom: 'env(safe-area-inset-bottom, 0px)',
 };
 
