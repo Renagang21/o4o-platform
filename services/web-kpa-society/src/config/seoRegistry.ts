@@ -62,8 +62,8 @@ export const kpaSeoRegistry: SeoRegistry = {
     ogType: 'website',
   },
   '/contact': {
-    title: '연락처 — KPA Society',
-    description: 'KPA Society 문의 및 연락처.',
+    title: '협업과 연결 — KPA Society',
+    description: 'KPA-Society 협업 및 강의 개설 안내.',
     ogType: 'website',
   },
 };

@@ -159,6 +159,8 @@ import { CommunityHomePage } from './pages/CommunityHomePage';
 
 // About Page (WO-O4O-KPA-ABOUT-PAGE-IMPLEMENTATION-V1)
 const AboutPage = lazy(() => import('./pages/about/AboutPage'));
+// Contact Page (WO-O4O-KPA-CONTACT-PAGE-IMPLEMENTATION-V1)
+const ContactPage = lazy(() => import('./pages/contact/ContactPage'));
 
 // Community Hub — /community는 Home으로 리다이렉트 (WO-KPA-A-PUBLIC-HOME-INTEGRATION-AND-MENU-SIMPLIFICATION-V1)
 
@@ -1060,19 +1062,6 @@ function DemoLayoutRoutes() {
         <Route path="*" element={<DemoNotFoundPage />} />
       </Routes>
     </DemoLayout>
-  );
-}
-
-// ─── Info Pages (stub) — WO-O4O-KPA-WEB-MENU-STRUCTURE-PHASE1-V1 ─────────────
-
-function ContactPage() {
-  return (
-    <div style={{ maxWidth: 720, margin: '0 auto', padding: '64px 24px' }}>
-      <h1 style={{ fontSize: '1.875rem', fontWeight: 700, color: '#0f172a', marginBottom: 16 }}>문의하기</h1>
-      <p style={{ fontSize: '1rem', color: '#475569', lineHeight: 1.7 }}>
-        서비스 문의는 운영팀 이메일로 연락해 주세요.
-      </p>
-    </div>
   );
 }
 

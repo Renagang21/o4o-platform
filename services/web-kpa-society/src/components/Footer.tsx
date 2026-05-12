@@ -19,6 +19,8 @@ export function Footer() {
           <nav style={styles.footerNav}>
             <Link to="/about" style={styles.navLink}>약사회 소개</Link>
             <span style={styles.divider}>|</span>
+            <Link to="/contact" style={styles.navLink}>협업 문의</Link>
+            <span style={styles.divider}>|</span>
             <Link to="/terms" style={styles.navLink}>이용약관</Link>
             <span style={styles.divider}>|</span>
             <Link to="/privacy" style={styles.navLink}>개인정보처리방침</Link>
