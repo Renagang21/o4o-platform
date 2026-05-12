@@ -1,0 +1,23 @@
+User-agent: *
+Allow: /
+
+# 인증 필요 영역 — 색인 제외
+Disallow: /admin/
+Disallow: /admin-vault/
+Disallow: /operator/
+Disallow: /supplier/dashboard
+Disallow: /supplier/products
+Disallow: /partner/dashboard
+Disallow: /partner/products
+Disallow: /mypage/
+Disallow: /qr/
+Disallow: /store/cart
+Disallow: /store/orders
+Disallow: /market-trial/my
+Disallow: /handoff
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+
+Sitemap: https://neture.co.kr/sitemap.xml
