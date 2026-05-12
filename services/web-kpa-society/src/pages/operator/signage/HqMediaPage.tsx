@@ -90,7 +90,7 @@ export default function HqMediaPage() {
 
   // Create form
   const [formName, setFormName] = useState('');
-  const [formMediaType, setFormMediaType] = useState('video');
+  const [formDescription, setFormDescription] = useState('');
   const [formSourceType, setFormSourceType] = useState('url');
   const [formSourceUrl, setFormSourceUrl] = useState('');
   const [isCreating, setIsCreating] = useState(false);
@@ -101,8 +101,8 @@ export default function HqMediaPage() {
 
   const resetForm = () => {
     setFormName('');
+    setFormDescription('');
     setFormSourceUrl('');
-    setFormMediaType('video');
     setFormSourceType('url');
     setFormDuration('');
     setFormTags([]);
@@ -188,7 +188,8 @@ export default function HqMediaPage() {
         method: 'POST',
         body: JSON.stringify({
           name: formName.trim(),
-          mediaType: formMediaType,
+          mediaType: 'video',
+          description: formDescription.trim() || undefined,
           sourceType: formSourceType,
           sourceUrl: formSourceUrl.trim(),
           tags: formTags,
@@ -441,6 +442,16 @@ export default function HqMediaPage() {
                 <label className="block text-xs font-medium text-slate-500 mb-1">동영상 URL *</label>
                 <input type="text" value={formSourceUrl} onChange={e => setFormSourceUrl(e.target.value)} placeholder="YouTube 또는 Vimeo URL" className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-500 mb-1">설명 / 용도 메모</label>
+                <textarea
+                  value={formDescription}
+                  onChange={e => setFormDescription(e.target.value)}
+                  placeholder="이 동영상의 활용 위치나 용도를 간략히 기록하세요"
+                  rows={2}
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                />
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-medium text-slate-500 mb-1">소스 타입</label>
@@ -454,15 +465,6 @@ export default function HqMediaPage() {
                   <label className="block text-xs font-medium text-slate-500 mb-1">재생시간 * (mm:ss)</label>
                   <input type="text" value={formDuration} onChange={e => setFormDuration(e.target.value)} placeholder="예: 10:30" className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-500 mb-1">미디어 타입</label>
-                <select value={formMediaType} onChange={e => setFormMediaType(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  <option value="video">동영상</option>
-                  <option value="image">이미지</option>
-                  <option value="html">HTML</option>
-                  <option value="text">텍스트</option>
-                </select>
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-500 mb-1">태그 * (최소 1개)</label>
