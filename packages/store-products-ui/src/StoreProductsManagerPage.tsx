@@ -64,6 +64,7 @@ function RegisterModal({ onClose, onSuccess }: { onClose: () => void; onSuccess:
   const [query, setQuery] = useState('');
   const [searchResults, setSearchResults] = useState<StoreProductSearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
   const [selectedMaster, setSelectedMaster] = useState<StoreProductSearchResult | null>(null);
   const [offers, setOffers] = useState<StoreProductOffer[]>([]);
   const [isLoadingOffers, setIsLoadingOffers] = useState(false);
@@ -75,14 +76,25 @@ function RegisterModal({ onClose, onSuccess }: { onClose: () => void; onSuccess:
   const handleQueryChange = (value: string) => {
     setQuery(value);
     if (searchTimeout.current) clearTimeout(searchTimeout.current);
-    if (!value.trim()) { setSearchResults([]); return; }
+    if (!value.trim()) { setSearchResults([]); setSearchError(null); return; }
     searchTimeout.current = setTimeout(async () => {
       setIsSearching(true);
+      setSearchError(null);
       try {
         const res = await searchStoreProducts(value.trim(), 1, 20);
         setSearchResults(res.data ?? []);
-      } catch {
-        toast.error('검색 중 오류가 발생했습니다.');
+      } catch (e: unknown) {
+        setSearchResults([]);
+        const status = (e as { response?: { status?: number }; status?: number })?.response?.status
+          ?? (e as { status?: number })?.status
+          ?? null;
+        if (status === 403) {
+          setSearchError('상품 검색 권한이 없습니다. 매장 소유자 권한이 필요합니다.');
+        } else if (status === 401) {
+          setSearchError('로그인이 필요합니다.');
+        } else {
+          setSearchError('검색 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+        }
       } finally {
         setIsSearching(false);
       }
@@ -165,11 +177,17 @@ function RegisterModal({ onClose, onSuccess }: { onClose: () => void; onSuccess:
                   className="w-full rounded-lg border border-gray-200 py-2 pl-9 pr-3 text-sm focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-300"
                 />
               </div>
+              {!isSearching && !query.trim() && (
+                <p className="text-center text-xs text-gray-400 py-4">상품명 또는 바코드를 입력하면 검색이 시작됩니다.</p>
+              )}
               {isSearching && <p className="text-center text-xs text-gray-400 py-4">검색 중...</p>}
-              {!isSearching && query.trim() && searchResults.length === 0 && (
+              {!isSearching && searchError && (
+                <p className="text-center text-xs text-red-500 py-4">{searchError}</p>
+              )}
+              {!isSearching && !searchError && query.trim() && searchResults.length === 0 && (
                 <p className="text-center text-xs text-gray-400 py-4">검색 결과가 없습니다.</p>
               )}
-              {!isSearching && searchResults.length > 0 && (
+              {!isSearching && !searchError && searchResults.length > 0 && (
                 <ul className="space-y-1.5">
                   {searchResults.map((m) => (
                     <li key={m.id}>
