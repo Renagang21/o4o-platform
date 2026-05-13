@@ -541,26 +541,26 @@ export function createMemberController(
                   userRole: 'KPA 약사회 회원',
                   approvalDate: decidedAt,
                 });
-                console.log(`[KPA Email] Approval sent to ${recipientEmail} (member: ${member.id})`);
+                console.error(`[KPA Email] Approval sent to ${recipientEmail} (member: ${member.id})`);
               } else if (oldStatus === 'pending' && newStatus === 'rejected') {
                 await emailService.sendUserRejectionEmail(recipientEmail, {
                   userName: recipientName,
                   rejectReason: (req.body.note as string | undefined)?.trim() || '가입 심사에서 승인되지 않았습니다.',
                 });
-                console.log(`[KPA Email] Rejection sent to ${recipientEmail} (member: ${member.id})`);
+                console.error(`[KPA Email] Rejection sent to ${recipientEmail} (member: ${member.id})`);
               } else if (newStatus === 'suspended') {
                 await emailService.sendAccountSuspensionEmail(recipientEmail, {
                   userName: recipientName,
                   suspendReason: (req.body.note as string | undefined)?.trim() || '운영 정책에 따라 계정이 정지되었습니다.',
                   suspendedDate: decidedAt,
                 });
-                console.log(`[KPA Email] Suspension sent to ${recipientEmail} (member: ${member.id})`);
+                console.error(`[KPA Email] Suspension sent to ${recipientEmail} (member: ${member.id})`);
               } else if (oldStatus === 'suspended' && newStatus === 'active') {
                 await emailService.sendAccountReactivationEmail(recipientEmail, {
                   userName: recipientName,
                   reactivatedDate: decidedAt,
                 });
-                console.log(`[KPA Email] Reactivation sent to ${recipientEmail} (member: ${member.id})`);
+                console.error(`[KPA Email] Reactivation sent to ${recipientEmail} (member: ${member.id})`);
               }
             }
           } catch (emailError) {
