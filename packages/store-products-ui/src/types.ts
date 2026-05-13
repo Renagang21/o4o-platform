@@ -18,23 +18,6 @@ export interface StoreProductSearchResult {
   category: { id: string; name: string } | null;
   brand: { id: string; name: string } | null;
   primaryImageUrl: string | null;
-  offerCount: number;
-}
-
-export interface StoreProductOffer {
-  id: string;                              // offerId (SupplierProductOffer.id)
-  supplierId: string;
-  supplierName: string;
-  priceGeneral: number;
-  priceGold: number;
-  pricePlatinum: number;
-  distributionType: string;
-  consumerShortDescription: string | null;
-  businessShortDescription: string | null;
-  effectiveShortDescription: string;
-  effectiveDetailDescription: string;
-  brandName: string | null;
-  manufacturerName: string | null;
 }
 
 // ── 매장 진열 목록 ───────────────────────────────────────────────────────────

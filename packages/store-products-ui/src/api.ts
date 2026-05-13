@@ -14,7 +14,6 @@
 import { authClient } from '@o4o/auth-client';
 import type {
   StoreProductSearchResult,
-  StoreProductOffer,
   StoreListingItem,
   PaginatedResponse,
   ProductImageItem,
@@ -43,18 +42,6 @@ export async function searchStoreProducts(
     `${BASE}/search?${params}`,
   );
   return res.data;
-}
-
-/**
- * 특정 ProductMaster의 APPROVED Offer 목록 조회
- */
-export async function getMasterOffers(
-  masterId: string,
-): Promise<StoreProductOffer[]> {
-  const res = await authClient.api.get<{ success: boolean; data: StoreProductOffer[] }>(
-    `${BASE}/master/${masterId}/offers`,
-  );
-  return res.data?.data ?? [];
 }
 
 /**
@@ -237,7 +224,6 @@ export async function updateListingDescription(
 
 export const storeProductsApi = {
   searchStoreProducts,
-  getMasterOffers,
   createStoreListing,
   getMyStoreListings,
   updateStoreListing,

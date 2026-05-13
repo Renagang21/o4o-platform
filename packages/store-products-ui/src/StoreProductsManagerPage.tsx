@@ -6,7 +6,7 @@
  * WO-O4O-STORE-PRODUCTS-UI-CORE-EXTRACTION-V1: admin-dashboard에서 공통 패키지로 이전.
  *
  * 매장 경영자(*:store_owner)가 사용하는 진열 상품 관리 페이지.
- * - 검색 → Offer 선택 → 매장 등록
+ * - 상품 검색 → 매장 등록 (ProductMaster 기반)
  * - 가격/설명 override
  * - 활성/비활성, 채널 노출 토글
  * - 이미지 관리(URL 등록/대표/순서/삭제) 위임
@@ -482,17 +482,11 @@ export interface StoreProductsManagerPageProps {
   /** 외곽 padding 커스터마이징(서비스별 layout과 정합 맞출 때) */
   containerClassName?: string;
 
-  /**
-   * Empty State에 표시되는 "공급자 상품 보러가기" 링크 경로.
-   * 미지정 시 기본값 '/store/commerce/products/suppliers' 사용.
-   */
-  supplierProductsHref?: string;
 }
 
 export default function StoreProductsManagerPage({
   headerSlot,
   containerClassName = 'p-6',
-  supplierProductsHref = '/store/commerce/products/suppliers',
 }: StoreProductsManagerPageProps = {}) {
   const [activeModal, setActiveModal] = useState<ActiveModal>(null);
   const [selectedListing, setSelectedListing] = useState<StoreListingItem | null>(null);
@@ -684,8 +678,8 @@ export default function StoreProductsManagerPage({
       <div className="mb-4 flex items-start gap-3 rounded-lg border border-blue-100 bg-blue-50 p-3">
         <Package size={16} className="mt-0.5 flex-shrink-0 text-blue-500" />
         <p className="text-xs text-blue-800">
-          공통 상품(ProductMaster)을 검색하여 매장 상품으로 등록하세요.
-          공급 제안이 있는 상품만 등록 가능하며, 등록 후 채널별 노출을 개별 제어할 수 있습니다.
+          상품 정보(ProductMaster)를 검색하여 매장 상품으로 등록하세요.
+          등록 후 채널별 노출을 개별 제어할 수 있습니다.
         </p>
       </div>
 
@@ -713,16 +707,10 @@ export default function StoreProductsManagerPage({
           <div className="text-center">
             <p className="text-sm font-semibold text-gray-700">등록된 내 매장 상품이 없습니다</p>
             <p className="text-xs text-gray-400 mt-1.5 max-w-xs">
-              공급자 상품에서 상품을 선택해 내 매장 상품으로 등록해 주세요.
+              상품을 검색하여 내 매장 상품으로 등록해 주세요.
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <a
-              href={supplierProductsHref}
-              className="flex items-center gap-2 rounded-lg border border-blue-500 bg-white px-5 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50"
-            >
-              공급자 상품 보러가기
-            </a>
             <button
               onClick={() => openModal('register')}
               className="flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-700"

@@ -42,6 +42,14 @@ export interface CreateSignageMediaPayload {
   status?: 'draft' | 'active';
 }
 
+export interface UpdateSignageMediaPayload {
+  name?: string;
+  description?: string;
+  thumbnailUrl?: string;
+  tags?: string[];
+  status?: 'draft' | 'active';
+}
+
 /* ─── Helpers ───────────────────────────────── */
 
 function headers(organizationId: string): Record<string, string> {
@@ -77,6 +85,24 @@ export async function createSignageMedia(
   const res = await fetch(BASE, {
     method: 'POST',
 
+    headers: headers(organizationId),
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || `HTTP ${res.status}`);
+  }
+  const json = await res.json();
+  return json.data ?? json;
+}
+
+export async function updateSignageMedia(
+  organizationId: string,
+  id: string,
+  payload: UpdateSignageMediaPayload,
+): Promise<SignageMediaItem> {
+  const res = await fetch(`${BASE}/${id}`, {
+    method: 'PATCH',
     headers: headers(organizationId),
     body: JSON.stringify(payload),
   });

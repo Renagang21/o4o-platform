@@ -59,7 +59,8 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
   const requireStoreOwner = createRequireStoreOwner(dataSource);
   const netureService = new NetureService();
 
-  // ─── GET /search — 제품 검색 (with offer count) ─────────────────────
+  // ─── GET /search — 제품 검색 (ProductMaster 기반) ────────────────────
+  // WO-O4O-KPA-STORE-MY-PRODUCTS-OFFER-DEPENDENCY-CLEANUP-V1: offerCount 제거
   router.get('/search', requireAuth, requireStoreOwner as RequestHandler, asyncHandler(async (req: Request, res: Response) => {
     const { q, categoryId, brandId, page, limit } = req.query;
 
@@ -71,10 +72,9 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
       limit: limit ? Number(limit) : 20,
     });
 
-    // Attach primary images + offer counts
+    // Attach primary images
     const masterIds = result.data.map((m) => m.id);
     let imageMap = new Map<string, string>();
-    let offerCountMap = new Map<string, number>();
 
     if (masterIds.length > 0) {
       const images: Array<{ master_id: string; image_url: string }> = await dataSource.query(
@@ -83,16 +83,6 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
         [masterIds],
       );
       imageMap = new Map(images.map((i) => [i.master_id, i.image_url]));
-
-      const offerCounts: Array<{ master_id: string; cnt: string }> = await dataSource.query(
-        `SELECT master_id, COUNT(*)::text AS cnt FROM supplier_product_offers
-         WHERE master_id = ANY($1)
-           AND approval_status = 'APPROVED'
-           AND is_active = true
-         GROUP BY master_id`,
-        [masterIds],
-      );
-      offerCountMap = new Map(offerCounts.map((o) => [o.master_id, Number(o.cnt)]));
     }
 
     const pageNum = page ? Number(page) : 1;
@@ -108,7 +98,6 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
       category: m.category ? { id: m.category.id, name: m.category.name } : null,
       brand: m.brand ? { id: m.brand.id, name: m.brand.name } : null,
       primaryImageUrl: imageMap.get(m.id) || null,
-      offerCount: offerCountMap.get(m.id) || 0,
     }));
 
     res.json({
