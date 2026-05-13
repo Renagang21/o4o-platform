@@ -898,9 +898,31 @@ export function createMemberController(
           return;
         }
 
-        // Hard delete: kpa:admin 전용 — 인라인 scope 체크
-        const userScopes: string[] = (req as any).user?.scopes ?? [];
-        if (!userScopes.includes('kpa:admin')) {
+        // Hard delete: kpa:admin 전용 — 인라인 admin 체크
+        // WO-O4O-KPA-ADMIN-HARDDELETE-SCOPE-FIX-V1:
+        //   기존 코드는 JWT scopes 배열에서 리터럴 'kpa:admin' 만 검사했으나, scopes 는
+        //   deriveUserScopes() 가 생성하는 권한 문자열(`kpa:admin:access` 등) 배열이라
+        //   바운드 'kpa:admin' 은 절대 포함되지 않아 admin 도 403 차단되는 버그.
+        //
+        //   canonical 출처(role_assignments → JWT.roles)를 우선 검사하고,
+        //   JWT.memberships(=kpa_members.role) 의 'admin' 도 함께 인정한다. 이는
+        //   프론트 AdminAuthGuard 의 `user.roles.includes('kpa:admin') || user.membershipRole === 'admin'`
+        //   판정과 1:1 정렬된다.
+        //
+        //   security-core 의 requireScope('kpa:admin') 미들웨어도 동일하게 roles 기반
+        //   판정을 사용하므로 이 인라인 체크는 그 결과와 일치한다.
+        const reqUser = (req as any).user;
+        const userRoles: string[] = reqUser?.roles ?? [];
+        const userScopes: string[] = reqUser?.scopes ?? [];
+        const memberships: Array<{ serviceKey: string; role?: string }> =
+          Array.isArray(reqUser?.memberships) ? reqUser.memberships : [];
+        const hasAdminRole = userRoles.includes('kpa:admin');
+        // 방어적: 향후 scopes 에 리터럴 'kpa:admin' 이 들어올 수 있을 경우도 허용
+        const hasAdminScope = userScopes.includes('kpa:admin');
+        const hasAdminMembership = memberships.some(
+          (m) => (m.serviceKey === 'kpa-society' || m.serviceKey === 'kpa') && m.role === 'admin',
+        );
+        if (!hasAdminRole && !hasAdminScope && !hasAdminMembership) {
           res.status(403).json({
             success: false,
             error: 'FORBIDDEN',
