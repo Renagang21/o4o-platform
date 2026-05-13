@@ -810,7 +810,7 @@ export function createMemberController(
   router.delete(
     '/:id',
     requireAuth,
-    requireScope('kpa:admin'),
+    requireScope('kpa:operator'),   // soft delete는 operator 허용; hard delete는 아래에서 admin 체크
     param('id').isUUID(),
     handleValidationErrors,
     async (req: Request, res: Response): Promise<void> => {
@@ -824,15 +824,16 @@ export function createMemberController(
         const mode = req.query.mode === 'hard' ? 'hard' : 'soft';
 
         if (mode === 'soft') {
-          // Soft delete: status → withdrawn
+          // Soft delete: status → withdrawn (kpa:operator 이상 허용)
           member.status = 'withdrawn' as any;
           member.identity_status = 'withdrawn' as any;
           await memberRepo.save(member);
 
+          const operatorRole = (req as any).user?.scopes?.includes('kpa:admin') ? 'kpa:admin' : 'kpa:operator';
           try {
             await auditRepo.save(auditRepo.create({
               operator_id: (req as any).user?.id,
-              operator_role: 'kpa:admin',
+              operator_role: operatorRole,
               action_type: 'MEMBER_STATUS_CHANGED' as any,
               target_type: 'member',
               target_id: member.id,
@@ -844,7 +845,17 @@ export function createMemberController(
           return;
         }
 
-        // Hard delete
+        // Hard delete: kpa:admin 전용 — 인라인 scope 체크
+        const userScopes: string[] = (req as any).user?.scopes ?? [];
+        if (!userScopes.includes('kpa:admin')) {
+          res.status(403).json({
+            success: false,
+            error: 'FORBIDDEN',
+            message: '완전삭제는 관리자(kpa:admin) 권한이 필요합니다.',
+          });
+          return;
+        }
+
         // 리스크 확인
         const [forumPosts, forumComments] = await Promise.all([
           dataSource.query(`SELECT COUNT(*)::int AS cnt FROM forum_post WHERE author_id = $1`, [member.user_id]).catch(() => [{ cnt: 0 }]),

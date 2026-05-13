@@ -41,7 +41,7 @@ import {
   useBatchAction,
 } from '@o4o/operator-ux-core';
 import type { ListColumnDef, MemberTab } from '@o4o/operator-ux-core';
-import { ACTIVITY_TYPE_LABELS } from '../../contexts/AuthContext';
+import { ACTIVITY_TYPE_LABELS, useAuth } from '../../contexts/AuthContext';
 import { apiClient } from '../../api/client';
 
 // ─── Types ───────────────────────────────────────────────────
@@ -328,10 +328,12 @@ function DeleteRiskModal({
   memberId,
   onClose,
   onDeleted,
+  isKpaAdmin,
 }: {
   memberId: string;
   onClose: () => void;
   onDeleted: () => void;
+  isKpaAdmin: boolean;
 }) {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<DeleteRiskData | null>(null);
@@ -419,10 +421,16 @@ function DeleteRiskModal({
                 className="w-full px-4 py-2.5 text-sm font-medium text-amber-700 bg-amber-50 border border-amber-200 hover:bg-amber-100 rounded-lg disabled:opacity-50">
                 탈퇴 처리 (비활성화)
               </button>
-              <button onClick={() => setConfirmMode('hard')} disabled={deleting || !data.canHardDelete}
-                className="w-full px-4 py-2.5 text-sm font-medium text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed">
-                {!data.canHardDelete ? '완전삭제 불가 (연결 데이터 존재)' : '완전삭제 (되돌릴 수 없음)'}
-              </button>
+              {isKpaAdmin ? (
+                <button onClick={() => setConfirmMode('hard')} disabled={deleting || !data.canHardDelete}
+                  className="w-full px-4 py-2.5 text-sm font-medium text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed">
+                  {!data.canHardDelete ? '완전삭제 불가 (연결 데이터 존재)' : '완전삭제 (되돌릴 수 없음)'}
+                </button>
+              ) : (
+                <div className="w-full px-4 py-2.5 text-sm text-slate-400 bg-slate-50 border border-slate-200 rounded-lg text-center">
+                  완전삭제는 관리자(admin)만 가능합니다
+                </div>
+              )}
               <button onClick={onClose} className="w-full px-4 py-2 text-sm text-slate-500 hover:bg-slate-50 rounded-lg">취소</button>
             </div>
 
@@ -451,6 +459,9 @@ function DeleteRiskModal({
 // ─── Component ───────────────────────────────────────────────
 
 export default function MemberManagementPage() {
+  const { user } = useAuth();
+  const isKpaAdmin = user?.roles.includes('kpa:admin') ?? false;
+
   const [activeTab, setActiveTab] = useState('all');
   const [stats, setStats] = useState<ApplicationStats | null>(null);
   const [memberTotal, setMemberTotal] = useState(0);
@@ -988,6 +999,7 @@ export default function MemberManagementPage() {
           memberId={deleteTargetId}
           onClose={() => setDeleteTargetId(null)}
           onDeleted={() => fetchMembers(memberPage)}
+          isKpaAdmin={isKpaAdmin}
         />
       )}
 
