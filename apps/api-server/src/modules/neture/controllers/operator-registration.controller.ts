@@ -179,6 +179,80 @@ export function createOperatorRegistrationController(dataSource: DataSource, act
   );
 
   /**
+   * POST /operator/registrations/batch
+   * 일괄 승인/거부 (max 50)
+   * WO-O4O-NETURE-USERS-CANONICAL-APPLY-V1
+   *
+   * body: { ids: string[], action: 'approve' | 'reject', reason?: string }
+   * response: { succeeded: string[], failed: { id, error }[], total: number }
+   *
+   * approve: Neture-specific flow (service_memberships + users + role_assignments + neture_suppliers)
+   * reject: service_memberships.status → 'rejected'
+   */
+  router.post(
+    '/registrations/batch',
+    requireAuth,
+    requireOperatorOrAdmin,
+    async (req: AuthenticatedRequest, res: Response) => {
+      try {
+        const { ids, action, reason } = req.body;
+        const operatorId = req.user?.id;
+        if (!operatorId) {
+          res.status(401).json({ success: false, error: 'UNAUTHORIZED' });
+          return;
+        }
+        if (!Array.isArray(ids) || ids.length === 0 || ids.length > 50) {
+          res.status(400).json({ success: false, error: 'ids must be a non-empty array (max 50)' });
+          return;
+        }
+        if (!['approve', 'reject'].includes(action)) {
+          res.status(400).json({ success: false, error: 'action must be approve or reject' });
+          return;
+        }
+
+        const settled = await Promise.allSettled(
+          ids.map((id: string) =>
+            action === 'approve'
+              ? registrationService.approveRegistration(id, operatorId)
+              : registrationService.rejectRegistration(id, operatorId, reason || '운영자 일괄 거부'),
+          ),
+        );
+
+        const succeeded = settled
+          .map((r, i) => ({ id: ids[i], ok: r.status === 'fulfilled' }))
+          .filter((r) => r.ok)
+          .map((r) => r.id);
+
+        const failed = settled
+          .map((r, i) => ({ id: ids[i], result: r }))
+          .filter((r) => r.result.status === 'rejected')
+          .map((r) => ({
+            id: r.id,
+            error: (r.result as PromiseRejectedResult).reason?.message || 'UNKNOWN_ERROR',
+          }));
+
+        actionLogService
+          ?.logSuccess('neture', operatorId, `neture.operator.registration_batch_${action}`, {
+            meta: { total: ids.length, succeeded: succeeded.length, failed: failed.length },
+          })
+          .catch(() => {});
+
+        res.json({
+          success: true,
+          data: { succeeded, failed, total: ids.length },
+        });
+      } catch (error) {
+        logger.error('[Operator] Error batch processing registrations:', error);
+        res.status(500).json({
+          success: false,
+          error: 'INTERNAL_ERROR',
+          message: 'Batch processing failed',
+        });
+      }
+    },
+  );
+
+  /**
    * GET /operator/registrations/copilot
    * 가입 승인 Copilot — 우선순위별 분류
    * WO-O4O-NETURE-OPERATOR-COPILOT-REGISTRATION-V1

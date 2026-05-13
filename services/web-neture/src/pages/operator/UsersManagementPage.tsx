@@ -3,14 +3,17 @@
  * WO-NETURE-OPERATOR-DASHBOARD-IMPLEMENTATION-V1
  * WO-O4O-MEMBER-LIST-STANDARDIZATION-V1
  * WO-O4O-OPERATOR-DATATABLE-SOURCE-ALIGN-V1: DataTable @o4o/ui → @o4o/operator-ux-core
+ * WO-O4O-NETURE-USERS-CANONICAL-APPLY-V1: canonical workflow 정렬
+ *   - selectable DataTable + ActionBar + BaseDetailDrawer
+ *   - row click → drawer (status-aware footer)
+ *   - bulk approve/reject (pending only)
+ *   - utility RowActionMenu 유지 (비밀번호 변경, 수정, 삭제)
  *
  * MemberListLayout + @o4o/operator-ux-core DataTable 기반 표준 회원 리스트.
  * 탭: 전체 | 공급자 | 파트너 | 셀러 | 가입 신청
- * 기능: 검색, 정렬, 승인/거부, 비밀번호 변경, 편집, 삭제
  */
 
 import { useState, useEffect, useCallback, useMemo, type ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Users,
   CheckCircle,
@@ -30,8 +33,17 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
-import { RowActionMenu } from '@o4o/ui';
-import { DataTable, MemberListLayout, StatusBadge, RoleBadge, ServiceBadge, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
+import { ActionBar, BulkResultModal, RowActionMenu, BaseDetailDrawer } from '@o4o/ui';
+import {
+  DataTable,
+  MemberListLayout,
+  StatusBadge,
+  RoleBadge,
+  ServiceBadge,
+  defineActionPolicy,
+  buildRowActions,
+  useBatchAction,
+} from '@o4o/operator-ux-core';
 import type { ListColumnDef, MemberTab } from '@o4o/operator-ux-core';
 import { api } from '@/lib/apiClient';
 import { toast } from '@o4o/error-handling';
@@ -83,21 +95,17 @@ function getUserName(u: UserData): string {
 }
 
 // Neture 컨텍스트 역할 표시 매핑 (RoleBadge용)
-// customer → consumer: RoleBadge의 customer="당뇨인"(GlycoPharm) 대신 consumer="소비자" 사용
 const NETURE_ROLE_DISPLAY: Record<string, string> = {
   customer: 'consumer',
 };
 
 function getPrimaryRole(u: UserData): string {
-  // WO-NETURE-ROLE-NORMALIZATION-V1: service membership role 우선 (service-scoped SSOT)
   const netureMembership = u.memberships?.find(m => m.serviceKey === 'neture');
   if (netureMembership?.role) return NETURE_ROLE_DISPLAY[netureMembership.role] || netureMembership.role;
-  // Fallback: role_assignments
   const roles = u.roles || (u.role ? [u.role] : []);
   return roles[0] || 'user';
 }
 
-// Role tab filtering
 const ROLE_TAB_FILTER: Record<string, string[]> = {
   all: [],
   supplier: ['supplier', 'neture:supplier'],
@@ -106,55 +114,13 @@ const ROLE_TAB_FILTER: Record<string, string[]> = {
   pending: [],
 };
 
-// ─── V4: Action Policy ────────────────────────────────────────
+// ─── V4: Action Policy (utility only — status changes go to drawer) ──
 
 const userActionPolicy = defineActionPolicy<UserData>('neture:users', {
-  inlineMax: 2,
+  inlineMax: 0, // 상태 변경은 drawer footer로 통일. utility만 overflow menu
   rules: [
-    {
-      key: 'approve',
-      label: '승인',
-      variant: 'primary',
-      visible: (u) => u.status === 'pending' || u.status === 'rejected',
-    },
-    {
-      key: 'reject',
-      label: '거부',
-      variant: 'danger',
-      visible: (u) => u.status === 'pending',
-      confirm: {
-        title: '회원 거부',
-        message: '이 사용자를 거부 처리하시겠습니까?',
-        variant: 'danger',
-        confirmText: '거부',
-      },
-    },
-    {
-      key: 'suspend',
-      label: '정지',
-      variant: 'warning',
-      visible: (u) => u.status === 'active' || u.status === 'approved',
-      confirm: {
-        title: '회원 정지',
-        message: '이 사용자를 정지 처리하시겠습니까?',
-        variant: 'warning',
-        confirmText: '정지',
-      },
-    },
-    {
-      key: 'activate',
-      label: '활성화',
-      variant: 'primary',
-      visible: (u) => u.status === 'suspended',
-    },
-    {
-      key: 'edit',
-      label: '정보 수정',
-    },
-    {
-      key: 'password',
-      label: '비밀번호 변경',
-    },
+    { key: 'edit', label: '정보 수정' },
+    { key: 'password', label: '비밀번호 변경' },
     {
       key: 'soft-delete',
       label: '비활성화',
@@ -176,10 +142,6 @@ const userActionPolicy = defineActionPolicy<UserData>('neture:users', {
 });
 
 const USER_ACTION_ICONS: Record<string, ReactNode> = {
-  approve: <UserCheck className="w-4 h-4" />,
-  reject: <UserX className="w-4 h-4" />,
-  suspend: <XCircle className="w-4 h-4" />,
-  activate: <CheckCircle className="w-4 h-4" />,
   edit: <Pencil className="w-4 h-4" />,
   password: <KeyRound className="w-4 h-4" />,
   'soft-delete': <XCircle className="w-4 h-4" />,
@@ -258,7 +220,6 @@ function PasswordModal({ user, onClose, onSuccess }: { user: UserData; onClose: 
 // ─── Main Component ──────────────────────────────────────────
 
 export default function UsersManagementPage() {
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('all');
   const [users, setUsers] = useState<UserData[]>([]);
   const [pagination, setPagination] = useState<PaginationData>({ page: 1, limit: 20, total: 0, totalPages: 0 });
@@ -269,6 +230,11 @@ export default function UsersManagementPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [passwordUser, setPasswordUser] = useState<UserData | null>(null);
   const [editUser, setEditUser] = useState<UserData | null>(null);
+
+  // Canonical: selection + drawer
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
+  const batch = useBatchAction();
 
   // Stats
   const [stats, setStats] = useState({ total: 0, active: 0, pending: 0, rejected: 0, supplierCount: 0, partnerCount: 0, sellerCount: 0 });
@@ -301,7 +267,6 @@ export default function UsersManagementPage() {
       const byStatus = data.statistics?.byStatus || [];
       const getCount = (s: string) => byStatus.find((b: any) => b.status === s)?.count || 0;
 
-      // Role counts from users (client-side for now)
       const allData = (await api.get('/operator/members?limit=1000')).data;
       const allUsers: UserData[] = allData.users || [];
       const supplierRoles = ROLE_TAB_FILTER.supplier;
@@ -313,18 +278,9 @@ export default function UsersManagementPage() {
         active: getCount('active') + getCount('approved'),
         pending: getCount('pending'),
         rejected: getCount('rejected'),
-        supplierCount: allUsers.filter(u => {
-          const role = getPrimaryRole(u);
-          return supplierRoles.includes(role);
-        }).length,
-        partnerCount: allUsers.filter(u => {
-          const role = getPrimaryRole(u);
-          return partnerRoles.includes(role);
-        }).length,
-        sellerCount: allUsers.filter(u => {
-          const role = getPrimaryRole(u);
-          return sellerRoles.includes(role);
-        }).length,
+        supplierCount: allUsers.filter(u => supplierRoles.includes(getPrimaryRole(u))).length,
+        partnerCount: allUsers.filter(u => partnerRoles.includes(getPrimaryRole(u))).length,
+        sellerCount: allUsers.filter(u => sellerRoles.includes(getPrimaryRole(u))).length,
       });
     } catch {
       // stats failure is non-critical
@@ -334,22 +290,25 @@ export default function UsersManagementPage() {
   useEffect(() => { fetchUsers(1); }, [fetchUsers]);
   useEffect(() => { fetchStats(); }, [fetchStats]);
 
+  // Reset selection on tab/search change
+  useEffect(() => {
+    setSelectedIds(new Set());
+    setSelectedUser(null);
+  }, [activeTab, searchQuery]);
+
   /**
    * WO-NETURE-MEMBERSHIP-APPROVAL-FLOW-STABILIZATION-V1:
-   * 승인/거부 → Neture 등록 API (operator 접근 가능)
+   * 승인/거부 → Neture 등록 API (service_memberships + role_assignments + neture_suppliers 동시 처리)
    * 정지/활성화 → Membership Console API
    */
   const handleStatusChange = async (userId: string, status: string, currentStatus?: string) => {
     setActionLoading(userId);
     try {
       if (status === 'approved' && (currentStatus === 'pending' || currentStatus === 'rejected')) {
-        // 승인: Neture registration endpoint (service_membership + user + role_assignment 동시 처리)
         await api.post(`/neture/operator/registrations/${userId}/approve`);
       } else if (status === 'rejected') {
-        // 거부: Neture registration endpoint
         await api.post(`/neture/operator/registrations/${userId}/reject`, { reason: '운영자 거부' });
       } else {
-        // 정지/활성화: Membership Console
         const user = users.find((u) => u.id === userId);
         const netureMembership = user?.memberships?.find((m) => m.serviceKey === 'neture');
         if (netureMembership) {
@@ -359,6 +318,8 @@ export default function UsersManagementPage() {
           await api.patch(endpoint);
         }
       }
+      // Sync drawer if open
+      setSelectedUser(null);
       fetchUsers(pagination.page);
       fetchStats();
     } catch (err: any) {
@@ -368,7 +329,6 @@ export default function UsersManagementPage() {
     }
   };
 
-  // WO-NETURE-MEMBER-DELETE-SAFE-FLOW-V1: soft/hard 2단계 분리
   const handleSoftDelete = async (user: UserData) => {
     setActionLoading(user.id);
     try {
@@ -401,19 +361,67 @@ export default function UsersManagementPage() {
     }
   };
 
-  // ─── Role tab filtering (client-side) ──────────────
+  // ─── Batch Actions (pending only) ──────────────────────────
+
+  const selectedPendingIds = useMemo(
+    () => [...selectedIds].filter(id => users.find(u => u.id === id)?.status === 'pending'),
+    [selectedIds, users],
+  );
+
+  const selectedApprovableIds = useMemo(
+    () => [...selectedIds].filter(id => {
+      const s = users.find(u => u.id === id)?.status;
+      return s === 'pending' || s === 'rejected';
+    }),
+    [selectedIds, users],
+  );
+
+  const handleBulkApprove = async () => {
+    if (selectedApprovableIds.length === 0) return;
+    const result = await batch.executeBatch(
+      async (batchIds) => {
+        const r = await api.post('/neture/operator/registrations/batch', { ids: batchIds, action: 'approve' });
+        return r.data;
+      },
+      selectedApprovableIds,
+    );
+    if (result.successCount > 0) {
+      setSelectedIds(new Set());
+      fetchUsers(pagination.page);
+      fetchStats();
+    }
+  };
+
+  const handleBulkReject = async () => {
+    if (selectedPendingIds.length === 0) return;
+    const result = await batch.executeBatch(
+      async (batchIds) => {
+        const r = await api.post('/neture/operator/registrations/batch', {
+          ids: batchIds,
+          action: 'reject',
+          reason: '운영자 일괄 거부',
+        });
+        return r.data;
+      },
+      selectedPendingIds,
+    );
+    if (result.successCount > 0) {
+      setSelectedIds(new Set());
+      fetchUsers(pagination.page);
+      fetchStats();
+    }
+  };
+
+  // ─── Role tab filtering (client-side) ──────────────────────
 
   const filteredUsers = useMemo(() => {
     if (activeTab === 'all' || activeTab === 'pending') return users;
     const allowedRoles = ROLE_TAB_FILTER[activeTab];
     if (!allowedRoles || allowedRoles.length === 0) return users;
-    return users.filter(u => {
-      const role = getPrimaryRole(u);
-      return allowedRoles.includes(role);
-    });
+    return users.filter(u => allowedRoles.includes(getPrimaryRole(u)));
   }, [users, activeTab]);
 
-  // ─── Tabs ──────────────────────────────────────────
+  // ─── Tabs ──────────────────────────────────────────────────
 
   const tabs: MemberTab[] = [
     { key: 'all', label: '전체', count: stats.total },
@@ -423,7 +431,40 @@ export default function UsersManagementPage() {
     { key: 'pending', label: '가입 신청', count: stats.pending },
   ];
 
-  // ─── DataTable Columns ────────────────────────────
+  // ─── Bulk action bar (pending tab에서만 승인/거부 표시) ───────
+
+  const bulkActions = [
+    {
+      key: 'approve',
+      label: `승인 (${selectedApprovableIds.length})`,
+      onClick: handleBulkApprove,
+      variant: 'primary' as const,
+      icon: <UserCheck size={14} />,
+      loading: batch.loading,
+      group: 'actions',
+      tooltip: '선택된 신청자를 일괄 승인합니다 (pending/rejected)',
+      visible: selectedApprovableIds.length > 0,
+    },
+    {
+      key: 'reject',
+      label: `거부 (${selectedPendingIds.length})`,
+      onClick: handleBulkReject,
+      variant: 'danger' as const,
+      icon: <UserX size={14} />,
+      loading: batch.loading,
+      group: 'actions',
+      tooltip: '선택된 대기 신청자를 일괄 거부합니다',
+      visible: selectedPendingIds.length > 0,
+      confirm: {
+        title: '일괄 거부 확인',
+        message: `${selectedPendingIds.length}명의 대기 신청자를 일괄 거부합니다.`,
+        variant: 'danger' as const,
+        confirmText: '거부',
+      },
+    },
+  ];
+
+  // ─── DataTable Columns ──────────────────────────────────────
 
   const columns: ListColumnDef<UserData>[] = [
     {
@@ -487,32 +528,72 @@ export default function UsersManagementPage() {
       system: true,
       width: '60px',
       align: 'center',
+      onCellClick: () => {}, // prevent row click from triggering
       render: (_v, user) => (
         actionLoading === user.id ? (
           <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
         ) : (
           <RowActionMenu
             actions={buildRowActions(userActionPolicy, user, {
-              approve: () => handleStatusChange(user.id, 'approved', user.status),
-              reject: () => handleStatusChange(user.id, 'rejected', user.status),
-              suspend: () => handleStatusChange(user.id, 'suspended', user.status),
-              activate: () => handleStatusChange(user.id, 'approved', user.status),
               edit: () => setEditUser(user),
               password: () => setPasswordUser(user),
               'soft-delete': () => handleSoftDelete(user),
               'hard-delete': () => setHardDeleteTarget(user),
-            }, {
-              icons: USER_ACTION_ICONS,
-              loading: actionLoading === user.id
-                ? { approve: true, reject: true, suspend: true, activate: true }
-                : undefined,
-            })}
+            }, { icons: USER_ACTION_ICONS })}
             inlineMax={userActionPolicy.inlineMax}
           />
         )
       ),
     },
   ];
+
+  // ─── Drawer: status-aware footer actions ────────────────────
+
+  const drawerActions = useMemo(() => {
+    if (!selectedUser) return [];
+    const u = selectedUser;
+    const isLoading = actionLoading === u.id;
+    const actions = [];
+
+    if (u.status === 'pending' || u.status === 'rejected') {
+      actions.push({
+        label: '승인',
+        onClick: () => handleStatusChange(u.id, 'approved', u.status),
+        variant: 'primary' as const,
+        loading: isLoading,
+        disabled: isLoading,
+      });
+    }
+    if (u.status === 'pending') {
+      actions.push({
+        label: '반려',
+        onClick: () => handleStatusChange(u.id, 'rejected', u.status),
+        variant: 'danger' as const,
+        loading: isLoading,
+        disabled: isLoading,
+      });
+    }
+    if (u.status === 'active' || u.status === 'approved') {
+      actions.push({
+        label: '비활성화',
+        onClick: () => handleStatusChange(u.id, 'suspended', u.status),
+        variant: 'danger' as const,
+        loading: isLoading,
+        disabled: isLoading,
+      });
+    }
+    if (u.status === 'suspended') {
+      actions.push({
+        label: '활성화',
+        onClick: () => handleStatusChange(u.id, 'approved', u.status),
+        variant: 'primary' as const,
+        loading: isLoading,
+        disabled: isLoading,
+      });
+    }
+    return actions;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedUser, actionLoading]);
 
   return (
     <div className="p-6">
@@ -564,6 +645,23 @@ export default function UsersManagementPage() {
           </div>
         )}
 
+        {/* ActionBar — pending 탭에서 선택 시 표시 */}
+        <div className="mb-3">
+          <ActionBar
+            selectedCount={selectedIds.size}
+            onClearSelection={() => setSelectedIds(new Set())}
+            actions={bulkActions}
+          />
+        </div>
+
+        {/* BulkResultModal */}
+        <BulkResultModal
+          open={batch.showResult}
+          onClose={() => { batch.clearResult(); fetchUsers(pagination.page); fetchStats(); }}
+          result={batch.result}
+          onRetry={() => { batch.retryFailed(); }}
+        />
+
         {/* DataTable */}
         <DataTable<UserData>
           columns={columns}
@@ -571,11 +669,14 @@ export default function UsersManagementPage() {
           rowKey="id"
           loading={loading}
           emptyMessage={activeTab === 'pending' ? '가입 신청이 없습니다.' : '등록된 사용자가 없습니다.'}
-          onRowClick={(user) => navigate(`/operator/users/${user.id}`)}
+          onRowClick={(user) => setSelectedUser(user)}
           tableId="neture-operator-users"
+          selectable
+          selectedKeys={selectedIds}
+          onSelectionChange={setSelectedIds}
         />
 
-        {/* Pagination — external JSX (operator-ux-core DataTable 미내장) */}
+        {/* Pagination */}
         {(activeTab === 'all' || activeTab === 'pending') && pagination.totalPages > 1 && (
           <div className="flex items-center justify-center gap-3 mt-4">
             <button
@@ -583,8 +684,7 @@ export default function UsersManagementPage() {
               disabled={pagination.page <= 1}
               className="flex items-center gap-1 px-3 py-2 border rounded-lg disabled:opacity-50 hover:bg-slate-50"
             >
-              <ChevronLeft className="w-4 h-4" />
-              이전
+              <ChevronLeft className="w-4 h-4" />이전
             </button>
             <span className="text-sm text-slate-600">
               {pagination.page} / {pagination.totalPages}
@@ -594,12 +694,106 @@ export default function UsersManagementPage() {
               disabled={pagination.page >= pagination.totalPages}
               className="flex items-center gap-1 px-3 py-2 border rounded-lg disabled:opacity-50 hover:bg-slate-50"
             >
-              다음
-              <ChevronRight className="w-4 h-4" />
+              다음<ChevronRight className="w-4 h-4" />
             </button>
           </div>
         )}
       </MemberListLayout>
+
+      {/* ─── BaseDetailDrawer ─────────────────────────────────── */}
+      <BaseDetailDrawer
+        open={!!selectedUser}
+        onClose={() => setSelectedUser(null)}
+        title={selectedUser ? getUserName(selectedUser) : ''}
+        width={520}
+        actions={drawerActions}
+      >
+        {selectedUser && (
+          <div style={{ fontSize: 14, color: '#374151' }}>
+            {/* 기본 정보 */}
+            <div style={{ padding: '12px 16px', backgroundColor: '#f8fafc', borderRadius: 8, marginBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+                <div style={{
+                  width: 40, height: 40, borderRadius: '50%',
+                  background: '#e2e8f0', display: 'flex', alignItems: 'center',
+                  justifyContent: 'center', fontWeight: 600, fontSize: 16, color: '#475569', flexShrink: 0,
+                }}>
+                  {getUserName(selectedUser).charAt(0)}
+                </div>
+                <div>
+                  <p style={{ fontWeight: 600, fontSize: 15, color: '#1e293b', marginBottom: 2 }}>
+                    {getUserName(selectedUser)}
+                  </p>
+                  <p style={{ fontSize: 13, color: '#64748b' }}>{selectedUser.email}</p>
+                </div>
+                <div style={{ marginLeft: 'auto' }}>
+                  <StatusBadge status={selectedUser.status} />
+                </div>
+              </div>
+            </div>
+
+            {/* 상세 필드 */}
+            {[
+              { label: '역할', value: getPrimaryRole(selectedUser) },
+              { label: '가입일', value: new Date(selectedUser.createdAt).toLocaleDateString('ko-KR') },
+              selectedUser.phone ? { label: '연락처', value: selectedUser.phone } : null,
+              selectedUser.company ? { label: '소속', value: selectedUser.company } : null,
+            ].filter(Boolean).map((item: any) => (
+              <div key={item.label} style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
+                <span style={{ fontWeight: 600, color: '#64748b', minWidth: 60 }}>{item.label}</span>
+                <span style={{ color: '#1e293b' }}>{item.value}</span>
+              </div>
+            ))}
+
+            {/* 서비스 멤버십 */}
+            {selectedUser.memberships && selectedUser.memberships.length > 0 && (
+              <div style={{ marginTop: 12, marginBottom: 12 }}>
+                <p style={{ fontWeight: 600, color: '#64748b', marginBottom: 6 }}>서비스 멤버십</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                  {selectedUser.memberships.map((m) => (
+                    <span
+                      key={m.id}
+                      style={{
+                        padding: '3px 10px', borderRadius: 12, fontSize: 12, fontWeight: 500,
+                        background: m.status === 'active' ? '#eff6ff' : m.status === 'pending' ? '#fffbeb' : '#f1f5f9',
+                        color: m.status === 'active' ? '#1d4ed8' : m.status === 'pending' ? '#92400e' : '#64748b',
+                      }}
+                    >
+                      {m.serviceKey} · {m.status}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 상태별 안내 */}
+            {selectedUser.status === 'pending' && (
+              <div style={{ marginTop: 12, padding: '10px 14px', backgroundColor: '#fffbeb', borderRadius: 8, border: '1px solid #fde68a' }}>
+                <p style={{ fontSize: 12, color: '#92400e', fontWeight: 500 }}>
+                  가입 신청 대기 중입니다. 아래 버튼으로 승인 또는 반려를 처리하세요.
+                </p>
+              </div>
+            )}
+            {selectedUser.status === 'rejected' && (
+              <div style={{ marginTop: 12, padding: '10px 14px', backgroundColor: '#fef2f2', borderRadius: 8, border: '1px solid #fecaca' }}>
+                <p style={{ fontSize: 12, color: '#991b1b', fontWeight: 500 }}>
+                  거부 처리된 신청입니다. 재승인이 가능합니다.
+                </p>
+              </div>
+            )}
+
+            {/* 전체 상세 링크 */}
+            <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid #f1f5f9' }}>
+              <a
+                href={`/operator/users/${selectedUser.id}`}
+                style={{ fontSize: 13, color: '#2563eb', textDecoration: 'none' }}
+              >
+                전체 상세 페이지 →
+              </a>
+            </div>
+          </div>
+        )}
+      </BaseDetailDrawer>
 
       {/* Password Modal */}
       {passwordUser && (
