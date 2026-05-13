@@ -32,18 +32,6 @@ const QUICK_LINKS = [
     external: true,
   },
   {
-    label: '위원회 관리',
-    desc: '위원회 신청 검토',
-    to: '/admin/committee-requests',
-    external: false,
-  },
-  {
-    label: 'Steward 관리',
-    desc: 'Steward 현황 확인',
-    to: '/admin/stewards',
-    external: false,
-  },
-  {
     label: '운영 대시보드',
     desc: 'operator 공간에서 운영 현황 확인',
     to: '/operator',

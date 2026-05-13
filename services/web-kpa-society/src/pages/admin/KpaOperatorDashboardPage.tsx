@@ -174,11 +174,8 @@ function buildDashboardConfig(
 
   // Block 5: Quick Actions
   const quickActions: QuickActionItem[] = [
-    { id: 'qa-members', label: '회원 관리', link: '/admin/members', icon: '👥' },
-    { id: 'qa-divisions', label: '분회 관리', link: '/admin/divisions', icon: '🏢' },
-    { id: 'qa-committee', label: '위원회 관리', link: '/admin/committee-requests', icon: '👔' },
+    { id: 'qa-members', label: '회원 관리', link: '/operator/members', icon: '👥' },
     { id: 'qa-event-offers', label: '이벤트/특가 관리', link: '/demo/intranet/event-offers', icon: '🏷️' },
-    { id: 'qa-settings', label: '설정', link: '/admin/settings', icon: '⚙️' },
   ];
 
   return { kpis, aiSummary, actionQueue, activityLog, quickActions };

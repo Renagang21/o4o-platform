@@ -13,7 +13,6 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
-  Users,
   ChevronRight,
   ChevronDown,
 } from 'lucide-react';
@@ -27,12 +26,8 @@ type SidebarItem = { label: string; path: string; exact?: boolean };
 type SidebarGroup = { label: string; icon: LucideIcon; items: SidebarItem[] };
 
 /**
- * WO-O4O-KPA-ADMIN-SIDEBAR-IMPLEMENTATION-ALIGN-V1:
- * 실제 구현된 라우트만 노출.
- * 미구현(redirect fallback) 메뉴 제거.
- *
- * 구현 완료: 관리자 홈, 위원회 관리, Steward 관리
- * 숨김(미구현): 신상신고, 연회비, 임원 관리, 설정, 회원 관리(→operator 공간)
+ * WO-O4O-KPA-ADMIN-ORG-MANAGEMENT-DEADCODE-REMOVE-V1:
+ * 약사회 조직관리(위원회/Steward) 제거 후 관리자 홈만 유지.
  */
 const ADMIN_SIDEBAR_GROUPS: SidebarGroup[] = [
   {
@@ -40,14 +35,6 @@ const ADMIN_SIDEBAR_GROUPS: SidebarGroup[] = [
     icon: LayoutDashboard,
     items: [
       { label: '관리자 홈', path: '/admin/kpa-dashboard', exact: true },
-    ],
-  },
-  {
-    label: 'Users',
-    icon: Users,
-    items: [
-      { label: '위원회 관리', path: '/admin/committee-requests' },
-      { label: 'Steward 관리', path: '/admin/stewards' },
     ],
   },
 ];
