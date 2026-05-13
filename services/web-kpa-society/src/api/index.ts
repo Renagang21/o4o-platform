@@ -11,7 +11,6 @@ export { eventOfferApi } from './eventOffer';
 export { eventOfferAdminApi } from './eventOfferAdmin';
 export { newsApi } from './news';
 export { mypageApi, type ProfileResponse } from './mypage';
-export { adminApi } from './admin';
 export { cmsApi } from './cms';
 export { participationApi } from './participation';
 export { homeApi } from './home';
