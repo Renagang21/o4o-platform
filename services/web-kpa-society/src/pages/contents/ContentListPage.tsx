@@ -37,6 +37,7 @@ import {
   BaseTable,
   BaseDetailDrawer,
   RowActionMenu,
+  ActionBar,
   type O4OColumn,
   type RowActionItem,
 } from '@o4o/ui';
@@ -105,6 +106,17 @@ function DocumentsSection({
   const [drawerDetail, setDrawerDetail] = useState<ContentItem | null>(null);
   const [drawerLoading, setDrawerLoading] = useState(false);
   const [copying, setCopying] = useState<string | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+
+  // 페이지/데이터 변경 시 사라진 selection 정리
+  useEffect(() => {
+    setSelected((prev) => {
+      const validKeys = new Set(items.map((r) => r.id));
+      const next = new Set<string>();
+      for (const k of prev) { if (validKeys.has(k)) next.add(k); }
+      return next.size === prev.size ? prev : next;
+    });
+  }, [items]);
 
   useEffect(() => {
     let cancelled = false;
@@ -166,6 +178,28 @@ function DocumentsSection({
     }
   }, []);
 
+  const handleBulkCopyToStore = useCallback(async () => {
+    const selectedItems = items.filter((r) => selected.has(r.id) && (r as any).reusable_policy !== 'restricted');
+    if (selectedItems.length === 0) {
+      toast.error('가져갈 수 있는 항목이 없습니다');
+      return;
+    }
+    setCopying('bulk');
+    try {
+      await Promise.all(
+        selectedItems.map((r) =>
+          assetSnapshotApi.copy({ sourceService: 'kpa', sourceAssetId: r.id, assetType: 'content' }),
+        ),
+      );
+      toast.success(`${selectedItems.length}개를 내 자료함에 가져왔습니다`);
+      setSelected(new Set());
+    } catch (e: any) {
+      toast.error(e?.message || '가져오기에 실패했습니다');
+    } finally {
+      setCopying(null);
+    }
+  }, [items, selected]);
+
   const handleDelete = useCallback(async (id: string) => {
     try {
       await contentApi.remove(id);
@@ -178,6 +212,7 @@ function DocumentsSection({
   }, [onChanged, drawerItem, closeDrawer]);
 
   const columns: O4OColumn<ContentItem>[] = [
+    { key: '_select', header: '', system: true, width: '44px' },
     {
       key: 'title',
       header: '제목',
@@ -293,10 +328,27 @@ function DocumentsSection({
         <>
           {/* Desktop: BaseTable */}
           <div className="hidden md:block bg-white rounded-lg border border-slate-200 overflow-hidden">
+            {selected.size > 0 && (
+              <ActionBar
+                selectedCount={selected.size}
+                actions={[
+                  {
+                    key: 'bulk-copy',
+                    label: '내 자료함 가져가기',
+                    onClick: handleBulkCopyToStore,
+                    loading: copying === 'bulk',
+                  },
+                ]}
+                onClearSelection={() => setSelected(new Set())}
+              />
+            )}
             <BaseTable<ContentItem>
               columns={columns}
               data={items}
               rowKey={(row) => row.id}
+              selectable
+              selectedKeys={selected}
+              onSelectionChange={setSelected}
               onRowClick={(row) => openDrawer(row)}
               emptyMessage={
                 <div className="py-8 px-4 text-sm text-slate-400 text-center">아직 문서가 없습니다</div>
@@ -390,7 +442,17 @@ function CoursesSection({ canCreateCourse }: { canCreateCourse: boolean }) {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [copying, setCopying] = useState<string | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
   // WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1: 중복 허용 — addedCourseIds 제거
+
+  useEffect(() => {
+    setSelected((prev) => {
+      const validKeys = new Set(courses.map((r) => r.id));
+      const next = new Set<string>();
+      for (const k of prev) { if (validKeys.has(k)) next.add(k); }
+      return next.size === prev.size ? prev : next;
+    });
+  }, [courses]);
 
   useEffect(() => {
     let cancelled = false;
@@ -415,6 +477,28 @@ function CoursesSection({ canCreateCourse }: { canCreateCourse: boolean }) {
     return () => { cancelled = true; };
   }, []);
 
+  const handleBulkCopyToStore = useCallback(async () => {
+    const selectedCourses = courses.filter((r) => selected.has(r.id) && r.reusablePolicy !== 'restricted');
+    if (selectedCourses.length === 0) {
+      toast.error('가져갈 수 있는 항목이 없습니다');
+      return;
+    }
+    setCopying('bulk');
+    try {
+      await Promise.all(
+        selectedCourses.map((r) =>
+          assetSnapshotApi.copy({ sourceService: 'kpa', sourceAssetId: r.id, assetType: 'lesson' }),
+        ),
+      );
+      toast.success(`${selectedCourses.length}개를 내 자료함에 가져왔습니다`);
+      setSelected(new Set());
+    } catch (e: any) {
+      toast.error(e?.message || '가져오기에 실패했습니다');
+    } finally {
+      setCopying(null);
+    }
+  }, [courses, selected]);
+
   // WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1: 중복 허용 — 매번 새 library item 생성
   const handleCopyToStore = useCallback(async (course: Course) => {
     setCopying(course.id);
@@ -433,6 +517,7 @@ function CoursesSection({ canCreateCourse }: { canCreateCourse: boolean }) {
   }, []);
 
   const columns: O4OColumn<Course>[] = [
+    { key: '_select', header: '', system: true, width: '44px' },
     {
       key: 'title',
       header: '제목',
@@ -515,10 +600,27 @@ function CoursesSection({ canCreateCourse }: { canCreateCourse: boolean }) {
         <>
           {/* Desktop: BaseTable */}
           <div className="hidden md:block bg-white rounded-lg border border-slate-200 overflow-hidden">
+            {selected.size > 0 && (
+              <ActionBar
+                selectedCount={selected.size}
+                actions={[
+                  {
+                    key: 'bulk-copy',
+                    label: '내 자료함 가져가기',
+                    onClick: handleBulkCopyToStore,
+                    loading: copying === 'bulk',
+                  },
+                ]}
+                onClearSelection={() => setSelected(new Set())}
+              />
+            )}
             <BaseTable<Course>
               columns={columns}
               data={courses}
               rowKey={(row) => row.id}
+              selectable
+              selectedKeys={selected}
+              onSelectionChange={setSelected}
               onRowClick={(row) => navigate(`/content/courses/${row.id}`)}
               emptyMessage={
                 <div className="py-8 px-4 text-sm text-slate-400 text-center">아직 코스형 자료가 없습니다</div>
@@ -571,6 +673,7 @@ function SurveysSection({ isAuthenticated }: { isAuthenticated: boolean }) {
   const navigate = useNavigate();
   const [items, setItems] = useState<ParticipationSet[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     let cancelled = false;
@@ -591,10 +694,57 @@ function SurveysSection({ isAuthenticated }: { isAuthenticated: boolean }) {
     return () => { cancelled = true; };
   }, []);
 
+  useEffect(() => {
+    setSelected((prev) => {
+      const validKeys = new Set(items.map((r) => r.id));
+      const next = new Set<string>();
+      for (const k of prev) { if (validKeys.has(k)) next.add(k); }
+      return next.size === prev.size ? prev : next;
+    });
+  }, [items]);
+
   const targetForSurvey = (set: ParticipationSet) =>
     set.status === 'active'
       ? `/participation/${set.id}/respond`
       : `/participation/${set.id}/results`;
+
+  const columns: O4OColumn<ParticipationSet>[] = [
+    { key: '_select', header: '', system: true, width: '44px' },
+    {
+      key: 'title',
+      header: '제목',
+      render: (_v, row) => (
+        <span className="font-semibold text-sm text-slate-800 overflow-hidden text-ellipsis whitespace-nowrap">{row.title}</span>
+      ),
+    },
+    {
+      key: 'status',
+      header: '상태',
+      width: '80px',
+      render: (val) => (
+        <span className={`inline-block px-2 py-0.5 text-[11px] font-semibold rounded ${
+          val === 'active' ? 'bg-emerald-50 text-emerald-700'
+          : val === 'closed' ? 'bg-red-50 text-red-700'
+          : 'bg-slate-100 text-slate-500'
+        }`}>
+          {val === 'active' ? '진행중' : val === 'closed' ? '종료' : '초안'}
+        </span>
+      ),
+    },
+    {
+      key: 'questions',
+      header: '질문',
+      width: '60px',
+      align: 'center',
+      render: (val) => <span className="text-[13px] text-slate-400">{Array.isArray(val) ? val.length : 0}개</span>,
+    },
+    {
+      key: 'createdAt',
+      header: '작성일',
+      width: '100px',
+      render: (val) => <span className="text-[13px] text-slate-400">{val ? new Date(val).toLocaleDateString('ko-KR') : '-'}</span>,
+    },
+  ];
 
   return (
     <section className="mb-10">
@@ -604,45 +754,72 @@ function SurveysSection({ isAuthenticated }: { isAuthenticated: boolean }) {
         primaryAction={isAuthenticated ? { label: '설문 등록', to: '/content/surveys/new' } : undefined}
         moreLink={{ label: '전체 보기', to: '/content/surveys' }}
       />
+
       {loading ? (
         <Card className="overflow-hidden">
           <div className="py-8 px-4 text-sm text-slate-400 text-center">불러오는 중...</div>
         </Card>
-      ) : items.length === 0 ? (
-        <Card className="overflow-hidden">
-          <div className="py-8 px-4 text-sm text-slate-400 text-center">아직 등록된 설문이 없습니다</div>
-        </Card>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {items.map((s) => (
-            <button
-              key={s.id}
-              type="button"
-              onClick={() => navigate(targetForSurvey(s))}
-              className="flex flex-col items-start p-4 bg-white border border-slate-200 rounded-lg cursor-pointer text-left transition-colors hover:border-slate-400 min-h-[120px]"
-            >
-              <div className="flex items-center justify-between w-full mb-2">
-                <span className={`inline-block px-2 py-0.5 text-[11px] font-semibold rounded ${
-                  s.status === 'active' ? 'bg-emerald-50 text-emerald-700'
-                  : s.status === 'closed' ? 'bg-red-50 text-red-700'
-                  : 'bg-slate-100 text-slate-500'
-                }`}>
-                  {s.status === 'active' ? '진행중' : s.status === 'closed' ? '종료' : '초안'}
-                </span>
-                <span className="text-xs text-slate-400">
-                  {s.createdAt ? new Date(s.createdAt).toLocaleDateString('ko-KR') : '-'}
-                </span>
+        <>
+          {/* Desktop: BaseTable */}
+          <div className="hidden md:block bg-white rounded-lg border border-slate-200 overflow-hidden">
+            {selected.size > 0 && (
+              <ActionBar
+                selectedCount={selected.size}
+                actions={[]}
+                onClearSelection={() => setSelected(new Set())}
+              />
+            )}
+            <BaseTable<ParticipationSet>
+              columns={columns}
+              data={items}
+              rowKey={(row) => row.id}
+              selectable
+              selectedKeys={selected}
+              onSelectionChange={setSelected}
+              onRowClick={(row) => navigate(targetForSurvey(row))}
+              emptyMessage={
+                <div className="py-8 px-4 text-sm text-slate-400 text-center">아직 등록된 설문이 없습니다</div>
+              }
+            />
+          </div>
+
+          {/* Mobile: Card List */}
+          <div className="block md:hidden">
+            {items.length === 0 ? (
+              <Card className="overflow-hidden">
+                <div className="py-8 px-4 text-sm text-slate-400 text-center">아직 등록된 설문이 없습니다</div>
+              </Card>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {items.map((s) => (
+                  <Card
+                    key={s.id}
+                    className="p-4 cursor-pointer hover:bg-slate-50 transition-colors"
+                    onClick={() => navigate(targetForSurvey(s))}
+                  >
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center justify-between">
+                        <span className={`inline-block px-2 py-0.5 text-[11px] font-semibold rounded ${
+                          s.status === 'active' ? 'bg-emerald-50 text-emerald-700'
+                          : s.status === 'closed' ? 'bg-red-50 text-red-700'
+                          : 'bg-slate-100 text-slate-500'
+                        }`}>
+                          {s.status === 'active' ? '진행중' : s.status === 'closed' ? '종료' : '초안'}
+                        </span>
+                        <span className="text-xs text-slate-400">
+                          {s.createdAt ? new Date(s.createdAt).toLocaleDateString('ko-KR') : '-'}
+                        </span>
+                      </div>
+                      <span className="text-sm font-medium text-slate-800 line-clamp-2">{s.title}</span>
+                      <span className="text-xs text-slate-400">질문 {s.questions?.length ?? 0}개</span>
+                    </div>
+                  </Card>
+                ))}
               </div>
-              <div className="text-sm font-semibold text-slate-900 mb-1.5 line-clamp-2 w-full">
-                {s.title}
-              </div>
-              {s.description && (
-                <div className="text-[13px] text-slate-500 mb-2 line-clamp-2 w-full">{s.description}</div>
-              )}
-              <div className="text-xs text-slate-400 mt-auto">질문 {s.questions?.length ?? 0}개</div>
-            </button>
-          ))}
-        </div>
+            )}
+          </div>
+        </>
       )}
     </section>
   );
