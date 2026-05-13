@@ -10,9 +10,12 @@
  *   두 결과를 updatedAt DESC 로 merge. 백엔드 통합 엔드포인트 없음 (클라이언트 머지).
  *   삭제 API: sourceKind에 따라 directContentApi.remove / deleteStoreExecutionAsset 분기.
  * WO-O4O-STORE-PRODUCTION-MATERIALS-FLOW-REALIGN-V1:
- *   본 페이지는 결과 저장소 역할만 유지.
- *   제작 시작 흐름은 /store/library/contents → StartProductionModal → AI 액션으로 이동.
- *   AI 생성 버튼 / ProductionTypeSelectorModal / SelectContentForAiModal 제거.
+ *   본 페이지는 결과 저장소 역할 유지. 제작 시작 흐름은 canonical:
+ *     콘텐츠/강의 선택 → StartProductionModal → AI 액션 → AiContentModal → 편집기 → 저장.
+ * WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-SELECTOR-MODAL-V1:
+ *   "새 제작 자료 만들기" CTA 는 페이지 이동 대신 SelectContentsForProductionModal 을 연다.
+ *   선택 완료 → StartProductionModal → AI 카드 → AiContentModal → ProductionMaterialEditorPage.
+ *   selector / production flow / AI modal 모두 canonical 컴포넌트 재사용 — 중복 구현 없음.
  *
  * 데이터 소스 (통합):
  *   directContentApi.list() — kpa_store_contents (sourceType='direct')
@@ -25,12 +28,17 @@ import { useEffect, useState, useCallback, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layers, Trash2, RefreshCw, FileEdit, Plus } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
+import { AiContentModal } from '@o4o/content-editor';
 import { directContentApi } from '../../api/assetSnapshot';
 import {
   getStoreExecutionAssets,
   deleteStoreExecutionAsset,
 } from '../../api/storeExecutionAssets';
+import { getAccessToken } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
+import { SelectContentsForProductionModal } from './SelectContentsForProductionModal';
+import { StartProductionModal, type ProductionSource, type ProductionSourceItem } from './StartProductionModal';
+import { composeSourceTextFromItems } from './productionTargets';
 
 // ─── 타입 ─────────────────────────────────────────────────────────────────────
 
@@ -93,6 +101,53 @@ export default function StoreProductionMaterialsPage() {
   const [error, setError]           = useState<string | null>(null);
   const [selected, setSelected]     = useState<Set<string>>(new Set());
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  // WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-SELECTOR-MODAL-V1:
+  // 콘텐츠/강의 선택 → StartProductionModal → AiContentModal → editor 의 canonical 흐름.
+  const [selectModalOpen, setSelectModalOpen] = useState(false);
+  const [productionModalOpen, setProductionModalOpen] = useState(false);
+  const [productionSource, setProductionSource] = useState<ProductionSource | null>(null);
+  const [aiOpen, setAiOpen] = useState(false);
+  const [aiInitialText, setAiInitialText] = useState('');
+  const [aiSourceMetadata, setAiSourceMetadata] = useState<
+    { sourceContentId?: string; sourceTitle?: string; sourceOrigin?: string } | null
+  >(null);
+
+  const openSelectModal = useCallback(() => setSelectModalOpen(true), []);
+
+  const handleSelectConfirm = useCallback((selectedItems: ProductionSourceItem[]) => {
+    if (selectedItems.length === 0) return;
+    setSelectModalOpen(false);
+    setProductionSource({ fromLibrary: 'contents', items: selectedItems });
+    setProductionModalOpen(true);
+  }, []);
+
+  const handleAiAction = useCallback((source: ProductionSource) => {
+    const text = composeSourceTextFromItems(source.items);
+    const first = source.items[0];
+    setAiInitialText(text);
+    setAiSourceMetadata(
+      first
+        ? { sourceContentId: first.id, sourceTitle: first.title, sourceOrigin: first.origin }
+        : null,
+    );
+    setProductionModalOpen(false);
+    setAiOpen(true);
+  }, []);
+
+  const handleAiInsert = useCallback(
+    (data: { html: string; title: string }) => {
+      setAiOpen(false);
+      navigate('/store/library/production-materials/new', {
+        state: {
+          generatedHtml: data.html,
+          title: data.title || undefined,
+          sourceMetadata: aiSourceMetadata ?? undefined,
+        },
+      });
+    },
+    [navigate, aiSourceMetadata],
+  );
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
@@ -228,7 +283,7 @@ export default function StoreProductionMaterialsPage() {
         <div style={styles.headerActions}>
           <button
             type="button"
-            onClick={() => navigate('/store/library/contents')}
+            onClick={openSelectModal}
             style={styles.newBtn}
           >
             <Plus size={14} />
@@ -281,7 +336,7 @@ export default function StoreProductionMaterialsPage() {
           </p>
           <button
             type="button"
-            onClick={() => navigate('/store/library/contents')}
+            onClick={openSelectModal}
             style={{ ...styles.newBtn, marginTop: 16 }}
           >
             <Plus size={14} />
@@ -365,6 +420,34 @@ export default function StoreProductionMaterialsPage() {
           })}
         </div>
       )}
+
+      {/* WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-SELECTOR-MODAL-V1:
+          페이지 이동 없이 모달 안에서 콘텐츠/강의 선택 → canonical 제작 흐름 */}
+      <SelectContentsForProductionModal
+        open={selectModalOpen}
+        onClose={() => setSelectModalOpen(false)}
+        onConfirm={handleSelectConfirm}
+      />
+
+      <StartProductionModal
+        open={productionModalOpen}
+        source={productionSource}
+        onClose={() => setProductionModalOpen(false)}
+        onAiAction={handleAiAction}
+      />
+
+      <AiContentModal
+        open={aiOpen}
+        onClose={() => setAiOpen(false)}
+        editor={null}
+        onInsert={handleAiInsert}
+        initialText={aiInitialText}
+        headerLabel="AI 매장 제작 자료 초안"
+        aiRequestHeaders={(() => {
+          const token = getAccessToken();
+          return token ? { Authorization: `Bearer ${token}` } : undefined;
+        })()}
+      />
     </div>
   );
 }
