@@ -360,8 +360,8 @@ export class AuthRegisterController extends BaseController {
     const isSupplierStaff = memberType === 'supplier_staff';
 
     // KPA Society: auto-create KPA member
-    // All new member types create a pending kpa_member; org can be assigned at approval
-    const needsMember = data.organizationId || isStudent || isExternalExpert || isSupplierStaff || memberType === 'pharmacist_member';
+    // All pharmacist / student / expert / supplier types create a pending kpa_member
+    const needsMember = isPharmacist || isStudent || isExternalExpert || isSupplierStaff;
     if (needsMember) {
       const licenseNum = isPharmacist ? (data.licenseNumber || null) : null;
 
