@@ -74,6 +74,13 @@ export const assetSnapshotApi = {
   },
 
   /**
+   * Update title/description/tags/thumbnailUrl of a store snapshot.
+   * description/tags/thumbnailUrl are merged into content_json.
+   */
+  patch: (id: string, body: { title?: string; description?: string; tags?: string[]; thumbnailUrl?: string }) =>
+    apiClient.patch<{ success: boolean; data: AssetSnapshotItem }>(`/assets/${id}`, body),
+
+  /**
    * Delete a snapshot from the store's library.
    * Only removes the store's copy — original community asset is untouched.
    */

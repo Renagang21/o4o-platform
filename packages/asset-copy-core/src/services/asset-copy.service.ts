@@ -136,6 +136,29 @@ export class AssetCopyService {
   }
 
   /**
+   * Update title and/or content_json fields of a snapshot.
+   * Only the owning organization can update its snapshot.
+   * Throws 'NOT_FOUND' if the snapshot does not exist or does not belong to the org.
+   */
+  async updateById(
+    id: string,
+    organizationId: string,
+    updates: { title?: string; contentJsonPatch?: Record<string, unknown> },
+  ): Promise<AssetSnapshot> {
+    const snapshot = await this.snapshotRepo.findOne({ where: { id, organizationId } });
+    if (!snapshot) {
+      throw new Error('NOT_FOUND');
+    }
+    if (updates.title !== undefined) {
+      snapshot.title = updates.title;
+    }
+    if (updates.contentJsonPatch) {
+      snapshot.contentJson = { ...snapshot.contentJson, ...updates.contentJsonPatch };
+    }
+    return this.snapshotRepo.save(snapshot);
+  }
+
+  /**
    * Delete a snapshot owned by the given organization.
    * Throws 'NOT_FOUND' if the snapshot does not exist or does not belong to the org.
    */

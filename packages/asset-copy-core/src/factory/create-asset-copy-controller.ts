@@ -195,6 +195,60 @@ export function createAssetCopyController(
   });
 
   /**
+   * PATCH /:id
+   * Update title and/or contentJson fields of a snapshot.
+   * Body: { title?, description?, tags?, thumbnailUrl? }
+   * Merges description/tags/thumbnailUrl into content_json.
+   */
+  router.patch('/:id', requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = (req as any).user;
+      if (!user?.id) {
+        res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+        return;
+      }
+
+      const userRoles = user.roles || [];
+      if (!service.checkPermission(userRoles, allowedRoles)) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Insufficient role' } });
+        return;
+      }
+
+      const orgId = await resolveOrgId(dataSource, user.id);
+      if (!orgId) {
+        res.status(403).json({ success: false, error: { code: noOrgErrorCode, message: noOrgMessage } });
+        return;
+      }
+
+      const { id } = req.params;
+      const { title, description, tags, thumbnailUrl } = req.body as {
+        title?: string;
+        description?: string;
+        tags?: string[];
+        thumbnailUrl?: string;
+      };
+
+      const contentJsonPatch: Record<string, unknown> = {};
+      if (description !== undefined) contentJsonPatch.description = description;
+      if (tags !== undefined) contentJsonPatch.tags = tags;
+      if (thumbnailUrl !== undefined) contentJsonPatch.thumbnailUrl = thumbnailUrl;
+
+      const updated = await service.updateById(id, orgId, {
+        title: title?.trim() || undefined,
+        contentJsonPatch: Object.keys(contentJsonPatch).length > 0 ? contentJsonPatch : undefined,
+      });
+
+      res.json({ success: true, data: updated });
+    } catch (err: any) {
+      if (err.message === 'NOT_FOUND') {
+        res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Snapshot not found' } });
+        return;
+      }
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to update snapshot' } });
+    }
+  });
+
+  /**
    * DELETE /:id
    * Deletes the snapshot owned by the authenticated user's organization.
    * 404 if not found or not owned by this org.

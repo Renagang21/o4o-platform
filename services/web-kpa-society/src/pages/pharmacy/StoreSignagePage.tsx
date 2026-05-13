@@ -55,6 +55,7 @@ import {
   type CreateSchedulePayload,
 } from '../../api/signageSchedule';
 import {
+  assetSnapshotApi,
   storeAssetControlApi,
   type StoreAssetItem,
   type AssetPublishStatus,
@@ -315,8 +316,9 @@ export function StoreSignagePage() {
   const [regVideoError, setRegVideoError] = useState('');
   const [selectedVideoKeys, setSelectedVideoKeys] = useState<string[]>([]);
 
-  // ── Media edit drawer ──
+  // ── Media / snapshot edit drawer ──
   const [editingMedia, setEditingMedia] = useState<SignageMediaItem | null>(null);
+  const [editingSnapshot, setEditingSnapshot] = useState<StoreAssetItem | null>(null);
   const [editName, setEditName] = useState('');
   const [editDescription, setEditDescription] = useState('');
   const [editTags, setEditTags] = useState('');
@@ -548,34 +550,62 @@ export function StoreSignagePage() {
     } catch { /* user can retry */ }
   };
 
-  // ── Media edit drawer handlers ──
-  const handleOpenEditDrawer = (media: SignageMediaItem) => {
-    setEditingMedia(media);
-    setEditName(media.name);
-    setEditDescription(media.description ?? '');
-    setEditTags((media.tags ?? []).join(', '));
-    setEditThumbnailUrl(media.thumbnailUrl ?? '');
+  // ── Media / snapshot edit drawer handlers ──
+  const handleOpenEdit = (v: UnifiedVideoItem) => {
     setEditError('');
+    if (v.source === 'direct' && v._media) {
+      const media = v._media;
+      setEditingMedia(media);
+      setEditingSnapshot(null);
+      setEditName(media.name);
+      setEditDescription(media.description ?? '');
+      setEditTags((media.tags ?? []).join(', '));
+      setEditThumbnailUrl(media.thumbnailUrl ?? '');
+    } else if (v.source === 'snapshot' && v._snapshot) {
+      const snap = v._snapshot;
+      setEditingSnapshot(snap);
+      setEditingMedia(null);
+      setEditName(snap.title);
+      const cj = snap.contentJson ?? {};
+      setEditDescription((cj.description as string) ?? '');
+      setEditTags(((cj.tags as string[]) ?? []).join(', '));
+      setEditThumbnailUrl((cj.thumbnailUrl as string) ?? '');
+    }
   };
 
   const handleCloseEditDrawer = () => {
     setEditingMedia(null);
+    setEditingSnapshot(null);
     setEditError('');
   };
 
   const handleSaveEdit = async () => {
-    if (!editingMedia || !editName.trim()) return;
+    if (!editName.trim()) return;
     setEditSaving(true);
     setEditError('');
     try {
       const tags = editTags.split(',').map(t => t.trim()).filter(Boolean);
-      const updated = await updateSignageMedia(organizationId, editingMedia.id, {
-        name: editName.trim(),
-        description: editDescription.trim() || undefined,
-        tags: tags.length > 0 ? tags : [],
-        thumbnailUrl: editThumbnailUrl.trim() || undefined,
-      });
-      setSignageMediaItems(prev => prev.map(m => m.id === updated.id ? updated : m));
+      if (editingMedia) {
+        const updated = await updateSignageMedia(organizationId, editingMedia.id, {
+          name: editName.trim(),
+          description: editDescription.trim() || undefined,
+          tags: tags.length > 0 ? tags : [],
+          thumbnailUrl: editThumbnailUrl.trim() || undefined,
+        });
+        setSignageMediaItems(prev => prev.map(m => m.id === updated.id ? updated : m));
+      } else if (editingSnapshot) {
+        const res = await assetSnapshotApi.patch(editingSnapshot.id, {
+          title: editName.trim(),
+          description: editDescription.trim() || undefined,
+          tags: tags.length > 0 ? tags : [],
+          thumbnailUrl: editThumbnailUrl.trim() || undefined,
+        });
+        const updated = res.data;
+        setItems(prev => prev.map(it => it.id === editingSnapshot.id
+          ? { ...it, title: updated.title, contentJson: updated.contentJson }
+          : it,
+        ));
+      }
       handleCloseEditDrawer();
     } catch (err: unknown) {
       setEditError(err instanceof Error ? err.message : '저장에 실패했습니다.');
@@ -585,13 +615,21 @@ export function StoreSignagePage() {
   };
 
   const handleDeleteFromDrawer = async () => {
-    if (!editingMedia) return;
-    if (!confirm(`"${editingMedia.name}" 동영상을 삭제하시겠습니까?`)) return;
-    try {
-      await deleteSignageMedia(organizationId, editingMedia.id);
-      handleCloseEditDrawer();
-      loadSignageMedia();
-    } catch { /* user can retry */ }
+    if (editingMedia) {
+      if (!confirm(`"${editingMedia.name}" 동영상을 삭제하시겠습니까?`)) return;
+      try {
+        await deleteSignageMedia(organizationId, editingMedia.id);
+        handleCloseEditDrawer();
+        loadSignageMedia();
+      } catch { /* user can retry */ }
+    } else if (editingSnapshot) {
+      if (!confirm(`"${editingSnapshot.title}" 동영상(HUB 복사본)을 삭제하시겠습니까?`)) return;
+      try {
+        await assetSnapshotApi.remove(editingSnapshot.id);
+        handleCloseEditDrawer();
+        fetchItems();
+      } catch { /* user can retry */ }
+    }
   };
 
   // ── Unified video list (snapshots + direct media) ──
@@ -1855,35 +1893,55 @@ export function StoreSignagePage() {
                 key: 'actions',
                 title: '',
                 align: 'right' as const,
-                render: (_v, v) => v.source === 'direct' ? (
-                  <div className="flex items-center justify-end gap-1">
-                    <button
-                      onClick={e => { e.stopPropagation(); handleOpenEditDrawer(v._media!); }}
-                      className="inline-flex items-center gap-1 px-2 py-1 text-[11px] text-blue-600 border border-blue-200 rounded hover:bg-blue-50"
-                      title="편집"
-                    >
-                      <Pencil className="w-3 h-3" />
-                      편집
-                    </button>
-                    <button
-                      onClick={e => { e.stopPropagation(); handleDeleteMedia(v._media!.id); }}
-                      className="inline-flex items-center gap-1 px-2 py-1 text-[11px] text-red-600 border border-red-200 rounded hover:bg-red-50"
-                      title="삭제"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                      삭제
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => navigateTab('playlist')}
-                    className="inline-flex items-center gap-1 px-2 py-1 text-[11px] text-blue-600 border border-blue-200 rounded hover:bg-blue-50"
-                    title="플레이리스트 탭으로 이동하여 추가"
-                  >
-                    <ListVideo className="w-3 h-3" />
-                    플레이리스트에 추가
-                  </button>
-                ),
+                render: (_v, v) => {
+                  if (v.source === 'direct') {
+                    return (
+                      <div className="flex items-center justify-end gap-1">
+                        <button
+                          onClick={e => { e.stopPropagation(); handleOpenEdit(v); }}
+                          className="inline-flex items-center gap-1 px-2 py-1 text-[11px] text-blue-600 border border-blue-200 rounded hover:bg-blue-50"
+                          title="편집"
+                        >
+                          <Pencil className="w-3 h-3" />
+                          편집
+                        </button>
+                        <button
+                          onClick={e => { e.stopPropagation(); handleDeleteMedia(v._media!.id); }}
+                          className="inline-flex items-center gap-1 px-2 py-1 text-[11px] text-red-600 border border-red-200 rounded hover:bg-red-50"
+                          title="삭제"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                          삭제
+                        </button>
+                      </div>
+                    );
+                  }
+                  // snapshot row
+                  const snap = v._snapshot!;
+                  const canEditSnap = !snap.isForced && !snap.isLocked;
+                  return (
+                    <div className="flex items-center justify-end gap-1">
+                      {canEditSnap && (
+                        <button
+                          onClick={e => { e.stopPropagation(); handleOpenEdit(v); }}
+                          className="inline-flex items-center gap-1 px-2 py-1 text-[11px] text-blue-600 border border-blue-200 rounded hover:bg-blue-50"
+                          title="편집"
+                        >
+                          <Pencil className="w-3 h-3" />
+                          편집
+                        </button>
+                      )}
+                      <button
+                        onClick={() => navigateTab('playlist')}
+                        className="inline-flex items-center gap-1 px-2 py-1 text-[11px] text-blue-600 border border-blue-200 rounded hover:bg-blue-50"
+                        title="플레이리스트 탭으로 이동하여 추가"
+                      >
+                        <ListVideo className="w-3 h-3" />
+                        플레이리스트에 추가
+                      </button>
+                    </div>
+                  );
+                },
               },
             ] as Column<UnifiedVideoItem>[]}
             dataSource={pagedUnified}
@@ -1931,9 +1989,9 @@ export function StoreSignagePage() {
         usageType="signage"
       />
 
-      {/* ─── Media Edit Drawer ─────────────────────── */}
+      {/* ─── Media / Snapshot Edit Drawer ─────────── */}
       <BaseDetailDrawer
-        open={!!editingMedia}
+        open={!!editingMedia || !!editingSnapshot}
         onClose={handleCloseEditDrawer}
         title="동영상 편집"
         width={480}
@@ -1965,79 +2023,94 @@ export function StoreSignagePage() {
           </div>
         }
       >
-        {editingMedia && (
-          <div className="space-y-5">
-            {editError && (
-              <p className="text-xs text-red-600 px-2 py-1.5 bg-red-50 border border-red-200 rounded">{editError}</p>
-            )}
-
-            {/* 읽기 전용 정보 */}
-            <div className="p-3 bg-slate-50 rounded-lg space-y-2">
-              <div>
-                <p className="text-[11px] font-medium text-slate-400 mb-0.5">소스 URL (수정 불가)</p>
-                <p className="text-xs text-slate-600 break-all">{editingMedia.sourceUrl}</p>
-              </div>
-              <div className="flex gap-4">
-                <div>
-                  <p className="text-[11px] font-medium text-slate-400 mb-0.5">유형</p>
-                  <p className="text-xs text-slate-600 capitalize">{editingMedia.sourceType}</p>
-                </div>
-                <div>
-                  <p className="text-[11px] font-medium text-slate-400 mb-0.5">등록일</p>
-                  <p className="text-xs text-slate-600">{new Date(editingMedia.createdAt).toLocaleDateString('ko-KR')}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* 수정 가능 필드 */}
-            <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">제목 <span className="text-red-500">*</span></label>
-              <input
-                type="text"
-                value={editName}
-                onChange={e => setEditName(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                placeholder="동영상 제목"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">설명</label>
-              <textarea
-                value={editDescription}
-                onChange={e => setEditDescription(e.target.value)}
-                rows={3}
-                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
-                placeholder="동영상 설명 또는 용도 메모"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">태그 <span className="text-slate-400 font-normal">(쉼표로 구분)</span></label>
-              <input
-                type="text"
-                value={editTags}
-                onChange={e => setEditTags(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                placeholder="예: 약국, 건강, 홍보"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">썸네일 URL</label>
-              <input
-                type="url"
-                value={editThumbnailUrl}
-                onChange={e => setEditThumbnailUrl(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                placeholder="https://..."
-              />
-              {editThumbnailUrl && (
-                <img src={editThumbnailUrl} alt="썸네일 미리보기" className="mt-2 rounded-md w-full max-h-32 object-cover" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+        {(editingMedia || editingSnapshot) && (() => {
+          const sourceUrl = editingMedia
+            ? editingMedia.sourceUrl
+            : (editingSnapshot!.contentJson?.sourceUrl as string | undefined) ?? '';
+          const sourceType = editingMedia
+            ? editingMedia.sourceType
+            : (editingSnapshot!.contentJson?.sourceType as string | undefined) ?? '';
+          const createdAt = editingMedia ? editingMedia.createdAt : editingSnapshot!.createdAt;
+          return (
+            <div className="space-y-5">
+              {editError && (
+                <p className="text-xs text-red-600 px-2 py-1.5 bg-red-50 border border-red-200 rounded">{editError}</p>
               )}
+
+              {/* 읽기 전용 정보 */}
+              <div className="p-3 bg-slate-50 rounded-lg space-y-2">
+                <div>
+                  <p className="text-[11px] font-medium text-slate-400 mb-0.5">소스 URL (수정 불가)</p>
+                  <p className="text-xs text-slate-600 break-all">{sourceUrl}</p>
+                </div>
+                <div className="flex gap-4">
+                  <div>
+                    <p className="text-[11px] font-medium text-slate-400 mb-0.5">유형</p>
+                    <p className="text-xs text-slate-600 capitalize">{sourceType}</p>
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-medium text-slate-400 mb-0.5">등록일</p>
+                    <p className="text-xs text-slate-600">{new Date(createdAt).toLocaleDateString('ko-KR')}</p>
+                  </div>
+                </div>
+                {editingSnapshot && (
+                  <div>
+                    <p className="text-[11px] font-medium text-slate-400 mb-0.5">출처</p>
+                    <p className="text-xs text-slate-500">HUB 복사본 — 원본 콘텐츠는 변경되지 않습니다</p>
+                  </div>
+                )}
+              </div>
+
+              {/* 수정 가능 필드 */}
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1">제목 <span className="text-red-500">*</span></label>
+                <input
+                  type="text"
+                  value={editName}
+                  onChange={e => setEditName(e.target.value)}
+                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  placeholder="동영상 제목"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1">설명</label>
+                <textarea
+                  value={editDescription}
+                  onChange={e => setEditDescription(e.target.value)}
+                  rows={3}
+                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+                  placeholder="동영상 설명 또는 용도 메모"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1">태그 <span className="text-slate-400 font-normal">(쉼표로 구분)</span></label>
+                <input
+                  type="text"
+                  value={editTags}
+                  onChange={e => setEditTags(e.target.value)}
+                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  placeholder="예: 약국, 건강, 홍보"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1">썸네일 URL</label>
+                <input
+                  type="url"
+                  value={editThumbnailUrl}
+                  onChange={e => setEditThumbnailUrl(e.target.value)}
+                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  placeholder="https://..."
+                />
+                {editThumbnailUrl && (
+                  <img src={editThumbnailUrl} alt="썸네일 미리보기" className="mt-2 rounded-md w-full max-h-32 object-cover" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
       </BaseDetailDrawer>
     </div>
   );
