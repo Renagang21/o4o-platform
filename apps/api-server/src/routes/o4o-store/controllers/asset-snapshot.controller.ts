@@ -24,20 +24,25 @@ import { DataSource } from 'typeorm';
 import { createAssetCopyController } from '@o4o/asset-copy-core';
 import { KpaAssetResolver } from '../../../modules/asset-snapshot/resolvers/kpa-asset.resolver.js';
 import { KpaMember } from '../../kpa/entities/kpa-member.entity.js';
+import { isStoreOwner } from '../../../utils/store-owner.utils.js';
 
 type AuthMiddleware = RequestHandler;
 
 /**
- * Resolve KPA organization ID from user's membership
+ * Resolve KPA organization ID — store-library-feed.controller 와 동일한 dual-resolution 전략.
+ * WO-O4O-CONTENT-TO-STORE-LIBRARY-COPY-FIX-V1:
+ *   store_owner의 경우 약국 org ID(organization_members)를 우선 반환하여
+ *   store-library-feed 의 조회 org ID 와 일치시킨다.
+ *   admin/operator 등 store_owner 가 아닌 경우 kpa_members fallback.
  */
 async function resolveKpaOrgId(
   dataSource: DataSource,
   userId: string,
 ): Promise<string | null> {
+  const { organizationId: pharmacyOrgId } = await isStoreOwner(dataSource, userId, 'kpa');
+  if (pharmacyOrgId) return pharmacyOrgId;
   const memberRepo = dataSource.getRepository(KpaMember);
-  const member = await memberRepo.findOne({
-    where: { user_id: userId },
-  });
+  const member = await memberRepo.findOne({ where: { user_id: userId } });
   return member?.organization_id || null;
 }
 
