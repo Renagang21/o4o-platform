@@ -18,7 +18,7 @@
  */
 
 import { useEffect, useState, useCallback, useMemo, type CSSProperties } from 'react';
-import { Library, ExternalLink, Trash2, RefreshCw, FileDown, Link as LinkIcon, FileText, Download, X } from 'lucide-react';
+import { Library, ExternalLink, Trash2, RefreshCw, FileDown, Link as LinkIcon, FileText, Download, X, Plus } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import {
   getStoreExecutionAssets,
@@ -28,6 +28,7 @@ import {
 } from '../../api/storeExecutionAssets';
 import { assetSnapshotApi, type AssetSnapshotItem } from '../../api/assetSnapshot';
 import { colors } from '../../styles/theme';
+import { RegisterStoreResourceModal } from './RegisterStoreResourceModal';
 
 const PAGE_LIMIT = 50;
 
@@ -154,6 +155,7 @@ export default function StoreLibraryResourcesPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [detailId, setDetailId] = useState<string | null>(null);
+  const [registerOpen, setRegisterOpen] = useState(false);
 
   const fetchItems = useCallback(async () => {
     setLoading(true);
@@ -292,10 +294,20 @@ export default function StoreLibraryResourcesPage() {
             커뮤니티 자료를 가져오거나 직접 자료를 등록할 수 있습니다.
           </p>
         </div>
-        <button onClick={fetchItems} style={styles.refreshBtn} disabled={loading}>
-          <RefreshCw size={14} />
-          새로고침
-        </button>
+        <div style={styles.headerActions}>
+          <button
+            type="button"
+            onClick={() => setRegisterOpen(true)}
+            style={styles.registerBtn}
+          >
+            <Plus size={14} />
+            자료 등록
+          </button>
+          <button onClick={fetchItems} style={styles.refreshBtn} disabled={loading}>
+            <RefreshCw size={14} />
+            새로고침
+          </button>
+        </div>
       </div>
 
       {/* Batch toolbar */}
@@ -375,7 +387,7 @@ export default function StoreLibraryResourcesPage() {
                     title={isSnapshot ? '커뮤니티 자료실에서 가져온 자료' : '직접 업로드한 자료'}
                   >
                     {isSnapshot ? <Download size={11} style={{ marginRight: 3 }} /> : null}
-                    {isSnapshot ? '커뮤니티 가져옴' : '직접 추가'}
+                    {isSnapshot ? '커뮤니티 가져옴' : '직접 등록'}
                   </span>
                   {item.category && (
                     <span style={{ ...styles.badge, background: colors.neutral100, color: colors.neutral600 }}>
@@ -416,6 +428,12 @@ export default function StoreLibraryResourcesPage() {
       {detailRow && (
         <ResourceDetailDrawer row={detailRow} onClose={() => setDetailId(null)} />
       )}
+
+      <RegisterStoreResourceModal
+        open={registerOpen}
+        onClose={() => setRegisterOpen(false)}
+        onRegistered={fetchItems}
+      />
     </div>
   );
 }
@@ -546,6 +564,25 @@ const styles: Record<string, CSSProperties> = {
     fontSize: '13px',
     color: colors.neutral500,
     margin: '6px 0 0',
+  },
+  headerActions: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    flexShrink: 0,
+  },
+  registerBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '6px 12px',
+    background: colors.primary,
+    border: `1px solid ${colors.primary}`,
+    borderRadius: '6px',
+    fontSize: '13px',
+    color: colors.white,
+    fontWeight: 500,
+    cursor: 'pointer',
   },
   refreshBtn: {
     display: 'inline-flex',
