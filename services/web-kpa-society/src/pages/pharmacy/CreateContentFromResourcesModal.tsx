@@ -2,18 +2,18 @@
  * CreateContentFromResourcesModal — 자료함 자료 → direct 콘텐츠 제작
  *
  * WO-O4O-STORE-CONTENT-CREATION-FROM-LIBRARY-RESOURCES-V1
- *
- * "내 자료함 → 자료" 의 자료를 입력 source 로 사용하여 direct 콘텐츠(매장 전용)
- * 를 만든다. 새 editor / AI 시스템을 도입하지 않고 기존 자원만 재사용:
- *   - 자료 수집: storeExecutionAssets + assetSnapshotApi.list({type:'resource'})
- *     (StoreLibraryResourcesPage 와 동일 source)
- *   - AI 생성: POST /api/ai/content (AiContentModal 과 동일 endpoint, outputType='product_detail')
- *   - 직접 콘텐츠 저장: POST /api/v1/kpa/store-contents (AiContentModal showStoreSave 와 동일 destination)
+ * WO-O4O-STORE-CONTENT-GENERATION-USER-INTENT-V1:
+ *   "요약/정리" 중심의 AI 결과를 사용자 의도 기반 매장 콘텐츠 생성으로 전환.
+ *   - 제작 요청 자유 입력(userIntent) + preset chips(분량/톤/내용 방향/이미지/URL) 추가
+ *   - customPrompt + options(tone/length) 로 매핑하여 /api/ai/content 호출
+ *   - 결과 미리보기를 O4O 표준 RichTextEditor 로 교체 → 검토/수정 동일 화면에서 수행
+ *   - 원소스 sourceMetadata 에 url/file/assetType 포함 → 향후 제작 자료 흐름 재사용 가능
+ *   - 본 결과는 "내 매장용 콘텐츠"로 저장됨 (production-materials 아님)
  *
  * 흐름:
- *   Step 1 (select):  자료 multi-select + 검색
+ *   Step 1 (select):   자료 multi-select + 검색
  *      ↓ "다음"
- *   Step 2 (compose): 자료 정보로 자동 작성된 source text 편집 + "AI 정리" + 결과 미리보기 + 제목
+ *   Step 2 (compose):  제작 요청 입력 + preset 선택 → "AI 콘텐츠 생성" → RichTextEditor 수정 → 제목
  *      ↓ "저장"
  *   POST /store-contents → 새 direct content id
  *      ↓
@@ -40,6 +40,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
+import { RichTextEditor, type EditorContent } from '@o4o/content-editor';
 import {
   getStoreExecutionAssets,
   type StoreExecutionAsset,
@@ -244,11 +245,22 @@ function snapshotToRow(snap: AssetSnapshotItem): ResourceRow {
 //   metadata(title/description/url/file)만 넣던 title-only prompt 를
 //   "본문:" 섹션이 포함된 body-aware prompt 로 확장.
 //   자료당 본문은 BODY_PER_RESOURCE_LIMIT 자로 truncate (전체는 handleGenerate 에서 10000자 cap).
+// WO-O4O-STORE-CONTENT-GENERATION-USER-INTENT-V1:
+//   요약/정리 지향 → 콘텐츠 작성 지향으로 prompt 도입부 환원.
+//   원소스의 URL/이미지/파일이 단순 텍스트가 아닌 콘텐츠 구성 요소임을 명시.
 function composeSourceText(rows: ResourceRow[]): string {
   if (rows.length === 0) return '';
-  const lines: string[] = ['다음 자료들을 참고하여 매장 콘텐츠로 정리해 주세요.', ''];
+  const lines: string[] = [
+    '다음 원소스를 참고하여 매장에서 그대로 게시·재사용할 수 있는 완성 콘텐츠를 작성해 주세요.',
+    '- 단순 요약/정리가 아니라 구조화된 본문(소제목/문단/목록)으로 작성합니다.',
+    '- 원소스의 URL/이미지/파일은 본문 내 링크·이미지·참고 출처로 활용할 수 있습니다.',
+    '- 출력은 HTML(<h2>, <p>, <ul>, <a>, <img> 등)로 구성합니다.',
+    '',
+    '[원소스]',
+  ];
   rows.forEach((r, i) => {
     lines.push(`${i + 1}. ${r.title}`);
+    lines.push(`유형: ${ASSET_TYPE_META[r.assetType].label}`);
     if (r.description) lines.push(`설명: ${r.description}`);
     if (r.url) lines.push(`URL: ${r.url}`);
     if (r.sourceFileName) lines.push(`파일: ${r.sourceFileName}`);
@@ -259,6 +271,126 @@ function composeSourceText(rows: ResourceRow[]): string {
     lines.push('');
   });
   return lines.join('\n').trim();
+}
+
+// ─── User Intent Presets ─────────────────────────────────────────────────────
+// WO-O4O-STORE-CONTENT-GENERATION-USER-INTENT-V1
+//
+// 사용자가 자유 입력한 제작 요청과 함께 customPrompt 로 합성된다.
+// 자유 입력이 가장 우선이며, preset 은 보조 지시문이다.
+// customPrompt 백엔드 cap=500자, 자유 입력이 길면 preset 지시문이 잘릴 수 있다.
+
+type LengthPreset = 'short' | 'medium' | 'a4' | 'detailed';
+type TonePreset = 'friendly' | 'professional' | 'pharmacist' | 'consumer';
+type DirectionPreset = 'health-info' | 'persuasion' | 'consult' | 'education' | 'product';
+type ImagePreset = 'include' | 'position' | 'caption';
+type UrlPreset = 'keep' | 'cite' | 'card';
+
+const LENGTH_OPTIONS: { key: LengthPreset; label: string }[] = [
+  { key: 'short',    label: '짧게' },
+  { key: 'medium',   label: '보통' },
+  { key: 'a4',       label: 'A4 1장' },
+  { key: 'detailed', label: '상세하게' },
+];
+
+const TONE_OPTIONS: { key: TonePreset; label: string }[] = [
+  { key: 'friendly',     label: '친근하게' },
+  { key: 'professional', label: '전문적으로' },
+  { key: 'pharmacist',   label: '약사 설명 느낌' },
+  { key: 'consumer',     label: '소비자 친화적으로' },
+];
+
+const DIRECTION_OPTIONS: { key: DirectionPreset; label: string }[] = [
+  { key: 'health-info', label: '건강정보 중심' },
+  { key: 'persuasion',  label: '소비자 설득 중심' },
+  { key: 'consult',     label: '상담 보조용' },
+  { key: 'education',   label: '교육용' },
+  { key: 'product',     label: '제품 이해 중심' },
+];
+
+const IMAGE_OPTIONS: { key: ImagePreset; label: string }[] = [
+  { key: 'include',  label: '이미지 포함' },
+  { key: 'position', label: '이미지 위치 제안' },
+  { key: 'caption',  label: '이미지 설명 포함' },
+];
+
+const URL_OPTIONS: { key: UrlPreset; label: string }[] = [
+  { key: 'keep', label: '링크 유지' },
+  { key: 'cite', label: '출처 표시' },
+  { key: 'card', label: '참고 링크 카드 포함' },
+];
+
+interface IntentState {
+  userIntent: string;
+  length: LengthPreset | null;
+  tone: TonePreset | null;
+  direction: DirectionPreset | null;
+  image: ImagePreset | null;
+  url: UrlPreset | null;
+}
+
+// preset → customPrompt 합성. userIntent 우선, 500자 cap.
+function buildCustomPrompt(s: IntentState): string {
+  const lines: string[] = [];
+  if (s.userIntent.trim()) lines.push(s.userIntent.trim());
+
+  if (s.length === 'a4')
+    lines.push('A4 1장 분량(약 800~1200자, 단락 5~7개)으로 작성해 주세요.');
+  if (s.length === 'detailed')
+    lines.push('상세하게 풀어 쓰되 하위 섹션과 예시를 포함해 주세요.');
+
+  if (s.tone === 'pharmacist')
+    lines.push('약사가 매장에서 고객에게 설명하는 자연스러운 어조로 작성해 주세요.');
+  if (s.tone === 'consumer')
+    lines.push('전문 용어 사용을 줄이고 소비자가 이해하기 쉬운 단어로 풀어 주세요.');
+
+  if (s.direction === 'health-info')
+    lines.push('판매 유도보다는 건강 정보 전달에 무게를 두세요.');
+  if (s.direction === 'persuasion')
+    lines.push('소비자가 사용 또는 구매를 결정할 수 있도록 설득력 있는 흐름으로 구성하세요.');
+  if (s.direction === 'consult')
+    lines.push('상담 시 보조 자료로 쓸 수 있도록 객관 정보 중심으로 정리하세요.');
+  if (s.direction === 'education')
+    lines.push('교육 자료로 활용할 수 있게 학습 흐름과 핵심 요약을 포함하세요.');
+  if (s.direction === 'product')
+    lines.push('제품의 성분·특징·효능 이해를 돕는 구조로 작성하세요.');
+
+  if (s.image === 'include')
+    lines.push('가능한 위치에 원소스의 이미지를 <img>로 본문에 삽입해 주세요.');
+  if (s.image === 'position')
+    lines.push('이미지가 들어가면 좋을 위치를 "[이미지: 설명]" 형태로 표시해 주세요.');
+  if (s.image === 'caption')
+    lines.push('각 이미지에는 짧은 설명 캡션을 함께 작성해 주세요.');
+
+  if (s.url === 'keep')
+    lines.push('원소스 URL은 본문 내 적절한 위치에 <a> 링크로 유지해 주세요.');
+  if (s.url === 'cite')
+    lines.push('원소스 URL을 본문 안에 "출처: …" 형태로 표시해 주세요.');
+  if (s.url === 'card')
+    lines.push('원소스 URL을 본문 끝에 "참고 링크" 섹션으로 묶어 주세요.');
+
+  // userIntent / preset 모두 비어 있으면 기본 지시문을 채워 default 요약 결과를 방지.
+  if (lines.length === 0) {
+    lines.push('단순 요약이 아니라 매장에서 사용할 완성 콘텐츠를 구조화된 HTML로 작성해 주세요.');
+  }
+
+  const merged = lines.join('\n');
+  return merged.length > 500 ? merged.slice(0, 500) : merged;
+}
+
+// preset → backend options.tone 매핑. 미선택 시 undefined.
+function mapBackendTone(p: TonePreset | null): 'friendly' | 'professional' | 'concise' | undefined {
+  if (p === 'friendly' || p === 'consumer') return 'friendly';
+  if (p === 'professional' || p === 'pharmacist') return 'professional';
+  return undefined;
+}
+
+// preset → backend options.length 매핑. 미선택 시 undefined.
+function mapBackendLength(p: LengthPreset | null): 'short' | 'medium' | 'long' | undefined {
+  if (p === 'short') return 'short';
+  if (p === 'medium') return 'medium';
+  if (p === 'a4' || p === 'detailed') return 'long';
+  return undefined;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -286,9 +418,18 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated }: Pr
   const [title, setTitle] = useState('');
   const [sourceText, setSourceText] = useState('');
   const [generating, setGenerating] = useState(false);
-  const [generatedHtml, setGeneratedHtml] = useState('');
+  const [editorHtml, setEditorHtml] = useState('');
+  const [aiGenerated, setAiGenerated] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  // WO-O4O-STORE-CONTENT-GENERATION-USER-INTENT-V1: 사용자 제작 의도
+  const [userIntent, setUserIntent] = useState('');
+  const [presetLength, setPresetLength] = useState<LengthPreset | null>(null);
+  const [presetTone, setPresetTone] = useState<TonePreset | null>(null);
+  const [presetDirection, setPresetDirection] = useState<DirectionPreset | null>(null);
+  const [presetImage, setPresetImage] = useState<ImagePreset | null>(null);
+  const [presetUrl, setPresetUrl] = useState<UrlPreset | null>(null);
 
   // 자료 로딩 — open 시점에만 fetch
   useEffect(() => {
@@ -326,8 +467,15 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated }: Pr
       setSearch('');
       setTitle('');
       setSourceText('');
-      setGeneratedHtml('');
+      setEditorHtml('');
+      setAiGenerated(false);
       setAiError(null);
+      setUserIntent('');
+      setPresetLength(null);
+      setPresetTone(null);
+      setPresetDirection(null);
+      setPresetImage(null);
+      setPresetUrl(null);
     }
   }, [open]);
 
@@ -357,17 +505,21 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated }: Pr
     if (selectedRows.length === 0) return;
     setSourceText(composeSourceText(selectedRows));
     const firstTitle = selectedRows[0]?.title ?? '';
+    // WO-O4O-STORE-CONTENT-GENERATION-USER-INTENT-V1: "정리" → "콘텐츠"
     const defaultTitle = selectedRows.length > 1
-      ? `${firstTitle} 외 ${selectedRows.length - 1}개 자료 정리`
+      ? `${firstTitle} 외 ${selectedRows.length - 1}개 자료 콘텐츠`
       : firstTitle;
     setTitle(defaultTitle);
     setStep('compose');
   }, [selectedRows]);
 
-  // AI 생성 — AiContentModal 과 동일 endpoint(/api/ai/content) + outputType='product_detail'
+  // AI 콘텐츠 생성 — AiContentModal 과 동일 endpoint(/api/ai/content) + outputType='product_detail'
+  // WO-O4O-STORE-CONTENT-GENERATION-USER-INTENT-V1:
+  //   사용자 제작 요청(userIntent) + preset(tone/length/direction/image/url) 을
+  //   customPrompt 와 options 로 매핑하여 의도 반영. input 은 원소스 bundle 텍스트.
   const handleGenerate = useCallback(async () => {
     if (!sourceText.trim()) {
-      setAiError('자료 정보가 비어 있습니다. 자료를 선택하거나 직접 입력해 주세요.');
+      setAiError('원소스 정보가 비어 있습니다. 자료를 선택해 주세요.');
       return;
     }
     setGenerating(true);
@@ -376,6 +528,21 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated }: Pr
       const token = getAccessToken();
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
       if (token) headers.Authorization = `Bearer ${token}`;
+
+      const customPrompt = buildCustomPrompt({
+        userIntent,
+        length: presetLength,
+        tone: presetTone,
+        direction: presetDirection,
+        image: presetImage,
+        url: presetUrl,
+      });
+      const backendTone = mapBackendTone(presetTone);
+      const backendLength = mapBackendLength(presetLength);
+      const options: Record<string, string> = {};
+      if (backendTone) options.tone = backendTone;
+      if (backendLength) options.length = backendLength;
+
       const res = await fetch(`${AI_API_BASE}/api/ai/content`, {
         method: 'POST',
         headers,
@@ -383,48 +550,63 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated }: Pr
         body: JSON.stringify({
           input: sourceText.trim().slice(0, 10000),
           outputType: AI_OUTPUT_TYPE,
+          options,
+          customPrompt,
         }),
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
         throw new Error(data?.error?.message || data?.error || 'AI 생성에 실패했습니다.');
       }
-      setGeneratedHtml(data.html || '');
+      setEditorHtml(data.html || '');
+      setAiGenerated(true);
       if (data.title && !title.trim()) setTitle(data.title);
     } catch (err: any) {
       setAiError(err?.message || 'AI 서비스 오류가 발생했습니다.');
     } finally {
       setGenerating(false);
     }
-  }, [sourceText, title]);
+  }, [sourceText, title, userIntent, presetLength, presetTone, presetDirection, presetImage, presetUrl]);
 
-  // 저장 — direct content 로 POST /store-contents (AiContentModal showStoreSave 와 동일)
+  // 저장 — direct content 로 POST /store-contents (AiContentModal showStoreSave 와 동일).
+  // WO-O4O-STORE-CONTENT-GENERATION-USER-INTENT-V1:
+  //   sourceResources 에 url/file/assetType 포함 → 향후 매장 제작 자료 흐름에서 원본으로 재사용 가능.
   const handleSave = useCallback(async () => {
     if (!title.trim()) {
       toast.error('제목을 입력해 주세요');
       return;
     }
-    if (!generatedHtml) {
-      toast.error('AI 정리 결과가 없습니다. 먼저 "AI 정리"를 실행해 주세요.');
+    const html = editorHtml.trim();
+    if (!html || html === '<p></p>') {
+      toast.error('콘텐츠 본문이 비어 있습니다. AI 콘텐츠 생성을 먼저 실행하거나 직접 작성해 주세요.');
       return;
     }
     setSaving(true);
     try {
-      // contentJson: AiContentModal 의 store 저장 형태(html only)를 그대로 사용.
-      // source metadata 는 source 자료 식별자 + 라벨만 보존 (운영 연결 없음).
       const sourceMetadata = selectedRows.map((r) => ({
         origin: r.kind === 'library' ? 'library' : 'snapshot',
         id: r.rawId,
         title: r.title,
+        assetType: r.assetType,
+        url: r.url,
+        fileName: r.sourceFileName,
       }));
       const res = await apiClient.post<{ success: boolean; data: { id: string } }>(
         '/store-contents',
         {
           title: title.trim(),
           contentJson: {
-            html: generatedHtml,
+            html,
             sourceResources: sourceMetadata,
             generatedBy: 'create-from-resources',
+            userIntent: userIntent.trim() || undefined,
+            presets: {
+              length: presetLength,
+              tone: presetTone,
+              direction: presetDirection,
+              image: presetImage,
+              url: presetUrl,
+            },
           },
         },
       );
@@ -442,7 +624,7 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated }: Pr
     } finally {
       setSaving(false);
     }
-  }, [title, generatedHtml, selectedRows, onCreated, onClose, navigate]);
+  }, [title, editorHtml, selectedRows, userIntent, presetLength, presetTone, presetDirection, presetImage, presetUrl, onCreated, onClose, navigate]);
 
   if (!open) return null;
 
@@ -486,11 +668,23 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated }: Pr
             selectedRows={selectedRows}
             title={title}
             onTitleChange={setTitle}
-            sourceText={sourceText}
-            onSourceTextChange={setSourceText}
+            userIntent={userIntent}
+            onUserIntentChange={setUserIntent}
+            presetLength={presetLength}
+            onPresetLengthChange={setPresetLength}
+            presetTone={presetTone}
+            onPresetToneChange={setPresetTone}
+            presetDirection={presetDirection}
+            onPresetDirectionChange={setPresetDirection}
+            presetImage={presetImage}
+            onPresetImageChange={setPresetImage}
+            presetUrl={presetUrl}
+            onPresetUrlChange={setPresetUrl}
             generating={generating}
             onGenerate={handleGenerate}
-            generatedHtml={generatedHtml}
+            editorHtml={editorHtml}
+            onEditorHtmlChange={setEditorHtml}
+            aiGenerated={aiGenerated}
             aiError={aiError}
           />
         )}
@@ -516,8 +710,10 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated }: Pr
           ) : (
             <>
               <span style={styles.footerHint}>
-                {generatedHtml ? <CheckCircle2 size={14} style={{ marginRight: 4, verticalAlign: 'middle' }} /> : null}
-                {generatedHtml ? 'AI 정리 완료 — 저장 가능' : '먼저 "AI 정리"를 실행해 주세요'}
+                {aiGenerated ? <CheckCircle2 size={14} style={{ marginRight: 4, verticalAlign: 'middle' }} /> : null}
+                {aiGenerated
+                  ? 'AI 콘텐츠 생성 완료 — 편집기에서 수정 후 저장하세요'
+                  : '먼저 "AI 콘텐츠 생성"을 실행해 주세요'}
               </span>
               <div style={styles.footerActions}>
                 <button type="button" onClick={onClose} style={styles.secondaryBtn} disabled={saving}>
@@ -526,8 +722,8 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated }: Pr
                 <button
                   type="button"
                   onClick={handleSave}
-                  disabled={!generatedHtml || saving || !title.trim()}
-                  style={{ ...styles.primaryBtn, opacity: !generatedHtml || saving || !title.trim() ? 0.5 : 1 }}
+                  disabled={!editorHtml.trim() || saving || !title.trim()}
+                  style={{ ...styles.primaryBtn, opacity: !editorHtml.trim() || saving || !title.trim() ? 0.5 : 1 }}
                 >
                   {saving ? <Loader2 size={14} style={{ marginRight: 6, verticalAlign: 'middle' }} className="animate-spin" /> : <Save size={14} style={{ marginRight: 6, verticalAlign: 'middle' }} />}
                   {saving ? '저장 중...' : '내 자료함 콘텐츠로 저장'}
@@ -624,28 +820,99 @@ function SelectStep({
 }
 
 // ─── Compose Step ────────────────────────────────────────────────────────────
+// WO-O4O-STORE-CONTENT-GENERATION-USER-INTENT-V1:
+//   제작 요청 자유 입력 + preset chips + AI 콘텐츠 생성 + RichTextEditor 검토/수정.
+
+function PresetChipGroup<T extends string>({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  options: { key: T; label: string }[];
+  value: T | null;
+  onChange: (v: T | null) => void;
+}) {
+  return (
+    <div style={styles.presetGroup}>
+      <span style={styles.presetGroupLabel}>{label}</span>
+      <div style={styles.presetChipRow}>
+        {options.map((opt) => {
+          const active = value === opt.key;
+          return (
+            <button
+              key={opt.key}
+              type="button"
+              onClick={() => onChange(active ? null : opt.key)}
+              style={{
+                ...styles.presetChip,
+                ...(active ? styles.presetChipActive : {}),
+              }}
+            >
+              {opt.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 function ComposeStep({
   selectedRows,
   title,
   onTitleChange,
-  sourceText,
-  onSourceTextChange,
+  userIntent,
+  onUserIntentChange,
+  presetLength,
+  onPresetLengthChange,
+  presetTone,
+  onPresetToneChange,
+  presetDirection,
+  onPresetDirectionChange,
+  presetImage,
+  onPresetImageChange,
+  presetUrl,
+  onPresetUrlChange,
   generating,
   onGenerate,
-  generatedHtml,
+  editorHtml,
+  onEditorHtmlChange,
+  aiGenerated,
   aiError,
 }: {
   selectedRows: ResourceRow[];
   title: string;
   onTitleChange: (v: string) => void;
-  sourceText: string;
-  onSourceTextChange: (v: string) => void;
+  userIntent: string;
+  onUserIntentChange: (v: string) => void;
+  presetLength: LengthPreset | null;
+  onPresetLengthChange: (v: LengthPreset | null) => void;
+  presetTone: TonePreset | null;
+  onPresetToneChange: (v: TonePreset | null) => void;
+  presetDirection: DirectionPreset | null;
+  onPresetDirectionChange: (v: DirectionPreset | null) => void;
+  presetImage: ImagePreset | null;
+  onPresetImageChange: (v: ImagePreset | null) => void;
+  presetUrl: UrlPreset | null;
+  onPresetUrlChange: (v: UrlPreset | null) => void;
   generating: boolean;
   onGenerate: () => void;
-  generatedHtml: string;
+  editorHtml: string;
+  onEditorHtmlChange: (v: string) => void;
+  aiGenerated: boolean;
   aiError: string | null;
 }) {
+  const handleEditorChange = useCallback(
+    (content: EditorContent) => onEditorHtmlChange(content.html),
+    [onEditorHtmlChange],
+  );
+  const aiHeaders = useMemo<Record<string, string> | undefined>(() => {
+    const token = getAccessToken();
+    return token ? { Authorization: `Bearer ${token}` } : undefined;
+  }, []);
+
   return (
     <div style={styles.body}>
       <div style={styles.composeRow}>
@@ -661,7 +928,7 @@ function ComposeStep({
       </div>
 
       <div style={styles.composeRow}>
-        <label style={styles.label}>선택한 자료 ({selectedRows.length}개)</label>
+        <label style={styles.label}>선택한 원소스 ({selectedRows.length}개)</label>
         <ul style={styles.chipList}>
           {selectedRows.map((r) => (
             <li key={r.id} style={styles.chip} title={r.title}>
@@ -672,49 +939,73 @@ function ComposeStep({
       </div>
 
       <div style={styles.composeRow}>
+        <label style={styles.label} htmlFor="cgu-user-intent">제작 요청 (자유 입력)</label>
+        <textarea
+          id="cgu-user-intent"
+          value={userIntent}
+          onChange={(e) => onUserIntentChange(e.target.value)}
+          rows={3}
+          style={styles.textarea}
+          placeholder='예: "당뇨 고객에게 도움이 된다는 내용을 설득력 있게 A4 1장 분량으로 작성해 주세요." / "약사가 고객에게 설명하는 느낌으로 쉽게 풀어 주세요."'
+          maxLength={400}
+        />
+        <span style={styles.helpText}>
+          원소스를 어떻게 활용할지 자유롭게 입력하세요. 선택한 원소스의 본문·URL·이미지가 함께 AI에 전달됩니다.
+        </span>
+      </div>
+
+      <div style={styles.composeRow}>
+        <span style={styles.label}>보조 옵션 (선택)</span>
+        <PresetChipGroup label="분량"      options={LENGTH_OPTIONS}    value={presetLength}    onChange={onPresetLengthChange} />
+        <PresetChipGroup label="문장 톤"   options={TONE_OPTIONS}      value={presetTone}      onChange={onPresetToneChange} />
+        <PresetChipGroup label="내용 방향" options={DIRECTION_OPTIONS} value={presetDirection} onChange={onPresetDirectionChange} />
+        <PresetChipGroup label="이미지"    options={IMAGE_OPTIONS}     value={presetImage}     onChange={onPresetImageChange} />
+        <PresetChipGroup label="URL"       options={URL_OPTIONS}       value={presetUrl}       onChange={onPresetUrlChange} />
+      </div>
+
+      <div style={styles.composeRow}>
         <div style={styles.labelRow}>
-          <label style={styles.label}>참고 자료 정보 (AI 입력)</label>
+          <label style={styles.label}>AI 매장 콘텐츠 생성</label>
           <button
             type="button"
             onClick={onGenerate}
-            disabled={generating || !sourceText.trim()}
-            style={{ ...styles.aiBtn, opacity: generating || !sourceText.trim() ? 0.5 : 1 }}
+            disabled={generating}
+            style={{ ...styles.aiBtn, opacity: generating ? 0.5 : 1 }}
           >
             {generating ? (
               <>
                 <Loader2 size={12} style={{ marginRight: 4, verticalAlign: 'middle' }} className="animate-spin" />
-                AI 정리 중...
+                생성 중...
               </>
             ) : (
               <>
                 <Sparkles size={12} style={{ marginRight: 4, verticalAlign: 'middle' }} />
-                AI 정리
+                AI 콘텐츠 생성
               </>
             )}
           </button>
         </div>
-        <textarea
-          value={sourceText}
-          onChange={(e) => onSourceTextChange(e.target.value)}
-          rows={6}
-          style={styles.textarea}
-          placeholder="자료를 정리할 방향을 자유롭게 추가하실 수 있습니다."
-          maxLength={10000}
-        />
         {aiError && <p style={styles.error}>{aiError}</p>}
       </div>
 
       <div style={styles.composeRow}>
-        <label style={styles.label}>AI 정리 결과 미리보기</label>
-        {generatedHtml ? (
-          <div
-            style={styles.preview}
-            // AI 결과 HTML — 백엔드가 정제. 신뢰 컨텍스트는 백엔드 게이트.
-            dangerouslySetInnerHTML={{ __html: generatedHtml }}
-          />
+        <label style={styles.label}>매장 콘텐츠 본문 (편집 가능)</label>
+        {aiGenerated || editorHtml ? (
+          <div style={styles.editorWrap}>
+            <RichTextEditor
+              value={editorHtml}
+              onChange={handleEditorChange}
+              placeholder="AI 생성 결과가 여기에 표시됩니다. 자유롭게 수정한 뒤 저장하세요."
+              minHeight="320px"
+              preset="full"
+              aiRequestHeaders={aiHeaders}
+            />
+          </div>
         ) : (
           <div style={styles.previewEmpty}>
-            {generating ? 'AI 정리 중입니다...' : '아직 결과가 없습니다. 위 "AI 정리" 버튼을 눌러주세요.'}
+            {generating
+              ? 'AI 콘텐츠 생성 중입니다...'
+              : '아직 결과가 없습니다. 위 "AI 콘텐츠 생성" 버튼을 눌러주세요.'}
           </div>
         )}
       </div>
@@ -930,16 +1221,51 @@ const styles: Record<string, CSSProperties> = {
     fontWeight: 500,
     cursor: 'pointer',
   },
-  preview: {
-    padding: 12,
+  helpText: {
+    fontSize: 11,
+    color: colors.neutral500,
+    lineHeight: 1.5,
+  },
+  presetGroup: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: 10,
+    marginTop: 4,
+  },
+  presetGroupLabel: {
+    flexShrink: 0,
+    fontSize: 12,
+    fontWeight: 500,
+    color: colors.neutral600,
+    paddingTop: 4,
+    minWidth: 64,
+  },
+  presetChipRow: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: 6,
+    flex: 1,
+  },
+  presetChip: {
+    padding: '4px 10px',
+    border: `1px solid ${colors.neutral300}`,
+    borderRadius: 999,
+    background: colors.white,
+    color: colors.neutral700,
+    fontSize: 12,
+    cursor: 'pointer',
+  },
+  presetChipActive: {
+    background: '#EFF6FF',
+    borderColor: colors.primary,
+    color: colors.primary,
+    fontWeight: 500,
+  },
+  editorWrap: {
     border: `1px solid ${colors.neutral200}`,
     borderRadius: 6,
-    background: colors.neutral100,
-    fontSize: 13,
-    color: colors.neutral800,
-    lineHeight: 1.55,
-    maxHeight: 240,
-    overflowY: 'auto',
+    overflow: 'hidden',
+    background: colors.white,
   },
   previewEmpty: {
     padding: 24,
