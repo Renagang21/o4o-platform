@@ -36,7 +36,6 @@ import {
   Plus,
   ListVideo,
   Trash2,
-  GripVertical,
   Play,
   Calendar,
   Pencil,
@@ -133,6 +132,24 @@ function isForcedExpiringSoon(item: StoreAssetItem): boolean {
 function isForcedExpired(item: StoreAssetItem): boolean {
   if (!item.isForced || !item.forcedEndAt) return false;
   return new Date(item.forcedEndAt) < new Date();
+}
+
+function formatDuration(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = Math.round(seconds % 60);
+  if (m === 0) return `${s}초`;
+  return s > 0 ? `${m}분 ${s}초` : `${m}분`;
+}
+
+function deriveYtThumbnail(cj: Record<string, unknown> | undefined): string | undefined {
+  if (!cj) return undefined;
+  const t = cj.thumbnailUrl as string | undefined;
+  if (t) return t;
+  const id = cj.embedId as string | undefined;
+  if (id && cj.sourceType === 'youtube') {
+    return `https://img.youtube.com/vi/${id}/mqdefault.jpg`;
+  }
+  return undefined;
 }
 
 /* ─── Schedule Visibility Helpers ───────────── */
@@ -299,9 +316,11 @@ export function StoreSignagePage() {
   const [playlistKeyword, setPlaylistKeyword] = useState('');
   const [selectedPlaylistKeys, setSelectedPlaylistKeys] = useState<string[]>([]);
 
-  // ── Signage snapshot list for "add to playlist" ──
-  const [signageSnapshots, setSignageSnapshots] = useState<StoreAssetItem[]>([]);
-  const [showAddPicker, setShowAddPicker] = useState(false);
+  // ── Add video modal state ──
+  const [showAddVideoModal, setShowAddVideoModal] = useState(false);
+  const [addModalSearch, setAddModalSearch] = useState('');
+  const [addModalSelected, setAddModalSelected] = useState<Set<string>>(new Set());
+  const [addModalSaving, setAddModalSaving] = useState(false);
   const [showLibrarySelector, setShowLibrarySelector] = useState(false);
 
   // ── Direct video registration (signage_media) ──
@@ -334,10 +353,8 @@ export function StoreSignagePage() {
       const res = await storeAssetControlApi.list({ type: 'signage', limit: 200 });
       const loadedItems = res.data.items || [];
       setItems(loadedItems);
-      setSignageSnapshots(loadedItems);
     } catch {
       setItems([]);
-      setSignageSnapshots([]);
     } finally {
       setLoading(false);
     }
@@ -458,29 +475,11 @@ export function StoreSignagePage() {
     } catch { /* user can retry */ }
   };
 
-  const handleAddItem = async (snapshotId: string) => {
-    if (!selectedPlaylistId) return;
-    try {
-      await addPlaylistItem(selectedPlaylistId, snapshotId);
-      setShowAddPicker(false);
-      loadPlaylistItems(selectedPlaylistId);
-    } catch { /* user can retry */ }
-  };
-
   const handleAddFromLibrary = async (item: LibrarySelectorResult) => {
     if (!selectedPlaylistId) return;
     try {
       await addPlaylistItemFromLibrary(selectedPlaylistId, item.id);
       setShowLibrarySelector(false);
-      loadPlaylistItems(selectedPlaylistId);
-    } catch { /* user can retry */ }
-  };
-
-  const handleAddFromSignage = async (mediaId: string) => {
-    if (!selectedPlaylistId) return;
-    try {
-      await addPlaylistItemFromSignage(selectedPlaylistId, mediaId, organizationId);
-      setShowAddPicker(false);
       loadPlaylistItems(selectedPlaylistId);
     } catch { /* user can retry */ }
   };
@@ -491,6 +490,25 @@ export function StoreSignagePage() {
       await deletePlaylistItem(selectedPlaylistId, itemId);
       loadPlaylistItems(selectedPlaylistId);
     } catch { /* user can retry */ }
+  };
+
+  const handleBulkAdd = async () => {
+    if (!selectedPlaylistId || addModalSelected.size === 0) return;
+    setAddModalSaving(true);
+    for (const key of addModalSelected) {
+      try {
+        if (key.startsWith('media_')) {
+          await addPlaylistItemFromSignage(selectedPlaylistId, key.slice(6), organizationId);
+        } else {
+          await addPlaylistItem(selectedPlaylistId, key);
+        }
+      } catch { /* skip individual failures, user can retry */ }
+    }
+    setShowAddVideoModal(false);
+    setAddModalSelected(new Set());
+    setAddModalSearch('');
+    setAddModalSaving(false);
+    loadPlaylistItems(selectedPlaylistId);
   };
 
   const handleMoveItem = async (index: number, direction: -1 | 1) => {
@@ -713,6 +731,25 @@ export function StoreSignagePage() {
   }, [filteredUnified, page]);
 
   useEffect(() => { setPage(1); }, [statusFilter, sortKey, assetKeyword]);
+
+  // Total duration + missing-duration count for selected playlist items
+  const totalDurationInfo = useMemo(() => {
+    let totalSec = 0;
+    let missingCount = 0;
+    for (const item of playlistItems) {
+      const dur = item.contentJson?.duration as number | undefined;
+      if (dur && dur > 0) totalSec += Math.round(dur);
+      else missingCount++;
+    }
+    return { totalSec, missingCount };
+  }, [playlistItems]);
+
+  // Filtered unified video list for add modal
+  const addModalVideos = useMemo(() => {
+    const kw = addModalSearch.trim().toLowerCase();
+    const all = unifiedVideos;
+    return kw ? all.filter(v => v.title.toLowerCase().includes(kw)) : all;
+  }, [unifiedVideos, addModalSearch]);
 
   const filteredPlaylists = useMemo(() => {
     if (!playlistKeyword.trim()) return playlists;
@@ -1182,60 +1219,48 @@ export function StoreSignagePage() {
             </div>
           )}
 
-          {/* Selected playlist items */}
+          {/* ── Playlist Builder ── */}
           {selectedPlaylistId && selectedPlaylist && (
-            <div className="border border-slate-200 rounded-lg bg-white">
+            <div className="border border-slate-200 rounded-lg bg-white mt-2">
+              {/* Builder header */}
               <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
-                <div className="flex items-center gap-2">
-                  <Play className="w-4 h-4 text-blue-600" />
-                  <span className="font-medium text-slate-800">{selectedPlaylist.name}</span>
-                  <span className="text-xs text-slate-400">({playlistItems.length}개 항목)</span>
+                <div className="flex items-center gap-2 min-w-0">
+                  <Play className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                  <span className="font-medium text-slate-800 truncate">{selectedPlaylist.name}</span>
+                  <span className="text-xs text-slate-400 flex-shrink-0">({playlistItems.length}개)</span>
                 </div>
-                <button
-                  onClick={() => setShowAddPicker(!showAddPicker)}
-                  className="flex items-center gap-1 px-2.5 py-1 text-xs text-blue-600 border border-blue-300 rounded-md hover:bg-blue-50"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  항목 추가
-                </button>
+                <div className="flex items-center gap-1.5 flex-shrink-0">
+                  <button
+                    onClick={() => setShowLibrarySelector(true)}
+                    className="flex items-center gap-1 px-2.5 py-1 text-xs text-emerald-600 border border-emerald-300 rounded-md hover:bg-emerald-50"
+                    title="HUB Library에서 추가"
+                  >
+                    <Plus className="w-3 h-3" />
+                    라이브러리
+                  </button>
+                  <button
+                    onClick={() => { setAddModalSearch(''); setAddModalSelected(new Set()); setShowAddVideoModal(true); }}
+                    className="flex items-center gap-1 px-2.5 py-1 text-xs text-blue-600 border border-blue-300 rounded-md hover:bg-blue-50"
+                  >
+                    <Plus className="w-3 h-3" />
+                    내 동영상에서 추가
+                  </button>
+                </div>
               </div>
 
-              {/* Add item picker */}
-              {showAddPicker && (
-                <div className="px-4 py-3 bg-slate-50 border-b border-slate-100">
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="text-xs text-slate-500">추가할 사이니지 자산을 선택하세요:</p>
-                    <button
-                      onClick={() => setShowLibrarySelector(true)}
-                      className="flex items-center gap-1 px-2.5 py-1 text-xs text-emerald-600 border border-emerald-300 rounded-md hover:bg-emerald-50"
-                    >
-                      Library에서 선택
-                    </button>
-                  </div>
-                  {signageSnapshots.length === 0 && signageMediaItems.length === 0 ? (
-                    <p className="text-xs text-slate-400">사이니지 자산이 없습니다. '내 동영상' 탭에서 동영상을 먼저 등록하세요.</p>
-                  ) : (
-                    <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
-                      {signageSnapshots.map(snap => (
-                        <button
-                          key={snap.id}
-                          onClick={() => handleAddItem(snap.id)}
-                          className="px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-md hover:bg-blue-50 hover:border-blue-300 truncate max-w-[200px]"
-                        >
-                          {snap.title}
-                        </button>
-                      ))}
-                      {signageMediaItems.map(media => (
-                        <button
-                          key={`media_${media.id}`}
-                          onClick={() => handleAddFromSignage(media.id)}
-                          className="px-3 py-1.5 text-xs bg-white border border-purple-200 rounded-md hover:bg-purple-50 hover:border-purple-400 truncate max-w-[200px]"
-                        >
-                          <span className="inline-block px-1 py-0 mr-1 rounded text-[9px] font-semibold bg-purple-100 text-purple-700">{media.sourceType === 'youtube' ? 'YT' : 'VM'}</span>
-                          {media.name}
-                        </button>
-                      ))}
-                    </div>
+              {/* Total duration summary */}
+              {playlistItems.length > 0 && (
+                <div className="px-4 py-2 bg-slate-50 border-b border-slate-100 flex items-center gap-3 text-[11px]">
+                  <span className="text-slate-500">
+                    총 재생시간:&nbsp;
+                    <span className="font-medium text-slate-700">
+                      {totalDurationInfo.totalSec > 0 ? formatDuration(totalDurationInfo.totalSec) : '—'}
+                    </span>
+                  </span>
+                  {totalDurationInfo.missingCount > 0 && (
+                    <span className="text-amber-600">
+                      (재생시간 미등록 영상 {totalDurationInfo.missingCount}개 제외)
+                    </span>
                   )}
                 </div>
               )}
@@ -1246,50 +1271,83 @@ export function StoreSignagePage() {
                   <Loader2 className="w-4 h-4 animate-spin mx-auto mb-2" /> 로딩 중...
                 </div>
               ) : playlistItems.length === 0 ? (
-                <div className="py-8 text-center text-slate-400 text-sm">
-                  항목이 없습니다. "항목 추가"로 사이니지 콘텐츠를 추가하세요.
+                <div className="py-10 text-center text-slate-400">
+                  <ListVideo className="w-8 h-8 mx-auto mb-2 text-slate-300" />
+                  <p className="text-sm">재생 항목이 없습니다.</p>
+                  <p className="text-xs mt-1">'내 동영상에서 추가' 버튼으로 동영상을 추가하세요.</p>
                 </div>
               ) : (
-                <div className="divide-y divide-slate-50">
-                  {playlistItems.map((item, idx) => (
-                    <div key={item.id} className={`flex items-center gap-3 px-4 py-2.5 ${item.isForced ? 'bg-red-50/30' : ''}`}>
-                      <span className="text-xs text-slate-400 w-5 text-right">{idx + 1}</span>
-                      <div className="flex flex-col gap-0.5">
-                        <button
-                          onClick={() => handleMoveItem(idx, -1)}
-                          disabled={idx === 0}
-                          className="text-slate-300 hover:text-slate-600 disabled:opacity-30"
-                        >
-                          <GripVertical className="w-3 h-3 rotate-180" />
-                        </button>
-                        <button
-                          onClick={() => handleMoveItem(idx, 1)}
-                          disabled={idx === playlistItems.length - 1}
-                          className="text-slate-300 hover:text-slate-600 disabled:opacity-30"
-                        >
-                          <GripVertical className="w-3 h-3" />
-                        </button>
+                <div className="divide-y divide-slate-100">
+                  {playlistItems.map((item, idx) => {
+                    const thumb = deriveYtThumbnail(item.contentJson);
+                    const dur = item.contentJson?.duration as number | undefined;
+                    const st = item.contentJson?.sourceType as string | undefined;
+                    return (
+                      <div key={item.id} className={`flex items-center gap-3 px-4 py-2.5 ${item.isForced ? 'bg-red-50/30' : 'hover:bg-slate-50/50'}`}>
+                        {/* Order number + reorder buttons */}
+                        <div className="flex flex-col items-center gap-0 flex-shrink-0">
+                          <span className="text-[10px] text-slate-400 w-5 text-center leading-none mb-0.5">{idx + 1}</span>
+                          <button
+                            onClick={() => handleMoveItem(idx, -1)}
+                            disabled={idx === 0}
+                            className="text-slate-300 hover:text-slate-600 disabled:opacity-20 p-0.5"
+                            title="위로"
+                          >
+                            <ChevronLeft className="w-3 h-3 rotate-90" />
+                          </button>
+                          <button
+                            onClick={() => handleMoveItem(idx, 1)}
+                            disabled={idx === playlistItems.length - 1}
+                            className="text-slate-300 hover:text-slate-600 disabled:opacity-20 p-0.5"
+                            title="아래로"
+                          >
+                            <ChevronRight className="w-3 h-3 rotate-90" />
+                          </button>
+                        </div>
+                        {/* Thumbnail */}
+                        <div className="w-14 h-9 rounded overflow-hidden bg-slate-100 flex-shrink-0">
+                          {thumb ? (
+                            <img src={thumb} alt="" className="w-full h-full object-cover" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <Play className="w-3 h-3 text-slate-300" />
+                            </div>
+                          )}
+                        </div>
+                        {/* Title + meta */}
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-medium text-slate-800 truncate">{item.title}</div>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            {st && (
+                              <span className={`px-1.5 py-0 rounded text-[9px] font-semibold ${st === 'youtube' ? 'bg-red-100 text-red-600' : st === 'vimeo' ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-500'}`}>
+                                {st === 'youtube' ? 'YT' : st === 'vimeo' ? 'VM' : st.toUpperCase()}
+                              </span>
+                            )}
+                            {dur && dur > 0 ? (
+                              <span className="text-[11px] text-slate-400">{formatDuration(dur)}</span>
+                            ) : (
+                              <span className="text-[11px] text-amber-400">재생시간 미등록</span>
+                            )}
+                            {item.isForced && (
+                              <span className="px-1.5 py-0 rounded text-[9px] font-semibold bg-red-100 text-red-700">강제</span>
+                            )}
+                          </div>
+                        </div>
+                        {/* Delete / Lock */}
+                        {item.isLocked ? (
+                          <Lock className="w-3.5 h-3.5 text-slate-300 flex-shrink-0" />
+                        ) : (
+                          <button
+                            onClick={() => handleDeleteItem(item.id)}
+                            className="p-1 text-slate-300 hover:text-red-500 rounded flex-shrink-0"
+                            title="삭제"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium text-slate-800 truncate">{item.title}</div>
-                        <div className="text-xs text-slate-400">{item.assetType}</div>
-                      </div>
-                      {item.isForced && (
-                        <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-red-100 text-red-700">강제</span>
-                      )}
-                      {item.isLocked ? (
-                        <Lock className="w-3.5 h-3.5 text-slate-300" />
-                      ) : (
-                        <button
-                          onClick={() => handleDeleteItem(item.id)}
-                          className="p-1 text-slate-300 hover:text-red-500 rounded"
-                          title="삭제"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      )}
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -1986,6 +2044,139 @@ export function StoreSignagePage() {
         </>
       )}
       </>}
+
+      {/* ── Add Video Modal (WO-O4O-STORE-SIGNAGE-PLAYLIST-BUILDER-V1) ── */}
+      {showAddVideoModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          onClick={e => { if (e.target === e.currentTarget) { setShowAddVideoModal(false); setAddModalSelected(new Set()); setAddModalSearch(''); } }}
+          onKeyDown={e => { if (e.key === 'Escape') { setShowAddVideoModal(false); setAddModalSelected(new Set()); setAddModalSearch(''); } }}
+          role="dialog"
+          aria-modal="true"
+          tabIndex={-1}
+        >
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg flex flex-col" style={{ maxHeight: '80vh' }}>
+            {/* Modal header */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+              <div>
+                <h3 className="text-sm font-semibold text-slate-800">내 동영상에서 추가</h3>
+                <p className="text-xs text-slate-400 mt-0.5">선택한 동영상이 플레이리스트에 추가됩니다</p>
+              </div>
+              {addModalSelected.size > 0 && (
+                <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+                  {addModalSelected.size}개 선택됨
+                </span>
+              )}
+            </div>
+            {/* Search */}
+            <div className="px-4 py-2.5 border-b border-slate-100">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                <input
+                  type="text"
+                  value={addModalSearch}
+                  onChange={e => setAddModalSearch(e.target.value)}
+                  placeholder="동영상 제목으로 검색..."
+                  className="w-full pl-8 pr-3 py-1.5 text-sm border border-slate-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  autoFocus
+                />
+              </div>
+            </div>
+            {/* Video list */}
+            <div className="flex-1 overflow-y-auto divide-y divide-slate-50">
+              {addModalVideos.length === 0 ? (
+                <div className="py-12 text-center text-slate-400 text-sm">
+                  {addModalSearch ? '검색 결과가 없습니다.' : '등록된 동영상이 없습니다. 먼저 내 동영상 탭에서 동영상을 추가하세요.'}
+                </div>
+              ) : addModalVideos.map(v => {
+                const isSelected = addModalSelected.has(v.id);
+                const thumb = v.source === 'direct'
+                  ? v._media?.thumbnailUrl
+                  : deriveYtThumbnail(v._snapshot?.contentJson);
+                const dur = v.source === 'direct'
+                  ? undefined
+                  : v._snapshot?.contentJson?.duration as number | undefined;
+                const st = v.source === 'direct'
+                  ? v._media?.sourceType
+                  : v._snapshot?.contentJson?.sourceType as string | undefined;
+                return (
+                  <button
+                    key={v.id}
+                    onClick={() => {
+                      setAddModalSelected(prev => {
+                        const next = new Set(prev);
+                        if (next.has(v.id)) next.delete(v.id);
+                        else next.add(v.id);
+                        return next;
+                      });
+                    }}
+                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${
+                      isSelected ? 'bg-blue-50' : 'hover:bg-slate-50'
+                    }`}
+                  >
+                    {/* Checkbox */}
+                    <div className={`w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center ${
+                      isSelected ? 'bg-blue-600 border-blue-600' : 'border-slate-300'
+                    }`}>
+                      {isSelected && (
+                        <svg className="w-2.5 h-2.5 text-white" viewBox="0 0 10 8" fill="none">
+                          <path d="M1 4l3 3 5-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      )}
+                    </div>
+                    {/* Thumbnail */}
+                    <div className="w-14 h-9 rounded overflow-hidden bg-slate-100 flex-shrink-0">
+                      {thumb ? (
+                        <img src={thumb} alt="" className="w-full h-full object-cover" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Play className="w-3 h-3 text-slate-300" />
+                        </div>
+                      )}
+                    </div>
+                    {/* Title + meta */}
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium text-slate-800 truncate">{v.title}</div>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        {v.source === 'snapshot' ? (
+                          <span className="text-[9px] font-semibold px-1 py-0 rounded bg-blue-50 text-blue-600">HUB복사</span>
+                        ) : (
+                          <span className="text-[9px] font-semibold px-1 py-0 rounded bg-purple-50 text-purple-600">직접등록</span>
+                        )}
+                        {st && (
+                          <span className={`px-1 py-0 rounded text-[9px] font-semibold ${st === 'youtube' ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'}`}>
+                            {st === 'youtube' ? 'YT' : 'VM'}
+                          </span>
+                        )}
+                        {dur && dur > 0 && (
+                          <span className="text-[11px] text-slate-400">{formatDuration(dur)}</span>
+                        )}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+            {/* Footer */}
+            <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100">
+              <button
+                onClick={() => { setShowAddVideoModal(false); setAddModalSelected(new Set()); setAddModalSearch(''); }}
+                className="px-3 py-1.5 text-sm text-slate-600 border border-slate-300 rounded-md hover:bg-slate-50"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleBulkAdd}
+                disabled={addModalSelected.size === 0 || addModalSaving}
+                className="flex items-center gap-1.5 px-4 py-1.5 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {addModalSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                {addModalSaving ? '추가 중...' : `${addModalSelected.size > 0 ? addModalSelected.size + '개 ' : ''}추가`}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Asset Selector Modal (WO-O4O-SIGNAGE-LIBRARY-INTEGRATION-V1) */}
       <StoreAssetSelectorModal
