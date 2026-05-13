@@ -212,7 +212,31 @@ function DocumentsSection({
   }, [onChanged, drawerItem, closeDrawer]);
 
   const columns: O4OColumn<ContentItem>[] = [
-    { key: '_select', header: '', system: true, width: '44px' },
+    {
+      key: '_select',
+      header: '',
+      system: true,
+      width: '44px',
+      align: 'center',
+      onCellClick: () => {},
+      render: (_v, row) => (
+        <input
+          type="checkbox"
+          checked={selected.has(row.id)}
+          onChange={(e) => {
+            e.stopPropagation();
+            setSelected((prev) => {
+              const next = new Set(prev);
+              if (next.has(row.id)) next.delete(row.id);
+              else next.add(row.id);
+              return next;
+            });
+          }}
+          onClick={(e) => e.stopPropagation()}
+          className="w-4 h-4 accent-blue-600 cursor-pointer"
+        />
+      ),
+    },
     {
       key: 'title',
       header: '제목',
@@ -517,7 +541,31 @@ function CoursesSection({ canCreateCourse }: { canCreateCourse: boolean }) {
   }, []);
 
   const columns: O4OColumn<Course>[] = [
-    { key: '_select', header: '', system: true, width: '44px' },
+    {
+      key: '_select',
+      header: '',
+      system: true,
+      width: '44px',
+      align: 'center',
+      onCellClick: () => {},
+      render: (_v, row) => (
+        <input
+          type="checkbox"
+          checked={selected.has(row.id)}
+          onChange={(e) => {
+            e.stopPropagation();
+            setSelected((prev) => {
+              const next = new Set(prev);
+              if (next.has(row.id)) next.delete(row.id);
+              else next.add(row.id);
+              return next;
+            });
+          }}
+          onClick={(e) => e.stopPropagation()}
+          className="w-4 h-4 accent-blue-600 cursor-pointer"
+        />
+      ),
+    },
     {
       key: 'title',
       header: '제목',
@@ -709,7 +757,31 @@ function SurveysSection({ isAuthenticated }: { isAuthenticated: boolean }) {
       : `/participation/${set.id}/results`;
 
   const columns: O4OColumn<ParticipationSet>[] = [
-    { key: '_select', header: '', system: true, width: '44px' },
+    {
+      key: '_select',
+      header: '',
+      system: true,
+      width: '44px',
+      align: 'center',
+      onCellClick: () => {},
+      render: (_v, row) => (
+        <input
+          type="checkbox"
+          checked={selected.has(row.id)}
+          onChange={(e) => {
+            e.stopPropagation();
+            setSelected((prev) => {
+              const next = new Set(prev);
+              if (next.has(row.id)) next.delete(row.id);
+              else next.add(row.id);
+              return next;
+            });
+          }}
+          onClick={(e) => e.stopPropagation()}
+          className="w-4 h-4 accent-blue-600 cursor-pointer"
+        />
+      ),
+    },
     {
       key: 'title',
       header: '제목',
