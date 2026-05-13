@@ -10,6 +10,7 @@ import { KpaMember, OrganizationStore, KpaMemberService, KpaAuditLog } from '../
 import type { AuthRequest } from '../../../types/auth.js';
 import { roleAssignmentService } from '../../../modules/auth/services/role-assignment.service.js';
 import { MembershipApprovalService } from '../../../services/approval/MembershipApprovalService.js';
+import { emailService } from '../../../services/email.service.js';
 
 type AuthMiddleware = RequestHandler;
 type ScopeMiddleware = (scope: string) => RequestHandler;
@@ -520,6 +521,52 @@ export function createMemberController(
             metadata: { previousStatus: oldStatus, newStatus },
           }));
         } catch (e) { console.error('[KPA AuditLog] Failed:', e); }
+
+        // WO-O4O-KPA-MEMBER-APPROVAL-EMAIL-CONNECT-V1: 상태 전환 이메일 알림 (non-blocking)
+        if (oldStatus !== newStatus) {
+          try {
+            const [appUser] = await dataSource.query(
+              `SELECT email, name FROM users WHERE id = $1 LIMIT 1`,
+              [member.user_id]
+            );
+            const recipientEmail: string | undefined = appUser?.email;
+            const recipientName: string = appUser?.name || appUser?.email || '회원';
+            const decidedAt = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+
+            if (recipientEmail && emailService.isServiceAvailable()) {
+              if (oldStatus === 'pending' && newStatus === 'active') {
+                await emailService.sendUserApprovalEmail(recipientEmail, {
+                  userName: recipientName,
+                  userEmail: recipientEmail,
+                  userRole: 'KPA 약사회 회원',
+                  approvalDate: decidedAt,
+                });
+                console.log(`[KPA Email] Approval sent to ${recipientEmail} (member: ${member.id})`);
+              } else if (oldStatus === 'pending' && newStatus === 'rejected') {
+                await emailService.sendUserRejectionEmail(recipientEmail, {
+                  userName: recipientName,
+                  rejectReason: (req.body.note as string | undefined)?.trim() || '가입 심사에서 승인되지 않았습니다.',
+                });
+                console.log(`[KPA Email] Rejection sent to ${recipientEmail} (member: ${member.id})`);
+              } else if (newStatus === 'suspended') {
+                await emailService.sendAccountSuspensionEmail(recipientEmail, {
+                  userName: recipientName,
+                  suspendReason: (req.body.note as string | undefined)?.trim() || '운영 정책에 따라 계정이 정지되었습니다.',
+                  suspendedDate: decidedAt,
+                });
+                console.log(`[KPA Email] Suspension sent to ${recipientEmail} (member: ${member.id})`);
+              } else if (oldStatus === 'suspended' && newStatus === 'active') {
+                await emailService.sendAccountReactivationEmail(recipientEmail, {
+                  userName: recipientName,
+                  reactivatedDate: decidedAt,
+                });
+                console.log(`[KPA Email] Reactivation sent to ${recipientEmail} (member: ${member.id})`);
+              }
+            }
+          } catch (emailError) {
+            console.error(`[KPA Email] Failed to send status change email (${oldStatus}→${newStatus}) for member ${member.id}:`, emailError);
+          }
+        }
 
         res.json({ data: saved });
       } catch (error: any) {
