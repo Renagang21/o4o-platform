@@ -5,6 +5,9 @@
  *   - "제작" 개념 제거. 본 화면은 콘텐츠를 만들 때 참고할 원소스 자료 보관/관리 전용.
  *   - 콘텐츠 생성 / AI 생성 / 편집기 진입 / POP·QR·블로그·상품 상세설명 제작 진입점 없음.
  *
+ * WO-O4O-STORE-LIBRARY-RESOURCE-DETAIL-DRAWER-V1:
+ *   - 자료 제목 클릭 시 우측 Drawer 로 원소스 자료 상세를 조회 (편집/AI/제작 진입 없음).
+ *
  * 매장이 보유한 자료(직접 업로드 + 커뮤니티 자료실 가져옴) 통합 목록.
  *   - 직접 업로드: store_execution_assets (GET /store/assets)
  *   - 커뮤니티 가져옴: o4o_asset_snapshots WHERE asset_type='resource' (GET /assets?type=resource)
@@ -15,7 +18,7 @@
  */
 
 import { useEffect, useState, useCallback, useMemo, type CSSProperties } from 'react';
-import { Library, ExternalLink, Trash2, RefreshCw, FileDown, Link as LinkIcon, FileText, Download } from 'lucide-react';
+import { Library, ExternalLink, Trash2, RefreshCw, FileDown, Link as LinkIcon, FileText, Download, X } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import {
   getStoreExecutionAssets,
@@ -45,9 +48,14 @@ interface UnifiedResourceRow {
   description: string | null;
   assetType: AssetType;                // 표시용 (snapshot 도 file/content/external-link 로 매핑)
   category: string | null;
+  createdAt: string;
   updatedAt: string;
   href: string | null;
   sourceFileName: string | null;
+  fileSize: number | null;
+  mimeType: string | null;
+  thumbnailUrl: string | null;
+  authorName: string | null;
 }
 
 function libraryToUnified(it: StoreExecutionAsset): UnifiedResourceRow {
@@ -59,9 +67,14 @@ function libraryToUnified(it: StoreExecutionAsset): UnifiedResourceRow {
     description: it.description,
     assetType: it.assetType,
     category: it.category,
+    createdAt: it.createdAt,
     updatedAt: it.updatedAt,
     href: it.assetType === 'file' ? it.fileUrl : it.assetType === 'external-link' ? it.url : null,
     sourceFileName: it.fileName,
+    fileSize: it.fileSize,
+    mimeType: it.mimeType,
+    thumbnailUrl: null,
+    authorName: null,
   };
 }
 
@@ -73,6 +86,8 @@ function snapshotToUnified(snap: AssetSnapshotItem): UnifiedResourceRow {
   const summary = (cj?.summary as string | null | undefined) ?? null;
   const category = (cj?.category as string | null | undefined) ?? null;
   const sourceType = (cj?.sourceType as string | null | undefined) ?? null;
+  const thumbnailUrl = (cj?.thumbnailUrl as string | null | undefined) ?? null;
+  const authorName = (cj?.authorName as string | null | undefined) ?? null;
 
   // resource 의 source_type(upload/external/manual) → assetType(file/external-link/content) 매핑
   const assetType: AssetType =
@@ -88,10 +103,49 @@ function snapshotToUnified(snap: AssetSnapshotItem): UnifiedResourceRow {
     description: summary,
     assetType,
     category,
+    createdAt: snap.createdAt,
     updatedAt: snap.createdAt,
     href: sourceUrl,
     sourceFileName,
+    fileSize: null,
+    mimeType: null,
+    thumbnailUrl,
+    authorName,
   };
+}
+
+// 자료 유형(PDF / 파일 / URL / 이미지 / 기타) 도출
+function deriveResourceKindLabel(row: UnifiedResourceRow): string {
+  const fileName = row.sourceFileName?.toLowerCase() ?? '';
+  const mime = row.mimeType?.toLowerCase() ?? '';
+
+  if (row.assetType === 'external-link') return 'URL';
+
+  const isPdf = mime === 'application/pdf' || fileName.endsWith('.pdf');
+  if (isPdf) return 'PDF';
+
+  const isImage =
+    mime.startsWith('image/') ||
+    /\.(png|jpe?g|gif|webp|svg|bmp)$/.test(fileName);
+  if (isImage) return '이미지';
+
+  if (row.assetType === 'file') return '파일';
+  if (row.assetType === 'content') return '콘텐츠';
+  return '기타';
+}
+
+function formatFileSize(bytes: number | null): string | null {
+  if (bytes == null || bytes <= 0) return null;
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
+}
+
+function isImageResource(row: UnifiedResourceRow): boolean {
+  const mime = row.mimeType?.toLowerCase() ?? '';
+  const fileName = row.sourceFileName?.toLowerCase() ?? '';
+  return mime.startsWith('image/') || /\.(png|jpe?g|gif|webp|svg|bmp)$/.test(fileName);
 }
 
 export default function StoreLibraryResourcesPage() {
@@ -99,6 +153,7 @@ export default function StoreLibraryResourcesPage() {
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [detailId, setDetailId] = useState<string | null>(null);
 
   const fetchItems = useCallback(async () => {
     setLoading(true);
@@ -212,6 +267,10 @@ export default function StoreLibraryResourcesPage() {
   };
 
   const visibleItems = useMemo(() => items, [items]);
+  const detailRow = useMemo(
+    () => (detailId ? items.find((it) => it.id === detailId) ?? null : null),
+    [items, detailId],
+  );
 
   return (
     <div style={styles.container}>
@@ -292,8 +351,15 @@ export default function StoreLibraryResourcesPage() {
                 />
                 <div style={styles.itemMain}>
                   <meta.Icon size={16} style={{ color: meta.color, flexShrink: 0 }} />
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
-                    <span style={styles.itemTitle}>{item.title}</span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0, flex: 1 }}>
+                    <button
+                      type="button"
+                      onClick={() => setDetailId(item.id)}
+                      style={styles.itemTitleBtn}
+                      title="자료 상세 보기"
+                    >
+                      {item.title}
+                    </button>
                     {item.description && (
                       <span style={styles.itemDesc}>{item.description}</span>
                     )}
@@ -347,6 +413,101 @@ export default function StoreLibraryResourcesPage() {
         </ul>
       )}
 
+      {detailRow && (
+        <ResourceDetailDrawer row={detailRow} onClose={() => setDetailId(null)} />
+      )}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────
+// Drawer — 원소스 자료 상세 (조회 전용)
+// ─────────────────────────────────────────────────────
+
+function ResourceDetailDrawer({ row, onClose }: { row: UnifiedResourceRow; onClose: () => void }) {
+  const kindLabel = deriveResourceKindLabel(row);
+  const originLabel = row.kind === 'snapshot' ? '커뮤니티 가져옴' : '직접 등록';
+  const sizeLabel = formatFileSize(row.fileSize);
+  const showImagePreview = isImageResource(row) && !!row.href;
+
+  return (
+    <>
+      <div style={drawerStyles.backdrop} onClick={onClose} aria-hidden="true" />
+      <aside style={drawerStyles.panel} role="dialog" aria-label="자료 상세">
+        <header style={drawerStyles.header}>
+          <h2 style={drawerStyles.headerTitle}>자료 상세</h2>
+          <button type="button" onClick={onClose} style={drawerStyles.closeBtn} aria-label="닫기">
+            <X size={18} />
+          </button>
+        </header>
+
+        <div style={drawerStyles.body}>
+          <h3 style={drawerStyles.title}>{row.title}</h3>
+
+          <dl style={drawerStyles.metaList}>
+            <DetailField label="자료 유형" value={kindLabel} />
+            <DetailField label="출처" value={originLabel} />
+            {row.category && <DetailField label="분류" value={row.category} />}
+            {row.authorName && <DetailField label="작성자" value={row.authorName} />}
+            <DetailField
+              label="등록일"
+              value={row.createdAt ? new Date(row.createdAt).toLocaleString('ko-KR') : '—'}
+            />
+          </dl>
+
+          {row.description && (
+            <section style={drawerStyles.section}>
+              <h4 style={drawerStyles.sectionLabel}>설명 / 메모</h4>
+              <p style={drawerStyles.descriptionText}>{row.description}</p>
+            </section>
+          )}
+
+          {showImagePreview && row.href && (
+            <section style={drawerStyles.section}>
+              <h4 style={drawerStyles.sectionLabel}>미리보기</h4>
+              <img src={row.href} alt={row.title} style={drawerStyles.imagePreview} />
+            </section>
+          )}
+
+          {(row.sourceFileName || sizeLabel) && (
+            <section style={drawerStyles.section}>
+              <h4 style={drawerStyles.sectionLabel}>파일 정보</h4>
+              <dl style={drawerStyles.metaList}>
+                {row.sourceFileName && <DetailField label="파일명" value={row.sourceFileName} />}
+                {sizeLabel && <DetailField label="파일 크기" value={sizeLabel} />}
+                {row.mimeType && <DetailField label="형식" value={row.mimeType} />}
+              </dl>
+            </section>
+          )}
+
+          {row.href && (
+            <section style={drawerStyles.section}>
+              <h4 style={drawerStyles.sectionLabel}>
+                {row.assetType === 'external-link' ? '원본 URL' : '파일 링크'}
+              </h4>
+              <a
+                href={row.href}
+                target="_blank"
+                rel="noreferrer"
+                style={drawerStyles.linkBox}
+                title={row.href}
+              >
+                <ExternalLink size={14} style={{ flexShrink: 0 }} />
+                <span style={drawerStyles.linkText}>{row.href}</span>
+              </a>
+            </section>
+          )}
+        </div>
+      </aside>
+    </>
+  );
+}
+
+function DetailField({ label, value }: { label: string; value: string }) {
+  return (
+    <div style={drawerStyles.metaRow}>
+      <dt style={drawerStyles.metaLabel}>{label}</dt>
+      <dd style={drawerStyles.metaValue}>{value}</dd>
     </div>
   );
 }
@@ -459,10 +620,16 @@ const styles: Record<string, CSSProperties> = {
     flex: 1,
     minWidth: 0,
   },
-  itemTitle: {
+  itemTitleBtn: {
     fontSize: '14px',
     fontWeight: 500,
     color: colors.neutral800,
+    background: 'transparent',
+    border: 'none',
+    padding: 0,
+    margin: 0,
+    textAlign: 'left',
+    cursor: 'pointer',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
@@ -525,5 +692,137 @@ const styles: Record<string, CSSProperties> = {
     border: `1px solid ${colors.neutral200}`,
     borderRadius: '8px',
     textAlign: 'center',
+  },
+};
+
+const drawerStyles: Record<string, CSSProperties> = {
+  backdrop: {
+    position: 'fixed',
+    inset: 0,
+    background: 'rgba(15, 23, 42, 0.32)',
+    zIndex: 90,
+  },
+  panel: {
+    position: 'fixed',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    width: 'min(460px, 100%)',
+    background: colors.white,
+    boxShadow: '-8px 0 24px rgba(15, 23, 42, 0.12)',
+    display: 'flex',
+    flexDirection: 'column',
+    zIndex: 100,
+  },
+  header: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '14px 16px',
+    borderBottom: `1px solid ${colors.neutral200}`,
+    flexShrink: 0,
+  },
+  headerTitle: {
+    fontSize: '15px',
+    fontWeight: 600,
+    color: colors.neutral800,
+    margin: 0,
+  },
+  closeBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '32px',
+    height: '32px',
+    background: 'transparent',
+    border: 'none',
+    color: colors.neutral500,
+    cursor: 'pointer',
+    borderRadius: '6px',
+  },
+  body: {
+    flex: 1,
+    overflowY: 'auto',
+    padding: '18px 18px 32px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '20px',
+  },
+  title: {
+    fontSize: '17px',
+    fontWeight: 600,
+    color: colors.neutral800,
+    margin: 0,
+    wordBreak: 'break-word',
+  },
+  metaList: {
+    margin: 0,
+    padding: 0,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+  },
+  metaRow: {
+    display: 'grid',
+    gridTemplateColumns: '88px 1fr',
+    alignItems: 'baseline',
+    gap: '10px',
+    margin: 0,
+  },
+  metaLabel: {
+    fontSize: '12px',
+    color: colors.neutral500,
+    margin: 0,
+  },
+  metaValue: {
+    fontSize: '13px',
+    color: colors.neutral800,
+    margin: 0,
+    wordBreak: 'break-word',
+  },
+  section: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+  },
+  sectionLabel: {
+    fontSize: '12px',
+    fontWeight: 600,
+    color: colors.neutral600,
+    margin: 0,
+    textTransform: 'uppercase',
+    letterSpacing: '0.04em',
+  },
+  descriptionText: {
+    fontSize: '13px',
+    color: colors.neutral700,
+    margin: 0,
+    whiteSpace: 'pre-wrap',
+    wordBreak: 'break-word',
+    lineHeight: 1.55,
+  },
+  imagePreview: {
+    width: '100%',
+    maxHeight: '320px',
+    objectFit: 'contain',
+    borderRadius: '6px',
+    border: `1px solid ${colors.neutral200}`,
+    background: colors.neutral50,
+  },
+  linkBox: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '10px 12px',
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: '6px',
+    color: colors.primary,
+    fontSize: '12px',
+    textDecoration: 'none',
+    wordBreak: 'break-all',
+  },
+  linkText: {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   },
 };
