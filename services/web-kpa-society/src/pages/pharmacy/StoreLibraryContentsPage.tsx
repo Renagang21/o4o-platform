@@ -137,25 +137,46 @@ function TopTabBar({
   active: TopTab;
   onChange: (t: TopTab) => void;
 }) {
+  const TAB_META: { key: TopTab; label: string; desc: string }[] = [
+    { key: 'contents', label: '콘텐츠', desc: 'Full Copy 자산' },
+    { key: 'lessons',  label: '강의',   desc: 'LMS 참조 자산' },
+  ];
+
   return (
-    <div style={styles.tabBar}>
-      {(['contents', 'lessons'] as TopTab[]).map((tab) => {
-        const label = tab === 'contents' ? '콘텐츠' : '강의';
-        const isActive = active === tab;
-        return (
-          <button
-            key={tab}
-            type="button"
-            onClick={() => onChange(tab)}
-            style={{
-              ...styles.tabBtn,
-              ...(isActive ? styles.tabBtnActive : styles.tabBtnInactive),
-            }}
-          >
-            {label}
-          </button>
-        );
-      })}
+    <div style={styles.segmentedWrapper}>
+      <div style={styles.segmentedGroup}>
+        {TAB_META.map(({ key, label, desc }) => {
+          const isActive = active === key;
+          return (
+            <button
+              key={key}
+              type="button"
+              onClick={() => onChange(key)}
+              style={{
+                ...styles.segmentedBtn,
+                ...(isActive ? styles.segmentedBtnActive : styles.segmentedBtnInactive),
+              }}
+            >
+              <span
+                style={{
+                  ...styles.segmentedLabel,
+                  color: isActive ? colors.neutral800 : colors.neutral500,
+                }}
+              >
+                {label}
+              </span>
+              <span
+                style={{
+                  ...styles.segmentedDesc,
+                  ...(isActive ? styles.segmentedDescActive : styles.segmentedDescInactive),
+                }}
+              >
+                {desc}
+              </span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -843,30 +864,51 @@ const styles: Record<string, CSSProperties> = {
     color: colors.neutral700,
     cursor: 'pointer',
   },
-  // Top tab bar
-  tabBar: {
-    display: 'flex',
-    gap: '0',
-    borderBottom: `2px solid ${colors.neutral200}`,
-    marginBottom: '0',
+  // Top segmented button group
+  segmentedWrapper: {
+    marginBottom: '20px',
   },
-  tabBtn: {
-    padding: '10px 20px',
-    fontSize: '14px',
-    fontWeight: 500,
+  segmentedGroup: {
+    display: 'inline-flex',
+    gap: '3px',
+    background: colors.neutral100,
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: '10px',
+    padding: '3px',
+  },
+  segmentedBtn: {
+    display: 'inline-flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    gap: '1px',
+    padding: '8px 20px',
     border: 'none',
-    background: 'transparent',
+    borderRadius: '7px',
     cursor: 'pointer',
-    borderBottom: '2px solid transparent',
-    marginBottom: '-2px',
-    transition: 'color 0.15s, border-color 0.15s',
+    transition: 'all 0.15s',
+    minWidth: '96px',
   },
-  tabBtnActive: {
+  segmentedBtnActive: {
+    background: colors.white,
+    boxShadow: '0 1px 4px rgba(0,0,0,0.10)',
+  },
+  segmentedBtnInactive: {
+    background: 'transparent',
+  },
+  segmentedLabel: {
+    fontSize: '14px',
+    fontWeight: 600,
+    lineHeight: 1.3,
+  },
+  segmentedDesc: {
+    fontSize: '11px',
+    lineHeight: 1.2,
+  },
+  segmentedDescActive: {
     color: colors.primary,
-    borderBottomColor: colors.primary,
   },
-  tabBtnInactive: {
-    color: colors.neutral500,
+  segmentedDescInactive: {
+    color: colors.neutral400,
   },
   // Sub tab bar
   subTabBar: {
