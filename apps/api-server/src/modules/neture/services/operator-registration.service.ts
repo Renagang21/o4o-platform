@@ -69,6 +69,11 @@ export class OperatorRegistrationService {
    * WO-O4O-NETURE-RBAC-APPROVAL-PRODUCT-FLOW-INTEGRATION-V1:
    *   4. supplier role → neture_suppliers 레코드 자동 생성 (status='ACTIVE')
    *   5. organization 연동 (businessInfo 있는 경우)
+   *
+   * WO-O4O-NETURE-SUPPLIER-APPROVAL-ROLE-ASSIGN-FIX-V1:
+   *   UPDATE...RETURNING 제거 — TypeORM queryRunner에서 RETURNING 컬럼이 null 반환되는
+   *   알려진 버그로 rawRole이 항상 'member'가 되어 supplier role이 미생성되던 문제 수정.
+   *   SELECT → UPDATE 분리 패턴으로 변경.
    */
   async approveRegistration(userId: string, approvedBy: string) {
     const queryRunner = this.dataSource.createQueryRunner();
@@ -76,20 +81,26 @@ export class OperatorRegistrationService {
     await queryRunner.startTransaction();
 
     try {
-      // 1. service_memberships 승인 (pending 또는 rejected → active)
-      const smResult = await queryRunner.query(
-        `UPDATE service_memberships
-         SET status = 'active', approved_by = $1, approved_at = NOW(), updated_at = NOW()
-         WHERE user_id = $2 AND service_key = 'neture' AND status IN ('pending', 'rejected')
-         RETURNING id, role`,
-        [approvedBy, userId],
+      // 1. 먼저 현재 role 조회 (UPDATE...RETURNING 의존 제거 — CLAUDE.md TypeORM queryRunner 주의사항)
+      const [smRow] = await queryRunner.query(
+        `SELECT id, role FROM service_memberships
+         WHERE user_id = $1 AND service_key = 'neture' AND status IN ('pending', 'rejected')`,
+        [userId],
       );
 
-      if (!smResult?.length) {
+      if (!smRow) {
         throw new Error('REGISTRATION_NOT_FOUND');
       }
 
-      // 2. users 상태 활성화 (camelCase columns)
+      // 2. service_memberships 승인 (RETURNING 없음)
+      await queryRunner.query(
+        `UPDATE service_memberships
+         SET status = 'active', approved_by = $1, approved_at = NOW(), updated_at = NOW()
+         WHERE user_id = $2 AND service_key = 'neture' AND status IN ('pending', 'rejected')`,
+        [approvedBy, userId],
+      );
+
+      // 3. users 상태 활성화 (camelCase columns)
       await queryRunner.query(
         `UPDATE users
          SET status = 'active', "isActive" = true, "approvedAt" = NOW(), "approvedBy" = $1, "updatedAt" = NOW()
@@ -97,9 +108,9 @@ export class OperatorRegistrationService {
         [approvedBy, userId],
       );
 
-      // 3. role_assignment 생성
+      // 4. role_assignment 생성
       // WO-NETURE-ROLE-NORMALIZATION-V1: admin/operator만 prefixed, 나머지는 unprefixed
-      const rawRole = smResult[0]?.role || 'member';
+      const rawRole = smRow.role || 'member';
       const ADMIN_ROLES = ['admin', 'operator'];
       const finalRole = ADMIN_ROLES.includes(rawRole)
         ? (rawRole.includes(':') ? rawRole : `neture:${rawRole}`)
@@ -162,8 +173,8 @@ export class OperatorRegistrationService {
           // 이미 존재하면 상태 유지 (별도 공급 승인 흐름에서 처리)
           await queryRunner.query(
             `UPDATE neture_suppliers SET updated_at = NOW()
-             WHERE user_id = $2 AND status = 'PENDING'`,
-            [approvedBy, userId],
+             WHERE user_id = $1 AND status = 'PENDING'`,
+            [userId],
           );
         }
       }
