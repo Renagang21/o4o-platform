@@ -109,12 +109,31 @@ export default function CourseListPage() {
   // ─── 컬럼 정의 ───────────────────────────────────────────────────────────
 
   const columns = useMemo<O4OColumn<Course>[]>(() => [
-    // 선택 컬럼 (BaseTable selectable 계약: key='_select', system=true)
+    // 선택 컬럼 (BaseTable selectable 계약: key='_select', system=true, render 필수)
     {
       key: '_select',
       header: '',
       width: '44px',
       system: true,
+      align: 'center' as const,
+      onCellClick: () => {},
+      render: (_v: unknown, row: Course) => (
+        <input
+          type="checkbox"
+          checked={selectedKeys.has(row.id)}
+          onChange={(e) => {
+            e.stopPropagation();
+            setSelectedKeys((prev) => {
+              const next = new Set(prev);
+              if (next.has(row.id)) next.delete(row.id);
+              else next.add(row.id);
+              return next;
+            });
+          }}
+          onClick={(e) => e.stopPropagation()}
+          className="w-4 h-4 accent-blue-600 cursor-pointer"
+        />
+      ),
     },
     // 썸네일
     {

@@ -176,6 +176,31 @@ export function LmsHubTemplate({ config }: { config: LmsHubConfig }) {
 
   const columns = useMemo((): O4OColumn<LmsHubCourse>[] => [
     {
+      key: '_select',
+      header: '',
+      system: true as true,
+      width: '44px',
+      align: 'center' as const,
+      onCellClick: () => {},
+      render: (_v: unknown, row: LmsHubCourse) => (
+        <input
+          type="checkbox"
+          checked={selectedKeys.has(row.id)}
+          onChange={(e) => {
+            e.stopPropagation();
+            setSelectedKeys((prev) => {
+              const next = new Set(prev);
+              if (next.has(row.id)) next.delete(row.id);
+              else next.add(row.id);
+              return next;
+            });
+          }}
+          onClick={(e) => e.stopPropagation()}
+          className="w-4 h-4 accent-blue-600 cursor-pointer"
+        />
+      ),
+    },
+    {
       key: 'title',
       header: '제목',
       width: '30%',
