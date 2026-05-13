@@ -698,7 +698,10 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
         },
       },
     ];
-  }, [config, navigate, openDrawer, handleDeleteItem, handleOwnerDeleteItem, handleTakeAction, handleToggleRecommend, copiedId]);
+    // WO-O4O-RESOURCES-HUB-CHECKBOX-SELECTION-VISUAL-FIX-V1:
+    //   selectedKeys 가 deps 에 없으면 _select 컬럼 render 가 stale closure 의 selectedKeys 를
+    //   계속 사용해 행 체크박스가 시각적으로 갱신되지 않는다 (ActionBar 의 "n개 선택" 만 갱신됨).
+  }, [config, navigate, openDrawer, handleDeleteItem, handleOwnerDeleteItem, handleTakeAction, handleToggleRecommend, copiedId, selectedKeys]);
 
   // ─── Bulk ActionBar ───────────────────────────────────────────────────────
 
