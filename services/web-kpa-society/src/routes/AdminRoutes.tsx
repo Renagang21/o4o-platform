@@ -9,7 +9,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AdminLayout, AdminAuthGuard } from '../components/admin';
 import { CommitteeRequestsPage } from '../pages/admin/CommitteeRequestsPage';
-import { KpaOperatorDashboardPage } from '../pages/admin/KpaOperatorDashboardPage';
+import { KpaAdminDashboardPage } from '../pages/admin/KpaAdminDashboardPage';
 import { StewardManagementPage } from '../pages/admin/StewardManagementPage';
 
 export function AdminRoutes() {
@@ -23,8 +23,8 @@ export function AdminRoutes() {
           {/* 대시보드 (레거시 /dashboard → kpa-dashboard) */}
           <Route path="dashboard" element={<Navigate to="kpa-dashboard" replace />} />
 
-          {/* 플랫폼 운영 대시보드 */}
-          <Route path="kpa-dashboard" element={<KpaOperatorDashboardPage />} />
+          {/* 관리자 대시보드 (WO-O4O-KPA-ADMIN-DASHBOARD-CANONICAL-SEPARATION-V1) */}
+          <Route path="kpa-dashboard" element={<KpaAdminDashboardPage />} />
 
           {/* 위원회 관리 */}
           <Route path="committee-requests" element={<CommitteeRequestsPage />} />
