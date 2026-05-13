@@ -1,18 +1,7 @@
 /**
- * StoreProductionMaterialsPage — 내 자료함 / 매장 제작 자료
+ * StoreProductionMaterialsPage — 내 자료함 / 매장 제작 자료 (결과 저장소)
  *
  * WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-LIBRARY-TAB-V1
- * WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-AI-FLOW-V1:
- *   ProductionTypeSelectorModal 선택 → AiContentModal 진입 흐름 연결.
- *   유형 선택 후 navigate 대신 in-page AiContentModal 을 띄워 AI 생성/편집 + 저장까지
- *   본 페이지 안에서 마무리할 수 있게 한다. 저장 destination 은
- *   showProductionMaterialSave 로 store_execution_assets (POST /api/v1/kpa/store/assets).
- * WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-AI-BRIDGE-V1:
- *   "AI로 제작 자료 초안 만들기" 버튼 추가.
- *   ProductionTypeSelectorModal(유형 선택) → SelectContentForAiModal(내 자료함 콘텐츠 단일 선택)
- *   → composeSourceTextFromContent() → AiContentModal(initialText=...) 순으로 진행.
- *   저장 destination: store_execution_assets (기존 showProductionMaterialSave 경로 유지).
- *   source metadata (sourceContentId / sourceTitle / sourceOrigin) AiContentModal 에 전달.
  * WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-LIST-SOURCE-ALIGN-V1:
  *   리스트 소스를 AI 저장 위치(store_execution_assets)와 정렬.
  *   fetchAll() 을 병렬 페치로 교체:
@@ -20,39 +9,27 @@
  *     - getStoreExecutionAssets(limit=100) → sourceType='generated' 필터 (store_execution_assets)
  *   두 결과를 updatedAt DESC 로 merge. 백엔드 통합 엔드포인트 없음 (클라이언트 머지).
  *   삭제 API: sourceKind에 따라 directContentApi.remove / deleteStoreExecutionAsset 분기.
- *
- * 매장에서 POP·QR·블로그·상품 상세설명 등 결과물을 만들기 위해
- * 편집하거나 AI로 정리한 원본/중간 제작 자료를 관리하는 페이지.
+ * WO-O4O-STORE-PRODUCTION-MATERIALS-FLOW-REALIGN-V1:
+ *   본 페이지는 결과 저장소 역할만 유지.
+ *   제작 시작 흐름은 /store/library/contents → StartProductionModal → AI 액션으로 이동.
+ *   AI 생성 버튼 / ProductionTypeSelectorModal / SelectContentForAiModal 제거.
  *
  * 데이터 소스 (통합):
  *   directContentApi.list() — kpa_store_contents (sourceType='direct')
  *   getStoreExecutionAssets() — store_execution_assets (sourceType='generated')
- *   AiContentModal 저장 규칙: assetType=content, sourceType=generated, category=outputType
  *
  * DB/migration 금지: 기존 API 재사용만으로 구현.
  */
 
 import { useEffect, useState, useCallback, type CSSProperties } from 'react';
-import { Layers, Trash2, RefreshCw, Sparkles, FileEdit, Plus } from 'lucide-react';
+import { Layers, Trash2, RefreshCw, FileEdit } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
-import { AiContentModal } from '@o4o/content-editor';
 import { directContentApi } from '../../api/assetSnapshot';
 import {
   getStoreExecutionAssets,
   deleteStoreExecutionAsset,
 } from '../../api/storeExecutionAssets';
-import { getAccessToken } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
-import { StartProductionModal, type ProductionSource } from './StartProductionModal';
-import { ProductionTypeSelectorModal } from './ProductionTypeSelectorModal';
-import { SelectContentForAiModal, composeSourceTextFromContent } from './SelectContentForAiModal';
-import {
-  PRODUCTION_TARGET_TO_AI_MODE,
-  type AiModeForProduction,
-  type ProductionTarget,
-  type ProductionTargetMeta,
-} from './productionTargets';
-import type { LibraryContentItem } from '../../api/assetSnapshot';
 
 // ─── 타입 ─────────────────────────────────────────────────────────────────────
 
@@ -70,12 +47,10 @@ interface ProductionMaterialItem {
 // ─── 메타 레이블 헬퍼 ────────────────────────────────────────────────────────
 
 const PURPOSE_LABELS: Record<string, string> = {
-  // direct-content purpose 값
   pop: 'POP',
   qr: 'QR 코드',
   blog: '블로그',
   product_description: '상품 상세설명',
-  // execution-asset category = AiContentModal outputType 값
   store_qr: 'QR 코드',
   product_detail: '상품 상세설명',
   summary: '요약',
@@ -116,22 +91,6 @@ export default function StoreProductionMaterialsPage() {
   const [error, setError]           = useState<string | null>(null);
   const [selected, setSelected]     = useState<Set<string>>(new Set());
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [modalOpen, setModalOpen]   = useState(false);
-  const [modalSource, setModalSource] = useState<ProductionSource | null>(null);
-  const [typeSelectorOpen, setTypeSelectorOpen] = useState(false);
-  // WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-AI-FLOW-V1
-  const [aiOpen, setAiOpen] = useState(false);
-  const [aiInitialMode, setAiInitialMode] = useState<AiModeForProduction>('customer_rewrite');
-  const [aiSelectedTarget, setAiSelectedTarget] = useState<ProductionTarget | null>(null);
-  // WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-AI-BRIDGE-V1
-  const [usingContentBridge, setUsingContentBridge] = useState(false);
-  const [contentSelectorOpen, setContentSelectorOpen] = useState(false);
-  const [pendingBridgeTarget, setPendingBridgeTarget] = useState<ProductionTarget | null>(null);
-  const [pendingBridgeMode, setPendingBridgeMode] = useState<AiModeForProduction>('customer_rewrite');
-  const [aiInitialText, setAiInitialText] = useState<string | undefined>(undefined);
-  const [aiSourceMetadata, setAiSourceMetadata] = useState<
-    { sourceContentId?: string; sourceTitle?: string; sourceOrigin?: string } | undefined
-  >(undefined);
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
@@ -156,7 +115,6 @@ export default function StoreProductionMaterialsPage() {
           sourceKind: 'direct-content',
         }));
 
-      // AiContentModal 저장 규칙: sourceType='generated', category=outputType
       const executionItems: ProductionMaterialItem[] = ((assetsRes?.data?.items ?? []) as any[])
         .filter((it: any) => it.sourceType === 'generated')
         .map((it: any): ProductionMaterialItem => ({
@@ -169,7 +127,6 @@ export default function StoreProductionMaterialsPage() {
           sourceKind: 'execution-asset',
         }));
 
-      // updatedAt DESC 병합
       const merged = [...directItems, ...executionItems].sort(
         (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
       );
@@ -245,64 +202,6 @@ export default function StoreProductionMaterialsPage() {
     }
   };
 
-  // ─── AI 흐름 진입 (WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-AI-FLOW-V1) ────────
-
-  /**
-   * 유형 선택 모달의 카드 클릭 결과를 받아 AI 흐름을 분기한다.
-   *
-   * - usingContentBridge=false (기존): AiContentModal 을 곧장 열고 직접 입력으로 시작.
-   * - usingContentBridge=true (신규): 콘텐츠 선택 모달 → composeSourceText → AiContentModal(initialText=...)
-   */
-  const handleTypeSelectedToAi = (card: ProductionTargetMeta) => {
-    if (usingContentBridge) {
-      // WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-AI-BRIDGE-V1: 콘텐츠 선택 단계로 이동
-      setPendingBridgeTarget(card.key);
-      setPendingBridgeMode(PRODUCTION_TARGET_TO_AI_MODE[card.key]);
-      setTypeSelectorOpen(false);
-      setContentSelectorOpen(true);
-    } else {
-      // 기존 흐름: 직접 AiContentModal 진입
-      setAiSelectedTarget(card.key);
-      setAiInitialMode(PRODUCTION_TARGET_TO_AI_MODE[card.key]);
-      setAiInitialText(undefined);
-      setAiSourceMetadata(undefined);
-      setAiOpen(true);
-    }
-  };
-
-  /**
-   * WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-AI-BRIDGE-V1
-   * 콘텐츠 선택 완료 → composeSourceTextFromContent() → AiContentModal(initialText=...)
-   */
-  const handleContentSelected = (item: LibraryContentItem) => {
-    const text = composeSourceTextFromContent(item);
-    setAiInitialText(text);
-    setAiSourceMetadata({
-      sourceContentId: item.id,
-      sourceTitle: item.title,
-      sourceOrigin: item.origin,
-    });
-    setAiSelectedTarget(pendingBridgeTarget);
-    setAiInitialMode(pendingBridgeMode);
-    setContentSelectorOpen(false);
-    setAiOpen(true);
-  };
-
-  // ─── 제작 시작 ────────────────────────────────────────────────────────────
-
-  const handleStartProduction = () => {
-    if (selected.size === 0) return;
-    const sourceItems: ProductionSource['items'] = items
-      .filter((it) => selected.has(it.id))
-      .map((it) => ({
-        id: it.id,
-        title: it.title,
-        origin: it.sourceKind === 'direct-content' ? 'direct' as const : 'library' as const,
-      }));
-    setModalSource({ fromLibrary: 'contents', items: sourceItems });
-    setModalOpen(true);
-  };
-
   // ─── 렌더 ─────────────────────────────────────────────────────────────────
 
   return (
@@ -320,27 +219,11 @@ export default function StoreProductionMaterialsPage() {
             매장 제작 자료
           </h1>
           <p style={styles.subtitle}>
-            POP·QR 코드·블로그·상품 상세설명 제작 과정에서 저장한 원본/편집 자료를 관리합니다.
+            AI로 생성하거나 편집한 POP·QR·블로그·상품 상세설명 제작 결과물을 관리합니다.
+            새 제작 자료를 만들려면 <strong>내 자료함 → 콘텐츠</strong>에서 콘텐츠를 선택하세요.
           </p>
         </div>
         <div style={styles.headerActions}>
-          {/* WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-AI-BRIDGE-V1: 콘텐츠 선택 → AI 생성 흐름 */}
-          <button
-            type="button"
-            onClick={() => { setUsingContentBridge(true); setTypeSelectorOpen(true); }}
-            style={styles.aiBridgeBtn}
-          >
-            <Sparkles size={14} />
-            AI로 제작 자료 초안 만들기
-          </button>
-          <button
-            type="button"
-            onClick={() => { setUsingContentBridge(false); setTypeSelectorOpen(true); }}
-            style={styles.createBtn}
-          >
-            <Plus size={14} />
-            매장 제작 자료 만들기
-          </button>
           <button onClick={fetchAll} style={styles.refreshBtn} disabled={loading}>
             <RefreshCw size={14} />
             새로고침
@@ -349,35 +232,20 @@ export default function StoreProductionMaterialsPage() {
       </div>
 
       {/* Batch toolbar */}
-      {!loading && !error && items.length > 0 && (
+      {!loading && !error && items.length > 0 && selected.size > 0 && (
         <div style={styles.toolbar}>
-          <label style={styles.selectAllLabel}>
-            <input
-              type="checkbox"
-              checked={allSelected}
-              onChange={toggleAll}
-              style={styles.checkbox}
-            />
-            전체 선택 ({selected.size}/{items.length})
-          </label>
+          <span style={{ fontSize: 13, color: colors.neutral700 }}>{selected.size}개 선택됨</span>
           <div style={{ flex: 1 }} />
           <button
             type="button"
-            onClick={handleStartProduction}
-            disabled={selected.size === 0}
-            style={{ ...styles.startBtn, opacity: selected.size === 0 ? 0.5 : 1 }}
-          >
-            <Sparkles size={14} />
-            제작 시작
-          </button>
-          <button
-            type="button"
             onClick={handleBulkDelete}
-            disabled={selected.size === 0}
-            style={{ ...styles.bulkDeleteBtn, opacity: selected.size === 0 ? 0.5 : 1 }}
+            style={styles.bulkDeleteBtn}
           >
             <Trash2 size={14} />
             선택 삭제
+          </button>
+          <button type="button" onClick={() => setSelected(new Set())} style={styles.clearBtn}>
+            선택 해제
           </button>
         </div>
       )}
@@ -396,33 +264,25 @@ export default function StoreProductionMaterialsPage() {
         <div style={styles.empty}>
           <Layers size={36} style={{ color: colors.neutral300, marginBottom: 14 }} />
           <p style={{ margin: 0, color: colors.neutral600, fontSize: 15, fontWeight: 500 }}>
-            매장 제작 자료가 없습니다.
+            저장된 제작 자료가 없습니다.
           </p>
           <p style={{ margin: '8px 0 0 0', color: colors.neutral400, fontSize: 13, lineHeight: 1.6 }}>
-            POP, QR 코드, 블로그, 상품 상세설명 제작 과정에서 저장한 자료가 이곳에 표시됩니다.
+            내 자료함 → 콘텐츠에서 콘텐츠를 선택한 뒤 "AI 제작 자료 초안 만들기"를 실행하세요.
           </p>
-          <button
-            type="button"
-            onClick={() => { setUsingContentBridge(true); setTypeSelectorOpen(true); }}
-            style={{ ...styles.aiBridgeBtn, marginTop: 16 }}
-          >
-            <Sparkles size={14} />
-            AI로 제작 자료 초안 만들기
-          </button>
-          <button
-            type="button"
-            onClick={() => { setUsingContentBridge(false); setTypeSelectorOpen(true); }}
-            style={{ ...styles.createBtn, marginTop: 8 }}
-          >
-            <Plus size={14} />
-            매장 제작 자료 만들기
-          </button>
         </div>
       ) : (
         <div style={styles.tableWrap}>
           {/* 테이블 헤더 */}
           <div style={styles.tableHead}>
-            <div style={{ ...styles.col, width: 28 }} />
+            <div style={{ ...styles.col, width: 28 }}>
+              <input
+                type="checkbox"
+                checked={allSelected}
+                onChange={toggleAll}
+                style={styles.checkbox}
+                aria-label="전체 선택"
+              />
+            </div>
             <div style={{ ...styles.col, flex: 3 }}>제목</div>
             <div style={{ ...styles.col, width: 110 }}>용도</div>
             <div style={{ ...styles.col, width: 80 }}>상태</div>
@@ -487,63 +347,6 @@ export default function StoreProductionMaterialsPage() {
           })}
         </div>
       )}
-
-      <StartProductionModal
-        open={modalOpen}
-        source={modalSource}
-        onClose={() => setModalOpen(false)}
-      />
-
-      <ProductionTypeSelectorModal
-        open={typeSelectorOpen}
-        onClose={() => { setTypeSelectorOpen(false); setUsingContentBridge(false); }}
-        onSelect={handleTypeSelectedToAi}
-      />
-
-      {/* WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-AI-BRIDGE-V1: 내 자료함 콘텐츠 단일 선택 */}
-      <SelectContentForAiModal
-        open={contentSelectorOpen}
-        onClose={() => { setContentSelectorOpen(false); setUsingContentBridge(false); }}
-        onSelect={handleContentSelected}
-      />
-
-      {/* WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-AI-FLOW-V1 +
-          WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-AI-BRIDGE-V1:
-            AI 생성/편집 모달. showProductionMaterialSave=true 로 결과를
-            store_execution_assets 에 직접 저장. 저장 성공 후 fetchAll() 로 list refresh.
-            initialMode 는 유형 선택 결과로 override.
-            initialText 는 콘텐츠 브리지 흐름에서만 설정됨 (직접 흐름은 undefined).
-            sourceMetadata 는 콘텐츠 브리지 흐름에서 source 추적용으로 전달.
-            productAiContent (productId 기반 비동기) 트랙은 본 흐름에 미통합. */}
-      <AiContentModal
-        open={aiOpen}
-        onClose={() => {
-          setAiOpen(false);
-          setAiSelectedTarget(null);
-          setAiInitialText(undefined);
-          setAiSourceMetadata(undefined);
-        }}
-        editor={null}
-        initialMode={aiInitialMode}
-        initialText={aiInitialText}
-        sourceMetadata={aiSourceMetadata}
-        showProductionMaterialSave
-        aiRequestHeaders={(() => {
-          const token = getAccessToken();
-          return token ? { Authorization: `Bearer ${token}` } : undefined;
-        })()}
-        headerLabel={`매장 제작 자료 만들기 — ${
-          aiSelectedTarget
-            ? ({
-                pop: 'POP',
-                qr: 'QR 코드',
-                blog: '블로그',
-                'product-description': '상품 상세설명',
-              } as Record<ProductionTarget, string>)[aiSelectedTarget]
-            : 'AI 생성'
-        }`}
-        onProductionMaterialSaved={fetchAll}
-      />
     </div>
   );
 }
@@ -584,38 +387,13 @@ const styles: Record<string, CSSProperties> = {
     fontSize: '13px',
     color: colors.neutral500,
     margin: '6px 0 0',
+    lineHeight: 1.6,
   },
   headerActions: {
     display: 'inline-flex',
     alignItems: 'center',
     gap: '8px',
     flexShrink: 0,
-  },
-  aiBridgeBtn: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '8px 14px',
-    background: '#f0fdf4',
-    border: '1px solid #16a34a',
-    borderRadius: '6px',
-    fontSize: '13px',
-    color: '#15803d',
-    fontWeight: 500,
-    cursor: 'pointer',
-  },
-  createBtn: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '8px 14px',
-    background: colors.primary,
-    border: 'none',
-    borderRadius: '6px',
-    fontSize: '13px',
-    color: colors.white,
-    fontWeight: 500,
-    cursor: 'pointer',
   },
   refreshBtn: {
     display: 'inline-flex',
@@ -632,39 +410,12 @@ const styles: Record<string, CSSProperties> = {
   toolbar: {
     display: 'flex',
     alignItems: 'center',
-    gap: '12px',
+    gap: '10px',
     padding: '10px 12px',
     background: colors.white,
     border: `1px solid ${colors.neutral200}`,
     borderRadius: '8px',
     marginBottom: '12px',
-  },
-  selectAllLabel: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '8px',
-    fontSize: '13px',
-    color: colors.neutral700,
-    cursor: 'pointer',
-  },
-  checkbox: {
-    width: '16px',
-    height: '16px',
-    cursor: 'pointer',
-    flexShrink: 0,
-  },
-  startBtn: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '8px 14px',
-    background: colors.primary,
-    border: 'none',
-    borderRadius: '6px',
-    fontSize: '13px',
-    color: colors.white,
-    fontWeight: 500,
-    cursor: 'pointer',
   },
   bulkDeleteBtn: {
     display: 'inline-flex',
@@ -677,6 +428,20 @@ const styles: Record<string, CSSProperties> = {
     fontSize: '13px',
     color: colors.neutral700,
     cursor: 'pointer',
+  },
+  clearBtn: {
+    padding: '8px 10px',
+    background: 'transparent',
+    border: 'none',
+    fontSize: '13px',
+    color: colors.neutral500,
+    cursor: 'pointer',
+  },
+  checkbox: {
+    width: '16px',
+    height: '16px',
+    cursor: 'pointer',
+    flexShrink: 0,
   },
   tableWrap: {
     border: `1px solid ${colors.neutral200}`,

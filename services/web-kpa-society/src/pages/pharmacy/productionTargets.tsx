@@ -141,6 +141,37 @@ export type AiModeForProduction =
  *  blog                → 'blog'          (outputType=blog)
  *  product-description → 'customer_rewrite' (outputType=product_detail)
  */
+// ─── composeSourceTextFromItems ─────────────────────────────────────────────
+
+/**
+ * ProductionSourceItem[] → AI 입력용 텍스트 변환.
+ *
+ * WO-O4O-STORE-PRODUCTION-MATERIALS-FLOW-REALIGN-V1
+ *
+ * 콘텐츠 화면에서 선택된 항목을 AiContentModal(initialText=...)에 자동 주입하는 용도.
+ * CreateContentFromResourcesModal.composeSourceText() 패턴 참고.
+ *
+ * 권장 시작 문구: "다음 콘텐츠를 참고하여 매장 제작 자료 형태로 정리해 주세요."
+ */
+export function composeSourceTextFromItems(items: ProductionSourceItem[]): string {
+  if (items.length === 0) return '';
+  const lines: string[] = [
+    '다음 콘텐츠를 참고하여 매장 제작 자료 형태로 정리해 주세요.',
+    '',
+  ];
+  items.forEach((it, i) => {
+    lines.push(`${i + 1}. ${it.title}`);
+    if (it.description) lines.push(`   설명: ${it.description}`);
+    const originLabel =
+      it.origin === 'direct' ? '매장 직접 작성'
+      : it.origin === 'snapshot' ? '커뮤니티 콘텐츠'
+      : '자료함';
+    lines.push(`   출처: ${originLabel}`);
+    lines.push('');
+  });
+  return lines.join('\n').trim();
+}
+
 export const PRODUCTION_TARGET_TO_AI_MODE: Record<ProductionTarget, AiModeForProduction> = {
   pop: 'pop',
   qr: 'store_qr',

@@ -21,7 +21,7 @@
 
 import { useState, useMemo, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, ArrowRight, Info } from 'lucide-react';
+import { X, ArrowRight, Info, Sparkles } from 'lucide-react';
 import { colors } from '../../styles/theme';
 import {
   PRODUCTION_TARGET_CATALOG,
@@ -54,11 +54,21 @@ interface Props {
   open: boolean;
   source: ProductionSource | null;
   onClose: () => void;
+  /**
+   * WO-O4O-STORE-PRODUCTION-MATERIALS-FLOW-REALIGN-V1
+   * "AI 제작 자료 초안 만들기" 선택 시 콜백.
+   * - 호출 시점: 사용자가 AI 액션 카드 선택 → 확인 버튼 클릭
+   * - 수신측(StoreLibraryContentsPage)이 AiContentModal 을 열고 initialText 주입
+   * - 미제공 시 AI 카드 미표시 (하위 호환)
+   */
+  onAiAction?: (source: ProductionSource) => void;
 }
 
-export function StartProductionModal({ open, source, onClose }: Props) {
+export function StartProductionModal({ open, source, onClose, onAiAction }: Props) {
   const navigate = useNavigate();
   const [selectedTarget, setSelectedTarget] = useState<ProductionTarget | null>(null);
+  // WO-O4O-STORE-PRODUCTION-MATERIALS-FLOW-REALIGN-V1: AI 액션 선택 여부
+  const [aiActionSelected, setAiActionSelected] = useState(false);
 
   // direct origin 항목만 선택된 경우 일부 제작 대상에 제한/안내 적용
   const allDirect = useMemo(
@@ -72,6 +82,13 @@ export function StartProductionModal({ open, source, onClose }: Props) {
   const targetMeta = selectedTarget ? findProductionTarget(selectedTarget) : undefined;
 
   const handleConfirm = () => {
+    if (!source) return;
+    if (aiActionSelected) {
+      // WO-O4O-STORE-PRODUCTION-MATERIALS-FLOW-REALIGN-V1: AI 흐름으로 위임
+      onAiAction?.(source);
+      handleClose();
+      return;
+    }
     if (!selectedTarget || !targetMeta) return;
     navigate(targetMeta.route, { state: buildProductionState({ target: selectedTarget, source }) });
     handleClose();
@@ -79,6 +96,7 @@ export function StartProductionModal({ open, source, onClose }: Props) {
 
   const handleClose = () => {
     setSelectedTarget(null);
+    setAiActionSelected(false);
     onClose();
   };
 
@@ -99,17 +117,17 @@ export function StartProductionModal({ open, source, onClose }: Props) {
 
         <div style={styles.body}>
           <section style={styles.section}>
-            <h3 style={styles.sectionTitle}>제작 대상</h3>
+            <h3 style={styles.sectionTitle}>제작 대상 (편집기로 이동)</h3>
             <div style={styles.targetGrid}>
               {PRODUCTION_TARGET_CATALOG.map((t) => {
-                const active = selectedTarget === t.key;
+                const active = selectedTarget === t.key && !aiActionSelected;
                 const directInfo = allDirect ? DIRECT_NOTES[t.key] : undefined;
                 const isDisabled = directInfo?.disabled === true;
                 return (
                   <div key={t.key} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                     <button
                       type="button"
-                      onClick={() => { if (!isDisabled) setSelectedTarget(t.key); }}
+                      onClick={() => { if (!isDisabled) { setSelectedTarget(t.key); setAiActionSelected(false); } }}
                       disabled={isDisabled}
                       style={{
                         ...styles.targetCard,
@@ -131,6 +149,27 @@ export function StartProductionModal({ open, source, onClose }: Props) {
               })}
             </div>
           </section>
+
+          {/* WO-O4O-STORE-PRODUCTION-MATERIALS-FLOW-REALIGN-V1: AI 제작 자료 초안 만들기 */}
+          {onAiAction && (
+            <section style={styles.section}>
+              <h3 style={styles.sectionTitle}>AI로 제작 자료 초안 만들기</h3>
+              <button
+                type="button"
+                onClick={() => { setAiActionSelected(true); setSelectedTarget(null); }}
+                style={{
+                  ...styles.aiActionCard,
+                  ...(aiActionSelected ? styles.aiActionCardActive : {}),
+                }}
+              >
+                <Sparkles size={20} style={{ color: aiActionSelected ? '#15803d' : '#16a34a', flexShrink: 0 }} />
+                <div style={styles.aiActionText}>
+                  <span style={styles.aiActionLabel}>AI 제작 자료 초안 만들기</span>
+                  <span style={styles.aiActionDesc}>선택한 콘텐츠를 AI가 POP·QR·블로그·상품설명 형태로 정리합니다</span>
+                </div>
+              </button>
+            </section>
+          )}
         </div>
 
         <div style={styles.footer}>
@@ -139,11 +178,21 @@ export function StartProductionModal({ open, source, onClose }: Props) {
           </button>
           <button
             onClick={handleConfirm}
-            disabled={!selectedTarget || (allDirect && !!selectedTarget && DIRECT_NOTES[selectedTarget]?.disabled)}
-            style={{ ...styles.confirmBtn, opacity: selectedTarget ? 1 : 0.5 }}
+            disabled={
+              !aiActionSelected &&
+              (!selectedTarget || (allDirect && !!selectedTarget && DIRECT_NOTES[selectedTarget]?.disabled))
+            }
+            style={{
+              ...styles.confirmBtn,
+              ...(aiActionSelected ? styles.confirmBtnAi : {}),
+              opacity: (aiActionSelected || selectedTarget) ? 1 : 0.5,
+            }}
           >
-            편집기로 이동
-            <ArrowRight size={14} />
+            {aiActionSelected ? (
+              <><Sparkles size={14} />AI 제작 시작</>
+            ) : (
+              <>편집기로 이동<ArrowRight size={14} /></>
+            )}
           </button>
         </div>
       </div>
@@ -284,5 +333,40 @@ const styles: Record<string, CSSProperties> = {
     color: colors.white,
     fontWeight: 500,
     cursor: 'pointer',
+  },
+  confirmBtnAi: {
+    background: '#16a34a',
+  },
+  aiActionCard: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    padding: '14px 16px',
+    background: '#f0fdf4',
+    border: '1px solid #86efac',
+    borderRadius: '8px',
+    fontSize: '14px',
+    color: colors.neutral700,
+    cursor: 'pointer',
+    textAlign: 'left',
+    width: '100%',
+  },
+  aiActionCardActive: {
+    background: '#dcfce7',
+    borderColor: '#16a34a',
+  },
+  aiActionText: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '2px',
+  },
+  aiActionLabel: {
+    fontSize: '14px',
+    fontWeight: 500,
+    color: '#15803d',
+  },
+  aiActionDesc: {
+    fontSize: '12px',
+    color: colors.neutral500,
   },
 };
