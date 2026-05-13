@@ -195,13 +195,9 @@ const memberActionPolicy = defineActionPolicy<KpaMember>('kpa:members', {
       label: '수정',
       visible: (m) => m.status !== 'withdrawn',
     },
-    {
-      key: 'delete',
-      label: '삭제',
-      variant: 'danger',
-      visible: (m) => m.status !== 'withdrawn',
-      divider: true,
-    },
+    // WO-O4O-KPA-MEMBER-BULK-DELETE-WORKFLOW-REFACTOR-V1:
+    //   점3개 메뉴는 회원 정보 수정/개별 관리 중심으로 정리. 삭제(탈퇴/완전삭제)는
+    //   bulk action 영역(ActionBar) 으로 이관되어 일관된 워크플로우로 처리됨.
   ],
 });
 
@@ -656,13 +652,18 @@ export default function MemberManagementPage() {
     () => members.filter((m) => selectedIds.has(m.id) && m.status === 'suspended').map((m) => m.id),
     [members, selectedIds],
   );
+  // WO-O4O-KPA-MEMBER-BULK-DELETE-WORKFLOW-REFACTOR-V1: 탈퇴 처리 후보 — 아직 withdrawn 이 아닌 모든 회원
+  const selectedWithdrawableIds = useMemo(
+    () => members.filter((m) => selectedIds.has(m.id) && m.status !== 'withdrawn').map((m) => m.id),
+    [members, selectedIds],
+  );
 
   const runBulk = useCallback(
-    async (ids: string[], status: MemberStatus) => {
+    async (ids: string[], status: MemberStatus, opts?: { keepSelection?: boolean }) => {
       if (ids.length === 0) return;
       const result = await batch.executeBatch(batchUpdateMemberStatus, ids, { status });
       if (result.successCount > 0) {
-        setSelectedIds(new Set());
+        if (!opts?.keepSelection) setSelectedIds(new Set());
         await fetchMembers(memberPage);
       }
     },
@@ -673,6 +674,21 @@ export default function MemberManagementPage() {
   const handleBulkReject = useCallback(() => runBulk(selectedPendingIds, 'rejected'), [runBulk, selectedPendingIds]);
   const handleBulkSuspend = useCallback(() => runBulk(selectedActiveIds, 'suspended'), [runBulk, selectedActiveIds]);
   const handleBulkRestore = useCallback(() => runBulk(selectedSuspendedIds, 'active'), [runBulk, selectedSuspendedIds]);
+  // WO-O4O-KPA-MEMBER-BULK-DELETE-WORKFLOW-REFACTOR-V1
+  //   탈퇴 처리(soft delete) bulk — selection 유지하여 admin 이 후속으로 완전삭제 이어갈 수 있게 한다.
+  //   리스트 refresh 후 현재 페이지에서 사라진 항목은 기존 useEffect 가 selection 에서 정리.
+  const handleBulkWithdraw = useCallback(
+    () => runBulk(selectedWithdrawableIds, 'withdrawn', { keepSelection: true }),
+    [runBulk, selectedWithdrawableIds],
+  );
+  // WO-O4O-KPA-MEMBER-BULK-DELETE-WORKFLOW-REFACTOR-V1
+  //   완전삭제(hard delete) — admin 전용, 단일 선택 시만. 기존 DeleteRiskModal 재사용.
+  //   여러 명 일괄 완전삭제는 본 WO 범위 외 (활동 데이터 경고를 단건 단위로 보호).
+  const handleBulkHardDelete = useCallback(() => {
+    if (!isKpaAdmin || selectedIds.size !== 1) return;
+    const [onlyId] = Array.from(selectedIds);
+    setDeleteTargetId(onlyId);
+  }, [isKpaAdmin, selectedIds]);
 
   // Client-side tab filtering (status tabs는 서버사이드이므로 여기선 membership_type만)
   const filteredMembers = useMemo(() => {
@@ -831,7 +847,8 @@ export default function MemberManagementPage() {
             suspend: () => handleStatusChange(m.id, 'suspended'),
             restore: () => handleStatusChange(m.id, 'active'),
             edit: () => setEditTarget(m),
-            delete: () => setDeleteTargetId(m.id),
+            // WO-O4O-KPA-MEMBER-BULK-DELETE-WORKFLOW-REFACTOR-V1:
+            //   삭제 콜백은 bulk action 으로 이관되어 행 메뉴에서는 더 이상 호출하지 않음.
           }, {
             icons: MEMBER_ACTION_ICONS,
             loading: actionLoading === m.id
@@ -993,6 +1010,42 @@ export default function MemberManagementPage() {
                       confirmText: '복원',
                     },
                   },
+                  // WO-O4O-KPA-MEMBER-BULK-DELETE-WORKFLOW-REFACTOR-V1: 탈퇴 처리 (soft delete) bulk
+                  // operator + admin 모두 가능. withdrawn 이 아닌 모든 회원 대상.
+                  {
+                    key: 'withdraw',
+                    label: `탈퇴 처리 (${selectedWithdrawableIds.length})`,
+                    onClick: handleBulkWithdraw,
+                    variant: 'warning' as const,
+                    icon: <UserX size={14} />,
+                    loading: batch.loading,
+                    group: 'danger',
+                    tooltip: '선택된 회원을 탈퇴(비활성) 처리합니다',
+                    visible: selectedWithdrawableIds.length > 0,
+                    confirm: {
+                      title: '회원 일괄 탈퇴 처리',
+                      message: `선택한 회원 ${selectedWithdrawableIds.length}명을 탈퇴(비활성) 처리하시겠습니까?\n탈퇴 처리 후에도 선택 상태는 유지되어 후속 작업을 이어갈 수 있습니다.`,
+                      variant: 'warning' as const,
+                      confirmText: '탈퇴 처리',
+                    },
+                  },
+                  // WO-O4O-KPA-MEMBER-BULK-DELETE-WORKFLOW-REFACTOR-V1: 완전삭제 (hard delete)
+                  // admin 전용. 단일 선택 시만 활성 — DeleteRiskModal 이 단일 회원 기준 설계되어 있음.
+                  // 면허번호 해제 + 잘못 가입 회원 정리 + withdrawn 회원 정리 모두 동일 진입점.
+                  ...(isKpaAdmin ? [{
+                    key: 'hard-delete',
+                    label: selectedIds.size === 1 ? '완전삭제' : `완전삭제 (1명만)`,
+                    onClick: handleBulkHardDelete,
+                    variant: 'danger' as const,
+                    icon: <Trash2 size={14} />,
+                    loading: false,
+                    group: 'danger' as const,
+                    tooltip: selectedIds.size === 1
+                      ? '선택한 회원을 완전삭제합니다 (면허번호 해제 등 재가입 데이터까지 정리)'
+                      : '완전삭제는 1명 선택 시에만 가능합니다',
+                    visible: selectedIds.size > 0,
+                    disabled: selectedIds.size !== 1,
+                  }] : []),
                 ]}
               />
             </div>
@@ -1057,12 +1110,23 @@ export default function MemberManagementPage() {
         />
       )}
 
-      {/* WO-KPA-A-MEMBER-EDIT-AND-DELETE-FLOW-V1: 삭제 리스크 모달 */}
+      {/* WO-KPA-A-MEMBER-EDIT-AND-DELETE-FLOW-V1: 삭제 리스크 모달
+          WO-O4O-KPA-MEMBER-BULK-DELETE-WORKFLOW-REFACTOR-V1:
+            bulk action 의 admin 단일선택 완전삭제 진입점에서도 동일 모달 재사용.
+            삭제 완료 시 selection 정리 + 리스트 refresh. */}
       {deleteTargetId && (
         <DeleteRiskModal
           memberId={deleteTargetId}
           onClose={() => setDeleteTargetId(null)}
-          onDeleted={() => fetchMembers(memberPage)}
+          onDeleted={() => {
+            setSelectedIds((prev) => {
+              if (!prev.has(deleteTargetId)) return prev;
+              const next = new Set(prev);
+              next.delete(deleteTargetId);
+              return next;
+            });
+            fetchMembers(memberPage);
+          }}
           isKpaAdmin={isKpaAdmin}
         />
       )}
