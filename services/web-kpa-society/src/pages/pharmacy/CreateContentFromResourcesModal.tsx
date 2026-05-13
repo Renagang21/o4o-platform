@@ -53,6 +53,12 @@ import { colors } from '../../styles/theme';
 const FETCH_LIMIT = 100;
 const AI_OUTPUT_TYPE = 'product_detail'; // 자료 정리 → 고객용 정리 톤 (AiContentModal mode 와 동일 endpoint)
 
+// WO-O4O-STORE-AI-INPUT-INCLUDE-STORED-BODY-V1
+// 자료별 본문(body/blocks/htmlContent)을 stripHtml 후 AI prompt 에 포함.
+// 자료 다중 선택 시에도 전체 prompt 가 10000자 (handleGenerate 의 slice 한도) 안에서
+// 의미 있는 분량이 유지되도록 자료당 본문은 3000자로 자른다.
+const BODY_PER_RESOURCE_LIMIT = 3000;
+
 // VITE_API_BASE_URL — AiContentModal 과 동일하게 raw 도메인 사용 (/api/ai/content 직접 호출)
 const AI_API_BASE: string =
   (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_BASE_URL) || '';
@@ -71,6 +77,114 @@ interface ResourceRow {
   url: string | null;       // 외부 URL 또는 fileUrl (있을 시 source 로 활용)
   sourceFileName: string | null;
   updatedAt: string;
+  // WO-O4O-STORE-AI-INPUT-INCLUDE-STORED-BODY-V1
+  // 저장된 본문(htmlContent / contentJson.body / blocks / html) → stripHtml 된 plain text.
+  // composeSourceText 가 AI prompt 에 inline 으로 포함하기 위한 값.
+  bodyText: string;
+}
+
+// ─── Body Text Extraction ────────────────────────────────────────────────────
+// 저장된 HTML/blocks/contentJson 을 AI 입력용 plain text 로 normalize.
+// 새 extraction pipeline 없이 이미 DB 에 저장된 usable text 만 재사용.
+
+function stripHtmlText(html: string): string {
+  if (!html) return '';
+  return html
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/(p|div|li|h[1-6])>/gi, '\n')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/[ \t]+/g, ' ')
+    .replace(/\n\s*\n+/g, '\n')
+    .replace(/^\s+|\s+$/g, '');
+}
+
+function blockToText(block: unknown): string {
+  if (!block || typeof block !== 'object') return '';
+  const b = block as Record<string, any>;
+  const type = typeof b.type === 'string' ? b.type : '';
+
+  // image / video / youtube 류는 본문 텍스트로 의미 없음
+  if (/image|video|youtube/i.test(type)) return '';
+
+  // list: items 배열을 줄바꿈으로 평면화
+  if (/list/i.test(type)) {
+    const items = Array.isArray(b.items)
+      ? b.items
+      : Array.isArray(b.content?.items) ? b.content.items
+      : Array.isArray(b.attributes?.items) ? b.attributes.items
+      : [];
+    return items
+      .map((it: unknown) => (typeof it === 'string' ? stripHtmlText(it) : ''))
+      .filter(Boolean)
+      .join('\n');
+  }
+
+  // text-ish — content / text / value / data.{content,text} 중 string 인 것 사용
+  const raw =
+    (typeof b.content === 'string' ? b.content : '') ||
+    (typeof b.text === 'string' ? b.text : '') ||
+    (typeof b.value === 'string' ? b.value : '') ||
+    (typeof b.data?.content === 'string' ? b.data.content : '') ||
+    (typeof b.data?.text === 'string' ? b.data.text : '') ||
+    '';
+  return raw ? stripHtmlText(raw) : '';
+}
+
+function blocksToFlatText(blocks: unknown[]): string {
+  return blocks
+    .map(blockToText)
+    .filter((s) => s.length > 0)
+    .join('\n')
+    .trim();
+}
+
+function extractBodyFromContentJson(cj: unknown): string {
+  if (!cj) return '';
+  // contentJson 자체가 블록 배열인 경우 (StoreDirectContentPage parseBlocks 참고)
+  if (Array.isArray(cj)) return blocksToFlatText(cj);
+  if (typeof cj !== 'object') return '';
+  const obj = cj as Record<string, unknown>;
+
+  // 1) body: string(HTML/plain) 또는 블록 배열
+  if (typeof obj.body === 'string' && obj.body.trim()) {
+    return stripHtmlText(obj.body);
+  }
+  if (Array.isArray(obj.body)) {
+    const t = blocksToFlatText(obj.body);
+    if (t) return t;
+  }
+
+  // 2) blocks: 블록 배열
+  if (Array.isArray(obj.blocks)) {
+    const t = blocksToFlatText(obj.blocks);
+    if (t) return t;
+  }
+
+  // 3) html: AiContentModal 저장 형태 (html only)
+  if (typeof obj.html === 'string' && obj.html.trim()) {
+    return stripHtmlText(obj.html);
+  }
+
+  // 4) htmlContent: 일부 snapshot 이 그대로 carry 하는 경우
+  if (typeof obj.htmlContent === 'string' && obj.htmlContent.trim()) {
+    return stripHtmlText(obj.htmlContent);
+  }
+
+  return '';
+}
+
+function truncateBody(text: string, max: number): string {
+  if (!text) return '';
+  if (text.length <= max) return text;
+  return text.slice(0, max).trimEnd() + '… (이하 생략)';
 }
 
 const ASSET_TYPE_META: Record<AssetType, { label: string; bg: string; color: string; Icon: typeof FileText }> = {
@@ -80,6 +194,9 @@ const ASSET_TYPE_META: Record<AssetType, { label: string; bg: string; color: str
 };
 
 function libraryToRow(it: StoreExecutionAsset): ResourceRow {
+  // assetType==='content' 인 직접 작성 자료는 htmlContent 에 본문이 들어있음.
+  // 그 외 type 도 htmlContent 가 채워져 있으면 동일하게 사용 (방어적).
+  const bodyText = it.htmlContent ? stripHtmlText(it.htmlContent) : '';
   return {
     id: `lib:${it.id}`,
     rawId: it.id,
@@ -90,6 +207,7 @@ function libraryToRow(it: StoreExecutionAsset): ResourceRow {
     url: it.assetType === 'file' ? it.fileUrl : it.assetType === 'external-link' ? it.url : null,
     sourceFileName: it.fileName,
     updatedAt: it.updatedAt,
+    bodyText,
   };
 }
 
@@ -103,6 +221,10 @@ function snapshotToRow(snap: AssetSnapshotItem): ResourceRow {
     sourceType === 'external' ? 'external-link'
     : sourceType === 'upload' ? 'file'
     : 'content';
+  // contentJson.body / blocks / html 중 존재하는 것을 plain text 로 추출.
+  // summary 는 description 으로 이미 노출되므로 본문 추출 fallback 으로는 사용하지 않는다
+  // (중복 방지).
+  const bodyText = extractBodyFromContentJson(snap.contentJson);
   return {
     id: `snap:${snap.id}`,
     rawId: snap.id,
@@ -113,10 +235,15 @@ function snapshotToRow(snap: AssetSnapshotItem): ResourceRow {
     url: sourceUrl,
     sourceFileName,
     updatedAt: snap.createdAt,
+    bodyText,
   };
 }
 
 // 선택된 자료 → AI prompt source text 자동 작성
+// WO-O4O-STORE-AI-INPUT-INCLUDE-STORED-BODY-V1:
+//   metadata(title/description/url/file)만 넣던 title-only prompt 를
+//   "본문:" 섹션이 포함된 body-aware prompt 로 확장.
+//   자료당 본문은 BODY_PER_RESOURCE_LIMIT 자로 truncate (전체는 handleGenerate 에서 10000자 cap).
 function composeSourceText(rows: ResourceRow[]): string {
   if (rows.length === 0) return '';
   const lines: string[] = ['다음 자료들을 참고하여 매장 콘텐츠로 정리해 주세요.', ''];
@@ -125,6 +252,10 @@ function composeSourceText(rows: ResourceRow[]): string {
     if (r.description) lines.push(`설명: ${r.description}`);
     if (r.url) lines.push(`URL: ${r.url}`);
     if (r.sourceFileName) lines.push(`파일: ${r.sourceFileName}`);
+    if (r.bodyText) {
+      lines.push('본문:');
+      lines.push(truncateBody(r.bodyText, BODY_PER_RESOURCE_LIMIT));
+    }
     lines.push('');
   });
   return lines.join('\n').trim();
