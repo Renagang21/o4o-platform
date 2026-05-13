@@ -27,12 +27,14 @@ import { BookOpen, Sparkles, Trash2, RefreshCw, Search, FileText, PenSquare, Inf
 import { toast } from '@o4o/error-handling';
 import { DataTable, Pagination } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
+import { AiContentModal } from '@o4o/content-editor';
 import {
   storeAssetControlApi,
   storeLibraryApi,
   type StoreAssetItem,
   type LibraryContentItem,
 } from '../../api/assetSnapshot';
+import { getAccessToken } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
 import { StartProductionModal, type ProductionSource, type ProductionSourceItem } from './StartProductionModal';
 import { CreateContentFromResourcesModal } from './CreateContentFromResourcesModal';
@@ -230,28 +232,47 @@ export default function StoreLibraryContentsPage() {
   const [modalSource, setModalSource] = useState<ProductionSource | null>(null);
   const [createFromResourcesOpen, setCreateFromResourcesOpen] = useState(false);
 
+  // WO-O4O-STORE-PRODUCTION-MATERIALS-FLOW-RECOVERY-V1:
+  // AI 흐름은 in-page AiContentModal 호출 → onInsert 시 ProductionMaterialEditorPage 로 결과 HTML 전달.
+  // (이전 구현: 프롬프트 텍스트를 editor 초기값으로 직접 navigate → AI 생성 단계가 사라졌던 문제 복구)
+  const [aiOpen, setAiOpen] = useState(false);
+  const [aiInitialText, setAiInitialText] = useState('');
+  const [aiSourceMetadata, setAiSourceMetadata] = useState<
+    { sourceContentId?: string; sourceTitle?: string; sourceOrigin?: string } | null
+  >(null);
+
   const openProduction = useCallback((items: ProductionSourceItem[]) => {
     if (items.length === 0) return;
     setModalSource({ fromLibrary: 'contents', items });
     setModalOpen(true);
   }, []);
 
-  // WO-O4O-STORE-PRODUCTION-MATERIALS-STANDARD-EDITOR-APPLY-V1:
-  // AI 흐름 → ProductionMaterialEditorPage (RichTextEditor 기반 편집기)
   const handleAiAction = useCallback((source: ProductionSource) => {
     const text = composeSourceTextFromItems(source.items);
     const first = source.items[0];
-    navigate('/store/library/production-materials/new', {
-      state: {
-        initialText: text || undefined,
-        sourceMetadata: first ? {
-          sourceContentId: first.id,
-          sourceTitle: first.title,
-          sourceOrigin: first.origin,
-        } : undefined,
-      },
-    });
-  }, [navigate]);
+    setAiInitialText(text);
+    setAiSourceMetadata(
+      first
+        ? { sourceContentId: first.id, sourceTitle: first.title, sourceOrigin: first.origin }
+        : null,
+    );
+    setModalOpen(false);
+    setAiOpen(true);
+  }, []);
+
+  const handleAiInsert = useCallback(
+    (data: { html: string; title: string }) => {
+      setAiOpen(false);
+      navigate('/store/library/production-materials/new', {
+        state: {
+          generatedHtml: data.html,
+          title: data.title || undefined,
+          sourceMetadata: aiSourceMetadata ?? undefined,
+        },
+      });
+    },
+    [navigate, aiSourceMetadata],
+  );
 
   const removeSnapshots = useCallback(async (snapshotIds: string[]): Promise<number> => {
     if (snapshotIds.length === 0) return 0;
@@ -341,6 +362,22 @@ export default function StoreLibraryContentsPage() {
         open={createFromResourcesOpen}
         onClose={() => setCreateFromResourcesOpen(false)}
         onCreated={reload}
+      />
+
+      {/* WO-O4O-STORE-PRODUCTION-MATERIALS-FLOW-RECOVERY-V1
+          콘텐츠/강의 선택 → StartProductionModal 의 AI 카드 → 본 모달에서 AI 생성 →
+          onInsert 시 ProductionMaterialEditorPage 로 결과 HTML 전달 */}
+      <AiContentModal
+        open={aiOpen}
+        onClose={() => setAiOpen(false)}
+        editor={null}
+        onInsert={handleAiInsert}
+        initialText={aiInitialText}
+        headerLabel="AI 매장 제작 자료 초안"
+        aiRequestHeaders={(() => {
+          const token = getAccessToken();
+          return token ? { Authorization: `Bearer ${token}` } : undefined;
+        })()}
       />
 
     </div>

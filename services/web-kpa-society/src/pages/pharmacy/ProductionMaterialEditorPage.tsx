@@ -1,15 +1,21 @@
 /**
- * ProductionMaterialEditorPage — AI 제작 자료 초안 편집기
+ * ProductionMaterialEditorPage — AI 결과 검토/수정 전용 편집기
  *
  * WO-O4O-STORE-PRODUCTION-MATERIALS-STANDARD-EDITOR-APPLY-V1
+ * WO-O4O-STORE-PRODUCTION-MATERIALS-FLOW-RECOVERY-V1:
+ *   진입 state 를 `generatedHtml` 로 재정의. 본 화면은 AiContentModal 이 생성한 HTML 을
+ *   받아 사용자가 검토/수정 후 매장 제작 자료(store_execution_assets)에 저장하는 단계.
+ *   AI 입력 프롬프트 텍스트(composeSourceTextFromItems 결과)는 이 화면으로 들어오지 않는다.
  *
- * 진입: StoreLibraryContentsPage.handleAiAction → navigate('/store/library/production-materials/new', { state })
- * state: { initialText?: string; sourceMetadata?: { sourceContentId?: string; sourceTitle?: string; sourceOrigin?: string } }
+ * 진입: StoreLibraryContentsPage → AiContentModal.onInsert → navigate('/store/library/production-materials/new', { state })
+ * state: {
+ *   generatedHtml?: string;
+ *   title?: string;
+ *   sourceMetadata?: { sourceContentId?: string; sourceTitle?: string; sourceOrigin?: string };
+ * }
  *
  * 역할:
- *   - O4O 표준 RichTextEditor 를 메인 편집기로 사용
- *   - initialText(선택된 콘텐츠 요약 텍스트) → HTML 변환 → 에디터 초기값
- *   - AiContentModal 은 toolbar AI 보조 기능으로만 사용 (메인 편집기는 RichTextEditor)
+ *   - O4O 표준 RichTextEditor 로 AI 결과 HTML 검토/수정
  *   - 제목 입력 + 제작 유형 선택 + 저장(store_execution_assets)
  *   - 저장 후 → /store/library/production-materials 이동
  */
@@ -28,28 +34,13 @@ import { PRODUCTION_TARGET_CATALOG, type ProductionTarget } from './productionTa
 // ─── Location State ──────────────────────────────────────────────────────────
 
 interface EditorPageState {
-  initialText?: string;
+  generatedHtml?: string;
+  title?: string;
   sourceMetadata?: {
     sourceContentId?: string;
     sourceTitle?: string;
     sourceOrigin?: string;
   };
-}
-
-// ─── Plain text → TipTap HTML 변환 ──────────────────────────────────────────
-
-function plainTextToHtml(text: string): string {
-  if (!text) return '';
-  return text
-    .split('\n')
-    .map((line) => {
-      const escaped = line
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-      return escaped ? `<p>${escaped}</p>` : '<p></p>';
-    })
-    .join('');
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -59,9 +50,9 @@ export default function ProductionMaterialEditorPage() {
   const location = useLocation();
   const state = (location.state as EditorPageState | null) ?? {};
 
-  const initialHtml = plainTextToHtml(state.initialText ?? '');
+  const initialHtml = state.generatedHtml ?? '';
 
-  const [title, setTitle] = useState('');
+  const [title, setTitle] = useState(state.title ?? '');
   const [selectedType, setSelectedType] = useState<ProductionTarget | null>(null);
   const [editorContent, setEditorContent] = useState<EditorContent>({ html: initialHtml });
   const [saving, setSaving] = useState(false);
