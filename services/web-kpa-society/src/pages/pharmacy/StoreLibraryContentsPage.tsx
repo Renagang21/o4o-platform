@@ -1,19 +1,18 @@
 /**
  * StoreLibraryContentsPage — 내 자료함 / 콘텐츠
  *
- * WO-O4O-STORE-LIBRARY-CONTENTS-CANONICAL-TABLE-SPLIT-V1
- *   - 문서형 콘텐츠 / 코스형 콘텐츠 두 독립 DataTable 섹션
- * WO-O4O-STORE-LIBRARY-SERVER-PAGINATION-V1
- *   - server-side pagination + search 로 전환 (limit=20 default, max 50)
- *   - client filter / pre-fetch 제거
- *   - 검색은 debounce(300ms) → 새 fetch
- *   - selection 은 페이지 단위 유지 (page transition 시 자동 cleanup)
+ * WO-O4O-STORE-LIBRARY-CONTENTS-TAB-RESTRUCTURE-V1
+ *   - 상위 탭: [콘텐츠] [강의]
+ *   - 콘텐츠 탭 내부: [문서형] [코스형]
+ *   - 강의 탭: LMS 참조 자산 단일 리스트 + 안내 문구
+ *   - 이중 세로 section 구조 제거
  *
  * 이전 WO 흐름 보존:
+ *   WO-O4O-STORE-LIBRARY-CONTENTS-CANONICAL-TABLE-SPLIT-V1
+ *   WO-O4O-STORE-LIBRARY-SERVER-PAGINATION-V1: server-side pagination + search
  *   WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1: 가상 type='document' = cms+content 통합
- *   WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1:       lesson Reference Metadata 노출
- *   WO-O4O-KPA-STORE-LIBRARY-CONTENTS-REMOVE-FLOW-FIX-V1:
- *     "선택 제거" = snapshot hidden 처리. direct 콘텐츠 삭제는 매장 제작 자료 화면 전담.
+ *   WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1: lesson Reference Metadata 노출
+ *   WO-O4O-KPA-STORE-LIBRARY-CONTENTS-REMOVE-FLOW-FIX-V1
  *   WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1: duplicate 허용 유지
  *
  * 제작 시작 flow: 자료 선택 → "제작 시작" → StartProductionModal → 편집기 route 이동
@@ -21,7 +20,7 @@
 
 import { useEffect, useState, useCallback, useMemo, useRef, type CSSProperties } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { BookOpen, Sparkles, Trash2, RefreshCw, Search, FileText, PenSquare } from 'lucide-react';
+import { BookOpen, Sparkles, Trash2, RefreshCw, Search, FileText, PenSquare, Info } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { DataTable, Pagination } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
@@ -37,6 +36,11 @@ import { CreateContentFromResourcesModal } from './CreateContentFromResourcesMod
 
 const PAGE_LIMIT = 20;
 const SEARCH_DEBOUNCE_MS = 300;
+
+// ─── Tab Types ───────────────────────────────────────────────────────────────
+
+type TopTab = 'contents' | 'lessons';
+type ContentsSubTab = 'document' | 'course-resource';
 
 // ─── Row Types ───────────────────────────────────────────────────────────────
 
@@ -55,7 +59,7 @@ interface DocumentRow {
   href: string;
 }
 
-interface CourseRow {
+interface LessonRow {
   id: string;
   selectionKey: string;
   title: string;
@@ -92,8 +96,6 @@ function formatDate(iso?: string | null): string {
   return Number.isNaN(d.getTime()) ? '-' : d.toLocaleDateString('ko-KR');
 }
 
-// WO-O4O-STORE-LIBRARY-DIRECT-CONTENT-UNIFIED-V1: 서버 unified feed item → row.
-// snapshot/direct 분기는 origin + assetType 으로 식별.
 function toDocumentRow(it: LibraryContentItem): DocumentRow {
   const sourceType: DocSourceType =
     it.origin === 'direct' ? 'direct' : it.assetType === 'content' ? 'content' : 'cms';
@@ -112,7 +114,7 @@ function toDocumentRow(it: LibraryContentItem): DocumentRow {
   };
 }
 
-function toCourseRow(s: StoreAssetItem): CourseRow {
+function toLessonRow(s: StoreAssetItem): LessonRow {
   const publicUrl = readString(s.contentJson, 'publicUrl');
   return {
     id: s.id,
@@ -126,21 +128,81 @@ function toCourseRow(s: StoreAssetItem): CourseRow {
   };
 }
 
+// ─── Tab Bar ─────────────────────────────────────────────────────────────────
+
+function TopTabBar({
+  active,
+  onChange,
+}: {
+  active: TopTab;
+  onChange: (t: TopTab) => void;
+}) {
+  return (
+    <div style={styles.tabBar}>
+      {(['contents', 'lessons'] as TopTab[]).map((tab) => {
+        const label = tab === 'contents' ? '콘텐츠' : '강의';
+        const isActive = active === tab;
+        return (
+          <button
+            key={tab}
+            type="button"
+            onClick={() => onChange(tab)}
+            style={{
+              ...styles.tabBtn,
+              ...(isActive ? styles.tabBtnActive : styles.tabBtnInactive),
+            }}
+          >
+            {label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function SubTabBar({
+  active,
+  onChange,
+}: {
+  active: ContentsSubTab;
+  onChange: (t: ContentsSubTab) => void;
+}) {
+  return (
+    <div style={styles.subTabBar}>
+      {(['document', 'course-resource'] as ContentsSubTab[]).map((tab) => {
+        const label = tab === 'document' ? '문서형' : '코스형';
+        const isActive = active === tab;
+        return (
+          <button
+            key={tab}
+            type="button"
+            onClick={() => onChange(tab)}
+            style={{
+              ...styles.subTabBtn,
+              ...(isActive ? styles.subTabBtnActive : styles.subTabBtnInactive),
+            }}
+          >
+            {label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 // ─── Page Component ──────────────────────────────────────────────────────────
 
 export default function StoreLibraryContentsPage() {
   const navigate = useNavigate();
 
-  // 페이지 단위 reload trigger — 섹션이 후속 fetch 를 재실행하게 함
+  const [topTab, setTopTab] = useState<TopTab>('contents');
+  const [contentsSubTab, setContentsSubTab] = useState<ContentsSubTab>('document');
+
   const [reloadKey, setReloadKey] = useState(0);
   const reload = useCallback(() => setReloadKey((k) => k + 1), []);
 
-  // Production modal
   const [modalOpen, setModalOpen] = useState(false);
   const [modalSource, setModalSource] = useState<ProductionSource | null>(null);
-
-  // WO-O4O-STORE-CONTENT-CREATION-FROM-LIBRARY-RESOURCES-V1
-  // "콘텐츠 제작" 진입 — 자료 선택 → AI 정리 → direct content 저장
   const [createFromResourcesOpen, setCreateFromResourcesOpen] = useState(false);
 
   const openProduction = useCallback((items: ProductionSourceItem[]) => {
@@ -155,6 +217,11 @@ export default function StoreLibraryContentsPage() {
     return snapshotIds.length;
   }, []);
 
+  const subtitleByTab: Record<TopTab, string> = {
+    contents: '콘텐츠(Full Copy 자산)를 문서형/코스형으로 구분해 보여드립니다. 선택 후 "제작 시작"으로 POP / QR / 블로그 / 상품 상세설명을 만들 수 있습니다.',
+    lessons: 'LMS 참조 자산입니다. 강의 본문은 LMS 원본에서 확인합니다.',
+  };
+
   return (
     <div style={styles.container}>
       <div style={styles.header}>
@@ -168,12 +235,9 @@ export default function StoreLibraryContentsPage() {
             <BookOpen size={20} style={{ color: colors.primary }} />
             콘텐츠
           </h1>
-          <p style={styles.subtitle}>
-            문서형/코스형 콘텐츠를 분리해 보여드립니다. 선택 후 "제작 시작" 으로 POP / QR / 블로그 / 상품 상세설명을 만들 수 있습니다.
-          </p>
+          <p style={styles.subtitle}>{subtitleByTab[topTab]}</p>
         </div>
         <div style={styles.headerActions}>
-          {/* WO-O4O-STORE-CONTENT-CREATION-FROM-LIBRARY-RESOURCES-V1 */}
           <button
             type="button"
             onClick={() => setCreateFromResourcesOpen(true)}
@@ -189,20 +253,40 @@ export default function StoreLibraryContentsPage() {
         </div>
       </div>
 
-      <DocumentsSection
-        reloadKey={reloadKey}
-        onStartProduction={openProduction}
-        onAfterRemove={reload}
-        onRemoveSnapshots={removeSnapshots}
-        navigate={navigate}
-      />
+      {/* 상위 탭: 콘텐츠 / 강의 */}
+      <TopTabBar active={topTab} onChange={setTopTab} />
 
-      <CoursesSection
-        reloadKey={reloadKey}
-        onStartProduction={openProduction}
-        onAfterRemove={reload}
-        onRemoveSnapshots={removeSnapshots}
-      />
+      {/* 콘텐츠 탭 */}
+      {topTab === 'contents' && (
+        <>
+          {/* 하위 탭: 문서형 / 코스형 */}
+          <SubTabBar active={contentsSubTab} onChange={setContentsSubTab} />
+
+          {contentsSubTab === 'document' && (
+            <DocumentsSection
+              reloadKey={reloadKey}
+              onStartProduction={openProduction}
+              onAfterRemove={reload}
+              onRemoveSnapshots={removeSnapshots}
+              navigate={navigate}
+            />
+          )}
+
+          {contentsSubTab === 'course-resource' && (
+            <CourseResourceEmptySection />
+          )}
+        </>
+      )}
+
+      {/* 강의 탭 */}
+      {topTab === 'lessons' && (
+        <LessonsSection
+          reloadKey={reloadKey}
+          onStartProduction={openProduction}
+          onAfterRemove={reload}
+          onRemoveSnapshots={removeSnapshots}
+        />
+      )}
 
       <StartProductionModal
         open={modalOpen}
@@ -210,20 +294,16 @@ export default function StoreLibraryContentsPage() {
         onClose={() => setModalOpen(false)}
       />
 
-      {/* WO-O4O-STORE-CONTENT-CREATION-FROM-LIBRARY-RESOURCES-V1 */}
       <CreateContentFromResourcesModal
         open={createFromResourcesOpen}
         onClose={() => setCreateFromResourcesOpen(false)}
-        onCreated={() => {
-          // direct content 가 새로 생성되면 콘텐츠 목록 갱신
-          reload();
-        }}
+        onCreated={reload}
       />
     </div>
   );
 }
 
-// ─── DocumentsSection — server-side paginated ─────────────────────────────────
+// ─── DocumentsSection — server-side paginated ────────────────────────────────
 
 function DocumentsSection({
   reloadKey,
@@ -238,7 +318,6 @@ function DocumentsSection({
   onRemoveSnapshots: (snapshotIds: string[]) => Promise<number>;
   navigate: ReturnType<typeof useNavigate>;
 }) {
-  // search input vs. committed query (debounced)
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
@@ -248,7 +327,6 @@ function DocumentsSection({
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
-  // search debounce
   useEffect(() => {
     const handle = setTimeout(() => {
       setSearchQuery(searchInput.trim());
@@ -257,8 +335,6 @@ function DocumentsSection({
     return () => clearTimeout(handle);
   }, [searchInput]);
 
-  // fetch on page/search/reload — WO-O4O-STORE-LIBRARY-DIRECT-CONTENT-UNIFIED-V1:
-  // 서버 unified endpoint 단일 호출. snapshot + direct 모두 동일 페이지/정렬/검색 적용.
   const reqIdRef = useRef(0);
   useEffect(() => {
     const myReq = ++reqIdRef.current;
@@ -286,7 +362,6 @@ function DocumentsSection({
     };
   }, [page, searchQuery, reloadKey]);
 
-  // 페이지 / 데이터 변경 시 사라진 selection 정리
   useEffect(() => {
     setSelected((prev) => {
       const validKeys = new Set(rows.map((r) => r.selectionKey));
@@ -410,11 +485,7 @@ function DocumentsSection({
   return (
     <section style={styles.section}>
       <div style={styles.sectionHeader}>
-        <h2 style={styles.sectionTitle}>
-          <FileText size={16} style={{ color: colors.primary }} />
-          문서형 콘텐츠
-          <span style={styles.countBadge}>{total}건</span>
-        </h2>
+        <span style={styles.countBadge}>{total}건</span>
         <div style={styles.searchWrap}>
           <Search size={14} style={styles.searchIcon} />
           <input
@@ -467,9 +538,25 @@ function DocumentsSection({
   );
 }
 
-// ─── CoursesSection — server-side paginated ───────────────────────────────────
+// ─── CourseResourceEmptySection — 코스형 콘텐츠 (확장 대비) ──────────────────
 
-function CoursesSection({
+function CourseResourceEmptySection() {
+  return (
+    <section style={styles.section}>
+      <div style={styles.emptyState}>
+        <BookOpen size={32} style={{ color: colors.neutral300, marginBottom: 12 }} />
+        <p style={styles.emptyTitle}>코스형 콘텐츠</p>
+        <p style={styles.emptyDesc}>
+          콘텐츠 허브에서 코스형 콘텐츠(CONTENT_RESOURCE)를 가져오면 여기에 표시됩니다.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+// ─── LessonsSection — server-side paginated ───────────────────────────────────
+
+function LessonsSection({
   reloadKey,
   onStartProduction,
   onAfterRemove,
@@ -483,7 +570,7 @@ function CoursesSection({
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
-  const [rows, setRows] = useState<CourseRow[]>([]);
+  const [rows, setRows] = useState<LessonRow[]>([]);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -508,7 +595,7 @@ function CoursesSection({
         .catch(() => null);
       if (cancelled || myReq !== reqIdRef.current) return;
       const snapshots: StoreAssetItem[] = res?.data?.items ?? [];
-      setRows(snapshots.map(toCourseRow));
+      setRows(snapshots.map(toLessonRow));
       setTotal(res?.data?.total ?? 0);
       setTotalPages(Math.max(1, res?.data?.totalPages ?? 1));
       setLoading(false);
@@ -553,7 +640,7 @@ function CoursesSection({
     }
   }, [selected, rows, onRemoveSnapshots, onAfterRemove]);
 
-  const columns: ListColumnDef<CourseRow>[] = useMemo(
+  const columns: ListColumnDef<LessonRow>[] = useMemo(
     () => [
       {
         key: 'title',
@@ -627,12 +714,14 @@ function CoursesSection({
 
   return (
     <section style={styles.section}>
+      {/* 안내 문구: 강의는 LMS 참조 자산 */}
+      <div style={styles.infoBar}>
+        <Info size={14} style={{ color: colors.primary, flexShrink: 0 }} />
+        <span>강의는 LMS 참조 자산입니다. 강의 본문은 LMS 원본에서 확인합니다.</span>
+      </div>
+
       <div style={styles.sectionHeader}>
-        <h2 style={styles.sectionTitle}>
-          <BookOpen size={16} style={{ color: colors.primary }} />
-          코스형 콘텐츠
-          <span style={styles.countBadge}>{total}건</span>
-        </h2>
+        <span style={styles.countBadge}>{total}건</span>
         <div style={styles.searchWrap}>
           <Search size={14} style={styles.searchIcon} />
           <input
@@ -663,13 +752,13 @@ function CoursesSection({
         </div>
       )}
 
-      <DataTable<CourseRow>
+      <DataTable<LessonRow>
         columns={columns}
         data={rows}
         rowKey="selectionKey"
         loading={loading}
-        emptyMessage={searchQuery ? '검색 결과가 없습니다' : '가져온 코스형 콘텐츠가 없습니다'}
-        tableId="kpa-store-library-courses"
+        emptyMessage={searchQuery ? '검색 결과가 없습니다' : '가져온 강의가 없습니다'}
+        tableId="kpa-store-library-lessons"
         selectable
         selectedKeys={selected}
         onSelectionChange={setSelected}
@@ -698,7 +787,7 @@ const styles: Record<string, CSSProperties> = {
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     gap: '16px',
-    marginBottom: '24px',
+    marginBottom: '20px',
     flexWrap: 'wrap',
   },
   breadcrumb: {
@@ -754,8 +843,59 @@ const styles: Record<string, CSSProperties> = {
     color: colors.neutral700,
     cursor: 'pointer',
   },
+  // Top tab bar
+  tabBar: {
+    display: 'flex',
+    gap: '0',
+    borderBottom: `2px solid ${colors.neutral200}`,
+    marginBottom: '0',
+  },
+  tabBtn: {
+    padding: '10px 20px',
+    fontSize: '14px',
+    fontWeight: 500,
+    border: 'none',
+    background: 'transparent',
+    cursor: 'pointer',
+    borderBottom: '2px solid transparent',
+    marginBottom: '-2px',
+    transition: 'color 0.15s, border-color 0.15s',
+  },
+  tabBtnActive: {
+    color: colors.primary,
+    borderBottomColor: colors.primary,
+  },
+  tabBtnInactive: {
+    color: colors.neutral500,
+  },
+  // Sub tab bar
+  subTabBar: {
+    display: 'flex',
+    gap: '0',
+    borderBottom: `1px solid ${colors.neutral200}`,
+    marginTop: '16px',
+    marginBottom: '0',
+  },
+  subTabBtn: {
+    padding: '8px 16px',
+    fontSize: '13px',
+    fontWeight: 500,
+    border: 'none',
+    background: 'transparent',
+    cursor: 'pointer',
+    borderBottom: '2px solid transparent',
+    marginBottom: '-1px',
+    transition: 'color 0.15s, border-color 0.15s',
+  },
+  subTabBtnActive: {
+    color: colors.primary,
+    borderBottomColor: colors.primary,
+  },
+  subTabBtnInactive: {
+    color: colors.neutral500,
+  },
   section: {
-    marginBottom: '32px',
+    marginTop: '16px',
   },
   sectionHeader: {
     display: 'flex',
@@ -764,15 +904,6 @@ const styles: Record<string, CSSProperties> = {
     gap: '12px',
     marginBottom: '12px',
     flexWrap: 'wrap',
-  },
-  sectionTitle: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '8px',
-    fontSize: '15px',
-    fontWeight: 600,
-    color: colors.neutral800,
-    margin: 0,
   },
   countBadge: {
     display: 'inline-flex',
@@ -783,6 +914,18 @@ const styles: Record<string, CSSProperties> = {
     color: colors.neutral600,
     background: colors.neutral100,
     borderRadius: '999px',
+  },
+  infoBar: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '10px 14px',
+    background: '#EFF6FF',
+    border: `1px solid #BFDBFE`,
+    borderRadius: '8px',
+    fontSize: '13px',
+    color: '#1D4ED8',
+    marginBottom: '14px',
   },
   searchWrap: {
     position: 'relative',
@@ -885,5 +1028,29 @@ const styles: Record<string, CSSProperties> = {
     color: colors.neutral700,
     cursor: 'pointer',
     textDecoration: 'none',
+  },
+  emptyState: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '60px 24px',
+    background: colors.white,
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: '8px',
+    textAlign: 'center',
+  },
+  emptyTitle: {
+    fontSize: '15px',
+    fontWeight: 600,
+    color: colors.neutral600,
+    margin: '0 0 8px',
+  },
+  emptyDesc: {
+    fontSize: '13px',
+    color: colors.neutral400,
+    margin: 0,
+    maxWidth: '360px',
+    lineHeight: 1.6,
   },
 };
