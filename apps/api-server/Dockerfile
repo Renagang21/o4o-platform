@@ -67,6 +67,9 @@ COPY dist/database ./dist/database
 # Copy static assets (fonts for PDF generation)
 COPY src/assets ./dist/assets
 
+# Copy email templates (mail-core, copied into build context by CI from packages/mail-core/templates/email)
+COPY mail-templates ./templates/email
+
 # Verify the bundle and migration files exist
 RUN ls -la /app/dist/main.js || (echo "CRITICAL: dist/main.js not found!" && exit 1)
 RUN ls -la /app/dist/migrate.js || (echo "CRITICAL: dist/migrate.js not found!" && exit 1)

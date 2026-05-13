@@ -241,6 +241,11 @@ jobs:
         echo "📦 main.js (Service): $(du -h dist/main.js | cut -f1)"
         echo "📦 migrate.js (Job): $(du -h dist/migrate.js | cut -f1)"
 
+        # Copy mail-core email templates into build context so Dockerfile can include them
+        echo "📧 Copying email templates into Docker build context..."
+        cp -r ../../packages/mail-core/templates/email ./mail-templates
+        echo "Templates: $(ls mail-templates | wc -l) files"
+
         IMAGE_TAG="${{ github.sha }}"
         FULL_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:${IMAGE_TAG}"
         LATEST_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:latest"
