@@ -45,6 +45,8 @@ export interface CreateSignageMediaPayload {
 export interface UpdateSignageMediaPayload {
   name?: string;
   description?: string;
+  /** WO-O4O-STORE-SIGNAGE-SOURCEURL-EDIT-ENABLE-V1: store owner may change video URL */
+  sourceUrl?: string;
   thumbnailUrl?: string;
   tags?: string[];
   status?: 'draft' | 'active';

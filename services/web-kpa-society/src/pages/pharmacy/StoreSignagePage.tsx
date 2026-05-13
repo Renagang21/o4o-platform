@@ -323,6 +323,7 @@ export function StoreSignagePage() {
   const [editDescription, setEditDescription] = useState('');
   const [editTags, setEditTags] = useState('');
   const [editThumbnailUrl, setEditThumbnailUrl] = useState('');
+  const [editSourceUrl, setEditSourceUrl] = useState('');
   const [editSaving, setEditSaving] = useState(false);
   const [editError, setEditError] = useState('');
 
@@ -561,6 +562,7 @@ export function StoreSignagePage() {
       setEditDescription(media.description ?? '');
       setEditTags((media.tags ?? []).join(', '));
       setEditThumbnailUrl(media.thumbnailUrl ?? '');
+      setEditSourceUrl(media.sourceUrl ?? '');
     } else if (v.source === 'snapshot' && v._snapshot) {
       const snap = v._snapshot;
       setEditingSnapshot(snap);
@@ -570,6 +572,7 @@ export function StoreSignagePage() {
       setEditDescription((cj.description as string) ?? '');
       setEditTags(((cj.tags as string[]) ?? []).join(', '));
       setEditThumbnailUrl((cj.thumbnailUrl as string) ?? '');
+      setEditSourceUrl((cj.sourceUrl as string) ?? '');
     }
   };
 
@@ -585,12 +588,14 @@ export function StoreSignagePage() {
     setEditError('');
     try {
       const tags = editTags.split(',').map(t => t.trim()).filter(Boolean);
+      const trimmedSourceUrl = editSourceUrl.trim();
       if (editingMedia) {
         const updated = await updateSignageMedia(organizationId, editingMedia.id, {
           name: editName.trim(),
           description: editDescription.trim() || undefined,
           tags: tags.length > 0 ? tags : [],
           thumbnailUrl: editThumbnailUrl.trim() || undefined,
+          sourceUrl: trimmedSourceUrl || undefined,
         });
         setSignageMediaItems(prev => prev.map(m => m.id === updated.id ? updated : m));
       } else if (editingSnapshot) {
@@ -599,6 +604,7 @@ export function StoreSignagePage() {
           description: editDescription.trim() || undefined,
           tags: tags.length > 0 ? tags : [],
           thumbnailUrl: editThumbnailUrl.trim() || undefined,
+          sourceUrl: trimmedSourceUrl || undefined,
         });
         const updated = res.data;
         setItems(prev => prev.map(it => it.id === editingSnapshot.id
@@ -2024,9 +2030,6 @@ export function StoreSignagePage() {
         }
       >
         {(editingMedia || editingSnapshot) && (() => {
-          const sourceUrl = editingMedia
-            ? editingMedia.sourceUrl
-            : (editingSnapshot!.contentJson?.sourceUrl as string | undefined) ?? '';
           const sourceType = editingMedia
             ? editingMedia.sourceType
             : (editingSnapshot!.contentJson?.sourceType as string | undefined) ?? '';
@@ -2037,26 +2040,35 @@ export function StoreSignagePage() {
                 <p className="text-xs text-red-600 px-2 py-1.5 bg-red-50 border border-red-200 rounded">{editError}</p>
               )}
 
-              {/* 읽기 전용 정보 */}
-              <div className="p-3 bg-slate-50 rounded-lg space-y-2">
+              {/* 소스 URL (수정 가능) */}
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1">동영상 URL</label>
+                <input
+                  type="url"
+                  value={editSourceUrl}
+                  onChange={e => setEditSourceUrl(e.target.value)}
+                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  placeholder="https://www.youtube.com/watch?v=..."
+                />
+                <p className="mt-1 text-[11px] text-slate-400">
+                  URL을 변경하면 이 항목이 재생하는 동영상이 변경됩니다. 기존 플레이리스트에는 변경된 URL이 적용됩니다.
+                </p>
+              </div>
+
+              {/* 읽기 전용 메타 */}
+              <div className="flex gap-4 text-[11px]">
                 <div>
-                  <p className="text-[11px] font-medium text-slate-400 mb-0.5">소스 URL (수정 불가)</p>
-                  <p className="text-xs text-slate-600 break-all">{sourceUrl}</p>
+                  <span className="font-medium text-slate-400">유형 · </span>
+                  <span className="text-slate-500 capitalize">{sourceType}</span>
                 </div>
-                <div className="flex gap-4">
-                  <div>
-                    <p className="text-[11px] font-medium text-slate-400 mb-0.5">유형</p>
-                    <p className="text-xs text-slate-600 capitalize">{sourceType}</p>
-                  </div>
-                  <div>
-                    <p className="text-[11px] font-medium text-slate-400 mb-0.5">등록일</p>
-                    <p className="text-xs text-slate-600">{new Date(createdAt).toLocaleDateString('ko-KR')}</p>
-                  </div>
+                <div>
+                  <span className="font-medium text-slate-400">등록일 · </span>
+                  <span className="text-slate-500">{new Date(createdAt).toLocaleDateString('ko-KR')}</span>
                 </div>
                 {editingSnapshot && (
                   <div>
-                    <p className="text-[11px] font-medium text-slate-400 mb-0.5">출처</p>
-                    <p className="text-xs text-slate-500">HUB 복사본 — 원본 콘텐츠는 변경되지 않습니다</p>
+                    <span className="font-medium text-slate-400">출처 · </span>
+                    <span className="text-slate-500">HUB 복사본</span>
                   </div>
                 )}
               </div>

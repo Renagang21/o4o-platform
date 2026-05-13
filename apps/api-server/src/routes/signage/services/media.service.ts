@@ -11,6 +11,30 @@ import type {
   MediaLibraryResponseDto,
 } from '../dto/index.js';
 
+function detectVideoSourceType(url: string): 'youtube' | 'vimeo' | null {
+  try {
+    const u = new URL(url);
+    if (u.hostname.includes('youtube.com') || u.hostname.includes('youtu.be')) return 'youtube';
+    if (u.hostname.includes('vimeo.com')) return 'vimeo';
+  } catch { /* invalid URL */ }
+  return null;
+}
+
+function extractEmbedId(sourceType: 'youtube' | 'vimeo', url: string): string | null {
+  try {
+    const u = new URL(url);
+    if (sourceType === 'youtube') {
+      if (u.hostname.includes('youtu.be')) return u.pathname.slice(1).split('?')[0];
+      return u.searchParams.get('v');
+    }
+    if (sourceType === 'vimeo') {
+      const m = u.pathname.match(/\/(\d+)/);
+      return m ? m[1] : null;
+    }
+  } catch { /* invalid URL */ }
+  return null;
+}
+
 export class SignageMediaService {
   private repository: SignageMediaRepository;
 
@@ -82,7 +106,21 @@ export class SignageMediaService {
     dto: UpdateMediaDto,
     scope: ScopeFilter,
   ): Promise<MediaResponseDto | null> {
-    const media = await this.repository.updateMedia(id, dto, scope);
+    // WO-O4O-STORE-SIGNAGE-SOURCEURL-EDIT-ENABLE-V1
+    // When sourceUrl is provided, derive sourceType and embedId automatically.
+    const updateData: UpdateMediaDto & { embedId?: string | null } = { ...dto };
+    if (dto.sourceUrl) {
+      const detected = detectVideoSourceType(dto.sourceUrl);
+      if (!detected) {
+        throw Object.assign(new Error('유튜브 또는 비메오 URL만 등록할 수 있습니다'), {
+          code: 'UNSUPPORTED_VIDEO_SOURCE',
+          statusCode: 400,
+        });
+      }
+      updateData.sourceType = detected;
+      updateData.embedId = extractEmbedId(detected, dto.sourceUrl);
+    }
+    const media = await this.repository.updateMedia(id, updateData, scope);
     if (!media) return null;
     return toMediaResponse(media);
   }

@@ -154,6 +154,10 @@ export interface CreateMediaDto {
 export interface UpdateMediaDto {
   name?: string;
   description?: string;
+  /** WO-O4O-STORE-SIGNAGE-SOURCEURL-EDIT-ENABLE-V1: store owner may change video URL */
+  sourceUrl?: string;
+  /** Derived automatically from sourceUrl when sourceUrl is provided */
+  sourceType?: 'youtube' | 'vimeo' | 'url' | 'cms';
   thumbnailUrl?: string;
   duration?: number;
   content?: string;

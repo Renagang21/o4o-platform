@@ -74,10 +74,11 @@ export const assetSnapshotApi = {
   },
 
   /**
-   * Update title/description/tags/thumbnailUrl of a store snapshot.
-   * description/tags/thumbnailUrl are merged into content_json.
+   * Update title/description/tags/thumbnailUrl/sourceUrl of a store snapshot.
+   * All fields except title are merged into content_json.
+   * WO-O4O-STORE-SIGNAGE-SOURCEURL-EDIT-ENABLE-V1: sourceUrl editing enabled.
    */
-  patch: (id: string, body: { title?: string; description?: string; tags?: string[]; thumbnailUrl?: string }) =>
+  patch: (id: string, body: { title?: string; description?: string; tags?: string[]; thumbnailUrl?: string; sourceUrl?: string }) =>
     apiClient.patch<{ success: boolean; data: AssetSnapshotItem }>(`/assets/${id}`, body),
 
   /**

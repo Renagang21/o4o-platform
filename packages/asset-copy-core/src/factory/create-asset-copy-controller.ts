@@ -16,6 +16,15 @@ import type { PermissionChecker } from '../interfaces/permission-checker.interfa
 
 type AuthMiddleware = RequestHandler;
 
+function detectSnapshotVideoSource(url: string): 'youtube' | 'vimeo' | null {
+  try {
+    const u = new URL(url);
+    if (u.hostname.includes('youtube.com') || u.hostname.includes('youtu.be')) return 'youtube';
+    if (u.hostname.includes('vimeo.com')) return 'vimeo';
+  } catch { /* invalid URL handled by caller */ }
+  return null;
+}
+
 /**
  * Create an asset copy controller for a specific service.
  *
@@ -221,17 +230,33 @@ export function createAssetCopyController(
       }
 
       const { id } = req.params;
-      const { title, description, tags, thumbnailUrl } = req.body as {
+      const { title, description, tags, thumbnailUrl, sourceUrl } = req.body as {
         title?: string;
         description?: string;
         tags?: string[];
         thumbnailUrl?: string;
+        /** WO-O4O-STORE-SIGNAGE-SOURCEURL-EDIT-ENABLE-V1: store owner may change video URL */
+        sourceUrl?: string;
       };
+
+      // WO-O4O-STORE-SIGNAGE-SOURCEURL-EDIT-ENABLE-V1: validate URL if provided
+      if (sourceUrl !== undefined) {
+        try { new URL(sourceUrl); } catch {
+          res.status(400).json({ success: false, error: { code: 'INVALID_URL', message: 'sourceUrl must be a valid URL' } });
+          return;
+        }
+      }
 
       const contentJsonPatch: Record<string, unknown> = {};
       if (description !== undefined) contentJsonPatch.description = description;
       if (tags !== undefined) contentJsonPatch.tags = tags;
       if (thumbnailUrl !== undefined) contentJsonPatch.thumbnailUrl = thumbnailUrl;
+      if (sourceUrl !== undefined) {
+        contentJsonPatch.sourceUrl = sourceUrl;
+        // Re-derive sourceType so contentJson stays consistent
+        const detected = detectSnapshotVideoSource(sourceUrl);
+        if (detected) contentJsonPatch.sourceType = detected;
+      }
 
       const updated = await service.updateById(id, orgId, {
         title: title?.trim() || undefined,
