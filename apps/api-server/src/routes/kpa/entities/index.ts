@@ -5,7 +5,6 @@
 export * from './kpa-member.entity.js';
 export * from './kpa-application.entity.js';
 export * from './kpa-join-inquiry.entity.js';
-export * from './kpa-steward.entity.js';
 export * from './kpa-member-service.entity.js';
 export * from './kpa-audit-log.entity.js';
 // WO-O4O-STORE-CORE-ENTITY-EXTRACTION-V1: re-export from store-core

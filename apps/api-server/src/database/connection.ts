@@ -251,7 +251,6 @@ import {
   NetureProduct,
   NetureProductLog,
 } from '../routes/neture/entities/index.js';
-import { KpaSteward } from '../routes/kpa/entities/kpa-steward.entity.js'; // WO-TYPEORM-ENTITY-REGISTRATION-FIX-V2
 // Guide Inline Edit entity (WO-O4O-GUIDE-CONTENT-DATASOURCE-REGISTER-V1)
 import { GuideContent } from '../routes/guide/entities/guide-content.entity.js';
 
@@ -766,8 +765,6 @@ export const AppDataSource = new DataSource({
     NeturePartner,
     NetureProduct,
     NetureProductLog,
-    // WO-TYPEORM-ENTITY-REGISTRATION-FIX-V2
-    KpaSteward,
     // WO-O4O-GUIDE-CONTENT-DATASOURCE-REGISTER-V1
     GuideContent,
     // ============================================================================

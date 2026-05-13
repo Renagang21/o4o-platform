@@ -10,13 +10,11 @@
  * │ ROUTE MANIFEST — Admin / Operator / Public 분류                      │
  * ├─────────────────────────────────────────────────────────────────────┤
  * │ ADMIN (kpa:admin scope required)                                    │
- * │  /admin             - 관리자 대시보드                                   │
  * │  /organizations     - 조직 관리 (CRUD)                                │
  * │  /members           - 회원 관리 (승인/거절)                             │
  * │  /applications      - 신청서 처리                                     │
  * │  /join-inquiries    - 참여 문의 관리                                   │
  * │  /organization-join-requests - 조직 가입 요청 관리                      │
- * │  /stewards          - 간사 관리                                       │
  * │  /forum/categories  - 포럼 카테고리 생성/수정/삭제 (구조 변경)             │
  * │  /operator/audit-logs - 감사 로그 조회                                 │
  * ├─────────────────────────────────────────────────────────────────────┤
@@ -57,7 +55,6 @@ import { ForumQueryService } from '../../modules/forum/index.js';
 import { createOrganizationController } from './controllers/organization.controller.js';
 import { createMemberController } from './controllers/member.controller.js';
 import { createApplicationController } from './controllers/application.controller.js';
-import { createAdminDashboardController } from './controllers/admin-dashboard.controller.js';
 import { createOperatorSummaryController } from './controllers/operator-summary.controller.js';
 import { createEventOfferOperatorController } from './controllers/event-offer-operator.controller.js';
 import { createSupplierOffersController } from './controllers/supplier-offers.controller.js';
@@ -66,7 +63,6 @@ import { createJoinInquiryAdminRoutes, createJoinInquiryPublicRoutes } from './c
 import { createContactRequestHandler, listContactRequestsHandler, updateContactRequestStatusHandler } from './controllers/contact-request.controller.js';
 import { createOrganizationJoinRequestRoutes } from './controllers/organization-join-request.controller.js';
 import { createPharmacyRequestRoutes } from './controllers/pharmacy-request.controller.js';
-import { createStewardController } from './controllers/steward.controller.js';
 import { createStoreHubController } from '../o4o-store/controllers/store-hub.controller.js';
 import { createPharmacyStoreConfigController } from '../o4o-store/controllers/pharmacy-store-config.controller.js';
 import { createPharmacyInfoController } from '../o4o-store/controllers/pharmacy-info.controller.js';
@@ -190,9 +186,6 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   router.use('/organizations', createOrganizationController(dataSource, coreRequireAuth as any, requireKpaScope));
   router.use('/members', createMemberController(dataSource, coreRequireAuth as any, requireKpaScope));
   router.use('/applications', createApplicationController(dataSource, coreRequireAuth as any, requireKpaScope));
-
-  // Admin Dashboard routes (WO-KPA-SOCIETY-DASHBOARD-P1-A)
-  router.use('/admin', createAdminDashboardController(dataSource, coreRequireAuth as any, requireKpaScope));
 
   // Admin Force Asset routes (WO-KPA-A-ASSET-CONTROL-EXTENSION-V2)
   router.use('/admin/force-assets', createAdminForceAssetController(dataSource, coreRequireAuth as any, requireKpaScope));
@@ -340,9 +333,6 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // Pharmacy Request routes (WO-KPA-A-PHARMACY-REQUEST-STRUCTURE-REALIGN-V1)
   // 약국 서비스 신청 — 개인 신원 확장 (OrganizationJoinRequest에서 분리)
   router.use('/pharmacy-requests', createPharmacyRequestRoutes(dataSource, coreRequireAuth as any, requireKpaScope, kpaActionLogService));
-
-  // Steward routes (WO-KPA-STEWARDSHIP-AND-ORGANIZATION-UI-IMPLEMENTATION-V1)
-  router.use('/stewards', createStewardController(dataSource, coreRequireAuth as any, requireKpaScope));
 
   // Legal Documents routes (WO-KPA-A-OPERATOR-DASHBOARD-ENHANCEMENT-V3)
   router.use('/', createLegalDocumentsController(dataSource, coreRequireAuth as any, requireKpaScope));
