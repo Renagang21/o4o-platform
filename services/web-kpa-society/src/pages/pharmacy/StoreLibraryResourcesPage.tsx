@@ -1,17 +1,13 @@
 /**
  * StoreLibraryResourcesPage — 내 자료함 / 자료
  *
- * WO-O4O-KPA-STORE-MATERIALS-AND-PRODUCTIONS-CANONICAL-ALIGN-V1
- * WO-O4O-KPA-STORE-PRODUCTION-ENTRY-CANONICAL-CORRECTION-V1: checkbox + 제작 시작 진입
- * WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: 커뮤니티 자료실에서 가져온 snapshot 도 함께 표시
- * WO-O4O-RESOURCES-LIBRARY-SNAPSHOT-DELETE-V1: snapshot 항목 삭제 지원 (DELETE /assets/:id)
+ * WO-O4O-STORE-LIBRARY-RESOURCE-SCREEN-CORRECTION-V1:
+ *   - "제작" 개념 제거. 본 화면은 콘텐츠를 만들 때 참고할 원소스 자료 보관/관리 전용.
+ *   - 콘텐츠 생성 / AI 생성 / 편집기 진입 / POP·QR·블로그·상품 상세설명 제작 진입점 없음.
  *
  * 매장이 보유한 자료(직접 업로드 + 커뮤니티 자료실 가져옴) 통합 목록.
- *   - 직접 업로드: store_execution_assets (GET /store/assets) ← WO-O4O-STORE-LIBRARY-TABLE-MERGE-V1
+ *   - 직접 업로드: store_execution_assets (GET /store/assets)
  *   - 커뮤니티 가져옴: o4o_asset_snapshots WHERE asset_type='resource' (GET /assets?type=resource)
- *
- * 본 페이지는 제작 시작 단일 진입점:
- *   자료 선택 → "제작 시작" → modal → 편집기 route 이동
  *
  * 삭제 정책:
  *   - 직접 업로드 항목: hard delete (DELETE /store/assets/:id)
@@ -19,7 +15,7 @@
  */
 
 import { useEffect, useState, useCallback, useMemo, type CSSProperties } from 'react';
-import { Library, ExternalLink, Trash2, RefreshCw, FileDown, Link as LinkIcon, FileText, Sparkles, Download } from 'lucide-react';
+import { Library, ExternalLink, Trash2, RefreshCw, FileDown, Link as LinkIcon, FileText, Download } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import {
   getStoreExecutionAssets,
@@ -29,7 +25,6 @@ import {
 } from '../../api/storeExecutionAssets';
 import { assetSnapshotApi, type AssetSnapshotItem } from '../../api/assetSnapshot';
 import { colors } from '../../styles/theme';
-import { StartProductionModal, type ProductionSource } from './StartProductionModal';
 
 const PAGE_LIMIT = 50;
 
@@ -44,7 +39,7 @@ type SourceKind = 'library' | 'snapshot';
 
 interface UnifiedResourceRow {
   id: string;                          // library: 'lib:<id>', snapshot: 'snap:<id>'
-  rawId: string;                       // 원본 id (삭제/제작 시 사용)
+  rawId: string;                       // 원본 id (삭제 시 사용)
   kind: SourceKind;
   title: string;
   description: string | null;
@@ -53,8 +48,6 @@ interface UnifiedResourceRow {
   updatedAt: string;
   href: string | null;
   sourceFileName: string | null;
-  // 제작 modal 진입 시 origin 분기용
-  modalOrigin: 'library' | 'snapshot';
 }
 
 function libraryToUnified(it: StoreExecutionAsset): UnifiedResourceRow {
@@ -69,7 +62,6 @@ function libraryToUnified(it: StoreExecutionAsset): UnifiedResourceRow {
     updatedAt: it.updatedAt,
     href: it.assetType === 'file' ? it.fileUrl : it.assetType === 'external-link' ? it.url : null,
     sourceFileName: it.fileName,
-    modalOrigin: 'library',
   };
 }
 
@@ -99,7 +91,6 @@ function snapshotToUnified(snap: AssetSnapshotItem): UnifiedResourceRow {
     updatedAt: snap.createdAt,
     href: sourceUrl,
     sourceFileName,
-    modalOrigin: 'snapshot',
   };
 }
 
@@ -108,8 +99,6 @@ export default function StoreLibraryResourcesPage() {
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalSource, setModalSource] = useState<ProductionSource | null>(null);
 
   const fetchItems = useCallback(async () => {
     setLoading(true);
@@ -189,20 +178,6 @@ export default function StoreLibraryResourcesPage() {
     else setSelected(new Set(items.map((it) => it.id)));
   };
 
-  const handleStartProduction = () => {
-    if (selected.size === 0) return;
-    const sourceItems: ProductionSource['items'] = items
-      .filter((it) => selected.has(it.id))
-      .map((it) => ({
-        id: it.rawId,
-        title: it.title,
-        description: it.description,
-        origin: it.modalOrigin,
-      }));
-    setModalSource({ fromLibrary: 'resources', items: sourceItems });
-    setModalOpen(true);
-  };
-
   // library + snapshot 항목 모두 일괄 삭제 가능.
   const handleBulkDelete = async () => {
     if (selected.size === 0) return;
@@ -252,7 +227,10 @@ export default function StoreLibraryResourcesPage() {
             자료
           </h1>
           <p style={styles.subtitle}>
-            보유한 자료를 선택하여 POP / QR / 블로그 / 상품 상세설명 제작을 시작합니다.
+            콘텐츠를 만들 때 참고할 원소스 자료를 보관합니다.
+          </p>
+          <p style={styles.subtitle}>
+            커뮤니티 자료를 가져오거나 직접 자료를 등록할 수 있습니다.
           </p>
         </div>
         <button onClick={fetchItems} style={styles.refreshBtn} disabled={loading}>
@@ -274,15 +252,6 @@ export default function StoreLibraryResourcesPage() {
             전체 선택 ({selected.size}/{visibleItems.length})
           </label>
           <div style={{ flex: 1 }} />
-          <button
-            type="button"
-            onClick={handleStartProduction}
-            disabled={selected.size === 0}
-            style={{ ...styles.startBtn, opacity: selected.size === 0 ? 0.5 : 1 }}
-          >
-            <Sparkles size={14} />
-            제작 시작
-          </button>
           <button
             type="button"
             onClick={handleBulkDelete}
@@ -378,11 +347,6 @@ export default function StoreLibraryResourcesPage() {
         </ul>
       )}
 
-      <StartProductionModal
-        open={modalOpen}
-        source={modalSource}
-        onClose={() => setModalOpen(false)}
-      />
     </div>
   );
 }
@@ -457,19 +421,6 @@ const styles: Record<string, CSSProperties> = {
     height: '16px',
     cursor: 'pointer',
     flexShrink: 0,
-  },
-  startBtn: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '8px 14px',
-    background: colors.primary,
-    border: 'none',
-    borderRadius: '6px',
-    fontSize: '13px',
-    color: colors.white,
-    fontWeight: 500,
-    cursor: 'pointer',
   },
   bulkDeleteBtn: {
     display: 'inline-flex',
