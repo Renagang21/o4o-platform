@@ -42,12 +42,16 @@ export class FixNetureSupplierRoleAssignments20260923000000 implements Migration
       const { user_id, sm_role, approved_by } = row;
       const assignedBy = approved_by || null;
 
-      // role_assignments에 supplier role 삽입 (ON CONFLICT 방어)
+      // role_assignments에 supplier role 삽입 (중복 방어: WHERE NOT EXISTS)
+      // unique_active_role_per_user 제약 조건이 없는 환경에서도 안전하게 동작.
       await queryRunner.query(`
         INSERT INTO role_assignments
           (user_id, role, assigned_by, is_active, valid_from, created_at, updated_at)
-        VALUES ($1, $2, $3, true, NOW(), NOW(), NOW())
-        ON CONFLICT ON CONSTRAINT "unique_active_role_per_user" DO UPDATE SET updated_at = NOW()
+        SELECT $1, $2, $3, true, NOW(), NOW(), NOW()
+        WHERE NOT EXISTS (
+          SELECT 1 FROM role_assignments
+          WHERE user_id = $1 AND role = $2 AND is_active = true
+        )
       `, [user_id, sm_role, assignedBy]);
 
       console.log(`[Migration] role_assignment created: user=${row.email} role=${sm_role}`);
@@ -77,12 +81,14 @@ export class FixNetureSupplierRoleAssignments20260923000000 implements Migration
       const contactEmail = email || null;
       const contactPhone = phone || null;
 
+      // ON CONFLICT (user_id) 불가 — neture_suppliers에 user_id unique constraint 없음
+      // WHERE NOT EXISTS로 중복 방지 후 INSERT
       const [inserted] = await queryRunner.query(`
         INSERT INTO neture_suppliers
           (user_id, slug, contact_email, contact_phone, representative_name,
            status, approved_by, approved_at, created_at, updated_at)
-        VALUES ($1, $2, $3, $4, $5, 'PENDING', $6, NULL, NOW(), NOW())
-        ON CONFLICT (user_id) DO NOTHING
+        SELECT $1, $2, $3, $4, $5, 'PENDING', $6, NULL, NOW(), NOW()
+        WHERE NOT EXISTS (SELECT 1 FROM neture_suppliers WHERE user_id = $1)
         RETURNING id
       `, [user_id, slug, contactEmail, contactPhone, representativeName, approved_by || null]);
 
