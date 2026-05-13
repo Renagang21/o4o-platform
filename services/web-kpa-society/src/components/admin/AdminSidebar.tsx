@@ -12,11 +12,8 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  Home,
+  LayoutDashboard,
   Users,
-  ClipboardCheck,
-  Wallet,
-  Settings,
   ChevronRight,
   ChevronDown,
 } from 'lucide-react';
@@ -30,47 +27,27 @@ type SidebarItem = { label: string; path: string; exact?: boolean };
 type SidebarGroup = { label: string; icon: LucideIcon; items: SidebarItem[] };
 
 /**
- * 표준 Admin Capability 순서:
- * Overview → Users → Approvals → Finance → System
+ * WO-O4O-KPA-ADMIN-SIDEBAR-IMPLEMENTATION-ALIGN-V1:
+ * 실제 구현된 라우트만 노출.
+ * 미구현(redirect fallback) 메뉴 제거.
+ *
+ * 구현 완료: 관리자 홈, 위원회 관리, Steward 관리
+ * 숨김(미구현): 신상신고, 연회비, 임원 관리, 설정, 회원 관리(→operator 공간)
  */
 const ADMIN_SIDEBAR_GROUPS: SidebarGroup[] = [
   {
     label: 'Overview',
-    icon: Home,
+    icon: LayoutDashboard,
     items: [
-      { label: '대시보드', path: '/admin/dashboard', exact: true },
-      { label: '플랫폼 운영', path: '/admin/kpa-dashboard' },
+      { label: '관리자 홈', path: '/admin/kpa-dashboard', exact: true },
     ],
   },
   {
     label: 'Users',
     icon: Users,
     items: [
-      { label: '회원 관리', path: '/admin/members' },
       { label: '위원회 관리', path: '/admin/committee-requests' },
       { label: 'Steward 관리', path: '/admin/stewards' },
-    ],
-  },
-  {
-    label: 'Approvals',
-    icon: ClipboardCheck,
-    items: [
-      { label: '신상신고', path: '/admin/annual-report' },
-    ],
-  },
-  {
-    label: 'Finance',
-    icon: Wallet,
-    items: [
-      { label: '연회비', path: '/admin/fee' },
-    ],
-  },
-  {
-    label: 'System',
-    icon: Settings,
-    items: [
-      { label: '임원 관리', path: '/admin/officers' },
-      { label: '설정', path: '/admin/settings' },
     ],
   },
 ];
@@ -83,7 +60,10 @@ export function AdminSidebar() {
   const { pathname } = useLocation();
 
   const isItemActive = (path: string, exact?: boolean) => {
-    if (exact) return pathname === path || pathname === '/admin' || pathname === '/admin/';
+    if (exact) {
+      // 관리자 홈(/admin/kpa-dashboard)은 /admin 루트에서도 active
+      return pathname === path || pathname === '/admin' || pathname === '/admin/';
+    }
     return pathname === path || pathname.startsWith(path + '/');
   };
 
@@ -105,14 +85,14 @@ export function AdminSidebar() {
 
   return (
     <aside className="fixed left-0 top-16 h-[calc(100vh-4rem)] w-[260px] bg-white border-r border-gray-200 flex flex-col z-40">
-      {/* 지부 정보 */}
+      {/* 관리자 식별 헤더 */}
       <div className="flex items-center gap-3 px-5 py-6 border-b border-gray-200">
-        <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center">
+        <div className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center">
           <span className="text-white text-lg font-bold">KPA</span>
         </div>
         <div>
           <div className="text-base font-semibold text-gray-900">서울특별시약사회</div>
-          <div className="text-xs text-blue-600 mt-0.5">지부 관리자</div>
+          <div className="text-xs text-indigo-600 mt-0.5">관리자</div>
         </div>
       </div>
 
@@ -133,7 +113,7 @@ export function AdminSidebar() {
                 to={item.path}
                 className={`flex items-center gap-3 px-5 py-3 text-sm font-medium transition-colors border-l-2 ${
                   isItemActive(item.path, item.exact)
-                    ? 'bg-blue-50 text-blue-600 border-blue-600'
+                    ? 'bg-indigo-50 text-indigo-600 border-indigo-600'
                     : 'text-gray-600 border-transparent hover:bg-gray-50 hover:text-gray-900'
                 }`}
               >
@@ -150,7 +130,7 @@ export function AdminSidebar() {
                 onClick={() => toggleGroup(group.label)}
                 className={`w-full flex items-center gap-3 px-5 py-3 text-sm font-medium transition-colors border-l-2 ${
                   active
-                    ? 'text-blue-600 border-blue-600'
+                    ? 'text-indigo-600 border-indigo-600'
                     : 'text-gray-600 border-transparent hover:bg-gray-50 hover:text-gray-900'
                 }`}
               >
@@ -171,7 +151,7 @@ export function AdminSidebar() {
                       to={item.path}
                       className={`block pl-12 pr-5 py-2 text-sm transition-colors ${
                         isItemActive(item.path, item.exact)
-                          ? 'text-blue-600 bg-blue-50 font-medium'
+                          ? 'text-indigo-600 bg-indigo-50 font-medium'
                           : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
                       }`}
                     >
