@@ -27,14 +27,12 @@ import { BookOpen, Sparkles, Trash2, RefreshCw, Search, FileText, PenSquare, Inf
 import { toast } from '@o4o/error-handling';
 import { DataTable, Pagination } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
-import { AiContentModal } from '@o4o/content-editor';
 import {
   storeAssetControlApi,
   storeLibraryApi,
   type StoreAssetItem,
   type LibraryContentItem,
 } from '../../api/assetSnapshot';
-import { getAccessToken } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
 import { StartProductionModal, type ProductionSource, type ProductionSourceItem } from './StartProductionModal';
 import { CreateContentFromResourcesModal } from './CreateContentFromResourcesModal';
@@ -232,32 +230,28 @@ export default function StoreLibraryContentsPage() {
   const [modalSource, setModalSource] = useState<ProductionSource | null>(null);
   const [createFromResourcesOpen, setCreateFromResourcesOpen] = useState(false);
 
-  // WO-O4O-STORE-PRODUCTION-MATERIALS-FLOW-REALIGN-V1: AI 제작 자료 초안 모달
-  const [aiOpen, setAiOpen] = useState(false);
-  const [aiInitialText, setAiInitialText] = useState<string | undefined>(undefined);
-  const [aiSourceMetadata, setAiSourceMetadata] = useState<
-    { sourceContentId?: string; sourceTitle?: string; sourceOrigin?: string } | undefined
-  >(undefined);
-
   const openProduction = useCallback((items: ProductionSourceItem[]) => {
     if (items.length === 0) return;
     setModalSource({ fromLibrary: 'contents', items });
     setModalOpen(true);
   }, []);
 
-  // StartProductionModal → AI 흐름: composeSourceTextFromItems → AiContentModal(initialText=...)
+  // WO-O4O-STORE-PRODUCTION-MATERIALS-STANDARD-EDITOR-APPLY-V1:
+  // AI 흐름 → ProductionMaterialEditorPage (RichTextEditor 기반 편집기)
   const handleAiAction = useCallback((source: ProductionSource) => {
     const text = composeSourceTextFromItems(source.items);
-    setAiInitialText(text || undefined);
-    // 첫 번째 항목을 source metadata로 사용 (단일 선택 대표)
     const first = source.items[0];
-    setAiSourceMetadata(first ? {
-      sourceContentId: first.id,
-      sourceTitle: first.title,
-      sourceOrigin: first.origin,
-    } : undefined);
-    setAiOpen(true);
-  }, []);
+    navigate('/store/library/production-materials/new', {
+      state: {
+        initialText: text || undefined,
+        sourceMetadata: first ? {
+          sourceContentId: first.id,
+          sourceTitle: first.title,
+          sourceOrigin: first.origin,
+        } : undefined,
+      },
+    });
+  }, [navigate]);
 
   const removeSnapshots = useCallback(async (snapshotIds: string[]): Promise<number> => {
     if (snapshotIds.length === 0) return 0;
@@ -349,25 +343,6 @@ export default function StoreLibraryContentsPage() {
         onCreated={reload}
       />
 
-      {/* WO-O4O-STORE-PRODUCTION-MATERIALS-FLOW-REALIGN-V1:
-          콘텐츠 선택 → AI 제작 자료 초안 → store_execution_assets 저장 */}
-      <AiContentModal
-        open={aiOpen}
-        onClose={() => {
-          setAiOpen(false);
-          setAiInitialText(undefined);
-          setAiSourceMetadata(undefined);
-        }}
-        editor={null}
-        initialText={aiInitialText}
-        sourceMetadata={aiSourceMetadata}
-        showProductionMaterialSave
-        headerLabel="AI 제작 자료 초안 만들기"
-        aiRequestHeaders={(() => {
-          const token = getAccessToken();
-          return token ? { Authorization: `Bearer ${token}` } : undefined;
-        })()}
-      />
     </div>
   );
 }

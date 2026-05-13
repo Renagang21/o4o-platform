@@ -22,7 +22,8 @@
  */
 
 import { useEffect, useState, useCallback, type CSSProperties } from 'react';
-import { Layers, Trash2, RefreshCw, FileEdit } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Layers, Trash2, RefreshCw, FileEdit, Plus } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { directContentApi } from '../../api/assetSnapshot';
 import {
@@ -86,6 +87,7 @@ function fromLabel(f?: string) {
 // ─── 컴포넌트 ─────────────────────────────────────────────────────────────────
 
 export default function StoreProductionMaterialsPage() {
+  const navigate = useNavigate();
   const [items, setItems]           = useState<ProductionMaterialItem[]>([]);
   const [loading, setLoading]       = useState(true);
   const [error, setError]           = useState<string | null>(null);
@@ -220,10 +222,18 @@ export default function StoreProductionMaterialsPage() {
           </h1>
           <p style={styles.subtitle}>
             AI로 생성하거나 편집한 POP·QR·블로그·상품 상세설명 제작 결과물을 관리합니다.
-            새 제작 자료를 만들려면 <strong>내 자료함 → 콘텐츠</strong>에서 콘텐츠를 선택하세요.
+            새 제작 자료를 만들려면 <strong>내 자료함 → 자료</strong>에서 자료를 선택한 뒤 제작 작업을 시작합니다.
           </p>
         </div>
         <div style={styles.headerActions}>
+          <button
+            type="button"
+            onClick={() => navigate('/store/library/resources')}
+            style={styles.newBtn}
+          >
+            <Plus size={14} />
+            새 제작 자료 만들기
+          </button>
           <button onClick={fetchAll} style={styles.refreshBtn} disabled={loading}>
             <RefreshCw size={14} />
             새로고침
@@ -267,8 +277,16 @@ export default function StoreProductionMaterialsPage() {
             저장된 제작 자료가 없습니다.
           </p>
           <p style={{ margin: '8px 0 0 0', color: colors.neutral400, fontSize: 13, lineHeight: 1.6 }}>
-            내 자료함 → 콘텐츠에서 콘텐츠를 선택한 뒤 "AI 제작 자료 초안 만들기"를 실행하세요.
+            내 자료함 → 자료에서 자료를 선택한 뒤 "AI 제작 자료 초안 만들기"를 실행하세요.
           </p>
+          <button
+            type="button"
+            onClick={() => navigate('/store/library/resources')}
+            style={{ ...styles.newBtn, marginTop: 16 }}
+          >
+            <Plus size={14} />
+            새 제작 자료 만들기
+          </button>
         </div>
       ) : (
         <div style={styles.tableWrap}>
@@ -394,6 +412,19 @@ const styles: Record<string, CSSProperties> = {
     alignItems: 'center',
     gap: '8px',
     flexShrink: 0,
+  },
+  newBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '6px 14px',
+    background: colors.primary,
+    border: 'none',
+    borderRadius: '6px',
+    fontSize: '13px',
+    color: colors.white,
+    fontWeight: 500,
+    cursor: 'pointer',
   },
   refreshBtn: {
     display: 'inline-flex',
