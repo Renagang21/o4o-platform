@@ -158,52 +158,90 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
   }));
 
   // ─── POST /list — Store Listing 생성 ─────────────────────────────────
+  // WO-O4O-KPA-STORE-MY-PRODUCTS-FLOW-SIMPLIFY-V1:
+  //   offer 기반 (offerId 전달 시) + master 기반 (masterId만 전달 시) 양방향 지원.
+  //   master 기반 등록 시 offer_id = NULL, 공급 연결 없이 매장 상품 생성.
   router.post('/list', requireAuth, requireStoreOwner as RequestHandler, asyncHandler(async (req: Request, res: Response) => {
     const organizationId = (req as any).organizationId;
-    const { offerId, price } = req.body;
+    const { offerId, masterId, price } = req.body;
 
-    if (!offerId) {
-      return res.status(400).json({ success: false, error: { code: 'INVALID_INPUT', message: 'offerId is required' } });
+    if (!offerId && !masterId) {
+      return res.status(400).json({ success: false, error: { code: 'INVALID_INPUT', message: 'offerId or masterId is required' } });
     }
 
-    // Verify offer exists and is APPROVED + active
-    const offerRows = await dataSource.query(
-      `SELECT spo.id, spo.master_id
-       FROM supplier_product_offers spo
-       WHERE spo.id = $1
-         AND spo.approval_status = 'APPROVED'
-         AND spo.is_active = true`,
-      [offerId],
-    );
-
-    if (offerRows.length === 0) {
-      return res.status(404).json({ success: false, error: { code: 'OFFER_NOT_FOUND', message: 'Approved offer not found' } });
-    }
-
-    const masterId = offerRows[0].master_id;
     const listingPrice = price != null ? Number(price) : null;
 
-    // Insert listing (ON CONFLICT DO NOTHING for idempotency)
-    const insertResult = await dataSource.query(
-      `INSERT INTO organization_product_listings
-        (id, organization_id, service_key, master_id, offer_id, is_active, price, created_at, updated_at)
-       VALUES
-        (gen_random_uuid(), $1, 'neture', $2, $3, true, $4, NOW(), NOW())
-       ON CONFLICT (organization_id, service_key, offer_id) DO NOTHING
-       RETURNING *`,
-      [organizationId, masterId, offerId, listingPrice],
-    );
+    if (offerId) {
+      // ── Offer 기반 등록 (기존 흐름 유지) ─────────────────────────────
+      const offerRows = await dataSource.query(
+        `SELECT spo.id, spo.master_id
+         FROM supplier_product_offers spo
+         WHERE spo.id = $1
+           AND spo.approval_status = 'APPROVED'
+           AND spo.is_active = true`,
+        [offerId],
+      );
 
-    if (insertResult.length === 0) {
-      // Already exists
-      const existing = await listingRepo.findOne({
-        where: { organization_id: organizationId, offer_id: offerId },
-      });
-      return res.json({ success: true, data: existing, message: 'ALREADY_LISTED' });
+      if (offerRows.length === 0) {
+        return res.status(404).json({ success: false, error: { code: 'OFFER_NOT_FOUND', message: 'Approved offer not found' } });
+      }
+
+      const resolvedMasterId = offerRows[0].master_id;
+
+      const insertResult = await dataSource.query(
+        `INSERT INTO organization_product_listings
+          (id, organization_id, service_key, master_id, offer_id, is_active, price, created_at, updated_at)
+         VALUES
+          (gen_random_uuid(), $1, 'neture', $2, $3, true, $4, NOW(), NOW())
+         ON CONFLICT (organization_id, service_key, offer_id) DO NOTHING
+         RETURNING *`,
+        [organizationId, resolvedMasterId, offerId, listingPrice],
+      );
+
+      if (insertResult.length === 0) {
+        const existing = await listingRepo.findOne({
+          where: { organization_id: organizationId, offer_id: offerId },
+        });
+        return res.json({ success: true, data: existing, message: 'ALREADY_LISTED' });
+      }
+
+      logger.info(`[StoreProductLibrary] Listing created (offer): org=${organizationId}, offer=${offerId}`);
+      return res.status(201).json({ success: true, data: insertResult[0] });
+
+    } else {
+      // ── Master 기반 등록 (offer_id = NULL) ────────────────────────────
+      const masterRows = await dataSource.query(
+        `SELECT id FROM product_masters WHERE id = $1`,
+        [masterId],
+      );
+
+      if (masterRows.length === 0) {
+        return res.status(404).json({ success: false, error: { code: 'MASTER_NOT_FOUND', message: 'Product master not found' } });
+      }
+
+      const insertResult = await dataSource.query(
+        `INSERT INTO organization_product_listings
+          (id, organization_id, service_key, master_id, offer_id, is_active, price, created_at, updated_at)
+         VALUES
+          (gen_random_uuid(), $1, 'neture', $2, NULL, true, $3, NOW(), NOW())
+         ON CONFLICT (organization_id, service_key, master_id) WHERE offer_id IS NULL DO NOTHING
+         RETURNING *`,
+        [organizationId, masterId, listingPrice],
+      );
+
+      if (insertResult.length === 0) {
+        const existingRows = await dataSource.query(
+          `SELECT * FROM organization_product_listings
+           WHERE organization_id = $1 AND service_key = 'neture' AND master_id = $2 AND offer_id IS NULL
+           LIMIT 1`,
+          [organizationId, masterId],
+        );
+        return res.json({ success: true, data: existingRows[0] ?? null, message: 'ALREADY_LISTED' });
+      }
+
+      logger.info(`[StoreProductLibrary] Listing created (master): org=${organizationId}, master=${masterId}`);
+      return res.status(201).json({ success: true, data: insertResult[0] });
     }
-
-    logger.info(`[StoreProductLibrary] Listing created: org=${organizationId}, offer=${offerId}`);
-    res.status(201).json({ success: true, data: insertResult[0] });
   }));
 
   // ─── GET / — 내 매장 진열 목록 ───────────────────────────────────────

@@ -22,13 +22,12 @@ import { BaseTable } from '@o4o/ui';
 import type { O4OColumn } from '@o4o/ui';
 import { toast } from 'react-hot-toast';
 import {
-  Plus, Search, RefreshCw, Package, ChevronRight,
+  Plus, Search, RefreshCw, Package,
   ToggleLeft, ToggleRight, Pencil, X, Tv2, ShoppingCart, Image as ImageLucide,
 } from 'lucide-react';
 import StoreProductImageManagerModal from './StoreProductImageManagerModal.js';
 import {
   searchStoreProducts,
-  getMasterOffers,
   createStoreListing,
   getMyStoreListings,
   updateStoreListing,
@@ -41,7 +40,6 @@ import {
 import type {
   StoreListingItem,
   StoreProductSearchResult,
-  StoreProductOffer,
   StoreChannel,
 } from './types.js';
 
@@ -55,22 +53,15 @@ const CHANNEL_ICON: Record<string, typeof ShoppingCart> = {
 
 const PAGE_SIZE = 20;
 
-// ── 등록 모달 (3-step) ────────────────────────────────────────────────────────
-
-type RegisterStep = 'search' | 'offer' | 'confirm';
+// ── 등록 모달 (2-step: 검색 → 선택 즉시 등록) ────────────────────────────────
+// WO-O4O-KPA-STORE-MY-PRODUCTS-FLOW-SIMPLIFY-V1
 
 function RegisterModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () => void }) {
-  const [step, setStep] = useState<RegisterStep>('search');
   const [query, setQuery] = useState('');
   const [searchResults, setSearchResults] = useState<StoreProductSearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
-  const [selectedMaster, setSelectedMaster] = useState<StoreProductSearchResult | null>(null);
-  const [offers, setOffers] = useState<StoreProductOffer[]>([]);
-  const [isLoadingOffers, setIsLoadingOffers] = useState(false);
-  const [selectedOffer, setSelectedOffer] = useState<StoreProductOffer | null>(null);
-  const [priceInput, setPriceInput] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [registeringId, setRegisteringId] = useState<string | null>(null);
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleQueryChange = (value: string) => {
@@ -85,9 +76,7 @@ function RegisterModal({ onClose, onSuccess }: { onClose: () => void; onSuccess:
         setSearchResults(res.data ?? []);
       } catch (e: unknown) {
         setSearchResults([]);
-        const status = (e as { response?: { status?: number }; status?: number })?.response?.status
-          ?? (e as { status?: number })?.status
-          ?? null;
+        const status = (e as { response?: { status?: number } })?.response?.status ?? null;
         if (status === 403) {
           setSearchError('상품 검색 권한이 없습니다. 매장 소유자 권한이 필요합니다.');
         } else if (status === 401) {
@@ -101,25 +90,10 @@ function RegisterModal({ onClose, onSuccess }: { onClose: () => void; onSuccess:
     }, 350);
   };
 
-  const handleSelectMaster = async (master: StoreProductSearchResult) => {
-    setSelectedMaster(master);
-    setStep('offer');
-    setIsLoadingOffers(true);
+  const handleSelect = async (master: StoreProductSearchResult) => {
+    setRegisteringId(master.id);
     try {
-      setOffers(await getMasterOffers(master.id));
-    } catch {
-      toast.error('공급 제안 조회 중 오류가 발생했습니다.');
-    } finally {
-      setIsLoadingOffers(false);
-    }
-  };
-
-  const handleRegister = async () => {
-    if (!selectedOffer) return;
-    setIsSubmitting(true);
-    try {
-      const price = priceInput.trim() ? Number(priceInput.trim()) : undefined;
-      const res = await createStoreListing(selectedOffer.id, price);
+      const res = await createStoreListing(master.id);
       if (res.success) {
         if (res.message === 'ALREADY_LISTED') {
           toast('이미 등록된 상품입니다.', { icon: 'ℹ️' });
@@ -134,7 +108,7 @@ function RegisterModal({ onClose, onSuccess }: { onClose: () => void; onSuccess:
     } catch {
       toast.error('등록 중 오류가 발생했습니다.');
     } finally {
-      setIsSubmitting(false);
+      setRegisteringId(null);
     }
   };
 
@@ -144,158 +118,72 @@ function RegisterModal({ onClose, onSuccess }: { onClose: () => void; onSuccess:
         <div className="flex items-center justify-between border-b px-5 py-4">
           <div>
             <h3 className="text-base font-semibold text-gray-900">상품 등록</h3>
-            <p className="text-xs text-gray-500 mt-0.5">
-              {step === 'search' && '상품명 또는 바코드로 검색하세요.'}
-              {step === 'offer' && `"${selectedMaster?.name}" 공급 제안을 선택하세요.`}
-              {step === 'confirm' && '등록 가격을 설정하고 확인하세요.'}
-            </p>
+            <p className="text-xs text-gray-500 mt-0.5">상품명 또는 바코드로 검색 후 선택하면 바로 등록됩니다.</p>
           </div>
           <button onClick={onClose} className="rounded-full p-1 hover:bg-gray-100">
             <X size={18} className="text-gray-500" />
           </button>
         </div>
 
-        <div className="flex items-center gap-1 px-5 py-2 text-xs text-gray-400 border-b">
-          <span className={step === 'search' ? 'font-semibold text-blue-600' : ''}>1. 상품 검색</span>
-          <ChevronRight size={12} />
-          <span className={step === 'offer' ? 'font-semibold text-blue-600' : ''}>2. 공급 제안 선택</span>
-          <ChevronRight size={12} />
-          <span className={step === 'confirm' ? 'font-semibold text-blue-600' : ''}>3. 등록 확인</span>
-        </div>
-
         <div className="flex-1 overflow-y-auto px-5 py-4">
-          {step === 'search' && (
-            <div className="space-y-3">
-              <div className="relative">
-                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input
-                  autoFocus
-                  type="text"
-                  placeholder="상품명 또는 바코드 입력..."
-                  value={query}
-                  onChange={(e) => handleQueryChange(e.target.value)}
-                  className="w-full rounded-lg border border-gray-200 py-2 pl-9 pr-3 text-sm focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-300"
-                />
-              </div>
-              {!isSearching && !query.trim() && (
-                <p className="text-center text-xs text-gray-400 py-4">상품명 또는 바코드를 입력하면 검색이 시작됩니다.</p>
-              )}
-              {isSearching && <p className="text-center text-xs text-gray-400 py-4">검색 중...</p>}
-              {!isSearching && searchError && (
-                <p className="text-center text-xs text-red-500 py-4">{searchError}</p>
-              )}
-              {!isSearching && !searchError && query.trim() && searchResults.length === 0 && (
-                <p className="text-center text-xs text-gray-400 py-4">검색 결과가 없습니다.</p>
-              )}
-              {!isSearching && !searchError && searchResults.length > 0 && (
-                <ul className="space-y-1.5">
-                  {searchResults.map((m) => (
-                    <li key={m.id}>
-                      <button
-                        onClick={() => handleSelectMaster(m)}
-                        className="w-full flex items-center gap-3 rounded-lg border border-gray-100 bg-gray-50 p-3 text-left hover:border-blue-300 hover:bg-blue-50 transition-colors"
-                      >
-                        {m.primaryImageUrl ? (
-                          <img src={m.primaryImageUrl} alt={m.name} className="h-10 w-10 flex-shrink-0 rounded object-cover" />
-                        ) : (
-                          <div className="h-10 w-10 flex-shrink-0 rounded bg-gray-200 flex items-center justify-center">
-                            <Package size={16} className="text-gray-400" />
-                          </div>
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">{m.name}</p>
-                          <p className="text-xs text-gray-500">{m.manufacturerName} · 바코드: {m.barcode}</p>
-                        </div>
-                        <span className={`flex-shrink-0 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
-                          m.offerCount > 0 ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'
-                        }`}>
-                          {m.offerCount > 0 ? `공급 ${m.offerCount}건` : '공급 없음'}
-                        </span>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
+          <div className="space-y-3">
+            <div className="relative">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                autoFocus
+                type="text"
+                placeholder="상품명 또는 바코드 입력..."
+                value={query}
+                onChange={(e) => handleQueryChange(e.target.value)}
+                className="w-full rounded-lg border border-gray-200 py-2 pl-9 pr-3 text-sm focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-300"
+              />
             </div>
-          )}
-
-          {step === 'offer' && (
-            <div className="space-y-3">
-              <button onClick={() => setStep('search')} className="text-xs text-blue-600 hover:underline">← 다시 검색</button>
-              {isLoadingOffers && <p className="text-center text-xs text-gray-400 py-4">조회 중...</p>}
-              {!isLoadingOffers && offers.length === 0 && (
-                <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-                  공급 제안이 없는 상품입니다. 공급자가 제안을 등록한 후 추가할 수 있습니다.
-                </div>
-              )}
-              {!isLoadingOffers && offers.length > 0 && (
-                <ul className="space-y-2">
-                  {offers.map((offer) => (
-                    <li key={offer.id}>
-                      <button
-                        onClick={() => { setSelectedOffer(offer); setStep('confirm'); }}
-                        className="w-full rounded-lg border border-gray-100 bg-gray-50 p-4 text-left hover:border-blue-300 hover:bg-blue-50 transition-colors"
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <p className="text-sm font-medium text-gray-900">{offer.supplierName}</p>
-                            {offer.effectiveShortDescription && (
-                              <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{offer.effectiveShortDescription}</p>
-                            )}
-                          </div>
-                          <p className="flex-shrink-0 text-sm font-semibold text-gray-900">
-                            {offer.priceGeneral.toLocaleString()}원
-                          </p>
+            {!isSearching && !query.trim() && (
+              <p className="text-center text-xs text-gray-400 py-4">상품명 또는 바코드를 입력하면 검색이 시작됩니다.</p>
+            )}
+            {isSearching && <p className="text-center text-xs text-gray-400 py-4">검색 중...</p>}
+            {!isSearching && searchError && (
+              <p className="text-center text-xs text-red-500 py-4">{searchError}</p>
+            )}
+            {!isSearching && !searchError && query.trim() && searchResults.length === 0 && (
+              <p className="text-center text-xs text-gray-400 py-4">등록된 상품 정보가 없습니다.</p>
+            )}
+            {!isSearching && !searchError && searchResults.length > 0 && (
+              <ul className="space-y-1.5">
+                {searchResults.map((m) => (
+                  <li key={m.id}>
+                    <button
+                      onClick={() => handleSelect(m)}
+                      disabled={registeringId === m.id}
+                      className="w-full flex items-center gap-3 rounded-lg border border-gray-100 bg-gray-50 p-3 text-left hover:border-blue-300 hover:bg-blue-50 transition-colors disabled:opacity-60"
+                    >
+                      {m.primaryImageUrl ? (
+                        <img src={m.primaryImageUrl} alt={m.name} className="h-10 w-10 flex-shrink-0 rounded object-cover" />
+                      ) : (
+                        <div className="h-10 w-10 flex-shrink-0 rounded bg-gray-200 flex items-center justify-center">
+                          <Package size={16} className="text-gray-400" />
                         </div>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          )}
-
-          {step === 'confirm' && selectedMaster && selectedOffer && (
-            <div className="space-y-4">
-              <button onClick={() => setStep('offer')} className="text-xs text-blue-600 hover:underline">← 공급 제안 다시 선택</button>
-              <div className="rounded-lg border border-gray-200 p-4 space-y-1.5 text-sm">
-                {[
-                  ['상품명', selectedMaster.name],
-                  ['제조사', selectedMaster.manufacturerName],
-                  ['바코드', selectedMaster.barcode],
-                  ['공급사', selectedOffer.supplierName],
-                  ['공급가', `${selectedOffer.priceGeneral.toLocaleString()}원`],
-                ].map(([k, v]) => (
-                  <div key={k} className="flex justify-between">
-                    <span className="text-gray-500">{k}</span>
-                    <span className={k === '공급가' ? 'font-semibold text-gray-900' : 'text-gray-700 text-right max-w-[60%]'}>{v}</span>
-                  </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">{m.name}</p>
+                        <p className="text-xs text-gray-500">
+                          {m.manufacturerName}
+                          {m.barcode ? ` · ${m.barcode}` : ''}
+                        </p>
+                      </div>
+                      <span className="flex-shrink-0 text-xs font-medium text-blue-600">
+                        {registeringId === m.id ? '등록 중...' : '등록'}
+                      </span>
+                    </button>
+                  </li>
                 ))}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  매장 판매가 <span className="text-xs font-normal text-gray-400">(선택, 비워두면 공급가 사용)</span>
-                </label>
-                <input
-                  type="number"
-                  min={0}
-                  placeholder={`기본: ${selectedOffer.priceGeneral.toLocaleString()}원`}
-                  value={priceInput}
-                  onChange={(e) => setPriceInput(e.target.value)}
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-300"
-                />
-              </div>
-            </div>
-          )}
+              </ul>
+            )}
+          </div>
         </div>
 
-        <div className="border-t px-5 py-4 flex justify-end gap-3">
-          <button onClick={onClose} disabled={isSubmitting} className="rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50">취소</button>
-          {step === 'confirm' && (
-            <button onClick={handleRegister} disabled={isSubmitting} className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50">
-              {isSubmitting ? '등록 중...' : '매장 상품 등록'}
-            </button>
-          )}
+        <div className="border-t px-5 py-4 flex justify-end">
+          <button onClick={onClose} className="rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50">닫기</button>
         </div>
       </div>
     </div>
@@ -329,7 +217,7 @@ function EditPriceModal({ listing, onClose, onSuccess }: { listing: StoreListing
         </label>
         <input
           autoFocus type="number" min={0}
-          placeholder={`공급가: ${listing.offerPrice.toLocaleString()}원`}
+          placeholder={listing.offerPrice != null ? `공급가: ${listing.offerPrice.toLocaleString()}원` : '판매가 입력'}
           value={price} onChange={(e) => setPrice(e.target.value)}
           className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-300 mb-5"
         />
@@ -354,6 +242,7 @@ function EditDescModal({ listing, onClose, onSuccess }: { listing: StoreListingI
     if (!shortDesc.trim()) { toast.error('설명을 입력하세요.'); return; }
     setIsSubmitting(true);
     try {
+      if (!listing.offerId) { toast.error('공급 연결이 없는 상품은 설명을 수정할 수 없습니다.'); return; }
       const res = await updateListingDescription(listing.offerId, { shortDescription: shortDesc.trim() });
       if (res.success) { toast.success('설명이 저장되었습니다.'); onSuccess(); onClose(); }
       else toast.error('저장 중 오류가 발생했습니다.');
@@ -706,7 +595,7 @@ export default function StoreProductsManagerPage({
       key: 'offerPrice',
       header: '공급가',
       width: 100,
-      render: (row) => <span className="text-sm text-gray-500">{row.offerPrice.toLocaleString()}원</span>,
+      render: (row) => <span className="text-sm text-gray-500">{row.offerPrice != null ? `${row.offerPrice.toLocaleString()}원` : '-'}</span>,
     },
     {
       key: 'price',

@@ -174,24 +174,24 @@ export default function StoreListingsPage() {
                 </h3>
                 <p className="text-xs text-slate-400 mt-0.5">{listing.barcode} · {listing.manufacturerName}</p>
                 <div className="flex items-center gap-3 mt-1.5 flex-wrap">
-                  <span className="text-xs text-slate-500">
-                    공급:{' '}
-                    {listing.supplierId ? (
+                  {listing.supplierId && (
+                    <span className="text-xs text-slate-500">
+                      공급:{' '}
                       <button
                         type="button"
-                        onClick={() => setConditionTarget({ id: listing.supplierId!, name: listing.supplierName })}
+                        onClick={() => setConditionTarget({ id: listing.supplierId!, name: listing.supplierName ?? '' })}
                         className="text-primary-600 hover:underline font-medium"
                       >
                         {listing.supplierName}
                       </button>
-                    ) : (
-                      listing.supplierName
-                    )}
-                    {' · '}{formatPrice(listing.offerPrice)}
-                  </span>
-                  <span className="inline-block px-1.5 py-0.5 text-xs bg-slate-100 text-slate-500 rounded">
-                    {listing.distributionType === 'PUBLIC' ? '공개' : '비공개'}
-                  </span>
+                      {listing.offerPrice != null && <>{' · '}{formatPrice(listing.offerPrice)}</>}
+                    </span>
+                  )}
+                  {listing.distributionType && (
+                    <span className="inline-block px-1.5 py-0.5 text-xs bg-slate-100 text-slate-500 rounded">
+                      {listing.distributionType === 'PUBLIC' ? '공개' : '비공개'}
+                    </span>
+                  )}
                 </div>
               </div>
 

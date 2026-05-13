@@ -76,10 +76,11 @@ export class OrganizationProductListing {
   @JoinColumn({ name: 'master_id' })
   master?: ProductMaster;
 
-  @Column({ name: 'offer_id', type: 'uuid' })
-  offer_id: string;
+  /** WO-O4O-KPA-STORE-MY-PRODUCTS-FLOW-SIMPLIFY-V1: nullable — ProductMaster 기반 등록 시 NULL */
+  @Column({ name: 'offer_id', type: 'uuid', nullable: true })
+  offer_id: string | null;
 
-  @ManyToOne('SupplierProductOffer', { onDelete: 'CASCADE' })
+  @ManyToOne('SupplierProductOffer', { onDelete: 'CASCADE', nullable: true })
   @JoinColumn({ name: 'offer_id' })
   offer?: SupplierProductOffer;
 

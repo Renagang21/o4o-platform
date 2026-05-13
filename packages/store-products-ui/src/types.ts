@@ -41,9 +41,10 @@ export interface StoreProductOffer {
 
 export interface StoreListingItem {
   id: string;                              // OrganizationProductListing.id
-  offerId: string;                         // SupplierProductOffer.id (for description override)
+  /** WO-O4O-KPA-STORE-MY-PRODUCTS-FLOW-SIMPLIFY-V1: master 기반 등록 시 null */
+  offerId: string | null;                  // SupplierProductOffer.id (null = master-only listing)
   isActive: boolean;
-  price: number | null;                    // 매장 override 가격 (null = offer 기본가 사용)
+  price: number | null;                    // 매장 override 가격 (null = 미설정)
   createdAt: string;
   updatedAt: string;
   masterId: string;
@@ -53,10 +54,10 @@ export interface StoreListingItem {
   manufacturerName: string;
   primaryImage: string | null;
   imageCount: number;                      // 등록된 이미지 수 (0 = 이미지 없음)
-  offerPrice: number;                      // 공급자 기본가
-  distributionType: string;
-  supplierId: string;
-  supplierName: string;
+  offerPrice: number | null;               // 공급자 기본가 (null = master-only listing)
+  distributionType: string | null;         // null = master-only listing
+  supplierId: string | null;               // null = master-only listing
+  supplierName: string | null;             // null = master-only listing
 }
 
 // ── 페이지네이션 응답 ─────────────────────────────────────────────────────────

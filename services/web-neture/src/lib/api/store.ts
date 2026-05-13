@@ -316,10 +316,11 @@ export interface StoreListingItem {
   regulatoryName: string;
   manufacturerName: string;
   primaryImage: string | null;
-  offerPrice: number;
-  distributionType: string;
+  /** WO-O4O-KPA-STORE-MY-PRODUCTS-FLOW-SIMPLIFY-V1: master-only listing 시 null */
+  offerPrice: number | null;
+  distributionType: string | null;
   supplierId: string | null;
-  supplierName: string;
+  supplierName: string | null;
 }
 
 export interface StoreListingsResponse {

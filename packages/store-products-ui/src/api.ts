@@ -59,12 +59,16 @@ export async function getMasterOffers(
 
 /**
  * 매장 상품 등록 (OrganizationProductListing 생성)
+ *
+ * WO-O4O-KPA-STORE-MY-PRODUCTS-FLOW-SIMPLIFY-V1:
+ *   masterId 단독 전달 시 offer_id=NULL로 등록 (ProductMaster 기반).
+ *   offerId 전달 시 기존 offer 기반 등록 흐름 유지.
  */
 export async function createStoreListing(
-  offerId: string,
+  masterId: string,
   price?: number,
 ): Promise<{ success: boolean; data: StoreListingItem; message?: string }> {
-  const body: Record<string, unknown> = { offerId };
+  const body: Record<string, unknown> = { masterId };
   if (price != null) body.price = price;
   const res = await authClient.api.post<{
     success: boolean;
