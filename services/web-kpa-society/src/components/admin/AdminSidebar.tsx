@@ -42,7 +42,10 @@ const ADMIN_SIDEBAR_GROUPS: SidebarGroup[] = [
     label: '운영 기능',
     icon: Users,
     items: [
-      { label: '회원 관리', path: '/operator/members' },
+      // WO-O4O-KPA-ADMIN-MEMBER-MANAGEMENT-SEPARATION-V1:
+      //   admin sidebar → /admin/members (완전삭제 워크플로우 전용).
+      //   /operator/members 는 운영자 회원관리(승인/반려/정지/복원/탈퇴) 로 잔존.
+      { label: '회원 관리', path: '/admin/members' },
     ],
   },
 ];

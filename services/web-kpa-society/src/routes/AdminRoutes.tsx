@@ -10,6 +10,8 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AdminLayout, AdminAuthGuard } from '../components/admin';
 import { KpaAdminDashboardPage } from '../pages/admin/KpaAdminDashboardPage';
+// WO-O4O-KPA-ADMIN-MEMBER-MANAGEMENT-SEPARATION-V1
+import AdminMemberManagementPage from '../pages/admin/AdminMemberManagementPage';
 
 export function AdminRoutes() {
   return (
@@ -24,6 +26,9 @@ export function AdminRoutes() {
 
           {/* 관리자 홈 */}
           <Route path="kpa-dashboard" element={<KpaAdminDashboardPage />} />
+
+          {/* WO-O4O-KPA-ADMIN-MEMBER-MANAGEMENT-SEPARATION-V1: admin 회원관리 (완전삭제) */}
+          <Route path="members" element={<AdminMemberManagementPage />} />
 
           {/* 알 수 없는 경로 → 관리자 홈 */}
           <Route path="*" element={<Navigate to="kpa-dashboard" replace />} />
