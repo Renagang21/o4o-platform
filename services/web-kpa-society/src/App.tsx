@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
-import { useEffect, useState, lazy, Suspense } from 'react';
+import { useEffect, useState, useRef, lazy, Suspense } from 'react';
 // WO-O4O-STORE-PRODUCTS-QUERYCLIENT-PROVIDER-ALIGN-V1
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -306,6 +306,71 @@ const SERVICE_NAME = 'KPA-Society';
 // Service User 인증 제거, Platform User 단일 인증으로 통합
 
 /**
+ * WO-O4O-ROLE-BASED-POST-LOGIN-REDIRECT-V1
+ * fetchKpaContext() 완료 후 isStoreOwner 기반 redirect fallback.
+ *
+ * LoginModal.tsx에서 login() 반환값으로 즉시 redirect를 시도하지만,
+ * isStoreOwner/activityType이 login API 응답에 없는 경우(KPA context 비동기 로딩 후 확정)
+ * 이 컴포넌트가 fallback으로 처리한다.
+ *
+ * 동작:
+ *   - isAuthenticated: false → true 전환 감지 (로그인 이벤트)
+ *   - isKpaContextLoaded: true 대기 (fetchKpaContext 완료 확인)
+ *   - user.isStoreOwner && 현재 경로가 store 바깥 && /store로 이동한 적 없음 → navigate('/store')
+ *   - 운영자/관리자 / 일반 회원 / 특정 URL 진입 중 로그인 → 무시 (기존 흐름 유지)
+ */
+function PostLoginRedirect() {
+  const { user, isAuthenticated, isKpaContextLoaded } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { onLoginSuccess } = useAuthModal();
+
+  // 직전 인증 상태를 ref로 추적 (state 변화로 재렌더 방지)
+  const wasAuthenticatedRef = useRef(isAuthenticated);
+  const didRedirectRef = useRef(false);
+
+  useEffect(() => {
+    const justLoggedIn = !wasAuthenticatedRef.current && isAuthenticated;
+    wasAuthenticatedRef.current = isAuthenticated;
+
+    if (!isAuthenticated) {
+      // 로그아웃: ref 초기화
+      didRedirectRef.current = false;
+      return;
+    }
+    // 방금 로그인 → context 로딩 완료 대기
+    if (!justLoggedIn && !didRedirectRef.current) return;
+    if (!isKpaContextLoaded || !user) return;
+    if (didRedirectRef.current) return;
+
+    // 명시적 returnTo/onLoginSuccess 콜백: LoginModal에서 이미 처리
+    if (onLoginSuccess) { didRedirectRef.current = true; return; }
+    // 이미 store/operator/admin 경로: 중복 이동 금지
+    if (
+      location.pathname.startsWith('/store') ||
+      location.pathname.startsWith('/operator') ||
+      location.pathname.startsWith('/admin')
+    ) { didRedirectRef.current = true; return; }
+
+    // 운영자/관리자: redirect 없음
+    const isPrivileged = user.roles?.some((r) =>
+      r.includes(':operator') || r.includes(':admin') || r === 'platform:super_admin',
+    );
+    if (isPrivileged) { didRedirectRef.current = true; return; }
+
+    // 약국 경영자: /store 이동
+    if (user.isStoreOwner || user.activityType === 'pharmacy_owner') {
+      didRedirectRef.current = true;
+      navigate('/store', { replace: true });
+    } else {
+      didRedirectRef.current = true;
+    }
+  }, [isAuthenticated, isKpaContextLoaded, user, navigate, location.pathname, onLoginSuccess]);
+
+  return null;
+}
+
+/**
  * WO-O4O-AUTH-LEGACY-LOGIN-REGISTER-PAGE-REMOVAL-V1
  * /login, /register URL 접근 시 홈으로 리다이렉트 + 모달 오픈
  */
@@ -452,6 +517,8 @@ function App() {
         {/* 전역 인증 모달 (WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1, WO-O4O-AUTH-MODAL-REGISTER-STANDARD-V1) */}
         <LoginModal />
         <RegisterModal />
+        {/* WO-O4O-ROLE-BASED-POST-LOGIN-REDIRECT-V1: KPA context 완료 후 역할 기반 redirect fallback */}
+        <PostLoginRedirect />
         <Suspense fallback={<PageLoader />}>
         <Routes>
           {/* =========================================================

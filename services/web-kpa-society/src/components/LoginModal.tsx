@@ -23,6 +23,7 @@ import { useNavigate } from 'react-router-dom';
 import { X, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/AuthModalContext';
+import { getKpaPostLoginRoute } from '../config/dashboard';
 
 const REMEMBER_EMAIL_KEY = 'kpasociety_remember_email';
 
@@ -83,7 +84,8 @@ export default function LoginModal() {
     setLoading(true);
 
     try {
-      await login(email, password);
+      // WO-O4O-ROLE-BASED-POST-LOGIN-REDIRECT-V1: 반환값 캡처 (역할 기반 redirect용)
+      const loggedInUser = await login(email, password);
 
       // 이메일 저장 처리
       if (rememberEmail) {
@@ -92,13 +94,23 @@ export default function LoginModal() {
         localStorage.removeItem(REMEMBER_EMAIL_KEY);
       }
 
-      // 로그인 성공: 모달 닫고 현재 화면 유지
-      // 원칙: 로그인 후 navigate 없음 — 사용자가 보고 있던 화면을 유지
+      // 로그인 성공: 모달 닫기
       closeModal();
 
-      // 선택적 콜백 실행 (예: 글 작성 재시도)
+      // 선택적 콜백 실행 (예: 글 작성 재시도, returnTo 이동)
       if (onLoginSuccess) {
         onLoginSuccess();
+      } else {
+        // WO-O4O-ROLE-BASED-POST-LOGIN-REDIRECT-V1: 역할 기반 기본 진입 화면
+        // - 약국 경영자(isStoreOwner) → /store
+        // - 운영자/관리자 → 기존 흐름 유지 (redirect 없음)
+        // - 일반 회원 → 현재 화면 유지 (커뮤니티 철학)
+        // Note: isStoreOwner가 login API 응답에 없는 경우 fetchKpaContext() 완료 후
+        //       App.tsx의 PostLoginRedirect가 fallback으로 처리
+        const redirectTo = getKpaPostLoginRoute(loggedInUser);
+        if (redirectTo) {
+          navigate(redirectTo);
+        }
       }
     } catch (err: any) {
       // 에러 상세 정보 추출
