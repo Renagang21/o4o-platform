@@ -92,9 +92,9 @@ export class FixNetureSupplierRoleAssignments20260923000000 implements Migration
       if (inserted?.id && biz_name) {
         const orgCode = `neture-${slug}`;
         const [org] = await queryRunner.query(`
-          INSERT INTO organizations (name, code, type, is_active, created_at, updated_at)
+          INSERT INTO organizations (name, code, type, "isActive", "createdAt", "updatedAt")
           VALUES ($1, $2, 'supplier', true, NOW(), NOW())
-          ON CONFLICT (code) DO UPDATE SET is_active = true, updated_at = NOW()
+          ON CONFLICT (code) DO UPDATE SET "isActive" = true, "updatedAt" = NOW()
           RETURNING id
         `, [biz_name, orgCode]);
 
