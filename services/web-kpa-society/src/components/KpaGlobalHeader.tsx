@@ -136,11 +136,15 @@ export function KpaGlobalHeader() {
               강의 대시보드
             </GlobalHeaderMenuItem>
           )}
-          {(isOperator || isAdmin) && (
+          {isAdmin ? (
+            <GlobalHeaderMenuItem to="/admin" icon={<Shield className="w-4 h-4" />}>
+              관리자 대시보드
+            </GlobalHeaderMenuItem>
+          ) : isOperator ? (
             <GlobalHeaderMenuItem to="/operator" icon={<Shield className="w-4 h-4" />}>
               운영 대시보드
             </GlobalHeaderMenuItem>
-          )}
+          ) : null}
           <GlobalHeaderMenuItem to="/mypage" icon={<LayoutDashboard className="w-4 h-4" />}>
             마이페이지
           </GlobalHeaderMenuItem>
