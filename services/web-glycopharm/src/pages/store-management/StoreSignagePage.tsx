@@ -25,11 +25,6 @@ import {
   AlertTriangle,
   ArrowUpDown,
   Filter,
-  Tv,
-  Eye,
-  EyeOff,
-  Megaphone,
-  Home,
   Plus,
   ListVideo,
   Trash2,
@@ -41,7 +36,6 @@ import {
   assetSnapshotApi,
   type StoreAssetItem,
   type AssetPublishStatus,
-  type ChannelMap,
 } from '@/api/assetSnapshot';
 import {
   fetchStorePlaylists,
@@ -177,7 +171,6 @@ export default function StoreSignagePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
-  const [channelUpdatingId, setChannelUpdatingId] = useState<string | null>(null);
 
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [sortKey, setSortKey] = useState<SortKey>('newest');
@@ -400,21 +393,6 @@ export default function StoreSignagePage() {
       ));
     } catch { /* user can retry */ } finally {
       setUpdatingId(null);
-    }
-  };
-
-  const handleToggleChannel = async (item: StoreAssetItem, channelKey: string) => {
-    if (item.isForced || item.isLocked) return;
-    const currentMap = item.channelMap || {};
-    const newMap: ChannelMap = { ...currentMap, [channelKey]: !currentMap[channelKey] };
-    setChannelUpdatingId(item.id);
-    try {
-      const res = await storeAssetControlApi.updateChannelMap(item.id, newMap);
-      setItems(prev => prev.map(it =>
-        it.id === item.id ? { ...it, channelMap: res.data.channelMap } : it,
-      ));
-    } catch { /* user can retry */ } finally {
-      setChannelUpdatingId(null);
     }
   };
 
@@ -827,7 +805,6 @@ export default function StoreSignagePage() {
                 <tr className="bg-slate-50 text-left text-xs text-slate-500 uppercase">
                   <th className="px-4 py-3 font-medium">제목</th>
                   <th className="px-4 py-3 font-medium w-24">상태</th>
-                  <th className="px-4 py-3 font-medium w-40">채널 배치</th>
                   <th className="px-4 py-3 font-medium w-28">복사일</th>
                 </tr>
               </thead>
@@ -837,9 +814,7 @@ export default function StoreSignagePage() {
                     key={item.id}
                     item={item}
                     updatingId={updatingId}
-                    channelUpdatingId={channelUpdatingId}
                     onToggleStatus={handleToggleStatus}
-                    onToggleChannel={handleToggleChannel}
                   />
                 ))}
               </tbody>
@@ -915,22 +890,13 @@ function KpiCard({ label, count, color, warning }: {
   );
 }
 
-const CHANNEL_DEFS = [
-  { key: 'signage', label: '사이니지', Icon: Tv, color: 'purple' },
-  { key: 'home', label: '홈', Icon: Home, color: 'blue' },
-  { key: 'promotion', label: '프로모션', Icon: Megaphone, color: 'emerald' },
-] as const;
-
-function SignageRow({ item, updatingId, channelUpdatingId, onToggleStatus, onToggleChannel }: {
+function SignageRow({ item, updatingId, onToggleStatus }: {
   item: StoreAssetItem;
   updatingId: string | null;
-  channelUpdatingId: string | null;
   onToggleStatus: (item: StoreAssetItem) => void;
-  onToggleChannel: (item: StoreAssetItem, channelKey: string) => void;
 }) {
   const statusCfg = STATUS_CONFIG[item.publishStatus] || STATUS_CONFIG.draft;
   const isUpdating = updatingId === item.id;
-  const isChannelUpdating = channelUpdatingId === item.id;
   const isForced = item.isForced;
   const isLocked = item.isLocked;
   const expiringSoon = isForcedExpiringSoon(item);
@@ -993,32 +959,6 @@ function SignageRow({ item, updatingId, channelUpdatingId, onToggleStatus, onTog
             {statusCfg.label}
           </button>
         )}
-      </td>
-
-      {/* Channel toggles */}
-      <td className="px-4 py-3">
-        <div className="flex gap-1.5">
-          {CHANNEL_DEFS.map(ch => {
-            const isOn = item.channelMap?.[ch.key] ?? false;
-            const disabled = isForced || isLocked || isChannelUpdating;
-            return (
-              <button
-                key={ch.key}
-                onClick={() => onToggleChannel(item, ch.key)}
-                disabled={disabled}
-                className={`inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium transition-colors ${
-                  isOn
-                    ? `bg-${ch.color}-100 text-${ch.color}-700 border border-${ch.color}-300`
-                    : 'bg-slate-50 text-slate-400 border border-slate-200'
-                } ${disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:opacity-80'}`}
-                title={`${ch.label} 채널 ${isOn ? 'OFF' : 'ON'}`}
-              >
-                {isOn ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
-                {ch.label}
-              </button>
-            );
-          })}
-        </div>
       </td>
 
       {/* Date */}

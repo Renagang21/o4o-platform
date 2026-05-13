@@ -111,9 +111,6 @@ export function AssetRow({ item, updatingId, onToggleStatus, onEdit }: AssetRowP
           </button>
         )}
       </td>
-      <td className="px-4 py-3">
-        <ChannelDots channelMap={item.channelMap} />
-      </td>
       <td className="px-4 py-3 text-slate-500">{formatDate(item.createdAt)}</td>
       <td className="px-4 py-3">
         {editable && item.assetType === 'cms' && (
@@ -131,28 +128,3 @@ export function AssetRow({ item, updatingId, onToggleStatus, onEdit }: AssetRowP
   );
 }
 
-/* ─── Internal helper ──────────────────── */
-
-function ChannelDots({ channelMap }: { channelMap: Record<string, boolean> | null }) {
-  if (!channelMap) return <span className="text-slate-300 text-xs">—</span>;
-  const channels = [
-    { key: 'home', label: '홈', color: 'bg-blue-400' },
-    { key: 'signage', label: 'S', color: 'bg-purple-400' },
-    { key: 'promotion', label: 'P', color: 'bg-emerald-400' },
-  ];
-  const active = channels.filter(ch => channelMap[ch.key]);
-  if (active.length === 0) return <span className="text-slate-300 text-xs">—</span>;
-  return (
-    <div className="flex gap-1">
-      {active.map(ch => (
-        <span
-          key={ch.key}
-          className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-white text-[9px] font-bold ${ch.color}`}
-          title={ch.label}
-        >
-          {ch.label.charAt(0)}
-        </span>
-      ))}
-    </div>
-  );
-}

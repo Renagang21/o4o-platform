@@ -142,7 +142,7 @@ export function createStoreAssetControlController(
             s.content_json AS "contentJson",
             s.created_by AS "createdBy",
             s.created_at AS "createdAt",
-            COALESCE(c.publish_status, 'draft') AS "publishStatus",
+            COALESCE(c.publish_status, CASE WHEN s.asset_type = 'signage' THEN 'published' ELSE 'draft' END) AS "publishStatus",
             c.id AS "controlId",
             c.updated_at AS "controlUpdatedAt",
             COALESCE(c.channel_map, '{}')::jsonb AS "channelMap",

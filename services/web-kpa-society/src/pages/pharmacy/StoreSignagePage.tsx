@@ -33,11 +33,6 @@ import {
   AlertTriangle,
   ArrowUpDown,
   Filter,
-  Tv,
-  Eye,
-  EyeOff,
-  Megaphone,
-  Home,
   Plus,
   ListVideo,
   Trash2,
@@ -282,7 +277,6 @@ export function StoreSignagePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
-  const [channelUpdatingId, setChannelUpdatingId] = useState<string | null>(null);
 
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [sortKey, setSortKey] = useState<SortKey>('newest');
@@ -640,21 +634,6 @@ export function StoreSignagePage() {
       ));
     } catch { /* user can retry */ } finally {
       setUpdatingId(null);
-    }
-  };
-
-  const handleToggleChannel = async (item: StoreAssetItem, channelKey: string) => {
-    if (item.isForced || item.isLocked) return;
-    const currentMap = item.channelMap || {};
-    const newMap: ChannelMap = { ...currentMap, [channelKey]: !currentMap[channelKey] };
-    setChannelUpdatingId(item.id);
-    try {
-      const res = await storeAssetControlApi.updateChannelMap(item.id, newMap);
-      setItems(prev => prev.map(it =>
-        it.id === item.id ? { ...it, channelMap: res.data.channelMap } : it,
-      ));
-    } catch { /* user can retry */ } finally {
-      setChannelUpdatingId(null);
     }
   };
 
@@ -1515,10 +1494,6 @@ export function StoreSignagePage() {
           동영상 등록
         </button>
       </div>
-      <p className="text-xs text-slate-400 mb-4">
-        &lsquo;활용 위치&rsquo;는 콘텐츠를 어디에 활용할지 표시하는 용도입니다. TV 재생과 스케줄은 플레이리스트/스케줄 설정에서 관리됩니다.
-      </p>
-
       {/* Video registration form — modal */}
       {showVideoRegForm && (
         <div
@@ -1815,40 +1790,6 @@ export function StoreSignagePage() {
                 },
               },
               {
-                key: 'channelMap',
-                title: '활용 위치',
-                render: (_v, v) => {
-                  if (v.source === 'direct') {
-                    return <span className="text-xs text-slate-300">—</span>;
-                  }
-                  const item = v._snapshot!;
-                  const disabled = item.isForced || item.isLocked || channelUpdatingId === item.id;
-                  return (
-                    <div className="flex gap-1.5">
-                      {CHANNEL_DEFS.map(ch => {
-                        const isOn = item.channelMap?.[ch.key] ?? false;
-                        return (
-                          <button
-                            key={ch.key}
-                            onClick={e => { e.stopPropagation(); handleToggleChannel(item, ch.key); }}
-                            disabled={disabled}
-                            className={`inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium transition-colors ${
-                              isOn
-                                ? `bg-${ch.color}-100 text-${ch.color}-700 border border-${ch.color}-300`
-                                : 'bg-slate-50 text-slate-400 border border-slate-200'
-                            } ${disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:opacity-80'}`}
-                            title={ch.tooltip}
-                          >
-                            {isOn ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
-                            {ch.label}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  );
-                },
-              },
-              {
                 key: 'createdAt',
                 title: '등록일',
                 dataIndex: 'createdAt',
@@ -1874,7 +1815,7 @@ export function StoreSignagePage() {
                     title="플레이리스트 탭으로 이동하여 추가"
                   >
                     <ListVideo className="w-3 h-3" />
-                    추가
+                    플레이리스트에 추가
                   </button>
                 ),
               },
@@ -1961,9 +1902,4 @@ function KpiCard({ label, count, color, warning }: {
 }
 
 
-const CHANNEL_DEFS = [
-  { key: 'signage', label: '사이니지', Icon: Tv, color: 'purple', tooltip: 'TV 재생용 콘텐츠로 표시 (실제 재생은 플레이리스트/스케줄에서 관리)' },
-  { key: 'home', label: '홈', Icon: Home, color: 'blue', tooltip: '매장 홈 화면 활용 후보로 표시' },
-  { key: 'promotion', label: '프로모션', Icon: Megaphone, color: 'emerald', tooltip: '홍보 영역 활용 후보로 표시' },
-] as const;
 
