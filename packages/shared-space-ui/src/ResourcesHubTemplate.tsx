@@ -610,17 +610,6 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
           // ⋯ 메뉴 구성
           const rowActions: RowActionItem[] = [];
 
-          // WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: 내 자료함 가져가기 (store_owner only)
-          if (config.onCopyToStore) {
-            const isRestricted = row.reusable_policy === 'restricted';
-            rowActions.push({
-              key: 'copy-to-store',
-              label: isRestricted ? '내 자료함 가져가기 (불가)' : '내 자료함 가져가기',
-              disabled: isRestricted,
-              onClick: () => { config.onCopyToStore!(row.id).catch(() => { /* consumer toast 처리 */ }); },
-            });
-          }
-
           // 수정: operator 우선, 없으면 본인
           if (config.getEditHref) {
             rowActions.push({ key: 'edit', label: '수정', onClick: () => navigate(config.getEditHref!(row.id)) });
@@ -649,9 +638,14 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
             });
           }
 
-          // 가져가기 버튼 아이콘/라벨
+          // WO-O4O-STORE-LIBRARY-RESOURCE-COPY-VISIBILITY-FIX-V1
+          // store_owner 에게는 "가져가기" = 내 자료함 추가(onCopyToStore) 가 우선.
+          // 비제한 자료이고 onCopyToStore 가 정의된 경우 primary 버튼이 store copy를 수행한다.
+          // 그 외(일반 사용자 / restricted 자료) 는 기존 handleTakeAction(클립보드 복사) 유지.
           const isCopied = copiedId === row.id;
-          const takeIcon = actionType === 'external' ? <ExternalLink size={12} />
+          const isStoreTarget = !!config.onCopyToStore && row.reusable_policy !== 'restricted';
+          const takeIcon = isStoreTarget ? null
+            : actionType === 'external' ? <ExternalLink size={12} />
             : actionType === 'download' ? <Download size={12} />
             : actionType === 'copy' ? <Copy size={12} />
             : null;
@@ -660,7 +654,14 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
           return (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}>
               <button
-                onClick={(e) => handleTakeAction(row, e)}
+                onClick={(e) => {
+                  if (isStoreTarget) {
+                    e.stopPropagation();
+                    config.onCopyToStore!(row.id).catch(() => { /* consumer handles toast */ });
+                  } else {
+                    handleTakeAction(row, e);
+                  }
+                }}
                 style={{ ...st.actionBtn, ...(isCopied ? { background: '#D1FAE5', color: '#065F46' } : {}) }}
               >
                 {takeIcon}
@@ -824,6 +825,8 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
                   const badge = FILE_TYPE_BADGE[ft];
                   const actionType = getActionType(row);
                   const isCopied = copiedId === row.id;
+                  // WO-O4O-STORE-LIBRARY-RESOURCE-COPY-VISIBILITY-FIX-V1: card view 동일 정책
+                  const isStoreTargetCard = !!config.onCopyToStore && row.reusable_policy !== 'restricted';
                   return (
                     <Card
                       key={row.id}
@@ -853,10 +856,18 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
                         {/* Line 3: take action button */}
                         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                           <button
-                            onClick={(e) => handleTakeAction(row, e)}
+                            onClick={(e) => {
+                              if (isStoreTargetCard) {
+                                e.stopPropagation();
+                                config.onCopyToStore!(row.id).catch(() => {});
+                              } else {
+                                handleTakeAction(row, e);
+                              }
+                            }}
                             style={{ ...st.actionBtn, ...(isCopied ? { background: '#D1FAE5', color: '#065F46' } : {}) }}
                           >
-                            {actionType === 'external' ? <ExternalLink size={12} />
+                            {isStoreTargetCard ? null
+                              : actionType === 'external' ? <ExternalLink size={12} />
                               : actionType === 'download' ? <Download size={12} />
                               : actionType === 'copy' ? <Copy size={12} />
                               : null}

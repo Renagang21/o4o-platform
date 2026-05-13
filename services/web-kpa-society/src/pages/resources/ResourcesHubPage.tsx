@@ -152,7 +152,7 @@ function useKpaResourcesConfig(
       ? async (id) => {
           try {
             await assetSnapshotApi.copy({ sourceService: 'kpa', sourceAssetId: id, assetType: 'resource' });
-            toast.success('내 자료함에 가져왔습니다');
+            toast.success('내 자료함에 자료를 추가했습니다.');
           } catch (e: any) {
             if (e?.code === 'SOURCE_NOT_FOUND' || e?.code === 'POLICY_VIOLATION') {
               toast.error('가져가기 불가 자료입니다');
