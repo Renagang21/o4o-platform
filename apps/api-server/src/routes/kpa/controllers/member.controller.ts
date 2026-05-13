@@ -821,7 +821,12 @@ export function createMemberController(
         };
 
         const totalImpact = Object.values(risks).reduce((s, v) => s + v, 0);
+        // WO-O4O-KPA-MEMBER-HARDDELETE-ADMIN-FOR-MISREGISTRATION-V1:
+        //   - canHardDelete: operator 관점 (포럼 게시글/댓글/감사로그 모두 0 인 경우)
+        //   - hasActivityData: 실제 활동 데이터 존재 여부 (포럼 게시글/댓글만 — 감사 로그는 제외)
+        //     admin 은 hasActivityData=true 여도 강한 경고와 함께 완전삭제 가능
         const canHardDelete = risks.forumPosts === 0 && risks.forumComments === 0 && risks.auditLogs === 0;
+        const hasActivityData = risks.forumPosts > 0 || risks.forumComments > 0;
 
         res.json({
           success: true,
@@ -838,6 +843,7 @@ export function createMemberController(
             risks,
             totalImpact,
             canHardDelete,
+            hasActivityData,
             message: canHardDelete
               ? '이 회원은 안전하게 삭제할 수 있습니다.'
               : '연결된 데이터가 있어 완전삭제 시 주의가 필요합니다.',
@@ -903,20 +909,19 @@ export function createMemberController(
           return;
         }
 
-        // 리스크 확인
+        // WO-O4O-KPA-MEMBER-HARDDELETE-ADMIN-FOR-MISREGISTRATION-V1
+        //   잘못 가입한 약사 회원은 면허번호 unique 제약으로 재가입이 막힌다.
+        //   admin 은 포럼 게시글/댓글이 있어도 완전삭제 가능해야 한다.
+        //   기존 forum_post/forum_comment 카운트 기반 409 차단을 제거.
+        //   사용자 측 강한 경고(DeleteRiskModal) + 명시적 confirm 으로 보호.
+        //
+        // 영향 데이터 — 감사 로그 (삭제 전 / 후 분석 가능)
         const [forumPosts, forumComments] = await Promise.all([
           dataSource.query(`SELECT COUNT(*)::int AS cnt FROM forum_post WHERE author_id = $1`, [member.user_id]).catch(() => [{ cnt: 0 }]),
           dataSource.query(`SELECT COUNT(*)::int AS cnt FROM forum_comment WHERE author_id = $1`, [member.user_id]).catch(() => [{ cnt: 0 }]),
         ]);
-
-        if ((forumPosts[0]?.cnt || 0) > 0 || (forumComments[0]?.cnt || 0) > 0) {
-          res.status(409).json({
-            success: false,
-            error: 'HARD_DELETE_BLOCKED',
-            message: `포럼 게시글 ${forumPosts[0]?.cnt}건, 댓글 ${forumComments[0]?.cnt}건이 있어 완전삭제가 불가합니다.`,
-          });
-          return;
-        }
+        const forumPostCnt = forumPosts[0]?.cnt || 0;
+        const forumCommentCnt = forumComments[0]?.cnt || 0;
 
         // Audit log 먼저 기록 (삭제 전)
         try {
@@ -926,7 +931,14 @@ export function createMemberController(
             action_type: 'MEMBER_STATUS_CHANGED' as any,
             target_type: 'member',
             target_id: member.id,
-            metadata: { action: 'hard_delete', userId: member.user_id },
+            metadata: {
+              action: 'hard_delete',
+              userId: member.user_id,
+              membershipType: member.membership_type,
+              licenseNumberCleared: !!member.license_number,
+              forumPosts: forumPostCnt,
+              forumComments: forumCommentCnt,
+            },
           }));
         } catch (e) { console.error('[KPA AuditLog] Failed:', e); }
 

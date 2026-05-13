@@ -320,7 +320,10 @@ interface DeleteRiskData {
   member: { id: string; userId: string; name: string; email: string; status: string; membershipType: string; role: string };
   risks: { memberServices: number; forumPosts: number; forumComments: number; approvalRequests: number; auditLogs: number };
   totalImpact: number;
+  /** operator 관점 — 활동/감사로그 0 일 때만 true. operator 의 완전삭제 가능 여부 */
   canHardDelete: boolean;
+  /** WO-O4O-KPA-MEMBER-HARDDELETE-ADMIN-FOR-MISREGISTRATION-V1: 포럼 게시글/댓글 > 0 */
+  hasActivityData?: boolean;
   message: string;
 }
 
@@ -407,13 +410,53 @@ function DeleteRiskModal({
               </div>
             </div>
 
-            {/* 경고 */}
-            {!data.canHardDelete && (
-              <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-                <AlertTriangle className="w-4 h-4 text-red-500 mt-0.5 shrink-0" />
-                <p className="text-xs text-red-700">포럼 게시글/댓글 또는 감사 로그가 있어 완전삭제가 제한됩니다. 탈퇴(비활성) 처리를 권장합니다.</p>
-              </div>
-            )}
+            {/* WO-O4O-KPA-MEMBER-HARDDELETE-ADMIN-FOR-MISREGISTRATION-V1
+                경고 메시지 — admin/operator 별 메시지 분기. operator 는 기존대로 제한,
+                admin 은 활동 데이터(forum 게시글/댓글) 가 있을 때 강한 경고만 표시하고
+                완전삭제 자체는 가능. 면허번호 중복 해소를 위해 admin 완전삭제는 필요. */}
+            {(() => {
+              const hasActivity = data.hasActivityData ?? (data.risks.forumPosts > 0 || data.risks.forumComments > 0);
+              if (isKpaAdmin) {
+                if (hasActivity) {
+                  return (
+                    <div className="flex items-start gap-2 p-3 bg-red-50 border-2 border-red-300 rounded-lg">
+                      <AlertTriangle className="w-4 h-4 text-red-600 mt-0.5 shrink-0" />
+                      <div className="text-xs text-red-700 space-y-1">
+                        <p className="font-semibold">
+                          이 회원은 실제 활동 데이터(포럼 게시글 {data.risks.forumPosts}건 / 댓글 {data.risks.forumComments}건)가 있습니다.
+                        </p>
+                        <p>
+                          완전삭제 시 게시글/댓글의 작성자 정보가 깨지거나 함께 삭제될 수 있습니다.
+                          잘못 가입된 회원이 아니라 활동 이력이 있는 회원이라면 탈퇴(비활성) 처리를 권장합니다.
+                        </p>
+                      </div>
+                    </div>
+                  );
+                }
+                if (!data.canHardDelete) {
+                  // 활동 데이터는 없지만 audit log 등 부수 데이터 — admin 은 진행 가능, 안내만 표시
+                  return (
+                    <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                      <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
+                      <p className="text-xs text-amber-700">
+                        감사 로그 등 부수 데이터가 있습니다. 완전삭제는 가능하지만 진행 전 확인하세요.
+                      </p>
+                    </div>
+                  );
+                }
+                return null;
+              }
+              // operator
+              if (!data.canHardDelete) {
+                return (
+                  <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <AlertTriangle className="w-4 h-4 text-red-500 mt-0.5 shrink-0" />
+                    <p className="text-xs text-red-700">포럼 게시글/댓글 또는 감사 로그가 있어 완전삭제가 제한됩니다. 탈퇴(비활성) 처리를 권장합니다.</p>
+                  </div>
+                );
+              }
+              return null;
+            })()}
 
             {/* 액션 */}
             <div className="flex flex-col gap-2 pt-2">
@@ -422,9 +465,11 @@ function DeleteRiskModal({
                 탈퇴 처리 (비활성화)
               </button>
               {isKpaAdmin ? (
-                <button onClick={() => setConfirmMode('hard')} disabled={deleting || !data.canHardDelete}
+                // WO-O4O-KPA-MEMBER-HARDDELETE-ADMIN-FOR-MISREGISTRATION-V1:
+                // admin 은 활동 데이터/감사로그와 무관하게 완전삭제 가능 (면허번호 중복 해소 목적).
+                <button onClick={() => setConfirmMode('hard')} disabled={deleting}
                   className="w-full px-4 py-2.5 text-sm font-medium text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed">
-                  {!data.canHardDelete ? '완전삭제 불가 (연결 데이터 존재)' : '완전삭제 (되돌릴 수 없음)'}
+                  완전삭제 (되돌릴 수 없음)
                 </button>
               ) : (
                 <div className="w-full px-4 py-2.5 text-sm text-slate-400 bg-slate-50 border border-slate-200 rounded-lg text-center">
@@ -434,14 +479,33 @@ function DeleteRiskModal({
               <button onClick={onClose} className="w-full px-4 py-2 text-sm text-slate-500 hover:bg-slate-50 rounded-lg">취소</button>
             </div>
 
-            {/* Delete Confirm Dialog (V4-EXPANSION) */}
+            {/* Delete Confirm Dialog (V4-EXPANSION)
+                WO-O4O-KPA-MEMBER-HARDDELETE-ADMIN-FOR-MISREGISTRATION-V1:
+                활동 데이터가 있을 때 confirm 메시지에 명시적 카운트 + 면허번호/연결 정리 안내. */}
             <ConfirmActionDialog
               open={!!confirmMode}
               onClose={() => setConfirmMode(null)}
               onConfirm={executeDelete}
               title={confirmMode === 'hard' ? '완전 삭제 확인' : '탈퇴 처리 확인'}
               message={confirmMode === 'hard'
-                ? '이 회원 데이터를 완전히 삭제합니다.\n이 작업은 되돌릴 수 없습니다.'
+                ? (() => {
+                    const hasActivity = (data.risks.forumPosts > 0 || data.risks.forumComments > 0);
+                    const lines = [
+                      '이 회원의 다음 데이터가 완전히 삭제됩니다 (되돌릴 수 없음):',
+                      '• users / kpa_members (면허번호 포함)',
+                      '• service_memberships / role_assignments',
+                      '• kpa_member_services / 약사·약대생·전문가·공급사 프로필',
+                    ];
+                    if (hasActivity) {
+                      lines.push('');
+                      lines.push(`⚠ 활동 데이터: 포럼 게시글 ${data.risks.forumPosts}건, 댓글 ${data.risks.forumComments}건`);
+                      lines.push('잘못 가입된 회원 정리가 아니라면 신중하게 진행하세요.');
+                    } else {
+                      lines.push('');
+                      lines.push('면허번호가 해제되어 동일 면허번호로 재가입할 수 있게 됩니다.');
+                    }
+                    return lines.join('\n');
+                  })()
                 : '이 회원을 탈퇴(비활성) 처리하시겠습니까?'}
               confirmText={confirmMode === 'hard' ? '완전 삭제' : '탈퇴 처리'}
               variant={confirmMode === 'hard' ? 'danger' : 'warning'}
