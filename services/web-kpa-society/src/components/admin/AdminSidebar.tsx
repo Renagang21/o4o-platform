@@ -13,6 +13,7 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
+  Users,
   ChevronRight,
   ChevronDown,
 } from 'lucide-react';
@@ -35,6 +36,13 @@ const ADMIN_SIDEBAR_GROUPS: SidebarGroup[] = [
     icon: LayoutDashboard,
     items: [
       { label: '관리자 홈', path: '/admin/kpa-dashboard', exact: true },
+    ],
+  },
+  {
+    label: '운영 기능',
+    icon: Users,
+    items: [
+      { label: '회원 관리', path: '/operator/members' },
     ],
   },
 ];
