@@ -132,6 +132,19 @@ interface AiContentModalProps {
    * - 사용자가 탭을 전환하면 그 이후로는 사용자 선택을 유지 (re-mount 시점에만 적용)
    */
   initialSourceTab?: 'text' | 'url';
+  /**
+   * WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-AI-BRIDGE-V1: 모달 열릴 때 텍스트 입력창 자동 주입.
+   * - open 시 input 을 initialText 로 초기화 (initialMode / initialSourceTab 과 동일 lifecycle)
+   * - modal reopen 시 항상 최신 initialText 로 재설정 — stale input 남지 않음
+   * - 미제공 시 기존 동작 유지 (빈 문자열로 시작)
+   */
+  initialText?: string;
+  /**
+   * WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-AI-BRIDGE-V1: production material 저장 시 source 추적 메타.
+   * - 제공 시 POST /api/v1/kpa/store/assets body 에 sourceMetadata 필드로 포함
+   * - 향후 재생성·추적 용도. 백엔드가 미지원 시 무시됨.
+   */
+  sourceMetadata?: { sourceContentId?: string; sourceTitle?: string; sourceOrigin?: string };
 }
 
 type AiMode = 'customer_rewrite' | 'summary' | 'pop' | 'title_suggest' | 'blog' | 'store_qr';
@@ -274,7 +287,7 @@ function blocksToHtml(blocks: UrlBlock[]): string {
     .join('\n');
 }
 
-export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeaders, onChannelSave, showCommunitySave, showStoreSave, showProductionMaterialSave, onProductionMaterialSaved, initialMode, headerLabel, urlPlaceholder, initialSourceTab }: AiContentModalProps) {
+export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeaders, onChannelSave, showCommunitySave, showStoreSave, showProductionMaterialSave, onProductionMaterialSaved, initialMode, initialText, headerLabel, urlPlaceholder, initialSourceTab, sourceMetadata }: AiContentModalProps) {
   // 기존 text 모드 상태
   const [input, setInput] = useState('');
   // WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-AI-FLOW-V1:
@@ -289,6 +302,14 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
       setMode(initialMode ?? 'customer_rewrite');
     }
   }, [open, initialMode]);
+  // WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-AI-BRIDGE-V1:
+  //   open 시 initialText 로 input 재설정 — 외부 콘텐츠 주입용.
+  //   handleClose 에서 input='' 로 리셋되므로 reopen 시 새 initialText 가 다시 적용됨.
+  useEffect(() => {
+    if (open) {
+      setInput(initialText ?? '');
+    }
+  }, [open, initialText]);
   const [tone, setTone] = useState<ToneOption>('professional');
   const [length, setLength] = useState<LengthOption>('medium');
   const [loading, setLoading] = useState(false);
@@ -668,6 +689,8 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
           category: outputType,
           usageType,
           sourceType: 'generated',
+          // WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-AI-BRIDGE-V1: source 추적 메타 (선택적)
+          ...(sourceMetadata ? { sourceMetadata } : {}),
         }),
       });
       const data = await res.json();

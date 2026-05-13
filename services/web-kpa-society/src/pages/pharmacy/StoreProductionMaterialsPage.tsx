@@ -7,6 +7,12 @@
  *   유형 선택 후 navigate 대신 in-page AiContentModal 을 띄워 AI 생성/편집 + 저장까지
  *   본 페이지 안에서 마무리할 수 있게 한다. 저장 destination 은
  *   showProductionMaterialSave 로 store_execution_assets (POST /api/v1/kpa/store/assets).
+ * WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-AI-BRIDGE-V1:
+ *   "AI로 제작 자료 초안 만들기" 버튼 추가.
+ *   ProductionTypeSelectorModal(유형 선택) → SelectContentForAiModal(내 자료함 콘텐츠 단일 선택)
+ *   → composeSourceTextFromContent() → AiContentModal(initialText=...) 순으로 진행.
+ *   저장 destination: store_execution_assets (기존 showProductionMaterialSave 경로 유지).
+ *   source metadata (sourceContentId / sourceTitle / sourceOrigin) AiContentModal 에 전달.
  * WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-LIST-SOURCE-ALIGN-V1:
  *   리스트 소스를 AI 저장 위치(store_execution_assets)와 정렬.
  *   fetchAll() 을 병렬 페치로 교체:
@@ -39,12 +45,14 @@ import { getAccessToken } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
 import { StartProductionModal, type ProductionSource } from './StartProductionModal';
 import { ProductionTypeSelectorModal } from './ProductionTypeSelectorModal';
+import { SelectContentForAiModal, composeSourceTextFromContent } from './SelectContentForAiModal';
 import {
   PRODUCTION_TARGET_TO_AI_MODE,
   type AiModeForProduction,
   type ProductionTarget,
   type ProductionTargetMeta,
 } from './productionTargets';
+import type { LibraryContentItem } from '../../api/assetSnapshot';
 
 // ─── 타입 ─────────────────────────────────────────────────────────────────────
 
@@ -115,6 +123,15 @@ export default function StoreProductionMaterialsPage() {
   const [aiOpen, setAiOpen] = useState(false);
   const [aiInitialMode, setAiInitialMode] = useState<AiModeForProduction>('customer_rewrite');
   const [aiSelectedTarget, setAiSelectedTarget] = useState<ProductionTarget | null>(null);
+  // WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-AI-BRIDGE-V1
+  const [usingContentBridge, setUsingContentBridge] = useState(false);
+  const [contentSelectorOpen, setContentSelectorOpen] = useState(false);
+  const [pendingBridgeTarget, setPendingBridgeTarget] = useState<ProductionTarget | null>(null);
+  const [pendingBridgeMode, setPendingBridgeMode] = useState<AiModeForProduction>('customer_rewrite');
+  const [aiInitialText, setAiInitialText] = useState<string | undefined>(undefined);
+  const [aiSourceMetadata, setAiSourceMetadata] = useState<
+    { sourceContentId?: string; sourceTitle?: string; sourceOrigin?: string } | undefined
+  >(undefined);
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
@@ -231,13 +248,43 @@ export default function StoreProductionMaterialsPage() {
   // ─── AI 흐름 진입 (WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-AI-FLOW-V1) ────────
 
   /**
-   * 유형 선택 모달의 카드 클릭 결과를 받아 AiContentModal 을 띄운다.
-   * navigate 하지 않음 — page 안에서 AI 생성 → 저장까지 마무리하는 흐름.
-   * productless 진입만 처리 (productId 기반 트랙은 본 흐름에 미통합).
+   * 유형 선택 모달의 카드 클릭 결과를 받아 AI 흐름을 분기한다.
+   *
+   * - usingContentBridge=false (기존): AiContentModal 을 곧장 열고 직접 입력으로 시작.
+   * - usingContentBridge=true (신규): 콘텐츠 선택 모달 → composeSourceText → AiContentModal(initialText=...)
    */
   const handleTypeSelectedToAi = (card: ProductionTargetMeta) => {
-    setAiSelectedTarget(card.key);
-    setAiInitialMode(PRODUCTION_TARGET_TO_AI_MODE[card.key]);
+    if (usingContentBridge) {
+      // WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-AI-BRIDGE-V1: 콘텐츠 선택 단계로 이동
+      setPendingBridgeTarget(card.key);
+      setPendingBridgeMode(PRODUCTION_TARGET_TO_AI_MODE[card.key]);
+      setTypeSelectorOpen(false);
+      setContentSelectorOpen(true);
+    } else {
+      // 기존 흐름: 직접 AiContentModal 진입
+      setAiSelectedTarget(card.key);
+      setAiInitialMode(PRODUCTION_TARGET_TO_AI_MODE[card.key]);
+      setAiInitialText(undefined);
+      setAiSourceMetadata(undefined);
+      setAiOpen(true);
+    }
+  };
+
+  /**
+   * WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-AI-BRIDGE-V1
+   * 콘텐츠 선택 완료 → composeSourceTextFromContent() → AiContentModal(initialText=...)
+   */
+  const handleContentSelected = (item: LibraryContentItem) => {
+    const text = composeSourceTextFromContent(item);
+    setAiInitialText(text);
+    setAiSourceMetadata({
+      sourceContentId: item.id,
+      sourceTitle: item.title,
+      sourceOrigin: item.origin,
+    });
+    setAiSelectedTarget(pendingBridgeTarget);
+    setAiInitialMode(pendingBridgeMode);
+    setContentSelectorOpen(false);
     setAiOpen(true);
   };
 
@@ -277,9 +324,18 @@ export default function StoreProductionMaterialsPage() {
           </p>
         </div>
         <div style={styles.headerActions}>
+          {/* WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-AI-BRIDGE-V1: 콘텐츠 선택 → AI 생성 흐름 */}
           <button
             type="button"
-            onClick={() => setTypeSelectorOpen(true)}
+            onClick={() => { setUsingContentBridge(true); setTypeSelectorOpen(true); }}
+            style={styles.aiBridgeBtn}
+          >
+            <Sparkles size={14} />
+            AI로 제작 자료 초안 만들기
+          </button>
+          <button
+            type="button"
+            onClick={() => { setUsingContentBridge(false); setTypeSelectorOpen(true); }}
             style={styles.createBtn}
           >
             <Plus size={14} />
@@ -347,8 +403,16 @@ export default function StoreProductionMaterialsPage() {
           </p>
           <button
             type="button"
-            onClick={() => setTypeSelectorOpen(true)}
-            style={{ ...styles.createBtn, marginTop: 16 }}
+            onClick={() => { setUsingContentBridge(true); setTypeSelectorOpen(true); }}
+            style={{ ...styles.aiBridgeBtn, marginTop: 16 }}
+          >
+            <Sparkles size={14} />
+            AI로 제작 자료 초안 만들기
+          </button>
+          <button
+            type="button"
+            onClick={() => { setUsingContentBridge(false); setTypeSelectorOpen(true); }}
+            style={{ ...styles.createBtn, marginTop: 8 }}
           >
             <Plus size={14} />
             매장 제작 자료 만들기
@@ -432,21 +496,37 @@ export default function StoreProductionMaterialsPage() {
 
       <ProductionTypeSelectorModal
         open={typeSelectorOpen}
-        onClose={() => setTypeSelectorOpen(false)}
+        onClose={() => { setTypeSelectorOpen(false); setUsingContentBridge(false); }}
         onSelect={handleTypeSelectedToAi}
       />
 
-      {/* WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-AI-FLOW-V1:
+      {/* WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-AI-BRIDGE-V1: 내 자료함 콘텐츠 단일 선택 */}
+      <SelectContentForAiModal
+        open={contentSelectorOpen}
+        onClose={() => { setContentSelectorOpen(false); setUsingContentBridge(false); }}
+        onSelect={handleContentSelected}
+      />
+
+      {/* WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-AI-FLOW-V1 +
+          WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-AI-BRIDGE-V1:
             AI 생성/편집 모달. showProductionMaterialSave=true 로 결과를
-            store_execution_assets 에 직접 저장. 저장 성공 후 fetchAll() 로 list refresh
-            (단, 현재 list 는 kpa_store_contents 만 노출하므로 새 항목은 즉시 보이지 않을 수 있음).
+            store_execution_assets 에 직접 저장. 저장 성공 후 fetchAll() 로 list refresh.
             initialMode 는 유형 선택 결과로 override.
+            initialText 는 콘텐츠 브리지 흐름에서만 설정됨 (직접 흐름은 undefined).
+            sourceMetadata 는 콘텐츠 브리지 흐름에서 source 추적용으로 전달.
             productAiContent (productId 기반 비동기) 트랙은 본 흐름에 미통합. */}
       <AiContentModal
         open={aiOpen}
-        onClose={() => { setAiOpen(false); setAiSelectedTarget(null); }}
+        onClose={() => {
+          setAiOpen(false);
+          setAiSelectedTarget(null);
+          setAiInitialText(undefined);
+          setAiSourceMetadata(undefined);
+        }}
         editor={null}
         initialMode={aiInitialMode}
+        initialText={aiInitialText}
+        sourceMetadata={aiSourceMetadata}
         showProductionMaterialSave
         aiRequestHeaders={(() => {
           const token = getAccessToken();
@@ -510,6 +590,19 @@ const styles: Record<string, CSSProperties> = {
     alignItems: 'center',
     gap: '8px',
     flexShrink: 0,
+  },
+  aiBridgeBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '8px 14px',
+    background: '#f0fdf4',
+    border: '1px solid #16a34a',
+    borderRadius: '6px',
+    fontSize: '13px',
+    color: '#15803d',
+    fontWeight: 500,
+    cursor: 'pointer',
   },
   createBtn: {
     display: 'inline-flex',
