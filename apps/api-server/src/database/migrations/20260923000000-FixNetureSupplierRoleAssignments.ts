@@ -42,16 +42,13 @@ export class FixNetureSupplierRoleAssignments20260923000000 implements Migration
       const { user_id, sm_role, approved_by } = row;
       const assignedBy = approved_by || null;
 
-      // role_assignments에 supplier role 삽입 (중복 방어: WHERE NOT EXISTS)
-      // unique_active_role_per_user 제약 조건이 없는 환경에서도 안전하게 동작.
+      // role_assignments에 supplier role 삽입
+      // ON CONFLICT (user_id, role, is_active) 제약 활용 (프로덕션 DB에 존재)
       await queryRunner.query(`
         INSERT INTO role_assignments
           (user_id, role, assigned_by, is_active, valid_from, created_at, updated_at)
-        SELECT $1, $2, $3, true, NOW(), NOW(), NOW()
-        WHERE NOT EXISTS (
-          SELECT 1 FROM role_assignments
-          WHERE user_id = $1 AND role = $2 AND is_active = true
-        )
+        VALUES ($1, $2, $3, true, NOW(), NOW(), NOW())
+        ON CONFLICT (user_id, role, is_active) DO UPDATE SET updated_at = NOW()
       `, [user_id, sm_role, assignedBy]);
 
       console.log(`[Migration] role_assignment created: user=${row.email} role=${sm_role}`);
