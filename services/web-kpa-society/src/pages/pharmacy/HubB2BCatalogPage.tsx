@@ -4,24 +4,32 @@
  * WO-O4O-HUB-B2B-CATALOG-V1
  * WO-O4O-STORE-HUB-B2B-UI-REFINEMENT-V1: 내 매장에 추가/제외 UX 정비
  * WO-O4O-STORE-PRODUCT-STATUS-REMOVAL-V1: 매장 상품 상태 제거 — 단순 취급 목록 모델
+ * WO-O4O-STORE-HUB-B2B-CANONICAL-DATATABLE-V1:
+ *   raw div 테이블 → @o4o/operator-ux-core DataTable 전환
+ *   체크박스 multi-select + ActionBar(내 매장에 추가 bulk / 선택 해제) 추가
  *
  * Hub 공용공간에서 플랫폼 공급자 상품을 탐색하고
- * "내 매장에 추가" 버튼으로 내 매장 상품 신청을 진행하는 페이지.
+ * "내 매장에 추가" 버튼 또는 bulk ActionBar로 내 매장 상품 신청을 진행하는 페이지.
  *
  * 사용 API:
  *   - getCatalog() : 플랫폼 B2B 상품 카탈로그 (neture_supplier_products PUBLIC)
- *   - applyBySupplyProductId() : 카탈로그 기반 상품 추가
+ *   - applyBySupplyProductId() : 카탈로그 기반 상품 추가 (단건/bulk 병렬)
  *   - cancelProductByOfferId() : 내 매장에서 상품 제외
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { DataTable, Pagination } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
+import { toast } from '@o4o/error-handling';
 import {
   getCatalog,
   applyBySupplyProductId,
   cancelProductByOfferId,
   type CatalogProduct,
 } from '../../api/pharmacyProducts';
-import { colors, shadows, borderRadius } from '../../styles/theme';
+import { colors, borderRadius } from '../../styles/theme';
+
+// ─── 가격 헬퍼 ────────────────────────────────────────────────────────────────
 
 /** KPA 기준 가격: priceGold 우선 → priceGeneral fallback */
 function formatKpaPrice(item: CatalogProduct): string {
@@ -36,14 +44,9 @@ function getPriceSublabel(item: CatalogProduct): string | null {
   return null;
 }
 
-// ============================================
-// 카테고리 필터
-// ============================================
+// ─── 탭 ───────────────────────────────────────────────────────────────────────
 
-// WO-KPA-HUB-OPERATOR-TAB-AND-STATUS-ALIGNMENT-V1:
-// 운영자 탭 추가 — KPA 운영자 승인 흐름 관련 상품을 모아보는 뷰.
-// 과거 비활성화된 '운영자 추천(offer_curations)' 개념과는 다른 개념임.
-// 백엔드(offer_curations) 및 getCatalog의 recommended 파라미터는 향후 재활성화를 위해 유지.
+// WO-KPA-HUB-OPERATOR-TAB-AND-STATUS-ALIGNMENT-V1: 운영자 탭 추가
 const DISTRIBUTION_TABS: { key: string; label: string }[] = [
   { key: 'all', label: '전체' },
   { key: 'SERVICE', label: 'B2B' },
@@ -53,9 +56,7 @@ const DISTRIBUTION_TABS: { key: string; label: string }[] = [
 
 const PAGE_LIMIT = 20;
 
-// ============================================
-// 컴포넌트
-// ============================================
+// ─── 컴포넌트 ─────────────────────────────────────────────────────────────────
 
 export function HubB2BCatalogPage() {
   const [products, setProducts] = useState<CatalogProduct[]>([]);
@@ -67,17 +68,15 @@ export function HubB2BCatalogPage() {
   const [applyingId, setApplyingId] = useState<string | null>(null);
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [removeConfirmId, setRemoveConfirmId] = useState<string | null>(null);
-  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-  // 정렬 상태
-  type SortKey = 'name' | 'supplier';
-  type SortOrder = 'asc' | 'desc';
-  const [sortKey, setSortKey] = useState<SortKey | null>(null);
-  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
+  // WO-O4O-STORE-HUB-B2B-CANONICAL-DATATABLE-V1: bulk selection state
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  const [bulkAdding, setBulkAdding] = useState(false);
 
   const fetchCatalog = useCallback(async (distType: string, pageOffset: number) => {
     setLoading(true);
     setError(null);
+    setSelectedKeys(new Set()); // 탭/페이지 변경 시 선택 초기화
     try {
       const isOperator = distType === 'operator';
       const res = await getCatalog({
@@ -101,87 +100,257 @@ export function HubB2BCatalogPage() {
   }, [fetchCatalog, distributionFilter, offset]);
 
   const handleDistributionChange = (key: string) => {
-    // WO-KPA-HUB-RECOMMENDED-TAB-HIDE-AND-STATE-CLEANUP-V1:
-    // recommended 탭 숨김 — 혹시 외부에서 값이 들어와도 'all'로 fallback.
     const safeKey = DISTRIBUTION_TABS.some(t => t.key === key) ? key : 'all';
     setDistributionFilter(safeKey);
     setOffset(0);
   };
 
+  // ─── 단건 추가 ─────────────────────────────────────────────────────────────
+
   const handleApply = async (product: CatalogProduct) => {
-    if (applyingId) return; // 중복 클릭 방지
+    if (applyingId) return;
     setApplyingId(product.id);
-    setToast(null);
     try {
       await applyBySupplyProductId(product.id);
-      setToast({ type: 'success', message: `"${product.name}" 내 매장에 추가되었습니다.` });
-      // 로컬 상태 즉시 반영 (재조회 없이)
-      setProducts(prev => prev.map(p =>
-        p.id === product.id ? { ...p, isAdded: true } : p,
-      ));
+      toast.success(`"${product.name}" 내 매장에 추가되었습니다.`);
+      setProducts(prev => prev.map(p => p.id === product.id ? { ...p, isAdded: true } : p));
     } catch (e: any) {
       const code = e?.response?.data?.error?.code || e?.code;
       if (code === 'DUPLICATE_APPLICATION') {
-        setToast({ type: 'error', message: '이미 내 매장에 추가된 상품입니다.' });
+        toast.error('이미 내 매장에 추가된 상품입니다.');
       } else {
-        setToast({ type: 'error', message: e.message || '상품 추가에 실패했습니다.' });
+        toast.error(e.message || '상품 추가에 실패했습니다.');
       }
     } finally {
       setApplyingId(null);
-      setTimeout(() => setToast(null), 4000);
     }
   };
+
+  // ─── 단건 제외 ─────────────────────────────────────────────────────────────
 
   const handleRemove = async (product: CatalogProduct) => {
     if (removingId) return;
     setRemovingId(product.id);
     setRemoveConfirmId(null);
-    setToast(null);
     try {
       await cancelProductByOfferId(product.id);
-      setToast({ type: 'success', message: `"${product.name}"을(를) 내 매장에서 제외했습니다.` });
-      setProducts(prev => prev.map(p =>
-        p.id === product.id ? { ...p, isAdded: false } : p,
-      ));
+      toast.success(`"${product.name}"을(를) 내 매장에서 제외했습니다.`);
+      setProducts(prev => prev.map(p => p.id === product.id ? { ...p, isAdded: false } : p));
     } catch (e: any) {
-      setToast({ type: 'error', message: e.message || '상품 제외에 실패했습니다.' });
+      toast.error(e.message || '상품 제외에 실패했습니다.');
     } finally {
       setRemovingId(null);
-      setTimeout(() => setToast(null), 4000);
     }
   };
 
-  // 정렬 적용
-  const sortedProducts = useMemo(() => {
-    if (!sortKey) return products;
-    const dir = sortOrder === 'asc' ? 1 : -1;
-    return [...products].sort((a, b) => {
-      let va = '';
-      let vb = '';
-      switch (sortKey) {
-        case 'name': va = a.name || ''; vb = b.name || ''; break;
-        case 'supplier': va = a.supplierName || ''; vb = b.supplierName || ''; break;
+  // ─── Bulk 추가 ─────────────────────────────────────────────────────────────
+  // WO-O4O-STORE-HUB-B2B-CANONICAL-DATATABLE-V1:
+  // 단건 API(applyBySupplyProductId)를 Promise.all 병렬로 호출.
+  // 이미 추가된 항목(isAdded=true) 는 건너뛰고 신규만 처리.
+  const handleBulkAdd = useCallback(async () => {
+    const targets = products.filter(p => selectedKeys.has(p.id) && !p.isAdded);
+    if (targets.length === 0) {
+      const alreadyAll = [...selectedKeys].every(k => products.find(p => p.id === k)?.isAdded);
+      if (alreadyAll) {
+        toast.error('선택한 상품이 이미 모두 내 매장에 추가되어 있습니다.');
+      } else {
+        toast.error('추가할 상품을 선택해주세요.');
       }
-      return va.localeCompare(vb, 'ko') * dir;
-    });
-  }, [products, sortKey, sortOrder]);
-
-  const handleSort = (key: SortKey) => {
-    if (sortKey === key) {
-      setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortKey(key);
-      setSortOrder('asc');
+      return;
     }
-  };
 
-  const sortIndicator = (key: SortKey) => {
-    if (sortKey !== key) return ' \u2195';
-    return sortOrder === 'asc' ? ' \u2191' : ' \u2193';
-  };
+    setBulkAdding(true);
+    const results = await Promise.allSettled(
+      targets.map(p => applyBySupplyProductId(p.id).then(() => p.id)),
+    );
+
+    let successCount = 0;
+    let duplicateCount = 0;
+    let failCount = 0;
+
+    const successIds = new Set<string>();
+    for (const r of results) {
+      if (r.status === 'fulfilled') {
+        successCount++;
+        successIds.add(r.value);
+      } else {
+        const code = (r.reason as any)?.response?.data?.error?.code || (r.reason as any)?.code;
+        if (code === 'DUPLICATE_APPLICATION') duplicateCount++;
+        else failCount++;
+      }
+    }
+
+    // 성공한 항목 로컬 즉시 반영
+    if (successIds.size > 0) {
+      setProducts(prev => prev.map(p => successIds.has(p.id) ? { ...p, isAdded: true } : p));
+    }
+
+    // 토스트
+    if (successCount > 0 && failCount === 0) {
+      toast.success(`${successCount}개 상품을 내 매장에 추가했습니다.`);
+    } else if (successCount > 0) {
+      toast.success(`${successCount}개 추가 완료. ${failCount}개 실패.`);
+    } else if (duplicateCount > 0) {
+      toast.error('선택한 상품이 이미 내 매장에 추가되어 있습니다.');
+    } else {
+      toast.error('상품 추가에 실패했습니다. 다시 시도해주세요.');
+    }
+
+    setSelectedKeys(new Set());
+    setBulkAdding(false);
+  }, [products, selectedKeys]);
+
+  // ─── 컬럼 정의 ─────────────────────────────────────────────────────────────
+
+  const columns: ListColumnDef<CatalogProduct>[] = useMemo(
+    () => [
+      {
+        key: 'name',
+        header: '상품명',
+        sortable: true,
+        sortAccessor: (row) => row.name || '',
+        render: (_v, row) => (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ fontWeight: 600, color: colors.neutral900, fontSize: '0.875rem' }}>
+                {row.name}
+              </span>
+              {row.isAdded && (
+                <span style={styles.myStoreBadge}>내 매장</span>
+              )}
+            </div>
+            {row.description && (
+              <span style={{ fontSize: '0.75rem', color: colors.neutral400, lineHeight: 1.4 }}>
+                {row.description}
+              </span>
+            )}
+          </div>
+        ),
+      },
+      {
+        key: 'supplierName',
+        header: '공급자',
+        width: '150px',
+        sortable: true,
+        sortAccessor: (row) => row.supplierName || '',
+        render: (_v, row) => (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {row.supplierLogoUrl ? (
+              <img src={row.supplierLogoUrl} alt={row.supplierName} style={styles.supplierLogo} />
+            ) : (
+              <div style={styles.supplierLogoPlaceholder}>{row.supplierName?.charAt(0)}</div>
+            )}
+            <span style={{ fontSize: '0.8125rem', color: colors.neutral600, fontWeight: 500 }}>
+              {row.supplierName}
+            </span>
+          </div>
+        ),
+      },
+      {
+        key: 'priceGold',
+        header: '공급가',
+        width: '130px',
+        align: 'right',
+        render: (_v, row) => (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 1 }}>
+            <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: colors.neutral900 }}>
+              {formatKpaPrice(row)}
+            </span>
+            {getPriceSublabel(row) && (
+              <span style={{ fontSize: '0.625rem', color: colors.neutral400 }}>
+                {getPriceSublabel(row)}
+              </span>
+            )}
+          </div>
+        ),
+      },
+      {
+        key: 'consumerReferencePrice',
+        header: '권장 소비자가',
+        width: '130px',
+        align: 'right',
+        render: (_v, row) => (
+          <span style={{ fontSize: '0.8125rem', color: colors.neutral700 }}>
+            {row.consumerReferencePrice != null
+              ? row.consumerReferencePrice.toLocaleString('ko-KR') + '원'
+              : '-'}
+          </span>
+        ),
+      },
+      {
+        key: '_actions',
+        header: '액션',
+        system: true,
+        align: 'center',
+        width: '80px',
+        onCellClick: () => {},
+        render: (_v, row) => {
+          const isApplying = applyingId === row.id;
+          const isRemoving = removingId === row.id;
+          if (row.isAdded) {
+            return (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                <button
+                  disabled
+                  title="이미 내 매장에 추가됨"
+                  style={styles.iconButtonAdded}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => setRemoveConfirmId(row.id)}
+                  disabled={isRemoving}
+                  title="내 매장에서 제외"
+                  style={{ ...styles.iconButtonRemove, opacity: isRemoving ? 0.5 : 1 }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="3 6 5 6 21 6" />
+                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                    <path d="M10 11v6M14 11v6" />
+                    <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                  </svg>
+                </button>
+              </div>
+            );
+          }
+          return (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <button
+                onClick={() => handleApply(row)}
+                disabled={isApplying}
+                title={isApplying ? '추가 중...' : '내 매장에 추가'}
+                style={{ ...styles.iconButtonAdd, opacity: isApplying ? 0.6 : 1 }}
+              >
+                {isApplying ? (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ animation: 'spin 1s linear infinite' }}>
+                    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                  </svg>
+                ) : (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="16" />
+                    <line x1="8" y1="12" x2="16" y2="12" />
+                  </svg>
+                )}
+              </button>
+            </div>
+          );
+        },
+      },
+    ],
+    [applyingId, removingId, handleApply],
+  );
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
   const currentPage = Math.floor(offset / PAGE_LIMIT) + 1;
+
+  // "미추가" 선택 항목 수 (ActionBar 표시용)
+  const notAddedSelectedCount = useMemo(
+    () => [...selectedKeys].filter(k => !products.find(p => p.id === k)?.isAdded).length,
+    [selectedKeys, products],
+  );
 
   return (
     <div style={styles.container}>
@@ -217,19 +386,6 @@ export function HubB2BCatalogPage() {
         </p>
       </header>
 
-      {/* Toast */}
-      {toast && (
-        <div style={{
-          ...styles.toast,
-          backgroundColor: toast.type === 'success' ? '#f0fdf4' : '#fef2f2',
-          borderColor: toast.type === 'success' ? '#86efac' : '#fecaca',
-          color: toast.type === 'success' ? '#166534' : '#991b1b',
-        }}>
-          <span>{toast.type === 'success' ? '\u2705' : '\u274c'}</span>
-          <span>{toast.message}</span>
-        </div>
-      )}
-
       {/* Distribution Type Filter */}
       <div style={styles.filterBar}>
         {DISTRIBUTION_TABS.map(tab => (
@@ -252,206 +408,85 @@ export function HubB2BCatalogPage() {
         <span>이 화면은 현재 공급 가능한 상품만 표시됩니다. 공급자 등록 전체 상품과는 범위가 다를 수 있습니다.</span>
       </div>
 
-      {/* Content */}
-      {loading ? (
-        <div style={styles.emptyState}>상품 카탈로그를 불러오는 중...</div>
-      ) : error ? (
+      {/* WO-O4O-STORE-HUB-B2B-CANONICAL-DATATABLE-V1: ActionBar — 선택 항목 있을 때만 표시 */}
+      {selectedKeys.size > 0 && (
+        <div style={styles.actionBar}>
+          <span style={{ fontSize: 13, color: colors.neutral700 }}>
+            {selectedKeys.size}개 선택됨
+            {notAddedSelectedCount > 0 && notAddedSelectedCount < selectedKeys.size && ` (미추가 ${notAddedSelectedCount}개)`}
+          </span>
+          <div style={{ flex: 1 }} />
+          <button
+            type="button"
+            onClick={handleBulkAdd}
+            disabled={bulkAdding}
+            style={{ ...styles.actionBarBtn, opacity: bulkAdding ? 0.6 : 1 }}
+          >
+            {bulkAdding ? '추가 중...' : `내 매장에 추가 (${notAddedSelectedCount || selectedKeys.size}건)`}
+          </button>
+          <button
+            type="button"
+            onClick={() => setSelectedKeys(new Set())}
+            style={styles.actionBarClearBtn}
+          >
+            선택 해제
+          </button>
+        </div>
+      )}
+
+      {/* 결과 카운트 */}
+      {!loading && !error && products.length > 0 && (
+        <div style={styles.resultCount}>공급 가능 상품 {total}건</div>
+      )}
+
+      {/* DataTable */}
+      {error ? (
         <div style={styles.errorState}>
           <p>{error}</p>
           <button onClick={() => fetchCatalog(distributionFilter, offset)} style={styles.retryButton}>
             다시 시도
           </button>
         </div>
-      ) : products.length === 0 ? (
-        <div style={styles.emptyState}>
-          {distributionFilter === 'operator'
-            ? '운영자 승인 흐름에 참여 중인 상품이 없습니다. B2B 탭에서 상품을 확인하고 내 매장에 추가해보세요.'
-            : distributionFilter === 'all'
-              ? '현재 공급 가능한 상품이 없습니다.'
-              : `"${DISTRIBUTION_TABS.find(t => t.key === distributionFilter)?.label}" 유형의 상품이 없습니다.`}
-        </div>
       ) : (
-        <>
-          <div style={styles.resultCount}>공급 가능 상품 {total}건</div>
+        <DataTable<CatalogProduct>
+          columns={columns}
+          data={products}
+          rowKey="id"
+          loading={loading}
+          emptyMessage={
+            distributionFilter === 'operator'
+              ? '운영자 승인 흐름에 참여 중인 상품이 없습니다. B2B 탭에서 상품을 확인해보세요.'
+              : distributionFilter === 'all'
+                ? '현재 공급 가능한 상품이 없습니다.'
+                : `"${DISTRIBUTION_TABS.find(t => t.key === distributionFilter)?.label}" 유형의 상품이 없습니다.`
+          }
+          tableId="kpa-store-hub-b2b-products"
+          selectable
+          selectedKeys={selectedKeys}
+          onSelectionChange={setSelectedKeys}
+        />
+      )}
 
-          <div style={styles.tableCard}>
-            {/* Table Header */}
-            <div style={styles.tableHeader}>
-              <span style={{ ...styles.th, flex: 2, cursor: 'pointer' }} onClick={() => handleSort('name')}>
-                상품명{sortIndicator('name')}
-              </span>
-              <span style={{ ...styles.th, flex: 1.2, cursor: 'pointer' }} onClick={() => handleSort('supplier')}>
-                공급자{sortIndicator('supplier')}
-              </span>
-              <span style={{ ...styles.th, flex: 1, textAlign: 'right' }}>
-                공급가
-              </span>
-              <span style={{ ...styles.th, flex: 1, textAlign: 'right' }}>
-                권장 소비자가
-              </span>
-              <span style={{ ...styles.th, flex: 1, textAlign: 'right' }}>액션</span>
-            </div>
-
-            {/* Table Rows */}
-            {sortedProducts.map(item => {
-              const isApplying = applyingId === item.id;
-              const isAdded = item.isAdded;
-
-              return (
-                <div key={item.id} style={styles.tableRow}>
-                  {/* 상품명 */}
-                  <div style={{ ...styles.td, flex: 2, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
-                      <span style={styles.rowTitle}>{item.name}</span>
-                      {isAdded && (
-                        <span style={styles.myStoreBadge}>내 매장</span>
-                      )}
-                    </div>
-                    {item.description && (
-                      <span style={styles.rowDesc}>{item.description}</span>
-                    )}
-                  </div>
-
-                  {/* 공급자 */}
-                  <div style={{ ...styles.td, flex: 1.2 }}>
-                    <div style={styles.supplierCell}>
-                      {item.supplierLogoUrl ? (
-                        <img src={item.supplierLogoUrl} alt={item.supplierName} style={styles.supplierLogo} />
-                      ) : (
-                        <div style={styles.supplierLogoPlaceholder}>{item.supplierName.charAt(0)}</div>
-                      )}
-                      <span style={styles.supplierName}>{item.supplierName}</span>
-                    </div>
-                  </div>
-
-                  {/* 공급가 */}
-                  <div style={{ ...styles.td, flex: 1, alignItems: 'flex-end' }}>
-                    <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: colors.neutral900 }}>
-                      {formatKpaPrice(item)}
-                    </span>
-                    {getPriceSublabel(item) && (
-                      <span style={{ fontSize: '0.625rem', color: colors.neutral400, marginTop: 1 }}>
-                        {getPriceSublabel(item)}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* 권장 소비자가 */}
-                  <div style={{ ...styles.td, flex: 1, alignItems: 'flex-end' }}>
-                    <span style={{ fontSize: '0.8125rem', color: colors.neutral700 }}>
-                      {item.consumerReferencePrice != null
-                        ? item.consumerReferencePrice.toLocaleString('ko-KR') + '원'
-                        : '-'}
-                    </span>
-                  </div>
-
-                  {/* 액션 */}
-                  <div style={{ ...styles.td, flex: 1, justifyContent: 'flex-end', flexDirection: 'row', gap: '6px', alignItems: 'center' }}>
-                    {isAdded ? (
-                      <>
-                        {/* 추가됨 표시 아이콘 */}
-                        <button
-                          disabled
-                          title="이미 내 매장에 추가됨"
-                          aria-label="이미 내 매장에 추가됨"
-                          style={styles.iconButtonAdded}
-                        >
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="20 6 9 17 4 12" />
-                          </svg>
-                        </button>
-                        {/* 제외 버튼 */}
-                        <button
-                          onClick={() => setRemoveConfirmId(item.id)}
-                          disabled={removingId === item.id}
-                          title="내 매장에서 제외"
-                          aria-label="내 매장에서 제외"
-                          style={{
-                            ...styles.iconButtonRemove,
-                            opacity: removingId === item.id ? 0.5 : 1,
-                            cursor: removingId === item.id ? 'not-allowed' : 'pointer',
-                          }}
-                        >
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="3 6 5 6 21 6" />
-                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-                            <path d="M10 11v6M14 11v6" />
-                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
-                          </svg>
-                        </button>
-                      </>
-                    ) : (
-                      /* 내 매장에 추가 버튼 */
-                      <button
-                        onClick={() => handleApply(item)}
-                        disabled={isApplying}
-                        title={isApplying ? '추가 중...' : '내 매장에 추가'}
-                        aria-label="내 매장에 추가"
-                        style={{
-                          ...styles.iconButtonAdd,
-                          opacity: isApplying ? 0.6 : 1,
-                          cursor: isApplying ? 'not-allowed' : 'pointer',
-                        }}
-                      >
-                        {isApplying ? (
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ animation: 'spin 1s linear infinite' }}>
-                            <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-                          </svg>
-                        ) : (
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <circle cx="12" cy="12" r="10" />
-                            <line x1="12" y1="8" x2="12" y2="16" />
-                            <line x1="8" y1="12" x2="16" y2="12" />
-                          </svg>
-                        )}
-                      </button>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div style={styles.pagination}>
-              <button
-                onClick={() => setOffset(Math.max(0, offset - PAGE_LIMIT))}
-                disabled={currentPage <= 1}
-                style={{
-                  ...styles.pageButton,
-                  opacity: currentPage <= 1 ? 0.4 : 1,
-                  cursor: currentPage <= 1 ? 'not-allowed' : 'pointer',
-                }}
-              >
-                &laquo; 이전
-              </button>
-              <span style={styles.pageInfo}>{currentPage} / {totalPages}</span>
-              <button
-                onClick={() => setOffset(offset + PAGE_LIMIT)}
-                disabled={currentPage >= totalPages}
-                style={{
-                  ...styles.pageButton,
-                  opacity: currentPage >= totalPages ? 0.4 : 1,
-                  cursor: currentPage >= totalPages ? 'not-allowed' : 'pointer',
-                }}
-              >
-                다음 &raquo;
-              </button>
-            </div>
-          )}
-        </>
+      {/* Pagination */}
+      {!loading && !error && totalPages > 1 && (
+        <Pagination
+          page={currentPage}
+          totalPages={totalPages}
+          onPageChange={(p) => setOffset((p - 1) * PAGE_LIMIT)}
+          total={total}
+        />
       )}
 
       {/* Guide */}
       <div style={styles.notice}>
         <span style={styles.noticeIcon}>💡</span>
         <span>
-          내 매장에 추가하면 주문 시 빠르게 사용할 수 있습니다.
+          상품을 선택한 뒤 "내 매장에 추가"로 한 번에 추가하거나, 각 행의 + 버튼으로 단건 추가할 수 있습니다.
+          추가된 상품은 <a href="/store/channels" style={{ color: colors.primary }}>채널 관리</a>에서 진열하면 고객에게 보여집니다.
         </span>
       </div>
 
-      {/* 채널 진열 CTA — 추가된 상품이 있을 때 표시 */}
+      {/* 채널 진열 CTA */}
       {products.some(p => p.isAdded) && (
         <div style={styles.channelCta}>
           <span style={styles.noticeIcon}>✅</span>
@@ -465,21 +500,13 @@ export function HubB2BCatalogPage() {
   );
 }
 
-// ============================================
-// 스타일
-// ============================================
+// ─── 스타일 ───────────────────────────────────────────────────────────────────
 
 const styles: Record<string, React.CSSProperties> = {
   container: {
     maxWidth: '1100px',
     margin: '0 auto',
     padding: '24px',
-  },
-  breadcrumb: { marginBottom: '16px' },
-  breadcrumbLink: {
-    fontSize: '0.875rem',
-    color: colors.primary,
-    textDecoration: 'none',
   },
   hero: {
     marginBottom: '24px',
@@ -496,18 +523,6 @@ const styles: Record<string, React.CSSProperties> = {
     margin: '8px 0 0',
     fontSize: '0.95rem',
     color: colors.neutral500,
-  },
-
-  // Toast
-  toast: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    padding: '12px 16px',
-    borderRadius: '8px',
-    border: '1px solid',
-    fontSize: '0.875rem',
-    marginBottom: '16px',
   },
 
   // Filter
@@ -548,99 +563,49 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '12px',
     flexShrink: 0,
   },
+
+  // WO-O4O-STORE-HUB-B2B-CANONICAL-DATATABLE-V1: ActionBar
+  actionBar: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    padding: '10px 14px',
+    background: '#fff',
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: '8px',
+    marginBottom: '12px',
+    flexWrap: 'wrap' as const,
+  },
+  actionBarBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '8px 16px',
+    background: colors.primary,
+    border: 'none',
+    borderRadius: '6px',
+    fontSize: '13px',
+    fontWeight: 500,
+    color: '#fff',
+    cursor: 'pointer',
+    transition: 'opacity 0.15s',
+  },
+  actionBarClearBtn: {
+    padding: '8px 10px',
+    background: 'transparent',
+    border: 'none',
+    fontSize: '13px',
+    color: colors.neutral500,
+    cursor: 'pointer',
+  },
+
   resultCount: {
     fontSize: '0.8125rem',
     color: colors.neutral500,
     marginBottom: '12px',
   },
 
-  // Table
-  tableCard: {
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.lg,
-    boxShadow: shadows.sm,
-    border: `1px solid ${colors.neutral200}`,
-    overflow: 'hidden',
-    marginBottom: '24px',
-  },
-  tableHeader: {
-    display: 'flex',
-    padding: '10px 20px',
-    borderBottom: `1px solid ${colors.neutral200}`,
-    backgroundColor: colors.neutral50,
-    userSelect: 'none' as const,
-  },
-  th: {
-    fontSize: '0.75rem',
-    fontWeight: 600,
-    color: colors.neutral500,
-    textTransform: 'uppercase',
-    letterSpacing: '0.03em',
-    transition: 'color 0.15s',
-  } as React.CSSProperties,
-  tableRow: {
-    display: 'flex',
-    alignItems: 'center',
-    padding: '14px 20px',
-    borderBottom: `1px solid ${colors.neutral100}`,
-    transition: 'background-color 0.1s',
-  },
-  td: {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    fontSize: '0.8125rem',
-    color: colors.neutral700,
-    paddingRight: '12px',
-  } as React.CSSProperties,
-  rowTitle: {
-    fontSize: '0.875rem',
-    fontWeight: 600,
-    color: colors.neutral900,
-    lineHeight: 1.4,
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-  } as React.CSSProperties,
-  rowDesc: {
-    fontSize: '0.75rem',
-    color: colors.neutral400,
-    lineHeight: 1.4,
-    marginTop: '2px',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-  } as React.CSSProperties,
-  supplierCell: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-  },
-  supplierLogo: {
-    width: '24px',
-    height: '24px',
-    borderRadius: '4px',
-    objectFit: 'cover' as const,
-  },
-  supplierLogoPlaceholder: {
-    width: '24px',
-    height: '24px',
-    borderRadius: '4px',
-    backgroundColor: colors.primary + '15',
-    color: colors.primary,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '0.625rem',
-    fontWeight: 700,
-  },
-  supplierName: {
-    fontSize: '0.8125rem',
-    color: colors.neutral600,
-    fontWeight: 500,
-  },
-
-  // Icon Buttons (WO-O4O-STORE-HUB-B2B-UI-REFINEMENT-V1)
+  // Icon Buttons
   iconButtonAdd: {
     display: 'flex',
     alignItems: 'center',
@@ -651,6 +616,7 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: colors.primary,
     border: 'none',
     borderRadius: '8px',
+    cursor: 'pointer',
     transition: 'opacity 0.15s',
     flexShrink: 0,
   },
@@ -677,6 +643,7 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: '#fff1f2',
     border: '1px solid #fecaca',
     borderRadius: '6px',
+    cursor: 'pointer',
     transition: 'opacity 0.15s',
     flexShrink: 0,
   },
@@ -690,6 +657,27 @@ const styles: Record<string, React.CSSProperties> = {
     border: `1px solid ${colors.primary}30`,
     borderRadius: '4px',
     whiteSpace: 'nowrap' as const,
+    flexShrink: 0,
+  },
+
+  // Supplier
+  supplierLogo: {
+    width: '24px',
+    height: '24px',
+    borderRadius: '4px',
+    objectFit: 'cover' as const,
+  },
+  supplierLogoPlaceholder: {
+    width: '24px',
+    height: '24px',
+    borderRadius: '4px',
+    backgroundColor: colors.primary + '15',
+    color: colors.primary,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '0.625rem',
+    fontWeight: 700,
     flexShrink: 0,
   },
 
@@ -748,35 +736,7 @@ const styles: Record<string, React.CSSProperties> = {
     transition: 'opacity 0.15s',
   },
 
-  // Pagination
-  pagination: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '16px',
-    marginBottom: '32px',
-  },
-  pageButton: {
-    padding: '6px 14px',
-    fontSize: '0.8125rem',
-    fontWeight: 500,
-    color: colors.neutral600,
-    backgroundColor: colors.white,
-    border: `1px solid ${colors.neutral200}`,
-    borderRadius: '6px',
-  },
-  pageInfo: {
-    fontSize: '0.8125rem',
-    color: colors.neutral500,
-  },
-
   // States
-  emptyState: {
-    textAlign: 'center' as const,
-    padding: '60px 20px',
-    fontSize: '0.9rem',
-    color: colors.neutral400,
-  },
   errorState: {
     textAlign: 'center' as const,
     padding: '60px 20px',
