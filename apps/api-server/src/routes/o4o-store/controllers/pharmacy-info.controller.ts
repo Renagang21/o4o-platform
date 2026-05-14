@@ -15,7 +15,7 @@ import { DataSource } from 'typeorm';
 import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 import { KpaAuditLog } from '../../kpa/entities/kpa-audit-log.entity.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
-import { createRequireStoreOwner } from '../../../utils/store-owner.utils.js';
+import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
 import type { StoreAddress } from '../../../types/store-address.js';
 import { StoreSlugService } from '@o4o/platform-core/store-identity';
 
@@ -47,12 +47,15 @@ function sanitizePhone(value: string | undefined | null): string | null {
 
 export function createPharmacyInfoController(
   dataSource: DataSource,
-  requireAuth: AuthMiddleware
+  requireAuth: AuthMiddleware,
+  // WO-O4O-STORE-OWNER-BACKCOMPAT-CALLERS-MIGRATION-V1:
+  //   serviceKey 명시 시 service_memberships(active) 검사 + 해당 서비스 store_owner role 만 허용.
+  serviceKey?: StoreOwnerServiceKey,
 ): Router {
   const router = Router();
   const orgRepo = dataSource.getRepository(OrganizationStore);
   const auditRepo = dataSource.getRepository(KpaAuditLog);
-  const requireStoreOwner = createRequireStoreOwner(dataSource);
+  const requireStoreOwner = createRequireStoreOwner(dataSource, serviceKey);
 
   // ─── GET /info — 약국 기본 정보 조회 ─────────────────────
   router.get('/info', requireAuth, requireStoreOwner, asyncHandler(async (req: Request, res: Response) => {

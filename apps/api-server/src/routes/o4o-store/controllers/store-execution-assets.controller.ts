@@ -27,7 +27,7 @@ import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { StoreExecutionAsset } from '../../platform/entities/store-execution-asset.entity.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
-import { createRequireStoreOwner } from '../../../utils/store-owner.utils.js';
+import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
 
 const VALID_ASSET_TYPES = ['file', 'content', 'external-link'] as const;
 
@@ -36,11 +36,14 @@ type AuthMiddleware = RequestHandler;
 export function createStoreExecutionAssetsController(
   dataSource: DataSource,
   requireAuth: AuthMiddleware,
+  // WO-O4O-STORE-OWNER-BACKCOMPAT-CALLERS-MIGRATION-V1:
+  //   serviceKey 명시 시 service_memberships(active) + store_owner role 모두 강제.
+  serviceKey?: StoreOwnerServiceKey,
 ): Router {
   const router = Router();
   const assetsRepo = dataSource.getRepository(StoreExecutionAsset);
 
-  const requirePharmacyOwner = createRequireStoreOwner(dataSource);
+  const requirePharmacyOwner = createRequireStoreOwner(dataSource, serviceKey);
 
   // ─── GET /store/assets — 자산 목록 (페이지네이션) ──────────
   router.get(

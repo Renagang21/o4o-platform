@@ -704,7 +704,12 @@ export function createKpaCheckoutController(
   // 판매자 관점: 매장 주문 목록 + KPI
   // ==========================================================================
 
-  const requireStoreOwner = createRequireStoreOwner(dataSource);
+  // WO-O4O-STORE-OWNER-BACKCOMPAT-CALLERS-MIGRATION-V1:
+  //   본 controller 는 KPA 전용 (kpa.routes.ts mount). serviceKey='kpa' 명시로
+  //   active kpa-society membership + kpa:store_owner role 모두 강제.
+  //   이전 (no serviceKey) 에는 glycopharm/cosmetics store_owner role 보유자도 통과 가능했던
+  //   cross-service leak 위험이 있었음 — 본 변경으로 차단.
+  const requireStoreOwner = createRequireStoreOwner(dataSource, 'kpa');
 
   /**
    * GET /checkout/store-orders/kpi

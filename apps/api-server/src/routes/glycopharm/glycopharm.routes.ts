@@ -377,7 +377,8 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   router.use('/', createStorePopController(dataSource, coreRequireAuth as any, 'glycopharm'));
 
   // Store Analytics (internal: /pharmacy/analytics/*)
-  router.use('/', createStoreAnalyticsController(dataSource, coreRequireAuth as any));
+  // WO-O4O-STORE-OWNER-BACKCOMPAT-CALLERS-MIGRATION-V1: serviceKey='glycopharm' 명시 (canonical)
+  router.use('/', createStoreAnalyticsController(dataSource, coreRequireAuth as any, 'glycopharm'));
 
   // Product Marketing Graph (internal: /pharmacy/products/*/marketing)
   // WO-O4O-STORE-GUARD-PHASE2B-LIBRARY-MARKETING-POP-V1: serviceKey='glycopharm' 전달.

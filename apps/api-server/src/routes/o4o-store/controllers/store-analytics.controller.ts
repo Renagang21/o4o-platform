@@ -14,16 +14,19 @@
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { asyncHandler } from '../../../middleware/error-handler.js';
-import { createRequireStoreOwner } from '../../../utils/store-owner.utils.js';
+import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
 
 type AuthMiddleware = RequestHandler;
 
 export function createStoreAnalyticsController(
   dataSource: DataSource,
   requireAuth: AuthMiddleware,
+  // WO-O4O-STORE-OWNER-BACKCOMPAT-CALLERS-MIGRATION-V1:
+  //   serviceKey 명시 시 service_memberships(active) + store_owner role 모두 강제.
+  serviceKey?: StoreOwnerServiceKey,
 ): Router {
   const router = Router();
-  const requirePharmacyOwner = createRequireStoreOwner(dataSource);
+  const requirePharmacyOwner = createRequireStoreOwner(dataSource, serviceKey);
 
   // ─── GET /pharmacy/analytics/marketing ───────────────────────
   router.get(

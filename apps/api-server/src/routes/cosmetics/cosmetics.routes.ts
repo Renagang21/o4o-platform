@@ -132,7 +132,8 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
   router.use('/', createStorePopController(dataSource, coreRequireAuth as any, 'cosmetics'));
 
   // Store Analytics (internal: /pharmacy/analytics/*)
-  router.use('/', createStoreAnalyticsController(dataSource, coreRequireAuth as any));
+  // WO-O4O-STORE-OWNER-BACKCOMPAT-CALLERS-MIGRATION-V1: serviceKey='cosmetics' 명시 (canonical)
+  router.use('/', createStoreAnalyticsController(dataSource, coreRequireAuth as any, 'cosmetics'));
 
   // Product Marketing Graph (internal: /pharmacy/products/*/marketing)
   // WO-O4O-STORE-GUARD-PHASE2B-LIBRARY-MARKETING-POP-V1: serviceKey='cosmetics' 전달.

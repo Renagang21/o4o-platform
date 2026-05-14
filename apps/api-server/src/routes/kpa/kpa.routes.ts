@@ -357,7 +357,8 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   router.use('/pharmacy/store', createPharmacyStoreConfigController(dataSource, coreRequireAuth as any, 'kpa'));
 
   // Pharmacy Info routes (WO-KPA-PHARMACY-INFO-EDIT-FLOW-V1)
-  router.use('/pharmacy', createPharmacyInfoController(dataSource, coreRequireAuth as any));
+  // WO-O4O-STORE-OWNER-BACKCOMPAT-CALLERS-MIGRATION-V1: serviceKey='kpa' 명시 (canonical)
+  router.use('/pharmacy', createPharmacyInfoController(dataSource, coreRequireAuth as any, 'kpa'));
 
   // Pharmacy Products routes (WO-PHARMACY-PRODUCT-LISTING-APPROVAL-PHASE1-V1)
   // WO-GLYCOPHARM-STORE-GUARD-SERVICE-AWARE-FIX-V1: serviceKey='kpa' 전달 → kpa:store_owner 만 통과.
@@ -384,7 +385,8 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // WO-KPA-B-STORE-CONTAMINATION-CLEANUP-V1 Phase 2: 문서화 완료
 
   // Store Execution Assets routes (WO-KPA-STORE-ASSET-STRUCTURE-REFACTOR-V1) — internal: /store/assets/*
-  router.use('/', createStoreExecutionAssetsController(dataSource, coreRequireAuth as any));
+  // WO-O4O-STORE-OWNER-BACKCOMPAT-CALLERS-MIGRATION-V1: serviceKey='kpa' 명시 (canonical)
+  router.use('/', createStoreExecutionAssetsController(dataSource, coreRequireAuth as any, 'kpa'));
 
   // Store QR Landing routes (WO-O4O-QR-LANDING-PAGE-V1) — internal: /qr/public/*, /pharmacy/qr/*
   // WO-O4O-STORE-GUARD-PHASE2A-CHANNEL-AND-QR-V1: serviceKey='kpa' 전달 (public route /qr/public/:slug 는 무관).
@@ -395,7 +397,8 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   router.use('/', createStorePopController(dataSource, coreRequireAuth as any, 'kpa'));
 
   // Store Analytics routes (WO-O4O-MARKETING-ANALYTICS-V1) — internal: /pharmacy/analytics/*
-  router.use('/', createStoreAnalyticsController(dataSource, coreRequireAuth as any));
+  // WO-O4O-STORE-OWNER-BACKCOMPAT-CALLERS-MIGRATION-V1: serviceKey='kpa' 명시 (canonical)
+  router.use('/', createStoreAnalyticsController(dataSource, coreRequireAuth as any, 'kpa'));
 
   // Product Marketing Graph (WO-O4O-PRODUCT-MARKETING-GRAPH-V1) — internal: /pharmacy/products/*/marketing
   // WO-O4O-STORE-GUARD-PHASE2B-LIBRARY-MARKETING-POP-V1: serviceKey='kpa' 전달.
