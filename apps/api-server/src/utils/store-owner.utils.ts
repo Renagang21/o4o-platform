@@ -9,6 +9,13 @@
  *   service-aware guard 도입 — cross-service role leakage 차단.
  *   서비스별 store_owner 역할 정의를 명시화하여 frontend/backend SSOT 정합 회복.
  *   기존 시그니처(serviceKey 미지정)는 back-compat 경로로 모든 서비스 role 허용.
+ *
+ * WO-O4O-STORE-OWNER-MEMBERSHIP-CANONICALIZATION-V1:
+ *   serviceKey 가 명시된 경로에서 service_memberships(active) 검사를 추가한다.
+ *   role 만 있고 active membership 이 없는 store-owner 접근을 차단 (frontend
+ *   MembershipGate / WO-O4O-BACKEND-MEMBERSHIP-GUARD-CANONICALIZATION-V1 과 동일 정책).
+ *   serviceKey 미지정 back-compat 경로는 본 WO 범위에서 변경하지 않음 — 점진 마이그레이션.
+ *   request 당 추가 DB query 0건 (JWT memberships 직접 사용).
  */
 
 import type { DataSource } from 'typeorm';
@@ -31,6 +38,19 @@ const STORE_OWNER_ROLES_BY_SERVICE = {
 } as const;
 
 export type StoreOwnerServiceKey = keyof typeof STORE_OWNER_ROLES_BY_SERVICE;
+
+/**
+ * WO-O4O-STORE-OWNER-MEMBERSHIP-CANONICALIZATION-V1:
+ *   StoreOwnerServiceKey(role-prefix) → service_memberships.service_key 매핑.
+ *   common/middleware/membership-guard.middleware.ts 의 SCOPE_TO_MEMBERSHIP_KEY,
+ *   utils/serviceScope.ts 의 ROLE_PREFIX_TO_SERVICE_KEY 와 동일 의미 (follow-up
+ *   으로 단일 상수 통합 권장).
+ */
+const STORE_OWNER_SCOPE_TO_MEMBERSHIP_KEY: Record<StoreOwnerServiceKey, string> = {
+  kpa: 'kpa-society',
+  glycopharm: 'glycopharm',
+  cosmetics: 'k-cosmetics',
+};
 
 /**
  * 모든 서비스의 store_owner role 합집합 (back-compat 경로용).
@@ -97,6 +117,33 @@ export function createRequireStoreOwner(
         code: 'AUTH_REQUIRED',
       });
       return;
+    }
+
+    // WO-O4O-STORE-OWNER-MEMBERSHIP-CANONICALIZATION-V1
+    // serviceKey 가 명시된 경우 service_memberships.active 사전 검증.
+    // back-compat 경로(serviceKey 미지정)는 본 WO 에서 변경 없음 — 점진 마이그레이션.
+    // JWT memberships 직접 사용 — request 당 추가 DB query 없음.
+    if (serviceKey) {
+      const membershipKey = STORE_OWNER_SCOPE_TO_MEMBERSHIP_KEY[serviceKey];
+      const memberships: { serviceKey: string; status: string }[] =
+        (user as any).memberships || [];
+      const membership = memberships.find((m) => m.serviceKey === membershipKey);
+      if (!membership) {
+        res.status(403).json({
+          success: false,
+          error: `No membership found for service: ${serviceKey}`,
+          code: 'MEMBERSHIP_NOT_FOUND',
+        });
+        return;
+      }
+      if (membership.status !== 'active') {
+        res.status(403).json({
+          success: false,
+          error: `Service membership is ${membership.status}. Active membership required.`,
+          code: 'MEMBERSHIP_NOT_ACTIVE',
+        });
+        return;
+      }
     }
 
     const { isOwner, organizationId, memberRole } = await isStoreOwner(
