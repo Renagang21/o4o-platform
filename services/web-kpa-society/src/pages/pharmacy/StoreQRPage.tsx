@@ -13,12 +13,17 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { QrCode, Trash2, ExternalLink, Copy, Check, RefreshCw, BarChart3, X, Smartphone, Monitor, Tablet, Download, Printer, ArrowRight, FolderOpen } from 'lucide-react';
+import { QrCode, Trash2, ExternalLink, Copy, Check, RefreshCw, BarChart3, X, Smartphone, Monitor, Tablet, Download, Printer, ArrowRight, FolderOpen, Sparkles, LayoutTemplate } from 'lucide-react';
 import { getStoreExecutionAsset } from '../../api/storeExecutionAssets';
 import { Link, useLocation } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { GuideBlock } from '@o4o/shared-space-ui';
+import { AiContentModal } from '@o4o/content-editor';
 import { colors } from '../../styles/theme';
+// WO-O4O-QR-TEMPLATE-WORKFLOW-V1
+import { findTemplate } from './productionTemplates';
+import type { ProductionTemplate } from './productionTemplates';
+import type { ProductionRouterState } from './productionTargets';
 import { StoreAssetSelectorModal } from '../../components/store/StoreAssetSelectorModal';
 import type { AssetSelectorResult as LibrarySelectorResult } from '../../components/store/StoreAssetSelectorModal';
 import { QrPrintTemplateModal } from './QrPrintTemplateModal';
@@ -77,6 +82,11 @@ export function StoreQRPage() {
   const [formLandingTargetId, setFormLandingTargetId] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  // WO-O4O-QR-TEMPLATE-WORKFLOW-V1: title/description AI 생성 + template 상태
+  const [formTitle, setFormTitle] = useState('');
+  const [formDescription, setFormDescription] = useState('');
+  const [selectedTemplate, setSelectedTemplate] = useState<ProductionTemplate | null>(null);
+  const [aiOpen, setAiOpen] = useState(false);
 
   // Analytics state
   const [analyticsId, setAnalyticsId] = useState<string | null>(null);
@@ -138,16 +148,17 @@ export function StoreQRPage() {
   //  - 상품 마케팅 → QR 만들기 (단건 자동 prefill, productContext 동반)
   // WO-O4O-KPA-STORE-PRODUCTION-ENTRY-CANONICAL-CORRECTION-V1
   // WO-O4O-KPA-STORE-QR-PRODUCT-CONTEXT-CANONICAL-MERGE-V1
+  // WO-O4O-QR-TEMPLATE-WORKFLOW-V1: selectedTemplateId 수신
   useEffect(() => {
-    const state = location.state as
-      | {
-          production?: {
-            source?: { items?: Array<{ id: string; title: string; description?: string | null; origin?: string }> };
-          };
-        }
-      | null;
+    const state = location.state as ProductionRouterState | null;
+    // template 조회: selectedTemplateId 우선, 없으면 qr-product-intro 기본값
+    const templateId = state?.production?.selectedTemplateId ?? 'qr-product-intro';
+    const tpl = findTemplate(templateId) ?? findTemplate('qr-product-intro') ?? null;
+    if (tpl) setSelectedTemplate(tpl);
 
-    const incoming = state?.production?.source?.items?.find((it) => it.origin === 'library');
+    const incoming = (state as any)?.production?.source?.items?.find(
+      (it: any) => it.origin === 'library',
+    );
     if (incoming) {
       // 자료실 항목 fetch 후 creation mode 진입
       (async () => {
@@ -177,10 +188,31 @@ export function StoreQRPage() {
     setFormSlug(toSlug(item.title));
     setFormLandingType(autoLandingType(item.assetType || 'file'));
     setFormLandingTargetId(item.assetType === 'external-link' && item.url ? item.url : '');
+    // WO-O4O-QR-TEMPLATE-WORKFLOW-V1: title/description 초기화
+    setFormTitle(item.title);
+    setFormDescription('');
     setFormError(null);
     setShowSelector(false);
     setCreating(true);
   };
+
+  // WO-O4O-QR-TEMPLATE-WORKFLOW-V1: AI 문구 생성 결과 주입
+  // html에서 title과 description을 추출해 form state에 반영.
+  // QR은 짧은 structured output이므로 첫 heading → title, 첫 p → description.
+  const handleAiInsert = useCallback(({ html, title: aiTitle }: { html: string; title: string }) => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    const titleFromHtml = doc.querySelector('h1,h2,h3')?.textContent?.trim() || '';
+    const descFromHtml = doc.querySelector('p')?.textContent?.trim() || '';
+    const finalTitle = aiTitle?.trim() || titleFromHtml;
+    const finalDesc = descFromHtml;
+
+    if (finalTitle) setFormTitle(finalTitle);
+    if (finalDesc) setFormDescription(finalDesc.slice(0, 150));
+    setAiOpen(false);
+    toast.success('AI 문구가 적용되었습니다. 내용을 확인하고 QR을 저장하세요.');
+  }, []);
 
   const handleCreate = async () => {
     if (!selectedLibrary) return;
@@ -194,7 +226,9 @@ export function StoreQRPage() {
 
     try {
       const res = await createStoreQrCode({
-        title: selectedLibrary.title,
+        // WO-O4O-QR-TEMPLATE-WORKFLOW-V1: AI 생성 제목/설명 우선 사용
+        title: formTitle.trim() || selectedLibrary.title,
+        description: formDescription.trim() || undefined,
         type: formLandingType,
         libraryItemId: selectedLibrary.id,
         landingType: formLandingType,
@@ -401,7 +435,22 @@ export function StoreQRPage() {
       {/* Create Form */}
       {creating && selectedLibrary && (
         <div style={styles.createForm}>
-          <h3 style={styles.formTitle}>새 QR 만들기</h3>
+          <div style={{ marginBottom: '16px' }}>
+            <h3 style={styles.formTitle}>새 QR 만들기</h3>
+            {/* WO-O4O-QR-TEMPLATE-WORKFLOW-V1: template badge */}
+            {selectedTemplate && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '6px', flexWrap: 'wrap' }}>
+                <span style={styles.templateBadge}>
+                  <LayoutTemplate size={11} />
+                  {selectedTemplate.name}
+                  {selectedTemplate.style ? ` · ${selectedTemplate.style}` : ''}
+                </span>
+                <span style={{ fontSize: '12px', color: colors.neutral400 }}>
+                  {selectedTemplate.description}
+                </span>
+              </div>
+            )}
+          </div>
 
           {/* 선택된 자료 정보 */}
           <div style={styles.selectedLibraryCard}>
@@ -425,6 +474,58 @@ export function StoreQRPage() {
               자료 변경
               <ArrowRight size={14} />
             </button>
+          </div>
+
+          {/* WO-O4O-QR-TEMPLATE-WORKFLOW-V1: AI 문구 보조 배너 */}
+          <div style={styles.aiBanner}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={styles.aiBannerTitle}>✨ AI 문구 보조</div>
+              <div style={styles.aiBannerDesc}>
+                {selectedTemplate
+                  ? `${selectedTemplate.name} 스타일로 QR 제목과 짧은 안내문을 생성합니다.`
+                  : 'QR 스캔 후 보여줄 짧은 제목과 안내문을 AI로 생성합니다.'}
+                {' '}선택 사항입니다.
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setAiOpen(true)}
+              style={styles.aiBannerBtn}
+            >
+              <Sparkles size={13} />
+              AI 문구 생성
+            </button>
+          </div>
+
+          {/* WO-O4O-QR-TEMPLATE-WORKFLOW-V1: QR 제목 */}
+          <div style={styles.formRow}>
+            <label style={styles.formLabel}>QR 제목</label>
+            <input
+              type="text"
+              value={formTitle}
+              onChange={(e) => setFormTitle(e.target.value)}
+              style={styles.input}
+              placeholder="QR 스캔 후 표시될 제목"
+              maxLength={60}
+            />
+          </div>
+
+          {/* WO-O4O-QR-TEMPLATE-WORKFLOW-V1: 짧은 안내문 */}
+          <div style={styles.formRow}>
+            <label style={styles.formLabel}>짧은 안내문 (선택)</label>
+            <input
+              type="text"
+              value={formDescription}
+              onChange={(e) => setFormDescription(e.target.value)}
+              style={styles.input}
+              placeholder="QR 스캔 후 표시될 짧은 설명 (50자 이내 권장)"
+              maxLength={150}
+            />
+            {formDescription && (
+              <p style={{ fontSize: '11px', color: colors.neutral400, margin: '4px 0 0' }}>
+                {formDescription.length}/150자
+              </p>
+            )}
           </div>
 
           <div style={styles.formRow}>
@@ -550,6 +651,9 @@ export function StoreQRPage() {
                   </div>
                   <div style={styles.cardInfo}>
                     <p style={styles.cardTitle}>{item.title}</p>
+                    {item.description && (
+                      <p style={styles.cardDescription}>{item.description}</p>
+                    )}
                     <div style={styles.cardMeta}>
                       <span style={styles.cardBadge}>
                         {LANDING_TYPE_OPTIONS.find((o) => o.value === item.landingType)?.label || item.landingType}
@@ -663,6 +767,23 @@ export function StoreQRPage() {
           </div>
         )}
       </div>
+
+      {/* WO-O4O-QR-TEMPLATE-WORKFLOW-V1: AI 문구 생성 모달 (template-aware) */}
+      <AiContentModal
+        open={aiOpen}
+        onClose={() => setAiOpen(false)}
+        editor={null}
+        onInsert={handleAiInsert}
+        aiRequestHeaders={(() => {
+          const token = getAccessToken();
+          return token ? { Authorization: `Bearer ${token}` } : undefined;
+        })()}
+        headerLabel="QR 안내문 생성"
+        urlPlaceholder="https://example.com/product 또는 QR 연결 대상 URL"
+        templateId={selectedTemplate?.id}
+        templateSystemPrompt={selectedTemplate?.systemPromptOverride}
+        templateForcedOptions={selectedTemplate?.forcedOptions}
+      />
 
       {/* Asset Selector Modal */}
       <StoreAssetSelectorModal
@@ -1038,6 +1159,64 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '12px',
     color: colors.neutral600,
     padding: '2px 0',
+  },
+
+  // WO-O4O-QR-TEMPLATE-WORKFLOW-V1
+  templateBadge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '4px',
+    padding: '3px 8px',
+    background: '#eef2ff',
+    color: '#4f46e5',
+    borderRadius: '5px',
+    fontSize: '11px',
+    fontWeight: 600,
+  },
+  aiBanner: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    padding: '10px 14px',
+    marginBottom: '16px',
+    background: '#eef2ff',
+    border: '1px solid #c7d2fe',
+    borderRadius: '8px',
+  },
+  aiBannerTitle: {
+    fontSize: '13px',
+    fontWeight: 600,
+    color: '#4338ca',
+    marginBottom: '2px',
+  },
+  aiBannerDesc: {
+    fontSize: '12px',
+    color: '#6366f1',
+    lineHeight: 1.5,
+  },
+  aiBannerBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '7px 14px',
+    background: '#4f46e5',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '6px',
+    fontSize: '12px',
+    fontWeight: 600,
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
+  },
+  cardDescription: {
+    fontSize: '12px',
+    color: colors.neutral500,
+    margin: '3px 0 0',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    maxWidth: '400px',
   },
 
   // Print / download

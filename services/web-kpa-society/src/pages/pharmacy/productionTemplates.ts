@@ -320,6 +320,26 @@ export const PRODUCTION_TEMPLATE_REGISTRY: ProductionTemplate[] = [
       '"지금 바로", "오늘만" 등 긴박감을 부여하는 표현을 적절히 활용합니다.',
   },
 
+  {
+    id: 'qr-health-info',
+    target: 'qr',
+    name: '건강정보형',
+    description: '건강·의약 정보를 연결하는 신뢰 중심 안내 스타일',
+    style: '건강형',
+    tags: ['qr', 'health', 'info', 'pharmacist', 'trust'],
+    forcedOptions: { length: 'short', tone: 'professional' },
+    outputConstraints: {
+      maxBodyLength: 150,
+      allowedLengths: ['short'],
+      requiredFields: ['title', 'shortText', 'summary'],
+    },
+    systemPromptOverride:
+      'QR 코드 스캔 후 건강·의약 정보를 안내하는 신뢰감 있는 안내문을 작성합니다. ' +
+      '제목은 20자 이내, 설명은 50자 이내로 핵심 건강 정보를 간결하게 전달하세요. ' +
+      '"약사가 직접 안내합니다", "전문 건강 정보" 등 신뢰감을 주는 표현을 포함하고, ' +
+      '과장 없이 정확한 정보를 제공합니다.',
+  },
+
   // ──────────────────────────────────────────────────────────────────────────
   // 상품설명 (2개)
   // ──────────────────────────────────────────────────────────────────────────
