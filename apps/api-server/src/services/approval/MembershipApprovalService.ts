@@ -166,22 +166,53 @@ export class MembershipApprovalService {
         [userId, memberRole, approvedBy]
       );
 
-      // STEP4: WO-O4O-KPA-MEMBERSHIP-STATUS-SYNC-V1 — kpa_members projection sync
-      //   service_memberships 가 KPA 가입 상태 SSOT. kpa_members.status 는 projection/cache.
-      //   기존엔 PATCH /kpa/members/:id/status 또는 AdminUserController 만 sync 했고,
-      //   본 서비스를 직접 호출하는 경로(operator membership routes 등)에서는 누락.
-      //   service_key='kpa-society' 일 때만 sync — 다른 서비스 사용자의 kpa_members 영향 없음.
-      //   status='pending' 인 row 만 update — 이미 active/suspended 인 경우 덮어쓰지 않음.
+      // STEP4: WO-O4O-KPA-MEMBERSHIP-SYNC-FIX-V1 — kpa_members upsert on approve
+      //   service_memberships 가 KPA 가입 상태 SSOT. kpa_members 는 domain profile (optional).
+      //   4a: 기존 pending 레코드 활성화
+      //   4b: 레코드 없으면 skeleton 생성 (legacy 등록자 / admin 생성 SM 등)
+      //   admin/operator role 은 KPA domain profile 불필요 — 생성 건너뜀
       if (membership.service_key === 'kpa-society') {
-        logger.info('[APPROVAL][STEP4] kpa_members projection sync', { userId });
-        await queryRunner.query(
-          `UPDATE kpa_members
-           SET status = 'active',
-               joined_at = COALESCE(joined_at, CURRENT_DATE),
-               updated_at = NOW()
-           WHERE user_id = $1 AND status = 'pending'`,
-          [userId]
-        );
+        const smRole = membership.role || 'member';
+        const skipKpaProfile = ['admin', 'operator'].includes(smRole);
+
+        if (!skipKpaProfile) {
+          logger.info('[APPROVAL][STEP4] kpa_members upsert', { userId, smRole });
+
+          // 4a: activate existing pending record
+          await queryRunner.query(
+            `UPDATE kpa_members
+             SET status = 'active',
+                 joined_at = COALESCE(joined_at, CURRENT_DATE),
+                 updated_at = NOW()
+             WHERE user_id = $1 AND status = 'pending'`,
+            [userId]
+          );
+
+          // 4b: create skeleton if still no record exists (idempotent)
+          const kpaExists = await queryRunner.query(
+            `SELECT 1 FROM kpa_members WHERE user_id = $1 LIMIT 1`,
+            [userId]
+          );
+          if (kpaExists.length === 0) {
+            // derive membership_type from SM role (best-effort)
+            const derivedMembershipType =
+              smRole === 'pharmacy' ? 'pharmacist'
+              : smRole === 'user' ? 'pharmacy_student_member'
+              : 'pharmacist';
+
+            await queryRunner.query(
+              `INSERT INTO kpa_members
+                 (user_id, role, status, identity_status, membership_type,
+                  joined_at, created_at, updated_at)
+               VALUES ($1, 'member', 'active', 'active', $2, CURRENT_DATE, NOW(), NOW())
+               ON CONFLICT (user_id) DO NOTHING`,
+              [userId, derivedMembershipType]
+            );
+            logger.info('[APPROVAL][STEP4] kpa_members skeleton created', {
+              userId, derivedMembershipType,
+            });
+          }
+        }
       }
 
       await queryRunner.commitTransaction();

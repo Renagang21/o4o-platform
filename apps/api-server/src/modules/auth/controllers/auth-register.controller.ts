@@ -49,7 +49,9 @@ export class AuthRegisterController extends BaseController {
         ? 'user'
         : (data.role || 'customer');
       const effectiveRole = VALID_ROLES.includes(rawRole) ? rawRole : 'user';
-      const serviceKey = data.service || 'platform';
+      const rawServiceKey = data.service || 'platform';
+      // WO-O4O-KPA-MEMBERSHIP-SYNC-FIX-V1: canonical service_key — 'kpa' alias → 'kpa-society'
+      const serviceKey = rawServiceKey === 'kpa' ? 'kpa-society' : rawServiceKey;
 
       // WO-NETURE-REGISTER-IDENTITY-STABILIZATION-V1: Name normalization
       let resolvedName: string;
@@ -351,16 +353,29 @@ export class AuthRegisterController extends BaseController {
     userId: string,
     data: RegisterRequestDto,
   ): Promise<void> {
-    if (data.service !== 'kpa-society') return;
+    // WO-O4O-KPA-MEMBERSHIP-SYNC-FIX-V1: accept canonical + legacy service_key
+    const isKpaSociety = data.service === 'kpa-society' || data.service === 'kpa';
+    if (!isKpaSociety) return;
 
-    const memberType = data.membershipType || 'pharmacist';
+    // WO-O4O-KPA-MEMBERSHIP-SYNC-FIX-V1: canonical membershipType — fallback to 'pharmacist'
+    // Prevents orphan state when frontend sends unrecognized membershipType values
+    const VALID_MEMBER_TYPES = [
+      'pharmacist', 'pharmacist_member',
+      'student', 'pharmacy_student_member',
+      'external_expert', 'supplier_staff',
+    ] as const;
+    const rawMemberType = data.membershipType || 'pharmacist';
+    const memberType: string = (VALID_MEMBER_TYPES as readonly string[]).includes(rawMemberType)
+      ? rawMemberType
+      : 'pharmacist';
+
     const isPharmacist = memberType === 'pharmacist' || memberType === 'pharmacist_member';
     const isStudent = memberType === 'student' || memberType === 'pharmacy_student_member';
     const isExternalExpert = memberType === 'external_expert';
     const isSupplierStaff = memberType === 'supplier_staff';
 
     // KPA Society: auto-create KPA member
-    // All pharmacist / student / expert / supplier types create a pending kpa_member
+    // All kpa-society registrations create a pending kpa_member (always true after fallback)
     const needsMember = isPharmacist || isStudent || isExternalExpert || isSupplierStaff;
     if (needsMember) {
       const licenseNum = isPharmacist ? (data.licenseNumber || null) : null;
