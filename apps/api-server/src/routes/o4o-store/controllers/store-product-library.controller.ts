@@ -3,6 +3,11 @@
  *
  * WO-O4O-STORE-PRODUCT-LIBRARY-INTEGRATION-V1
  * WO-O4O-STORE-PRODUCT-IMAGE-REGISTRATION-PHASE2-V1
+ * WO-O4O-STORE-PRODUCT-LIBRARY-SERVICE-KEY-DERIVATION-V1:
+ *   organization_product_listings.service_key 'neture' 하드코딩 제거.
+ *   사용자의 active service_memberships 에서 canonical role-prefix 형식으로 도출.
+ *   ── 의도: 매장이 어느 서비스 컨텍스트에서 listing 했는지 정확히 기록.
+ *   ── multi-membership 은 본 WO 범위 밖 (deterministic priority fallback 사용).
  *
  * 매장(Store Owner)이 Product Library를 검색하고,
  * Offer를 선택하여 Store Listing을 직접 생성·관리하는 API.
@@ -32,6 +37,53 @@ import { createRequireStoreOwner } from '../../../utils/store-owner.utils.js';
 import { NetureService } from '../../../modules/neture/neture.service.js';
 import { ImageStorageService } from '../../../modules/neture/services/image-storage.service.js';
 import logger from '../../../utils/logger.js';
+
+// ─────────────────────────────────────────────────────
+// WO-O4O-STORE-PRODUCT-LIBRARY-SERVICE-KEY-DERIVATION-V1
+//
+// 사용자의 active service_membership 을 organization_product_listings.service_key
+// 컬럼 값으로 매핑한다 (entity 의 role-prefix 형식 — default 'kpa').
+//
+// 매핑:
+//   service_memberships.service_key → organization_product_listings.service_key
+//     'kpa-society'  → 'kpa'
+//     'glycopharm'   → 'glycopharm'
+//     'neture'       → 'neture'
+//     'k-cosmetics'  → 'cosmetics'
+//   (common/middleware/membership-guard.middleware.ts 의 SCOPE_TO_MEMBERSHIP_KEY 역방향)
+//
+// Multi-membership 정책 (deterministic priority, 본 WO 범위 밖의 design 결정 임시 대체):
+//   기존 하드코딩이 'neture' 였으므로 마이그레이션 안전을 위해 neture 우선 유지.
+//   추후 multi-membership full design 시 user context (URL/header) 기반 도출로 교체.
+// ─────────────────────────────────────────────────────
+
+const MEMBERSHIP_KEY_TO_LISTING_SERVICE_KEY: Record<string, string> = {
+  'kpa-society': 'kpa',
+  'glycopharm': 'glycopharm',
+  'neture': 'neture',
+  'k-cosmetics': 'cosmetics',
+};
+
+const MULTI_MEMBERSHIP_PRIORITY = ['neture', 'kpa-society', 'glycopharm', 'k-cosmetics'];
+
+interface MembershipLike { serviceKey: string; status: string }
+
+function deriveListingServiceKey(req: Request): string | null {
+  const memberships: MembershipLike[] = (req as any).user?.memberships ?? [];
+  const active = memberships.filter((m) => m?.status === 'active');
+  if (active.length === 0) return null;
+  // single-membership 의 일반 경로
+  if (active.length === 1) {
+    return MEMBERSHIP_KEY_TO_LISTING_SERVICE_KEY[active[0].serviceKey] ?? null;
+  }
+  // multi-membership: deterministic priority. 본 WO 범위 밖의 정책 결정을 임시 대체.
+  for (const key of MULTI_MEMBERSHIP_PRIORITY) {
+    if (active.some((m) => m.serviceKey === key)) {
+      return MEMBERSHIP_KEY_TO_LISTING_SERVICE_KEY[key] ?? null;
+    }
+  }
+  return MEMBERSHIP_KEY_TO_LISTING_SERVICE_KEY[active[0].serviceKey] ?? null;
+}
 
 // ── 허용 MIME 타입 (URL 임포트) ───────────────────────────────────────────────
 const ALLOWED_IMAGE_MIMES = new Set([
@@ -177,14 +229,23 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
 
       const resolvedMasterId = offerRows[0].master_id;
 
+      // WO-O4O-STORE-PRODUCT-LIBRARY-SERVICE-KEY-DERIVATION-V1: active membership 기반 도출
+      const listingServiceKey = deriveListingServiceKey(req);
+      if (!listingServiceKey) {
+        return res.status(403).json({
+          success: false,
+          error: { code: 'NO_ACTIVE_MEMBERSHIP', message: 'No active service membership to derive listing service_key' },
+        });
+      }
+
       const insertResult = await dataSource.query(
         `INSERT INTO organization_product_listings
           (id, organization_id, service_key, master_id, offer_id, is_active, price, created_at, updated_at)
          VALUES
-          (gen_random_uuid(), $1, 'neture', $2, $3, true, $4, NOW(), NOW())
+          (gen_random_uuid(), $1, $5, $2, $3, true, $4, NOW(), NOW())
          ON CONFLICT (organization_id, service_key, offer_id) DO NOTHING
          RETURNING *`,
-        [organizationId, resolvedMasterId, offerId, listingPrice],
+        [organizationId, resolvedMasterId, offerId, listingPrice, listingServiceKey],
       );
 
       if (insertResult.length === 0) {
@@ -208,22 +269,32 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
         return res.status(404).json({ success: false, error: { code: 'MASTER_NOT_FOUND', message: 'Product master not found' } });
       }
 
+      // WO-O4O-STORE-PRODUCT-LIBRARY-SERVICE-KEY-DERIVATION-V1: active membership 기반 도출
+      const listingServiceKey = deriveListingServiceKey(req);
+      if (!listingServiceKey) {
+        return res.status(403).json({
+          success: false,
+          error: { code: 'NO_ACTIVE_MEMBERSHIP', message: 'No active service membership to derive listing service_key' },
+        });
+      }
+
       const insertResult = await dataSource.query(
         `INSERT INTO organization_product_listings
           (id, organization_id, service_key, master_id, offer_id, is_active, price, created_at, updated_at)
          VALUES
-          (gen_random_uuid(), $1, 'neture', $2, NULL, true, $3, NOW(), NOW())
+          (gen_random_uuid(), $1, $4, $2, NULL, true, $3, NOW(), NOW())
          ON CONFLICT (organization_id, service_key, master_id) WHERE offer_id IS NULL DO NOTHING
          RETURNING *`,
-        [organizationId, masterId, listingPrice],
+        [organizationId, masterId, listingPrice, listingServiceKey],
       );
 
       if (insertResult.length === 0) {
+        // 동일 derive 값으로 lookup — INSERT 와 같은 service_key 사용 (정합성 보장)
         const existingRows = await dataSource.query(
           `SELECT * FROM organization_product_listings
-           WHERE organization_id = $1 AND service_key = 'neture' AND master_id = $2 AND offer_id IS NULL
+           WHERE organization_id = $1 AND service_key = $3 AND master_id = $2 AND offer_id IS NULL
            LIMIT 1`,
-          [organizationId, masterId],
+          [organizationId, masterId, listingServiceKey],
         );
         return res.json({ success: true, data: existingRows[0] ?? null, message: 'ALREADY_LISTED' });
       }
