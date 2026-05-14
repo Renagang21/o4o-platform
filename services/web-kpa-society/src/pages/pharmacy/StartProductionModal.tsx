@@ -13,15 +13,16 @@
  *     본 모듈은 호환성 위해 re-export 유지.
  *   - navigate payload 는 buildProductionState() 헬퍼로 표준화.
  *
- * 본 단계 범위 외 (후속 WO):
- *   - multi-template 시스템
- *   - AI 변환 wizard 단계
- *   - 결과물 lifecycle / entity
+ * WO-O4O-STORE-PRODUCTION-TEMPLATE-REGISTRY-V1:
+ *   - 제작 흐름에 template picker step 추가.
+ *   - target 선택 → template 선택(supportsTemplates=true인 경우) → 편집기 route 이동.
+ *   - selectedTemplateId가 buildProductionState()를 통해 router state에 포함됨.
+ *   - AI 액션 흐름: template 선택 없이 onAiAction 경로 유지 (기존 호환).
  */
 
 import { useState, useMemo, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, ArrowRight, Info, Sparkles } from 'lucide-react';
+import { X, ArrowRight, Info, Sparkles, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { colors } from '../../styles/theme';
 import {
   PRODUCTION_TARGET_CATALOG,
@@ -30,6 +31,7 @@ import {
   type ProductionTarget,
   type ProductionSource,
 } from './productionTargets';
+import { getTemplatesForTarget } from './productionTemplates';
 
 // 외부 사용처 호환을 위한 type re-export (StoreLibraryContents/Resources/ProductionMaterials, ProductionTypeSelectorModal)
 export type {
@@ -64,9 +66,15 @@ interface Props {
   onAiAction?: (source: ProductionSource) => void;
 }
 
+// step: 'target' → target 선택 단계, 'template' → template 선택 단계
+type ModalStep = 'target' | 'template';
+
 export function StartProductionModal({ open, source, onClose, onAiAction }: Props) {
   const navigate = useNavigate();
+  const [step, setStep] = useState<ModalStep>('target');
   const [selectedTarget, setSelectedTarget] = useState<ProductionTarget | null>(null);
+  // WO-O4O-STORE-PRODUCTION-TEMPLATE-REGISTRY-V1: 선택된 template id
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   // WO-O4O-STORE-PRODUCTION-MATERIALS-FLOW-REALIGN-V1: AI 액션 선택 여부
   const [aiActionSelected, setAiActionSelected] = useState(false);
 
@@ -81,33 +89,225 @@ export function StartProductionModal({ open, source, onClose, onAiAction }: Prop
   const itemsCount = source.items.length;
   const targetMeta = selectedTarget ? findProductionTarget(selectedTarget) : undefined;
 
-  const handleConfirm = () => {
+  // 현재 target의 template 목록
+  const availableTemplates = selectedTarget ? getTemplatesForTarget(selectedTarget) : [];
+
+  const handleTargetSelect = (key: ProductionTarget) => {
+    const meta = findProductionTarget(key);
+    setSelectedTarget(key);
+    setAiActionSelected(false);
+    // supportsTemplates=true이고 template이 있으면 template step으로 진행
+    if (meta?.supportsTemplates && getTemplatesForTarget(key).length > 0) {
+      // template은 아직 선택하지 않은 상태 — 다음 단계에서 선택
+      setSelectedTemplateId(null);
+    }
+  };
+
+  const handleGoToTemplateStep = () => {
+    if (!selectedTarget || aiActionSelected) return;
+    const meta = findProductionTarget(selectedTarget);
+    if (meta?.supportsTemplates && availableTemplates.length > 0) {
+      setStep('template');
+    } else {
+      handleFinalConfirm();
+    }
+  };
+
+  const handleFinalConfirm = () => {
     if (!source) return;
     if (aiActionSelected) {
-      // WO-O4O-STORE-PRODUCTION-MATERIALS-FLOW-REALIGN-V1: AI 흐름으로 위임
       onAiAction?.(source);
       handleClose();
       return;
     }
     if (!selectedTarget || !targetMeta) return;
-    navigate(targetMeta.route, { state: buildProductionState({ target: selectedTarget, source }) });
+    navigate(targetMeta.route, {
+      state: buildProductionState({
+        target: selectedTarget,
+        source,
+        // template 미선택 시 defaultTemplateId fallback
+        selectedTemplateId: selectedTemplateId ?? targetMeta.defaultTemplateId ?? undefined,
+      }),
+    });
     handleClose();
   };
 
   const handleClose = () => {
+    setStep('target');
     setSelectedTarget(null);
+    setSelectedTemplateId(null);
     setAiActionSelected(false);
     onClose();
   };
+
+  const handleBackToTarget = () => {
+    setStep('target');
+    setSelectedTemplateId(null);
+  };
+
+  // ─── Step: target 선택 ───────────────────────────────────────────────────────
+  const renderTargetStep = () => (
+    <>
+      <div style={styles.body}>
+        <section style={styles.section}>
+          <h3 style={styles.sectionTitle}>제작 대상 (편집기로 이동)</h3>
+          <div style={styles.targetGrid}>
+            {PRODUCTION_TARGET_CATALOG.map((t) => {
+              const active = selectedTarget === t.key && !aiActionSelected;
+              const directInfo = allDirect ? DIRECT_NOTES[t.key] : undefined;
+              const isDisabled = directInfo?.disabled === true;
+              return (
+                <div key={t.key} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <button
+                    type="button"
+                    onClick={() => { if (!isDisabled) handleTargetSelect(t.key); }}
+                    disabled={isDisabled}
+                    style={{
+                      ...styles.targetCard,
+                      ...(active && !isDisabled ? styles.targetCardActive : {}),
+                      ...(isDisabled ? styles.targetCardDisabled : {}),
+                    }}
+                  >
+                    <t.Icon size={20} style={{ color: isDisabled ? colors.neutral300 : t.iconColor }} />
+                    <span style={styles.targetLabel}>{t.label}</span>
+                  </button>
+                  {directInfo && (
+                    <div style={styles.directNote}>
+                      <Info size={11} style={{ flexShrink: 0, marginTop: 1 }} />
+                      <span>{directInfo.note}</span>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* WO-O4O-STORE-PRODUCTION-MATERIALS-FLOW-REALIGN-V1: AI 제작 자료 초안 만들기 */}
+        {onAiAction && (
+          <section style={styles.section}>
+            <h3 style={styles.sectionTitle}>AI로 제작 자료 초안 만들기</h3>
+            <button
+              type="button"
+              onClick={() => { setAiActionSelected(true); setSelectedTarget(null); }}
+              style={{
+                ...styles.aiActionCard,
+                ...(aiActionSelected ? styles.aiActionCardActive : {}),
+              }}
+            >
+              <Sparkles size={20} style={{ color: aiActionSelected ? '#15803d' : '#16a34a', flexShrink: 0 }} />
+              <div style={styles.aiActionText}>
+                <span style={styles.aiActionLabel}>AI 제작 자료 초안 만들기</span>
+                <span style={styles.aiActionDesc}>선택한 콘텐츠를 AI가 POP·QR·블로그·상품설명 형태로 정리합니다</span>
+              </div>
+            </button>
+          </section>
+        )}
+      </div>
+
+      <div style={styles.footer}>
+        <button onClick={handleClose} style={styles.cancelBtn}>취소</button>
+        <button
+          onClick={aiActionSelected ? handleFinalConfirm : handleGoToTemplateStep}
+          disabled={
+            !aiActionSelected &&
+            (!selectedTarget || (allDirect && !!selectedTarget && DIRECT_NOTES[selectedTarget]?.disabled))
+          }
+          style={{
+            ...styles.confirmBtn,
+            ...(aiActionSelected ? styles.confirmBtnAi : {}),
+            opacity: (aiActionSelected || selectedTarget) ? 1 : 0.5,
+          }}
+        >
+          {aiActionSelected ? (
+            <><Sparkles size={14} />AI 제작 시작</>
+          ) : (
+            <>다음<ArrowRight size={14} /></>
+          )}
+        </button>
+      </div>
+    </>
+  );
+
+  // ─── Step: template 선택 ─────────────────────────────────────────────────────
+  const renderTemplateStep = () => (
+    <>
+      <div style={styles.body}>
+        <section style={styles.section}>
+          <h3 style={styles.sectionTitle}>
+            {targetMeta?.label} 스타일 선택
+          </h3>
+          <p style={styles.templateStepDesc}>
+            제작 방향에 맞는 스타일을 선택하면 AI 생성과 편집기 구조가 자동으로 설정됩니다.
+          </p>
+          <div style={styles.templateGrid}>
+            {availableTemplates.map((tpl) => {
+              const isActive = selectedTemplateId === tpl.id;
+              return (
+                <button
+                  key={tpl.id}
+                  type="button"
+                  onClick={() => setSelectedTemplateId(isActive ? null : tpl.id)}
+                  style={{
+                    ...styles.templateCard,
+                    ...(isActive ? styles.templateCardActive : {}),
+                  }}
+                >
+                  <div style={styles.templateCardTop}>
+                    {isActive && <CheckCircle2 size={14} style={{ color: colors.primary, flexShrink: 0 }} />}
+                    <span style={styles.templateName}>{tpl.name}</span>
+                    {tpl.style && (
+                      <span style={styles.templateStyleBadge}>{tpl.style}</span>
+                    )}
+                  </div>
+                  {tpl.description && (
+                    <p style={styles.templateDesc}>{tpl.description}</p>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+          {/* template-less 진입 옵션 */}
+          <button
+            type="button"
+            onClick={() => { setSelectedTemplateId(null); handleFinalConfirm(); }}
+            style={styles.skipTemplateBtn}
+          >
+            스타일 없이 빈 편집기로 시작
+          </button>
+        </section>
+      </div>
+
+      <div style={styles.footer}>
+        <button onClick={handleBackToTarget} style={{ ...styles.cancelBtn, display: 'flex', alignItems: 'center', gap: 4 }}>
+          <ArrowLeft size={13} />이전
+        </button>
+        <button
+          onClick={handleFinalConfirm}
+          disabled={!selectedTemplateId}
+          style={{
+            ...styles.confirmBtn,
+            opacity: selectedTemplateId ? 1 : 0.5,
+          }}
+        >
+          편집기로 이동<ArrowRight size={14} />
+        </button>
+      </div>
+    </>
+  );
 
   return (
     <div style={styles.overlay} onClick={handleClose}>
       <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div style={styles.header}>
           <div>
-            <h2 style={styles.title}>제작 시작</h2>
+            <h2 style={styles.title}>
+              {step === 'template' ? `${targetMeta?.label} 스타일 선택` : '제작 시작'}
+            </h2>
             <p style={styles.subtitle}>
-              선택한 자료 {itemsCount}개를 기반으로 제작을 시작합니다.
+              {step === 'template'
+                ? `선택한 자료 ${itemsCount}개 · ${targetMeta?.label} 제작`
+                : `선택한 자료 ${itemsCount}개를 기반으로 제작을 시작합니다.`}
             </p>
           </div>
           <button onClick={handleClose} style={styles.closeBtn} aria-label="닫기">
@@ -115,86 +315,7 @@ export function StartProductionModal({ open, source, onClose, onAiAction }: Prop
           </button>
         </div>
 
-        <div style={styles.body}>
-          <section style={styles.section}>
-            <h3 style={styles.sectionTitle}>제작 대상 (편집기로 이동)</h3>
-            <div style={styles.targetGrid}>
-              {PRODUCTION_TARGET_CATALOG.map((t) => {
-                const active = selectedTarget === t.key && !aiActionSelected;
-                const directInfo = allDirect ? DIRECT_NOTES[t.key] : undefined;
-                const isDisabled = directInfo?.disabled === true;
-                return (
-                  <div key={t.key} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    <button
-                      type="button"
-                      onClick={() => { if (!isDisabled) { setSelectedTarget(t.key); setAiActionSelected(false); } }}
-                      disabled={isDisabled}
-                      style={{
-                        ...styles.targetCard,
-                        ...(active && !isDisabled ? styles.targetCardActive : {}),
-                        ...(isDisabled ? styles.targetCardDisabled : {}),
-                      }}
-                    >
-                      <t.Icon size={20} style={{ color: isDisabled ? colors.neutral300 : t.iconColor }} />
-                      <span style={styles.targetLabel}>{t.label}</span>
-                    </button>
-                    {directInfo && (
-                      <div style={styles.directNote}>
-                        <Info size={11} style={{ flexShrink: 0, marginTop: 1 }} />
-                        <span>{directInfo.note}</span>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-
-          {/* WO-O4O-STORE-PRODUCTION-MATERIALS-FLOW-REALIGN-V1: AI 제작 자료 초안 만들기 */}
-          {onAiAction && (
-            <section style={styles.section}>
-              <h3 style={styles.sectionTitle}>AI로 제작 자료 초안 만들기</h3>
-              <button
-                type="button"
-                onClick={() => { setAiActionSelected(true); setSelectedTarget(null); }}
-                style={{
-                  ...styles.aiActionCard,
-                  ...(aiActionSelected ? styles.aiActionCardActive : {}),
-                }}
-              >
-                <Sparkles size={20} style={{ color: aiActionSelected ? '#15803d' : '#16a34a', flexShrink: 0 }} />
-                <div style={styles.aiActionText}>
-                  <span style={styles.aiActionLabel}>AI 제작 자료 초안 만들기</span>
-                  <span style={styles.aiActionDesc}>선택한 콘텐츠를 AI가 POP·QR·블로그·상품설명 형태로 정리합니다</span>
-                </div>
-              </button>
-            </section>
-          )}
-        </div>
-
-        <div style={styles.footer}>
-          <button onClick={handleClose} style={styles.cancelBtn}>
-            취소
-          </button>
-          <button
-            onClick={handleConfirm}
-            disabled={
-              !aiActionSelected &&
-              (!selectedTarget || (allDirect && !!selectedTarget && DIRECT_NOTES[selectedTarget]?.disabled))
-            }
-            style={{
-              ...styles.confirmBtn,
-              ...(aiActionSelected ? styles.confirmBtnAi : {}),
-              opacity: (aiActionSelected || selectedTarget) ? 1 : 0.5,
-            }}
-          >
-            {aiActionSelected ? (
-              <><Sparkles size={14} />AI 제작 시작</>
-            ) : (
-              <>편집기로 이동<ArrowRight size={14} /></>
-            )}
-          </button>
-        </div>
+        {step === 'target' ? renderTargetStep() : renderTemplateStep()}
       </div>
     </div>
   );
@@ -368,5 +489,71 @@ const styles: Record<string, CSSProperties> = {
   aiActionDesc: {
     fontSize: '12px',
     color: colors.neutral500,
+  },
+  // ─── Template picker styles ────────────────────────────────────────────────
+  templateStepDesc: {
+    fontSize: '12px',
+    color: colors.neutral500,
+    margin: '0 0 8px',
+    lineHeight: 1.5,
+  },
+  templateGrid: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '8px',
+  },
+  templateCard: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '4px',
+    padding: '12px 14px',
+    background: colors.white,
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: '8px',
+    fontSize: '14px',
+    color: colors.neutral700,
+    cursor: 'pointer',
+    textAlign: 'left' as const,
+    width: '100%',
+  },
+  templateCardActive: {
+    background: '#EFF6FF',
+    borderColor: colors.primary,
+  },
+  templateCardTop: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+  },
+  templateName: {
+    fontSize: '14px',
+    fontWeight: 500,
+    color: colors.neutral800,
+    flex: 1,
+  },
+  templateStyleBadge: {
+    fontSize: '11px',
+    color: colors.neutral500,
+    background: colors.neutral100,
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: '4px',
+    padding: '1px 6px',
+  },
+  templateDesc: {
+    fontSize: '12px',
+    color: colors.neutral500,
+    margin: 0,
+    lineHeight: 1.5,
+  },
+  skipTemplateBtn: {
+    marginTop: '8px',
+    padding: '8px 0',
+    background: 'transparent',
+    border: 'none',
+    color: colors.neutral400,
+    fontSize: '12px',
+    cursor: 'pointer',
+    textDecoration: 'underline',
+    textAlign: 'left' as const,
   },
 };

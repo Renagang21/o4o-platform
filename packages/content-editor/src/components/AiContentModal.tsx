@@ -145,6 +145,30 @@ interface AiContentModalProps {
    * - 향후 재생성·추적 용도. 백엔드가 미지원 시 무시됨.
    */
   sourceMetadata?: { sourceContentId?: string; sourceTitle?: string; sourceOrigin?: string };
+  /**
+   * WO-O4O-STORE-PRODUCTION-TEMPLATE-REGISTRY-V1: 선택된 template id (참조용).
+   * - 직접 registry를 조회하지 않으므로, caller가 templateSystemPrompt/templateForcedOptions를
+   *   함께 전달해야 함. 모달은 id를 저장 메타(category/label)에만 활용.
+   * - 미제공 시 template 없이 generic 생성 (기존 동작 유지).
+   */
+  templateId?: string;
+  /**
+   * WO-O4O-STORE-PRODUCTION-TEMPLATE-REGISTRY-V1: template의 systemPromptOverride.
+   * - 제공 시 customPrompt 앞에 prepend되어 AI 생성에 반영됨.
+   * - productionTemplates.ts의 template.systemPromptOverride를 caller가 조회하여 전달.
+   * - 미제공 시 customPrompt만 사용 (기존 동작 유지).
+   */
+  templateSystemPrompt?: string;
+  /**
+   * WO-O4O-STORE-PRODUCTION-TEMPLATE-REGISTRY-V1: template의 forcedOptions.
+   * - 모달 open 시 tone/length를 이 값으로 초기화 (사용자 변경 가능).
+   * - productionTemplates.ts의 template.forcedOptions를 caller가 조회하여 전달.
+   * - 미제공 시 기존 기본값 유지 (tone='professional', length='medium').
+   */
+  templateForcedOptions?: {
+    length?: 'short' | 'medium' | 'long';
+    tone?: 'friendly' | 'professional' | 'concise';
+  };
 }
 
 type AiMode = 'customer_rewrite' | 'summary' | 'pop' | 'title_suggest' | 'blog' | 'store_qr';
@@ -287,7 +311,7 @@ function blocksToHtml(blocks: UrlBlock[]): string {
     .join('\n');
 }
 
-export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeaders, onChannelSave, showCommunitySave, showStoreSave, showProductionMaterialSave, onProductionMaterialSaved, initialMode, initialText, headerLabel, urlPlaceholder, initialSourceTab, sourceMetadata }: AiContentModalProps) {
+export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeaders, onChannelSave, showCommunitySave, showStoreSave, showProductionMaterialSave, onProductionMaterialSaved, initialMode, initialText, headerLabel, urlPlaceholder, initialSourceTab, sourceMetadata, templateId, templateSystemPrompt, templateForcedOptions }: AiContentModalProps) {
   // 기존 text 모드 상태
   const [input, setInput] = useState('');
   // WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-AI-FLOW-V1:
@@ -310,8 +334,18 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
       setInput(initialText ?? '');
     }
   }, [open, initialText]);
-  const [tone, setTone] = useState<ToneOption>('professional');
-  const [length, setLength] = useState<LengthOption>('medium');
+  // WO-O4O-STORE-PRODUCTION-TEMPLATE-REGISTRY-V1:
+  //   open 시 templateForcedOptions 로 tone/length 초기화.
+  //   사용자가 모달 안에서 변경 후 닫고 다시 열면 다시 template 기본값으로 복귀.
+  //   templateForcedOptions 미제공 시 기본값('professional', 'medium') 복귀.
+  useEffect(() => {
+    if (open) {
+      setTone(templateForcedOptions?.tone ?? 'professional');
+      setLength(templateForcedOptions?.length ?? 'medium');
+    }
+  }, [open, templateForcedOptions]);
+  const [tone, setTone] = useState<ToneOption>(templateForcedOptions?.tone ?? 'professional');
+  const [length, setLength] = useState<LengthOption>(templateForcedOptions?.length ?? 'medium');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AiContentResult | null>(null);
   const [error, setError] = useState('');
@@ -379,6 +413,14 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
     setCopied(false);
 
     try {
+      // WO-O4O-STORE-PRODUCTION-TEMPLATE-REGISTRY-V1:
+      //   templateSystemPrompt 이 있으면 customPrompt 앞에 prepend.
+      //   template 지시문 + 사용자 지시문 stack 방식 (override가 아닌 supplement).
+      const effectiveCustomPrompt = [
+        templateSystemPrompt?.trim() ?? '',
+        customPrompt.trim(),
+      ].filter(Boolean).join('\n\n').slice(0, CUSTOM_PROMPT_MAX);
+
       const response = await fetch(`${API_BASE_URL}/api/ai/content`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...aiRequestHeaders },
@@ -388,7 +430,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
           outputType: currentConfig.outputType,
           options: showToneLength ? { tone, length } : {},
           // WO-O4O-AI-CONTENT-CUSTOM-PROMPT-AND-CORE-EXTENSION-AUDIT-V1
-          customPrompt: customPrompt.trim().slice(0, CUSTOM_PROMPT_MAX),
+          customPrompt: effectiveCustomPrompt,
         }),
       });
 
@@ -691,6 +733,8 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
           sourceType: 'generated',
           // WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-AI-BRIDGE-V1: source 추적 메타 (선택적)
           ...(sourceMetadata ? { sourceMetadata } : {}),
+          // WO-O4O-STORE-PRODUCTION-TEMPLATE-REGISTRY-V1: template id 추적 (선택적)
+          ...(templateId ? { templateId } : {}),
         }),
       });
       const data = await res.json();

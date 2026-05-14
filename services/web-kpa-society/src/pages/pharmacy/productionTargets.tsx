@@ -13,7 +13,7 @@
  * 디지털 사이니지는 의도적 제외 (KPA Signage 구조 freeze 보호).
  *
  * Router state 표준:
- *   navigate(meta.route, { state: buildProductionState({ target, source? }) })
+ *   navigate(meta.route, { state: buildProductionState({ target, source?, selectedTemplateId? }) })
  *
  * 수신측(StorePopPage / StoreQRPage / StoreProductDescriptionsPage / PharmacyBlogPage)은
  * source.items.length === 0 일 때 메뉴 직접 진입과 동일하게 동작 (early return 처리됨).
@@ -21,9 +21,15 @@
  * WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-AI-FLOW-V1:
  *   AiContentModal 진입용 default AiMode 매핑(productionTargetToAiMode) 추가.
  *   AiContentModal 의 MODE_CONFIG 와 동기 — 추가 시 양쪽 갱신 필요.
+ *
+ * WO-O4O-STORE-PRODUCTION-TEMPLATE-REGISTRY-V1:
+ *   ProductionTargetMeta에 templateCategory, outputConstraints, supportsTemplates, defaultTemplateId 추가.
+ *   ProductionRouterState에 selectedTemplateId 추가.
+ *   buildProductionState()에 selectedTemplateId 인자 추가.
  */
 
 import { Megaphone, QrCode, BookOpen, FileText, type LucideIcon } from 'lucide-react';
+import type { ProductionOutputConstraints } from './productionTemplates';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -51,6 +57,28 @@ export interface ProductionTargetMeta {
   /** Hex color for icon tint */
   iconColor: string;
   route: string;
+  /**
+   * WO-O4O-STORE-PRODUCTION-TEMPLATE-REGISTRY-V1:
+   * template registry에서 이 target에 해당하는 category 키.
+   * getTemplatesForTarget(templateCategory) 로 template 목록을 가져온다.
+   */
+  templateCategory: ProductionTarget;
+  /**
+   * template 선택 흐름 지원 여부.
+   * true: StartProductionModal에서 template picker step 표시
+   * false: template 선택 없이 바로 진입 (기존 동작 유지)
+   */
+  supportsTemplates: boolean;
+  /**
+   * 기본 template id (registry 첫 번째 항목과 동기).
+   * template-less fallback에서 AiContentModal에 전달되는 기본값.
+   */
+  defaultTemplateId: string;
+  /**
+   * target 수준 출력 제약 (template 미선택 시 적용되는 기본값).
+   * template 선택 시 template.outputConstraints가 우선한다.
+   */
+  outputConstraints?: ProductionOutputConstraints;
 }
 
 // ─── Catalog ──────────────────────────────────────────────────────────────────
@@ -63,6 +91,14 @@ export const PRODUCTION_TARGET_CATALOG: ProductionTargetMeta[] = [
     Icon: Megaphone,
     iconColor: '#f59e0b',
     route: '/store/marketing/pop',
+    templateCategory: 'pop',
+    supportsTemplates: true,
+    defaultTemplateId: 'pop-modern',
+    outputConstraints: {
+      maxBodyLength: 300,
+      allowedLengths: ['short', 'medium'],
+      requiredFields: ['title', 'bullets', 'shortText'],
+    },
   },
   {
     key: 'qr',
@@ -71,6 +107,14 @@ export const PRODUCTION_TARGET_CATALOG: ProductionTargetMeta[] = [
     Icon: QrCode,
     iconColor: '#0ea5e9',
     route: '/store/marketing/qr',
+    templateCategory: 'qr',
+    supportsTemplates: true,
+    defaultTemplateId: 'qr-product-intro',
+    outputConstraints: {
+      maxBodyLength: 150,
+      allowedLengths: ['short'],
+      requiredFields: ['title', 'shortText'],
+    },
   },
   {
     key: 'blog',
@@ -79,6 +123,12 @@ export const PRODUCTION_TARGET_CATALOG: ProductionTargetMeta[] = [
     Icon: BookOpen,
     iconColor: '#16a34a',
     route: '/store/content/blog',
+    templateCategory: 'blog',
+    supportsTemplates: true,
+    defaultTemplateId: 'blog-health-professional',
+    outputConstraints: {
+      requiredFields: ['html', 'title', 'summary'],
+    },
   },
   {
     key: 'product-description',
@@ -87,6 +137,12 @@ export const PRODUCTION_TARGET_CATALOG: ProductionTargetMeta[] = [
     Icon: FileText,
     iconColor: '#2563EB',
     route: '/store/marketing/product-descriptions',
+    templateCategory: 'product-description',
+    supportsTemplates: true,
+    defaultTemplateId: 'desc-b2c-persuasion',
+    outputConstraints: {
+      requiredFields: ['html', 'title', 'bullets'],
+    },
   },
 ];
 
@@ -100,21 +156,31 @@ export interface ProductionRouterState {
   production: {
     source: ProductionSource;
     target: ProductionTarget;
+    /**
+     * WO-O4O-STORE-PRODUCTION-TEMPLATE-REGISTRY-V1:
+     * 선택된 template id. 미지정 시 target의 defaultTemplateId 사용.
+     * 수신측(StorePopPage/PharmacyBlogPage/ProductionMaterialEditorPage)에서
+     * findTemplate(selectedTemplateId)로 template 조회 후 AI/editor에 적용.
+     */
+    selectedTemplateId?: string;
   };
 }
 
 /**
  * 표준 router state payload 빌더.
  * source 미지정 시 빈 items 로 진입 (메뉴 직접 진입과 동등).
+ * selectedTemplateId 미지정 시 undefined (수신측에서 defaultTemplateId fallback).
  */
 export function buildProductionState(opts: {
   target: ProductionTarget;
   source?: ProductionSource;
+  selectedTemplateId?: string;
 }): ProductionRouterState {
   return {
     production: {
       source: opts.source ?? { fromLibrary: 'contents', items: [] },
       target: opts.target,
+      selectedTemplateId: opts.selectedTemplateId,
     },
   };
 }

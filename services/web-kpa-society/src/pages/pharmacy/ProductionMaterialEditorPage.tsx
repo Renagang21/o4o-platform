@@ -7,11 +7,17 @@
  *   받아 사용자가 검토/수정 후 매장 제작 자료(store_execution_assets)에 저장하는 단계.
  *   AI 입력 프롬프트 텍스트(composeSourceTextFromItems 결과)는 이 화면으로 들어오지 않는다.
  *
+ * WO-O4O-STORE-PRODUCTION-TEMPLATE-REGISTRY-V1:
+ *   selectedTemplateId 를 state 에 추가. generatedHtml 없을 때 template.starterHtml 을 초기 값으로 사용.
+ *   template.forcedOptions 를 AiContentModal 에 templateForcedOptions 로 전달.
+ *   template.systemPromptOverride 를 AiContentModal 에 templateSystemPrompt 로 전달.
+ *
  * 진입: StoreLibraryContentsPage → AiContentModal.onInsert → navigate('/store/library/production-materials/new', { state })
  * state: {
  *   generatedHtml?: string;
  *   title?: string;
  *   sourceMetadata?: { sourceContentId?: string; sourceTitle?: string; sourceOrigin?: string };
+ *   selectedTemplateId?: string;   ← WO-O4O-STORE-PRODUCTION-TEMPLATE-REGISTRY-V1
  * }
  *
  * 역할:
@@ -30,6 +36,7 @@ import { createStoreExecutionAsset } from '../../api/storeExecutionAssets';
 import { getAccessToken } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
 import { PRODUCTION_TARGET_CATALOG, type ProductionTarget } from './productionTargets';
+import { findTemplate } from './productionTemplates';
 
 // ─── Location State ──────────────────────────────────────────────────────────
 
@@ -41,6 +48,11 @@ interface EditorPageState {
     sourceTitle?: string;
     sourceOrigin?: string;
   };
+  /**
+   * WO-O4O-STORE-PRODUCTION-TEMPLATE-REGISTRY-V1:
+   * 선택된 template id. generatedHtml 없을 때 template.starterHtml 을 editor 초기값으로 사용.
+   */
+  selectedTemplateId?: string;
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -50,7 +62,11 @@ export default function ProductionMaterialEditorPage() {
   const location = useLocation();
   const state = (location.state as EditorPageState | null) ?? {};
 
-  const initialHtml = state.generatedHtml ?? '';
+  // WO-O4O-STORE-PRODUCTION-TEMPLATE-REGISTRY-V1:
+  //   generatedHtml 우선. 없을 때 template.starterHtml fallback.
+  //   둘 다 없으면 빈 editor (기존 동작).
+  const selectedTemplate = state.selectedTemplateId ? findTemplate(state.selectedTemplateId) : undefined;
+  const initialHtml = state.generatedHtml ?? selectedTemplate?.starterHtml ?? '';
 
   const [title, setTitle] = useState(state.title ?? '');
   const [selectedType, setSelectedType] = useState<ProductionTarget | null>(null);
