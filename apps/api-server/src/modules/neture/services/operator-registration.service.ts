@@ -165,12 +165,14 @@ export class OperatorRegistrationService {
           // organization 연동 (businessName이 있는 경우)
           if (bizName && insertedSupplier?.id) {
             const orgCode = `neture-${slug}`;
+            const orgPath = `/${orgCode}`;
+            // organizations 테이블은 camelCase 컬럼 (TypeORM SnakeNamingStrategy 미적용)
             const [org] = await queryRunner.query(
-              `INSERT INTO organizations (name, code, type, is_active, created_at, updated_at)
-               VALUES ($1, $2, 'supplier', true, NOW(), NOW())
-               ON CONFLICT (code) DO UPDATE SET is_active = true, updated_at = NOW()
+              `INSERT INTO organizations (name, code, type, "isActive", "createdAt", "updatedAt", level, path, "childrenCount")
+               VALUES ($1, $2, 'supplier', true, NOW(), NOW(), 0, $3, 0)
+               ON CONFLICT (code) DO UPDATE SET "isActive" = true, "updatedAt" = NOW()
                RETURNING id`,
-              [bizName, orgCode],
+              [bizName, orgCode, orgPath],
             );
             if (org?.id) {
               await queryRunner.query(
