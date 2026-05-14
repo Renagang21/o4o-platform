@@ -278,6 +278,13 @@ export function createMemberController(
   /**
    * GET /kpa/members
    * 회원 목록 조회 (관리자/운영자 전용)
+   *
+   * WO-O4O-KPA-OPERATOR-MEMBER-LIST-SOURCE-FIX-V1:
+   *   canonical source = service_memberships (회원 존재 여부)
+   *   kpa_members = LEFT JOIN (KPA 도메인 프로필/확장 데이터)
+   *
+   *   변경 전: kpa_members 단독 조회 (2건 노출)
+   *   변경 후: service_memberships 기준 (실제 가입 신청자 전체 노출)
    */
   router.get(
     '/',
@@ -286,51 +293,120 @@ export function createMemberController(
     async (req: AuthRequest, res: Response): Promise<void> => {
       try {
         const { organization_id, status, role, search, page = '1', limit = '20' } = req.query;
-
-        const qb = memberRepo.createQueryBuilder('m')
-          .leftJoinAndSelect('m.user', 'u')
-          .leftJoinAndSelect('m.organization', 'org');
-
-        if (organization_id) {
-          qb.andWhere('m.organization_id = :organization_id', { organization_id });
-        }
-
-        if (status) {
-          qb.andWhere('m.status = :status', { status });
-        }
-
-        if (role) {
-          qb.andWhere('m.role = :role', { role });
-        }
-
-        if (search) {
-          qb.andWhere(
-            '(u.name ILIKE :search OR u.email ILIKE :search)',
-            { search: `%${search}%` }
-          );
-        }
-
         const pageNum = parseInt(page as string) || 1;
         const limitNum = parseInt(limit as string) || 20;
+        const offset = (pageNum - 1) * limitNum;
 
-        qb.orderBy('m.created_at', 'DESC')
-          .skip((pageNum - 1) * limitNum)
-          .take(limitNum);
+        const conditions: string[] = [`sm.service_key IN ('kpa-society', 'kpa')`];
+        const params: any[] = [];
+        let paramIdx = 1;
 
-        const [members, total] = await qb.getManyAndCount();
+        if (status) {
+          conditions.push(`sm.status = $${paramIdx++}`);
+          params.push(status);
+        }
+        if (role) {
+          conditions.push(`km.role = $${paramIdx++}`);
+          params.push(role);
+        }
+        if (organization_id) {
+          conditions.push(`km.organization_id = $${paramIdx++}`);
+          params.push(organization_id);
+        }
+        if (search) {
+          conditions.push(`(u.name ILIKE $${paramIdx} OR u.email ILIKE $${paramIdx})`);
+          params.push(`%${search}%`);
+          paramIdx++;
+        }
+
+        const whereClause = conditions.join(' AND ');
+        const baseFrom = `
+          FROM service_memberships sm
+          JOIN users u ON u.id = sm.user_id
+          LEFT JOIN kpa_members km ON km.user_id = sm.user_id
+          WHERE ${whereClause}
+        `;
+
+        const [countResult, rows] = await Promise.all([
+          dataSource.query<Array<{ total: number }>>(
+            `SELECT COUNT(*)::int AS total ${baseFrom}`,
+            params,
+          ),
+          dataSource.query(
+            `SELECT
+               sm.id        AS sm_id,
+               sm.user_id,
+               sm.service_key,
+               sm.status    AS status,
+               sm.created_at AS sm_created_at,
+               km.id        AS km_id,
+               km.organization_id,
+               km.role,
+               km.status    AS kpa_status,
+               km.membership_type,
+               km.license_number,
+               km.pharmacy_name,
+               km.pharmacy_address,
+               km.activity_type,
+               km.fee_category,
+               km.sub_role,
+               km.university_name,
+               km.student_year,
+               km.joined_at,
+               km.created_at AS km_created_at,
+               km.updated_at AS km_updated_at,
+               u.name       AS user_name,
+               u.email      AS user_email
+             ${baseFrom}
+             ORDER BY sm.created_at DESC
+             LIMIT $${paramIdx} OFFSET $${paramIdx + 1}`,
+            [...params, limitNum, offset],
+          ),
+        ]);
+
+        const total = countResult[0]?.total ?? 0;
+
+        // WO-O4O-KPA-OPERATOR-MEMBER-LIST-SOURCE-FIX-V1:
+        //   id = km_id (kpa_members 있을 때) | sm_id (없을 때) — 항상 유효한 UUID
+        //   has_kpa_member = true/false — UI에서 "KPA 프로필 없음" 표시 + 액션 비활성화
+        const members = (rows as any[]).map((r) => ({
+          id: r.km_id ?? r.sm_id,
+          sm_id: r.sm_id,
+          user_id: r.user_id,
+          has_kpa_member: !!r.km_id,
+          status: r.status,
+          kpa_status: r.kpa_status ?? null,
+          organization_id: r.organization_id ?? null,
+          role: r.role ?? null,
+          membership_type: r.membership_type ?? null,
+          license_number: r.license_number ?? null,
+          pharmacy_name: r.pharmacy_name ?? null,
+          pharmacy_address: r.pharmacy_address ?? null,
+          activity_type: r.activity_type ?? null,
+          fee_category: r.fee_category ?? null,
+          sub_role: r.sub_role ?? null,
+          university_name: r.university_name ?? null,
+          student_year: r.student_year ?? null,
+          joined_at: r.joined_at ?? null,
+          created_at: r.sm_created_at,
+          updated_at: r.km_updated_at ?? r.sm_created_at,
+          service_key: r.service_key,
+          user: {
+            name: r.user_name ?? null,
+            email: r.user_email ?? null,
+          },
+        }));
 
         // WO-O4O-KPA-MEMBER-PROFILE-CAPABILITY-COLUMN-ADD-V1:
-        //   role_assignments 의 active role 을 user_id 별 batch 로 조회 후 attach.
-        //   leftJoinAndSelect 로 직접 join 하면 row duplication 발생하므로 별도 aggregate.
-        //   activity_type 은 KpaMember entity 컬럼이라 getManyAndCount() 가 자동 반환.
+        //   role_assignments 의 active role 을 user_id 별 batch 조회 후 attach.
         const userIds = members.map((m) => m.user_id).filter((id): id is string => Boolean(id));
         const capabilityMap = new Map<string, string[]>();
         if (userIds.length > 0) {
-          const rows = await dataSource.query(
+          const raRows = await dataSource.query(
             `SELECT user_id, role FROM role_assignments WHERE user_id = ANY($1::uuid[]) AND is_active = true`,
             [userIds],
           );
-          for (const row of rows as Array<{ user_id: string; role: string }>) {
+          for (const row of raRows as Array<{ user_id: string; role: string }>) {
             if (!row.user_id || !row.role) continue;
             const list = capabilityMap.get(row.user_id) ?? [];
             list.push(row.role);

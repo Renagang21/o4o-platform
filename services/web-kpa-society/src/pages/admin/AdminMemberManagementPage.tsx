@@ -30,12 +30,16 @@ import { MemberDeleteRiskModal } from './components/MemberDeleteRiskModal';
 type MemberStatus = 'pending' | 'active' | 'suspended' | 'rejected' | 'withdrawn';
 
 interface KpaMember {
+  // WO-O4O-KPA-OPERATOR-MEMBER-LIST-SOURCE-FIX-V1:
+  //   id = kpa_members.id (존재 시) | service_memberships.id (없을 시)
   id: string;
+  sm_id: string;
+  has_kpa_member: boolean;
   user_id: string;
-  organization_id: string;
-  role: string;
+  organization_id: string | null;
+  role: string | null;
   status: MemberStatus;
-  membership_type: 'pharmacist' | 'student';
+  membership_type: string | null;
   license_number: string | null;
   pharmacy_name: string | null;
   joined_at: string | null;
@@ -194,12 +198,18 @@ export default function AdminMemberManagementPage() {
     {
       key: 'membership_type',
       header: '구분',
-      width: '90px',
-      render: (_v, m) => (
-        <span className="text-xs px-2 py-0.5 bg-slate-100 text-slate-700 rounded">
-          {m.membership_type === 'pharmacist' ? '약사' : '약대생'}
-        </span>
-      ),
+      width: '100px',
+      render: (_v, m) => {
+        if (!m.has_kpa_member) {
+          return <span className="text-xs px-2 py-0.5 bg-slate-50 text-slate-400 rounded italic">KPA 프로필 없음</span>;
+        }
+        const isStudent = m.membership_type === 'student' || m.membership_type === 'pharmacy_student_member';
+        return (
+          <span className="text-xs px-2 py-0.5 bg-slate-100 text-slate-700 rounded">
+            {isStudent ? '약대생' : '약사'}
+          </span>
+        );
+      },
     },
     {
       key: 'license_number',

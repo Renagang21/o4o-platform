@@ -51,12 +51,19 @@ type MemberRole = 'member' | 'operator' | 'admin';
 type ApplicationStatus = 'submitted' | 'approved' | 'rejected' | 'cancelled';
 
 interface KpaMember {
+  // WO-O4O-KPA-OPERATOR-MEMBER-LIST-SOURCE-FIX-V1:
+  //   id = kpa_members.id (존재 시) | service_memberships.id (없을 시) — 항상 유효한 UUID
+  //   sm_id = service_memberships.id (항상 존재)
+  //   has_kpa_member = KPA 도메인 프로필 존재 여부
   id: string;
+  sm_id: string;
+  has_kpa_member: boolean;
   user_id: string;
-  organization_id: string;
-  role: MemberRole;
+  organization_id: string | null;
+  role: MemberRole | null;
   status: MemberStatus;
-  membership_type: 'pharmacist' | 'student';
+  kpa_status?: string | null;          // kpa_members.status (진단용, sm.status와 다를 수 있음)
+  membership_type: string | null;      // null이면 KPA 프로필 미생성
   license_number: string | null;
   pharmacy_name: string | null;
   // WO-O4O-KPA-MEMBER-PROFILE-CAPABILITY-COLUMN-ADD-V1: profile + capability
@@ -65,6 +72,7 @@ interface KpaMember {
   joined_at: string | null;
   created_at: string;
   updated_at: string;
+  service_key?: string;
   user?: { name?: string; email?: string };
   organization?: { name?: string };
 }
@@ -150,6 +158,10 @@ function formatDate(dateStr: string | null): string {
 
 // ─── Action Policy (V4-EXPANSION) ────────────────────────────────
 
+// WO-O4O-KPA-OPERATOR-MEMBER-LIST-SOURCE-FIX-V1:
+//   has_kpa_member 가드: kpa_members 없는 사용자는 KPA 프로필 기반 액션 비활성화.
+//   (승인/반려/정지/복원/수정은 kpa_members.id 기반 PATCH 엔드포인트를 사용하므로
+//    kpa_members 없으면 백엔드 404. 목록 표시는 하되 액션은 비활성화.)
 const memberActionPolicy = defineActionPolicy<KpaMember>('kpa:members', {
   inlineMax: 2,
   rules: [
@@ -157,13 +169,13 @@ const memberActionPolicy = defineActionPolicy<KpaMember>('kpa:members', {
       key: 'approve',
       label: '승인',
       variant: 'primary',
-      visible: (m) => m.status === 'pending',
+      visible: (m) => m.status === 'pending' && m.has_kpa_member,
     },
     {
       key: 'reject',
       label: '반려',
       variant: 'danger',
-      visible: (m) => m.status === 'pending',
+      visible: (m) => m.status === 'pending' && m.has_kpa_member,
       confirm: {
         title: '회원 반려',
         message: '이 회원의 가입을 반려하시겠습니까?',
@@ -175,7 +187,7 @@ const memberActionPolicy = defineActionPolicy<KpaMember>('kpa:members', {
       key: 'suspend',
       label: '정지',
       variant: 'danger',
-      visible: (m) => m.status === 'active',
+      visible: (m) => m.status === 'active' && m.has_kpa_member,
       confirm: {
         title: '회원 정지',
         message: '이 회원을 정지 처리하시겠습니까?',
@@ -187,12 +199,12 @@ const memberActionPolicy = defineActionPolicy<KpaMember>('kpa:members', {
       key: 'restore',
       label: '복원',
       variant: 'primary',
-      visible: (m) => m.status === 'suspended',
+      visible: (m) => m.status === 'suspended' && m.has_kpa_member,
     },
     {
       key: 'edit',
       label: '수정',
-      visible: (m) => m.status !== 'withdrawn',
+      visible: (m) => m.status !== 'withdrawn' && m.has_kpa_member,
     },
     // WO-O4O-KPA-MEMBER-BULK-DELETE-WORKFLOW-REFACTOR-V1:
     //   점3개 메뉴는 회원 정보 수정/개별 관리 중심으로 정리. 삭제(탈퇴/완전삭제)는
@@ -214,8 +226,8 @@ const MEMBER_ACTION_ICONS: Record<string, ReactNode> = {
 /** membership_type 기반 클라이언트 필터 */
 const ROLE_TAB_FILTER: Record<string, string[]> = {
   all: [],
-  pharmacist: ['pharmacist'],
-  student: ['student'],
+  pharmacist: ['pharmacist', 'pharmacist_member'],
+  student: ['student', 'pharmacy_student_member'],
   applications: [],
 };
 
@@ -244,7 +256,7 @@ function EditMemberModal({
 }) {
   const [form, setForm] = useState({
     name: member.user?.name || '',
-    membership_type: member.membership_type,
+    membership_type: member.membership_type || 'pharmacist',
     license_number: member.license_number || '',
     pharmacy_name: member.pharmacy_name || '',
   });
@@ -377,8 +389,8 @@ export default function MemberManagementPage() {
       // Count by membership_type + status (한 번만 조회)
       const allRes = await apiClient.get<{ data: KpaMember[]; total: number }>('/members', { limit: 1000 });
       const all = allRes.data || [];
-      setPharmacistCount(all.filter(m => m.membership_type === 'pharmacist').length);
-      setStudentCount(all.filter(m => m.membership_type === 'student').length);
+      setPharmacistCount(all.filter(m => m.membership_type === 'pharmacist' || m.membership_type === 'pharmacist_member').length);
+      setStudentCount(all.filter(m => m.membership_type === 'student' || m.membership_type === 'pharmacy_student_member').length);
       setPendingMemberCount(all.filter(m => m.status === 'pending').length);
       setActiveMemberCount(all.filter(m => m.status === 'active').length);
       setRejectedMemberCount(all.filter(m => m.status === 'rejected').length);
@@ -436,21 +448,24 @@ export default function MemberManagementPage() {
   );
 
   // Selection 기반 bulk action 후보 ID 추출 — 현재 status 가 액션 정책에 부합하는 것만 (서버 거절 사전 차단)
+  // WO-O4O-KPA-OPERATOR-MEMBER-LIST-SOURCE-FIX-V1: has_kpa_member 가드 추가
+  //   kpa_members 없는 사용자는 bulk 작업에서도 제외 (PATCH /members/:id/status = kpa_members 기반)
   const selectedPendingIds = useMemo(
-    () => members.filter((m) => selectedIds.has(m.id) && m.status === 'pending').map((m) => m.id),
+    () => members.filter((m) => selectedIds.has(m.id) && m.status === 'pending' && m.has_kpa_member).map((m) => m.id),
     [members, selectedIds],
   );
   const selectedActiveIds = useMemo(
-    () => members.filter((m) => selectedIds.has(m.id) && m.status === 'active').map((m) => m.id),
+    () => members.filter((m) => selectedIds.has(m.id) && m.status === 'active' && m.has_kpa_member).map((m) => m.id),
     [members, selectedIds],
   );
   const selectedSuspendedIds = useMemo(
-    () => members.filter((m) => selectedIds.has(m.id) && m.status === 'suspended').map((m) => m.id),
+    () => members.filter((m) => selectedIds.has(m.id) && m.status === 'suspended' && m.has_kpa_member).map((m) => m.id),
     [members, selectedIds],
   );
   // WO-O4O-KPA-MEMBER-BULK-DELETE-WORKFLOW-REFACTOR-V1: 탈퇴 처리 후보 — 아직 withdrawn 이 아닌 모든 회원
+  // WO-O4O-KPA-OPERATOR-MEMBER-LIST-SOURCE-FIX-V1: has_kpa_member 가드 추가
   const selectedWithdrawableIds = useMemo(
-    () => members.filter((m) => selectedIds.has(m.id) && m.status !== 'withdrawn').map((m) => m.id),
+    () => members.filter((m) => selectedIds.has(m.id) && m.status !== 'withdrawn' && m.has_kpa_member).map((m) => m.id),
     [members, selectedIds],
   );
 
@@ -485,7 +500,7 @@ export default function MemberManagementPage() {
     if (activeTab === 'all' || activeTab === 'applications' || activeTab.startsWith('status-')) return members;
     const allowed = ROLE_TAB_FILTER[activeTab];
     if (!allowed || allowed.length === 0) return members;
-    return members.filter(m => allowed.includes(m.membership_type));
+    return members.filter(m => m.membership_type && allowed.includes(m.membership_type));
   }, [members, activeTab]);
 
   // WO-O4O-KPA-MEMBER-BULK-ACTION-ALIGN-V1:
@@ -552,16 +567,27 @@ export default function MemberManagementPage() {
     {
       key: 'membership_type',
       header: '유형',
-      width: '80px',
-      render: (_v, m) => (
-        <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full border ${
-          m.membership_type === 'student'
-            ? 'bg-sky-50 border-sky-200 text-sky-700'
-            : 'bg-teal-50 border-teal-200 text-teal-700'
-        }`}>
-          {m.membership_type === 'student' ? '약대생' : '약사'}
-        </span>
-      ),
+      width: '100px',
+      render: (_v, m) => {
+        // WO-O4O-KPA-OPERATOR-MEMBER-LIST-SOURCE-FIX-V1: kpa_members 없는 경우 표시
+        if (!m.has_kpa_member) {
+          return (
+            <span className="inline-flex items-center px-2 py-0.5 text-xs rounded-full border border-slate-200 bg-slate-50 text-slate-400 italic">
+              KPA 프로필 없음
+            </span>
+          );
+        }
+        const isStudent = m.membership_type === 'student' || m.membership_type === 'pharmacy_student_member';
+        return (
+          <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full border ${
+            isStudent
+              ? 'bg-sky-50 border-sky-200 text-sky-700'
+              : 'bg-teal-50 border-teal-200 text-teal-700'
+          }`}>
+            {isStudent ? '약대생' : '약사'}
+          </span>
+        );
+      },
     },
     // WO-O4O-KPA-MEMBER-PROFILE-CAPABILITY-COLUMN-ADD-V1:
     //   activity_type = profile metadata (자기소개) — 자유 변경 가능
@@ -581,7 +607,7 @@ export default function MemberManagementPage() {
       key: 'role',
       header: '조직 역할',
       width: '90px',
-      render: (_v, m) => <span className="text-sm text-slate-600">{roleLabels[m.role]}</span>,
+      render: (_v, m) => <span className="text-sm text-slate-600">{m.role ? (roleLabels[m.role as MemberRole] ?? m.role) : '-'}</span>,
     },
     // WO-O4O-KPA-MEMBER-PROFILE-CAPABILITY-COLUMN-ADD-V1:
     //   capabilities = role_assignments active roles (RBAC SSOT) — 승인 절차로만 부여/회수
@@ -954,7 +980,7 @@ export default function MemberManagementPage() {
               selectedMember.activity_type
                 ? { label: '활동 유형', value: ACTIVITY_TYPE_LABELS[selectedMember.activity_type] ?? selectedMember.activity_type }
                 : null,
-              { label: '조직 역할', value: roleLabels[selectedMember.role] },
+              { label: '조직 역할', value: selectedMember.role ? (roleLabels[selectedMember.role as MemberRole] ?? selectedMember.role) : '-' },
               selectedMember.license_number ? { label: '면허번호', value: selectedMember.license_number } : null,
               selectedMember.pharmacy_name ? { label: '약국명', value: selectedMember.pharmacy_name } : null,
               { label: '가입일', value: formatDate(selectedMember.joined_at || selectedMember.created_at) },
