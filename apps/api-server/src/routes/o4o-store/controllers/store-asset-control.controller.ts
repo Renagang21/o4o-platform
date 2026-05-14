@@ -128,7 +128,10 @@ export function createStoreAssetControlController(
         const countQuery = `
           SELECT COUNT(*)::int as total
           FROM o4o_asset_snapshots s
+          LEFT JOIN kpa_store_asset_controls c
+            ON c.snapshot_id = s.id AND c.organization_id = s.organization_id
           WHERE s.organization_id = $1
+            AND (c.publish_status IS NULL OR c.publish_status != 'hidden')
           ${countTypeFilter}
           ${countSearchFilter}
         `;
@@ -162,6 +165,7 @@ export function createStoreAssetControlController(
           LEFT JOIN kpa_store_asset_controls c
             ON c.snapshot_id = s.id AND c.organization_id = s.organization_id
           WHERE s.organization_id = $1
+            AND (c.publish_status IS NULL OR c.publish_status != 'hidden')
           ${typeFilter}
           ${searchFilter}
           ORDER BY

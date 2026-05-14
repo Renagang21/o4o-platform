@@ -132,6 +132,7 @@ export function createStoreLibraryFeedController(
                 ON c.snapshot_id = s.id AND c.organization_id = s.organization_id
               WHERE s.organization_id = $1
                 AND s.asset_type IN ('cms', 'content')
+                AND (c.publish_status IS NULL OR c.publish_status != 'hidden')
                 ${snapshotSearchClauseData}
             )
             UNION ALL
@@ -159,8 +160,11 @@ export function createStoreLibraryFeedController(
             (
               SELECT 1
               FROM o4o_asset_snapshots s
+              LEFT JOIN kpa_store_asset_controls c
+                ON c.snapshot_id = s.id AND c.organization_id = s.organization_id
               WHERE s.organization_id = $1
                 AND s.asset_type IN ('cms', 'content')
+                AND (c.publish_status IS NULL OR c.publish_status != 'hidden')
                 ${snapshotSearchClauseCount}
             )
             UNION ALL
