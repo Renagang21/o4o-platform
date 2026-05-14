@@ -357,13 +357,13 @@ function DocumentsSection({
       .map((r) => r.id);
     const directCount = selected.size - snapshotIds.length;
     if (snapshotIds.length === 0) {
-      toast.error('제거 가능한 항목이 없습니다 (직접 작성 콘텐츠는 매장 제작 자료에서 제거)');
+      toast.error('삭제 가능한 항목이 없습니다 (직접 작성 콘텐츠는 매장 제작 자료에서 삭제)');
       return;
     }
     if (
       !confirm(
-        `선택한 ${snapshotIds.length}개 콘텐츠를 내 자료함에서 제거하시겠습니까?${
-          directCount > 0 ? `\n(직접 작성 ${directCount}개는 매장 제작 자료에서 제거)` : ''
+        `선택한 ${snapshotIds.length}개 콘텐츠를 내 자료함에서 삭제하시겠습니까?${
+          directCount > 0 ? `\n(직접 작성 ${directCount}개는 매장 제작 자료에서 삭제)` : ''
         }`,
       )
     )
@@ -371,12 +371,12 @@ function DocumentsSection({
     try {
       const n = await onRemoveSnapshots(snapshotIds);
       if (n > 0) {
-        toast.success(`${n}개 콘텐츠를 내 자료함에서 제거했습니다`);
+        toast.success(`${n}개 콘텐츠를 내 자료함에서 삭제했습니다`);
         setSelected(new Set());
         onAfterRemove?.();
       }
     } catch (e: any) {
-      toast.error(e?.message || '제거에 실패했습니다');
+      toast.error(e?.message || '삭제에 실패했습니다');
     }
   }, [selected, rows, onRemoveSnapshots, onAfterRemove]);
 
@@ -491,7 +491,7 @@ function DocumentsSection({
           {showRemoveButton && (
             <button type="button" onClick={handleRemove} style={styles.bulkDeleteBtn}>
               <Trash2 size={14} />
-              선택 제거
+              선택 삭제
             </button>
           )}
           <button type="button" onClick={() => setSelected(new Set())} style={styles.clearBtn}>
@@ -616,16 +616,16 @@ function LessonsSection({
     if (!onRemoveSnapshots) return;
     const ids = rows.filter((r) => selected.has(r.selectionKey)).map((r) => r.id);
     if (ids.length === 0) return;
-    if (!confirm(`선택한 ${ids.length}개 강의를 내 자료함에서 제거하시겠습니까?`)) return;
+    if (!confirm(`선택한 ${ids.length}개 강의를 내 자료함에서 삭제하시겠습니까?`)) return;
     try {
       const n = await onRemoveSnapshots(ids);
       if (n > 0) {
-        toast.success(`${n}개 강의를 내 자료함에서 제거했습니다`);
+        toast.success(`${n}개 강의를 내 자료함에서 삭제했습니다`);
         setSelected(new Set());
         onAfterRemove?.();
       }
     } catch (e: any) {
-      toast.error(e?.message || '제거에 실패했습니다');
+      toast.error(e?.message || '삭제에 실패했습니다');
     }
   }, [selected, rows, onRemoveSnapshots, onAfterRemove]);
 
@@ -735,7 +735,7 @@ function LessonsSection({
           {showRemoveButton && (
             <button type="button" onClick={handleRemove} style={styles.bulkDeleteBtn}>
               <Trash2 size={14} />
-              선택 제거
+              선택 삭제
             </button>
           )}
           <button type="button" onClick={() => setSelected(new Set())} style={styles.clearBtn}>

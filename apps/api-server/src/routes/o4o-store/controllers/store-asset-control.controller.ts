@@ -22,17 +22,22 @@ import { KpaMember } from '../../kpa/entities/kpa-member.entity.js';
 import { KpaStoreAssetControl } from '../../kpa/entities/kpa-store-asset-control.entity.js';
 import type { AssetPublishStatus, ChannelMap } from '../../kpa/entities/kpa-store-asset-control.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
+import { isStoreOwner } from '../../../utils/store-owner.utils.js';
 
 type AuthMiddleware = import('express').RequestHandler;
 
 const VALID_STATUSES: AssetPublishStatus[] = ['draft', 'published', 'hidden'];
 
+// store-library-feed.controller 와 동일한 dual resolution:
+// role_assignments(isStoreOwner) 우선 → KpaMember fallback.
+// 두 컨트롤러가 동일한 organizationId를 사용해야 snapshot scope 정합이 유지된다.
 async function resolveOrgId(
   dataSource: DataSource,
   userId: string,
 ): Promise<string | null> {
-  const memberRepo = dataSource.getRepository(KpaMember);
-  const member = await memberRepo.findOne({ where: { user_id: userId } });
+  const { organizationId: orgFromRa } = await isStoreOwner(dataSource, userId, 'kpa');
+  if (orgFromRa) return orgFromRa;
+  const member = await dataSource.getRepository(KpaMember).findOne({ where: { user_id: userId } });
   return member?.organization_id || null;
 }
 
