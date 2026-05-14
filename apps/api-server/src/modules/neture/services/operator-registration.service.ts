@@ -92,6 +92,18 @@ export class OperatorRegistrationService {
         throw new Error('REGISTRATION_NOT_FOUND');
       }
 
+      // WO-O4O-NETURE-MEMBER-DATA-INTEGRITY-CLEANUP-V1:
+      // users 존재 검증 — supplier 생성 전 users 행이 반드시 유효해야 함.
+      // FK ON DELETE CASCADE가 DB 레벨 보호를 담당하지만,
+      // 승인 트랜잭션 내에서도 명시적으로 확인해 고아 데이터 생성을 선차단한다.
+      const [userRow] = await queryRunner.query(
+        `SELECT id, status FROM users WHERE id = $1`,
+        [userId],
+      );
+      if (!userRow) {
+        throw new Error('USER_NOT_FOUND');
+      }
+
       // 2. service_memberships 승인 (RETURNING 없음)
       await queryRunner.query(
         `UPDATE service_memberships
