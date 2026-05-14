@@ -5,6 +5,12 @@
  * WO-O4O-KPA-STORE-PRODUCTION-ENTRY-CANONICAL-CORRECTION-V1:
  *   "신규 제작 시작" 진입 제거 — 신규 생성은 "내 자료함 → 제작 시작 → 상품 상세설명"에서만.
  *   본 페이지는 보유 상품의 기존 product_description 결과물 조회/재편집/저장/삭제(빈값 저장).
+ * WO-O4O-PRODUCT-DESCRIPTION-TEMPLATE-WORKFLOW-V1:
+ *   - textarea → RichTextEditor 전환 (structured HTML 기반 편집)
+ *   - ProductionRouterState에서 selectedTemplateId 수신
+ *   - template badge + 설명 유형 표시
+ *   - template starterHtml 초기 구조 주입 (기존 저장 내용 없을 때)
+ *   - AiContentModal template-aware 연결 (templateSystemPrompt / templateForcedOptions)
  *
  * Backend: ProductAiContent (contentType='product_description') — 기존 active entity/API 재사용.
  *
@@ -12,10 +18,11 @@
  * 상품 선택 + 자료 description prefill 처리.
  */
 
-import { useEffect, useState, useCallback, type CSSProperties } from 'react';
+import { useEffect, useState, useCallback, useRef, type CSSProperties } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { Sparkles, Save, RefreshCw, FileText, Package, FolderOpen } from 'lucide-react';
+import { Sparkles, Save, RefreshCw, FileText, Package, FolderOpen, LayoutTemplate } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
+import { RichTextEditor, AiContentModal } from '@o4o/content-editor';
 import {
   fetchLocalProducts,
   type LocalProduct,
@@ -25,7 +32,12 @@ import {
   saveProductAiContent,
   generateProductAiContent,
 } from '../../api/productAiContent';
+import { mediaApi } from '../../api/media';
+import { getAccessToken } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
+import { findTemplate } from './productionTemplates';
+import type { ProductionTemplate } from './productionTemplates';
+import type { ProductionRouterState } from './productionTargets';
 
 const POLL_DELAY_MS = 4000;
 
@@ -41,6 +53,17 @@ export default function StoreProductDescriptionsPage() {
   const [model, setModel] = useState<string | null>(null);
   const [updatedAt, setUpdatedAt] = useState<string | null>(null);
   const [prefillNote, setPrefillNote] = useState<string | null>(null);
+
+  // WO-O4O-PRODUCT-DESCRIPTION-TEMPLATE-WORKFLOW-V1: template 상태
+  const [selectedTemplate, setSelectedTemplate] = useState<ProductionTemplate | null>(null);
+  const [aiOpen, setAiOpen] = useState(false);
+
+  /**
+   * starterHtml은 1회 소비용 ref.
+   * fetchContent 완료 후 저장된 내용이 없을 때 editor 초기값으로 주입하고 즉시 null로 소비.
+   * 사용자가 사이드바에서 다른 상품 전환 시 재적용 방지.
+   */
+  const starterHtmlRef = useRef<string | null>(null);
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -67,11 +90,18 @@ export default function StoreProductDescriptionsPage() {
     try {
       const res = await getProductAiContents(productId);
       const desc = (res.data || []).find((c) => c.contentType === 'product_description');
-      setContent(desc?.content || '');
+      const rawContent = desc?.content || '';
+      // WO-O4O-PRODUCT-DESCRIPTION-TEMPLATE-WORKFLOW-V1:
+      // 저장된 내용이 없을 때 template starterHtml을 초기 구조로 적용 (1회 소비)
+      const starterHtml = starterHtmlRef.current;
+      starterHtmlRef.current = null; // consume
+      setContent(rawContent || starterHtml || '');
       setModel(desc?.model || null);
       setUpdatedAt(desc?.updatedAt || null);
     } catch {
-      setContent('');
+      const starterHtml = starterHtmlRef.current;
+      starterHtmlRef.current = null;
+      setContent(starterHtml || '');
       setModel(null);
       setUpdatedAt(null);
     } finally {
@@ -83,27 +113,38 @@ export default function StoreProductDescriptionsPage() {
     if (selectedId) fetchContent(selectedId);
   }, [selectedId, fetchContent]);
 
-  // WO-O4O-KPA-STORE-PRODUCTION-ENTRY-CANONICAL-CORRECTION-V1:
-  //   내 자료함에서 진입 시 source 항목 description을 prefill 후보로 보관.
-  //   사용자가 "자료 내용으로 채우기" 클릭 시 textarea에 적용.
+  // WO-O4O-KPA-STORE-PRODUCTION-ENTRY-CANONICAL-CORRECTION-V1 +
+  // WO-O4O-PRODUCT-DESCRIPTION-TEMPLATE-WORKFLOW-V1:
+  //   production 진입 시 selectedTemplateId → template 조회 + starterHtml ref 설정.
+  //   source description → prefill 후보 보관.
   useEffect(() => {
-    const state = location.state as
-      | {
-          production?: {
-            source?: { items?: Array<{ id: string; title: string; description?: string | null; origin?: string }> };
-          };
-        }
-      | null;
+    const state = location.state as ProductionRouterState | null;
     const first = state?.production?.source?.items?.[0];
+    const templateId = state?.production?.selectedTemplateId;
+
+    const template = templateId ? (findTemplate(templateId) ?? null) : null;
+    if (template) {
+      setSelectedTemplate(template);
+      if (template.starterHtml) {
+        starterHtmlRef.current = template.starterHtml;
+      }
+    }
+
     if (first?.description?.trim()) {
       setPrefillNote(first.description.trim());
     }
+
     if (state) window.history.replaceState({}, document.title);
   }, [location.state]);
 
   const handleApplyPrefill = () => {
     if (!prefillNote) return;
-    setContent(prefillNote);
+    // plain text → HTML paragraph (RichTextEditor가 파싱 가능한 최소 구조)
+    const lines = prefillNote.split(/\n+/).filter(Boolean);
+    const html = lines.length > 1
+      ? lines.map((l) => `<p>${l}</p>`).join('')
+      : `<p>${prefillNote}</p>`;
+    setContent(html);
     toast.success('자료 내용을 편집기에 채웠습니다');
   };
 
@@ -143,6 +184,20 @@ export default function StoreProductDescriptionsPage() {
     }
   };
 
+  // WO-O4O-PRODUCT-DESCRIPTION-TEMPLATE-WORKFLOW-V1: RichTextEditor 이미지 업로드
+  const handleImageUpload = async (file: File): Promise<string> => {
+    const res = await mediaApi.upload(file, true, 'kpa-society', 'product-description');
+    if (res.success && res.data) return res.data.url;
+    throw new Error(res.error || '이미지 업로드에 실패했습니다.');
+  };
+
+  // WO-O4O-PRODUCT-DESCRIPTION-TEMPLATE-WORKFLOW-V1: AiContentModal onInsert
+  const handleAiInsert = useCallback(({ html }: { html: string; title: string }) => {
+    setContent(html);
+    setAiOpen(false);
+    toast.success('AI 작성 내용이 편집기에 적용되었습니다. 검토 후 저장하세요.');
+  }, []);
+
   const selectedProduct = products.find((p) => p.id === selectedId) || null;
   const hasExisting = !!updatedAt;
 
@@ -155,10 +210,20 @@ export default function StoreProductDescriptionsPage() {
             <span style={{ color: colors.neutral300 }}>/</span>
             <span style={{ color: colors.neutral700 }}>상품 상세설명</span>
           </div>
-          <h1 style={styles.title}>
-            <FileText size={20} style={{ color: colors.primary }} />
-            상품 상세설명 관리
-          </h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+            <h1 style={styles.title}>
+              <FileText size={20} style={{ color: colors.primary }} />
+              상품 상세설명 관리
+            </h1>
+            {/* WO-O4O-PRODUCT-DESCRIPTION-TEMPLATE-WORKFLOW-V1: template badge */}
+            {selectedTemplate && (
+              <span style={styles.templateBadge}>
+                <LayoutTemplate size={12} />
+                {selectedTemplate.name}
+                {selectedTemplate.style ? ` · ${selectedTemplate.style}` : ''}
+              </span>
+            )}
+          </div>
           <p style={styles.subtitle}>
             저장된 상품 상세설명을 조회·재편집·삭제(빈값 저장)합니다.
             신규 생성은 "내 자료함 → 제작 시작 → 상품 상세설명"에서 진입하세요.
@@ -226,6 +291,17 @@ export default function StoreProductDescriptionsPage() {
                   {selectedProduct.summary && (
                     <div style={styles.editorProductSummary}>{selectedProduct.summary}</div>
                   )}
+                  {/* WO-O4O-PRODUCT-DESCRIPTION-TEMPLATE-WORKFLOW-V1: 설명 유형 badge */}
+                  {selectedTemplate && (
+                    <div style={{ marginTop: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={styles.typeLabel}>
+                        {selectedTemplate.style ?? selectedTemplate.name}
+                      </span>
+                      <span style={{ fontSize: '11px', color: colors.neutral400 }}>
+                        {selectedTemplate.description}
+                      </span>
+                    </div>
+                  )}
                 </div>
                 <div style={styles.editorMeta}>
                   {model && <span style={styles.metaBadge}>모델: {model}</span>}
@@ -254,19 +330,51 @@ export default function StoreProductDescriptionsPage() {
                 </div>
               )}
 
-              <textarea
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                disabled={contentLoading}
-                style={styles.textarea}
-                placeholder={
-                  contentLoading
-                    ? '불러오는 중...'
-                    : hasExisting
+              {/* WO-O4O-PRODUCT-DESCRIPTION-TEMPLATE-WORKFLOW-V1: AI 보조 배너 */}
+              <div style={styles.aiBanner}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={styles.aiBannerTitle}>✨ AI 상품설명 보조</div>
+                  <div style={styles.aiBannerDesc}>
+                    {selectedTemplate
+                      ? `${selectedTemplate.name} 스타일로 AI가 상품설명 초안을 작성합니다.`
+                      : 'URL이나 자료를 기반으로 AI가 상품설명 초안을 작성합니다.'}
+                    {' '}최종 내용은 직접 검토 후 저장하세요.
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setAiOpen(true)}
+                  style={styles.aiBannerBtn}
+                >
+                  <Sparkles size={13} />
+                  AI로 작성
+                </button>
+              </div>
+
+              {/* WO-O4O-PRODUCT-DESCRIPTION-TEMPLATE-WORKFLOW-V1: RichTextEditor */}
+              {contentLoading ? (
+                <div style={styles.editorLoading}>불러오는 중...</div>
+              ) : (
+                <RichTextEditor
+                  key={selectedId ?? 'empty'}
+                  value={content}
+                  onChange={(c) => setContent(c.html)}
+                  onImageUpload={handleImageUpload}
+                  placeholder={
+                    hasExisting
                       ? '저장된 상품 상세설명을 수정하세요.'
-                      : '저장된 결과물이 없습니다. 신규 생성은 "내 자료함 → 제작 시작 → 상품 상세설명"에서 시작하세요.'
-                }
-              />
+                      : selectedTemplate
+                        ? `${selectedTemplate.name} 템플릿 구조로 작성하세요. AI 보조를 활용하면 빠르게 초안을 만들 수 있습니다.`
+                        : '신규 생성은 "내 자료함 → 제작 시작 → 상품 상세설명"에서 시작하세요.'
+                  }
+                  minHeight="360px"
+                  preset="full"
+                  aiRequestHeaders={(() => {
+                    const token = getAccessToken();
+                    return token ? { Authorization: `Bearer ${token}` } : undefined;
+                  })()}
+                />
+              )}
 
               <div style={styles.actions}>
                 {hasExisting && (
@@ -295,6 +403,23 @@ export default function StoreProductDescriptionsPage() {
           )}
         </section>
       </div>
+
+      {/* WO-O4O-PRODUCT-DESCRIPTION-TEMPLATE-WORKFLOW-V1: AiContentModal (template-aware) */}
+      <AiContentModal
+        open={aiOpen}
+        onClose={() => setAiOpen(false)}
+        editor={null}
+        onInsert={handleAiInsert}
+        aiRequestHeaders={(() => {
+          const token = getAccessToken();
+          return token ? { Authorization: `Bearer ${token}` } : undefined;
+        })()}
+        headerLabel="상품설명 AI 보조"
+        urlPlaceholder="https://example.com/product 또는 제품 페이지 URL"
+        templateId={selectedTemplate?.id}
+        templateSystemPrompt={selectedTemplate?.systemPromptOverride}
+        templateForcedOptions={selectedTemplate?.forcedOptions}
+      />
     </div>
   );
 }
@@ -328,6 +453,17 @@ const styles: Record<string, CSSProperties> = {
     fontWeight: 600,
     color: colors.neutral800,
     margin: 0,
+  },
+  templateBadge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '5px',
+    padding: '3px 8px',
+    background: '#eef2ff',
+    color: '#4f46e5',
+    borderRadius: '5px',
+    fontSize: '12px',
+    fontWeight: 600,
   },
   subtitle: {
     fontSize: '13px',
@@ -427,6 +563,14 @@ const styles: Record<string, CSSProperties> = {
     fontSize: '14px',
     minHeight: '300px',
   },
+  editorLoading: {
+    minHeight: '360px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: colors.neutral400,
+    fontSize: '14px',
+  },
   editorHeader: {
     display: 'flex',
     justifyContent: 'space-between',
@@ -445,11 +589,22 @@ const styles: Record<string, CSSProperties> = {
     color: colors.neutral500,
     marginTop: '4px',
   },
+  typeLabel: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    padding: '2px 8px',
+    background: '#f0fdf4',
+    color: '#15803d',
+    borderRadius: '4px',
+    fontSize: '11px',
+    fontWeight: 600,
+  },
   editorMeta: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'flex-end',
     gap: '4px',
+    flexShrink: 0,
   },
   metaBadge: {
     display: 'inline-flex',
@@ -490,19 +645,41 @@ const styles: Record<string, CSSProperties> = {
     cursor: 'pointer',
     flexShrink: 0,
   },
-  textarea: {
-    width: '100%',
-    minHeight: '320px',
-    padding: '12px',
-    border: `1px solid ${colors.neutral300}`,
-    borderRadius: '6px',
-    fontSize: '14px',
-    lineHeight: 1.6,
-    color: colors.neutral800,
-    fontFamily: 'inherit',
-    resize: 'vertical',
-    outline: 'none',
-    boxSizing: 'border-box',
+  aiBanner: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '12px',
+    padding: '10px 14px',
+    background: '#eef2ff',
+    border: '1px solid #c7d2fe',
+    borderRadius: '8px',
+  },
+  aiBannerTitle: {
+    fontSize: '13px',
+    fontWeight: 600,
+    color: '#4338ca',
+    marginBottom: '2px',
+  },
+  aiBannerDesc: {
+    fontSize: '12px',
+    color: '#6366f1',
+    lineHeight: 1.5,
+  },
+  aiBannerBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '8px 16px',
+    background: '#4f46e5',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '7px',
+    fontSize: '13px',
+    fontWeight: 600,
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
   },
   actions: {
     display: 'flex',
