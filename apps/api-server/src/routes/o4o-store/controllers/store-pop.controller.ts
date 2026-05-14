@@ -3,6 +3,10 @@
  *
  * WO-O4O-QR-POP-AUTO-GENERATOR-V1
  * WO-STORE-POP-DIRECT-SOURCE-V1
+ * WO-O4O-POP-TEMPLATE-WORKFLOW-V1:
+ *   - POST /pharmacy/pop/generate body에 templateId + aiContent 추가
+ *   - templateId / aiContent는 모든 popItems에 일괄 적용
+ *   - aiContent 제공 시: 각 popItem의 title/description 오버라이드
  *
  * Library 콘텐츠 + QR 코드를 조합하여 POP PDF 자동 생성.
  * 공급자 공개 자료(supplierItemIds)를 StoreLibraryItem 복사 없이 직접 참조 지원.
@@ -20,7 +24,7 @@ import { NetureSupplierLibraryItem } from '../../../modules/neture/entities/Netu
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
 import { generatePopPdf } from '../../../services/pop-generator.service.js';
-import type { PopGenerateInput } from '../../../services/pop-generator.service.js';
+import type { PopGenerateInput, PopAiContent } from '../../../services/pop-generator.service.js';
 
 type AuthMiddleware = RequestHandler;
 
@@ -80,7 +84,19 @@ export function createStorePopController(
     requirePharmacyOwner,
     asyncHandler(async (req: Request, res: Response) => {
       const organizationId = (req as any).organizationId;
-      const { libraryItemIds, supplierItemIds, qrId, layout } = req.body;
+      const {
+        libraryItemIds, supplierItemIds, qrId, layout,
+        // WO-O4O-POP-TEMPLATE-WORKFLOW-V1
+        templateId,
+        aiContent,
+      } = req.body as {
+        libraryItemIds?: string[];
+        supplierItemIds?: string[];
+        qrId?: string;
+        layout?: string;
+        templateId?: string;
+        aiContent?: PopAiContent;
+      };
 
       const hasLibraryItems = Array.isArray(libraryItemIds) && libraryItemIds.length > 0;
       const hasSupplierItems = Array.isArray(supplierItemIds) && supplierItemIds.length > 0;
@@ -123,6 +139,9 @@ export function createStorePopController(
             qrUrl: null,
             qrLabel: null,
             layout: validLayout as 'A4' | 'A5',
+            // WO-O4O-POP-TEMPLATE-WORKFLOW-V1
+            templateId: templateId || undefined,
+            aiContent: aiContent || undefined,
           });
         }
       }
@@ -142,6 +161,9 @@ export function createStorePopController(
             qrUrl: null,
             qrLabel: null,
             layout: validLayout as 'A4' | 'A5',
+            // WO-O4O-POP-TEMPLATE-WORKFLOW-V1
+            templateId: templateId || undefined,
+            aiContent: aiContent || undefined,
           });
         }
       }
