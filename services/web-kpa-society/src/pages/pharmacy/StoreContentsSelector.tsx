@@ -406,6 +406,10 @@ function DocumentsSection({
                 {row.title}
               </Link>
             )}
+            {/* WO-O4O-STORE-LIBRARY-CONTENTS-DIRECT-CONTENT-REENTRY-UX-V1: direct 콘텐츠 visual indicator */}
+            {row.origin === 'direct' && (
+              <span style={{ ...styles.badge, background: '#DCFCE7', color: '#16A34A', flexShrink: 0 }}>내 콘텐츠</span>
+            )}
             {row.lifecycleStatus === 'archived' && (
               <span style={{ ...styles.badge, background: '#FEF3C7', color: '#D97706' }}>보관</span>
             )}
@@ -446,15 +450,17 @@ function DocumentsSection({
         align: 'center',
         width: '80px',
         onCellClick: () => {},
+        // WO-O4O-STORE-LIBRARY-CONTENTS-DIRECT-CONTENT-REENTRY-UX-V1:
+        // direct 콘텐츠는 편집 가능 — action label 을 "편집"으로 분기
         render: (_v, row) => (
           <a
             href={row.href}
             target={mode === 'modal' ? '_blank' : undefined}
             rel={mode === 'modal' ? 'noreferrer' : undefined}
             style={styles.viewBtn}
-            aria-label="자료 보기"
+            aria-label={row.origin === 'direct' ? '콘텐츠 편집' : '자료 보기'}
           >
-            보기
+            {row.origin === 'direct' ? '편집' : '보기'}
           </a>
         ),
       },
@@ -466,6 +472,14 @@ function DocumentsSection({
 
   return (
     <section style={styles.section}>
+      {/* WO-O4O-STORE-LIBRARY-CONTENTS-DIRECT-CONTENT-REENTRY-UX-V1: guide bar */}
+      <div style={styles.infoBar}>
+        <Info size={14} style={{ color: colors.primary, flexShrink: 0 }} />
+        <span>
+          제작 후 저장한 콘텐츠는 <strong style={{ color: '#1D4ED8' }}>내 콘텐츠</strong> 표시 항목에서 다시 수정할 수 있습니다.
+        </span>
+      </div>
+
       <div style={styles.sectionHeader}>
         <span style={styles.countBadge}>{total}건</span>
         <div style={styles.searchWrap}>

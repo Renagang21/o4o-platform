@@ -168,7 +168,8 @@ export default function StoreDirectContentPage() {
     setDeleting(true);
     try {
       await directContentApi.remove(id);
-      navigate('/store/content', { replace: true });
+      // WO-O4O-STORE-LIBRARY-CONTENTS-DIRECT-CONTENT-REENTRY-UX-V1: canonical 허브로 복귀
+      navigate('/store/library/contents', { replace: true });
     } catch (e: any) {
       showToast(e.message || '삭제 실패', false);
       setDeleting(false);
@@ -227,10 +228,10 @@ export default function StoreDirectContentPage() {
         </div>
       )}
 
-      {/* Back nav */}
-      <Link to="/store/content" className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline mb-4">
+      {/* Back nav — WO-O4O-STORE-LIBRARY-CONTENTS-DIRECT-CONTENT-REENTRY-UX-V1: canonical 허브로 복귀 */}
+      <Link to="/store/library/contents" className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline mb-4">
         <ArrowLeft className="w-4 h-4" />
-        자료실로 돌아가기
+        내 자료함 콘텐츠로 돌아가기
       </Link>
 
       {/* Header */}
