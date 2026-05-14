@@ -9,6 +9,8 @@
 
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { MembershipGate } from './MembershipGate';
+import { isPlatformSuperAdmin } from '../../lib/membershipGate';
 
 // ─── Neture Role Constants ───
 
@@ -84,14 +86,12 @@ export function RouteGuard({
     return <Navigate to="/" replace />;
   }
 
-  // Membership check
+  // WO-O4O-SERVICE-MEMBERSHIP-LOGIN-GATE-V1:
+  //   기존 코드는 missing membership 시 Navigate("/") 했으나, 사용자가 왜 차단됐는지
+  //   알 수 없었음. MembershipGate 로 위임 — none/pending/rejected/suspended/withdrawn
+  //   별 안내 화면을 표시. super_admin 은 MembershipGate 내부에서 bypass.
   if (requireMembership) {
-    const hasMembership = user.memberships?.some(
-      m => m.serviceKey === requireMembership && m.status === 'active'
-    );
-    if (!hasMembership) {
-      return <Navigate to="/" replace />;
-    }
+    return <MembershipGate serviceKey={requireMembership}>{children}</MembershipGate>;
   }
 
   return <>{children}</>;
@@ -125,6 +125,10 @@ export function RoleGuard({ children, allowedRoles, fallback = '/login' }: Legac
     return <Navigate to="/" replace />;
   }
 
+  // WO-O4O-SERVICE-MEMBERSHIP-LOGIN-GATE-V1: role 통과 후 membership active 강제
+  if (user && !isPlatformSuperAdmin(user)) {
+    return <MembershipGate>{children}</MembershipGate>;
+  }
   return <>{children}</>;
 }
 
@@ -149,11 +153,17 @@ export function OperatorRoute({ children, fallback = '/login' }: Omit<LegacyGuar
 
 /**
  * AdminRoute — RouteGuard wrapper (하위 호환)
+ *
+ * WO-O4O-SERVICE-MEMBERSHIP-LOGIN-GATE-V1:
+ *   기존에는 admin role 만으로 통과시켰으나, role 만 있고 membership 없는 사용자도
+ *   서비스 이용 불가 정책에 맞춰 'neture' membership 검증을 추가한다.
+ *   platform:super_admin 은 MembershipGate 내부에서 bypass.
  */
 export function AdminRoute({ children, fallback = '/login' }: Omit<LegacyGuardProps, 'allowedRoles'>) {
   return (
     <RouteGuard
       allowedRoles={ADMIN_ROLES}
+      requireMembership="neture"
       fallback={fallback}
     >
       {children}

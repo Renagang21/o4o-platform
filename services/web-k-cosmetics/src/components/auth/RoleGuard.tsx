@@ -11,14 +11,20 @@ import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { isAdminOrAbove } from '@o4o/auth-utils';
 import { useAuth } from '../../contexts/AuthContext';
+import { MembershipGate } from './MembershipGate';
 
 interface RoleGuardProps {
   children: React.ReactNode;
   allowedRoles?: string[];
   fallback?: string;
+  /**
+   * WO-O4O-SERVICE-MEMBERSHIP-LOGIN-GATE-V1:
+   *   role 통과 후 service_membership active 강제. 기본 true.
+   */
+  enforceMembership?: boolean;
 }
 
-export function RoleGuard({ children, allowedRoles, fallback = '/login' }: RoleGuardProps) {
+export function RoleGuard({ children, allowedRoles, fallback = '/login', enforceMembership = true }: RoleGuardProps) {
   const { isAuthenticated, user, isLoading, isSessionChecked, checkSession } = useAuth();
   const location = useLocation();
 
@@ -46,6 +52,9 @@ export function RoleGuard({ children, allowedRoles, fallback = '/login' }: RoleG
     return <Navigate to="/" replace />;
   }
 
+  if (enforceMembership) {
+    return <MembershipGate>{children}</MembershipGate>;
+  }
   return <>{children}</>;
 }
 
@@ -53,12 +62,13 @@ export function RoleGuard({ children, allowedRoles, fallback = '/login' }: RoleG
  * OperatorRoute — service_memberships 기반 Operator 접근 제어
  *
  * WO-O4O-OPERATOR-VISIBILITY-UNIFICATION-V1
- * - Platform admin (admin/super_admin) → 항상 허용
- * - 그 외 → 해당 서비스의 active membership 필요
+ * WO-O4O-SERVICE-MEMBERSHIP-LOGIN-GATE-V1:
+ *   missing-membership 시 Navigate("/") 대신 MembershipGate 의 상태별 안내 화면 표시.
+ *   admin 도 membership 검증 거침 — role 만 있고 membership 없는 케이스 차단.
+ *   platform:super_admin 만 MembershipGate 내부에서 bypass.
  */
-const SERVICE_KEY = 'k-cosmetics';
 
-export function OperatorRoute({ children, fallback = '/login' }: Omit<RoleGuardProps, 'allowedRoles'>) {
+export function OperatorRoute({ children, fallback = '/login' }: Omit<RoleGuardProps, 'allowedRoles' | 'enforceMembership'>) {
   const { isAuthenticated, user, isLoading, isSessionChecked, checkSession } = useAuth();
   const location = useLocation();
 
@@ -82,15 +92,12 @@ export function OperatorRoute({ children, fallback = '/login' }: Omit<RoleGuardP
 
   if (!user) return <Navigate to="/" replace />;
 
-  // WO-O4O-OPERATOR-ROUTE-GUARD-COMMONIZATION-V1: 공통 helper 사용
+  // role 자체가 없으면 (admin 도 아니고 operator role 도 없으면) 홈으로 — operator 페이지는 role 필수
   const isAdmin = isAdminOrAbove(user.roles, 'k-cosmetics');
-  const hasOperatorMembership = user.memberships?.some(
-    m => m.serviceKey === SERVICE_KEY && m.status === 'active'
-  );
-
-  if (!isAdmin && !hasOperatorMembership) {
+  const hasOperatorRole = user.roles.some((r) => r === 'k-cosmetics:operator' || r === 'cosmetics:operator');
+  if (!isAdmin && !hasOperatorRole) {
     return <Navigate to="/" replace />;
   }
 
-  return <>{children}</>;
+  return <MembershipGate>{children}</MembershipGate>;
 }

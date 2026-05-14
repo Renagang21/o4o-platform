@@ -11,6 +11,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { hasAnyRole, PLATFORM_ROLES, STORE_OWNER_ROLES } from '../../lib/role-constants';
 import { getMyRequestsCached } from '../../api/pharmacyRequestApi';
+import { MembershipGate } from './MembershipGate';
 
 interface PharmacyGuardProps {
   children: React.ReactNode;
@@ -67,7 +68,8 @@ export function PharmacyGuard({ children }: PharmacyGuardProps) {
   // WO-O4O-KPA-MY-PHARMACY-HEADER-ROUTE-FIX-V1
   // storeOwner가 아닌 운영자/admin은 /store 접근 불가 — /operator로 redirect 금지
   if (hasStoreRole) {
-    return <>{children}</>;
+    // WO-O4O-SERVICE-MEMBERSHIP-LOGIN-GATE-V1: role 만 있고 membership 없는 사용자 차단
+    return <MembershipGate>{children}</MembershipGate>;
   }
 
   if (isPlatformOnlyUser) {
@@ -89,7 +91,7 @@ export function PharmacyGuard({ children }: PharmacyGuardProps) {
   }
 
   if (apiCheck === 'approved') {
-    return <>{children}</>;
+    return <MembershipGate>{children}</MembershipGate>;
   }
 
   return <Navigate to="/pharmacy" replace />;

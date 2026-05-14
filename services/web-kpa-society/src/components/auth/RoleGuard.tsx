@@ -13,6 +13,7 @@
 
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { MembershipGate } from './MembershipGate';
 
 interface RoleGuardProps {
   children: React.ReactNode;
@@ -20,9 +21,16 @@ interface RoleGuardProps {
   fallback?: string;
   /** 지정 시 역할 불일치에서 리다이렉트 대신 에러 카드 표시 */
   accessDeniedMessage?: string;
+  /**
+   * WO-O4O-SERVICE-MEMBERSHIP-LOGIN-GATE-V1:
+   *   role 체크 통과 후 service_membership active 까지 강제할지 여부. 기본 true.
+   *   role 만 있고 membership 없는 사용자는 가입/대기/제한 안내로 보낸다.
+   *   public landing page 등 membership 검사가 의미 없는 곳에서만 false 사용.
+   */
+  enforceMembership?: boolean;
 }
 
-export function RoleGuard({ children, allowedRoles, fallback = '/login', accessDeniedMessage }: RoleGuardProps) {
+export function RoleGuard({ children, allowedRoles, fallback = '/login', accessDeniedMessage, enforceMembership = true }: RoleGuardProps) {
   const { user, isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
 
@@ -45,6 +53,10 @@ export function RoleGuard({ children, allowedRoles, fallback = '/login', accessD
     return <Navigate to="/" replace />;
   }
 
+  // role 통과 후 membership active 검사 (super_admin 예외, 자세한 정책은 MembershipGate)
+  if (enforceMembership) {
+    return <MembershipGate>{children}</MembershipGate>;
+  }
   return <>{children}</>;
 }
 

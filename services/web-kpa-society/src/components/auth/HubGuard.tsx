@@ -8,6 +8,7 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { hasAnyRole, PLATFORM_ROLES, STORE_OWNER_ROLES } from '../../lib/role-constants';
+import { MembershipGate } from './MembershipGate';
 
 interface HubGuardProps {
   children: React.ReactNode;
@@ -34,7 +35,8 @@ export function HubGuard({ children }: HubGuardProps) {
   }
 
   if (hasAnyRole(user.roles, STORE_OWNER_ROLES)) {
-    return <>{children}</>;
+    // WO-O4O-SERVICE-MEMBERSHIP-LOGIN-GATE-V1
+    return <MembershipGate>{children}</MembershipGate>;
   }
 
   return <Navigate to="/pharmacy" replace />;

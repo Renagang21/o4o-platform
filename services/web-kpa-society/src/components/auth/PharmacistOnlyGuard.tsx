@@ -19,6 +19,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { LoadingSpinner } from '../common';
 import { colors } from '../../styles/theme';
 import { PLATFORM_ROLES, hasAnyRole } from '../../lib/role-constants';
+import { MembershipGate } from './MembershipGate';
 
 interface PharmacistOnlyGuardProps {
   children: React.ReactNode;
@@ -36,9 +37,9 @@ export function PharmacistOnlyGuard({ children }: PharmacistOnlyGuardProps) {
     return renderError('로그인이 필요합니다.', navigate, true);
   }
 
-  // Platform roles bypass (kpa:admin, kpa:operator)
+  // Platform roles bypass (kpa:admin, kpa:operator) — service-scoped, membership 검증은 MembershipGate 가 수행
   if (hasAnyRole(user.roles, PLATFORM_ROLES)) {
-    return <>{children}</>;
+    return <MembershipGate>{children}</MembershipGate>;
   }
 
   // Student block
@@ -47,7 +48,8 @@ export function PharmacistOnlyGuard({ children }: PharmacistOnlyGuardProps) {
     return renderError('약사 회원만 이용할 수 있는 서비스입니다.', navigate);
   }
 
-  return <>{children}</>;
+  // WO-O4O-SERVICE-MEMBERSHIP-LOGIN-GATE-V1
+  return <MembershipGate>{children}</MembershipGate>;
 }
 
 function renderError(

@@ -10,6 +10,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { LoadingSpinner } from '../common';
 import { colors } from '../../styles/theme';
 import { PLATFORM_ROLES, STORE_OWNER_ROLES, hasAnyRole } from '../../lib/role-constants';
+import { MembershipGate } from './MembershipGate';
 
 interface PharmacyOwnerOnlyGuardProps {
   children: React.ReactNode;
@@ -28,11 +29,13 @@ export function PharmacyOwnerOnlyGuard({ children }: PharmacyOwnerOnlyGuardProps
   }
 
   if (hasAnyRole(user.roles, PLATFORM_ROLES)) {
-    return <>{children}</>;
+    // WO-O4O-SERVICE-MEMBERSHIP-LOGIN-GATE-V1
+    return <MembershipGate>{children}</MembershipGate>;
   }
 
   if (hasAnyRole(user.roles, STORE_OWNER_ROLES)) {
-    return <>{children}</>;
+    // WO-O4O-SERVICE-MEMBERSHIP-LOGIN-GATE-V1
+    return <MembershipGate>{children}</MembershipGate>;
   }
 
   return renderError('약국 개설자만 이벤트에 참여할 수 있습니다.', navigate);
