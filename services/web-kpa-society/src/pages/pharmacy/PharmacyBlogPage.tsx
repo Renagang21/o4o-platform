@@ -29,6 +29,9 @@ import { getStoreSlug } from '../../api/pharmacyInfo';
 import { RichTextEditor, AiContentModal } from '@o4o/content-editor';
 import { mediaApi } from '../../api/media';
 import { getAccessToken } from '../../contexts/AuthContext';
+// WO-O4O-BLOG-TEMPLATE-WORKFLOW-V1: 블로그 템플릿 연결
+import { findTemplate } from './productionTemplates';
+import type { ProductionTemplate } from './productionTemplates';
 
 // WO-O4O-KPA-STORE-BLOG-AI-WIRING-V1: HTML 첫 heading 추출 (AI title fallback)
 function extractTitleFromHtml(html: string): string {
@@ -79,6 +82,8 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
   const [saving, setSaving] = useState(false);
   // WO-O4O-KPA-STORE-BLOG-AI-WIRING-V1: AI 콘텐츠 보조 모달
   const [aiOpen, setAiOpen] = useState(false);
+  // WO-O4O-BLOG-TEMPLATE-WORKFLOW-V1: 제작 흐름 진입 시 선택된 템플릿
+  const [selectedTemplate, setSelectedTemplate] = useState<ProductionTemplate | null>(null);
 
   // WO-O4O-KPA-STORE-BLOG-META-V1: Blog identity 설정
   const [settings, setSettings] = useState<StaffBlogSettings | null>(null);
@@ -135,21 +140,38 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
 
   // WO-O4O-KPA-STORE-PRODUCTION-ENTRY-CANONICAL-CORRECTION-V1:
   //   "내 자료함 → 제작 시작 → 블로그" 진입 시 source 항목 기반 신규 에디터 자동 오픈.
+  // WO-O4O-BLOG-TEMPLATE-WORKFLOW-V1:
+  //   selectedTemplateId → template 조회 → starterHtml 초기 콘텐츠 주입.
+  //   source.description 있으면 description 우선, 없으면 starterHtml 사용.
   useEffect(() => {
     const state = location.state as
       | {
           production?: {
             source?: { items?: Array<{ id: string; title: string; description?: string | null; origin?: string }> };
+            selectedTemplateId?: string;
           };
         }
       | null;
     const items = state?.production?.source?.items;
+    const templateId = state?.production?.selectedTemplateId;
+    const template = templateId ? (findTemplate(templateId) ?? null) : null;
+    if (template) setSelectedTemplate(template);
+
     if (items && items.length > 0) {
       const first = items[0];
       setEditingPost(null);
       setEditorTitle(first.title || '');
-      setEditorContent(first.description || '');
+      setEditorContent(first.description || template?.starterHtml || '');
       setEditorExcerpt(first.description?.slice(0, 120) || '');
+      setEditorSlug('');
+      setMode('editor');
+      window.history.replaceState({}, document.title);
+    } else if (template) {
+      // 소스 없이 템플릿만 선택하고 진입한 경우 (빈 에디터 + starterHtml)
+      setEditingPost(null);
+      setEditorTitle('');
+      setEditorContent(template.starterHtml || '');
+      setEditorExcerpt('');
       setEditorSlug('');
       setMode('editor');
       window.history.replaceState({}, document.title);
@@ -157,6 +179,8 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const openEditor = (post?: StaffBlogPost) => {
+    // WO-O4O-BLOG-TEMPLATE-WORKFLOW-V1: 직접 진입(목록→글쓰기)은 템플릿 없이 시작
+    setSelectedTemplate(null);
     if (post) {
       setEditingPost(post);
       setEditorTitle(post.title);
@@ -345,9 +369,20 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
     return (
       <div style={{ maxWidth: '800px', margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-          <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#1e293b' }}>
-            {editingPost ? '게시글 수정' : '새 게시글'}
-          </h1>
+          <div>
+            <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#1e293b' }}>
+              {editingPost ? '게시글 수정' : '새 게시글'}
+            </h1>
+            {/* WO-O4O-BLOG-TEMPLATE-WORKFLOW-V1: 제작 흐름 진입 시 선택된 템플릿 배지 */}
+            {selectedTemplate && (
+              <div style={{ marginTop: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ fontSize: 11, fontWeight: 600, color: '#4f46e5', backgroundColor: '#eef2ff', padding: '2px 8px', borderRadius: 4 }}>
+                  {selectedTemplate.style ?? selectedTemplate.name}
+                </span>
+                <span style={{ fontSize: 11, color: '#94a3b8' }}>{selectedTemplate.name} 템플릿 적용 중</span>
+              </div>
+            )}
+          </div>
           <button onClick={() => setMode('list')} style={{ ...btnStyle, backgroundColor: '#f1f5f9', color: '#475569' }}>
             취소
           </button>
@@ -438,6 +473,7 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
               pop (POP·SNS용 짧은 문구) / title_suggest (제목 추천)
             - URL 탭: /api/ai/url-to-blocks → blocksToHtml → RichTextEditor 주입
             - 자동 발행 / 자동 게시 안 함 — 사용자가 검토 후 임시저장 / 발행 */}
+        {/* WO-O4O-BLOG-TEMPLATE-WORKFLOW-V1: templateId/systemPrompt/forcedOptions 주입 */}
         <AiContentModal
           open={aiOpen}
           onClose={() => setAiOpen(false)}
@@ -449,6 +485,9 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
           })()}
           headerLabel="AI 칼럼 보조"
           urlPlaceholder="https://example.com/article 또는 https://www.youtube.com/watch?v=..."
+          templateId={selectedTemplate?.id}
+          templateSystemPrompt={selectedTemplate?.systemPromptOverride}
+          templateForcedOptions={selectedTemplate?.forcedOptions}
         />
       </div>
     );
