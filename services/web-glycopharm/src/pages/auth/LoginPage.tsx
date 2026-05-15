@@ -10,7 +10,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useSearchParams, NavLink } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { getGlycopharmDashboardRoute } from '@/config/dashboard';
 import { Activity, Mail, Lock, Eye, EyeOff, AlertCircle, ArrowLeft } from 'lucide-react';
 
 const REMEMBER_EMAIL_KEY = 'glycopharm_remember_email';
@@ -63,14 +62,14 @@ export default function LoginPage() {
       }
 
       // Post-login 라우팅
+      // loginType override / returnUrl만 LoginPage에서 처리.
+      // WO-O4O-POSTLOGINREDIRECT-CANONICALIZATION-V1: 일반 역할 redirect는 App.tsx PostLoginRedirect 담당.
       if (returnUrl) {
         navigate(returnUrl);
       } else if (loginType === 'pharmacy') {
         navigate('/store/hub');
       } else if (loginType === 'operator') {
         navigate('/operator');
-      } else {
-        navigate(getGlycopharmDashboardRoute(loggedInUser.roles ?? []));
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');

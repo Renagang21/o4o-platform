@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useRef, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 // WO-O4O-STORE-PRODUCTS-QUERYCLIENT-PROVIDER-ALIGN-V1
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1 } },
 });
-import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { AuthProvider, useAuth, getGlycopharmDashboardRoute } from '@/contexts/AuthContext';
 import { GLYCOPHARM_ROLES } from '@/lib/role-constants';
 import { LoginModalProvider } from '@/contexts/LoginModalContext';
 import LoginModal from '@/components/common/LoginModal';
@@ -330,6 +330,54 @@ function OperatorAreaLayout() {
   return <OperatorLayoutWrapper />;
 }
 
+/**
+ * PostLoginRedirect — 로그인 이후 역할 기반 redirect
+ *
+ * WO-O4O-POSTLOGINREDIRECT-CANONICALIZATION-V1
+ *
+ * canonical 패턴 (KPA reference implementation 기반):
+ * - 로그인 직후 1회만 실행 (wasAuthRef + didRedirectRef 이중 가드)
+ * - / 또는 /login 에서만 redirect (기존 LoginModal '/' 가드 정책 유지)
+ * - loginType override (pharmacy/operator) 및 returnUrl은 LoginPage에서 처리
+ *   → LoginPage가 먼저 navigate하면 path가 바뀌어 자동으로 이 가드에 걸림
+ * - workspace 경로 진입 시 early-exit
+ */
+function PostLoginRedirect() {
+  const { user, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const wasAuthRef = useRef(isAuthenticated);
+  const didRedirectRef = useRef(false);
+
+  useEffect(() => {
+    const justLoggedIn = !wasAuthRef.current && isAuthenticated;
+    wasAuthRef.current = isAuthenticated;
+
+    if (!isAuthenticated) { didRedirectRef.current = false; return; }
+    if (!justLoggedIn && !didRedirectRef.current) return;
+    if (!user) return;
+    if (didRedirectRef.current) return;
+
+    // '/' 또는 '/login'에서만 redirect — 기존 LoginModal 가드 정책 유지
+    // (loginType/returnUrl로 LoginPage가 먼저 navigate했으면 path가 이미 변경됨)
+    if (location.pathname !== '/' && location.pathname !== '/login') {
+      didRedirectRef.current = true; return;
+    }
+
+    // workspace 경로 early-exit
+    const WORKSPACE_PREFIXES = ['/store', '/operator', '/admin', '/patient', '/partner', '/instructor'];
+    if (WORKSPACE_PREFIXES.some(p => location.pathname.startsWith(p))) {
+      didRedirectRef.current = true; return;
+    }
+
+    const target = getGlycopharmDashboardRoute(user.roles ?? []);
+    didRedirectRef.current = true;
+    if (target && target !== '/') navigate(target, { replace: true });
+  }, [isAuthenticated, user, navigate, location.pathname]);
+
+  return null;
+}
+
 // App Routes
 function AppRoutes() {
   return (
@@ -637,6 +685,8 @@ export default function App() {
             <TemplateProvider template={templates[glycopharmConfig.template]}>
             <O4OToastProvider />
             <LoginModal />
+            {/* WO-O4O-POSTLOGINREDIRECT-CANONICALIZATION-V1: 역할 기반 redirect 단일화 */}
+            <PostLoginRedirect />
             <Suspense fallback={<PageLoading />}>
               <AppRoutes />
             </Suspense>
