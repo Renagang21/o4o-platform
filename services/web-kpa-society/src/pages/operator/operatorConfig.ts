@@ -310,7 +310,9 @@ export function buildKpaOperatorConfig(
     { id: 'qa-news', label: '공지사항', link: '/operator/news', icon: '📢' },
     { id: 'qa-forum', label: '포럼 관리', link: '/operator/forum-management', icon: '💬' },
     { id: 'qa-signage', label: '사이니지', link: '/operator/signage/content', icon: '🖥️' },
-    // WO-KPA-OPERATOR-STORES-MENU-HIDE-V1: 매장 관리 quick action 제거
+    // WO-O4O-OPERATOR-DASHBOARD-COMMUNITY-STORE-HUB-SPLIT-V1: 매장 HUB 운영 Quick Actions 복원
+    { id: 'qa-stores', label: '매장 관리', link: '/operator/stores', icon: '🏪' },
+    { id: 'qa-event-offers', label: '이벤트 오퍼', link: '/operator/event-offers', icon: '🎯' },
     // Admin 추가 4개
     ...(isAdmin ? [
       { id: 'qa-community', label: 'Home 편집', link: '/operator/community', icon: '🏠' },

@@ -37,8 +37,11 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     // WO-O4O-KPA-OPERATOR-COLLABORATION-INBOX-V1
     { label: '협업 문의', path: '/operator/collaboration-requests' },
   ],
-  // WO-KPA-OPERATOR-STORES-MENU-HIDE-V1: stores 메뉴 노출 제거
-  // stores: [ ... ] — 라우트/페이지/API/DB는 유지
+  // WO-O4O-OPERATOR-DASHBOARD-COMMUNITY-STORE-HUB-SPLIT-V1: stores 메뉴 복원 (매장 HUB 운영 축)
+  stores: [
+    { label: '매장 관리', path: '/operator/stores' },
+    { label: '채널 관리', path: '/operator/store-channels' },
+  ],
   // WO-KPA-OPERATOR-CONTENT-NOTICE-NEWS-MENU-NORMALIZATION-V1: "공지사항" + "콘텐츠 관리" → "공지사항/뉴스" 통합
   // WO-KPA-LMS-INSTRUCTOR-APPROVAL-RELOCATE-V1: 자료실 관리 → resources 그룹으로, 강의 관리 → lms 그룹으로 이동
   content: [
