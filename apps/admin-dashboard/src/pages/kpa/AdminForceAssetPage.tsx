@@ -15,7 +15,8 @@
  *      /api/v1/kpa/organizations        (GET — 대상 org 선택)
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
 import {
@@ -75,6 +76,13 @@ interface SnapshotItem {
 interface OrgItem {
   id: string;
   name: string;
+}
+
+interface PreselectedSnapshot {
+  id: string;
+  title: string;
+  assetType: string;
+  organizationName: string | null;
 }
 
 // ── API ──────────────────────────────────────────────────────────────────────
@@ -252,11 +260,13 @@ function CreateForceAssetDialog({
   onOpenChange,
   orgs,
   onSave,
+  initialSnapshot,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   orgs: OrgItem[];
   onSave: () => void;
+  initialSnapshot?: PreselectedSnapshot | null;
 }) {
   const { toast } = useToast();
   const [snapshotSelectorOpen, setSnapshotSelectorOpen] = useState(false);
@@ -267,13 +277,23 @@ function CreateForceAssetDialog({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!open) {
+    if (open && initialSnapshot) {
+      setSelectedSnapshot({
+        id: initialSnapshot.id,
+        title: initialSnapshot.title,
+        assetType: initialSnapshot.assetType,
+        sourceService: '',
+        organizationId: '',
+        organizationName: initialSnapshot.organizationName,
+        createdAt: '',
+      });
+    } else if (!open) {
       setSelectedSnapshot(null);
       setOrganizationId('');
       setForcedStartAt('');
       setForcedEndAt('');
     }
-  }, [open]);
+  }, [open, initialSnapshot]);
 
   const handleSubmit = async () => {
     if (!selectedSnapshot || !organizationId) return;
@@ -462,12 +482,28 @@ function EditForceAssetDialog({
 export default function AdminForceAssetPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const preselectProcessed = useRef(false);
 
   const [page, setPage] = useState(1);
   const [orgFilter, setOrgFilter] = useState('');
   const [createOpen, setCreateOpen] = useState(false);
   const [editItem, setEditItem] = useState<ForceAssetItem | null>(null);
   const [editOpen, setEditOpen] = useState(false);
+  const [preselectedSnapshot, setPreselectedSnapshot] = useState<PreselectedSnapshot | null>(null);
+
+  // Auto-open create dialog when arriving from Snapshot Browser
+  useEffect(() => {
+    const state = location.state as { preselectedSnapshot?: PreselectedSnapshot } | null;
+    if (state?.preselectedSnapshot && !preselectProcessed.current) {
+      preselectProcessed.current = true;
+      setPreselectedSnapshot(state.preselectedSnapshot);
+      setCreateOpen(true);
+      // Clear location state to prevent re-trigger on refresh
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [location, navigate]);
 
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['admin-force-assets', page, orgFilter],
@@ -627,9 +663,10 @@ export default function AdminForceAssetPage() {
       {/* Dialogs */}
       <CreateForceAssetDialog
         open={createOpen}
-        onOpenChange={setCreateOpen}
+        onOpenChange={(v) => { setCreateOpen(v); if (!v) setPreselectedSnapshot(null); }}
         orgs={orgs}
         onSave={() => queryClient.invalidateQueries({ queryKey: ['admin-force-assets'] })}
+        initialSnapshot={preselectedSnapshot}
       />
       <EditForceAssetDialog
         item={editItem}
