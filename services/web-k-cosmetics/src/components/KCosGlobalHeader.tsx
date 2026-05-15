@@ -14,6 +14,7 @@
 import { useNavigate } from 'react-router-dom';
 import { LayoutDashboard, UserCircle, Settings, GraduationCap, Shield } from 'lucide-react';
 import { GlobalHeader, GlobalHeaderMenuItem } from '@o4o/ui';
+import { isStoreOwnerDual } from '@o4o/auth-utils';
 import { useAuth, getKCosmeticsDashboardRoute } from '@/contexts/AuthContext';
 import { useLoginModal } from '@/contexts/LoginModalContext';
 import {
@@ -56,14 +57,18 @@ export function KCosGlobalHeader() {
   );
   const showInstructor = isInstructor || isAdmin;
 
-  const isStoreManager = isAuthenticated && user?.roles?.some(
-    (r: string) =>
-      r === 'cosmetics:store_owner' ||
-      r === 'cosmetics:operator' ||
-      r === 'cosmetics:admin' ||
-      r === 'k-cosmetics:admin' ||
-      r === 'platform:admin' ||
-      r === 'platform:super_admin',
+  // WO-O4O-AUTH-UTILS-STORE-OWNER-DUAL-V1: cosmetics:store_owner 부분 helper 적용
+  // isStoreManager = 매장 경영자 OR 관리/운영 역할 (광의)
+  const isStoreManager = isAuthenticated && (
+    isStoreOwnerDual(user?.roles ?? [], 'cosmetics:store_owner') ||
+    user?.roles?.some(
+      (r: string) =>
+        r === 'cosmetics:operator' ||
+        r === 'cosmetics:admin' ||
+        r === 'k-cosmetics:admin' ||
+        r === 'platform:admin' ||
+        r === 'platform:super_admin',
+    )
   );
 
   // WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1: operator/admin은 모든 메뉴를 본다

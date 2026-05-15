@@ -15,7 +15,8 @@
 import { useState, useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { hasAnyRole, PLATFORM_ROLES, STORE_OWNER_ROLES } from '../../lib/role-constants';
+import { hasAnyRole, PLATFORM_ROLES } from '../../lib/role-constants';
+import { isStoreOwnerDual } from '@o4o/auth-utils';
 import { getMyRequestsCached } from '../../api/pharmacyRequestApi';
 import { MembershipGate } from './MembershipGate';
 
@@ -31,8 +32,10 @@ export function PharmacyGuard({ children }: PharmacyGuardProps) {
   // WO-O4O-KPA-PHARMACYGUARD-OPERATOR-FIX-V1:
   // JWT roles(STORE_OWNER_ROLES) 또는 KPA context(isStoreOwner) 중 하나라도 true면 통과.
   // operator+store_owner 동시 보유 계정: fresh JWT → roles로 판정, stale JWT → isStoreOwner로 보완.
+  // WO-O4O-AUTH-UTILS-STORE-OWNER-DUAL-V1: isStoreOwnerDual() 공통 helper 적용
+  // STORE_OWNER_ROLES = ['kpa:store_owner'] 단일 항목이므로 직접 key 전달
   const hasStoreRole =
-    !!user && (hasAnyRole(user.roles, STORE_OWNER_ROLES) || user.isStoreOwner === true);
+    !!user && isStoreOwnerDual(user.roles, 'kpa:store_owner', user.isStoreOwner);
   // PLATFORM_ROLES 보유자이고 store_owner가 전혀 아닌 경우에만 API 확인 불필요(즉시 차단)
   const isPlatformOnlyUser = !!user && !hasStoreRole && hasAnyRole(user.roles, PLATFORM_ROLES);
   const needsApiCheck = !!user && !hasStoreRole && !isPlatformOnlyUser;
