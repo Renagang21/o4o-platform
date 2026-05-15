@@ -370,5 +370,82 @@ export function createAdminForceAssetController(
     },
   );
 
+  /**
+   * GET /admin/snapshots
+   *
+   * Admin-only: list all asset snapshots for force-deploy selection.
+   * Query: ?search=  &type=cms|signage|content|resource|lesson  &page=1  &limit=20
+   */
+  router.get(
+    '/snapshots',
+    ...adminGuard,
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const search = (req.query.search as string | undefined)?.trim();
+        const assetType = req.query.type as string | undefined;
+        const page = Math.max(1, parseInt(req.query.page as string) || 1);
+        const limit = Math.min(50, Math.max(1, parseInt(req.query.limit as string) || 20));
+        const offset = (page - 1) * limit;
+
+        const dataConditions: string[] = [];
+        const countConditions: string[] = [];
+        const dataParams: any[] = [limit, offset];
+        const countParams: any[] = [];
+        let di = 3;
+        let ci = 1;
+
+        if (search) {
+          dataConditions.push(`s.title ILIKE $${di}`);
+          countConditions.push(`s.title ILIKE $${ci}`);
+          dataParams.push(`%${search}%`);
+          countParams.push(`%${search}%`);
+          di++; ci++;
+        }
+        if (assetType) {
+          dataConditions.push(`s.asset_type = $${di}`);
+          countConditions.push(`s.asset_type = $${ci}`);
+          dataParams.push(assetType);
+          countParams.push(assetType);
+        }
+
+        const dataWhere = dataConditions.length > 0 ? `WHERE ${dataConditions.join(' AND ')}` : '';
+        const countWhere = countConditions.length > 0 ? `WHERE ${countConditions.join(' AND ')}` : '';
+
+        const [countResult, items] = await Promise.all([
+          dataSource.query(
+            `SELECT COUNT(*)::int as total FROM o4o_asset_snapshots s ${countWhere}`,
+            countParams,
+          ),
+          dataSource.query(
+            `SELECT
+               s.id,
+               s.title,
+               s.asset_type AS "assetType",
+               s.source_service AS "sourceService",
+               s.organization_id AS "organizationId",
+               o.name AS "organizationName",
+               s.created_at AS "createdAt"
+             FROM o4o_asset_snapshots s
+             LEFT JOIN organizations o ON o.id = s.organization_id
+             ${dataWhere}
+             ORDER BY s.created_at DESC
+             LIMIT $1 OFFSET $2`,
+            dataParams,
+          ),
+        ]);
+
+        res.json({
+          success: true,
+          data: { items, total: countResult[0]?.total ?? 0, page, limit },
+        });
+      } catch (error: any) {
+        res.status(500).json({
+          success: false,
+          error: { code: 'INTERNAL_ERROR', message: error.message },
+        });
+      }
+    },
+  );
+
   return router;
 }

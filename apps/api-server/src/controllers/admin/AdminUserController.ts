@@ -422,6 +422,18 @@ export class AdminUserController {
         return;
       }
 
+      // WO-O4O-ADMIN-OPERATOR-ROLE-REVOKE-AND-SUPERADMIN-GUARD-V1:
+      // platform:super_admin 계정은 이 API로 삭제/비활성화 불가
+      const isSuperAdmin = await roleAssignmentService.hasAnyRole(id, ['platform:super_admin']);
+      if (isSuperAdmin) {
+        res.status(403).json({
+          success: false,
+          error: 'Cannot delete or deactivate a platform super admin account',
+          code: 'SUPER_ADMIN_PROTECTED',
+        });
+        return;
+      }
+
       // Try hard delete first; if FK constraint prevents it, soft-delete instead
       try {
         await userRepo.remove(user);
@@ -451,6 +463,60 @@ export class AdminUserController {
       res.status(500).json({
         success: false,
         error: 'Failed to delete user'
+      });
+    }
+  };
+
+  // WO-O4O-ADMIN-OPERATOR-ROLE-REVOKE-AND-SUPERADMIN-GUARD-V1
+  // 단일 역할 해제 — 계정 삭제/비활성화 없이 role_assignments만 비활성화
+  revokeRoleAssignment = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { userId, role } = req.params;
+
+      // platform:super_admin 역할 해제는 차단
+      if (role === 'platform:super_admin') {
+        res.status(403).json({
+          success: false,
+          error: 'Cannot revoke the platform:super_admin role via this API',
+          code: 'SUPER_ADMIN_ROLE_PROTECTED',
+        });
+        return;
+      }
+
+      const userRepo = AppDataSource.getRepository(User);
+      const user = await userRepo.findOne({ where: { id: userId } });
+      if (!user) {
+        res.status(404).json({ success: false, error: 'User not found' });
+        return;
+      }
+
+      // role_assignments에서 해당 userId + role만 비활성화 (soft revoke)
+      const result = await AppDataSource.query(
+        `UPDATE role_assignments SET is_active = false, updated_at = NOW()
+         WHERE user_id = $1 AND role = $2 AND is_active = true`,
+        [userId, role]
+      );
+
+      const affected = result?.[1] ?? 0;
+      if (affected === 0) {
+        res.status(404).json({
+          success: false,
+          error: `Active role assignment '${role}' not found for this user`,
+          code: 'ROLE_ASSIGNMENT_NOT_FOUND',
+        });
+        return;
+      }
+
+      logger.info(`[revokeRoleAssignment] role=${role} revoked from userId=${userId}`);
+      res.json({
+        success: true,
+        message: `Role '${role}' revoked. User account remains active.`,
+      });
+    } catch (error) {
+      logger.error('Error revoking role assignment:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to revoke role assignment',
       });
     }
   };

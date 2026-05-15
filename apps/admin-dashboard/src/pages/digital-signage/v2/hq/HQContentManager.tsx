@@ -121,6 +121,21 @@ interface ContentStats {
   activeStores: number;
 }
 
+interface ForcedContentItem {
+  id: string;
+  title: string;
+  videoUrl: string;
+  sourceType: string;
+  embedId: string | null;
+  thumbnailUrl: string | null;
+  startAt: string | null;
+  endAt: string | null;
+  isActive: boolean;
+  note: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // Mock API functions
 const fetchHQPlaylists = async (serviceKey: string) => {
   const response = await fetch(`/api/signage/${serviceKey}/global/playlists/hq`);
@@ -171,6 +186,46 @@ const deleteHQPlaylist = async (serviceKey: string, playlistId: string) => {
     method: 'DELETE',
   });
   if (!response.ok) throw new Error('Failed to delete playlist');
+};
+
+const fetchForcedContent = async (serviceKey: string) => {
+  const response = await fetch(`/api/signage/${serviceKey}/hq/forced-content`);
+  if (!response.ok) throw new Error('Failed to fetch forced content');
+  return response.json();
+};
+
+const createForcedContent = async (
+  serviceKey: string,
+  data: { title: string; videoUrl: string; startAt?: string; endAt?: string; isActive: boolean; note?: string },
+) => {
+  const response = await fetch(`/api/signage/${serviceKey}/hq/forced-content`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) throw new Error('Failed to create forced content');
+  return response.json();
+};
+
+const updateForcedContent = async (
+  serviceKey: string,
+  id: string,
+  data: Partial<{ title: string; videoUrl: string; startAt: string; endAt: string; isActive: boolean; note: string }>,
+) => {
+  const response = await fetch(`/api/signage/${serviceKey}/hq/forced-content/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) throw new Error('Failed to update forced content');
+  return response.json();
+};
+
+const deleteForcedContent = async (serviceKey: string, id: string) => {
+  const response = await fetch(`/api/signage/${serviceKey}/hq/forced-content/${id}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) throw new Error('Failed to delete forced content');
 };
 
 // Format duration
@@ -594,6 +649,230 @@ const MediaGrid = ({
   );
 };
 
+// Forced Content Form Dialog
+const ForcedContentDialog = ({
+  open,
+  onOpenChange,
+  initial,
+  onSubmit,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  initial?: ForcedContentItem | null;
+  onSubmit: (data: { title: string; videoUrl: string; startAt: string; endAt: string; isActive: boolean; note: string }) => Promise<void>;
+}) => {
+  const [title, setTitle] = useState(initial?.title ?? '');
+  const [videoUrl, setVideoUrl] = useState(initial?.videoUrl ?? '');
+  const [startAt, setStartAt] = useState(initial?.startAt?.slice(0, 16) ?? '');
+  const [endAt, setEndAt] = useState(initial?.endAt?.slice(0, 16) ?? '');
+  const [isActive, setIsActive] = useState(initial?.isActive ?? true);
+  const [note, setNote] = useState(initial?.note ?? '');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    setTitle(initial?.title ?? '');
+    setVideoUrl(initial?.videoUrl ?? '');
+    setStartAt(initial?.startAt?.slice(0, 16) ?? '');
+    setEndAt(initial?.endAt?.slice(0, 16) ?? '');
+    setIsActive(initial?.isActive ?? true);
+    setNote(initial?.note ?? '');
+  }, [initial, open]);
+
+  const handleSubmit = async () => {
+    if (!title.trim() || !videoUrl.trim()) return;
+    setIsSubmitting(true);
+    try {
+      await onSubmit({ title, videoUrl, startAt, endAt, isActive, note });
+      onOpenChange(false);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{initial ? 'Edit Forced Content' : 'Add Forced Content'}</DialogTitle>
+          <DialogDescription>
+            Forced content is automatically injected into all store playlists.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <Label htmlFor="fc-title">Title</Label>
+            <Input
+              id="fc-title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Enter title"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="fc-url">YouTube / Vimeo URL</Label>
+            <Input
+              id="fc-url"
+              value={videoUrl}
+              onChange={(e) => setVideoUrl(e.target.value)}
+              placeholder="https://www.youtube.com/watch?v=..."
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="fc-start">Start At</Label>
+              <Input
+                id="fc-start"
+                type="datetime-local"
+                value={startAt}
+                onChange={(e) => setStartAt(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="fc-end">End At</Label>
+              <Input
+                id="fc-end"
+                type="datetime-local"
+                value={endAt}
+                onChange={(e) => setEndAt(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="fc-note">Note (optional)</Label>
+            <Input
+              id="fc-note"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="Internal note"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <Switch id="fc-active" checked={isActive} onCheckedChange={setIsActive} />
+            <Label htmlFor="fc-active">Active</Label>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit} disabled={isSubmitting || !title.trim() || !videoUrl.trim()}>
+            {isSubmitting ? 'Saving...' : initial ? 'Save Changes' : 'Add'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// Forced Content Table
+const ForcedContentTable = ({
+  items,
+  onEdit,
+  onDelete,
+  onToggle,
+  loading,
+}: {
+  items: ForcedContentItem[];
+  onEdit: (item: ForcedContentItem) => void;
+  onDelete: (item: ForcedContentItem) => void;
+  onToggle: (item: ForcedContentItem) => void;
+  loading: boolean;
+}) => {
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        {[1, 2, 3].map((i) => (
+          <Skeleton key={i} className="h-14 w-full" />
+        ))}
+      </div>
+    );
+  }
+
+  if (items.length === 0) {
+    return (
+      <div className="text-center py-12 text-muted-foreground">
+        No forced content yet. Click &quot;Add Forced Content&quot; to get started.
+      </div>
+    );
+  }
+
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Title</TableHead>
+          <TableHead>Source</TableHead>
+          <TableHead>Active</TableHead>
+          <TableHead>Start</TableHead>
+          <TableHead>End</TableHead>
+          <TableHead>Created</TableHead>
+          <TableHead className="w-[50px]"></TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {items.map((item) => (
+          <TableRow key={item.id}>
+            <TableCell>
+              <div className="font-medium">{item.title}</div>
+              {item.note && (
+                <div className="text-xs text-muted-foreground line-clamp-1">{item.note}</div>
+              )}
+            </TableCell>
+            <TableCell>
+              <Badge variant="outline">{item.sourceType || 'url'}</Badge>
+            </TableCell>
+            <TableCell>
+              <button
+                onClick={() => onToggle(item)}
+                className="flex items-center gap-1 text-sm"
+                title={item.isActive ? 'Active — click to deactivate' : 'Inactive — click to activate'}
+              >
+                {item.isActive ? (
+                  <Lock className="h-4 w-4 text-green-600" />
+                ) : (
+                  <Unlock className="h-4 w-4 text-muted-foreground" />
+                )}
+                <Badge variant={item.isActive ? 'default' : 'secondary'}>
+                  {item.isActive ? 'ON' : 'OFF'}
+                </Badge>
+              </button>
+            </TableCell>
+            <TableCell className="text-sm">
+              {item.startAt ? formatDate(item.startAt) : '—'}
+            </TableCell>
+            <TableCell className="text-sm">
+              {item.endAt ? formatDate(item.endAt) : '—'}
+            </TableCell>
+            <TableCell>{formatDate(item.createdAt)}</TableCell>
+            <TableCell>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => onEdit(item)}>
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => onDelete(item)}
+                    className="text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+};
+
 // Main Component
 export default function HQContentManager() {
   const { serviceKey } = useParams<{ serviceKey: string }>();
@@ -601,10 +880,13 @@ export default function HQContentManager() {
 
   const [playlists, setPlaylists] = useState<HQPlaylist[]>([]);
   const [media, setMedia] = useState<HQMedia[]>([]);
+  const [forcedContent, setForcedContent] = useState<ForcedContentItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [createPlaylistOpen, setCreatePlaylistOpen] = useState(false);
   const [createMediaOpen, setCreateMediaOpen] = useState(false);
+  const [forcedContentDialogOpen, setForcedContentDialogOpen] = useState(false);
+  const [editingForcedItem, setEditingForcedItem] = useState<ForcedContentItem | null>(null);
 
   // Stats (mock data for now)
   const stats: ContentStats = {
@@ -620,12 +902,14 @@ export default function HQContentManager() {
       if (!serviceKey) return;
       setLoading(true);
       try {
-        const [playlistsRes, mediaRes] = await Promise.all([
+        const [playlistsRes, mediaRes, forcedRes] = await Promise.all([
           fetchHQPlaylists(serviceKey),
           fetchHQMedia(serviceKey),
+          fetchForcedContent(serviceKey),
         ]);
         setPlaylists(playlistsRes.data || []);
         setMedia(mediaRes.data || []);
+        setForcedContent(forcedRes.data || []);
       } catch {
         toast({
           title: 'Error',
@@ -668,6 +952,50 @@ export default function HQContentManager() {
       title: 'Success',
       description: 'Media added successfully',
     });
+  };
+
+  const handleSaveForcedContent = async (data: {
+    title: string; videoUrl: string; startAt: string; endAt: string; isActive: boolean; note: string;
+  }) => {
+    if (!serviceKey) return;
+    const payload = {
+      ...data,
+      startAt: data.startAt || undefined,
+      endAt: data.endAt || undefined,
+      note: data.note || undefined,
+    };
+    if (editingForcedItem) {
+      const result = await updateForcedContent(serviceKey, editingForcedItem.id, payload);
+      setForcedContent((prev) => prev.map((i) => i.id === editingForcedItem.id ? result.data : i));
+      toast({ title: 'Success', description: 'Forced content updated' });
+    } else {
+      const result = await createForcedContent(serviceKey, payload);
+      setForcedContent((prev) => [result.data, ...prev]);
+      toast({ title: 'Success', description: 'Forced content added' });
+    }
+    setEditingForcedItem(null);
+  };
+
+  const handleToggleForcedContent = async (item: ForcedContentItem) => {
+    if (!serviceKey) return;
+    try {
+      const result = await updateForcedContent(serviceKey, item.id, { isActive: !item.isActive });
+      setForcedContent((prev) => prev.map((i) => i.id === item.id ? result.data : i));
+    } catch {
+      toast({ title: 'Error', description: 'Failed to update status', variant: 'destructive' });
+    }
+  };
+
+  const handleDeleteForcedContent = async (item: ForcedContentItem) => {
+    if (!serviceKey) return;
+    if (!confirm(`Delete forced content "${item.title}"?`)) return;
+    try {
+      await deleteForcedContent(serviceKey, item.id);
+      setForcedContent((prev) => prev.filter((i) => i.id !== item.id));
+      toast({ title: 'Success', description: 'Forced content deleted' });
+    } catch {
+      toast({ title: 'Error', description: 'Failed to delete forced content', variant: 'destructive' });
+    }
   };
 
   const handleDeletePlaylist = async (playlist: HQPlaylist) => {
@@ -745,6 +1073,7 @@ export default function HQContentManager() {
           <TabsList>
             <TabsTrigger value="playlists">Playlists</TabsTrigger>
             <TabsTrigger value="media">Media Library</TabsTrigger>
+            <TabsTrigger value="forced-content">Forced Content</TabsTrigger>
           </TabsList>
 
           <div className="flex items-center gap-2">
@@ -792,6 +1121,22 @@ export default function HQContentManager() {
             loading={loading}
           />
         </TabsContent>
+
+        <TabsContent value="forced-content" className="mt-6">
+          <div className="flex justify-end mb-4">
+            <Button onClick={() => { setEditingForcedItem(null); setForcedContentDialogOpen(true); }}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Forced Content
+            </Button>
+          </div>
+          <ForcedContentTable
+            items={forcedContent.filter((i) => i.title.toLowerCase().includes(search.toLowerCase()))}
+            onEdit={(item) => { setEditingForcedItem(item); setForcedContentDialogOpen(true); }}
+            onDelete={handleDeleteForcedContent}
+            onToggle={handleToggleForcedContent}
+            loading={loading}
+          />
+        </TabsContent>
       </Tabs>
 
       {/* Dialogs */}
@@ -804,6 +1149,12 @@ export default function HQContentManager() {
         open={createMediaOpen}
         onOpenChange={setCreateMediaOpen}
         onSubmit={handleCreateMedia}
+      />
+      <ForcedContentDialog
+        open={forcedContentDialogOpen}
+        onOpenChange={(v) => { setForcedContentDialogOpen(v); if (!v) setEditingForcedItem(null); }}
+        initial={editingForcedItem}
+        onSubmit={handleSaveForcedContent}
       />
     </div>
   );

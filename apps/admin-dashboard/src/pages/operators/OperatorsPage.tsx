@@ -214,13 +214,33 @@ export default function OperatorsPage() {
     } finally { setSubmitting(false); }
   };
 
-  const handleDelete = async (op: Operator) => {
-    if (!confirm(`Are you sure you want to delete operator "${op.name}" (${op.email})?`)) return;
-    try {
-      await authClient.api.delete(`/admin/users/${op.id}`);
-      toast.success('Operator deleted successfully');
-      fetchOperators();
-    } catch { toast.error('Failed to delete operator'); }
+  // WO-O4O-ADMIN-OPERATOR-ROLE-REVOKE-AND-SUPERADMIN-GUARD-V1
+  // 역할 해제 — 계정 삭제/비활성화 없이 role_assignments만 비활성화
+  const handleRevokeRoles = async (op: Operator) => {
+    const revokeableRoles = op.roles.filter((r) => r !== 'platform:super_admin');
+    if (revokeableRoles.length === 0) {
+      toast.error('슈퍼관리자 역할은 이 화면에서 해제할 수 없습니다.');
+      return;
+    }
+    const roleList = revokeableRoles.join(', ');
+    if (!confirm(`"${op.name}" (${op.email})의 운영자 권한을 해제하시겠습니까?\n\n해제 대상 역할: ${roleList}\n\n※ 계정은 유지됩니다.`)) return;
+
+    const results = await Promise.allSettled(
+      revokeableRoles.map((role) =>
+        authClient.api.delete(`/admin/users/${op.id}/role-assignments/${encodeURIComponent(role)}`)
+      )
+    );
+
+    const failed = results.filter((r) => r.status === 'rejected');
+    const succeeded = results.filter((r) => r.status === 'fulfilled').length;
+    if (failed.length === 0) {
+      toast.success('운영자 권한이 해제되었습니다. 계정은 유지됩니다.');
+    } else {
+      const firstError = (failed[0] as PromiseRejectedResult).reason;
+      const msg = firstError?.response?.data?.error || firstError?.message || '권한 해제 실패';
+      toast.error(`${failed.length}개 역할 해제 실패 (성공 ${succeeded}개): ${msg}`);
+    }
+    fetchOperators();
   };
 
   const toggleRole = (role: string) => {
@@ -301,7 +321,7 @@ export default function OperatorsPage() {
         <RowActionMenu
           actions={[
             { key: 'edit', label: '편집', variant: 'primary', onClick: () => openEditModal(row) },
-            { key: 'delete', label: '삭제', variant: 'danger', confirm: `"${row.name}" 를 삭제하시겠습니까?`, onClick: () => handleDelete(row) },
+            { key: 'revoke', label: '권한 해제', variant: 'danger', onClick: () => handleRevokeRoles(row) },
           ]}
         />
       ),

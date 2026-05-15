@@ -18,6 +18,8 @@ export function getDefaultRouteByRole(userRoles?: string[]): string {
   if (userRoles.includes('kpa:admin')) return '/admin';
   // kpa:operator → /operator (운영 대시보드)
   if (userRoles.includes('kpa:operator')) return '/operator';
+  // kpa:store_owner → /store (약국 경영자 매장)
+  if (userRoles.includes('kpa:store_owner')) return '/store';
 
   return '/mypage';
 }
