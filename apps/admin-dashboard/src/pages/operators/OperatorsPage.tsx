@@ -5,18 +5,23 @@
  * Only accessible by platform:super_admin or admin roles.
  *
  * WO-O4O-TABLE-DATATABLE-DEPRECATION-V1 — BaseTable 직접 사용으로 마이그레이션
- * - DataTable wrapper 제거 → BaseTable + O4OColumn
- * - 인라인 아이콘 버튼 → RowActionMenu
- * - 검색 → FilterBar
+ * WO-O4O-ADMIN-OPERATORS-CANONICAL-DATATABLE-V1 —
+ *   - @o4o/operator-ux-core DataTable + Set<string> selection canonical 적용
+ *   - ActionBar + BulkResultModal + useBatchAction 패턴으로 일괄 권한 해제 도입
+ *   - super_admin 보호 유지 (bulk 도 platform:super_admin 단일 role 사용자 skip)
+ *   - row click → 상세 drawer (BaseDetailDrawer)
+ *   - RowActionMenu 유지 (수정 / 권한 해제)
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, RefreshCw, Shield, Users, X, Check, AlertCircle } from 'lucide-react';
+import { Plus, RefreshCw, Shield, Users, X, Check, AlertCircle, UserX } from 'lucide-react';
 import { authClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
-import { BaseTable, RowActionMenu, FilterBar } from '@o4o/ui';
-import type { O4OColumn } from '@o4o/ui';
+import { ActionBar, BulkResultModal, RowActionMenu, FilterBar, BaseDetailDrawer } from '@o4o/ui';
+import type { ActionBarAction } from '@o4o/ui';
+import { DataTable, useBatchAction } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import PageHeader from '@/components/common/PageHeader';
 
 // WO-OPERATOR-ROLE-CLEANUP-V1: Super Admin = 전체 접근, 각 서비스 = Admin + Operator만
@@ -41,15 +46,14 @@ const SERVICE_ROLES = {
     { value: 'cosmetics:admin', label: 'Admin', description: 'K-Cosmetics 관리자' },
     { value: 'cosmetics:operator', label: 'Operator', description: 'K-Cosmetics 운영자' },
   ],
-  glucoseview: [
-    { value: 'glucoseview:admin', label: 'Admin', description: 'GlucoseView 관리자' },
-    { value: 'glucoseview:operator', label: 'Operator', description: 'GlucoseView 운영자' },
-  ],
+  // WO-O4O-ADMIN-OPERATORS-LEGACY-SERVICE-TABS-CLEANUP-V1:
+  //   glucoseview 서비스는 정책상 제거됨 — SERVICE_ROLES 엔트리 제거.
+  //   platform 은 super_admin 역할 할당을 위해 잔존 (UI 필터 탭에서만 제외, §SERVICE_TABS 참조).
 };
 
 const SERVICE_DISPLAY_NAMES: Record<string, string> = {
   platform: 'Platform', kpa: 'KPA', neture: 'Neture',
-  glycopharm: 'GlycoPharm', cosmetics: 'K-Cosmetics', glucoseview: 'GlucoseView',
+  glycopharm: 'GlycoPharm', cosmetics: 'K-Cosmetics',
 };
 
 const ALL_ROLES = Object.values(SERVICE_ROLES).flat();
@@ -79,6 +83,12 @@ export default function OperatorsPage() {
   const [formData, setFormData] = useState({ email: '', password: '', lastName: '', firstName: '', roles: [] as string[] });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+
+  // WO-O4O-ADMIN-OPERATORS-CANONICAL-DATATABLE-V1
+  // canonical Set<string> selection + useBatchAction hook + row click detail drawer
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [detailTarget, setDetailTarget] = useState<Operator | null>(null);
+  const batch = useBatchAction();
 
   const fetchOperators = async () => {
     try {
@@ -128,7 +138,7 @@ export default function OperatorsPage() {
     if (role.startsWith('neture:')) return 'Neture';
     if (role.startsWith('glycopharm:')) return 'GlycoPharm';
     if (role.startsWith('cosmetics:')) return 'K-Cosmetics';
-    if (role.startsWith('glucoseview:')) return 'GlucoseView';
+    // WO-O4O-ADMIN-OPERATORS-LEGACY-SERVICE-TABS-CLEANUP-V1: glucoseview 브랜치 제거 (서비스 폐지)
     return '';
   };
 
@@ -146,7 +156,7 @@ export default function OperatorsPage() {
     if (role.startsWith('neture:')) return 'bg-orange-100 text-orange-800';
     if (role.startsWith('glycopharm:')) return 'bg-green-100 text-green-800';
     if (role.startsWith('cosmetics:')) return 'bg-pink-100 text-pink-800';
-    if (role.startsWith('glucoseview:')) return 'bg-purple-100 text-purple-800';
+    // WO-O4O-ADMIN-OPERATORS-LEGACY-SERVICE-TABS-CLEANUP-V1: glucoseview 브랜치 제거 (서비스 폐지)
     if (role.includes('super_admin')) return 'bg-red-100 text-red-800';
     if (role.includes('admin')) return 'bg-orange-100 text-orange-800';
     if (role.includes('operator')) return 'bg-blue-100 text-blue-800';
@@ -243,6 +253,44 @@ export default function OperatorsPage() {
     fetchOperators();
   };
 
+  // WO-O4O-ADMIN-OPERATORS-CANONICAL-DATATABLE-V1
+  // Bulk role revoke — selectedIds 의 각 사용자에 대해 super_admin 제외 모든 role 해제.
+  // useBatchAction 호환 응답 형태 ({ data: { results: [{ id, status, error? }] } }) 반환.
+  // super_admin 단독 보유자는 'skipped' 처리 (보호 정책 유지).
+  const bulkRevokeRoles = useCallback(
+    async (ids: string[]): Promise<{ data: { results: Array<{ id: string; status: 'success' | 'failed' | 'skipped'; error?: string }> } }> => {
+      const targets = operators.filter((o) => ids.includes(o.id));
+      const perUser = await Promise.all(
+        targets.map(async (op) => {
+          const revokeableRoles = op.roles.filter((r) => r !== 'platform:super_admin');
+          if (revokeableRoles.length === 0) {
+            return { id: op.id, status: 'skipped' as const, error: '슈퍼관리자 단독 — 해제 불가' };
+          }
+          const results = await Promise.allSettled(
+            revokeableRoles.map((role) =>
+              authClient.api.delete(`/admin/users/${op.id}/role-assignments/${encodeURIComponent(role)}`)
+            )
+          );
+          const failed = results.filter((r) => r.status === 'rejected');
+          if (failed.length === 0) {
+            return { id: op.id, status: 'success' as const };
+          }
+          const firstErr = (failed[0] as PromiseRejectedResult).reason;
+          const msg = firstErr?.response?.data?.error || firstErr?.message || '권한 해제 실패';
+          return { id: op.id, status: 'failed' as const, error: `${failed.length}/${revokeableRoles.length} 역할 해제 실패: ${msg}` };
+        }),
+      );
+      return { data: { results: perUser } };
+    },
+    [operators],
+  );
+
+  const handleBulkRevoke = useCallback(async () => {
+    if (selectedIds.size === 0) return;
+    await batch.executeBatch(bulkRevokeRoles, Array.from(selectedIds));
+    // selection 유지 (사용자가 결과 확인 후 BulkResultModal 닫을 때 fetch + clear)
+  }, [batch, bulkRevokeRoles, selectedIds]);
+
   const toggleRole = (role: string) => {
     setFormData((prev) => ({
       ...prev,
@@ -250,18 +298,20 @@ export default function OperatorsPage() {
     }));
   };
 
+  // WO-O4O-ADMIN-OPERATORS-LEGACY-SERVICE-TABS-CLEANUP-V1
+  //   - Platform 탭 제거: super_admin 은 'All' 에서 보이며, 별도 필터 의미 없음
+  //   - GlucoseView 탭 제거: 서비스 정책상 폐지됨 (SERVICE_ROLES 엔트리도 함께 제거)
+  //   - O4O canonical 서비스 4종: KPA / Neture / GlycoPharm / K-Cosmetics
   const SERVICE_TABS: { id: ServiceFilter; label: string }[] = [
     { id: 'all', label: 'All' },
-    { id: 'platform', label: 'Platform' },
     { id: 'kpa', label: 'KPA' },
     { id: 'neture', label: 'Neture' },
     { id: 'glycopharm', label: 'GlycoPharm' },
     { id: 'cosmetics', label: 'K-Cosmetics' },
-    { id: 'glucoseview', label: 'GlucoseView' },
   ];
 
-  // ── O4O 표준 컬럼 정의 ─────────────────────────────
-  const columns: O4OColumn<Operator>[] = [
+  // ── O4O 표준 컬럼 정의 (operator-ux-core canonical) ─────────────────────────────
+  const columns: ListColumnDef<Operator>[] = [
     {
       key: 'name',
       header: 'Name',
@@ -290,7 +340,7 @@ export default function OperatorsPage() {
     {
       key: 'status',
       header: 'Status',
-      width: 100,
+      width: '100px',
       align: 'center',
       sortable: true,
       sortAccessor: (row) => row.status,
@@ -306,7 +356,7 @@ export default function OperatorsPage() {
     {
       key: 'createdAt',
       header: 'Created',
-      width: 110,
+      width: '110px',
       sortable: true,
       sortAccessor: (row) => row.createdAt,
       render: (_, row) => <span className="text-sm text-gray-500">{row.createdAt}</span>,
@@ -314,7 +364,7 @@ export default function OperatorsPage() {
     {
       key: '_actions',
       header: '',
-      width: 56,
+      width: '56px',
       system: true,
       align: 'center',
       render: (_, row) => (
@@ -381,19 +431,105 @@ export default function OperatorsPage() {
         />
       </div>
 
-      {/* BaseTable */}
-      <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-        <BaseTable<Operator>
-          columns={columns}
-          data={filteredOperators}
-          rowKey={(row) => row.id}
-          tableId="operators-list"
-          reorderable
-          persistState
-          columnVisibility
-          emptyMessage="조건에 맞는 운영자가 없습니다."
-        />
-      </div>
+      {/* WO-O4O-ADMIN-OPERATORS-CANONICAL-DATATABLE-V1: ActionBar (선택 시 노출) */}
+      {selectedIds.size > 0 && (
+        <div className="mb-3">
+          <ActionBar
+            selectedCount={selectedIds.size}
+            onClearSelection={() => setSelectedIds(new Set())}
+            actions={[
+              {
+                key: 'bulk-revoke',
+                label: `권한 해제 (${selectedIds.size})`,
+                variant: 'danger',
+                icon: <UserX className="w-4 h-4" />,
+                onClick: handleBulkRevoke,
+                loading: batch.loading,
+                tooltip: '선택된 운영자의 모든 역할을 일괄 해제합니다 (super_admin 제외, 계정 유지)',
+                confirm: {
+                  title: '운영자 권한 일괄 해제',
+                  message: `선택한 운영자 ${selectedIds.size}명의 역할을 일괄 해제하시겠습니까?\n\n슈퍼관리자 단독 보유 계정은 자동으로 건너뜁니다.\n계정은 유지되며 role_assignments 만 비활성화됩니다.`,
+                  variant: 'danger',
+                  confirmText: '권한 해제',
+                },
+              } as ActionBarAction,
+            ]}
+          />
+        </div>
+      )}
+
+      {/* DataTable (canonical operator-ux-core) */}
+      <DataTable<Operator>
+        columns={columns}
+        data={filteredOperators}
+        rowKey={(row) => row.id}
+        tableId="admin-operators-list"
+        loading={loading}
+        emptyMessage="조건에 맞는 운영자가 없습니다."
+        selectable
+        selectedKeys={selectedIds}
+        onSelectionChange={setSelectedIds}
+        onRowClick={(row) => setDetailTarget(row)}
+        reorderable
+        persistState
+        columnVisibility
+      />
+
+      {/* WO-O4O-ADMIN-OPERATORS-CANONICAL-DATATABLE-V1: bulk 결과 모달 */}
+      <BulkResultModal
+        open={batch.showResult}
+        onClose={() => {
+          batch.clearResult();
+          setSelectedIds(new Set());
+          fetchOperators();
+        }}
+        result={batch.result}
+        onRetry={() => { batch.retryFailed(); }}
+        title="운영자 권한 해제 결과"
+      />
+
+      {/* WO-O4O-ADMIN-OPERATORS-CANONICAL-DATATABLE-V1: 운영자 상세 Drawer (조회 전용) */}
+      <BaseDetailDrawer
+        open={!!detailTarget}
+        onClose={() => setDetailTarget(null)}
+        title={detailTarget?.name}
+      >
+        {detailTarget && (
+          <div className="space-y-4">
+            <dl className="grid grid-cols-3 gap-y-3 gap-x-4 text-sm">
+              <dt className="text-gray-500">이메일</dt>
+              <dd className="col-span-2 text-gray-900">{detailTarget.email}</dd>
+              <dt className="text-gray-500">상태</dt>
+              <dd className="col-span-2">
+                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${
+                  detailTarget.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
+                }`}>
+                  {detailTarget.status === 'active' ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                  {detailTarget.status === 'active' ? 'Active' : 'Inactive'}
+                </span>
+              </dd>
+              <dt className="text-gray-500">가입일</dt>
+              <dd className="col-span-2 text-gray-900">{detailTarget.createdAt || '-'}</dd>
+              {detailTarget.lastLogin && (
+                <>
+                  <dt className="text-gray-500">최근 로그인</dt>
+                  <dd className="col-span-2 text-gray-900">{detailTarget.lastLogin}</dd>
+                </>
+              )}
+            </dl>
+            <div>
+              <h4 className="text-xs uppercase font-semibold text-gray-500 mb-2">역할</h4>
+              <div className="flex flex-wrap gap-1">
+                {detailTarget.roles.map((role) => (
+                  <span key={role} className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getRoleColor(role)}`}>
+                    {getRoleDisplay(role)}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </BaseDetailDrawer>
 
       {/* Create/Edit Modal */}
       {showModal && (
