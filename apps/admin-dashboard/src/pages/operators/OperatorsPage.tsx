@@ -1,24 +1,30 @@
 /**
- * OperatorsPage — Assignment-Row Canonical
+ * OperatorsPage — Assignment-Row Canonical (operator-ux-core DataTable)
  *
- * WO-O4O-ADMIN-ASSIGNMENT-ROW-LIST-CANONICALIZATION-V1
+ * WO-O4O-ADMIN-ASSIGNMENT-ROW-LIST-CANONICALIZATION-V1 (assignment-row data model)
+ * WO-O4O-ADMIN-OPERATORS-ROWACTION-EDIT-RESTORE-V1 (canonical DataTable + ActionBar
+ *   + BulkResultModal + BaseDetailDrawer 복구, RowActionMenu Edit + Revoke 유지)
  *
- * 변경:
- * - 행(Row)의 단위: 1 user → 1 role_assignment (admin/operator/super_admin/branch_* 만)
- * - service tab 7개 제거 → Service/Role facet 필터
- * - keyword whitelist 제거 → `rbac-catalog.isOperatorRole` 단일 판별
- * - role 라벨/색상 하드코딩 → catalog 단일 출처
- * - API 무변경, "Add Operator" 모달 + 권한 해제 동작 보존
+ * 구조:
+ * - 행 단위: 1 role_assignment (assignment-row, multi-role 자동 펼침)
+ * - DataTable: @o4o/operator-ux-core (selectable, onRowClick → detail drawer)
+ * - Bulk Action: ActionBar — 선택된 assignment row 의 role 만 해제 (per-assignment),
+ *                platform:super_admin 은 자동 skip, useBatchAction + BulkResultModal
+ * - Row Action: RowActionMenu — 편집 / 권한 해제
+ * - Row Click:  BaseDetailDrawer — 사용자 + 이 assignment 상세 (조회 전용)
+ * - facet 필터: Service / Role (operator role 만)
  *
  * 자매: docs/investigations/IR-O4O-ADMIN-ROLE-LIST-SERVICE-CENTRIC-UX-AUDIT-V1.md
  */
 
-import { useState, useEffect, useMemo } from 'react';
-import { Plus, RefreshCw, Shield, Users, X, Check, AlertCircle } from 'lucide-react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { Plus, RefreshCw, Shield, Users, X, Check, AlertCircle, UserX } from 'lucide-react';
 import { authClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
-import { BaseTable, RowActionMenu, FilterBar } from '@o4o/ui';
-import type { O4OColumn } from '@o4o/ui';
+import { ActionBar, BulkResultModal, RowActionMenu, FilterBar, BaseDetailDrawer } from '@o4o/ui';
+import type { ActionBarAction } from '@o4o/ui';
+import { DataTable, useBatchAction } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import PageHeader from '@/components/common/PageHeader';
 import {
   flattenUsersToAssignments,
@@ -81,6 +87,11 @@ export default function OperatorsPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [facets, setFacets] = useState<Facets>(EMPTY_FACETS);
+
+  // WO-O4O-ADMIN-OPERATORS-ROWACTION-EDIT-RESTORE-V1 — canonical selection / bulk / drawer
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [detailTarget, setDetailTarget] = useState<AssignmentRow | null>(null);
+  const batch = useBatchAction();
 
   // Create/Edit modal
   const [showModal, setShowModal] = useState(false);
@@ -253,11 +264,48 @@ export default function OperatorsPage() {
     }
   };
 
-  const columns: O4OColumn<AssignmentRow>[] = [
+  // WO-O4O-ADMIN-OPERATORS-ROWACTION-EDIT-RESTORE-V1
+  // Bulk role revoke (per-assignment) — selectedIds 각 assignment key 단위로 해제.
+  // platform:super_admin 은 'skipped' 처리 (보호 정책 유지).
+  // useBatchAction 호환 응답: { data: { results: [{ id, status, error? }] } }
+  const bulkRevokeRoles = useCallback(
+    async (
+      ids: string[],
+    ): Promise<{ data: { results: Array<{ id: string; status: 'success' | 'failed' | 'skipped'; error?: string }> } }> => {
+      const results = await Promise.all(
+        ids.map(async (key) => {
+          const [userId, role] = key.split('::');
+          if (!userId || !role) {
+            return { id: key, status: 'failed' as const, error: 'Invalid selection key' };
+          }
+          if (role === 'platform:super_admin') {
+            return { id: key, status: 'skipped' as const, error: '슈퍼관리자 — 해제 불가' };
+          }
+          try {
+            await authClient.api.delete(`/admin/users/${userId}/role-assignments/${encodeURIComponent(role)}`);
+            return { id: key, status: 'success' as const };
+          } catch (err: any) {
+            const msg = err?.response?.data?.error || err?.message || '권한 해제 실패';
+            return { id: key, status: 'failed' as const, error: msg };
+          }
+        }),
+      );
+      return { data: { results } };
+    },
+    [],
+  );
+
+  const handleBulkRevoke = useCallback(async () => {
+    if (selectedIds.size === 0) return;
+    await batch.executeBatch(bulkRevokeRoles, Array.from(selectedIds));
+    // selection 은 BulkResultModal 닫을 때 일괄 정리 + refetch
+  }, [batch, bulkRevokeRoles, selectedIds]);
+
+  const columns: ListColumnDef<AssignmentRow>[] = [
     {
       key: 'service',
       header: 'Service',
-      width: 130,
+      width: '130px',
       sortable: true,
       sortAccessor: (row) => row.service.label,
       render: (_, row) => (
@@ -269,7 +317,7 @@ export default function OperatorsPage() {
     {
       key: 'role',
       header: 'Role',
-      width: 150,
+      width: '150px',
       sortable: true,
       sortAccessor: (row) => row.roleMeta.label,
       render: (_, row) => (
@@ -293,7 +341,7 @@ export default function OperatorsPage() {
     {
       key: 'status',
       header: 'Status',
-      width: 100,
+      width: '100px',
       align: 'center',
       sortable: true,
       sortAccessor: (row) => (row.userIsActive ? 'active' : 'inactive'),
@@ -311,7 +359,7 @@ export default function OperatorsPage() {
     {
       key: 'createdAt',
       header: 'Created',
-      width: 110,
+      width: '110px',
       sortable: true,
       sortAccessor: (row) => row.userCreatedAt,
       render: (_, row) => <span className="text-sm text-gray-500">{row.userCreatedAt}</span>,
@@ -319,7 +367,7 @@ export default function OperatorsPage() {
     {
       key: '_actions',
       header: '',
-      width: 56,
+      width: '56px',
       system: true,
       align: 'center',
       render: (_, row) => (
@@ -371,28 +419,128 @@ export default function OperatorsPage() {
         />
       </div>
 
-      {loading ? (
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <div className="animate-pulse space-y-3">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="h-10 bg-gray-100 rounded" />
-            ))}
-          </div>
-        </div>
-      ) : (
-        <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-          <BaseTable<AssignmentRow>
-            columns={columns}
-            data={filteredRows}
-            rowKey={(row) => row.key}
-            tableId="operators-assignments-list"
-            reorderable
-            persistState
-            columnVisibility
-            emptyMessage="조건에 맞는 운영 권한이 없습니다."
+      {/* WO-O4O-ADMIN-OPERATORS-ROWACTION-EDIT-RESTORE-V1: ActionBar (선택 시 노출) */}
+      {selectedIds.size > 0 && (
+        <div className="mb-3">
+          <ActionBar
+            selectedCount={selectedIds.size}
+            onClearSelection={() => setSelectedIds(new Set())}
+            actions={[
+              {
+                key: 'bulk-revoke',
+                label: `권한 해제 (${selectedIds.size})`,
+                variant: 'danger',
+                icon: <UserX className="w-4 h-4" />,
+                onClick: handleBulkRevoke,
+                loading: batch.loading,
+                tooltip: '선택된 assignment 의 role 만 해제합니다 (super_admin 자동 skip, 계정 유지)',
+                confirm: {
+                  title: '권한 일괄 해제',
+                  message: `선택한 ${selectedIds.size}개 권한을 해제하시겠습니까?\n\nplatform:super_admin 은 자동으로 건너뜁니다.\n계정은 유지되며 role_assignments 만 비활성화됩니다.`,
+                  variant: 'danger',
+                  confirmText: '권한 해제',
+                },
+              } as ActionBarAction,
+            ]}
           />
         </div>
       )}
+
+      {/* DataTable (canonical operator-ux-core) */}
+      <DataTable<AssignmentRow>
+        columns={columns}
+        data={filteredRows}
+        rowKey={(row) => row.key}
+        tableId="admin-operators-assignments-list"
+        loading={loading}
+        emptyMessage="조건에 맞는 운영 권한이 없습니다."
+        selectable
+        selectedKeys={selectedIds}
+        onSelectionChange={setSelectedIds}
+        onRowClick={(row) => setDetailTarget(row)}
+        reorderable
+        persistState
+        columnVisibility
+      />
+
+      {/* Bulk 결과 모달 */}
+      <BulkResultModal
+        open={batch.showResult}
+        onClose={() => {
+          batch.clearResult();
+          setSelectedIds(new Set());
+          fetchUsers();
+        }}
+        result={batch.result}
+        onRetry={() => {
+          batch.retryFailed();
+        }}
+        title="운영자 권한 해제 결과"
+      />
+
+      {/* 상세 Drawer (조회 전용) — row click 진입 */}
+      <BaseDetailDrawer
+        open={!!detailTarget}
+        onClose={() => setDetailTarget(null)}
+        title={detailTarget?.userName}
+      >
+        {detailTarget && (
+          <div className="space-y-4">
+            <dl className="grid grid-cols-3 gap-y-3 gap-x-4 text-sm">
+              <dt className="text-gray-500">이메일</dt>
+              <dd className="col-span-2 text-gray-900">{detailTarget.userEmail}</dd>
+              <dt className="text-gray-500">상태</dt>
+              <dd className="col-span-2">
+                <span
+                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${
+                    detailTarget.userIsActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
+                  }`}
+                >
+                  {detailTarget.userIsActive ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                  {detailTarget.userIsActive ? 'Active' : 'Inactive'}
+                </span>
+              </dd>
+              <dt className="text-gray-500">가입일</dt>
+              <dd className="col-span-2 text-gray-900">{detailTarget.userCreatedAt || '-'}</dd>
+              {detailTarget.userLastLogin && (
+                <>
+                  <dt className="text-gray-500">최근 로그인</dt>
+                  <dd className="col-span-2 text-gray-900">{detailTarget.userLastLogin}</dd>
+                </>
+              )}
+            </dl>
+            <div>
+              <h4 className="text-xs uppercase font-semibold text-gray-500 mb-2">선택된 권한</h4>
+              <div className="flex flex-wrap gap-1">
+                <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${detailTarget.service.badgeClass}`}>
+                  {detailTarget.service.label}
+                </span>
+                <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${detailTarget.roleMeta.badgeClass}`}>
+                  {detailTarget.roleMeta.label}
+                </span>
+              </div>
+            </div>
+            {detailTarget.userAllRoles.length > 1 && (
+              <div>
+                <h4 className="text-xs uppercase font-semibold text-gray-500 mb-2">전체 보유 권한</h4>
+                <div className="flex flex-wrap gap-1">
+                  {detailTarget.userAllRoles.map((raw) => {
+                    const parsed = parseRole(raw);
+                    return (
+                      <span
+                        key={raw}
+                        className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700"
+                      >
+                        {parsed.serviceKey}:{parsed.roleKey}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </BaseDetailDrawer>
 
       {/* Create/Edit Modal */}
       {showModal && (
