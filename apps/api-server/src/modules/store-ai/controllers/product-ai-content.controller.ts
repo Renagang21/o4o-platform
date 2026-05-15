@@ -4,6 +4,7 @@ import { ProductAiContentService } from '../services/product-ai-content.service.
 import type { ProductContentInput } from '../services/product-ai-content.service.js';
 import type { ProductAiContentType } from '../entities/product-ai-content.entity.js';
 import { authenticate } from '../../../middleware/auth.middleware.js';
+import { verifyProductOrgAccess } from '../utils/product-access.utils.js';
 
 /**
  * Product AI Content Controller — IR-O4O-AI-CONTENT-ENGINE-IMPLEMENTATION-V1
@@ -14,6 +15,11 @@ import { authenticate } from '../../../middleware/auth.middleware.js';
  * GET  /:productId/ai-contents                    — 상품 AI 콘텐츠 전체 조회
  * GET  /:productId/ai-contents/:type              — 특정 content_type 조회
  * DELETE /:productId/ai-contents/:contentId       — AI 콘텐츠 삭제
+ *
+ * WO-O4O-STORE-AI-PRODUCT-ORG-GUARD-V1:
+ *   모든 endpoint에 organization ownership 검증 추가.
+ *   자기 org product 만 AI content 조회/생성 가능.
+ *   canonical source: organization_product_listings → supplier_product_offers.master_id
  */
 
 const VALID_CONTENT_TYPES: ProductAiContentType[] = [
@@ -32,6 +38,13 @@ export function createProductAiContentRouter(dataSource: DataSource): Router {
   router.post('/:productId/ai-contents/generate', authenticate, async (req, res) => {
     try {
       const { productId } = req.params;
+      const userId = req.user?.id as string;
+
+      const { allowed } = await verifyProductOrgAccess(dataSource, productId, userId);
+      if (!allowed) {
+        res.status(403).json({ success: false, error: 'Product access denied', code: 'PRODUCT_ACCESS_DENIED' });
+        return;
+      }
 
       const product = await loadProductContentInput(dataSource, productId);
       if (!product) {
@@ -53,12 +66,19 @@ export function createProductAiContentRouter(dataSource: DataSource): Router {
   router.post('/:productId/ai-contents/generate/:type', authenticate, async (req, res) => {
     try {
       const { productId, type } = req.params;
+      const userId = req.user?.id as string;
 
       if (!VALID_CONTENT_TYPES.includes(type as ProductAiContentType)) {
         res.status(400).json({
           success: false,
           error: `Invalid content type. Valid types: ${VALID_CONTENT_TYPES.join(', ')}`,
         });
+        return;
+      }
+
+      const { allowed } = await verifyProductOrgAccess(dataSource, productId, userId);
+      if (!allowed) {
+        res.status(403).json({ success: false, error: 'Product access denied', code: 'PRODUCT_ACCESS_DENIED' });
         return;
       }
 
@@ -82,12 +102,19 @@ export function createProductAiContentRouter(dataSource: DataSource): Router {
   router.put('/:productId/ai-contents/:type', authenticate, async (req, res) => {
     try {
       const { productId, type } = req.params;
+      const userId = req.user?.id as string;
 
       if (!VALID_CONTENT_TYPES.includes(type as ProductAiContentType)) {
         res.status(400).json({
           success: false,
           error: `Invalid content type. Valid types: ${VALID_CONTENT_TYPES.join(', ')}`,
         });
+        return;
+      }
+
+      const { allowed } = await verifyProductOrgAccess(dataSource, productId, userId);
+      if (!allowed) {
+        res.status(403).json({ success: false, error: 'Product access denied', code: 'PRODUCT_ACCESS_DENIED' });
         return;
       }
 
@@ -109,6 +136,14 @@ export function createProductAiContentRouter(dataSource: DataSource): Router {
   router.get('/:productId/ai-contents', authenticate, async (req, res) => {
     try {
       const { productId } = req.params;
+      const userId = req.user?.id as string;
+
+      const { allowed } = await verifyProductOrgAccess(dataSource, productId, userId);
+      if (!allowed) {
+        res.status(403).json({ success: false, error: 'Product access denied', code: 'PRODUCT_ACCESS_DENIED' });
+        return;
+      }
+
       const contents = await contentService.getContentsByProduct(productId);
       res.json({ success: true, data: contents });
     } catch (error) {
@@ -121,12 +156,19 @@ export function createProductAiContentRouter(dataSource: DataSource): Router {
   router.get('/:productId/ai-contents/:type', authenticate, async (req, res) => {
     try {
       const { productId, type } = req.params;
+      const userId = req.user?.id as string;
 
       if (!VALID_CONTENT_TYPES.includes(type as ProductAiContentType)) {
         res.status(400).json({
           success: false,
           error: `Invalid content type. Valid types: ${VALID_CONTENT_TYPES.join(', ')}`,
         });
+        return;
+      }
+
+      const { allowed } = await verifyProductOrgAccess(dataSource, productId, userId);
+      if (!allowed) {
+        res.status(403).json({ success: false, error: 'Product access denied', code: 'PRODUCT_ACCESS_DENIED' });
         return;
       }
 
@@ -146,6 +188,14 @@ export function createProductAiContentRouter(dataSource: DataSource): Router {
   router.delete('/:productId/ai-contents/:contentId', authenticate, async (req, res) => {
     try {
       const { productId, contentId } = req.params;
+      const userId = req.user?.id as string;
+
+      const { allowed } = await verifyProductOrgAccess(dataSource, productId, userId);
+      if (!allowed) {
+        res.status(403).json({ success: false, error: 'Product access denied', code: 'PRODUCT_ACCESS_DENIED' });
+        return;
+      }
+
       await contentService.deleteContent(contentId, productId);
       res.json({ success: true, message: 'Content deleted' });
     } catch (error) {

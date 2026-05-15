@@ -3,6 +3,7 @@ import type { DataSource } from 'typeorm';
 import { ProductAiTaggingService } from '../services/product-ai-tagging.service.js';
 import type { ProductTagInput } from '../services/product-ai-tagging.service.js';
 import { authenticate } from '../../../middleware/auth.middleware.js';
+import { verifyProductOrgAccess } from '../utils/product-access.utils.js';
 
 /**
  * Product AI Tag Controller — WO-O4O-PRODUCT-AI-TAGGING-V1
@@ -11,6 +12,11 @@ import { authenticate } from '../../../middleware/auth.middleware.js';
  * POST   /:productId/ai-tags/regenerate   — AI 태그 재생성 (fire-and-forget)
  * POST   /:productId/ai-tags/manual       — 수동 태그 추가
  * DELETE /:productId/ai-tags/:tagId       — 태그 삭제
+ *
+ * WO-O4O-STORE-AI-PRODUCT-ORG-GUARD-V1:
+ *   모든 endpoint에 organization ownership 검증 추가.
+ *   자기 org product 만 AI tag 조회/재생성 가능.
+ *   canonical source: organization_product_listings → supplier_product_offers.master_id
  */
 export function createProductAiTagRouter(dataSource: DataSource): Router {
   const router = Router();
@@ -20,6 +26,14 @@ export function createProductAiTagRouter(dataSource: DataSource): Router {
   router.get('/:productId/ai-tags', authenticate, async (req, res) => {
     try {
       const { productId } = req.params;
+      const userId = req.user?.id as string;
+
+      const { allowed } = await verifyProductOrgAccess(dataSource, productId, userId);
+      if (!allowed) {
+        res.status(403).json({ success: false, error: 'Product access denied', code: 'PRODUCT_ACCESS_DENIED' });
+        return;
+      }
+
       const result = await taggingService.getTagsByProduct(productId);
 
       res.json({ success: true, data: result });
@@ -33,6 +47,13 @@ export function createProductAiTagRouter(dataSource: DataSource): Router {
   router.post('/:productId/ai-tags/regenerate', authenticate, async (req, res) => {
     try {
       const { productId } = req.params;
+      const userId = req.user?.id as string;
+
+      const { allowed } = await verifyProductOrgAccess(dataSource, productId, userId);
+      if (!allowed) {
+        res.status(403).json({ success: false, error: 'Product access denied', code: 'PRODUCT_ACCESS_DENIED' });
+        return;
+      }
 
       // ProductMaster 조회
       const product = await loadProductTagInput(dataSource, productId);
@@ -64,6 +85,13 @@ export function createProductAiTagRouter(dataSource: DataSource): Router {
   router.post('/:productId/ai-tags/suggest', authenticate, async (req, res) => {
     try {
       const { productId } = req.params;
+      const userId = req.user?.id as string;
+
+      const { allowed } = await verifyProductOrgAccess(dataSource, productId, userId);
+      if (!allowed) {
+        res.status(403).json({ success: false, error: 'Product access denied', code: 'PRODUCT_ACCESS_DENIED' });
+        return;
+      }
 
       const product = await loadProductTagInput(dataSource, productId);
       if (!product) {
@@ -101,6 +129,14 @@ export function createProductAiTagRouter(dataSource: DataSource): Router {
   router.post('/:productId/ai-tags/manual', authenticate, async (req, res) => {
     try {
       const { productId } = req.params;
+      const userId = req.user?.id as string;
+
+      const { allowed } = await verifyProductOrgAccess(dataSource, productId, userId);
+      if (!allowed) {
+        res.status(403).json({ success: false, error: 'Product access denied', code: 'PRODUCT_ACCESS_DENIED' });
+        return;
+      }
+
       const { tag } = req.body;
 
       if (!tag || typeof tag !== 'string' || tag.trim().length === 0) {
@@ -120,6 +156,14 @@ export function createProductAiTagRouter(dataSource: DataSource): Router {
   router.post('/:productId/ai-tags/manual/batch', authenticate, async (req, res) => {
     try {
       const { productId } = req.params;
+      const userId = req.user?.id as string;
+
+      const { allowed } = await verifyProductOrgAccess(dataSource, productId, userId);
+      if (!allowed) {
+        res.status(403).json({ success: false, error: 'Product access denied', code: 'PRODUCT_ACCESS_DENIED' });
+        return;
+      }
+
       const { tags } = req.body;
 
       if (!Array.isArray(tags) || tags.length === 0) {
@@ -149,6 +193,14 @@ export function createProductAiTagRouter(dataSource: DataSource): Router {
   router.delete('/:productId/ai-tags/:tagId', authenticate, async (req, res) => {
     try {
       const { productId, tagId } = req.params;
+      const userId = req.user?.id as string;
+
+      const { allowed } = await verifyProductOrgAccess(dataSource, productId, userId);
+      if (!allowed) {
+        res.status(403).json({ success: false, error: 'Product access denied', code: 'PRODUCT_ACCESS_DENIED' });
+        return;
+      }
+
       await taggingService.deleteTag(tagId, productId);
       res.json({ success: true, message: 'Tag deleted' });
     } catch (error) {

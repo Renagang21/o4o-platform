@@ -31,9 +31,26 @@ export class ProductAiRecommendationService {
   /**
    * Tag-based recommendation: 주어진 태그와 일치하는 상품 추천.
    * Score = matching_tags * 0.6 + avg_confidence * 0.3 + normalized_popularity * 0.1
+   *
+   * WO-O4O-STORE-AI-PRODUCT-ORG-GUARD-V1:
+   *   organizationId 제공 시 popularity 집계를 해당 org 스냅샷으로 한정.
+   *   cross-org popularity contamination 제거.
+   *   미제공 시 (platform admin 등) 기존 전역 집계 유지.
    */
-  async recommendByTags(tags: string[], limit = DEFAULT_LIMIT): Promise<RecommendedProduct[]> {
+  async recommendByTags(
+    tags: string[],
+    limit = DEFAULT_LIMIT,
+    organizationId?: string,
+  ): Promise<RecommendedProduct[]> {
     if (tags.length === 0) return [];
+
+    // Parameterized snap filter — $3 when organizationId is provided
+    const params: unknown[] = [tags, limit];
+    let snapOrgFilter = '';
+    if (organizationId) {
+      params.push(organizationId);
+      snapOrgFilter = `AND organization_id = $${params.length}`;
+    }
 
     const rows = await this.dataSource.query(
       `SELECT
@@ -56,13 +73,14 @@ export class ProductAiRecommendationService {
          SELECT product_id, SUM(orders)::int AS total_orders
          FROM store_ai_product_snapshots
          WHERE snapshot_date >= CURRENT_DATE - INTERVAL '30 days'
+         ${snapOrgFilter}
          GROUP BY product_id
        ) snap ON snap.product_id = pm.id
        GROUP BY pm.id, pm.regulatory_name, pm.name, pm.tags,
                 pm.specification, pc.name, b.name, snap.total_orders
        ORDER BY "matchingTags" DESC, avg_confidence DESC, popularity DESC
        LIMIT $2`,
-      [tags, limit],
+      params,
     );
 
     return this.mapResults(rows, tags);

@@ -3,6 +3,7 @@ import type { DataSource } from 'typeorm';
 import { ProductAiRecommendationService } from '../services/product-ai-recommendation.service.js';
 import { authenticate } from '../../../middleware/auth.middleware.js';
 import { createRequireStoreOwner } from '../../../utils/store-owner.utils.js';
+import { resolveCallerOrg } from '../utils/product-access.utils.js';
 
 /**
  * Product AI Recommendation Controller — WO-O4O-AI-PRODUCT-RECOMMENDATION-V1
@@ -16,6 +17,7 @@ export function createProductAiRecommendationRouter(dataSource: DataSource): Rou
   const requireStoreOwner = createRequireStoreOwner(dataSource);
 
   // GET /recommend?tags=혈당관리,면역&limit=10
+  // WO-O4O-STORE-AI-PRODUCT-ORG-GUARD-V1: caller org 기반 popularity 격리
   router.get('/recommend', authenticate, async (req, res) => {
     try {
       const tagsParam = (req.query.tags as string || '').trim();
@@ -32,7 +34,12 @@ export function createProductAiRecommendationRouter(dataSource: DataSource): Rou
         return;
       }
 
-      const products = await recommendService.recommendByTags(tags, limit);
+      // Resolve caller's org for org-scoped popularity aggregation.
+      // null → platform admin or ungrouped user → global aggregation (backward compat).
+      const userId = req.user?.id as string | undefined;
+      const organizationId = userId ? (await resolveCallerOrg(dataSource, userId)) ?? undefined : undefined;
+
+      const products = await recommendService.recommendByTags(tags, limit, organizationId);
 
       res.json({
         success: true,
