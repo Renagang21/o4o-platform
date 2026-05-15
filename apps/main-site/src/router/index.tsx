@@ -18,10 +18,6 @@ const LoginPage = lazy(() => import('@/pages/auth/LoginPage'));
 const ForumListPage = lazy(() => import('@/pages/forum/ForumListPage'));
 const ForumDetailPage = lazy(() => import('@/pages/forum/ForumDetailPage'));
 
-// Groupbuy pages
-const GroupbuyListPage = lazy(() => import('@/pages/groupbuy/GroupbuyListPage'));
-const GroupbuyDetailPage = lazy(() => import('@/pages/groupbuy/GroupbuyDetailPage'));
-
 // LMS pages
 const MyCoursesPage = lazy(() => import('@/pages/lms/MyCoursesPage'));
 const CourseDetailPage = lazy(() => import('@/pages/lms/CourseDetailPage'));
@@ -118,10 +114,6 @@ export function AppRouter() {
                       </RequireAuth>
                     }
                   />
-
-                  {/* 공동구매 */}
-                  <Route path="/groupbuy" element={<GroupbuyListPage />} />
-                  <Route path="/groupbuy/:id" element={<GroupbuyDetailPage />} />
 
                   {/* LMS */}
                   <Route

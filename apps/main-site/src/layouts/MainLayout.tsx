@@ -29,7 +29,6 @@ export function MainLayout({ children }: MainLayoutProps) {
   const navItems = [
     { label: '홈', path: '/', icon: '🏠' },
     { label: '커뮤니티', path: '/forum', icon: '💬' },
-    { label: '공동구매', path: '/groupbuy', icon: '🛒' },
     { label: '내 학습', path: '/lms', icon: '📚' },
   ];
 
@@ -193,7 +192,6 @@ export function MainLayout({ children }: MainLayoutProps) {
               <h4 className="font-medium mb-3">서비스</h4>
               <ul className="space-y-2 text-sm text-gray-400">
                 <li><Link to="/forum" className="hover:text-white">커뮤니티</Link></li>
-                <li><Link to="/groupbuy" className="hover:text-white">공동구매</Link></li>
                 <li><Link to="/lms" className="hover:text-white">교육</Link></li>
               </ul>
             </div>

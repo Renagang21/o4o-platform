@@ -35,7 +35,6 @@ interface DashboardData {
   stats: {
     forumPosts: number;
     forumComments: number;
-    groupbuyParticipations: number;
     coursesCompleted: number;
   };
 }
@@ -73,7 +72,6 @@ export function DashboardPage() {
         stats: {
           forumPosts: 0,
           forumComments: 0,
-          groupbuyParticipations: 0,
           coursesCompleted: 0,
         },
       });
@@ -120,19 +118,12 @@ export function DashboardPage() {
 
         {/* 기능 소개 */}
         <div className="max-w-6xl mx-auto px-4 py-16">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
               <span className="text-4xl mb-4 block">💬</span>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">커뮤니티</h3>
               <p className="text-gray-600">
                 약사 회원들과 정보를 공유하고 소통하세요
-              </p>
-            </div>
-            <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
-              <span className="text-4xl mb-4 block">🛒</span>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">공동구매</h3>
-              <p className="text-gray-600">
-                약국 운영에 필요한 물품을 저렴하게 구매하세요
               </p>
             </div>
             <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
@@ -192,7 +183,7 @@ export function DashboardPage() {
         )}
 
         {/* 통계 카드 */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
           <div className="bg-white rounded-lg border border-gray-200 p-4">
             <p className="text-sm text-gray-500">작성 글</p>
             <p className="text-2xl font-bold text-gray-900">
@@ -203,12 +194,6 @@ export function DashboardPage() {
             <p className="text-sm text-gray-500">작성 댓글</p>
             <p className="text-2xl font-bold text-gray-900">
               {dashboardData?.stats.forumComments || 0}
-            </p>
-          </div>
-          <div className="bg-white rounded-lg border border-gray-200 p-4">
-            <p className="text-sm text-gray-500">공동구매 참여</p>
-            <p className="text-2xl font-bold text-gray-900">
-              {dashboardData?.stats.groupbuyParticipations || 0}
             </p>
           </div>
           <div className="bg-white rounded-lg border border-gray-200 p-4">
@@ -232,16 +217,6 @@ export function DashboardPage() {
                 <div>
                   <p className="font-medium text-gray-900">커뮤니티</p>
                   <p className="text-sm text-gray-500">게시글 보기 및 작성</p>
-                </div>
-              </Link>
-              <Link
-                to="/groupbuy"
-                className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <span className="text-2xl">🛒</span>
-                <div>
-                  <p className="font-medium text-gray-900">공동구매</p>
-                  <p className="text-sm text-gray-500">진행 중인 캠페인 보기</p>
                 </div>
               </Link>
               <Link
