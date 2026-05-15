@@ -77,9 +77,13 @@ export const adminMenuStatic: MenuItem[] = [
     icon: <Shield className="w-5 h-5" />,
     roles: ['admin', 'super_admin'],
     children: [
+      // WO-O4O-ADMIN-ASSIGNMENT-ROW-LIST-CANONICALIZATION-V1
+      // 두 entry 는 동일 RBAC SSOT (`role_assignments`) 위의 다른 facet preset:
+      //   /users     — 전체 권한 할당 (assignment-row, 모든 role)
+      //   /operators — 운영 권한(admin/operator/super_admin) preset 적용 + Add/Revoke
       {
         id: 'core-users',
-        label: 'Users & Roles',
+        label: 'Role Assignments',
         icon: <Users className="w-4 h-4" />,
         path: '/users',
       },

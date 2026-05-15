@@ -1,92 +1,83 @@
 /**
- * UsersListClean
+ * UsersListClean — Assignment-Row Canonical
  *
- * WO-O4O-TABLE-DATATABLE-DEPRECATION-V1 — BaseTable 직접 사용으로 마이그레이션
+ * WO-O4O-ADMIN-ASSIGNMENT-ROW-LIST-CANONICALIZATION-V1
  *
- * 변경사항:
- * - DataTable wrapper 제거 → BaseTable + O4OColumn 직접 사용
- * - Screen Options 커스텀 패널 제거 → BaseTable columnVisibility(+persistState) 대체
- * - rowSelection: string[] → Set<string>
- * - expandable → renderAfterRow
- * - Actions → RowActionMenu
+ * 변경:
+ * - 행(Row)의 단위: 1 user → 1 role_assignment
+ *   (RBAC SSOT `role_assignments` 와 일치, multi-role 자동 펼침)
+ * - role tab 7개 제거 → Service/Role/Status facet 필터 (FilterBar)
+ * - role 라벨/색상 하드코딩 제거 → `lib/rbac-catalog` 단일 출처
+ * - API 무변경 (GET /admin/users 응답의 roles[] 를 frontend flatMap)
+ *
+ * 자매:
+ *   docs/investigations/IR-O4O-ADMIN-ROLE-LIST-SERVICE-CENTRIC-UX-AUDIT-V1.md
  */
 
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, RefreshCw, CheckCircle, XCircle } from 'lucide-react';
+import { Plus, RefreshCw, CheckCircle, XCircle, Check, X } from 'lucide-react';
 import { authClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
 import { BaseTable, RowActionMenu, FilterBar } from '@o4o/ui';
 import type { O4OColumn } from '@o4o/ui';
 import PageHeader from '@/components/common/PageHeader';
+import {
+  flattenUsersToAssignments,
+  uniqueUserIdsFromKeys,
+  type AdminUserDto,
+  type AssignmentRow,
+} from '@/lib/assignment-row';
+import { getRoleOptions, getServiceOptions } from '@/lib/rbac-catalog';
 
-interface User {
-  id: string;
-  name: string;
-  username: string;
-  email: string;
+const STATUS_OPTIONS = [
+  { value: 'active', label: 'Active' },
+  { value: 'inactive', label: 'Inactive' },
+];
+
+interface Facets {
+  service: string;
   role: string;
-  posts: number;
-  registeredDate: string;
-  lastLogin?: string;
-  status: 'active' | 'inactive' | 'pending';
-  avatar?: string;
+  status: string;
 }
 
-type TabStatus = 'all' | 'super_admin' | 'admin' | 'seller' | 'partner' | 'supplier' | 'customer';
-
-const ROLE_MAP: Record<string, { label: string; color: string }> = {
-  super_admin: { label: 'Super Admin', color: 'text-red-700 bg-red-50' },
-  admin: { label: 'Admin', color: 'text-red-600 bg-red-50' },
-  seller: { label: 'Seller', color: 'text-green-600 bg-green-50' },
-  partner: { label: 'Partner', color: 'text-orange-600 bg-orange-50' },
-  supplier: { label: 'Supplier', color: 'text-purple-600 bg-purple-50' },
-  customer: { label: 'Customer', color: 'text-gray-600 bg-gray-50' },
-};
-
-const TABS: { id: TabStatus; label: string }[] = [
-  { id: 'all', label: 'All' },
-  { id: 'super_admin', label: 'Super Admin' },
-  { id: 'admin', label: 'Admin' },
-  { id: 'seller', label: 'Seller' },
-  { id: 'partner', label: 'Partner' },
-  { id: 'supplier', label: 'Supplier' },
-  { id: 'customer', label: 'Customer' },
-];
+const EMPTY_FACETS: Facets = { service: '', role: '', status: '' };
 
 export default function UsersListClean() {
   const navigate = useNavigate();
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<AdminUserDto[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<TabStatus>(() => (sessionStorage.getItem('users-active-tab') as TabStatus) || 'all');
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [bulkAction, setBulkAction] = useState('');
   const [search, setSearch] = useState('');
-  const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [quickEdit, setQuickEdit] = useState({ id: '', name: '', email: '', role: 'customer', username: '' });
+  const [facets, setFacets] = useState<Facets>(() => {
+    try {
+      const raw = sessionStorage.getItem('users-facets');
+      return raw ? { ...EMPTY_FACETS, ...JSON.parse(raw) } : EMPTY_FACETS;
+    } catch {
+      return EMPTY_FACETS;
+    }
+  });
 
-  useEffect(() => { fetchUsers(); }, []);
-  useEffect(() => { sessionStorage.setItem('users-active-tab', activeTab); }, [activeTab]);
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  useEffect(() => {
+    sessionStorage.setItem('users-facets', JSON.stringify(facets));
+  }, [facets]);
 
   const fetchUsers = async () => {
     try {
       setLoading(true);
       const response = await authClient.api.get('/admin/users', { params: { limit: 1000, page: 1 } });
-      const raw = response.data?.users || response.data?.data?.users || response.data?.data || response.data || [];
-      if (Array.isArray(raw)) {
-        setUsers(raw.map((u: any) => ({
-          id: u.id || u._id,
-          name: u.name || `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Unknown',
-          username: u.username || u.email?.split('@')[0] || 'unknown',
-          email: u.email || '',
-          role: u.role || 'customer',
-          posts: u.postsCount || 0,
-          registeredDate: u.createdAt ? new Date(u.createdAt).toISOString().split('T')[0] : '',
-          lastLogin: u.lastLogin || u.lastLoginAt ? new Date(u.lastLogin || u.lastLoginAt).toISOString().split('T')[0] : undefined,
-          status: u.status || 'active',
-          avatar: u.avatar,
-        })));
-      }
+      const raw =
+        response.data?.users ||
+        response.data?.data?.users ||
+        response.data?.data ||
+        response.data ||
+        [];
+      setUsers(Array.isArray(raw) ? (raw as AdminUserDto[]) : []);
     } catch {
       toast.error('Failed to load users');
       setUsers([]);
@@ -95,127 +86,188 @@ export default function UsersListClean() {
     }
   };
 
-  const filteredUsers = useMemo(() => users.filter((u) => {
-    if (activeTab !== 'all' && u.role !== activeTab) return false;
-    if (search) {
-      const q = search.toLowerCase();
-      return u.username.toLowerCase().includes(q) || u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q);
-    }
-    return true;
-  }), [users, activeTab, search]);
+  // assignment-row flatMap
+  const allRows = useMemo<AssignmentRow[]>(() => flattenUsersToAssignments(users), [users]);
+
+  const filteredRows = useMemo<AssignmentRow[]>(() => {
+    return allRows.filter((row) => {
+      if (facets.service && row.parsedRole.serviceKey !== facets.service) return false;
+      if (facets.role && row.parsedRole.roleKey !== facets.role) return false;
+      if (facets.status === 'active' && !row.userIsActive) return false;
+      if (facets.status === 'inactive' && row.userIsActive) return false;
+      if (search) {
+        const q = search.toLowerCase();
+        const haystack =
+          row.userName + ' ' + row.userEmail + ' ' + row.username + ' ' + row.role + ' ' + row.service.label + ' ' + row.roleMeta.label;
+        if (!haystack.toLowerCase().includes(q)) return false;
+      }
+      return true;
+    });
+  }, [allRows, facets, search]);
+
+  // 통계 (assignment 단위 + unique user count)
+  const stats = useMemo(() => {
+    const total = allRows.length;
+    const activeUsers = new Set<string>();
+    allRows.forEach((r) => {
+      if (r.userIsActive) activeUsers.add(r.userId);
+    });
+    const allUsers = new Set(allRows.map((r) => r.userId));
+    return {
+      assignments: total,
+      users: allUsers.size,
+      activeUsers: activeUsers.size,
+      visible: filteredRows.length,
+    };
+  }, [allRows, filteredRows]);
 
   const handleBulkAction = async () => {
-    if (!bulkAction || selectedKeys.size === 0) { toast.error('Please select an action and users'); return; }
-    const ids = Array.from(selectedKeys);
+    if (!bulkAction || selectedKeys.size === 0) {
+      toast.error('Please select an action and rows');
+      return;
+    }
+    const userIds = uniqueUserIdsFromKeys(selectedKeys);
     if (bulkAction === 'delete') {
-      if (!confirm(`Are you sure you want to delete ${ids.length} users?`)) return;
+      if (!confirm(`${userIds.length}명의 사용자를 삭제하시겠습니까?\n(선택된 ${selectedKeys.size}개 권한 행이 같은 사용자에 속하면 중복 제거됩니다.)`)) {
+        return;
+      }
       try {
-        await Promise.all(ids.map((id) => authClient.api.delete(`/users/${id}`)));
-        setUsers((prev) => prev.filter((u) => !selectedKeys.has(u.id)));
+        await Promise.all(userIds.map((id) => authClient.api.delete(`/users/${id}`)));
+        setUsers((prev) => prev.filter((u) => !userIds.includes(u.id ?? u._id ?? '')));
         setSelectedKeys(new Set());
-        toast.success('Users deleted successfully');
-      } catch { toast.error('Failed to delete users'); }
-    } else if (bulkAction === 'change-role') {
-      const newRole = prompt('Enter new role (super_admin, admin, seller, partner, supplier, customer):');
-      if (!newRole) return;
-      try {
-        await Promise.all(ids.map((id) => authClient.api.patch(`/users/${id}`, { role: newRole })));
-        setUsers((prev) => prev.map((u) => selectedKeys.has(u.id) ? { ...u, role: newRole } : u));
-        setSelectedKeys(new Set());
-        toast.success('Roles updated successfully');
-      } catch { toast.error('Failed to update roles'); }
+        toast.success(`${userIds.length}명 삭제 완료`);
+      } catch {
+        toast.error('삭제 실패');
+      }
+    } else if (bulkAction === 'revoke') {
+      // 선택된 assignment-row 각각의 role 해제
+      const targets = Array.from(selectedKeys).map((k) => {
+        const [uid, role] = k.split('::');
+        return { uid, role };
+      });
+      if (!confirm(`${targets.length}개 권한을 해제하시겠습니까? (계정은 유지됩니다)`)) return;
+      const results = await Promise.allSettled(
+        targets.map(({ uid, role }) =>
+          authClient.api.delete(`/admin/users/${uid}/role-assignments/${encodeURIComponent(role)}`),
+        ),
+      );
+      const failed = results.filter((r) => r.status === 'rejected').length;
+      if (failed === 0) {
+        toast.success(`${targets.length}개 권한 해제 완료`);
+      } else {
+        toast.error(`${failed}개 권한 해제 실패 (성공 ${targets.length - failed}개)`);
+      }
+      setSelectedKeys(new Set());
+      fetchUsers();
     }
   };
 
-  const openQuickEdit = (user: User) => {
-    if (expandedId === user.id) { setExpandedId(null); return; }
-    setQuickEdit({ id: user.id, name: user.name, email: user.email, role: user.role, username: user.username });
-    setExpandedId(user.id);
-  };
-
-  const handleQuickEditSave = async () => {
+  const handleDeleteUser = async (userId: string) => {
+    if (!confirm('이 사용자를 삭제하시겠습니까? (모든 권한이 함께 해제됩니다)')) return;
     try {
-      await authClient.api.patch(`/users/${quickEdit.id}`, quickEdit);
-      setUsers((prev) => prev.map((u) => u.id === quickEdit.id ? { ...u, ...quickEdit } : u));
-      setExpandedId(null);
-      toast.success('User updated successfully');
-    } catch { toast.error('Failed to update user'); }
+      await authClient.api.delete(`/users/${userId}`);
+      setUsers((prev) => prev.filter((u) => (u.id ?? u._id) !== userId));
+      toast.success('사용자 삭제 완료');
+    } catch {
+      toast.error('삭제 실패');
+    }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this user?')) return;
+  const handleRevokeRole = async (userId: string, role: string) => {
+    if (!confirm(`이 권한(${role})을 해제하시겠습니까? (계정은 유지됩니다)`)) return;
     try {
-      await authClient.api.delete(`/users/${id}`);
-      setUsers((prev) => prev.filter((u) => u.id !== id));
-      toast.success('User deleted');
-    } catch { toast.error('Failed to delete user'); }
+      await authClient.api.delete(`/admin/users/${userId}/role-assignments/${encodeURIComponent(role)}`);
+      toast.success('권한 해제 완료');
+      fetchUsers();
+    } catch (err: any) {
+      const msg = err?.response?.data?.error || err?.message || '권한 해제 실패';
+      toast.error(msg);
+    }
   };
 
-  const counts = useMemo(() => {
-    const c: Record<string, number> = { all: users.length };
-    users.forEach((u) => { c[u.role] = (c[u.role] || 0) + 1; });
-    return c;
-  }, [users]);
-
-  // ── O4O 표준 컬럼 정의 ─────────────────────────────
-  const columns: O4OColumn<User>[] = [
+  const columns: O4OColumn<AssignmentRow>[] = [
     {
-      key: 'username',
-      header: 'Username',
+      key: 'service',
+      header: 'Service',
+      width: 130,
       sortable: true,
-      sortAccessor: (row) => row.username,
+      sortAccessor: (row) => row.service.label,
       render: (_, row) => (
-        <div className="flex items-center gap-2">
-          {row.avatar && <img src={row.avatar} alt="" className="w-7 h-7 rounded-full flex-shrink-0" />}
-          <button
-            onClick={() => navigate(`/users/${row.id}/edit`)}
-            className="font-medium text-blue-600 hover:text-blue-800 text-sm"
-          >
-            {row.username}
-          </button>
-        </div>
-      ),
-    },
-    {
-      key: 'name',
-      header: 'Name',
-      sortable: true,
-      sortAccessor: (row) => row.name,
-      render: (_, row) => <span className="text-sm text-gray-900">{row.name}</span>,
-    },
-    {
-      key: 'email',
-      header: 'Email',
-      sortable: true,
-      sortAccessor: (row) => row.email,
-      render: (_, row) => (
-        <a href={`mailto:${row.email}`} className="text-sm text-blue-600 hover:underline">{row.email}</a>
+        <span className={`px-2 py-0.5 rounded text-xs font-medium ${row.service.badgeClass}`}>
+          {row.service.label}
+        </span>
       ),
     },
     {
       key: 'role',
       header: 'Role',
+      width: 150,
       sortable: true,
-      sortAccessor: (row) => row.role,
-      render: (_, row) => {
-        const { label, color } = ROLE_MAP[row.role] || { label: row.role, color: 'text-gray-600 bg-gray-50' };
-        return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${color}`}>{label}</span>;
-      },
+      sortAccessor: (row) => row.roleMeta.label,
+      render: (_, row) => (
+        <span className={`px-2 py-0.5 rounded text-xs font-medium ${row.roleMeta.badgeClass}`}>
+          {row.roleMeta.label}
+        </span>
+      ),
     },
     {
-      key: 'posts',
-      header: 'Posts',
+      key: 'user',
+      header: 'User',
       sortable: true,
-      sortAccessor: (row) => row.posts,
-      align: 'right',
-      render: (_, row) => <span className="text-sm tabular-nums">{row.posts}</span>,
+      sortAccessor: (row) => row.userName,
+      render: (_, row) => (
+        <div className="flex items-center gap-2">
+          {row.userAvatar && (
+            <img src={row.userAvatar} alt="" className="w-7 h-7 rounded-full flex-shrink-0" />
+          )}
+          <div className="min-w-0">
+            <button
+              onClick={() => navigate(`/users/${row.userId}/edit`)}
+              className="font-medium text-blue-600 hover:text-blue-800 text-sm truncate block"
+            >
+              {row.userName}
+            </button>
+            <div className="text-xs text-gray-500 truncate">@{row.username}</div>
+          </div>
+        </div>
+      ),
     },
     {
-      key: 'registeredDate',
+      key: 'email',
+      header: 'Email',
+      sortable: true,
+      sortAccessor: (row) => row.userEmail,
+      render: (_, row) => (
+        <a href={`mailto:${row.userEmail}`} className="text-sm text-blue-600 hover:underline">
+          {row.userEmail}
+        </a>
+      ),
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      width: 100,
+      align: 'center',
+      sortable: true,
+      sortAccessor: (row) => (row.userIsActive ? 'active' : 'inactive'),
+      render: (_, row) => (
+        <span
+          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${
+            row.userIsActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
+          }`}
+        >
+          {row.userIsActive ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+          {row.userIsActive ? 'Active' : 'Inactive'}
+        </span>
+      ),
+    },
+    {
+      key: 'createdAt',
       header: 'Registered',
+      width: 110,
       sortable: true,
-      sortAccessor: (row) => row.registeredDate,
-      render: (_, row) => <span className="text-sm text-gray-500">{row.registeredDate}</span>,
+      sortAccessor: (row) => row.userCreatedAt,
+      render: (_, row) => <span className="text-sm text-gray-500">{row.userCreatedAt}</span>,
     },
     {
       key: '_actions',
@@ -226,58 +278,40 @@ export default function UsersListClean() {
       render: (_, row) => (
         <RowActionMenu
           actions={[
-            { key: 'edit', label: '편집', icon: <CheckCircle size={14} />, variant: 'primary', onClick: () => navigate(`/users/${row.id}/edit`) },
-            { key: 'quickedit', label: '빠른 편집', onClick: () => openQuickEdit(row) },
-            { key: 'delete', label: '삭제', variant: 'danger', icon: <XCircle size={14} />, confirm: '이 사용자를 삭제하시겠습니까?', onClick: () => handleDelete(row.id) },
+            {
+              key: 'edit',
+              label: '사용자 편집',
+              icon: <CheckCircle size={14} />,
+              variant: 'primary',
+              onClick: () => navigate(`/users/${row.userId}/edit`),
+            },
+            {
+              key: 'revoke',
+              label: `권한 해제 (${row.roleMeta.label})`,
+              variant: 'danger',
+              onClick: () => handleRevokeRole(row.userId, row.role),
+            },
+            {
+              key: 'delete',
+              label: '사용자 삭제',
+              variant: 'danger',
+              icon: <XCircle size={14} />,
+              onClick: () => handleDeleteUser(row.userId),
+            },
           ]}
         />
       ),
     },
   ];
 
-  // Quick Edit expand row
-  const renderAfterRow = (row: User) => {
-    if (expandedId !== row.id) return null;
-    return (
-      <tr className="bg-blue-50">
-        <td colSpan={columns.length + 1} className="px-6 py-4">
-          <div className="grid grid-cols-2 gap-4 max-w-2xl">
-            {(['username', 'name', 'email'] as const).map((field) => (
-              <div key={field}>
-                <label className="block text-xs text-gray-500 mb-1 capitalize">{field}</label>
-                <input
-                  className="w-full border rounded px-2 py-1 text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                  value={(quickEdit as any)[field]}
-                  onChange={(e) => setQuickEdit({ ...quickEdit, [field]: e.target.value })}
-                />
-              </div>
-            ))}
-            <div>
-              <label className="block text-xs text-gray-500 mb-1">Role</label>
-              <select
-                className="w-full border rounded px-2 py-1 text-sm"
-                value={quickEdit.role}
-                onChange={(e) => setQuickEdit({ ...quickEdit, role: e.target.value })}
-              >
-                {TABS.slice(1).map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}
-              </select>
-            </div>
-            <div className="col-span-2 flex justify-end gap-2 mt-1">
-              <button onClick={() => setExpandedId(null)} className="px-3 py-1 text-sm border rounded hover:bg-gray-100">Cancel</button>
-              <button onClick={handleQuickEditSave} className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
-            </div>
-          </div>
-        </td>
-      </tr>
-    );
-  };
-
   if (loading) {
     return (
       <div className="p-6">
         <div className="animate-pulse space-y-3">
           <div className="h-10 bg-gray-200 rounded" />
-          {[...Array(5)].map((_, i) => <div key={i} className="h-14 bg-gray-100 rounded" />)}
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="h-14 bg-gray-100 rounded" />
+          ))}
         </div>
       </div>
     );
@@ -286,37 +320,37 @@ export default function UsersListClean() {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <PageHeader
-        title="Users"
-        subtitle="Manage system users"
+        title="Users & Roles"
+        subtitle="권한 할당 단위 (1 row = 1 user × 1 role) — RBAC SSOT"
         backUrl="/"
         backLabel="Dashboard"
         actions={[
-          { id: 'add', label: 'Add New', onClick: () => navigate('/users/new'), variant: 'primary', icon: <Plus className="w-4 h-4" /> },
+          { id: 'add', label: 'Add User', onClick: () => navigate('/users/new'), variant: 'primary', icon: <Plus className="w-4 h-4" /> },
           { id: 'refresh', label: 'Refresh', onClick: fetchUsers, variant: 'secondary', icon: <RefreshCw className="w-4 h-4" /> },
         ]}
       />
 
-      {/* Role Tabs */}
-      <div className="flex border-b border-gray-200 mb-4 gap-6 overflow-x-auto">
-        {TABS.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`pb-3 border-b-2 text-sm font-medium transition-colors whitespace-nowrap ${
-              activeTab === tab.id ? 'border-admin-blue text-admin-blue' : 'border-transparent text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            {tab.label} ({counts[tab.id] || 0})
-          </button>
-        ))}
+      {/* Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+        <StatCard label="Users" value={stats.users} color="text-gray-900" />
+        <StatCard label="Active Users" value={stats.activeUsers} color="text-green-600" />
+        <StatCard label="Assignments" value={stats.assignments} color="text-blue-600" />
+        <StatCard label="Visible" value={stats.visible} color="text-orange-600" />
       </div>
 
-      {/* FilterBar + Bulk Actions */}
+      {/* FilterBar with facet selects */}
       <div className="bg-white rounded-lg border border-gray-200 p-3 mb-4">
         <FilterBar
-          searchPlaceholder="Username, 이름, 이메일 검색..."
+          searchPlaceholder="사용자명, 이메일, 서비스, 역할 검색..."
           searchValue={search}
           onSearchChange={setSearch}
+          filters={[
+            { key: 'service', placeholder: 'All Services', options: getServiceOptions() },
+            { key: 'role', placeholder: 'All Roles', options: getRoleOptions() },
+            { key: 'status', placeholder: 'All Status', options: STATUS_OPTIONS },
+          ]}
+          filterValues={facets as unknown as Record<string, string>}
+          onFilterChange={(k, v) => setFacets((prev) => ({ ...prev, [k]: v } as Facets))}
         >
           <select
             value={bulkAction}
@@ -324,8 +358,8 @@ export default function UsersListClean() {
             className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white"
           >
             <option value="">Bulk Actions</option>
-            <option value="delete">Delete</option>
-            <option value="change-role">Change Role</option>
+            <option value="revoke">Revoke Role</option>
+            <option value="delete">Delete User</option>
           </select>
           <button
             onClick={handleBulkAction}
@@ -337,23 +371,31 @@ export default function UsersListClean() {
         </FilterBar>
       </div>
 
-      {/* BaseTable — columnVisibility가 Screen Options를 대체 */}
+      {/* Table */}
       <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-        <BaseTable<User>
+        <BaseTable<AssignmentRow>
           columns={columns}
-          data={filteredUsers}
-          rowKey={(row) => row.id}
-          tableId="users-list"
+          data={filteredRows}
+          rowKey={(row) => row.key}
+          tableId="users-assignments-list"
           reorderable
           persistState
           columnVisibility
           selectable
           selectedKeys={selectedKeys}
           onSelectionChange={setSelectedKeys}
-          renderAfterRow={renderAfterRow}
-          emptyMessage="조건에 맞는 사용자가 없습니다."
+          emptyMessage="조건에 맞는 권한 할당이 없습니다."
         />
       </div>
+    </div>
+  );
+}
+
+function StatCard({ label, value, color }: { label: string; value: number; color: string }) {
+  return (
+    <div className="bg-white p-4 rounded-lg border border-gray-200">
+      <div className={`text-2xl font-bold ${color}`}>{value}</div>
+      <div className="text-sm text-gray-500">{label}</div>
     </div>
   );
 }
