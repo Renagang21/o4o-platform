@@ -13,7 +13,7 @@
 
 import { useNavigate, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { GraduationCap, LayoutDashboard, Settings, Shield } from 'lucide-react';
+import { GraduationCap, LayoutDashboard, Settings, Shield, Store } from 'lucide-react';
 import { GlobalHeader, GlobalHeaderMenuItem } from '@o4o/ui';
 import { isOperatorOrAbove, isAdminOrAbove } from '@o4o/auth-utils';
 import { useAuth, type User as UserType } from '../contexts';
@@ -69,7 +69,12 @@ export function KpaGlobalHeader() {
   const isAdmin = user ? isAdminOrAbove(user.roles, 'kpa') : false;
   const isOperator = user ? isOperatorOrAbove(user.roles, 'kpa') : false;
   const isInstructor = user ? user.roles.includes('lms:instructor') : false;
-  const isStoreOwner = user?.isStoreOwner === true;
+  // WO-O4O-KPA-HEADER-STORE-MENU-ENTRY-V1:
+  //   kpa:store_owner 역할 보유 OR isStoreOwner=true 모두 내 매장 표시
+  //   (role_assignments 기반 role이 먼저 세팅되고 isStoreOwner는 KPA context 로드 후 확정됨)
+  const isStoreOwner =
+    user?.isStoreOwner === true ||
+    (user?.roles?.includes('kpa:store_owner') ?? false);
   const isPharmacyRelated = isStoreOwner || (user as any)?.activityType === 'pharmacy_owner';
 
   // WO-O4O-KPA-WEB-MENU-STRUCTURE-PHASE1-V1: 상태별 통합 nav 조합
@@ -145,6 +150,11 @@ export function KpaGlobalHeader() {
               운영 대시보드
             </GlobalHeaderMenuItem>
           ) : null}
+          {isStoreOwner && (
+            <GlobalHeaderMenuItem to="/store" icon={<Store className="w-4 h-4" />}>
+              내 매장
+            </GlobalHeaderMenuItem>
+          )}
           <GlobalHeaderMenuItem to="/mypage" icon={<LayoutDashboard className="w-4 h-4" />}>
             마이페이지
           </GlobalHeaderMenuItem>
