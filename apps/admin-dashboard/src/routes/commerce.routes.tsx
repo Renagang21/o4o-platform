@@ -12,12 +12,6 @@ const DropshippingSettlementDetailPage = lazy(() => import('@/pages/dropshipping
 const OrderListPage = lazy(() => import('@/pages/admin/orders/OrderListPage'));
 const OrderDetailPage = lazy(() => import('@/pages/admin/orders/OrderDetailPage'));
 
-// Groupbuy Pages
-const GroupbuyCampaignListPage = lazy(() => import('@/pages/groupbuy/GroupbuyCampaignListPage'));
-const GroupbuyCampaignDetailPage = lazy(() => import('@/pages/groupbuy/GroupbuyCampaignDetailPage'));
-const GroupbuyParticipantsPage = lazy(() => import('@/pages/groupbuy/GroupbuyParticipantsPage'));
-const GroupbuySettlementPage = lazy(() => import('@/pages/groupbuy/GroupbuySettlementPage'));
-
 // Loading component
 const PageLoader = () => (
   <div className="flex items-center justify-center h-screen">
@@ -26,7 +20,7 @@ const PageLoader = () => (
 );
 
 /**
- * Commerce routes — dropshipping, orders, groupbuy
+ * Commerce routes — dropshipping, orders
  */
 export function CommerceRoutes() {
   return [
@@ -76,34 +70,5 @@ export function CommerceRoutes() {
       </AdminProtectedRoute>
     } />,
 
-    // Groupbuy Management
-    <Route key="/admin/groupbuy" path="/admin/groupbuy" element={
-      <AdminProtectedRoute requiredPermissions={['content:read']}>
-        <Suspense fallback={<PageLoader />}>
-          <GroupbuyCampaignListPage />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/admin/groupbuy/settlement" path="/admin/groupbuy/settlement" element={
-      <AdminProtectedRoute requiredPermissions={['content:read']}>
-        <Suspense fallback={<PageLoader />}>
-          <GroupbuySettlementPage />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/admin/groupbuy/:id" path="/admin/groupbuy/:id" element={
-      <AdminProtectedRoute requiredPermissions={['content:read']}>
-        <Suspense fallback={<PageLoader />}>
-          <GroupbuyCampaignDetailPage />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/admin/groupbuy/:id/participants" path="/admin/groupbuy/:id/participants" element={
-      <AdminProtectedRoute requiredPermissions={['content:read']}>
-        <Suspense fallback={<PageLoader />}>
-          <GroupbuyParticipantsPage />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
   ];
 }
