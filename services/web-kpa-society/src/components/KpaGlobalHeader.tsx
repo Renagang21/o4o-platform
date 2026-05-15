@@ -135,20 +135,27 @@ export function KpaGlobalHeader() {
       }
       userMenuItems={
         <>
-          {(isInstructor || isAdmin) && (
+          {/* WO-O4O-ROLE-BASED-PROFILE-MENU-CANONICALIZATION-V1:
+              강의 대시보드 — lms:instructor 역할 보유 시에만 표시.
+              isAdmin 조건 제거: admin이라도 instructor 역할 없으면 미표시. */}
+          {isInstructor && (
             <GlobalHeaderMenuItem to="/instructor" icon={<GraduationCap className="w-4 h-4" />}>
               강의 대시보드
             </GlobalHeaderMenuItem>
           )}
-          {isAdmin ? (
+          {/* WO-O4O-ROLE-BASED-PROFILE-MENU-CANONICALIZATION-V1:
+              관리자/운영자 — 역할별 독립 표시. legacy ternary(admin이면 operator 숨김) 제거.
+              isAdmin → /admin 표시 / isOperator → /operator 표시 (동시 보유 시 둘 다 표시). */}
+          {isAdmin && (
             <GlobalHeaderMenuItem to="/admin" icon={<Shield className="w-4 h-4" />}>
               관리자 대시보드
             </GlobalHeaderMenuItem>
-          ) : isOperator ? (
+          )}
+          {isOperator && (
             <GlobalHeaderMenuItem to="/operator" icon={<Shield className="w-4 h-4" />}>
               운영 대시보드
             </GlobalHeaderMenuItem>
-          ) : null}
+          )}
           {isStoreOwner && (
             <GlobalHeaderMenuItem to="/store" icon={<Store className="w-4 h-4" />}>
               내 매장
