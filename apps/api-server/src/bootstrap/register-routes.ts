@@ -339,9 +339,8 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     // 17. Cosmetics Seller routes (/api/v1/cosmetics-seller) - @o4o/cosmetics-seller-extension
     // 18. Cosmetics Sample Display routes - @o4o/cosmetics-sample-display-extension
     // 19. Cosmetics Supplier routes - @o4o/cosmetics-supplier-extension
-    // 20. Groupbuy-Yaksa routes - @o4o/groupbuy-yaksa
 
-    // 21. Register Partner routes (Phase K)
+    // 20. Register Partner routes (Phase K)
     app.use('/api/partner', partnerRoutes);
     logger.info('✅ Partner routes registered at /api/partner');
 
