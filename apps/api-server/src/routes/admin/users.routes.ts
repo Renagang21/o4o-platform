@@ -83,6 +83,7 @@ router.delete('/:id', requireAdmin, adminUserController.deleteUser);
 
 // WO-O4O-ADMIN-OPERATOR-ROLE-REVOKE-AND-SUPERADMIN-GUARD-V1
 // 단일 역할 해제 — 계정 삭제/비활성화 없이 role_assignments만 비활성화
-router.delete('/:userId/role-assignments/:role', requireAdmin, adminUserController.revokeRoleAssignment);
+// requireRole(ADMIN_ROLES): legacy super_admin / admin + platform:super_admin / platform:admin 모두 허용
+router.delete('/:userId/role-assignments/:role', requireRole(ADMIN_ROLES), adminUserController.revokeRoleAssignment);
 
 export default router;
