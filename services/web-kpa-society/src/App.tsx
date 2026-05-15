@@ -19,6 +19,7 @@ import { useAuth } from './contexts/AuthContext';
 import { getPharmacyInfo } from './api/pharmacyInfo';
 import { LoginModalProvider, useAuthModal } from './contexts/LoginModalContext';
 import LoginModal from './components/LoginModal';
+import { getKpaPostLoginRoute } from './config/dashboard';
 import RegisterModal from './components/RegisterModal';
 const HandoffPage = lazy(() => import('./pages/HandoffPage'));
 const AccountRecoveryPage = lazy(() => import('./pages/auth/AccountRecoveryPage'));
@@ -325,25 +326,19 @@ function PostLoginRedirect() {
 
     // 명시적 returnTo/onLoginSuccess 콜백: LoginModal에서 이미 처리
     if (onLoginSuccess) { didRedirectRef.current = true; return; }
-    // 이미 store/operator/admin 경로: 중복 이동 금지
+    // 이미 workspace 경로에 있으면 중복 이동 금지
     if (
       location.pathname.startsWith('/store') ||
       location.pathname.startsWith('/operator') ||
-      location.pathname.startsWith('/admin')
+      location.pathname.startsWith('/admin') ||
+      location.pathname.startsWith('/instructor')
     ) { didRedirectRef.current = true; return; }
 
-    // 운영자/관리자: redirect 없음
-    const isPrivileged = user.roles?.some((r) =>
-      r.includes(':operator') || r.includes(':admin') || r === 'platform:super_admin',
-    );
-    if (isPrivileged) { didRedirectRef.current = true; return; }
-
-    // 약국 경영자: /store 이동
-    if (user.isStoreOwner || user.activityType === 'pharmacy_owner') {
-      didRedirectRef.current = true;
-      navigate('/store', { replace: true });
-    } else {
-      didRedirectRef.current = true;
+    // WO-O4O-KPA-DASHBOARD-REDIRECT-UNIFICATION-V1: PRIORITY+MAP 기반 redirect
+    const targetRoute = getKpaPostLoginRoute(user);
+    didRedirectRef.current = true;
+    if (targetRoute) {
+      navigate(targetRoute, { replace: true });
     }
   }, [isAuthenticated, isKpaContextLoaded, user, navigate, location.pathname, onLoginSuccess]);
 
