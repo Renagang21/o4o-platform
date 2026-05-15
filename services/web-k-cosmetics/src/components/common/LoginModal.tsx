@@ -17,15 +17,13 @@
  */
 
 import { useState, useEffect, FormEvent } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth, getKCosmeticsDashboardRoute } from '@/contexts/AuthContext';
+import { Link } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import { useLoginModal } from '@/contexts/LoginModalContext';
 
 const REMEMBER_EMAIL_KEY = 'kcosmetics_remember_email';
 
 export default function LoginModal() {
-  const navigate = useNavigate();
-  const location = useLocation();
   const { login } = useAuth();
   const { isLoginModalOpen, closeLoginModal, onLoginSuccess } = useLoginModal();
 
@@ -72,14 +70,7 @@ export default function LoginModal() {
       setPassword('');
       closeLoginModal();
 
-      // WO-K-COSMETICS-ROLE-BASED-LANDING-V1: 홈(/) 또는 /login에서 로그인한 경우 역할 기반 이동
-      if (location.pathname === '/' || location.pathname === '/login') {
-        const dashboardPath = result.roles?.length ? getKCosmeticsDashboardRoute(result.roles) : '/';
-        if (dashboardPath !== '/') {
-          navigate(dashboardPath);
-        }
-      }
-
+      // WO-O4O-POSTLOGINREDIRECT-CANONICALIZATION-V1: 역할 기반 redirect는 App.tsx PostLoginRedirect 담당.
       onLoginSuccess?.();
     } catch (err: any) {
       setError(err.message || '이메일 또는 비밀번호가 올바르지 않습니다.');
@@ -98,10 +89,7 @@ export default function LoginModal() {
         return;
       }
       closeLoginModal();
-      if (location.pathname === '/' || location.pathname === '/login') {
-        const dashboardPath = result.roles?.length ? getKCosmeticsDashboardRoute(result.roles) : '/';
-        if (dashboardPath !== '/') navigate(dashboardPath);
-      }
+      // WO-O4O-POSTLOGINREDIRECT-CANONICALIZATION-V1: 역할 기반 redirect는 App.tsx PostLoginRedirect 담당.
       onLoginSuccess?.();
     } catch (err: any) {
       setError(err.message || '빠른 로그인에 실패했습니다.');
