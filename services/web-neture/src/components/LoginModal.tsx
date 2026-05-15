@@ -14,7 +14,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Eye, EyeOff } from 'lucide-react';
-import { useAuth, getNetureDashboardRoute, useLoginModal } from '../contexts';
+import { useAuth, useLoginModal } from '../contexts';
 
 const REMEMBER_EMAIL_KEY = 'neture_remember_email';
 
@@ -60,30 +60,18 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
     };
   }, [isOpen, onClose]);
 
-  // WO-O4O-NETURE-LOGIN-RETURNURL-FIX-V1: workspace returnUrl 충돌 수정
-  // WO-O4O-ROLE-PRIORITY-FIX-V1: navigate를 onClose 전에 호출하여 모달 unmount에 의한 navigation 누락 방지
-  const handleLoginSuccess = (role?: string, roles?: string[]) => {
+  // WO-O4O-NETURE-POSTLOGINREDIRECT-CANONICAL-ALIGNMENT-V1:
+  // returnUrl만 LoginModal에서 처리. 역할 기반 redirect는 App.tsx PostLoginRedirect 담당.
+  const handleLoginSuccess = () => {
     if (rememberEmail) {
       localStorage.setItem(REMEMBER_EMAIL_KEY, email);
     } else {
       localStorage.removeItem(REMEMBER_EMAIL_KEY);
     }
 
-    const dashboardPath =
-      (roles && roles.length > 0)
-        ? getNetureDashboardRoute(roles)
-        : role
-          ? getNetureDashboardRoute([role])
-          : '/';
-
-    // 역할 우선순위 기반 리다이렉트 (admin > operator > ...)
-    // workspace 경로는 returnUrl보다 역할 우선
-    const targetPath = (returnUrl && !returnUrl.startsWith('/workspace/'))
-      ? returnUrl
-      : dashboardPath;
-
-    // navigate를 먼저 호출 — onClose()가 모달 unmount를 트리거해도 navigation 보장
-    navigate(targetPath);
+    if (returnUrl && !returnUrl.startsWith('/workspace/')) {
+      navigate(returnUrl);
+    }
     onClose();
   };
 
@@ -101,7 +89,7 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
         return;
       }
 
-      handleLoginSuccess(result.role, result.roles);
+      handleLoginSuccess();
     } catch (err) {
       // WO-AUTH-ERROR-MESSAGE-SANITIZATION-V1: 내부 오류(TypeError 등) 사용자 노출 차단
       console.error('[LoginModal] Login error:', err);

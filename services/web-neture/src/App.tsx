@@ -14,15 +14,15 @@
  * 5. Admin/Operator (/operator/*) - OperatorLayoutWrapper: 관리자 전용
  */
 
-import { lazy, Suspense, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { lazy, Suspense, useEffect, useRef } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 // WO-O4O-STORE-PRODUCTS-QUERYCLIENT-PROVIDER-ALIGN-V1
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1 } },
 });
-import { AuthProvider, LoginModalProvider, useLoginModal } from './contexts';
+import { AuthProvider, LoginModalProvider, useLoginModal, useAuth, getNetureDashboardRoute } from './contexts';
 import LoginModal from './components/LoginModal';
 import RegisterModal from './components/RegisterModal';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
@@ -490,6 +490,50 @@ function PageLoading() {
   );
 }
 
+// WO-O4O-NETURE-POSTLOGINREDIRECT-CANONICAL-ALIGNMENT-V1:
+// 로그인 직후 1회 역할 기반 redirect 수행.
+// / 또는 /login 경로에서만 동작. workspace 경로 early-exit.
+// returnUrl은 LoginModal에서 처리하므로 여기서는 미개입.
+function PostLoginRedirect() {
+  const { user, isAuthenticated, isLoading } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const wasAuthRef = useRef(isAuthenticated);
+  const didRedirectRef = useRef(false);
+
+  useEffect(() => {
+    const justLoggedIn = !wasAuthRef.current && isAuthenticated;
+    wasAuthRef.current = isAuthenticated;
+
+    if (!isAuthenticated) {
+      didRedirectRef.current = false;
+      return;
+    }
+    if (!justLoggedIn && !didRedirectRef.current) return;
+    if (isLoading || !user) return;
+    if (didRedirectRef.current) return;
+
+    // / 또는 /login 경로에서만 동작
+    if (location.pathname !== '/' && location.pathname !== '/login') {
+      didRedirectRef.current = true;
+      return;
+    }
+
+    // workspace 경로 early-exit
+    const WORKSPACE_PREFIXES = ['/supplier', '/operator', '/admin', '/partner', '/seller', '/account'];
+    if (WORKSPACE_PREFIXES.some(p => location.pathname.startsWith(p))) {
+      didRedirectRef.current = true;
+      return;
+    }
+
+    const target = getNetureDashboardRoute(user.roles ?? []);
+    didRedirectRef.current = true;
+    if (target && target !== '/') navigate(target, { replace: true });
+  }, [isAuthenticated, isLoading, user, navigate, location.pathname]);
+
+  return null;
+}
+
 // 인증 모달 렌더링 컴포넌트 (로그인 + 회원가입)
 function ModalRenderer() {
   const { activeModal, closeModal, loginReturnUrl } = useLoginModal();
@@ -548,6 +592,7 @@ function App() {
         <BrowserRouter>
           <SeoWatcher />
           <O4OToastProvider />
+          <PostLoginRedirect />
           <ModalRenderer />
           <Suspense fallback={<PageLoading />}>
             <Routes>
