@@ -38,7 +38,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   isSessionChecked: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; role?: UserRole }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; role?: UserRole; roles?: UserRole[] }>;
   logout: () => void;
   switchRole: (role: UserRole) => void;
   hasMultipleRoles: boolean;
@@ -76,7 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string; role?: UserRole }> => {
+  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string; role?: UserRole; roles?: UserRole[] }> => {
     try {
       setIsLoading(true);
 
@@ -90,7 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const memberships = (apiUser as any).memberships || [];
         setUser({ ...base, roles, memberships });
         setIsSessionChecked(true);
-        return { success: true, role: roles[0] };
+        return { success: true, role: roles[0], roles };
       }
 
       return { success: false, error: '로그인 응답이 올바르지 않습니다.' };

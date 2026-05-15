@@ -74,7 +74,7 @@ export default function LoginModal() {
 
       // WO-K-COSMETICS-ROLE-BASED-LANDING-V1: 홈(/) 또는 /login에서 로그인한 경우 역할 기반 이동
       if (location.pathname === '/' || location.pathname === '/login') {
-        const dashboardPath = result.role ? getKCosmeticsDashboardRoute([result.role]) : '/';
+        const dashboardPath = result.roles?.length ? getKCosmeticsDashboardRoute(result.roles) : '/';
         if (dashboardPath !== '/') {
           navigate(dashboardPath);
         }
@@ -99,7 +99,7 @@ export default function LoginModal() {
       }
       closeLoginModal();
       if (location.pathname === '/' || location.pathname === '/login') {
-        const dashboardPath = result.role ? getKCosmeticsDashboardRoute([result.role]) : '/';
+        const dashboardPath = result.roles?.length ? getKCosmeticsDashboardRoute(result.roles) : '/';
         if (dashboardPath !== '/') navigate(dashboardPath);
       }
       onLoginSuccess?.();

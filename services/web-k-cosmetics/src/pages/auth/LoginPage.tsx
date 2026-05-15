@@ -31,7 +31,7 @@ export default function LoginPage() {
         throw new Error(result.error || '로그인에 실패했습니다.');
       }
       // WO-K-COSMETICS-ROLE-BASED-LANDING-V1: 역할 기반 리다이렉트
-      navigate(returnUrl || (result.role ? getKCosmeticsDashboardRoute([result.role]) : '/'));
+      navigate(returnUrl || (result.roles?.length ? getKCosmeticsDashboardRoute(result.roles) : '/'));
     } catch (err) {
       setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
     } finally {
