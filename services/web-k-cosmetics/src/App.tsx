@@ -3,11 +3,11 @@
  * Based on GlycoPharm App structure
  */
 
-import { lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import { lazy, Suspense, useRef, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 // WO-O4O-STORE-PRODUCTS-QUERYCLIENT-PROVIDER-ALIGN-V1
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { AuthProvider, useAuth, getKCosmeticsDashboardRoute } from '@/contexts/AuthContext';
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1 } },
@@ -191,6 +191,52 @@ function StoreLayoutWrapper() {
       />
     </div>
   );
+}
+
+/**
+ * PostLoginRedirect — 로그인 이후 역할 기반 redirect
+ *
+ * WO-O4O-POSTLOGINREDIRECT-CANONICALIZATION-V1
+ *
+ * canonical 패턴 (KPA reference implementation 기반):
+ * - 로그인 직후 1회만 실행 (wasAuthRef + didRedirectRef 이중 가드)
+ * - / 또는 /login 에서만 redirect (기존 LoginModal '/' 가드 정책 유지)
+ * - returnUrl은 LoginPage에서 처리 (먼저 navigate하면 path가 변경되어 자동 bail)
+ * - workspace 경로 진입 시 early-exit
+ */
+function PostLoginRedirect() {
+  const { user, isAuthenticated, isSessionChecked } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const wasAuthRef = useRef(isAuthenticated);
+  const didRedirectRef = useRef(false);
+
+  useEffect(() => {
+    const justLoggedIn = !wasAuthRef.current && isAuthenticated;
+    wasAuthRef.current = isAuthenticated;
+
+    if (!isAuthenticated) { didRedirectRef.current = false; return; }
+    if (!justLoggedIn && !didRedirectRef.current) return;
+    if (!isSessionChecked || !user) return;
+    if (didRedirectRef.current) return;
+
+    // '/' 또는 '/login'에서만 redirect — 기존 LoginModal 가드 정책 유지
+    if (location.pathname !== '/' && location.pathname !== '/login') {
+      didRedirectRef.current = true; return;
+    }
+
+    // workspace 경로 early-exit
+    const WORKSPACE_PREFIXES = ['/store', '/operator', '/admin', '/partner', '/instructor'];
+    if (WORKSPACE_PREFIXES.some(p => location.pathname.startsWith(p))) {
+      didRedirectRef.current = true; return;
+    }
+
+    const target = getKCosmeticsDashboardRoute(user.roles ?? []);
+    didRedirectRef.current = true;
+    if (target && target !== '/') navigate(target, { replace: true });
+  }, [isAuthenticated, isSessionChecked, user, navigate, location.pathname]);
+
+  return null;
 }
 
 // App Routes
@@ -434,6 +480,8 @@ export default function App() {
           <LoginModalProvider>
             <O4OToastProvider />
             <LoginModal />
+            {/* WO-O4O-POSTLOGINREDIRECT-CANONICALIZATION-V1: 역할 기반 redirect 단일화 */}
+            <PostLoginRedirect />
             {/* WO-O4O-REFERENCE-DESIGN-IMPORT-V1: TemplateProvider 추가 */}
             <TemplateProvider template={templates[kcosmeticsConfig.template]}>
               <Suspense fallback={<PageLoading />}>
