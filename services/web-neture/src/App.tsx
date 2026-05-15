@@ -15,7 +15,7 @@
  */
 
 import { lazy, Suspense, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 // WO-O4O-STORE-PRODUCTS-QUERYCLIENT-PROVIDER-ALIGN-V1
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -505,24 +505,6 @@ function ModalRenderer() {
   );
 }
 
-// Legacy redirect helpers
-function RedirectSupplierDetail() {
-  return <Navigate to="/" replace />;
-}
-function RedirectPartnershipRequestDetail() {
-  const { id } = useParams();
-  return <Navigate to={`/workspace/partners/requests/${id}`} replace />;
-}
-function RedirectContentDetail() {
-  const { id } = useParams();
-  return <Navigate to={`/partner/contents/${id}`} replace />;
-}
-// WO-CLEANUP-2: /admin/market-trial/:id → /operator/market-trial/:id
-function RedirectAdminMarketTrialDetail() {
-  const { id } = useParams();
-  return <Navigate to={`/operator/market-trial/${id}`} replace />;
-}
-
 // /login 경로 접근 시 홈으로 리다이렉트하고 로그인 모달 열기
 function LoginRedirect() {
   const { openLoginModal } = useLoginModal();
@@ -546,13 +528,6 @@ function RegisterRedirect() {
   }, [openRegisterModal]);
 
   return <Navigate to="/" replace />;
-}
-
-// WO-O4O-NETURE-ROUTE-UNIFICATION-BIG-SWITCH-V1: Legacy /workspace/operator/* → /operator/*
-function WorkspaceOperatorRedirect() {
-  const location = useLocation();
-  const subpath = location.pathname.replace(/^\/workspace\/operator/, '');
-  return <Navigate to={`/operator${subpath}${location.search}`} replace />;
 }
 
 const ProtectedRoute = RoleGuard;
@@ -597,11 +572,8 @@ function App() {
               <Route path="/mypage" element={<MyPageHub />} />
               <Route path="/mypage/profile" element={<MyProfilePage />} />
               <Route path="/mypage/settings" element={<MySettingsPage />} />
-              <Route path="/my" element={<Navigate to="/mypage" replace />} />
               <Route path="/supplier" element={<SupplierLandingPage />} />
               <Route path="/partner" element={<PartnerLandingPage />} />
-              {/* WO-O4O-GLOBAL-MENU-UPDATE-V1: /about → /o4o redirect (backward compat) */}
-              <Route path="/about" element={<Navigate to="/o4o" replace />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/terms" element={<LegalPage slug="terms-of-service" title="이용약관" />} />
               <Route path="/privacy" element={<LegalPage slug="privacy-policy" title="개인정보처리방침" />} />
@@ -757,8 +729,6 @@ function App() {
               <Route path="/partner/stores" element={<RecruitingProductsPage />} />
               <Route path="/partner/commissions" element={<SettlementsPage />} />
               <Route path="/partner/promotions" element={<PromotionsPage />} />
-              <Route path="/partner/product-pool" element={<Navigate to="/partner/products" replace />} />
-              <Route path="/partner/referrals" element={<Navigate to="/partner/links" replace />} />
               <Route path="/partner/forum" element={<ForumPage title="파트너 포럼" description="파트너 간 소통 공간" basePath="/partner/forum" />} />
               <Route path="/partner/forum/write" element={<ForumWritePage backPath="/partner/forum" />} />
               <Route path="/partner/forum/post/:slug" element={<ForumPostPage basePath="/partner/forum" />} />
@@ -789,15 +759,6 @@ function App() {
                 ※ /o4o/* 는 NetureLayout으로 이동 (WO-O4O-ABOUT-URL-SEMANTIC-ALIGNMENT-V1)
             ================================================================ */}
             <Route element={<MainLayout />}>
-              {/* 레거시 redirect — /manual, /channel → /o4o/* */}
-              <Route path="/manual/concepts" element={<Navigate to="/o4o/concepts" replace />} />
-              <Route path="/manual/concepts/channel-map" element={<Navigate to="/o4o/channel-map" replace />} />
-              <Route path="/channel/structure" element={<Navigate to="/o4o/structure" replace />} />
-              <Route path="/channel/dental" element={<Navigate to="/o4o/channels/dental" replace />} />
-              <Route path="/channel/pharmacy" element={<Navigate to="/o4o/channels/pharmacy" replace />} />
-              <Route path="/channel/optical" element={<Navigate to="/o4o/channels/optical" replace />} />
-              <Route path="/channel/medical" element={<Navigate to="/o4o/channels/medical" replace />} />
-
               {/* 판매자 개요 */}
               <Route path="/seller/overview" element={<SellerOverviewPage />} />
               <Route path="/seller/overview/pharmacy" element={<SellerOverviewPharmacy />} />
@@ -841,7 +802,6 @@ function App() {
               <Route path="/workspace/partners/requests/new" element={<PartnershipRequestCreatePage />} />
               <Route path="/workspace/partners/requests/:id" element={<PartnershipRequestDetailPage />} />
               <Route path="/workspace/partners/info" element={<PartnerInfoPage />} />
-              <Route path="/workspace/platform/principles" element={<Navigate to="/o4o/principles" replace />} />
               <Route path="/workspace/my-content" element={<MyContentPage />} />
 
               {/* Workspace 포럼 */}
@@ -896,7 +856,6 @@ function App() {
               <Route path="/admin/roles" element={<RoleManagementPage />} />
               {/* WO-CLEANUP-2: /admin/market-trial → /operator/market-trial redirect */}
               <Route path="/admin/market-trial" element={<Navigate to="/operator/market-trial" replace />} />
-              <Route path="/admin/market-trial/:id" element={<RedirectAdminMarketTrialDetail />} />
               <Route path="/admin/categories" element={<CategoryManagementPage />} />
               <Route path="/admin/brands" element={<BrandManagementPage />} />
               <Route path="/admin/product-cleanup" element={<ProductDataCleanupPage />} />
@@ -988,9 +947,7 @@ function App() {
             {/* Workspace → 새 경로 */}
             <Route path="/workspace" element={<Navigate to="/" replace />} />
             <Route path="/workspace/suppliers" element={<Navigate to="/" replace />} />
-            <Route path="/workspace/suppliers/:slug" element={<RedirectSupplierDetail />} />
             <Route path="/workspace/content" element={<Navigate to="/partner/contents" replace />} />
-            <Route path="/workspace/content/:id" element={<RedirectContentDetail />} />
 
             {/* Supplier Dashboard 리다이렉트 */}
             <Route path="/workspace/supplier/dashboard" element={<Navigate to="/supplier" replace />} />
@@ -1011,9 +968,7 @@ function App() {
 
             {/* 기존 최상위 경로 리다이렉트 */}
             <Route path="/suppliers" element={<Navigate to="/" replace />} />
-            <Route path="/suppliers/:slug" element={<RedirectSupplierDetail />} />
             <Route path="/partners/requests" element={<Navigate to="/workspace/partners/requests" replace />} />
-            <Route path="/partners/requests/:id" element={<RedirectPartnershipRequestDetail />} />
             <Route path="/partners/info" element={<Navigate to="/workspace/partners/info" replace />} />
             <Route path="/platform/principles" element={<Navigate to="/o4o/principles" replace />} />
             {/* /content, /content/:id — NetureLayout 내 /content 라우트로 처리됨 (레거시 redirect 제거) */}
@@ -1025,7 +980,6 @@ function App() {
             <Route path="/workspace/admin" element={<Navigate to="/admin" replace />} />
             <Route path="/workspace/admin/*" element={<Navigate to="/admin" replace />} />
             <Route path="/workspace/operator" element={<Navigate to="/operator" replace />} />
-            <Route path="/workspace/operator/*" element={<WorkspaceOperatorRedirect />} />
 
             {/* Legacy supplier/partner 리다이렉트 */}
             <Route path="/supplier/dashboard" element={<Navigate to="/supplier" replace />} />

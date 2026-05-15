@@ -417,11 +417,6 @@ function RegisterRedirect() {
  * /select-function URL 접근 시 대시보드로 리다이렉트 + 모달 표시
  * (페이지 → 모달 전환 후 하위호환용)
  */
-/** Legacy /news/:id → / redirect (WO-KPA-CONTENT-HUB-REMOVAL-V1) */
-function NewsIdRedirect() {
-  return <Navigate to="/" replace />;
-}
-
 // WO-KPA-CONTENT-COURSES-LIST-V1: /content/courses/:id → /instructor/courses/:id (상세/편집).
 // Phase에서 ContentCourseDetailPage 도입 시 본 wrapper 제거.
 function ContentCourseDetailRedirect() {
@@ -541,8 +536,6 @@ function App() {
            * WO-KPA-SOCIETY-PHASE4-ADJUSTMENT-V1
            * ========================================================= */}
           <Route path="/" element={<AuthGate><Layout serviceName={SERVICE_NAME}><CommunityHomePage /></Layout></AuthGate>} />
-          {/* WO-KPA-SOCIETY-DASHBOARD-TO-MYPAGE-CONSOLIDATION-V1: 기존 북마크 호환 리다이렉트 */}
-          <Route path="/dashboard" element={<Navigate to="/mypage" replace />} />
 
           {/* WO-KPA-A-AUTH-UX-STATE-UNIFICATION-V1: 상태 기반 페이지 */}
           <Route path="/setup-activity" element={<ActivitySetupPage />} />
@@ -812,18 +805,10 @@ function App() {
           <Route path="/content/new/survey" element={<Navigate to="/content/surveys/new" replace />} />
           <Route path="/content/new/course" element={<Navigate to="/content/courses/new" replace />} />
           <Route path="/content/new/lecture" element={<Navigate to="/content/courses/new" replace />} />
-          {/* 퀴즈는 LMS 전용 (WO-KPA-CONTENT-QUIZ-REMOVE-V1) — /lms로 리다이렉트 */}
-          <Route path="/content/new/quiz" element={<Navigate to="/lms" replace />} />
 
           {/* Legacy redirects: /contents → /content */}
           <Route path="/contents" element={<Navigate to="/content" replace />} />
           <Route path="/content/notice" element={<Navigate to="/content" replace />} />
-          <Route path="/content/news" element={<Navigate to="/content" replace />} />
-
-          {/* Legacy redirect: /news → / */}
-          <Route path="/news" element={<Navigate to="/" replace />} />
-          <Route path="/news/notice" element={<Navigate to="/" replace />} />
-          <Route path="/news/:id" element={<NewsIdRedirect />} />
 
           {/* Course Hub & Intro (Public-facing) - WO-CONTENT-COURSE-HUB/INTRO */}
           <Route path="/courses" element={<Layout serviceName={SERVICE_NAME}><CourseHubPage /></Layout>} />
@@ -892,12 +877,8 @@ function App() {
           <Route path="/participation/:id/results" element={<Layout serviceName={SERVICE_NAME}><ParticipationResultPage /></Layout>} />
 
           {/* Event Offers (이벤트) */}
-          <Route path="/groupbuy" element={<Navigate to="/store-hub/event-offers" replace />} />
           <Route path="/event-offers" element={<Navigate to="/store-hub/event-offers" replace />} />
           <Route path="/event-offers/:id" element={<Layout serviceName={SERVICE_NAME}><PharmacyOwnerOnlyGuard><EventOfferDetailPage /></PharmacyOwnerOnlyGuard></Layout>} />
-
-          {/* Function Gate → /setup-activity 리다이렉트 (WO-KPA-A-AUTH-UX-STATE-UNIFICATION-V1) */}
-          <Route path="/select-function" element={<Navigate to="/setup-activity" replace />} />
 
           {/* Mobile Hub — WO-O4O-KPA-MOBILE-MENU-STRUCTURE-PHASE2-V1 */}
           <Route path="/mobile/pharmacy" element={<Layout serviceName={SERVICE_NAME}><MobilePharmacyPage /></Layout>} />

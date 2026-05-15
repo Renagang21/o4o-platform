@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 // WO-O4O-STORE-PRODUCTS-QUERYCLIENT-PROVIDER-ALIGN-V1
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -88,11 +88,6 @@ const SignageTemplatesPage = lazy(() => import('@/pages/operator/signage/Templat
 const SignageTemplateDetailPage = lazy(() => import('@/pages/operator/signage/TemplateDetailPage'));
 // WO-O4O-GLYCOPHARM-SIGNAGE-FORCED-CONTENT-V1
 const ForcedContentPage = lazy(() => import('@/pages/operator/signage/ForcedContentPage'));
-
-// Market Trial → Neture redirect
-// WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1:
-// Market Trial 실행은 Neture로 일원화. /store/market-trial/* 는 동일 경로의 Neture로 redirect.
-const MarketTrialNetureRedirect = lazy(() => import('@/components/common/MarketTrialNetureRedirect'));
 
 // B2B Order & Supply
 const B2BOrderPage = lazy(() => import('@/pages/store-management/b2b-order').then(m => ({ default: m.B2BOrderPage })));
@@ -335,12 +330,6 @@ function OperatorAreaLayout() {
   return <OperatorLayoutWrapper />;
 }
 
-/** /education/:id → /lms/:id (하위 호환 redirect) */
-function EducationRedirect() {
-  const { id } = useParams<{ id: string }>();
-  return <Navigate to={`/lms/${id}`} replace />;
-}
-
 // App Routes
 function AppRoutes() {
   return (
@@ -351,10 +340,6 @@ function AppRoutes() {
       <Route path="register" element={<RegisterPage />} />
       <Route path="forgot-password" element={<AccountRecoveryPage />} />
       <Route path="reset-password" element={<ResetPasswordPage />} />
-      {/* WO-O4O-GLYCOPHARM-ENTRYPOINT-AND-NAV-REALIGN-V1 + WO-O4O-GLYCO-STORE-CANONICAL-ENTRY-ALIGN-V1:
-          /pharmacy → /store (canonical 정렬) */}
-      <Route path="pharmacy" element={<Navigate to="/store" replace />} />
-
       {/* Public Routes with MainLayout */}
       <Route element={<MainLayout />}>
         <Route path="role-select" element={<RoleSelectPage />} />
@@ -373,9 +358,6 @@ function AppRoutes() {
         {/* WO-O4O-GLYCOPHARM-HOME-KPA-ALIGNMENT-V1: /lms 통일 */}
         <Route path="lms" element={<EducationPage />} />
         <Route path="lms/:id" element={<CourseDetailPage />} />
-        {/* /education → /lms redirect (하위 호환) */}
-        <Route path="education" element={<Navigate to="/lms" replace />} />
-        <Route path="education/:id" element={<EducationRedirect />} />
         {/* WO-O4O-GLYCOPHARM-CONTENT-RESOURCES-ROUTE-ALIGNMENT-V1: top-level canonical paths */}
         <Route path="content" element={<HubContentListPage />} />
         <Route path="resources" element={<ResourcesPage />} />
@@ -407,12 +389,8 @@ function AppRoutes() {
         <Route path="apply/my-applications" element={<MyApplicationsPage />} />
         {/* B2B Supply */}
         <Route path="b2b/supply" element={<SupplyPage />} />
-        {/* Signage → Store canonical redirect (WO-O4O-GLYCOPHARM-SIGNAGE-STRUCTURE-ALIGNMENT-TO-KPA-V1) */}
-        <Route path="signage" element={<Navigate to="/store/signage/library" replace />} />
         {/* Hub Exploration — sidebar layout (WO-O4O-GLYCOPHARM-KPA-STYLE-UX-REFINE-P1-V1) */}
         {/* WO-O4O-HUB-TO-STORE-HUB-RENAMING-V1: /hub → /store-hub */}
-        <Route path="hub" element={<Navigate to="/store-hub" replace />} />
-        <Route path="hub/*" element={<Navigate to="/store-hub" replace />} />
         <Route path="store-hub" element={<GlycoPharmHubLayout />}>
           <Route index element={<GlycoStoreHubPage />} />
           <Route path="b2b" element={<HubB2BCatalogPage />} />
@@ -458,11 +436,6 @@ function AppRoutes() {
         <Route index element={<ServiceDashboardPage />} />
         <Route path="dashboard" element={<ServiceDashboardPage />} />
       </Route>
-
-      {/* Backward compat: /pharmacist → /store (레거시 북마크 대응)
-          WO-O4O-GLYCO-STORE-CANONICAL-ENTRY-ALIGN-V1: /store/hub → /store 로 정렬 */}
-      <Route path="pharmacist" element={<Navigate to="/store" replace />} />
-      <Route path="pharmacist/*" element={<Navigate to="/store" replace />} />
 
       {/* Supplier Dashboard - Neture에서 관리 */}
       <Route
@@ -603,13 +576,9 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       >
-        {/* WO-O4O-GLYCO-STORE-CANONICAL-ENTRY-ALIGN-V1:
-            /store 인덱스 = 운영 홈 (canonical). /store/hub 는 backward compat redirect. */}
+        {/* WO-O4O-GLYCO-STORE-CANONICAL-ENTRY-ALIGN-V1: /store 인덱스 = 운영 홈 (canonical). */}
         <Route index element={<StoreOverviewPage />} />
-        <Route path="hub" element={<Navigate to="/store" replace />} />
         <Route path="identity" element={<StoreMainPage />} />
-        {/* WO-O4O-STORE-PRODUCTS-UI-CANONICAL-ALIGNMENT-V2: /store/my-products 로 통일 */}
-        <Route path="products" element={<Navigate to="/store/my-products" replace />} />
         {/* WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: 내 매장 상품 (ProductMaster + Listing).
             상위 ProtectedRoute 가 PHARMACIST 게이트 — 추가로 store_owner/admin 만 통과시킨다. */}
         <Route path="my-products" element={
@@ -644,10 +613,6 @@ function AppRoutes() {
         <Route path="signage/media/:id" element={<SignageMediaDetailPage />} />
         <Route path="signage/preview" element={<SignagePreviewPage />} />
         {/* Extensions */}
-        {/* WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1:
-            Market Trial 실행은 Neture로 일원화. URL은 호환을 위해 유지하고 redirect 처리. */}
-        <Route path="market-trial" element={<MarketTrialNetureRedirect />} />
-        <Route path="market-trial/:id" element={<MarketTrialNetureRedirect />} />
         <Route path="b2b-order" element={<B2BOrderPage />} />
         <Route path="requests" element={<CustomerRequestsPage />} />
         <Route path="funnel" element={<FunnelPage />} />

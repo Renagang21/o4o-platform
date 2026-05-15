@@ -4,7 +4,7 @@
  */
 
 import { lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 // WO-O4O-STORE-PRODUCTS-QUERYCLIENT-PROVIDER-ALIGN-V1
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
@@ -122,11 +122,6 @@ import { useStoreCapabilities } from './hooks/useStoreCapabilities';
 
 // Store Settings (WO-STORE-COMMON-SETTINGS-KCOS-UI-V1)
 const StoreSettingsPage = lazy(() => import('@/pages/store/StoreSettingsPage'));
-
-// Market Trial → Neture redirect
-// WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1:
-// Market Trial 실행은 Neture로 일원화. /store/market-trial 은 Neture로 redirect.
-const MarketTrialNetureRedirect = lazy(() => import('@/components/common/MarketTrialNetureRedirect'));
 
 // Operator Dashboard Pages
 const KCosmeticsOperatorDashboard = lazy(() => import('@/pages/operator/KCosmeticsOperatorDashboard'));
@@ -324,8 +319,7 @@ function AppRoutes() {
         <Route path="b2b/supply" element={<SupplyPage />} />
 
         {/* Hub (WO-O4O-STOREHUB-STRUCTURE-ALIGNMENT-V1: KCosmeticsHubLayout + nested routes) */}
-        {/* WO-O4O-HUB-TO-STORE-HUB-RENAMING-V1: /hub → /store-hub */}
-        <Route path="hub" element={<Navigate to="/store-hub" replace />} />
+        {/* WO-O4O-HUB-TO-STORE-HUB-RENAMING-V1: /hub → /store-hub canonical */}
         <Route path="store-hub" element={<KCosmeticsHubLayout />}>
           <Route index element={<KCosmeticsHubPage />} />
           <Route path="b2b" element={<HubB2BPage />} />
@@ -435,8 +429,6 @@ function AppRoutes() {
         }
       >
         <Route index element={<StoreCockpitPage />} />
-        {/* WO-O4O-STORE-PRODUCTS-UI-CANONICAL-ALIGNMENT-V2: /store/my-products 로 통일 */}
-        <Route path="products" element={<Navigate to="/store/my-products" replace />} />
         {/* WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: 내 매장 상품 (ProductMaster + Listing).
             상위 ProtectedRoute 가 cosmetics:store_owner 포함 게이트. */}
         <Route path="my-products" element={<StoreProductsManagerPage />} />
@@ -448,9 +440,6 @@ function AppRoutes() {
         <Route path="orders" element={<StorePlaceholderPage title="주문 관리" />} />
         <Route path="billing" element={<StorePlaceholderPage title="정산/인보이스" />} />
         <Route path="content" element={<StorePlaceholderPage title="콘텐츠 관리" />} />
-        {/* WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1:
-            Market Trial 실행은 Neture로 일원화. URL은 호환을 위해 유지하고 redirect 처리. */}
-        <Route path="market-trial" element={<MarketTrialNetureRedirect />} />
         {/* Interest 관리 (WO-O4O-TABLET-INTEREST-UX-REFACTOR-V1) */}
         <Route path="interest-requests" element={<InterestRequestsPage />} />
         <Route path="settings" element={<StoreSettingsPage />} />
