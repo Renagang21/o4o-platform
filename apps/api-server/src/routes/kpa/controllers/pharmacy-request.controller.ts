@@ -180,6 +180,16 @@ export function createPharmacyRequestRoutes(
         return res.status(400).json({ success: false, error: '이미 처리된 신청입니다.', code: 'ALREADY_PROCESSED' });
       }
 
+      // WO-O4O-PHARMACY-REQUEST-SELFAPPROVE-GUARD-V1: 셀프 승인 차단
+      if (request.user_id === user.id) {
+        console.warn('[PharmacyRequest] Self-approval attempt blocked', { userId: user.id, requestId: req.params.id });
+        return res.status(403).json({
+          success: false,
+          error: '자기 자신의 약국 개설 신청은 직접 승인할 수 없습니다.',
+          code: 'SELF_APPROVE_DENIED',
+        });
+      }
+
       // Update request status
       request.status = 'approved';
       request.approved_by = user.id;
