@@ -187,7 +187,21 @@ export class HandoffController extends BaseController {
       );
 
       if (existing.length > 0) {
-        // Reactivate if inactive
+        // WO-O4O-HANDOFF-INACTIVE-MEMBERSHIP-BLOCK-V1: block withdrawn (inactive) memberships
+        if (existing[0].status === 'inactive') {
+          logger.warn('[Handoff] Blocked reactivation of inactive (withdrawn) membership', {
+            userId: user.id,
+            serviceKey,
+          });
+          return BaseController.error(
+            res,
+            '이 서비스는 탈퇴 처리된 상태입니다. 다시 이용하려면 가입 신청을 진행하세요.',
+            403,
+            'MEMBERSHIP_INACTIVE',
+          );
+        }
+
+        // Reactivate if pending/rejected/suspended
         if (existing[0].status !== 'active') {
           await AppDataSource.query(
             `UPDATE service_memberships SET status = 'active', updated_at = NOW() WHERE id = $1`,
