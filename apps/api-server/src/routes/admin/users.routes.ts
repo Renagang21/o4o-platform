@@ -7,7 +7,7 @@
 import { Router } from 'express';
 import { AdminUserController } from '../../controllers/admin/AdminUserController.js';
 import { authenticate } from '../../middleware/auth.middleware.js';
-import { requireRole, requireAdmin } from '../../middleware/auth.middleware.js';
+import { requireRole } from '../../middleware/auth.middleware.js';
 import { body } from 'express-validator';
 
 const router: Router = Router();
@@ -37,9 +37,9 @@ router.get('/', requireRole(ADMIN_ROLES), adminUserController.getUsers);
 router.get('/statistics', requireRole(ADMIN_ROLES), adminUserController.getUserStatistics);
 router.get('/:id', requireRole(ADMIN_ROLES), adminUserController.getUser);
 
-// User creation (admin only)
+// User creation (admin only) — IR-O4O-ADMIN-OPERATOR-CREATE-SUPERADMIN-AUTH-FAILURE-V1
 router.post('/',
-  requireAdmin,
+  requireRole(ADMIN_ROLES),
   [
     body('email').isEmail().withMessage('Valid email is required'),
     body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
@@ -78,8 +78,8 @@ router.patch('/:id/status',
   adminUserController.updateUserStatus
 );
 
-// User deletion (admin only)
-router.delete('/:id', requireAdmin, adminUserController.deleteUser);
+// User deletion (admin only) — IR-O4O-ADMIN-OPERATOR-CREATE-SUPERADMIN-AUTH-FAILURE-V1
+router.delete('/:id', requireRole(ADMIN_ROLES), adminUserController.deleteUser);
 
 // WO-O4O-ADMIN-OPERATOR-ROLE-REVOKE-AND-SUPERADMIN-GUARD-V1
 // 단일 역할 해제 — 계정 삭제/비활성화 없이 role_assignments만 비활성화
