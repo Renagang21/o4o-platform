@@ -41,6 +41,9 @@ const HubNoticeListPage = lazy(() => import('@/pages/kpa/HubNoticeListPage'));
 // KPA Force Asset Console (WO-O4O-ADMIN-FORCE-ASSET-CONSOLE-V1)
 const AdminForceAssetPage = lazy(() => import('@/pages/kpa/AdminForceAssetPage'));
 
+// KPA Snapshot Browser (WO-O4O-KPA-ADMIN-SNAPSHOT-BROWSE-V1)
+const AdminSnapshotBrowserPage = lazy(() => import('@/pages/kpa/AdminSnapshotBrowserPage'));
+
 // Loading component
 const PageLoader = () => (
   <div className="flex items-center justify-center h-screen">
@@ -197,6 +200,15 @@ export function PlatformRoutes() {
       <AdminProtectedRoute requiredRoles={['admin', 'super_admin']}>
         <Suspense fallback={<PageLoader />}>
           <AdminForceAssetPage />
+        </Suspense>
+      </AdminProtectedRoute>
+    } />,
+
+    // Snapshot Browser (WO-O4O-KPA-ADMIN-SNAPSHOT-BROWSE-V1)
+    <Route key="/operator/kpa/snapshots" path="/operator/kpa/snapshots" element={
+      <AdminProtectedRoute requiredRoles={['admin', 'super_admin']}>
+        <Suspense fallback={<PageLoader />}>
+          <AdminSnapshotBrowserPage />
         </Suspense>
       </AdminProtectedRoute>
     } />,

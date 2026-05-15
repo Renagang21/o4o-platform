@@ -283,6 +283,19 @@ export const adminMenuStatic: MenuItem[] = [
         icon: <LayoutDashboard className="w-4 h-4" />,
         path: '/admin/yaksa-hub',
       },
+      // WO-O4O-KPA-ADMIN-SNAPSHOT-BROWSE-V1
+      {
+        id: 'yaksa-snapshots',
+        label: '공급 자산 조회',
+        icon: <Layers className="w-4 h-4" />,
+        path: '/operator/kpa/snapshots',
+      },
+      {
+        id: 'yaksa-force-assets',
+        label: 'Force Asset 관리',
+        icon: <Shield className="w-4 h-4" />,
+        path: '/operator/kpa/force-assets',
+      },
     ],
   },
 

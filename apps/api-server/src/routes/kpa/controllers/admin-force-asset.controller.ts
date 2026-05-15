@@ -373,8 +373,11 @@ export function createAdminForceAssetController(
   /**
    * GET /admin/snapshots
    *
-   * Admin-only: list all asset snapshots for force-deploy selection.
-   * Query: ?search=  &type=cms|signage|content|resource|lesson  &page=1  &limit=20
+   * Admin-only: list all asset snapshots (browse + force-deploy selection).
+   * Query: ?search=  &type=  &organizationId=  &page=1  &limit=20
+   *
+   * Returns force_count (total controls), forced_count (is_forced=true controls) per snapshot.
+   * WO-O4O-KPA-ADMIN-SNAPSHOT-BROWSE-V1: organizationId filter + force stats added.
    */
   router.get(
     '/snapshots',
@@ -383,6 +386,7 @@ export function createAdminForceAssetController(
       try {
         const search = (req.query.search as string | undefined)?.trim();
         const assetType = req.query.type as string | undefined;
+        const organizationId = req.query.organizationId as string | undefined;
         const page = Math.max(1, parseInt(req.query.page as string) || 1);
         const limit = Math.min(50, Math.max(1, parseInt(req.query.limit as string) || 20));
         const offset = (page - 1) * limit;
@@ -406,6 +410,13 @@ export function createAdminForceAssetController(
           countConditions.push(`s.asset_type = $${ci}`);
           dataParams.push(assetType);
           countParams.push(assetType);
+          di++; ci++;
+        }
+        if (organizationId) {
+          dataConditions.push(`s.organization_id = $${di}`);
+          countConditions.push(`s.organization_id = $${ci}`);
+          dataParams.push(organizationId);
+          countParams.push(organizationId);
         }
 
         const dataWhere = dataConditions.length > 0 ? `WHERE ${dataConditions.join(' AND ')}` : '';
@@ -422,11 +433,23 @@ export function createAdminForceAssetController(
                s.title,
                s.asset_type AS "assetType",
                s.source_service AS "sourceService",
+               s.source_asset_id AS "sourceAssetId",
                s.organization_id AS "organizationId",
                o.name AS "organizationName",
-               s.created_at AS "createdAt"
+               s.created_by AS "createdBy",
+               s.created_at AS "createdAt",
+               COALESCE(fc.total_controls, 0)::int AS "totalControls",
+               COALESCE(fc.forced_controls, 0)::int AS "forcedControls"
              FROM o4o_asset_snapshots s
              LEFT JOIN organizations o ON o.id = s.organization_id
+             LEFT JOIN (
+               SELECT
+                 snapshot_id,
+                 COUNT(*)::int AS total_controls,
+                 COUNT(*) FILTER (WHERE is_forced = true)::int AS forced_controls
+               FROM kpa_store_asset_controls
+               GROUP BY snapshot_id
+             ) fc ON fc.snapshot_id = s.id
              ${dataWhere}
              ORDER BY s.created_at DESC
              LIMIT $1 OFFSET $2`,

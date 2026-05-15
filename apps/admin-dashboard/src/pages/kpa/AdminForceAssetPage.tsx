@@ -504,7 +504,7 @@ export default function AdminForceAssetPage() {
     <div className="p-6 space-y-6">
       <PageHeader
         title="Force Asset 관리"
-        description="특정 매장에 Asset을 강제 배포하고 관리합니다."
+        subtitle="특정 매장에 Asset을 강제 배포하고 관리합니다."
       />
 
       {/* Filters */}
