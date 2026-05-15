@@ -17,5 +17,14 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-o4o': ['@o4o/ui', '@o4o/auth-utils', '@o4o/types'],
+          'vendor-common': ['lucide-react', '@tanstack/react-query', 'axios'],
+        },
+      },
+    },
   },
 });
