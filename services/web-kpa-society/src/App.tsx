@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { useEffect, useState, useRef, lazy, Suspense } from 'react';
 // WO-O4O-STORE-PRODUCTS-QUERYCLIENT-PROVIDER-ALIGN-V1
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -62,6 +62,8 @@ const ContentParticipantsPage = lazy(() => import('./pages/instructor/ContentPar
 const LessonSubmissionsPage = lazy(() => import('./pages/instructor/courses/LessonSubmissionsPage'));
 // WO-KPA-INSTRUCTOR-DASHBOARD-SIDEBAR-LAYOUT-V1: 강사 영역 사이드바 레이아웃
 import { InstructorLayout } from './components/instructor/InstructorLayout';
+import { RoleGuard } from './components/auth/RoleGuard';
+import { ROLES } from './lib/role-constants';
 
 // Events pages — Phase 2 lazy
 const EventsHomePage = lazy(() => import('./pages/events/EventsHomePage').then(m => ({ default: m.EventsHomePage })));
@@ -728,16 +730,27 @@ function App() {
           <Route path="/instructors/:userId" element={<Layout serviceName={SERVICE_NAME}><InstructorProfilePage /></Layout>} />
 
           {/* Instructor Dashboard - WO-O4O-INSTRUCTOR-DASHBOARD-V1
-              WO-KPA-INSTRUCTOR-DASHBOARD-SIDEBAR-LAYOUT-V1: Layout → InstructorLayout(사이드바+본문) */}
-          <Route path="/instructor" element={<InstructorLayout><InstructorDashboardPage /></InstructorLayout>} />
-          <Route path="/instructor/courses" element={<InstructorLayout><CourseListPage /></InstructorLayout>} />
-          <Route path="/instructor/courses/new" element={<InstructorLayout><CourseNewPage /></InstructorLayout>} />
-          <Route path="/instructor/courses/:id" element={<InstructorLayout><CourseEditPage /></InstructorLayout>} />
-          <Route path="/instructor/dashboard" element={<InstructorLayout><InstructorCourseDashboardPage /></InstructorLayout>} />
-          {/* WO-O4O-MARKETING-CONTENT-OPERATIONS-MVP-V1 */}
-          <Route path="/instructor/contents/:courseId/participants" element={<InstructorLayout><ContentParticipantsPage /></InstructorLayout>} />
-          {/* WO-O4O-LMS-ASSIGNMENT-GRADING-V1: 과제 채점 */}
-          <Route path="/instructor/courses/:courseId/lessons/:lessonId/submissions" element={<InstructorLayout><LessonSubmissionsPage /></InstructorLayout>} />
+              WO-KPA-INSTRUCTOR-DASHBOARD-SIDEBAR-LAYOUT-V1: Layout → InstructorLayout(사이드바+본문)
+              WO-O4O-INSTRUCTOR-ROUTE-GUARD-V1: RoleGuard — lms:instructor / kpa:admin / platform:super_admin 전용 */}
+          <Route element={
+            <RoleGuard
+              allowedRoles={[ROLES.LMS_INSTRUCTOR, ROLES.KPA_ADMIN, ROLES.PLATFORM_SUPER_ADMIN]}
+              accessDeniedMessage="강사 권한이 필요합니다. 강사 신청 후 심사를 받으세요."
+              enforceMembership={false}
+            >
+              <Outlet />
+            </RoleGuard>
+          }>
+            <Route path="/instructor" element={<InstructorLayout><InstructorDashboardPage /></InstructorLayout>} />
+            <Route path="/instructor/courses" element={<InstructorLayout><CourseListPage /></InstructorLayout>} />
+            <Route path="/instructor/courses/new" element={<InstructorLayout><CourseNewPage /></InstructorLayout>} />
+            <Route path="/instructor/courses/:id" element={<InstructorLayout><CourseEditPage /></InstructorLayout>} />
+            <Route path="/instructor/dashboard" element={<InstructorLayout><InstructorCourseDashboardPage /></InstructorLayout>} />
+            {/* WO-O4O-MARKETING-CONTENT-OPERATIONS-MVP-V1 */}
+            <Route path="/instructor/contents/:courseId/participants" element={<InstructorLayout><ContentParticipantsPage /></InstructorLayout>} />
+            {/* WO-O4O-LMS-ASSIGNMENT-GRADING-V1: 과제 채점 */}
+            <Route path="/instructor/courses/:courseId/lessons/:lessonId/submissions" element={<InstructorLayout><LessonSubmissionsPage /></InstructorLayout>} />
+          </Route>
 
           {/* LMS (교육/강의) — WO-O4O-LMS-CANONICAL-ROUTE-ALIGN-V1: /lms canonical → LmsCoursesPage */}
           <Route path="/lms" element={<Layout serviceName={SERVICE_NAME}><LmsCoursesPage /></Layout>} />
