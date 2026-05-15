@@ -34,11 +34,11 @@ import SlotFormModal from './SlotFormModal';
 import SlotContentAssignment from './SlotContentAssignment';
 
 // Available services
+// WO-O4O-GLUCOSEVIEW-RESIDUAL-CLEANUP-PHASE1-V1: GlucoseView 폐지 — 필터 옵션 제거
 const SERVICES = [
   { value: '', label: 'All Services' },
   { value: 'glycopharm', label: 'Glycopharm' },
   { value: 'kpa', label: 'KPA Society' },
-  { value: 'glucoseview', label: 'GlucoseView' },
   { value: 'neture', label: 'Neture' },
   { value: 'k-cosmetics', label: 'K-Cosmetics' },
 ];

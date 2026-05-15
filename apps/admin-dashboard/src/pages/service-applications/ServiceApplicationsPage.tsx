@@ -1,8 +1,10 @@
 /**
  * Service Applications List Page
  *
- * 서비스 신청 목록 페이지 (glycopharm, glucoseview 공통)
+ * 서비스 신청 목록 페이지 (glycopharm)
  * URL: /admin/service-applications/:service
+ *
+ * WO-O4O-GLUCOSEVIEW-RESIDUAL-CLEANUP-PHASE1-V1: GlucoseView 폐지 — 분기 제거.
  */
 
 import { useState, useEffect } from 'react';
@@ -53,7 +55,8 @@ export default function ServiceApplicationsPage() {
   const [total, setTotal] = useState(0);
 
   // Validate service type
-  const validService = service === 'glycopharm' || service === 'glucoseview' ? service as ServiceType : null;
+  // WO-O4O-GLUCOSEVIEW-RESIDUAL-CLEANUP-PHASE1-V1: 'glucoseview' 분기 제거
+  const validService = service === 'glycopharm' ? service as ServiceType : null;
 
   useEffect(() => {
     if (validService) {

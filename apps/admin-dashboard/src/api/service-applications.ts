@@ -1,11 +1,14 @@
 /**
  * Service Applications Admin API Client
  *
- * 서비스 신청 관리 통합 API (glycopharm, glucoseview)
+ * 서비스 신청 관리 통합 API
  *
  * API 경로:
  * - Glycopharm: /api/v1/glycopharm/applications/*
- * - GlucoseView: /api/v1/glucoseview/applications/*
+ *
+ * WO-O4O-GLUCOSEVIEW-RESIDUAL-CLEANUP-PHASE1-V1:
+ *   GlucoseView 폐지 — ServiceType union / case 분기 / SERVICE_LABELS / SERVICE_TYPE_LABELS 에서 제거.
+ *   백엔드 /api/v1/glucoseview/applications 라우트는 이미 부재 — 호출 시 404 발생을 사전 차단.
  */
 
 import { authClient } from '@o4o/auth-client';
@@ -14,12 +17,11 @@ const api = authClient.api;
 
 // ==================== Types ====================
 
-export type ServiceType = 'glycopharm' | 'glucoseview';
+export type ServiceType = 'glycopharm';
 
 export type ApplicationStatus = 'submitted' | 'approved' | 'rejected';
 
 export type GlycopharmServiceType = 'nps' | 'erp_integration';
-export type GlucoseViewServiceType = 'cgm_view';
 
 export interface ServiceApplication {
   id: string;
@@ -87,8 +89,6 @@ function getApiBasePath(service: ServiceType): string {
   switch (service) {
     case 'glycopharm':
       return '/api/v1/glycopharm/applications';
-    case 'glucoseview':
-      return '/api/v1/glucoseview/applications';
     default:
       throw new Error(`Unknown service type: ${service}`);
   }
@@ -163,15 +163,12 @@ export const APPLICATION_STATUS_COLORS: Record<ApplicationStatus, { bg: string; 
 
 export const SERVICE_LABELS: Record<ServiceType, string> = {
   glycopharm: 'GlycoPharm',
-  glucoseview: 'GlucoseView',
 };
 
 export const SERVICE_TYPE_LABELS: Record<string, string> = {
   // Glycopharm
   nps: 'NPS 서비스',
   erp_integration: 'ERP 연동',
-  // GlucoseView
-  cgm_view: 'CGM View',
 };
 
 export function getServiceTypeLabel(serviceType: string): string {
