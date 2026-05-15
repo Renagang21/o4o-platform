@@ -47,6 +47,20 @@ export interface DeleteMemberParams {
   mode?: 'soft' | 'hard';
 }
 
+// WO-O4O-USER-WITHDRAW-LIFECYCLE-V1
+export interface WithdrawMemberParams {
+  userId: string;
+  withdrawnBy: string | null;
+  isPlatformAdmin: boolean;
+  serviceKeys: string[];
+}
+
+export interface WithdrawResult {
+  inactivatedMemberships: number;
+  deactivatedRoles: string[];
+  userId: string;
+}
+
 // WO-O4O-USER-MEMBERSHIP-REACTIVATION-V1
 export interface SuspendParams {
   userId: string;
@@ -545,6 +559,187 @@ export class MembershipApprovalService {
       const err = error instanceof Error ? error : new Error(String(error));
       logger.error('[REACTIVATE][FAILED]', {
         userId, reactivatedBy,
+        errorMessage: err.message,
+        errorCode: (error as any)?.code,
+        errorDetail: (error as any)?.detail,
+        stack: err.stack,
+      });
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  /**
+   * Withdraw a member from specific service(s) — canonical service leave lifecycle.
+   * WO-O4O-USER-WITHDRAW-LIFECYCLE-V1
+   *
+   * Policy:
+   * - service_memberships.status = 'inactive' (접근 차단, Core enum 재사용)
+   * - role_assignments: deactivate service-prefix roles only
+   * - kpa_members: status/identity_status = 'withdrawn' (KPA domain profile sync)
+   * - organization_members: role='member' → remove (KPA scope); owner/admin → log only
+   * - users.status: 변경하지 않음 (로그인 유지 — MembershipGate가 접근 차단)
+   * - 다른 서비스 membership/role: 영향 없음
+   *
+   * Returns result with counts, or null if no eligible memberships found.
+   */
+  async withdrawMembership(params: WithdrawMemberParams): Promise<WithdrawResult | null> {
+    const { userId, withdrawnBy, isPlatformAdmin, serviceKeys } = params;
+    const queryRunner = AppDataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      // STEP0: SELECT eligible memberships FOR UPDATE
+      logger.info('[WITHDRAW][STEP0] SELECT eligible memberships FOR UPDATE', {
+        userId, withdrawnBy, isPlatformAdmin, serviceKeys,
+      });
+
+      const selectResult = isPlatformAdmin
+        ? await queryRunner.query(
+            `SELECT id, user_id, service_key, role, status
+             FROM service_memberships
+             WHERE user_id = $1 AND status IN ('pending', 'active', 'suspended')
+             FOR UPDATE`,
+            [userId]
+          )
+        : await queryRunner.query(
+            `SELECT id, user_id, service_key, role, status
+             FROM service_memberships
+             WHERE user_id = $1 AND status IN ('pending', 'active', 'suspended')
+               AND service_key = ANY($2)
+             FOR UPDATE`,
+            [userId, serviceKeys]
+          );
+
+      if (!selectResult || selectResult.length === 0) {
+        logger.warn('[WITHDRAW][STEP0] no eligible memberships found', {
+          userId, isPlatformAdmin, serviceKeys,
+        });
+        await queryRunner.rollbackTransaction();
+        return null;
+      }
+
+      const membershipIds = selectResult.map((m: any) => m.id);
+      const affectedServiceKeys: string[] = Array.from(new Set(selectResult.map((m: any) => m.service_key as string)));
+
+      logger.info('[WITHDRAW][STEP0] memberships locked', {
+        userId, count: selectResult.length, affectedServiceKeys,
+      });
+
+      // STEP1: Set service_memberships.status = 'inactive'
+      // 'inactive'는 Core freeze 내 기존 값 재사용 — 새 enum 추가 금지
+      logger.info('[WITHDRAW][STEP1] membership INACTIVATE', { membershipIds });
+
+      await queryRunner.query(
+        `UPDATE service_memberships SET status = 'inactive', updated_at = NOW() WHERE id = ANY($1)`,
+        [membershipIds]
+      );
+
+      // STEP2: Deactivate service-prefix role_assignments
+      // Platform roles (super_admin, admin, operator) 는 prefix 매핑에 없으므로 건드리지 않음
+      const SERVICE_ROLE_PREFIXES: Record<string, string> = {
+        'kpa-society': 'kpa:',
+        'k-cosmetics': 'cosmetics:',
+        'glycopharm': 'glycopharm:',
+        'neture': 'neture:',
+      };
+
+      const deactivatedRoles: string[] = [];
+      const prefixesToClean = affectedServiceKeys
+        .map((k) => SERVICE_ROLE_PREFIXES[k])
+        .filter(Boolean);
+
+      for (const prefix of prefixesToClean) {
+        logger.info('[WITHDRAW][STEP2] role DEACTIVATE', { userId, prefix });
+
+        await queryRunner.query(
+          `UPDATE role_assignments SET is_active = false, updated_at = NOW()
+           WHERE user_id = $1 AND role LIKE $2 AND is_active = true`,
+          [userId, `${prefix}%`]
+        );
+        deactivatedRoles.push(prefix);
+      }
+
+      // STEP3: Domain profile sync — KPA 전용
+      // kpa_members.status='withdrawn', identity_status='withdrawn'
+      // 다른 서비스 profile 테이블 sync 는 추후 별도 WO
+      const hasKpaSociety = affectedServiceKeys.includes('kpa-society');
+      if (hasKpaSociety) {
+        logger.info('[WITHDRAW][STEP3] kpa_members projection sync', { userId });
+
+        await queryRunner.query(
+          `UPDATE kpa_members
+           SET status = 'withdrawn', identity_status = 'withdrawn', updated_at = NOW()
+           WHERE user_id = $1 AND status NOT IN ('withdrawn')`,
+          [userId]
+        );
+      }
+
+      // STEP4: organization_members — service-scoped 정리
+      // Policy: role='member' → 제거 (KPA org scope만)
+      //         owner/admin/operator → 유지 + AUDIT warning
+      // Store ownership 자동 이전 금지. Orphan resolution 금지.
+      if (hasKpaSociety) {
+        logger.info('[WITHDRAW][STEP4] organization_members cleanup (KPA scope)', { userId });
+
+        // KPA org linkage: kpa_members.organization_id
+        const kpaOrgRows = await queryRunner.query(
+          `SELECT organization_id FROM kpa_members WHERE user_id = $1 AND organization_id IS NOT NULL LIMIT 1`,
+          [userId]
+        );
+
+        if (kpaOrgRows.length > 0) {
+          const kpaOrgId = kpaOrgRows[0].organization_id;
+
+          // 일반 member: 제거
+          await queryRunner.query(
+            `DELETE FROM organization_members
+             WHERE user_id = $1 AND organization_id = $2 AND role = 'member'`,
+            [userId, kpaOrgId]
+          );
+
+          // Non-member (owner/admin/operator): 유지, AUDIT 로그
+          const nonMemberRows = await queryRunner.query(
+            `SELECT id, role FROM organization_members
+             WHERE user_id = $1 AND organization_id = $2 AND role != 'member'`,
+            [userId, kpaOrgId]
+          );
+
+          if (nonMemberRows.length > 0) {
+            logger.warn('[WITHDRAW][STEP4] Non-member org roles retained — manual review required', {
+              userId,
+              organizationId: kpaOrgId,
+              roles: nonMemberRows.map((r: any) => r.role),
+              withdrawnBy,
+            });
+          }
+        }
+      }
+
+      // NOTE: users.status 변경하지 않음 — 로그인 유지, MembershipGate가 접근 차단
+      await queryRunner.commitTransaction();
+
+      logger.info('[WITHDRAW][SUCCESS]', {
+        userId,
+        withdrawnBy,
+        inactivatedMemberships: membershipIds.length,
+        deactivatedRoles,
+        affectedServiceKeys,
+      });
+
+      return {
+        inactivatedMemberships: membershipIds.length,
+        deactivatedRoles,
+        userId,
+      };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      const err = error instanceof Error ? error : new Error(String(error));
+      logger.error('[WITHDRAW][FAILED]', {
+        userId,
+        withdrawnBy,
         errorMessage: err.message,
         errorCode: (error as any)?.code,
         errorDetail: (error as any)?.detail,

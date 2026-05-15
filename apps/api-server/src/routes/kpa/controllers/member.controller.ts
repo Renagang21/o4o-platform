@@ -539,7 +539,15 @@ export function createMemberController(
               serviceKeys: ['kpa-society'],
             });
           } else if (newStatus === 'withdrawn') {
-            // WITHDRAWAL: no role to remove (profile retained for audit)
+            // WO-O4O-USER-WITHDRAW-LIFECYCLE-V1: canonical withdraw lifecycle
+            // service_memberships inactive + role deactivate + kpa_members sync
+            const approvalService = new MembershipApprovalService();
+            await approvalService.withdrawMembership({
+              userId: member.user_id,
+              withdrawnBy: req.user!.id,
+              isPlatformAdmin: false,
+              serviceKeys: ['kpa-society'],
+            });
           } else if (oldStatus === 'suspended' && newStatus === 'active') {
             // WO-O4O-AUTH-RBAC-FINAL-CLEANUP-V2: delegate to MembershipApprovalService
             const approvalService = new MembershipApprovalService();
@@ -953,10 +961,15 @@ export function createMemberController(
         const mode = req.query.mode === 'hard' ? 'hard' : 'soft';
 
         if (mode === 'soft') {
-          // Soft delete: status → withdrawn (kpa:operator 이상 허용)
-          member.status = 'withdrawn' as any;
-          member.identity_status = 'withdrawn' as any;
-          await memberRepo.save(member);
+          // WO-O4O-USER-WITHDRAW-LIFECYCLE-V1: canonical withdraw lifecycle
+          // kpa:operator 이상 허용. 이전 직접 save 패턴 → withdrawMembership() 통합.
+          const approvalService = new MembershipApprovalService();
+          const result = await approvalService.withdrawMembership({
+            userId: member.user_id,
+            withdrawnBy: (req as any).user?.id ?? null,
+            isPlatformAdmin: false,
+            serviceKeys: ['kpa-society'],
+          });
 
           const operatorRole = (req as any).user?.scopes?.includes('kpa:admin') ? 'kpa:admin' : 'kpa:operator';
           try {
@@ -966,7 +979,13 @@ export function createMemberController(
               action_type: 'MEMBER_STATUS_CHANGED' as any,
               target_type: 'member',
               target_id: member.id,
-              metadata: { previousStatus: member.status, newStatus: 'withdrawn', mode: 'soft' },
+              metadata: {
+                previousStatus: member.status,
+                newStatus: 'withdrawn',
+                mode: 'soft',
+                inactivatedMemberships: result?.inactivatedMemberships ?? 0,
+                deactivatedRoles: result?.deactivatedRoles ?? [],
+              },
             }));
           } catch (e) { console.error('[KPA AuditLog] Failed:', e); }
 
