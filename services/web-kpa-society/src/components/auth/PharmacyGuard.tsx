@@ -4,6 +4,12 @@
  * WO-O4O-STORE-OWNER-LEGACY-CLEANUP-V1:
  *   STORE_OWNER_ROLES 보유 여부가 유일한 통과 조건이다.
  *   JWT가 stale인 경우 API 승인 확인 후 세션 갱신으로 회복한다.
+ *
+ * WO-O4O-KPA-PHARMACYGUARD-OPERATOR-FIX-V1:
+ *   operator/admin + store_owner 동시 보유 계정 접근 보장.
+ *   hasStoreRole: STORE_OWNER_ROLES(JWT) OR user.isStoreOwner(KPA context) 양쪽 체크.
+ *   → stale JWT로 kpa:store_owner가 누락된 경우에도 KPA context 기준으로 통과.
+ *   → operator 단독 계정: isStoreOwner=false → isPlatformOnlyUser=true → 차단 유지.
  */
 
 import { useState, useEffect } from 'react';
@@ -22,8 +28,12 @@ export function PharmacyGuard({ children }: PharmacyGuardProps) {
   const location = useLocation();
   const [apiCheck, setApiCheck] = useState<'idle' | 'loading' | 'approved' | 'denied'>('idle');
 
-  const hasStoreRole = !!user && hasAnyRole(user.roles, STORE_OWNER_ROLES);
-  // PLATFORM_ROLES 보유자라도 storeOwner가 아니면 API 확인 불필요
+  // WO-O4O-KPA-PHARMACYGUARD-OPERATOR-FIX-V1:
+  // JWT roles(STORE_OWNER_ROLES) 또는 KPA context(isStoreOwner) 중 하나라도 true면 통과.
+  // operator+store_owner 동시 보유 계정: fresh JWT → roles로 판정, stale JWT → isStoreOwner로 보완.
+  const hasStoreRole =
+    !!user && (hasAnyRole(user.roles, STORE_OWNER_ROLES) || user.isStoreOwner === true);
+  // PLATFORM_ROLES 보유자이고 store_owner가 전혀 아닌 경우에만 API 확인 불필요(즉시 차단)
   const isPlatformOnlyUser = !!user && !hasStoreRole && hasAnyRole(user.roles, PLATFORM_ROLES);
   const needsApiCheck = !!user && !hasStoreRole && !isPlatformOnlyUser;
 
@@ -73,10 +83,11 @@ export function PharmacyGuard({ children }: PharmacyGuardProps) {
   }
 
   if (isPlatformOnlyUser) {
+    // operator/admin 단독 계정 (store_owner 역할 없음) — 차단 유지
     return (
       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', minHeight: '400px', gap: 12 }}>
         <p style={{ color: '#1e40af', fontSize: 16, fontWeight: 600 }}>약국 경영지원 전용 영역</p>
-        <p style={{ color: '#64748B', fontSize: 14 }}>운영자 계정으로는 이 페이지에 접근할 수 없습니다.</p>
+        <p style={{ color: '#64748B', fontSize: 14 }}>약국 경영자 역할이 없는 계정은 이 페이지에 접근할 수 없습니다.</p>
         <p style={{ color: '#94a3b8', fontSize: 13 }}>운영 대시보드는 상단 메뉴에서 진입하세요.</p>
       </div>
     );
