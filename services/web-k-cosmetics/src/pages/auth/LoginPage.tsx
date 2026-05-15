@@ -6,7 +6,7 @@
 
 import { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { useAuth, getKCosmeticsDashboardRoute } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card, Button } from '@o4o/ui';
 
 export default function LoginPage() {
@@ -30,8 +30,9 @@ export default function LoginPage() {
       if (!result.success) {
         throw new Error(result.error || '로그인에 실패했습니다.');
       }
-      // WO-K-COSMETICS-ROLE-BASED-LANDING-V1: 역할 기반 리다이렉트
-      navigate(returnUrl || (result.roles?.length ? getKCosmeticsDashboardRoute(result.roles) : '/'));
+      // returnUrl만 LoginPage에서 처리.
+      // WO-O4O-POSTLOGINREDIRECT-CANONICALIZATION-V1: 일반 역할 redirect는 App.tsx PostLoginRedirect 담당.
+      if (returnUrl) navigate(returnUrl);
     } catch (err) {
       setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
     } finally {
