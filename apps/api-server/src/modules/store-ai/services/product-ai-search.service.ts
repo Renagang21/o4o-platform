@@ -6,6 +6,11 @@ import type { DataSource } from 'typeorm';
  * AI 태그 + 상품명 기반 통합 검색.
  * product_ai_tags.tag (VARCHAR index) + product_masters name (ILIKE) 결합.
  * confidence 기반 스코어 정렬.
+ *
+ * Visibility policy — WO-O4O-STORE-AI-SEARCH-APPROVED-FILTER-V1:
+ *   최소 1개 이상의 APPROVED supplier_product_offer가 존재하는 product만 검색.
+ *   pending/rejected offer만 있는 product는 제외.
+ *   platform-wide catalog search 유지 (org/service scoped 전환 금지).
  */
 
 export interface ProductSearchResult {
@@ -45,9 +50,11 @@ export class ProductAiSearchService {
        LEFT JOIN product_ai_tags pat
          ON pat.product_id = pm.id AND pat.tag ILIKE $1
        WHERE
-         pat.product_id IS NOT NULL
-         OR pm.name ILIKE $1
-         OR pm.regulatory_name ILIKE $1
+         (pat.product_id IS NOT NULL OR pm.name ILIKE $1 OR pm.regulatory_name ILIKE $1)
+         AND EXISTS (
+           SELECT 1 FROM supplier_product_offers spo
+           WHERE spo.master_id = pm.id AND spo.approval_status = 'APPROVED'
+         )
        GROUP BY pm.id, pm.regulatory_name, pm.name, pm.tags,
                 pm.specification, pc.name, b.name
        ORDER BY score DESC, pm.name ASC
