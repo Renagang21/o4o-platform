@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1 } },
 });
-import { Layout, DemoLayout } from './components';
+import { Layout } from './components';
 import { LoadingSpinner } from './components/common/LoadingSpinner';
 import { AuthProvider, OrganizationProvider } from './contexts';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
@@ -20,8 +20,6 @@ import { getPharmacyInfo } from './api/pharmacyInfo';
 import { LoginModalProvider, useAuthModal } from './contexts/LoginModalContext';
 import LoginModal from './components/LoginModal';
 import RegisterModal from './components/RegisterModal';
-// Phase 2 lazy: DashboardPage + auth flow
-const DashboardPage = lazy(() => import('./pages/DashboardPage').then(m => ({ default: m.DashboardPage })));
 const HandoffPage = lazy(() => import('./pages/HandoffPage'));
 const AccountRecoveryPage = lazy(() => import('./pages/auth/AccountRecoveryPage'));
 const ResetPasswordPage = lazy(() => import('./pages/auth/ResetPasswordPage'));
@@ -80,15 +78,9 @@ import { QuestionType } from './pages/participation/types';
 //   canonical = KpaEventOfferPage (enriched ViewModel) — /store-hub/event-offers
 //   /demo/event-offers 라우트는 canonical 로 redirect.
 const EventOfferDetailPage = lazy(() => import('./pages/event-offer/EventOfferDetailPage').then(m => ({ default: m.EventOfferDetailPage })));
-const EventOfferHistoryPage = lazy(() => import('./pages/event-offer/EventOfferHistoryPage').then(m => ({ default: m.EventOfferHistoryPage })));
 const KpaEventOfferPage = lazy(() => import('./pages/event-offer/KpaEventOfferPage').then(m => ({ default: m.KpaEventOfferPage })));
 // Supplier pages — Phase 2 lazy
 const SupplierEventOfferPage = lazy(() => import('./pages/supplier/SupplierEventOfferPage').then(m => ({ default: m.SupplierEventOfferPage })));
-
-// News pages — Phase 2 lazy (barrel unwound)
-const NewsListPage = lazy(() => import('./pages/news/NewsListPage').then(m => ({ default: m.NewsListPage })));
-const NewsDetailPage = lazy(() => import('./pages/news/NewsDetailPage').then(m => ({ default: m.NewsDetailPage })));
-const GalleryPage = lazy(() => import('./pages/news/GalleryPage').then(m => ({ default: m.GalleryPage })));
 
 // Signage pages — WO-KPA-SOCIETY-APP-ROUTE-CODE-SPLITTING-V1: lazy
 const ContentHubPage = lazy(() => import('./pages/signage/ContentHubPage'));
@@ -107,8 +99,6 @@ const MyDashboardPage = lazy(() => import('./pages/mypage/MyDashboardPage').then
 const MyProfilePage = lazy(() => import('./pages/mypage/MyProfilePage').then(m => ({ default: m.MyProfilePage })));
 const MySettingsPage = lazy(() => import('./pages/mypage/MySettingsPage').then(m => ({ default: m.MySettingsPage })));
 const MyCertificatesPage = lazy(() => import('./pages/mypage/MyCertificatesPage').then(m => ({ default: m.MyCertificatesPage })));
-const PersonalStatusReportPage = lazy(() => import('./pages/mypage/PersonalStatusReportPage').then(m => ({ default: m.PersonalStatusReportPage })));
-const AnnualReportFormPage = lazy(() => import('./pages/mypage/AnnualReportFormPage').then(m => ({ default: m.AnnualReportFormPage })));
 const MyQualificationsPage = lazy(() => import('./pages/mypage/MyQualificationsPage').then(m => ({ default: m.MyQualificationsPage })));
 const MyEnrollmentsPage = lazy(() => import('./pages/mypage/MyEnrollmentsPage').then(m => ({ default: m.MyEnrollmentsPage })));
 const MyCreditsPage = lazy(() => import('./pages/mypage/MyCreditsPage').then(m => ({ default: m.MyCreditsPage })));
@@ -126,12 +116,6 @@ const OperatorRoutes = lazy(() => import('./routes/OperatorRoutes').then(m => ({
 // Resources Hub — Phase 2 lazy
 const ResourcesHubPage = lazy(() => import('./pages/resources/ResourcesHubPage').then(m => ({ default: m.ResourcesHubPage })));
 const ResourceWritePage = lazy(() => import('./pages/resources/ResourceWritePage').then(m => ({ default: m.ResourceWritePage })));
-
-// Intranet Routes — Phase 2 lazy (resolves Phase 1 ContentHubPage warning)
-const IntranetRoutes = lazy(() => import('./routes/IntranetRoutes').then(m => ({ default: m.IntranetRoutes })));
-
-// Auth/Register — Phase 2 lazy
-const RegisterPendingPage = lazy(() => import('./pages/auth/RegisterPendingPage'));
 
 // Mobile Pages — WO-O4O-KPA-MOBILE-MENU-STRUCTURE-PHASE2-V1
 const MobilePharmacyPage = lazy(() => import('./pages/mobile/MobilePharmacyPage').then(m => ({ default: m.MobilePharmacyPage })));
@@ -286,10 +270,6 @@ const ContentSurveysPage = lazy(() => import('./pages/contents/ContentSurveysPag
 
 // QR Landing Page — Phase 2 lazy
 const QrLandingPage = lazy(() => import('./pages/qr/QrLandingPage'));
-
-// Legacy pages — Phase 2 lazy (root barrel unwound)
-const MemberApplyPage = lazy(() => import('./pages/MemberApplyPage').then(m => ({ default: m.MemberApplyPage })));
-const MyApplicationsPage = lazy(() => import('./pages/MyApplicationsPage').then(m => ({ default: m.MyApplicationsPage })));
 
 /**
  * KPA Society - 약사회 SaaS
@@ -607,31 +587,8 @@ function App() {
            * ======================================== */}
           {/* 게이트: 인증/승인 분기 (PharmacyPage 자체에 완전한 게이트 로직) */}
           <Route path="/pharmacy" element={<Layout serviceName={SERVICE_NAME}><PharmacyPage /></Layout>} />
-          {/* /pharmacy/* → /store/* 리다이렉트 */}
-          <Route path="/pharmacy/dashboard" element={<Navigate to="/store" replace />} />
-          <Route path="/pharmacy/hub" element={<Navigate to="/store-hub" replace />} />
-          <Route path="/pharmacy/store" element={<Navigate to="/store" replace />} />
-          <Route path="/pharmacy/store/layout" element={<Navigate to="/store/settings/layout" replace />} />
-          <Route path="/pharmacy/store/template" element={<Navigate to="/store/settings/template" replace />} />
-          <Route path="/pharmacy/store/blog" element={<Navigate to="/store/content/blog" replace />} />
-          <Route path="/pharmacy/store/tablet" element={<Navigate to="/store/channels/tablet" replace />} />
-          <Route path="/pharmacy/store/channels" element={<Navigate to="/store/channels" replace />} />
-          <Route path="/pharmacy/store/cyber-templates" element={<Navigate to="/store/settings" replace />} />
-          <Route path="/pharmacy/assets" element={<Navigate to="/store/content" replace />} />
-          <Route path="/pharmacy/settings" element={<Navigate to="/store/settings" replace />} />
-          <Route path="/pharmacy/sales/b2b" element={<Navigate to="/store/products" replace />} />
-          <Route path="/pharmacy/sales/b2b/suppliers" element={<Navigate to="/store/products/suppliers" replace />} />
-          <Route path="/pharmacy/sales/b2c" element={<Navigate to="/store/products/b2c" replace />} />
-          <Route path="/pharmacy/services" element={<Navigate to="/store/settings" replace />} />
-          {/* 레거시 2단 리다이렉트 → /store/* */}
-          <Route path="/pharmacy/b2b" element={<Navigate to="/store/products" replace />} />
-          <Route path="/pharmacy/b2b/suppliers" element={<Navigate to="/store/products/suppliers" replace />} />
-          <Route path="/pharmacy/sell" element={<Navigate to="/store/products/b2c" replace />} />
-          <Route path="/pharmacy/tablet-requests" element={<Navigate to="/store/channels/tablet" replace />} />
-          <Route path="/pharmacy/blog" element={<Navigate to="/store/content/blog" replace />} />
-          <Route path="/pharmacy/kpa-blog" element={<Navigate to="/store/content/blog" replace />} />
-          <Route path="/pharmacy/template" element={<Navigate to="/store/settings/template" replace />} />
-          <Route path="/pharmacy/layout-builder" element={<Navigate to="/store/settings/layout" replace />} />
+          {/* /pharmacy/* → /store 리다이렉트 (wildcard 통합) */}
+          <Route path="/pharmacy/*" element={<Navigate to="/store" replace />} />
 
           {/* ========================================
            * 약국 서비스 신청 게이트
@@ -653,47 +610,6 @@ function App() {
           <Route path="/work/learning" element={<Layout serviceName={SERVICE_NAME}><WorkLearningPage /></Layout>} />
           <Route path="/work/display" element={<Layout serviceName={SERVICE_NAME}><WorkDisplayPage /></Layout>} />
           <Route path="/work/community" element={<Layout serviceName={SERVICE_NAME}><WorkCommunityPage /></Layout>} />
-
-          {/* =========================================================
-           * SVC-B: 지부/분회 데모 서비스 (District/Branch Demo)
-           * WO-KPA-SOCIETY-PHASE6-SVC-B-DEMO-UX-REFINE-V1
-           *
-           * ⚠️ 삭제 대상: 실제 지부/분회 서비스가 독립 도메인으로
-           * 제공되면 이 블록(/demo/*)의 모든 라우트는 전체 삭제 대상.
-           * 삭제 시 관련 파일: DemoLayout, DemoHeader, DashboardPage,
-           * DemoLayoutRoutes 함수, 그리고 /demo/* 전용 페이지들.
-           *
-           * SCOPE: 순수 데모 서비스 (실운영 아님)
-           * 조직 관리 중심 서비스 — 커뮤니티 홈(/)과 혼합 금지
-           * - /demo : 데모 대시보드 (DashboardPage)
-           * - /demo/admin/* : 지부 관리자 데모
-           * - /demo/operator/* : 서비스 운영자 데모
-           * - /demo/intranet/* : 인트라넷 데모
-           * - /demo/forum/* : 포럼 데모 (NOT /forum)
-           *
-           * WO-KPA-DEMO-ROUTE-ISOLATION-V1
-           * WO-KPA-DEMO-SCOPE-SEPARATION-AND-IMPLEMENTATION-V1
-           * ========================================================= */}
-
-          {/* Login & Register - 모달로 대체 (WO-O4O-AUTH-LEGACY-LOGIN-REGISTER-PAGE-REMOVAL-V1) */}
-          <Route path="/demo/login" element={<LoginRedirect />} />
-          <Route path="/demo/register" element={<RegisterRedirect />} />
-          <Route path="/demo/register/pending" element={<RegisterPendingPage />} />
-
-          {/* Function Gate → /setup-activity 리다이렉트 (WO-KPA-A-AUTH-UX-STATE-UNIFICATION-V1) */}
-          <Route path="/demo/select-function" element={<Navigate to="/setup-activity" replace />} />
-
-          {/* Admin Routes (지부 관리자 - 별도 레이아웃) */}
-          <Route path="/demo/admin/*" element={<AdminRoutes />} />
-
-          {/* Operator Routes — /demo/operator → /operator 리다이렉트 */}
-          <Route path="/demo/operator/*" element={<Navigate to="/operator" replace />} />
-
-          {/* Intranet Routes (인트라넷 - 별도 레이아웃) */}
-          <Route path="/demo/intranet/*" element={<IntranetRoutes />} />
-
-          {/* Main Layout Routes - /demo 하위 나머지 경로 */}
-          <Route path="/demo/*" element={<DemoLayoutRoutes />} />
 
           {/* =========================================================
            * SCOPE: 레거시 경로 리다이렉트 (Legacy Redirects)
@@ -724,7 +640,6 @@ function App() {
           <Route path="/resources/:id/edit" element={<Layout serviceName={SERVICE_NAME}><ResourceWritePage /></Layout>} />
           {/* Operator Routes — WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: KpaOperatorLayout (standalone sidebar) */}
           <Route path="/operator/*" element={<OperatorRoutes />} />
-          <Route path="/intranet/*" element={<Navigate to="/demo/intranet" replace />} />
 
           {/* Supplier Event Offer Proposal (WO-EVENT-OFFER-SUPPLIER-PROPOSAL-PATH-V1) */}
           <Route path="/supplier/event-offers" element={<Layout serviceName={SERVICE_NAME}><SupplierEventOfferPage /></Layout>} />
@@ -1027,97 +942,6 @@ function App() {
 }
 
 /**
- * SVC-B: 지부/분회 데모 서비스 — DemoLayout 하위 라우트
- *
- * ⚠️ 삭제 대상: 실제 지부/분회 서비스가 독립 도메인으로 제공되면
- * 이 함수와 모든 하위 라우트는 전체 삭제 대상.
- *
- * WO-KPA-DEMO-HEADER-SEPARATION-V1: DemoLayout 사용
- * WO-KPA-SOCIETY-PHASE6-SVC-B-DEMO-UX-REFINE-V1
- *
- * /demo 하위에서 DemoLayout을 사용하는 라우트들.
- * 이 라우트들은 지부/분회 조직 관리 데모 범위에 속합니다.
- * 커뮤니티 홈(/)과는 별도 스코프이며, 시각적으로도 분리됩니다.
- */
-function DemoLayoutRoutes() {
-  return (
-    <DemoLayout serviceName={SERVICE_NAME}>
-      <Routes>
-        {/* Home / Dashboard */}
-        <Route path="/" element={<DashboardPage />} />
-
-        {/* News (공지/소식) */}
-        <Route path="/news" element={<NewsListPage />} />
-        <Route path="/news/notice" element={<NewsListPage />} />
-        <Route path="/news/branch-news" element={<NewsListPage />} />
-        <Route path="/news/kpa-news" element={<NewsListPage />} />
-        <Route path="/news/gallery" element={<GalleryPage />} />
-        <Route path="/news/press" element={<NewsListPage />} />
-        <Route path="/news/:id" element={<NewsDetailPage />} />
-
-        {/* Forum (포럼) - WO-KPA-COMMUNITY-HOME-V1 */}
-        <Route path="/forum" element={<ForumHomePage />} />
-        <Route path="/forum/all" element={<ForumListPage />} />
-        <Route path="/forum/post/:id" element={<ForumDetailPage />} />
-        <Route path="/forum/:slug/write" element={<ForumWritePage />} />
-        <Route path="/forum/write" element={<ForumWritePage />} />
-        <Route path="/forum/edit/:id" element={<ForumWritePage />} />
-        {/* WO-O4O-FORUM-MULTI-STRUCTURE-RECONSTRUCTION-V1: 포럼 피드 */}
-        <Route path="/forum/:slug" element={<ForumFeedPage />} />
-
-        {/* LMS (교육) - WO-O4O-LMS-CANONICAL-ROUTE-ALIGN-V1 */}
-        <Route path="/lms" element={<LmsCoursesPage />} />
-        <Route path="/lms/courses" element={<Navigate to="/lms" replace />} />
-        <Route path="/lms/course/:id" element={<LmsCourseDetailPage />} />
-        <Route path="/lms/course/:courseId/lesson/:lessonId" element={<LmsLessonPage />} />
-        <Route path="/lms/certificate" element={<LmsCertificatesPage />} />
-
-        {/* Participation (참여 - 설문/퀴즈) WO-KPA-PARTICIPATION-APP-V1 */}
-        <Route path="/participation" element={<ParticipationListPage />} />
-        <Route path="/participation/create" element={<ParticipationCreatePage />} />
-        <Route path="/participation/:id/respond" element={<ParticipationRespondPage />} />
-        <Route path="/participation/:id/results" element={<ParticipationResultPage />} />
-
-        {/* Event Offers (이벤트) */}
-        {/* WO-O4O-KPA-EVENT-OFFER-LIST-LEGACY-RETIRE-V1:
-            legacy EventOfferListPage 제거 — /demo/event-offers 는 canonical 로 redirect. */}
-        <Route path="/event-offers" element={<Navigate to="/store-hub/event-offers" replace />} />
-        <Route path="/event-offers/history" element={<PharmacyOwnerOnlyGuard><EventOfferHistoryPage /></PharmacyOwnerOnlyGuard>} />
-        <Route path="/event-offers/:id" element={<PharmacyOwnerOnlyGuard><EventOfferDetailPage /></PharmacyOwnerOnlyGuard>} />
-
-        {/* Pharmacy Management - 실경로로 리다이렉트 (WO-KPA-PHARMACY-LOCATION-V1) */}
-
-        {/* Pharmacy Management - 실경로로 리다이렉트 (WO-KPA-PHARMACY-LOCATION-V1) */}
-        <Route path="/pharmacy" element={<Navigate to="/pharmacy" replace />} />
-        <Route path="/pharmacy/*" element={<Navigate to="/pharmacy" replace />} />
-
-
-
-        {/* MyPage (마이페이지) */}
-        <Route path="/mypage" element={<MyDashboardPage />} />
-        <Route path="/mypage/profile" element={<MyProfilePage />} />
-        <Route path="/mypage/settings" element={<MySettingsPage />} />
-        <Route path="/mypage/certificates" element={<MyCertificatesPage />} />
-        <Route path="/mypage/credits" element={<MyCreditsPage />} />
-        <Route path="/mypage/completions" element={<Navigate to="/demo/mypage/certificates" replace />} />
-        <Route path="/mypage/status-report" element={<PersonalStatusReportPage />} />
-        <Route path="/mypage/annual-report" element={<AnnualReportFormPage />} />
-
-        {/* Events (이벤트) - WO-KPA-COMMUNITY-HOME-V1 */}
-        <Route path="/events" element={<EventsHomePage />} />
-
-        {/* Legacy routes (for backward compatibility) */}
-        <Route path="/member/apply" element={<MemberApplyPage />} />
-        <Route path="/applications" element={<MyApplicationsPage />} />
-
-        {/* 404 */}
-        <Route path="*" element={<DemoNotFoundPage />} />
-      </Routes>
-    </DemoLayout>
-  );
-}
-
-/**
  * 404 페이지 (플랫폼 전체)
  */
 function NotFoundPage() {
@@ -1143,37 +967,6 @@ function NotFoundPage() {
         }}
       >
         홈으로 돌아가기
-      </a>
-    </div>
-  );
-}
-
-/**
- * 404 페이지 (/demo 내부)
- */
-function DemoNotFoundPage() {
-  return (
-    <div style={{ padding: '60px 20px', textAlign: 'center', maxWidth: '600px', margin: '0 auto' }}>
-      <h1 style={{ fontSize: '4rem', margin: 0, color: '#2563EB' }}>404</h1>
-      <h2 style={{ fontSize: '1.5rem', marginTop: '16px', color: '#0F172A' }}>
-        페이지를 찾을 수 없습니다
-      </h2>
-      <p style={{ color: '#64748B', marginTop: '8px' }}>
-        요청하신 페이지가 존재하지 않거나 이동되었습니다.
-      </p>
-      <a
-        href="/demo"
-        style={{
-          display: 'inline-block',
-          marginTop: '24px',
-          padding: '12px 24px',
-          backgroundColor: '#2563EB',
-          color: '#fff',
-          textDecoration: 'none',
-          borderRadius: '6px',
-        }}
-      >
-        데모 홈으로 돌아가기
       </a>
     </div>
   );

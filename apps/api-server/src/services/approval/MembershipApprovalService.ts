@@ -560,7 +560,8 @@ export class MembershipApprovalService {
    * Delete a member.
    * WO-NETURE-MEMBER-DELETE-SAFE-FLOW-V1: soft/hard 2단계 분리
    *
-   * soft (기본): users.status='deleted', isActive=false, memberships 비활성
+   * soft (기본): users.status='deleted', isActive=false, memberships 비활성,
+   *              role_assignments 서비스 prefix 범위 내 비활성 (WO-O4O-SOFT-DELETE-ROLE-CLEANUP-V1)
    * hard: service_memberships + role_assignments 삭제, users hard delete (FK 위험)
    *
    * Returns true if processed, false if user not found in scope.
@@ -606,8 +607,32 @@ export class MembershipApprovalService {
           [userId]
         );
 
+        // WO-O4O-SOFT-DELETE-ROLE-CLEANUP-V1: role_assignments 서비스 prefix 범위 내 비활성화.
+        // 플랫폼 역할(super_admin, admin, operator)은 절대 자동 비활성화하지 않는다.
+        // isPlatformAdmin: 전체 서비스 prefix 정리 / 서비스 operator: 해당 서비스 prefix만 정리.
+        const SERVICE_ROLE_PREFIXES: Record<string, string> = {
+          'kpa-society': 'kpa:',
+          'k-cosmetics': 'cosmetics:',
+          'glycopharm': 'glycopharm:',
+          'neture': 'neture:',
+        };
+
+        const prefixesToClean = isPlatformAdmin
+          ? Object.values(SERVICE_ROLE_PREFIXES)
+          : serviceKeys.map((k) => SERVICE_ROLE_PREFIXES[k]).filter(Boolean);
+
+        for (const prefix of prefixesToClean) {
+          await queryRunner.query(
+            `UPDATE role_assignments SET is_active = false, updated_at = NOW()
+             WHERE user_id = $1 AND role LIKE $2 AND is_active = true`,
+            [userId, `${prefix}%`]
+          );
+        }
+
         await queryRunner.commitTransaction();
-        logger.info('[ApprovalService] SOFT_DELETE_SUCCESS', { userId, deletedBy });
+        logger.info('[ApprovalService] SOFT_DELETE_SUCCESS', {
+          userId, deletedBy, cleanedPrefixes: prefixesToClean,
+        });
       }
 
       return true;

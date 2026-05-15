@@ -21,14 +21,13 @@ export const KCOS_PUBLIC_NAV: GlobalHeaderNavItem[] = [
 // ─── Contextual Nav ──────────────────────────────────────────────────────────
 
 export interface KCosContextualNavItem extends GlobalHeaderNavItem {
-  visibleWhen: 'storeManager' | 'partner' | 'operator' | 'admin';
+  visibleWhen: 'storeManager' | 'operator' | 'admin';
 }
 
-// HUB 우선 — 비KPA 서비스는 매장 HUB가 먼저 노출, 파트너 유지
+// HUB 우선 — 비KPA 서비스는 매장 HUB가 먼저 노출
 export const KCOS_CONTEXTUAL_NAV: KCosContextualNavItem[] = [
   { label: kcosmeticsConfig.terminology.storeHubLabel, href: '/store-hub', visibleWhen: 'storeManager' },
   { label: kcosmeticsConfig.terminology.myStoreLabel, href: '/store', visibleWhen: 'storeManager' },
-  { label: '파트너', href: '/partner', visibleWhen: 'partner' },
 ];
 
 // ─── Filter Helper ───────────────────────────────────────────────────────────
@@ -36,7 +35,6 @@ export const KCOS_CONTEXTUAL_NAV: KCosContextualNavItem[] = [
 export interface KCosNavVisibility {
   isAdminOrOperator: boolean;
   isStoreManager: boolean;
-  isPartner: boolean;
 }
 
 // WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1
@@ -52,7 +50,6 @@ export function filterContextualNav(
     .filter((item) => {
       const cond = item.visibleWhen;
       if (cond === 'storeManager') return vis.isStoreManager;
-      if (cond === 'partner') return vis.isPartner;
       return false;
     })
     .map(({ label, href }) => ({ label, href }));

@@ -20,7 +20,6 @@ export function PlatformFooter() {
           <div style={styles.links}>
             <div style={styles.linkGroup}>
               <h4 style={styles.linkGroupTitle}>서비스</h4>
-              <a href="/demo" style={styles.link}>약사회 서비스 (Demo)</a>
               <a href="#" style={styles.link}>Digital Signage</a>
               <a href="#" style={styles.link}>Forum</a>
               <a href="#" style={styles.link}>콘텐츠 안내</a>

@@ -22,7 +22,6 @@ import { KCosGlobalHeader } from '@/components/KCosGlobalHeader';
 
 // Layouts (always needed)
 import MainLayout from '@/components/layouts/MainLayout';
-import PartnerLayout from '@/components/layouts/PartnerLayout';
 import { KCosmeticsHubLayout } from '@/components/layouts/KCosmeticsHubLayout';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import OperatorLayoutWrapper from '@/components/layouts/OperatorLayoutWrapper';
@@ -94,14 +93,6 @@ const ResourcesPage = lazy(() => import('@/pages/resources/ResourcesPage').then(
 
 // Content Library (WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1)
 const ContentLibraryPage = lazy(() => import('@/pages/library/ContentLibraryPage'));
-
-// Partner Dashboard Pages
-const PartnerIndex = lazy(() => import('@/pages/partner/index'));
-const PartnerOverviewPage = lazy(() => import('@/pages/partner/OverviewPage'));
-const PartnerTargetsPage = lazy(() => import('@/pages/partner/TargetsPage'));
-const PartnerContentPage = lazy(() => import('@/pages/partner/ContentPage'));
-const PartnerEventsPage = lazy(() => import('@/pages/partner/EventsPage'));
-const PartnerStatusPage = lazy(() => import('@/pages/partner/StatusPage'));
 
 // Signage Content Hub (WO-SIGNAGE-CONTENT-HUB-V1)
 const SignageContentHubPage = lazy(() => import('@/pages/signage/ContentHubPage'));
@@ -330,26 +321,6 @@ function AppRoutes() {
 
         {/* Services Routes */}
         <Route path="services/tourists" element={<TouristHubPage />} />
-      </Route>
-
-      {/* Partner Dashboard */}
-      <Route
-        path="partner"
-        element={
-          <ProtectedRoute allowedRoles={['k-cosmetics:partner']}>
-            <PartnerLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<PartnerIndex />} />
-        <Route path="overview" element={<PartnerOverviewPage />} />
-        <Route path="targets" element={<PartnerTargetsPage />} />
-        <Route path="content" element={<PartnerContentPage />} />
-        <Route path="signage/content" element={<SignageContentHubPage />} />
-              <Route path="signage/playlist/:id" element={<SignagePlaylistDetailPage />} />
-              <Route path="signage/media/:id" element={<SignageMediaDetailPage />} />
-        <Route path="events" element={<PartnerEventsPage />} />
-        <Route path="status" element={<PartnerStatusPage />} />
       </Route>
 
       {/* Admin Dashboard (WO-K-COSMETICS-ADMIN-AREA-V1: 구조 관리 영역 신설) */}

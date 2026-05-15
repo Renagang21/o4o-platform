@@ -50,9 +50,6 @@ export function KCosGlobalHeader() {
   const isOperator = isAuthenticated && user?.roles?.some(
     (r: string) => r === 'k-cosmetics:operator' || r === 'k-cosmetics:admin' || r === 'platform:super_admin',
   );
-  const isPartner = isAuthenticated && user?.roles?.some(
-    (r: string) => r === 'k-cosmetics:partner',
-  );
   // WO-KCOS-LMS-INSTRUCTOR-BOOTSTRAP-V1: lms:instructor 또는 admin 진입 허용
   const isInstructor = isAuthenticated && user?.roles?.some(
     (r: string) => r === 'lms:instructor',
@@ -74,7 +71,6 @@ export function KCosGlobalHeader() {
   const contextualNav = filterContextualNav(KCOS_CONTEXTUAL_NAV, {
     isAdminOrOperator: !!(isAdmin || isOperator),
     isStoreManager: !!isStoreManager,
-    isPartner: !!isPartner,
   });
 
   // WO-O4O-KCOS-MENU-CANONICAL-ALIGN-V1: 비로그인 시 Contact 헤더 노출

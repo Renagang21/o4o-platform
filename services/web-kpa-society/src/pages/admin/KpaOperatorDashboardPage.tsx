@@ -175,7 +175,6 @@ function buildDashboardConfig(
   // Block 5: Quick Actions
   const quickActions: QuickActionItem[] = [
     { id: 'qa-members', label: '회원 관리', link: '/operator/members', icon: '👥' },
-    { id: 'qa-event-offers', label: '이벤트/특가 관리', link: '/demo/intranet/event-offers', icon: '🏷️' },
   ];
 
   return { kpis, aiSummary, actionQueue, activityLog, quickActions };
