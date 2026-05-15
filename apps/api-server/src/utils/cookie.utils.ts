@@ -11,7 +11,6 @@ import { AuthTokens } from '../types/auth.js';
  * - neture.co.kr (and subdomains)
  * - glycopharm.co.kr
  * - kpa-society.co.kr
- * - glucoseview.co.kr
  * - k-cosmetics.site
  */
 
@@ -23,7 +22,6 @@ const SERVICE_DOMAINS = [
   '.neture.co.kr',
   '.glycopharm.co.kr',
   '.kpa-society.co.kr',
-  '.glucoseview.co.kr',
   '.k-cosmetics.site',
 ];
 

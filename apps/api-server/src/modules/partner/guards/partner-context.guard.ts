@@ -56,7 +56,7 @@ function extractServiceId(req: Request): string {
  * Validates service ID is one of the allowed services
  */
 function isValidServiceId(serviceId: string): boolean {
-  const allowedServices = ['glycopharm', 'k-cosmetics', 'glucoseview'];
+  const allowedServices = ['glycopharm', 'k-cosmetics'];
   return allowedServices.includes(serviceId.toLowerCase());
 }
 

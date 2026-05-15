@@ -30,7 +30,7 @@ export class OperatorNotificationController {
       // If no service code provided, try to get from user's scopes
       if (!serviceCode && req.user) {
         const userScopes = (req.user as any).scopes || [];
-        // Find service-specific scope (e.g., 'neture:operator', 'glucoseview:operator')
+        // Find service-specific scope (e.g., 'neture:operator', 'glycopharm:operator')
         const serviceScope = userScopes.find((s: string) => s.includes(':operator'));
         if (serviceScope) {
           serviceCode = serviceScope.split(':')[0];

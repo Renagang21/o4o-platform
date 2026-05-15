@@ -1,8 +1,9 @@
 ---
 id: IR-O4O-GLUCOSEVIEW-RESIDUAL-REFERENCE-AUDIT-V1
 title: "GlucoseView 잔존 참조 전수 감사 — UI / API / DB / 마이그레이션 / 타입 / 테스트"
-status: investigation-complete
+status: phase1-complete-phase2-inprogress
 date: 2026-05-15
+last_updated: 2026-05-15
 type: investigation
 scope:
   - 폐지된 서비스 GlucoseView 의 코드/DB/문서 잔재 전수 점검
@@ -13,11 +14,24 @@ related:
   - WO-O4O-ADMIN-OPERATORS-LEGACY-SERVICE-TABS-CLEANUP-V1
   - WO-O4O-ADMIN-OPERATORS-CANONICAL-DATATABLE-V1 (5d8aa5fe5)
   - WO-O4O-ADMIN-ASSIGNMENT-ROW-LIST-CANONICALIZATION-V1 (c85455881)
+  - WO-O4O-GLUCOSEVIEW-RESIDUAL-CLEANUP-PHASE1-V1 (2b2fb92d2)
+  - WO-O4O-GLUCOSEVIEW-RESIDUAL-CLEANUP-PHASE2-BACKEND-CONFIG-V1
 ---
 
 # IR-O4O-GLUCOSEVIEW-RESIDUAL-REFERENCE-AUDIT-V1
 
-> 폐지된 GlucoseView 서비스의 잔존 참조를 코드/DB/마이그레이션/문서 전반에 걸쳐 전수 감사한다. 코드 변경 없음 — 후속 cleanup WO 발행을 위한 근거 자료.
+> 폐지된 GlucoseView 서비스의 잔존 참조를 코드/DB/마이그레이션/문서 전반에 걸쳐 전수 감사한다. 본 IR 은 cleanup WO 의 근거 자료이며, 실제 cleanup 은 P1/P2/... 분할 WO 로 수행한다.
+
+> **📌 진행 상태 (2026-05-15 갱신)**
+>
+> | Phase | 항목 | 상태 |
+> |---|---|---|
+> | **P1** | 사용자 가시 UI/API 잔재 (CMS dropdown 7건 + service-applications) | ✅ 완료 (커밋 `2b2fb92d2`) |
+> | **P2** | 백엔드 dead config (cookie.utils / partner-context.guard / OperatorNotificationController) | 🔄 진행 중 (`WO-...-PHASE2-BACKEND-CONFIG-V1`) |
+> | **P3** | platform-core type union 위생 | ⏳ 대기 (P4 SQL 점검 선행) |
+> | **P4** | DB 잔재 row 점검 + cleanup | ⏳ 대기 (사용자 승인 필요) |
+> | **P5** | 서비스별 frontend SERVICE_LABELS 정리 | ⏳ 대기 |
+> | **P6** | 문서/주석 통일 | ⏳ 대기 |
 
 ---
 
@@ -230,7 +244,7 @@ CLAUDE.md §0 정책상 read-only `SELECT` 는 Claude Code 가 직접 수행 가
 
 ## 6. 위험도 분류
 
-### 6-1. 즉시 제거 권장 (P1 — UX 영향)
+### 6-1. ✅ 완료 (P1 — UX 영향, 커밋 `2b2fb92d2` / 2026-05-15)
 
 | 항목 | 위험 |
 |---|---|
@@ -239,7 +253,7 @@ CLAUDE.md §0 정책상 read-only `SELECT` 는 Claude Code 가 직접 수행 가
 | `partner-context.guard.ts:59` 의 `allowedServices` | 폐지 서비스가 허용 목록에 잔존 → 의미적 오류 |
 | `cookie.utils.ts:26` `.glucoseview.co.kr` 도메인 | 폐지된 도메인 cookie 설정 시도 — 운영 영향 없으나 잔재 |
 
-### 6-2. 다음 스프린트 정리 (P2 — type 위생)
+### 6-2. 🔄 진행 중 (P2 — 백엔드 dead config, type 위생)
 
 | 항목 | 위험 |
 |---|---|
@@ -272,7 +286,7 @@ CLAUDE.md §0 정책상 read-only `SELECT` 는 Claude Code 가 직접 수행 가
 
 ## 7. Cleanup 우선순위 / 후속 WO 제안
 
-### Phase 1 — 사용자 가시 dead-option 제거 (즉시)
+### Phase 1 — ✅ 완료 (커밋 `2b2fb92d2`, 2026-05-15)
 
 **WO-O4O-ADMIN-CMS-GLUCOSEVIEW-OPTION-REMOVE-V1**
 - 7개 CMS form dropdown 에서 `glucoseview` 옵션 제거
@@ -284,7 +298,7 @@ CLAUDE.md §0 정책상 read-only `SELECT` 는 Claude Code 가 직접 수행 가
 - `apps/admin-dashboard/src/pages/service-applications/*` 의 `service === 'glucoseview'` 분기 제거
 - 호출 시 404 발생 가능성 차단
 
-### Phase 2 — 백엔드 dead config 정리 (다음 스프린트)
+### Phase 2 — 🔄 진행 중 (`WO-O4O-GLUCOSEVIEW-RESIDUAL-CLEANUP-PHASE2-BACKEND-CONFIG-V1`)
 
 **WO-O4O-API-LEGACY-GLUCOSEVIEW-CONFIG-CLEANUP-V1**
 - `apps/api-server/src/utils/cookie.utils.ts` 의 SERVICE_DOMAINS 에서 `.glucoseview.co.kr` 제거
@@ -347,10 +361,10 @@ CLAUDE.md §0 정책상 read-only `SELECT` 는 Claude Code 가 직접 수행 가
 7. **유지 (의도)**: `rbac-catalog.ts` 의 SERVICE_KEYS / SERVICES / EXCLUDED_FROM_FACET — facet 제외 + 과거 role 표시 호환.
 8. **유지 (regression 방지)**: security spec 의 glucoseview 차단 테스트.
 
-본 IR 의 P1-P6 6 단계 WO 발행으로 GlucoseView 잔재 정리 완료 가능. P1 우선순위가 가장 높음 (사용자 가시 영향).
+본 IR 의 P1-P6 6 단계 중 **P1 완료 (`2b2fb92d2`, 2026-05-15)**, 현재 **P2 진행 중**. P3-P6 후속 예정. P3 (type union) 는 P4 DB 잔재 SQL 점검 결과를 선행 조건으로 한다.
 
 ---
 
-*Status: Investigation Complete. No code changes performed. Awaiting Phase 1 WO authorization.*
-*Updated: 2026-05-15*
-*Version: 1.0*
+*Status: P1 Complete (`2b2fb92d2`, 2026-05-15). P2 In Progress. P3-P6 Pending.*
+*Updated: 2026-05-15 (Phase 진행 상태 반영)*
+*Version: 1.1*
