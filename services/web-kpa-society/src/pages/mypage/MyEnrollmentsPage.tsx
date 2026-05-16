@@ -10,9 +10,8 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PageHeader, LoadingSpinner, EmptyState } from '../../components/common';
-import { MyPageNavigation } from '@o4o/account-ui';
-import { KPA_MYPAGE_NAV_ITEMS } from './navItems';
+import { LoadingSpinner, EmptyState } from '../../components/common';
+import { MyPageLayout } from '../../layouts/MyPageLayout';
 import { useAuth } from '../../contexts';
 import { lmsApi } from '../../api/lms';
 import { colors } from '../../styles/theme';
@@ -198,14 +197,12 @@ export function MyEnrollmentsPage() {
       });
 
   return (
-    <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '0 20px 40px' }}>
-      <PageHeader
-        title="내 수강 목록"
-        description="신청하거나 진행 중인 강의를 확인하세요."
-        breadcrumb={[{ label: '홈', href: '/' }, { label: '마이페이지', href: '/mypage' }, { label: '내 수강' }]}
-      />
-      <MyPageNavigation items={KPA_MYPAGE_NAV_ITEMS} />
-
+    <MyPageLayout
+      title="내 수강 목록"
+      description="신청하거나 진행 중인 강의를 확인하세요."
+      breadcrumb={[{ label: '홈', href: '/' }, { label: '마이페이지', href: '/mypage' }, { label: '내 수강' }]}
+      width="wide"
+    >
       {/* 필터 탭 */}
       <div style={{ display: 'flex', gap: 8, margin: '20px 0', flexWrap: 'wrap' }}>
         {FILTER_OPTIONS.map((opt) => (
@@ -269,6 +266,6 @@ export function MyEnrollmentsPage() {
           전체 {enrollments.length}개 · 표시 {filtered.length}개
         </div>
       )}
-    </div>
+    </MyPageLayout>
   );
 }

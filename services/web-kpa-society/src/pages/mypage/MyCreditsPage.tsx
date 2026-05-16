@@ -7,9 +7,8 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PageHeader, LoadingSpinner, EmptyState, Pagination, Card } from '../../components/common';
-import { MyPageNavigation } from '@o4o/account-ui';
-import { KPA_MYPAGE_NAV_ITEMS } from './navItems';
+import { LoadingSpinner, EmptyState, Pagination, Card } from '../../components/common';
+import { MyPageLayout } from '../../layouts/MyPageLayout';
 import { creditApi } from '../../api/credit';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
@@ -85,18 +84,16 @@ export function MyCreditsPage() {
   }
 
   return (
-    <div style={styles.container}>
-      <PageHeader
-        title="네처 크레딧"
-        description="학습 활동으로 획득한 크레딧을 확인하세요"
-        breadcrumb={[
-          { label: '홈', href: '/' },
-          { label: '마이페이지', href: '/mypage' },
-          { label: '네처 크레딧' },
-        ]}
-      />
-      <MyPageNavigation items={KPA_MYPAGE_NAV_ITEMS} />
-
+    <MyPageLayout
+      title="네처 크레딧"
+      description="학습 활동으로 획득한 크레딧을 확인하세요"
+      breadcrumb={[
+        { label: '홈', href: '/' },
+        { label: '마이페이지', href: '/mypage' },
+        { label: '네처 크레딧' },
+      ]}
+      width="wide"
+    >
       {/* Balance Card */}
       <Card padding="large">
         <div style={styles.balanceSection}>
@@ -167,7 +164,7 @@ export function MyCreditsPage() {
           />
         </>
       )}
-    </div>
+    </MyPageLayout>
   );
 }
 

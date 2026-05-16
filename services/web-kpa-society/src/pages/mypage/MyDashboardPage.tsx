@@ -12,9 +12,8 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
-import { MyPageNavigation } from '@o4o/account-ui';
-import { KPA_MYPAGE_NAV_ITEMS } from './navItems';
+import { LoadingSpinner, EmptyState, Card } from '../../components/common';
+import { MyPageLayout } from '../../layouts/MyPageLayout';
 import { mypageApi } from '../../api';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
@@ -98,13 +97,11 @@ export function MyDashboardPage() {
   }
 
   return (
-    <div style={styles.container}>
-      <PageHeader
-        title="마이페이지"
-        breadcrumb={[{ label: '홈', href: '/' }, { label: '마이페이지' }]}
-      />
-      <MyPageNavigation items={KPA_MYPAGE_NAV_ITEMS} />
-
+    <MyPageLayout
+      title="마이페이지"
+      breadcrumb={[{ label: '홈', href: '/' }, { label: '마이페이지' }]}
+      width="wide"
+    >
       {/* 사용자 프로필 요약 */}
       <Card padding="large" style={{ marginBottom: '24px' }}>
         <div style={styles.profileSection}>
@@ -232,7 +229,7 @@ export function MyDashboardPage() {
           <span>설정</span>
         </Link>
       </div>
-    </div>
+    </MyPageLayout>
   );
 }
 
