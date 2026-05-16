@@ -11,6 +11,9 @@ import type { AuthRequest } from '../../../types/auth.js';
 import { roleAssignmentService } from '../../../modules/auth/services/role-assignment.service.js';
 import { MembershipApprovalService } from '../../../services/approval/MembershipApprovalService.js';
 import { emailService } from '../../../services/email.service.js';
+// WO-O4O-KPA-MEMBER-REGISTRATION-NOTIFICATION-PHASE1-V1:
+//   회원 승인/반려 시 신청자에게 in-app 알림 발송.
+import { notificationService } from '../../../services/NotificationService.js';
 // WO-O4O-KPA-MEMBER-APPROVAL-STORE-OWNER-AUTO-ACTIVATION-V1:
 //   pharmacy_owner 회원 승인 시 자동 매장/owner/role_assignment 생성.
 //   pharmacy-request.controller.ts (WO-KPA-PHARMACY-APPROVAL-ENSURE-STORE-LINK-V1) 패턴 재사용.
@@ -638,6 +641,40 @@ export function createMemberController(
             metadata: { previousStatus: oldStatus, newStatus },
           }));
         } catch (e) { console.error('[KPA AuditLog] Failed:', e); }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // WO-O4O-KPA-MEMBER-REGISTRATION-NOTIFICATION-PHASE1-V1
+        // 신청자 in-app 알림: pending→active 승인 / pending→rejected 반려.
+        // best-effort — 실패해도 회원 상태 변경은 성공.
+        // ─────────────────────────────────────────────────────────────────────
+        if (oldStatus === 'pending' && (newStatus === 'active' || newStatus === 'rejected')) {
+          try {
+            const isApproved = newStatus === 'active';
+            const noteRaw = typeof req.body.note === 'string' ? req.body.note.trim() : '';
+            await notificationService.createNotification({
+              userId: member.user_id,
+              type: isApproved ? 'member.registration_approved' : 'member.registration_rejected',
+              title: isApproved
+                ? 'KPA 회원가입이 승인되었습니다'
+                : 'KPA 회원가입이 반려되었습니다',
+              message: isApproved
+                ? '약사회 커뮤니티 서비스를 이용하실 수 있습니다.'
+                : (noteRaw || '가입 신청을 다시 검토해 주세요.'),
+              serviceKey: 'kpa-society',
+              actorId: req.user!.id,
+              metadata: {
+                memberId: member.id,
+                decision: newStatus,
+                targetUrl: isApproved ? '/mypage' : '/mypage',
+              },
+            });
+          } catch (notifyError) {
+            console.error(
+              `[KPA Notification] Applicant decision notify failed (${oldStatus}→${newStatus}) for member ${member.id}:`,
+              notifyError,
+            );
+          }
+        }
 
         // WO-O4O-KPA-MEMBER-APPROVAL-EMAIL-CONNECT-V1: 상태 전환 이메일 알림 (non-blocking)
         if (oldStatus !== newStatus) {

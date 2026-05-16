@@ -14,6 +14,10 @@ import type { RegisterRequestDto } from '../dto/index.js';
 import logger from '../../../utils/logger.js';
 import { getServiceName } from '../../../config/service-catalog.js';
 import { PasswordResetService } from '../../../services/passwordResetService.js';
+// WO-O4O-KPA-MEMBER-REGISTRATION-NOTIFICATION-PHASE1-V1:
+//   KPA-Society 가입 신청 시 운영자에게 in-app 알림 발송.
+//   contact-request.controller.ts 의 broadcast 패턴을 그대로 사용한다.
+import { notificationService } from '../../../services/NotificationService.js';
 
 export class AuthRegisterController extends BaseController {
   /**
@@ -264,6 +268,54 @@ export class AuthRegisterController extends BaseController {
           error: emailError,
           userId: user.id,
         });
+      }
+
+      // ─────────────────────────────────────────────────────────────────────
+      // WO-O4O-KPA-MEMBER-REGISTRATION-NOTIFICATION-PHASE1-V1
+      // KPA-society 가입 신청 시 운영자(kpa:operator / kpa:admin) in-app 알림 broadcast.
+      // contact-request.controller.ts 의 검증된 패턴 재사용. best-effort — 실패해도 회원가입 성공.
+      // ─────────────────────────────────────────────────────────────────────
+      if (serviceKey === 'kpa-society') {
+        try {
+          const operators: { userId: string }[] = await AppDataSource.query(
+            `SELECT DISTINCT user_id AS "userId"
+               FROM role_assignments
+              WHERE role IN ('kpa:operator','kpa:admin')
+                AND is_active = true
+              LIMIT 20`,
+          );
+          const membershipType = data.membershipType || 'pharmacist';
+          const isStudent = membershipType === 'student' || membershipType === 'pharmacy_student_member';
+          const memberTypeLabel = isStudent ? '약대생 준회원' : '약사 정회원';
+          const activityType = data.activityType || null;
+          const isPharmacyOwner = activityType === 'pharmacy_owner';
+          const activityLabel = isPharmacyOwner ? ' (개설약사)' : '';
+
+          await Promise.allSettled(
+            operators.map((op) =>
+              notificationService.createNotification({
+                userId: op.userId,
+                type: 'member.registration_pending',
+                title: '신규 KPA 회원 가입 신청',
+                message: `${resolvedName || data.email}님이 ${memberTypeLabel}${activityLabel} 가입을 신청했습니다.`,
+                serviceKey: 'kpa-society',
+                actorId: user.id,
+                metadata: {
+                  userId: user.id,
+                  membershipType,
+                  activityType,
+                  pharmacyName: data.pharmacyName || null,
+                  targetUrl: '/operator/members?tab=status-pending',
+                },
+              }),
+            ),
+          );
+        } catch (notifyError) {
+          logger.warn('[AuthRegisterController.register] Operator notification failed (best-effort)', {
+            error: notifyError instanceof Error ? notifyError.message : String(notifyError),
+            userId: user.id,
+          });
+        }
       }
 
       // P0-T1: No auto-login after registration (status = PENDING)

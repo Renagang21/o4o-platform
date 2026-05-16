@@ -14,6 +14,7 @@
  */
 
 import { useState, useEffect, useCallback, useMemo, type CSSProperties, type ReactNode } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import {
   Users,
@@ -270,7 +271,18 @@ export default function MemberManagementPage() {
     (r) => r === 'kpa:admin' || r === 'platform:super_admin'
   );
 
-  const [activeTab, setActiveTab] = useState('all');
+  // WO-O4O-KPA-MEMBER-REGISTRATION-NOTIFICATION-PHASE1-V1:
+  //   알림 클릭 deeplink — /operator/members?tab=status-pending 지원.
+  //   유효하지 않은 tab 값은 'all' 로 fallback.
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState<string>(() => {
+    const VALID_TABS = new Set([
+      'all', 'pharmacist', 'student', 'applications',
+      'status-pending', 'status-active', 'status-rejected', 'status-suspended', 'status-withdrawn',
+    ]);
+    const initial = searchParams.get('tab');
+    return initial && VALID_TABS.has(initial) ? initial : 'all';
+  });
   const [stats, setStats] = useState<ApplicationStats | null>(null);
   const [memberTotal, setMemberTotal] = useState(0);
   const [pendingMemberCount, setPendingMemberCount] = useState(0);

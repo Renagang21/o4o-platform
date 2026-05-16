@@ -12,9 +12,11 @@
  */
 
 import { useNavigate, Link } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { GraduationCap, LayoutDashboard, Settings, Shield, Store } from 'lucide-react';
 import { GlobalHeader, GlobalHeaderMenuItem } from '@o4o/ui';
+import { NotificationBell, useNotifications } from '@o4o/account-ui';
+import type { NotificationItem } from '@o4o/account-ui';
 import { isOperatorOrAbove, isAdminOrAbove, isStoreOwnerDual } from '@o4o/auth-utils';
 import { useAuth, type User as UserType } from '../contexts';
 import { useAuthModal } from '../contexts/LoginModalContext';
@@ -27,6 +29,7 @@ import {
 } from '../config/navigation';
 import ServiceSwitcher from './ServiceSwitcher';
 import { creditApi } from '../api/credit';
+import { notificationsApi } from '../api/notifications';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -64,6 +67,24 @@ export function KpaGlobalHeader() {
       })
       .catch(() => { /* 실패 시 뱃지 숨김 */ });
   }, [user]);
+
+  // WO-O4O-KPA-MEMBER-REGISTRATION-NOTIFICATION-PHASE1-V1
+  // 알림 — kpa-society serviceKey 로 backend 가 저장하므로 동일 키로 필터.
+  // (KPA 로컬 SERVICE_KEY='kpa' 는 backend 와 불일치 — literal 'kpa-society' 사용)
+  const notif = useNotifications(notificationsApi, {
+    enabled: !!user,
+    serviceKey: 'kpa-society',
+  });
+
+  const handleNotificationClick = useCallback(
+    (n: NotificationItem) => {
+      const target = (n.metadata as Record<string, unknown> | undefined)?.targetUrl;
+      if (typeof target === 'string' && target.length > 0) {
+        navigate(target);
+      }
+    },
+    [navigate],
+  );
 
   // 역할 판정 — WO-O4O-OPERATOR-MENU-COMMONIZATION-V1: platform:super_admin 포함
   const isAdmin = user ? isAdminOrAbove(user.roles, 'kpa') : false;
@@ -129,6 +150,18 @@ export function KpaGlobalHeader() {
             >
               ⭐ {creditBalance.toLocaleString()} C
             </Link>
+          )}
+          {/* WO-O4O-KPA-MEMBER-REGISTRATION-NOTIFICATION-PHASE1-V1: 로그인 사용자에게만 표시 */}
+          {user && (
+            <NotificationBell
+              unreadCount={notif.unreadCount}
+              notifications={notif.notifications}
+              loading={notif.loading}
+              onOpen={notif.refetchList}
+              onItemClick={handleNotificationClick}
+              onMarkAsRead={notif.markAsRead}
+              onMarkAllAsRead={notif.markAllAsRead}
+            />
           )}
           <ServiceSwitcher currentServiceKey="kpa-society" />
         </div>

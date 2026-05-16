@@ -53,6 +53,10 @@ export type NotificationType =
   | 'market_trial.fulfilled'
   // WO-O4O-KPA-CONTACT-FORM-WORKFLOW-V1: Contact 문의 등록 알림
   | 'contact.new'
+  // WO-O4O-KPA-MEMBER-REGISTRATION-NOTIFICATION-PHASE1-V1
+  | 'member.registration_pending'    // 운영자: 신규 회원가입 신청 접수
+  | 'member.registration_approved'   // 신청자: 회원가입 승인
+  | 'member.registration_rejected'   // 신청자: 회원가입 반려
   | 'custom';
 
 // Legacy interface for backward compatibility
