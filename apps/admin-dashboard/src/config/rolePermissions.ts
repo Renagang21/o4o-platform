@@ -57,15 +57,7 @@ export const menuPermissions: MenuPermission[] = [
     menuId: 'users-edit',
     permissions: ['users.edit']
   },
-  {
-    menuId: 'users-roles',
-    permissions: ['users.view']
-  },
-  {
-    menuId: 'users-permissions',
-    permissions: ['users.view']
-  },
-  
+
   // Seller Management - No restriction (allow all)
   // These menus are visible to all authenticated users
 

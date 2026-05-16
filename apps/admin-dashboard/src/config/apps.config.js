@@ -39,7 +39,6 @@ export const apiEndpoints = {
         create: '/users',
         update: (id) => `/users/${id}`,
         delete: (id) => `/users/${id}`,
-        roles: '/users/roles',
     },
     // E-commerce
     products: {

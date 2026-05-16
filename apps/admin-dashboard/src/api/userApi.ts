@@ -1,5 +1,5 @@
 import { unifiedApi } from './unified-client'
-import { User, UserFilters, UserBulkAction, UserFormData, UserStats, UserActivityLog } from '@/types/user'
+import { User, UserFilters, UserBulkAction, UserFormData, UserActivityLog } from '@/types/user'
 import { ApiResponse, PaginatedResponse } from '@/types'
 
 export class UserApi {
@@ -97,11 +97,6 @@ export class UserApi {
       userIds: action.userIds,
       notes: action.reason || 'Bulk action via admin dashboard'
     })
-    return response.data
-  }
-
-  static async getUserStats(): Promise<ApiResponse<UserStats>> {
-    const response = await unifiedApi.raw.get('/v1/users/statistics')
     return response.data
   }
 

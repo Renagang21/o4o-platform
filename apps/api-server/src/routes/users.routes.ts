@@ -93,9 +93,6 @@ router.get(
   userController.getUsers
 );
 
-// Get user statistics
-router.get('/statistics', userController.getUserStatistics);
-
 // Get pending approval users
 router.get(
   '/pending',

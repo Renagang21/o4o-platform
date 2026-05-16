@@ -5,8 +5,6 @@ import { Suspense, lazy } from 'react';
 const UsersPage = lazy(() => import('@/pages/users'));
 const UserForm = lazy(() => import('@/pages/users/UserForm'));
 const UserDetail = lazy(() => import('@/pages/users/UserDetail'));
-const RoleManagement = lazy(() => import('@/pages/users/RoleManagement'));
-const UserStatistics = lazy(() => import('@/pages/users/UserStatistics'));
 const ActiveUsers = lazy(() => import('@/pages/users/ActiveUsers'));
 // Operators Management (admin.neture.co.kr)
 const OperatorsPage = lazy(() => import('@/pages/operators'));
@@ -66,20 +64,6 @@ export function UserRoutes() {
       <AdminProtectedRoute requiredPermissions={['users:create']}>
         <Suspense fallback={<PageLoader />}>
           <UserForm />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/users/roles" path="/users/roles" element={
-      <AdminProtectedRoute requiredPermissions={['users:update']}>
-        <Suspense fallback={<PageLoader />}>
-          <RoleManagement />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/users/statistics" path="/users/statistics" element={
-      <AdminProtectedRoute requiredPermissions={['users:read']}>
-        <Suspense fallback={<PageLoader />}>
-          <UserStatistics />
         </Suspense>
       </AdminProtectedRoute>
     } />,

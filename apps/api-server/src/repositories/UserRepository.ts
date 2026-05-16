@@ -229,25 +229,6 @@ export class UserRepository extends Repository<User> {
     return user;
   }
 
-  // Get user statistics
-  async getUserStatistics(): Promise<{
-    total: number;
-    pending: number;
-    active: number;
-    rejected: number;
-    byRole: Record<string, number>;
-  }> {
-    const total = await this.count();
-    const pending = await this.count({ where: { status: UserStatus.PENDING } });
-    const active = await this.count({ where: { status: UserStatus.ACTIVE } });
-    const rejected = await this.count({ where: { status: UserStatus.REJECTED } });
-
-    // Phase3-E PR3: role 컬럼 제거됨. byRole은 빈 객체 반환.
-    const byRole: Record<string, number> = {};
-
-    return { total, pending, active, rejected, byRole };
-  }
-
   // Find users by role
   async findByRole(role: UserRole, pagination?: PaginationOptions): Promise<{ users: User[]; total: number }> {
     return this.findWithFilters({ role }, pagination);
