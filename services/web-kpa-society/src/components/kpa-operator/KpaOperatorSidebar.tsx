@@ -30,6 +30,7 @@ import {
   DOMAIN_GROUP_ORDER,
   DOMAIN_LABELS,
   GROUP_TO_DOMAIN,
+  TOP_PINNED_GROUPS,
   type OperatorDomainKey,
 } from '../../config/operatorMenuGroups';
 
@@ -68,6 +69,20 @@ export function KpaOperatorSidebar({
   sidebarTopOffset = 'top-6',
 }: KpaOperatorSidebarProps) {
   const { pathname } = useLocation();
+
+  // ── Resolve top-pinned groups (도메인 헤딩과 무관, sidebar 최상단 고정) ──
+  const resolvedTopGroups: ResolvedGroup[] = useMemo(() => {
+    const out: ResolvedGroup[] = [];
+    for (const groupKey of TOP_PINNED_GROUPS) {
+      const items = menuItems[groupKey];
+      if (!items || items.length === 0) continue;
+      const standard = STANDARD_GROUPS.find((g) => g.key === groupKey);
+      if (!standard) continue;
+      if (standard.capability && !capabilities.includes(standard.capability)) continue;
+      out.push({ key: groupKey, label: standard.label, icon: standard.icon, items });
+    }
+    return out;
+  }, [menuItems, capabilities]);
 
   // ── Resolve visible domains × groups (STANDARD_GROUPS 의 icon/label 재사용) ──
   const resolvedDomains: ResolvedDomain[] = useMemo(() => {
@@ -114,8 +129,13 @@ export function KpaOperatorSidebar({
     group.items.some((item) => isItemActive(item.path, item.exact));
 
   // ── Collapsible state ── (active group 자동 open)
+  //   top-pinned 그룹은 single-item 만 가정하므로 collapsible state 대상에서 제외 가능하나,
+  //   미래에 multi-item 가능성 대비해 동일 로직 적용.
   const initialOpen = useMemo(() => {
     const set = new Set<OperatorGroupKey>();
+    for (const g of resolvedTopGroups) {
+      if (isGroupActive(g)) set.add(g.key);
+    }
     for (const dom of resolvedDomains) {
       for (const g of dom.groups) {
         if (isGroupActive(g)) set.add(g.key);
@@ -123,7 +143,7 @@ export function KpaOperatorSidebar({
     }
     return set;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resolvedDomains]);
+  }, [resolvedTopGroups, resolvedDomains]);
   const [openGroups, setOpenGroups] = useState<Set<OperatorGroupKey>>(initialOpen);
 
   const toggleGroup = (key: OperatorGroupKey) => {
@@ -135,10 +155,10 @@ export function KpaOperatorSidebar({
     });
   };
 
-  // ── Mobile: flat tab list (도메인 순서로 그룹 정렬, 헤딩 생략) ──
+  // ── Mobile: flat tab list (top-pinned 우선 + 도메인 순서로 그룹 정렬, 헤딩 생략) ──
   const flatGroupsForMobile = useMemo(
-    () => resolvedDomains.flatMap((d) => d.groups),
-    [resolvedDomains],
+    () => [...resolvedTopGroups, ...resolvedDomains.flatMap((d) => d.groups)],
+    [resolvedTopGroups, resolvedDomains],
   );
 
   return (
@@ -146,12 +166,83 @@ export function KpaOperatorSidebar({
       {/* ── Desktop Sidebar ── */}
       <aside className="w-60 flex-shrink-0 hidden md:block">
         <nav className={`bg-white rounded-xl border border-gray-200 overflow-hidden sticky ${sidebarTopOffset}`}>
+          {/* Top-pinned (대시보드) — 도메인 헤딩 외부, 최상단 고정 */}
+          {resolvedTopGroups.map((group) => {
+            const Icon = group.icon;
+            const active = isGroupActive(group);
+            const isOpen = openGroups.has(group.key);
+            const isSingle = group.items.length === 1;
+
+            if (isSingle) {
+              const item = group.items[0];
+              const itemActive = isItemActive(item.path, item.exact);
+              return (
+                <Link
+                  key={group.key}
+                  to={item.path}
+                  className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors border-l-2 ${
+                    itemActive
+                      ? 'bg-blue-50 text-blue-600 border-blue-600'
+                      : 'text-gray-600 border-transparent hover:bg-gray-50 hover:text-gray-900'
+                  }`}
+                >
+                  <Icon size={18} />
+                  {item.label}
+                </Link>
+              );
+            }
+
+            return (
+              <div key={group.key}>
+                <button
+                  type="button"
+                  onClick={() => toggleGroup(group.key)}
+                  className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors border-l-2 ${
+                    active
+                      ? 'text-blue-600 border-blue-600'
+                      : 'text-gray-600 border-transparent hover:bg-gray-50 hover:text-gray-900'
+                  }`}
+                >
+                  <Icon size={18} />
+                  <span className="flex-1 text-left">{group.label}</span>
+                  {isOpen ? (
+                    <ChevronDown className="w-4 h-4 text-gray-400" />
+                  ) : (
+                    <ChevronRight className="w-4 h-4 text-gray-400" />
+                  )}
+                </button>
+                {isOpen && (
+                  <div className="pb-1">
+                    {group.items.map((item) => {
+                      const itemActive = isItemActive(item.path, item.exact);
+                      return (
+                        <Link
+                          key={item.path}
+                          to={item.path}
+                          className={`block pl-11 pr-4 py-2 text-sm transition-colors ${
+                            itemActive
+                              ? 'text-blue-600 bg-blue-50 font-medium'
+                              : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                          }`}
+                        >
+                          {item.label}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+
           {resolvedDomains.map((domain, domainIdx) => (
             <div key={domain.key}>
-              {/* Domain heading */}
+              {/* Domain heading — top-pinned 존재 여부와 관계 없이 첫 도메인부터 separator */}
               <div
                 className={`px-4 py-2 ${
-                  domainIdx > 0 ? 'border-t border-gray-100' : ''
+                  domainIdx > 0 || resolvedTopGroups.length > 0
+                    ? 'border-t border-gray-100'
+                    : ''
                 } bg-gray-50/60`}
               >
                 <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-gray-500">

@@ -145,16 +145,21 @@ export const GROUP_TO_DOMAIN: Record<OperatorGroupKey, OperatorDomainKey> = {
  *  WO 명시 sidebar 순서를 그룹 키 시퀀스로 변환.
  *  - community: 회원 → 포럼 → 콘텐츠 → LMS → 자료실
  *  - store_hub: 매장 → 상품/이벤트/협업(approvals) → 사이니지
- *  - common: 대시보드 → 분석 → 시스템
+ *  - common: 분석 → 시스템 (대시보드는 TOP_PINNED_GROUPS 에서 별도 처리)
  */
 export const DOMAIN_GROUP_ORDER: Record<OperatorDomainKey, OperatorGroupKey[]> = {
   community: ['users', 'forum', 'content', 'lms', 'resources'],
   store_hub: ['stores', 'approvals', 'signage'],
-  common: ['dashboard', 'analytics', 'system'],
+  common: ['analytics', 'system'],
 };
 
 /** 도메인 표시 순서 (sidebar top → bottom) */
 export const DOMAIN_DISPLAY_ORDER: OperatorDomainKey[] = ['community', 'store_hub', 'common'];
+
+/** sidebar 최상단 고정 항목 — 도메인 헤딩과 무관하게 항상 sidebar 첫 영역에 노출.
+ *  대시보드는 모든 도메인의 진입점이므로 sidebar 최상단에 단독 배치.
+ */
+export const TOP_PINNED_GROUPS: OperatorGroupKey[] = ['dashboard'];
 
 // ─── Legacy export (하위호환, deprecated) ───
 /** @deprecated Use UNIFIED_MENU + filterMenuByRole instead */
