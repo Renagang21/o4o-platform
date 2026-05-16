@@ -13,9 +13,23 @@ import { roleAssignmentService } from '../../modules/auth/services/role-assignme
 import logger from '../../utils/logger.js';
 import type { ServiceMembership } from '../../modules/auth/entities/ServiceMembership.js';
 
+// WO-O4O-ADMIN-OPERATOR-MEMBERSHIP-CANONICAL-KEY-FIX-V1:
+// service-prefixed role (e.g., 'kpa:operator') prefix -> service_memberships canonical service_key 매핑.
+// 미매핑 prefix는 그대로 사용 (neture, glycopharm 등은 self-map).
+// serviceScope.ts의 ROLE_PREFIX_TO_SERVICE_KEY 와 동일 의미. 단일 출처화는 별도 WO.
+const ROLE_PREFIX_TO_CANONICAL_SERVICE_KEY: Record<string, string> = {
+  'kpa': 'kpa-society',
+  'cosmetics': 'k-cosmetics',
+};
+
+function toCanonicalServiceKey(rolePrefix: string): string {
+  return ROLE_PREFIX_TO_CANONICAL_SERVICE_KEY[rolePrefix] || rolePrefix;
+}
+
 export class AdminUserController {
 
   // WO-O4O-OPERATOR-CREATION-FLOW-FIX-V1: Ensure service_memberships exist for each role's service
+  // WO-O4O-ADMIN-OPERATOR-MEMBERSHIP-CANONICAL-KEY-FIX-V1: role prefix를 canonical service_key로 매핑
   private ensureServiceMemberships = async (userId: string, roles: string[]): Promise<void> => {
     const smRepo = AppDataSource.getRepository<ServiceMembership>('ServiceMembership');
     const processedServices = new Set<string>();
@@ -23,7 +37,8 @@ export class AdminUserController {
     for (const r of roles) {
       const parts = r.split(':');
       if (parts.length === 2) {
-        const [serviceKey, roleName] = parts;
+        const [rolePrefix, roleName] = parts;
+        const serviceKey = toCanonicalServiceKey(rolePrefix);
         if (!processedServices.has(serviceKey)) {
           processedServices.add(serviceKey);
           const existing = await smRepo.findOne({ where: { userId, serviceKey } as any });
