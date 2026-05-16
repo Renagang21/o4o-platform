@@ -13,7 +13,7 @@
  * 탭: 전체 | 약사 | 약대생 | 가입 신청
  */
 
-import { useState, useEffect, useCallback, useMemo, type ReactNode } from 'react';
+import { useState, useEffect, useCallback, useMemo, type CSSProperties, type ReactNode } from 'react';
 import { toast } from '@o4o/error-handling';
 import {
   Users,
@@ -27,7 +27,6 @@ import {
   RefreshCw,
   Pencil,
   Trash2,
-  X,
   ShieldAlert,
 } from 'lucide-react';
 import { ActionBar, BulkResultModal, RowActionMenu, ConfirmActionDialog, BaseDetailDrawer } from '@o4o/ui';
@@ -243,91 +242,20 @@ const STATUS_TAB_FILTER: Record<string, MemberStatus | ''> = {
   applications: '',
 };
 
-// ─── Edit Member Modal (WO-KPA-A-MEMBER-EDIT-AND-DELETE-FLOW-V1) ───
-
-function EditMemberModal({
-  member,
-  onClose,
-  onSaved,
-}: {
-  member: KpaMember;
-  onClose: () => void;
-  onSaved: () => void;
-}) {
-  const [form, setForm] = useState({
-    name: member.user?.name || '',
-    membership_type: member.membership_type || 'pharmacist',
-    license_number: member.license_number || '',
-    pharmacy_name: member.pharmacy_name || '',
-  });
-  const [saving, setSaving] = useState(false);
-
-  const handleSave = async () => {
-    setSaving(true);
-    try {
-      await apiClient.patch(`/members/${member.id}/info`, form);
-      toast.success('회원 정보가 수정되었습니다.');
-      onSaved();
-      onClose();
-    } catch (e: any) {
-      toast.error(e.message || '수정 실패');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-slate-900">회원 정보 수정</h3>
-          <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded"><X className="w-5 h-5 text-slate-400" /></button>
-        </div>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">이름</label>
-            <input type="text" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">유형</label>
-            <select value={form.membership_type} onChange={e => setForm(f => ({ ...f, membership_type: e.target.value as any }))}
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="pharmacist">약사</option>
-              <option value="student">약대생</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">면허번호</label>
-            <input type="text" value={form.license_number} onChange={e => setForm(f => ({ ...f, license_number: e.target.value }))}
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">약국명</label>
-            <input type="text" value={form.pharmacy_name} onChange={e => setForm(f => ({ ...f, pharmacy_name: e.target.value }))}
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          </div>
-          <div className="text-xs text-slate-400">이메일: {member.user?.email || '-'} (읽기 전용)</div>
-        </div>
-        <div className="flex justify-end gap-2 mt-6">
-          <button onClick={onClose} className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">취소</button>
-          <button onClick={handleSave} disabled={saving}
-            className="px-4 py-2 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50">
-            {saving ? '저장 중...' : '저장'}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-
 // ─── Component ───────────────────────────────────────────────
 
 export default function MemberManagementPage() {
-  const { user: _user } = useAuth();
+  const { user: currentUser } = useAuth();
   // WO-O4O-KPA-ADMIN-MEMBER-MANAGEMENT-SEPARATION-V1:
   //   isKpaAdmin 분기 제거 — 완전삭제는 /admin/members 에서 처리. 본 페이지는 operator 표준 UX.
+
+  // WO-O4O-OPERATOR-MEMBER-EDIT-ROLE-MANAGEMENT-V1:
+  //   현재 사용자가 admin scope 보유 여부 (조직 역할 변경 자격).
+  //   kpa:admin 또는 platform:super_admin 이면 PATCH /:id/role 호출 가능.
+  const currentUserRoles = currentUser?.roles ?? [];
+  const currentUserIsAdmin = currentUserRoles.some(
+    (r) => r === 'kpa:admin' || r === 'platform:super_admin'
+  );
 
   const [activeTab, setActiveTab] = useState('all');
   const [stats, setStats] = useState<ApplicationStats | null>(null);
@@ -350,10 +278,20 @@ export default function MemberManagementPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [editTarget, setEditTarget] = useState<KpaMember | null>(null);
   // WO-O4O-KPA-ADMIN-MEMBER-MANAGEMENT-SEPARATION-V1:
   //   완전삭제 진입점 + DeleteRiskModal 은 /admin/members (AdminMemberManagementPage) 로 이관.
   const [selectedMember, setSelectedMember] = useState<KpaMember | null>(null);
+  // WO-O4O-OPERATOR-MEMBER-EDIT-ROLE-MANAGEMENT-V1:
+  //   Drawer 인라인 편집 모드 + 폼 state.
+  //   기존 EditMemberModal 제거 — 모든 편집은 Drawer 내부에서 진행.
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState<{
+    name: string;
+    membership_type: string;
+    role: MemberRole;
+    status: MemberStatus;
+  }>({ name: '', membership_type: 'pharmacist', role: 'member', status: 'active' });
+  const [savingEdit, setSavingEdit] = useState(false);
 
   // WO-O4O-KPA-MEMBER-BULK-ACTION-ALIGN-V1: bulk selection + batch hook
   //   - selectedIds: 현재 페이지 기준 회원 ID 집합 (canonical Set<string>)
@@ -419,6 +357,126 @@ export default function MemberManagementPage() {
       setActionLoading(null);
     }
   }
+
+  // ────────────────────────────────────────────────────────────
+  // WO-O4O-OPERATOR-MEMBER-EDIT-ROLE-MANAGEMENT-V1:
+  //   Drawer 인라인 편집 모드 helpers.
+  //   - 편집 가능 필드: 이름, 회원 유형, 조직 역할, 상태
+  //   - 이메일: 표시만 (수정 불가)
+  //   - capability(권한 chip): 표시만 (별도 부여/회수 흐름 유지)
+  //   - super_admin(platform:super_admin capability 보유자): 편집 진입 자체 차단
+  //   - 조직 역할 변경: kpa:admin / platform:super_admin scope 필요 (백엔드 PATCH /:id/role)
+  // ────────────────────────────────────────────────────────────
+
+  const memberHasSuperAdmin = useCallback((m: KpaMember | null): boolean => {
+    if (!m) return false;
+    return (m.capabilities ?? []).includes('platform:super_admin');
+  }, []);
+
+  const openMemberEdit = useCallback((m: KpaMember) => {
+    if (memberHasSuperAdmin(m)) {
+      toast.error('super_admin 권한을 보유한 회원은 수정할 수 없습니다.');
+      return;
+    }
+    setSelectedMember(m);
+    setEditForm({
+      name: m.user?.name || '',
+      membership_type: m.membership_type || 'pharmacist',
+      role: (m.role || 'member') as MemberRole,
+      status: m.status,
+    });
+    setIsEditing(true);
+  }, [memberHasSuperAdmin]);
+
+  const enterEditMode = useCallback(() => {
+    if (!selectedMember) return;
+    if (memberHasSuperAdmin(selectedMember)) {
+      toast.error('super_admin 권한을 보유한 회원은 수정할 수 없습니다.');
+      return;
+    }
+    setEditForm({
+      name: selectedMember.user?.name || '',
+      membership_type: selectedMember.membership_type || 'pharmacist',
+      role: (selectedMember.role || 'member') as MemberRole,
+      status: selectedMember.status,
+    });
+    setIsEditing(true);
+  }, [selectedMember, memberHasSuperAdmin]);
+
+  const cancelEditMode = useCallback(() => setIsEditing(false), []);
+
+  const saveMemberEdit = useCallback(async () => {
+    if (!selectedMember) return;
+    setSavingEdit(true);
+    try {
+      // 1) 사전 검증 — super_admin 방어 (이중 가드)
+      if (memberHasSuperAdmin(selectedMember)) {
+        throw new Error('super_admin 권한을 보유한 회원은 수정할 수 없습니다.');
+      }
+
+      // 2) 변경 사항 계산
+      const currentName = (selectedMember.user?.name || '').trim();
+      const newName = editForm.name.trim();
+      const nameChanged = newName !== currentName;
+      const typeChanged = editForm.membership_type !== (selectedMember.membership_type || '');
+      const roleChanged = editForm.role !== (selectedMember.role || 'member');
+      const statusChanged = editForm.status !== selectedMember.status;
+
+      if (!nameChanged && !typeChanged && !roleChanged && !statusChanged) {
+        setIsEditing(false);
+        return;
+      }
+
+      // 3) 권한 사전 검증 (서버도 검증하지만 사용자 피드백 명확화)
+      if (roleChanged) {
+        if (!currentUserIsAdmin) {
+          throw new Error('조직 역할 변경은 admin 권한이 필요합니다.');
+        }
+        if (currentUser && selectedMember.user_id === currentUser.id && editForm.role === 'admin') {
+          throw new Error('자신을 admin으로 지정할 수 없습니다.');
+        }
+      }
+
+      // 4) 순차 호출 — info → role → status
+      //    순서 고정: role 변경이 status 변경 흐름(MembershipApprovalService)에 영향 줄 수 있어 status 가 마지막.
+      if (nameChanged || typeChanged) {
+        const payload: Record<string, string> = {};
+        if (nameChanged) payload.name = newName;
+        if (typeChanged) payload.membership_type = editForm.membership_type;
+        await apiClient.patch(`/members/${selectedMember.id}/info`, payload);
+      }
+      if (roleChanged) {
+        await apiClient.patch(`/members/${selectedMember.id}/role`, { role: editForm.role });
+      }
+      if (statusChanged) {
+        await apiClient.patch(`/members/${selectedMember.id}/status`, { status: editForm.status });
+      }
+
+      toast.success('회원 정보가 저장되었습니다.');
+      setIsEditing(false);
+      // 5) 목록 + Drawer (selectedMember) 갱신 — selectedMember 는 별도 effect 가 members 변동 시 동기화.
+      await fetchMembers(memberPage);
+    } catch (e: any) {
+      toast.error(e?.message || '저장에 실패했습니다.');
+    } finally {
+      setSavingEdit(false);
+    }
+  }, [selectedMember, editForm, memberHasSuperAdmin, currentUserIsAdmin, currentUser, fetchMembers, memberPage]);
+
+  // 목록(fetchMembers) 갱신 후 Drawer 의 selectedMember 도 최신 데이터로 동기화.
+  // selectedMember 가 현재 페이지에 없으면(필터 변경 등) 기존 객체 유지.
+  useEffect(() => {
+    setSelectedMember((prev) => {
+      if (!prev) return prev;
+      const refreshed = members.find((m) => m.id === prev.id);
+      return refreshed ?? prev;
+    });
+  }, [members]);
+
+  // Drawer 닫힘 시 편집 모드 해제
+  useEffect(() => {
+    if (!selectedMember) setIsEditing(false);
+  }, [selectedMember]);
 
   // WO-O4O-KPA-MEMBER-BULK-ACTION-ALIGN-V1:
   //   sequential batch wrapper — 별도 backend bulk endpoint 없이 기존 PATCH /members/:id/status 를 N회 병렬 호출.
@@ -662,7 +720,7 @@ export default function MemberManagementPage() {
             reject: () => handleStatusChange(m.id, 'rejected'),
             suspend: () => handleStatusChange(m.id, 'suspended'),
             restore: () => handleStatusChange(m.id, 'active'),
-            edit: () => setEditTarget(m),
+            edit: () => openMemberEdit(m),
             // WO-O4O-KPA-MEMBER-BULK-DELETE-WORKFLOW-REFACTOR-V1:
             //   삭제 콜백은 bulk action 으로 이관되어 행 메뉴에서는 더 이상 호출하지 않음.
           }, {
@@ -903,132 +961,293 @@ export default function MemberManagementPage() {
         onRetry={() => { batch.retryFailed(); }}
       />
 
-      {/* WO-KPA-A-MEMBER-EDIT-AND-DELETE-FLOW-V1: 수정 모달 */}
-      {editTarget && (
-        <EditMemberModal
-          member={editTarget}
-          onClose={() => setEditTarget(null)}
-          onSaved={() => fetchMembers(memberPage)}
-        />
-      )}
+      {/* WO-O4O-OPERATOR-MEMBER-EDIT-ROLE-MANAGEMENT-V1:
+          기존 EditMemberModal 제거 — 모든 회원 수정은 Drawer 인라인 편집 모드로 통합. */}
 
       {/* WO-O4O-KPA-ADMIN-MEMBER-MANAGEMENT-SEPARATION-V1:
           완전삭제 진입점 + DeleteRiskModal 은 /admin/members 로 이관되었음. */}
 
-      {/* 회원 상세 Drawer */}
+      {/* 회원 상세 Drawer
+          WO-O4O-OPERATOR-MEMBER-EDIT-ROLE-MANAGEMENT-V1:
+            - 편집 모드(isEditing=true): footer 가 [저장, 취소] 로 전환.
+            - 보기 모드: 기존 status 기반 quick action 유지 (super_admin 회원은 가드).
+       */}
       <BaseDetailDrawer
         open={!!selectedMember}
         onClose={() => setSelectedMember(null)}
         title={selectedMember ? (selectedMember.user?.name || '-') : ''}
         width={520}
-        actions={selectedMember ? [
-          ...(selectedMember.status === 'pending' ? [
+        actions={selectedMember ? (
+          isEditing ? [
             {
-              label: '승인',
-              onClick: () => { handleStatusChange(selectedMember.id, 'active').then(() => setSelectedMember(null)); },
+              label: '저장',
+              onClick: () => { void saveMemberEdit(); },
               variant: 'primary' as const,
-              loading: actionLoading === selectedMember.id,
-              disabled: actionLoading === selectedMember.id,
+              loading: savingEdit,
+              disabled: savingEdit,
             },
             {
-              label: '반려',
-              onClick: () => { handleStatusChange(selectedMember.id, 'rejected').then(() => setSelectedMember(null)); },
-              variant: 'danger' as const,
-              loading: actionLoading === selectedMember.id,
-              disabled: actionLoading === selectedMember.id,
+              label: '취소',
+              onClick: cancelEditMode,
+              variant: 'default' as const,
+              disabled: savingEdit,
             },
-          ] : []),
-          ...(selectedMember.status === 'active' ? [{
-            label: '정지',
-            onClick: () => { handleStatusChange(selectedMember.id, 'suspended').then(() => setSelectedMember(null)); },
-            variant: 'danger' as const,
-            loading: actionLoading === selectedMember.id,
-            disabled: actionLoading === selectedMember.id,
-          }] : []),
-          ...(selectedMember.status === 'suspended' ? [{
-            label: '복원',
-            onClick: () => { handleStatusChange(selectedMember.id, 'active').then(() => setSelectedMember(null)); },
-            variant: 'primary' as const,
-            loading: actionLoading === selectedMember.id,
-            disabled: actionLoading === selectedMember.id,
-          }] : []),
-        ] : []}
+          ] : [
+            ...(memberHasSuperAdmin(selectedMember) ? [] : [
+              ...(selectedMember.status === 'pending' ? [
+                {
+                  label: '승인',
+                  onClick: () => { handleStatusChange(selectedMember.id, 'active').then(() => setSelectedMember(null)); },
+                  variant: 'primary' as const,
+                  loading: actionLoading === selectedMember.id,
+                  disabled: actionLoading === selectedMember.id,
+                },
+                {
+                  label: '반려',
+                  onClick: () => { handleStatusChange(selectedMember.id, 'rejected').then(() => setSelectedMember(null)); },
+                  variant: 'danger' as const,
+                  loading: actionLoading === selectedMember.id,
+                  disabled: actionLoading === selectedMember.id,
+                },
+              ] : []),
+              ...(selectedMember.status === 'active' ? [{
+                label: '정지',
+                onClick: () => { handleStatusChange(selectedMember.id, 'suspended').then(() => setSelectedMember(null)); },
+                variant: 'danger' as const,
+                loading: actionLoading === selectedMember.id,
+                disabled: actionLoading === selectedMember.id,
+              }] : []),
+              ...(selectedMember.status === 'suspended' ? [{
+                label: '복원',
+                onClick: () => { handleStatusChange(selectedMember.id, 'active').then(() => setSelectedMember(null)); },
+                variant: 'primary' as const,
+                loading: actionLoading === selectedMember.id,
+                disabled: actionLoading === selectedMember.id,
+              }] : []),
+            ]),
+          ]
+        ) : []}
       >
-        {selectedMember && (
-          <div style={{ fontSize: 14, color: '#374151' }}>
-            {/* 기본 정보 */}
-            <div style={{ padding: '12px 16px', backgroundColor: '#f8fafc', borderRadius: '8px', marginBottom: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
-                <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: 16, color: '#475569', flexShrink: 0 }}>
-                  {(selectedMember.user?.name || '-').charAt(0)}
-                </div>
-                <div>
-                  <p style={{ fontWeight: 600, fontSize: 15, color: '#1e293b', marginBottom: 2 }}>{selectedMember.user?.name || '-'}</p>
-                  <p style={{ fontSize: 13, color: '#64748b' }}>{selectedMember.user?.email || '-'}</p>
-                </div>
-                <div style={{ marginLeft: 'auto' }}>
-                  <StatusBadge status={selectedMember.status} />
+        {selectedMember && (() => {
+          // WO-O4O-OPERATOR-MEMBER-EDIT-ROLE-MANAGEMENT-V1:
+          //   편집/보기 모드 분기. super_admin 회원은 편집 진입 차단.
+          const targetIsSuperAdmin = memberHasSuperAdmin(selectedMember);
+          const targetIsSelf = !!currentUser && selectedMember.user_id === currentUser.id;
+          const roleSelectDisabled = !currentUserIsAdmin; // admin scope 없으면 비활성
+          const inputStyle: CSSProperties = {
+            width: '100%',
+            padding: '6px 10px',
+            border: '1px solid #cbd5e1',
+            borderRadius: 6,
+            fontSize: 14,
+            color: '#1e293b',
+            background: '#fff',
+          };
+          const fieldRowStyle: CSSProperties = { display: 'flex', gap: 12, marginBottom: 10, alignItems: 'center' };
+          const labelStyle: CSSProperties = { fontWeight: 600, color: '#64748b', minWidth: 70, flexShrink: 0 };
+          const valueStyle: CSSProperties = { color: '#1e293b', flex: 1 };
+
+          return (
+            <div style={{ fontSize: 14, color: '#374151' }}>
+              {/* 기본 정보 */}
+              <div style={{ padding: '12px 16px', backgroundColor: '#f8fafc', borderRadius: '8px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
+                  <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: 16, color: '#475569', flexShrink: 0 }}>
+                    {(selectedMember.user?.name || '-').charAt(0)}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        value={editForm.name}
+                        onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
+                        placeholder="이름"
+                        disabled={savingEdit}
+                        style={{ ...inputStyle, fontWeight: 600, fontSize: 15, marginBottom: 4 }}
+                      />
+                    ) : (
+                      <p style={{ fontWeight: 600, fontSize: 15, color: '#1e293b', marginBottom: 2 }}>
+                        {selectedMember.user?.name || '-'}
+                      </p>
+                    )}
+                    <p style={{ fontSize: 13, color: '#64748b' }} title="이메일은 수정할 수 없습니다">
+                      {selectedMember.user?.email || '-'}
+                    </p>
+                  </div>
+                  <div style={{ marginLeft: 'auto' }}>
+                    <StatusBadge status={selectedMember.status} />
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* 상세 필드 — WO-O4O-KPA-MEMBER-PROFILE-CAPABILITY-COLUMN-ADD-V1:
-                활동 유형(profile metadata) + 조직 역할(kpa_members.role) 분리.
-                권한(capabilities) 은 chip 으로 별도 렌더 (아래). */}
-            {([
-              { label: '유형', value: selectedMember.membership_type === 'pharmacist' ? '약사' : '약대생' },
-              selectedMember.activity_type
-                ? { label: '활동 유형', value: ACTIVITY_TYPE_LABELS[selectedMember.activity_type] ?? selectedMember.activity_type }
-                : null,
-              { label: '조직 역할', value: selectedMember.role ? (roleLabels[selectedMember.role as MemberRole] ?? selectedMember.role) : '-' },
-              selectedMember.license_number ? { label: '면허번호', value: selectedMember.license_number } : null,
-              selectedMember.pharmacy_name ? { label: '약국명', value: selectedMember.pharmacy_name } : null,
-              { label: '가입일', value: formatDate(selectedMember.joined_at || selectedMember.created_at) },
-            ] as ({ label: string; value: string } | null)[]).filter(Boolean).map((item) => (
-              <div key={item!.label} style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
-                <span style={{ fontWeight: 600, color: '#64748b', minWidth: 70 }}>{item!.label}</span>
-                <span style={{ color: '#1e293b' }}>{item!.value}</span>
+              {/* 상세 필드 */}
+              {/* 유형 */}
+              <div style={fieldRowStyle}>
+                <span style={labelStyle}>유형</span>
+                {isEditing ? (
+                  <select
+                    value={editForm.membership_type}
+                    onChange={(e) => setEditForm((f) => ({ ...f, membership_type: e.target.value }))}
+                    disabled={savingEdit}
+                    style={inputStyle}
+                  >
+                    <option value="pharmacist">약사</option>
+                    <option value="student">약대생</option>
+                    {/* legacy alias 값이 들어와 있는 경우 표시 유지 */}
+                    {editForm.membership_type === 'pharmacist_member' && (
+                      <option value="pharmacist_member">약사 (legacy)</option>
+                    )}
+                    {editForm.membership_type === 'pharmacy_student_member' && (
+                      <option value="pharmacy_student_member">약대생 (legacy)</option>
+                    )}
+                  </select>
+                ) : (
+                  <span style={valueStyle}>
+                    {selectedMember.membership_type === 'pharmacist' || selectedMember.membership_type === 'pharmacist_member'
+                      ? '약사'
+                      : selectedMember.membership_type === 'student' || selectedMember.membership_type === 'pharmacy_student_member'
+                        ? '약대생'
+                        : '-'}
+                  </span>
+                )}
               </div>
-            ))}
 
-            {/* 권한 (capability chips) */}
-            <div style={{ display: 'flex', gap: 12, marginBottom: 10, alignItems: 'flex-start' }}>
-              <span style={{ fontWeight: 600, color: '#64748b', minWidth: 70 }}>권한</span>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                {(() => {
-                  const caps = sortCapabilities(selectedMember.capabilities ?? []);
-                  if (caps.length === 0) return <span style={{ color: '#94a3b8', fontSize: 13 }}>일반 회원</span>;
-                  return caps.map((cap) => (
-                    <span
-                      key={cap}
-                      title={cap}
-                      style={{
-                        display: 'inline-flex', alignItems: 'center',
-                        padding: '2px 8px', fontSize: 11, fontWeight: 500,
-                        borderRadius: 9999,
-                        backgroundColor: '#eef2ff', border: '1px solid #c7d2fe', color: '#4338ca',
-                      }}
+              {/* 활동 유형 — 표시 전용 */}
+              {selectedMember.activity_type && (
+                <div style={fieldRowStyle}>
+                  <span style={labelStyle}>활동 유형</span>
+                  <span style={valueStyle}>
+                    {ACTIVITY_TYPE_LABELS[selectedMember.activity_type] ?? selectedMember.activity_type}
+                  </span>
+                </div>
+              )}
+
+              {/* 조직 역할 */}
+              <div style={fieldRowStyle}>
+                <span style={labelStyle}>조직 역할</span>
+                {isEditing ? (
+                  <div style={{ flex: 1 }}>
+                    <select
+                      value={editForm.role}
+                      onChange={(e) => setEditForm((f) => ({ ...f, role: e.target.value as MemberRole }))}
+                      disabled={savingEdit || roleSelectDisabled}
+                      style={inputStyle}
                     >
-                      {formatCapabilityLabel(cap)}
-                    </span>
-                  ));
-                })()}
+                      <option value="member">회원</option>
+                      <option value="operator">운영자</option>
+                      {/* self-escalation 차단: 자신을 admin 으로 못 만듦 (백엔드도 차단) */}
+                      <option value="admin" disabled={targetIsSelf}>관리자</option>
+                    </select>
+                    {roleSelectDisabled && (
+                      <p style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>
+                        조직 역할 변경은 admin 권한이 필요합니다.
+                      </p>
+                    )}
+                    {!roleSelectDisabled && targetIsSelf && (
+                      <p style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>
+                        자신을 admin으로 지정할 수 없습니다.
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <span style={valueStyle}>
+                    {selectedMember.role ? (roleLabels[selectedMember.role as MemberRole] ?? selectedMember.role) : '-'}
+                  </span>
+                )}
               </div>
-            </div>
 
-            {/* 수정/삭제 링크 */}
-            <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid #f1f5f9', display: 'flex', gap: 12 }}>
-              <button
-                onClick={() => { setEditTarget(selectedMember); setSelectedMember(null); }}
-                style={{ fontSize: 13, color: '#2563eb', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-              >
-                정보 수정
-              </button>
-              {/* WO-O4O-KPA-ADMIN-MEMBER-MANAGEMENT-SEPARATION-V1:
-                  완전삭제 진입점은 /admin/members 로 이관되었으므로 본 Drawer 의 삭제 버튼 제거 */}
+              {/* 상태 */}
+              <div style={fieldRowStyle}>
+                <span style={labelStyle}>상태</span>
+                {isEditing ? (
+                  <select
+                    value={editForm.status}
+                    onChange={(e) => setEditForm((f) => ({ ...f, status: e.target.value as MemberStatus }))}
+                    disabled={savingEdit}
+                    style={inputStyle}
+                  >
+                    <option value="pending">대기</option>
+                    <option value="active">활성</option>
+                    <option value="suspended">정지</option>
+                    <option value="rejected">반려</option>
+                    <option value="withdrawn">탈퇴</option>
+                  </select>
+                ) : (
+                  <span style={valueStyle}><StatusBadge status={selectedMember.status} /></span>
+                )}
+              </div>
+
+              {/* 면허번호 — 표시 전용 (info endpoint 가 받지만 본 WO 범위 외) */}
+              {selectedMember.license_number && (
+                <div style={fieldRowStyle}>
+                  <span style={labelStyle}>면허번호</span>
+                  <span style={valueStyle}>{selectedMember.license_number}</span>
+                </div>
+              )}
+
+              {/* 약국명 — 표시 전용 */}
+              {selectedMember.pharmacy_name && (
+                <div style={fieldRowStyle}>
+                  <span style={labelStyle}>약국명</span>
+                  <span style={valueStyle}>{selectedMember.pharmacy_name}</span>
+                </div>
+              )}
+
+              {/* 가입일 */}
+              <div style={fieldRowStyle}>
+                <span style={labelStyle}>가입일</span>
+                <span style={valueStyle}>{formatDate(selectedMember.joined_at || selectedMember.created_at)}</span>
+              </div>
+
+              {/* 권한 (capability chips) — 항상 표시 전용 */}
+              <div style={{ display: 'flex', gap: 12, marginBottom: 10, alignItems: 'flex-start' }}>
+                <span style={labelStyle}>권한</span>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                  {(() => {
+                    const caps = sortCapabilities(selectedMember.capabilities ?? []);
+                    if (caps.length === 0) return <span style={{ color: '#94a3b8', fontSize: 13 }}>일반 회원</span>;
+                    return caps.map((cap) => (
+                      <span
+                        key={cap}
+                        title={cap}
+                        style={{
+                          display: 'inline-flex', alignItems: 'center',
+                          padding: '2px 8px', fontSize: 11, fontWeight: 500,
+                          borderRadius: 9999,
+                          backgroundColor: '#eef2ff', border: '1px solid #c7d2fe', color: '#4338ca',
+                        }}
+                      >
+                        {formatCapabilityLabel(cap)}
+                      </span>
+                    ));
+                  })()}
+                </div>
+              </div>
+
+              {/* 정보 수정 진입 / super_admin 차단 안내 */}
+              {!isEditing && (
+                <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid #f1f5f9', display: 'flex', gap: 12, alignItems: 'center' }}>
+                  {targetIsSuperAdmin ? (
+                    <span style={{ fontSize: 12, color: '#94a3b8', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                      <ShieldAlert size={14} />
+                      super_admin 권한을 보유한 회원은 본 화면에서 수정할 수 없습니다.
+                    </span>
+                  ) : (
+                    <button
+                      onClick={enterEditMode}
+                      style={{ fontSize: 13, color: '#2563eb', background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                    >
+                      <Pencil size={13} />
+                      정보 수정
+                    </button>
+                  )}
+                  {/* WO-O4O-KPA-ADMIN-MEMBER-MANAGEMENT-SEPARATION-V1:
+                      완전삭제 진입점은 /admin/members 로 이관되었으므로 본 Drawer 의 삭제 버튼 제거 */}
+                </div>
+              )}
             </div>
-          </div>
-        )}
+          );
+        })()}
       </BaseDetailDrawer>
     </div>
   );
