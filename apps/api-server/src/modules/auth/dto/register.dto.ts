@@ -70,6 +70,27 @@ export class RegisterRequestDto {
   @IsString()
   licenseNumber?: string;
 
+  /**
+   * WO-O4O-KPA-REGISTER-MODAL-ACTIVITY-AND-PHARMACY-OWNER-INTEGRATION-V1:
+   * 약사 가입 단계 직역 (canonical UI 6종, backend enum 11종 부분집합).
+   */
+  @IsOptional()
+  @IsIn([
+    'pharmacy_owner', 'pharmacy_employee', 'hospital', 'manufacturer',
+    'importer', 'wholesaler', 'other_industry', 'government', 'school', 'other', 'inactive',
+  ])
+  activityType?: string;
+
+  /** KPA 약사: 근무처(또는 약국) 주소 — kpa_members.pharmacy_address 저장 */
+  @IsOptional()
+  @IsString()
+  pharmacyAddress?: string;
+
+  /** KPA 약사: 근무처(또는 약국) 전화번호 — 숫자만, optional */
+  @IsOptional()
+  @IsString()
+  pharmacyPhone?: string;
+
   @IsOptional()
   @IsString()
   universityName?: string;

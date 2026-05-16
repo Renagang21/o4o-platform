@@ -302,7 +302,8 @@ export function createMemberController(
                km.created_at AS km_created_at,
                km.updated_at AS km_updated_at,
                u.name       AS user_name,
-               u.email      AS user_email
+               u.email      AS user_email,
+               u."businessInfo" AS user_business_info
              ${baseFrom}
              ORDER BY sm.created_at DESC
              LIMIT $${paramIdx} OFFSET $${paramIdx + 1}`,
@@ -315,33 +316,50 @@ export function createMemberController(
         // WO-O4O-KPA-OPERATOR-MEMBER-LIST-SOURCE-FIX-V1:
         //   id = km_id (kpa_members 있을 때) | sm_id (없을 때) — 항상 유효한 UUID
         //   has_kpa_member = true/false — UI에서 "KPA 프로필 없음" 표시 + 액션 비활성화
-        const members = (rows as any[]).map((r) => ({
-          id: r.km_id ?? r.sm_id,
-          sm_id: r.sm_id,
-          user_id: r.user_id,
-          has_kpa_member: !!r.km_id,
-          status: r.status,
-          kpa_status: r.kpa_status ?? null,
-          organization_id: r.organization_id ?? null,
-          role: r.role ?? null,
-          membership_type: r.membership_type ?? null,
-          license_number: r.license_number ?? null,
-          pharmacy_name: r.pharmacy_name ?? null,
-          pharmacy_address: r.pharmacy_address ?? null,
-          activity_type: r.activity_type ?? null,
-          fee_category: r.fee_category ?? null,
-          sub_role: r.sub_role ?? null,
-          university_name: r.university_name ?? null,
-          student_year: r.student_year ?? null,
-          joined_at: r.joined_at ?? null,
-          created_at: r.sm_created_at,
-          updated_at: r.km_updated_at ?? r.sm_created_at,
-          service_key: r.service_key,
-          user: {
-            name: r.user_name ?? null,
-            email: r.user_email ?? null,
-          },
-        }));
+        const members = (rows as any[]).map((r) => {
+          // WO-O4O-KPA-REGISTER-MODAL-ACTIVITY-AND-PHARMACY-OWNER-INTEGRATION-V1:
+          //   개설약사 가입 시 users.businessInfo 에 저장된 사업자 정보 일부를 운영자에게 노출.
+          //   민감 정보(은행/세금 등)는 제외, 회원 승인 판단에 필요한 항목만.
+          const businessInfo = (r.user_business_info && typeof r.user_business_info === 'object')
+            ? r.user_business_info as Record<string, any>
+            : null;
+          const business_info = businessInfo
+            ? {
+                businessNumber: businessInfo.businessNumber ?? null,
+                businessName: businessInfo.businessName ?? null,
+                representativeName: businessInfo.representativeName ?? null,
+                taxEmail: businessInfo.taxEmail ?? null,
+              }
+            : null;
+          return {
+            id: r.km_id ?? r.sm_id,
+            sm_id: r.sm_id,
+            user_id: r.user_id,
+            has_kpa_member: !!r.km_id,
+            status: r.status,
+            kpa_status: r.kpa_status ?? null,
+            organization_id: r.organization_id ?? null,
+            role: r.role ?? null,
+            membership_type: r.membership_type ?? null,
+            license_number: r.license_number ?? null,
+            pharmacy_name: r.pharmacy_name ?? null,
+            pharmacy_address: r.pharmacy_address ?? null,
+            activity_type: r.activity_type ?? null,
+            fee_category: r.fee_category ?? null,
+            sub_role: r.sub_role ?? null,
+            university_name: r.university_name ?? null,
+            student_year: r.student_year ?? null,
+            joined_at: r.joined_at ?? null,
+            created_at: r.sm_created_at,
+            updated_at: r.km_updated_at ?? r.sm_created_at,
+            service_key: r.service_key,
+            business_info,
+            user: {
+              name: r.user_name ?? null,
+              email: r.user_email ?? null,
+            },
+          };
+        });
 
         // WO-O4O-KPA-MEMBER-PROFILE-CAPABILITY-COLUMN-ADD-V1:
         //   role_assignments 의 active role 을 user_id 별 batch 조회 후 attach.

@@ -1,11 +1,16 @@
 /**
  * RegisterModal - KPA Society 회원가입 모달
  *
- * WO-O4O-KPA-REGISTER-CANONICAL-CLEANUP-V1
+ * WO-O4O-KPA-REGISTER-MODAL-ACTIVITY-AND-PHARMACY-OWNER-INTEGRATION-V1
  *
  * 2개 회원 그룹 (canonical):
  *   1. pharmacist_member       — 약사 정회원 (면허 보유)
  *   2. pharmacy_student_member — 약대생 준회원
+ *
+ * 약사 가입 단계 입력:
+ *   - 직역 (activity_type): canonical 6종 (UI) → backend 11종 enum 매핑
+ *   - 근무처: 근무처명·주소·전화(선택)
+ *   - 개설약사 추가: 사업자번호·대표자명·세금계산서이메일(선택)·사업장 주소
  *
  * 흐름: select → form → success
  */
@@ -16,6 +21,28 @@ import { useAuthModal } from '../contexts/AuthModalContext';
 
 type MemberType = 'pharmacist_member' | 'pharmacy_student_member';
 type Step = 'select' | 'form' | 'success';
+
+/**
+ * 직역 canonical UI 분류 → backend enum 매핑.
+ * backend(kpa_pharmacist_profiles.activity_type / kpa_members.activity_type)는 11종 유지.
+ * 가입 모달은 6종으로 단순화 — "산업약사"는 other_industry 로 일괄 매핑(세부 sub-type은 추후 MyProfile에서 조정 가능).
+ */
+type CanonicalActivityType =
+  | 'pharmacy_owner'
+  | 'pharmacy_employee'
+  | 'hospital'
+  | 'other_industry'
+  | 'other'
+  | 'inactive';
+
+const ACTIVITY_TYPE_OPTIONS: { value: CanonicalActivityType; label: string; description: string }[] = [
+  { value: 'pharmacy_owner', label: '개설약사', description: '약국 개설자 (사업자등록 보유)' },
+  { value: 'pharmacy_employee', label: '근무약사', description: '약국 근무 약사' },
+  { value: 'hospital', label: '병원약사', description: '의료기관 근무' },
+  { value: 'other_industry', label: '산업약사', description: '제약·제조·유통·공공·학교 등' },
+  { value: 'other', label: '기타', description: '기타 직역' },
+  { value: 'inactive', label: '면허 미사용', description: '현재 약사 활동 없음' },
+];
 
 /** 국내 약학대학 목록 (2025 기준, 가나다순) */
 const PHARMACY_UNIVERSITIES = [
@@ -73,8 +100,17 @@ export default function RegisterModal() {
     phone: '',
     agreeTerms: false,
     agreePrivacy: false,
-    // 약사 전용
+    // 약사 전용 — 면허
     licenseNumber: '',
+    // 약사 전용 — 직역·근무처
+    activityType: '' as '' | CanonicalActivityType,
+    pharmacyName: '',
+    pharmacyAddress: '',
+    pharmacyPhone: '',
+    // 개설약사 전용 — 사업자 정보
+    businessNumber: '',
+    representativeName: '',
+    taxEmail: '',
     // 약대생 전용
     universityName: '',
     studentYear: '',
@@ -104,7 +140,10 @@ export default function RegisterModal() {
         email: '', password: '', passwordConfirm: '',
         lastName: '', firstName: '', nickname: '', phone: '',
         agreeTerms: false, agreePrivacy: false,
-        licenseNumber: '', universityName: '', studentYear: '',
+        licenseNumber: '',
+        activityType: '', pharmacyName: '', pharmacyAddress: '', pharmacyPhone: '',
+        businessNumber: '', representativeName: '', taxEmail: '',
+        universityName: '', studentYear: '',
       });
       setError(null);
       setLicenseStatus('idle');
@@ -129,8 +168,10 @@ export default function RegisterModal() {
     const { name, value } = target;
     const checked = target instanceof HTMLInputElement ? target.checked : false;
     const type = target instanceof HTMLInputElement ? target.type : 'text';
-    if (name === 'phone') {
-      setFormData(prev => ({ ...prev, phone: value.replace(/\D/g, '') }));
+    // 숫자 전용 필드 — 비숫자 제거
+    const DIGITS_ONLY = new Set(['phone', 'pharmacyPhone', 'businessNumber']);
+    if (DIGITS_ONLY.has(name)) {
+      setFormData(prev => ({ ...prev, [name]: value.replace(/\D/g, '') }));
       return;
     }
     setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
@@ -161,6 +202,20 @@ export default function RegisterModal() {
 
       if (memberType === 'pharmacist_member') {
         if (formData.licenseNumber) payload.licenseNumber = formData.licenseNumber;
+        // 직역 + 근무처
+        if (formData.activityType) payload.activityType = formData.activityType;
+        if (formData.pharmacyName) payload.pharmacyName = formData.pharmacyName;
+        if (formData.pharmacyAddress) payload.pharmacyAddress = formData.pharmacyAddress;
+        if (formData.pharmacyPhone) payload.pharmacyPhone = formData.pharmacyPhone;
+        // 개설약사: 사업자 정보
+        if (formData.activityType === 'pharmacy_owner') {
+          if (formData.businessNumber) payload.businessNumber = formData.businessNumber;
+          if (formData.representativeName) payload.representativeName = formData.representativeName;
+          if (formData.taxEmail) payload.taxEmail = formData.taxEmail;
+          // 사업장명/주소는 약국명/약국주소와 동일 (개설약사 = 사업장 == 약국)
+          if (formData.pharmacyName) payload.businessName = formData.pharmacyName;
+          if (formData.pharmacyAddress) payload.address1 = formData.pharmacyAddress;
+        }
       } else if (memberType === 'pharmacy_student_member') {
         payload.universityName = formData.universityName;
         if (formData.studentYear) payload.studentYear = parseInt(formData.studentYear, 10);
@@ -211,7 +266,18 @@ export default function RegisterModal() {
     if (!common) return false;
 
     if (memberType === 'pharmacist_member') {
-      return !!formData.licenseNumber && licenseStatus !== 'duplicate';
+      if (!formData.licenseNumber || licenseStatus === 'duplicate') return false;
+      if (!formData.activityType) return false;
+      // 면허 미사용은 근무처 입력 불요
+      if (formData.activityType === 'inactive') return true;
+      // 약사 직역(개설약사/근무약사/병원약사/산업약사/기타)는 근무처명·주소 필수
+      if (!formData.pharmacyName || !formData.pharmacyAddress) return false;
+      // 개설약사: 사업자번호·대표자명 필수
+      if (formData.activityType === 'pharmacy_owner') {
+        if (!formData.businessNumber || formData.businessNumber.length < 10) return false;
+        if (!formData.representativeName) return false;
+      }
+      return true;
     }
     if (memberType === 'pharmacy_student_member') {
       return !!formData.universityName;
@@ -371,21 +437,92 @@ export default function RegisterModal() {
 
                 {/* 약사 정회원 전용 */}
                 {memberType === 'pharmacist_member' && (
-                  <div className="space-y-4">
-                    <h4 className="text-sm font-semibold text-gray-700 pb-2 border-b border-gray-100">약사 정보</h4>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">약사면허번호 <span className="text-red-500">*</span></label>
-                      <input type="text" name="licenseNumber" value={formData.licenseNumber} onChange={handleInputChange}
-                        onBlur={() => checkLicenseDuplicate(formData.licenseNumber)} placeholder="00000" required
-                        className={`w-full px-4 py-3 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                          licenseStatus === 'duplicate' ? 'border-red-400' : licenseStatus === 'available' ? 'border-green-400' : 'border-gray-200'
-                        }`} />
-                      <p className="text-xs text-gray-500 mt-1">약사면허증에 기재된 면허번호</p>
-                      {licenseStatus === 'checking' && <p className="text-xs text-gray-500 mt-1">확인 중...</p>}
-                      {licenseStatus === 'duplicate' && <p className="text-xs text-red-500 mt-1">이미 등록된 면허번호입니다.</p>}
-                      {licenseStatus === 'available' && <p className="text-xs text-green-600 mt-1">사용 가능한 면허번호입니다.</p>}
+                  <>
+                    <div className="space-y-4">
+                      <h4 className="text-sm font-semibold text-gray-700 pb-2 border-b border-gray-100">약사 정보</h4>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">약사면허번호 <span className="text-red-500">*</span></label>
+                        <input type="text" name="licenseNumber" value={formData.licenseNumber} onChange={handleInputChange}
+                          onBlur={() => checkLicenseDuplicate(formData.licenseNumber)} placeholder="00000" required
+                          className={`w-full px-4 py-3 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                            licenseStatus === 'duplicate' ? 'border-red-400' : licenseStatus === 'available' ? 'border-green-400' : 'border-gray-200'
+                          }`} />
+                        <p className="text-xs text-gray-500 mt-1">약사면허증에 기재된 면허번호</p>
+                        {licenseStatus === 'checking' && <p className="text-xs text-gray-500 mt-1">확인 중...</p>}
+                        {licenseStatus === 'duplicate' && <p className="text-xs text-red-500 mt-1">이미 등록된 면허번호입니다.</p>}
+                        {licenseStatus === 'available' && <p className="text-xs text-green-600 mt-1">사용 가능한 면허번호입니다.</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">직역 <span className="text-red-500">*</span></label>
+                        <select name="activityType" value={formData.activityType} onChange={handleInputChange} required
+                          className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                          <option value="">직역을 선택해 주세요</option>
+                          {ACTIVITY_TYPE_OPTIONS.map(opt => (
+                            <option key={opt.value} value={opt.value}>{opt.label} — {opt.description}</option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
-                  </div>
+
+                    {/* 근무처 정보 — 면허 미사용 제외 모든 약사 직역 */}
+                    {formData.activityType && formData.activityType !== 'inactive' && (
+                      <div className="space-y-4">
+                        <h4 className="text-sm font-semibold text-gray-700 pb-2 border-b border-gray-100">
+                          {formData.activityType === 'pharmacy_owner' ? '약국 정보' : '근무처 정보'}
+                        </h4>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {formData.activityType === 'pharmacy_owner' ? '약국명' : '근무처명'} <span className="text-red-500">*</span>
+                          </label>
+                          <input type="text" name="pharmacyName" value={formData.pharmacyName} onChange={handleInputChange}
+                            placeholder={formData.activityType === 'pharmacy_owner' ? '예: ○○약국' : '예: ○○약국 / ○○병원'} required maxLength={200}
+                            className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {formData.activityType === 'pharmacy_owner' ? '사업장 주소' : '근무처 주소'} <span className="text-red-500">*</span>
+                          </label>
+                          <input type="text" name="pharmacyAddress" value={formData.pharmacyAddress} onChange={handleInputChange}
+                            placeholder="예: 서울특별시 강남구 ○○로 ○○" required maxLength={300}
+                            className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {formData.activityType === 'pharmacy_owner' ? '약국 전화' : '근무처 전화'}
+                          </label>
+                          <input type="tel" name="pharmacyPhone" value={formData.pharmacyPhone} onChange={handleInputChange}
+                            placeholder="숫자만 입력 (선택)" maxLength={11}
+                            className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 개설약사 추가 — 사업자 정보 */}
+                    {formData.activityType === 'pharmacy_owner' && (
+                      <div className="space-y-4">
+                        <h4 className="text-sm font-semibold text-gray-700 pb-2 border-b border-gray-100">사업자 정보</h4>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">사업자등록번호 <span className="text-red-500">*</span></label>
+                          <input type="text" name="businessNumber" value={formData.businessNumber} onChange={handleInputChange}
+                            placeholder="숫자 10자리 (예: 1234567890)" required maxLength={10}
+                            className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                          <p className="text-xs text-gray-500 mt-1">사업자등록증의 등록번호 10자리. 사업자등록증 파일은 승인 후 별도 안내됩니다.</p>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">대표자명 <span className="text-red-500">*</span></label>
+                          <input type="text" name="representativeName" value={formData.representativeName} onChange={handleInputChange}
+                            placeholder="사업자등록증 대표자명" required maxLength={50}
+                            className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">세금계산서 이메일</label>
+                          <input type="email" name="taxEmail" value={formData.taxEmail} onChange={handleInputChange}
+                            placeholder="세금계산서 수신 이메일 (선택)"
+                            className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
 
                 {/* 약대생 준회원 전용 */}

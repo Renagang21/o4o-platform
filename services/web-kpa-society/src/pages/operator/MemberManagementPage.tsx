@@ -65,9 +65,18 @@ interface KpaMember {
   membership_type: string | null;      // null이면 KPA 프로필 미생성
   license_number: string | null;
   pharmacy_name: string | null;
+  pharmacy_address?: string | null;
   // WO-O4O-KPA-MEMBER-PROFILE-CAPABILITY-COLUMN-ADD-V1: profile + capability
   activity_type?: string | null;       // kpa_members.activity_type (profile metadata)
   capabilities?: string[];             // role_assignments active roles (capability SSOT)
+  // WO-O4O-KPA-REGISTER-MODAL-ACTIVITY-AND-PHARMACY-OWNER-INTEGRATION-V1:
+  //   개설약사 가입 시 users.businessInfo 에 저장된 사업자 정보 일부.
+  business_info?: {
+    businessNumber: string | null;
+    businessName: string | null;
+    representativeName: string | null;
+    taxEmail: string | null;
+  } | null;
   joined_at: string | null;
   created_at: string;
   updated_at: string;
@@ -1185,11 +1194,59 @@ export default function MemberManagementPage() {
                 </div>
               )}
 
-              {/* 약국명 — 표시 전용 */}
+              {/* WO-O4O-KPA-REGISTER-MODAL-ACTIVITY-AND-PHARMACY-OWNER-INTEGRATION-V1:
+                  직역(활동 유형) — 가입 단계에서 입력됨. 개설약사 여부 판단의 핵심 필드. */}
+              {selectedMember.activity_type && (
+                <div style={fieldRowStyle}>
+                  <span style={labelStyle}>직역</span>
+                  <span style={valueStyle}>
+                    {ACTIVITY_TYPE_LABELS[selectedMember.activity_type] ?? selectedMember.activity_type}
+                    {selectedMember.activity_type === 'pharmacy_owner' && (
+                      <span style={{ marginLeft: 6, fontSize: 11, padding: '1px 6px', borderRadius: 9999, background: '#fef3c7', color: '#92400e', border: '1px solid #fde68a' }}>
+                        개설약사
+                      </span>
+                    )}
+                  </span>
+                </div>
+              )}
+
+              {/* 약국명/근무처명 — 표시 전용 */}
               {selectedMember.pharmacy_name && (
                 <div style={fieldRowStyle}>
-                  <span style={labelStyle}>약국명</span>
+                  <span style={labelStyle}>
+                    {selectedMember.activity_type === 'pharmacy_owner' ? '약국명' : '근무처명'}
+                  </span>
                   <span style={valueStyle}>{selectedMember.pharmacy_name}</span>
+                </div>
+              )}
+
+              {/* 근무처/사업장 주소 — 표시 전용 */}
+              {selectedMember.pharmacy_address && (
+                <div style={fieldRowStyle}>
+                  <span style={labelStyle}>
+                    {selectedMember.activity_type === 'pharmacy_owner' ? '사업장 주소' : '근무처 주소'}
+                  </span>
+                  <span style={valueStyle}>{selectedMember.pharmacy_address}</span>
+                </div>
+              )}
+
+              {/* 개설약사: 사업자 정보 — users.businessInfo 에서 enrich */}
+              {selectedMember.business_info?.businessNumber && (
+                <div style={fieldRowStyle}>
+                  <span style={labelStyle}>사업자번호</span>
+                  <span style={valueStyle}>{selectedMember.business_info.businessNumber}</span>
+                </div>
+              )}
+              {selectedMember.business_info?.representativeName && (
+                <div style={fieldRowStyle}>
+                  <span style={labelStyle}>대표자명</span>
+                  <span style={valueStyle}>{selectedMember.business_info.representativeName}</span>
+                </div>
+              )}
+              {selectedMember.business_info?.taxEmail && (
+                <div style={fieldRowStyle}>
+                  <span style={labelStyle}>세금계산서 이메일</span>
+                  <span style={valueStyle}>{selectedMember.business_info.taxEmail}</span>
                 </div>
               )}
 

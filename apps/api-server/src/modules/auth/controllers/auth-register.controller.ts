@@ -372,11 +372,41 @@ export class AuthRegisterController extends BaseController {
     const isPharmacist = memberType === 'pharmacist' || memberType === 'pharmacist_member';
     const isStudent = memberType === 'student' || memberType === 'pharmacy_student_member';
 
-    // KPA Society: auto-create KPA member (pending)
+    // WO-O4O-KPA-REGISTER-MODAL-ACTIVITY-AND-PHARMACY-OWNER-INTEGRATION-V1:
+    //   가입 단계에서 직역/근무처/사업자 정보 수용.
+    //   activity_type 은 frontend 6종 canonical → backend 11종 enum 부분집합.
+    //   pharmacistFunction(legacy) 은 매핑하여 fallback (deprecated 호환).
+    const VALID_ACTIVITY_TYPES = new Set([
+      'pharmacy_owner', 'pharmacy_employee', 'hospital', 'manufacturer',
+      'importer', 'wholesaler', 'other_industry', 'government', 'school', 'other', 'inactive',
+    ]);
+    const legacyFunctionToActivity: Record<string, string> = {
+      pharmacy: 'pharmacy_employee', hospital: 'hospital',
+      industry: 'other_industry', other: 'other',
+    };
+    let resolvedActivityType: string | null = null;
+    if (isPharmacist) {
+      if (data.activityType && VALID_ACTIVITY_TYPES.has(data.activityType)) {
+        resolvedActivityType = data.activityType;
+      } else if (data.pharmacistFunction && legacyFunctionToActivity[data.pharmacistFunction]) {
+        resolvedActivityType = legacyFunctionToActivity[data.pharmacistFunction];
+      }
+    }
+    const isPharmacyOwner = isPharmacist && resolvedActivityType === 'pharmacy_owner';
+
     const licenseNum = isPharmacist ? (data.licenseNumber || null) : null;
+    const pharmacyNameValue = isPharmacist ? (data.pharmacyName || null) : null;
+    const pharmacyAddressValue = isPharmacist ? (data.pharmacyAddress || null) : null;
+
+    // KPA Society: auto-create KPA member (pending)
     const memberResult = await manager.query(`
-      INSERT INTO kpa_members (user_id, organization_id, membership_type, license_number, university_name, role, status, identity_status)
-      VALUES ($1, $2, $3, $4, $5, 'member', 'pending', 'active')
+      INSERT INTO kpa_members (
+        user_id, organization_id, membership_type,
+        license_number, university_name,
+        pharmacy_name, pharmacy_address, activity_type,
+        role, status, identity_status
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'member', 'pending', 'active')
       ON CONFLICT (user_id) DO NOTHING
       RETURNING id
     `, [
@@ -385,6 +415,9 @@ export class AuthRegisterController extends BaseController {
       memberType,
       licenseNum,
       isStudent ? (data.universityName || null) : null,
+      pharmacyNameValue,
+      pharmacyAddressValue,
+      resolvedActivityType,
     ]);
 
     // 서비스별 승인 레코드 생성 (kpa-a: 커뮤니티)
@@ -396,21 +429,43 @@ export class AuthRegisterController extends BaseController {
       `, [memberResult[0].id]);
     }
 
-    // WO-ROLE-NORMALIZATION-PHASE3-B-V1: create kpa_pharmacist_profiles record
-    if (isPharmacist && (data.pharmacistFunction || data.licenseNumber)) {
-      const functionToActivity: Record<string, string> = {
-        pharmacy: 'pharmacy_employee', hospital: 'hospital',
-        industry: 'other_industry', other: 'other',
-      };
+    // WO-ROLE-NORMALIZATION-PHASE3-B-V1: kpa_pharmacist_profiles record (SSOT for activity_type)
+    if (isPharmacist && (resolvedActivityType || data.licenseNumber)) {
       await manager.query(
         `INSERT INTO kpa_pharmacist_profiles (user_id, license_number, activity_type)
          VALUES ($1, $2, $3) ON CONFLICT (user_id) DO NOTHING`,
-        [
-          userId,
-          data.licenseNumber || null,
-          data.pharmacistFunction ? (functionToActivity[data.pharmacistFunction] || 'other') : null,
-        ]
+        [userId, data.licenseNumber || null, resolvedActivityType]
       );
+    }
+
+    // WO-O4O-KPA-REGISTER-MODAL-ACTIVITY-AND-PHARMACY-OWNER-INTEGRATION-V1:
+    //   개설약사: 사업자 정보를 users.businessInfo JSONB 에 merge.
+    //   (organization_stores 자동 생성·kpa:store_owner 자동 부여는 본 WO 범위 외 — pharmacy_request 흐름 유지)
+    if (isPharmacyOwner) {
+      const businessFields = {
+        businessNumber: data.businessNumber || null,
+        businessName: data.businessName || data.pharmacyName || null,
+        representativeName: data.representativeName || null,
+        taxEmail: data.taxEmail || null,
+        zipCode: data.zipCode || null,
+        address: data.address1 || data.pharmacyAddress || null,
+        address2: data.address2 || null,
+      };
+      const sanitized: Record<string, any> = {};
+      for (const [key, value] of Object.entries(businessFields)) {
+        if (value !== null && value !== undefined && value !== '') sanitized[key] = value;
+      }
+      if (Object.keys(sanitized).length > 0) {
+        const [existingUser] = await manager.query(
+          `SELECT "businessInfo" FROM users WHERE id = $1`,
+          [userId]
+        );
+        const merged = { ...(existingUser?.businessInfo || {}), ...sanitized };
+        await manager.query(
+          `UPDATE users SET "businessInfo" = $1 WHERE id = $2`,
+          [JSON.stringify(merged), userId]
+        );
+      }
     }
   }
 
