@@ -1,6 +1,8 @@
 /**
  * MyEnrollmentsPage — 내 수강 목록
  * WO-O4O-ENROLLMENT-SYSTEM-V1
+ * WO-O4O-KPA-MYPAGE-ENROLLMENTS-LAYOUT-ALIGN-V1 — 외곽 레이아웃을 /mypage 프로필 공통 패턴으로 정렬
+ *   (실제 코드 변경은 commit 64b567eca 에 함께 묶여 push 되었음 — parallel-session 동시 commit 사고)
  *
  * Route: /mypage/enrollments
  * API: GET /lms/enrollments/me
