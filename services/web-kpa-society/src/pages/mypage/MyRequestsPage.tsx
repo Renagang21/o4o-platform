@@ -11,10 +11,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { MyPageNavigation } from '@o4o/account-ui';
-import { KPA_MYPAGE_NAV_ITEMS } from './navItems';
+import { MyPageLayout } from '../../layouts/MyPageLayout';
 import {
-  ClipboardList,
   Clock,
   CheckCircle,
   XCircle,
@@ -169,18 +167,12 @@ export default function MyRequestsPage() {
   const approvedCount = items.filter(i => i.status === 'approved').length;
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4">
-      <MyPageNavigation items={KPA_MYPAGE_NAV_ITEMS} />
-
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
-          <ClipboardList className="w-6 h-6 text-blue-600" />
-          내 신청 내역
-        </h1>
-        <p className="text-slate-500 mt-1">포럼, 강좌, 강사 등 모든 승인 요청을 확인합니다</p>
-      </div>
-
+    <MyPageLayout
+      title="내 신청 내역"
+      description="포럼, 강좌, 강사 등 모든 승인 요청을 확인합니다"
+      breadcrumb={[{ label: '홈', href: '/' }, { label: '마이페이지', href: '/mypage' }, { label: '내 신청 내역' }]}
+      width="wide"
+    >
       {/* Stats */}
       {!isLoading && !error && items.length > 0 && (
         <div className="grid grid-cols-3 gap-3 mb-6">
@@ -399,6 +391,6 @@ export default function MyRequestsPage() {
           })}
         </div>
       )}
-    </div>
+    </MyPageLayout>
   );
 }

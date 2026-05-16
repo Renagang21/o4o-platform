@@ -9,8 +9,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { MyPageNavigation } from '@o4o/account-ui';
-import { KPA_MYPAGE_NAV_ITEMS } from './navItems';
+import { MyPageLayout } from '../../layouts/MyPageLayout';
 import {
   MessageSquare,
   ExternalLink,
@@ -139,16 +138,12 @@ export default function MyForumDashboardPage() {
   const getDeleteStatus = (cat: MyForumCategory) => cat.metadata?.deleteRequestStatus;
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4">
-      <MyPageNavigation items={KPA_MYPAGE_NAV_ITEMS} />
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
-          <MessageSquare className="w-6 h-6 text-blue-600" />
-          내 포럼
-        </h1>
-        <p className="text-slate-500 mt-1">내가 운영하는 포럼을 관리합니다</p>
-      </div>
-
+    <MyPageLayout
+      title="내 포럼"
+      description="내가 운영하는 포럼을 관리합니다"
+      breadcrumb={[{ label: '홈', href: '/' }, { label: '마이페이지', href: '/mypage' }, { label: '내 포럼' }]}
+      width="wide"
+    >
       <div className="grid grid-cols-1 gap-3 mb-6">
         <Link to="/forum" className="flex items-center gap-3 p-4 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors">
           <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
@@ -285,6 +280,6 @@ export default function MyForumDashboardPage() {
           </div>
         </div>
       )}
-    </div>
+    </MyPageLayout>
   );
 }
