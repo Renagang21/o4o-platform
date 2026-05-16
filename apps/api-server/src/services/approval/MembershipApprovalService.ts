@@ -15,6 +15,7 @@
  */
 import { AppDataSource } from '../../database/connection.js';
 import logger from '../../utils/logger.js';
+import { resolveRolePrefixFromCanonicalServiceKey } from '@o4o/security-core';
 
 export interface ApproveParams {
   membershipId: string;
@@ -639,17 +640,12 @@ export class MembershipApprovalService {
 
       // STEP2: Deactivate service-prefix role_assignments
       // Platform roles (super_admin, admin, operator) 는 prefix 매핑에 없으므로 건드리지 않음
-      const SERVICE_ROLE_PREFIXES: Record<string, string> = {
-        'kpa-society': 'kpa:',
-        'k-cosmetics': 'cosmetics:',
-        'glycopharm': 'glycopharm:',
-        'neture': 'neture:',
-      };
-
+      // WO-O4O-CANONICAL-SERVICE-KEY-REVERSE-MAP-V1: canonical service_key → role prefix 는
+      //   @o4o/security-core SSOT 위임. SQL LIKE 패턴의 ':' 는 호출처에서 조립.
       const deactivatedRoles: string[] = [];
       const prefixesToClean = affectedServiceKeys
-        .map((k) => SERVICE_ROLE_PREFIXES[k])
-        .filter(Boolean);
+        .map((k) => `${resolveRolePrefixFromCanonicalServiceKey(k)}:`)
+        .filter((p) => p !== ':');  // safety: empty key 방어
 
       for (const prefix of prefixesToClean) {
         logger.info('[WITHDRAW][STEP2] role DEACTIVATE', { userId, prefix });
@@ -805,16 +801,15 @@ export class MembershipApprovalService {
         // WO-O4O-SOFT-DELETE-ROLE-CLEANUP-V1: role_assignments 서비스 prefix 범위 내 비활성화.
         // 플랫폼 역할(super_admin, admin, operator)은 절대 자동 비활성화하지 않는다.
         // isPlatformAdmin: 전체 서비스 prefix 정리 / 서비스 operator: 해당 서비스 prefix만 정리.
-        const SERVICE_ROLE_PREFIXES: Record<string, string> = {
-          'kpa-society': 'kpa:',
-          'k-cosmetics': 'cosmetics:',
-          'glycopharm': 'glycopharm:',
-          'neture': 'neture:',
-        };
+        // WO-O4O-CANONICAL-SERVICE-KEY-REVERSE-MAP-V1: canonical service_key → role prefix 는
+        //   @o4o/security-core SSOT 위임. SQL LIKE 패턴의 ':' 는 호출처에서 조립.
+        const ALL_SERVICE_KEYS = ['kpa-society', 'k-cosmetics', 'glycopharm', 'neture'] as const;
 
         const prefixesToClean = isPlatformAdmin
-          ? Object.values(SERVICE_ROLE_PREFIXES)
-          : serviceKeys.map((k) => SERVICE_ROLE_PREFIXES[k]).filter(Boolean);
+          ? ALL_SERVICE_KEYS.map((k) => `${resolveRolePrefixFromCanonicalServiceKey(k)}:`)
+          : serviceKeys
+              .map((k) => `${resolveRolePrefixFromCanonicalServiceKey(k)}:`)
+              .filter((p) => p !== ':');  // safety: empty key 방어
 
         for (const prefix of prefixesToClean) {
           await queryRunner.query(

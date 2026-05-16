@@ -61,6 +61,48 @@ export function resolveCanonicalServiceKey(rolePrefix: string): string {
 }
 
 /**
+ * Reverse canonical mapping: service_memberships.service_key → role prefix
+ *
+ * WO-O4O-CANONICAL-SERVICE-KEY-REVERSE-MAP-V1
+ *
+ * Derived (Object.fromEntries) from {@link ROLE_PREFIX_TO_CANONICAL_SERVICE_KEY} so
+ * the two directions can never drift. Self-mapped services (neture/glycopharm) are
+ * resolved via fallback in {@link resolveRolePrefixFromCanonicalServiceKey} since they
+ * have no entry in the forward map.
+ *
+ * ⚠️ Drift prevention rules:
+ *   - NEVER hardcode a local `{'kpa-society': 'kpa'}` style map elsewhere. Always
+ *     use {@link resolveRolePrefixFromCanonicalServiceKey} or import this constant.
+ *   - To get a SQL `LIKE` prefix (e.g., `'kpa:'`), compose at the caller:
+ *     `resolveRolePrefixFromCanonicalServiceKey(sk) + ':'`. Do not add a new helper
+ *     for that — the colon is a SQL pattern concern, not a mapping concern.
+ *
+ * Used by:
+ *   - apps/api-server/src/utils/serviceScope.ts:injectServiceScope (membership → rolePrefixes)
+ *   - apps/api-server/src/services/approval/MembershipApprovalService.ts (withdraw + soft-delete role cleanup)
+ */
+export const CANONICAL_SERVICE_KEY_TO_ROLE_PREFIX: Readonly<Record<string, string>> = Object.freeze(
+  Object.fromEntries(
+    Object.entries(ROLE_PREFIX_TO_CANONICAL_SERVICE_KEY).map(
+      ([prefix, canonical]) => [canonical, prefix],
+    ),
+  ),
+);
+
+/**
+ * Resolve a canonical `service_memberships.service_key` back to its role prefix.
+ *
+ * Examples:
+ *   resolveRolePrefixFromCanonicalServiceKey('kpa-society') // 'kpa'
+ *   resolveRolePrefixFromCanonicalServiceKey('k-cosmetics') // 'cosmetics'
+ *   resolveRolePrefixFromCanonicalServiceKey('neture')      // 'neture'    (self-map fallback)
+ *   resolveRolePrefixFromCanonicalServiceKey('glycopharm')  // 'glycopharm'(self-map fallback)
+ */
+export function resolveRolePrefixFromCanonicalServiceKey(serviceKey: string): string {
+  return CANONICAL_SERVICE_KEY_TO_ROLE_PREFIX[serviceKey] || serviceKey;
+}
+
+/**
  * KPA Service Configuration
  *
  * Organizational isolation: platform:super_admin does NOT bypass.

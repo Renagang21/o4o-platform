@@ -36,6 +36,13 @@ export {
   resolveCanonicalServiceKey,
 } from './service-configs.js';
 
+// WO-O4O-CANONICAL-SERVICE-KEY-REVERSE-MAP-V1:
+// reverse: service_memberships.service_key → role prefix (derived SSOT)
+export {
+  CANONICAL_SERVICE_KEY_TO_ROLE_PREFIX,
+  resolveRolePrefixFromCanonicalServiceKey,
+} from './service-configs.js';
+
 // Types
 export type {
   ServiceKey,

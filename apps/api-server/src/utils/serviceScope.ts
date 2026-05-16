@@ -8,7 +8,7 @@
 
 import type { Request, Response, NextFunction } from 'express';
 import { parseServiceRole, isPlatformAdmin } from './role.utils.js';
-import { resolveCanonicalServiceKey } from '@o4o/security-core';
+import { resolveCanonicalServiceKey, resolveRolePrefixFromCanonicalServiceKey } from '@o4o/security-core';
 
 // WO-O4O-BACKFILL-MIGRATION-CANONICAL-KEY-CONSISTENCY-V1:
 //   role prefix → canonical service_key 매핑은 @o4o/security-core SSOT 위임.
@@ -92,12 +92,11 @@ export function injectServiceScope(req: Request, _res: Response, next: NextFunct
       .filter(m => m.status === 'active')
       .map(m => m.serviceKey);
     if (activeKeys.length > 0) {
-      const SERVICE_KEY_TO_PREFIX: Record<string, string> = {
-        'kpa-society': 'kpa',
-        'k-cosmetics': 'cosmetics',
-      };
+      // WO-O4O-CANONICAL-SERVICE-KEY-REVERSE-MAP-V1:
+      //   canonical service_key → role prefix 매핑은 @o4o/security-core SSOT 위임.
+      //   로컬 const 정의 금지 — drift 재발 방지 (forward/reverse SSOT 동시 적용).
       scope.serviceKeys = activeKeys;
-      scope.rolePrefixes = activeKeys.map(k => SERVICE_KEY_TO_PREFIX[k] || k);
+      scope.rolePrefixes = activeKeys.map(k => resolveRolePrefixFromCanonicalServiceKey(k));
     }
   }
 
