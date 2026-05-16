@@ -476,6 +476,21 @@ export function createMemberController(
                 [member.user_id, member.license_number, member.activity_type]
               );
             }
+            // WO-O4O-KPA-MEMBER-APPROVAL-SM-SYNC-FIX-V1:
+            //   canonical service_memberships 동기화 — 누락 시 GET /kpa/members 의
+            //   sm.status 기반 필터/카운트가 승인 후에도 'pending' 으로 남아
+            //   승인대기 탭에 계속 표시되는 정합성 문제 해소.
+            //   WHERE status='pending' 가드로 멱등성 보장 (중복 호출 안전).
+            //   approveMembership() 전체 호출 대신 inline UPDATE 만 추가 —
+            //   STEP3 role_assignments 부여가 KPA 'profile 기반 RBAC role 최소화'
+            //   정책 (WO-KPA-A-ROLE-CLEANUP-V1) 과 충돌하지 않게 분리.
+            //   근거: IR-O4O-KPA-OPERATOR-MEMBER-APPROVAL-STALE-PENDING-AUDIT-V1
+            await dataSource.query(
+              `UPDATE service_memberships
+               SET status = 'active', approved_by = $2, approved_at = NOW(), updated_at = NOW()
+               WHERE user_id = $1 AND service_key = 'kpa-society' AND status = 'pending'`,
+              [member.user_id, req.user!.id]
+            );
           } else if (newStatus === 'suspended' || newStatus === 'rejected') {
             // WO-KPA-A-MEMBER-STATUS-SEMANTICS-SEPARATION-V1: rejected도 suspended와 동일하게 membership 중지
             const approvalService = new MembershipApprovalService();
