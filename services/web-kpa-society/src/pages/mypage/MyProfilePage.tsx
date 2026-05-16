@@ -11,9 +11,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
-import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
-import { MyPageNavigation } from '@o4o/account-ui';
-import { KPA_MYPAGE_NAV_ITEMS } from './navItems';
+import { LoadingSpinner, EmptyState, Card } from '../../components/common';
+import { MyPageLayout } from '../../layouts/MyPageLayout';
 import { mypageApi, type ProfileResponse } from '../../api';
 import { pharmacyRequestApi, type PharmacyRequest } from '../../api/pharmacyRequestApi';
 import { useAuth, ACTIVITY_TYPE_LABELS } from '../../contexts';
@@ -308,17 +307,15 @@ export function MyProfilePage() {
   const workplacePhone = biz?.phone || null;
 
   return (
-    <div style={styles.container}>
-      <PageHeader
-        title="프로필"
-        breadcrumb={[
-          { label: '홈', href: '/' },
-          { label: '마이페이지', href: `/mypage` },
-          { label: '프로필' },
-        ]}
-      />
-      <MyPageNavigation items={KPA_MYPAGE_NAV_ITEMS} />
-
+    <MyPageLayout
+      title="프로필"
+      breadcrumb={[
+        { label: '홈', href: '/' },
+        { label: '마이페이지', href: `/mypage` },
+        { label: '프로필' },
+      ]}
+      width="form"
+    >
       {/* Tab bar */}
       <div style={styles.tabBar}>
         <button
@@ -681,7 +678,7 @@ export function MyProfilePage() {
           )}
         </Card>
       )}
-    </div>
+    </MyPageLayout>
   );
 }
 

@@ -5,9 +5,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
-import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
-import { MyPageNavigation } from '@o4o/account-ui';
-import { KPA_MYPAGE_NAV_ITEMS } from './navItems';
+import { LoadingSpinner, EmptyState, Card } from '../../components/common';
+import { MyPageLayout } from '../../layouts/MyPageLayout';
 import { mypageApi } from '../../api';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
@@ -123,17 +122,15 @@ export function MySettingsPage() {
   }
 
   return (
-    <div style={styles.container}>
-      <PageHeader
-        title="설정"
-        breadcrumb={[
-          { label: '홈', href: '/' },
-          { label: '마이페이지', href: `/mypage` },
-          { label: '설정' },
-        ]}
-      />
-      <MyPageNavigation items={KPA_MYPAGE_NAV_ITEMS} />
-
+    <MyPageLayout
+      title="설정"
+      breadcrumb={[
+        { label: '홈', href: '/' },
+        { label: '마이페이지', href: `/mypage` },
+        { label: '설정' },
+      ]}
+      width="form"
+    >
       {/* 알림 설정 */}
       <Card padding="large" style={{ marginBottom: '24px' }}>
         <h3 style={styles.sectionTitle}>알림 설정</h3>
@@ -251,7 +248,7 @@ export function MySettingsPage() {
           </div>
         </div>
       )}
-    </div>
+    </MyPageLayout>
   );
 }
 
