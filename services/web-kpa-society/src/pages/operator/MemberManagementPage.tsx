@@ -239,7 +239,10 @@ const ROLE_TAB_FILTER: Record<string, string[]> = {
   applications: [],
 };
 
-/** status 기반 서버사이드 필터 (WO-KPA-A-MEMBER-STATUS-SEMANTICS-SEPARATION-V1) */
+/** status 기반 서버사이드 필터 (WO-KPA-A-MEMBER-STATUS-SEMANTICS-SEPARATION-V1)
+ *  WO-O4O-OPERATOR-MEMBER-WITHDRAWN-TAB-ADD-V1: 'status-withdrawn' 정식 추가.
+ *  service_memberships.status='withdrawn' 은 WO-O4O-SM-WITHDRAWN-STATUS-CANONICAL-ALIGNMENT-V1
+ *  에서 canonical 정렬됨 — backend GET /kpa/members?status=withdrawn 그대로 동작. */
 const STATUS_TAB_FILTER: Record<string, MemberStatus | ''> = {
   all: '',
   pharmacist: '',
@@ -248,6 +251,7 @@ const STATUS_TAB_FILTER: Record<string, MemberStatus | ''> = {
   'status-active': 'active',
   'status-rejected': 'rejected',
   'status-suspended': 'suspended',
+  'status-withdrawn': 'withdrawn',
   applications: '',
 };
 
@@ -273,6 +277,8 @@ export default function MemberManagementPage() {
   const [activeMemberCount, setActiveMemberCount] = useState(0);
   const [rejectedMemberCount, setRejectedMemberCount] = useState(0);
   const [suspendedMemberCount, setSuspendedMemberCount] = useState(0);
+  // WO-O4O-OPERATOR-MEMBER-WITHDRAWN-TAB-ADD-V1: withdrawn count
+  const [withdrawnMemberCount, setWithdrawnMemberCount] = useState(0);
   const [pharmacistCount, setPharmacistCount] = useState(0);
   const [studentCount, setStudentCount] = useState(0);
 
@@ -342,6 +348,8 @@ export default function MemberManagementPage() {
       setActiveMemberCount(all.filter(m => m.status === 'active').length);
       setRejectedMemberCount(all.filter(m => m.status === 'rejected').length);
       setSuspendedMemberCount(all.filter(m => m.status === 'suspended').length);
+      // WO-O4O-OPERATOR-MEMBER-WITHDRAWN-TAB-ADD-V1: withdrawn lifecycle count
+      setWithdrawnMemberCount(all.filter(m => m.status === 'withdrawn').length);
     } catch (e: any) {
       setMemberError(e.message);
     } finally {
@@ -382,9 +390,21 @@ export default function MemberManagementPage() {
     return (m.capabilities ?? []).includes('platform:super_admin');
   }, []);
 
+  // WO-O4O-OPERATOR-MEMBER-WITHDRAWN-TAB-ADD-V1:
+  //   withdrawn 회원은 lifecycle 종료 상태 — 정보 수정 차단.
+  //   복구(withdrawn→active) 는 본 WO 범위 외 (별도 흐름 필요 시 후속 WO).
+  const memberIsWithdrawn = useCallback((m: KpaMember | null): boolean => {
+    if (!m) return false;
+    return m.status === 'withdrawn';
+  }, []);
+
   const openMemberEdit = useCallback((m: KpaMember) => {
     if (memberHasSuperAdmin(m)) {
       toast.error('super_admin 권한을 보유한 회원은 수정할 수 없습니다.');
+      return;
+    }
+    if (memberIsWithdrawn(m)) {
+      toast.error('탈퇴 처리된 회원은 수정할 수 없습니다.');
       return;
     }
     setSelectedMember(m);
@@ -395,12 +415,16 @@ export default function MemberManagementPage() {
       status: m.status,
     });
     setIsEditing(true);
-  }, [memberHasSuperAdmin]);
+  }, [memberHasSuperAdmin, memberIsWithdrawn]);
 
   const enterEditMode = useCallback(() => {
     if (!selectedMember) return;
     if (memberHasSuperAdmin(selectedMember)) {
       toast.error('super_admin 권한을 보유한 회원은 수정할 수 없습니다.');
+      return;
+    }
+    if (memberIsWithdrawn(selectedMember)) {
+      toast.error('탈퇴 처리된 회원은 수정할 수 없습니다.');
       return;
     }
     setEditForm({
@@ -410,7 +434,7 @@ export default function MemberManagementPage() {
       status: selectedMember.status,
     });
     setIsEditing(true);
-  }, [selectedMember, memberHasSuperAdmin]);
+  }, [selectedMember, memberHasSuperAdmin, memberIsWithdrawn]);
 
   const cancelEditMode = useCallback(() => setIsEditing(false), []);
 
@@ -418,9 +442,12 @@ export default function MemberManagementPage() {
     if (!selectedMember) return;
     setSavingEdit(true);
     try {
-      // 1) 사전 검증 — super_admin 방어 (이중 가드)
+      // 1) 사전 검증 — super_admin / withdrawn 이중 가드
       if (memberHasSuperAdmin(selectedMember)) {
         throw new Error('super_admin 권한을 보유한 회원은 수정할 수 없습니다.');
+      }
+      if (memberIsWithdrawn(selectedMember)) {
+        throw new Error('탈퇴 처리된 회원은 수정할 수 없습니다.');
       }
 
       // 2) 변경 사항 계산
@@ -470,7 +497,7 @@ export default function MemberManagementPage() {
     } finally {
       setSavingEdit(false);
     }
-  }, [selectedMember, editForm, memberHasSuperAdmin, currentUserIsAdmin, currentUser, fetchMembers, memberPage]);
+  }, [selectedMember, editForm, memberHasSuperAdmin, memberIsWithdrawn, currentUserIsAdmin, currentUser, fetchMembers, memberPage]);
 
   // 목록(fetchMembers) 갱신 후 Drawer 의 selectedMember 도 최신 데이터로 동기화.
   // selectedMember 가 현재 페이지에 없으면(필터 변경 등) 기존 객체 유지.
@@ -601,6 +628,8 @@ export default function MemberManagementPage() {
     { key: 'status-active', label: '승인완료', count: activeMemberCount },
     { key: 'status-rejected', label: '반려', count: rejectedMemberCount },
     { key: 'status-suspended', label: '정지', count: suspendedMemberCount },
+    // WO-O4O-OPERATOR-MEMBER-WITHDRAWN-TAB-ADD-V1: 탈퇴 탭 정식 추가
+    { key: 'status-withdrawn', label: '탈퇴', count: withdrawnMemberCount },
     { key: 'applications', label: '가입 신청', count: stats?.submitted ?? 0 },
   ];
 
@@ -1281,14 +1310,29 @@ export default function MemberManagementPage() {
                 </div>
               </div>
 
-              {/* 정보 수정 진입 / super_admin 차단 안내 */}
+              {/* 정보 수정 진입 / super_admin / withdrawn 차단 안내
+                  WO-O4O-OPERATOR-MEMBER-WITHDRAWN-TAB-ADD-V1:
+                    withdrawn 회원은 lifecycle 종료 — '정보 수정' hide + 완전삭제 안내 링크 노출 */}
               {!isEditing && (
-                <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid #f1f5f9', display: 'flex', gap: 12, alignItems: 'center' }}>
+                <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid #f1f5f9', display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
                   {targetIsSuperAdmin ? (
                     <span style={{ fontSize: 12, color: '#94a3b8', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                       <ShieldAlert size={14} />
                       super_admin 권한을 보유한 회원은 본 화면에서 수정할 수 없습니다.
                     </span>
+                  ) : memberIsWithdrawn(selectedMember) ? (
+                    <>
+                      <span style={{ fontSize: 12, color: '#94a3b8', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                        <ShieldAlert size={14} />
+                        탈퇴 처리된 회원은 수정할 수 없습니다.
+                      </span>
+                      <a
+                        href="/admin/members"
+                        style={{ fontSize: 12, color: '#2563eb', textDecoration: 'underline' }}
+                      >
+                        관리자 회원관리로 이동
+                      </a>
+                    </>
                   ) : (
                     <button
                       onClick={enterEditMode}
