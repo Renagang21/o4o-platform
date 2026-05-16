@@ -95,9 +95,17 @@ export function KpaAdminDashboardPage() {
       ) : kpis ? (
         <div className="grid grid-cols-3 gap-4">
           <div className="bg-white border border-slate-200 rounded-xl p-5">
+            {/* WO-O4O-KPA-ADMIN-DASHBOARD-TOTALMEMBERS-LABEL-FIX-V1:
+                실제 count 는 kpa_members.status='active' 만 — 라벨 "전체 회원" → "활성 회원" 정렬.
+                lifecycle 전체(승인 대기 / 정지 / 반려 / 탈퇴 포함) 카운트는 회원관리 화면 참조. */}
             <div className="flex items-center gap-2 mb-1">
               <Users className="w-4 h-4 text-slate-400" />
-              <span className="text-xs text-slate-500">전체 회원</span>
+              <span
+                className="text-xs text-slate-500"
+                title="활성 상태(active)인 회원만 카운트합니다. 승인 대기 / 정지 / 반려 / 탈퇴를 포함한 lifecycle 전체 회원 수는 회원관리 화면을 확인하세요."
+              >
+                활성 회원
+              </span>
             </div>
             <p className="text-2xl font-bold text-slate-900">{kpis.totalMembers.toLocaleString()}</p>
           </div>
