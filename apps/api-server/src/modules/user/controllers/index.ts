@@ -5,6 +5,3 @@
  */
 
 export * from './user.controller.js';
-export * from './user-management.controller.js';
-export * from './user-role.controller.js';
-export * from './user-activity.controller.js';
