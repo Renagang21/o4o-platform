@@ -58,6 +58,14 @@ export const menuPermissions: MenuPermission[] = [
     permissions: ['users.edit']
   },
 
+  // WO-O4O-ADMIN-USERS-RBAC-CONSOLE-REPOSITIONING-V1:
+  // /users 는 platform super_admin 전용 RBAC 권한 할당 콘솔로 재정렬됨.
+  // role suffix 'super_admin' 과 prefix 형식 'platform:super_admin' 둘 다 허용 (useAdminMenu 가 role.name 을 raw string 으로 비교).
+  {
+    menuId: 'core-users',
+    roles: ['super_admin', 'platform:super_admin']
+  },
+
   // Seller Management - No restriction (allow all)
   // These menus are visible to all authenticated users
 

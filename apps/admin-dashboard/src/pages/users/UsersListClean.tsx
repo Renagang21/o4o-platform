@@ -16,7 +16,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, RefreshCw, CheckCircle, XCircle, Check, X } from 'lucide-react';
+import { Plus, RefreshCw, CheckCircle, Check, X } from 'lucide-react';
 import { authClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
 import { BaseTable, RowActionMenu, FilterBar } from '@o4o/ui';
@@ -24,7 +24,6 @@ import type { O4OColumn } from '@o4o/ui';
 import PageHeader from '@/components/common/PageHeader';
 import {
   flattenUsersToAssignments,
-  uniqueUserIdsFromKeys,
   type AdminUserDto,
   type AssignmentRow,
 } from '@/lib/assignment-row';
@@ -126,20 +125,7 @@ export default function UsersListClean() {
       toast.error('Please select an action and rows');
       return;
     }
-    const userIds = uniqueUserIdsFromKeys(selectedKeys);
-    if (bulkAction === 'delete') {
-      if (!confirm(`${userIds.length}명의 사용자를 삭제하시겠습니까?\n(선택된 ${selectedKeys.size}개 권한 행이 같은 사용자에 속하면 중복 제거됩니다.)`)) {
-        return;
-      }
-      try {
-        await Promise.all(userIds.map((id) => authClient.api.delete(`/users/${id}`)));
-        setUsers((prev) => prev.filter((u) => !userIds.includes(u.id ?? u._id ?? '')));
-        setSelectedKeys(new Set());
-        toast.success(`${userIds.length}명 삭제 완료`);
-      } catch {
-        toast.error('삭제 실패');
-      }
-    } else if (bulkAction === 'revoke') {
+    if (bulkAction === 'revoke') {
       // 선택된 assignment-row 각각의 role 해제
       const targets = Array.from(selectedKeys).map((k) => {
         const [uid, role] = k.split('::');
@@ -159,17 +145,6 @@ export default function UsersListClean() {
       }
       setSelectedKeys(new Set());
       fetchUsers();
-    }
-  };
-
-  const handleDeleteUser = async (userId: string) => {
-    if (!confirm('이 사용자를 삭제하시겠습니까? (모든 권한이 함께 해제됩니다)')) return;
-    try {
-      await authClient.api.delete(`/users/${userId}`);
-      setUsers((prev) => prev.filter((u) => (u.id ?? u._id) !== userId));
-      toast.success('사용자 삭제 완료');
-    } catch {
-      toast.error('삭제 실패');
     }
   };
 
@@ -280,7 +255,7 @@ export default function UsersListClean() {
           actions={[
             {
               key: 'edit',
-              label: '사용자 편집',
+              label: '권한 할당 편집',
               icon: <CheckCircle size={14} />,
               variant: 'primary',
               onClick: () => navigate(`/users/${row.userId}/edit`),
@@ -290,13 +265,6 @@ export default function UsersListClean() {
               label: `권한 해제 (${row.roleMeta.label})`,
               variant: 'danger',
               onClick: () => handleRevokeRole(row.userId, row.role),
-            },
-            {
-              key: 'delete',
-              label: '사용자 삭제',
-              variant: 'danger',
-              icon: <XCircle size={14} />,
-              onClick: () => handleDeleteUser(row.userId),
             },
           ]}
         />
@@ -320,12 +288,12 @@ export default function UsersListClean() {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <PageHeader
-        title="Users & Roles"
-        subtitle="권한 할당 단위 (1 row = 1 user × 1 role) — RBAC SSOT"
+        title="RBAC Role Assignments"
+        subtitle="Platform super-admin 전용 콘솔 — role_assignments SSOT (1 row = 1 user × 1 role)"
         backUrl="/"
         backLabel="Dashboard"
         actions={[
-          { id: 'add', label: 'Add User', onClick: () => navigate('/users/new'), variant: 'primary', icon: <Plus className="w-4 h-4" /> },
+          { id: 'add', label: 'New Assignment', onClick: () => navigate('/users/new'), variant: 'primary', icon: <Plus className="w-4 h-4" /> },
           { id: 'refresh', label: 'Refresh', onClick: fetchUsers, variant: 'secondary', icon: <RefreshCw className="w-4 h-4" /> },
         ]}
       />
@@ -341,7 +309,7 @@ export default function UsersListClean() {
       {/* FilterBar with facet selects */}
       <div className="bg-white rounded-lg border border-gray-200 p-3 mb-4">
         <FilterBar
-          searchPlaceholder="사용자명, 이메일, 서비스, 역할 검색..."
+          searchPlaceholder="사용자 / 이메일 / 서비스 / role 검색 — 권한 할당을 찾아 회수합니다"
           searchValue={search}
           onSearchChange={setSearch}
           filters={[
@@ -359,7 +327,6 @@ export default function UsersListClean() {
           >
             <option value="">Bulk Actions</option>
             <option value="revoke">Revoke Role</option>
-            <option value="delete">Delete User</option>
           </select>
           <button
             onClick={handleBulkAction}
