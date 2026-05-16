@@ -4,20 +4,23 @@
  * WO-KPA-A-AUTH-UX-STATE-UNIFICATION-V1
  * WO-KPA-B-SERVICE-CONTEXT-UNIFICATION-V1: kpaMembership.serviceAccess 기반 확장
  * WO-KPA-LOGIN-LATENCY-CLEANUP-V1: KPA context 비동기 로딩 지원
+ * WO-O4O-KPA-AUTHGATE-LEGACY-ACTIVITY-REDIRECT-CLEANUP-V1:
+ *   activity_type 미설정 시 /setup-activity 강제 redirect 제거.
+ *   canonical 가입 흐름(WO-O4O-KPA-REGISTER-MODAL-ACTIVITY-AND-PHARMACY-OWNER-INTEGRATION-V1)
+ *   에서 가입 단계에 직역 입력이 이미 완료됨. legacy active+NULL 사용자는
+ *   /setup-activity 또는 /mypage/profile 에서 manual 진입으로 보완.
  *
  * 로그인된 사용자의 상태에 따라 적절한 화면으로 분기:
  * 1. KPA context 아직 로딩 중 → children 통과 (차단하지 않음)
  * 2. serviceAccess = 'pending' → PendingApprovalPage
  * 3. serviceAccess = 'blocked' → PendingApprovalPage (정지/탈퇴)
- * 4. active + activityType 미설정 + 면제 아님 → ActivitySetupPage
- * 5. 정상 → children 렌더링
+ * 4. 정상 → children 렌더링
  *
  * 비로그인 사용자는 그대로 통과 (공개 페이지 접근 허용)
  */
 
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { isActivityTypeExempt } from '../../lib/role-constants';
 
 interface AuthGateProps {
   children: React.ReactNode;
@@ -49,14 +52,9 @@ export function AuthGate({ children }: AuthGateProps) {
     }
   }
 
-  // active + activityType 미설정 + 면제 아님 → 직능 설정
-  if (
-    !user.activityType &&
-    !isActivityTypeExempt(user.roles, user.membershipRole, user.membershipType)
-  ) {
-    return <Navigate to="/setup-activity" replace />;
-  }
-
-  // 정상
+  // WO-O4O-KPA-AUTHGATE-LEGACY-ACTIVITY-REDIRECT-CLEANUP-V1:
+  //   activity_type 강제 redirect 제거 — canonical 가입 단계에서 입력 완료됨.
+  //   legacy active+NULL 사용자는 /mypage 등 정상 화면 통과시키고, 본인이 원할 때
+  //   /setup-activity 또는 MyProfilePage 에서 manual 수정.
   return <>{children}</>;
 }

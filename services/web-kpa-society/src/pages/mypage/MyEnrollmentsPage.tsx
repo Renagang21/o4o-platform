@@ -196,83 +196,77 @@ export function MyEnrollmentsPage() {
       });
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f9fafb' }}>
-      <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 20px', display: 'flex', gap: 28 }}>
+    <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '0 20px 40px' }}>
+      <PageHeader
+        title="내 수강 목록"
+        description="신청하거나 진행 중인 강의를 확인하세요."
+        breadcrumb={[{ label: '홈', href: '/' }, { label: '마이페이지', href: '/mypage' }, { label: '내 수강' }]}
+      />
+      <MyPageNavigation items={KPA_MYPAGE_NAV_ITEMS} />
 
-        {/* 사이드바 */}
-        <div style={{ flexShrink: 0, width: 200 }}>
-          <MyPageNavigation items={KPA_MYPAGE_NAV_ITEMS} />
-        </div>
-
-        {/* 메인 */}
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <PageHeader title="내 수강 목록" description="신청하거나 진행 중인 강의를 확인하세요." />
-
-          {/* 필터 탭 */}
-          <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
-            {FILTER_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                style={{
-                  padding: '6px 14px', borderRadius: 999, fontSize: 13, fontWeight: filter === opt.value ? 600 : 400,
-                  border: `1px solid ${filter === opt.value ? colors.primary : colors.neutral200}`,
-                  background: filter === opt.value ? colors.primary : colors.white,
-                  color: filter === opt.value ? '#fff' : colors.neutral600,
-                  cursor: 'pointer',
-                }}
-                onClick={() => setFilter(opt.value)}
-              >
-                {opt.label}
-                {opt.value !== 'all' && (
-                  <span style={{ marginLeft: 4, opacity: 0.8 }}>
-                    ({enrollments.filter((e) => {
-                      if (opt.value === 'in_progress') return e.status === 'in_progress' || e.status === 'approved';
-                      if (opt.value === 'cancelled') return e.status === 'cancelled' || e.status === 'rejected' || e.status === 'expired';
-                      return e.status === opt.value;
-                    }).length})
-                  </span>
-                )}
-              </button>
-            ))}
-          </div>
-
-          {/* 목록 */}
-          {loading && <LoadingSpinner />}
-
-          {!loading && error && (
-            <div style={{ padding: '20px', color: '#ef4444', background: '#fef2f2', borderRadius: 8, fontSize: 14 }}>
-              {error}
-            </div>
-          )}
-
-          {!loading && !error && filtered.length === 0 && (
-            <EmptyState
-              title={filter === 'all' ? '수강 중인 강의가 없습니다' : '해당 상태의 강의가 없습니다'}
-              description={filter === 'all' ? '강의 목록에서 관심 있는 강의를 찾아보세요.' : undefined}
-              action={filter === 'all' ? { label: '강의 둘러보기', onClick: () => navigate('/courses') } : undefined}
-            />
-          )}
-
-          {!loading && !error && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {filtered.map((enrollment) => (
-                <EnrollmentCard
-                  key={enrollment.id}
-                  enrollment={enrollment}
-                  onNavigate={() => navigate(`/lms/course/${enrollment.courseId}`)}
-                />
-              ))}
-            </div>
-          )}
-
-          {/* 총 수 */}
-          {!loading && enrollments.length > 0 && (
-            <div style={{ marginTop: 20, fontSize: 13, color: colors.neutral400, textAlign: 'right' }}>
-              전체 {enrollments.length}개 · 표시 {filtered.length}개
-            </div>
-          )}
-        </div>
+      {/* 필터 탭 */}
+      <div style={{ display: 'flex', gap: 8, margin: '20px 0', flexWrap: 'wrap' }}>
+        {FILTER_OPTIONS.map((opt) => (
+          <button
+            key={opt.value}
+            style={{
+              padding: '6px 14px', borderRadius: 999, fontSize: 13, fontWeight: filter === opt.value ? 600 : 400,
+              border: `1px solid ${filter === opt.value ? colors.primary : colors.neutral200}`,
+              background: filter === opt.value ? colors.primary : colors.white,
+              color: filter === opt.value ? '#fff' : colors.neutral600,
+              cursor: 'pointer',
+            }}
+            onClick={() => setFilter(opt.value)}
+          >
+            {opt.label}
+            {opt.value !== 'all' && (
+              <span style={{ marginLeft: 4, opacity: 0.8 }}>
+                ({enrollments.filter((e) => {
+                  if (opt.value === 'in_progress') return e.status === 'in_progress' || e.status === 'approved';
+                  if (opt.value === 'cancelled') return e.status === 'cancelled' || e.status === 'rejected' || e.status === 'expired';
+                  return e.status === opt.value;
+                }).length})
+              </span>
+            )}
+          </button>
+        ))}
       </div>
+
+      {/* 목록 */}
+      {loading && <LoadingSpinner />}
+
+      {!loading && error && (
+        <div style={{ padding: '20px', color: '#ef4444', background: '#fef2f2', borderRadius: 8, fontSize: 14 }}>
+          {error}
+        </div>
+      )}
+
+      {!loading && !error && filtered.length === 0 && (
+        <EmptyState
+          title={filter === 'all' ? '수강 중인 강의가 없습니다' : '해당 상태의 강의가 없습니다'}
+          description={filter === 'all' ? '강의 목록에서 관심 있는 강의를 찾아보세요.' : undefined}
+          action={filter === 'all' ? { label: '강의 둘러보기', onClick: () => navigate('/courses') } : undefined}
+        />
+      )}
+
+      {!loading && !error && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {filtered.map((enrollment) => (
+            <EnrollmentCard
+              key={enrollment.id}
+              enrollment={enrollment}
+              onNavigate={() => navigate(`/lms/course/${enrollment.courseId}`)}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* 총 수 */}
+      {!loading && enrollments.length > 0 && (
+        <div style={{ marginTop: 20, fontSize: 13, color: colors.neutral400, textAlign: 'right' }}>
+          전체 {enrollments.length}개 · 표시 {filtered.length}개
+        </div>
+      )}
     </div>
   );
 }

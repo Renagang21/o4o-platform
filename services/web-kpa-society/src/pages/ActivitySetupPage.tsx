@@ -1,16 +1,24 @@
 /**
- * ActivitySetupPage - 직능 분류 설정 + 근무지 정보 수집 (2단계)
+ * ActivitySetupPage - 직역/근무처 정보 설정·수정 페이지
  *
  * WO-KPA-A-AUTH-UX-STATE-UNIFICATION-V1
  * WO-KPA-A-PHARMACIST-ACTIVITY-TYPE-BUSINESS-INFO-FLOW-V1
+ * WO-O4O-KPA-AUTHGATE-LEGACY-ACTIVITY-REDIRECT-CLEANUP-V1:
+ *   AuthGate 강제 redirect 제거에 따라 본 페이지는 "회원가입 필수 단계"가 아닌
+ *   "직역/근무 정보 수정" 페이지로 역할 축소. 신규 canonical 가입자는
+ *   RegisterModal 에서 입력 완료되므로 본 페이지를 거치지 않는다.
+ *   - 신규 진입 경로: legacy active+NULL 사용자의 manual 진입,
+ *     기존 사용자의 프로필 수정 (MyProfilePage 외 보조 경로),
+ *     직접 URL 진입.
+ *   - activityType 이 이미 설정된 사용자는 /mypage 로 redirect (편집은 MyProfilePage 사용).
  *
- * Step 1: 직능 분류 선택
- * Step 2: 근무지/사업장 정보 입력 (직능에 따라 분기)
- *   - pharmacy_owner: 약국명, 주소, 전화번호 (Full)
- *   - 기타 근무 직능: 근무지명, 전화번호 (Minimal)
- *   - inactive/other/student: Step 2 없이 바로 완료
+ * 흐름 (직역에 따라 분기):
+ *   Step 1: 직역 선택
+ *   Step 2: 근무지/사업장 정보 입력
+ *     - pharmacy_owner: 약국명, 주소, 전화번호 (Full)
+ *     - 기타 근무 직역: 근무지명, 전화번호 (Minimal)
+ *     - inactive/other/student: Step 2 없이 바로 완료
  *
- * AuthGate가 activityType 미설정 + 비면제 사용자를 이 페이지로 리다이렉트.
  * API 호출은 최종 제출 시에만 수행 (중간 이탈 시 activityType=null 유지).
  */
 
@@ -144,11 +152,12 @@ export function ActivitySetupPage() {
     return true;
   };
 
-  // Determine step 1 button text
+  // Determine step 1 button text — WO-O4O-KPA-AUTHGATE-LEGACY-ACTIVITY-REDIRECT-CLEANUP-V1:
+  // "시작하기"(온보딩 톤) → "저장"(프로필 수정 톤)
   const step1BtnText = (): string => {
     if (saving) return '저장 중...';
     if (!selected) return '다음';
-    return getStep2Type(selected) === 'skip' ? '시작하기' : '다음';
+    return getStep2Type(selected) === 'skip' ? '저장' : '다음';
   };
 
   const totalSteps = !selected || getStep2Type(selected) === 'skip' ? 1 : 2;
@@ -168,13 +177,14 @@ export function ActivitySetupPage() {
           <>
             <div style={styles.header}>
               <div style={styles.stepBadge}>
-                {totalSteps > 1 ? '1단계: 직능 분류' : '필수 설정'}
+                {totalSteps > 1 ? '1단계: 직역 선택' : '직역 설정'}
               </div>
               <h1 style={styles.title}>
-                {user.membershipType === 'student' ? '학생 분류를 선택해주세요' : '직능 분류를 선택해주세요'}
+                {user.membershipType === 'student' ? '학생 분류를 선택해주세요' : '직역을 선택해주세요'}
               </h1>
               <p style={styles.subtitle}>
-                {user.name}님, 환영합니다. 맞춤 서비스 제공을 위해 현재 {user.membershipType === 'student' ? '상태' : '직능'}를 선택해주세요.
+                맞춤 서비스 제공을 위해 현재 {user.membershipType === 'student' ? '상태' : '직역'}를 입력합니다.
+                <br />언제든 마이페이지에서 수정할 수 있습니다.
               </p>
             </div>
 
@@ -220,7 +230,8 @@ export function ActivitySetupPage() {
               <div style={styles.stepBadge}>2단계: 약국 정보</div>
               <h1 style={styles.title}>약국 정보를 입력해주세요</h1>
               <p style={styles.subtitle}>
-                개설약사로서의 약국 정보를 입력해주세요.
+                개설약사의 약국 정보를 입력합니다.
+                <br />언제든 마이페이지에서 수정할 수 있습니다.
               </p>
             </div>
 
@@ -298,7 +309,7 @@ export function ActivitySetupPage() {
                 cursor: (!isStep2Valid() || saving) ? 'not-allowed' : 'pointer',
               }}
             >
-              {saving ? '저장 중...' : '시작하기'}
+              {saving ? '저장 중...' : '저장'}
             </button>
 
             <p style={styles.footnote}>
@@ -313,7 +324,8 @@ export function ActivitySetupPage() {
               <div style={styles.stepBadge}>2단계: 근무지 정보</div>
               <h1 style={styles.title}>근무지 정보를 입력해주세요</h1>
               <p style={styles.subtitle}>
-                현재 근무하시는 곳의 정보를 입력해주세요.
+                현재 근무하시는 곳의 정보를 입력합니다.
+                <br />언제든 마이페이지에서 수정할 수 있습니다.
               </p>
             </div>
 
@@ -358,7 +370,7 @@ export function ActivitySetupPage() {
                 cursor: (!isStep2Valid() || saving) ? 'not-allowed' : 'pointer',
               }}
             >
-              {saving ? '저장 중...' : '시작하기'}
+              {saving ? '저장 중...' : '저장'}
             </button>
 
             <p style={styles.footnote}>
