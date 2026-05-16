@@ -6,8 +6,7 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MyPageNavigation } from '@o4o/account-ui';
-import { KPA_MYPAGE_NAV_ITEMS } from './navItems';
+import { MyPageLayout } from '../../layouts/MyPageLayout';
 import {
   qualificationApi,
   getQualificationLabel,
@@ -121,10 +120,11 @@ export function MyQualificationsPage() {
   if (loading) return <div style={styles.loading}>불러오는 중...</div>;
 
   return (
-    <div style={styles.container}>
-      <MyPageNavigation items={KPA_MYPAGE_NAV_ITEMS} />
-      <h1 style={styles.title}>내 자격</h1>
-
+    <MyPageLayout
+      title="내 자격"
+      breadcrumb={[{ label: '홈', href: '/' }, { label: '마이페이지', href: '/mypage' }, { label: '내 자격' }]}
+      width="list"
+    >
       {error && <div style={styles.errorBanner}>{error}</div>}
       {success && <div style={styles.successBanner}>{success}</div>}
 
@@ -245,7 +245,7 @@ export function MyQualificationsPage() {
           </div>
         )}
       </section>
-    </div>
+    </MyPageLayout>
   );
 }
 
