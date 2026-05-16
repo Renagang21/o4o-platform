@@ -1,10 +1,6 @@
 /**
  * MyDashboardPage - 마이페이지 대시보드
  *
- * WO-KPA-MYPAGE-OFFICER-V1
- * - 임원인 경우 임원 대시보드 바로가기 추가
- * - 임원인 경우 회계 요약 섹션 추가
- *
  * WO-KPA-A-MYPAGE-HUB-NAVIGATION-AND-CTA-ENHANCEMENT-V1
  * - MyPageNavigation 탭 네비게이션 추가
  * - 내 포럼 바로가기 추가, 작성 글 카드 링크 연결
@@ -19,22 +15,10 @@ import { Link } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { MyPageNavigation } from '@o4o/account-ui';
 import { KPA_MYPAGE_NAV_ITEMS } from './navItems';
-import { AiSummaryButton } from '../../components/ai';
 import { mypageApi } from '../../api';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 import type { UserActivity } from '../../api/mypage';
-
-// 회계 항목 타입 (단식부기)
-interface AccountingEntry {
-  id: string;
-  date: string;
-  type: 'income' | 'expense';
-  category: string;
-  description: string;
-  amount: number;
-  balance: number;
-}
 
 interface DashboardSummary {
   enrolledCourses: number;
@@ -60,27 +44,6 @@ export function MyDashboardPage() {
   const [activities, setActivities] = useState<UserActivity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // WO-O4O-AUTH-RBAC-CLEANUP-V1: prefixed role check
-  const isOfficer = user?.roles.some(r => r === 'kpa:admin' || r === 'platform:super_admin') ?? false;
-
-  // 임원용 회계 데이터 (단식부기) - Mock
-  const [accountingEntries] = useState<AccountingEntry[]>([
-    { id: '1', date: '2025-01-02', type: 'income', category: '연회비', description: '1월 연회비 수납', amount: 15000000, balance: 85000000 },
-    { id: '2', date: '2025-01-03', type: 'expense', category: '인건비', description: '1월 직원 급여', amount: 8000000, balance: 77000000 },
-    { id: '3', date: '2025-01-04', type: 'expense', category: '운영비', description: '사무실 관리비', amount: 2000000, balance: 75000000 },
-  ]);
-
-  // 회계 요약 계산
-  const accountingSummary = {
-    totalIncome: accountingEntries.filter(e => e.type === 'income').reduce((sum, e) => sum + e.amount, 0),
-    totalExpense: accountingEntries.filter(e => e.type === 'expense').reduce((sum, e) => sum + e.amount, 0),
-    currentBalance: accountingEntries.length > 0 ? accountingEntries[accountingEntries.length - 1].balance : 0,
-  };
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(amount);
-  };
 
   useEffect(() => {
     if (user) loadData();
@@ -167,69 +130,6 @@ export function MyDashboardPage() {
           </Link>
         </div>
       </Card>
-
-      {/* 임원 전용 섹션 */}
-      {isOfficer && (
-        <>
-          {/* 임원 대시보드 바로가기 */}
-          <Card padding="medium" style={{ marginBottom: '24px' }}>
-            <div style={styles.officerSection}>
-              <div style={styles.officerInfo}>
-                <span style={styles.officerIcon}>🏛️</span>
-                <div>
-                  <h3 style={styles.officerTitle}>임원 대시보드</h3>
-                  <p style={styles.officerDesc}>회계, 일정, 행사 관리 등 임원 업무를 확인하세요.</p>
-                </div>
-              </div>
-              <Link to="/intranet" style={styles.officerButton}>
-                대시보드 이동 →
-              </Link>
-            </div>
-          </Card>
-
-          {/* 임원용 회계 요약 */}
-          <Card padding="large" style={{ marginBottom: '24px' }}>
-            <div style={styles.accountingHeader}>
-              <h3 style={styles.sectionTitle}>💰 회계 요약</h3>
-              <AiSummaryButton
-                label="AI 분석"
-                contextLabel="회계 현황"
-                size="sm"
-                serviceId="kpa-society"
-                contextData={{
-                  role: user.roles[0],
-                  summary: accountingSummary,
-                  recentEntries: accountingEntries.slice(0, 3),
-                  period: '2025년 1월',
-                }}
-              />
-            </div>
-            <div style={styles.accountingSummaryGrid}>
-              <div style={styles.accountingSummaryCard}>
-                <span style={styles.accountingLabel}>총 수입</span>
-                <span style={{ ...styles.accountingValue, color: '#059669' }}>
-                  {formatCurrency(accountingSummary.totalIncome)}
-                </span>
-              </div>
-              <div style={styles.accountingSummaryCard}>
-                <span style={styles.accountingLabel}>총 지출</span>
-                <span style={{ ...styles.accountingValue, color: '#DC2626' }}>
-                  {formatCurrency(accountingSummary.totalExpense)}
-                </span>
-              </div>
-              <div style={styles.accountingSummaryCard}>
-                <span style={styles.accountingLabel}>현재 잔액</span>
-                <span style={{ ...styles.accountingValue, color: colors.primary }}>
-                  {formatCurrency(accountingSummary.currentBalance)}
-                </span>
-              </div>
-            </div>
-            <Link to="/intranet" style={styles.viewDetailLink}>
-              상세 내역 보기 →
-            </Link>
-          </Card>
-        </>
-      )}
 
       {/* 활동 요약 카드 */}
       <div style={styles.summaryGrid}>
@@ -493,78 +393,6 @@ const styles: Record<string, React.CSSProperties> = {
   quickLinkIcon: {
     fontSize: '28px',
     marginBottom: '8px',
-  },
-  // 임원 섹션 스타일
-  officerSection: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: '16px',
-  },
-  officerInfo: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '16px',
-  },
-  officerIcon: {
-    fontSize: '40px',
-  },
-  officerTitle: {
-    ...typography.headingS,
-    color: colors.neutral900,
-    margin: 0,
-  },
-  officerDesc: {
-    ...typography.bodyS,
-    color: colors.neutral500,
-    marginTop: '4px',
-  },
-  officerButton: {
-    padding: '12px 24px',
-    backgroundColor: colors.primary,
-    color: colors.white,
-    textDecoration: 'none',
-    borderRadius: '8px',
-    fontSize: '14px',
-    fontWeight: 600,
-  },
-  // 회계 섹션 스타일
-  accountingHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '16px',
-  },
-  accountingSummaryGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
-    gap: '16px',
-    marginBottom: '16px',
-  },
-  accountingSummaryCard: {
-    padding: '16px',
-    backgroundColor: colors.neutral50,
-    borderRadius: '8px',
-    textAlign: 'center',
-  },
-  accountingLabel: {
-    display: 'block',
-    ...typography.bodyS,
-    color: colors.neutral500,
-    marginBottom: '8px',
-  },
-  accountingValue: {
-    display: 'block',
-    fontSize: '20px',
-    fontWeight: 700,
-  },
-  viewDetailLink: {
-    display: 'block',
-    textAlign: 'center',
-    color: colors.primary,
-    textDecoration: 'none',
-    fontSize: '14px',
-    paddingTop: '8px',
   },
   // Market Trial 섹션
   trialSummaryRow: {
