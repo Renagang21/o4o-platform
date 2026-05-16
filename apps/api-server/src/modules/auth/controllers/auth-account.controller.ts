@@ -135,6 +135,15 @@ export class AuthAccountController extends BaseController {
     }
 
     try {
+      // WO-O4O-KPA-ACTIVITY-TYPE-ROLE-SYNC-V1:
+      //   변경 전 직역 조회 (UPSERT 후엔 새 값으로 덮여있어 비교 불가).
+      //   pharmacy_owner → 다른 직역 전환 감지에 사용 (아래 step 5).
+      const [prevProfile] = await AppDataSource.query(
+        `SELECT activity_type FROM kpa_pharmacist_profiles WHERE user_id = $1`,
+        [userId]
+      );
+      const prevActivityType: string | null = prevProfile?.activity_type ?? null;
+
       // 1. SSOT: kpa_pharmacist_profiles
       await AppDataSource.query(
         `INSERT INTO kpa_pharmacist_profiles (user_id, activity_type)
@@ -178,6 +187,22 @@ export class AuthAccountController extends BaseController {
         await AppDataSource.query(
           `UPDATE kpa_members SET pharmacy_name = COALESCE($2, pharmacy_name), pharmacy_address = COALESCE($3, pharmacy_address) WHERE user_id = $1`,
           [userId, pName, pAddr]
+        );
+      }
+
+      // 5. WO-O4O-KPA-ACTIVITY-TYPE-ROLE-SYNC-V1:
+      //    pharmacy_owner → 다른 직역 전환 시 kpa:store_owner role 비활성화.
+      //    AdminUserController.revokeRoleAssignment 와 동일한 raw SQL soft delete 패턴.
+      //    is_active = true 가드로 멱등성 보장 (중복 호출 무해).
+      //    부여 방향(다른 직역 → pharmacy_owner) 은 frontend 가드
+      //    (WO-O4O-KPA-PHARMACY-OWNER-DIRECT-CHANGE-GUARD-V1) 로 차단되어
+      //    본 경로에서는 거의 발생하지 않음 — 본 WO 범위 외.
+      if (prevActivityType === 'pharmacy_owner' && resolvedActivityType !== 'pharmacy_owner') {
+        await AppDataSource.query(
+          `UPDATE role_assignments
+           SET is_active = false, updated_at = NOW()
+           WHERE user_id = $1 AND role = 'kpa:store_owner' AND is_active = true`,
+          [userId]
         );
       }
 
