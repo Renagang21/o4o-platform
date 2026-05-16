@@ -129,3 +129,6 @@ bin/cloud_sql_proxy
 
 # Local test accounts (browser verification — never commit)
 docs/local/*.local.md
+
+# Verification script outputs (screenshots, findings JSON — reproducible by re-running the script)
+scripts/verify/output/
