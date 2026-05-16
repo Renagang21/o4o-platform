@@ -574,9 +574,10 @@ export class MembershipApprovalService {
   /**
    * Withdraw a member from specific service(s) — canonical service leave lifecycle.
    * WO-O4O-USER-WITHDRAW-LIFECYCLE-V1
+   * WO-O4O-SM-WITHDRAWN-STATUS-CANONICAL-ALIGNMENT-V1: status='withdrawn' 정식 통일
    *
    * Policy:
-   * - service_memberships.status = 'inactive' (접근 차단, Core enum 재사용)
+   * - service_memberships.status = 'withdrawn' (Core enum 정식 추가, frontend filter 와 일치)
    * - role_assignments: deactivate service-prefix roles only
    * - kpa_members: status/identity_status = 'withdrawn' (KPA domain profile sync)
    * - organization_members: role='member' → remove (KPA scope); owner/admin → log only
@@ -629,12 +630,14 @@ export class MembershipApprovalService {
         userId, count: selectResult.length, affectedServiceKeys,
       });
 
-      // STEP1: Set service_memberships.status = 'inactive'
-      // 'inactive'는 Core freeze 내 기존 값 재사용 — 새 enum 추가 금지
-      logger.info('[WITHDRAW][STEP1] membership INACTIVATE', { membershipIds });
+      // STEP1: Set service_memberships.status = 'withdrawn'
+      // WO-O4O-SM-WITHDRAWN-STATUS-CANONICAL-ALIGNMENT-V1:
+      //   이전 'inactive' 저장은 Core enum 미정의 + GET filter 'withdrawn' 과 미스매치 발생.
+      //   ServiceMembershipStatus 에 'withdrawn' 정식 추가하여 정렬.
+      logger.info('[WITHDRAW][STEP1] membership WITHDRAW', { membershipIds });
 
       await queryRunner.query(
-        `UPDATE service_memberships SET status = 'inactive', updated_at = NOW() WHERE id = ANY($1)`,
+        `UPDATE service_memberships SET status = 'withdrawn', updated_at = NOW() WHERE id = ANY($1)`,
         [membershipIds]
       );
 
@@ -793,8 +796,11 @@ export class MembershipApprovalService {
           `UPDATE users SET status = 'deleted', "isActive" = false, "updatedAt" = NOW() WHERE id = $1`,
           [userId]
         );
+        // WO-O4O-SM-WITHDRAWN-STATUS-CANONICAL-ALIGNMENT-V1:
+        //   soft delete 도 lifecycle 종료 status 'withdrawn' 으로 일원화.
+        //   withdrawMembership() 과 동일 enum 사용 (별도 'inactive' 분리 금지).
         await queryRunner.query(
-          `UPDATE service_memberships SET status = 'inactive', updated_at = NOW() WHERE user_id = $1`,
+          `UPDATE service_memberships SET status = 'withdrawn', updated_at = NOW() WHERE user_id = $1`,
           [userId]
         );
 

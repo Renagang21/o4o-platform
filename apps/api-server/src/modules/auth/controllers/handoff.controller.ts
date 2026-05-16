@@ -187,9 +187,11 @@ export class HandoffController extends BaseController {
       );
 
       if (existing.length > 0) {
-        // WO-O4O-HANDOFF-INACTIVE-MEMBERSHIP-BLOCK-V1: block withdrawn (inactive) memberships
-        if (existing[0].status === 'inactive') {
-          logger.warn('[Handoff] Blocked reactivation of inactive (withdrawn) membership', {
+        // WO-O4O-HANDOFF-INACTIVE-MEMBERSHIP-BLOCK-V1: block withdrawn memberships
+        // WO-O4O-SM-WITHDRAWN-STATUS-CANONICAL-ALIGNMENT-V1:
+        //   canonical 탈퇴 status 가 'withdrawn' 으로 통일됨 (이전 'inactive' 저장 폐기).
+        if (existing[0].status === 'withdrawn') {
+          logger.warn('[Handoff] Blocked reactivation of withdrawn membership', {
             userId: user.id,
             serviceKey,
           });
@@ -197,7 +199,7 @@ export class HandoffController extends BaseController {
             res,
             '이 서비스는 탈퇴 처리된 상태입니다. 다시 이용하려면 가입 신청을 진행하세요.',
             403,
-            'MEMBERSHIP_INACTIVE',
+            'MEMBERSHIP_WITHDRAWN',
           );
         }
 

@@ -25,7 +25,12 @@ import {
 } from 'typeorm';
 import type { User } from './User.js';
 
-export type ServiceMembershipStatus = 'pending' | 'active' | 'suspended' | 'rejected';
+// WO-O4O-SM-WITHDRAWN-STATUS-CANONICAL-ALIGNMENT-V1:
+//   탈퇴(withdrawn) 정식 상태 추가. 이전에는 withdrawMembership() 이
+//   Core enum 회피 목적으로 'inactive' 를 저장했으나, GET /kpa/members 와 frontend
+//   가 'withdrawn' 을 기대하여 contract drift 발생. lifecycle 종료 status 를
+//   'withdrawn' 으로 일원화 (soft delete 흐름 포함).
+export type ServiceMembershipStatus = 'pending' | 'active' | 'suspended' | 'rejected' | 'withdrawn';
 
 @Entity('service_memberships')
 @Unique(['userId', 'serviceKey'])
