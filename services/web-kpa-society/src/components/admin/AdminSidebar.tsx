@@ -83,16 +83,10 @@ export function AdminSidebar() {
 
   return (
     <aside className="fixed left-0 top-16 h-[calc(100vh-4rem)] w-[260px] bg-white border-r border-gray-200 flex flex-col z-40">
-      {/* 관리자 식별 헤더 */}
-      <div className="flex items-center gap-3 px-5 py-6 border-b border-gray-200">
-        <div className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center">
-          <span className="text-white text-lg font-bold">KPA</span>
-        </div>
-        <div>
-          <div className="text-base font-semibold text-gray-900">서울특별시약사회</div>
-          <div className="text-xs text-indigo-600 mt-0.5">관리자</div>
-        </div>
-      </div>
+      {/* WO-O4O-KPA-ADMIN-DASHBOARD-ORG-BRANDING-REMOVAL-V1:
+          organization branding (KPA icon + "서울특별시약사회" + "관리자") 블록 제거.
+          KPA-Society 는 특정 organization 기반 관리 서비스가 아님.
+          관리자 식별은 페이지 헤더("관리자 대시보드") + global header 가 담당. */}
 
       {/* 메뉴 */}
       <nav className="flex-1 overflow-y-auto py-3">
