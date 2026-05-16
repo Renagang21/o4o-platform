@@ -105,6 +105,12 @@ export function MyProfilePage() {
   const [storeOwnerStatus, setStoreOwnerStatus] = useState<StoreOwnerCapStatus>('unknown');
   const [storeOwnerStatusLoading, setStoreOwnerStatusLoading] = useState(false);
 
+  // WO-O4O-KPA-MYPAGE-CAPABILITY-CARD-AUTO-ALIGN-V1:
+  //   자동 store_owner 부여 정책 도입 후, role 보유 사용자에게는 capability 신청 UI 미표시.
+  //   fallback (다른 직역 / 자동 부여 실패) 경로는 role 미보유 사용자에게만 노출됨.
+  const hasStoreOwnerRole = Array.isArray((user as any)?.roles)
+    && (user as any).roles.includes('kpa:store_owner');
+
   useEffect(() => {
     if (user) loadData();
   }, [user]);
@@ -114,8 +120,6 @@ export function MyProfilePage() {
   //   /pharmacy-requests/my 엔드포인트는 인증된 모든 사용자에게 본인 신청을 반환.
   useEffect(() => {
     if (!user) return;
-    const hasStoreOwnerRole = Array.isArray((user as any)?.roles)
-      && (user as any).roles.includes('kpa:store_owner');
     let cancelled = false;
     setStoreOwnerStatusLoading(true);
     pharmacyRequestApi.getMyRequests()
@@ -611,47 +615,52 @@ export function MyProfilePage() {
                 </>
               )}
 
-              {/* WO-O4O-KPA-PROFILE-AND-STOREOWNER-UX-ALIGN-V1:
-                  매장 운영 권한 (kpa:store_owner capability) — 직역(profile) 과 분리된 별도 영역.
-                  직역 정보는 자유 변경이지만 매장 운영 권한은 별도 신청·승인 절차 필요. */}
-              <div style={styles.bizDivider} />
-              <div style={styles.capabilitySection}>
-                <div style={styles.capabilityHeader}>
-                  <h4 style={styles.capabilityTitle}>매장 운영 권한</h4>
-                  {storeOwnerStatus !== 'unknown' && (
-                    <span
-                      style={{
-                        ...styles.capabilityBadge,
-                        ...(storeOwnerStatus === 'approved' ? styles.capabilityBadgeApproved
-                          : storeOwnerStatus === 'pending' ? styles.capabilityBadgePending
-                          : storeOwnerStatus === 'rejected' ? styles.capabilityBadgeRejected
-                          : styles.capabilityBadgeUnsubmitted),
-                      }}
-                    >
-                      {STORE_OWNER_STATUS_LABELS[storeOwnerStatus]}
-                    </span>
-                  )}
-                  {storeOwnerStatusLoading && storeOwnerStatus === 'unknown' && (
-                    <span style={styles.capabilityBadgeLoading}>확인 중...</span>
-                  )}
-                </div>
-                <p style={styles.capabilityDesc}>
-                  내 매장 / Store HUB 이용은 별도의 매장 운영 승인 절차가 필요합니다.
-                  위 직역(활동 유형)은 회원 본인 소개 정보이며, 매장 운영 권한과는 다릅니다.
-                </p>
-                {storeOwnerStatus === 'unsubmitted' && (
-                  <Link to="/pharmacy" style={styles.capabilityCtaPrimary}>매장 운영 권한 신청 →</Link>
-                )}
-                {storeOwnerStatus === 'pending' && (
-                  <Link to="/pharmacy" style={styles.capabilityCtaSecondary}>내 신청 보기</Link>
-                )}
-                {storeOwnerStatus === 'approved' && (
-                  <Link to="/store" style={styles.capabilityCtaPrimary}>내 매장으로 이동 →</Link>
-                )}
-                {storeOwnerStatus === 'rejected' && (
-                  <Link to="/pharmacy" style={styles.capabilityCtaPrimary}>다시 신청하기 →</Link>
-                )}
-              </div>
+              {/* WO-O4O-KPA-MYPAGE-CAPABILITY-CARD-AUTO-ALIGN-V1:
+                  자동 store_owner 부여 정책 도입 후, role 보유 사용자에게는 본 카드를 미표시.
+                  role 미보유 + 다른 직역 / 자동 부여 실패 fallback 경로에만 신청 UI 노출.
+                  근거: docs/investigations/IR-O4O-STORE-OWNER-AUTO-CAPABILITY-AUDIT-V1.md */}
+              {!hasStoreOwnerRole && (
+                <>
+                  <div style={styles.bizDivider} />
+                  <div style={styles.capabilitySection}>
+                    <div style={styles.capabilityHeader}>
+                      <h4 style={styles.capabilityTitle}>매장 운영 권한</h4>
+                      {storeOwnerStatus !== 'unknown' && (
+                        <span
+                          style={{
+                            ...styles.capabilityBadge,
+                            ...(storeOwnerStatus === 'approved' ? styles.capabilityBadgeApproved
+                              : storeOwnerStatus === 'pending' ? styles.capabilityBadgePending
+                              : storeOwnerStatus === 'rejected' ? styles.capabilityBadgeRejected
+                              : styles.capabilityBadgeUnsubmitted),
+                          }}
+                        >
+                          {STORE_OWNER_STATUS_LABELS[storeOwnerStatus]}
+                        </span>
+                      )}
+                      {storeOwnerStatusLoading && storeOwnerStatus === 'unknown' && (
+                        <span style={styles.capabilityBadgeLoading}>확인 중...</span>
+                      )}
+                    </div>
+                    <p style={styles.capabilityDesc}>
+                      내 매장 / Store HUB 이용은 별도의 매장 운영 승인 절차가 필요합니다.
+                      위 직역(활동 유형)은 회원 본인 소개 정보이며, 매장 운영 권한과는 다릅니다.
+                    </p>
+                    {storeOwnerStatus === 'unsubmitted' && (
+                      <Link to="/pharmacy" style={styles.capabilityCtaPrimary}>매장 운영 권한 신청 →</Link>
+                    )}
+                    {storeOwnerStatus === 'pending' && (
+                      <Link to="/pharmacy" style={styles.capabilityCtaSecondary}>내 신청 보기</Link>
+                    )}
+                    {storeOwnerStatus === 'approved' && (
+                      <Link to="/store" style={styles.capabilityCtaPrimary}>내 매장으로 이동 →</Link>
+                    )}
+                    {storeOwnerStatus === 'rejected' && (
+                      <Link to="/pharmacy" style={styles.capabilityCtaPrimary}>다시 신청하기 →</Link>
+                    )}
+                  </div>
+                </>
+              )}
 
               {/* 소속 조직 */}
               {hasOrganizations && (
