@@ -8,21 +8,13 @@
 
 import type { Request, Response, NextFunction } from 'express';
 import { parseServiceRole, isPlatformAdmin } from './role.utils.js';
+import { resolveCanonicalServiceKey } from '@o4o/security-core';
 
-/**
- * Role prefix → canonical service_key/service_code mapping.
- * Role prefixes that differ from service_key used in
- * service_memberships / organization_service_enrollments.
- *
- * Mirrors SCOPE_TO_MEMBERSHIP_KEY in membership-guard.middleware.ts
- */
-const ROLE_PREFIX_TO_SERVICE_KEY: Record<string, string> = {
-  'kpa': 'kpa-society',
-  'cosmetics': 'k-cosmetics',
-};
-
+// WO-O4O-BACKFILL-MIGRATION-CANONICAL-KEY-CONSISTENCY-V1:
+//   role prefix → canonical service_key 매핑은 @o4o/security-core SSOT 위임.
+//   로컬 const 정의 금지 — 3-way drift(membership-guard / AdminUserController / serviceScope) 방지.
 function resolveServiceKey(rolePrefix: string): string {
-  return ROLE_PREFIX_TO_SERVICE_KEY[rolePrefix] || rolePrefix;
+  return resolveCanonicalServiceKey(rolePrefix);
 }
 
 export interface ServiceScope {

@@ -12,18 +12,14 @@ import { hashPassword } from '../../utils/auth.utils.js';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 import logger from '../../utils/logger.js';
 import type { ServiceMembership } from '../../modules/auth/entities/ServiceMembership.js';
+import { resolveCanonicalServiceKey } from '@o4o/security-core';
 
-// WO-O4O-ADMIN-OPERATOR-MEMBERSHIP-CANONICAL-KEY-FIX-V1:
-// service-prefixed role (e.g., 'kpa:operator') prefix -> service_memberships canonical service_key 매핑.
-// 미매핑 prefix는 그대로 사용 (neture, glycopharm 등은 self-map).
-// serviceScope.ts의 ROLE_PREFIX_TO_SERVICE_KEY 와 동일 의미. 단일 출처화는 별도 WO.
-const ROLE_PREFIX_TO_CANONICAL_SERVICE_KEY: Record<string, string> = {
-  'kpa': 'kpa-society',
-  'cosmetics': 'k-cosmetics',
-};
-
+// WO-O4O-ADMIN-OPERATOR-MEMBERSHIP-CANONICAL-KEY-FIX-V1 +
+// WO-O4O-BACKFILL-MIGRATION-CANONICAL-KEY-CONSISTENCY-V1:
+// service-prefixed role (e.g., 'kpa:operator') prefix → service_memberships canonical service_key 매핑.
+// SSOT: @o4o/security-core 의 resolveCanonicalServiceKey() 사용. 로컬 const 정의 금지.
 function toCanonicalServiceKey(rolePrefix: string): string {
-  return ROLE_PREFIX_TO_CANONICAL_SERVICE_KEY[rolePrefix] || rolePrefix;
+  return resolveCanonicalServiceKey(rolePrefix);
 }
 
 export class AdminUserController {

@@ -35,18 +35,15 @@
  */
 
 import type { RequestHandler } from 'express';
-import { createServiceScopeGuard } from '@o4o/security-core';
+import { createServiceScopeGuard, resolveCanonicalServiceKey } from '@o4o/security-core';
 import type { ServiceScopeGuardConfig } from '@o4o/security-core';
 
-// Scope guard serviceKey → service_memberships.service_key 매핑
-// 대부분 동일하지만, 일부 서비스는 다른 키를 사용
-const SCOPE_TO_MEMBERSHIP_KEY: Record<string, string> = {
-  'kpa': 'kpa-society',
-  'cosmetics': 'k-cosmetics',
-};
-
+// WO-O4O-BACKFILL-MIGRATION-CANONICAL-KEY-CONSISTENCY-V1:
+//   scope serviceKey → service_memberships.service_key 매핑은 @o4o/security-core 의
+//   resolveCanonicalServiceKey() SSOT 로 위임 (kpa→kpa-society, cosmetics→k-cosmetics,
+//   기타 self-map). 로컬 const 정의 금지 — drift 재발 방지.
 function resolveMembershipKey(scopeServiceKey: string): string {
-  return SCOPE_TO_MEMBERSHIP_KEY[scopeServiceKey] || scopeServiceKey;
+  return resolveCanonicalServiceKey(scopeServiceKey);
 }
 
 /**

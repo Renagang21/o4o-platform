@@ -10,6 +10,57 @@
 import type { ServiceScopeGuardConfig } from './types.js';
 
 /**
+ * Canonical mapping: role prefix → service_memberships.service_key
+ *
+ * WO-O4O-BACKFILL-MIGRATION-CANONICAL-KEY-CONSISTENCY-V1
+ *
+ * SSOT for all places that need to derive the canonical `service_memberships.service_key`
+ * from a service-prefixed role's prefix (e.g., 'kpa:operator' → prefix 'kpa' → 'kpa-society').
+ *
+ * Used by:
+ *   - apps/api-server/src/common/middleware/membership-guard.middleware.ts  (scope → membership key)
+ *   - apps/api-server/src/controllers/admin/AdminUserController.ts          (role grant → SM upsert)
+ *   - any future backfill / migration util that maps role prefix to service_memberships row
+ *
+ * ⚠️ Drift prevention rules (do NOT bypass):
+ *   - NEVER use raw `SPLIT_PART(role, ':', 1)` for service_memberships.service_key writes.
+ *     Always pass the prefix through `resolveCanonicalServiceKey(prefix)`.
+ *   - Frontend MembershipGate uses literal canonical key ('kpa-society' etc.) directly.
+ *     This map is only the prefix→canonical direction. Reverse (canonical→prefix) is
+ *     not provided since each canonical key corresponds to exactly one prefix.
+ *
+ * Self-mapped services (prefix === canonical key):
+ *   - neture   (no entry — fallback returns 'neture')
+ *   - glycopharm (no entry — fallback returns 'glycopharm')
+ *   - platform (no entry — fallback returns 'platform')
+ *
+ * Mapped (drift-prone) services:
+ *   - kpa        → kpa-society
+ *   - cosmetics  → k-cosmetics
+ */
+export const ROLE_PREFIX_TO_CANONICAL_SERVICE_KEY: Readonly<Record<string, string>> = Object.freeze({
+  kpa: 'kpa-society',
+  cosmetics: 'k-cosmetics',
+});
+
+/**
+ * Resolve a role prefix to its canonical `service_memberships.service_key`.
+ *
+ * Examples:
+ *   resolveCanonicalServiceKey('kpa')        // 'kpa-society'
+ *   resolveCanonicalServiceKey('cosmetics')  // 'k-cosmetics'
+ *   resolveCanonicalServiceKey('neture')     // 'neture'   (self-map fallback)
+ *   resolveCanonicalServiceKey('glycopharm') // 'glycopharm'(self-map fallback)
+ *
+ * Use this anywhere that derives membership key from a role prefix — never inline
+ * `SPLIT_PART(role, ':', 1)` for service_memberships writes. See
+ * WO-O4O-BACKFILL-MIGRATION-CANONICAL-KEY-CONSISTENCY-V1 for rationale.
+ */
+export function resolveCanonicalServiceKey(rolePrefix: string): string {
+  return ROLE_PREFIX_TO_CANONICAL_SERVICE_KEY[rolePrefix] || rolePrefix;
+}
+
+/**
  * KPA Service Configuration
  *
  * Organizational isolation: platform:super_admin does NOT bypass.

@@ -29,6 +29,13 @@ export {
   COSMETICS_SCOPE_CONFIG,
 } from './service-configs.js';
 
+// WO-O4O-BACKFILL-MIGRATION-CANONICAL-KEY-CONSISTENCY-V1:
+// canonical role prefix → service_memberships.service_key SSOT
+export {
+  ROLE_PREFIX_TO_CANONICAL_SERVICE_KEY,
+  resolveCanonicalServiceKey,
+} from './service-configs.js';
+
 // Types
 export type {
   ServiceKey,
