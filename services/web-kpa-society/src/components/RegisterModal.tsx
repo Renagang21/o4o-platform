@@ -1,13 +1,11 @@
 /**
  * RegisterModal - KPA Society 회원가입 모달
  *
- * WO-O4O-REGISTRATION-STRUCTURE-REFACTOR-V1
+ * WO-O4O-KPA-REGISTER-CANONICAL-CLEANUP-V1
  *
- * 4개 회원 그룹:
- *   1. pharmacist_member   — 약사 정회원 (면허 보유)
+ * 2개 회원 그룹 (canonical):
+ *   1. pharmacist_member       — 약사 정회원 (면허 보유)
  *   2. pharmacy_student_member — 약대생 준회원
- *   3. external_expert     — 외부전문가 준회원
- *   4. supplier_staff      — 제약/의료기기 업체 직원
  *
  * 흐름: select → form → success
  */
@@ -16,7 +14,7 @@ import { useState, useEffect } from 'react';
 import { X, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
 import { useAuthModal } from '../contexts/AuthModalContext';
 
-type MemberType = 'pharmacist_member' | 'pharmacy_student_member' | 'external_expert' | 'supplier_staff';
+type MemberType = 'pharmacist_member' | 'pharmacy_student_member';
 type Step = 'select' | 'form' | 'success';
 
 /** 국내 약학대학 목록 (2025 기준, 가나다순) */
@@ -35,38 +33,6 @@ const PHARMACY_UNIVERSITIES = [
   '충남대학교 약학대학', '충북대학교 약학대학', '한양대학교 약학대학(ERICA)',
 ];
 
-/** 외부전문가 전문 분야 */
-const EXPERT_DOMAINS = [
-  { value: 'physician', label: '의사' },
-  { value: 'nurse', label: '간호사' },
-  { value: 'researcher', label: '연구원' },
-  { value: 'lawyer', label: '법무 (변호사/법무사)' },
-  { value: 'accountant', label: '회계사/세무사' },
-  { value: 'healthcare_admin', label: '의료행정' },
-  { value: 'nutritionist', label: '영양사/식품전문가' },
-  { value: 'engineer', label: '공학/IT 전문가' },
-  { value: 'other', label: '기타 전문직' },
-];
-
-/** 기관 유형 */
-const INSTITUTION_TYPES = [
-  { value: 'hospital', label: '의료기관 (병원/의원)' },
-  { value: 'university', label: '대학교/연구기관' },
-  { value: 'government', label: '공공기관/정부' },
-  { value: 'law_firm', label: '법무법인' },
-  { value: 'consulting', label: '컨설팅/자문' },
-  { value: 'other', label: '기타' },
-];
-
-/** 업체 유형 */
-const COMPANY_TYPES = [
-  { value: 'pharmaceutical', label: '제약사' },
-  { value: 'medical_device', label: '의료기기' },
-  { value: 'cosmetics', label: '화장품/기능성' },
-  { value: 'distributor', label: '도매/유통' },
-  { value: 'other', label: '기타' },
-];
-
 const MEMBER_GROUP_INFO: Record<MemberType, { emoji: string; title: string; desc: string; notice: string }> = {
   pharmacist_member: {
     emoji: '💊',
@@ -80,25 +46,11 @@ const MEMBER_GROUP_INFO: Record<MemberType, { emoji: string; title: string; desc
     desc: '약학대학 재학생\n승인제 가입',
     notice: '재학 정보 확인 후 운영자 승인이 완료되면 서비스 이용이 가능합니다.',
   },
-  external_expert: {
-    emoji: '🔬',
-    title: '외부전문가',
-    desc: '의료·법무·연구 등\n전문직 종사자',
-    notice: '전문 자격 확인 후 운영자 승인이 완료되면 서비스 이용이 가능합니다.',
-  },
-  supplier_staff: {
-    emoji: '🏭',
-    title: '제약업체 직원',
-    desc: '제약·의료기기·유통\n업체 재직자',
-    notice: '재직 정보 확인 후 운영자 승인이 완료되면 서비스 이용이 가능합니다.',
-  },
 };
 
 const SUCCESS_TYPE_LABELS: Record<MemberType, string> = {
   pharmacist_member: '약사 정회원',
   pharmacy_student_member: '약대생 준회원',
-  external_expert: '외부전문가 준회원',
-  supplier_staff: '제약업체 직원',
 };
 
 export default function RegisterModal() {
@@ -126,17 +78,6 @@ export default function RegisterModal() {
     // 약대생 전용
     universityName: '',
     studentYear: '',
-    // 외부전문가 전용
-    expertDomain: '',     // subRole
-    institutionName: '',
-    institutionType: '',
-    qualification: '',
-    qualificationType: '',
-    // 제약업체 직원 전용
-    companyName: '',
-    companyType: '',
-    jobTitle: '',
-    department: '',
   });
 
   const isOpen = activeModal === 'register';
@@ -164,9 +105,6 @@ export default function RegisterModal() {
         lastName: '', firstName: '', nickname: '', phone: '',
         agreeTerms: false, agreePrivacy: false,
         licenseNumber: '', universityName: '', studentYear: '',
-        expertDomain: '', institutionName: '', institutionType: '',
-        qualification: '', qualificationType: '',
-        companyName: '', companyType: '', jobTitle: '', department: '',
       });
       setError(null);
       setLicenseStatus('idle');
@@ -226,17 +164,6 @@ export default function RegisterModal() {
       } else if (memberType === 'pharmacy_student_member') {
         payload.universityName = formData.universityName;
         if (formData.studentYear) payload.studentYear = parseInt(formData.studentYear, 10);
-      } else if (memberType === 'external_expert') {
-        payload.subRole = formData.expertDomain;
-        if (formData.institutionName) payload.institutionName = formData.institutionName;
-        if (formData.institutionType) payload.institutionType = formData.institutionType;
-        if (formData.qualification) payload.qualification = formData.qualification;
-        if (formData.qualificationType) payload.qualificationType = formData.qualificationType;
-      } else if (memberType === 'supplier_staff') {
-        payload.companyName = formData.companyName;
-        payload.companyType = formData.companyType;
-        if (formData.jobTitle) payload.jobTitle = formData.jobTitle;
-        if (formData.department) payload.department = formData.department;
       }
 
       const response = await fetch(`${baseUrl}/api/v1/auth/register`, {
@@ -289,12 +216,6 @@ export default function RegisterModal() {
     if (memberType === 'pharmacy_student_member') {
       return !!formData.universityName;
     }
-    if (memberType === 'external_expert') {
-      return !!formData.expertDomain;
-    }
-    if (memberType === 'supplier_staff') {
-      return !!formData.companyName && !!formData.companyType;
-    }
     return false;
   };
 
@@ -331,7 +252,7 @@ export default function RegisterModal() {
         </div>
 
         <div className="flex-1 overflow-y-auto p-6">
-          {/* Step 1: 회원 유형 선택 (2×2 그리드) */}
+          {/* Step 1: 회원 유형 선택 */}
           {step === 'select' && (
             <div className="space-y-6">
               <p className="text-sm text-gray-600 text-center">가입 유형을 선택해 주세요</p>
@@ -486,73 +407,6 @@ export default function RegisterModal() {
                         <option value="">학년 선택 (선택)</option>
                         {[1, 2, 3, 4, 5, 6].map(y => <option key={y} value={y}>{y}학년</option>)}
                       </select>
-                    </div>
-                  </div>
-                )}
-
-                {/* 외부전문가 전용 */}
-                {memberType === 'external_expert' && (
-                  <div className="space-y-4">
-                    <h4 className="text-sm font-semibold text-gray-700 pb-2 border-b border-gray-100">전문가 정보</h4>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">전문 분야 <span className="text-red-500">*</span></label>
-                      <select name="expertDomain" value={formData.expertDomain} onChange={handleInputChange} required
-                        className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
-                        <option value="">전문 분야 선택</option>
-                        {EXPERT_DOMAINS.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">소속 기관명</label>
-                      <input type="text" name="institutionName" value={formData.institutionName} onChange={handleInputChange}
-                        placeholder="예: ○○병원, ○○대학교" className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">기관 유형</label>
-                        <select name="institutionType" value={formData.institutionType} onChange={handleInputChange}
-                          className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
-                          <option value="">선택 (선택)</option>
-                          {INSTITUTION_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">자격/면허명</label>
-                        <input type="text" name="qualification" value={formData.qualification} onChange={handleInputChange}
-                          placeholder="예: 의사면허, 변호사" className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* 제약업체 직원 전용 */}
-                {memberType === 'supplier_staff' && (
-                  <div className="space-y-4">
-                    <h4 className="text-sm font-semibold text-gray-700 pb-2 border-b border-gray-100">재직 정보</h4>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">회사명 <span className="text-red-500">*</span></label>
-                      <input type="text" name="companyName" value={formData.companyName} onChange={handleInputChange}
-                        placeholder="예: ○○제약" required className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">업체 유형 <span className="text-red-500">*</span></label>
-                      <select name="companyType" value={formData.companyType} onChange={handleInputChange} required
-                        className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
-                        <option value="">업체 유형 선택</option>
-                        {COMPANY_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-                      </select>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">직책</label>
-                        <input type="text" name="jobTitle" value={formData.jobTitle} onChange={handleInputChange}
-                          placeholder="예: MR, 영업사원" className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">부서</label>
-                        <input type="text" name="department" value={formData.department} onChange={handleInputChange}
-                          placeholder="예: 영업부" className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                      </div>
                     </div>
                   </div>
                 )}

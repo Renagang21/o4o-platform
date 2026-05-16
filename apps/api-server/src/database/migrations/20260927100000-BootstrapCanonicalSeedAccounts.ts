@@ -66,7 +66,7 @@ interface BootstrapAccount {
   smRole: string | null;              // service_memberships.role
   raRole: string;                     // role_assignments.role
   kpaProfile?: {                      // KPA 도메인 프로필
-    membershipType: 'pharmacist' | 'student' | 'external_expert' | 'supplier_staff';
+    membershipType: 'pharmacist' | 'student' | 'pharmacist_member' | 'pharmacy_student_member';
     licenseNumber?: string;
     pharmacyName?: string;
     activityType?: string;

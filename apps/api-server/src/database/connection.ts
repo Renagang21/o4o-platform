@@ -297,8 +297,7 @@ import {
   KpaWorkingContent, // WO-TYPEORM-ENTITY-REGISTRATION-P1-FIX-V1
 } from '../routes/kpa/entities/index.js';
 import { KpaLegalDocument } from '../routes/kpa/entities/kpa-legal-document.entity.js'; // WO-TYPEORM-ENTITY-REGISTRATION-P1-FIX-V1
-import { KpaExternalExpertProfile } from '../routes/kpa/entities/kpa-external-expert-profile.entity.js';
-import { KpaSupplierStaffProfile } from '../routes/kpa/entities/kpa-supplier-staff-profile.entity.js';
+// WO-O4O-KPA-REGISTER-CANONICAL-CLEANUP-V1: external_expert / supplier_staff entity 제거
 import { MemberQualification } from '../routes/kpa/entities/member-qualification.entity.js';
 import { QualificationRequest } from '../routes/kpa/entities/qualification-request.entity.js';
 import { InstructorProfile } from '../routes/kpa/entities/instructor-profile.entity.js';
@@ -800,9 +799,6 @@ export const AppDataSource = new DataSource({
     KpaPharmacistProfile,
     // WO-KPA-A-RBAC-PROFILE-NORMALIZATION-V1
     KpaStudentProfile,
-    // WO-O4O-REGISTRATION-STRUCTURE-REFACTOR-V1
-    KpaExternalExpertProfile,
-    KpaSupplierStaffProfile,
     // WO-O4O-QUALIFICATION-SYSTEM-V1
     MemberQualification,
     QualificationRequest,

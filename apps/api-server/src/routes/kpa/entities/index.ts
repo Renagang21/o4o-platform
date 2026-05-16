@@ -24,9 +24,6 @@ export { OrganizationServiceEnrollment } from './organization-service-enrollment
 export { KpaPharmacistProfile } from './kpa-pharmacist-profile.entity.js';
 // WO-KPA-A-RBAC-PROFILE-NORMALIZATION-V1
 export { KpaStudentProfile } from './kpa-student-profile.entity.js';
-// WO-O4O-REGISTRATION-STRUCTURE-REFACTOR-V1
-export { KpaExternalExpertProfile } from './kpa-external-expert-profile.entity.js';
-export { KpaSupplierStaffProfile } from './kpa-supplier-staff-profile.entity.js';
 // WO-O4O-QUALIFICATION-SYSTEM-V1
 export { MemberQualification, QUALIFICATION_TYPES } from './member-qualification.entity.js';
 export { QualificationRequest } from './qualification-request.entity.js';

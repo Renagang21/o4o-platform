@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate, Outlet, useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
-import { useEffect, useState, useRef, lazy, Suspense } from 'react';
+import { useEffect, useState, useRef, lazy, Suspense, type ReactNode } from 'react';
 // WO-O4O-STORE-PRODUCTS-QUERYCLIENT-PROVIDER-ALIGN-V1
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -348,46 +348,61 @@ function PostLoginRedirect() {
 }
 
 /**
- * WO-O4O-AUTH-LEGACY-LOGIN-REGISTER-PAGE-REMOVAL-V1
- * /login, /register URL 접근 시 홈으로 리다이렉트 + 모달 오픈
+ * WO-O4O-KPA-REGISTER-CANONICAL-CLEANUP-V1
+ * /login, /register 는 canonical URL 유지.
+ * 공개 홈(CommunityHomePage) 위에 모달을 오픈한다.
+ *
+ * 이전(WO-O4O-AUTH-LEGACY-LOGIN-REGISTER-PAGE-REMOVAL-V1):
+ *   /register → /mypage replace + 모달 / /login → / replace + 모달
+ * 변경:
+ *   URL 변경 없음 → URL과 화면 흐름 정렬, 북마크/공유 가능
  */
-function LoginRedirect() {
-  const navigate = useNavigate();
+function LoginRoute() {
   const location = useLocation();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const { openLoginModal, setOnLoginSuccess } = useAuthModal();
 
   useEffect(() => {
-    // WO-KPA-A-AUTH-LOOP-GUARD-STABILIZATION-V1:
-    // 항상 / (공개 페이지)로 이동 — 가드된 경로로 직접 이동하면 Guard→/login→Guard 무한 루프 발생
-    navigate('/', { replace: true });
-
-    // from/returnTo는 로그인 성공 후에만 사용
     const returnTo = searchParams.get('returnTo') ||
                      (location.state as { from?: string })?.from;
     if (returnTo) {
       setOnLoginSuccess(() => {
-        navigate(returnTo);
+        navigate(returnTo, { replace: true });
       });
     }
-
     openLoginModal();
-  }, [navigate, openLoginModal, location.state, searchParams, setOnLoginSuccess]);
+  }, [openLoginModal, location.state, searchParams, setOnLoginSuccess, navigate]);
 
-  return null;
+  return <Layout serviceName={SERVICE_NAME}><CommunityHomePage /></Layout>;
 }
 
-function RegisterRedirect() {
-  const navigate = useNavigate();
+function RegisterRoute() {
   const { openRegisterModal } = useAuthModal();
 
   useEffect(() => {
-    // WO-KPA-SOCIETY-DASHBOARD-TO-MYPAGE-CONSOLIDATION-V1
-    navigate('/mypage', { replace: true });
     openRegisterModal();
-  }, [navigate, openRegisterModal]);
+  }, [openRegisterModal]);
 
-  return null;
+  return <Layout serviceName={SERVICE_NAME}><CommunityHomePage /></Layout>;
+}
+
+/**
+ * WO-O4O-KPA-REGISTER-CANONICAL-CLEANUP-V1
+ * /mypage 비로그인 시 /login 으로 redirect.
+ * isLoading 동안은 빈 화면 — 깜빡임 방지.
+ */
+function MyPageGuard({ children }: { children: ReactNode }) {
+  const { user, isLoading } = useAuth();
+  const location = useLocation();
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+  if (!user) {
+    return <Navigate to="/login" state={{ from: location.pathname + location.search }} replace />;
+  }
+  return <>{children}</>;
 }
 
 /**
@@ -609,13 +624,13 @@ function App() {
           <Route path="/work/community" element={<Layout serviceName={SERVICE_NAME}><WorkCommunityPage /></Layout>} />
 
           {/* =========================================================
-           * SCOPE: 레거시 경로 리다이렉트 (Legacy Redirects)
-           * 기존 북마크 호환용, 신규 코드에서 참조 금지
-           * WO-O4O-AUTH-LEGACY-LOGIN-REGISTER-PAGE-REMOVAL-V1
+           * SCOPE: 인증 라우트 (Canonical Auth Routes)
+           * WO-O4O-KPA-REGISTER-CANONICAL-CLEANUP-V1:
+           *   /login, /register canonical URL 유지 (모달 오버레이)
            * ========================================================= */}
           <Route path="/handoff" element={<HandoffPage />} />
-          <Route path="/login" element={<LoginRedirect />} />
-          <Route path="/register" element={<RegisterRedirect />} />
+          <Route path="/login" element={<LoginRoute />} />
+          <Route path="/register" element={<RegisterRoute />} />
           <Route path="/forgot-password" element={<AccountRecoveryPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/admin/*" element={<AdminRoutes />} />
@@ -772,24 +787,24 @@ function App() {
           {/* Events (이벤트) */}
           <Route path="/events" element={<Layout serviceName={SERVICE_NAME}><EventsHomePage /></Layout>} />
 
-          {/* MyPage (마이페이지) */}
-          <Route path="/mypage" element={<Layout serviceName={SERVICE_NAME}><MyDashboardPage /></Layout>} />
-          <Route path="/mypage/profile" element={<Layout serviceName={SERVICE_NAME}><MyProfilePage /></Layout>} />
-          <Route path="/mypage/settings" element={<Layout serviceName={SERVICE_NAME}><MySettingsPage /></Layout>} />
-          <Route path="/mypage/certificates" element={<Layout serviceName={SERVICE_NAME}><MyCertificatesPage /></Layout>} />
+          {/* MyPage (마이페이지) — WO-O4O-KPA-REGISTER-CANONICAL-CLEANUP-V1: MyPageGuard 적용 (비로그인 → /login redirect) */}
+          <Route path="/mypage" element={<MyPageGuard><Layout serviceName={SERVICE_NAME}><MyDashboardPage /></Layout></MyPageGuard>} />
+          <Route path="/mypage/profile" element={<MyPageGuard><Layout serviceName={SERVICE_NAME}><MyProfilePage /></Layout></MyPageGuard>} />
+          <Route path="/mypage/settings" element={<MyPageGuard><Layout serviceName={SERVICE_NAME}><MySettingsPage /></Layout></MyPageGuard>} />
+          <Route path="/mypage/certificates" element={<MyPageGuard><Layout serviceName={SERVICE_NAME}><MyCertificatesPage /></Layout></MyPageGuard>} />
           {/* WO-O4O-FORUM-MY-FORUM-EXPANSION-V1 */}
-          <Route path="/mypage/my-forums" element={<Layout serviceName={SERVICE_NAME}><MyForumDashboardPage /></Layout>} />
+          <Route path="/mypage/my-forums" element={<MyPageGuard><Layout serviceName={SERVICE_NAME}><MyForumDashboardPage /></Layout></MyPageGuard>} />
           {/* WO-FORUM-REQUEST-ROUTE-EXTRACTION-FROM-MYPAGE-V1: 레거시 리다이렉트 */}
           <Route path="/mypage/my-forums/request" element={<Navigate to="/forum/request" replace />} />
           {/* WO-KPA-A-FORUM-OWNER-MEMBER-MANAGEMENT-UI-V1: 포럼 회원 관리 */}
-          <Route path="/mypage/my-forums/:forumId/members" element={<Layout serviceName={SERVICE_NAME}><ForumMemberManagementPage /></Layout>} />
+          <Route path="/mypage/my-forums/:forumId/members" element={<MyPageGuard><Layout serviceName={SERVICE_NAME}><ForumMemberManagementPage /></Layout></MyPageGuard>} />
           {/* WO-KPA-A-MYPAGE-UNIFIED-REQUEST-INBOX-V1 */}
-          <Route path="/mypage/my-requests" element={<Layout serviceName={SERVICE_NAME}><MyRequestsPage /></Layout>} />
+          <Route path="/mypage/my-requests" element={<MyPageGuard><Layout serviceName={SERVICE_NAME}><MyRequestsPage /></Layout></MyPageGuard>} />
           {/* WO-O4O-QUALIFICATION-SYSTEM-V1 */}
-          <Route path="/mypage/qualifications" element={<Layout serviceName={SERVICE_NAME}><MyQualificationsPage /></Layout>} />
-          <Route path="/mypage/enrollments" element={<Layout serviceName={SERVICE_NAME}><MyEnrollmentsPage /></Layout>} />
+          <Route path="/mypage/qualifications" element={<MyPageGuard><Layout serviceName={SERVICE_NAME}><MyQualificationsPage /></Layout></MyPageGuard>} />
+          <Route path="/mypage/enrollments" element={<MyPageGuard><Layout serviceName={SERVICE_NAME}><MyEnrollmentsPage /></Layout></MyPageGuard>} />
           {/* WO-O4O-CREDIT-SYSTEM-V1 */}
-          <Route path="/mypage/credits" element={<Layout serviceName={SERVICE_NAME}><MyCreditsPage /></Layout>} />
+          <Route path="/mypage/credits" element={<MyPageGuard><Layout serviceName={SERVICE_NAME}><MyCreditsPage /></Layout></MyPageGuard>} />
           {/* WO-MYPAGE-STATE-BASED-IA-REDEFINITION-V1: completions → certificates redirect */}
           <Route path="/mypage/completions" element={<Navigate to="/mypage/certificates" replace />} />
 

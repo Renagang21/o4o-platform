@@ -19,13 +19,16 @@ export type KpaMemberRole = 'member' | 'operator' | 'admin';
 /** WO-KPA-A-MEMBER-STATUS-SEMANTICS-SEPARATION-V1: rejected 추가 (반려 ≠ 정지) */
 export type KpaMemberStatus = 'pending' | 'active' | 'suspended' | 'rejected' | 'withdrawn';
 export type KpaIdentityStatus = 'active' | 'suspended' | 'withdrawn';
+/**
+ * WO-O4O-KPA-REGISTER-CANONICAL-CLEANUP-V1:
+ *   canonical = pharmacist_member / pharmacy_student_member
+ *   legacy 별칭 = pharmacist / student (DB 저장값 양립; 신규 등록은 canonical 키 사용)
+ */
 export type KpaMemberType =
-  | 'pharmacist'           // 약사 정회원 (legacy: 'pharmacist')
-  | 'student'              // 약대생 준회원 (legacy: 'student')
-  | 'pharmacist_member'    // 약사 정회원 (신규)
-  | 'pharmacy_student_member' // 약대생 준회원 (신규)
-  | 'external_expert'      // 외부전문가 준회원
-  | 'supplier_staff';      // 제약/의료기기 업체 직원
+  | 'pharmacist'              // 약사 정회원 (legacy alias)
+  | 'student'                 // 약대생 준회원 (legacy alias)
+  | 'pharmacist_member'       // 약사 정회원 (canonical)
+  | 'pharmacy_student_member';// 약대생 준회원 (canonical)
 
 // Phase 5: 직능 분류 (프론트엔드 ActivityType 매핑)
 export type KpaActivityType =

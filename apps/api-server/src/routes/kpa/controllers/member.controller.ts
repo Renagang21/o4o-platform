@@ -92,8 +92,9 @@ export function createMemberController(
     '/apply',
     requireAuth,
     [
+      // WO-O4O-KPA-REGISTER-CANONICAL-CLEANUP-V1: canonical 2유형 + legacy alias만 허용
       body('organization_id').optional().isUUID(),
-      body('membership_type').optional().isIn(['pharmacist', 'student', 'pharmacist_member', 'pharmacy_student_member', 'external_expert', 'supplier_staff']),
+      body('membership_type').optional().isIn(['pharmacist', 'student', 'pharmacist_member', 'pharmacy_student_member']),
       body('license_number').optional().isString().isLength({ max: 100 }),
       body('university_name').optional().isString().isLength({ max: 200 }),
       body('student_year').optional().isInt({ min: 1, max: 6 }),
@@ -107,15 +108,6 @@ export function createMemberController(
         'A1_pharmacy_owner', 'A2_pharma_manager', 'B1_pharmacy_employee',
         'B2_pharma_company_employee', 'C1_hospital', 'C2_admin_edu_research', 'D_fee_exempted',
       ]),
-      body('sub_role').optional().isString().isLength({ max: 100 }),
-      body('institution_name').optional().isString().isLength({ max: 200 }),
-      body('institution_type').optional().isString().isLength({ max: 100 }),
-      body('department').optional().isString().isLength({ max: 200 }),
-      body('qualification').optional().isString().isLength({ max: 200 }),
-      body('qualification_type').optional().isString().isLength({ max: 100 }),
-      body('company_name').optional().isString().isLength({ max: 200 }),
-      body('company_type').optional().isString().isLength({ max: 100 }),
-      body('job_title').optional().isString().isLength({ max: 100 }),
       handleValidationErrors,
     ],
     async (req: AuthRequest, res: Response): Promise<void> => {
@@ -135,10 +127,8 @@ export function createMemberController(
         const membershipType = req.body.membership_type || 'pharmacist';
         const isPharmacistType = membershipType === 'pharmacist' || membershipType === 'pharmacist_member';
         const isStudentType = membershipType === 'student' || membershipType === 'pharmacy_student_member';
-        const isExternalExpert = membershipType === 'external_expert';
-        const isSupplierStaff = membershipType === 'supplier_staff';
 
-        // 조직 확인 — 약사/학생 타입은 조직 필수, 외부전문가/업체직원은 선택
+        // 조직 확인 — 약사/학생 모두 조직 필수
         let organizationId: string | null = req.body.organization_id || null;
         if (organizationId) {
           const org = await orgRepo.findOne({ where: { id: organizationId } });
@@ -170,7 +160,6 @@ export function createMemberController(
           user_id: req.user!.id,
           organization_id: organizationId,
           membership_type: membershipType,
-          sub_role: req.body.sub_role || null,
           role: 'member',
           status: 'pending',
           identity_status: 'active',
@@ -197,49 +186,6 @@ export function createMemberController(
             );
           } catch (syncErr) {
             console.error('[SSOT-SYNC] kpa_pharmacist_profiles sync on apply:', syncErr);
-          }
-        }
-
-        // WO-O4O-REGISTRATION-STRUCTURE-REFACTOR-V1: profile insert for new member types
-        if (isExternalExpert && req.body.sub_role) {
-          try {
-            await dataSource.query(
-              `INSERT INTO kpa_external_expert_profiles
-               (user_id, expert_domain, institution_name, institution_type, department, qualification, qualification_type)
-               VALUES ($1, $2, $3, $4, $5, $6, $7)
-               ON CONFLICT (user_id) DO NOTHING`,
-              [
-                req.user!.id,
-                req.body.sub_role,
-                req.body.institution_name || null,
-                req.body.institution_type || null,
-                req.body.department || null,
-                req.body.qualification || null,
-                req.body.qualification_type || null,
-              ]
-            );
-          } catch (profileErr) {
-            console.error('[PROFILE-SYNC] kpa_external_expert_profiles sync on apply:', profileErr);
-          }
-        }
-
-        if (isSupplierStaff && req.body.company_name) {
-          try {
-            await dataSource.query(
-              `INSERT INTO kpa_supplier_staff_profiles
-               (user_id, company_name, company_type, job_title, department)
-               VALUES ($1, $2, $3, $4, $5)
-               ON CONFLICT (user_id) DO NOTHING`,
-              [
-                req.user!.id,
-                req.body.company_name,
-                req.body.company_type || 'other',
-                req.body.job_title || null,
-                req.body.department || null,
-              ]
-            );
-          } catch (profileErr) {
-            console.error('[PROFILE-SYNC] kpa_supplier_staff_profiles sync on apply:', profileErr);
           }
         }
 
@@ -487,7 +433,7 @@ export function createMemberController(
                WHERE id = $1`,
               [member.user_id, req.user!.id]
             );
-            // WO-KPA-A-ROLE-CLEANUP-V1 + WO-O4O-REGISTRATION-STRUCTURE-REFACTOR-V1: Create profile per membership type
+            // WO-O4O-KPA-REGISTER-CANONICAL-CLEANUP-V1: 약사/약대생만 처리
             const mType = member.membership_type;
             if (mType === 'student' || mType === 'pharmacy_student_member') {
               await dataSource.query(
@@ -496,30 +442,6 @@ export function createMemberController(
                  ON CONFLICT (user_id) DO NOTHING`,
                 [member.user_id, member.university_name, member.student_year]
               );
-            } else if (mType === 'external_expert') {
-              // Profile should already exist from registration; this is a safety-net insert only
-              const expertDomain = (member as any).sub_role || 'general';
-              await dataSource.query(
-                `INSERT INTO kpa_external_expert_profiles (user_id, expert_domain)
-                 VALUES ($1, $2)
-                 ON CONFLICT (user_id) DO NOTHING`,
-                [member.user_id, expertDomain]
-              );
-            } else if (mType === 'supplier_staff') {
-              // Profile should already exist from registration; this is a safety-net insert only
-              // Look up existing profile first to avoid overwriting with poor fallback data
-              const [existingProfile] = await dataSource.query(
-                `SELECT company_name FROM kpa_supplier_staff_profiles WHERE user_id = $1 LIMIT 1`,
-                [member.user_id]
-              );
-              if (!existingProfile) {
-                await dataSource.query(
-                  `INSERT INTO kpa_supplier_staff_profiles (user_id, company_name, company_type)
-                   VALUES ($1, $2, $3)
-                   ON CONFLICT (user_id) DO NOTHING`,
-                  [member.user_id, 'Unknown', 'other']
-                );
-              }
             } else {
               // pharmacist / pharmacist_member
               await dataSource.query(
@@ -820,8 +742,8 @@ export function createMemberController(
         const { name, membership_type, license_number, pharmacy_name, pharmacy_address, activity_type } = req.body;
         const changes: Record<string, any> = {};
 
-        // kpa_members 필드 업데이트
-        const validMembershipTypes = ['pharmacist', 'student', 'pharmacist_member', 'pharmacy_student_member', 'external_expert', 'supplier_staff'];
+        // kpa_members 필드 업데이트 — WO-O4O-KPA-REGISTER-CANONICAL-CLEANUP-V1
+        const validMembershipTypes = ['pharmacist', 'student', 'pharmacist_member', 'pharmacy_student_member'];
         if (membership_type && validMembershipTypes.includes(membership_type)) {
           changes.membership_type = membership_type;
           member.membership_type = membership_type;
@@ -1066,8 +988,6 @@ export function createMemberController(
         try {
           await queryRunner.query(`DELETE FROM kpa_pharmacist_profiles WHERE user_id = $1`, [member.user_id]);
           await queryRunner.query(`DELETE FROM kpa_student_profiles WHERE user_id = $1`, [member.user_id]);
-          await queryRunner.query(`DELETE FROM kpa_external_expert_profiles WHERE user_id = $1`, [member.user_id]);
-          await queryRunner.query(`DELETE FROM kpa_supplier_staff_profiles WHERE user_id = $1`, [member.user_id]);
           await queryRunner.query(`DELETE FROM service_memberships WHERE user_id = $1`, [member.user_id]);
           await queryRunner.query(`DELETE FROM role_assignments WHERE user_id = $1`, [member.user_id]);
           await memberRepo.remove(member); // CASCADE: kpa_member_services 자동 삭제

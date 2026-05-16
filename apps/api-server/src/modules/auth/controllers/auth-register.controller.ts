@@ -357,12 +357,12 @@ export class AuthRegisterController extends BaseController {
     const isKpaSociety = data.service === 'kpa-society' || data.service === 'kpa';
     if (!isKpaSociety) return;
 
-    // WO-O4O-KPA-MEMBERSHIP-SYNC-FIX-V1: canonical membershipType — fallback to 'pharmacist'
-    // Prevents orphan state when frontend sends unrecognized membershipType values
+    // WO-O4O-KPA-REGISTER-CANONICAL-CLEANUP-V1:
+    //   canonical = pharmacist_member / pharmacy_student_member
+    //   legacy 별칭 = pharmacist / student (정규화 후 동일 처리)
     const VALID_MEMBER_TYPES = [
       'pharmacist', 'pharmacist_member',
       'student', 'pharmacy_student_member',
-      'external_expert', 'supplier_staff',
     ] as const;
     const rawMemberType = data.membershipType || 'pharmacist';
     const memberType: string = (VALID_MEMBER_TYPES as readonly string[]).includes(rawMemberType)
@@ -371,37 +371,29 @@ export class AuthRegisterController extends BaseController {
 
     const isPharmacist = memberType === 'pharmacist' || memberType === 'pharmacist_member';
     const isStudent = memberType === 'student' || memberType === 'pharmacy_student_member';
-    const isExternalExpert = memberType === 'external_expert';
-    const isSupplierStaff = memberType === 'supplier_staff';
 
-    // KPA Society: auto-create KPA member
-    // All kpa-society registrations create a pending kpa_member (always true after fallback)
-    const needsMember = isPharmacist || isStudent || isExternalExpert || isSupplierStaff;
-    if (needsMember) {
-      const licenseNum = isPharmacist ? (data.licenseNumber || null) : null;
+    // KPA Society: auto-create KPA member (pending)
+    const licenseNum = isPharmacist ? (data.licenseNumber || null) : null;
+    const memberResult = await manager.query(`
+      INSERT INTO kpa_members (user_id, organization_id, membership_type, license_number, university_name, role, status, identity_status)
+      VALUES ($1, $2, $3, $4, $5, 'member', 'pending', 'active')
+      ON CONFLICT (user_id) DO NOTHING
+      RETURNING id
+    `, [
+      userId,
+      data.organizationId || null,
+      memberType,
+      licenseNum,
+      isStudent ? (data.universityName || null) : null,
+    ]);
 
-      const memberResult = await manager.query(`
-        INSERT INTO kpa_members (user_id, organization_id, membership_type, sub_role, license_number, university_name, role, status, identity_status)
-        VALUES ($1, $2, $3, $4, $5, $6, 'member', 'pending', 'active')
-        ON CONFLICT (user_id) DO NOTHING
-        RETURNING id
-      `, [
-        userId,
-        data.organizationId || null,
-        memberType,
-        data.subRole || null,
-        licenseNum,
-        isStudent ? (data.universityName || null) : null,
-      ]);
-
-      // 서비스별 승인 레코드 생성 (kpa-a: 커뮤니티)
-      if (memberResult[0]?.id) {
-        await manager.query(`
-          INSERT INTO kpa_member_services (member_id, service_key, status)
-          VALUES ($1, 'kpa-a', 'pending')
-          ON CONFLICT (member_id, service_key) DO NOTHING
-        `, [memberResult[0].id]);
-      }
+    // 서비스별 승인 레코드 생성 (kpa-a: 커뮤니티)
+    if (memberResult[0]?.id) {
+      await manager.query(`
+        INSERT INTO kpa_member_services (member_id, service_key, status)
+        VALUES ($1, 'kpa-a', 'pending')
+        ON CONFLICT (member_id, service_key) DO NOTHING
+      `, [memberResult[0].id]);
     }
 
     // WO-ROLE-NORMALIZATION-PHASE3-B-V1: create kpa_pharmacist_profiles record
@@ -417,38 +409,6 @@ export class AuthRegisterController extends BaseController {
           userId,
           data.licenseNumber || null,
           data.pharmacistFunction ? (functionToActivity[data.pharmacistFunction] || 'other') : null,
-        ]
-      );
-    }
-
-    // WO-O4O-REGISTRATION-STRUCTURE-REFACTOR-V1: create kpa_external_expert_profiles record
-    if (isExternalExpert && data.subRole) {
-      await manager.query(
-        `INSERT INTO kpa_external_expert_profiles (user_id, expert_domain, institution_name, institution_type, department, qualification, qualification_type)
-         VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (user_id) DO NOTHING`,
-        [
-          userId,
-          data.subRole,
-          data.institutionName || null,
-          data.institutionType || null,
-          data.department || null,
-          data.qualification || null,
-          data.qualificationType || null,
-        ]
-      );
-    }
-
-    // WO-O4O-REGISTRATION-STRUCTURE-REFACTOR-V1: create kpa_supplier_staff_profiles record
-    if (isSupplierStaff && data.companyName) {
-      await manager.query(
-        `INSERT INTO kpa_supplier_staff_profiles (user_id, company_name, company_type, job_title, department)
-         VALUES ($1, $2, $3, $4, $5) ON CONFLICT (user_id) DO NOTHING`,
-        [
-          userId,
-          data.companyName,
-          data.companyType || 'other',
-          data.jobTitle || null,
-          data.department || null,
         ]
       );
     }

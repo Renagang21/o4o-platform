@@ -57,49 +57,14 @@ export class RegisterRequestDto {
   @IsString()
   service?: string;
 
+  /**
+   * WO-O4O-KPA-REGISTER-CANONICAL-CLEANUP-V1:
+   *   canonical = pharmacist_member / pharmacy_student_member
+   *   legacy 별칭 = pharmacist / student (member.controller.ts에서 정규화 유지)
+   */
   @IsOptional()
-  @IsIn(['pharmacist', 'student', 'pharmacist_member', 'pharmacy_student_member', 'external_expert', 'supplier_staff'])
-  membershipType?: 'pharmacist' | 'student' | 'pharmacist_member' | 'pharmacy_student_member' | 'external_expert' | 'supplier_staff';
-
-  /** WO-O4O-REGISTRATION-STRUCTURE-REFACTOR-V1: 그룹 내 세부 역할 */
-  @IsOptional()
-  @IsString()
-  subRole?: string;
-
-  /** external_expert: 소속 기관명 */
-  @IsOptional()
-  @IsString()
-  institutionName?: string;
-
-  /** external_expert: 기관 유형 (hospital, university, research_institute, law_firm, government, other) */
-  @IsOptional()
-  @IsString()
-  institutionType?: string;
-
-  /** external_expert: 전문 자격증/면허 명칭 */
-  @IsOptional()
-  @IsString()
-  qualification?: string;
-
-  /** external_expert: 자격증 유형 */
-  @IsOptional()
-  @IsString()
-  qualificationType?: string;
-
-  /** supplier_staff: 업체 유형 (pharmaceutical, medical_device, cosmetics, distributor, other) */
-  @IsOptional()
-  @IsString()
-  companyType?: string;
-
-  /** supplier_staff: 직책 */
-  @IsOptional()
-  @IsString()
-  jobTitle?: string;
-
-  /** supplier_staff/external_expert: 부서 */
-  @IsOptional()
-  @IsString()
-  department?: string;
+  @IsIn(['pharmacist', 'student', 'pharmacist_member', 'pharmacy_student_member'])
+  membershipType?: 'pharmacist' | 'student' | 'pharmacist_member' | 'pharmacy_student_member';
 
   @IsOptional()
   @IsString()
