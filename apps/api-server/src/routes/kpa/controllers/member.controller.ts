@@ -11,6 +11,10 @@ import type { AuthRequest } from '../../../types/auth.js';
 import { roleAssignmentService } from '../../../modules/auth/services/role-assignment.service.js';
 import { MembershipApprovalService } from '../../../services/approval/MembershipApprovalService.js';
 import { emailService } from '../../../services/email.service.js';
+// WO-O4O-KPA-MEMBER-APPROVAL-STORE-OWNER-AUTO-ACTIVATION-V1:
+//   pharmacy_owner 회원 승인 시 자동 매장/owner/role_assignment 생성.
+//   pharmacy-request.controller.ts (WO-KPA-PHARMACY-APPROVAL-ENSURE-STORE-LINK-V1) 패턴 재사용.
+import { organizationOpsService } from '../../../modules/organization/services/organization-ops.service.js';
 
 type AuthMiddleware = RequestHandler;
 type ScopeMiddleware = (scope: string) => RequestHandler;
@@ -500,6 +504,95 @@ export function createMemberController(
           }
         } catch (syncError) {
           console.error('[WO-KPA-A-APPROVAL-RBAC-ALIGNMENT-V1] User/profile sync failed:', syncError);
+        }
+
+        // ============================================================
+        // WO-O4O-KPA-MEMBER-APPROVAL-STORE-OWNER-AUTO-ACTIVATION-V1
+        //
+        // pending → active 승인 + activity_type='pharmacy_owner' 인 회원은
+        // 별도 pharmacy_request 없이 다음을 자동 수행:
+        //   1) organizations(type='pharmacy') ensureOrganization
+        //      code = `kpa-pharm-{businessNumber}` (pharmacy-request 와 동일 규칙)
+        //   2) kpa_members.organization_id 보정 (null 인 경우에만 — 분회 연결 보호)
+        //   3) organization_members(role='owner') 추가
+        //   4) role_assignments('kpa:store_owner') 부여
+        //
+        // 패턴은 pharmacy-request.controller.ts /:id/approve
+        // (WO-KPA-PHARMACY-APPROVAL-ENSURE-STORE-LINK-V1) 와 byte-equivalent.
+        // 차이점: businessNumber 가 users.businessInfo 에서 옴 (가입 단계 입력).
+        //
+        // Graceful fallback:
+        //   businessNumber 또는 pharmacy_name 이 없으면 skip + warn 만 (회원 승인은 성공).
+        //   legacy active+pharmacy_owner 회원이나 데이터 결손 케이스 대응 — 이런 경우
+        //   기존 pharmacy_request 흐름으로 복구 가능.
+        //
+        // 실패 isolation:
+        //   자동 활성화 실패는 회원 승인 자체를 실패시키지 않음 (별도 try/catch).
+        // ============================================================
+        if (
+          oldStatus === 'pending' &&
+          newStatus === 'active' &&
+          member.activity_type === 'pharmacy_owner'
+        ) {
+          try {
+            const [userRow] = await dataSource.query(
+              `SELECT "businessInfo" FROM users WHERE id = $1 LIMIT 1`,
+              [member.user_id]
+            );
+            const biz = (userRow?.businessInfo && typeof userRow.businessInfo === 'object')
+              ? (userRow.businessInfo as Record<string, any>)
+              : {};
+            const rawBusinessNumber = typeof biz.businessNumber === 'string' ? biz.businessNumber : '';
+            const businessNumberDigits = rawBusinessNumber.replace(/[^0-9]/g, '');
+            const pharmacyName = member.pharmacy_name || (typeof biz.businessName === 'string' ? biz.businessName : null);
+
+            if (businessNumberDigits.length === 0 || !pharmacyName) {
+              console.warn(
+                `[KPA Approval] pharmacy_owner auto-activation skipped — missing businessNumber/pharmacyName for member ${member.id}`,
+                {
+                  hasBusinessNumber: businessNumberDigits.length > 0,
+                  hasPharmacyName: !!pharmacyName,
+                }
+              );
+            } else {
+              // 1) organizations ensure (멱등 — code 충돌 시 동일 row 반환)
+              const orgCode = `kpa-pharm-${businessNumberDigits}`;
+              const orgResult = await organizationOpsService.ensureOrganization({
+                name: pharmacyName,
+                code: orgCode,
+                type: 'pharmacy',
+                createdByUserId: member.user_id,
+              });
+
+              // 2) kpa_members.organization_id — null 인 경우에만 (분회 연결 보호)
+              await dataSource.query(
+                `UPDATE kpa_members SET organization_id = $1, updated_at = NOW()
+                 WHERE user_id = $2 AND organization_id IS NULL`,
+                [orgResult.id, member.user_id]
+              );
+
+              // 3) organization_members(owner) — 멱등 (organization_id, user_id) UNIQUE
+              await organizationOpsService.addMember({
+                organizationId: orgResult.id,
+                userId: member.user_id,
+                role: 'owner',
+                isPrimary: false,
+              });
+
+              // 4) role_assignments(kpa:store_owner) — SSOT (role-assignment.service 멱등 upsert)
+              await roleAssignmentService.assignRole({
+                userId: member.user_id,
+                role: 'kpa:store_owner',
+                assignedBy: req.user!.id,
+              });
+            }
+          } catch (autoActivationError) {
+            // 회원 승인 자체는 성공시킴 — 운영자가 legacy pharmacy_request 흐름으로 복구 가능
+            console.error(
+              `[KPA Approval] pharmacy_owner auto-activation failed for member ${member.id}:`,
+              autoActivationError
+            );
+          }
         }
 
         // 서비스 레코드 동기화 (kpa-a)
