@@ -3,6 +3,9 @@
  *
  * WO-O4O-OPERATOR-UI-STANDARDIZATION-V1
  * WO-O4O-RBAC-GLOBAL-STANDARD-ROLL-OUT-V1: adminOnly 플래그 추가
+ * WO-O4O-KPA-OPERATOR-SIDEBAR-DOMAIN-IA-RESTRUCTURE-V1:
+ *   KPA-only domain 매핑 추가 (커뮤니티 운영 / 매장 HUB 운영 / 운영 공통).
+ *   STANDARD_GROUPS 자체는 보존 — KPA 전용 KpaOperatorSidebar 가 domain 헤딩 + 그룹 정렬에 사용.
  *
  * 표준 11-그룹 키에 대한 라우트 매핑.
  * adminOnly 항목은 admin 역할만 표시.
@@ -103,6 +106,55 @@ export function filterMenuByRole(
   }
   return filtered;
 }
+
+// ─── Domain IA mapping — WO-O4O-KPA-OPERATOR-SIDEBAR-DOMAIN-IA-RESTRUCTURE-V1 ───
+
+/** KPA operator sidebar 도메인 키.
+ *  dashboard 의 2축 운영 (커뮤니티 / 매장 HUB) + 운영 공통 으로 IA 정렬.
+ */
+export type OperatorDomainKey = 'community' | 'store_hub' | 'common';
+
+/** 도메인 헤딩 라벨 + 시각 토큰 */
+export const DOMAIN_LABELS: Record<OperatorDomainKey, { label: string; emoji: string }> = {
+  community: { label: '커뮤니티 운영', emoji: '💬' },
+  store_hub: { label: '매장 HUB 운영', emoji: '🏪' },
+  common: { label: '운영 공통', emoji: '⚙️' },
+};
+
+/** STANDARD_GROUPS key → 도메인 매핑.
+ *  KPA 미사용 그룹(products/orders/care)도 안전한 default 도메인 지정.
+ */
+export const GROUP_TO_DOMAIN: Record<OperatorGroupKey, OperatorDomainKey> = {
+  dashboard: 'common',
+  users: 'community',
+  approvals: 'store_hub',
+  products: 'store_hub',
+  stores: 'store_hub',
+  orders: 'store_hub',
+  content: 'community',
+  resources: 'community',
+  lms: 'community',
+  signage: 'store_hub',
+  forum: 'community',
+  analytics: 'common',
+  care: 'common',
+  system: 'common',
+};
+
+/** 도메인 별 그룹 표시 순서.
+ *  WO 명시 sidebar 순서를 그룹 키 시퀀스로 변환.
+ *  - community: 회원 → 포럼 → 콘텐츠 → LMS → 자료실
+ *  - store_hub: 매장 → 상품/이벤트/협업(approvals) → 사이니지
+ *  - common: 대시보드 → 분석 → 시스템
+ */
+export const DOMAIN_GROUP_ORDER: Record<OperatorDomainKey, OperatorGroupKey[]> = {
+  community: ['users', 'forum', 'content', 'lms', 'resources'],
+  store_hub: ['stores', 'approvals', 'signage'],
+  common: ['dashboard', 'analytics', 'system'],
+};
+
+/** 도메인 표시 순서 (sidebar top → bottom) */
+export const DOMAIN_DISPLAY_ORDER: OperatorDomainKey[] = ['community', 'store_hub', 'common'];
 
 // ─── Legacy export (하위호환, deprecated) ───
 /** @deprecated Use UNIFIED_MENU + filterMenuByRole instead */
