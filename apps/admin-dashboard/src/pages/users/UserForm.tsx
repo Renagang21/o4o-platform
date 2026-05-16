@@ -13,7 +13,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import BusinessInfoSection from './components/BusinessInfoSection';
 import toast from 'react-hot-toast';
 import { UserApi } from '@/api/userApi';
-import { authClient } from '@o4o/auth-client';
+import { ROLES } from '@/lib/rbac-catalog';
+
+const ROLE_OPTIONS = Object.values(ROLES).map((r) => ({ value: r.key, label: r.label }));
 
 const userSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -52,31 +54,7 @@ export default function UserForm() {
   });
 
   const selectedRoles = watch('roles');
-  const [roles, setRoles] = useState<Array<{ value: string; label: string; description: string }>>([]);
-  const [loadingRoles, setLoadingRoles] = useState(true);
-
-  // Fetch roles from database
-  useEffect(() => {
-    const fetchRoles = async () => {
-      try {
-        setLoadingRoles(true);
-        const response = await authClient.api.get('/users/roles');
-        if (response.data?.success && Array.isArray(response.data.data)) {
-          setRoles(response.data.data);
-        } else {
-          console.warn('Invalid roles data format:', response.data);
-          setRoles([]);
-        }
-      } catch (error) {
-        console.error('Failed to fetch roles:', error);
-        toast.error('Failed to load roles');
-        setRoles([]);
-      } finally {
-        setLoadingRoles(false);
-      }
-    };
-    fetchRoles();
-  }, []);
+  const roles = ROLE_OPTIONS;
 
   useEffect(() => {
     if (isEdit) {
@@ -283,35 +261,24 @@ export default function UserForm() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {loadingRoles ? (
-                  <div className="flex items-center justify-center py-8 text-gray-500">
-                    Loading roles...
-                  </div>
-                ) : roles.length === 0 ? (
-                  <div className="flex items-center justify-center py-8 text-gray-500">
-                    No roles available
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {roles.map((role) => (
-                      <div
-                        key={role.value}
-                        className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
-                        onClick={() => handleRoleToggle(role.value)}
-                      >
-                        <Checkbox
-                          checked={selectedRoles?.includes(role.value) || false}
-                          onCheckedChange={() => handleRoleToggle(role.value)}
-                          onClick={(e) => e.stopPropagation()}
-                        />
-                        <div className="flex-1">
-                          <div className="font-medium">{role.label}</div>
-                          <div className="text-sm text-gray-600">{role.description}</div>
-                        </div>
+                <div className="space-y-3">
+                  {roles.map((role) => (
+                    <div
+                      key={role.value}
+                      className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                      onClick={() => handleRoleToggle(role.value)}
+                    >
+                      <Checkbox
+                        checked={selectedRoles?.includes(role.value) || false}
+                        onCheckedChange={() => handleRoleToggle(role.value)}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                      <div className="flex-1">
+                        <div className="font-medium">{role.label}</div>
                       </div>
-                    ))}
-                  </div>
-                )}
+                    </div>
+                  ))}
+                </div>
                 {errors.roles && (
                   <p className="text-sm text-red-500 mt-2">{errors.roles.message}</p>
                 )}

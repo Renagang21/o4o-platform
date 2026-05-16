@@ -7,7 +7,7 @@ import { ContentApi } from '@/api/contentApi';
 import { useAuthStore } from '@/stores/authStore';
 import { Category as CategoryType } from '@/types/content';
 import { hasPermission, hasAnyPermission } from '@/utils/permissions';
-import { authClient } from '@o4o/auth-client';
+import { getRoleOptions } from '@/lib/rbac-catalog';
 
 interface CategoryWithPermissions extends CategoryType {
   permissions?: {
@@ -17,12 +17,7 @@ interface CategoryWithPermissions extends CategoryType {
   };
 }
 
-interface SystemRole {
-  value: string;
-  label: string;
-  permissions: string[];
-  permissionCount: number;
-}
+const AVAILABLE_ROLES = getRoleOptions();
 
 const CategoryEdit = () => {
   const { id } = useParams();
@@ -31,8 +26,7 @@ const CategoryEdit = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [categories, setCategories] = useState<CategoryType[]>([]);
-  const [availableRoles, setAvailableRoles] = useState<SystemRole[]>([]);
-  const [rolesLoading, setRolesLoading] = useState(true);
+  const availableRoles = AVAILABLE_ROLES;
   const [category, setCategory] = useState<CategoryWithPermissions>({
     id: '',
     name: '',
@@ -53,30 +47,6 @@ const CategoryEdit = () => {
 
   // Admin dashboard users have all permissions
   const hasEditPermission = true;
-
-  // Fetch available roles from API
-  useEffect(() => {
-    const fetchRoles = async () => {
-      try {
-        const response = await authClient.api.get('/users/roles');
-
-        if (response.data?.success && response.data.data) {
-          setAvailableRoles(response.data.data);
-        }
-      } catch (error: any) {
-        // If unauthorized, user may need to login again
-        if (error.response?.status === 401) {
-          toast.error('Session expired. Please login again.');
-        } else {
-          toast.error('Failed to load user roles');
-        }
-      } finally {
-        setRolesLoading(false);
-      }
-    };
-
-    fetchRoles();
-  }, []);
 
   useEffect(() => {
     loadData();
@@ -372,23 +342,17 @@ const CategoryEdit = () => {
                     Select allowed roles:
                   </label>
                   <div className="space-y-2">
-                    {rolesLoading ? (
-                      <span className="text-sm text-gray-500">Loading roles...</span>
-                    ) : availableRoles.length > 0 ? (
-                      availableRoles.map(role => (
-                        <label key={role.value} className="flex items-center">
-                          <input
-                            type="checkbox"
-                            checked={(category.permissions?.allowedRoles || []).includes(role.value)}
-                            onChange={() => handleRoleToggle(role.value)}
-                            className="mr-2"
-                          />
-                          <span>{role.label}</span>
-                        </label>
-                      ))
-                    ) : (
-                      <span className="text-sm text-gray-500">No roles available</span>
-                    )}
+                    {availableRoles.map(role => (
+                      <label key={role.value} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={(category.permissions?.allowedRoles || []).includes(role.value)}
+                          onChange={() => handleRoleToggle(role.value)}
+                          className="mr-2"
+                        />
+                        <span>{role.label}</span>
+                      </label>
+                    ))}
                   </div>
                 </div>
               )}

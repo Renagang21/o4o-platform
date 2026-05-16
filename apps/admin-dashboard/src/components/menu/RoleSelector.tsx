@@ -1,49 +1,23 @@
-import { FC, useEffect, useState } from 'react';
+import { FC } from 'react';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { Info, Loader2 } from 'lucide-react';
-import { authClient } from '@o4o/auth-client';
-import toast from 'react-hot-toast';
+import { Info } from 'lucide-react';
+import { ROLES } from '@/lib/rbac-catalog';
 
 interface RoleSelectorProps {
   selectedRoles: string[];
   onChange: (roles: string[]) => void;
 }
 
-interface RoleData {
-  id: string;
-  name: string;
-  displayName: string;
-  description: string;
-  color: string;
-  isActive: boolean;
-}
+const ROLE_OPTIONS = Object.values(ROLES).map((r) => ({
+  name: r.key,
+  displayName: r.label,
+  badgeClass: r.badgeClass,
+}));
 
 export const RoleSelector: FC<RoleSelectorProps> = ({ selectedRoles, onChange }) => {
-  const [roles, setRoles] = useState<RoleData[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchRoles();
-  }, []);
-
-  const fetchRoles = async () => {
-    try {
-      setLoading(true);
-      const response = await authClient.api.get('/users/roles');
-      if (response.data.success) {
-        // 활성화된 역할만 필터링
-        const activeRoles = response.data.data.filter((role: RoleData) => role.isActive);
-        setRoles(activeRoles);
-      }
-    } catch (error) {
-      toast.error('역할 목록을 불러올 수 없습니다');
-      setRoles([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const roles = ROLE_OPTIONS;
 
   const toggleRole = (roleName: string) => {
     const newRoles = selectedRoles.includes(roleName)
@@ -62,25 +36,6 @@ export const RoleSelector: FC<RoleSelectorProps> = ({ selectedRoles, onChange })
 
   const allSelected = selectedRoles.length === roles.length;
   const noneSelected = selectedRoles.length === 0;
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-8">
-        <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
-        <span className="ml-2 text-gray-600">역할 목록 로딩 중...</span>
-      </div>
-    );
-  }
-
-  if (roles.length === 0) {
-    return (
-      <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-        <p className="text-sm text-yellow-800">
-          등록된 역할이 없습니다. 먼저 사용자 역할을 생성해주세요.
-        </p>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-4">
@@ -114,7 +69,7 @@ export const RoleSelector: FC<RoleSelectorProps> = ({ selectedRoles, onChange })
 
           return (
             <div
-              key={role.id}
+              key={role.name}
               className={`
                 flex items-start gap-3 p-3 rounded-lg border-2 transition-all cursor-pointer
                 ${isSelected
@@ -131,12 +86,11 @@ export const RoleSelector: FC<RoleSelectorProps> = ({ selectedRoles, onChange })
               />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <Badge style={{ backgroundColor: role.color }} className="text-white text-xs">
+                  <Badge className={`text-xs ${role.badgeClass}`}>
                     {role.displayName}
                   </Badge>
                   <span className="text-xs text-gray-500">({role.name})</span>
                 </div>
-                <p className="text-sm text-gray-600">{role.description}</p>
               </div>
             </div>
           );
@@ -154,8 +108,7 @@ export const RoleSelector: FC<RoleSelectorProps> = ({ selectedRoles, onChange })
               return role ? (
                 <Badge
                   key={roleName}
-                  style={{ backgroundColor: role.color }}
-                  className="text-white text-xs"
+                  className={`text-xs ${role.badgeClass}`}
                 >
                   {role.displayName}
                 </Badge>
