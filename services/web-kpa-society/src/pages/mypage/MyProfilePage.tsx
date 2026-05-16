@@ -46,8 +46,12 @@ function deriveStoreOwnerStatus(items: PharmacyRequest[], hasStoreOwnerRole: boo
   return 'unsubmitted';
 }
 
+// WO-O4O-KPA-PHARMACY-OWNER-DIRECT-CHANGE-GUARD-V1:
+//   pharmacy_owner 는 직역 select 에서 직접 선택 불가 (자동 부여 / pharmacy_request 승인 경로로만 진입).
+//   현재 직역이 이미 pharmacy_owner 인 사용자는 아래 select 렌더 시 별도 옵션으로 현재 값만 표시.
+//   근거: docs/investigations/IR-O4O-KPA-ACTIVITY-TYPE-CHANGE-FLOW-AUDIT-V1.md
 const EDITABLE_ACTIVITY_TYPES = [
-  'pharmacy_owner', 'pharmacy_employee', 'hospital',
+  'pharmacy_employee', 'hospital',
   'manufacturer', 'importer', 'wholesaler', 'other_industry',
   'government', 'school', 'other', 'inactive',
 ] as const;
@@ -472,6 +476,12 @@ export function MyProfilePage() {
                 <select style={styles.input} value={roleForm.activityType}
                   onChange={e => setRoleForm({ ...roleForm, activityType: e.target.value })}>
                   <option value="">선택하세요</option>
+                  {/* WO-O4O-KPA-PHARMACY-OWNER-DIRECT-CHANGE-GUARD-V1:
+                      현재 값이 pharmacy_owner 인 기존 사용자만 별도 옵션으로 현재 값 표시.
+                      일반 사용자에겐 옵션 자체가 노출되지 않음. */}
+                  {roleForm.activityType === 'pharmacy_owner' && (
+                    <option value="pharmacy_owner">{ACTIVITY_TYPE_LABELS['pharmacy_owner']}</option>
+                  )}
                   {EDITABLE_ACTIVITY_TYPES.map(value => (
                     <option key={value} value={value}>{ACTIVITY_TYPE_LABELS[value]}</option>
                   ))}
