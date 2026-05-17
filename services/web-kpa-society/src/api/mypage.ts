@@ -81,6 +81,7 @@ export interface ProfileResponse {
   // WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1:
   //   canonical fields (ceoName / taxInvoiceEmail / managerPhone) + legacy fallback (representativeName / taxEmail).
   businessInfo: {
+    businessNumber?: string;
     businessName?: string;
     phone?: string;
     storeAddress?: {

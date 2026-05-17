@@ -361,6 +361,21 @@ export function MyProfilePage() {
   const isPharmacyOwner = activityType === 'pharmacy_owner';
   const biz = profile?.businessInfo;
 
+  // WO-O4O-KPA-ACTIVITY-TYPE-SSOT-ROLE-CANONICAL-ALIGN-V1 (Phase 3):
+  //   자동 활성화 prerequisite (사업자번호, 약국명) 부족으로 store_owner role 부여가 보류된
+  //   상태를 사용자에게 신호. 조건 (backend member.controller.ts L1086-1099 skip 조건과 정렬):
+  //     - profile 로드 완료
+  //     - 직역 = pharmacy_owner (자기소개)
+  //     - kpa:store_owner role 미보유
+  //     - businessNumber 누락, 또는 (pharmacy_name AND businessName) 모두 누락
+  //   해소: 직역 탭의 사업자 정보 섹션에서 입력 후 저장 → operator 재저장 또는 자동 부여 재시도 가능.
+  const hasActivationBusinessNumber = !!profile?.businessInfo?.businessNumber;
+  const hasActivationPharmacyName = !!(profile?.pharmacy?.name || profile?.businessInfo?.businessName);
+  const isMissingActivationBusinessData = !!profile
+    && isPharmacyOwner
+    && !hasStoreOwnerRole
+    && (!hasActivationBusinessNumber || !hasActivationPharmacyName);
+
   // Derive pharmacy/workplace display info
   const pharmacyName = profile?.pharmacy?.name || biz?.businessName || null;
   const pharmacyAddress = profile?.pharmacy?.address
@@ -753,6 +768,14 @@ export function MyProfilePage() {
                       내 매장 / Store HUB 이용은 별도의 매장 운영 승인 절차가 필요합니다.
                       위 직역(활동 유형)은 회원 본인 소개 정보이며, 매장 운영과는 다릅니다.
                     </p>
+                    {/* WO-O4O-KPA-ACTIVITY-TYPE-SSOT-ROLE-CANONICAL-ALIGN-V1 (Phase 3):
+                        자동 활성화 prerequisite 부족 안내 — 사용자가 운영자의 silent skip 을 인지할 수 있도록. */}
+                    {isMissingActivationBusinessData && (
+                      <div style={styles.activationWarning}>
+                        ⚠ 매장 운영 활성화에 필요한 정보(사업자번호, 약국명)가 부족합니다.
+                        위 직역 정보 섹션에서 사업자 정보를 입력해 주세요.
+                      </div>
+                    )}
                     {storeOwnerStatus === 'unsubmitted' && (
                       <Link to="/pharmacy" style={styles.capabilityCtaPrimary}>매장 운영 신청 →</Link>
                     )}
@@ -1084,6 +1107,16 @@ const styles: Record<string, React.CSSProperties> = {
     lineHeight: 1.6,
     color: colors.neutral600,
     margin: '0 0 12px 0',
+  },
+  activationWarning: {
+    padding: '10px 12px',
+    margin: '0 0 12px 0',
+    backgroundColor: '#FFFBEB',
+    color: '#92400E',
+    border: '1px solid #FCD34D',
+    borderRadius: '6px',
+    fontSize: '13px',
+    lineHeight: 1.55,
   },
   capabilityCtaPrimary: {
     display: 'inline-block',
