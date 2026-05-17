@@ -125,9 +125,11 @@ export class BackfillKpaStoreOwnerForTestUsers20261020000000 implements Migratio
       console.log(`[Backfill V1] ${t.email}: organization_members(owner) ensure`);
 
       // Step E — role_assignments(kpa:store_owner, active) (멱등 — unique_active_role_per_user)
+      // assigned_by 는 uuid (nullable) — system migration 이므로 NULL 사용.
+      // (WO trail 은 본 마이그레이션 파일명 / commit message 로 추적 가능)
       await queryRunner.query(
         `INSERT INTO role_assignments (user_id, role, assigned_by, is_active, valid_from, created_at, updated_at)
-         VALUES ($1, 'kpa:store_owner', 'backfill-WO-KPA-STOREOWNER-ROLE-BACKFILL-V1', true, NOW(), NOW(), NOW())
+         VALUES ($1, 'kpa:store_owner', NULL, true, NOW(), NOW(), NOW())
          ON CONFLICT ON CONSTRAINT "unique_active_role_per_user" DO UPDATE
            SET is_active = true,
                updated_at = NOW(),
