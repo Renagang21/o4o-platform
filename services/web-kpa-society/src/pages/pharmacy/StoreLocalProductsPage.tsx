@@ -2,17 +2,19 @@
  * Store Local Products Management Page
  *
  * WO-O4O-STORE-LOCAL-PRODUCT-UI-V1
+ * WO-O4O-STORE-HUB-LEGACY-LIST-CLEANUP-V1: raw <table> → BaseTable canonical 정렬
  *
  * CRUD for store_local_products (Display Domain).
  * Local Products are NOT Commerce Objects — Checkout/Order 연결 금지.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Plus, Search, X, Loader2, ShoppingBag, AlertTriangle,
   Edit2, Trash2, ChevronLeft, ChevronRight, Tablet, BarChart3,
 } from 'lucide-react';
+import { BaseTable, type O4OColumn } from '@o4o/ui';
 import {
   fetchLocalProducts,
   createLocalProduct,
@@ -156,6 +158,126 @@ export default function StoreLocalProductsPage() {
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
+  // WO-O4O-STORE-HUB-LEGACY-LIST-CLEANUP-V1: BaseTable 컬럼 정의
+  const columns = useMemo<O4OColumn<LocalProduct>[]>(() => [
+    {
+      key: 'thumbnail',
+      header: '이미지',
+      width: 64,
+      render: (_, product) =>
+        product.thumbnail_url ? (
+          <img
+            src={product.thumbnail_url}
+            alt={product.name}
+            className="w-10 h-10 rounded-lg object-cover"
+          />
+        ) : (
+          <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
+            <ShoppingBag className="w-5 h-5 text-slate-300" />
+          </div>
+        ),
+    },
+    {
+      key: 'name',
+      header: '상품명',
+      render: (_, product) => (
+        <div>
+          <div className="font-medium text-slate-900">{product.name}</div>
+          {product.summary && (
+            <div className="text-xs text-slate-400 mt-0.5 line-clamp-1">{product.summary}</div>
+          )}
+          {product.highlight_flag && (
+            <span className="inline-block mt-1 px-1.5 py-0.5 text-[10px] font-medium bg-amber-100 text-amber-700 rounded">
+              강조
+            </span>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'category',
+      header: '카테고리',
+      width: 112,
+      render: (_, product) => (
+        <span className="text-slate-600">{product.category || '-'}</span>
+      ),
+    },
+    {
+      key: 'price_display',
+      header: '표시 가격',
+      width: 112,
+      align: 'right',
+      render: (_, product) => (
+        <span className="text-slate-900 font-medium">
+          {product.price_display ? `₩${Number(product.price_display).toLocaleString()}` : '-'}
+        </span>
+      ),
+    },
+    {
+      key: 'badge',
+      header: 'Badge',
+      width: 80,
+      align: 'center',
+      render: (_, product) =>
+        product.badge_type !== 'none' ? (
+          <span
+            className={`inline-block px-2 py-0.5 text-xs font-medium rounded-full ${
+              BADGE_OPTIONS.find((b) => b.value === product.badge_type)?.color || ''
+            }`}
+          >
+            {BADGE_OPTIONS.find((b) => b.value === product.badge_type)?.label}
+          </span>
+        ) : null,
+    },
+    {
+      key: 'is_active',
+      header: '활성',
+      width: 64,
+      align: 'center',
+      render: (_, product) => (
+        <span
+          className={`inline-block w-2.5 h-2.5 rounded-full ${
+            product.is_active ? 'bg-green-500' : 'bg-slate-300'
+          }`}
+        />
+      ),
+    },
+    {
+      key: 'actions',
+      header: '액션',
+      width: 96,
+      align: 'center',
+      system: 'last',
+      render: (_, product) => (
+        <div className="flex items-center justify-center gap-1">
+          <button
+            onClick={() => handleEdit(product)}
+            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-700"
+            title="수정"
+          >
+            <Edit2 className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => navigate(`/store/commerce/products/${product.id}/marketing`)}
+            className="p-1.5 rounded-lg hover:bg-blue-50 text-slate-500 hover:text-blue-600"
+            title="마케팅 자산"
+          >
+            <BarChart3 className="w-4 h-4" />
+          </button>
+          {product.is_active && (
+            <button
+              onClick={() => handleDelete(product)}
+              className="p-1.5 rounded-lg hover:bg-red-50 text-slate-500 hover:text-red-600"
+              title="비활성화"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+      ),
+    },
+  ], [navigate]);
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -261,106 +383,15 @@ export default function StoreLocalProductsPage() {
         </div>
       )}
 
-      {/* Table */}
+      {/* Table — WO-O4O-STORE-HUB-LEGACY-LIST-CLEANUP-V1: BaseTable canonical */}
       {!loading && !error && filteredProducts.length > 0 && (
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b bg-slate-50">
-                <th className="text-left px-4 py-3 font-medium text-slate-500 w-16">이미지</th>
-                <th className="text-left px-4 py-3 font-medium text-slate-500">상품명</th>
-                <th className="text-left px-4 py-3 font-medium text-slate-500 w-28">카테고리</th>
-                <th className="text-right px-4 py-3 font-medium text-slate-500 w-28">표시 가격</th>
-                <th className="text-center px-4 py-3 font-medium text-slate-500 w-20">Badge</th>
-                <th className="text-center px-4 py-3 font-medium text-slate-500 w-16">활성</th>
-                <th className="text-center px-4 py-3 font-medium text-slate-500 w-24">액션</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredProducts.map((product) => (
-                <tr
-                  key={product.id}
-                  className={`border-b last:border-0 hover:bg-slate-50 transition-colors ${
-                    !product.is_active ? 'opacity-50' : ''
-                  }`}
-                >
-                  <td className="px-4 py-3">
-                    {product.thumbnail_url ? (
-                      <img
-                        src={product.thumbnail_url}
-                        alt={product.name}
-                        className="w-10 h-10 rounded-lg object-cover"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
-                        <ShoppingBag className="w-5 h-5 text-slate-300" />
-                      </div>
-                    )}
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="font-medium text-slate-900">{product.name}</div>
-                    {product.summary && (
-                      <div className="text-xs text-slate-400 mt-0.5 line-clamp-1">{product.summary}</div>
-                    )}
-                    {product.highlight_flag && (
-                      <span className="inline-block mt-1 px-1.5 py-0.5 text-[10px] font-medium bg-amber-100 text-amber-700 rounded">
-                        강조
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-slate-600">{product.category || '-'}</td>
-                  <td className="px-4 py-3 text-right text-slate-900 font-medium">
-                    {product.price_display ? `₩${Number(product.price_display).toLocaleString()}` : '-'}
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    {product.badge_type !== 'none' && (
-                      <span
-                        className={`inline-block px-2 py-0.5 text-xs font-medium rounded-full ${
-                          BADGE_OPTIONS.find((b) => b.value === product.badge_type)?.color || ''
-                        }`}
-                      >
-                        {BADGE_OPTIONS.find((b) => b.value === product.badge_type)?.label}
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <span
-                      className={`inline-block w-2.5 h-2.5 rounded-full ${
-                        product.is_active ? 'bg-green-500' : 'bg-slate-300'
-                      }`}
-                    />
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <div className="flex items-center justify-center gap-1">
-                      <button
-                        onClick={() => handleEdit(product)}
-                        className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-700"
-                        title="수정"
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => navigate(`/store/commerce/products/${product.id}/marketing`)}
-                        className="p-1.5 rounded-lg hover:bg-blue-50 text-slate-500 hover:text-blue-600"
-                        title="마케팅 자산"
-                      >
-                        <BarChart3 className="w-4 h-4" />
-                      </button>
-                      {product.is_active && (
-                        <button
-                          onClick={() => handleDelete(product)}
-                          className="p-1.5 rounded-lg hover:bg-red-50 text-slate-500 hover:text-red-600"
-                          title="비활성화"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <BaseTable<LocalProduct>
+            columns={columns}
+            data={filteredProducts}
+            rowKey={(product) => product.id}
+            rowClassName={(product) => (!product.is_active ? 'opacity-50' : '')}
+          />
 
           {/* Pagination */}
           {totalPages > 1 && (

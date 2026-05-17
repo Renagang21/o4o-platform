@@ -49,8 +49,7 @@ export { StoreChannelsPage } from './StoreChannelsPage';
 // WO-STORE-ORDERS-FOUNDATION-V1: 주문 관리
 export { StoreOrdersPage } from './StoreOrdersPage';
 
-// WO-STORE-BILLING-FOUNDATION-V1: 정산/인보이스
-export { StoreBillingPage } from './StoreBillingPage';
+// WO-O4O-STORE-HUB-LEGACY-LIST-CLEANUP-V1: StoreBillingPage 제거 (KPA 사이드바 미노출, API 미연결)
 
 // WO-O4O-STORE-SIGNAGE-ENGINE-V1: 사이니지 운영 엔진
 export { StoreSignagePage } from './StoreSignagePage';

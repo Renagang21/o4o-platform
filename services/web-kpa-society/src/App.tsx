@@ -173,7 +173,7 @@ const PharmacyBlogPage = lazy(() => import('./pages/pharmacy/PharmacyBlogPage').
 const PharmacyTemplatePage = lazy(() => import('./pages/pharmacy/PharmacyTemplatePage').then(m => ({ default: m.PharmacyTemplatePage })));
 const StoreChannelsPage = lazy(() => import('./pages/pharmacy/StoreChannelsPage').then(m => ({ default: m.StoreChannelsPage })));
 const StoreOrdersPage = lazy(() => import('./pages/pharmacy/StoreOrdersPage').then(m => ({ default: m.StoreOrdersPage })));
-const StoreBillingPage = lazy(() => import('./pages/pharmacy/StoreBillingPage').then(m => ({ default: m.StoreBillingPage })));
+// WO-O4O-STORE-HUB-LEGACY-LIST-CLEANUP-V1: StoreBillingPage 제거 (KPA 사이드바 미노출, API 미연결 placeholder)
 const StoreSignagePage = lazy(() => import('./pages/pharmacy/StoreSignagePage').then(m => ({ default: m.StoreSignagePage })));
 const StoreQRPage = lazy(() => import('./pages/pharmacy/StoreQRPage').then(m => ({ default: m.StoreQRPage })));
 const StorePopPage = lazy(() => import('./pages/pharmacy/StorePopPage').then(m => ({ default: m.StorePopPage })));
@@ -212,9 +212,9 @@ import { PharmacyHubLayout } from './components/pharmacy/PharmacyHubLayout';
 import { StoreDashboardLayout, KPA_SOCIETY_STORE_CONFIG, resolveStoreMenu } from '@o4o/store-ui-core';
 import { useStoreCapabilities } from './hooks/useStoreCapabilities';
 import { KpaGlobalHeader } from './components/KpaGlobalHeader';
-// Pharmacy B2B — Phase 2 lazy (barrel unwound)
-const SupplierListPage = lazy(() => import('./pages/pharmacy/b2b/SupplierListPage').then(m => ({ default: m.SupplierListPage })));
-const SupplierDetailPage = lazy(() => import('./pages/pharmacy/b2b/SupplierDetailPage').then(m => ({ default: m.SupplierDetailPage })));
+// WO-O4O-STORE-HUB-LEGACY-LIST-CLEANUP-V1: SupplierList/DetailPage 제거
+//   - 사이드바 미노출, mock-only, /store-hub/b2b 와 redundant
+//   - 백엔드 미연결 placeholder
 
 // Work Pages — Phase 2 lazy (barrel unwound)
 const WorkPage = lazy(() => import('./pages/work/WorkPage').then(m => ({ default: m.WorkPage })));
@@ -865,8 +865,7 @@ function App() {
             <Route path="commerce/products/b2c" element={<PharmacySellPage />} />
             {/* WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: 내 매장 상품 (ProductMaster + Listing) */}
             <Route path="my-products" element={<PharmacyOwnerOnlyGuard><StoreProductsManagerPage /></PharmacyOwnerOnlyGuard>} />
-            <Route path="commerce/products/suppliers" element={<SupplierListPage />} />
-            <Route path="commerce/products/suppliers/:supplierId" element={<SupplierDetailPage />} />
+            {/* WO-O4O-STORE-HUB-LEGACY-LIST-CLEANUP-V1: suppliers 라우트 제거 (mock-only, /store-hub/b2b 와 redundant) */}
             <Route path="commerce/products/:productId/marketing" element={<ProductMarketingPage />} />
             {/* WO-O4O-AI-AUTO-POP-BUILDER-V1: 상품 POP 만들기 (AI prefill + 편집 + PDF) */}
             <Route path="commerce/products/:productId/pop" element={<ProductPopBuilderPage />} />
@@ -896,7 +895,7 @@ function App() {
             <Route path="analytics" element={<Navigate to="/store/analytics/marketing" replace />} />
             <Route path="products" element={<Navigate to="/store/commerce/products" replace />} />
             <Route path="products/b2c" element={<Navigate to="/store/commerce/products/b2c" replace />} />
-            <Route path="products/suppliers" element={<Navigate to="/store/commerce/products/suppliers" replace />} />
+            {/* WO-O4O-STORE-HUB-LEGACY-LIST-CLEANUP-V1: products/suppliers legacy redirect 제거 */}
             <Route path="orders" element={<Navigate to="/store/commerce/orders" replace />} />
 
             {/* ── WO-O4O-STORE-REQUESTS-UNIFIED-MENU-V1: 상담 요청 독립 메뉴 ── */}
@@ -909,7 +908,7 @@ function App() {
             <Route path="content/blog" element={<PharmacyBlogPage />} />
             <Route path="content/direct/:id" element={<StoreDirectContentPage />} />
             <Route path="content/:snapshotId/edit" element={<StoreContentEditPage />} />
-            <Route path="billing" element={<StoreBillingPage />} />
+            {/* WO-O4O-STORE-HUB-LEGACY-LIST-CLEANUP-V1: billing 라우트 제거 (사이드바 미노출, API 미연결 placeholder) */}
             <Route path="settings" element={<PharmacyStorePage />} />
             {/* WO-STORE-COMMON-SETTINGS-KPA-MIGRATION-V1: layout integrated into /store/settings */}
             <Route path="settings/layout" element={<Navigate to="/store/settings" replace />} />
