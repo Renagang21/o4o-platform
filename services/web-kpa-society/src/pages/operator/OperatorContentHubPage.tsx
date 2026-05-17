@@ -2,9 +2,10 @@
  * OperatorContentHubPage — 콘텐츠 정리 허브
  *
  * WO-O4O-KPA-CONTENT-HUB-FOUNDATION-V1
- *
- * 기존 OperatorDocsPage(파일 저장소 구조)를 대체하는
- * Block 기반 콘텐츠 허브. O4O DataTable 패턴 준수.
+ * WO-O4O-KPA-OPERATOR-LEGACY-TABLE-CANONICAL-MIGRATION-V1:
+ *   raw <table>/thead/tbody → @o4o/operator-ux-core DataTable + ListColumnDef 로 정렬.
+ *   기존 필터/페이지네이션/row action/등록·수정 모달은 그대로 유지.
+ *   selection / bulk action 은 본 WO scope 외 (LEGACY → PARTIAL 승격).
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -13,6 +14,8 @@ import {
   Plus, Search, RefreshCw, Pencil, Trash2, Copy, Tag,
   FileText, ChevronRight, Loader2, AlertCircle,
 } from 'lucide-react';
+import { DataTable } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { getAccessToken } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
 
@@ -223,6 +226,122 @@ export default function OperatorContentHubPage() {
     catch { return '-'; }
   };
 
+  // ─── Columns (WO-O4O-KPA-OPERATOR-LEGACY-TABLE-CANONICAL-MIGRATION-V1) ───
+  //   raw <table> 의 6개 컬럼을 ListColumnDef 로 정렬.
+  //   inline 아이콘 액션(복사/수정/삭제) 은 기존 UX 유지 — RowActionMenu 도입은 본 WO scope 외.
+  const contentColumns: ListColumnDef<ContentItem>[] = [
+    {
+      key: 'title',
+      header: '제목',
+      width: '34%',
+      render: (_v, item) => (
+        <button
+          onClick={() => navigate(`/operator/content-hub/${item.id}`)}
+          className="text-left group w-full"
+        >
+          <p className="font-medium text-sm text-slate-800 group-hover:text-blue-600 flex items-center gap-1">
+            <FileText className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+            {item.title}
+            <ChevronRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-blue-400 ml-auto" />
+          </p>
+          {item.summary && (
+            <p className="text-xs text-slate-400 mt-0.5 truncate max-w-xs">{item.summary}</p>
+          )}
+        </button>
+      ),
+    },
+    {
+      key: 'category_tags',
+      header: '카테고리 / 태그',
+      width: '18%',
+      render: (_v, item) => (
+        <>
+          {item.category && (
+            <span className="inline-block px-2 py-0.5 rounded-full text-xs bg-slate-100 text-slate-600 mb-1">{item.category}</span>
+          )}
+          {(item.tags || []).length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {item.tags.slice(0, 3).map(t => (
+                <span key={t} className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs bg-blue-50 text-blue-600">
+                  <Tag className="w-2.5 h-2.5" />{t}
+                </span>
+              ))}
+              {item.tags.length > 3 && <span className="text-xs text-slate-400">+{item.tags.length - 3}</span>}
+            </div>
+          )}
+        </>
+      ),
+    },
+    {
+      key: 'source_type',
+      header: '유형',
+      width: '8%',
+      align: 'center',
+      render: (_v, item) => (
+        <span className="text-xs text-slate-500">{SOURCE_LABEL[item.source_type] || item.source_type}</span>
+      ),
+    },
+    {
+      key: 'status',
+      header: '상태',
+      width: '8%',
+      align: 'center',
+      render: (_v, item) => {
+        const badge = STATUS_BADGE[item.status] || STATUS_BADGE.draft;
+        return (
+          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${badge.cls}`}>{badge.label}</span>
+        );
+      },
+    },
+    {
+      key: 'created_at',
+      header: '등록일',
+      width: '10%',
+      sortable: true,
+      sortAccessor: (item) => new Date(item.created_at).getTime(),
+      render: (_v, item) => (
+        <span className="text-sm text-slate-500">{formatDate(item.created_at)}</span>
+      ),
+    },
+    {
+      key: '_actions',
+      header: '액션',
+      width: '22%',
+      align: 'right',
+      render: (_v, item) => {
+        const isDeleting = deleting === item.id;
+        const isCopying = copying === item.id;
+        return (
+          <div className="flex items-center justify-end gap-1">
+            <button
+              onClick={() => handleCopyToStore(item)}
+              disabled={isCopying}
+              title="내 공간에 복사"
+              className="p-1.5 rounded-lg hover:bg-blue-50 text-blue-500 disabled:opacity-40"
+            >
+              {isCopying ? <Loader2 className="w-4 h-4 animate-spin" /> : <Copy className="w-4 h-4" />}
+            </button>
+            <button
+              onClick={() => openEdit(item)}
+              title="수정"
+              className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500"
+            >
+              <Pencil className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => handleDelete(item)}
+              disabled={isDeleting}
+              title="삭제"
+              className="p-1.5 rounded-lg hover:bg-red-50 text-red-500 disabled:opacity-40"
+            >
+              {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+            </button>
+          </div>
+        );
+      },
+    },
+  ];
+
   // ─── Render ───────────────────────────────────────────────────────────────
 
   return (
@@ -321,118 +440,22 @@ export default function OperatorContentHubPage() {
           </button>
         </div>
 
-        {/* Loading */}
-        {isLoading && items.length === 0 && (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
-          </div>
-        )}
-
-        {/* DataTable */}
-        {(!isLoading || items.length > 0) && (
-          <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-100">
-              <tr>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 w-[34%]">제목</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 w-[18%]">카테고리 / 태그</th>
-                <th className="text-center px-4 py-3 text-xs font-medium text-slate-500 w-[8%]">유형</th>
-                <th className="text-center px-4 py-3 text-xs font-medium text-slate-500 w-[8%]">상태</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 w-[10%]">등록일</th>
-                <th className="text-right px-4 py-3 text-xs font-medium text-slate-500 w-[22%]">액션</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {items.length === 0 && !isLoading ? (
-                <tr>
-                  <td colSpan={6} className="px-4 py-12 text-center text-slate-400 text-sm">
-                    등록된 콘텐츠가 없습니다.
-                    <button onClick={openCreate} className="ml-2 text-blue-500 underline">첫 콘텐츠 등록</button>
-                  </td>
-                </tr>
-              ) : (
-                items.map(item => {
-                  const badge = STATUS_BADGE[item.status] || STATUS_BADGE.draft;
-                  const isDeleting = deleting === item.id;
-                  const isCopying = copying === item.id;
-                  return (
-                    <tr key={item.id} className="hover:bg-slate-50 transition-colors">
-                      {/* 제목 */}
-                      <td className="px-4 py-3">
-                        <button
-                          onClick={() => navigate(`/operator/content-hub/${item.id}`)}
-                          className="text-left group w-full"
-                        >
-                          <p className="font-medium text-sm text-slate-800 group-hover:text-blue-600 flex items-center gap-1">
-                            <FileText className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
-                            {item.title}
-                            <ChevronRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-blue-400 ml-auto" />
-                          </p>
-                          {item.summary && (
-                            <p className="text-xs text-slate-400 mt-0.5 truncate max-w-xs">{item.summary}</p>
-                          )}
-                        </button>
-                      </td>
-                      {/* 카테고리/태그 */}
-                      <td className="px-4 py-3">
-                        {item.category && (
-                          <span className="inline-block px-2 py-0.5 rounded-full text-xs bg-slate-100 text-slate-600 mb-1">{item.category}</span>
-                        )}
-                        {(item.tags || []).length > 0 && (
-                          <div className="flex flex-wrap gap-1">
-                            {item.tags.slice(0, 3).map(t => (
-                              <span key={t} className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs bg-blue-50 text-blue-600">
-                                <Tag className="w-2.5 h-2.5" />{t}
-                              </span>
-                            ))}
-                            {item.tags.length > 3 && <span className="text-xs text-slate-400">+{item.tags.length - 3}</span>}
-                          </div>
-                        )}
-                      </td>
-                      {/* 유형 */}
-                      <td className="px-4 py-3 text-center">
-                        <span className="text-xs text-slate-500">{SOURCE_LABEL[item.source_type] || item.source_type}</span>
-                      </td>
-                      {/* 상태 */}
-                      <td className="px-4 py-3 text-center">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${badge.cls}`}>{badge.label}</span>
-                      </td>
-                      {/* 등록일 */}
-                      <td className="px-4 py-3 text-sm text-slate-500">{formatDate(item.created_at)}</td>
-                      {/* 액션 */}
-                      <td className="px-4 py-3 text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <button
-                            onClick={() => handleCopyToStore(item)}
-                            disabled={isCopying}
-                            title="내 공간에 복사"
-                            className="p-1.5 rounded-lg hover:bg-blue-50 text-blue-500 disabled:opacity-40"
-                          >
-                            {isCopying ? <Loader2 className="w-4 h-4 animate-spin" /> : <Copy className="w-4 h-4" />}
-                          </button>
-                          <button
-                            onClick={() => openEdit(item)}
-                            title="수정"
-                            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500"
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(item)}
-                            disabled={isDeleting}
-                            title="삭제"
-                            className="p-1.5 rounded-lg hover:bg-red-50 text-red-500 disabled:opacity-40"
-                          >
-                            {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        )}
+        {/* DataTable — canonical @o4o/operator-ux-core
+            WO-O4O-KPA-OPERATOR-LEGACY-TABLE-CANONICAL-MIGRATION-V1:
+              raw <table> + 자체 thead/tbody + 자체 spinner/empty 분기 → DataTable 내장 처리. */}
+        <DataTable<ContentItem>
+          columns={contentColumns}
+          data={items}
+          rowKey="id"
+          loading={isLoading}
+          emptyMessage={
+            <span>
+              등록된 콘텐츠가 없습니다.
+              <button onClick={openCreate} className="ml-2 text-blue-500 underline">첫 콘텐츠 등록</button>
+            </span>
+          }
+          tableId="kpa-operator-content-hub"
+        />
 
         {/* Pagination */}
         {!isLoading && pagination.totalPages > 1 && (

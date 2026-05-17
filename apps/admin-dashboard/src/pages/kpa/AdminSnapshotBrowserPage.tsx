@@ -2,6 +2,10 @@
  * AdminSnapshotBrowserPage — 공급 자산(Snapshot) 전체 조회
  *
  * WO-O4O-KPA-ADMIN-SNAPSHOT-BROWSE-V1
+ * WO-O4O-KPA-OPERATOR-LEGACY-TABLE-CANONICAL-MIGRATION-V1:
+ *   shadcn <Table> → @o4o/ui BaseTable 으로 정렬.
+ *   기존 검색/필터/페이지네이션/행 클릭 Dialog/Force navigate 흐름은 그대로 유지.
+ *   selection / bulk action 은 본 WO scope 외 (LEGACY-SHADCN → PARTIAL 승격).
  *
  * 경로: /operator/kpa/snapshots
  * 기능:
@@ -30,9 +34,8 @@ import { Badge } from '@/components/ui/badge';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
-import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from '@/components/ui/table';
+import { BaseTable } from '@o4o/ui';
+import type { O4OColumn } from '@o4o/ui';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Search, RefreshCw, Zap, X } from 'lucide-react';
 import PageHeader from '@/components/common/PageHeader';
@@ -219,6 +222,74 @@ export default function AdminSnapshotBrowserPage() {
     setDetailOpen(true);
   };
 
+  // WO-O4O-KPA-OPERATOR-LEGACY-TABLE-CANONICAL-MIGRATION-V1:
+  //   shadcn <Table> → BaseTable. 행 클릭 → 상세 Dialog, "강제 배포" 버튼은 system:'last' 컬럼.
+  const snapshotColumns: O4OColumn<SnapshotRow>[] = [
+    {
+      key: 'title',
+      header: '제목',
+      render: (_v, row) => <span className="font-medium text-sm">{row.title}</span>,
+    },
+    {
+      key: 'assetType',
+      header: '타입',
+      width: 100,
+      render: (_v, row) => <TypeBadge type={row.assetType} />,
+    },
+    {
+      key: 'organizationName',
+      header: '출처 조직',
+      render: (_v, row) => (
+        <span className="text-sm text-muted-foreground">{row.organizationName ?? '—'}</span>
+      ),
+    },
+    {
+      key: 'totalControls',
+      header: '배포 수',
+      width: 90,
+      align: 'center',
+      render: (_v, row) => <span className="text-sm">{row.totalControls}</span>,
+    },
+    {
+      key: 'forcedControls',
+      header: '강제 배포 중',
+      width: 110,
+      align: 'center',
+      render: (_v, row) => row.forcedControls > 0 ? (
+        <Badge variant="default" className="bg-amber-500 hover:bg-amber-500">
+          {row.forcedControls}
+        </Badge>
+      ) : (
+        <span className="text-muted-foreground text-sm">—</span>
+      ),
+    },
+    {
+      key: 'createdAt',
+      header: '생성일',
+      width: 130,
+      render: (_v, row) => <span className="text-sm">{fmtDate(row.createdAt)}</span>,
+    },
+    {
+      key: '_actions',
+      header: '',
+      width: 110,
+      system: 'last',
+      // row click → 상세 Dialog 와 충돌 방지: cell 클릭 핸들러로 전파 차단.
+      onCellClick: () => {},
+      render: (_v, row) => (
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={(e) => { e.stopPropagation(); handleForce(row); }}
+          title="강제 배포 화면으로 이동"
+        >
+          <Zap className="h-3.5 w-3.5 mr-1" />
+          강제 배포
+        </Button>
+      ),
+    },
+  ];
+
   const handleForce = (snapshot: SnapshotRow) => {
     // Navigate to force-assets page with snapshot pre-selected via location state
     navigate('/operator/kpa/force-assets', {
@@ -297,70 +368,22 @@ export default function AdminSnapshotBrowserPage() {
         </p>
       )}
 
-      {/* Table */}
+      {/* Table — WO-O4O-KPA-OPERATOR-LEGACY-TABLE-CANONICAL-MIGRATION-V1:
+          shadcn <Table> → BaseTable. row click → onRowClick. */}
       {isLoading ? (
         <div className="space-y-2">
           {[1, 2, 3, 4, 5].map((i) => <Skeleton key={i} className="h-11 w-full" />)}
         </div>
       ) : isError ? (
         <div className="text-center py-12 text-destructive text-sm">데이터를 불러오지 못했습니다.</div>
-      ) : items.length === 0 ? (
-        <div className="text-center py-16 text-muted-foreground text-sm">조건에 맞는 Snapshot이 없습니다.</div>
       ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>제목</TableHead>
-              <TableHead>타입</TableHead>
-              <TableHead>출처 조직</TableHead>
-              <TableHead className="text-center">배포 수</TableHead>
-              <TableHead className="text-center">강제 배포 중</TableHead>
-              <TableHead>생성일</TableHead>
-              <TableHead className="w-24"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {items.map((row) => (
-              <TableRow
-                key={row.id}
-                className="cursor-pointer hover:bg-muted/50"
-                onClick={() => handleRowClick(row)}
-              >
-                <TableCell>
-                  <span className="font-medium text-sm">{row.title}</span>
-                </TableCell>
-                <TableCell>
-                  <TypeBadge type={row.assetType} />
-                </TableCell>
-                <TableCell className="text-sm text-muted-foreground">
-                  {row.organizationName ?? '—'}
-                </TableCell>
-                <TableCell className="text-center text-sm">{row.totalControls}</TableCell>
-                <TableCell className="text-center">
-                  {row.forcedControls > 0 ? (
-                    <Badge variant="default" className="bg-amber-500 hover:bg-amber-500">
-                      {row.forcedControls}
-                    </Badge>
-                  ) : (
-                    <span className="text-muted-foreground text-sm">—</span>
-                  )}
-                </TableCell>
-                <TableCell className="text-sm">{fmtDate(row.createdAt)}</TableCell>
-                <TableCell onClick={(e) => e.stopPropagation()}>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={(e) => { e.stopPropagation(); handleForce(row); }}
-                    title="강제 배포 화면으로 이동"
-                  >
-                    <Zap className="h-3.5 w-3.5 mr-1" />
-                    강제 배포
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <BaseTable<SnapshotRow>
+          columns={snapshotColumns}
+          data={items}
+          rowKey={(row) => row.id}
+          onRowClick={handleRowClick}
+          emptyMessage="조건에 맞는 Snapshot이 없습니다."
+        />
       )}
 
       {/* Pagination */}

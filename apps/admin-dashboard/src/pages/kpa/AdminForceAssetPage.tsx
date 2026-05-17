@@ -2,6 +2,10 @@
  * AdminForceAssetPage — Force Asset 강제 배포 관리
  *
  * WO-O4O-ADMIN-FORCE-ASSET-CONSOLE-V1
+ * WO-O4O-KPA-OPERATOR-LEGACY-TABLE-CANONICAL-MIGRATION-V1:
+ *   shadcn <Table> (2곳: 메인 list + SnapshotSelector dialog) → @o4o/ui BaseTable 으로 정렬.
+ *   기존 필터/페이지네이션/Dialog/액션 흐름은 그대로 유지.
+ *   selection / bulk action 은 본 WO scope 외 (LEGACY-SHADCN → PARTIAL 승격).
  *
  * 경로: /operator/kpa/force-assets
  * 기능:
@@ -29,9 +33,10 @@ import { Badge } from '@/components/ui/badge';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
-import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from '@/components/ui/table';
+import { BaseTable } from '@o4o/ui';
+import type { O4OColumn } from '@o4o/ui';
+// WO-O4O-KPA-OPERATOR-LEGACY-TABLE-CANONICAL-MIGRATION-V1:
+//   shadcn Table import 제거 — BaseTable 사용으로 대체.
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
@@ -179,6 +184,51 @@ function SnapshotSelectorDialog({
     enabled: open,
   });
 
+  // WO-O4O-KPA-OPERATOR-LEGACY-TABLE-CANONICAL-MIGRATION-V1:
+  //   shadcn <Table> → BaseTable. 선택 버튼은 "_select" 컬럼으로 이관.
+  //   render 시그너처는 (value, row, index) — value 는 미사용이라 _v 로 표기.
+  const snapshotColumns: O4OColumn<SnapshotItem>[] = [
+    {
+      key: 'title',
+      header: '제목',
+      render: (_v, row) => <span className="font-medium">{row.title}</span>,
+    },
+    {
+      key: 'assetType',
+      header: '타입',
+      width: 100,
+      render: (_v, row) => (
+        <span className={`text-xs px-2 py-0.5 rounded font-medium ${ASSET_TYPE_COLORS[row.assetType] ?? 'bg-gray-100 text-gray-700'}`}>
+          {row.assetType}
+        </span>
+      ),
+    },
+    {
+      key: 'organizationName',
+      header: '출처 조직',
+      render: (_v, row) => (
+        <span className="text-sm text-muted-foreground">{row.organizationName ?? '—'}</span>
+      ),
+    },
+    {
+      key: 'createdAt',
+      header: '생성일',
+      width: 120,
+      render: (_v, row) => <span className="text-sm">{fmtDate(row.createdAt)}</span>,
+    },
+    {
+      key: '_select',
+      header: '',
+      width: 80,
+      system: 'last',
+      render: (_v, row) => (
+        <Button size="sm" variant="outline" onClick={() => { onSelect(row); onOpenChange(false); }}>
+          선택
+        </Button>
+      ),
+    },
+  ];
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
@@ -214,39 +264,12 @@ function SnapshotSelectorDialog({
           <div className="space-y-2">
             {[1, 2, 3].map((i) => <Skeleton key={i} className="h-10 w-full" />)}
           </div>
-        ) : snapshots.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground text-sm">검색 결과가 없습니다.</div>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>제목</TableHead>
-                <TableHead>타입</TableHead>
-                <TableHead>출처 조직</TableHead>
-                <TableHead>생성일</TableHead>
-                <TableHead className="w-16"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {snapshots.map((s) => (
-                <TableRow key={s.id} className="cursor-pointer hover:bg-muted/50">
-                  <TableCell className="font-medium">{s.title}</TableCell>
-                  <TableCell>
-                    <span className={`text-xs px-2 py-0.5 rounded font-medium ${ASSET_TYPE_COLORS[s.assetType] ?? 'bg-gray-100 text-gray-700'}`}>
-                      {s.assetType}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{s.organizationName ?? '—'}</TableCell>
-                  <TableCell className="text-sm">{fmtDate(s.createdAt)}</TableCell>
-                  <TableCell>
-                    <Button size="sm" variant="outline" onClick={() => { onSelect(s); onOpenChange(false); }}>
-                      선택
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <BaseTable<SnapshotItem>
+            columns={snapshotColumns}
+            data={snapshots}
+            emptyMessage="검색 결과가 없습니다."
+          />
         )}
       </DialogContent>
     </Dialog>
@@ -536,6 +559,101 @@ export default function AdminForceAssetPage() {
   const total = data?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / 20));
 
+  // WO-O4O-KPA-OPERATOR-LEGACY-TABLE-CANONICAL-MIGRATION-V1:
+  //   shadcn <Table> → BaseTable. 9개 컬럼 정렬, kebab 메뉴는 system:'last' 액션 컬럼으로 유지.
+  const forceAssetColumns: O4OColumn<ForceAssetItem>[] = [
+    {
+      key: 'snapshotTitle',
+      header: 'Snapshot',
+      render: (_v, row) => (
+        <div>
+          <div className="font-medium text-sm">{row.snapshotTitle ?? '(제목 없음)'}</div>
+          <div className="text-xs text-muted-foreground">{row.snapshotId.slice(0, 8)}…</div>
+        </div>
+      ),
+    },
+    {
+      key: 'assetType',
+      header: '타입',
+      width: 100,
+      render: (_v, row) => row.assetType ? (
+        <span className={`text-xs px-2 py-0.5 rounded font-medium ${ASSET_TYPE_COLORS[row.assetType] ?? 'bg-gray-100 text-gray-700'}`}>
+          {row.assetType}
+        </span>
+      ) : null,
+    },
+    {
+      key: 'organizationName',
+      header: '대상 매장',
+      render: (_v, row) => <span className="text-sm">{row.organizationName ?? '—'}</span>,
+    },
+    {
+      key: 'publishStatus',
+      header: '상태',
+      width: 110,
+      render: (_v, row) => (
+        <Badge variant={row.publishStatus === 'published' ? 'default' : 'secondary'}>
+          {row.publishStatus}
+        </Badge>
+      ),
+    },
+    {
+      key: 'forcedStartAt',
+      header: '시작',
+      width: 130,
+      render: (_v, row) => <span className="text-sm">{fmtDate(row.forcedStartAt)}</span>,
+    },
+    {
+      key: 'forcedEndAt',
+      header: '종료',
+      width: 130,
+      render: (_v, row) => <span className="text-sm">{fmtDate(row.forcedEndAt)}</span>,
+    },
+    {
+      key: 'isLocked',
+      header: '잠금',
+      width: 60,
+      align: 'center',
+      render: (_v, row) => row.isLocked
+        ? <Lock className="h-4 w-4 text-amber-500" />
+        : <Unlock className="h-4 w-4 text-muted-foreground" />,
+    },
+    {
+      key: 'createdAt',
+      header: '생성일',
+      width: 130,
+      render: (_v, row) => <span className="text-sm">{fmtDate(row.createdAt)}</span>,
+    },
+    {
+      key: '_actions',
+      header: '',
+      width: 60,
+      system: 'last',
+      render: (_v, row) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => { setEditItem(row); setEditOpen(true); }}>
+              <Edit className="h-4 w-4 mr-2" />
+              수정
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => handleRelease(row)}
+              className="text-destructive"
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              강제 해제
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+    },
+  ];
+
   return (
     <div className="p-6 space-y-6">
       <PageHeader
@@ -568,84 +686,21 @@ export default function AdminForceAssetPage() {
         </Button>
       </div>
 
-      {/* Table */}
+      {/* Table — WO-O4O-KPA-OPERATOR-LEGACY-TABLE-CANONICAL-MIGRATION-V1:
+          shadcn <Table> → BaseTable. loading/error 분기 외 empty 는 BaseTable 내장 처리. */}
       {isLoading ? (
         <div className="space-y-3">
           {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-12 w-full" />)}
         </div>
       ) : isError ? (
         <div className="text-center py-12 text-destructive text-sm">데이터를 불러오지 못했습니다.</div>
-      ) : items.length === 0 ? (
-        <div className="text-center py-16 text-muted-foreground text-sm">강제 배포된 Asset이 없습니다.</div>
       ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Snapshot</TableHead>
-              <TableHead>타입</TableHead>
-              <TableHead>대상 매장</TableHead>
-              <TableHead>상태</TableHead>
-              <TableHead>시작</TableHead>
-              <TableHead>종료</TableHead>
-              <TableHead>잠금</TableHead>
-              <TableHead>생성일</TableHead>
-              <TableHead className="w-12"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {items.map((item) => (
-              <TableRow key={item.controlId}>
-                <TableCell>
-                  <div className="font-medium text-sm">{item.snapshotTitle ?? '(제목 없음)'}</div>
-                  <div className="text-xs text-muted-foreground">{item.snapshotId.slice(0, 8)}…</div>
-                </TableCell>
-                <TableCell>
-                  {item.assetType && (
-                    <span className={`text-xs px-2 py-0.5 rounded font-medium ${ASSET_TYPE_COLORS[item.assetType] ?? 'bg-gray-100 text-gray-700'}`}>
-                      {item.assetType}
-                    </span>
-                  )}
-                </TableCell>
-                <TableCell className="text-sm">{item.organizationName ?? '—'}</TableCell>
-                <TableCell>
-                  <Badge variant={item.publishStatus === 'published' ? 'default' : 'secondary'}>
-                    {item.publishStatus}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-sm">{fmtDate(item.forcedStartAt)}</TableCell>
-                <TableCell className="text-sm">{fmtDate(item.forcedEndAt)}</TableCell>
-                <TableCell>
-                  {item.isLocked
-                    ? <Lock className="h-4 w-4 text-amber-500" />
-                    : <Unlock className="h-4 w-4 text-muted-foreground" />}
-                </TableCell>
-                <TableCell className="text-sm">{fmtDate(item.createdAt)}</TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => { setEditItem(item); setEditOpen(true); }}>
-                        <Edit className="h-4 w-4 mr-2" />
-                        수정
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => handleRelease(item)}
-                        className="text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        강제 해제
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <BaseTable<ForceAssetItem>
+          columns={forceAssetColumns}
+          data={items}
+          rowKey={(row) => row.controlId}
+          emptyMessage="강제 배포된 Asset이 없습니다."
+        />
       )}
 
       {/* Pagination */}
