@@ -341,6 +341,13 @@ export function createMemberController(
           //   ceoName canonical ?? representativeName (legacy) fallback.
           //   taxInvoiceEmail canonical ?? taxEmail (legacy) ?? email (legacy overwrite history) fallback.
           //   응답 키도 canonical (ceoName / taxInvoiceEmail) 로 변경.
+          // WO-O4O-KPA-MEMBER-EDIT-FORM-CURRENT-VALUE-FIX-V1:
+          //   pharmacy_phone 노출 — write path 가 users.businessInfo.metadata.pharmacy_phone
+          //   JSONB 이므로 read path 도 동일 위치에서 추출. operator 편집 폼이 현재값을
+          //   prefill 할 수 있도록 응답에 포함.
+          const metadata = (businessInfo && typeof businessInfo.metadata === 'object' && businessInfo.metadata !== null)
+            ? businessInfo.metadata as Record<string, any>
+            : null;
           const business_info = businessInfo
             ? {
                 businessNumber: businessInfo.businessNumber ?? null,
@@ -348,6 +355,7 @@ export function createMemberController(
                 ceoName: businessInfo.ceoName ?? businessInfo.representativeName ?? null,
                 taxInvoiceEmail: businessInfo.taxInvoiceEmail ?? businessInfo.taxEmail ?? businessInfo.email ?? null,
                 managerPhone: businessInfo.managerPhone ?? null,
+                pharmacy_phone: (metadata?.pharmacy_phone as string | undefined) ?? null,
               }
             : null;
           return {

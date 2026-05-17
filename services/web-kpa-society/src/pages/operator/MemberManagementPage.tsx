@@ -82,6 +82,10 @@ interface KpaMember {
     taxInvoiceEmail?: string | null;
     representativeName?: string | null;
     taxEmail?: string | null;
+    // WO-O4O-KPA-MEMBER-EDIT-FORM-CURRENT-VALUE-FIX-V1:
+    //   pharmacy_phone canonical = users.businessInfo.metadata.pharmacy_phone (JSONB).
+    //   backend GET /kpa/members 가 business_info 응답 객체에 attach.
+    pharmacy_phone?: string | null;
   } | null;
   joined_at: string | null;
   created_at: string;
@@ -442,6 +446,10 @@ export default function MemberManagementPage() {
       return;
     }
     setSelectedMember(m);
+    // WO-O4O-KPA-MEMBER-EDIT-FORM-CURRENT-VALUE-FIX-V1:
+    //   pharmacy_address / pharmacy_phone 현재값을 form 에 prefill.
+    //   기존 ''(빈 문자열) 초기화는 운영자가 "주소가 비어있다"고 오인하게 만들었음.
+    //   빈 값 명시 삭제는 본 WO 범위 외 — saveMemberEdit 에서 비교 기반 변경 감지로 보호.
     setEditForm({
       name: m.user?.name || '',
       nickname: m.user?.nickname || '',
@@ -449,9 +457,9 @@ export default function MemberManagementPage() {
       activity_type: m.activity_type || '',
       license_number: m.license_number || '',
       pharmacy_name: m.pharmacy_name || '',
-      pharmacy_address: '',
+      pharmacy_address: m.pharmacy_address || '',
       business_number: m.business_info?.businessNumber || '',
-      pharmacy_phone: '',
+      pharmacy_phone: m.business_info?.pharmacy_phone || '',
       status: m.status,
     });
     setIsEditing(true);
@@ -467,6 +475,7 @@ export default function MemberManagementPage() {
       toast.error('탈퇴 처리된 회원은 수정할 수 없습니다.');
       return;
     }
+    // WO-O4O-KPA-MEMBER-EDIT-FORM-CURRENT-VALUE-FIX-V1: 현재값 prefill (openMemberEdit 와 동일 정책)
     setEditForm({
       name: selectedMember.user?.name || '',
       nickname: selectedMember.user?.nickname || '',
@@ -474,9 +483,9 @@ export default function MemberManagementPage() {
       activity_type: selectedMember.activity_type || '',
       license_number: selectedMember.license_number || '',
       pharmacy_name: selectedMember.pharmacy_name || '',
-      pharmacy_address: '',
+      pharmacy_address: selectedMember.pharmacy_address || '',
       business_number: selectedMember.business_info?.businessNumber || '',
-      pharmacy_phone: '',
+      pharmacy_phone: selectedMember.business_info?.pharmacy_phone || '',
       status: selectedMember.status,
     });
     setIsEditing(true);
@@ -513,10 +522,19 @@ export default function MemberManagementPage() {
       const activityChanged = editForm.activity_type !== (selectedMember.activity_type || '');
       const licenseChanged = editForm.license_number !== (selectedMember.license_number || '');
       const pharmacyNameChanged = editForm.pharmacy_name !== (selectedMember.pharmacy_name || '');
-      const pharmacyAddressChanged = editForm.pharmacy_address.trim().length > 0;
+      // WO-O4O-KPA-MEMBER-EDIT-FORM-CURRENT-VALUE-FIX-V1:
+      //   pharmacy_address / pharmacy_phone 가 form 에 prefill 되므로 변경 감지를
+      //   비교 기반으로 전환한다. 단, 빈 값 명시 삭제는 본 WO 범위 외이므로
+      //   `newValue.length === 0` (운영자가 입력칸을 비웠을 때) 은 "변경 없음"으로 유지.
+      //   → 의도치 않은 빈 저장을 방지하고 기존 데이터를 보존한다.
+      const currentPharmacyAddress = (selectedMember.pharmacy_address || '').trim();
+      const newPharmacyAddress = editForm.pharmacy_address.trim();
+      const pharmacyAddressChanged = newPharmacyAddress.length > 0 && newPharmacyAddress !== currentPharmacyAddress;
       const currentBusinessNumber = selectedMember.business_info?.businessNumber || '';
       const businessNumberChanged = editForm.business_number !== currentBusinessNumber;
-      const pharmacyPhoneChanged = editForm.pharmacy_phone.trim().length > 0;
+      const currentPharmacyPhone = (selectedMember.business_info?.pharmacy_phone || '').trim();
+      const newPharmacyPhone = editForm.pharmacy_phone.trim();
+      const pharmacyPhoneChanged = newPharmacyPhone.length > 0 && newPharmacyPhone !== currentPharmacyPhone;
       const statusChanged = editForm.status !== selectedMember.status;
 
       if (
@@ -544,9 +562,11 @@ export default function MemberManagementPage() {
         if (activityChanged) payload.activity_type = editForm.activity_type;
         if (licenseChanged) payload.license_number = editForm.license_number;
         if (pharmacyNameChanged) payload.pharmacy_name = editForm.pharmacy_name;
-        if (pharmacyAddressChanged) payload.pharmacy_address = editForm.pharmacy_address.trim();
+        // WO-O4O-KPA-MEMBER-EDIT-FORM-CURRENT-VALUE-FIX-V1:
+        //   변경 감지에서 이미 trim + 비-빈 + 다른 값 보장 — 변수 그대로 전달.
+        if (pharmacyAddressChanged) payload.pharmacy_address = newPharmacyAddress;
         if (businessNumberChanged) payload.business_number = editForm.business_number;
-        if (pharmacyPhoneChanged) payload.pharmacy_phone = editForm.pharmacy_phone.trim();
+        if (pharmacyPhoneChanged) payload.pharmacy_phone = newPharmacyPhone;
         const infoRes = await apiClient.patch<{ success: boolean; warnings?: string[] }>(
           `/members/${selectedMember.id}/info`,
           payload,
@@ -1413,13 +1433,16 @@ export default function MemberManagementPage() {
                         }}
                       />
                     </div>
+                    {/* WO-O4O-KPA-MEMBER-EDIT-FORM-CURRENT-VALUE-FIX-V1:
+                        현재값이 form 에 prefill 되므로 placeholder 는 단순 안내 문구로 변경.
+                        빈 입력으로 명시 삭제 의도가 있어도 본 WO 범위 외 — 현재값 유지 동작. */}
                     <div style={fieldRowStyle}>
                       <span style={labelStyle}>약국 주소</span>
                       <input
                         type="text"
                         value={editForm.pharmacy_address}
                         onChange={(e) => setEditForm((f) => ({ ...f, pharmacy_address: e.target.value }))}
-                        placeholder={selectedMember.pharmacy_address || '주소 (선택 — 비워두면 현재 값 유지)'}
+                        placeholder="약국 주소 (예: 서울특별시 강남구 ○○로 ○○)"
                         disabled={savingEdit}
                         style={inputStyle}
                       />
@@ -1430,7 +1453,7 @@ export default function MemberManagementPage() {
                         type="text"
                         value={editForm.pharmacy_phone}
                         onChange={(e) => setEditForm((f) => ({ ...f, pharmacy_phone: e.target.value }))}
-                        placeholder="약국 전화번호 (선택)"
+                        placeholder="약국 전화번호 (예: 02-1234-5678)"
                         disabled={savingEdit}
                         style={inputStyle}
                       />
