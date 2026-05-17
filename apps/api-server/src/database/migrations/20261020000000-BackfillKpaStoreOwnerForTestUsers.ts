@@ -65,6 +65,8 @@ export class BackfillKpaStoreOwnerForTestUsers20261020000000 implements Migratio
       const userId: string = userRow.id;
 
       // Step A — sohae2100: businessInfo 정규화 (drift state 한정 idempotent)
+      // users.businessInfo 컬럼은 json 타입 (User.ts:65) — jsonb 연산자 사용 시
+      // COALESCE 타입 충돌. JS 에서 merge 후 단일 json 파라미터로 UPDATE.
       if (t.normalizeFrom && t.normalizeNameTo) {
         const currentBiz = (userRow.businessInfo && typeof userRow.businessInfo === 'object')
           ? userRow.businessInfo as Record<string, unknown>
@@ -73,18 +75,14 @@ export class BackfillKpaStoreOwnerForTestUsers20261020000000 implements Migratio
           ? currentBiz.businessNumber.replace(/[^0-9]/g, '')
           : '';
         if (currentBizno === t.normalizeFrom) {
+          const mergedBiz = {
+            ...currentBiz,
+            businessNumber: t.expectedBizno,
+            businessName: t.normalizeNameTo,
+          };
           await queryRunner.query(
-            `UPDATE users
-             SET "businessInfo" = jsonb_set(
-                                    jsonb_set(
-                                      COALESCE("businessInfo", '{}'::jsonb),
-                                      '{businessNumber}', to_jsonb($2::text)
-                                    ),
-                                    '{businessName}', to_jsonb($3::text)
-                                  ),
-                 "updatedAt" = NOW()
-             WHERE id = $1`,
-            [userId, t.expectedBizno, t.normalizeNameTo],
+            `UPDATE users SET "businessInfo" = $2::json, "updatedAt" = NOW() WHERE id = $1`,
+            [userId, JSON.stringify(mergedBiz)],
           );
           console.log(`[Backfill V1] ${t.email}: normalized businessInfo (bizno ${t.normalizeFrom} → ${t.expectedBizno})`);
         } else {
