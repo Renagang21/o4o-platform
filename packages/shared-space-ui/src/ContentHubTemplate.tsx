@@ -20,6 +20,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { BaseTable, type O4OColumn } from '@o4o/ui';
 import { HubPagination } from './HubPagination';
 
 // ─── Data Types ───────────────────────────────────────────────────────────────
@@ -381,50 +382,38 @@ export function ContentHubTemplate({ config }: { config: ContentHubConfig }) {
 export default ContentHubTemplate;
 
 // ─── Default Table View ───────────────────────────────────────────────────────
+// WO-O4O-CONTENT-HUB-TEMPLATE-DEFAULT-CANONICAL-V1:
+//   raw <table> 제거 → BaseTable + getContentHubColumns 패턴.
+//   assetColumns.tsx (store-asset-policy-core) 와 동일한 shared-column 패턴 적용.
+//   single-action 정책 유지 (selection/ActionBar/bulk 미도입).
 
-function DefaultTableView({ items, ctx, showCopyCol }: { items: ContentHubItem[]; ctx: ContentHubItemContext; showCopyCol: boolean }) {
-  return (
-    <div style={st.tableWrapper}>
-      <table style={st.table}>
-        <thead>
-          <tr>
-            <th style={{ ...st.th, width: '100px' }}>유형</th>
-            <th style={st.th}>제목</th>
-            <th style={{ ...st.th, width: '200px' }}>요약</th>
-            {showCopyCol && <th style={{ ...st.th, width: '70px' }}>상태</th>}
-            <th style={{ ...st.th, width: '90px' }}>작성일</th>
-            {showCopyCol && <th style={{ ...st.th, width: '130px' }}></th>}
-          </tr>
-        </thead>
-        <tbody>
-          {items.map(item => (
-            <DefaultTableRow key={item.id} item={item} ctx={ctx} showCopyCol={showCopyCol} />
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-function DefaultTableRow({ item, ctx, showCopyCol }: { item: ContentHubItem; ctx: ContentHubItemContext; showCopyCol: boolean }) {
-  const badgeColor = item.typeColor ?? { bg: '#f1f5f9', text: '#475569' };
-  const isCopying = ctx.copyingId === item.id;
-  const alreadyCopied = ctx.copiedIds.has(item.id);
-  const wasJustCopied = ctx.justCopiedId === item.id;
-
-  return (
-    <tr style={item.isPinned ? st.rowPinned : st.row}>
-      {/* 유형 */}
-      <td style={{ ...st.td, width: '100px', textAlign: 'center' }}>
-        {item.type ? (
+function getContentHubColumns({
+  ctx,
+  showCopyCol,
+}: {
+  ctx: ContentHubItemContext;
+  showCopyCol: boolean;
+}): O4OColumn<ContentHubItem>[] {
+  const columns: O4OColumn<ContentHubItem>[] = [
+    {
+      key: 'type',
+      header: '유형',
+      width: '100px',
+      align: 'center',
+      render: (_v, item) => {
+        if (!item.type) return null;
+        const badgeColor = item.typeColor ?? { bg: '#f1f5f9', text: '#475569' };
+        return (
           <span style={{ ...st.typeBadge, backgroundColor: badgeColor.bg, color: badgeColor.text }}>
             {item.type}
           </span>
-        ) : null}
-      </td>
-
-      {/* 제목 */}
-      <td style={st.td}>
+        );
+      },
+    },
+    {
+      key: 'title',
+      header: '제목',
+      render: (_v, item) => (
         <div style={st.titleCell}>
           {item.href ? (
             <a href={item.href} target="_blank" rel="noopener noreferrer" style={st.titleLink}>
@@ -436,71 +425,128 @@ function DefaultTableRow({ item, ctx, showCopyCol }: { item: ContentHubItem; ctx
           {item.isNew && <span style={st.newBadge}>신규</span>}
           {item.isPinned && <span style={st.pinnedBadge}>추천</span>}
         </div>
-      </td>
+      ),
+    },
+    {
+      key: 'summary',
+      header: '요약',
+      width: '200px',
+      render: (_v, item) => (
+        <span style={{ ...st.summaryText, color: NEUTRAL500, fontSize: '13px' }}>
+          {item.summary || '-'}
+        </span>
+      ),
+    },
+  ];
 
-      {/* 요약 */}
-      <td style={{ ...st.td, width: '200px', color: NEUTRAL500, fontSize: '13px' }}>
-        <span style={st.summaryText}>{item.summary || '-'}</span>
-      </td>
+  if (showCopyCol) {
+    columns.push({
+      key: 'status',
+      header: '상태',
+      width: '70px',
+      align: 'center',
+      render: (_v, item) =>
+        ctx.copiedIds.has(item.id) ? (
+          <span style={st.statusCopied}>복사됨</span>
+        ) : (
+          <span style={st.statusAvailable}>미복사</span>
+        ),
+    });
+  }
 
-      {/* 상태 (복사 기능이 있을 때만) */}
-      {showCopyCol && (
-        <td style={{ ...st.td, width: '70px', textAlign: 'center' }}>
-          {alreadyCopied ? (
-            <span style={st.statusCopied}>복사됨</span>
+  columns.push({
+    key: 'date',
+    header: '작성일',
+    width: '90px',
+    render: (_v, item) => (
+      <span style={{ color: NEUTRAL400, fontSize: '13px' }}>{item.date ?? '-'}</span>
+    ),
+  });
+
+  if (showCopyCol) {
+    columns.push({
+      key: '_action',
+      header: '',
+      width: '130px',
+      align: 'center',
+      system: 'last',
+      render: (_v, item) => {
+        const isCopying = ctx.copyingId === item.id;
+        const alreadyCopied = ctx.copiedIds.has(item.id);
+        const wasJustCopied = ctx.justCopiedId === item.id;
+
+        if (alreadyCopied) {
+          return wasJustCopied && ctx.afterCopyAction ? (
+            <Link to={ctx.afterCopyAction.href} style={st.afterCopyBtn}>
+              {ctx.afterCopyAction.label}
+            </Link>
           ) : (
-            <span style={st.statusAvailable}>미복사</span>
-          )}
-        </td>
-      )}
+            <span style={st.copiedLabel}>{ctx.copiedLabel}</span>
+          );
+        }
 
-      {/* 작성일 */}
-      <td style={{ ...st.td, width: '90px', color: NEUTRAL400, fontSize: '13px' }}>
-        {item.date ?? '-'}
-      </td>
+        return (
+          <button
+            onClick={() => ctx.onCopy(item)}
+            disabled={isCopying}
+            style={{
+              ...st.copyBtn,
+              opacity: isCopying ? 0.6 : 1,
+              cursor: isCopying ? 'not-allowed' : 'pointer',
+            }}
+          >
+            {isCopying ? ctx.copyingLabel : ctx.copyLabel}
+          </button>
+        );
+      },
+    });
+  }
 
-      {/* 액션 (복사 기능이 있을 때만) */}
-      {showCopyCol && (
-        <td style={{ ...st.td, width: '130px', textAlign: 'center' }}>
-          {alreadyCopied ? (
-            wasJustCopied && ctx.afterCopyAction ? (
-              <Link to={ctx.afterCopyAction.href} style={st.afterCopyBtn}>
-                {ctx.afterCopyAction.label}
-              </Link>
-            ) : (
-              <span style={st.copiedLabel}>{ctx.copiedLabel}</span>
-            )
-          ) : (
-            <button
-              onClick={() => ctx.onCopy(item)}
-              disabled={isCopying}
-              style={{ ...st.copyBtn, opacity: isCopying ? 0.6 : 1, cursor: isCopying ? 'not-allowed' : 'pointer' }}
-            >
-              {isCopying ? ctx.copyingLabel : ctx.copyLabel}
-            </button>
-          )}
-        </td>
-      )}
-    </tr>
+  return columns;
+}
+
+function DefaultTableView({
+  items,
+  ctx,
+  showCopyCol,
+}: {
+  items: ContentHubItem[];
+  ctx: ContentHubItemContext;
+  showCopyCol: boolean;
+}) {
+  return (
+    <div style={st.tableWrapper}>
+      <BaseTable<ContentHubItem>
+        columns={getContentHubColumns({ ctx, showCopyCol })}
+        data={items}
+        rowKey={(item) => item.id}
+        rowClassName={(item) => (item.isPinned ? 'bg-amber-50' : '')}
+      />
+    </div>
   );
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
+// WO-O4O-CONTENT-HUB-TEMPLATE-DEFAULT-CANONICAL-V1:
+//   기존 raw <table> 기반 SkeletonTable 을 div 기반으로 정리.
 function SkeletonTable() {
   return (
     <div style={st.tableWrapper}>
-      <table style={st.table}>
-        <tbody>
-          {[1, 2, 3, 4, 5].map(i => (
-            <tr key={i}>
-              <td colSpan={6} style={st.td}>
-                <div style={{ height: '14px', backgroundColor: NEUTRAL200, borderRadius: '4px', width: `${50 + i * 8}%` }} />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div style={{ padding: '12px' }}>
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div
+            key={i}
+            style={{
+              height: '14px',
+              backgroundColor: NEUTRAL200,
+              borderRadius: '4px',
+              width: `${50 + i * 8}%`,
+              marginBottom: i < 5 ? '12px' : 0,
+            }}
+          />
+        ))}
+      </div>
     </div>
   );
 }
