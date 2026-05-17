@@ -269,9 +269,31 @@ export function createMemberController(
         if (search) {
           // WO-O4O-KPA-MEMBER-CAPABILITY-NICKNAME-UI-CANONICAL-CLEANUP-V1:
           //   nickname 검색 추가 — operator 가 닉네임으로도 회원을 찾을 수 있도록.
-          conditions.push(`(u.name ILIKE $${paramIdx} OR u.email ILIKE $${paramIdx} OR u.nickname ILIKE $${paramIdx})`);
-          params.push(`%${search}%`);
+          // WO-O4O-KPA-MEMBER-SEARCH-PHARMACY-BUSINESS-FIELDS-V1:
+          //   pharmacy_name + businessInfo.businessNumber / businessName 검색 확장.
+          //   businessNumber 는 하이픈 포함/미포함 입력 모두 매칭하기 위해 양쪽에서
+          //   숫자만 추출(REGEXP_REPLACE)한 정규화 ILIKE 도 함께 평가한다.
+          const searchStr = typeof search === 'string' ? search : String(search);
+          const searchPattern = `%${searchStr}%`;
+          const digits = searchStr.replace(/\D/g, '');
+          const orParts: string[] = [
+            `u.name ILIKE $${paramIdx}`,
+            `u.email ILIKE $${paramIdx}`,
+            `u.nickname ILIKE $${paramIdx}`,
+            `km.pharmacy_name ILIKE $${paramIdx}`,
+            `(u."businessInfo"->>'businessName') ILIKE $${paramIdx}`,
+            `(u."businessInfo"->>'businessNumber') ILIKE $${paramIdx}`,
+          ];
+          params.push(searchPattern);
           paramIdx++;
+          if (digits.length > 0) {
+            orParts.push(
+              `REGEXP_REPLACE(COALESCE(u."businessInfo"->>'businessNumber', ''), '[^0-9]', '', 'g') ILIKE $${paramIdx}`,
+            );
+            params.push(`%${digits}%`);
+            paramIdx++;
+          }
+          conditions.push(`(${orParts.join(' OR ')})`);
         }
 
         const whereClause = conditions.join(' AND ');

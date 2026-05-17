@@ -926,7 +926,7 @@ export default function MemberManagementPage() {
         search={search}
         onSearchChange={setSearch}
         onSearch={setSearchQuery}
-        searchPlaceholder="이름, 이메일로 검색"
+        searchPlaceholder="이름, 이메일, 닉네임, 약국명, 사업자번호 검색"
         headerActions={
           <button
             onClick={() => { fetchMembers(memberPage); }}
