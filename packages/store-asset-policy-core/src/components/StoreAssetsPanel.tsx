@@ -24,6 +24,7 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { BaseTable } from '@o4o/ui';
 import type {
   StoreAssetItem,
   TabKey,
@@ -36,7 +37,7 @@ import { isForcedActive, isForcedExpired } from '../policy/policyGate';
 import { isForcedExpiringSoon } from '../policy/expiringSoon';
 import { PolicyFilterBar } from './PolicyFilterBar';
 import { ForcedSection } from './ForcedSection';
-import { AssetRow } from './AssetRow';
+import { getAssetColumns, assetRowClassName } from './assetColumns';
 
 /* ─── Constants ──────────────────────────── */
 
@@ -334,30 +335,15 @@ export function StoreAssetsPanel({
                 </div>
               )}
               <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="bg-slate-50 text-left text-xs text-slate-500 uppercase">
-                      <th className="px-4 py-3 font-medium">종류</th>
-                      <th className="px-4 py-3 font-medium">유형</th>
-                      <th className="px-4 py-3 font-medium">제목</th>
-                      <th className="px-4 py-3 font-medium w-24">상태</th>
-                      <th className="px-4 py-3 font-medium w-20">채널</th>
-                      <th className="px-4 py-3 font-medium w-28">복사일</th>
-                      <th className="px-4 py-3 font-medium w-16"></th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {pagedItems.map(item => (
-                      <AssetRow
-                        key={item.id}
-                        item={item}
-                        updatingId={updatingId}
-                        onToggleStatus={onToggleStatus}
-                        onEdit={onEdit}
-                      />
-                    ))}
-                  </tbody>
-                </table>
+                <BaseTable<StoreAssetItem>
+                  columns={getAssetColumns({ updatingId, onToggleStatus, onEdit })}
+                  data={pagedItems}
+                  rowKey={(item) => item.id}
+                  rowClassName={assetRowClassName}
+                  headerClassName="bg-slate-50"
+                  bodyClassName="bg-white divide-y divide-slate-100"
+                  thClassName="px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider"
+                />
               </div>
             </>
           )}

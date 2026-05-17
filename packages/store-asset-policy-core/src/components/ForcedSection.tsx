@@ -1,11 +1,13 @@
 /**
- * ForcedSection — HQ_FORCED items pinned at top with red border
+ * ForcedSection — HQ_FORCED items pinned at top with red-bordered card
  *
  * WO-O4O-STORE-HUB-CORE-EXTRACTION-V1
+ * WO-O4O-STORE-ASSETS-PANEL-BASETABLE-MIGRATION-V1 — raw <table> → BaseTable
  */
 
 import { ShieldAlert } from 'lucide-react';
-import { AssetRow } from './AssetRow';
+import { BaseTable } from '@o4o/ui';
+import { getAssetColumns, assetRowClassName } from './assetColumns';
 import type { StoreAssetItem } from '../types/snapshot';
 
 export interface ForcedSectionProps {
@@ -18,6 +20,8 @@ export interface ForcedSectionProps {
 export function ForcedSection({ items, updatingId, onToggleStatus, onEdit }: ForcedSectionProps) {
   if (items.length === 0) return null;
 
+  const columns = getAssetColumns({ updatingId, onToggleStatus, onEdit });
+
   return (
     <div className="mb-4">
       <div className="flex items-center gap-2 mb-2">
@@ -26,19 +30,15 @@ export function ForcedSection({ items, updatingId, onToggleStatus, onEdit }: For
         <span className="text-xs text-red-400">{items.length}건</span>
       </div>
       <div className="bg-white rounded-lg border-2 border-red-200 overflow-hidden">
-        <table className="w-full text-sm">
-          <tbody className="divide-y divide-red-100">
-            {items.map(item => (
-              <AssetRow
-                key={item.id}
-                item={item}
-                updatingId={updatingId}
-                onToggleStatus={onToggleStatus}
-                onEdit={onEdit}
-              />
-            ))}
-          </tbody>
-        </table>
+        <BaseTable<StoreAssetItem>
+          columns={columns}
+          data={items}
+          rowKey={(item) => item.id}
+          rowClassName={assetRowClassName}
+          headerClassName="bg-red-50"
+          bodyClassName="bg-white divide-y divide-red-100"
+          thClassName="px-4 py-2 text-xs font-medium text-red-600 uppercase tracking-wider"
+        />
       </div>
     </div>
   );

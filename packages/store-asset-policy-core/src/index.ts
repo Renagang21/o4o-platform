@@ -49,9 +49,6 @@ export type { StoreAssetsPanelProps } from './components/StoreAssetsPanel';
 export { ForcedSection } from './components/ForcedSection';
 export type { ForcedSectionProps } from './components/ForcedSection';
 
-export { AssetRow } from './components/AssetRow';
-export type { AssetRowProps } from './components/AssetRow';
-
 export { SnapshotTypeBadge } from './components/SnapshotTypeBadge';
 export { LifecycleStatusPill } from './components/LifecycleStatusPill';
 
