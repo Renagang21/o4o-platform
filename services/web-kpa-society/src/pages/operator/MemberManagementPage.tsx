@@ -87,7 +87,9 @@ interface KpaMember {
   created_at: string;
   updated_at: string;
   service_key?: string;
-  user?: { name?: string; email?: string };
+  // WO-O4O-KPA-MEMBER-CAPABILITY-NICKNAME-UI-CANONICAL-CLEANUP-V1:
+  //   nickname canonical = users.nickname. backend GET /kpa/members user 객체에 추가.
+  user?: { name?: string; email?: string; nickname?: string | null };
   organization?: { name?: string };
 }
 
@@ -123,23 +125,25 @@ interface ApplicationStats {
 // WO-O4O-KPA-MEMBER-PROFILE-CAPABILITY-COLUMN-ADD-V1:
 //   role_assignments role 키 → 사용자 표시 라벨.
 //   알려진 키만 매핑하고, 미매핑 키는 raw 값으로 안전하게 표시.
+// WO-O4O-KPA-MEMBER-CAPABILITY-NICKNAME-UI-CANONICAL-CLEANUP-V1:
+//   `kpa:pharmacist` 매핑 제거 — 마이그레이션 20260326300000 으로 soft-deactivate 된 deprecated role.
+//   '약사' 는 `유형` 컬럼(membership_type) 에서만 표현한다. capability column 의 의미는
+//   `RBAC 추가 권한` (운영자/관리자/매장 운영/강사/플랫폼 관리자 등) 전용.
 const CAPABILITY_LABELS: Record<string, string> = {
   'kpa:store_owner': '매장 운영',
   'kpa:operator': '운영자',
   'kpa:admin': '관리자',
-  'kpa:pharmacist': '약사',
   'lms:instructor': '강사',
   'platform:super_admin': '플랫폼 관리자',
 };
 
-/** capability chip 정렬: store_owner → operator → admin → 그 외 */
+/** capability chip 정렬: super_admin → admin → operator → store_owner → instructor → 그 외 */
 const CAPABILITY_PRIORITY: Record<string, number> = {
   'platform:super_admin': 0,
   'kpa:admin': 1,
   'kpa:operator': 2,
   'kpa:store_owner': 3,
   'lms:instructor': 4,
-  'kpa:pharmacist': 5,
 };
 
 function sortCapabilities(caps: string[]): string[] {
@@ -315,6 +319,7 @@ export default function MemberManagementPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState<{
     name: string;
+    nickname: string;
     membership_type: string;
     activity_type: string;
     license_number: string;
@@ -325,6 +330,7 @@ export default function MemberManagementPage() {
     status: MemberStatus;
   }>({
     name: '',
+    nickname: '',
     membership_type: 'pharmacist',
     activity_type: '',
     license_number: '',
@@ -438,6 +444,7 @@ export default function MemberManagementPage() {
     setSelectedMember(m);
     setEditForm({
       name: m.user?.name || '',
+      nickname: m.user?.nickname || '',
       membership_type: m.membership_type || 'pharmacist',
       activity_type: m.activity_type || '',
       license_number: m.license_number || '',
@@ -462,6 +469,7 @@ export default function MemberManagementPage() {
     }
     setEditForm({
       name: selectedMember.user?.name || '',
+      nickname: selectedMember.user?.nickname || '',
       membership_type: selectedMember.membership_type || 'pharmacist',
       activity_type: selectedMember.activity_type || '',
       license_number: selectedMember.license_number || '',
@@ -496,6 +504,11 @@ export default function MemberManagementPage() {
       const currentName = (selectedMember.user?.name || '').trim();
       const newName = editForm.name.trim();
       const nameChanged = newName !== currentName;
+      // WO-O4O-KPA-MEMBER-CAPABILITY-NICKNAME-UI-CANONICAL-CLEANUP-V1:
+      //   nickname trim 비교. 빈 문자열로 비우면 backend 가 NULL 로 저장.
+      const currentNickname = (selectedMember.user?.nickname || '').trim();
+      const newNickname = editForm.nickname.trim();
+      const nicknameChanged = newNickname !== currentNickname;
       const typeChanged = editForm.membership_type !== (selectedMember.membership_type || '');
       const activityChanged = editForm.activity_type !== (selectedMember.activity_type || '');
       const licenseChanged = editForm.license_number !== (selectedMember.license_number || '');
@@ -507,7 +520,7 @@ export default function MemberManagementPage() {
       const statusChanged = editForm.status !== selectedMember.status;
 
       if (
-        !nameChanged && !typeChanged && !activityChanged && !licenseChanged
+        !nameChanged && !nicknameChanged && !typeChanged && !activityChanged && !licenseChanged
         && !pharmacyNameChanged && !pharmacyAddressChanged
         && !businessNumberChanged && !pharmacyPhoneChanged && !statusChanged
       ) {
@@ -519,12 +532,14 @@ export default function MemberManagementPage() {
       //    backend PATCH /:id/info 가 activity_type 변경 시 store_owner 부여/회수 자동 동기화 +
       //    warnings[] 응답 가능. status 가 마지막 (MembershipApprovalService 흐름에 영향).
       if (
-        nameChanged || typeChanged || activityChanged || licenseChanged
+        nameChanged || nicknameChanged || typeChanged || activityChanged || licenseChanged
         || pharmacyNameChanged || pharmacyAddressChanged
         || businessNumberChanged || pharmacyPhoneChanged
       ) {
         const payload: Record<string, string> = {};
         if (nameChanged) payload.name = newName;
+        // WO-O4O-KPA-MEMBER-CAPABILITY-NICKNAME-UI-CANONICAL-CLEANUP-V1: nickname write
+        if (nicknameChanged) payload.nickname = newNickname;
         if (typeChanged) payload.membership_type = editForm.membership_type;
         if (activityChanged) payload.activity_type = editForm.activity_type;
         if (licenseChanged) payload.license_number = editForm.license_number;
@@ -700,13 +715,20 @@ export default function MemberManagementPage() {
       key: 'name',
       header: '이름',
       sortable: true,
-      width: '150px',
+      width: '170px',
       render: (_v, m) => (
+        // WO-O4O-KPA-MEMBER-CAPABILITY-NICKNAME-UI-CANONICAL-CLEANUP-V1:
+        //   이름 아래에 nickname 보조 표시 (users.nickname). 닉네임 없으면 줄 자체 생략.
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center text-sm font-medium text-slate-600 shrink-0">
             {(m.user?.name || '-').charAt(0)}
           </div>
-          <span className="font-medium text-slate-800 text-sm">{m.user?.name || '-'}</span>
+          <div className="flex flex-col min-w-0">
+            <span className="font-medium text-slate-800 text-sm truncate">{m.user?.name || '-'}</span>
+            {m.user?.nickname && (
+              <span className="text-[11px] text-slate-500 truncate" title="닉네임">@{m.user.nickname}</span>
+            )}
+          </div>
         </div>
       ),
       sortAccessor: (m) => m.user?.name || '',
@@ -765,14 +787,18 @@ export default function MemberManagementPage() {
 
     // WO-O4O-KPA-MEMBER-PROFILE-CAPABILITY-COLUMN-ADD-V1:
     //   capabilities = role_assignments active roles (RBAC SSOT) — 승인 절차로만 부여/회수
+    // WO-O4O-KPA-MEMBER-CAPABILITY-NICKNAME-UI-CANONICAL-CLEANUP-V1:
+    //   컬럼명 '권한' → '추가 권한'. 약사/약대생은 `유형` 컬럼에서 표현하고,
+    //   본 컬럼은 RBAC 추가 권한(운영자/관리자/매장 운영 등) 전용으로 의미를 정리.
+    //   capabilities 비어있을 때 '일반 회원' 라벨 제거 — '—' 으로 단순 placeholder.
     {
       key: 'capabilities',
-      header: '권한',
+      header: '추가 권한',
       width: '180px',
       render: (_v, m) => {
         const caps = sortCapabilities(m.capabilities ?? []);
         if (caps.length === 0) {
-          return <span className="text-xs text-slate-400">일반 회원</span>;
+          return <span className="text-xs text-slate-300">—</span>;
         }
         return (
           <div className="flex flex-wrap gap-1">
@@ -1171,12 +1197,36 @@ export default function MemberManagementPage() {
                     <p style={{ fontSize: 13, color: '#64748b' }} title="이메일은 수정할 수 없습니다">
                       {selectedMember.user?.email || '-'}
                     </p>
+                    {/* WO-O4O-KPA-MEMBER-CAPABILITY-NICKNAME-UI-CANONICAL-CLEANUP-V1:
+                        보기 모드에서 닉네임이 있을 때만 이메일 아래 보조 표시. */}
+                    {!isEditing && selectedMember.user?.nickname && (
+                      <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }} title="닉네임 (users.nickname)">
+                        @{selectedMember.user.nickname}
+                      </p>
+                    )}
                   </div>
                   <div style={{ marginLeft: 'auto' }}>
                     <StatusBadge status={selectedMember.status} />
                   </div>
                 </div>
               </div>
+
+              {/* WO-O4O-KPA-MEMBER-CAPABILITY-NICKNAME-UI-CANONICAL-CLEANUP-V1:
+                  닉네임 편집 행 — 수정 모드에서만 노출. 보기 모드는 기본정보 블록 안에 보조 표시. */}
+              {isEditing && (
+                <div style={fieldRowStyle}>
+                  <span style={labelStyle}>닉네임</span>
+                  <input
+                    type="text"
+                    value={editForm.nickname}
+                    onChange={(e) => setEditForm((f) => ({ ...f, nickname: e.target.value }))}
+                    placeholder="닉네임 (선택 — 비우면 해제)"
+                    maxLength={50}
+                    disabled={savingEdit}
+                    style={inputStyle}
+                  />
+                </div>
+              )}
 
               {/* 상세 필드 */}
               {/* 유형 */}
@@ -1313,7 +1363,9 @@ export default function MemberManagementPage() {
                 )}
               </div>
 
-              {/* 현재 매장 운영 권한 — 표시 전용 (capability 보유 여부) */}
+              {/* 현재 매장 운영 권한 — 표시 전용 (capability 보유 여부).
+                  WO-O4O-KPA-MEMBER-CAPABILITY-NICKNAME-UI-CANONICAL-CLEANUP-V1:
+                  '없음' → 'store_owner 미보유' — capability 미보유 사실을 기술적으로 명확히 표기. */}
               <div style={fieldRowStyle}>
                 <span style={labelStyle}>매장 권한</span>
                 <span style={valueStyle}>
@@ -1322,7 +1374,7 @@ export default function MemberManagementPage() {
                       store_owner 보유
                     </span>
                   ) : (
-                    <span style={{ fontSize: 12, color: '#94a3b8' }}>없음</span>
+                    <span style={{ fontSize: 12, color: '#94a3b8' }}>store_owner 미보유</span>
                   )}
                 </span>
               </div>
@@ -1448,13 +1500,15 @@ export default function MemberManagementPage() {
                 <span style={valueStyle}>{formatDate(selectedMember.joined_at || selectedMember.created_at)}</span>
               </div>
 
-              {/* 권한 (capability chips) — 항상 표시 전용 */}
+              {/* 추가 권한 (capability chips) — 항상 표시 전용.
+                  WO-O4O-KPA-MEMBER-CAPABILITY-NICKNAME-UI-CANONICAL-CLEANUP-V1:
+                  label '권한' → '추가 권한'. capabilities 빈 배열일 때 '일반 회원' → '—'. */}
               <div style={{ display: 'flex', gap: 12, marginBottom: 10, alignItems: 'flex-start' }}>
-                <span style={labelStyle}>권한</span>
+                <span style={labelStyle}>추가 권한</span>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                   {(() => {
                     const caps = sortCapabilities(selectedMember.capabilities ?? []);
-                    if (caps.length === 0) return <span style={{ color: '#94a3b8', fontSize: 13 }}>일반 회원</span>;
+                    if (caps.length === 0) return <span style={{ color: '#cbd5e1', fontSize: 13 }}>—</span>;
                     return caps.map((cap) => (
                       <span
                         key={cap}

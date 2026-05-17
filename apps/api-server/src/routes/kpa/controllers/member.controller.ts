@@ -267,7 +267,9 @@ export function createMemberController(
           params.push(organization_id);
         }
         if (search) {
-          conditions.push(`(u.name ILIKE $${paramIdx} OR u.email ILIKE $${paramIdx})`);
+          // WO-O4O-KPA-MEMBER-CAPABILITY-NICKNAME-UI-CANONICAL-CLEANUP-V1:
+          //   nickname 검색 추가 — operator 가 닉네임으로도 회원을 찾을 수 있도록.
+          conditions.push(`(u.name ILIKE $${paramIdx} OR u.email ILIKE $${paramIdx} OR u.nickname ILIKE $${paramIdx})`);
           params.push(`%${search}%`);
           paramIdx++;
         }
@@ -314,6 +316,7 @@ export function createMemberController(
                km.updated_at AS km_updated_at,
                u.name       AS user_name,
                u.email      AS user_email,
+               u.nickname   AS user_nickname,
                u."businessInfo" AS user_business_info
              ${baseFrom}
              ORDER BY sm.created_at DESC
@@ -373,6 +376,7 @@ export function createMemberController(
             user: {
               name: r.user_name ?? null,
               email: r.user_email ?? null,
+              nickname: r.user_nickname ?? null,
             },
           };
         });
@@ -917,6 +921,8 @@ export function createMemberController(
     ]),
     body('business_number').optional().isString().isLength({ max: 50 }),
     body('pharmacy_phone').optional().isString().isLength({ max: 50 }),
+    // WO-O4O-KPA-MEMBER-CAPABILITY-NICKNAME-UI-CANONICAL-CLEANUP-V1: nickname 수정 허용
+    body('nickname').optional({ nullable: true }).isString().isLength({ max: 50 }),
     handleValidationErrors,
     async (req: Request, res: Response): Promise<void> => {
       try {
@@ -983,7 +989,7 @@ export function createMemberController(
 
         const {
           name, membership_type, license_number, pharmacy_name, pharmacy_address,
-          activity_type, business_number, pharmacy_phone,
+          activity_type, business_number, pharmacy_phone, nickname,
         } = req.body;
         const changes: Record<string, any> = {};
         const warnings: string[] = [];
@@ -1021,6 +1027,17 @@ export function createMemberController(
         if (name && typeof name === 'string' && name.trim()) {
           changes.name = name.trim();
           await dataSource.query(`UPDATE users SET name = $1, updated_at = NOW() WHERE id = $2`, [name.trim(), member.user_id]);
+        }
+
+        // WO-O4O-KPA-MEMBER-CAPABILITY-NICKNAME-UI-CANONICAL-CLEANUP-V1:
+        //   users.nickname canonical write. '' 입력은 NULL 로 저장 (닉네임 해제).
+        if (nickname !== undefined) {
+          const next = typeof nickname === 'string' && nickname.trim() ? nickname.trim() : null;
+          changes.nickname = next;
+          await dataSource.query(
+            `UPDATE users SET nickname = $1, "updatedAt" = NOW() WHERE id = $2`,
+            [next, member.user_id]
+          );
         }
 
         // ─── WO-O4O-KPA-OPERATOR-MEMBER-CANONICAL-EDIT-COMPLETE-V1 ───
