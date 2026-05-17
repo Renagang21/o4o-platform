@@ -677,9 +677,12 @@ export class MembershipApprovalService {
       }
 
       // STEP4: organization_members — service-scoped 정리
-      // Policy: role='member' → 제거 (KPA org scope만)
-      //         owner/admin/operator → 유지 + AUDIT warning
-      // Store ownership 자동 이전 금지. Orphan resolution 금지.
+      // Policy (WO-O4O-KPA-ACTIVITY-TYPE-SSOT-ROLE-CANONICAL-ALIGN-V1 Phase 4):
+      //   role='member' → 제거 (KPA org scope)
+      //   role='owner'  → soft-cleanup (left_at=NOW) — store_owner role 과 정렬, orphan drift 방지
+      //   role IN ('admin', 'operator') → 유지 + AUDIT warning (delegated role, manual review)
+      // 다른 사용자의 owner row 는 절대 수정하지 않음. Store ownership 자동 이전 금지.
+      // Soft pattern 만 사용 (DESTRUCTIVE DELETE 금지 — owner 는 historical 보존).
       if (hasKpaSociety) {
         logger.info('[WITHDRAW][STEP4] organization_members cleanup (KPA scope)', { userId });
 
@@ -699,18 +702,36 @@ export class MembershipApprovalService {
             [userId, kpaOrgId]
           );
 
-          // Non-member (owner/admin/operator): 유지, AUDIT 로그
-          const nonMemberRows = await queryRunner.query(
+          // owner: soft-cleanup (left_at=NOW) — kpa:store_owner role 비활성과 정렬
+          const ownerCleanupRows = await queryRunner.query(
+            `UPDATE organization_members
+             SET left_at = NOW(), updated_at = NOW()
+             WHERE user_id = $1 AND organization_id = $2 AND role = 'owner' AND left_at IS NULL
+             RETURNING id`,
+            [userId, kpaOrgId]
+          );
+          const ownerSoftCleanupCount = ownerCleanupRows?.length ?? 0;
+          if (ownerSoftCleanupCount > 0) {
+            logger.info('[WITHDRAW][STEP4] owner role soft-cleanup applied', {
+              userId,
+              organizationId: kpaOrgId,
+              count: ownerSoftCleanupCount,
+              withdrawnBy,
+            });
+          }
+
+          // admin/operator: 유지 + AUDIT 로그 (위임 권한 — manual review)
+          const delegatedRows = await queryRunner.query(
             `SELECT id, role FROM organization_members
-             WHERE user_id = $1 AND organization_id = $2 AND role != 'member'`,
+             WHERE user_id = $1 AND organization_id = $2 AND role IN ('admin', 'operator') AND left_at IS NULL`,
             [userId, kpaOrgId]
           );
 
-          if (nonMemberRows.length > 0) {
-            logger.warn('[WITHDRAW][STEP4] Non-member org roles retained — manual review required', {
+          if (delegatedRows.length > 0) {
+            logger.warn('[WITHDRAW][STEP4] Delegated org roles retained — manual review required', {
               userId,
               organizationId: kpaOrgId,
-              roles: nonMemberRows.map((r: any) => r.role),
+              roles: delegatedRows.map((r: any) => r.role),
               withdrawnBy,
             });
           }
