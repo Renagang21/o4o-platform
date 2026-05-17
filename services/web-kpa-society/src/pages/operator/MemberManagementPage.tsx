@@ -72,11 +72,16 @@ interface KpaMember {
   capabilities?: string[];             // role_assignments active roles (capability SSOT)
   // WO-O4O-KPA-REGISTER-MODAL-ACTIVITY-AND-PHARMACY-OWNER-INTEGRATION-V1:
   //   개설약사 가입 시 users.businessInfo 에 저장된 사업자 정보 일부.
+  // WO-O4O-KPA-OPERATOR-MEMBER-LIST-BUSINESSINFO-TYPE-CANONICAL-ALIGN-V1:
+  //   canonical key (ceoName / taxInvoiceEmail) 추가. backend 응답이 canonical 로 전환됨
+  //   (member.controller.ts business_info 정규화). legacy key 는 fallback 호환 목적 유지.
   business_info?: {
     businessNumber: string | null;
     businessName: string | null;
-    representativeName: string | null;
-    taxEmail: string | null;
+    ceoName?: string | null;
+    taxInvoiceEmail?: string | null;
+    representativeName?: string | null;
+    taxEmail?: string | null;
   } | null;
   joined_at: string | null;
   created_at: string;
@@ -1418,16 +1423,22 @@ export default function MemberManagementPage() {
                   <span style={valueStyle}>{selectedMember.business_info.businessNumber}</span>
                 </div>
               )}
-              {selectedMember.business_info?.representativeName && (
+              {/* WO-O4O-KPA-OPERATOR-MEMBER-LIST-BUSINESSINFO-TYPE-CANONICAL-ALIGN-V1:
+                  canonical (ceoName / taxInvoiceEmail) 우선, legacy (representativeName / taxEmail) fallback. */}
+              {(selectedMember.business_info?.ceoName || selectedMember.business_info?.representativeName) && (
                 <div style={fieldRowStyle}>
                   <span style={labelStyle}>대표자명</span>
-                  <span style={valueStyle}>{selectedMember.business_info.representativeName}</span>
+                  <span style={valueStyle}>
+                    {selectedMember.business_info.ceoName || selectedMember.business_info.representativeName}
+                  </span>
                 </div>
               )}
-              {selectedMember.business_info?.taxEmail && (
+              {(selectedMember.business_info?.taxInvoiceEmail || selectedMember.business_info?.taxEmail) && (
                 <div style={fieldRowStyle}>
                   <span style={labelStyle}>세금계산서 이메일</span>
-                  <span style={valueStyle}>{selectedMember.business_info.taxEmail}</span>
+                  <span style={valueStyle}>
+                    {selectedMember.business_info.taxInvoiceEmail || selectedMember.business_info.taxEmail}
+                  </span>
                 </div>
               )}
 
