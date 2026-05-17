@@ -58,8 +58,8 @@ export function createMypageController(
       return;
     }
 
-    const { name, lastName, firstName, phone, university, workplace } = req.body;
-    const data = await service.updateProfile(user.id, { name, lastName, firstName, phone, university, workplace }, user);
+    const { name, lastName, firstName, nickname, phone, university, workplace } = req.body;
+    const data = await service.updateProfile(user.id, { name, lastName, firstName, nickname, phone, university, workplace }, user);
 
     res.json({
       success: true,
