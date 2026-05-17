@@ -145,12 +145,77 @@ export function createUserDebugRouter(dataSource: DataSource): Router {
         [user.id],
       );
 
-      // 4. Summary
+      // 4. KPA activation chain — pharmacy_owner auto-activation 진단용 (read-only)
+      //   member.controller.ts:555-619 의 trigger 조건:
+      //     oldStatus=pending → newStatus=active + kpa_members.activity_type='pharmacy_owner'
+      //     + users.businessInfo.businessNumber + (businessName OR pharmacy_name)
+      //   → ensureOrganization(code=kpa-pharm-{bizno}) + organization_members(owner) + role_assignments(kpa:store_owner)
+      const kpaMembers = await dataSource.query(
+        `SELECT * FROM kpa_members WHERE user_id = $1`,
+        [user.id],
+      );
+      const pharmacistProfile = await dataSource.query(
+        `SELECT * FROM kpa_pharmacist_profiles WHERE user_id = $1`,
+        [user.id],
+      );
+      const orgMembers = await dataSource.query(
+        `SELECT om.*, o.name AS organization_name, o.code AS organization_code, o.type AS organization_type
+         FROM organization_members om
+         LEFT JOIN organizations o ON o.id = om.organization_id
+         WHERE om.user_id = $1
+         ORDER BY om.created_at DESC`,
+        [user.id],
+      );
+      // businessNumber 에서 digits 만 추출하여 expected org code 로 lookup
+      const biz = (user.businessInfo && typeof user.businessInfo === 'object')
+        ? (user.businessInfo as Record<string, any>)
+        : {};
+      const rawBizNum: string = typeof biz.businessNumber === 'string' ? biz.businessNumber : '';
+      const bizNumDigits = rawBizNum.replace(/[^0-9]/g, '');
+      const expectedOrgCode = bizNumDigits.length > 0 ? `kpa-pharm-${bizNumDigits}` : null;
+      const expectedOrg = expectedOrgCode
+        ? await dataSource.query(
+            `SELECT id, code, name, type, "isActive", "createdAt" FROM organizations WHERE code = $1 LIMIT 1`,
+            [expectedOrgCode],
+          )
+        : [];
+
+      // 5. Summary
       const activeRoles = roles.filter((r: any) => r.is_active).map((r: any) => r.role);
       const hasPending = memberships.some((m: any) => m.status === 'pending');
 
-      // 5. Raw JSON (복사용)
-      const rawJson = JSON.stringify({ user, memberships, roles }, null, 2);
+      // Activation chain 진단
+      const kpaMember = kpaMembers[0] || null;
+      const profile = pharmacistProfile[0] || null;
+      const kmActivityType: string | null = kpaMember?.activity_type || null;
+      const ppActivityType: string | null = profile?.activity_type || null;
+      const hasStoreOwnerRole = activeRoles.includes('kpa:store_owner');
+      const orgMemberOwner = orgMembers.find((om: any) => om.role === 'owner') || null;
+      const expectedOrgRow = expectedOrg[0] || null;
+      const activationChain = {
+        step1_users_businessInfo_businessNumber: bizNumDigits || '(empty)',
+        step1_users_businessInfo_businessName: typeof biz.businessName === 'string' ? biz.businessName : '(empty)',
+        step2_kpa_members_activity_type: kmActivityType || '(null)',
+        step2_kpa_pharmacist_profiles_activity_type: ppActivityType || '(null)',
+        step3_expected_org_code: expectedOrgCode || '(no bizno)',
+        step3_expected_org_exists: !!expectedOrgRow,
+        step3_expected_org_id: expectedOrgRow?.id || null,
+        step4_organization_members_owner_row: !!orgMemberOwner,
+        step4_organization_members_owner_org_id: orgMemberOwner?.organization_id || null,
+        step5_role_assignment_kpa_store_owner: hasStoreOwnerRole,
+      };
+
+      // 6. Raw JSON (복사용)
+      const rawJson = JSON.stringify({
+        user,
+        memberships,
+        roles,
+        kpa_members: kpaMembers,
+        kpa_pharmacist_profiles: pharmacistProfile,
+        organization_members: orgMembers,
+        expected_organization: expectedOrgRow,
+        activation_chain_diagnosis: activationChain,
+      }, null, 2);
 
       // 6. HTML 렌더링
       const body = `
@@ -187,6 +252,33 @@ export function createUserDebugRouter(dataSource: DataSource): Router {
 
         <h2>Role Assignments (${roles.length})</h2>
         <div class="card">${tableHtml(roles, ['is_active'])}</div>
+
+        <h2>KPA Pharmacy Owner Activation Chain</h2>
+        <div class="card">
+          <table>
+            <tr><th>Step</th><th>Field</th><th>Value</th></tr>
+            <tr><td>1</td><td>users.businessInfo.businessNumber (digits)</td><td>${esc(activationChain.step1_users_businessInfo_businessNumber)}</td></tr>
+            <tr><td>1</td><td>users.businessInfo.businessName</td><td>${esc(activationChain.step1_users_businessInfo_businessName)}</td></tr>
+            <tr><td>2</td><td>kpa_members.activity_type</td><td class="${kmActivityType === 'pharmacy_owner' ? 'ok' : 'warn'}">${esc(activationChain.step2_kpa_members_activity_type)}</td></tr>
+            <tr><td>2</td><td>kpa_pharmacist_profiles.activity_type</td><td class="${ppActivityType === 'pharmacy_owner' ? 'ok' : 'warn'}">${esc(activationChain.step2_kpa_pharmacist_profiles_activity_type)}</td></tr>
+            <tr><td>3</td><td>expected org code</td><td>${esc(activationChain.step3_expected_org_code)}</td></tr>
+            <tr><td>3</td><td>organizations row exists</td><td class="${activationChain.step3_expected_org_exists ? 'ok' : 'err'}">${activationChain.step3_expected_org_exists}</td></tr>
+            <tr><td>4</td><td>organization_members(role=owner)</td><td class="${activationChain.step4_organization_members_owner_row ? 'ok' : 'err'}">${activationChain.step4_organization_members_owner_row}</td></tr>
+            <tr><td>5</td><td>role_assignments(kpa:store_owner)</td><td class="${activationChain.step5_role_assignment_kpa_store_owner ? 'ok' : 'err'}">${activationChain.step5_role_assignment_kpa_store_owner}</td></tr>
+          </table>
+        </div>
+
+        <h2>kpa_members (${kpaMembers.length})</h2>
+        <div class="card">${tableHtml(kpaMembers)}</div>
+
+        <h2>kpa_pharmacist_profiles (${pharmacistProfile.length})</h2>
+        <div class="card">${tableHtml(pharmacistProfile)}</div>
+
+        <h2>organization_members (${orgMembers.length})</h2>
+        <div class="card">${tableHtml(orgMembers)}</div>
+
+        <h2>expected organization (code=${esc(expectedOrgCode || 'n/a')})</h2>
+        <div class="card">${expectedOrgRow ? tableHtml([expectedOrgRow]) : '<p class="warn">존재하지 않음</p>'}</div>
 
         <h2>Raw JSON (복사용)</h2>
         <div class="card"><pre>${esc(rawJson)}</pre></div>
