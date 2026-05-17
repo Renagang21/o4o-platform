@@ -404,11 +404,31 @@ export class MembershipApprovalService {
         }
       }
 
+      // STEP2.5: WO-O4O-KPA-STORE-OWNER-ROLE-LIFECYCLE-FIX-V1
+      //   service_memberships.role (member/operator/admin) 만으로는 kpa:store_owner 같은
+      //   capability role 이 회수되지 않는다. kpa:store_owner 는 service_memberships 와 별개의
+      //   role_assignments 단독 row 이기 때문 (IR-O4O-KPA-STORE-PERMISSION-ADDRESS-DRIFT-AUDIT-V1 §3-2 F1).
+      //   kpa-society membership 이 정지/거부될 때 kpa:store_owner 도 명시적으로 deactivate.
+      //   다른 서비스(glycopharm/cosmetics)의 store_owner 는 본 단계에서 손대지 않음 — 각 서비스
+      //   정지 흐름이 자체적으로 처리해야 함.
+      const hasKpaSocietyMembership = selectResult.some((m: any) => m.service_key === 'kpa-society');
+      if (hasKpaSocietyMembership) {
+        logger.info('[SUSPEND][STEP2.5] kpa:store_owner DEACTIVATE', { userId });
+        const storeOwnerRows = await queryRunner.query(
+          `UPDATE role_assignments SET is_active = false, updated_at = NOW()
+           WHERE user_id = $1 AND role = $2 AND is_active = true
+           RETURNING id`,
+          [userId, 'kpa:store_owner']
+        );
+        if ((storeOwnerRows?.length ?? 0) > 0) {
+          deactivatedRoles.push('kpa:store_owner');
+        }
+      }
+
       // STEP3: WO-O4O-KPA-MEMBERSHIP-STATUS-SYNC-V1 — kpa_members projection sync
       //   service_key='kpa-society' 인 membership 이 포함된 경우에만 kpa_members.status='suspended'.
       //   status='active' 인 row 만 update (이미 다른 상태이면 덮어쓰지 않음).
       //   identity_status 컬럼은 별도 의미(KpaIdentityStatus)이므로 손대지 않음.
-      const hasKpaSocietyMembership = selectResult.some((m: any) => m.service_key === 'kpa-society');
       if (hasKpaSocietyMembership) {
         logger.info('[SUSPEND][STEP3] kpa_members projection sync', { userId });
         await queryRunner.query(
@@ -530,10 +550,37 @@ export class MembershipApprovalService {
         reactivatedRoles.push(memberRole);
       }
 
+      // STEP3.5: WO-O4O-KPA-STORE-OWNER-ROLE-LIFECYCLE-FIX-V1
+      //   suspendMembership STEP2.5 에서 kpa:store_owner 를 deactivate 했으므로, 재활성화 시에도
+      //   동일 정책으로 복원. 단:
+      //     (a) activity_type='pharmacy_owner' (SSOT = kpa_pharmacist_profiles) 인 경우만
+      //     (b) deactivated row 가 존재할 때만 in-place 활성화 (UPDATE only — INSERT 없음)
+      //   부여 자체는 별도 트리거 (PATCH /:id/status pending→active 자동활성화,
+      //   PATCH /:id/info activity_type 전환) 가 담당. 본 단계는 "정지 직전 상태 복귀" 만 수행.
+      const hasKpaSocietyMembership = selectResult.some((m: any) => m.service_key === 'kpa-society');
+      if (hasKpaSocietyMembership) {
+        const profileRows = await queryRunner.query(
+          `SELECT activity_type FROM kpa_pharmacist_profiles WHERE user_id = $1 LIMIT 1`,
+          [userId]
+        );
+        const isPharmacyOwner = profileRows?.[0]?.activity_type === 'pharmacy_owner';
+        if (isPharmacyOwner) {
+          logger.info('[REACTIVATE][STEP3.5] kpa:store_owner RESTORE candidate', { userId });
+          const restoredRows = await queryRunner.query(
+            `UPDATE role_assignments SET is_active = true, updated_at = NOW()
+             WHERE user_id = $1 AND role = $2 AND is_active = false
+             RETURNING id`,
+            [userId, 'kpa:store_owner']
+          );
+          if ((restoredRows?.length ?? 0) > 0) {
+            reactivatedRoles.push('kpa:store_owner');
+          }
+        }
+      }
+
       // STEP4: WO-O4O-KPA-MEMBERSHIP-STATUS-SYNC-V1 — kpa_members projection sync
       //   service_key='kpa-society' 인 membership 이 포함된 경우에만 kpa_members.status='active'.
       //   status='suspended' 인 row 만 update (다른 상태는 덮어쓰지 않음).
-      const hasKpaSocietyMembership = selectResult.some((m: any) => m.service_key === 'kpa-society');
       if (hasKpaSocietyMembership) {
         logger.info('[REACTIVATE][STEP4] kpa_members projection sync', { userId });
         await queryRunner.query(
