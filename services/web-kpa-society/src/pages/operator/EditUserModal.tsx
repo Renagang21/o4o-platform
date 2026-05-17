@@ -29,6 +29,13 @@ export interface BusinessInfoData {
   address?: string;
   address2?: string;
   zipCode?: string;
+  // WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1: canonical fields
+  ceoName?: string;
+  taxInvoiceEmail?: string;
+  managerPhone?: string;
+  // legacy fallback fields (read only — 새 저장 금지)
+  representativeName?: string;
+  taxEmail?: string;
 }
 
 // ─── API Helper ──────────────────────────────────────────────
@@ -77,7 +84,10 @@ export default function EditUserModal({ userId, onClose, onSuccess }: { userId: 
     phone: '',
     businessName: '',
     businessNumber: '',
-    taxEmail: '',
+    // WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1: canonical key (ceoName / taxInvoiceEmail / managerPhone)
+    ceoName: '',
+    taxInvoiceEmail: '',
+    managerPhone: '',
     businessType: '',
     businessCategory: '',
     zipCode: '',
@@ -101,7 +111,15 @@ export default function EditUserModal({ userId, onClose, onSuccess }: { userId: 
         setCurrentRole(adminRole);
         setSelectedRole(adminRole);
         const biz: BusinessInfoData = u.businessInfo || {};
-        const hasBiz = !!(biz.businessName || u.company);
+        // WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1:
+        //   pharmacy_owner activity_type 기반 표시 (multi-role 대응, kpa_members row 누락 graceful fallback).
+        const kpaMembershipRow = (data.memberships || []).find((m: any) => m.serviceKey === 'kpa-society');
+        const activityType = (kpaMembershipRow as any)?.activityType
+          || (data as any).activityType
+          || u.activityType
+          || '';
+        const isPharmacyOwner = activityType === 'pharmacy_owner';
+        const hasBiz = isPharmacyOwner || !!(biz.businessName || u.company);
         setHasBusinessInfo(hasBiz);
         setForm({
           lastName: u.lastName || '',
@@ -110,7 +128,10 @@ export default function EditUserModal({ userId, onClose, onSuccess }: { userId: 
           phone: u.phone || '',
           businessName: biz.businessName || u.company || '',
           businessNumber: biz.businessNumber || '',
-          taxEmail: biz.email || '',
+          // canonical read with legacy fallback (ceoName ?? representativeName, taxInvoiceEmail ?? taxEmail ?? email)
+          ceoName: biz.ceoName || biz.representativeName || '',
+          taxInvoiceEmail: biz.taxInvoiceEmail || biz.taxEmail || biz.email || '',
+          managerPhone: biz.managerPhone || '',
           businessType: biz.businessType || '',
           businessCategory: biz.businessCategory || '',
           zipCode: biz.zipCode || '',
@@ -127,7 +148,7 @@ export default function EditUserModal({ userId, onClose, onSuccess }: { userId: 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    const numericFields = ['phone', 'businessNumber'];
+    const numericFields = ['phone', 'businessNumber', 'managerPhone'];
     setForm(prev => ({
       ...prev,
       [name]: numericFields.includes(name) ? value.replace(/\D/g, '') : value,
@@ -147,9 +168,12 @@ export default function EditUserModal({ userId, onClose, onSuccess }: { userId: 
         phone: form.phone,
       };
       if (hasBusinessInfo) {
+        // WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1: canonical key 만 전송 (representativeName/taxEmail 재저장 금지).
         payload.businessName = form.businessName;
         payload.businessNumber = form.businessNumber;
-        payload.taxEmail = form.taxEmail;
+        payload.ceoName = form.ceoName;
+        payload.taxInvoiceEmail = form.taxInvoiceEmail;
+        payload.managerPhone = form.managerPhone;
         payload.businessType = form.businessType;
         payload.businessCategory = form.businessCategory;
         payload.zipCode = form.zipCode;
@@ -286,13 +310,25 @@ export default function EditUserModal({ userId, onClose, onSuccess }: { userId: 
                       maxLength={10} placeholder="숫자만 입력" />
                   </div>
                   <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">대표자명</label>
+                    <input type="text" name="ceoName" value={form.ceoName} onChange={handleChange}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      placeholder="사업자등록증 대표자명" maxLength={50} />
+                  </div>
+                  <div>
                     <label className="block text-xs font-medium text-slate-600 mb-1">세금계산서 이메일</label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                      <input type="email" name="taxEmail" value={form.taxEmail} onChange={handleChange}
+                      <input type="email" name="taxInvoiceEmail" value={form.taxInvoiceEmail} onChange={handleChange}
                         className="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                         placeholder="tax@pharmacy.com" />
                     </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">담당자 전화</label>
+                    <input type="tel" name="managerPhone" inputMode="numeric" value={form.managerPhone} onChange={handleChange}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      maxLength={11} placeholder="숫자만 입력" />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>

@@ -17,6 +17,7 @@
 
 import { useState, useEffect } from 'react';
 import { X, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
+import { AddressSearch } from '@o4o/ui';
 import { useAuthModal } from '../contexts/AuthModalContext';
 
 type MemberType = 'pharmacist_member' | 'pharmacy_student_member';
@@ -107,10 +108,15 @@ export default function RegisterModal() {
     pharmacyName: '',
     pharmacyAddress: '',
     pharmacyPhone: '',
-    // 개설약사 전용 — 사업자 정보
+    // 개설약사 전용 — 사업자 정보 (WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1)
     businessNumber: '',
-    representativeName: '',
-    taxEmail: '',
+    ceoName: '',               // canonical (legacy: representativeName)
+    taxInvoiceEmail: '',       // canonical (legacy: taxEmail)
+    managerPhone: '',          // canonical (신규)
+    // 개설약사 전용 — 사업장 주소 (StoreAddress 3-part)
+    businessZipCode: '',
+    businessAddress: '',
+    businessAddressDetail: '',
     // 약대생 전용
     universityName: '',
     studentYear: '',
@@ -142,7 +148,8 @@ export default function RegisterModal() {
         agreeTerms: false, agreePrivacy: false,
         licenseNumber: '',
         activityType: '', pharmacyName: '', pharmacyAddress: '', pharmacyPhone: '',
-        businessNumber: '', representativeName: '', taxEmail: '',
+        businessNumber: '', ceoName: '', taxInvoiceEmail: '', managerPhone: '',
+        businessZipCode: '', businessAddress: '', businessAddressDetail: '',
         universityName: '', studentYear: '',
       });
       setError(null);
@@ -169,7 +176,7 @@ export default function RegisterModal() {
     const checked = target instanceof HTMLInputElement ? target.checked : false;
     const type = target instanceof HTMLInputElement ? target.type : 'text';
     // 숫자 전용 필드 — 비숫자 제거
-    const DIGITS_ONLY = new Set(['phone', 'pharmacyPhone', 'businessNumber']);
+    const DIGITS_ONLY = new Set(['phone', 'pharmacyPhone', 'businessNumber', 'managerPhone']);
     if (DIGITS_ONLY.has(name)) {
       setFormData(prev => ({ ...prev, [name]: value.replace(/\D/g, '') }));
       return;
@@ -202,19 +209,30 @@ export default function RegisterModal() {
 
       if (memberType === 'pharmacist_member') {
         if (formData.licenseNumber) payload.licenseNumber = formData.licenseNumber;
-        // 직역 + 근무처
+        // 직역
         if (formData.activityType) payload.activityType = formData.activityType;
         if (formData.pharmacyName) payload.pharmacyName = formData.pharmacyName;
-        if (formData.pharmacyAddress) payload.pharmacyAddress = formData.pharmacyAddress;
         if (formData.pharmacyPhone) payload.pharmacyPhone = formData.pharmacyPhone;
-        // 개설약사: 사업자 정보
+        // 비-pharmacy_owner: 근무처 주소 (free-text)
+        // pharmacy_owner: 사업장 주소 (StoreAddress 3-part — businessAddress 가 backend address1, businessZipCode 가 zipCode)
         if (formData.activityType === 'pharmacy_owner') {
+          // 개설약사: 사업자 정보 (WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1 canonical key)
           if (formData.businessNumber) payload.businessNumber = formData.businessNumber;
-          if (formData.representativeName) payload.representativeName = formData.representativeName;
-          if (formData.taxEmail) payload.taxEmail = formData.taxEmail;
+          if (formData.ceoName) payload.ceoName = formData.ceoName;
+          if (formData.taxInvoiceEmail) payload.taxInvoiceEmail = formData.taxInvoiceEmail;
+          if (formData.managerPhone) payload.managerPhone = formData.managerPhone;
           // 사업장명/주소는 약국명/약국주소와 동일 (개설약사 = 사업장 == 약국)
           if (formData.pharmacyName) payload.businessName = formData.pharmacyName;
-          if (formData.pharmacyAddress) payload.address1 = formData.pharmacyAddress;
+          if (formData.businessZipCode) payload.zipCode = formData.businessZipCode;
+          if (formData.businessAddress) payload.address1 = formData.businessAddress;
+          if (formData.businessAddressDetail) payload.address2 = formData.businessAddressDetail;
+          // kpa_members.pharmacy_address backend 호환: 사업장 주소 합쳐서 free-text 전달
+          const composedAddr = [formData.businessZipCode, formData.businessAddress, formData.businessAddressDetail]
+            .filter(Boolean)
+            .join(' ');
+          if (composedAddr) payload.pharmacyAddress = composedAddr;
+        } else {
+          if (formData.pharmacyAddress) payload.pharmacyAddress = formData.pharmacyAddress;
         }
       } else if (memberType === 'pharmacy_student_member') {
         payload.universityName = formData.universityName;
@@ -270,13 +288,16 @@ export default function RegisterModal() {
       if (!formData.activityType) return false;
       // 면허 미사용은 근무처 입력 불요
       if (formData.activityType === 'inactive') return true;
-      // 약사 직역(개설약사/근무약사/병원약사/산업약사/기타)는 근무처명·주소 필수
-      if (!formData.pharmacyName || !formData.pharmacyAddress) return false;
-      // 개설약사: 사업자번호·대표자명 필수
       if (formData.activityType === 'pharmacy_owner') {
+        // 개설약사: 약국명·사업자번호·대표자명(ceoName)·사업장 주소 필수
+        if (!formData.pharmacyName) return false;
         if (!formData.businessNumber || formData.businessNumber.length < 10) return false;
-        if (!formData.representativeName) return false;
+        if (!formData.ceoName) return false;
+        if (!formData.businessZipCode || !formData.businessAddress) return false;
+        return true;
       }
+      // 비-pharmacy_owner: 근무처명·주소 (free-text) 필수
+      if (!formData.pharmacyName || !formData.pharmacyAddress) return false;
       return true;
     }
     if (memberType === 'pharmacy_student_member') {
@@ -464,32 +485,24 @@ export default function RegisterModal() {
                       </div>
                     </div>
 
-                    {/* 근무처 정보 — 면허 미사용 제외 모든 약사 직역 */}
-                    {formData.activityType && formData.activityType !== 'inactive' && (
+                    {/* 비-pharmacy_owner: 근무처 정보 (free-text) — 면허 미사용 / 개설약사 제외 모든 약사 직역 */}
+                    {formData.activityType && formData.activityType !== 'inactive' && formData.activityType !== 'pharmacy_owner' && (
                       <div className="space-y-4">
-                        <h4 className="text-sm font-semibold text-gray-700 pb-2 border-b border-gray-100">
-                          {formData.activityType === 'pharmacy_owner' ? '약국 정보' : '근무처 정보'}
-                        </h4>
+                        <h4 className="text-sm font-semibold text-gray-700 pb-2 border-b border-gray-100">근무처 정보</h4>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            {formData.activityType === 'pharmacy_owner' ? '약국명' : '근무처명'} <span className="text-red-500">*</span>
-                          </label>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">근무처명 <span className="text-red-500">*</span></label>
                           <input type="text" name="pharmacyName" value={formData.pharmacyName} onChange={handleInputChange}
-                            placeholder={formData.activityType === 'pharmacy_owner' ? '예: ○○약국' : '예: ○○약국 / ○○병원'} required maxLength={200}
+                            placeholder="예: ○○약국 / ○○병원" required maxLength={200}
                             className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            {formData.activityType === 'pharmacy_owner' ? '사업장 주소' : '근무처 주소'} <span className="text-red-500">*</span>
-                          </label>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">근무처 주소 <span className="text-red-500">*</span></label>
                           <input type="text" name="pharmacyAddress" value={formData.pharmacyAddress} onChange={handleInputChange}
                             placeholder="예: 서울특별시 강남구 ○○로 ○○" required maxLength={300}
                             className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            {formData.activityType === 'pharmacy_owner' ? '약국 전화' : '근무처 전화'}
-                          </label>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">근무처 전화</label>
                           <input type="tel" name="pharmacyPhone" value={formData.pharmacyPhone} onChange={handleInputChange}
                             placeholder="숫자만 입력 (선택)" maxLength={11}
                             className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
@@ -497,10 +510,17 @@ export default function RegisterModal() {
                       </div>
                     )}
 
-                    {/* 개설약사 추가 — 사업자 정보 */}
+                    {/* 개설약사 — 사업자 정보 (약국명 + 사업자번호 + 대표자명 + 세금계산서 + 담당자전화 + AddressSearch 통합) */}
+                    {/* WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1 */}
                     {formData.activityType === 'pharmacy_owner' && (
                       <div className="space-y-4">
-                        <h4 className="text-sm font-semibold text-gray-700 pb-2 border-b border-gray-100">사업자 정보</h4>
+                        <h4 className="text-sm font-semibold text-gray-700 pb-2 border-b border-gray-100">약국 / 사업자 정보</h4>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">약국명 (사업장명) <span className="text-red-500">*</span></label>
+                          <input type="text" name="pharmacyName" value={formData.pharmacyName} onChange={handleInputChange}
+                            placeholder="예: ○○약국" required maxLength={200}
+                            className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                        </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">사업자등록번호 <span className="text-red-500">*</span></label>
                           <input type="text" name="businessNumber" value={formData.businessNumber} onChange={handleInputChange}
@@ -510,15 +530,46 @@ export default function RegisterModal() {
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">대표자명 <span className="text-red-500">*</span></label>
-                          <input type="text" name="representativeName" value={formData.representativeName} onChange={handleInputChange}
+                          <input type="text" name="ceoName" value={formData.ceoName} onChange={handleInputChange}
                             placeholder="사업자등록증 대표자명" required maxLength={50}
                             className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">세금계산서 이메일</label>
-                          <input type="email" name="taxEmail" value={formData.taxEmail} onChange={handleInputChange}
+                          <input type="email" name="taxInvoiceEmail" value={formData.taxInvoiceEmail} onChange={handleInputChange}
                             placeholder="세금계산서 수신 이메일 (선택)"
                             className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">약국 전화</label>
+                            <input type="tel" name="pharmacyPhone" value={formData.pharmacyPhone} onChange={handleInputChange}
+                              placeholder="숫자만 입력 (선택)" maxLength={11}
+                              className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">담당자 전화</label>
+                            <input type="tel" name="managerPhone" value={formData.managerPhone} onChange={handleInputChange}
+                              placeholder="숫자만 입력 (선택)" maxLength={11}
+                              className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">사업장 주소 <span className="text-red-500">*</span></label>
+                          <AddressSearch
+                            zipCode={formData.businessZipCode}
+                            address={formData.businessAddress}
+                            addressDetail={formData.businessAddressDetail}
+                            onChange={({ zipCode, address, addressDetail }) =>
+                              setFormData(prev => ({
+                                ...prev,
+                                businessZipCode: zipCode,
+                                businessAddress: address,
+                                businessAddressDetail: addressDetail,
+                              }))
+                            }
+                            inputClassName="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
                         </div>
                       </div>
                     )}

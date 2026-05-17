@@ -11,6 +11,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
+import { AddressSearch } from '@o4o/ui';
 import { LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { MyPageLayout } from '../../layouts/MyPageLayout';
 import { mypageApi, type ProfileResponse } from '../../api';
@@ -87,12 +88,24 @@ export function MyProfilePage() {
   });
 
   // Role tab edit
+  // WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1:
+  //   pharmacy_owner 의 사업자 정보를 본인이 직접 수정 가능 (businessInfo cache edit).
+  //   organization canonical edit 은 PharmacyInfoPage 에서 계속 처리.
   const [isRoleEdit, setIsRoleEdit] = useState(false);
   const [roleSaving, setRoleSaving] = useState(false);
   const [roleForm, setRoleForm] = useState({
     activityType: '',
     university: '',
     workplace: '',
+    // 사업자 정보 (pharmacy_owner 만 사용)
+    businessName: '',
+    ceoName: '',
+    taxInvoiceEmail: '',
+    businessPhone: '',
+    managerPhone: '',
+    storeZipCode: '',
+    storeBaseAddress: '',
+    storeDetailAddress: '',
   });
 
   // Password
@@ -170,10 +183,22 @@ export function MyProfilePage() {
   };
 
   const resetRoleForm = (data: ProfileResponse) => {
+    const biz = data.businessInfo || {};
+    const storeAddr = biz.storeAddress || null;
     setRoleForm({
       activityType: user?.activityType || '',
       university: data.pharmacist?.university || '',
       workplace: data.pharmacist?.workplace || '',
+      // WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1:
+      //   canonical (ceoName / taxInvoiceEmail) read with legacy fallback.
+      businessName: biz.businessName || '',
+      ceoName: biz.ceoName || biz.representativeName || '',
+      taxInvoiceEmail: biz.taxInvoiceEmail || biz.taxEmail || '',
+      businessPhone: biz.phone || '',
+      managerPhone: biz.managerPhone || '',
+      storeZipCode: storeAddr?.zipCode || biz.zipCode || '',
+      storeBaseAddress: storeAddr?.baseAddress || biz.address || '',
+      storeDetailAddress: storeAddr?.detailAddress || biz.address2 || '',
     });
   };
 
@@ -209,9 +234,31 @@ export function MyProfilePage() {
         university: roleForm.university,
         workplace: roleForm.workplace,
       });
-      // Save activityType via auth API
+      // Save activityType + businessInfo via auth API (PATCH /auth/me/profile)
+      // WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1:
+      //   pharmacy_owner 의 사업자 정보 cache edit. canonical key 로만 전송 (representativeName/taxEmail 재저장 금지).
+      //   organizations sync 는 backend (auth-account.controller) 가 처리.
+      const isPharmacyOwnerEdit = (roleForm.activityType === 'pharmacy_owner');
+      const businessInfoPayload: Record<string, any> = {};
+      if (isPharmacyOwnerEdit) {
+        if (roleForm.businessName) businessInfoPayload.businessName = roleForm.businessName;
+        if (roleForm.ceoName) businessInfoPayload.ceoName = roleForm.ceoName;
+        if (roleForm.taxInvoiceEmail) businessInfoPayload.taxInvoiceEmail = roleForm.taxInvoiceEmail;
+        if (roleForm.businessPhone) businessInfoPayload.phone = roleForm.businessPhone;
+        if (roleForm.managerPhone) businessInfoPayload.managerPhone = roleForm.managerPhone;
+        if (roleForm.storeBaseAddress || roleForm.storeZipCode || roleForm.storeDetailAddress) {
+          businessInfoPayload.storeAddress = {
+            ...(roleForm.storeZipCode ? { zipCode: roleForm.storeZipCode } : {}),
+            baseAddress: roleForm.storeBaseAddress || '',
+            ...(roleForm.storeDetailAddress ? { detailAddress: roleForm.storeDetailAddress } : {}),
+          };
+        }
+      }
       if (roleForm.activityType) {
-        await setActivityType(roleForm.activityType);
+        await setActivityType(
+          roleForm.activityType,
+          Object.keys(businessInfoPayload).length > 0 ? businessInfoPayload : undefined,
+        );
       }
       await checkAuth();
       await loadData();
@@ -500,25 +547,65 @@ export function MyProfilePage() {
                   onChange={e => setRoleForm({ ...roleForm, workplace: e.target.value })} placeholder="근무처를 입력하세요" />
               </div>
 
-              {/* 약국/근무지 정보 — read-only (ActivitySetupPage에서 입력) */}
+              {/* 약국 정보 — pharmacy_owner 본인 편집 가능 (businessInfo cache edit).
+                  WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1:
+                    canonical key (ceoName / taxInvoiceEmail / storeAddress) 로 write.
+                    organization canonical edit 은 PharmacyInfoPage 에서. */}
               {isPharmacyOwner && (
                 <div style={styles.bizSection}>
                   <h4 style={styles.bizSectionTitle}>약국 정보</h4>
                   <div style={styles.field}>
-                    <label style={styles.label}>약국명</label>
-                    <input type="text" style={{ ...styles.input, ...styles.inputReadonly }} value={pharmacyName || '-'} disabled />
+                    <label style={styles.label}>약국명 (사업장명)</label>
+                    <input type="text" style={styles.input} value={roleForm.businessName}
+                      onChange={e => setRoleForm({ ...roleForm, businessName: e.target.value })}
+                      placeholder="예: ○○약국" maxLength={200} />
+                  </div>
+                  <div style={styles.field}>
+                    <label style={styles.label}>대표자명</label>
+                    <input type="text" style={styles.input} value={roleForm.ceoName}
+                      onChange={e => setRoleForm({ ...roleForm, ceoName: e.target.value })}
+                      placeholder="사업자등록증 대표자명" maxLength={50} />
+                  </div>
+                  <div style={styles.field}>
+                    <label style={styles.label}>세금계산서 이메일</label>
+                    <input type="email" style={styles.input} value={roleForm.taxInvoiceEmail}
+                      onChange={e => setRoleForm({ ...roleForm, taxInvoiceEmail: e.target.value })}
+                      placeholder="세금계산서 수신 이메일 (선택)" />
+                  </div>
+                  <div style={styles.field}>
+                    <label style={styles.label}>약국 전화</label>
+                    <input type="tel" style={styles.input} value={roleForm.businessPhone}
+                      onChange={e => setRoleForm({ ...roleForm, businessPhone: e.target.value.replace(/\D/g, '') })}
+                      placeholder="숫자만 입력 (선택)" maxLength={11} />
+                  </div>
+                  <div style={styles.field}>
+                    <label style={styles.label}>담당자 전화</label>
+                    <input type="tel" style={styles.input} value={roleForm.managerPhone}
+                      onChange={e => setRoleForm({ ...roleForm, managerPhone: e.target.value.replace(/\D/g, '') })}
+                      placeholder="숫자만 입력 (선택)" maxLength={11} />
                   </div>
                   <div style={styles.field}>
                     <label style={styles.label}>약국 주소</label>
-                    <input type="text" style={{ ...styles.input, ...styles.inputReadonly }} value={pharmacyAddress || '-'} disabled />
+                    <AddressSearch
+                      zipCode={roleForm.storeZipCode}
+                      address={roleForm.storeBaseAddress}
+                      addressDetail={roleForm.storeDetailAddress}
+                      onChange={({ zipCode, address, addressDetail }) =>
+                        setRoleForm({
+                          ...roleForm,
+                          storeZipCode: zipCode,
+                          storeBaseAddress: address,
+                          storeDetailAddress: addressDetail,
+                        })
+                      }
+                    />
                   </div>
-                  <div style={styles.field}>
-                    <label style={styles.label}>약국 전화번호</label>
-                    <input type="text" style={{ ...styles.input, ...styles.inputReadonly }} value={pharmacyPhone || '-'} disabled />
-                  </div>
-                  {!pharmacyName && (
-                    <p style={styles.hint}>약국 정보가 등록되지 않았습니다. 직역 설정에서 입력할 수 있습니다.</p>
-                  )}
+                  <p style={styles.hint}>
+                    여기서 수정한 정보는 본인 사업자 정보 (cache) 에 저장됩니다.
+                    채널 운영 / 정산 등 매장 canonical 정보는{' '}
+                    <Link to="/store/info" style={{ color: colors.primary }}>약국 정보 페이지</Link>
+                    에서 수정해 주세요.
+                  </p>
                 </div>
               )}
 

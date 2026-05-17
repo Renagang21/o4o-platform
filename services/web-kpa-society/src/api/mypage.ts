@@ -78,6 +78,8 @@ export interface ProfileResponse {
   } | null;
 
   // 사업장/근무지 정보 (users.businessInfo JSONB)
+  // WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1:
+  //   canonical fields (ceoName / taxInvoiceEmail / managerPhone) + legacy fallback (representativeName / taxEmail).
   businessInfo: {
     businessName?: string;
     phone?: string;
@@ -87,7 +89,15 @@ export interface ProfileResponse {
       detailAddress?: string;
     };
     address?: string;
+    address2?: string;
     zipCode?: string;
+    // canonical
+    ceoName?: string;
+    taxInvoiceEmail?: string;
+    managerPhone?: string;
+    // legacy fallback (read only)
+    representativeName?: string;
+    taxEmail?: string;
   } | null;
 
   // 조직/임원 정보
