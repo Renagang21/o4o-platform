@@ -13,8 +13,10 @@
 
 import { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
+import { isStoreOwnerDual } from '@o4o/auth-utils';
 import { useAuth } from '../../contexts/AuthContext';
 import { pharmacyRequestApi } from '../../api/pharmacyRequestApi';
+import { ROLES } from '../../lib/role-constants';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
 
 type PageState = 'form' | 'submitting' | 'success' | 'duplicate' | 'already_member' | 'error';
@@ -102,6 +104,15 @@ export function PharmacyApprovalGatePage() {
   // WO-KPA-PHARMACY-GATE-SIMPLIFICATION-V1: 자체 인증 체크
   if (!user) {
     return <Navigate to="/login?returnTo=/pharmacy/approval" replace />;
+  }
+
+  // WO-O4O-KPA-STOREOWNER-GUARD-CANONICAL-ALIGNMENT-V1:
+  //   이미 store_owner capability 보유한 사용자(자동 부여 완료 또는 수동 승인 완료)는
+  //   /pharmacy/approval 신청 폼을 다시 보지 않도록 즉시 /store 로 redirect.
+  //   pharmacy-request.controller 의 organization_members(owner) 중복 체크로 인한
+  //   "이미 가입" 에러 / UX 혼란을 사전 차단.
+  if (isStoreOwnerDual(user.roles, ROLES.KPA_STORE_OWNER, user.isStoreOwner)) {
+    return <Navigate to="/store" replace />;
   }
 
   // WO-KPA-STORE-ACCESS-GATE-ALIGNMENT-BY-ACTIVITYTYPE-V1: 비경영자 차단

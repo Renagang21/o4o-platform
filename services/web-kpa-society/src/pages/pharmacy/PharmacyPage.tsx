@@ -8,9 +8,10 @@
 
 import { useEffect, useState } from 'react';
 import { Navigate, Link, useNavigate } from 'react-router-dom';
+import { isStoreOwnerDual } from '@o4o/auth-utils';
 import { useAuth } from '../../contexts/AuthContext';
 import { getMyRequestsCached } from '../../api/pharmacyRequestApi';
-import { hasAnyRole, STORE_OWNER_ROLES } from '../../lib/role-constants';
+import { ROLES } from '../../lib/role-constants';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
 
 /** Admin/operator roles that should NOT see pharmacist function selection */
@@ -23,7 +24,11 @@ export function PharmacyPage() {
   const [approvalError, setApprovalError] = useState<string | null>(null);
 
   const isAdminOrOperator = user?.roles.some(r => NON_PHARMACIST_ROLES.includes(r)) ?? false;
-  const hasStoreRole = !!user && hasAnyRole(user.roles, STORE_OWNER_ROLES);
+  // WO-O4O-KPA-STOREOWNER-GUARD-CANONICAL-ALIGNMENT-V1:
+  //   PharmacyGuard / HubGuard 와 동일한 dual-check 적용.
+  //   stale JWT 시 user.isStoreOwner (KPA context) fallback 으로 회복 → 자동 부여 사용자의
+  //   /pharmacy/approval 강제 redirect 방지.
+  const hasStoreRole = !!user && isStoreOwnerDual(user.roles, ROLES.KPA_STORE_OWNER, user.isStoreOwner);
 
   useEffect(() => {
     if (!user || isAdminOrOperator) {
