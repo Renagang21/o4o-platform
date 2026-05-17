@@ -79,12 +79,16 @@ export class MypageService {
         isOfficer,
       },
 
-      // Pharmacist info (약사 정보) - Super Operator가 아닌 경우에만
+      // Pharmacist info (약사 정보) — kpa_members 보유자 본인의 profession 데이터
+      // WO-O4O-KPA-MYPROFILE-PHARMACIST-GATE-RELAX-V1:
+      //   role(admin/operator) 과 profession(pharmacist) 을 분리. visibility gate 를
+      //   role 기반(!isSuperOperator) → profession 기반(kpaMember 존재) 으로 정렬.
+      //   admin/operator 겸직 약사 사용자가 본인 면허/출신교/근무처를 못 보던 버그 수정.
       // FIX-O4O-MYPAGE-PROFILE-COLUMN-ROUTING-V1:
       //   university 는 kpa_members.university_name 컬럼이 SSOT (User 에는 컬럼 없음)
       //   workplace 는 User.businessInfo.metadata.workplace JSONB 슬롯에 저장
       //   기존 코드가 fullUser.university / fullUser.workplace 를 읽어 항상 null 반환하던 버그 수정
-      pharmacist: !isSuperOperator ? {
+      pharmacist: kpaMember ? {
         licenseNumber: kpaMember?.license_number || null,
         university: kpaMember?.university_name || null,
         workplace: fullUser?.businessInfo?.metadata?.workplace || null,
