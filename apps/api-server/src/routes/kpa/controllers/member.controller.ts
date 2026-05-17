@@ -889,40 +889,113 @@ export function createMemberController(
    * PATCH /kpa/members/:id/info — 운영자용 회원정보 수정
    *
    * WO-O4O-KPA-OPERATOR-ACTIVITYTYPE-STOREOWNER-REALIGNMENT-V1:
-   *   activity_type 변경 시 자동 동기화:
-   *     · kpa_pharmacist_profiles.activity_type (SSOT — JWT user.activityType source)
-   *     · pharmacy_owner 부여: organization ensure + organization_member(owner) + kpa:store_owner role
-   *     · pharmacy_owner 회수: kpa:store_owner role deactivate
-   *   self 흐름 (auth-account.controller / me/profession) 의 동기화 패턴을 operator 흐름에 정렬.
+   *   activity_type 변경 시 자동 동기화 (SSOT + store_owner 부여/회수).
    *
-   *   부여 방향은 operator 권한으로 의도된 허용 (self frontend 가드와 다른 정책).
+   * WO-O4O-KPA-OPERATOR-MEMBER-CANONICAL-EDIT-COMPLETE-V1:
+   *   - kpa_members ensure: req.params.id 가 kpa_members.id 또는 service_memberships.id 둘 다
+   *     허용. km 미존재 시 skeleton 생성 후 진행 ("Member not found" 회피).
+   *   - business_number / pharmacy_phone payload 추가 → users.businessInfo JSONB merge.
+   *   - silent skip 제거: pharmacy_owner 부여 보류 시 응답 warnings[] 로 사유 명시.
    */
   router.patch(
     '/:id/info',
     requireAuth,
     requireScope('kpa:operator'),
     param('id').isUUID(),
-    // activity_type 화이트리스트 — ACTIVITY_TYPE_LABELS 와 정렬
     body('activity_type').optional().isString().isIn([
       'pharmacy_owner', 'pharmacy_employee', 'hospital', 'manufacturer',
       'importer', 'wholesaler', 'other_industry', 'government', 'school', 'other', 'inactive',
     ]),
+    body('business_number').optional().isString().isLength({ max: 50 }),
+    body('pharmacy_phone').optional().isString().isLength({ max: 50 }),
     handleValidationErrors,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const member = await memberRepo.findOne({ where: { id: req.params.id } });
+        // ─── WO-O4O-KPA-OPERATOR-MEMBER-CANONICAL-EDIT-COMPLETE-V1 ───
+        //   km.id 또는 sm.id 양쪽 허용 + km 누락 시 skeleton ensure.
+        //   GET /kpa/members 가 m.id = km_id ?? sm_id 로 반환하므로 양쪽 모두 도달 가능.
+        let member = await memberRepo.findOne({ where: { id: req.params.id } });
+        let memberWasEnsured = false;
+
         if (!member) {
-          res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Member not found' } });
-          return;
+          // req.params.id 가 service_memberships.id 일 수 있음 — fallback 시도
+          const smRows = await dataSource.query(
+            `SELECT user_id, status, role, created_at
+             FROM service_memberships
+             WHERE id = $1 AND service_key IN ('kpa-society', 'kpa')
+             LIMIT 1`,
+            [req.params.id]
+          );
+          if (smRows.length === 0) {
+            res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Member not found' } });
+            return;
+          }
+          const sm = smRows[0];
+
+          // 동일 user 의 km 존재 여부 재확인 (sm.id 와 km.id 가 다른 경우)
+          const existingKm = await memberRepo.findOne({ where: { user_id: sm.user_id } });
+          if (existingKm) {
+            member = existingKm;
+          } else {
+            // skeleton 생성 — backfill migration 과 동일 derive 정책
+            const profilePresence = await dataSource.query(
+              `SELECT
+                 EXISTS(SELECT 1 FROM kpa_pharmacist_profiles WHERE user_id = $1) AS has_pp,
+                 EXISTS(SELECT 1 FROM kpa_student_profiles WHERE user_id = $1) AS has_sp`,
+              [sm.user_id]
+            );
+            const hasPp = !!profilePresence[0]?.has_pp;
+            const hasSp = !!profilePresence[0]?.has_sp;
+            const derivedType = hasPp ? 'pharmacist' : hasSp ? 'pharmacy_student_member' : 'pharmacist';
+            const safeRole = ['member', 'operator', 'admin'].includes(sm.role) ? sm.role : 'member';
+            const safeStatus = sm.status === 'active' ? 'active' : 'pending';
+            const joinedAt = sm.status === 'active' ? new Date(sm.created_at) : null;
+
+            // raw SQL INSERT — TypeORM Repository.create 오버로드 타입 회피 + 결과 row 즉시 반환.
+            const insertResult = await dataSource.query(
+              `INSERT INTO kpa_members
+                 (user_id, role, status, identity_status, membership_type, joined_at, created_at, updated_at)
+               VALUES ($1, $2, $3, 'active', $4, $5, NOW(), NOW())
+               RETURNING id`,
+              [sm.user_id, safeRole, safeStatus, derivedType, joinedAt]
+            );
+            const insertedId: string | undefined = insertResult?.[0]?.id;
+            const ensured = insertedId
+              ? await memberRepo.findOne({ where: { id: insertedId } })
+              : null;
+            if (!ensured) {
+              res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to ensure kpa_members skeleton' } });
+              return;
+            }
+            member = ensured;
+            memberWasEnsured = true;
+          }
         }
 
-        const { name, membership_type, license_number, pharmacy_name, pharmacy_address, activity_type } = req.body;
+        const {
+          name, membership_type, license_number, pharmacy_name, pharmacy_address,
+          activity_type, business_number, pharmacy_phone,
+        } = req.body;
         const changes: Record<string, any> = {};
+        const warnings: string[] = [];
+        if (memberWasEnsured) {
+          changes._kpa_member_ensured = true;
+          warnings.push('KPA 회원 정보(kpa_members)가 누락되어 있어 기본 정보로 자동 생성했습니다.');
+        }
 
         // 변경 전 activity_type 보관 — pharmacy_owner 부여/회수 판정용
         const prevActivityType = member.activity_type ?? null;
 
-        // kpa_members 필드 업데이트 — WO-O4O-KPA-REGISTER-CANONICAL-CLEANUP-V1
+        // users.businessInfo 사전 조회 — validation + merge + pharmacy_owner 부여 판정에 모두 사용
+        const [userRow] = await dataSource.query(
+          `SELECT "businessInfo" FROM users WHERE id = $1 LIMIT 1`,
+          [member.user_id]
+        );
+        const prevBiz: Record<string, any> = (userRow?.businessInfo && typeof userRow.businessInfo === 'object')
+          ? { ...(userRow.businessInfo as Record<string, any>) }
+          : {};
+
+        // kpa_members 필드 업데이트
         const validMembershipTypes = ['pharmacist', 'student', 'pharmacist_member', 'pharmacy_student_member'];
         if (membership_type && validMembershipTypes.includes(membership_type)) {
           changes.membership_type = membership_type;
@@ -941,7 +1014,28 @@ export function createMemberController(
           await dataSource.query(`UPDATE users SET name = $1, updated_at = NOW() WHERE id = $2`, [name.trim(), member.user_id]);
         }
 
-        // ─── WO-O4O-KPA-OPERATOR-ACTIVITYTYPE-STOREOWNER-REALIGNMENT-V1 ───
+        // ─── WO-O4O-KPA-OPERATOR-MEMBER-CANONICAL-EDIT-COMPLETE-V1 ───
+        //   business_number / pharmacy_phone → users.businessInfo JSONB merge (별도 컬럼 없음).
+        //   이후 pharmacy_owner 부여 분기에서도 prevBiz 가 갱신된 값을 사용.
+        let nextBiz: Record<string, any> | null = null;
+        if (business_number !== undefined || pharmacy_phone !== undefined) {
+          nextBiz = { ...prevBiz };
+          if (business_number !== undefined) {
+            nextBiz.businessNumber = business_number;
+            changes.business_number = business_number;
+          }
+          if (pharmacy_phone !== undefined) {
+            nextBiz.metadata = { ...((prevBiz.metadata as Record<string, any>) || {}), pharmacy_phone };
+            changes.pharmacy_phone = pharmacy_phone;
+          }
+          await dataSource.query(
+            `UPDATE users SET "businessInfo" = $1::jsonb, "updatedAt" = NOW() WHERE id = $2`,
+            [JSON.stringify(nextBiz), member.user_id]
+          );
+          // 갱신값을 prevBiz 에 반영 — 이후 부여 분기에서 사용
+          Object.assign(prevBiz, nextBiz);
+        }
+
         // 1) kpa_pharmacist_profiles SSOT sync (activity_type SSOT)
         if (activity_type !== undefined) {
           try {
@@ -957,7 +1051,6 @@ export function createMemberController(
         }
 
         // 2) pharmacy_owner 회수 — 이전 = pharmacy_owner, 새 != pharmacy_owner
-        //    self auth-account.controller (WO-O4O-KPA-ACTIVITY-TYPE-ROLE-SYNC-V1) 패턴 복제
         if (
           activity_type !== undefined
           && prevActivityType === 'pharmacy_owner'
@@ -973,34 +1066,31 @@ export function createMemberController(
             changes._store_owner_revoked = true;
           } catch (revokeErr) {
             console.error('[KPA Operator] kpa:store_owner revoke failed:', revokeErr);
+            warnings.push('매장 운영 권한(store_owner) 회수 중 오류가 발생했습니다. 수동 확인이 필요합니다.');
           }
         }
 
         // 3) pharmacy_owner 부여 — 이전 != pharmacy_owner, 새 = pharmacy_owner
-        //    member.controller pending→active 자동 활성화 분기 패턴 복제.
-        //    businessNumber/pharmacy_name 누락 시 silent skip (자동 활성화와 동일 정책).
+        //   WO-O4O-KPA-OPERATOR-MEMBER-CANONICAL-EDIT-COMPLETE-V1:
+        //     silent skip 제거 — 누락 항목을 warnings 로 명시하여 운영자에게 노출.
         if (
           activity_type === 'pharmacy_owner'
           && prevActivityType !== 'pharmacy_owner'
         ) {
           try {
-            const [userRow] = await dataSource.query(
-              `SELECT "businessInfo" FROM users WHERE id = $1 LIMIT 1`,
-              [member.user_id]
-            );
-            const biz = (userRow?.businessInfo && typeof userRow.businessInfo === 'object')
-              ? (userRow.businessInfo as Record<string, any>)
-              : {};
-            const rawBusinessNumber = typeof biz.businessNumber === 'string' ? biz.businessNumber : '';
+            const rawBusinessNumber = typeof prevBiz.businessNumber === 'string' ? prevBiz.businessNumber : '';
             const businessNumberDigits = rawBusinessNumber.replace(/[^0-9]/g, '');
-            const pName = member.pharmacy_name || (typeof biz.businessName === 'string' ? biz.businessName : null);
+            const pName = member.pharmacy_name || (typeof prevBiz.businessName === 'string' ? prevBiz.businessName : null);
 
-            if (businessNumberDigits.length === 0 || !pName) {
-              console.warn(
-                `[KPA Operator] pharmacy_owner activation skipped — missing businessNumber/pharmacyName for member ${member.id}`,
-                { hasBusinessNumber: businessNumberDigits.length > 0, hasPharmacyName: !!pName }
-              );
-              changes._store_owner_activation = 'skipped:missing_business_info';
+            const missing: string[] = [];
+            if (businessNumberDigits.length === 0) missing.push('사업자번호');
+            if (!pName) missing.push('약국명');
+
+            if (missing.length > 0) {
+              const reason = `매장 운영 권한(store_owner) 자동 부여 보류: ${missing.join(' / ')} 입력 후 다시 저장하세요.`;
+              console.warn(`[KPA Operator] ${reason} — member ${member.id}`);
+              changes._store_owner_activation = `skipped:missing:${missing.join(',')}`;
+              warnings.push(reason);
             } else {
               const orgCode = `kpa-pharm-${businessNumberDigits}`;
               const orgResult = await organizationOpsService.ensureOrganization({
@@ -1030,6 +1120,7 @@ export function createMemberController(
           } catch (activateErr) {
             console.error('[KPA Operator] pharmacy_owner activation failed:', activateErr);
             changes._store_owner_activation = 'error';
+            warnings.push('매장 운영 권한(store_owner) 자동 부여 중 오류가 발생했습니다. 수동 확인이 필요합니다.');
           }
         }
 
@@ -1045,7 +1136,11 @@ export function createMemberController(
           }));
         } catch (e) { console.error('[KPA AuditLog] Failed:', e); }
 
-        res.json({ success: true, data: member });
+        res.json({
+          success: true,
+          data: member,
+          ...(warnings.length > 0 ? { warnings } : {}),
+        });
       } catch (error: any) {
         console.error('Failed to update member info:', error);
         res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: error.message } });
