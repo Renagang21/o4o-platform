@@ -667,7 +667,7 @@ export function MyProfilePage() {
                   {/* WO-O4O-KPA-PROFILE-AND-STOREOWNER-UX-ALIGN-V1:
                       pharmacy_owner 직역은 capability 가 아니라 자기소개. 분리 안내. */}
                   {isPharmacyOwner && (
-                    <p style={styles.hint}>회원 본인 소개 정보입니다. 매장 운영 권한은 아래 별도 항목에서 확인하세요.</p>
+                    <p style={styles.hint}>회원 본인 소개 정보입니다. 매장 운영은 아래 별도 항목에서 확인하세요.</p>
                   )}
                 </div>
               </div>
@@ -731,7 +731,7 @@ export function MyProfilePage() {
                   <div style={styles.bizDivider} />
                   <div style={styles.capabilitySection}>
                     <div style={styles.capabilityHeader}>
-                      <h4 style={styles.capabilityTitle}>매장 운영 권한</h4>
+                      <h4 style={styles.capabilityTitle}>매장 운영</h4>
                       {storeOwnerStatus !== 'unknown' && (
                         <span
                           style={{
@@ -751,10 +751,10 @@ export function MyProfilePage() {
                     </div>
                     <p style={styles.capabilityDesc}>
                       내 매장 / Store HUB 이용은 별도의 매장 운영 승인 절차가 필요합니다.
-                      위 직역(활동 유형)은 회원 본인 소개 정보이며, 매장 운영 권한과는 다릅니다.
+                      위 직역(활동 유형)은 회원 본인 소개 정보이며, 매장 운영과는 다릅니다.
                     </p>
                     {storeOwnerStatus === 'unsubmitted' && (
-                      <Link to="/pharmacy" style={styles.capabilityCtaPrimary}>매장 운영 권한 신청 →</Link>
+                      <Link to="/pharmacy" style={styles.capabilityCtaPrimary}>매장 운영 신청 →</Link>
                     )}
                     {storeOwnerStatus === 'pending' && (
                       <Link to="/pharmacy" style={styles.capabilityCtaSecondary}>내 신청 보기</Link>
