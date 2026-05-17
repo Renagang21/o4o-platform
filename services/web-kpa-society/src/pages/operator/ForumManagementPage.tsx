@@ -29,8 +29,11 @@ import {
 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 // WO-KPA-OPERATOR-FORUM-REQUESTS-TABLE-COMPLIANCE-V1: ActionBar 추가
-import { RowActionMenu, ActionBar, BaseDetailDrawer } from '@o4o/ui';
-import { DataTable, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
+// WO-O4O-KPA-OPERATOR-PARTIAL-CANONICAL-ALIGN-V1:
+//   PARTIAL → TRUE CANONICAL — useBatchAction + BulkResultModal 추가.
+//   기존 inline custom bulk bar (categories tab) 도 canonical ActionBar 로 정렬.
+import { RowActionMenu, ActionBar, BulkResultModal, BaseDetailDrawer } from '@o4o/ui';
+import { DataTable, defineActionPolicy, buildRowActions, useBatchAction } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { forumOperatorApi } from '../../api/forum';
 
@@ -203,12 +206,15 @@ export default function ForumManagementPage() {
   const [isDeactivating, setIsDeactivating] = useState(false);
 
   // ── Selection (DataTable selectable) ──
+  // WO-O4O-KPA-OPERATOR-PARTIAL-CANONICAL-ALIGN-V1:
+  //   isBulkProcessing / isBulkRequestProcessing → batch.loading 으로 흡수.
+  //   ForumManagementPage 는 카테고리/신청 두 탭이지만 한 번에 한 bulk 만 실행되므로 단일 batch 인스턴스 사용.
   const [selectedCatIds, setSelectedCatIds] = useState<Set<string>>(new Set());
-  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
 
   // WO-KPA-OPERATOR-FORUM-REQUESTS-TABLE-COMPLIANCE-V1: 신청 관리 탭 selection
   const [selectedRequestIds, setSelectedRequestIds] = useState<Set<string>>(new Set());
-  const [isBulkRequestProcessing, setIsBulkRequestProcessing] = useState(false);
+
+  const batch = useBatchAction();
 
   // ── Category detail drawer ──
   const [selectedCategory, setSelectedCategory] = useState<CategoryData | null>(null);
@@ -396,7 +402,12 @@ export default function ForumManagementPage() {
   // Reset selection on filter change
   useEffect(() => { setSelectedCatIds(new Set()); }, [catSearch, catStatusFilter]);
 
-  // ── Bulk soft delete (비활성화): 선택된 활성 포럼만 대상 ──
+  // ── Bulk handlers (WO-O4O-KPA-OPERATOR-PARTIAL-CANONICAL-ALIGN-V1) ──
+  //   기존 for-await 패턴 → useBatchAction.executeBatch + Promise.allSettled wrap.
+  //   결과는 BulkResultModal 이 표시 (이전 toast/alert 대체).
+  //   reason prompt 는 UX 보존 위해 유지.
+
+  // 비활성화: 활성 포럼만 대상
   const handleBulkSoftDelete = async () => {
     const targets = filteredCategories.filter((c) => selectedCatIds.has(c.id) && c.isActive);
     if (targets.length === 0) {
@@ -405,68 +416,67 @@ export default function ForumManagementPage() {
     }
     const reason = prompt(`선택한 ${targets.length}개 활성 포럼을 비활성화합니다.\n사유를 입력하세요:`);
     if (!reason?.trim()) return;
-    if (!confirm(`${targets.length}개 포럼을 비활성화합니다. 진행하시겠습니까?`)) return;
+    const reasonText = reason.trim();
+    const targetIds = targets.map((t) => t.id);
 
-    setIsBulkProcessing(true);
-    let success = 0;
-    let failed = 0;
-    const failedNames: string[] = [];
+    const result = await batch.executeBatch(async (ids) => {
+      const settled = await Promise.allSettled(
+        ids.map((id) => forumOperatorApi.directDeactivate(id, { reason: reasonText })),
+      );
+      return {
+        data: {
+          results: settled.map((r, i) => ({
+            id: ids[i],
+            status: (r.status === 'fulfilled' && (r.value as any)?.success !== false)
+              ? ('success' as const)
+              : ('failed' as const),
+            error: r.status === 'rejected'
+              ? String((r as PromiseRejectedResult).reason?.message ?? r.reason)
+              : (r.status === 'fulfilled' && (r.value as any)?.success === false
+                  ? ((r.value as any)?.error || '처리 실패')
+                  : undefined),
+          })),
+        },
+      };
+    }, targetIds);
 
-    for (const cat of targets) {
-      try {
-        const result = await forumOperatorApi.directDeactivate(cat.id, { reason: reason.trim() });
-        if (result.success) success++;
-        else { failed++; failedNames.push(cat.name); }
-      } catch {
-        failed++; failedNames.push(cat.name);
-      }
-    }
-
-    if (failed === 0) {
-      toast.success(`${success}개 포럼 비활성화 완료`);
-    } else {
-      toast.error(`${success}건 성공, ${failed}건 실패${failedNames.length > 0 ? ` (${failedNames.join(', ')})` : ''}`);
-    }
-    setSelectedCatIds(new Set());
-    loadCategories();
-    setIsBulkProcessing(false);
+    if (result.successCount > 0) setSelectedCatIds(new Set());
   };
 
-  // ── Bulk activate (활성화): 선택된 비활성 포럼만 대상 ──
+  // 활성화: 비활성 포럼만 대상
   const handleBulkActivate = async () => {
     const targets = filteredCategories.filter((c) => selectedCatIds.has(c.id) && !c.isActive);
     if (targets.length === 0) {
       toast.error('활성화할 수 있는 비활성 포럼이 없습니다');
       return;
     }
-    if (!confirm(`${targets.length}개 비활성 포럼을 활성화합니다. 진행하시겠습니까?`)) return;
+    const targetIds = targets.map((t) => t.id);
 
-    setIsBulkProcessing(true);
-    let success = 0;
-    let failed = 0;
-    const failedNames: string[] = [];
+    const result = await batch.executeBatch(async (ids) => {
+      const settled = await Promise.allSettled(
+        ids.map((id) => forumOperatorApi.activate(id)),
+      );
+      return {
+        data: {
+          results: settled.map((r, i) => ({
+            id: ids[i],
+            status: (r.status === 'fulfilled' && (r.value as any)?.success !== false)
+              ? ('success' as const)
+              : ('failed' as const),
+            error: r.status === 'rejected'
+              ? String((r as PromiseRejectedResult).reason?.message ?? r.reason)
+              : (r.status === 'fulfilled' && (r.value as any)?.success === false
+                  ? ((r.value as any)?.error || '처리 실패')
+                  : undefined),
+          })),
+        },
+      };
+    }, targetIds);
 
-    for (const cat of targets) {
-      try {
-        const result = await forumOperatorApi.activate(cat.id);
-        if (result.success) success++;
-        else { failed++; failedNames.push(cat.name); }
-      } catch {
-        failed++; failedNames.push(cat.name);
-      }
-    }
-
-    if (failed === 0) {
-      toast.success(`${success}개 포럼 활성화 완료`);
-    } else {
-      toast.error(`${success}건 성공, ${failed}건 실패${failedNames.length > 0 ? ` (${failedNames.join(', ')})` : ''}`);
-    }
-    setSelectedCatIds(new Set());
-    loadCategories();
-    setIsBulkProcessing(false);
+    if (result.successCount > 0) setSelectedCatIds(new Set());
   };
 
-  // ── Bulk hard delete (완전 삭제): 선택된 비활성 포럼만 대상 ──
+  // 완전 삭제: 비활성 포럼 + delete-check 통과 항목만 success, 차단 항목은 skipped.
   const handleBulkHardDelete = async () => {
     const targets = filteredCategories.filter((c) => selectedCatIds.has(c.id) && !c.isActive);
     if (targets.length === 0) {
@@ -476,47 +486,37 @@ export default function ForumManagementPage() {
     const reason = prompt(`선택한 ${targets.length}개 비활성 포럼을 완전 삭제합니다.\n삭제 사유를 입력하세요 (복구 불가):`);
     if (!reason?.trim()) return;
     if (!confirm(`${targets.length}개 포럼을 영구 삭제합니다.\n이 작업은 복구할 수 없습니다. 진행하시겠습니까?`)) return;
+    const reasonText = reason.trim();
+    const targetIds = targets.map((t) => t.id);
 
-    setIsBulkProcessing(true);
-    let success = 0;
-    let blocked = 0;
-    let failed = 0;
-    const blockedItems: Array<{ name: string; reasons: string[] }> = [];
-
-    for (const cat of targets) {
-      try {
-        // 1) delete-check
-        const check = await forumOperatorApi.getDeleteCheck(cat.id);
-        if (!check.data?.hardDeleteAllowed) {
-          blocked++;
-          blockedItems.push({ name: cat.name, reasons: check.data?.blockedReasons || ['삭제 불가'] });
-          continue;
+    const result = await batch.executeBatch(async (ids) => {
+      // delete-check 후 hard delete — 직렬 처리 유지 (기존 안전 동작 보존).
+      const results: Array<{ id: string; status: 'success' | 'failed' | 'skipped'; error?: string }> = [];
+      for (const id of ids) {
+        try {
+          const check = await forumOperatorApi.getDeleteCheck(id);
+          if (!check.data?.hardDeleteAllowed) {
+            results.push({
+              id,
+              status: 'skipped',
+              error: (check.data?.blockedReasons || ['삭제 불가']).join(', '),
+            });
+            continue;
+          }
+          const r = await forumOperatorApi.hardDelete(id, { reason: reasonText });
+          results.push({
+            id,
+            status: r.success ? 'success' : 'failed',
+            error: r.success ? undefined : (r.error || '처리 실패'),
+          });
+        } catch (e: any) {
+          results.push({ id, status: 'failed', error: e?.message ?? String(e) });
         }
-        // 2) hard delete
-        const result = await forumOperatorApi.hardDelete(cat.id, { reason: reason.trim() });
-        if (result.success) success++;
-        else { failed++; }
-      } catch {
-        failed++;
       }
-    }
+      return { data: { results } };
+    }, targetIds);
 
-    if (success > 0 && blocked === 0 && failed === 0) {
-      toast.success(`${success}개 포럼 영구 삭제 완료`);
-    } else {
-      const parts: string[] = [];
-      if (success > 0) parts.push(`${success}건 삭제`);
-      if (blocked > 0) parts.push(`${blocked}건 차단`);
-      if (failed > 0) parts.push(`${failed}건 실패`);
-      if (blocked > 0) {
-        const detail = blockedItems.map((b) => `${b.name}: ${b.reasons.join(', ')}`).join('\n');
-        alert(`처리 결과: ${parts.join(', ')}\n\n차단 사유 (정상 게시글 잔존):\n${detail}`);
-      }
-      toast.error(parts.join(', '));
-    }
-    setSelectedCatIds(new Set());
-    loadCategories();
-    setIsBulkProcessing(false);
+    if (result.successCount > 0) setSelectedCatIds(new Set());
   };
 
   const selectedActiveCount = useMemo(() =>
@@ -542,12 +542,11 @@ export default function ForumManagementPage() {
   useEffect(() => { setSelectedRequestIds(new Set()); }, [searchQuery, statusFilter, tagFilter]);
 
   // WO-KPA-OPERATOR-FORUM-REQUESTS-TABLE-COMPLIANCE-V1: bulk 승인/거부.
-  // 신규 bulk endpoint 신설 금지 — 기존 단건 review API를 Promise.allSettled 병렬 호출.
-  // 단건 "삭제" API는 존재하지 않으므로 ActionBar의 삭제 액션은 본 WO 범위에서 제외.
-  const runRequestBulk = async (
-    action: 'approve' | 'reject',
-    successLabel: string,
-  ) => {
+  // WO-O4O-KPA-OPERATOR-PARTIAL-CANONICAL-ALIGN-V1:
+  //   기존 raw Promise.allSettled + toast → batch.executeBatch + BulkResultModal.
+  //   신규 bulk endpoint 신설 금지 — 기존 단건 review API wrap.
+  //   단건 "삭제" API는 존재하지 않으므로 ActionBar의 삭제 액션은 본 WO 범위에서 제외.
+  const runRequestBulk = async (action: 'approve' | 'reject') => {
     const ids = [...selectedRequestIds].filter((id) => {
       const row = requests.find((r) => r.id === id);
       return row ? isReviewable(row.status) : false;
@@ -556,26 +555,31 @@ export default function ForumManagementPage() {
       toast.error('처리할 수 있는 대기 항목이 선택되지 않았습니다');
       return;
     }
-    setIsBulkRequestProcessing(true);
-    try {
-      const results = await Promise.allSettled(
-        ids.map((id) => forumOperatorApi.review(id, { action })),
+    const result = await batch.executeBatch(async (batchIds) => {
+      const settled = await Promise.allSettled(
+        batchIds.map((id) => forumOperatorApi.review(id, { action })),
       );
-      const okCount = results.filter(
-        (r) => r.status === 'fulfilled' && (r.value as any)?.success !== false,
-      ).length;
-      const failCount = results.length - okCount;
-      if (okCount > 0) toast.success(`${okCount}건 ${successLabel} 처리되었습니다`);
-      if (failCount > 0) toast.error(`${failCount}건 처리 실패`);
-      setSelectedRequestIds(new Set());
-      loadRequests();
-    } finally {
-      setIsBulkRequestProcessing(false);
-    }
+      return {
+        data: {
+          results: settled.map((r, i) => ({
+            id: batchIds[i],
+            status: (r.status === 'fulfilled' && (r.value as any)?.success !== false)
+              ? ('success' as const)
+              : ('failed' as const),
+            error: r.status === 'rejected'
+              ? String((r as PromiseRejectedResult).reason?.message ?? r.reason)
+              : (r.status === 'fulfilled' && (r.value as any)?.success === false
+                  ? ((r.value as any)?.error || '처리 실패')
+                  : undefined),
+          })),
+        },
+      };
+    }, ids);
+    if (result.successCount > 0) setSelectedRequestIds(new Set());
   };
 
-  const handleBulkApprove = () => runRequestBulk('approve', '승인');
-  const handleBulkReject = () => runRequestBulk('reject', '거부');
+  const handleBulkApprove = () => runRequestBulk('approve');
+  const handleBulkReject = () => runRequestBulk('reject');
 
   const handleReview = async (action: 'approve' | 'reject' | 'revision') => {
     if (!selectedRequest) return;
@@ -788,6 +792,18 @@ export default function ForumManagementPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      {/* WO-O4O-KPA-OPERATOR-PARTIAL-CANONICAL-ALIGN-V1: BulkResultModal — categories/requests 양 탭 결과 표시 */}
+      <BulkResultModal
+        open={batch.showResult}
+        onClose={() => {
+          batch.clearResult();
+          if (activeTab === 'requests') loadRequests();
+          else loadCategories();
+        }}
+        result={batch.result}
+        onRetry={() => batch.retryFailed()}
+      />
+
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
@@ -888,7 +904,7 @@ export default function ForumManagementPage() {
                 onClick: handleBulkApprove,
                 variant: 'primary',
                 icon: <CheckCircle size={14} />,
-                loading: isBulkRequestProcessing,
+                loading: batch.loading,
                 tooltip: '선택된 대기 항목을 일괄 승인합니다',
                 confirm: {
                   title: '선택 신청 일괄 승인',
@@ -902,7 +918,7 @@ export default function ForumManagementPage() {
                 onClick: handleBulkReject,
                 variant: 'danger',
                 icon: <XCircle size={14} />,
-                loading: isBulkRequestProcessing,
+                loading: batch.loading,
                 tooltip: '선택된 대기 항목을 일괄 거부합니다',
                 confirm: {
                   title: '선택 신청 일괄 거부',
@@ -1061,49 +1077,42 @@ export default function ForumManagementPage() {
             </div>
           </div>
 
-          {/* Bulk Action Bar */}
-          {selectedCatIds.size > 0 && (
-            <div className="flex items-center gap-3 px-4 py-2.5 bg-blue-50 border border-blue-200 rounded-lg">
-              <span className="text-sm text-blue-700 font-medium">{selectedCatIds.size}개 선택</span>
-              <div className="h-4 w-px bg-blue-200" />
-              {selectedActiveCount > 0 && (
-                <button
-                  onClick={handleBulkSoftDelete}
-                  disabled={isBulkProcessing}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-amber-600 hover:bg-amber-700 rounded disabled:opacity-50 transition-colors"
-                >
-                  {isBulkProcessing ? <Spinner className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
-                  비활성화 ({selectedActiveCount})
-                </button>
-              )}
-              {selectedInactiveCount > 0 && (
-                <button
-                  onClick={handleBulkActivate}
-                  disabled={isBulkProcessing}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-green-600 hover:bg-green-700 rounded disabled:opacity-50 transition-colors"
-                >
-                  {isBulkProcessing ? <Spinner className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5" />}
-                  활성화 ({selectedInactiveCount})
-                </button>
-              )}
-              {selectedInactiveCount > 0 && (
-                <button
-                  onClick={handleBulkHardDelete}
-                  disabled={isBulkProcessing}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-rose-600 hover:bg-rose-700 rounded disabled:opacity-50 transition-colors"
-                >
-                  {isBulkProcessing ? <Spinner className="w-3.5 h-3.5 animate-spin" /> : <AlertOctagon className="w-3.5 h-3.5" />}
-                  완전 삭제 ({selectedInactiveCount})
-                </button>
-              )}
-              <button
-                onClick={() => setSelectedCatIds(new Set())}
-                className="ml-auto text-sm text-slate-500 hover:text-slate-700"
-              >
-                선택 해제
-              </button>
-            </div>
-          )}
+          {/* WO-O4O-KPA-OPERATOR-PARTIAL-CANONICAL-ALIGN-V1:
+              inline custom bulk bar → canonical ActionBar. visible 조건은 select 상태에 따라 결정. */}
+          <ActionBar
+            selectedCount={selectedCatIds.size}
+            onClearSelection={() => setSelectedCatIds(new Set())}
+            actions={[
+              {
+                key: 'soft-delete',
+                label: `비활성화 (${selectedActiveCount})`,
+                onClick: handleBulkSoftDelete,
+                variant: 'warning' as const,
+                icon: <Trash2 size={14} />,
+                loading: batch.loading,
+                visible: selectedActiveCount > 0,
+              },
+              {
+                key: 'activate',
+                label: `활성화 (${selectedInactiveCount})`,
+                onClick: handleBulkActivate,
+                variant: 'primary' as const,
+                icon: <CheckCircle size={14} />,
+                loading: batch.loading,
+                visible: selectedInactiveCount > 0,
+              },
+              {
+                key: 'hard-delete',
+                label: `완전 삭제 (${selectedInactiveCount})`,
+                onClick: handleBulkHardDelete,
+                variant: 'danger' as const,
+                icon: <AlertOctagon size={14} />,
+                loading: batch.loading,
+                visible: selectedInactiveCount > 0,
+                group: 'danger',
+              },
+            ]}
+          />
 
           {/* DataTable (selectable) */}
           <DataTable<CategoryData>

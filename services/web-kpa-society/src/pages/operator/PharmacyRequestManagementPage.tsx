@@ -3,6 +3,10 @@
  *
  * WO-KPA-A-PHARMACY-REQUEST-OPERATOR-UI-V1
  * WO-O4O-OPERATOR-LIST-TABLE-STANDARD-V3: card 목록 → DataTable 표준 전환
+ * WO-O4O-KPA-OPERATOR-PARTIAL-CANONICAL-ALIGN-V1:
+ *   PARTIAL → TRUE CANONICAL — ActionBar + useBatchAction + BulkResultModal 추가.
+ *   bulk API 없음 → 단건 approve/reject 를 Promise.allSettled 로 wrap (canonical doc §4.4).
+ *   기존 단건 OperatorConfirmModal/RowActionMenu 흐름은 그대로 유지.
  *
  * 약국 개설자 신청(kpa_pharmacy_requests)을 조회하고 승인/반려합니다.
  * API: pharmacyRequestApi.getPending / approve / reject
@@ -10,9 +14,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Check, X } from 'lucide-react';
-import { OperatorConfirmModal, RowActionMenu, useOperatorAction, BaseDetailDrawer } from '@o4o/ui';
+import { OperatorConfirmModal, RowActionMenu, useOperatorAction, BaseDetailDrawer, ActionBar, BulkResultModal } from '@o4o/ui';
 import { OperatorActionType } from '@o4o/types';
-import { DataTable, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
+import { DataTable, defineActionPolicy, buildRowActions, useBatchAction } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { pharmacyRequestApi } from '../../api/pharmacyRequestApi';
 import type { PharmacyRequest } from '../../api/pharmacyRequestApi';
@@ -45,6 +49,9 @@ export default function PharmacyRequestManagementPage() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [selectedRequest, setSelectedRequest] = useState<RequestItem | null>(null);
   const { pendingAction, loading: actionHookLoading, requestAction, cancelAction, executeAction } = useOperatorAction();
+
+  // WO-O4O-KPA-OPERATOR-PARTIAL-CANONICAL-ALIGN-V1: bulk batch hook
+  const batch = useBatchAction();
 
   const loadRequests = useCallback(async () => {
     try {
@@ -90,6 +97,38 @@ export default function PharmacyRequestManagementPage() {
     setActionTargetId(null);
     setSelectedRequest(null);
   };
+
+  // WO-O4O-KPA-OPERATOR-PARTIAL-CANONICAL-ALIGN-V1:
+  //   bulk approve/reject — 단건 API Promise.allSettled wrap (bulk API 없음).
+  //   bulk 시 reason 입력은 생략 (단건 흐름은 OperatorConfirmModal 로 유지).
+  const runRequestBulk = async (action: 'approve' | 'reject') => {
+    const ids = [...selectedIds];
+    if (ids.length === 0) return;
+    const result = await batch.executeBatch(async (batchIds) => {
+      const settled = await Promise.allSettled(
+        batchIds.map((id) =>
+          action === 'approve'
+            ? pharmacyRequestApi.approve(id)
+            : pharmacyRequestApi.reject(id),
+        ),
+      );
+      return {
+        data: {
+          results: settled.map((r, i) => ({
+            id: batchIds[i],
+            status: r.status === 'fulfilled' ? ('success' as const) : ('failed' as const),
+            error: r.status === 'rejected'
+              ? String((r as PromiseRejectedResult).reason?.message ?? r.reason)
+              : undefined,
+          })),
+        },
+      };
+    }, ids);
+    if (result.successCount > 0) setSelectedIds(new Set());
+  };
+
+  const handleBulkApprove = () => runRequestBulk('approve');
+  const handleBulkReject = () => runRequestBulk('reject');
 
   const formatBizNo = (num: string) => {
     const d = num.replace(/\D/g, '');
@@ -224,6 +263,52 @@ export default function PharmacyRequestManagementPage() {
           </button>
         </div>
       )}
+
+      {/* WO-O4O-KPA-OPERATOR-PARTIAL-CANONICAL-ALIGN-V1: BulkResultModal */}
+      <BulkResultModal
+        open={batch.showResult}
+        onClose={() => { batch.clearResult(); loadRequests(); }}
+        result={batch.result}
+        onRetry={() => batch.retryFailed()}
+      />
+
+      {/* WO-O4O-KPA-OPERATOR-PARTIAL-CANONICAL-ALIGN-V1: ActionBar (선택 ≥ 1) */}
+      <div style={{ marginBottom: 12 }}>
+        <ActionBar
+          selectedCount={selectedIds.size}
+          onClearSelection={() => setSelectedIds(new Set())}
+          actions={[
+            {
+              key: 'approve',
+              label: `승인 (${selectedIds.size})`,
+              onClick: handleBulkApprove,
+              variant: 'primary' as const,
+              icon: <Check size={14} />,
+              loading: batch.loading,
+              confirm: {
+                title: '약국 신청 일괄 승인',
+                message: `${selectedIds.size}건의 약국 서비스 신청을 승인합니다.\n승인 시 각 사용자에게 pharmacy_owner 권한이 부여됩니다.`,
+                confirmText: '승인',
+              },
+            },
+            {
+              key: 'reject',
+              label: `반려 (${selectedIds.size})`,
+              onClick: handleBulkReject,
+              variant: 'danger' as const,
+              icon: <X size={14} />,
+              loading: batch.loading,
+              group: 'danger',
+              confirm: {
+                title: '약국 신청 일괄 반려',
+                message: `${selectedIds.size}건의 약국 서비스 신청을 반려합니다.`,
+                variant: 'danger' as const,
+                confirmText: '반려',
+              },
+            },
+          ]}
+        />
+      </div>
 
       <DataTable<RequestItem>
         columns={columns}

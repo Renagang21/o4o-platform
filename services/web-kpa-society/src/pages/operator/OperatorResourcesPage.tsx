@@ -29,12 +29,16 @@ import {
   ExternalLink,
 } from 'lucide-react';
 // WO-KPA-OPERATOR-RESOURCES-TABLE-STANDARD-COMPLIANCE-V1: ActionBar 추가
-import { RowActionMenu, ActionBar, BaseDetailDrawer } from '@o4o/ui';
+// WO-O4O-KPA-OPERATOR-PARTIAL-CANONICAL-ALIGN-V1:
+//   PARTIAL → TRUE CANONICAL — useBatchAction + BulkResultModal 추가.
+//   bulk API 없음 → Promise.allSettled wrap (canonical doc §4.4).
+import { RowActionMenu, ActionBar, BulkResultModal, BaseDetailDrawer } from '@o4o/ui';
 import {
   DataTable,
   Pagination,
   defineActionPolicy,
   buildRowActions,
+  useBatchAction,
 } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { resourcesApi } from '../../api/resources';
@@ -132,8 +136,9 @@ export default function OperatorResourcesPage() {
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 20;
   // WO-KPA-OPERATOR-RESOURCES-TABLE-STANDARD-COMPLIANCE-V1: 선택 상태
+  // WO-O4O-KPA-OPERATOR-PARTIAL-CANONICAL-ALIGN-V1: bulkLoading → batch.loading 으로 흡수
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [bulkLoading, setBulkLoading] = useState(false);
+  const batch = useBatchAction();
   const [selectedItem, setSelectedItem] = useState<ResourceItem | null>(null);
 
   const fetchItems = useCallback(async () => {
@@ -201,49 +206,51 @@ export default function OperatorResourcesPage() {
   };
 
   // ─── Bulk actions (WO-KPA-OPERATOR-RESOURCES-TABLE-STANDARD-COMPLIANCE-V1) ───
-  // 기존 단건 API를 병렬 호출. bulk 엔드포인트 추가는 본 WO 금지 사항.
-
-  const runBulk = async (
-    op: (id: string) => Promise<unknown>,
-    successMsg: (n: number) => string,
-    failureMsg: string,
-  ) => {
-    const ids = [...selectedIds];
-    if (ids.length === 0) return;
-    setBulkLoading(true);
-    try {
-      const results = await Promise.allSettled(ids.map((id) => op(id)));
-      const okCount = results.filter((r) => r.status === 'fulfilled').length;
-      const failCount = results.length - okCount;
-      if (okCount > 0) toast.success(successMsg(okCount));
-      if (failCount > 0) toast.error(`${failCount}건 ${failureMsg}`);
-      setSelectedIds(new Set());
-      await fetchItems();
-    } finally {
-      setBulkLoading(false);
-    }
+  // WO-O4O-KPA-OPERATOR-PARTIAL-CANONICAL-ALIGN-V1:
+  //   bulk 엔드포인트 미존재 → Promise.allSettled 를 useBatchAction.executeBatch 안에 wrap.
+  //   canonical doc §4.4 패턴 — 결과는 BulkResultModal 이 표시.
+  const wrapBulk = async (op: (id: string) => Promise<unknown>, ids: string[]) => {
+    const results = await Promise.allSettled(ids.map((id) => op(id)));
+    return {
+      data: {
+        results: results.map((r, i) => ({
+          id: ids[i],
+          status: r.status === 'fulfilled' ? ('success' as const) : ('failed' as const),
+          error: r.status === 'rejected' ? String((r as PromiseRejectedResult).reason?.message ?? r.reason) : undefined,
+        })),
+      },
+    };
   };
 
-  const handleBulkDelete = () =>
-    runBulk(
-      (id) => resourcesApi.operatorDelete(id),
-      (n) => `${n}건 삭제되었습니다`,
-      '삭제에 실패했습니다',
+  const handleBulkDelete = async () => {
+    const ids = [...selectedIds];
+    if (ids.length === 0) return;
+    const result = await batch.executeBatch(
+      (batchIds) => wrapBulk((id) => resourcesApi.operatorDelete(id), batchIds),
+      ids,
     );
+    if (result.successCount > 0) setSelectedIds(new Set());
+  };
 
-  const handleBulkPublish = () =>
-    runBulk(
-      (id) => resourcesApi.operatorUpdateStatus(id, 'published'),
-      (n) => `${n}건 노출 처리되었습니다`,
-      '노출 처리에 실패했습니다',
+  const handleBulkPublish = async () => {
+    const ids = [...selectedIds];
+    if (ids.length === 0) return;
+    const result = await batch.executeBatch(
+      (batchIds) => wrapBulk((id) => resourcesApi.operatorUpdateStatus(id, 'published'), batchIds),
+      ids,
     );
+    if (result.successCount > 0) setSelectedIds(new Set());
+  };
 
-  const handleBulkHide = () =>
-    runBulk(
-      (id) => resourcesApi.operatorUpdateStatus(id, 'private'),
-      (n) => `${n}건 숨김 처리되었습니다`,
-      '숨김 처리에 실패했습니다',
+  const handleBulkHide = async () => {
+    const ids = [...selectedIds];
+    if (ids.length === 0) return;
+    const result = await batch.executeBatch(
+      (batchIds) => wrapBulk((id) => resourcesApi.operatorUpdateStatus(id, 'private'), batchIds),
+      ids,
     );
+    if (result.successCount > 0) setSelectedIds(new Set());
+  };
 
   // ─── Columns ───
 
@@ -535,6 +542,14 @@ export default function OperatorResourcesPage() {
         </div>
       )}
 
+      {/* WO-O4O-KPA-OPERATOR-PARTIAL-CANONICAL-ALIGN-V1: BulkResultModal (batch 결과 표시) */}
+      <BulkResultModal
+        open={batch.showResult}
+        onClose={() => { batch.clearResult(); fetchItems(); }}
+        result={batch.result}
+        onRetry={() => batch.retryFailed()}
+      />
+
       {/* WO-KPA-OPERATOR-RESOURCES-TABLE-STANDARD-COMPLIANCE-V1: ActionBar (선택 ≥ 1) */}
       {!error && items.length > 0 && (
         <div style={{ marginBottom: 12 }}>
@@ -548,7 +563,7 @@ export default function OperatorResourcesPage() {
                 onClick: handleBulkPublish,
                 variant: 'primary',
                 icon: <Eye size={14} />,
-                loading: bulkLoading,
+                loading: batch.loading,
                 confirm: {
                   title: '선택 자료 노출',
                   message: `${selectedIds.size}건을 노출 처리합니다.`,
@@ -561,7 +576,7 @@ export default function OperatorResourcesPage() {
                 onClick: handleBulkHide,
                 variant: 'default',
                 icon: <EyeOff size={14} />,
-                loading: bulkLoading,
+                loading: batch.loading,
                 confirm: {
                   title: '선택 자료 숨김',
                   message: `${selectedIds.size}건을 숨김 처리합니다. 사용자 자료실에서 보이지 않게 됩니다.`,
@@ -574,7 +589,7 @@ export default function OperatorResourcesPage() {
                 onClick: handleBulkDelete,
                 variant: 'danger',
                 icon: <Trash2 size={14} />,
-                loading: bulkLoading,
+                loading: batch.loading,
                 confirm: {
                   title: '선택 자료 삭제',
                   message: `${selectedIds.size}건을 삭제합니다. 사용자 자료실에서 즉시 사라집니다.`,
