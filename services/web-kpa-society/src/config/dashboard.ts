@@ -52,8 +52,11 @@ export function getKpaPostLoginRoute(user: User): string | null {
 
   // 매핑 없음(빈 배열 등) → '/' 반환됨 → null로 통일 (현재 화면 유지)
   if (!route || route === '/') {
-    // legacy fallback: activityType 기반 store_owner 판정
-    if (user.isStoreOwner || user.activityType === 'pharmacy_owner') {
+    // WO-O4O-KPA-ACTIVITY-TYPE-SSOT-ROLE-CANONICAL-ALIGN-V1 (Phase 2):
+    //   store_owner 활성 여부 canonical source = role_assignments (user.isStoreOwner 로 파생).
+    //   activity_type === 'pharmacy_owner' 단독 판단 제거 — 직역 (profile metadata) 은
+    //   capability 가 아님. JWT roles stale 시 isStoreOwner (me-context) 가 safety net.
+    if (user.isStoreOwner) {
       return '/store';
     }
     return null;
