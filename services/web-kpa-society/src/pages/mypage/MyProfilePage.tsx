@@ -128,6 +128,16 @@ export function MyProfilePage() {
   const hasStoreOwnerRole = Array.isArray((user as any)?.roles)
     && (user as any).roles.includes('kpa:store_owner');
 
+  // WO-O4O-KPA-MYPROFILE-AUTH-REFRESH-ON-MOUNT-V1:
+  //   profile 진입 시 1 회 auth context refresh — operator 가 activity_type / roles 변경한 경우의
+  //   user.activityType / user.roles stale 보정. graceful fail (네트워크 실패 시 기존 캐시 유지).
+  //   visibility/focus refresh 는 본 WO 범위 외 (필요 시 후속 WO).
+  //   근거: docs/investigations/IR-O4O-KPA-PROFILE-OPERATOR-CONSISTENCY-AUDIT-V1.md (M1)
+  useEffect(() => {
+    void checkAuth().catch(() => { /* graceful — 실패해도 기존 화면 흐름 유지 */ });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     if (user) loadData();
   }, [user]);
