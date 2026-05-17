@@ -15,7 +15,23 @@ import type { ServiceMembership } from '../../modules/auth/entities/ServiceMembe
 
 export class AdminUserController {
 
+  // WO-O4O-ADMIN-OPERATOR-MEMBERSHIP-CANONICAL-KEY-FIX-V1:
+  // Role prefix → canonical service_memberships.service_key 매핑.
+  // Mirrors SCOPE_TO_MEMBERSHIP_KEY (membership-guard.middleware.ts)
+  // and ROLE_PREFIX_TO_SERVICE_KEY (utils/serviceScope.ts).
+  // 본 WO 는 alias 단일 출처화는 수행하지 않음 (별도 WO).
+  private static readonly ROLE_PREFIX_TO_SERVICE_KEY: Record<string, string> = {
+    'kpa': 'kpa-society',
+    'cosmetics': 'k-cosmetics',
+  };
+
+  private resolveCanonicalServiceKey(rolePrefix: string): string {
+    return AdminUserController.ROLE_PREFIX_TO_SERVICE_KEY[rolePrefix] || rolePrefix;
+  }
+
   // WO-O4O-OPERATOR-CREATION-FLOW-FIX-V1: Ensure service_memberships exist for each role's service
+  // WO-O4O-ADMIN-OPERATOR-MEMBERSHIP-CANONICAL-KEY-FIX-V1: store canonical service_key
+  //   (kpa → kpa-society, cosmetics → k-cosmetics) so frontend MembershipGate matches.
   private ensureServiceMemberships = async (userId: string, roles: string[]): Promise<void> => {
     const smRepo = AppDataSource.getRepository<ServiceMembership>('ServiceMembership');
     const processedServices = new Set<string>();
@@ -23,7 +39,8 @@ export class AdminUserController {
     for (const r of roles) {
       const parts = r.split(':');
       if (parts.length === 2) {
-        const [serviceKey, roleName] = parts;
+        const [rolePrefix, roleName] = parts;
+        const serviceKey = this.resolveCanonicalServiceKey(rolePrefix);
         if (!processedServices.has(serviceKey)) {
           processedServices.add(serviceKey);
           const existing = await smRepo.findOne({ where: { userId, serviceKey } as any });
