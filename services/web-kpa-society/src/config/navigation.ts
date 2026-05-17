@@ -28,24 +28,26 @@ export const KPA_CONTACT_NAV_ITEM: GlobalHeaderNavItem = { label: 'Contact', hre
 
 export interface KpaContextualNavItem extends GlobalHeaderNavItem {
   /** 노출 조건 키 */
-  visibleWhen: 'pharmacyRelated' | 'storeOwner' | 'operator' | 'admin';
+  visibleWhen: 'storeOwner' | 'operator' | 'admin';
 }
 
+// WO-O4O-KPA-HEADER-MENU-CANONICAL-ALIGNMENT-V1:
+//   두 메뉴 모두 store_owner role 기준으로 통일.
+//   기존 '운영 허브'의 activityType=='pharmacy_owner' fallback 제거 — HubGuard/PharmacyGuard/
+//   StoreHubPage CTA 가 모두 role 기반(isStoreOwnerDual)이므로 menu 노출도 동일 기준으로 정합.
+//   선언만 한 사용자(activityType=pharmacy_owner, role 미부여)에게 메뉴 노출 후 클릭 시
+//   guard redirect 되는 UX 함정 제거.
 export const KPA_CONTEXTUAL_NAV: KpaContextualNavItem[] = [
   { label: kpaConfig.terminology.myStoreLabel, href: '/store', visibleWhen: 'storeOwner' },
-  { label: kpaConfig.terminology.storeHubLabel, href: '/store-hub', visibleWhen: 'pharmacyRelated' },
+  { label: kpaConfig.terminology.storeHubLabel, href: '/store-hub', visibleWhen: 'storeOwner' },
 ];
 
 // ─── Filter Helper ───────────────────────────────────────────────────────────
 
 export interface KpaNavVisibility {
   isStoreOwner: boolean;
-  isPharmacyRelated: boolean;
 }
 
-// WO-O4O-KPA-MY-PHARMACY-HEADER-ROUTE-FIX-V1
-// visibleWhen 조건은 operator/admin에게도 동일하게 적용한다.
-// "내 약국"은 storeOwner 자격이 있을 때만 노출된다.
 export function filterContextualNav(
   items: KpaContextualNavItem[],
   vis: KpaNavVisibility,
@@ -54,7 +56,6 @@ export function filterContextualNav(
     .filter((item) => {
       const cond = item.visibleWhen;
       if (cond === 'storeOwner') return vis.isStoreOwner;
-      if (cond === 'pharmacyRelated') return vis.isPharmacyRelated;
       return false;
     })
     .map(({ label, href }) => ({ label, href }));

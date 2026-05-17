@@ -90,17 +90,16 @@ export function KpaGlobalHeader() {
   const isAdmin = user ? isAdminOrAbove(user.roles, 'kpa') : false;
   const isOperator = user ? isOperatorOrAbove(user.roles, 'kpa') : false;
   const isInstructor = user ? user.roles.includes('lms:instructor') : false;
-  // WO-O4O-KPA-HEADER-STORE-MENU-ENTRY-V1:
-  //   kpa:store_owner 역할 보유 OR isStoreOwner=true 모두 내 매장 표시
-  //   WO-O4O-AUTH-UTILS-STORE-OWNER-DUAL-V1: isStoreOwnerDual() 공통 helper 적용
-  //   (role_assignments 기반 role이 먼저 세팅되고 isStoreOwner는 KPA context 로드 후 확정됨)
+  // WO-O4O-KPA-HEADER-MENU-CANONICAL-ALIGNMENT-V1:
+  //   내 약국 + 운영 허브 모두 store_owner role 기준으로 통일.
+  //   HubGuard/PharmacyGuard/StoreHubPage CTA 가 모두 isStoreOwnerDual 단일 SSOT 사용 — header도 동일.
+  //   (이전: 운영 허브만 activityType=='pharmacy_owner' fallback 보유 → 메뉴 보이지만 진입 시 guard redirect)
   const isStoreOwner = isStoreOwnerDual(user?.roles ?? [], 'kpa:store_owner', user?.isStoreOwner);
-  const isPharmacyRelated = isStoreOwner || (user as any)?.activityType === 'pharmacy_owner';
 
   // WO-O4O-KPA-WEB-MENU-STRUCTURE-PHASE1-V1: 상태별 통합 nav 조합
   // 비로그인: 커뮤니티 / About / Contact
   // 로그인:   커뮤니티 / [내 매장] / [약국 HUB] / About
-  const roleItems = filterContextualNav(KPA_CONTEXTUAL_NAV, { isStoreOwner, isPharmacyRelated });
+  const roleItems = filterContextualNav(KPA_CONTEXTUAL_NAV, { isStoreOwner });
   const computedNav = [
     ...KPA_BASE_NAV,
     ...roleItems,
