@@ -40,7 +40,7 @@ import {
   useBatchAction,
 } from '@o4o/operator-ux-core';
 import type { ListColumnDef, MemberTab } from '@o4o/operator-ux-core';
-import { ACTIVITY_TYPE_LABELS, useAuth } from '../../contexts/AuthContext';
+import { ACTIVITY_TYPE_LABELS } from '../../contexts/AuthContext';
 import { apiClient } from '../../api/client';
 
 // ─── Types ───────────────────────────────────────────────────
@@ -259,17 +259,11 @@ const STATUS_TAB_FILTER: Record<string, MemberStatus | ''> = {
 // ─── Component ───────────────────────────────────────────────
 
 export default function MemberManagementPage() {
-  const { user: currentUser } = useAuth();
   // WO-O4O-KPA-ADMIN-MEMBER-MANAGEMENT-SEPARATION-V1:
   //   isKpaAdmin 분기 제거 — 완전삭제는 /admin/members 에서 처리. 본 페이지는 operator 표준 UX.
-
-  // WO-O4O-OPERATOR-MEMBER-EDIT-ROLE-MANAGEMENT-V1:
-  //   현재 사용자가 admin scope 보유 여부 (조직 역할 변경 자격).
-  //   kpa:admin 또는 platform:super_admin 이면 PATCH /:id/role 호출 가능.
-  const currentUserRoles = currentUser?.roles ?? [];
-  const currentUserIsAdmin = currentUserRoles.some(
-    (r) => r === 'kpa:admin' || r === 'platform:super_admin'
-  );
+  // WO-O4O-KPA-OPERATOR-ACTIVITYTYPE-STOREOWNER-REALIGNMENT-V1:
+  //   useAuth / currentUserIsAdmin 제거 — 조직 역할 select 가 사라져 본 화면에서 admin scope
+  //   판정이 더 이상 필요 없음. admin scope 권한 수정은 admin.neture.co.kr 로 이관.
 
   // WO-O4O-KPA-MEMBER-REGISTRATION-NOTIFICATION-PHASE1-V1:
   //   알림 클릭 deeplink — /operator/members?tab=status-pending 지원.
@@ -311,13 +305,25 @@ export default function MemberManagementPage() {
   // WO-O4O-OPERATOR-MEMBER-EDIT-ROLE-MANAGEMENT-V1:
   //   Drawer 인라인 편집 모드 + 폼 state.
   //   기존 EditMemberModal 제거 — 모든 편집은 Drawer 내부에서 진행.
+  // WO-O4O-KPA-OPERATOR-ACTIVITYTYPE-STOREOWNER-REALIGNMENT-V1:
+  //   조직 역할(member/operator/admin) 편집 제거 → 활동 유형 + 약국 정보 편집 중심으로 재설계.
+  //   admin scope 권한 (operator/admin/super_admin) 수정은 admin.neture.co.kr 로 이관.
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState<{
     name: string;
     membership_type: string;
-    role: MemberRole;
+    activity_type: string;
+    pharmacy_name: string;
+    pharmacy_address: string;
     status: MemberStatus;
-  }>({ name: '', membership_type: 'pharmacist', role: 'member', status: 'active' });
+  }>({
+    name: '',
+    membership_type: 'pharmacist',
+    activity_type: '',
+    pharmacy_name: '',
+    pharmacy_address: '',
+    status: 'active',
+  });
   const [savingEdit, setSavingEdit] = useState(false);
 
   // WO-O4O-KPA-MEMBER-BULK-ACTION-ALIGN-V1: bulk selection + batch hook
@@ -423,7 +429,9 @@ export default function MemberManagementPage() {
     setEditForm({
       name: m.user?.name || '',
       membership_type: m.membership_type || 'pharmacist',
-      role: (m.role || 'member') as MemberRole,
+      activity_type: m.activity_type || '',
+      pharmacy_name: m.pharmacy_name || '',
+      pharmacy_address: '',
       status: m.status,
     });
     setIsEditing(true);
@@ -442,7 +450,9 @@ export default function MemberManagementPage() {
     setEditForm({
       name: selectedMember.user?.name || '',
       membership_type: selectedMember.membership_type || 'pharmacist',
-      role: (selectedMember.role || 'member') as MemberRole,
+      activity_type: selectedMember.activity_type || '',
+      pharmacy_name: selectedMember.pharmacy_name || '',
+      pharmacy_address: '',
       status: selectedMember.status,
     });
     setIsEditing(true);
@@ -463,38 +473,37 @@ export default function MemberManagementPage() {
       }
 
       // 2) 변경 사항 계산
+      //   WO-O4O-KPA-OPERATOR-ACTIVITYTYPE-STOREOWNER-REALIGNMENT-V1:
+      //     조직 역할(role) 변경 제거 — admin scope 권한은 admin.neture.co.kr 로 이관.
+      //     활동 유형(activity_type) + 약국 정보 편집 중심.
       const currentName = (selectedMember.user?.name || '').trim();
       const newName = editForm.name.trim();
       const nameChanged = newName !== currentName;
       const typeChanged = editForm.membership_type !== (selectedMember.membership_type || '');
-      const roleChanged = editForm.role !== (selectedMember.role || 'member');
+      const activityChanged = editForm.activity_type !== (selectedMember.activity_type || '');
+      const pharmacyNameChanged = editForm.pharmacy_name !== (selectedMember.pharmacy_name || '');
+      const pharmacyAddressChanged = editForm.pharmacy_address.trim().length > 0; // pharmacy_address 는 응답에 없으므로 입력 시에만 전송
       const statusChanged = editForm.status !== selectedMember.status;
 
-      if (!nameChanged && !typeChanged && !roleChanged && !statusChanged) {
+      if (
+        !nameChanged && !typeChanged && !activityChanged
+        && !pharmacyNameChanged && !pharmacyAddressChanged && !statusChanged
+      ) {
         setIsEditing(false);
         return;
       }
 
-      // 3) 권한 사전 검증 (서버도 검증하지만 사용자 피드백 명확화)
-      if (roleChanged) {
-        if (!currentUserIsAdmin) {
-          throw new Error('조직 역할 변경은 admin 권한이 필요합니다.');
-        }
-        if (currentUser && selectedMember.user_id === currentUser.id && editForm.role === 'admin') {
-          throw new Error('자신을 admin으로 지정할 수 없습니다.');
-        }
-      }
-
-      // 4) 순차 호출 — info → role → status
-      //    순서 고정: role 변경이 status 변경 흐름(MembershipApprovalService)에 영향 줄 수 있어 status 가 마지막.
-      if (nameChanged || typeChanged) {
+      // 3) 순차 호출 — info → status
+      //    backend PATCH /:id/info 가 activity_type 변경 시 store_owner 부여/회수 자동 동기화.
+      //    status 가 마지막 (MembershipApprovalService 흐름에 영향 줄 수 있어).
+      if (nameChanged || typeChanged || activityChanged || pharmacyNameChanged || pharmacyAddressChanged) {
         const payload: Record<string, string> = {};
         if (nameChanged) payload.name = newName;
         if (typeChanged) payload.membership_type = editForm.membership_type;
+        if (activityChanged) payload.activity_type = editForm.activity_type;
+        if (pharmacyNameChanged) payload.pharmacy_name = editForm.pharmacy_name;
+        if (pharmacyAddressChanged) payload.pharmacy_address = editForm.pharmacy_address.trim();
         await apiClient.patch(`/members/${selectedMember.id}/info`, payload);
-      }
-      if (roleChanged) {
-        await apiClient.patch(`/members/${selectedMember.id}/role`, { role: editForm.role });
       }
       if (statusChanged) {
         await apiClient.patch(`/members/${selectedMember.id}/status`, { status: editForm.status });
@@ -509,7 +518,7 @@ export default function MemberManagementPage() {
     } finally {
       setSavingEdit(false);
     }
-  }, [selectedMember, editForm, memberHasSuperAdmin, memberIsWithdrawn, currentUserIsAdmin, currentUser, fetchMembers, memberPage]);
+  }, [selectedMember, editForm, memberHasSuperAdmin, memberIsWithdrawn, fetchMembers, memberPage]);
 
   // 목록(fetchMembers) 갱신 후 Drawer 의 selectedMember 도 최신 데이터로 동기화.
   // selectedMember 가 현재 페이지에 없으면(필터 변경 등) 기존 객체 유지.
@@ -1081,9 +1090,11 @@ export default function MemberManagementPage() {
         {selectedMember && (() => {
           // WO-O4O-OPERATOR-MEMBER-EDIT-ROLE-MANAGEMENT-V1:
           //   편집/보기 모드 분기. super_admin 회원은 편집 진입 차단.
+          // WO-O4O-KPA-OPERATOR-ACTIVITYTYPE-STOREOWNER-REALIGNMENT-V1:
+          //   조직 역할 select 제거 → 활동 유형 select + pharmacy_owner 부여/회수 흐름으로 교체.
+          //   admin scope (operator/admin/super_admin) 수정은 admin.neture.co.kr 로 이관.
           const targetIsSuperAdmin = memberHasSuperAdmin(selectedMember);
-          const targetIsSelf = !!currentUser && selectedMember.user_id === currentUser.id;
-          const roleSelectDisabled = !currentUserIsAdmin; // admin scope 없으면 비활성
+          const hasStoreOwnerCap = (selectedMember.capabilities ?? []).includes('kpa:store_owner');
           const inputStyle: CSSProperties = {
             width: '100%',
             padding: '6px 10px',
@@ -1162,48 +1173,20 @@ export default function MemberManagementPage() {
                 )}
               </div>
 
-              {/* 활동 유형 — 표시 전용 */}
-              {selectedMember.activity_type && (
-                <div style={fieldRowStyle}>
-                  <span style={labelStyle}>활동 유형</span>
-                  <span style={valueStyle}>
-                    {ACTIVITY_TYPE_LABELS[selectedMember.activity_type] ?? selectedMember.activity_type}
-                  </span>
-                </div>
-              )}
-
-              {/* 조직 역할 */}
+              {/* 조직 역할 — view-only.
+                  WO-O4O-KPA-OPERATOR-ACTIVITYTYPE-STOREOWNER-REALIGNMENT-V1:
+                  operator/admin/super_admin 수정은 admin.neture.co.kr 로 이관.
+                  본 화면에서는 현재 값만 확인 가능. */}
               <div style={fieldRowStyle}>
                 <span style={labelStyle}>조직 역할</span>
-                {isEditing ? (
-                  <div style={{ flex: 1 }}>
-                    <select
-                      value={editForm.role}
-                      onChange={(e) => setEditForm((f) => ({ ...f, role: e.target.value as MemberRole }))}
-                      disabled={savingEdit || roleSelectDisabled}
-                      style={inputStyle}
-                    >
-                      <option value="member">회원</option>
-                      <option value="operator">운영자</option>
-                      {/* self-escalation 차단: 자신을 admin 으로 못 만듦 (백엔드도 차단) */}
-                      <option value="admin" disabled={targetIsSelf}>관리자</option>
-                    </select>
-                    {roleSelectDisabled && (
-                      <p style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>
-                        조직 역할 변경은 admin 권한이 필요합니다.
-                      </p>
-                    )}
-                    {!roleSelectDisabled && targetIsSelf && (
-                      <p style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>
-                        자신을 admin으로 지정할 수 없습니다.
-                      </p>
-                    )}
-                  </div>
-                ) : (
-                  <span style={valueStyle}>
-                    {selectedMember.role ? (roleLabels[selectedMember.role as MemberRole] ?? selectedMember.role) : '-'}
-                  </span>
-                )}
+                <span style={valueStyle}>
+                  {selectedMember.role ? (roleLabels[selectedMember.role as MemberRole] ?? selectedMember.role) : '-'}
+                  {isEditing && (
+                    <span style={{ marginLeft: 8, fontSize: 11, color: '#94a3b8' }}>
+                      (수정은 관리자 화면에서)
+                    </span>
+                  )}
+                </span>
               </div>
 
               {/* 상태 */}
@@ -1235,40 +1218,123 @@ export default function MemberManagementPage() {
                 </div>
               )}
 
-              {/* WO-O4O-KPA-REGISTER-MODAL-ACTIVITY-AND-PHARMACY-OWNER-INTEGRATION-V1:
-                  직역(활동 유형) — 가입 단계에서 입력됨. 개설약사 여부 판단의 핵심 필드. */}
-              {selectedMember.activity_type && (
-                <div style={fieldRowStyle}>
-                  <span style={labelStyle}>직역</span>
+              {/* 직역(활동 유형) + 약국/근무처 정보
+                  WO-O4O-KPA-OPERATOR-ACTIVITYTYPE-STOREOWNER-REALIGNMENT-V1:
+                    operator 가 activity_type 을 수정. pharmacy_owner 전환 시 backend 가
+                    자동으로 store_owner role 부여/회수 + organization ensure 동기화.
+                    현재 store_owner 보유 상태는 capability chip 으로 노출됨. */}
+              <div style={fieldRowStyle}>
+                <span style={labelStyle}>직역</span>
+                {isEditing ? (
+                  <div style={{ flex: 1 }}>
+                    <select
+                      value={editForm.activity_type}
+                      onChange={(e) => setEditForm((f) => ({ ...f, activity_type: e.target.value }))}
+                      disabled={savingEdit}
+                      style={inputStyle}
+                    >
+                      <option value="">-</option>
+                      <option value="pharmacy_owner">약국 개설자</option>
+                      <option value="pharmacy_employee">약국 근무 약사</option>
+                      <option value="hospital">병원 약사</option>
+                      <option value="manufacturer">제조업</option>
+                      <option value="importer">수입업</option>
+                      <option value="wholesaler">도매업</option>
+                      <option value="other_industry">산업체</option>
+                      <option value="government">공무원</option>
+                      <option value="school">학교</option>
+                      <option value="other">기타</option>
+                      <option value="inactive">비활동</option>
+                    </select>
+                    {editForm.activity_type === 'pharmacy_owner'
+                      && selectedMember.activity_type !== 'pharmacy_owner' && (
+                      <p style={{ fontSize: 11, color: '#0369a1', marginTop: 4 }}>
+                        약국 개설자로 지정하면 매장 운영 권한(store_owner)이 자동 부여됩니다.
+                        (사업자번호/약국명이 누락된 경우 권한 부여는 건너뛰어집니다)
+                      </p>
+                    )}
+                    {selectedMember.activity_type === 'pharmacy_owner'
+                      && editForm.activity_type !== 'pharmacy_owner' && (
+                      <p style={{ fontSize: 11, color: '#b45309', marginTop: 4 }}>
+                        다른 직역으로 변경하면 매장 운영 권한(store_owner)이 회수됩니다.
+                      </p>
+                    )}
+                  </div>
+                ) : (
                   <span style={valueStyle}>
-                    {ACTIVITY_TYPE_LABELS[selectedMember.activity_type] ?? selectedMember.activity_type}
+                    {selectedMember.activity_type
+                      ? (ACTIVITY_TYPE_LABELS[selectedMember.activity_type] ?? selectedMember.activity_type)
+                      : '-'}
                     {selectedMember.activity_type === 'pharmacy_owner' && (
                       <span style={{ marginLeft: 6, fontSize: 11, padding: '1px 6px', borderRadius: 9999, background: '#fef3c7', color: '#92400e', border: '1px solid #fde68a' }}>
                         개설약사
                       </span>
                     )}
                   </span>
-                </div>
-              )}
+                )}
+              </div>
 
-              {/* 약국명/근무처명 — 표시 전용 */}
-              {selectedMember.pharmacy_name && (
-                <div style={fieldRowStyle}>
-                  <span style={labelStyle}>
-                    {selectedMember.activity_type === 'pharmacy_owner' ? '약국명' : '근무처명'}
-                  </span>
-                  <span style={valueStyle}>{selectedMember.pharmacy_name}</span>
-                </div>
-              )}
+              {/* 현재 매장 운영 권한 — 표시 전용 (capability 보유 여부) */}
+              <div style={fieldRowStyle}>
+                <span style={labelStyle}>매장 권한</span>
+                <span style={valueStyle}>
+                  {hasStoreOwnerCap ? (
+                    <span style={{ fontSize: 12, padding: '1px 8px', borderRadius: 9999, background: '#dcfce7', color: '#15803d', border: '1px solid #bbf7d0' }}>
+                      store_owner 보유
+                    </span>
+                  ) : (
+                    <span style={{ fontSize: 12, color: '#94a3b8' }}>없음</span>
+                  )}
+                </span>
+              </div>
 
-              {/* 근무처/사업장 주소 — 표시 전용 */}
-              {selectedMember.pharmacy_address && (
-                <div style={fieldRowStyle}>
-                  <span style={labelStyle}>
-                    {selectedMember.activity_type === 'pharmacy_owner' ? '사업장 주소' : '근무처 주소'}
-                  </span>
-                  <span style={valueStyle}>{selectedMember.pharmacy_address}</span>
-                </div>
+              {/* 약국명/근무처명 — 편집 모드 + view 통합 */}
+              {isEditing ? (
+                editForm.activity_type === 'pharmacy_owner' ? (
+                  <>
+                    <div style={fieldRowStyle}>
+                      <span style={labelStyle}>약국명</span>
+                      <input
+                        type="text"
+                        value={editForm.pharmacy_name}
+                        onChange={(e) => setEditForm((f) => ({ ...f, pharmacy_name: e.target.value }))}
+                        placeholder="약국명"
+                        disabled={savingEdit}
+                        style={inputStyle}
+                      />
+                    </div>
+                    <div style={fieldRowStyle}>
+                      <span style={labelStyle}>사업장 주소</span>
+                      <input
+                        type="text"
+                        value={editForm.pharmacy_address}
+                        onChange={(e) => setEditForm((f) => ({ ...f, pharmacy_address: e.target.value }))}
+                        placeholder={selectedMember.pharmacy_address || '주소 입력 (현재 값 유지하려면 비워둠)'}
+                        disabled={savingEdit}
+                        style={inputStyle}
+                      />
+                    </div>
+                  </>
+                ) : null
+              ) : (
+                <>
+                  {selectedMember.pharmacy_name && (
+                    <div style={fieldRowStyle}>
+                      <span style={labelStyle}>
+                        {selectedMember.activity_type === 'pharmacy_owner' ? '약국명' : '근무처명'}
+                      </span>
+                      <span style={valueStyle}>{selectedMember.pharmacy_name}</span>
+                    </div>
+                  )}
+                  {selectedMember.pharmacy_address && (
+                    <div style={fieldRowStyle}>
+                      <span style={labelStyle}>
+                        {selectedMember.activity_type === 'pharmacy_owner' ? '사업장 주소' : '근무처 주소'}
+                      </span>
+                      <span style={valueStyle}>{selectedMember.pharmacy_address}</span>
+                    </div>
+                  )}
+                </>
               )}
 
               {/* 개설약사: 사업자 정보 — users.businessInfo 에서 enrich */}

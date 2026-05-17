@@ -887,12 +887,26 @@ export function createMemberController(
 
   /**
    * PATCH /kpa/members/:id/info — 운영자용 회원정보 수정
+   *
+   * WO-O4O-KPA-OPERATOR-ACTIVITYTYPE-STOREOWNER-REALIGNMENT-V1:
+   *   activity_type 변경 시 자동 동기화:
+   *     · kpa_pharmacist_profiles.activity_type (SSOT — JWT user.activityType source)
+   *     · pharmacy_owner 부여: organization ensure + organization_member(owner) + kpa:store_owner role
+   *     · pharmacy_owner 회수: kpa:store_owner role deactivate
+   *   self 흐름 (auth-account.controller / me/profession) 의 동기화 패턴을 operator 흐름에 정렬.
+   *
+   *   부여 방향은 operator 권한으로 의도된 허용 (self frontend 가드와 다른 정책).
    */
   router.patch(
     '/:id/info',
     requireAuth,
     requireScope('kpa:operator'),
     param('id').isUUID(),
+    // activity_type 화이트리스트 — ACTIVITY_TYPE_LABELS 와 정렬
+    body('activity_type').optional().isString().isIn([
+      'pharmacy_owner', 'pharmacy_employee', 'hospital', 'manufacturer',
+      'importer', 'wholesaler', 'other_industry', 'government', 'school', 'other', 'inactive',
+    ]),
     handleValidationErrors,
     async (req: Request, res: Response): Promise<void> => {
       try {
@@ -904,6 +918,9 @@ export function createMemberController(
 
         const { name, membership_type, license_number, pharmacy_name, pharmacy_address, activity_type } = req.body;
         const changes: Record<string, any> = {};
+
+        // 변경 전 activity_type 보관 — pharmacy_owner 부여/회수 판정용
+        const prevActivityType = member.activity_type ?? null;
 
         // kpa_members 필드 업데이트 — WO-O4O-KPA-REGISTER-CANONICAL-CLEANUP-V1
         const validMembershipTypes = ['pharmacist', 'student', 'pharmacist_member', 'pharmacy_student_member'];
@@ -922,6 +939,98 @@ export function createMemberController(
         if (name && typeof name === 'string' && name.trim()) {
           changes.name = name.trim();
           await dataSource.query(`UPDATE users SET name = $1, updated_at = NOW() WHERE id = $2`, [name.trim(), member.user_id]);
+        }
+
+        // ─── WO-O4O-KPA-OPERATOR-ACTIVITYTYPE-STOREOWNER-REALIGNMENT-V1 ───
+        // 1) kpa_pharmacist_profiles SSOT sync (activity_type SSOT)
+        if (activity_type !== undefined) {
+          try {
+            await dataSource.query(
+              `INSERT INTO kpa_pharmacist_profiles (user_id, activity_type)
+               VALUES ($1, $2)
+               ON CONFLICT (user_id) DO UPDATE SET activity_type = $2, updated_at = NOW()`,
+              [member.user_id, activity_type]
+            );
+          } catch (syncErr) {
+            console.error('[SSOT-SYNC] kpa_pharmacist_profiles sync failed:', syncErr);
+          }
+        }
+
+        // 2) pharmacy_owner 회수 — 이전 = pharmacy_owner, 새 != pharmacy_owner
+        //    self auth-account.controller (WO-O4O-KPA-ACTIVITY-TYPE-ROLE-SYNC-V1) 패턴 복제
+        if (
+          activity_type !== undefined
+          && prevActivityType === 'pharmacy_owner'
+          && activity_type !== 'pharmacy_owner'
+        ) {
+          try {
+            await dataSource.query(
+              `UPDATE role_assignments
+               SET is_active = false, updated_at = NOW()
+               WHERE user_id = $1 AND role = 'kpa:store_owner' AND is_active = true`,
+              [member.user_id]
+            );
+            changes._store_owner_revoked = true;
+          } catch (revokeErr) {
+            console.error('[KPA Operator] kpa:store_owner revoke failed:', revokeErr);
+          }
+        }
+
+        // 3) pharmacy_owner 부여 — 이전 != pharmacy_owner, 새 = pharmacy_owner
+        //    member.controller pending→active 자동 활성화 분기 패턴 복제.
+        //    businessNumber/pharmacy_name 누락 시 silent skip (자동 활성화와 동일 정책).
+        if (
+          activity_type === 'pharmacy_owner'
+          && prevActivityType !== 'pharmacy_owner'
+        ) {
+          try {
+            const [userRow] = await dataSource.query(
+              `SELECT "businessInfo" FROM users WHERE id = $1 LIMIT 1`,
+              [member.user_id]
+            );
+            const biz = (userRow?.businessInfo && typeof userRow.businessInfo === 'object')
+              ? (userRow.businessInfo as Record<string, any>)
+              : {};
+            const rawBusinessNumber = typeof biz.businessNumber === 'string' ? biz.businessNumber : '';
+            const businessNumberDigits = rawBusinessNumber.replace(/[^0-9]/g, '');
+            const pName = member.pharmacy_name || (typeof biz.businessName === 'string' ? biz.businessName : null);
+
+            if (businessNumberDigits.length === 0 || !pName) {
+              console.warn(
+                `[KPA Operator] pharmacy_owner activation skipped — missing businessNumber/pharmacyName for member ${member.id}`,
+                { hasBusinessNumber: businessNumberDigits.length > 0, hasPharmacyName: !!pName }
+              );
+              changes._store_owner_activation = 'skipped:missing_business_info';
+            } else {
+              const orgCode = `kpa-pharm-${businessNumberDigits}`;
+              const orgResult = await organizationOpsService.ensureOrganization({
+                name: pName,
+                code: orgCode,
+                type: 'pharmacy',
+                createdByUserId: member.user_id,
+              });
+              await dataSource.query(
+                `UPDATE kpa_members SET organization_id = $1, updated_at = NOW()
+                 WHERE user_id = $2 AND organization_id IS NULL`,
+                [orgResult.id, member.user_id]
+              );
+              await organizationOpsService.addMember({
+                organizationId: orgResult.id,
+                userId: member.user_id,
+                role: 'owner',
+                isPrimary: false,
+              });
+              await roleAssignmentService.assignRole({
+                userId: member.user_id,
+                role: 'kpa:store_owner',
+                assignedBy: (req as any).user?.id,
+              });
+              changes._store_owner_activated = true;
+            }
+          } catch (activateErr) {
+            console.error('[KPA Operator] pharmacy_owner activation failed:', activateErr);
+            changes._store_owner_activation = 'error';
+          }
         }
 
         // Audit log
