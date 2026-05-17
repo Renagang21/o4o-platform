@@ -25,7 +25,8 @@ import OperatorStoresPage from '../pages/operator/OperatorStoresPage';
 import OperatorStoreDetailPage from '../pages/operator/OperatorStoreDetailPage';
 import OperatorStoreChannelsPage from '../pages/operator/OperatorStoreChannelsPage';
 // WO-O4O-EVENT-OFFER-OPERATOR-APPROVAL-KPA-V1: operator event offer approval
-import { EventOfferManagePage } from '../pages/intranet/event-offer';
+// WO-O4O-KPA-INTRANET-FEEDBACK-LEGACY-CLEANUP-V1: pages/intranet/event-offer/ → pages/operator/event-offer/
+import { EventOfferManagePage } from '../pages/operator/event-offer';
 // WO-KPA-A-BRANCH-CHAPTER-REMOVAL-PHASE4: admin-branch/NewsPage 제거 → operator/news 리다이렉트
 // WO-KPA-A-PLACEHOLDER-PAGES-IMPLEMENTATION: KPA-a operator 전용 페이지로 교체
 import OperatorForumPage from '../pages/operator/OperatorForumPage';
@@ -80,7 +81,8 @@ export function OperatorRoutes() {
           {/* 콘텐츠 관리 (WO-KPA-A-CONTENT-CMS-PHASE1-V1) */}
           <Route path="content" element={<ContentManagementPage />} />
 
-          {/* signage/content removed (WO-KPA-SIGNAGE-UI-RESTRUCTURE-V1) — use /intranet/signage/content for community */}
+          {/* signage/content removed (WO-KPA-SIGNAGE-UI-RESTRUCTURE-V1)
+              WO-O4O-KPA-INTRANET-FEEDBACK-LEGACY-CLEANUP-V1: 기존 /intranet/signage/content 참조 제거 — intranet 영역 전체 제거됨 */}
           {/* Signage Operator Console (WO-O4O-SIGNAGE-CONSOLE-V1) */}
           <Route path="signage/hq-media" element={<HqMediaPage />} />
           <Route path="signage/hq-media/:mediaId" element={<HqMediaDetailPage />} />
