@@ -471,6 +471,11 @@ export function createMemberController(
         const newStatus = req.body.status;
         member.status = newStatus;
 
+        // WO-O4O-KPA-ORGANIZATIONS-RAW-SQL-COLUMN-ALIGNMENT-V1:
+        //   auto-activation silent catch 가 운영자 인지를 차단하던 문제 정정.
+        //   PATCH /:id/info 의 warnings 패턴과 동일하게 응답에 명시한다.
+        const warnings: string[] = [];
+
         // identity_status 동기화 (WO-KPA-A-MEMBER-STATUS-SEMANTICS-SEPARATION-V1: rejected 추가)
         if (newStatus === 'suspended' || newStatus === 'rejected') {
           member.identity_status = 'suspended';
@@ -608,13 +613,14 @@ export function createMemberController(
             const pharmacyName = member.pharmacy_name || (typeof biz.businessName === 'string' ? biz.businessName : null);
 
             if (businessNumberDigits.length === 0 || !pharmacyName) {
+              const missing: string[] = [];
+              if (businessNumberDigits.length === 0) missing.push('사업자번호');
+              if (!pharmacyName) missing.push('약국명');
+              const reason = `매장 운영 권한(store_owner) 자동 부여 보류: ${missing.join(' / ')} 입력 후 다시 저장하세요.`;
               console.warn(
-                `[KPA Approval] pharmacy_owner auto-activation skipped — missing businessNumber/pharmacyName for member ${member.id}`,
-                {
-                  hasBusinessNumber: businessNumberDigits.length > 0,
-                  hasPharmacyName: !!pharmacyName,
-                }
+                `[KPA Approval] pharmacy_owner auto-activation skipped — ${missing.join(',')} missing for member ${member.id}`,
               );
+              warnings.push(reason);
             } else {
               // 1) organizations ensure (멱등 — code 충돌 시 동일 row 반환)
               const orgCode = `kpa-pharm-${businessNumberDigits}`;
@@ -649,9 +655,15 @@ export function createMemberController(
             }
           } catch (autoActivationError) {
             // 회원 승인 자체는 성공시킴 — 운영자가 legacy pharmacy_request 흐름으로 복구 가능
+            const errMsg = autoActivationError instanceof Error
+              ? autoActivationError.message
+              : String(autoActivationError);
             console.error(
               `[KPA Approval] pharmacy_owner auto-activation failed for member ${member.id}:`,
               autoActivationError
+            );
+            warnings.push(
+              `매장 운영 권한(store_owner) 자동 부여 실패: ${errMsg.slice(0, 200)} (운영자 수동 확인 필요)`,
             );
           }
         }
@@ -780,7 +792,12 @@ export function createMemberController(
           }
         }
 
-        res.json({ data: saved });
+        // WO-O4O-KPA-ORGANIZATIONS-RAW-SQL-COLUMN-ALIGNMENT-V1:
+        //   auto-activation 실패/보류 시 warnings[] 동봉 — PATCH /:id/info 패턴과 정렬.
+        res.json({
+          data: saved,
+          ...(warnings.length > 0 ? { warnings } : {}),
+        });
       } catch (error: any) {
         console.error('Failed to update member status:', error);
         res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: error.message } });

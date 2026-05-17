@@ -66,13 +66,19 @@ class OrganizationOpsService {
     const metadata = input.metadata ? JSON.stringify(input.metadata) : '{}';
     const isActive = input.isActive ?? true;
 
+    // WO-O4O-KPA-ORGANIZATIONS-RAW-SQL-COLUMN-ALIGNMENT-V1:
+    //   organizations 의 원본 컬럼은 camelCase quoted ("parentId", "isActive", "childrenCount",
+    //   "createdAt", "updatedAt") — connection.ts:570 SnakeNamingStrategy 비활성 정책.
+    //   Phase A 확장 컬럼만 snake_case (created_by_user_id, business_number, ...).
+    //   기존 raw SQL 이 snake_case 로 잘못 작성되어 sohae21@naver.com 등 신규 pharmacy_owner
+    //   승인 시 `column "parent_id" of relation "organizations" does not exist` 로 실패하던 것을 정정.
     const rows = await query(
-      `INSERT INTO organizations (id, name, code, type, metadata, parent_id, created_by_user_id, is_active, level, path, children_count, created_at, updated_at)
+      `INSERT INTO organizations (id, name, code, type, metadata, "parentId", created_by_user_id, "isActive", level, path, "childrenCount", "createdAt", "updatedAt")
        VALUES (gen_random_uuid(), $1, $2, $3, $4::jsonb, $5, $6, $7, 0, '/' || LOWER($2), 0, NOW(), NOW())
        ON CONFLICT (code) DO UPDATE SET
          name = EXCLUDED.name,
          metadata = organizations.metadata || EXCLUDED.metadata,
-         updated_at = NOW()
+         "updatedAt" = NOW()
        RETURNING id, (xmax = 0) AS created`,
       [input.name, input.code, input.type, metadata, input.parentId || null, input.createdByUserId || null, isActive],
     );

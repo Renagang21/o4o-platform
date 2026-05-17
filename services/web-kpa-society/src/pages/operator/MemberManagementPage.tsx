@@ -404,7 +404,18 @@ export default function MemberManagementPage() {
   async function handleStatusChange(memberId: string, newStatus: MemberStatus) {
     setActionLoading(memberId);
     try {
-      await apiClient.patch(`/members/${memberId}/status`, { status: newStatus });
+      // WO-O4O-KPA-ORGANIZATIONS-RAW-SQL-COLUMN-ALIGNMENT-V1:
+      //   PATCH /:id/status 가 store_owner auto-activation 실패/보류 시 warnings[] 를 동봉.
+      //   saveMemberEdit (PATCH /info) 와 동일 패턴으로 운영자에게 toast 노출.
+      const res = await apiClient.patch<{ data: any; warnings?: string[] }>(
+        `/members/${memberId}/status`,
+        { status: newStatus },
+      );
+      if (Array.isArray(res?.warnings) && res.warnings.length > 0) {
+        for (const w of res.warnings) {
+          toast.warning(w);
+        }
+      }
       await fetchMembers(memberPage);
     } catch (e: any) {
       toast.error(e.message || '상태 변경에 실패했습니다.');
