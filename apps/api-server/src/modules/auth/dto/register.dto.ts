@@ -121,7 +121,12 @@ export class RegisterRequestDto {
   @IsString()
   businessName?: string;
 
-  /** WO-O4O-GLYCOPHARM-PHARMACY-OWNER-SIGNUP-FORM-REFORM-V1: 약국 대표자명 */
+  /** 대표자명 (canonical) — WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1 */
+  @IsOptional()
+  @IsString()
+  ceoName?: string;
+
+  /** @deprecated ceoName 으로 통일. controller 에서 ceoName ?? representativeName fallback. */
   @IsOptional()
   @IsString()
   representativeName?: string;
@@ -140,10 +145,20 @@ export class RegisterRequestDto {
   @IsString()
   businessType?: string;
 
-  /** GlycoPharm: 세금계산서 이메일 */
+  /** 세금계산서 이메일 (canonical) — WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1 */
+  @IsOptional()
+  @IsEmail({}, { message: 'Valid tax invoice email is required' })
+  taxInvoiceEmail?: string;
+
+  /** @deprecated taxInvoiceEmail 로 통일. controller 에서 taxInvoiceEmail ?? taxEmail fallback. */
   @IsOptional()
   @IsEmail({}, { message: 'Valid tax email is required' })
   taxEmail?: string;
+
+  /** 담당자 전화번호 (canonical) — WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1 */
+  @IsOptional()
+  @IsString()
+  managerPhone?: string;
 
   /** GlycoPharm: 업종 */
   @IsOptional()

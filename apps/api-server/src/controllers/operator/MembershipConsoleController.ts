@@ -743,10 +743,14 @@ export class MembershipConsoleController {
     try {
       const scope: ServiceScope = (req as any).serviceScope;
       const { userId } = req.params;
+      // WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1: ceoName/taxInvoiceEmail/managerPhone canonical 수용.
+      // taxEmail/representativeName 은 legacy alias — controller 에서 canonical key 로만 저장.
       const {
         password, lastName, firstName, nickname, phone,
-        businessName, businessNumber, taxEmail, businessType,
+        businessName, businessNumber, businessType,
         businessCategory, zipCode, address1, address2,
+        ceoName, taxInvoiceEmail, managerPhone,
+        taxEmail, representativeName, // legacy aliases
         membershipRole, // service_memberships.role 변경
       } = req.body;
 
@@ -797,12 +801,20 @@ export class MembershipConsoleController {
       }
 
       // 3. businessInfo JSONB 머지
-      const bizFields: Record<string, string> = {};
+      // WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1:
+      //   ceoName / taxInvoiceEmail / managerPhone canonical write.
+      //   taxEmail → email overwrite 제거 (대표 이메일과 세금계산서 이메일 의미 분리).
+      //   legacy alias (taxEmail / representativeName) 는 client 보내도 canonical key 로 저장.
+      const bizFields: Record<string, any> = {};
       if (businessName !== undefined) bizFields.businessName = businessName;
       if (businessNumber !== undefined) bizFields.businessNumber = businessNumber;
-      if (taxEmail !== undefined) bizFields.email = taxEmail;
       if (businessType !== undefined) bizFields.businessType = businessType;
       if (businessCategory !== undefined) bizFields.businessCategory = businessCategory;
+      const effectiveCeoName = ceoName ?? representativeName;
+      if (effectiveCeoName !== undefined) bizFields.ceoName = effectiveCeoName;
+      const effectiveTaxInvoiceEmail = taxInvoiceEmail ?? taxEmail;
+      if (effectiveTaxInvoiceEmail !== undefined) bizFields.taxInvoiceEmail = effectiveTaxInvoiceEmail;
+      if (managerPhone !== undefined) bizFields.managerPhone = managerPhone;
       // WO-O4O-POSTAL-CODE-ADDRESS-V1: zipCode 저장
       if (zipCode !== undefined) bizFields.zipCode = zipCode;
       if (address1 !== undefined) bizFields.address = address1;

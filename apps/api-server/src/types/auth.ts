@@ -104,7 +104,9 @@ export interface BusinessInfo {
   businessName?: string;          // 사업자명 (상호명)
   businessNumber?: string;        // 사업자등록번호 (XXX-XX-XXXXX)
   businessType?: string;          // 사업자 유형 (개인/법인/개인사업자)
-  ceoName?: string;               // 대표자명
+  ceoName?: string;               // 대표자명 (canonical)
+  /** @deprecated WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1: ceoName 으로 통일. read-fallback 만 유지, 신규 write 금지. */
+  representativeName?: string;
 
   // 사업장 정보
   address?: string;               // 사업장 주소 (전체 주소 문자열)
@@ -114,8 +116,12 @@ export interface BusinessInfo {
 
   // 연락처 정보
   phone?: string;                 // 대표 전화번호
-  email?: string;                 // 사업자 이메일
+  email?: string;                 // 대표 이메일 (사업자 이메일) — 세금계산서 이메일은 taxInvoiceEmail 사용
   website?: string;               // 웹사이트 URL
+
+  // 세금계산서 / 운영 (WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1)
+  taxInvoiceEmail?: string;       // 세금계산서 발행용 이메일 (canonical) — email overwrite 금지
+  managerPhone?: string;          // 담당자 전화번호 (canonical)
 
   // 확장 가능한 메타데이터
   metadata?: Record<string, any>;

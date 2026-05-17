@@ -330,12 +330,17 @@ export function createMemberController(
           const businessInfo = (r.user_business_info && typeof r.user_business_info === 'object')
             ? r.user_business_info as Record<string, any>
             : null;
+          // WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1:
+          //   ceoName canonical ?? representativeName (legacy) fallback.
+          //   taxInvoiceEmail canonical ?? taxEmail (legacy) ?? email (legacy overwrite history) fallback.
+          //   응답 키도 canonical (ceoName / taxInvoiceEmail) 로 변경.
           const business_info = businessInfo
             ? {
                 businessNumber: businessInfo.businessNumber ?? null,
                 businessName: businessInfo.businessName ?? null,
-                representativeName: businessInfo.representativeName ?? null,
-                taxEmail: businessInfo.taxEmail ?? null,
+                ceoName: businessInfo.ceoName ?? businessInfo.representativeName ?? null,
+                taxInvoiceEmail: businessInfo.taxInvoiceEmail ?? businessInfo.taxEmail ?? businessInfo.email ?? null,
+                managerPhone: businessInfo.managerPhone ?? null,
               }
             : null;
           return {

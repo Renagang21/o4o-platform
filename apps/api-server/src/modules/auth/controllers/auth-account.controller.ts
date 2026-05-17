@@ -135,76 +135,88 @@ export class AuthAccountController extends BaseController {
     }
 
     try {
-      // WO-O4O-KPA-ACTIVITY-TYPE-ROLE-SYNC-V1:
-      //   변경 전 직역 조회 (UPSERT 후엔 새 값으로 덮여있어 비교 불가).
-      //   pharmacy_owner → 다른 직역 전환 감지에 사용 (아래 step 5).
-      const [prevProfile] = await AppDataSource.query(
-        `SELECT activity_type FROM kpa_pharmacist_profiles WHERE user_id = $1`,
-        [userId]
-      );
-      const prevActivityType: string | null = prevProfile?.activity_type ?? null;
-
-      // 1. SSOT: kpa_pharmacist_profiles
-      await AppDataSource.query(
-        `INSERT INTO kpa_pharmacist_profiles (user_id, activity_type)
-         VALUES ($1, $2)
-         ON CONFLICT (user_id) DO UPDATE SET activity_type = $2, updated_at = NOW()`,
-        [userId, resolvedActivityType]
-      );
-
-      // 2. Mirror: kpa_members.activity_type (denormalized sync)
-      await AppDataSource.query(
-        `UPDATE kpa_members SET activity_type = $2 WHERE user_id = $1`,
-        [userId, resolvedActivityType]
-      );
-
-      // 3. WO-KPA-A-PHARMACIST-ACTIVITY-TYPE-BUSINESS-INFO-FLOW-V1:
-      //    businessInfo → users.businessInfo JSONB (merge with existing)
-      if (businessInfo && typeof businessInfo === 'object') {
-        const allowedFields = ['businessName', 'phone', 'storeAddress', 'address', 'address2', 'zipCode'];
-        const sanitized: Record<string, any> = {};
-        for (const key of allowedFields) {
-          if (businessInfo[key] !== undefined) sanitized[key] = businessInfo[key];
-        }
-        if (Object.keys(sanitized).length > 0) {
-          const [existingUser] = await AppDataSource.query(
-            `SELECT "businessInfo" FROM users WHERE id = $1`, [userId]
-          );
-          const merged = { ...(existingUser?.businessInfo || {}), ...sanitized };
-          await AppDataSource.query(
-            `UPDATE users SET "businessInfo" = $1 WHERE id = $2`,
-            [JSON.stringify(merged), userId]
-          );
-        }
-      }
-
-      // 4. pharmacy_owner → kpa_members.pharmacy_name/pharmacy_address mirror
-      if (resolvedActivityType === 'pharmacy_owner' && businessInfo) {
-        const pName = businessInfo.businessName || null;
-        const pAddr = businessInfo.storeAddress
-          ? [businessInfo.storeAddress.zipCode, businessInfo.storeAddress.baseAddress, businessInfo.storeAddress.detailAddress].filter(Boolean).join(' ')
-          : (businessInfo.address || null);
-        await AppDataSource.query(
-          `UPDATE kpa_members SET pharmacy_name = COALESCE($2, pharmacy_name), pharmacy_address = COALESCE($3, pharmacy_address) WHERE user_id = $1`,
-          [userId, pName, pAddr]
-        );
-      }
-
-      // 5. WO-O4O-KPA-ACTIVITY-TYPE-ROLE-SYNC-V1:
-      //    pharmacy_owner → 다른 직역 전환 시 kpa:store_owner role 비활성화.
-      //    AdminUserController.revokeRoleAssignment 와 동일한 raw SQL soft delete 패턴.
-      //    is_active = true 가드로 멱등성 보장 (중복 호출 무해).
-      //    부여 방향(다른 직역 → pharmacy_owner) 은 frontend 가드
-      //    (WO-O4O-KPA-PHARMACY-OWNER-DIRECT-CHANGE-GUARD-V1) 로 차단되어
-      //    본 경로에서는 거의 발생하지 않음 — 본 WO 범위 외.
-      if (prevActivityType === 'pharmacy_owner' && resolvedActivityType !== 'pharmacy_owner') {
-        await AppDataSource.query(
-          `UPDATE role_assignments
-           SET is_active = false, updated_at = NOW()
-           WHERE user_id = $1 AND role = 'kpa:store_owner' AND is_active = true`,
+      // WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1:
+      //   FLOW P (PATCH /auth/me/profile) atomic transaction.
+      //   기존 4 separate query → 단일 transaction 으로 묶어 partial failure 시 전체 rollback.
+      await AppDataSource.transaction(async (manager) => {
+        // WO-O4O-KPA-ACTIVITY-TYPE-ROLE-SYNC-V1:
+        //   변경 전 직역 조회 (UPSERT 후엔 새 값으로 덮여있어 비교 불가).
+        //   pharmacy_owner → 다른 직역 전환 감지에 사용 (아래 step 5).
+        const [prevProfile] = await manager.query(
+          `SELECT activity_type FROM kpa_pharmacist_profiles WHERE user_id = $1`,
           [userId]
         );
-      }
+        const prevActivityType: string | null = prevProfile?.activity_type ?? null;
+
+        // 1. SSOT: kpa_pharmacist_profiles
+        await manager.query(
+          `INSERT INTO kpa_pharmacist_profiles (user_id, activity_type)
+           VALUES ($1, $2)
+           ON CONFLICT (user_id) DO UPDATE SET activity_type = $2, updated_at = NOW()`,
+          [userId, resolvedActivityType]
+        );
+
+        // 2. Mirror: kpa_members.activity_type (denormalized sync)
+        await manager.query(
+          `UPDATE kpa_members SET activity_type = $2 WHERE user_id = $1`,
+          [userId, resolvedActivityType]
+        );
+
+        // 3. WO-KPA-A-PHARMACIST-ACTIVITY-TYPE-BUSINESS-INFO-FLOW-V1:
+        //    businessInfo → users.businessInfo JSONB (merge with existing)
+        // WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1:
+        //    allowed list 에 ceoName / taxInvoiceEmail / managerPhone / businessNumber 추가.
+        //    representativeName / taxEmail (legacy) 은 client 가 보내도 무시 (canonical key 만 저장).
+        if (businessInfo && typeof businessInfo === 'object') {
+          const allowedFields = [
+            'businessName', 'businessNumber', 'businessType', 'businessCategory',
+            'ceoName', 'taxInvoiceEmail', 'managerPhone',
+            'phone', 'storeAddress', 'address', 'address2', 'zipCode',
+          ];
+          const sanitized: Record<string, any> = {};
+          for (const key of allowedFields) {
+            if (businessInfo[key] !== undefined) sanitized[key] = businessInfo[key];
+          }
+          if (Object.keys(sanitized).length > 0) {
+            const [existingUser] = await manager.query(
+              `SELECT "businessInfo" FROM users WHERE id = $1`, [userId]
+            );
+            const merged = { ...(existingUser?.businessInfo || {}), ...sanitized };
+            await manager.query(
+              `UPDATE users SET "businessInfo" = $1 WHERE id = $2`,
+              [JSON.stringify(merged), userId]
+            );
+          }
+        }
+
+        // 4. pharmacy_owner → kpa_members.pharmacy_name/pharmacy_address mirror
+        if (resolvedActivityType === 'pharmacy_owner' && businessInfo) {
+          const pName = businessInfo.businessName || null;
+          const pAddr = businessInfo.storeAddress
+            ? [businessInfo.storeAddress.zipCode, businessInfo.storeAddress.baseAddress, businessInfo.storeAddress.detailAddress].filter(Boolean).join(' ')
+            : (businessInfo.address || null);
+          await manager.query(
+            `UPDATE kpa_members SET pharmacy_name = COALESCE($2, pharmacy_name), pharmacy_address = COALESCE($3, pharmacy_address) WHERE user_id = $1`,
+            [userId, pName, pAddr]
+          );
+        }
+
+        // 5. WO-O4O-KPA-ACTIVITY-TYPE-ROLE-SYNC-V1:
+        //    pharmacy_owner → 다른 직역 전환 시 kpa:store_owner role 비활성화.
+        //    AdminUserController.revokeRoleAssignment 와 동일한 raw SQL soft delete 패턴.
+        //    is_active = true 가드로 멱등성 보장 (중복 호출 무해).
+        //    부여 방향(다른 직역 → pharmacy_owner) 은 frontend 가드
+        //    (WO-O4O-KPA-PHARMACY-OWNER-DIRECT-CHANGE-GUARD-V1) 로 차단되어
+        //    본 경로에서는 거의 발생하지 않음 — 본 WO 범위 외.
+        if (prevActivityType === 'pharmacy_owner' && resolvedActivityType !== 'pharmacy_owner') {
+          await manager.query(
+            `UPDATE role_assignments
+             SET is_active = false, updated_at = NOW()
+             WHERE user_id = $1 AND role = 'kpa:store_owner' AND is_active = true`,
+            [userId]
+          );
+        }
+      });
 
       const qualification = await derivePharmacistQualification(userId);
       return BaseController.ok(res, {

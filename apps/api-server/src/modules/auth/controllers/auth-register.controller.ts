@@ -116,15 +116,20 @@ export class AuthRegisterController extends BaseController {
           await txSmRepo.save(membership);
 
           // WO-O4O-GLYCOPHARM-SIGNUP-REFORM-V1: businessInfo 머지 (기존 정보 보존 + 신규 추가)
-          const newBiz: Record<string, string> = {};
+          // WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1: ceoName/taxInvoiceEmail canonical, taxEmail→email overwrite 제거.
+          const newBiz: Record<string, any> = {};
           const effectiveBusinessName = data.businessName || data.companyName;
           if (effectiveBusinessName) newBiz.businessName = effectiveBusinessName;
           if (data.businessNumber) newBiz.businessNumber = data.businessNumber;
           if (data.businessType) newBiz.businessType = data.businessType;
-          if (data.taxEmail) newBiz.email = data.taxEmail;
           if (data.businessCategory) newBiz.businessCategory = data.businessCategory;
-          // WO-O4O-GLYCOPHARM-PHARMACY-OWNER-SIGNUP-FORM-REFORM-V1: 대표자명
-          if (data.representativeName) newBiz.representativeName = data.representativeName;
+          // 대표자명 — ceoName canonical (representativeName fallback read 만 유지)
+          const effectiveCeoName = data.ceoName ?? data.representativeName;
+          if (effectiveCeoName) newBiz.ceoName = effectiveCeoName;
+          // 세금계산서 이메일 — taxInvoiceEmail canonical (taxEmail fallback). email 필드는 덮어쓰지 않음
+          const effectiveTaxInvoiceEmail = data.taxInvoiceEmail ?? data.taxEmail;
+          if (effectiveTaxInvoiceEmail) newBiz.taxInvoiceEmail = effectiveTaxInvoiceEmail;
+          if (data.managerPhone) newBiz.managerPhone = data.managerPhone;
           if (data.zipCode) newBiz.zipCode = data.zipCode;
           if (data.address1) newBiz.address = data.address1;
           if (data.address2) newBiz.address2 = data.address2;
@@ -191,8 +196,9 @@ export class AuthRegisterController extends BaseController {
         newUser.marketingAccepted = marketingAccepted;
 
         // businessInfo: 사업자 정보 + 면허번호 저장
+        // WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1: ceoName/taxInvoiceEmail canonical, taxEmail→email overwrite 제거.
         const effectiveBusinessName = data.businessName || data.companyName;
-        const businessInfo: Record<string, string> = {};
+        const businessInfo: Record<string, any> = {};
         if (data.licenseNumber) {
           businessInfo.licenseNumber = data.licenseNumber;
         }
@@ -205,15 +211,21 @@ export class AuthRegisterController extends BaseController {
         if (data.businessType) {
           businessInfo.businessType = data.businessType;
         }
-        if (data.taxEmail) {
-          businessInfo.email = data.taxEmail;
-        }
         if (data.businessCategory) {
           businessInfo.businessCategory = data.businessCategory;
         }
-        // WO-O4O-GLYCOPHARM-PHARMACY-OWNER-SIGNUP-FORM-REFORM-V1: 대표자명
-        if (data.representativeName) {
-          businessInfo.representativeName = data.representativeName;
+        // 대표자명 — ceoName canonical (representativeName fallback read 만)
+        const effectiveCeoName = data.ceoName ?? data.representativeName;
+        if (effectiveCeoName) {
+          businessInfo.ceoName = effectiveCeoName;
+        }
+        // 세금계산서 이메일 — taxInvoiceEmail canonical (taxEmail fallback). email 필드는 덮어쓰지 않음
+        const effectiveTaxInvoiceEmail = data.taxInvoiceEmail ?? data.taxEmail;
+        if (effectiveTaxInvoiceEmail) {
+          businessInfo.taxInvoiceEmail = effectiveTaxInvoiceEmail;
+        }
+        if (data.managerPhone) {
+          businessInfo.managerPhone = data.managerPhone;
         }
         // WO-O4O-POSTAL-CODE-ADDRESS-V1: zipCode 저장
         if (data.zipCode) {
@@ -494,11 +506,13 @@ export class AuthRegisterController extends BaseController {
     //   개설약사: 사업자 정보를 users.businessInfo JSONB 에 merge.
     //   (organization_stores 자동 생성·kpa:store_owner 자동 부여는 본 WO 범위 외 — pharmacy_request 흐름 유지)
     if (isPharmacyOwner) {
+      // WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1: ceoName/taxInvoiceEmail canonical.
       const businessFields = {
         businessNumber: data.businessNumber || null,
         businessName: data.businessName || data.pharmacyName || null,
-        representativeName: data.representativeName || null,
-        taxEmail: data.taxEmail || null,
+        ceoName: data.ceoName ?? data.representativeName ?? null,
+        taxInvoiceEmail: data.taxInvoiceEmail ?? data.taxEmail ?? null,
+        managerPhone: data.managerPhone || null,
         zipCode: data.zipCode || null,
         address: data.address1 || data.pharmacyAddress || null,
         address2: data.address2 || null,
@@ -554,13 +568,16 @@ export class AuthRegisterController extends BaseController {
     );
     if (existing.length > 0) return;
 
-    // 약국 경영자 신청 metadata: 대표자명, 면허번호, 주소, 업태/업종 등
+    // 약국 경영자 신청 metadata snapshot — WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1: ceoName/taxInvoiceEmail canonical.
     const metadata: Record<string, any> = {};
-    if (data.representativeName) metadata.representativeName = data.representativeName;
+    const metaCeoName = data.ceoName ?? data.representativeName;
+    if (metaCeoName) metadata.ceoName = metaCeoName;
     if (data.licenseNumber) metadata.licenseNumber = data.licenseNumber;
-    if (data.taxEmail) metadata.taxEmail = data.taxEmail;
+    const metaTaxInvoiceEmail = data.taxInvoiceEmail ?? data.taxEmail;
+    if (metaTaxInvoiceEmail) metadata.taxInvoiceEmail = metaTaxInvoiceEmail;
     if (data.businessType) metadata.businessType = data.businessType;
     if (data.businessCategory) metadata.businessCategory = data.businessCategory;
+    if (data.managerPhone) metadata.managerPhone = data.managerPhone;
     if (data.zipCode) metadata.zipCode = data.zipCode;
     if (data.address1) metadata.address = data.address1;
     if (data.address2) metadata.addressDetail = data.address2;
