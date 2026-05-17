@@ -3,6 +3,11 @@
  * WO-O4O-ENROLLMENT-SYSTEM-V1
  * WO-O4O-KPA-MYPAGE-ENROLLMENTS-LAYOUT-ALIGN-V1 — 외곽 레이아웃을 /mypage 프로필 공통 패턴으로 정렬
  *   (실제 코드 변경은 commit 64b567eca 에 함께 묶여 push 되었음 — parallel-session 동시 commit 사고)
+ * WO-O4O-KPA-MY-ENROLLMENTS-HYBRID-LIST-ALIGN-V1 — pure card → hybrid (card+meta row).
+ *   IR-O4O-COMMUNITY-LIST-UX-CANONICAL-AUDIT-V1 의 medium drift 1건 정비.
+ *   - thumbnail / identity / meta / progress / action 영역 분리
+ *   - desktop 에서 정보 밀도 ↑, mobile 에서 카드 wrap 유지
+ *   - 명시적 action 버튼 (이어서 학습 / 다시 보기 / 수료증 보기)
  *
  * Route: /mypage/enrollments
  * API: GET /lms/enrollments/me
@@ -86,12 +91,50 @@ function ProgressBar({ value }: { value: number }) {
   );
 }
 
-/* ── 수강 카드 ─────────────────────────── */
-function EnrollmentCard({ enrollment, onNavigate }: { enrollment: Enrollment; onNavigate: () => void }) {
-  const { course, status, progressPercentage, completedLessons, totalLessons, enrolledAt } = enrollment;
+/* ── Action 정책 — 상태별 다음 행동 ───── */
+type EnrollmentAction = {
+  key: string;
+  label: string;
+  variant: 'primary' | 'secondary';
+  onClick: () => void;
+};
+
+function buildEnrollmentActions(
+  enrollment: Enrollment,
+  navigate: ReturnType<typeof useNavigate>,
+): EnrollmentAction[] {
+  const { status, courseId } = enrollment;
+  const goCourse = () => navigate(`/lms/course/${courseId}`);
+  const goCertificate = () => navigate('/mypage/certificates');
+
+  switch (status) {
+    case 'in_progress':
+    case 'approved':
+      return [{ key: 'continue', label: '이어서 학습', variant: 'primary', onClick: goCourse }];
+    case 'completed':
+      return [
+        { key: 'certificate', label: '수료증 보기', variant: 'primary', onClick: goCertificate },
+        { key: 'review',      label: '다시 보기',   variant: 'secondary', onClick: goCourse },
+      ];
+    case 'pending':
+      return [{ key: 'detail', label: '신청 상세', variant: 'secondary', onClick: goCourse }];
+    case 'rejected':
+    case 'cancelled':
+    case 'expired':
+    default:
+      return [{ key: 'view', label: '강의 보기', variant: 'secondary', onClick: goCourse }];
+  }
+}
+
+/* ── 수강 카드 (hybrid row) ───────────────
+   Desktop: [thumb] [identity + meta + progress] [actions]  3-column row
+   Mobile : flex-wrap 으로 actions 가 아래로 wrap 되는 card 형태 유지   */
+function EnrollmentCard({ enrollment, actions }: { enrollment: Enrollment; actions: EnrollmentAction[] }) {
+  const { course, status, progressPercentage, completedLessons, totalLessons, enrolledAt, completedAt } = enrollment;
 
   const isActive = status === 'in_progress' || status === 'approved';
   const isCompleted = status === 'completed';
+  const showProgress = isActive || isCompleted;
 
   return (
     <div
@@ -101,29 +144,33 @@ function EnrollmentCard({ enrollment, onNavigate }: { enrollment: Enrollment; on
         borderRadius: 12,
         padding: '20px 24px',
         display: 'flex',
-        gap: 16,
-        cursor: isActive || isCompleted ? 'pointer' : 'default',
+        flexWrap: 'wrap',
+        alignItems: 'stretch',
+        gap: 20,
         transition: 'box-shadow 0.15s',
       }}
-      onClick={isActive || isCompleted ? onNavigate : undefined}
     >
-      {/* 썸네일 */}
+      {/* 1. Thumbnail */}
       <div style={{
-        width: 80, height: 60, borderRadius: 8, flexShrink: 0,
+        width: 112, height: 80, borderRadius: 8, flexShrink: 0,
         background: course.thumbnail ? undefined : '#e5e7eb',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         overflow: 'hidden',
       }}>
         {course.thumbnail
           ? <img src={course.thumbnail} alt={course.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          : <span style={{ fontSize: 24 }}>📚</span>
+          : <span style={{ fontSize: 32 }} aria-hidden>📚</span>
         }
       </div>
 
-      {/* 본문 */}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, marginBottom: 6 }}>
-          <h3 style={{ fontSize: 15, fontWeight: 600, color: colors.neutral900, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+      {/* 2. Identity + Meta + Progress */}
+      <div style={{ flex: '1 1 280px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {/* identity row */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <h3 style={{
+            fontSize: 15, fontWeight: 600, color: colors.neutral900, margin: 0,
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0,
+          }}>
             {course.title}
           </h3>
           <span style={{
@@ -135,15 +182,20 @@ function EnrollmentCard({ enrollment, onNavigate }: { enrollment: Enrollment; on
           </span>
         </div>
 
-        <div style={{ display: 'flex', gap: 10, fontSize: 12, color: colors.neutral500, marginBottom: 10 }}>
-          {course.duration > 0 && <span>{course.duration}분</span>}
-          {course.duration > 0 && enrolledAt && <span>·</span>}
-          {enrolledAt && <span>신청일: {new Date(enrolledAt).toLocaleDateString('ko-KR')}</span>}
+        {/* meta row — duration / enrolled / completed */}
+        <div style={{ display: 'flex', gap: 10, fontSize: 12, color: colors.neutral500, flexWrap: 'wrap' }}>
+          {course.duration > 0 && <span>⏱ {course.duration}분</span>}
+          {enrolledAt && <span>📝 신청 {new Date(enrolledAt).toLocaleDateString('ko-KR')}</span>}
+          {isCompleted && completedAt && (
+            <span style={{ color: '#6366f1', fontWeight: 600 }}>
+              🎓 수료 {new Date(completedAt).toLocaleDateString('ko-KR')}
+            </span>
+          )}
         </div>
 
-        {/* 진도 */}
-        {(isActive || isCompleted) && (
-          <div>
+        {/* progress row */}
+        {showProgress && (
+          <div style={{ marginTop: 2 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: colors.neutral500, marginBottom: 4 }}>
               <span>{completedLessons}/{totalLessons} 레슨 완료</span>
               <span style={{ fontWeight: 600, color: isCompleted ? '#6366f1' : colors.neutral700 }}>
@@ -153,6 +205,37 @@ function EnrollmentCard({ enrollment, onNavigate }: { enrollment: Enrollment; on
             <ProgressBar value={progressPercentage} />
           </div>
         )}
+      </div>
+
+      {/* 3. Action stack */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 6,
+        alignSelf: 'center',
+        flexShrink: 0,
+        minWidth: 120,
+      }}>
+        {actions.map((action) => (
+          <button
+            key={action.key}
+            onClick={action.onClick}
+            style={{
+              padding: '8px 16px',
+              fontSize: 13,
+              fontWeight: 500,
+              borderRadius: 8,
+              cursor: 'pointer',
+              border: action.variant === 'primary' ? 'none' : `1px solid ${colors.neutral200}`,
+              background: action.variant === 'primary' ? colors.primary : colors.white,
+              color: action.variant === 'primary' ? '#fff' : colors.neutral700,
+              whiteSpace: 'nowrap',
+              transition: 'opacity 0.15s',
+            }}
+          >
+            {action.label}
+          </button>
+        ))}
       </div>
     </div>
   );
@@ -254,7 +337,7 @@ export function MyEnrollmentsPage() {
             <EnrollmentCard
               key={enrollment.id}
               enrollment={enrollment}
-              onNavigate={() => navigate(`/lms/course/${enrollment.courseId}`)}
+              actions={buildEnrollmentActions(enrollment, navigate)}
             />
           ))}
         </div>
