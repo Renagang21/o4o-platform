@@ -273,10 +273,14 @@ export function createMemberController(
         }
 
         const whereClause = conditions.join(' AND ');
+        // WO-O4O-KPA-ACTIVITY-TYPE-SSOT-ROLE-CANONICAL-ALIGN-V1 (Phase 1):
+        //   activity_type SSOT = kpa_pharmacist_profiles.activity_type.
+        //   kpa_members.activity_type 은 legacy mirror — SSOT 부재 시 fallback 으로만 사용.
         const baseFrom = `
           FROM service_memberships sm
           JOIN users u ON u.id = sm.user_id
           LEFT JOIN kpa_members km ON km.user_id = sm.user_id
+          LEFT JOIN kpa_pharmacist_profiles pp ON pp.user_id = sm.user_id
           WHERE ${whereClause}
         `;
 
@@ -300,7 +304,7 @@ export function createMemberController(
                km.license_number,
                km.pharmacy_name,
                km.pharmacy_address,
-               km.activity_type,
+               COALESCE(pp.activity_type, km.activity_type) AS activity_type,
                km.fee_category,
                km.sub_role,
                km.university_name,
