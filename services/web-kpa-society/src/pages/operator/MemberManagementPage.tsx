@@ -30,7 +30,7 @@ import {
   Trash2,
   ShieldAlert,
 } from 'lucide-react';
-import { ActionBar, BulkResultModal, RowActionMenu, ConfirmActionDialog, BaseDetailDrawer } from '@o4o/ui';
+import { ActionBar, BulkResultModal, RowActionMenu, ConfirmActionDialog, BaseDetailDrawer, AddressSearch } from '@o4o/ui';
 import {
   DataTable,
   MemberListLayout,
@@ -86,6 +86,10 @@ interface KpaMember {
     //   pharmacy_phone canonical = users.businessInfo.metadata.pharmacy_phone (JSONB).
     //   backend GET /kpa/members 가 business_info 응답 객체에 attach.
     pharmacy_phone?: string | null;
+    // WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1: canonical address fields
+    zipCode?: string | null;
+    address?: string | null;
+    address2?: string | null;
   } | null;
   joined_at: string | null;
   created_at: string;
@@ -329,6 +333,10 @@ export default function MemberManagementPage() {
     license_number: string;
     pharmacy_name: string;
     pharmacy_address: string;
+    // WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1: canonical split address fields
+    zipCode: string;
+    address1: string;
+    address2: string;
     business_number: string;
     pharmacy_phone: string;
     status: MemberStatus;
@@ -340,6 +348,9 @@ export default function MemberManagementPage() {
     license_number: '',
     pharmacy_name: '',
     pharmacy_address: '',
+    zipCode: '',
+    address1: '',
+    address2: '',
     business_number: '',
     pharmacy_phone: '',
     status: 'active',
@@ -469,6 +480,10 @@ export default function MemberManagementPage() {
       license_number: m.license_number || '',
       pharmacy_name: m.pharmacy_name || '',
       pharmacy_address: m.pharmacy_address || '',
+      // WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1: canonical address prefill
+      zipCode: m.business_info?.zipCode || '',
+      address1: m.business_info?.address || '',
+      address2: m.business_info?.address2 || '',
       business_number: m.business_info?.businessNumber || '',
       pharmacy_phone: m.business_info?.pharmacy_phone || '',
       status: m.status,
@@ -495,6 +510,10 @@ export default function MemberManagementPage() {
       license_number: selectedMember.license_number || '',
       pharmacy_name: selectedMember.pharmacy_name || '',
       pharmacy_address: selectedMember.pharmacy_address || '',
+      // WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1: canonical address prefill
+      zipCode: selectedMember.business_info?.zipCode || '',
+      address1: selectedMember.business_info?.address || '',
+      address2: selectedMember.business_info?.address2 || '',
       business_number: selectedMember.business_info?.businessNumber || '',
       pharmacy_phone: selectedMember.business_info?.pharmacy_phone || '',
       status: selectedMember.status,
@@ -533,6 +552,17 @@ export default function MemberManagementPage() {
       const activityChanged = editForm.activity_type !== (selectedMember.activity_type || '');
       const licenseChanged = editForm.license_number !== (selectedMember.license_number || '');
       const pharmacyNameChanged = editForm.pharmacy_name !== (selectedMember.pharmacy_name || '');
+      // WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1: canonical address change detection
+      const currentZipCode = (selectedMember.business_info?.zipCode || '').trim();
+      const newZipCode = editForm.zipCode.trim();
+      const currentAddress1 = (selectedMember.business_info?.address || '').trim();
+      const newAddress1 = editForm.address1.trim();
+      const currentAddress2 = (selectedMember.business_info?.address2 || '').trim();
+      const newAddress2 = editForm.address2.trim();
+      const addressChanged = newAddress1.length > 0 && (
+        newZipCode !== currentZipCode || newAddress1 !== currentAddress1 || newAddress2 !== currentAddress2
+      );
+
       // WO-O4O-KPA-MEMBER-EDIT-FORM-CURRENT-VALUE-FIX-V1:
       //   pharmacy_address / pharmacy_phone 가 form 에 prefill 되므로 변경 감지를
       //   비교 기반으로 전환한다. 단, 빈 값 명시 삭제는 본 WO 범위 외이므로
@@ -551,7 +581,7 @@ export default function MemberManagementPage() {
       if (
         !nameChanged && !nicknameChanged && !typeChanged && !activityChanged && !licenseChanged
         && !pharmacyNameChanged && !pharmacyAddressChanged
-        && !businessNumberChanged && !pharmacyPhoneChanged && !statusChanged
+        && !businessNumberChanged && !pharmacyPhoneChanged && !addressChanged && !statusChanged
       ) {
         setIsEditing(false);
         return;
@@ -563,7 +593,7 @@ export default function MemberManagementPage() {
       if (
         nameChanged || nicknameChanged || typeChanged || activityChanged || licenseChanged
         || pharmacyNameChanged || pharmacyAddressChanged
-        || businessNumberChanged || pharmacyPhoneChanged
+        || businessNumberChanged || pharmacyPhoneChanged || addressChanged
       ) {
         const payload: Record<string, string> = {};
         if (nameChanged) payload.name = newName;
@@ -578,6 +608,12 @@ export default function MemberManagementPage() {
         if (pharmacyAddressChanged) payload.pharmacy_address = newPharmacyAddress;
         if (businessNumberChanged) payload.business_number = editForm.business_number;
         if (pharmacyPhoneChanged) payload.pharmacy_phone = newPharmacyPhone;
+        // WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1: send split address fields
+        if (addressChanged) {
+          payload.zipCode = newZipCode;
+          payload.address1 = newAddress1;
+          payload.address2 = newAddress2;
+        }
         const infoRes = await apiClient.patch<{ success: boolean; warnings?: string[] }>(
           `/members/${selectedMember.id}/info`,
           payload,
@@ -1444,19 +1480,22 @@ export default function MemberManagementPage() {
                         }}
                       />
                     </div>
-                    {/* WO-O4O-KPA-MEMBER-EDIT-FORM-CURRENT-VALUE-FIX-V1:
-                        현재값이 form 에 prefill 되므로 placeholder 는 단순 안내 문구로 변경.
-                        빈 입력으로 명시 삭제 의도가 있어도 본 WO 범위 외 — 현재값 유지 동작. */}
-                    <div style={fieldRowStyle}>
-                      <span style={labelStyle}>약국 주소</span>
-                      <input
-                        type="text"
-                        value={editForm.pharmacy_address}
-                        onChange={(e) => setEditForm((f) => ({ ...f, pharmacy_address: e.target.value }))}
-                        placeholder="약국 주소 (예: 서울특별시 강남구 ○○로 ○○)"
-                        disabled={savingEdit}
-                        style={inputStyle}
-                      />
+                    {/* WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1:
+                        AddressSearch 컴포넌트 사용 — canonical split address (zipCode/address1/address2).
+                        저장 시 backend 가 pharmacy_address 합성하여 kpa_members 동기화. */}
+                    <div style={{ ...fieldRowStyle, flexDirection: 'column', alignItems: 'flex-start' }}>
+                      <span style={{ ...labelStyle, marginBottom: 6 }}>약국 주소</span>
+                      <div style={{ width: '100%' }}>
+                        <AddressSearch
+                          zipCode={editForm.zipCode}
+                          address={editForm.address1}
+                          addressDetail={editForm.address2}
+                          onChange={({ zipCode, address, addressDetail }) =>
+                            setEditForm((f) => ({ ...f, zipCode, address1: address, address2: addressDetail }))
+                          }
+                          disabled={savingEdit}
+                        />
+                      </div>
                     </div>
                     <div style={fieldRowStyle}>
                       <span style={labelStyle}>약국 전화</span>

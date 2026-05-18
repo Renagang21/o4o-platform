@@ -378,6 +378,11 @@ export function createMemberController(
                 taxInvoiceEmail: businessInfo.taxInvoiceEmail ?? businessInfo.taxEmail ?? businessInfo.email ?? null,
                 managerPhone: businessInfo.managerPhone ?? null,
                 pharmacy_phone: (metadata?.pharmacy_phone as string | undefined) ?? null,
+                // WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1:
+                //   canonical address fields from users.businessInfo — used by MemberManagementPage AddressSearch.
+                zipCode: businessInfo.zipCode ?? null,
+                address: businessInfo.address ?? null,
+                address2: businessInfo.address2 ?? null,
               }
             : null;
           return {
@@ -968,6 +973,10 @@ export function createMemberController(
     ]),
     body('business_number').optional().isString().isLength({ max: 50 }),
     body('pharmacy_phone').optional().isString().isLength({ max: 50 }),
+    // WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1: split address fields
+    body('zipCode').optional({ nullable: true }).isString().isLength({ max: 10 }),
+    body('address1').optional({ nullable: true }).isString().isLength({ max: 200 }),
+    body('address2').optional({ nullable: true }).isString().isLength({ max: 100 }),
     // WO-O4O-KPA-MEMBER-CAPABILITY-NICKNAME-UI-CANONICAL-CLEANUP-V1: nickname 수정 허용
     body('nickname').optional({ nullable: true }).isString().isLength({ max: 50 }),
     handleValidationErrors,
@@ -1037,6 +1046,8 @@ export function createMemberController(
         const {
           name, membership_type, license_number, pharmacy_name, pharmacy_address,
           activity_type, business_number, pharmacy_phone, nickname,
+          // WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1: canonical split address fields
+          zipCode, address1, address2,
         } = req.body;
         const changes: Record<string, any> = {};
         const warnings: string[] = [];
@@ -1089,9 +1100,13 @@ export function createMemberController(
 
         // ─── WO-O4O-KPA-OPERATOR-MEMBER-CANONICAL-EDIT-COMPLETE-V1 ───
         //   business_number / pharmacy_phone → users.businessInfo JSONB merge (별도 컬럼 없음).
-        //   이후 pharmacy_owner 부여 분기에서도 prevBiz 가 갱신된 값을 사용.
+        //   WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1:
+        //   zipCode / address1→address / address2 → users.businessInfo canonical address fields.
+        //   pharmacy_address 미전송 시 분리 필드로 합성 → kpa_members.pharmacy_address 동기화.
         let nextBiz: Record<string, any> | null = null;
-        if (business_number !== undefined || pharmacy_phone !== undefined) {
+        const hasBizUpdate = business_number !== undefined || pharmacy_phone !== undefined
+          || zipCode !== undefined || address1 !== undefined || address2 !== undefined;
+        if (hasBizUpdate) {
           nextBiz = { ...prevBiz };
           if (business_number !== undefined) {
             nextBiz.businessNumber = business_number;
@@ -1101,12 +1116,26 @@ export function createMemberController(
             nextBiz.metadata = { ...((prevBiz.metadata as Record<string, any>) || {}), pharmacy_phone };
             changes.pharmacy_phone = pharmacy_phone;
           }
+          if (zipCode !== undefined) { nextBiz.zipCode = zipCode || null; changes.zipCode = zipCode; }
+          if (address1 !== undefined) { nextBiz.address = address1 || null; changes.address1 = address1; }
+          if (address2 !== undefined) { nextBiz.address2 = address2 || null; changes.address2 = address2; }
           await dataSource.query(
             `UPDATE users SET "businessInfo" = $1::jsonb, "updatedAt" = NOW() WHERE id = $2`,
             [JSON.stringify(nextBiz), member.user_id]
           );
           // 갱신값을 prevBiz 에 반영 — 이후 부여 분기에서 사용
           Object.assign(prevBiz, nextBiz);
+
+          // kpa_members.pharmacy_address 동기화:
+          //   pharmacy_address 가 명시 전송되지 않은 경우, 분리 필드로 합성하여 덮어씀.
+          if (pharmacy_address === undefined && (address1 !== undefined || zipCode !== undefined)) {
+            const bz = nextBiz as Record<string, any>;
+            const composed = [bz.zipCode, bz.address, bz.address2].filter(Boolean).join(' ').trim();
+            if (composed) {
+              changes.pharmacy_address = composed;
+              member.pharmacy_address = composed;
+            }
+          }
         }
 
         // 1) kpa_pharmacist_profiles SSOT sync (activity_type SSOT)
