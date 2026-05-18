@@ -247,7 +247,7 @@ export function createPharmacyRequestRoutes(
         const slugService = new StoreSlugService(dataSource);
         const existing = await slugService.findByStoreId(orgResult.id, 'kpa');
         if (!existing) {
-          const slug = await slugService.generateUniqueSlug(request.pharmacy_name || orgResult.name);
+          const slug = await slugService.generateUniqueSlug(request.pharmacy_name);
           await slugService.reserveSlug({ storeId: orgResult.id, serviceKey: 'kpa', slug });
         }
       } catch (e) {
