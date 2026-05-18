@@ -132,6 +132,9 @@ export function useNotifications(
   }, [api, enabled]);
 
   // Initial fetch + optional polling.
+  // WO-O4O-KPA-NOTIFICATION-429-GUARD-V1:
+  // refetchCount를 deps에서 제거 — api/enabled 변경으로 이미 재실행됨.
+  // refetchCount 함수 참조 변경만으로 불필요한 재실행이 발생하는 경로 차단.
   useEffect(() => {
     if (!enabled || !api) return;
     void refetchCount();
@@ -142,7 +145,7 @@ export function useNotifications(
       return () => clearInterval(id);
     }
     return undefined;
-  }, [enabled, api, pollIntervalMs, refetchCount]);
+  }, [enabled, api, pollIntervalMs]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // When disabled (logout), reset local state.
   useEffect(() => {

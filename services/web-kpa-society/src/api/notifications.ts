@@ -40,6 +40,10 @@ function isUnauthorized(err: any): boolean {
   return err?.status === 401;
 }
 
+function isRateLimited(err: any): boolean {
+  return err?.status === 429;
+}
+
 const SERVICE_KEY = 'kpa';
 
 export const notificationsApi: NotificationApiClient = {
@@ -52,6 +56,12 @@ export const notificationsApi: NotificationApiClient = {
       return res?.data?.count ?? 0;
     } catch (err) {
       if (isUnauthorized(err)) return 0;
+      // WO-O4O-KPA-NOTIFICATION-429-GUARD-V1:
+      // 429 Rate Limit — re-throw 대신 0 반환.
+      // useNotifications는 silent catch이지만, re-throw 경로를 유지하면
+      // 컴포넌트 재마운트 시 backoff 없이 즉시 재시도된다.
+      // 0을 반환해 bell을 조용히 유지하고, 다음 정상 fetch에서 실제 값 복원.
+      if (isRateLimited(err)) return 0;
       throw err;
     }
   },
