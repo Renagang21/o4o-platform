@@ -342,7 +342,7 @@ export function MyProfilePage() {
   // ─── Guards ───
   if (!user) {
     return (
-      <div style={styles.container}>
+      <div className="w-full max-w-[1120px] mx-auto px-4 sm:px-5 lg:px-6 pb-10">
         <EmptyState icon="🔒" title="로그인이 필요합니다" description="프로필을 확인하려면 로그인해주세요." />
       </div>
     );
@@ -352,7 +352,7 @@ export function MyProfilePage() {
 
   if (error) {
     return (
-      <div style={styles.container}>
+      <div className="w-full max-w-[1120px] mx-auto px-4 sm:px-5 lg:px-6 pb-10">
         <EmptyState icon="⚠️" title="오류가 발생했습니다" description={error} action={{ label: '다시 시도', onClick: loadData }} />
       </div>
     );
@@ -381,10 +381,11 @@ export function MyProfilePage() {
 
   // Derive pharmacy/workplace display info
   const pharmacyName = profile?.pharmacy?.name || biz?.businessName || null;
-  const pharmacyAddress = profile?.pharmacy?.address
-    || (biz?.storeAddress
-      ? [biz.storeAddress.zipCode, biz.storeAddress.baseAddress, biz.storeAddress.detailAddress].filter(Boolean).join(' ')
-      : biz?.address || null);
+  // 주소: storeAddress 구조화 데이터 우선, 없으면 단일 문자열 fallback
+  const pharmacyAddressDetail = biz?.storeAddress && biz.storeAddress.baseAddress
+    ? biz.storeAddress
+    : null;
+  const pharmacyAddressFallback = profile?.pharmacy?.address || biz?.address || null;
   const pharmacyPhone = biz?.phone || null;
   const workplaceName = biz?.businessName || null;
   const workplacePhone = biz?.phone || null;
@@ -714,10 +715,33 @@ export function MyProfilePage() {
                     <span style={styles.infoLabel}>약국명</span>
                     <span style={styles.infoValue}>{pharmacyName || <span style={styles.notRegistered}>등록 필요</span>}</span>
                   </div>
-                  <div style={styles.infoRow}>
-                    <span style={styles.infoLabel}>약국 주소</span>
-                    <span style={styles.infoValue}>{pharmacyAddress || '-'}</span>
-                  </div>
+                  {(pharmacyAddressDetail || pharmacyAddressFallback) ? (
+                    <>
+                      {pharmacyAddressDetail?.zipCode && (
+                        <div style={styles.infoRow}>
+                          <span style={styles.infoLabel}>우편번호</span>
+                          <span style={styles.infoValue}>{pharmacyAddressDetail.zipCode}</span>
+                        </div>
+                      )}
+                      <div style={styles.infoRow}>
+                        <span style={styles.infoLabel}>약국 주소</span>
+                        <span style={styles.infoValue}>
+                          {pharmacyAddressDetail?.baseAddress || pharmacyAddressFallback || '-'}
+                        </span>
+                      </div>
+                      {pharmacyAddressDetail?.detailAddress && (
+                        <div style={styles.infoRow}>
+                          <span style={styles.infoLabel}>상세주소</span>
+                          <span style={styles.infoValue}>{pharmacyAddressDetail.detailAddress}</span>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div style={styles.infoRow}>
+                      <span style={styles.infoLabel}>약국 주소</span>
+                      <span style={styles.infoValue}>-</span>
+                    </div>
+                  )}
                   <div style={styles.infoRow}>
                     <span style={styles.infoLabel}>약국 전화번호</span>
                     <span style={styles.infoValue}>{pharmacyPhone || '-'}</span>
@@ -831,11 +855,6 @@ export function MyProfilePage() {
 }
 
 const styles: Record<string, React.CSSProperties> = {
-  container: {
-    maxWidth: '600px',
-    margin: '0 auto',
-    padding: '0 20px 40px',
-  },
   // Tab bar
   tabBar: {
     display: 'flex',

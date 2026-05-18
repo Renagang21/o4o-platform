@@ -161,7 +161,7 @@ export default function ForumMemberManagementPage() {
   // ---------------------------------------------------------------------------
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4">
+    <div className="w-full max-w-[1120px] mx-auto px-4 sm:px-5 lg:px-6 pb-10">
       <MyPageNavigation items={KPA_MYPAGE_NAV_ITEMS} />
 
       {/* Back link */}
