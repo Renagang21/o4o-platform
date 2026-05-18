@@ -1272,12 +1272,12 @@ export default function MemberManagementPage() {
                   >
                     <option value="pharmacist">약사</option>
                     <option value="student">약대생</option>
-                    {/* legacy alias 값이 들어와 있는 경우 표시 유지 */}
+                    {/* pharmacist_member / pharmacy_student_member 는 canonical 저장값 — pharmacist/student alias 와 동일 표시 */}
                     {editForm.membership_type === 'pharmacist_member' && (
-                      <option value="pharmacist_member">약사 (legacy)</option>
+                      <option value="pharmacist_member">약사</option>
                     )}
                     {editForm.membership_type === 'pharmacy_student_member' && (
-                      <option value="pharmacy_student_member">약대생 (legacy)</option>
+                      <option value="pharmacy_student_member">약대생</option>
                     )}
                   </select>
                 ) : (
