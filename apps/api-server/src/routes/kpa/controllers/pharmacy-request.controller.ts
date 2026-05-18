@@ -23,6 +23,7 @@ import type { ActionLogService } from '@o4o/action-log-core';
 import { KpaPharmacyRequest } from '../entities/kpa-pharmacy-request.entity.js';
 import { organizationOpsService } from '../../../modules/organization/services/organization-ops.service.js';
 import { RoleAssignmentService } from '../../../modules/auth/services/role-assignment.service.js';
+import { StoreSlugService } from '@o4o/platform-core/store-identity';
 
 export function createPharmacyRequestRoutes(
   dataSource: DataSource,
@@ -239,6 +240,19 @@ export function createPharmacyRequestRoutes(
         role: 'kpa:store_owner',
         assignedBy: user.id,
       });
+
+      // 6. WO-O4O-KPA-STORE-SLUG-ON-APPROVE-V1: 승인 시 store slug 즉시 생성 (멱등)
+      // 이전에는 slug가 backfill 마이그레이션에만 의존했으나, 승인 후 즉시 생성으로 변경
+      try {
+        const slugService = new StoreSlugService(dataSource);
+        const existing = await slugService.findByStoreId(orgResult.id, 'kpa');
+        if (!existing) {
+          const slug = await slugService.generateUniqueSlug(request.pharmacy_name || orgResult.name);
+          await slugService.reserveSlug({ storeId: orgResult.id, serviceKey: 'kpa', slug });
+        }
+      } catch (e) {
+        console.error('[PharmacyRequest] Slug generation failed (non-blocking):', e);
+      }
 
       actionLogService?.logSuccess('kpa-society', user.id, 'kpa.operator.pharmacy_approve', {
         meta: { targetId: req.params.id, statusBefore: 'pending', statusAfter: 'approved' },
