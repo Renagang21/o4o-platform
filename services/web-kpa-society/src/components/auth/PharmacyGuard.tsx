@@ -12,7 +12,7 @@
  *   → operator 단독 계정: isStoreOwner=false → isPlatformOnlyUser=true → 차단 유지.
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { hasAnyRole, PLATFORM_ROLES } from '../../lib/role-constants';
@@ -28,6 +28,11 @@ export function PharmacyGuard({ children }: PharmacyGuardProps) {
   const { user, isAuthenticated, isLoading, checkAuth } = useAuth();
   const location = useLocation();
   const [apiCheck, setApiCheck] = useState<'idle' | 'loading' | 'approved' | 'denied'>('idle');
+  // WO-O4O-KPA-PHARMACYGUARD-LOOP-FIX-V1: stale JWT recovery는 최초 1회만 시도.
+  // checkAuth() Phase1이 isStoreOwner를 일시적으로 false로 설정하므로
+  // hasStoreRole이 false로 변할 때마다 effect가 재실행되어 무한루프 발생.
+  // ref로 이미 시도했으면 재호출 방지.
+  const staleJwtRecoveryAttemptedRef = useRef(false);
 
   // WO-O4O-KPA-PHARMACYGUARD-OPERATOR-FIX-V1:
   // JWT roles(STORE_OWNER_ROLES) 또는 KPA context(isStoreOwner) 중 하나라도 true면 통과.
@@ -59,9 +64,13 @@ export function PharmacyGuard({ children }: PharmacyGuardProps) {
     return () => { cancelled = true; };
   }, [needsApiCheck, apiCheck]);
 
-  // Stale JWT 회복: API 승인 확인 시 세션 갱신
+  // Stale JWT 회복: API 승인 확인 시 세션 갱신 (최초 1회만)
+  // WO-O4O-KPA-PHARMACYGUARD-LOOP-FIX-V1:
+  // checkAuth() → Phase1: isStoreOwner=false → hasStoreRole=false →
+  // effect 재실행 → checkAuth() 무한루프. ref로 1회 시도 후 차단.
   useEffect(() => {
-    if (apiCheck === 'approved' && !hasStoreRole) {
+    if (apiCheck === 'approved' && !hasStoreRole && !staleJwtRecoveryAttemptedRef.current) {
+      staleJwtRecoveryAttemptedRef.current = true;
       checkAuth();
     }
   }, [apiCheck, hasStoreRole, checkAuth]);
