@@ -11,26 +11,15 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { MembershipGate } from './MembershipGate';
 import { isPlatformSuperAdmin } from '../../lib/membershipGate';
+import {
+  NETURE_ROLES,
+  ADMIN_ROLES,
+  OPERATOR_ROLES,
+  SUPPLIER_ROLES,
+} from '../../lib/role-constants';
 
-// ─── Neture Role Constants ───
-
-export const NETURE_ROLES = {
-  PLATFORM_SUPER_ADMIN: 'platform:super_admin',
-  ADMIN: 'neture:admin',
-  OPERATOR: 'neture:operator',
-  SUPPLIER: 'neture:supplier',
-  PARTNER: 'neture:partner',
-  SELLER: 'neture:seller',
-} as const;
-
-/** Admin 역할 집합 (admin + platform:super_admin) */
-export const ADMIN_ROLES = [NETURE_ROLES.ADMIN, NETURE_ROLES.PLATFORM_SUPER_ADMIN];
-
-/** Operator 역할 집합 */
-export const OPERATOR_ROLES = [NETURE_ROLES.OPERATOR];
-
-/** Supplier 역할 집합 (legacy 'supplier' 포함 — 가입 시 unprefixed로 저장됨) */
-export const SUPPLIER_ROLES = [NETURE_ROLES.SUPPLIER, 'supplier', 'partner', 'seller'];
+// re-export for backward compat — 기존 import 유지
+export { NETURE_ROLES, ADMIN_ROLES, OPERATOR_ROLES, SUPPLIER_ROLES };
 
 // ─── RouteGuard (통합 컴포넌트) ───
 

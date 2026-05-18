@@ -16,6 +16,12 @@ import { LayoutDashboard, Settings, Shield } from 'lucide-react';
 import { GlobalHeader, GlobalHeaderMenuItem } from '@o4o/ui';
 import { NotificationBell, useNotifications } from '@o4o/account-ui';
 import { notificationsApi, NOTIFICATION_SERVICE_KEY } from '../lib/api/notifications';
+import {
+  ADMIN_ROLES,
+  OPERATOR_OR_ABOVE_ROLES,
+  SUPPLIER_ONLY_ROLES,
+  PARTNER_ONLY_ROLES,
+} from '../lib/role-constants';
 import { useAuth } from '../contexts/AuthContext';
 import { useLoginModal } from '../contexts/LoginModalContext';
 import {
@@ -51,18 +57,10 @@ export function NetureGlobalHeader() {
     serviceKey: NOTIFICATION_SERVICE_KEY,
   });
 
-  const isAdmin = isAuthenticated && user?.roles?.some(
-    (r: string) => r === 'neture:admin' || r === 'platform:super_admin',
-  );
-  const isOperator = isAuthenticated && user?.roles?.some(
-    (r: string) => r === 'neture:operator' || r === 'neture:admin' || r === 'platform:super_admin',
-  );
-  const isSupplier = isAuthenticated && user?.roles?.some(
-    (r: string) => r === 'neture:supplier' || r === 'supplier',
-  );
-  const isPartner = isAuthenticated && user?.roles?.some(
-    (r: string) => r === 'neture:partner' || r === 'partner',
-  );
+  const isAdmin = isAuthenticated && user?.roles?.some((r: string) => ADMIN_ROLES.includes(r));
+  const isOperator = isAuthenticated && user?.roles?.some((r: string) => OPERATOR_OR_ABOVE_ROLES.includes(r));
+  const isSupplier = isAuthenticated && user?.roles?.some((r: string) => SUPPLIER_ONLY_ROLES.includes(r));
+  const isPartner = isAuthenticated && user?.roles?.some((r: string) => PARTNER_ONLY_ROLES.includes(r));
 
   const hasDashboardRole = isAdmin || isOperator || isSupplier || isPartner;
   const dashboardPath = hasDashboardRole && user?.roles

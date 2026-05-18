@@ -13,6 +13,7 @@ import { Link, Outlet, useLocation, Navigate } from 'react-router-dom';
 import { LayoutDashboard, Package, ShoppingCart } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { NetureGlobalHeader } from '../NetureGlobalHeader';
+import { SUPPLIER_ACCESS_ROLES } from '../../lib/role-constants';
 
 const SIDEBAR_ITEMS = [
   { label: 'Dashboard', path: '/account/supplier', icon: LayoutDashboard, exact: true },
@@ -41,7 +42,7 @@ export default function SupplierAccountLayout() {
     return <Navigate to="/login" state={{ from: location.pathname + location.search }} replace />;
   }
 
-  const hasAccess = user.roles.some((r: string) => ['neture:supplier', 'supplier', 'neture:admin', 'platform:super_admin'].includes(r));
+  const hasAccess = user.roles.some((r: string) => SUPPLIER_ACCESS_ROLES.includes(r));
   if (!hasAccess) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen text-center p-8">

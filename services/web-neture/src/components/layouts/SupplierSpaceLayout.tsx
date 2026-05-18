@@ -26,6 +26,7 @@ import {
 import type { LucideIcon } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { NetureGlobalHeader } from '../NetureGlobalHeader';
+import { SUPPLIER_ACCESS_ROLES } from '../../lib/role-constants';
 
 // WO-NETURE-SUPPLIER-PRODUCT-LIST-WIDE-TABLE-VIEW-APPLY-V1
 // 자식 페이지가 본문 영역의 max-width 제약을 해제할 수 있도록 컨텍스트 제공
@@ -137,7 +138,7 @@ export default function SupplierSpaceLayout() {
     return <Navigate to="/login" state={{ from: location.pathname + location.search }} replace />;
   }
 
-  const hasAccess = user.roles.some(r => ['neture:supplier', 'supplier', 'neture:admin', 'platform:super_admin'].includes(r));
+  const hasAccess = user.roles.some(r => SUPPLIER_ACCESS_ROLES.includes(r));
   if (!hasAccess) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen text-center p-8">

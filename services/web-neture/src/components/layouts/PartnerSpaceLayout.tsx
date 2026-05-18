@@ -23,6 +23,7 @@ import {
 import type { LucideIcon } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { NetureGlobalHeader } from '../NetureGlobalHeader';
+import { PARTNER_ACCESS_ROLES } from '../../lib/role-constants';
 
 /* ------------------------------------------------------------------ */
 /*  Sidebar 그룹 정의                                                   */
@@ -96,7 +97,7 @@ export default function PartnerSpaceLayout() {
     return <Navigate to="/login" state={{ from: location.pathname + location.search }} replace />;
   }
 
-  const hasAccess = user.roles.some(r => ['neture:partner', 'partner', 'neture:admin', 'platform:super_admin'].includes(r));
+  const hasAccess = user.roles.some(r => PARTNER_ACCESS_ROLES.includes(r));
   if (!hasAccess) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen text-center p-8">

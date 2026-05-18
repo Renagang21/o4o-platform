@@ -18,6 +18,7 @@ import {
 } from '@o4o/account-ui';
 
 import { useAuth, getNetureDashboardRoute, getNetureRoleLabel, useLoginModal } from '../contexts';
+import { DASHBOARD_B2B_ROLES } from '../lib/role-constants';
 
 export default function AccountMenu() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -55,7 +56,7 @@ export default function AccountMenu() {
   const roleLabel = getNetureRoleLabel(user.roles);
 
   // WO-O4O-AUTH-RBAC-CLEANUP-V1: 대시보드 대상 역할 판별
-  const DASHBOARD_ROLES = ['supplier', 'partner', 'seller'];
+  const DASHBOARD_ROLES = DASHBOARD_B2B_ROLES;
   const hasDashboardRole = user.roles?.some((r: string) =>
     r.endsWith(':admin') ||
     r.endsWith(':operator') ||

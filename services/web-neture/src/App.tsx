@@ -41,6 +41,7 @@ import SupplierAccountLayout from './components/layouts/SupplierAccountLayout';
 import PartnerAccountLayout from './components/layouts/PartnerAccountLayout';
 import AdminVaultLayout from './components/layouts/AdminVaultLayout';
 import { RoleGuard, OperatorRoute, AdminRoute, SupplierRoute } from './components/auth/RoleGuard';
+import { ADMIN_ROLES } from './lib/role-constants';
 
 // ============================================================================
 // Neture 메인 페이지 (항상 로드)
@@ -826,7 +827,7 @@ function App() {
                 Admin Vault (/admin-vault)
             ================================================================ */}
             <Route element={
-              <ProtectedRoute allowedRoles={['neture:admin', 'platform:super_admin']}>
+              <ProtectedRoute allowedRoles={ADMIN_ROLES}>
                 <AdminVaultLayout />
               </ProtectedRoute>
             }>

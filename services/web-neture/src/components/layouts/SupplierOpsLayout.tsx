@@ -24,6 +24,7 @@ import {
 import type { LucideIcon } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { NetureGlobalHeader } from '../NetureGlobalHeader';
+import { SUPPLIER_HUB_ACCESS_ROLES } from '../../lib/role-constants';
 
 /* ------------------------------------------------------------------ */
 /*  Sidebar 그룹 정의                                                   */
@@ -70,7 +71,7 @@ export default function SupplierOpsLayout() {
   const { user } = useAuth();
 
   // 허브 접근 가능 역할: supplier, partner, admin
-  const hasHubAccess = user?.roles.some(r => ['neture:admin', 'platform:super_admin', 'neture:supplier', 'supplier', 'neture:partner', 'partner'].includes(r));
+  const hasHubAccess = user?.roles.some(r => SUPPLIER_HUB_ACCESS_ROLES.includes(r));
 
   const sidebarGroups = hasHubAccess
     ? [...BASE_SIDEBAR_GROUPS, HUB_GROUP]

@@ -13,6 +13,7 @@ import { Link, Outlet, useLocation, Navigate } from 'react-router-dom';
 import { LayoutDashboard, FileText, Link2, Store, MessageSquare } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { NetureGlobalHeader } from '../NetureGlobalHeader';
+import { PARTNER_ACCESS_ROLES } from '../../lib/role-constants';
 
 const SIDEBAR_ITEMS = [
   { label: 'Dashboard', path: '/account/partner', icon: LayoutDashboard, exact: true },
@@ -43,7 +44,7 @@ export default function PartnerAccountLayout() {
     return <Navigate to="/login" state={{ from: location.pathname + location.search }} replace />;
   }
 
-  const hasAccess = user.roles.some((r: string) => ['neture:partner', 'partner', 'neture:admin', 'platform:super_admin'].includes(r));
+  const hasAccess = user.roles.some((r: string) => PARTNER_ACCESS_ROLES.includes(r));
   if (!hasAccess) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen text-center p-8">
