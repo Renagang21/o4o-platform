@@ -31,6 +31,7 @@ interface PharmacyInfoResponse {
   taxInvoiceEmail: string | null;
   ownerPhone: string | null;
   ceoName: string | null;
+  contactName: string | null;
   managerPhone: string | null;
   storeSlug: string | null;
 }
@@ -92,6 +93,7 @@ export function createPharmacyInfoController(
       taxInvoiceEmail: meta.taxInvoiceEmail || null,
       ownerPhone: meta.ownerPhone || null,
       ceoName: meta.ceoName || null,
+      contactName: meta.contactName || null,
       managerPhone: meta.managerPhone || null,
       storeSlug: slugRecord?.slug ?? null,
     };
@@ -127,6 +129,7 @@ export function createPharmacyInfoController(
           if (biz) {
             if (!data.phone && biz.phone) data.phone = biz.phone;
             if (!data.ceoName && biz.ceoName) data.ceoName = biz.ceoName;
+            if (!data.contactName && biz.contactName) data.contactName = biz.contactName;
             if (!data.managerPhone && biz.managerPhone) data.managerPhone = biz.managerPhone;
             if (!data.addressDetail && biz.storeAddress) {
               data.addressDetail = {
@@ -199,6 +202,12 @@ export function createPharmacyInfoController(
       }
     }
 
+    if (body.contactName !== undefined && body.contactName !== null && body.contactName !== '') {
+      if (typeof body.contactName !== 'string' || body.contactName.trim().length > 50) {
+        errors.push('contactName: 담당자명은 50자 이내');
+      }
+    }
+
     if (body.managerPhone !== undefined && body.managerPhone !== null && body.managerPhone !== '') {
       const digits = sanitizePhone(body.managerPhone);
       if (digits && digits.length > 20) errors.push('managerPhone: 담당자 전화는 20자 이내');
@@ -236,6 +245,7 @@ export function createPharmacyInfoController(
       taxInvoiceEmail: body.taxInvoiceEmail || null,
       ownerPhone: sanitizePhone(body.ownerPhone),
       ceoName: body.ceoName?.trim() || null,
+      contactName: body.contactName?.trim() || null,
       managerPhone: sanitizePhone(body.managerPhone),
     };
 
@@ -273,6 +283,7 @@ export function createPharmacyInfoController(
         taxInvoiceEmail: meta?.taxInvoiceEmail || null,
         ownerPhone: meta?.ownerPhone || null,
         ceoName: meta?.ceoName || null,
+        contactName: meta?.contactName || null,
         managerPhone: meta?.managerPhone || null,
         storeSlug: slugRecord?.slug ?? null,
       } satisfies PharmacyInfoResponse,

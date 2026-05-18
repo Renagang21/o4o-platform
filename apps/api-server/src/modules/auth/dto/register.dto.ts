@@ -155,6 +155,11 @@ export class RegisterRequestDto {
   @IsEmail({}, { message: 'Valid tax email is required' })
   taxEmail?: string;
 
+  /** 담당자명 (canonical) — WO-O4O-KPA-PHARMACY-CONTACT-NAME-FIELD-V1 */
+  @IsOptional()
+  @IsString()
+  contactName?: string;
+
   /** 담당자 전화번호 (canonical) — WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1 */
   @IsOptional()
   @IsString()

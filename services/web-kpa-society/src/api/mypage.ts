@@ -94,6 +94,7 @@ export interface ProfileResponse {
     zipCode?: string;
     // canonical
     ceoName?: string;
+    contactName?: string;
     taxInvoiceEmail?: string;
     managerPhone?: string;
     // legacy fallback (read only)

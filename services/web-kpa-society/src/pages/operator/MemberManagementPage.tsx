@@ -86,6 +86,8 @@ interface KpaMember {
     //   pharmacy_phone canonical = users.businessInfo.metadata.pharmacy_phone (JSONB).
     //   backend GET /kpa/members 가 business_info 응답 객체에 attach.
     pharmacy_phone?: string | null;
+    // WO-O4O-KPA-PHARMACY-CONTACT-NAME-FIELD-V1
+    contactName?: string | null;
     // WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1: canonical address fields
     zipCode?: string | null;
     address?: string | null;
@@ -333,6 +335,8 @@ export default function MemberManagementPage() {
     license_number: string;
     pharmacy_name: string;
     pharmacy_address: string;
+    // WO-O4O-KPA-PHARMACY-CONTACT-NAME-FIELD-V1
+    contactName: string;
     // WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1: canonical split address fields
     zipCode: string;
     address1: string;
@@ -348,6 +352,7 @@ export default function MemberManagementPage() {
     license_number: '',
     pharmacy_name: '',
     pharmacy_address: '',
+    contactName: '',
     zipCode: '',
     address1: '',
     address2: '',
@@ -480,6 +485,8 @@ export default function MemberManagementPage() {
       license_number: m.license_number || '',
       pharmacy_name: m.pharmacy_name || '',
       pharmacy_address: m.pharmacy_address || '',
+      // WO-O4O-KPA-PHARMACY-CONTACT-NAME-FIELD-V1
+      contactName: m.business_info?.contactName || '',
       // WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1: canonical address prefill
       zipCode: m.business_info?.zipCode || '',
       address1: m.business_info?.address || '',
@@ -510,6 +517,8 @@ export default function MemberManagementPage() {
       license_number: selectedMember.license_number || '',
       pharmacy_name: selectedMember.pharmacy_name || '',
       pharmacy_address: selectedMember.pharmacy_address || '',
+      // WO-O4O-KPA-PHARMACY-CONTACT-NAME-FIELD-V1
+      contactName: selectedMember.business_info?.contactName || '',
       // WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1: canonical address prefill
       zipCode: selectedMember.business_info?.zipCode || '',
       address1: selectedMember.business_info?.address || '',
@@ -552,6 +561,10 @@ export default function MemberManagementPage() {
       const activityChanged = editForm.activity_type !== (selectedMember.activity_type || '');
       const licenseChanged = editForm.license_number !== (selectedMember.license_number || '');
       const pharmacyNameChanged = editForm.pharmacy_name !== (selectedMember.pharmacy_name || '');
+      const currentContactName = (selectedMember.business_info?.contactName || '').trim();
+      const newContactName = editForm.contactName.trim();
+      const contactNameChanged = newContactName !== currentContactName;
+
       // WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1: canonical address change detection
       const currentZipCode = (selectedMember.business_info?.zipCode || '').trim();
       const newZipCode = editForm.zipCode.trim();
@@ -581,7 +594,7 @@ export default function MemberManagementPage() {
       if (
         !nameChanged && !nicknameChanged && !typeChanged && !activityChanged && !licenseChanged
         && !pharmacyNameChanged && !pharmacyAddressChanged
-        && !businessNumberChanged && !pharmacyPhoneChanged && !addressChanged && !statusChanged
+        && !businessNumberChanged && !pharmacyPhoneChanged && !contactNameChanged && !addressChanged && !statusChanged
       ) {
         setIsEditing(false);
         return;
@@ -593,7 +606,7 @@ export default function MemberManagementPage() {
       if (
         nameChanged || nicknameChanged || typeChanged || activityChanged || licenseChanged
         || pharmacyNameChanged || pharmacyAddressChanged
-        || businessNumberChanged || pharmacyPhoneChanged || addressChanged
+        || businessNumberChanged || pharmacyPhoneChanged || contactNameChanged || addressChanged
       ) {
         const payload: Record<string, string> = {};
         if (nameChanged) payload.name = newName;
@@ -608,6 +621,7 @@ export default function MemberManagementPage() {
         if (pharmacyAddressChanged) payload.pharmacy_address = newPharmacyAddress;
         if (businessNumberChanged) payload.business_number = editForm.business_number;
         if (pharmacyPhoneChanged) payload.pharmacy_phone = newPharmacyPhone;
+        if (contactNameChanged) payload.contactName = newContactName;
         // WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1: send split address fields
         if (addressChanged) {
           payload.zipCode = newZipCode;
@@ -1498,6 +1512,18 @@ export default function MemberManagementPage() {
                       </div>
                     </div>
                     <div style={fieldRowStyle}>
+                      <span style={labelStyle}>담당자명</span>
+                      <input
+                        type="text"
+                        value={editForm.contactName}
+                        onChange={(e) => setEditForm((f) => ({ ...f, contactName: e.target.value }))}
+                        placeholder="담당자 이름 (선택)"
+                        maxLength={50}
+                        disabled={savingEdit}
+                        style={inputStyle}
+                      />
+                    </div>
+                    <div style={fieldRowStyle}>
                       <span style={labelStyle}>약국 전화</span>
                       <input
                         type="text"
@@ -1556,6 +1582,12 @@ export default function MemberManagementPage() {
                   <span style={valueStyle}>
                     {selectedMember.business_info.ceoName || selectedMember.business_info.representativeName}
                   </span>
+                </div>
+              )}
+              {selectedMember.business_info?.contactName && (
+                <div style={fieldRowStyle}>
+                  <span style={labelStyle}>담당자명</span>
+                  <span style={valueStyle}>{selectedMember.business_info.contactName}</span>
                 </div>
               )}
               {(selectedMember.business_info?.taxInvoiceEmail || selectedMember.business_info?.taxEmail) && (

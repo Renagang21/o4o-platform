@@ -749,7 +749,7 @@ export class MembershipConsoleController {
         password, lastName, firstName, nickname, phone,
         businessName, businessNumber, businessType,
         businessCategory, zipCode, address1, address2,
-        ceoName, taxInvoiceEmail, pharmacyPhone, managerPhone,
+        ceoName, contactName, taxInvoiceEmail, pharmacyPhone, managerPhone,
         taxEmail, representativeName, // legacy aliases
         membershipRole, // service_memberships.role 변경
       } = req.body;
@@ -812,6 +812,7 @@ export class MembershipConsoleController {
       if (businessCategory !== undefined) bizFields.businessCategory = businessCategory;
       const effectiveCeoName = ceoName ?? representativeName;
       if (effectiveCeoName !== undefined) bizFields.ceoName = effectiveCeoName;
+      if (contactName !== undefined) bizFields.contactName = contactName;
       const effectiveTaxInvoiceEmail = taxInvoiceEmail ?? taxEmail;
       if (effectiveTaxInvoiceEmail !== undefined) bizFields.taxInvoiceEmail = effectiveTaxInvoiceEmail;
       if (pharmacyPhone !== undefined) bizFields.pharmacyPhone = pharmacyPhone;

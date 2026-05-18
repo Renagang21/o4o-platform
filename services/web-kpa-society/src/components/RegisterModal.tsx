@@ -111,6 +111,7 @@ export default function RegisterModal() {
     // 개설약사 전용 — 사업자 정보 (WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1)
     businessNumber: '',
     ceoName: '',               // canonical (legacy: representativeName)
+    contactName: '',           // WO-O4O-KPA-PHARMACY-CONTACT-NAME-FIELD-V1
     taxInvoiceEmail: '',       // canonical (legacy: taxEmail)
     managerPhone: '',          // canonical (신규)
     // 개설약사 전용 — 사업장 주소 (StoreAddress 3-part)
@@ -148,7 +149,7 @@ export default function RegisterModal() {
         agreeTerms: false, agreePrivacy: false,
         licenseNumber: '',
         activityType: '', pharmacyName: '', pharmacyAddress: '', pharmacyPhone: '',
-        businessNumber: '', ceoName: '', taxInvoiceEmail: '', managerPhone: '',
+        businessNumber: '', ceoName: '', contactName: '', taxInvoiceEmail: '', managerPhone: '',
         businessZipCode: '', businessAddress: '', businessAddressDetail: '',
         universityName: '', studentYear: '',
       });
@@ -219,6 +220,7 @@ export default function RegisterModal() {
           // 개설약사: 사업자 정보 (WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1 canonical key)
           if (formData.businessNumber) payload.businessNumber = formData.businessNumber;
           if (formData.ceoName) payload.ceoName = formData.ceoName;
+          if (formData.contactName) payload.contactName = formData.contactName;
           if (formData.taxInvoiceEmail) payload.taxInvoiceEmail = formData.taxInvoiceEmail;
           if (formData.managerPhone) payload.managerPhone = formData.managerPhone;
           // 사업장명/주소는 약국명/약국주소와 동일 (개설약사 = 사업장 == 약국)
@@ -532,6 +534,12 @@ export default function RegisterModal() {
                           <label className="block text-sm font-medium text-gray-700 mb-1">대표자명 <span className="text-red-500">*</span></label>
                           <input type="text" name="ceoName" value={formData.ceoName} onChange={handleInputChange}
                             placeholder="사업자등록증 대표자명" required maxLength={50}
+                            className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">담당자명</label>
+                          <input type="text" name="contactName" value={formData.contactName} onChange={handleInputChange}
+                            placeholder="담당자 이름 (선택)" maxLength={50}
                             className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                         </div>
                         <div>

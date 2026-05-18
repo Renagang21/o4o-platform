@@ -100,6 +100,7 @@ export function MyProfilePage() {
     // 사업자 정보 (pharmacy_owner 만 사용)
     businessName: '',
     ceoName: '',
+    contactName: '',
     taxInvoiceEmail: '',
     businessPhone: '',
     managerPhone: '',
@@ -203,6 +204,7 @@ export function MyProfilePage() {
       //   canonical (ceoName / taxInvoiceEmail) read with legacy fallback.
       businessName: biz.businessName || '',
       ceoName: biz.ceoName || biz.representativeName || '',
+      contactName: biz.contactName || '',
       taxInvoiceEmail: biz.taxInvoiceEmail || biz.taxEmail || '',
       businessPhone: biz.phone || '',
       managerPhone: biz.managerPhone || '',
@@ -253,6 +255,7 @@ export function MyProfilePage() {
       if (isPharmacyOwnerEdit) {
         if (roleForm.businessName) businessInfoPayload.businessName = roleForm.businessName;
         if (roleForm.ceoName) businessInfoPayload.ceoName = roleForm.ceoName;
+        if (roleForm.contactName) businessInfoPayload.contactName = roleForm.contactName;
         if (roleForm.taxInvoiceEmail) businessInfoPayload.taxInvoiceEmail = roleForm.taxInvoiceEmail;
         if (roleForm.businessPhone) businessInfoPayload.phone = roleForm.businessPhone;
         if (roleForm.managerPhone) businessInfoPayload.managerPhone = roleForm.managerPhone;
@@ -590,6 +593,12 @@ export function MyProfilePage() {
                     <input type="text" style={styles.input} value={roleForm.ceoName}
                       onChange={e => setRoleForm({ ...roleForm, ceoName: e.target.value })}
                       placeholder="사업자등록증 대표자명" maxLength={50} />
+                  </div>
+                  <div style={styles.field}>
+                    <label style={styles.label}>담당자명</label>
+                    <input type="text" style={styles.input} value={roleForm.contactName}
+                      onChange={e => setRoleForm({ ...roleForm, contactName: e.target.value })}
+                      placeholder="담당자 이름 (선택)" maxLength={50} />
                   </div>
                   <div style={styles.field}>
                     <label style={styles.label}>세금계산서 이메일</label>

@@ -31,6 +31,7 @@ export interface BusinessInfoData {
   zipCode?: string;
   // WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1: canonical fields
   ceoName?: string;
+  contactName?: string;
   taxInvoiceEmail?: string;
   managerPhone?: string;
   // pharmacyPhone: stored in businessInfo.metadata.pharmacy_phone (KPA PATCH) or businessInfo.pharmacyPhone (operator PUT)
@@ -89,6 +90,7 @@ export default function EditUserModal({ userId, onClose, onSuccess }: { userId: 
     businessNumber: '',
     // WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1: canonical key (ceoName / taxInvoiceEmail / managerPhone)
     ceoName: '',
+    contactName: '',
     taxInvoiceEmail: '',
     pharmacyPhone: '',
     managerPhone: '',
@@ -134,6 +136,7 @@ export default function EditUserModal({ userId, onClose, onSuccess }: { userId: 
           businessNumber: biz.businessNumber || '',
           // canonical read with legacy fallback (ceoName ?? representativeName, taxInvoiceEmail ?? taxEmail ?? email)
           ceoName: biz.ceoName || biz.representativeName || '',
+          contactName: biz.contactName || '',
           taxInvoiceEmail: biz.taxInvoiceEmail || biz.taxEmail || biz.email || '',
           // pharmacyPhone: top-level (operator PUT) ?? nested metadata (KPA PATCH) fallback
           pharmacyPhone: biz.pharmacyPhone || (biz.metadata as Record<string, any>)?.pharmacy_phone || '',
@@ -178,6 +181,7 @@ export default function EditUserModal({ userId, onClose, onSuccess }: { userId: 
         payload.businessName = form.businessName;
         payload.businessNumber = form.businessNumber;
         payload.ceoName = form.ceoName;
+        payload.contactName = form.contactName;
         payload.taxInvoiceEmail = form.taxInvoiceEmail;
         payload.pharmacyPhone = form.pharmacyPhone;
         payload.managerPhone = form.managerPhone;
@@ -321,6 +325,12 @@ export default function EditUserModal({ userId, onClose, onSuccess }: { userId: 
                     <input type="text" name="ceoName" value={form.ceoName} onChange={handleChange}
                       className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="사업자등록증 대표자명" maxLength={50} />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">담당자명</label>
+                    <input type="text" name="contactName" value={form.contactName} onChange={handleChange}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      placeholder="담당자 이름 (선택)" maxLength={50} />
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-slate-600 mb-1">세금계산서 이메일</label>

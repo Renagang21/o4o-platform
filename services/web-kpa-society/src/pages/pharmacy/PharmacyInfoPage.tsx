@@ -25,6 +25,7 @@ interface FormState {
   phone: string;
   ownerPhone: string;
   ceoName: string;
+  contactName: string;
   managerPhone: string;
   taxInvoiceEmail: string;
   zipCode: string;
@@ -38,6 +39,7 @@ function dataToForm(data: PharmacyInfoData): FormState {
     phone: data.phone || '',
     ownerPhone: data.ownerPhone || '',
     ceoName: data.ceoName || '',
+    contactName: data.contactName || '',
     managerPhone: data.managerPhone || '',
     taxInvoiceEmail: data.taxInvoiceEmail || '',
     zipCode: data.addressDetail?.zipCode || '',
@@ -63,7 +65,7 @@ export function PharmacyInfoPage() {
   const [data, setData] = useState<PharmacyInfoData | null>(null);
   const [loadState, setLoadState] = useState<LoadState>('loading');
   const [isEditMode, setIsEditMode] = useState(false);
-  const [form, setForm] = useState<FormState>({ name: '', phone: '', ownerPhone: '', ceoName: '', managerPhone: '', taxInvoiceEmail: '', zipCode: '', baseAddress: '', detailAddress: '' });
+  const [form, setForm] = useState<FormState>({ name: '', phone: '', ownerPhone: '', ceoName: '', contactName: '', managerPhone: '', taxInvoiceEmail: '', zipCode: '', baseAddress: '', detailAddress: '' });
   const [isSaving, setIsSaving] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const [successMsg, setSuccessMsg] = useState('');
@@ -133,6 +135,7 @@ export function PharmacyInfoPage() {
         phone: digitsOnly(form.phone) || undefined,
         ownerPhone: digitsOnly(form.ownerPhone) || undefined,
         ceoName: form.ceoName.trim() || undefined,
+        contactName: form.contactName.trim() || undefined,
         managerPhone: digitsOnly(form.managerPhone) || undefined,
         taxInvoiceEmail: form.taxInvoiceEmail.trim() || undefined,
         addressDetail,
@@ -239,6 +242,17 @@ export function PharmacyInfoPage() {
             </div>
 
             <div style={styles.formGroup}>
+              <label style={styles.formLabel}>담당자명</label>
+              <input
+                style={styles.formInput}
+                value={form.contactName}
+                onChange={e => updateField('contactName', e.target.value)}
+                placeholder="담당자 이름 (선택)"
+                maxLength={50}
+              />
+            </div>
+
+            <div style={styles.formGroup}>
               <label style={styles.formLabel}>담당자 전화</label>
               <input
                 style={styles.formInput}
@@ -338,6 +352,10 @@ export function PharmacyInfoPage() {
             <div style={styles.infoRow}>
               <span style={styles.infoLabel}>대표자명</span>
               <span style={styles.infoValue}>{data.ceoName || '-'}</span>
+            </div>
+            <div style={styles.infoRow}>
+              <span style={styles.infoLabel}>담당자명</span>
+              <span style={styles.infoValue}>{data.contactName || '-'}</span>
             </div>
             <div style={styles.infoRow}>
               <span style={styles.infoLabel}>담당자 전화</span>

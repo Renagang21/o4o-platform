@@ -129,6 +129,7 @@ export class AuthRegisterController extends BaseController {
           // 세금계산서 이메일 — taxInvoiceEmail canonical (taxEmail fallback). email 필드는 덮어쓰지 않음
           const effectiveTaxInvoiceEmail = data.taxInvoiceEmail ?? data.taxEmail;
           if (effectiveTaxInvoiceEmail) newBiz.taxInvoiceEmail = effectiveTaxInvoiceEmail;
+          if (data.contactName) newBiz.contactName = data.contactName;
           if (data.managerPhone) newBiz.managerPhone = data.managerPhone;
           if (data.zipCode) newBiz.zipCode = data.zipCode;
           if (data.address1) newBiz.address = data.address1;
@@ -223,6 +224,9 @@ export class AuthRegisterController extends BaseController {
         const effectiveTaxInvoiceEmail = data.taxInvoiceEmail ?? data.taxEmail;
         if (effectiveTaxInvoiceEmail) {
           businessInfo.taxInvoiceEmail = effectiveTaxInvoiceEmail;
+        }
+        if (data.contactName) {
+          businessInfo.contactName = data.contactName;
         }
         if (data.managerPhone) {
           businessInfo.managerPhone = data.managerPhone;

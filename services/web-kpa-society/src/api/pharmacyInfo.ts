@@ -26,6 +26,7 @@ export interface PharmacyInfoData {
   taxInvoiceEmail: string | null;
   ownerPhone: string | null;
   ceoName: string | null;
+  contactName: string | null;
   managerPhone: string | null;
   storeSlug: string | null;
 }
@@ -37,6 +38,7 @@ export interface UpdatePharmacyInfoPayload {
   taxInvoiceEmail?: string;
   ownerPhone?: string;
   ceoName?: string;
+  contactName?: string;
   managerPhone?: string;
 }
 

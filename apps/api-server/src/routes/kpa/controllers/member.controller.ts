@@ -375,6 +375,8 @@ export function createMemberController(
                 businessNumber: businessInfo.businessNumber ?? null,
                 businessName: businessInfo.businessName ?? null,
                 ceoName: businessInfo.ceoName ?? businessInfo.representativeName ?? null,
+                // WO-O4O-KPA-PHARMACY-CONTACT-NAME-FIELD-V1: contactName canonical
+                contactName: businessInfo.contactName ?? null,
                 taxInvoiceEmail: businessInfo.taxInvoiceEmail ?? businessInfo.taxEmail ?? businessInfo.email ?? null,
                 managerPhone: businessInfo.managerPhone ?? null,
                 pharmacy_phone: (metadata?.pharmacy_phone as string | undefined) ?? null,
@@ -973,6 +975,8 @@ export function createMemberController(
     ]),
     body('business_number').optional().isString().isLength({ max: 50 }),
     body('pharmacy_phone').optional().isString().isLength({ max: 50 }),
+    // WO-O4O-KPA-PHARMACY-CONTACT-NAME-FIELD-V1
+    body('contactName').optional({ nullable: true }).isString().isLength({ max: 50 }),
     // WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1: split address fields
     body('zipCode').optional({ nullable: true }).isString().isLength({ max: 10 }),
     body('address1').optional({ nullable: true }).isString().isLength({ max: 200 }),
@@ -1046,6 +1050,8 @@ export function createMemberController(
         const {
           name, membership_type, license_number, pharmacy_name, pharmacy_address,
           activity_type, business_number, pharmacy_phone, nickname,
+          // WO-O4O-KPA-PHARMACY-CONTACT-NAME-FIELD-V1
+          contactName,
           // WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1: canonical split address fields
           zipCode, address1, address2,
         } = req.body;
@@ -1105,6 +1111,7 @@ export function createMemberController(
         //   pharmacy_address 미전송 시 분리 필드로 합성 → kpa_members.pharmacy_address 동기화.
         let nextBiz: Record<string, any> | null = null;
         const hasBizUpdate = business_number !== undefined || pharmacy_phone !== undefined
+          || contactName !== undefined
           || zipCode !== undefined || address1 !== undefined || address2 !== undefined;
         if (hasBizUpdate) {
           nextBiz = { ...prevBiz };
@@ -1116,6 +1123,7 @@ export function createMemberController(
             nextBiz.metadata = { ...((prevBiz.metadata as Record<string, any>) || {}), pharmacy_phone };
             changes.pharmacy_phone = pharmacy_phone;
           }
+          if (contactName !== undefined) { nextBiz.contactName = contactName || null; changes.contactName = contactName; }
           if (zipCode !== undefined) { nextBiz.zipCode = zipCode || null; changes.zipCode = zipCode; }
           if (address1 !== undefined) { nextBiz.address = address1 || null; changes.address1 = address1; }
           if (address2 !== undefined) { nextBiz.address2 = address2 || null; changes.address2 = address2; }
