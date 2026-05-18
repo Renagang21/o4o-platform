@@ -44,9 +44,9 @@ export function MyCreditsPage() {
         creditApi.getMyTransactions({ page: currentPage, limit: 20 }),
       ]);
 
-      setBalance(balanceRes.data.balance);
-      setTransactions(txRes.data.transactions);
-      setTotalPages(txRes.data.pagination.totalPages);
+      setBalance(balanceRes.data?.balance ?? 0);
+      setTransactions(txRes.data?.transactions || []);
+      setTotalPages(txRes.data?.pagination?.totalPages ?? 1);
     } catch (err) {
       setError(err instanceof Error ? err.message : '데이터를 불러오는데 실패했습니다.');
     } finally {

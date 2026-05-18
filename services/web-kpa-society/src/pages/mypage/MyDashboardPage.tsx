@@ -59,7 +59,7 @@ export function MyDashboardPage() {
       ]);
 
       setSummary(summaryRes.data);
-      setActivities(activitiesRes.data);
+      setActivities(activitiesRes.data || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : '데이터를 불러오는데 실패했습니다.');
     } finally {

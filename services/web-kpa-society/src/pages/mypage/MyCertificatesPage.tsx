@@ -36,8 +36,8 @@ export function MyCertificatesPage() {
         limit: 12,
       });
 
-      setCertificates(res.data);
-      setTotalPages(res.totalPages);
+      setCertificates(res.data || []);
+      setTotalPages(res.totalPages ?? 1);
     } catch (err) {
       setError(err instanceof Error ? err.message : '데이터를 불러오는데 실패했습니다.');
     } finally {
