@@ -272,7 +272,7 @@ export default function LoginModal() {
           {/* 테스트 계정 자동입력 — 약국 개설자만 노출 */}
           <div className="mt-4 flex justify-center">
             {[
-              { label: '약국 개설자', email: 'phamacy1@o4o.com', password: 'O4oTestPass@1' },
+              { label: '약국 경영자', email: 'renagang21@gmail.com', password: 'seochuran1!' },
             ].map((acct) => (
               <button
                 key={acct.email}
