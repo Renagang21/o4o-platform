@@ -52,15 +52,6 @@ function digitsOnly(value: string): string {
   return value.replace(/\D/g, '');
 }
 
-function composeDisplayAddress(detail: StoreAddress | null): string {
-  if (!detail?.baseAddress) return '-';
-  const parts = [];
-  if (detail.zipCode) parts.push(`(${detail.zipCode})`);
-  parts.push(detail.baseAddress);
-  if (detail.detailAddress) parts.push(detail.detailAddress);
-  return parts.join(' ');
-}
-
 export function PharmacyInfoPage() {
   const [data, setData] = useState<PharmacyInfoData | null>(null);
   const [loadState, setLoadState] = useState<LoadState>('loading');
@@ -372,10 +363,31 @@ export function PharmacyInfoPage() {
               <span style={styles.infoLabel}>세금계산서 이메일</span>
               <span style={styles.infoValue}>{data.taxInvoiceEmail || '-'}</span>
             </div>
-            <div style={styles.infoRow}>
-              <span style={styles.infoLabel}>주소</span>
-              <span style={styles.infoValue}>{composeDisplayAddress(data.addressDetail)}</span>
-            </div>
+            {(data.addressDetail || data.address) ? (
+              <>
+                {data.addressDetail?.zipCode && (
+                  <div style={styles.infoRow}>
+                    <span style={styles.infoLabel}>우편번호</span>
+                    <span style={styles.infoValue}>{data.addressDetail.zipCode}</span>
+                  </div>
+                )}
+                <div style={styles.infoRow}>
+                  <span style={styles.infoLabel}>기본주소</span>
+                  <span style={styles.infoValue}>{data.addressDetail?.baseAddress || data.address}</span>
+                </div>
+                {data.addressDetail?.detailAddress && (
+                  <div style={styles.infoRow}>
+                    <span style={styles.infoLabel}>상세주소</span>
+                    <span style={styles.infoValue}>{data.addressDetail.detailAddress}</span>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div style={styles.infoRow}>
+                <span style={styles.infoLabel}>주소</span>
+                <span style={styles.infoValue}>-</span>
+              </div>
+            )}
           </div>
         )}
       </div>
