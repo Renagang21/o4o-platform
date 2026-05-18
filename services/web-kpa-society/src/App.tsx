@@ -311,6 +311,11 @@ function PostLoginRedirect() {
   // 직전 인증 상태를 ref로 추적 (state 변화로 재렌더 방지)
   const wasAuthenticatedRef = useRef(isAuthenticated);
   const didRedirectRef = useRef(false);
+  // WO-O4O-KPA-LOGIN-REFETCH-MINIMIZE-V1:
+  // user 객체를 ref로 유지 — Phase 2 참조 변경으로 인한 불필요한 effect 재실행 방지.
+  // isKpaContextLoaded=true 시점에 user는 항상 최신값 보장.
+  const userRef = useRef(user);
+  userRef.current = user;
 
   useEffect(() => {
     const justLoggedIn = !wasAuthenticatedRef.current && isAuthenticated;
@@ -323,7 +328,7 @@ function PostLoginRedirect() {
     }
     // 방금 로그인 → context 로딩 완료 대기
     if (!justLoggedIn && !didRedirectRef.current) return;
-    if (!isKpaContextLoaded || !user) return;
+    if (!isKpaContextLoaded || !userRef.current) return;
     if (didRedirectRef.current) return;
 
     // 명시적 returnTo/onLoginSuccess 콜백: LoginModal에서 이미 처리
@@ -337,12 +342,12 @@ function PostLoginRedirect() {
     ) { didRedirectRef.current = true; return; }
 
     // WO-O4O-KPA-DASHBOARD-REDIRECT-UNIFICATION-V1: PRIORITY+MAP 기반 redirect
-    const targetRoute = getKpaPostLoginRoute(user);
+    const targetRoute = getKpaPostLoginRoute(userRef.current);
     didRedirectRef.current = true;
     if (targetRoute) {
       navigate(targetRoute, { replace: true });
     }
-  }, [isAuthenticated, isKpaContextLoaded, user, navigate, location.pathname, onLoginSuccess]);
+  }, [isAuthenticated, isKpaContextLoaded, navigate, location.pathname, onLoginSuccess]);
 
   return null;
 }

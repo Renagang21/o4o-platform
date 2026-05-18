@@ -58,6 +58,9 @@ export function KpaGlobalHeader() {
   const navigate = useNavigate();
   const [creditBalance, setCreditBalance] = useState<number | null>(null);
 
+  // WO-O4O-KPA-LOGIN-REFETCH-MINIMIZE-V1:
+  // user 객체 참조 전체 대신 user.id만 의존 — fetchKpaContext Phase2 갱신 시
+  // user 참조가 바뀌어도 동일 사용자이면 재호출 방지.
   useEffect(() => {
     if (!user) { setCreditBalance(null); return; }
     creditApi.getMyBalance()
@@ -66,7 +69,7 @@ export function KpaGlobalHeader() {
         if (typeof bal === 'number') setCreditBalance(bal);
       })
       .catch(() => { /* 실패 시 뱃지 숨김 */ });
-  }, [user]);
+  }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // WO-O4O-KPA-MEMBER-REGISTRATION-NOTIFICATION-PHASE1-V1
   // 알림 — kpa-society serviceKey 로 backend 가 저장하므로 동일 키로 필터.
