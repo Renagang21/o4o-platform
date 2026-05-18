@@ -27,7 +27,6 @@ import {
   KPA_CONTEXTUAL_NAV,
   filterContextualNav,
 } from '../config/navigation';
-import ServiceSwitcher from './ServiceSwitcher';
 import { creditApi } from '../api/credit';
 import { notificationsApi } from '../api/notifications';
 
@@ -165,7 +164,6 @@ export function KpaGlobalHeader() {
               onMarkAllAsRead={notif.markAllAsRead}
             />
           )}
-          <ServiceSwitcher currentServiceKey="kpa-society" />
         </div>
       }
       userMenuItems={
