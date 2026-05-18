@@ -52,7 +52,7 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      const loggedInUser = await login(email, password);
+      await login(email, password);
 
       // 아이디 기억하기
       if (rememberEmail) {

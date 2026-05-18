@@ -58,7 +58,8 @@ import {
   type ChannelProduct,
   type AvailableProduct,
 } from '@/api/channelProducts';
-import { GuideEditableSection, GuideBlock } from '@o4o/shared-space-ui';
+import { GuideBlock } from '@o4o/shared-space-ui';
+import { GuideEditableSection } from '@/components/guide/GuideEditableSection';
 import { fetchGuidePageContent } from '@/api/guideContent';
 
 const GUIDE_PAGE_KEY = 'store.channel.editor';
