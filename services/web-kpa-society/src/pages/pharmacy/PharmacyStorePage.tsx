@@ -96,8 +96,9 @@ export function PharmacyStorePage() {
     (async () => {
       try {
         const resolved = await getStoreSlug();
-        // WO-KPA-PHARMACY-OWNER-WITHOUT-STORE-HANDLING-V1: 매장 미연결 → 게이트로
-        if (!resolved) { navigate('/pharmacy', { replace: true }); return; }
+        // WO-KPA-PHARMACY-OWNER-WITHOUT-STORE-HANDLING-V1: 매장 미연결 시 inline 안내
+        // (navigate('/pharmacy') 사용 금지 — PharmacyPage의 hasStoreRole→/store redirect와 무한루프 발생)
+        if (!resolved) { if (!cancelled) setLoading(false); return; }
         if (cancelled) return;
         setSlug(resolved);
 
@@ -209,6 +210,24 @@ export function PharmacyStorePage() {
       <div style={S.container}>
         <div style={{ textAlign: 'center', padding: '80px 0', color: colors.neutral400 }}>
           불러오는 중...
+        </div>
+      </div>
+    );
+  }
+
+  // ── No store linked ───────────────────────────────────────────────────────
+  if (!slug) {
+    return (
+      <div style={S.container}>
+        <header style={S.header}>
+          <Link to="/store" style={S.backLink}>&larr; 내 매장관리</Link>
+          <h1 style={S.pageTitle}>매장 설정</h1>
+        </header>
+        <div style={S.accessDenied}>
+          <span style={{ fontSize: '48px', marginBottom: '16px' }}>🏪</span>
+          <h2 style={S.accessDeniedTitle}>약국 매장이 연결되지 않았습니다</h2>
+          <p style={S.accessDeniedText}>약국 경영지원 서비스 신청 후 매장이 활성화됩니다.</p>
+          <Link to="/store" style={S.backButton}>돌아가기</Link>
         </div>
       </div>
     );

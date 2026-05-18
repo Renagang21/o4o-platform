@@ -105,12 +105,14 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
         if (resolved) {
           setSlug(resolved);
         } else {
-          // WO-KPA-PHARMACY-OWNER-WITHOUT-STORE-HANDLING-V1: 매장 미연결 → 게이트로
-          navigate('/pharmacy', { replace: true });
+          // WO-KPA-PHARMACY-OWNER-WITHOUT-STORE-HANDLING-V1: 매장 미연결 시 slug=null 유지 → inline 안내
+          // (navigate('/pharmacy') 사용 금지 — PharmacyPage의 hasStoreRole→/store redirect와 무한루프 발생)
+          setLoading(false);
           return;
         }
       } catch {
-        navigate('/pharmacy', { replace: true });
+        // 오류 시 slug=null 유지 → inline 안내
+        setLoading(false);
         return;
       }
     };
@@ -639,6 +641,16 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
             )}
           </div>
         )}
+      </div>
+    );
+  }
+
+  // No store linked
+  if (!slug) {
+    return (
+      <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center', padding: '80px 0' }}>
+        <p style={{ fontSize: '16px', fontWeight: 600, color: '#374151' }}>약국 매장이 아직 연결되지 않았습니다</p>
+        <p style={{ fontSize: '14px', color: '#6b7280', marginTop: '8px' }}>약국 경영지원 서비스 신청 후 매장이 활성화됩니다.</p>
       </div>
     );
   }

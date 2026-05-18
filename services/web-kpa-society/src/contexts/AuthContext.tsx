@@ -254,15 +254,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
    * AuthGate는 isKpaContextLoaded=false 동안 KPA 게이트를 건너뛴다.
    */
   const fetchKpaContext = useCallback(async () => {
-    // IR-O4O-KPA-STORE-NAVIGATION-TRACE-AUDIT-V1
-    console.log('[TRACE][fetchKpaContext] START');
     try {
       const response = await authClient.api.get('/kpa/me-context');
       const data = response.data as { success: boolean; data: any };
       if (data.success && data.data) {
         const ctx = data.data;
-        // IR-O4O-KPA-STORE-NAVIGATION-TRACE-AUDIT-V1
-        console.log('[TRACE][fetchKpaContext] Phase2: isStoreOwner=', !!ctx.isStoreOwner);
         setUser(prev => {
           if (!prev) return prev;
           const updated = { ...prev };
@@ -286,15 +282,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error('[KPA] me-context fetch failed:', error);
     } finally {
-      // IR-O4O-KPA-STORE-NAVIGATION-TRACE-AUDIT-V1
-      console.log('[TRACE][fetchKpaContext] END → setIsKpaContextLoaded(true)');
       setIsKpaContextLoaded(true);
     }
   }, []);
 
   const checkAuth = useCallback(async () => {
-    // IR-O4O-KPA-STORE-NAVIGATION-TRACE-AUDIT-V1
-    console.log('[TRACE][checkAuth] START', { caller: new Error().stack?.split('\n')[2]?.trim() });
     // WO-KPA-A-AUTH-LOOP-GUARD-STABILIZATION-V1:
     // 토큰 없으면 /auth/me 호출 자체를 생략 → 불필요한 401 방지
     const token = getAccessToken();
@@ -316,11 +308,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const userData = createUserFromApiResponse(apiUser);
 
         // 즉시 user 설정 → 화면 표시 차단 해제
-        // IR-O4O-KPA-STORE-NAVIGATION-TRACE-AUDIT-V1
-        console.log('[TRACE][checkAuth] Phase1: setUser', { userId: userData.id, roles: userData.roles, isStoreOwner: userData.isStoreOwner });
         setUser(userData);
         // WO-KPA-LOGIN-LATENCY-CLEANUP-V1: KPA context는 비동기 후속 로딩
-        console.log('[TRACE][checkAuth] setIsKpaContextLoaded(false) → fetchKpaContext()');
         setIsKpaContextLoaded(false);
         void fetchKpaContext();
       } else {
@@ -330,8 +319,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error('Auth check failed:', error);
       setUser(null);
     } finally {
-      // IR-O4O-KPA-STORE-NAVIGATION-TRACE-AUDIT-V1
-      console.log('[TRACE][checkAuth] END (isLoading=false)');
       setIsLoading(false);
     }
   }, [fetchKpaContext]);

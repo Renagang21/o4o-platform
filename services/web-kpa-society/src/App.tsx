@@ -320,13 +320,6 @@ function PostLoginRedirect() {
   useEffect(() => {
     const justLoggedIn = !wasAuthenticatedRef.current && isAuthenticated;
     wasAuthenticatedRef.current = isAuthenticated;
-    // IR-O4O-KPA-STORE-NAVIGATION-TRACE-AUDIT-V1
-    console.log('[TRACE][PostLoginRedirect] effect', {
-      isAuthenticated, isKpaContextLoaded, justLoggedIn,
-      didRedirect: didRedirectRef.current,
-      pathname: location.pathname,
-    });
-
     if (!isAuthenticated) {
       // 로그아웃: ref 초기화
       didRedirectRef.current = false;
@@ -350,8 +343,6 @@ function PostLoginRedirect() {
     // WO-O4O-KPA-DASHBOARD-REDIRECT-UNIFICATION-V1: PRIORITY+MAP 기반 redirect
     const targetRoute = getKpaPostLoginRoute(userRef.current);
     didRedirectRef.current = true;
-    // IR-O4O-KPA-STORE-NAVIGATION-TRACE-AUDIT-V1
-    console.log('[TRACE][PostLoginRedirect] NAVIGATE →', targetRoute, { isStoreOwner: userRef.current?.isStoreOwner, roles: userRef.current?.roles });
     if (targetRoute) {
       navigate(targetRoute, { replace: true });
     }
@@ -449,14 +440,8 @@ function KpaStoreLayoutWrapper() {
   // WO-KPA-SOCIETY-STORE-LAYOUT-ORGNAME-TO-PHARMACY-NAME-FIX-V1:
   // 분회명(membershipOrgName) 대신 실제 약국명을 표시
   const [pharmacyName, setPharmacyName] = useState<string | undefined>(undefined);
-  // IR-O4O-KPA-STORE-NAVIGATION-TRACE-AUDIT-V1: mount/unmount + pharmacy info trace
-  useEffect(() => {
-    console.log('[TRACE][KpaStoreLayoutWrapper] MOUNT', { userId: user?.id });
-    return () => { console.log('[TRACE][KpaStoreLayoutWrapper] UNMOUNT'); };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     let cancelled = false;
-    console.log('[TRACE][KpaStoreLayoutWrapper] getPharmacyInfo() fetch');
     getPharmacyInfo().then((info) => {
       if (!cancelled && info?.name) setPharmacyName(info.name);
     }).catch(() => {});

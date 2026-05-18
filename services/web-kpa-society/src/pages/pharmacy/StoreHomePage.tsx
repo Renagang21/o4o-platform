@@ -57,13 +57,15 @@ export function StoreHomePage() {
   const [productCount, setProductCount] = useState<number | null>(null);
   const [liveSignals, setLiveSignals] = useState<LiveSignals | null>(null);
   const [loading, setLoading] = useState(true);
+  const [noStore, setNoStore] = useState(false);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      // WO-KPA-PHARMACY-OWNER-WITHOUT-STORE-HANDLING-V1: 매장 미연결 → 게이트로
+      // WO-KPA-PHARMACY-OWNER-WITHOUT-STORE-HANDLING-V1: 매장 미연결 시 inline 안내
+      // (navigate('/pharmacy') 사용 금지 — PharmacyPage의 hasStoreRole→/store redirect와 무한루프 발생)
       const storeSlug = await getStoreSlug();
-      if (!storeSlug) { navigate('/pharmacy', { replace: true }); return; }
+      if (!storeSlug) { setNoStore(true); setLoading(false); return; }
 
       const [analyticsRes, scansRes, libraryRes, listingsRes, signalsRes] = await Promise.all([
         getMarketingAnalytics().catch(() => null),
@@ -92,11 +94,23 @@ export function StoreHomePage() {
     } finally {
       setLoading(false);
     }
-  }, [navigate]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  if (noStore) {
+    return (
+      <div className="max-w-[960px] p-6">
+        <div className="flex flex-col items-center justify-center py-20 gap-3">
+          <AlertCircle size={32} className="text-slate-400" />
+          <p className="text-base font-medium text-slate-700">약국 매장이 아직 연결되지 않았습니다</p>
+          <p className="text-sm text-slate-500">약국 경영지원 서비스 신청 후 매장이 활성화됩니다.</p>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
