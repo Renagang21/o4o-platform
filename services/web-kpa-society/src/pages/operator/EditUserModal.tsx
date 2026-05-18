@@ -33,6 +33,9 @@ export interface BusinessInfoData {
   ceoName?: string;
   taxInvoiceEmail?: string;
   managerPhone?: string;
+  // pharmacyPhone: stored in businessInfo.metadata.pharmacy_phone (KPA PATCH) or businessInfo.pharmacyPhone (operator PUT)
+  pharmacyPhone?: string;
+  metadata?: Record<string, any>;
   // legacy fallback fields (read only — 새 저장 금지)
   representativeName?: string;
   taxEmail?: string;
@@ -87,6 +90,7 @@ export default function EditUserModal({ userId, onClose, onSuccess }: { userId: 
     // WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1: canonical key (ceoName / taxInvoiceEmail / managerPhone)
     ceoName: '',
     taxInvoiceEmail: '',
+    pharmacyPhone: '',
     managerPhone: '',
     businessType: '',
     businessCategory: '',
@@ -131,6 +135,8 @@ export default function EditUserModal({ userId, onClose, onSuccess }: { userId: 
           // canonical read with legacy fallback (ceoName ?? representativeName, taxInvoiceEmail ?? taxEmail ?? email)
           ceoName: biz.ceoName || biz.representativeName || '',
           taxInvoiceEmail: biz.taxInvoiceEmail || biz.taxEmail || biz.email || '',
+          // pharmacyPhone: top-level (operator PUT) ?? nested metadata (KPA PATCH) fallback
+          pharmacyPhone: biz.pharmacyPhone || (biz.metadata as Record<string, any>)?.pharmacy_phone || '',
           managerPhone: biz.managerPhone || '',
           businessType: biz.businessType || '',
           businessCategory: biz.businessCategory || '',
@@ -148,7 +154,7 @@ export default function EditUserModal({ userId, onClose, onSuccess }: { userId: 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    const numericFields = ['phone', 'businessNumber', 'managerPhone'];
+    const numericFields = ['phone', 'businessNumber', 'pharmacyPhone', 'managerPhone'];
     setForm(prev => ({
       ...prev,
       [name]: numericFields.includes(name) ? value.replace(/\D/g, '') : value,
@@ -173,6 +179,7 @@ export default function EditUserModal({ userId, onClose, onSuccess }: { userId: 
         payload.businessNumber = form.businessNumber;
         payload.ceoName = form.ceoName;
         payload.taxInvoiceEmail = form.taxInvoiceEmail;
+        payload.pharmacyPhone = form.pharmacyPhone;
         payload.managerPhone = form.managerPhone;
         payload.businessType = form.businessType;
         payload.businessCategory = form.businessCategory;
@@ -323,6 +330,12 @@ export default function EditUserModal({ userId, onClose, onSuccess }: { userId: 
                         className="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                         placeholder="tax@pharmacy.com" />
                     </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">약국 전화</label>
+                    <input type="tel" name="pharmacyPhone" inputMode="numeric" value={form.pharmacyPhone} onChange={handleChange}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      maxLength={11} placeholder="숫자만 입력" />
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-slate-600 mb-1">담당자 전화</label>

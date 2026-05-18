@@ -25,6 +25,8 @@ export interface PharmacyInfoData {
   addressDetail: StoreAddress | null;
   taxInvoiceEmail: string | null;
   ownerPhone: string | null;
+  ceoName: string | null;
+  managerPhone: string | null;
   storeSlug: string | null;
 }
 
@@ -34,6 +36,8 @@ export interface UpdatePharmacyInfoPayload {
   addressDetail?: StoreAddress;
   taxInvoiceEmail?: string;
   ownerPhone?: string;
+  ceoName?: string;
+  managerPhone?: string;
 }
 
 export async function getPharmacyInfo(): Promise<PharmacyInfoData | null> {

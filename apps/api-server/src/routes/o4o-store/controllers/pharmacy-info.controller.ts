@@ -30,6 +30,8 @@ interface PharmacyInfoResponse {
   addressDetail: StoreAddress | null;
   taxInvoiceEmail: string | null;
   ownerPhone: string | null;
+  ceoName: string | null;
+  managerPhone: string | null;
   storeSlug: string | null;
 }
 
@@ -89,6 +91,8 @@ export function createPharmacyInfoController(
       addressDetail: (org.address_detail as StoreAddress) || null,
       taxInvoiceEmail: meta.taxInvoiceEmail || null,
       ownerPhone: meta.ownerPhone || null,
+      ceoName: meta.ceoName || null,
+      managerPhone: meta.managerPhone || null,
       storeSlug: slugRecord?.slug ?? null,
     };
 
@@ -122,6 +126,8 @@ export function createPharmacyInfoController(
           const biz = user?.businessInfo;
           if (biz) {
             if (!data.phone && biz.phone) data.phone = biz.phone;
+            if (!data.ceoName && biz.ceoName) data.ceoName = biz.ceoName;
+            if (!data.managerPhone && biz.managerPhone) data.managerPhone = biz.managerPhone;
             if (!data.addressDetail && biz.storeAddress) {
               data.addressDetail = {
                 zipCode: biz.storeAddress.zipCode || undefined,
@@ -187,6 +193,17 @@ export function createPharmacyInfoController(
       if (digits && digits.length > 20) errors.push('ownerPhone: 연락처는 20자 이내');
     }
 
+    if (body.ceoName !== undefined && body.ceoName !== null && body.ceoName !== '') {
+      if (typeof body.ceoName !== 'string' || body.ceoName.trim().length > 50) {
+        errors.push('ceoName: 대표자명은 50자 이내');
+      }
+    }
+
+    if (body.managerPhone !== undefined && body.managerPhone !== null && body.managerPhone !== '') {
+      const digits = sanitizePhone(body.managerPhone);
+      if (digits && digits.length > 20) errors.push('managerPhone: 담당자 전화는 20자 이내');
+    }
+
     if (errors.length > 0) {
       res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: errors.join('; ') } });
       return;
@@ -212,12 +229,14 @@ export function createPharmacyInfoController(
       org.address = composeAddress(body.addressDetail);
     }
 
-    // Merge taxInvoiceEmail & ownerPhone into metadata
+    // Merge taxInvoiceEmail, ownerPhone, ceoName, managerPhone into metadata
     const existingMeta = (org.metadata as Record<string, any>) || {};
     org.metadata = {
       ...existingMeta,
       taxInvoiceEmail: body.taxInvoiceEmail || null,
       ownerPhone: sanitizePhone(body.ownerPhone),
+      ceoName: body.ceoName?.trim() || null,
+      managerPhone: sanitizePhone(body.managerPhone),
     };
 
     await orgRepo.save(org);
@@ -253,6 +272,8 @@ export function createPharmacyInfoController(
         addressDetail: (org as any).address_detail || null,
         taxInvoiceEmail: meta?.taxInvoiceEmail || null,
         ownerPhone: meta?.ownerPhone || null,
+        ceoName: meta?.ceoName || null,
+        managerPhone: meta?.managerPhone || null,
         storeSlug: slugRecord?.slug ?? null,
       } satisfies PharmacyInfoResponse,
     });

@@ -24,6 +24,8 @@ interface FormState {
   name: string;
   phone: string;
   ownerPhone: string;
+  ceoName: string;
+  managerPhone: string;
   taxInvoiceEmail: string;
   zipCode: string;
   baseAddress: string;
@@ -35,6 +37,8 @@ function dataToForm(data: PharmacyInfoData): FormState {
     name: data.name || '',
     phone: data.phone || '',
     ownerPhone: data.ownerPhone || '',
+    ceoName: data.ceoName || '',
+    managerPhone: data.managerPhone || '',
     taxInvoiceEmail: data.taxInvoiceEmail || '',
     zipCode: data.addressDetail?.zipCode || '',
     baseAddress: data.addressDetail?.baseAddress || '',
@@ -59,7 +63,7 @@ export function PharmacyInfoPage() {
   const [data, setData] = useState<PharmacyInfoData | null>(null);
   const [loadState, setLoadState] = useState<LoadState>('loading');
   const [isEditMode, setIsEditMode] = useState(false);
-  const [form, setForm] = useState<FormState>({ name: '', phone: '', ownerPhone: '', taxInvoiceEmail: '', zipCode: '', baseAddress: '', detailAddress: '' });
+  const [form, setForm] = useState<FormState>({ name: '', phone: '', ownerPhone: '', ceoName: '', managerPhone: '', taxInvoiceEmail: '', zipCode: '', baseAddress: '', detailAddress: '' });
   const [isSaving, setIsSaving] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const [successMsg, setSuccessMsg] = useState('');
@@ -128,6 +132,8 @@ export function PharmacyInfoPage() {
         name: form.name.trim(),
         phone: digitsOnly(form.phone) || undefined,
         ownerPhone: digitsOnly(form.ownerPhone) || undefined,
+        ceoName: form.ceoName.trim() || undefined,
+        managerPhone: digitsOnly(form.managerPhone) || undefined,
         taxInvoiceEmail: form.taxInvoiceEmail.trim() || undefined,
         addressDetail,
       });
@@ -222,6 +228,27 @@ export function PharmacyInfoPage() {
             </div>
 
             <div style={styles.formGroup}>
+              <label style={styles.formLabel}>대표자명</label>
+              <input
+                style={styles.formInput}
+                value={form.ceoName}
+                onChange={e => updateField('ceoName', e.target.value)}
+                placeholder="사업자등록증 대표자명"
+                maxLength={50}
+              />
+            </div>
+
+            <div style={styles.formGroup}>
+              <label style={styles.formLabel}>담당자 전화</label>
+              <input
+                style={styles.formInput}
+                value={form.managerPhone}
+                onChange={e => updateField('managerPhone', digitsOnly(e.target.value))}
+                placeholder="숫자만 입력"
+              />
+            </div>
+
+            <div style={styles.formGroup}>
               <label style={styles.formLabel}>사업자등록번호</label>
               <input
                 style={{ ...styles.formInput, backgroundColor: colors.neutral100, cursor: 'not-allowed' }}
@@ -307,6 +334,14 @@ export function PharmacyInfoPage() {
             <div style={styles.infoRow}>
               <span style={styles.infoLabel}>개설자 연락처</span>
               <span style={styles.infoValue}>{data.ownerPhone || '-'}</span>
+            </div>
+            <div style={styles.infoRow}>
+              <span style={styles.infoLabel}>대표자명</span>
+              <span style={styles.infoValue}>{data.ceoName || '-'}</span>
+            </div>
+            <div style={styles.infoRow}>
+              <span style={styles.infoLabel}>담당자 전화</span>
+              <span style={styles.infoValue}>{data.managerPhone || '-'}</span>
             </div>
             <div style={styles.infoRow}>
               <span style={styles.infoLabel}>사업자등록번호</span>

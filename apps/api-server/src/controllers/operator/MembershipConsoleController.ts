@@ -749,7 +749,7 @@ export class MembershipConsoleController {
         password, lastName, firstName, nickname, phone,
         businessName, businessNumber, businessType,
         businessCategory, zipCode, address1, address2,
-        ceoName, taxInvoiceEmail, managerPhone,
+        ceoName, taxInvoiceEmail, pharmacyPhone, managerPhone,
         taxEmail, representativeName, // legacy aliases
         membershipRole, // service_memberships.role 변경
       } = req.body;
@@ -814,6 +814,7 @@ export class MembershipConsoleController {
       if (effectiveCeoName !== undefined) bizFields.ceoName = effectiveCeoName;
       const effectiveTaxInvoiceEmail = taxInvoiceEmail ?? taxEmail;
       if (effectiveTaxInvoiceEmail !== undefined) bizFields.taxInvoiceEmail = effectiveTaxInvoiceEmail;
+      if (pharmacyPhone !== undefined) bizFields.pharmacyPhone = pharmacyPhone;
       if (managerPhone !== undefined) bizFields.managerPhone = managerPhone;
       // WO-O4O-POSTAL-CODE-ADDRESS-V1: zipCode 저장
       if (zipCode !== undefined) bizFields.zipCode = zipCode;
