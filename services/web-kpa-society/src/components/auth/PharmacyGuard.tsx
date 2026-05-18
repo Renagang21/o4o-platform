@@ -28,6 +28,16 @@ export function PharmacyGuard({ children }: PharmacyGuardProps) {
   const { user, isAuthenticated, isLoading, checkAuth } = useAuth();
   const location = useLocation();
   const [apiCheck, setApiCheck] = useState<'idle' | 'loading' | 'approved' | 'denied'>('idle');
+  // IR-O4O-KPA-STORE-NAVIGATION-TRACE-AUDIT-V1: mount/unmount trace
+  useEffect(() => {
+    console.log('[TRACE][PharmacyGuard] MOUNT', {
+      pathname: location.pathname,
+      roles: user?.roles,
+      isStoreOwner: user?.isStoreOwner,
+      isAuthenticated,
+    });
+    return () => { console.log('[TRACE][PharmacyGuard] UNMOUNT', { pathname: location.pathname }); };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   // WO-O4O-KPA-PHARMACYGUARD-LOOP-FIX-V1: stale JWT recovery는 최초 1회만 시도.
   // checkAuth() Phase1이 isStoreOwner를 일시적으로 false로 설정하므로
   // hasStoreRole이 false로 변할 때마다 effect가 재실행되어 무한루프 발생.
@@ -64,12 +74,22 @@ export function PharmacyGuard({ children }: PharmacyGuardProps) {
     return () => { cancelled = true; };
   }, [needsApiCheck, apiCheck]);
 
+  // IR-O4O-KPA-STORE-NAVIGATION-TRACE-AUDIT-V1: hasStoreRole / apiCheck 변화 추적
+  useEffect(() => {
+    console.log('[TRACE][PharmacyGuard] state', {
+      hasStoreRole, apiCheck, needsApiCheck, isPlatformOnlyUser,
+      roles: user?.roles, isStoreOwner: user?.isStoreOwner,
+      pathname: location.pathname,
+    });
+  });
+
   // Stale JWT 회복: API 승인 확인 시 세션 갱신 (최초 1회만)
   // WO-O4O-KPA-PHARMACYGUARD-LOOP-FIX-V1:
   // checkAuth() → Phase1: isStoreOwner=false → hasStoreRole=false →
   // effect 재실행 → checkAuth() 무한루프. ref로 1회 시도 후 차단.
   useEffect(() => {
     if (apiCheck === 'approved' && !hasStoreRole && !staleJwtRecoveryAttemptedRef.current) {
+      console.log('[TRACE][PharmacyGuard] RECOVERY: stale JWT → checkAuth()');
       staleJwtRecoveryAttemptedRef.current = true;
       checkAuth();
     }
@@ -117,5 +137,6 @@ export function PharmacyGuard({ children }: PharmacyGuardProps) {
     return <MembershipGate>{children}</MembershipGate>;
   }
 
+  console.log('[TRACE][PharmacyGuard] NAVIGATE → /pharmacy (apiCheck=denied)');
   return <Navigate to="/pharmacy" replace />;
 }

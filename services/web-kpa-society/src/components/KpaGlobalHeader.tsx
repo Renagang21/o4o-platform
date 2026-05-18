@@ -58,10 +58,18 @@ export function KpaGlobalHeader() {
   const navigate = useNavigate();
   const [creditBalance, setCreditBalance] = useState<number | null>(null);
 
+  // IR-O4O-KPA-STORE-NAVIGATION-TRACE-AUDIT-V1: mount/unmount trace
+  useEffect(() => {
+    console.log('[TRACE][KpaGlobalHeader] MOUNT', { userId: user?.id, pathname: window.location.pathname });
+    return () => { console.log('[TRACE][KpaGlobalHeader] UNMOUNT', { pathname: window.location.pathname }); };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // WO-O4O-KPA-LOGIN-REFETCH-MINIMIZE-V1:
   // user 객체 참조 전체 대신 user.id만 의존 — fetchKpaContext Phase2 갱신 시
   // user 참조가 바뀌어도 동일 사용자이면 재호출 방지.
   useEffect(() => {
+    // IR-O4O-KPA-STORE-NAVIGATION-TRACE-AUDIT-V1
+    console.log('[TRACE][KpaGlobalHeader] credits/me effect', { userId: user?.id, hasUser: !!user });
     if (!user) { setCreditBalance(null); return; }
     creditApi.getMyBalance()
       .then((res: any) => {
