@@ -7,9 +7,8 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PageHeader, LoadingSpinner, EmptyState, Pagination, Card } from '../../components/common';
-import { MyPageNavigation } from '@o4o/account-ui';
-import { KPA_MYPAGE_NAV_ITEMS } from './navItems';
+import { LoadingSpinner, EmptyState, Pagination, Card } from '../../components/common';
+import { MyPageLayout } from '../../layouts/MyPageLayout';
 import { lmsApi } from '../../api/lms';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
@@ -44,7 +43,7 @@ export function MyCompletionsPage() {
 
   if (!user) {
     return (
-      <div style={styles.container}>
+      <div className="w-full max-w-[1120px] mx-auto px-4 sm:px-5 lg:px-6 pb-10">
         <EmptyState
           icon="🔒"
           title="로그인이 필요합니다"
@@ -60,7 +59,7 @@ export function MyCompletionsPage() {
 
   if (error) {
     return (
-      <div style={styles.container}>
+      <div className="w-full max-w-[1120px] mx-auto px-4 sm:px-5 lg:px-6 pb-10">
         <EmptyState
           icon="⚠️"
           title="오류가 발생했습니다"
@@ -72,18 +71,15 @@ export function MyCompletionsPage() {
   }
 
   return (
-    <div style={styles.container}>
-      <PageHeader
-        title="내 수료"
-        description="완료한 코스 목록을 확인하세요"
-        breadcrumb={[
-          { label: '홈', href: '/' },
-          { label: '마이페이지', href: '/mypage' },
-          { label: '내 수료' },
-        ]}
-      />
-      <MyPageNavigation items={KPA_MYPAGE_NAV_ITEMS} />
-
+    <MyPageLayout
+      title="내 수료"
+      description="완료한 코스 목록을 확인하세요"
+      breadcrumb={[
+        { label: '홈', href: '/' },
+        { label: '마이페이지', href: '/mypage' },
+        { label: '내 수료' },
+      ]}
+    >
       {completions.length === 0 ? (
         <EmptyState
           icon="📋"
@@ -129,16 +125,11 @@ export function MyCompletionsPage() {
           />
         </>
       )}
-    </div>
+    </MyPageLayout>
   );
 }
 
 const styles: Record<string, React.CSSProperties> = {
-  container: {
-    maxWidth: '1000px',
-    margin: '0 auto',
-    padding: '0 20px 40px',
-  },
   grid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',

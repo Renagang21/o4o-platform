@@ -1,17 +1,18 @@
 /**
  * MyPageLayout — KPA-Society /mypage 공통 외곽 wrapper
  *
- * WO-O4O-KPA-MYPAGE-LAYOUT-FOUNDATION-V1
+ * WO-O4O-KPA-MYPAGE-RESPONSIVE-LAYOUT-CANONICALIZATION-V1
  * 근거: docs/investigations/IR-O4O-KPA-MYPAGE-UI-CONSISTENCY-AUDIT-V1.md
  *
  * 책임:
- * - container 폭/패딩 표준화 (width: form 600px / list 800px / wide 1000px)
+ * - container 폭/패딩 canonical 기준 (outer: max-w-[1120px], form inner: max-w-[860px])
  * - PageHeader 렌더링 (title/description/breadcrumb)
  * - MyPageNavigation 렌더링 (KPA_MYPAGE_NAV_ITEMS 고정)
  * - children 에 페이지 고유 콘텐츠 위임
  *
- * Phase 1 (본 WO): 컴포넌트 신설만. 기존 /mypage 페이지에는 적용하지 않는다.
- * Phase 2 이후 별도 WO 에서 페이지별 마이그레이션 진행.
+ * width prop:
+ *   - 'wide' (default) / 'list' — outer 1120px 그대로 사용
+ *   - 'form'                    — children을 max-w-[860px] inner wrapper로 제한
  */
 
 import type { ReactNode } from 'react';
@@ -29,12 +30,6 @@ export interface MyPageLayoutProps {
   children: ReactNode;
 }
 
-const WIDTH_MAP: Record<MyPageWidth, string> = {
-  form: '600px',
-  list: '800px',
-  wide: '1000px',
-};
-
 export function MyPageLayout({
   title,
   description,
@@ -43,16 +38,14 @@ export function MyPageLayout({
   children,
 }: MyPageLayoutProps) {
   return (
-    <div
-      style={{
-        maxWidth: WIDTH_MAP[width],
-        margin: '0 auto',
-        padding: '0 20px 40px',
-      }}
-    >
+    <div className="w-full max-w-[1120px] mx-auto px-4 sm:px-5 lg:px-6 pb-10">
       <PageHeader title={title} description={description} breadcrumb={breadcrumb} />
       <MyPageNavigation items={KPA_MYPAGE_NAV_ITEMS} />
-      {children}
+      {width === 'form' ? (
+        <div className="w-full max-w-[860px]">{children}</div>
+      ) : (
+        children
+      )}
     </div>
   );
 }

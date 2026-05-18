@@ -27,7 +27,7 @@ export function MyPageNavigation({
 
   return (
     <nav className="mb-6 border-b border-gray-200">
-      <div className="flex flex-wrap">
+      <div className="flex overflow-x-auto whitespace-nowrap">
         {items.map((item) => {
           const fullPath = item.path
             ? `${normalizedBase}${item.path}`
