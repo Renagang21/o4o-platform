@@ -74,7 +74,7 @@ class OrganizationOpsService {
     //   승인 시 `column "parent_id" of relation "organizations" does not exist` 로 실패하던 것을 정정.
     const rows = await query(
       `INSERT INTO organizations (id, name, code, type, metadata, "parentId", created_by_user_id, "isActive", level, path, "childrenCount", "createdAt", "updatedAt")
-       VALUES (gen_random_uuid(), $1, $2, $3, $4::jsonb, $5, $6, $7, 0, '/' || LOWER($2), 0, NOW(), NOW())
+       VALUES (gen_random_uuid(), $1, $2, $3, $4::jsonb, $5, $6, $7, 0, '/' || LOWER($2::text), 0, NOW(), NOW())
        ON CONFLICT (code) DO UPDATE SET
          name = EXCLUDED.name,
          metadata = organizations.metadata || EXCLUDED.metadata,
