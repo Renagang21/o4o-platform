@@ -65,6 +65,12 @@ class OrganizationOpsService {
 
     const metadata = input.metadata ? JSON.stringify(input.metadata) : '{}';
     const isActive = input.isActive ?? true;
+    // WO-O4O-KPA-ENSURE-ORG-PATH-SEPARATE-PARAM-V1:
+    //   $2 가 VALUES($2) = varchar 와 LOWER($2::text) 에 동시 사용되면
+    //   PostgreSQL prepared statement 가 'inconsistent types deduced for parameter $2'
+    //   (42P08) 을 발생시킨다 — $2::text cast 만으로는 해결 불가.
+    //   path 값을 JS 에서 미리 계산한 뒤 $8 로 분리하여 타입 충돌 원천 차단.
+    const pathValue = '/' + input.code.toLowerCase();
 
     // WO-O4O-KPA-ORGANIZATIONS-RAW-SQL-COLUMN-ALIGNMENT-V1:
     //   organizations 의 원본 컬럼은 camelCase quoted ("parentId", "isActive", "childrenCount",
@@ -74,13 +80,13 @@ class OrganizationOpsService {
     //   승인 시 `column "parent_id" of relation "organizations" does not exist` 로 실패하던 것을 정정.
     const rows = await query(
       `INSERT INTO organizations (id, name, code, type, metadata, "parentId", created_by_user_id, "isActive", level, path, "childrenCount", "createdAt", "updatedAt")
-       VALUES (gen_random_uuid(), $1, $2, $3, $4::jsonb, $5, $6, $7, 0, '/' || LOWER($2::text), 0, NOW(), NOW())
+       VALUES (gen_random_uuid(), $1, $2, $3, $4::jsonb, $5, $6, $7, 0, $8, 0, NOW(), NOW())
        ON CONFLICT (code) DO UPDATE SET
          name = EXCLUDED.name,
          metadata = organizations.metadata || EXCLUDED.metadata,
          "updatedAt" = NOW()
        RETURNING id, (xmax = 0) AS created`,
-      [input.name, input.code, input.type, metadata, input.parentId || null, input.createdByUserId || null, isActive],
+      [input.name, input.code, input.type, metadata, input.parentId || null, input.createdByUserId || null, isActive, pathValue],
     );
 
     const row = Array.isArray(rows) && rows.length > 0
