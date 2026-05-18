@@ -6,7 +6,6 @@
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { LogOut } from 'lucide-react';
-import ServiceSwitcher from './ServiceSwitcher';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function AccountLayout() {
@@ -95,7 +94,6 @@ export default function AccountLayout() {
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
           <h1 className="text-lg font-bold text-gray-900">O4O Account Center</h1>
           <div className="flex items-center gap-4">
-            <ServiceSwitcher currentServiceKey="account" />
             <span className="text-sm text-gray-600">{user?.name || user?.email}</span>
             <button
               onClick={logout}

@@ -10,6 +10,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Navigate } from 'react-router-dom';
+import { AddressSearch } from '@o4o/ui';
 import { colors, shadows, borderRadius } from '../../styles/theme';
 import {
   getPharmacyInfo,
@@ -277,32 +278,20 @@ export function PharmacyInfoPage() {
             <div style={styles.formDivider} />
 
             <div style={styles.formGroup}>
-              <label style={styles.formLabel}>우편번호</label>
-              <input
-                style={{ ...styles.formInput, maxWidth: '200px' }}
-                value={form.zipCode}
-                onChange={e => updateField('zipCode', e.target.value)}
-                placeholder="00000"
-              />
-            </div>
-
-            <div style={styles.formGroup}>
-              <label style={styles.formLabel}>기본주소</label>
-              <input
-                style={styles.formInput}
-                value={form.baseAddress}
-                onChange={e => updateField('baseAddress', e.target.value)}
-                placeholder="도로명 또는 지번 주소"
-              />
-            </div>
-
-            <div style={styles.formGroup}>
-              <label style={styles.formLabel}>상세주소</label>
-              <input
-                style={styles.formInput}
-                value={form.detailAddress}
-                onChange={e => updateField('detailAddress', e.target.value)}
-                placeholder="동/호수 등"
+              <label style={styles.formLabel}>약국 주소</label>
+              <AddressSearch
+                zipCode={form.zipCode}
+                address={form.baseAddress}
+                addressDetail={form.detailAddress}
+                onChange={({ zipCode, address, addressDetail }) =>
+                  setForm(prev => ({
+                    ...prev,
+                    zipCode,
+                    baseAddress: address,
+                    detailAddress: addressDetail,
+                  }))
+                }
+                disabled={isSaving}
               />
             </div>
 

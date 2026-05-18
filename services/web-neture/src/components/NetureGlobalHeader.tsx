@@ -24,8 +24,6 @@ import {
   filterContextualNav,
 } from '../config/navigation';
 import { getNetureDashboardRoute, getNetureRoleLabel } from '../config/dashboard';
-import ServiceSwitcher from './ServiceSwitcher';
-
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function getUserDisplayName(user: any): string {
@@ -115,7 +113,6 @@ export function NetureGlobalHeader() {
               onMarkAllAsRead={notif.markAllAsRead}
             />
           )}
-          <ServiceSwitcher currentServiceKey="neture" />
         </>
       }
       userMenuItems={

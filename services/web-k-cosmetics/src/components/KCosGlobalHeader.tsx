@@ -22,8 +22,6 @@ import {
   KCOS_CONTEXTUAL_NAV,
   filterContextualNav,
 } from '@/config/navigation';
-import ServiceSwitcher from './ServiceSwitcher';
-
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function getUserDisplayName(user: any): string {
@@ -108,7 +106,7 @@ export function KCosGlobalHeader() {
       onLogin={openLoginModal}
       onRegister={() => navigate('/register')}
       onLogout={handleLogout}
-      utilitySlot={<ServiceSwitcher currentServiceKey="k-cosmetics" />}
+      utilitySlot={undefined}
       userMenuItems={
         <>
           {/* 강의 대시보드 — 최상단 (WO-KCOS-LMS-INSTRUCTOR-BOOTSTRAP-V1) */}

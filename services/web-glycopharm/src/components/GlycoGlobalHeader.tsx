@@ -23,8 +23,6 @@ import {
   GLYCO_CONTEXTUAL_NAV,
   filterContextualNav,
 } from '@/config/navigation';
-import ServiceSwitcher from './ServiceSwitcher';
-
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 /**
@@ -108,7 +106,7 @@ export function GlycoGlobalHeader() {
       onLogin={openLoginModal}
       onRegister={() => navigate('/register')}
       onLogout={handleLogout}
-      utilitySlot={<ServiceSwitcher currentServiceKey="glycopharm" />}
+      utilitySlot={undefined}
       userMenuItems={
         <>
           {(isInstructor || isAdmin) && (
