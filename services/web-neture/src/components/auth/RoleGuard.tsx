@@ -8,6 +8,7 @@
  */
 
 import { Navigate, useLocation } from 'react-router-dom';
+import { hasAnyRole } from '@o4o/auth-utils';
 import { useAuth } from '../../contexts/AuthContext';
 import { MembershipGate } from './MembershipGate';
 import { isPlatformSuperAdmin } from '../../lib/membershipGate';
@@ -70,7 +71,7 @@ export function RouteGuard({
   }
 
   // Role check
-  const hasRequiredRole = userRoles.some(r => allowedRoles.includes(r));
+  const hasRequiredRole = hasAnyRole(userRoles, allowedRoles);
   if (!hasRequiredRole) {
     return <Navigate to="/" replace />;
   }
@@ -110,7 +111,7 @@ export function RoleGuard({ children, allowedRoles, fallback = '/login' }: Legac
     return <Navigate to={fallback} state={{ from: location.pathname + location.search }} replace />;
   }
 
-  if (allowedRoles && user && !user.roles.some(r => allowedRoles.includes(r))) {
+  if (allowedRoles && user && !hasAnyRole(user.roles, allowedRoles)) {
     return <Navigate to="/" replace />;
   }
 

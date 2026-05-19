@@ -12,6 +12,7 @@
  */
 
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { hasAnyRole } from '@o4o/auth-utils';
 import { useAuth } from '../../contexts/AuthContext';
 import { MembershipGate } from './MembershipGate';
 
@@ -46,7 +47,7 @@ export function RoleGuard({ children, allowedRoles, fallback = '/login', accessD
     return <Navigate to={fallback} state={{ from: location.pathname + location.search }} replace />;
   }
 
-  if (allowedRoles && !user.roles.some(r => allowedRoles.includes(r))) {
+  if (allowedRoles && !hasAnyRole(user.roles, allowedRoles)) {
     if (accessDeniedMessage) {
       return <AccessDeniedCard message={accessDeniedMessage} />;
     }

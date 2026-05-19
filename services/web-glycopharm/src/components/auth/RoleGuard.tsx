@@ -6,7 +6,7 @@
  */
 
 import { Navigate, useLocation } from 'react-router-dom';
-import { isAdminOrAbove } from '@o4o/auth-utils';
+import { hasAnyRole, isOperatorOrAbove } from '@o4o/auth-utils';
 import { useAuth } from '../../contexts/AuthContext';
 import { MembershipGate } from './MembershipGate';
 
@@ -37,7 +37,7 @@ export function RoleGuard({ children, allowedRoles, fallback = '/login', enforce
     return <Navigate to={fallback} state={{ from: location.pathname + location.search }} replace />;
   }
 
-  if (allowedRoles && user && !user.roles.some(r => allowedRoles.includes(r))) {
+  if (allowedRoles && user && !hasAnyRole(user.roles, allowedRoles)) {
     return <Navigate to="/" replace />;
   }
 
@@ -77,11 +77,9 @@ export function OperatorRoute({ children, fallback = '/login' }: Omit<RoleGuardP
 
   if (!user) return <Navigate to="/" replace />;
 
-  // role 체크: admin 계열은 통과시키되, membership 활성은 MembershipGate 가 한번 더 검사.
-  // admin 도 아니고 운영자 role 도 없으면 홈으로 (membership 화면이 더 적절하지만 운영자 페이지는 role 자체가 필요).
-  const isAdmin = isAdminOrAbove(user.roles, 'glycopharm');
-  const hasOperatorRole = user.roles.some((r) => r === 'glycopharm:operator');
-  if (!isAdmin && !hasOperatorRole) {
+  // role 체크: glycopharm:admin / glycopharm:operator / platform:super_admin 중 하나 필요.
+  // WO-O4O-ROLEGUARD-RUNTIME-CANONICALIZATION-V1: isOperatorOrAbove(@o4o/auth-utils) 사용.
+  if (!isOperatorOrAbove(user.roles, 'glycopharm')) {
     return <Navigate to="/" replace />;
   }
 

@@ -9,7 +9,7 @@
 
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { isAdminOrAbove } from '@o4o/auth-utils';
+import { hasAnyRole, isAdminOrAbove } from '@o4o/auth-utils';
 import { useAuth } from '../../contexts/AuthContext';
 import { MembershipGate } from './MembershipGate';
 
@@ -48,7 +48,7 @@ export function RoleGuard({ children, allowedRoles, fallback = '/login', enforce
     return <Navigate to={fallback} state={{ from: location.pathname + location.search }} replace />;
   }
 
-  if (allowedRoles && user && !user.roles.some(r => allowedRoles.includes(r))) {
+  if (allowedRoles && user && !hasAnyRole(user.roles, allowedRoles)) {
     return <Navigate to="/" replace />;
   }
 
