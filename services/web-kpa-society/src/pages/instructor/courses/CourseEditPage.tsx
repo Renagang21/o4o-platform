@@ -17,7 +17,6 @@ import { lmsInstructorApi, Course, Lesson, LessonType, type CourseVisibility, ty
 import { getAccessToken } from '../../../contexts/AuthContext';
 import QuizBuilder from './QuizBuilder';
 import AssignmentEditor from './AssignmentEditor';
-import LiveEditor from './LiveEditor';
 // WO-O4O-LMS-COURSE-STRUCTURE-AI-V2
 import CourseStructureAiModal, { type GeneratedLessonWithBody } from './CourseStructureAiModal';
 
@@ -26,7 +25,7 @@ const LESSON_TYPE_LABEL: Record<LessonType, string> = {
   video: '동영상', article: '문서', quiz: '퀴즈', assignment: '과제', live: '라이브',
 };
 
-const SUPPORTED_LESSON_TYPES: LessonType[] = ['video', 'article', 'quiz', 'assignment', 'live'];
+const SUPPORTED_LESSON_TYPES: LessonType[] = ['video', 'article', 'quiz', 'assignment'];
 
 // WO-O4O-GUIDE-CONTENT-MANAGEMENT-V1-SCOPED:
 //   guide_contents 에 sectionKey={lessonType} / pageKey='lms.lesson.editor' 로 저장된
@@ -80,10 +79,11 @@ const LESSON_TYPE_GUIDE: Record<LessonType, { title: string; description: string
     description: '이 화면에서는 과제에 대한 안내를 작성합니다.',
     steps: ['저장 후 제출 조건과 과제 설정을 이어서 입력할 수 있습니다.'],
   },
+  // @deprecated WO-O4O-LMS-LIVE-LESSON-DEPRECATION-PHASE1-V1: live 생성 중단. 타입 계약 유지를 위해 키는 보존.
   live: {
     title: '라이브 레슨입니다.',
-    description: '이 화면에서는 라이브 수업에 대한 설명을 작성합니다.',
-    steps: ['저장 후 일정과 접속 정보를 설정할 수 있습니다.'],
+    description: '라이브 강의 기능은 현재 지원하지 않습니다.',
+    steps: [],
   },
 };
 
@@ -224,8 +224,8 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
     return () => { cancelled = true; };
   }, []);
 
-  // quiz/assignment/live 타입은 전용 editor 마운트가 필요하므로 저장 후 modal을 닫지 않는다
-  const EDITOR_TYPES: LessonType[] = ['quiz', 'assignment', 'live'];
+  // quiz/assignment 타입은 전용 editor 마운트가 필요하므로 저장 후 modal을 닫지 않는다
+  const EDITOR_TYPES: LessonType[] = ['quiz', 'assignment'];
 
   // ── WO-O4O-LMS-LESSON-AI-ASSIST-V1: AI 레슨 초안 핸들러 ──────────────────
   const isYouTubeUrl = (url: string) => /^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\//i.test(url);
@@ -305,7 +305,7 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
         const created: Lesson = (res as any).data?.data?.lesson ?? (res as any).data?.lesson ?? (res as any).data;
         const needsEditor = EDITOR_TYPES.includes(form.type) && !!created?.id;
         if (needsEditor) {
-          // quiz/assignment/live: modal을 유지하고 전용 editor를 즉시 표시
+          // quiz/assignment: modal을 유지하고 전용 editor를 즉시 표시
           setSavedLesson(created);
           onSaved(true); // 리스트 reload만, modal은 닫지 않음
         } else {
@@ -454,11 +454,6 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
         {/* WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1: 과제 에디터 */}
         {showEditor && activeLesson && form.type === 'assignment' && (
           <AssignmentEditor lessonId={activeLesson.id} />
-        )}
-
-        {/* WO-O4O-LMS-LIVE-MINIMAL-V1: 라이브 에디터 */}
-        {showEditor && activeLesson && form.type === 'live' && (
-          <LiveEditor lessonId={activeLesson.id} />
         )}
 
         {/* 신규 생성 후 editor 표시 중일 때 닫기 버튼 */}
@@ -760,7 +755,7 @@ export default function CourseEditPage() {
             padding: '12px 14px', background: '#fffbeb', border: '1px solid #fde68a',
             color: '#92400e', borderRadius: 8, fontSize: 13, marginBottom: 12, lineHeight: 1.5,
           }}>
-            <strong>공개 중인 강의입니다.</strong> 강의 정보, 레슨, 퀴즈/과제/라이브 등을 수정하면
+            <strong>공개 중인 강의입니다.</strong> 강의 정보, 레슨, 퀴즈/과제 등을 수정하면
             자동으로 <strong>재검토 대기 상태</strong>로 전환되어 사용자 노출이 일시 중단됩니다.
             운영자 재승인 후 다시 공개됩니다.
           </div>

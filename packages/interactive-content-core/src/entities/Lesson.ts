@@ -19,6 +19,7 @@ export enum LessonType {
   ARTICLE = 'article',
   QUIZ = 'quiz',
   ASSIGNMENT = 'assignment',
+  /** @deprecated O4O LMS live lesson feature is being phased out (Phase 1). Phase 2 will remove this value. */
   LIVE = 'live',
 }
 
@@ -92,13 +93,15 @@ export class Lesson {
   };
 
   // Live Lesson Fields (WO-O4O-LMS-LIVE-MINIMAL-V1)
-  // Used only when type === LessonType.LIVE.
+  // @deprecated O4O LMS live lesson feature is being phased out (Phase 1). DB columns preserved for Phase 2 cleanup.
   @Column({ type: 'timestamp', nullable: true })
   liveStartAt?: Date;
 
+  /** @deprecated See liveStartAt */
   @Column({ type: 'timestamp', nullable: true })
   liveEndAt?: Date;
 
+  /** @deprecated See liveStartAt */
   @Column({ type: 'text', nullable: true })
   liveUrl?: string; // YouTube URL only (validated at API layer)
 

@@ -7,7 +7,7 @@
 import { apiClient } from './client';
 import type { ApiResponse } from '../types';
 
-export type AiAnalyzeKind = 'quiz' | 'live' | 'assignment';
+export type AiAnalyzeKind = 'quiz' | 'live' | 'assignment'; // 'live' @deprecated
 
 export interface AiAnalyzeResult {
   summary: string;
@@ -33,6 +33,7 @@ export interface QuizAnalyzePayload {
   passingScore?: number;
 }
 
+/** @deprecated O4O LMS live lesson feature is being phased out (Phase 1). */
 export interface LiveAnalyzePayload {
   lessonId?: string;
   title: string;
@@ -51,6 +52,7 @@ export const aiApi = {
   analyzeQuiz: (payload: QuizAnalyzePayload) =>
     apiClient.post<ApiResponse<AiAnalyzeResult>>('/ai/analyze', { type: 'quiz', payload }),
 
+  /** @deprecated O4O LMS live lesson feature is being phased out (Phase 1). */
   summarizeLive: (payload: LiveAnalyzePayload) =>
     apiClient.post<ApiResponse<AiAnalyzeResult>>('/ai/analyze', { type: 'live', payload }),
 

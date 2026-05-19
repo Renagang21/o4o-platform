@@ -359,14 +359,15 @@ export const lmsInstructorApi = {
     ),
 
   // ── Live 관리 (WO-O4O-LMS-LIVE-MINIMAL-V1) ─────────────────────────
+  // @deprecated O4O LMS live lesson feature is being phased out (Phase 1). API preserved for Phase 2 cleanup.
 
-  /** 레슨에 연결된 라이브 정보 조회 */
+  /** @deprecated O4O LMS live lesson feature is being phased out. */
   getLiveForLesson: (lessonId: string) =>
     authClient.api.get<{ success: boolean; data: { live: LiveDto } }>(
       `/lms/lessons/${lessonId}/live`,
     ),
 
-  /** 라이브 설정 생성/수정 */
+  /** @deprecated O4O LMS live lesson feature is being phased out. */
   upsertLive: (lessonId: string, dto: UpsertLiveDto) =>
     authClient.api.post<{ success: boolean; data: { live: LiveDto } }>(
       `/lms/lessons/${lessonId}/live`,
@@ -476,6 +477,7 @@ export interface UpsertAssignmentDto {
   dueDate?: string | null;
 }
 
+/** @deprecated O4O LMS live lesson feature is being phased out (Phase 1). */
 // WO-O4O-LMS-LIVE-MINIMAL-V1
 export interface LiveDto {
   lessonId: string;
@@ -484,6 +486,7 @@ export interface LiveDto {
   liveUrl: string | null;
 }
 
+/** @deprecated O4O LMS live lesson feature is being phased out (Phase 1). */
 export interface UpsertLiveDto {
   liveStartAt: string;
   liveEndAt: string;

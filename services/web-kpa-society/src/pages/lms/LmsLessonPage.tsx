@@ -10,7 +10,7 @@ import { toast } from '@o4o/error-handling';
 import { LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { lmsApi, aiApi, type AiAnalyzeResult } from '../../api';
 import { normalizeEnrollment } from '../../api/lms';
-import type { AssignmentLearner, AssignmentSubmission, LiveLesson } from '../../api/lms';
+import type { AssignmentLearner, AssignmentSubmission } from '../../api/lms';
 import { colors, typography } from '../../styles/theme';
 import type { Course, Lesson, Enrollment, Quiz, QuizResult } from '../../types';
 import { ContentRenderer } from '@o4o/content-editor';
@@ -53,11 +53,6 @@ export function LmsLessonPage() {
   const [assignmentDraft, setAssignmentDraft] = useState('');
   const [assignmentSubmitting, setAssignmentSubmitting] = useState(false);
 
-  // Live state (WO-O4O-LMS-LIVE-MINIMAL-V1)
-  const [live, setLive] = useState<LiveLesson | null>(null);
-  const [liveJoining, setLiveJoining] = useState(false);
-  const [now, setNow] = useState(() => new Date());
-
   // AI state (WO-O4O-LMS-AI-MINIMAL-V1)
   const [aiResult, setAiResult] = useState<AiAnalyzeResult | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
@@ -85,8 +80,6 @@ export function LmsLessonPage() {
     setAssignment(null);
     setMySubmission(null);
     setAssignmentDraft('');
-    // WO-O4O-LMS-LIVE-MINIMAL-V1
-    setLive(null);
     // WO-O4O-LMS-AI-MINIMAL-V1
     setAiResult(null);
     setAiError(null);
@@ -111,13 +104,6 @@ export function LmsLessonPage() {
     handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, [currentLesson?.type, lessonId]);
-
-  // WO-O4O-LMS-LIVE-MINIMAL-V1: tick clock for live status (예정/진행중/종료) — 30s cadence
-  useEffect(() => {
-    if (!live) return;
-    const id = setInterval(() => setNow(new Date()), 30_000);
-    return () => clearInterval(id);
-  }, [live]);
 
   const loadData = async () => {
     try {
@@ -159,17 +145,6 @@ export function LmsLessonPage() {
           }
         } catch {
           // No quiz available
-        }
-      }
-
-      // WO-O4O-LMS-LIVE-MINIMAL-V1
-      if (lessonType === 'live') {
-        try {
-          const lRes = await lmsApi.getLiveForLesson(lessonId!);
-          const l = (lRes as any).data?.live ?? null;
-          if (l) setLive(l);
-        } catch {
-          // 강사가 아직 라이브 설정 안 함 — 정상
         }
       }
 
@@ -369,18 +344,6 @@ export function LmsLessonPage() {
     );
   };
 
-  const handleAiLive = () => {
-    if (!live || !currentLesson) return;
-    callAi(() =>
-      aiApi.summarizeLive({
-        lessonId: currentLesson.id,
-        title: currentLesson.title,
-        description: currentLesson.description ?? undefined,
-        notes: typeof currentLesson.content === 'string' ? currentLesson.content : undefined,
-      }) as any,
-    );
-  };
-
   const handleAiAssignment = () => {
     if (!mySubmission || !mySubmission.content) return;
     callAi(() =>
@@ -390,41 +353,6 @@ export function LmsLessonPage() {
         submissionContent: mySubmission.content || '',
       }) as any,
     );
-  };
-
-  // WO-O4O-LMS-LIVE-MINIMAL-V1
-  const handleLiveJoin = async () => {
-    if (!live?.liveUrl || !lessonId) return;
-    setLiveJoining(true);
-    try {
-      // 1) 새 탭으로 YouTube 이동
-      window.open(live.liveUrl, '_blank', 'noopener,noreferrer');
-      // 2) 진도 마킹
-      const res = await lmsApi.joinLive(lessonId);
-      const lessonCompleted = (res as any).data?.lessonCompleted ?? false;
-      // 3) enrollment refresh
-      try {
-        const enrollmentRes = await lmsApi.getEnrollmentByCourse(courseId!);
-        const enrollmentData = normalizeEnrollment(
-          (enrollmentRes as any).data?.enrollment ?? (enrollmentRes as any).data
-        );
-        setEnrollment(enrollmentData);
-
-        const isLast = lessons.findIndex(l => l.id === lessonId) === lessons.length - 1;
-        const isCourseDone = enrollmentData?.status === 'completed'
-          || (enrollmentData as any)?.progressPercentage >= 100
-          || (enrollmentData?.progress ?? 0) >= 100;
-        if (isLast && lessonCompleted && isCourseDone) {
-          setShowCompletionModal(true);
-        }
-      } catch {
-        // ignore
-      }
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : '참여 처리에 실패했습니다.');
-    } finally {
-      setLiveJoining(false);
-    }
   };
 
   // WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1
@@ -493,7 +421,6 @@ export function LmsLessonPage() {
   // WO-O4O-LMS-LESSON-TYPE-NORMALIZATION-V1: type is always lowercase
   const isQuizLesson = currentLesson.type === 'quiz' && quiz;
   const isAssignmentLesson = currentLesson.type === 'assignment';
-  const isLiveLesson = currentLesson.type === 'live';
 
   // WO-O4O-LMS-AI-MINIMAL-V1: 결과 패널 (3개 트리거가 같은 슬롯 공유)
   const renderAiPanel = () => {
@@ -541,18 +468,6 @@ export function LmsLessonPage() {
       </Card>
     );
   };
-
-  // Live status (예정/진행중/종료)
-  const liveStatus: 'unset' | 'scheduled' | 'in_progress' | 'ended' = (() => {
-    if (!isLiveLesson) return 'unset';
-    if (!live?.liveStartAt || !live?.liveEndAt) return 'unset';
-    const start = new Date(live.liveStartAt).getTime();
-    const end = new Date(live.liveEndAt).getTime();
-    const t = now.getTime();
-    if (t < start) return 'scheduled';
-    if (t > end) return 'ended';
-    return 'in_progress';
-  })();
 
   return (
     <div style={styles.wrapper}>
@@ -619,77 +534,11 @@ export function LmsLessonPage() {
               {LESSON_TYPE_ICON[currentLesson.type ?? ''] || '📄'} {LESSON_TYPE_LABEL[currentLesson.type ?? ''] || currentLesson.type || '레슨'}
             </span>
             {isCompleted && <span style={styles.statusBadgeCompleted}>✓ 완료</span>}
-            {isLiveLesson && liveStatus === 'scheduled' && (
-              <span style={styles.statusBadgeScheduled}>⏰ 예정</span>
-            )}
-            {isLiveLesson && liveStatus === 'in_progress' && (
-              <span style={styles.statusBadgeLive}>🔴 진행 중</span>
-            )}
           </div>
           <h1 style={styles.title}>{currentLesson.title}</h1>
         </div>
 
-        {/* WO-O4O-LMS-LIVE-MINIMAL-V1: 라이브 영역 */}
-        {isLiveLesson ? (
-          live && live.liveStartAt && live.liveEndAt && live.liveUrl ? (
-            <Card padding="large" style={{ marginTop: '24px' }}>
-              <h3 style={{ ...typography.headingS, color: colors.neutral900, marginBottom: '8px' }}>라이브 일정</h3>
-              <p style={{ ...typography.bodyM, color: colors.neutral700 }}>
-                시작: {new Date(live.liveStartAt).toLocaleString('ko-KR')}<br />
-                종료: {new Date(live.liveEndAt).toLocaleString('ko-KR')}
-              </p>
-
-              {liveStatus === 'scheduled' && (
-                <div style={{ marginTop: '16px', padding: '14px', background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '8px' }}>
-                  <p style={{ ...typography.bodyM, color: '#1e40af' }}>
-                    📅 라이브 예정 — 시작 시간이 되면 참여 버튼이 활성화됩니다.
-                  </p>
-                </div>
-              )}
-
-              {liveStatus === 'in_progress' && (
-                <div style={{ marginTop: '16px' }}>
-                  <button
-                    style={{ ...styles.submitButton, opacity: liveJoining ? 0.6 : 1 }}
-                    onClick={handleLiveJoin}
-                    disabled={liveJoining}
-                  >
-                    🔴 {liveJoining ? '참여 처리 중...' : '지금 참여하기'}
-                  </button>
-                  <p style={{ ...typography.bodyS, color: colors.neutral500, marginTop: '8px' }}>
-                    참여 클릭 시 진도가 완료 처리됩니다.
-                  </p>
-                </div>
-              )}
-
-              {liveStatus === 'ended' && (
-                <div style={{ marginTop: '16px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                  <a
-                    href={live.liveUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ ...styles.navButton, display: 'inline-block', textDecoration: 'none' }}
-                  >
-                    ▶ 다시보기
-                  </a>
-                  {/* WO-O4O-LMS-AI-MINIMAL-V1 */}
-                  <button style={styles.aiButton} onClick={handleAiLive} disabled={aiLoading}>
-                    ✨ {aiLoading ? '요약 중…' : 'AI 요약 보기'}
-                  </button>
-                </div>
-              )}
-              {/* WO-O4O-LMS-AI-MINIMAL-V1: live panel */}
-              {liveStatus === 'ended' && renderAiPanel()}
-            </Card>
-          ) : (
-            <Card padding="large" style={{ marginTop: '24px', backgroundColor: '#fef3c7', border: '1px solid #fde68a' }}>
-              <h3 style={{ ...typography.headingS, color: '#92400e', marginBottom: '8px' }}>라이브가 아직 준비되지 않았습니다</h3>
-              <p style={{ ...typography.bodyM, color: '#92400e' }}>
-                강사가 라이브 일정과 URL을 등록하면 참여할 수 있습니다.
-              </p>
-            </Card>
-          )
-        ) : isAssignmentLesson ? (
+        {isAssignmentLesson ? (
           /* WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1: 과제 제출 영역 */
           assignment ? (
             <>
@@ -991,7 +840,7 @@ export function LmsLessonPage() {
             <div />
           )}
 
-          {!isCompleted && enrollment && !isQuizLesson && !isAssignmentLesson && !isLiveLesson && (
+          {!isCompleted && enrollment && !isQuizLesson && !isAssignmentLesson && (
             <button style={styles.completeButton} onClick={handleComplete}>
               ✓ 완료
             </button>
@@ -1180,22 +1029,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 600,
     backgroundColor: '#d1fae5',
     color: '#065f46',
-  },
-  statusBadgeScheduled: {
-    padding: '3px 10px',
-    borderRadius: '999px',
-    fontSize: '12px',
-    fontWeight: 600,
-    backgroundColor: '#dbeafe',
-    color: '#1e40af',
-  },
-  statusBadgeLive: {
-    padding: '3px 10px',
-    borderRadius: '999px',
-    fontSize: '12px',
-    fontWeight: 700,
-    backgroundColor: '#fee2e2',
-    color: '#991b1b',
   },
   title: {
     ...typography.headingL,

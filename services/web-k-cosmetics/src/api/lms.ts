@@ -136,6 +136,7 @@ export interface LmsAssignmentSubmission {
   status: 'submitted';
 }
 
+/** @deprecated O4O LMS live lesson feature is being phased out (Phase 1). */
 // WO-O4O-LMS-LIVE-MINIMAL-V1
 export interface LmsLive {
   lessonId: string;
@@ -246,11 +247,13 @@ export const lmsApi = {
   },
 
   // 라이브 (WO-O4O-LMS-LIVE-MINIMAL-V1)
+  // @deprecated O4O LMS live lesson feature is being phased out (Phase 1). API preserved for Phase 2 cleanup.
   getLiveForLesson: async (lessonId: string): Promise<ApiResponse<{ live: LmsLive }>> => {
     const { data } = await api.get<ApiResponse<{ live: LmsLive }>>(`/lms/lessons/${lessonId}/live`);
     return data;
   },
 
+  /** @deprecated O4O LMS live lesson feature is being phased out (Phase 1). */
   joinLive: async (lessonId: string): Promise<ApiResponse<{ lessonCompleted: boolean }>> => {
     const { data } = await api.post<ApiResponse<{ lessonCompleted: boolean }>>(
       `/lms/lessons/${lessonId}/live/join`,
