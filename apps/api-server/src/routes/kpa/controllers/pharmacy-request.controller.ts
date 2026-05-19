@@ -24,6 +24,7 @@ import { KpaPharmacyRequest } from '../entities/kpa-pharmacy-request.entity.js';
 import { organizationOpsService } from '../../../modules/organization/services/organization-ops.service.js';
 import { RoleAssignmentService } from '../../../modules/auth/services/role-assignment.service.js';
 import { StoreSlugService } from '@o4o/platform-core/store-identity';
+import { notificationService } from '../../../services/NotificationService.js';
 
 export function createPharmacyRequestRoutes(
   dataSource: DataSource,
@@ -93,6 +94,43 @@ export function createPharmacyRequestRoutes(
       });
 
       const saved = await repo.save(request);
+
+      // WO-O4O-KPA-PHARMACY-REQUEST-NOTIFICATION-P1-V1
+      // 신청 등록 시 운영자(kpa:operator, kpa:admin)에게 in-app 알림 broadcast.
+      // best-effort — 실패해도 신청 생성은 성공.
+      try {
+        const [applicant] = await dataSource.query(
+          `SELECT name, email FROM users WHERE id = $1 LIMIT 1`,
+          [user.id],
+        );
+        const applicantName = applicant?.name || applicant?.email || user.email || '신청자';
+        const operators: { userId: string }[] = await dataSource.query(
+          `SELECT DISTINCT user_id AS "userId"
+             FROM role_assignments
+            WHERE role IN ('kpa:operator','kpa:admin')
+              AND is_active = true
+            LIMIT 20`,
+        );
+        await Promise.allSettled(
+          operators.map((op) =>
+            notificationService.createNotification({
+              userId: op.userId,
+              type: 'pharmacy.request_submitted',
+              title: '약국 개설 신청 접수',
+              message: `${applicantName}님이 ${pharmacyName.trim()} 약국 개설을 신청했습니다.`,
+              serviceKey: 'kpa-society',
+              actorId: user.id,
+              metadata: {
+                requestId: saved.id,
+                pharmacyName: pharmacyName.trim(),
+                targetUrl: '/operator/pharmacy-requests',
+              },
+            }),
+          ),
+        );
+      } catch (notifyError) {
+        console.error('[PharmacyRequest] Operator notification failed (best-effort):', notifyError);
+      }
 
       return res.status(201).json({ success: true, data: saved });
     } catch (error: any) {
@@ -281,6 +319,27 @@ export function createPharmacyRequestRoutes(
       actionLogService?.logSuccess('kpa-society', user.id, 'kpa.operator.pharmacy_approve', {
         meta: { targetId: req.params.id, statusBefore: 'pending', statusAfter: 'approved' },
       }).catch(() => {});
+
+      // WO-O4O-KPA-PHARMACY-REQUEST-NOTIFICATION-P1-V1
+      // 승인 시 신청자에게 in-app 알림. best-effort.
+      try {
+        await notificationService.createNotification({
+          userId: request.user_id,
+          type: 'pharmacy.request_approved',
+          title: '약국 개설 신청이 승인되었습니다',
+          message: `${request.pharmacy_name} 약국 개설이 승인되었습니다. 내 매장에서 서비스를 이용하실 수 있습니다.`,
+          serviceKey: 'kpa-society',
+          actorId: user.id,
+          metadata: {
+            requestId: request.id,
+            pharmacyName: request.pharmacy_name,
+            targetUrl: '/store/info',
+          },
+        });
+      } catch (notifyError) {
+        console.error('[PharmacyRequest] Approve notification failed (best-effort):', notifyError);
+      }
+
       return res.json({ success: true, data: request });
     } catch (error: any) {
       console.error('[PharmacyRequest] Approve error:', error);
@@ -311,6 +370,29 @@ export function createPharmacyRequestRoutes(
       actionLogService?.logSuccess('kpa-society', user.id, 'kpa.operator.pharmacy_reject', {
         meta: { targetId: req.params.id, reason: req.body.reviewNote, statusBefore: 'pending', statusAfter: 'rejected' },
       }).catch(() => {});
+
+      // WO-O4O-KPA-PHARMACY-REQUEST-NOTIFICATION-P1-V1
+      // 반려 시 신청자에게 in-app 알림. best-effort.
+      try {
+        const reviewNote = typeof req.body.reviewNote === 'string' ? req.body.reviewNote.trim() : '';
+        await notificationService.createNotification({
+          userId: request.user_id,
+          type: 'pharmacy.request_rejected',
+          title: '약국 개설 신청이 반려되었습니다',
+          message: reviewNote || '약국 개설 신청을 다시 검토해 주세요.',
+          serviceKey: 'kpa-society',
+          actorId: user.id,
+          metadata: {
+            requestId: request.id,
+            pharmacyName: request.pharmacy_name,
+            reviewNote: reviewNote || null,
+            targetUrl: '/mypage',
+          },
+        });
+      } catch (notifyError) {
+        console.error('[PharmacyRequest] Reject notification failed (best-effort):', notifyError);
+      }
+
       return res.json({ success: true, data: request });
     } catch (error: any) {
       console.error('[PharmacyRequest] Reject error:', error);

@@ -57,6 +57,10 @@ export type NotificationType =
   | 'member.registration_pending'    // 운영자: 신규 회원가입 신청 접수
   | 'member.registration_approved'   // 신청자: 회원가입 승인
   | 'member.registration_rejected'   // 신청자: 회원가입 반려
+  // WO-O4O-KPA-PHARMACY-REQUEST-NOTIFICATION-P1-V1
+  | 'pharmacy.request_submitted'     // 운영자: 약국 개설 신청 접수
+  | 'pharmacy.request_approved'      // 신청자: 약국 개설 신청 승인
+  | 'pharmacy.request_rejected'      // 신청자: 약국 개설 신청 반려
   | 'custom';
 
 // Legacy interface for backward compatibility
