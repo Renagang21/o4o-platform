@@ -178,8 +178,8 @@ export function AnnualReportFormPage() {
   const isInactive = formData.employment.activityType === 'inactive';
 
   return (
-    <div style={styles.container}>
-      <div style={styles.formContainer}>
+    <div style={styles.container} className="px-4 py-4 md:px-6 md:py-6">
+      <div style={styles.formContainer} className="p-4 md:p-10">
         {/* 헤더 */}
         <div style={styles.header}>
           <div style={styles.headerNote}>
@@ -192,8 +192,8 @@ export function AnnualReportFormPage() {
         <div style={styles.section}>
           <h2 style={styles.sectionTitle}>인적사항</h2>
           <div style={styles.formTable}>
-            <div style={styles.formRow}>
-              <div style={styles.formCell}>
+            <div style={styles.formRow} className="flex flex-col md:flex-row gap-3 md:gap-4">
+              <div style={styles.formCell} className="md:flex-1">
                 <label style={styles.label}>성명 *</label>
                 <input
                   type="text"
@@ -202,7 +202,7 @@ export function AnnualReportFormPage() {
                   onChange={(e) => updatePersonal('name', e.target.value)}
                 />
               </div>
-              <div style={styles.formCell}>
+              <div style={styles.formCell} className="md:flex-1">
                 <label style={styles.label}>성별 *</label>
                 <div style={styles.radioGroup}>
                   <label style={styles.radioLabel}>
@@ -223,7 +223,7 @@ export function AnnualReportFormPage() {
                   </label>
                 </div>
               </div>
-              <div style={styles.formCell}>
+              <div style={styles.formCell} className="md:flex-1">
                 <label style={styles.label}>생년월일 *</label>
                 <input
                   type="date"
@@ -234,8 +234,8 @@ export function AnnualReportFormPage() {
               </div>
             </div>
 
-            <div style={styles.formRow}>
-              <div style={styles.formCell}>
+            <div style={styles.formRow} className="flex flex-col md:flex-row gap-3 md:gap-4">
+              <div style={styles.formCell} className="md:flex-1">
                 <label style={styles.label}>면허번호 *</label>
                 <input
                   type="text"
@@ -245,7 +245,7 @@ export function AnnualReportFormPage() {
                   placeholder="예: 12345"
                 />
               </div>
-              <div style={styles.formCell}>
+              <div style={styles.formCell} className="md:flex-1">
                 <label style={styles.label}>취득년도 *</label>
                 <input
                   type="text"
@@ -255,9 +255,9 @@ export function AnnualReportFormPage() {
                   placeholder="예: 2010"
                 />
               </div>
-              <div style={styles.formCell}>
+              <div style={styles.formCell} className="md:flex-1">
                 <label style={styles.label}>연락처</label>
-                <div style={styles.phoneInputs}>
+                <div style={styles.phoneInputs} className="flex-wrap">
                   <input
                     type="tel"
                     style={{ ...styles.input, flex: 1 }}
@@ -276,8 +276,8 @@ export function AnnualReportFormPage() {
               </div>
             </div>
 
-            <div style={styles.formRow}>
-              <div style={{ ...styles.formCell, flex: 2 }}>
+            <div style={styles.formRow} className="flex flex-col md:flex-row gap-3 md:gap-4">
+              <div style={styles.formCell} className="md:flex-[2]">
                 <label style={styles.label}>거주지 주소 (도로명) *</label>
                 <input
                   type="text"
@@ -287,7 +287,7 @@ export function AnnualReportFormPage() {
                   placeholder="도로명 주소를 입력하세요"
                 />
               </div>
-              <div style={styles.formCell}>
+              <div style={styles.formCell} className="md:flex-1">
                 <label style={styles.label}>Email *</label>
                 <input
                   type="email"
@@ -298,10 +298,10 @@ export function AnnualReportFormPage() {
               </div>
             </div>
 
-            <div style={styles.formRow}>
-              <div style={styles.formCell}>
+            <div style={styles.formRow} className="flex flex-col md:flex-row gap-3 md:gap-4">
+              <div style={styles.formCell} className="md:flex-1">
                 <label style={styles.label}>학력</label>
-                <div style={styles.educationInputs}>
+                <div style={styles.educationInputs} className="flex-wrap">
                   <span>학부</span>
                   <input
                     type="text"
@@ -321,9 +321,9 @@ export function AnnualReportFormPage() {
                   <span>)</span>
                 </div>
               </div>
-              <div style={styles.formCell}>
+              <div style={styles.formCell} className="md:flex-1">
                 <label style={styles.label}>소속지부·분회</label>
-                <div style={styles.branchInputs}>
+                <div style={styles.branchInputs} className="flex-wrap">
                   <span>지부</span>
                   <input
                     type="text"
@@ -340,7 +340,7 @@ export function AnnualReportFormPage() {
                   />
                 </div>
               </div>
-              <div style={styles.formCell}>
+              <div style={styles.formCell} className="md:flex-1">
                 <label style={styles.label}>한약조제자격</label>
                 <div style={styles.radioGroup}>
                   <label style={styles.radioLabel}>
@@ -484,8 +484,8 @@ export function AnnualReportFormPage() {
           {/* 근무처 정보 */}
           {!isInactive && (
             <div style={styles.formTable}>
-              <div style={styles.formRow}>
-                <div style={styles.formCell}>
+              <div style={styles.formRow} className="flex flex-col md:flex-row gap-3 md:gap-4">
+                <div style={styles.formCell} className="md:flex-1">
                   <label style={styles.label}>근무처 명칭 *</label>
                   <input
                     type="text"
@@ -494,7 +494,7 @@ export function AnnualReportFormPage() {
                     onChange={(e) => updateEmployment('workplaceName', e.target.value)}
                   />
                 </div>
-                <div style={{ ...styles.formCell, flex: 2 }}>
+                <div style={styles.formCell} className="md:flex-[2]">
                   <label style={styles.label}>근무처 주소 (도로명) *</label>
                   <input
                     type="text"
@@ -503,7 +503,7 @@ export function AnnualReportFormPage() {
                     onChange={(e) => updateEmployment('workplaceAddress', e.target.value)}
                   />
                 </div>
-                <div style={styles.formCell}>
+                <div style={styles.formCell} className="md:flex-1">
                   <label style={styles.label}>전화번호</label>
                   <input
                     type="tel"
@@ -522,8 +522,8 @@ export function AnnualReportFormPage() {
           <div style={styles.section}>
             <h2 style={styles.sectionTitle}>※ 약국 현황 (개설약사에 한함)</h2>
             <div style={styles.formTable}>
-              <div style={styles.formRow}>
-                <div style={styles.formCell}>
+              <div style={styles.formRow} className="flex flex-col md:flex-row gap-3 md:gap-4">
+                <div style={styles.formCell} className="md:flex-1">
                   <label style={styles.label}>사업자번호</label>
                   <input
                     type="text"
@@ -533,7 +533,7 @@ export function AnnualReportFormPage() {
                     placeholder="0000000000"
                   />
                 </div>
-                <div style={styles.formCell}>
+                <div style={styles.formCell} className="md:flex-1">
                   <label style={styles.label}>요양기관기호</label>
                   <input
                     type="text"
@@ -543,8 +543,8 @@ export function AnnualReportFormPage() {
                   />
                 </div>
               </div>
-              <div style={styles.formRow}>
-                <div style={styles.formCell}>
+              <div style={styles.formRow} className="flex flex-col md:flex-row gap-3 md:gap-4">
+                <div style={styles.formCell} className="md:flex-1">
                   <label style={styles.label}>한약(첩약) 취급</label>
                   <div style={styles.radioGroup}>
                     <label style={styles.radioLabel}>
@@ -565,7 +565,7 @@ export function AnnualReportFormPage() {
                     </label>
                   </div>
                 </div>
-                <div style={styles.formCell}>
+                <div style={styles.formCell} className="md:flex-1">
                   <label style={styles.label}>동물약품 취급</label>
                   <div style={styles.radioGroup}>
                     <label style={styles.radioLabel}>
@@ -586,7 +586,7 @@ export function AnnualReportFormPage() {
                     </label>
                   </div>
                 </div>
-                <div style={styles.formCell}>
+                <div style={styles.formCell} className="md:flex-1">
                   <label style={styles.label}>의약분업 지역구분</label>
                   <div style={styles.radioGroup}>
                     <label style={styles.radioLabel}>
@@ -688,9 +688,9 @@ export function AnnualReportFormPage() {
         <div style={styles.section}>
           <h2 style={styles.sectionTitle}>우편물 수신처</h2>
           <div style={styles.mailingTable}>
-            <div style={styles.mailingRow}>
-              <div style={styles.mailingLabel}>약사공론</div>
-              <div style={styles.mailingOptions}>
+            <div style={styles.mailingRow} className="flex flex-col md:flex-row md:items-center gap-2 md:gap-0 p-3">
+              <div style={styles.mailingLabel} className="md:w-[100px]">약사공론</div>
+              <div style={styles.mailingOptions} className="flex flex-wrap gap-3 md:gap-5 md:flex-1">
                 <label style={styles.radioLabel}>
                   <input
                     type="radio"
@@ -726,9 +726,9 @@ export function AnnualReportFormPage() {
                 </label>
               </div>
             </div>
-            <div style={styles.mailingRow}>
-              <div style={styles.mailingLabel}>기타 우편물*</div>
-              <div style={styles.mailingOptions}>
+            <div style={styles.mailingRow} className="flex flex-col md:flex-row md:items-center gap-2 md:gap-0 p-3">
+              <div style={styles.mailingLabel} className="md:w-[100px]">기타 우편물*</div>
+              <div style={styles.mailingOptions} className="flex flex-wrap gap-3 md:gap-5 md:flex-1">
                 <label style={styles.radioLabel}>
                   <input
                     type="radio"
@@ -783,7 +783,7 @@ export function AnnualReportFormPage() {
           </div>
           <div style={styles.recipient}>대한약사회장 귀하</div>
 
-          <div style={styles.buttonGroup}>
+          <div style={styles.buttonGroup} className="flex-wrap">
             <button style={styles.cancelButton} onClick={() => navigate(-1)}>
               취소
             </button>
@@ -798,10 +798,13 @@ export function AnnualReportFormPage() {
 }
 
 const styles: Record<string, React.CSSProperties> = {
+  // WO-O4O-KPA-ANNUAL-REPORT-FORM-MOBILE-V1:
+  // mobile 깨짐의 직접 원인이 되는 속성(padding/display/gap/flex/width)은
+  // 인라인 스타일에서 제거하고 JSX className으로 mobile-first 분기. 다른 시각
+  // 속성은 인라인 유지하여 데스크톱 회귀를 최소화한다.
   container: {
     minHeight: '100vh',
     backgroundColor: '#f5f5f5',
-    padding: '24px',
   },
   formContainer: {
     maxWidth: '900px',
@@ -809,7 +812,6 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: colors.white,
     borderRadius: '8px',
     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-    padding: '40px',
   },
   header: {
     textAlign: 'center',
@@ -853,12 +855,9 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: 'column',
     gap: '12px',
   },
-  formRow: {
-    display: 'flex',
-    gap: '16px',
-  },
+  // formRow.display/gap, formCell.flex 는 JSX className으로 옮김 (mobile 1열 stack).
+  formRow: {},
   formCell: {
-    flex: 1,
     display: 'flex',
     flexDirection: 'column',
   },
@@ -995,23 +994,17 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: 'column',
     gap: '12px',
   },
+  // mailingRow / mailingLabel / mailingOptions 의 display/gap/width/flex 도
+  // JSX className으로 옮겨 mobile에서 라벨↓옵션 stack.
   mailingRow: {
-    display: 'flex',
-    alignItems: 'center',
-    padding: '12px',
     backgroundColor: colors.neutral50,
     borderRadius: '6px',
   },
   mailingLabel: {
-    width: '100px',
     fontSize: '14px',
     fontWeight: 500,
   },
-  mailingOptions: {
-    display: 'flex',
-    gap: '20px',
-    flex: 1,
-  },
+  mailingOptions: {},
   refuseInput: {
     marginLeft: '8px',
     padding: '4px 8px',
