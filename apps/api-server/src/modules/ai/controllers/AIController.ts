@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
 import {
   LmsAIService,
-  type LmsAiKind,
   type AIAnalyzeResult,
 } from '../services/LmsAIService.js';
 import logger from '../../../utils/logger.js';
@@ -14,7 +13,7 @@ import logger from '../../../utils/logger.js';
  *
  * Single endpoint:
  *   POST /api/v1/ai/analyze
- *   Body: { type: 'quiz' | 'live' | 'assignment', payload: {...} }
+ *   Body: { type: 'quiz' | 'assignment', payload: {...} }
  *   Response: { summary, insights[], recommendations[] }
  */
 export class AIController extends BaseController {
@@ -23,7 +22,7 @@ export class AIController extends BaseController {
       const userId = (req as any).user?.id;
       if (!userId) return BaseController.unauthorized(res, 'User not authenticated');
 
-      const { type, payload } = (req.body || {}) as { type?: LmsAiKind; payload?: any };
+      const { type, payload } = (req.body || {}) as { type?: string; payload?: any };
       if (!type || !payload) {
         return BaseController.error(res, 'type and payload are required', 400);
       }
@@ -37,13 +36,6 @@ export class AIController extends BaseController {
             return BaseController.error(res, 'quiz payload requires questions[] and userAnswers[]', 400);
           }
           result = await service.analyzeQuiz(payload);
-          break;
-
-        case 'live':
-          if (typeof payload.title !== 'string' || payload.title.trim().length === 0) {
-            return BaseController.error(res, 'live payload requires non-empty title', 400);
-          }
-          result = await service.summarizeLive(payload);
           break;
 
         case 'assignment':

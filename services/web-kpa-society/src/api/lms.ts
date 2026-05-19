@@ -142,17 +142,6 @@ export const lmsApi = {
       `/lms/assignments/${assignmentId}/my`,
     ),
 
-  // 라이브 (WO-O4O-LMS-LIVE-MINIMAL-V1)
-  // @deprecated O4O LMS live lesson feature is being phased out (Phase 1). API preserved for Phase 2 cleanup.
-  getLiveForLesson: (lessonId: string) =>
-    apiClient.get<ApiResponse<{ live: LiveLesson }>>(`/lms/lessons/${lessonId}/live`),
-
-  /** @deprecated O4O LMS live lesson feature is being phased out (Phase 1). */
-  joinLive: (lessonId: string) =>
-    apiClient.post<ApiResponse<{ lessonCompleted: boolean }>>(
-      `/lms/lessons/${lessonId}/live/join`,
-    ),
-
   // 수료 (WO-O4O-COMPLETION-V1)
   getMyCompletions: (params?: { page?: number; limit?: number }) =>
     apiClient.get<PaginatedResponse<CourseCompletionItem>>('/lms/completions/me', params),
@@ -222,11 +211,3 @@ export interface AssignmentSubmission {
   gradedAt?: string | null;
 }
 
-/** @deprecated O4O LMS live lesson feature is being phased out (Phase 1). */
-// WO-O4O-LMS-LIVE-MINIMAL-V1
-export interface LiveLesson {
-  lessonId: string;
-  liveStartAt: string | null;
-  liveEndAt: string | null;
-  liveUrl: string | null;
-}

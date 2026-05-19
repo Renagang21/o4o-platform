@@ -7,7 +7,7 @@
 
 import { api } from '../lib/apiClient';
 
-export type AiAnalyzeKind = 'quiz' | 'live' | 'assignment';
+export type AiAnalyzeKind = 'quiz' | 'assignment';
 
 export interface AiAnalyzeResult {
   summary: string;
@@ -33,14 +33,6 @@ export interface QuizAnalyzePayload {
   passingScore?: number;
 }
 
-export interface LiveAnalyzePayload {
-  lessonId?: string;
-  title: string;
-  description?: string;
-  notes?: string;
-  transcript?: string;
-}
-
 export interface AssignmentAnalyzePayload {
   lessonId?: string;
   instructions?: string;
@@ -55,11 +47,6 @@ interface ApiResponse<T> {
 export const aiApi = {
   analyzeQuiz: async (payload: QuizAnalyzePayload): Promise<ApiResponse<AiAnalyzeResult>> => {
     const { data } = await api.post<ApiResponse<AiAnalyzeResult>>('/ai/analyze', { type: 'quiz', payload });
-    return data;
-  },
-
-  summarizeLive: async (payload: LiveAnalyzePayload): Promise<ApiResponse<AiAnalyzeResult>> => {
-    const { data } = await api.post<ApiResponse<AiAnalyzeResult>>('/ai/analyze', { type: 'live', payload });
     return data;
   },
 

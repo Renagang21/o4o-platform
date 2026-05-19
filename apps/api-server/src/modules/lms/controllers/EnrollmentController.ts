@@ -239,7 +239,7 @@ export class EnrollmentController extends BaseController {
         const lesson: any = await lessonRepo.findOne({ where: { id: lessonId } });
         if (!lesson) return BaseController.notFound(res, 'Lesson not found');
 
-        if (lesson.type === 'quiz' || lesson.type === 'assignment' || lesson.type === 'live') {
+        if (lesson.type === 'quiz' || lesson.type === 'assignment') {
           return BaseController.error(
             res,
             `${lesson.type} 레슨은 전용 제출/참여 API를 통해서만 완료 처리됩니다.`,

@@ -33,14 +33,12 @@ const LESSON_TYPE_LABEL: Record<string, string> = {
   video: '동영상',
   quiz: '퀴즈',
   assignment: '과제',
-  live: '라이브',
 };
 const LESSON_TYPE_ICON: Record<string, string> = {
   article: '📄',
   video: '🎬',
   quiz: '❓',
   assignment: '📝',
-  live: '🔴',
 };
 
 // ─── Page Component ──────────────────────────────────────────────────────────

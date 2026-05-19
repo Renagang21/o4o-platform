@@ -5,9 +5,8 @@ import logger from '../../../utils/logger.js';
  *
  * WO-O4O-LMS-AI-MINIMAL-V1
  *
- * On-demand AI assistance for 3 LMS lesson types:
+ * On-demand AI assistance for 2 LMS lesson types:
  *   - quiz analysis (wrong-answer explanation)
- *   - live summary (key takeaways)
  *   - assignment feedback (improvement points)
  *
  * Phase 1 constraints:
@@ -22,7 +21,7 @@ import logger from '../../../utils/logger.js';
  * OperatorAiLlmService.
  */
 
-export type LmsAiKind = 'quiz' | 'live' | 'assignment';
+export type LmsAiKind = 'quiz' | 'assignment';
 
 export interface QuizAnalysisPayload {
   lessonId?: string;
@@ -40,14 +39,6 @@ export interface QuizAnalysisPayload {
   }>;
   score?: number;
   passingScore?: number;
-}
-
-export interface LiveSummaryPayload {
-  lessonId?: string;
-  title: string;
-  description?: string;
-  notes?: string;
-  transcript?: string;
 }
 
 export interface AssignmentFeedbackPayload {
@@ -89,21 +80,6 @@ Constraints:
 - If everything was correct, focus recommendations on next steps / extending mastery.
 - Do not invent facts that aren't in the input.`;
 
-const LIVE_PROMPT = `You are an LMS assistant. Summarize a live lesson.
-
-Return a single JSON object:
-{
-  "summary": "Korean 2-3 sentence overview.",
-  "insights": ["Korean", ...],            // 3-5 key points / takeaways
-  "recommendations": ["Korean", ...]      // 2-4 follow-up actions for the learner
-}
-
-Constraints:
-- Korean only.
-- If transcript or notes are provided, ground the summary in them.
-- If only title/description are available, produce best-effort orientation
-  (preview style) and clearly avoid inventing specifics.`;
-
 const ASSIGNMENT_PROMPT = `You are an LMS instructor giving formative feedback.
 
 Return a single JSON object:
@@ -131,11 +107,6 @@ export class LmsAIService {
   async analyzeQuiz(payload: QuizAnalysisPayload): Promise<AIAnalyzeResult> {
     const userPrompt = this.buildQuizPrompt(payload);
     return this.run('quiz', QUIZ_PROMPT, userPrompt, () => this.quizFallback(payload));
-  }
-
-  async summarizeLive(payload: LiveSummaryPayload): Promise<AIAnalyzeResult> {
-    const userPrompt = this.buildLivePrompt(payload);
-    return this.run('live', LIVE_PROMPT, userPrompt, () => this.liveFallback(payload));
   }
 
   async feedbackAssignment(payload: AssignmentFeedbackPayload): Promise<AIAnalyzeResult> {
@@ -226,15 +197,6 @@ export class LmsAIService {
     return lines.join('\n');
   }
 
-  private buildLivePrompt(p: LiveSummaryPayload): string {
-    const lines = ['# Live lesson', ''];
-    lines.push(`Title: ${p.title}`);
-    if (p.description) lines.push(`Description: ${clip(p.description, 1500)}`);
-    if (p.notes) lines.push(`Notes: ${clip(p.notes, 4000)}`);
-    if (p.transcript) lines.push(`Transcript:\n${clip(p.transcript, 6000)}`);
-    return lines.join('\n');
-  }
-
   private buildAssignmentPrompt(p: AssignmentFeedbackPayload): string {
     const lines = ['# Assignment submission', ''];
     if (p.instructions) lines.push(`Instructions: ${clip(p.instructions, 2000)}`);
@@ -269,14 +231,6 @@ export class LmsAIService {
     ];
 
     return { summary, insights, recommendations };
-  }
-
-  private liveFallback(p: LiveSummaryPayload): AIAnalyzeResult {
-    return {
-      summary: `${p.title} 라이브 세션 정보입니다.`,
-      insights: p.description ? [clip(p.description, 200)] : ['상세 설명이 등록되지 않았습니다.'],
-      recommendations: ['AI 키 설정 후 다시 시도하면 라이브 요약을 받을 수 있습니다.'],
-    };
   }
 
   private assignmentFallback(p: AssignmentFeedbackPayload): AIAnalyzeResult {

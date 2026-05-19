@@ -13,7 +13,7 @@ export type CourseStatus =
   | 'rejected'
   | 'archived';
 // WO-O4O-LMS-LESSON-TYPE-NORMALIZATION-V1: lowercase across the board
-export type LessonType = 'video' | 'article' | 'quiz' | 'assignment' | 'live';
+export type LessonType = 'video' | 'article' | 'quiz' | 'assignment';
 // WO-KPA-CONTENT-COURSE-KIND-SEPARATION-V1
 export type ContentKind = 'lecture' | 'content_resource';
 // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1
@@ -358,22 +358,6 @@ export const lmsInstructorApi = {
       dto,
     ),
 
-  // ── Live 관리 (WO-O4O-LMS-LIVE-MINIMAL-V1) ─────────────────────────
-  // @deprecated O4O LMS live lesson feature is being phased out (Phase 1). API preserved for Phase 2 cleanup.
-
-  /** @deprecated O4O LMS live lesson feature is being phased out. */
-  getLiveForLesson: (lessonId: string) =>
-    authClient.api.get<{ success: boolean; data: { live: LiveDto } }>(
-      `/lms/lessons/${lessonId}/live`,
-    ),
-
-  /** @deprecated O4O LMS live lesson feature is being phased out. */
-  upsertLive: (lessonId: string, dto: UpsertLiveDto) =>
-    authClient.api.post<{ success: boolean; data: { live: LiveDto } }>(
-      `/lms/lessons/${lessonId}/live`,
-      dto,
-    ),
-
   // ── 승인 대기 수강신청 (WO-O4O-LMS-INSTRUCTOR-DASHBOARD-CONNECT-V1) ───────────
 
   /** 본인 강의의 PENDING 수강신청 목록 */
@@ -477,18 +461,3 @@ export interface UpsertAssignmentDto {
   dueDate?: string | null;
 }
 
-/** @deprecated O4O LMS live lesson feature is being phased out (Phase 1). */
-// WO-O4O-LMS-LIVE-MINIMAL-V1
-export interface LiveDto {
-  lessonId: string;
-  liveStartAt: string | null;
-  liveEndAt: string | null;
-  liveUrl: string | null;
-}
-
-/** @deprecated O4O LMS live lesson feature is being phased out (Phase 1). */
-export interface UpsertLiveDto {
-  liveStartAt: string;
-  liveEndAt: string;
-  liveUrl: string;
-}

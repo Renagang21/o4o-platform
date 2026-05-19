@@ -58,7 +58,7 @@ export interface LmsLesson {
   content?: string;
   isPreview: boolean;
   isFree?: boolean;
-  type?: 'video' | 'article' | 'quiz' | 'assignment' | 'live';
+  type?: 'video' | 'article' | 'quiz' | 'assignment';
 }
 
 export interface LmsEnrollment {
@@ -134,15 +134,6 @@ export interface LmsAssignmentSubmission {
   content: string | null;
   submittedAt: string;
   status: 'submitted';
-}
-
-/** @deprecated O4O LMS live lesson feature is being phased out (Phase 1). */
-// WO-O4O-LMS-LIVE-MINIMAL-V1
-export interface LmsLive {
-  lessonId: string;
-  liveStartAt: string | null;
-  liveEndAt: string | null;
-  liveUrl: string | null;
 }
 
 // PaginatedResponse — V2 Step 1 이후 @o4o/lms-client 의 LmsPaginatedResponse 사용으로 대체됨.
@@ -246,18 +237,4 @@ export const lmsApi = {
     return data;
   },
 
-  // 라이브 (WO-O4O-LMS-LIVE-MINIMAL-V1)
-  // @deprecated O4O LMS live lesson feature is being phased out (Phase 1). API preserved for Phase 2 cleanup.
-  getLiveForLesson: async (lessonId: string): Promise<ApiResponse<{ live: LmsLive }>> => {
-    const { data } = await api.get<ApiResponse<{ live: LmsLive }>>(`/lms/lessons/${lessonId}/live`);
-    return data;
-  },
-
-  /** @deprecated O4O LMS live lesson feature is being phased out (Phase 1). */
-  joinLive: async (lessonId: string): Promise<ApiResponse<{ lessonCompleted: boolean }>> => {
-    const { data } = await api.post<ApiResponse<{ lessonCompleted: boolean }>>(
-      `/lms/lessons/${lessonId}/live/join`,
-    );
-    return data;
-  },
 };

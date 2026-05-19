@@ -22,7 +22,7 @@ import CourseStructureAiModal, { type GeneratedLessonWithBody } from './CourseSt
 
 // WO-O4O-LMS-UX-REFINEMENT-V1: instructor 라벨 통일 ("동영상")
 const LESSON_TYPE_LABEL: Record<LessonType, string> = {
-  video: '동영상', article: '문서', quiz: '퀴즈', assignment: '과제', live: '라이브',
+  video: '동영상', article: '문서', quiz: '퀴즈', assignment: '과제',
 };
 
 const SUPPORTED_LESSON_TYPES: LessonType[] = ['video', 'article', 'quiz', 'assignment'];
@@ -78,12 +78,6 @@ const LESSON_TYPE_GUIDE: Record<LessonType, { title: string; description: string
     title: '과제 레슨입니다.',
     description: '이 화면에서는 과제에 대한 안내를 작성합니다.',
     steps: ['저장 후 제출 조건과 과제 설정을 이어서 입력할 수 있습니다.'],
-  },
-  // @deprecated WO-O4O-LMS-LIVE-LESSON-DEPRECATION-PHASE1-V1: live 생성 중단. 타입 계약 유지를 위해 키는 보존.
-  live: {
-    title: '라이브 레슨입니다.',
-    description: '라이브 강의 기능은 현재 지원하지 않습니다.',
-    steps: [],
   },
 };
 
