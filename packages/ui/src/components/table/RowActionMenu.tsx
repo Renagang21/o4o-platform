@@ -136,10 +136,15 @@ export function RowActionMenu({ actions, inlineMax = 0, disabled }: RowActionMen
       if (disabled) return;
       const rect = triggerRef.current?.getBoundingClientRect();
       if (rect) {
+        const menuW = 192; // w-48
+        const padding = 8;
         const spaceBelow = window.innerHeight - rect.bottom;
         const estHeight = overflowActions.length * 36 + 16;
         const top = spaceBelow > estHeight ? rect.bottom + 4 : rect.top - estHeight - 4;
-        setMenuPos({ top, left: rect.right - 192 });
+        // Align right edge of menu to right edge of trigger; clamp within viewport
+        const rawLeft = rect.right - menuW;
+        const left = Math.min(window.innerWidth - menuW - padding, Math.max(padding, rawLeft));
+        setMenuPos({ top, left });
       }
       setMenuOpen((prev) => !prev);
     },
@@ -212,7 +217,7 @@ export function RowActionMenu({ actions, inlineMax = 0, disabled }: RowActionMen
           <div
             ref={menuRef}
             className="fixed z-[9999] w-48 bg-white rounded-lg border border-slate-200 shadow-lg py-1"
-            style={{ top: menuPos.top, left: Math.max(8, menuPos.left) }}
+            style={{ top: menuPos.top, left: menuPos.left }}
           >
             {overflowActions.map((action, idx) => (
               <React.Fragment key={action.key}>
