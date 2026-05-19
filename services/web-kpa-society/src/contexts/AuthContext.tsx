@@ -219,6 +219,10 @@ function createUserFromApiResponse(apiUser: ApiUser): User {
     id: apiUser.id,
     email: apiUser.email,
     name: apiUser.fullName || apiUser.name || apiUser.email,
+    // WO-O4O-KPA-FORUM-DISPLAYNAME-NICKNAME-ALIGNMENT-V1:
+    //   포럼 공개 표시명 canonical: nickname → name → email local-part.
+    //   서버 /auth/me 응답이 nickname 을 포함하지 않으면 undefined 유지.
+    nickname: (apiUser as any).nickname || undefined,
     role, // 매핑 없이 그대로 사용 (Backward compatibility)
     roles: apiUser.roles || [role], // P2-T1: Phase 4 support
     membershipType,

@@ -109,9 +109,13 @@ export function ForumWritePage() {
       />
 
       <Card padding="large">
+        {/* WO-O4O-KPA-FORUM-DISPLAYNAME-NICKNAME-ALIGNMENT-V1:
+            포럼 공개 표시명 canonical: nickname → name → email local-part → '익명'. */}
         <div style={styles.authorInfo}>
           <span style={styles.authorLabel}>작성자 표시명:</span>
-          <span style={styles.authorName}>{user.nickname || user.name}</span>
+          <span style={styles.authorName}>
+            {user.nickname || user.name || user.email?.split('@')[0] || '익명'}
+          </span>
           <p style={styles.authorHint}>(표시명은 프로필에서 변경할 수 있습니다)</p>
         </div>
 

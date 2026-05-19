@@ -53,6 +53,8 @@ export class AuthAccountController extends BaseController {
         id: req.user.id,
         email: req.user.email,
         name: req.user.name,
+        // WO-O4O-KPA-FORUM-DISPLAYNAME-NICKNAME-ALIGNMENT-V1: nickname fallback
+        nickname: req.user.nickname || null,
         role: roles[0] || 'user',
         roles,  // WO-O4O-ROLE-MODEL-UNIFICATION-PHASE1-V1
         status: req.user.status,
@@ -67,6 +69,9 @@ export class AuthAccountController extends BaseController {
       const ud0 = userData as Record<string, unknown>;
       ud0.firstName = req.user.firstName || null;
       ud0.lastName = req.user.lastName || null;
+      // WO-O4O-KPA-FORUM-DISPLAYNAME-NICKNAME-ALIGNMENT-V1:
+      //   toPublicData() 가 nickname 을 포함하지 않는 fallback 경로에서도 일관 노출.
+      ud0.nickname = req.user.nickname || null;
       ud0.displayName =
         (req.user.lastName || req.user.firstName)
           ? `${req.user.lastName || ''}${req.user.firstName || ''}`.trim()

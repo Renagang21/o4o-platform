@@ -319,6 +319,9 @@ export class User {
       displayName: this.displayName,
       firstName: this.firstName,
       lastName: this.lastName,
+      // WO-O4O-KPA-FORUM-DISPLAYNAME-NICKNAME-ALIGNMENT-V1:
+      //   포럼 공개 표시명을 nickname-first 로 노출하기 위해 /auth/me 응답에 nickname 포함.
+      nickname: this.nickname || null,
       fullName: this.fullName,
       phone: this.phone,
       contactEnabled: this.contactEnabled,

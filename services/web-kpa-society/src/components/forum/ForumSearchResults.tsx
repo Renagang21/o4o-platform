@@ -79,7 +79,8 @@ export function ForumSearchResults({ query }: ForumSearchResultsProps) {
             id: p.id,
             title: p.title,
             categoryName: p.categoryName ?? p.category?.name ?? '',
-            authorName: p.authorName ?? p.author?.name ?? '익명',
+            // WO-O4O-KPA-FORUM-DISPLAYNAME-NICKNAME-ALIGNMENT-V1: nickname-first fallback chain
+            authorName: p.authorName ?? p.author?.nickname ?? p.author?.name ?? '익명',
             createdAt: p.createdAt ?? p.created_at ?? '',
             viewCount: p.viewCount ?? 0,
             likeCount: p.likeCount ?? 0,
