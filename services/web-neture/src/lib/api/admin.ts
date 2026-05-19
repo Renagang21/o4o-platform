@@ -27,6 +27,12 @@ export interface NetureOperatorInfo {
   createdAt: string;
 }
 
+export interface OperatorActionResult {
+  success: boolean;
+  error?: string;
+  code?: string;
+}
+
 export const adminOperatorApi = {
   async getOperators(includeInactive = false): Promise<NetureOperatorInfo[]> {
     try {
@@ -40,21 +46,23 @@ export const adminOperatorApi = {
     }
   },
 
-  async deactivateOperator(userId: string): Promise<boolean> {
+  async deactivateOperator(userId: string): Promise<OperatorActionResult> {
     try {
       await api.patch(`/neture/admin/operators/${userId}/deactivate`);
-      return true;
-    } catch {
-      return false;
+      return { success: true };
+    } catch (error: any) {
+      const data = error?.response?.data;
+      return { success: false, error: data?.error || '권한 해제에 실패했습니다', code: data?.code };
     }
   },
 
-  async reactivateOperator(userId: string): Promise<boolean> {
+  async reactivateOperator(userId: string): Promise<OperatorActionResult> {
     try {
       await api.patch(`/neture/admin/operators/${userId}/reactivate`);
-      return true;
-    } catch {
-      return false;
+      return { success: true };
+    } catch (error: any) {
+      const data = error?.response?.data;
+      return { success: false, error: data?.error || '권한 복원에 실패했습니다', code: data?.code };
     }
   },
 };

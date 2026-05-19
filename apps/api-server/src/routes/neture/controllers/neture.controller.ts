@@ -491,25 +491,26 @@ export function createNetureController(dataSource: DataSource): Router {
   /**
    * GET /admin/operators
    * Neture 역할 보유 사용자 목록 (neture:admin, neture:operator)
-   * WO-O4O-NETURE-OPERATOR-DASHBOARD-500-FIX-V1:
-   *   users.roles 컬럼 삭제됨 (RBAC SSOT) → role_assignments JOIN으로 전환
+   * WO-O4O-NETURE-OPERATOR-MGMT-P0-LEGACY-SQL-AND-RBAC-FIX-V1:
+   *   - FROM "user" → FROM "users" (테이블명 수정)
+   *   - ra."userId"/"isActive" → ra.user_id/is_active (snake_case 수정)
+   *   - isActive 기준: role_assignments.is_active (users.isActive 제거)
+   *   - includeInactive: HAVING bool_or 기반 필터
    */
   router.get('/admin/operators', requireAuth, requireNetureScope('neture:admin'), async (req: Request, res: Response) => {
     try {
       const includeInactive = req.query.includeInactive === 'true';
 
-      const activeFilter = includeInactive ? '' : `AND u."isActive" = true`;
-
       const operators = await dataSource.query(
-        `SELECT u.id, u.name, u.email, u."isActive", u."createdAt", u."updatedAt",
-                array_agg(ra.role) AS roles
-         FROM "user" u
+        `SELECT u.id, u.name, u.email, u."createdAt",
+                array_agg(ra.role) FILTER (WHERE ra.is_active = true) AS roles,
+                bool_or(ra.is_active) AS "isActive"
+         FROM users u
          JOIN role_assignments ra
-           ON ra."userId" = u.id
-           AND ra."isActive" = true
+           ON ra.user_id = u.id
            AND ra.role IN ('neture:admin', 'neture:operator')
-         WHERE 1=1 ${activeFilter}
-         GROUP BY u.id, u.name, u.email, u."isActive", u."createdAt", u."updatedAt"
+         GROUP BY u.id, u.name, u.email, u."createdAt"
+         HAVING ${includeInactive ? 'true' : 'bool_or(ra.is_active) = true'}
          ORDER BY u."createdAt" DESC`
       );
 
@@ -532,7 +533,14 @@ export function createNetureController(dataSource: DataSource): Router {
 
   /**
    * PATCH /admin/operators/:id/deactivate
-   * 사용자 비활성화 (isActive = false)
+   * Neture 운영자 권한 해제: role_assignments.is_active = false
+   *
+   * WO-O4O-NETURE-OPERATOR-MGMT-P0-LEGACY-SQL-AND-RBAC-FIX-V1:
+   *   - users.isActive 변경 제거 (전체 계정 차단 방지)
+   *   - role_assignments.is_active = false (Neture 권한만 해제)
+   *   - 마지막 neture:admin 보호: 다른 활성 neture:admin이 없으면 거부
+   *
+   * NOTE: platform:super_admin 보호 로직은 requireNetureScope에서 처리됨 (변경 없음)
    */
   router.patch('/admin/operators/:id/deactivate', requireAuth, requireNetureScope('neture:admin'), async (req: Request, res: Response) => {
     try {
@@ -544,24 +552,66 @@ export function createNetureController(dataSource: DataSource): Router {
         return res.status(400).json({ success: false, error: 'Cannot deactivate yourself' });
       }
 
+      // Check user exists
       const [target] = await dataSource.query(
-        `SELECT id, "isActive", roles FROM "user" WHERE id = $1`,
+        `SELECT id FROM users WHERE id = $1`,
         [targetId]
       );
 
       if (!target) {
         return res.status(404).json({ success: false, error: 'User not found' });
       }
-      if (!target.isActive) {
-        return res.status(400).json({ success: false, error: 'User already inactive' });
-      }
 
-      await dataSource.query(
-        `UPDATE "user" SET "isActive" = false, "updatedAt" = NOW() WHERE id = $1`,
+      // Check active neture role_assignments on target
+      const activeRoles: { id: string; role: string }[] = await dataSource.query(
+        `SELECT id, role FROM role_assignments
+         WHERE user_id = $1
+           AND role IN ('neture:admin', 'neture:operator')
+           AND is_active = true`,
         [targetId]
       );
 
-      res.json({ success: true, data: { id: targetId, deactivated: true } });
+      if (activeRoles.length === 0) {
+        return res.status(400).json({
+          success: false,
+          error: 'User has no active Neture operator roles',
+          code: 'NO_ACTIVE_ROLES',
+        });
+      }
+
+      // Last neture:admin protection: refuse if target is the only active neture:admin
+      const targetIsAdmin = activeRoles.some((r) => r.role === 'neture:admin');
+      if (targetIsAdmin) {
+        const [{ count }] = await dataSource.query(
+          `SELECT COUNT(*) AS count FROM role_assignments
+           WHERE role = 'neture:admin'
+             AND is_active = true
+             AND user_id != $1`,
+          [targetId]
+        );
+        if (parseInt(count, 10) === 0) {
+          return res.status(400).json({
+            success: false,
+            error: 'Cannot deactivate the last active neture:admin',
+            code: 'LAST_ADMIN_PROTECTED',
+          });
+        }
+      }
+
+      // Deactivate Neture role_assignments (users.isActive unchanged)
+      await dataSource.query(
+        `UPDATE role_assignments
+         SET is_active = false, updated_at = NOW()
+         WHERE user_id = $1
+           AND role IN ('neture:admin', 'neture:operator')
+           AND is_active = true`,
+        [targetId]
+      );
+
+      res.json({
+        success: true,
+        data: { id: targetId, revokedRoles: activeRoles.map((r) => r.role) },
+      });
     } catch (error) {
       logger.error('[Neture API] Error deactivating operator:', error);
       res.status(500).json({ success: false, error: 'Failed to deactivate operator' });
@@ -570,30 +620,58 @@ export function createNetureController(dataSource: DataSource): Router {
 
   /**
    * PATCH /admin/operators/:id/reactivate
-   * 사용자 재활성화 (isActive = true)
+   * Neture 운영자 권한 복원: role_assignments.is_active = true
+   *
+   * WO-O4O-NETURE-OPERATOR-MGMT-P0-LEGACY-SQL-AND-RBAC-FIX-V1:
+   *   - users.isActive 변경 제거
+   *   - 기존 inactive role_assignment 복원 (신규 INSERT 금지)
+   *   - inactive row 없으면 NO_ROLES_TO_RESTORE 오류 반환
    */
   router.patch('/admin/operators/:id/reactivate', requireAuth, requireNetureScope('neture:admin'), async (req: Request, res: Response) => {
     try {
       const targetId = req.params.id;
 
+      // Check user exists
       const [target] = await dataSource.query(
-        `SELECT id, "isActive" FROM "user" WHERE id = $1`,
+        `SELECT id FROM users WHERE id = $1`,
         [targetId]
       );
 
       if (!target) {
         return res.status(404).json({ success: false, error: 'User not found' });
       }
-      if (target.isActive) {
-        return res.status(400).json({ success: false, error: 'User already active' });
-      }
 
-      await dataSource.query(
-        `UPDATE "user" SET "isActive" = true, "updatedAt" = NOW() WHERE id = $1`,
+      // Check inactive neture role_assignments to restore
+      const inactiveRoles: { id: string; role: string }[] = await dataSource.query(
+        `SELECT id, role FROM role_assignments
+         WHERE user_id = $1
+           AND role IN ('neture:admin', 'neture:operator')
+           AND is_active = false`,
         [targetId]
       );
 
-      res.json({ success: true, data: { id: targetId, reactivated: true } });
+      if (inactiveRoles.length === 0) {
+        return res.status(400).json({
+          success: false,
+          error: 'No inactive Neture roles to restore. Use the operator creation flow to assign new roles.',
+          code: 'NO_ROLES_TO_RESTORE',
+        });
+      }
+
+      // Restore Neture role_assignments (users.isActive unchanged)
+      await dataSource.query(
+        `UPDATE role_assignments
+         SET is_active = true, updated_at = NOW()
+         WHERE user_id = $1
+           AND role IN ('neture:admin', 'neture:operator')
+           AND is_active = false`,
+        [targetId]
+      );
+
+      res.json({
+        success: true,
+        data: { id: targetId, restoredRoles: inactiveRoles.map((r) => r.role) },
+      });
     } catch (error) {
       logger.error('[Neture API] Error reactivating operator:', error);
       res.status(500).json({ success: false, error: 'Failed to reactivate operator' });

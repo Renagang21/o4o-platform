@@ -11,6 +11,7 @@ import { UserX, UserCheck } from 'lucide-react';
 import { DataTable } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { RowActionMenu } from '@o4o/ui';
+import { toast } from '@o4o/error-handling';
 import { adminOperatorApi, type NetureOperatorInfo } from '../../lib/api';
 
 const roleLabels: Record<string, string> = {
@@ -44,16 +45,24 @@ export default function OperatorsPage() {
 
   const handleDeactivate = async (userId: string) => {
     setActionLoading(userId);
-    const ok = await adminOperatorApi.deactivateOperator(userId);
+    const result = await adminOperatorApi.deactivateOperator(userId);
     setActionLoading(null);
-    if (ok) await loadOperators();
+    if (result.success) {
+      await loadOperators();
+    } else {
+      toast.error(result.error || '권한 해제에 실패했습니다');
+    }
   };
 
   const handleReactivate = async (userId: string) => {
     setActionLoading(userId);
-    const ok = await adminOperatorApi.reactivateOperator(userId);
+    const result = await adminOperatorApi.reactivateOperator(userId);
     setActionLoading(null);
-    if (ok) await loadOperators();
+    if (result.success) {
+      await loadOperators();
+    } else {
+      toast.error(result.error || '권한 복원에 실패했습니다');
+    }
   };
 
   const roles = ['all', 'neture:admin', 'neture:operator'];
