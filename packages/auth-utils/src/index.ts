@@ -14,3 +14,4 @@ export type { MembershipStatus, MembershipLike, UserLike } from './membershipGat
 export { getServiceMembershipStatus, isPlatformSuperAdmin, isServiceAccessAllowed, normalizeMemberships } from './membershipGate.js';
 export type { PlatformUser } from './buildPlatformUser.js';
 export { buildPlatformUser } from './buildPlatformUser.js';
+export { AUTH_TOKEN_CLEARED_EVENT } from './authEvents.js';

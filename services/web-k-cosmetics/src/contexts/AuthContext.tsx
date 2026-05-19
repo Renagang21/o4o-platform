@@ -6,7 +6,7 @@
  * WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefix 유지, mapApiRoles 제거
  */
 
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, useRef, ReactNode } from 'react';
 import { parseAuthResponse, resolveAuthError, buildPlatformUser } from '@o4o/auth-utils';
 import { getAccessToken } from '@o4o/auth-client';
 import { authClient, api } from '../lib/apiClient';
@@ -52,10 +52,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSessionChecked, setIsSessionChecked] = useState(false);
+  // WO-O4O-AUTH-RUNTIME-ORCHESTRATION-STABILIZATION-V1:
+  // 여러 RoleGuard 동시 마운트 시 병렬 중복 호출 방지 (ref는 동기적으로 업데이트됨)
+  const sessionCheckInProgressRef = useRef(false);
 
   // Lazy session check - only called when entering protected routes
   const checkSession = async () => {
-    if (isSessionChecked) return; // Already checked
+    if (isSessionChecked || sessionCheckInProgressRef.current) return;
+    sessionCheckInProgressRef.current = true;
 
     setIsLoading(true);
     try {
@@ -70,6 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoading(false);
       setIsSessionChecked(true);
+      sessionCheckInProgressRef.current = false;
     }
   };
 

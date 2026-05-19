@@ -50,6 +50,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const checkSession = async () => {
+      // WO-O4O-AUTH-RUNTIME-ORCHESTRATION-STABILIZATION-V1:
+      // 토큰 없으면 /auth/me 호출 생략 — 불필요한 401 방지 (GlycoPharm/KPA 패턴 정렬)
+      if (!getAccessToken()) {
+        setIsLoading(false);
+        return;
+      }
       try {
         const response = await api.get('/auth/me');
         const data = response.data;
