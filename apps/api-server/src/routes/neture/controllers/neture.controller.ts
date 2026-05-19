@@ -697,6 +697,22 @@ export function createNetureController(dataSource: DataSource): Router {
         }
       }
 
+      // Remove ghost inactive rows first to prevent unique constraint conflict.
+      // UNIQUE(user_id, role, is_active) allows both (true) and (false) rows to coexist.
+      // If an inactive ghost row exists from a previous lifecycle, the UPDATE below would
+      // fail with duplicate key violation. Delete ghosts before flipping active → inactive.
+      const ghostResult = await dataSource.query(
+        `DELETE FROM role_assignments
+         WHERE user_id = $1
+           AND role IN ('neture:admin', 'neture:operator')
+           AND is_active = false`,
+        [targetId]
+      );
+      const ghostCount = ghostResult[1] ?? 0;
+      if (ghostCount > 0) {
+        logger.info(`[Neture API] Removed ${ghostCount} ghost inactive role row(s) for userId=${targetId}`);
+      }
+
       // Deactivate Neture role_assignments (users.isActive unchanged)
       await dataSource.query(
         `UPDATE role_assignments
@@ -712,7 +728,7 @@ export function createNetureController(dataSource: DataSource): Router {
         data: { id: targetId, revokedRoles: activeRoles.map((r) => r.role) },
       });
     } catch (error) {
-      logger.error('[Neture API] Error deactivating operator:', error);
+      logger.error('[Neture API] Error deactivating operator: userId=%s error=%s', req.params.id, (error as Error).message);
       res.status(500).json({ success: false, error: 'Failed to deactivate operator' });
     }
   });
