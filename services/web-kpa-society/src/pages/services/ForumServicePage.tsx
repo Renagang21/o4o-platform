@@ -49,7 +49,7 @@ export function ForumServicePage() {
         </p>
       </div>
 
-      <div style={styles.ctaSection}>
+      <div style={styles.ctaSection} className="flex-wrap">
         <a href="/forum" style={styles.ctaPrimary}>
           포럼 이용하기
         </a>

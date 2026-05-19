@@ -2,11 +2,18 @@
  * InfoPageLayout - 정보 페이지용 공통 레이아웃
  *
  * WO-KPA-HOME-SERVICE-SECTION-V1
+ * WO-O4O-INFO-PAGE-LAYOUT-RESPONSIVE-V1:
+ *   inline style 전면 제거 → @o4o/ui responsive primitive 적용
+ *   - PageContainer width="form" (max-w-3xl ≈ 기존 800px)
+ *   - HeroSection align="center" (mobile-first title/icon sizing)
+ *   - ContentCard variant="outlined" padding="relaxed"
  *
  * 서비스 상세 소개 및 참여 안내 페이지에서 사용
+ * (LmsServicePage / ForumServicePage / PharmacyServicePage / PharmacyJoinPage)
  */
 
 import React from 'react';
+import { PageContainer, HeroSection, ContentCard } from '@o4o/ui';
 import { PlatformHeader } from './PlatformHeader';
 import { PlatformFooter } from './PlatformFooter';
 
@@ -20,36 +27,22 @@ export interface InfoPageLayoutProps {
   subtitle?: string;
   /** 배지 타입 */
   badgeType?: BadgeType;
-  /** 상단 아이콘 */
+  /** 상단 아이콘 (emoji 문자열) */
   icon?: string;
 }
 
-const BADGE_CONFIG: Record<Exclude<BadgeType, 'none'>, { text: string; style: React.CSSProperties }> = {
+// 기존 inline style (#fef3c7/#92400e/#d1fae5/#065f46) 의 Tailwind 동등 색
+// — amber/emerald 토큰과 정확히 매칭됨.
+const BADGE_CONFIG: Record<Exclude<BadgeType, 'none'>, { text: string; className: string }> = {
   demo: {
     text: '도입 검토용 데모',
-    style: {
-      display: 'inline-block',
-      fontSize: '0.875rem',
-      fontWeight: 500,
-      backgroundColor: '#fef3c7',
-      color: '#92400e',
-      padding: '6px 12px',
-      borderRadius: '16px',
-      marginBottom: '16px',
-    },
+    className:
+      'inline-block text-sm font-medium bg-amber-100 text-amber-800 px-3 py-1.5 rounded-full',
   },
   independent: {
     text: '독립 운영 가능',
-    style: {
-      display: 'inline-block',
-      fontSize: '0.875rem',
-      fontWeight: 500,
-      backgroundColor: '#d1fae5',
-      color: '#065f46',
-      padding: '6px 12px',
-      borderRadius: '16px',
-      marginBottom: '16px',
-    },
+    className:
+      'inline-block text-sm font-medium bg-emerald-100 text-emerald-800 px-3 py-1.5 rounded-full',
   },
 };
 
@@ -63,70 +56,48 @@ export function InfoPageLayout({
   const badge = badgeType !== 'none' ? BADGE_CONFIG[badgeType] : null;
 
   return (
-    <div style={styles.wrapper}>
+    <div className="min-h-screen flex flex-col">
       <PlatformHeader />
-      <main style={styles.main}>
-        <div style={styles.container}>
-          {/* Hero Section */}
-          <div style={styles.hero}>
-            {icon && <div style={styles.icon}>{icon}</div>}
-            {badge && <span style={badge.style}>{badge.text}</span>}
-            <h1 style={styles.title}>{title}</h1>
-            {subtitle && <p style={styles.subtitle}>{subtitle}</p>}
-          </div>
-
-          {/* Content */}
-          <div style={styles.content}>
+      <main className="flex-1 bg-slate-50">
+        <PageContainer width="form" className="py-8 md:py-12">
+          {/*
+            HeroSection 자체의 py(`py-10 md:py-14 lg:py-20`)는 외부 PageContainer
+            의 py-8/12와 합쳐져 hero 영역이 과도해지므로 `!py-0`로 무효화하고,
+            hero ↓ content 간격은 `mb-8 md:mb-12`로 명시.
+          */}
+          <HeroSection
+            align="center"
+            title={title}
+            subtitle={subtitle}
+            eyebrow={badge ? <span className={badge.className}>{badge.text}</span> : undefined}
+            icon={
+              icon ? (
+                <span
+                  aria-hidden="true"
+                  className="block text-5xl md:text-6xl leading-none"
+                >
+                  {icon}
+                </span>
+              ) : undefined
+            }
+            className="!py-0 mb-8 md:mb-12"
+          />
+          {/*
+            기존 content 시각 (borderRadius 16px + shadow + border + 32px padding) 을
+            ContentCard variant="outlined" padding="relaxed" + rounded-2xl + shadow-sm 로 복원.
+          */}
+          <ContentCard
+            variant="outlined"
+            padding="relaxed"
+            className="rounded-2xl shadow-sm"
+          >
             {children}
-          </div>
-        </div>
+          </ContentCard>
+        </PageContainer>
       </main>
       <PlatformFooter />
     </div>
   );
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  wrapper: {
-    minHeight: '100vh',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  main: {
-    flex: 1,
-    backgroundColor: '#f8fafc',
-  },
-  container: {
-    maxWidth: '800px',
-    margin: '0 auto',
-    padding: '48px 24px',
-  },
-  hero: {
-    textAlign: 'center',
-    marginBottom: '48px',
-  },
-  icon: {
-    fontSize: '4rem',
-    marginBottom: '16px',
-  },
-  title: {
-    fontSize: '2rem',
-    fontWeight: 700,
-    color: '#0f172a',
-    margin: '0 0 8px 0',
-  },
-  subtitle: {
-    fontSize: '1.125rem',
-    color: '#64748b',
-    margin: 0,
-  },
-  content: {
-    backgroundColor: '#fff',
-    borderRadius: '16px',
-    padding: '32px',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-    border: '1px solid #e2e8f0',
-  },
-};
 
 export default InfoPageLayout;

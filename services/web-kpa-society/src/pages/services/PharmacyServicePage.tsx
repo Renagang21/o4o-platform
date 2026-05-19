@@ -46,7 +46,7 @@ export function PharmacyServicePage() {
 
       {/* 혈당관리 프로그램 섹션 */}
       <div style={styles.programSection}>
-        <div style={styles.programHeader}>
+        <div style={styles.programHeader} className="flex-wrap">
           <span style={styles.programIcon}>🩸</span>
           <h3 style={styles.programTitle}>혈당관리 프로그램</h3>
           <span style={styles.programBadge}>선택 참여</span>
@@ -68,7 +68,7 @@ export function PharmacyServicePage() {
         </p>
       </div>
 
-      <div style={styles.ctaSection}>
+      <div style={styles.ctaSection} className="flex-wrap">
         <a href="/mypage" style={styles.ctaPrimary}>
           약국 서비스 안내
         </a>

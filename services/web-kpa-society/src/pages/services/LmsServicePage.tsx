@@ -52,7 +52,7 @@ export function LmsServicePage() {
         </p>
       </div>
 
-      <div style={styles.ctaSection}>
+      <div style={styles.ctaSection} className="flex-wrap">
         <a href="/lms" style={styles.ctaPrimary}>
           콘텐츠 서비스 이용하기
         </a>
