@@ -16,6 +16,7 @@
  */
 
 import React, { useState } from 'react';
+import { getAccessToken } from '../../../contexts/AuthContext';
 
 const API_BASE_URL =
   (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_BASE_URL) ||
@@ -70,10 +71,13 @@ async function fetchLessonBodyHtml(params: {
   lessonTitle: string;
   lessonSummary: string;
 }): Promise<string> {
+  const token = getAccessToken();
   const res = await fetch(`${API_BASE_URL}/api/ai/lesson-body`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
     body: JSON.stringify({
       courseTitle: params.courseTitle,
       lessonTitle: params.lessonTitle,
@@ -137,10 +141,13 @@ export default function CourseStructureAiModal({ open, onClose, courseTitle = ''
     setSelected(new Set());
 
     try {
+      const token = getAccessToken();
       const res = await fetch(`${API_BASE_URL}/api/ai/course-structure`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ input: inputValue, type: tab }),
       });
       const data = await res.json();
