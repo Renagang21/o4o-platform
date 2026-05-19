@@ -7,6 +7,10 @@
  * WO-O4O-ADMIN-DASHBOARD-REFINE-V1:
  * - inline style → Tailwind + lucide-react
  * - flat menu → collapsible groups (표준 Admin Capability 순서)
+ *
+ * WO-O4O-KPA-ADMIN-LAYOUT-MOBILE-FIX-V1:
+ * - mobile drawer 패턴 (slide-in transform + backdrop)
+ * - desktop 동작 유지 (md+에서는 항상 visible)
  */
 
 import { useState } from 'react';
@@ -54,7 +58,14 @@ const ADMIN_SIDEBAR_GROUPS: SidebarGroup[] = [
 /*  AdminSidebar                                                       */
 /* ------------------------------------------------------------------ */
 
-export function AdminSidebar() {
+export interface AdminSidebarProps {
+  /** mobile drawer 열림 상태. md+에서는 항상 visible (값 무관). */
+  isMobileOpen?: boolean;
+  /** mobile에서 메뉴 항목 클릭 또는 backdrop 클릭 시 호출. */
+  onMobileClose?: () => void;
+}
+
+export function AdminSidebar({ isMobileOpen = false, onMobileClose }: AdminSidebarProps = {}) {
   const { pathname } = useLocation();
 
   const isItemActive = (path: string, exact?: boolean) => {
@@ -81,91 +92,115 @@ export function AdminSidebar() {
     });
   };
 
+  // mobile에서 메뉴 항목 클릭 시 drawer 자동 닫힘. desktop에서는 onMobileClose이 noop.
+  const handleNavigate = () => {
+    onMobileClose?.();
+  };
+
   return (
-    <aside className="fixed left-0 top-16 h-[calc(100vh-4rem)] w-[260px] bg-white border-r border-gray-200 flex flex-col z-40">
-      {/* WO-O4O-KPA-ADMIN-DASHBOARD-ORG-BRANDING-REMOVAL-V1:
-          organization branding (KPA icon + "서울특별시약사회" + "관리자") 블록 제거.
-          KPA-Society 는 특정 organization 기반 관리 서비스가 아님.
-          관리자 식별은 페이지 헤더("관리자 대시보드") + global header 가 담당. */}
+    <>
+      {/* Mobile drawer backdrop — md+에서는 hidden, drawer 닫혔으면 hidden */}
+      {isMobileOpen && (
+        <div
+          className="md:hidden fixed inset-x-0 top-16 bottom-0 bg-black/40 z-30"
+          onClick={onMobileClose}
+          aria-hidden="true"
+        />
+      )}
 
-      {/* 메뉴 */}
-      <nav className="flex-1 overflow-y-auto py-3">
-        {ADMIN_SIDEBAR_GROUPS.map((group) => {
-          const Icon = group.icon;
-          const active = isGroupActive(group);
-          const isOpen = openGroups.has(group.label);
-          const isSingle = group.items.length === 1;
+      <aside
+        id="admin-sidebar"
+        className={`fixed left-0 top-16 h-[calc(100vh-4rem)] w-[260px] bg-white border-r border-gray-200 flex flex-col z-40 transition-transform duration-200 ease-out md:translate-x-0 ${
+          isMobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        }`}
+      >
+        {/* WO-O4O-KPA-ADMIN-DASHBOARD-ORG-BRANDING-REMOVAL-V1:
+            organization branding (KPA icon + "서울특별시약사회" + "관리자") 블록 제거.
+            KPA-Society 는 특정 organization 기반 관리 서비스가 아님.
+            관리자 식별은 페이지 헤더("관리자 대시보드") + global header 가 담당. */}
 
-          // 단일 항목 그룹 → 직접 링크
-          if (isSingle) {
-            const item = group.items[0];
+        {/* 메뉴 */}
+        <nav className="flex-1 overflow-y-auto py-3">
+          {ADMIN_SIDEBAR_GROUPS.map((group) => {
+            const Icon = group.icon;
+            const active = isGroupActive(group);
+            const isOpen = openGroups.has(group.label);
+            const isSingle = group.items.length === 1;
+
+            // 단일 항목 그룹 → 직접 링크
+            if (isSingle) {
+              const item = group.items[0];
+              return (
+                <Link
+                  key={group.label}
+                  to={item.path}
+                  onClick={handleNavigate}
+                  className={`flex items-center gap-3 px-5 py-3 text-sm font-medium transition-colors border-l-2 ${
+                    isItemActive(item.path, item.exact)
+                      ? 'bg-indigo-50 text-indigo-600 border-indigo-600'
+                      : 'text-gray-600 border-transparent hover:bg-gray-50 hover:text-gray-900'
+                  }`}
+                >
+                  <Icon size={18} />
+                  {item.label}
+                </Link>
+              );
+            }
+
+            // 복수 항목 그룹 → collapsible
             return (
-              <Link
-                key={group.label}
-                to={item.path}
-                className={`flex items-center gap-3 px-5 py-3 text-sm font-medium transition-colors border-l-2 ${
-                  isItemActive(item.path, item.exact)
-                    ? 'bg-indigo-50 text-indigo-600 border-indigo-600'
-                    : 'text-gray-600 border-transparent hover:bg-gray-50 hover:text-gray-900'
-                }`}
-              >
-                <Icon size={18} />
-                {item.label}
-              </Link>
-            );
-          }
+              <div key={group.label}>
+                <button
+                  onClick={() => toggleGroup(group.label)}
+                  className={`w-full flex items-center gap-3 px-5 py-3 text-sm font-medium transition-colors border-l-2 ${
+                    active
+                      ? 'text-indigo-600 border-indigo-600'
+                      : 'text-gray-600 border-transparent hover:bg-gray-50 hover:text-gray-900'
+                  }`}
+                >
+                  <Icon size={18} />
+                  <span className="flex-1 text-left">{group.label}</span>
+                  {isOpen ? (
+                    <ChevronDown className="w-4 h-4 text-gray-400" />
+                  ) : (
+                    <ChevronRight className="w-4 h-4 text-gray-400" />
+                  )}
+                </button>
 
-          // 복수 항목 그룹 → collapsible
-          return (
-            <div key={group.label}>
-              <button
-                onClick={() => toggleGroup(group.label)}
-                className={`w-full flex items-center gap-3 px-5 py-3 text-sm font-medium transition-colors border-l-2 ${
-                  active
-                    ? 'text-indigo-600 border-indigo-600'
-                    : 'text-gray-600 border-transparent hover:bg-gray-50 hover:text-gray-900'
-                }`}
-              >
-                <Icon size={18} />
-                <span className="flex-1 text-left">{group.label}</span>
-                {isOpen ? (
-                  <ChevronDown className="w-4 h-4 text-gray-400" />
-                ) : (
-                  <ChevronRight className="w-4 h-4 text-gray-400" />
+                {isOpen && (
+                  <div className="pb-1">
+                    {group.items.map((item) => (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        onClick={handleNavigate}
+                        className={`block pl-12 pr-5 py-2 text-sm transition-colors ${
+                          isItemActive(item.path, item.exact)
+                            ? 'text-indigo-600 bg-indigo-50 font-medium'
+                            : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                        }`}
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
                 )}
-              </button>
+              </div>
+            );
+          })}
+        </nav>
 
-              {isOpen && (
-                <div className="pb-1">
-                  {group.items.map((item) => (
-                    <Link
-                      key={item.path}
-                      to={item.path}
-                      className={`block pl-12 pr-5 py-2 text-sm transition-colors ${
-                        isItemActive(item.path, item.exact)
-                          ? 'text-indigo-600 bg-indigo-50 font-medium'
-                          : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </nav>
-
-      {/* 하단 링크 */}
-      <div className="px-5 py-4 border-t border-gray-200">
-        <Link
-          to="/"
-          className="text-sm text-gray-500 hover:text-blue-600 transition-colors"
-        >
-          ← 메인으로 돌아가기
-        </Link>
-      </div>
-    </aside>
+        {/* 하단 링크 */}
+        <div className="px-5 py-4 border-t border-gray-200">
+          <Link
+            to="/"
+            onClick={handleNavigate}
+            className="text-sm text-gray-500 hover:text-blue-600 transition-colors"
+          >
+            ← 메인으로 돌아가기
+          </Link>
+        </div>
+      </aside>
+    </>
   );
 }
