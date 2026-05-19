@@ -127,10 +127,17 @@ export function createPharmacyInfoController(
           );
           const biz = user?.businessInfo;
           if (biz) {
-            if (!data.phone && biz.phone) data.phone = biz.phone;
+            // WO-O4O-KPA-STORE-INFO-PHARMACY-OWNER-DATA-FIX-V1:
+            //   pharmacy_phone (metadata 하위) 우선, 없으면 대표 phone
+            const bizPhone = (biz.metadata?.pharmacy_phone as string | undefined) || biz.phone || null;
+            if (!data.phone && bizPhone) data.phone = bizPhone;
             if (!data.ceoName && biz.ceoName) data.ceoName = biz.ceoName;
             if (!data.contactName && biz.contactName) data.contactName = biz.contactName;
             if (!data.managerPhone && biz.managerPhone) data.managerPhone = biz.managerPhone;
+            // 누락 필드 보완: taxInvoiceEmail, businessNumber
+            if (!data.taxInvoiceEmail && biz.taxInvoiceEmail) data.taxInvoiceEmail = biz.taxInvoiceEmail;
+            if (!data.businessNumber && biz.businessNumber) data.businessNumber = biz.businessNumber;
+            // 주소: 구조화 주소 우선, 없으면 레거시 address/address2
             if (!data.addressDetail && biz.storeAddress) {
               data.addressDetail = {
                 zipCode: biz.storeAddress.zipCode || undefined,
@@ -140,6 +147,9 @@ export function createPharmacyInfoController(
               if (!data.address) {
                 data.address = composeAddress(data.addressDetail);
               }
+            } else if (!data.addressDetail && !data.address && biz.address) {
+              // 레거시 address/address2 평문 → address 필드로 fallback
+              data.address = [biz.address, biz.address2].filter(Boolean).join(' ').trim() || null;
             }
           }
         } catch { /* graceful degradation */ }

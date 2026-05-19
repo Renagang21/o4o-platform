@@ -640,6 +640,58 @@ export function createMemberController(
                 createdByUserId: member.user_id,
               });
 
+              // 1-b. WO-O4O-KPA-STORE-INFO-PHARMACY-OWNER-DATA-FIX-V1:
+              //   organizations 테이블에 약국 정보 동기화 (NULL 또는 빈 값만 채움, 기존 값 보존)
+              //   소스: users.businessInfo (경로 B 사용자는 kpa_pharmacy_requests 없음)
+              try {
+                const orgMeta: Record<string, string | null> = {};
+                if (biz.taxInvoiceEmail) orgMeta.taxInvoiceEmail = biz.taxInvoiceEmail;
+                if (biz.ceoName) orgMeta.ceoName = biz.ceoName;
+                if (biz.contactName) orgMeta.contactName = biz.contactName;
+                if (biz.managerPhone) orgMeta.managerPhone = biz.managerPhone;
+                // pharmacy_phone 우선, 없으면 대표 phone
+                const phoneValue = (biz.metadata?.pharmacy_phone as string | undefined) || biz.phone || null;
+                await dataSource.query(
+                  `UPDATE organizations SET
+                     phone = COALESCE(NULLIF(phone, ''), $1),
+                     business_number = COALESCE(NULLIF(business_number, ''), $2),
+                     metadata = COALESCE(metadata, '{}'::jsonb) || $3::jsonb
+                   WHERE id = $4`,
+                  [
+                    phoneValue,
+                    biz.businessNumber || null,
+                    JSON.stringify(orgMeta),
+                    orgResult.id,
+                  ],
+                );
+                // 구조화 주소 (storeAddress 우선, 없으면 레거시 address)
+                if (biz.storeAddress?.baseAddress) {
+                  await dataSource.query(
+                    `UPDATE organizations SET
+                       address = COALESCE(NULLIF(address, ''), $1),
+                       address_detail = COALESCE(address_detail, $2::jsonb)
+                     WHERE id = $3`,
+                    [
+                      [biz.storeAddress.baseAddress, biz.storeAddress.detailAddress].filter(Boolean).join(' '),
+                      JSON.stringify(biz.storeAddress),
+                      orgResult.id,
+                    ],
+                  );
+                } else if (biz.address) {
+                  await dataSource.query(
+                    `UPDATE organizations SET
+                       address = COALESCE(NULLIF(address, ''), $1)
+                     WHERE id = $2`,
+                    [
+                      [biz.address, biz.address2].filter(Boolean).join(' ').trim(),
+                      orgResult.id,
+                    ],
+                  );
+                }
+              } catch (orgSyncError) {
+                console.error('[KPA Approval] Organization sync failed (non-blocking):', orgSyncError);
+              }
+
               // 2) kpa_members.organization_id — null 인 경우에만 (분회 연결 보호)
               await dataSource.query(
                 `UPDATE kpa_members SET organization_id = $1, updated_at = NOW()

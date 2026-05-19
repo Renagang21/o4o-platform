@@ -210,6 +210,30 @@ export function createPharmacyRequestRoutes(
         createdByUserId: request.user_id,
       });
 
+      // 1-b. WO-O4O-KPA-STORE-INFO-PHARMACY-OWNER-DATA-FIX-V1:
+      //   organizations 테이블에 약국 정보 동기화 (NULL 또는 빈 값만 채움, 기존 값 보존)
+      //   ensureOrganization은 name/code/type만 저장하므로 여기서 별도 UPDATE.
+      try {
+        const orgMeta: Record<string, string | null> = {};
+        if (request.owner_phone) orgMeta.ownerPhone = request.owner_phone;
+        if (request.tax_invoice_email) orgMeta.taxInvoiceEmail = request.tax_invoice_email;
+        await dataSource.query(
+          `UPDATE organizations SET
+             phone = COALESCE(NULLIF(phone, ''), $1),
+             business_number = COALESCE(NULLIF(business_number, ''), $2),
+             metadata = COALESCE(metadata, '{}'::jsonb) || $3::jsonb
+           WHERE id = $4`,
+          [
+            request.pharmacy_phone || null,
+            request.business_number || null,
+            JSON.stringify(orgMeta),
+            orgResult.id,
+          ],
+        );
+      } catch (orgSyncError) {
+        console.error('[PharmacyRequest] Organization sync failed (non-blocking):', orgSyncError);
+      }
+
       // 2. kpa_members.organization_id — null인 경우에만 업데이트 (기존 분회 연결 보호)
       await dataSource.query(
         `UPDATE kpa_members SET organization_id = $1, updated_at = NOW()
