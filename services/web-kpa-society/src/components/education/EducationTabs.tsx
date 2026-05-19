@@ -2,8 +2,14 @@
  * EducationTabs - 상단 정렬 탭
  *
  * 전체, 추천, 신규, 인기 정렬
+ *
+ * WO-O4O-EDUCATION-EVENTS-TABS-RESPONSIVE-V1:
+ *   mobile에서 탭 가로 스크롤(overflow-x:auto) + 탭 자체 압축 방지(flex-shrink:0 / nowrap)
+ *   + currentTab 변경 시 active 탭 자동 center scrollIntoView.
+ *   기능 로직(onTabChange / 탭 전환)은 변경 없음.
  */
 
+import { useEffect, useRef } from 'react';
 import { colors, spacing, borderRadius } from '../../styles/theme';
 
 export type EducationTab = 'all' | 'recommended' | 'new' | 'popular';
@@ -21,11 +27,25 @@ const tabs: { key: EducationTab; label: string }[] = [
 ];
 
 export function EducationTabs({ currentTab, onTabChange }: EducationTabsProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // 좁은 viewport에서 active 탭이 스크롤 영역 바깥에 가려지지 않도록 center 자동 노출.
+  // currentTab 변경 시에만 동작 — 사용자 인터랙션과 충돌 없음.
+  useEffect(() => {
+    const active = containerRef.current?.querySelector(
+      '[data-active="true"]',
+    ) as HTMLElement | null;
+    if (active && typeof active.scrollIntoView === 'function') {
+      active.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+  }, [currentTab]);
+
   return (
-    <div style={styles.container}>
+    <div ref={containerRef} style={styles.container}>
       {tabs.map((tab) => (
         <button
           key={tab.key}
+          data-active={currentTab === tab.key ? 'true' : 'false'}
           style={{
             ...styles.tab,
             ...(currentTab === tab.key ? styles.tabActive : {}),
@@ -44,6 +64,9 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     gap: spacing.sm,
     marginBottom: spacing.lg,
+    // WO-O4O-EDUCATION-EVENTS-TABS-RESPONSIVE-V1: mobile 가로 스크롤 + iOS 부드러운 스크롤
+    overflowX: 'auto',
+    WebkitOverflowScrolling: 'touch',
   },
   tab: {
     padding: `${spacing.sm} ${spacing.md}`,
@@ -54,6 +77,9 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.neutral600,
     cursor: 'pointer',
     transition: 'all 0.2s',
+    // WO-O4O-EDUCATION-EVENTS-TABS-RESPONSIVE-V1: 좁은 폭에서 탭 압축 방지 + 라벨 한 줄 유지
+    flexShrink: 0,
+    whiteSpace: 'nowrap',
   },
   tabActive: {
     backgroundColor: colors.primary,
