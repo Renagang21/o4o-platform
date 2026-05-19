@@ -7,7 +7,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { UserX, UserCheck } from 'lucide-react';
+import { UserX, UserCheck, UserPlus, X } from 'lucide-react';
 import { DataTable } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { RowActionMenu } from '@o4o/ui';
@@ -31,6 +31,10 @@ export default function OperatorsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [createEmail, setCreateEmail] = useState('');
+  const [createRole, setCreateRole] = useState<'neture:admin' | 'neture:operator'>('neture:operator');
+  const [createLoading, setCreateLoading] = useState(false);
 
   const loadOperators = useCallback(async () => {
     setLoading(true);
@@ -51,6 +55,31 @@ export default function OperatorsPage() {
       await loadOperators();
     } else {
       toast.error(result.error || '권한 해제에 실패했습니다');
+    }
+  };
+
+  const handleCreate = async () => {
+    if (!createEmail.trim()) {
+      toast.error('이메일을 입력해주세요');
+      return;
+    }
+    setCreateLoading(true);
+    const result = await adminOperatorApi.createOperator(createEmail.trim(), createRole);
+    setCreateLoading(false);
+    if (result.success) {
+      const msg = result.data?.restored ? '기존 운영자 권한이 복원되었습니다' : '운영자가 추가되었습니다';
+      toast.success(msg);
+      setShowCreateModal(false);
+      setCreateEmail('');
+      setCreateRole('neture:operator');
+      await loadOperators();
+    } else {
+      const errMsg = result.code === 'USER_NOT_FOUND'
+        ? '해당 이메일로 가입된 계정이 없습니다'
+        : result.code === 'ALREADY_OPERATOR'
+        ? '이미 활성 운영자입니다'
+        : result.error || '운영자 추가에 실패했습니다';
+      toast.error(errMsg);
     }
   };
 
@@ -197,9 +226,18 @@ export default function OperatorsPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-slate-800">운영자 관리</h1>
-        <p className="text-slate-500 mt-1">Neture 서비스 운영자를 관리합니다</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800">운영자 관리</h1>
+          <p className="text-slate-500 mt-1">Neture 서비스 운영자를 관리합니다</p>
+        </div>
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition-colors"
+        >
+          <UserPlus className="w-4 h-4" />
+          운영자 추가
+        </button>
       </div>
 
       {/* Stats */}
@@ -264,6 +302,65 @@ export default function OperatorsPage() {
         emptyMessage={operators.length === 0 ? '등록된 운영자가 없습니다' : '검색 결과가 없습니다'}
         tableId="neture-admin-operators"
       />
+
+      {/* Create Operator Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-slate-800">운영자 추가</h2>
+              <button
+                onClick={() => { setShowCreateModal(false); setCreateEmail(''); setCreateRole('neture:operator'); }}
+                className="p-1 rounded-lg hover:bg-slate-100 text-slate-400"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-sm text-slate-500 mb-4">
+              이미 가입된 계정의 이메일을 입력하세요. 해당 계정에 운영자 역할이 부여됩니다.
+            </p>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">이메일</label>
+                <input
+                  type="email"
+                  value={createEmail}
+                  onChange={(e) => setCreateEmail(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
+                  placeholder="operator@example.com"
+                  className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">역할</label>
+                <select
+                  value={createRole}
+                  onChange={(e) => setCreateRole(e.target.value as 'neture:admin' | 'neture:operator')}
+                  className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                >
+                  <option value="neture:operator">운영자</option>
+                  <option value="neture:admin">관리자</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => { setShowCreateModal(false); setCreateEmail(''); setCreateRole('neture:operator'); }}
+                className="flex-1 px-4 py-2 border border-slate-200 rounded-lg text-slate-600 font-medium hover:bg-slate-50"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleCreate}
+                disabled={createLoading}
+                className="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 disabled:opacity-50"
+              >
+                {createLoading ? '처리 중...' : '추가'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

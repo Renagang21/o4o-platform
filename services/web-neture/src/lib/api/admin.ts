@@ -65,6 +65,16 @@ export const adminOperatorApi = {
       return { success: false, error: data?.error || '권한 복원에 실패했습니다', code: data?.code };
     }
   },
+
+  async createOperator(email: string, role: 'neture:admin' | 'neture:operator'): Promise<OperatorActionResult & { data?: { userId: string; name: string; email: string; role: string; restored: boolean } }> {
+    try {
+      const response = await api.post('/neture/admin/operators', { email, role });
+      return { success: true, data: response.data.data };
+    } catch (error: any) {
+      const data = error?.response?.data;
+      return { success: false, error: data?.error || '운영자 추가에 실패했습니다', code: data?.code };
+    }
+  },
 };
 
 // ==================== Admin Supplier ====================

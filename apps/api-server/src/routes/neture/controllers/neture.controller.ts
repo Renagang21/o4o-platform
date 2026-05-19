@@ -489,6 +489,105 @@ export function createNetureController(dataSource: DataSource): Router {
   // ============================================================================
 
   /**
+   * POST /admin/operators
+   * Neture 운영자 등록
+   *
+   * WO-O4O-NETURE-OPERATOR-MGMT-P1-CREATE-OPERATOR-FLOW-V1:
+   *   - email 기준으로 기존 사용자 조회
+   *   - active role_assignment 있으면 ALREADY_OPERATOR
+   *   - inactive role_assignment 있으면 is_active=true 복원
+   *   - 없으면 신규 INSERT
+   *   - users.isActive 변경 없음
+   *   - 없는 email → USER_NOT_FOUND (임시계정 생성 금지)
+   */
+  router.post('/admin/operators', requireAuth, requireNetureScope('neture:admin'), async (req: Request, res: Response) => {
+    try {
+      const admin = (req as any).user;
+      const { email, name: _name, role } = req.body;
+
+      // Input validation
+      if (!email || !role) {
+        return res.status(400).json({ success: false, error: 'email and role are required', code: 'INVALID_INPUT' });
+      }
+      if (!['neture:admin', 'neture:operator'].includes(role)) {
+        return res.status(400).json({
+          success: false,
+          error: 'role must be neture:admin or neture:operator',
+          code: 'INVALID_ROLE',
+        });
+      }
+
+      // Find user by email (case-insensitive)
+      const [targetUser] = await dataSource.query(
+        `SELECT id, name, email FROM users WHERE lower(email) = lower($1)`,
+        [email.trim()]
+      );
+
+      if (!targetUser) {
+        return res.status(404).json({
+          success: false,
+          error: `가입된 사용자를 찾을 수 없습니다: ${email}`,
+          code: 'USER_NOT_FOUND',
+        });
+      }
+
+      // Check for existing active role_assignment
+      const [activeRA] = await dataSource.query(
+        `SELECT id FROM role_assignments WHERE user_id = $1 AND role = $2 AND is_active = true`,
+        [targetUser.id, role]
+      );
+
+      if (activeRA) {
+        return res.status(409).json({
+          success: false,
+          error: '이미 해당 역할을 보유한 운영자입니다',
+          code: 'ALREADY_OPERATOR',
+        });
+      }
+
+      // Check for existing inactive role_assignment → restore
+      const [inactiveRA] = await dataSource.query(
+        `SELECT id FROM role_assignments WHERE user_id = $1 AND role = $2 AND is_active = false`,
+        [targetUser.id, role]
+      );
+
+      if (inactiveRA) {
+        // Restore existing row
+        await dataSource.query(
+          `UPDATE role_assignments
+           SET is_active = true, assigned_by = $1, assigned_at = NOW(), updated_at = NOW()
+           WHERE id = $2`,
+          [admin.id, inactiveRA.id]
+        );
+      } else {
+        // Insert new role_assignment
+        await dataSource.query(
+          `INSERT INTO role_assignments
+             (user_id, role, is_active, assigned_by, assigned_at, valid_from, scope_type, created_at, updated_at)
+           VALUES ($1, $2, true, $3, NOW(), NOW(), 'global', NOW(), NOW())`,
+          [targetUser.id, role, admin.id]
+        );
+      }
+
+      logger.info(`[Neture API] Operator assigned: ${targetUser.email} → ${role} by ${admin.id}`);
+
+      res.status(201).json({
+        success: true,
+        data: {
+          userId: targetUser.id,
+          name: targetUser.name || targetUser.email,
+          email: targetUser.email,
+          role,
+          restored: !!inactiveRA,
+        },
+      });
+    } catch (error) {
+      logger.error('[Neture API] Error creating operator:', error);
+      res.status(500).json({ success: false, error: '운영자 등록에 실패했습니다' });
+    }
+  });
+
+  /**
    * GET /admin/operators
    * Neture 역할 보유 사용자 목록 (neture:admin, neture:operator)
    * WO-O4O-NETURE-OPERATOR-MGMT-P0-LEGACY-SQL-AND-RBAC-FIX-V1:
