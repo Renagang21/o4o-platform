@@ -78,3 +78,8 @@ export function getJoinableServices(): O4OService[] {
 export function getAllServiceKeys(): string[] {
   return O4O_SERVICES.map(s => s.key);
 }
+
+/** 모든 서비스의 공식 origin (https://domain) 목록 — WO-O4O-DOMAIN-SSOT-CANONICALIZATION-V1 */
+export function getServiceOrigins(): string[] {
+  return O4O_SERVICES.map(s => `https://${s.domain}`);
+}

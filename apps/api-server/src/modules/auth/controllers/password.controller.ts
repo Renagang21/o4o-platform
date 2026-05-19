@@ -5,6 +5,7 @@ import { PasswordResetRequestDto, PasswordResetDto } from '../dto/index.js';
 import { AppDataSource } from '../../../database/connection.js';
 import { User } from '../../../entities/User.js';
 import logger from '../../../utils/logger.js';
+import { getServiceOrigins } from '../../../config/service-catalog.js';
 
 /**
  * Password Controller - NextGen Pattern
@@ -15,13 +16,16 @@ import logger from '../../../utils/logger.js';
  * - Find ID (account lookup by phone)
  */
 export class PasswordController extends BaseController {
-  /** Allowed origins for password reset email links */
+  /**
+   * Allowed origins for password reset email links.
+   * WO-O4O-DOMAIN-SSOT-CANONICALIZATION-V1:
+   *   Main service canonical origins are sourced from service-catalog SSOT.
+   *   Non-catalog origins (glucoseview / admin sub-domain / localhost dev) are
+   *   declared explicitly to preserve previous behavior.
+   */
   private static readonly ALLOWED_ORIGINS = [
-    'https://neture.co.kr',
-    'https://glycopharm.co.kr',
+    ...getServiceOrigins(),
     'https://glucoseview.co.kr',
-    'https://k-cosmetics.site',
-    'https://kpa-society.co.kr',
     'https://admin.neture.co.kr',
     'http://localhost:',
   ];
