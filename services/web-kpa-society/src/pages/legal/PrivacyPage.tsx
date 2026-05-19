@@ -90,7 +90,7 @@ export function PrivacyPage() {
             <ul style={styles.unorderedList}>
               <li>KPA Society: 약사면허번호, 소속 분회, 약국명</li>
               <li>글라이코팜/글루코스뷰: 약사면허번호</li>
-              <li>네처/K-Cosmetics: 사업자등록번호 (사업자 회원의 경우)</li>
+              <li>네뚜레/K-Cosmetics: 사업자등록번호 (사업자 회원의 경우)</li>
             </ul>
           </div>
           <div style={styles.infoBox}>

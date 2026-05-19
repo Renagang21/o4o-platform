@@ -25,7 +25,7 @@ export type ServiceScope = 'all' | 'neture' | 'k-cosmetics' | 'glycopharm' | 'kp
 
 export const SERVICE_SCOPE_OPTIONS: Array<{ value: ServiceScope; label: string }> = [
   { value: 'all', label: '전체 서비스' },
-  { value: 'neture', label: '네처 (Neture)' },
+  { value: 'neture', label: '네뚜레 (Neture)' },
   { value: 'k-cosmetics', label: 'K-코스메틱' },
   { value: 'glycopharm', label: '글라이코팜' },
   { value: 'kpa-society', label: 'KPA 약사회' },

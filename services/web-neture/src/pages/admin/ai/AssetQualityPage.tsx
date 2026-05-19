@@ -73,7 +73,7 @@ interface ImprovementRequest {
 const mockServiceSummaries: ServiceQualitySummary[] = [
   {
     serviceId: 'neture',
-    serviceName: '네처 (Neture)',
+    serviceName: '네뚜레 (Neture)',
     signalCounts: { high: 1, medium: 2, low: 1 },
     pendingRequests: 2,
     lastUpdated: '2026-01-16T10:30:00Z',
@@ -117,7 +117,7 @@ const mockImprovementRequests: ImprovementRequest[] = [
   {
     id: 'req-1',
     serviceId: 'neture',
-    serviceName: '네처 (Neture)',
+    serviceName: '네뚜레 (Neture)',
     signalType: 'fallback_high',
     signalTitle: 'Fallback 비율 높음',
     severity: 'high',
@@ -130,11 +130,11 @@ const mockImprovementRequests: ImprovementRequest[] = [
   {
     id: 'req-2',
     serviceId: 'neture',
-    serviceName: '네처 (Neture)',
+    serviceName: '네뚜레 (Neture)',
     signalType: 'asset_concentration',
     signalTitle: '특정 Asset 과다 노출',
     severity: 'medium',
-    description: '"네처 프리미엄 멀티비타민"이 전체 노출의 35%를 차지하고 있습니다.',
+    description: '"네뚜레 프리미엄 멀티비타민"이 전체 노출의 35%를 차지하고 있습니다.',
     operatorMemo: '다른 비타민 제품들도 많이 노출되어야 할 것 같습니다. 특히 오메가3 제품군요.',
     status: 'pending',
     createdAt: '2026-01-15T15:30:00Z',
@@ -171,7 +171,7 @@ const mockImprovementRequests: ImprovementRequest[] = [
   {
     id: 'req-5',
     serviceId: 'neture',
-    serviceName: '네처 (Neture)',
+    serviceName: '네뚜레 (Neture)',
     signalType: 'asset_underutilized',
     signalTitle: '저활용 Asset 발견',
     severity: 'low',

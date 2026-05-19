@@ -74,7 +74,7 @@ export const SERVICE_SCOPES: Record<string, ServiceScopes> = {
   /**
 
   /**
-   * 네처 스코프
+   * 네뚜레 스코프
    */
   neture: {
     public: [

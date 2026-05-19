@@ -1,5 +1,5 @@
 /**
- * MyCreditsPage - 네처 크레딧 페이지
+ * MyCreditsPage - 네뚜레 크레딧 페이지
  *
  * WO-O4O-CREDIT-SYSTEM-V1
  * 잔액 표시 + 거래 내역 (적립 기록)

@@ -44,7 +44,7 @@ const mockCostData: CostDashboardData = {
   byService: [
     {
       serviceId: 'neture',
-      serviceName: '네처 (Neture)',
+      serviceName: '네뚜레 (Neture)',
       requests: 4520,
       cost: 5424.0,
       avgCost: 1.2,

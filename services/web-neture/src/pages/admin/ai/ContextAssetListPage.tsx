@@ -44,9 +44,9 @@ const mockContextAssets: ContextAsset[] = [
   {
     id: 'ca-1',
     type: 'brand',
-    title: '네처 프리미엄 브랜드 소개',
+    title: '네뚜레 프리미엄 브랜드 소개',
     summary: '건강한 삶을 위한 프리미엄 건강기능식품 브랜드',
-    content: '<p>네처는 과학적 근거에 기반한 건강기능식품을 제공합니다...</p>',
+    content: '<p>네뚜레는 과학적 근거에 기반한 건강기능식품을 제공합니다...</p>',
     imageUrl: '/images/brand-neture.jpg',
     linkUrl: '/brand/neture-premium',
     serviceScope: ['neture', 'glycopharm'],

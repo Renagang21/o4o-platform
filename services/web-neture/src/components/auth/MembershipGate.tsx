@@ -52,7 +52,7 @@ export function MembershipGate({ children, serviceKey = SERVICE_KEY }: Membershi
 }
 
 const STATUS_MESSAGES: Record<Exclude<MembershipStatus, 'active'>, { title: string; message: string }> = {
-  none:      { title: '서비스 가입이 필요합니다',  message: '네처(Neture) 서비스를 이용하려면 먼저 가입 신청을 해주세요.' },
+  none:      { title: '서비스 가입이 필요합니다',  message: '네뚜레(Neture) 서비스를 이용하려면 먼저 가입 신청을 해주세요.' },
   pending:   { title: '가입 승인 대기 중',         message: '가입 신청이 승인 대기 중입니다. 승인 완료 후 이용하실 수 있습니다.' },
   rejected:  { title: '가입 신청 반려',             message: '가입 신청이 반려되었습니다. 자세한 사항은 운영자에게 문의해주세요.' },
   suspended: { title: '서비스 이용 정지',          message: '서비스 이용이 정지되었습니다. 자세한 사항은 운영자에게 문의해주세요.' },

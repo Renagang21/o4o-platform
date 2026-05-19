@@ -77,7 +77,7 @@ export function PolicyPage() {
         <section style={styles.section}>
           <h2 style={styles.sectionTitle}>제2조 (용어의 정의)</h2>
           <ol style={styles.orderedList}>
-            <li>"서비스"란 회사가 제공하는 KPA Society, 네처, 글라이코팜, 글루코스뷰, K-Cosmetics 등 모든 온라인 서비스를 말합니다.</li>
+            <li>"서비스"란 회사가 제공하는 KPA Society, 네뚜레, 글라이코팜, 글루코스뷰, K-Cosmetics 등 모든 온라인 서비스를 말합니다.</li>
             <li>"회원"이란 서비스에 접속하여 이 약관에 동의하고 회원가입을 완료한 자를 말합니다.</li>
             <li>"아이디(ID)"란 회원의 식별과 서비스 이용을 위해 회원이 설정하고 회사가 승인하는 이메일 주소를 말합니다.</li>
             <li>"비밀번호"란 회원이 부여받은 아이디와 일치되는 회원임을 확인하고 회원의 비밀보호를 위해 회원 자신이 설정한 문자 또는 숫자의 조합을 말합니다.</li>
