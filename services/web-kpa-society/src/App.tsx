@@ -290,17 +290,20 @@ const SERVICE_NAME = 'KPA-Society';
 
 /**
  * WO-O4O-ROLE-BASED-POST-LOGIN-REDIRECT-V1
- * fetchKpaContext() 완료 후 isStoreOwner 기반 redirect fallback.
+ * WO-O4O-KPA-POST-LOGIN-PRIMARY-ROUTE-FIX-V1
  *
- * LoginModal.tsx에서 login() 반환값으로 즉시 redirect를 시도하지만,
- * isStoreOwner/activityType이 login API 응답에 없는 경우(KPA context 비동기 로딩 후 확정)
- * 이 컴포넌트가 fallback으로 처리한다.
+ * 로그인 직후 운영 역할(kpa:admin / kpa:operator / platform:super_admin) 보유자만
+ * 자동으로 해당 워크스페이스(/admin, /operator)로 이동시키는 fallback.
+ *
+ * LoginModal.tsx 에서 login() 반환값으로 즉시 redirect 를 시도하지만,
+ * KPA context 가 비동기 로딩되는 경우 이 컴포넌트가 fallback 으로 처리한다.
  *
  * 동작:
  *   - isAuthenticated: false → true 전환 감지 (로그인 이벤트)
  *   - isKpaContextLoaded: true 대기 (fetchKpaContext 완료 확인)
- *   - user.isStoreOwner && 현재 경로가 store 바깥 && /store로 이동한 적 없음 → navigate('/store')
- *   - 운영자/관리자 / 일반 회원 / 특정 URL 진입 중 로그인 → 무시 (기존 흐름 유지)
+ *   - getKpaPostLoginRoute() 결과가 null 이면 현재 화면 유지 (커뮤니티 철학)
+ *   - 강사 / 약국 경영자 / 일반 회원은 자동 이동하지 않고 메인/커뮤니티 유지
+ *     (강사 대시보드·약국 운영은 메뉴에서 직접 진입)
  */
 function PostLoginRedirect() {
   const { user, isAuthenticated, isKpaContextLoaded } = useAuth();
