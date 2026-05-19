@@ -1,12 +1,14 @@
 /**
  * LectureGrid - 강의 카드 그리드
  *
- * LectureCard 목록을 3열 그리드로 표시
+ * WO-O4O-LECTURE-EVENT-GRID-RESPONSIVE-V1:
+ *   기존 gridTemplateColumns: 'repeat(3, 1fr)' 고정 → @o4o/ui ResponsiveGrid 적용.
+ *   mobile 1열 → sm 2열 → lg 3열 mobile-first 전환.
  */
 
+import { ResponsiveGrid } from '@o4o/ui';
 import { LectureCard } from './LectureCard';
 import type { LectureData } from './LectureCard';
-import { spacing } from '../../styles/theme';
 
 interface LectureGridProps {
   lectures: LectureData[];
@@ -14,18 +16,10 @@ interface LectureGridProps {
 
 export function LectureGrid({ lectures }: LectureGridProps) {
   return (
-    <div style={styles.grid}>
+    <ResponsiveGrid cols={{ base: 1, sm: 2, lg: 3 }} gap="default">
       {lectures.map((lecture) => (
         <LectureCard key={lecture.id} lecture={lecture} />
       ))}
-    </div>
+    </ResponsiveGrid>
   );
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  grid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
-    gap: spacing.lg,
-  },
-};

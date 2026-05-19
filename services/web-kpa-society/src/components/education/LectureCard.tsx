@@ -201,6 +201,8 @@ const styles: Record<string, React.CSSProperties> = {
   meta: {
     display: 'flex',
     gap: spacing.xs,
+    // WO-O4O-LECTURE-EVENT-GRID-RESPONSIVE-V1: mobile에서 instructor·lessons·hours wrap 보강
+    flexWrap: 'wrap',
     marginTop: spacing.sm,
     fontSize: '0.75rem',
     color: colors.neutral400,

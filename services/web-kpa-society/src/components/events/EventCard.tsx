@@ -141,6 +141,9 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
+    // WO-O4O-LECTURE-EVENT-GRID-RESPONSIVE-V1: 좁은 화면에서 type+provider | status 영역 wrap 보강
+    flexWrap: 'wrap',
+    gap: spacing.sm,
     marginBottom: spacing.md,
   },
   badges: {
@@ -195,6 +198,8 @@ const styles: Record<string, React.CSSProperties> = {
   meta: {
     display: 'flex',
     gap: spacing.md,
+    // WO-O4O-LECTURE-EVENT-GRID-RESPONSIVE-V1: 좁은 화면에서 date | participant 라인 wrap 보강
+    flexWrap: 'wrap',
     marginBottom: spacing.sm,
   },
   metaItem: {
@@ -217,6 +222,8 @@ const styles: Record<string, React.CSSProperties> = {
   actions: {
     display: 'flex',
     gap: spacing.sm,
+    // WO-O4O-LECTURE-EVENT-GRID-RESPONSIVE-V1: 좁은 화면에서 CTA + 상세보기 wrap 보강
+    flexWrap: 'wrap',
     marginTop: spacing.md,
   },
   participateBtn: {
