@@ -1,0 +1,91 @@
+name: E2E — Auth Runtime Regression
+
+# 4개 배포 서비스(Neture / GlycoPharm / KPA-Society / K-Cosmetics) auth runtime 검증
+# 실제 운영 URL을 대상으로 하므로 과도한 자동 실행 방지:
+#   - workflow_dispatch: 주 실행 방법 (배포 후 수동 검증)
+#   - push to main (e2e/auth-runtime/** 변경 시): E2E 코드 자체 변경에 한해 자동 실행
+
+on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: '실행 사유 (예: auth 배포 후 검증, 회귀 확인)'
+        required: false
+        default: '수동 검증'
+
+  push:
+    branches:
+      - main
+    paths:
+      - 'e2e/auth-runtime/**'
+
+concurrency:
+  group: e2e-auth-runtime-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '22.18.0'
+
+jobs:
+  e2e-auth-runtime:
+    name: Auth Runtime E2E (4 Services)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: '9'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+          cache-dependency-path: '**/pnpm-lock.yaml'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile || pnpm install --no-frozen-lockfile
+
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium --with-deps
+
+      - name: Validate E2E credentials
+        id: creds
+        run: |
+          if [ -z "${{ secrets.E2E_ADMIN_EMAIL }}" ] || [ -z "${{ secrets.E2E_ADMIN_PASSWORD }}" ]; then
+            echo "configured=false" >> $GITHUB_OUTPUT
+            echo "::warning::E2E_ADMIN_EMAIL 또는 E2E_ADMIN_PASSWORD Secret이 설정되지 않았습니다."
+            echo "::warning::GitHub Secrets에 E2E_ADMIN_EMAIL, E2E_ADMIN_PASSWORD를 추가하세요."
+          else
+            echo "configured=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run Auth Runtime E2E
+        if: steps.creds.outputs.configured == 'true'
+        env:
+          E2E_ADMIN_EMAIL: ${{ secrets.E2E_ADMIN_EMAIL }}
+          E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
+          CI: 'true'
+        run: npx playwright test --config=e2e/auth-runtime/playwright.config.ts
+
+      - name: Skip notice (no credentials)
+        if: steps.creds.outputs.configured == 'false'
+        run: |
+          echo "⏭️ E2E 테스트 건너뜀 — Secret 미설정"
+          echo "   설정 방법: GitHub repo → Settings → Secrets → Actions"
+          echo "   필요 Secret: E2E_ADMIN_EMAIL, E2E_ADMIN_PASSWORD"
+
+      - name: Upload Playwright report (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report-auth-runtime-${{ github.run_id }}
+          path: |
+            test-results/
+          retention-days: 7
+          if-no-files-found: ignore
