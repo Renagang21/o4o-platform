@@ -18,6 +18,8 @@ import { notificationService } from '../../../services/NotificationService.js';
 //   pharmacy_owner 회원 승인 시 자동 매장/owner/role_assignment 생성.
 //   pharmacy-request.controller.ts (WO-KPA-PHARMACY-APPROVAL-ENSURE-STORE-LINK-V1) 패턴 재사용.
 import { organizationOpsService } from '../../../modules/organization/services/organization-ops.service.js';
+// WO-O4O-KPA-STORE-SLUG-MEMBER-APPROVAL-PATH-FIX-V1: slug 생성 (pharmacy-request 경로와 동일)
+import { StoreSlugService } from '@o4o/platform-core/store-identity';
 
 type AuthMiddleware = RequestHandler;
 type ScopeMiddleware = (scope: string) => RequestHandler;
@@ -659,6 +661,19 @@ export function createMemberController(
                 role: 'kpa:store_owner',
                 assignedBy: req.user!.id,
               });
+
+              // 5) platform_store_slugs — WO-O4O-KPA-STORE-SLUG-MEMBER-APPROVAL-PATH-FIX-V1
+              // pharmacy-request.controller.ts Step 6 패턴과 동일 (비차단, 멱등)
+              try {
+                const slugService = new StoreSlugService(dataSource);
+                const existing = await slugService.findByStoreId(orgResult.id, 'kpa');
+                if (!existing) {
+                  const slug = await slugService.generateUniqueSlug(pharmacyName);
+                  await slugService.reserveSlug({ storeId: orgResult.id, serviceKey: 'kpa', slug });
+                }
+              } catch (slugError) {
+                console.error('[KPA Approval] Slug generation failed (non-blocking):', slugError);
+              }
             }
           } catch (autoActivationError) {
             // 회원 승인 자체는 성공시킴 — 운영자가 legacy pharmacy_request 흐름으로 복구 가능
