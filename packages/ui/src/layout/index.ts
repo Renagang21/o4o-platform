@@ -60,11 +60,13 @@ export * from './Container';
 // ═══════════════════════════════════════════════════════════════════════════
 // Responsive Primitives
 // WO-O4O-RESPONSIVE-PRIMITIVES-AND-SAFE-AREA-V1
+// WO-O4O-RESPONSIVE-TABBAR-PRIMITIVE-V1 (ResponsiveTabBar)
 // ═══════════════════════════════════════════════════════════════════════════
 export * from './HeroSection';
 export * from './ResponsiveGrid';
 export * from './ContentCard';
 export * from './MobileSafeArea';
+export * from './ResponsiveTabBar';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Admin Layout System - 관리자 레이아웃 (표준)

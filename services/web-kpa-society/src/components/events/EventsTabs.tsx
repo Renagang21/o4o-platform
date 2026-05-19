@@ -3,14 +3,14 @@
  *
  * 전체 이벤트, 퀴즈, 설문조사, 업체 이벤트
  *
- * WO-O4O-EDUCATION-EVENTS-TABS-RESPONSIVE-V1:
- *   mobile에서 탭 가로 스크롤(overflow-x:auto) + 탭 자체 압축 방지(flex-shrink:0 / nowrap)
- *   + currentTab 변경 시 active 탭 자동 center scrollIntoView.
- *   긴 한글 라벨('전체 이벤트' 등)이 좁은 화면에서 잘리지 않음.
- *   기능 로직(onTabChange / 탭 전환)은 변경 없음.
+ * WO-O4O-EDUCATION-EVENTS-TABS-RESPONSIVE-V1: mobile 가로 스크롤 + active 자동 노출
+ * WO-O4O-RESPONSIVE-TABBAR-PRIMITIVE-V1: @o4o/ui ResponsiveTabBar 적용 (thin wrapper).
+ *   기존 public props (currentTab / onTabChange) 시그니처 유지. 시각 토큰
+ *   (padding/border/colors.primary 등) 도 inline style 그대로 전달하여
+ *   시각 회귀 0.
  */
 
-import { useEffect, useRef } from 'react';
+import { ResponsiveTabBar } from '@o4o/ui';
 import { colors, spacing, borderRadius } from '../../styles/theme';
 
 export type EventTab = 'all' | 'quiz' | 'survey' | 'corporate';
@@ -28,46 +28,24 @@ const tabs: { key: EventTab; label: string }[] = [
 ];
 
 export function EventsTabs({ currentTab, onTabChange }: EventsTabsProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  // 좁은 viewport에서 active 탭이 스크롤 영역 바깥에 가려지지 않도록 center 자동 노출.
-  // currentTab 변경 시에만 동작 — 사용자 인터랙션과 충돌 없음.
-  useEffect(() => {
-    const active = containerRef.current?.querySelector(
-      '[data-active="true"]',
-    ) as HTMLElement | null;
-    if (active && typeof active.scrollIntoView === 'function') {
-      active.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-    }
-  }, [currentTab]);
-
   return (
-    <div ref={containerRef} style={styles.container}>
-      {tabs.map((tab) => (
-        <button
-          key={tab.key}
-          data-active={currentTab === tab.key ? 'true' : 'false'}
-          style={{
-            ...styles.tab,
-            ...(currentTab === tab.key ? styles.tabActive : {}),
-          }}
-          onClick={() => onTabChange(tab.key)}
-        >
-          {tab.label}
-        </button>
-      ))}
-    </div>
+    <ResponsiveTabBar
+      tabs={tabs}
+      activeKey={currentTab}
+      onChange={(key) => onTabChange(key as EventTab)}
+      aria-label="이벤트 유형 탭"
+      style={styles.container}
+      tabStyle={styles.tab}
+      activeTabStyle={styles.tabActive}
+    />
   );
 }
 
 const styles: Record<string, React.CSSProperties> = {
   container: {
-    display: 'flex',
     gap: spacing.sm,
     marginBottom: spacing.lg,
-    // WO-O4O-EDUCATION-EVENTS-TABS-RESPONSIVE-V1: mobile 가로 스크롤 + iOS 부드러운 스크롤
-    overflowX: 'auto',
-    WebkitOverflowScrolling: 'touch',
+    // display / overflowX / WebkitOverflowScrolling 는 ResponsiveTabBar 가 강제.
   },
   tab: {
     padding: `${spacing.sm} ${spacing.md}`,
@@ -78,9 +56,7 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.neutral600,
     cursor: 'pointer',
     transition: 'all 0.2s',
-    // WO-O4O-EDUCATION-EVENTS-TABS-RESPONSIVE-V1: 좁은 폭에서 탭 압축 방지 + 라벨 한 줄 유지
-    flexShrink: 0,
-    whiteSpace: 'nowrap',
+    // flexShrink / whiteSpace 는 ResponsiveTabBar 가 강제.
   },
   tabActive: {
     backgroundColor: colors.primary,
