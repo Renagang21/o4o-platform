@@ -8,7 +8,7 @@
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import type { User, UserRole } from '@/types';
-import { parseAuthResponse, normalizeUser, resolveAuthError, extractRoles, normalizeMemberships } from '@o4o/auth-utils';
+import { parseAuthResponse, normalizeUser, resolveAuthError, extractRoles, normalizeMemberships, AUTH_TOKEN_CLEARED_EVENT } from '@o4o/auth-utils';
 import { getAccessToken } from '@o4o/auth-client';
 import { authClient, api } from '../lib/apiClient';
 // Re-export for backward compatibility (API files, pages 등에서 import)
@@ -187,6 +187,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const switchRole = selectRole;
   const hasMultipleRoles = availableRoles.length > 1;
+
+  // WO-O4O-AUTH-TOKEN-CLEARED-UNIFICATION-V1: 토큰 갱신 실패 시 stale auth 정리
+  useEffect(() => {
+    const handleTokenCleared = () => { setUser(null); setAvailableRoles([]); };
+    window.addEventListener(AUTH_TOKEN_CLEARED_EVENT, handleTokenCleared);
+    return () => window.removeEventListener(AUTH_TOKEN_CLEARED_EVENT, handleTokenCleared);
+  }, []);
 
   // ============================================================================
   // Phase 2: Service User Login (WO-AUTH-SERVICE-IDENTITY-PHASE2-GLYCOPHARM)

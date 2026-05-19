@@ -7,7 +7,7 @@
  */
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { parseAuthResponse, resolveAuthError, buildPlatformUser } from '@o4o/auth-utils';
+import { parseAuthResponse, resolveAuthError, buildPlatformUser, AUTH_TOKEN_CLEARED_EVENT } from '@o4o/auth-utils';
 import { getAccessToken } from '@o4o/auth-client';
 import { authClient, api } from '../lib/apiClient';
 
@@ -70,6 +70,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     checkSession();
+  }, []);
+
+  // WO-O4O-AUTH-TOKEN-CLEARED-UNIFICATION-V1: 토큰 갱신 실패 시 stale auth 정리
+  useEffect(() => {
+    const handleTokenCleared = () => setUser(null);
+    window.addEventListener(AUTH_TOKEN_CLEARED_EVENT, handleTokenCleared);
+    return () => window.removeEventListener(AUTH_TOKEN_CLEARED_EVENT, handleTokenCleared);
   }, []);
 
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string; role?: UserRole; roles?: UserRole[] }> => {

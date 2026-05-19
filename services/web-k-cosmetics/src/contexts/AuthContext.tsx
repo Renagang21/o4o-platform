@@ -6,8 +6,8 @@
  * WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefix 유지, mapApiRoles 제거
  */
 
-import { createContext, useContext, useState, useRef, ReactNode } from 'react';
-import { parseAuthResponse, resolveAuthError, buildPlatformUser } from '@o4o/auth-utils';
+import { createContext, useContext, useState, useRef, useEffect, ReactNode } from 'react';
+import { parseAuthResponse, resolveAuthError, buildPlatformUser, AUTH_TOKEN_CLEARED_EVENT } from '@o4o/auth-utils';
 import { getAccessToken } from '@o4o/auth-client';
 import { authClient, api } from '../lib/apiClient';
 
@@ -124,6 +124,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const hasMultipleRoles = user ? user.roles.length > 1 : false;
+
+  // WO-O4O-AUTH-TOKEN-CLEARED-UNIFICATION-V1: 토큰 갱신 실패 시 stale auth 정리 + lazy check 초기화
+  useEffect(() => {
+    const handleTokenCleared = () => { setUser(null); setIsSessionChecked(false); };
+    window.addEventListener(AUTH_TOKEN_CLEARED_EVENT, handleTokenCleared);
+    return () => window.removeEventListener(AUTH_TOKEN_CLEARED_EVENT, handleTokenCleared);
+  }, []);
 
   return (
     <AuthContext.Provider

@@ -11,7 +11,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { AuthClient, getAccessToken } from '@o4o/auth-client';
-import { parseAuthResponse, normalizeMemberships, type ApiUser } from '@o4o/auth-utils';
+import { parseAuthResponse, normalizeMemberships, AUTH_TOKEN_CLEARED_EVENT, type ApiUser } from '@o4o/auth-utils';
 
 // Re-export for client.ts to use
 export { getAccessToken };
@@ -330,8 +330,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // 토큰 갱신 실패 시 user 상태 정리 (api/token-refresh.ts에서 이벤트 발행)
   useEffect(() => {
     const handleTokenCleared = () => setUser(null);
-    window.addEventListener('auth:token-cleared', handleTokenCleared);
-    return () => window.removeEventListener('auth:token-cleared', handleTokenCleared);
+    window.addEventListener(AUTH_TOKEN_CLEARED_EVENT, handleTokenCleared);
+    return () => window.removeEventListener(AUTH_TOKEN_CLEARED_EVENT, handleTokenCleared);
   }, []);
 
   const login = async (email: string, password: string): Promise<User> => {
