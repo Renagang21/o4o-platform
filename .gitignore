@@ -3,6 +3,11 @@ tmp-*
 test123.txt
 nul
 
+# Playwright E2E test artifacts (generated output, not source)
+test-results/
+playwright-report/
+*-after-event.png
+
 # Logs
 logs
 *.log
