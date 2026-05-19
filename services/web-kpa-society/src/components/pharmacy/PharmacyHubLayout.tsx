@@ -2,12 +2,20 @@
  * PharmacyHubLayout — 약국 HUB 좌측 사이드바 + 우측 본문 레이아웃
  *
  * WO-KPA-PHARMACY-HUB-SIDEBAR-LAYOUT-AND-PRODUCT-TABS-FIX-V1
+ * WO-O4O-PHARMACY-HUB-LAYOUT-MOBILE-V1:
+ *   AdminLayout drawer 패턴 적용. mobile에서 sidebar가 본문을 압박/덮는 문제 해소.
+ *   - mobile-only sticky 토글 바 (햄버거 + "허브 메뉴")
+ *   - aside: mobile fixed drawer (slide-in transform + backdrop) / desktop static flex-item
+ *   - 메뉴 항목 클릭 시 drawer 자동 닫힘
+ *   메뉴 구조 / 라우팅 / 권한 변경 없음.
  *
  * 상단 섹션 나열형 구조에서 좌측 사이드바 메뉴 + 우측 본문 구조로 전환.
  * Outlet으로 선택된 메뉴의 페이지를 렌더링한다.
  */
 
+import { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Menu } from 'lucide-react';
 import { colors } from '../../styles/theme';
 
 interface HubMenuItem {
@@ -34,11 +42,43 @@ function isMenuActive(pathname: string, menuPath: string): boolean {
 
 export function PharmacyHubLayout() {
   const { pathname } = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const closeMobileMenu = () => setMobileMenuOpen(false);
 
   return (
-    <div style={layoutStyles.wrapper}>
-      {/* Sidebar */}
-      <aside style={layoutStyles.sidebar}>
+    <div style={layoutStyles.wrapper} className="flex-col md:flex-row">
+      {/* Mobile-only sidebar toggle bar — desktop 숨김 */}
+      <div className="md:hidden sticky top-16 z-20 bg-white border-b border-slate-200 px-4 py-2 flex items-center">
+        <button
+          type="button"
+          onClick={() => setMobileMenuOpen(true)}
+          aria-label="HUB 메뉴 열기"
+          aria-expanded={mobileMenuOpen}
+          aria-controls="pharmacy-hub-sidebar"
+          className="flex items-center gap-2 text-sm font-medium text-slate-700 hover:text-indigo-600 transition-colors"
+        >
+          <Menu className="w-5 h-5" />
+          허브 메뉴
+        </button>
+      </div>
+
+      {/* Mobile drawer backdrop */}
+      {mobileMenuOpen && (
+        <div
+          className="md:hidden fixed inset-x-0 top-16 bottom-0 bg-black/40 z-30"
+          onClick={closeMobileMenu}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Sidebar — mobile drawer (fixed) / desktop static flex-item */}
+      <aside
+        id="pharmacy-hub-sidebar"
+        style={layoutStyles.sidebar}
+        className={`fixed left-0 top-16 bottom-0 z-40 transition-transform duration-200 ease-out md:static md:top-auto md:bottom-auto md:z-auto md:translate-x-0 ${
+          mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        }`}
+      >
         <div style={layoutStyles.sidebarHeader}>
           <h2 style={layoutStyles.sidebarTitle}>매장 운영 허브</h2>
           <p style={layoutStyles.sidebarSubtitle}>
@@ -53,6 +93,7 @@ export function PharmacyHubLayout() {
               <Link
                 key={item.path}
                 to={item.path}
+                onClick={closeMobileMenu}
                 style={{
                   ...layoutStyles.menuItem,
                   ...(active ? layoutStyles.menuItemActive : {}),
