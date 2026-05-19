@@ -92,6 +92,15 @@ interface KpaMember {
     zipCode?: string | null;
     address?: string | null;
     address2?: string | null;
+    // WO-O4O-KPA-OPERATOR-MEMBER-BUSINESS-INFO-STRUCTURED-PROJECTION-V1:
+    //   ownerPhone: 개설자 본인 연락처 (canonical pos 3).
+    //   storeAddress: 구조화 주소 — heuristic split 없이 view 에서 직접 사용.
+    ownerPhone?: string | null;
+    storeAddress?: {
+      zipCode?: string | null;
+      baseAddress?: string | null;
+      detailAddress?: string | null;
+    } | null;
   } | null;
   joined_at: string | null;
   created_at: string;
@@ -1558,13 +1567,33 @@ export default function MemberManagementPage() {
                   </>
                 ) : null
               ) : selectedMember.activity_type === 'pharmacy_owner' ? (
-                /* VIEW — pharmacy_owner: canonical 10 필드 모두 표시 */
+                /* VIEW — pharmacy_owner: canonical 10 필드 모두 표시.
+                   WO-O4O-KPA-OPERATOR-MEMBER-BUSINESS-INFO-STRUCTURED-PROJECTION-V1:
+                     heuristic 주소 분리 제거. business_info.storeAddress 우선,
+                     legacy zipCode/address/address2 fallback, 마지막에 pharmacy_address heuristic. */
                 (() => {
                   const bi = selectedMember.business_info;
-                  const addrRaw = (selectedMember.pharmacy_address || '').trim();
-                  const zipMatch = addrRaw.match(/^(\d{5})\s+(.+)$/);
-                  const addrZip = zipMatch ? zipMatch[1] : '';
-                  const addrRest = zipMatch ? zipMatch[2] : addrRaw;
+                  const sAddr = bi?.storeAddress;
+                  let addrZip = '';
+                  let addrBase = '';
+                  let addrDetail = '';
+                  if (sAddr && (sAddr.zipCode || sAddr.baseAddress || sAddr.detailAddress)) {
+                    addrZip = sAddr.zipCode || '';
+                    addrBase = sAddr.baseAddress || '';
+                    addrDetail = sAddr.detailAddress || '';
+                  } else if (bi?.zipCode || bi?.address || bi?.address2) {
+                    // legacy split fields (backfill 안 된 회원 보호)
+                    addrZip = bi.zipCode || '';
+                    addrBase = bi.address || '';
+                    addrDetail = bi.address2 || '';
+                  } else {
+                    // 최후 fallback: pharmacy_address 합성 string heuristic (5자리 zipCode prefix)
+                    const addrRaw = (selectedMember.pharmacy_address || '').trim();
+                    const zipMatch = addrRaw.match(/^(\d{5})\s+(.+)$/);
+                    addrZip = zipMatch ? zipMatch[1] : '';
+                    addrBase = zipMatch ? zipMatch[2] : addrRaw;
+                    addrDetail = '';
+                  }
                   return (
                     <>
                       {/* 1. 약국명 */}
@@ -1580,7 +1609,7 @@ export default function MemberManagementPage() {
                       {/* 3. 개설자 연락처 */}
                       <div style={fieldRowStyle}>
                         <span style={labelStyle}>개설자 연락처</span>
-                        <span style={valueStyle}>{(bi as any)?.ownerPhone || '-'}</span>
+                        <span style={valueStyle}>{bi?.ownerPhone || '-'}</span>
                       </div>
                       {/* 4. 대표자명 */}
                       <div style={fieldRowStyle}>
@@ -1602,7 +1631,7 @@ export default function MemberManagementPage() {
                         <span style={labelStyle}>세금계산서 이메일</span>
                         <span style={valueStyle}>{bi?.taxInvoiceEmail || bi?.taxEmail || '-'}</span>
                       </div>
-                      {/* 8. 우편번호 — 합성된 pharmacy_address 에서 heuristic 분리 */}
+                      {/* 8. 우편번호 */}
                       <div style={fieldRowStyle}>
                         <span style={labelStyle}>우편번호</span>
                         <span style={valueStyle}>{addrZip || '-'}</span>
@@ -1610,12 +1639,12 @@ export default function MemberManagementPage() {
                       {/* 9. 기본주소 */}
                       <div style={fieldRowStyle}>
                         <span style={labelStyle}>기본주소</span>
-                        <span style={valueStyle}>{addrRest || '-'}</span>
+                        <span style={valueStyle}>{addrBase || '-'}</span>
                       </div>
-                      {/* 10. 상세주소 — heuristic 분리 불가하여 기본주소에 포함되어 표시됨 */}
+                      {/* 10. 상세주소 */}
                       <div style={fieldRowStyle}>
                         <span style={labelStyle}>상세주소</span>
-                        <span style={valueStyle}>-</span>
+                        <span style={valueStyle}>{addrDetail || '-'}</span>
                       </div>
                     </>
                   );

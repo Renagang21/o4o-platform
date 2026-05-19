@@ -372,6 +372,12 @@ export function createMemberController(
           const metadata = (businessInfo && typeof businessInfo.metadata === 'object' && businessInfo.metadata !== null)
             ? businessInfo.metadata as Record<string, any>
             : null;
+          // WO-O4O-KPA-OPERATOR-MEMBER-BUSINESS-INFO-STRUCTURED-PROJECTION-V1:
+          //   storeAddress (canonical structured) — users.businessInfo.storeAddress JSONB 에서 직접 projection.
+          //   운영자 Drawer view 가 heuristic 분리 없이 zipCode/baseAddress/detailAddress 를 정확히 표시.
+          const storeAddressRaw = (businessInfo?.storeAddress && typeof businessInfo.storeAddress === 'object')
+            ? businessInfo.storeAddress as Record<string, any>
+            : null;
           const business_info = businessInfo
             ? {
                 businessNumber: businessInfo.businessNumber ?? null,
@@ -387,6 +393,18 @@ export function createMemberController(
                 zipCode: businessInfo.zipCode ?? null,
                 address: businessInfo.address ?? null,
                 address2: businessInfo.address2 ?? null,
+                // WO-O4O-KPA-OPERATOR-MEMBER-BUSINESS-INFO-STRUCTURED-PROJECTION-V1:
+                //   additive 확장 — legacy 필드 (zipCode/address/address2) 는 그대로 유지.
+                //   ownerPhone: 개설자 본인 연락처 (canonical pos 3).
+                //   storeAddress: 구조화 주소 (canonical pos 8-10) — /store/info /mypage/profile 와 동일 shape.
+                ownerPhone: businessInfo.ownerPhone ?? null,
+                storeAddress: storeAddressRaw
+                  ? {
+                      zipCode: storeAddressRaw.zipCode ?? null,
+                      baseAddress: storeAddressRaw.baseAddress ?? null,
+                      detailAddress: storeAddressRaw.detailAddress ?? null,
+                    }
+                  : null,
               }
             : null;
           return {
