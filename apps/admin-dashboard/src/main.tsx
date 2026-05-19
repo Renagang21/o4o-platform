@@ -23,8 +23,9 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: (failureCount, error: any) => {
-        // Don't retry on 404 or 401 errors
-        if (error?.response?.status === 404 || error?.response?.status === 401) {
+        // Don't retry on 401, 403, or 404 errors
+        const status = error?.response?.status;
+        if (status === 401 || status === 403 || status === 404) {
           return false;
         }
         // Retry up to 1 time for other errors
