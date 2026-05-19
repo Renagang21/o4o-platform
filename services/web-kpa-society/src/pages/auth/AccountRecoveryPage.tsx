@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import { Mail, Phone, ArrowLeft, CheckCircle, AlertCircle, Search, KeyRound } from 'lucide-react';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-const SERVICE_URL = import.meta.env.VITE_SERVICE_URL || 'https://kpa-society.o4o.com';
+const SERVICE_URL = import.meta.env.VITE_SERVICE_URL || 'https://kpa-society.co.kr';
 
 type Tab = 'find-id' | 'find-password';
 

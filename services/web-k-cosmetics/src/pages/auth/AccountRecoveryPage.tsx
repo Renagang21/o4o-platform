@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import { Mail, Phone, ArrowLeft, CheckCircle, AlertCircle, Search, KeyRound } from 'lucide-react';
 import { api } from '../../lib/apiClient';
 
-const SERVICE_URL = import.meta.env.VITE_SERVICE_URL || 'https://k-cosmetics.o4o.com';
+const SERVICE_URL = import.meta.env.VITE_SERVICE_URL || 'https://k-cosmetics.site';
 
 type Tab = 'find-id' | 'find-password';
 

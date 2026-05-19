@@ -20,8 +20,8 @@ export class PasswordController extends BaseController {
     'https://neture.co.kr',
     'https://glycopharm.co.kr',
     'https://glucoseview.co.kr',
-    'https://k-cosmetics.o4o.com',
-    'https://kpa-society.o4o.com',
+    'https://k-cosmetics.site',
+    'https://kpa-society.co.kr',
     'https://admin.neture.co.kr',
     'http://localhost:',
   ];
