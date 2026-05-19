@@ -37,6 +37,12 @@ env:
   VITE_API_URL_KPA_SOCIETY: https://api.neture.co.kr
   VITE_API_URL_K_COSMETICS: https://api.neture.co.kr
   VITE_KPA_URL: https://kpa-society-web-3e3aws7zqa-du.a.run.app
+  # WO-O4O-DOMAIN-SSOT-CANONICALIZATION-V1: per-service canonical URL injected as build-arg.
+  # Values mirror apps/api-server/src/config/service-catalog.ts O4O_SERVICES[].domain.
+  VITE_SERVICE_URL_NETURE: https://neture.co.kr
+  VITE_SERVICE_URL_GLYCOPHARM: https://glycopharm.co.kr
+  VITE_SERVICE_URL_KPA_SOCIETY: https://kpa-society.co.kr
+  VITE_SERVICE_URL_K_COSMETICS: https://k-cosmetics.site
 
 jobs:
   detect-changes:
@@ -146,6 +152,7 @@ jobs:
           docker build \
             --platform linux/amd64 \
             --build-arg VITE_API_BASE_URL=${{ env.VITE_API_BASE_URL }} \
+            --build-arg VITE_SERVICE_URL=${{ env.VITE_SERVICE_URL_NETURE }} \
             -f services/web-neture/Dockerfile \
             -t gcr.io/${{ env.PROJECT_ID }}/neture-web:${IMAGE_TAG} \
             -t gcr.io/${{ env.PROJECT_ID }}/neture-web:latest \
@@ -220,6 +227,7 @@ jobs:
           docker build \
             --platform linux/amd64 \
             --build-arg VITE_API_BASE_URL=${{ env.VITE_API_URL_K_COSMETICS }} \
+            --build-arg VITE_SERVICE_URL=${{ env.VITE_SERVICE_URL_K_COSMETICS }} \
             -f services/web-k-cosmetics/Dockerfile \
             -t gcr.io/${{ env.PROJECT_ID }}/k-cosmetics-web:${IMAGE_TAG} \
             -t gcr.io/${{ env.PROJECT_ID }}/k-cosmetics-web:latest \
@@ -288,6 +296,7 @@ jobs:
           docker build \
             --platform linux/amd64 \
             --build-arg VITE_API_BASE_URL=${{ env.VITE_API_URL_KPA_SOCIETY }} \
+            --build-arg VITE_SERVICE_URL=${{ env.VITE_SERVICE_URL_KPA_SOCIETY }} \
             -f services/web-kpa-society/Dockerfile \
             -t gcr.io/${{ env.PROJECT_ID }}/kpa-society-web:${IMAGE_TAG} \
             -t gcr.io/${{ env.PROJECT_ID }}/kpa-society-web:latest \
@@ -356,6 +365,7 @@ jobs:
           docker build \
             --platform linux/amd64 \
             --build-arg VITE_API_BASE_URL=${{ env.VITE_API_URL_GLYCOPHARM }} \
+            --build-arg VITE_SERVICE_URL=${{ env.VITE_SERVICE_URL_GLYCOPHARM }} \
             -f services/web-glycopharm/Dockerfile \
             -t gcr.io/${{ env.PROJECT_ID }}/glycopharm-web:${IMAGE_TAG} \
             -t gcr.io/${{ env.PROJECT_ID }}/glycopharm-web:latest \

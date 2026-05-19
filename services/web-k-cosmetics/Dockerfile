@@ -80,6 +80,9 @@ RUN pnpm --filter @o4o/lms-client build
 # Build-time environment variable for Vite
 ARG VITE_API_BASE_URL=https://api.neture.co.kr
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+# WO-O4O-DOMAIN-SSOT-CANONICALIZATION-V1: canonical service URL for password reset & cross-service handoff
+ARG VITE_SERVICE_URL=https://k-cosmetics.site
+ENV VITE_SERVICE_URL=$VITE_SERVICE_URL
 
 # Build the service (vite only — tsc는 CI/로컬에서 별도 수행)
 WORKDIR /app/services/web-k-cosmetics
