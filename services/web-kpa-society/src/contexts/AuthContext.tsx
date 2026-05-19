@@ -11,7 +11,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { AuthClient, getAccessToken } from '@o4o/auth-client';
-import { parseAuthResponse, type ApiUser } from '@o4o/auth-utils';
+import { parseAuthResponse, normalizeMemberships, type ApiUser } from '@o4o/auth-utils';
 
 // Re-export for client.ts to use
 export { getAccessToken };
@@ -225,7 +225,7 @@ function createUserFromApiResponse(apiUser: ApiUser): User {
     // WO-ROLE-NORMALIZATION-PHASE3-C-V1: isStoreOwner + activityType
     isStoreOwner: !!(apiUser as any).isStoreOwner,
     activityType: (apiUser as any).activityType || undefined,
-    memberships: (apiUser as any).memberships || [],
+    memberships: normalizeMemberships(apiUser),
   };
 }
 

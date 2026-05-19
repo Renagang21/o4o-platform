@@ -7,7 +7,7 @@
  */
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { parseAuthResponse, normalizeUser, resolveAuthError, extractRoles } from '@o4o/auth-utils';
+import { parseAuthResponse, resolveAuthError, buildPlatformUser } from '@o4o/auth-utils';
 import { getAccessToken } from '@o4o/auth-client';
 import { authClient, api } from '../lib/apiClient';
 
@@ -55,10 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const data = response.data;
         const { user: apiUser } = parseAuthResponse(data);
         if (apiUser) {
-          const roles = extractRoles(apiUser);
-          const base = normalizeUser(apiUser);
-          const memberships = (apiUser as any).memberships || [];
-          setUser({ ...base, roles, memberships });
+          setUser(buildPlatformUser(apiUser));
         }
       } catch {
         // 세션 없음 - 정상
@@ -76,11 +73,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const result = await authClient.login({ email, password });
       const apiUser = result.user as any;
       if (apiUser) {
-        const roles = extractRoles(apiUser);
-        const base = normalizeUser(apiUser);
-        const memberships = (apiUser as any).memberships || [];
-        setUser({ ...base, roles, memberships });
-        return { success: true, role: roles[0], roles };
+        const built = buildPlatformUser(apiUser);
+        setUser(built);
+        return { success: true, role: built.roles[0], roles: built.roles };
       }
 
       return { success: false, error: '로그인 응답이 올바르지 않습니다.' };

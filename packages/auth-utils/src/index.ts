@@ -11,4 +11,6 @@ export { extractRoles } from './extractRoles.js';
 export type { ProfileConfig } from './profile-utils.js';
 export { PROFILE_MAP } from './profile-utils.js';
 export type { MembershipStatus, MembershipLike, UserLike } from './membershipGate.js';
-export { getServiceMembershipStatus, isPlatformSuperAdmin, isServiceAccessAllowed } from './membershipGate.js';
+export { getServiceMembershipStatus, isPlatformSuperAdmin, isServiceAccessAllowed, normalizeMemberships } from './membershipGate.js';
+export type { PlatformUser } from './buildPlatformUser.js';
+export { buildPlatformUser } from './buildPlatformUser.js';

@@ -1,5 +1,6 @@
 /**
  * Membership Gate — Shared Helper
+ * (buildPlatformUser import 없음 — 순환 방지)
  *
  * WO-O4O-MEMBERSHIPGATE-SHARED-INSTANCE-V1
  *
@@ -19,6 +20,8 @@
  *   - React 컴포넌트 (서비스별 UI 차이 유지)
  *   - redirect/onboarding CTA (서비스별 정책 유지)
  */
+
+import type { ApiUser } from './types.js';
 
 // ─── Canonical Membership Status ───────────────────────────────────────────
 
@@ -84,6 +87,21 @@ export function getServiceMembershipStatus(
       // legacy 'inactive' 및 알 수 없는 값 → 'none' 으로 fallback (차단 측 안전)
       return 'none';
   }
+}
+
+/**
+ * normalizeMemberships — API 응답 user 객체에서 memberships 배열 정규화
+ *
+ * WO-O4O-AUTH-STATUS-RUNTIME-CANONICALIZATION-V1:
+ *   `(apiUser as any).memberships || []` 패턴을 타입-안전하게 대체.
+ *   Array 검증 포함 — 비배열·null·undefined 모두 [] 반환.
+ *
+ * @param apiUser - `memberships` 필드를 포함할 수 있는 API user 객체
+ */
+export function normalizeMemberships(apiUser: ApiUser): MembershipLike[] {
+  const raw = apiUser.memberships;
+  if (Array.isArray(raw)) return raw as MembershipLike[];
+  return [];
 }
 
 /**

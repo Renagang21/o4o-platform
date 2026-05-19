@@ -8,7 +8,7 @@
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import type { User, UserRole } from '@/types';
-import { parseAuthResponse, normalizeUser, resolveAuthError, extractRoles } from '@o4o/auth-utils';
+import { parseAuthResponse, normalizeUser, resolveAuthError, extractRoles, normalizeMemberships } from '@o4o/auth-utils';
 import { getAccessToken } from '@o4o/auth-client';
 import { authClient, api } from '../lib/apiClient';
 // Re-export for backward compatibility (API files, pages 등에서 import)
@@ -115,7 +115,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             ...apiUser,
             ...base,
             roles: rawRoles,
-            memberships: (apiUser as any).memberships || [],
+            memberships: normalizeMemberships(apiUser),
             status: (apiUser.status as string) || 'approved',
           } as User;
           setUser(userData);
@@ -145,7 +145,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           ...apiUser,
           ...base,
           roles: rawRoles,
-          memberships: (apiUser as any).memberships || [],
+          memberships: normalizeMemberships(apiUser),
           status: (apiUser.status as string) || 'approved',
         } as User;
 
