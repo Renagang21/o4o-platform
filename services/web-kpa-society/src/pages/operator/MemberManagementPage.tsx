@@ -1460,12 +1460,17 @@ export default function MemberManagementPage() {
                 </span>
               </div>
 
-              {/* 약국 정보 — WO-O4O-KPA-OPERATOR-MEMBER-CANONICAL-EDIT-COMPLETE-V1:
-                  pharmacy_owner 일 때 약국명/사업자번호/주소/전화번호 입력.
-                  사업자번호와 약국명은 store_owner 자동 부여 조건이므로 누락 시 backend warning. */}
+              {/* 약국 정보 — WO-O4O-KPA-PHARMACY-INFO-VIEW-EDIT-CANONICAL-ALIGNMENT-V1:
+                  pharmacy_owner 의 view/edit 양쪽을 canonical 순서로 정렬.
+                  canonical 10 필드: 약국명/약국 전화번호/개설자 연락처/대표자명/담당자명/
+                  사업자등록번호/세금계산서 이메일/우편번호/기본주소/상세주소.
+                  EDIT 는 backend payload 지원 필드만 (개설자 연락처/대표자명/세금계산서 이메일은
+                  /store/info canonical 화면에서 수정 — operator PATCH /info 는 미지원).
+                  VIEW 는 모두 표시. 주소는 heuristic split (zipCode 5자리 prefix 분리). */}
               {isEditing ? (
                 editForm.activity_type === 'pharmacy_owner' ? (
                   <>
+                    {/* 1. 약국명 */}
                     <div style={fieldRowStyle}>
                       <span style={labelStyle}>약국명 *</span>
                       <input
@@ -1480,8 +1485,34 @@ export default function MemberManagementPage() {
                         }}
                       />
                     </div>
+                    {/* 2. 약국 전화번호 */}
                     <div style={fieldRowStyle}>
-                      <span style={labelStyle}>사업자번호 *</span>
+                      <span style={labelStyle}>약국 전화번호</span>
+                      <input
+                        type="text"
+                        value={editForm.pharmacy_phone}
+                        onChange={(e) => setEditForm((f) => ({ ...f, pharmacy_phone: e.target.value }))}
+                        placeholder="약국 전화번호 (예: 02-1234-5678)"
+                        disabled={savingEdit}
+                        style={inputStyle}
+                      />
+                    </div>
+                    {/* 5. 담당자명 (canonical pos 3~4 은 /store/info 에서만 수정) */}
+                    <div style={fieldRowStyle}>
+                      <span style={labelStyle}>담당자명</span>
+                      <input
+                        type="text"
+                        value={editForm.contactName}
+                        onChange={(e) => setEditForm((f) => ({ ...f, contactName: e.target.value }))}
+                        placeholder="담당자 이름 (선택)"
+                        maxLength={50}
+                        disabled={savingEdit}
+                        style={inputStyle}
+                      />
+                    </div>
+                    {/* 6. 사업자등록번호 (canonical pos 7 은 /store/info 에서만 수정) */}
+                    <div style={fieldRowStyle}>
+                      <span style={labelStyle}>사업자등록번호 *</span>
                       <input
                         type="text"
                         value={editForm.business_number}
@@ -1494,8 +1525,8 @@ export default function MemberManagementPage() {
                         }}
                       />
                     </div>
-                    {/* WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1:
-                        AddressSearch 컴포넌트 사용 — canonical split address (zipCode/address1/address2).
+                    {/* 8-10. 우편번호 / 기본주소 / 상세주소 — AddressSearch (zipCode/address1/address2 분리).
+                        WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1:
                         저장 시 backend 가 pharmacy_address 합성하여 kpa_members 동기화. */}
                     <div style={{ ...fieldRowStyle, flexDirection: 'column', alignItems: 'flex-start' }}>
                       <span style={{ ...labelStyle, marginBottom: 6 }}>약국 주소</span>
@@ -1511,29 +1542,6 @@ export default function MemberManagementPage() {
                         />
                       </div>
                     </div>
-                    <div style={fieldRowStyle}>
-                      <span style={labelStyle}>담당자명</span>
-                      <input
-                        type="text"
-                        value={editForm.contactName}
-                        onChange={(e) => setEditForm((f) => ({ ...f, contactName: e.target.value }))}
-                        placeholder="담당자 이름 (선택)"
-                        maxLength={50}
-                        disabled={savingEdit}
-                        style={inputStyle}
-                      />
-                    </div>
-                    <div style={fieldRowStyle}>
-                      <span style={labelStyle}>약국 전화</span>
-                      <input
-                        type="text"
-                        value={editForm.pharmacy_phone}
-                        onChange={(e) => setEditForm((f) => ({ ...f, pharmacy_phone: e.target.value }))}
-                        placeholder="약국 전화번호 (예: 02-1234-5678)"
-                        disabled={savingEdit}
-                        style={inputStyle}
-                      />
-                    </div>
                     {(editForm.pharmacy_name.trim().length === 0
                       || editForm.business_number.replace(/[^0-9]/g, '').length === 0) && (
                       <div style={{ ...fieldRowStyle, alignItems: 'flex-start' }}>
@@ -1544,59 +1552,90 @@ export default function MemberManagementPage() {
                         </p>
                       </div>
                     )}
+                    <p style={{ fontSize: 11, color: '#64748b', margin: '8px 0 0' }}>
+                      ※ 개설자 연락처 / 대표자명 / 세금계산서 이메일은 약국 정보 페이지(/store/info)에서 수정합니다.
+                    </p>
                   </>
                 ) : null
+              ) : selectedMember.activity_type === 'pharmacy_owner' ? (
+                /* VIEW — pharmacy_owner: canonical 10 필드 모두 표시 */
+                (() => {
+                  const bi = selectedMember.business_info;
+                  const addrRaw = (selectedMember.pharmacy_address || '').trim();
+                  const zipMatch = addrRaw.match(/^(\d{5})\s+(.+)$/);
+                  const addrZip = zipMatch ? zipMatch[1] : '';
+                  const addrRest = zipMatch ? zipMatch[2] : addrRaw;
+                  return (
+                    <>
+                      {/* 1. 약국명 */}
+                      <div style={fieldRowStyle}>
+                        <span style={labelStyle}>약국명</span>
+                        <span style={valueStyle}>{selectedMember.pharmacy_name || '-'}</span>
+                      </div>
+                      {/* 2. 약국 전화번호 */}
+                      <div style={fieldRowStyle}>
+                        <span style={labelStyle}>약국 전화번호</span>
+                        <span style={valueStyle}>{bi?.pharmacy_phone || '-'}</span>
+                      </div>
+                      {/* 3. 개설자 연락처 */}
+                      <div style={fieldRowStyle}>
+                        <span style={labelStyle}>개설자 연락처</span>
+                        <span style={valueStyle}>{(bi as any)?.ownerPhone || '-'}</span>
+                      </div>
+                      {/* 4. 대표자명 */}
+                      <div style={fieldRowStyle}>
+                        <span style={labelStyle}>대표자명</span>
+                        <span style={valueStyle}>{bi?.ceoName || bi?.representativeName || '-'}</span>
+                      </div>
+                      {/* 5. 담당자명 */}
+                      <div style={fieldRowStyle}>
+                        <span style={labelStyle}>담당자명</span>
+                        <span style={valueStyle}>{bi?.contactName || '-'}</span>
+                      </div>
+                      {/* 6. 사업자등록번호 */}
+                      <div style={fieldRowStyle}>
+                        <span style={labelStyle}>사업자등록번호</span>
+                        <span style={valueStyle}>{bi?.businessNumber || '-'}</span>
+                      </div>
+                      {/* 7. 세금계산서 이메일 */}
+                      <div style={fieldRowStyle}>
+                        <span style={labelStyle}>세금계산서 이메일</span>
+                        <span style={valueStyle}>{bi?.taxInvoiceEmail || bi?.taxEmail || '-'}</span>
+                      </div>
+                      {/* 8. 우편번호 — 합성된 pharmacy_address 에서 heuristic 분리 */}
+                      <div style={fieldRowStyle}>
+                        <span style={labelStyle}>우편번호</span>
+                        <span style={valueStyle}>{addrZip || '-'}</span>
+                      </div>
+                      {/* 9. 기본주소 */}
+                      <div style={fieldRowStyle}>
+                        <span style={labelStyle}>기본주소</span>
+                        <span style={valueStyle}>{addrRest || '-'}</span>
+                      </div>
+                      {/* 10. 상세주소 — heuristic 분리 불가하여 기본주소에 포함되어 표시됨 */}
+                      <div style={fieldRowStyle}>
+                        <span style={labelStyle}>상세주소</span>
+                        <span style={valueStyle}>-</span>
+                      </div>
+                    </>
+                  );
+                })()
               ) : (
+                /* VIEW — 비-개설약사 (pharmacy_employee 등): 근무처 정보 최소 표시 */
                 <>
                   {selectedMember.pharmacy_name && (
                     <div style={fieldRowStyle}>
-                      <span style={labelStyle}>
-                        {selectedMember.activity_type === 'pharmacy_owner' ? '약국명' : '근무처명'}
-                      </span>
+                      <span style={labelStyle}>근무처명</span>
                       <span style={valueStyle}>{selectedMember.pharmacy_name}</span>
                     </div>
                   )}
                   {selectedMember.pharmacy_address && (
                     <div style={fieldRowStyle}>
-                      <span style={labelStyle}>
-                        {selectedMember.activity_type === 'pharmacy_owner' ? '사업장 주소' : '근무처 주소'}
-                      </span>
+                      <span style={labelStyle}>근무처 주소</span>
                       <span style={valueStyle}>{selectedMember.pharmacy_address}</span>
                     </div>
                   )}
                 </>
-              )}
-
-              {/* 개설약사: 사업자 정보 — users.businessInfo 에서 enrich */}
-              {selectedMember.business_info?.businessNumber && (
-                <div style={fieldRowStyle}>
-                  <span style={labelStyle}>사업자번호</span>
-                  <span style={valueStyle}>{selectedMember.business_info.businessNumber}</span>
-                </div>
-              )}
-              {/* WO-O4O-KPA-OPERATOR-MEMBER-LIST-BUSINESSINFO-TYPE-CANONICAL-ALIGN-V1:
-                  canonical (ceoName / taxInvoiceEmail) 우선, legacy (representativeName / taxEmail) fallback. */}
-              {(selectedMember.business_info?.ceoName || selectedMember.business_info?.representativeName) && (
-                <div style={fieldRowStyle}>
-                  <span style={labelStyle}>대표자명</span>
-                  <span style={valueStyle}>
-                    {selectedMember.business_info.ceoName || selectedMember.business_info.representativeName}
-                  </span>
-                </div>
-              )}
-              {selectedMember.business_info?.contactName && (
-                <div style={fieldRowStyle}>
-                  <span style={labelStyle}>담당자명</span>
-                  <span style={valueStyle}>{selectedMember.business_info.contactName}</span>
-                </div>
-              )}
-              {(selectedMember.business_info?.taxInvoiceEmail || selectedMember.business_info?.taxEmail) && (
-                <div style={fieldRowStyle}>
-                  <span style={labelStyle}>세금계산서 이메일</span>
-                  <span style={valueStyle}>
-                    {selectedMember.business_info.taxInvoiceEmail || selectedMember.business_info.taxEmail}
-                  </span>
-                </div>
               )}
 
               {/* 가입일 */}

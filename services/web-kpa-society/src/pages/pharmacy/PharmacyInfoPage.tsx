@@ -21,13 +21,14 @@ import {
 
 type LoadState = 'loading' | 'loaded' | 'error';
 
+// WO-O4O-KPA-PHARMACY-INFO-VIEW-EDIT-CANONICAL-ALIGNMENT-V1:
+//   "담당자 전화" (managerPhone) UI 제거. API 타입/필드는 유지 — 기존 DB 값 보존.
 interface FormState {
   name: string;
   phone: string;
   ownerPhone: string;
   ceoName: string;
   contactName: string;
-  managerPhone: string;
   taxInvoiceEmail: string;
   zipCode: string;
   baseAddress: string;
@@ -41,7 +42,6 @@ function dataToForm(data: PharmacyInfoData): FormState {
     ownerPhone: data.ownerPhone || '',
     ceoName: data.ceoName || '',
     contactName: data.contactName || '',
-    managerPhone: data.managerPhone || '',
     taxInvoiceEmail: data.taxInvoiceEmail || '',
     zipCode: data.addressDetail?.zipCode || '',
     baseAddress: data.addressDetail?.baseAddress || '',
@@ -57,7 +57,7 @@ export function PharmacyInfoPage() {
   const [data, setData] = useState<PharmacyInfoData | null>(null);
   const [loadState, setLoadState] = useState<LoadState>('loading');
   const [isEditMode, setIsEditMode] = useState(false);
-  const [form, setForm] = useState<FormState>({ name: '', phone: '', ownerPhone: '', ceoName: '', contactName: '', managerPhone: '', taxInvoiceEmail: '', zipCode: '', baseAddress: '', detailAddress: '' });
+  const [form, setForm] = useState<FormState>({ name: '', phone: '', ownerPhone: '', ceoName: '', contactName: '', taxInvoiceEmail: '', zipCode: '', baseAddress: '', detailAddress: '' });
   const [isSaving, setIsSaving] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const [successMsg, setSuccessMsg] = useState('');
@@ -122,13 +122,15 @@ export function PharmacyInfoPage() {
           ? { zipCode: form.zipCode || undefined, baseAddress: form.baseAddress.trim(), detailAddress: form.detailAddress.trim() || undefined }
           : undefined;
 
+      // WO-O4O-KPA-PHARMACY-INFO-VIEW-EDIT-CANONICAL-ALIGNMENT-V1:
+      //   managerPhone payload 미전송 — backend 는 missing field 를 "변경 없음" 으로 처리하여
+      //   기존 DB 값 보존. API 계약 (UpdatePharmacyInfoPayload) 자체는 그대로.
       await updatePharmacyInfo({
         name: form.name.trim(),
         phone: digitsOnly(form.phone) || undefined,
         ownerPhone: digitsOnly(form.ownerPhone) || undefined,
         ceoName: form.ceoName.trim() || undefined,
         contactName: form.contactName.trim() || undefined,
-        managerPhone: digitsOnly(form.managerPhone) || undefined,
         taxInvoiceEmail: form.taxInvoiceEmail.trim() || undefined,
         addressDetail,
       });
@@ -245,16 +247,6 @@ export function PharmacyInfoPage() {
             </div>
 
             <div style={styles.formGroup}>
-              <label style={styles.formLabel}>담당자 전화</label>
-              <input
-                style={styles.formInput}
-                value={form.managerPhone}
-                onChange={e => updateField('managerPhone', digitsOnly(e.target.value))}
-                placeholder="숫자만 입력"
-              />
-            </div>
-
-            <div style={styles.formGroup}>
               <label style={styles.formLabel}>사업자등록번호</label>
               <input
                 style={{ ...styles.formInput, backgroundColor: colors.neutral100, cursor: 'not-allowed' }}
@@ -336,10 +328,6 @@ export function PharmacyInfoPage() {
             <div style={styles.infoRow}>
               <span style={styles.infoLabel}>담당자명</span>
               <span style={styles.infoValue}>{data.contactName || '-'}</span>
-            </div>
-            <div style={styles.infoRow}>
-              <span style={styles.infoLabel}>담당자 전화</span>
-              <span style={styles.infoValue}>{data.managerPhone || '-'}</span>
             </div>
             <div style={styles.infoRow}>
               <span style={styles.infoLabel}>사업자등록번호</span>

@@ -103,7 +103,6 @@ export function MyProfilePage() {
     contactName: '',
     taxInvoiceEmail: '',
     businessPhone: '',
-    managerPhone: '',
     storeZipCode: '',
     storeBaseAddress: '',
     storeDetailAddress: '',
@@ -207,7 +206,6 @@ export function MyProfilePage() {
       contactName: biz.contactName || '',
       taxInvoiceEmail: biz.taxInvoiceEmail || biz.taxEmail || '',
       businessPhone: biz.phone || '',
-      managerPhone: biz.managerPhone || '',
       storeZipCode: storeAddr?.zipCode || biz.zipCode || '',
       storeBaseAddress: storeAddr?.baseAddress || biz.address || '',
       storeDetailAddress: storeAddr?.detailAddress || biz.address2 || '',
@@ -258,7 +256,9 @@ export function MyProfilePage() {
         if (roleForm.contactName) businessInfoPayload.contactName = roleForm.contactName;
         if (roleForm.taxInvoiceEmail) businessInfoPayload.taxInvoiceEmail = roleForm.taxInvoiceEmail;
         if (roleForm.businessPhone) businessInfoPayload.phone = roleForm.businessPhone;
-        if (roleForm.managerPhone) businessInfoPayload.managerPhone = roleForm.managerPhone;
+        // WO-O4O-KPA-PHARMACY-INFO-VIEW-EDIT-CANONICAL-ALIGNMENT-V1:
+        //   "담당자 전화" UI 제거에 따라 managerPhone payload 미전송 — 기존 DB 값 보존.
+        //   API field 자체는 그대로 (backend businessInfoPayload spec 변경 없음).
         if (roleForm.storeBaseAddress || roleForm.storeZipCode || roleForm.storeDetailAddress) {
           businessInfoPayload.storeAddress = {
             ...(roleForm.storeZipCode ? { zipCode: roleForm.storeZipCode } : {}),
@@ -387,6 +387,15 @@ export function MyProfilePage() {
     : null;
   const pharmacyAddressFallback = profile?.pharmacy?.address || biz?.address || null;
   const pharmacyPhone = biz?.phone || null;
+  // WO-O4O-KPA-PHARMACY-INFO-VIEW-EDIT-CANONICAL-ALIGNMENT-V1:
+  //   display 블록에 canonical 10 필드 모두 노출 위해 추가 derived 값.
+  //   businessInfo cache 가 보유한 값을 read-only 로 표시. write 는 /store/info canonical.
+  // ownerPhone 은 businessInfo type 의 8+ optional 키에 포함되지 않아 cast 사용.
+  const pharmacyOwnerPhone = (biz as any)?.ownerPhone || null;
+  const pharmacyCeoName = biz?.ceoName || biz?.representativeName || null;
+  const pharmacyContactName = biz?.contactName || null;
+  const pharmacyBusinessNumber = biz?.businessNumber || null;
+  const pharmacyTaxInvoiceEmail = biz?.taxInvoiceEmail || biz?.taxEmail || null;
   const workplaceName = biz?.businessName || null;
   const workplacePhone = biz?.phone || null;
 
@@ -583,42 +592,45 @@ export function MyProfilePage() {
               {isPharmacyOwner && (
                 <div style={styles.bizSection}>
                   <h4 style={styles.bizSectionTitle}>약국 정보</h4>
+                  {/* WO-O4O-KPA-PHARMACY-INFO-VIEW-EDIT-CANONICAL-ALIGNMENT-V1:
+                      canonical 순서 (약국명 → 약국 전화 → 대표자명 → 담당자명 → 세금계산서 이메일 → 주소).
+                      "담당자 전화" 제거. 개설자 연락처/사업자등록번호는 /store/info canonical 에서만 수정. */}
+                  {/* 1. 약국명 */}
                   <div style={styles.field}>
                     <label style={styles.label}>약국명 (사업장명)</label>
                     <input type="text" style={styles.input} value={roleForm.businessName}
                       onChange={e => setRoleForm({ ...roleForm, businessName: e.target.value })}
                       placeholder="예: ○○약국" maxLength={200} />
                   </div>
+                  {/* 2. 약국 전화번호 */}
+                  <div style={styles.field}>
+                    <label style={styles.label}>약국 전화번호</label>
+                    <input type="tel" style={styles.input} value={roleForm.businessPhone}
+                      onChange={e => setRoleForm({ ...roleForm, businessPhone: e.target.value.replace(/\D/g, '') })}
+                      placeholder="숫자만 입력 (선택)" maxLength={11} />
+                  </div>
+                  {/* 4. 대표자명 (canonical pos 3: 개설자 연락처는 /store/info 에서만 수정) */}
                   <div style={styles.field}>
                     <label style={styles.label}>대표자명</label>
                     <input type="text" style={styles.input} value={roleForm.ceoName}
                       onChange={e => setRoleForm({ ...roleForm, ceoName: e.target.value })}
                       placeholder="사업자등록증 대표자명" maxLength={50} />
                   </div>
+                  {/* 5. 담당자명 */}
                   <div style={styles.field}>
                     <label style={styles.label}>담당자명</label>
                     <input type="text" style={styles.input} value={roleForm.contactName}
                       onChange={e => setRoleForm({ ...roleForm, contactName: e.target.value })}
                       placeholder="담당자 이름 (선택)" maxLength={50} />
                   </div>
+                  {/* 7. 세금계산서 이메일 (canonical pos 6: 사업자번호는 /store/info 에서만 수정) */}
                   <div style={styles.field}>
                     <label style={styles.label}>세금계산서 이메일</label>
                     <input type="email" style={styles.input} value={roleForm.taxInvoiceEmail}
                       onChange={e => setRoleForm({ ...roleForm, taxInvoiceEmail: e.target.value })}
                       placeholder="세금계산서 수신 이메일 (선택)" />
                   </div>
-                  <div style={styles.field}>
-                    <label style={styles.label}>약국 전화</label>
-                    <input type="tel" style={styles.input} value={roleForm.businessPhone}
-                      onChange={e => setRoleForm({ ...roleForm, businessPhone: e.target.value.replace(/\D/g, '') })}
-                      placeholder="숫자만 입력 (선택)" maxLength={11} />
-                  </div>
-                  <div style={styles.field}>
-                    <label style={styles.label}>담당자 전화</label>
-                    <input type="tel" style={styles.input} value={roleForm.managerPhone}
-                      onChange={e => setRoleForm({ ...roleForm, managerPhone: e.target.value.replace(/\D/g, '') })}
-                      placeholder="숫자만 입력 (선택)" maxLength={11} />
-                  </div>
+                  {/* 8-10. 우편번호 / 기본주소 / 상세주소 — AddressSearch 컴포넌트 */}
                   <div style={styles.field}>
                     <label style={styles.label}>약국 주소</label>
                     <AddressSearch
@@ -637,7 +649,7 @@ export function MyProfilePage() {
                   </div>
                   <p style={styles.hint}>
                     여기서 수정한 정보는 본인 사업자 정보 (cache) 에 저장됩니다.
-                    채널 운영 / 정산 등 매장 canonical 정보는{' '}
+                    개설자 연락처, 사업자등록번호 등 매장 canonical 정보는{' '}
                     <Link to="/store/info" style={{ color: colors.primary }}>약국 정보 페이지</Link>
                     에서 수정해 주세요.
                   </p>
@@ -707,45 +719,81 @@ export function MyProfilePage() {
                 <span style={styles.infoValue}>{profile?.pharmacist?.workplace || '-'}</span>
               </div>
 
-              {/* 약국 개설자: 약국 정보 */}
+              {/* 약국 개설자: 약국 정보 — WO-O4O-KPA-PHARMACY-INFO-VIEW-EDIT-CANONICAL-ALIGNMENT-V1
+                  canonical 10 필드 순서 (약국명/약국 전화번호/개설자 연락처/대표자명/담당자명/사업자등록번호/
+                  세금계산서 이메일/우편번호/기본주소/상세주소). "담당자 전화" 제거. */}
               {isPharmacyOwner && (
                 <>
                   <div style={styles.bizDivider} />
+                  {/* 1. 약국명 */}
                   <div style={styles.infoRow}>
                     <span style={styles.infoLabel}>약국명</span>
                     <span style={styles.infoValue}>{pharmacyName || <span style={styles.notRegistered}>등록 필요</span>}</span>
                   </div>
-                  {(pharmacyAddressDetail || pharmacyAddressFallback) ? (
-                    <>
-                      {pharmacyAddressDetail?.zipCode && (
-                        <div style={styles.infoRow}>
-                          <span style={styles.infoLabel}>우편번호</span>
-                          <span style={styles.infoValue}>{pharmacyAddressDetail.zipCode}</span>
-                        </div>
-                      )}
-                      <div style={styles.infoRow}>
-                        <span style={styles.infoLabel}>약국 주소</span>
-                        <span style={styles.infoValue}>
-                          {pharmacyAddressDetail?.baseAddress || pharmacyAddressFallback || '-'}
-                        </span>
-                      </div>
-                      {pharmacyAddressDetail?.detailAddress && (
-                        <div style={styles.infoRow}>
-                          <span style={styles.infoLabel}>상세주소</span>
-                          <span style={styles.infoValue}>{pharmacyAddressDetail.detailAddress}</span>
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <div style={styles.infoRow}>
-                      <span style={styles.infoLabel}>약국 주소</span>
-                      <span style={styles.infoValue}>-</span>
-                    </div>
-                  )}
+                  {/* 2. 약국 전화번호 */}
                   <div style={styles.infoRow}>
                     <span style={styles.infoLabel}>약국 전화번호</span>
                     <span style={styles.infoValue}>{pharmacyPhone || '-'}</span>
                   </div>
+                  {/* 3. 개설자 연락처 */}
+                  <div style={styles.infoRow}>
+                    <span style={styles.infoLabel}>개설자 연락처</span>
+                    <span style={styles.infoValue}>{pharmacyOwnerPhone || '-'}</span>
+                  </div>
+                  {/* 4. 대표자명 */}
+                  <div style={styles.infoRow}>
+                    <span style={styles.infoLabel}>대표자명</span>
+                    <span style={styles.infoValue}>{pharmacyCeoName || '-'}</span>
+                  </div>
+                  {/* 5. 담당자명 */}
+                  <div style={styles.infoRow}>
+                    <span style={styles.infoLabel}>담당자명</span>
+                    <span style={styles.infoValue}>{pharmacyContactName || '-'}</span>
+                  </div>
+                  {/* 6. 사업자등록번호 */}
+                  <div style={styles.infoRow}>
+                    <span style={styles.infoLabel}>사업자등록번호</span>
+                    <span style={styles.infoValue}>{pharmacyBusinessNumber || '-'}</span>
+                  </div>
+                  {/* 7. 세금계산서 이메일 */}
+                  <div style={styles.infoRow}>
+                    <span style={styles.infoLabel}>세금계산서 이메일</span>
+                    <span style={styles.infoValue}>{pharmacyTaxInvoiceEmail || '-'}</span>
+                  </div>
+                  {/* 8-10. 우편번호 / 기본주소 / 상세주소 */}
+                  {(pharmacyAddressDetail || pharmacyAddressFallback) ? (
+                    <>
+                      <div style={styles.infoRow}>
+                        <span style={styles.infoLabel}>우편번호</span>
+                        <span style={styles.infoValue}>{pharmacyAddressDetail?.zipCode || '-'}</span>
+                      </div>
+                      <div style={styles.infoRow}>
+                        <span style={styles.infoLabel}>기본주소</span>
+                        <span style={styles.infoValue}>
+                          {pharmacyAddressDetail?.baseAddress || pharmacyAddressFallback || '-'}
+                        </span>
+                      </div>
+                      <div style={styles.infoRow}>
+                        <span style={styles.infoLabel}>상세주소</span>
+                        <span style={styles.infoValue}>{pharmacyAddressDetail?.detailAddress || '-'}</span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div style={styles.infoRow}>
+                        <span style={styles.infoLabel}>우편번호</span>
+                        <span style={styles.infoValue}>-</span>
+                      </div>
+                      <div style={styles.infoRow}>
+                        <span style={styles.infoLabel}>기본주소</span>
+                        <span style={styles.infoValue}>-</span>
+                      </div>
+                      <div style={styles.infoRow}>
+                        <span style={styles.infoLabel}>상세주소</span>
+                        <span style={styles.infoValue}>-</span>
+                      </div>
+                    </>
+                  )}
                   <div style={styles.infoRow}>
                     <span style={styles.infoLabel}>약국 정보 관리</span>
                     <Link to="/store/info" style={{ color: colors.primary, fontSize: '14px', fontWeight: 500, textDecoration: 'none' }}>
