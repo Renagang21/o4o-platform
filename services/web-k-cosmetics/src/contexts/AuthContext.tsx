@@ -59,6 +59,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Lazy session check - only called when entering protected routes
   const checkSession = async () => {
     if (isSessionChecked || sessionCheckInProgressRef.current) return;
+    // WO-O4O-AUTH-RUNTIME-DRIFT-CLEANUP-V1: token guard — 토큰 없으면 API 호출 생략 (GlycoPharm/KPA/Neture 패턴 정렬)
+    if (!getAccessToken()) {
+      setIsSessionChecked(true);
+      return;
+    }
     sessionCheckInProgressRef.current = true;
 
     setIsLoading(true);

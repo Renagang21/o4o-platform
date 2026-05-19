@@ -46,7 +46,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  // WO-O4O-AUTH-RUNTIME-DRIFT-CLEANUP-V1: 토큰 없으면 spinner 불필요 — GlycoPharm 패턴 정렬
+  const [isLoading, setIsLoading] = useState(() => !!getAccessToken());
 
   useEffect(() => {
     const checkSession = async () => {
