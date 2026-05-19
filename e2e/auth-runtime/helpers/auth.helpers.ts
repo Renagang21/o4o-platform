@@ -162,11 +162,20 @@ export async function loginAs(
 
 /**
  * localStorage에서 auth 토큰 제거 (로그아웃 없이 강제 토큰 클리어)
+ *
+ * auth-client clearAllTokens()와 동일한 범위로 제거:
+ * - 표준 키: o4o_accessToken, o4o_refreshToken
+ * - 레거시 키: accessToken, authToken, token, refreshToken
+ * - admin-auth-storage (getAccessToken() fallback — 미제거 시 token guard 우회)
  */
 export async function clearAuthTokens(page: Page): Promise<void> {
   await page.evaluate(() => {
-    localStorage.removeItem('o4o_accessToken');
-    localStorage.removeItem('o4o_refreshToken');
+    const keys = [
+      'o4o_accessToken', 'o4o_refreshToken',
+      'accessToken', 'authToken', 'token', 'refreshToken',
+      'admin-auth-storage', 'user',
+    ];
+    keys.forEach((k) => localStorage.removeItem(k));
   });
 }
 
@@ -174,12 +183,20 @@ export async function clearAuthTokens(page: Page): Promise<void> {
  * AUTH_TOKEN_CLEARED_EVENT 강제 발행 (token-refresh 실패 시뮬레이션)
  * 실제 auth-client는 이벤트 발행 전에 토큰을 localStorage에서 먼저 제거한다.
  * 이를 재현하기 위해 localStorage 클리어 + 이벤트 발행을 동시에 수행한다.
+ *
+ * auth-client clearAllTokens()와 동일한 범위로 제거:
+ * - 표준 키: o4o_accessToken, o4o_refreshToken
+ * - 레거시 키: accessToken, authToken, token, refreshToken
+ * - admin-auth-storage (getAccessToken() fallback — 미제거 시 checkSession 토큰 가드 우회)
  */
 export async function dispatchTokenClearedEvent(page: Page): Promise<void> {
   await page.evaluate(() => {
-    // auth-client 동작 재현: 토큰 제거 → 이벤트 발행
-    localStorage.removeItem('o4o_accessToken');
-    localStorage.removeItem('o4o_refreshToken');
+    const keys = [
+      'o4o_accessToken', 'o4o_refreshToken',
+      'accessToken', 'authToken', 'token', 'refreshToken',
+      'admin-auth-storage', 'user',
+    ];
+    keys.forEach((k) => localStorage.removeItem(k));
     window.dispatchEvent(new CustomEvent('auth:token-cleared'));
   });
 }

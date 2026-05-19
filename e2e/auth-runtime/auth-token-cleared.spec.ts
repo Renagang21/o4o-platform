@@ -19,6 +19,7 @@ import {
   loginAs,
   dispatchTokenClearedEvent,
   clearAuthTokens,
+  waitForLoadingComplete,
 } from './helpers/auth.helpers';
 
 for (const svc of ALL_SERVICES) {
@@ -49,7 +50,10 @@ for (const svc of ALL_SERVICES) {
 
       // protected route로 이동 (SPA 내에서 live 상태 유지)
       await page.goto(`${svc.baseUrl}${svc.protectedPath}`, { waitUntil: 'domcontentloaded' });
-      await page.waitForTimeout(3000);
+      // auth 로딩 완료 대기 — K-Cosmetics checkSession() 완료(sessionCheckInProgressRef=false) 보장
+      // 이벤트 발행 전 ref가 false여야 token-cleared handler의 재체크 호출이 차단되지 않음
+      await waitForLoadingComplete(page, 8000);
+      await page.waitForTimeout(1000);
 
       const urlBefore = page.url();
       if (urlBefore.includes('/login')) {
@@ -61,7 +65,9 @@ for (const svc of ALL_SERVICES) {
       await dispatchTokenClearedEvent(page);
 
       // React state 업데이트 + SPA redirect 대기
-      await page.waitForTimeout(3000);
+      // /login redirect를 active하게 대기 (고정 timeout 대신 event-driven).
+      // KPA AdminAuthGuard는 URL 유지 + access-denied 카드 → waitForURL timeout (catch) 후 card assertion.
+      await page.waitForURL(/\/login/, { timeout: 7000 }).catch(() => {});
 
       const urlAfter = page.url();
       // SPA 레벨에서 RoleGuard가 /login으로 redirect해야 함
@@ -83,21 +89,6 @@ for (const svc of ALL_SERVICES) {
         urlAfter === svc.baseUrl ||
         hasAccessDenied ||
         hasLoginForm;
-
-      if (svc.name === 'K-Cosmetics') {
-        /**
-         * K-Cosmetics: lazy session 전략으로 인해 token-cleared 이후
-         * setIsSessionChecked(false) → checkSession() 재호출 →
-         * 서버 쿠키 세션이 존재하면 /auth/me가 user를 복원하고 localStorage 토큰을 재발급함.
-         *
-         * WO-O4O-AUTH-RUNTIME-DRIFT-CLEANUP-V1에서 추가한 token guard 배포 완료 후:
-         * getAccessToken()=null → /auth/me 미호출 → redirect 정상화 예정.
-         *
-         * CI/CD 배포 완료 전까지 이 케이스는 pending (token이 서버에서 복원됨이 확인됨).
-         */
-        console.log('[K-Cosmetics] token-cleared SPA redirect: token guard 배포 대기 중 — skip');
-        return;
-      }
 
       expect(
         isBlocked,
