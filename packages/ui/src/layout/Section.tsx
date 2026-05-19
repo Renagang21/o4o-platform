@@ -70,29 +70,63 @@ export function PageHero({ children, className, template, ...props }: PageHeroPr
 
 // ─── PageSection ───────────────────────────────────────────────────────────
 
+/**
+ * Section spacing variant (mobile-first).
+ *
+ * - `compact`: mb-6 md:mb-8 (24px → 32px) — Hub 내부 dense layout
+ * - `default`: mb-8 md:mb-12 (32px → 48px) — 일반 콘텐츠 섹션
+ * - `relaxed`: mb-12 md:mb-16 lg:mb-20 (48px → 64px → 80px) — Hero 인접, breathing layout
+ *
+ * 기존 사용처 호환을 위해 prop 미지정 시 `default`를 적용한다.
+ * 단, `default`는 mb-12 단일값에서 mb-8 md:mb-12로 mobile-first 축소된다.
+ */
+export type PageSectionSpacing = 'compact' | 'default' | 'relaxed';
+
+const sectionSpacingMap: Record<PageSectionSpacing, string> = {
+  compact: 'mb-6 md:mb-8',
+  default: 'mb-8 md:mb-12',
+  relaxed: 'mb-12 md:mb-16 lg:mb-20',
+};
+
 export interface PageSectionProps extends HTMLAttributes<HTMLElement> {
   children: ReactNode;
   /** 마지막 섹션처럼 하단 여백을 제거할 때 사용 */
   last?: boolean;
   /** Template tokens — auto-applies section spacing class */
   template?: SectionTemplate;
+  /**
+   * Section spacing variant (mobile-first).
+   * 미지정 시 `default` (mb-8 md:mb-12).
+   * template prop 또는 Context의 section.spacing이 있으면 그 값이 우선.
+   */
+  spacing?: PageSectionSpacing;
 }
 
 /**
- * 페이지 콘텐츠 섹션 래퍼. 하단에 항상 mb-12(48px) 여백을 둔다.
+ * 페이지 콘텐츠 섹션 래퍼. 하단에 mobile-first margin을 둔다.
  * 마지막 섹션은 last={true}로 여백을 제거할 수 있다.
- * template prop > Context > 없음 순으로 template를 결정한다.
+ *
+ * 우선순위:
+ *   1. template prop (있으면)
+ *   2. TemplateProvider Context의 section
+ *   3. spacing prop variant (없으면 'default')
  *
  * @example
- * // TemplateProvider가 있으면 prop 없이도 자동 적용
- * <PageSection>
- *   <NewsNoticesSection ... />
+ * <PageSection spacing="compact">
+ *   <KpiGrid ... />
  * </PageSection>
  */
-export function PageSection({ children, className, last = false, template, ...props }: PageSectionProps) {
+export function PageSection({
+  children,
+  className,
+  last = false,
+  template,
+  spacing = 'default',
+  ...props
+}: PageSectionProps) {
   const ctx = useTemplate();
   const resolved = template ?? ctx?.section;
-  const base = last ? '' : 'mb-12';
+  const base = last ? '' : sectionSpacingMap[spacing];
   const tpl = resolved?.spacing ?? '';
   return (
     <section
