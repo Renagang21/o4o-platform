@@ -21,7 +21,8 @@ import type {
   ChannelProductItem,
 } from './types.js';
 
-const BASE = '/api/v1/store/products';
+const BASE = '/store/products';
+const CHANNEL_BASE = '/store/channel-products';
 
 // ── 검색/조회/등록 ──────────────────────────────────────────────────────────
 
@@ -171,7 +172,7 @@ export async function getMyChannels(): Promise<StoreChannel[]> {
  */
 export async function getChannelProducts(channelId: string): Promise<ChannelProductItem[]> {
   const res = await authClient.api.get<{ success: boolean; data: ChannelProductItem[] }>(
-    `/api/v1/store/channel-products/${channelId}`,
+    `${CHANNEL_BASE}/${channelId}`,
   );
   return res.data?.data ?? [];
 }
@@ -186,7 +187,7 @@ export async function addProductToChannel(
   const res = await authClient.api.post<{
     success: boolean;
     data: { id: string; reactivated: boolean };
-  }>(`/api/v1/store/channel-products/${channelId}`, { productListingId });
+  }>(`${CHANNEL_BASE}/${channelId}`, { productListingId });
   return res.data;
 }
 
@@ -200,7 +201,7 @@ export async function toggleChannelProduct(
 ): Promise<{ success: boolean }> {
   const action = activate ? 'activate' : 'deactivate';
   const res = await authClient.api.patch<{ success: boolean }>(
-    `/api/v1/store/channel-products/${channelId}/${productChannelId}/${action}`,
+    `${CHANNEL_BASE}/${channelId}/${productChannelId}/${action}`,
   );
   return res.data;
 }
