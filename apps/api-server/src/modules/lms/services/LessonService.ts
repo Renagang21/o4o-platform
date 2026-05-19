@@ -2,7 +2,6 @@ import { Repository } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
 import { BaseService } from '../../../common/base.service.js';
 import { Lesson, LessonType } from '@o4o/lms-core';
-import { CourseService } from './CourseService.js';
 import logger from '../../../utils/logger.js';
 
 export interface CreateLessonRequest {
@@ -85,8 +84,9 @@ export class LessonService extends BaseService<Lesson> {
 
     logger.info(`[LMS] Lesson created: ${saved.title}`, { id: saved.id, courseId: data.courseId });
 
-    // WO-O4O-LMS-COURSE-REAPPROVAL-FLOW-V1
-    await CourseService.getInstance().maybeRevertToPendingReview(data.courseId);
+    // WO-O4O-KPA-LMS-LESSON-AUTONOMY-V1:
+    //   승인된 강의 내 레슨 생성은 강사 자율 영역이므로 course 재승인을 트리거하지 않는다.
+    //   (이전: WO-O4O-LMS-COURSE-REAPPROVAL-FLOW-V1 호출 제거)
 
     return saved;
   }
@@ -153,8 +153,8 @@ export class LessonService extends BaseService<Lesson> {
 
     logger.info(`[LMS] Lesson updated: ${updated.title}`, { id: updated.id });
 
-    // WO-O4O-LMS-COURSE-REAPPROVAL-FLOW-V1
-    await CourseService.getInstance().maybeRevertToPendingReview(updated.courseId);
+    // WO-O4O-KPA-LMS-LESSON-AUTONOMY-V1:
+    //   승인된 강의 내 레슨 수정은 강사 자율 영역이므로 course 재승인을 트리거하지 않는다.
 
     return updated;
   }
@@ -165,13 +165,12 @@ export class LessonService extends BaseService<Lesson> {
       throw new Error(`Lesson not found: ${id}`);
     }
 
-    const courseId = lesson.courseId; // remove 후엔 access 불가, 미리 캡처
     await this.lessonRepository.remove(lesson);
 
     logger.info(`[LMS] Lesson deleted: ${lesson.title}`, { id });
 
-    // WO-O4O-LMS-COURSE-REAPPROVAL-FLOW-V1
-    await CourseService.getInstance().maybeRevertToPendingReview(courseId);
+    // WO-O4O-KPA-LMS-LESSON-AUTONOMY-V1:
+    //   승인된 강의 내 레슨 삭제는 강사 자율 영역이므로 course 재승인을 트리거하지 않는다.
   }
 
   async reorderLessons(courseId: string, lessonIds: string[]): Promise<void> {
@@ -184,7 +183,7 @@ export class LessonService extends BaseService<Lesson> {
 
     logger.info(`[LMS] Lessons reordered for course ${courseId}`);
 
-    // WO-O4O-LMS-COURSE-REAPPROVAL-FLOW-V1
-    await CourseService.getInstance().maybeRevertToPendingReview(courseId);
+    // WO-O4O-KPA-LMS-LESSON-AUTONOMY-V1:
+    //   승인된 강의 내 레슨 순서 변경은 강사 자율 영역이므로 course 재승인을 트리거하지 않는다.
   }
 }

@@ -116,7 +116,6 @@ const s: Record<string, React.CSSProperties> = {
   emptyDesc: { fontSize: 13, color: '#9ca3af', marginBottom: 20 },
   createdBanner: { display: 'flex', alignItems: 'center', gap: 12, padding: '14px 18px', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 10, marginBottom: 24, fontSize: 14, color: '#15803d' },
   createdBannerBtn: { marginLeft: 'auto', padding: '6px 14px', background: '#10b981', color: '#fff', border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' as const },
-  publishSmBtn: { padding: '4px 10px', border: 'none', borderRadius: 5, fontSize: 12, cursor: 'pointer' },
   dragHandle: { cursor: 'grab', color: '#9ca3af', fontSize: 16, userSelect: 'none' as const, paddingRight: 4 },
   dragOver: { borderColor: '#4f46e5', background: '#f5f3ff' },
   modal: {
@@ -645,15 +644,8 @@ export default function CourseEditPage() {
     await loadData();
   };
 
-  // WO-KPA-LMS-UX-QUICK-WINS-V1: 레슨 발행 토글
-  const handleTogglePublish = async (lesson: Lesson) => {
-    try {
-      await lmsInstructorApi.updateLesson(lesson.id, { isPublished: !lesson.isPublished });
-      await loadData();
-    } catch {
-      alert('발행 상태 변경에 실패했습니다.');
-    }
-  };
+  // WO-O4O-KPA-LMS-LESSON-AUTONOMY-V1:
+  //   레슨 단위 발행/비공개 토글 제거. 수강생 노출은 강의 승인 상태로만 결정한다.
 
   // WO-KPA-LMS-UX-QUICK-WINS-V1: 드래그 정렬
   const handleDragStart = (index: number) => {
@@ -743,15 +735,16 @@ export default function CourseEditPage() {
             운영자 검토 중입니다. 검토가 완료되면 알림이 표시됩니다.
           </div>
         )}
-        {/* WO-O4O-LMS-COURSE-REAPPROVAL-FLOW-V1: PUBLISHED 상태에서 수정 시 재검토 안내 */}
+        {/* WO-O4O-LMS-COURSE-REAPPROVAL-FLOW-V1 + WO-O4O-KPA-LMS-LESSON-AUTONOMY-V1:
+            레슨은 강사 자율 편집 영역이므로 재검토 대상에서 제외. 강의 정보·퀴즈·과제 수정은 여전히 재검토 회귀. */}
         {course.status === 'published' && (
           <div style={{
             padding: '12px 14px', background: '#fffbeb', border: '1px solid #fde68a',
             color: '#92400e', borderRadius: 8, fontSize: 13, marginBottom: 12, lineHeight: 1.5,
           }}>
-            <strong>공개 중인 강의입니다.</strong> 강의 정보, 레슨, 퀴즈/과제 등을 수정하면
+            <strong>공개 중인 강의입니다.</strong> 강의 정보·퀴즈·과제를 수정하면
             자동으로 <strong>재검토 대기 상태</strong>로 전환되어 사용자 노출이 일시 중단됩니다.
-            운영자 재승인 후 다시 공개됩니다.
+            운영자 재승인 후 다시 공개됩니다. 레슨 추가/수정/삭제/순서변경은 재검토 없이 즉시 반영됩니다.
           </div>
         )}
         <div style={s.card}>
@@ -943,16 +936,11 @@ export default function CourseEditPage() {
                   <div style={s.lessonTitle}>{lesson.title}</div>
                   <div style={s.lessonMeta}>
                     {LESSON_TYPE_LABEL[lesson.type] || lesson.type} · {lesson.duration > 0 ? `${lesson.duration}분` : '시간 미설정'}
-                    {!lesson.isPublished && <span style={{ marginLeft: 6, color: '#f59e0b' }}>미발행</span>}
                   </div>
                 </div>
+                {/* WO-O4O-KPA-LMS-LESSON-AUTONOMY-V1:
+                    레슨 단위 발행/비공개 토글 제거. 수강생 노출은 강의 승인 상태로만 결정. */}
                 <div style={s.lessonActions}>
-                  <button
-                    style={{ ...s.publishSmBtn, background: lesson.isPublished ? '#fef3c7' : '#d1fae5', color: lesson.isPublished ? '#92400e' : '#065f46' }}
-                    onClick={() => handleTogglePublish(lesson)}
-                  >
-                    {lesson.isPublished ? '비공개' : '발행'}
-                  </button>
                   <button style={s.editSmBtn} onClick={() => setLessonModal({ open: true, lesson })}>편집</button>
                   <button style={s.delSmBtn} onClick={() => handleDeleteLesson(lesson.id)}>삭제</button>
                 </div>
