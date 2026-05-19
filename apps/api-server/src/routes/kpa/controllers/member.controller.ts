@@ -1066,6 +1066,12 @@ export function createMemberController(
     body('zipCode').optional({ nullable: true }).isString().isLength({ max: 10 }),
     body('address1').optional({ nullable: true }).isString().isLength({ max: 200 }),
     body('address2').optional({ nullable: true }).isString().isLength({ max: 100 }),
+    // WO-O4O-KPA-OPERATOR-MEMBER-BUSINESS-INFO-EDIT-PAYLOAD-ALIGNMENT-V1:
+    //   canonical 약국 정보 3개 필드 운영자 수정 허용 — additive payload 확장.
+    //   정책 B: write 는 canonical key 만 사용 (legacy alias representativeName/taxEmail 재저장 금지).
+    body('ownerPhone').optional({ nullable: true }).isString().isLength({ max: 50 }),
+    body('ceoName').optional({ nullable: true }).isString().isLength({ max: 50 }),
+    body('taxInvoiceEmail').optional({ nullable: true }).isString().isEmail().isLength({ max: 254 }),
     // WO-O4O-KPA-MEMBER-CAPABILITY-NICKNAME-UI-CANONICAL-CLEANUP-V1: nickname 수정 허용
     body('nickname').optional({ nullable: true }).isString().isLength({ max: 50 }),
     handleValidationErrors,
@@ -1139,6 +1145,9 @@ export function createMemberController(
           contactName,
           // WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1: canonical split address fields
           zipCode, address1, address2,
+          // WO-O4O-KPA-OPERATOR-MEMBER-BUSINESS-INFO-EDIT-PAYLOAD-ALIGNMENT-V1:
+          //   canonical 3개 필드 추가 (정책 B: canonical key 만 destructure).
+          ownerPhone, ceoName, taxInvoiceEmail,
         } = req.body;
         const changes: Record<string, any> = {};
         const warnings: string[] = [];
@@ -1197,7 +1206,9 @@ export function createMemberController(
         let nextBiz: Record<string, any> | null = null;
         const hasBizUpdate = business_number !== undefined || pharmacy_phone !== undefined
           || contactName !== undefined
-          || zipCode !== undefined || address1 !== undefined || address2 !== undefined;
+          || zipCode !== undefined || address1 !== undefined || address2 !== undefined
+          // WO-O4O-KPA-OPERATOR-MEMBER-BUSINESS-INFO-EDIT-PAYLOAD-ALIGNMENT-V1: 3개 필드 추가
+          || ownerPhone !== undefined || ceoName !== undefined || taxInvoiceEmail !== undefined;
         if (hasBizUpdate) {
           nextBiz = { ...prevBiz };
           if (business_number !== undefined) {
@@ -1212,6 +1223,15 @@ export function createMemberController(
           if (zipCode !== undefined) { nextBiz.zipCode = zipCode || null; changes.zipCode = zipCode; }
           if (address1 !== undefined) { nextBiz.address = address1 || null; changes.address1 = address1; }
           if (address2 !== undefined) { nextBiz.address2 = address2 || null; changes.address2 = address2; }
+          // WO-O4O-KPA-OPERATOR-MEMBER-BUSINESS-INFO-EDIT-PAYLOAD-ALIGNMENT-V1:
+          //   정책 B (canonical-only write): ownerPhone / ceoName / taxInvoiceEmail 만 저장.
+          //   representativeName / taxEmail 등 legacy alias 는 재저장하지 않음 (prevBiz spread 로
+          //   그대로 보존됨 — 신규 write 에서 절대 touch 금지).
+          //   정책 A (빈 문자열 = 변경 없음): frontend 변경 감지가 빈 값 skip 을 보장하므로
+          //   payload 에 키 자체가 없으면 분기 미진입 (기존 패턴과 동일).
+          if (ownerPhone !== undefined) { nextBiz.ownerPhone = ownerPhone || null; changes.ownerPhone = ownerPhone; }
+          if (ceoName !== undefined) { nextBiz.ceoName = ceoName || null; changes.ceoName = ceoName; }
+          if (taxInvoiceEmail !== undefined) { nextBiz.taxInvoiceEmail = taxInvoiceEmail || null; changes.taxInvoiceEmail = taxInvoiceEmail; }
           await dataSource.query(
             `UPDATE users SET "businessInfo" = $1::jsonb, "updatedAt" = NOW() WHERE id = $2`,
             [JSON.stringify(nextBiz), member.user_id]

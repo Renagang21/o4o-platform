@@ -352,6 +352,11 @@ export default function MemberManagementPage() {
     address2: string;
     business_number: string;
     pharmacy_phone: string;
+    // WO-O4O-KPA-OPERATOR-MEMBER-BUSINESS-INFO-EDIT-PAYLOAD-ALIGNMENT-V1:
+    //   canonical 약국 정보 3개 필드 운영자 수정 가능 (개설자 연락처/대표자명/세금계산서 이메일).
+    ownerPhone: string;
+    ceoName: string;
+    taxInvoiceEmail: string;
     status: MemberStatus;
   }>({
     name: '',
@@ -367,6 +372,9 @@ export default function MemberManagementPage() {
     address2: '',
     business_number: '',
     pharmacy_phone: '',
+    ownerPhone: '',
+    ceoName: '',
+    taxInvoiceEmail: '',
     status: 'active',
   });
   const [savingEdit, setSavingEdit] = useState(false);
@@ -502,6 +510,11 @@ export default function MemberManagementPage() {
       address2: m.business_info?.address2 || '',
       business_number: m.business_info?.businessNumber || '',
       pharmacy_phone: m.business_info?.pharmacy_phone || '',
+      // WO-O4O-KPA-OPERATOR-MEMBER-BUSINESS-INFO-EDIT-PAYLOAD-ALIGNMENT-V1:
+      //   정책 B (canonical-only): canonical key 우선, legacy alias 는 read fallback 으로만 사용.
+      ownerPhone: m.business_info?.ownerPhone || '',
+      ceoName: m.business_info?.ceoName || m.business_info?.representativeName || '',
+      taxInvoiceEmail: m.business_info?.taxInvoiceEmail || m.business_info?.taxEmail || '',
       status: m.status,
     });
     setIsEditing(true);
@@ -534,6 +547,10 @@ export default function MemberManagementPage() {
       address2: selectedMember.business_info?.address2 || '',
       business_number: selectedMember.business_info?.businessNumber || '',
       pharmacy_phone: selectedMember.business_info?.pharmacy_phone || '',
+      // WO-O4O-KPA-OPERATOR-MEMBER-BUSINESS-INFO-EDIT-PAYLOAD-ALIGNMENT-V1: canonical prefill
+      ownerPhone: selectedMember.business_info?.ownerPhone || '',
+      ceoName: selectedMember.business_info?.ceoName || selectedMember.business_info?.representativeName || '',
+      taxInvoiceEmail: selectedMember.business_info?.taxInvoiceEmail || selectedMember.business_info?.taxEmail || '',
       status: selectedMember.status,
     });
     setIsEditing(true);
@@ -598,12 +615,35 @@ export default function MemberManagementPage() {
       const currentPharmacyPhone = (selectedMember.business_info?.pharmacy_phone || '').trim();
       const newPharmacyPhone = editForm.pharmacy_phone.trim();
       const pharmacyPhoneChanged = newPharmacyPhone.length > 0 && newPharmacyPhone !== currentPharmacyPhone;
+
+      // WO-O4O-KPA-OPERATOR-MEMBER-BUSINESS-INFO-EDIT-PAYLOAD-ALIGNMENT-V1:
+      //   canonical 3개 필드 — 정책 A (빈 문자열 = 변경 없음) 적용. 정책 B (canonical fallback read).
+      const currentOwnerPhone = (selectedMember.business_info?.ownerPhone || '').trim();
+      const newOwnerPhone = editForm.ownerPhone.trim();
+      const ownerPhoneChanged = newOwnerPhone.length > 0 && newOwnerPhone !== currentOwnerPhone;
+      const currentCeoName = (
+        selectedMember.business_info?.ceoName
+        || selectedMember.business_info?.representativeName
+        || ''
+      ).trim();
+      const newCeoName = editForm.ceoName.trim();
+      const ceoNameChanged = newCeoName.length > 0 && newCeoName !== currentCeoName;
+      const currentTaxInvoiceEmail = (
+        selectedMember.business_info?.taxInvoiceEmail
+        || selectedMember.business_info?.taxEmail
+        || ''
+      ).trim();
+      const newTaxInvoiceEmail = editForm.taxInvoiceEmail.trim();
+      const taxInvoiceEmailChanged = newTaxInvoiceEmail.length > 0 && newTaxInvoiceEmail !== currentTaxInvoiceEmail;
+
       const statusChanged = editForm.status !== selectedMember.status;
 
       if (
         !nameChanged && !nicknameChanged && !typeChanged && !activityChanged && !licenseChanged
         && !pharmacyNameChanged && !pharmacyAddressChanged
-        && !businessNumberChanged && !pharmacyPhoneChanged && !contactNameChanged && !addressChanged && !statusChanged
+        && !businessNumberChanged && !pharmacyPhoneChanged && !contactNameChanged && !addressChanged
+        && !ownerPhoneChanged && !ceoNameChanged && !taxInvoiceEmailChanged
+        && !statusChanged
       ) {
         setIsEditing(false);
         return;
@@ -616,6 +656,7 @@ export default function MemberManagementPage() {
         nameChanged || nicknameChanged || typeChanged || activityChanged || licenseChanged
         || pharmacyNameChanged || pharmacyAddressChanged
         || businessNumberChanged || pharmacyPhoneChanged || contactNameChanged || addressChanged
+        || ownerPhoneChanged || ceoNameChanged || taxInvoiceEmailChanged
       ) {
         const payload: Record<string, string> = {};
         if (nameChanged) payload.name = newName;
@@ -637,6 +678,11 @@ export default function MemberManagementPage() {
           payload.address1 = newAddress1;
           payload.address2 = newAddress2;
         }
+        // WO-O4O-KPA-OPERATOR-MEMBER-BUSINESS-INFO-EDIT-PAYLOAD-ALIGNMENT-V1:
+        //   정책 A/B 준수: canonical key 만 전송, 빈 값은 변경 감지에서 이미 skip.
+        if (ownerPhoneChanged) payload.ownerPhone = newOwnerPhone;
+        if (ceoNameChanged) payload.ceoName = newCeoName;
+        if (taxInvoiceEmailChanged) payload.taxInvoiceEmail = newTaxInvoiceEmail;
         const infoRes = await apiClient.patch<{ success: boolean; warnings?: string[] }>(
           `/members/${selectedMember.id}/info`,
           payload,
@@ -1469,13 +1515,12 @@ export default function MemberManagementPage() {
                 </span>
               </div>
 
-              {/* 약국 정보 — WO-O4O-KPA-PHARMACY-INFO-VIEW-EDIT-CANONICAL-ALIGNMENT-V1:
-                  pharmacy_owner 의 view/edit 양쪽을 canonical 순서로 정렬.
-                  canonical 10 필드: 약국명/약국 전화번호/개설자 연락처/대표자명/담당자명/
-                  사업자등록번호/세금계산서 이메일/우편번호/기본주소/상세주소.
-                  EDIT 는 backend payload 지원 필드만 (개설자 연락처/대표자명/세금계산서 이메일은
-                  /store/info canonical 화면에서 수정 — operator PATCH /info 는 미지원).
-                  VIEW 는 모두 표시. 주소는 heuristic split (zipCode 5자리 prefix 분리). */}
+              {/* 약국 정보 — WO-O4O-KPA-OPERATOR-MEMBER-BUSINESS-INFO-EDIT-PAYLOAD-ALIGNMENT-V1:
+                  view/edit 모두 canonical 10 필드 완전 정합. edit 에서 개설자 연락처/대표자명/
+                  세금계산서 이메일 3개 추가 (PATCH /info payload 확장).
+                  정책 A: 빈 문자열 = 변경 없음. 정책 B: canonical key 만 write.
+                  canonical 10: 약국명/약국 전화번호/개설자 연락처/대표자명/담당자명/
+                  사업자등록번호/세금계산서 이메일/우편번호/기본주소/상세주소. */}
               {isEditing ? (
                 editForm.activity_type === 'pharmacy_owner' ? (
                   <>
@@ -1506,7 +1551,32 @@ export default function MemberManagementPage() {
                         style={inputStyle}
                       />
                     </div>
-                    {/* 5. 담당자명 (canonical pos 3~4 은 /store/info 에서만 수정) */}
+                    {/* 3. 개설자 연락처 */}
+                    <div style={fieldRowStyle}>
+                      <span style={labelStyle}>개설자 연락처</span>
+                      <input
+                        type="text"
+                        value={editForm.ownerPhone}
+                        onChange={(e) => setEditForm((f) => ({ ...f, ownerPhone: e.target.value }))}
+                        placeholder="개설자 본인 연락처 (선택)"
+                        disabled={savingEdit}
+                        style={inputStyle}
+                      />
+                    </div>
+                    {/* 4. 대표자명 */}
+                    <div style={fieldRowStyle}>
+                      <span style={labelStyle}>대표자명</span>
+                      <input
+                        type="text"
+                        value={editForm.ceoName}
+                        onChange={(e) => setEditForm((f) => ({ ...f, ceoName: e.target.value }))}
+                        placeholder="사업자등록증 대표자명 (선택)"
+                        maxLength={50}
+                        disabled={savingEdit}
+                        style={inputStyle}
+                      />
+                    </div>
+                    {/* 5. 담당자명 */}
                     <div style={fieldRowStyle}>
                       <span style={labelStyle}>담당자명</span>
                       <input
@@ -1519,7 +1589,7 @@ export default function MemberManagementPage() {
                         style={inputStyle}
                       />
                     </div>
-                    {/* 6. 사업자등록번호 (canonical pos 7 은 /store/info 에서만 수정) */}
+                    {/* 6. 사업자등록번호 */}
                     <div style={fieldRowStyle}>
                       <span style={labelStyle}>사업자등록번호 *</span>
                       <input
@@ -1532,6 +1602,19 @@ export default function MemberManagementPage() {
                           ...inputStyle,
                           borderColor: editForm.business_number.replace(/[^0-9]/g, '').length === 0 ? '#fca5a5' : inputStyle.border?.toString() ?? '#cbd5e1',
                         }}
+                      />
+                    </div>
+                    {/* 7. 세금계산서 이메일 */}
+                    <div style={fieldRowStyle}>
+                      <span style={labelStyle}>세금계산서 이메일</span>
+                      <input
+                        type="email"
+                        value={editForm.taxInvoiceEmail}
+                        onChange={(e) => setEditForm((f) => ({ ...f, taxInvoiceEmail: e.target.value }))}
+                        placeholder="세금계산서 수신 이메일 (선택)"
+                        maxLength={254}
+                        disabled={savingEdit}
+                        style={inputStyle}
                       />
                     </div>
                     {/* 8-10. 우편번호 / 기본주소 / 상세주소 — AddressSearch (zipCode/address1/address2 분리).
@@ -1562,7 +1645,7 @@ export default function MemberManagementPage() {
                       </div>
                     )}
                     <p style={{ fontSize: 11, color: '#64748b', margin: '8px 0 0' }}>
-                      ※ 개설자 연락처 / 대표자명 / 세금계산서 이메일은 약국 정보 페이지(/store/info)에서 수정합니다.
+                      ※ 빈 입력으로 저장하면 기존 값이 보존됩니다 (변경 없음 정책). 명시적 비우기는 미지원.
                     </p>
                   </>
                 ) : null
