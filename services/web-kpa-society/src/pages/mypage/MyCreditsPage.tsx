@@ -85,12 +85,12 @@ export function MyCreditsPage() {
 
   return (
     <MyPageLayout
-      title="네처 크레딧"
+      title="네뚜레 크레딧 (Neture Credit)"
       description="학습 활동으로 획득한 크레딧을 확인하세요"
       breadcrumb={[
         { label: '홈', href: '/' },
         { label: '마이페이지', href: '/mypage' },
-        { label: '네처 크레딧' },
+        { label: '네뚜레 크레딧 (Neture Credit)' },
       ]}
       width="wide"
     >
