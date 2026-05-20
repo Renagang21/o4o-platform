@@ -110,7 +110,15 @@ export async function fetchYouTubeTranscript(videoId: string): Promise<string | 
     const Transcript = (mod as any).YoutubeTranscript ?? (mod as any).default ?? mod;
     if (!Transcript || typeof Transcript.fetchTranscript !== 'function') return null;
 
-    const items: Array<{ text?: string }> = await Transcript.fetchTranscript(videoId).catch(() => []);
+    // 10s timeout — fetchTranscript can hang (never-reject) if YouTube blocks the request,
+    // which would stall the entire Promise.all in fetchYouTubeContent indefinitely.
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('transcript timeout')), 10000),
+    );
+    const items: Array<{ text?: string }> = await Promise.race([
+      Transcript.fetchTranscript(videoId),
+      timeoutPromise,
+    ]).catch(() => []);
     if (!Array.isArray(items) || items.length === 0) return null;
 
     const merged = items

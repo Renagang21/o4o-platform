@@ -466,11 +466,17 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
     setResult(null);
     setCopied(false);
 
+    // 90s client-side guard — backend can hang on transcript/AI; without this
+    // the finally block never fires and the spinner never clears.
+    const abortCtrl = new AbortController();
+    const abortTimer = setTimeout(() => abortCtrl.abort(), 90000);
+
     try {
       const response = await fetch(`${API_BASE_URL}/api/ai/url-to-blocks`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...aiRequestHeaders },
         credentials: 'include',
+        signal: abortCtrl.signal,
         body: JSON.stringify({
           url: urlInput.trim(),
           contentType: urlContentType,
@@ -515,8 +521,13 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
       });
       setResultTab('preview');
     } catch (err: any) {
-      setError(err.message || 'URL 콘텐츠 생성 중 오류가 발생했습니다.');
+      if (err?.name === 'AbortError') {
+        setError('URL 분석 시간이 초과되었습니다. (90초) 다시 시도하거나 다른 URL을 입력해 주세요.');
+      } else {
+        setError(err.message || 'URL 콘텐츠 생성 중 오류가 발생했습니다.');
+      }
     } finally {
+      clearTimeout(abortTimer);
       setLoading(false);
     }
   };

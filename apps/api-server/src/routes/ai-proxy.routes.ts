@@ -637,18 +637,34 @@ router.post('/url-to-blocks', authenticate, async (req, res: Response) => {
     ].filter(Boolean).join('\n');
 
     // 3. AI 호출 (기존 프록시 서비스 사용)
-    const aiResponse = await aiProxyService.generateRawContent(
-      {
-        provider: 'gemini',
-        model: 'gemini-2.5-flash',
-        systemPrompt,
-        userPrompt,
-        temperature: 0.5,
-        maxTokens: 8192,
-      },
-      userId,
-      requestId,
-    );
+    let aiResponse: Awaited<ReturnType<typeof aiProxyService.generateRawContent>>;
+    try {
+      aiResponse = await aiProxyService.generateRawContent(
+        {
+          provider: 'gemini',
+          model: 'gemini-2.5-flash',
+          systemPrompt,
+          userPrompt,
+          temperature: 0.5,
+          maxTokens: 8192,
+        },
+        userId,
+        requestId,
+      );
+    } catch (aiError: any) {
+      logger.error('[url-to-blocks] AI 생성 실패', { requestId, error: aiError.message, type: aiError.type });
+      const isTimeout = aiError.type === 'TIMEOUT_ERROR' || aiError.message?.includes('abort');
+      const isRateLimit = aiError.type === 'RATE_LIMIT_ERROR';
+      const statusCode = isTimeout ? 504 : isRateLimit ? 429 : 500;
+      return res.status(statusCode).json({
+        success: false,
+        error: isTimeout
+          ? 'AI 분석 시간이 초과되었습니다. 잠시 후 다시 시도해 주세요.'
+          : isRateLimit
+            ? 'AI 서비스 요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.'
+            : 'AI 콘텐츠 생성에 실패했습니다. 다시 시도해 주세요.',
+      });
+    }
 
     // 4. JSON 블록 파싱
     const rawText: string = aiResponse.rawText || '';
