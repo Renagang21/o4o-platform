@@ -395,6 +395,8 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: '8px',
     marginTop: '32px',
     paddingTop: '20px',
     borderTop: `1px solid ${colors.neutral200}`,
@@ -415,6 +417,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   authorActions: {
     display: 'flex',
+    flexWrap: 'wrap',
     gap: '8px',
   },
   pinButton: {
