@@ -95,11 +95,18 @@ export class EnrollmentService extends BaseService<Enrollment> {
       }
       // Reactivate terminal enrollment — reset progress
       // WO-O4O-LMS-INTEGRITY-PATCH-V1: completedLessonIds도 함께 초기화
-      existing.status = EnrollmentStatus.IN_PROGRESS;
+      // WO-O4O-LMS-ENROLLMENT-REACTIVATION-APPROVAL-FIX-V1:
+      // 재활성화 경로에도 신규 등록과 동일한 requiresApproval 정책 적용
+      const reactivateCourse = await this.courseService.getCourse(data.courseId);
+      const reactivateStatus = reactivateCourse?.requiresApproval
+        ? EnrollmentStatus.PENDING
+        : EnrollmentStatus.IN_PROGRESS;
+      const prevStatus = existing.status;
+      existing.status = reactivateStatus;
       existing.progressPercentage = 0;
       existing.completedLessons = 0;
       existing.enrolledAt = new Date();
-      existing.startedAt = new Date();
+      existing.startedAt = reactivateStatus === EnrollmentStatus.IN_PROGRESS ? new Date() : undefined as any;
       existing.completedAt = undefined as any;
       existing.metadata = { ...(existing.metadata || {}), completedLessonIds: [] };
       const reactivated = await this.enrollmentRepository.save(existing);
@@ -107,7 +114,9 @@ export class EnrollmentService extends BaseService<Enrollment> {
         enrollmentId: reactivated.id,
         userId: data.userId,
         courseId: data.courseId,
-        previousStatus: existing.status,
+        previousStatus: prevStatus,
+        newStatus: reactivateStatus,
+        requiresApproval: reactivateCourse?.requiresApproval ?? false,
       });
       return reactivated;
     }
