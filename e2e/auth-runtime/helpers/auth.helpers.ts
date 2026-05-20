@@ -222,6 +222,88 @@ export async function logoutViaApi(page: Page, baseUrl: string): Promise<void> {
   }, baseUrl);
 }
 
+// ─── UI Logout helper ────────────────────────────────────────────────────────
+
+/**
+ * UI logout — 드롭다운 트리거 클릭 → 로그아웃 버튼 클릭
+ *
+ * WO-O4O-AUTH-LOGOUT-SELECTOR-STABILIZATION-V1
+ *
+ * 지원 컴포넌트:
+ *   GlobalHeader (@o4o/ui, KPA / GlycoPharm / K-Cosmetics) — aria-label="사용자 메뉴"
+ *   GlobalUserProfileDropdown (@o4o/account-ui, Neture)     — aria-label="계정 메뉴"
+ *
+ * 실패 시 숨기지 않고 어느 단계에서 실패했는지 console.error로 보고한다.
+ */
+export async function clickLogoutViaUI(
+  page: Page,
+): Promise<{ success: boolean; method: string }> {
+  // 1) 로그아웃 버튼이 이미 바로 보이는지 확인 (드롭다운이 이미 열린 상태 or 모바일 메뉴)
+  const directLogout = page.locator('button:has-text("로그아웃"), a:has-text("로그아웃")').first();
+  if (await directLogout.isVisible({ timeout: 1000 }).catch(() => false)) {
+    await directLogout.click();
+    await page.waitForTimeout(2000);
+    return { success: true, method: 'direct-visible' };
+  }
+
+  // 2) 드롭다운 트리거 클릭 (서비스별 aria-label 순서로 시도)
+  const triggerSelectors = [
+    'button[aria-label="사용자 메뉴"]',  // GlobalHeader (KPA / GlycoPharm / K-Cosmetics)
+    'button[aria-label="계정 메뉴"]',    // GlobalUserProfileDropdown (Neture)
+    'button[aria-label*="사용자"]',
+    'button[aria-label*="계정"]',
+    'button[aria-haspopup="true"]',
+  ];
+
+  let triggeredBy = '';
+  for (const sel of triggerSelectors) {
+    const el = page.locator(sel).first();
+    if (await el.isVisible({ timeout: 2000 }).catch(() => false)) {
+      await el.click();
+      triggeredBy = sel;
+      break;
+    }
+  }
+
+  if (!triggeredBy) {
+    console.error(
+      '[clickLogoutViaUI] FAIL (step 1): 드롭다운 트리거 버튼 미발견.\n' +
+      '  원인 후보: 로그인 상태 아님 / 헤더가 아직 로드되지 않음 / aria-label 변경됨\n' +
+      `  시도한 셀렉터: ${triggerSelectors.join(', ')}\n` +
+      `  현재 URL: ${page.url()}`,
+    );
+    return { success: false, method: 'no-trigger' };
+  }
+
+  // 3) 드롭다운 열림 대기 후 로그아웃 버튼 탐색
+  await page.waitForTimeout(600);
+
+  const logoutSelectors = [
+    'button:has-text("로그아웃")',
+    '[role="menuitem"]:has-text("로그아웃")',
+    'a:has-text("로그아웃")',
+    '[data-testid="logout"]',
+    '[aria-label*="로그아웃"]',
+  ];
+
+  for (const sel of logoutSelectors) {
+    const el = page.locator(sel).first();
+    if (await el.isVisible({ timeout: 2000 }).catch(() => false)) {
+      await el.click();
+      await page.waitForTimeout(2000);
+      return { success: true, method: `trigger(${triggeredBy}) → ${sel}` };
+    }
+  }
+
+  console.error(
+    `[clickLogoutViaUI] FAIL (step 2): 트리거(${triggeredBy}) 클릭 후 로그아웃 버튼 미발견.\n` +
+    '  원인 후보: 드롭다운 미열림 / 버튼 텍스트 변경 / 렌더링 지연\n' +
+    `  시도한 셀렉터: ${logoutSelectors.join(', ')}\n` +
+    `  현재 URL: ${page.url()}`,
+  );
+  return { success: false, method: `trigger(${triggeredBy}) → logout-not-found` };
+}
+
 // ─── Wait helpers ────────────────────────────────────────────────────────────
 
 /**

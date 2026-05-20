@@ -19,29 +19,8 @@ import {
   loginAs,
   clearAuthTokens,
   logoutViaApi,
+  clickLogoutViaUI,
 } from './helpers/auth.helpers';
-
-/** 로그아웃 버튼 클릭 공통 helper */
-async function clickLogout(page: import('@playwright/test').Page): Promise<boolean> {
-  const selectors = [
-    'button:has-text("로그아웃")',
-    'a:has-text("로그아웃")',
-    'button:has-text("Logout")',
-    'a:has-text("Logout")',
-    '[data-testid="logout"]',
-    '[aria-label*="logout" i]',
-    '[aria-label*="로그아웃"]',
-  ];
-  for (const sel of selectors) {
-    const el = page.locator(sel).first();
-    if (await el.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await el.click();
-      await page.waitForTimeout(2000);
-      return true;
-    }
-  }
-  return false;
-}
 
 for (const svc of ALL_SERVICES) {
   test.describe(`[${svc.name}] Logout`, () => {
@@ -69,8 +48,9 @@ for (const svc of ALL_SERVICES) {
       await page.goto(`${svc.baseUrl}${svc.protectedPath}`, { waitUntil: 'domcontentloaded' });
       await page.waitForTimeout(2000);
 
-      // UI 로그아웃 시도
-      const loggedOut = await clickLogout(page);
+      // UI 로그아웃 시도 — 드롭다운 트리거 → 로그아웃 버튼 클릭 2단계
+      const { success: loggedOut, method } = await clickLogoutViaUI(page);
+      console.log(`[${svc.name}] UI logout: success=${loggedOut}, method=${method}`);
 
       if (loggedOut) {
         // SPA 내 로그아웃 → React가 setUser(null) → RoleGuard redirect
@@ -83,11 +63,10 @@ for (const svc of ALL_SERVICES) {
           urlAfter === svc.baseUrl;
         expect(redirectedOut, `[${svc.name}] 로그아웃 후 SPA redirect 없음: ${urlAfter}`).toBe(true);
       } else {
-        // 로그아웃 버튼 미발견 — localStorage 토큰 삭제 테스트로 대체 검증
-        // (로그아웃 버튼 위치는 서비스별 UX에 따라 다름)
+        // UI logout 실패 원인은 clickLogoutViaUI 내부에서 console.error로 보고됨
+        // localStorage 토큰 존재 확인으로 로그인 상태를 간접 검증
         const tokenBefore = await page.evaluate(() => !!localStorage.getItem('o4o_accessToken'));
-        expect(tokenBefore, `[${svc.name}] 로그인 상태에서 accessToken 없음`).toBe(true);
-        console.log(`[${svc.name}] SKIP: 로그아웃 버튼 미발견 — 로그인 상태 확인으로 대체`);
+        expect(tokenBefore, `[${svc.name}] 로그인 상태에서 accessToken 없음 (method: ${method})`).toBe(true);
       }
     });
 
@@ -110,8 +89,10 @@ for (const svc of ALL_SERVICES) {
       await page.goto(`${svc.baseUrl}${svc.protectedPath}`, { waitUntil: 'domcontentloaded' });
       await page.waitForTimeout(1500);
 
-      const loggedOut = await clickLogout(page);
+      const { success: loggedOut, method } = await clickLogoutViaUI(page);
+      console.log(`[${svc.name}] UI logout: success=${loggedOut}, method=${method}`);
       if (!loggedOut) {
+        // UI logout 실패 시 API 직접 호출로 fallback (토큰 클리어 보장)
         await logoutViaApi(page, svc.baseUrl);
       }
 
