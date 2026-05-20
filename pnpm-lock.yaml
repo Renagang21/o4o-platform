@@ -3457,6 +3457,9 @@ importers:
       '@o4o/account-ui':
         specifier: workspace:*
         version: link:../../packages/account-ui
+      '@o4o/admin-ux-core':
+        specifier: workspace:*
+        version: link:../../packages/admin-ux-core
       '@o4o/ai-components':
         specifier: workspace:*
         version: link:../../packages/o4o-ai-components

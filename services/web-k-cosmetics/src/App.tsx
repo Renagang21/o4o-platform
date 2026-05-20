@@ -114,6 +114,9 @@ import { useStoreCapabilities } from './hooks/useStoreCapabilities';
 // Store Settings (WO-STORE-COMMON-SETTINGS-KCOS-UI-V1)
 const StoreSettingsPage = lazy(() => import('@/pages/store/StoreSettingsPage'));
 
+// Admin Dashboard (WO-O4O-KCOS-ADMIN-DASHBOARD-DEDICATED-V1)
+const KCosmeticsAdminDashboard = lazy(() => import('@/pages/admin/KCosmeticsAdminDashboard'));
+
 // Operator Dashboard Pages
 const KCosmeticsOperatorDashboard = lazy(() => import('@/pages/operator/KCosmeticsOperatorDashboard'));
 const OperatorStoresPage = lazy(() => import('@/pages/operator/StoresPage'));
@@ -378,7 +381,8 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<KCosmeticsOperatorDashboard />} />
+        {/* WO-O4O-KCOS-ADMIN-DASHBOARD-DEDICATED-V1: Operator 재사용 → Admin 전용 뷰 분리 */}
+        <Route index element={<KCosmeticsAdminDashboard />} />
         <Route path="stores" element={<OperatorStoresPage />} />
         <Route path="stores/:storeId" element={<OperatorStoreDetailPage />} />
         <Route path="users" element={<OperatorUsersPage />} />
