@@ -506,6 +506,11 @@ export class CourseRequestService {
           isOrganizationExclusive: true,
           metadata: { kpaCourseRequestId: requestId, createdVia: 'kpa_extension' },
         });
+        // WO-O4O-LMS-COURSE-APPROVAL-PUBLISH-STATUS-FIX-V1: 승인된 강의는 즉시 published 상태로 전환
+        await queryRunner.query(
+          `UPDATE lms_courses SET status = 'published', "isPublished" = true, "publishedAt" = NOW() WHERE id = $1`,
+          [course.id],
+        );
         await queryRunner.query(
           `UPDATE kpa_approval_requests SET result_entity_id = $1, result_metadata = $2::jsonb, updated_at = NOW() WHERE id = $3`,
           [course.id, JSON.stringify({ courseId: course.id }), requestId],
@@ -552,6 +557,11 @@ export class CourseRequestService {
         isOrganizationExclusive: true,
         metadata: { kpaCourseRequestId: requestId, createdVia: 'kpa_extension' },
       });
+      // WO-O4O-LMS-COURSE-APPROVAL-PUBLISH-STATUS-FIX-V1: 승인된 강의는 즉시 published 상태로 전환
+      await queryRunner.query(
+        `UPDATE lms_courses SET status = 'published', "isPublished" = true, "publishedAt" = NOW() WHERE id = $1`,
+        [course.id],
+      );
       await queryRunner.query(
         `UPDATE kpa_course_requests SET created_course_id = $1 WHERE id = $2`,
         [course.id, requestId],
