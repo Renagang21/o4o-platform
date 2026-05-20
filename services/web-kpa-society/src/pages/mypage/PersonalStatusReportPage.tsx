@@ -205,7 +205,7 @@ export function PersonalStatusReportPage() {
           <form onSubmit={handleSubmit} style={styles.form}>
             <h4 style={styles.formTitle}>신상신고 정보 입력</h4>
 
-            <div style={styles.formGrid}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div style={styles.formField}>
                 <label style={styles.label}>근무형태 *</label>
                 <select
@@ -236,7 +236,7 @@ export function PersonalStatusReportPage() {
                 />
               </div>
 
-              <div style={styles.formFieldFull}>
+              <div style={{ display: 'flex', flexDirection: 'column' }} className="sm:col-span-2">
                 <label style={styles.label}>근무처 주소</label>
                 <input
                   type="text"
@@ -283,7 +283,7 @@ export function PersonalStatusReportPage() {
                 />
               </div>
 
-              <div style={styles.formFieldFull}>
+              <div style={{ display: 'flex', flexDirection: 'column' }} className="sm:col-span-2">
                 <label style={styles.label}>비고</label>
                 <textarea
                   name="remarks"

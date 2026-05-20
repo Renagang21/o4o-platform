@@ -67,6 +67,29 @@ const ORGANIZATION_ROLE_LABELS: Record<string, string> = {
 
 type TabKey = 'basic' | 'role';
 
+// WO-O4O-MYPAGE-FORM-MOBILE-V1: 모바일 stack, 데스크톱 row — infoRow 반응형 헬퍼
+function InfoRow({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div
+      style={{ padding: '16px 0', borderBottom: `1px solid ${colors.neutral100}` }}
+      className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1"
+    >
+      <span
+        style={{ color: colors.neutral500, fontWeight: 500, fontSize: '14px', lineHeight: '1.5' }}
+        className="shrink-0 sm:min-w-[140px]"
+      >
+        {label}
+      </span>
+      <div
+        style={{ color: colors.neutral900, fontSize: '14px', lineHeight: '1.5' }}
+        className="sm:text-right break-words flex-1 min-w-0"
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
 export function MyProfilePage() {
   const { user, setActivityType, checkAuth } = useAuth();
   const [profile, setProfile] = useState<ProfileResponse | null>(null);
@@ -441,6 +464,7 @@ export function MyProfilePage() {
 
             {isBasicEdit ? (
               <form onSubmit={handleBasicSave}>
+                {/* WO-O4O-MYPAGE-FORM-MOBILE-V1: flex-wrap으로 모바일 320px 이하에서도 성/이름 필드 분리 유지 */}
                 <div style={styles.nameRow}>
                   <div style={styles.nameField}>
                     <label style={styles.label}>성</label>
@@ -480,25 +504,13 @@ export function MyProfilePage() {
               </form>
             ) : (
               <div style={styles.profileView}>
-                <div style={styles.infoRow}>
-                  <span style={styles.infoLabel}>이름</span>
-                  <span style={styles.infoValue}>{profile?.name || '-'}</span>
-                </div>
-                <div style={styles.infoRow}>
-                  <span style={styles.infoLabel}>닉네임</span>
-                  <div style={{ textAlign: 'right' }}>
-                    <span style={styles.infoValue}>{profile?.nickname || '-'}</span>
-                    <p style={styles.hint}>포럼, 댓글 등 공개 화면에 표시됩니다.</p>
-                  </div>
-                </div>
-                <div style={styles.infoRow}>
-                  <span style={styles.infoLabel}>핸드폰</span>
-                  <span style={styles.infoValue}>{profile?.phone || '-'}</span>
-                </div>
-                <div style={styles.infoRow}>
-                  <span style={styles.infoLabel}>이메일</span>
-                  <span style={styles.infoValue}>{profile?.email || '-'}</span>
-                </div>
+                <InfoRow label="이름">{profile?.name || '-'}</InfoRow>
+                <InfoRow label="닉네임">
+                  <span>{profile?.nickname || '-'}</span>
+                  <p style={styles.hint}>포럼, 댓글 등 공개 화면에 표시됩니다.</p>
+                </InfoRow>
+                <InfoRow label="핸드폰">{profile?.phone || '-'}</InfoRow>
+                <InfoRow label="이메일">{profile?.email || '-'}</InfoRow>
                 <div style={styles.editButtonWrapper}>
                   <button type="button" style={styles.editButton} onClick={() => setIsBasicEdit(true)}>수정</button>
                 </div>
@@ -692,32 +704,19 @@ export function MyProfilePage() {
             </form>
           ) : (
             <div style={styles.profileView}>
-              <div style={styles.infoRow}>
-                <span style={styles.infoLabel}>약사면허</span>
-                <span style={styles.infoValue}>{profile?.pharmacist?.licenseNumber || '-'}</span>
-              </div>
+              <InfoRow label="약사면허">{profile?.pharmacist?.licenseNumber || '-'}</InfoRow>
 
-              <div style={styles.infoRow}>
-                <span style={styles.infoLabel}>직역</span>
-                <div style={{ textAlign: 'right' }}>
-                  <span style={styles.infoValue}>{activityType ? ACTIVITY_TYPE_LABELS[activityType] : '-'}</span>
-                  {/* WO-O4O-KPA-PROFILE-AND-STOREOWNER-UX-ALIGN-V1:
-                      pharmacy_owner 직역은 capability 가 아니라 자기소개. 분리 안내. */}
-                  {isPharmacyOwner && (
-                    <p style={styles.hint}>회원 본인 소개 정보입니다. 매장 운영은 아래 별도 항목에서 확인하세요.</p>
-                  )}
-                </div>
-              </div>
+              <InfoRow label="직역">
+                <span>{activityType ? ACTIVITY_TYPE_LABELS[activityType] : '-'}</span>
+                {/* WO-O4O-KPA-PROFILE-AND-STOREOWNER-UX-ALIGN-V1:
+                    pharmacy_owner 직역은 capability 가 아니라 자기소개. 분리 안내. */}
+                {isPharmacyOwner && (
+                  <p style={styles.hint}>회원 본인 소개 정보입니다. 매장 운영은 아래 별도 항목에서 확인하세요.</p>
+                )}
+              </InfoRow>
 
-              <div style={styles.infoRow}>
-                <span style={styles.infoLabel}>출신교 (대학)</span>
-                <span style={styles.infoValue}>{profile?.pharmacist?.university || '-'}</span>
-              </div>
-
-              <div style={styles.infoRow}>
-                <span style={styles.infoLabel}>근무처</span>
-                <span style={styles.infoValue}>{profile?.pharmacist?.workplace || '-'}</span>
-              </div>
+              <InfoRow label="출신교 (대학)">{profile?.pharmacist?.university || '-'}</InfoRow>
+              <InfoRow label="근무처">{profile?.pharmacist?.workplace || '-'}</InfoRow>
 
               {/* 약국 개설자: 약국 정보 — WO-O4O-KPA-PHARMACY-INFO-VIEW-EDIT-CANONICAL-ALIGNMENT-V1
                   canonical 10 필드 순서 (약국명/약국 전화번호/개설자 연락처/대표자명/담당자명/사업자등록번호/
@@ -725,81 +724,35 @@ export function MyProfilePage() {
               {isPharmacyOwner && (
                 <>
                   <div style={styles.bizDivider} />
-                  {/* 1. 약국명 */}
-                  <div style={styles.infoRow}>
-                    <span style={styles.infoLabel}>약국명</span>
-                    <span style={styles.infoValue}>{pharmacyName || <span style={styles.notRegistered}>등록 필요</span>}</span>
-                  </div>
-                  {/* 2. 약국 전화번호 */}
-                  <div style={styles.infoRow}>
-                    <span style={styles.infoLabel}>약국 전화번호</span>
-                    <span style={styles.infoValue}>{pharmacyPhone || '-'}</span>
-                  </div>
-                  {/* 3. 개설자 연락처 */}
-                  <div style={styles.infoRow}>
-                    <span style={styles.infoLabel}>개설자 연락처</span>
-                    <span style={styles.infoValue}>{pharmacyOwnerPhone || '-'}</span>
-                  </div>
-                  {/* 4. 대표자명 */}
-                  <div style={styles.infoRow}>
-                    <span style={styles.infoLabel}>대표자명</span>
-                    <span style={styles.infoValue}>{pharmacyCeoName || '-'}</span>
-                  </div>
-                  {/* 5. 담당자명 */}
-                  <div style={styles.infoRow}>
-                    <span style={styles.infoLabel}>담당자명</span>
-                    <span style={styles.infoValue}>{pharmacyContactName || '-'}</span>
-                  </div>
-                  {/* 6. 사업자등록번호 */}
-                  <div style={styles.infoRow}>
-                    <span style={styles.infoLabel}>사업자등록번호</span>
-                    <span style={styles.infoValue}>{pharmacyBusinessNumber || '-'}</span>
-                  </div>
-                  {/* 7. 세금계산서 이메일 */}
-                  <div style={styles.infoRow}>
-                    <span style={styles.infoLabel}>세금계산서 이메일</span>
-                    <span style={styles.infoValue}>{pharmacyTaxInvoiceEmail || '-'}</span>
-                  </div>
-                  {/* 8-10. 우편번호 / 기본주소 / 상세주소 */}
+                  <InfoRow label="약국명">
+                    {pharmacyName || <span style={styles.notRegistered}>등록 필요</span>}
+                  </InfoRow>
+                  <InfoRow label="약국 전화번호">{pharmacyPhone || '-'}</InfoRow>
+                  <InfoRow label="개설자 연락처">{pharmacyOwnerPhone || '-'}</InfoRow>
+                  <InfoRow label="대표자명">{pharmacyCeoName || '-'}</InfoRow>
+                  <InfoRow label="담당자명">{pharmacyContactName || '-'}</InfoRow>
+                  <InfoRow label="사업자등록번호">{pharmacyBusinessNumber || '-'}</InfoRow>
+                  <InfoRow label="세금계산서 이메일">{pharmacyTaxInvoiceEmail || '-'}</InfoRow>
                   {(pharmacyAddressDetail || pharmacyAddressFallback) ? (
                     <>
-                      <div style={styles.infoRow}>
-                        <span style={styles.infoLabel}>우편번호</span>
-                        <span style={styles.infoValue}>{pharmacyAddressDetail?.zipCode || '-'}</span>
-                      </div>
-                      <div style={styles.infoRow}>
-                        <span style={styles.infoLabel}>기본주소</span>
-                        <span style={styles.infoValue}>
-                          {pharmacyAddressDetail?.baseAddress || pharmacyAddressFallback || '-'}
-                        </span>
-                      </div>
-                      <div style={styles.infoRow}>
-                        <span style={styles.infoLabel}>상세주소</span>
-                        <span style={styles.infoValue}>{pharmacyAddressDetail?.detailAddress || '-'}</span>
-                      </div>
+                      <InfoRow label="우편번호">{pharmacyAddressDetail?.zipCode || '-'}</InfoRow>
+                      <InfoRow label="기본주소">
+                        {pharmacyAddressDetail?.baseAddress || pharmacyAddressFallback || '-'}
+                      </InfoRow>
+                      <InfoRow label="상세주소">{pharmacyAddressDetail?.detailAddress || '-'}</InfoRow>
                     </>
                   ) : (
                     <>
-                      <div style={styles.infoRow}>
-                        <span style={styles.infoLabel}>우편번호</span>
-                        <span style={styles.infoValue}>-</span>
-                      </div>
-                      <div style={styles.infoRow}>
-                        <span style={styles.infoLabel}>기본주소</span>
-                        <span style={styles.infoValue}>-</span>
-                      </div>
-                      <div style={styles.infoRow}>
-                        <span style={styles.infoLabel}>상세주소</span>
-                        <span style={styles.infoValue}>-</span>
-                      </div>
+                      <InfoRow label="우편번호">-</InfoRow>
+                      <InfoRow label="기본주소">-</InfoRow>
+                      <InfoRow label="상세주소">-</InfoRow>
                     </>
                   )}
-                  <div style={styles.infoRow}>
-                    <span style={styles.infoLabel}>약국 정보 관리</span>
+                  <InfoRow label="약국 정보 관리">
                     <Link to="/store/info" style={{ color: colors.primary, fontSize: '14px', fontWeight: 500, textDecoration: 'none' }}>
                       약국 정보 수정 →
                     </Link>
-                  </div>
+                  </InfoRow>
                 </>
               )}
 
@@ -807,14 +760,10 @@ export function MyProfilePage() {
               {!isPharmacyOwner && activityType && activityType !== 'inactive' && activityType !== 'other' && (
                 <>
                   <div style={styles.bizDivider} />
-                  <div style={styles.infoRow}>
-                    <span style={styles.infoLabel}>근무지명</span>
-                    <span style={styles.infoValue}>{workplaceName || <span style={styles.notRegistered}>등록 필요</span>}</span>
-                  </div>
-                  <div style={styles.infoRow}>
-                    <span style={styles.infoLabel}>근무지 전화번호</span>
-                    <span style={styles.infoValue}>{workplacePhone || '-'}</span>
-                  </div>
+                  <InfoRow label="근무지명">
+                    {workplaceName || <span style={styles.notRegistered}>등록 필요</span>}
+                  </InfoRow>
+                  <InfoRow label="근무지 전화번호">{workplacePhone || '-'}</InfoRow>
                 </>
               )}
 
@@ -877,8 +826,7 @@ export function MyProfilePage() {
               {hasOrganizations && (
                 <>
                   <div style={styles.bizDivider} />
-                  <div style={styles.infoRow}>
-                    <span style={styles.infoLabel}>소속 조직</span>
+                  <InfoRow label="소속 조직">
                     <div style={styles.orgList}>
                       {profile?.organizations.map((org, idx) => (
                         <div key={org.id || idx} style={styles.orgItem}>
@@ -887,7 +835,7 @@ export function MyProfilePage() {
                         </div>
                       ))}
                     </div>
-                  </div>
+                  </InfoRow>
                 </>
               )}
 
@@ -954,24 +902,6 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     flexDirection: 'column',
   },
-  infoRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    padding: '16px 0',
-    borderBottom: `1px solid ${colors.neutral100}`,
-  },
-  infoLabel: {
-    ...typography.bodyM,
-    color: colors.neutral500,
-    fontWeight: 500,
-    minWidth: '120px',
-  },
-  infoValue: {
-    ...typography.bodyM,
-    color: colors.neutral900,
-    textAlign: 'right',
-  },
   editButtonWrapper: {
     marginTop: '24px',
     display: 'flex',
@@ -991,13 +921,16 @@ const styles: Record<string, React.CSSProperties> = {
   field: {
     marginBottom: '20px',
   },
+  // WO-O4O-MYPAGE-FORM-MOBILE-V1: flex-wrap 추가 — 320px 이하에서 성/이름 필드 자연 wrap
   nameRow: {
     display: 'flex',
+    flexWrap: 'wrap' as const,
     gap: '16px',
     marginBottom: '20px',
   },
   nameField: {
     flex: 1,
+    minWidth: '120px',
   },
   label: {
     display: 'block',
