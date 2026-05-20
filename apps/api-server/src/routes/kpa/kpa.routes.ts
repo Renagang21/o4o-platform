@@ -717,7 +717,8 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   homeRouter.get('/forum-hub', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
     const sort = (req.query.sort as string) || 'default';
     const keyword = (req.query.q as string) || '';
-    const userId = sort === 'joined' ? (req as any).user?.id : undefined;
+    // WO-O4O-KPA-FORUM-MEMBERSHIP-UX-ENHANCEMENT-V1: 멤버십 상태 포함을 위해 항상 전달
+    const userId = (req as any).user?.id as string | undefined;
     const data = await forumService.listForumHub({ sort, keyword, userId });
     res.json({ success: true, data });
   }));

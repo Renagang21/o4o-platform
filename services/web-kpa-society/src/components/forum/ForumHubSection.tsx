@@ -104,7 +104,8 @@ export function ForumHubSection({ prefetchedForums, loading: parentLoading }: Pr
             {row.iconEmoji && <span>{row.iconEmoji}</span>}
             <span>{row.name}</span>
           </div>
-          {row.description && (
+          {/* 공개 포럼만 설명 표시 — 회원제 포럼은 최소 정보만 노출 */}
+          {row.forumType !== 'closed' && row.description && (
             <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2, maxWidth: 360, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {row.description}
             </div>
@@ -141,22 +142,66 @@ export function ForumHubSection({ prefetchedForums, loading: parentLoading }: Pr
         <span style={{ fontSize: 13, color: '#374151' }}>{(val as string) || '-'}</span>
       ),
     },
-    // 공개범위
+    // 공개범위 + 멤버십 상태 (WO-O4O-KPA-FORUM-MEMBERSHIP-UX-ENHANCEMENT-V1)
     {
       key: 'forumType',
       header: '공개범위',
-      width: '90px',
+      width: '110px',
       align: 'center' as const,
       render: (_v, row) => {
         const isClosed = row.forumType === 'closed';
+        if (!isClosed) {
+          return (
+            <span style={{
+              display: 'inline-block', padding: '2px 10px', borderRadius: 999,
+              fontSize: 11, fontWeight: 600,
+              background: '#d1fae5', color: '#065f46',
+            }}>
+              공개
+            </span>
+          );
+        }
+        const ms = row.myMembershipStatus;
+        if (ms === 'owner') {
+          return (
+            <span style={{
+              display: 'inline-block', padding: '2px 10px', borderRadius: 999,
+              fontSize: 11, fontWeight: 600,
+              background: '#fef9c3', color: '#854d0e',
+            }}>
+              👑 개설자
+            </span>
+          );
+        }
+        if (ms === 'member') {
+          return (
+            <span style={{
+              display: 'inline-block', padding: '2px 10px', borderRadius: 999,
+              fontSize: 11, fontWeight: 600,
+              background: '#dcfce7', color: '#166534',
+            }}>
+              ✅ 가입됨
+            </span>
+          );
+        }
+        if (ms === 'pending') {
+          return (
+            <span style={{
+              display: 'inline-block', padding: '2px 10px', borderRadius: 999,
+              fontSize: 11, fontWeight: 600,
+              background: '#fefce8', color: '#854d0e',
+            }}>
+              ⏳ 승인 대기
+            </span>
+          );
+        }
         return (
           <span style={{
             display: 'inline-block', padding: '2px 10px', borderRadius: 999,
             fontSize: 11, fontWeight: 600,
-            background: isClosed ? '#fff7ed' : '#d1fae5',
-            color: isClosed ? '#9a3412' : '#065f46',
+            background: '#fff7ed', color: '#9a3412',
           }}>
-            {isClosed ? '가입 필요' : '공개'}
+            🔒 가입 필요
           </span>
         );
       },

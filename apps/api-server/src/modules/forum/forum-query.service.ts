@@ -98,6 +98,20 @@ export class ForumQueryService {
       scopeFilter = `c.organization_id = $${params.length}`;
     }
 
+    // WO-O4O-KPA-FORUM-MEMBERSHIP-UX-ENHANCEMENT-V1: 인증 사용자 멤버십 상태
+    let membershipSelect = `NULL AS "myMembershipStatus"`;
+    if (userId) {
+      params.push(userId);
+      const uidParam = `$${params.length}`;
+      membershipSelect = `
+        COALESCE(
+          (SELECT role FROM forum_category_members WHERE forum_category_id = c.id AND user_id = ${uidParam} LIMIT 1),
+          (SELECT 'pending' FROM kpa_approval_requests
+           WHERE entity_type = 'forum_member_join' AND requester_id = ${uidParam}
+             AND status = 'pending' AND payload->>'forum_category_id' = c.id::text LIMIT 1)
+        ) AS "myMembershipStatus"`;
+    }
+
     return this.dataSource.query(`
       SELECT
         c.id,
@@ -116,7 +130,8 @@ export class ForumQueryService {
         MAX(p.created_at) AS "lastActivityAt",
         (SELECT p2.title FROM forum_post p2
          WHERE p2.forum_id = c.id AND p2.status = 'publish'
-         ORDER BY p2.created_at DESC LIMIT 1) AS "lastPostTitle"
+         ORDER BY p2.created_at DESC LIMIT 1) AS "lastPostTitle",
+        ${membershipSelect}
       FROM forum_category_requests c
       LEFT JOIN forum_post p ON p.forum_id = c.id AND p.status = 'publish'
       WHERE c.status = 'completed' AND ${scopeFilter} ${keywordFilter}
@@ -186,6 +201,16 @@ export class ForumQueryService {
       scopeFilter = `c.organization_id = $${params.length}`;
     }
 
+    // WO-O4O-KPA-FORUM-MEMBERSHIP-UX-ENHANCEMENT-V1
+    const uidParamJoined = `$1`;
+    const membershipSelectJoined = `
+      COALESCE(
+        (SELECT role FROM forum_category_members WHERE forum_category_id = c.id AND user_id = ${uidParamJoined} LIMIT 1),
+        (SELECT 'pending' FROM kpa_approval_requests
+         WHERE entity_type = 'forum_member_join' AND requester_id = ${uidParamJoined}
+           AND status = 'pending' AND payload->>'forum_category_id' = c.id::text LIMIT 1)
+      ) AS "myMembershipStatus"`;
+
     return this.dataSource.query(`
       WITH my_forums AS (
         SELECT DISTINCT p.forum_id AS id FROM forum_post p
@@ -206,7 +231,8 @@ export class ForumQueryService {
         MAX(p.created_at) AS "lastActivityAt",
         (SELECT p2.title FROM forum_post p2
          WHERE p2.forum_id = c.id AND p2.status = 'publish'
-         ORDER BY p2.created_at DESC LIMIT 1) AS "lastPostTitle"
+         ORDER BY p2.created_at DESC LIMIT 1) AS "lastPostTitle",
+        ${membershipSelectJoined}
       FROM forum_category_requests c
       INNER JOIN my_forums mf ON mf.id = c.id
       LEFT JOIN forum_post p ON p.forum_id = c.id AND p.status = 'publish'

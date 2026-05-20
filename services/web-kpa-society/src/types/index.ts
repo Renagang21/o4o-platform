@@ -104,6 +104,8 @@ export interface ForumHubItem {
   forumType?: string;
   tags?: string[] | null;
   creatorName?: string;
+  /** WO-O4O-KPA-FORUM-MEMBERSHIP-UX-ENHANCEMENT-V1: 인증 사용자의 멤버십 상태 */
+  myMembershipStatus?: 'owner' | 'member' | 'pending' | null;
 }
 
 // 포럼 활동 섹션 (WO-KPA-FORUM-HUB-V2-PHASE3)
