@@ -1921,7 +1921,8 @@ function ApplicationsTab({ onReviewComplete }: { onReviewComplete: () => void })
         </button>
       </div>
 
-      <table className="w-full text-sm">
+      <div className="overflow-x-auto">
+      <table className="w-full text-sm min-w-[680px]">
         <thead>
           <tr className="bg-slate-50 text-left text-xs text-slate-500 uppercase">
             <th className="px-4 py-3 font-medium">신청자</th>
@@ -1986,6 +1987,7 @@ function ApplicationsTab({ onReviewComplete }: { onReviewComplete: () => void })
           })}
         </tbody>
       </table>
+      </div>
 
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-2 py-4 border-t border-slate-100">
