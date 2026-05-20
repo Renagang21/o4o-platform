@@ -112,7 +112,7 @@ function getPrimaryRole(u: UserData): string {
 const ROLE_TAB_FILTER: Record<string, string[]> = {
   all: [],
   seller: ['cosmetics:store_owner'],
-  consumer: ['consumer', 'customer', 'k-cosmetics:consumer'],
+  consumer: ['consumer', 'customer'],
   pending: [],
 };
 

@@ -9,8 +9,8 @@ import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
 
 export const ROLE_LABELS: Record<string, string> = {
   'platform:super_admin': '최고 관리자',
-  'k-cosmetics:admin': '관리자',
-  'k-cosmetics:operator': '운영자',
+  'cosmetics:admin': '관리자',
+  'cosmetics:operator': '운영자',
   'k-cosmetics:supplier': '공급자',
   'cosmetics:store_owner': '매장 운영자',
   'k-cosmetics:partner': '파트너',
@@ -19,8 +19,8 @@ export const ROLE_LABELS: Record<string, string> = {
 
 export const KCOSMETICS_ROLE_PRIORITY = [
   'platform:super_admin',
-  'k-cosmetics:admin',
-  'k-cosmetics:operator',
+  'cosmetics:admin',
+  'cosmetics:operator',
   'k-cosmetics:supplier',
   'k-cosmetics:partner',
   'cosmetics:store_owner',
@@ -30,8 +30,8 @@ export const KCOSMETICS_ROLE_PRIORITY = [
 
 export const KCOSMETICS_DASHBOARD_MAP: Record<string, string> = {
   'platform:super_admin': '/admin',
-  'k-cosmetics:admin': '/admin',
-  'k-cosmetics:operator': '/operator',
+  'cosmetics:admin': '/admin',
+  'cosmetics:operator': '/operator',
   'k-cosmetics:supplier': '/',
   'k-cosmetics:partner': '/partner',
   'cosmetics:store_owner': '/store',

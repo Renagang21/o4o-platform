@@ -20,7 +20,7 @@ router.use(requireRole([
   'platform:admin', 'platform:super_admin',
   'neture:admin', 'neture:operator',
   'glycopharm:admin', 'glycopharm:operator',
-  'k-cosmetics:admin', 'k-cosmetics:operator',
+  'cosmetics:admin', 'cosmetics:operator',
   'kpa-society:admin', 'kpa-society:operator',
 ]));
 router.use(injectServiceScope);

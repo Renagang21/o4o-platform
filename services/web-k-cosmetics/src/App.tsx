@@ -299,12 +299,12 @@ function AppRoutes() {
         <Route path="lms/course/:courseId/lesson/:lessonId" element={<LmsLessonPage />} />
 
         {/* LMS Instructor (WO-KCOS-LMS-INSTRUCTOR-BOOTSTRAP-V1)
-            진입은 lms:instructor / k-cosmetics:admin / platform:super_admin.
+            진입은 lms:instructor / cosmetics:admin / platform:super_admin.
             백엔드 requireInstructor 가 실제 권한을 검증하므로 가드는 정책상 일관성을 위한 1차 차단. */}
         <Route
           path="instructor"
           element={
-            <ProtectedRoute allowedRoles={['lms:instructor', 'k-cosmetics:admin', 'platform:super_admin']}>
+            <ProtectedRoute allowedRoles={['lms:instructor', 'cosmetics:admin', 'platform:super_admin']}>
               <InstructorDashboardPage />
             </ProtectedRoute>
           }
@@ -312,7 +312,7 @@ function AppRoutes() {
         <Route
           path="instructor/courses"
           element={
-            <ProtectedRoute allowedRoles={['lms:instructor', 'k-cosmetics:admin', 'platform:super_admin']}>
+            <ProtectedRoute allowedRoles={['lms:instructor', 'cosmetics:admin', 'platform:super_admin']}>
               <InstructorCoursesPage />
             </ProtectedRoute>
           }
@@ -373,7 +373,7 @@ function AppRoutes() {
       <Route
         path="admin"
         element={
-          <ProtectedRoute allowedRoles={['k-cosmetics:admin', 'platform:super_admin']}>
+          <ProtectedRoute allowedRoles={['cosmetics:admin', 'platform:super_admin']}>
             <DashboardLayout role="admin" />
           </ProtectedRoute>
         }
@@ -440,7 +440,7 @@ function AppRoutes() {
       <Route
         path="store"
         element={
-          <ProtectedRoute allowedRoles={['cosmetics:store_owner', 'k-cosmetics:operator', 'k-cosmetics:admin', 'platform:super_admin']}>
+          <ProtectedRoute allowedRoles={['cosmetics:store_owner', 'cosmetics:operator', 'cosmetics:admin', 'platform:super_admin']}>
             <StoreLayoutWrapper />
           </ProtectedRoute>
         }
