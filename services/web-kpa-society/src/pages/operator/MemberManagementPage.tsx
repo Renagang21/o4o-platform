@@ -996,7 +996,7 @@ export default function MemberManagementPage() {
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
       {/* Stats Cards */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <div className="bg-white rounded-lg border border-slate-200 p-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
@@ -1303,9 +1303,9 @@ export default function MemberManagementPage() {
             color: '#1e293b',
             background: '#fff',
           };
-          const fieldRowStyle: CSSProperties = { display: 'flex', gap: 12, marginBottom: 10, alignItems: 'center' };
-          const labelStyle: CSSProperties = { fontWeight: 600, color: '#64748b', minWidth: 70, flexShrink: 0 };
-          const valueStyle: CSSProperties = { color: '#1e293b', flex: 1 };
+          const fieldRowStyle: CSSProperties = { display: 'flex', gap: 8, marginBottom: 10, alignItems: 'flex-start', flexWrap: 'wrap' };
+          const labelStyle: CSSProperties = { fontWeight: 600, color: '#64748b', minWidth: 100, flexShrink: 0, paddingTop: 2 };
+          const valueStyle: CSSProperties = { color: '#1e293b', flex: 1, minWidth: 0, wordBreak: 'break-word', overflowWrap: 'break-word' as const };
 
           return (
             <div style={{ fontSize: 14, color: '#374151' }}>

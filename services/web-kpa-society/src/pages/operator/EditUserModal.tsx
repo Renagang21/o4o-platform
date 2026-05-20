@@ -248,7 +248,7 @@ export default function EditUserModal({ userId, onClose, onSuccess }: { userId: 
             <div>
               <h4 className="text-sm font-semibold text-slate-700 mb-3">기본 정보</h4>
               <div className="space-y-3">
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-medium text-slate-600 mb-1">성</label>
                     <input type="text" name="lastName" value={form.lastName} onChange={handleChange}
@@ -353,7 +353,7 @@ export default function EditUserModal({ userId, onClose, onSuccess }: { userId: 
                       className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                       maxLength={11} placeholder="숫자만 입력" />
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-medium text-slate-600 mb-1">업태</label>
                       <input type="text" name="businessType" value={form.businessType} onChange={handleChange}
