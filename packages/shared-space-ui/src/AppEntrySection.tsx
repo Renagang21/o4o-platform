@@ -27,6 +27,11 @@ export function AppEntrySection({
           grid-template-columns: repeat(2, 1fr);
         }
       }
+      @media (min-width: 1024px) {
+        .ss-appentry-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
       .ss-appentry-card:hover {
         border-color: #cbd5e1;
         box-shadow: 0 2px 8px rgba(0,0,0,0.06);

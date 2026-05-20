@@ -87,6 +87,7 @@ const styles: Record<string, CSSProperties> = {
   card: {
     display: 'flex',
     alignItems: 'center',
+    flexWrap: 'wrap' as const,
     gap: 16,
     padding: '20px 24px',
     backgroundColor: '#ffffff',

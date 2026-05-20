@@ -102,17 +102,19 @@ export function CommunityHomePage() {
       noticesAccentBg="var(--color-primary-light, #eff6ff)"
       noticesRightSlot={
         <>
-          <div style={placeholderStyles.header}>
-            <h2 style={placeholderStyles.title}>약사공론 뉴스</h2>
+          <div className="mb-3">
+            <h2 className="text-lg font-bold text-slate-800 m-0">약사공론 뉴스</h2>
           </div>
-          <Card style={placeholderStyles.card}>
+          <Card className="flex flex-col items-center justify-center py-12 px-4 min-h-[200px]">
             <NewspaperIcon />
-            <p style={placeholderStyles.text}>이 영역은 약사공론 뉴스가 표시될 예정입니다.</p>
+            <p className="text-[0.9375rem] font-medium text-slate-500 my-3 text-center">
+              이 영역은 약사공론 뉴스가 표시될 예정입니다.
+            </p>
             <a
               href="https://www.kpanews.co.kr"
               target="_blank"
               rel="noopener noreferrer"
-              style={placeholderStyles.link}
+              className="text-sm font-semibold text-blue-600 no-underline"
             >
               약사공론 바로가기 →
             </a>
@@ -149,40 +151,5 @@ export function CommunityHomePage() {
     />
   );
 }
-
-// ─── Notices Right Placeholder Styles ───────────────────────
-
-const placeholderStyles: Record<string, React.CSSProperties> = {
-  header: { marginBottom: 12 },
-  title: {
-    fontSize: 18,
-    fontWeight: 700,
-    color: 'var(--color-text-primary, #1e293b)',
-    margin: 0,
-  },
-  card: {
-    backgroundColor: 'var(--color-bg-primary, #ffffff)',
-    border: '1px solid var(--color-border-default, #e2e8f0)',
-    padding: '48px 16px',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 200,
-  },
-  text: {
-    fontSize: '0.9375rem',
-    fontWeight: 500,
-    color: 'var(--color-text-secondary, #475569)',
-    margin: '12px 0',
-    textAlign: 'center',
-  },
-  link: {
-    fontSize: '0.875rem',
-    fontWeight: 600,
-    color: 'var(--color-primary, #2563EB)',
-    textDecoration: 'none',
-  },
-};
 
 export default CommunityHomePage;
