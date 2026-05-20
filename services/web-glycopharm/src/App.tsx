@@ -210,6 +210,8 @@ const ForumPage = lazy(() => import('@/pages/forum/ForumPage'));
 const ForumWritePage = lazy(() => import('@/pages/forum/ForumWritePage'));
 const RequestCategoryPage = lazy(() => import('@/pages/forum/RequestCategoryPage'));
 const MyRequestsPage = lazy(() => import('@/pages/forum/MyRequestsPage'));
+// WO-O4O-GLYCOPHARM-FORUM-DASHBOARD-V1
+const MyForumDashboardPage = lazy(() => import('@/pages/forum/MyForumDashboardPage'));
 const ForumFeedbackPage = lazy(() => import('@/pages/forum/ForumFeedbackPage'));
 const EducationPage = lazy(() => import('@/pages/education/EducationPage'));
 const CourseDetailPage = lazy(() => import('@/pages/education/CourseDetailPage'));
@@ -396,6 +398,8 @@ function AppRoutes() {
         <Route path="forum/posts/:id" element={<ForumPostDetailPage />} />
         <Route path="forum/request-category" element={<RequestCategoryPage />} />
         <Route path="forum/my-requests" element={<MyRequestsPage />} />
+        {/* WO-O4O-GLYCOPHARM-FORUM-DASHBOARD-V1 */}
+        <Route path="forum/my-dashboard" element={<MyForumDashboardPage />} />
         <Route path="forum/feedback" element={<ForumFeedbackPage />} />
         {/* WO-O4O-GLYCOPHARM-HOME-KPA-ALIGNMENT-V1: /lms 통일 */}
         <Route path="lms" element={<EducationPage />} />

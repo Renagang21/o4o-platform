@@ -124,3 +124,53 @@ export async function createForumPost(payload: {
   const response = await api.post('/forum/posts', payload);
   return response.data;
 }
+
+// ─── Owner Category Management ─────────────────────────────────────────────────
+// WO-O4O-GLYCOPHARM-FORUM-DASHBOARD-V1
+// Canonical endpoints: /api/v1/forum/categories/{mine,/owner,/delete-request}
+
+export async function fetchMyCategories(): Promise<{ success: boolean; data: any[] }> {
+  try {
+    const response = await api.get('/forum/categories/mine');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching my categories:', error);
+    return { success: false, data: [] };
+  }
+}
+
+export async function updateMyCategory(
+  id: string,
+  data: { name?: string; description?: string; iconEmoji?: string | null; iconUrl?: string | null },
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const response = await api.patch(`/forum/categories/${id}/owner`, data);
+    return response.data;
+  } catch (error: any) {
+    const msg = error?.response?.data?.message || error?.response?.data?.error || '저장에 실패했습니다.';
+    return { success: false, error: msg };
+  }
+}
+
+export async function requestDeleteCategory(
+  id: string,
+  data: { reason?: string },
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const response = await api.post(`/forum/categories/${id}/delete-request`, data);
+    return response.data;
+  } catch (error: any) {
+    const msg = error?.response?.data?.message || error?.response?.data?.error || '삭제 요청에 실패했습니다.';
+    return { success: false, error: msg };
+  }
+}
+
+export async function fetchMyForumRequests(): Promise<{ success: boolean; data: any[] }> {
+  try {
+    const response = await api.get('/forum/category-requests/my?serviceCode=glycopharm');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching my forum requests:', error);
+    return { success: false, data: [] };
+  }
+}

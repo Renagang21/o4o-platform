@@ -127,6 +127,7 @@ export default function ForumHubPage() {
 
     infoLinks: [
       { label: '전체 글', href: '/forum' },
+      { label: '내 포럼', href: '/forum/my-dashboard' },
       { label: '피드백', href: '/forum/feedback' },
     ],
   };
