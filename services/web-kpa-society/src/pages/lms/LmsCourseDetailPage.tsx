@@ -166,8 +166,20 @@ export function LmsCourseDetailPage() {
       <div style={styles.content}>
         <div style={styles.main}>
           <Card padding="large">
+            {/* WO-O4O-LMS-COURSE-VISIBILITY-BADGE-UX-V1 */}
             <div style={styles.courseHeader}>
               <span style={styles.categoryBadge}>{course.category}</span>
+              {course.visibility === 'public' ? (
+                <span style={detailBadge('public')}>공개</span>
+              ) : (
+                <span style={detailBadge('members')}>회원제</span>
+              )}
+              {course.visibility !== 'public' && course.requiresApproval && (
+                <span style={detailBadge('approval')}>승인 필요</span>
+              )}
+              {course.isPaid && (
+                <span style={detailBadge('paid')}>유료</span>
+              )}
               {isArchived && (
                 <span style={styles.archivedBadge}>종료</span>
               )}
@@ -236,6 +248,17 @@ export function LmsCourseDetailPage() {
               <img src={course.thumbnail} alt={course.title} style={styles.thumbnail} />
             ) : (
               <div style={styles.thumbnailPlaceholder}>📚</div>
+            )}
+
+            {/* WO-O4O-LMS-COURSE-VISIBILITY-BADGE-UX-V1: 접근 정책 안내 — enrollment 전 상태에서만 */}
+            {!enrollment && !isArchived && course.visibility !== 'public' && (
+              <div style={accessPolicyNoteStyle}>
+                {course.isPaid
+                  ? '결제 완료 후 이용 가능합니다.'
+                  : course.requiresApproval
+                    ? '강사 승인 후 이용 가능합니다.'
+                    : '수강 신청 후 이용 가능합니다.'}
+              </div>
             )}
 
             {/* WO-LMS-ARCHIVED-COURSE-ACCESS-POLICY-V1: archived → 모든 CTA 비활성화 */}
@@ -544,4 +567,35 @@ const styles: Record<string, React.CSSProperties> = {
     textAlign: 'center',
     boxSizing: 'border-box',
   },
+};
+
+// WO-O4O-LMS-COURSE-VISIBILITY-BADGE-UX-V1
+function detailBadge(type: 'public' | 'members' | 'approval' | 'paid'): React.CSSProperties {
+  const map: Record<string, { bg: string; color: string }> = {
+    public:   { bg: '#dcfce7', color: '#15803d' },
+    members:  { bg: '#ede9fe', color: '#6d28d9' },
+    approval: { bg: '#fef3c7', color: '#92400e' },
+    paid:     { bg: '#fee2e2', color: '#991b1b' },
+  };
+  const { bg, color } = map[type];
+  return {
+    display: 'inline-block',
+    padding: '3px 10px',
+    borderRadius: 20,
+    fontSize: 12,
+    fontWeight: 600,
+    backgroundColor: bg,
+    color,
+  };
+}
+
+const accessPolicyNoteStyle: React.CSSProperties = {
+  padding: '10px 14px',
+  backgroundColor: '#f8fafc',
+  border: '1px solid #e2e8f0',
+  borderRadius: 8,
+  fontSize: 13,
+  color: '#475569',
+  marginBottom: 12,
+  textAlign: 'center',
 };

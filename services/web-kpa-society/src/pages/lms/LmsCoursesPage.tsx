@@ -383,11 +383,19 @@ export function LmsCoursesPage() {
                           {instructorName}
                         </td>
 
-                        {/* 유형 */}
+                        {/* 유형 — WO-O4O-LMS-COURSE-VISIBILITY-BADGE-UX-V1 */}
                         <td style={{ ...styles.td, textAlign: 'center' }}>
-                          <span style={visibilityBadge(isPublic)}>
-                            {isPublic ? '공개' : '회원제'}
-                          </span>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+                            <span style={visibilityBadge(isPublic)}>
+                              {isPublic ? '공개' : '회원제'}
+                            </span>
+                            {!isPublic && course.requiresApproval && (
+                              <span style={approvalBadgeStyle}>승인 필요</span>
+                            )}
+                            {course.isPaid && (
+                              <span style={paidBadgeStyle}>유료</span>
+                            )}
+                          </div>
                         </td>
 
                         {/* 강의수 */}
@@ -622,6 +630,27 @@ function visibilityBadge(isPublic: boolean): React.CSSProperties {
     color: isPublic ? '#15803d' : '#6d28d9',
   };
 }
+
+// WO-O4O-LMS-COURSE-VISIBILITY-BADGE-UX-V1
+const approvalBadgeStyle: React.CSSProperties = {
+  display: 'inline-block',
+  padding: '2px 8px',
+  borderRadius: 20,
+  fontSize: 11,
+  fontWeight: 600,
+  backgroundColor: '#fef3c7',
+  color: '#92400e',
+};
+
+const paidBadgeStyle: React.CSSProperties = {
+  display: 'inline-block',
+  padding: '2px 8px',
+  borderRadius: 20,
+  fontSize: 11,
+  fontWeight: 600,
+  backgroundColor: '#fee2e2',
+  color: '#991b1b',
+};
 
 function statusBadge(status: string): React.CSSProperties {
   return {

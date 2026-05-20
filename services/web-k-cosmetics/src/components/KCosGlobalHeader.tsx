@@ -44,10 +44,10 @@ export function KCosGlobalHeader() {
   const navigate = useNavigate();
 
   const isAdmin = isAuthenticated && user?.roles?.some(
-    (r: string) => r === 'k-cosmetics:admin' || r === 'platform:super_admin',
+    (r: string) => r === 'cosmetics:admin' || r === 'platform:super_admin',
   );
   const isOperator = isAuthenticated && user?.roles?.some(
-    (r: string) => r === 'k-cosmetics:operator' || r === 'k-cosmetics:admin' || r === 'platform:super_admin',
+    (r: string) => r === 'cosmetics:operator' || r === 'cosmetics:admin' || r === 'platform:super_admin',
   );
   // WO-KCOS-LMS-INSTRUCTOR-BOOTSTRAP-V1: lms:instructor 또는 admin 진입 허용
   const isInstructor = isAuthenticated && user?.roles?.some(
@@ -63,7 +63,6 @@ export function KCosGlobalHeader() {
       (r: string) =>
         r === 'cosmetics:operator' ||
         r === 'cosmetics:admin' ||
-        r === 'k-cosmetics:admin' ||
         r === 'platform:admin' ||
         r === 'platform:super_admin',
     )

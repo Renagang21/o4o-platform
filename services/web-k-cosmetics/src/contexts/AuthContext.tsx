@@ -19,7 +19,7 @@ export { ROLE_LABELS, KCOSMETICS_ROLE_PRIORITY, KCOSMETICS_DASHBOARD_MAP, getKCo
 
 /**
  * WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed role format
- * e.g., 'k-cosmetics:admin', 'k-cosmetics:operator', 'platform:super_admin'
+ * e.g., 'cosmetics:admin', 'cosmetics:operator', 'platform:super_admin'
  */
 export type UserRole = string;
 
