@@ -7,14 +7,17 @@
  * 현재 k-cosmetics에서는 기능이 제한적이므로 안내 메시지로 구성.
  */
 
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { toast } from '@o4o/error-handling';
+import { api } from '@/lib/apiClient';
 import { Lock } from 'lucide-react';
-import { MyPageLayout, SettingsSection } from '@o4o/account-ui';
+import { MyPageLayout, SettingsSection, PasswordChangeModal } from '@o4o/account-ui';
 
 export default function MySettingsPage() {
   const { user, isAuthenticated } = useAuth();
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
 
   if (!isAuthenticated || !user) {
     return (
@@ -32,11 +35,20 @@ export default function MySettingsPage() {
     );
   }
 
+  const handleChangePassword = async (currentPassword: string, newPassword: string, newPasswordConfirm: string) => {
+    setChangingPassword(true);
+    try {
+      await api.put('/users/password', { currentPassword, newPassword, newPasswordConfirm });
+    } finally {
+      setChangingPassword(false);
+    }
+  };
+
   return (
     <MyPageLayout title="마이페이지" subtitle="내 정보를 확인하고 관리할 수 있습니다">
       <SettingsSection title="보안 설정" description="정기적인 비밀번호 변경을 권장합니다">
         <button
-          onClick={() => toast.info('비밀번호 변경 기능은 준비 중입니다.')}
+          onClick={() => setShowPasswordModal(true)}
           className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
         >
           <div className="flex items-center gap-3">
@@ -45,6 +57,13 @@ export default function MySettingsPage() {
           </div>
         </button>
       </SettingsSection>
+
+      <PasswordChangeModal
+        open={showPasswordModal}
+        onClose={() => setShowPasswordModal(false)}
+        onSubmit={handleChangePassword}
+        submitting={changingPassword}
+      />
     </MyPageLayout>
   );
 }

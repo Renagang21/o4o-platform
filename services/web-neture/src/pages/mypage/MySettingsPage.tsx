@@ -6,16 +6,19 @@
  * /mypage/settings — 보안 설정. 현재 비밀번호 변경만 안내 상태.
  */
 
+import { useState } from 'react';
 import { User } from 'lucide-react';
-import { toast } from '@o4o/error-handling';
 import { Lock } from 'lucide-react';
 import { useAuth } from '../../contexts';
 import { useLoginModal } from '../../contexts/LoginModalContext';
-import { MyPageLayout, SettingsSection } from '@o4o/account-ui';
+import { api } from '../../lib/apiClient';
+import { MyPageLayout, SettingsSection, PasswordChangeModal } from '@o4o/account-ui';
 
 export default function MySettingsPage() {
   const { user, isAuthenticated } = useAuth();
   const { openLoginModal } = useLoginModal();
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
 
   if (!isAuthenticated || !user) {
     return (
@@ -37,11 +40,20 @@ export default function MySettingsPage() {
     );
   }
 
+  const handleChangePassword = async (currentPassword: string, newPassword: string, newPasswordConfirm: string) => {
+    setChangingPassword(true);
+    try {
+      await api.put('/users/password', { currentPassword, newPassword, newPasswordConfirm });
+    } finally {
+      setChangingPassword(false);
+    }
+  };
+
   return (
     <MyPageLayout title="마이페이지" subtitle="계정 보안 및 환경 설정을 관리합니다">
       <SettingsSection title="보안 설정">
         <button
-          onClick={() => toast.info('비밀번호 변경 기능은 준비 중입니다.')}
+          onClick={() => setShowPasswordModal(true)}
           className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
         >
           <div className="flex items-center gap-3">
@@ -50,6 +62,13 @@ export default function MySettingsPage() {
           </div>
         </button>
       </SettingsSection>
+
+      <PasswordChangeModal
+        open={showPasswordModal}
+        onClose={() => setShowPasswordModal(false)}
+        onSubmit={handleChangePassword}
+        submitting={changingPassword}
+      />
     </MyPageLayout>
   );
 }
