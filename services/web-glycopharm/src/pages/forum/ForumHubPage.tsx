@@ -10,36 +10,17 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Link } from 'react-router-dom';
 import { ForumHubTemplate, type ForumHubConfig, type ForumHubCategory, type ForumHubPost } from '@o4o/shared-space-ui';
-import { apiClient } from '@/services/api';
-
-// ─── Raw API Types ─────────────────────────────────────────────────────────────
-
-interface RawForumCategory {
-  id: string;
-  name: string;
-  description?: string | null;
-  slug: string;
-  color?: string | null;
-  iconUrl?: string | null;
-  iconEmoji?: string | null;
-  postCount: number;
-  isPinned?: boolean;
-}
-
-interface RawForumPost {
-  id: string;
-  title: string;
-  author?: { id: string; name?: string; nickname?: string; email?: string } | null;
-  authorName?: string;
-  viewCount: number;
-  commentCount: number;
-  createdAt: string;
-  isPinned?: boolean;
-}
+import {
+  fetchPopularForums,
+  fetchForumPosts,
+  getAuthorName,
+  type ForumCategory,
+  type ForumPost,
+} from '@/services/forumApi';
 
 // ─── Adapters ─────────────────────────────────────────────────────────────────
 
-function mapCategory(raw: RawForumCategory): ForumHubCategory {
+function mapCategory(raw: ForumCategory): ForumHubCategory {
   return {
     id: raw.id,
     name: raw.name,
@@ -52,11 +33,11 @@ function mapCategory(raw: RawForumCategory): ForumHubCategory {
   };
 }
 
-function mapPost(raw: RawForumPost): ForumHubPost {
+function mapPost(raw: ForumPost): ForumHubPost {
   return {
     id: raw.id,
     title: raw.title,
-    authorName: raw.authorName || raw.author?.nickname || raw.author?.name || '익명',
+    authorName: getAuthorName(raw),
     viewCount: raw.viewCount ?? 0,
     commentCount: raw.commentCount ?? 0,
     createdAt: raw.createdAt,
@@ -133,13 +114,13 @@ export default function ForumHubPage() {
     listPath: '/forum',
 
     fetchCategories: async () => {
-      const res = await apiClient.get<RawForumCategory[]>('/api/v1/glycopharm/forum/categories');
-      return Array.isArray(res.data) ? res.data.map(mapCategory) : [];
+      const res = await fetchPopularForums(20);
+      return (res.data ?? []).map(mapCategory);
     },
 
     fetchRecentPosts: async () => {
-      const res = await apiClient.get<RawForumPost[]>('/api/v1/glycopharm/forum/posts?limit=10');
-      return Array.isArray(res.data) ? res.data.map(mapPost) : [];
+      const res = await fetchForumPosts({ limit: 10 });
+      return (res.data ?? []).map(mapPost);
     },
 
     renderWritePrompt: () => <GlycoWritePrompt isAuthenticated={isAuthenticated} />,

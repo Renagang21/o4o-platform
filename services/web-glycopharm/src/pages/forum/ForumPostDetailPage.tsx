@@ -11,33 +11,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, MessageSquare, Eye, Heart, Calendar, User, Loader2, AlertCircle } from 'lucide-react';
-import { apiClient } from '@/services/api';
+import { fetchForumPost, fetchPostComments, type ForumPostDetail, type ForumComment } from '@/services/forumApi';
 import { ContentRenderer } from '@o4o/content-editor';
 
-// ─── Types ──────────────────────────────────────────────────
-
-interface PostDetail {
-  id: string;
-  title: string;
-  content?: string | null;
-  body?: string | null;
-  author?: { name?: string; nickname?: string | null; email?: string } | null;
-  category?: { name?: string } | null;
-  viewCount: number;
-  commentCount: number;
-  likeCount?: number;
-  createdAt: string;
-  isPinned?: boolean;
-  status?: string;
-}
-
-interface Comment {
-  id: string;
-  content?: string | null;
-  body?: string | null;
-  author?: { name?: string; nickname?: string | null; email?: string } | null;
-  createdAt: string;
-}
+// ─── Local aliases ───────────────────────────────────────────
+type PostDetail = ForumPostDetail & { body?: string | null };
+type Comment = ForumComment & { body?: string | null };
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('ko-KR', {
@@ -60,19 +39,16 @@ export default function ForumPostDetailPage() {
     setError(null);
 
     Promise.all([
-      apiClient.get<{ success: boolean; data: PostDetail }>(`/api/v1/glycopharm/forum/posts/${id}`),
-      apiClient.get<{ success: boolean; data: Comment[] }>(`/api/v1/glycopharm/forum/posts/${id}/comments`)
-        .catch(() => ({ data: { success: true, data: [] } })),
+      fetchForumPost(id),
+      fetchPostComments(id).catch(() => ({ success: true, data: [] as Comment[] })),
     ])
       .then(([postRes, commentRes]) => {
-        if (postRes.data?.success && postRes.data?.data) {
-          setPost(postRes.data.data);
+        if (postRes.success && postRes.data) {
+          setPost(postRes.data as PostDetail);
         } else {
           setError('게시글을 찾을 수 없습니다.');
         }
-        if (commentRes.data?.data && Array.isArray(commentRes.data.data)) {
-          setComments(commentRes.data.data);
-        }
+        setComments(commentRes.data as Comment[]);
       })
       .catch(() => setError('게시글을 불러오지 못했습니다.'))
       .finally(() => setLoading(false));

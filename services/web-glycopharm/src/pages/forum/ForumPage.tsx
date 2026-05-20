@@ -12,37 +12,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { PageSection, PageContainer } from '@o4o/ui';
-import { apiClient } from '@/services/api';
-
-interface ForumPostAuthor {
-  id: string;
-  name?: string;
-  nickname?: string | null;
-  email?: string;
-}
-
-interface ForumPostCategory {
-  id: string;
-  name: string;
-  slug?: string;
-}
-
-interface ForumPostRaw {
-  id: string;
-  title: string;
-  excerpt?: string;
-  slug?: string;
-  author?: ForumPostAuthor | null;
-  authorId?: string;
-  category?: ForumPostCategory | null;
-  categoryId?: string;
-  viewCount: number;
-  commentCount: number;
-  likeCount?: number;
-  createdAt: string;
-  isPinned?: boolean;
-  status?: string;
-}
+import { fetchForumPosts, type ForumPost as ApiForumPost } from '@/services/forumApi';
 
 interface ForumPost {
   id: string;
@@ -57,11 +27,11 @@ interface ForumPost {
   isHot: boolean;
 }
 
-function normalizePost(raw: ForumPostRaw): ForumPost {
+function normalizePost(raw: ApiForumPost): ForumPost {
   return {
     id: raw.id,
     title: raw.title || '(제목 없음)',
-    author: (raw as any).authorName || raw.author?.nickname || raw.author?.name || '익명',
+    author: raw.author?.nickname || raw.author?.name || '익명',
     authorRole: '',
     category: raw.category?.name || '일반',
     views: raw.viewCount || 0,
@@ -115,13 +85,9 @@ export default function ForumPage() {
   useEffect(() => {
     setIsLoading(true);
     setError(null);
-    apiClient.get<ForumPostRaw[]>('/api/v1/glycopharm/forum/posts?limit=50')
+    fetchForumPosts({ limit: 50 })
       .then((res) => {
-        if (Array.isArray(res.data)) {
-          setAllPosts(res.data.map(normalizePost));
-        } else {
-          setAllPosts([]);
-        }
+        setAllPosts(res.data.map(normalizePost));
       })
       .catch(() => {
         setError('게시글을 불러오지 못했습니다.');

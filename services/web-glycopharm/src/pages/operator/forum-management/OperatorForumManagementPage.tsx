@@ -19,7 +19,40 @@ import {
   Clock,
   X,
 } from 'lucide-react';
-import type { Forum, ForumApplication, ForumStatus, ForumApplicationStatus, UserRole } from '@/types';
+import type { UserRole } from '@/types';
+
+type ForumStatus = 'open' | 'readonly' | 'closed';
+type ForumApplicationStatus = 'pending' | 'approved' | 'rejected';
+
+interface Forum {
+  id: string;
+  title: string;
+  description: string;
+  status: ForumStatus;
+  allowedRoles: UserRole[];
+  creatorId: string;
+  creatorName: string;
+  postCount: number;
+  memberCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface ForumApplication {
+  id: string;
+  title: string;
+  description: string;
+  purpose: string;
+  targetRoles: UserRole[];
+  allowedWriteRoles: UserRole[];
+  note?: string;
+  applicantId: string;
+  applicantName: string;
+  status: ForumApplicationStatus;
+  rejectionReason?: string;
+  createdAt: string;
+  reviewedAt?: string;
+}
 import { GLYCOPHARM_ROLES, ROLE_LABELS } from '@/lib/role-constants';
 import { toast } from '@o4o/error-handling';
 

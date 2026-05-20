@@ -96,9 +96,6 @@ const SupplyPage = lazy(() => import('@/pages/b2b').then(m => ({ default: m.Supp
 // Forum Post Detail (WO-O4O-GLYCOPHARM-KPA-STYLE-UX-REFINE-P3-V1)
 const ForumPostDetailPage = lazy(() => import('@/pages/forum/ForumPostDetailPage'));
 
-// Forum Extension
-const ForumListPage = lazy(() => import('@/pages/forum-ext').then(m => ({ default: m.ForumListPage })));
-const ForumFeedPage = lazy(() => import('@/pages/forum-ext').then(m => ({ default: m.ForumFeedPage })));
 const OperatorForumManagementPage = lazy(() => import('@/pages/operator/forum-management').then(m => ({ default: m.OperatorForumManagementPage })));
 
 // Role Not Available Page
@@ -400,9 +397,6 @@ function AppRoutes() {
         <Route path="forum/request-category" element={<RequestCategoryPage />} />
         <Route path="forum/my-requests" element={<MyRequestsPage />} />
         <Route path="forum/feedback" element={<ForumFeedbackPage />} />
-        {/* Forum Extension */}
-        <Route path="forum-ext" element={<ForumListPage />} />
-        <Route path="forum-ext/:forumId" element={<ForumFeedPage />} />
         {/* WO-O4O-GLYCOPHARM-HOME-KPA-ALIGNMENT-V1: /lms 통일 */}
         <Route path="lms" element={<EducationPage />} />
         <Route path="lms/:id" element={<CourseDetailPage />} />

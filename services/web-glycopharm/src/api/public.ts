@@ -91,7 +91,7 @@ const fallbackNowRunning: NowRunningItem[] = [
     type: 'campaign',
     title: '당뇨인의 날 캠페인',
     deadline: '2026.03.14',
-    link: '/forum-ext',
+    link: '/forum',
   },
 ];
 
@@ -101,28 +101,28 @@ const fallbackNotices: Notice[] = [
     title: '[공지] GlycoPharm 서비스 업데이트 안내 (v2.0)',
     date: '2026.01.06',
     isPinned: true,
-    link: '/forum-ext',
+    link: '/forum',
   },
   {
     id: '2',
     title: '[안내] Market Trial 참여 가이드',
     date: '2026.01.05',
     isPinned: true,
-    link: '/forum-ext',
+    link: '/forum',
   },
   {
     id: '3',
     title: '1월 Signage 콘텐츠 업데이트',
     date: '2026.01.03',
     isPinned: false,
-    link: '/forum-ext',
+    link: '/forum',
   },
   {
     id: '4',
     title: '협력 공급사 추가 안내',
     date: '2026.01.02',
     isPinned: false,
-    link: '/forum-ext',
+    link: '/forum',
   },
 ];
 

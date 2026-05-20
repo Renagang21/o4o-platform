@@ -14,16 +14,9 @@ import { useState, useEffect } from 'react';
 import type { CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { apiClient } from '../../services/api';
+import { fetchForumCategories, createForumPost, type ForumCategory } from '@/services/forumApi';
 import { toast } from '@o4o/error-handling';
 import { RichTextEditor } from '@o4o/content-editor';
-
-interface ForumCategory {
-  id: string;
-  name: string;
-  slug: string;
-  postCount: number;
-}
 
 type PostType = 'discussion' | 'question' | 'guide' | 'poll' | 'announcement';
 
@@ -48,12 +41,8 @@ export default function ForumWritePage() {
   const [content, setContent] = useState('');
 
   useEffect(() => {
-    apiClient
-      .get<ForumCategory[]>('/api/v1/glycopharm/forum/categories')
-      .then((res) => {
-        const data = (res as any)?.data ?? res;
-        setCategories(Array.isArray(data) ? data : []);
-      })
+    fetchForumCategories()
+      .then((data) => setCategories(data))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
@@ -77,14 +66,13 @@ export default function ForumWritePage() {
 
     try {
       setSubmitting(true);
-      const res = await apiClient.post('/api/v1/glycopharm/forum/posts', {
+      const data = await createForumPost({
         title: title.trim(),
         categoryId,
         type: postType,
         content,
       });
 
-      const data = res as any;
       if (data.success && data.data?.id) {
         navigate(`/forum/post/${data.data.id}`);
       } else if (data.id) {
