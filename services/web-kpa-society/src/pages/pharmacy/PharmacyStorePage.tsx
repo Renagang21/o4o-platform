@@ -19,7 +19,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { colors, shadows, borderRadius } from '../../styles/theme';
 import { useAuth, TestUser } from '../../contexts/AuthContext';
 import { isPharmacyOwner, PharmacistFeeCategory } from '../../types';
@@ -65,7 +65,6 @@ const DEVICES: Array<{ id: PreviewDevice; name: string; icon: string; maxWidth: 
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export function PharmacyStorePage() {
-  const navigate = useNavigate();
   const { user } = useAuth();
   const testUser = user as TestUser | null;
 
@@ -89,6 +88,28 @@ export function PharmacyStorePage() {
   const [previewDevice, setPreviewDevice] = useState<PreviewDevice>('B2C');
   const [saveState, setSaveState] = useState<SaveState>('idle');
   const [error, setError] = useState<string | null>(null);
+
+  // Responsive grid CSS injection (CSSProperties cannot express media queries)
+  useEffect(() => {
+    const id = 'pharmacy-store-grid-css';
+    if (document.getElementById(id)) return;
+    const style = document.createElement('style');
+    style.id = id;
+    style.textContent = `
+      .ss-pharmacy-store-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+      @media (min-width: 768px) {
+        .ss-pharmacy-store-grid {
+          grid-template-columns: 1fr 400px;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+    return () => { document.getElementById(id)?.remove(); };
+  }, []);
 
   // ── Load settings ────────────────────────────────────────────────────────
   useEffect(() => {
@@ -253,7 +274,7 @@ export function PharmacyStorePage() {
         <div style={S.errorBanner}>{error}</div>
       )}
 
-      <div style={S.mainGrid}>
+      <div className="ss-pharmacy-store-grid">
         {/* ── Left: Settings Panel ─────────────────────────────────────── */}
         <div style={S.settingsPanel}>
 
@@ -530,7 +551,7 @@ const S: Record<string, React.CSSProperties> = {
   header: { marginBottom: '24px' },
   headerContent: { display: 'flex', flexDirection: 'column', gap: '12px' },
   backLink: { color: colors.primary, textDecoration: 'none', fontSize: '0.875rem', fontWeight: 500 },
-  headerMain: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
+  headerMain: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' },
   pharmacyName: { fontSize: '1.5rem', fontWeight: 700, color: colors.neutral900, margin: 0 },
   pageTitle: { fontSize: '1.5rem', fontWeight: 700, color: colors.neutral900, margin: 0 },
   subLabel: { fontSize: '1rem', color: colors.neutral500, fontWeight: 500 },

@@ -22,7 +22,7 @@ import {
   type StaffBlogPost,
   type StaffBlogSettings,
 } from '../../api/blogStaff';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { getStoreSlug } from '../../api/pharmacyInfo';
 // WO-O4O-KPA-STORE-BLOG-CONTENT-RICHTEXT-V1: canonical RichTextEditor 사용
 // WO-O4O-KPA-STORE-BLOG-AI-WIRING-V1: AI 콘텐츠 보조 (canonical AiContentModal 재사용)
@@ -64,7 +64,6 @@ function formatDate(dateStr: string): string {
 }
 
 export function PharmacyBlogPage({ service }: { service?: string }) {
-  const navigate = useNavigate();
   const location = useLocation();
   const [slug, setSlug] = useState<string | null>(null);
   const [posts, setPosts] = useState<StaffBlogPost[]>([]);
@@ -370,7 +369,7 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
   if (mode === 'editor') {
     return (
       <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '24px' }}>
           <div>
             <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#1e293b' }}>
               {editingPost ? '게시글 수정' : '새 게시글'}
@@ -499,7 +498,7 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
   if (mode === 'settings') {
     return (
       <div style={{ maxWidth: '720px', margin: '0 auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px', marginBottom: '24px' }}>
           <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#1e293b' }}>블로그 설정</h1>
           <button onClick={() => setMode('list')} style={{ ...btnStyle, backgroundColor: '#f1f5f9', color: '#475569' }}>
             돌아가기
@@ -658,7 +657,7 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
   // List view
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '24px' }}>
         <div>
           <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#1e293b' }}>블로그 관리</h1>
           <p style={{ fontSize: '14px', color: '#64748b', marginTop: '4px' }}>
@@ -684,7 +683,7 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
       </div>
 
       {/* Status filter */}
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '16px' }}>
         {(['all', 'draft', 'published', 'archived'] as StatusFilter[]).map((f) => (
           <button
             key={f}
@@ -741,7 +740,9 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
                   padding: '16px',
                   display: 'flex',
                   justifyContent: 'space-between',
-                  alignItems: 'center',
+                  alignItems: 'flex-start',
+                  flexWrap: 'wrap',
+                  gap: '10px',
                 }}
               >
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -759,7 +760,7 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
                   </span>
                 </div>
 
-                <div style={{ display: 'flex', gap: '6px', flexShrink: 0, marginLeft: '12px' }}>
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', flexShrink: 0 }}>
                   {/* WO-O4O-KPA-STORE-BLOG-PUBLIC-HEADER-V1: 공개 URL 복사 / 미리보기 (발행 글만) */}
                   {post.status === 'published' && (
                     <>
@@ -840,6 +841,7 @@ const aiBanner: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
+  flexWrap: 'wrap',
   gap: 12,
   padding: '12px 14px',
   marginBottom: 16,

@@ -36,7 +36,7 @@ import {
   AlertCircle,
   FileEdit,
 } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Card, useTemplate } from '@o4o/ui';
 import { kpaConfig } from '@o4o/operator-ux-core';
 import { getMarketingAnalytics, getRecentScans } from '../../api/storeAnalytics';
@@ -50,7 +50,6 @@ import { GuideEditableSection } from '../../components/guide';
 
 export function StoreHomePage() {
   const tpl = useTemplate();
-  const navigate = useNavigate();
   const [analytics, setAnalytics] = useState<MarketingAnalyticsData | null>(null);
   const [recentScans, setRecentScans] = useState<RecentScanItem[]>([]);
   const [libraryCount, setLibraryCount] = useState<number | null>(null);
@@ -133,7 +132,7 @@ export function StoreHomePage() {
   return (
     <div className="max-w-[960px] p-6">
       {/* Header */}
-      <div className="flex justify-between items-start mb-6">
+      <div className="flex flex-wrap justify-between items-start gap-3 mb-6">
         <div>
           <h1 className="text-xl font-bold text-slate-800 m-0">{kpaConfig.uiText.storeHomeTitle}</h1>
           <p className="text-[13px] text-slate-500 mt-1">{kpaConfig.uiText.storeHomeSubtitle}</p>
@@ -260,7 +259,7 @@ export function StoreHomePage() {
       </Card>
 
       {/* ── 하단 2열: 홍보 성과 요약 + 최근 활동 ── */}
-      <div className="grid grid-cols-2 gap-4 mb-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         {/* 홍보 성과 요약 */}
         <Card className="p-5">
           <div className="flex justify-between items-center mb-4">
