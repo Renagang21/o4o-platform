@@ -1,20 +1,23 @@
 /**
  * OperationsCourseDetailPage — 선택한 강의 운영 화면
  *
- * WO-O4O-KPA-LMS-INSTRUCTOR-OPERATIONS-MENU-REFACTOR-V1
+ * WO-O4O-KPA-LMS-INSTRUCTOR-OPERATIONS-MENU-REFACTOR-V1 (초기 구조)
+ * WO-O4O-KPA-LMS-INSTRUCTOR-OPERATIONS-PARTICIPANTS-LIST-V1 (수강회원 리스트 연결)
+ *
  * 경로: /instructor/operations/:courseId
  * 접근 조건: lms:instructor 역할 보유 (App.tsx RoleGuard)
  *
- * 책임 (canonical 구조):
+ * 책임:
  *  - 선택한 강의의 기본 운영 지표 표시 (KPI)
- *  - 추후 회원관리 / 진도 / 퀴즈 / 수료증 기능 확장을 위한 섹션 placeholder
+ *  - 수강 회원 리스트 표시 (인라인 BaseTable)
+ *  - 추후 진도 / 퀴즈 / 수료증 기능 확장을 위한 섹션 placeholder
  *
- * 본 WO에서는 내부 운영 기능 전체 구현은 하지 않는다.
- * 회원관리(참여자)는 기존 /instructor/contents/:courseId/participants 로 연결한다.
+ * 본 WO 범위: 수강회원 리스트 표시까지. row click 상세는 미구현 (placeholder).
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
+import { BaseTable, type O4OColumn } from '@o4o/ui';
 import { lmsInstructorApi } from '../../../api/lms-instructor';
 import { colors, typography } from '../../../styles/theme';
 
@@ -34,6 +37,53 @@ type CourseStats = {
   averageQuizScore: number;
   certificateIssuedCount: number;
 };
+
+// 수강 회원 — participants API items (status는 enrollment status enum)
+type Participant = {
+  enrollmentId: string;
+  userId: string;
+  userName: string;
+  enrolledAt: string;
+  status: string;
+  progressPercentage: number;
+};
+
+// enrollment status → 수강 상태 label
+const ENROLLMENT_LABEL: Record<string, string> = {
+  pending: '대기',
+  approved: '준비',
+  in_progress: '진행 중',
+  completed: '완료',
+  cancelled: '취소',
+  rejected: '거절',
+  expired: '만료',
+};
+const ENROLLMENT_COLOR: Record<string, { bg: string; color: string }> = {
+  pending:     { bg: '#fef3c7', color: '#92400e' },
+  approved:    { bg: '#e0f2fe', color: '#0369a1' },
+  in_progress: { bg: '#dbeafe', color: '#1d4ed8' },
+  completed:   { bg: '#dcfce7', color: '#15803d' },
+  cancelled:   { bg: '#fee2e2', color: '#b91c1c' },
+  rejected:    { bg: '#fce7f3', color: '#9d174d' },
+  expired:     { bg: '#f3f4f6', color: '#6b7280' },
+};
+
+// enrollment status → 승인 상태 (파생)
+function approvalLabel(status: string): { label: string; bg: string; color: string } {
+  if (status === 'pending') return { label: '승인 대기', bg: '#fef3c7', color: '#92400e' };
+  if (status === 'rejected') return { label: '거절됨', bg: '#fce7f3', color: '#9d174d' };
+  return { label: '승인됨', bg: '#dcfce7', color: '#15803d' };
+}
+
+function formatDate(d: string | null | undefined): string {
+  if (!d) return '-';
+  try { return new Date(d).toLocaleDateString('ko-KR'); } catch { return '-'; }
+}
+
+function shortId(id: string): string {
+  if (!id) return '-';
+  return id.length > 8 ? id.slice(-8) : id;
+}
 
 function KpiCard({ label, value, sub, accent }: {
   label: string;
@@ -108,6 +158,11 @@ export default function OperationsCourseDetailPage() {
   const [statsLoading, setStatsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // 수강 회원 리스트 상태
+  const [participants, setParticipants] = useState<Participant[]>([]);
+  const [participantsLoading, setParticipantsLoading] = useState(true);
+  const [participantsError, setParticipantsError] = useState<string | null>(null);
+
   useEffect(() => {
     if (!courseId) return;
     let cancelled = false;
@@ -144,8 +199,143 @@ export default function OperationsCourseDetailPage() {
       }
     })();
 
+    // 수강 회원 리스트 — status 미지정 시 모든 enrollment (pending 포함) 반환
+    (async () => {
+      try {
+        setParticipantsLoading(true);
+        setParticipantsError(null);
+        const res = await lmsInstructorApi.participants(courseId, { limit: 100 });
+        if (cancelled) return;
+        const items = res.data?.data?.items ?? [];
+        // pending(승인 대기) 우선 → 최신 신청 순
+        const sorted = [...items].sort((a, b) => {
+          const aPending = a.status === 'pending' ? 0 : 1;
+          const bPending = b.status === 'pending' ? 0 : 1;
+          if (aPending !== bPending) return aPending - bPending;
+          return new Date(b.enrolledAt).getTime() - new Date(a.enrolledAt).getTime();
+        });
+        setParticipants(sorted);
+      } catch {
+        if (!cancelled) setParticipantsError('수강 회원 목록을 불러오지 못했습니다.');
+      } finally {
+        if (!cancelled) setParticipantsLoading(false);
+      }
+    })();
+
     return () => { cancelled = true; };
   }, [courseId]);
+
+  // BaseTable 컬럼 정의 (회원명/식별/수강상태/승인상태/진도율/신청일/최근학습일)
+  const participantColumns = useMemo<O4OColumn<Participant>[]>(() => [
+    {
+      key: 'userName',
+      header: '회원명',
+      render: (_v, row) => (
+        <span style={{ fontWeight: 600, color: colors.neutral900 }}>
+          {row.userName || '(이름 없음)'}
+        </span>
+      ),
+    },
+    {
+      key: 'userId',
+      header: '식별 ID',
+      width: '120px',
+      render: (_v, row) => (
+        <span style={{ fontSize: '12px', color: colors.neutral500, fontFamily: 'monospace' }}>
+          {shortId(row.userId)}
+        </span>
+      ),
+    },
+    {
+      key: 'status',
+      header: '수강 상태',
+      width: '100px',
+      align: 'center',
+      render: (_v, row) => {
+        const c = ENROLLMENT_COLOR[row.status] ?? { bg: '#f3f4f6', color: '#374151' };
+        return (
+          <span style={{
+            display: 'inline-block',
+            padding: '2px 10px',
+            borderRadius: '999px',
+            fontSize: '11px',
+            fontWeight: 600,
+            backgroundColor: c.bg,
+            color: c.color,
+          }}>
+            {ENROLLMENT_LABEL[row.status] ?? row.status}
+          </span>
+        );
+      },
+    },
+    {
+      key: '_approval',
+      header: '승인 상태',
+      width: '100px',
+      align: 'center',
+      render: (_v, row) => {
+        const a = approvalLabel(row.status);
+        return (
+          <span style={{
+            display: 'inline-block',
+            padding: '2px 10px',
+            borderRadius: '999px',
+            fontSize: '11px',
+            fontWeight: 600,
+            backgroundColor: a.bg,
+            color: a.color,
+          }}>
+            {a.label}
+          </span>
+        );
+      },
+    },
+    {
+      key: 'progressPercentage',
+      header: '진도율',
+      width: '80px',
+      align: 'right',
+      render: (_v, row) => (
+        <span style={{ fontSize: '13px', color: colors.neutral700 }}>
+          {(row.progressPercentage ?? 0).toFixed(1)}%
+        </span>
+      ),
+    },
+    {
+      key: 'enrolledAt',
+      header: '신청일',
+      width: '110px',
+      align: 'center',
+      render: (_v, row) => (
+        <span style={{ fontSize: '12px', color: colors.neutral500 }}>
+          {formatDate(row.enrolledAt)}
+        </span>
+      ),
+    },
+    {
+      // 최근 학습일: 백엔드 participants API 미노출 (lms_progress.lastAccessedAt 집계 필요).
+      // 본 WO 범위 밖 — placeholder '-' 로 표시.
+      key: '_lastStudiedAt',
+      header: '최근 학습일',
+      width: '110px',
+      align: 'center',
+      render: () => (
+        <span style={{ fontSize: '12px', color: colors.neutral300 }} title="추후 backend 확장 예정">
+          -
+        </span>
+      ),
+    },
+  ], []);
+
+  // 회원 row click — 본 WO 범위 밖 (상세 미구현)
+  const handleParticipantClick = () => {
+    alert('회원 상세 화면은 추후 단계에서 제공됩니다.');
+  };
+
+  const pendingCount = useMemo(
+    () => participants.filter(p => p.status === 'pending').length,
+    [participants],
+  );
 
   if (loading) {
     return <div style={styles.stateBox}>강의 정보를 불러오는 중...</div>;
@@ -229,21 +419,50 @@ export default function OperationsCourseDetailPage() {
         <div style={styles.stateBox}>운영 지표를 불러올 수 없습니다.</div>
       )}
 
+      {/* 수강 회원 리스트 */}
+      <div style={styles.tableCard}>
+        <div style={styles.tableHeader}>
+          <div>
+            <h2 style={styles.sectionTitle}>수강 회원</h2>
+            <p style={styles.sectionHint}>
+              {participantsLoading
+                ? '불러오는 중...'
+                : `총 ${participants.length}명${pendingCount > 0 ? ` · 승인 대기 ${pendingCount}명` : ''}`}
+            </p>
+          </div>
+          <button
+            style={styles.secondaryBtn}
+            onClick={() => navigate(`/instructor/contents/${header.courseId}/participants`)}
+          >
+            고급 회원관리 / CSV
+          </button>
+        </div>
+
+        {participantsError && (
+          <div style={styles.errorBanner}>{participantsError}</div>
+        )}
+
+        {!participantsError && participantsLoading && (
+          <div style={styles.stateBox}>수강 회원을 불러오는 중...</div>
+        )}
+
+        {!participantsError && !participantsLoading && (
+          <BaseTable<Participant>
+            columns={participantColumns}
+            data={participants}
+            rowKey={(row) => row.enrollmentId}
+            emptyMessage={
+              <div style={{ textAlign: 'center', padding: '40px 0', color: colors.neutral400 }}>
+                아직 수강 회원이 없습니다.
+              </div>
+            }
+            onRowClick={handleParticipantClick}
+          />
+        )}
+      </div>
+
       {/* 운영 기능 섹션 (canonical extension points) */}
       <div style={styles.sectionGrid}>
-        <SectionCard
-          title="회원 관리"
-          description="수강 신청·승인/거절·진도·수료 여부를 한 곳에서 관리합니다."
-          status="ready"
-          action={
-            <button
-              style={styles.primaryBtn}
-              onClick={() => navigate(`/instructor/contents/${header.courseId}/participants`)}
-            >
-              회원 관리 열기
-            </button>
-          }
-        />
         <SectionCard
           title="진도 관리"
           description="레슨별 진행 현황과 미진행 수강자를 추적합니다."
@@ -298,6 +517,23 @@ const styles: Record<string, React.CSSProperties> = {
     gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
     gap: '12px',
   },
+  tableCard: {
+    backgroundColor: colors.white,
+    borderRadius: '12px',
+    boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+    padding: '20px',
+    marginBottom: '24px',
+  },
+  tableHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    gap: '12px',
+    flexWrap: 'wrap',
+    marginBottom: '12px',
+  },
+  sectionTitle: { ...typography.headingS, color: colors.neutral900, margin: 0 },
+  sectionHint: { fontSize: '12px', color: colors.neutral500, margin: '4px 0 0' },
   stateBox: { padding: '40px', textAlign: 'center' as const, color: colors.neutral500 },
   errorBanner: {
     padding: '12px 16px',
@@ -306,16 +542,6 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: '8px',
     color: '#dc2626',
     fontSize: '14px',
-  },
-  primaryBtn: {
-    padding: '8px 16px',
-    fontSize: '13px',
-    fontWeight: 500,
-    color: colors.white,
-    backgroundColor: colors.primary,
-    border: 'none',
-    borderRadius: '6px',
-    cursor: 'pointer',
   },
   secondaryBtn: {
     padding: '8px 16px',
