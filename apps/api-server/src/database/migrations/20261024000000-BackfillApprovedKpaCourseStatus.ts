@@ -25,17 +25,25 @@ export class BackfillApprovedKpaCourseStatus20261024000000 implements MigrationI
         AND c.status = 'draft'
     `);
 
-    // 2. legacy table (kpa_course_requests)
+    // 2. legacy table (kpa_course_requests) — 테이블이 없는 환경(프로덕션)은 건너뜀
     await queryRunner.query(`
-      UPDATE lms_courses c
-      SET
-        status = 'published',
-        "isPublished" = true,
-        "publishedAt" = COALESCE(c."publishedAt", cr.reviewed_at, NOW())
-      FROM kpa_course_requests cr
-      WHERE cr.status = 'approved'
-        AND cr.created_course_id = c.id
-        AND c.status = 'draft'
+      DO $$
+      BEGIN
+        IF EXISTS (
+          SELECT FROM information_schema.tables
+          WHERE table_schema = 'public' AND table_name = 'kpa_course_requests'
+        ) THEN
+          UPDATE lms_courses c
+          SET
+            status = 'published',
+            "isPublished" = true,
+            "publishedAt" = COALESCE(c."publishedAt", cr.reviewed_at, NOW())
+          FROM kpa_course_requests cr
+          WHERE cr.status = 'approved'
+            AND cr.created_course_id = c.id
+            AND c.status = 'draft';
+        END IF;
+      END $$;
     `);
   }
 
