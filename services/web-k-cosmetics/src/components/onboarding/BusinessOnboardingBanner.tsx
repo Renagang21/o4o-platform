@@ -15,8 +15,7 @@ export function BusinessOnboardingBanner() {
 
   // Guard: 로그인 + operator/partner가 아닌 사용자에게만 노출
   if (!isAuthenticated || !user) return null;
-  // WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed role checks
-  if (user.roles.some(r => ['k-cosmetics:operator', 'k-cosmetics:partner', 'k-cosmetics:admin', 'platform:super_admin'].includes(r))) return null;
+  if (user.roles.some(r => ['cosmetics:operator', 'cosmetics:admin', 'platform:super_admin'].includes(r))) return null;
 
   return (
     <div style={styles.banner}>
