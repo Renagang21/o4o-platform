@@ -104,6 +104,7 @@ export function ForumFeedPage() {
     if (!slug) return;
     setForumLoading(true);
     setError(null);
+    setClosedForumId(null);
     homeApi.getForumDetail(slug, { limit: 1 })
       .then((res) => {
         if (res?.data?.forum) {
@@ -113,7 +114,10 @@ export function ForumFeedPage() {
         }
       })
       .catch((err: any) => {
-        if (err?.response?.status === 404) {
+        // WO-O4O-KPA-MEMBER_ONLY-FORUM-ACCESS-GUARD-FIX-V1: 403 closed forum 처리
+        if (err?.status === 403 && err?.code === 'CLOSED_FORUM_ACCESS_DENIED') {
+          setClosedForumId(err?.data?.forumId ?? null);
+        } else if (err?.status === 404 || err?.response?.status === 404) {
           setError('포럼을 찾을 수 없습니다.');
         } else {
           setError('포럼 정보를 불러오지 못했습니다.');
@@ -341,6 +345,24 @@ export function ForumFeedPage() {
   // ── Render ──
 
   if (forumLoading) return <LoadingSpinner />;
+
+  // WO-O4O-KPA-MEMBER_ONLY-FORUM-ACCESS-GUARD-FIX-V1: 포럼 로드 단계에서 403 수신 시 처리
+  // forum 정보 없이도 ClosedForumAccessBlocker를 표시한다 (포럼 메타정보 노출 없음)
+  if (closedForumId && !forum) {
+    return (
+      <PageSection last>
+        <PageContainer width="form">
+          <ClosedForumAccessBlocker
+            categoryId={closedForumId}
+            user={user}
+            variant="page"
+            onBack={() => navigate('/forum')}
+          />
+        </PageContainer>
+      </PageSection>
+    );
+  }
+
   if (error) {
     return (
       <div style={styles.errorWrap}>

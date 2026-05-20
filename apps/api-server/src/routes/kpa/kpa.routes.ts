@@ -753,6 +753,40 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       res.status(404).json({ success: false, error: 'FORUM_NOT_FOUND' });
       return;
     }
+    // WO-O4O-KPA-MEMBER_ONLY-FORUM-ACCESS-GUARD-FIX-V1: closed forum 멤버십 검증
+    if (forum.forumType === 'closed') {
+      const userId: string | undefined = (req as any).user?.id;
+      const userRoles: string[] = (req as any).user?.roles || [];
+      const BYPASS_ROLES = ['kpa:admin', 'kpa:operator', 'platform:admin', 'platform:super_admin'];
+      if (!userRoles.some((r) => BYPASS_ROLES.includes(r))) {
+        let allowed = false;
+        if (userId) {
+          const [member] = await dataSource.query(
+            `SELECT role FROM forum_category_members WHERE forum_category_id = $1 AND user_id = $2 LIMIT 1`,
+            [forum.id, userId],
+          );
+          if (member) {
+            allowed = true;
+          } else {
+            // Fallback: forum creator (before membership backfill)
+            const [forumRow] = await dataSource.query(
+              `SELECT requester_id FROM forum_category_requests WHERE id = $1 LIMIT 1`,
+              [forum.id],
+            );
+            if (forumRow?.requester_id === userId) allowed = true;
+          }
+        }
+        if (!allowed) {
+          res.status(403).json({
+            success: false,
+            error: 'This is a closed forum. Membership is required.',
+            code: 'CLOSED_FORUM_ACCESS_DENIED',
+            data: { forumId: forum.id },
+          });
+          return;
+        }
+      }
+    }
     const posts = await forumService.listForumPosts(forum.id, { limit, offset });
     res.json({ success: true, data: { forum, posts } });
   }));
