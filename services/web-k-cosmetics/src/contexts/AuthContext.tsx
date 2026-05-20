@@ -50,7 +50,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  // smart init: 토큰이 있으면 checkSession 완료 전까지 isLoading=true → RoleGuard 성급한 redirect 방지
+  const [isLoading, setIsLoading] = useState(() => !!getAccessToken());
   const [isSessionChecked, setIsSessionChecked] = useState(false);
   // WO-O4O-AUTH-RUNTIME-ORCHESTRATION-STABILIZATION-V1:
   // 여러 RoleGuard 동시 마운트 시 병렬 중복 호출 방지 (ref는 동기적으로 업데이트됨)
