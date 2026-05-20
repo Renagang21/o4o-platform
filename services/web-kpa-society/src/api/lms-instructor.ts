@@ -90,6 +90,8 @@ export interface CreateCourseDto {
   visibility?: CourseVisibility;
   // WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1: 미전달 시 백엔드에서 'restricted' 기본
   reusablePolicy?: CourseReusablePolicy;
+  // WO-O4O-LMS-VISIBILITY-ENROLLMENT-INTEGRATION-V1: 강사 승인 필요 여부
+  requiresApproval?: boolean;
 }
 
 export interface UpdateCourseDto {
@@ -101,6 +103,8 @@ export interface UpdateCourseDto {
   visibility?: CourseVisibility;
   // WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1
   reusablePolicy?: CourseReusablePolicy;
+  // WO-O4O-LMS-VISIBILITY-ENROLLMENT-INTEGRATION-V1: 강사 승인 필요 여부
+  requiresApproval?: boolean;
 }
 
 export interface CreateLessonDto {

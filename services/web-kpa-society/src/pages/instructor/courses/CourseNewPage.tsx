@@ -85,6 +85,8 @@ export default function CourseNewPage({
   const [tagInput, setTagInput] = useState('');
   // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1: 기본값 회원제
   const [visibility, setVisibility] = useState<CourseVisibility>('members');
+  // WO-O4O-LMS-VISIBILITY-ENROLLMENT-INTEGRATION-V1: 강사 승인 필요 여부 (기본값 false)
+  const [requiresApproval, setRequiresApproval] = useState(false);
   // WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1: 매장 자료함 가져가기 허용 여부 (기본값 차단)
   const [reusablePolicy, setReusablePolicy] = useState<CourseReusablePolicy>('restricted');
   const [submitting, setSubmitting] = useState(false);
@@ -113,6 +115,7 @@ export default function CourseNewPage({
         contentKind, // 미지정 시 백엔드에서 'lecture' 기본
         visibility,  // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1
         reusablePolicy, // WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1
+        requiresApproval, // WO-O4O-LMS-VISIBILITY-ENROLLMENT-INTEGRATION-V1
       });
       // API returns { success, data: Course }
       const courseId = res.data?.data?.id;
@@ -185,6 +188,24 @@ export default function CourseNewPage({
           </div>
           <span style={styles.hint}>회원제는 로그인 회원만, 공개는 모두에게 노출됩니다.</span>
         </div>
+
+        {/* WO-O4O-LMS-VISIBILITY-ENROLLMENT-INTEGRATION-V1: 강사 승인 필요 — MEMBERS 강의에서만 표시 */}
+        {visibility === 'members' && (
+          <div style={styles.field}>
+            <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={requiresApproval}
+                onChange={(e) => setRequiresApproval(e.target.checked)}
+                style={{ marginTop: 2 }}
+              />
+              <span>
+                <span style={{ ...styles.label, display: 'block' }}>강사 승인 필요</span>
+                <span style={styles.hint}>수강 신청 후 강사가 직접 승인해야 수강이 가능합니다.</span>
+              </span>
+            </label>
+          </div>
+        )}
 
         {/* WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1: 매장 자료함 가져가기 허용 — visibility와 독립 축 */}
         <div style={styles.field}>

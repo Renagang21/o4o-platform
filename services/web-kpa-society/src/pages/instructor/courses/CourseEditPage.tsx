@@ -513,6 +513,8 @@ export default function CourseEditPage() {
   const [tagInput, setTagInput] = useState('');
   // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1: 공개/회원제. 기본값 회원제.
   const [visibility, setVisibility] = useState<CourseVisibility>('members');
+  // WO-O4O-LMS-VISIBILITY-ENROLLMENT-INTEGRATION-V1: 강사 승인 필요 여부. 기본값 false.
+  const [requiresApproval, setRequiresApproval] = useState(false);
   // WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1: 매장 자료함 가져가기 허용. 기본값 차단.
   const [reusablePolicy, setReusablePolicy] = useState<CourseReusablePolicy>('restricted');
   const [saving, setSaving] = useState(false);
@@ -547,6 +549,8 @@ export default function CourseEditPage() {
       setTags(c.tags || []);
       // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1: 응답에 visibility가 없으면 기본 'members'
       setVisibility(c.visibility ?? 'members');
+      // WO-O4O-LMS-VISIBILITY-ENROLLMENT-INTEGRATION-V1
+      setRequiresApproval(c.requiresApproval ?? false);
       // WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1: 응답에 reusablePolicy가 없으면 기본 'restricted'
       setReusablePolicy(c.reusablePolicy ?? 'restricted');
       setLessons(ls.sort((a, b) => a.order - b.order));
@@ -575,6 +579,7 @@ export default function CourseEditPage() {
         tags: tags.length > 0 ? tags : [],
         visibility, // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1
         reusablePolicy, // WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1
+        requiresApproval, // WO-O4O-LMS-VISIBILITY-ENROLLMENT-INTEGRATION-V1
       });
       setSaveMsg('저장되었습니다.');
       setTimeout(() => setSaveMsg(null), 2000);
@@ -795,6 +800,23 @@ export default function CourseEditPage() {
               </label>
             </div>
           </div>
+          {/* WO-O4O-LMS-VISIBILITY-ENROLLMENT-INTEGRATION-V1: 강사 승인 필요 — MEMBERS 강의에서만 표시 */}
+          {visibility === 'members' && (
+            <div style={s.field}>
+              <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={requiresApproval}
+                  onChange={(e) => setRequiresApproval(e.target.checked)}
+                  style={{ marginTop: 2 }}
+                />
+                <span>
+                  <span style={{ ...s.label, display: 'block' }}>강사 승인 필요</span>
+                  <span style={{ fontSize: 11, color: '#9ca3af' }}>수강 신청 후 강사가 직접 승인해야 수강이 가능합니다.</span>
+                </span>
+              </label>
+            </div>
+          )}
           {/* WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1: 매장 자료함 가져가기 허용 — visibility와 독립 축 */}
           <div style={s.field}>
             <label style={s.label}>매장 자료함 활용 허용</label>
