@@ -17,7 +17,22 @@ on:
     branches:
       - main
     paths:
+      # E2E 테스트 코드 자체
       - 'e2e/auth-runtime/**'
+      # Auth 공통 패키지 (src만 — dist는 자동 생성이므로 제외)
+      - 'packages/auth-utils/src/**'
+      - 'packages/auth-client/src/**'
+      - 'packages/security-core/src/**'
+      # 서비스별 AuthContext (login/token 흐름 직접 제어)
+      - 'services/web-kpa-society/src/contexts/AuthContext.tsx'
+      - 'services/web-neture/src/contexts/AuthContext.tsx'
+      - 'services/web-glycopharm/src/contexts/AuthContext.tsx'
+      - 'services/web-k-cosmetics/src/contexts/AuthContext.tsx'
+      # Auth guard 컴포넌트 (RoleGuard, MembershipGate, AuthGate 등)
+      - 'services/web-*/src/components/auth/**'
+      # 서비스별 membership/role 로직
+      - 'services/web-*/src/lib/membershipGate.ts'
+      - 'services/web-*/src/lib/role-constants.ts'
 
 concurrency:
   group: e2e-auth-runtime-${{ github.ref }}
