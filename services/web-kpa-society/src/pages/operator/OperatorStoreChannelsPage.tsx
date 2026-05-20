@@ -279,7 +279,7 @@ export default function OperatorStoreChannelsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">채널 관리</h1>
           <p className="text-slate-500 text-sm mt-1">전체 매장의 채널 상태를 관리합니다</p>
@@ -301,7 +301,7 @@ export default function OperatorStoreChannelsPage() {
       )}
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white rounded-xl p-4 border border-slate-100">
           <p className="text-2xl font-bold text-slate-800">{totalCount}</p>
           <p className="text-xs text-slate-500">전체 채널</p>
