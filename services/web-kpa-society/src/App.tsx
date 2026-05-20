@@ -56,7 +56,9 @@ const InstructorDashboardPage = lazy(() => import('./pages/instructor/Instructor
 const CourseListPage = lazy(() => import('./pages/instructor/courses/CourseListPage'));
 const CourseNewPage = lazy(() => import('./pages/instructor/courses/CourseNewPage'));
 const CourseEditPage = lazy(() => import('./pages/instructor/courses/CourseEditPage'));
-const InstructorCourseDashboardPage = lazy(() => import('./pages/instructor/InstructorCourseDashboardPage'));
+// WO-O4O-KPA-LMS-INSTRUCTOR-OPERATIONS-MENU-REFACTOR-V1: 강의 운영 신규 페이지
+const OperationsCourseListPage = lazy(() => import('./pages/instructor/operations/OperationsCourseListPage'));
+const OperationsCourseDetailPage = lazy(() => import('./pages/instructor/operations/OperationsCourseDetailPage'));
 const ContentParticipantsPage = lazy(() => import('./pages/instructor/ContentParticipantsPage'));
 // WO-O4O-LMS-ASSIGNMENT-GRADING-V1
 const LessonSubmissionsPage = lazy(() => import('./pages/instructor/courses/LessonSubmissionsPage'));
@@ -767,7 +769,11 @@ function App() {
             <Route path="/instructor/courses" element={<InstructorLayout><CourseListPage /></InstructorLayout>} />
             <Route path="/instructor/courses/new" element={<InstructorLayout><CourseNewPage /></InstructorLayout>} />
             <Route path="/instructor/courses/:id" element={<InstructorLayout><CourseEditPage /></InstructorLayout>} />
-            <Route path="/instructor/dashboard" element={<InstructorLayout><InstructorCourseDashboardPage /></InstructorLayout>} />
+            {/* WO-O4O-KPA-LMS-INSTRUCTOR-OPERATIONS-MENU-REFACTOR-V1: 강의 운영 신규 메뉴 */}
+            <Route path="/instructor/operations" element={<InstructorLayout><OperationsCourseListPage /></InstructorLayout>} />
+            <Route path="/instructor/operations/:courseId" element={<InstructorLayout><OperationsCourseDetailPage /></InstructorLayout>} />
+            {/* /instructor/dashboard: legacy → /instructor/operations 로 redirect (backward compat) */}
+            <Route path="/instructor/dashboard" element={<Navigate to="/instructor/operations" replace />} />
             {/* WO-O4O-MARKETING-CONTENT-OPERATIONS-MVP-V1 */}
             <Route path="/instructor/contents/:courseId/participants" element={<InstructorLayout><ContentParticipantsPage /></InstructorLayout>} />
             {/* WO-O4O-LMS-ASSIGNMENT-GRADING-V1: 과제 채점 */}

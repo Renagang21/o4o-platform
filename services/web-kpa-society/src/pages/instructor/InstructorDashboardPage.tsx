@@ -6,11 +6,13 @@
  *
  * 화면 구성:
  *  1. 운영 요약 KPI 카드 (강의 수 / 수강생 수 / 평균 완료율 / 승인 대기)
- *  2. 운영 대시보드 CTA (/instructor/dashboard)
- *  3. 승인 대기 수강신청 카드 (목록 + 승인/거절 버튼)
- *  4. 내 강의 목록 카드 (dashboardCourses 기반)
- *  5. 강사 프로필 카드 (수정 모달 유지)
- *  6. 신청/심사 정보 카드
+ *  2. 승인 대기 수강신청 카드 (목록 + 승인/거절 버튼)
+ *  3. 내 강의 목록 카드 (dashboardCourses 기반)
+ *  4. 강사 프로필 카드 (수정 모달 유지)
+ *  5. 신청/심사 정보 카드
+ *
+ * WO-O4O-KPA-LMS-INSTRUCTOR-OPERATIONS-MENU-REFACTOR-V1:
+ *   강의 운영 대시보드 CTA 카드 제거 — /instructor/operations 메뉴로 진입.
  *
  * 사용 API (모두 기존):
  *  - instructorApi.getMe / updateProfile
@@ -413,16 +415,7 @@ export default function InstructorDashboardPage() {
         <KpiCard label="승인 대기" value={pendingTotal} sub="수강 신청" accent={pendingTotal > 0 ? '#dc2626' : '#94a3b8'} />
       </div>
 
-      {/* 2. CTA: 강의 운영 대시보드 */}
-      <Card style={{ marginTop: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
-        <div>
-          <p style={{ fontSize: '15px', fontWeight: 700, color: colors.neutral900, margin: 0 }}>강의 운영 대시보드</p>
-          <p style={{ fontSize: '13px', color: colors.neutral500, margin: '4px 0 0' }}>강의별 수강자 / 진도 / 퀴즈 통계 / 인증서 발급 현황</p>
-        </div>
-        <button style={styles.primaryBtn} onClick={() => navigate('/instructor/dashboard')}>운영 대시보드 보기</button>
-      </Card>
-
-      {/* 3. 승인 대기 수강신청 */}
+      {/* 2. 승인 대기 수강신청 */}
       {pendings.length > 0 && (
         <Card style={{ marginTop: '16px' }}>
           <CardTitle action={
@@ -467,7 +460,7 @@ export default function InstructorDashboardPage() {
         </Card>
       )}
 
-      {/* 4. 내 강의 목록 */}
+      {/* 3. 내 강의 목록 */}
       <Card style={{ marginTop: '16px' }}>
         <CardTitle action={
           <button style={styles.linkBtn} onClick={() => navigate('/instructor/courses/new')}>+ 신규 강의</button>
@@ -515,7 +508,7 @@ export default function InstructorDashboardPage() {
         )}
       </Card>
 
-      {/* 5+6. 프로필 + 신청/심사 */}
+      {/* 4+5. 프로필 + 신청/심사 */}
       <div style={styles.profileGrid}>
         <InstructorProfileCard data={data} onEdit={() => setEditOpen(true)} />
         <ReviewInfoCard data={data} />
@@ -551,7 +544,6 @@ const styles: Record<string, React.CSSProperties> = {
   th: { padding: '10px 12px', textAlign: 'left' as const, fontSize: '12px', fontWeight: 600, color: colors.neutral600, borderBottom: `1px solid ${colors.neutral200}` },
   td: { padding: '10px 12px', fontSize: '14px', color: colors.neutral800, borderBottom: `1px solid ${colors.neutral100}` },
   editBtn: { padding: '6px 14px', fontSize: '13px', color: colors.primary, backgroundColor: 'transparent', border: `1px solid ${colors.primary}`, borderRadius: '6px', cursor: 'pointer' },
-  primaryBtn: { padding: '9px 18px', fontSize: '14px', fontWeight: 500, color: colors.white, backgroundColor: colors.primary, border: 'none', borderRadius: '7px', cursor: 'pointer' },
   linkBtn: { padding: '4px 10px', fontSize: '12px', color: colors.primary, backgroundColor: 'transparent', border: `1px solid ${colors.primary}`, borderRadius: '6px', cursor: 'pointer' },
   tinyBtn: { padding: '4px 10px', fontSize: '12px', color: colors.neutral700, backgroundColor: colors.neutral100, border: 'none', borderRadius: '6px', cursor: 'pointer', marginRight: '4px' },
   smallApprove: { padding: '5px 12px', fontSize: '12px', fontWeight: 500, color: colors.white, backgroundColor: '#10b981', border: 'none', borderRadius: '6px', cursor: 'pointer' },

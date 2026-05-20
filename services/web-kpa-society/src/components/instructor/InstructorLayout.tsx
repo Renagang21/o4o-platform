@@ -9,7 +9,7 @@
 
 import type { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, BookOpen, PlusSquare, FileText, UserCircle } from 'lucide-react';
+import { LayoutDashboard, BookOpen, PlusSquare, ClipboardList, FileText, UserCircle } from 'lucide-react';
 import { KpaGlobalHeader } from '../KpaGlobalHeader';
 import { Footer } from '../Footer';
 
@@ -45,6 +45,12 @@ const MENU: InstructorMenuItem[] = [
     path: '/instructor/courses/new',
     icon: PlusSquare,
     match: (p) => p === '/instructor/courses/new',
+  },
+  {
+    label: '강의 운영',
+    path: '/instructor/operations',
+    icon: ClipboardList,
+    match: (p) => p === '/instructor/operations' || p.startsWith('/instructor/operations/'),
   },
   {
     label: '신청 / 심사 정보',

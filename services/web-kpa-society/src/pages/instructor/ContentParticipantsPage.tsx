@@ -266,8 +266,8 @@ export default function ContentParticipantsPage() {
     <div style={styles.container}>
       {/* 헤더 */}
       <div style={styles.header}>
-        <button onClick={() => navigate('/instructor/dashboard')} style={styles.backBtn}>
-          ← 대시보드로
+        <button onClick={() => navigate('/instructor/operations')} style={styles.backBtn}>
+          ← 강의 운영으로
         </button>
         <div style={{ flex: 1 }}>
           <h1 style={styles.pageTitle}>참여자 관리</h1>
