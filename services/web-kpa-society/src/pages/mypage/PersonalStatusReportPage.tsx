@@ -578,15 +578,21 @@ const styles: Record<string, React.CSSProperties> = {
   historyRow: {
     display: 'flex',
     gap: '8px',
+    flexWrap: 'wrap' as const,
   },
   historyLabel: {
     fontSize: '0.75rem',
     color: colors.neutral500,
     minWidth: '50px',
+    flexShrink: 0,
   },
   historyValue: {
     fontSize: '0.875rem',
     color: colors.neutral700,
+    flex: 1,
+    minWidth: 0,
+    wordBreak: 'break-word' as const,
+    overflowWrap: 'break-word' as const,
   },
   noHistory: {
     textAlign: 'center',
