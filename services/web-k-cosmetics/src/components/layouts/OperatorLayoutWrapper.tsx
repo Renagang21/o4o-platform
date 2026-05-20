@@ -24,7 +24,7 @@ export default function OperatorLayoutWrapper() {
   const navigate = useNavigate();
 
   // WO-O4O-OPERATOR-ROUTE-GUARD-COMMONIZATION-V1: 공통 helper 사용
-  const isAdmin = user ? isAdminOrAbove(user.roles, 'k-cosmetics') : false;
+  const isAdmin = user ? isAdminOrAbove(user.roles, 'cosmetics') : false;
 
   const menuItems = useMemo(
     () => filterMenuByRole(UNIFIED_MENU, isAdmin),
