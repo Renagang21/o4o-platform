@@ -241,7 +241,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  // WO-O4O-KPA-AUTH-ISLOADING-SMART-INIT-V1: Neture/GlycoPharm 패턴 정렬
+  // 토큰 없는 비로그인 방문자: false로 즉시 시작 / 토큰 있는 사용자: true로 시작
+  const [isLoading, setIsLoading] = useState(() => !!getAccessToken());
   // WO-KPA-LOGIN-LATENCY-CLEANUP-V1: KPA context 비동기 로딩 상태
   // true = 로딩 불필요 또는 로딩 완료 / false = 아직 로딩 중
   const [isKpaContextLoaded, setIsKpaContextLoaded] = useState(true);
