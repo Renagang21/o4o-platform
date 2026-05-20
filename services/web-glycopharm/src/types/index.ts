@@ -1,8 +1,6 @@
 // Re-export from other type files
 export * from './signage';
 export * from './categoryRequest';
-// marketTrial: removed (WO-MARKET-TRIAL-B2B-API-UNIFICATION-V1 — use common API types)
-// forum.ts: removed (WO-O4O-GLYCOPHARM-FORUM-API-CANONICAL-V1 — forum-ext 제거, 타입 인라인 이동)
 export * from './b2bOrder';
 // Note: store.ts also exports CartItem, so we selectively re-export to avoid conflict
 export {

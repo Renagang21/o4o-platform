@@ -11,8 +11,7 @@
 import { useState, useEffect, CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { fetchPopularForums, type PopularForum } from '../../services/forumApi';
-import { api } from '../../lib/apiClient';
+import { createForumPost, fetchPopularForums, type PopularForum } from '../../services/forumApi';
 import { toast } from '@o4o/error-handling';
 
 type PostType = 'discussion' | 'question' | 'guide' | 'poll' | 'announcement';
@@ -74,14 +73,13 @@ export default function ForumWritePage() {
     try {
       setSubmitting(true);
       const blocks = textToBlocks(content);
-      const res = await api.post('/forum/posts', {
+      const data = await createForumPost({
         title: title.trim(),
         categoryId,
         type: postType,
         content: blocks,
       });
 
-      const data = res.data;
       if (data.success && data.data?.id) {
         navigate(`/forum/post/${data.data.id}`);
       } else {

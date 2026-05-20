@@ -203,6 +203,17 @@ export function extractTextContent(content: string | object[] | undefined): stri
 // Owner Category Management — WO-O4O-FORUM-MY-FORUM-EXPANSION-V1
 // ============================================================================
 
+// WO-O4O-FORUM-CANONICAL-SPRINT2-CLEANUP-V1
+export async function createForumPost(payload: {
+  title: string;
+  categoryId: string;
+  type: ForumPostType;
+  content: Array<{ type: string; content: string }> | string;
+}): Promise<{ success: boolean; data?: { id: string }; error?: string }> {
+  const response = await api.post('/forum/posts', payload);
+  return response.data;
+}
+
 export async function fetchMyCategories(): Promise<{ success: boolean; data: any[] }> {
   try {
     const response = await api.get('/forum/categories/mine');

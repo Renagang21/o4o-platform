@@ -72,6 +72,8 @@ export function ForumHubPage() {
     infoLinks: [
       { label: '인기 글', href: '/forum/posts?sort=popular' },
       { label: '공지사항', href: '/forum/posts?type=announcement' },
+      // WO-O4O-FORUM-CANONICAL-SPRINT2-CLEANUP-V1
+      { label: '내 포럼', href: '/forum/my-dashboard' },
     ],
   };
 

@@ -11,7 +11,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, MessageSquare, Eye, Heart, Calendar, User, Loader2, AlertCircle } from 'lucide-react';
-import { fetchForumPost, fetchPostComments, type ForumPostDetail, type ForumComment } from '@/services/forumApi';
+import { fetchForumPost, fetchPostComments, extractTextContent, type ForumPostDetail, type ForumComment } from '@/services/forumApi';
 import { ContentRenderer } from '@o4o/content-editor';
 
 // ─── Local aliases ───────────────────────────────────────────
@@ -79,7 +79,7 @@ export default function ForumPostDetailPage() {
   }
 
   const authorName = (post as any).authorName || post.author?.nickname || post.author?.name || '익명';
-  const bodyText = post.content || post.body || '';
+  const bodyText = extractTextContent(post.content) || post.body || '';
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">

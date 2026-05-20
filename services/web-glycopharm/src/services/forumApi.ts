@@ -2,66 +2,60 @@
  * GlycoPharm Forum API
  *
  * WO-O4O-GLYCOPHARM-FORUM-API-CANONICAL-V1
+ * WO-O4O-FORUM-CANONICAL-SPRINT2-CLEANUP-V1 — @o4o/types/forum SSOT 정렬
  *
  * Canonical endpoint: /api/v1/forum/* (common forum API)
- * Pattern: K-Cosmetics forumApi.ts 기준 정렬
  */
 
 import { api } from '@/lib/apiClient';
 
-// ─── Types ─────────────────────────────────────────────────────────────────────
+// ─── Types — @o4o/types/forum SSOT ─────────────────────────────────────────────
 
-export interface ForumCategory {
-  id: string;
-  name: string;
-  slug?: string;
-  description?: string | null;
-  color?: string | null;
-  iconUrl?: string | null;
-  iconEmoji?: string | null;
-  postCount: number;
-  isPinned?: boolean;
-}
+import type {
+  ForumPostResponse,
+  ForumPostType,
+  ForumCategoryResponse,
+  ForumCommentResponse,
+  ForumAuthorResponse,
+  ForumPaginationInfo,
+} from '@o4o/types/forum';
 
-export interface ForumPostAuthor {
-  id: string;
-  name?: string;
-  nickname?: string | null;
-  email?: string;
-}
+export type {
+  ForumPostResponse,
+  ForumPostType,
+  ForumCategoryResponse,
+  ForumCommentResponse,
+  ForumAuthorResponse,
+  ForumPaginationInfo,
+};
 
-export interface ForumPost {
-  id: string;
-  title: string;
-  excerpt?: string;
-  slug?: string;
-  author?: ForumPostAuthor | null;
-  authorId?: string;
-  category?: { id: string; name: string; slug?: string } | null;
-  categoryId?: string;
-  viewCount: number;
-  commentCount: number;
-  likeCount?: number;
-  createdAt: string;
-  isPinned?: boolean;
-  status?: string;
-}
+// Backward-compatible aliases used throughout web-glycopharm
+export type ForumPost = ForumPostResponse;
+export type ForumPostDetail = ForumPostResponse;
+export type ForumCategory = ForumCategoryResponse;
+export type ForumComment = ForumCommentResponse;
+export type ForumPostAuthor = ForumAuthorResponse;
 
-export interface ForumPostDetail extends ForumPost {
-  content: string;
-}
-
-export interface ForumComment {
-  id: string;
-  content: string;
-  authorId: string;
-  author?: ForumPostAuthor | null;
-  createdAt: string;
-  updatedAt?: string;
-}
-
-export function getAuthorName(post: { author?: ForumPostAuthor | null }): string {
+export function getAuthorName(post: { author?: ForumAuthorResponse | null }): string {
   return post.author?.nickname || post.author?.name || '익명';
+}
+
+/** Normalize Forum post content (Block[] | string) to plain text. */
+export function extractTextContent(content: unknown): string {
+  if (!content) return '';
+  if (typeof content === 'string') return content;
+  if (Array.isArray(content)) {
+    return content
+      .map((block: any) => {
+        if (block?.content && (block.type === 'paragraph' || block.type === 'heading')) {
+          return String(block.content);
+        }
+        return '';
+      })
+      .filter(Boolean)
+      .join('\n\n');
+  }
+  return '';
 }
 
 // ─── API Functions ─────────────────────────────────────────────────────────────
