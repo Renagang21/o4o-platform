@@ -11,7 +11,7 @@ import { Link } from 'react-router-dom';
 import { useAuth, ROLE_LABELS } from '@/contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
 import { api } from '@/lib/apiClient';
-import { User, Mail, Shield } from 'lucide-react';
+import { User, Mail, Phone, Shield } from 'lucide-react';
 import {
   MyPageLayout,
   ProfileCard,
@@ -25,6 +25,7 @@ export default function MyProfilePage() {
   const [editData, setEditData] = useState({
     name: user?.name || '',
     nickname: user?.nickname || '',
+    phone: user?.phone || '',
   });
 
   if (!isAuthenticated || !user) {
@@ -48,8 +49,8 @@ export default function MyProfilePage() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await api.put('/users/profile', { name: editData.name, nickname: editData.nickname });
-      updateUser({ name: editData.name, nickname: editData.nickname });
+      await api.put('/users/profile', { name: editData.name, nickname: editData.nickname, phone: editData.phone });
+      updateUser({ name: editData.name, nickname: editData.nickname, phone: editData.phone });
       setIsEditing(false);
       toast.success('프로필이 수정되었습니다.');
     } catch (err: any) {
@@ -61,7 +62,7 @@ export default function MyProfilePage() {
   };
 
   const handleCancel = () => {
-    setEditData({ name: user.name || '', nickname: user.nickname || '' });
+    setEditData({ name: user.name || '', nickname: user.nickname || '', phone: user.phone || '' });
     setIsEditing(false);
   };
 
@@ -97,6 +98,15 @@ export default function MyProfilePage() {
         {!isEditing && user.nickname && (
           <p className="text-xs text-gray-400 -mt-2 ml-10 mb-2">포럼, 댓글 등 공개 화면에 표시됩니다.</p>
         )}
+        <ProfileInfoField
+          label="연락처"
+          value={user.phone || '등록된 연락처가 없습니다'}
+          editValue={editData.phone}
+          isEditing={isEditing}
+          onChange={(v: string) => setEditData(prev => ({ ...prev, phone: v }))}
+          type="tel"
+          icon={<Phone className="w-5 h-5 text-gray-400" />}
+        />
         <ProfileInfoField
           label="이메일"
           value={user.email}

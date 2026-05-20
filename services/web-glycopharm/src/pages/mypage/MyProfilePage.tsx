@@ -10,14 +10,13 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/apiClient';
+import { toast } from '@o4o/error-handling';
 import {
   User,
   Mail,
   Phone,
   Building2,
   Shield,
-  CheckCircle,
-  AlertCircle,
 } from 'lucide-react';
 import {
   MyPageLayout,
@@ -44,11 +43,6 @@ const statusLabels: Record<string, { label: string; color: string }> = {
   suspended: { label: '정지됨', color: '#6b7280' },
 };
 
-interface FeedbackState {
-  type: 'success' | 'error';
-  message: string;
-}
-
 export default function MyProfilePage() {
   const { user, updateUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
@@ -59,7 +53,6 @@ export default function MyProfilePage() {
     phone: user?.phone || '',
   });
   const [saving, setSaving] = useState(false);
-  const [feedback, setFeedback] = useState<FeedbackState | null>(null);
 
   if (!user) {
     return (
@@ -75,7 +68,6 @@ export default function MyProfilePage() {
 
   const handleSave = async () => {
     setSaving(true);
-    setFeedback(null);
     try {
       const fullName = (editData.lastName && editData.firstName)
         ? `${editData.lastName}${editData.firstName}`
@@ -96,11 +88,10 @@ export default function MyProfilePage() {
         phone: editData.phone,
       });
       setIsEditing(false);
-      setFeedback({ type: 'success', message: '프로필이 수정되었습니다.' });
-      setTimeout(() => setFeedback(null), 3000);
+      toast.success('프로필이 수정되었습니다.');
     } catch (err: any) {
       const message = err.response?.data?.message || err.response?.data?.error || (err instanceof Error ? err.message : '프로필 수정에 실패했습니다.');
-      setFeedback({ type: 'error', message });
+      toast.error(message);
     } finally {
       setSaving(false);
     }
@@ -109,29 +100,10 @@ export default function MyProfilePage() {
   const handleCancel = () => {
     setIsEditing(false);
     setEditData({ lastName: user.lastName || '', firstName: user.firstName || '', nickname: user.nickname || '', phone: user.phone || '' });
-    setFeedback(null);
   };
 
   return (
     <MyPageLayout title="마이페이지">
-      {/* Feedback Banner */}
-      {feedback && (
-        <div
-          className={`mb-6 flex items-center gap-2 p-4 rounded-xl text-sm ${
-            feedback.type === 'success'
-              ? 'bg-green-50 text-green-700 border border-green-200'
-              : 'bg-red-50 text-red-700 border border-red-200'
-          }`}
-        >
-          {feedback.type === 'success' ? (
-            <CheckCircle className="w-4 h-4 flex-shrink-0" />
-          ) : (
-            <AlertCircle className="w-4 h-4 flex-shrink-0" />
-          )}
-          {feedback.message}
-        </div>
-      )}
-
       <ProfileCard
         initial={user.lastName?.charAt(0) || user.name?.charAt(0) || '?'}
         name={displayName}
