@@ -37,7 +37,9 @@ export function ContentWritePage() {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [summary, setSummary] = useState('');
-  const [tags, setTags] = useState('');
+  // WO-O4O-CONTENT-DOCUMENT-TAG-INPUT-CHIP-FIX-V1: chip 기반 입력. tags=확정된 태그, tagInput=현재 입력 중 텍스트
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState('');
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
   // WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1:
@@ -88,7 +90,8 @@ export function ContentWritePage() {
           setTitle(c.title);
           setBody(c.body || '');
           setSummary(c.summary || '');
-          setTags((c.tags || []).join(', '));
+          setTags(c.tags || []);
+          setTagInput('');
           // WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1
           if (c.reusable_policy === 'restricted' || c.reusable_policy === 'platform') {
             setReusablePolicy(c.reusable_policy);
@@ -129,8 +132,9 @@ export function ContentWritePage() {
 
     // WO-O4O-CONTENT-FORM-TAG-LABEL-VALIDATION-ALIGN-V1:
     //   백엔드 O4O Tag Policy V1 (kpa.routes.ts: 최소 1개 필수)을 라벨/검증 양쪽에서 반영.
-    //   서버 round-trip 전에 사용자에게 즉시 피드백.
-    const tagArr = tags.split(',').map((t) => t.trim()).filter(Boolean);
+    //   확정 칩 + 미확정 input 텍스트를 합쳐 검증.
+    const pendingFromInput = tagInput.split(',').map((t) => t.trim()).filter(Boolean);
+    const tagArr = Array.from(new Set([...tags, ...pendingFromInput]));
     if (tagArr.length === 0) {
       toast.error('태그를 1개 이상 입력해주세요');
       return;
@@ -251,16 +255,60 @@ export function ContentWritePage() {
           />
         </div>
 
-        {/* Tags */}
+        {/* Tags — WO-O4O-CONTENT-DOCUMENT-TAG-INPUT-CHIP-FIX-V1: Enter/쉼표 확정, Backspace 마지막 칩 삭제 */}
         <div style={styles.field}>
-          <label style={styles.label}>태그 <span style={styles.required}>*</span> <span style={styles.hint}>(쉼표로 구분, 최소 1개)</span></label>
-          <input
-            type="text"
-            value={tags}
-            onChange={(e) => setTags(e.target.value)}
-            placeholder="예: 약국경영, 복약지도, 건강관리"
-            style={styles.input}
-          />
+          <label style={styles.label}>태그 <span style={styles.required}>*</span> <span style={styles.hint}>(Enter 또는 쉼표로 추가, 최소 1개)</span></label>
+          <div style={styles.tagInputWrap}>
+            {tags.map((tag) => (
+              <span key={tag} style={styles.tagChip}>
+                {tag}
+                <button
+                  type="button"
+                  onClick={() => setTags((prev) => prev.filter((t) => t !== tag))}
+                  style={styles.tagChipRemove}
+                  aria-label={`${tag} 삭제`}
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+            <input
+              type="text"
+              value={tagInput}
+              onChange={(e) => {
+                const v = e.target.value;
+                if (v.includes(',')) {
+                  const parts = v.split(',');
+                  const last = parts.pop() || '';
+                  setTags((prev) => {
+                    const next = [...prev];
+                    parts.forEach((p) => {
+                      const t = p.trim();
+                      if (t && !next.includes(t)) next.push(t);
+                    });
+                    return next;
+                  });
+                  setTagInput(last);
+                } else {
+                  setTagInput(v);
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ',') {
+                  e.preventDefault();
+                  const t = tagInput.trim();
+                  if (!t) return;
+                  setTags((prev) => (prev.includes(t) ? prev : [...prev, t]));
+                  setTagInput('');
+                } else if (e.key === 'Backspace' && tagInput === '' && tags.length > 0) {
+                  e.preventDefault();
+                  setTags((prev) => prev.slice(0, -1));
+                }
+              }}
+              placeholder={tags.length === 0 ? '예: 약국경영, 복약지도, 건강관리' : ''}
+              style={styles.tagInput}
+            />
+          </div>
         </div>
 
         {/* Reusable Policy (WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1) */}
@@ -398,8 +446,59 @@ const styles: Record<string, React.CSSProperties> = {
     border: '1px solid #e2e8f0',
     borderRadius: 8,
     outline: 'none',
-    resize: 'vertical',
-    boxSizing: 'border-box',
+    resize: 'vertical' as const,
+    boxSizing: 'border-box' as const,
+  },
+  // WO-O4O-CONTENT-DOCUMENT-TAG-INPUT-CHIP-FIX-V1
+  tagInputWrap: {
+    display: 'flex',
+    flexWrap: 'wrap' as const,
+    alignItems: 'center',
+    gap: 6,
+    width: '100%',
+    minHeight: 44,
+    padding: '7px 10px',
+    border: '1.5px solid #e2e8f0',
+    borderRadius: 8,
+    background: '#fff',
+    boxSizing: 'border-box' as const,
+  },
+  tagChip: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 4,
+    padding: '4px 10px',
+    fontSize: '0.8125rem',
+    fontWeight: 500,
+    background: '#eff6ff',
+    color: '#1d4ed8',
+    border: '1px solid #bfdbfe',
+    borderRadius: 9999,
+    lineHeight: 1.2,
+  },
+  tagChipRemove: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 16,
+    height: 16,
+    padding: 0,
+    border: 'none',
+    background: 'rgba(29, 78, 216, 0.12)',
+    color: '#1d4ed8',
+    fontSize: '0.875rem',
+    cursor: 'pointer',
+    lineHeight: 1,
+    borderRadius: '50%',
+  },
+  tagInput: {
+    flex: 1,
+    minWidth: 120,
+    padding: '4px 4px',
+    fontSize: '0.875rem',
+    border: 'none',
+    outline: 'none',
+    background: 'transparent',
   },
   actions: {
     display: 'flex',
