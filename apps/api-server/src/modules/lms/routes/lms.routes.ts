@@ -212,6 +212,9 @@ router.post('/instructor/applications/:id/reject', requireKpaAdmin, asyncHandler
 // GET /api/v1/lms/instructor/courses - My Courses (Instructor)
 router.get('/instructor/courses', requireAuth, requireInstructor, asyncHandler(InstructorController.myCourses));
 
+// GET /api/v1/lms/instructor/courses/:courseId/lessons - Instructor Lessons (WO-O4O-LMS-MEMBERSHIP-COURSE-E2E-BUGFIX-V1)
+router.get('/instructor/courses/:courseId/lessons', requireAuth, requireInstructor, asyncHandler(InstructorController.courseLessons));
+
 // GET /api/v1/lms/instructor/enrollments - Pending Enrollments for My Courses (Instructor)
 router.get('/instructor/enrollments', requireAuth, requireInstructor, asyncHandler(InstructorController.pendingEnrollments));
 

@@ -196,10 +196,10 @@ export const lmsInstructorApi = {
   deleteCourse: (id: string) =>
     authClient.api.delete<{ success: boolean }>(`/lms/courses/${id}`),
 
-  /** 강의 레슨 목록 */
+  /** 강의 레슨 목록 (강사 전용 엔드포인트 — requireEnrollment 우회) */
   getLessons: (courseId: string) =>
     authClient.api.get<{ success: boolean; data: Lesson[] }>(
-      `/lms/courses/${courseId}/lessons`,
+      `/lms/instructor/courses/${courseId}/lessons`,
     ),
 
   /** 레슨 생성 */

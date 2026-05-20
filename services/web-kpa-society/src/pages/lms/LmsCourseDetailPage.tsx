@@ -283,7 +283,26 @@ export function LmsCourseDetailPage() {
               </div>
             ) : enrollment ? (
               // WO-LMS-COMPLETION-AND-CERTIFICATE-UX-REFINEMENT-V1
-              enrollment.status === 'completed' ? (
+              enrollment.status === 'pending' ? (
+                // WO-O4O-LMS-MEMBERSHIP-COURSE-E2E-BUGFIX-V1: 승인 대기 상태 명시
+                <div style={styles.enrolledInfo}>
+                  <button disabled style={{ ...styles.enrollButton, opacity: 0.5, cursor: 'not-allowed' }}>
+                    승인 대기 중
+                  </button>
+                  <p style={{ fontSize: '12px', color: '#94a3b8', textAlign: 'center' as const, marginTop: '8px' }}>
+                    강사 승인 후 수강이 가능합니다.
+                  </p>
+                </div>
+              ) : enrollment.status === 'rejected' ? (
+                <div style={styles.enrolledInfo}>
+                  <button disabled style={{ ...styles.enrollButton, opacity: 0.5, cursor: 'not-allowed', background: '#ef4444' }}>
+                    수강 거절됨
+                  </button>
+                  <p style={{ fontSize: '12px', color: '#94a3b8', textAlign: 'center' as const, marginTop: '8px' }}>
+                    강사에게 문의하세요.
+                  </p>
+                </div>
+              ) : enrollment.status === 'completed' ? (
                 <div style={styles.enrolledInfo}>
                   <div style={styles.completedBadge}>수료 완료</div>
                   <p style={styles.progressText}>진도율: 100%</p>

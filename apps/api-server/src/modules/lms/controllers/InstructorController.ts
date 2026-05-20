@@ -1008,4 +1008,41 @@ export class InstructorController extends BaseController {
       return BaseController.error(res, error);
     }
   }
+
+  // ========================================
+  // 강사 전용 레슨 목록 (WO-O4O-LMS-MEMBERSHIP-COURSE-E2E-BUGFIX-V1)
+  // ========================================
+
+  /**
+   * GET /instructor/courses/:courseId/lessons
+   * 강사 본인 강의의 레슨 목록 조회 — requireEnrollment 우회
+   */
+  static async courseLessons(req: Request, res: Response): Promise<any> {
+    try {
+      const { courseId } = req.params;
+      const userId = (req as any).user?.id;
+
+      const courseRepo = AppDataSource.getRepository(Course);
+      const course = await courseRepo.findOne({ where: { id: courseId }, select: ['id', 'instructorId'] });
+      if (!course) return BaseController.notFound(res, 'Course not found');
+
+      const isKpaAdmin = await roleAssignmentService.hasAnyRole(userId, ['kpa:admin']);
+      if (course.instructorId !== userId && !isKpaAdmin) {
+        return BaseController.forbidden(res, '본인 강의의 레슨만 조회할 수 있습니다');
+      }
+
+      const service = LessonService.getInstance();
+      const { lessons, total } = await service.listLessonsByCourse(courseId, {});
+
+      return BaseController.okPaginated(res, lessons, {
+        total,
+        page: 1,
+        limit: 100,
+        totalPages: Math.ceil(total / 100),
+      });
+    } catch (error: any) {
+      logger.error('[InstructorController.courseLessons] Error', { error: error.message });
+      return BaseController.error(res, error);
+    }
+  }
 }
