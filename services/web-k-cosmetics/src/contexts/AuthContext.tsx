@@ -41,6 +41,7 @@ interface AuthContextType {
   isSessionChecked: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string; role?: UserRole; roles?: UserRole[] }>;
   logout: () => void;
+  logoutAll: () => Promise<void>;
   switchRole: (role: UserRole) => void;
   hasMultipleRoles: boolean;
   checkSession: () => Promise<void>;
@@ -118,6 +119,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   };
 
+  const logoutAll = async () => {
+    await api.post('/auth/logout-all');
+  };
+
   const switchRole = (role: UserRole) => {
     if (user && user.roles.includes(role)) {
       setUser({ ...user, roles: [role, ...user.roles.filter(r => r !== role)] });
@@ -148,6 +153,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isSessionChecked,
         login,
         logout,
+        logoutAll,
         switchRole,
         hasMultipleRoles,
         checkSession,

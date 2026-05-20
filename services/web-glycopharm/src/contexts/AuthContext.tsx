@@ -66,6 +66,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<User>;
   logout: () => void;
+  logoutAll: () => Promise<void>;
   selectRole: (role: UserRole) => void;
   switchRole: (role: UserRole) => void;
   hasMultipleRoles: boolean;
@@ -172,6 +173,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setAvailableRoles([]);
   };
 
+  const logoutAll = async () => {
+    await api.post('/auth/logout-all');
+  };
+
   const selectRole = (role: UserRole) => {
     if (user && availableRoles.includes(role)) {
       const reordered = [role, ...user.roles.filter(r => r !== role)];
@@ -246,6 +251,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoading,
         login,
         logout,
+        logoutAll,
         selectRole,
         switchRole,
         hasMultipleRoles,

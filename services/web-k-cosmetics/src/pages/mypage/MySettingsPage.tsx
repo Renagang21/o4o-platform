@@ -11,13 +11,15 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/apiClient';
-import { Lock } from 'lucide-react';
+import { toast } from '@o4o/error-handling';
+import { Lock, LogOut } from 'lucide-react';
 import { MyPageLayout, SettingsSection, PasswordChangeModal } from '@o4o/account-ui';
 
 export default function MySettingsPage() {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, logoutAll } = useAuth();
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
+  const [loggingOutAll, setLoggingOutAll] = useState(false);
 
   if (!isAuthenticated || !user) {
     return (
@@ -44,6 +46,20 @@ export default function MySettingsPage() {
     }
   };
 
+  const handleLogoutAll = async () => {
+    const confirmed = window.confirm('다른 모든 기기에서 로그아웃됩니다.\n\n계속하시겠습니까?');
+    if (!confirmed) return;
+    setLoggingOutAll(true);
+    try {
+      await logoutAll();
+      toast.success('다른 기기에서 로그아웃되었습니다.');
+    } catch {
+      toast.error('로그아웃에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      setLoggingOutAll(false);
+    }
+  };
+
   return (
     <MyPageLayout title="마이페이지" subtitle="내 정보를 확인하고 관리할 수 있습니다">
       <SettingsSection title="보안 설정" description="정기적인 비밀번호 변경을 권장합니다">
@@ -55,6 +71,20 @@ export default function MySettingsPage() {
             <Lock className="w-4 h-4 text-gray-500" />
             <span className="text-sm text-gray-700">비밀번호 변경</span>
           </div>
+        </button>
+      </SettingsSection>
+
+      <SettingsSection title="계정 관리">
+        <button
+          onClick={handleLogoutAll}
+          disabled={loggingOutAll}
+          className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors disabled:opacity-50"
+        >
+          <div className="flex items-center gap-3">
+            <LogOut className="w-4 h-4 text-gray-500" />
+            <span className="text-sm text-gray-700">모든 기기 로그아웃</span>
+          </div>
+          {loggingOutAll && <span className="text-xs text-gray-400">처리 중...</span>}
         </button>
       </SettingsSection>
 
