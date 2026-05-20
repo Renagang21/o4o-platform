@@ -190,7 +190,7 @@ export function ForumListPage() {
         <div>
           <Link to={`/forum/post/${row.id}`} className="flex items-center gap-1.5 no-underline text-inherit">
             {row.isPinned && <span className="inline-block px-1.5 py-0.5 text-[11px] font-semibold bg-red-50 text-red-600 rounded shrink-0">공지</span>}
-            <span className={`font-medium overflow-hidden text-ellipsis whitespace-nowrap ${row.isPinned ? 'bg-amber-50' : ''}`}>
+            <span className={`font-medium line-clamp-2 ${row.isPinned ? 'bg-amber-50' : ''}`}>
               {row.title}
             </span>
             {(row.commentCount ?? 0) > 0 && (

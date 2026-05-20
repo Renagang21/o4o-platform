@@ -10,7 +10,7 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { Link, useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
-import { BaseTable, RowActionMenu, type O4OColumn, type RowActionItem } from '@o4o/ui';
+import { BaseTable, RowActionMenu, PageSection, PageContainer, type O4OColumn, type RowActionItem } from '@o4o/ui';
 import { homeApi } from '../../api';
 import { forumApi } from '../../api';
 import { LoadingSpinner } from '../../components/common';
@@ -79,6 +79,8 @@ export function ForumFeedPage() {
   const [forumLoading, setForumLoading] = useState(true);
   const [postsLoading, setPostsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // WO-O4O-KPA-CLOSED-FORUM-FRONTEND-ACCESS-UX-V1
+  const [closedForumId, setClosedForumId] = useState<string | null>(null);
   const [sort, setSort] = useState<SortKey>('recent');
   const [searchInput, setSearchInput] = useState(searchQuery);
 
@@ -132,13 +134,22 @@ export function ForumFeedPage() {
         search: searchQuery || undefined,
         sortBy: sort === 'popular' ? 'popular' : undefined,
       });
+      setClosedForumId(null);
       setPosts(res.data || []);
       setTotalPages(res.totalPages || 1);
       setTotalCount(res.total || res.data?.length || 0);
-    } catch {
-      setPosts([]);
-      setTotalPages(1);
-      setTotalCount(0);
+    } catch (err: any) {
+      // WO-O4O-KPA-CLOSED-FORUM-FRONTEND-ACCESS-UX-V1
+      if (err?.status === 403 && err?.code === 'CLOSED_FORUM_ACCESS_DENIED') {
+        setClosedForumId(err?.data?.forumId ?? forum.id);
+        setPosts([]);
+        setTotalPages(1);
+        setTotalCount(0);
+      } else {
+        setPosts([]);
+        setTotalPages(1);
+        setTotalCount(0);
+      }
     } finally {
       setPostsLoading(false);
     }
@@ -196,7 +207,7 @@ export function ForumFeedPage() {
         <div>
           <Link to={`/forum/post/${row.id}`} className="flex items-center gap-1.5 no-underline text-inherit">
             {row.isPinned && <span className="inline-block px-1.5 py-0.5 text-[11px] font-semibold bg-red-50 text-red-600 rounded shrink-0">공지</span>}
-            <span className="font-medium overflow-hidden text-ellipsis whitespace-nowrap">
+            <span className="font-medium line-clamp-2">
               {row.title}
             </span>
             {(row.commentCount ?? 0) > 0 && (
@@ -340,12 +351,18 @@ export function ForumFeedPage() {
   if (!forum) return null;
 
   return (
-    <div style={styles.page}>
+    <PageSection last>
+    <PageContainer width="form">
       {/* Forum header */}
       <header style={styles.header}>
         <div style={styles.titleRow}>
           {forum.iconEmoji && <span style={styles.icon}>{forum.iconEmoji}</span>}
           <h1 style={styles.title}>{forum.name}</h1>
+          {forum.forumType === 'closed' && (
+            <span className="inline-flex items-center px-2 py-0.5 text-xs font-semibold bg-orange-50 text-orange-600 border border-orange-200 rounded-full">
+              🔒 회원 전용
+            </span>
+          )}
         </div>
         {forum.description && <p style={styles.desc}>{forum.description}</p>}
         {forum.tags && forum.tags.length > 0 && (
@@ -358,8 +375,18 @@ export function ForumFeedPage() {
         <Link to="/forum" style={styles.backLink}>← 포럼 홈</Link>
       </header>
 
-      {/* Search + Write */}
-      <div className="flex gap-2 mt-5 mb-3">
+      {/* WO-O4O-KPA-CLOSED-FORUM-FRONTEND-ACCESS-UX-V1: 비회원 접근 차단 */}
+      {closedForumId && (
+        <ClosedForumAccessBlocker
+          categoryId={closedForumId}
+          user={user}
+          variant="page"
+          onBack={() => navigate('/forum')}
+        />
+      )}
+
+      {/* Search + Write (멤버만 표시) */}
+      {!closedForumId && <div className="flex gap-2 mt-5 mb-3">
         <form className="flex gap-2 flex-1" onSubmit={handleSearchSubmit}>
           <input
             type="text"
@@ -445,14 +472,14 @@ export function ForumFeedPage() {
             }`}>&raquo;</button>
         </div>
       )}
-    </div>
+    </PageContainer>
+    </PageSection>
   );
 }
 
 export default ForumFeedPage;
 
 const styles: Record<string, React.CSSProperties> = {
-  page: { maxWidth: 800, margin: '0 auto', padding: '0 16px' },
   header: { borderBottom: '1px solid #e2e8f0', padding: '32px 0 24px', marginBottom: 0 },
   titleRow: { display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 },
   icon: { fontSize: 28 },
