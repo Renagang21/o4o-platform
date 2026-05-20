@@ -6,7 +6,7 @@
 
 import { Link } from 'react-router-dom';
 import { useAuth, ROLE_LABELS, getKCosmeticsDashboardRoute } from '@/contexts/AuthContext';
-import { Mail, Shield, UserCog, Settings, ChevronRight } from 'lucide-react';
+import { Mail, Phone, Shield, UserCog, Settings, ChevronRight } from 'lucide-react';
 import { MyPageLayout, QuickActionsSection } from '@o4o/account-ui';
 
 export default function MyPageHub() {
@@ -53,6 +53,7 @@ export default function MyPageHub() {
         </div>
         <div className="p-6 space-y-3">
           <InfoRow icon={<Mail className="w-4 h-4 text-gray-400" />} label="이메일" value={user.email} />
+          <InfoRow icon={<Phone className="w-4 h-4 text-gray-400" />} label="연락처" value={user.phone || '미등록'} />
           <InfoRow icon={<Shield className="w-4 h-4 text-gray-400" />} label="역할" value={roleLabel} />
         </div>
       </div>
