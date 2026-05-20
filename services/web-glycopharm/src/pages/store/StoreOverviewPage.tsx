@@ -96,7 +96,7 @@ const HUB_SECTIONS: HubSectionDefinition[] = [
     id: 'admin',
     title: '관리자 전용',
     badge: 'Admin',
-    roles: ['operator', 'glycopharm:admin'],
+    roles: ['glycopharm:operator', 'glycopharm:admin'],
     cards: [
       {
         id: 'pharmacy-approval',
