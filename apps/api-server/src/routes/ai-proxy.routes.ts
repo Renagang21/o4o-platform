@@ -263,6 +263,15 @@ router.post('/content', authenticate, async (req, res: Response) => {
 // ===========================================
 
 /**
+ * URL 추출 본문 최대 길이 (글자).
+ * WO-O4O-KPA-AI-URL-LONGFORM-GENERATION-DRIFT-V1:
+ *   기존 3500 → 6000 으로 완화. 장문(A4 1장 이상) 생성 시 원문 핵심을
+ *   충분히 확보하려면 추출 단계 절단을 줄여야 한다. AI 입력 토큰 한도는
+ *   maxTokens 상향(16384)으로 함께 흡수한다.
+ */
+const URL_EXTRACT_MAX_CHARS = 6000;
+
+/**
  * URL에서 텍스트 추출 (서버사이드 fetch + HTML 스트리핑)
  *
  * WO-O4O-AI-URL-TO-BLOCKS-YOUTUBE-SUPPORT-V1:
@@ -274,7 +283,7 @@ async function fetchUrlText(url: string): Promise<string> {
   if (isYouTubeUrl(url)) {
     const ytText = await fetchYouTubeContent(url).catch(() => '');
     if (ytText && ytText.trim().length >= 50) {
-      return ytText.slice(0, 3500);
+      return ytText.slice(0, URL_EXTRACT_MAX_CHARS);
     }
     // 폴백: 일반 fetch 도 거의 의미 없지만 시도는 해 둔다
   }
@@ -329,7 +338,7 @@ async function fetchUrlContent(url: string): Promise<UrlContent> {
     ]);
     if (ytText && ytText.trim().length >= 50) {
       return {
-        text: ytText.slice(0, 3500),
+        text: ytText.slice(0, URL_EXTRACT_MAX_CHARS),
         title: oembed?.title?.trim() || undefined,
       };
     }
@@ -510,34 +519,105 @@ function stripHtml(html: string): string {
     .join('\n')
     .replace(/\n{3,}/g, '\n\n')
     .trim()
-    // 최대 3500자 (토큰 초과 방지, V2: 4000→3500 압축)
-    .slice(0, 3500);
+    // WO-O4O-KPA-AI-URL-LONGFORM-GENERATION-DRIFT-V1:
+    //   3500 → 6000 으로 완화. 장문 모드(long, A4 1장 이상)에서 원문 핵심을
+    //   충분히 확보하려면 추출 단계 절단을 줄여야 한다. 토큰 한도는 maxTokens
+    //   상향(16384)으로 흡수.
+    .slice(0, URL_EXTRACT_MAX_CHARS);
 }
+
+// ===========================================
+// URL Length — WO-O4O-KPA-AI-CONTENT-MODE-PRESET-REMOVAL-V1
+// ===========================================
+//
+// 모달의 "정리 모드" 프리셋 제거에 맞춰 url-to-blocks 도 outputType 분기를 제거.
+// 결과 형식은 customInstruction(사용자 추가 요청) 이 결정한다.
+// length / tone 만 분량·말투 보조 가이드로 유지된다.
+//
+// 레거시: 구버전 클라이언트가 보내는 outputType / contentType 은 받기만 하고
+// 무시한다 (UI 가 사라졌으므로 의미 없음).
+
+type UrlLength = 'short' | 'medium' | 'long';
+
+const VALID_URL_LENGTHS: readonly UrlLength[] = ['short', 'medium', 'long'];
+
+// customInstruction 에서 장문 요청 의도를 추론하는 키워드.
+// 명시 length 가 없을 때만 적용 — 사용자가 짧게 지정했으면 그쪽이 우선.
+const LONGFORM_INTENT_RE = /(A4|1\s*장|장문|상세\s*히|상세\s*하게|깊이|풍부|길게|풀\s*버전|full\s*version|강의\s*자료)/i;
+
+function isLongformIntent(customInstruction: string | undefined): boolean {
+  if (!customInstruction) return false;
+  return LONGFORM_INTENT_RE.test(customInstruction);
+}
+
+function resolveUrlLength(
+  requested: unknown,
+  customInstruction: string | undefined,
+): UrlLength {
+  if (typeof requested === 'string' && (VALID_URL_LENGTHS as readonly string[]).includes(requested)) {
+    return requested as UrlLength;
+  }
+  // 사용자 자유 텍스트에서 장문 의도 감지 시 자동 long 승격
+  if (isLongformIntent(customInstruction)) return 'long';
+  return 'medium';
+}
+
+/**
+ * length → 분량/블록 수 가이드.
+ * WO-O4O-KPA-AI-CONTENT-MODE-PRESET-REMOVAL-V1:
+ *   outputType 별 형식 강제(요약/문서/블로그/강의자료)는 제거. customInstruction 이
+ *   결과 형식을 결정하고, length 는 분량 보조 가이드로만 사용한다.
+ */
+const URL_LENGTH_INSTRUCTIONS: Record<UrlLength, string> = {
+  short: '총 분량 500~1000자, 4~8개 블록. 핵심만 간결히.',
+  medium: '총 분량 1500~2500자, 8~15개 블록. 본문을 적절히 풀어쓰기.',
+  long: '총 분량 3000~6000자, 15~25개 블록. A4 1장 이상의 충분한 분량.',
+};
+
+/** length → MAX_BLOCKS 강제 상한. customInstruction 으로 형식이 결정되므로 length 만으로 통일. */
+const MAX_BLOCKS_BY_LENGTH: Record<UrlLength, number> = {
+  short: 10,
+  medium: 18,
+  long: 32,
+};
+
+/** length 별 AI 응답 max output tokens. long 은 Gemini 2.5 한도 내에서 충분히 확보. */
+const MAX_TOKENS_BY_LENGTH: Record<UrlLength, number> = {
+  short: 4096,
+  medium: 8192,
+  long: 16384,
+};
 
 /**
  * Block 생성용 시스템 프롬프트
  * WO-O4O-AI-URL-CONTENT-QUALITY-V2: 블록 수 압축 + 구조 안정화
+ * WO-O4O-KPA-AI-CONTENT-MODE-PRESET-REMOVAL-V1:
+ *   outputType 별 형식 강제(요약/문서/블로그/강의자료) 제거.
+ *   결과 형식은 customInstruction(사용자 추가 요청) 이 결정한다.
+ *   length / tone 은 분량·말투 보조 가이드로만 동작한다.
  */
-function buildUrlBlockSystemPrompt(contentType: string, tone: string): string {
-  const contentTypeLabel = contentType === 'explain' || contentType === 'explanatory' ? '설명형' : '문서형';
+function buildUrlBlockSystemPrompt(length: UrlLength, tone: string): string {
   const toneLabel = tone === 'professional' ? '전문적' : tone === 'store' ? '매장 친화적' : '일반적';
+  const lengthInstruction = URL_LENGTH_INSTRUCTIONS[length];
 
-  return `당신은 O4O 플랫폼의 콘텐츠 블록 생성 전문가입니다.
-주어진 텍스트를 분석하여 O4O 블록 JSON 배열을 생성하세요.
+  return `당신은 O4O 플랫폼의 콘텐츠 블록 생성 보조 도구입니다.
+주어진 URL 원본 텍스트를 사용자 요청에 맞춰 O4O 블록 JSON 배열로 재구성하세요.
 
-콘텐츠 유형: ${contentTypeLabel}
 톤앤매너: ${toneLabel}
+
+## 결과 형식 (필수)
+- [사용자 추가 요청] 블록이 있으면 그 의도(예: 블로그 글, POP 문구, QR 안내문, 제목 추천, A4 1장 강의자료 등)대로 따른다.
+- 요청이 없거나 모호하면 원본을 깨끗한 본문 블록 묶음으로 정리한다.
+- 자의적으로 "요약" 으로 좁히지 말 것. 사용자가 명시적으로 요약을 요청한 경우에만 요약한다.
+
+## 분량 (보조 가이드)
+${lengthInstruction}
+- 사용자 요청과 충돌하면 사용자 요청 우선. 없는 사실은 창작하지 말 것.
 
 ## 출력 규칙
 - 반드시 JSON 배열만 반환 (\`\`\`json ... \`\`\` 코드블록 형식)
 - 각 블록 구조: { "id": "block-N", "type": "o4o/...", "content": "...", "attributes": {...} }
 - id는 "block-1", "block-2" ... 순서대로
-
-## 블록 수 및 길이 제한 (필수)
-- **최대 8~10개 블록**으로 구성할 것
-- 핵심 내용만 요약하여 포함할 것
-- 각 paragraph는 3문장 이내로 간결하게 작성
-- 전체 내용을 나열하지 말고 독자에게 가장 유용한 정보만 선별
 
 ## 콘텐츠 필터링 (필수)
 - 메뉴, 네비게이션, 로그인, 회원가입, footer, 저작권 등 UI 요소는 절대 포함하지 말 것
@@ -554,10 +634,10 @@ function buildUrlBlockSystemPrompt(contentType: string, tone: string): string {
 - o4o/youtube: YouTube URL 있을 때만 → { "id": "block-6", "type": "o4o/youtube", "attributes": { "url": "https://youtube.com/..." } }
 
 ## 구조 규칙
-1. heading(level 2) → paragraph 흐름 중심으로 구성
-2. list는 핵심 포인트에만 사용 (3~5개 항목)
-3. layout/widget/columns 블록 사용 금지
-4. 읽기 쉬운 문서 형태로 구성
+1. heading(level 2)을 큰 흐름 구분에, level 3은 세부 섹션 구분에 사용
+2. paragraph 본문이 흐름의 중심 — 단락마다 한 가지 주제 집중
+3. list는 핵심 포인트 정리에 사용 (한 list 당 3~7개 항목)
+4. layout/widget/columns 블록 사용 금지
 
 JSON만 반환하고 다른 텍스트는 포함하지 마세요.`;
 }
@@ -570,17 +650,25 @@ router.post('/url-to-blocks', authenticate, async (req, res: Response) => {
     return res.status(401).json({ success: false, error: '로그인이 필요합니다.' });
   }
 
+  // WO-O4O-KPA-AI-CONTENT-MODE-PRESET-REMOVAL-V1:
+  //   outputType / contentType 은 받기만 하고 prompt 분기에는 사용하지 않는다
+  //   (정리 모드 프리셋 제거에 따라 결과 형식은 customInstruction 이 결정).
+  //   length / tone 만 보조 가이드로 사용.
   const {
     url,
-    contentType = 'document',
+    length: rawLength,
     tone = 'normal',
     customInstruction = '',
   } = req.body as {
     url?: string;
-    contentType?: string;
+    outputType?: string;  // 레거시 — 무시
+    length?: string;
+    contentType?: string;  // 레거시 — 무시
     tone?: string;
     customInstruction?: string;
   };
+
+  const resolvedLength = resolveUrlLength(rawLength, customInstruction);
 
   if (!url || typeof url !== 'string' || url.trim().length === 0) {
     return res.status(400).json({ success: false, error: 'url이 필요합니다.' });
@@ -600,7 +688,13 @@ router.post('/url-to-blocks', authenticate, async (req, res: Response) => {
   const requestId = crypto.randomUUID();
 
   try {
-    logger.info('[url-to-blocks] 시작', { requestId, userId, url: parsedUrl.hostname });
+    logger.info('[url-to-blocks] 시작', {
+      requestId,
+      userId,
+      url: parsedUrl.hostname,
+      length: resolvedLength,
+      hasCustomInstruction: customInstruction.trim().length > 0,
+    });
 
     // 1. URL 콘텐츠 가져오기
     // WO-O4O-AI-URL-BLOCKS-TITLE-AUTO-FILL-V1: fetchUrlContent 로 본문 + 추출 제목 함께 수신
@@ -626,17 +720,24 @@ router.post('/url-to-blocks', authenticate, async (req, res: Response) => {
     }
 
     // 2. 프롬프트 빌드
-    const systemPrompt = buildUrlBlockSystemPrompt(contentType, tone);
+    // WO-O4O-KPA-AI-CONTENT-MODE-PRESET-REMOVAL-V1:
+    //   outputType 별 형식 강제 제거. customInstruction 이 결과 형식을 결정한다.
+    //   length 는 분량 보조 가이드, tone 은 말투 보조 가이드.
+    const systemPrompt = buildUrlBlockSystemPrompt(resolvedLength, tone);
     const userPrompt = [
-      `다음 URL(${parsedUrl.hostname})의 텍스트를 O4O 블록 JSON 배열로 변환하세요:`,
+      `다음 URL(${parsedUrl.hostname})의 텍스트를 O4O 블록 JSON 배열로 변환하세요.`,
+      `분량 가이드: ${resolvedLength}`,
       '',
       '=== 추출된 텍스트 ===',
       urlText,
       '',
-      customInstruction ? `=== 추가 요청사항 ===\n${customInstruction}` : '',
+      customInstruction
+        ? `=== 사용자 추가 요청 (최우선) ===\n${customInstruction}\n\n위 요청이 결과 형식·구조의 1순위 기준입니다. 분량/톤 가이드와 충돌하면 이 요청을 따르세요.`
+        : '',
     ].filter(Boolean).join('\n');
 
     // 3. AI 호출 (기존 프록시 서비스 사용)
+    //   maxTokens 는 length 별로 동적 조정 (long 은 16384 까지 확보).
     let aiResponse: Awaited<ReturnType<typeof aiProxyService.generateRawContent>>;
     try {
       aiResponse = await aiProxyService.generateRawContent(
@@ -646,7 +747,7 @@ router.post('/url-to-blocks', authenticate, async (req, res: Response) => {
           systemPrompt,
           userPrompt,
           temperature: 0.5,
-          maxTokens: 8192,
+          maxTokens: MAX_TOKENS_BY_LENGTH[resolvedLength],
         },
         userId,
         requestId,
@@ -745,7 +846,9 @@ router.post('/url-to-blocks', authenticate, async (req, res: Response) => {
     }
 
     // 6-C. 최대 블록 수 강제 제한
-    const MAX_BLOCKS = 10;
+    // WO-O4O-KPA-AI-CONTENT-MODE-PRESET-REMOVAL-V1:
+    //   length 기준 단일 매트릭스로 단순화. outputType 분기 제거.
+    const MAX_BLOCKS = MAX_BLOCKS_BY_LENGTH[resolvedLength];
     const limitedBlocks = finalBlocks.slice(0, MAX_BLOCKS);
 
     // WO-O4O-AI-URL-BLOCKS-TITLE-AUTO-FILL-V1:
@@ -757,6 +860,8 @@ router.post('/url-to-blocks', authenticate, async (req, res: Response) => {
     logger.info('[url-to-blocks] 완료', {
       requestId,
       userId,
+      length: resolvedLength,
+      maxBlocks: MAX_BLOCKS,
       rawBlocks: normalizedBlocks.length,
       afterFilter: finalBlocks.length,
       final: limitedBlocks.length,

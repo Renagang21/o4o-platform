@@ -61,6 +61,12 @@ export function buildToneInstruction(
       professional: '정보 전달이 명확한 전문적인 어조로 작성하세요.',
       promotion: '공유와 참여를 유도하는 홍보형 어조로 작성하세요.',
     },
+    // WO-O4O-KPA-AI-CONTENT-MODE-PRESET-REMOVAL-V1
+    flexible: {
+      friendly: '친근하고 자연스러운 어조로 작성하세요.',
+      professional: '전문적이고 신뢰감 있는 어조로 작성하세요.',
+      concise: '간결하고 핵심만 담아 작성하세요.',
+    },
   };
 
   return map[outputType]?.[tone] ?? '';
@@ -94,6 +100,17 @@ export function buildLengthInstruction(
   if (outputType === 'title_suggest') {
     // title_suggest는 length 옵션이 의미 없으므로 빈 문자열 반환
     return '';
+  }
+
+  // WO-O4O-KPA-AI-CONTENT-MODE-PRESET-REMOVAL-V1:
+  //   flexible 은 형식을 강제하지 않으므로 분량 범위만 폭넓게 안내.
+  if (outputType === 'flexible') {
+    const map: Record<string, string> = {
+      short: '결과 본문은 짧고 간결하게 (500자 내외 또는 2~3 단락).',
+      medium: '결과 본문은 보통 분량으로 (1000~2000자 또는 5~8 단락).',
+      long: '결과 본문은 충분히 길게 (3000~6000자, A4 1장 이상의 분량).',
+    };
+    return map[length] ?? '';
   }
 
   // product_detail, blog: 문단 수 기준

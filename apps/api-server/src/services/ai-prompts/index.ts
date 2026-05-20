@@ -54,13 +54,37 @@ export {
   parseStoreSnsResponse,
 } from './storeSns.js';
 
+// WO-O4O-KPA-AI-CONTENT-MODE-PRESET-REMOVAL-V1
+export {
+  buildFlexibleSystemPrompt,
+  buildFlexibleUserPrompt,
+  parseFlexibleResponse,
+} from './flexible.js';
+
 // ---------------------------------------------------------------------------
 // 지원 outputType 목록 및 builder 디스패처
 // ---------------------------------------------------------------------------
 
-export type OutputType = 'product_detail' | 'blog' | 'pop' | 'summary' | 'title_suggest' | 'store_qr' | 'store_sns';
+export type OutputType =
+  | 'product_detail'
+  | 'blog'
+  | 'pop'
+  | 'summary'
+  | 'title_suggest'
+  | 'store_qr'
+  | 'store_sns'
+  | 'flexible';
 
-export const SUPPORTED_OUTPUT_TYPES: OutputType[] = ['product_detail', 'blog', 'pop', 'summary', 'title_suggest', 'store_qr', 'store_sns'];
+export const SUPPORTED_OUTPUT_TYPES: OutputType[] = [
+  'product_detail',
+  'blog',
+  'pop',
+  'summary',
+  'title_suggest',
+  'store_qr',
+  'store_sns',
+  'flexible',
+];
 
 export function isSupportedOutputType(value: string): value is OutputType {
   return SUPPORTED_OUTPUT_TYPES.includes(value as OutputType);
@@ -77,6 +101,7 @@ import { buildSummarySystemPrompt, buildSummaryUserPrompt, parseSummaryResponse 
 import { buildTitleSuggestSystemPrompt, buildTitleSuggestUserPrompt, parseTitleSuggestResponse } from './titleSuggest.js';
 import { buildStoreQrSystemPrompt, buildStoreQrUserPrompt, parseStoreQrResponse } from './storeQr.js';
 import { buildStoreSnsSystemPrompt, buildStoreSnsUserPrompt, parseStoreSnsResponse } from './storeSns.js';
+import { buildFlexibleSystemPrompt, buildFlexibleUserPrompt, parseFlexibleResponse } from './flexible.js';
 import type { NormalizedAiContentResponse } from './common.js';
 
 interface PromptOptions {
@@ -126,6 +151,9 @@ export function buildSystemPrompt(outputType: OutputType, options: PromptOptions
     case 'store_sns':
       base = buildStoreSnsSystemPrompt(rest);
       break;
+    case 'flexible':
+      base = buildFlexibleSystemPrompt(rest);
+      break;
   }
 
   return base + buildCustomPromptInstruction(customPrompt);
@@ -150,6 +178,8 @@ export function buildUserPrompt(outputType: OutputType, input: string): string {
       return buildStoreQrUserPrompt(input);
     case 'store_sns':
       return buildStoreSnsUserPrompt(input);
+    case 'flexible':
+      return buildFlexibleUserPrompt(input);
   }
 }
 
@@ -184,6 +214,9 @@ export function parseResponse(
       break;
     case 'store_sns':
       partial = parseStoreSnsResponse(parsed, rawText);
+      break;
+    case 'flexible':
+      partial = parseFlexibleResponse(parsed, rawText);
       break;
   }
 

@@ -177,7 +177,9 @@ type LengthOption = 'short' | 'medium' | 'long';
 type ResultTab = 'preview' | 'html';
 type SourceTab = 'text' | 'url';
 type UrlTone = 'normal' | 'professional' | 'store';
-type UrlContentType = 'document' | 'explain';
+// WO-O4O-KPA-AI-CONTENT-MODE-PRESET-REMOVAL-V1:
+//   URL 모드도 결과 형식 프리셋 제거. length 만 보조 가이드로 유지.
+type UrlLength = 'short' | 'medium' | 'long';
 
 interface UrlBlock {
   id?: string;
@@ -220,9 +222,13 @@ const URL_TONE_LABELS: Record<UrlTone, string> = {
   store: '매장용',
 };
 
-const URL_CONTENT_TYPE_LABELS: Record<UrlContentType, string> = {
-  document: '문서형',
-  explain: '설명형',
+// WO-O4O-KPA-AI-CONTENT-MODE-PRESET-REMOVAL-V1:
+//   URL_OUTPUT_TYPE_OPTIONS 제거. "생성 형태" 프리셋이 없어졌으므로 더 이상 필요 없음.
+
+const URL_LENGTH_LABELS: Record<UrlLength, string> = {
+  short: '짧게',
+  medium: '보통',
+  long: '길게(A4 1장↑)',
 };
 
 /**
@@ -381,7 +387,10 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
   const [sourceTab, setSourceTab] = useState<SourceTab>(initialSourceTab ?? 'text');
   const [urlInput, setUrlInput] = useState('');
   const [urlTone, setUrlTone] = useState<UrlTone>('normal');
-  const [urlContentType, setUrlContentType] = useState<UrlContentType>('document');
+  // WO-O4O-KPA-AI-CONTENT-MODE-PRESET-REMOVAL-V1:
+  //   URL 모드도 "생성 형태" 프리셋 제거. urlLength / urlTone 만 보조 가이드로 유지.
+  //   결과 형식은 추가 요청사항(customPrompt) 이 결정한다.
+  const [urlLength, setUrlLength] = useState<UrlLength>('medium');
 
   // WO-O4O-AI-CONTENT-CUSTOM-PROMPT-AND-CORE-EXTENSION-AUDIT-V1:
   //   사용자 자유 입력 — text 모드는 customPrompt, URL 모드는 customInstruction 으로 매핑.
@@ -392,7 +401,6 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
   if (!open) return null;
 
   const currentConfig = MODE_CONFIG.find((m) => m.key === mode)!;
-  const showToneLength = mode !== 'title_suggest';
 
   const handleGrabFromEditor = () => {
     if (!editor) return;
@@ -421,14 +429,20 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
         customPrompt.trim(),
       ].filter(Boolean).join('\n\n').slice(0, CUSTOM_PROMPT_MAX);
 
+      // WO-O4O-KPA-AI-CONTENT-MODE-PRESET-REMOVAL-V1:
+      //   initialMode 가 명시적으로 전달된 외부 호출(POP/QR/블로그 페이지 등) 은 기존 outputType 을
+      //   그대로 사용한다 (해당 페이지 컨텍스트가 곧 결과 형식). 모달이 일반 진입(initialMode 없음)
+      //   이면 'flexible' outputType 으로 보내 추가 요청사항 중심으로 생성된다.
+      const effectiveOutputType = initialMode ? currentConfig.outputType : 'flexible';
+
       const response = await fetch(`${API_BASE_URL}/api/ai/content`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...aiRequestHeaders },
         credentials: 'include',
         body: JSON.stringify({
           input: input.trim(),
-          outputType: currentConfig.outputType,
-          options: showToneLength ? { tone, length } : {},
+          outputType: effectiveOutputType,
+          options: { tone, length },
           // WO-O4O-AI-CONTENT-CUSTOM-PROMPT-AND-CORE-EXTENSION-AUDIT-V1
           customPrompt: effectiveCustomPrompt,
         }),
@@ -479,7 +493,9 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
         signal: abortCtrl.signal,
         body: JSON.stringify({
           url: urlInput.trim(),
-          contentType: urlContentType,
+          // WO-O4O-KPA-AI-CONTENT-MODE-PRESET-REMOVAL-V1:
+          //   outputType 전송 제거. 결과 형식은 customInstruction 이 결정한다.
+          length: urlLength,
           tone: urlTone,
           // WO-O4O-AI-CONTENT-CUSTOM-PROMPT-AND-CORE-EXTENSION-AUDIT-V1:
           //   동일한 customPrompt 입력란을 URL 모드의 customInstruction 으로도 매핑한다.
@@ -901,12 +917,13 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
             ))}
           </div>
 
-          {/* WO-O4O-AI-CONTENT-CUSTOM-PROMPT-AND-CORE-EXTENSION-AUDIT-V1:
-              추가 요청사항 — text/url 모드 공통 적용. 미입력 시 기존 동작 유지. */}
+          {/* WO-O4O-KPA-AI-CONTENT-MODE-PRESET-REMOVAL-V1:
+              추가 요청사항이 결과 형식·구조를 결정하는 1순위 입력이 된다.
+              모달의 "정리 모드" 프리셋이 제거됐으므로, 사용자가 여기서 의도를 적는다. */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
               <label style={{ fontSize: '13px', fontWeight: 500, color: '#374151' }}>
-                추가 요청사항 <span style={{ color: '#9ca3af', fontWeight: 400 }}>(선택)</span>
+                추가 요청사항 <span style={{ color: '#9ca3af', fontWeight: 400 }}>(결과 형식은 여기서 정합니다)</span>
               </label>
               <span style={{ fontSize: '11px', color: '#9ca3af' }}>
                 {customPrompt.length}/{CUSTOM_PROMPT_MAX}
@@ -916,7 +933,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
               value={customPrompt}
               onChange={(e) => setCustomPrompt(e.target.value.slice(0, CUSTOM_PROMPT_MAX))}
               placeholder={
-                '예) 약국 고객이 이해하기 쉽게 작성\n블로그 스타일로 길게 정리\nPOP에 맞게 짧고 강조형으로 작성\n전문가 칼럼 스타일로 작성\n소제목 중심으로 정리'
+                '예) A4 1장 길이 강의자료\n블로그 글처럼 정리\nPOP 문구로 짧고 강조형\nQR 안내문으로 작성\n제목 5개만 추천\n약국 고객이 이해하기 쉽게'
               }
               rows={3}
               style={{
@@ -932,45 +949,29 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
               }}
             />
             <p style={{ fontSize: '11px', color: '#9ca3af', margin: '4px 0 0' }}>
-              모든 모드(텍스트/URL)에 공통 적용됩니다. 공통 원칙·출력 형식은 그대로 유지됩니다.
+              비워두면 입력 원문을 깨끗한 본문으로 정리합니다. 텍스트/URL 양쪽에 공통 적용됩니다.
             </p>
           </div>
 
           {/* TEXT MODE */}
           {sourceTab === 'text' && (
             <>
-              {/* Mode Selector */}
-              <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#374151', marginBottom: '6px' }}>
-                  정리 모드
-                </label>
-                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                  {MODE_CONFIG.map((m) => (
-                    <button
-                      key={m.key}
-                      type="button"
-                      onClick={() => { setMode(m.key); setResult(null); setError(''); }}
-                      title={m.desc}
-                      style={{
-                        padding: '6px 12px',
-                        fontSize: '12px',
-                        border: `1px solid ${mode === m.key ? '#6366f1' : '#d1d5db'}`,
-                        borderRadius: '16px',
-                        background: mode === m.key ? '#eef2ff' : 'white',
-                        color: mode === m.key ? '#4f46e5' : '#6b7280',
-                        cursor: 'pointer',
-                        fontWeight: mode === m.key ? 600 : 400,
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {m.label}
-                    </button>
-                  ))}
+              {/* WO-O4O-KPA-AI-CONTENT-MODE-PRESET-REMOVAL-V1:
+                  "정리 모드" 프리셋 UI 제거. 결과 형식은 추가 요청사항이 결정한다.
+                  외부 호출(POP/QR/블로그 페이지 등)은 initialMode prop 으로 mode 를
+                  주입할 수 있고, 그 경우에만 컨텍스트 안내 한 줄을 보여준다. */}
+              {initialMode && (
+                <div style={{
+                  padding: '8px 12px',
+                  background: '#f5f3ff',
+                  border: '1px solid #ddd6fe',
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  color: '#5b21b6',
+                }}>
+                  <strong>{currentConfig.label}</strong> 컨텍스트 — {currentConfig.desc}
                 </div>
-                <p style={{ fontSize: '12px', color: '#9ca3af', marginTop: '4px', margin: '4px 0 0' }}>
-                  {currentConfig.desc}
-                </p>
-              </div>
+              )}
 
               {/* Input */}
               <div>
@@ -1014,68 +1015,68 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
                 />
               </div>
 
-              {/* Options — hide for title_suggest */}
-              {showToneLength && (
-                <div style={{ display: 'flex', gap: '16px' }}>
-                  {/* Tone */}
-                  <div style={{ flex: 1 }}>
-                    <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#374151', marginBottom: '6px' }}>
-                      톤
-                    </label>
-                    <div style={{ display: 'flex', gap: '6px' }}>
-                      {(Object.keys(TONE_LABELS) as ToneOption[]).map((t) => (
-                        <button
-                          key={t}
-                          type="button"
-                          onClick={() => setTone(t)}
-                          style={{
-                            flex: 1,
-                            padding: '6px 4px',
-                            fontSize: '12px',
-                            border: `1px solid ${tone === t ? '#6366f1' : '#d1d5db'}`,
-                            borderRadius: '6px',
-                            background: tone === t ? '#eef2ff' : 'white',
-                            color: tone === t ? '#4f46e5' : '#6b7280',
-                            cursor: 'pointer',
-                            fontWeight: tone === t ? 600 : 400,
-                          }}
-                        >
-                          {TONE_LABELS[t]}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Length */}
-                  <div style={{ flex: 1 }}>
-                    <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#374151', marginBottom: '6px' }}>
-                      분량
-                    </label>
-                    <div style={{ display: 'flex', gap: '6px' }}>
-                      {(Object.keys(LENGTH_LABELS) as LengthOption[]).map((l) => (
-                        <button
-                          key={l}
-                          type="button"
-                          onClick={() => setLength(l)}
-                          style={{
-                            flex: 1,
-                            padding: '6px 4px',
-                            fontSize: '12px',
-                            border: `1px solid ${length === l ? '#6366f1' : '#d1d5db'}`,
-                            borderRadius: '6px',
-                            background: length === l ? '#eef2ff' : 'white',
-                            color: length === l ? '#4f46e5' : '#6b7280',
-                            cursor: 'pointer',
-                            fontWeight: length === l ? 600 : 400,
-                          }}
-                        >
-                          {LENGTH_LABELS[l]}
-                        </button>
-                      ))}
-                    </div>
+              {/* Options — WO-O4O-KPA-AI-CONTENT-MODE-PRESET-REMOVAL-V1:
+                  showToneLength 게이팅 제거. 모드 프리셋이 사라졌으므로 톤·분량은 항상 표시된다.
+                  title_suggest 같은 초소형 출력도 customPrompt 로 처리되므로 보조 가이드만으로 충분. */}
+              <div style={{ display: 'flex', gap: '16px' }}>
+                {/* Tone */}
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#374151', marginBottom: '6px' }}>
+                    톤
+                  </label>
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    {(Object.keys(TONE_LABELS) as ToneOption[]).map((t) => (
+                      <button
+                        key={t}
+                        type="button"
+                        onClick={() => setTone(t)}
+                        style={{
+                          flex: 1,
+                          padding: '6px 4px',
+                          fontSize: '12px',
+                          border: `1px solid ${tone === t ? '#6366f1' : '#d1d5db'}`,
+                          borderRadius: '6px',
+                          background: tone === t ? '#eef2ff' : 'white',
+                          color: tone === t ? '#4f46e5' : '#6b7280',
+                          cursor: 'pointer',
+                          fontWeight: tone === t ? 600 : 400,
+                        }}
+                      >
+                        {TONE_LABELS[t]}
+                      </button>
+                    ))}
                   </div>
                 </div>
-              )}
+
+                {/* Length */}
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#374151', marginBottom: '6px' }}>
+                    분량
+                  </label>
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    {(Object.keys(LENGTH_LABELS) as LengthOption[]).map((l) => (
+                      <button
+                        key={l}
+                        type="button"
+                        onClick={() => setLength(l)}
+                        style={{
+                          flex: 1,
+                          padding: '6px 4px',
+                          fontSize: '12px',
+                          border: `1px solid ${length === l ? '#6366f1' : '#d1d5db'}`,
+                          borderRadius: '6px',
+                          background: length === l ? '#eef2ff' : 'white',
+                          color: length === l ? '#4f46e5' : '#6b7280',
+                          cursor: 'pointer',
+                          fontWeight: length === l ? 600 : 400,
+                        }}
+                      >
+                        {LENGTH_LABELS[l]}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
 
               {/* Generate button (text mode) */}
               <button
@@ -1097,7 +1098,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
                   cursor: loading || !input.trim() ? 'not-allowed' : 'pointer',
                 }}
               >
-                {loading ? '생성 중...' : `✨ ${currentConfig.label} 시작`}
+                {loading ? '생성 중...' : initialMode ? `✨ ${currentConfig.label} 시작` : '✨ AI로 생성'}
               </button>
             </>
           )}
@@ -1130,32 +1131,34 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
                 </p>
               </div>
 
-              {/* URL Options */}
+              {/* URL Options — WO-O4O-KPA-AI-CONTENT-MODE-PRESET-REMOVAL-V1:
+                  "생성 형태" 프리셋(요약/문서/블로그/강의자료) 제거.
+                  결과 형식은 추가 요청사항이 결정하고, 분량/톤만 보조 가이드로 유지. */}
               <div style={{ display: 'flex', gap: '16px' }}>
-                {/* Content Type */}
+                {/* Length */}
                 <div style={{ flex: 1 }}>
                   <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#374151', marginBottom: '6px' }}>
-                    콘텐츠 유형
+                    분량
                   </label>
                   <div style={{ display: 'flex', gap: '6px' }}>
-                    {(Object.keys(URL_CONTENT_TYPE_LABELS) as UrlContentType[]).map((ct) => (
+                    {(Object.keys(URL_LENGTH_LABELS) as UrlLength[]).map((l) => (
                       <button
-                        key={ct}
+                        key={l}
                         type="button"
-                        onClick={() => setUrlContentType(ct)}
+                        onClick={() => setUrlLength(l)}
                         style={{
                           flex: 1,
                           padding: '6px 4px',
                           fontSize: '12px',
-                          border: `1px solid ${urlContentType === ct ? '#6366f1' : '#d1d5db'}`,
+                          border: `1px solid ${urlLength === l ? '#6366f1' : '#d1d5db'}`,
                           borderRadius: '6px',
-                          background: urlContentType === ct ? '#eef2ff' : 'white',
-                          color: urlContentType === ct ? '#4f46e5' : '#6b7280',
+                          background: urlLength === l ? '#eef2ff' : 'white',
+                          color: urlLength === l ? '#4f46e5' : '#6b7280',
                           cursor: 'pointer',
-                          fontWeight: urlContentType === ct ? 600 : 400,
+                          fontWeight: urlLength === l ? 600 : 400,
                         }}
                       >
-                        {URL_CONTENT_TYPE_LABELS[ct]}
+                        {URL_LENGTH_LABELS[l]}
                       </button>
                     ))}
                   </div>
