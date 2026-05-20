@@ -14,6 +14,7 @@ import { BaseTable, RowActionMenu, PageSection, PageContainer, type O4OColumn, t
 import { homeApi } from '../../api';
 import { forumApi } from '../../api';
 import { LoadingSpinner } from '../../components/common';
+import { ClosedForumAccessBlocker } from '../../components/forum/ClosedForumAccessBlocker';
 import { useAuth } from '../../contexts/AuthContext';
 import type { ForumPost } from '../../types';
 
@@ -385,92 +386,96 @@ export function ForumFeedPage() {
         />
       )}
 
-      {/* Search + Write (멤버만 표시) */}
-      {!closedForumId && <div className="flex gap-2 mt-5 mb-3">
-        <form className="flex gap-2 flex-1" onSubmit={handleSearchSubmit}>
-          <input
-            type="text"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="제목, 내용, 태그, 작성자 검색"
-            className="flex-1 px-3.5 py-2 text-sm border border-slate-200 rounded-md outline-none bg-white"
-          />
-          <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-primary border-none rounded-md cursor-pointer whitespace-nowrap">검색</button>
-        </form>
-        <button onClick={handleWriteClick} style={styles.writeBtn}>+ 글쓰기</button>
-      </div>
+      {/* Search + Write + Table: 멤버(또는 open forum)만 표시 */}
+      {!closedForumId && (
+        <>
+          <div className="flex gap-2 mt-5 mb-3">
+            <form className="flex gap-2 flex-1" onSubmit={handleSearchSubmit}>
+              <input
+                type="text"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                placeholder="제목, 내용, 태그, 작성자 검색"
+                className="flex-1 px-3.5 py-2 text-sm border border-slate-200 rounded-md outline-none bg-white"
+              />
+              <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-primary border-none rounded-md cursor-pointer whitespace-nowrap">검색</button>
+            </form>
+            <button onClick={handleWriteClick} style={styles.writeBtn}>+ 글쓰기</button>
+          </div>
 
-      {/* Sort tabs + info */}
-      <div className="flex justify-between items-center mb-2">
-        <div className="flex gap-1">
-          <button
-            className={`ff-sort-btn${sort === 'recent' ? ' active' : ''}`}
-            onClick={() => setSort('recent')}
-          >최신</button>
-          <button
-            className={`ff-sort-btn${sort === 'popular' ? ' active' : ''}`}
-            onClick={() => setSort('popular')}
-          >인기</button>
-        </div>
-        {!postsLoading && (
-          <div className="flex items-center gap-3">
-            <span className="text-xs text-slate-500">
-              {searchQuery ? `검색 결과 ${totalCount}건` : `총 ${totalCount}개의 게시글`}
-            </span>
-            {totalPages > 1 && (
-              <span className="text-xs text-slate-400">{currentPage} / {totalPages} 페이지</span>
+          {/* Sort tabs + info */}
+          <div className="flex justify-between items-center mb-2">
+            <div className="flex gap-1">
+              <button
+                className={`ff-sort-btn${sort === 'recent' ? ' active' : ''}`}
+                onClick={() => setSort('recent')}
+              >최신</button>
+              <button
+                className={`ff-sort-btn${sort === 'popular' ? ' active' : ''}`}
+                onClick={() => setSort('popular')}
+              >인기</button>
+            </div>
+            {!postsLoading && (
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-slate-500">
+                  {searchQuery ? `검색 결과 ${totalCount}건` : `총 ${totalCount}개의 게시글`}
+                </span>
+                {totalPages > 1 && (
+                  <span className="text-xs text-slate-400">{currentPage} / {totalPages} 페이지</span>
+                )}
+              </div>
             )}
           </div>
-        )}
-      </div>
 
-      {/* Search active indicator */}
-      {searchQuery && (
-        <div className="flex items-center justify-between px-3 py-1.5 mb-2 bg-blue-50 rounded-md border border-blue-200">
-          <span className="text-xs text-blue-700">"{searchQuery}" 검색 결과</span>
-          <button
-            onClick={() => { setSearchInput(''); updateParam('search', ''); }}
-            className="text-xs text-blue-700 bg-transparent border-none cursor-pointer underline px-1 py-0.5"
-          >전체 보기</button>
-        </div>
-      )}
+          {/* Search active indicator */}
+          {searchQuery && (
+            <div className="flex items-center justify-between px-3 py-1.5 mb-2 bg-blue-50 rounded-md border border-blue-200">
+              <span className="text-xs text-blue-700">"{searchQuery}" 검색 결과</span>
+              <button
+                onClick={() => { setSearchInput(''); updateParam('search', ''); }}
+                className="text-xs text-blue-700 bg-transparent border-none cursor-pointer underline px-1 py-0.5"
+              >전체 보기</button>
+            </div>
+          )}
 
-      {/* Table */}
-      <div className="bg-white rounded-lg border border-slate-200 overflow-hidden mb-2">
-        <BaseTable<ForumPost>
-          columns={columns}
-          data={displayedPosts}
-          rowKey={(row) => row.id}
-          emptyMessage={emptyMessage}
-        />
-      </div>
+          {/* Table */}
+          <div className="bg-white rounded-lg border border-slate-200 overflow-hidden mb-2">
+            <BaseTable<ForumPost>
+              columns={columns}
+              data={displayedPosts}
+              rowKey={(row) => row.id}
+              emptyMessage={emptyMessage}
+            />
+          </div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-1 py-6">
-          <button onClick={() => goToPage(1)} disabled={currentPage === 1}
-            className={`inline-flex items-center justify-center min-w-[36px] h-9 px-2 text-sm font-medium rounded-md border transition-all ${
-              currentPage === 1 ? 'text-slate-300 cursor-default opacity-50 bg-white border-slate-200' : 'text-slate-600 bg-white border-slate-200 cursor-pointer hover:bg-slate-50'
-            }`}>&laquo;</button>
-          <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}
-            className={`inline-flex items-center justify-center min-w-[36px] h-9 px-2 text-sm font-medium rounded-md border transition-all ${
-              currentPage === 1 ? 'text-slate-300 cursor-default opacity-50 bg-white border-slate-200' : 'text-slate-600 bg-white border-slate-200 cursor-pointer hover:bg-slate-50'
-            }`}>&lsaquo;</button>
-          {pageNumbers.map(p => (
-            <button key={p} onClick={() => goToPage(p)}
-              className={`inline-flex items-center justify-center min-w-[36px] h-9 px-2 text-sm font-medium rounded-md border transition-all cursor-pointer ${
-                p === currentPage ? 'bg-primary text-white border-primary' : 'text-slate-600 bg-white border-slate-200 hover:bg-slate-50'
-              }`}>{p}</button>
-          ))}
-          <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages}
-            className={`inline-flex items-center justify-center min-w-[36px] h-9 px-2 text-sm font-medium rounded-md border transition-all ${
-              currentPage === totalPages ? 'text-slate-300 cursor-default opacity-50 bg-white border-slate-200' : 'text-slate-600 bg-white border-slate-200 cursor-pointer hover:bg-slate-50'
-            }`}>&rsaquo;</button>
-          <button onClick={() => goToPage(totalPages)} disabled={currentPage === totalPages}
-            className={`inline-flex items-center justify-center min-w-[36px] h-9 px-2 text-sm font-medium rounded-md border transition-all ${
-              currentPage === totalPages ? 'text-slate-300 cursor-default opacity-50 bg-white border-slate-200' : 'text-slate-600 bg-white border-slate-200 cursor-pointer hover:bg-slate-50'
-            }`}>&raquo;</button>
-        </div>
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-1 py-6">
+              <button onClick={() => goToPage(1)} disabled={currentPage === 1}
+                className={`inline-flex items-center justify-center min-w-[36px] h-9 px-2 text-sm font-medium rounded-md border transition-all ${
+                  currentPage === 1 ? 'text-slate-300 cursor-default opacity-50 bg-white border-slate-200' : 'text-slate-600 bg-white border-slate-200 cursor-pointer hover:bg-slate-50'
+                }`}>&laquo;</button>
+              <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}
+                className={`inline-flex items-center justify-center min-w-[36px] h-9 px-2 text-sm font-medium rounded-md border transition-all ${
+                  currentPage === 1 ? 'text-slate-300 cursor-default opacity-50 bg-white border-slate-200' : 'text-slate-600 bg-white border-slate-200 cursor-pointer hover:bg-slate-50'
+                }`}>&lsaquo;</button>
+              {pageNumbers.map(p => (
+                <button key={p} onClick={() => goToPage(p)}
+                  className={`inline-flex items-center justify-center min-w-[36px] h-9 px-2 text-sm font-medium rounded-md border transition-all cursor-pointer ${
+                    p === currentPage ? 'bg-primary text-white border-primary' : 'text-slate-600 bg-white border-slate-200 hover:bg-slate-50'
+                  }`}>{p}</button>
+              ))}
+              <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages}
+                className={`inline-flex items-center justify-center min-w-[36px] h-9 px-2 text-sm font-medium rounded-md border transition-all ${
+                  currentPage === totalPages ? 'text-slate-300 cursor-default opacity-50 bg-white border-slate-200' : 'text-slate-600 bg-white border-slate-200 cursor-pointer hover:bg-slate-50'
+                }`}>&rsaquo;</button>
+              <button onClick={() => goToPage(totalPages)} disabled={currentPage === totalPages}
+                className={`inline-flex items-center justify-center min-w-[36px] h-9 px-2 text-sm font-medium rounded-md border transition-all ${
+                  currentPage === totalPages ? 'text-slate-300 cursor-default opacity-50 bg-white border-slate-200' : 'text-slate-600 bg-white border-slate-200 cursor-pointer hover:bg-slate-50'
+                }`}>&raquo;</button>
+            </div>
+          )}
+        </>
       )}
     </PageContainer>
     </PageSection>
