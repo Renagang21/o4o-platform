@@ -164,6 +164,18 @@ function runTypeCheckFrontend() {
     }
   }
 
+  // Type check web services (KPA, etc.)
+  log.info('Type checking web services...');
+  const webServices = ['web-kpa-society'];
+
+  for (const svc of webServices) {
+    const svcPath = join('services', svc);
+    if (existsSync(join(ROOT_DIR, svcPath))) {
+      console.log(`  - Checking ${svc}`);
+      exec('npx tsc --noEmit', join(ROOT_DIR, svcPath));
+    }
+  }
+
   log.warn('Skipping api-server type check (handled separately on server)');
   return true;
 }
