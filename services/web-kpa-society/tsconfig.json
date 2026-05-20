@@ -17,7 +17,8 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "paths": {
-      "@o4o/account-ui": ["../../packages/account-ui/src"]
+      "@o4o/account-ui": ["../../packages/account-ui/src"],
+      "@o4o/lms-client": ["../../packages/lms-client/src"]
     }
   },
   "include": ["src"],
