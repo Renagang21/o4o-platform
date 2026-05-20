@@ -545,7 +545,7 @@ const styles: Record<string, React.CSSProperties> = {
   errorBanner: { padding: '12px 16px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', color: '#dc2626', marginBottom: '16px', fontSize: '14px' },
   successBanner: { padding: '12px 16px', backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', color: '#16a34a', marginBottom: '16px', fontSize: '14px' },
   kpiGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' },
-  profileGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '16px', marginTop: '16px' },
+  profileGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginTop: '16px' },
   pendingRow: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', backgroundColor: colors.neutral50, borderRadius: '8px', gap: '12px' },
   coursesTable: { width: '100%', borderCollapse: 'collapse' as const },
   th: { padding: '10px 12px', textAlign: 'left' as const, fontSize: '12px', fontWeight: 600, color: colors.neutral600, borderBottom: `1px solid ${colors.neutral200}` },

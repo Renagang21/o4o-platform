@@ -102,6 +102,7 @@ function CourseTable({
       boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
       overflow: 'hidden',
     }}>
+      <div style={{ overflowX: 'auto' }}>
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr style={{ backgroundColor: colors.neutral50 }}>
@@ -176,6 +177,7 @@ function CourseTable({
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

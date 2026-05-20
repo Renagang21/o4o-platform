@@ -495,7 +495,7 @@ export default function OperatorLmsCoursesPage() {
   return (
     <div>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
         <div>
           <h1 style={{ fontSize: 20, fontWeight: 700, color: '#1e293b', margin: 0 }}>강의 관리</h1>
           <p style={{ fontSize: 13, color: '#64748b', margin: '4px 0 0' }}>
@@ -608,7 +608,7 @@ export default function OperatorLmsCoursesPage() {
             ].map((item) => (
               <div key={item.label} style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
                 <span style={{ fontWeight: 600, color: '#64748b', minWidth: 70, flexShrink: 0 }}>{item.label}</span>
-                <span style={{ color: '#1e293b' }}>{item.value}</span>
+                <span style={{ color: '#1e293b', wordBreak: 'break-word', minWidth: 0 }}>{item.value}</span>
               </div>
             ))}
             <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid #e2e8f0' }}>
