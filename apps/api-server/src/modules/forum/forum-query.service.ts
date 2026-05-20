@@ -106,6 +106,7 @@ export class ForumQueryService {
       membershipSelect = `
         COALESCE(
           (SELECT role FROM forum_category_members WHERE forum_category_id = c.id AND user_id = ${uidParam} LIMIT 1),
+          CASE WHEN c.requester_id = ${uidParam} THEN 'owner' ELSE NULL END,
           (SELECT 'pending' FROM kpa_approval_requests
            WHERE entity_type = 'forum_member_join' AND requester_id = ${uidParam}
              AND status = 'pending' AND payload->>'forum_category_id' = c.id::text LIMIT 1)
@@ -206,6 +207,7 @@ export class ForumQueryService {
     const membershipSelectJoined = `
       COALESCE(
         (SELECT role FROM forum_category_members WHERE forum_category_id = c.id AND user_id = ${uidParamJoined} LIMIT 1),
+        CASE WHEN c.requester_id = ${uidParamJoined} THEN 'owner' ELSE NULL END,
         (SELECT 'pending' FROM kpa_approval_requests
          WHERE entity_type = 'forum_member_join' AND requester_id = ${uidParamJoined}
            AND status = 'pending' AND payload->>'forum_category_id' = c.id::text LIMIT 1)
