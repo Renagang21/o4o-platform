@@ -19,6 +19,7 @@ import type { SignageHubVideo, SignageHubPlaylist } from '@o4o/shared-space-ui';
 import { ActionBar } from '@o4o/ui';
 import { publicContentApi } from '../../lib/api/signageV2';
 import { getAccessToken, useAuth } from '../../contexts/AuthContext';
+import { tryRefreshToken } from '../../api/token-refresh';
 import { hasAnyRole, PLATFORM_ROLES } from '../../lib/role-constants';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
@@ -95,18 +96,33 @@ export default function ContentHubPage() {
   const [selectedVideoIds, setSelectedVideoIds] = useState<Set<string>>(new Set());
   const [selectedPlaylistIds, setSelectedPlaylistIds] = useState<Set<string>>(new Set());
 
-  // ── Auth fetch helper ──
+  // ── Auth fetch helper (with 401 refresh → retry, apiClient.ts 동일 패턴) ──
   const apiFetch = useCallback(async (path: string, options?: RequestInit) => {
-    const token = getAccessToken();
-    const res = await fetch(`${API_BASE}${path}`, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...options?.headers,
-      },
-    });
+    const doFetch = (token: string | null) =>
+      fetch(`${API_BASE}${path}`, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...options?.headers,
+        },
+      });
+
+    let res = await doFetch(getAccessToken());
+
+    // 401: refresh token으로 재발급 후 1회 재시도
+    if (res.status === 401) {
+      const newToken = await tryRefreshToken();
+      if (newToken) {
+        res = await doFetch(newToken);
+      }
+    }
+
     if (!res.ok) {
+      // 여전히 401 → refresh도 실패한 상태. 원시 API 메시지 대신 안내문 표시
+      if (res.status === 401) {
+        throw new Error('로그인이 만료되었습니다. 다시 로그인 후 시도해 주세요.');
+      }
       const body = await res.json().catch(() => ({}));
       throw new Error(body?.error || body?.message || `API error ${res.status}`);
     }
