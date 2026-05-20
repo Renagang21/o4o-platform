@@ -7,6 +7,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@o4o/account-ui': path.resolve(__dirname, '../../packages/account-ui/src'),
+      '@o4o/lms-client': path.resolve(__dirname, '../../packages/lms-client/src'),
     },
     // react-router-dom v6(앱) vs v7(root) 중복 인스턴스 방지
     dedupe: ['react', 'react-dom', 'react-router-dom'],
