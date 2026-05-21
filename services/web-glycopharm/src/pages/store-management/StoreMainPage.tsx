@@ -35,6 +35,7 @@ import {
   Tag,
   FileText,
   DollarSign,
+  Megaphone,
 } from 'lucide-react';
 import { pharmacyApi } from '@/api/pharmacy';
 import type {
@@ -56,6 +57,8 @@ const QUICK_ACTIONS = [
   { label: '상품 관리', icon: Package, desc: '상품 목록 및 등록', path: '/store/products', color: '#7c3aed' },
   { label: '사이니지', icon: Tv, desc: '디지털 디스플레이 관리', path: '/store/signage', color: '#2563eb' },
   { label: '콘텐츠', icon: FileText, desc: '콘텐츠 가져오기', path: '/store/content', color: '#ec4899' },
+  // WO-O4O-GLYCOPHARM-POP-STORE-EXECUTION-V1: POP 생성 진입점
+  { label: 'POP 생성', icon: Megaphone, desc: 'AI 문구로 약국 POP PDF 생성', path: '/store/pop', color: '#ea580c' },
   { label: '설정', icon: Settings, desc: '약국 설정 관리', path: '/store/settings', color: '#64748b' },
 ];
 

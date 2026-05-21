@@ -241,6 +241,9 @@ const QrLandingPage = lazy(() => import('@/pages/qr/QrLandingPage'));
 // Funnel Visualization (Phase 3-A: WO-O4O-FUNNEL-VISUALIZATION-PHASE3A-CP1)
 const FunnelPage = lazy(() => import('@/pages/store-management/FunnelPage'));
 
+// WO-O4O-GLYCOPHARM-POP-STORE-EXECUTION-V1
+const StorePopPage = lazy(() => import('@/pages/store-management/StorePopPage'));
+
 // Loading fallback
 function PageLoading() {
   return (
@@ -667,6 +670,8 @@ function AppRoutes() {
         <Route path="b2b-order" element={<B2BOrderPage />} />
         <Route path="requests" element={<CustomerRequestsPage />} />
         <Route path="funnel" element={<FunnelPage />} />
+        {/* POP 생성 (WO-O4O-GLYCOPHARM-POP-STORE-EXECUTION-V1) */}
+        <Route path="pop" element={<StorePopPage />} />
         <Route path="management" element={<PharmacyManagement />} />
         <Route path="management/b2b" element={<PharmacyB2BProducts />} />
       </Route>
