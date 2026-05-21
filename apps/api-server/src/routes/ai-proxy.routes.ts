@@ -470,6 +470,48 @@ function extractNaverBlogText(html: string): string {
   const cclIdx = html.search(/<div[^>]+class="[^"]*blog_ccl[^"]*"/i);
   const workHtml = cclIdx > 200 ? html.slice(0, cclIdx) : html;
 
+  // === IR-O4O-AI-NAVER-BLOG-POSTVIEW-HTML-STRUCTURE-AUDIT-V1 ===
+  //   관측 전용 — 추출 로직 변경 없음. 운영환경에서 받은 PostView HTML 내부 구조 진단.
+  try {
+    const auditMarkers = [
+      'se-main-container',
+      'se-component-wrap',
+      'post-view',
+      'post_body',
+      'postViewArea',
+      'viewTypeSelector',
+      '__se_component_area',
+      'logNo',
+      '해양 심층수',
+      '풍부한 미네랄',
+      '식품의약품안전처 블로그',
+    ];
+    const markerIndices: Record<string, number> = {};
+    for (const m of auditMarkers) markerIndices[m] = workHtml.indexOf(m);
+
+    const sampleAround = (idx: number, before = 200, after = 300): string => {
+      if (idx < 0) return '';
+      const start = Math.max(0, idx - before);
+      const end = Math.min(workHtml.length, idx + after);
+      return workHtml.slice(start, end);
+    };
+
+    logger.info('[NAVER_HTML_STRUCTURE_AUDIT]', {
+      bodyLength: html.length,
+      workHtmlLength: workHtml.length,
+      cclIdx,
+      markerIndices,
+      sampleFirst1000: workHtml.slice(0, 1000),
+      sampleAroundSeMain: sampleAround(markerIndices['se-main-container']),
+      sampleAroundPostBody: sampleAround(markerIndices['post_body']),
+      sampleAroundTopic: sampleAround(markerIndices['해양 심층수']),
+      sampleAroundLogNo: sampleAround(markerIndices['logNo']),
+    });
+  } catch (auditError: any) {
+    logger.warn('[NAVER_HTML_STRUCTURE_AUDIT_ERROR]', { error: auditError?.message });
+  }
+  // === audit end ===
+
   // WO-O4O-AI-URL-NAVER-BLOG-CANDIDATE-SELECTION-FIX-V1:
   //   소개문 라인만 제거, 후보 전체 제거 금지 (Cause B 수정)
   //   "이 블로그는 X가 운영합니다" 라인을 첫 줄에서만 trim
@@ -487,6 +529,25 @@ function extractNaverBlogText(html: string): string {
     extractContainerByClass(workHtml, 'post_body'),          // 매우 구형
   ];
 
+  // === AUDIT: per-class-selector probe (관측 전용, 로직 변경 없음) ===
+  try {
+    const classSelectorNames = ['se-main-container', 'se-component-wrap', 'post-view', 'post_body'];
+    const probes = contentOnlyRaw.map((raw, i) => {
+      const text = raw ? stripHtml(raw).trim() : '';
+      return {
+        selector: classSelectorNames[i],
+        hit: raw !== null,
+        rawHtmlLength: raw?.length ?? 0,
+        textLength: text.length,
+        firstTextSample: text.slice(0, 100),
+      };
+    });
+    logger.info('[NAVER_SELECTOR_PROBE_CLASS]', { probes });
+  } catch (e: any) {
+    logger.warn('[NAVER_SELECTOR_PROBE_ERROR]', { phase: 'class', error: e?.message });
+  }
+  // === audit end ===
+
   // 소개문 라인 trim 후 100자 이상인 content-only 후보 → 가장 긴 것 선택
   const contentCandidates = contentOnlyRaw
     .filter((c): c is string => c !== null)
@@ -494,7 +555,13 @@ function extractNaverBlogText(html: string): string {
     .filter((t) => t.length >= 100);
 
   if (contentCandidates.length > 0) {
-    return contentCandidates.reduce((a, b) => (a.length >= b.length ? a : b));
+    const selected = contentCandidates.reduce((a, b) => (a.length >= b.length ? a : b));
+    logger.info('[NAVER_FINAL_SELECTION]', {
+      source: 'contentCandidates',
+      selectedTextLength: selected.length,
+      selectedTextSample: selected.slice(0, 300),
+    });
+    return selected;
   }
 
   // lenient fallback 1: content-only 후보 중 50자 이상 (짧은 포스트 대응)
@@ -504,7 +571,13 @@ function extractNaverBlogText(html: string): string {
     .filter((t) => t.length >= 50);
 
   if (lenientContent.length > 0) {
-    return lenientContent.reduce((a, b) => (a.length >= b.length ? a : b));
+    const selected = lenientContent.reduce((a, b) => (a.length >= b.length ? a : b));
+    logger.info('[NAVER_FINAL_SELECTION]', {
+      source: 'lenientContent',
+      selectedTextLength: selected.length,
+      selectedTextSample: selected.slice(0, 300),
+    });
+    return selected;
   }
 
   // lenient fallback 2: wrapper selector (content-only 후보가 없을 때만 사용)
@@ -514,17 +587,48 @@ function extractNaverBlogText(html: string): string {
     extractContainerById(workHtml, 'viewTypeSelector'),
   ];
 
+  // === AUDIT: per-id-selector probe (관측 전용, 로직 변경 없음) ===
+  try {
+    const idSelectorNames = ['postViewArea', 'viewTypeSelector'];
+    const probes = wrapperRaw.map((raw, i) => {
+      const text = raw ? stripHtml(raw).trim() : '';
+      return {
+        selector: idSelectorNames[i],
+        hit: raw !== null,
+        rawHtmlLength: raw?.length ?? 0,
+        textLength: text.length,
+        firstTextSample: text.slice(0, 100),
+      };
+    });
+    logger.info('[NAVER_SELECTOR_PROBE_ID]', { probes });
+  } catch (e: any) {
+    logger.warn('[NAVER_SELECTOR_PROBE_ERROR]', { phase: 'id', error: e?.message });
+  }
+  // === audit end ===
+
   const wrapperCandidates = wrapperRaw
     .filter((c): c is string => c !== null)
     .map((c) => trimIntroLine(stripHtml(c).trim()))
     .filter((t) => t.length >= 50);
 
   if (wrapperCandidates.length > 0) {
-    return wrapperCandidates.reduce((a, b) => (a.length >= b.length ? a : b));
+    const selected = wrapperCandidates.reduce((a, b) => (a.length >= b.length ? a : b));
+    logger.info('[NAVER_FINAL_SELECTION]', {
+      source: 'wrapperCandidates',
+      selectedTextLength: selected.length,
+      selectedTextSample: selected.slice(0, 300),
+    });
+    return selected;
   }
 
   // 최종 fallback: CCL 차단 후 전체 stripHtml
-  return stripHtml(workHtml);
+  const fallback = stripHtml(workHtml);
+  logger.info('[NAVER_FINAL_SELECTION]', {
+    source: 'stripHtmlFallback',
+    selectedTextLength: fallback.length,
+    selectedTextSample: fallback.slice(0, 300),
+  });
+  return fallback;
 }
 
 async function fetchNaverBlogContent(url: string): Promise<UrlContent> {
