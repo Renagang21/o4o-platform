@@ -21,10 +21,12 @@ interface PlayerOverlayProps {
   isPlaying: boolean;
   currentItem: PlaylistItem | null;
   playlistName?: string;
+  isFullscreen?: boolean;
   onPlay: () => void;
   onPause: () => void;
   onNext: () => void;
   onPrevious: () => void;
+  onFullscreenToggle?: () => void;
 }
 
 // ============================================================================
@@ -36,10 +38,12 @@ export default function PlayerOverlay({
   isPlaying,
   currentItem,
   playlistName,
+  isFullscreen,
   onPlay,
   onPause,
   onNext,
   onPrevious,
+  onFullscreenToggle,
 }: PlayerOverlayProps) {
   const [visible, setVisible] = useState(true);
   const [hideTimeout, setHideTimeout] = useState<number | null>(null);
@@ -81,7 +85,7 @@ export default function PlayerOverlay({
       onMouseMove={handleMouseMove}
       data-mode={mode}
     >
-      {/* Top bar with info */}
+      {/* Top bar with info and fullscreen toggle */}
       {mode !== 'minimal' && (
         <div className="overlay-top">
           <div className="overlay-info">
@@ -90,6 +94,15 @@ export default function PlayerOverlay({
               <span className="content-name">{currentItem.media.name}</span>
             )}
           </div>
+          {onFullscreenToggle && (
+            <button
+              className="overlay-fullscreen-btn"
+              onClick={onFullscreenToggle}
+              title={isFullscreen ? '전체화면 해제 (ESC)' : '전체화면 전환'}
+            >
+              {isFullscreen ? <MinimizeIcon /> : <MaximizeIcon />}
+            </button>
+          )}
         </div>
       )}
 
@@ -164,12 +177,39 @@ export default function PlayerOverlay({
 
         .overlay-top {
           padding: 1rem;
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
         }
 
         .overlay-info {
           display: flex;
           gap: 1rem;
           color: #fff;
+        }
+
+        .overlay-fullscreen-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 2rem;
+          height: 2rem;
+          background: rgba(0, 0, 0, 0.4);
+          border: none;
+          border-radius: 0.375rem;
+          color: #fff;
+          cursor: pointer;
+          flex-shrink: 0;
+          transition: background 0.15s;
+        }
+
+        .overlay-fullscreen-btn:hover {
+          background: rgba(0, 0, 0, 0.6);
+        }
+
+        .overlay-fullscreen-btn svg {
+          width: 1rem;
+          height: 1rem;
         }
 
         .playlist-name {
@@ -284,6 +324,22 @@ function NextIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor">
       <path d="M6 18l8.5-6L6 6v12zm10-12v12h2V6h-2z" />
+    </svg>
+  );
+}
+
+function MaximizeIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+    </svg>
+  );
+}
+
+function MinimizeIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" />
     </svg>
   );
 }

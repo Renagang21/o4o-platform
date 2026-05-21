@@ -7,9 +7,15 @@
  * - Error recovery and reconnection
  *
  * Phase 2: Digital Signage Production Upgrade
+ *
+ * WO-O4O-SIGNAGE-PLAYER-CORE-FULLSCREEN-START-UI-V1:
+ *   재생 시작 전 "전체화면으로 재생 / 일반 화면으로 재생" 선택 화면 추가.
+ *   containerRef를 단일 루트 div에 유지하여 phase 전환 후에도
+ *   requestFullscreen이 동일 DOM 요소에서 동작.
  */
 
 import { useEffect, useState, useCallback, useRef } from 'react';
+import { Maximize, Minimize, MonitorPlay, Play } from 'lucide-react';
 import { PlaybackEngine, EngineState, PlaybackEventType } from '../../engine/PlaybackEngine';
 import { ScheduleResolver, type ResolvedContent } from '../../services/ScheduleResolver';
 import { getContentCache, type ContentCache } from '../../services/ContentCache';
@@ -41,6 +47,20 @@ type ControllerState =
   | 'offline';
 
 // ============================================================================
+// Fullscreen helpers
+// ============================================================================
+
+function requestFsEl(el: HTMLElement) {
+  if (el.requestFullscreen) el.requestFullscreen();
+  else if ((el as any).webkitRequestFullscreen) (el as any).webkitRequestFullscreen();
+}
+
+function exitFs() {
+  if (document.exitFullscreen) document.exitFullscreen();
+  else if ((document as any).webkitExitFullscreen) (document as any).webkitExitFullscreen();
+}
+
+// ============================================================================
 // PlayerController Component
 // ============================================================================
 
@@ -52,6 +72,11 @@ export default function PlayerController({ config, onReady, onError }: PlayerCon
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [debugInfo, setDebugInfo] = useState<Record<string, unknown>>({});
 
+  // WO-O4O-SIGNAGE-PLAYER-CORE-FULLSCREEN-START-UI-V1
+  const [phase, setPhase] = useState<'start' | 'playing'>('start');
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showControls, setShowControls] = useState(true);
+
   // Refs
   const engineRef = useRef<PlaybackEngine | null>(null);
   const resolverRef = useRef<ScheduleResolver | null>(null);
@@ -59,6 +84,71 @@ export default function PlayerController({ config, onReady, onError }: PlayerCon
   const telemetryRef = useRef<PlayerTelemetry | null>(null);
   const errorTrackerRef = useRef<ErrorTracker | null>(null);
   const contentRef = useRef<ResolvedContent | null>(null);
+  // Single persistent container — requestFullscreen operates on same element across phase changes
+  const containerRef = useRef<HTMLDivElement>(null);
+  // phaseRef avoids stale closure in handleContentUpdate auto-refresh callback
+  const phaseRef = useRef<'start' | 'playing'>('start');
+  const mouseMoveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const updatePhase = (p: 'start' | 'playing') => {
+    phaseRef.current = p;
+    setPhase(p);
+  };
+
+  // ============================================================================
+  // Mouse move / controls visibility
+  // ============================================================================
+
+  const handleMouseMove = () => {
+    setShowControls(true);
+    if (mouseMoveTimerRef.current) clearTimeout(mouseMoveTimerRef.current);
+    mouseMoveTimerRef.current = setTimeout(() => setShowControls(false), 3000);
+  };
+
+  useEffect(() => {
+    handleMouseMove();
+    return () => { if (mouseMoveTimerRef.current) clearTimeout(mouseMoveTimerRef.current); };
+  }, []);
+
+  // ============================================================================
+  // Fullscreen change detection
+  // ============================================================================
+
+  useEffect(() => {
+    const handler = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener('fullscreenchange', handler);
+    document.addEventListener('webkitfullscreenchange', handler);
+    return () => {
+      document.removeEventListener('fullscreenchange', handler);
+      document.removeEventListener('webkitfullscreenchange', handler);
+    };
+  }, []);
+
+  const handleFullscreenToggle = () => {
+    if (isFullscreen) exitFs();
+    else if (containerRef.current) requestFsEl(containerRef.current);
+  };
+
+  // ============================================================================
+  // Start screen handlers
+  // ============================================================================
+
+  const handleStartNormal = async () => {
+    updatePhase('playing');
+    if (engineRef.current) {
+      await engineRef.current.play();
+      setControllerState('playing');
+    }
+  };
+
+  const handleStartFullscreen = async () => {
+    if (containerRef.current) requestFsEl(containerRef.current);
+    updatePhase('playing');
+    if (engineRef.current) {
+      await engineRef.current.play();
+      setControllerState('playing');
+    }
+  };
 
   // ============================================================================
   // Initialization
@@ -172,14 +262,10 @@ export default function PlayerController({ config, onReady, onError }: PlayerCon
         }
       }
 
-      // Load into engine
+      // Load into engine — do NOT auto-start; show start screen first
       await engineRef.current.loadPlaylist(content.items);
-
-      // Start playback if autoplay
-      if (config.autoplay) {
-        await engineRef.current.play();
-        setControllerState('playing');
-      }
+      setControllerState('paused');
+      updatePhase('start');
 
       // Start auto-refresh
       resolverRef.current.startAutoRefresh((newContent) => {
@@ -213,10 +299,8 @@ export default function PlayerController({ config, onReady, onError }: PlayerCon
 
     if (cachedPlaylist && cachedPlaylist.items.length > 0) {
       await engineRef.current.loadPlaylist(cachedPlaylist.items);
-      if (config.autoplay) {
-        await engineRef.current.play();
-        setControllerState('playing');
-      }
+      setControllerState('paused');
+      updatePhase('start');
     } else {
       setControllerState('offline');
     }
@@ -241,7 +325,8 @@ export default function PlayerController({ config, onReady, onError }: PlayerCon
       // Reload engine with new content
       await engineRef.current.loadPlaylist(content.items);
 
-      if (config.autoplay && controllerState !== 'paused') {
+      // Only restart playback if already in playing phase
+      if (phaseRef.current === 'playing') {
         await engineRef.current.play();
         setControllerState('playing');
       }
@@ -360,6 +445,7 @@ export default function PlayerController({ config, onReady, onError }: PlayerCon
 
     setDebugInfo({
       state: controllerState,
+      phase,
       online: isOnline,
       playlist: contentRef.current?.playlist?.name,
       schedule: contentRef.current?.schedule?.name,
@@ -391,76 +477,283 @@ export default function PlayerController({ config, onReady, onError }: PlayerCon
   }, []);
 
   // ============================================================================
-  // Render
+  // Render — single root container so requestFullscreen targets same DOM element
   // ============================================================================
 
-  // Loading state
-  if (controllerState === 'initializing' || controllerState === 'loading') {
-    return <LoadingScreen mode={config.mode} />;
-  }
+  const itemCount = contentRef.current?.items.length ?? 0;
+  const playlistName = contentRef.current?.playlist?.name ?? '';
 
-  // Error state
-  if (controllerState === 'error') {
-    return (
-      <ErrorScreen
-        mode={config.mode}
-        message={errorMessage || 'An error occurred'}
-        onRetry={handleRetry}
-      />
-    );
-  }
-
-  // Offline state
-  if (controllerState === 'offline') {
-    return (
-      <ErrorScreen
-        mode={config.mode}
-        message="No network connection. Waiting for content..."
-        onRetry={handleRetry}
-        isOffline
-      />
-    );
-  }
-
-  // Empty state
-  if (controllerState === 'empty') {
-    return (
-      <div className="player-empty">
-        <p>No content scheduled</p>
-      </div>
-    );
-  }
-
-  // Playing state
   return (
-    <div className="player-controller" data-mode={config.mode}>
-      {/* Main content renderer */}
-      {currentItem && (
-        <MediaRenderer
-          item={currentItem}
-          cache={cacheRef.current || undefined}
-          onVideoEnded={handleVideoEnded}
-          muted={config.muted}
-          transitionDuration={config.transitionDuration}
-        />
+    <div
+      ref={containerRef}
+      className="player-controller"
+      data-mode={config.mode}
+      onMouseMove={handleMouseMove}
+    >
+      {/* ── Loading ──────────────────────────────────────────────────────── */}
+      {(controllerState === 'initializing' || controllerState === 'loading') && (
+        <LoadingScreen mode={config.mode} />
       )}
 
-      {/* Overlay for minimal/preview modes */}
-      {config.mode !== 'zero-ui' && (
-        <PlayerOverlay
+      {/* ── Error ────────────────────────────────────────────────────────── */}
+      {controllerState === 'error' && (
+        <ErrorScreen
           mode={config.mode}
-          isPlaying={controllerState === 'playing'}
-          currentItem={currentItem}
-          playlistName={contentRef.current?.playlist?.name}
-          onPlay={handlePlay}
-          onPause={handlePause}
-          onNext={handleNext}
-          onPrevious={handlePrevious}
+          message={errorMessage || 'An error occurred'}
+          onRetry={handleRetry}
         />
       )}
 
-      {/* Debug panel */}
-      {config.mode === 'debug' && <DebugPanel info={debugInfo} />}
+      {/* ── Offline ──────────────────────────────────────────────────────── */}
+      {controllerState === 'offline' && (
+        <ErrorScreen
+          mode={config.mode}
+          message="No network connection. Waiting for content..."
+          onRetry={handleRetry}
+          isOffline
+        />
+      )}
+
+      {/* ── Empty ────────────────────────────────────────────────────────── */}
+      {controllerState === 'empty' && (
+        <div className="player-empty">
+          <p>No content scheduled</p>
+        </div>
+      )}
+
+      {/* ── Start screen ─────────────────────────────────────────────────── */}
+      {phase === 'start'
+        && controllerState !== 'initializing'
+        && controllerState !== 'loading'
+        && controllerState !== 'error'
+        && controllerState !== 'offline'
+        && controllerState !== 'empty' && (
+        <div className="player-start-screen">
+          <div className="start-card">
+            <MonitorPlay className="start-icon" />
+            <p className="start-playlist-name">{playlistName}</p>
+            <p className="start-item-count">{itemCount}개 콘텐츠</p>
+
+            <div className="start-buttons">
+              <button
+                onClick={handleStartFullscreen}
+                className="start-btn start-btn-primary"
+              >
+                <Maximize className="btn-icon" />
+                전체화면으로 재생
+              </button>
+              <button
+                onClick={handleStartNormal}
+                className="start-btn start-btn-secondary"
+              >
+                <Play className="btn-icon" />
+                일반 화면으로 재생
+              </button>
+            </div>
+
+            <div className="start-hints">
+              <p>전체화면 해제: ESC 키</p>
+              <p>브라우저 전체화면: F11 키</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Playback ─────────────────────────────────────────────────────── */}
+      {phase === 'playing'
+        && controllerState !== 'error'
+        && controllerState !== 'offline'
+        && controllerState !== 'empty' && (
+        <>
+          {/* Main content renderer */}
+          {currentItem && (
+            <MediaRenderer
+              item={currentItem}
+              cache={cacheRef.current || undefined}
+              onVideoEnded={handleVideoEnded}
+              muted={config.muted}
+              transitionDuration={config.transitionDuration}
+            />
+          )}
+
+          {/* Overlay for minimal/preview modes */}
+          {config.mode !== 'zero-ui' && (
+            <PlayerOverlay
+              mode={config.mode}
+              isPlaying={controllerState === 'playing'}
+              currentItem={currentItem}
+              playlistName={playlistName}
+              isFullscreen={isFullscreen}
+              onPlay={handlePlay}
+              onPause={handlePause}
+              onNext={handleNext}
+              onPrevious={handlePrevious}
+              onFullscreenToggle={handleFullscreenToggle}
+            />
+          )}
+
+          {/* Fullscreen toggle for zero-ui mode — shown briefly on mouse move */}
+          {config.mode === 'zero-ui' && showControls && (
+            <div className="player-fullscreen-hint">
+              <button
+                onClick={handleFullscreenToggle}
+                className="fullscreen-hint-btn"
+                title={isFullscreen ? '전체화면 해제 (ESC)' : '전체화면 전환'}
+              >
+                {isFullscreen ? <Minimize className="hint-icon" /> : <Maximize className="hint-icon" />}
+              </button>
+            </div>
+          )}
+
+          {/* Debug panel */}
+          {config.mode === 'debug' && <DebugPanel info={debugInfo} />}
+        </>
+      )}
+
+      <style>{`
+        .player-controller {
+          position: fixed;
+          inset: 0;
+          background: #000;
+          overflow: hidden;
+        }
+
+        .player-empty {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          height: 100%;
+          color: rgba(255, 255, 255, 0.4);
+          font-size: 0.875rem;
+        }
+
+        /* Start screen */
+        .player-start-screen {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          height: 100%;
+        }
+
+        .start-card {
+          text-align: center;
+          max-width: 20rem;
+          width: 100%;
+          padding: 1.5rem;
+        }
+
+        .start-icon {
+          width: 3rem;
+          height: 3rem;
+          color: rgba(255, 255, 255, 0.4);
+          margin: 0 auto 1rem;
+        }
+
+        .start-playlist-name {
+          color: rgba(255, 255, 255, 0.8);
+          font-size: 1.125rem;
+          font-weight: 500;
+          margin: 0 0 0.25rem;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .start-item-count {
+          color: rgba(255, 255, 255, 0.4);
+          font-size: 0.875rem;
+          margin: 0 0 2rem;
+        }
+
+        .start-buttons {
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .start-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          width: 100%;
+          padding: 0.875rem 1.25rem;
+          border: none;
+          border-radius: 0.75rem;
+          font-size: 0.875rem;
+          cursor: pointer;
+          transition: background 0.15s;
+        }
+
+        .start-btn-primary {
+          background: #2563eb;
+          color: #fff;
+          font-weight: 600;
+        }
+
+        .start-btn-primary:hover {
+          background: #3b82f6;
+        }
+
+        .start-btn-secondary {
+          background: rgba(255, 255, 255, 0.1);
+          color: #fff;
+          font-weight: 500;
+        }
+
+        .start-btn-secondary:hover {
+          background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-icon {
+          width: 1rem;
+          height: 1rem;
+        }
+
+        .start-hints {
+          color: rgba(255, 255, 255, 0.3);
+          font-size: 0.75rem;
+          line-height: 1.6;
+        }
+
+        .start-hints p {
+          margin: 0;
+        }
+
+        /* Fullscreen hint (zero-ui) */
+        .player-fullscreen-hint {
+          position: absolute;
+          top: 1rem;
+          right: 1rem;
+          z-index: 100;
+        }
+
+        .fullscreen-hint-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 2.5rem;
+          height: 2.5rem;
+          background: rgba(0, 0, 0, 0.4);
+          border: none;
+          border-radius: 0.5rem;
+          color: #fff;
+          cursor: pointer;
+          transition: background 0.15s;
+        }
+
+        .fullscreen-hint-btn:hover {
+          background: rgba(0, 0, 0, 0.6);
+        }
+
+        .hint-icon {
+          width: 1rem;
+          height: 1rem;
+        }
+      `}</style>
     </div>
   );
 }
