@@ -130,8 +130,8 @@ function QuizPanel({
         answer: answers[q.id] ?? '',
       }));
       const res = await lmsApi.submitQuiz(quiz.id, payload);
-      setResult(res);
-      onComplete(res);
+      setResult(res.data);
+      onComplete(res.data);
     } catch {
       setError('퀴즈 제출 중 오류가 발생했습니다.');
     } finally {
@@ -272,7 +272,7 @@ export default function CourseDetailPage() {
     let cancelled = false;
     setLoading(true);
     lmsApi.getCourseById(id)
-      .then((data) => { if (!cancelled) setCourse(data); })
+      .then((res) => { if (!cancelled) setCourse(res.data.course); })
       .catch(() => { if (!cancelled) setError('강의 정보를 불러오지 못했습니다.'); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
@@ -281,7 +281,9 @@ export default function CourseDetailPage() {
   // ── 수강 상태 조회 ─────────────────────────────────────────────────────────
   useEffect(() => {
     if (!id || !isAuthenticated) return;
-    lmsApi.getMyEnrollment(id).then((e) => { if (e) setEnrolled(true); });
+    lmsApi.getMyEnrollment(id)
+      .then((res) => { if (res.data.enrollment) setEnrolled(true); })
+      .catch(() => {}); // 404 = not enrolled
   }, [id, isAuthenticated]);
 
   // ── 레슨 목록 조회 (enrolled 후) ───────────────────────────────────────────
@@ -290,9 +292,9 @@ export default function CourseDetailPage() {
     let cancelled = false;
     setLessonsLoading(true);
     lmsApi.getLessonsByCourse(id)
-      .then((data) => {
+      .then((res) => {
         if (!cancelled) {
-          const sorted = [...data].sort((a, b) => a.order - b.order);
+          const sorted = [...(res.data ?? [])].sort((a, b) => a.order - b.order);
           setLessons(sorted);
         }
       })
@@ -345,8 +347,10 @@ export default function CourseDetailPage() {
     setLessonCompleted(completedLessonIds.has(lesson.id));
     setQuizLoading(true);
     try {
-      const q = await lmsApi.getLessonQuiz(lesson.id);
-      setQuiz(q);
+      const res = await lmsApi.getLessonQuiz(lesson.id);
+      setQuiz(res.data.quiz ?? null);
+    } catch {
+      setQuiz(null);
     } finally {
       setQuizLoading(false);
     }

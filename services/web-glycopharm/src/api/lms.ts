@@ -159,85 +159,40 @@ export const lmsApi = {
   getInstructorCourses: (): Promise<LmsApiResponse<LmsCourse[]>> =>
     instructorClient.getCourses<LmsCourse>(),
 
-  // ─── 학습자 메서드 (WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP1) ─────────────────
-  // 공통 factory 가 envelope 을 그대로 반환하므로, GlycoPharm thin wrapper 가
-  // 기존 unwrap 패턴(`data.data.X`, try/catch null) 을 보존하여 페이지 호환 유지.
-  // unwrap 제거는 Phase 5 별도 WO 에서 진행.
+  // ─── 학습자 메서드 (WO-O4O-LMS-CLIENT-GLYCOPHARM-UNWRAP-CLEANUP-V1) ──────────
+  // factory 직접 위임. envelope(`{ success, data }`)은 호출측(page)에서 처리.
+  // KPA / K-Cosmetics 와 동일한 factory 위임 구조.
 
-  getCourses: async (params?: {
+  getCourses: (params?: {
     search?: string;
     page?: number;
     limit?: number;
-  }): Promise<LmsCoursesResult> => {
-    const res = await learnerClient.getCourses<LmsCourse>({
+  }) =>
+    learnerClient.getCourses<LmsCourse>({
       status: 'published',
       ...(params?.search ? { search: params.search } : {}),
       ...(params?.page ? { page: params.page } : {}),
       ...(params?.limit ? { limit: params.limit } : {}),
-    });
-    // factory 반환은 LmsPaginatedResponse — Glyco 의 LmsCoursesResult 와 구조 호환.
-    return res as unknown as LmsCoursesResult;
-  },
+    }) as unknown as Promise<LmsCoursesResult>,
 
-  // ─── 표준 이름 (WO-O4O-LMS-GLYCOPHARM-METHOD-ALIGNMENT-V1 + V2-STEP1) ──────
-  // LMS-CLIENT-CONVENTION-V1 §4 기준 표준 이름. 내부 구현은 공통 factory 호출 + 기존 unwrap 보존.
+  getCourse: (id: string) => learnerClient.getCourse<LmsCourse>(id),
 
-  getCourse: async (id: string): Promise<LmsCourse> => {
-    const res = await learnerClient.getCourse<LmsCourse>(id);
-    return res.data.course;
-  },
+  getEnrollmentByCourse: (courseId: string) =>
+    learnerClient.getEnrollmentByCourse<LmsEnrollment>(courseId),
 
-  // 주의: Glyco 의 endpoint(`/lms/enrollments/:courseId`) 는 factory 의
-  // `/lms/enrollments/me/course/:courseId` 와 다르므로 V2 Step 1 에서 factory 로 전환하지 않는다.
-  // endpoint 정렬은 별도 WO 에서 진행 (현 동작 보존이 우선).
-  getEnrollmentByCourse: async (courseId: string): Promise<LmsEnrollment | null> => {
-    try {
-      const { data } = await api.get<{ success: boolean; data: { enrollment: LmsEnrollment } }>(
-        `/lms/enrollments/${courseId}`,
-      );
-      return data.data.enrollment;
-    } catch {
-      return null;
-    }
-  },
+  enrollCourse: (courseId: string) => learnerClient.enrollCourse<LmsEnrollment>(courseId),
 
-  // 강의 신청 — WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP2.
-  // 공통 factory 호출 + Glyco 의 기존 unwrap 패턴 보존.
-  enrollCourse: async (courseId: string): Promise<LmsEnrollment> => {
-    const res = await learnerClient.enrollCourse<LmsEnrollment>(courseId);
-    return res.data.enrollment;
-  },
+  getLessons: (courseId: string) => learnerClient.getLessons<LmsLesson>(courseId),
 
-  getLessons: async (courseId: string): Promise<LmsLesson[]> => {
-    const res = await learnerClient.getLessons<LmsLesson>(courseId);
-    return res.data ?? [];
-  },
+  getQuizForLesson: (lessonId: string) => learnerClient.getQuizForLesson<LmsQuiz>(lessonId),
 
-  getQuizForLesson: async (lessonId: string): Promise<LmsQuiz | null> => {
-    try {
-      const res = await learnerClient.getQuizForLesson<LmsQuiz>(lessonId);
-      return res.data.quiz;
-    } catch {
-      return null;
-    }
-  },
-
-  // 퀴즈 제출 — WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP2.
-  // 공통 factory 호출 + Glyco 의 기존 unwrap 패턴 보존.
-  submitQuiz: async (
+  submitQuiz: (
     quizId: string,
     answers: Array<{ questionId: string; answer: string | string[] }>,
-  ): Promise<QuizSubmitResult> => {
-    const res = await learnerClient.submitQuiz<QuizSubmitResult>(quizId, answers);
-    return res.data;
-  },
+  ) => learnerClient.submitQuiz<QuizSubmitResult>(quizId, answers),
 
-  // updateProgress — WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP2.
-  // KPA/K-Cos 시그니처와 통일. completed 미지정 시 기존 GlycoPharm 동작(true 고정) 보존.
-  // Glyco 페이지가 결과를 사용하지 않으므로 void 반환은 유지.
-  updateProgress: async (courseId: string, lessonId: string, completed: boolean = true): Promise<void> => {
-    await learnerClient.updateProgress<LmsEnrollment>(courseId, lessonId, completed);
-  },
+  updateProgress: (courseId: string, lessonId: string, completed = true) =>
+    learnerClient.updateProgress<LmsEnrollment>(courseId, lessonId, completed),
 
   // ─── deprecated alias (LMS-CLIENT-CONVENTION-V1 §4) ───────────────────────
   // 기존 페이지 호환을 위해 유지. 신규 코드는 위의 표준 이름 사용.
