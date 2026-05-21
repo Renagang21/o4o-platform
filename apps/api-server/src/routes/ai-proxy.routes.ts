@@ -441,34 +441,70 @@ function extractContainerByClass(html: string, classMarker: string): string | nu
   return html.slice(bodyStart, depth === 0 ? i - 5 : i);
 }
 
-// 네이버 블로그 PostView HTML에서 본문 텍스트 추출 (se-main-container 우선)
+// WO-O4O-AI-URL-NAVER-BLOG-MAIN-CONTENT-SELECTION-WITH-GENERIC-REGRESSION-GUARD-V1:
+//   id 기반 depth counter — postViewArea 등 네이버 전용 id 지원
+function extractContainerById(html: string, id: string): string | null {
+  const startRe = new RegExp(`<div[^>]+id=["']${id}["'][^>]*>`, 'i');
+  const startMatch = startRe.exec(html);
+  if (!startMatch) return null;
+
+  const bodyStart = startMatch.index + startMatch[0].length;
+  let depth = 1;
+  let i = bodyStart;
+
+  while (i < html.length && depth > 0) {
+    const nextOpen = html.indexOf('<div', i);
+    const nextClose = html.indexOf('</div', i);
+    if (nextClose < 0) break;
+    if (nextOpen >= 0 && nextOpen < nextClose) { depth++; i = nextOpen + 4; }
+    else { depth--; i = nextClose + 5; }
+  }
+
+  return html.slice(bodyStart, depth === 0 ? i - 5 : i);
+}
+
+// 네이버 블로그 PostView HTML에서 실제 게시글 본문 추출
+// — 다중 selector 후보 수집 → 소개문 제거 → 최장 콘텐츠 선택 (네이버 전용, Generic 오염 없음)
 function extractNaverBlogText(html: string): string {
   // CCL 블록 이전까지만 분석 — footer 오염 원천 차단
   const cclIdx = html.search(/<div[^>]+class="[^"]*blog_ccl[^"]*"/i);
   const workHtml = cclIdx > 200 ? html.slice(0, cclIdx) : html;
 
-  // se-main-container (스마트에디터 최신 글) — depth counter로 전체 블록 추출
-  const seMainContent = extractContainerByClass(workHtml, 'se-main-container');
-  if (seMainContent) {
-    const text = stripHtml(seMainContent);
-    if (text.trim().length >= 50) return text;
+  // 네이버 블로그 소개문 패턴 ("이 블로그는 X가 운영합니다")
+  const NAVER_INTRO_RE = /^이\s*블로그(는|의)?\s+\S+\s*(가|이)?\s*운영합니다/;
+
+  // 다중 selector 후보 수집 (스마트에디터 / 구형에디터 / 공통 wrapper)
+  const rawCandidates: Array<string | null> = [
+    extractContainerByClass(workHtml, 'se-main-container'), // 스마트에디터 2.0+
+    extractContainerByClass(workHtml, 'se-component-wrap'), // 스마트에디터 1.0
+    extractContainerByClass(workHtml, 'post-view'),          // 구형 에디터
+    extractContainerByClass(workHtml, 'post_body'),          // 매우 구형
+    extractContainerById(workHtml, 'postViewArea'),          // 구형 에디터 wrapper
+    extractContainerById(workHtml, 'viewTypeSelector'),      // 일부 레이아웃
+  ];
+
+  const candidates = rawCandidates
+    .filter((c): c is string => c !== null)
+    .map((c) => stripHtml(c).trim())
+    .filter((t) => t.length >= 100)                 // 소개문은 대부분 100자 미만
+    .filter((t) => !NAVER_INTRO_RE.test(t));        // 소개문 패턴 제거
+
+  if (candidates.length > 0) {
+    // 가장 긴 후보 = 실제 게시글 본문
+    return candidates.reduce((a, b) => (a.length >= b.length ? a : b));
   }
 
-  // post-view (구형 에디터)
-  const postViewContent = extractContainerByClass(workHtml, 'post-view');
-  if (postViewContent) {
-    const text = stripHtml(postViewContent);
-    if (text.trim().length >= 50) return text;
+  // fallback: 50자 이상인 모든 후보에서 최장 선택 (소개문 필터 완화)
+  const lenientCandidates = rawCandidates
+    .filter((c): c is string => c !== null)
+    .map((c) => stripHtml(c).trim())
+    .filter((t) => t.length >= 50);
+
+  if (lenientCandidates.length > 0) {
+    return lenientCandidates.reduce((a, b) => (a.length >= b.length ? a : b));
   }
 
-  // viewTypeSelector (일부 레이아웃)
-  const viewType = workHtml.match(/<div[^>]+id="viewTypeSelector"[^>]*>([\s\S]*?)<\/div>/i);
-  if (viewType) {
-    const text = stripHtml(viewType[1]);
-    if (text.trim().length >= 50) return text;
-  }
-
-  // fallback: CCL 차단 후 전체 stripHtml
+  // 최종 fallback: CCL 차단 후 전체 stripHtml
   return stripHtml(workHtml);
 }
 
