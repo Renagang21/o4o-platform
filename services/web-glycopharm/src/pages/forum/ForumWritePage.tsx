@@ -3,6 +3,7 @@
  *
  * WO-GLYCOPHARM-COMMUNITY-HUB-IMPLEMENTATION-V1
  * WO-O4O-GLYCOPHARM-FORUM-EDITOR-MIGRATION-V1
+ * WO-O4O-FORUM-TAG-CANONICAL-ALIGNMENT-V1: category 제거 (KPA Canonical 정렬)
  *
  * Route: /forum/write
  * Uses @o4o/content-editor RichTextEditor (TipTap-based).
@@ -10,11 +11,11 @@
  * Uses apiClient centralized pattern (GlycoPharm standard).
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type { CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { fetchForumCategories, createForumPost, type ForumCategory } from '@/services/forumApi';
+import { createForumPost } from '@/services/forumApi';
 import { toast } from '@o4o/error-handling';
 import { RichTextEditor } from '@o4o/content-editor';
 
@@ -31,31 +32,17 @@ const POST_TYPES: { value: PostType; label: string }[] = [
 export default function ForumWritePage() {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
-  const [categories, setCategories] = useState<ForumCategory[]>([]);
-  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
   const [title, setTitle] = useState('');
-  const [categoryId, setCategoryId] = useState('');
   const [postType, setPostType] = useState<PostType>('discussion');
   const [content, setContent] = useState('');
-
-  useEffect(() => {
-    fetchForumCategories()
-      .then((data) => setCategories(data))
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!title.trim()) {
       toast.error('제목을 입력해주세요.');
-      return;
-    }
-    if (!categoryId) {
-      toast.error('카테고리를 선택해주세요.');
       return;
     }
     const isEmpty = !content || content === '<p></p>' || content.replace(/<[^>]*>/g, '').trim() === '';
@@ -68,7 +55,6 @@ export default function ForumWritePage() {
       setSubmitting(true);
       const data = await createForumPost({
         title: title.trim(),
-        categoryId,
         type: postType,
         content,
       });
@@ -100,16 +86,6 @@ export default function ForumWritePage() {
     );
   }
 
-  if (loading) {
-    return (
-      <div style={styles.page}>
-        <div style={styles.container}>
-          <p style={{ color: '#94a3b8', textAlign: 'center' }}>Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div style={styles.page}>
       <div style={styles.container}>
@@ -124,21 +100,6 @@ export default function ForumWritePage() {
         )}
 
         <form onSubmit={handleSubmit} style={styles.form}>
-          {/* Category */}
-          <div style={styles.field}>
-            <label style={styles.label}>카테고리</label>
-            <select
-              value={categoryId}
-              onChange={(e) => setCategoryId(e.target.value)}
-              style={styles.select}
-            >
-              <option value="">카테고리를 선택하세요</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>{cat.name}</option>
-              ))}
-            </select>
-          </div>
-
           {/* Post Type */}
           <div style={styles.field}>
             <label style={styles.label}>글 유형</label>

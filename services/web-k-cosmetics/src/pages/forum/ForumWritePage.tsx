@@ -2,16 +2,17 @@
  * ForumWritePage — Simplified Forum Post Creation
  *
  * WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1
+ * WO-O4O-FORUM-TAG-CANONICAL-ALIGNMENT-V1: category 제거 (KPA Canonical 정렬)
  *
  * Route: /forum/write
  * Uses textarea (no rich editor dependency).
  * Converts plain text to Block[] format for API submission.
  */
 
-import { useState, useEffect, CSSProperties } from 'react';
+import { useState, CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { createForumPost, fetchPopularForums, type PopularForum } from '../../services/forumApi';
+import { createForumPost } from '../../services/forumApi';
 import { toast } from '@o4o/error-handling';
 
 type PostType = 'discussion' | 'question' | 'guide' | 'poll' | 'announcement';
@@ -36,33 +37,17 @@ function textToBlocks(text: string): Array<{ type: string; content: string }> {
 export default function ForumWritePage() {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
-  const [categories, setCategories] = useState<PopularForum[]>([]);
-  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
   const [title, setTitle] = useState('');
-  const [categoryId, setCategoryId] = useState('');
   const [postType, setPostType] = useState<PostType>('discussion');
   const [content, setContent] = useState('');
-
-  useEffect(() => {
-    fetchPopularForums(50)
-      .then((res) => {
-        setCategories(res.data ?? []);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!title.trim()) {
       toast.error('Please enter a title.');
-      return;
-    }
-    if (!categoryId) {
-      toast.error('Please select a category.');
       return;
     }
     if (!content.trim()) {
@@ -75,7 +60,6 @@ export default function ForumWritePage() {
       const blocks = textToBlocks(content);
       const data = await createForumPost({
         title: title.trim(),
-        categoryId,
         type: postType,
         content: blocks,
       });
@@ -105,16 +89,6 @@ export default function ForumWritePage() {
     );
   }
 
-  if (loading) {
-    return (
-      <div style={styles.page}>
-        <div style={styles.container}>
-          <p style={{ color: '#94a3b8', textAlign: 'center' }}>Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div style={styles.page}>
       <div style={styles.container}>
@@ -129,21 +103,6 @@ export default function ForumWritePage() {
         )}
 
         <form onSubmit={handleSubmit} style={styles.form}>
-          {/* Category */}
-          <div style={styles.field}>
-            <label style={styles.label}>Category</label>
-            <select
-              value={categoryId}
-              onChange={(e) => setCategoryId(e.target.value)}
-              style={styles.select}
-            >
-              <option value="">Select a category</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>{cat.name}</option>
-              ))}
-            </select>
-          </div>
-
           {/* Post Type */}
           <div style={styles.field}>
             <label style={styles.label}>Post Type</label>

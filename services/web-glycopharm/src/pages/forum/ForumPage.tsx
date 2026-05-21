@@ -3,10 +3,11 @@
  *
  * Phase 22-F: 테이블 형태 + 20건 단위 페이지 넘김
  *
- * 컬럼: 카테고리 | 제목 | 작성자 | 작성일 | 댓글
- * 검색 + 카테고리 필터 + 정렬
- *
  * WO-O4O-FORUM-LIST-DESIGN-REFINEMENT-V1: hardcoded blue → primary
+ * WO-O4O-FORUM-TAG-CANONICAL-ALIGNMENT-V1: 카테고리 컬럼/필터 제거 (KPA Canonical 정렬)
+ *
+ * 컬럼: 제목 | 작성자 | 작성일 | 좋아요 | 댓글
+ * 검색 + 정렬
  */
 
 import { useState, useEffect, useMemo } from 'react';
@@ -19,7 +20,6 @@ interface ForumPost {
   title: string;
   author: string;
   authorRole: string;
-  category: string;
   views: number;
   likes: number;
   comments: number;
@@ -33,7 +33,6 @@ function normalizePost(raw: ApiForumPost): ForumPost {
     title: raw.title || '(제목 없음)',
     author: raw.author?.nickname || raw.author?.name || '익명',
     authorRole: '',
-    category: raw.category?.name || '일반',
     views: raw.viewCount || 0,
     likes: raw.likeCount || 0,
     comments: raw.commentCount || 0,
@@ -41,8 +40,6 @@ function normalizePost(raw: ApiForumPost): ForumPost {
     isHot: (raw.viewCount || 0) >= 50 || (raw.commentCount || 0) >= 10,
   };
 }
-
-const categories = ['전체', 'CGM', '혈당측정기', '상담', '영양', '의약품', '기타'];
 
 const SORT_OPTIONS = [
   { value: 'latest', label: '최신순' },
@@ -70,10 +67,9 @@ export default function ForumPage() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const searchQuery = searchParams.get('q') || '';
-  const categoryFilter = searchParams.get('category') || '전체';
   const sortBy = (searchParams.get('sort') || 'latest') as 'latest' | 'popular' | 'oldest';
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
-  const hasFilters = !!searchQuery || categoryFilter !== '전체' || sortBy !== 'latest';
+  const hasFilters = !!searchQuery || sortBy !== 'latest';
 
   const [searchInput, setSearchInput] = useState(searchQuery);
   const [allPosts, setAllPosts] = useState<ForumPost[]>([]);
@@ -105,16 +101,13 @@ export default function ForumPage() {
         p.title.toLowerCase().includes(q) || p.author.toLowerCase().includes(q)
       );
     }
-    if (categoryFilter && categoryFilter !== '전체') {
-      result = result.filter(p => p.category === categoryFilter);
-    }
 
     if (sortBy === 'popular') result.sort((a, b) => b.views - a.views);
     else if (sortBy === 'oldest') result.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
     else result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     return result;
-  }, [allPosts, searchQuery, categoryFilter, sortBy]);
+  }, [allPosts, searchQuery, sortBy]);
 
   const totalCount = filtered.length;
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
@@ -185,22 +178,7 @@ export default function ForumPage() {
             검색
           </button>
         </form>
-        <div className="flex justify-between items-center gap-2 flex-wrap mb-2">
-          <div className="flex gap-1 flex-wrap">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => updateParam('category', cat === '전체' ? '' : cat)}
-                className={`px-3 py-1 text-xs font-medium rounded-full border transition-colors ${
-                  (cat === '전체' && categoryFilter === '전체') || categoryFilter === cat
-                    ? 'bg-primary-600 text-white border-primary-600'
-                    : 'bg-white text-slate-500 border-slate-200 hover:border-primary-200'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
+        <div className="flex justify-end items-center gap-2 flex-wrap mb-2">
           <select
             value={sortBy}
             onChange={(e) => updateParam('sort', e.target.value === 'latest' ? '' : e.target.value)}
@@ -213,7 +191,6 @@ export default function ForumPage() {
           <div className="flex items-center justify-between px-3 py-1.5 bg-primary-50 rounded-md border border-primary-200">
             <span className="text-xs text-primary-700">
               {searchQuery && `"${searchQuery}" `}
-              {categoryFilter !== '전체' && `${categoryFilter} `}
               {sortBy !== 'latest' && SORT_OPTIONS.find(o => o.value === sortBy)?.label}
             </span>
             <button onClick={handleClearAll} className="text-xs text-primary-700 underline bg-transparent border-none cursor-pointer">초기화</button>
@@ -227,7 +204,6 @@ export default function ForumPage() {
           <table className="w-full border-collapse" style={{ tableLayout: 'fixed' }}>
             <thead>
               <tr>
-                <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left" style={{ width: '80px' }}>카테고리</th>
                 <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left">제목</th>
                 <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left" style={{ width: '100px' }}>작성자</th>
                 <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left" style={{ width: '100px' }}>작성일</th>
@@ -237,7 +213,7 @@ export default function ForumPage() {
             </thead>
             <tbody>
               {[1,2,3,4,5].map(i => (
-                <tr key={i}><td colSpan={6} className="px-3 py-3 border-b border-slate-50">
+                <tr key={i}><td colSpan={5} className="px-3 py-3 border-b border-slate-50">
                   <div className="h-3.5 bg-slate-200 rounded" style={{ width: `${50 + i * 8}%` }} />
                 </td></tr>
               ))}
@@ -264,9 +240,6 @@ export default function ForumPage() {
                 <tbody>
                   {hotPosts.map(post => (
                     <tr key={post.id} className="bg-amber-50 cursor-pointer hover:bg-amber-100 transition-colors" onClick={() => navigate(`/forum/posts/${post.id}`)}>
-                      <td className="px-3 py-3 text-center border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: '80px' }}>
-                        <span className="inline-block px-2 py-0.5 text-[11px] font-medium rounded bg-slate-100 text-slate-500">{post.category}</span>
-                      </td>
                       <td className="px-3 py-3 border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap text-sm text-slate-800">
                         <span className="inline-block px-1.5 py-0.5 text-[11px] font-semibold rounded bg-red-50 text-red-600 mr-1.5">HOT</span>
                         <span className="font-medium">{post.title}</span>
@@ -298,19 +271,16 @@ export default function ForumPage() {
             <table className="w-full border-collapse" style={{ tableLayout: 'fixed' }}>
               <thead>
                 <tr>
-                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left" style={{ width: '80px' }}>카테고리</th>
                   <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left">제목</th>
                   <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left" style={{ width: '100px' }}>작성자</th>
                   <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left" style={{ width: '100px' }}>작성일</th>
-                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-center" style={{ width: '60px' }}>댓글</th>
+                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-center" style={{ width: '50px' }}>좋아요</th>
+                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-center" style={{ width: '50px' }}>댓글</th>
                 </tr>
               </thead>
               <tbody>
                 {posts.length > 0 ? posts.map(post => (
                   <tr key={post.id} className="cursor-pointer hover:bg-slate-50 transition-colors" onClick={() => navigate(`/forum/posts/${post.id}`)}>
-                    <td className="px-3 py-3 text-center border-b border-slate-50 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: '80px' }}>
-                      <span className="inline-block px-2 py-0.5 text-[11px] font-medium rounded bg-slate-100 text-slate-500">{post.category}</span>
-                    </td>
                     <td className="px-3 py-3 border-b border-slate-50 overflow-hidden text-ellipsis whitespace-nowrap text-sm text-slate-800">
                       {post.isHot && <span className="inline-block px-1.5 py-0.5 text-[11px] font-semibold rounded bg-red-50 text-red-600 mr-1.5">HOT</span>}
                       <span className="font-medium">{post.title}</span>
@@ -323,7 +293,7 @@ export default function ForumPage() {
                   </tr>
                 )) : (
                   <tr>
-                    <td colSpan={6} className="py-16 text-center">
+                    <td colSpan={5} className="py-16 text-center">
                       {hasFilters ? (
                         <>
                           <p className="text-sm text-slate-500 mb-3">검색 결과가 없습니다</p>

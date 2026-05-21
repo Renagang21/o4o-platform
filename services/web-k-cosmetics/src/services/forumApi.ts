@@ -42,15 +42,14 @@ export type CommentsResponse = ForumListResponse<ForumCommentResponse>;
 /**
  * Fetch forum posts with optional filters
  */
+// WO-O4O-FORUM-TAG-CANONICAL-ALIGNMENT-V1: categoryId 파라미터 제거 (KPA Canonical 정렬)
 export async function fetchForumPosts(params: {
-  categoryId?: string;
   page?: number;
   limit?: number;
   isPinned?: boolean;
 }): Promise<PostsResponse> {
   try {
     const queryParams = new URLSearchParams();
-    if (params.categoryId) queryParams.append('categoryId', params.categoryId);
     if (params.page) queryParams.append('page', params.page.toString());
     if (params.limit) queryParams.append('limit', params.limit.toString());
 
@@ -204,9 +203,9 @@ export function extractTextContent(content: string | object[] | undefined): stri
 // ============================================================================
 
 // WO-O4O-FORUM-CANONICAL-SPRINT2-CLEANUP-V1
+// WO-O4O-FORUM-TAG-CANONICAL-ALIGNMENT-V1: categoryId 제거 (KPA Canonical 정렬)
 export async function createForumPost(payload: {
   title: string;
-  categoryId: string;
   type: ForumPostType;
   content: Array<{ type: string; content: string }> | string;
 }): Promise<{ success: boolean; data?: { id: string }; error?: string }> {

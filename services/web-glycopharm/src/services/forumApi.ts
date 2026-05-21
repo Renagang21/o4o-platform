@@ -86,14 +86,6 @@ export async function fetchPopularForums(limit: number = 6): Promise<{ success: 
   return { success: true, data: [] };
 }
 
-export async function fetchForumCategories(): Promise<ForumCategory[]> {
-  const response = await api.get('/forum/categories');
-  const data = response.data;
-  if (Array.isArray(data)) return data;
-  if (data?.data && Array.isArray(data.data)) return data.data;
-  return [];
-}
-
 export async function fetchForumPost(id: string): Promise<{ success: boolean; data: ForumPostDetail | null }> {
   const response = await api.get(`/forum/posts/${id}`);
   const data = response.data;
@@ -109,9 +101,9 @@ export async function fetchPostComments(postId: string): Promise<{ success: bool
   return { success: true, data: [] };
 }
 
+// WO-O4O-FORUM-TAG-CANONICAL-ALIGNMENT-V1: categoryId 제거 (KPA Canonical 정렬)
 export async function createForumPost(payload: {
   title: string;
-  categoryId: string;
   type: string;
   content: string;
 }): Promise<{ success: boolean; data?: { id: string }; id?: string; error?: string }> {
