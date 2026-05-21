@@ -354,6 +354,9 @@ export class QuizService {
       //   운영자 수동 보상 기능은 현재 단계에서 지원하지 않는다.
       //   승인/감사 정책 확정 전까지 수동 지급 관련 로직/엔드포인트 추가 금지.
       // ────────────────────────────────────────────────────────────────────────────────
+      // WO-O4O-LMS-COURSE-COMPLETE-SERVICEKEY-HOTFIX-V1: dynamic serviceKey resolution
+      // (quiz_pass / lesson_complete 와 동일 패턴, lessonCourseServiceKey 재사용)
+      // null serviceKey = legacy course → fallback to 'kpa-society' for backward compat
       try {
         await PointService.getInstance().grantPoint({
           userId,
@@ -362,7 +365,7 @@ export class QuizService {
           sourceId: courseId,
           referenceKey: `course_complete:${userId}:${courseId}`,
           description: CREDIT_DESCRIPTIONS.COURSE_COMPLETE,
-          serviceKey: 'kpa-society',
+          serviceKey: lessonCourseServiceKey ?? 'kpa-society',
         });
       } catch (creditError) {
         logger.warn('[Quiz] Point grant failed (course_complete)', { courseId, userId, error: (creditError as Error).message });
