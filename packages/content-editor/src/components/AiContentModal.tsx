@@ -35,6 +35,13 @@ const API_BASE_URL =
   (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_BASE_URL) ||
   'https://api.neture.co.kr';
 
+// WO-O4O-AI-USAGE-CONDITION-DETECTION-UX-V1
+interface UsageWarning {
+  detected: boolean;
+  categories: string[];
+  snippets: string[];
+}
+
 interface AiContentResult {
   html: string;
   title: string;
@@ -47,6 +54,8 @@ interface AiContentResult {
    *   미리보기(blocksToHtml)에는 youtube wrapper 가 그대로 포함되므로 시각적 일관성 유지.
    */
   youtubeUrls?: string[];
+  /** WO-O4O-AI-USAGE-CONDITION-DETECTION-UX-V1: 원문 이용조건 감지 결과 */
+  usageWarning?: UsageWarning;
 }
 
 interface AiContentModalProps {
@@ -395,6 +404,8 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
   //   미입력 시 기존 동작 유지. 500자 제한은 백엔드에서도 다시 trim.
   const [customPrompt, setCustomPrompt] = useState('');
   const CUSTOM_PROMPT_MAX = 500;
+  // WO-O4O-AI-USAGE-CONDITION-DETECTION-UX-V1
+  const [showUsageSnippets, setShowUsageSnippets] = useState(false);
 
   if (!open) return null;
 
@@ -452,7 +463,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
         throw new Error(data.error || 'AI 생성에 실패했습니다.');
       }
 
-      setResult({ html: data.html, title: data.title || '', summary: data.summary || '' });
+      setResult({ html: data.html, title: data.title || '', summary: data.summary || '', usageWarning: data.usageWarning });
       setResultTab('preview');
     } catch (err: any) {
       setError(err.message || 'AI 서비스 오류가 발생했습니다.');
@@ -532,6 +543,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
         title: typeof data.title === 'string' ? data.title : '',
         summary: `${data.blocks.length}개 블록 → HTML 변환 완료`,
         youtubeUrls,
+        usageWarning: data.usageWarning,
       });
       setResultTab('preview');
     } catch (err: any) {
@@ -803,6 +815,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
     setProductionMaterialSaveStatus(null);
     setProductionMaterialSaving(false);
     setCustomPrompt('');
+    setShowUsageSnippets(false);
     setSourceTab(initialSourceTab ?? 'text');
     // WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-AI-FLOW-V1
     setMode(initialMode ?? 'pop');
@@ -1259,6 +1272,51 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
                   <span style={{ fontSize: '12px', color: '#6b7280', marginLeft: '4px' }}>— {result.title}</span>
                 )}
               </div>
+
+              {/* WO-O4O-AI-USAGE-CONDITION-DETECTION-UX-V1: 원문 이용조건 안내 카드 */}
+              {result.usageWarning?.detected && (
+                <div style={{
+                  padding: '10px 14px',
+                  background: '#fffbeb',
+                  borderBottom: '1px solid #fde68a',
+                  fontSize: '12px',
+                  color: '#92400e',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px' }}>
+                    <div>
+                      <span style={{ fontWeight: 600 }}>⚠ 원문 이용조건 안내</span>
+                      <span style={{ marginLeft: '6px', fontWeight: 400, color: '#b45309' }}>
+                        원문에서 저작권 또는 콘텐츠 이용 관련 표현이 감지되었습니다.
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowUsageSnippets((v) => !v)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '11px', color: '#b45309', whiteSpace: 'nowrap', padding: 0 }}
+                    >
+                      {showUsageSnippets ? '접기' : '감지된 표현 보기'}
+                    </button>
+                  </div>
+                  <ul style={{ margin: '6px 0 0 0', paddingLeft: '16px' }}>
+                    {result.usageWarning.categories.map((cat) => (
+                      <li key={cat}>{cat}</li>
+                    ))}
+                  </ul>
+                  {showUsageSnippets && result.usageWarning.snippets.length > 0 && (
+                    <div style={{ marginTop: '6px', padding: '6px 8px', background: '#fef3c7', borderRadius: '4px' }}>
+                      {result.usageWarning.snippets.map((s, i) => (
+                        <div key={i} style={{ fontFamily: 'monospace', fontSize: '11px', color: '#78350f' }}>"{s}"</div>
+                      ))}
+                    </div>
+                  )}
+                  <div style={{ marginTop: '6px', color: '#b45309' }}>
+                    최종 활용 전 원문 이용조건을 확인하세요.
+                    {sourceTab === 'url' && urlInput.trim() && (
+                      <> &nbsp;<a href={urlInput.trim()} target="_blank" rel="noopener noreferrer" style={{ color: '#92400e', textDecoration: 'underline' }}>원문 보기</a></>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Tabs */}
               <div

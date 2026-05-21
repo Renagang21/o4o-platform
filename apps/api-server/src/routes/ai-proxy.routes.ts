@@ -239,9 +239,17 @@ router.post('/content', authenticate, async (req, res: Response) => {
 
     const normalized = parseResponse(outputType, rawResponse.parsed, rawResponse.rawText);
 
+    // WO-O4O-AI-USAGE-CONDITION-DETECTION-UX-V1: text 입력 원문에도 감지 적용
+    const usageWarning = detectUsageConditions(input);
+
     logger.info('AI content generated', { requestId, userId, outputType, model: rawResponse.model });
 
-    return res.json({ success: true, ...normalized, requestId });
+    return res.json({
+      success: true,
+      ...normalized,
+      requestId,
+      usageWarning: usageWarning.detected ? usageWarning : undefined,
+    });
   } catch (error: any) {
     const status = error.type === 'RATE_LIMIT_ERROR' ? 429
                  : error.type === 'AUTH_ERROR' ? 401
@@ -333,7 +341,67 @@ async function fetchUrlText(url: string): Promise<string> {
  * - HTML 페이지: <title> → og:title → twitter:title 우선순위로 추출
  * - course-structure 등 LMS 라우트는 기존 fetchUrlText 를 계속 사용 (영향 없음)
  */
-interface UrlContent { text: string; title?: string }
+// WO-O4O-AI-USAGE-CONDITION-DETECTION-UX-V1 ─────────────────────────────────
+// 이용조건 감지 Core. AI 생성 중단 금지. 감지 → 안내만.
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface UsageWarning {
+  detected: boolean;
+  categories: string[];   // 사용자 친화 카테고리 레이블
+  snippets: string[];     // 원문 표현 (AI 재해석 없이 그대로)
+}
+
+const USAGE_CONDITION_PATTERNS: { category: string; patterns: RegExp[] }[] = [
+  {
+    category: '저작자 표시 관련 표현',
+    patterns: [/저작자\s*(명시|표시)/, /출처\s*(명시|표시|표기)/],
+  },
+  {
+    category: '영리적 이용 제한 관련 표현',
+    patterns: [/영리적?\s*(사용|이용)\s*(불가|금지|제한)/, /비영리\s*한정/],
+  },
+  {
+    category: '내용 변경 제한 관련 표현',
+    patterns: [/내용\s*변경\s*(불가|금지)/, /변경\s*(금지|불가)/, /개작\s*(금지|불가)/],
+  },
+  {
+    category: '복제·재배포 제한 관련 표현',
+    patterns: [/무단\s*(복제|전재|배포|게시|도용)/, /재배포\s*(금지|불가)/, /무단\s*사용\s*금지/],
+  },
+  {
+    category: '저작권 표시 관련 표현',
+    patterns: [/copyright\s*(©|\(c\)|\d{4})/i, /all\s*rights?\s*reserved/i, /©\s*\d{4}/],
+  },
+  {
+    category: 'Creative Commons 라이선스 표현',
+    patterns: [/\bcc\s*by(-sa|-nd|-nc)?\b/i, /creative\s*commons/i, /creativecommons\.org/i],
+  },
+];
+
+function detectUsageConditions(rawText: string): UsageWarning {
+  const categories: string[] = [];
+  const snippets: string[] = [];
+
+  for (const { category, patterns } of USAGE_CONDITION_PATTERNS) {
+    for (const re of patterns) {
+      const m = rawText.match(re);
+      if (m) {
+        if (!categories.includes(category)) categories.push(category);
+        // 원문 표현: 매칭된 위치 앞뒤 20자 맥락
+        const idx = rawText.indexOf(m[0]);
+        const start = Math.max(0, idx - 10);
+        const end = Math.min(rawText.length, idx + m[0].length + 10);
+        const snippet = rawText.slice(start, end).replace(/\s+/g, ' ').trim();
+        if (!snippets.includes(snippet)) snippets.push(snippet);
+        break; // 카테고리당 첫 매칭만
+      }
+    }
+  }
+
+  return { detected: categories.length > 0, categories, snippets };
+}
+
+interface UrlContent { text: string; title?: string; usageWarning?: UsageWarning }
 
 // WO-O4O-AI-URL-NAVER-BLOG-IFRAME-POSTVIEW-EXTRACTOR-V1
 function isNaverBlogUrl(url: string): boolean {
@@ -451,8 +519,10 @@ async function fetchNaverBlogContent(url: string): Promise<UrlContent> {
     }
   }
 
+  // WO-O4O-AI-USAGE-CONDITION-DETECTION-UX-V1: CCL 차단 전 전체 HTML로 감지 (cleanup 후엔 이미 제거됨)
+  const usageWarning = detectUsageConditions(postViewHtml);
   const text = extractNaverBlogText(postViewHtml).slice(0, URL_EXTRACT_MAX_CHARS);
-  return { text, title: resolvedTitle };
+  return { text, title: resolvedTitle, usageWarning };
 }
 
 async function fetchUrlContent(url: string): Promise<UrlContent> {
@@ -496,12 +566,14 @@ async function fetchUrlContent(url: string): Promise<UrlContent> {
     const rawText = await response.text();
 
     if (contentType.includes('text/html')) {
+      // WO-O4O-AI-USAGE-CONDITION-DETECTION-UX-V1: stripHtml 전 raw HTML로 감지
       return {
         text: stripHtml(rawText),
         title: extractHtmlTitle(rawText),
+        usageWarning: detectUsageConditions(rawText),
       };
     }
-    return { text: rawText };
+    return { text: rawText, usageWarning: detectUsageConditions(rawText) };
   } finally {
     clearTimeout(timeoutId);
   }
@@ -850,10 +922,12 @@ router.post('/url-to-blocks', authenticate, async (req, res: Response) => {
     // WO-O4O-AI-URL-BLOCKS-TITLE-AUTO-FILL-V1: fetchUrlContent 로 본문 + 추출 제목 함께 수신
     let urlText: string;
     let extractedTitle: string | undefined;
+    let fetchedUsageWarning: UsageWarning | undefined;
     try {
       const fetched = await fetchUrlContent(parsedUrl.toString());
       urlText = fetched.text;
       extractedTitle = fetched.title;
+      fetchedUsageWarning = fetched.usageWarning;
     } catch (fetchError: any) {
       logger.warn('[url-to-blocks] URL fetch 실패', { requestId, error: fetchError.message });
       return res.status(422).json({
@@ -1019,7 +1093,14 @@ router.post('/url-to-blocks', authenticate, async (req, res: Response) => {
       titleSource: extractedTitle ? 'extracted' : (blocksTitleFallback ? 'blocks' : 'none'),
     });
 
-    return res.json({ success: true, blocks: limitedBlocks, title: finalTitle, requestId });
+    return res.json({
+      success: true,
+      blocks: limitedBlocks,
+      title: finalTitle,
+      requestId,
+      // WO-O4O-AI-USAGE-CONDITION-DETECTION-UX-V1
+      usageWarning: fetchedUsageWarning?.detected ? fetchedUsageWarning : undefined,
+    });
   } catch (error: any) {
     logger.error('[url-to-blocks] 오류', { requestId, error: error.message });
     return res.status(500).json({
