@@ -528,6 +528,12 @@ function extractNaverBlogText(html: string): string {
 }
 
 async function fetchNaverBlogContent(url: string): Promise<UrlContent> {
+  // WO-O4O-AI-NAVER-BLOG-POSTVIEW-SILENT-FALLBACK-FIX-V1:
+  //   iframe context 모방을 위해 Referer로 사용할 blog 첫 페이지 URL 추출.
+  //   blog.naver.com/{blogId}/{logNo} 또는 m.blog.naver.com/{blogId}/... 모두 매칭.
+  const blogIdMatch = url.match(/blog\.naver\.com\/([^/?#]+)/i);
+  const refererBase = blogIdMatch ? `https://blog.naver.com/${blogIdMatch[1]}` : 'https://blog.naver.com/';
+
   const fetchOpts = {
     headers: {
       'User-Agent': 'Mozilla/5.0 (compatible; O4O-AI-Bot/1.0)',
@@ -564,11 +570,55 @@ async function fetchNaverBlogContent(url: string): Promise<UrlContent> {
     const ctrl2 = new AbortController();
     const t2 = setTimeout(() => ctrl2.abort(), 12000);
     try {
-      const res2 = await fetch(postViewUrl, { ...fetchOpts, signal: ctrl2.signal });
+      // WO-O4O-AI-NAVER-BLOG-POSTVIEW-SILENT-FALLBACK-FIX-V1:
+      //   Referer 헤더 추가 — Naver PostView는 iframe context에서 로드되므로
+      //   blog 첫 페이지 URL을 Referer로 모방하여 GCP IP 차단/리디렉션 가능성 완화.
+      const postViewFetchOpts = {
+        headers: {
+          ...fetchOpts.headers,
+          'Referer': refererBase,
+        },
+        signal: ctrl2.signal,
+      };
+      const res2 = await fetch(postViewUrl, postViewFetchOpts);
       if (res2.ok) {
         postViewHtml = await res2.text();
         resolvedTitle = extractHtmlTitle(postViewHtml) || resolvedTitle;
+        // WO-O4O-AI-NAVER-BLOG-POSTVIEW-SILENT-FALLBACK-FIX-V1:
+        //   운영 관측 — 성공 케이스의 응답 메타데이터 기록.
+        //   비정상적으로 짧은 body (e.g. login redirect) 추적 목적.
+        logger.info('[NAVER_POSTVIEW_FETCH_OK]', {
+          status: res2.status,
+          finalUrl: res2.url,
+          redirected: res2.redirected,
+          contentType: res2.headers.get('content-type'),
+          bodyLength: postViewHtml.length,
+        });
+      } else {
+        // WO-O4O-AI-NAVER-BLOG-POSTVIEW-SILENT-FALLBACK-FIX-V1:
+        //   silent fallback 제거 — !res2.ok 시 warn + degraded mode.
+        //   Cloud Run GCP IP에서 PostView 차단/리디렉션 여부 관측.
+        //   postViewHtml은 firstHtml로 유지 (기존 동작 보존, observable degradation).
+        logger.warn('[NAVER_POSTVIEW_FETCH_FAIL]', {
+          status: res2.status,
+          statusText: res2.statusText,
+          contentType: res2.headers.get('content-type'),
+          contentLength: res2.headers.get('content-length'),
+          finalUrl: res2.url,
+          requestedUrl: postViewUrl.slice(0, 200),
+          redirected: res2.redirected,
+          referer: refererBase,
+        });
       }
+    } catch (postViewError: any) {
+      // WO-O4O-AI-NAVER-BLOG-POSTVIEW-SILENT-FALLBACK-FIX-V1:
+      //   네트워크 오류 / abort / timeout 등 fetch 자체 실패 시에도 silent 금지.
+      logger.warn('[NAVER_POSTVIEW_FETCH_ERROR]', {
+        error: postViewError?.message,
+        name: postViewError?.name,
+        requestedUrl: postViewUrl.slice(0, 200),
+        referer: refererBase,
+      });
     } finally {
       clearTimeout(t2);
     }
