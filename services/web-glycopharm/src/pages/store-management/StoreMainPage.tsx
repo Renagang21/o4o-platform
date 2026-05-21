@@ -36,6 +36,7 @@ import {
   FileText,
   DollarSign,
   Megaphone,
+  QrCode,
 } from 'lucide-react';
 import { pharmacyApi } from '@/api/pharmacy';
 import type {
@@ -59,6 +60,8 @@ const QUICK_ACTIONS = [
   { label: '콘텐츠', icon: FileText, desc: '콘텐츠 가져오기', path: '/store/content', color: '#ec4899' },
   // WO-O4O-GLYCOPHARM-POP-STORE-EXECUTION-V1: POP 생성 진입점
   { label: 'POP 생성', icon: Megaphone, desc: 'AI 문구로 약국 POP PDF 생성', path: '/store/pop', color: '#ea580c' },
+  // WO-O4O-GLYCOPHARM-QR-STORE-EXECUTION-V1: QR 관리 진입점
+  { label: 'QR 관리', icon: QrCode, desc: 'QR 코드 생성 및 관리', path: '/store/qr', color: '#0d9488' },
   { label: '설정', icon: Settings, desc: '약국 설정 관리', path: '/store/settings', color: '#64748b' },
 ];
 

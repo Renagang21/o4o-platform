@@ -244,6 +244,9 @@ const FunnelPage = lazy(() => import('@/pages/store-management/FunnelPage'));
 // WO-O4O-GLYCOPHARM-POP-STORE-EXECUTION-V1
 const StorePopPage = lazy(() => import('@/pages/store-management/StorePopPage'));
 
+// WO-O4O-GLYCOPHARM-QR-STORE-EXECUTION-V1
+const StoreQrPage = lazy(() => import('@/pages/store/StoreQrPage'));
+
 // Loading fallback
 function PageLoading() {
   return (
@@ -672,6 +675,8 @@ function AppRoutes() {
         <Route path="funnel" element={<FunnelPage />} />
         {/* POP 생성 (WO-O4O-GLYCOPHARM-POP-STORE-EXECUTION-V1) */}
         <Route path="pop" element={<StorePopPage />} />
+        {/* QR 관리 (WO-O4O-GLYCOPHARM-QR-STORE-EXECUTION-V1) */}
+        <Route path="qr" element={<StoreQrPage />} />
         <Route path="management" element={<PharmacyManagement />} />
         <Route path="management/b2b" element={<PharmacyB2BProducts />} />
       </Route>
