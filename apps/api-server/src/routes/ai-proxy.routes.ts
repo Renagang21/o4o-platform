@@ -345,31 +345,63 @@ function isNaverBlogUrl(url: string): boolean {
   }
 }
 
+// WO-O4O-AI-URL-NAVER-BLOG-POLICY-FOOTER-CLEANUP-V1:
+//   lazy regex는 se-main-container 첫 자식 div에서 조기 종료 → 50자 미만 → 전체 fallback.
+//   div depth counter로 실제 닫는 태그를 찾아 전체 블록을 정확히 추출.
+function extractContainerByClass(html: string, classMarker: string): string | null {
+  const startRe = new RegExp(`<div[^>]+class="[^"]*${classMarker}[^"]*"[^>]*>`, 'i');
+  const startMatch = startRe.exec(html);
+  if (!startMatch) return null;
+
+  const bodyStart = startMatch.index + startMatch[0].length;
+  let depth = 1;
+  let i = bodyStart;
+
+  while (i < html.length && depth > 0) {
+    const nextOpen = html.indexOf('<div', i);
+    const nextClose = html.indexOf('</div', i);
+    if (nextClose < 0) break;
+    if (nextOpen >= 0 && nextOpen < nextClose) {
+      depth++;
+      i = nextOpen + 4;
+    } else {
+      depth--;
+      i = nextClose + 5;
+    }
+  }
+
+  return html.slice(bodyStart, depth === 0 ? i - 5 : i);
+}
+
 // 네이버 블로그 PostView HTML에서 본문 텍스트 추출 (se-main-container 우선)
 function extractNaverBlogText(html: string): string {
-  // se-main-container (스마트에디터 최신 글)
-  const seMain = html.match(/<div[^>]+class="[^"]*se-main-container[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>/i);
-  if (seMain) {
-    const text = stripHtml(seMain[1]);
+  // CCL 블록 이전까지만 분석 — footer 오염 원천 차단
+  const cclIdx = html.search(/<div[^>]+class="[^"]*blog_ccl[^"]*"/i);
+  const workHtml = cclIdx > 200 ? html.slice(0, cclIdx) : html;
+
+  // se-main-container (스마트에디터 최신 글) — depth counter로 전체 블록 추출
+  const seMainContent = extractContainerByClass(workHtml, 'se-main-container');
+  if (seMainContent) {
+    const text = stripHtml(seMainContent);
     if (text.trim().length >= 50) return text;
   }
 
   // post-view (구형 에디터)
-  const postView = html.match(/<div[^>]+class="[^"]*post-view[^"]*"[^>]*>([\s\S]*?)<\/div>/i);
-  if (postView) {
-    const text = stripHtml(postView[1]);
+  const postViewContent = extractContainerByClass(workHtml, 'post-view');
+  if (postViewContent) {
+    const text = stripHtml(postViewContent);
     if (text.trim().length >= 50) return text;
   }
 
   // viewTypeSelector (일부 레이아웃)
-  const viewType = html.match(/<div[^>]+id="viewTypeSelector"[^>]*>([\s\S]*?)<\/div>/i);
+  const viewType = workHtml.match(/<div[^>]+id="viewTypeSelector"[^>]*>([\s\S]*?)<\/div>/i);
   if (viewType) {
     const text = stripHtml(viewType[1]);
     if (text.trim().length >= 50) return text;
   }
 
-  // fallback: 전체 stripHtml
-  return stripHtml(html);
+  // fallback: CCL 차단 후 전체 stripHtml
+  return stripHtml(workHtml);
 }
 
 async function fetchNaverBlogContent(url: string): Promise<UrlContent> {
@@ -592,12 +624,31 @@ function stripHtml(html: string): string {
     .replace(/[ \t]+/g, ' ');
 
   // 라인별 UI 노이즈 필터링 (WO-O4O-AI-URL-CONTENT-QUALITY-V2)
+  // WO-O4O-AI-URL-NAVER-BLOG-POLICY-FOOTER-CLEANUP-V1: CCL/소셜/저작권 다단어 패턴 추가 (범용 URL Core)
   const noisePatterns = [
+    // 단독 단어 정확 매칭
     /^(로그인|회원가입|아이디\s*찾기|비밀번호\s*찾기|회원\s*등록|이용약관|개인정보|저작권|문의|고객센터)$/,
     /^(login|sign\s*up|register|contact|menu|quick\s*menu|subscribe|newsletter)$/i,
     /^(정보|보도자료|저작권|광고|개발자|약관|크리에이터|채널|구독|좋아요|댓글|공유)$/,
     /^(home|about|services|products|blog|news|events|careers|faq|sitemap)$/i,
     /^[\s\|·•\-–—]+$/,  // 구분자만 있는 라인
+    // CCL / 저작권 정책 문구 (부분 포함 매칭 — 어디 있든 제거)
+    /저작자\s*명시/,
+    /영리적?\s*사용\s*불가/,
+    /내용\s*변경\s*불가/,
+    /동일\s*조건\s*변경\s*허락/,
+    /이\s*블로그의?\s*저작물/,
+    /무단\s*(복제|전재|배포)/,
+    /출처\s*(표기|명시)\s*필수/,
+    /copyright\s*(©|\(c\)|\d{4})/i,
+    /all\s*rights?\s*reserved/i,
+    // 소셜 / 공유 버튼 영역
+    /^(공유하기|스크랩|이웃\s*추가|공감\s*\d*|이\s*글에\s*공감)$/,
+    /^댓글\s*(쓰기|입력|등록|\d+)$/,
+    /^(카카오톡|트위터|페이스북|밴드|라인)\s*(공유|에\s*공유)$/,
+    // 고객센터 / 운영 안내
+    /고객센터\s*(문의|로\s*문의)/,
+    /^(신고하기|차단하기|더\s*보기|접기|펼치기)$/,
   ];
 
   const filteredLines = cleaned
