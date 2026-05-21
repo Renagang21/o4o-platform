@@ -164,6 +164,7 @@ export class QuizService {
     }
 
     // WO-O4O-CREDIT-SYSTEM-V1 / WO-O4O-POINT-CORE-SEPARATION-V1: 포인트 지급 (PointService facade)
+    // WO-O4O-SERVICE-OPERATOR-POINT-BUDGET-PHASE1-V1: serviceKey='kpa-society' 예산 체크 연동
     let creditsEarned = 0;
     if (passed) {
       try {
@@ -174,6 +175,7 @@ export class QuizService {
           sourceId: quizId,
           referenceKey: `quiz_pass:${userId}:${quizId}`,
           description: CREDIT_DESCRIPTIONS.QUIZ_PASS,
+          serviceKey: 'kpa-society',
         });
         if (quizCredit) creditsEarned += CREDIT_REWARDS.QUIZ_PASS;
       } catch (creditError) {
@@ -285,6 +287,7 @@ export class QuizService {
     await this.progressRepository.save(progress);
 
     // WO-O4O-CREDIT-SYSTEM-V1 / WO-O4O-POINT-CORE-SEPARATION-V1: 포인트 지급 (PointService facade)
+    // WO-O4O-SERVICE-OPERATOR-POINT-BUDGET-PHASE1-V1: serviceKey='kpa-society' 예산 체크 연동
     try {
       await PointService.getInstance().grantPoint({
         userId,
@@ -293,6 +296,7 @@ export class QuizService {
         sourceId: lessonId,
         referenceKey: `lesson_complete:${userId}:${lessonId}`,
         description: CREDIT_DESCRIPTIONS.LESSON_COMPLETE,
+        serviceKey: 'kpa-society',
       });
     } catch (creditError) {
       logger.warn('[Quiz] Point grant failed (lesson_complete)', { lessonId, userId, error: (creditError as Error).message });

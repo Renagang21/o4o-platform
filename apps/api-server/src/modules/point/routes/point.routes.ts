@@ -14,11 +14,13 @@
 
 import { Router } from 'express';
 import { PointAdminController } from '../controllers/PointAdminController.js';
+import { PointBudgetController } from '../controllers/PointBudgetController.js';
 import { requireAuth, requireAdmin } from '../../../common/middleware/auth.middleware.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 
 const router: Router = Router();
 
+// ── 포인트 지급/차감 (admin) ─────────────────────────────────────────────────
 router.post(
   '/admin/grant',
   requireAuth,
@@ -38,6 +40,35 @@ router.get(
   requireAuth,
   requireAdmin,
   asyncHandler(PointAdminController.listTransactions),
+);
+
+// ── 서비스별 예산 관리 (WO-O4O-SERVICE-OPERATOR-POINT-BUDGET-PHASE1-V1) ──────
+router.get(
+  '/budget',
+  requireAuth,
+  requireAdmin,
+  asyncHandler(PointBudgetController.listAll),
+);
+
+router.get(
+  '/budget/:serviceKey',
+  requireAuth,
+  requireAdmin,
+  asyncHandler(PointBudgetController.getSummary),
+);
+
+router.post(
+  '/budget/:serviceKey/allocate',
+  requireAuth,
+  requireAdmin,
+  asyncHandler(PointBudgetController.allocate),
+);
+
+router.get(
+  '/budget/:serviceKey/transactions',
+  requireAuth,
+  requireAdmin,
+  asyncHandler(PointBudgetController.listTransactions),
 );
 
 export default router;

@@ -24,15 +24,16 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 export class PointAdminController extends BaseController {
   /**
    * POST /api/v1/points/admin/grant
-   * Body: { userId: string; amount: number; description: string }
+   * Body: { userId: string; amount: number; description: string; requestId?: string }
    *
-   * 멱등성: referenceKey가 `admin_grant:{userId}:{Date.now()}` 기반이라 동일 요청 재시도 시
-   *        Date.now() 차이로 새 트랜잭션이 생성됨. 운영자가 의도적으로 두 번 지급하면 두 번 적립.
-   *        클라이언트 단에서 중복 호출 가드는 별도 책임.
+   * 멱등성 (WO-O4O-SERVICE-OPERATOR-POINT-BUDGET-PHASE1-V1):
+   *   requestId가 주어지면 `admin_grant:{userId}:{requestId}` — 완전한 멱등성 보장.
+   *   requestId 없으면 `admin_grant:{userId}:{operatorId}:{Date.now()}` — 기존 동작 유지.
+   *   클라이언트가 재시도 보호가 필요하면 requestId를 생성해 전달할 것.
    */
   static async grant(req: Request, res: Response): Promise<any> {
     try {
-      const { userId, amount, description } = req.body ?? {};
+      const { userId, amount, description, requestId } = req.body ?? {};
 
       if (!userId || typeof userId !== 'string') {
         return BaseController.badRequest(res, 'userId is required', 'INVALID_USER_ID');
@@ -45,7 +46,9 @@ export class PointAdminController extends BaseController {
         : 'Admin grant';
 
       const operatorId = (req as any).user?.id;
-      const referenceKey = `admin_grant:${userId}:${Date.now()}`;
+      const referenceKey = (typeof requestId === 'string' && requestId.trim())
+        ? `admin_grant:${userId}:${requestId.trim()}`
+        : `admin_grant:${userId}:${operatorId}:${Date.now()}`;
 
       const tx = await PointService.getInstance().grantPoint({
         userId,

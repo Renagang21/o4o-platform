@@ -28,6 +28,9 @@ const ContentApprovalsPage = lazy(() => import('@/pages/operator/ContentApproval
 // Point Spend (WO-O4O-POINT-OPERATOR-UI-V1)
 const PointSpendPage = lazy(() => import('@/pages/operator/PointSpendPage'));
 
+// Point Budget (WO-O4O-SERVICE-OPERATOR-POINT-BUDGET-PHASE1-V1)
+const PointBudgetPage = lazy(() => import('@/pages/operator/PointBudgetPage'));
+
 // KPA HUB & Store Content (WO-O4O-STORE-CONTENT-HUB-SHARE-UI-PHASE2-V1)
 const HubContentsPage = lazy(() => import('@/pages/kpa/HubContentsPage'));
 const MyStoreContentsPage = lazy(() => import('@/pages/kpa/MyStoreContentsPage'));
@@ -155,6 +158,15 @@ export function PlatformRoutes() {
       <AdminProtectedRoute requiredRoles={['admin', 'super_admin']}>
         <Suspense fallback={<PageLoader />}>
           <PointSpendPage />
+        </Suspense>
+      </AdminProtectedRoute>
+    } />,
+
+    // Point Budget (WO-O4O-SERVICE-OPERATOR-POINT-BUDGET-PHASE1-V1)
+    <Route key="/operator/points/budget" path="/operator/points/budget" element={
+      <AdminProtectedRoute requiredRoles={['admin', 'super_admin']}>
+        <Suspense fallback={<PageLoader />}>
+          <PointBudgetPage />
         </Suspense>
       </AdminProtectedRoute>
     } />,

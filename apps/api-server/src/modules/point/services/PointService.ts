@@ -23,6 +23,7 @@ import {
   TransactionType,
 } from '../../credit/entities/CreditTransaction.js';
 import { CreditService } from '../../credit/services/CreditService.js';
+import { ServicePointBudgetService } from './ServicePointBudgetService.js';
 import logger from '../../../utils/logger.js';
 
 /**
@@ -65,6 +66,12 @@ export interface GrantPointParams {
   /** 중복 지급 방지 키. 동일 보상 이벤트에 결정성 있게 생성. */
   referenceKey: string;
   description: string;
+  /**
+   * 서비스 예산 키 (WO-O4O-SERVICE-OPERATOR-POINT-BUDGET-PHASE1-V1).
+   * 제공 시 지급 전 예산 잔액 확인 + 차감을 수행한다.
+   * 없으면 예산 체크 없이 지급 (기존 동작 유지).
+   */
+  serviceKey?: string;
 }
 
 export interface SpendPointParams {
@@ -90,8 +97,52 @@ export class PointService {
   /**
    * 사용자에게 포인트 지급. 동일 referenceKey가 이미 존재하면 null 반환(dedup).
    * CreditService.earnCredit()로 위임 — 동작·DB·로그 모두 기존과 동일.
+   *
+   * serviceKey가 제공된 경우 (WO-O4O-SERVICE-OPERATOR-POINT-BUDGET-PHASE1-V1):
+   *   1. 예산 잔액 확인 → 부족하면 INSUFFICIENT_BUDGET 에러
+   *   2. 사용자 포인트 지급
+   *   3. 예산 차감 기록
    */
   async grantPoint(params: GrantPointParams): Promise<CreditTransaction | null> {
+    if (params.serviceKey) {
+      const budgetService = ServicePointBudgetService.getInstance();
+
+      const hasBudget = await budgetService.checkBudget(params.serviceKey, params.amount);
+      if (!hasBudget) {
+        throw new Error('INSUFFICIENT_BUDGET');
+      }
+
+      const tx = await CreditService.getInstance().earnCredit(
+        params.userId,
+        params.amount,
+        params.sourceType as CreditSourceType,
+        params.sourceId,
+        params.referenceKey,
+        params.description,
+      );
+
+      // tx === null means dedup (already granted). No budget deduction needed.
+      if (tx !== null) {
+        try {
+          await budgetService.deductBudget({
+            serviceKey: params.serviceKey,
+            amount: params.amount,
+            referenceKey: `budget:${params.referenceKey}`,
+            description: params.description,
+          });
+        } catch (budgetErr) {
+          // 예산 차감 실패 — 사용자 포인트는 이미 적립되었으므로 롤백 없이 경고만 기록
+          logger.warn('[Point] Budget deduct failed after credit earn', {
+            serviceKey: params.serviceKey,
+            referenceKey: params.referenceKey,
+            error: (budgetErr as Error).message,
+          });
+        }
+      }
+
+      return tx;
+    }
+
     return CreditService.getInstance().earnCredit(
       params.userId,
       params.amount,
