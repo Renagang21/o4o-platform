@@ -17,6 +17,11 @@ import { AppDataSource } from '../database/connection.js';
 import type { AuthRequest } from '../types/auth.js';
 import logger from '../utils/logger.js';
 import { resolveAiApiKey } from '../utils/ai-key.util.js';
+// WO-O4O-AI-NAVER-BLOG-ROBUST-CONTAINER-PARSER-FIX-V1:
+//   Naver SmartEditor HTML 본문 추출에 견고한 HTML parser 사용.
+//   기존 naive depth-counter (extractContainerByClass) 가 SE component 내부 script/comment 로
+//   조기 종료되던 문제를 해결.
+import { parse as parseHtml, type HTMLElement as NodeHtmlElement } from 'node-html-parser';
 import {
   isSupportedOutputType,
   buildSystemPrompt,
@@ -416,144 +421,60 @@ function isNaverBlogUrl(url: string): boolean {
 // WO-O4O-AI-URL-NAVER-BLOG-POLICY-FOOTER-CLEANUP-V1:
 //   lazy regex는 se-main-container 첫 자식 div에서 조기 종료 → 50자 미만 → 전체 fallback.
 //   div depth counter로 실제 닫는 태그를 찾아 전체 블록을 정확히 추출.
-function extractContainerByClass(html: string, classMarker: string): string | null {
-  const startRe = new RegExp(`<div[^>]+class="[^"]*${classMarker}[^"]*"[^>]*>`, 'i');
-  const startMatch = startRe.exec(html);
-  if (!startMatch) return null;
-
-  const bodyStart = startMatch.index + startMatch[0].length;
-  let depth = 1;
-  let i = bodyStart;
-
-  while (i < html.length && depth > 0) {
-    const nextOpen = html.indexOf('<div', i);
-    const nextClose = html.indexOf('</div', i);
-    if (nextClose < 0) break;
-    if (nextOpen >= 0 && nextOpen < nextClose) {
-      depth++;
-      i = nextOpen + 4;
-    } else {
-      depth--;
-      i = nextClose + 5;
-    }
-  }
-
-  return html.slice(bodyStart, depth === 0 ? i - 5 : i);
-}
-
-// WO-O4O-AI-URL-NAVER-BLOG-MAIN-CONTENT-SELECTION-WITH-GENERIC-REGRESSION-GUARD-V1:
-//   id 기반 depth counter — postViewArea 등 네이버 전용 id 지원
-function extractContainerById(html: string, id: string): string | null {
-  const startRe = new RegExp(`<div[^>]+id=["']${id}["'][^>]*>`, 'i');
-  const startMatch = startRe.exec(html);
-  if (!startMatch) return null;
-
-  const bodyStart = startMatch.index + startMatch[0].length;
-  let depth = 1;
-  let i = bodyStart;
-
-  while (i < html.length && depth > 0) {
-    const nextOpen = html.indexOf('<div', i);
-    const nextClose = html.indexOf('</div', i);
-    if (nextClose < 0) break;
-    if (nextOpen >= 0 && nextOpen < nextClose) { depth++; i = nextOpen + 4; }
-    else { depth--; i = nextClose + 5; }
-  }
-
-  return html.slice(bodyStart, depth === 0 ? i - 5 : i);
-}
-
-// 네이버 블로그 PostView HTML에서 실제 게시글 본문 추출
-// — content-only 후보 우선 → wrapper fallback 순서 (네이버 전용, Generic 오염 없음)
+// WO-O4O-AI-NAVER-BLOG-ROBUST-CONTAINER-PARSER-FIX-V1
+// 네이버 블로그 PostView HTML에서 실제 게시글 본문 추출 — 견고한 HTML parser 기반.
+// 기존 naive depth-counter 방식은 SE component 내부의 script/comment/raw text 때문에
+// 조기 종료되어 본문을 놓쳤음 (IR-O4O-AI-NAVER-BLOG-POSTVIEW-HTML-STRUCTURE-AUDIT-V1 참조).
+// — 4-tier fallback 순서는 유지: contentCandidates(≥100자) → lenientContent(≥50자) → wrapper(≥50자) → 전체 텍스트.
+// — Generic URL extractor에는 영향 없음 (이 함수는 네이버 전용 경로에서만 호출됨).
 function extractNaverBlogText(html: string): string {
-  // CCL 블록 이전까지만 분석 — footer 오염 원천 차단
+  // CCL 블록 이전까지만 분석 — footer 오염 원천 차단 (parser 입력에서도 동일 정책 유지)
   const cclIdx = html.search(/<div[^>]+class="[^"]*blog_ccl[^"]*"/i);
   const workHtml = cclIdx > 200 ? html.slice(0, cclIdx) : html;
 
-  // === IR-O4O-AI-NAVER-BLOG-POSTVIEW-HTML-STRUCTURE-AUDIT-V1 ===
-  //   관측 전용 — 추출 로직 변경 없음. 운영환경에서 받은 PostView HTML 내부 구조 진단.
+  // HTML parse — 실패 시 전체 stripHtml로 안전 fallback
+  let root: NodeHtmlElement;
   try {
-    const auditMarkers = [
-      'se-main-container',
-      'se-component-wrap',
-      'post-view',
-      'post_body',
-      'postViewArea',
-      'viewTypeSelector',
-      '__se_component_area',
-      'logNo',
-      '해양 심층수',
-      '풍부한 미네랄',
-      '식품의약품안전처 블로그',
-    ];
-    const markerIndices: Record<string, number> = {};
-    for (const m of auditMarkers) markerIndices[m] = workHtml.indexOf(m);
-
-    const sampleAround = (idx: number, before = 200, after = 300): string => {
-      if (idx < 0) return '';
-      const start = Math.max(0, idx - before);
-      const end = Math.min(workHtml.length, idx + after);
-      return workHtml.slice(start, end);
-    };
-
-    logger.info('[NAVER_HTML_STRUCTURE_AUDIT]', {
-      bodyLength: html.length,
-      workHtmlLength: workHtml.length,
-      cclIdx,
-      markerIndices,
-      sampleFirst1000: workHtml.slice(0, 1000),
-      sampleAroundSeMain: sampleAround(markerIndices['se-main-container']),
-      sampleAroundPostBody: sampleAround(markerIndices['post_body']),
-      sampleAroundTopic: sampleAround(markerIndices['해양 심층수']),
-      sampleAroundLogNo: sampleAround(markerIndices['logNo']),
-    });
-  } catch (auditError: any) {
-    logger.warn('[NAVER_HTML_STRUCTURE_AUDIT_ERROR]', { error: auditError?.message });
+    root = parseHtml(workHtml, { comment: false, blockTextElements: { script: false, noscript: false, style: false, pre: true } });
+  } catch (parseError: any) {
+    logger.warn('[NAVER_PARSER_ERROR]', { error: parseError?.message });
+    return stripHtml(workHtml);
   }
-  // === audit end ===
 
-  // WO-O4O-AI-URL-NAVER-BLOG-CANDIDATE-SELECTION-FIX-V1:
-  //   소개문 라인만 제거, 후보 전체 제거 금지 (Cause B 수정)
-  //   "이 블로그는 X가 운영합니다" 라인을 첫 줄에서만 trim
+  // script/style/noscript 노드 제거 후 text 추출 — head meta·iframe 내부 JS 잡음 차단
+  for (const el of root.querySelectorAll('script, style, noscript')) {
+    el.remove();
+  }
+
+  // 소개문 라인 trim (WO-O4O-AI-URL-NAVER-BLOG-CANDIDATE-SELECTION-FIX-V1 유지)
   const NAVER_INTRO_LINE_RE = /^이\s*블로그(는|의)?\s+\S+[^\n]*\n+/;
-  function trimIntroLine(t: string): string {
-    return t.replace(NAVER_INTRO_LINE_RE, '').trim();
-  }
+  const trimIntroLine = (t: string): string => t.replace(NAVER_INTRO_LINE_RE, '').trim();
 
-  // content-only selector: 본문 전용 컨테이너 (스마트에디터 / 구형에디터)
-  // Cause A 수정: postViewArea / viewTypeSelector 는 여기서 제외 (페이지 wrapper)
-  const contentOnlyRaw: Array<string | null> = [
-    extractContainerByClass(workHtml, 'se-main-container'), // 스마트에디터 2.0+
-    extractContainerByClass(workHtml, 'se-component-wrap'), // 스마트에디터 1.0
-    extractContainerByClass(workHtml, 'post-view'),          // 구형 에디터
-    extractContainerByClass(workHtml, 'post_body'),          // 매우 구형
-  ];
-
-  // === AUDIT: per-class-selector probe (관측 전용, 로직 변경 없음) ===
-  try {
-    const classSelectorNames = ['se-main-container', 'se-component-wrap', 'post-view', 'post_body'];
-    const probes = contentOnlyRaw.map((raw, i) => {
-      const text = raw ? stripHtml(raw).trim() : '';
-      return {
-        selector: classSelectorNames[i],
-        hit: raw !== null,
-        rawHtmlLength: raw?.length ?? 0,
-        textLength: text.length,
-        firstTextSample: text.slice(0, 100),
-      };
+  type Probed = { selector: string; hit: boolean; rawLen: number; text: string };
+  const collectProbes = (selectors: string[]): Probed[] =>
+    selectors.map((sel) => {
+      const el = root.querySelector(sel);
+      if (!el) return { selector: sel, hit: false, rawLen: 0, text: '' };
+      const text = trimIntroLine(el.text.trim());
+      return { selector: sel, hit: true, rawLen: el.outerHTML.length, text };
     });
-    logger.info('[NAVER_SELECTOR_PROBE_CLASS]', { probes });
-  } catch (e: any) {
-    logger.warn('[NAVER_SELECTOR_PROBE_ERROR]', { phase: 'class', error: e?.message });
-  }
-  // === audit end ===
+  const logProbes = (logKey: string, probes: Probed[]) => {
+    logger.info(logKey, {
+      probes: probes.map((p) => ({
+        selector: p.selector,
+        hit: p.hit,
+        rawLen: p.rawLen,
+        textLen: p.text.length,
+        sample: p.text.slice(0, 100),
+      })),
+    });
+  };
 
-  // 소개문 라인 trim 후 100자 이상인 content-only 후보 → 가장 긴 것 선택
-  const contentCandidates = contentOnlyRaw
-    .filter((c): c is string => c !== null)
-    .map((c) => trimIntroLine(stripHtml(c).trim()))
-    .filter((t) => t.length >= 100);
+  // content-only selectors — SmartEditor / 구형 에디터 본문 컨테이너 (페이지 wrapper 아님)
+  const contentProbes = collectProbes(['.se-main-container', '.se-component-wrap', '.post-view', '.post_body']);
+  logProbes('[NAVER_PARSER_PROBE_CLASS]', contentProbes);
 
+  const contentCandidates = contentProbes.map((p) => p.text).filter((t) => t.length >= 100);
   if (contentCandidates.length > 0) {
     const selected = contentCandidates.reduce((a, b) => (a.length >= b.length ? a : b));
     logger.info('[NAVER_FINAL_SELECTION]', {
@@ -564,12 +485,7 @@ function extractNaverBlogText(html: string): string {
     return selected;
   }
 
-  // lenient fallback 1: content-only 후보 중 50자 이상 (짧은 포스트 대응)
-  const lenientContent = contentOnlyRaw
-    .filter((c): c is string => c !== null)
-    .map((c) => trimIntroLine(stripHtml(c).trim()))
-    .filter((t) => t.length >= 50);
-
+  const lenientContent = contentProbes.map((p) => p.text).filter((t) => t.length >= 50);
   if (lenientContent.length > 0) {
     const selected = lenientContent.reduce((a, b) => (a.length >= b.length ? a : b));
     logger.info('[NAVER_FINAL_SELECTION]', {
@@ -580,37 +496,11 @@ function extractNaverBlogText(html: string): string {
     return selected;
   }
 
-  // lenient fallback 2: wrapper selector (content-only 후보가 없을 때만 사용)
-  // postViewArea / viewTypeSelector 는 페이지 전체 wrapper이므로 최후 수단
-  const wrapperRaw: Array<string | null> = [
-    extractContainerById(workHtml, 'postViewArea'),
-    extractContainerById(workHtml, 'viewTypeSelector'),
-  ];
+  // wrapper fallback — postViewArea / viewTypeSelector 는 페이지 전체 wrapper (최후 수단)
+  const wrapperProbes = collectProbes(['#postViewArea', '#viewTypeSelector']);
+  logProbes('[NAVER_PARSER_PROBE_ID]', wrapperProbes);
 
-  // === AUDIT: per-id-selector probe (관측 전용, 로직 변경 없음) ===
-  try {
-    const idSelectorNames = ['postViewArea', 'viewTypeSelector'];
-    const probes = wrapperRaw.map((raw, i) => {
-      const text = raw ? stripHtml(raw).trim() : '';
-      return {
-        selector: idSelectorNames[i],
-        hit: raw !== null,
-        rawHtmlLength: raw?.length ?? 0,
-        textLength: text.length,
-        firstTextSample: text.slice(0, 100),
-      };
-    });
-    logger.info('[NAVER_SELECTOR_PROBE_ID]', { probes });
-  } catch (e: any) {
-    logger.warn('[NAVER_SELECTOR_PROBE_ERROR]', { phase: 'id', error: e?.message });
-  }
-  // === audit end ===
-
-  const wrapperCandidates = wrapperRaw
-    .filter((c): c is string => c !== null)
-    .map((c) => trimIntroLine(stripHtml(c).trim()))
-    .filter((t) => t.length >= 50);
-
+  const wrapperCandidates = wrapperProbes.map((p) => p.text).filter((t) => t.length >= 50);
   if (wrapperCandidates.length > 0) {
     const selected = wrapperCandidates.reduce((a, b) => (a.length >= b.length ? a : b));
     logger.info('[NAVER_FINAL_SELECTION]', {
@@ -621,10 +511,10 @@ function extractNaverBlogText(html: string): string {
     return selected;
   }
 
-  // 최종 fallback: CCL 차단 후 전체 stripHtml
-  const fallback = stripHtml(workHtml);
+  // 최종 fallback — root.text (이미 script/style 제거됨)
+  const fallback = trimIntroLine(root.text.trim());
   logger.info('[NAVER_FINAL_SELECTION]', {
-    source: 'stripHtmlFallback',
+    source: 'parserFullText',
     selectedTextLength: fallback.length,
     selectedTextSample: fallback.slice(0, 300),
   });
