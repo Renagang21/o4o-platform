@@ -351,6 +351,7 @@ export class QuizService {
           sourceId: courseId,
           referenceKey: `course_complete:${userId}:${courseId}`,
           description: CREDIT_DESCRIPTIONS.COURSE_COMPLETE,
+          serviceKey: 'kpa-society',
         });
       } catch (creditError) {
         logger.warn('[Quiz] Point grant failed (course_complete)', { courseId, userId, error: (creditError as Error).message });
@@ -411,8 +412,14 @@ export class QuizService {
       }
     }
 
+    // Ensure every question has an id for submitQuiz() matching
+    const questions = data.questions.map((q) =>
+      q.id ? q : { ...q, id: crypto.randomUUID() }
+    );
+
     const quiz = this.quizRepository.create({
       ...data,
+      questions,
       passingScore: data.passingScore ?? 60,
       isPublished: true,
       publishedAt: new Date(),
