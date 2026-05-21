@@ -237,4 +237,32 @@ export const lmsApi = {
     return data;
   },
 
+  // ─── Operator 메서드 (WO-KCOS-OPERATOR-LMS-BOOTSTRAP-V1) ──────────────────
+  // KPA Canonical endpoint 기준. 백엔드 /lms/operator/courses/:id/* (requireLmsOperatorScope).
+
+  operatorApproveCourse: async (id: string): Promise<ApiResponse<{ course: LmsCourse }>> => {
+    const { data } = await api.post<ApiResponse<{ course: LmsCourse }>>(`/lms/operator/courses/${id}/approve`);
+    return data;
+  },
+
+  operatorRejectCourse: async (id: string, reason: string): Promise<ApiResponse<{ course: LmsCourse }>> => {
+    const { data } = await api.post<ApiResponse<{ course: LmsCourse }>>(`/lms/operator/courses/${id}/reject`, { reason });
+    return data;
+  },
+
+  operatorUnpublishCourse: async (id: string): Promise<ApiResponse<{ course: LmsCourse }>> => {
+    const { data } = await api.post<ApiResponse<{ course: LmsCourse }>>(`/lms/operator/courses/${id}/unpublish`);
+    return data;
+  },
+
+  operatorArchiveCourse: async (id: string): Promise<ApiResponse<{ course: LmsCourse }>> => {
+    const { data } = await api.post<ApiResponse<{ course: LmsCourse }>>(`/lms/operator/courses/${id}/archive`);
+    return data;
+  },
+
+  operatorHardDeleteCourse: async (id: string): Promise<ApiResponse<{ deleted: boolean }>> => {
+    const { data } = await api.delete<ApiResponse<{ deleted: boolean }>>(`/lms/operator/courses/${id}/hard`);
+    return data;
+  },
+
 };

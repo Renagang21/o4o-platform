@@ -33,6 +33,10 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     // WO-O4O-OPERATOR-GUIDE-CONTENTS-CORE-EXTRACTION-V1
     { label: '안내 문구 관리', path: '/operator/guide-contents' },
   ],
+  // WO-KCOS-OPERATOR-LMS-BOOTSTRAP-V1
+  lms: [
+    { label: '강의 관리', path: '/operator/lms' },
+  ],
   signage: [
     { label: '사이니지 콘텐츠', path: '/operator/signage/content' },
     { label: 'HQ 미디어', path: '/operator/signage/hq-media' },

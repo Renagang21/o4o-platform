@@ -135,6 +135,8 @@ const OperatorAiReportPage = lazy(() => import('@/pages/operator/AiReportPage'))
 const StoreCockpitPage = lazy(() => import('@/pages/operator/StoreCockpitPage'));
 // Operator Guide Contents (WO-O4O-OPERATOR-GUIDE-CONTENTS-CORE-EXTRACTION-V1)
 const OperatorGuideContentsPage = lazy(() => import('@/pages/operator/OperatorGuideContentsPage'));
+// WO-KCOS-OPERATOR-LMS-BOOTSTRAP-V1
+const OperatorLmsCoursesPage = lazy(() => import('@/pages/operator/OperatorLmsCoursesPage'));
 
 // WO-O4O-FORUM-OPERATOR-UNIFICATION-V1
 const ForumRequestsPage = lazy(() => import('@/pages/operator/ForumRequestsPage'));
@@ -438,6 +440,8 @@ function AppRoutes() {
         <Route path="forum-analytics" element={<ForumAnalyticsPage />} />
         {/* Guide Contents (WO-O4O-OPERATOR-GUIDE-CONTENTS-CORE-EXTRACTION-V1) */}
         <Route path="guide-contents" element={<OperatorGuideContentsPage />} />
+        {/* LMS 강의 관리 (WO-KCOS-OPERATOR-LMS-BOOTSTRAP-V1) */}
+        <Route path="lms" element={<OperatorLmsCoursesPage />} />
       </Route>
 
       {/* Store Owner Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1) */}
