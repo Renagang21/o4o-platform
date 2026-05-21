@@ -14,16 +14,17 @@ import { requireAuth } from './authentication.middleware.js';
 /**
  * Require Admin Role Middleware
  *
- * WO-P2-PLATFORM-ROLE-PREFIX-IMPLEMENTATION-V1 - Phase 2
+ * WO-O4O-RBAC-ADMIN-LEGACY-PREFIX-COMPAT-GUARD-FIX-V1
  *
  * Requires the user to be authenticated AND have platform-level admin role.
  * This should be chained after requireAuth or used standalone (it calls requireAuth internally).
  *
- * Only accepts prefixed platform roles:
- * - platform:super_admin
- * - platform:admin
+ * Accepts both legacy and prefixed platform roles (compat layer):
+ * - admin, super_admin          ← legacy (current DB state)
+ * - platform:admin, platform:super_admin  ← Phase 2+ prefix
  *
- * Legacy roles (admin, super_admin, operator) are logged and DENIED.
+ * Full legacy→prefix migration is a separate Phase.
+ * Do NOT remove legacy roles until role_assignments data is fully migrated.
  *
  * Returns 403 if user lacks admin privileges.
  *
@@ -45,10 +46,12 @@ export const requireAdmin = async (
   const user = req.user as User;
 
   try {
-    // WO-O4O-AUTH-RBAC-FINAL-CLEANUP-V2: prefixed roles only
+    // Legacy + prefix compat: accept both until role_assignments data migration is complete
     const isAdmin = await roleAssignmentService.hasAnyRole(user.id, [
-      'platform:admin',
-      'platform:super_admin',
+      'admin',                // legacy
+      'super_admin',          // legacy
+      'platform:admin',       // Phase 2+
+      'platform:super_admin', // Phase 2+
     ]);
 
     if (!isAdmin) {
