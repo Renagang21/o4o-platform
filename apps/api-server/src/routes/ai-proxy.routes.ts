@@ -1082,17 +1082,22 @@ router.post('/url-to-blocks', authenticate, async (req, res: Response) => {
       parsedUrl.hostname.includes('youtu.be');
 
     // 6-A. 품질 기반 필터 함수 (WO-O4O-AI-BLOCK-VALIDATION-TYPE-AWARE-LENGTH-FIX-V1)
-    /** 블록 타입별 최소 글자 수 — heading은 한국어 특성상 2자 이상만 허용 */
+    /** 블록 타입별 최소 글자 수
+     *  - heading: 한국어 특성상 2자 이상
+     *  - paragraph/기타: 10자 이상 (한국어 단문 허용 — 20자는 과도하게 엄격)
+     */
     const isTooShort = (text: string, type?: string): boolean => {
       const normalized = text.trim();
       if (type === 'o4o/heading') return normalized.length < 2;
-      return normalized.length < 20;
+      return normalized.length < 10;
     };
 
-    /** 짧은 단어 4개 이상 연속 — 네비게이션/메뉴 구조 특징 */
+    /** 짧은 단어 6개 이상 연속 — 네비게이션/메뉴 구조 특징
+     *  임계값 4→6: 한국어 4-단어 문장("비타민 D 결핍 주의")이 오탐되던 문제 방지
+     */
     const isMenuLike = (text: string): boolean => {
       const tokens = text.split(/[\s|,·\-–—\/]/).filter(Boolean);
-      return tokens.length >= 4 && tokens.every(t => t.length <= 6);
+      return tokens.length >= 6 && tokens.every(t => t.length <= 6);
     };
 
     /** 블록 텍스트가 실질적인 콘텐츠인지 판단 (타입 인식) */
@@ -1126,6 +1131,16 @@ router.post('/url-to-blocks', authenticate, async (req, res: Response) => {
     } else {
       // 일반 페이지: 품질 필터 적용 (타입 인식)
       finalBlocks = normalizedBlocks.filter(b => isValidContent(b.content || '', b.type));
+    }
+
+    // 필터에서 탈락한 블록 진단 로그
+    if (finalBlocks.length < normalizedBlocks.length) {
+      const filtered = normalizedBlocks.filter(b => !finalBlocks.includes(b));
+      logger.info('[url-to-blocks] 필터 탈락 블록', {
+        requestId,
+        count: filtered.length,
+        items: filtered.map(b => ({ type: b.type, len: (b.content || '').length, preview: (b.content || '').slice(0, 40) })),
+      });
     }
 
     // 6-C. 최대 블록 수 강제 제한
