@@ -221,6 +221,9 @@ const ResourcesPage = lazy(() => import('@/pages/resources/ResourcesPage').then(
 const InstructorDashboardPage = lazy(() => import('@/pages/instructor/InstructorDashboardPage'));
 const LmsCoursesPage = lazy(() => import('@/pages/operator/LmsCoursesPage'));
 
+// WO-O4O-GLYCOPHARM-AI-CONTENT-ACTIVATION-V1
+const OperatorResourcesPage = lazy(() => import('@/pages/operator/OperatorResourcesPage'));
+
 // MyPage 3-split (WO-O4O-GLYCOPHARM-MYPAGE-SPLIT-V1)
 const MyPageHub = lazy(() => import('@/pages/mypage/MyPageHub'));
 const MyProfilePage = lazy(() => import('@/pages/mypage/MyProfilePage'));
@@ -576,6 +579,8 @@ function AppRoutes() {
         <Route path="guide-contents" element={<OperatorGuideContentsPage />} />
         {/* LMS Management (WO-GLYCOPHARM-INSTRUCTOR-OPERATOR-V1) */}
         <Route path="lms/courses" element={<LmsCoursesPage />} />
+        {/* Resources Management + AI Content (WO-O4O-GLYCOPHARM-AI-CONTENT-ACTIVATION-V1) */}
+        <Route path="resources" element={<OperatorResourcesPage />} />
         {/* Settings */}
         <Route path="settings" element={<SettingsPage />} />
       </Route>

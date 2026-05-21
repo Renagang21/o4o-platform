@@ -57,4 +57,42 @@ export const glycoResourcesApi = {
 
   getDetail: (id: string) =>
     api.get<{ success: boolean; data: GlycoResourceItem }>(`/glycopharm/contents/${id}`),
+
+  // ─── Operator APIs ─────────────────────────────────────────────────────────
+
+  operatorList: (params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    source_type?: 'manual' | 'upload' | 'external';
+    status?: 'draft' | 'published' | 'private';
+    usage_type?: 'READ' | 'LINK' | 'DOWNLOAD' | 'COPY';
+  }) =>
+    api.get<GlycoResourceListResponse>('/glycopharm/operator/resources', { params }),
+
+  operatorCreate: (data: {
+    title: string;
+    summary?: string;
+    blocks?: object[];
+    tags?: string[];
+    category?: string;
+    source_type?: 'manual' | 'upload' | 'external';
+    source_url?: string;
+    source_file_name?: string;
+    usage_type?: 'READ' | 'LINK' | 'DOWNLOAD' | 'COPY';
+    status?: 'draft' | 'published' | 'private';
+    reusable_policy?: 'platform' | 'restricted';
+  }) =>
+    api.post<{ success: boolean; data: GlycoResourceItem }>('/glycopharm/operator/resources', data),
+
+  operatorUpdateStatus: (id: string, status: 'draft' | 'published' | 'private') =>
+    api.patch<{ success: boolean; data: GlycoResourceItem }>(
+      `/glycopharm/operator/resources/${id}/status`,
+      { status },
+    ),
+
+  operatorDelete: (id: string) =>
+    api.delete<{ success: boolean; data: { deleted: boolean; id: string } }>(
+      `/glycopharm/operator/resources/${id}`,
+    ),
 };
