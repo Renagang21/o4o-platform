@@ -359,8 +359,9 @@ export class CourseService extends BaseService<Course> {
     });
 
     // WO-O4O-GLOBAL-EVENT-LOG-MINIMAL-V1
+    // WO-O4O-LMS-SERVICEKEY-CONTEXT-V1: use course.serviceKey; null = legacy KPA fallback
     await logEvent({
-      serviceKey: 'kpa-society',
+      serviceKey: updated.serviceKey ?? 'kpa-society',
       entityType: 'course',
       entityId: updated.id,
       action: 'course.submitted',
@@ -412,8 +413,9 @@ export class CourseService extends BaseService<Course> {
     });
 
     // WO-O4O-GLOBAL-EVENT-LOG-MINIMAL-V1
+    // WO-O4O-LMS-SERVICEKEY-CONTEXT-V1: use course.serviceKey; null = legacy KPA fallback
     await logEvent({
-      serviceKey: 'kpa-society',
+      serviceKey: updated.serviceKey ?? 'kpa-society',
       entityType: 'course',
       entityId: updated.id,
       action: 'course.approved',
@@ -471,8 +473,9 @@ export class CourseService extends BaseService<Course> {
     });
 
     // WO-O4O-GLOBAL-EVENT-LOG-MINIMAL-V1
+    // WO-O4O-LMS-SERVICEKEY-CONTEXT-V1: use course.serviceKey; null = legacy KPA fallback
     await logEvent({
-      serviceKey: 'kpa-society',
+      serviceKey: updated.serviceKey ?? 'kpa-society',
       entityType: 'course',
       entityId: updated.id,
       action: 'course.rejected',
