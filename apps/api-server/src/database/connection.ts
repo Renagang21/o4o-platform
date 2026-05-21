@@ -164,6 +164,7 @@ import {
   StoreBlogSettings, // WO-O4O-KPA-STORE-BLOG-META-V1
   GlycopharmPharmacyExtension, // WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1
   GlycopharmMember, // WO-GLYCOPHARM-MEMBER-TABLE-CREATION-V1
+  GlycopharmContent, // WO-O4O-GLYCOPHARM-RESOURCES-BACKEND-V1
 } from '../routes/glycopharm/entities/index.js';
 
 // ============================================================================
@@ -438,6 +439,11 @@ import { CourseCompletion } from '../modules/lms/entities/CourseCompletion.js';
 // ============================================================================
 import { CreditBalance } from '../modules/credit/entities/CreditBalance.js';
 import { CreditTransaction } from '../modules/credit/entities/CreditTransaction.js';
+
+// POINT BUDGET ENTITIES (WO-O4O-SERVICE-OPERATOR-POINT-BUDGET-PHASE1-V1)
+// ============================================================================
+import { ServicePointBudget } from '../modules/point/entities/ServicePointBudget.js';
+import { ServicePointBudgetTransaction } from '../modules/point/entities/ServicePointBudgetTransaction.js';
 
 // ============================================================================
 // INTERACTIVE-CONTENT-CORE ENTITIES (Phase 1 + Phase 2)
@@ -714,6 +720,7 @@ export const AppDataSource = new DataSource({
     StoreBlogSettings, // WO-O4O-KPA-STORE-BLOG-META-V1
     GlycopharmPharmacyExtension, // WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1
     GlycopharmMember, // WO-GLYCOPHARM-MEMBER-TABLE-CREATION-V1
+    GlycopharmContent, // WO-O4O-GLYCOPHARM-RESOURCES-BACKEND-V1
     // ============================================================================
     // ASSET SNAPSHOT ENTITY (WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1)
     // ============================================================================
@@ -872,6 +879,11 @@ export const AppDataSource = new DataSource({
     // ============================================================================
     CreditBalance,
     CreditTransaction,
+    // ============================================================================
+    // POINT BUDGET ENTITIES (WO-O4O-SERVICE-OPERATOR-POINT-BUDGET-PHASE1-V1)
+    // ============================================================================
+    ServicePointBudget,
+    ServicePointBudgetTransaction,
     // ============================================================================
     // INTERACTIVE-CONTENT-CORE ENTITIES (Phase 1 + Phase 2)
     // ============================================================================

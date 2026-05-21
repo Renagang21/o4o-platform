@@ -81,3 +81,9 @@ export {
   type GlycopharmMemberSubRole,
   type GlycopharmMemberStatus,
 } from './glycopharm-member.entity.js';
+
+// WO-O4O-GLYCOPHARM-RESOURCES-BACKEND-V1
+export {
+  GlycopharmContent,
+  GlycopharmContentReusablePolicy,
+} from './glycopharm-content.entity.js';

@@ -8,6 +8,7 @@
 import { Router, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { createGlycopharmController } from './controllers/glycopharm.controller.js';
+import { createGlycopharmContentsRouter, createGlycopharmOperatorResourcesRouter } from './controllers/resources.controller.js'; // WO-O4O-GLYCOPHARM-RESOURCES-BACKEND-V1
 // display.controller removed — WO-O4O-GLYCOPHARM-SIGNAGE-MIGRATION-V1
 // forum-request.controller removed — WO-O4O-FORUM-CATEGORY-DEAD-CODE-REMOVAL-V1
 import { createApplicationController } from './controllers/application.controller.js';
@@ -422,6 +423,25 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   // ============================================================================
   const publicController = createPublicController(dataSource);
   router.use('/public', publicController);
+
+  // ============================================================================
+  // Contents / Resources Routes
+  // WO-O4O-GLYCOPHARM-RESOURCES-BACKEND-V1
+  //
+  // Public/Member:
+  //   GET /api/v1/glycopharm/contents?sub_type=resource
+  //
+  // Operator:
+  //   GET    /api/v1/glycopharm/operator/resources
+  //   POST   /api/v1/glycopharm/operator/resources
+  //   PATCH  /api/v1/glycopharm/operator/resources/:id/status
+  //   DELETE /api/v1/glycopharm/operator/resources/:id
+  // ============================================================================
+  router.use('/contents', createGlycopharmContentsRouter(dataSource, optionalAuth as any));
+  router.use(
+    '/operator/resources',
+    createGlycopharmOperatorResourcesRouter(dataSource, authenticate as any, requireGlycopharmScope),
+  );
 
   return router;
 }
