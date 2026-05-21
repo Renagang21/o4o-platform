@@ -464,44 +464,63 @@ function extractContainerById(html: string, id: string): string | null {
 }
 
 // 네이버 블로그 PostView HTML에서 실제 게시글 본문 추출
-// — 다중 selector 후보 수집 → 소개문 제거 → 최장 콘텐츠 선택 (네이버 전용, Generic 오염 없음)
+// — content-only 후보 우선 → wrapper fallback 순서 (네이버 전용, Generic 오염 없음)
 function extractNaverBlogText(html: string): string {
   // CCL 블록 이전까지만 분석 — footer 오염 원천 차단
   const cclIdx = html.search(/<div[^>]+class="[^"]*blog_ccl[^"]*"/i);
   const workHtml = cclIdx > 200 ? html.slice(0, cclIdx) : html;
 
-  // 네이버 블로그 소개문 패턴 ("이 블로그는 X가 운영합니다")
-  const NAVER_INTRO_RE = /^이\s*블로그(는|의)?\s+\S+\s*(가|이)?\s*운영합니다/;
+  // WO-O4O-AI-URL-NAVER-BLOG-CANDIDATE-SELECTION-FIX-V1:
+  //   소개문 라인만 제거, 후보 전체 제거 금지 (Cause B 수정)
+  //   "이 블로그는 X가 운영합니다" 라인을 첫 줄에서만 trim
+  const NAVER_INTRO_LINE_RE = /^이\s*블로그(는|의)?\s+\S+[^\n]*\n+/;
+  function trimIntroLine(t: string): string {
+    return t.replace(NAVER_INTRO_LINE_RE, '').trim();
+  }
 
-  // 다중 selector 후보 수집 (스마트에디터 / 구형에디터 / 공통 wrapper)
-  const rawCandidates: Array<string | null> = [
+  // content-only selector: 본문 전용 컨테이너 (스마트에디터 / 구형에디터)
+  // Cause A 수정: postViewArea / viewTypeSelector 는 여기서 제외 (페이지 wrapper)
+  const contentOnlyRaw: Array<string | null> = [
     extractContainerByClass(workHtml, 'se-main-container'), // 스마트에디터 2.0+
     extractContainerByClass(workHtml, 'se-component-wrap'), // 스마트에디터 1.0
     extractContainerByClass(workHtml, 'post-view'),          // 구형 에디터
     extractContainerByClass(workHtml, 'post_body'),          // 매우 구형
-    extractContainerById(workHtml, 'postViewArea'),          // 구형 에디터 wrapper
-    extractContainerById(workHtml, 'viewTypeSelector'),      // 일부 레이아웃
   ];
 
-  const candidates = rawCandidates
+  // 소개문 라인 trim 후 100자 이상인 content-only 후보 → 가장 긴 것 선택
+  const contentCandidates = contentOnlyRaw
     .filter((c): c is string => c !== null)
-    .map((c) => stripHtml(c).trim())
-    .filter((t) => t.length >= 100)                 // 소개문은 대부분 100자 미만
-    .filter((t) => !NAVER_INTRO_RE.test(t));        // 소개문 패턴 제거
+    .map((c) => trimIntroLine(stripHtml(c).trim()))
+    .filter((t) => t.length >= 100);
 
-  if (candidates.length > 0) {
-    // 가장 긴 후보 = 실제 게시글 본문
-    return candidates.reduce((a, b) => (a.length >= b.length ? a : b));
+  if (contentCandidates.length > 0) {
+    return contentCandidates.reduce((a, b) => (a.length >= b.length ? a : b));
   }
 
-  // fallback: 50자 이상인 모든 후보에서 최장 선택 (소개문 필터 완화)
-  const lenientCandidates = rawCandidates
+  // lenient fallback 1: content-only 후보 중 50자 이상 (짧은 포스트 대응)
+  const lenientContent = contentOnlyRaw
     .filter((c): c is string => c !== null)
-    .map((c) => stripHtml(c).trim())
+    .map((c) => trimIntroLine(stripHtml(c).trim()))
     .filter((t) => t.length >= 50);
 
-  if (lenientCandidates.length > 0) {
-    return lenientCandidates.reduce((a, b) => (a.length >= b.length ? a : b));
+  if (lenientContent.length > 0) {
+    return lenientContent.reduce((a, b) => (a.length >= b.length ? a : b));
+  }
+
+  // lenient fallback 2: wrapper selector (content-only 후보가 없을 때만 사용)
+  // postViewArea / viewTypeSelector 는 페이지 전체 wrapper이므로 최후 수단
+  const wrapperRaw: Array<string | null> = [
+    extractContainerById(workHtml, 'postViewArea'),
+    extractContainerById(workHtml, 'viewTypeSelector'),
+  ];
+
+  const wrapperCandidates = wrapperRaw
+    .filter((c): c is string => c !== null)
+    .map((c) => trimIntroLine(stripHtml(c).trim()))
+    .filter((t) => t.length >= 50);
+
+  if (wrapperCandidates.length > 0) {
+    return wrapperCandidates.reduce((a, b) => (a.length >= b.length ? a : b));
   }
 
   // 최종 fallback: CCL 차단 후 전체 stripHtml
