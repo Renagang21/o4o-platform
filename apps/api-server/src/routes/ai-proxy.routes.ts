@@ -1081,9 +1081,13 @@ router.post('/url-to-blocks', authenticate, async (req, res: Response) => {
       parsedUrl.hostname.includes('youtube.com') ||
       parsedUrl.hostname.includes('youtu.be');
 
-    // 6-A. 품질 기반 필터 함수
-    /** 20자 미만 — 메뉴/버튼/레이블 대부분 해당 */
-    const isTooShort = (text: string): boolean => text.trim().length < 20;
+    // 6-A. 품질 기반 필터 함수 (WO-O4O-AI-BLOCK-VALIDATION-TYPE-AWARE-LENGTH-FIX-V1)
+    /** 블록 타입별 최소 글자 수 — heading은 한국어 특성상 2자 이상만 허용 */
+    const isTooShort = (text: string, type?: string): boolean => {
+      const normalized = text.trim();
+      if (type === 'o4o/heading') return normalized.length < 2;
+      return normalized.length < 20;
+    };
 
     /** 짧은 단어 4개 이상 연속 — 네비게이션/메뉴 구조 특징 */
     const isMenuLike = (text: string): boolean => {
@@ -1091,10 +1095,10 @@ router.post('/url-to-blocks', authenticate, async (req, res: Response) => {
       return tokens.length >= 4 && tokens.every(t => t.length <= 6);
     };
 
-    /** 블록 텍스트가 실질적인 콘텐츠인지 판단 */
-    const isValidContent = (text: string): boolean => {
-      if (!text || isTooShort(text)) return false;
-      if (isMenuLike(text)) return false;
+    /** 블록 텍스트가 실질적인 콘텐츠인지 판단 (타입 인식) */
+    const isValidContent = (text: string, type?: string): boolean => {
+      if (!text || isTooShort(text, type)) return false;
+      if (type !== 'o4o/heading' && isMenuLike(text)) return false;
       return true;
     };
 
@@ -1116,12 +1120,12 @@ router.post('/url-to-blocks', authenticate, async (req, res: Response) => {
       }
       const textBlocks = normalizedBlocks
         .filter(b => b.type !== 'o4o/youtube')
-        .filter(b => isValidContent(b.content || ''))
+        .filter(b => isValidContent(b.content || '', b.type))
         .slice(0, 3);
       finalBlocks = [...ytBlocks, ...textBlocks];
     } else {
-      // 일반 페이지: 품질 필터 적용
-      finalBlocks = normalizedBlocks.filter(b => isValidContent(b.content || ''));
+      // 일반 페이지: 품질 필터 적용 (타입 인식)
+      finalBlocks = normalizedBlocks.filter(b => isValidContent(b.content || '', b.type));
     }
 
     // 6-C. 최대 블록 수 강제 제한
