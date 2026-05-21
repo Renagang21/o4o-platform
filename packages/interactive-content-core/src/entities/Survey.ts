@@ -131,6 +131,13 @@ export class Survey {
   @Column({ name: 'target_filter', type: 'jsonb', default: {} })
   targetFilter!: Record<string, any>;
 
+  // WO-O4O-SURVEY-POINT-REWARD-PHASE1-V1: 포인트 보상 설정
+  @Column({ name: 'reward_enabled', type: 'boolean', default: true })
+  rewardEnabled!: boolean;
+
+  @Column({ name: 'reward_amount', type: 'integer', default: 100 })
+  rewardAmount!: number;
+
   @Column({ type: 'uuid', nullable: true })
   createdBy?: string;
 

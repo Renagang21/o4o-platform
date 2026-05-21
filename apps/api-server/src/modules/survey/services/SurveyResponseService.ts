@@ -12,6 +12,7 @@ import {
   type QuestionAnswer,
 } from '@o4o/lms-core';
 import type { SubmitResponseDto } from '../dto/survey.dto.js';
+import { PointService } from '../../point/services/PointService.js';
 import logger from '../../../utils/logger.js';
 
 export class SurveyResponseService {
@@ -84,6 +85,26 @@ export class SurveyResponseService {
 
     // responseCount++
     await this.surveyRepo.increment({ id: surveyId }, 'responseCount', 1);
+
+    // WO-O4O-SURVEY-POINT-REWARD-PHASE1-V1: 포인트 보상 (기명 응답만, rewardEnabled=true 시)
+    if (!isAnonymous && userId) {
+      const survey = await this.surveyRepo.findOne({ where: { id: surveyId } });
+      if (survey?.rewardEnabled && survey.rewardAmount > 0) {
+        try {
+          await PointService.getInstance().grantPoint({
+            userId,
+            amount: survey.rewardAmount,
+            sourceType: 'survey_complete',
+            sourceId: surveyId,
+            referenceKey: `survey_complete:${userId}:${surveyId}`,
+            description: `설문 참여 보상: ${survey.title}`,
+            serviceKey: survey.serviceKey,
+          });
+        } catch (err) {
+          logger.warn('[Survey] Point grant failed', { surveyId, userId, error: (err as Error).message });
+        }
+      }
+    }
 
     logger.info(`[Survey] Response submitted`, { surveyId, anonymous: isAnonymous });
     return saved;

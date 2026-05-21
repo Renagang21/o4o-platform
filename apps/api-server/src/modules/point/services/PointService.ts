@@ -56,6 +56,7 @@ export type PointSourceType =
   | 'admin_grant'
   | 'admin_spend'
   | 'admin_adjust'
+  | 'survey_complete'  // WO-O4O-SURVEY-POINT-REWARD-PHASE1-V1
   | PointPayoutType;
 
 export interface GrantPointParams {

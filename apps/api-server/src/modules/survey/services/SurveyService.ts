@@ -60,6 +60,8 @@ export class SurveyService {
       organizationId: data.organizationId,
       visibility: data.visibility ?? SurveyVisibility.MEMBERS_ONLY,
       targetFilter: data.targetFilter ?? {},
+      rewardEnabled: data.rewardEnabled ?? true,
+      rewardAmount: data.rewardAmount ?? 100,
       createdBy: userId,
     });
 
@@ -146,6 +148,8 @@ export class SurveyService {
     if (data.maxResponses !== undefined) survey.maxResponses = data.maxResponses;
     if (data.visibility !== undefined) survey.visibility = data.visibility;
     if (data.targetFilter !== undefined) survey.targetFilter = data.targetFilter ?? {};
+    if (data.rewardEnabled !== undefined) survey.rewardEnabled = data.rewardEnabled;
+    if (data.rewardAmount !== undefined) survey.rewardAmount = data.rewardAmount;
 
     const saved = await this.surveyRepo.save(survey);
 

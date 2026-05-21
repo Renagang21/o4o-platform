@@ -77,6 +77,9 @@ const ParticipationRespondPage = lazy(() => import('./pages/participation/Partic
 const ParticipationResultPage = lazy(() => import('./pages/participation/ParticipationResultPage').then(m => ({ default: m.ParticipationResultPage })));
 // WO-O4O-SURVEY-CORE-PHASE1-V1: /content/surveys/new에서 allowedQuestionTypes/hideScopeField 사용
 import { QuestionType } from './pages/participation/types';
+// WO-O4O-SURVEY-POINT-REWARD-PHASE1-V1: 회원용 설문 목록/상세
+const SurveyListPage = lazy(() => import('./pages/survey/SurveyListPage'));
+const SurveyDetailPage = lazy(() => import('./pages/survey/SurveyDetailPage'));
 
 // Event Offer pages — Phase 2 lazy (barrel unwound)
 // WO-O4O-KPA-EVENT-OFFER-LIST-LEGACY-RETIRE-V1: legacy EventOfferListPage 제거.
@@ -820,6 +823,10 @@ function App() {
           <Route path="/mypage/credits" element={<MyPageGuard><Layout serviceName={SERVICE_NAME}><MyCreditsPage /></Layout></MyPageGuard>} />
           {/* WO-MYPAGE-STATE-BASED-IA-REDEFINITION-V1: completions → certificates redirect */}
           <Route path="/mypage/completions" element={<Navigate to="/mypage/certificates" replace />} />
+
+          {/* Survey (설문조사) — WO-O4O-SURVEY-POINT-REWARD-PHASE1-V1 */}
+          <Route path="/surveys" element={<Layout serviceName={SERVICE_NAME}><SurveyListPage /></Layout>} />
+          <Route path="/surveys/:id" element={<Layout serviceName={SERVICE_NAME}><SurveyDetailPage /></Layout>} />
 
           {/* Participation (참여) */}
           <Route path="/participation" element={<Layout serviceName={SERVICE_NAME}><ParticipationListPage /></Layout>} />

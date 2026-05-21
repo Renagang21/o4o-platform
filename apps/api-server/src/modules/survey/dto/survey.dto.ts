@@ -35,6 +35,10 @@ export interface CreateSurveyDto {
   allowMultipleResponses?: boolean;
   maxResponses?: number;
 
+  // WO-O4O-SURVEY-POINT-REWARD-PHASE1-V1
+  rewardEnabled?: boolean;
+  rewardAmount?: number;
+
   // O4O 공통 분류
   serviceKey?: string;
   ownerType?: SurveyOwnerType;
@@ -56,6 +60,8 @@ export interface UpdateSurveyDto {
   maxResponses?: number;
   visibility?: SurveyVisibility;
   targetFilter?: Record<string, any>;
+  rewardEnabled?: boolean;
+  rewardAmount?: number;
 }
 
 export interface SurveyListQuery {
