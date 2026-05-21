@@ -1,5 +1,5 @@
 import { lazy, Suspense, useRef, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
 // WO-O4O-STORE-PRODUCTS-QUERYCLIENT-PROVIDER-ALIGN-V1
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -386,6 +386,12 @@ function PostLoginRedirect() {
   return null;
 }
 
+// WO-O4O-LMS-ROUTING-UNIFICATION-V1: /lms/:id → /lms/course/:id legacy redirect
+function LmsCourseRedirect() {
+  const { id } = useParams<{ id: string }>();
+  return <Navigate to={`/lms/course/${id}`} replace />;
+}
+
 // App Routes
 function AppRoutes() {
   return (
@@ -411,8 +417,10 @@ function AppRoutes() {
         <Route path="forum/my-dashboard" element={<MyForumDashboardPage />} />
         <Route path="forum/feedback" element={<ForumFeedbackPage />} />
         {/* WO-O4O-GLYCOPHARM-HOME-KPA-ALIGNMENT-V1: /lms 통일 */}
+        {/* WO-O4O-LMS-ROUTING-UNIFICATION-V1: Canonical /lms/course/:id 정렬 */}
         <Route path="lms" element={<EducationPage />} />
-        <Route path="lms/:id" element={<CourseDetailPage />} />
+        <Route path="lms/course/:id" element={<CourseDetailPage />} />
+        <Route path="lms/:id" element={<LmsCourseRedirect />} />
         {/* WO-O4O-GLYCOPHARM-CONTENT-RESOURCES-ROUTE-ALIGNMENT-V1: top-level canonical paths */}
         <Route path="content" element={<HubContentListPage />} />
         <Route path="resources" element={<ResourcesPage />} />

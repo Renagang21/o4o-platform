@@ -406,7 +406,7 @@ export default function CourseDetailPage() {
   if (error || !course) {
     return (
       <div className="max-w-5xl mx-auto py-8 px-4">
-        <button onClick={() => navigate('/education')} className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 mb-6">
+        <button onClick={() => navigate('/lms')} className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 mb-6">
           <ArrowLeft className="w-4 h-4" /> 강의 목록으로
         </button>
         <div className="text-center py-16 bg-white rounded-2xl">
@@ -421,7 +421,7 @@ export default function CourseDetailPage() {
   return (
     <div className="max-w-5xl mx-auto py-8 px-4">
       {/* Back */}
-      <button onClick={() => navigate('/education')} className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 mb-6 transition-colors">
+      <button onClick={() => navigate('/lms')} className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 mb-6 transition-colors">
         <ArrowLeft className="w-4 h-4" /> 강의 목록으로
       </button>
 

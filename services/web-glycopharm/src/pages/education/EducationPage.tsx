@@ -29,7 +29,7 @@ const glycoConfig: LmsHubConfig = {
   serviceKey: 'glycopharm',
   heroTitle: '강의',
   heroDesc: '혈당관리 전문성을 높이는 다양한 교육 자료',
-  courseDetailPath: (id) => `/lms/${id}`,
+  courseDetailPath: (id) => `/lms/course/${id}`,
 
   fetchCourses: async (params) => {
     const result = await lmsApi.getCourses({
