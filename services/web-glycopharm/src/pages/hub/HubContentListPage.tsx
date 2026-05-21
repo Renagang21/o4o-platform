@@ -12,33 +12,13 @@ import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check, Loader2, Download, FileText, ExternalLink, Image as ImageIcon } from 'lucide-react';
 import { ContentHubTemplate, type ContentHubConfig, type ContentHubItem, type ContentHubItemContext } from '@o4o/shared-space-ui';
-import { apiClient } from '@/services/api';
+import { hubContentApi, type HubContentItemResponse } from '@/api/hubContent';
 import { useAuth } from '@/contexts/AuthContext';
 import { dashboardCopyApi } from '@/api/dashboardCopy';
 
-// ─── API Types ────────────────────────────────────────────────────────────────
-
-interface HubContentApiItem {
-  id: string;
-  title: string;
-  description?: string | null;
-  thumbnailUrl?: string | null;
-  imageUrl?: string | null;
-  linkUrl?: string | null;
-  cmsType?: string | null;
-  createdAt: string;
-  publishedAt?: string | null;
-}
-
-interface HubContentApiResponse {
-  success: boolean;
-  data: HubContentApiItem[];
-  pagination: { page: number; limit: number; total: number; totalPages: number };
-}
-
 // ─── Adapter ──────────────────────────────────────────────────────────────────
 
-function apiItemToContentHubItem(item: HubContentApiItem): ContentHubItem {
+function apiItemToContentHubItem(item: HubContentItemResponse): ContentHubItem {
   return {
     id: item.id,
     title: item.title,
@@ -172,20 +152,14 @@ function useGlycoContentHubConfig(userId?: string, navigate?: (path: string) => 
     pageLimit: 12,
 
     fetchItems: async ({ filter, search, page, limit }) => {
-      const params = new URLSearchParams({
-        serviceKey: 'glycopharm',
-        sourceDomain: 'cms',
-        page: String(page),
-        limit: String(limit),
-      });
-      if (filter !== 'all') params.set('type', filter);
-      if (search) params.set('search', search);
-
       try {
-        const res = await apiClient.get<HubContentApiResponse>(
-          `/api/v1/hub/contents?${params.toString()}`
-        );
-        const data = res.data;
+        const data = await hubContentApi.list({
+          sourceDomain: 'cms',
+          type: filter !== 'all' ? filter : undefined,
+          search: search || undefined,
+          page,
+          limit,
+        });
         const list = Array.isArray(data?.data) ? data.data : [];
         return {
           items: list.map(apiItemToContentHubItem),
