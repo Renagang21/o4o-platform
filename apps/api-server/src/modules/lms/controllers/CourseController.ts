@@ -3,6 +3,7 @@ import { CourseVisibility } from '@o4o/lms-core';
 import { BaseController } from '../../../common/base.controller.js';
 import { CourseService } from '../services/CourseService.js';
 import { roleAssignmentService } from '../../auth/services/role-assignment.service.js';
+import { AppDataSource } from '../../../database/connection.js';
 import logger from '../../../utils/logger.js';
 
 /**
@@ -40,6 +41,15 @@ export class CourseController extends BaseController {
       // Set instructorId to current user if not specified
       if (!data.instructorId && userId) {
         data.instructorId = userId;
+      }
+
+      // WO-O4O-LMS-COURSE-SERVICEKEY-V1: derive serviceKey from creator's active service membership
+      if (!data.serviceKey && userId) {
+        const [membership] = await AppDataSource.query<{ service_key: string }[]>(
+          `SELECT service_key FROM service_memberships WHERE user_id = $1 AND status = 'active' AND service_key <> 'platform' ORDER BY created_at ASC LIMIT 1`,
+          [userId],
+        );
+        data.serviceKey = membership?.service_key ?? null;
       }
 
       const service = CourseService.getInstance();

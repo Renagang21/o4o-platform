@@ -46,6 +46,8 @@ export interface CreateCourseRequest {
   // WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1: 매장 자료함 가져가기 허용 정책 (미전달 시 RESTRICTED)
   // visibility(수강 접근성)와 독립된 별개 축. 두 축을 혼동하지 말 것.
   reusablePolicy?: CourseReusablePolicy;
+  // WO-O4O-LMS-COURSE-SERVICEKEY-V1: 서비스 소유권 — 생성 시 자동 도출. null = legacy/미분류.
+  serviceKey?: string | null;
 }
 
 export interface UpdateCourseRequest extends Partial<CreateCourseRequest> {

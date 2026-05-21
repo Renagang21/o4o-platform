@@ -16,7 +16,7 @@ import { asyncHandler } from '../../../middleware/error-handler.js';
 import { requireEnrollment } from '../middleware/requireEnrollment.js';
 import { requireInstructor } from '../middleware/requireInstructor.js';
 // WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: KPA scope guard replaces legacy requireKpaAdmin
-import { KPA_SCOPE_CONFIG } from '@o4o/security-core';
+import { KPA_SCOPE_CONFIG, resolveCanonicalServiceKey } from '@o4o/security-core';
 import { createMembershipScopeGuard } from '../../../common/middleware/membership-guard.middleware.js';
 // WO-O4O-LMS-GLOBAL-OPERATOR-ROUTES-V1
 import { CourseService } from '../services/CourseService.js';
@@ -34,6 +34,24 @@ const requireLmsOperator = requireRole([
   'cosmetics:admin', 'cosmetics:operator',
   'glycopharm:admin', 'glycopharm:operator',
 ]);
+
+// WO-O4O-LMS-COURSE-SERVICEKEY-V1: Service-scope check for operator course actions.
+// Returns true if the operator's service matches the course's serviceKey.
+// Platform admins bypass. Courses with null serviceKey allow all operators (legacy compat).
+const PLATFORM_ADMIN_ROLES = new Set(['admin', 'super_admin', 'platform:admin', 'platform:super_admin']);
+function isCourseAccessibleByOperator(roles: string[], courseServiceKey: string | null | undefined): boolean {
+  if (roles.some(r => PLATFORM_ADMIN_ROLES.has(r))) return true;
+  if (!courseServiceKey) return true; // legacy/unscoped course: backward compat
+  for (const role of roles) {
+    const colon = role.indexOf(':');
+    if (colon <= 0) continue;
+    const prefix = role.slice(0, colon);
+    if (prefix !== 'lms' && prefix !== 'platform') {
+      return resolveCanonicalServiceKey(prefix) === courseServiceKey;
+    }
+  }
+  return false; // no identifiable service in roles
+}
 
 const router: Router = Router();
 
@@ -428,8 +446,11 @@ router.post('/operator/courses/:id/approve', requireAuth, requireLmsOperator, as
   const service = CourseService.getInstance();
   const course = await service.getCourse(req.params.id);
   if (!course) { return res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); }
+  const userRoles: string[] = (req as any).user?.roles || [];
+  if (!isCourseAccessibleByOperator(userRoles, course.serviceKey)) {
+    return res.status(403).json({ success: false, error: '해당 서비스의 강의에 접근할 권한이 없습니다.', code: 'SERVICE_SCOPE_VIOLATION' });
+  }
   try {
-    const userRoles: string[] = (req as any).user?.roles || [];
     const updated = await service.approveCourse(req.params.id, {
       id: (req as any).user?.id,
       role: userRoles[0] ?? null,
@@ -448,9 +469,12 @@ router.post('/operator/courses/:id/reject', requireAuth, requireLmsOperator, asy
   const service = CourseService.getInstance();
   const course = await service.getCourse(req.params.id);
   if (!course) { return res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); }
+  const userRoles: string[] = (req as any).user?.roles || [];
+  if (!isCourseAccessibleByOperator(userRoles, course.serviceKey)) {
+    return res.status(403).json({ success: false, error: '해당 서비스의 강의에 접근할 권한이 없습니다.', code: 'SERVICE_SCOPE_VIOLATION' });
+  }
   const reason = typeof req.body?.reason === 'string' ? req.body.reason : '';
   try {
-    const userRoles: string[] = (req as any).user?.roles || [];
     const updated = await service.rejectCourse(req.params.id, reason, {
       id: (req as any).user?.id,
       role: userRoles[0] ?? null,
@@ -472,6 +496,10 @@ router.post('/operator/courses/:id/unpublish', requireAuth, requireLmsOperator, 
   const service = CourseService.getInstance();
   const course = await service.getCourse(req.params.id);
   if (!course) { return res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); }
+  const userRoles: string[] = (req as any).user?.roles || [];
+  if (!isCourseAccessibleByOperator(userRoles, course.serviceKey)) {
+    return res.status(403).json({ success: false, error: '해당 서비스의 강의에 접근할 권한이 없습니다.', code: 'SERVICE_SCOPE_VIOLATION' });
+  }
   const updated = await service.unpublishCourse(req.params.id);
   return res.json({ success: true, data: { course: updated } });
 }));
@@ -481,6 +509,10 @@ router.post('/operator/courses/:id/archive', requireAuth, requireLmsOperator, as
   const service = CourseService.getInstance();
   const course = await service.getCourse(req.params.id);
   if (!course) { return res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); }
+  const userRoles: string[] = (req as any).user?.roles || [];
+  if (!isCourseAccessibleByOperator(userRoles, course.serviceKey)) {
+    return res.status(403).json({ success: false, error: '해당 서비스의 강의에 접근할 권한이 없습니다.', code: 'SERVICE_SCOPE_VIOLATION' });
+  }
   const updated = await service.archiveCourse(req.params.id);
   return res.json({ success: true, data: { course: updated } });
 }));
@@ -490,6 +522,10 @@ router.delete('/operator/courses/:id/hard', requireAuth, requireLmsOperator, asy
   const service = CourseService.getInstance();
   const course = await service.getCourse(req.params.id);
   if (!course) { return res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); }
+  const userRoles: string[] = (req as any).user?.roles || [];
+  if (!isCourseAccessibleByOperator(userRoles, course.serviceKey)) {
+    return res.status(403).json({ success: false, error: '해당 서비스의 강의에 접근할 권한이 없습니다.', code: 'SERVICE_SCOPE_VIOLATION' });
+  }
   if (course.status !== 'archived') {
     return res.status(400).json({ success: false, error: '종료(보관) 상태의 강의만 완전 삭제할 수 있습니다.' });
   }

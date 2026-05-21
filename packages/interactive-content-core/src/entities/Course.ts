@@ -97,6 +97,12 @@ export class Course {
   @Column({ name: 'rejectionReason', type: 'text', nullable: true })
   rejectionReason?: string | null;
 
+  // WO-O4O-LMS-COURSE-SERVICEKEY-V1: Service ownership — cross-service operator access control.
+  // Values: canonical service keys (e.g. 'kpa-society', 'k-cosmetics', 'glycopharm').
+  // null = legacy / platform-wide course (accessible to all operators).
+  @Column({ name: 'service_key', type: 'varchar', length: 100, nullable: true })
+  serviceKey?: string | null;
+
   // WO-KPA-CONTENT-COURSE-KIND-SEPARATION-V1: 코스형 자료 vs 일반 강의 분류
   @Column({ name: 'content_kind', type: 'varchar', length: 30, default: ContentKind.LECTURE })
   contentKind!: ContentKind;
