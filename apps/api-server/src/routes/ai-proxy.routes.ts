@@ -288,6 +288,12 @@ async function fetchUrlText(url: string): Promise<string> {
     // 폴백: 일반 fetch 도 거의 의미 없지만 시도는 해 둔다
   }
 
+  // WO-O4O-AI-URL-NAVER-BLOG-IFRAME-POSTVIEW-EXTRACTOR-V1
+  if (isNaverBlogUrl(url)) {
+    const { text } = await fetchNaverBlogContent(url);
+    return text;
+  }
+
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 15000);
 
@@ -329,6 +335,94 @@ async function fetchUrlText(url: string): Promise<string> {
  */
 interface UrlContent { text: string; title?: string }
 
+// WO-O4O-AI-URL-NAVER-BLOG-IFRAME-POSTVIEW-EXTRACTOR-V1
+function isNaverBlogUrl(url: string): boolean {
+  try {
+    const { hostname } = new URL(url);
+    return hostname === 'blog.naver.com' || hostname === 'm.blog.naver.com';
+  } catch {
+    return false;
+  }
+}
+
+// 네이버 블로그 PostView HTML에서 본문 텍스트 추출 (se-main-container 우선)
+function extractNaverBlogText(html: string): string {
+  // se-main-container (스마트에디터 최신 글)
+  const seMain = html.match(/<div[^>]+class="[^"]*se-main-container[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>/i);
+  if (seMain) {
+    const text = stripHtml(seMain[1]);
+    if (text.trim().length >= 50) return text;
+  }
+
+  // post-view (구형 에디터)
+  const postView = html.match(/<div[^>]+class="[^"]*post-view[^"]*"[^>]*>([\s\S]*?)<\/div>/i);
+  if (postView) {
+    const text = stripHtml(postView[1]);
+    if (text.trim().length >= 50) return text;
+  }
+
+  // viewTypeSelector (일부 레이아웃)
+  const viewType = html.match(/<div[^>]+id="viewTypeSelector"[^>]*>([\s\S]*?)<\/div>/i);
+  if (viewType) {
+    const text = stripHtml(viewType[1]);
+    if (text.trim().length >= 50) return text;
+  }
+
+  // fallback: 전체 stripHtml
+  return stripHtml(html);
+}
+
+async function fetchNaverBlogContent(url: string): Promise<UrlContent> {
+  const fetchOpts = {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (compatible; O4O-AI-Bot/1.0)',
+      'Accept': 'text/html,application/xhtml+xml,text/plain',
+    },
+  };
+
+  // 1. 첫 페이지 fetch
+  const ctrl1 = new AbortController();
+  const t1 = setTimeout(() => ctrl1.abort(), 12000);
+  let firstHtml: string;
+  try {
+    const res = await fetch(url, { ...fetchOpts, signal: ctrl1.signal });
+    if (!res.ok) throw new Error(`네이버 블로그 fetch 실패: ${res.status}`);
+    firstHtml = await res.text();
+  } finally {
+    clearTimeout(t1);
+  }
+
+  // 2. iframe#mainFrame src 추출
+  const iframeMatch = firstHtml.match(/<iframe[^>]+id=["']mainFrame["'][^>]+src=["']([^"']+)["']/i)
+    || firstHtml.match(/<iframe[^>]+src=["']([^"']+)["'][^>]+id=["']mainFrame["']/i);
+
+  let postViewHtml = firstHtml;
+  let resolvedTitle = extractHtmlTitle(firstHtml);
+
+  if (iframeMatch) {
+    const iframeSrc = iframeMatch[1];
+    // 상대경로 → 절대 URL
+    const postViewUrl = iframeSrc.startsWith('http')
+      ? iframeSrc
+      : `https://blog.naver.com${iframeSrc.startsWith('/') ? '' : '/'}${iframeSrc}`;
+
+    const ctrl2 = new AbortController();
+    const t2 = setTimeout(() => ctrl2.abort(), 12000);
+    try {
+      const res2 = await fetch(postViewUrl, { ...fetchOpts, signal: ctrl2.signal });
+      if (res2.ok) {
+        postViewHtml = await res2.text();
+        resolvedTitle = extractHtmlTitle(postViewHtml) || resolvedTitle;
+      }
+    } finally {
+      clearTimeout(t2);
+    }
+  }
+
+  const text = extractNaverBlogText(postViewHtml).slice(0, URL_EXTRACT_MAX_CHARS);
+  return { text, title: resolvedTitle };
+}
+
 async function fetchUrlContent(url: string): Promise<UrlContent> {
   if (isYouTubeUrl(url)) {
     // oEmbed 와 본문(자막+metadata)을 병렬 호출 — 추가 latency 없음
@@ -343,6 +437,11 @@ async function fetchUrlContent(url: string): Promise<UrlContent> {
       };
     }
     // 폴백: 일반 fetch — 보통 SPA 라 본문도 부족하지만 흐름 유지
+  }
+
+  // WO-O4O-AI-URL-NAVER-BLOG-IFRAME-POSTVIEW-EXTRACTOR-V1
+  if (isNaverBlogUrl(url)) {
+    return fetchNaverBlogContent(url);
   }
 
   const controller = new AbortController();
