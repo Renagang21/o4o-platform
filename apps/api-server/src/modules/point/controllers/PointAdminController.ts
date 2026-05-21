@@ -68,6 +68,9 @@ export class PointAdminController extends BaseController {
         deduped: tx === null,
       });
     } catch (error: any) {
+      if (error?.message === 'INSUFFICIENT_BUDGET') {
+        return BaseController.badRequest(res, '예산이 부족합니다', 'INSUFFICIENT_BUDGET');
+      }
       logger.error('[PointAdminController.grant] Error', { error: error.message });
       return BaseController.error(res, error);
     }
