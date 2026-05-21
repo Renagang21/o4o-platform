@@ -25,7 +25,7 @@
  *
  * - 인증: credentials: 'include' (쿠키 기반 fallback) + aiRequestHeaders prop (Bearer 토큰 등 명시 주입)
  * - 삽입: editor.commands.setContent(html) → TipTap onUpdate → onChange 자동 트리거
- * - 모드: 고객용 문장 정리 / 짧게 요약 / POP용 정리 / 제목 추천 / 블로그 글 / QR 안내문
+ * - initialMode: POP / 제목 추천 / 블로그 글 / QR 안내문 (Extension 진입). 없으면 flexible 자유 입력.
  */
 
 import { useEffect, useState } from 'react';
@@ -113,11 +113,11 @@ interface AiContentModalProps {
   onProductionMaterialSaved?: (assetId: string | undefined) => void;
   /**
    * WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-AI-FLOW-V1: 모달 첫 진입 mode 오버라이드.
-   * - 미제공 시 기존 동작 유지 ('customer_rewrite' 로 시작)
-   * - 매장 제작 자료 흐름처럼 유형(POP/QR/블로그/상품 상세설명)을 미리 선택하고 진입할 때 사용
+   * - 미제공 시 general flexible 진입 (추가 요청사항이 결과 형식 결정)
+   * - POP/QR/블로그/제목 추천처럼 진입 유형을 고정할 때 사용
    * - 사용자가 모달 안에서 다른 mode 로 전환 시 그 선택을 유지 (re-mount 시점에만 적용)
    */
-  initialMode?: 'customer_rewrite' | 'summary' | 'pop' | 'title_suggest' | 'blog' | 'store_qr';
+  initialMode?: 'pop' | 'title_suggest' | 'blog' | 'store_qr';
   /**
    * WO-O4O-AI-LESSON-FLOW-FIX-V1: 헤더/입력 라벨 LMS 문맥 오버라이드.
    * - 미제공 시 기존 기본값("AI 콘텐츠 정리", "https://example.com/article") 유지
@@ -171,7 +171,7 @@ interface AiContentModalProps {
   };
 }
 
-type AiMode = 'customer_rewrite' | 'summary' | 'pop' | 'title_suggest' | 'blog' | 'store_qr';
+type AiMode = 'pop' | 'title_suggest' | 'blog' | 'store_qr';
 type ToneOption = 'friendly' | 'professional' | 'concise';
 type LengthOption = 'short' | 'medium' | 'long';
 type ResultTab = 'preview' | 'html';
@@ -196,12 +196,10 @@ interface UrlBlock {
 //   `store_sns` 는 본 WO 범위 외 — 후속 결정.
 //   디지털 사이니지 outputType 은 카탈로그 자체에 부재 (격리 유지).
 const MODE_CONFIG: { key: AiMode; label: string; outputType: string; desc: string }[] = [
-  { key: 'customer_rewrite', label: '고객용 정리', outputType: 'product_detail', desc: '고객이 읽기 쉬운 상품 설명으로 정리' },
-  { key: 'summary',          label: '짧게 요약',  outputType: 'summary',        desc: '핵심만 남겨 3-5줄로 요약' },
-  { key: 'pop',              label: 'POP용 정리', outputType: 'pop',            desc: 'POP 템플릿용 짧은 문구 세트' },
-  { key: 'title_suggest',    label: '제목 추천',  outputType: 'title_suggest',  desc: '콘텐츠/POP/QR 제목 후보 추천' },
-  { key: 'blog',             label: '블로그 글',  outputType: 'blog',           desc: '블로그 게시용 본문으로 재구성' },
-  { key: 'store_qr',         label: 'QR 안내문',  outputType: 'store_qr',       desc: 'QR 스캔 후 보여줄 짧은 안내문 생성' },
+  { key: 'pop',           label: 'POP용 정리', outputType: 'pop',           desc: 'POP 템플릿용 짧은 문구 세트' },
+  { key: 'title_suggest', label: '제목 추천',  outputType: 'title_suggest', desc: '콘텐츠/POP/QR 제목 후보 추천' },
+  { key: 'blog',          label: '블로그 글',  outputType: 'blog',          desc: '블로그 게시용 본문으로 재구성' },
+  { key: 'store_qr',      label: 'QR 안내문',  outputType: 'store_qr',      desc: 'QR 스캔 후 보여줄 짧은 안내문 생성' },
 ];
 
 const TONE_LABELS: Record<ToneOption, string> = {
@@ -326,10 +324,10 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
   //   useState 초기값은 첫 mount 시점에만 평가됨. 따라서 open 또는 initialMode 가 바뀔 때
   //   useEffect 로 mode 를 재설정한다 (사용자가 모달 안에서 다른 mode 로 전환한 뒤 닫고 다시
   //   열면 다시 initialMode 로 돌아옴 — 진입 컨텍스트 우선).
-  const [mode, setMode] = useState<AiMode>(initialMode ?? 'customer_rewrite');
+  const [mode, setMode] = useState<AiMode>(initialMode ?? 'pop');
   useEffect(() => {
     if (open) {
-      setMode(initialMode ?? 'customer_rewrite');
+      setMode(initialMode ?? 'pop');
     }
   }, [open, initialMode]);
   // WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-AI-BRIDGE-V1:
@@ -807,7 +805,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
     setCustomPrompt('');
     setSourceTab(initialSourceTab ?? 'text');
     // WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-AI-FLOW-V1
-    setMode(initialMode ?? 'customer_rewrite');
+    setMode(initialMode ?? 'pop');
     onClose();
   };
 
