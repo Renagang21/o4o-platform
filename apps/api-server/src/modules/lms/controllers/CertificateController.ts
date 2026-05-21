@@ -9,6 +9,24 @@ import logger from '../../../utils/logger.js';
  * LMS Module - Certificate Management
  * Handles certificate issuance and verification
  */
+
+/**
+ * WO-O4O-LMS-CERTIFICATE-DOMAIN-V1
+ * Map course.serviceKey → frontend base URL for certificate verification links.
+ * null/unknown serviceKey = legacy course → KPA fallback for backward compat.
+ */
+function resolveVerificationBase(serviceKey: string | null | undefined): string {
+  switch (serviceKey) {
+    case 'k-cosmetics':
+      return process.env.KCOSMETICS_FRONTEND_URL || process.env.FRONTEND_URL || 'https://k-cosmetics.co.kr';
+    case 'glycopharm':
+      return process.env.GLYCOPHARM_FRONTEND_URL || process.env.FRONTEND_URL || 'https://glycopharm.co.kr';
+    case 'kpa-society':
+    default:
+      return process.env.KPA_FRONTEND_URL || process.env.FRONTEND_URL || 'https://kpa-society.co.kr';
+  }
+}
+
 export class CertificateController extends BaseController {
   static async issueCertificate(req: Request, res: Response): Promise<any> {
     try {
@@ -252,11 +270,8 @@ export class CertificateController extends BaseController {
       const userName = (certificate.user as any)?.name || '수강자';
       const courseTitle = certificate.course?.title || '과정';
 
-      // WO-O4O-LMS-CERTIFICATE-ACCESS-ENHANCEMENT-V1: 검증 URL 생성
-      const frontendBase =
-        process.env.KPA_FRONTEND_URL ||
-        process.env.FRONTEND_URL ||
-        'https://kpa-society.co.kr';
+      // WO-O4O-LMS-CERTIFICATE-DOMAIN-V1: serviceKey 기준 도메인 결정 (legacy null → KPA fallback)
+      const frontendBase = resolveVerificationBase(certificate.course?.serviceKey);
       const verificationUrl = `${frontendBase}/certificate/verify/${certificate.id}`;
 
       const pdfBuffer = await generateCertificatePdf({
