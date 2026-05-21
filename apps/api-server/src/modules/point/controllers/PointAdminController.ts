@@ -33,7 +33,7 @@ export class PointAdminController extends BaseController {
    */
   static async grant(req: Request, res: Response): Promise<any> {
     try {
-      const { userId, amount, description, requestId } = req.body ?? {};
+      const { userId, amount, description, requestId, serviceKey } = req.body ?? {};
 
       if (!userId || typeof userId !== 'string') {
         return BaseController.badRequest(res, 'userId is required', 'INVALID_USER_ID');
@@ -50,12 +50,14 @@ export class PointAdminController extends BaseController {
         ? `admin_grant:${userId}:${requestId.trim()}`
         : `admin_grant:${userId}:${operatorId}:${Date.now()}`;
 
+      // WO-O4O-SERVICE-OPERATOR-POINT-BUDGET-PHASE1-V1: serviceKey → 예산 체크/차감 연동
       const tx = await PointService.getInstance().grantPoint({
         userId,
         amount,
         sourceType: 'admin_grant',
         referenceKey,
         description: desc,
+        serviceKey: typeof serviceKey === 'string' && serviceKey.trim() ? serviceKey.trim() : undefined,
       });
 
       logger.info('[PointAdmin] grant', { operatorId, userId, amount, referenceKey });
