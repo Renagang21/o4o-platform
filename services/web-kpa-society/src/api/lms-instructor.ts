@@ -337,6 +337,18 @@ export const lmsInstructorApi = {
       };
     }>(`/lms/instructor/participants/${courseId}/summary`),
 
+  /** 강의 포인트 지급 현황 (WO-O4O-KPA-LMS-OPERATIONS-POINT-REWARD-VIEW-V1) */
+  coursePoints: (courseId: string, params?: { page?: number; limit?: number }) => {
+    const qs = new URLSearchParams();
+    if (params?.page) qs.set('page', String(params.page));
+    if (params?.limit) qs.set('limit', String(params.limit));
+    const suffix = qs.toString() ? `?${qs.toString()}` : '';
+    return authClient.api.get<{
+      success: boolean;
+      data: CoursePointsData;
+    }>(`/lms/instructor/courses/${courseId}/points${suffix}`);
+  },
+
   /** CSV 내보내기 URL 반환 — fetch + blob 다운로드용 */
   participantsExportUrl: (courseId: string, params?: { status?: string; credited?: string; query?: string }) => {
     const qs = new URLSearchParams();
@@ -463,5 +475,32 @@ export interface UpsertAssignmentDto {
   lessonId: string;
   instructions?: string | null;
   dueDate?: string | null;
+}
+
+// WO-O4O-KPA-LMS-OPERATIONS-POINT-REWARD-VIEW-V1
+export interface CoursePointTransaction {
+  id: string;
+  userId: string;
+  userName: string;
+  amount: number;
+  sourceType: string;
+  sourceLabel: string;
+  description: string | null;
+  grantedAt: string;
+  status: 'granted';
+}
+
+export interface CoursePointsSummary {
+  totalAmount: number;
+  totalCount: number;
+  uniqueUsers: number;
+  lastGrantedAt: string | null;
+  insufficientBudgetCount: number;
+}
+
+export interface CoursePointsData {
+  summary: CoursePointsSummary;
+  transactions: CoursePointTransaction[];
+  pagination: { page: number; limit: number; total: number; totalPages: number };
 }
 

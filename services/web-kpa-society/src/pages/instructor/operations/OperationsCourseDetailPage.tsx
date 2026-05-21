@@ -18,7 +18,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { BaseTable, type O4OColumn } from '@o4o/ui';
-import { lmsInstructorApi } from '../../../api/lms-instructor';
+import { lmsInstructorApi, type CoursePointsData, type CoursePointTransaction } from '../../../api/lms-instructor';
 import { colors, typography } from '../../../styles/theme';
 
 type CourseHeader = {
@@ -163,6 +163,11 @@ export default function OperationsCourseDetailPage() {
   const [participantsLoading, setParticipantsLoading] = useState(true);
   const [participantsError, setParticipantsError] = useState<string | null>(null);
 
+  // 포인트 지급 현황 상태 (WO-O4O-KPA-LMS-OPERATIONS-POINT-REWARD-VIEW-V1)
+  const [pointsData, setPointsData] = useState<CoursePointsData | null>(null);
+  const [pointsLoading, setPointsLoading] = useState(true);
+  const [pointsError, setPointsError] = useState<string | null>(null);
+
   useEffect(() => {
     if (!courseId) return;
     let cancelled = false;
@@ -219,6 +224,21 @@ export default function OperationsCourseDetailPage() {
         if (!cancelled) setParticipantsError('수강 회원 목록을 불러오지 못했습니다.');
       } finally {
         if (!cancelled) setParticipantsLoading(false);
+      }
+    })();
+
+    // 포인트 지급 현황 (WO-O4O-KPA-LMS-OPERATIONS-POINT-REWARD-VIEW-V1)
+    (async () => {
+      try {
+        setPointsLoading(true);
+        setPointsError(null);
+        const res = await lmsInstructorApi.coursePoints(courseId, { limit: 50 });
+        if (cancelled) return;
+        setPointsData(res.data?.data ?? null);
+      } catch {
+        if (!cancelled) setPointsError('포인트 지급 현황을 불러오지 못했습니다.');
+      } finally {
+        if (!cancelled) setPointsLoading(false);
       }
     })();
 
@@ -322,6 +342,65 @@ export default function OperationsCourseDetailPage() {
       render: () => (
         <span style={{ fontSize: '12px', color: colors.neutral300 }} title="추후 backend 확장 예정">
           -
+        </span>
+      ),
+    },
+  ], []);
+
+  // 포인트 지급 내역 컬럼 (WO-O4O-KPA-LMS-OPERATIONS-POINT-REWARD-VIEW-V1)
+  const pointColumns = useMemo<O4OColumn<CoursePointTransaction>[]>(() => [
+    {
+      key: 'userName',
+      header: '회원명',
+      render: (_v, row) => (
+        <span style={{ fontWeight: 600, color: colors.neutral900 }}>
+          {row.userName || '(이름 없음)'}
+        </span>
+      ),
+    },
+    {
+      key: 'sourceLabel',
+      header: '지급 사유',
+      render: (_v, row) => (
+        <span style={{ fontSize: '13px', color: colors.neutral700 }}>{row.sourceLabel}</span>
+      ),
+    },
+    {
+      key: 'amount',
+      header: '지급 포인트',
+      width: '110px',
+      align: 'right',
+      render: (_v, row) => (
+        <span style={{ fontWeight: 600, color: '#2563eb' }}>+{row.amount.toLocaleString()}</span>
+      ),
+    },
+    {
+      key: 'status',
+      header: '지급 상태',
+      width: '100px',
+      align: 'center',
+      render: () => (
+        <span style={{
+          display: 'inline-block',
+          padding: '2px 10px',
+          borderRadius: '999px',
+          fontSize: '11px',
+          fontWeight: 600,
+          backgroundColor: '#dcfce7',
+          color: '#15803d',
+        }}>
+          지급 완료
+        </span>
+      ),
+    },
+    {
+      key: 'grantedAt',
+      header: '지급 일시',
+      width: '130px',
+      align: 'center',
+      render: (_v, row) => (
+        <span style={{ fontSize: '12px', color: colors.neutral500 }}>
+          {formatDate(row.grantedAt)}
         </span>
       ),
     },
@@ -461,6 +540,70 @@ export default function OperationsCourseDetailPage() {
         )}
       </div>
 
+      {/* 포인트 지급 현황 (WO-O4O-KPA-LMS-OPERATIONS-POINT-REWARD-VIEW-V1) */}
+      <div style={styles.tableCard}>
+        <div style={styles.tableHeader}>
+          <div>
+            <h2 style={styles.sectionTitle}>포인트 지급 현황</h2>
+            <p style={styles.sectionHint}>퀴즈 통과·레슨 완료·강의 완료 시 자동 지급된 포인트 내역입니다. (조회 전용)</p>
+          </div>
+        </div>
+
+        {pointsError && <div style={styles.errorBanner}>{pointsError}</div>}
+
+        {!pointsError && pointsLoading && (
+          <div style={styles.stateBox}>포인트 현황을 불러오는 중...</div>
+        )}
+
+        {!pointsError && !pointsLoading && pointsData && (
+          <>
+            {/* 요약 미니 KPI */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '10px', marginBottom: '16px' }}>
+              <div style={styles.miniKpi}>
+                <p style={styles.miniKpiLabel}>총 지급 포인트</p>
+                <p style={styles.miniKpiValue}>{pointsData.summary.totalAmount.toLocaleString()}</p>
+              </div>
+              <div style={styles.miniKpi}>
+                <p style={styles.miniKpiLabel}>총 지급 건수</p>
+                <p style={styles.miniKpiValue}>{pointsData.summary.totalCount.toLocaleString()}</p>
+              </div>
+              <div style={styles.miniKpi}>
+                <p style={styles.miniKpiLabel}>지급 회원 수</p>
+                <p style={styles.miniKpiValue}>{pointsData.summary.uniqueUsers.toLocaleString()}</p>
+              </div>
+              <div style={styles.miniKpi}>
+                <p style={styles.miniKpiLabel}>최근 지급</p>
+                <p style={styles.miniKpiValue}>{formatDate(pointsData.summary.lastGrantedAt)}</p>
+              </div>
+              <div style={styles.miniKpi}>
+                <p style={styles.miniKpiLabel}>예산 부족 미지급</p>
+                <p style={{ ...styles.miniKpiValue, color: colors.neutral400 }}>
+                  {pointsData.summary.insufficientBudgetCount}
+                  <span style={{ fontSize: '10px', marginLeft: '4px' }}>(Phase 1 미추적)</span>
+                </p>
+              </div>
+            </div>
+
+            {/* 지급 내역 테이블 */}
+            <BaseTable<CoursePointTransaction>
+              columns={pointColumns}
+              data={pointsData.transactions}
+              rowKey={(row) => row.id}
+              emptyMessage={
+                <div style={{ textAlign: 'center', padding: '32px 0', color: colors.neutral400 }}>
+                  아직 지급된 포인트가 없습니다.
+                </div>
+              }
+            />
+            {pointsData.pagination.total > pointsData.transactions.length && (
+              <p style={{ fontSize: '12px', color: colors.neutral400, textAlign: 'center', marginTop: '8px' }}>
+                최근 {pointsData.transactions.length}건 표시 중 (전체 {pointsData.pagination.total}건)
+              </p>
+            )}
+          </>
+        )}
+      </div>
+
       {/* 운영 기능 섹션 (canonical extension points) */}
       <div style={styles.sectionGrid}>
         <SectionCard
@@ -552,5 +695,22 @@ const styles: Record<string, React.CSSProperties> = {
     border: `1px solid ${colors.primary}`,
     borderRadius: '6px',
     cursor: 'pointer',
+  },
+  miniKpi: {
+    backgroundColor: '#f8fafc',
+    borderRadius: '8px',
+    padding: '10px 14px',
+  },
+  miniKpiLabel: {
+    fontSize: '11px',
+    color: colors.neutral500,
+    margin: '0 0 4px',
+  },
+  miniKpiValue: {
+    fontSize: '18px',
+    fontWeight: 700,
+    color: colors.neutral900,
+    margin: 0,
+    lineHeight: 1,
   },
 };

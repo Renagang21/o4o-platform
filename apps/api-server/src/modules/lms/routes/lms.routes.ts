@@ -215,6 +215,9 @@ router.get('/instructor/courses', requireAuth, requireInstructor, asyncHandler(I
 // GET /api/v1/lms/instructor/courses/:courseId/lessons - Instructor Lessons (WO-O4O-LMS-MEMBERSHIP-COURSE-E2E-BUGFIX-V1)
 router.get('/instructor/courses/:courseId/lessons', requireAuth, requireInstructor, asyncHandler(InstructorController.courseLessons));
 
+// GET /api/v1/lms/instructor/courses/:courseId/points - 강의 포인트 지급 현황 (WO-O4O-KPA-LMS-OPERATIONS-POINT-REWARD-VIEW-V1)
+router.get('/instructor/courses/:courseId/points', requireAuth, requireInstructor, asyncHandler(InstructorController.coursePoints));
+
 // GET /api/v1/lms/instructor/enrollments - Pending Enrollments for My Courses (Instructor)
 router.get('/instructor/enrollments', requireAuth, requireInstructor, asyncHandler(InstructorController.pendingEnrollments));
 

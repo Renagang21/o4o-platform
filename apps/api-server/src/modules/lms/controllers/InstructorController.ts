@@ -1045,4 +1045,150 @@ export class InstructorController extends BaseController {
       return BaseController.error(res, error);
     }
   }
+
+  // ========================================
+  // 강의 포인트 지급 현황 (WO-O4O-KPA-LMS-OPERATIONS-POINT-REWARD-VIEW-V1)
+  // ========================================
+
+  /**
+   * GET /instructor/courses/:courseId/points?page=1&limit=50
+   *
+   * 강사가 본인 강의의 포인트 지급 현황을 조회한다 (읽기 전용).
+   *
+   * 지급 내역 범위: course_complete + lesson_complete + quiz_pass
+   * 예산 부족 미지급 건수: Phase 1에서 DB 미기록 → 0 반환 (로그 기반으로만 추적 가능)
+   */
+  static async coursePoints(req: Request, res: Response): Promise<any> {
+    try {
+      const { courseId } = req.params;
+      const userId = (req as any).user?.id;
+
+      const courseRepo = AppDataSource.getRepository(Course);
+      const course = await courseRepo.findOne({
+        where: { id: courseId },
+        select: ['id', 'instructorId'],
+      });
+      if (!course) return BaseController.notFound(res, 'Course not found');
+
+      const isKpaAdmin = await roleAssignmentService.hasAnyRole(userId, ['kpa:admin']);
+      if (course.instructorId !== userId && !isKpaAdmin) {
+        return BaseController.forbidden(res, '본인 콘텐츠의 포인트 현황만 조회할 수 있습니다');
+      }
+
+      const pageNum = Math.max(1, parseInt(String(req.query.page ?? '1'), 10) || 1);
+      const limitNum = Math.min(100, Math.max(1, parseInt(String(req.query.limit ?? '50'), 10) || 50));
+
+      // ── 이 강의에 속한 레슨/퀴즈 ID 수집 ───────────────────────────────
+      const lessons = await AppDataSource.getRepository('Lesson')
+        .createQueryBuilder('l')
+        .select('l.id')
+        .where('l.courseId = :courseId', { courseId })
+        .getMany();
+      const lessonIds = lessons.map((l: any) => l.id);
+
+      let quizIds: string[] = [];
+      if (lessonIds.length > 0) {
+        const quizzes = await AppDataSource.getRepository('Quiz')
+          .createQueryBuilder('q')
+          .select('q.id')
+          .where('q.lessonId IN (:...lessonIds)', { lessonIds })
+          .getMany();
+        quizIds = quizzes.map((q: any) => q.id);
+      }
+
+      // ── CreditTransaction 기본 필터 조건 빌더 ───────────────────────────
+      const buildBase = () => {
+        const conditions: string[] = [
+          '(ct.sourceType = :courseCompleteType AND ct.sourceId = :courseId)',
+        ];
+        const params: Record<string, any> = {
+          courseCompleteType: 'course_complete',
+          courseId,
+        };
+        if (lessonIds.length > 0) {
+          conditions.push('(ct.sourceType = :lessonCompleteType AND ct.sourceId IN (:...lessonIds))');
+          params.lessonCompleteType = 'lesson_complete';
+          params.lessonIds = lessonIds;
+        }
+        if (quizIds.length > 0) {
+          conditions.push('(ct.sourceType = :quizPassType AND ct.sourceId IN (:...quizIds))');
+          params.quizPassType = 'quiz_pass';
+          params.quizIds = quizIds;
+        }
+        return AppDataSource.getRepository('CreditTransaction')
+          .createQueryBuilder('ct')
+          .where(conditions.join(' OR '), params);
+      };
+
+      // ── 요약 집계 ────────────────────────────────────────────────────────
+      const summary = await buildBase()
+        .select('COALESCE(SUM(ct.amount), 0)::int', 'totalAmount')
+        .addSelect('COUNT(*)::int', 'totalCount')
+        .addSelect('COUNT(DISTINCT ct.userId)::int', 'uniqueUsers')
+        .addSelect('MAX(ct.createdAt)', 'lastGrantedAt')
+        .getRawOne();
+
+      // ── 페이지네이션 총 건수 ──────────────────────────────────────────────
+      const total = await buildBase().getCount();
+
+      // ── 포인트 지급 목록 (페이지네이션) ─────────────────────────────────
+      const txEntities = await buildBase()
+        .orderBy('ct.createdAt', 'DESC')
+        .skip((pageNum - 1) * limitNum)
+        .take(limitNum)
+        .getMany();
+
+      // 사용자 이름 일괄 조회
+      const txUserIds = [...new Set(txEntities.map((t: any) => t.userId))].filter(Boolean);
+      const userNameMap = new Map<string, string>();
+      if (txUserIds.length > 0) {
+        const userRows = await AppDataSource.query(
+          `SELECT id, name FROM users WHERE id = ANY($1::uuid[])`,
+          [txUserIds],
+        );
+        for (const u of userRows) {
+          userNameMap.set(u.id, u.name || '(이름 없음)');
+        }
+      }
+
+      const SOURCE_TYPE_LABELS: Record<string, string> = {
+        course_complete: '강의 완료',
+        lesson_complete: '레슨 완료',
+        quiz_pass: '퀴즈 통과',
+        admin_grant: '운영자 지급',
+      };
+
+      const transactions = txEntities.map((tx: any) => ({
+        id: tx.id,
+        userId: tx.userId,
+        userName: userNameMap.get(tx.userId) ?? '(이름 없음)',
+        amount: tx.amount,
+        sourceType: tx.sourceType,
+        sourceLabel: SOURCE_TYPE_LABELS[tx.sourceType] ?? tx.sourceType,
+        description: tx.description,
+        grantedAt: tx.createdAt,
+        status: 'granted' as const,
+      }));
+
+      return BaseController.ok(res, {
+        summary: {
+          totalAmount: Number(summary?.totalAmount ?? 0),
+          totalCount: Number(summary?.totalCount ?? 0),
+          uniqueUsers: Number(summary?.uniqueUsers ?? 0),
+          lastGrantedAt: summary?.lastGrantedAt ?? null,
+          insufficientBudgetCount: 0, // Phase 1: DB 미기록 (로그 기반으로만 추적 가능)
+        },
+        transactions,
+        pagination: {
+          page: pageNum,
+          limit: limitNum,
+          total,
+          totalPages: Math.ceil(total / limitNum),
+        },
+      });
+    } catch (error: any) {
+      logger.error('[InstructorController.coursePoints] Error', { error: error.message });
+      return BaseController.error(res, error);
+    }
+  }
 }
