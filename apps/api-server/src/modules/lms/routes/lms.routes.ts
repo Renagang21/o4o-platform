@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { CourseController } from '../controllers/CourseController.js';
 import { LessonController } from '../controllers/LessonController.js';
 import { EnrollmentController } from '../controllers/EnrollmentController.js';
@@ -11,14 +11,29 @@ import { QuizController } from '../controllers/QuizController.js';
 import { AssignmentController } from '../controllers/AssignmentController.js';
 // WO-O4O-COMPLETION-V1
 import { CompletionController } from '../controllers/CompletionController.js';
-import { requireAuth, optionalAuth } from '../../../common/middleware/auth.middleware.js';
+import { requireAuth, optionalAuth, requireRole } from '../../../common/middleware/auth.middleware.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import { requireEnrollment } from '../middleware/requireEnrollment.js';
 import { requireInstructor } from '../middleware/requireInstructor.js';
 // WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: KPA scope guard replaces legacy requireKpaAdmin
 import { KPA_SCOPE_CONFIG } from '@o4o/security-core';
 import { createMembershipScopeGuard } from '../../../common/middleware/membership-guard.middleware.js';
+// WO-O4O-LMS-GLOBAL-OPERATOR-ROUTES-V1
+import { CourseService } from '../services/CourseService.js';
+import { AppDataSource } from '../../../database/connection.js';
+import logger from '../../../utils/logger.js';
 const requireKpaAdmin = createMembershipScopeGuard(KPA_SCOPE_CONFIG)('kpa:admin');
+
+// WO-O4O-LMS-GLOBAL-OPERATOR-ROUTES-V1: Global LMS operator guard.
+// Accepts platform-level admins + non-KPA service operators (cosmetics, glycopharm).
+// KPA operators use /api/v1/kpa/lms/operator/* (KPA-specific scope guard).
+// This natural separation enforces kpa:operator cannot approve via the global route.
+// Cross-service isolation between non-KPA operators requires Course.serviceKey — WO-O4O-LMS-COURSE-SERVICEKEY-V1.
+const requireLmsOperator = requireRole([
+  'admin', 'super_admin', 'platform:admin', 'platform:super_admin',
+  'cosmetics:admin', 'cosmetics:operator',
+  'glycopharm:admin', 'glycopharm:operator',
+]);
 
 const router: Router = Router();
 
@@ -401,5 +416,97 @@ router.get('/content-analytics/content/:storeContentId', requireAuth, asyncHandl
 
 // GET /api/v1/lms/content-analytics/store/:storeId - Get Store Analytics
 router.get('/content-analytics/store/:storeId', requireAuth, asyncHandler(StoreContentController.getStoreAnalytics));
+
+// ========================================
+// OPERATOR COURSE ACTION ROUTES (WO-O4O-LMS-GLOBAL-OPERATOR-ROUTES-V1)
+// Global operator endpoints for K-Cosmetics, GlycoPharm, and platform admins.
+// KPA operators use /api/v1/kpa/lms/operator/* with requireKpaScope — not duplicated here.
+// ========================================
+
+// POST /api/v1/lms/operator/courses/:id/approve — PENDING_REVIEW → PUBLISHED
+router.post('/operator/courses/:id/approve', requireAuth, requireLmsOperator, asyncHandler(async (req: Request, res: Response) => {
+  const service = CourseService.getInstance();
+  const course = await service.getCourse(req.params.id);
+  if (!course) { return res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); }
+  try {
+    const userRoles: string[] = (req as any).user?.roles || [];
+    const updated = await service.approveCourse(req.params.id, {
+      id: (req as any).user?.id,
+      role: userRoles[0] ?? null,
+    });
+    return res.json({ success: true, data: { course: updated } });
+  } catch (err: any) {
+    if (err.message?.startsWith('INVALID_STATUS_TRANSITION')) {
+      return res.status(400).json({ success: false, error: '검토 대기(PENDING_REVIEW) 상태의 강의만 승인할 수 있습니다.', code: 'INVALID_STATUS_TRANSITION' });
+    }
+    throw err;
+  }
+}));
+
+// POST /api/v1/lms/operator/courses/:id/reject — PENDING_REVIEW → REJECTED + rejectionReason
+router.post('/operator/courses/:id/reject', requireAuth, requireLmsOperator, asyncHandler(async (req: Request, res: Response) => {
+  const service = CourseService.getInstance();
+  const course = await service.getCourse(req.params.id);
+  if (!course) { return res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); }
+  const reason = typeof req.body?.reason === 'string' ? req.body.reason : '';
+  try {
+    const userRoles: string[] = (req as any).user?.roles || [];
+    const updated = await service.rejectCourse(req.params.id, reason, {
+      id: (req as any).user?.id,
+      role: userRoles[0] ?? null,
+    });
+    return res.json({ success: true, data: { course: updated } });
+  } catch (err: any) {
+    if (err.message === 'REJECTION_REASON_REQUIRED') {
+      return res.status(400).json({ success: false, error: '반려 사유를 입력해주세요.', code: 'REJECTION_REASON_REQUIRED' });
+    }
+    if (err.message?.startsWith('INVALID_STATUS_TRANSITION')) {
+      return res.status(400).json({ success: false, error: '검토 대기(PENDING_REVIEW) 상태의 강의만 반려할 수 있습니다.', code: 'INVALID_STATUS_TRANSITION' });
+    }
+    throw err;
+  }
+}));
+
+// POST /api/v1/lms/operator/courses/:id/unpublish — PUBLISHED → DRAFT
+router.post('/operator/courses/:id/unpublish', requireAuth, requireLmsOperator, asyncHandler(async (req: Request, res: Response) => {
+  const service = CourseService.getInstance();
+  const course = await service.getCourse(req.params.id);
+  if (!course) { return res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); }
+  const updated = await service.unpublishCourse(req.params.id);
+  return res.json({ success: true, data: { course: updated } });
+}));
+
+// POST /api/v1/lms/operator/courses/:id/archive — any status → ARCHIVED
+router.post('/operator/courses/:id/archive', requireAuth, requireLmsOperator, asyncHandler(async (req: Request, res: Response) => {
+  const service = CourseService.getInstance();
+  const course = await service.getCourse(req.params.id);
+  if (!course) { return res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); }
+  const updated = await service.archiveCourse(req.params.id);
+  return res.json({ success: true, data: { course: updated } });
+}));
+
+// DELETE /api/v1/lms/operator/courses/:id/hard — ARCHIVED only, cascaded hard delete
+router.delete('/operator/courses/:id/hard', requireAuth, requireLmsOperator, asyncHandler(async (req: Request, res: Response) => {
+  const service = CourseService.getInstance();
+  const course = await service.getCourse(req.params.id);
+  if (!course) { return res.status(404).json({ success: false, error: '강의를 찾을 수 없습니다' }); }
+  if (course.status !== 'archived') {
+    return res.status(400).json({ success: false, error: '종료(보관) 상태의 강의만 완전 삭제할 수 있습니다.' });
+  }
+  const courseId = course.id;
+  const title = course.title;
+  const db = AppDataSource;
+  await db.query(`DELETE FROM lms_progress WHERE "enrollmentId" IN (SELECT id FROM lms_enrollments WHERE "courseId" = $1)`, [courseId]);
+  await db.query(`DELETE FROM lms_progress WHERE "lessonId" IN (SELECT id FROM lms_lessons WHERE "courseId" = $1)`, [courseId]);
+  await db.query(`DELETE FROM lms_quiz_attempts WHERE "quizId" IN (SELECT id FROM lms_quizzes WHERE "courseId" = $1)`, [courseId]);
+  await db.query(`DELETE FROM lms_quizzes WHERE "courseId" = $1`, [courseId]);
+  await db.query(`DELETE FROM lms_certificates WHERE "courseId" = $1`, [courseId]);
+  await db.query(`DELETE FROM lms_enrollments WHERE "courseId" = $1`, [courseId]);
+  await db.query(`DELETE FROM lms_events WHERE "courseId" = $1`, [courseId]);
+  await db.query(`DELETE FROM lms_lessons WHERE "courseId" = $1`, [courseId]);
+  await db.query(`DELETE FROM lms_courses WHERE id = $1`, [courseId]);
+  logger.info('[LmsOperator] COURSE_HARD_DELETED', { operatorId: (req as any).user?.id, courseId, title });
+  return res.json({ success: true, data: { deleted: true, id: courseId, title } });
+}));
 
 export default router;
