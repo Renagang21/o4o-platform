@@ -2,15 +2,16 @@
  * ResourcesPage — GlycoPharm 자료실
  *
  * WO-O4O-RESOURCES-HUB-TEMPLATE-FOUNDATION-V1
+ * WO-O4O-GLYCOPHARM-HUB-RESOURCES-V1: glycoResourcesApi wrapper + usage_type 매핑 적용
  *
  * ResourcesHubTemplate + GlycoPharm adapter.
- * GlycoPharm 전용 API(api.get), 문구는 glycoResourcesConfig에만 위치한다.
- * operator 기능 없음 — read-only 접근.
+ * Route: /resources
+ * API: GET /api/v1/glycopharm/contents?sub_type=resource
  */
 
 import { useMemo } from 'react';
-import { ResourcesHubTemplate, type ResourcesHubConfig } from '@o4o/shared-space-ui';
-import { api } from '@/lib/apiClient';
+import { ResourcesHubTemplate, type ResourcesHubConfig, type ResourcesHubItem } from '@o4o/shared-space-ui';
+import { glycoResourcesApi } from '@/api/resources';
 
 // ─── GlycoPharm Config ────────────────────────────────────────────────────────
 
@@ -25,17 +26,33 @@ function useGlycoResourcesConfig(): ResourcesHubConfig {
 
     fetchItems: async ({ page, limit, search }) => {
       try {
-        const params: Record<string, string | number> = { page, limit };
-        if (search) params.search = search;
-        const res = await api.get('/glycopharm/contents', { params });
-        const data = res.data?.data;
+        const res = await glycoResourcesApi.list({ page, limit, search, sort: 'latest' });
+        const d = res.data?.data;
+        const items = (d?.items ?? []).map((item): ResourcesHubItem => {
+          // usage_type → actionType 매핑 (KPA 패턴)
+          let actionType: 'view' | 'download' | 'external' | 'copy' | undefined;
+          if (item.usage_type === 'LINK') actionType = 'external';
+          else if (item.usage_type === 'DOWNLOAD') actionType = 'download';
+          else if (item.usage_type === 'COPY') actionType = 'copy';
+          else actionType = 'view';
+          return { ...item, actionType };
+        });
         return {
-          items: data?.items ?? [],
-          total: data?.total ?? 0,
-          totalPages: data?.totalPages ?? 1,
+          items,
+          total: d?.total ?? 0,
+          totalPages: d?.totalPages ?? 1,
         };
       } catch {
         return { items: [], total: 0, totalPages: 1 };
+      }
+    },
+
+    fetchDetail: async (id) => {
+      try {
+        const res = await glycoResourcesApi.getDetail(id);
+        return res.data?.data as ResourcesHubItem;
+      } catch {
+        return null as unknown as ResourcesHubItem;
       }
     },
 
