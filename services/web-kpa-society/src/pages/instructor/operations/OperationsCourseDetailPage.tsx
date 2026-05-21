@@ -297,7 +297,7 @@ export default function OperationsCourseDetailPage() {
       align: 'right',
       render: (_v, row) => (
         <span style={{ fontSize: '13px', color: colors.neutral700 }}>
-          {(row.progressPercentage ?? 0).toFixed(1)}%
+          {Number(row.progressPercentage ?? 0).toFixed(0)}%
         </span>
       ),
     },
