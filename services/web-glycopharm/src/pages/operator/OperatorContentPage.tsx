@@ -13,6 +13,7 @@
 
 import { CmsContentManager } from '@o4o/operator-core-ui';
 import { getAccessToken } from '@o4o/auth-client';
+import { RichTextEditor } from '@o4o/content-editor';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
@@ -22,6 +23,7 @@ export default function OperatorContentPage() {
       apiBase={`${API_BASE_URL}/api/v1/glycopharm`}
       serviceKey="glycopharm"
       getToken={getAccessToken}
+      RichTextEditor={RichTextEditor}
     />
   );
 }

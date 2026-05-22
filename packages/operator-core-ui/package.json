@@ -9,9 +9,12 @@
   "exports": {
     ".": "./src/index.ts",
     "./modules/stores": "./src/modules/stores/index.ts",
-    "./modules/guide-contents": "./src/modules/guide-contents/index.ts"
+    "./modules/guide-contents": "./src/modules/guide-contents/index.ts",
+    "./modules/cms-content": "./src/modules/cms-content/index.ts"
   },
   "dependencies": {
+    "@o4o/content-editor": "workspace:*",
+    "@o4o/error-handling": "workspace:*",
     "@o4o/operator-ux-core": "workspace:*",
     "@o4o/shared-space-ui": "workspace:*",
     "@o4o/ui": "workspace:*"

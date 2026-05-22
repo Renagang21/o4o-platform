@@ -15,7 +15,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from '@o4o/error-handling';
 import {
   FileText,
   Megaphone,
@@ -36,12 +35,19 @@ import {
 import { ActionBar, BulkResultModal, RowActionMenu, BaseDetailDrawer } from '@o4o/ui';
 import { DataTable, useBatchAction, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
-import { RichTextEditor } from '@o4o/content-editor';
 
 export interface CmsContentManagerProps {
   apiBase: string;
   serviceKey: string;
   getToken: () => string | null;
+  /** RichTextEditor component injected by the consuming service */
+  RichTextEditor: React.ComponentType<{
+    value: string;
+    onChange: (v: { html: string }) => void;
+    preset?: 'full' | 'compact';
+    minHeight?: string;
+    placeholder?: string;
+  }>;
   assetCopyEnabled?: boolean;
   storeContentPath?: string;
   assetCopyFn?: (sourceService: string, assetId: string) => Promise<void>;
@@ -78,7 +84,7 @@ function getEnvApiBase(): string {
   }
 }
 
-function makeApiFetch(apiBase: string, getToken: () => string | null) {
+function makeApiFetch(getToken: () => string | null) {
   return async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
     const token = getToken();
     const envBase = getEnvApiBase();
@@ -122,12 +128,13 @@ export function CmsContentManager({
   apiBase,
   serviceKey,
   getToken,
+  RichTextEditor,
   assetCopyEnabled = false,
   storeContentPath = '/store/content',
   assetCopyFn,
 }: CmsContentManagerProps) {
   const navigate = useNavigate();
-  const apiFetch = makeApiFetch(apiBase, getToken);
+  const apiFetch = makeApiFetch(getToken);
 
   const [activeTab, setActiveTab] = useState<TabKey>('notice');
   const [showEditor, setShowEditor] = useState(false);
@@ -224,6 +231,7 @@ export function CmsContentManager({
           onSaved={handleSaved}
           apiBase={apiBase}
           apiFetch={apiFetch}
+          RichTextEditor={RichTextEditor}
         />
       )}
     </div>
@@ -262,6 +270,7 @@ function ContentList({
   const [items, setItems] = useState<CmsContent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [statusFilter, setStatusFilter] = useState<string>('');
@@ -308,7 +317,7 @@ function ContentList({
       });
       await fetchItems();
     } catch (e: any) {
-      toast.error(e.message || '상태 변경에 실패했습니다.');
+      setActionError(e.message || '상태 변경에 실패했습니다.');
     } finally {
       setActionLoading(null);
     }
@@ -320,7 +329,7 @@ function ContentList({
       await apiFetch(`${apiBase}/news/${item.id}`, { method: 'DELETE' });
       onDeleted();
     } catch (e: any) {
-      toast.error(e.message || '보관 처리에 실패했습니다.');
+      setActionError(e.message || '보관 처리에 실패했습니다.');
     } finally {
       setActionLoading(null);
     }
@@ -330,10 +339,11 @@ function ContentList({
     setActionLoading(item.id);
     try {
       await apiFetch(`${apiBase}/news/${item.id}/hard`, { method: 'DELETE' });
-      toast.success('콘텐츠가 완전 삭제되었습니다.');
+      onCopyToast('콘텐츠가 완전 삭제되었습니다.');
+      setTimeout(() => onCopyToast(null), 3000);
       onDeleted();
     } catch (e: any) {
-      toast.error(e.message || '완전 삭제에 실패했습니다.');
+      setActionError(e.message || '완전 삭제에 실패했습니다.');
     } finally {
       setActionLoading(null);
     }
@@ -603,6 +613,15 @@ function ContentList({
 
   return (
     <div>
+      {actionError && (
+        <div className="mb-3 flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-100 px-3 py-2 rounded-lg">
+          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+          {actionError}
+          <button onClick={() => setActionError(null)} className="ml-auto text-red-400 hover:text-red-600">
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
       <div className="flex items-center gap-3 mb-4 flex-wrap">
         <div className="relative">
           <Search className="w-4 h-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -781,6 +800,7 @@ function ContentEditor({
   onSaved,
   apiBase,
   apiFetch,
+  RichTextEditor,
 }: {
   type: ContentType;
   editTarget: CmsContent | null;
@@ -788,6 +808,7 @@ function ContentEditor({
   onSaved: () => void;
   apiBase: string;
   apiFetch: <T>(path: string, options?: RequestInit) => Promise<T>;
+  RichTextEditor: CmsContentManagerProps['RichTextEditor'];
 }) {
   const isEdit = !!editTarget;
   const [title, setTitle] = useState(editTarget?.title || '');
@@ -874,7 +895,7 @@ function ContentEditor({
             <label className="block text-sm font-medium text-slate-700 mb-1">내용</label>
             <RichTextEditor
               value={body}
-              onChange={({ html }) => setBody(html)}
+              onChange={({ html }: { html: string }) => setBody(html)}
               preset="full"
               minHeight="300px"
               placeholder="콘텐츠 내용을 입력하세요"

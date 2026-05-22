@@ -10,6 +10,7 @@
 import { CmsContentManager } from '@o4o/operator-core-ui';
 import { getAccessToken } from '../../contexts/AuthContext';
 import { assetSnapshotApi } from '../../api/assetSnapshot';
+import { RichTextEditor } from '@o4o/content-editor';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
@@ -27,6 +28,7 @@ export default function ContentManagementPage() {
       apiBase={`${API_BASE_URL}/api/v1/kpa`}
       serviceKey="kpa-society"
       getToken={getAccessToken}
+      RichTextEditor={RichTextEditor}
       assetCopyEnabled
       storeContentPath="/store/content?tab=cms"
       assetCopyFn={kpaAssetCopyFn}
