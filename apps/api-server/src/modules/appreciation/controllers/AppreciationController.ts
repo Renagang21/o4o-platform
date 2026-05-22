@@ -85,6 +85,28 @@ export class AppreciationController extends BaseController {
     }
   }
 
+  /** GET /api/v1/appreciation/:targetType/:targetId/recent — 최근 감사 메시지 (WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1) */
+  static async getRecent(req: Request, res: Response): Promise<any> {
+    try {
+      const { targetType, targetId } = req.params;
+
+      if (!APPRECIATION_TARGET_TYPES.includes(targetType as AppreciationTargetType)) {
+        return BaseController.badRequest(res, '지원하지 않는 targetType');
+      }
+
+      const items = await AppreciationService.getInstance().getRecent(
+        targetType as AppreciationTargetType,
+        targetId,
+        5,
+      );
+
+      return BaseController.ok(res, { items });
+    } catch (e: any) {
+      logger.error('[AppreciationController.getRecent]', { error: e.message });
+      return BaseController.error(res, e);
+    }
+  }
+
   /** GET /api/v1/appreciation/:targetType/:targetId/summary */
   static async getSummary(req: Request, res: Response): Promise<any> {
     try {

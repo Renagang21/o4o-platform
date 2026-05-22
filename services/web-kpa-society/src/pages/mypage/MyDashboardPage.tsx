@@ -15,6 +15,7 @@ import { Link } from 'react-router-dom';
 import { LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { MyPageLayout } from '../../layouts/MyPageLayout';
 import { mypageApi } from '../../api';
+import { appreciationApi, type AppreciationSend } from '../../api/appreciation';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 import type { UserActivity } from '../../api/mypage';
@@ -43,6 +44,11 @@ export function MyDashboardPage() {
   const [activities, setActivities] = useState<UserActivity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1
+  const [receivedTotal, setReceivedTotal] = useState(0);
+  const [sentTotal, setSentTotal] = useState(0);
+  const [recentReceived, setRecentReceived] = useState<AppreciationSend[]>([]);
+  const [recentSent, setRecentSent] = useState<AppreciationSend[]>([]);
 
   useEffect(() => {
     if (user) loadData();
@@ -60,6 +66,23 @@ export function MyDashboardPage() {
 
       setSummary(summaryRes.data);
       setActivities(activitiesRes.data || []);
+
+      // WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1: 감사 활동 로드
+      Promise.allSettled([
+        appreciationApi.getMyReceived({ limit: 5 }),
+        appreciationApi.getMySent({ limit: 5 }),
+      ]).then(([recRes, sentRes]) => {
+        if (recRes.status === 'fulfilled') {
+          const items: AppreciationSend[] = (recRes.value.data as any) ?? [];
+          setRecentReceived(items.slice(0, 5));
+          setReceivedTotal(items.reduce((s, i) => s + i.amount, 0));
+        }
+        if (sentRes.status === 'fulfilled') {
+          const items: AppreciationSend[] = (sentRes.value.data as any) ?? [];
+          setRecentSent(items.slice(0, 5));
+          setSentTotal(items.reduce((s, i) => s + i.amount, 0));
+        }
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : '데이터를 불러오는데 실패했습니다.');
     } finally {
@@ -205,6 +228,53 @@ export function MyDashboardPage() {
           </div>
         )}
       </Card>
+
+      {/* WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1: 내 감사 활동 */}
+      {(receivedTotal > 0 || sentTotal > 0 || recentReceived.length > 0 || recentSent.length > 0) && (
+        <Card padding="large" style={{ marginTop: '24px' }}>
+          <h3 style={styles.sectionTitle}>내 감사 활동</h3>
+          <div style={aStyles.totals}>
+            <div style={aStyles.totalItem}>
+              <span style={aStyles.totalIcon}>🎁</span>
+              <span style={aStyles.totalValue}>{receivedTotal.toLocaleString()}P</span>
+              <span style={aStyles.totalLabel}>받은 감사</span>
+            </div>
+            <div style={aStyles.totalItem}>
+              <span style={aStyles.totalIcon}>💝</span>
+              <span style={aStyles.totalValue}>{sentTotal.toLocaleString()}P</span>
+              <span style={aStyles.totalLabel}>보낸 감사</span>
+            </div>
+          </div>
+
+          {recentReceived.length > 0 && (
+            <div style={aStyles.listBlock}>
+              <p style={aStyles.listLabel}>최근 받은 감사</p>
+              {recentReceived.map((r, i) => (
+                <div key={i} style={aStyles.listRow}>
+                  <span style={aStyles.listType}>🎁</span>
+                  <span style={aStyles.listTarget}>{r.targetType === 'forum_post' ? '포럼' : r.targetType === 'lms_course' ? '강의' : '콘텐츠'}</span>
+                  {r.message && <span style={aStyles.listMsg}>"{r.message.length > 30 ? r.message.slice(0, 30) + '…' : r.message}"</span>}
+                  <span style={aStyles.listAmt}>+{r.amount}P</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {recentSent.length > 0 && (
+            <div style={{ ...aStyles.listBlock, marginTop: '12px' }}>
+              <p style={aStyles.listLabel}>최근 보낸 감사</p>
+              {recentSent.map((r, i) => (
+                <div key={i} style={aStyles.listRow}>
+                  <span style={aStyles.listType}>💝</span>
+                  <span style={aStyles.listTarget}>{r.targetType === 'forum_post' ? '포럼' : r.targetType === 'lms_course' ? '강의' : '콘텐츠'}</span>
+                  {r.message && <span style={aStyles.listMsg}>"{r.message.length > 30 ? r.message.slice(0, 30) + '…' : r.message}"</span>}
+                  <span style={aStyles.listAmt}>-{r.amount}P</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
+      )}
 
       {/* 바로가기 */}
       <div style={styles.quickLinks}>
@@ -526,5 +596,84 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#115E59',
     fontWeight: 500,
     whiteSpace: 'nowrap' as const,
+  },
+};
+
+// WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1
+const aStyles: Record<string, React.CSSProperties> = {
+  totals: {
+    display: 'flex',
+    gap: '16px',
+    marginBottom: '16px',
+  },
+  totalItem: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    padding: '16px',
+    backgroundColor: '#fffbeb',
+    borderRadius: '10px',
+    border: '1px solid #fde68a',
+    gap: '4px',
+  },
+  totalIcon: {
+    fontSize: '24px',
+  },
+  totalValue: {
+    fontSize: '22px',
+    fontWeight: 700,
+    color: '#92400e',
+  },
+  totalLabel: {
+    fontSize: '12px',
+    color: '#b45309',
+    fontWeight: 500,
+  },
+  listBlock: {
+    paddingTop: '12px',
+    borderTop: '1px solid #fef3c7',
+  },
+  listLabel: {
+    margin: '0 0 8px',
+    fontSize: '12px',
+    fontWeight: 600,
+    color: '#b45309',
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.05em',
+  },
+  listRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '6px 0',
+    borderBottom: '1px solid #fef9e7',
+  },
+  listType: {
+    fontSize: '14px',
+    flexShrink: 0,
+  },
+  listTarget: {
+    fontSize: '12px',
+    color: '#6b7280',
+    backgroundColor: '#f3f4f6',
+    padding: '2px 6px',
+    borderRadius: '4px',
+    flexShrink: 0,
+  },
+  listMsg: {
+    fontSize: '13px',
+    color: '#78350f',
+    fontStyle: 'italic',
+    flex: 1,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap' as const,
+  },
+  listAmt: {
+    fontSize: '13px',
+    fontWeight: 600,
+    color: '#92400e',
+    flexShrink: 0,
   },
 };

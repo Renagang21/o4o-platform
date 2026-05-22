@@ -9,6 +9,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { contentApi, type ContentItem } from '../../api/content';
+import { appreciationApi } from '../../api/appreciation';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
 
@@ -39,6 +40,9 @@ export function ContentDetailPage() {
   const [likeCount, setLikeCount] = useState(0);
   const [recommending, setRecommending] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
+  // WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1
+  const [appreciationSummary, setAppreciationSummary] = useState<{ totalAmount: number; count: number } | null>(null);
+  const [appreciationRecent, setAppreciationRecent] = useState<{ amount: number; message?: string; createdAt: string }[]>([]);
 
   useEffect(() => {
     if (!id) return;
@@ -56,6 +60,15 @@ export function ContentDetailPage() {
 
     // Track view
     contentApi.trackView(id).catch(() => {});
+
+    // WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1: 감사 집계 + 최근 메시지
+    Promise.allSettled([
+      appreciationApi.getSummary('content', id),
+      appreciationApi.getRecent('content', id),
+    ]).then(([sumRes, recentRes]) => {
+      if (sumRes.status === 'fulfilled') setAppreciationSummary(sumRes.value.data);
+      if (recentRes.status === 'fulfilled') setAppreciationRecent(recentRes.value.data?.items ?? []);
+    });
   }, [id]);
 
   const handleRecommend = async () => {
@@ -204,7 +217,29 @@ export function ContentDetailPage() {
               ✏️ 수정
             </Link>
           )}
+
+          {/* WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1: 감사 집계 */}
+          {appreciationSummary && appreciationSummary.totalAmount > 0 && (
+            <span style={cStyles.appreciationStat}>
+              🎁 {appreciationSummary.totalAmount.toLocaleString()}P · 👥 {appreciationSummary.count}명
+            </span>
+          )}
         </div>
+
+        {/* WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1: 최근 감사 메시지 */}
+        {appreciationRecent.length > 0 && (
+          <div style={cStyles.recentBlock}>
+            <p style={cStyles.recentLabel}>최근 감사</p>
+            {appreciationRecent.map((r, i) => (
+              <div key={i} style={cStyles.recentRow}>
+                <span style={cStyles.recentMsg}>
+                  "{r.message!.length > 60 ? r.message!.slice(0, 60) + '…' : r.message}"
+                </span>
+                <span style={cStyles.recentAmt}>+{r.amount}P</span>
+              </div>
+            ))}
+          </div>
+        )}
       </article>
     </div>
   );
@@ -401,6 +436,56 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: 8,
     textDecoration: 'none',
     transition: 'all 0.15s',
+  },
+};
+
+// WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1
+const cStyles: Record<string, React.CSSProperties> = {
+  appreciationStat: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    padding: '6px 12px',
+    backgroundColor: '#fffbeb',
+    border: '1px solid #fde68a',
+    borderRadius: '20px',
+    fontSize: '13px',
+    color: '#92400e',
+    fontWeight: 500,
+  },
+  recentBlock: {
+    marginTop: '20px',
+    padding: '16px 20px',
+    backgroundColor: '#fffbeb',
+    borderRadius: '10px',
+    border: '1px solid #fde68a',
+  },
+  recentLabel: {
+    margin: '0 0 10px',
+    fontSize: '12px',
+    fontWeight: 600,
+    color: '#b45309',
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
+  },
+  recentRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '5px 0',
+    borderBottom: '1px solid #fef3c7',
+  },
+  recentMsg: {
+    fontSize: '13px',
+    color: '#78350f',
+    fontStyle: 'italic',
+    flex: 1,
+    marginRight: '12px',
+  },
+  recentAmt: {
+    fontSize: '13px',
+    fontWeight: 600,
+    color: '#92400e',
+    whiteSpace: 'nowrap',
   },
 };
 

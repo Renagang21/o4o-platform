@@ -36,6 +36,8 @@ export function ForumDetailPage() {
   const [appreciationMsg, setAppreciationMsg] = useState('');
   const [isSendingAppreciation, setIsSendingAppreciation] = useState(false);
   const [appreciationSummary, setAppreciationSummary] = useState<{ totalAmount: number; count: number } | null>(null);
+  // WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1
+  const [appreciationRecent, setAppreciationRecent] = useState<{ amount: number; message?: string; createdAt: string }[]>([]);
   const [isPinning, setIsPinning] = useState(false);
   // WO-O4O-KPA-CLOSED-FORUM-FRONTEND-ACCESS-UX-V1
   const [closedForumId, setClosedForumId] = useState<string | null>(null);
@@ -58,10 +60,14 @@ export function ForumDetailPage() {
       setComments(commentsRes.data);
       // WO-FORUM-LIKE-SYSTEM-V1: initialize isLiked from server response
       setIsLiked(!!(postRes.data as any)?.isLiked);
-      // WO-O4O-APPRECIATION-POINT-LIKE-SYSTEM-PHASE1-V1: 감사 집계 로드
+      // WO-O4O-APPRECIATION-POINT-LIKE-SYSTEM-PHASE1-V1 / WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1: 감사 집계 + 최근 메시지
       try {
-        const sumRes = await appreciationApi.getSummary('forum_post', id!);
-        setAppreciationSummary(sumRes.data);
+        const [sumRes, recentRes] = await Promise.allSettled([
+          appreciationApi.getSummary('forum_post', id!),
+          appreciationApi.getRecent('forum_post', id!),
+        ]);
+        if (sumRes.status === 'fulfilled') setAppreciationSummary(sumRes.value.data);
+        if (recentRes.status === 'fulfilled') setAppreciationRecent(recentRes.value.data?.items ?? []);
       } catch {
         // non-critical
       }
@@ -128,9 +134,13 @@ export function ForumDetailPage() {
       setShowAppreciation(false);
       setAppreciationAmount('');
       setAppreciationMsg('');
-      // 집계 갱신
-      const sumRes = await appreciationApi.getSummary('forum_post', post.id);
-      setAppreciationSummary(sumRes.data);
+      // 집계 + 최근 메시지 갱신
+      const [sumRes, recentRes] = await Promise.allSettled([
+        appreciationApi.getSummary('forum_post', post.id),
+        appreciationApi.getRecent('forum_post', post.id),
+      ]);
+      if (sumRes.status === 'fulfilled') setAppreciationSummary(sumRes.value.data);
+      if (recentRes.status === 'fulfilled') setAppreciationRecent(recentRes.value.data?.items ?? []);
     } catch (err: any) {
       const msg = err?.message || '';
       if (msg.includes('INSUFFICIENT_BALANCE') || msg.includes('부족')) toast.error('포인트가 부족합니다');
@@ -286,17 +296,20 @@ export function ForumDetailPage() {
             {isLiked ? '❤️' : '🤍'} 좋아요{post.likeCount > 0 ? ` ${post.likeCount}` : ''}
           </button>
 
-          {/* WO-O4O-APPRECIATION-POINT-LIKE-SYSTEM-PHASE1-V1 */}
+          {/* WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1 */}
           {user && (
             <button
               style={styles.appreciationButton}
               onClick={() => setShowAppreciation(true)}
             >
-              🎁 감사하기{appreciationSummary && appreciationSummary.totalAmount > 0 ? ` ${appreciationSummary.totalAmount.toLocaleString()}P` : ''}
+              🎁 감사하기
+              {appreciationSummary && appreciationSummary.totalAmount > 0 && (
+                <span style={styles.appreciationBtnBadge}>{appreciationSummary.totalAmount.toLocaleString()}P · {appreciationSummary.count}명</span>
+              )}
             </button>
           )}
           {!user && appreciationSummary && appreciationSummary.totalAmount > 0 && (
-            <span style={styles.appreciationCount}>🎁 {appreciationSummary.totalAmount.toLocaleString()}P</span>
+            <span style={styles.appreciationCount}>🎁 {appreciationSummary.totalAmount.toLocaleString()}P · {appreciationSummary.count}명</span>
           )}
 
           <div style={styles.authorActions}>
@@ -332,6 +345,31 @@ export function ForumDetailPage() {
           </div>
         </div>
       </Card>
+
+      {/* WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1: 감사 집계 + 최근 메시지 */}
+      {(appreciationSummary && appreciationSummary.totalAmount > 0) && (
+        <div style={styles.appreciationCultureBlock}>
+          <div style={styles.appreciationStats}>
+            <span style={styles.appreciationStatItem}>🎁 감사 <strong>{appreciationSummary.totalAmount.toLocaleString()}P</strong></span>
+            <span style={styles.appreciationStatSep}>·</span>
+            <span style={styles.appreciationStatItem}>👥 감사한 사람 <strong>{appreciationSummary.count}명</strong></span>
+          </div>
+
+          {appreciationRecent.length > 0 && (
+            <div style={styles.appreciationMessages}>
+              <p style={styles.appreciationMessagesLabel}>최근 감사</p>
+              {appreciationRecent.map((r, i) => (
+                <div key={i} style={styles.appreciationMessageRow}>
+                  <span style={styles.appreciationMessageText}>
+                    "{r.message!.length > 60 ? r.message!.slice(0, 60) + '…' : r.message}"
+                  </span>
+                  <span style={styles.appreciationMessageAmount}>+{r.amount}P</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* WO-O4O-APPRECIATION-POINT-LIKE-SYSTEM-PHASE1-V1: 감사 포인트 모달 */}
       {showAppreciation && (
@@ -695,6 +733,67 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 500,
     border: `1px solid ${colors.neutral300}`,
     transition: 'all 0.2s',
+  },
+  // WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1
+  appreciationCultureBlock: {
+    marginTop: '16px',
+    padding: '16px 20px',
+    backgroundColor: '#fffbeb',
+    borderRadius: '10px',
+    border: '1px solid #fde68a',
+  },
+  appreciationStats: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    fontSize: '14px',
+    color: '#92400e',
+  },
+  appreciationStatItem: {
+    fontSize: '14px',
+    color: '#92400e',
+  },
+  appreciationStatSep: {
+    color: '#d97706',
+    fontSize: '12px',
+  },
+  appreciationMessages: {
+    marginTop: '12px',
+    paddingTop: '12px',
+    borderTop: '1px solid #fde68a',
+  },
+  appreciationMessagesLabel: {
+    margin: '0 0 8px',
+    fontSize: '12px',
+    fontWeight: 600,
+    color: '#b45309',
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.05em',
+  },
+  appreciationMessageRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '6px 0',
+    borderBottom: '1px solid #fef3c7',
+  },
+  appreciationMessageText: {
+    fontSize: '13px',
+    color: '#78350f',
+    fontStyle: 'italic',
+    flex: 1,
+    marginRight: '12px',
+  },
+  appreciationMessageAmount: {
+    fontSize: '13px',
+    fontWeight: 600,
+    color: '#92400e',
+    whiteSpace: 'nowrap' as const,
+  },
+  appreciationBtnBadge: {
+    marginLeft: '6px',
+    fontSize: '12px',
+    opacity: 0.8,
   },
   // WO-O4O-APPRECIATION-POINT-LIKE-SYSTEM-PHASE1-V1
   appreciationButton: {

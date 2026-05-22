@@ -22,4 +22,7 @@ router.get('/my-received', requireAuth, asyncHandler(AppreciationController.getM
 // GET /api/v1/appreciation/:targetType/:targetId/summary — 대상 감사 집계 (공개)
 router.get('/:targetType/:targetId/summary', optionalAuth, asyncHandler(AppreciationController.getSummary));
 
+// GET /api/v1/appreciation/:targetType/:targetId/recent — 최근 감사 메시지 (공개, WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1)
+router.get('/:targetType/:targetId/recent', optionalAuth, asyncHandler(AppreciationController.getRecent));
+
 export default router;

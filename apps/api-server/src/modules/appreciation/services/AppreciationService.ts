@@ -168,6 +168,23 @@ export class AppreciationService {
     return { items, total };
   }
 
+  /** 대상 콘텐츠의 최근 감사 메시지 (메시지 있는 것만, WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1) */
+  async getRecent(
+    targetType: AppreciationTargetType,
+    targetId: string,
+    limit = 5,
+  ): Promise<AppreciationSend[]> {
+    return this.repo
+      .createQueryBuilder('a')
+      .where(
+        "a.targetType = :targetType AND a.targetId = :targetId AND a.message IS NOT NULL AND a.message != ''",
+        { targetType, targetId },
+      )
+      .orderBy('a.createdAt', 'DESC')
+      .take(limit)
+      .getMany();
+  }
+
   /** 내가 받은 감사 목록 */
   async getMyReceived(
     userId: string,

@@ -11,6 +11,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { lmsApi, normalizeEnrollment } from '../../api/lms';
+import { appreciationApi } from '../../api/appreciation';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 import type { Course, Lesson, Enrollment } from '../../types';
@@ -27,6 +28,8 @@ export function LmsCourseDetailPage() {
   // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-POLICY-V1: 회원제 강의 + 비로그인 → 로그인 유도
   const [needLogin, setNeedLogin] = useState(false);
   const [enrolling, setEnrolling] = useState(false);
+  // WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1
+  const [appreciationSummary, setAppreciationSummary] = useState<{ totalAmount: number; count: number } | null>(null);
 
   useEffect(() => {
     if (id) loadData();
@@ -52,6 +55,9 @@ export function LmsCourseDetailPage() {
       } catch {
         setLessons([]);
       }
+
+      // WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1: 감사 집계
+      appreciationApi.getSummary('lms_course', id!).then((r) => setAppreciationSummary(r.data)).catch(() => {});
 
       // 진행 정보 확인 (로그인 시)
       if (user) {
@@ -195,6 +201,15 @@ export function LmsCourseDetailPage() {
               <span>⏱ {Math.floor(course.duration / 60)}시간 {course.duration % 60}분</span>
               <span>·</span>
               <span>{course.enrollmentCount}명 진행중</span>
+              {/* WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1 */}
+              {appreciationSummary && appreciationSummary.totalAmount > 0 && (
+                <>
+                  <span>·</span>
+                  <span style={{ color: '#92400e', fontWeight: 500 }}>
+                    🎁 감사 {appreciationSummary.totalAmount.toLocaleString()}P · 👥 {appreciationSummary.count}명
+                  </span>
+                </>
+              )}
             </div>
 
             <div style={styles.description}>

@@ -36,4 +36,7 @@ export const appreciationApi = {
 
   getSummary: (targetType: string, targetId: string) =>
     apiClient.get<ApiResponse<AppreciationSummary>>(`/appreciation/${targetType}/${targetId}/summary`),
+
+  getRecent: (targetType: string, targetId: string) =>
+    apiClient.get<ApiResponse<{ items: AppreciationSend[] }>>(`/appreciation/${targetType}/${targetId}/recent`),
 };

@@ -23,6 +23,7 @@ import { toast } from '@o4o/error-handling';
 import { BaseTable, ActionBar, RowActionMenu, PageSection, PageContainer, Card, type O4OColumn, type ActionBarAction, type RowActionItem } from '@o4o/ui';
 import { PageHeader } from '../../components/common';
 import { forumApi } from '../../api';
+import { appreciationApi } from '../../api/appreciation';
 import { useAuth } from '../../contexts';
 import type { ForumInfo, ForumPost } from '../../types';
 import { buildAiClipboardText, stripHtml, blocksToText } from '../../utils/ai-clipboard';
@@ -184,6 +185,8 @@ export function ForumListPage() {
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [popularTags, setPopularTags] = useState<{ tag: string; count: number }[]>([]);
   const [forums, setForums] = useState<Pick<ForumInfo, 'id' | 'name' | 'slug'>[]>([]);
+  // WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1
+  const [appreciationMap, setAppreciationMap] = useState<Record<string, number>>({});
 
   useEffect(() => { setSearchInput(searchQuery); }, [searchQuery]);
 
@@ -238,6 +241,20 @@ export function ForumListPage() {
   }, [currentPage, searchQuery, activeTag, forumParam]);
 
   useEffect(() => { loadData(); }, [loadData]);
+
+  // WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1: posts 변경 시 감사 총액 배치 로드
+  useEffect(() => {
+    if (posts.length === 0) return;
+    Promise.allSettled(posts.map((p) => appreciationApi.getSummary('forum_post', p.id))).then((results) => {
+      const map: Record<string, number> = {};
+      results.forEach((r, i) => {
+        if (r.status === 'fulfilled' && r.value?.data?.totalAmount > 0) {
+          map[posts[i].id] = r.value.data.totalAmount;
+        }
+      });
+      setAppreciationMap(map);
+    });
+  }, [posts]);
 
   // ── URL param helpers ──
 
@@ -395,6 +412,16 @@ export function ForumListPage() {
       ),
     },
     {
+      key: '_appreciation',
+      header: '🎁',
+      width: '60px',
+      align: 'center',
+      render: (_v, row) => {
+        const amt = appreciationMap[row.id];
+        return amt ? <span className="text-xs font-medium" style={{ color: '#92400e' }}>{amt >= 1000 ? `${(amt / 1000).toFixed(1)}k` : amt}P</span> : null;
+      },
+    },
+    {
       key: 'viewCount',
       header: '👁',
       width: '50px',
@@ -442,7 +469,7 @@ export function ForumListPage() {
         return <RowActionMenu actions={actions} />;
       },
     },
-  ], [user, navigate, handleDeletePost, activeTag]);
+  ], [user, navigate, handleDeletePost, activeTag, appreciationMap]);
 
   // ── Bulk Actions ──
 
