@@ -49,6 +49,7 @@ import { createBillingPreviewController } from './controllers/billing-preview.co
 import { createInvoiceController } from './controllers/invoice.controller.js'; // Phase 3-D: Invoice Finalization
 import { createInvoiceDispatchController } from './controllers/invoice-dispatch.controller.js'; // Phase 3-E: Invoice Dispatch
 import { createGlycopharmCommunityHubController } from './controllers/glycopharm-community-hub.controller.js'; // WO-GLYCOPHARM-COMMUNITY-HUB-IMPLEMENTATION-V1
+import { createGlycopharmEventOfferController } from './controllers/event-offer.controller.js'; // WO-O4O-GLYCOPHARM-EVENT-OFFERS-BACKEND-CANONICAL-ALIGNMENT-V1
 import { createGlycopharmMemberController } from './controllers/glycopharm-member.controller.js'; // WO-GLYCOPHARM-MEMBER-REGISTER-FLOW-V1
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 import { hasAnyServiceRole, logLegacyRoleUsage } from '../../utils/role.utils.js';
@@ -423,6 +424,15 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   // ============================================================================
   const publicController = createPublicController(dataSource);
   router.use('/public', publicController);
+
+  // ============================================================================
+  // Event Offer Routes — WO-O4O-GLYCOPHARM-EVENT-OFFERS-BACKEND-CANONICAL-ALIGNMENT-V1
+  // /api/v1/glycopharm/event-offers/*
+  // ============================================================================
+  router.use('/event-offers', createGlycopharmEventOfferController(
+    dataSource,
+    coreRequireAuth as any,
+  ));
 
   // ============================================================================
   // Contents / Resources Routes
