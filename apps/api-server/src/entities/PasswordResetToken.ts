@@ -31,7 +31,7 @@ export class PasswordResetToken {
    * 토큰을 발급한 서비스 키. 재설정 실행 시 요청 serviceKey와 일치 여부를 검증한다.
    * null은 serviceKey 없이 발급된 기존 토큰(fallback 허용).
    */
-  @Column({ type: 'varchar', length: 100, nullable: true })
+  @Column({ type: 'varchar', length: 100, nullable: true, name: 'service_key' })
   serviceKey: string | null;
 
   @CreateDateColumn()

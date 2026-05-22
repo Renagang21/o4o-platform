@@ -55,7 +55,7 @@ export class PasswordResetService {
       // serviceKey 없는 기존 전역 토큰도 함께 무효화
       await AppDataSource.query(
         `UPDATE "password_reset_tokens" SET "usedAt" = NOW()
-         WHERE "userId" = $1 AND "usedAt" IS NULL AND "serviceKey" IS NULL`,
+         WHERE "userId" = $1 AND "usedAt" IS NULL AND service_key IS NULL`,
         [user.id]
       );
     } else {
